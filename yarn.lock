@@ -1992,6 +1992,11 @@
   resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-7.0.4.tgz#00a5749810b4ad80bff73a61f9cc9d0d521feb3c"
   integrity sha512-WGZCqBZZ0mXN2RxvLHL6/7RCu+OWs28jgQMP04LWfpyJlQUMTR6YU9CNJAKDgbw+EV/u687INXuLUc7FuML/4g==
 
+"@types/vscode@^1.32.0":
+  version "1.51.0"
+  resolved "https://registry.yarnpkg.com/@types/vscode/-/vscode-1.51.0.tgz#f2e324d8385db95030b1454fd1f043618e08097d"
+  integrity sha512-C/jZ35OT5k/rsJyAK8mS1kM++vMcm89oSWegkzxRCvHllIq0cToZAkIDs6eCY4SKrvik3nrhELizyLcM0onbQA==
+
 "@types/webpack-sources@*":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@types/webpack-sources/-/webpack-sources-2.0.0.tgz#08216ab9be2be2e1499beaebc4d469cec81e82a7"
@@ -11633,7 +11638,7 @@ textextensions@^2.5.0:
   integrity sha512-49WtAWS+tcsy93dRt6P0P3AMD2m5PvXRhuEA0kaXos5ZLlujtYmpmFsB+QvWUSxE1ZsstmYXfQ7L40+EcQgpAQ==
 
 theia-vuengine-branding@./extensions/theia-vuengine-branding/theia-vuengine-branding:
-  version "0.0.0"
+  version "1.0.0"
   dependencies:
     "@theia/core" latest
 

@@ -1,6 +1,7 @@
+.DS_Store
 .browser_modules
 node_modules
-plugins
+theia_plugins
 lib
 src-gen
 gen-webpack.config.js

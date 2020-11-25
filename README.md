@@ -2,16 +2,14 @@
 
 A Virtual Boy development environment.
 
-
 ### Action plan
 
 - Mostly bundled built-in VSCode extensions
-    - vuengine/build
-    - vuengine/pad-rom
-    - vuengine/flashboy
-    - vuengine/hyperflash
-    - ...
-
+  - vuengine/build
+  - vuengine/pad-rom
+  - vuengine/flashboy
+  - vuengine/hyperflash
+  - ...
 
 ### Bundled extensions
 
@@ -19,8 +17,11 @@ Before building the main app, build the bundled extensions.
 
 #### Build bundled extensions
 
+For every bundled extension, do the following:
+
 ```sh
 cd extensions/*
+yarn
 yarn prepare
 yarn rebuild:electron
 ```
@@ -32,22 +33,23 @@ cd .\electron-app\
 yarn start
 ```
 
-
 ### Build the application
+
+Preparation
+
+```sh
+nvm use 12
+```
 
 ```sh
 yarn
-yarn theia rebuild:electron
-yarn theia build
 ```
-
 
 ### Test run the application
 
 ```sh
 yarn start
 ```
-
 
 ### Package the application
 
@@ -60,7 +62,6 @@ Or create a preview application (without packaging it)
 ```sh
 yarn package:preview
 ```
-
 
 ### Troubleshooting
 

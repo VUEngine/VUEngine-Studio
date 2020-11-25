@@ -1,6 +1,6 @@
 electronDist: node_modules/electron/dist
-productName: Theia
-appId: theia
+productName: VUEngine Studio
+appId: vuengine
 
 asar: false
 directories:
@@ -12,8 +12,12 @@ files:
   - scripts
   - package.json
 extraResources:
+  - from: bin
+    to: app/bin
   - from: plugins
     to: app/plugins
+  - from: theia_plugins
+    to: app/theia_plugins
 
 win:
   target:
