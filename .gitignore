@@ -1,0 +1,11 @@
+.browser_modules
+node_modules
+plugins
+lib
+src-gen
+gen-webpack.config.js
+dist
+*.log
+
+# binaries später anders einbinden
+bin
