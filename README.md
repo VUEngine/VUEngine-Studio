@@ -22,7 +22,6 @@ For every bundled extension, do the following:
 ```sh
 cd extensions/*
 yarn
-yarn prepare
 yarn rebuild:electron
 ```
 

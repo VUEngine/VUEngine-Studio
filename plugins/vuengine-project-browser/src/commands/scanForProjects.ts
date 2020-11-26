@@ -2,6 +2,8 @@ import * as vscode from "vscode";
 import * as glob from "glob";
 import * as fs from "fs";
 import * as path from "path";
+import * as os from "os";
+
 import * as projects from "../projects";
 import * as extension from "../extension";
 
@@ -12,7 +14,10 @@ export function init(context: vscode.ExtensionContext) {
     "vuengine.projects.scanForProjects",
     (project) => {
       if (!isScanning) {
-        const projectsFolder = "/Users/cradke/dev"; //extension.getExtensionConfig("projects.path");
+        let projectsFolder: string | undefined = vscode.workspace.getConfiguration("vuengine.projects").get("path");
+        if (projectsFolder) {
+          projectsFolder = projectsFolder.replace('%HOME%', path.resolve(os.homedir()));
+        }
         if (projectsFolder && fs.existsSync(projectsFolder)) {
           isScanning = true;
           vscode.window.withProgress(
@@ -29,7 +34,7 @@ export function init(context: vscode.ExtensionContext) {
                     ".",
                 });
 
-                glob(projectsFolder + "/**/.vuengine/", {}, function(
+                glob(projectsFolder + "/**/.vuengine/", {}, function (
                   error,
                   matches
                 ) {
@@ -54,8 +59,8 @@ export function init(context: vscode.ExtensionContext) {
                         addedProjects == 1
                           ? "Found and registered 1 project."
                           : "Found and registered " +
-                            addedProjects +
-                            " projects.";
+                          addedProjects +
+                          " projects.";
                       vscode.window.showInformationMessage(message);
                       vscode.commands.executeCommand(
                         "vuengine.projects.refresh"
@@ -73,8 +78,8 @@ export function init(context: vscode.ExtensionContext) {
         } else {
           vscode.window.showErrorMessage(
             'Directory "' +
-              projectsFolder +
-              '" does not exist. Please check your config.'
+            projectsFolder +
+            '" does not exist. Please check your config.'
           );
         }
       }

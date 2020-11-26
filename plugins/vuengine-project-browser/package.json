@@ -68,6 +68,15 @@
         }
       },
       {
+        "command": "vuengine.projects.clearRegistry",
+        "title": "Clear projects registry",
+        "category": "Projects",
+        "icon": {
+          "dark": "img/icon/dark/trash.svg",
+          "light": "img/icon/light/trash.svg"
+        }
+      },
+      {
         "command": "vuengine.projects.refresh",
         "title": "Refresh",
         "category": "Projects",
@@ -101,6 +110,11 @@
         },
         {
           "command": "vuengine.projects.scanForProjects",
+          "group": "navigation@1",
+          "when": "view == vuengine-studio-projects"
+        },
+        {
+          "command": "vuengine.projects.clearRegistry",
           "group": "navigation@1",
           "when": "view == vuengine-studio-projects"
         }

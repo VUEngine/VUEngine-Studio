@@ -27,6 +27,11 @@ function setProjectRegistry(context: vscode.ExtensionContext) {
   context.globalState.update("vuengine.projects.registry", projectsRegistry);
 }
 
+export function clearProjectRegistry(context: vscode.ExtensionContext) {
+  projectsRegistry = {};
+  setProjectRegistry(context);
+}
+
 export function addCurrentToProjectsRegistry(context: vscode.ExtensionContext) {
   if (
     !vscode.workspace
