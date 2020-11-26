@@ -1,7 +1,7 @@
 {
-  "name": "vuengine-project-browser",
-  "displayName": "vuengine-project-browser",
-  "description": "VUEngine Studio Project Browser",
+  "name": "vuengine-projects",
+  "displayName": "VUEngine Projects",
+  "description": "Projects registry, browser and creation for VUEngine Studio",
   "version": "1.0.0",
   "publisher": "vuengine",
   "engines": {
@@ -17,8 +17,17 @@
   "contributes": {
     "commands": [
       {
+        "command": "vuengine.projects.create",
+        "title": "Create new project",
+        "category": "VUEngine Studio",
+        "icon": {
+          "dark": "img/icon/dark/new-folder.svg",
+          "light": "img/icon/light/new-folder.svg"
+        }
+      },
+      {
         "command": "vuengine.projects.listToOpen",
-        "title": "Open Project",
+        "title": "Open project",
         "category": "Projects",
         "icon": {
           "dark": "img/icon/dark/folder-opened.svg",
@@ -27,7 +36,7 @@
       },
       {
         "command": "vuengine.touchBar.projects.listToOpen",
-        "title": "Open Project",
+        "title": "Open project",
         "category": "Projects",
         "icon": "img/icon/touchBar/open-project.png"
       },
@@ -42,7 +51,7 @@
       },
       {
         "command": "vuengine.projects.openProjectInNewWindow",
-        "title": "Open in New Window",
+        "title": "Open in new window",
         "category": "Projects",
         "icon": {
           "dark": "img/icon/dark/folder-opened.svg",
@@ -51,7 +60,7 @@
       },
       {
         "command": "vuengine.projects.removeFromRegistry",
-        "title": "Remove from Registry",
+        "title": "Remove from registry",
         "category": "Projects",
         "icon": {
           "dark": "img/icon/dark/remove.svg",
@@ -87,7 +96,7 @@
       },
       {
         "command": "vuengine.projects.rename",
-        "title": "Rename Project",
+        "title": "Rename registry entry",
         "category": "Projects",
         "icon": {
           "dark": "img/icon/dark/edit.svg",
@@ -114,8 +123,13 @@
           "when": "view == vuengine-studio-projects"
         },
         {
+          "command": "vuengine.projects.create",
+          "group": "navigation@2",
+          "when": "view == vuengine-studio-projects"
+        },
+        {
           "command": "vuengine.projects.clearRegistry",
-          "group": "navigation@1",
+          "group": "navigation@3",
           "when": "view == vuengine-studio-projects"
         }
       ],
@@ -149,11 +163,6 @@
           "command": "vuengine.projects.removeFromRegistry",
           "group": "registry",
           "when": "view == vuengine-studio-projects && viewItem == currentProject"
-        },
-        {
-          "command": "vuengine.projects.scanForProjects",
-          "group": "actions",
-          "when": "view == vuengine-studio-projects && viewItem == projectsErrorNoProjectsFound"
         }
       ],
       "commandPalette": [
@@ -196,13 +205,19 @@
       "vuengine-studio-projects-bar": [
         {
           "id": "vuengine-studio-projects",
-          "name": "Projects"
+          "name": "Registry"
         }
       ]
     },
+    "viewsWelcome": [
+      {
+        "view": "vuengine-studio-projects",
+        "contents": "No registered projects found.\nOpen any VUEngine project workspace file for the project to be automatically registered (if the respective setting is not disabled).\nYou can scan for projects to be auto-registered in your projects base folder (modify through the respective setting).\n [Create a new Project](command:vuengine.projects.create)\n[Scan for projects](command:vuengine.projects.scanForProjects)"
+      }
+    ],
     "configuration": {
       "type": "object",
-      "title": "Projects Browser",
+      "title": "Projects",
       "properties": {
         "vuengine.projects.path": {
           "type": "string",

@@ -1,28 +1,27 @@
-import * as vscode from "vscode";
+import { commands, ExtensionContext, ProgressLocation, window, workspace } from "vscode";
 import * as glob from "glob";
-import * as fs from "fs";
-import * as path from "path";
-import * as os from "os";
+import { existsSync } from "fs";
+import { resolve as resolvePath } from "path";
+import { homedir } from "os";
 
-import * as projects from "../projects";
-import * as extension from "../extension";
+import { addToProjectsRegistry } from "../projects";
 
 let isScanning = false;
 
-export function init(context: vscode.ExtensionContext) {
-  const command = vscode.commands.registerCommand(
+export function init(context: ExtensionContext) {
+  const command = commands.registerCommand(
     "vuengine.projects.scanForProjects",
     (project) => {
       if (!isScanning) {
-        let projectsFolder: string | undefined = vscode.workspace.getConfiguration("vuengine.projects").get("path");
+        let projectsFolder: string | undefined = workspace.getConfiguration("vuengine.projects").get("path");
         if (projectsFolder) {
-          projectsFolder = projectsFolder.replace('%HOME%', path.resolve(os.homedir()));
+          projectsFolder = projectsFolder.replace('%HOME%', resolvePath(homedir()));
         }
-        if (projectsFolder && fs.existsSync(projectsFolder)) {
+        if (projectsFolder && existsSync(projectsFolder)) {
           isScanning = true;
-          vscode.window.withProgress(
+          window.withProgress(
             {
-              location: vscode.ProgressLocation.Notification,
+              location: ProgressLocation.Notification,
               title: "Projects",
             },
             (p) => {
@@ -42,9 +41,9 @@ export function init(context: vscode.ExtensionContext) {
                     let addedProjects = 0;
                     for (const match of matches) {
                       if (
-                        projects.addToProjectsRegistry(
+                        addToProjectsRegistry(
                           context,
-                          path.resolve(match + "..")
+                          resolvePath(match + "..")
                         )
                       ) {
                         addedProjects++;
@@ -61,12 +60,12 @@ export function init(context: vscode.ExtensionContext) {
                           : "Found and registered " +
                           addedProjects +
                           " projects.";
-                      vscode.window.showInformationMessage(message);
-                      vscode.commands.executeCommand(
+                      window.showInformationMessage(message);
+                      commands.executeCommand(
                         "vuengine.projects.refresh"
                       );
                     } else {
-                      vscode.window.showInformationMessage(
+                      window.showInformationMessage(
                         "No unregistered projects found."
                       );
                     }
@@ -76,7 +75,7 @@ export function init(context: vscode.ExtensionContext) {
             }
           );
         } else {
-          vscode.window.showErrorMessage(
+          window.showErrorMessage(
             'Directory "' +
             projectsFolder +
             '" does not exist. Please check your config.'

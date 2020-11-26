@@ -1,11 +1,11 @@
-import * as vscode from "vscode";
-import * as projects from "../projects";
+import { commands, ExtensionContext, window } from "vscode";
+import { renameProject } from "../projects";
 
-export function init(context: vscode.ExtensionContext) {
-  const command = vscode.commands.registerCommand(
+export function init(context: ExtensionContext) {
+  const command = commands.registerCommand(
     "vuengine.projects.rename",
     (project) => {
-      vscode.window
+      window
         .showInputBox({
           value: project.label,
           placeHolder: "Type a new name for the project",
@@ -15,7 +15,7 @@ export function init(context: vscode.ExtensionContext) {
             return;
           }
 
-          projects.renameProject(context, project.projectFolder, name);
+          renameProject(context, project.projectFolder, name);
         });
     }
   );

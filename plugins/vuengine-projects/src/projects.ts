@@ -1,8 +1,8 @@
-import * as vscode from "vscode";
-import * as fs from "fs";
-import * as path from "path";
-//import * as logger from './logger';
-import * as extension from "./extension";
+import { commands, ExtensionContext, workspace } from "vscode";
+import { existsSync } from "fs";
+import { basename, resolve } from "path";
+//import { logInfo } from './logger';
+import { getWorkspaceRoot, isWorkspaceVUEngineProject, isVUEngineProject, parseJson } from "./extension";
 
 type ProjectsRegistry = {
   [key: string]: {
@@ -12,45 +12,48 @@ type ProjectsRegistry = {
 
 export let projectsRegistry: ProjectsRegistry;
 
-export function init(context: vscode.ExtensionContext) {
+export function init(context: ExtensionContext) {
   getProjectRegistry(context);
   addCurrentToProjectsRegistry(context);
   cleanProjectsRegistry(context);
 }
 
-function getProjectRegistry(context: vscode.ExtensionContext) {
+function getProjectRegistry(context: ExtensionContext) {
   projectsRegistry =
     context.globalState.get("vuengine.projects.registry") || {};
 }
 
-function setProjectRegistry(context: vscode.ExtensionContext) {
+function setProjectRegistry(context: ExtensionContext) {
   context.globalState.update("vuengine.projects.registry", projectsRegistry);
 }
 
-export function clearProjectRegistry(context: vscode.ExtensionContext) {
+export function clearProjectRegistry(context: ExtensionContext) {
   projectsRegistry = {};
   setProjectRegistry(context);
 }
 
-export function addCurrentToProjectsRegistry(context: vscode.ExtensionContext) {
+export function addCurrentToProjectsRegistry(context: ExtensionContext) {
+  console.log('AUTO ADD?', 'setting', workspace
+    .getConfiguration("vuengine.projects")
+    .get("autoAddToRegistry"), 'isWorkspaceVUEngineProject', isWorkspaceVUEngineProject, "workspaceRoot", getWorkspaceRoot());
   if (
-    !vscode.workspace
+    !workspace
       .getConfiguration("vuengine.projects")
       .get("autoAddToRegistry")
   ) {
     return;
   }
 
-  const workspaceRoot = extension.getWorkspaceRoot();
-  if (extension.isWorkspaceVUEngineProject) {
+  const workspaceRoot = getWorkspaceRoot();
+  if (isWorkspaceVUEngineProject) {
     addToProjectsRegistry(context, workspaceRoot);
   }
 }
 
 // remove no longer existing projects from registry
-export function cleanProjectsRegistry(context: vscode.ExtensionContext) {
+export function cleanProjectsRegistry(context: ExtensionContext) {
   if (
-    !vscode.workspace
+    !workspace
       .getConfiguration("vuengine.projects")
       .get("autoCleanRegistry")
   ) {
@@ -59,7 +62,7 @@ export function cleanProjectsRegistry(context: vscode.ExtensionContext) {
 
   const cleanedProjectsRegistry = {};
   for (const key in projectsRegistry) {
-    if (extension.isVUEngineProject(key)) {
+    if (isVUEngineProject(key)) {
       cleanedProjectsRegistry[key] = projectsRegistry[key];
     }
   }
@@ -71,17 +74,17 @@ export function cleanProjectsRegistry(context: vscode.ExtensionContext) {
 }
 
 export function addToProjectsRegistry(
-  context: vscode.ExtensionContext,
+  context: ExtensionContext,
   projectFolder: string
 ) {
   let success = false;
 
-  const normalizedProjectFolder = path.resolve(projectFolder);
+  const normalizedProjectFolder = resolve(projectFolder);
   if (!projectsRegistry[normalizedProjectFolder]) {
-    let name = path.basename(normalizedProjectFolder);
+    let name = basename(normalizedProjectFolder);
     const configFilePath = projectFolder + "/.vuengine/project.json";
-    if (fs.existsSync(configFilePath)) {
-      const configFilePathData = extension.parseJson(configFilePath);
+    if (existsSync(configFilePath)) {
+      const configFilePathData = parseJson(configFilePath);
       if (configFilePathData && configFilePathData["name"]) {
         name = configFilePathData["name"];
       }
@@ -92,31 +95,31 @@ export function addToProjectsRegistry(
     setProjectRegistry(context);
 
     success = true;
-    //logger.logInfo('Added project to registry', normalizedProjectFolder);
+    //logInfo('Added project to registry', normalizedProjectFolder);
   }
 
   return success;
 }
 
 export function removeFromProjectsRegistry(
-  context: vscode.ExtensionContext,
+  context: ExtensionContext,
   projectFolder: string
 ) {
   if (projectsRegistry[projectFolder]) {
     delete projectsRegistry[projectFolder];
     setProjectRegistry(context);
-    vscode.commands.executeCommand("vuengine.projects.refresh");
+    commands.executeCommand("vuengine.projects.refresh");
   }
 }
 
 export function renameProject(
-  context: vscode.ExtensionContext,
+  context: ExtensionContext,
   projectFolder: string,
   newName: string
 ) {
   if (projectsRegistry[projectFolder]) {
     projectsRegistry[projectFolder].name = newName;
     setProjectRegistry(context);
-    vscode.commands.executeCommand("vuengine.projects.refresh");
+    commands.executeCommand("vuengine.projects.refresh");
   }
 }

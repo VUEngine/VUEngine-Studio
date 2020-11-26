@@ -1,23 +1,23 @@
-import * as vscode from "vscode";
-import * as projects from "../projects";
-import * as extension from "../extension";
+import { commands, ExtensionContext, window } from "vscode";
+import { projectsRegistry } from "../projects";
+import { sortObject } from "../extension";
 
-export function init(context: vscode.ExtensionContext) {
-  const command = vscode.commands.registerCommand(
+export function init(context: ExtensionContext) {
+  const command = commands.registerCommand(
     "vuengine.projects.listToOpen",
     () => {
       const quickPickOptions = [];
-      for (const projectPath in extension.sortObject(
-        projects.projectsRegistry,
+      for (const projectPath in sortObject(
+        projectsRegistry,
         "name"
       )) {
         quickPickOptions.push({
-          label: projects.projectsRegistry[projectPath].name,
+          label: projectsRegistry[projectPath].name,
           detail: projectPath,
         });
       }
 
-      vscode.window
+      window
         .showQuickPick(quickPickOptions, {
           matchOnDescription: true,
           matchOnDetail: true,
@@ -29,7 +29,7 @@ export function init(context: vscode.ExtensionContext) {
             return;
           }
 
-          vscode.window
+          window
             .showQuickPick(
               [
                 {
@@ -51,9 +51,9 @@ export function init(context: vscode.ExtensionContext) {
                 return;
               }
 
-              vscode.commands.executeCommand(
+              commands.executeCommand(
                 window.label == "Open in new window"
-                  ? "vuengine.projects.openProjectInNewWindow"
+                  ? "vuengine.openProjectInNewWindow"
                   : "vuengine.projects.openProject",
                 project["detail"]
               );
@@ -63,10 +63,10 @@ export function init(context: vscode.ExtensionContext) {
   );
   context.subscriptions.push(command);
 
-  const touchBarCommand = vscode.commands.registerCommand(
+  const touchBarCommand = commands.registerCommand(
     "vuengine.touchBar.projects.listToOpen",
     () => {
-      vscode.commands.executeCommand("vuengine.projects.listToOpen");
+      commands.executeCommand("vuengine.projects.listToOpen");
     }
   );
   context.subscriptions.push(touchBarCommand);
