@@ -11,7 +11,7 @@
     "Other"
   ],
   "activationEvents": [
-    "*"
+    "onStartupFinished"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -19,7 +19,7 @@
       {
         "command": "vuengine.projects.create",
         "title": "Create new project",
-        "category": "VUEngine Studio",
+        "category": "Projects",
         "icon": {
           "dark": "img/icon/dark/new-folder.svg",
           "light": "img/icon/light/new-folder.svg"
@@ -205,7 +205,7 @@
       "vuengine-studio-projects-bar": [
         {
           "id": "vuengine-studio-projects",
-          "name": "Registry"
+          "name": ""
         }
       ]
     },

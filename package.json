@@ -14,7 +14,11 @@
     "target": "electron",
     "frontend": {
       "config": {
-        "applicationName": "VUEngine Studio"
+        "applicationName": "VUEngine Studio",
+        "preferences": {
+          "workbench.colorTheme": "vuengine-dark",
+          "workbench.iconTheme": "vs-minimal"
+        }
       }
     },
     "backend": {
@@ -86,7 +90,6 @@
     "vscode-builtin-powershell": "https://github.com/theia-ide/vscode-builtin-extensions/releases/download/v1.39.1-prel/powershell-1.39.1-prel.vsix",
     "vscode-builtin-shellscript": "https://github.com/theia-ide/vscode-builtin-extensions/releases/download/v1.39.1-prel/shellscript-1.39.1-prel.vsix",
     "vscode-builtin-theme-defaults": "https://github.com/theia-ide/vscode-builtin-extensions/releases/download/v1.39.1-prel/theme-defaults-1.39.1-prel.vsix",
-    "vscode-builtin-icon-theme-seti": "https://github.com/theia-ide/vscode-builtin-extensions/releases/download/v1.39.1-prel/vscode-theme-seti-1.39.1-prel.vsix",
     "vscode-editorconfig": "https://github.com/theia-ide/editorconfig-vscode/releases/download/v0.14.4/EditorConfig-0.14.4.vsix"
   },
   "workspaces": [

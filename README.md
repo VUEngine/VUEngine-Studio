@@ -5,6 +5,8 @@ A Virtual Boy development environment.
 ### Action plan
 
 - Mostly bundled built-in VSCode extensions
+  - vuengine/projects
+  - vuengine/plugins
   - vuengine/build
   - vuengine/pad-rom
   - vuengine/flashboy

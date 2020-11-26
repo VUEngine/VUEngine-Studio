@@ -1,0 +1,14 @@
+{
+	"name": "Light (VUEngine)",
+	"type": "light",
+	"colors": {
+		"activityBarBadge.background": "#d31422",
+		"editorOverviewRuler.rangeHighlightForeground": "#d3142299",
+		"extensionBadge.remoteBackground": "#d31422",
+		"inputOption.activeBorder": "#d3142200",
+		"inputValidation.infoBorder": "#d31422",
+		"peekView.border": "#d31422",
+		"statusBar.background": "#111",
+		"textBlockQuote.border": "#d3142280",
+	}
+}
