@@ -15,9 +15,13 @@
     "frontend": {
       "config": {
         "applicationName": "VUEngine Studio",
-        "preferences": {
-          "workbench.colorTheme": "vuengine-dark",
-          "workbench.iconTheme": "vs-minimal"
+        "defaultTheme": "vuengine-dark",
+        "defaultIconTheme": "theia-file-icons",
+        "electron": {
+          "windowOptions": {
+            "backgroundColor": "#D31422",
+            "titleBarStyle": "hidden"
+          }
         }
       }
     },
