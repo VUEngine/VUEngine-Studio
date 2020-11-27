@@ -1,6 +1,6 @@
 electronDist: node_modules/electron/dist
-productName: VUEngine Studio
-appId: vuengine
+productName: VUEngineStudio
+appId: vuengine.studio
 
 asar: false
 directories:
@@ -36,7 +36,7 @@ linux:
   icon: resources/icons
 
 appImage:
-  artifactName: ${productName}-${version}.${ext}
+  artifactName: VUEngine-Studio-${version}.${ext}
 nsis:
   menuCategory: true
   oneClick: false
@@ -48,7 +48,7 @@ nsis:
   uninstallerSidebar: resources/installerSidebar.bmp
   allowToChangeInstallationDirectory: true
   runAfterFinish: false
-  artifactName: ${productName}-Installer-${version}.${ext}
+  artifactName: VUEngine-Studio-Installer-${version}.${ext}
 dmg:
   icon: resources/icon.icns
   iconSize: 128
