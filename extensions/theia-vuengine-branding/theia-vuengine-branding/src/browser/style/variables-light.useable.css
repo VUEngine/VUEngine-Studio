@@ -16,6 +16,6 @@
 
 :root {
     --theia-brand-logo-size: 25%;
-    --theia-brand-logo: url('../../../src/browser/icons/brand.png');
+    --theia-brand-logo: url('../../../src/browser/icons/brand-light.png');
     --theia-menu-logo: url('../../../src/browser/icons/menu.png');
 }

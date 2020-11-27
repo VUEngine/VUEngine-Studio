@@ -17,7 +17,7 @@ A Virtual Boy development environment.
 
 Before building the main app, build the bundled extensions.
 
-#### Build bundled extensions
+#### Build bundled extensions and plugins
 
 For every bundled extension, do the following:
 
@@ -25,6 +25,14 @@ For every bundled extension, do the following:
 cd extensions/*
 yarn
 yarn rebuild:electron
+```
+
+For every bundled plugin, do the following:
+
+```sh
+cd plugins/*
+yarn
+yarn compile
 ```
 
 #### Test run bundled extensions

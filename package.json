@@ -20,7 +20,7 @@
         "electron": {
           "windowOptions": {
             "backgroundColor": "#D31422",
-            "titleBarStyle": "hidden"
+            "titleBarStyle": "hiddenInset"
           }
         }
       }
@@ -28,6 +28,11 @@
     "backend": {
       "config": {
         "startupTimeout": -1
+      }
+    },
+    "generator": {
+      "config": {
+          "preloadTemplate": "resources/splash/index.html"
       }
     }
   },
