@@ -1,5 +1,5 @@
 binaries/*
-engine/*
+vuengine/*
 .DS_Store
 .browser_modules
 node_modules

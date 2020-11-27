@@ -12,10 +12,10 @@ files:
   - scripts
   - package.json
 extraResources:
-  - from: binaries
-    to: app/binaries
-  - from: engine
-    to: app/engine
+  - from: binaries/win
+    to: app/binaries/win
+  - from: vuengine
+    to: app/vuengine
   - from: plugins
     to: app/plugins
   - from: theia_plugins

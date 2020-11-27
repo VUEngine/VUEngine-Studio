@@ -72,11 +72,13 @@ class Project extends TreeItem {
         light: getExtensionPath() + "/img/icon/light/folder.svg",
       };
     this.contextValue = this.isCurrent ? "currentProject" : "project";
-    this.command = {
-      command: "vuengine.projects.openProject",
-      arguments: [projectFolder],
-      title: "Open",
-    };
+    this.command = this.isCurrent
+      ? null
+      : {
+        command: "vuengine.projects.openProject",
+        arguments: [projectFolder],
+        title: "Open",
+      };
   }
 
   get tooltip(): string {
