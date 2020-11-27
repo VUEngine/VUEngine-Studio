@@ -33,9 +33,6 @@ export function clearProjectRegistry(context: ExtensionContext) {
 }
 
 export function addCurrentToProjectsRegistry(context: ExtensionContext) {
-  console.log('AUTO ADD?', 'setting', workspace
-    .getConfiguration("vuengine.projects")
-    .get("autoAddToRegistry"), 'isWorkspaceVUEngineProject', isWorkspaceVUEngineProject, "workspaceRoot", getWorkspaceRoot());
   if (
     !workspace
       .getConfiguration("vuengine.projects")

@@ -1,3 +1,5 @@
+binaries/*
+engine/*
 .DS_Store
 .browser_modules
 node_modules

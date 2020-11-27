@@ -1,0 +1,157 @@
+{
+  "name": "vuengine-plugins",
+  "displayName": "VUEngine Plugins",
+  "description": "Plugins Plugins support",
+  "version": "1.0.0",
+  "publisher": "vuengine",
+  "engines": {
+    "vscode": "^1.32.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "vuengine.plugins.create",
+        "title": "lugin",
+        "category": "Plugins",
+        "icon": {
+          "dark": "img/icon/dark/new-folder.svg",
+          "light": "img/icon/light/new-folder.svg"
+        }
+      },
+      {
+        "command": "vuengine.plugins.activate",
+        "title": "Activate plugin",
+        "category": "Plugins",
+        "icon": {
+          "dark": "img/icon/dark/add.svg",
+          "light": "img/icon/light/add.svg"
+        }
+      },
+      {
+        "command": "vuengine.plugins.deactivate",
+        "title": "Deactivate plugin",
+        "category": "Plugins",
+        "icon": {
+          "dark": "img/icon/dark/remove.svg",
+          "light": "img/icon/light/remove.svg"
+        }
+      },
+      {
+        "command": "vuengine.plugins.refresh",
+        "title": "Refresh",
+        "category": "Plugins",
+        "icon": {
+          "dark": "img/icon/dark/refresh.svg",
+          "light": "img/icon/light/refresh.svg"
+        }
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "vuengine.plugins.refresh",
+          "group": "navigation@0",
+          "when": "view == vuengine-studio-plugins"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "vuengine.plugins.activate",
+          "group": "inline",
+          "when": "view == vuengine-studio-plugins && viewItem == inactivePlugin"
+        },
+        {
+          "command": "vuengine.plugins.deactivate",
+          "group": "inline",
+          "when": "view == vuengine-studio-plugins && viewItem == activePlugin"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "vuengine.plugins.activate",
+          "when": "false"
+        },
+        {
+          "command": "vuengine.plugins.deactivate",
+          "when": "false"
+        },
+        {
+          "command": "vuengine.plugins.refresh",
+          "when": "false"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "vuengine-studio-plugins-bar",
+          "title": "Plugins",
+          "icon": "img/activity-bar-plugins.svg"
+        }
+      ]
+    },
+    "views": {
+      "vuengine-studio-plugins-bar": [
+        {
+          "id": "vuengine-studio-plugins",
+          "name": ""
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "vuengine-studio-plugins",
+        "contents": "No plugins found."
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Plugins",
+      "properties": {
+        "vuengine.plugins.path": {
+          "type": "string",
+          "label": "Path",
+          "default": "%BASE_FOLDER%/vuengine/plugins",
+          "description": "Full path to where VUEngine plugins are stored"
+        },
+        "vuengine.library.plugins.path": {
+          "type": "string",
+          "label": "Plugins Library Path",
+          "default": "%PLUGINS_FOLDER%/vuengine",
+          "description": "Full path to the VUEngine Plugins library"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "lint": "eslint . --ext .ts,.tsx",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile",
+    "test": "node ./out/test/runTest.js"
+  },
+  "dependencies": {
+    "glob": "^7.1.4"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.1.1",
+    "@types/mocha": "^5.2.6",
+    "@types/node": "^12.12.0",
+    "@types/vscode": "^1.32.0",
+    "mocha": "^6.1.4",
+    "source-map-support": "^0.5.12",
+    "@typescript-eslint/eslint-plugin": "^3.0.2",
+    "@typescript-eslint/parser": "^3.0.2",
+    "eslint": "^7.1.0",
+    "typescript": "^4.0.2",
+    "vscode-test": "^1.3.0"
+  }
+}

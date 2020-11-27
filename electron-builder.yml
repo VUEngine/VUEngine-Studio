@@ -12,8 +12,10 @@ files:
   - scripts
   - package.json
 extraResources:
-  - from: bin
-    to: app/bin
+  - from: binaries
+    to: app/binaries
+  - from: engine
+    to: app/engine
   - from: plugins
     to: app/plugins
   - from: theia_plugins

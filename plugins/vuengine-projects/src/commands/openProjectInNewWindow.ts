@@ -1,11 +1,11 @@
 import { commands, ExtensionContext, Uri } from "vscode";
-import { sync } from "glob";
+import { sync as globSync } from "glob";
 
 export function init(context: ExtensionContext) {
   const command = commands.registerCommand(
     "vuengine.projects.openProjectInNewWindow",
     (projectFolder) => {
-      const workspaceFiles = sync(projectFolder + "/*.code-workspace");
+      const workspaceFiles = globSync(projectFolder + "/*.code-workspace");
       const workspaceFile =
         workspaceFiles[0] != undefined ? workspaceFiles[0] : projectFolder;
 
