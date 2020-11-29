@@ -1,6 +1,6 @@
 import { commands, ExtensionContext, ProgressLocation, window } from "vscode";
 import * as rimraf from "rimraf";
-import { getWorkspaceRoot } from "../extension";
+import { getWorkspaceRoot } from "vuengine-common";
 
 export function init(context: ExtensionContext) {
 

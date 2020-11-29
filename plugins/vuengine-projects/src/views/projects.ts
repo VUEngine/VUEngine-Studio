@@ -1,7 +1,8 @@
 import { commands, Event, EventEmitter, ExtensionContext, TreeDataProvider, TreeItem, window } from "vscode";
 import { resolve } from "path";
+import { getWorkspaceRoot } from "vuengine-common";
 import { projectsRegistry } from "../projects";
-import { getWorkspaceRoot, getExtensionPath } from "../extension";
+import { getExtensionPath } from "../extension";
 
 export function init(context: ExtensionContext) {
   const projectsProvider = new ProjectsProvider();

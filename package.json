@@ -72,6 +72,7 @@
     "@theia/terminal": "latest",
     "@theia/userstorage": "latest",
     "@theia/workspace": "latest",
+    "cross-env": "5.0.5",
     "theia-vuengine-branding": "./extensions/theia-vuengine-branding/theia-vuengine-branding"
   },
   "devDependencies": {

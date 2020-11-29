@@ -3,7 +3,8 @@ import { existsSync } from 'fs';
 import { sync as globSync } from 'glob';
 import { resolve as resolvePath, dirname } from 'path';
 //import * as logger from '../logger';
-import { getExtensionPath, getConfig, getWorkspaceRoot, parseJson, sortObject } from '../extension';
+import { parseJson, sortObject } from 'vuengine-common';
+import { getExtensionPath, getConfig } from '../extension';
 
 export function init(context: ExtensionContext) {
 
@@ -57,7 +58,7 @@ class PluginsProvider implements TreeDataProvider<TreeItem> {
 			if (pluginsPath && existsSync(pluginsPath)) {
 
 				try {
-					const activePlugins: string[] = getConfig('plugins').project.plugins;
+					const activePlugins: string[] = getConfig().project.plugins;
 					const pluginsFiles = globSync(pluginsPath + '/**/.vuengine/plugin.json');
 
 					if (pluginsFiles && pluginsFiles.length > 0) {

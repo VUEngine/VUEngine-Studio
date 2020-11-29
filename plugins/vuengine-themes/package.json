@@ -1,4 +1,5 @@
 {
+    "private": true,
     "name": "vuengine-themes",
     "displayName": "VUEngine Studio Default Themes",
     "description": "VUEngine Studio Default Themes",

@@ -1,4 +1,5 @@
 {
+  "private": true,
   "name": "vuengine-build",
   "displayName": "VUEngine Build",
   "description": "VUEngine Build System",

@@ -2,7 +2,7 @@ import { commands, ExtensionContext, workspace } from "vscode";
 import { existsSync } from "fs";
 import { basename, resolve } from "path";
 //import { logInfo } from './logger';
-import { getWorkspaceRoot, isWorkspaceVUEngineProject, isVUEngineProject, parseJson } from "./extension";
+import { getWorkspaceRoot, isWorkspaceVUEngineProject, isVUEngineProject, parseJson } from "vuengine-common";
 
 type ProjectsRegistry = {
   [key: string]: {

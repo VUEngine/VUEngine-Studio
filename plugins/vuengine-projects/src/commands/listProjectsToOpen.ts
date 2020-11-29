@@ -1,6 +1,6 @@
 import { commands, ExtensionContext, window } from "vscode";
+import { sortObject } from 'vuengine-common';
 import { projectsRegistry } from "../projects";
-import { sortObject } from "../extension";
 
 export function init(context: ExtensionContext) {
   const command = commands.registerCommand(
