@@ -1,14 +1,16 @@
 import { commands, ExtensionContext, window, workspace } from "vscode";
 import { createWriteStream, existsSync, readFileSync, unlinkSync } from "fs";
-import { platform } from "os";
 import { dirname, join as joinPath } from "path";
+import { getDeviceList, Device } from "usb";
+
 import { convertoToEnvPath, getOs, getTerminal, getWorkspaceRoot } from "vuengine-common";
 
 type FlashCartConfig = {
 	name: string;
 	vid: number;
 	pid: number;
-	deviceName: string;
+	manufacturer: string;
+	product: string;
 	serialNumber: string;
 	size: number;
 	path: string;
@@ -17,22 +19,22 @@ type FlashCartConfig = {
 
 export function init(context: ExtensionContext) {
 
-	const command = commands.registerCommand("vuengine.flash", () => {
+	const command = commands.registerCommand("vuengine.flash", async () => {
 
 		const flashCarts: FlashCartConfig[] | undefined = workspace.getConfiguration("vuengine.flash").get("flashCarts");
 		if (!flashCarts || flashCarts.length === 0) {
-			// TODO show error "no carts configured"
+			window.showErrorMessage(`No flash cart configs provided. Update vuengine.flash.flashCarts.`);
 			return;
 		}
 
-		const connectedFlashCart: FlashCartConfig = detectFlashCart(flashCarts);
+		const connectedFlashCart: {"config": FlashCartConfig, "device": Device} | undefined = await detectFlashCart(flashCarts);
 
 		if (!connectedFlashCart) {
-			// TODO show error "no flash cart connected"
+			window.showErrorMessage(`No connected flash cart could be found.`);
 		} else if (!existsSync(getRomPath())) {
 			// TODO queue
 		} else {
-			flash(connectedFlashCart);
+			flash(connectedFlashCart.config, connectedFlashCart.device);
 		}
 	});
 	context.subscriptions.push(command);
@@ -43,18 +45,48 @@ export function init(context: ExtensionContext) {
 	context.subscriptions.push(touchBarCommand);
 }
 
-function detectFlashCart(flashCarts: FlashCartConfig[]) {
-	// TODO
-	return flashCarts[0];
+async function detectFlashCart(flashCarts: FlashCartConfig[]) {
+	const devices: Device[] = getDeviceList();
+	let manufacturer: string | undefined;
+	let product: string | undefined;
+	let serialNumber: string | undefined;
+
+	for (const flashCart of flashCarts) {
+		for (let i = 0; i < devices.length; i++) {
+			const deviceDesc = devices[i].deviceDescriptor;
+			if ((deviceDesc.idVendor == flashCart.vid) && (deviceDesc.idProduct == flashCart.pid)) {
+				devices[i].open();
+				manufacturer = await new Promise((resolve, reject) => {
+					devices[i].getStringDescriptor(devices[i].deviceDescriptor.iManufacturer, (error, data) => {
+						resolve(data);
+					});
+				});
+				product = await new Promise((resolve, reject) => {
+					devices[i].getStringDescriptor(devices[i].deviceDescriptor.iProduct, (error, data) => {
+						resolve(data);
+					});
+				});
+				serialNumber = await new Promise((resolve, reject) => {
+					devices[i].getStringDescriptor(devices[i].deviceDescriptor.iSerialNumber, (error, data) => {
+						resolve(data);
+					});
+				});
+				devices[i].close();
+
+				if ((flashCart.manufacturer === "" || manufacturer == flashCart.manufacturer) && 
+					(flashCart.product === "" || product == flashCart.product) && 
+					(flashCart.serialNumber === "" || serialNumber == flashCart.serialNumber)) {
+					return {
+						config: flashCart,
+						device: devices[i]
+					};
+				}
+			}
+		}
+	}
 }
 
-function getOs() {
-	return platform()
-		.replace("win32", "win")
-		.replace("darwin", "osx");
-}
-
-function flash(flashCart: FlashCartConfig) {
+function flash(flashCart: FlashCartConfig, device: Device) {
 	if (!flashCart.path) {
 		window.showErrorMessage(`No path to flasher software provided for cart "${flashCart}"`);
 		return;

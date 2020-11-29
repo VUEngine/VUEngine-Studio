@@ -62,79 +62,90 @@
       }
     ],
     "configuration": {
-      "vuengine.flash.flashCarts": {
-        "type": "array",
-        "label": "Flash cart configurations",
-        "description": "Configurations of known flash carts",
-        "items": {
-          "type": "object",
-          "title": "Flash cart config",
-          "properties": {
-            "name": {
-              "type": "string",
-              "description": "Name of the flash cart configuration"
-            },
-            "vid": {
-              "type": "number",
-              "description": "USB vendor ID (VID) of the flash cart",
-              "minimum": 0,
-              "maximum": 65535
-            },
-            "pid": {
-              "type": "number",
-              "description": "USB product ID (PID) of the flash cart",
-              "minimum": 0,
-              "maximum": 65535
-            },
-            "deviceName": {
-              "type": "string",
-              "description": "USB Device Name of the flash cart (optional)"
-            },
-            "serialNumber": {
-              "type": "string",
-              "description": "USB Serial Number of the flash cart (optional)"
-            },
-            "size": {
-              "type": "number",
-              "description": "Size of flash cart (in Mbit)"
-            },
-            "path": {
-              "type": "string",
-              "description": "Full path to flasher software"
-            },
-            "args": {
-              "type": "string",
-              "multiline": true,
-              "description": "Arguments to pass to flasher software"
+      "type": "object",
+      "title": "Plugins",
+      "properties": {
+        "vuengine.flash.flashCarts": {
+          "type": "array",
+          "label": "Flash cart configurations",
+          "description": "Configurations of known flash carts",
+          "items": {
+            "type": "object",
+            "title": "Flash cart config",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Name of the flash cart configuration"
+              },
+              "vid": {
+                "type": "number",
+                "description": "USB vendor ID (VID) of the flash cart",
+                "minimum": 0,
+                "maximum": 65535
+              },
+              "pid": {
+                "type": "number",
+                "description": "USB product ID (PID) of the flash cart",
+                "minimum": 0,
+                "maximum": 65535
+              },
+              "manufacturer": {
+                "type": "string",
+                "description": "USB manufacturer string of the flash cart (optional)"
+              },
+              "product": {
+                "type": "string",
+                "description": "USB product string of the flash cart (optional)"
+              },
+              "serialNumber": {
+                "type": "string",
+                "description": "USB serial number string of the flash cart (optional)"
+              },
+              "size": {
+                "type": "number",
+                "description": "Size of flash cart (in Mbit)"
+              },
+              "path": {
+                "type": "string",
+                "description": "Full path to flasher software"
+              },
+              "args": {
+                "type": "string",
+                "multiline": true,
+                "description": "Arguments to pass to flasher software"
+              }
             }
-          }
-        },
-        "default": [
-          {
-            "name": "FlashBoy (Plus)",
-            "vid": 6017,
-            "pid": 2466,
-            "deviceName": "FlashBoy",
-            "serialNumber": "",
-            "size": 16,
-            "path": "%PROG_VB_PATH%",
-            "args": "%ROM%"
           },
-          {
-            "name": "HyperFlash32",
-            "vid": 0,
-            "pid": 0,
-            "deviceName": "",
-            "serialNumber": "",
-            "size": 32,
-            "path": "%HYPERFLASHER_PATH%",
-            "args": "%ROM%"
-          }
-        ]
+          "default": [
+            {
+              "name": "FlashBoy (Plus)",
+              "vid": 6017,
+              "pid": 2466,
+              "manufacturer": "Richard Hutchinson",
+              "product": "FlashBoy",
+              "serialNumber": "",
+              "size": 16,
+              "path": "%PROG_VB_PATH%",
+              "args": "%ROM%"
+            },
+            {
+              "name": "HyperFlash32",
+              "vid": 0,
+              "pid": 0,
+              "manufacturer": "",
+              "product": "",
+              "serialNumber": "",
+              "size": 32,
+              "path": "%HYPERFLASHER_PATH%",
+              "args": "%ROM%"
+            }
+          ]
+        }
       }
     }
   },
   "scripts": {
+    "rebuild": "./node_modules/.bin/electron-rebuild",
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "lint": "eslint . --ext .ts,.tsx",
@@ -145,13 +156,15 @@
   "dependencies": {
     "glob": "^7.1.4",
     "usb": "^1.6.3",
-    "cross-env": "5.0.5"
+    "cross-env": "5.0.5",
+    "electron-rebuild": "2.0.3"
   },
   "devDependencies": {
     "@types/glob": "^7.1.1",
     "@types/mocha": "^5.2.6",
     "@types/node": "^12.12.0",
     "@types/vscode": "^1.32.0",
+    "@types/usb": "^1.5.2",
     "mocha": "^6.1.4",
     "source-map-support": "^0.5.12",
     "@typescript-eslint/eslint-plugin": "^3.0.2",

@@ -95,11 +95,15 @@
       }
     ],
     "configuration": {
-      "vuengine.build.enableWsl": {
-        "type": "boolean",
-        "label": "%package.contributes.configuration.compiler.enableWsl.label%",
-        "default": false,
-        "description": "%package.contributes.configuration.compiler.enableWsl.description%"
+      "type": "object",
+      "title": "Plugins",
+      "properties": {
+        "vuengine.build.enableWsl": {
+          "type": "boolean",
+          "label": "%package.contributes.configuration.compiler.enableWsl.label%",
+          "default": false,
+          "description": "%package.contributes.configuration.compiler.enableWsl.description%"
+        }
       }
     }
   },
