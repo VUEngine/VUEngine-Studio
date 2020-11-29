@@ -1,6 +1,6 @@
 import { ExtensionContext } from "vscode";
 import { extensions, workspace } from "vscode";
-import { existsSync, fstat, readFileSync, writeFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
 
 import { init as initCommands } from "./commands";

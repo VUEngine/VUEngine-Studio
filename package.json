@@ -19,8 +19,8 @@
         "defaultIconTheme": "theia-file-icons",
         "electron": {
           "windowOptions": {
-            "backgroundColor": "#D31422",
-            "titleBarStyle": "hiddenInset"
+            "backgroundColor": "#222",
+            "titleBarStyle": "default"
           }
         }
       }
@@ -32,7 +32,7 @@
     },
     "generator": {
       "config": {
-          "preloadTemplate": "resources/splash/index.html"
+        "preloadTemplate": "resources/splash/index.html"
       }
     }
   },
