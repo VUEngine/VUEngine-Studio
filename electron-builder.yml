@@ -12,8 +12,8 @@ files:
   - scripts
   - package.json
 extraResources:
-  - from: binaries/win
-    to: app/binaries/win
+  - from: binaries/vuengine-studio-tools/osx
+    to: app/binaries/osx
   - from: vuengine
     to: app/vuengine
   - from: plugins

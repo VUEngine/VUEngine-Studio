@@ -1,5 +1,3 @@
-binaries/*
-vuengine/*
 .DS_Store
 .browser_modules
 node_modules
@@ -9,6 +7,3 @@ src-gen
 gen-webpack.config.js
 dist
 *.log
-
-# binaries später anders einbinden
-bin

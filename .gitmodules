@@ -1,0 +1,12 @@
+[submodule "vuengine/vuengine-core"]
+	path = vuengine/vuengine-core
+	url = git@bitbucket.org:vuengine/vuengine-core.git
+[submodule "vuengine/vuengine-plugins"]
+	path = vuengine/vuengine-plugins
+	url = git@bitbucket.org:vuengine/vuengine-plugins.git
+[submodule "vuengine/vuengine-barebone"]
+	path = vuengine/vuengine-barebone
+	url = git@bitbucket.org:vuengine/vuengine-barebone.git
+[submodule "binaries/vuengine-studio-tools"]
+	path = binaries/vuengine-studio-tools
+	url = git@bitbucket.org:vuengine/vuengine-studio-tools.git
