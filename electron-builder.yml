@@ -1,5 +1,5 @@
 electronDist: node_modules/electron/dist
-productName: VUEngineStudio
+productName: VUEngine Studio
 appId: vuengine.studio
 
 asar: false
