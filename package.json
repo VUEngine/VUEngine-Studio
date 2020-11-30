@@ -20,7 +20,8 @@
         "electron": {
           "windowOptions": {
             "backgroundColor": "#222",
-            "titleBarStyle": "default"
+            "titleBarStyle": "default",
+            "frame": true
           }
         }
       }

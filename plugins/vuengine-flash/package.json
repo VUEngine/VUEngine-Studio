@@ -68,7 +68,7 @@
         "vuengine.flash.flashCarts": {
           "type": "array",
           "label": "Flash cart configurations",
-          "description": "Configurations of known flash carts",
+          "description": "Additional configurations for custom flash carts",
           "items": {
             "type": "object",
             "title": "Flash cart config",
@@ -113,33 +113,14 @@
                 "type": "string",
                 "multiline": true,
                 "description": "Arguments to pass to flasher software"
+              },
+              "padRom": {
+                "type": "boolean",
+                "description": "Should ROMs be padded before being passed to the flasher program?"
               }
             }
           },
-          "default": [
-            {
-              "name": "FlashBoy (Plus)",
-              "vid": 6017,
-              "pid": 2466,
-              "manufacturer": "Richard Hutchinson",
-              "product": "FlashBoy",
-              "serialNumber": "",
-              "size": 16,
-              "path": "%PROG_VB_PATH%",
-              "args": "%ROM%"
-            },
-            {
-              "name": "HyperFlash32",
-              "vid": 0,
-              "pid": 0,
-              "manufacturer": "",
-              "product": "",
-              "serialNumber": "",
-              "size": 32,
-              "path": "%HYPERFLASHER_PATH%",
-              "args": "%ROM%"
-            }
-          ]
+          "default": []
         }
       }
     }

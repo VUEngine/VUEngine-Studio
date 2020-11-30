@@ -2,8 +2,7 @@ import { commands, ExtensionContext, window, workspace } from "vscode";
 import { createWriteStream, existsSync, readFileSync, unlinkSync } from "fs";
 import { dirname, join as joinPath } from "path";
 import { getDeviceList, Device } from "usb";
-
-import { convertoToEnvPath, getOs, getTerminal, getWorkspaceRoot } from "vuengine-common";
+import { convertoToEnvPath, getOs, getResourcesPath, getTerminal, getWorkspaceRoot } from "vuengine-common";
 
 type FlashCartConfig = {
 	name: string;
@@ -15,26 +14,27 @@ type FlashCartConfig = {
 	size: number;
 	path: string;
 	args: string;
+	padRom: boolean;
+}
+
+type ConnectedFlashCart = {
+	"config": FlashCartConfig,
+	"device": Device
 }
 
 export function init(context: ExtensionContext) {
 
 	const command = commands.registerCommand("vuengine.flash", async () => {
 
-		const flashCarts: FlashCartConfig[] | undefined = workspace.getConfiguration("vuengine.flash").get("flashCarts");
-		if (!flashCarts || flashCarts.length === 0) {
-			window.showErrorMessage(`No flash cart configs provided. Update vuengine.flash.flashCarts.`);
-			return;
-		}
-
-		const connectedFlashCart: {"config": FlashCartConfig, "device": Device} | undefined = await detectFlashCart(flashCarts);
+		const flashCartConfigs: FlashCartConfig[] = getFlashCartConfigs();
+		const connectedFlashCart: ConnectedFlashCart | undefined = await detectFlashCart(flashCartConfigs);
 
 		if (!connectedFlashCart) {
 			window.showErrorMessage(`No connected flash cart could be found.`);
 		} else if (!existsSync(getRomPath())) {
 			// TODO queue
 		} else {
-			flash(connectedFlashCart.config, connectedFlashCart.device);
+			flash(connectedFlashCart);
 		}
 	});
 	context.subscriptions.push(command);
@@ -45,16 +45,16 @@ export function init(context: ExtensionContext) {
 	context.subscriptions.push(touchBarCommand);
 }
 
-async function detectFlashCart(flashCarts: FlashCartConfig[]) {
+async function detectFlashCart(flashCartConfigs: FlashCartConfig[]) {
 	const devices: Device[] = getDeviceList();
 	let manufacturer: string | undefined;
 	let product: string | undefined;
 	let serialNumber: string | undefined;
 
-	for (const flashCart of flashCarts) {
+	for (const flashCartConfig of flashCartConfigs) {
 		for (let i = 0; i < devices.length; i++) {
 			const deviceDesc = devices[i].deviceDescriptor;
-			if ((deviceDesc.idVendor == flashCart.vid) && (deviceDesc.idProduct == flashCart.pid)) {
+			if ((deviceDesc.idVendor == flashCartConfig.vid) && (deviceDesc.idProduct == flashCartConfig.pid)) {
 				devices[i].open();
 				manufacturer = await new Promise((resolve, reject) => {
 					devices[i].getStringDescriptor(devices[i].deviceDescriptor.iManufacturer, (error, data) => {
@@ -73,11 +73,11 @@ async function detectFlashCart(flashCarts: FlashCartConfig[]) {
 				});
 				devices[i].close();
 
-				if ((flashCart.manufacturer === "" || manufacturer == flashCart.manufacturer) && 
-					(flashCart.product === "" || product == flashCart.product) && 
-					(flashCart.serialNumber === "" || serialNumber == flashCart.serialNumber)) {
+				if ((flashCartConfig.manufacturer === "" || manufacturer?.includes(flashCartConfig.manufacturer)) &&
+					(flashCartConfig.product === "" || product?.includes(flashCartConfig.product)) &&
+					(flashCartConfig.serialNumber === "" || serialNumber?.includes(flashCartConfig.serialNumber)) {
 					return {
-						config: flashCart,
+						config: flashCartConfig,
 						device: devices[i]
 					};
 				}
@@ -86,33 +86,66 @@ async function detectFlashCart(flashCarts: FlashCartConfig[]) {
 	}
 }
 
-function flash(flashCart: FlashCartConfig, device: Device) {
-	if (!flashCart.path) {
-		window.showErrorMessage(`No path to flasher software provided for cart "${flashCart}"`);
+function getFlashCartConfigs() {
+	const flashCartConfigs = [
+		{
+			"name": "FlashBoy (Plus)",
+			"vid": 6017,
+			"pid": 2466,
+			"manufacturer": "Richard Hutchinson",
+			"product": "FlashBoy",
+			"serialNumber": "",
+			"size": 16,
+			"path": joinPath(getResourcesPath(), "app", "binaries", "prog-vb", (getOs() === 'win') ? "prog-vb.exe" : "prog-vb"),
+			"args": "%ROM%",
+			"padRom": true
+		},
+		{
+			"name": "HyperFlash32",
+			"vid": 0,
+			"pid": 0,
+			"manufacturer": "",
+			"product": "",
+			"serialNumber": "",
+			"size": 32,
+			"path": "",
+			"args": "%ROM%",
+			"padRom": false
+		}
+	];
+
+	const userDefinedFlashCartConfigs: FlashCartConfig[] | undefined = workspace.getConfiguration("vuengine.flash").get("flashCarts") ?? [];
+
+	return [...flashCartConfigs, ...userDefinedFlashCartConfigs];
+}
+
+function flash(connectedFlashCart: ConnectedFlashCart) {
+	if (!connectedFlashCart.config.path) {
+		window.showErrorMessage(`No path to flasher software provided for cart "${connectedFlashCart.config.name}"`);
 		return;
 	}
 
-	if (!existsSync(dirname(flashCart.path))) {
-		window.showErrorMessage(`Flasher software does not exist at "${flashCart.path}"`);
+	if (!existsSync(dirname(connectedFlashCart.config.path))) {
+		window.showErrorMessage(`Flasher software does not exist at "${connectedFlashCart.config.path}"`);
 		return;
 	}
 
 	const terminal = getTerminal('Flash');
-	const flasherEnvPath = convertoToEnvPath(flashCart.path);
+	let flasherEnvPath = convertoToEnvPath(connectedFlashCart.config.path);
 	const enableWsl = workspace.getConfiguration('vuengine.build').get('enableWsl');
 	if (getOs() === "win" && enableWsl) {
 		flasherEnvPath.replace(/\.[^/.]+$/, "");
 	}
 
-	padRom(flashCart.size);
+	const romPath = (connectedFlashCart.config.padRom && padRom(connectedFlashCart.config.size))
+		? getPaddedRomPath()
+		: getRomPath();
 
-	const paddedRomPath = getPaddedRomPath();
-	let flasherArgs = flashCart.args ? " " + flashCart.args : flashCart.args;
-	if (existsSync(paddedRomPath)) {
-		flasherArgs = flasherArgs.replace("output.vb", "outputPadded.vb");
-	}
+	const flasherArgs = connectedFlashCart.config.args
+		? " " + connectedFlashCart.config.args.replace("%ROM%", `"${romPath}"`)
+		: "";
 
-	terminal.sendText(flasherEnvPath + flasherArgs);
+	terminal.sendText(`"${flasherEnvPath}" ${flasherArgs}`);
 	terminal.show(true);
 }
 
@@ -120,20 +153,21 @@ function getRomPath(): string {
 	return joinPath(getWorkspaceRoot(), "build", "output.vb");
 }
 
-function padRom(size: number) {
-	if (!existsSync(getRomPath())) {
-		return;
+function padRom(size: number): boolean {
+	const romPath = getRomPath();
+	const paddedRomPath = getPaddedRomPath();
+
+	if (!existsSync(romPath)) {
+		return false;
 	}
 
 	const targetSize = size * 128;
-	const romPath = getRomPath();
-	const paddedRomPath = getPaddedRomPath();
 	const romContent = readFileSync(romPath);
 	const romSize = romContent.length / 1024;
 	const timesToMirror = targetSize / romSize;
 
 	if (romSize >= targetSize) {
-		return;
+		return false;
 	}
 
 	if (existsSync(paddedRomPath)) {
@@ -145,6 +179,8 @@ function padRom(size: number) {
 		stream.write(romContent);
 	});
 	stream.end();
+
+	return true;
 }
 
 function getPaddedRomPath() {

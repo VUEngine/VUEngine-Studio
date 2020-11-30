@@ -137,7 +137,7 @@ export function getTerminal(terminalName: string, env = {}): Terminal {
       if (enableWsl) {
         terminalArgs.shellPath = process.env.windir + '\\System32\\wsl.exe';
       } else {
-        terminalArgs.shellPath = msysPath + '/usr/bin/bash.exe';
+        terminalArgs.shellPath = joinPath(msysPath, 'usr', 'bin', 'bash.exe');
         terminalArgs.shellArgs = ['--login'];
       }
     }
@@ -160,7 +160,7 @@ export function convertoToEnvPath(path: string) {
     return "/" + x.substr(0, 1).toLowerCase() + "/";
   });
   if (getOs() === "win" && enableWsl) {
-    envPath = joinPath("/mnt", "envPath");
+    envPath = "/mnt/" + envPath;
   }
   return envPath;
 }
