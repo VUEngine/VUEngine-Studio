@@ -2,16 +2,13 @@
 
 A Virtual Boy development environment.
 
-### Action plan
+### Init
 
-- Mostly bundled built-in VSCode extensions
-  - vuengine/projects
-  - vuengine/plugins
-  - vuengine/build
-  - vuengine/pad-rom
-  - vuengine/flashboy
-  - vuengine/hyperflash
-  - ...
+After cloning, load the submodules with
+
+```sh
+git submodule update --init
+```
 
 ### Bundled extensions
 
