@@ -1,7 +1,6 @@
 import { injectable, inject } from "inversify";
 import { CommandContribution, CommandRegistry, MenuContribution, MenuModelRegistry, MessageService } from "@theia/core/lib/common";
 import { CommonMenus } from "@theia/core/lib/browser";
-
 export const TheiaHelloWorldExtensionCommand = {
     id: 'TheiaHelloWorldExtension.command',
     label: "Say Hello"
@@ -23,7 +22,6 @@ export class TheiaHelloWorldExtensionCommandContribution implements CommandContr
 
 @injectable()
 export class TheiaHelloWorldExtensionMenuContribution implements MenuContribution {
-
     registerMenus(menus: MenuModelRegistry): void {
         menus.registerMenuAction(CommonMenus.EDIT_FIND, {
             commandId: TheiaHelloWorldExtensionCommand.id,

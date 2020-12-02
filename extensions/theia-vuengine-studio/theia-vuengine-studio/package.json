@@ -1,5 +1,5 @@
 {
-  "name": "theia-vuengine-branding",
+  "name": "theia-vuengine-studio",
   "keywords": [
     "theia-extension"
   ],
@@ -23,7 +23,7 @@
   },
   "theiaExtensions": [
     {
-      "frontend": "lib/browser/theia-vuengine-branding-frontend-module"
+      "frontend": "lib/browser/frontend-module"
     }
   ]
 }

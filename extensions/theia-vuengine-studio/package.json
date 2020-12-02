@@ -10,7 +10,7 @@
     "lerna": "2.4.0"
   },
   "workspaces": [
-    "theia-vuengine-branding",
+    "theia-vuengine-studio",
     "browser-app",
     "electron-app"
   ]

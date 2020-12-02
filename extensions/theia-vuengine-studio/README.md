@@ -1,4 +1,4 @@
-# theia-vuengine-branding
+# theia-vuengine-studio
 
 Adds VUEngine icons and styles to the application.
 
@@ -33,9 +33,9 @@ Open http://localhost:3000 in the browser.
 
 ## Developing with the browser example
 
-Start watching of theia-vuengine-branding.
+Start watching of theia-vuengine-studio.
 
-    cd theia-vuengine-branding
+    cd theia-vuengine-studio
     yarn watch
 
 Start watching of the browser example.
@@ -50,9 +50,9 @@ Open http://localhost:3000 in the browser.
 
 ## Developing with the Electron example
 
-Start watching of theia-vuengine-branding.
+Start watching of theia-vuengine-studio.
 
-    cd theia-vuengine-branding
+    cd theia-vuengine-studio
     yarn watch
 
 Start watching of the electron example.

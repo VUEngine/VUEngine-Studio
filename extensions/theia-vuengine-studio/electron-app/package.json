@@ -15,7 +15,7 @@
     "@theia/process": "latest",
     "@theia/terminal": "latest",
     "@theia/workspace": "latest",
-    "theia-vuengine-branding": "1.0.0"
+    "theia-vuengine-studio": "1.0.0"
   },
   "devDependencies": {
     "@theia/cli": "latest"
