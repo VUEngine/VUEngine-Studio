@@ -1,19 +1,28 @@
-import './branding/branding';
-import './themes/index';
-import '../../src/browser/branding/style/index.css';
+// branding
+import "./branding/branding";
+import "../../src/browser/branding/style/index.css";
 
-import { TheiaHelloWorldExtensionCommandContribution, TheiaHelloWorldExtensionMenuContribution } from './hello-world';
-import { bindHostedPluginPreferences } from './preferences';
-import { CleanTheiaCommandContribution, CleanTheiaMenuContribution } from './clean-theia';
+// themes
+import "./themes/index";
+
+// flash carts
+// import { bindVesFlashCartsPreferences } from "./flash-carts/preferences";
+// import { VesFlashCartsCommandContribution } from "./flash-carts/commands";
+
+import {
+  CleanTheiaCommandContribution,
+  CleanTheiaMenuContribution,
+} from "./clean-theia";
 import { CommandContribution, MenuContribution } from "@theia/core/lib/common";
 import { ContainerModule } from "inversify";
 
-export default new ContainerModule(bind => {
-    bind(CommandContribution).to(TheiaHelloWorldExtensionCommandContribution);
-    bind(MenuContribution).to(TheiaHelloWorldExtensionMenuContribution);
+export default new ContainerModule((bind) => {
+  // clean unneeded theia functions
+  bind(CommandContribution).to(CleanTheiaCommandContribution);
+  bind(MenuContribution).to(CleanTheiaMenuContribution);
 
-    bind(CommandContribution).to(CleanTheiaCommandContribution);
-    bind(MenuContribution).to(CleanTheiaMenuContribution);
-
-    bindHostedPluginPreferences(bind);
+  // flash carts
+  // bindVesFlashCartsPreferences(bind);
+  // bind(CommandContribution).to(VesFlashCartsCommandContribution);
+  // bind(MenuContribution).to(TheiaHelloWorldExtensionMenuContribution);
 });
