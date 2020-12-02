@@ -1,3 +1,5 @@
+import { bindSampleMenu } from "./sample-menu-contribution"
+
 // branding
 import "./branding/branding";
 import "../../src/browser/branding/style/index.css";
@@ -25,4 +27,6 @@ export default new ContainerModule((bind) => {
   // bindVesFlashCartsPreferences(bind);
   // bind(CommandContribution).to(VesFlashCartsCommandContribution);
   // bind(MenuContribution).to(TheiaHelloWorldExtensionMenuContribution);
+
+  bindSampleMenu(bind);
 });

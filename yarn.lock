@@ -1394,7 +1394,7 @@
     "@types/p-queue" "^2.3.1"
     p-queue "^2.4.2"
 
-"@theia/plugin-ext-vscode@^1.8.0", "@theia/plugin-ext-vscode@latest":
+"@theia/plugin-ext-vscode@^1.8.0":
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/@theia/plugin-ext-vscode/-/plugin-ext-vscode-1.8.0.tgz#a4ce3cd0598078d248d4e0c9d676004cc55bdd7b"
   integrity sha512-fnB1JhJuZ1VboknP4ZL4hGAM96hJ6zpr21ZyPYhHstdXG7F13sntpObPBkqlHzdRoald3+eej0lSfdL/NESxDA==
@@ -1410,7 +1410,7 @@
     filenamify "^4.1.0"
     request "^2.82.0"
 
-"@theia/plugin-ext@^1.8.0", "@theia/plugin-ext@latest":
+"@theia/plugin-ext@^1.8.0":
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/@theia/plugin-ext/-/plugin-ext-1.8.0.tgz#0d90d88faa46057dc05527946b6126e2ef031f5d"
   integrity sha512-FwOSspt9nmteLR7bPGk0FjdfZGDIP2Sq4b35gmPr5Qd3M+E5h1lKah/EBDoBRqdWH+VzEsVcpLtiA6+ygg0xPg==
@@ -1455,7 +1455,7 @@
     vscode-debugprotocol "^1.32.0"
     vscode-textmate "^4.0.1"
 
-"@theia/plugin@^1.8.0", "@theia/plugin@latest":
+"@theia/plugin@^1.8.0":
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/@theia/plugin/-/plugin-1.8.0.tgz#b3a2a5d874a4105f0d20ff333818b72f8e966597"
   integrity sha512-/nrX2prLpJgKcecH1xdg+v2HJcxaePbScA7k/Z/t8outKZatO0odX2F04wAWgwOLfDLq6POyuyGQ/L9XExsd/Q==
