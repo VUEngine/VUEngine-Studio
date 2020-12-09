@@ -1,14 +1,15 @@
 import { injectable } from "inversify";
 import { MenuContribution, MenuModelRegistry } from "@theia/core/lib/common";
-import { CommonMenus } from "@theia/core/lib/browser";
 import { VesFlashCartsCommand } from "./commands";
+import { BuildMenuSection } from "../build/menu";
 
 @injectable()
 export class VesFlashCartsMenuContribution implements MenuContribution {
   registerMenus(menus: MenuModelRegistry): void {
-    menus.registerMenuAction(CommonMenus.EDIT_FIND, {
+    menus.registerMenuAction(BuildMenuSection.ACTION, {
       commandId: VesFlashCartsCommand.id,
       label: VesFlashCartsCommand.label,
+      order: "4"
     });
   }
 }

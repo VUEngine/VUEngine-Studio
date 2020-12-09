@@ -26,10 +26,6 @@
   "theiaExtensions": [
     {
       "frontend": "lib/browser/frontend-module"
-    },
-    {
-      "frontend": "lib/browser/sample-browser-menu-module",
-      "frontendElectron": "lib/electron-browser/sample-electron-menu-module"
     }
   ]
 }

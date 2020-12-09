@@ -1,3 +1,10 @@
+import { ContainerModule } from "inversify";
+import { CommandContribution, MenuContribution } from "@theia/core/lib/common";
+import { KeybindingContribution } from "@theia/core/lib/browser";
+
+// clean theia
+import { CleanTheiaCommandContribution, CleanTheiaMenuContribution } from "./clean-theia";
+
 // branding
 import "./branding/branding";
 import "../../src/browser/branding/style/index.css";
@@ -5,18 +12,17 @@ import "../../src/browser/branding/style/index.css";
 // themes
 import "./themes/index";
 
-// flash carts
-import { bindVesFlashCartsPreferences } from "./flash-carts/preferences";
-import { VesFlashCartsCommandContribution } from "./flash-carts/commands";
+// build
 import { VesBuildCommandContribution } from "./build/commands";
-
-import {
-  CleanTheiaCommandContribution,
-  CleanTheiaMenuContribution,
-} from "./clean-theia";
-import { CommandContribution, MenuContribution } from "@theia/core/lib/common";
-import { ContainerModule } from "inversify";
+import { VesBuildKeybindingContribution } from "./build/keybindings";
+import { VesBuildMenuContribution } from "./build/menu";
 import { bindVesBuildPreferences } from "./build/preferences";
+
+// flash carts
+import { VesFlashCartsCommandContribution } from "./flash-carts/commands";
+import { VesFlashCartsKeybindingContribution } from "./flash-carts/keybindings";
+import { VesFlashCartsMenuContribution } from "./flash-carts/menu";
+import { bindVesFlashCartsPreferences } from "./flash-carts/preferences";
 
 export default new ContainerModule((bind) => {
   // clean unneeded theia functions
@@ -26,9 +32,12 @@ export default new ContainerModule((bind) => {
   // build
   bindVesBuildPreferences(bind);
   bind(CommandContribution).to(VesBuildCommandContribution);
+  bind(MenuContribution).to(VesBuildMenuContribution);
+  bind(KeybindingContribution).to(VesBuildKeybindingContribution);
 
   // flash carts
   bindVesFlashCartsPreferences(bind);
   bind(CommandContribution).to(VesFlashCartsCommandContribution);
-  // bind(MenuContribution).to(TheiaHelloWorldExtensionMenuContribution);
+  bind(MenuContribution).to(VesFlashCartsMenuContribution);
+  bind(KeybindingContribution).to(VesFlashCartsKeybindingContribution);
 });
