@@ -1,3 +1,5 @@
+import { PreferenceScope, PreferenceService } from "@theia/core/lib/browser";
+
 export enum BuildMode {
     release = "release",
     beta = "beta",
@@ -6,7 +8,6 @@ export enum BuildMode {
     preprocessor = "preprocessor",
 }
 
-export async function setModeCommand(buildMode: BuildMode) {
-    // TODO
-    //alert(`Set build mode to ${BuildMode[buildMode]}`);
+export async function setModeCommand(preferenceService: PreferenceService, buildMode: BuildMode) {
+    preferenceService.set("build.buildMode", buildMode, PreferenceScope.User);
 }

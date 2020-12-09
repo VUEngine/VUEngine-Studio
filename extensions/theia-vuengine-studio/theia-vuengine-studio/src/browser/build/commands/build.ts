@@ -48,7 +48,7 @@ async function build(preferenceService: PreferenceService, terminalService: Term
         'LC_ALL': 'C',
     };
     const preCallMake = 'export PATH=' + v810path + ' && ';
-    const enableWsl = preferenceService.get("vuengine.build.enableWsl");;
+    const enableWsl = preferenceService.get("build.enableWsl");
 
     let makefile = convertoToEnvPath(preferenceService, joinPath(getWorkspaceRoot(workspaceService), 'makefile'));
     if (!existsSync(makefile)) {

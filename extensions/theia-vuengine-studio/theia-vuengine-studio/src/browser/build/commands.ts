@@ -24,14 +24,14 @@ import { togglePedanticWarnings } from "./commands/togglePedanticWarnings";
 
 export const VesBuildCommand: Command = {
   id: "VesBuild.commands.build",
-  label: "Build project",
+  label: "Build Project",
   category: "Build",
   iconClass: "wrench",
 };
 
 export const VesBuildCleanCommand: Command = {
   id: "VesBuild.commands.clean",
-  label: "Clean build folder",
+  label: "Clean Build Folder",
   category: "Build",
   iconClass: "remove",
 };
@@ -45,31 +45,31 @@ export const VesBuildExportCommand: Command = {
 
 export const VesBuildSetModeReleaseCommand: Command = {
   id: "VesBuild.commands.setMode.release",
-  label: `Set build mode to "release"`,
+  label: `Set Build Mode to "release"`,
   category: "Build",
   iconClass: "mode",
 };
 export const VesBuildSetModeBetaCommand: Command = {
   id: "VesBuild.commands.setMode.beta",
-  label: `Set build mode to "beta"`,
+  label: `Set Build Mode to "beta"`,
   category: "Build",
   iconClass: "mode",
 };
 export const VesBuildSetModeToolsCommand: Command = {
   id: "VesBuild.commands.setMode.tools",
-  label: `Set build mode to "tools"`,
+  label: `Set Build Mode to "tools"`,
   category: "Build",
   iconClass: "mode",
 };
 export const VesBuildSetModeDebugCommand: Command = {
   id: "VesBuild.commands.setMode.debug",
-  label: `Set build mode to "debug"`,
+  label: `Set Build Mode to "debug"`,
   category: "Build",
   iconClass: "mode",
 };
 export const VesBuildSetModePreprocessorCommand: Command = {
   id: "VesBuild.commands.setMode.preprocessor",
-  label: `Set build mode to "preprocessor"`,
+  label: `Set Build Mode to "preprocessor"`,
   category: "Build",
   iconClass: "mode",
 };
@@ -109,6 +109,10 @@ export class VesBuildCommandContribution implements CommandContribution {
   ) { }
 
   registerCommands(registry: CommandRegistry): void {
+    const buildMode = this.preferenceService.get("build.buildMode");
+    const dumpElf = this.preferenceService.get("build.dumpElf");
+    const pedanticWarnings = this.preferenceService.get("build.pedanticWarnings");
+
     registry.registerCommand(VesBuildCommand, {
       execute: () => buildCommand(this.preferenceService, this.terminalService, this.workspaceService),
     });
@@ -120,39 +124,51 @@ export class VesBuildCommandContribution implements CommandContribution {
     });
 
     registry.registerCommand(VesBuildSetModeReleaseCommand, {
-      execute: () => setModeCommand(BuildMode.release),
-      isEnabled: () => false,
-      isToggled: () => true,
+      execute: () => setModeCommand(this.preferenceService, BuildMode.release),
+      isEnabled: () => (buildMode !== BuildMode.release),
+      isToggled: () => (buildMode === BuildMode.release),
     });
     registry.registerCommand(VesBuildSetModeBetaCommand, {
-      execute: () => setModeCommand(BuildMode.beta),
+      execute: () => setModeCommand(this.preferenceService, BuildMode.beta),
+      isEnabled: () => (buildMode !== BuildMode.beta),
+      isToggled: () => (buildMode === BuildMode.beta),
     });
     registry.registerCommand(VesBuildSetModeToolsCommand, {
-      execute: () => setModeCommand(BuildMode.tools),
+      execute: () => setModeCommand(this.preferenceService, BuildMode.tools),
+      isEnabled: () => (buildMode !== BuildMode.tools),
+      isToggled: () => (buildMode === BuildMode.tools),
     });
     registry.registerCommand(VesBuildSetModeDebugCommand, {
-      execute: () => setModeCommand(BuildMode.debug),
+      execute: () => setModeCommand(this.preferenceService, BuildMode.debug),
+      isEnabled: () => (buildMode !== BuildMode.debug),
+      isToggled: () => (buildMode === BuildMode.debug),
     });
     registry.registerCommand(VesBuildSetModePreprocessorCommand, {
-      execute: () => setModeCommand(BuildMode.preprocessor),
+      execute: () => setModeCommand(this.preferenceService, BuildMode.preprocessor),
+      isEnabled: () => (buildMode !== BuildMode.preprocessor),
+      isToggled: () => (buildMode === BuildMode.preprocessor),
     });
 
     registry.registerCommand(VesBuildEnableDumpElfCommand, {
-      execute: () => toggleDumpElf(true),
-      isToggled: () => true,
+      execute: () => toggleDumpElf(this.preferenceService, true),
+      isToggled: () => false,
+      isVisible: () => !dumpElf,
     });
     registry.registerCommand(VesBuildDisableDumpElfCommand, {
-      execute: () => toggleDumpElf(false),
-      isVisible: () => false,
+      execute: () => toggleDumpElf(this.preferenceService, false),
+      isToggled: () => true,
+      isVisible: () => !!dumpElf,
     });
 
     registry.registerCommand(VesBuildEnablePedanticWarningsCommand, {
-      execute: () => togglePedanticWarnings(true),
-      isToggled: () => true,
-      isVisible: () => false,
+      execute: () => togglePedanticWarnings(this.preferenceService, true),
+      isToggled: () => false,
+      isVisible: () => !pedanticWarnings,
     });
     registry.registerCommand(VesBuildDisablePedanticWarningsCommand, {
-      execute: () => togglePedanticWarnings(false),
+      execute: () => togglePedanticWarnings(this.preferenceService, false),
+      isToggled: () => true,
+      isVisible: () => !!pedanticWarnings,
     });
   }
 }

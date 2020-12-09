@@ -108,7 +108,7 @@ export function getMsysPath() {
 // //   // TODO: ensure that invoked processes are killed when Terminal is closed
 // //   const terminalMode = preferenceService.get("vuengine.terminal.instances");
 // //   const terminalClear = preferenceService.get("vuengine.terminal.clear");
-// //   const enableWsl = preferenceService.get("vuengine.build.enableWsl");
+// //   const enableWsl = preferenceService.get("build.enableWsl");
 // //   const msysPath = getMsysPath();
 
 // //   let terminalStillExists = false;
@@ -165,7 +165,7 @@ export function convertoToEnvPath(
     preferenceService: PreferenceService,
     path: string
 ) {
-    const enableWsl = preferenceService.get("vuengine.build.enableWsl");
+    const enableWsl = preferenceService.get("build.enableWsl");
     let envPath = path.replace(/^[a-zA-Z]:\//, function (x) {
         return "/" + x.substr(0, 1).toLowerCase() + "/";
     });

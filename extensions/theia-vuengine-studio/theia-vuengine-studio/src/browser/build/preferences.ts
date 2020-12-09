@@ -1,4 +1,5 @@
 import { interfaces } from "inversify";
+import { isWindows } from "@theia/core";
 import {
   createPreferenceProxy,
   PreferenceProxy,
@@ -6,11 +7,33 @@ import {
   PreferenceContribution,
   PreferenceSchema,
 } from "@theia/core/lib/browser";
-import { isWindows } from "@theia/core";
+import { BuildMode } from "./commands/setMode";
 
 const VesBuildPreferenceSchema: PreferenceSchema = {
   type: "object",
-  properties: {},
+  properties: {
+    "build.dumpElf": {
+      type: "boolean",
+      description: "Dump assembly code and memory sections",
+      default: false,
+    },
+    "build.pedanticWarnings": {
+      type: "boolean",
+      description: "Enable pedantic compiler warnigns",
+      default: false,
+    },
+    "build.buildMode": {
+      type: "string",
+      default: BuildMode.release,
+      enum: [
+        BuildMode.release,
+        BuildMode.beta,
+        BuildMode.tools,
+        BuildMode.debug,
+        BuildMode.preprocessor
+      ]
+    }
+  },
 };
 
 if (isWindows) {

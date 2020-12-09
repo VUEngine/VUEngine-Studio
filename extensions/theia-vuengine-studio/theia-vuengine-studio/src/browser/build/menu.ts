@@ -73,22 +73,22 @@ export class VesBuildMenuContribution implements MenuContribution {
 
     menus.registerMenuAction(BuildMenuSection.OPTION, {
       commandId: VesBuildEnableDumpElfCommand.id,
-      label: VesBuildEnableDumpElfCommand.label,
+      label: "Dump ELF",
       order: "1"
     });
     menus.registerMenuAction(BuildMenuSection.OPTION, {
       commandId: VesBuildDisableDumpElfCommand.id,
-      label: VesBuildDisableDumpElfCommand.label,
+      label: "Dump ELF",
       order: "2"
     });
     menus.registerMenuAction(BuildMenuSection.OPTION, {
       commandId: VesBuildEnablePedanticWarningsCommand.id,
-      label: VesBuildEnablePedanticWarningsCommand.label,
+      label: "Pedantic Warnings",
       order: "3"
     });
     menus.registerMenuAction(BuildMenuSection.OPTION, {
       commandId: VesBuildDisablePedanticWarningsCommand.id,
-      label: VesBuildDisablePedanticWarningsCommand.label,
+      label: "Pedantic Warnings",
       order: "4"
     });
   }

@@ -16,7 +16,7 @@ import { WorkspaceService } from "@theia/workspace/lib/browser";
 export const VesFlashCartsCommand: Command = {
   id: "VesFlashCarts.commands.flash",
   // TODO: dynamic label based on connected flash cart? "Flash to HyperFlash32"
-  label: "Flash to flash cart",
+  label: "Flash to Flash Cart",
   category: "Flash",
   iconClass: "usb",
 };
