@@ -9,11 +9,13 @@
     "src"
   ],
   "dependencies": {
-    "@theia/core": "latest"
+    "@theia/core": "latest",
+    "usb": "^1.6.3"
   },
   "devDependencies": {
     "rimraf": "latest",
-    "typescript": "latest"
+    "typescript": "latest",
+    "@types/usb": "^1.5.2"
   },
   "scripts": {
     "prepare": "yarn run clean && yarn run build",
@@ -24,6 +26,10 @@
   "theiaExtensions": [
     {
       "frontend": "lib/browser/frontend-module"
+    },
+    {
+      "frontend": "lib/browser/sample-browser-menu-module",
+      "frontendElectron": "lib/electron-browser/sample-electron-menu-module"
     }
   ]
 }

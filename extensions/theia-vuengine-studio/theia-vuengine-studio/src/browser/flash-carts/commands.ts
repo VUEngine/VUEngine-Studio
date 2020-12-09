@@ -1,15 +1,17 @@
 import {
-  // inject,
+  inject,
   injectable,
 } from "inversify";
 import {
   Command,
   CommandContribution,
   CommandRegistry,
-  // MessageService,
+  MessageService
 } from "@theia/core/lib/common";
-// import { flashCommand } from "./commands/flash";
-// import { PreferenceService } from "@theia/core/lib/browser";
+import { TerminalService } from '@theia/terminal/lib/browser/base/terminal-service';
+import { flashCommand } from "./commands/flash";
+import { PreferenceService } from "@theia/core/lib/browser";
+import { WorkspaceService } from "@theia/workspace/lib/browser";
 
 export const VesFlashCartsCommand: Command = {
   id: "VesFlashCarts.commands.flash",
@@ -21,13 +23,16 @@ export const VesFlashCartsCommand: Command = {
 
 @injectable()
 export class VesFlashCartsCommandContribution implements CommandContribution {
-  constructor() // @inject(MessageService) private readonly messageService: MessageService,
-  // @inject(PreferenceService) private readonly preferenceService: PreferenceService
-  {}
+  constructor(
+    @inject(MessageService) private readonly messageService: MessageService,
+    @inject(PreferenceService) private readonly preferenceService: PreferenceService,
+    @inject(TerminalService) private readonly terminalService: TerminalService,
+    @inject(WorkspaceService) private readonly workspaceService: WorkspaceService
+  ) { }
 
   registerCommands(registry: CommandRegistry): void {
     registry.registerCommand(VesFlashCartsCommand, {
-      execute: () => console.log(""), //flashCommand(this.messageService, this.preferenceService),
+      execute: () => flashCommand(this.messageService, this.preferenceService, this.terminalService, this.workspaceService),
     });
   }
 }

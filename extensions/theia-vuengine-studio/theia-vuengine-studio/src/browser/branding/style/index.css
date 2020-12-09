@@ -3,6 +3,9 @@
     background-position: center;
     background-repeat: no-repeat;
     background-size: contain;
+    height: 32px;
+    margin: 0;
+    width: 50px;
 }
 
  #theia-main-content-panel {
@@ -10,4 +13,9 @@
     background-position: center center;
     background-repeat: no-repeat;
     background-size: var(--theia-brand-logo-size);
+}
+
+.p-MenuBar-item,
+.p-Menu-item {
+    cursor: pointer;
 }

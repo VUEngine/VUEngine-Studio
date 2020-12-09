@@ -3,8 +3,9 @@ import { workspace } from "vscode";
 import { join as joinPath, resolve as resolvePath } from "path";
 import { existsSync, readFileSync } from "fs";
 import { cpus, platform } from 'os';
+import { isWindows } from "@theia/core";
 
-const terminals: {[key:string]: Terminal} = {};
+const terminals: { [key: string]: Terminal } = {};
 export let isWorkspaceVUEngineProject = false;
 
 export function activate(context: ExtensionContext) {
@@ -133,7 +134,7 @@ export function getTerminal(terminalName: string, env = {}): Terminal {
       };
     }
 
-    if (getOs() == 'win') {
+    if (isWindows) {
       if (enableWsl) {
         terminalArgs.shellPath = process.env.windir + '\\System32\\wsl.exe';
       } else {
@@ -159,7 +160,7 @@ export function convertoToEnvPath(path: string) {
   let envPath = path.replace(/^[a-zA-Z]:\//, function (x) {
     return "/" + x.substr(0, 1).toLowerCase() + "/";
   });
-  if (getOs() === "win" && enableWsl) {
+  if (isWindows && enableWsl) {
     envPath = "/mnt/" + envPath;
   }
   return envPath;

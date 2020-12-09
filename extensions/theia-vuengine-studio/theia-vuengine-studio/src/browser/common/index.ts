@@ -1,7 +1,9 @@
-// import { join as joinPath, resolve as resolvePath } from "path";
-// import { existsSync, readFileSync } from "fs";
-// import { cpus, platform } from "os";
-// import { PreferenceService } from "@theia/core/lib/browser";
+import { join as joinPath, resolve as resolvePath } from "path";
+//import { existsSync, readFileSync } from "fs";
+import { cpus, platform } from "os";
+import { PreferenceService } from "@theia/core/lib/browser";
+import { WorkspaceService } from "@theia/workspace/lib/browser";
+import { isOSX, isWindows } from "@theia/core";
 
 // // const terminals: { [key: string]: Terminal } = {};
 // export let isWorkspaceVUEngineProject = isVUEngineProject(getWorkspaceRoot());
@@ -10,22 +12,21 @@
 //   return existsSync(resolvePath(folder + "/.vuengine"));
 // }
 
-// function getExtensionPath() {
-//   return "";
-// }
+function getExtensionPath() {
+    return "";
+}
 
-// export function getWorkspaceRoot(): string {
-//   // return workspace &&
-//   //   workspace.workspaceFolders &&
-//   //   workspace.workspaceFolders.length
-//   //   ? resolvePath(workspace.workspaceFolders[0]["uri"]["fsPath"])
-//   //   : "";
-//   return "";
-// }
+export function getWorkspaceRoot(workspaceService: WorkspaceService): string {
+    return workspaceService.getWorkspaceRootUri(workspaceService.workspace?.resource)?.path.toString() ?? "";
+}
 
-// export function getResourcesPath() {
-//   return resolvePath(joinPath(getExtensionPath(), "..", "..", "resources"));
-// }
+export function getResourcesPath() {
+    return resolvePath(joinPath(getExtensionPath(), "..", "..", "resources"));
+}
+
+export function getRomPath(workspaceService: WorkspaceService) {
+    return joinPath(getWorkspaceRoot(workspaceService), "build", "output.vb");
+}
 
 // export function parseJson(file: string) {
 //   if (existsSync(file)) {
@@ -66,36 +67,38 @@
 //   return object;
 // }
 
-// export function getThreads() {
-//   let threads = cpus().length;
-//   if (threads > 2) {
-//     threads--;
-//   }
+export function getThreads() {
+    let threads = cpus().length;
+    if (threads > 2) {
+        threads--;
+    }
 
-//   return threads;
-// }
+    return threads;
+}
 
-// export function getOs() {
-//   return platform()
-//     .replace("win32", "win")
-//     .replace("darwin", "osx");
-// }
+export function getOs() {
+    return isWindows
+        ? "win"
+        : isOSX
+            ? "osx"
+            : platform();
+}
 
-// export function getEngineCorePath() {
-//   return joinPath(getResourcesPath(), "app", "vuengine", "vuengine-core");
-// }
+export function getEngineCorePath() {
+    return joinPath(getResourcesPath(), "app", "vuengine", "vuengine-core");
+}
 
-// export function getEnginePluginsPath() {
-//   return joinPath(getResourcesPath(), "app", "vuengine", "vuengine-plugins");
-// }
+export function getEnginePluginsPath() {
+    return joinPath(getResourcesPath(), "app", "vuengine", "vuengine-plugins");
+}
 
-// export function getCompilerPath() {
-//   return joinPath(getResourcesPath(), "app", "binaries", getOs(), "gcc");
-// }
+export function getCompilerPath() {
+    return joinPath(getResourcesPath(), "app", "binaries", getOs(), "gcc");
+}
 
-// export function getMsysPath() {
-//   return joinPath(getResourcesPath(), "app", "binaries", "win", "msys");
-// }
+export function getMsysPath() {
+    return joinPath(getResourcesPath(), "app", "binaries", "win", "msys");
+}
 
 // // export function getTerminal(
 // //   preferenceService: PreferenceService,
@@ -137,7 +140,7 @@
 // //       };
 // //     }
 
-// //     if (getOs() == "win") {
+// //     if (isWindows) {
 // //       if (enableWsl) {
 // //         terminalArgs.shellPath = process.env.windir + "\\System32\\wsl.exe";
 // //       } else {
@@ -158,16 +161,16 @@
 // //   return terminals[terminalName];
 // // }
 
-// export function convertoToEnvPath(
-//   preferenceService: PreferenceService,
-//   path: string
-// ) {
-//   const enableWsl = preferenceService.get("vuengine.build.enableWsl");
-//   let envPath = path.replace(/^[a-zA-Z]:\//, function(x) {
-//     return "/" + x.substr(0, 1).toLowerCase() + "/";
-//   });
-//   if (getOs() === "win" && enableWsl) {
-//     envPath = "/mnt/" + envPath;
-//   }
-//   return envPath;
-// }
+export function convertoToEnvPath(
+    preferenceService: PreferenceService,
+    path: string
+) {
+    const enableWsl = preferenceService.get("vuengine.build.enableWsl");
+    let envPath = path.replace(/^[a-zA-Z]:\//, function (x) {
+        return "/" + x.substr(0, 1).toLowerCase() + "/";
+    });
+    if (isWindows && enableWsl) {
+        envPath = "/mnt/" + envPath;
+    }
+    return envPath;
+}

@@ -124,7 +124,6 @@ export class SampleMenuContribution implements MenuContribution {
  * Special menu node that is not backed by any commands and is always disabled.
  */
 export class PlaceholderMenuNode implements MenuNode {
-
     constructor(readonly id: string, public readonly label: string, protected options?: SubMenuOptions) { }
 
     get icon(): string | undefined {
@@ -134,7 +133,6 @@ export class PlaceholderMenuNode implements MenuNode {
     get sortString(): string {
         return this.options?.order || this.label;
     }
-
 }
 
 export const bindSampleMenu = (bind: interfaces.Bind) => {
