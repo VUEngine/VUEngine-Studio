@@ -1,13 +1,10 @@
-import {
-  inject,
-  injectable,
-} from "inversify";
+import { inject, injectable } from "inversify";
 import {
   Command,
   CommandContribution,
   CommandRegistry,
   CommandService,
-  MessageService
+  MessageService,
 } from "@theia/core/lib/common";
 import { cleanCommand } from "./commands/clean";
 import { QuickPickService } from "@theia/core/lib/common/quick-pick-service";
@@ -38,7 +35,7 @@ export const VesBuildCleanCommand: Command = {
 
 export const VesBuildExportCommand: Command = {
   id: "VesBuild.commands.export",
-  label: "Export ROM",
+  label: "Export ROM...",
   category: "Build",
   iconClass: "save",
 };
@@ -77,22 +74,22 @@ export const VesBuildSetModePreprocessorCommand: Command = {
 export const VesBuildEnableDumpElfCommand: Command = {
   id: "VesBuild.commands.dumpElf.enable",
   label: "Enable Dump ELF",
-  category: "Build"
+  category: "Build",
 };
 export const VesBuildDisableDumpElfCommand: Command = {
   id: "VesBuild.commands.dumpElf.disable",
   label: "Disable Dump ELF",
-  category: "Build"
+  category: "Build",
 };
 export const VesBuildEnablePedanticWarningsCommand: Command = {
   id: "VesBuild.commands.pedanticWarnings.enable",
   label: "Enable Pedantic Warnings",
-  category: "Build"
+  category: "Build",
 };
 export const VesBuildDisablePedanticWarningsCommand: Command = {
   id: "VesBuild.commands.pedanticWarnings.disable",
   label: "Disable Pedantic Warnings",
-  category: "Build"
+  category: "Build",
 };
 
 @injectable()
@@ -100,53 +97,76 @@ export class VesBuildCommandContribution implements CommandContribution {
   constructor(
     @inject(CommandService) private readonly commandService: CommandService,
     @inject(FileService) private readonly fileService: FileService,
-    @inject(FileDialogService) private readonly fileDialogService: FileDialogService,
+    @inject(FileDialogService)
+    private readonly fileDialogService: FileDialogService,
     @inject(MessageService) private readonly messageService: MessageService,
-    @inject(PreferenceService) private readonly preferenceService: PreferenceService,
+    @inject(PreferenceService)
+    private readonly preferenceService: PreferenceService,
     @inject(TerminalService) private readonly terminalService: TerminalService,
-    @inject(QuickPickService) private readonly quickPickService: QuickPickService,
-    @inject(WorkspaceService) private readonly workspaceService: WorkspaceService,
-  ) { }
+    @inject(QuickPickService)
+    private readonly quickPickService: QuickPickService,
+    @inject(WorkspaceService)
+    private readonly workspaceService: WorkspaceService
+  ) {}
 
   registerCommands(registry: CommandRegistry): void {
-    const buildMode = this.preferenceService.get("build.buildMode");
-    const dumpElf = this.preferenceService.get("build.dumpElf");
-    const pedanticWarnings = this.preferenceService.get("build.pedanticWarnings");
+    const buildMode = <string>this.preferenceService.get("build.buildMode");
+    const dumpElf = <boolean>this.preferenceService.get("build.dumpElf");
+    const pedanticWarnings = <boolean>(
+      this.preferenceService.get("build.pedanticWarnings")
+    );
 
     registry.registerCommand(VesBuildCommand, {
-      execute: () => buildCommand(this.preferenceService, this.terminalService, this.workspaceService),
+      execute: () =>
+        buildCommand(
+          this.preferenceService,
+          this.terminalService,
+          this.workspaceService
+        ),
     });
     registry.registerCommand(VesBuildCleanCommand, {
-      execute: () => cleanCommand(this.messageService, this.quickPickService, this.workspaceService)
+      execute: () =>
+        cleanCommand(
+          this.messageService,
+          this.quickPickService,
+          this.workspaceService
+        ),
     });
     registry.registerCommand(VesBuildExportCommand, {
-      execute: () => exportCommand(this.commandService, this.fileService, this.fileDialogService, this.preferenceService, this.workspaceService),
+      execute: () =>
+        exportCommand(
+          this.commandService,
+          this.fileService,
+          this.fileDialogService,
+          this.workspaceService
+        ),
     });
 
     registry.registerCommand(VesBuildSetModeReleaseCommand, {
       execute: () => setModeCommand(this.preferenceService, BuildMode.release),
-      isEnabled: () => (buildMode !== BuildMode.release),
-      isToggled: () => (buildMode === BuildMode.release),
+      isEnabled: () => buildMode !== BuildMode.release,
+      isToggled: () => buildMode === BuildMode.release,
     });
     registry.registerCommand(VesBuildSetModeBetaCommand, {
       execute: () => setModeCommand(this.preferenceService, BuildMode.beta),
-      isEnabled: () => (buildMode !== BuildMode.beta),
-      isToggled: () => (buildMode === BuildMode.beta),
+      isEnabled: () => buildMode !== BuildMode.beta,
+      isToggled: () => buildMode === BuildMode.beta,
     });
     registry.registerCommand(VesBuildSetModeToolsCommand, {
       execute: () => setModeCommand(this.preferenceService, BuildMode.tools),
-      isEnabled: () => (buildMode !== BuildMode.tools),
-      isToggled: () => (buildMode === BuildMode.tools),
+      isEnabled: () => buildMode !== BuildMode.tools,
+      isToggled: () => buildMode === BuildMode.tools,
     });
     registry.registerCommand(VesBuildSetModeDebugCommand, {
       execute: () => setModeCommand(this.preferenceService, BuildMode.debug),
-      isEnabled: () => (buildMode !== BuildMode.debug),
-      isToggled: () => (buildMode === BuildMode.debug),
+      isEnabled: () => buildMode !== BuildMode.debug,
+      isToggled: () => buildMode === BuildMode.debug,
     });
     registry.registerCommand(VesBuildSetModePreprocessorCommand, {
-      execute: () => setModeCommand(this.preferenceService, BuildMode.preprocessor),
-      isEnabled: () => (buildMode !== BuildMode.preprocessor),
-      isToggled: () => (buildMode === BuildMode.preprocessor),
+      execute: () =>
+        setModeCommand(this.preferenceService, BuildMode.preprocessor),
+      isEnabled: () => buildMode !== BuildMode.preprocessor,
+      isToggled: () => buildMode === BuildMode.preprocessor,
     });
 
     registry.registerCommand(VesBuildEnableDumpElfCommand, {

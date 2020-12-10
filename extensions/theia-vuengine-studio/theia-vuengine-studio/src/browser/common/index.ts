@@ -13,19 +13,23 @@ import { isOSX, isWindows } from "@theia/core";
 // }
 
 function getExtensionPath() {
-    return "";
+  return "";
 }
 
 export function getWorkspaceRoot(workspaceService: WorkspaceService): string {
-    return workspaceService.getWorkspaceRootUri(workspaceService.workspace?.resource)?.path.toString() ?? "";
+  return (
+    workspaceService
+      .getWorkspaceRootUri(workspaceService.workspace?.resource)
+      ?.path.toString() ?? ""
+  );
 }
 
 export function getResourcesPath() {
-    return resolvePath(joinPath(getExtensionPath(), "..", "..", "resources"));
+  return resolvePath(joinPath(getExtensionPath(), "..", "..", "resources"));
 }
 
-export function getRomPath(workspaceService: WorkspaceService) {
-    return joinPath(getWorkspaceRoot(workspaceService), "build", "output.vb");
+export function getRomPath(workspaceService: WorkspaceService): string {
+  return joinPath(getWorkspaceRoot(workspaceService), "build", "output.vb");
 }
 
 // export function parseJson(file: string) {
@@ -68,36 +72,32 @@ export function getRomPath(workspaceService: WorkspaceService) {
 // }
 
 export function getThreads() {
-    let threads = cpus().length;
-    if (threads > 2) {
-        threads--;
-    }
+  let threads = cpus().length;
+  if (threads > 2) {
+    threads--;
+  }
 
-    return threads;
+  return threads;
 }
 
 export function getOs() {
-    return isWindows
-        ? "win"
-        : isOSX
-            ? "osx"
-            : platform();
+  return isWindows ? "win" : isOSX ? "osx" : platform();
 }
 
 export function getEngineCorePath() {
-    return joinPath(getResourcesPath(), "app", "vuengine", "vuengine-core");
+  return joinPath(getResourcesPath(), "app", "vuengine", "vuengine-core");
 }
 
 export function getEnginePluginsPath() {
-    return joinPath(getResourcesPath(), "app", "vuengine", "vuengine-plugins");
+  return joinPath(getResourcesPath(), "app", "vuengine", "vuengine-plugins");
 }
 
 export function getCompilerPath() {
-    return joinPath(getResourcesPath(), "app", "binaries", getOs(), "gcc");
+  return joinPath(getResourcesPath(), "app", "binaries", getOs(), "gcc");
 }
 
 export function getMsysPath() {
-    return joinPath(getResourcesPath(), "app", "binaries", "win", "msys");
+  return joinPath(getResourcesPath(), "app", "binaries", "win", "msys");
 }
 
 // // export function getTerminal(
@@ -162,15 +162,15 @@ export function getMsysPath() {
 // // }
 
 export function convertoToEnvPath(
-    preferenceService: PreferenceService,
-    path: string
+  preferenceService: PreferenceService,
+  path: string
 ) {
-    const enableWsl = preferenceService.get("build.enableWsl");
-    let envPath = path.replace(/^[a-zA-Z]:\//, function (x) {
-        return "/" + x.substr(0, 1).toLowerCase() + "/";
-    });
-    if (isWindows && enableWsl) {
-        envPath = "/mnt/" + envPath;
-    }
-    return envPath;
+  const enableWsl = preferenceService.get("build.enableWsl");
+  let envPath = path.replace(/^[a-zA-Z]:\//, function(x) {
+    return "/" + x.substr(0, 1).toLowerCase() + "/";
+  });
+  if (isWindows && enableWsl) {
+    envPath = "/mnt/" + envPath;
+  }
+  return envPath;
 }

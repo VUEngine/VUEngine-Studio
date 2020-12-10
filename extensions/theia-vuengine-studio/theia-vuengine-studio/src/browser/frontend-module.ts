@@ -3,11 +3,17 @@ import { CommandContribution, MenuContribution } from "@theia/core/lib/common";
 import { KeybindingContribution } from "@theia/core/lib/browser";
 
 // clean theia
-import { CleanTheiaCommandContribution, CleanTheiaMenuContribution } from "./clean-theia";
+import {
+  CleanTheiaCommandContribution,
+  CleanTheiaMenuContribution,
+} from "./clean-theia";
 
 // branding
 import "./branding/branding";
 import "../../src/browser/branding/style/index.css";
+
+// touchbar
+import "./touchbarTest";
 
 // themes
 import "./themes/index";
@@ -23,6 +29,12 @@ import { VesFlashCartsCommandContribution } from "./flash-carts/commands";
 import { VesFlashCartsKeybindingContribution } from "./flash-carts/keybindings";
 import { VesFlashCartsMenuContribution } from "./flash-carts/menu";
 import { bindVesFlashCartsPreferences } from "./flash-carts/preferences";
+
+// run
+import { bindVesRunPreferences } from "./run/preferences";
+import { VesRunCommandContribution } from "./run/commands";
+import { VesRunMenuContribution } from "./run/menu";
+import { VesRunKeybindingContribution } from "./run/keybindings";
 
 export default new ContainerModule((bind) => {
   // clean unneeded theia functions
@@ -40,4 +52,10 @@ export default new ContainerModule((bind) => {
   bind(CommandContribution).to(VesFlashCartsCommandContribution);
   bind(MenuContribution).to(VesFlashCartsMenuContribution);
   bind(KeybindingContribution).to(VesFlashCartsKeybindingContribution);
+
+  // run
+  bindVesRunPreferences(bind);
+  bind(CommandContribution).to(VesRunCommandContribution);
+  bind(MenuContribution).to(VesRunMenuContribution);
+  bind(KeybindingContribution).to(VesRunKeybindingContribution);
 });

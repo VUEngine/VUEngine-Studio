@@ -12,6 +12,17 @@ import { BuildMode } from "./commands/setMode";
 const VesBuildPreferenceSchema: PreferenceSchema = {
   type: "object",
   properties: {
+    "build.buildMode": {
+      type: "string",
+      default: BuildMode.release,
+      enum: [
+        BuildMode.release,
+        BuildMode.beta,
+        BuildMode.tools,
+        BuildMode.debug,
+        BuildMode.preprocessor,
+      ],
+    },
     "build.dumpElf": {
       type: "boolean",
       description: "Dump assembly code and memory sections",
@@ -22,17 +33,6 @@ const VesBuildPreferenceSchema: PreferenceSchema = {
       description: "Enable pedantic compiler warnigns",
       default: false,
     },
-    "build.buildMode": {
-      type: "string",
-      default: BuildMode.release,
-      enum: [
-        BuildMode.release,
-        BuildMode.beta,
-        BuildMode.tools,
-        BuildMode.debug,
-        BuildMode.preprocessor
-      ]
-    }
   },
 };
 
