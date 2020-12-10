@@ -3,17 +3,19 @@ import { CommandContribution, MenuContribution } from "@theia/core/lib/common";
 import { KeybindingContribution } from "@theia/core/lib/browser";
 
 // clean theia
-import {
-  CleanTheiaCommandContribution,
-  CleanTheiaMenuContribution,
-} from "./clean-theia";
+// import {
+//   CleanTheiaCommandContribution,
+//   CleanTheiaMenuContribution,
+// } from "./clean-theia";
 
 // branding
 import "./branding/branding";
 import "../../src/browser/branding/style/index.css";
+import { VesBrandingMenuContribution } from "./branding/menu";
+import { VesBrandingCommandContribution } from "./branding/commands";
 
 // touchbar
-import "./touchbarTest";
+// import "./touchbarTest";
 
 // themes
 import "./themes/index";
@@ -38,8 +40,12 @@ import { VesRunKeybindingContribution } from "./run/keybindings";
 
 export default new ContainerModule((bind) => {
   // clean unneeded theia functions
-  bind(CommandContribution).to(CleanTheiaCommandContribution);
-  bind(MenuContribution).to(CleanTheiaMenuContribution);
+  // bind(CommandContribution).to(CleanTheiaCommandContribution);
+  // bind(MenuContribution).to(CleanTheiaMenuContribution);
+
+  // branding
+  bind(CommandContribution).to(VesBrandingCommandContribution);
+  bind(MenuContribution).to(VesBrandingMenuContribution);
 
   // build
   bindVesBuildPreferences(bind);
