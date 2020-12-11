@@ -8,9 +8,9 @@
 		"inputOption.activeBorder": "#d3142200",
 		"inputValidation.infoBorder": "#d31422",
 		"peekView.border": "#d31422",
-		"statusBar.background": "#111",
 		"textBlockQuote.border": "#d3142280",
-		"titleBar.activeBackground": "#111",
-		"titleBar.inactiveBackground": "#000"
+		"statusBar.background": "#3c3c3c",
+		"statusBar.border": "#1e1e1e",
+		"titleBar.border": "#1e1e1e"
 	}
 }

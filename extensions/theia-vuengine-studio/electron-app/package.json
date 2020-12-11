@@ -27,6 +27,30 @@
     "watch": "theia build --watch --mode development"
   },
   "theia": {
-    "target": "electron"
+    "target": "electron",
+    "frontend": {
+      "config": {
+        "applicationName": "VUEngine Studio",
+        "defaultTheme": "vuengine-dark",
+        "defaultIconTheme": "theia-file-icons",
+        "electron": {
+          "windowOptions": {
+            "backgroundColor": "#222",
+            "titleBarStyle": "hiddenInset",
+            "frame": true
+          }
+        }
+      }
+    },
+    "backend": {
+      "config": {
+        "startupTimeout": -1
+      }
+    },
+    "generator": {
+      "config": {
+        "preloadTemplate": "../../../resources/splash/index.html"
+      }
+    }
   }
 }

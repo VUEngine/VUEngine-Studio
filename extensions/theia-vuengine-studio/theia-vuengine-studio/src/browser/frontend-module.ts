@@ -8,6 +8,12 @@ import { KeybindingContribution } from "@theia/core/lib/browser";
 //   CleanTheiaMenuContribution,
 // } from "./clean-theia";
 
+// topbar
+import { VesTopbarWidget } from './topbar/widget';
+import { VesTopbarContribution } from './topbar/view';
+import { bindViewContribution, FrontendApplicationContribution, WidgetFactory } from '@theia/core/lib/browser';
+import '../../src/browser/topbar/style/index.css';
+
 // branding
 import "./branding/branding";
 import "../../src/browser/branding/style/index.css";
@@ -42,6 +48,16 @@ export default new ContainerModule((bind) => {
   // clean unneeded theia functions
   // bind(CommandContribution).to(CleanTheiaCommandContribution);
   // bind(MenuContribution).to(CleanTheiaMenuContribution);
+
+  // topbar
+  bindViewContribution(bind, VesTopbarContribution);
+  bind(FrontendApplicationContribution).toService(VesTopbarContribution);
+  bind(VesTopbarWidget).toSelf();
+  bind(WidgetFactory).toDynamicValue(ctx => ({
+    id: VesTopbarWidget.ID,
+    createWidget: () => ctx.container.get<VesTopbarWidget>(VesTopbarWidget)
+  })).inSingletonScope();
+
 
   // branding
   bind(CommandContribution).to(VesBrandingCommandContribution);

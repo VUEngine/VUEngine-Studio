@@ -1,0 +1,27 @@
+/* TODO: find better way to resize top panel */
+#theia-top-panel {
+    height: 38px !important;
+}
+#theia-left-right-split-panel {
+    bottom: 19px !important;
+    height: auto !important;
+    top: 38px !important;
+}
+
+#ves-topbar {
+    -webkit-app-region: drag;
+    color: var(--theia-ui-font-color1);
+    font-size: 12px;
+    font-weight: 400;
+    text-align: center;
+    width: 100%;
+}
+
+#application-title {
+    line-height: 40px;
+}
+
+.topbar-buttons {
+    float: right;
+    padding: 8px;
+}
