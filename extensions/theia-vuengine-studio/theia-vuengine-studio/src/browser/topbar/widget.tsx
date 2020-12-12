@@ -3,12 +3,13 @@ import { injectable, postConstruct, inject } from 'inversify';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { FrontendApplicationConfigProvider } from '@theia/core/lib/browser/frontend-application-config-provider';
 import { CommandService, MessageService } from '@theia/core';
-
+import { existsSync } from "fs";
+import { join as joinPath } from "path";
 import { VesFlashCartsCommand } from "../flash-carts/commands";
 import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand } from '../build/commands';
 import { VesStateModel } from '../common/vesStateModel';
-
-declare var window: any;
+import { getWorkspaceRoot } from '../common';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
 
 @injectable()
 export class VesTopbarWidget extends ReactWidget {
@@ -22,6 +23,8 @@ export class VesTopbarWidget extends ReactWidget {
     protected readonly messageService!: MessageService;
     @inject(CommandService)
     protected readonly commandService!: CommandService;
+    @inject(WorkspaceService)
+    protected readonly workspaceService!: WorkspaceService;
 
     @postConstruct()
     protected async init(): Promise<void> {
@@ -32,6 +35,7 @@ export class VesTopbarWidget extends ReactWidget {
         this.vesStateModel.onDidChangeIsCleaning(() => this.update());
         this.vesStateModel.onDidChangeIsBuilding(() => this.update());
         this.vesStateModel.onDidChangeIsFlashQueued(() => this.update());
+        this.vesStateModel.onDidChangeConnectedFlashCart(() => this.update());
         this.vesStateModel.onDidChangeIsRunQueued(() => this.update());
         this.vesStateModel.onDidChangeIsExportQueued(() => this.update());
         this.update();
@@ -39,11 +43,14 @@ export class VesTopbarWidget extends ReactWidget {
 
     protected render(): React.ReactNode {
         const { applicationName } = FrontendApplicationConfigProvider.get();
+        // TODO: on initial render, the workspace root can not be determined
+        const buildFolderExists = existsSync(joinPath(getWorkspaceRoot(this.workspaceService), "build"));
         return <>
             <div className="topbar-buttons">
                 <button
                     className={this.vesStateModel.isCleaning ? "theia-button" : "theia-button secondary"}
                     title={this.vesStateModel.isCleaning ? "Cleaning..." : "Clean"}
+                    disabled={!buildFolderExists}
                     onClick={this.handleCleanOnClick}
                 >
                     {this.vesStateModel.isCleaning
@@ -70,7 +77,12 @@ export class VesTopbarWidget extends ReactWidget {
                 </button>
                 <button
                     className={this.vesStateModel.isFlashQueued ? "theia-button" : "theia-button secondary"}
-                    title={this.vesStateModel.isFlashQueued ? "Flash Queued..." : "Flash"}
+                    title={this.vesStateModel.connectedFlashCart === ""
+                        ? "No Flash Cart Connected"
+                        : this.vesStateModel.isFlashQueued
+                            ? `Flash to ${this.vesStateModel.connectedFlashCart} Queued...`
+                            : `Flash to ${this.vesStateModel.connectedFlashCart}`}
+                    disabled={this.vesStateModel.connectedFlashCart === ""}
                     onClick={this.handleFlashOnClick}
                 >
                     {this.vesStateModel.isFlashQueued

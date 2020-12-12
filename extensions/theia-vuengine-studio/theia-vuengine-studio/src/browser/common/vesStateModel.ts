@@ -28,6 +28,18 @@ export class VesStateModel {
         return this._isBuilding;
     }
 
+    // flash cart connected
+    protected _connectedFlashCart = "";
+    protected readonly onDidChangeConnectedFlashCartEmitter = new Emitter<string>();
+    readonly onDidChangeConnectedFlashCart = this.onDidChangeConnectedFlashCartEmitter.event;
+    set connectedFlashCart(name: string) {
+        this._connectedFlashCart = name;
+        this.onDidChangeConnectedFlashCartEmitter.fire(this._connectedFlashCart);
+    }
+    get connectedFlashCart(): string {
+        return this._connectedFlashCart;
+    }
+
     // flash queued
     protected _isFlashQueued = false;
     protected readonly onDidChangeIsFlashQueuedEmitter = new Emitter<boolean>();

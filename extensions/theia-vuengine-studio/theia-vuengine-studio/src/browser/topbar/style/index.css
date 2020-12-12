@@ -30,15 +30,17 @@
 }
 
 .topbar-buttons {
-    padding: 6px 8px 0 0;
+    padding: 5px 8px 0 0;
     position: absolute;
     right: 0;
     top: 0;
 }
 
 .topbar-buttons .theia-button {
-    font-size: 18px !important;
-    margin-left: 8px !important;
-    min-width: 48px !important;
-    padding: 3px 4px 2px !important;
+    border-radius: 3px;
+    font-size: 18px;
+    line-height: 28px;
+    margin-left: 4px;
+    min-width: 40px;
+    padding: 1px 0 0;
 }

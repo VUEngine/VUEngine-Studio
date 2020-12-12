@@ -21,6 +21,7 @@ const VesFlashCartsPreferenceSchema: PreferenceSchema = {
           name: {
             type: "string",
             description: "Name of the flash cart configuration",
+            minimum: 1
           },
           vid: {
             type: "number",
@@ -50,6 +51,8 @@ const VesFlashCartsPreferenceSchema: PreferenceSchema = {
           size: {
             type: "number",
             description: "Size of flash cart (in Mbit)",
+            minimum: 1,
+            maximum: 256,
           },
           path: {
             type: "string",
