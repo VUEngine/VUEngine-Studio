@@ -10,6 +10,7 @@ import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-servi
 import { flashCommand } from "./commands/flash";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
+import { VesStateModel } from "../common/vesStateModel";
 
 export const VesFlashCartsCommand: Command = {
   id: "VesFlashCarts.commands.flash",
@@ -27,9 +28,11 @@ export class VesFlashCartsCommandContribution implements CommandContribution {
     @inject(PreferenceService)
     private readonly preferenceService: PreferenceService,
     @inject(TerminalService) private readonly terminalService: TerminalService,
+    @inject(VesStateModel)
+    private readonly vesStateModel: VesStateModel,
     @inject(WorkspaceService)
     private readonly workspaceService: WorkspaceService
-  ) {}
+  ) { }
 
   registerCommands(registry: CommandRegistry): void {
     registry.registerCommand(VesFlashCartsCommand, {
@@ -39,6 +42,7 @@ export class VesFlashCartsCommandContribution implements CommandContribution {
           this.messageService,
           this.preferenceService,
           this.terminalService,
+          this.vesStateModel,
           this.workspaceService
         ),
     });

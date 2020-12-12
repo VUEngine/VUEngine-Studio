@@ -10,8 +10,10 @@ import { WorkspaceService } from "@theia/workspace/lib/browser";
 import { createWriteStream, existsSync, readFileSync, unlinkSync } from "fs";
 import { dirname, join as joinPath } from "path";
 import { /*getDeviceList, */ Device } from "usb";
+
 import { VesBuildCommand } from "../../build/commands";
 import { convertoToEnvPath, getResourcesPath, getRomPath } from "../../common";
+import { VesStateModel } from "../../common/vesStateModel";
 
 type FlashCartConfig = {
   name: string;
@@ -36,6 +38,7 @@ export async function flashCommand(
   messageService: MessageService,
   preferenceService: PreferenceService,
   terminalService: TerminalService,
+  vesStateModel: VesStateModel,
   workspaceService: WorkspaceService
 ) {
   const flashCartConfigs: FlashCartConfig[] = getFlashCartConfigs(
@@ -58,7 +61,7 @@ export async function flashCommand(
     );
   } else {
     commandService.executeCommand(VesBuildCommand.id);
-    // TODO queue flash
+    vesStateModel.isFlashQueued = true;
   }
 }
 
@@ -196,7 +199,7 @@ async function flash(
 
   const romPath =
     connectedFlashCart.config.padRom &&
-    padRom(workspaceService, connectedFlashCart.config.size)
+      padRom(workspaceService, connectedFlashCart.config.size)
       ? getPaddedRomPath(workspaceService)
       : getRomPath(workspaceService);
 
@@ -239,7 +242,7 @@ function padRom(workspaceService: WorkspaceService, size: number): boolean {
   }
 
   const stream = createWriteStream(paddedRomPath, { flags: "a" });
-  [...Array(timesToMirror)].forEach(function() {
+  [...Array(timesToMirror)].forEach(function () {
     stream.write(romContent);
   });
   stream.end();

@@ -6,18 +6,19 @@ import {
   CommandService,
   MessageService,
 } from "@theia/core/lib/common";
-import { cleanCommand } from "./commands/clean";
 import { QuickPickService } from "@theia/core/lib/common/quick-pick-service";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
-import { buildCommand } from "./commands/build";
+import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
-import { exportCommand } from "./commands/export";
 import { FileDialogService } from "@theia/filesystem/lib/browser";
-import { FileService } from "@theia/filesystem/lib/browser/file-service";
+import { buildCommand } from "./commands/build";
+import { exportCommand } from "./commands/export";
 import { BuildMode, setModeCommand } from "./commands/setMode";
+import { cleanCommand } from "./commands/clean";
 import { toggleDumpElf } from "./commands/toggleDumpElf";
 import { togglePedanticWarnings } from "./commands/togglePedanticWarnings";
+import { VesStateModel } from "../common/vesStateModel";
 
 export const VesBuildCommand: Command = {
   id: "VesBuild.commands.build",
@@ -105,9 +106,11 @@ export class VesBuildCommandContribution implements CommandContribution {
     @inject(TerminalService) private readonly terminalService: TerminalService,
     @inject(QuickPickService)
     private readonly quickPickService: QuickPickService,
+    @inject(VesStateModel)
+    private readonly vesStateModel: VesStateModel,
     @inject(WorkspaceService)
     private readonly workspaceService: WorkspaceService
-  ) {}
+  ) { }
 
   registerCommands(registry: CommandRegistry): void {
     const buildMode = <string>this.preferenceService.get("build.buildMode");
@@ -121,6 +124,7 @@ export class VesBuildCommandContribution implements CommandContribution {
         buildCommand(
           this.preferenceService,
           this.terminalService,
+          this.vesStateModel,
           this.workspaceService
         ),
     });
@@ -129,6 +133,7 @@ export class VesBuildCommandContribution implements CommandContribution {
         cleanCommand(
           this.messageService,
           this.quickPickService,
+          this.vesStateModel,
           this.workspaceService
         ),
     });
@@ -138,6 +143,7 @@ export class VesBuildCommandContribution implements CommandContribution {
           this.commandService,
           this.fileService,
           this.fileDialogService,
+          this.vesStateModel,
           this.workspaceService
         ),
     });

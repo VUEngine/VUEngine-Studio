@@ -20,7 +20,7 @@
         "electron": {
           "windowOptions": {
             "backgroundColor": "#222",
-            "titleBarStyle": "default",
+            "titleBarStyle": "hiddenInset",
             "frame": true
           }
         }

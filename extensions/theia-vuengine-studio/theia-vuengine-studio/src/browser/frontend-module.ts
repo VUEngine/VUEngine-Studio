@@ -23,6 +23,9 @@ import { VesBrandingCommandContribution } from "./branding/commands";
 // touchbar
 // import "./touchbarTest";
 
+// common
+import { VesStateModel } from './common/vesStateModel';
+
 // themes
 import "./themes/index";
 
@@ -62,6 +65,9 @@ export default new ContainerModule((bind) => {
   // branding
   bind(CommandContribution).to(VesBrandingCommandContribution);
   bind(MenuContribution).to(VesBrandingMenuContribution);
+
+  // common
+  bind(VesStateModel).toSelf().inSingletonScope();
 
   // build
   bindVesBuildPreferences(bind);

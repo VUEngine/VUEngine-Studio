@@ -9,12 +9,14 @@ import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
 import { existsSync } from "fs";
 import { getRomPath } from "../../common";
+import { VesStateModel } from "../../common/vesStateModel";
 import { VesBuildCommand } from "../commands";
 
 export async function exportCommand(
   commandService: CommandService,
   fileService: FileService,
   fileDialogService: FileDialogService,
+  vesStateModel: VesStateModel,
   workspaceService: WorkspaceService
 ) {
   const romPath = getRomPath(workspaceService);
@@ -23,8 +25,7 @@ export async function exportCommand(
     exportRom(commandService, fileService, fileDialogService, romPath);
   } else {
     commandService.executeCommand(VesBuildCommand.id);
-    // TODO: queue export to run after build finishes
-    // queueExportRom(...)
+    vesStateModel.isExportQueued = true;
   }
 }
 
@@ -67,18 +68,12 @@ async function exportRom(
 }
 
 async function confirmOverwrite(uri: URI): Promise<boolean> {
-  // Electron already handles the confirmation so do not prompt again.
-  if (isElectron()) {
+  if (environment.electron.is()) {
     return true;
   }
-  // Prompt users for confirmation before overwriting.
   const confirmed = await new ConfirmDialog({
     title: "Overwrite",
     msg: `Do you really want to overwrite "${uri.toString()}"?`,
   }).open();
   return !!confirmed;
-}
-
-function isElectron(): boolean {
-  return environment.electron.is();
 }

@@ -166,7 +166,7 @@ export function convertoToEnvPath(
   path: string
 ) {
   const enableWsl = preferenceService.get("build.enableWsl");
-  let envPath = path.replace(/^[a-zA-Z]:\//, function(x) {
+  let envPath = path.replace(/^[a-zA-Z]:\//, function (x) {
     return "/" + x.substr(0, 1).toLowerCase() + "/";
   });
   if (isWindows && enableWsl) {

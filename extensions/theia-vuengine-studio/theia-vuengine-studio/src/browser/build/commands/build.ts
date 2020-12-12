@@ -13,18 +13,23 @@ import {
   getWorkspaceRoot,
   getThreads,
 } from "../../common";
+import { VesStateModel } from "../../common/vesStateModel";
 
 export async function buildCommand(
   preferenceService: PreferenceService,
   terminalService: TerminalService,
+  vesStateModel: VesStateModel,
   workspaceService: WorkspaceService
 ) {
-  build(preferenceService, terminalService, workspaceService);
+  if (!vesStateModel.isBuilding) {
+    build(preferenceService, terminalService, vesStateModel, workspaceService);
+  }
 }
 
 async function build(
   preferenceService: PreferenceService,
   terminalService: TerminalService,
+  vesStateModel: VesStateModel,
   workspaceService: WorkspaceService
 ) {
   const buildMode = preferenceService.get("build.buildMode");
@@ -77,7 +82,7 @@ async function build(
     );
     exports.push(
       "PLUGINS_FOLDER=" +
-        convertoToEnvPath(preferenceService, enginePluginsPath)
+      convertoToEnvPath(preferenceService, enginePluginsPath)
     );
 
     // fix line endings of preprocessor scripts
@@ -95,12 +100,14 @@ async function build(
   terminalWidget.start();
   terminalWidget.sendText(
     preCallMake +
-      "make all " +
-      exports.join(" ") +
-      " -f " +
-      makefile +
-      " -C " +
-      workingDir
+    "make all " +
+    exports.join(" ") +
+    " -f " +
+    makefile +
+    " -C " +
+    workingDir
   );
   terminalService.open(terminalWidget);
+
+  vesStateModel.isBuilding = true;
 }

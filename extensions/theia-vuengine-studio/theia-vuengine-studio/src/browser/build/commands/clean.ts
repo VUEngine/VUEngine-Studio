@@ -7,13 +7,19 @@ import rimraf = require("rimraf");
 import {
     getWorkspaceRoot,
 } from "../../common";
+import { VesStateModel } from "../../common/vesStateModel";
 
 
 export async function cleanCommand(
     messageService: MessageService,
     quickPickService: QuickPickService,
+    vesStateModel: VesStateModel,
     workspaceService: WorkspaceService
 ) {
+    if (vesStateModel.isCleaning) {
+        return;
+    }
+
     const quickPickOptions: QuickPickOptions = {
         title: "Clean build folder",
         placeholder: "Which build type do you want to remove processed files for?",

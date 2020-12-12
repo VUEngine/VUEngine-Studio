@@ -1,11 +1,17 @@
 /* TODO: find better way to resize top panel */
 #theia-top-panel {
-    height: 38px !important;
+    height: 39px !important;
 }
 #theia-left-right-split-panel {
     bottom: 19px !important;
     height: auto !important;
-    top: 38px !important;
+    top: 39px !important;
+}
+
+/* TODO: find better way to hide scroll bar */
+#theia-top-panel .ps__rail-x,
+#theia-top-panel .ps__rail-y {
+    display: none;
 }
 
 #ves-topbar {
@@ -18,10 +24,21 @@
 }
 
 #application-title {
+    display: inline-block;
+    height: 100%;
     line-height: 40px;
 }
 
 .topbar-buttons {
-    float: right;
-    padding: 8px;
+    padding: 6px 8px 0 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.topbar-buttons .theia-button {
+    font-size: 18px !important;
+    margin-left: 8px !important;
+    min-width: 48px !important;
+    padding: 3px 4px 2px !important;
 }
