@@ -5,7 +5,6 @@ import {
   MessageService,
 } from "@theia/core/lib/common";
 import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
-import { TerminalWidgetOptions } from "@theia/terminal/lib/browser/base/terminal-widget";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
 import { createWriteStream, existsSync, readFileSync, unlinkSync } from "fs";
 import { dirname, join as joinPath } from "path";
@@ -209,15 +208,18 @@ async function flash(
 
   messageService.info(`"${flasherEnvPath}" ${flasherArgs}`);
 
-  const terminalWidgetOptions: TerminalWidgetOptions = {
+
+  const terminalId = "vuengine-flash";
+  const terminalWidget = terminalService.getById(terminalId) || await terminalService.newTerminal({
     title: "Flash",
-  };
-  const terminalWidget = await terminalService.newTerminal(
-    terminalWidgetOptions
-  );
-  terminalWidget.start();
-  terminalWidget.sendText(`"${flasherEnvPath}" ${flasherArgs}`);
+    id: terminalId
+  });
+  await terminalWidget.start();
+  terminalWidget.clearOutput();
+  //await new Promise(resolve => setTimeout(resolve, 1000));
+  terminalWidget.sendText(`"${flasherEnvPath}" ${flasherArgs}\n`);
   terminalService.open(terminalWidget);
+
 }
 
 function padRom(workspaceService: WorkspaceService, size: number): boolean {

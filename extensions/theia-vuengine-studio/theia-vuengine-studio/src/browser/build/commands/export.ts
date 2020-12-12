@@ -25,7 +25,13 @@ export async function exportCommand(
     exportRom(commandService, fileService, fileDialogService, romPath);
   } else {
     commandService.executeCommand(VesBuildCommand.id);
-    vesStateModel.isExportQueued = true;
+    // TODO: use FileWatcher instead?
+    vesStateModel.enqueueExport(setInterval(() => {
+      if (existsSync(getRomPath(workspaceService))) {
+        vesStateModel.unqueueExport();
+        exportRom(commandService, fileService, fileDialogService, romPath);
+      }
+    }, 500))
   }
 }
 

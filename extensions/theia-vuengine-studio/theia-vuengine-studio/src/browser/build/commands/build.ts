@@ -1,7 +1,6 @@
 import { isWindows } from "@theia/core";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
-import { TerminalWidgetOptions } from "@theia/terminal/lib/browser/base/terminal-widget";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
 import { existsSync } from "fs";
 import { join as joinPath } from "path";
@@ -52,7 +51,8 @@ async function build(
     MAKE_JOBS: getThreads() + "",
     LC_ALL: "C",
   };
-  const preCallMake = "export PATH=" + v810path + " && ";
+  const workspaceRoot = getWorkspaceRoot(workspaceService)
+  const preCallMake = `cd ${workspaceRoot} && export PATH=${v810path} && `;
   const enableWsl = preferenceService.get("build.enableWsl");
 
   let makefile = convertoToEnvPath(
@@ -90,14 +90,17 @@ async function build(
     //preCallMake = 'find "' + convertoToEnvPath(engineCorePath) + 'lib/compiler/preprocessor/" -name "*.sh" -exec sed -i -e "s/$(printf \'\\r\')//" {} \\; && ' + preCallMake;
   }
 
-  const terminalWidgetOptions: TerminalWidgetOptions = {
+  vesStateModel.isBuilding = true;
+
+  const terminalId = "vuengine-build";
+  const terminalWidget = terminalService.getById(terminalId) || await terminalService.newTerminal({
     title: "Build",
     env: env,
-  };
-  const terminalWidget = await terminalService.newTerminal(
-    terminalWidgetOptions
-  );
-  terminalWidget.start();
+    id: terminalId
+  });
+  await terminalWidget.start();
+  terminalWidget.clearOutput();
+  //await new Promise(resolve => setTimeout(resolve, 1000));
   terminalWidget.sendText(
     preCallMake +
     "make all " +
@@ -105,9 +108,8 @@ async function build(
     " -f " +
     makefile +
     " -C " +
-    workingDir
+    workingDir +
+    "\n"
   );
   terminalService.open(terminalWidget);
-
-  vesStateModel.isBuilding = true;
 }

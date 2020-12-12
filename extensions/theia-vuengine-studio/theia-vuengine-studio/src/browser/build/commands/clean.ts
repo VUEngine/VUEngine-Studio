@@ -70,13 +70,20 @@ export async function cleanCommand(
             return;
         }
 
-        clean(messageService, workspaceService, selection);
+        clean(messageService, vesStateModel, workspaceService, selection);
     });
 }
 
-async function clean(messageService: MessageService, workspaceService: WorkspaceService, type: string) {
+async function clean(
+    messageService: MessageService,
+    vesStateModel: VesStateModel,
+    workspaceService: WorkspaceService,
+    type: string
+) {
     const clearAll = (type === "all");
     const cleanPath = getCleanPath(workspaceService, type);
+
+    vesStateModel.isCleaning = true;
 
     if (!existsSync(cleanPath)) {
         const notFoundMessage = clearAll
@@ -101,6 +108,7 @@ async function clean(messageService: MessageService, workspaceService: Workspace
     rimraf(cleanPath, function (error) {
         progressMessage.cancel();
         messageService.info(doneMessage);
+        vesStateModel.isCleaning = false;
     });
 }
 

@@ -101,7 +101,7 @@ export class VesTopbarWidget extends ReactWidget {
 
     protected handleExportOnClick = () => {
         this.vesStateModel.isExportQueued
-            ? this.vesStateModel.isExportQueued = false
+            ? this.vesStateModel.unqueueExport()
             : this.commandService.executeCommand(VesBuildExportCommand.id)
     };
 

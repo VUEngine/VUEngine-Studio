@@ -52,15 +52,22 @@ export class VesStateModel {
         return this._isRunQueued;
     }
 
-    // export queued
+    // export queue
     protected _isExportQueued = false;
+    protected _exportQueueInterval: any = 0;
     protected readonly onDidChangeIsExportQueuedEmitter = new Emitter<boolean>();
     readonly onDidChangeIsExportQueued = this.onDidChangeIsExportQueuedEmitter.event;
-    set isExportQueued(flag: boolean) {
-        this._isExportQueued = flag;
-        this.onDidChangeIsBuildingEmitter.fire(this._isExportQueued);
-    }
     get isExportQueued(): boolean {
         return this._isExportQueued;
+    }
+    public enqueueExport(interval: any) {
+        this._isExportQueued = true;
+        this.onDidChangeIsExportQueuedEmitter.fire(this._isExportQueued);
+        this._exportQueueInterval = interval;
+    }
+    public unqueueExport() {
+        this._isExportQueued = false;
+        this.onDidChangeIsExportQueuedEmitter.fire(this._isExportQueued);
+        clearInterval(this._exportQueueInterval);
     }
 }

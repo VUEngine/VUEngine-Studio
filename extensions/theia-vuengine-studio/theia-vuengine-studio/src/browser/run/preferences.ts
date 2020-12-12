@@ -10,7 +10,7 @@ import {
 const VesRunPreferenceSchema: PreferenceSchema = {
   type: "object",
   properties: {
-    "vuengine.emulators": {
+    "emulators.emulators": {
       type: "array",
       label: "Emulator Configurations",
       description: "Emulator configurations",
