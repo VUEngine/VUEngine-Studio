@@ -60,7 +60,19 @@ export async function flashCommand(
     );
   } else {
     commandService.executeCommand(VesBuildCommand.id);
-    vesStateModel.isFlashQueued = true;
+    // TODO: use FileWatcher instead?
+    vesStateModel.enqueueFlash(setInterval(() => {
+      if (existsSync(getRomPath(workspaceService))) {
+        vesStateModel.unqueueFlash();
+        flash(
+          messageService,
+          preferenceService,
+          terminalService,
+          workspaceService,
+          connectedFlashCart
+        );
+      }
+    }, 500));
   }
 }
 
@@ -138,8 +150,8 @@ function getFlashCartConfigs(preferenceService: PreferenceService) {
       size: 16,
       path: joinPath(
         getResourcesPath(),
-        "app",
         "binaries",
+        "vuengine-studio-tools",
         "prog-vb",
         isWindows ? "prog-vb.exe" : "prog-vb"
       ),
@@ -206,9 +218,6 @@ async function flash(
     ? " " + connectedFlashCart.config.args.replace("%ROM%", `"${romPath}"`)
     : "";
 
-  messageService.info(`"${flasherEnvPath}" ${flasherArgs}`);
-
-
   const terminalId = "vuengine-flash";
   const terminalWidget = terminalService.getById(terminalId) || await terminalService.newTerminal({
     title: "Flash",
@@ -219,7 +228,6 @@ async function flash(
   //await new Promise(resolve => setTimeout(resolve, 1000));
   terminalWidget.sendText(`"${flasherEnvPath}" ${flasherArgs}\n`);
   terminalService.open(terminalWidget);
-
 }
 
 function padRom(workspaceService: WorkspaceService, size: number): boolean {

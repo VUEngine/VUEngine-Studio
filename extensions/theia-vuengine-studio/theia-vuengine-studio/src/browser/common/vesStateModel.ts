@@ -40,30 +40,6 @@ export class VesStateModel {
         return this._connectedFlashCart;
     }
 
-    // flash queued
-    protected _isFlashQueued = false;
-    protected readonly onDidChangeIsFlashQueuedEmitter = new Emitter<boolean>();
-    readonly onDidChangeIsFlashQueued = this.onDidChangeIsFlashQueuedEmitter.event;
-    set isFlashQueued(flag: boolean) {
-        this._isFlashQueued = flag;
-        this.onDidChangeIsBuildingEmitter.fire(this._isFlashQueued);
-    }
-    get isFlashQueued(): boolean {
-        return this._isFlashQueued;
-    }
-
-    // run queued
-    protected _isRunQueued = false;
-    protected readonly onDidChangeIsRunQueuedEmitter = new Emitter<boolean>();
-    readonly onDidChangeIsRunQueued = this.onDidChangeIsRunQueuedEmitter.event;
-    set isRunQueued(flag: boolean) {
-        this._isRunQueued = flag;
-        this.onDidChangeIsBuildingEmitter.fire(this._isRunQueued);
-    }
-    get isRunQueued(): boolean {
-        return this._isRunQueued;
-    }
-
     // export queue
     protected _isExportQueued = false;
     protected _exportQueueInterval: any = 0;
@@ -81,5 +57,43 @@ export class VesStateModel {
         this._isExportQueued = false;
         this.onDidChangeIsExportQueuedEmitter.fire(this._isExportQueued);
         clearInterval(this._exportQueueInterval);
+    }
+
+    // run queue
+    protected _isRunQueued = false;
+    protected _runQueueInterval: any = 0;
+    protected readonly onDidChangeIsRunQueuedEmitter = new Emitter<boolean>();
+    readonly onDidChangeIsRunQueued = this.onDidChangeIsRunQueuedEmitter.event;
+    get isRunQueued(): boolean {
+        return this._isRunQueued;
+    }
+    public enqueueRun(interval: any) {
+        this._isRunQueued = true;
+        this.onDidChangeIsRunQueuedEmitter.fire(this._isRunQueued);
+        this._runQueueInterval = interval;
+    }
+    public unqueueRun() {
+        this._isRunQueued = false;
+        this.onDidChangeIsRunQueuedEmitter.fire(this._isRunQueued);
+        clearInterval(this._runQueueInterval);
+    }
+
+    // flash queue
+    protected _isFlashQueued = false;
+    protected _flashQueueInterval: any = 0;
+    protected readonly onDidChangeIsFlashQueuedEmitter = new Emitter<boolean>();
+    readonly onDidChangeIsFlashQueued = this.onDidChangeIsFlashQueuedEmitter.event;
+    get isFlashQueued(): boolean {
+        return this._isFlashQueued;
+    }
+    public enqueueFlash(interval: any) {
+        this._isFlashQueued = true;
+        this.onDidChangeIsFlashQueuedEmitter.fire(this._isFlashQueued);
+        this._flashQueueInterval = interval;
+    }
+    public unqueueFlash() {
+        this._isFlashQueued = false;
+        this.onDidChangeIsFlashQueuedEmitter.fire(this._isFlashQueued);
+        clearInterval(this._flashQueueInterval);
     }
 }

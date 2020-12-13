@@ -22,4 +22,5 @@ async function selectEmulator(
   preferenceService: PreferenceService,
   terminalService: TerminalService,
   workspaceService: WorkspaceService
-) {}
+) {
+}

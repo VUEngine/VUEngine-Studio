@@ -11,6 +11,7 @@ import { runCommand } from "./commands/run";
 import { selectEmulatorCommand } from "./commands/selectEmulator";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
+import { VesStateModel } from "../common/vesStateModel";
 
 export const VesRunCommand: Command = {
   id: "VesRun.commands.run",
@@ -35,18 +36,20 @@ export class VesRunCommandContribution implements CommandContribution {
     @inject(PreferenceService)
     private readonly preferenceService: PreferenceService,
     @inject(TerminalService) private readonly terminalService: TerminalService,
+    @inject(VesStateModel)
+    private readonly vesStateModel: VesStateModel,
     @inject(WorkspaceService)
     private readonly workspaceService: WorkspaceService
-  ) {}
+  ) { }
 
   registerCommands(registry: CommandRegistry): void {
     registry.registerCommand(VesRunCommand, {
       execute: () =>
         runCommand(
           this.commandService,
-          this.messageService,
           this.preferenceService,
           this.terminalService,
+          this.vesStateModel,
           this.workspaceService
         ),
     });

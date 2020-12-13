@@ -9,6 +9,7 @@ import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand } from '..
 import { VesStateModel } from '../../common/vesStateModel';
 import { getWorkspaceRoot } from '../../common';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { VesRunCommand } from '../../run/commands';
 
 @injectable()
 export class VesTopbarActionButtonsWidget extends ReactWidget {
@@ -114,14 +115,14 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
 
     protected handleFlashOnClick = () => {
         this.vesStateModel.isFlashQueued
-            ? this.vesStateModel.isFlashQueued = false
+            ? this.vesStateModel.unqueueFlash()
             : this.commandService.executeCommand(VesFlashCartsCommand.id)
     };
 
     protected handleRunOnClick = () => {
-        // this.vesStateModel.isRunQueued
-        //     ? this.vesStateModel.isRunQueued = false
-        //     : this.commandService.executeCommand(VesRunCommand.id)
+        this.vesStateModel.isRunQueued
+            ? this.vesStateModel.unqueueRun()
+            : this.commandService.executeCommand(VesRunCommand.id)
     };
 
     // protected updateIsBuilding = (e: React.ChangeEvent<HTMLInputElement>) => this.vesStateModel.isBuilding = e.target.value === "dings";
