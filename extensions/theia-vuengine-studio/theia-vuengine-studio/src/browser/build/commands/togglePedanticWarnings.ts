@@ -7,6 +7,6 @@ export async function togglePedanticWarnings(
   preferenceService.set(
     "build.pedanticWarnings",
     enable,
-    PreferenceScope.Workspace
+    PreferenceScope.User
   );
 }

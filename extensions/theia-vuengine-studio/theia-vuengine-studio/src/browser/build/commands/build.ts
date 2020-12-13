@@ -1,17 +1,10 @@
-import { isWindows } from "@theia/core";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
 import { existsSync } from "fs";
+import { cpus } from "os";
 import { join as joinPath } from "path";
-import {
-  convertoToEnvPath,
-  getEngineCorePath,
-  getEnginePluginsPath,
-  getCompilerPath,
-  getWorkspaceRoot,
-  getThreads,
-} from "../../common";
+import { convertoToEnvPath, getOs, getResourcesPath, getWorkspaceRoot } from "../../common";
 import { VesStateModel } from "../../common/vesStateModel";
 
 export async function buildCommand(
@@ -41,19 +34,8 @@ async function build(
     preferenceService,
     getWorkspaceRoot(workspaceService)
   );
-  const v810path = convertoToEnvPath(
-    preferenceService,
-    joinPath(compilerPath, "bin:$PATH")
-  );
-  const env = {
-    ENGINE_FOLDER: convertoToEnvPath(preferenceService, engineCorePath),
-    PLUGINS_FOLDER: convertoToEnvPath(preferenceService, enginePluginsPath),
-    MAKE_JOBS: getThreads() + "",
-    LC_ALL: "C",
-  };
+  const v810path = convertoToEnvPath(preferenceService, joinPath(compilerPath, "bin"));
   const workspaceRoot = getWorkspaceRoot(workspaceService)
-  const preCallMake = `cd ${workspaceRoot} && export PATH=${v810path} && `;
-  const enableWsl = preferenceService.get("build.enableWsl");
 
   let makefile = convertoToEnvPath(
     preferenceService,
@@ -66,7 +48,7 @@ async function build(
     );
   }
 
-  const exports = ["-e TYPE=" + buildMode];
+  const exports = [`-e TYPE=${buildMode}`];
   if (dumpElf) {
     exports.push("DUMP_ELF=1");
   }
@@ -74,42 +56,50 @@ async function build(
     exports.push("PRINT_PEDANTIC_WARNINGS=1");
   }
 
-  if (isWindows && enableWsl) {
-    exports.push("MAKE_JOBS=" + getThreads());
-    exports.push("LC_ALL=C");
-    exports.push(
-      "ENGINE_FOLDER=" + convertoToEnvPath(preferenceService, engineCorePath)
-    );
-    exports.push(
-      "PLUGINS_FOLDER=" +
-      convertoToEnvPath(preferenceService, enginePluginsPath)
-    );
+  exports.push(`MAKE_JOBS=${getThreads()}`);
+  exports.push("LC_ALL=C");
+  exports.push(`ENGINE_FOLDER="${convertoToEnvPath(preferenceService, engineCorePath)}"`);
+  exports.push(`PLUGINS_FOLDER="${convertoToEnvPath(preferenceService, enginePluginsPath)}"`);
 
-    // fix line endings of preprocessor scripts
-    // note: should no longer be necessary due to .gitattributes directive
-    //preCallMake = 'find "' + convertoToEnvPath(engineCorePath) + 'lib/compiler/preprocessor/" -name "*.sh" -exec sed -i -e "s/$(printf \'\\r\')//" {} \\; && ' + preCallMake;
-  }
+  // fix line endings of preprocessor scripts
+  // note: should no longer be necessary due to .gitattributes directive
+  //preCallMake = 'find "' + convertoToEnvPath(engineCorePath) + 'lib/compiler/preprocessor/" -name "*.sh" -exec sed -i -e "s/$(printf \'\\r\')//" {} \\; && ' + preCallMake;
 
   vesStateModel.isBuilding = true;
 
   const terminalId = "vuengine-build";
   const terminalWidget = terminalService.getById(terminalId) || await terminalService.newTerminal({
     title: "Build",
-    env: env,
     id: terminalId
   });
   await terminalWidget.start();
   terminalWidget.clearOutput();
   //await new Promise(resolve => setTimeout(resolve, 1000));
-  terminalWidget.sendText(
-    preCallMake +
-    "make all " +
-    exports.join(" ") +
-    " -f " +
-    makefile +
-    " -C " +
-    workingDir +
-    "\n"
-  );
+  terminalWidget.sendText(`cd "${workspaceRoot}" && export PATH="${v810path}":$PATH && make all ${exports.join(" ")} -f "${makefile}" -C "${workingDir}" \n`);
   terminalService.open(terminalWidget);
+}
+
+function getEngineCorePath() {
+  return joinPath(getResourcesPath(), "vuengine", "vuengine-core");
+}
+
+function getEnginePluginsPath() {
+  return joinPath(getResourcesPath(), "vuengine", "vuengine-plugins");
+}
+
+function getCompilerPath() {
+  return joinPath(getResourcesPath(), "binaries", getOs(), "gcc");
+}
+
+// function getMsysPath() {
+//   return joinPath(getResourcesPath(), "binaries", "win", "msys");
+// }
+
+function getThreads() {
+  let threads = cpus().length;
+  if (threads > 2) {
+    threads--;
+  }
+
+  return threads;
 }

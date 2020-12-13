@@ -15,6 +15,6 @@ export async function setModeCommand(
   preferenceService.set(
     "build.buildMode",
     buildMode,
-    PreferenceScope.Workspace
+    PreferenceScope.User
   );
 }
