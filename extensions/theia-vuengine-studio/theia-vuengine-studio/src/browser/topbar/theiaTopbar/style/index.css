@@ -1,0 +1,45 @@
+/* TODO: find better way to resize top panel */
+#theia-top-panel {
+    height: 39px !important;
+}
+#theia-left-right-split-panel {
+    bottom: 19px !important;
+    height: auto !important;
+    top: 39px !important;
+}
+
+/* TODO: find better way to hide scroll bar */
+#theia-top-panel .ps__rail-x,
+#theia-top-panel .ps__rail-y {
+    display: none;
+}
+
+:root {
+    --theia-private-menubar-height: 38px;
+}
+
+#theia-top-panel {
+    -webkit-app-region: drag;
+    display: flex;
+    flex-wrap: nowrap;
+}
+[id="theia:icon"] {
+    -webkit-app-region: no-drag;
+    order: 1;
+}
+[id="theia:menubar"] {
+    -webkit-app-region: no-drag;
+    order: 2;
+}
+[id="ves-topbar-application-title"] {
+    flex-grow: 1;
+    order: 3;
+}
+[id="ves-topbar-action-buttons"] {
+    flex-shrink: 0;
+    order: 4;
+}
+[id="ves-topbar-window-controls"] {
+    flex-shrink: 0;
+    order: 5;
+}

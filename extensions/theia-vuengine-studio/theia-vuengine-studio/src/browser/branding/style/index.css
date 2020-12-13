@@ -1,9 +1,10 @@
 .theia-icon {
+    background-color: var(--theia-activityBar-background);
     background-image: var(--theia-menu-logo);
     background-position: center;
     background-repeat: no-repeat;
     background-size: contain;
-    height: 32px;
+    height: 38px;
     margin: 0;
     width: 50px;
 }

@@ -1,14 +1,14 @@
 import { injectable, postConstruct } from 'inversify';
-import { VesTopbarWidget } from './widget';
+import { VesTopbarWindowControlsWidget } from './window-controls-widget';
 import { AbstractViewContribution } from '@theia/core/lib/browser';
 
 @injectable()
-export class VesTopbarContribution extends AbstractViewContribution<VesTopbarWidget> {
+export class VesTopbarWindowControlsContribution extends AbstractViewContribution<VesTopbarWindowControlsWidget> {
 
     constructor() {
         super({
-            widgetId: VesTopbarWidget.ID,
-            widgetName: VesTopbarWidget.LABEL,
+            widgetId: VesTopbarWindowControlsWidget.ID,
+            widgetName: VesTopbarWindowControlsWidget.LABEL,
             defaultWidgetOptions: { area: 'top' }
         });
     }

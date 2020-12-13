@@ -1,0 +1,5 @@
+#ves-topbar-application-title {
+    height: var(--theia-private-menubar-height);
+    line-height: var(--theia-private-menubar-height);
+    text-align: center;
+}
