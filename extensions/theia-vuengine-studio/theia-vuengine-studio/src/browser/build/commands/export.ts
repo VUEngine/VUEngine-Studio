@@ -31,7 +31,7 @@ export async function exportCommand(
         vesStateModel.unqueueExport();
         exportRom(commandService, fileService, fileDialogService, romPath);
       }
-    }, 500))
+    }, 500));
   }
 }
 

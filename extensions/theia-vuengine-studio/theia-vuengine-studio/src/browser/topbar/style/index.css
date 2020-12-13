@@ -30,6 +30,7 @@
 }
 
 .topbar-buttons {
+    -webkit-app-region: no-drag;
     padding: 5px 8px 0 0;
     position: absolute;
     right: 0;
