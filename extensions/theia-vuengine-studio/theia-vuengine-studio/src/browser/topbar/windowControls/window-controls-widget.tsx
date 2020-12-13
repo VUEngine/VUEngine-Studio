@@ -1,7 +1,10 @@
+import * as electron from 'electron';
 import * as React from 'react';
-import { injectable, postConstruct } from 'inversify';
-const remote = require('electron').remote;
+import { inject, injectable, postConstruct } from 'inversify';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
+import { ElectronCommands } from '@theia/core/lib/electron-browser/menu/electron-menu-contribution';
+import { CommandService } from '@theia/core';
+import { VesMaximizeWindowCommand, VesMinimizeWindowCommand, VesUnmaximizeWindowCommand } from './commands';
 
 @injectable()
 export class VesTopbarWindowControlsWidget extends ReactWidget {
@@ -9,12 +12,8 @@ export class VesTopbarWindowControlsWidget extends ReactWidget {
     static readonly ID = 'ves-topbar-window-controls';
     static readonly LABEL = 'Topbar Window Controls';
 
-    // @inject(MessageService)
-    // protected readonly messageService!: MessageService;
-    // @inject(CommandService)
-    // protected readonly commandService!: CommandService;
-    // @inject(WorkspaceService)
-    // protected readonly workspaceService!: WorkspaceService;
+    @inject(CommandService)
+    protected readonly commandService!: CommandService;
 
     @postConstruct()
     protected async init(): Promise<void> {
@@ -22,45 +21,50 @@ export class VesTopbarWindowControlsWidget extends ReactWidget {
         this.title.label = VesTopbarWindowControlsWidget.LABEL;
         this.title.caption = VesTopbarWindowControlsWidget.LABEL;
         this.title.closable = false;
+        electron.remote.getCurrentWindow().on("maximize", () => this.update());
+        electron.remote.getCurrentWindow().on("unmaximize", () => this.update());
         this.update();
     }
 
     protected render(): React.ReactNode {
-        const win = remote.getCurrentWindow();
         return <>
             <div className="topbar-window-controls-separator"></div>
             <div
                 className="topbar-window-controls-button"
                 id="ves-topbar-window-controls-minimize"
-                onClick={win.minimize}
+                onClick={() => this.commandService.executeCommand(VesMinimizeWindowCommand.id)}
             >
-                <i className="fa fa-window-minimize"></i>
+                ‒
             </div>
-            {!win.isMaximized() &&
+            {!this.isMaximized() &&
                 <div
                     className="topbar-window-controls-button"
                     id="ves-topbar-window-controls-maximize"
-                    onClick={win.maximize}
+                    onClick={() => this.commandService.executeCommand(VesMaximizeWindowCommand.id)}
                 >
-                    <i className="fa fa-window-maximize"></i>
+                    ◻
                 </div>
             }
-            {win.isMaximized() &&
+            {this.isMaximized() &&
                 <div
                     className="topbar-window-controls-button"
                     id="ves-topbar-window-controls-restore"
-                    onClick={win.unmaximize}
+                    onClick={() => this.commandService.executeCommand(VesUnmaximizeWindowCommand.id)}
                 >
-                    <i className="fa fa-window-restore"></i>
+                    ❐
                 </div>
             }
             <div
                 className="topbar-window-controls-button"
                 id="ves-topbar-window-controls-close"
-                onClick={win.close}
+                onClick={() => this.commandService.executeCommand(ElectronCommands.CLOSE_WINDOW.id)}
             >
-                <i className="fa fa-times"></i>
+                ⨉
             </div>
         </>;
+    }
+
+    protected isMaximized(): boolean {
+        return electron.remote.getCurrentWindow().isMaximized();
     }
 }

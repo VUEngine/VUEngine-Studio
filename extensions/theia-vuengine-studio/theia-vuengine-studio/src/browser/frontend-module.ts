@@ -18,6 +18,7 @@ import { VesTopbarApplicationTitleContribution } from './topbar/applicationTitle
 import '../../src/browser/topbar/applicationTitle/style/index.css';
 import { VesTopbarWindowControlsWidget } from './topbar/windowControls/window-controls-widget';
 import { VesTopbarWindowControlsContribution } from './topbar/windowControls/window-controls-view';
+import { VesWindowCommandContribution } from "./topbar/windowControls/commands";
 import '../../src/browser/topbar/windowControls/style/index.css';
 import '../../src/browser/topbar/theiaTopbar/style/index.css';
 import { bindViewContribution, FrontendApplicationContribution, WidgetFactory } from '@theia/core/lib/browser';
@@ -84,6 +85,7 @@ export default new ContainerModule((bind) => {
     createWidget: () => ctx.container.get<VesTopbarActionButtonsWidget>(VesTopbarActionButtonsWidget)
   })).inSingletonScope();
   // window controls
+  bind(CommandContribution).to(VesWindowCommandContribution);
   if (!isOSX) {
     bindViewContribution(bind, VesTopbarWindowControlsContribution);
     bind(FrontendApplicationContribution).toService(VesTopbarWindowControlsContribution);

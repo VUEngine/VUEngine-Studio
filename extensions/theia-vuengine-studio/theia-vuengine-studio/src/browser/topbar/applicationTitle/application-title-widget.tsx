@@ -21,7 +21,7 @@ export class VesTopbarApplicationTitleWidget extends ReactWidget {
     protected render(): React.ReactNode {
         const { applicationName } = FrontendApplicationConfigProvider.get();
         return <>
-            [Current Project] — {applicationName}
+            {applicationName}
         </>;
     }
 }
