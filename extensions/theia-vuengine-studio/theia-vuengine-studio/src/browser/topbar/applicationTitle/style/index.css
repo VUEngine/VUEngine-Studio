@@ -1,5 +1,13 @@
 #ves-topbar-application-title {
-    height: var(--theia-private-menubar-height);
-    line-height: var(--theia-private-menubar-height);
-    text-align: center;
+  flex-grow: 1;
+  height: var(--theia-private-menubar-height);
+  line-height: var(--theia-private-menubar-height);
+  order: 3;
+  text-align: center;
+}
+
+@media (max-width: 1000px) {
+  #ves-topbar-application-title {
+    visibility: hidden;
+  }
 }

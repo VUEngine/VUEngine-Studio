@@ -19,6 +19,8 @@
         "defaultIconTheme": "theia-file-icons",
         "electron": {
           "windowOptions": {
+            "minWidth": 820,
+            "minHeight": 420,
             "backgroundColor": "#222",
             "titleBarStyle": "hiddenInset",
             "frame": true
@@ -39,6 +41,7 @@
   },
   "main": "scripts/theia-electron-main.js",
   "scripts": {
+    "all": "cd extensions/theia-vuengine-studio && yarn && yarn theia rebuild:electron && cd ../.. && yarn && yarn start",
     "prepare": "yarn build && yarn download:plugins",
     "build": "theia rebuild:electron && theia build",
     "start": "electron scripts/theia-electron-main.js",

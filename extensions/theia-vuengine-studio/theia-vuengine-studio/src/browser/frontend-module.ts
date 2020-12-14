@@ -1,7 +1,14 @@
 import { ContainerModule } from "inversify";
-import { CommandContribution, isOSX, MenuContribution } from "@theia/core/lib/common";
+import {
+  CommandContribution,
+  isOSX,
+  MenuContribution,
+} from "@theia/core/lib/common";
 import { KeybindingContribution } from "@theia/core/lib/browser";
-import { BrowserMenuBarContribution, BrowserMainMenuFactory } from '@theia/core/lib/browser/menu/browser-menu-plugin';
+import {
+  BrowserMenuBarContribution,
+  BrowserMainMenuFactory,
+} from "@theia/core/lib/browser/menu/browser-menu-plugin";
 
 // clean theia
 // import {
@@ -10,18 +17,22 @@ import { BrowserMenuBarContribution, BrowserMainMenuFactory } from '@theia/core/
 // } from "./clean-theia";
 
 // topbar
-import { VesTopbarActionButtonsWidget } from './topbar/actionButtons/action-buttons-widget';
-import { VesTopbarActionButtonsContribution } from './topbar/actionButtons/action-buttons-view';
-import '../../src/browser/topbar/actionButtons/style/index.css';
-import { VesTopbarApplicationTitleWidget } from './topbar/applicationTitle/application-title-widget';
-import { VesTopbarApplicationTitleContribution } from './topbar/applicationTitle/application-title-view';
-import '../../src/browser/topbar/applicationTitle/style/index.css';
-import { VesTopbarWindowControlsWidget } from './topbar/windowControls/window-controls-widget';
-import { VesTopbarWindowControlsContribution } from './topbar/windowControls/window-controls-view';
+import { VesTopbarActionButtonsWidget } from "./topbar/actionButtons/action-buttons-widget";
+import { VesTopbarActionButtonsContribution } from "./topbar/actionButtons/action-buttons-view";
+import "../../src/browser/topbar/actionButtons/style/index.css";
+import { VesTopbarApplicationTitleWidget } from "./topbar/applicationTitle/application-title-widget";
+import { VesTopbarApplicationTitleContribution } from "./topbar/applicationTitle/application-title-view";
+import "../../src/browser/topbar/applicationTitle/style/index.css";
+import { VesTopbarWindowControlsWidget } from "./topbar/windowControls/window-controls-widget";
+import { VesTopbarWindowControlsContribution } from "./topbar/windowControls/window-controls-view";
 import { VesWindowCommandContribution } from "./topbar/windowControls/commands";
-import '../../src/browser/topbar/windowControls/style/index.css';
-import '../../src/browser/topbar/theiaTopbar/style/index.css';
-import { bindViewContribution, FrontendApplicationContribution, WidgetFactory } from '@theia/core/lib/browser';
+import "../../src/browser/topbar/windowControls/style/index.css";
+import "../../src/browser/topbar/theiaTopbar/style/index.css";
+import {
+  bindViewContribution,
+  FrontendApplicationContribution,
+  WidgetFactory,
+} from "@theia/core/lib/browser";
 
 // branding
 import "./branding/branding";
@@ -33,7 +44,7 @@ import { VesBrandingCommandContribution } from "./branding/commands";
 // import "./touchbarTest";
 
 // common
-import { VesStateModel } from './common/vesStateModel';
+import { VesStateModel } from "./common/vesStateModel";
 
 // themes
 import "./themes/index";
@@ -41,7 +52,7 @@ import "./themes/index";
 // build
 import { VesBuildCommandContribution } from "./build/commands";
 import { VesBuildKeybindingContribution } from "./build/keybindings";
-import { VesBuildMenuContribution } from "./build/menu";
+// import { VesBuildMenuContribution } from "./build/menu";
 import { bindVesBuildPreferences } from "./build/preferences";
 
 // flash carts
@@ -64,36 +75,61 @@ export default new ContainerModule((bind) => {
   // topbar
   // show theia main menu in topbar
   if (!isOSX) {
-    bind(BrowserMainMenuFactory).toSelf().inSingletonScope();
-    bind(BrowserMenuBarContribution).toSelf().inSingletonScope();
+    bind(BrowserMainMenuFactory)
+      .toSelf()
+      .inSingletonScope();
+    bind(BrowserMenuBarContribution)
+      .toSelf()
+      .inSingletonScope();
     bind(FrontendApplicationContribution).toService(BrowserMenuBarContribution);
   }
   // application title
   bindViewContribution(bind, VesTopbarApplicationTitleContribution);
-  bind(FrontendApplicationContribution).toService(VesTopbarApplicationTitleContribution);
+  bind(FrontendApplicationContribution).toService(
+    VesTopbarApplicationTitleContribution
+  );
   bind(VesTopbarApplicationTitleWidget).toSelf();
-  bind(WidgetFactory).toDynamicValue(ctx => ({
-    id: VesTopbarApplicationTitleWidget.ID,
-    createWidget: () => ctx.container.get<VesTopbarApplicationTitleWidget>(VesTopbarApplicationTitleWidget)
-  })).inSingletonScope();
+  bind(WidgetFactory)
+    .toDynamicValue((ctx) => ({
+      id: VesTopbarApplicationTitleWidget.ID,
+      createWidget: () =>
+        ctx.container.get<VesTopbarApplicationTitleWidget>(
+          VesTopbarApplicationTitleWidget
+        ),
+    }))
+    .inSingletonScope();
   // action buttons
   bindViewContribution(bind, VesTopbarActionButtonsContribution);
-  bind(FrontendApplicationContribution).toService(VesTopbarActionButtonsContribution);
+  bind(FrontendApplicationContribution).toService(
+    VesTopbarActionButtonsContribution
+  );
   bind(VesTopbarActionButtonsWidget).toSelf();
-  bind(WidgetFactory).toDynamicValue(ctx => ({
-    id: VesTopbarActionButtonsWidget.ID,
-    createWidget: () => ctx.container.get<VesTopbarActionButtonsWidget>(VesTopbarActionButtonsWidget)
-  })).inSingletonScope();
+  bind(WidgetFactory)
+    .toDynamicValue((ctx) => ({
+      id: VesTopbarActionButtonsWidget.ID,
+      createWidget: () =>
+        ctx.container.get<VesTopbarActionButtonsWidget>(
+          VesTopbarActionButtonsWidget
+        ),
+    }))
+    .inSingletonScope();
   // window controls
   bind(CommandContribution).to(VesWindowCommandContribution);
   if (!isOSX) {
     bindViewContribution(bind, VesTopbarWindowControlsContribution);
-    bind(FrontendApplicationContribution).toService(VesTopbarWindowControlsContribution);
+    bind(FrontendApplicationContribution).toService(
+      VesTopbarWindowControlsContribution
+    );
     bind(VesTopbarWindowControlsWidget).toSelf();
-    bind(WidgetFactory).toDynamicValue(ctx => ({
-      id: VesTopbarWindowControlsWidget.ID,
-      createWidget: () => ctx.container.get<VesTopbarWindowControlsWidget>(VesTopbarWindowControlsWidget)
-    })).inSingletonScope();
+    bind(WidgetFactory)
+      .toDynamicValue((ctx) => ({
+        id: VesTopbarWindowControlsWidget.ID,
+        createWidget: () =>
+          ctx.container.get<VesTopbarWindowControlsWidget>(
+            VesTopbarWindowControlsWidget
+          ),
+      }))
+      .inSingletonScope();
   }
 
   // branding
@@ -101,12 +137,14 @@ export default new ContainerModule((bind) => {
   bind(MenuContribution).to(VesBrandingMenuContribution);
 
   // common
-  bind(VesStateModel).toSelf().inSingletonScope();
+  bind(VesStateModel)
+    .toSelf()
+    .inSingletonScope();
 
   // build
   bindVesBuildPreferences(bind);
   bind(CommandContribution).to(VesBuildCommandContribution);
-  bind(MenuContribution).to(VesBuildMenuContribution);
+  //bind(MenuContribution).to(VesBuildMenuContribution);
   bind(KeybindingContribution).to(VesBuildKeybindingContribution);
 
   // flash carts

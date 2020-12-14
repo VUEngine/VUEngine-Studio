@@ -35,6 +35,8 @@
         "defaultIconTheme": "theia-file-icons",
         "electron": {
           "windowOptions": {
+            "minWidth": 820,
+            "minHeight": 420,
             "backgroundColor": "#222",
             "titleBarStyle": "hiddenInset",
             "frame": true
