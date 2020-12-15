@@ -6,8 +6,12 @@
   text-align: center;
 }
 
+#ves-topbar-application-title.os-osx {
+  padding-left: 80px;
+}
+
 @media (max-width: 1000px) {
-  #ves-topbar-application-title {
+  #ves-topbar-application-title:not(.os-osx) {
     visibility: hidden;
   }
 }
