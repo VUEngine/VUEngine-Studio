@@ -9,15 +9,15 @@
   border-left: 2px solid rgba(0, 0, 0, 0.2);
   float: left;
   margin: 8px 10px 0 4px;
-  height: 24px;
+  height: 23px;
 }
 
 #ves-topbar-window-controls .topbar-window-controls-button {
   display: block;
   float: left;
   font-size: 18px;
-  height: var(--theia-private-menubar-height);
-  line-height: var(--theia-private-menubar-height);
+  height: 37px;
+  line-height: 37px;
   text-align: center;
   width: 46px;
 }

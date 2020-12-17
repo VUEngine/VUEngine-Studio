@@ -1,26 +1,13 @@
-/* TODO: find better way to resize top panel */
-#theia-top-panel {
-  height: 39px !important;
-}
-#theia-left-right-split-panel {
-  bottom: 19px !important;
-  height: auto !important;
-  top: 39px !important;
-}
+/* TODO: move style overrides to separate place. branding folder? */
 
-/* TODO: find better way to hide scroll bar */
-#theia-top-panel .ps__rail-x,
-#theia-top-panel .ps__rail-y {
-  display: none;
-}
-
-/* TODO: is there a better way? */
+/* do not drag main menu popups 4px to the top */
 .p-MenuBar-menu {
-  margin-top: 4px;
+  transform: none;
 }
 
 :root {
   --theia-private-menubar-height: 38px;
+  --theia-statusBar-height: 28px;
 }
 
 #theia-top-panel {
@@ -38,4 +25,18 @@
   -webkit-app-region: no-drag;
   flex-shrink: 0;
   order: 2;
+}
+
+#theia-statusBar .area.left {
+  padding-left: var(--theia-ui-padding);
+}
+
+#theia-statusBar .area.right {
+  padding-right: var(--theia-ui-padding);
+}
+
+#theia-statusBar .area.left .element,
+#theia-statusBar .area.right .element {
+  margin-left: unset;
+  padding: 0 var(--theia-ui-padding);
 }

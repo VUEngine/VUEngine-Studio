@@ -5,5 +5,4 @@ export function supportUsCommand(commandService: CommandService) {
   // const uri = new theiaURI("https://www.patreon.com/VUEngine");
   // commandService.executeCommand("theia.open", uri);
   commandService.executeCommand("vscode.open", "https://www.patreon.com/VUEngine");
-  alert("https://www.patreon.com/VUEngine");
 }

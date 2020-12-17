@@ -58,13 +58,13 @@ import { bindVesBuildPreferences } from "./build/preferences";
 // flash carts
 import { VesFlashCartsCommandContribution } from "./flash-carts/commands";
 import { VesFlashCartsKeybindingContribution } from "./flash-carts/keybindings";
-import { VesFlashCartsMenuContribution } from "./flash-carts/menu";
+// import { VesFlashCartsMenuContribution } from "./flash-carts/menu";
 import { bindVesFlashCartsPreferences } from "./flash-carts/preferences";
 
 // run
 import { bindVesRunPreferences } from "./run/preferences";
 import { VesRunCommandContribution } from "./run/commands";
-import { VesRunMenuContribution } from "./run/menu";
+// import { VesRunMenuContribution } from "./run/menu";
 import { VesRunKeybindingContribution } from "./run/keybindings";
 
 export default new ContainerModule((bind) => {
@@ -150,12 +150,12 @@ export default new ContainerModule((bind) => {
   // flash carts
   bindVesFlashCartsPreferences(bind);
   bind(CommandContribution).to(VesFlashCartsCommandContribution);
-  bind(MenuContribution).to(VesFlashCartsMenuContribution);
+  // bind(MenuContribution).to(VesFlashCartsMenuContribution);
   bind(KeybindingContribution).to(VesFlashCartsKeybindingContribution);
 
   // run
   bindVesRunPreferences(bind);
   bind(CommandContribution).to(VesRunCommandContribution);
-  bind(MenuContribution).to(VesRunMenuContribution);
+  // bind(MenuContribution).to(VesRunMenuContribution);
   bind(KeybindingContribution).to(VesRunKeybindingContribution);
 });
