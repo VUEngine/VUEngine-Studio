@@ -2,16 +2,16 @@
 	"name": "Dark (VUEngine Studio)",
 	"type": "dark",
 	"colors": {
-		"button.background": "#d31422",
 		"activityBarBadge.background": "#d31422",
+		"button.background": "#d31422",
 		"editorOverviewRuler.rangeHighlightForeground": "#d3142299",
 		"extensionBadge.remoteBackground": "#d31422",
 		"inputOption.activeBorder": "#d3142200",
 		"inputValidation.infoBorder": "#d31422",
 		"peekView.border": "#d31422",
-		"textBlockQuote.border": "#d3142280",
 		"statusBar.background": "#3c3c3c",
 		"statusBar.border": "#1e1e1e",
+		"textBlockQuote.border": "#d3142280",
 		"titleBar.border": "#1e1e1e"
 	}
 }

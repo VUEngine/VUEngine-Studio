@@ -2,16 +2,21 @@
 	"name": "Light (VUEngine Studio)",
 	"type": "light",
 	"colors": {
-		"button.background": "#d31422",
+		"activityBar.activeBorder": "#000000",
+		"activityBar.background": "#ececec",
+		"activityBar.foreground": "#000000",
 		"activityBarBadge.background": "#d31422",
+		"button.background": "#d31422",
 		"editorOverviewRuler.rangeHighlightForeground": "#d3142299",
 		"extensionBadge.remoteBackground": "#d31422",
 		"inputOption.activeBorder": "#d3142200",
 		"inputValidation.infoBorder": "#d31422",
 		"peekView.border": "#d31422",
+		"statusBarItem.hoverBackground": "#cccccc",
+		"statusBar.background": "#dddddd",
+		"statusBar.foreground": "#616161",
+		"statusBar.border": "#ffffff",
 		"textBlockQuote.border": "#d3142280",
-		"statusBar.background": "#3c3c3c",
-		"statusBar.border": "#1e1e1e",
-		"titleBar.border": "#1e1e1e"
+		"titleBar.border": "#ffffff"
 	}
 }
