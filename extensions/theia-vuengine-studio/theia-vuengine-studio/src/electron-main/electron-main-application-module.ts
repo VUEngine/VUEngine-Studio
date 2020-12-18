@@ -1,8 +1,8 @@
-// import { ContainerModule } from 'inversify';
-// import { ElectronMainApplication } from '@theia/core/lib/electron-main/electron-main-application';
-// import { VesElectronMainApplication } from './electron-main-application';
+import { ContainerModule } from 'inversify';
+import { ElectronMainApplication } from '@theia/core/lib/electron-main/electron-main-application';
+import { VesElectronMainApplication } from './electron-main-application';
 
-// export default new ContainerModule((bind, unbind, isBound, rebind) => {
-//     bind(VesElectronMainApplication).toSelf().inSingletonScope();
-//     rebind(ElectronMainApplication).toService(VesElectronMainApplication);
-// });
+export default new ContainerModule((bind, unbind, isBound, rebind) => {
+    bind(VesElectronMainApplication).toSelf().inSingletonScope();
+    rebind(ElectronMainApplication).toService(VesElectronMainApplication);
+});

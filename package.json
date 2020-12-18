@@ -16,16 +16,7 @@
       "config": {
         "applicationName": "VUEngine Studio",
         "defaultTheme": "vuengine-dark",
-        "defaultIconTheme": "theia-file-icons",
-        "electron": {
-          "windowOptions": {
-            "minWidth": 820,
-            "minHeight": 420,
-            "backgroundColor": "#222",
-            "titleBarStyle": "hiddenInset",
-            "frame": true
-          }
-        }
+        "defaultIconTheme": "theia-file-icons"
       }
     },
     "backend": {

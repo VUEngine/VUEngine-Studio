@@ -11,6 +11,7 @@
 		"extensionBadge.remoteBackground": "#d31422",
 		"inputOption.activeBorder": "#d3142200",
 		"inputValidation.infoBorder": "#d31422",
+		"menu.separatorBackground": "#dddddd",
 		"peekView.border": "#d31422",
 		"statusBarItem.hoverBackground": "#cccccc",
 		"statusBar.background": "#dddddd",
