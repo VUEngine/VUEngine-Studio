@@ -1,8 +1,9 @@
 #ves-topbar-window-controls {
   -webkit-app-region: no-drag;
-  flex-shrink: 0;
-  float: right;
-  order: 5;
+  background-color: var(--theia-titleBar-activeBackground);
+  position: absolute;
+  right: 0;
+  z-index: 1;
 }
 
 #ves-topbar-window-controls .topbar-window-controls-separator {
@@ -28,7 +29,6 @@
 #ves-topbar-window-controls .topbar-window-controls-button:active {
   background: rgba(255, 255, 255, 0.2);
 }
-
 #ves-topbar-window-controls #ves-topbar-window-controls-close:hover {
   background: #e81123;
 }
