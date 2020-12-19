@@ -35,7 +35,6 @@ import {
 } from "@theia/core/lib/browser";
 
 // branding
-import "./branding/branding";
 import "../../src/browser/branding/style/index.css";
 import { VesBrandingMenuContribution } from "./branding/menu";
 import { VesBrandingCommandContribution } from "./branding/commands";
