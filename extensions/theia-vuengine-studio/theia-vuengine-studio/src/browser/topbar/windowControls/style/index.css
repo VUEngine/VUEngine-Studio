@@ -7,15 +7,16 @@
 }
 
 #ves-topbar-window-controls .topbar-window-controls-separator {
-  border-left: 2px solid rgba(0, 0, 0, 0.2);
+  border-left: 1px solid var(--theia-titleBar-activeForeground);
   float: left;
-  margin: 8px 10px 0 4px;
   height: 23px;
+  margin: 8px 10px 0 4px;
+  opacity: 0.2;
 }
 
 #ves-topbar-window-controls .topbar-window-controls-button {
   display: block;
-  fill: var(--theia-foreground);
+  fill: var(--theia-titleBar-activeForeground);
   float: left;
   font-size: 18px;
   height: 37px;
