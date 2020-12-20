@@ -10,18 +10,18 @@ import { VesStateModel } from "../../common/vesStateModel";
 export async function buildCommand(
   preferenceService: PreferenceService,
   terminalService: TerminalService,
-  vesStateModel: VesStateModel,
+  vesState: VesStateModel,
   workspaceService: WorkspaceService
 ) {
-  if (!vesStateModel.isBuilding) {
-    build(preferenceService, terminalService, vesStateModel, workspaceService);
+  if (!vesState.isBuilding) {
+    build(preferenceService, terminalService, vesState, workspaceService);
   }
 }
 
 async function build(
   preferenceService: PreferenceService,
   terminalService: TerminalService,
-  vesStateModel: VesStateModel,
+  vesState: VesStateModel,
   workspaceService: WorkspaceService
 ) {
   const buildMode = preferenceService.get("build.buildMode");
@@ -65,7 +65,7 @@ async function build(
   // note: should no longer be necessary due to .gitattributes directive
   //preCallMake = 'find "' + convertoToEnvPath(engineCorePath) + 'lib/compiler/preprocessor/" -name "*.sh" -exec sed -i -e "s/$(printf \'\\r\')//" {} \\; && ' + preCallMake;
 
-  vesStateModel.isBuilding = true;
+  vesState.isBuilding = true;
 
   const terminalId = "vuengine-build";
   const terminalWidget = terminalService.getById(terminalId) || await terminalService.newTerminal({

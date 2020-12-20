@@ -16,7 +16,7 @@ export async function exportCommand(
   commandService: CommandService,
   fileService: FileService,
   fileDialogService: FileDialogService,
-  vesStateModel: VesStateModel,
+  vesState: VesStateModel,
   workspaceService: WorkspaceService
 ) {
   const romPath = getRomPath(workspaceService);
@@ -26,9 +26,9 @@ export async function exportCommand(
   } else {
     commandService.executeCommand(VesBuildCommand.id);
     // TODO: use FileWatcher instead?
-    vesStateModel.enqueueExport(setInterval(() => {
+    vesState.enqueueExport(setInterval(() => {
       if (existsSync(getRomPath(workspaceService))) {
-        vesStateModel.unqueueExport();
+        vesState.unqueueExport();
         exportRom(commandService, fileService, fileDialogService, romPath);
       }
     }, 500));

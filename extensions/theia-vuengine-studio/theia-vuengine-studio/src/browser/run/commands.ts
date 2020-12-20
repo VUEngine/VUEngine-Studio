@@ -36,7 +36,7 @@ export class VesRunCommandContribution implements CommandContribution {
     private readonly preferenceService: PreferenceService,
     @inject(TerminalService) private readonly terminalService: TerminalService,
     @inject(VesStateModel)
-    private readonly vesStateModel: VesStateModel,
+    private readonly vesState: VesStateModel,
     @inject(WorkspaceService)
     private readonly workspaceService: WorkspaceService
   ) { }
@@ -48,7 +48,7 @@ export class VesRunCommandContribution implements CommandContribution {
           this.commandService,
           this.preferenceService,
           this.terminalService,
-          this.vesStateModel,
+          this.vesState,
           this.workspaceService
         ),
     });

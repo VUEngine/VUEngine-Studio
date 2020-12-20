@@ -18,7 +18,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
     static readonly ID = 'ves-topbar-action-buttons';
     static readonly LABEL = 'Topbar Action Buttons';
 
-    @inject(VesStateModel) protected readonly vesStateModel: VesStateModel;
+    @inject(VesStateModel) protected readonly vesState: VesStateModel;
     @inject(MessageService) protected readonly messageService!: MessageService;
     @inject(KeybindingRegistry) protected readonly keybindingRegistry!: KeybindingRegistry;
     @inject(CommandService) protected readonly commandService!: CommandService;
@@ -30,12 +30,12 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
         this.title.label = VesTopbarActionButtonsWidget.LABEL;
         this.title.caption = VesTopbarActionButtonsWidget.LABEL;
         this.title.closable = false;
-        this.vesStateModel.onDidChangeIsCleaning(() => this.update());
-        this.vesStateModel.onDidChangeIsBuilding(() => this.update());
-        this.vesStateModel.onDidChangeIsFlashQueued(() => this.update());
-        this.vesStateModel.onDidChangeConnectedFlashCart(() => this.update());
-        this.vesStateModel.onDidChangeIsRunQueued(() => this.update());
-        this.vesStateModel.onDidChangeIsExportQueued(() => this.update());
+        this.vesState.onDidChangeIsCleaning(() => this.update());
+        this.vesState.onDidChangeIsBuilding(() => this.update());
+        this.vesState.onDidChangeIsFlashQueued(() => this.update());
+        this.vesState.onDidChangeConnectedFlashCart(() => this.update());
+        this.vesState.onDidChangeIsRunQueued(() => this.update());
+        this.vesState.onDidChangeIsExportQueued(() => this.update());
         this.keybindingRegistry.onKeybindingsChanged(() => this.update());
         this.update();
     }
@@ -47,53 +47,53 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
         const cleanKeybinding = this.keybindingRegistry.getKeybindingsForCommand(VesBuildCleanCommand.id).pop()?.keybinding;
         return <>
             <button
-                className={this.vesStateModel.isCleaning ? "theia-button" : "theia-button secondary"}
-                title={this.vesStateModel.isCleaning ? "Cleaning..." : `Clean (${cleanKeybinding})`}
+                className={this.vesState.isCleaning ? "theia-button" : "theia-button secondary"}
+                title={this.vesState.isCleaning ? "Cleaning..." : `Clean (${cleanKeybinding})`}
                 disabled={!buildFolderExists}
                 onClick={this.handleCleanOnClick}
             >
-                {this.vesStateModel.isCleaning
+                {this.vesState.isCleaning
                     ? <i className="fa fa-spinner fa-pulse"></i>
                     : <i className="fa fa-trash"></i>}
             </button>
             <button
-                className={this.vesStateModel.isBuilding ? "theia-button" : "theia-button secondary"}
-                title={this.vesStateModel.isBuilding ? "Building..." : "Build"}
+                className={this.vesState.isBuilding ? "theia-button" : "theia-button secondary"}
+                title={this.vesState.isBuilding ? "Building..." : "Build"}
                 onClick={this.handleBuildOnClick}
             >
-                {this.vesStateModel.isBuilding
+                {this.vesState.isBuilding
                     ? <i className="fa fa-spinner fa-pulse"></i>
                     : <i className="fa fa-wrench"></i>}
             </button>
             <button
-                className={this.vesStateModel.isRunQueued ? "theia-button" : "theia-button secondary"}
-                title={this.vesStateModel.isRunQueued ? "Run Queued..." : "Run"}
+                className={this.vesState.isRunQueued ? "theia-button" : "theia-button secondary"}
+                title={this.vesState.isRunQueued ? "Run Queued..." : "Run"}
                 onClick={this.handleRunOnClick}
             >
-                {this.vesStateModel.isRunQueued
+                {this.vesState.isRunQueued
                     ? <i className="fa fa-hourglass-half"></i>
                     : <i className="fa fa-play"></i>}
             </button>
             <button
-                className={this.vesStateModel.isFlashQueued ? "theia-button" : "theia-button secondary"}
-                title={this.vesStateModel.connectedFlashCart === ""
+                className={this.vesState.isFlashQueued ? "theia-button" : "theia-button secondary"}
+                title={this.vesState.connectedFlashCart === ""
                     ? "No Flash Cart Connected"
-                    : this.vesStateModel.isFlashQueued
-                        ? `Flash to ${this.vesStateModel.connectedFlashCart} Queued...`
-                        : `Flash to ${this.vesStateModel.connectedFlashCart}`}
-                disabled={this.vesStateModel.connectedFlashCart === ""}
+                    : this.vesState.isFlashQueued
+                        ? `Flash to ${this.vesState.connectedFlashCart} Queued...`
+                        : `Flash to ${this.vesState.connectedFlashCart}`}
+                disabled={this.vesState.connectedFlashCart === ""}
                 onClick={this.handleFlashOnClick}
             >
-                {this.vesStateModel.isFlashQueued
+                {this.vesState.isFlashQueued
                     ? <i className="fa fa-hourglass-half"></i>
                     : <i className="fa fa-usb"></i>}
             </button>
             <button
-                className={this.vesStateModel.isExportQueued ? "theia-button" : "theia-button secondary"}
-                title={this.vesStateModel.isExportQueued ? "Export Queued..." : "Export"}
+                className={this.vesState.isExportQueued ? "theia-button" : "theia-button secondary"}
+                title={this.vesState.isExportQueued ? "Export Queued..." : "Export"}
                 onClick={this.handleExportOnClick}
             >
-                {this.vesStateModel.isExportQueued
+                {this.vesState.isExportQueued
                     ? <i className="fa fa-hourglass-half"></i>
                     : <i className="fa fa-share-square"></i>}
             </button>
@@ -109,22 +109,22 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
     };
 
     protected handleExportOnClick = () => {
-        this.vesStateModel.isExportQueued
-            ? this.vesStateModel.unqueueExport()
+        this.vesState.isExportQueued
+            ? this.vesState.unqueueExport()
             : this.commandService.executeCommand(VesBuildExportCommand.id)
     };
 
     protected handleFlashOnClick = () => {
-        this.vesStateModel.isFlashQueued
-            ? this.vesStateModel.unqueueFlash()
+        this.vesState.isFlashQueued
+            ? this.vesState.unqueueFlash()
             : this.commandService.executeCommand(VesFlashCartsCommand.id)
     };
 
     protected handleRunOnClick = () => {
-        this.vesStateModel.isRunQueued
-            ? this.vesStateModel.unqueueRun()
+        this.vesState.isRunQueued
+            ? this.vesState.unqueueRun()
             : this.commandService.executeCommand(VesRunCommand.id)
     };
 
-    // protected updateIsBuilding = (e: React.ChangeEvent<HTMLInputElement>) => this.vesStateModel.isBuilding = e.target.value === "dings";
+    // protected updateIsBuilding = (e: React.ChangeEvent<HTMLInputElement>) => this.vesState.isBuilding = e.target.value === "dings";
 }

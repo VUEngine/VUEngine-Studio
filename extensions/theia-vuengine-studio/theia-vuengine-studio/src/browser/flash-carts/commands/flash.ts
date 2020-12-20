@@ -37,7 +37,7 @@ export async function flashCommand(
   messageService: MessageService,
   preferenceService: PreferenceService,
   terminalService: TerminalService,
-  vesStateModel: VesStateModel,
+  vesState: VesStateModel,
   workspaceService: WorkspaceService
 ) {
   const flashCartConfigs: FlashCartConfig[] = getFlashCartConfigs(
@@ -61,9 +61,9 @@ export async function flashCommand(
   } else {
     commandService.executeCommand(VesBuildCommand.id);
     // TODO: use FileWatcher instead?
-    vesStateModel.enqueueFlash(setInterval(() => {
+    vesState.enqueueFlash(setInterval(() => {
       if (existsSync(getRomPath(workspaceService))) {
-        vesStateModel.unqueueFlash();
+        vesState.unqueueFlash();
         flash(
           messageService,
           preferenceService,

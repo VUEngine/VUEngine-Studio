@@ -13,10 +13,10 @@ import { VesStateModel } from "../../common/vesStateModel";
 export async function cleanCommand(
     messageService: MessageService,
     quickPickService: QuickPickService,
-    vesStateModel: VesStateModel,
+    vesState: VesStateModel,
     workspaceService: WorkspaceService
 ) {
-    if (vesStateModel.isCleaning) {
+    if (vesState.isCleaning) {
         return;
     }
 
@@ -70,20 +70,20 @@ export async function cleanCommand(
             return;
         }
 
-        clean(messageService, vesStateModel, workspaceService, selection);
+        clean(messageService, vesState, workspaceService, selection);
     });
 }
 
 async function clean(
     messageService: MessageService,
-    vesStateModel: VesStateModel,
+    vesState: VesStateModel,
     workspaceService: WorkspaceService,
     type: string
 ) {
     const clearAll = (type === "all");
     const cleanPath = getCleanPath(workspaceService, type);
 
-    vesStateModel.isCleaning = true;
+    vesState.isCleaning = true;
 
     if (!existsSync(cleanPath)) {
         const notFoundMessage = clearAll
@@ -108,7 +108,7 @@ async function clean(
     rimraf(cleanPath, function (error) {
         progressMessage.cancel();
         messageService.info(doneMessage);
-        vesStateModel.isCleaning = false;
+        vesState.isCleaning = false;
     });
 }
 

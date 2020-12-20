@@ -56,12 +56,8 @@ export default new ContainerModule((bind) => {
   // topbar
   // show theia main menu in topbar
   if (!isOSX) {
-    bind(BrowserMainMenuFactory)
-      .toSelf()
-      .inSingletonScope();
-    bind(BrowserMenuBarContribution)
-      .toSelf()
-      .inSingletonScope();
+    bind(BrowserMainMenuFactory).toSelf().inSingletonScope();
+    bind(BrowserMenuBarContribution).toSelf().inSingletonScope();
     bind(FrontendApplicationContribution).toService(BrowserMenuBarContribution);
   }
   // application title

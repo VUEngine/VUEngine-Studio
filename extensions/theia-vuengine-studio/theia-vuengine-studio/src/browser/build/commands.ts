@@ -104,7 +104,7 @@ export class VesBuildCommandContribution implements CommandContribution {
     @inject(QuickPickService)
     private readonly quickPickService: QuickPickService,
     @inject(VesStateModel)
-    private readonly vesStateModel: VesStateModel,
+    private readonly vesState: VesStateModel,
     @inject(WorkspaceService)
     private readonly workspaceService: WorkspaceService
   ) { }
@@ -115,7 +115,7 @@ export class VesBuildCommandContribution implements CommandContribution {
         cleanCommand(
           this.messageService,
           this.quickPickService,
-          this.vesStateModel,
+          this.vesState,
           this.workspaceService
         ),
     });
@@ -124,7 +124,7 @@ export class VesBuildCommandContribution implements CommandContribution {
         buildCommand(
           this.preferenceService,
           this.terminalService,
-          this.vesStateModel,
+          this.vesState,
           this.workspaceService
         ),
     });
@@ -134,7 +134,7 @@ export class VesBuildCommandContribution implements CommandContribution {
           this.commandService,
           this.fileService,
           this.fileDialogService,
-          this.vesStateModel,
+          this.vesState,
           this.workspaceService
         ),
     });

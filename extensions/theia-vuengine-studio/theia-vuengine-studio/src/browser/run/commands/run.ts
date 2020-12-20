@@ -18,7 +18,7 @@ export async function runCommand(
   commandService: CommandService,
   preferenceService: PreferenceService,
   terminalService: TerminalService,
-  vesStateModel: VesStateModel,
+  vesState: VesStateModel,
   workspaceService: WorkspaceService
 ) {
   const romPath = getRomPath(workspaceService);
@@ -27,9 +27,9 @@ export async function runCommand(
   } else {
     commandService.executeCommand(VesBuildCommand.id);
     // TODO: use FileWatcher instead?
-    vesStateModel.enqueueRun(setInterval(() => {
+    vesState.enqueueRun(setInterval(() => {
       if (existsSync(getRomPath(workspaceService))) {
-        vesStateModel.unqueueRun();
+        vesState.unqueueRun();
         run(preferenceService, terminalService, workspaceService);
       }
     }, 500));
