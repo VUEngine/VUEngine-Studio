@@ -20,7 +20,6 @@ export async function exportCommand(
   workspaceService: WorkspaceService
 ) {
   const romPath = getRomPath(workspaceService);
-
   if (existsSync(romPath)) {
     exportRom(commandService, fileService, fileDialogService, romPath);
   } else {

@@ -18,6 +18,7 @@ export namespace BuildMenuSection {
   export const ACTION = [...MAIN_MENU_BAR, "vesBuild", '1_action'];
   export const MODE = [...MAIN_MENU_BAR, "vesBuild", '2_mode'];
   export const BUILD_OPTION = [...MAIN_MENU_BAR, "vesBuild", '3_build_option'];
+  export const DEFAULTS = [...MAIN_MENU_BAR, "vesBuild", '4_defaults'];
 }
 
 @injectable()
@@ -28,13 +29,13 @@ export class VesBuildMenuContribution implements MenuContribution {
     });
 
     menus.registerMenuAction(BuildMenuSection.ACTION, {
-      commandId: VesBuildCommand.id,
-      label: VesBuildCommand.label,
+      commandId: VesBuildCleanCommand.id,
+      label: VesBuildCleanCommand.label,
       order: "1"
     });
     menus.registerMenuAction(BuildMenuSection.ACTION, {
-      commandId: VesBuildCleanCommand.id,
-      label: VesBuildCleanCommand.label,
+      commandId: VesBuildCommand.id,
+      label: VesBuildCommand.label,
       order: "2"
     });
     menus.registerMenuAction(BuildMenuSection.ACTION, {

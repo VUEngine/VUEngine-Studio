@@ -4,11 +4,11 @@ import {
   VesBuildCleanCommand,
   VesBuildCommand,
   VesBuildExportCommand,
-  // VesBuildSetModeReleaseCommand,
-  // VesBuildSetModeBetaCommand,
-  // VesBuildSetModeToolsCommand,
-  // VesBuildSetModeDebugCommand,
-  // VesBuildSetModePreprocessorCommand
+  VesBuildSetModeReleaseCommand,
+  VesBuildSetModeBetaCommand,
+  VesBuildSetModeToolsCommand,
+  VesBuildSetModeDebugCommand,
+  VesBuildSetModePreprocessorCommand
 } from "./commands";
 
 @injectable()
@@ -26,21 +26,21 @@ export class VesBuildKeybindingContribution implements KeybindingContribution {
     }, {
       command: VesBuildExportCommand.id,
       keybinding: "alt+shift+e"
-    }/*, {
+    }, {
       command: VesBuildSetModeReleaseCommand.id,
-      keybinding: "alt+shift+1"
+      keybinding: "ctrl+shift+1"
     }, {
       command: VesBuildSetModeBetaCommand.id,
-      keybinding: "alt+shift+2"
+      keybinding: "ctrl+shift+2"
     }, {
       command: VesBuildSetModeToolsCommand.id,
-      keybinding: "alt+shift+3"
+      keybinding: "ctrl+shift+3"
     }, {
       command: VesBuildSetModeDebugCommand.id,
-      keybinding: "alt+shift+4"
+      keybinding: "ctrl+shift+4"
     }, {
       command: VesBuildSetModePreprocessorCommand.id,
-      keybinding: "alt+shift+5"
-    }*/);
+      keybinding: "ctrl+shift+5"
+    });
   }
 }

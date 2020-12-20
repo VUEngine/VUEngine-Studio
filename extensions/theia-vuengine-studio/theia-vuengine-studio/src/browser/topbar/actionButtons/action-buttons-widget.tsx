@@ -35,7 +35,6 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
         this.vesState.onDidChangeIsFlashQueued(() => this.update());
         this.vesState.onDidChangeConnectedFlashCart(() => this.update());
         this.vesState.onDidChangeIsRunQueued(() => this.update());
-        this.vesState.onDidChangeIsExportQueued(() => this.update());
         this.keybindingRegistry.onKeybindingsChanged(() => this.update());
         this.update();
     }
@@ -43,12 +42,10 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
     protected render(): React.ReactNode {
         // TODO: on initial render, the workspace root can not be determined
         const buildFolderExists = existsSync(joinPath(getWorkspaceRoot(this.workspaceService), "build"));
-        // TODO: this is initially not available
-        const cleanKeybinding = this.keybindingRegistry.getKeybindingsForCommand(VesBuildCleanCommand.id).pop()?.keybinding;
         return <>
             <button
                 className={this.vesState.isCleaning ? "theia-button" : "theia-button secondary"}
-                title={this.vesState.isCleaning ? "Cleaning..." : `Clean (${cleanKeybinding})`}
+                title={this.vesState.isCleaning ? "Cleaning..." : `Clean${this.getKeybindingLabel(VesBuildCleanCommand.id)}`}
                 disabled={!buildFolderExists}
                 onClick={this.handleCleanOnClick}
             >
@@ -124,6 +121,13 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
         this.vesState.isRunQueued
             ? this.vesState.unqueueRun()
             : this.commandService.executeCommand(VesRunCommand.id)
+    };
+
+    protected getKeybindingLabel = (commandId: string) => {
+        // TODO: this is initially not available
+        const cleanKeybinding = this.keybindingRegistry.getKeybindingsForCommand(commandId).pop();
+        const cleanKeybindingAccelerator = cleanKeybinding ? ` (${this.keybindingRegistry.acceleratorFor(cleanKeybinding, "+")})` : "";
+        return cleanKeybindingAccelerator;
     };
 
     // protected updateIsBuilding = (e: React.ChangeEvent<HTMLInputElement>) => this.vesState.isBuilding = e.target.value === "dings";

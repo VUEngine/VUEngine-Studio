@@ -77,9 +77,7 @@ export default new ContainerModule((bind) => {
     .inSingletonScope();
   // action buttons
   bindViewContribution(bind, VesTopbarActionButtonsContribution);
-  bind(FrontendApplicationContribution).toService(
-    VesTopbarActionButtonsContribution
-  );
+  bind(FrontendApplicationContribution).toService(VesTopbarActionButtonsContribution);
   bind(VesTopbarActionButtonsWidget).toSelf();
   bind(WidgetFactory)
     .toDynamicValue((ctx) => ({
@@ -94,9 +92,7 @@ export default new ContainerModule((bind) => {
   bind(CommandContribution).to(VesWindowCommandContribution);
   if (!isOSX) {
     bindViewContribution(bind, VesTopbarWindowControlsContribution);
-    bind(FrontendApplicationContribution).toService(
-      VesTopbarWindowControlsContribution
-    );
+    bind(FrontendApplicationContribution).toService(VesTopbarWindowControlsContribution);
     bind(VesTopbarWindowControlsWidget).toSelf();
     bind(WidgetFactory)
       .toDynamicValue((ctx) => ({
