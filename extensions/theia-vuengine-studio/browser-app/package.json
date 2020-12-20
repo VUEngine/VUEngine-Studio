@@ -20,11 +20,24 @@
     "@theia/cli": "latest"
   },
   "scripts": {
+    "all": "cd .. && yarn && cd browser-app && yarn start",
     "prepare": "theia build --mode development",
     "start": "theia start",
     "watch": "theia build --watch --mode development"
   },
   "theia": {
-    "target": "browser"
+    "target": "browser",
+    "frontend": {
+      "config": {
+        "applicationName": "VUEngine Studio",
+        "defaultTheme": "vuengine-dark",
+        "defaultIconTheme": "theia-file-icons"
+      }
+    },
+    "generator": {
+      "config": {
+        "preloadTemplate": "../../../resources/splash/index.html"
+      }
+    }
   }
 }

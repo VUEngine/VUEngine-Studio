@@ -1,5 +1,9 @@
 /* TODO: move style overrides to separate place. branding folder? */
 
+.p-Widget.p-MenuBar {
+  padding-left: 0;
+}
+
 /* do not drag main menu popups 4px to the top */
 .p-MenuBar-menu {
   transform: none;
@@ -14,6 +18,7 @@
   -webkit-app-region: drag;
   display: flex;
   flex-wrap: nowrap;
+  overflow: visible;
   padding-right: 154px;
   user-select: none;
 }

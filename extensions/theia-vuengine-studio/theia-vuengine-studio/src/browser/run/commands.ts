@@ -18,14 +18,13 @@ export const VesRunCommand: Command = {
   // TODO: dynamic label based on selected emu config?"
   label: "Run on Emulator",
   category: "Run",
-  iconClass: "play",
+  iconClass: "fa fa-play",
 };
 
 export const VesSelectEmulatorCommand: Command = {
   id: "VesRun.commands.selectEmulator",
   label: "Select Default Emulator...",
-  category: "Run",
-  iconClass: "select",
+  category: "Run"
 };
 
 @injectable()

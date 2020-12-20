@@ -2,6 +2,7 @@ import * as React from 'react';
 import { injectable, postConstruct, inject } from 'inversify';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { CommandService, MessageService } from '@theia/core';
+import { KeybindingRegistry } from "@theia/core/lib/browser/keybinding";
 import { existsSync } from "fs";
 import { join as joinPath } from "path";
 import { VesFlashCartsCommand } from "../../flash-carts/commands";
@@ -17,14 +18,11 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
     static readonly ID = 'ves-topbar-action-buttons';
     static readonly LABEL = 'Topbar Action Buttons';
 
-    @inject(VesStateModel)
-    protected readonly vesStateModel: VesStateModel;
-    @inject(MessageService)
-    protected readonly messageService!: MessageService;
-    @inject(CommandService)
-    protected readonly commandService!: CommandService;
-    @inject(WorkspaceService)
-    protected readonly workspaceService!: WorkspaceService;
+    @inject(VesStateModel) protected readonly vesStateModel: VesStateModel;
+    @inject(MessageService) protected readonly messageService!: MessageService;
+    @inject(KeybindingRegistry) protected readonly keybindingRegistry!: KeybindingRegistry;
+    @inject(CommandService) protected readonly commandService!: CommandService;
+    @inject(WorkspaceService) protected readonly workspaceService!: WorkspaceService;
 
     @postConstruct()
     protected async init(): Promise<void> {
@@ -38,16 +36,19 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
         this.vesStateModel.onDidChangeConnectedFlashCart(() => this.update());
         this.vesStateModel.onDidChangeIsRunQueued(() => this.update());
         this.vesStateModel.onDidChangeIsExportQueued(() => this.update());
+        this.keybindingRegistry.onKeybindingsChanged(() => this.update());
         this.update();
     }
 
     protected render(): React.ReactNode {
         // TODO: on initial render, the workspace root can not be determined
         const buildFolderExists = existsSync(joinPath(getWorkspaceRoot(this.workspaceService), "build"));
+        // TODO: this is initially not available
+        const cleanKeybinding = this.keybindingRegistry.getKeybindingsForCommand(VesBuildCleanCommand.id).pop()?.keybinding;
         return <>
             <button
                 className={this.vesStateModel.isCleaning ? "theia-button" : "theia-button secondary"}
-                title={this.vesStateModel.isCleaning ? "Cleaning..." : "Clean"}
+                title={this.vesStateModel.isCleaning ? "Cleaning..." : `Clean (${cleanKeybinding})`}
                 disabled={!buildFolderExists}
                 onClick={this.handleCleanOnClick}
             >

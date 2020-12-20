@@ -22,7 +22,7 @@
     "@theia/cli": "latest"
   },
   "scripts": {
-    "all": "cd .. && yarn && cd electron-app && yarn start",
+    "all": "cd .. && yarn && yarn theia rebuild:electron && cd electron-app && yarn start",
     "prepare": "theia build --mode development",
     "start": "theia start",
     "watch": "theia build --watch --mode development"

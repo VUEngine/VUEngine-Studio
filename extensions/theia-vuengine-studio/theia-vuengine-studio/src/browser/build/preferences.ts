@@ -7,14 +7,14 @@ import {
   PreferenceContribution,
   PreferenceSchema,
 } from "@theia/core/lib/browser";
-import { BuildMode } from "./commands/setMode";
+import { BuildMode, DEFAULT_BUILD_MODE } from "./commands/setMode";
 
 const VesBuildPreferenceSchema: PreferenceSchema = {
   type: "object",
   properties: {
     "build.buildMode": {
       type: "string",
-      default: BuildMode.release,
+      default: DEFAULT_BUILD_MODE,
       enum: [
         BuildMode.release,
         BuildMode.beta,

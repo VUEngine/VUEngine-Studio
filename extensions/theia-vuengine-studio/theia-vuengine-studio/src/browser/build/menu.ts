@@ -9,17 +9,15 @@ import {
   VesBuildSetModeToolsCommand,
   VesBuildSetModeDebugCommand,
   VesBuildSetModePreprocessorCommand,
-  VesBuildEnableDumpElfCommand,
-  VesBuildDisableDumpElfCommand,
-  VesBuildEnablePedanticWarningsCommand,
-  VesBuildDisablePedanticWarningsCommand
+  VesBuildToggleDumpElfCommand,
+  VesBuildTogglePedanticWarningsCommand,
 } from "./commands";
 
 export const buildMenuPath = [...MAIN_MENU_BAR, "vesBuild"];
 export namespace BuildMenuSection {
   export const ACTION = [...MAIN_MENU_BAR, "vesBuild", '1_action'];
   export const MODE = [...MAIN_MENU_BAR, "vesBuild", '2_mode'];
-  export const OPTION = [...MAIN_MENU_BAR, "vesBuild", '3_options'];
+  export const BUILD_OPTION = [...MAIN_MENU_BAR, "vesBuild", '3_build_option'];
 }
 
 @injectable()
@@ -47,49 +45,46 @@ export class VesBuildMenuContribution implements MenuContribution {
 
     menus.registerMenuAction(BuildMenuSection.MODE, {
       commandId: VesBuildSetModeReleaseCommand.id,
-      label: "release",
+      label: "Release Mode",
       order: "1"
     });
     menus.registerMenuAction(BuildMenuSection.MODE, {
       commandId: VesBuildSetModeBetaCommand.id,
-      label: "beta",
+      label: "Beta Mode",
       order: "2"
     });
     menus.registerMenuAction(BuildMenuSection.MODE, {
       commandId: VesBuildSetModeToolsCommand.id,
-      label: "tools",
+      label: "Tools Mode",
       order: "3"
     });
     menus.registerMenuAction(BuildMenuSection.MODE, {
       commandId: VesBuildSetModeDebugCommand.id,
-      label: "debug",
+      label: "Debug Mode",
       order: "4"
     });
     menus.registerMenuAction(BuildMenuSection.MODE, {
       commandId: VesBuildSetModePreprocessorCommand.id,
-      label: "preprocessor",
+      label: "Preprocessor Mode",
       order: "5"
     });
 
-    menus.registerMenuAction(BuildMenuSection.OPTION, {
-      commandId: VesBuildEnableDumpElfCommand.id,
+    menus.registerMenuAction(BuildMenuSection.BUILD_OPTION, {
+      commandId: VesBuildToggleDumpElfCommand.id,
       label: "Dump ELF",
       order: "1"
     });
-    menus.registerMenuAction(BuildMenuSection.OPTION, {
-      commandId: VesBuildDisableDumpElfCommand.id,
-      label: "Dump ELF",
+    menus.registerMenuAction(BuildMenuSection.BUILD_OPTION, {
+      commandId: VesBuildTogglePedanticWarningsCommand.id,
+      label: "Pedantic Warnings",
       order: "2"
     });
-    menus.registerMenuAction(BuildMenuSection.OPTION, {
-      commandId: VesBuildEnablePedanticWarningsCommand.id,
-      label: "Pedantic Warnings",
-      order: "3"
-    });
-    menus.registerMenuAction(BuildMenuSection.OPTION, {
-      commandId: VesBuildDisablePedanticWarningsCommand.id,
-      label: "Pedantic Warnings",
-      order: "4"
-    });
+    /*if (isWindows) {
+      menus.registerMenuAction(BuildMenuSection.OPTION, {
+        commandId: VesBuildToggleEnableWslCommand.id,
+        label: "Enable WSL",
+        order: "3"
+      });
+    }*/
   }
 }

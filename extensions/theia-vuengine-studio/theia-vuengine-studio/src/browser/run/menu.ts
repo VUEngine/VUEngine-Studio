@@ -11,7 +11,7 @@ export class VesRunMenuContribution implements MenuContribution {
       label: VesRunCommand.label,
       order: "3",
     });
-    menus.registerMenuAction(BuildMenuSection.OPTION, {
+    menus.registerMenuAction(BuildMenuSection.BUILD_OPTION, {
       commandId: VesSelectEmulatorCommand.id,
       label: VesSelectEmulatorCommand.label,
       order: "3",

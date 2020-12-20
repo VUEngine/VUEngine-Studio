@@ -9,14 +9,10 @@ import {
   BrowserMenuBarContribution,
   BrowserMainMenuFactory,
 } from "@theia/core/lib/browser/menu/browser-menu-plugin";
-
-// clean theia
 // import {
 //   CleanTheiaCommandContribution,
 //   CleanTheiaMenuContribution,
 // } from "./clean-theia";
-
-// topbar
 import { VesTopbarActionButtonsWidget } from "./topbar/actionButtons/action-buttons-widget";
 import { VesTopbarActionButtonsContribution } from "./topbar/actionButtons/action-buttons-view";
 import "../../src/browser/topbar/actionButtons/style/index.css";
@@ -33,38 +29,24 @@ import {
   FrontendApplicationContribution,
   WidgetFactory,
 } from "@theia/core/lib/browser";
-
-// branding
 import "../../src/browser/branding/style/index.css";
 import { VesBrandingMenuContribution } from "./branding/menu";
 import { VesBrandingCommandContribution } from "./branding/commands";
-
-// touchbar
 // import "./touchbarTest";
-
-// common
 import { VesStateModel } from "./common/vesStateModel";
-
-// themes
 import "./themes/index";
-
-// build
 import { VesBuildCommandContribution } from "./build/commands";
 import { VesBuildKeybindingContribution } from "./build/keybindings";
-// import { VesBuildMenuContribution } from "./build/menu";
 import { bindVesBuildPreferences } from "./build/preferences";
-
-// flash carts
 import { VesFlashCartsCommandContribution } from "./flash-carts/commands";
 import { VesFlashCartsKeybindingContribution } from "./flash-carts/keybindings";
-// import { VesFlashCartsMenuContribution } from "./flash-carts/menu";
 import { bindVesFlashCartsPreferences } from "./flash-carts/preferences";
-
-// run
 import { bindVesRunPreferences } from "./run/preferences";
 import { VesRunCommandContribution } from "./run/commands";
-// import { VesRunMenuContribution } from "./run/menu";
 import { VesRunKeybindingContribution } from "./run/keybindings";
+import { VesBuildMenuContribution } from "./build/menu";
+import { VesFlashCartsMenuContribution } from "./flash-carts/menu";
+import { VesRunMenuContribution } from "./run/menu";
 
 export default new ContainerModule((bind) => {
   // clean unneeded theia functions
@@ -132,29 +114,27 @@ export default new ContainerModule((bind) => {
   }
 
   // branding
-  bind(CommandContribution).to(VesBrandingCommandContribution);
-  bind(MenuContribution).to(VesBrandingMenuContribution);
+  bind(CommandContribution).to(VesBrandingCommandContribution).inSingletonScope();
+  bind(MenuContribution).to(VesBrandingMenuContribution).inSingletonScope();
 
   // common
-  bind(VesStateModel)
-    .toSelf()
-    .inSingletonScope();
+  bind(VesStateModel).toSelf().inSingletonScope();
 
   // build
   bindVesBuildPreferences(bind);
-  bind(CommandContribution).to(VesBuildCommandContribution);
-  //bind(MenuContribution).to(VesBuildMenuContribution);
-  bind(KeybindingContribution).to(VesBuildKeybindingContribution);
+  bind(CommandContribution).to(VesBuildCommandContribution).inSingletonScope();
+  bind(MenuContribution).to(VesBuildMenuContribution).inSingletonScope();
+  bind(KeybindingContribution).to(VesBuildKeybindingContribution).inSingletonScope();
 
   // flash carts
   bindVesFlashCartsPreferences(bind);
-  bind(CommandContribution).to(VesFlashCartsCommandContribution);
-  // bind(MenuContribution).to(VesFlashCartsMenuContribution);
-  bind(KeybindingContribution).to(VesFlashCartsKeybindingContribution);
+  bind(CommandContribution).to(VesFlashCartsCommandContribution).inSingletonScope();
+  bind(MenuContribution).to(VesFlashCartsMenuContribution).inSingletonScope();
+  bind(KeybindingContribution).to(VesFlashCartsKeybindingContribution).inSingletonScope();
 
   // run
   bindVesRunPreferences(bind);
-  bind(CommandContribution).to(VesRunCommandContribution);
-  // bind(MenuContribution).to(VesRunMenuContribution);
-  bind(KeybindingContribution).to(VesRunKeybindingContribution);
+  bind(CommandContribution).to(VesRunCommandContribution).inSingletonScope();
+  bind(MenuContribution).to(VesRunMenuContribution).inSingletonScope();
+  bind(KeybindingContribution).to(VesRunKeybindingContribution).inSingletonScope();
 });
