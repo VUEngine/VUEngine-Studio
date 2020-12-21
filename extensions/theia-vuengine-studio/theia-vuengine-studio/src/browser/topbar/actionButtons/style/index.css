@@ -8,6 +8,11 @@
   padding-top: 5px;
 }
 
+#ves-topbar-action-buttons.os-linux,
+#ves-topbar-action-buttons.os-windows {
+  padding-right: 162px;
+}
+
 @media (max-width: 800px) {
   #ves-topbar-action-buttons {
     display: none;

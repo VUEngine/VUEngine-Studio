@@ -18,7 +18,6 @@
   -webkit-app-region: drag;
   display: flex;
   flex-wrap: nowrap;
-  padding-right: 154px;
   user-select: none;
 }
 [id="theia:icon"] {

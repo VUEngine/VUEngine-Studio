@@ -8,7 +8,7 @@ import { join as joinPath } from "path";
 import { VesFlashCartsCommand } from "../../flash-carts/commands";
 import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand } from '../../build/commands';
 import { VesStateModel } from '../../common/vesStateModel';
-import { getWorkspaceRoot } from '../../common';
+import { getOs, getWorkspaceRoot } from '../../common';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesRunCommand } from '../../run/commands';
 
@@ -30,6 +30,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
         this.title.label = VesTopbarActionButtonsWidget.LABEL;
         this.title.caption = VesTopbarActionButtonsWidget.LABEL;
         this.title.closable = false;
+        this.addClass(`os-${getOs()}`);
         this.vesState.onDidChangeIsCleaning(() => this.update());
         this.vesState.onDidChangeIsBuilding(() => this.update());
         this.vesState.onDidChangeIsFlashQueued(() => this.update());
