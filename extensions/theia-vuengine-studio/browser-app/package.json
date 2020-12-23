@@ -20,7 +20,7 @@
     "@theia/cli": "latest"
   },
   "scripts": {
-    "all": "cd .. && yarn && cd browser-app && yarn start",
+    "all": "cd .. && yarn && yarn rebuild:browser && cd browser-app && yarn start",
     "prepare": "theia build --mode development",
     "start": "theia start",
     "watch": "theia build --watch --mode development"

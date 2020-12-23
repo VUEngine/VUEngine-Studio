@@ -7,7 +7,6 @@ import {
 } from "@theia/filesystem/lib/browser";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
-import { existsSync } from "fs";
 import { getRomPath } from "../../common";
 import { VesStateModel } from "../../common/vesStateModel";
 import { VesBuildCommand } from "../commands";
@@ -19,18 +18,19 @@ export async function exportCommand(
   vesState: VesStateModel,
   workspaceService: WorkspaceService
 ) {
-  const romPath = getRomPath(workspaceService);
-  if (existsSync(romPath)) {
-    exportRom(commandService, fileService, fileDialogService, romPath);
+
+  vesState.onDidChangeOutputRomExists(outputRomExists => {
+    if (outputRomExists && vesState.isExportQueued) {
+      vesState.isExportQueued = false;
+      exportRom(commandService, fileService, fileDialogService, workspaceService);
+    }
+  })
+
+  if (vesState.outputRomExists) {
+    exportRom(commandService, fileService, fileDialogService, workspaceService);
   } else {
     commandService.executeCommand(VesBuildCommand.id);
-    // TODO: use FileWatcher instead?
-    vesState.enqueueExport(setInterval(() => {
-      if (existsSync(getRomPath(workspaceService))) {
-        vesState.unqueueExport();
-        exportRom(commandService, fileService, fileDialogService, romPath);
-      }
-    }, 500));
+    vesState.isExportQueued = true;
   }
 }
 
@@ -38,8 +38,9 @@ async function exportRom(
   commandService: CommandService,
   fileService: FileService,
   fileDialogService: FileDialogService,
-  romPath: string
+  workspaceService: WorkspaceService
 ) {
+  const romPath = getRomPath(workspaceService);
   const romUri = new URI(romPath);
   let exists: boolean = false;
   let overwrite: boolean = false;

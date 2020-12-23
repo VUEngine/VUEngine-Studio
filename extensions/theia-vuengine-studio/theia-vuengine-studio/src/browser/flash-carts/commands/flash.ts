@@ -4,9 +4,11 @@ import {
   isWindows,
   MessageService,
 } from "@theia/core/lib/common";
+import URI from "@theia/core/lib/common/uri";
+import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
-import { createWriteStream, existsSync, readFileSync, unlinkSync } from "fs";
+import { createWriteStream, readFileSync, unlinkSync } from "fs";
 import { dirname, join as joinPath } from "path";
 import { /*getDeviceList, */ Device } from "usb";
 
@@ -34,45 +36,53 @@ type ConnectedFlashCart = {
 
 export async function flashCommand(
   commandService: CommandService,
+  fileService: FileService,
   messageService: MessageService,
   preferenceService: PreferenceService,
   terminalService: TerminalService,
   vesState: VesStateModel,
   workspaceService: WorkspaceService
 ) {
+
   const flashCartConfigs: FlashCartConfig[] = getFlashCartConfigs(
     preferenceService
   );
 
+  // TODO: store connectedFlashCart in state
   const connectedFlashCart:
     | ConnectedFlashCart
     | undefined = await detectFlashCart(flashCartConfigs);
 
+  vesState.onDidChangeOutputRomExists(outputRomExists => {
+    if (outputRomExists && vesState.isFlashQueued) {
+      vesState.isFlashQueued = false;
+      flash(
+        fileService,
+        messageService,
+        preferenceService,
+        terminalService,
+        vesState,
+        workspaceService,
+        connectedFlashCart
+      );
+    }
+  })
+
   if (!connectedFlashCart) {
     messageService.error(`No connected flash cart could be found.`);
-  } else if (existsSync(getRomPath(workspaceService))) {
+  } else if (vesState.outputRomExists) {
     flash(
+      fileService,
       messageService,
       preferenceService,
       terminalService,
+      vesState,
       workspaceService,
       connectedFlashCart
     );
   } else {
     commandService.executeCommand(VesBuildCommand.id);
-    // TODO: use FileWatcher instead?
-    vesState.enqueueFlash(setInterval(() => {
-      if (existsSync(getRomPath(workspaceService))) {
-        vesState.unqueueFlash();
-        flash(
-          messageService,
-          preferenceService,
-          terminalService,
-          workspaceService,
-          connectedFlashCart
-        );
-      }
-    }, 500));
+    vesState.isFlashQueued = true;
   }
 }
 
@@ -179,12 +189,18 @@ function getFlashCartConfigs(preferenceService: PreferenceService) {
 }
 
 async function flash(
+  fileService: FileService,
   messageService: MessageService,
   preferenceService: PreferenceService,
   terminalService: TerminalService,
+  vesState: VesStateModel,
   workspaceService: WorkspaceService,
-  connectedFlashCart: ConnectedFlashCart
+  connectedFlashCart: ConnectedFlashCart | undefined
 ) {
+  if (!connectedFlashCart) {
+    return;
+  }
+
   if (!connectedFlashCart.config.path) {
     messageService.error(
       `No path to flasher software provided for cart "${connectedFlashCart.config.name}"`
@@ -192,7 +208,7 @@ async function flash(
     return;
   }
 
-  if (!existsSync(dirname(connectedFlashCart.config.path))) {
+  if (!await fileService.exists(new URI(dirname(connectedFlashCart.config.path)))) {
     messageService.error(
       `Flasher software does not exist at "${connectedFlashCart.config.path}"`
     );
@@ -210,7 +226,7 @@ async function flash(
 
   const romPath =
     connectedFlashCart.config.padRom &&
-      padRom(workspaceService, connectedFlashCart.config.size)
+      await padRom(fileService, vesState, workspaceService, connectedFlashCart.config.size)
       ? getPaddedRomPath(workspaceService)
       : getRomPath(workspaceService);
 
@@ -230,11 +246,11 @@ async function flash(
   terminalService.open(terminalWidget);
 }
 
-function padRom(workspaceService: WorkspaceService, size: number): boolean {
+async function padRom(fileService: FileService, vesState: VesStateModel, workspaceService: WorkspaceService, size: number): Promise<boolean> {
   const romPath = getRomPath(workspaceService);
   const paddedRomPath = getPaddedRomPath(workspaceService);
 
-  if (!existsSync(romPath)) {
+  if (!vesState.outputRomExists) {
     return false;
   }
 
@@ -247,7 +263,7 @@ function padRom(workspaceService: WorkspaceService, size: number): boolean {
     return false;
   }
 
-  if (existsSync(paddedRomPath)) {
+  if (await fileService.exists(new URI(paddedRomPath))) {
     unlinkSync(paddedRomPath);
   }
 

@@ -3,14 +3,15 @@ import { injectable, postConstruct, inject } from 'inversify';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { CommandService, MessageService } from '@theia/core';
 import { KeybindingRegistry } from "@theia/core/lib/browser/keybinding";
-import { existsSync } from "fs";
-import { join as joinPath } from "path";
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { VesFlashCartsCommand } from "../../flash-carts/commands";
 import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand } from '../../build/commands';
 import { VesStateModel } from '../../common/vesStateModel';
-import { getOs, getWorkspaceRoot } from '../../common';
+import { getOs } from '../../common';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesRunCommand } from '../../run/commands';
+import { PreferenceService } from '@theia/core/lib/browser';
+import { BuildMode } from '../../build/commands/setMode';
 
 @injectable()
 export class VesTopbarActionButtonsWidget extends ReactWidget {
@@ -18,10 +19,12 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
     static readonly ID = 'ves-topbar-action-buttons';
     static readonly LABEL = 'Topbar Action Buttons';
 
-    @inject(VesStateModel) protected readonly vesState: VesStateModel;
-    @inject(MessageService) protected readonly messageService!: MessageService;
-    @inject(KeybindingRegistry) protected readonly keybindingRegistry!: KeybindingRegistry;
     @inject(CommandService) protected readonly commandService!: CommandService;
+    @inject(FileService) protected readonly fileService!: FileService;
+    @inject(KeybindingRegistry) protected readonly keybindingRegistry!: KeybindingRegistry;
+    @inject(MessageService) protected readonly messageService!: MessageService;
+    @inject(PreferenceService) protected readonly preferenceService!: PreferenceService;
+    @inject(VesStateModel) protected readonly vesState: VesStateModel;
     @inject(WorkspaceService) protected readonly workspaceService!: WorkspaceService;
 
     @postConstruct()
@@ -36,18 +39,19 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
         this.vesState.onDidChangeIsFlashQueued(() => this.update());
         this.vesState.onDidChangeConnectedFlashCart(() => this.update());
         this.vesState.onDidChangeIsRunQueued(() => this.update());
+        this.vesState.onDidChangeBuildFolder(() => this.update());
+        this.vesState.onDidChangeOutputRomExists(() => this.update());
         this.keybindingRegistry.onKeybindingsChanged(() => this.update());
         this.update();
     }
 
     protected render(): React.ReactNode {
-        // TODO: on initial render, the workspace root can not be determined
-        const buildFolderExists = existsSync(joinPath(getWorkspaceRoot(this.workspaceService), "build"));
+        const buildMode = this.preferenceService.get("build.buildMode") as BuildMode;
         return <>
             <button
-                className={this.vesState.isCleaning ? "theia-button" : "theia-button secondary"}
+                className="theia-button secondary"
                 title={this.vesState.isCleaning ? "Cleaning..." : `Clean${this.getKeybindingLabel(VesBuildCleanCommand.id)}`}
-                disabled={!buildFolderExists}
+                disabled={!this.vesState.buildFolderExists[buildMode]}
                 onClick={this.handleCleanOnClick}
             >
                 {this.vesState.isCleaning
@@ -55,7 +59,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                     : <i className="fa fa-trash"></i>}
             </button>
             <button
-                className={this.vesState.isBuilding ? "theia-button" : "theia-button secondary"}
+                className="theia-button secondary"
                 title={this.vesState.isBuilding ? "Building..." : "Build"}
                 onClick={this.handleBuildOnClick}
             >
@@ -64,7 +68,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                     : <i className="fa fa-wrench"></i>}
             </button>
             <button
-                className={this.vesState.isRunQueued ? "theia-button" : "theia-button secondary"}
+                className="theia-button secondary"
                 title={this.vesState.isRunQueued ? "Run Queued..." : "Run"}
                 onClick={this.handleRunOnClick}
             >
@@ -73,7 +77,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                     : <i className="fa fa-play"></i>}
             </button>
             <button
-                className={this.vesState.isFlashQueued ? "theia-button" : "theia-button secondary"}
+                className="theia-button secondary"
                 title={this.vesState.connectedFlashCart === ""
                     ? "No Flash Cart Connected"
                     : this.vesState.isFlashQueued
@@ -87,7 +91,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                     : <i className="fa fa-usb"></i>}
             </button>
             <button
-                className={this.vesState.isExportQueued ? "theia-button" : "theia-button secondary"}
+                className="theia-button secondary"
                 title={this.vesState.isExportQueued ? "Export Queued..." : "Export"}
                 onClick={this.handleExportOnClick}
             >
@@ -108,19 +112,19 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
 
     protected handleExportOnClick = () => {
         this.vesState.isExportQueued
-            ? this.vesState.unqueueExport()
+            ? this.vesState.isExportQueued = false
             : this.commandService.executeCommand(VesBuildExportCommand.id)
     };
 
     protected handleFlashOnClick = () => {
         this.vesState.isFlashQueued
-            ? this.vesState.unqueueFlash()
+            ? this.vesState.isFlashQueued = false
             : this.commandService.executeCommand(VesFlashCartsCommand.id)
     };
 
     protected handleRunOnClick = () => {
         this.vesState.isRunQueued
-            ? this.vesState.unqueueRun()
+            ? this.vesState.isRunQueued = false
             : this.commandService.executeCommand(VesRunCommand.id)
     };
 

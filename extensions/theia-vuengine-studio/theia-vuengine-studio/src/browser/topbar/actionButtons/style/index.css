@@ -3,18 +3,18 @@
   flex-shrink: 0;
   float: right;
   order: 4;
-  overflow: visible !important;
-  padding-right: 8px;
+  margin-right: 8px;
   padding-top: 5px;
 }
 
 #ves-topbar-action-buttons.os-linux,
-#ves-topbar-action-buttons.os-windows {
+#ves-topbar-action-buttons.os-win {
   padding-right: 162px;
 }
 
 @media (max-width: 800px) {
-  #ves-topbar-action-buttons {
+  #ves-topbar-action-buttons.os-linux,
+  #ves-topbar-action-buttons.os-win {
     display: none;
   }
 }

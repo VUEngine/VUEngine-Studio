@@ -2,7 +2,6 @@ import { PreferenceService } from "@theia/core/lib/browser";
 import { CommandService, isWindows } from "@theia/core/lib/common";
 import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
-import { existsSync } from "fs";
 import { join as joinPath } from "path";
 import { VesBuildCommand } from "../../build/commands";
 import { getOs, getResourcesPath, getRomPath } from "../../common";
@@ -21,18 +20,18 @@ export async function runCommand(
   vesState: VesStateModel,
   workspaceService: WorkspaceService
 ) {
-  const romPath = getRomPath(workspaceService);
-  if (existsSync(romPath)) {
+  vesState.onDidChangeOutputRomExists(outputRomExists => {
+    if (outputRomExists && vesState.isRunQueued) {
+      vesState.isRunQueued = false;
+      run(preferenceService, terminalService, workspaceService);
+    }
+  })
+
+  if (vesState.outputRomExists) {
     run(preferenceService, terminalService, workspaceService);
   } else {
     commandService.executeCommand(VesBuildCommand.id);
-    // TODO: use FileWatcher instead?
-    vesState.enqueueRun(setInterval(() => {
-      if (existsSync(getRomPath(workspaceService))) {
-        vesState.unqueueRun();
-        run(preferenceService, terminalService, workspaceService);
-      }
-    }, 500));
+    vesState.isRunQueued = true;
   }
 }
 

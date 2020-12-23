@@ -1,24 +1,27 @@
 import { PreferenceService } from "@theia/core/lib/browser";
+import URI from "@theia/core/lib/common/uri";
+import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
-import { existsSync } from "fs";
 import { cpus } from "os";
 import { join as joinPath } from "path";
 import { convertoToEnvPath, getOs, getResourcesPath, getWorkspaceRoot } from "../../common";
 import { VesStateModel } from "../../common/vesStateModel";
 
 export async function buildCommand(
+  fileService: FileService,
   preferenceService: PreferenceService,
   terminalService: TerminalService,
   vesState: VesStateModel,
   workspaceService: WorkspaceService
 ) {
   if (!vesState.isBuilding) {
-    build(preferenceService, terminalService, vesState, workspaceService);
+    build(fileService, preferenceService, terminalService, vesState, workspaceService);
   }
 }
 
 async function build(
+  fileService: FileService,
   preferenceService: PreferenceService,
   terminalService: TerminalService,
   vesState: VesStateModel,
@@ -41,7 +44,7 @@ async function build(
     preferenceService,
     joinPath(getWorkspaceRoot(workspaceService), "makefile")
   );
-  if (!existsSync(makefile)) {
+  if (!await fileService.exists(new URI(makefile))) {
     makefile = convertoToEnvPath(
       preferenceService,
       joinPath(engineCorePath, "makefile-game")

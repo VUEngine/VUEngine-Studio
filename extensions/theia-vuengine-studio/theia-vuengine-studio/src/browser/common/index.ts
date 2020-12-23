@@ -1,5 +1,5 @@
 import { join as joinPath/*, resolve as resolvePath*/ } from "path";
-//import { existsSync, readFileSync } from "fs";
+//import { readFileSync } from "fs";
 import { platform } from "os";
 import { env } from "process";
 import { PreferenceService } from "@theia/core/lib/browser";
@@ -9,8 +9,8 @@ import { isOSX, isWindows } from "@theia/core";
 // // const terminals: { [key: string]: Terminal } = {};
 // export let isWorkspaceVUEngineProject = isVUEngineProject(getWorkspaceRoot());
 
-// export function isVUEngineProject(folder: string) {
-//   return existsSync(resolvePath(folder + "/.vuengine"));
+// export async function isVUEngineProject(folder: string) {
+//   return await this.fileService.exists(new URI(resolvePath(folder + "/.vuengine")));
 // }
 
 export function getWorkspaceRoot(workspaceService: WorkspaceService): string {
@@ -34,8 +34,8 @@ export function getResourcesPath() {
   return env.THEIA_APP_PROJECT_PATH ?? "";
 }
 
-// export function parseJson(file: string) {
-//   if (existsSync(file)) {
+// export async function parseJson(file: string) {
+//   if (await this.fileService.exists(new URI(file))) {
 //     try {
 //       return JSON.parse(readFileSync(file, "utf8"));
 //     } catch (e) {

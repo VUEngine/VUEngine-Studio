@@ -113,7 +113,9 @@ export class VesBuildCommandContribution implements CommandContribution {
     registry.registerCommand(VesBuildCleanCommand, {
       execute: () =>
         cleanCommand(
+          this.fileService,
           this.messageService,
+          this.preferenceService,
           this.quickPickService,
           this.vesState,
           this.workspaceService
@@ -122,6 +124,7 @@ export class VesBuildCommandContribution implements CommandContribution {
     registry.registerCommand(VesBuildCommand, {
       execute: () =>
         buildCommand(
+          this.fileService,
           this.preferenceService,
           this.terminalService,
           this.vesState,
