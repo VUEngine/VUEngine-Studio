@@ -29,7 +29,7 @@ type FlashCartConfig = {
   padRom: boolean;
 };
 
-type ConnectedFlashCart = {
+export type ConnectedFlashCart = {
   config: FlashCartConfig;
   device: Device;
 };
@@ -48,10 +48,7 @@ export async function flashCommand(
     preferenceService
   );
 
-  // TODO: store connectedFlashCart in state
-  const connectedFlashCart:
-    | ConnectedFlashCart
-    | undefined = await detectFlashCart(flashCartConfigs);
+  vesState.connectedFlashCart = await detectFlashCart(flashCartConfigs);
 
   vesState.onDidChangeOutputRomExists(outputRomExists => {
     if (outputRomExists && vesState.isFlashQueued) {
@@ -62,13 +59,12 @@ export async function flashCommand(
         preferenceService,
         terminalService,
         vesState,
-        workspaceService,
-        connectedFlashCart
+        workspaceService
       );
     }
   })
 
-  if (!connectedFlashCart) {
+  if (!vesState.connectedFlashCart) {
     messageService.error(`No connected flash cart could be found.`);
   } else if (vesState.outputRomExists) {
     flash(
@@ -77,8 +73,7 @@ export async function flashCommand(
       preferenceService,
       terminalService,
       vesState,
-      workspaceService,
-      connectedFlashCart
+      workspaceService
     );
   } else {
     commandService.executeCommand(VesBuildCommand.id);
@@ -194,30 +189,29 @@ async function flash(
   preferenceService: PreferenceService,
   terminalService: TerminalService,
   vesState: VesStateModel,
-  workspaceService: WorkspaceService,
-  connectedFlashCart: ConnectedFlashCart | undefined
+  workspaceService: WorkspaceService
 ) {
-  if (!connectedFlashCart) {
+  if (!vesState.connectedFlashCart) {
     return;
   }
 
-  if (!connectedFlashCart.config.path) {
+  if (!vesState.connectedFlashCart.config.path) {
     messageService.error(
-      `No path to flasher software provided for cart "${connectedFlashCart.config.name}"`
+      `No path to flasher software provided for cart "${vesState.connectedFlashCart.config.name}"`
     );
     return;
   }
 
-  if (!await fileService.exists(new URI(dirname(connectedFlashCart.config.path)))) {
+  if (!await fileService.exists(new URI(dirname(vesState.connectedFlashCart.config.path)))) {
     messageService.error(
-      `Flasher software does not exist at "${connectedFlashCart.config.path}"`
+      `Flasher software does not exist at "${vesState.connectedFlashCart.config.path}"`
     );
     return;
   }
 
   let flasherEnvPath = convertoToEnvPath(
     preferenceService,
-    connectedFlashCart.config.path
+    vesState.connectedFlashCart.config.path
   );
   const enableWsl = preferenceService.get("build.enableWsl");
   if (isWindows && enableWsl) {
@@ -225,13 +219,13 @@ async function flash(
   }
 
   const romPath =
-    connectedFlashCart.config.padRom &&
-      await padRom(fileService, vesState, workspaceService, connectedFlashCart.config.size)
+    vesState.connectedFlashCart.config.padRom &&
+      await padRom(fileService, vesState, workspaceService, vesState.connectedFlashCart.config.size)
       ? getPaddedRomPath(workspaceService)
       : getRomPath(workspaceService);
 
-  const flasherArgs = connectedFlashCart.config.args
-    ? " " + connectedFlashCart.config.args.replace("%ROM%", `"${romPath}"`)
+  const flasherArgs = vesState.connectedFlashCart.config.args
+    ? " " + vesState.connectedFlashCart.config.args.replace("%ROM%", `"${romPath}"`)
     : "";
 
   const terminalId = "vuengine-flash";

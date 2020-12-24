@@ -5,6 +5,7 @@ import { WorkspaceService } from "@theia/workspace/lib/browser";
 import URI from "@theia/core/lib/common/uri";
 import { FileChangesEvent } from "@theia/filesystem/lib/common/files";
 import { BuildMode } from "../build/commands/setMode";
+import { ConnectedFlashCart } from "../flash-carts/commands/flash";
 
 type BuildFolderFlags = {
     [key: string]: boolean
@@ -56,7 +57,7 @@ export class VesStateModel {
     // output rom exists
     protected readonly onDidChangeOutputRomExistsEmitter = new Emitter<boolean>();
     readonly onDidChangeOutputRomExists = this.onDidChangeOutputRomExistsEmitter.event;
-    protected _outputRomExists = false;
+    protected _outputRomExists: boolean = false;
     set outputRomExists(flag: boolean) {
         this._outputRomExists = flag;
         this.onDidChangeOutputRomExistsEmitter.fire(this._outputRomExists);
@@ -66,7 +67,7 @@ export class VesStateModel {
     }
 
     // is cleaning
-    protected _isCleaning = false;
+    protected _isCleaning: boolean = false;
     protected readonly onDidChangeIsCleaningEmitter = new Emitter<boolean>();
     readonly onDidChangeIsCleaning = this.onDidChangeIsCleaningEmitter.event;
     set isCleaning(flag: boolean) {
@@ -78,7 +79,7 @@ export class VesStateModel {
     }
 
     // is building
-    protected _isBuilding = false;
+    protected _isBuilding: boolean = false;
     protected readonly onDidChangeIsBuildingEmitter = new Emitter<boolean>();
     readonly onDidChangeIsBuilding = this.onDidChangeIsBuildingEmitter.event;
     set isBuilding(flag: boolean) {
@@ -89,20 +90,20 @@ export class VesStateModel {
         return this._isBuilding;
     }
 
-    // flash cart connected
-    protected _connectedFlashCart = "";
-    protected readonly onDidChangeConnectedFlashCartEmitter = new Emitter<string>();
+    // connected flash cart
+    protected _connectedFlashCart: ConnectedFlashCart | undefined = undefined;
+    protected readonly onDidChangeConnectedFlashCartEmitter = new Emitter<ConnectedFlashCart | undefined>();
     readonly onDidChangeConnectedFlashCart = this.onDidChangeConnectedFlashCartEmitter.event;
-    set connectedFlashCart(name: string) {
-        this._connectedFlashCart = name;
+    set connectedFlashCart(connectedFlashCart: ConnectedFlashCart | undefined) {
+        this._connectedFlashCart = connectedFlashCart;
         this.onDidChangeConnectedFlashCartEmitter.fire(this._connectedFlashCart);
     }
-    get connectedFlashCart(): string {
+    get connectedFlashCart(): ConnectedFlashCart | undefined {
         return this._connectedFlashCart;
     }
 
     // export queue
-    protected _isExportQueued = false;
+    protected _isExportQueued: boolean = false;
     protected readonly onDidChangeIsExportQueuedEmitter = new Emitter<boolean>();
     readonly onDidChangeIsExportQueued = this.onDidChangeIsExportQueuedEmitter.event;
     set isExportQueued(flag: boolean) {
@@ -113,7 +114,7 @@ export class VesStateModel {
     }
 
     // run queue
-    protected _isRunQueued = false;
+    protected _isRunQueued: boolean = false;
     protected readonly onDidChangeIsRunQueuedEmitter = new Emitter<boolean>();
     readonly onDidChangeIsRunQueued = this.onDidChangeIsRunQueuedEmitter.event;
     set isRunQueued(flag: boolean) {
@@ -124,7 +125,7 @@ export class VesStateModel {
     }
 
     // flash queue
-    protected _isFlashQueued = false;
+    protected _isFlashQueued: boolean = false;
     protected readonly onDidChangeIsFlashQueuedEmitter = new Emitter<boolean>();
     readonly onDidChangeIsFlashQueued = this.onDidChangeIsFlashQueuedEmitter.event;
     set isFlashQueued(flag: boolean) {
