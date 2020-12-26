@@ -19,9 +19,13 @@ export class VesStateModel {
 
     @postConstruct()
     protected async init(): Promise<void> {
+        // init flags
         for (const buildMode in BuildMode) {
             this.buildFolderExists[buildMode] = await this.fileService.exists(new URI(this.getReleaseFolder(buildMode)));
         }
+        this.outputRomExists = await this.fileService.exists(new URI(this.getReleaseFolder("output.vb")));
+
+        // watch for file changes
         // TODO: watch only respective folders
         // const cleanPath = joinPath(getWorkspaceRoot(this.workspaceService), "build", "release")
         // const test = this.fileService.watch(new URI(cleanPath));

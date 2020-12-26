@@ -78,12 +78,12 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
             </button>
             <button
                 className="theia-button secondary"
-                title={this.vesState.connectedFlashCart === ""
+                title={!this.vesState.connectedFlashCart
                     ? "No Flash Cart Connected"
                     : this.vesState.isFlashQueued
-                        ? `Flash to ${this.vesState.connectedFlashCart} Queued...`
-                        : `Flash to ${this.vesState.connectedFlashCart}`}
-                disabled={this.vesState.connectedFlashCart === ""}
+                        ? `Flash to ${this.vesState.connectedFlashCart.config.name} Queued...`
+                        : `Flash to ${this.vesState.connectedFlashCart.config.name}`}
+                disabled={!this.vesState.connectedFlashCart}
                 onClick={this.handleFlashOnClick}
             >
                 {this.vesState.isFlashQueued
