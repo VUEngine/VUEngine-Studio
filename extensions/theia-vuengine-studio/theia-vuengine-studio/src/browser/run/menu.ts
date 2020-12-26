@@ -1,4 +1,4 @@
-import { injectable } from "inversify";
+import { injectable, interfaces } from "inversify";
 import { MenuContribution, MenuModelRegistry } from "@theia/core/lib/common";
 import { VesRunCommand, VesSelectEmulatorCommand } from "./commands";
 import { BuildMenuSection } from "../build/menu";
@@ -17,4 +17,8 @@ export class VesRunMenuContribution implements MenuContribution {
       order: "3",
     });
   }
+}
+
+export function bindVesRunMenu(bind: interfaces.Bind): void {
+  bind(MenuContribution).to(VesRunMenuContribution).inSingletonScope();
 }

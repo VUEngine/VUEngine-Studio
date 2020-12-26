@@ -1,4 +1,4 @@
-import { injectable } from "inversify";
+import { injectable, interfaces } from "inversify";
 import {
   KeybindingContribution,
   KeybindingRegistry,
@@ -13,4 +13,8 @@ export class VesRunKeybindingContribution implements KeybindingContribution {
       keybinding: "alt+shift+r",
     });
   }
+}
+
+export function bindVesRunKeybindings(bind: interfaces.Bind): void {
+  bind(KeybindingContribution).to(VesRunKeybindingContribution).inSingletonScope();
 }

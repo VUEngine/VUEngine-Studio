@@ -1,4 +1,4 @@
-import { injectable } from 'inversify';
+import { injectable, interfaces } from 'inversify';
 import { KeybindingContribution, KeybindingRegistry } from '@theia/core/lib/browser/keybinding';
 import {
   VesBuildCleanCommand,
@@ -43,4 +43,8 @@ export class VesBuildKeybindingContribution implements KeybindingContribution {
       keybinding: "ctrl+shift+5"
     });
   }
+}
+
+export function bindVesBuildKeybindings(bind: interfaces.Bind): void {
+  bind(KeybindingContribution).to(VesBuildKeybindingContribution).inSingletonScope();
 }

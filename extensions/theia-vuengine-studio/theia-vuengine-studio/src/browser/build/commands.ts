@@ -1,4 +1,4 @@
-import { inject, injectable } from "inversify";
+import { inject, injectable, interfaces } from "inversify";
 import {
   Command,
   CommandContribution,
@@ -183,4 +183,8 @@ export class VesBuildCommandContribution implements CommandContribution {
       });
     }
   }
+}
+
+export function bindVesBuildCommands(bind: interfaces.Bind): void {
+  bind(CommandContribution).to(VesBuildCommandContribution).inSingletonScope();
 }

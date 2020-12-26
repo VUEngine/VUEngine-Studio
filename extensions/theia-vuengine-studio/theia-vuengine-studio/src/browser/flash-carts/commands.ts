@@ -1,4 +1,4 @@
-import { inject, injectable } from "inversify";
+import { inject, injectable, interfaces } from "inversify";
 import {
   Command,
   CommandContribution,
@@ -50,4 +50,8 @@ export class VesFlashCartsCommandContribution implements CommandContribution {
         ),
     });
   }
+}
+
+export function bindVesFlashCartsCommands(bind: interfaces.Bind): void {
+  bind(CommandContribution).to(VesFlashCartsCommandContribution).inSingletonScope();
 }

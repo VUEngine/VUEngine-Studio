@@ -1,4 +1,4 @@
-import { injectable } from "inversify";
+import { injectable, interfaces } from "inversify";
 import { MAIN_MENU_BAR, MenuContribution, MenuModelRegistry } from "@theia/core/lib/common";
 import {
   VesBuildCleanCommand,
@@ -88,4 +88,8 @@ export class VesBuildMenuContribution implements MenuContribution {
       });
     }*/
   }
+}
+
+export function bindVesBuildMenu(bind: interfaces.Bind): void {
+  bind(MenuContribution).to(VesBuildMenuContribution).inSingletonScope();
 }

@@ -1,6 +1,7 @@
-import { injectable, postConstruct } from 'inversify';
+import { injectable, interfaces, postConstruct } from 'inversify';
 import { VesTopbarWindowControlsWidget } from './window-controls-widget';
-import { AbstractViewContribution } from '@theia/core/lib/browser';
+import { AbstractViewContribution, bindViewContribution, FrontendApplicationContribution, WidgetFactory } from '@theia/core/lib/browser';
+import { isOSX } from '@theia/core';
 
 @injectable()
 export class VesTopbarWindowControlsContribution extends AbstractViewContribution<VesTopbarWindowControlsWidget> {
@@ -16,5 +17,22 @@ export class VesTopbarWindowControlsContribution extends AbstractViewContributio
     @postConstruct()
     protected async init(): Promise<void> {
         this.openView({ activate: false, reveal: true });
+    }
+}
+
+export function bindVesTopbarWindowControlsViews(bind: interfaces.Bind): void {
+    if (!isOSX) {
+        bindViewContribution(bind, VesTopbarWindowControlsContribution);
+        bind(FrontendApplicationContribution).toService(VesTopbarWindowControlsContribution);
+        bind(VesTopbarWindowControlsWidget).toSelf();
+        bind(WidgetFactory)
+            .toDynamicValue((ctx) => ({
+                id: VesTopbarWindowControlsWidget.ID,
+                createWidget: () =>
+                    ctx.container.get<VesTopbarWindowControlsWidget>(
+                        VesTopbarWindowControlsWidget
+                    ),
+            }))
+            .inSingletonScope();
     }
 }

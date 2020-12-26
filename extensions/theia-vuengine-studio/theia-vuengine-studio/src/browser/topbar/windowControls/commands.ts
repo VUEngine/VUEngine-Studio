@@ -1,5 +1,5 @@
 import * as electron from 'electron';
-import { injectable } from "inversify";
+import { injectable, interfaces } from "inversify";
 import { Command, CommandContribution, CommandRegistry } from "@theia/core/lib/common";
 
 export const VesMinimizeWindowCommand: Command = {
@@ -21,7 +21,7 @@ export const VesUnmaximizeWindowCommand: Command = {
 };
 
 @injectable()
-export class VesWindowCommandContribution implements CommandContribution {
+export class VesWindowControlsCommandContribution implements CommandContribution {
   registerCommands(registry: CommandRegistry): void {
     const currentWindow = electron.remote.getCurrentWindow();
     registry.registerCommand(VesMinimizeWindowCommand, {
@@ -34,4 +34,8 @@ export class VesWindowCommandContribution implements CommandContribution {
       execute: () => currentWindow.unmaximize()
     });
   }
+}
+
+export function bindVesWindowControlsCommands(bind: interfaces.Bind): void {
+  bind(CommandContribution).to(VesWindowControlsCommandContribution).inSingletonScope();
 }
