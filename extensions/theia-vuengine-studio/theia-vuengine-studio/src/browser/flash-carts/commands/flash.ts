@@ -9,13 +9,13 @@ import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
 import { createWriteStream, readFileSync, unlinkSync } from "fs";
 import { dirname, join as joinPath } from "path";
-// import { /*getDeviceList, */ Device } from "usb";
+import { VesUsbService } from "../../../common/usb-service-protocol";
 
 import { VesBuildCommand } from "../../build/commands";
-import { convertoToEnvPath, getResourcesPath, getRomPath } from "../../common";
+import { convertoToEnvPath, getOs, getResourcesPath, getRomPath } from "../../common";
 import { VesStateModel } from "../../common/vesStateModel";
 
-type FlashCartConfig = {
+export type FlashCartConfig = {
   name: string;
   vid: number;
   pid: number;
@@ -28,24 +28,19 @@ type FlashCartConfig = {
   padRom: boolean;
 };
 
-export type ConnectedFlashCart = {
-  config: FlashCartConfig;
-  device: any;
-};
-
 export async function flashCommand(
   commandService: CommandService,
   fileService: FileService,
   messageService: MessageService,
   preferenceService: PreferenceService,
   terminalService: TerminalService,
+  vesUsbService: VesUsbService,
   vesState: VesStateModel
 ) {
-  const flashCartConfigs: FlashCartConfig[] = getFlashCartConfigs(
-    preferenceService
-  );
-
-  vesState.connectedFlashCart = await detectFlashCart(flashCartConfigs);
+  await detectFlashCart(preferenceService, vesState, vesUsbService);
+  vesUsbService.onDeviceConnected((device) => {
+    console.log("HEUREKA", device);
+  });
 
   vesState.onDidChangeOutputRomExists(outputRomExists => {
     if (outputRomExists && vesState.isFlashQueued) {
@@ -76,66 +71,15 @@ export async function flashCommand(
   }
 }
 
-async function detectFlashCart(
-  flashCartConfigs: FlashCartConfig[]
-): Promise<ConnectedFlashCart | undefined> {
-  // const devices: Device[] = getDeviceList();
-  // let manufacturer: string | undefined;
-  // let product: string | undefined;
-  // let serialNumber: string | undefined;
-
-  // for (const flashCartConfig of flashCartConfigs) {
-  //     for (let i = 0; i < devices.length; i++) {
-  //         const deviceDesc = devices[i].deviceDescriptor;
-  //         if (
-  //             deviceDesc.idVendor == flashCartConfig.vid &&
-  //             deviceDesc.idProduct == flashCartConfig.pid
-  //         ) {
-  //             devices[i].open();
-  //             manufacturer = await new Promise((resolve, reject) => {
-  //                 devices[i].getStringDescriptor(
-  //                     devices[i].deviceDescriptor.iManufacturer,
-  //                     (error, data) => {
-  //                         resolve(data);
-  //                     }
-  //                 );
-  //             });
-  //             product = await new Promise((resolve, reject) => {
-  //                 devices[i].getStringDescriptor(
-  //                     devices[i].deviceDescriptor.iProduct,
-  //                     (error, data) => {
-  //                         resolve(data);
-  //                     }
-  //                 );
-  //             });
-  //             serialNumber = await new Promise((resolve, reject) => {
-  //                 devices[i].getStringDescriptor(
-  //                     devices[i].deviceDescriptor.iSerialNumber,
-  //                     (error, data) => {
-  //                         resolve(data);
-  //                     }
-  //                 );
-  //             });
-  //             devices[i].close();
-
-  //             if (
-  //                 (flashCartConfig.manufacturer === "" ||
-  //                     manufacturer?.includes(flashCartConfig.manufacturer)) &&
-  //                 (flashCartConfig.product === "" ||
-  //                     product?.includes(flashCartConfig.product)) &&
-  //                 (flashCartConfig.serialNumber === "" ||
-  //                     serialNumber?.includes(flashCartConfig.serialNumber))
-  //             ) {
-  //                 return {
-  //                     config: flashCartConfig,
-  //                     device: devices[i],
-  //                 };
-  //             }
-  //         }
-  //     }
-  // }
-
-  return;
+export async function detectFlashCart(
+  preferenceService: PreferenceService,
+  vesState: VesStateModel,
+  vesUsbService: VesUsbService,
+) {
+  const flashCartConfigs: FlashCartConfig[] = getFlashCartConfigs(
+    preferenceService
+  );
+  vesState.connectedFlashCart = await vesUsbService.detectFlashCart(flashCartConfigs);
 }
 
 function getFlashCartConfigs(preferenceService: PreferenceService) {
@@ -152,6 +96,7 @@ function getFlashCartConfigs(preferenceService: PreferenceService) {
         getResourcesPath(),
         "binaries",
         "vuengine-studio-tools",
+        getOs(),
         "prog-vb",
         isWindows ? "prog-vb.exe" : "prog-vb"
       ),
@@ -189,37 +134,40 @@ async function flash(
     return;
   }
 
-  if (!vesState.connectedFlashCart.config.path) {
+  if (!vesState.connectedFlashCart.path) {
     messageService.error(
-      `No path to flasher software provided for cart "${vesState.connectedFlashCart.config.name}"`
+      `No path to flasher software provided for cart "${vesState.connectedFlashCart.name}"`
     );
     return;
   }
 
-  if (!await fileService.exists(new URI(dirname(vesState.connectedFlashCart.config.path)))) {
+  if (!await fileService.exists(new URI(dirname(vesState.connectedFlashCart.path)))) {
     messageService.error(
-      `Flasher software does not exist at "${vesState.connectedFlashCart.config.path}"`
+      `Flasher software does not exist at "${vesState.connectedFlashCart.path}"`
     );
     return;
   }
+
+  const fixPermissions = isWindows ? "" : `chmod a+x "${vesState.connectedFlashCart.path}" && `;
 
   let flasherEnvPath = convertoToEnvPath(
     preferenceService,
-    vesState.connectedFlashCart.config.path
+    vesState.connectedFlashCart.path
   );
+
   const enableWsl = preferenceService.get("build.enableWsl");
   if (isWindows && enableWsl) {
     flasherEnvPath.replace(/\.[^/.]+$/, "");
   }
 
   const romPath =
-    vesState.connectedFlashCart.config.padRom &&
-      await padRom(fileService, vesState, vesState.connectedFlashCart.config.size)
+    vesState.connectedFlashCart.padRom &&
+      await padRom(fileService, vesState, vesState.connectedFlashCart.size)
       ? getPaddedRomPath()
       : getRomPath();
 
-  const flasherArgs = vesState.connectedFlashCart.config.args
-    ? " " + vesState.connectedFlashCart.config.args.replace("%ROM%", `"${romPath}"`)
+  const flasherArgs = vesState.connectedFlashCart.args
+    ? " " + vesState.connectedFlashCart.args.replace("%ROM%", `"${romPath}"`)
     : "";
 
   const terminalId = "vuengine-flash";
@@ -230,7 +178,7 @@ async function flash(
   await terminalWidget.start();
   terminalWidget.clearOutput();
   //await new Promise(resolve => setTimeout(resolve, 1000));
-  terminalWidget.sendText(`"${flasherEnvPath}" ${flasherArgs}\n`);
+  terminalWidget.sendText(`${fixPermissions}"${flasherEnvPath}" ${flasherArgs}\n`);
   terminalService.open(terminalWidget);
 }
 

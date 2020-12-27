@@ -80,8 +80,8 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                 title={!this.vesState.connectedFlashCart
                     ? "No Flash Cart Connected"
                     : this.vesState.isFlashQueued
-                        ? `Flash to ${this.vesState.connectedFlashCart.config.name} Queued...`
-                        : `Flash to ${this.vesState.connectedFlashCart.config.name}`}
+                        ? `Flash to ${this.vesState.connectedFlashCart.name} Queued...`
+                        : `Flash to ${this.vesState.connectedFlashCart.name}`}
                 disabled={!this.vesState.connectedFlashCart}
                 onClick={this.handleFlashOnClick}
             >

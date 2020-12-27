@@ -29,7 +29,8 @@
       "electronMain": "lib/electron-main/electron-main-application-module"
     },
     {
-      "frontend": "lib/browser/frontend-module"
+      "frontend": "lib/browser/frontend-module",
+      "backend": "lib/node/usb-service-module"
     }
   ]
 }
