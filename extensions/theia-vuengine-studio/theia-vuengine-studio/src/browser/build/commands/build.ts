@@ -1,3 +1,4 @@
+import { isWindows } from "@theia/core";
 import { PreferenceService } from "@theia/core/lib/browser";
 import URI from "@theia/core/lib/common/uri";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
@@ -67,10 +68,24 @@ async function build(
 
   vesState.isBuilding = true;
 
+  let shellPath = "";
+  let shellArgs = [""];
+  if (isWindows) {
+    const enableWsl = preferenceService.get("build.enableWsl");
+    if (enableWsl) {
+      shellPath = process.env.windir + '\\System32\\wsl.exe';
+    } else {
+      shellPath = joinPath(getResourcesPath(), "binaries", "vuengine-studio-tools", "win", "msys", "usr", "bin", "bash.exe");
+      shellArgs = ['--login'];
+    }
+  }
+
   const terminalId = "vuengine-build";
   const terminalWidget = terminalService.getById(terminalId) || await terminalService.newTerminal({
     title: "Build",
-    id: terminalId
+    id: terminalId,
+    shellPath,
+    shellArgs,
   });
   await terminalWidget.start();
   terminalWidget.clearOutput();

@@ -9,7 +9,7 @@
 
 #ves-topbar-action-buttons.os-linux,
 #ves-topbar-action-buttons.os-win {
-  padding-right: 162px;
+  margin-right: 162px;
 }
 
 @media (max-width: 800px) {
