@@ -14,7 +14,7 @@ export class DefaultVesUsbService implements VesUsbService {
     @postConstruct()
     protected init(): void {
         const self = this;
-        on('attach', function (device) {
+        on('attach', async function (device) {
             console.log('attach');
             self.onDeviceConnectedEmitter.fire(device);
         });
@@ -24,12 +24,7 @@ export class DefaultVesUsbService implements VesUsbService {
         });
     }
 
-    async detectFlashCart(flashCartConfigs: FlashCartConfig[]): Promise<FlashCartConfig | undefined> {
-        // TODO: why is this function only receiving the first entry of flashCartConfigs instead of an array?
-        if (!Array.isArray(flashCartConfigs)) {
-            flashCartConfigs = [flashCartConfigs];
-        }
-
+    async detectFlashCart(...flashCartConfigs: FlashCartConfig[]): Promise<FlashCartConfig | undefined> {
         const devices: Device[] = getDeviceList();
         let manufacturer: string | undefined;
         let product: string | undefined;

@@ -38,9 +38,9 @@ export async function flashCommand(
   vesState: VesStateModel
 ) {
   await detectFlashCart(preferenceService, vesState, vesUsbService);
-  vesUsbService.onDeviceConnected((device) => {
-    console.log("HEUREKA", device);
-  });
+  // vesUsbService.onDeviceConnected((device) => {
+  //   console.log("HEUREKA", device);
+  // });
 
   vesState.onDidChangeOutputRomExists(outputRomExists => {
     if (outputRomExists && vesState.isFlashQueued) {
@@ -79,7 +79,7 @@ export async function detectFlashCart(
   const flashCartConfigs: FlashCartConfig[] = getFlashCartConfigs(
     preferenceService
   );
-  vesState.connectedFlashCart = await vesUsbService.detectFlashCart(flashCartConfigs);
+  vesState.connectedFlashCart = await vesUsbService.detectFlashCart(...flashCartConfigs);
 }
 
 function getFlashCartConfigs(preferenceService: PreferenceService) {
@@ -105,11 +105,11 @@ function getFlashCartConfigs(preferenceService: PreferenceService) {
     },
     {
       name: "HyperFlash32",
-      vid: 0,
-      pid: 0,
-      manufacturer: "",
-      product: "",
-      serialNumber: "",
+      vid: 1027,
+      pid: 24577,
+      manufacturer: "FTDI",
+      product: "FT232R",
+      serialNumber: "AU00E5KY",
       size: 32,
       path: "",
       args: "%ROM%",

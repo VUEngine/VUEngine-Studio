@@ -15,7 +15,6 @@ import { VesUsbService } from "../../common/usb-service-protocol";
 
 export const VesFlashCartsCommand: Command = {
   id: "VesFlashCarts.commands.flash",
-  // TODO: dynamic label based on connected flash cart? "Flash to HyperFlash32"
   label: "Flash to Flash Cart",
   category: "Flash",
   iconClass: "fa fa-usb",
