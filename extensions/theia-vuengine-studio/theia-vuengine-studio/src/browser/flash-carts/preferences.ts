@@ -43,11 +43,6 @@ const VesFlashCartsPreferenceSchema: PreferenceSchema = {
             type: "string",
             description: "USB product string of the flash cart (optional)",
           },
-          serialNumber: {
-            type: "string",
-            description:
-              "USB serial number string of the flash cart (optional)",
-          },
           size: {
             type: "number",
             description: "Size of flash cart (in Mbit)",

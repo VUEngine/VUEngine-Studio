@@ -21,7 +21,6 @@ export type FlashCartConfig = {
   pid: number;
   manufacturer: string;
   product: string;
-  serialNumber: string;
   size: number;
   path: string;
   args: string;
@@ -90,7 +89,6 @@ function getFlashCartConfigs(preferenceService: PreferenceService) {
       pid: 2466,
       manufacturer: "Richard Hutchinson",
       product: "FlashBoy",
-      serialNumber: "",
       size: 16,
       path: joinPath(
         getResourcesPath(),
@@ -109,7 +107,6 @@ function getFlashCartConfigs(preferenceService: PreferenceService) {
       pid: 24577,
       manufacturer: "FTDI",
       product: "FT232R",
-      serialNumber: "AU00E5KY",
       size: 32,
       path: "",
       args: "%ROM%",

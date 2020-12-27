@@ -28,7 +28,6 @@ export class DefaultVesUsbService implements VesUsbService {
         const devices: Device[] = getDeviceList();
         let manufacturer: string | undefined;
         let product: string | undefined;
-        let serialNumber: string | undefined;
         for (const flashCartConfig of flashCartConfigs) {
             for (let i = 0; i < devices.length; i++) {
                 const deviceDesc = devices[i].deviceDescriptor;
@@ -53,23 +52,13 @@ export class DefaultVesUsbService implements VesUsbService {
                             }
                         );
                     });
-                    serialNumber = await new Promise((resolve, reject) => {
-                        devices[i].getStringDescriptor(
-                            devices[i].deviceDescriptor.iSerialNumber,
-                            (error, data) => {
-                                resolve(data);
-                            }
-                        );
-                    });
                     devices[i].close();
 
                     if (
                         (flashCartConfig.manufacturer === "" ||
                             manufacturer?.includes(flashCartConfig.manufacturer)) &&
                         (flashCartConfig.product === "" ||
-                            product?.includes(flashCartConfig.product)) &&
-                        (flashCartConfig.serialNumber === "" ||
-                            serialNumber?.includes(flashCartConfig.serialNumber))
+                            product?.includes(flashCartConfig.product))
                     ) {
                         return flashCartConfig;
                     }
