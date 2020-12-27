@@ -7,10 +7,9 @@ import {
 import URI from "@theia/core/lib/common/uri";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
-import { WorkspaceService } from "@theia/workspace/lib/browser";
 import { createWriteStream, readFileSync, unlinkSync } from "fs";
 import { dirname, join as joinPath } from "path";
-import { /*getDeviceList, */ Device } from "usb";
+// import { /*getDeviceList, */ Device } from "usb";
 
 import { VesBuildCommand } from "../../build/commands";
 import { convertoToEnvPath, getResourcesPath, getRomPath } from "../../common";
@@ -31,7 +30,7 @@ type FlashCartConfig = {
 
 export type ConnectedFlashCart = {
   config: FlashCartConfig;
-  device: Device;
+  device: any;
 };
 
 export async function flashCommand(
@@ -40,10 +39,8 @@ export async function flashCommand(
   messageService: MessageService,
   preferenceService: PreferenceService,
   terminalService: TerminalService,
-  vesState: VesStateModel,
-  workspaceService: WorkspaceService
+  vesState: VesStateModel
 ) {
-
   const flashCartConfigs: FlashCartConfig[] = getFlashCartConfigs(
     preferenceService
   );
@@ -58,8 +55,7 @@ export async function flashCommand(
         messageService,
         preferenceService,
         terminalService,
-        vesState,
-        workspaceService
+        vesState
       );
     }
   })
@@ -72,8 +68,7 @@ export async function flashCommand(
       messageService,
       preferenceService,
       terminalService,
-      vesState,
-      workspaceService
+      vesState
     );
   } else {
     commandService.executeCommand(VesBuildCommand.id);
@@ -188,8 +183,7 @@ async function flash(
   messageService: MessageService,
   preferenceService: PreferenceService,
   terminalService: TerminalService,
-  vesState: VesStateModel,
-  workspaceService: WorkspaceService
+  vesState: VesStateModel
 ) {
   if (!vesState.connectedFlashCart) {
     return;
@@ -220,9 +214,9 @@ async function flash(
 
   const romPath =
     vesState.connectedFlashCart.config.padRom &&
-      await padRom(fileService, vesState, workspaceService, vesState.connectedFlashCart.config.size)
-      ? getPaddedRomPath(workspaceService)
-      : getRomPath(workspaceService);
+      await padRom(fileService, vesState, vesState.connectedFlashCart.config.size)
+      ? getPaddedRomPath()
+      : getRomPath();
 
   const flasherArgs = vesState.connectedFlashCart.config.args
     ? " " + vesState.connectedFlashCart.config.args.replace("%ROM%", `"${romPath}"`)
@@ -240,9 +234,9 @@ async function flash(
   terminalService.open(terminalWidget);
 }
 
-async function padRom(fileService: FileService, vesState: VesStateModel, workspaceService: WorkspaceService, size: number): Promise<boolean> {
-  const romPath = getRomPath(workspaceService);
-  const paddedRomPath = getPaddedRomPath(workspaceService);
+async function padRom(fileService: FileService, vesState: VesStateModel, size: number): Promise<boolean> {
+  const romPath = getRomPath();
+  const paddedRomPath = getPaddedRomPath();
 
   if (!vesState.outputRomExists) {
     return false;
@@ -270,6 +264,6 @@ async function padRom(fileService: FileService, vesState: VesStateModel, workspa
   return true;
 }
 
-function getPaddedRomPath(workspaceService: WorkspaceService) {
-  return getRomPath(workspaceService).replace("output.vb", "outputPadded.vb");
+function getPaddedRomPath() {
+  return getRomPath().replace("output.vb", "outputPadded.vb");
 }

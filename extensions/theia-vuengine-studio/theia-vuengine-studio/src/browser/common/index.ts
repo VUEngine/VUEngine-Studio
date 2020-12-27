@@ -1,9 +1,8 @@
-import { join as joinPath/*, resolve as resolvePath*/ } from "path";
+import { dirname, join as joinPath/*, resolve as resolvePath*/ } from "path";
 //import { readFileSync } from "fs";
 import { platform } from "os";
 import { env } from "process";
 import { PreferenceService } from "@theia/core/lib/browser";
-import { WorkspaceService } from "@theia/workspace/lib/browser";
 import { isOSX, isWindows } from "@theia/core";
 
 // // const terminals: { [key: string]: Terminal } = {};
@@ -13,17 +12,19 @@ import { isOSX, isWindows } from "@theia/core";
 //   return await this.fileService.exists(new URI(resolvePath(folder + "/.vuengine")));
 // }
 
-export function getWorkspaceRoot(workspaceService: WorkspaceService): string {
-  // TODO: do not rely on workspace service, but simply get opened folder
-  return (
-    workspaceService
-      .getWorkspaceRootUri(workspaceService.workspace?.resource)
-      ?.path.toString() ?? ""
-  );
+export function getWorkspaceRoot(): string {
+  return (window.location.hash.slice(-9) === "workspace")
+    ? dirname(window.location.hash.substring(1))
+    : window.location.hash.substring(1);
 }
 
-export function getRomPath(workspaceService: WorkspaceService): string {
-  return joinPath(getWorkspaceRoot(workspaceService), "build", "output.vb");
+export function getBuildPath(buildMode?: string) {
+  const buildRoot = joinPath(getWorkspaceRoot(), "build");
+  return buildMode ? joinPath(buildRoot, buildMode) : buildRoot;
+}
+
+export function getRomPath(): string {
+  return getBuildPath("output.vb");
 }
 
 export function getOs() {

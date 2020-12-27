@@ -6,7 +6,6 @@ import {
   SaveFileDialogProps,
 } from "@theia/filesystem/lib/browser";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
-import { WorkspaceService } from "@theia/workspace/lib/browser";
 import { getRomPath } from "../../common";
 import { VesStateModel } from "../../common/vesStateModel";
 import { VesBuildCommand } from "../commands";
@@ -15,19 +14,17 @@ export async function exportCommand(
   commandService: CommandService,
   fileService: FileService,
   fileDialogService: FileDialogService,
-  vesState: VesStateModel,
-  workspaceService: WorkspaceService
+  vesState: VesStateModel
 ) {
-
   vesState.onDidChangeOutputRomExists(outputRomExists => {
     if (outputRomExists && vesState.isExportQueued) {
       vesState.isExportQueued = false;
-      exportRom(commandService, fileService, fileDialogService, workspaceService);
+      exportRom(commandService, fileService, fileDialogService);
     }
   })
 
   if (vesState.outputRomExists) {
-    exportRom(commandService, fileService, fileDialogService, workspaceService);
+    exportRom(commandService, fileService, fileDialogService);
   } else {
     commandService.executeCommand(VesBuildCommand.id);
     vesState.isExportQueued = true;
@@ -37,10 +34,9 @@ export async function exportCommand(
 async function exportRom(
   commandService: CommandService,
   fileService: FileService,
-  fileDialogService: FileDialogService,
-  workspaceService: WorkspaceService
+  fileDialogService: FileDialogService
 ) {
-  const romPath = getRomPath(workspaceService);
+  const romPath = getRomPath();
   const romUri = new URI(romPath);
   let exists: boolean = false;
   let overwrite: boolean = false;

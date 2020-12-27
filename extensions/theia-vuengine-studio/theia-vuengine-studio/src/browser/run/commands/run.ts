@@ -1,7 +1,6 @@
 import { PreferenceService } from "@theia/core/lib/browser";
 import { CommandService, isWindows } from "@theia/core/lib/common";
 import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
-import { WorkspaceService } from "@theia/workspace/lib/browser";
 import { join as joinPath } from "path";
 import { VesBuildCommand } from "../../build/commands";
 import { getOs, getResourcesPath, getRomPath } from "../../common";
@@ -17,18 +16,17 @@ export async function runCommand(
   commandService: CommandService,
   preferenceService: PreferenceService,
   terminalService: TerminalService,
-  vesState: VesStateModel,
-  workspaceService: WorkspaceService
+  vesState: VesStateModel
 ) {
   vesState.onDidChangeOutputRomExists(outputRomExists => {
     if (outputRomExists && vesState.isRunQueued) {
       vesState.isRunQueued = false;
-      run(preferenceService, terminalService, workspaceService);
+      run(preferenceService, terminalService);
     }
   })
 
   if (vesState.outputRomExists) {
-    run(preferenceService, terminalService, workspaceService);
+    run(preferenceService, terminalService);
   } else {
     commandService.executeCommand(VesBuildCommand.id);
     vesState.isRunQueued = true;
@@ -37,8 +35,7 @@ export async function runCommand(
 
 async function run(
   preferenceService: PreferenceService,
-  terminalService: TerminalService,
-  workspaceService: WorkspaceService
+  terminalService: TerminalService
 ) {
   const emulatorConfigs: EmulatorConfig[] = preferenceService.get("emulators.emulators") ?? [];
 
@@ -53,7 +50,7 @@ async function run(
       "mednafen",
       isWindows ? "mednafen.exe" : "mednafen"
     )),
-    args: emulatorConfigs[0].args.replace("%ROM%", `"${getRomPath(workspaceService)}"`),
+    args: emulatorConfigs[0].args.replace("%ROM%", `"${getRomPath()}"`),
   };
 
   const fixPermissions = isWindows ? "" : `chmod a+x "${defaultEmulator.path}" && `;

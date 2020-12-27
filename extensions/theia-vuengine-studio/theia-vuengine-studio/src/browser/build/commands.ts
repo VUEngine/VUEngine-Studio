@@ -8,7 +8,6 @@ import {
   MessageService,
 } from "@theia/core/lib/common";
 import { QuickPickService } from "@theia/core/lib/common/quick-pick-service";
-import { WorkspaceService } from "@theia/workspace/lib/browser";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
@@ -104,9 +103,7 @@ export class VesBuildCommandContribution implements CommandContribution {
     @inject(QuickPickService)
     private readonly quickPickService: QuickPickService,
     @inject(VesStateModel)
-    private readonly vesState: VesStateModel,
-    @inject(WorkspaceService)
-    private readonly workspaceService: WorkspaceService
+    private readonly vesState: VesStateModel
   ) { }
 
   registerCommands(registry: CommandRegistry): void {
@@ -117,8 +114,7 @@ export class VesBuildCommandContribution implements CommandContribution {
           this.messageService,
           this.preferenceService,
           this.quickPickService,
-          this.vesState,
-          this.workspaceService
+          this.vesState
         ),
     });
     registry.registerCommand(VesBuildCommand, {
@@ -127,8 +123,7 @@ export class VesBuildCommandContribution implements CommandContribution {
           this.fileService,
           this.preferenceService,
           this.terminalService,
-          this.vesState,
-          this.workspaceService
+          this.vesState
         ),
     });
     registry.registerCommand(VesBuildExportCommand, {
@@ -137,8 +132,7 @@ export class VesBuildCommandContribution implements CommandContribution {
           this.commandService,
           this.fileService,
           this.fileDialogService,
-          this.vesState,
-          this.workspaceService
+          this.vesState
         ),
     });
 

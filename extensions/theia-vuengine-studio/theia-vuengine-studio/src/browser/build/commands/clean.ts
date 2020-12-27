@@ -2,10 +2,9 @@ import { PreferenceService } from "@theia/core/lib/browser";
 import { MessageService } from "@theia/core/lib/common";
 import { QuickPickService } from "@theia/core/lib/common/quick-pick-service";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
-import { WorkspaceService } from "@theia/workspace/lib/browser";
 import { join as joinPath } from "path";
 import * as rimraf from "rimraf";
-import { getWorkspaceRoot } from "../../common";
+import { getBuildPath } from "../../common";
 import { VesStateModel } from "../../common/vesStateModel";
 import { BuildMode } from "./setMode";
 
@@ -14,8 +13,7 @@ export async function cleanCommand(
     messageService: MessageService,
     preferenceService: PreferenceService,
     quickPickService: QuickPickService,
-    vesState: VesStateModel,
-    workspaceService: WorkspaceService
+    vesState: VesStateModel
 ) {
     if (vesState.isCleaning) {
         return;
@@ -70,13 +68,13 @@ export async function cleanCommand(
     //         return;
     //     }
 
-    //     clean(fileService, messageService, vesState, workspaceService, selection);
+    //     clean(fileService, messageService, vesState, selection);
     // });
 
     const buildMode = preferenceService.get("build.buildMode") as BuildMode;
 
     if (vesState.buildFolderExists[buildMode]) {
-        clean(fileService, messageService, vesState, workspaceService, buildMode);
+        clean(fileService, messageService, vesState, buildMode);
     } else {
         // messageService.info(`Build folder for ${buildMode} mode does not exist. Nothing to clean.`);
     }
@@ -86,11 +84,10 @@ async function clean(
     fileService: FileService,
     messageService: MessageService,
     vesState: VesStateModel,
-    workspaceService: WorkspaceService,
     buildMode: string
 ) {
     const clearAll = (buildMode === "all");
-    const cleanPath = getCleanPath(workspaceService, buildMode);
+    const cleanPath = getCleanPath(buildMode);
 
     vesState.isCleaning = true;
 
@@ -121,11 +118,11 @@ async function clean(
     });
 }
 
-function getCleanPath(workspaceService: WorkspaceService, mode: string): string {
-    const clearAll = (mode === "all");
-    let cleanPath = joinPath(getWorkspaceRoot(workspaceService), 'build');
+function getCleanPath(buildMode: string): string {
+    const clearAll = (buildMode === "all");
+    let cleanPath = getBuildPath();
     if (!clearAll) {
-        cleanPath = joinPath(cleanPath, mode);
+        cleanPath = joinPath(cleanPath, buildMode);
     }
 
     return cleanPath;

@@ -8,7 +8,6 @@ import { VesFlashCartsCommand } from "../../flash-carts/commands";
 import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand } from '../../build/commands';
 import { VesStateModel } from '../../common/vesStateModel';
 import { getOs } from '../../common';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesRunCommand } from '../../run/commands';
 import { PreferenceService } from '@theia/core/lib/browser';
 import { BuildMode } from '../../build/commands/setMode';
@@ -25,7 +24,6 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
     @inject(MessageService) protected readonly messageService!: MessageService;
     @inject(PreferenceService) protected readonly preferenceService!: PreferenceService;
     @inject(VesStateModel) protected readonly vesState: VesStateModel;
-    @inject(WorkspaceService) protected readonly workspaceService!: WorkspaceService;
 
     @postConstruct()
     protected async init(): Promise<void> {
@@ -36,9 +34,10 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
         this.addClass(`os-${getOs()}`);
         this.vesState.onDidChangeIsCleaning(() => this.update());
         this.vesState.onDidChangeIsBuilding(() => this.update());
+        this.vesState.onDidChangeIsExportQueued(() => this.update());
         this.vesState.onDidChangeIsFlashQueued(() => this.update());
-        this.vesState.onDidChangeConnectedFlashCart(() => this.update());
         this.vesState.onDidChangeIsRunQueued(() => this.update());
+        this.vesState.onDidChangeConnectedFlashCart(() => this.update());
         this.vesState.onDidChangeBuildFolder(() => this.update());
         this.vesState.onDidChangeOutputRomExists(() => this.update());
         this.keybindingRegistry.onKeybindingsChanged(() => this.update());

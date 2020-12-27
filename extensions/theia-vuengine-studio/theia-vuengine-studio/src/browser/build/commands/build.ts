@@ -2,7 +2,6 @@ import { PreferenceService } from "@theia/core/lib/browser";
 import URI from "@theia/core/lib/common/uri";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
-import { WorkspaceService } from "@theia/workspace/lib/browser";
 import { cpus } from "os";
 import { join as joinPath } from "path";
 import { convertoToEnvPath, getOs, getResourcesPath, getWorkspaceRoot } from "../../common";
@@ -12,11 +11,10 @@ export async function buildCommand(
   fileService: FileService,
   preferenceService: PreferenceService,
   terminalService: TerminalService,
-  vesState: VesStateModel,
-  workspaceService: WorkspaceService
+  vesState: VesStateModel
 ) {
   if (!vesState.isBuilding) {
-    build(fileService, preferenceService, terminalService, vesState, workspaceService);
+    build(fileService, preferenceService, terminalService, vesState);
   }
 }
 
@@ -24,8 +22,7 @@ async function build(
   fileService: FileService,
   preferenceService: PreferenceService,
   terminalService: TerminalService,
-  vesState: VesStateModel,
-  workspaceService: WorkspaceService
+  vesState: VesStateModel
 ) {
   const buildMode = preferenceService.get("build.buildMode");
   const dumpElf = preferenceService.get("build.dumpElf");
@@ -35,14 +32,14 @@ async function build(
   const compilerPath = getCompilerPath();
   const workingDir = convertoToEnvPath(
     preferenceService,
-    getWorkspaceRoot(workspaceService)
+    getWorkspaceRoot()
   );
   const v810path = convertoToEnvPath(preferenceService, joinPath(compilerPath, "bin"));
-  const workspaceRoot = getWorkspaceRoot(workspaceService)
+  const workspaceRoot = getWorkspaceRoot()
 
   let makefile = convertoToEnvPath(
     preferenceService,
-    joinPath(getWorkspaceRoot(workspaceService), "makefile")
+    joinPath(getWorkspaceRoot(), "makefile")
   );
   if (!await fileService.exists(new URI(makefile))) {
     makefile = convertoToEnvPath(
