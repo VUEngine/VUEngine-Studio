@@ -1,4 +1,5 @@
 import { injectable, interfaces } from 'inversify';
+import { isWindows } from '@theia/core';
 import { KeybindingContribution, KeybindingRegistry } from '@theia/core/lib/browser/keybinding';
 import {
   VesBuildCleanCommand,
@@ -28,19 +29,19 @@ export class VesBuildKeybindingContribution implements KeybindingContribution {
       keybinding: "alt+shift+e"
     }, {
       command: VesBuildSetModeReleaseCommand.id,
-      keybinding: "ctrl+shift+1"
+      keybinding: isWindows ? "alt+shift+1" : ""
     }, {
       command: VesBuildSetModeBetaCommand.id,
-      keybinding: "ctrl+shift+2"
+      keybinding: isWindows ? "alt+shift+2" : ""
     }, {
       command: VesBuildSetModeToolsCommand.id,
-      keybinding: "ctrl+shift+3"
+      keybinding: isWindows ? "alt+shift+3" : ""
     }, {
       command: VesBuildSetModeDebugCommand.id,
-      keybinding: "ctrl+shift+4"
+      keybinding: isWindows ? "alt+shift+4" : ""
     }, {
       command: VesBuildSetModePreprocessorCommand.id,
-      keybinding: "ctrl+shift+5"
+      keybinding: isWindows ? "alt+shift+5" : ""
     });
   }
 }
