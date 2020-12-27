@@ -32,7 +32,7 @@
   },
   "main": "scripts/theia-electron-main.js",
   "scripts": {
-    "all": "cd extensions/theia-vuengine-studio && yarn && yarn theia rebuild:electron && yarn electron-rebuild && cd ../.. && yarn && yarn start",
+    "all": "cd extensions/theia-vuengine-studio && yarn && yarn theia rebuild:electron && cd ../.. && yarn && yarn electron-rebuild && yarn start",
     "prepare": "yarn build && yarn download:plugins",
     "build": "theia rebuild:electron && theia build",
     "start": "electron scripts/theia-electron-main.js",

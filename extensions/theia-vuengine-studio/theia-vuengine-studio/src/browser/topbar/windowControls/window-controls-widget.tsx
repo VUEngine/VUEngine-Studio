@@ -1,4 +1,4 @@
-import * as electron from "electron";
+import { remote } from "electron";
 import * as React from "react";
 import { inject, injectable, postConstruct } from "inversify";
 import { ReactWidget } from "@theia/core/lib/browser/widgets/react-widget";
@@ -24,8 +24,8 @@ export class VesTopbarWindowControlsWidget extends ReactWidget {
     this.title.label = VesTopbarWindowControlsWidget.LABEL;
     this.title.caption = VesTopbarWindowControlsWidget.LABEL;
     this.title.closable = false;
-    electron.remote.getCurrentWindow().on("maximize", () => this.update());
-    electron.remote.getCurrentWindow().on("unmaximize", () => this.update());
+    remote.getCurrentWindow().on("maximize", () => this.update());
+    remote.getCurrentWindow().on("unmaximize", () => this.update());
     this.update();
   }
 
@@ -42,7 +42,7 @@ export class VesTopbarWindowControlsWidget extends ReactWidget {
         >
           {/*‒*/}
           <svg width="11" height="11" viewBox="0 0 11 1">
-            <path d="m11 0v1h-11v-1z" stroke-width=".26208"/>
+            <path d="m11 0v1h-11v-1z" stroke-width=".26208" />
           </svg>
         </div>
         {!this.isMaximized() && (
@@ -90,6 +90,6 @@ export class VesTopbarWindowControlsWidget extends ReactWidget {
   }
 
   protected isMaximized(): boolean {
-    return electron.remote.getCurrentWindow().isMaximized();
+    return remote.getCurrentWindow().isMaximized();
   }
 }

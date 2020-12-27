@@ -1,20 +1,15 @@
 import { injectable } from 'inversify';
-import { BrowserWindow/*, nativeImage, TouchBar*/ } from 'electron';
+import { app, BrowserWindow, nativeImage, TouchBar } from 'electron';
 import { ElectronMainApplication, TheiaBrowserWindowOptions } from '@theia/core/lib/electron-main/electron-main-application';
 import { isOSX, MaybePromise } from '@theia/core';
-//import { VesStateModel } from '../browser/common/vesStateModel';
-//import { VesBuildCommand } from '../browser/build/commands';
 
 @injectable()
 export class VesElectronMainApplication extends ElectronMainApplication {
-    //@inject(VesStateModel) protected readonly vesState: VesStateModel;
-    //@inject(CommandService) protected readonly commandService!: CommandService;
-
     async createWindow(asyncOptions: MaybePromise<TheiaBrowserWindowOptions> = this.getDefaultBrowserWindowOptions()): Promise<BrowserWindow> {
         const electronWindow = await super.createWindow(asyncOptions);
         // electronWindow.on('focus', () => electronWindow.setOpacity(1));
         // electronWindow.on('blur', () => electronWindow.setOpacity(0.95));
-        // this.registerVesTouchBar(electronWindow);
+        this.registerVesTouchBar(electronWindow);
         return electronWindow;
     }
 
@@ -29,57 +24,60 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         }
     }
 
-    // protected registerVesTouchBar(electronWindow: BrowserWindow) {
-    //     const { TouchBarButton, TouchBarGroup } = TouchBar;
+    protected registerVesTouchBar(electronWindow: BrowserWindow) {
+        const { TouchBarButton, TouchBarGroup } = TouchBar;
 
-    //     const runIcon = nativeImage.createFromDataURL("data:image/svg+xml;base64,PHN2ZyBhcmlhLWhpZGRlbj0idHJ1ZSIgZm9jdXNhYmxlPSJmYWxzZSIgZGF0YS1wcmVmaXg9ImZhcyIgZGF0YS1pY29uPSJwbGF5IiBjbGFzcz0ic3ZnLWlubGluZS0tZmEgZmEtcGxheSBmYS13LTE0IiByb2xlPSJpbWciIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgdmlld0JveD0iMCAwIDQ0OCA1MTIiPjxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZD0iTTQyNC40IDIxNC43TDcyLjQgNi42QzQzLjgtMTAuMyAwIDYuMSAwIDQ3LjlWNDY0YzAgMzcuNSA0MC43IDYwLjEgNzIuNCA0MS4zbDM1Mi0yMDhjMzEuNC0xOC41IDMxLjUtNjQuMSAwLTgyLjZ6Ij48L3BhdGg+PC9zdmc+").resize({ height: 30 });
-    //     console.log("IMG WATTAFOCK", runIcon.isEmpty, runIcon.isTemplateImage());
+        const cleanButton = new TouchBarButton({
+            label: "🗑",
+            accessibilityLabel: "Clean",
+            click: () => app.emit("ves-cmd-clean"),
+        });
 
+        const buildButton = new TouchBarButton({
+            label: "🔧",
+            accessibilityLabel: "Build",
+            click: () => app.emit("ves-cmd-build"),
+        });
 
-    //     const cleanButton = new TouchBarButton({
-    //         label: "Clean",
-    //         icon: runIcon,
-    //         accessibilityLabel: "Clean",
-    //         //click: () => this.handleVesTouchBarBuildOnClick()
-    //     });
+        const runButton = new TouchBarButton({
+            icon: nativeImage.createFromDataURL(`data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABhWlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV9bpUUqDhYUdchQnSyIioiTVqEIFUKt0KqDyaVf0KQhSXFxFFwLDn4sVh1cnHV1cBUEwQ8QJ0cnRRcp8X9JoUWMB8f9eHfvcfcO8NfLTDU7xgBVs4xUIi5ksqtC8BVhDKIPIcxIzNTnRDEJz/F1Dx9f72I8y/vcn6NbyZkM8AnEs0w3LOIN4qlNS+e8TxxhRUkhPiceNeiCxI9cl11+41xw2M8zI0Y6NU8cIRYKbSy3MSsaKvEkcVRRNcr3Z1xWOG9xVstV1rwnf2E4p60sc53mEBJYxBJECJBRRQllWIjRqpFiIkX7cQ//gOMXySWTqwRGjgVUoEJy/OB/8LtbMz8x7iaF40Dni21/DAPBXaBRs+3vY9tunACBZ+BKa/krdWD6k/RaS4seAT3bwMV1S5P3gMsdoP9JlwzJkQI0/fk88H5G35QFem+BrjW3t+Y+Th+ANHWVvAEODoGRAmWve7w71N7bv2ea/f0Aqg1yvdTHMhoAAAAGYktHRAD/AP8A/6C9p5MAAAAJcEhZcwAADdcAAA3XAUIom3gAAAAHdElNRQfkDBsXCzNGpMODAAAAyUlEQVQ4y6WTPWqCQRRFjxJ0A5am+jqzEjsbsVDIPoJByDKyAl2ClYUuQRS00w1YpAgoHJsJGUTH+fTCgwePc3l3flC5U3V1pG7VX3Ucz3Pghf/aqUUZg88UnGOwigy+LmaFOnkhrWbUt6K+AGZAo6KmDJbAW+h/gCmwBt6BV2CTWr+nHk1r+Aw8V+u58FFdqodwsB9q7dotdK/AJ7V/K+pTcGzwEPxn0LmRuZfxT0Ddq9+hSsEq1YuHcwIGwIRcqe2wxS7EoUydAdFUvsbdGwNTAAAAAElFTkSuQmCC`).resize({
+                width: 16,
+                height: 16,
+            }),
+            accessibilityLabel: "Run",
+            click: () => app.emit("ves-cmd-run"),
+        });
 
-    //     const buildButton = new TouchBarButton({
-    //         label: "Build",
-    //         icon: "fa fa-wrench",
-    //         accessibilityLabel: "Build",
-    //         //backgroundColor: "#3b2576",
-    //         //click: () => this.handleVesTouchBarBuildOnClick()
-    //     });
+        const flashButton = new TouchBarButton({
+            label: "Flash",
+            accessibilityLabel: "Flash",
+            click: () => app.emit("ves-cmd-flash"),
+        });
 
-    //     const runButton = new TouchBarButton({
-    //         label: "Run",
-    //         icon: "fa fa-run",
-    //         accessibilityLabel: "Run",
-    //         //backgroundColor: "#3b2576",
-    //         //click: () => this.handleVesTouchBarBuildOnClick()
-    //     });
+        const exportButton = new TouchBarButton({
+            label: "Export",
+            accessibilityLabel: "Export",
+            click: () => app.emit("ves-cmd-export"),
+        });
 
-    //     const buildTouchBarGroup = new TouchBarGroup({
-    //         items: new TouchBar({
-    //             items: [
-    //                 cleanButton,
-    //                 buildButton,
-    //                 runButton,
-    //             ]
-    //         })
-    //     });
+        const buildTouchBarGroup = new TouchBarGroup({
+            items: new TouchBar({
+                items: [
+                    cleanButton,
+                    buildButton,
+                    runButton,
+                    flashButton,
+                    exportButton
+                ]
+            })
+        });
 
-    //     const vesTouchBar = new TouchBar({
-    //         items: [
-    //             buildTouchBarGroup,
-    //         ]
-    //     });
+        const vesTouchBar = new TouchBar({
+            items: [
+                buildTouchBarGroup,
+            ]
+        });
 
-
-    //     electronWindow.setTouchBar(vesTouchBar);
-    // }
-
-    // protected handleVesTouchBarBuildOnClick = () => {
-    //     //this.commandService.executeCommand(VesBuildCommand.id);
-    // };
+        electronWindow.setTouchBar(vesTouchBar);
+    }
 }
