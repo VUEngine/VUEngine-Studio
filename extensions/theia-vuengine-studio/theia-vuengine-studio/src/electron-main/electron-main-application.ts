@@ -57,7 +57,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         const vesButton = new TouchBarButton({
             backgroundColor: "#3b2576",
             icon: vesIcon,
-            click: () => app.emit("ves-execute-command", "commandPalette"),
+            click: () => app.emit("ves-execute-command", "workbench.action.showCommands"),
         });
 
         const buildMenuCleanButton = new TouchBarButton({
