@@ -2,7 +2,7 @@ import { PreferenceService } from "@theia/core/lib/browser";
 import { CommandService, isWindows } from "@theia/core/lib/common";
 import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
 import { join as joinPath } from "path";
-import { VesBuildCommand } from "../../build/commands";
+import { VesBuildCommand } from "../../build/commands/definitions";
 import { getOs, getResourcesPath, getRomPath } from "../../common";
 import { VesStateModel } from "../../common/vesStateModel";
 

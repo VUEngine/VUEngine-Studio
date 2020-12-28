@@ -1,6 +1,6 @@
 import { injectable, interfaces } from 'inversify';
 import { KeybindingContribution, KeybindingRegistry } from '@theia/core/lib/browser/keybinding';
-import { VesFlashCartsCommand } from "./commands";
+import { VesFlashCartsCommand } from './commands/definitions';
 
 @injectable()
 export class VesFlashCartsKeybindingContribution implements KeybindingContribution {

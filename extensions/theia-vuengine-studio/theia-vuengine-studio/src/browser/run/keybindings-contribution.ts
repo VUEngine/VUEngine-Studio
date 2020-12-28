@@ -3,7 +3,7 @@ import {
   KeybindingContribution,
   KeybindingRegistry,
 } from "@theia/core/lib/browser/keybinding";
-import { VesRunCommand } from "./commands";
+import { VesRunCommand } from "./commands/definitions";
 
 @injectable()
 export class VesRunKeybindingContribution implements KeybindingContribution {

@@ -1,6 +1,5 @@
 import { inject, injectable, interfaces } from "inversify";
 import {
-  Command,
   CommandContribution,
   CommandRegistry,
   CommandService,
@@ -12,13 +11,7 @@ import { PreferenceService } from "@theia/core/lib/browser";
 import { VesStateModel } from "../common/vesStateModel";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { VesUsbService } from "../../common/usb-service-protocol";
-
-export const VesFlashCartsCommand: Command = {
-  id: "VesFlashCarts.commands.flash",
-  label: "Flash to Flash Cart",
-  category: "Flash",
-  iconClass: "fa fa-usb",
-};
+import { VesFlashCartsCommand } from "./commands/definitions";
 
 @injectable()
 export class VesFlashCartsCommandContribution implements CommandContribution {

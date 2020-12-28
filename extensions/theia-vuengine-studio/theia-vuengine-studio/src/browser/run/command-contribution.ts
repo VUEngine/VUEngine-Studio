@@ -1,6 +1,5 @@
 import { inject, injectable, interfaces } from "inversify";
 import {
-  Command,
   CommandContribution,
   CommandRegistry,
   CommandService,
@@ -11,20 +10,7 @@ import { runCommand } from "./commands/run";
 import { selectEmulatorCommand } from "./commands/selectEmulator";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { VesStateModel } from "../common/vesStateModel";
-
-export const VesRunCommand: Command = {
-  id: "VesRun.commands.run",
-  // TODO: dynamic label based on selected emu config?"
-  label: "Run on Emulator",
-  category: "Run",
-  iconClass: "fa fa-play",
-};
-
-export const VesSelectEmulatorCommand: Command = {
-  id: "VesRun.commands.selectEmulator",
-  label: "Select Default Emulator...",
-  category: "Run"
-};
+import { VesRunCommand, VesSelectEmulatorCommand } from "./commands/definitions";
 
 @injectable()
 export class VesRunCommandContribution implements CommandContribution {

@@ -11,7 +11,7 @@ import {
   VesBuildSetModePreprocessorCommand,
   VesBuildToggleDumpElfCommand,
   VesBuildTogglePedanticWarningsCommand,
-} from "./commands";
+} from "./commands/definitions";
 
 export const buildMenuPath = [...MAIN_MENU_BAR, "vesBuild"];
 export namespace BuildMenuSection {

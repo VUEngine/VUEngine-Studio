@@ -1,8 +1,8 @@
 import { interfaces } from 'inversify';
-import { bindVesRunCommands } from "./commands";
-import { bindVesRunKeybindings } from "./keybindings";
-import { bindVesRunMenu } from "./menu";
-import { bindVesRunPreferences } from "./preferences";
+import { bindVesRunCommands } from "./command-contribution";
+import { bindVesRunKeybindings } from "./keybindings-contribution";
+import { bindVesRunMenu } from "./menu-contribution";
+import { bindVesRunPreferences } from "./preferences-contribution";
 
 export function bindVesRunContributions(bind: interfaces.Bind): void {
     bindVesRunPreferences(bind);

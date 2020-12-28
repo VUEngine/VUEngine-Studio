@@ -4,13 +4,13 @@ import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { CommandService, MessageService } from '@theia/core';
 import { KeybindingRegistry } from "@theia/core/lib/browser/keybinding";
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { VesFlashCartsCommand } from "../../flash-carts/commands";
-import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand } from '../../build/commands';
+import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand } from '../../build/commands/definitions';
 import { VesStateModel } from '../../common/vesStateModel';
 import { getOs } from '../../common';
-import { VesRunCommand } from '../../run/commands';
 import { PreferenceService } from '@theia/core/lib/browser';
-import { BuildMode } from '../../build/commands/setMode';
+import { BuildMode } from "../../build/types";
+import { VesRunCommand } from '../../run/commands/definitions';
+import { VesFlashCartsCommand } from '../../flash-carts/commands/definitions';
 
 @injectable()
 export class VesTopbarActionButtonsWidget extends ReactWidget {
@@ -48,7 +48,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
         const buildMode = this.preferenceService.get("build.buildMode") as BuildMode;
         return <>
             <button
-                className="theia-button secondary"
+                className="theia-button secondary clean"
                 title={this.vesState.isCleaning ? "Cleaning..." : `Clean${this.getKeybindingLabel(VesBuildCleanCommand.id)}`}
                 disabled={!this.vesState.buildFolderExists[buildMode]}
                 onClick={this.handleCleanOnClick}
@@ -58,7 +58,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                     : <i className="fa fa-trash"></i>}
             </button>
             <button
-                className="theia-button secondary"
+                className="theia-button secondary build"
                 title={this.vesState.isBuilding ? "Building..." : "Build"}
                 onClick={this.handleBuildOnClick}
             >
@@ -67,7 +67,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                     : <i className="fa fa-wrench"></i>}
             </button>
             <button
-                className="theia-button secondary"
+                className="theia-button secondary run"
                 title={this.vesState.isRunQueued ? "Run Queued..." : "Run"}
                 onClick={this.handleRunOnClick}
             >
@@ -76,7 +76,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                     : <i className="fa fa-play"></i>}
             </button>
             <button
-                className="theia-button secondary"
+                className="theia-button secondary flash"
                 title={!this.vesState.connectedFlashCart
                     ? "No Flash Cart Connected"
                     : this.vesState.isFlashQueued
@@ -90,7 +90,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                     : <i className="fa fa-usb"></i>}
             </button>
             <button
-                className="theia-button secondary"
+                className="theia-button secondary export"
                 title={this.vesState.isExportQueued ? "Export Queued..." : "Export"}
                 onClick={this.handleExportOnClick}
             >

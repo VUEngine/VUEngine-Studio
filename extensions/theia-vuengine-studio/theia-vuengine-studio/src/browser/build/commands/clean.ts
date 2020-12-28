@@ -6,7 +6,7 @@ import { join as joinPath } from "path";
 import * as rimraf from "rimraf";
 import { getBuildPath } from "../../common";
 import { VesStateModel } from "../../common/vesStateModel";
-import { BuildMode } from "./setMode";
+import { BuildMode } from "../types";
 
 export async function cleanCommand(
     fileService: FileService,

@@ -1,7 +1,7 @@
 import { injectable, interfaces } from "inversify";
 import { MenuContribution, MenuModelRegistry } from "@theia/core/lib/common";
-import { VesFlashCartsCommand } from "./commands";
-import { BuildMenuSection } from "../build/menu";
+import { BuildMenuSection } from "../build/menu-contribution";
+import { VesFlashCartsCommand } from "./commands/definitions";
 
 @injectable()
 export class VesFlashCartsMenuContribution implements MenuContribution {

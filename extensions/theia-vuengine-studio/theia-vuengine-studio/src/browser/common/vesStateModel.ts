@@ -3,7 +3,7 @@ import { Emitter } from "@theia/core/lib/common/event";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import URI from "@theia/core/lib/common/uri";
 import { FileChangesEvent } from "@theia/filesystem/lib/common/files";
-import { BuildMode } from "../build/commands/setMode";
+import { BuildMode } from "../build/types";
 import { FlashCartConfig } from "../flash-carts/commands/flash";
 import { getBuildPath, getRomPath } from ".";
 

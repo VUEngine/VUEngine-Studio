@@ -11,7 +11,7 @@ import { createWriteStream, readFileSync, unlinkSync } from "fs";
 import { dirname, join as joinPath } from "path";
 import { VesUsbService } from "../../../common/usb-service-protocol";
 
-import { VesBuildCommand } from "../../build/commands";
+import { VesBuildCommand } from "../../build/commands/definitions";
 import { convertoToEnvPath, getOs, getResourcesPath, getRomPath } from "../../common";
 import { VesStateModel } from "../../common/vesStateModel";
 

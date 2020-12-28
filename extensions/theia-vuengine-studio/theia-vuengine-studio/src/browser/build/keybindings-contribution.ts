@@ -1,16 +1,7 @@
 import { injectable, interfaces } from 'inversify';
 import { isWindows } from '@theia/core';
 import { KeybindingContribution, KeybindingRegistry } from '@theia/core/lib/browser/keybinding';
-import {
-  VesBuildCleanCommand,
-  VesBuildCommand,
-  VesBuildExportCommand,
-  VesBuildSetModeReleaseCommand,
-  VesBuildSetModeBetaCommand,
-  VesBuildSetModeToolsCommand,
-  VesBuildSetModeDebugCommand,
-  VesBuildSetModePreprocessorCommand
-} from "./commands";
+import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand, VesBuildSetModeBetaCommand, VesBuildSetModeDebugCommand, VesBuildSetModePreprocessorCommand, VesBuildSetModeReleaseCommand, VesBuildSetModeToolsCommand } from './commands/definitions';
 
 @injectable()
 export class VesBuildKeybindingContribution implements KeybindingContribution {
