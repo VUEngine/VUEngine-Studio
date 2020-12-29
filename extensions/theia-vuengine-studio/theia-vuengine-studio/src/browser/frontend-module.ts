@@ -5,7 +5,7 @@ import { bindVesFlashCartsContributions } from "./flash-carts/frontend-module";
 import { bindVesRunContributions } from "./run/frontend-module";
 import { bindVesBrandingContributions } from "./branding/frontend-module";
 import { bindVesTopBarContributions } from "./topbar/frontend-module";
-import { rebindtheiaContributions } from "./clean-theia/frontend-module";
+import { rebindtheiaContributions } from "./theia-customizations/frontend-module";
 
 import "./themes/index";
 

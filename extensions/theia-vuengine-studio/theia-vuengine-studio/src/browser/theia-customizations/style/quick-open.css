@@ -1,0 +1,27 @@
+quick-open-container {
+    top: 10% !important;
+}
+
+.monaco-quick-open-widget {
+    border: 1px solid var(--theia-editor-foreground);
+    border-radius: 5px;
+}
+
+.monaco-quick-open-widget:before {
+    background-color: var(--theia-editor-background);
+    bottom: 0;
+    content: "";
+    left: 0;
+    opacity: 0.8;
+    position: fixed;
+    right: 0;
+    top: var(--theia-private-menubar-height);
+    z-index: -1;
+}
+
+.monaco-quick-open-widget .theia-quick-title-container {
+    background: transparent;
+    font-weight: bold;
+    padding-bottom: 0;
+    padding-top: var(--theia-ui-padding);
+}

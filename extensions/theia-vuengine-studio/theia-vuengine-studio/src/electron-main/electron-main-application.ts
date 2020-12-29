@@ -22,7 +22,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             ...await super.getDefaultBrowserWindowOptions(),
             backgroundColor: "#222",
             frame: isOSX,
-            minHeight: 420,
+            minHeight: 560,
             minWidth: 820,
             titleBarStyle: "hiddenInset"
         }
