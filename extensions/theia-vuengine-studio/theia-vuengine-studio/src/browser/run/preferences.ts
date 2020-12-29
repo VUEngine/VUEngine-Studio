@@ -1,11 +1,11 @@
 import { VesProperty } from "../common/types";
 
-export const VesRunEmulatorsPreference: VesProperty = {
-    id: "emulators.emulators",
+export const VesRunEmulatorsCustomPreference: VesProperty = {
+    id: "emulators.customEmulators",
     property: {
         type: "array",
         label: "Emulator Configurations",
-        description: "Emulator configurations",
+        description: "Additional custom emulator configurations",
         items: {
             type: "object",
             title: "Emulator configs",
@@ -28,19 +28,16 @@ export const VesRunEmulatorsPreference: VesProperty = {
                 },
             },
         },
-        default: [
-            {
-                name: "Mednafen (2D)",
-                path: "%MEDNAFEN%",
-                args:
-                    "-'vb.3dmode' 'anaglyph' -'vb.anaglyph.preset' 'disabled' -'vb.anaglyph.lcolor' '0xff0000' -'vb.anaglyph.rcolor' '0x000000' -'vb.xscale' 2 -'vb.yscale' 2 %ROM%",
-            },
-            {
-                name: "Mednafen (Anaglyph Red/Blue)",
-                path: "%MEDNAFEN%",
-                args:
-                    "-'vb.3dmode' 'anaglyph' -'vb.anaglyph.preset' 'red_blue' -'vb.anaglyph.lcolor' '0xffba00' -'vb.anaglyph.rcolor' '0x00baff' -'vb.xscale' 2 -'vb.yscale' 2 %ROM%",
-            },
-        ],
+        default: [],
     },
-}
+};
+
+export const VesRunDefaultEmulatorPreference: VesProperty = {
+    id: "emulators.defaultEmulator",
+    property: {
+        type: "string",
+        label: "Default Emulator",
+        description: "Default emulator to use. Use first in emulators list when empty.",
+        default: ""
+    }
+};

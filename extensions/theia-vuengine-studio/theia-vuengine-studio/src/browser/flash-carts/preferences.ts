@@ -4,7 +4,7 @@ export const VesFlashCartsCustomPreference: VesProperty = {
     id: "flashCarts.customFlashCarts",
     property: {
         type: "array",
-        label: "Flash cart configurations",
+        label: "Flash Cart Configurations",
         description: "Additional configurations for custom flash carts",
         items: {
             type: "object",

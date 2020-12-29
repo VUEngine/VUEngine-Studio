@@ -3,7 +3,6 @@ import {
   CommandContribution,
   CommandRegistry,
   CommandService,
-  MessageService,
 } from "@theia/core/lib/common";
 import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
 import { runCommand } from "./commands/run";
@@ -11,17 +10,16 @@ import { selectEmulatorCommand } from "./commands/selectEmulator";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { VesStateModel } from "../common/vesStateModel";
 import { VesRunCommand, VesSelectEmulatorCommand } from "./commands";
+import { QuickPickService } from "@theia/core/lib/common/quick-pick-service";
 
 @injectable()
 export class VesRunCommandContribution implements CommandContribution {
   constructor(
     @inject(CommandService) private readonly commandService: CommandService,
-    @inject(MessageService) private readonly messageService: MessageService,
-    @inject(PreferenceService)
-    private readonly preferenceService: PreferenceService,
+    @inject(PreferenceService) private readonly preferenceService: PreferenceService,
+    @inject(QuickPickService) private readonly quickPickService: QuickPickService,
     @inject(TerminalService) private readonly terminalService: TerminalService,
-    @inject(VesStateModel)
-    private readonly vesState: VesStateModel,
+    @inject(VesStateModel) private readonly vesState: VesStateModel,
   ) { }
 
   registerCommands(registry: CommandRegistry): void {
@@ -37,9 +35,8 @@ export class VesRunCommandContribution implements CommandContribution {
     registry.registerCommand(VesSelectEmulatorCommand, {
       execute: () =>
         selectEmulatorCommand(
-          this.messageService,
           this.preferenceService,
-          this.terminalService
+          this.quickPickService,
         ),
     });
   }

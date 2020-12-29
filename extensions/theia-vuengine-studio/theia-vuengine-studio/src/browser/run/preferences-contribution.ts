@@ -6,21 +6,20 @@ import {
   PreferenceContribution,
   PreferenceSchema,
 } from "@theia/core/lib/browser";
-import { VesRunEmulatorsPreference } from "./preferences";
+import { VesRunDefaultEmulatorPreference, VesRunEmulatorsCustomPreference } from "./preferences";
 
 const VesRunPreferenceSchema: PreferenceSchema = {
   type: "object",
   properties: {
-    [VesRunEmulatorsPreference.id]: VesRunEmulatorsPreference.property,
+    [VesRunEmulatorsCustomPreference.id]: VesRunEmulatorsCustomPreference.property,
+    [VesRunDefaultEmulatorPreference.id]: VesRunDefaultEmulatorPreference.property,
   },
 };
 
 const VesRunPreferences = Symbol("VesRunPreferences");
 type VesRunPreferences = PreferenceProxy<any>;
 
-function createNavigatorPreferences(
-  preferences: PreferenceService
-): VesRunPreferences {
+function createNavigatorPreferences(preferences: PreferenceService): VesRunPreferences {
   return createPreferenceProxy(preferences, VesRunPreferenceSchema);
 }
 

@@ -25,9 +25,7 @@ if (isWindows) {
 const VesBuildPreferences = Symbol("VesBuildPreferences");
 type VesBuildPreferences = PreferenceProxy<any>;
 
-function createNavigatorPreferences(
-  preferences: PreferenceService
-): VesBuildPreferences {
+function createNavigatorPreferences(preferences: PreferenceService): VesBuildPreferences {
   return createPreferenceProxy(preferences, VesBuildPreferenceSchema);
 }
 

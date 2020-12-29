@@ -18,9 +18,7 @@ const VesFlashCartsPreferenceSchema: PreferenceSchema = {
 const VesFlashCartsPreferences = Symbol("VesFlashCartsPreferences");
 type VesFlashCartsPreferences = PreferenceProxy<any>;
 
-function createNavigatorPreferences(
-  preferences: PreferenceService
-): VesFlashCartsPreferences {
+function createNavigatorPreferences(preferences: PreferenceService): VesFlashCartsPreferences {
   return createPreferenceProxy(preferences, VesFlashCartsPreferenceSchema);
 }
 

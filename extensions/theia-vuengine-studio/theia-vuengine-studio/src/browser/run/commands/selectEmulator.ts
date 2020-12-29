@@ -1,22 +1,46 @@
-import { PreferenceService } from "@theia/core/lib/browser";
-import { MessageService } from "@theia/core/lib/common";
-import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
+import { PreferenceScope, PreferenceService } from "@theia/core/lib/browser";
+import { QuickPickItem, QuickPickOptions, QuickPickService } from "@theia/core/lib/common/quick-pick-service";
+import { VesRunDefaultEmulatorPreference } from "../preferences";
+import { getEmulatorConfigs } from "./run";
 
 export async function selectEmulatorCommand(
-  messageService: MessageService,
   preferenceService: PreferenceService,
-  terminalService: TerminalService
+  quickPickService: QuickPickService,
 ) {
-  selectEmulator(
-    messageService,
-    preferenceService,
-    terminalService
-  );
+  selectEmulator(preferenceService, quickPickService);
 }
 
 async function selectEmulator(
-  messageService: MessageService,
   preferenceService: PreferenceService,
-  terminalService: TerminalService
+  quickPickService: QuickPickService,
 ) {
+  const quickPickOptions: QuickPickOptions = {
+    title: "Select default emulator",
+    placeholder: "Which of the configured emulators do you want to use to run compiled projects?",
+    value: preferenceService.get(VesRunDefaultEmulatorPreference.id),
+  };
+  const quickPickItems: QuickPickItem<string>[] = [{
+    label: "First in list",
+    description: " (default)",
+    value: "",
+  }];
+
+  const emulatorConfigs = getEmulatorConfigs(preferenceService);
+
+  for (const emulatorConfig of emulatorConfigs) {
+    quickPickItems.push({
+      label: emulatorConfig.name,
+      value: emulatorConfig.name,
+      description: `(${emulatorConfig.path})`,
+      detail: emulatorConfig.args,
+    });
+  }
+
+  quickPickService.show<string>(quickPickItems, quickPickOptions).then(selection => {
+    if (!selection && selection !== "") {
+      return;
+    }
+
+    preferenceService.set(VesRunDefaultEmulatorPreference.id, selection, PreferenceScope.User);
+  });
 }
