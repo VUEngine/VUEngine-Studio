@@ -6,6 +6,7 @@ import { FileChangesEvent } from "@theia/filesystem/lib/common/files";
 import { BuildMode } from "../build/types";
 import { FlashCartConfig } from "../flash-carts/commands/flash";
 import { getBuildPath, getRomPath } from ".";
+import { PreferenceService } from "@theia/core/lib/browser";
 
 type BuildFolderFlags = {
     [key: string]: boolean
@@ -15,6 +16,7 @@ type BuildFolderFlags = {
 export class VesStateModel {
 
     @inject(FileService) protected fileService: FileService;
+    @inject(PreferenceService) protected readonly preferenceService: PreferenceService;
 
     @postConstruct()
     protected async init(): Promise<void> {
@@ -38,7 +40,19 @@ export class VesStateModel {
                 this.outputRomExists = await this.fileService.exists(new URI(getRomPath()));
             }
         })
+
+        // watch for build mode changes
+        this.preferenceService.onPreferenceChanged(({ preferenceName, newValue }) => {
+            if (preferenceName === "build.buildMode") {
+                this.onDidChangeBuildModeEmitter.fire(newValue);
+                this.onDidChangeBuildFolderEmitter.fire(this._buildFolderExists);
+            }
+        });
     }
+
+    // build mode
+    protected readonly onDidChangeBuildModeEmitter = new Emitter<BuildMode>();
+    readonly onDidChangeBuildMode = this.onDidChangeBuildModeEmitter.event;
 
     // build folder
     protected readonly onDidChangeBuildFolderEmitter = new Emitter<BuildFolderFlags>();

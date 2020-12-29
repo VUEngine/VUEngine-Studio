@@ -18,7 +18,7 @@ export const VesBuildExportCommand: Command = {
     id: "VesBuild.commands.export",
     label: "Export ROM...",
     category: "Build",
-    iconClass: "fa fa-share-square",
+    iconClass: "fa fa-share-square-o",
 };
 
 export const VesBuildSetModeCommand: Command = {

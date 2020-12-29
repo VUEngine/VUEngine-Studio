@@ -36,6 +36,11 @@ export async function flashCommand(
   vesUsbService: VesUsbService,
   vesState: VesStateModel
 ) {
+  if (vesState.isFlashQueued) {
+    vesState.isFlashQueued = false;
+    return;
+  }
+
   await detectFlashCart(preferenceService, vesState, vesUsbService);
   // vesUsbService.onDeviceConnected((device) => {
   //   console.log("HEUREKA", device);

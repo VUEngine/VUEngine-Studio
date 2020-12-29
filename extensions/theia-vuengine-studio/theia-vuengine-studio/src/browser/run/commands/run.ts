@@ -18,6 +18,11 @@ export async function runCommand(
   terminalService: TerminalService,
   vesState: VesStateModel
 ) {
+  if (vesState.isRunQueued) {
+    vesState.isRunQueued = false;
+    return;
+  }
+
   vesState.onDidChangeOutputRomExists(outputRomExists => {
     if (outputRomExists && vesState.isRunQueued) {
       vesState.isRunQueued = false;

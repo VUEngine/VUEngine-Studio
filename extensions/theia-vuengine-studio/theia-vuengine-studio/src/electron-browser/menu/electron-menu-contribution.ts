@@ -2,27 +2,39 @@ import { inject, injectable, interfaces } from "inversify";
 import { FrontendApplication, PreferenceService } from "@theia/core/lib/browser";
 import { ElectronMenuContribution } from "@theia/core/lib/electron-browser/menu/electron-menu-contribution";
 import { CommandService } from "@theia/core";
+import { VesStateModel } from "../../browser/common/vesStateModel";
 
 @injectable()
 export class VesElectronMenuContribution extends ElectronMenuContribution {
     @inject(CommandService) protected readonly commandService!: CommandService;
     @inject(PreferenceService) protected readonly preferenceService: PreferenceService;
+    @inject(VesStateModel) protected readonly vesState: VesStateModel;
 
-    protected hideTopPanel(frontendApplication: FrontendApplication): void {
+    onStart(app: FrontendApplication): void {
+        super.onStart(app);
+        this.bindVesTouchBar();
+    }
+
+    protected hideTopPanel(app: FrontendApplication): void {
         // override this with an empty function so the top panel is not removed in electron
+    }
 
-
-
-
-        // TODO: move these to their dedicated place
+    protected bindVesTouchBar(): void {
         const { app } = require("electron").remote;
+
         app.on("ves-execute-command", (command: string) => this.commandService.executeCommand(command));
-        app.emit("ves-set-build-mode", this.preferenceService.get("build.buildMode"));
-        this.preferenceService.onPreferenceChanged(({ preferenceName, newValue }) => {
-            if (preferenceName === "build.buildMode") {
-                app.emit("ves-set-build-mode", newValue);
-            }
-        });
+
+        app.emit("ves-change-build-mode", this.preferenceService.get("build.buildMode"));
+        app.emit("ves-change-connected-flash-cart", this.vesState.connectedFlashCart);
+        app.emit("ves-change-build-folder", this.vesState.buildFolderExists);
+
+        this.vesState.onDidChangeIsBuilding((flag) => app.emit("ves-change-is-building", flag));
+        this.vesState.onDidChangeIsRunQueued((flag) => app.emit("ves-change-is-run-queued", flag));
+        this.vesState.onDidChangeIsFlashQueued((flag) => app.emit("ves-change-is-flash-queued", flag));
+        this.vesState.onDidChangeIsExportQueued((flag) => app.emit("ves-change-is-export-queued", flag));
+        this.vesState.onDidChangeConnectedFlashCart((config) => app.emit("ves-change-connected-flash-cart", config));
+        this.vesState.onDidChangeBuildMode((buildMode) => app.emit("ves-change-build-mode", buildMode));
+        this.vesState.onDidChangeBuildFolder((flags) => app.emit("ves-change-build-folder", flags));
     }
 }
 

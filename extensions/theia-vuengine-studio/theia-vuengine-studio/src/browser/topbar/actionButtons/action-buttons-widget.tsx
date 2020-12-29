@@ -51,7 +51,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                 className="theia-button secondary clean"
                 title={this.vesState.isCleaning ? "Cleaning..." : `Clean${this.getKeybindingLabel(VesBuildCleanCommand.id)}`}
                 disabled={!this.vesState.buildFolderExists[buildMode]}
-                onClick={this.handleCleanOnClick}
+                onClick={() => this.commandService.executeCommand(VesBuildCleanCommand.id)}
             >
                 {this.vesState.isCleaning
                     ? <i className="fa fa-spinner fa-pulse"></i>
@@ -60,7 +60,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
             <button
                 className="theia-button secondary build"
                 title={this.vesState.isBuilding ? "Building..." : "Build"}
-                onClick={this.handleBuildOnClick}
+                onClick={() => this.commandService.executeCommand(VesBuildCommand.id)}
             >
                 {this.vesState.isBuilding
                     ? <i className="fa fa-spinner fa-pulse"></i>
@@ -69,7 +69,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
             <button
                 className="theia-button secondary run"
                 title={this.vesState.isRunQueued ? "Run Queued..." : "Run"}
-                onClick={this.handleRunOnClick}
+                onClick={() => this.commandService.executeCommand(VesRunCommand.id)}
             >
                 {this.vesState.isRunQueued
                     ? <i className="fa fa-hourglass-half"></i>
@@ -83,7 +83,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                         ? `Flash to ${this.vesState.connectedFlashCart.name} Queued...`
                         : `Flash to ${this.vesState.connectedFlashCart.name}`}
                 disabled={!this.vesState.connectedFlashCart}
-                onClick={this.handleFlashOnClick}
+                onClick={() => this.commandService.executeCommand(VesFlashCartsCommand.id)}
             >
                 {this.vesState.isFlashQueued
                     ? <i className="fa fa-hourglass-half"></i>
@@ -92,40 +92,14 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
             <button
                 className="theia-button secondary export"
                 title={this.vesState.isExportQueued ? "Export Queued..." : "Export"}
-                onClick={this.handleExportOnClick}
+                onClick={() => this.commandService.executeCommand(VesBuildExportCommand.id)}
             >
                 {this.vesState.isExportQueued
                     ? <i className="fa fa-hourglass-half"></i>
-                    : <i className="fa fa-share-square"></i>}
+                    : <i className="fa fa-share-square-o"></i>}
             </button>
         </>
     }
-
-    protected handleCleanOnClick = () => {
-        this.commandService.executeCommand(VesBuildCleanCommand.id);
-    };
-
-    protected handleBuildOnClick = () => {
-        this.commandService.executeCommand(VesBuildCommand.id);
-    };
-
-    protected handleExportOnClick = () => {
-        this.vesState.isExportQueued
-            ? this.vesState.isExportQueued = false
-            : this.commandService.executeCommand(VesBuildExportCommand.id)
-    };
-
-    protected handleFlashOnClick = () => {
-        this.vesState.isFlashQueued
-            ? this.vesState.isFlashQueued = false
-            : this.commandService.executeCommand(VesFlashCartsCommand.id)
-    };
-
-    protected handleRunOnClick = () => {
-        this.vesState.isRunQueued
-            ? this.vesState.isRunQueued = false
-            : this.commandService.executeCommand(VesRunCommand.id)
-    };
 
     protected getKeybindingLabel = (commandId: string) => {
         // TODO: this is initially not available

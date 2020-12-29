@@ -16,6 +16,11 @@ export async function exportCommand(
   fileDialogService: FileDialogService,
   vesState: VesStateModel
 ) {
+  if (vesState.isExportQueued) {
+    vesState.isExportQueued = false;
+    return;
+  }
+
   vesState.onDidChangeOutputRomExists(outputRomExists => {
     if (outputRomExists && vesState.isExportQueued) {
       vesState.isExportQueued = false;
