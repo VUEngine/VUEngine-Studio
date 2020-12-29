@@ -12,6 +12,7 @@ import { BuildMode } from "../../build/types";
 import { VesRunCommand } from '../../run/commands';
 import { VesFlashCartsCommand } from '../../flash-carts/commands';
 import { VesBuildModePreference } from '../../build/preferences';
+import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 
 @injectable()
 export class VesTopbarActionButtonsWidget extends ReactWidget {
@@ -21,6 +22,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
 
     @inject(CommandService) protected readonly commandService!: CommandService;
     @inject(FileService) protected readonly fileService!: FileService;
+    @inject(FrontendApplicationStateService) protected readonly frontendApplicationStateService: FrontendApplicationStateService;
     @inject(KeybindingRegistry) protected readonly keybindingRegistry!: KeybindingRegistry;
     @inject(MessageService) protected readonly messageService!: MessageService;
     @inject(PreferenceService) protected readonly preferenceService!: PreferenceService;
@@ -33,6 +35,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
         this.title.caption = VesTopbarActionButtonsWidget.LABEL;
         this.title.closable = false;
         this.addClass(`os-${getOs()}`);
+
         this.vesState.onDidChangeIsCleaning(() => this.update());
         this.vesState.onDidChangeIsBuilding(() => this.update());
         this.vesState.onDidChangeIsExportQueued(() => this.update());
@@ -42,7 +45,10 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
         this.vesState.onDidChangeBuildFolder(() => this.update());
         this.vesState.onDidChangeOutputRomExists(() => this.update());
         this.keybindingRegistry.onKeybindingsChanged(() => this.update());
-        this.update();
+
+        this.frontendApplicationStateService.onStateChanged((state: FrontendApplicationState) => {
+            if (state === 'ready') this.update();
+        });
     }
 
     protected render(): React.ReactNode {
@@ -60,7 +66,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
             </button>
             <button
                 className="theia-button secondary build"
-                title={this.vesState.isBuilding ? "Building..." : "Build"}
+                title={this.vesState.isBuilding ? "Building..." : `Build${this.getKeybindingLabel(VesBuildCommand.id)}`}
                 onClick={() => this.commandService.executeCommand(VesBuildCommand.id)}
             >
                 {this.vesState.isBuilding
@@ -69,7 +75,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
             </button>
             <button
                 className="theia-button secondary run"
-                title={this.vesState.isRunQueued ? "Run Queued..." : "Run"}
+                title={this.vesState.isRunQueued ? "Run Queued..." : `Run${this.getKeybindingLabel(VesRunCommand.id)}`}
                 onClick={() => this.commandService.executeCommand(VesRunCommand.id)}
             >
                 {this.vesState.isRunQueued
@@ -82,7 +88,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                     ? "No Flash Cart Connected"
                     : this.vesState.isFlashQueued
                         ? `Flash to ${this.vesState.connectedFlashCart.name} Queued...`
-                        : `Flash to ${this.vesState.connectedFlashCart.name}`}
+                        : `Flash to ${this.vesState.connectedFlashCart.name}${this.getKeybindingLabel(VesFlashCartsCommand.id)}`}
                 disabled={!this.vesState.connectedFlashCart}
                 onClick={() => this.commandService.executeCommand(VesFlashCartsCommand.id)}
             >
@@ -92,7 +98,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
             </button>
             <button
                 className="theia-button secondary export"
-                title={this.vesState.isExportQueued ? "Export Queued..." : "Export"}
+                title={this.vesState.isExportQueued ? "Export Queued..." : `Export${this.getKeybindingLabel(VesBuildExportCommand.id)}`}
                 onClick={() => this.commandService.executeCommand(VesBuildExportCommand.id)}
             >
                 {this.vesState.isExportQueued
@@ -103,11 +109,8 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
     }
 
     protected getKeybindingLabel = (commandId: string) => {
-        // TODO: this is initially not available
         const cleanKeybinding = this.keybindingRegistry.getKeybindingsForCommand(commandId).pop();
         const cleanKeybindingAccelerator = cleanKeybinding ? ` (${this.keybindingRegistry.acceleratorFor(cleanKeybinding, "+")})` : "";
         return cleanKeybindingAccelerator;
     };
-
-    // protected updateIsBuilding = (e: React.ChangeEvent<HTMLInputElement>) => this.vesState.isBuilding = e.target.value === "dings";
 }
