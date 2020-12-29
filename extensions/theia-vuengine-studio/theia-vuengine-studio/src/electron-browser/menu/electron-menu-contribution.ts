@@ -1,9 +1,10 @@
 import { inject, injectable, interfaces } from "inversify";
+import { remote } from "electron";
 import { FrontendApplication, PreferenceService } from "@theia/core/lib/browser";
 import { ElectronMenuContribution } from "@theia/core/lib/electron-browser/menu/electron-menu-contribution";
-import { CommandService } from "@theia/core";
+import { CommandService, isOSX } from "@theia/core";
 import { VesStateModel } from "../../browser/common/vesStateModel";
-import { VesBuildModePreference } from "../../browser/build/preferences";
+import { VesBuildDumpElfPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "../../browser/build/preferences";
 
 @injectable()
 export class VesElectronMenuContribution extends ElectronMenuContribution {
@@ -13,14 +14,34 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
 
     onStart(app: FrontendApplication): void {
         super.onStart(app);
-        this.bindVesTouchBar();
+        this.vesBindTouchBar();
+        this.vesBindDynamicMenu();
     }
 
     protected hideTopPanel(app: FrontendApplication): void {
         // override this with an empty function so the top panel is not removed in electron
     }
 
-    protected bindVesTouchBar(): void {
+    protected vesBindDynamicMenu(): void {
+        // workaround for dynamic menus in electron 
+        // @see: https://github.com/eclipse-theia/theia/issues/446
+        // TODO: remove this function when issue resolved
+        if (isOSX) {
+            const rebuildMenu = () => remote.Menu.setApplicationMenu(this.factory.createMenuBar());
+
+            this.vesState.onDidChangeBuildMode(() => rebuildMenu());
+            this.preferenceService.onPreferenceChanged(({ preferenceName }) => {
+                if ([
+                    VesBuildDumpElfPreference.id,
+                    VesBuildPedanticWarningsPreference.id
+                ].includes(preferenceName)) {
+                    rebuildMenu();
+                }
+            });
+        }
+    }
+
+    protected vesBindTouchBar(): void {
         const { app } = require("electron").remote;
 
         app.on("ves-execute-command", (command: string) => this.commandService.executeCommand(command));
