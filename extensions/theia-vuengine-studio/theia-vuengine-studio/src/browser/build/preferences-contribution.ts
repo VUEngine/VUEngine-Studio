@@ -7,41 +7,19 @@ import {
   PreferenceContribution,
   PreferenceSchema,
 } from "@theia/core/lib/browser";
-import { BuildMode, DEFAULT_BUILD_MODE } from "./types";
+import { VesBuildDumpElfPreference, VesBuildEnableWslPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "./preferences";
 
 const VesBuildPreferenceSchema: PreferenceSchema = {
   type: "object",
   properties: {
-    "build.buildMode": {
-      type: "string",
-      default: DEFAULT_BUILD_MODE,
-      enum: [
-        BuildMode.release,
-        BuildMode.beta,
-        BuildMode.tools,
-        BuildMode.debug,
-        BuildMode.preprocessor,
-      ],
-    },
-    "build.dumpElf": {
-      type: "boolean",
-      description: "Dump assembly code and memory sections",
-      default: false,
-    },
-    "build.pedanticWarnings": {
-      type: "boolean",
-      description: "Enable pedantic compiler warnigns",
-      default: false,
-    },
-  },
+    [VesBuildModePreference.id]: VesBuildModePreference.property,
+    [VesBuildDumpElfPreference.id]: VesBuildDumpElfPreference.property,
+    [VesBuildPedanticWarningsPreference.id]: VesBuildPedanticWarningsPreference.property,
+  }
 };
 
 if (isWindows) {
-  VesBuildPreferenceSchema.properties["build.enableWsl"] = {
-    type: "boolean",
-    description: "Build in WSL for faster compilation times",
-    default: false,
-  };
+  VesBuildPreferenceSchema.properties[VesBuildEnableWslPreference.id] = VesBuildEnableWslPreference.property;
 }
 
 const VesBuildPreferences = Symbol("VesBuildPreferences");

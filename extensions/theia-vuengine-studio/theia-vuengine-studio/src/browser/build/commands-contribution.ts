@@ -20,7 +20,8 @@ import { toggleDumpElf } from "./commands/toggleDumpElf";
 import { togglePedanticWarnings } from "./commands/togglePedanticWarnings";
 import { VesStateModel } from "../common/vesStateModel";
 import { toggleEnableWsl } from "./commands/toggleEnableWSL";
-import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand, VesBuildSetModeBetaCommand, VesBuildSetModeCommand, VesBuildSetModeDebugCommand, VesBuildSetModePreprocessorCommand, VesBuildSetModeReleaseCommand, VesBuildSetModeToolsCommand, VesBuildToggleDumpElfCommand, VesBuildToggleEnableWslCommand, VesBuildTogglePedanticWarningsCommand } from "./commands/definitions";
+import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand, VesBuildSetModeBetaCommand, VesBuildSetModeCommand, VesBuildSetModeDebugCommand, VesBuildSetModePreprocessorCommand, VesBuildSetModeReleaseCommand, VesBuildSetModeToolsCommand, VesBuildToggleDumpElfCommand, VesBuildToggleEnableWslCommand, VesBuildTogglePedanticWarningsCommand } from "./commands";
+import { VesBuildDumpElfPreference, VesBuildEnableWslPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "./preferences";
 
 @injectable()
 export class VesBuildCommandContribution implements CommandContribution {
@@ -74,39 +75,39 @@ export class VesBuildCommandContribution implements CommandContribution {
     });
     registry.registerCommand(VesBuildSetModeReleaseCommand, {
       execute: () => setModeCommand(this.preferenceService, this.quickPickService, BuildMode.release),
-      isToggled: () => this.preferenceService.get("build.buildMode") == BuildMode.release
+      isToggled: () => this.preferenceService.get(VesBuildModePreference.id) == BuildMode.release
     });
     registry.registerCommand(VesBuildSetModeBetaCommand, {
       execute: () => setModeCommand(this.preferenceService, this.quickPickService, BuildMode.beta),
-      isToggled: () => this.preferenceService.get("build.buildMode") == BuildMode.beta,
+      isToggled: () => this.preferenceService.get(VesBuildModePreference.id) == BuildMode.beta,
     });
     registry.registerCommand(VesBuildSetModeToolsCommand, {
       execute: () => setModeCommand(this.preferenceService, this.quickPickService, BuildMode.tools),
-      isToggled: () => this.preferenceService.get("build.buildMode") == BuildMode.tools,
+      isToggled: () => this.preferenceService.get(VesBuildModePreference.id) == BuildMode.tools,
     });
     registry.registerCommand(VesBuildSetModeDebugCommand, {
       execute: () => setModeCommand(this.preferenceService, this.quickPickService, BuildMode.debug),
-      isToggled: () => this.preferenceService.get("build.buildMode") == BuildMode.debug,
+      isToggled: () => this.preferenceService.get(VesBuildModePreference.id) == BuildMode.debug,
     });
     registry.registerCommand(VesBuildSetModePreprocessorCommand, {
       execute: () => setModeCommand(this.preferenceService, this.quickPickService, BuildMode.preprocessor),
-      isToggled: () => this.preferenceService.get("build.buildMode") == BuildMode.preprocessor,
+      isToggled: () => this.preferenceService.get(VesBuildModePreference.id) == BuildMode.preprocessor,
     });
 
     registry.registerCommand(VesBuildToggleDumpElfCommand, {
       execute: () => toggleDumpElf(this.preferenceService),
-      isToggled: () => !!this.preferenceService.get("build.dumpElf"),
+      isToggled: () => !!this.preferenceService.get(VesBuildDumpElfPreference.id),
     });
 
     registry.registerCommand(VesBuildTogglePedanticWarningsCommand, {
       execute: () => togglePedanticWarnings(this.preferenceService),
-      isToggled: () => !!this.preferenceService.get("build.pedanticWarnings"),
+      isToggled: () => !!this.preferenceService.get(VesBuildPedanticWarningsPreference.id),
     });
 
     if (isWindows) {
       registry.registerCommand(VesBuildToggleEnableWslCommand, {
         execute: () => toggleEnableWsl(this.preferenceService),
-        isToggled: () => !!this.preferenceService.get("build.enableWsl"),
+        isToggled: () => !!this.preferenceService.get(VesBuildEnableWslPreference.id),
       });
     }
   }

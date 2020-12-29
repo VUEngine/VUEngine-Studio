@@ -4,13 +4,14 @@ import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { CommandService, MessageService } from '@theia/core';
 import { KeybindingRegistry } from "@theia/core/lib/browser/keybinding";
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand } from '../../build/commands/definitions';
+import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand } from '../../build/commands';
 import { VesStateModel } from '../../common/vesStateModel';
 import { getOs } from '../../common';
 import { PreferenceService } from '@theia/core/lib/browser';
 import { BuildMode } from "../../build/types";
-import { VesRunCommand } from '../../run/commands/definitions';
-import { VesFlashCartsCommand } from '../../flash-carts/commands/definitions';
+import { VesRunCommand } from '../../run/commands';
+import { VesFlashCartsCommand } from '../../flash-carts/commands';
+import { VesBuildModePreference } from '../../build/preferences';
 
 @injectable()
 export class VesTopbarActionButtonsWidget extends ReactWidget {
@@ -45,7 +46,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
     }
 
     protected render(): React.ReactNode {
-        const buildMode = this.preferenceService.get("build.buildMode") as BuildMode;
+        const buildMode = this.preferenceService.get(VesBuildModePreference.id) as BuildMode;
         return <>
             <button
                 className="theia-button secondary clean"

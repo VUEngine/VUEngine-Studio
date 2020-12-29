@@ -7,6 +7,7 @@ import { cpus } from "os";
 import { join as joinPath } from "path";
 import { convertoToEnvPath, getOs, getResourcesPath, getWorkspaceRoot } from "../../common";
 import { VesStateModel } from "../../common/vesStateModel";
+import { VesBuildDumpElfPreference, VesBuildEnableWslPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "../preferences";
 
 export async function buildCommand(
   fileService: FileService,
@@ -25,9 +26,9 @@ async function build(
   terminalService: TerminalService,
   vesState: VesStateModel
 ) {
-  const buildMode = preferenceService.get("build.buildMode");
-  const dumpElf = preferenceService.get("build.dumpElf");
-  const pedanticWarnings = preferenceService.get("build.pedanticWarnings");
+  const buildMode = preferenceService.get(VesBuildModePreference.id);
+  const dumpElf = preferenceService.get(VesBuildDumpElfPreference.id);
+  const pedanticWarnings = preferenceService.get(VesBuildPedanticWarningsPreference.id);
   const engineCorePath = getEngineCorePath();
   const enginePluginsPath = getEnginePluginsPath();
   const compilerPath = getCompilerPath();
@@ -71,7 +72,7 @@ async function build(
   let shellPath = "";
   let shellArgs = [""];
   if (isWindows) {
-    const enableWsl = preferenceService.get("build.enableWsl");
+    const enableWsl = preferenceService.get(VesBuildEnableWslPreference.id);
     if (enableWsl) {
       shellPath = process.env.windir + '\\System32\\wsl.exe';
     } else {

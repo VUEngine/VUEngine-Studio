@@ -7,6 +7,7 @@ import { BuildMode } from "../build/types";
 import { FlashCartConfig } from "../flash-carts/commands/flash";
 import { getBuildPath, getRomPath } from ".";
 import { PreferenceService } from "@theia/core/lib/browser";
+import { VesBuildModePreference } from "../build/preferences";
 
 type BuildFolderFlags = {
     [key: string]: boolean
@@ -43,7 +44,7 @@ export class VesStateModel {
 
         // watch for build mode changes
         this.preferenceService.onPreferenceChanged(({ preferenceName, newValue }) => {
-            if (preferenceName === "build.buildMode") {
+            if (preferenceName === VesBuildModePreference.id) {
                 this.onDidChangeBuildModeEmitter.fire(newValue);
                 this.onDidChangeBuildFolderEmitter.fire(this._buildFolderExists);
             }

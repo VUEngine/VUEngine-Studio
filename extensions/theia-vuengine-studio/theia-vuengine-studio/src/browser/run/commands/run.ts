@@ -2,9 +2,10 @@ import { PreferenceService } from "@theia/core/lib/browser";
 import { CommandService, isWindows } from "@theia/core/lib/common";
 import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
 import { join as joinPath } from "path";
-import { VesBuildCommand } from "../../build/commands/definitions";
+import { VesBuildCommand } from "../../build/commands";
 import { getOs, getResourcesPath, getRomPath } from "../../common";
 import { VesStateModel } from "../../common/vesStateModel";
+import { VesRunEmulatorsPreference } from "../preferences";
 
 type EmulatorConfig = {
   name: string;
@@ -42,7 +43,7 @@ async function run(
   preferenceService: PreferenceService,
   terminalService: TerminalService
 ) {
-  const emulatorConfigs: EmulatorConfig[] = preferenceService.get("emulators.emulators") ?? [];
+  const emulatorConfigs: EmulatorConfig[] = preferenceService.get(VesRunEmulatorsPreference.id) ?? [];
 
   // TODO: choose user selected emulator (or first one if none or no valid one selected)
   const defaultEmulator: EmulatorConfig = {

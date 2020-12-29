@@ -1,6 +1,7 @@
 import { PreferenceScope, PreferenceService } from "@theia/core/lib/browser";
+import { VesBuildDumpElfPreference } from "../preferences";
 
 export async function toggleDumpElf(preferenceService: PreferenceService) {
-  const current = preferenceService.get("build.dumpElf");
-  preferenceService.set("build.dumpElf", !current, PreferenceScope.User);
+  const current = preferenceService.get(VesBuildDumpElfPreference.id);
+  preferenceService.set(VesBuildDumpElfPreference.id, !current, PreferenceScope.User);
 }

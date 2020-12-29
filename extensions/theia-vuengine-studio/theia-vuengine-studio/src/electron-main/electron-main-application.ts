@@ -2,9 +2,9 @@ import { injectable } from 'inversify';
 import { app, BrowserWindow, nativeImage, TouchBar } from 'electron';
 import { ElectronMainApplication, TheiaBrowserWindowOptions } from '@theia/core/lib/electron-main/electron-main-application';
 import { isOSX, MaybePromise } from '@theia/core';
-import { VesRunCommand } from '../browser/run/commands/definitions';
-import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand, VesBuildSetModeBetaCommand, VesBuildSetModeDebugCommand, VesBuildSetModePreprocessorCommand, VesBuildSetModeReleaseCommand, VesBuildSetModeToolsCommand } from '../browser/build/commands/definitions';
-import { VesFlashCartsCommand } from '../browser/flash-carts/commands/definitions';
+import { VesRunCommand } from '../browser/run/commands';
+import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand, VesBuildSetModeBetaCommand, VesBuildSetModeDebugCommand, VesBuildSetModePreprocessorCommand, VesBuildSetModeReleaseCommand, VesBuildSetModeToolsCommand } from '../browser/build/commands';
+import { VesFlashCartsCommand } from '../browser/flash-carts/commands';
 import { BuildMode } from '../browser/build/types';
 
 @injectable()
@@ -176,7 +176,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         // @ts-ignore
         app.on("ves-change-is-building", (isBuilding: boolean) => {
             if (isBuilding) {
-                spinnerIconIntervall = setInterval(animateSpinner, 100);
+                spinnerIconIntervall = setInterval(animateSpinner, 130);
             } else {
                 if (spinnerIconIntervall) clearInterval(spinnerIconIntervall);
                 buildMenuBuildButton.icon = buildIcon;

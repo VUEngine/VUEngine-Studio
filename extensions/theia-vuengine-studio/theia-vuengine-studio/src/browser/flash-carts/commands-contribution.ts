@@ -11,7 +11,7 @@ import { PreferenceService } from "@theia/core/lib/browser";
 import { VesStateModel } from "../common/vesStateModel";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { VesUsbService } from "../../common/usb-service-protocol";
-import { VesFlashCartsCommand } from "./commands/definitions";
+import { VesFlashCartsCommand } from "./commands";
 
 @injectable()
 export class VesFlashCartsCommandContribution implements CommandContribution {

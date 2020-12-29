@@ -1,5 +1,6 @@
 import { PreferenceScope, PreferenceService } from "@theia/core/lib/browser";
 import { QuickPickOptions, QuickPickService } from "@theia/core/lib/common/quick-pick-service";
+import { VesBuildModePreference } from "../preferences";
 import { BuildMode } from "../types";
 
 export async function setModeCommand(
@@ -58,5 +59,5 @@ export async function setModeCommand(
   });
 }
 function setBuildMode(preferenceService: PreferenceService, buildMode: string) {
-  preferenceService.set("build.buildMode", buildMode, PreferenceScope.User);
+  preferenceService.set(VesBuildModePreference.id, buildMode, PreferenceScope.User);
 }

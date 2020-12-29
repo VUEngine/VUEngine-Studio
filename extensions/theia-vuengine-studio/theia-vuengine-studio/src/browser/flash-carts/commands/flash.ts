@@ -11,9 +11,11 @@ import { createWriteStream, readFileSync, unlinkSync } from "fs";
 import { dirname, join as joinPath } from "path";
 import { VesUsbService } from "../../../common/usb-service-protocol";
 
-import { VesBuildCommand } from "../../build/commands/definitions";
+import { VesBuildCommand } from "../../build/commands";
+import { VesBuildEnableWslPreference } from "../../build/preferences";
 import { convertoToEnvPath, getOs, getResourcesPath, getRomPath } from "../../common";
 import { VesStateModel } from "../../common/vesStateModel";
+import { VesFlashCartsCustomPreference } from "../preferences";
 
 export type FlashCartConfig = {
   name: string;
@@ -120,7 +122,7 @@ function getFlashCartConfigs(preferenceService: PreferenceService) {
   ];
 
   const userDefinedFlashCartConfigs: FlashCartConfig[] | undefined =
-    preferenceService.get("flashCarts.customFlashCarts") ?? [];
+    preferenceService.get(VesFlashCartsCustomPreference.id) ?? [];
 
   return [...flashCartConfigs, ...userDefinedFlashCartConfigs];
 }
@@ -157,7 +159,7 @@ async function flash(
     vesState.connectedFlashCart.path
   );
 
-  const enableWsl = preferenceService.get("build.enableWsl");
+  const enableWsl = preferenceService.get(VesBuildEnableWslPreference.id);
   if (isWindows && enableWsl) {
     flasherEnvPath.replace(/\.[^/.]+$/, "");
   }

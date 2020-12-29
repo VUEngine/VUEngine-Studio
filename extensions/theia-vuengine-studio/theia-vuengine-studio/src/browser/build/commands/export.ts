@@ -8,7 +8,7 @@ import {
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { getRomPath } from "../../common";
 import { VesStateModel } from "../../common/vesStateModel";
-import { VesBuildCommand } from "./definitions";
+import { VesBuildCommand } from "../commands";
 
 export async function exportCommand(
   commandService: CommandService,

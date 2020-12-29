@@ -1,6 +1,7 @@
 import { PreferenceScope, PreferenceService } from "@theia/core/lib/browser";
+import { VesBuildEnableWslPreference } from "../preferences";
 
 export async function toggleEnableWsl(preferenceService: PreferenceService) {
-  const current = preferenceService.get("build.enableWsl");
-  preferenceService.set("build.enableWsl", !current, PreferenceScope.User);
+  const current = preferenceService.get(VesBuildEnableWslPreference.id);
+  preferenceService.set(VesBuildEnableWslPreference.id, !current, PreferenceScope.User);
 }

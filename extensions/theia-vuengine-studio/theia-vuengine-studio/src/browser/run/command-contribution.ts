@@ -10,7 +10,7 @@ import { runCommand } from "./commands/run";
 import { selectEmulatorCommand } from "./commands/selectEmulator";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { VesStateModel } from "../common/vesStateModel";
-import { VesRunCommand, VesSelectEmulatorCommand } from "./commands/definitions";
+import { VesRunCommand, VesSelectEmulatorCommand } from "./commands";
 
 @injectable()
 export class VesRunCommandContribution implements CommandContribution {
