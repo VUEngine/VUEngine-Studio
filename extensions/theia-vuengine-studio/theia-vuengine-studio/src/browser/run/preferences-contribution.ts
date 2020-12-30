@@ -6,12 +6,12 @@ import {
   PreferenceContribution,
   PreferenceSchema,
 } from "@theia/core/lib/browser";
-import { VesRunDefaultEmulatorPreference, VesRunEmulatorsCustomPreference } from "./preferences";
+import { VesRunDefaultEmulatorPreference, VesRunEmulatorConfigsPreference } from "./preferences";
 
 const VesRunPreferenceSchema: PreferenceSchema = {
   type: "object",
   properties: {
-    [VesRunEmulatorsCustomPreference.id]: VesRunEmulatorsCustomPreference.property,
+    [VesRunEmulatorConfigsPreference.id]: VesRunEmulatorConfigsPreference.property,
     [VesRunDefaultEmulatorPreference.id]: VesRunDefaultEmulatorPreference.property,
   },
 };

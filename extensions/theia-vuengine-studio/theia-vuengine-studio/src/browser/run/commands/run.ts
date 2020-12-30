@@ -5,7 +5,7 @@ import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-servi
 import { VesBuildCommand } from "../../build/commands";
 import { getOs, getResourcesPath, getRomPath } from "../../common";
 import { VesStateModel } from "../../common/vesStateModel";
-import { VesRunDefaultEmulatorPreference, VesRunEmulatorsCustomPreference } from "../preferences";
+import { VesRunDefaultEmulatorPreference, VesRunEmulatorConfigsPreference } from "../preferences";
 import { EmulatorConfig } from "../types";
 
 export async function runCommand(
@@ -41,9 +41,16 @@ async function run(
   const defaultEmulatorConfig = getDefaultEmulatorConfig(preferenceService);
   if (!defaultEmulatorConfig) return;
 
-  const fixPermissions = isWindows ? "" : `chmod a+x "${defaultEmulatorConfig.path}" && `;
-  const emulatorPath = `"${defaultEmulatorConfig.path}"`;
+  const emulatorPath = `"${defaultEmulatorConfig.path.replace("%MEDNAFEN%", joinPath(
+    getResourcesPath(),
+    "binaries",
+    "vuengine-studio-tools",
+    getOs(),
+    "mednafen",
+    isWindows ? "mednafen.exe" : "mednafen"
+  ))}"`;
   const emulatorArgs = ` ${defaultEmulatorConfig.args.replace("%ROM%", `"${getRomPath()}"`)}`;
+  const fixPermissions = isWindows ? "" : `chmod a+x "${emulatorPath}" && `;
 
   const terminalId = "vuengine-run";
   const terminalWidget = terminalService.getById(terminalId) || await terminalService.newTerminal({
@@ -72,30 +79,10 @@ export function getDefaultEmulatorConfig(preferenceService: PreferenceService): 
 }
 
 export function getEmulatorConfigs(preferenceService: PreferenceService) {
-  const defaultEmulatorPath = joinPath(
-    getResourcesPath(),
-    "binaries",
-    "vuengine-studio-tools",
-    getOs(),
-    "mednafen",
-    isWindows ? "mednafen.exe" : "mednafen"
-  );
+  const emulatorConfigs: EmulatorConfig[] | undefined =
+    preferenceService.get(VesRunEmulatorConfigsPreference.id) ?? [];
 
-  const emulatorConfigs: EmulatorConfig[] = [
-    {
-      name: "Mednafen (2D)",
-      path: defaultEmulatorPath,
-      args: "-'vb.3dmode' 'anaglyph' -'vb.anaglyph.preset' 'disabled' -'vb.anaglyph.lcolor' '0xff0000' -'vb.anaglyph.rcolor' '0x000000' -'vb.xscale' 2 -'vb.yscale' 2 %ROM%",
-    },
-    {
-      name: "Mednafen (Anaglyph)",
-      path: defaultEmulatorPath,
-      args: "-'vb.3dmode' 'anaglyph' -'vb.anaglyph.preset' 'red_blue' -'vb.anaglyph.lcolor' '0xffba00' -'vb.anaglyph.rcolor' '0x00baff' -'vb.xscale' 2 -'vb.yscale' 2 %ROM%",
-    },
-  ];
-
-  const userDefinedEmulatorConfigs: EmulatorConfig[] | undefined =
-    preferenceService.get(VesRunEmulatorsCustomPreference.id) ?? [];
-
-  return [...emulatorConfigs, ...userDefinedEmulatorConfigs];
+  return emulatorConfigs.length > 0
+    ? emulatorConfigs
+    : VesRunEmulatorConfigsPreference.property.default
 }

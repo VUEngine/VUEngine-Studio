@@ -15,8 +15,8 @@ async function selectEmulator(
   quickPickService: QuickPickService,
 ) {
   const quickPickOptions: QuickPickOptions = {
-    title: "Select default emulator",
-    placeholder: "Which of the configured emulators do you want to use to run compiled projects?",
+    title: "Select default emulator configuration",
+    placeholder: "Which emulator configuration should be used to run compiled projects?",
   };
   const quickPickItems: QuickPickItem<string>[] = [];
 
