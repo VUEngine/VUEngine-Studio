@@ -88,7 +88,7 @@ export function getEmulatorConfigs(preferenceService: PreferenceService) {
       args: "-'vb.3dmode' 'anaglyph' -'vb.anaglyph.preset' 'disabled' -'vb.anaglyph.lcolor' '0xff0000' -'vb.anaglyph.rcolor' '0x000000' -'vb.xscale' 2 -'vb.yscale' 2 %ROM%",
     },
     {
-      name: "Mednafen (Anaglyph Red/Blue)",
+      name: "Mednafen (Anaglyph)",
       path: defaultEmulatorPath,
       args: "-'vb.3dmode' 'anaglyph' -'vb.anaglyph.preset' 'red_blue' -'vb.anaglyph.lcolor' '0xffba00' -'vb.anaglyph.rcolor' '0x00baff' -'vb.xscale' 2 -'vb.yscale' 2 %ROM%",
     },

@@ -2,7 +2,7 @@ import { injectable } from 'inversify';
 import { app, BrowserWindow, nativeImage, TouchBar } from 'electron';
 import { ElectronMainApplication, TheiaBrowserWindowOptions } from '@theia/core/lib/electron-main/electron-main-application';
 import { isOSX, MaybePromise } from '@theia/core';
-import { VesRunCommand } from '../browser/run/commands';
+import { VesRunCommand, VesSelectEmulatorCommand } from '../browser/run/commands';
 import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand, VesBuildSetModeBetaCommand, VesBuildSetModeDebugCommand, VesBuildSetModePreprocessorCommand, VesBuildSetModeReleaseCommand, VesBuildSetModeToolsCommand } from '../browser/build/commands';
 import { VesFlashCartsCommand } from '../browser/flash-carts/commands';
 import { BuildMode } from '../browser/build/types';
@@ -110,39 +110,33 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             change: (selectedIndex) => app.emit("ves-execute-command", buildMenuSegmentedControlSegments[selectedIndex].accessibilityLabel),
         });
 
-        const buildModes = [
-            {
-                label: this.capitalizeFirstLetter(BuildMode.release),
-                accessibilityLabel: VesBuildSetModeReleaseCommand.id,
-            },
-            {
-                label: this.capitalizeFirstLetter(BuildMode.beta),
-                accessibilityLabel: VesBuildSetModeBetaCommand.id,
-            },
-            {
-                label: this.capitalizeFirstLetter(BuildMode.tools),
-                accessibilityLabel: VesBuildSetModeToolsCommand.id,
-            },
-            {
-                label: this.capitalizeFirstLetter(BuildMode.debug),
-                accessibilityLabel: VesBuildSetModeDebugCommand.id,
-            },
-            {
-                label: this.capitalizeFirstLetter(BuildMode.preprocessor),
-                accessibilityLabel: VesBuildSetModePreprocessorCommand.id,
-            },
-        ];
+        const buildModes = [{
+            label: this.capitalizeFirstLetter(BuildMode.release),
+            accessibilityLabel: VesBuildSetModeReleaseCommand.id,
+        }, {
+            label: this.capitalizeFirstLetter(BuildMode.beta),
+            accessibilityLabel: VesBuildSetModeBetaCommand.id,
+        }, {
+            label: this.capitalizeFirstLetter(BuildMode.tools),
+            accessibilityLabel: VesBuildSetModeToolsCommand.id,
+        }, {
+            label: this.capitalizeFirstLetter(BuildMode.debug),
+            accessibilityLabel: VesBuildSetModeDebugCommand.id,
+        }, {
+            label: this.capitalizeFirstLetter(BuildMode.preprocessor),
+            accessibilityLabel: VesBuildSetModePreprocessorCommand.id,
+        }];
 
         const buildModeButtonSegmentedControl = new TouchBarSegmentedControl({
             segmentStyle: 'automatic',
             mode: 'single',
             segments: buildModes,
-            selectedIndex: 0,
+            selectedIndex: 1,
             change: (selectedIndex) => app.emit("ves-execute-command", buildModes[selectedIndex].accessibilityLabel),
         });
 
         const buildModeButton = new TouchBarPopover({
-            label: `Beta`,
+            label: buildModes[buildModeButtonSegmentedControl.selectedIndex].label,
             showCloseButton: true,
             items: new TouchBar({
                 items: [
@@ -152,11 +146,17 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             }),
         });
 
+        const emulatorButton = new TouchBarButton({
+            label: "Mednafen (2D)",
+            click: () => app.emit("ves-execute-command", VesSelectEmulatorCommand.id),
+        });
+
         const vesTouchBar = new TouchBar({
             items: [
                 vesButton,
                 buildMenuSegmentedControl,
                 buildModeButton,
+                emulatorButton,
             ]
         });
 
@@ -209,6 +209,10 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             buildMenuCleanButton.enabled = flags[buildMode];
             redrawMenuSegmentedControl();
         });
+        // @ts-ignore
+        app.on("ves-change-emulator", (name) => {
+            emulatorButton.label = this.shorten(name, 20);
+        });
 
         const animateSpinner = () => {
             spinnerIconFrame++;
@@ -224,5 +228,11 @@ export class VesElectronMainApplication extends ElectronMainApplication {
 
     private capitalizeFirstLetter(word: string) {
         return word.charAt(0).toUpperCase() + word.slice(1);
+    }
+
+    private shorten(word: string, length: number) {
+        if (word.length <= length) return word;
+
+        return word.slice(0, length) + "…";
     }
 }

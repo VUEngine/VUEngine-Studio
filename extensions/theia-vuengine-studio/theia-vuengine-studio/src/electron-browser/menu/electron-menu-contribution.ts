@@ -5,6 +5,7 @@ import { ElectronMenuContribution } from "@theia/core/lib/electron-browser/menu/
 import { CommandService, isOSX } from "@theia/core";
 import { VesStateModel } from "../../browser/common/vesStateModel";
 import { VesBuildDumpElfPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "../../browser/build/preferences";
+import { getDefaultEmulatorConfig } from "../../browser/run/commands/run";
 
 @injectable()
 export class VesElectronMenuContribution extends ElectronMenuContribution {
@@ -46,9 +47,11 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
 
         app.on("ves-execute-command", (command: string) => this.commandService.executeCommand(command));
 
+        // init touchbar values
         app.emit("ves-change-build-mode", this.preferenceService.get(VesBuildModePreference.id));
         app.emit("ves-change-connected-flash-cart", this.vesState.connectedFlashCart);
         app.emit("ves-change-build-folder", this.vesState.buildFolderExists);
+        app.emit("ves-change-emulator", getDefaultEmulatorConfig(this.preferenceService).name);
 
         this.vesState.onDidChangeIsBuilding((flag) => app.emit("ves-change-is-building", flag));
         this.vesState.onDidChangeIsRunQueued((flag) => app.emit("ves-change-is-run-queued", flag));
@@ -57,6 +60,7 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
         this.vesState.onDidChangeConnectedFlashCart((config) => app.emit("ves-change-connected-flash-cart", config));
         this.vesState.onDidChangeBuildMode((buildMode) => app.emit("ves-change-build-mode", buildMode));
         this.vesState.onDidChangeBuildFolder((flags) => app.emit("ves-change-build-folder", flags));
+        this.vesState.onDidChangeEmulator((name) => app.emit("ves-change-emulator", name));
     }
 }
 

@@ -8,6 +8,8 @@ import { FlashCartConfig } from "../flash-carts/commands/flash";
 import { getBuildPath, getRomPath } from ".";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { VesBuildModePreference } from "../build/preferences";
+import { VesRunDefaultEmulatorPreference } from "../run/preferences";
+import { getDefaultEmulatorConfig } from "../run/commands/run";
 
 type BuildFolderFlags = {
     [key: string]: boolean
@@ -40,16 +42,25 @@ export class VesStateModel {
             if (fileChangesEvent.contains(new URI(getRomPath()))) {
                 this.outputRomExists = await this.fileService.exists(new URI(getRomPath()));
             }
-        })
+        });
 
-        // watch for build mode changes
+        // watch for preferene changes
         this.preferenceService.onPreferenceChanged(({ preferenceName, newValue }) => {
-            if (preferenceName === VesBuildModePreference.id) {
-                this.onDidChangeBuildModeEmitter.fire(newValue);
-                this.onDidChangeBuildFolderEmitter.fire(this._buildFolderExists);
+            switch (preferenceName) {
+                case VesBuildModePreference.id:
+                    this.onDidChangeBuildModeEmitter.fire(newValue);
+                    this.onDidChangeBuildFolderEmitter.fire(this._buildFolderExists);
+                    break;
+                case VesRunDefaultEmulatorPreference.id:
+                    this.onDidChangeEmulatorEmitter.fire(getDefaultEmulatorConfig(this.preferenceService).name);
+                    break;
             }
         });
     }
+
+    // emulator
+    protected readonly onDidChangeEmulatorEmitter = new Emitter<string>();
+    readonly onDidChangeEmulator = this.onDidChangeEmulatorEmitter.event;
 
     // build mode
     protected readonly onDidChangeBuildModeEmitter = new Emitter<BuildMode>();

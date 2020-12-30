@@ -13,6 +13,8 @@ export async function setModeCommand(
     return;
   }
 
+  const currentBuildMode = preferenceService.get(VesBuildModePreference.id) as BuildMode;
+
   const quickPickOptions: QuickPickOptions = {
     title: "Set build mode",
     placeholder: "Select which mode to build in"
@@ -20,34 +22,39 @@ export async function setModeCommand(
 
   const buildTypes = [
     {
-      label: "Release Mode",
+      label: capitalizeFirstLetter(BuildMode.release),
       value: BuildMode.release,
-      description: `(${BuildMode.release})`,
-      detail: "Includes no asserts or debug flags, for shipping only."
+      description: BuildMode.release,
+      detail: "Includes no asserts or debug flags, for shipping only.",
+      iconClass: (BuildMode.release === currentBuildMode) ? "fa fa-check" : "",
     },
     {
-      label: "Beta Mode",
+      label: capitalizeFirstLetter(BuildMode.beta),
       value: BuildMode.beta,
-      description: `(${BuildMode.beta})`,
-      detail: "Includes selected asserts, for testing the performance on hardware."
+      description: BuildMode.beta,
+      detail: "Includes selected asserts, for testing the performance on hardware.",
+      iconClass: (BuildMode.beta === currentBuildMode) ? "fa fa-check" : "",
     },
     {
-      label: "Tools Mode",
+      label: capitalizeFirstLetter(BuildMode.tools),
       value: BuildMode.tools,
-      description: `(${BuildMode.tools})`,
-      detail: "Includes selected asserts, includes debugging tools."
+      description: BuildMode.tools,
+      detail: "Includes selected asserts, includes debugging tools.",
+      iconClass: (BuildMode.tools === currentBuildMode) ? "fa fa-check" : "",
     },
     {
-      label: "Debug Mode",
+      label: capitalizeFirstLetter(BuildMode.debug),
       value: BuildMode.debug,
-      description: `(${BuildMode.debug})`,
-      detail: "Includes all runtime assertions, includes debugging tools."
+      description: BuildMode.debug,
+      detail: "Includes all runtime assertions, includes debugging tools.",
+      iconClass: (BuildMode.debug === currentBuildMode) ? "fa fa-check" : "",
     },
     {
-      label: "Preprocessor Mode",
+      label: capitalizeFirstLetter(BuildMode.preprocessor),
       value: BuildMode.preprocessor,
-      description: `(${BuildMode.preprocessor})`,
-      detail: "The .o files are preprocessor output instead of compiler output."
+      description: BuildMode.preprocessor,
+      detail: "The .o files are preprocessor output instead of compiler output.",
+      iconClass: (BuildMode.preprocessor === currentBuildMode) ? "fa fa-check" : "",
     }
   ];
 
@@ -58,6 +65,11 @@ export async function setModeCommand(
     setBuildMode(preferenceService, selection);
   });
 }
+
 function setBuildMode(preferenceService: PreferenceService, buildMode: string) {
   preferenceService.set(VesBuildModePreference.id, buildMode, PreferenceScope.User);
+}
+
+function capitalizeFirstLetter(word: string) {
+  return word.charAt(0).toUpperCase() + word.slice(1);
 }
