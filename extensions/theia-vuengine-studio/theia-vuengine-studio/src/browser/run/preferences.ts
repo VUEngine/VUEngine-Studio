@@ -12,18 +12,18 @@ export const VesRunEmulatorConfigsPreference: VesProperty = {
             properties: {
                 name: {
                     type: "string",
-                    description: "Name of the emulator configuration",
+                    description: "Name of the emulator configuration.",
                     label: "Name",
                 },
                 path: {
                     type: "string",
-                    description: "Full path to emulator",
+                    description: "Full path to emulator.",
                     label: "Path",
                 },
                 args: {
                     type: "string",
                     multiline: true,
-                    description: "Arguments to pass to emulator",
+                    description: "Arguments to pass to emulator. Use %ROM% as a placeholder for the project's output ROM path.",
                     label: "Arguments",
                 },
             },
@@ -93,7 +93,7 @@ export const VesRunDefaultEmulatorPreference: VesProperty = {
     property: {
         type: "string",
         label: "Default Emulator",
-        description: "Default emulator to use. Use first in emulators list when empty.",
+        description: `Emulator configuration that shall be used to run compiled ROMs. Uses first in "emulators.emulators" list when empty.`,
         default: ""
     }
 };
