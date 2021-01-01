@@ -9,6 +9,6 @@ export const VesRunCommand: Command = {
 
 export const VesSelectEmulatorCommand: Command = {
     id: "VesRun.commands.selectEmulator",
-    label: "Select Default Emulator...",
+    label: "Set Default Emulator Config...",
     category: "Run"
 };

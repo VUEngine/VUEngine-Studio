@@ -88,7 +88,7 @@ export async function detectFlashCart(
   vesState.connectedFlashCart = await vesUsbService.detectFlashCart(...flashCartConfigs);
 }
 
-function getFlashCartConfigs(preferenceService: PreferenceService) {
+export function getFlashCartConfigs(preferenceService: PreferenceService) {
   const flashCartConfigs = [
     {
       name: "FlashBoy (Plus)",

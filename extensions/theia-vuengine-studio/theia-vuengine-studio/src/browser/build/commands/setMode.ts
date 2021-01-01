@@ -16,7 +16,7 @@ export async function setModeCommand(
   const currentBuildMode = preferenceService.get(VesBuildModePreference.id) as BuildMode;
 
   const quickPickOptions: QuickPickOptions = {
-    title: "Set build mode",
+    title: "Set Build Mode",
     placeholder: "Select which mode to build in"
   };
 

@@ -23,32 +23,7 @@ export const VesBuildExportCommand: Command = {
 
 export const VesBuildSetModeCommand: Command = {
     id: "VesBuild.commands.setMode",
-    label: `Set Build Mode`,
-    category: "Build",
-};
-export const VesBuildSetModeReleaseCommand: Command = {
-    id: "VesBuild.commands.setMode.release",
-    label: `Set Build Mode to Release`,
-    category: "Build"
-};
-export const VesBuildSetModeBetaCommand: Command = {
-    id: "VesBuild.commands.setMode.beta",
-    label: `Set Build Mode to Beta`,
-    category: "Build",
-};
-export const VesBuildSetModeToolsCommand: Command = {
-    id: "VesBuild.commands.setMode.tools",
-    label: `Set Build Mode to Tools`,
-    category: "Build",
-};
-export const VesBuildSetModeDebugCommand: Command = {
-    id: "VesBuild.commands.setMode.debug",
-    label: `Set Build Mode to Debug`,
-    category: "Build",
-};
-export const VesBuildSetModePreprocessorCommand: Command = {
-    id: "VesBuild.commands.setMode.preprocessor",
-    label: `Set Build Mode to Preprocessor`,
+    label: `Set Build Mode...`,
     category: "Build",
 };
 
@@ -57,11 +32,13 @@ export const VesBuildToggleDumpElfCommand: Command = {
     label: "Toggle Dump ELF",
     category: "Build",
 };
+
 export const VesBuildTogglePedanticWarningsCommand: Command = {
     id: "VesBuild.commands.pedanticWarnings.toggle",
     label: "Toggle Pedantic Warnings",
     category: "Build",
 };
+
 export const VesBuildToggleEnableWslCommand: Command = {
     id: "VesBuild.commands.enableWsl.toggle",
     label: "Toggle use WSL for building",

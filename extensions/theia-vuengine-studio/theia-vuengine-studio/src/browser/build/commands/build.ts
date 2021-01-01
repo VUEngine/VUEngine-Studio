@@ -1,3 +1,4 @@
+import { isWindows } from "@theia/core";
 import { PreferenceService } from "@theia/core/lib/browser";
 import URI from "@theia/core/lib/common/uri";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
@@ -81,6 +82,7 @@ async function build(
   //     shellArgs = ['--login'];
   //   }
   // }
+  const fixPermissions = isWindows ? "" : `chmod a+x ${joinPath(compilerPath, "bin", "*")} && chmod a+x ${joinPath(engineCorePath, "lib", "compiler", "preprocessor", "*.sh")} && `;
 
   const terminalId = "vuengine-build";
   const terminalWidget = terminalService.getById(terminalId) || await terminalService.newTerminal({
@@ -90,10 +92,14 @@ async function build(
     //shellArgs,
   });
   await terminalWidget.start();
-  terminalWidget.clearOutput();
-  //await new Promise(resolve => setTimeout(resolve, 1000));
-  terminalWidget.sendText(`cd "${workspaceRoot}" && export PATH="${v810path}":$PATH && make all ${exports.join(" ")} -f "${makefile}" -C "${workingDir}" \n`);
   terminalService.open(terminalWidget);
+  //await new Promise(resolve => setTimeout(resolve, 1000));
+  terminalWidget.clearOutput();
+  terminalWidget.show();
+  terminalWidget.sendText(`${fixPermissions}cd "${workspaceRoot}" && export PATH="${v810path}":$PATH && make all ${exports.join(" ")} -f "${makefile}" -C "${workingDir}" \n`);
+  terminalWidget.onTerminalDidClose(() => {
+    // TODO: kill process (if necessary?)
+  });
 }
 
 async function getEngineCorePath(fileService: FileService, preferenceService: PreferenceService) {
@@ -115,11 +121,11 @@ async function getEnginePluginsPath(fileService: FileService, preferenceService:
 }
 
 function getCompilerPath() {
-  return joinPath(getResourcesPath(), "binaries", getOs(), "gcc");
+  return joinPath(getResourcesPath(), "binaries", "vuengine-studio-tools", getOs(), "gcc");
 }
 
 // function getMsysPath() {
-//   return joinPath(getResourcesPath(), "binaries", "win", "msys");
+//   return joinPath(getResourcesPath(), "binaries", "vuengine-studio-tools", "win", "msys");
 // }
 
 function getThreads() {

@@ -14,6 +14,8 @@ export class VesRunStatusBarContribution implements FrontendApplicationContribut
     };
 
     updateStatusBar() {
+        this.setSelectedEmulatorStatusBar(getDefaultEmulatorConfig(this.preferenceService).name);
+
         this.preferenceService.onPreferenceChanged(({ preferenceName }) => {
             if (preferenceName === VesRunDefaultEmulatorPreference.id) {
                 this.setSelectedEmulatorStatusBar(getDefaultEmulatorConfig(this.preferenceService).name);
@@ -27,7 +29,7 @@ export class VesRunStatusBarContribution implements FrontendApplicationContribut
             command: VesSelectEmulatorCommand.id,
             priority: 2,
             text: `$(play) ${name}`,
-            tooltip: "Select Default Emulator Config"
+            tooltip: VesSelectEmulatorCommand.label,
         });
     }
 }

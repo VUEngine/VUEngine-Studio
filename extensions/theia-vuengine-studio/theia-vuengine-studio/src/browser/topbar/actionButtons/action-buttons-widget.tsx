@@ -46,8 +46,10 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
         this.vesState.onDidChangeOutputRomExists(() => this.update());
         this.keybindingRegistry.onKeybindingsChanged(() => this.update());
 
+        this.update();
+
         this.frontendApplicationStateService.onStateChanged((state: FrontendApplicationState) => {
-            if (state === 'ready') this.update();
+            if (state === 'attached_shell') this.update();
         });
     }
 
@@ -109,7 +111,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
     }
 
     protected getKeybindingLabel = (commandId: string) => {
-        const keybinding = this.keybindingRegistry.getKeybindingsForCommand(commandId).pop();
+        const keybinding = this.keybindingRegistry.getKeybindingsForCommand(commandId)[0];
         const keybindingAccelerator = keybinding ? ` (${this.keybindingRegistry.acceleratorFor(keybinding, "+")})` : "";
         return keybindingAccelerator;
     };
