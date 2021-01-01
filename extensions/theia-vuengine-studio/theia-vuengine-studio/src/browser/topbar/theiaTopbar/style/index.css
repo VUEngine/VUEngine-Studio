@@ -15,6 +15,7 @@
 }
 
 #theia-top-panel {
+  background: linear-gradient(to right, #1a2a6c 0%, #a22929 30%, #a22929 70%, #ce650a 100%);
   -webkit-app-region: drag;
   display: flex;
   flex-wrap: nowrap;

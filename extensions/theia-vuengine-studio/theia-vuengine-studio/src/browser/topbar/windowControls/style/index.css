@@ -1,13 +1,12 @@
 #ves-topbar-window-controls {
   -webkit-app-region: no-drag;
-  background-color: var(--theia-titleBar-activeBackground);
   position: absolute;
   right: 0;
   z-index: 1;
 }
 
 #ves-topbar-window-controls .topbar-window-controls-separator {
-  border-left: 1px solid var(--theia-titleBar-activeForeground);
+  border-left: 1px solid var(#ccc);
   float: left;
   height: 23px;
   margin: 8px 10px 0 4px;
@@ -16,7 +15,7 @@
 
 #ves-topbar-window-controls .topbar-window-controls-button {
   display: block;
-  fill: var(--theia-titleBar-activeForeground);
+  fill: var(#ccc);
   float: left;
   font-size: 18px;
   height: 37px;
