@@ -1,7 +1,7 @@
 import { VesProperty } from "../common/types";
 
 export const VesRunEmulatorConfigsPreference: VesProperty = {
-    id: "emulators.emulators",
+    id: "build.emulators.emulators",
     property: {
         type: "array",
         label: "Emulator Configurations",
@@ -89,11 +89,11 @@ export const VesRunEmulatorConfigsPreference: VesProperty = {
 };
 
 export const VesRunDefaultEmulatorPreference: VesProperty = {
-    id: "emulators.defaultEmulator",
+    id: "build.emulators.defaultEmulator",
     property: {
         type: "string",
         label: "Default Emulator",
-        description: `Emulator configuration that shall be used to run compiled ROMs. Uses first in "emulators.emulators" list when empty.`,
+        description: `Emulator configuration that shall be used to run compiled ROMs. Uses first in list by default.`,
         default: ""
     }
 };

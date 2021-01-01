@@ -1,7 +1,7 @@
 import { VesProperty } from "../common/types";
 
 export const VesFlashCartsCustomPreference: VesProperty = {
-    id: "flashCarts.customFlashCarts",
+    id: "build.flash.customFlashCarts",
     property: {
         type: "array",
         label: "Flash Cart Configurations",

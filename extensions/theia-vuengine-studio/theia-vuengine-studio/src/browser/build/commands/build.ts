@@ -1,4 +1,3 @@
-import { isWindows } from "@theia/core";
 import { PreferenceService } from "@theia/core/lib/browser";
 import URI from "@theia/core/lib/common/uri";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
@@ -8,7 +7,7 @@ import { join as joinPath } from "path";
 import { VesProcessService } from "../../../common/process-service-protocol";
 import { convertoToEnvPath, getOs, getResourcesPath, getWorkspaceRoot } from "../../common";
 import { VesStateModel } from "../../common/vesStateModel";
-import { VesBuildDumpElfPreference, VesBuildEnableWslPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "../preferences";
+import { VesBuildDumpElfPreference, VesBuildEngineCorePathPreference, VesBuildEnginePluginsPathPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "../preferences";
 
 export async function buildCommand(
   fileService: FileService,
@@ -31,8 +30,8 @@ async function build(
   const buildMode = preferenceService.get(VesBuildModePreference.id) as string;
   const dumpElf = preferenceService.get(VesBuildDumpElfPreference.id) as boolean;
   const pedanticWarnings = preferenceService.get(VesBuildPedanticWarningsPreference.id) as boolean;
-  const engineCorePath = getEngineCorePath();
-  const enginePluginsPath = getEnginePluginsPath();
+  const engineCorePath = await getEngineCorePath(fileService, preferenceService);
+  const enginePluginsPath = await getEnginePluginsPath(fileService, preferenceService);
   const compilerPath = getCompilerPath();
   const workingDir = convertoToEnvPath(
     preferenceService,
@@ -71,24 +70,24 @@ async function build(
 
   vesState.isBuilding = true;
 
-  let shellPath = "";
-  let shellArgs = [""];
-  if (isWindows) {
-    const enableWsl = preferenceService.get(VesBuildEnableWslPreference.id);
-    if (enableWsl) {
-      shellPath = process.env.windir + '\\System32\\wsl.exe';
-    } else {
-      shellPath = joinPath(getResourcesPath(), "binaries", "vuengine-studio-tools", "win", "msys", "usr", "bin", "bash.exe");
-      shellArgs = ['--login'];
-    }
-  }
+  // let shellPath = "";
+  // let shellArgs = [""];
+  // if (isWindows) {
+  //   const enableWsl = preferenceService.get(VesBuildEnableWslPreference.id);
+  //   if (enableWsl) {
+  //     shellPath = process.env.windir + '\\System32\\wsl.exe';
+  //   } else {
+  //     shellPath = joinPath(getResourcesPath(), "binaries", "vuengine-studio-tools", "win", "msys", "usr", "bin", "bash.exe");
+  //     shellArgs = ['--login'];
+  //   }
+  // }
 
   const terminalId = "vuengine-build";
   const terminalWidget = terminalService.getById(terminalId) || await terminalService.newTerminal({
     title: "Build",
     id: terminalId,
-    shellPath,
-    shellArgs,
+    //shellPath,
+    //shellArgs,
   });
   await terminalWidget.start();
   terminalWidget.clearOutput();
@@ -97,12 +96,22 @@ async function build(
   terminalService.open(terminalWidget);
 }
 
-function getEngineCorePath() {
-  return joinPath(getResourcesPath(), "vuengine", "vuengine-core");
+async function getEngineCorePath(fileService: FileService, preferenceService: PreferenceService) {
+  const defaultPath = joinPath(getResourcesPath(), "vuengine", "vuengine-core");
+  const customPath = preferenceService.get(VesBuildEngineCorePathPreference.id) as string;
+
+  return customPath && await fileService.exists(new URI(customPath))
+    ? customPath
+    : defaultPath;
 }
 
-function getEnginePluginsPath() {
-  return joinPath(getResourcesPath(), "vuengine", "vuengine-plugins");
+async function getEnginePluginsPath(fileService: FileService, preferenceService: PreferenceService) {
+  const defaultPath = joinPath(getResourcesPath(), "vuengine", "vuengine-plugins");
+  const customPath = preferenceService.get(VesBuildEnginePluginsPathPreference.id) as string;
+
+  return customPath && await fileService.exists(new URI(customPath))
+    ? customPath
+    : defaultPath;
 }
 
 function getCompilerPath() {
