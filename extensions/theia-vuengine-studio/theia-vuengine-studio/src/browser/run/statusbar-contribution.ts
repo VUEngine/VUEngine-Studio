@@ -25,7 +25,7 @@ export class VesRunStatusBarContribution implements FrontendApplicationContribut
         this.statusBar.setElement("ves-selected-emulator", {
             alignment: StatusBarAlignment.LEFT,
             command: VesSelectEmulatorCommand.id,
-            priority: 102,
+            priority: 2,
             text: `$(play) ${name}`,
             tooltip: "Select Default Emulator Config"
         });

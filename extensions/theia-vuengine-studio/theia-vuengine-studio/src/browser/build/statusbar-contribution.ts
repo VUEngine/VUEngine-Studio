@@ -24,7 +24,7 @@ export class VesBuildStatusBarContribution implements FrontendApplicationContrib
         this.statusBar.setElement("ves-build-mode", {
             alignment: StatusBarAlignment.LEFT,
             command: VesBuildSetModeCommand.id,
-            priority: 103,
+            priority: 3,
             text: `$(wrench) ${name}`,
             tooltip: "Select Build Mode"
         });

@@ -18,7 +18,7 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
     onStart(app: FrontendApplication): void {
         super.onStart(app);
         this.vesBindTouchBar();
-        this.vesBindDynamicMenu();
+        //this.vesBindDynamicMenu();
     }
 
     protected hideTopPanel(app: FrontendApplication): void {

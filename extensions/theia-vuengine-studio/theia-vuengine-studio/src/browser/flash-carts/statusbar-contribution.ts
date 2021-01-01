@@ -25,7 +25,7 @@ export class VesFlashCartsStatusBarContribution implements FrontendApplicationCo
         this.statusBar.setElement("ves-flash-cart", {
             alignment: StatusBarAlignment.LEFT,
             className: name ? "" : "disabled",
-            priority: 101,
+            priority: 1,
             text: `$(usb) ${emulatorName}`,
             tooltip: "Connected Flash Cart"
         });
