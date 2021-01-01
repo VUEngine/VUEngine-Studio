@@ -109,8 +109,8 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
     }
 
     protected getKeybindingLabel = (commandId: string) => {
-        const cleanKeybinding = this.keybindingRegistry.getKeybindingsForCommand(commandId).pop();
-        const cleanKeybindingAccelerator = cleanKeybinding ? ` (${this.keybindingRegistry.acceleratorFor(cleanKeybinding, "+")})` : "";
-        return cleanKeybindingAccelerator;
+        const keybinding = this.keybindingRegistry.getKeybindingsForCommand(commandId).pop();
+        const keybindingAccelerator = keybinding ? ` (${this.keybindingRegistry.acceleratorFor(keybinding, "+")})` : "";
+        return keybindingAccelerator;
     };
 }
