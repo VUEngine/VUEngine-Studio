@@ -1,11 +1,13 @@
 import { inject, injectable, interfaces } from "inversify";
 import { remote } from "electron";
-import { FrontendApplication, PreferenceService } from "@theia/core/lib/browser";
+import { FrontendApplication, PreferenceScope, PreferenceService } from "@theia/core/lib/browser";
 import { ElectronMenuContribution } from "@theia/core/lib/electron-browser/menu/electron-menu-contribution";
 import { CommandService, isOSX } from "@theia/core";
 import { VesStateModel } from "../../browser/common/vesStateModel";
 import { VesBuildDumpElfPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "../../browser/build/preferences";
-import { getDefaultEmulatorConfig } from "../../browser/run/commands/run";
+import { VesRunDefaultEmulatorPreference } from "../../browser/run/preferences";
+import { getDefaultEmulatorConfig, getEmulatorConfigs } from "../../browser/run/commands/run";
+import { BuildMode } from "../../browser/build/types";
 
 @injectable()
 export class VesElectronMenuContribution extends ElectronMenuContribution {
@@ -46,12 +48,19 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
         const { app } = require("electron").remote;
 
         app.on("ves-execute-command", (command: string) => this.commandService.executeCommand(command));
+        app.on("ves-set-build-mode", (buildMode: BuildMode) => this.preferenceService.set(
+            VesBuildModePreference.id, buildMode, PreferenceScope.User
+        ));
+        app.on("ves-set-emulator", (emulatorName: string) => this.preferenceService.set(
+            VesRunDefaultEmulatorPreference.id, emulatorName, PreferenceScope.User
+        ));
 
         // init touchbar values
         app.emit("ves-change-build-mode", this.preferenceService.get(VesBuildModePreference.id));
         app.emit("ves-change-connected-flash-cart", this.vesState.connectedFlashCart);
         app.emit("ves-change-build-folder", this.vesState.buildFolderExists);
         app.emit("ves-change-emulator", getDefaultEmulatorConfig(this.preferenceService).name);
+        app.emit("ves-change-emulator-configs", getEmulatorConfigs(this.preferenceService));
 
         this.vesState.onDidChangeIsBuilding((flag) => app.emit("ves-change-is-building", flag));
         this.vesState.onDidChangeIsRunQueued((flag) => app.emit("ves-change-is-run-queued", flag));
@@ -61,6 +70,7 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
         this.vesState.onDidChangeBuildMode((buildMode) => app.emit("ves-change-build-mode", buildMode));
         this.vesState.onDidChangeBuildFolder((flags) => app.emit("ves-change-build-folder", flags));
         this.vesState.onDidChangeEmulator((name) => app.emit("ves-change-emulator", name));
+        this.vesState.onDidChangeEmulatorConfigs((emulatorConfigs) => app.emit("ves-change-emulator-configs", emulatorConfigs));
     }
 }
 

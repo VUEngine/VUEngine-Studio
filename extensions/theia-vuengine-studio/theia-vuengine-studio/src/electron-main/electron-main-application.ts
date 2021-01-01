@@ -1,11 +1,12 @@
 import { injectable } from 'inversify';
-import { app, BrowserWindow, nativeImage, TouchBar } from 'electron';
+import { app, BrowserWindow, nativeImage, ScrubberItem, TouchBar } from 'electron';
 import { ElectronMainApplication, TheiaBrowserWindowOptions } from '@theia/core/lib/electron-main/electron-main-application';
 import { isOSX, MaybePromise } from '@theia/core';
-import { VesRunCommand, VesSelectEmulatorCommand } from '../browser/run/commands';
+import { VesRunCommand } from '../browser/run/commands';
 import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand, VesBuildSetModeBetaCommand, VesBuildSetModeDebugCommand, VesBuildSetModePreprocessorCommand, VesBuildSetModeReleaseCommand, VesBuildSetModeToolsCommand } from '../browser/build/commands';
 import { VesFlashCartsCommand } from '../browser/flash-carts/commands';
 import { BuildMode } from '../browser/build/types';
+import { EmulatorConfig } from '../browser/run/types';
 
 @injectable()
 export class VesElectronMainApplication extends ElectronMainApplication {
@@ -29,7 +30,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
     }
 
     protected registerVesTouchBar(electronWindow: BrowserWindow) {
-        const { TouchBarButton, TouchBarLabel, TouchBarPopover, TouchBarSegmentedControl } = TouchBar;
+        const { TouchBarButton, TouchBarLabel, TouchBarPopover, TouchBarScrubber, TouchBarSegmentedControl } = TouchBar;
 
         const vesIcon = nativeImage.createFromDataURL("data:image/png;base64,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").resize({
             height: 16,
@@ -159,9 +160,25 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             }),
         });
 
-        const emulatorButton = new TouchBarButton({
+        const emulators: ScrubberItem[] = [];
+
+        const emulatorScrubber = new TouchBarScrubber({
+            items: emulators,
+            selectedStyle: 'background',
+            mode: 'fixed',
+            showArrowButtons: true,
+            select: (selectedIndex) => app.emit("ves-set-emulator", emulators[selectedIndex].label),
+        });
+
+        const emulatorButton = new TouchBarPopover({
             label: "Emulator",
-            click: () => app.emit("ves-execute-command", VesSelectEmulatorCommand.id),
+            showCloseButton: true,
+            items: new TouchBar({
+                items: [
+                    new TouchBarLabel({ label: 'Emulator Config:' }),
+                    emulatorScrubber
+                ]
+            }),
         });
 
         const vesTouchBar = new TouchBar({
@@ -225,6 +242,15 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         // @ts-ignore
         app.on("ves-change-emulator", (name) => {
             emulatorButton.label = this.shorten(name, 14);
+        });
+        // @ts-ignore
+        app.on("ves-change-emulator-configs", (configs: EmulatorConfig[]) => {
+            emulators.length = 0;
+            for (const config of configs) {
+                emulators.push({
+                    label: config.name
+                });
+            }
         });
 
         const animateSpinner = () => {

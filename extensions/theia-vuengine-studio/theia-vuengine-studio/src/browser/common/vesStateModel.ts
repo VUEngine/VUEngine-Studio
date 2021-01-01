@@ -8,9 +8,10 @@ import { FlashCartConfig } from "../flash-carts/commands/flash";
 import { getBuildPath, getRomPath } from ".";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { VesBuildModePreference } from "../build/preferences";
-import { VesRunDefaultEmulatorPreference } from "../run/preferences";
-import { getDefaultEmulatorConfig } from "../run/commands/run";
+import { VesRunDefaultEmulatorPreference, VesRunEmulatorConfigsPreference } from "../run/preferences";
+import { getDefaultEmulatorConfig, getEmulatorConfigs } from "../run/commands/run";
 import { FrontendApplicationState, FrontendApplicationStateService } from "@theia/core/lib/browser/frontend-application-state";
+import { EmulatorConfig } from "../run/types";
 
 type BuildFolderFlags = {
     [key: string]: boolean
@@ -58,12 +59,15 @@ export class VesStateModel {
             }
         });
 
-        // watch for preferene changes
+        // watch for preference changes
         this.preferenceService.onPreferenceChanged(({ preferenceName, newValue }) => {
             switch (preferenceName) {
                 case VesBuildModePreference.id:
                     this.onDidChangeBuildModeEmitter.fire(newValue);
                     this.onDidChangeBuildFolderEmitter.fire(this._buildFolderExists);
+                    break;
+                case VesRunEmulatorConfigsPreference.id:
+                    this.onDidChangeEmulatorConfigsEmitter.fire(getEmulatorConfigs(this.preferenceService));
                     break;
                 case VesRunDefaultEmulatorPreference.id:
                     this.onDidChangeEmulatorEmitter.fire(getDefaultEmulatorConfig(this.preferenceService).name);
@@ -72,7 +76,11 @@ export class VesStateModel {
         });
     }
 
-    // emulator
+    // emulator configs
+    protected readonly onDidChangeEmulatorConfigsEmitter = new Emitter<EmulatorConfig[]>();
+    readonly onDidChangeEmulatorConfigs = this.onDidChangeEmulatorConfigsEmitter.event;
+
+    // default emulator
     protected readonly onDidChangeEmulatorEmitter = new Emitter<string>();
     readonly onDidChangeEmulator = this.onDidChangeEmulatorEmitter.event;
 
