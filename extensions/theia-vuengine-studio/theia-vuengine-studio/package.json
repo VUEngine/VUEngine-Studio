@@ -30,7 +30,7 @@
     },
     {
       "frontend": "lib/browser/frontend-module",
-      "backend": "lib/node/usb-service-module"
+      "backend": "lib/node/backend-module"
     }
   ]
 }
