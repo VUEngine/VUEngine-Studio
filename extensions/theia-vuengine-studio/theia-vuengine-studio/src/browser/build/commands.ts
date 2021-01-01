@@ -28,27 +28,27 @@ export const VesBuildSetModeCommand: Command = {
 };
 export const VesBuildSetModeReleaseCommand: Command = {
     id: "VesBuild.commands.setMode.release",
-    label: `Set Build Mode to "release"`,
+    label: `Set Build Mode to Release`,
     category: "Build"
 };
 export const VesBuildSetModeBetaCommand: Command = {
     id: "VesBuild.commands.setMode.beta",
-    label: `Set Build Mode to "beta"`,
+    label: `Set Build Mode to Beta`,
     category: "Build",
 };
 export const VesBuildSetModeToolsCommand: Command = {
     id: "VesBuild.commands.setMode.tools",
-    label: `Set Build Mode to "tools"`,
+    label: `Set Build Mode to Tools`,
     category: "Build",
 };
 export const VesBuildSetModeDebugCommand: Command = {
     id: "VesBuild.commands.setMode.debug",
-    label: `Set Build Mode to "debug"`,
+    label: `Set Build Mode to Debug`,
     category: "Build",
 };
 export const VesBuildSetModePreprocessorCommand: Command = {
     id: "VesBuild.commands.setMode.preprocessor",
-    label: `Set Build Mode to "preprocessor"`,
+    label: `Set Build Mode to Preprocessor`,
     category: "Build",
 };
 

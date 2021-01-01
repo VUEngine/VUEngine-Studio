@@ -1,9 +1,9 @@
 export enum BuildMode {
-  release = "release",
-  beta = "beta",
-  tools = "tools",
-  debug = "debug",
-  preprocessor = "preprocessor"
+  Release = "Release",
+  Beta = "Beta",
+  Tools = "Tools",
+  Debug = "Debug",
+  Preprocessor = "Preprocessor"
 }
 
-export const DEFAULT_BUILD_MODE = BuildMode.beta;
+export const DEFAULT_BUILD_MODE = BuildMode.Beta;

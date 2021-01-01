@@ -42,10 +42,8 @@ export class VesBuildCommandContribution implements CommandContribution {
     registry.registerCommand(VesBuildCleanCommand, {
       execute: () =>
         cleanCommand(
-          this.fileService,
           this.messageService,
           this.preferenceService,
-          this.quickPickService,
           this.vesState
         ),
     });
@@ -73,24 +71,24 @@ export class VesBuildCommandContribution implements CommandContribution {
       execute: () => setModeCommand(this.preferenceService, this.quickPickService)
     });
     registry.registerCommand(VesBuildSetModeReleaseCommand, {
-      execute: () => setModeCommand(this.preferenceService, this.quickPickService, BuildMode.release),
-      isToggled: () => this.preferenceService.get(VesBuildModePreference.id) == BuildMode.release
+      execute: () => setModeCommand(this.preferenceService, this.quickPickService, BuildMode.Release),
+      isToggled: () => this.preferenceService.get(VesBuildModePreference.id) == BuildMode.Release
     });
     registry.registerCommand(VesBuildSetModeBetaCommand, {
-      execute: () => setModeCommand(this.preferenceService, this.quickPickService, BuildMode.beta),
-      isToggled: () => this.preferenceService.get(VesBuildModePreference.id) == BuildMode.beta,
+      execute: () => setModeCommand(this.preferenceService, this.quickPickService, BuildMode.Beta),
+      isToggled: () => this.preferenceService.get(VesBuildModePreference.id) == BuildMode.Beta,
     });
     registry.registerCommand(VesBuildSetModeToolsCommand, {
-      execute: () => setModeCommand(this.preferenceService, this.quickPickService, BuildMode.tools),
-      isToggled: () => this.preferenceService.get(VesBuildModePreference.id) == BuildMode.tools,
+      execute: () => setModeCommand(this.preferenceService, this.quickPickService, BuildMode.Tools),
+      isToggled: () => this.preferenceService.get(VesBuildModePreference.id) == BuildMode.Tools,
     });
     registry.registerCommand(VesBuildSetModeDebugCommand, {
-      execute: () => setModeCommand(this.preferenceService, this.quickPickService, BuildMode.debug),
-      isToggled: () => this.preferenceService.get(VesBuildModePreference.id) == BuildMode.debug,
+      execute: () => setModeCommand(this.preferenceService, this.quickPickService, BuildMode.Debug),
+      isToggled: () => this.preferenceService.get(VesBuildModePreference.id) == BuildMode.Debug,
     });
     registry.registerCommand(VesBuildSetModePreprocessorCommand, {
-      execute: () => setModeCommand(this.preferenceService, this.quickPickService, BuildMode.preprocessor),
-      isToggled: () => this.preferenceService.get(VesBuildModePreference.id) == BuildMode.preprocessor,
+      execute: () => setModeCommand(this.preferenceService, this.quickPickService, BuildMode.Preprocessor),
+      isToggled: () => this.preferenceService.get(VesBuildModePreference.id) == BuildMode.Preprocessor,
     });
 
     registry.registerCommand(VesBuildToggleDumpElfCommand, {

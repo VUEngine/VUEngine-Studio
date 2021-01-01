@@ -10,6 +10,7 @@ import { PreferenceService } from "@theia/core/lib/browser";
 import { VesBuildModePreference } from "../build/preferences";
 import { VesRunDefaultEmulatorPreference } from "../run/preferences";
 import { getDefaultEmulatorConfig } from "../run/commands/run";
+import { FrontendApplicationState, FrontendApplicationStateService } from "@theia/core/lib/browser/frontend-application-state";
 
 type BuildFolderFlags = {
     [key: string]: boolean
@@ -19,28 +20,41 @@ type BuildFolderFlags = {
 export class VesStateModel {
 
     @inject(FileService) protected fileService: FileService;
+    @inject(FrontendApplicationStateService) protected readonly frontendApplicationStateService: FrontendApplicationStateService;
     @inject(PreferenceService) protected readonly preferenceService: PreferenceService;
 
     @postConstruct()
     protected async init(): Promise<void> {
         // init flags
-        for (const buildMode in BuildMode) {
-            this.setBuildFolderExists(buildMode, await this.fileService.exists(new URI(getBuildPath(buildMode))));
-        }
-        this.outputRomExists = await this.fileService.exists(new URI(getRomPath()));
+        this.frontendApplicationStateService.onStateChanged((state: FrontendApplicationState) => {
+            if (state === 'ready') {
+                for (const buildMode in BuildMode) {
+                    this.fileService.exists(new URI(getBuildPath(buildMode))).then((exists: boolean) => {
+                        this.setBuildFolderExists(buildMode, exists);
+                    });
+                }
+                this.fileService.exists(new URI(getRomPath())).then((exists: boolean) => {
+                    this.outputRomExists = exists;
+                });
+            }
+        });
 
         // watch for file changes
         // TODO: watch only respective folders
-        // const cleanPath = joinPath(getWorkspaceRoot(), "build", "release")
+        // const cleanPath = joinPath(getWorkspaceRoot(), "build", BuildMode.Release)
         // const test = this.fileService.watch(new URI(cleanPath));
-        this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
+        this.fileService.onDidFilesChange((fileChangesEvent: FileChangesEvent) => {
             for (const buildMode in BuildMode) {
                 if (fileChangesEvent.contains(new URI(getBuildPath(buildMode)))) {
-                    this.setBuildFolderExists(buildMode, await this.fileService.exists(new URI(getBuildPath(buildMode))));
+                    this.fileService.exists(new URI(getBuildPath(buildMode))).then((exists: boolean) => {
+                        this.setBuildFolderExists(buildMode, exists);
+                    });
                 }
             }
             if (fileChangesEvent.contains(new URI(getRomPath()))) {
-                this.outputRomExists = await this.fileService.exists(new URI(getRomPath()));
+                this.fileService.exists(new URI(getRomPath())).then((exists: boolean) => {
+                    this.outputRomExists = exists;
+                });
             }
         });
 

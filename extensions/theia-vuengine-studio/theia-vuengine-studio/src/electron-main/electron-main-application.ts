@@ -124,19 +124,19 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         });
 
         const buildModes = [{
-            label: this.capitalizeFirstLetter(BuildMode.release),
+            label: BuildMode.Release,
             accessibilityLabel: VesBuildSetModeReleaseCommand.id,
         }, {
-            label: this.capitalizeFirstLetter(BuildMode.beta),
+            label: BuildMode.Beta,
             accessibilityLabel: VesBuildSetModeBetaCommand.id,
         }, {
-            label: this.capitalizeFirstLetter(BuildMode.tools),
+            label: BuildMode.Tools,
             accessibilityLabel: VesBuildSetModeToolsCommand.id,
         }, {
-            label: this.capitalizeFirstLetter(BuildMode.debug),
+            label: BuildMode.Debug,
             accessibilityLabel: VesBuildSetModeDebugCommand.id,
         }, {
-            label: this.capitalizeFirstLetter(BuildMode.preprocessor),
+            label: BuildMode.Preprocessor,
             accessibilityLabel: VesBuildSetModePreprocessorCommand.id,
         }];
 
@@ -176,14 +176,14 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         electronWindow.setTouchBar(vesTouchBar);
 
         // @ts-ignore
-        app.on("ves-change-build-mode", (buildMode: string) => {
-            buildModeButton.label = this.capitalizeFirstLetter(buildMode).replace("Preprocessor", "Preproc.");
+        app.on("ves-change-build-mode", (buildMode: BuildMode) => {
+            buildModeButton.label = buildMode.replace("Preprocessor", "Preproc.");
             buildModeButtonSegmentedControl.selectedIndex =
-                (buildMode === BuildMode.release) ? 0 :
-                    (buildMode === BuildMode.beta) ? 1 :
-                        (buildMode === BuildMode.tools) ? 2 :
-                            (buildMode === BuildMode.debug) ? 3 :
-                                (buildMode === BuildMode.preprocessor) ? 4 :
+                (buildMode === BuildMode.Release) ? 0 :
+                    (buildMode === BuildMode.Beta) ? 1 :
+                        (buildMode === BuildMode.Tools) ? 2 :
+                            (buildMode === BuildMode.Debug) ? 3 :
+                                (buildMode === BuildMode.Preprocessor) ? 4 :
                                     0;
         });
         // @ts-ignore
@@ -218,7 +218,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         });
         // @ts-ignore
         app.on("ves-change-build-folder", (flags) => {
-            const buildMode = buildModes[buildModeButtonSegmentedControl.selectedIndex].label.toLowerCase();
+            const buildMode = buildModes[buildModeButtonSegmentedControl.selectedIndex].label;
             buildMenuCleanButton.enabled = flags[buildMode];
             redrawMenuSegmentedControl();
         });
@@ -237,10 +237,6 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         const redrawMenuSegmentedControl = () => {
             buildMenuSegmentedControl.selectedIndex = 0; // have to update element somehow to trigger redrawing of its children
         };
-    }
-
-    private capitalizeFirstLetter(word: string) {
-        return word.charAt(0).toUpperCase() + word.slice(1);
     }
 
     private shorten(word: string, length: number) {

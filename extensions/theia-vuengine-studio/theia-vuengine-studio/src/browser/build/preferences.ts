@@ -7,11 +7,11 @@ export const VesBuildModePreference: VesProperty = {
         type: "string",
         default: DEFAULT_BUILD_MODE,
         enum: [
-            BuildMode.release,
-            BuildMode.beta,
-            BuildMode.tools,
-            BuildMode.debug,
-            BuildMode.preprocessor,
+            BuildMode.Release,
+            BuildMode.Beta,
+            BuildMode.Tools,
+            BuildMode.Debug,
+            BuildMode.Preprocessor,
         ],
     },
 };

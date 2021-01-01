@@ -13,11 +13,12 @@ export function getWorkspaceRoot(): string {
 
 export function getBuildPath(buildMode?: string) {
   const buildRoot = joinPath(getWorkspaceRoot(), "build");
-  return buildMode ? joinPath(buildRoot, buildMode) : buildRoot;
+  return buildMode ? joinPath(buildRoot, buildMode.toLowerCase()) : buildRoot;
 }
 
 export function getRomPath(): string {
-  return getBuildPath("output.vb");
+  const buildRoot = joinPath(getWorkspaceRoot(), "build");
+  return joinPath(buildRoot, "output.vb");
 }
 
 export function getOs() {

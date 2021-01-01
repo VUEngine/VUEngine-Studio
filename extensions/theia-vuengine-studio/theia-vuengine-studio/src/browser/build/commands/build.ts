@@ -30,9 +30,9 @@ async function build(
   terminalService: TerminalService,
   vesState: VesStateModel
 ) {
-  const buildMode = preferenceService.get(VesBuildModePreference.id);
-  const dumpElf = preferenceService.get(VesBuildDumpElfPreference.id);
-  const pedanticWarnings = preferenceService.get(VesBuildPedanticWarningsPreference.id);
+  const buildMode = preferenceService.get(VesBuildModePreference.id) as string;
+  const dumpElf = preferenceService.get(VesBuildDumpElfPreference.id) as boolean;
+  const pedanticWarnings = preferenceService.get(VesBuildPedanticWarningsPreference.id) as boolean;
   const engineCorePath = getEngineCorePath();
   const enginePluginsPath = getEnginePluginsPath();
   const compilerPath = getCompilerPath();
@@ -54,7 +54,7 @@ async function build(
     );
   }
 
-  const exports = [`-e TYPE=${buildMode}`];
+  const exports = [`-e TYPE=${buildMode.toLowerCase()}`];
   if (dumpElf) {
     exports.push("DUMP_ELF=1");
   }

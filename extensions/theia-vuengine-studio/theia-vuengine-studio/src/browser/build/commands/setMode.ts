@@ -22,39 +22,39 @@ export async function setModeCommand(
 
   const buildTypes = [
     {
-      label: capitalizeFirstLetter(BuildMode.release),
-      value: BuildMode.release,
-      description: BuildMode.release,
+      label: BuildMode.Release,
+      value: BuildMode.Release,
+      description: BuildMode.Release,
       detail: "Includes no asserts or debug flags, for shipping only.",
-      iconClass: (BuildMode.release === currentBuildMode) ? "fa fa-check" : "",
+      iconClass: (BuildMode.Release === currentBuildMode) ? "fa fa-check" : "",
     },
     {
-      label: capitalizeFirstLetter(BuildMode.beta),
-      value: BuildMode.beta,
-      description: BuildMode.beta,
+      label: BuildMode.Beta,
+      value: BuildMode.Beta,
+      description: BuildMode.Beta,
       detail: "Includes selected asserts, for testing the performance on hardware.",
-      iconClass: (BuildMode.beta === currentBuildMode) ? "fa fa-check" : "",
+      iconClass: (BuildMode.Beta === currentBuildMode) ? "fa fa-check" : "",
     },
     {
-      label: capitalizeFirstLetter(BuildMode.tools),
-      value: BuildMode.tools,
-      description: BuildMode.tools,
+      label: BuildMode.Tools,
+      value: BuildMode.Tools,
+      description: BuildMode.Tools,
       detail: "Includes selected asserts, includes debugging tools.",
-      iconClass: (BuildMode.tools === currentBuildMode) ? "fa fa-check" : "",
+      iconClass: (BuildMode.Tools === currentBuildMode) ? "fa fa-check" : "",
     },
     {
-      label: capitalizeFirstLetter(BuildMode.debug),
-      value: BuildMode.debug,
-      description: BuildMode.debug,
+      label: BuildMode.Debug,
+      value: BuildMode.Debug,
+      description: BuildMode.Debug,
       detail: "Includes all runtime assertions, includes debugging tools.",
-      iconClass: (BuildMode.debug === currentBuildMode) ? "fa fa-check" : "",
+      iconClass: (BuildMode.Debug === currentBuildMode) ? "fa fa-check" : "",
     },
     {
-      label: capitalizeFirstLetter(BuildMode.preprocessor),
-      value: BuildMode.preprocessor,
-      description: BuildMode.preprocessor,
+      label: BuildMode.Preprocessor,
+      value: BuildMode.Preprocessor,
+      description: BuildMode.Preprocessor,
       detail: "The .o files are preprocessor output instead of compiler output.",
-      iconClass: (BuildMode.preprocessor === currentBuildMode) ? "fa fa-check" : "",
+      iconClass: (BuildMode.Preprocessor === currentBuildMode) ? "fa fa-check" : "",
     }
   ];
 
@@ -68,8 +68,4 @@ export async function setModeCommand(
 
 function setBuildMode(preferenceService: PreferenceService, buildMode: string) {
   preferenceService.set(VesBuildModePreference.id, buildMode, PreferenceScope.User);
-}
-
-function capitalizeFirstLetter(word: string) {
-  return word.charAt(0).toUpperCase() + word.slice(1);
 }
