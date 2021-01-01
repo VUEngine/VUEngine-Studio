@@ -22,22 +22,20 @@ import { VesStateModel } from "../common/vesStateModel";
 import { toggleEnableWsl } from "./commands/toggleEnableWSL";
 import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand, VesBuildSetModeBetaCommand, VesBuildSetModeCommand, VesBuildSetModeDebugCommand, VesBuildSetModePreprocessorCommand, VesBuildSetModeReleaseCommand, VesBuildSetModeToolsCommand, VesBuildToggleDumpElfCommand, VesBuildToggleEnableWslCommand, VesBuildTogglePedanticWarningsCommand } from "./commands";
 import { VesBuildDumpElfPreference, VesBuildEnableWslPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "./preferences";
+import { VesProcessService } from "../../common/process-service-protocol";
 
 @injectable()
 export class VesBuildCommandContribution implements CommandContribution {
   constructor(
     @inject(CommandService) private readonly commandService: CommandService,
     @inject(FileService) private readonly fileService: FileService,
-    @inject(FileDialogService)
-    private readonly fileDialogService: FileDialogService,
+    @inject(FileDialogService) private readonly fileDialogService: FileDialogService,
     @inject(MessageService) private readonly messageService: MessageService,
-    @inject(PreferenceService)
-    private readonly preferenceService: PreferenceService,
+    @inject(PreferenceService) private readonly preferenceService: PreferenceService,
     @inject(TerminalService) private readonly terminalService: TerminalService,
-    @inject(QuickPickService)
-    private readonly quickPickService: QuickPickService,
-    @inject(VesStateModel)
-    private readonly vesState: VesStateModel
+    @inject(QuickPickService) private readonly quickPickService: QuickPickService,
+    @inject(VesProcessService) private readonly vesProcessService: VesProcessService,
+    @inject(VesStateModel) private readonly vesState: VesStateModel,
   ) { }
 
   registerCommands(registry: CommandRegistry): void {
@@ -57,6 +55,7 @@ export class VesBuildCommandContribution implements CommandContribution {
           this.fileService,
           this.preferenceService,
           this.terminalService,
+          this.vesProcessService,
           this.vesState
         ),
     });

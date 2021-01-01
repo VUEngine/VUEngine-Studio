@@ -5,6 +5,7 @@ import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
 import { cpus } from "os";
 import { join as joinPath } from "path";
+import { VesProcessService } from "../../../common/process-service-protocol";
 import { convertoToEnvPath, getOs, getResourcesPath, getWorkspaceRoot } from "../../common";
 import { VesStateModel } from "../../common/vesStateModel";
 import { VesBuildDumpElfPreference, VesBuildEnableWslPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "../preferences";
@@ -13,8 +14,11 @@ export async function buildCommand(
   fileService: FileService,
   preferenceService: PreferenceService,
   terminalService: TerminalService,
+  vesProcessService: VesProcessService,
   vesState: VesStateModel
 ) {
+  vesProcessService.launchProcess(); return;
+
   if (!vesState.isBuilding) {
     build(fileService, preferenceService, terminalService, vesState);
   }

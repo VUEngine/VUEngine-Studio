@@ -50,7 +50,7 @@ async function run(
     isWindows ? "mednafen.exe" : "mednafen"
   ))}"`;
   const emulatorArgs = ` ${defaultEmulatorConfig.args.replace("%ROM%", `"${getRomPath()}"`)}`;
-  const fixPermissions = isWindows ? "" : `chmod a+x "${emulatorPath}" && `;
+  const fixPermissions = isWindows ? "" : `chmod a+x ${emulatorPath} && `;
 
   const terminalId = "vuengine-run";
   const terminalWidget = terminalService.getById(terminalId) || await terminalService.newTerminal({

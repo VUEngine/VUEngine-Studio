@@ -1,15 +1,15 @@
 import { injectable, postConstruct } from "inversify";
-import { VesUsbService } from "../common/usb-service-protocol";
 import { Device, getDeviceList, on } from "usb";
-import { FlashCartConfig } from "../browser/flash-carts/commands/flash";
-import { Emitter } from "@theia/core";
+import { Emitter, Event } from "@theia/core";
+import { FlashCartConfig } from "../../browser/flash-carts/commands/flash";
+import { VesUsbService } from "../../common/usb-service-protocol";
 
 @injectable()
 export class DefaultVesUsbService implements VesUsbService {
     protected readonly onDeviceConnectedEmitter = new Emitter<Device>();
-    readonly onDeviceConnected = this.onDeviceConnectedEmitter.event;
+    readonly onDeviceConnected: Event<Device> = this.onDeviceConnectedEmitter.event;
     protected readonly onDeviceDisconnectedEmitter = new Emitter<Device>();
-    readonly onDeviceDisconnected = this.onDeviceDisconnectedEmitter.event;
+    readonly onDeviceDisconnected: Event<Device> = this.onDeviceDisconnectedEmitter.event;
 
     @postConstruct()
     protected init(): void {

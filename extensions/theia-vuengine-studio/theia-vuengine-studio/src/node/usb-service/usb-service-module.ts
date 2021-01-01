@@ -1,9 +1,9 @@
-import { ContainerModule } from 'inversify';
+import { interfaces } from 'inversify';
 import { ConnectionHandler, JsonRpcConnectionHandler } from '@theia/core';
 import { DefaultVesUsbService } from './default-usb-service';
-import { VesUsbService, workspacePath } from '../common/usb-service-protocol';
+import { VesUsbService, workspacePath } from '../../common/usb-service-protocol';
 
-export default new ContainerModule(bind => {
+export function bindVesUsbService(bind: interfaces.Bind): void {
     bind(DefaultVesUsbService).toSelf().inSingletonScope();
     bind(VesUsbService).toService(DefaultVesUsbService);
 
@@ -12,4 +12,4 @@ export default new ContainerModule(bind => {
             return ctx.container.get(VesUsbService);
         })
     ).inSingletonScope()
-});
+}
