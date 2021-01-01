@@ -3,7 +3,7 @@ import { app, BrowserWindow, nativeImage, ScrubberItem, TouchBar } from 'electro
 import { ElectronMainApplication, TheiaBrowserWindowOptions } from '@theia/core/lib/electron-main/electron-main-application';
 import { isOSX, MaybePromise } from '@theia/core';
 import { VesRunCommand } from '../browser/run/commands';
-import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand, VesBuildSetModeBetaCommand, VesBuildSetModeDebugCommand, VesBuildSetModePreprocessorCommand, VesBuildSetModeReleaseCommand, VesBuildSetModeToolsCommand } from '../browser/build/commands';
+import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand } from '../browser/build/commands';
 import { VesFlashCartsCommand } from '../browser/flash-carts/commands';
 import { BuildMode } from '../browser/build/types';
 import { EmulatorConfig } from '../browser/run/types';
@@ -124,29 +124,24 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             change: (selectedIndex) => app.emit("ves-execute-command", buildMenuSegmentedControlSegments[selectedIndex].accessibilityLabel),
         });
 
-        const buildModes = [{
+        const buildModes: ScrubberItem[] = [{
             label: BuildMode.Release,
-            accessibilityLabel: VesBuildSetModeReleaseCommand.id,
         }, {
             label: BuildMode.Beta,
-            accessibilityLabel: VesBuildSetModeBetaCommand.id,
         }, {
             label: BuildMode.Tools,
-            accessibilityLabel: VesBuildSetModeToolsCommand.id,
         }, {
             label: BuildMode.Debug,
-            accessibilityLabel: VesBuildSetModeDebugCommand.id,
         }, {
             label: BuildMode.Preprocessor,
-            accessibilityLabel: VesBuildSetModePreprocessorCommand.id,
         }];
 
-        const buildModeButtonSegmentedControl = new TouchBarSegmentedControl({
-            segmentStyle: 'automatic',
-            mode: 'single',
-            segments: buildModes,
-            selectedIndex: 1,
-            change: (selectedIndex) => app.emit("ves-execute-command", buildModes[selectedIndex].accessibilityLabel),
+        const buildModeScrubber = new TouchBarScrubber({
+            items: buildModes,
+            selectedStyle: 'background',
+            mode: 'fixed',
+            showArrowButtons: false,
+            select: (selectedIndex) => app.emit("ves-set-build-mode", buildModes[selectedIndex].label),
         });
 
         const buildModeButton = new TouchBarPopover({
@@ -155,7 +150,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             items: new TouchBar({
                 items: [
                     new TouchBarLabel({ label: 'Build Mode:' }),
-                    buildModeButtonSegmentedControl
+                    buildModeScrubber
                 ]
             }),
         });
@@ -175,7 +170,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             showCloseButton: true,
             items: new TouchBar({
                 items: [
-                    new TouchBarLabel({ label: 'Emulator Config:' }),
+                    new TouchBarLabel({ label: 'Emulator:' }),
                     emulatorScrubber
                 ]
             }),
@@ -195,13 +190,6 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         // @ts-ignore
         app.on("ves-change-build-mode", (buildMode: BuildMode) => {
             buildModeButton.label = buildMode.replace("Preprocessor", "Preproc.");
-            buildModeButtonSegmentedControl.selectedIndex =
-                (buildMode === BuildMode.Release) ? 0 :
-                    (buildMode === BuildMode.Beta) ? 1 :
-                        (buildMode === BuildMode.Tools) ? 2 :
-                            (buildMode === BuildMode.Debug) ? 3 :
-                                (buildMode === BuildMode.Preprocessor) ? 4 :
-                                    0;
         });
         // @ts-ignore
         app.on("ves-change-is-building", (isBuilding: boolean) => {
@@ -235,7 +223,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         });
         // @ts-ignore
         app.on("ves-change-build-folder", (flags) => {
-            const buildMode = buildModes[buildModeButtonSegmentedControl.selectedIndex].label;
+            const buildMode = buildModeButton.label;
             buildMenuCleanButton.enabled = flags[buildMode];
             redrawMenuSegmentedControl();
         });
