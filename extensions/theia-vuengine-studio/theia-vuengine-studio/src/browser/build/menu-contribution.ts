@@ -4,11 +4,7 @@ import {
   VesBuildCleanCommand,
   VesBuildCommand,
   VesBuildExportCommand,
-  VesBuildSetModeReleaseCommand,
-  VesBuildSetModeBetaCommand,
-  VesBuildSetModeToolsCommand,
-  VesBuildSetModeDebugCommand,
-  VesBuildSetModePreprocessorCommand,
+  VesBuildSetModeCommand,
   VesBuildToggleDumpElfCommand,
   VesBuildTogglePedanticWarningsCommand,
 } from "./commands";
@@ -16,13 +12,13 @@ import {
 export const buildMenuPath = [...MAIN_MENU_BAR, "vesBuild"];
 export namespace BuildMenuSection {
   export const ACTION = [...MAIN_MENU_BAR, "vesBuild", '1_action'];
-  export const MODE = [...MAIN_MENU_BAR, "vesBuild", '2_mode'];
+  export const CONFIG = [...MAIN_MENU_BAR, "vesBuild", '2_config'];
   export const BUILD_OPTION = [...MAIN_MENU_BAR, "vesBuild", '3_build_option'];
-  export const DEFAULTS = [...MAIN_MENU_BAR, "vesBuild", '4_defaults'];
 }
 
 @injectable()
 export class VesBuildMenuContribution implements MenuContribution {
+
   registerMenus(menus: MenuModelRegistry): void {
     menus.registerSubmenu(buildMenuPath, "Build", {
       order: "6"
@@ -44,30 +40,10 @@ export class VesBuildMenuContribution implements MenuContribution {
       order: "5"
     });
 
-    menus.registerMenuAction(BuildMenuSection.MODE, {
-      commandId: VesBuildSetModeReleaseCommand.id,
-      label: "Release Mode",
+    menus.registerMenuAction(BuildMenuSection.CONFIG, {
+      commandId: VesBuildSetModeCommand.id,
+      label: VesBuildSetModeCommand.label,
       order: "1"
-    });
-    menus.registerMenuAction(BuildMenuSection.MODE, {
-      commandId: VesBuildSetModeBetaCommand.id,
-      label: "Beta Mode",
-      order: "2"
-    });
-    menus.registerMenuAction(BuildMenuSection.MODE, {
-      commandId: VesBuildSetModeToolsCommand.id,
-      label: "Tools Mode",
-      order: "3"
-    });
-    menus.registerMenuAction(BuildMenuSection.MODE, {
-      commandId: VesBuildSetModeDebugCommand.id,
-      label: "Debug Mode",
-      order: "4"
-    });
-    menus.registerMenuAction(BuildMenuSection.MODE, {
-      commandId: VesBuildSetModePreprocessorCommand.id,
-      label: "Preprocessor Mode",
-      order: "5"
     });
 
     menus.registerMenuAction(BuildMenuSection.BUILD_OPTION, {

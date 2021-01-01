@@ -17,8 +17,6 @@ export async function buildCommand(
   vesProcessService: VesProcessService,
   vesState: VesStateModel
 ) {
-  vesProcessService.launchProcess(); return;
-
   if (!vesState.isBuilding) {
     build(fileService, preferenceService, terminalService, vesState);
   }

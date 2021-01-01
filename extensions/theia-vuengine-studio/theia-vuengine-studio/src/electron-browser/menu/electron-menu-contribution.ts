@@ -4,7 +4,7 @@ import { FrontendApplication, PreferenceScope, PreferenceService } from "@theia/
 import { ElectronMenuContribution } from "@theia/core/lib/electron-browser/menu/electron-menu-contribution";
 import { CommandService, isOSX } from "@theia/core";
 import { VesStateModel } from "../../browser/common/vesStateModel";
-import { VesBuildDumpElfPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "../../browser/build/preferences";
+import { VesBuildDumpElfPreference, VesBuildEnableWslPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "../../browser/build/preferences";
 import { VesRunDefaultEmulatorPreference } from "../../browser/run/preferences";
 import { getDefaultEmulatorConfig, getEmulatorConfigs } from "../../browser/run/commands/run";
 import { BuildMode } from "../../browser/build/types";
@@ -18,7 +18,7 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
     onStart(app: FrontendApplication): void {
         super.onStart(app);
         this.vesBindTouchBar();
-        //this.vesBindDynamicMenu();
+        this.vesBindDynamicMenu();
     }
 
     protected hideTopPanel(app: FrontendApplication): void {
@@ -32,11 +32,11 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
         if (isOSX) {
             const rebuildMenu = () => remote.Menu.setApplicationMenu(this.factory.createMenuBar());
 
-            this.vesState.onDidChangeBuildMode(() => rebuildMenu());
             this.preferenceService.onPreferenceChanged(({ preferenceName }) => {
                 if ([
                     VesBuildDumpElfPreference.id,
-                    VesBuildPedanticWarningsPreference.id
+                    VesBuildPedanticWarningsPreference.id,
+                    VesBuildEnableWslPreference.id,
                 ].includes(preferenceName)) {
                     rebuildMenu();
                 }

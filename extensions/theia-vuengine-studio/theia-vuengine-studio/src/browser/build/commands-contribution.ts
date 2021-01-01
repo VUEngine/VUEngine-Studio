@@ -69,26 +69,6 @@ export class VesBuildCommandContribution implements CommandContribution {
     registry.registerCommand(VesBuildSetModeCommand, {
       execute: () => setModeCommand(this.preferenceService, this.quickPickService)
     });
-    // registry.registerCommand(VesBuildSetModeReleaseCommand, {
-    //   execute: () => setModeCommand(this.preferenceService, this.quickPickService, BuildMode.Release),
-    //   isToggled: () => this.preferenceService.get(VesBuildModePreference.id) == BuildMode.Release
-    // });
-    // registry.registerCommand(VesBuildSetModeBetaCommand, {
-    //   execute: () => setModeCommand(this.preferenceService, this.quickPickService, BuildMode.Beta),
-    //   isToggled: () => this.preferenceService.get(VesBuildModePreference.id) == BuildMode.Beta,
-    // });
-    // registry.registerCommand(VesBuildSetModeToolsCommand, {
-    //   execute: () => setModeCommand(this.preferenceService, this.quickPickService, BuildMode.Tools),
-    //   isToggled: () => this.preferenceService.get(VesBuildModePreference.id) == BuildMode.Tools,
-    // });
-    // registry.registerCommand(VesBuildSetModeDebugCommand, {
-    //   execute: () => setModeCommand(this.preferenceService, this.quickPickService, BuildMode.Debug),
-    //   isToggled: () => this.preferenceService.get(VesBuildModePreference.id) == BuildMode.Debug,
-    // });
-    // registry.registerCommand(VesBuildSetModePreprocessorCommand, {
-    //   execute: () => setModeCommand(this.preferenceService, this.quickPickService, BuildMode.Preprocessor),
-    //   isToggled: () => this.preferenceService.get(VesBuildModePreference.id) == BuildMode.Preprocessor,
-    // });
 
     registry.registerCommand(VesBuildToggleDumpElfCommand, {
       execute: () => toggleDumpElf(this.preferenceService),

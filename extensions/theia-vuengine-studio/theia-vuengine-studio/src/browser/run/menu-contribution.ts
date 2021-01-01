@@ -11,10 +11,10 @@ export class VesRunMenuContribution implements MenuContribution {
       label: VesRunCommand.label,
       order: "3",
     });
-    menus.registerMenuAction(BuildMenuSection.DEFAULTS, {
+    menus.registerMenuAction(BuildMenuSection.CONFIG, {
       commandId: VesSelectEmulatorCommand.id,
       label: VesSelectEmulatorCommand.label,
-      order: "3",
+      order: "2",
     });
   }
 }
