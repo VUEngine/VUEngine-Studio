@@ -12,6 +12,7 @@
 		"menu.separatorBackground": "#555555",
 		"peekView.border": "#a22929",
 		"statusBar.background": "#111",
+		"statusBar.noFolderBackground": "#111",
 		"statusBar.border": "#1e1e1e",
 		"textBlockQuote.border": "#a2292980",
 		"titleBar.activeBackground": "#a22929",

@@ -2,7 +2,7 @@ import * as React from "react";
 import { injectable, postConstruct } from "inversify";
 import { ReactWidget } from "@theia/core/lib/browser/widgets/react-widget";
 import { FrontendApplicationConfigProvider } from "@theia/core/lib/browser/frontend-application-config-provider";
-import { getOs } from "../../common";
+import { getOs } from "../../common/functions";
 
 @injectable()
 export class VesTopbarApplicationTitleWidget extends ReactWidget {

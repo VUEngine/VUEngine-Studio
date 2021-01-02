@@ -1,5 +1,6 @@
 import { dirname, join as joinPath } from "path";
 import { env } from "process";
+import { shell } from "electron";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { isOSX, isWindows } from "@theia/core";
 import { VesBuildEnableWslPreference } from "../build/preferences";
@@ -42,4 +43,8 @@ export function convertoToEnvPath(
     envPath = "/mnt/" + envPath;
   }
   return envPath;
+}
+
+export function openUrl(url: string) {
+  shell.openExternal(url);
 }

@@ -21,7 +21,7 @@ export class VesFlashCartsStatusBarContribution implements FrontendApplicationCo
     }
 
     setConnectedFlashCartStatusBar(name?: string) {
-        const emulatorName = name ? name : "No Flash Cart";
+        const emulatorName = name ? name : "No Flash Cart Connected";
         this.statusBar.setElement("ves-flash-cart", {
             alignment: StatusBarAlignment.LEFT,
             className: name ? "" : "disabled",

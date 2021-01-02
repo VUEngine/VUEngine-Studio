@@ -3,7 +3,7 @@ import { PreferenceService } from "@theia/core/lib/browser";
 import { CommandService, isWindows } from "@theia/core/lib/common";
 import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
 import { VesBuildCommand } from "../../build/commands";
-import { getOs, getResourcesPath, getRomPath } from "../../common";
+import { getOs, getResourcesPath, getRomPath } from "../../common/functions";
 import { VesStateModel } from "../../common/vesStateModel";
 import { VesRunDefaultEmulatorPreference, VesRunEmulatorConfigsPreference } from "../preferences";
 import { EmulatorConfig } from "../types";

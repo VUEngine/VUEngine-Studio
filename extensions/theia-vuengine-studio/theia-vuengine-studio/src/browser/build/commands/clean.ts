@@ -2,7 +2,7 @@ import { PreferenceService } from "@theia/core/lib/browser";
 import { MessageService } from "@theia/core/lib/common";
 import { join as joinPath } from "path";
 import * as rimraf from "rimraf";
-import { getBuildPath } from "../../common";
+import { getBuildPath } from "../../common/functions";
 import { VesStateModel } from "../../common/vesStateModel";
 import { VesBuildModePreference } from "../preferences";
 import { BuildMode } from "../types";

@@ -1,24 +1,24 @@
-import * as React from 'react';
-import { injectable, postConstruct, inject } from 'inversify';
-import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
-import { CommandService, MessageService } from '@theia/core';
+import * as React from "react";
+import { injectable, postConstruct, inject } from "inversify";
+import { ReactWidget } from "@theia/core/lib/browser/widgets/react-widget";
+import { CommandService, MessageService } from "@theia/core";
 import { KeybindingRegistry } from "@theia/core/lib/browser/keybinding";
-import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand } from '../../build/commands';
-import { VesStateModel } from '../../common/vesStateModel';
-import { getOs } from '../../common';
-import { PreferenceService } from '@theia/core/lib/browser';
+import { FileService } from "@theia/filesystem/lib/browser/file-service";
+import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand } from "../../build/commands";
+import { VesStateModel } from "../../common/vesStateModel";
+import { getOs } from "../../common/functions";
+import { PreferenceService } from "@theia/core/lib/browser";
 import { BuildMode } from "../../build/types";
-import { VesRunCommand } from '../../run/commands';
-import { VesFlashCartsCommand } from '../../flash-carts/commands';
-import { VesBuildModePreference } from '../../build/preferences';
-import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
+import { VesRunCommand } from "../../run/commands";
+import { VesFlashCartsCommand } from "../../flash-carts/commands";
+import { VesBuildModePreference } from "../../build/preferences";
+import { FrontendApplicationState, FrontendApplicationStateService } from "@theia/core/lib/browser/frontend-application-state";
 
 @injectable()
 export class VesTopbarActionButtonsWidget extends ReactWidget {
 
-    static readonly ID = 'ves-topbar-action-buttons';
-    static readonly LABEL = 'Topbar Action Buttons';
+    static readonly ID = "ves-topbar-action-buttons";
+    static readonly LABEL = "Topbar Action Buttons";
 
     @inject(CommandService) protected readonly commandService!: CommandService;
     @inject(FileService) protected readonly fileService!: FileService;
@@ -49,7 +49,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
         this.update();
 
         this.frontendApplicationStateService.onStateChanged((state: FrontendApplicationState) => {
-            if (state === 'attached_shell') this.update();
+            if (state === "attached_shell") this.update();
         });
     }
 

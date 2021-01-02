@@ -6,7 +6,7 @@ import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-servi
 import { cpus } from "os";
 import { join as joinPath } from "path";
 import { VesProcessService } from "../../../common/process-service-protocol";
-import { convertoToEnvPath, getOs, getResourcesPath, getWorkspaceRoot } from "../../common";
+import { convertoToEnvPath, getOs, getResourcesPath, getWorkspaceRoot } from "../../common/functions";
 import { VesStateModel } from "../../common/vesStateModel";
 import { VesBuildDumpElfPreference, VesBuildEngineCorePathPreference, VesBuildEnginePluginsPathPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "../preferences";
 

@@ -5,7 +5,7 @@ import URI from "@theia/core/lib/common/uri";
 import { FileChangesEvent } from "@theia/filesystem/lib/common/files";
 import { BuildMode } from "../build/types";
 import { FlashCartConfig, getFlashCartConfigs } from "../flash-carts/commands/flash";
-import { getBuildPath, getRomPath } from ".";
+import { getBuildPath, getRomPath } from "./functions";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { VesBuildModePreference } from "../build/preferences";
 import { VesRunDefaultEmulatorPreference, VesRunEmulatorConfigsPreference } from "../run/preferences";

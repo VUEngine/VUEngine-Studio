@@ -9,22 +9,23 @@ import { CommonCommands, LabelProvider } from "@theia/core/lib/browser";
 import { ApplicationInfo, ApplicationServer } from "@theia/core/lib/common/application-protocol";
 import { FrontendApplicationConfigProvider } from "@theia/core/lib/browser/frontend-application-config-provider";
 import { EnvVariablesServer } from "@theia/core/lib/common/env-variables";
+import { openUrl } from "../common/functions";
 
 @injectable()
 export class WelcomeWidget extends ReactWidget {
 
-    static readonly ID = "ves.welcome.widget";
+    static readonly ID = "vesWelcomeWidget";
     static readonly LABEL = "Welcome";
 
     protected applicationInfo: ApplicationInfo | undefined;
     protected applicationName = FrontendApplicationConfigProvider.get().applicationName;
     protected home: string | undefined;
-    protected recentLimit = 5;
+    protected recentLimit = 10;
     protected recentWorkspaces: string[] = [];
 
-    protected readonly documentationUrl = "https://www.theia-ide.org/docs/";
-    protected readonly extensionUrl = "https://www.theia-ide.org/docs/authoring_extensions";
-    protected readonly pluginUrl = "https://www.theia-ide.org/docs/authoring_plugins";
+    protected readonly patreonUrl = "https://www.patreon.com/vuengine";
+    protected readonly vuengineUrl = "https://www.vuengine.dev";
+    protected readonly planetVbUrl = "https://www.virtual-boy.com";
 
     @inject(ApplicationServer) protected readonly appServer: ApplicationServer;
     @inject(CommandRegistry) protected readonly commandRegistry: CommandRegistry;
@@ -36,6 +37,7 @@ export class WelcomeWidget extends ReactWidget {
     protected async init(): Promise<void> {
         this.id = WelcomeWidget.ID;
         this.title.label = WelcomeWidget.LABEL;
+        this.title.iconClass = "fa fa-info-circle"
         this.title.caption = WelcomeWidget.LABEL;
         this.title.closable = true;
 
@@ -46,36 +48,52 @@ export class WelcomeWidget extends ReactWidget {
     }
 
     protected render(): React.ReactNode {
-        return <div className="gs-container">
+        return <div className="ves-welcome-container">
             {this.renderHeader()}
-            <div className="flex-grid">
+            <div className="flex-grid open">
                 <div className="col">
                     {this.renderOpen()}
                 </div>
             </div>
-            <div className="flex-grid">
-                <div className="col">
-                    {this.renderRecentWorkspaces()}
+            <div className="flex-grid emulated-flex-gap">
+                <div className="flex-grid-column">
+                    <div className="flex-grid recent">
+                        <div className="col">
+                            {this.renderRecentWorkspaces()}
+                        </div>
+                    </div>
+                    <div className="flex-grid settings">
+                        <div className="col">
+                            {this.renderSettings()}
+                        </div>
+                    </div>
+                    <div className="flex-grid links">
+                        <div className="col">
+                            {this.renderLinks()}
+                        </div>
+                    </div>
+                    <div className="flex-grid links">
+                        <div className="col">
+                            {this.renderExamples()}
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div className="flex-grid">
-                <div className="col">
-                    {this.renderSettings()}
-                </div>
-            </div>
-            <div className="flex-grid">
-                <div className="col">
-                    {this.renderHelp()}
+                <div className="flex-grid-column">
+                    <div className="flex-grid help">
+                        <div className="col">
+                            {this.renderHelp()}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>;
     }
 
     protected renderHeader(): React.ReactNode {
-        return <div className="gs-header">
+        return <div className="ves-welcome-header">
             <h1>
                 {this.applicationName}
-                <span className="gs-sub-header">
+                <span className="ves-welcome-sub-header">
                     {this.applicationInfo ? ` ${this.applicationInfo.version}` : ""}
                 </span>
             </h1>
@@ -83,16 +101,16 @@ export class WelcomeWidget extends ReactWidget {
     }
 
     protected renderOpen(): React.ReactNode {
+        const newProject = <button className="theia-button large"><i className="fa fa-plus"></i> Create New Project</button>;
         const requireSingleOpen = isOSX || !environment.electron.is();
-        const open = requireSingleOpen && <div className="gs-action-container"><a href="#" onClick={this.doOpen}>Open</a></div>;
-        const openFile = !requireSingleOpen && <div className="gs-action-container"><a href="#" onClick={this.doOpenFile}>Open File</a></div>;
-        const openFolder = !requireSingleOpen && <div className="gs-action-container"><a href="#" onClick={this.doOpenFolder}>Open Folder</a></div>;
-        const openWorkspace = <a href="#" onClick={this.doOpenWorkspace}>Open Workspace</a>;
-        return <div className="gs-section">
-            <h3 className="gs-section-header"><i className="fa fa-folder-open"></i>Open</h3>
-            {open}
-            {openFile}
-            {openFolder}
+        const open = requireSingleOpen && <button className="theia-button large" onClick={this.open}><i className="fa fa-folder-open"></i> Open</button>;
+        const openFile = !requireSingleOpen && <button className="theia-button large" onClick={this.openFile}><i className="fa fa-file-o"></i> Open File</button>;
+        const openFolder = !requireSingleOpen && <button className="theia-button large" onClick={this.openFolder}><i className="fa fa-folder-open"></i> Open Folder</button>;
+        const openWorkspace = <button className="theia-button large" onClick={this.openWorkspace}><i className="fa fa-file-code-o"></i> Open Workspace</button>;
+
+        return <div className="ves-welcome-section">
+            {newProject}
+            {open} {openFile} {openFolder}
             {openWorkspace}
         </div>;
     }
@@ -101,46 +119,76 @@ export class WelcomeWidget extends ReactWidget {
         const items = this.recentWorkspaces;
         const paths = this.buildPaths(items);
         const content = paths.slice(0, this.recentLimit).map((item, index) =>
-            <div className="gs-action-container" key={index}>
-                <a href="#" onClick={a => this.open(new URI(items[index]))}>{new URI(items[index]).path.base}</a>
-                <span className="gs-action-details">
+            <div className="ves-welcome-action-container" key={index}>
+                <a href="#" onClick={a => this.openWorkspaceServiceUri(new URI(items[index]))}>{new URI(items[index]).path.base}</a>
+                <span className="ves-welcome-action-details">
                     {item}
                 </span>
             </div>
         );
-        const more = paths.length > this.recentLimit && <div className="gs-action-container"><a href="#" onClick={this.doOpenRecentWorkspace}>More...</a></div>;
-        return <div className="gs-section">
-            <h3 className="gs-section-header">
+        const more = paths.length > this.recentLimit && <div className="ves-welcome-action-container"><a href="#" onClick={this.openRecentWorkspace}>More...</a></div>;
+        return <div className="ves-welcome-section">
+            <h3 className="ves-welcome-section-header">
                 <i className="fa fa-clock-o"></i>Recently Opened
             </h3>
-            {items.length > 0 ? content : <p className="gs-no-recent">No Recent Workspaces</p>}
+            {items.length > 0 ? content : <p className="ves-welcome-empty">No Recent Workspaces</p>}
             {more}
         </div>;
     }
 
     protected renderSettings(): React.ReactNode {
-        return <div className="gs-section">
-            <h3 className="gs-section-header">
+        return <div className="ves-welcome-section">
+            <h3 className="ves-welcome-section-header">
                 <i className="fa fa-cog"></i>
                 Settings
             </h3>
-            <div className="gs-action-container">
-                <a href="#" onClick={this.doOpenPreferences}>Open Preferences</a>
+            <div className="ves-welcome-action-container">
+                <a href="#" onClick={this.openPreferences}>Open Preferences</a>
             </div>
-            <div className="gs-action-container">
-                <a href="#" onClick={this.doOpenKeyboardShortcuts}>Open Keyboard Shortcuts</a>
+            <div className="ves-welcome-action-container">
+                <a href="#" onClick={this.openKeyboardShortcuts}>Open Keyboard Shortcuts</a>
             </div>
         </div>;
     }
 
     protected renderHelp(): React.ReactNode {
-        return <div className="gs-section">
-            <h3 className="gs-section-header">
+        return <div className="ves-welcome-section">
+            <h3 className="ves-welcome-section-header">
                 <i className="fa fa-question-circle"></i>
                 Help
             </h3>
-            <div className="gs-action-container">
-                <a href={this.documentationUrl} target="_blank">Documentation</a>
+            <div className="ves-welcome-action-container">
+                <p className="ves-welcome-empty">Tutorials coming soon...</p>
+            </div>
+        </div>;
+    }
+
+    protected renderLinks(): React.ReactNode {
+        return <div className="ves-welcome-section">
+            <h3 className="ves-welcome-section-header">
+                <i className="fa fa-link"></i>
+                Links
+            </h3>
+            <div className="ves-welcome-action-container">
+                <a href="#" onClick={() => this.openUrl(this.patreonUrl)}>Support Us on Patreon</a>
+            </div>
+            <div className="ves-welcome-action-container">
+                <a href="#" onClick={() => this.openUrl(this.vuengineUrl)}>VUEngine Website</a>
+            </div>
+            <div className="ves-welcome-action-container">
+                <a href="#" onClick={() => this.openUrl(this.planetVbUrl)}>Planet Virtual Boy</a>
+            </div>
+        </div>;
+    }
+
+    protected renderExamples(): React.ReactNode {
+        return <div className="ves-welcome-section">
+            <h3 className="ves-welcome-section-header">
+                <i className="fa fa-star"></i>
+                Made with VUEngine Studio
+            </h3>
+            <div className="ves-welcome-action-container">
+                <p className="ves-welcome-empty">Examples coming soon...</p>
             </div>
         </div>;
     }
@@ -156,12 +204,13 @@ export class WelcomeWidget extends ReactWidget {
         return paths;
     }
 
-    protected doOpen = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN.id);
-    protected doOpenFile = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN_FILE.id);
-    protected doOpenFolder = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN_FOLDER.id);
-    protected doOpenWorkspace = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN_WORKSPACE.id);
-    protected doOpenRecentWorkspace = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN_RECENT_WORKSPACE.id);
-    protected doOpenPreferences = () => this.commandRegistry.executeCommand(CommonCommands.OPEN_PREFERENCES.id);
-    protected doOpenKeyboardShortcuts = () => this.commandRegistry.executeCommand(KeymapsCommands.OPEN_KEYMAPS.id);
-    protected open = (uri: URI) => this.workspaceService.open(uri);
+    protected open = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN.id);
+    protected openFile = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN_FILE.id);
+    protected openFolder = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN_FOLDER.id);
+    protected openWorkspace = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN_WORKSPACE.id);
+    protected openRecentWorkspace = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN_RECENT_WORKSPACE.id);
+    protected openPreferences = () => this.commandRegistry.executeCommand(CommonCommands.OPEN_PREFERENCES.id);
+    protected openKeyboardShortcuts = () => this.commandRegistry.executeCommand(KeymapsCommands.OPEN_KEYMAPS.id);
+    protected openWorkspaceServiceUri = (uri: URI) => this.workspaceService.open(uri);
+    protected openUrl = (url: string) => openUrl(url);
 }

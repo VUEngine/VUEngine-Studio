@@ -6,7 +6,7 @@ import {
   SaveFileDialogProps,
 } from "@theia/filesystem/lib/browser";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
-import { getRomPath } from "../../common";
+import { getRomPath } from "../../common/functions";
 import { VesStateModel } from "../../common/vesStateModel";
 import { VesBuildCommand } from "../commands";
 

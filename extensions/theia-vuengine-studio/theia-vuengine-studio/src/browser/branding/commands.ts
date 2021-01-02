@@ -1,9 +1,8 @@
-import { inject, injectable, interfaces } from "inversify";
+import { injectable, interfaces } from "inversify";
 import {
   Command,
   CommandContribution,
   CommandRegistry,
-  CommandService,
 } from "@theia/core/lib/common";
 import { supportUsCommand } from "./commands/supportUs";
 
@@ -16,13 +15,9 @@ export const VesSupportUsCommand: Command = {
 
 @injectable()
 export class VesBrandingCommandContribution implements CommandContribution {
-  constructor(
-    @inject(CommandService) private readonly commandService: CommandService,
-  ) { }
-
   registerCommands(registry: CommandRegistry): void {
     registry.registerCommand(VesSupportUsCommand, {
-      execute: () => supportUsCommand(this.commandService)
+      execute: () => supportUsCommand()
     });
   }
 }

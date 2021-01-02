@@ -13,7 +13,7 @@ import { VesUsbService } from "../../../common/usb-service-protocol";
 
 import { VesBuildCommand } from "../../build/commands";
 import { VesBuildEnableWslPreference } from "../../build/preferences";
-import { convertoToEnvPath, getOs, getResourcesPath, getRomPath } from "../../common";
+import { convertoToEnvPath, getOs, getResourcesPath, getRomPath } from "../../common/functions";
 import { VesStateModel } from "../../common/vesStateModel";
 import { VesFlashCartsCustomPreference } from "../preferences";
 

@@ -16,6 +16,7 @@
 		"peekView.border": "#a22929",
 		"statusBarItem.hoverBackground": "#cccccc",
 		"statusBar.background": "#616161",
+		"statusBar.noFolderBackground": "#616161",
 		"statusBar.border": "#ffffff",
 		"textBlockQuote.border": "#a2292980",
 		"titleBar.activeBackground": "#a22929",

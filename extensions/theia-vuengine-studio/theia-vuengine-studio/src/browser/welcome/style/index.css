@@ -1,67 +1,82 @@
- html, body {
-    font-family: var(--theia-ui-font-family);
-}
-
-.col {
+#vesWelcomeWidget .col {
     flex: 1;
     align-items: center;
     justify-content: center;
 }
 
-.flex-grid {
+#vesWelcomeWidget .flex-grid {
     display: flex;
 }
 
-.gs-action-container {
+#vesWelcomeWidget .flex-grid.emulated-flex-gap > .flex-grid-column {
+    margin-left: 40px;
+}
+
+#vesWelcomeWidget .flex-grid.emulated-flex-gap {
+    display: inline-flex;
+    flex-wrap: wrap;
+    margin-left: -40px;
+    width: calc(100% + 40px);
+}
+
+#vesWelcomeWidget .flex-grid.open {
+    padding: 20px 0;
+}
+#vesWelcomeWidget .flex-grid.open .theia-button:first-child {
+    margin-left: 0;
+}
+
+#vesWelcomeWidget .ves-welcome-action-container {
     line-height: 20px;
 }
 
-.gs-action-details {
+#vesWelcomeWidget .ves-welcome-action-details {
     padding-left: 5px;
     color: var(--theia-descriptionForeground);
 }
 
-.gs-container {
+#vesWelcomeWidget .ves-welcome-container {
     padding: 20px;
 }
 
-.gs-header h1 {
+#vesWelcomeWidget .ves-welcome-header h1 {
     flex: 1;
     font-weight: 600;
 }
 
-.gs-hr {
+#vesWelcomeWidget .ves-welcome-hr {
     background-color: var(--theia-contrastBorder);
     height: 1px;
     border: 0;
     margin: 0px;
 }
 
-.gs-no-recent {
+#vesWelcomeWidget .ves-welcome-empty {
     color: var(--theia-descriptionForeground);
+    font-style: italic;
 }
 
-.gs-section a {
+#vesWelcomeWidget .ves-welcome-section a {
     border: none;
     font-weight: 500;
     text-decoration: none;
 }
 
-.gs-section a:hover {
+#vesWelcomeWidget .ves-welcome-section a:hover {
     text-decoration: underline;
 }
 
-.gs-section-header {
+#vesWelcomeWidget .ves-welcome-section-header {
     font-size: var(--theia-ui-font-size2);
     font-weight: 600;
-    margin-bottom: 5px;
+    margin: 20px 0 5px;
 }
 
-.gs-section-header i {
+#vesWelcomeWidget .ves-welcome-section-header i {
     padding-right: 5px;
 }
 
-.gs-sub-header {
+#vesWelcomeWidget .ves-welcome-sub-header {
     color: var(--theia-descriptionForeground);
     text-transform: capitalize;
     font-weight: 400;
