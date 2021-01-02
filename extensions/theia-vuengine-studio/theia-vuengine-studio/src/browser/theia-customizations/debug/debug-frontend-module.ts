@@ -1,13 +1,12 @@
 import { interfaces } from 'inversify';
 import { DebugConsoleContribution } from '@theia/debug/lib/browser/console/debug-console-contribution';
 import { DebugFrontendApplicationContribution } from '@theia/debug/lib/browser/debug-frontend-application-contribution';
-
 import { DebugPrefixConfiguration } from '@theia/debug/lib/browser/debug-prefix-configuration';
-import { VesDebugRemovalContribution } from './debug-contribution';
+import { VesTheiaCustomizationDebugContribution } from './debug-contribution';
 
-export function rebindDebugRemovalModule(bind: interfaces.Bind, rebind: interfaces.Rebind): void {
-    bind(VesDebugRemovalContribution).toSelf().inSingletonScope();
-    rebind(DebugFrontendApplicationContribution).toService(VesDebugRemovalContribution);
+export function bindTheiaCustomizationDebugModule(bind: interfaces.Bind, rebind: interfaces.Rebind): void {
+    bind(VesTheiaCustomizationDebugContribution).toSelf().inSingletonScope();
+    rebind(DebugFrontendApplicationContribution).toService(VesTheiaCustomizationDebugContribution);
 
     rebind(DebugConsoleContribution).toConstantValue({
         registerCommands: () => { },
