@@ -15,7 +15,6 @@
     "@theia/electron": "^1.9.0",
     "@theia/file-search": "^1.9.0",
     "@theia/filesystem": "^1.9.0",
-    "@theia/getting-started": "^1.9.0",
     "@theia/git": "^1.9.0",
     "@theia/keymaps": "^1.9.0",
     "@theia/markers": "^1.9.0",
