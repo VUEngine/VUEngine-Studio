@@ -4,6 +4,8 @@ import { bindTheiaCustomizationDebugModule } from './debug/debug-frontend-module
 import { bindTheiaCustomizationPluginModule } from './plugin/plugin-frontend-module';
 
 import "../../../src/browser/theia-customizations/style/buttons.css";
+import "../../../src/browser/theia-customizations/style/dialog.css";
+import "../../../src/browser/theia-customizations/style/menu.css";
 import "../../../src/browser/theia-customizations/style/quick-open.css";
 import "../../../src/browser/theia-customizations/style/statusbar.css";
 

@@ -1,82 +1,82 @@
-#vesWelcomeWidget .col {
+.ves-welcome-col {
     flex: 1;
     align-items: center;
     justify-content: center;
 }
 
-#vesWelcomeWidget .flex-grid {
+.ves-welcome-flex-grid {
     display: flex;
 }
 
-#vesWelcomeWidget .flex-grid.emulated-flex-gap > .flex-grid-column {
+.ves-welcome-flex-grid.emulated-flex-gap > .ves-welcome-flex-grid-column {
     margin-left: 40px;
 }
 
-#vesWelcomeWidget .flex-grid.emulated-flex-gap {
+.ves-welcome-flex-grid.emulated-flex-gap {
     display: inline-flex;
     flex-wrap: wrap;
     margin-left: -40px;
     width: calc(100% + 40px);
 }
 
-#vesWelcomeWidget .flex-grid.open {
+.ves-welcome-flex-grid.open {
     padding: 20px 0;
 }
-#vesWelcomeWidget .flex-grid.open .theia-button:first-child {
+.ves-welcome-flex-grid.open .theia-button:first-child {
     margin-left: 0;
 }
 
-#vesWelcomeWidget .ves-welcome-action-container {
+.ves-welcome-action-container {
     line-height: 20px;
 }
 
-#vesWelcomeWidget .ves-welcome-action-details {
+.ves-welcome-action-details {
     padding-left: 5px;
     color: var(--theia-descriptionForeground);
 }
 
-#vesWelcomeWidget .ves-welcome-container {
+.ves-welcome-container {
     padding: 20px;
 }
 
-#vesWelcomeWidget .ves-welcome-header h1 {
+.ves-welcome-header h1 {
     flex: 1;
     font-weight: 600;
 }
 
-#vesWelcomeWidget .ves-welcome-hr {
+.ves-welcome-hr {
     background-color: var(--theia-contrastBorder);
     height: 1px;
     border: 0;
     margin: 0px;
 }
 
-#vesWelcomeWidget .ves-welcome-empty {
+.ves-welcome-empty {
     color: var(--theia-descriptionForeground);
     font-style: italic;
 }
 
-#vesWelcomeWidget .ves-welcome-section a {
+.ves-welcome-section a {
     border: none;
     font-weight: 500;
     text-decoration: none;
 }
 
-#vesWelcomeWidget .ves-welcome-section a:hover {
+.ves-welcome-section a:hover {
     text-decoration: underline;
 }
 
-#vesWelcomeWidget .ves-welcome-section-header {
+.ves-welcome-section-header {
     font-size: var(--theia-ui-font-size2);
     font-weight: 600;
     margin: 20px 0 5px;
 }
 
-#vesWelcomeWidget .ves-welcome-section-header i {
+.ves-welcome-section-header i {
     padding-right: 5px;
 }
 
-#vesWelcomeWidget .ves-welcome-sub-header {
+.ves-welcome-sub-header {
     color: var(--theia-descriptionForeground);
     text-transform: capitalize;
     font-weight: 400;

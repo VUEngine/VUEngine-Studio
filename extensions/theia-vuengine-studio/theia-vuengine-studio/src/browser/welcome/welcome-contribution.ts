@@ -35,8 +35,8 @@ export class WelcomeContribution extends AbstractViewContribution<WelcomeWidget>
         }
     }
 
-    registerCommands(registry: CommandRegistry): void {
-        registry.registerCommand(WelcomeCommand, {
+    registerCommands(commandRegistry: CommandRegistry): void {
+        commandRegistry.registerCommand(WelcomeCommand, {
             execute: () => this.openView({ reveal: true }),
         });
     }

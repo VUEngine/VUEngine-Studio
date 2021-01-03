@@ -15,8 +15,8 @@ export const VesSupportUsCommand: Command = {
 
 @injectable()
 export class VesBrandingCommandContribution implements CommandContribution {
-  registerCommands(registry: CommandRegistry): void {
-    registry.registerCommand(VesSupportUsCommand, {
+  registerCommands(commandRegistry: CommandRegistry): void {
+    commandRegistry.registerCommand(VesSupportUsCommand, {
       execute: () => supportUsCommand()
     });
   }

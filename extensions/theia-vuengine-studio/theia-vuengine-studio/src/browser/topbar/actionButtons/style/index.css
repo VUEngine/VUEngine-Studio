@@ -29,9 +29,7 @@
   min-width: 40px;
   padding: 1px 0 0;
 }
-#ves-topbar-action-buttons .theia-button:not([disabled]):hover {
-  background-color: #1a2a6c;
-}
+
 #ves-topbar-action-buttons .theia-button.build {
   min-width: 64px;
 }

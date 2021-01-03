@@ -37,8 +37,8 @@ export class VesBuildCommandContribution implements CommandContribution {
     @inject(VesStateModel) private readonly vesState: VesStateModel,
   ) { }
 
-  registerCommands(registry: CommandRegistry): void {
-    registry.registerCommand(VesBuildCleanCommand, {
+  registerCommands(commandRegistry: CommandRegistry): void {
+    commandRegistry.registerCommand(VesBuildCleanCommand, {
       execute: () =>
         cleanCommand(
           this.messageService,
@@ -46,7 +46,7 @@ export class VesBuildCommandContribution implements CommandContribution {
           this.vesState
         ),
     });
-    registry.registerCommand(VesBuildCommand, {
+    commandRegistry.registerCommand(VesBuildCommand, {
       execute: () =>
         buildCommand(
           this.fileService,
@@ -56,7 +56,7 @@ export class VesBuildCommandContribution implements CommandContribution {
           this.vesState
         ),
     });
-    registry.registerCommand(VesBuildExportCommand, {
+    commandRegistry.registerCommand(VesBuildExportCommand, {
       execute: () =>
         exportCommand(
           this.commandService,
@@ -66,22 +66,22 @@ export class VesBuildCommandContribution implements CommandContribution {
         ),
     });
 
-    registry.registerCommand(VesBuildSetModeCommand, {
+    commandRegistry.registerCommand(VesBuildSetModeCommand, {
       execute: () => setModeCommand(this.preferenceService, this.quickPickService)
     });
 
-    registry.registerCommand(VesBuildToggleDumpElfCommand, {
+    commandRegistry.registerCommand(VesBuildToggleDumpElfCommand, {
       execute: () => toggleDumpElf(this.preferenceService),
       isToggled: () => !!this.preferenceService.get(VesBuildDumpElfPreference.id),
     });
 
-    registry.registerCommand(VesBuildTogglePedanticWarningsCommand, {
+    commandRegistry.registerCommand(VesBuildTogglePedanticWarningsCommand, {
       execute: () => togglePedanticWarnings(this.preferenceService),
       isToggled: () => !!this.preferenceService.get(VesBuildPedanticWarningsPreference.id),
     });
 
     if (isWindows) {
-      registry.registerCommand(VesBuildToggleEnableWslCommand, {
+      commandRegistry.registerCommand(VesBuildToggleEnableWslCommand, {
         execute: () => toggleEnableWsl(this.preferenceService),
         isToggled: () => !!this.preferenceService.get(VesBuildEnableWslPreference.id),
       });

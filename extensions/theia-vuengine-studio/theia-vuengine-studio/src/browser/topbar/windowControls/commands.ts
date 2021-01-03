@@ -22,15 +22,15 @@ export const VesUnmaximizeWindowCommand: Command = {
 
 @injectable()
 export class VesWindowControlsCommandContribution implements CommandContribution {
-  registerCommands(registry: CommandRegistry): void {
+  registerCommands(commandRegistry: CommandRegistry): void {
     const currentWindow = electron.remote.getCurrentWindow();
-    registry.registerCommand(VesMinimizeWindowCommand, {
+    commandRegistry.registerCommand(VesMinimizeWindowCommand, {
       execute: () => currentWindow.minimize()
     });
-    registry.registerCommand(VesMaximizeWindowCommand, {
+    commandRegistry.registerCommand(VesMaximizeWindowCommand, {
       execute: () => currentWindow.maximize()
     });
-    registry.registerCommand(VesUnmaximizeWindowCommand, {
+    commandRegistry.registerCommand(VesUnmaximizeWindowCommand, {
       execute: () => currentWindow.unmaximize()
     });
   }

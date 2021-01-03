@@ -22,8 +22,8 @@ export class VesRunCommandContribution implements CommandContribution {
     @inject(VesStateModel) private readonly vesState: VesStateModel,
   ) { }
 
-  registerCommands(registry: CommandRegistry): void {
-    registry.registerCommand(VesRunCommand, {
+  registerCommands(commandRegistry: CommandRegistry): void {
+    commandRegistry.registerCommand(VesRunCommand, {
       execute: () =>
         runCommand(
           this.commandService,
@@ -32,7 +32,7 @@ export class VesRunCommandContribution implements CommandContribution {
           this.vesState
         ),
     });
-    registry.registerCommand(VesSelectEmulatorCommand, {
+    commandRegistry.registerCommand(VesSelectEmulatorCommand, {
       execute: () =>
         selectEmulatorCommand(
           this.preferenceService,

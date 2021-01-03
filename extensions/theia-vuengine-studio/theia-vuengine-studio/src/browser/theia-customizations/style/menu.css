@@ -1,0 +1,13 @@
+.p-Widget.p-MenuBar {
+    padding-left: 0;
+}
+
+/* do not drag main menu popups 4px to the top */
+.p-MenuBar-menu {
+    transform: none;
+}
+
+.p-MenuBar-item,
+.p-Menu-item {
+    cursor: pointer;
+}

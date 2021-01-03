@@ -10,6 +10,7 @@ import { ApplicationInfo, ApplicationServer } from "@theia/core/lib/common/appli
 import { FrontendApplicationConfigProvider } from "@theia/core/lib/browser/frontend-application-config-provider";
 import { EnvVariablesServer } from "@theia/core/lib/common/env-variables";
 import { openUrl } from "../common/functions";
+import { VesUrls } from "../common/urls";
 
 @injectable()
 export class WelcomeWidget extends ReactWidget {
@@ -22,10 +23,6 @@ export class WelcomeWidget extends ReactWidget {
     protected home: string | undefined;
     protected recentLimit = 10;
     protected recentWorkspaces: string[] = [];
-
-    protected readonly patreonUrl = "https://www.patreon.com/vuengine";
-    protected readonly vuengineUrl = "https://www.vuengine.dev";
-    protected readonly planetVbUrl = "https://www.virtual-boy.com";
 
     @inject(ApplicationServer) protected readonly appServer: ApplicationServer;
     @inject(CommandRegistry) protected readonly commandRegistry: CommandRegistry;
@@ -50,37 +47,37 @@ export class WelcomeWidget extends ReactWidget {
     protected render(): React.ReactNode {
         return <div className="ves-welcome-container">
             {this.renderHeader()}
-            <div className="flex-grid open">
-                <div className="col">
+            <div className="ves-welcome-flex-grid open">
+                <div className="ves-welcome-col">
                     {this.renderOpen()}
                 </div>
             </div>
-            <div className="flex-grid emulated-flex-gap">
-                <div className="flex-grid-column">
-                    <div className="flex-grid recent">
-                        <div className="col">
+            <div className="ves-welcome-flex-grid emulated-flex-gap">
+                <div className="ves-welcome-flex-grid-column">
+                    <div className="ves-welcome-flex-grid recent">
+                        <div className="ves-welcome-col">
                             {this.renderRecentWorkspaces()}
                         </div>
                     </div>
-                    <div className="flex-grid settings">
-                        <div className="col">
+                    <div className="ves-welcome-flex-grid settings">
+                        <div className="ves-welcome-col">
                             {this.renderSettings()}
                         </div>
                     </div>
-                    <div className="flex-grid links">
-                        <div className="col">
+                    <div className="ves-welcome-flex-grid links">
+                        <div className="ves-welcome-col">
                             {this.renderLinks()}
                         </div>
                     </div>
-                    <div className="flex-grid links">
-                        <div className="col">
+                    <div className="ves-welcome-flex-grid links">
+                        <div className="ves-welcome-col">
                             {this.renderExamples()}
                         </div>
                     </div>
                 </div>
-                <div className="flex-grid-column">
-                    <div className="flex-grid help">
-                        <div className="col">
+                <div className="ves-welcome-flex-grid-column">
+                    <div className="ves-welcome-flex-grid help">
+                        <div className="ves-welcome-col">
                             {this.renderHelp()}
                         </div>
                     </div>
@@ -170,13 +167,13 @@ export class WelcomeWidget extends ReactWidget {
                 Links
             </h3>
             <div className="ves-welcome-action-container">
-                <a href="#" onClick={() => this.openUrl(this.patreonUrl)}>Support Us on Patreon</a>
+                <a href="#" onClick={() => this.openUrl(VesUrls.PATREON)}>Support Us on Patreon</a>
             </div>
             <div className="ves-welcome-action-container">
-                <a href="#" onClick={() => this.openUrl(this.vuengineUrl)}>VUEngine Website</a>
+                <a href="#" onClick={() => this.openUrl(VesUrls.VUENGINE_STUDIO)}>VUEngine Website</a>
             </div>
             <div className="ves-welcome-action-container">
-                <a href="#" onClick={() => this.openUrl(this.planetVbUrl)}>Planet Virtual Boy</a>
+                <a href="#" onClick={() => this.openUrl(VesUrls.VUENGINE_STUDIO)}>Planet Virtual Boy</a>
             </div>
         </div>;
     }

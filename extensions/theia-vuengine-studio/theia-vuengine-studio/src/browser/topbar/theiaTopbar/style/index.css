@@ -1,21 +1,8 @@
-/* TODO: move style overrides to separate place. branding folder? */
-
-.p-Widget.p-MenuBar {
-  padding-left: 0;
-}
-
-/* do not drag main menu popups 4px to the top */
-.p-MenuBar-menu {
-  transform: none;
-}
-
 :root {
   --theia-private-menubar-height: 38px;
-  --theia-statusBar-height: 28px;
 }
 
 #theia-top-panel {
-  background: linear-gradient(to right, #1a2a6c 0%, #a22929 30%, #a22929 70%, #ce650a 100%);
   -webkit-app-region: drag;
   display: flex;
   flex-wrap: nowrap;
@@ -30,18 +17,4 @@
   -webkit-app-region: no-drag;
   flex-shrink: 0;
   order: 2;
-}
-
-#theia-statusBar .area.left {
-  padding-left: var(--theia-ui-padding);
-}
-
-#theia-statusBar .area.right {
-  padding-right: var(--theia-ui-padding);
-}
-
-#theia-statusBar .area.left .element,
-#theia-statusBar .area.right .element {
-  margin-left: unset;
-  padding: 0 var(--theia-ui-padding);
 }

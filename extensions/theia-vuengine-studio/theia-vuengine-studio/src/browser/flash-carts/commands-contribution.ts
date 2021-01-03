@@ -26,8 +26,8 @@ export class VesFlashCartsCommandContribution implements CommandContribution {
     @inject(VesStateModel) private readonly vesState: VesStateModel,
   ) { }
 
-  registerCommands(registry: CommandRegistry): void {
-    registry.registerCommand(VesFlashCartsCommand, {
+  registerCommands(commandRegistry: CommandRegistry): void {
+    commandRegistry.registerCommand(VesFlashCartsCommand, {
       execute: () =>
         flashCommand(
           this.commandService,
