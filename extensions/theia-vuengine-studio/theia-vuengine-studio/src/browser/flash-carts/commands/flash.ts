@@ -2,7 +2,7 @@ import { createWriteStream, readFileSync, unlinkSync } from "fs";
 import { dirname, join as joinPath } from "path";
 import { Device } from "usb";
 import { PreferenceService } from "@theia/core/lib/browser";
-import { CommandService, isWindows, MessageService } from "@theia/core/lib/common";
+import { CommandService, isOSX, isWindows, MessageService } from "@theia/core/lib/common";
 import URI from "@theia/core/lib/common/uri";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
@@ -124,7 +124,9 @@ export function getFlashCartConfigs(preferenceService: PreferenceService) {
         "hf-cli",
         isWindows ? "hfcli.exe" : "hfcli"
       ),
-      args: "-p %PORT% -s %ROM% -u",
+      args: isOSX
+        ? `-p %PORT% -s %ROM% -u --slow`
+        : `-p %PORT% -s %ROM% -u`,
       padRom: false,
     },
   ];

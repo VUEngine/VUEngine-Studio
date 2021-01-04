@@ -62,11 +62,25 @@ export class VesAboutDialog extends AboutDialog {
             <hr className="ves-about-hr" />
             <div className="ves-about-paragraph">
                 <div>
-                    <a href="#" onClick={() => this.openUrl(VesUrls.LICENSE)}>Eclipse Public License 2.0</a> or
+                    Built with <a href="#" onClick={() => this.openUrl(VesUrls.THEIA_WEBSITE)}>Eclipse Theia</a> – <a href="#" onClick={() => this.openUrl(VesUrls.LICENSE)}>Eclipse Public License 2.0</a> or
                 </div>
                 <div>
                     <a href="#" onClick={() => this.openUrl(VesUrls.LICENSE)}>(Secondary) GNU General Public License, version 2 with the GNU Classpath Exception</a>
                 </div>
+            </div>
+            <hr className="ves-about-hr" />
+            <div className="ves-about-paragraph">
+                <div>
+                    Includes the following third party binaries:
+                </div>
+                <ul>
+                    <li>GCC 4.7 <i>– The GNU Project, with patches for V810 by ElmerPCFX</i></li>
+                    <li>Grit 0.8.6 <i>– Jasper Vijn, with patches for Virtual Boy by dasi</i></li>
+                    <li>hf-cli 1.0.0.0 <i>– thunderstruck</i></li>
+                    <li>Mednafen <i>– The Mednafen team</i></li>
+                    <li>MSYS <i>– The MinGW Project</i></li>
+                    <li>prog-vb 0.10.0 <i>– William D. Jones</i></li>
+                </ul>
             </div>
             <hr className="ves-about-hr" />
             <div className="ves-about-paragraph">
