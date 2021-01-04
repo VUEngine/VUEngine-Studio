@@ -1,16 +1,12 @@
+import { createWriteStream, readFileSync, unlinkSync } from "fs";
+import { dirname, join as joinPath } from "path";
+import { Device } from "usb";
 import { PreferenceService } from "@theia/core/lib/browser";
-import {
-  CommandService,
-  isWindows,
-  MessageService,
-} from "@theia/core/lib/common";
+import { CommandService, isWindows, MessageService } from "@theia/core/lib/common";
 import URI from "@theia/core/lib/common/uri";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
-import { createWriteStream, readFileSync, unlinkSync } from "fs";
-import { dirname, join as joinPath } from "path";
 import { VesUsbService } from "../../../common/usb-service-protocol";
-
 import { VesBuildCommand } from "../../build/commands";
 import { VesBuildEnableWslPreference } from "../../build/preferences";
 import { convertoToEnvPath, getOs, getResourcesPath, getRomPath } from "../../common/functions";
@@ -28,6 +24,11 @@ export type FlashCartConfig = {
   args: string;
   padRom: boolean;
 };
+
+export type ConnectedFlashCart = {
+  config: FlashCartConfig,
+  device: Device,
+}
 
 export async function flashCommand(
   commandService: CommandService,
@@ -115,8 +116,15 @@ export function getFlashCartConfigs(preferenceService: PreferenceService) {
       manufacturer: "FTDI",
       product: "FT232R",
       size: 32,
-      path: "",
-      args: "%ROM%",
+      path: joinPath(
+        getResourcesPath(),
+        "binaries",
+        "vuengine-studio-tools",
+        getOs(),
+        "hf-cli",
+        isWindows ? "hfcli.exe" : "hfcli"
+      ),
+      args: "-p %PORT% -s %ROM% -u",
       padRom: false,
     },
   ];
@@ -138,25 +146,25 @@ async function flash(
     return;
   }
 
-  if (!vesState.connectedFlashCart.path) {
+  if (!vesState.connectedFlashCart.config.path) {
     messageService.error(
-      `No path to flasher software provided for cart "${vesState.connectedFlashCart.name}"`
+      `No path to flasher software provided for cart "${vesState.connectedFlashCart.config.name}"`
     );
     return;
   }
 
-  if (!await fileService.exists(new URI(dirname(vesState.connectedFlashCart.path)))) {
+  if (!await fileService.exists(new URI(dirname(vesState.connectedFlashCart.config.path)))) {
     messageService.error(
-      `Flasher software does not exist at "${vesState.connectedFlashCart.path}"`
+      `Flasher software does not exist at "${vesState.connectedFlashCart.config.path}"`
     );
     return;
   }
 
-  const fixPermissions = isWindows ? "" : `chmod a+x "${vesState.connectedFlashCart.path}" && `;
+  const fixPermissions = isWindows ? "" : `chmod a+x "${vesState.connectedFlashCart.config.path}" && `;
 
   let flasherEnvPath = convertoToEnvPath(
     preferenceService,
-    vesState.connectedFlashCart.path
+    vesState.connectedFlashCart.config.path
   );
 
   const enableWsl = preferenceService.get(VesBuildEnableWslPreference.id);
@@ -165,13 +173,15 @@ async function flash(
   }
 
   const romPath =
-    vesState.connectedFlashCart.padRom &&
-      await padRom(fileService, vesState, vesState.connectedFlashCart.size)
+    vesState.connectedFlashCart.config.padRom &&
+      await padRom(fileService, vesState, vesState.connectedFlashCart.config.size)
       ? getPaddedRomPath()
       : getRomPath();
 
-  const flasherArgs = vesState.connectedFlashCart.args
-    ? " " + vesState.connectedFlashCart.args.replace("%ROM%", `"${romPath}"`)
+  const flasherArgs = vesState.connectedFlashCart.config.args
+    ? " " + vesState.connectedFlashCart.config.args
+      .replace("%ROM%", `"${romPath}"`)
+      .replace("%PORT%", `...`)
     : "";
 
   const terminalId = "vuengine-flash";

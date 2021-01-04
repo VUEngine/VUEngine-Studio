@@ -23,7 +23,8 @@ export const VesRunEmulatorConfigsPreference: VesProperty = {
                 args: {
                     type: "string",
                     multiline: true,
-                    description: "Arguments to pass to emulator. Use %ROM% as a placeholder for the project's output ROM path.",
+                    description: "Arguments to pass to emulator. You can use the following placeholders: "
+                        + "%ROM%: project's output ROM image path ",
                     label: "Arguments",
                 },
             },

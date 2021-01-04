@@ -1,7 +1,7 @@
 import { injectable, postConstruct } from "inversify";
 import { Device, getDeviceList, on } from "usb";
 import { Emitter, Event } from "@theia/core";
-import { FlashCartConfig } from "../../browser/flash-carts/commands/flash";
+import { ConnectedFlashCart, FlashCartConfig } from "../../browser/flash-carts/commands/flash";
 import { VesUsbService } from "../../common/usb-service-protocol";
 
 @injectable()
@@ -24,7 +24,7 @@ export class DefaultVesUsbService implements VesUsbService {
         });
     }
 
-    async detectFlashCart(...flashCartConfigs: FlashCartConfig[]): Promise<FlashCartConfig | undefined> {
+    async detectFlashCart(...flashCartConfigs: FlashCartConfig[]): Promise<ConnectedFlashCart | undefined> {
         const devices: Device[] = getDeviceList();
         let manufacturer: string | undefined;
         let product: string | undefined;
@@ -60,7 +60,10 @@ export class DefaultVesUsbService implements VesUsbService {
                         (flashCartConfig.product === "" ||
                             product?.includes(flashCartConfig.product))
                     ) {
-                        return flashCartConfig;
+                        return {
+                            config: flashCartConfig,
+                            device: devices[i],
+                        }
                     }
                 }
             }

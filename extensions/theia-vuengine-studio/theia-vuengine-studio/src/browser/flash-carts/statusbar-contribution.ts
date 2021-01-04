@@ -1,7 +1,7 @@
 import { inject, injectable, interfaces } from "inversify";
 import { FrontendApplication, FrontendApplicationContribution, StatusBar, StatusBarAlignment } from "@theia/core/lib/browser";
 import { VesStateModel } from "../common/vesStateModel";
-import { FlashCartConfig } from "./commands/flash";
+import { ConnectedFlashCart } from "./commands/flash";
 
 @injectable()
 export class VesFlashCartsStatusBarContribution implements FrontendApplicationContribution {
@@ -15,18 +15,18 @@ export class VesFlashCartsStatusBarContribution implements FrontendApplicationCo
     updateStatusBar() {
         this.setConnectedFlashCartStatusBar();
 
-        this.vesState.onDidChangeConnectedFlashCart((flashCartConfig: FlashCartConfig | undefined) => {
-            this.setConnectedFlashCartStatusBar(flashCartConfig ? flashCartConfig.name : undefined);
+        this.vesState.onDidChangeConnectedFlashCart((connectedFlashCart: ConnectedFlashCart | undefined) => {
+            this.setConnectedFlashCartStatusBar(connectedFlashCart ? connectedFlashCart.config.name : undefined);
         });
     }
 
     setConnectedFlashCartStatusBar(name?: string) {
-        const emulatorName = name ? name : "No Flash Cart Connected";
+        const text = name ? name : "No Flash Cart Connected";
         this.statusBar.setElement("ves-flash-cart", {
             alignment: StatusBarAlignment.LEFT,
             className: name ? "" : "disabled",
             priority: 1,
-            text: `$(usb) ${emulatorName}`,
+            text: `$(usb) ${text}`,
             tooltip: "Connected Flash Cart"
         });
     }

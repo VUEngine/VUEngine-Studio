@@ -4,7 +4,7 @@ import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import URI from "@theia/core/lib/common/uri";
 import { FileChangesEvent } from "@theia/filesystem/lib/common/files";
 import { BuildMode } from "../build/types";
-import { FlashCartConfig, getFlashCartConfigs } from "../flash-carts/commands/flash";
+import { ConnectedFlashCart, FlashCartConfig, getFlashCartConfigs } from "../flash-carts/commands/flash";
 import { getBuildPath, getRomPath } from "./functions";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { VesBuildModePreference } from "../build/preferences";
@@ -146,14 +146,14 @@ export class VesStateModel {
     }
 
     // connected flash cart
-    protected _connectedFlashCart: FlashCartConfig | undefined = undefined;
-    protected readonly onDidChangeConnectedFlashCartEmitter = new Emitter<FlashCartConfig | undefined>();
+    protected _connectedFlashCart: ConnectedFlashCart | undefined = undefined;
+    protected readonly onDidChangeConnectedFlashCartEmitter = new Emitter<ConnectedFlashCart | undefined>();
     readonly onDidChangeConnectedFlashCart = this.onDidChangeConnectedFlashCartEmitter.event;
-    set connectedFlashCart(connectedFlashCart: FlashCartConfig | undefined) {
+    set connectedFlashCart(connectedFlashCart: ConnectedFlashCart | undefined) {
         this._connectedFlashCart = connectedFlashCart;
         this.onDidChangeConnectedFlashCartEmitter.fire(this._connectedFlashCart);
     }
-    get connectedFlashCart(): FlashCartConfig | undefined {
+    get connectedFlashCart(): ConnectedFlashCart | undefined {
         return this._connectedFlashCart;
     }
 

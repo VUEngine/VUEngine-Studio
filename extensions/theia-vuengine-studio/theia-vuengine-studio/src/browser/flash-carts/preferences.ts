@@ -48,7 +48,9 @@ export const VesFlashCartsCustomPreference: VesProperty = {
                 args: {
                     type: "string",
                     multiline: true,
-                    description: "Arguments to pass to flasher software",
+                    description: "Arguments to pass to flasher software. You can use the following placeholders: "
+                        + "%ROM%: project's output ROM image path "
+                        + "%PORT%: port the flash cart is connected to ",
                 },
                 padRom: {
                     type: "boolean",
