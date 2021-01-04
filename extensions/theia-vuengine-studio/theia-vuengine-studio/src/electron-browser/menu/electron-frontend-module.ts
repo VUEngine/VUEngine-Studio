@@ -1,6 +1,6 @@
-import { ContainerModule } from 'inversify';
+import { interfaces } from 'inversify';
 import { bindVesElectronMenu } from './electron-menu-contribution';
 
-export default new ContainerModule((bind, unbind, isBound, rebind) => {
+export function bindVesElectronMenuContributions(bind: interfaces.Bind, rebind: interfaces.Rebind): void {
     bindVesElectronMenu(bind, rebind);
-});
+};

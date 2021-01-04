@@ -9,8 +9,9 @@ import { rebindtheiaContributions } from "./theia-customizations/frontend-module
 import { bindVesServices } from "./services/frontend-module";
 import { bindVesDocumentationContributions } from "./documentation/frontend-module";
 import { bindVesWelcomeContributions } from "./welcome/welcome-frontend-module";
-import "./themes/index";
 import { bindTheiaCustomizationAboutDialogModule } from "./about/about-dialog-frontend-module";
+import { bindVesZoomContributions } from "./zoom/frontend-module";
+import "./themes/index";
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
   rebindtheiaContributions(bind, rebind);
@@ -24,4 +25,5 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
   bindVesDocumentationContributions(bind);
   bindVesWelcomeContributions(bind);
   bindTheiaCustomizationAboutDialogModule(bind, rebind);
+  bindVesZoomContributions(bind);
 });

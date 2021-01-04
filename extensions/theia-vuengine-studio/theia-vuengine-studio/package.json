@@ -50,7 +50,7 @@
   },
   "theiaExtensions": [
     {
-      "frontendElectron": "lib/electron-browser/menu/electron-frontend-module",
+      "frontendElectron": "lib/electron-browser/electron-frontend-module",
       "electronMain": "lib/electron-main/electron-main-application-module"
     },
     {
