@@ -1,5 +1,5 @@
 import { interfaces } from 'inversify';
-import { bindVesRunCommands } from "./command-contribution";
+import { bindVesRunCommands } from './command-contribution';
 import { bindVesRunKeybindings } from "./keybindings-contribution";
 import { bindVesRunMenu } from "./menu-contribution";
 import { bindVesRunPreferences } from "./preferences-contribution";

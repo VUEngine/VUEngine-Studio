@@ -1,9 +1,5 @@
 import { injectable, interfaces } from "inversify";
-import {
-  Command,
-  CommandContribution,
-  CommandRegistry,
-} from "@theia/core/lib/common";
+import { Command, CommandContribution, CommandRegistry } from "@theia/core/lib/common";
 import { supportUsCommand } from "./commands/supportUs";
 
 export const VesSupportUsCommand: Command = {

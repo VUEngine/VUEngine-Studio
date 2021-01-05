@@ -26,6 +26,7 @@ export class VesAboutDialog extends AboutDialog {
     }
 
     protected appendAcceptButton(text: string): HTMLButtonElement {
+        // prevent append of parent's button
         return this.createButton(text);
     }
 
@@ -37,6 +38,7 @@ export class VesAboutDialog extends AboutDialog {
         return <div className={ABOUT_CONTENT_CLASS}>
             <div className="ves-about-paragraph ves-about-flex-grid">
                 <div className="ves-about-flex-grid-column">
+                    {/* TODO: Make image file available in packaged app */}
                     <img src={iconPath} height="128" />
                 </div>
                 <div className="ves-about-flex-grid-column">

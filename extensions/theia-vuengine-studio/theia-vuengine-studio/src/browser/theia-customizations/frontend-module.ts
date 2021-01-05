@@ -5,6 +5,7 @@ import { bindTheiaCustomizationPluginModule } from './plugin/plugin-frontend-mod
 
 import "../../../src/browser/theia-customizations/style/buttons.css";
 import "../../../src/browser/theia-customizations/style/dialog.css";
+import "../../../src/browser/theia-customizations/style/input.css";
 import "../../../src/browser/theia-customizations/style/menu.css";
 import "../../../src/browser/theia-customizations/style/quick-open.css";
 import "../../../src/browser/theia-customizations/style/statusbar.css";

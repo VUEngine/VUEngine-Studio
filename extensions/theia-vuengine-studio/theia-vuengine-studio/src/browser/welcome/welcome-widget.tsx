@@ -11,6 +11,7 @@ import { FrontendApplicationConfigProvider } from "@theia/core/lib/browser/front
 import { EnvVariablesServer } from "@theia/core/lib/common/env-variables";
 import { openUrl } from "../common/functions";
 import { VesUrls } from "../common/urls";
+import { VesProjectsCommands } from "../projects/commands";
 
 @injectable()
 export class WelcomeWidget extends ReactWidget {
@@ -98,7 +99,7 @@ export class WelcomeWidget extends ReactWidget {
     }
 
     protected renderOpen(): React.ReactNode {
-        const newProject = <button className="theia-button large"><i className="fa fa-plus"></i> Create New Project</button>;
+        const newProject = <button className="theia-button large" onClick={this.newProject}><i className="fa fa-plus"></i> Create New Project</button>;
         const requireSingleOpen = isOSX || !environment.electron.is();
         const open = requireSingleOpen && <button className="theia-button large" onClick={this.open}><i className="fa fa-folder-open"></i> Open</button>;
         const openFile = !requireSingleOpen && <button className="theia-button large" onClick={this.openFile}><i className="fa fa-file-o"></i> Open File</button>;
@@ -210,4 +211,5 @@ export class WelcomeWidget extends ReactWidget {
     protected openKeyboardShortcuts = () => this.commandRegistry.executeCommand(KeymapsCommands.OPEN_KEYMAPS.id);
     protected openWorkspaceServiceUri = (uri: URI) => this.workspaceService.open(uri);
     protected openUrl = (url: string) => openUrl(url);
+    protected newProject = () => this.commandRegistry.executeCommand(VesProjectsCommands.NEW.id);
 }

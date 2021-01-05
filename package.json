@@ -94,7 +94,8 @@
     "vscode-builtin-markdown": "https://github.com/theia-ide/vscode-builtin-extensions/releases/download/v1.39.1-prel/markdown-1.39.1-prel.vsix",
     "vscode-builtin-merge-conflicts": "https://github.com/theia-ide/vscode-builtin-extensions/releases/download/v1.39.1-prel/merge-conflict-1.39.1-prel.vsix",
     "vscode-builtin-shellscript": "https://github.com/theia-ide/vscode-builtin-extensions/releases/download/v1.39.1-prel/shellscript-1.39.1-prel.vsix",
-    "vscode-editorconfig": "https://github.com/theia-ide/editorconfig-vscode/releases/download/v0.14.4/EditorConfig-0.14.4.vsix"
+    "vscode-editorconfig": "https://github.com/theia-ide/editorconfig-vscode/releases/download/v0.14.4/EditorConfig-0.14.4.vsix",
+    "ms-vscode.hexeditor": "https://open-vsx.org/api/ms-vscode/hexeditor/1.3.0/file/ms-vscode.hexeditor-1.3.0.vsix"
   },
   "workspaces": [
     ".",

@@ -7,7 +7,7 @@ import {
   PreferenceContribution,
   PreferenceSchema,
 } from "@theia/core/lib/browser";
-import { VesBuildDumpElfPreference, VesBuildEnableWslPreference, VesBuildEngineCorePathPreference, VesBuildEnginePluginsPathPreference, VesBuildMakerCodePreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "./preferences";
+import { VesBuildDumpElfPreference, VesBuildEnableWslPreference, VesBuildEngineCorePathPreference, VesBuildEnginePluginsPathPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "./preferences";
 
 const VesBuildPreferenceSchema: PreferenceSchema = {
   type: "object",
@@ -17,7 +17,6 @@ const VesBuildPreferenceSchema: PreferenceSchema = {
     [VesBuildPedanticWarningsPreference.id]: VesBuildPedanticWarningsPreference.property,
     [VesBuildEngineCorePathPreference.id]: VesBuildEngineCorePathPreference.property,
     [VesBuildEnginePluginsPathPreference.id]: VesBuildEnginePluginsPathPreference.property,
-    [VesBuildMakerCodePreference.id]: VesBuildMakerCodePreference.property
   }
 };
 

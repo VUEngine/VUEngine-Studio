@@ -25,17 +25,6 @@ export const VesBuildDumpElfPreference: VesProperty = {
     },
 };
 
-export const VesBuildMakerCodePreference: VesProperty = {
-    id: "build.build.makerCode",
-    property: {
-        type: "string",
-        minLength: 2,
-        maxLength: 2,
-        description: "Default Maker Code to place in ROM header of new projects",
-        default: "VS",
-    },
-};
-
 export const VesBuildPedanticWarningsPreference: VesProperty = {
     id: "build.build.pedanticWarnings",
     property: {
