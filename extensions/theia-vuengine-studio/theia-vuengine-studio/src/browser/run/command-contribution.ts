@@ -11,6 +11,7 @@ import { PreferenceService } from "@theia/core/lib/browser";
 import { VesStateModel } from "../common/vesStateModel";
 import { VesRunCommand, VesSelectEmulatorCommand } from "./commands";
 import { QuickPickService } from "@theia/core/lib/common/quick-pick-service";
+import { WorkspaceService } from "@theia/workspace/lib/browser";
 
 @injectable()
 export class VesRunCommandContribution implements CommandContribution {
@@ -20,10 +21,12 @@ export class VesRunCommandContribution implements CommandContribution {
     @inject(QuickPickService) private readonly quickPickService: QuickPickService,
     @inject(TerminalService) private readonly terminalService: TerminalService,
     @inject(VesStateModel) private readonly vesState: VesStateModel,
+    @inject(WorkspaceService) private readonly workspaceService: WorkspaceService,
   ) { }
 
   registerCommands(commandRegistry: CommandRegistry): void {
     commandRegistry.registerCommand(VesRunCommand, {
+      isVisible: () => this.workspaceService.opened,
       execute: () =>
         runCommand(
           this.commandService,

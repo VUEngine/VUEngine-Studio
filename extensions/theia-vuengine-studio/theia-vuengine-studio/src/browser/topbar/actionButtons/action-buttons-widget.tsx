@@ -13,6 +13,7 @@ import { VesRunCommand } from "../../run/commands";
 import { VesFlashCartsCommand } from "../../flash-carts/commands";
 import { VesBuildModePreference } from "../../build/preferences";
 import { FrontendApplicationState, FrontendApplicationStateService } from "@theia/core/lib/browser/frontend-application-state";
+import { WorkspaceService } from "@theia/workspace/lib/browser";
 
 @injectable()
 export class VesTopbarActionButtonsWidget extends ReactWidget {
@@ -27,6 +28,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
     @inject(MessageService) protected readonly messageService!: MessageService;
     @inject(PreferenceService) protected readonly preferenceService!: PreferenceService;
     @inject(VesStateModel) protected readonly vesState: VesStateModel;
+    @inject(WorkspaceService) protected readonly workspaceService: WorkspaceService;
 
     @postConstruct()
     protected async init(): Promise<void> {
@@ -59,7 +61,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
             <button
                 className="theia-button secondary clean"
                 title={this.vesState.isCleaning ? "Cleaning..." : `Clean${this.getKeybindingLabel(VesBuildCleanCommand.id)}`}
-                disabled={!this.vesState.buildFolderExists[buildMode]}
+                disabled={!this.workspaceService.opened || !this.vesState.buildFolderExists[buildMode]}
                 onClick={() => this.commandService.executeCommand(VesBuildCleanCommand.id)}
             >
                 {this.vesState.isCleaning
@@ -69,6 +71,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
             <button
                 className="theia-button secondary build"
                 title={this.vesState.isBuilding ? "Building..." : `Build${this.getKeybindingLabel(VesBuildCommand.id)}`}
+                disabled={!this.workspaceService.opened}
                 onClick={() => this.commandService.executeCommand(VesBuildCommand.id)}
             >
                 {this.vesState.isBuilding
@@ -78,6 +81,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
             <button
                 className="theia-button secondary run"
                 title={this.vesState.isRunQueued ? "Run Queued..." : `Run${this.getKeybindingLabel(VesRunCommand.id)}`}
+                disabled={!this.workspaceService.opened}
                 onClick={() => this.commandService.executeCommand(VesRunCommand.id)}
             >
                 {this.vesState.isRunQueued
@@ -91,7 +95,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                     : this.vesState.isFlashQueued
                         ? `Flash to ${this.vesState.connectedFlashCart.config.name} Queued...`
                         : `Flash to ${this.vesState.connectedFlashCart.config.name}${this.getKeybindingLabel(VesFlashCartsCommand.id)}`}
-                disabled={!this.vesState.connectedFlashCart}
+                disabled={!this.workspaceService.opened || !this.vesState.connectedFlashCart}
                 onClick={() => this.commandService.executeCommand(VesFlashCartsCommand.id)}
             >
                 {this.vesState.isFlashQueued
@@ -101,6 +105,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
             <button
                 className="theia-button secondary export"
                 title={this.vesState.isExportQueued ? "Export Queued..." : `Export${this.getKeybindingLabel(VesBuildExportCommand.id)}`}
+                disabled={!this.workspaceService.opened}
                 onClick={() => this.commandService.executeCommand(VesBuildExportCommand.id)}
             >
                 {this.vesState.isExportQueued

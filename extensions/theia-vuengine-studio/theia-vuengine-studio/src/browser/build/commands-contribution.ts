@@ -22,6 +22,7 @@ import { toggleEnableWsl } from "./commands/toggleEnableWSL";
 import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand, VesBuildSetModeCommand, VesBuildToggleDumpElfCommand, VesBuildToggleEnableWslCommand, VesBuildTogglePedanticWarningsCommand } from "./commands";
 import { VesBuildDumpElfPreference, VesBuildEnableWslPreference, VesBuildPedanticWarningsPreference } from "./preferences";
 import { VesProcessService } from "../../common/process-service-protocol";
+import { WorkspaceService } from "@theia/workspace/lib/browser";
 
 @injectable()
 export class VesBuildCommandContribution implements CommandContribution {
@@ -35,10 +36,12 @@ export class VesBuildCommandContribution implements CommandContribution {
     @inject(QuickPickService) private readonly quickPickService: QuickPickService,
     @inject(VesProcessService) private readonly vesProcessService: VesProcessService,
     @inject(VesStateModel) private readonly vesState: VesStateModel,
+    @inject(WorkspaceService) private readonly workspaceService: WorkspaceService,
   ) { }
 
   registerCommands(commandRegistry: CommandRegistry): void {
     commandRegistry.registerCommand(VesBuildCleanCommand, {
+      isVisible: () => this.workspaceService.opened,
       execute: () =>
         cleanCommand(
           this.messageService,
@@ -47,6 +50,7 @@ export class VesBuildCommandContribution implements CommandContribution {
         ),
     });
     commandRegistry.registerCommand(VesBuildCommand, {
+      isVisible: () => this.workspaceService.opened,
       execute: () =>
         buildCommand(
           this.fileService,
@@ -57,6 +61,7 @@ export class VesBuildCommandContribution implements CommandContribution {
         ),
     });
     commandRegistry.registerCommand(VesBuildExportCommand, {
+      isVisible: () => this.workspaceService.opened,
       execute: () =>
         exportCommand(
           this.commandService,

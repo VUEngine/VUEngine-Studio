@@ -66,6 +66,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
             canSelectFolders: true,
             canSelectFiles: false
         };
+        // TODO: pass current content of path input to showOpenDialog
         const destinationFolderUri = await fileDialogService.showOpenDialog(props);
         if (destinationFolderUri) {
             const destinationFolder = await this.fileService.resolve(destinationFolderUri);

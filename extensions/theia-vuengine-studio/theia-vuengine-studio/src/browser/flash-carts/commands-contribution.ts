@@ -12,6 +12,7 @@ import { VesStateModel } from "../common/vesStateModel";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { VesUsbService } from "../../common/usb-service-protocol";
 import { VesFlashCartsCommand } from "./commands";
+import { WorkspaceService } from "@theia/workspace/lib/browser";
 
 @injectable()
 export class VesFlashCartsCommandContribution implements CommandContribution {
@@ -24,10 +25,12 @@ export class VesFlashCartsCommandContribution implements CommandContribution {
     @inject(TerminalService) private readonly terminalService: TerminalService,
     @inject(VesUsbService) private readonly vesUsbService: VesUsbService,
     @inject(VesStateModel) private readonly vesState: VesStateModel,
+    @inject(WorkspaceService) private readonly workspaceService: WorkspaceService,
   ) { }
 
   registerCommands(commandRegistry: CommandRegistry): void {
     commandRegistry.registerCommand(VesFlashCartsCommand, {
+      isVisible: () => this.workspaceService.opened,
       execute: () =>
         flashCommand(
           this.commandService,
