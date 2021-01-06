@@ -1,5 +1,5 @@
 #ves-topbar-application-title {
-  color: #ccc;
+  /* color: #ccc; */
   flex-grow: 1;
   height: var(--theia-private-menubar-height);
   line-height: var(--theia-private-menubar-height);
@@ -8,7 +8,7 @@
 }
 
 #ves-topbar-application-title.os-osx {
-  padding-left: 252px;
+  padding-left: 260px;
 }
 
 @media (max-width: 1000px) {

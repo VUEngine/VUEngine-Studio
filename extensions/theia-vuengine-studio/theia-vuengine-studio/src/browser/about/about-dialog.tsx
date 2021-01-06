@@ -53,7 +53,7 @@ export class VesAboutDialog extends AboutDialog {
                     </div>
                     <div className="ves-about-paragraph">
                         <div>
-                            <i className="fa fa-link" /> <a href="#" onClick={() => this.openUrl(VesUrls.VUENGINE_STUDIO)}>{VesUrls.VUENGINE_STUDIO}</a>
+                            <i className="fa fa-link" /> <a href="#" onClick={() => this.openUrl(VesUrls.VUENGINE)}>{VesUrls.VUENGINE}</a>
                         </div>
                         <div>
                             <i className="fa fa-link" /> <a href="#" onClick={() => this.openUrl(VesUrls.VES_GITHUB)}>{VesUrls.VES_GITHUB}</a>

@@ -4,7 +4,7 @@ export namespace VesUrls {
     export const PATREON = "https://www.patreon.com/VUEngine";
     export const PLANETVB = "https://www.virtual-boy.com";
     export const THEIA_WEBSITE = "https://theia-ide.org/";
-    export const VUENGINE_STUDIO = "https://www.VUEngine.dev/Studio";
+    export const VUENGINE = "https://www.vuengine.dev/";
     export const VES_GITHUB = "https://github.com/VUEngine/VUEngine-Studio";
 
     export const MAIL_CHRIS = "c.radke@posteo.de";

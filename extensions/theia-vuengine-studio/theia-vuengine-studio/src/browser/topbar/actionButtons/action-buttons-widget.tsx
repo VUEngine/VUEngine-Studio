@@ -1,7 +1,7 @@
 import * as React from "react";
 import { injectable, postConstruct, inject } from "inversify";
 import { ReactWidget } from "@theia/core/lib/browser/widgets/react-widget";
-import { CommandService, MessageService } from "@theia/core";
+import { CommandService, environment, isOSX, MessageService } from "@theia/core";
 import { KeybindingRegistry } from "@theia/core/lib/browser/keybinding";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand } from "../../build/commands";
@@ -13,7 +13,8 @@ import { VesRunCommand } from "../../run/commands";
 import { VesFlashCartsCommand } from "../../flash-carts/commands";
 import { VesBuildModePreference } from "../../build/preferences";
 import { FrontendApplicationState, FrontendApplicationStateService } from "@theia/core/lib/browser/frontend-application-state";
-import { WorkspaceService } from "@theia/workspace/lib/browser";
+import { WorkspaceCommands, WorkspaceService } from "@theia/workspace/lib/browser";
+import { VesProjectsCommands } from "../../projects/commands";
 
 @injectable()
 export class VesTopbarActionButtonsWidget extends ReactWidget {
@@ -57,62 +58,80 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
 
     protected render(): React.ReactNode {
         const buildMode = this.preferenceService.get(VesBuildModePreference.id) as BuildMode;
-        return <>
+        const requireSingleOpen = isOSX || !environment.electron.is();
+        const openProjectId = requireSingleOpen ? WorkspaceCommands.OPEN.id : WorkspaceCommands.OPEN_FOLDER.id;
+        return !this.workspaceService.opened ? <>
             <button
-                className="theia-button secondary clean"
-                title={this.vesState.isCleaning ? "Cleaning..." : `Clean${this.getKeybindingLabel(VesBuildCleanCommand.id)}`}
-                disabled={!this.workspaceService.opened || !this.vesState.buildFolderExists[buildMode]}
-                onClick={() => this.commandService.executeCommand(VesBuildCleanCommand.id)}
+                className="theia-button secondary new-project"
+                title={`Create New Project${this.getKeybindingLabel(VesProjectsCommands.NEW.id)}`}
+                onClick={() => this.commandService.executeCommand(VesProjectsCommands.NEW.id)}
             >
-                {this.vesState.isCleaning
-                    ? <i className="fa fa-spinner fa-pulse"></i>
-                    : <i className="fa fa-trash"></i>}
+                <i className="fa fa-plus"></i>
             </button>
             <button
-                className="theia-button secondary build"
-                title={this.vesState.isBuilding ? "Building..." : `Build${this.getKeybindingLabel(VesBuildCommand.id)}`}
-                disabled={!this.workspaceService.opened}
-                onClick={() => this.commandService.executeCommand(VesBuildCommand.id)}
+                className="theia-button secondary new-project"
+                title={`Open Project${this.getKeybindingLabel(openProjectId)}`}
+                onClick={() => this.commandService.executeCommand(openProjectId)}
             >
-                {this.vesState.isBuilding
-                    ? <i className="fa fa-spinner fa-pulse"></i>
-                    : <i className="fa fa-wrench"></i>}
+                <i className="fa fa-folder-open"></i>
             </button>
             <button
-                className="theia-button secondary run"
-                title={this.vesState.isRunQueued ? "Run Queued..." : `Run${this.getKeybindingLabel(VesRunCommand.id)}`}
-                disabled={!this.workspaceService.opened}
-                onClick={() => this.commandService.executeCommand(VesRunCommand.id)}
+                className="theia-button secondary new-project"
+                title={`Open Workspace${this.getKeybindingLabel(WorkspaceCommands.OPEN_WORKSPACE.id)}`}
+                onClick={() => this.commandService.executeCommand(WorkspaceCommands.OPEN_WORKSPACE.id)}
             >
-                {this.vesState.isRunQueued
-                    ? <i className="fa fa-hourglass-half"></i>
-                    : <i className="fa fa-play"></i>}
-            </button>
-            <button
-                className="theia-button secondary flash"
-                title={!this.vesState.connectedFlashCart
-                    ? `No Flash Cart Connected${this.getKeybindingLabel(VesFlashCartsCommand.id)}`
-                    : this.vesState.isFlashQueued
-                        ? `Flash to ${this.vesState.connectedFlashCart.config.name} Queued...`
-                        : `Flash to ${this.vesState.connectedFlashCart.config.name}${this.getKeybindingLabel(VesFlashCartsCommand.id)}`}
-                disabled={!this.workspaceService.opened || !this.vesState.connectedFlashCart}
-                onClick={() => this.commandService.executeCommand(VesFlashCartsCommand.id)}
-            >
-                {this.vesState.isFlashQueued
-                    ? <i className="fa fa-hourglass-half"></i>
-                    : <i className="fa fa-usb"></i>}
-            </button>
-            <button
-                className="theia-button secondary export"
-                title={this.vesState.isExportQueued ? "Export Queued..." : `Export${this.getKeybindingLabel(VesBuildExportCommand.id)}`}
-                disabled={!this.workspaceService.opened}
-                onClick={() => this.commandService.executeCommand(VesBuildExportCommand.id)}
-            >
-                {this.vesState.isExportQueued
-                    ? <i className="fa fa-hourglass-half"></i>
-                    : <i className="fa fa-share-square-o"></i>}
+                <i className="fa fa-file-code-o"></i>
             </button>
         </>
+            : <>
+                <button
+                    className={"theia-button secondary clean" + (this.vesState.isCleaning ? " active" : "")}
+                    title={this.vesState.isCleaning ? "Cleaning..." : `${VesBuildCleanCommand.label}${this.getKeybindingLabel(VesBuildCleanCommand.id)}`}
+                    disabled={this.vesState.isBuilding || !this.vesState.buildFolderExists[buildMode]}
+                    onClick={() => this.commandService.executeCommand(VesBuildCleanCommand.id)}
+                >
+                    {this.vesState.isCleaning
+                        ? <i className="fa fa-spinner fa-pulse"></i>
+                        : <i className="fa fa-trash"></i>}
+                </button>
+                <button
+                    className={"theia-button secondary build" + (this.vesState.isBuilding ? " active" : "")}
+                    title={this.vesState.isBuilding ? "Building..." : `${VesBuildCommand.label}${this.getKeybindingLabel(VesBuildCommand.id)}`}
+                    onClick={() => this.commandService.executeCommand(VesBuildCommand.id)}
+                >
+                    {this.vesState.isBuilding
+                        ? <i className="fa fa-spinner fa-pulse"></i>
+                        : <i className="fa fa-wrench"></i>}
+                </button>
+                <button
+                    className={"theia-button secondary run" + (this.vesState.isRunQueued ? " active" : "")}
+                    title={this.vesState.isRunQueued ? "Run Queued..." : `${VesRunCommand.label}${this.getKeybindingLabel(VesRunCommand.id)}`}
+                    onClick={() => this.commandService.executeCommand(VesRunCommand.id)}
+                >
+                    {this.vesState.isRunQueued
+                        ? <i className="fa fa-hourglass-half"></i>
+                        : <i className="fa fa-play"></i>}
+                </button>
+                <button
+                    className={"theia-button secondary flash" + (this.vesState.isFlashQueued ? " active" : "")}
+                    title={this.vesState.isFlashQueued ? "Flash Queued..." : `${VesFlashCartsCommand.label}${this.getKeybindingLabel(VesFlashCartsCommand.id)}`}
+                    disabled={!this.vesState.connectedFlashCart}
+                    onClick={() => this.commandService.executeCommand(VesFlashCartsCommand.id)}
+                >
+                    {this.vesState.isFlashQueued
+                        ? <i className="fa fa-hourglass-half"></i>
+                        : <i className="fa fa-usb"></i>}
+                </button>
+                <button
+                    className={"theia-button secondary export" + (this.vesState.isExportQueued ? " active" : "")}
+                    title={this.vesState.isExportQueued ? "Export Queued..." : `${VesBuildExportCommand.label}${this.getKeybindingLabel(VesBuildExportCommand.id)}`}
+                    onClick={() => this.commandService.executeCommand(VesBuildExportCommand.id)}
+                >
+                    {this.vesState.isExportQueued
+                        ? <i className="fa fa-hourglass-half"></i>
+                        : <i className="fa fa-share-square-o"></i>}
+                </button>
+            </>
     }
 
     protected getKeybindingLabel = (commandId: string) => {

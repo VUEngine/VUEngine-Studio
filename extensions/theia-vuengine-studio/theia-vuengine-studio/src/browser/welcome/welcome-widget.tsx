@@ -100,15 +100,12 @@ export class WelcomeWidget extends ReactWidget {
 
     protected renderOpen(): React.ReactNode {
         const newProject = <button className="theia-button large" onClick={this.newProject}><i className="fa fa-plus"></i> Create New Project</button>;
-        const requireSingleOpen = isOSX || !environment.electron.is();
-        const open = requireSingleOpen && <button className="theia-button large" onClick={this.open}><i className="fa fa-folder-open"></i> Open</button>;
-        const openFile = !requireSingleOpen && <button className="theia-button large" onClick={this.openFile}><i className="fa fa-file-o"></i> Open File</button>;
-        const openFolder = !requireSingleOpen && <button className="theia-button large" onClick={this.openFolder}><i className="fa fa-folder-open"></i> Open Folder</button>;
+        const openProject = <button className="theia-button large" onClick={this.openProject}><i className="fa fa-folder-open"></i> Open Project</button>;
         const openWorkspace = <button className="theia-button large" onClick={this.openWorkspace}><i className="fa fa-file-code-o"></i> Open Workspace</button>;
 
         return <div className="ves-welcome-section">
             {newProject}
-            {open} {openFile} {openFolder}
+            {openProject}
             {openWorkspace}
         </div>;
     }
@@ -171,10 +168,10 @@ export class WelcomeWidget extends ReactWidget {
                 <a href="#" onClick={() => this.openUrl(VesUrls.PATREON)}>Support Us on Patreon</a>
             </div>
             <div className="ves-welcome-action-container">
-                <a href="#" onClick={() => this.openUrl(VesUrls.VUENGINE_STUDIO)}>VUEngine Website</a>
+                <a href="#" onClick={() => this.openUrl(VesUrls.VUENGINE)}>VUEngine Website</a>
             </div>
             <div className="ves-welcome-action-container">
-                <a href="#" onClick={() => this.openUrl(VesUrls.VUENGINE_STUDIO)}>Planet Virtual Boy</a>
+                <a href="#" onClick={() => this.openUrl(VesUrls.VUENGINE)}>Planet Virtual Boy</a>
             </div>
         </div>;
     }
@@ -202,9 +199,15 @@ export class WelcomeWidget extends ReactWidget {
         return paths;
     }
 
-    protected open = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN.id);
+    protected openProject = () => {
+        const requireSingleOpen = isOSX || !environment.electron.is();
+        if (requireSingleOpen) {
+            this.commandRegistry.executeCommand(WorkspaceCommands.OPEN.id)
+        } else {
+            this.commandRegistry.executeCommand(WorkspaceCommands.OPEN_FOLDER.id);
+        }
+    };
     protected openFile = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN_FILE.id);
-    protected openFolder = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN_FOLDER.id);
     protected openWorkspace = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN_WORKSPACE.id);
     protected openRecentWorkspace = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN_RECENT_WORKSPACE.id);
     protected openPreferences = () => this.commandRegistry.executeCommand(CommonCommands.OPEN_PREFERENCES.id);

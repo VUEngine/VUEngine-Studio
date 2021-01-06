@@ -5,6 +5,8 @@
   order: 4;
   margin-right: 8px;
   padding-top: 5px;
+  text-align: right;
+  width: 260px;
 }
 
 #ves-topbar-action-buttons.os-linux,
@@ -20,14 +22,24 @@
 }
 
 #ves-topbar-action-buttons .theia-button {
-  background-color: #333;
+  background-color: rgba(0,0,0,0.4);
   border-radius: 3px;
-  color: #ccc;
-  font-size: 18px;
+  /* color: #ccc; */
+  font-size: 17px;
   line-height: 27px;
   margin-left: 4px;
   min-width: 40px;
   padding: 1px 0 0;
+}
+
+#ves-topbar-action-buttons .theia-button:hover,
+#ves-topbar-action-buttons .theia-button.active {
+  background-color: rgba(0,0,0,0.6);
+}
+
+#ves-topbar-action-buttons .theia-button[disabled] {
+  background-color: rgba(0,0,0,0.2);
+  opacity: unset;
 }
 
 #ves-topbar-action-buttons .theia-button.build {
