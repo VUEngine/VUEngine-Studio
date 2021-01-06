@@ -2,6 +2,7 @@ import { inject, injectable, interfaces } from "inversify";
 import { remote } from 'electron';
 import { FrontendApplication, FrontendApplicationContribution, PreferenceService, StatusBar, StatusBarAlignment } from "@theia/core/lib/browser";
 import { VesZoomCommands } from "./commands";
+import { VesZoomPreferences } from "./preferences";
 
 @injectable()
 export class VesZoomStatusBarContribution implements FrontendApplicationContribution {
@@ -10,6 +11,12 @@ export class VesZoomStatusBarContribution implements FrontendApplicationContribu
 
     onStart(app: FrontendApplication) {
         this.updateStatusBar();
+
+        this.preferenceService.onPreferenceChanged(({ preferenceName, newValue }) => {
+            if (preferenceName === VesZoomPreferences.ZOOM_FACTOR.id) {
+                this.updateStatusBar();
+            }
+        });
     };
 
     updateStatusBar() {
