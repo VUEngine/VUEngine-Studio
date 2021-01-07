@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as path from "path";
+import { sep } from "path";
 import * as filenamify from "filenamify";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { FileDialogService, OpenFileDialogProps } from "@theia/filesystem/lib/browser";
@@ -16,7 +16,8 @@ export interface VesNewProjectFormProps {
 export interface VesNewProjectFormData {
     name: string
     template: string
-    path: string
+    pathFolder: string
+    pathName: string
 }
 
 export class VesNewProjectForm extends React.Component<VesNewProjectFormProps, VesNewProjectFormData> {
@@ -34,7 +35,8 @@ export class VesNewProjectForm extends React.Component<VesNewProjectFormProps, V
         this.state = {
             name: "",
             template: "vuengine-barebone",
-            path: this.preferenceService.get(VesProjectsBaseFolderPreference.id) as string,
+            pathFolder: this.preferenceService.get(VesProjectsBaseFolderPreference.id) as string,
+            pathName: "",
         }
     }
 
@@ -63,21 +65,20 @@ export class VesNewProjectForm extends React.Component<VesNewProjectFormProps, V
                 <input
                     type="text"
                     className="theia-input"
-                    value={this.state.path}
-                    onChange={this.updatePath}
-                    // size={this.state.path.length}
-                    style={{ flexGrow: 3 }}
+                    value={this.state.pathFolder}
+                    onChange={this.updatePathFolder}
+                    size={this.state.pathFolder.length}
+                    style={{ fontFamily: "monospace", maxWidth: 332 }}
                 />
                 <span className="ves-new-project-path-separator">
-                    {path.sep}
+                    {sep}
                 </span>
                 <input
                     type="text"
                     className="theia-input"
-                    value={this.projectFolderName()}
-                    onChange={this.updatePath}
-                    // size={this.projectFolderName().length}
-                    style={{ flexGrow: 1 }}
+                    value={this.state.pathName}
+                    onChange={this.updatePathName}
+                    style={{ flexGrow: 1, fontFamily: "monospace" }}
                 />
                 <button
                     className="theia-button secondary"
@@ -98,19 +99,24 @@ export class VesNewProjectForm extends React.Component<VesNewProjectFormProps, V
     }
 
     protected updateName = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({
-        name: e.currentTarget.value
+        name: e.currentTarget.value,
+        pathName: this.getPathName(e.currentTarget.value),
     });
 
     protected updateTemplate = (e: React.ChangeEvent<HTMLSelectElement>) => this.setState({
         template: e.currentTarget.value
     });
 
-    protected updatePath = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({
-        path: e.currentTarget.value
+    protected updatePathFolder = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({
+        pathFolder: e.currentTarget.value
     });
 
-    protected projectFolderName(): string {
-        return filenamify(this.state.name, { replacement: " " })
+    protected updatePathName = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({
+        pathName: e.currentTarget.value
+    });
+
+    protected getPathName(name: string): string {
+        return filenamify(name, { replacement: " " })
             .replace(/\s+/g, '-')
             .toLowerCase()
     }
@@ -121,13 +127,15 @@ export class VesNewProjectForm extends React.Component<VesNewProjectFormProps, V
             canSelectFolders: true,
             canSelectFiles: false
         };
-        const currentPath = await this.fileService.resolve(new URI(this.state.path));
+        const currentPath = await this.fileService.exists(new URI(this.state.pathFolder))
+            ? await this.fileService.resolve(new URI(this.state.pathFolder))
+            : undefined;
         const destinationFolderUri = await this.fileDialogService.showOpenDialog(props, currentPath);
         if (destinationFolderUri) {
             const destinationFolder = await this.fileService.resolve(destinationFolderUri);
             if (destinationFolder.isDirectory) {
                 this.setState({
-                    path: destinationFolder.resource.path.toString()
+                    pathFolder: destinationFolder.resource.path.toString()
                 });
             }
         }
