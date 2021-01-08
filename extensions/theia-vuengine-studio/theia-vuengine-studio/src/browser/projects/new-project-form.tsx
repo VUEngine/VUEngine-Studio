@@ -13,14 +13,15 @@ export interface VesNewProjectFormProps {
     preferenceService: PreferenceService
 }
 
-export interface VesNewProjectFormData {
+export interface VesNewProjectFormState {
     name: string
     template: string
-    pathFolder: string
-    pathName: string
+    path: string
+    folder: string,
+    isCreating: boolean
 }
 
-export class VesNewProjectForm extends React.Component<VesNewProjectFormProps, VesNewProjectFormData> {
+export class VesNewProjectForm extends React.Component<VesNewProjectFormProps, VesNewProjectFormState> {
     protected fileService: FileService
     protected fileDialogService: FileDialogService
     protected preferenceService: PreferenceService
@@ -35,9 +36,16 @@ export class VesNewProjectForm extends React.Component<VesNewProjectFormProps, V
         this.state = {
             name: "",
             template: "vuengine-barebone",
-            pathFolder: this.preferenceService.get(VesProjectsBaseFolderPreference.id) as string,
-            pathName: "",
+            path: this.removeTrailingSlash(this.preferenceService.get(VesProjectsBaseFolderPreference.id) as string),
+            folder: "new-project",
+            isCreating: false
         }
+
+        this.preferenceService.onPreferenceChanged(({ preferenceName, newValue }) => {
+            if (preferenceName === VesProjectsBaseFolderPreference.id) {
+                this.setState({ path: this.removeTrailingSlash(newValue) });
+            }
+        });
     }
 
     render(): JSX.Element {
@@ -49,6 +57,7 @@ export class VesNewProjectForm extends React.Component<VesNewProjectFormProps, V
                 className="theia-input"
                 value={this.state.name}
                 onChange={this.updateName}
+                disabled={this.state.isCreating}
             />
             <br />
             <div className="ves-new-project-input-label">Template</div>
@@ -56,6 +65,7 @@ export class VesNewProjectForm extends React.Component<VesNewProjectFormProps, V
                 className="theia-select"
                 value={this.state.template}
                 onChange={this.updateTemplate}
+                disabled={this.state.isCreating}
             >
                 <option value="vuengine-barebone">Barebone</option>
             </select>
@@ -65,10 +75,11 @@ export class VesNewProjectForm extends React.Component<VesNewProjectFormProps, V
                 <input
                     type="text"
                     className="theia-input"
-                    value={this.state.pathFolder}
+                    value={this.state.path}
                     onChange={this.updatePathFolder}
-                    size={this.state.pathFolder.length}
+                    size={this.state.path.length}
                     style={{ fontFamily: "monospace", maxWidth: 332 }}
+                    disabled={this.state.isCreating}
                 />
                 <span className="ves-new-project-path-separator">
                     {sep}
@@ -76,14 +87,16 @@ export class VesNewProjectForm extends React.Component<VesNewProjectFormProps, V
                 <input
                     type="text"
                     className="theia-input"
-                    value={this.state.pathName}
+                    value={this.state.folder}
                     onChange={this.updatePathName}
                     style={{ flexGrow: 1, fontFamily: "monospace" }}
+                    disabled={this.state.isCreating}
                 />
                 <button
                     className="theia-button secondary"
                     onClick={() => this.selectProjectFolder()}
                     style={{ minWidth: 40 }}
+                    disabled={this.state.isCreating}
                 >
                     <i
                         style={{ fontSize: 16, verticalAlign: "bottom" }}
@@ -92,15 +105,13 @@ export class VesNewProjectForm extends React.Component<VesNewProjectFormProps, V
                 </button>
             </div>
             <br />
-            {/* <input type="checkbox" className="theia-input" style={{ display: "inline-block" }} checked /> Open project after creation */}
-            {/* <input type="checkbox" className="theia-input" style={{ display: "inline-block" }} /> Init Git repository */}
             <br />
         </>;
     }
 
     protected updateName = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({
         name: e.currentTarget.value,
-        pathName: this.getPathName(e.currentTarget.value),
+        folder: this.getPathName(e.currentTarget.value),
     });
 
     protected updateTemplate = (e: React.ChangeEvent<HTMLSelectElement>) => this.setState({
@@ -108,11 +119,11 @@ export class VesNewProjectForm extends React.Component<VesNewProjectFormProps, V
     });
 
     protected updatePathFolder = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({
-        pathFolder: e.currentTarget.value
+        path: e.currentTarget.value
     });
 
     protected updatePathName = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({
-        pathName: e.currentTarget.value
+        folder: e.currentTarget.value
     });
 
     protected getPathName(name: string): string {
@@ -127,17 +138,21 @@ export class VesNewProjectForm extends React.Component<VesNewProjectFormProps, V
             canSelectFolders: true,
             canSelectFiles: false
         };
-        const currentPath = await this.fileService.exists(new URI(this.state.pathFolder))
-            ? await this.fileService.resolve(new URI(this.state.pathFolder))
+        const currentPath = await this.fileService.exists(new URI(this.state.path))
+            ? await this.fileService.resolve(new URI(this.state.path))
             : undefined;
         const destinationFolderUri = await this.fileDialogService.showOpenDialog(props, currentPath);
         if (destinationFolderUri) {
             const destinationFolder = await this.fileService.resolve(destinationFolderUri);
             if (destinationFolder.isDirectory) {
                 this.setState({
-                    pathFolder: destinationFolder.resource.path.toString()
+                    path: destinationFolder.resource.path.toString()
                 });
             }
         }
+    }
+
+    removeTrailingSlash(string: string) {
+        return string.replace(/\/$/, "");
     }
 }
