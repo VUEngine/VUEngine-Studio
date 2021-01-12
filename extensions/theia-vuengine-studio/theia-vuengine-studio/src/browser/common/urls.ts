@@ -5,6 +5,7 @@ export namespace VesUrls {
     export const PLANETVB = "https://www.virtual-boy.com";
     export const THEIA_WEBSITE = "https://theia-ide.org/";
     export const VUENGINE = "https://www.vuengine.dev/";
+    export const GITHUB = "https://github.com/VUEngine";
     export const VES_GITHUB = "https://github.com/VUEngine/VUEngine-Studio";
 
     export const MAIL_CHRIS = "c.radke@posteo.de";

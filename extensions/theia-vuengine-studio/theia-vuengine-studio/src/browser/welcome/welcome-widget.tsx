@@ -168,6 +168,9 @@ export class WelcomeWidget extends ReactWidget {
                 <a href="#" onClick={() => this.openUrl(VesUrls.PATREON)}>Support Us on Patreon</a>
             </div>
             <div className="ves-welcome-action-container">
+                <a href="#" onClick={() => this.openUrl(VesUrls.GITHUB)}>Github</a>
+            </div>
+            <div className="ves-welcome-action-container">
                 <a href="#" onClick={() => this.openUrl(VesUrls.VUENGINE)}>VUEngine Website</a>
             </div>
             <div className="ves-welcome-action-container">
