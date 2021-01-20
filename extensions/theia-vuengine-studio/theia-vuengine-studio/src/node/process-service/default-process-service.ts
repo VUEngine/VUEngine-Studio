@@ -17,9 +17,9 @@ export class DefaultVesProcessService implements VesProcessService {
         terminalProcess.onClose(() => console.log("CLOSE"));
         terminalProcess.onExit(() => console.log("EXIT"));
 
-        // terminalProcess.outputStream.on('data', (data) => {
-        //     console.log("error: ", data.toString())
-        // })
+        terminalProcess.outputStream.on('data', (data) => {
+            console.log("DATA", data.toString())
+        })
 
         return terminalProcess.id;
     }

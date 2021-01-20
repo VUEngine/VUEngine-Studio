@@ -204,4 +204,16 @@ export class VesStateModel {
     get isFlashQueued(): boolean {
         return this._isFlashQueued;
     }
+
+    // flashing
+    protected _isFlashing: boolean = false;
+    protected readonly onDidChangeIsFlashingEmitter = new Emitter<boolean>();
+    readonly onDidChangeIsFlashing = this.onDidChangeIsFlashingEmitter.event;
+    set isFlashing(flag: boolean) {
+        this._isFlashing = flag;
+        this.onDidChangeIsFlashingEmitter.fire(this._isFlashing);
+    }
+    get isFlashing(): boolean {
+        return this._isFlashing;
+    }
 }

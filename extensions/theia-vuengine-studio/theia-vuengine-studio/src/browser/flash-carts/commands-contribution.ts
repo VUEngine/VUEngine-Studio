@@ -13,6 +13,7 @@ import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { VesUsbService } from "../../common/usb-service-protocol";
 import { VesFlashCartsCommand } from "./commands";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
+import { VesProcessService } from "../../common/process-service-protocol";
 
 @injectable()
 export class VesFlashCartsCommandContribution implements CommandContribution {
@@ -23,6 +24,7 @@ export class VesFlashCartsCommandContribution implements CommandContribution {
     @inject(PreferenceService)
     private readonly preferenceService: PreferenceService,
     @inject(TerminalService) private readonly terminalService: TerminalService,
+    @inject(VesProcessService) private readonly vesProcessService: VesProcessService,
     @inject(VesUsbService) private readonly vesUsbService: VesUsbService,
     @inject(VesStateModel) private readonly vesState: VesStateModel,
     @inject(WorkspaceService) private readonly workspaceService: WorkspaceService,
@@ -38,8 +40,9 @@ export class VesFlashCartsCommandContribution implements CommandContribution {
           this.messageService,
           this.preferenceService,
           this.terminalService,
+          this.vesProcessService,
+          this.vesState,
           this.vesUsbService,
-          this.vesState
         ),
     });
   }

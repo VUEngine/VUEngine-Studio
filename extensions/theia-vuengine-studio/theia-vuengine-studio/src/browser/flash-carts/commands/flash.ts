@@ -1,5 +1,5 @@
 import { createWriteStream, readFileSync, unlinkSync } from "fs";
-import { dirname, join as joinPath } from "path";
+import { basename, dirname, join as joinPath, sep } from "path";
 import { Device } from "usb";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { CommandService, isOSX, isWindows, MessageService } from "@theia/core/lib/common";
@@ -12,6 +12,7 @@ import { VesBuildEnableWslPreference } from "../../build/preferences";
 import { convertoToEnvPath, getOs, getResourcesPath, getRomPath } from "../../common/functions";
 import { VesStateModel } from "../../common/vesStateModel";
 import { VesFlashCartsCustomPreference } from "../preferences";
+import { VesProcessService } from "../../../common/process-service-protocol";
 
 export type FlashCartConfig = {
   name: string;
@@ -36,11 +37,15 @@ export async function flashCommand(
   messageService: MessageService,
   preferenceService: PreferenceService,
   terminalService: TerminalService,
-  vesUsbService: VesUsbService,
-  vesState: VesStateModel
+  vesProcessService: VesProcessService,
+  vesState: VesStateModel,
+  vesUsbService: VesUsbService
 ) {
   if (vesState.isFlashQueued) {
     vesState.isFlashQueued = false;
+    return;
+  } else if (vesState.isFlashing) {
+    // TODO: open terminal
     return;
   }
 
@@ -57,7 +62,8 @@ export async function flashCommand(
         messageService,
         preferenceService,
         terminalService,
-        vesState
+        vesProcessService,
+        vesState,
       );
     }
   })
@@ -70,7 +76,8 @@ export async function flashCommand(
       messageService,
       preferenceService,
       terminalService,
-      vesState
+      vesProcessService,
+      vesState,
     );
   } else {
     commandService.executeCommand(VesBuildCommand.id);
@@ -142,6 +149,7 @@ async function flash(
   messageService: MessageService,
   preferenceService: PreferenceService,
   terminalService: TerminalService,
+  vesProcessService: VesProcessService,
   vesState: VesStateModel
 ) {
   if (!vesState.connectedFlashCart) {
@@ -162,8 +170,6 @@ async function flash(
     return;
   }
 
-  const fixPermissions = isWindows ? "" : `chmod a+x "${vesState.connectedFlashCart.config.path}" && `;
-
   let flasherEnvPath = convertoToEnvPath(
     preferenceService,
     vesState.connectedFlashCart.config.path
@@ -174,28 +180,47 @@ async function flash(
     flasherEnvPath.replace(/\.[^/.]+$/, "");
   }
 
-  const romPath =
-    vesState.connectedFlashCart.config.padRom &&
+  const romPath = vesState.connectedFlashCart.config.padRom &&
       await padRom(fileService, vesState, vesState.connectedFlashCart.config.size)
       ? getPaddedRomPath()
       : getRomPath();
 
   const flasherArgs = vesState.connectedFlashCart.config.args
-    ? " " + vesState.connectedFlashCart.config.args
-      .replace("%ROM%", `"${romPath}"`)
-      .replace("%PORT%", `...`)
-    : "";
+    ? vesState.connectedFlashCart.config.args
+      .replace("%ROM%", romPath)
+      .replace("%PORT%", `...`) // TODO
+      .split(" ")
+    : [];
 
-  const terminalId = "ves-flash";
-  const terminalWidget = terminalService.getById(terminalId) || await terminalService.newTerminal({
-    title: "Flash",
-    id: terminalId
+  // fix permissions
+  // TODO: do this only once on app startup
+  if (!isWindows) {
+    vesProcessService.launchProcess({
+      command: "chmod",
+      args: ["a+x", vesState.connectedFlashCart.config.path]
+    });
+  }
+
+  const processId = await vesProcessService.launchProcess({
+    command: "." + sep + basename(vesState.connectedFlashCart.config.path),
+    args: flasherArgs,
+    options: {
+      cwd: dirname(vesState.connectedFlashCart.config.path),
+    },
   });
-  await terminalWidget.start();
+
+  const terminalWidget = terminalService.getById(getTerminalId()) || await terminalService.newTerminal({
+    title: "Flash",
+    id: getTerminalId()
+  });
+  await terminalWidget.start(processId);
   terminalWidget.clearOutput();
-  //await new Promise(resolve => setTimeout(resolve, 1000));
-  terminalWidget.sendText(`${fixPermissions}"${flasherEnvPath}" ${flasherArgs}\n`);
   terminalService.open(terminalWidget);
+  // showFlashingMessage(messageService); return;
+}
+
+function getTerminalId(): string {
+  return "ves-flash";
 }
 
 async function padRom(fileService: FileService, vesState: VesStateModel, size: number): Promise<boolean> {
@@ -231,3 +256,45 @@ async function padRom(fileService: FileService, vesState: VesStateModel, size: n
 function getPaddedRomPath() {
   return getRomPath().replace("output.vb", "outputPadded.vb");
 }
+
+// async function showFlashingMessage(messageService: MessageService) {
+//   /*
+//   Notes on prog-vb output
+//   1) Erasing device...
+//   2) Flashing...
+//   3) [00:01:26] [###################################>----] 1806/2048 packets (12s)
+//   4) Image flashed successfully.
+//   */
+
+//   const progressMessage = await messageService.showProgress({
+//     text: `<img style="position:absolute;left:10px;top:15px;background-color:#222;border-radius:5px;padding:10px;height:100px;border:1px dashed rgba(255,255,255,0.2)" src="https://files.virtual-boy.com/album/1042058/hf32_cartfront.png"/>
+//     <div style="padding-left:100px;margin-bottom:10px;">Flashing ROM image to <i>HyperFlash32</i>`,
+//     actions: ["Abort"],
+//   });
+//   progressMessage.report({message: `<br><br>Erasing device... <br><br>Working, do not remove your HyperFlash32.</div>`, work: {done: 0, total: 2048}}),
+
+//   setTimeout(
+//     () => progressMessage.report({message: `<br><br><i class="fa fa-check"></i> Erasing device done.<br>Flashing... (10/2048)<br><br>Working, do not remove your HyperFlash32.</div>`, work: {done: 10, total: 2048}}),
+//     4000
+//   );
+
+//   setTimeout(
+//     () => progressMessage.report({message: `<br><br><i class="fa fa-check"></i> Erasing device done.<br>Flashing... (256/2048)<br><br>Working, do not remove your HyperFlash32.</div>`, work: {done: 256, total: 2048}}),
+//     5000
+//   );
+
+//   setTimeout(
+//     () => progressMessage.report({message: `<br><br><i class="fa fa-check"></i> Erasing device done.<br>Flashing... (512/2048)<br><br>Working, do not remove your HyperFlash32.</div>`, work: {done: 512, total: 2048}}),
+//     6000
+//   );
+
+//   setTimeout(
+//     () => progressMessage.report({message: `<br><br><i class="fa fa-check"></i> Erasing device done.<br>Flashing... (1024/2048)<br><br>Working, do not remove your HyperFlash32.</div>`, work: {done: 1024, total: 2048}}),
+//     7000
+//   );
+
+//   setTimeout(
+//     () => progressMessage.report({message: `<br><br><i class="fa fa-check"></i> Erasing device done.<br><i class="fa fa-check"></i> Flashing done.<br><br>All done. You may now remove your HyperFlash32..</div>`, work: {done: 2048, total: 2048}}),
+//     8000
+//   );
+// }
