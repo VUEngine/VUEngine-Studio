@@ -1,6 +1,6 @@
 # theia-vuengine-studio
 
-Adds VUEngine icons and styles to the application.
+Adds all VUEngine Studio specific functionality and customizations.
 
 ## Getting started
 

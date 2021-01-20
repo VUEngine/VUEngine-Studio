@@ -36,10 +36,10 @@
     "@theia/vsx-registry": "^1.9.0",
     "@theia/workspace": "^1.9.0",
     "usb": "^1.6.3",
+    "rimraf": "latest",
     "filenamify": "4.2.0"
   },
   "devDependencies": {
-    "rimraf": "latest",
     "typescript": "latest",
     "@types/usb": "^1.5.2"
   },

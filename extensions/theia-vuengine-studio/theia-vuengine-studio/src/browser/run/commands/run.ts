@@ -1,4 +1,4 @@
-import { join as joinPath } from "path";
+import { basename, dirname, join as joinPath, sep } from "path";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { CommandService, isWindows } from "@theia/core/lib/common";
 import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
@@ -7,27 +7,32 @@ import { getOs, getResourcesPath, getRomPath } from "../../common/functions";
 import { VesStateModel } from "../../common/vesStateModel";
 import { VesRunDefaultEmulatorPreference, VesRunEmulatorConfigsPreference } from "../preferences";
 import { EmulatorConfig } from "../types";
+import { VesProcessService } from "../../../common/process-service-protocol";
 
 export async function runCommand(
   commandService: CommandService,
   preferenceService: PreferenceService,
   terminalService: TerminalService,
-  vesState: VesStateModel
+  vesProcessService: VesProcessService,
+  vesState: VesStateModel,
 ) {
   if (vesState.isRunQueued) {
     vesState.isRunQueued = false;
+    return;
+  } else if (vesState.isRunning) {
+    openTerminal(terminalService);
     return;
   }
 
   vesState.onDidChangeOutputRomExists(outputRomExists => {
     if (outputRomExists && vesState.isRunQueued) {
       vesState.isRunQueued = false;
-      run(preferenceService, terminalService);
+      run(preferenceService, terminalService, vesProcessService, vesState);
     }
   })
 
   if (vesState.outputRomExists) {
-    run(preferenceService, terminalService);
+    run(preferenceService, terminalService, vesProcessService, vesState);
   } else {
     commandService.executeCommand(VesBuildCommand.id);
     vesState.isRunQueued = true;
@@ -36,34 +41,59 @@ export async function runCommand(
 
 async function run(
   preferenceService: PreferenceService,
-  terminalService: TerminalService
+  terminalService: TerminalService,
+  vesProcessService: VesProcessService,
+  vesState: VesStateModel,
 ) {
   const defaultEmulatorConfig = getDefaultEmulatorConfig(preferenceService);
   if (!defaultEmulatorConfig) return;
 
-  const emulatorPath = `"${defaultEmulatorConfig.path.replace("%MEDNAFEN%", joinPath(
+  vesState.isRunning = true;
+
+  const emulatorPath = defaultEmulatorConfig.path.replace("%MEDNAFEN%", joinPath(
     getResourcesPath(),
     "binaries",
     "vuengine-studio-tools",
     getOs(),
     "mednafen",
     isWindows ? "mednafen.exe" : "mednafen"
-  ))}"`;
+  ));
 
-  const emulatorArgs = ` ${defaultEmulatorConfig.args.replace("%ROM%", `"${getRomPath()}"`)}`;
+  const emulatorArgs = defaultEmulatorConfig.args.replace("%ROM%", getRomPath()).split(" ");
 
-  const fixPermissions = isWindows ? "" : `chmod a+x ${emulatorPath} && `;
+  // fix permissions
+  // TODO: do this only once on app startup
+  if (!isWindows) {
+    vesProcessService.launchProcess({
+      command: "chmod",
+      args: ["a+x", emulatorPath]
+    });
+  }
 
-  const terminalId = "vuengine-run";
-  const terminalWidget = terminalService.getById(terminalId) || await terminalService.newTerminal({
-    title: "Run",
-    id: terminalId
+  const processId = await vesProcessService.launchProcess({
+    command: "." + sep + basename(emulatorPath),
+    args: emulatorArgs,
+    options: {
+      cwd: dirname(emulatorPath),
+    },
   });
-  await terminalWidget.start();
+
+  const terminalWidget = terminalService.getById(getTerminalId()) || await terminalService.newTerminal({
+    title: "Run",
+    id: getTerminalId(),
+  });
+  await terminalWidget.start(processId);
   terminalWidget.clearOutput();
-  //await new Promise(resolve => setTimeout(resolve, 1000));
-  terminalWidget.sendText(`${fixPermissions}${emulatorPath}${emulatorArgs}\n`);
-  terminalService.open(terminalWidget);
+  // openTerminal(terminalService);
+}
+
+function getTerminalId(): string {
+  return "ves-run";
+}
+
+function openTerminal(terminalService: TerminalService) {
+  const terminalWidget = terminalService.getById(getTerminalId())
+  if (terminalWidget) terminalService.open(terminalWidget);
 }
 
 export function getDefaultEmulatorConfig(preferenceService: PreferenceService): EmulatorConfig {

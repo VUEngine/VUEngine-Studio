@@ -84,7 +84,7 @@ async function build(
   // }
   const fixPermissions = isWindows ? "" : `chmod a+x ${joinPath(compilerPath, "bin", "*")} && chmod a+x ${joinPath(engineCorePath, "lib", "compiler", "preprocessor", "*.sh")} && `;
 
-  const terminalId = "vuengine-build";
+  const terminalId = "ves-build";
   const terminalWidget = terminalService.getById(terminalId) || await terminalService.newTerminal({
     title: "Build",
     id: terminalId,

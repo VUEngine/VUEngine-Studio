@@ -1,52 +1,26 @@
 import { inject, injectable } from "inversify";
-import { RawProcessFactory } from '@theia/process/lib/node';
+// import { spawn } from "child_process";
+import { ProcessErrorEvent, TerminalProcessFactory, TerminalProcessOptions } from '@theia/process/lib/node';
 import { VesProcessService } from "../../common/process-service-protocol";
 
 @injectable()
 export class DefaultVesProcessService implements VesProcessService {
-    @inject(RawProcessFactory) protected readonly processFactory: RawProcessFactory;
+    @inject(TerminalProcessFactory) protected readonly terminalProcessFactory: TerminalProcessFactory;
 
-    async launchProcess(): Promise<void> {
-        // const terminalProcess = this.processFactory({
-        //     command: "mednafen",
-        //     args: ["/Users/chris/dev/vb/projects/vuengine-platformer-demo/build/output.vb"],
-        //     options: {
-        //         cwd: "/Users/chris/dev/vuengine-studio/extensions/theia-vuengine-studio/electron-app/binaries/vuengine-studio-tools/osx/mednafen",
-        //         env: {},
-        //         // shell: {
-        //         //     executable: "";
+    async launchProcess(options: TerminalProcessOptions): Promise<number> {
+        const terminalProcess = this.terminalProcessFactory(options);
+        await new Promise((resolve, reject) => {
+            terminalProcess.onStart(resolve);
+            terminalProcess.onError((error: ProcessErrorEvent) => console.log(error));
+        });
 
-        //         //     /**
-        //         //      * The arguments to be passed to the shell executable to run in command mode
-        //         //      * (e.g ['-c'] for bash or ['/S', '/C'] for cmd.exe).
-        //         //      */
-        //         //     args: [""];
-        //         // },
-        //     },
-        // });
+        terminalProcess.onClose(() => console.log("CLOSE"));
+        terminalProcess.onExit(() => console.log("EXIT"));
 
-        // await new Promise((resolve, reject) => {
-        //     terminalProcess.onStart(resolve);
-        //     terminalProcess.onExit(() => console.log("EXIT"));
-        //     terminalProcess.onError((error: ProcessErrorEvent) => { });
-        // });
+        // terminalProcess.outputStream.on('data', (data) => {
+        //     console.log("error: ", data.toString())
+        // })
 
-
-
-        // const process = this.processFactory({
-        //     options: {
-        //         stdio: ['pipe', 'pipe', 2, 'ipc'],
-        //         env: environment.electron.runAsNodeEnv()
-        //     },
-        //     modulePath: getResourcesPath()
-        // });
-
-        // await new Promise((resolve, reject) => {
-        //     process.onStart(resolve);
-        //     process.onExit(() => console.log("EXIT"));
-        //     process.onError((error) => { });
-        // });
-
-        // console.log("process.getCwdURI()", await process.getCwdURI());
+        return terminalProcess.id;
     }
 }

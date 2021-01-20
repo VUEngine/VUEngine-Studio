@@ -181,6 +181,18 @@ export class VesStateModel {
         return this._isRunQueued;
     }
 
+    // running
+    protected _isRunning: boolean = false;
+    protected readonly onDidChangeIsRunningEmitter = new Emitter<boolean>();
+    readonly onDidChangeIsRunning = this.onDidChangeIsRunningEmitter.event;
+    set isRunning(flag: boolean) {
+        this._isRunning = flag;
+        this.onDidChangeIsRunningEmitter.fire(this._isRunning);
+    }
+    get isRunning(): boolean {
+        return this._isRunning;
+    }
+
     // flash queue
     protected _isFlashQueued: boolean = false;
     protected readonly onDidChangeIsFlashQueuedEmitter = new Emitter<boolean>();

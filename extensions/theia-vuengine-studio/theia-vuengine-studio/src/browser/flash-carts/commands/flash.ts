@@ -186,7 +186,7 @@ async function flash(
       .replace("%PORT%", `...`)
     : "";
 
-  const terminalId = "vuengine-flash";
+  const terminalId = "ves-flash";
   const terminalWidget = terminalService.getById(terminalId) || await terminalService.newTerminal({
     title: "Flash",
     id: terminalId
