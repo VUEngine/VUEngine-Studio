@@ -8,7 +8,7 @@ import { join as joinPath } from "path";
 import { VesProcessService } from "../../../common/process-service-protocol";
 import { convertoToEnvPath, getOs, getResourcesPath, getWorkspaceRoot } from "../../common/functions";
 import { VesStateModel } from "../../common/vesStateModel";
-import { VesBuildDumpElfPreference, VesBuildEngineCorePathPreference, VesBuildEnginePluginsPathPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "../preferences";
+import { VesBuildDumpElfPreference, VesBuildEnableWslPreference, VesBuildEngineCorePathPreference, VesBuildEnginePluginsPathPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "../preferences";
 
 export async function buildCommand(
   fileService: FileService,
@@ -18,7 +18,7 @@ export async function buildCommand(
   vesState: VesStateModel
 ) {
   if (!vesState.isBuilding) {
-    build(fileService, preferenceService, terminalService, vesState);
+    build(fileService, preferenceService, terminalService, vesProcessService, vesState);
   }
 }
 
@@ -26,80 +26,92 @@ async function build(
   fileService: FileService,
   preferenceService: PreferenceService,
   terminalService: TerminalService,
+  vesProcessService: VesProcessService,
   vesState: VesStateModel
 ) {
+  vesState.isBuilding = true;
+
+  const workspaceRoot = getWorkspaceRoot()
   const buildMode = preferenceService.get(VesBuildModePreference.id) as string;
   const dumpElf = preferenceService.get(VesBuildDumpElfPreference.id) as boolean;
   const pedanticWarnings = preferenceService.get(VesBuildPedanticWarningsPreference.id) as boolean;
   const engineCorePath = await getEngineCorePath(fileService, preferenceService);
   const enginePluginsPath = await getEnginePluginsPath(fileService, preferenceService);
   const compilerPath = getCompilerPath();
-  const workingDir = convertoToEnvPath(
-    preferenceService,
-    getWorkspaceRoot()
-  );
-  const v810path = convertoToEnvPath(preferenceService, joinPath(compilerPath, "bin"));
-  const workspaceRoot = getWorkspaceRoot()
 
-  let makefile = convertoToEnvPath(
-    preferenceService,
-    joinPath(getWorkspaceRoot(), "makefile")
-  );
+  let makefile = convertoToEnvPath(preferenceService, joinPath(workspaceRoot, "makefile"));
   if (!await fileService.exists(new URI(makefile))) {
-    makefile = convertoToEnvPath(
-      preferenceService,
-      joinPath(engineCorePath, "makefile-game")
-    );
+    makefile = convertoToEnvPath(preferenceService, joinPath(engineCorePath, "makefile-game"));
   }
 
-  const exports = [`-e TYPE=${buildMode.toLowerCase()}`];
-  if (dumpElf) {
-    exports.push("DUMP_ELF=1");
-  }
-  if (pedanticWarnings) {
-    exports.push("PRINT_PEDANTIC_WARNINGS=1");
+  // Support for building through WSL
+  let shellPath = "";
+  let shellArgs = [""];
+  if (isWindows) {
+    const enableWsl = preferenceService.get(VesBuildEnableWslPreference.id);
+    if (enableWsl) {
+      shellPath = process.env.windir + '\\System32\\wsl.exe';
+    } else {
+      shellPath = joinPath(getResourcesPath(), "binaries", "vuengine-studio-tools", "win", "msys", "usr", "bin", "bash.exe");
+      shellArgs = ['--login'];
+    }
   }
 
-  exports.push(`MAKE_JOBS=${getThreads()}`);
-  exports.push("LC_ALL=C");
-  exports.push(`ENGINE_FOLDER="${convertoToEnvPath(preferenceService, engineCorePath)}"`);
-  exports.push(`PLUGINS_FOLDER="${convertoToEnvPath(preferenceService, enginePluginsPath)}"`);
+  // fix permissions
+  // TODO: do this only once on app startup
+  if (!isWindows) {
+    vesProcessService.launchProcess({
+      command: "chmod",
+      args: ["-R", "a+x", joinPath(compilerPath, "bin")]
+    });
+    vesProcessService.launchProcess({
+      command: "chmod",
+      args: ["-R", "a+x", joinPath(engineCorePath, "lib", "compiler", "preprocessor")]
+    });
+  }
 
   // fix line endings of preprocessor scripts
   // note: should no longer be necessary due to .gitattributes directive
-  //preCallMake = 'find "' + convertoToEnvPath(engineCorePath) + 'lib/compiler/preprocessor/" -name "*.sh" -exec sed -i -e "s/$(printf \'\\r\')//" {} \\; && ' + preCallMake;
+  //preCallMake = 'find "' + convertoToEnvPath(engineCorePath) + 'lib/compiler/preprocessor/" -name "*.sh" -exec sed -i -e "s/$(printf \'\\r\')//" {} \\; ';
 
-  vesState.isBuilding = true;
-
-  // let shellPath = "";
-  // let shellArgs = [""];
-  // if (isWindows) {
-  //   const enableWsl = preferenceService.get(VesBuildEnableWslPreference.id);
-  //   if (enableWsl) {
-  //     shellPath = process.env.windir + '\\System32\\wsl.exe';
-  //   } else {
-  //     shellPath = joinPath(getResourcesPath(), "binaries", "vuengine-studio-tools", "win", "msys", "usr", "bin", "bash.exe");
-  //     shellArgs = ['--login'];
-  //   }
-  // }
-  const fixPermissions = isWindows ? "" : `chmod a+x ${joinPath(compilerPath, "bin", "*")} && chmod a+x ${joinPath(engineCorePath, "lib", "compiler", "preprocessor", "*.sh")} && `;
-
-  const terminalId = "ves-build";
-  const terminalWidget = terminalService.getById(terminalId) || await terminalService.newTerminal({
-    title: "Build",
-    id: terminalId,
-    //shellPath,
-    //shellArgs,
+  const processId = await vesProcessService.launchProcess({
+    command: "make",
+    args: [
+      "all",
+      "-e", `TYPE=${buildMode.toLowerCase()}`,
+      "-e", `PATH=${joinPath(compilerPath, "bin")}:${process.env.PATH}`,
+      "-f", makefile,
+      "-C", convertoToEnvPath(preferenceService, workspaceRoot),
+    ],
+    options: {
+      cwd: workspaceRoot,
+      env: {
+        "DUMP_ELF": dumpElf ? 1 : 0,
+        "ENGINE_FOLDER": convertoToEnvPath(preferenceService, engineCorePath),
+        "LC_ALL": "C",
+        "MAKE_JOBS": getThreads(),
+        "PLUGINS_FOLDER": convertoToEnvPath(preferenceService, enginePluginsPath),
+        "PRINT_PEDANTIC_WARNINGS": pedanticWarnings ? 1 : 0,
+      }
+    },
   });
-  await terminalWidget.start();
-  terminalService.open(terminalWidget);
-  //await new Promise(resolve => setTimeout(resolve, 1000));
+
+  const terminalWidget = terminalService.getById(getTerminalId()) || await terminalService.newTerminal({
+    title: "Build",
+    id: getTerminalId(),
+    shellPath,
+    shellArgs,
+  });
+  await terminalWidget.start(processId);
   terminalWidget.clearOutput();
-  terminalWidget.show();
-  terminalWidget.sendText(`${fixPermissions}cd "${workspaceRoot}" && export PATH="${v810path}":$PATH && make all ${exports.join(" ")} -f "${makefile}" -C "${workingDir}" \n`);
   terminalWidget.onTerminalDidClose(() => {
     // TODO: kill process (if necessary?)
   });
+  terminalService.open(terminalWidget);
+}
+
+function getTerminalId(): string {
+  return "ves-build";
 }
 
 async function getEngineCorePath(fileService: FileService, preferenceService: PreferenceService) {

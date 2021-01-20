@@ -43,6 +43,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
         this.vesState.onDidChangeIsBuilding(() => this.update());
         this.vesState.onDidChangeIsExportQueued(() => this.update());
         this.vesState.onDidChangeIsFlashQueued(() => this.update());
+        this.vesState.onDidChangeIsFlashing(() => this.update());
         this.vesState.onDidChangeIsRunQueued(() => this.update());
         this.vesState.onDidChangeIsRunning(() => this.update());
         this.vesState.onDidChangeConnectedFlashCart(() => this.update());
@@ -117,14 +118,16 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
 
                 </button>
                 <button
-                    className={"theia-button secondary flash" + (this.vesState.isFlashQueued ? " active" : "")}
+                    className={"theia-button secondary flash" + (this.vesState.isFlashQueued || this.vesState.isFlashing ? " active" : "")}
                     title={this.vesState.isFlashQueued ? "Flash Queued..." : `${VesFlashCartsCommand.label}${this.getKeybindingLabel(VesFlashCartsCommand.id)}`}
                     disabled={!this.vesState.connectedFlashCart}
                     onClick={() => this.commandService.executeCommand(VesFlashCartsCommand.id)}
                 >
                     {this.vesState.isFlashQueued
                         ? <i className="fa fa-hourglass-half"></i>
-                        : <i className="fa fa-usb"></i>}
+                        : this.vesState.isFlashing
+                            ? <i className="fa fa-spinner fa-pulse"></i>
+                            : <i className="fa fa-usb"></i>}
                 </button>
                 <button
                     className={"theia-button secondary export" + (this.vesState.isExportQueued ? " active" : "")}

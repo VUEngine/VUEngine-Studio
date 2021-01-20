@@ -169,6 +169,7 @@ async function flash(
     );
     return;
   }
+  vesState.isFlashing = true;
 
   let flasherEnvPath = convertoToEnvPath(
     preferenceService,
@@ -181,9 +182,9 @@ async function flash(
   }
 
   const romPath = vesState.connectedFlashCart.config.padRom &&
-      await padRom(fileService, vesState, vesState.connectedFlashCart.config.size)
-      ? getPaddedRomPath()
-      : getRomPath();
+    await padRom(fileService, vesState, vesState.connectedFlashCart.config.size)
+    ? getPaddedRomPath()
+    : getRomPath();
 
   const flasherArgs = vesState.connectedFlashCart.config.args
     ? vesState.connectedFlashCart.config.args
