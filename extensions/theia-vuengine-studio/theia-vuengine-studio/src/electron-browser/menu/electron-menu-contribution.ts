@@ -64,7 +64,9 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
 
         this.vesState.onDidChangeIsBuilding((flag) => app.emit("ves-change-is-building", flag));
         this.vesState.onDidChangeIsRunQueued((flag) => app.emit("ves-change-is-run-queued", flag));
+        this.vesState.onDidChangeIsRunning((flag) => app.emit("ves-change-is-running", flag));
         this.vesState.onDidChangeIsFlashQueued((flag) => app.emit("ves-change-is-flash-queued", flag));
+        this.vesState.onDidChangeIsFlashing((flag) => app.emit("ves-change-is-flashing", flag));
         this.vesState.onDidChangeIsExportQueued((flag) => app.emit("ves-change-is-export-queued", flag));
         this.vesState.onDidChangeConnectedFlashCart((config) => app.emit("ves-change-connected-flash-cart", config));
         this.vesState.onDidChangeBuildMode((buildMode) => app.emit("ves-change-build-mode", buildMode));
