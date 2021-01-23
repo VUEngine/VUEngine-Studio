@@ -67,7 +67,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
     protected async createProject() {
         if (this.isCreating) return
 
-        const spinnerIcon = `<i class="fa fa-spinner fa-pulse"></i>`;
+        const spinnerIcon = `<i class="fa fa-refresh fa-spin"></i>`;
         const warningIcon = `<i class="fa fa-warning"></i>`;
 
         this.setIsCreating(true);

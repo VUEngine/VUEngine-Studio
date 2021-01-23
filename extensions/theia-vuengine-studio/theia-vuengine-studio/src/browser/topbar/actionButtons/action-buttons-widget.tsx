@@ -93,7 +93,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                     onClick={() => this.commandService.executeCommand(VesBuildCleanCommand.id)}
                 >
                     {this.vesState.isCleaning
-                        ? <i className="fa fa-spinner fa-pulse"></i>
+                        ? <i className="fa fa-refresh fa-spin"></i>
                         : <i className="fa fa-trash"></i>}
                 </button>
                 <button
@@ -102,7 +102,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                     onClick={() => this.commandService.executeCommand(VesBuildCommand.id)}
                 >
                     {this.vesState.isBuilding
-                        ? <i className="fa fa-spinner fa-pulse"></i>
+                        ? <i className="fa fa-cog fa-spin"></i>
                         : <i className="fa fa-wrench"></i>}
                 </button>
                 <button
@@ -113,7 +113,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                     {this.vesState.isRunQueued
                         ? <i className="fa fa-hourglass-half"></i>
                         : this.vesState.isRunning
-                            ? <i className="fa fa-spinner fa-pulse"></i>
+                            ? <i className="fa fa-refresh fa-spin"></i>
                             : <i className="fa fa-play"></i>}
 
                 </button>
@@ -126,7 +126,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                     {this.vesState.isFlashQueued
                         ? <i className="fa fa-hourglass-half"></i>
                         : this.vesState.isFlashing
-                            ? <i className="fa fa-spinner fa-pulse"></i>
+                            ? <i className="fa fa-refresh fa-spin"></i>
                             : <i className="fa fa-usb"></i>}
                 </button>
                 <button
