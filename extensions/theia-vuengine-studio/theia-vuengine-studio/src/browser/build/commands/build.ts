@@ -6,7 +6,7 @@ import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-servi
 import { cpus } from "os";
 import { join as joinPath } from "path";
 import { VesProcessService } from "../../../common/process-service-protocol";
-import { convertoToEnvPath, getOs, getResourcesPath, getWorkspaceRoot } from "../../common/functions";
+import { convertoToEnvPath, getOs, getResourcesPath, getRomPath, getWorkspaceRoot } from "../../common/functions";
 import { VesStateModel } from "../../common/vesStateModel";
 import { VesBuildDumpElfPreference, VesBuildEnableWslPreference, VesBuildEngineCorePathPreference, VesBuildEnginePluginsPathPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "../preferences";
 
@@ -43,6 +43,8 @@ async function build(
   if (!await fileService.exists(new URI(makefile))) {
     makefile = convertoToEnvPath(preferenceService, joinPath(engineCorePath, "makefile-game"));
   }
+
+  fileService.delete(new URI(getRomPath()));
 
   // Support for building through WSL
   let shellPath = "";
