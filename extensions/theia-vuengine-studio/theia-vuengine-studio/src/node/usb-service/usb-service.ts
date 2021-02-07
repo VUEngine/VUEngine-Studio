@@ -19,8 +19,6 @@ export class VesUsbServiceImpl implements VesUsbService {
 
     async setClient(client: VesUsbServiceClient) {
         this.client = client;
-        // do initial cart detection
-        this.client?.onAttach(await this.detectFlashCart())
     }
 
     @postConstruct()
@@ -79,7 +77,7 @@ export class VesUsbServiceImpl implements VesUsbService {
         return flashCartConfigs;
     }
 
-    protected async detectFlashCart(): Promise<ConnectedFlashCart | undefined> {
+    async detectFlashCart(): Promise<ConnectedFlashCart | undefined> {
         const flashCartConfigs = this.getFlashCartConfigs();
         const devices: Device[] = getDeviceList();
         let manufacturer: string | undefined;

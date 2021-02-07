@@ -11,8 +11,9 @@ import { VesBuildModePreference } from "../build/preferences";
 import { VesRunDefaultEmulatorPreference, VesRunEmulatorConfigsPreference } from "../run/preferences";
 import { getDefaultEmulatorConfig, getEmulatorConfigs } from "../run/commands/run";
 import { EmulatorConfig } from "../run/types";
-import { VesUsbServiceClient } from "../services/usb-service/usb-service-client";
+import { VesUsbWatcher } from "../services/usb-service/usb-service-client";
 import { BuildMode } from "../build/types";
+import { VesUsbService } from "../../common/usb-service-protocol";
 
 type BuildFolderFlags = {
     [key: string]: boolean
@@ -24,7 +25,8 @@ export class VesStateModel {
     @inject(FileService) protected fileService: FileService;
     @inject(FrontendApplicationStateService) protected readonly frontendApplicationStateService: FrontendApplicationStateService;
     @inject(PreferenceService) protected readonly preferenceService: PreferenceService;
-    @inject(VesUsbServiceClient) protected readonly vesUsbServiceClient: VesUsbServiceClient;
+    @inject(VesUsbService) protected readonly vesUsbService: VesUsbService;
+    @inject(VesUsbWatcher) protected readonly vesUsbServiceClient: VesUsbWatcher;
 
     @postConstruct()
     protected async init(): Promise<void> {
@@ -40,6 +42,8 @@ export class VesStateModel {
                 this.fileService.exists(new URI(getRomPath())).then((exists: boolean) => {
                     this.outputRomExists = exists;
                 });
+
+                this.connectedFlashCart = await this.vesUsbService.detectFlashCart();
             }
         });
 

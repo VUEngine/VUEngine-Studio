@@ -10,4 +10,5 @@ export interface VesUsbServiceClient {
 }
 
 export interface VesUsbService extends JsonRpcServer<VesUsbServiceClient> {
+    detectFlashCart(): Promise<ConnectedFlashCart | undefined>;
 }

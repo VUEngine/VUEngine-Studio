@@ -4,7 +4,7 @@ import { VesUsbService } from "../../../common/usb-service-protocol";
 import { ConnectedFlashCart } from "../../flash-carts/commands/flash";
 
 @injectable()
-export class VesUsbServiceClient {
+export class VesUsbWatcher {
     public readonly onAttachEmitter = new Emitter<ConnectedFlashCart | undefined>();
     public readonly onAttach: Event<ConnectedFlashCart | undefined> = this.onAttachEmitter.event;
     public readonly onDetachEmitter = new Emitter<ConnectedFlashCart | undefined>();
