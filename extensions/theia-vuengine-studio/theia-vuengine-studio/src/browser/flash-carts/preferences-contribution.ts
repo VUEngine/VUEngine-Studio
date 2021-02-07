@@ -6,12 +6,12 @@ import {
   PreferenceContribution,
   PreferenceSchema,
 } from "@theia/core/lib/browser";
-import { VesFlashCartsCustomPreference } from "./preferences";
+import { VesFlashCartsPreference } from "./preferences";
 
 const VesFlashCartsPreferenceSchema: PreferenceSchema = {
   type: "object",
   properties: {
-    [VesFlashCartsCustomPreference.id]: VesFlashCartsCustomPreference.property,
+    [VesFlashCartsPreference.id]: VesFlashCartsPreference.property,
   },
 };
 

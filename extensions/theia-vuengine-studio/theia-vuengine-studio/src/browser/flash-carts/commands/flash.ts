@@ -2,7 +2,7 @@ import { createWriteStream, readFileSync, unlinkSync } from "fs";
 import { basename, dirname, join as joinPath, sep } from "path";
 import { Device } from "usb";
 import { PreferenceService } from "@theia/core/lib/browser";
-import { CommandService, isOSX, isWindows, MessageService } from "@theia/core/lib/common";
+import { CommandService, isWindows, MessageService } from "@theia/core/lib/common";
 import URI from "@theia/core/lib/common/uri";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
@@ -11,7 +11,7 @@ import { VesBuildEnableWslPreference } from "../../build/preferences";
 import { convertoToEnvPath, getOs, getResourcesPath, getRomPath } from "../../common/functions";
 import { VesStateModel } from "../../common/vesStateModel";
 import { VesProcessService } from "../../../common/process-service-protocol";
-import { VesFlashCartsCustomPreference } from "../preferences";
+import { VesFlashCartsPreference } from "../preferences";
 
 export type FlashCartConfig = {
   name: string;
@@ -193,51 +193,34 @@ function getPaddedRomPath() {
 }
 
 export function getFlashCartConfigs(preferenceService: PreferenceService): FlashCartConfig[] {
-  const flashCartConfigs = [
-    {
-      name: "FlashBoy (Plus)",
-      vid: 6017,
-      pid: 2466,
-      manufacturer: "Richard Hutchinson",
-      product: "FlashBoy",
-      size: 16,
-      path: joinPath(
-        getResourcesPath(),
-        "binaries",
-        "vuengine-studio-tools",
-        getOs(),
-        "prog-vb",
-        isWindows ? "prog-vb.exe" : "prog-vb"
-      ),
-      args: "%ROM%",
-      padRom: true,
-    },
-    {
-      name: "HyperFlash32",
-      vid: 1027,
-      pid: 24577,
-      manufacturer: "FTDI",
-      product: "FT232R",
-      size: 32,
-      path: joinPath(
-        getResourcesPath(),
-        "binaries",
-        "vuengine-studio-tools",
-        getOs(),
-        "hf-cli",
-        isWindows ? "hfcli.exe" : "hfcli"
-      ),
-      args: isOSX
-        ? `-p %PORT% -s %ROM% -u --slow`
-        : `-p %PORT% -s %ROM% -u`,
-      padRom: false,
-    },
-  ];
+  const flashCartConfigs: FlashCartConfig[] = preferenceService.get(VesFlashCartsPreference.id) ?? [];
 
-  const userDefinedFlashCartConfigs: FlashCartConfig[] | undefined =
-    preferenceService.get(VesFlashCartsCustomPreference.id) ?? [];
+  const effectiveFlashCartConfigs = flashCartConfigs.length > 0
+    ? flashCartConfigs
+    : VesFlashCartsPreference.property.default;
 
-  return [...flashCartConfigs, ...userDefinedFlashCartConfigs];
+  return effectiveFlashCartConfigs.map((flashCartConfig: FlashCartConfig) => {
+    return {
+      ...flashCartConfig,
+      path: flashCartConfig.path
+        .replace("%HFCLI%", joinPath(
+          getResourcesPath(),
+          "binaries",
+          "vuengine-studio-tools",
+          getOs(),
+          "hf-cli",
+          isWindows ? "hfcli.exe" : "hfcli"
+        ))
+        .replace("%PROGVB%", joinPath(
+          getResourcesPath(),
+          "binaries",
+          "vuengine-studio-tools",
+          getOs(),
+          "prog-vb",
+          isWindows ? "prog-vb.exe" : "prog-vb"
+        )),
+    };
+  });
 }
 
 // async function showFlashingMessage(messageService: MessageService) {

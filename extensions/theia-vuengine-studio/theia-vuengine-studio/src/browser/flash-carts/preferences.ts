@@ -1,7 +1,8 @@
+import { isOSX } from "@theia/core";
 import { VesProperty } from "../common/types";
 
-export const VesFlashCartsCustomPreference: VesProperty = {
-    id: "build.flash.customFlashCarts",
+export const VesFlashCartsPreference: VesProperty = {
+    id: "build.flash.flashCarts",
     property: {
         type: "array",
         label: "Flash Cart Configurations",
@@ -59,6 +60,31 @@ export const VesFlashCartsCustomPreference: VesProperty = {
                 },
             },
         },
-        default: [],
+        default: [
+            {
+                name: "FlashBoy (Plus)",
+                vid: 6017,
+                pid: 2466,
+                manufacturer: "Richard Hutchinson",
+                product: "FlashBoy",
+                size: 16,
+                path: "%PROGVB%",
+                args: "%ROM%",
+                padRom: true,
+            },
+            {
+                name: "HyperFlash32",
+                vid: 1027,
+                pid: 24577,
+                manufacturer: "FTDI",
+                product: "FT232R",
+                size: 32,
+                path: "%HFCLI%",
+                args: isOSX
+                    ? `-p %PORT% -s %ROM% -u --slow`
+                    : `-p %PORT% -s %ROM% -u`,
+                padRom: false,
+            },
+        ],
     },
 }

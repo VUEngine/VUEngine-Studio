@@ -50,15 +50,7 @@ async function run(
 
   vesState.isRunning = true;
 
-  const emulatorPath = defaultEmulatorConfig.path.replace("%MEDNAFEN%", joinPath(
-    getResourcesPath(),
-    "binaries",
-    "vuengine-studio-tools",
-    getOs(),
-    "mednafen",
-    isWindows ? "mednafen.exe" : "mednafen"
-  ));
-
+  const emulatorPath = defaultEmulatorConfig.path;
   const emulatorArgs = defaultEmulatorConfig.args.replace("%ROM%", getRomPath()).split(" ");
 
   // fix permissions
@@ -111,10 +103,24 @@ export function getDefaultEmulatorConfig(preferenceService: PreferenceService): 
 }
 
 export function getEmulatorConfigs(preferenceService: PreferenceService) {
-  const emulatorConfigs: EmulatorConfig[] | undefined =
-    preferenceService.get(VesRunEmulatorConfigsPreference.id) ?? [];
+  const emulatorConfigs: EmulatorConfig[] = preferenceService.get(VesRunEmulatorConfigsPreference.id) ?? [];
 
-  return emulatorConfigs.length > 0
+  const effectiveEmulatorConfigs = emulatorConfigs.length > 0
     ? emulatorConfigs
-    : VesRunEmulatorConfigsPreference.property.default
+    : VesRunEmulatorConfigsPreference.property.default;
+
+  return effectiveEmulatorConfigs.map((emulatorConfig: EmulatorConfig) => {
+    return {
+      ...emulatorConfig,
+      path: emulatorConfig.path
+        .replace("%MEDNAFEN%", joinPath(
+          getResourcesPath(),
+          "binaries",
+          "vuengine-studio-tools",
+          getOs(),
+          "mednafen",
+          isWindows ? "mednafen.exe" : "mednafen"
+        )),
+    };
+  });
 }
