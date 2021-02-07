@@ -1,17 +1,15 @@
 import { createWriteStream, readFileSync, unlinkSync } from "fs";
-import { basename, dirname, join as joinPath, sep } from "path";
+import { basename, dirname, sep } from "path";
 import { Device } from "usb";
 import { PreferenceService } from "@theia/core/lib/browser";
-import { CommandService, isOSX, isWindows, MessageService } from "@theia/core/lib/common";
+import { CommandService, isWindows, MessageService } from "@theia/core/lib/common";
 import URI from "@theia/core/lib/common/uri";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
-import { VesUsbService } from "../../../common/usb-service-protocol";
 import { VesBuildCommand } from "../../build/commands";
 import { VesBuildEnableWslPreference } from "../../build/preferences";
-import { convertoToEnvPath, getOs, getResourcesPath, getRomPath } from "../../common/functions";
+import { convertoToEnvPath, getRomPath } from "../../common/functions";
 import { VesStateModel } from "../../common/vesStateModel";
-import { VesFlashCartsCustomPreference } from "../preferences";
 import { VesProcessService } from "../../../common/process-service-protocol";
 
 export type FlashCartConfig = {
@@ -39,7 +37,6 @@ export async function flashCommand(
   terminalService: TerminalService,
   vesProcessService: VesProcessService,
   vesState: VesStateModel,
-  vesUsbService: VesUsbService
 ) {
   if (vesState.isFlashQueued) {
     vesState.isFlashQueued = false;
@@ -48,11 +45,6 @@ export async function flashCommand(
     // TODO: open terminal
     return;
   }
-
-  await detectFlashCart(preferenceService, vesState, vesUsbService);
-  // vesUsbService.onDeviceConnected((device) => {
-  //   console.log("HEUREKA", device);
-  // });
 
   vesState.onDidChangeOutputRomExists(outputRomExists => {
     if (outputRomExists && vesState.isFlashQueued) {
@@ -83,65 +75,6 @@ export async function flashCommand(
     commandService.executeCommand(VesBuildCommand.id);
     vesState.isFlashQueued = true;
   }
-}
-
-export async function detectFlashCart(
-  preferenceService: PreferenceService,
-  vesState: VesStateModel,
-  vesUsbService: VesUsbService,
-) {
-  const flashCartConfigs: FlashCartConfig[] = getFlashCartConfigs(
-    preferenceService
-  );
-  vesState.connectedFlashCart = await vesUsbService.detectFlashCart(...flashCartConfigs);
-}
-
-export function getFlashCartConfigs(preferenceService: PreferenceService) {
-  const flashCartConfigs = [
-    {
-      name: "FlashBoy (Plus)",
-      vid: 6017,
-      pid: 2466,
-      manufacturer: "Richard Hutchinson",
-      product: "FlashBoy",
-      size: 16,
-      path: joinPath(
-        getResourcesPath(),
-        "binaries",
-        "vuengine-studio-tools",
-        getOs(),
-        "prog-vb",
-        isWindows ? "prog-vb.exe" : "prog-vb"
-      ),
-      args: "%ROM%",
-      padRom: true,
-    },
-    {
-      name: "HyperFlash32",
-      vid: 1027,
-      pid: 24577,
-      manufacturer: "FTDI",
-      product: "FT232R",
-      size: 32,
-      path: joinPath(
-        getResourcesPath(),
-        "binaries",
-        "vuengine-studio-tools",
-        getOs(),
-        "hf-cli",
-        isWindows ? "hfcli.exe" : "hfcli"
-      ),
-      args: isOSX
-        ? `-p %PORT% -s %ROM% -u --slow`
-        : `-p %PORT% -s %ROM% -u`,
-      padRom: false,
-    },
-  ];
-
-  const userDefinedFlashCartConfigs: FlashCartConfig[] | undefined =
-    preferenceService.get(VesFlashCartsCustomPreference.id) ?? [];
-
-  return [...flashCartConfigs, ...userDefinedFlashCartConfigs];
 }
 
 async function flash(

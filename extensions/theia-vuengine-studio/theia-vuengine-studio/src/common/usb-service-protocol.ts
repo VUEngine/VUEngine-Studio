@@ -1,11 +1,13 @@
-import { Event } from "@theia/core";
-import { Device } from "usb";
-export const workspacePath = '/services/ves/usb';
-import { ConnectedFlashCart, FlashCartConfig } from "../browser/flash-carts/commands/flash";
+import { JsonRpcServer } from "@theia/core";
+import { ConnectedFlashCart } from "../browser/flash-carts/commands/flash";
 
-export const VesUsbService = Symbol('VesUsbService');
-export interface VesUsbService {
-    detectFlashCart(...flashCartConfigs: FlashCartConfig[]): Promise<ConnectedFlashCart | undefined>;
-    onDeviceConnected: Event<Device>;
-    onDeviceDisconnected: Event<Device>;
+export const VES_USB_SERVICE_PATH = "/ves/services/usb";
+export const VesUsbService = Symbol("VesUsbService");
+
+export interface VesUsbServiceClient {
+    onAttach(connectedFlashCart: ConnectedFlashCart | undefined): void;
+    onDetach(connectedFlashCart: ConnectedFlashCart | undefined): void;
+}
+
+export interface VesUsbService extends JsonRpcServer<VesUsbServiceClient> {
 }
