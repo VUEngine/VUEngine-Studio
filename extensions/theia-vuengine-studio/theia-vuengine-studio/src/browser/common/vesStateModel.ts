@@ -5,15 +5,15 @@ import URI from "@theia/core/lib/common/uri";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { FileChangesEvent } from "@theia/filesystem/lib/common/files";
 import { FrontendApplicationState, FrontendApplicationStateService } from "@theia/core/lib/browser/frontend-application-state";
-import { ConnectedFlashCart } from "../flash-carts/commands/flash";
+import { ConnectedFlashCart, FlashCartConfig, getFlashCartConfigs } from "../flash-carts/commands/flash";
 import { getBuildPath, getRomPath } from "./functions";
 import { VesBuildModePreference } from "../build/preferences";
 import { VesRunDefaultEmulatorPreference, VesRunEmulatorConfigsPreference } from "../run/preferences";
 import { getDefaultEmulatorConfig, getEmulatorConfigs } from "../run/commands/run";
 import { EmulatorConfig } from "../run/types";
-import { VesUsbWatcher } from "../services/usb-service/usb-service-client";
+import { VesFlashCartWatcher } from "../services/flash-cart-service/flash-cart-service-client";
 import { BuildMode } from "../build/types";
-import { VesUsbService } from "../../common/usb-service-protocol";
+import { VesFlashCartService } from "../../common/flash-cart-service-protocol";
 
 type BuildFolderFlags = {
     [key: string]: boolean
@@ -25,8 +25,8 @@ export class VesStateModel {
     @inject(FileService) protected fileService: FileService;
     @inject(FrontendApplicationStateService) protected readonly frontendApplicationStateService: FrontendApplicationStateService;
     @inject(PreferenceService) protected readonly preferenceService: PreferenceService;
-    @inject(VesUsbService) protected readonly vesUsbService: VesUsbService;
-    @inject(VesUsbWatcher) protected readonly vesUsbServiceClient: VesUsbWatcher;
+    @inject(VesFlashCartService) protected readonly vesFlashCartService: VesFlashCartService;
+    @inject(VesFlashCartWatcher) protected readonly vesFlashCartServiceClient: VesFlashCartWatcher;
 
     @postConstruct()
     protected async init(): Promise<void> {
@@ -43,7 +43,7 @@ export class VesStateModel {
                     this.outputRomExists = exists;
                 });
 
-                this.connectedFlashCart = await this.vesUsbService.detectFlashCart();
+                this.detectConnectedFlashCart();
             }
         });
 
@@ -84,8 +84,13 @@ export class VesStateModel {
         });
 
         // watch for flash cart attach/detach
-        this.vesUsbServiceClient.onAttach((connectedFlashCart) => this.connectedFlashCart = connectedFlashCart);
-        this.vesUsbServiceClient.onDetach((connectedFlashCart) => this.connectedFlashCart = connectedFlashCart);
+        this.vesFlashCartServiceClient.onAttach(async () => this.detectConnectedFlashCart());
+        this.vesFlashCartServiceClient.onDetach(async () => this.detectConnectedFlashCart());
+    }
+
+    protected detectConnectedFlashCart = async () => {
+        const flashCartConfigs: FlashCartConfig[] = getFlashCartConfigs(this.preferenceService);
+        this.connectedFlashCart = await this.vesFlashCartService.detectFlashCart(...flashCartConfigs);
     }
 
     // emulator configs

@@ -1,16 +1,17 @@
 import { createWriteStream, readFileSync, unlinkSync } from "fs";
-import { basename, dirname, sep } from "path";
+import { basename, dirname, join as joinPath, sep } from "path";
 import { Device } from "usb";
 import { PreferenceService } from "@theia/core/lib/browser";
-import { CommandService, isWindows, MessageService } from "@theia/core/lib/common";
+import { CommandService, isOSX, isWindows, MessageService } from "@theia/core/lib/common";
 import URI from "@theia/core/lib/common/uri";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
 import { VesBuildCommand } from "../../build/commands";
 import { VesBuildEnableWslPreference } from "../../build/preferences";
-import { convertoToEnvPath, getRomPath } from "../../common/functions";
+import { convertoToEnvPath, getOs, getResourcesPath, getRomPath } from "../../common/functions";
 import { VesStateModel } from "../../common/vesStateModel";
 import { VesProcessService } from "../../../common/process-service-protocol";
+import { VesFlashCartsCustomPreference } from "../preferences";
 
 export type FlashCartConfig = {
   name: string;
@@ -189,6 +190,54 @@ async function padRom(fileService: FileService, vesState: VesStateModel, size: n
 
 function getPaddedRomPath() {
   return getRomPath().replace("output.vb", "outputPadded.vb");
+}
+
+export function getFlashCartConfigs(preferenceService: PreferenceService): FlashCartConfig[] {
+  const flashCartConfigs = [
+    {
+      name: "FlashBoy (Plus)",
+      vid: 6017,
+      pid: 2466,
+      manufacturer: "Richard Hutchinson",
+      product: "FlashBoy",
+      size: 16,
+      path: joinPath(
+        getResourcesPath(),
+        "binaries",
+        "vuengine-studio-tools",
+        getOs(),
+        "prog-vb",
+        isWindows ? "prog-vb.exe" : "prog-vb"
+      ),
+      args: "%ROM%",
+      padRom: true,
+    },
+    {
+      name: "HyperFlash32",
+      vid: 1027,
+      pid: 24577,
+      manufacturer: "FTDI",
+      product: "FT232R",
+      size: 32,
+      path: joinPath(
+        getResourcesPath(),
+        "binaries",
+        "vuengine-studio-tools",
+        getOs(),
+        "hf-cli",
+        isWindows ? "hfcli.exe" : "hfcli"
+      ),
+      args: isOSX
+        ? `-p %PORT% -s %ROM% -u --slow`
+        : `-p %PORT% -s %ROM% -u`,
+      padRom: false,
+    },
+  ];
+
+  const userDefinedFlashCartConfigs: FlashCartConfig[] | undefined =
+    preferenceService.get(VesFlashCartsCustomPreference.id) ?? [];
+
+  return [...flashCartConfigs, ...userDefinedFlashCartConfigs];
 }
 
 // async function showFlashingMessage(messageService: MessageService) {
