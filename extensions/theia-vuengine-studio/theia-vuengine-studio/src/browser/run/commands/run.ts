@@ -8,12 +8,14 @@ import { VesStateModel } from "../../common/vesStateModel";
 import { VesRunDefaultEmulatorPreference, VesRunEmulatorConfigsPreference } from "../preferences";
 import { EmulatorConfig } from "../types";
 import { VesProcessService } from "../../../common/process-service-protocol";
+import { VesProcessWatcher } from "../../services/process-service/process-watcher";
 
 export async function runCommand(
   commandService: CommandService,
   preferenceService: PreferenceService,
   terminalService: TerminalService,
   vesProcessService: VesProcessService,
+  vesProcessWatcher: VesProcessWatcher,
   vesState: VesStateModel,
 ) {
   if (vesState.isRunQueued) {
@@ -27,12 +29,12 @@ export async function runCommand(
   vesState.onDidChangeOutputRomExists(outputRomExists => {
     if (outputRomExists && vesState.isRunQueued) {
       vesState.isRunQueued = false;
-      run(preferenceService, terminalService, vesProcessService, vesState);
+      run(preferenceService, terminalService, vesProcessService, vesProcessWatcher, vesState);
     }
   })
 
   if (vesState.outputRomExists) {
-    run(preferenceService, terminalService, vesProcessService, vesState);
+    run(preferenceService, terminalService, vesProcessService, vesProcessWatcher, vesState);
   } else {
     commandService.executeCommand(VesBuildCommand.id);
     vesState.isRunQueued = true;
@@ -43,6 +45,7 @@ async function run(
   preferenceService: PreferenceService,
   terminalService: TerminalService,
   vesProcessService: VesProcessService,
+  vesProcessWatcher: VesProcessWatcher,
   vesState: VesStateModel,
 ) {
   const defaultEmulatorConfig = getDefaultEmulatorConfig(preferenceService);
@@ -77,6 +80,12 @@ async function run(
   await terminalWidget.start(processId);
   terminalWidget.clearOutput();
   // openTerminal(terminalService);
+
+  vesProcessWatcher.onExit(({ pId }) => {
+    if (processId === pId) {
+      vesState.isRunning = false;
+    }
+  });
 }
 
 function getTerminalId(): string {

@@ -23,6 +23,7 @@ import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand, VesBuildS
 import { VesBuildDumpElfPreference, VesBuildEnableWslPreference, VesBuildPedanticWarningsPreference } from "./preferences";
 import { VesProcessService } from "../../common/process-service-protocol";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
+import { VesProcessWatcher } from "../services/process-service/process-watcher";
 
 @injectable()
 export class VesBuildCommandContribution implements CommandContribution {
@@ -35,6 +36,7 @@ export class VesBuildCommandContribution implements CommandContribution {
     @inject(TerminalService) private readonly terminalService: TerminalService,
     @inject(QuickPickService) private readonly quickPickService: QuickPickService,
     @inject(VesProcessService) private readonly vesProcessService: VesProcessService,
+    @inject(VesProcessWatcher) private readonly vesProcessWatcher: VesProcessWatcher,
     @inject(VesStateModel) private readonly vesState: VesStateModel,
     @inject(WorkspaceService) private readonly workspaceService: WorkspaceService,
   ) { }
@@ -46,7 +48,7 @@ export class VesBuildCommandContribution implements CommandContribution {
         cleanCommand(
           this.messageService,
           this.preferenceService,
-          this.vesState
+          this.vesState,
         ),
     });
     commandRegistry.registerCommand(VesBuildCommand, {
@@ -57,7 +59,8 @@ export class VesBuildCommandContribution implements CommandContribution {
           this.preferenceService,
           this.terminalService,
           this.vesProcessService,
-          this.vesState
+          this.vesProcessWatcher,
+          this.vesState,
         ),
     });
     commandRegistry.registerCommand(VesBuildExportCommand, {
@@ -67,7 +70,7 @@ export class VesBuildCommandContribution implements CommandContribution {
           this.commandService,
           this.fileService,
           this.fileDialogService,
-          this.vesState
+          this.vesState,
         ),
     });
 

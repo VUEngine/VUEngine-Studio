@@ -11,7 +11,7 @@ import { VesBuildModePreference } from "../build/preferences";
 import { VesRunDefaultEmulatorPreference, VesRunEmulatorConfigsPreference } from "../run/preferences";
 import { getDefaultEmulatorConfig, getEmulatorConfigs } from "../run/commands/run";
 import { EmulatorConfig } from "../run/types";
-import { VesFlashCartWatcher } from "../services/flash-cart-service/flash-cart-service-client";
+import { VesFlashCartWatcher } from "../services/flash-cart-service/flash-cart-watcher";
 import { BuildMode } from "../build/types";
 import { VesFlashCartService } from "../../common/flash-cart-service-protocol";
 
@@ -26,7 +26,7 @@ export class VesStateModel {
     @inject(FrontendApplicationStateService) protected readonly frontendApplicationStateService: FrontendApplicationStateService;
     @inject(PreferenceService) protected readonly preferenceService: PreferenceService;
     @inject(VesFlashCartService) protected readonly vesFlashCartService: VesFlashCartService;
-    @inject(VesFlashCartWatcher) protected readonly vesFlashCartServiceClient: VesFlashCartWatcher;
+    @inject(VesFlashCartWatcher) protected readonly vesFlashCartWatcher: VesFlashCartWatcher;
 
     @postConstruct()
     protected async init(): Promise<void> {
@@ -84,8 +84,8 @@ export class VesStateModel {
         });
 
         // watch for flash cart attach/detach
-        this.vesFlashCartServiceClient.onAttach(async () => this.detectConnectedFlashCart());
-        this.vesFlashCartServiceClient.onDetach(async () => this.detectConnectedFlashCart());
+        this.vesFlashCartWatcher.onAttach(async () => this.detectConnectedFlashCart());
+        this.vesFlashCartWatcher.onDetach(async () => this.detectConnectedFlashCart());
     }
 
     protected detectConnectedFlashCart = async () => {

@@ -8,6 +8,7 @@ import { join as joinPath } from "path";
 import { VesProcessService } from "../../../common/process-service-protocol";
 import { convertoToEnvPath, getOs, getResourcesPath, getRomPath, getWorkspaceRoot } from "../../common/functions";
 import { VesStateModel } from "../../common/vesStateModel";
+import { VesProcessWatcher } from "../../services/process-service/process-watcher";
 import { VesBuildDumpElfPreference, VesBuildEnableWslPreference, VesBuildEngineCorePathPreference, VesBuildEnginePluginsPathPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "../preferences";
 
 export async function buildCommand(
@@ -15,10 +16,11 @@ export async function buildCommand(
   preferenceService: PreferenceService,
   terminalService: TerminalService,
   vesProcessService: VesProcessService,
+  vesProcessWatcher: VesProcessWatcher,
   vesState: VesStateModel
 ) {
   if (!vesState.isBuilding) {
-    build(fileService, preferenceService, terminalService, vesProcessService, vesState);
+    build(fileService, preferenceService, terminalService, vesProcessService, vesProcessWatcher, vesState);
   }
 }
 
@@ -27,6 +29,7 @@ async function build(
   preferenceService: PreferenceService,
   terminalService: TerminalService,
   vesProcessService: VesProcessService,
+  vesProcessWatcher: VesProcessWatcher,
   vesState: VesStateModel
 ) {
   vesState.isBuilding = true;
@@ -110,6 +113,18 @@ async function build(
     // TODO: kill process (if necessary?)
   });
   terminalService.open(terminalWidget);
+
+  vesProcessWatcher.onExit(({ pId }) => {
+    if (processId === pId) {
+      vesState.isBuilding = false;
+    }
+  });
+
+  vesProcessWatcher.onData(({ pId, data }) => {
+    if (processId === pId) {
+      console.log(data);
+    }
+  });
 }
 
 function getTerminalId(): string {

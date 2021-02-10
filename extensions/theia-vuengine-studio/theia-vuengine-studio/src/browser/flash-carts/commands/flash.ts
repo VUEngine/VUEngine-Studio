@@ -12,6 +12,7 @@ import { convertoToEnvPath, getOs, getResourcesPath, getRomPath } from "../../co
 import { VesStateModel } from "../../common/vesStateModel";
 import { VesProcessService } from "../../../common/process-service-protocol";
 import { VesFlashCartsPreference } from "../preferences";
+import { VesProcessWatcher } from "../../services/process-service/process-watcher";
 
 export type FlashCartConfig = {
   name: string;
@@ -37,6 +38,7 @@ export async function flashCommand(
   preferenceService: PreferenceService,
   terminalService: TerminalService,
   vesProcessService: VesProcessService,
+  vesProcessWatcher: VesProcessWatcher,
   vesState: VesStateModel,
 ) {
   if (vesState.isFlashQueued) {
@@ -56,6 +58,7 @@ export async function flashCommand(
         preferenceService,
         terminalService,
         vesProcessService,
+        vesProcessWatcher,
         vesState,
       );
     }
@@ -70,6 +73,7 @@ export async function flashCommand(
       preferenceService,
       terminalService,
       vesProcessService,
+      vesProcessWatcher,
       vesState,
     );
   } else {
@@ -84,6 +88,7 @@ async function flash(
   preferenceService: PreferenceService,
   terminalService: TerminalService,
   vesProcessService: VesProcessService,
+  vesProcessWatcher: VesProcessWatcher,
   vesState: VesStateModel
 ) {
   if (!vesState.connectedFlashCart) {
@@ -151,7 +156,13 @@ async function flash(
   await terminalWidget.start(processId);
   terminalWidget.clearOutput();
   terminalService.open(terminalWidget);
-  // showFlashingMessage(messageService); return;
+  // showFlashingMessage(messageService, vesProcessWatcher, processId);
+
+  vesProcessWatcher.onExit(({ pId }) => {
+    if (processId === pId) {
+      vesState.isFlashing = false;
+    }
+  });
 }
 
 function getTerminalId(): string {
@@ -223,44 +234,46 @@ export function getFlashCartConfigs(preferenceService: PreferenceService): Flash
   });
 }
 
-// async function showFlashingMessage(messageService: MessageService) {
+// async function showFlashingMessage(
+//   messageService: MessageService,
+//   vesProcessWatcher: VesProcessWatcher,
+//   processId: number,
+// ) {
 //   /*
 //   Notes on prog-vb output
 //   1) Erasing device...
 //   2) Flashing...
 //   3) [00:01:26] [###################################>----] 1806/2048 packets (12s)
 //   4) Image flashed successfully.
+//   Or: 
+//   1) Error: Input ROM was less than 16kB in length, greater than 2MB in length, or a non power of two length.
 //   */
 
+//   const taskHead = `<img style="position:absolute;left:10px;top:15px;background-color:#222;border-radius:5px;padding:10px;height:100px;border:1px dashed rgba(255,255,255,0.2)" src="https://files.virtual-boy.com/album/1042058/hf32_cartfront.png"/>
+// <div style="padding-left:100px;margin-bottom:10px;"><b>Flashing ROM image to <i>FlashBoy (Plus)</i></b><br><br>`;
+
 //   const progressMessage = await messageService.showProgress({
-//     text: `<img style="position:absolute;left:10px;top:15px;background-color:#222;border-radius:5px;padding:10px;height:100px;border:1px dashed rgba(255,255,255,0.2)" src="https://files.virtual-boy.com/album/1042058/hf32_cartfront.png"/>
-//     <div style="padding-left:100px;margin-bottom:10px;">Flashing ROM image to <i>HyperFlash32</i>`,
+//     text: "",
 //     actions: ["Abort"],
 //   });
-//   progressMessage.report({message: `<br><br>Erasing device... <br><br>Working, do not remove your HyperFlash32.</div>`, work: {done: 0, total: 2048}}),
+//   progressMessage.report({
+//     message: taskHead + "<br><br><br>", work: { done: 0, total: 2048 }
+//   });
 
-//   setTimeout(
-//     () => progressMessage.report({message: `<br><br><i class="fa fa-check"></i> Erasing device done.<br>Flashing... (10/2048)<br><br>Working, do not remove your HyperFlash32.</div>`, work: {done: 10, total: 2048}}),
-//     4000
-//   );
-
-//   setTimeout(
-//     () => progressMessage.report({message: `<br><br><i class="fa fa-check"></i> Erasing device done.<br>Flashing... (256/2048)<br><br>Working, do not remove your HyperFlash32.</div>`, work: {done: 256, total: 2048}}),
-//     5000
-//   );
-
-//   setTimeout(
-//     () => progressMessage.report({message: `<br><br><i class="fa fa-check"></i> Erasing device done.<br>Flashing... (512/2048)<br><br>Working, do not remove your HyperFlash32.</div>`, work: {done: 512, total: 2048}}),
-//     6000
-//   );
-
-//   setTimeout(
-//     () => progressMessage.report({message: `<br><br><i class="fa fa-check"></i> Erasing device done.<br>Flashing... (1024/2048)<br><br>Working, do not remove your HyperFlash32.</div>`, work: {done: 1024, total: 2048}}),
-//     7000
-//   );
-
-//   setTimeout(
-//     () => progressMessage.report({message: `<br><br><i class="fa fa-check"></i> Erasing device done.<br><i class="fa fa-check"></i> Flashing done.<br><br>All done. You may now remove your HyperFlash32..</div>`, work: {done: 2048, total: 2048}}),
-//     8000
-//   );
+//   vesProcessWatcher.onData(({ pId, data }) => {
+//     if (processId === pId) {
+//       if (data.includes("Error")) {
+//         progressMessage.report({ message: `${taskHead}${data}.</div>`, work: { done: 0, total: 2048 } });
+//       } else if (data.includes("Erasing")) {
+//         progressMessage.report({ message: `${taskHead}Erasing device... <br><br><i>Working, do not remove your FlashBoy (Plus)</i>.</div>`, work: { done: 0, total: 2048 } });
+//       } else if (data.includes("/2048")) {
+//         const packetsWrittenMatch = data.match(new RegExp("] " + "(.*)" + "/2048"));
+//         const packetsWritten = packetsWrittenMatch ? parseInt(packetsWrittenMatch[1]) : 0;
+//         console.log(packetsWrittenMatch, packetsWritten);
+//         progressMessage.report({ message: `${taskHead}<i class="fa fa-check"></i> Erasing device done.<br>Flashing... (${packetsWritten}/2048)<br><br><i>Working, do not remove your FlashBoy (Plus)</i>.</div>`, work: { done: packetsWritten, total: 2048 } })
+//       } else if (data.includes("successfully")) {
+//         progressMessage.report({ message: `${taskHead}<i class="fa fa-check"></i> Erasing device done.<br><i class="fa fa-check"></i> Flashing done.<br><br>All done. You may now remove your FlashBoy (Plus)..</div>`, work: { done: 2048, total: 2048 } })
+//       }
+//     }
+//   });
 // }

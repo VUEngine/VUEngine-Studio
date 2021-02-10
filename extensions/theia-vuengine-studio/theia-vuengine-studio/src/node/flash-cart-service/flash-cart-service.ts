@@ -5,7 +5,6 @@ import { VesFlashCartService, VesFlashCartServiceClient } from "../../common/fla
 
 @injectable()
 export class VesFlashCartServiceImpl implements VesFlashCartService {
-    // @inject(PreferenceService) private readonly preferenceService: PreferenceService;
     protected client: VesFlashCartServiceClient | undefined;
 
     dispose(): void {
