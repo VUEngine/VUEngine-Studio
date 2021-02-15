@@ -6,7 +6,7 @@
 }
 
 #ves-topbar-window-controls .topbar-window-controls-separator {
-  border-left: 1px solid var(#ccc);
+  border-left: 1px solid #ccc;
   float: left;
   height: 23px;
   margin: 8px 10px 0 4px;
@@ -15,7 +15,7 @@
 
 #ves-topbar-window-controls .topbar-window-controls-button {
   display: block;
-  fill: var(#ccc);
+  fill: #ccc;
   float: left;
   font-size: 18px;
   height: 37px;
@@ -29,9 +29,11 @@
 #ves-topbar-window-controls .topbar-window-controls-button:active {
   background: rgba(255, 255, 255, 0.2);
 }
+/*
 #ves-topbar-window-controls #ves-topbar-window-controls-close:hover {
   background: #e81123;
 }
 #ves-topbar-window-controls #ves-topbar-window-controls-close:active {
   background: #f1707a;
 }
+*/

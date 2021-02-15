@@ -39,6 +39,7 @@ export class VesStateModel {
                     });
                 }
 
+                // TODO: fileService.exists does not seem to work on Windows
                 this.fileService.exists(new URI(getRomPath())).then((exists: boolean) => {
                     this.outputRomExists = exists;
                 });
