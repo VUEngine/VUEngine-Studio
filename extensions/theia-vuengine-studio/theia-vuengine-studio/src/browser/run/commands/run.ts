@@ -22,7 +22,7 @@ export async function runCommand(
     vesState.isRunQueued = false;
     return;
   } else if (vesState.isRunning) {
-    openTerminal(terminalService);
+    vesProcessService.killProcess(vesState.isRunning);
     return;
   }
 
@@ -51,8 +51,6 @@ async function run(
   const defaultEmulatorConfig = getDefaultEmulatorConfig(preferenceService);
   if (!defaultEmulatorConfig) return;
 
-  vesState.isRunning = true;
-
   const emulatorPath = defaultEmulatorConfig.path;
   const emulatorArgs = defaultEmulatorConfig.args.replace("%ROM%", getRomPath()).split(" ");
 
@@ -65,7 +63,7 @@ async function run(
     });
   }
 
-  const processId = await vesProcessService.launchProcess({
+  const { terminalProcessId, processManagerId } = await vesProcessService.launchProcess({
     command: "." + sep + basename(emulatorPath),
     args: emulatorArgs,
     options: {
@@ -77,25 +75,26 @@ async function run(
     title: "Run",
     id: getTerminalId(),
   });
-  await terminalWidget.start(processId);
+  await terminalWidget.start(terminalProcessId);
   terminalWidget.clearOutput();
-  // openTerminal(terminalService);
 
   vesProcessWatcher.onExit(({ pId }) => {
-    if (processId === pId) {
-      vesState.isRunning = false;
+    if (processManagerId === pId) {
+      vesState.isRunning = 0;
     }
   });
+
+  vesState.isRunning = processManagerId;
 }
 
 function getTerminalId(): string {
   return "ves-run";
 }
 
-function openTerminal(terminalService: TerminalService) {
-  const terminalWidget = terminalService.getById(getTerminalId())
-  if (terminalWidget) terminalService.open(terminalWidget);
-}
+// function openTerminal(terminalService: TerminalService) {
+//   const terminalWidget = terminalService.getById(getTerminalId())
+//   if (terminalWidget) terminalService.open(terminalWidget);
+// }
 
 export function getDefaultEmulatorConfig(preferenceService: PreferenceService): EmulatorConfig {
   const emulatorConfigs: EmulatorConfig[] = getEmulatorConfigs(preferenceService);

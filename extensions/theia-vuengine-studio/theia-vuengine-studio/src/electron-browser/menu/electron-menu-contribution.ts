@@ -62,11 +62,11 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
         app.emit("ves-change-emulator", getDefaultEmulatorConfig(this.preferenceService).name);
         app.emit("ves-change-emulator-configs", getEmulatorConfigs(this.preferenceService));
 
-        this.vesState.onDidChangeIsBuilding((flag) => app.emit("ves-change-is-building", flag));
+        this.vesState.onDidChangeIsBuilding((processManagerId) => app.emit("ves-change-is-building", processManagerId));
         this.vesState.onDidChangeIsRunQueued((flag) => app.emit("ves-change-is-run-queued", flag));
-        this.vesState.onDidChangeIsRunning((flag) => app.emit("ves-change-is-running", flag));
+        this.vesState.onDidChangeIsRunning((processManagerId) => app.emit("ves-change-is-running", processManagerId));
         this.vesState.onDidChangeIsFlashQueued((flag) => app.emit("ves-change-is-flash-queued", flag));
-        this.vesState.onDidChangeIsFlashing((flag) => app.emit("ves-change-is-flashing", flag));
+        this.vesState.onDidChangeIsFlashing((processManagerId) => app.emit("ves-change-is-flashing", processManagerId));
         this.vesState.onDidChangeIsExportQueued((flag) => app.emit("ves-change-is-export-queued", flag));
         this.vesState.onDidChangeConnectedFlashCart((config) => app.emit("ves-change-connected-flash-cart", config));
         this.vesState.onDidChangeBuildMode((buildMode) => app.emit("ves-change-build-mode", buildMode));

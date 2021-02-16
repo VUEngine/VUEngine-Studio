@@ -19,7 +19,9 @@ export async function buildCommand(
   vesProcessWatcher: VesProcessWatcher,
   vesState: VesStateModel
 ) {
-  if (!vesState.isBuilding) {
+  if (vesState.isBuilding) {
+    vesProcessService.killProcess(vesState.isBuilding);
+  } else {
     build(fileService, preferenceService, terminalService, vesProcessService, vesProcessWatcher, vesState);
   }
 }
@@ -32,8 +34,6 @@ async function build(
   vesProcessWatcher: VesProcessWatcher,
   vesState: VesStateModel
 ) {
-  vesState.isBuilding = true;
-
   const workspaceRoot = getWorkspaceRoot()
   const buildMode = preferenceService.get(VesBuildModePreference.id) as string;
   const dumpElf = preferenceService.get(VesBuildDumpElfPreference.id) as boolean;
@@ -79,7 +79,7 @@ async function build(
   // note: should no longer be necessary due to .gitattributes directive
   //preCallMake = 'find "' + convertoToEnvPath(engineCorePath) + 'lib/compiler/preprocessor/" -name "*.sh" -exec sed -i -e "s/$(printf \'\\r\')//" {} \\; ';
 
-  const processId = await vesProcessService.launchProcess({
+  const { terminalProcessId, processManagerId } = await vesProcessService.launchProcess({
     command: "make",
     args: [
       "all",
@@ -107,7 +107,7 @@ async function build(
     shellPath,
     shellArgs,
   });
-  await terminalWidget.start(processId);
+  await terminalWidget.start(terminalProcessId);
   terminalWidget.clearOutput();
   terminalWidget.onTerminalDidClose(() => {
     // TODO: kill process (if necessary?)
@@ -115,16 +115,18 @@ async function build(
   terminalService.open(terminalWidget);
 
   vesProcessWatcher.onExit(({ pId }) => {
-    if (processId === pId) {
-      vesState.isBuilding = false;
+    if (processManagerId === pId) {
+      vesState.isBuilding = 0;
     }
   });
 
   vesProcessWatcher.onData(({ pId, data }) => {
-    if (processId === pId) {
+    if (processManagerId === pId) {
       console.log(data);
     }
   });
+
+  vesState.isBuilding = processManagerId;
 }
 
 function getTerminalId(): string {

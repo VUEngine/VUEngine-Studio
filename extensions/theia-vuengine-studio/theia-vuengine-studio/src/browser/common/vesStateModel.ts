@@ -145,14 +145,14 @@ export class VesStateModel {
     }
 
     // is building
-    protected _isBuilding: boolean = false;
-    protected readonly onDidChangeIsBuildingEmitter = new Emitter<boolean>();
+    protected _isBuilding: number = 0;
+    protected readonly onDidChangeIsBuildingEmitter = new Emitter<number>();
     readonly onDidChangeIsBuilding = this.onDidChangeIsBuildingEmitter.event;
-    set isBuilding(flag: boolean) {
-        this._isBuilding = flag;
+    set isBuilding(processManagerId: number) {
+        this._isBuilding = processManagerId;
         this.onDidChangeIsBuildingEmitter.fire(this._isBuilding);
     }
-    get isBuilding(): boolean {
+    get isBuilding(): number {
         return this._isBuilding;
     }
 
@@ -192,15 +192,15 @@ export class VesStateModel {
         return this._isRunQueued;
     }
 
-    // running
-    protected _isRunning: boolean = false;
-    protected readonly onDidChangeIsRunningEmitter = new Emitter<boolean>();
+    // is running
+    protected _isRunning: number = 0;
+    protected readonly onDidChangeIsRunningEmitter = new Emitter<number>();
     readonly onDidChangeIsRunning = this.onDidChangeIsRunningEmitter.event;
-    set isRunning(flag: boolean) {
-        this._isRunning = flag;
+    set isRunning(processManagerId: number) {
+        this._isRunning = processManagerId;
         this.onDidChangeIsRunningEmitter.fire(this._isRunning);
     }
-    get isRunning(): boolean {
+    get isRunning(): number {
         return this._isRunning;
     }
 
@@ -216,15 +216,15 @@ export class VesStateModel {
         return this._isFlashQueued;
     }
 
-    // flashing
-    protected _isFlashing: boolean = false;
-    protected readonly onDidChangeIsFlashingEmitter = new Emitter<boolean>();
+    // is flashing
+    protected _isFlashing: number = 0;
+    protected readonly onDidChangeIsFlashingEmitter = new Emitter<number>();
     readonly onDidChangeIsFlashing = this.onDidChangeIsFlashingEmitter.event;
-    set isFlashing(flag: boolean) {
-        this._isFlashing = flag;
+    set isFlashing(processManagerId: number) {
+        this._isFlashing = processManagerId;
         this.onDidChangeIsFlashingEmitter.fire(this._isFlashing);
     }
-    get isFlashing(): boolean {
+    get isFlashing(): number {
         return this._isFlashing;
     }
 }

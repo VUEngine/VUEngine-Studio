@@ -45,7 +45,7 @@ export async function flashCommand(
     vesState.isFlashQueued = false;
     return;
   } else if (vesState.isFlashing) {
-    // TODO: open terminal
+    vesProcessService.killProcess(vesState.isFlashing);
     return;
   }
 
@@ -108,7 +108,6 @@ async function flash(
     );
     return;
   }
-  vesState.isFlashing = true;
 
   let flasherEnvPath = convertoToEnvPath(
     preferenceService,
@@ -141,7 +140,7 @@ async function flash(
     });
   }
 
-  const processId = await vesProcessService.launchProcess({
+  const { terminalProcessId, processManagerId } = await vesProcessService.launchProcess({
     command: "." + sep + basename(vesState.connectedFlashCart.config.path),
     args: flasherArgs,
     options: {
@@ -153,16 +152,18 @@ async function flash(
     title: "Flash",
     id: getTerminalId()
   });
-  await terminalWidget.start(processId);
+  await terminalWidget.start(terminalProcessId);
   terminalWidget.clearOutput();
   terminalService.open(terminalWidget);
   // showFlashingMessage(messageService, vesProcessWatcher, processId);
 
   vesProcessWatcher.onExit(({ pId }) => {
-    if (processId === pId) {
-      vesState.isFlashing = false;
+    if (processManagerId === pId) {
+      vesState.isFlashing = 0;
     }
   });
+
+  vesState.isFlashing = processManagerId;
 }
 
 function getTerminalId(): string {

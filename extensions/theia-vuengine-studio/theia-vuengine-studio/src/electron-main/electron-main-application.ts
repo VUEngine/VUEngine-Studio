@@ -192,7 +192,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             buildModeButton.label = buildMode.replace("Preprocessor", "Preproc.");
         });
         // @ts-ignore
-        app.on("ves-change-is-building", (isBuilding: boolean) => {
+        app.on("ves-change-is-building", (isBuilding: number) => {
             if (isBuilding) {
                 spinnerIconIntervall = setInterval(() => animateSpinner(buildMenuBuildButton, spinnerIcon), 130);
             } else {
@@ -207,7 +207,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             redrawMenuSegmentedControl();
         });
         // @ts-ignore
-        app.on("ves-change-is-running", (isRunning: boolean) => {
+        app.on("ves-change-is-running", (isRunning: number) => {
             if (isRunning) {
                 spinnerIconIntervall = setInterval(() => animateSpinner(buildMenuRunButton, spinnerIcon), 130);
             } else {
@@ -222,7 +222,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             redrawMenuSegmentedControl();
         });
         // @ts-ignore
-        app.on("ves-change-is-flashing", (isFlashing: boolean) => {
+        app.on("ves-change-is-flashing", (isFlashing: number) => {
             if (isFlashing) {
                 spinnerIconIntervall = setInterval(() => animateSpinner(buildMenuFlashButton, spinnerIcon), 130);
             } else {

@@ -89,7 +89,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                 <button
                     className={"theia-button secondary clean" + (this.vesState.isCleaning ? " active" : "")}
                     title={this.vesState.isCleaning ? "Cleaning..." : `${VesBuildCleanCommand.label}${this.getKeybindingLabel(VesBuildCleanCommand.id)}`}
-                    disabled={this.vesState.isBuilding || !this.vesState.buildFolderExists[buildMode]}
+                    disabled={this.vesState.isBuilding > 0 || !this.vesState.buildFolderExists[buildMode]}
                     onClick={() => this.commandService.executeCommand(VesBuildCleanCommand.id)}
                 >
                     {this.vesState.isCleaning
