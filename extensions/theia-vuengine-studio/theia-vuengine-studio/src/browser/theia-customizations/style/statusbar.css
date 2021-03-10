@@ -16,6 +16,10 @@
   padding: 0 var(--theia-ui-padding);
 }
 
+#theia-statusBar .element.active {
+    font-style: italic;
+}
+
 #theia-statusBar .element.disabled {
     opacity: 0.5;
 }

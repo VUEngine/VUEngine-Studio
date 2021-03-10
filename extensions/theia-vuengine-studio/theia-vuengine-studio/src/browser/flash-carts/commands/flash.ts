@@ -31,6 +31,11 @@ export type ConnectedFlashCart = {
   device: Device,
 }
 
+export type FlashingProgress = {
+  step: string,
+  progress: number
+}
+
 export async function flashCommand(
   commandService: CommandService,
   fileService: FileService,
@@ -155,7 +160,6 @@ async function flash(
   await terminalWidget.start(terminalProcessId);
   terminalWidget.clearOutput();
   terminalService.open(terminalWidget);
-  // showFlashingMessage(messageService, vesProcessWatcher, processId);
 
   vesProcessWatcher.onExit(({ pId }) => {
     if (processManagerId === pId) {
@@ -164,6 +168,7 @@ async function flash(
   });
 
   vesState.isFlashing = processManagerId;
+  monitorFlashing(vesProcessWatcher, vesState);
 }
 
 function getTerminalId(): string {
@@ -235,46 +240,64 @@ export function getFlashCartConfigs(preferenceService: PreferenceService): Flash
   });
 }
 
-// async function showFlashingMessage(
-//   messageService: MessageService,
-//   vesProcessWatcher: VesProcessWatcher,
-//   processId: number,
-// ) {
-//   /*
-//   Notes on prog-vb output
-//   1) Erasing device...
-//   2) Flashing...
-//   3) [00:01:26] [###################################>----] 1806/2048 packets (12s)
-//   4) Image flashed successfully.
-//   Or: 
-//   1) Error: Input ROM was less than 16kB in length, greater than 2MB in length, or a non power of two length.
-//   */
+async function monitorFlashing(
+  vesProcessWatcher: VesProcessWatcher,
+  vesState: VesStateModel
+) {
+  switch (vesState.connectedFlashCart?.config.name) {
+    case "FlashBoy (Plus)":
+      monitorFlashingFlashBoy(vesProcessWatcher, vesState);
+      break;
+    case "HyperFlash32":
+      monitorFlashingHyperFlash32(vesProcessWatcher, vesState);
+      break;
+    default:
+      vesState.flashingProgress = {
+        step: "Flashing",
+        progress: -1,
+      };
+      break;
+  }
+}
 
-//   const taskHead = `<img style="position:absolute;left:10px;top:15px;background-color:#222;border-radius:5px;padding:10px;height:100px;border:1px dashed rgba(255,255,255,0.2)" src="https://files.virtual-boy.com/album/1042058/hf32_cartfront.png"/>
-// <div style="padding-left:100px;margin-bottom:10px;"><b>Flashing ROM image to <i>FlashBoy (Plus)</i></b><br><br>`;
+// TODO
+async function monitorFlashingHyperFlash32(
+  vesProcessWatcher: VesProcessWatcher,
+  vesState: VesStateModel
+) {
+  vesState.flashingProgress = {
+    step: "Flashing",
+    //step: "Erasing",
+    progress: -1,
+  };
 
-//   const progressMessage = await messageService.showProgress({
-//     text: "",
-//     actions: ["Abort"],
-//   });
-//   progressMessage.report({
-//     message: taskHead + "<br><br><br>", work: { done: 0, total: 2048 }
-//   });
+  vesProcessWatcher.onData(({ pId, data }) => {
+    if (vesState.isFlashing === pId && data.includes("")) {
+      // const packetsWritten = parseInt(data.substring(data.lastIndexOf("]") + 2, data.lastIndexOf("/")));
+      // vesState.flashingProgress = {
+      //   step: "Flashing",
+      //   progress: Math.round(packetsWritten * 100 / 2048),
+      // };
+    }
+  });
+}
 
-//   vesProcessWatcher.onData(({ pId, data }) => {
-//     if (processId === pId) {
-//       if (data.includes("Error")) {
-//         progressMessage.report({ message: `${taskHead}${data}.</div>`, work: { done: 0, total: 2048 } });
-//       } else if (data.includes("Erasing")) {
-//         progressMessage.report({ message: `${taskHead}Erasing device... <br><br><i>Working, do not remove your FlashBoy (Plus)</i>.</div>`, work: { done: 0, total: 2048 } });
-//       } else if (data.includes("/2048")) {
-//         const packetsWrittenMatch = data.match(new RegExp("] " + "(.*)" + "/2048"));
-//         const packetsWritten = packetsWrittenMatch ? parseInt(packetsWrittenMatch[1]) : 0;
-//         console.log(packetsWrittenMatch, packetsWritten);
-//         progressMessage.report({ message: `${taskHead}<i class="fa fa-check"></i> Erasing device done.<br>Flashing... (${packetsWritten}/2048)<br><br><i>Working, do not remove your FlashBoy (Plus)</i>.</div>`, work: { done: packetsWritten, total: 2048 } })
-//       } else if (data.includes("successfully")) {
-//         progressMessage.report({ message: `${taskHead}<i class="fa fa-check"></i> Erasing device done.<br><i class="fa fa-check"></i> Flashing done.<br><br>All done. You may now remove your FlashBoy (Plus)..</div>`, work: { done: 2048, total: 2048 } })
-//       }
-//     }
-//   });
-// }
+async function monitorFlashingFlashBoy(
+  vesProcessWatcher: VesProcessWatcher,
+  vesState: VesStateModel
+) {
+  vesState.flashingProgress = {
+    step: "Erasing",
+    progress: -1,
+  };
+
+  vesProcessWatcher.onData(({ pId, data }) => {
+    if (vesState.isFlashing === pId && data.includes("/2048")) {
+      const packetsWritten = parseInt(data.substring(data.lastIndexOf("]") + 2, data.lastIndexOf("/")));
+      vesState.flashingProgress = {
+        step: "Flashing",
+        progress: Math.round(packetsWritten * 100 / 2048),
+      };
+    }
+  });
+}

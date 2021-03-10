@@ -5,7 +5,7 @@ import URI from "@theia/core/lib/common/uri";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { FileChangesEvent } from "@theia/filesystem/lib/common/files";
 import { FrontendApplicationState, FrontendApplicationStateService } from "@theia/core/lib/browser/frontend-application-state";
-import { ConnectedFlashCart, FlashCartConfig, getFlashCartConfigs } from "../flash-carts/commands/flash";
+import { ConnectedFlashCart, FlashCartConfig, FlashingProgress, getFlashCartConfigs } from "../flash-carts/commands/flash";
 import { getBuildPath, getRomPath } from "./functions";
 import { VesBuildModePreference } from "../build/preferences";
 import { VesRunDefaultEmulatorPreference, VesRunEmulatorConfigsPreference } from "../run/preferences";
@@ -109,9 +109,7 @@ export class VesStateModel {
     // build folder
     protected readonly onDidChangeBuildFolderEmitter = new Emitter<BuildFolderFlags>();
     readonly onDidChangeBuildFolder = this.onDidChangeBuildFolderEmitter.event;
-    protected _buildFolderExists: BuildFolderFlags = {
-
-    };
+    protected _buildFolderExists: BuildFolderFlags = {};
     setBuildFolderExists(buildMode: string, flag: boolean) {
         this._buildFolderExists[buildMode] = flag;
         this.onDidChangeBuildFolderEmitter.fire(this._buildFolderExists);
@@ -226,5 +224,20 @@ export class VesStateModel {
     }
     get isFlashing(): number {
         return this._isFlashing;
+    }
+
+    // flashing progress
+    protected _flashingProgress: FlashingProgress = {
+        step: "Initial",
+        progress: -1,
+    };
+    protected readonly onDidChangeFlashingProgressEmitter = new Emitter<FlashingProgress>();
+    readonly onDidChangeFlashingProgress = this.onDidChangeFlashingProgressEmitter.event;
+    set flashingProgress(progress: FlashingProgress) {
+        this._flashingProgress = progress;
+        this.onDidChangeFlashingProgressEmitter.fire(this._flashingProgress);
+    }
+    get flashingProgress(): FlashingProgress {
+        return this._flashingProgress;
     }
 }

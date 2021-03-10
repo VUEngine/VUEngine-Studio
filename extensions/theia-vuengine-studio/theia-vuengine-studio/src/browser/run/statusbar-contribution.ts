@@ -3,32 +3,45 @@ import { FrontendApplication, FrontendApplicationContribution, PreferenceService
 import { VesSelectEmulatorCommand } from "./commands";
 import { VesRunDefaultEmulatorPreference } from "./preferences";
 import { getDefaultEmulatorConfig } from "./commands/run";
+import { VesStateModel } from "../common/vesStateModel";
 
 @injectable()
 export class VesRunStatusBarContribution implements FrontendApplicationContribution {
     @inject(PreferenceService) protected readonly preferenceService: PreferenceService;
     @inject(StatusBar) protected readonly statusBar: StatusBar;
+    @inject(VesStateModel) protected readonly vesState: VesStateModel;
 
     onStart(app: FrontendApplication) {
         this.updateStatusBar();
     };
 
     updateStatusBar() {
-        this.setSelectedEmulatorStatusBar(getDefaultEmulatorConfig(this.preferenceService).name);
+        this.setSelectedEmulatorStatusBar();
 
+        this.vesState.onDidChangeIsRunning(() => this.setSelectedEmulatorStatusBar());
         this.preferenceService.onPreferenceChanged(({ preferenceName }) => {
             if (preferenceName === VesRunDefaultEmulatorPreference.id) {
-                this.setSelectedEmulatorStatusBar(getDefaultEmulatorConfig(this.preferenceService).name);
+                this.setSelectedEmulatorStatusBar();
             }
         });
     }
 
-    setSelectedEmulatorStatusBar(name: string) {
+    setSelectedEmulatorStatusBar() {
+        let label = "";
+        let className = "";
+        const command = VesSelectEmulatorCommand.id;
+        if (this.vesState.isRunning) {
+            label = "Running...";
+            className = "active";
+        } else {
+            label = getDefaultEmulatorConfig(this.preferenceService).name;
+        }
         this.statusBar.setElement("ves-selected-emulator", {
             alignment: StatusBarAlignment.LEFT,
-            command: VesSelectEmulatorCommand.id,
+            command: command,
+            className: className,
             priority: 2,
-            text: `$(play) ${name}`,
+            text: `$(play) ${label}`,
             tooltip: VesSelectEmulatorCommand.label,
         });
     }
