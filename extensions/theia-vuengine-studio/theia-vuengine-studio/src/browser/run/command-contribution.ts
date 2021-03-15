@@ -14,6 +14,7 @@ import { QuickPickService } from "@theia/core/lib/common/quick-pick-service";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
 import { VesProcessService } from "../../common/process-service-protocol";
 import { VesProcessWatcher } from "../services/process-service/process-watcher";
+import { VesEmulatorContribution } from "./widget/emulator-view";
 
 @injectable()
 export class VesRunCommandContribution implements CommandContribution {
@@ -26,6 +27,7 @@ export class VesRunCommandContribution implements CommandContribution {
     @inject(VesStateModel) private readonly vesState: VesStateModel,
     @inject(VesProcessWatcher) private readonly vesProcessWatcher: VesProcessWatcher,
     @inject(WorkspaceService) private readonly workspaceService: WorkspaceService,
+    @inject(VesEmulatorContribution) private readonly vesEmulator: VesEmulatorContribution,
   ) { }
 
   registerCommands(commandRegistry: CommandRegistry): void {
@@ -36,6 +38,7 @@ export class VesRunCommandContribution implements CommandContribution {
           this.commandService,
           this.preferenceService,
           this.terminalService,
+          this.vesEmulator,
           this.vesProcessService,
           this.vesProcessWatcher,
           this.vesState,

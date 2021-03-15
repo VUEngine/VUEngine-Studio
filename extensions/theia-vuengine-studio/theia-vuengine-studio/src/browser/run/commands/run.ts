@@ -9,11 +9,13 @@ import { VesRunDefaultEmulatorPreference, VesRunEmulatorConfigsPreference } from
 import { EmulatorConfig } from "../types";
 import { VesProcessService } from "../../../common/process-service-protocol";
 import { VesProcessWatcher } from "../../services/process-service/process-watcher";
+import { VesEmulatorContribution } from "../widget/emulator-view";
 
 export async function runCommand(
   commandService: CommandService,
   preferenceService: PreferenceService,
   terminalService: TerminalService,
+  vesEmulator: VesEmulatorContribution,
   vesProcessService: VesProcessService,
   vesProcessWatcher: VesProcessWatcher,
   vesState: VesStateModel,
@@ -22,18 +24,22 @@ export async function runCommand(
     vesState.isRunQueued = false;
     return;
   } else if (vesState.isRunning) {
-    vesProcessService.killProcess(vesState.isRunning);
+    //    vesProcessService.killProcess(vesState.isRunning);
     return;
   }
 
   vesState.onDidChangeOutputRomExists(outputRomExists => {
     if (outputRomExists && vesState.isRunQueued) {
       vesState.isRunQueued = false;
+      vesEmulator.openView({ activate: true, reveal: true });
+      return;
       run(preferenceService, terminalService, vesProcessService, vesProcessWatcher, vesState);
     }
   })
 
   if (vesState.outputRomExists) {
+    vesEmulator.openView({ activate: true, reveal: true });
+    return;
     run(preferenceService, terminalService, vesProcessService, vesProcessWatcher, vesState);
   } else {
     commandService.executeCommand(VesBuildCommand.id);
