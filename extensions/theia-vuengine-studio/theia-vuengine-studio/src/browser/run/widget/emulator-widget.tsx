@@ -2,20 +2,14 @@ import * as React from "react";
 import { join as joinPath } from "path";
 import { inject, injectable, postConstruct } from "inversify";
 import { ReactWidget } from "@theia/core/lib/browser/widgets/react-widget";
-import {
-  FrontendApplicationState,
-  FrontendApplicationStateService,
-} from "@theia/core/lib/browser/frontend-application-state";
 import { getResourcesPath, getWorkspaceRoot } from "../../common/functions";
+import { VesStateModel } from "../../common/vesStateModel";
 
 const datauri = require("datauri");
 
-// TODO: when emulator tab is being switched to, focus emulator
-
 @injectable()
 export class VesEmulatorWidget extends ReactWidget {
-  @inject(FrontendApplicationStateService)
-  protected readonly frontendApplicationStateService: FrontendApplicationStateService;
+  @inject(VesStateModel) private readonly vesState: VesStateModel;
 
   static readonly ID = "vesEmulatorWidget";
   static readonly LABEL = "Emulator";
@@ -24,6 +18,7 @@ export class VesEmulatorWidget extends ReactWidget {
   static readonly RESOLUTIONY = 224;
 
   protected wrapperRef = React.createRef<HTMLDivElement>();
+  protected iframeRef = React.createRef<HTMLIFrameElement>();
 
   protected state = {
     paused: false,
@@ -41,29 +36,35 @@ export class VesEmulatorWidget extends ReactWidget {
     this.title.caption = VesEmulatorWidget.LABEL;
     this.title.iconClass = "fa fa-play";
     this.title.closable = true;
-
     this.update();
+  }
 
-    this.frontendApplicationStateService.onStateChanged(
-      async (state: FrontendApplicationState) => {
-        if (state === "ready") {
-          const romPath = joinPath(getWorkspaceRoot(), "build", "output.vb");
-          datauri(romPath, (err: any) => {
-            if (err) throw err;
-          }).then((content: string) => {
-            this.determineScalingFactor();
-            this.sendCoreOptions();
-            this.sendCommand("start", content);
-            this.update();
-          });
-        }
-      }
-    );
+  protected startEmulator(self: any) {
+    const romPath = joinPath(getWorkspaceRoot(), "build", "output.vb");
+    datauri(romPath, (err: any) => {
+      if (err) throw err;
+    }).then((content: string) => {
+      self.determineScalingFactor();
+      self.sendCoreOptions();
+      self.sendCommand("start", content);
+    });
   }
 
   protected onResize() {
     this.determineScalingFactor();
     this.update();
+  }
+
+  onAfterAttach() {
+    this.vesState.isRunning = 1;
+  }
+
+  onAfterDetach() {
+    this.vesState.isRunning = 0;
+  }
+
+  protected onAfterShow() {
+    this.iframeRef.current?.focus();
   }
 
   protected render(): React.ReactNode {
@@ -222,8 +223,8 @@ export class VesEmulatorWidget extends ReactWidget {
               <option value="anaglyph-red-electric-cyan">
                 Anaglyph (Red/Electric Cyan)
               </option>
-              {/* TODO: Mednafen's red/green option does not seem to exist in Beetle VB */}
-              <option value="anaglyph-red-green">Anaglyph (Red/Green)</option>
+              {/* Mednafen's red/green option does not seem to exist in Beetle VB */}
+              {/* <option value="anaglyph-red-green">Anaglyph (Red/Green)</option> */}
               <option value="anaglyph-green-magenta">
                 Anaglyph (Green/Magenta)
               </option>
@@ -274,9 +275,11 @@ export class VesEmulatorWidget extends ReactWidget {
           )}
           <iframe
             id="vesEmulatorFrame"
+            ref={this.iframeRef}
             src={this.getResoure()}
             width={this.getCanvasDimensions().width}
             height={this.getCanvasDimensions().height}
+            onLoad={() => this.startEmulator(this)}
           ></iframe>
         </div>
       </>
@@ -294,11 +297,11 @@ export class VesEmulatorWidget extends ReactWidget {
   }
 
   protected sendCommand(command: string, data?: any) {
-    // @ts-ignore
-    document
-      .getElementById("vesEmulatorFrame")
-      // @ts-ignore
-      .contentWindow.postMessage({ command, data });
+    this.iframeRef.current?.contentWindow?.postMessage({ command, data }, "file://" + this.getResoure());
+  }
+
+  protected reload() {
+    if (this.iframeRef.current) this.iframeRef.current.src += "";
   }
 
   protected async togglePause() {
@@ -314,11 +317,13 @@ export class VesEmulatorWidget extends ReactWidget {
   protected setEmulationMode(e: React.ChangeEvent<HTMLSelectElement>) {
     this.state.coreOptions.emulationMode = e.target.value;
     this.sendCoreOptions();
+    this.reload();
   }
 
   protected setStereoMode(e: React.ChangeEvent<HTMLSelectElement>) {
     this.state.coreOptions.stereoMode = e.target.value;
     this.sendCoreOptions();
+    this.reload();
   }
 
   protected sendCoreOptions() {
@@ -358,8 +363,8 @@ export class VesEmulatorWidget extends ReactWidget {
     this.sendCommand(
       "setRetroArchConfig",
       `
-      menu_driver = "xmb"
-    `
+        menu_driver = "xmb"
+      `
     );
   }
 

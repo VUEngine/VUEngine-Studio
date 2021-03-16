@@ -24,7 +24,7 @@ export async function runCommand(
     vesState.isRunQueued = false;
     return;
   } else if (vesState.isRunning) {
-    //    vesProcessService.killProcess(vesState.isRunning);
+    vesEmulator.openView({ activate: true, reveal: true });
     return;
   }
 
