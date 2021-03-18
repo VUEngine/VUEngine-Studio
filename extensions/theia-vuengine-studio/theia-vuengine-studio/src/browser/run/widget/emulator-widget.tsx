@@ -7,6 +7,12 @@ import { VesStateModel } from "../../common/vesStateModel";
 
 const datauri = require("datauri");
 
+export type vesEmulatorWidgetState = {
+  status: string;
+  coreOptions: any;
+  canvasScale: string | number;
+};
+
 @injectable()
 export class VesEmulatorWidget extends ReactWidget {
   @inject(VesStateModel) private readonly vesState: VesStateModel;
@@ -20,13 +26,13 @@ export class VesEmulatorWidget extends ReactWidget {
   protected wrapperRef = React.createRef<HTMLDivElement>();
   protected iframeRef = React.createRef<HTMLIFrameElement>();
 
-  protected state = {
-    paused: false,
+  protected state: vesEmulatorWidgetState = {
+    status: "running",
     coreOptions: {
       emulationMode: "accurate",
       stereoMode: "2d-black-red",
     },
-    canvasScaleFactor: 1,
+    canvasScale: "auto",
   };
 
   @postConstruct()
@@ -44,14 +50,12 @@ export class VesEmulatorWidget extends ReactWidget {
     datauri(romPath, (err: any) => {
       if (err) throw err;
     }).then((content: string) => {
-      self.determineScalingFactor();
       self.sendCoreOptions();
       self.sendCommand("start", content);
     });
   }
 
   protected onResize() {
-    this.determineScalingFactor();
     this.update();
   }
 
@@ -68,10 +72,77 @@ export class VesEmulatorWidget extends ReactWidget {
   }
 
   protected render(): React.ReactNode {
+    const canvasDimensions = this.getCanvasDimensions();
+    let statusActionButtons;
+
+    switch (this.state.status) {
+      case "running":
+        // TODO: send reset command instead of calling this.reload()
+        statusActionButtons = (
+          <>
+            <button
+              className="theia-button secondary"
+              title="Pause"
+              onClick={() => this.togglePause()}
+            >
+              <i className="fa fa-pause"></i>
+            </button>
+            <button
+              className="theia-button secondary"
+              title="Reset"
+              onClick={() => this.reload()}
+            >
+              <i className="fa fa-refresh"></i>
+            </button>
+            <button className="theia-button secondary" title="Stop">
+              <i className="fa fa-stop"></i>
+            </button>
+          </>
+        );
+        break;
+      case "paused":
+        statusActionButtons = (
+          <>
+            <button
+              className="theia-button secondary"
+              title="Resume"
+              onClick={() => this.togglePause()}
+            >
+              <i className="fa fa-play"></i>
+            </button>
+            <button
+              className="theia-button secondary"
+              title="Reset"
+              onClick={() => this.reload()}
+            >
+              <i className="fa fa-refresh"></i>
+            </button>
+            <button className="theia-button secondary" title="Stop">
+              <i className="fa fa-stop"></i>
+            </button>
+          </>
+        );
+        break;
+      case "stopped":
+        statusActionButtons = (
+          <>
+            <button
+              className="theia-button secondary"
+              title="Start"
+              onClick={() => this.startEmulator(this)}
+            >
+              <i className="fa fa-play"></i>
+            </button>
+          </>
+        );
+        break;
+    }
+
     return (
       <>
         <div id="vesEmulatorUi">
           <div>
+            {statusActionButtons}
             {/*/
               <button
                 className="theia-button secondary"
@@ -81,23 +152,8 @@ export class VesEmulatorWidget extends ReactWidget {
                 <i className="fa fa-trash"></i>
               </button>
               /**/}
-            {this.state.paused ? (
-              <button
-                className="theia-button secondary"
-                title="Resume"
-                onClick={() => this.togglePause()}
-              >
-                <i className="fa fa-play"></i>
-              </button>
-            ) : (
-              <button
-                className="theia-button secondary"
-                title="Pause"
-                onClick={() => this.togglePause()}
-              >
-                <i className="fa fa-pause"></i>
-              </button>
-            )}
+          </div>
+          <div>
             <button
               className="theia-button secondary"
               title="Rewind"
@@ -119,13 +175,6 @@ export class VesEmulatorWidget extends ReactWidget {
               onClick={() => this.sendCommand("toggleFastForward")}
             >
               <i className="fa fa-forward"></i>
-            </button>
-            <button
-              className="theia-button secondary"
-              title="Reset"
-              onClick={() => this.sendCommand("reset")}
-            >
-              <i className="fa fa-refresh"></i>
             </button>
           </div>
           <div>
@@ -184,14 +233,17 @@ export class VesEmulatorWidget extends ReactWidget {
             </button>
           </div>
           <div>
-            <select className="theia-select" title="Scale">
+            <select
+              className="theia-select"
+              title="Scale"
+              value={this.state.canvasScale}
+              onChange={(value) => this.setScale(value)}
+            >
               <option value="auto">Auto scale</option>
               <option value="1">×1</option>
               <option value="2">×2</option>
               <option value="3">×3</option>
-              <option value="4">×4</option>
-              <option value="5">×5</option>
-              <option value="full">Full width</option>
+              <option value="full">Full size</option>
             </select>
             <button
               className="theia-button secondary"
@@ -212,18 +264,17 @@ export class VesEmulatorWidget extends ReactWidget {
               <option value="2d-black-blue">2D (Blue/Black)</option>
               <option value="2d-black-cyan">2D (Cyan/Black)</option>
               <option value="2d-black-electric-cyan">
-                2D (Electric Cyan/Black)
+                2D (El. Cyan/Black)
               </option>
               <option value="2d-black-green">2D (Green/Black)</option>
               <option value="2d-black-magenta">2D (Magenta/Black)</option>
               <option value="2d-black-yellow">2D (Yellow/Black)</option>
-
               <option value="anaglyph-red-blue">Anaglyph (Red/Blue)</option>
               <option value="anaglyph-red-cyan">Anaglyph (Red/Cyan)</option>
               <option value="anaglyph-red-electric-cyan">
-                Anaglyph (Red/Electric Cyan)
+                Anaglyph (Red/El. Cyan)
               </option>
-              {/* Mednafen's red/green option does not seem to exist in Beetle VB */}
+              {/* Mednafen's red/green option does not exist in Beetle VB */}
               {/* <option value="anaglyph-red-green">Anaglyph (Red/Green)</option> */}
               <option value="anaglyph-green-magenta">
                 Anaglyph (Green/Magenta)
@@ -246,6 +297,8 @@ export class VesEmulatorWidget extends ReactWidget {
             </select>
           </div>
           <div>
+            {/* TODO: save canvas to PNG instead of using emulator's screenshot function,
+              because we do not want to litter the in-browser filesystem */}
             <button
               className="theia-button secondary"
               title="Screenshot"
@@ -253,6 +306,7 @@ export class VesEmulatorWidget extends ReactWidget {
             >
               <i className="fa fa-camera"></i>
             </button>
+            {/* TODO: fully disable menu access? */}
             <button
               className="theia-button secondary"
               title="Menu"
@@ -263,12 +317,12 @@ export class VesEmulatorWidget extends ReactWidget {
           </div>
           <div>
             <button className="theia-button secondary" title="Configure Input">
-              <i className="fa fa-gamepad"></i>
+              <i className="fa fa-keyboard-o"></i>
             </button>
           </div>
         </div>
         <div id="vesEmulatorWrapper" ref={this.wrapperRef}>
-          {this.state.paused && (
+          {this.state.status === "paused" && (
             <div className="pauseOverlay">
               <i className="fa fa-pause fa-4x"></i>
             </div>
@@ -277,8 +331,8 @@ export class VesEmulatorWidget extends ReactWidget {
             id="vesEmulatorFrame"
             ref={this.iframeRef}
             src={this.getResoure()}
-            width={this.getCanvasDimensions().width}
-            height={this.getCanvasDimensions().height}
+            width={canvasDimensions.width}
+            height={canvasDimensions.height}
             onLoad={() => this.startEmulator(this)}
           ></iframe>
         </div>
@@ -297,7 +351,10 @@ export class VesEmulatorWidget extends ReactWidget {
   }
 
   protected sendCommand(command: string, data?: any) {
-    this.iframeRef.current?.contentWindow?.postMessage({ command, data }, "file://" + this.getResoure());
+    this.iframeRef.current?.contentWindow?.postMessage(
+      { command, data },
+      "file://" + this.getResoure()
+    );
   }
 
   protected reload() {
@@ -305,12 +362,14 @@ export class VesEmulatorWidget extends ReactWidget {
   }
 
   protected async togglePause() {
-    if (this.state.paused) {
+    if (this.state.status === "paused") {
       this.sendCommand("resume");
-    } else {
+      this.state.status = "running";
+    } else if (this.state.status === "running") {
       this.sendCommand("pause");
+      this.state.status = "paused";
     }
-    this.state.paused = !this.state.paused;
+
     this.update();
   }
 
@@ -324,6 +383,11 @@ export class VesEmulatorWidget extends ReactWidget {
     this.state.coreOptions.stereoMode = e.target.value;
     this.sendCoreOptions();
     this.reload();
+  }
+
+  protected setScale(e: React.ChangeEvent<HTMLSelectElement>) {
+    this.state.canvasScale = e.target.value;
+    this.update();
   }
 
   protected sendCoreOptions() {
@@ -374,39 +438,41 @@ export class VesEmulatorWidget extends ReactWidget {
     const wrapperWidth =
       this.wrapperRef.current?.offsetWidth || VesEmulatorWidget.RESOLUTIONX;
 
-    if (!this.state.canvasScaleFactor) {
-      const fullSizeCanvasScaleFactor = Math.min.apply(Math, [
+    if (this.state.canvasScale === "full") {
+      const fullSizeCanvasScale = Math.min.apply(Math, [
         wrapperHeight / VesEmulatorWidget.RESOLUTIONY,
         wrapperWidth / VesEmulatorWidget.RESOLUTIONX,
       ]);
       return {
-        height: fullSizeCanvasScaleFactor * VesEmulatorWidget.RESOLUTIONY,
-        width: fullSizeCanvasScaleFactor * VesEmulatorWidget.RESOLUTIONX,
+        height: fullSizeCanvasScale * VesEmulatorWidget.RESOLUTIONY,
+        width: fullSizeCanvasScale * VesEmulatorWidget.RESOLUTIONX,
+      };
+    } else if (this.state.canvasScale === "auto") {
+      const maxScale = this.determineMaxCanvasScaleFactor();
+      return {
+        height: maxScale * VesEmulatorWidget.RESOLUTIONY,
+        width: maxScale * VesEmulatorWidget.RESOLUTIONX,
       };
     } else {
+      const preferredScale = this.state.canvasScale;
+      const maxScale = this.determineMaxCanvasScaleFactor();
+      const actualScale = Math.min.apply(Math, [maxScale, preferredScale]);
       return {
-        height: this.state.canvasScaleFactor * VesEmulatorWidget.RESOLUTIONY,
-        width: this.state.canvasScaleFactor * VesEmulatorWidget.RESOLUTIONX,
+        height: actualScale * VesEmulatorWidget.RESOLUTIONY,
+        width: actualScale * VesEmulatorWidget.RESOLUTIONX,
       };
     }
   }
 
-  protected determineScalingFactor() {
-    if (this.state.canvasScaleFactor > 0) {
-      const wrapperHeight =
-        this.wrapperRef.current?.offsetHeight || VesEmulatorWidget.RESOLUTIONY;
-      const wrapperWidth =
-        this.wrapperRef.current?.offsetWidth || VesEmulatorWidget.RESOLUTIONX;
+  protected determineMaxCanvasScaleFactor(): number {
+    const wrapperHeight =
+      this.wrapperRef.current?.offsetHeight || VesEmulatorWidget.RESOLUTIONY;
+    const wrapperWidth =
+      this.wrapperRef.current?.offsetWidth || VesEmulatorWidget.RESOLUTIONX;
 
-      this.state.canvasScaleFactor = Math.min.apply(Math, [
-        Math.floor(wrapperHeight / VesEmulatorWidget.RESOLUTIONY),
-        Math.floor(wrapperWidth / VesEmulatorWidget.RESOLUTIONX),
-      ]);
-    }
-  }
-
-  protected resizeCanvas(scaleFactor: number) {
-    this.state.canvasScaleFactor = scaleFactor;
-    this.update();
+    return Math.min.apply(Math, [
+      Math.floor(wrapperHeight / VesEmulatorWidget.RESOLUTIONY),
+      Math.floor(wrapperWidth / VesEmulatorWidget.RESOLUTIONX),
+    ]);
   }
 }
