@@ -37,7 +37,8 @@
     "@theia/workspace": "^1.10.0",
     "usb": "^1.6.3",
     "rimraf": "latest",
-    "filenamify": "4.2.0"
+    "filenamify": "4.2.0",
+    "datauri": "3.0.0"
   },
   "devDependencies": {
     "typescript": "latest",

@@ -1,6 +1,6 @@
 import { inject, injectable, interfaces } from "inversify";
 import { FrontendApplication, FrontendApplicationContribution, PreferenceService, StatusBar, StatusBarAlignment } from "@theia/core/lib/browser";
-import { VesSelectEmulatorCommand } from "./commands";
+import { VesRunCommand, VesSelectEmulatorCommand } from "./commands";
 import { VesRunDefaultEmulatorPreference } from "./preferences";
 import { getDefaultEmulatorConfig } from "./commands/run";
 import { VesStateModel } from "../common/vesStateModel";
@@ -29,10 +29,13 @@ export class VesRunStatusBarContribution implements FrontendApplicationContribut
     setSelectedEmulatorStatusBar() {
         let label = "";
         let className = "";
-        const command = VesSelectEmulatorCommand.id;
+        let command = VesSelectEmulatorCommand.id;
+        let tooltip = VesSelectEmulatorCommand.label;
         if (this.vesState.isRunning) {
             label = "Running...";
             className = "active";
+            command = VesRunCommand.id;
+            tooltip = "Open Emulator";
         } else {
             label = getDefaultEmulatorConfig(this.preferenceService).name;
         }
@@ -42,7 +45,7 @@ export class VesRunStatusBarContribution implements FrontendApplicationContribut
             className: className,
             priority: 2,
             text: `$(play) ${label}`,
-            tooltip: VesSelectEmulatorCommand.label,
+            tooltip: tooltip,
         });
     }
 }

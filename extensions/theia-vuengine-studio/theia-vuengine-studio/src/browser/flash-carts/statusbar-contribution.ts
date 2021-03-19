@@ -33,7 +33,7 @@ export class VesFlashCartsStatusBarContribution implements FrontendApplicationCo
         } else if (this.vesState.connectedFlashCart) {
             label = this.vesState.connectedFlashCart.config.name;
         } else {
-            label = "No Flash Cart Connected";
+            label = "No Flash Cart";
             className = "disabled";
         }
         this.statusBar.setElement("ves-flash-cart", {
