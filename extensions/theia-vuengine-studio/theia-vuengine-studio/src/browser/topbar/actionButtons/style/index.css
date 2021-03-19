@@ -24,7 +24,7 @@
 #ves-topbar-action-buttons .theia-button {
   background-color: rgba(0,0,0,0.4);
   border-radius: 3px;
-  /* color: #ccc; */
+  color: #ececec !important;
   font-size: 17px;
   line-height: 27px;
   margin-left: 4px;

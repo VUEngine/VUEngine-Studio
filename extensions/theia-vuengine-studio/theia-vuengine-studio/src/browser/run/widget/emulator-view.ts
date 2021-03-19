@@ -1,4 +1,4 @@
-import { injectable, interfaces, postConstruct } from 'inversify';
+import { injectable, interfaces } from 'inversify';
 import { AbstractViewContribution, bindViewContribution, FrontendApplicationContribution, WidgetFactory } from '@theia/core/lib/browser';
 import { VesEmulatorWidget } from './emulator-widget';
 
@@ -11,11 +11,6 @@ export class VesEmulatorContribution extends AbstractViewContribution<VesEmulato
             widgetName: VesEmulatorWidget.LABEL,
             defaultWidgetOptions: { area: 'main' },
         });
-    }
-
-    @postConstruct()
-    protected async init(): Promise<void> {
-        this.openView({ activate: true, reveal: true });
     }
 }
 

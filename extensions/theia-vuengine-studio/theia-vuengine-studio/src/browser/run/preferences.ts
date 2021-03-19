@@ -1,11 +1,12 @@
 import { VesProperty } from "../common/types";
+import { EmulationMode, EmulatorScale, StereoMode } from "./types";
 
 export const VesRunEmulatorConfigsPreference: VesProperty = {
-    id: "build.emulators.emulators",
+    id: "emulator.custom.configs",
     property: {
         type: "array",
-        label: "Emulator Configurations",
-        description: "Emulator Configurations",
+        label: "Custom Emulator Configurations",
+        description: "User-defined emulator configurations for running compiled ROMs.",
         items: {
             type: "object",
             title: "Emulator configs",
@@ -23,78 +24,57 @@ export const VesRunEmulatorConfigsPreference: VesProperty = {
                 args: {
                     type: "string",
                     multiline: true,
-                    description: "Arguments to pass to emulator. You can use the following placeholders: "
-                        + "%ROM%: project's output ROM image path ",
+                    description: "Arguments to pass to emulator. You can use the placeholder %ROM% for the project's output ROM image path.",
                     label: "Arguments",
                 },
             },
         },
-        default: [
-            {
-                name: "2D",
-                path: "%MEDNAFEN%",
-                args: "-vb.3dmode anaglyph -vb.anaglyph.preset disabled -vb.anaglyph.lcolor 0xff0000 -vb.anaglyph.rcolor 0x000000 -vb.xscale 2 -vb.yscale 2 %ROM%",
-            },
-            {
-                name: "Anaglyph Red/Blue",
-                path: "%MEDNAFEN%",
-                args: "-vb.3dmode anaglyph -vb.anaglyph.preset red_blue -vb.anaglyph.lcolor 0xffba00 -vb.anaglyph.rcolor 0x00baff -vb.xscale 2 -vb.yscale 2 %ROM%",
-            },
-            {
-                name: "Anaglyph Red/Cyan",
-                path: "%MEDNAFEN%",
-                args: "-vb.3dmode anaglyph -vb.anaglyph.preset red_cyan -vb.anaglyph.lcolor 0xffba00 -vb.anaglyph.rcolor 0x00baff -vb.xscale 2 -vb.yscale 2 %ROM%",
-            },
-            {
-                name: "Anaglyph Red/Electric Cyan",
-                path: "%MEDNAFEN%",
-                args: "-vb.3dmode anaglyph -vb.anaglyph.preset red_electriccyan -vb.anaglyph.lcolor 0xffba00 -vb.anaglyph.rcolor 0x00baff -vb.xscale 2 -vb.yscale 2 %ROM%",
-            },
-            {
-                name: "Anaglyph Red/Green",
-                path: "%MEDNAFEN%",
-                args: "-vb.3dmode anaglyph -vb.anaglyph.preset red_green -vb.anaglyph.lcolor 0xffba00 -vb.anaglyph.rcolor 0x00baff -vb.xscale 2 -vb.yscale 2 %ROM%",
-            },
-            {
-                name: "Anaglyph Green/Magenta",
-                path: "%MEDNAFEN%",
-                args: "-vb.3dmode anaglyph -vb.anaglyph.preset green_magenta -vb.anaglyph.lcolor 0xffba00 -vb.anaglyph.rcolor 0x00baff -vb.xscale 2 -vb.yscale 2 %ROM%",
-            },
-            {
-                name: "Anaglyph Yellow/Blue",
-                path: "%MEDNAFEN%",
-                args: "-vb.3dmode anaglyph -vb.anaglyph.preset yellow_blue -vb.anaglyph.lcolor 0xffba00 -vb.anaglyph.rcolor 0x00baff -vb.xscale 2 -vb.yscale 2 %ROM%",
-            },
-            {
-                name: "CyberScope",
-                path: "%MEDNAFEN%",
-                args: "-vb.3dmode cscope -vb.xscale 1 -vb.yscale 1 %ROM%",
-            },
-            {
-                name: "Side-by-Side",
-                path: "%MEDNAFEN%",
-                args: "-vb.3dmode sidebyside -vb.xscale 1 -vb.yscale 1 %ROM%",
-            },
-            {
-                name: "Vertical Line Interlaced",
-                path: "%MEDNAFEN%",
-                args: "-vb.3dmode vli -vb.xscale 1 -vb.yscale 1 %ROM%",
-            },
-            {
-                name: "Horizontal Line Interlaced",
-                path: "%MEDNAFEN%",
-                args: "-vb.3dmode hli -vb.xscale 1 -vb.yscale 1 %ROM%",
-            },
-        ],
+        default: [],
     },
 };
 
 export const VesRunDefaultEmulatorPreference: VesProperty = {
-    id: "build.emulators.defaultEmulator",
+    id: "emulator.custom.default",
     property: {
         type: "string",
         label: "Default Emulator",
-        description: `Emulator configuration that shall be used to run compiled ROMs. Uses first in list by default.`,
+        description: "Emulator configuration that shall be used to run compiled ROMs. Uses built-in emulator if left blank.",
         default: ""
+    }
+};
+
+export const VesRunEmulatorStereoModePreference: VesProperty = {
+    id: "emulator.builtIn.stereoMode",
+    property: {
+        type: "string",
+        label: "Stereo Mode",
+        description: "Stereoscopy display mode of built-in emulator.",
+        enum: Object.keys(StereoMode),
+        /*enumDescriptions: Object.values(StereoMode),*/
+        default: Object.keys(StereoMode)[0],
+    }
+};
+
+export const VesRunEmulatorEmulationModePreference: VesProperty = {
+    id: "emulator.builtIn.emulationMode",
+    property: {
+        type: "string",
+        label: "Emulation Mode",
+        description: "Emulation mode of built-in emulator.",
+        enum: Object.keys(EmulationMode),
+        /*enumDescriptions: Object.values(EmulationMode),*/
+        default: Object.keys(EmulationMode)[0],
+    }
+};
+
+export const VesRunEmulatorScalePreference: VesProperty = {
+    id: "emulator.builtIn.scale",
+    property: {
+        type: "string",
+        label: "Scale",
+        description: "Scaling mode of built-in emulator.",
+        enum: Object.keys(EmulatorScale),
+        /*enumDescriptions: Object.values(EmulatorScale),*/
+        default: Object.keys(EmulatorScale)[0],
     }
 };
