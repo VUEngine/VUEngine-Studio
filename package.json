@@ -38,7 +38,8 @@
     "start": "electron scripts/theia-electron-main.js",
     "package": "electron-builder",
     "package:preview": "electron-builder --dir",
-    "download:plugins": "theia download:plugins"
+    "download:plugins": "theia download:plugins",
+    "update": "git submodule update --recursive --remote"
   },
   "dependencies": {
     "@theia/core": "^1.10.0",
