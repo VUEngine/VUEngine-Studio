@@ -6,3 +6,10 @@ export const VesFlashCartsCommand: Command = {
     category: "Flash",
     iconClass: "fa fa-usb",
 };
+
+export const VesOpenFlashCartsWidgetCommand: Command = {
+    id: "VesFlashCarts.commands.openWidget",
+    label: "Open Flash Cart Widget",
+    category: "Flash",
+    iconClass: "fa fa-usb",
+};

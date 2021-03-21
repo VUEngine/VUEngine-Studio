@@ -124,18 +124,5 @@ export function getEmulatorConfigs(preferenceService: PreferenceService) {
     ...customEmulatorConfigs,
   ]
 
-  return emulatorConfigs/*.map((emulatorConfig: EmulatorConfig) => {
-    return {
-      ...emulatorConfig,
-      path: emulatorConfig.path
-        .replace("%MEDNAFEN%", joinPath(
-          getResourcesPath(),
-          "binaries",
-          "vuengine-studio-tools",
-          getOs(),
-          "mednafen",
-          isWindows ? "mednafen.exe" : "mednafen"
-        )),
-    };
-  });*/
+  return emulatorConfigs;
 }

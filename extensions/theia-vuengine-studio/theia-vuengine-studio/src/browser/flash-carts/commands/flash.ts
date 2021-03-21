@@ -13,6 +13,7 @@ import { VesStateModel } from "../../common/vesStateModel";
 import { VesProcessService } from "../../../common/process-service-protocol";
 import { VesFlashCartsPreference } from "../preferences";
 import { VesProcessWatcher } from "../../services/process-service/process-watcher";
+import { VesOpenFlashCartsWidgetCommand } from "../commands";
 
 export type FlashCartConfig = {
   name: string;
@@ -24,6 +25,7 @@ export type FlashCartConfig = {
   path: string;
   args: string;
   padRom: boolean;
+  image: string;
 };
 
 export type ConnectedFlashCart = {
@@ -50,7 +52,7 @@ export async function flashCommand(
     vesState.isFlashQueued = false;
     return;
   } else if (vesState.isFlashing) {
-    vesProcessService.killProcess(vesState.isFlashing);
+    commandService.executeCommand(VesOpenFlashCartsWidgetCommand.id);
     return;
   }
 
@@ -58,6 +60,7 @@ export async function flashCommand(
     if (outputRomExists && vesState.isFlashQueued) {
       vesState.isFlashQueued = false;
       flash(
+        commandService,
         fileService,
         messageService,
         preferenceService,
@@ -73,6 +76,7 @@ export async function flashCommand(
     messageService.error(`No connected flash cart could be found.`);
   } else if (vesState.outputRomExists) {
     flash(
+      commandService,
       fileService,
       messageService,
       preferenceService,
@@ -88,6 +92,7 @@ export async function flashCommand(
 }
 
 async function flash(
+  commandService: CommandService,
   fileService: FileService,
   messageService: MessageService,
   preferenceService: PreferenceService,
@@ -159,7 +164,7 @@ async function flash(
   });
   await terminalWidget.start(terminalProcessId);
   terminalWidget.clearOutput();
-  terminalService.open(terminalWidget);
+  //terminalService.open(terminalWidget);
 
   vesProcessWatcher.onExit(({ pId }) => {
     if (processManagerId === pId) {
@@ -169,6 +174,8 @@ async function flash(
 
   vesState.isFlashing = processManagerId;
   monitorFlashing(vesProcessWatcher, vesState);
+
+  commandService.executeCommand(VesOpenFlashCartsWidgetCommand.id, true);
 }
 
 function getTerminalId(): string {
@@ -245,10 +252,12 @@ async function monitorFlashing(
   vesState: VesStateModel
 ) {
   switch (vesState.connectedFlashCart?.config.name) {
-    case "FlashBoy (Plus)":
+    // FlashBoy (Plus)
+    case VesFlashCartsPreference.property.default[0].name:
       monitorFlashingFlashBoy(vesProcessWatcher, vesState);
       break;
-    case "HyperFlash32":
+    // HyperFlash32:
+    case VesFlashCartsPreference.property.default[1].name:
       monitorFlashingHyperFlash32(vesProcessWatcher, vesState);
       break;
     default:

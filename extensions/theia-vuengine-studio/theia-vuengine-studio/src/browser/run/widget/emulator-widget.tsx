@@ -10,6 +10,8 @@ import { VesRunEmulatorEmulationModePreference, VesRunEmulatorScalePreference, V
 
 const datauri = require("datauri");
 
+// TODO: create overlay(s?) to view/remap button assigments for both emulator commands and controller input
+
 export type vesEmulatorWidgetState = {
   status: string;
   lowBattery: boolean;

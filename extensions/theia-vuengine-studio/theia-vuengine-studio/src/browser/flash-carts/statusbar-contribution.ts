@@ -1,6 +1,7 @@
 import { inject, injectable, interfaces } from "inversify";
 import { FrontendApplication, FrontendApplicationContribution, StatusBar, StatusBarAlignment } from "@theia/core/lib/browser";
 import { VesStateModel } from "../common/vesStateModel";
+import { VesOpenFlashCartsWidgetCommand } from "./commands";
 
 @injectable()
 export class VesFlashCartsStatusBarContribution implements FrontendApplicationContribution {
@@ -38,7 +39,7 @@ export class VesFlashCartsStatusBarContribution implements FrontendApplicationCo
         }
         this.statusBar.setElement("ves-flash-cart", {
             alignment: StatusBarAlignment.LEFT,
-            //command: VesFlashShowWidgetCommand.id,
+            command: VesOpenFlashCartsWidgetCommand.id,
             className: className,
             priority: 1,
             text: `$(usb) ${label}`,

@@ -8,7 +8,7 @@ export class bindTheiaCustomizationScmHistoryContribution extends ScmHistoryCont
         return {
             ...this.options.defaultWidgetOptions,
             area: 'right',
-            rank: 600
+            rank: 600,
         };
     }
 

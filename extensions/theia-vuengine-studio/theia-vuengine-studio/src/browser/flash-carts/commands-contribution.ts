@@ -5,10 +5,12 @@ import { flashCommand } from "./commands/flash";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { VesStateModel } from "../common/vesStateModel";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
-import { VesFlashCartsCommand } from "./commands";
+import { VesFlashCartsCommand, VesOpenFlashCartsWidgetCommand } from "./commands";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
 import { VesProcessService } from "../../common/process-service-protocol";
 import { VesProcessWatcher } from "../services/process-service/process-watcher";
+import { showFlashCartWidgetCommand } from "./commands/showFlashCartWidget";
+import { VesFlashCartWidgetContribution } from "./widget/flash-cart-view";
 
 @injectable()
 export class VesFlashCartsCommandContribution implements CommandContribution {
@@ -18,6 +20,7 @@ export class VesFlashCartsCommandContribution implements CommandContribution {
     @inject(MessageService) private readonly messageService: MessageService,
     @inject(PreferenceService) private readonly preferenceService: PreferenceService,
     @inject(TerminalService) private readonly terminalService: TerminalService,
+    @inject(VesFlashCartWidgetContribution) private readonly vesFlashCartWidget: VesFlashCartWidgetContribution,
     @inject(VesProcessService) private readonly vesProcessService: VesProcessService,
     @inject(VesProcessWatcher) private readonly vesProcessWatcher: VesProcessWatcher,
     @inject(VesStateModel) private readonly vesState: VesStateModel,
@@ -37,6 +40,14 @@ export class VesFlashCartsCommandContribution implements CommandContribution {
           this.vesProcessService,
           this.vesProcessWatcher,
           this.vesState,
+        ),
+    });
+
+    commandRegistry.registerCommand(VesOpenFlashCartsWidgetCommand, {
+      execute: (forceOpen: boolean = false) =>
+        showFlashCartWidgetCommand(
+          forceOpen,
+          this.vesFlashCartWidget,
         ),
     });
   }

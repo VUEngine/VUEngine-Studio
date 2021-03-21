@@ -7,6 +7,8 @@ import { bindVesRunStatusBar } from './statusbar-contribution';
 import { bindVesEmulatorView } from './widget/emulator-view';
 import "../../../src/browser/run/style/index.css";
 
+// TODO: create widget for defining custom emulator configs
+
 export function bindVesRunContributions(bind: interfaces.Bind): void {
     bindVesRunPreferences(bind);
     bindVesRunCommands(bind);

@@ -4,6 +4,8 @@ import { bindVesFlashCartsKeybindings } from "./keybindings-contribution";
 import { bindVesFlashCartsMenu } from "./menu-contribution";
 import { bindVesFlashCartsPreferences } from "./preferences-contribution";
 import { bindVesFlashCartsStatusBar } from './statusbar-contribution';
+import { bindVesFlashCartsView } from './widget/flash-cart-view';
+import "../../../src/browser/flash-carts/style/index.css";
 
 export function bindVesFlashCartsContributions(bind: interfaces.Bind): void {
     bindVesFlashCartsPreferences(bind);
@@ -11,4 +13,5 @@ export function bindVesFlashCartsContributions(bind: interfaces.Bind): void {
     bindVesFlashCartsMenu(bind);
     bindVesFlashCartsKeybindings(bind);
     bindVesFlashCartsStatusBar(bind);
+    bindVesFlashCartsView(bind);
 }
