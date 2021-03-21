@@ -4,7 +4,6 @@ import {
   CommandRegistry,
   CommandService,
 } from "@theia/core/lib/common";
-import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
 import { runCommand } from "./commands/run";
 import { selectEmulatorCommand } from "./commands/selectEmulator";
 import { PreferenceService } from "@theia/core/lib/browser";
@@ -22,7 +21,6 @@ export class VesRunCommandContribution implements CommandContribution {
     @inject(CommandService) private readonly commandService: CommandService,
     @inject(PreferenceService) private readonly preferenceService: PreferenceService,
     @inject(QuickPickService) private readonly quickPickService: QuickPickService,
-    @inject(TerminalService) private readonly terminalService: TerminalService,
     @inject(VesProcessService) private readonly vesProcessService: VesProcessService,
     @inject(VesStateModel) private readonly vesState: VesStateModel,
     @inject(VesProcessWatcher) private readonly vesProcessWatcher: VesProcessWatcher,
@@ -37,7 +35,6 @@ export class VesRunCommandContribution implements CommandContribution {
         runCommand(
           this.commandService,
           this.preferenceService,
-          this.terminalService,
           this.vesEmulator,
           this.vesProcessService,
           this.vesProcessWatcher,

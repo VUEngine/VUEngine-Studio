@@ -10,5 +10,5 @@ export interface VesFlashCartServiceClient {
 }
 
 export interface VesFlashCartService extends JsonRpcServer<VesFlashCartServiceClient> {
-    detectFlashCart(...flashCartConfigs: FlashCartConfig[]): Promise<ConnectedFlashCart | undefined>;
+    detectFlashCarts(...flashCartConfigs: FlashCartConfig[]): Promise<ConnectedFlashCart[]>;
 }

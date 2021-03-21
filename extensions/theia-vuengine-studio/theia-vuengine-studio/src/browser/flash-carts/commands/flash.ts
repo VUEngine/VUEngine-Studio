@@ -16,26 +16,28 @@ import { VesProcessWatcher } from "../../services/process-service/process-watche
 import { VesOpenFlashCartsWidgetCommand } from "../commands";
 
 export type FlashCartConfig = {
-  name: string;
-  vid: number;
-  pid: number;
-  manufacturer: string;
-  product: string;
-  size: number;
-  path: string;
-  args: string;
-  padRom: boolean;
-  image: string;
-};
-
-export type ConnectedFlashCart = {
-  config: FlashCartConfig,
-  device: Device,
+  name: string
+  vid: number
+  pid: number
+  manufacturer: string
+  product: string
+  size: number
+  path: string
+  args: string
+  padRom: boolean
+  image: string
 }
 
-export type FlashingProgress = {
-  step: string,
+export type ConnectedFlashCart = {
+  config: FlashCartConfig
+  device: Device
+  status: FlashCartStatus
+}
+
+export type FlashCartStatus = {
+  processId: number
   progress: number
+  step: string
 }
 
 export async function flashCommand(
@@ -72,7 +74,7 @@ export async function flashCommand(
     }
   })
 
-  if (!vesState.connectedFlashCart) {
+  if (!vesState.connectedFlashCarts) {
     messageService.error(`No connected flash cart could be found.`);
   } else if (vesState.outputRomExists) {
     flash(
@@ -101,85 +103,114 @@ async function flash(
   vesProcessWatcher: VesProcessWatcher,
   vesState: VesStateModel
 ) {
-  if (!vesState.connectedFlashCart) {
-    return;
-  }
-
-  if (!vesState.connectedFlashCart.config.path) {
-    messageService.error(
-      `No path to flasher software provided for cart "${vesState.connectedFlashCart.config.name}"`
-    );
-    return;
-  }
-
-  if (!await fileService.exists(new URI(dirname(vesState.connectedFlashCart.config.path)))) {
-    messageService.error(
-      `Flasher software does not exist at "${vesState.connectedFlashCart.config.path}"`
-    );
-    return;
-  }
-
-  let flasherEnvPath = convertoToEnvPath(
-    preferenceService,
-    vesState.connectedFlashCart.config.path
-  );
-
-  const enableWsl = preferenceService.get(VesBuildEnableWslPreference.id);
-  if (isWindows && enableWsl) {
-    flasherEnvPath.replace(/\.[^/.]+$/, "");
-  }
-
-  const romPath = vesState.connectedFlashCart.config.padRom &&
-    await padRom(fileService, vesState, vesState.connectedFlashCart.config.size)
-    ? getPaddedRomPath()
-    : getRomPath();
-
-  const flasherArgs = vesState.connectedFlashCart.config.args
-    ? vesState.connectedFlashCart.config.args
-      .replace("%ROM%", romPath)
-      .replace("%PORT%", `...`) // TODO
-      .split(" ")
-    : [];
-
-  // fix permissions
-  // TODO: do this only once on app startup
-  if (!isWindows) {
-    vesProcessService.launchProcess({
-      command: "chmod",
-      args: ["a+x", vesState.connectedFlashCart.config.path]
-    });
-  }
-
-  const { terminalProcessId, processManagerId } = await vesProcessService.launchProcess({
-    command: "." + sep + basename(vesState.connectedFlashCart.config.path),
-    args: flasherArgs,
-    options: {
-      cwd: dirname(vesState.connectedFlashCart.config.path),
-    },
-  });
-
-  const terminalWidget = terminalService.getById(getTerminalId()) || await terminalService.newTerminal({
-    title: "Flash",
-    id: getTerminalId()
-  });
-  await terminalWidget.start(terminalProcessId);
-  terminalWidget.clearOutput();
-  //terminalService.open(terminalWidget);
-
-  vesProcessWatcher.onExit(({ pId }) => {
-    if (processManagerId === pId) {
-      vesState.isFlashing = 0;
+  for (const connectedFlashCart of vesState.connectedFlashCarts) {
+    if (!connectedFlashCart.config.path) {
+      messageService.error(
+        `No path to flasher software provided for cart "${connectedFlashCart.config.name}"`
+      );
+      continue;
     }
-  });
 
-  vesState.isFlashing = processManagerId;
-  monitorFlashing(vesProcessWatcher, vesState);
+    if (!await fileService.exists(new URI(dirname(connectedFlashCart.config.path)))) {
+      messageService.error(
+        `Flasher software does not exist at "${connectedFlashCart.config.path}"`
+      );
+      continue;
+    }
 
+    let flasherEnvPath = convertoToEnvPath(
+      preferenceService,
+      connectedFlashCart.config.path
+    );
+
+    const enableWsl = preferenceService.get(VesBuildEnableWslPreference.id);
+    if (isWindows && enableWsl) {
+      flasherEnvPath.replace(/\.[^/.]+$/, "");
+    }
+
+    const romPath = connectedFlashCart.config.padRom &&
+      await padRom(fileService, vesState, connectedFlashCart.config.size)
+      ? getPaddedRomPath()
+      : getRomPath();
+
+    const flasherArgs = connectedFlashCart.config.args
+      ? connectedFlashCart.config.args
+        .replace("%ROM%", romPath)
+        .replace("%PORT%", `...`) // TODO
+        .split(" ")
+      : [];
+
+    // fix permissions
+    if (!isWindows) {
+      vesProcessService.launchProcess({
+        command: "chmod",
+        args: ["a+x", connectedFlashCart.config.path]
+      });
+    }
+
+    const { terminalProcessId, processManagerId } = await vesProcessService.launchProcess({
+      command: "." + sep + basename(connectedFlashCart.config.path),
+      args: flasherArgs,
+      options: {
+        cwd: dirname(connectedFlashCart.config.path),
+      },
+    });
+
+    const terminalId = "flash" + Math.random();
+
+    const terminalWidget = terminalService.getById(terminalId) || await terminalService.newTerminal({
+      title: "Flash",
+      id: terminalId
+    });
+    await terminalWidget.start(terminalProcessId);
+    terminalWidget.clearOutput();
+    terminalService.open(terminalWidget);
+
+    vesProcessWatcher.onExit(({ pId }) => {
+      if (processManagerId === pId) {
+        connectedFlashCart.status = {
+          ...connectedFlashCart.status,
+          // TODO: differenciate between done and error
+          progress: -1,
+        };
+
+        // trigger change event
+        vesState.connectedFlashCarts = vesState.connectedFlashCarts;
+
+        let finished = 0;
+        for (const connectedFlashCart of vesState.connectedFlashCarts) {
+          if (connectedFlashCart.status.progress === -1 || connectedFlashCart.status.progress === 100) {
+            finished++;
+          }
+        }
+
+        if (finished === vesState.connectedFlashCarts.length) {
+          vesState.isFlashing = false;
+        }
+      }
+    });
+
+    connectedFlashCart.status.processId = processManagerId;
+    monitorFlashing(vesProcessWatcher, vesState);
+  }
+
+  vesState.isFlashing = true;
   commandService.executeCommand(VesOpenFlashCartsWidgetCommand.id, true);
 }
 
-function getTerminalId(): string {
-  return "ves-flash";
+export function cancelFlash(vesProcessService: VesProcessService, vesState: VesStateModel) {
+  for (const connectedFlashCart of vesState.connectedFlashCarts) {
+    vesProcessService.killProcess(connectedFlashCart.status.processId)
+    connectedFlashCart.status = {
+      ...connectedFlashCart.status,
+      progress: -1,
+    };
+  }
+
+  // trigger change event
+  vesState.connectedFlashCarts = vesState.connectedFlashCarts;
+
+  vesState.isFlashing = false;
 }
 
 async function padRom(fileService: FileService, vesState: VesStateModel, size: number): Promise<boolean> {
@@ -251,62 +282,65 @@ async function monitorFlashing(
   vesProcessWatcher: VesProcessWatcher,
   vesState: VesStateModel
 ) {
-  switch (vesState.connectedFlashCart?.config.name) {
-    // FlashBoy (Plus)
-    case VesFlashCartsPreference.property.default[0].name:
-      monitorFlashingFlashBoy(vesProcessWatcher, vesState);
-      break;
-    // HyperFlash32:
-    case VesFlashCartsPreference.property.default[1].name:
-      monitorFlashingHyperFlash32(vesProcessWatcher, vesState);
-      break;
-    default:
-      vesState.flashingProgress = {
-        step: "Flashing",
-        progress: -1,
-      };
-      break;
+  for (const connectedFlashCart of vesState.connectedFlashCarts) {
+    connectedFlashCart.status = {
+      ...connectedFlashCart.status,
+      step: "Flashing",
+      progress: 0,
+    };
+
+    // trigger change event
+    vesState.connectedFlashCarts = vesState.connectedFlashCarts;
+
+    switch (connectedFlashCart.config.name) {
+      // FlashBoy (Plus)
+      case VesFlashCartsPreference.property.default[0].name:
+        monitorFlashingFlashBoy(connectedFlashCart, vesProcessWatcher, vesState);
+        break;
+      // HyperFlash32:
+      case VesFlashCartsPreference.property.default[1].name:
+        monitorFlashingHyperFlash32(connectedFlashCart, vesProcessWatcher, vesState);
+        break;
+    }
   }
 }
 
-// TODO
 async function monitorFlashingHyperFlash32(
+  connectedFlashCart: ConnectedFlashCart,
   vesProcessWatcher: VesProcessWatcher,
-  vesState: VesStateModel
+  vesState: VesStateModel,
 ) {
-  vesState.flashingProgress = {
-    step: "Flashing",
-    //step: "Erasing",
-    progress: -1,
-  };
-
   vesProcessWatcher.onData(({ pId, data }) => {
-    if (vesState.isFlashing === pId && data.includes("")) {
-      // const packetsWritten = parseInt(data.substring(data.lastIndexOf("]") + 2, data.lastIndexOf("/")));
-      // vesState.flashingProgress = {
-      //   step: "Flashing",
-      //   progress: Math.round(packetsWritten * 100 / 2048),
-      // };
+    if (connectedFlashCart.status.processId === pId && data.includes("")) {
+      // TODO
     }
   });
 }
 
 async function monitorFlashingFlashBoy(
+  connectedFlashCart: ConnectedFlashCart,
   vesProcessWatcher: VesProcessWatcher,
-  vesState: VesStateModel
+  vesState: VesStateModel,
 ) {
-  vesState.flashingProgress = {
+  connectedFlashCart.status = {
+    ...connectedFlashCart.status,
     step: "Erasing",
-    progress: -1,
   };
 
+  // trigger change event
+  vesState.connectedFlashCarts = vesState.connectedFlashCarts;
+
   vesProcessWatcher.onData(({ pId, data }) => {
-    if (vesState.isFlashing === pId && data.includes("/2048")) {
+    if (connectedFlashCart.status.processId === pId && data.includes("/2048")) {
       const packetsWritten = parseInt(data.substring(data.lastIndexOf("]") + 2, data.lastIndexOf("/")));
-      vesState.flashingProgress = {
+      connectedFlashCart.status = {
+        ...connectedFlashCart.status,
         step: "Flashing",
         progress: Math.round(packetsWritten * 100 / 2048),
       };
+
+      // trigger change event
+      vesState.connectedFlashCarts = vesState.connectedFlashCarts;
     }
   });
 }

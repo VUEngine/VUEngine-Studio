@@ -1,71 +1,82 @@
-#vesFlashCartWidget {
+#vesFlashCartsWidget {
   display: flex;
   flex-direction: column;
   line-height: 130%;
-  min-width: 200px;
+  min-width: 250px;
+}
+
+#vesFlashCartsWidget .flashingActions {
+  border-bottom: 1px solid var(--theia-activityBar-background);
   padding: 19px;
 }
 
-#vesFlashCartWidget .flashCartTitle {
+#vesFlashCartsWidget > div:last-child {
+  flex-grow: 1;
+  overflow: auto;
+}
+
+#vesFlashCartsWidget .flashCart {
+  border-bottom: 1px solid var(--theia-activityBar-background);
+  padding: 19px;
+}
+
+#vesFlashCartsWidget .theia-button {
+  margin: 0;
+}
+
+#vesFlashCartsWidget .theia-button.flash {
+  width: 100%;
+}
+
+#vesFlashCartsWidget .flashCartTitle {
   font-size: 150%;
+  line-height: 150%;
 }
 
-#vesFlashCartWidget .flashCartInfo {
-  margin: var(--theia-ui-padding) 0;
+#vesFlashCartsWidget .flashCartInfo {
+  padding: var(--theia-ui-padding) 0;
 }
 
-#vesFlashCartWidget .flashCartInfo div {
+#vesFlashCartsWidget .flashCartInfo div {
   margin: var(--theia-ui-padding) 0;
   padding-left: 24px;
   position: relative;
 }
 
-#vesFlashCartWidget .flashCartInfo div i {
+#vesFlashCartsWidget .flashCartInfo div i {
   left: 0;
   position: absolute;
   top: 1px;
 }
 
-#vesFlashCartWidget .cartImgWrapper {
+#vesFlashCartsWidget .cartImgWrapper {
   background: rgba(0, 0, 0, 0.2);
+  margin-bottom: calc(var(--theia-ui-padding) * 2);
   padding: calc(var(--theia-ui-padding) * 2);
   text-align: center;
 }
 
-#vesFlashCartWidget .cartImgWrapper img {
+#vesFlashCartsWidget .cartImgWrapper img {
   max-width: 100%;
-  width: 250px;
+  width: 200px;
 }
 
-#vesFlashCartWidget .flashingPanel {
-  margin: calc(var(--theia-ui-padding) * 2) 0;
+#vesFlashCartsWidget .flashingPanel {
+  margin-bottom: calc(var(--theia-ui-padding) * 2);
 }
 
-#vesFlashCartWidget .flashingPanel div {
-  margin: var(--theia-ui-padding) 0;
-}
-
-#vesFlashCartWidget .flashingPanel .theia-button {
-  margin: calc(var(--theia-ui-padding) * 2) 0;
-}
-
-#vesFlashCartWidget .flashingPanel .theia-button.flash {
-  width: 100%;
-}
-
-#vesFlashCartWidget .progressBar {
+#vesFlashCartsWidget .progressBar {
   background: rgba(0, 0, 0, 0.2);
-  margin: var(--theia-ui-padding) 0;
 }
 
-#vesFlashCartWidget .progressBar div {
+#vesFlashCartsWidget .progressBar div {
   color: var(--theia-button-foreground);
-  background-color: var(--theia-button-background);
-  line-height: 26px;
+  background-color: /*var(--theia-button-background)*/ #4aa94e;
+  line-height: 32px;
   text-align: center;
   width: 0px;
 }
 
-#vesFlashCartWidget .progressBar div span {
+#vesFlashCartsWidget .progressBar div span {
   padding: 0 var(--theia-ui-padding);
 }

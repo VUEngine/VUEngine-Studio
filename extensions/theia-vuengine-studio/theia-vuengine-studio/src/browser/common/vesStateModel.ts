@@ -5,7 +5,7 @@ import URI from "@theia/core/lib/common/uri";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { FileChangesEvent } from "@theia/filesystem/lib/common/files";
 import { FrontendApplicationState, FrontendApplicationStateService } from "@theia/core/lib/browser/frontend-application-state";
-import { ConnectedFlashCart, FlashCartConfig, FlashingProgress, getFlashCartConfigs } from "../flash-carts/commands/flash";
+import { ConnectedFlashCart, FlashCartConfig, getFlashCartConfigs } from "../flash-carts/commands/flash";
 import { getBuildPath, getRomPath } from "./functions";
 import { VesBuildModePreference } from "../build/preferences";
 import { VesRunDefaultEmulatorPreference, VesRunEmulatorConfigsPreference } from "../run/preferences";
@@ -44,7 +44,7 @@ export class VesStateModel {
                     this.outputRomExists = exists;
                 });
 
-                this.detectConnectedFlashCart();
+                this.detectConnectedFlashCarts();
             }
         });
 
@@ -85,13 +85,13 @@ export class VesStateModel {
         });
 
         // watch for flash cart attach/detach
-        this.vesFlashCartWatcher.onAttach(async () => this.detectConnectedFlashCart());
-        this.vesFlashCartWatcher.onDetach(async () => this.detectConnectedFlashCart());
+        this.vesFlashCartWatcher.onAttach(async () => this.detectConnectedFlashCarts());
+        this.vesFlashCartWatcher.onDetach(async () => this.detectConnectedFlashCarts());
     }
 
-    protected detectConnectedFlashCart = async () => {
+    protected detectConnectedFlashCarts = async () => {
         const flashCartConfigs: FlashCartConfig[] = getFlashCartConfigs(this.preferenceService);
-        this.connectedFlashCart = await this.vesFlashCartService.detectFlashCart(...flashCartConfigs);
+        this.connectedFlashCarts = await this.vesFlashCartService.detectFlashCarts(...flashCartConfigs);
     }
 
     // emulator configs
@@ -154,18 +154,6 @@ export class VesStateModel {
         return this._isBuilding;
     }
 
-    // connected flash cart
-    protected _connectedFlashCart: ConnectedFlashCart | undefined = undefined;
-    protected readonly onDidChangeConnectedFlashCartEmitter = new Emitter<ConnectedFlashCart | undefined>();
-    readonly onDidChangeConnectedFlashCart = this.onDidChangeConnectedFlashCartEmitter.event;
-    set connectedFlashCart(connectedFlashCart: ConnectedFlashCart | undefined) {
-        this._connectedFlashCart = connectedFlashCart;
-        this.onDidChangeConnectedFlashCartEmitter.fire(this._connectedFlashCart);
-    }
-    get connectedFlashCart(): ConnectedFlashCart | undefined {
-        return this._connectedFlashCart;
-    }
-
     // export queue
     protected _isExportQueued: boolean = false;
     protected readonly onDidChangeIsExportQueuedEmitter = new Emitter<boolean>();
@@ -202,6 +190,18 @@ export class VesStateModel {
         return this._isRunning;
     }
 
+    // connected flash carts
+    protected _connectedFlashCarts: ConnectedFlashCart[] = [];
+    protected readonly onDidChangeConnectedFlashCartsEmitter = new Emitter<ConnectedFlashCart[]>();
+    readonly onDidChangeConnectedFlashCarts = this.onDidChangeConnectedFlashCartsEmitter.event;
+    set connectedFlashCarts(connectedFlashCart: ConnectedFlashCart[]) {
+        this._connectedFlashCarts = connectedFlashCart;
+        this.onDidChangeConnectedFlashCartsEmitter.fire(this._connectedFlashCarts);
+    }
+    get connectedFlashCarts(): ConnectedFlashCart[] {
+        return this._connectedFlashCarts;
+    }
+
     // flash queue
     protected _isFlashQueued: boolean = false;
     protected readonly onDidChangeIsFlashQueuedEmitter = new Emitter<boolean>();
@@ -215,29 +215,14 @@ export class VesStateModel {
     }
 
     // is flashing
-    protected _isFlashing: number = 0;
-    protected readonly onDidChangeIsFlashingEmitter = new Emitter<number>();
+    protected _isFlashing: boolean = false;
+    protected readonly onDidChangeIsFlashingEmitter = new Emitter<boolean>();
     readonly onDidChangeIsFlashing = this.onDidChangeIsFlashingEmitter.event;
-    set isFlashing(processManagerId: number) {
-        this._isFlashing = processManagerId;
+    set isFlashing(flag: boolean) {
+        this._isFlashing = flag;
         this.onDidChangeIsFlashingEmitter.fire(this._isFlashing);
     }
-    get isFlashing(): number {
+    get isFlashing(): boolean {
         return this._isFlashing;
-    }
-
-    // flashing progress
-    protected _flashingProgress: FlashingProgress = {
-        step: "Initial",
-        progress: -1,
-    };
-    protected readonly onDidChangeFlashingProgressEmitter = new Emitter<FlashingProgress>();
-    readonly onDidChangeFlashingProgress = this.onDidChangeFlashingProgressEmitter.event;
-    set flashingProgress(progress: FlashingProgress) {
-        this._flashingProgress = progress;
-        this.onDidChangeFlashingProgressEmitter.fire(this._flashingProgress);
-    }
-    get flashingProgress(): FlashingProgress {
-        return this._flashingProgress;
     }
 }

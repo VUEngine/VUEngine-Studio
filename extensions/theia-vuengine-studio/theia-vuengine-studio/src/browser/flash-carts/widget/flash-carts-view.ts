@@ -1,14 +1,14 @@
 import { injectable, interfaces, postConstruct } from 'inversify';
 import { AbstractViewContribution, bindViewContribution, FrontendApplicationContribution, WidgetFactory } from '@theia/core/lib/browser';
-import { VesFlashCartWidget } from './flash-cart-widget';
+import { VesFlashCartsWidget } from './flash-carts-widget';
 
 @injectable()
-export class VesFlashCartWidgetContribution extends AbstractViewContribution<VesFlashCartWidget> {
+export class VesFlashCartsWidgetContribution extends AbstractViewContribution<VesFlashCartsWidget> {
 
     constructor() {
         super({
-            widgetId: VesFlashCartWidget.ID,
-            widgetName: VesFlashCartWidget.LABEL,
+            widgetId: VesFlashCartsWidget.ID,
+            widgetName: VesFlashCartsWidget.LABEL,
             defaultWidgetOptions: {
                 area: 'right',
                 rank: 800,
@@ -23,17 +23,17 @@ export class VesFlashCartWidgetContribution extends AbstractViewContribution<Ves
 }
 
 export function bindVesFlashCartsView(bind: interfaces.Bind): void {
-    bindViewContribution(bind, VesFlashCartWidgetContribution);
+    bindViewContribution(bind, VesFlashCartsWidgetContribution);
     bind(FrontendApplicationContribution).toService(
-        VesFlashCartWidgetContribution
+        VesFlashCartsWidgetContribution
     );
-    bind(VesFlashCartWidget).toSelf();
+    bind(VesFlashCartsWidget).toSelf();
     bind(WidgetFactory)
         .toDynamicValue((ctx) => ({
-            id: VesFlashCartWidget.ID,
+            id: VesFlashCartsWidget.ID,
             createWidget: () =>
-                ctx.container.get<VesFlashCartWidget>(
-                    VesFlashCartWidget
+                ctx.container.get<VesFlashCartsWidget>(
+                    VesFlashCartsWidget
                 ),
         }))
         .inSingletonScope();

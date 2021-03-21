@@ -22,7 +22,8 @@ export class VesFlashCartServiceImpl implements VesFlashCartService {
         on("detach", async (device) => self.client?.onDetach());
     }
 
-    async detectFlashCart(...flashCartConfigs: FlashCartConfig[]): Promise<ConnectedFlashCart | undefined> {
+    async detectFlashCarts(...flashCartConfigs: FlashCartConfig[]): Promise<ConnectedFlashCart[]> {
+        const connectedFlashCarts = [];
         const devices: Device[] = getDeviceList();
         let manufacturer: string | undefined;
         let product: string | undefined;
@@ -58,15 +59,20 @@ export class VesFlashCartServiceImpl implements VesFlashCartService {
                         (flashCartConfig.product === "" ||
                             product?.includes(flashCartConfig.product))
                     ) {
-                        return {
+                        connectedFlashCarts.push({
                             config: flashCartConfig,
                             device: devices[i],
-                        }
+                            status: {
+                                processId: 0,
+                                step: "",
+                                progress: -1,
+                            },
+                        })
                     }
                 }
             }
         }
 
-        return;
+        return connectedFlashCarts;
     }
 }

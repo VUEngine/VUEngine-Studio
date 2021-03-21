@@ -57,7 +57,7 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
 
         // init touchbar values
         app.emit("ves-change-build-mode", this.preferenceService.get(VesBuildModePreference.id));
-        app.emit("ves-change-connected-flash-cart", this.vesState.connectedFlashCart);
+        app.emit("ves-change-connected-flash-cart", this.vesState.connectedFlashCarts);
         app.emit("ves-change-build-folder", this.vesState.buildFolderExists);
         app.emit("ves-change-emulator", getDefaultEmulatorConfig(this.preferenceService).name);
         app.emit("ves-change-emulator-configs", getEmulatorConfigs(this.preferenceService));
@@ -68,7 +68,7 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
         this.vesState.onDidChangeIsFlashQueued((flag) => app.emit("ves-change-is-flash-queued", flag));
         this.vesState.onDidChangeIsFlashing((processManagerId) => app.emit("ves-change-is-flashing", processManagerId));
         this.vesState.onDidChangeIsExportQueued((flag) => app.emit("ves-change-is-export-queued", flag));
-        this.vesState.onDidChangeConnectedFlashCart((config) => app.emit("ves-change-connected-flash-cart", config));
+        this.vesState.onDidChangeConnectedFlashCarts((config) => app.emit("ves-change-connected-flash-cart", config));
         this.vesState.onDidChangeBuildMode((buildMode) => app.emit("ves-change-build-mode", buildMode));
         this.vesState.onDidChangeBuildFolder((flags) => app.emit("ves-change-build-folder", flags));
         this.vesState.onDidChangeEmulator((name) => app.emit("ves-change-emulator", name));

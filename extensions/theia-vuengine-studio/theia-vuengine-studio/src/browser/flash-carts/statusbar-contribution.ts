@@ -16,8 +16,7 @@ export class VesFlashCartsStatusBarContribution implements FrontendApplicationCo
         this.setConnectedFlashCartStatusBar();
 
         this.vesState.onDidChangeIsFlashing(() => this.setConnectedFlashCartStatusBar());
-        this.vesState.onDidChangeFlashingProgress(() => this.setConnectedFlashCartStatusBar());
-        this.vesState.onDidChangeConnectedFlashCart(() => {
+        this.vesState.onDidChangeConnectedFlashCarts(() => {
             this.setConnectedFlashCartStatusBar();
         });
     }
@@ -26,24 +25,38 @@ export class VesFlashCartsStatusBarContribution implements FrontendApplicationCo
         let label = "";
         let className = "";
         if (this.vesState.isFlashing) {
-            label = `${this.vesState.flashingProgress.step}...`;
-            if (this.vesState.flashingProgress.progress >= 0) {
-                label += ` ${this.vesState.flashingProgress.progress}%`;
+            label = "Flashing...";
+            // TODO: move overall progress to state
+            let activeCarts = 0;
+            let activeCartsProgress = 0;
+            for (const connectedFlashCart of this.vesState.connectedFlashCarts) {
+                if (connectedFlashCart.status.progress > -1) {
+                    activeCarts++;
+                    activeCartsProgress += connectedFlashCart.status.progress;
+                }
+            }
+            if (activeCarts >= 0) {
+                const overallProgress = Math.floor(activeCartsProgress / activeCarts);
+                label += ` ${overallProgress}%`;
             }
             className = "active";
-        } else if (this.vesState.connectedFlashCart) {
-            label = this.vesState.connectedFlashCart.config.name;
+        } else if (this.vesState.connectedFlashCarts.length > 0) {
+            const connectedFlashCartsNames = [];
+            for (const connectedFlashCart of this.vesState.connectedFlashCarts) {
+                connectedFlashCartsNames.push(connectedFlashCart.config.name);
+            }
+            label = connectedFlashCartsNames.join(", ");
         } else {
-            label = "No Flash Cart";
+            label = "No Flash Carts";
             className = "disabled";
         }
-        this.statusBar.setElement("ves-flash-cart", {
+        this.statusBar.setElement("ves-flash-carts", {
             alignment: StatusBarAlignment.LEFT,
             command: VesOpenFlashCartsWidgetCommand.id,
             className: className,
             priority: 1,
             text: `$(usb) ${label}`,
-            tooltip: "Connected Flash Cart"
+            tooltip: "Connected Flash Carts"
         });
     }
 }

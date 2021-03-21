@@ -46,7 +46,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
         this.vesState.onDidChangeIsFlashing(() => this.update());
         this.vesState.onDidChangeIsRunQueued(() => this.update());
         this.vesState.onDidChangeIsRunning(() => this.update());
-        this.vesState.onDidChangeConnectedFlashCart(() => this.update());
+        this.vesState.onDidChangeConnectedFlashCarts(() => this.update());
         this.vesState.onDidChangeBuildFolder(() => this.update());
         this.vesState.onDidChangeOutputRomExists(() => this.update());
         this.keybindingRegistry.onKeybindingsChanged(() => this.update());
@@ -120,7 +120,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                 <button
                     className={"theia-button secondary flash" + (this.vesState.isFlashQueued || this.vesState.isFlashing ? " active" : "")}
                     title={this.vesState.isFlashQueued ? "Flash Queued..." : `${VesFlashCartsCommand.label}${this.getKeybindingLabel(VesFlashCartsCommand.id)}`}
-                    disabled={!this.vesState.connectedFlashCart}
+                    disabled={!this.vesState.connectedFlashCarts}
                     onClick={() => this.commandService.executeCommand(VesFlashCartsCommand.id)}
                 >
                     {this.vesState.isFlashQueued

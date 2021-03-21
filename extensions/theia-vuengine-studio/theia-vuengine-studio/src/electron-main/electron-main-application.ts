@@ -222,7 +222,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             redrawMenuSegmentedControl();
         });
         // @ts-ignore
-        app.on("ves-change-is-flashing", (isFlashing: number) => {
+        app.on("ves-change-is-flashing", (isFlashing: boolean) => {
             if (isFlashing) {
                 spinnerIconIntervall = setInterval(() => animateSpinner(buildMenuFlashButton, spinnerIcon), 130);
             } else {
