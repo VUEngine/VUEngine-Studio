@@ -26,6 +26,7 @@ export class VesFlashCartsWidget extends ReactWidget {
   protected async init(): Promise<void> {
     this.id = VesFlashCartsWidget.ID;
     this.title.iconClass = "fa fa-usb";
+    // this.title.iconClass = "ves-flash-carts-tab-icon";
     this.title.closable = true;
     this.setTitle();
     this.update();
