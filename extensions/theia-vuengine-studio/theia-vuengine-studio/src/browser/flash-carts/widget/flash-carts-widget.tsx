@@ -7,7 +7,7 @@ import { CommandService } from "@theia/core";
 import { VesFlashCartsCommand } from "../commands";
 import { VesProcessService } from "../../../common/process-service-protocol";
 import { VesFlashCartsPreference } from "../preferences";
-import { cancelFlash, ConnectedFlashCart } from "../commands/flash";
+import { abortFlash, ConnectedFlashCart } from "../commands/flash";
 
 @injectable()
 export class VesFlashCartsWidget extends ReactWidget {
@@ -17,6 +17,10 @@ export class VesFlashCartsWidget extends ReactWidget {
 
   static readonly ID = "vesFlashCartsWidget";
   static readonly LABEL = "Connected Flash Carts";
+
+  protected state = {
+    showLog: [] as boolean[],
+  }
 
   @postConstruct()
   protected async init(): Promise<void> {
@@ -80,13 +84,13 @@ export class VesFlashCartsWidget extends ReactWidget {
             </>
           }
           {this.vesState.isFlashing &&
-            <button className="theia-button secondary" onClick={() => cancelFlash(this.vesProcessService, this.vesState)}>
+            <button className="theia-button secondary" onClick={() => abortFlash(this.vesProcessService, this.vesState)}>
               Abort
             </button>
           }
         </div>
         <div>
-          {this.vesState.connectedFlashCarts.map((connectedFlashCart: ConnectedFlashCart) =>
+          {this.vesState.connectedFlashCarts.map((connectedFlashCart: ConnectedFlashCart, index: number) =>
             <div className="flashCart">
               <div className="flashCartTitle">{connectedFlashCart.config.name}</div>
               <div className="flashCartInfo">
@@ -121,9 +125,25 @@ export class VesFlashCartsWidget extends ReactWidget {
                 <div className="flashingPanel">
                   <i className="fa fa-fw fa-refresh fa-spin"></i> {connectedFlashCart.status.step}... {connectedFlashCart.status.progress}%
                 </div>}
+
+              <div className="flashLogWrapper">
+                <button className="theia-button secondary" onClick={() => this.toggleLog(index)}>
+                  {this.state.showLog[index] ? "Hide Log" : "Show Log"}
+                </button>
+                {this.state.showLog[index] &&
+                  <pre className="flashLog">
+                    {connectedFlashCart.status.log}
+                  </pre>
+                }
+              </div>
             </div>)}
         </div>
       </>
       : <div className="flashingActions"><em>No flash carts connected.</em></div>
+  }
+
+  protected toggleLog(index: number) {
+    this.state.showLog[index] = !this.state.showLog[index];
+    this.update();
   }
 }

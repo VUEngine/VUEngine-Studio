@@ -5,7 +5,6 @@ import { PreferenceService } from "@theia/core/lib/browser";
 import { CommandService, isWindows, MessageService } from "@theia/core/lib/common";
 import URI from "@theia/core/lib/common/uri";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
-import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
 import { VesBuildCommand } from "../../build/commands";
 import { VesBuildEnableWslPreference } from "../../build/preferences";
 import { convertoToEnvPath, getOs, getResourcesPath, getRomPath } from "../../common/functions";
@@ -38,6 +37,7 @@ export type FlashCartStatus = {
   processId: number
   progress: number
   step: string
+  log: string
 }
 
 export async function flashCommand(
@@ -45,7 +45,6 @@ export async function flashCommand(
   fileService: FileService,
   messageService: MessageService,
   preferenceService: PreferenceService,
-  terminalService: TerminalService,
   vesProcessService: VesProcessService,
   vesProcessWatcher: VesProcessWatcher,
   vesState: VesStateModel,
@@ -66,7 +65,6 @@ export async function flashCommand(
         fileService,
         messageService,
         preferenceService,
-        terminalService,
         vesProcessService,
         vesProcessWatcher,
         vesState,
@@ -82,7 +80,6 @@ export async function flashCommand(
       fileService,
       messageService,
       preferenceService,
-      terminalService,
       vesProcessService,
       vesProcessWatcher,
       vesState,
@@ -98,7 +95,6 @@ async function flash(
   fileService: FileService,
   messageService: MessageService,
   preferenceService: PreferenceService,
-  terminalService: TerminalService,
   vesProcessService: VesProcessService,
   vesProcessWatcher: VesProcessWatcher,
   vesState: VesStateModel
@@ -148,7 +144,7 @@ async function flash(
       });
     }
 
-    const { terminalProcessId, processManagerId } = await vesProcessService.launchProcess({
+    const { processManagerId } = await vesProcessService.launchProcess({
       command: "." + sep + basename(connectedFlashCart.config.path),
       args: flasherArgs,
       options: {
@@ -156,23 +152,10 @@ async function flash(
       },
     });
 
-    const terminalId = "flash" + Math.random();
-
-    const terminalWidget = terminalService.getById(terminalId) || await terminalService.newTerminal({
-      title: "Flash",
-      id: terminalId
-    });
-    await terminalWidget.start(terminalProcessId);
-    terminalWidget.clearOutput();
-    terminalService.open(terminalWidget);
-
     vesProcessWatcher.onExit(({ pId }) => {
       if (processManagerId === pId) {
-        connectedFlashCart.status = {
-          ...connectedFlashCart.status,
-          // TODO: differenciate between done and error
-          progress: -1,
-        };
+        // TODO: differenciate between done and error
+        connectedFlashCart.status.progress = -1;
 
         // trigger change event
         vesState.connectedFlashCarts = vesState.connectedFlashCarts;
@@ -198,19 +181,17 @@ async function flash(
   commandService.executeCommand(VesOpenFlashCartsWidgetCommand.id, true);
 }
 
-export function cancelFlash(vesProcessService: VesProcessService, vesState: VesStateModel) {
+export function abortFlash(vesProcessService: VesProcessService, vesState: VesStateModel) {
   for (const connectedFlashCart of vesState.connectedFlashCarts) {
     vesProcessService.killProcess(connectedFlashCart.status.processId)
-    connectedFlashCart.status = {
-      ...connectedFlashCart.status,
-      progress: -1,
-    };
+    connectedFlashCart.status.progress = -1;
   }
 
   // trigger change event
   vesState.connectedFlashCarts = vesState.connectedFlashCarts;
 
   vesState.isFlashing = false;
+  vesState.flashingProgress = -1;
 }
 
 async function padRom(fileService: FileService, vesState: VesStateModel, size: number): Promise<boolean> {
@@ -287,10 +268,18 @@ async function monitorFlashing(
       ...connectedFlashCart.status,
       step: "Flashing",
       progress: 0,
+      log: "",
     };
 
     // trigger change event
     vesState.connectedFlashCarts = vesState.connectedFlashCarts;
+
+    // log
+    vesProcessWatcher.onData(({ pId, data }) => {
+      if (connectedFlashCart.status.processId === pId) {
+        connectedFlashCart.status.log += data;
+      }
+    });
 
     switch (connectedFlashCart.config.name) {
       // FlashBoy (Plus)
@@ -312,15 +301,12 @@ async function monitorFlashingHyperFlash32(
 ) {
   vesProcessWatcher.onData(({ pId, data }) => {
     if (connectedFlashCart.status.processId === pId) {
-      if (data.startsWith("Transmitting:")) {
-        connectedFlashCart.status = {
-          ...connectedFlashCart.status,
-          step: "Transmitting",
-        };
+      if (data.includes("Transmitting:")) {
+        connectedFlashCart.status.step = "Transmitting";
 
         // trigger change event
         vesState.connectedFlashCarts = vesState.connectedFlashCarts;
-      } else if (data.startsWith("Flashing:")) {
+      } else if (data.includes("Flashing:")) {
         connectedFlashCart.status = {
           ...connectedFlashCart.status,
           step: "Flashing",
@@ -342,10 +328,7 @@ async function monitorFlashingFlashBoy(
   vesProcessWatcher: VesProcessWatcher,
   vesState: VesStateModel,
 ) {
-  connectedFlashCart.status = {
-    ...connectedFlashCart.status,
-    step: "Erasing",
-  };
+  connectedFlashCart.status.step = "Erasing";
 
   // trigger change event
   vesState.connectedFlashCarts = vesState.connectedFlashCarts;

@@ -1,6 +1,5 @@
 import { inject, injectable, interfaces } from "inversify";
 import { CommandContribution, CommandRegistry, CommandService, MessageService } from "@theia/core/lib/common";
-import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
 import { flashCommand } from "./commands/flash";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { VesStateModel } from "../common/vesStateModel";
@@ -19,7 +18,6 @@ export class VesFlashCartsCommandContribution implements CommandContribution {
     @inject(FileService) private readonly fileService: FileService,
     @inject(MessageService) private readonly messageService: MessageService,
     @inject(PreferenceService) private readonly preferenceService: PreferenceService,
-    @inject(TerminalService) private readonly terminalService: TerminalService,
     @inject(VesFlashCartsWidgetContribution) private readonly vesFlashCartsWidget: VesFlashCartsWidgetContribution,
     @inject(VesProcessService) private readonly vesProcessService: VesProcessService,
     @inject(VesProcessWatcher) private readonly vesProcessWatcher: VesProcessWatcher,
@@ -36,7 +34,6 @@ export class VesFlashCartsCommandContribution implements CommandContribution {
           this.fileService,
           this.messageService,
           this.preferenceService,
-          this.terminalService,
           this.vesProcessService,
           this.vesProcessWatcher,
           this.vesState,

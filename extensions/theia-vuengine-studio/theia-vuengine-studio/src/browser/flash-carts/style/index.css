@@ -80,3 +80,16 @@
 #vesFlashCartsWidget .progressBar div span {
   padding: 0 var(--theia-ui-padding);
 }
+
+#vesFlashCartsWidget .flashLogWrapper {
+  margin-bottom: calc(var(--theia-ui-padding) * 2);
+}
+
+#vesFlashCartsWidget .flashLog {
+  background: rgba(0, 0, 0, 0.2);
+  font-size: 80%;
+  margin-top: calc(var(--theia-ui-padding) * 2);
+  max-height: 300px;
+  overflow: auto;
+  padding: calc(var(--theia-ui-padding) * 2);
+}

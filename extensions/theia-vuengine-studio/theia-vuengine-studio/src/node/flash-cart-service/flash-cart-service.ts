@@ -66,6 +66,7 @@ export class VesFlashCartServiceImpl implements VesFlashCartService {
                                 processId: 0,
                                 step: "",
                                 progress: -1,
+                                log: "",
                             },
                         })
                     }
