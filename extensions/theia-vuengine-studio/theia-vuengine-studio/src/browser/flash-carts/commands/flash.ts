@@ -311,8 +311,28 @@ async function monitorFlashingHyperFlash32(
   vesState: VesStateModel,
 ) {
   vesProcessWatcher.onData(({ pId, data }) => {
-    if (connectedFlashCart.status.processId === pId && data.includes("")) {
-      // TODO
+    if (connectedFlashCart.status.processId === pId) {
+      if (data.startsWith("Transmitting:")) {
+        connectedFlashCart.status = {
+          ...connectedFlashCart.status,
+          step: "Transmitting",
+        };
+
+        // trigger change event
+        vesState.connectedFlashCarts = vesState.connectedFlashCarts;
+      } else if (data.startsWith("Flashing:")) {
+        connectedFlashCart.status = {
+          ...connectedFlashCart.status,
+          step: "Flashing",
+          /* Number of # is only fixed (to 20) on HF32 firmware version 1.9 and above 
+             on lower firmwares, the number of # depends on file size
+             TODO: support older firmwares as well? Can the firmware be detected? */
+          progress: data.split("Flashing: ")[1].length * 5,
+        };
+
+        // trigger change event
+        vesState.connectedFlashCarts = vesState.connectedFlashCarts;
+      }
     }
   });
 }

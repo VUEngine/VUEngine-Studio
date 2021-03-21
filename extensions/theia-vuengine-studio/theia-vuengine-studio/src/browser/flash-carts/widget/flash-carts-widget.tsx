@@ -32,6 +32,7 @@ export class VesFlashCartsWidget extends ReactWidget {
     });
     this.vesState.onDidChangeIsFlashing(() => this.update());
     this.vesState.onDidChangeIsFlashQueued(() => this.update());
+    this.vesState.onDidChangeFlashingProgress(() => this.update());
   }
 
   protected setTitle() {
@@ -41,56 +42,47 @@ export class VesFlashCartsWidget extends ReactWidget {
   }
 
   protected render(): React.ReactNode {
-    // TODO: move overall progress to state
-    let activeCarts = 0;
-    let activeCartsProgress = 0;
-    let overallProgress = -1;
-    for (const connectedFlashCart of this.vesState.connectedFlashCarts) {
-      if (connectedFlashCart.status.progress > -1) {
-        activeCarts++;
-        activeCartsProgress += connectedFlashCart.status.progress;
-      }
-    }
-    if (activeCarts >= 0) {
-      overallProgress = Math.floor(activeCartsProgress / activeCarts);
-    }
-
     return this.vesState.connectedFlashCarts.length > 0
       ?
       <>
         <div className="flashingActions">
-          {!this.vesState.isFlashQueued && !this.vesState.isFlashing &&
-            <>
-              <button className="theia-button flash" onClick={() => this.commandService.executeCommand(VesFlashCartsCommand.id)}>
-                <i className="fa fa-usb"></i> Flash
-          </button>
-            </>
-          }
           {this.vesState.isFlashQueued &&
             <>
-              <div>
-                <i className="fa fa-fw fa-hourglass-half"></i> <em>Flashing is queued and will start once the build is ready</em>
+              <div className="flashCartInfo">
+                <div>
+                  <i className="fa fa-fw fa-hourglass-half"></i> <em>Flashing is queued and will start once the build is ready</em>
+                </div>
               </div>
               <button className="theia-button secondary" onClick={() => this.commandService.executeCommand(VesFlashCartsCommand.id)}>
                 Cancel
             </button>
             </>
           }
-          {this.vesState.isFlashing &&
-            <>
-              {overallProgress > -1 &&
-                <div className="flashingPanel">
-                  <div className="progressBar">
-                    <div style={{ width: overallProgress + "%" }}>
-                      <span>{overallProgress + "%"}</span>
-                    </div>
-                  </div>
+          {!this.vesState.isFlashQueued && this.vesState.flashingProgress > -1 &&
+            <div className="flashingPanel">
+              <div className="progressBar">
+                <div style={{ width: this.vesState.flashingProgress + "%" }}>
+                  <span>
+                    {this.vesState.flashingProgress === 100
+                      ? <><i className="fa fa-check"></i> Done</>
+                      : <>{this.vesState.flashingProgress}%</>
+                    }
+                  </span>
                 </div>
-              }
-              <button className="theia-button secondary" onClick={() => cancelFlash(this.vesProcessService, this.vesState)}>
-                Abort
-            </button>
+              </div>
+            </div>
+          }
+          {!this.vesState.isFlashQueued && !this.vesState.isFlashing &&
+            <>
+              <button className="theia-button flash" onClick={() => this.commandService.executeCommand(VesFlashCartsCommand.id)}>
+                <i className="fa fa-usb"></i> Flash
+              </button>
             </>
+          }
+          {this.vesState.isFlashing &&
+            <button className="theia-button secondary" onClick={() => cancelFlash(this.vesProcessService, this.vesState)}>
+              Abort
+            </button>
           }
         </div>
         <div>

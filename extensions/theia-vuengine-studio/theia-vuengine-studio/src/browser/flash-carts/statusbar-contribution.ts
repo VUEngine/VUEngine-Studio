@@ -25,20 +25,7 @@ export class VesFlashCartsStatusBarContribution implements FrontendApplicationCo
         let label = "";
         let className = "";
         if (this.vesState.isFlashing) {
-            label = "Flashing...";
-            // TODO: move overall progress to state
-            let activeCarts = 0;
-            let activeCartsProgress = 0;
-            for (const connectedFlashCart of this.vesState.connectedFlashCarts) {
-                if (connectedFlashCart.status.progress > -1) {
-                    activeCarts++;
-                    activeCartsProgress += connectedFlashCart.status.progress;
-                }
-            }
-            if (activeCarts >= 0) {
-                const overallProgress = Math.floor(activeCartsProgress / activeCarts);
-                label += ` ${overallProgress}%`;
-            }
+            label = `Flashing... ${this.vesState.flashingProgress}%`;
             className = "active";
         } else if (this.vesState.connectedFlashCarts.length > 0) {
             const connectedFlashCartsNames = [];

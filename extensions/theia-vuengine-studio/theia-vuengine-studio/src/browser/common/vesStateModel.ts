@@ -87,6 +87,24 @@ export class VesStateModel {
         // watch for flash cart attach/detach
         this.vesFlashCartWatcher.onAttach(async () => this.detectConnectedFlashCarts());
         this.vesFlashCartWatcher.onDetach(async () => this.detectConnectedFlashCarts());
+
+        // compute overall flashing progress
+        this.onDidChangeConnectedFlashCarts(() => {
+            let activeCarts = 0;
+            let activeCartsProgress = 0;
+            for (const connectedFlashCart of this.connectedFlashCarts) {
+                if (connectedFlashCart.status.progress > -1) {
+                    activeCarts++;
+                    activeCartsProgress += connectedFlashCart.status.progress;
+                }
+            }
+            if (activeCarts > 0) {
+                const overallProgress = Math.floor(activeCartsProgress / activeCarts);
+                if (this.flashingProgress !== overallProgress) {
+                    this.flashingProgress = overallProgress;
+                }
+            }
+        })
     }
 
     protected detectConnectedFlashCarts = async () => {
@@ -224,5 +242,17 @@ export class VesStateModel {
     }
     get isFlashing(): boolean {
         return this._isFlashing;
+    }
+
+    // flashing progress
+    protected _flashingProgress: number = -1;
+    protected readonly onDidChangeFlashingProgressEmitter = new Emitter<number>();
+    readonly onDidChangeFlashingProgress = this.onDidChangeFlashingProgressEmitter.event;
+    set flashingProgress(progress: number) {
+        this._flashingProgress = progress;
+        this.onDidChangeFlashingProgressEmitter.fire(this._flashingProgress);
+    }
+    get flashingProgress(): number {
+        return this._flashingProgress;
     }
 }
