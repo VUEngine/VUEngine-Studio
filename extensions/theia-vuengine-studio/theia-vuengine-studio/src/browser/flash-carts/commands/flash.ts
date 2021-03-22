@@ -299,10 +299,18 @@ async function monitorFlashingHyperFlash32(
   vesProcessWatcher: VesProcessWatcher,
   vesState: VesStateModel,
 ) {
+  /* Number of # is only fixed (to 20) on HF32 firmware version 1.9 and above. 
+     On lower firmwares, the number of # depends on file size.
+     TODO: support older firmwares as well? Can the firmware be detected? */
+
   vesProcessWatcher.onData(({ pId, data }) => {
     if (connectedFlashCart.status.processId === pId) {
       if (data.includes("Transmitting:")) {
-        connectedFlashCart.status.step = "Transmitting";
+        connectedFlashCart.status = {
+          ...connectedFlashCart.status,
+          step: "Transmitting",
+          progress: Math.floor(data.split("Transmitting: ")[1].length * 2.5),
+        };
 
         // trigger change event
         vesState.connectedFlashCarts = vesState.connectedFlashCarts;
@@ -310,10 +318,7 @@ async function monitorFlashingHyperFlash32(
         connectedFlashCart.status = {
           ...connectedFlashCart.status,
           step: "Flashing",
-          /* Number of # is only fixed (to 20) on HF32 firmware version 1.9 and above 
-             on lower firmwares, the number of # depends on file size
-             TODO: support older firmwares as well? Can the firmware be detected? */
-          progress: data.split("Flashing: ")[1].length * 5,
+          progress: 50 + Math.floor(data.split("Flashing: ")[1].length * 2.5),
         };
 
         // trigger change event
