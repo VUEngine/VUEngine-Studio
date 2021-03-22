@@ -13,6 +13,8 @@ import { VesProcessService } from "../../../common/process-service-protocol";
 import { VesFlashCartsPreference } from "../preferences";
 import { VesProcessWatcher } from "../../services/process-service/process-watcher";
 import { VesOpenFlashCartsWidgetCommand } from "../commands";
+import { IMAGE_HYPERFLASH32 } from "../images/hyperflash32";
+import { IMAGE_FLASHBOY_PLUS } from "../images/flashboy-plus";
 
 export type FlashCartConfig = {
   name: string
@@ -132,7 +134,6 @@ async function flash(
     const flasherArgs = connectedFlashCart.config.args
       ? connectedFlashCart.config.args
         .replace("%ROM%", romPath)
-        .replace("%PORT%", `...`) // TODO
         .split(" ")
       : [];
 
@@ -255,6 +256,9 @@ export function getFlashCartConfigs(preferenceService: PreferenceService): Flash
           "prog-vb",
           isWindows ? "prog-vb.exe" : "prog-vb"
         )),
+      image: flashCartConfig.image
+        .replace("%FBP_IMG%", IMAGE_FLASHBOY_PLUS)
+        .replace("%HF32_IMG%", IMAGE_HYPERFLASH32),
     };
   });
 }

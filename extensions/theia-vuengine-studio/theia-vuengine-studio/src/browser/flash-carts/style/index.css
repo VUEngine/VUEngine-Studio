@@ -9,6 +9,10 @@
   min-width: 250px;
 }
 
+#vesFlashCartsWidget .noFlashCarts {
+  padding: 10px 19px;
+}
+
 #vesFlashCartsWidget .flashingActions {
   border-bottom: 1px solid var(--theia-activityBar-background);
   padding: 19px;

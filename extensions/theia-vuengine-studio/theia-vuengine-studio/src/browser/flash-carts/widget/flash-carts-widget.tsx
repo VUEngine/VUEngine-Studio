@@ -140,7 +140,7 @@ export class VesFlashCartsWidget extends ReactWidget {
             </div>)}
         </div>
       </>
-      : <div className="flashingActions"><em>No flash carts connected.</em></div>
+      : <div className="noFlashCarts">No flash carts connected.</div>
   }
 
   protected toggleLog(index: number) {
