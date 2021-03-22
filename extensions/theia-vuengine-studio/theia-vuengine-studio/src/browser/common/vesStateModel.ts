@@ -14,6 +14,7 @@ import { EmulatorConfig } from "../run/types";
 import { VesFlashCartWatcher } from "../services/flash-cart-service/flash-cart-watcher";
 import { BuildMode } from "../build/types";
 import { VesFlashCartService } from "../../common/flash-cart-service-protocol";
+import { VesFlashCartsPreference } from "../flash-carts/preferences";
 
 type BuildFolderFlags = {
     [key: string]: boolean
@@ -80,6 +81,9 @@ export class VesStateModel {
                     break;
                 case VesRunDefaultEmulatorPreference.id:
                     this.onDidChangeEmulatorEmitter.fire(getDefaultEmulatorConfig(this.preferenceService).name);
+                    break;
+                case VesFlashCartsPreference.id:
+                    this.detectConnectedFlashCarts();
                     break;
             }
         });
