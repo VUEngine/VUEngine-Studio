@@ -54,7 +54,7 @@ export async function flashCommand(
   if (vesState.isFlashQueued) {
     vesState.isFlashQueued = false;
     return;
-  } else if (vesState.isFlashing) {
+  } else if (vesState.isFlashing || vesState.connectedFlashCarts.length === 0) {
     commandService.executeCommand(VesOpenFlashCartsWidgetCommand.id);
     return;
   }
@@ -74,9 +74,7 @@ export async function flashCommand(
     }
   })
 
-  if (!vesState.connectedFlashCarts) {
-    messageService.error(`No connected flash cart could be found.`);
-  } else if (vesState.outputRomExists) {
+  if (vesState.outputRomExists) {
     flash(
       commandService,
       fileService,

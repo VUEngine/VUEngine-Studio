@@ -1,9 +1,23 @@
-import { injectable, interfaces, postConstruct } from 'inversify';
-import { AbstractViewContribution, bindViewContribution, FrontendApplicationContribution, WidgetFactory } from '@theia/core/lib/browser';
+import { inject, injectable, interfaces } from 'inversify';
+import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
+import { AbstractViewContribution, bindViewContribution, FrontendApplication, FrontendApplicationContribution, WidgetFactory } from '@theia/core/lib/browser';
 import { VesFlashCartsWidget } from './flash-carts-widget';
+import { VesDetectConnectedFlashCartsCommand } from "../commands";
+import { Command, CommandRegistry } from '@theia/core';
+import { detectConnectedFlashCarts } from '../commands/detectConnectedFlashCarts';
+import { VesStateModel } from '../../common/vesStateModel';
+
+export namespace VesFlashCartsWidgetContributionCommands {
+    export const REFRESH: Command = {
+        id: `${VesFlashCartsWidget.ID}.refresh`,
+        label: VesDetectConnectedFlashCartsCommand.label,
+        iconClass: "refresh",
+    };
+}
 
 @injectable()
-export class VesFlashCartsWidgetContribution extends AbstractViewContribution<VesFlashCartsWidget> {
+export class VesFlashCartsWidgetContribution extends AbstractViewContribution<VesFlashCartsWidget> implements TabBarToolbarContribution {
+    @inject(VesStateModel) private readonly vesState: VesStateModel;
 
     constructor() {
         super({
@@ -16,9 +30,27 @@ export class VesFlashCartsWidgetContribution extends AbstractViewContribution<Ve
         });
     }
 
-    @postConstruct()
-    protected async init(): Promise<void> {
-        this.openView({ activate: true });
+    async initializeLayout(app: FrontendApplication): Promise<void> {
+        await this.openView();
+    }
+
+    registerCommands(commandRegistry: CommandRegistry): void {
+        commandRegistry.registerCommand(VesFlashCartsWidgetContributionCommands.REFRESH, {
+            isEnabled: widget => widget.id === VesFlashCartsWidget.ID,
+            isVisible: widget => widget.id === VesFlashCartsWidget.ID,
+            execute: () => detectConnectedFlashCarts(
+                this.vesState,
+            )
+        });
+    }
+
+    registerToolbarItems(toolbar: TabBarToolbarRegistry): void {
+        toolbar.registerItem({
+            id: VesFlashCartsWidgetContributionCommands.REFRESH.id,
+            command: VesFlashCartsWidgetContributionCommands.REFRESH.id,
+            tooltip: VesFlashCartsWidgetContributionCommands.REFRESH.label,
+            priority: 0,
+        });
     }
 }
 
@@ -27,6 +59,7 @@ export function bindVesFlashCartsView(bind: interfaces.Bind): void {
     bind(FrontendApplicationContribution).toService(
         VesFlashCartsWidgetContribution
     );
+    bind(TabBarToolbarContribution).toService(VesFlashCartsWidgetContribution);
     bind(VesFlashCartsWidget).toSelf();
     bind(WidgetFactory)
         .toDynamicValue((ctx) => ({

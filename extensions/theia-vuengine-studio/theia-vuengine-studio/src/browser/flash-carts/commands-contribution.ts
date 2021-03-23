@@ -4,12 +4,13 @@ import { flashCommand } from "./commands/flash";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { VesStateModel } from "../common/vesStateModel";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
-import { VesFlashCartsCommand, VesOpenFlashCartsWidgetCommand } from "./commands";
+import { VesDetectConnectedFlashCartsCommand, VesFlashCartsCommand, VesOpenFlashCartsWidgetCommand } from "./commands";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
 import { VesProcessService } from "../../common/process-service-protocol";
 import { VesProcessWatcher } from "../services/process-service/process-watcher";
 import { showFlashCartsWidgetCommand } from "./commands/showFlashCartsWidget";
 import { VesFlashCartsWidgetContribution } from "./widget/flash-carts-view";
+import { detectConnectedFlashCarts } from "./commands/detectConnectedFlashCarts";
 
 @injectable()
 export class VesFlashCartsCommandContribution implements CommandContribution {
@@ -46,6 +47,13 @@ export class VesFlashCartsCommandContribution implements CommandContribution {
           forceOpen,
           this.vesFlashCartsWidget,
         ),
+    });
+
+    commandRegistry.registerCommand(VesDetectConnectedFlashCartsCommand, {
+      execute: () =>
+        detectConnectedFlashCarts(
+          this.vesState,
+        )
     });
   }
 }

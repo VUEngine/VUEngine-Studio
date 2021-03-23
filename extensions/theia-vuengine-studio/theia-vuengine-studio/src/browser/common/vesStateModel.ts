@@ -111,7 +111,7 @@ export class VesStateModel {
         })
     }
 
-    protected detectConnectedFlashCarts = async () => {
+    detectConnectedFlashCarts = async () => {
         const flashCartConfigs: FlashCartConfig[] = getFlashCartConfigs(this.preferenceService);
         this.connectedFlashCarts = await this.vesFlashCartService.detectFlashCarts(...flashCartConfigs);
     }

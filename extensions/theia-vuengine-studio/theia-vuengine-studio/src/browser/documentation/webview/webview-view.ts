@@ -1,5 +1,5 @@
-import { injectable, interfaces, postConstruct } from 'inversify';
-import { AbstractViewContribution, bindViewContribution, FrontendApplicationContribution, WidgetFactory } from '@theia/core/lib/browser';
+import { injectable, interfaces } from 'inversify';
+import { AbstractViewContribution, bindViewContribution, FrontendApplication, FrontendApplicationContribution, WidgetFactory } from '@theia/core/lib/browser';
 import { VesWebViewWidget } from './webview-widget';
 
 @injectable()
@@ -13,9 +13,8 @@ export class VesWebViewContribution extends AbstractViewContribution<VesWebViewW
         });
     }
 
-    @postConstruct()
-    protected async init(): Promise<void> {
-        //this.openView({ activate: true, reveal: true });
+    async initializeLayout(app: FrontendApplication): Promise<void> {
+        await this.openView();
     }
 }
 
