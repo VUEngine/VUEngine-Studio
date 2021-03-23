@@ -1,6 +1,7 @@
 import { injectable, interfaces } from 'inversify';
-import { AbstractViewContribution, bindViewContribution, FrontendApplicationContribution, WidgetFactory } from '@theia/core/lib/browser';
-import { VesEmulatorWidget } from './emulator-widget';
+import { AbstractViewContribution, bindViewContribution, FrontendApplicationContribution, OpenHandler, WidgetFactory } from '@theia/core/lib/browser';
+import { VesEmulatorWidget, VesEmulatorWidgetOptions } from './emulator-widget';
+import { VesEmulatorOpenHandler } from './emulator-open-handler';
 
 @injectable()
 export class VesEmulatorContribution extends AbstractViewContribution<VesEmulatorWidget> {
@@ -19,14 +20,18 @@ export function bindVesEmulatorView(bind: interfaces.Bind): void {
     bind(FrontendApplicationContribution).toService(
         VesEmulatorContribution
     );
+    bind(OpenHandler).to(VesEmulatorOpenHandler).inSingletonScope();
     bind(VesEmulatorWidget).toSelf();
     bind(WidgetFactory)
-        .toDynamicValue((ctx) => ({
+        .toDynamicValue(({ container }) => ({
             id: VesEmulatorWidget.ID,
-            createWidget: () =>
-                ctx.container.get<VesEmulatorWidget>(
-                    VesEmulatorWidget
-                ),
+            createWidget: (options: VesEmulatorWidgetOptions) => {
+                const child = container.createChild();
+                child.bind(VesEmulatorWidgetOptions).toConstantValue(options);
+                child.bind(VesEmulatorWidget).toSelf();
+                return child.get(VesEmulatorWidget);
+            }
+
         }))
         .inSingletonScope();
 }

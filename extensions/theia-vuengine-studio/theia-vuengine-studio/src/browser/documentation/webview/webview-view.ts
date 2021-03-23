@@ -14,7 +14,7 @@ export class VesWebViewContribution extends AbstractViewContribution<VesWebViewW
     }
 
     async initializeLayout(app: FrontendApplication): Promise<void> {
-        await this.openView();
+        //await this.openView();
     }
 }
 

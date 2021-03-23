@@ -1,16 +1,21 @@
 import * as React from "react";
-import { join as joinPath } from "path";
+import { basename, join as joinPath } from "path";
 import { inject, injectable, postConstruct } from "inversify";
 import { ReactWidget } from "@theia/core/lib/browser/widgets/react-widget";
 import { PreferenceScope, PreferenceService } from "@theia/core/lib/browser";
 import { EmulationMode, EmulatorScale, StereoMode } from "../types";
-import { getResourcesPath, getWorkspaceRoot } from "../../common/functions";
+import { getResourcesPath, getRomPath } from "../../common/functions";
 import { VesStateModel } from "../../common/vesStateModel";
 import { VesRunEmulatorEmulationModePreference, VesRunEmulatorScalePreference, VesRunEmulatorStereoModePreference } from "../preferences";
 
 const datauri = require("datauri");
 
 // TODO: create overlay(s?) to view/remap button assigments for both emulator commands and controller input
+
+export const VesEmulatorWidgetOptions = Symbol('VesEmulatorWidgetOptions');
+export interface VesEmulatorWidgetOptions {
+  uri: string
+}
 
 export type vesEmulatorWidgetState = {
   status: string;
@@ -21,6 +26,7 @@ export type vesEmulatorWidgetState = {
 @injectable()
 export class VesEmulatorWidget extends ReactWidget {
   @inject(PreferenceService) protected readonly preferenceService: PreferenceService;
+  @inject(VesEmulatorWidgetOptions) protected readonly options: VesEmulatorWidgetOptions;
   @inject(VesStateModel) private readonly vesState: VesStateModel;
 
   static readonly ID = "vesEmulatorWidget";
@@ -40,16 +46,23 @@ export class VesEmulatorWidget extends ReactWidget {
 
   @postConstruct()
   protected async init(): Promise<void> {
+    const label = this.options
+      ? basename(this.options.uri)
+      : VesEmulatorWidget.LABEL;
+
     this.id = VesEmulatorWidget.ID;
-    this.title.label = VesEmulatorWidget.LABEL;
-    this.title.caption = VesEmulatorWidget.LABEL;
+    this.title.label = label;
+    this.title.caption = label;
     this.title.iconClass = "fa fa-play";
     this.title.closable = true;
     this.update();
   }
 
   protected startEmulator(self: any) {
-    const romPath = joinPath(getWorkspaceRoot(), "build", "output.vb");
+    const romPath = this.options
+      ? this.options.uri
+      : getRomPath();
+
     datauri(romPath, (err: any) => {
       if (err) throw err;
     }).then((content: string) => {
