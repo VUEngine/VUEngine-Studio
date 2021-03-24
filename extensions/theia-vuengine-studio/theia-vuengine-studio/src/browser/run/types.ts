@@ -10,7 +10,6 @@ export const DEFAULT_EMULATOR: EmulatorConfig = {
   args: "",
 };
 
-/* Note: Mednafen's red/green anaglyph option does not exist in Beetle VB */
 export enum StereoMode {
   "2d-black-red" = "2D (Red/Black)",
   "2d-black-white" = "2D (White/Black)",
@@ -23,7 +22,7 @@ export enum StereoMode {
   "anaglyph-red-blue" = "Anaglyph (Red/Blue)",
   "anaglyph-red-cyan" = "Anaglyph (Red/Cyan)",
   "anaglyph-red-electric-cyan" = "Anaglyph (Red/El.Cyan)",
-  "anaglyph-green-magenta" = "Anaglyph (Green/Magenta)",
+  "anaglyph-green-magenta" = "Anaglyph (Red/Green)",
   "anaglyph-yellow-blue" = "Anaglyph (Yellow/Blue)",
   "side-by-side" = "Side By Side",
   "cyberscope" = "CyberScope",
