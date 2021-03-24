@@ -6,7 +6,7 @@ import { CommandService, isOSX } from "@theia/core";
 import { VesStateModel } from "../../browser/common/vesStateModel";
 import { VesBuildDumpElfPreference, VesBuildEnableWslPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "../../browser/build/preferences";
 import { VesRunDefaultEmulatorPreference } from "../../browser/run/preferences";
-import { getDefaultEmulatorConfig, getEmulatorConfigs } from "../../browser/run/commands/run";
+import { getDefaultEmulatorConfig, getEmulatorConfigs } from "../../browser/run/commands/runInEmulator";
 import { BuildMode } from "../../browser/build/types";
 
 @injectable()
@@ -64,7 +64,6 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
 
         this.vesState.onDidChangeIsBuilding((processManagerId) => app.emit("ves-change-is-building", processManagerId));
         this.vesState.onDidChangeIsRunQueued((flag) => app.emit("ves-change-is-run-queued", flag));
-        this.vesState.onDidChangeIsRunning((processManagerId) => app.emit("ves-change-is-running", processManagerId));
         this.vesState.onDidChangeIsFlashQueued((flag) => app.emit("ves-change-is-flash-queued", flag));
         this.vesState.onDidChangeIsFlashing((flag) => app.emit("ves-change-is-flashing", flag));
         this.vesState.onDidChangeIsExportQueued((flag) => app.emit("ves-change-is-export-queued", flag));

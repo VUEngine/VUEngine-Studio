@@ -9,7 +9,7 @@ import { ConnectedFlashCart, FlashCartConfig, getFlashCartConfigs } from "../fla
 import { getBuildPath, getRomPath } from "./functions";
 import { VesBuildModePreference } from "../build/preferences";
 import { VesRunDefaultEmulatorPreference, VesRunEmulatorConfigsPreference } from "../run/preferences";
-import { getDefaultEmulatorConfig, getEmulatorConfigs } from "../run/commands/run";
+import { getDefaultEmulatorConfig, getEmulatorConfigs } from "../run/commands/runInEmulator";
 import { EmulatorConfig } from "../run/types";
 import { VesFlashCartWatcher } from "../services/flash-cart-service/flash-cart-watcher";
 import { BuildMode } from "../build/types";
@@ -198,18 +198,6 @@ export class VesStateModel {
     }
     get isRunQueued(): boolean {
         return this._isRunQueued;
-    }
-
-    // is running
-    protected _isRunning: number = 0;
-    protected readonly onDidChangeIsRunningEmitter = new Emitter<number>();
-    readonly onDidChangeIsRunning = this.onDidChangeIsRunningEmitter.event;
-    set isRunning(processManagerId: number) {
-        this._isRunning = processManagerId;
-        this.onDidChangeIsRunningEmitter.fire(this._isRunning);
-    }
-    get isRunning(): number {
-        return this._isRunning;
     }
 
     // connected flash carts

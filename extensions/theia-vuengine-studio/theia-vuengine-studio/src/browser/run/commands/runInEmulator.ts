@@ -1,5 +1,5 @@
 import { basename, dirname, sep } from "path";
-import { PreferenceService } from "@theia/core/lib/browser";
+import { OpenerService, PreferenceService } from "@theia/core/lib/browser";
 import { CommandService, isWindows } from "@theia/core/lib/common";
 import { VesBuildCommand } from "../../build/commands";
 import { getRomPath } from "../../common/functions";
@@ -7,51 +7,43 @@ import { VesStateModel } from "../../common/vesStateModel";
 import { VesRunDefaultEmulatorPreference, VesRunEmulatorConfigsPreference } from "../preferences";
 import { DEFAULT_EMULATOR, EmulatorConfig } from "../types";
 import { VesProcessService } from "../../../common/process-service-protocol";
-import { VesProcessWatcher } from "../../services/process-service/process-watcher";
-import { VesEmulatorContribution } from "../widget/emulator-view";
+import URI from "@theia/core/lib/common/uri";
 
-export async function runCommand(
+export async function runInEmulatorCommand(
   commandService: CommandService,
+  openerService: OpenerService,
   preferenceService: PreferenceService,
-  vesEmulator: VesEmulatorContribution,
   vesProcessService: VesProcessService,
-  vesProcessWatcher: VesProcessWatcher,
   vesState: VesStateModel,
 ) {
   if (vesState.isRunQueued) {
     vesState.isRunQueued = false;
-    return;
-  } else if (vesState.isRunning) {
-    run(preferenceService, vesEmulator, vesProcessService, vesProcessWatcher, vesState);
-    return;
-  }
-
-  vesState.onDidChangeOutputRomExists(outputRomExists => {
-    if (outputRomExists && vesState.isRunQueued) {
-      vesState.isRunQueued = false;
-      run(preferenceService, vesEmulator, vesProcessService, vesProcessWatcher, vesState);
-    }
-  })
-
-  if (vesState.outputRomExists) {
-    run(preferenceService, vesEmulator, vesProcessService, vesProcessWatcher, vesState);
+  } else if (vesState.outputRomExists) {
+    run(openerService, preferenceService, vesProcessService);
   } else {
-    commandService.executeCommand(VesBuildCommand.id);
+    vesState.onDidChangeOutputRomExists(outputRomExists => {
+      if (outputRomExists && vesState.isRunQueued) {
+        vesState.isRunQueued = false;
+        run(openerService, preferenceService, vesProcessService);
+      }
+    })
     vesState.isRunQueued = true;
+    commandService.executeCommand(VesBuildCommand.id);
   }
 }
 
 async function run(
+  openerService: OpenerService,
   preferenceService: PreferenceService,
-  vesEmulator: VesEmulatorContribution,
   vesProcessService: VesProcessService,
-  vesProcessWatcher: VesProcessWatcher,
-  vesState: VesStateModel,
 ) {
   const defaultEmulatorConfig = getDefaultEmulatorConfig(preferenceService);
 
   if (defaultEmulatorConfig === DEFAULT_EMULATOR) {
-    vesEmulator.openView({ activate: true, reveal: true });
+    const romUri = new URI(getRomPath());
+    const opener = await openerService.getOpener(romUri);
+    await opener.open(romUri);
+    console.log(opener);
   } else {
     const emulatorPath = defaultEmulatorConfig.path;
     const emulatorArgs = defaultEmulatorConfig.args.replace("%ROM%", getRomPath()).split(" ");
@@ -63,21 +55,13 @@ async function run(
       });
     }
 
-    const { processManagerId } = await vesProcessService.launchProcess({
+    await vesProcessService.launchProcess({
       command: "." + sep + basename(emulatorPath),
       args: emulatorArgs,
       options: {
         cwd: dirname(emulatorPath),
       },
     });
-
-    vesProcessWatcher.onExit(({ pId }) => {
-      if (processManagerId === pId) {
-        vesState.isRunning = 0;
-      }
-    });
-
-    vesState.isRunning = processManagerId;
   }
 }
 

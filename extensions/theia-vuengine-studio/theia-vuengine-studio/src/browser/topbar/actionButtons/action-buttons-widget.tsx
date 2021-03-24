@@ -45,7 +45,6 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
         this.vesState.onDidChangeIsFlashQueued(() => this.update());
         this.vesState.onDidChangeIsFlashing(() => this.update());
         this.vesState.onDidChangeIsRunQueued(() => this.update());
-        this.vesState.onDidChangeIsRunning(() => this.update());
         this.vesState.onDidChangeConnectedFlashCarts(() => this.update());
         this.vesState.onDidChangeBuildFolder(() => this.update());
         this.vesState.onDidChangeOutputRomExists(() => this.update());
@@ -106,15 +105,13 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                         : <i className="fa fa-wrench"></i>}
                 </button>
                 <button
-                    className={"theia-button secondary run" + (this.vesState.isRunQueued || this.vesState.isRunning ? " active" : "")}
-                    title={this.vesState.isRunQueued ? "Run Queued..." : this.vesState.isBuilding ? "Running..." : `${VesRunCommand.label}${this.getKeybindingLabel(VesRunCommand.id)}`}
+                    className={"theia-button secondary run" + (this.vesState.isRunQueued ? " active" : "")}
+                    title={this.vesState.isRunQueued ? "Run Queued..." : `${VesRunCommand.label}${this.getKeybindingLabel(VesRunCommand.id)}`}
                     onClick={() => this.commandService.executeCommand(VesRunCommand.id)}
                 >
                     {this.vesState.isRunQueued
                         ? <i className="fa fa-hourglass-half"></i>
-                        : this.vesState.isRunning
-                            ? <i className="fa fa-refresh fa-spin"></i>
-                            : <i className="fa fa-play"></i>}
+                        : <i className="fa fa-play"></i>}
 
                 </button>
                 <button

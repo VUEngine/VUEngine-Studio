@@ -1,12 +1,11 @@
 import { injectable } from "inversify";
-import { app, BrowserWindow, nativeImage, ScrubberItem, TouchBar } from "electron";
+import { app, BrowserWindow, nativeImage, TouchBar } from "electron";
 import { ElectronMainApplication, TheiaBrowserWindowOptions } from "@theia/core/lib/electron-main/electron-main-application";
 import { isOSX, MaybePromise } from "@theia/core";
 import { VesRunCommand } from "../browser/run/commands";
 import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand } from "../browser/build/commands";
 import { VesFlashCartsCommand } from "../browser/flash-carts/commands";
 import { BuildMode } from "../browser/build/types";
-import { EmulatorConfig } from "../browser/run/types";
 
 @injectable()
 export class VesElectronMainApplication extends ElectronMainApplication {
@@ -30,7 +29,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
     }
 
     protected registerVesTouchBar(electronWindow: BrowserWindow) {
-        const { TouchBarButton, TouchBarLabel, TouchBarPopover, TouchBarScrubber, TouchBarSegmentedControl } = TouchBar;
+        const { TouchBarButton, TouchBarLabel, TouchBarPopover, TouchBarSegmentedControl } = TouchBar;
 
         const vesIcon = nativeImage.createFromDataURL("data:image/png;base64,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").resize({
             height: 16,
@@ -51,6 +50,9 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             height: 18,
         });
         const exportIcon = nativeImage.createFromDataURL("data:image/png;base64,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").resize({
+            height: 16,
+        });
+        const menuIcon = nativeImage.createFromDataURL("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHAAAACACAYAAADTcu1SAAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw1AUhU9TpSIVBysUcchQnSyIijhqFYpQIdQKrTqYvPQPmjQkKS6OgmvBwZ/FqoOLs64OroIg+APi5uak6CIl3pcUWsT44PE+znvncN+9gNCoMM3qGgc03TbTyYSYza2KoVcEEcUggKDMLGNOklLwXV/3CPDzLs6z/N/9ufrUvMWAgEg8ywzTJt4gnt60Dc77xBFWklXic+IxkwokfuS64vEb56LLAs+MmJn0PHGEWCx2sNLBrGRqxFPEMVXTKV/Ieqxy3uKsVWqsVSf/YTivryxznfYwkljEEiSIUFBDGRXYiNOpk2IhTfcJH/+Q65fIpZCrDEaOBVShQXb94DP43VurMDnhJYUTQPeL43yMAKFdoFl3nO9jx2me0LiegSu97a82gJlP0uttLXYE9G8DF9dtTdkDLneA6JMhm7IrBWkLhQLwfkZjygEDt0Dvmte31j1OH4AM9Sp1AxwcAqNFyl73+XdPZ9/+fdPq3w/senJxLLYxqAAAAAZiS0dEAAAAAAAA+UO7fwAAAAlwSFlzAAAN1wAADdcBQiibeAAAAAd0SU1FB+UDGBUCH/2DK90AAAC4SURBVHja7dyxDQAxCARB7vvvma/AjpycNFMCG4KYAQAAAAAAgKPMzOzuGkVhvCQRr9tnBAIiIAIKiIAIiIACIiACIqCACIiAnFnoNsdLYgoAAAAAAAAAAAC846ywOZ4/Mf1cZguIgAgoIAIiIAIKiIAIiIACIiACcmGh2xzPnxgAAAAAAAAAAACeclbYHM+fmH4uswVEQAQUEAEREAEFREAEREABERABubDQbY7nTwwAAAAAAAB3PxA8JFiVjalSAAAAAElFTkSuQmCC").resize({
             height: 16,
         });
         const queuedIcon = nativeImage.createFromDataURL("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAACACAYAAAD03Gy6AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV9TpSIVBYuIdshQnSyIijhqFYpQIdQKrTqYXPoFTRqSFBdHwbXg4Mdi1cHFWVcHV0EQ/ABxcnRSdJES/5cUWsR6cNyPd/ced+8AoVZimtUxDmi6bSbjMTGdWRUDrwgijAEMo09mljEnSQm0HV/38PH1Lsqz2p/7c/SoWYsBPpF4lhmmTbxBPL1pG5z3iUOsIKvE58RjJl2Q+JHrisdvnPMuCzwzZKaS88QhYjHfwkoLs4KpEU8RR1RNp3wh7bHKeYuzVqqwxj35C4NZfWWZ6zTDiGMRS5AgQkEFRZRgI0qrToqFJO3H2viHXL9ELoVcRTByLKAMDbLrB/+D391auckJLykYAzpfHOdjBAjsAvWq43wfO079BPA/A1d601+uATOfpFebWuQI6N0GLq6bmrIHXO4Ag0+GbMqu5Kcp5HLA+xl9UwbovwW617zeGvs4fQBS1FXiBjg4BEbzlL3e5t1drb39e6bR3w9w+nKm6lEgGQAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAAN1wAADdcBQiibeAAAAAd0SU1FB+QMHBYbL4Ry3xMAAAf1SURBVHja7Z1bbFVFFIa/fYAWSlWChghN6oUIKiAIBlBjvYNixUtEokUxIiJBMTxofDCoCQka7xe8YDDeinjDSyQmBAnBSMqDSISACERAC8KTQimllS4fZpBG5fScPXP2retP+gJnz8z+/71m71mz1ppARLAoB2YAtwNDgd4ofOIgsBGoBxYChwECK0AVsAwYrjxFgvVALdAYiEg5sFbJj0WEsTk77Sj50WMEMD0QkbXAaOUjFjQEInIAqFQuYkFTIB0+gxTRI6cUqAAqgCJeAZqUhtiwPwdsUh5iw6Yc8L7yEBvqj7oiGuzKTBEd1gNjchivXK39B0V05NcCrUGHdVgZcC9Qh3FH6+rY86oX2AAsxrijW+GYO/r/0AZ0d+iwzLaRBZTZmSIs2mwbRa0DWhwHXZGhp9d1c+pQmIXYoZgHnSRUqgDptoDmMAL86djpyRkSoK/rijeMALsdOz09QwKc4Xh9YxgBGh07PVMFiFeAM1QANwF2OnY6OEMCuN7LrjACbHTs9AKgRwbI7wGMdGxjQ1gB2h067QWclwEBRth7CYsj5HH55xPgILDDcfAXZkAA13vYHnYdALDOsfNLMyBAjeP1P+T7z84EWO3Y+TVAzxSTXw6Mc2xjtYsAqxw7rwSuSrEA44ATHNtY5SLARmCf4wBuTLEANzhevw/YnO8HQQGBcYuB21CEQT0wxcUCAD5VHkPjk85+UIgFVFhT0oyZ4tAE9KMTt34hFtAMfK18Fo2vKGBPpdDQxPeUz6JREGdBgdHp3eyK7jTltSDswrjjj/iygCPAIuW1YLxeCPnFWABAf+AXuzpUHB8tmN3AvYX8uJjw9D3A28pvp1hUKPnFWgBANbCV4wQZKWgFBlHEZlaxCRq7gHeV57xPf1E7iUGIHL0q4Cc0dvTfOACcTZHRJGFSlBqB+cr3fzCPEKE8Qcgs1TLMPucg5R2AbZiI8qIDeMMm6bUCDwCaY2w4mEnI6GmXLMnlwKvKPy8CK8JeHDgmyldg9o0Hd1HyNwOjcAhkds0TbsZk1LR0QfKbMcWtnKLIfSRqfw/c0wXn/Wl4yKvzlSlfDzzThQSYDyzx0VDgsVhKNzuoWzJO/hI77bYnTQAwcZRLMSmYWcSX9gHzlnwYlKBcUC/MdtwVGSN/OTARt2zJkr0DOuIQMAH4MEPkL8XECB323XCpytUcxsQSZeHF/DIwqVSf2kEEFctmAc+Svp20FmAOZnuxZAgiKhk3EvgIGJgS8ncCkzH1VEuKqCpmrcNkzLxFsh14AryJqaO6NooOgxiKJl5izfrchJG/FbgPWBllp3HUjPvWTkkPAr8ngPg9wGyMP39l1J0HMZcNrcD40udgtjqjxG/A88BruJdlSK0AHS3xCky9optwK5OTD+32KV8IfAb8lYQbTwKCLtJn4iygN3C/fR/0j7jv3cALwALyZDFmVYCedu5/BBNDHyf2YtzLr5fC1ZBEAWqANzAxNEnCdvsZuiLKTqN8B/QF3sFkDSaNfOwqfbldLPbJmgWMsq6ItJSw2WVdEQ1ZsIDZwBrSVT+o2lrqrDRbQDeMK3cm6cYC+xC1p0mAckyO1CSygc/xEIISlQAVmKzKGrKFb4DrfYvg+x1QBnycQfIBrrSWUJ5UAbpjQjYmkF2Ms1NrN5+k+cLTGEdaqbDRTgNrgC3Arxw7/aPSfrkMAi7CVGgZUqJxTMIUsnrYS2si4uNvqpQG+0XkOREZGmJMQ0XkeRE5UKKx1fngzgf5o0XkkOebaxGR+SLSx8P4+orIUyJy2PMYm0VkpOv4XL+CemNKcp3l0cS/A+7CZJ34xCBMmq3POnZbMLt7ob2pOQ/zvi/yBXgCU2duWwnm7p8x+9Hz8BcYMBh4Kq53wHgRafc45dzi6X1UyN+tHqekdhG5OuopqByTpOfj6W/DBLx+GfEn5bWYbUkf3/Xb7VdXZEl6D3ki/whwRwzkY1frt+NnX3ggJrAgEldENSY3qsLDnF8HfBDz4moKfuohNWH2ORpLbQGP4ed8mJcTQD6Yg+x8ZHtWAnNLbQG+inV8D1xMDHuwed5pa3Av0t1mP3d3lMoCHvVA/n7MblNSyMeOZTJ5jhopED2KdVEUI8AAYKqHm51rvxqShm3A4x7auRs4tRQCTPfw9G8h2dn1r9gFm+t0Ns33O8BX0b5aYBnJxkTgC8c2vBftq/VA/ooUkI9dk7hGSVfbhZ63KcjH3J+mGkNPemjjTl9TkI/SxZsw8fdpKm/zIzDM4fpmTNjlQVcLuA73utEvkb7aQq85Xl8BjPcxBd3sOJA/SOex6e/ZsbugU+46m4ICO/2cgiIM9tk1gYS1gGFKvhP6Aee4TEGXKYfOuNxFgBrlzxk1LgKMVP6ccX7Yl/AJmEOdA+XQCe3AicdbD+SzgKFKvhfkyFMVIJ8AQ5Q7bxgWRgA9rsQfqsMIUKW8eUOVCpBCAforb94wIIwAJylv3nBSGAF6KW/e0EsFSKEAPZW3aAUoxyQkN2DiHLsrb97Qw3LagDl55J+I7KO+oCpMxMJw5SoSrMdEmjQGIlKOKdGo5EcvwtgcMEPJjwUjgOmBiKwFRisfsaAhEJED6Kl4caEpkITUreyqyCkFKoAKoIhXgCalITbsz2EilxXxYFOOdAbOZgX1R10RDXZlpogO64ExOUyKZi0ezkVUFEV+LdDaMTKuDFO/vw4TlKWrY8+rXkyBk8WY8wtaAf4GOUe4G1+YjIMAAAAASUVORK5CYII=").resize({
@@ -84,7 +86,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         const vesButton = new TouchBarButton({
             backgroundColor: "#a22929",
             icon: vesIcon,
-            click: () => app.emit("ves-execute-command", "workbench.action.showCommands"),
+            click: () => app.emit("ves-execute-command", "core.about"),
         });
 
         const buildMenuCleanButton = new TouchBarButton({
@@ -124,7 +126,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             change: (selectedIndex) => app.emit("ves-execute-command", buildMenuSegmentedControlSegments[selectedIndex].accessibilityLabel),
         });
 
-        const buildModes: ScrubberItem[] = [{
+        const buildModes = [{
             label: BuildMode.Release,
         }, {
             label: BuildMode.Beta,
@@ -136,12 +138,12 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             label: BuildMode.Preprocessor,
         }];
 
-        const buildModeScrubber = new TouchBarScrubber({
-            items: buildModes,
-            selectedStyle: "background",
-            mode: "fixed",
-            showArrowButtons: false,
-            select: (selectedIndex) => app.emit("ves-set-build-mode", buildModes[selectedIndex].label),
+        const buildModeButtonSegmentedControl = new TouchBarSegmentedControl({
+            segmentStyle: 'automatic',
+            mode: 'single',
+            segments: buildModes,
+            selectedIndex: 1,
+            change: (selectedIndex) => app.emit("ves-set-build-mode", buildModes[selectedIndex].label),
         });
 
         const buildModeButton = new TouchBarPopover({
@@ -149,31 +151,15 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             showCloseButton: true,
             items: new TouchBar({
                 items: [
-                    new TouchBarLabel({ label: "Build Mode:" }),
-                    buildModeScrubber
+                    new TouchBarLabel({ label: 'Build Mode:' }),
+                    buildModeButtonSegmentedControl
                 ]
             }),
         });
 
-        const emulators: ScrubberItem[] = [];
-
-        const emulatorScrubber = new TouchBarScrubber({
-            items: emulators,
-            selectedStyle: "background",
-            mode: "fixed",
-            showArrowButtons: true,
-            select: (selectedIndex) => app.emit("ves-set-emulator", emulators[selectedIndex].label),
-        });
-
-        const emulatorButton = new TouchBarPopover({
-            label: "Emulator",
-            showCloseButton: true,
-            items: new TouchBar({
-                items: [
-                    new TouchBarLabel({ label: "Emulator:" }),
-                    emulatorScrubber
-                ]
-            }),
+        const MenuButton = new TouchBarButton({
+            icon: menuIcon,
+            click: () => app.emit("ves-execute-command", "workbench.action.showCommands"),
         });
 
         const vesTouchBar = new TouchBar({
@@ -181,7 +167,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
                 vesButton,
                 buildMenuSegmentedControl,
                 buildModeButton,
-                emulatorButton,
+                MenuButton,
             ]
         });
 
@@ -205,16 +191,6 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         app.on("ves-change-is-run-queued", (isQueued: boolean) => {
             buildMenuRunButton.icon = isQueued ? queuedIcon : runIcon;
             redrawMenuSegmentedControl();
-        });
-        // @ts-ignore
-        app.on("ves-change-is-running", (isRunning: number) => {
-            if (isRunning) {
-                spinnerIconIntervall = setInterval(() => animateSpinner(buildMenuRunButton, spinnerIcon), 130);
-            } else {
-                if (spinnerIconIntervall) clearInterval(spinnerIconIntervall);
-                buildMenuRunButton.icon = runIcon;
-                redrawMenuSegmentedControl();
-            }
         });
         // @ts-ignore
         app.on("ves-change-is-flash-queued", (isQueued: boolean) => {
@@ -247,19 +223,6 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             buildMenuCleanButton.enabled = flags[buildMode];
             redrawMenuSegmentedControl();
         });
-        // @ts-ignore
-        app.on("ves-change-emulator", (name) => {
-            emulatorButton.label = this.shorten(name, 14);
-        });
-        // @ts-ignore
-        app.on("ves-change-emulator-configs", (configs: EmulatorConfig[]) => {
-            emulators.length = 0;
-            for (const config of configs) {
-                emulators.push({
-                    label: config.name
-                });
-            }
-        });
 
         const animateSpinner = (button: Electron.TouchBarButton, spinnerIcon: Electron.NativeImage[]) => {
             spinnerIconFrame++;
@@ -271,11 +234,5 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         const redrawMenuSegmentedControl = () => {
             buildMenuSegmentedControl.selectedIndex = 0; // have to update element somehow to trigger redrawing of its children
         };
-    }
-
-    private shorten(word: string, length: number) {
-        if (word.length <= length) return word;
-
-        return word.slice(0, length) + "…";
     }
 }

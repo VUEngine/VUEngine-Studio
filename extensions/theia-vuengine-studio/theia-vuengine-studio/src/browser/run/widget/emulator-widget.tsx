@@ -5,7 +5,6 @@ import { ReactWidget } from "@theia/core/lib/browser/widgets/react-widget";
 import { PreferenceScope, PreferenceService } from "@theia/core/lib/browser";
 import { EmulationMode, EmulatorScale, StereoMode } from "../types";
 import { getResourcesPath, getRomPath } from "../../common/functions";
-import { VesStateModel } from "../../common/vesStateModel";
 import { VesRunEmulatorEmulationModePreference, VesRunEmulatorScalePreference, VesRunEmulatorStereoModePreference } from "../preferences";
 
 const datauri = require("datauri");
@@ -27,7 +26,6 @@ export type vesEmulatorWidgetState = {
 export class VesEmulatorWidget extends ReactWidget {
   @inject(PreferenceService) protected readonly preferenceService: PreferenceService;
   @inject(VesEmulatorWidgetOptions) protected readonly options: VesEmulatorWidgetOptions;
-  @inject(VesStateModel) private readonly vesState: VesStateModel;
 
   static readonly ID = "vesEmulatorWidget";
   static readonly LABEL = "Emulator";
@@ -74,14 +72,6 @@ export class VesEmulatorWidget extends ReactWidget {
 
   protected onResize() {
     this.update();
-  }
-
-  onAfterAttach() {
-    this.vesState.isRunning = 1;
-  }
-
-  onAfterDetach() {
-    this.vesState.isRunning = 0;
   }
 
   protected onAfterShow() {
