@@ -62,7 +62,7 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
         app.emit("ves-change-emulator", getDefaultEmulatorConfig(this.preferenceService).name);
         app.emit("ves-change-emulator-configs", getEmulatorConfigs(this.preferenceService));
 
-        this.vesState.onDidChangeIsBuilding((processManagerId) => app.emit("ves-change-is-building", processManagerId));
+        this.vesState.onDidChangeBuildStatus((buildStatus) => app.emit("ves-change-build-status", buildStatus));
         this.vesState.onDidChangeIsRunQueued((flag) => app.emit("ves-change-is-run-queued", flag));
         this.vesState.onDidChangeIsFlashQueued((flag) => app.emit("ves-change-is-flash-queued", flag));
         this.vesState.onDidChangeIsFlashing((flag) => app.emit("ves-change-is-flashing", flag));

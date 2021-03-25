@@ -12,7 +12,7 @@ import { VesRunDefaultEmulatorPreference, VesRunEmulatorConfigsPreference } from
 import { getDefaultEmulatorConfig, getEmulatorConfigs } from "../run/commands/runInEmulator";
 import { EmulatorConfig } from "../run/types";
 import { VesFlashCartWatcher } from "../services/flash-cart-service/flash-cart-watcher";
-import { BuildMode } from "../build/types";
+import { BuildLogLine, BuildMode, buildStatus } from "../build/types";
 import { VesFlashCartService } from "../../common/flash-cart-service-protocol";
 import { VesFlashCartsPreference } from "../flash-carts/preferences";
 
@@ -48,6 +48,8 @@ export class VesStateModel {
                 this.detectConnectedFlashCarts();
             }
         });
+
+        this.resetBuildStatus();
 
         // watch for file changes
         // TODO: watch only respective folders
@@ -164,16 +166,36 @@ export class VesStateModel {
         return this._isCleaning;
     }
 
-    // is building
-    protected _isBuilding: number = 0;
-    protected readonly onDidChangeIsBuildingEmitter = new Emitter<number>();
-    readonly onDidChangeIsBuilding = this.onDidChangeIsBuildingEmitter.event;
-    set isBuilding(processManagerId: number) {
-        this._isBuilding = processManagerId;
-        this.onDidChangeIsBuildingEmitter.fire(this._isBuilding);
+    // build status
+    protected _buildStatus: buildStatus = {
+        active: false,
+        processId: -1,
+        progress: -1,
+        log: {
+            startTimestamp: 0,
+            log: [],
+        },
+    };
+    protected readonly onDidChangeBuildStatusEmitter = new Emitter<buildStatus>();
+    readonly onDidChangeBuildStatus = this.onDidChangeBuildStatusEmitter.event;
+    set buildStatus(status: buildStatus) {
+        this._buildStatus = status;
+        this.onDidChangeBuildStatusEmitter.fire(this._buildStatus);
     }
-    get isBuilding(): number {
-        return this._isBuilding;
+    get buildStatus(): buildStatus {
+        return this._buildStatus;
+    }
+    public resetBuildStatus() {
+        this.buildStatus = {
+            ...this.buildStatus,
+            active: false,
+            processId: -1,
+            progress: -1,
+        }
+    }
+    public pushBuildLogLine(buildLogLine: BuildLogLine) {
+        this._buildStatus.log.log.push(buildLogLine);
+        this.onDidChangeBuildStatusEmitter.fire(this._buildStatus);
     }
 
     // export queue

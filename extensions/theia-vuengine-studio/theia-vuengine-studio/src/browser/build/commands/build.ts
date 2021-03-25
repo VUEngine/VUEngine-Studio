@@ -1,35 +1,40 @@
 import { isWindows } from "@theia/core";
-import { PreferenceService } from "@theia/core/lib/browser";
+import { PreferenceService, StorageService } from "@theia/core/lib/browser";
 import URI from "@theia/core/lib/common/uri";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
-import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
+import { WorkspaceService } from "@theia/workspace/lib/browser";
 import { cpus } from "os";
 import { join as joinPath } from "path";
 import { VesProcessService } from "../../../common/process-service-protocol";
 import { convertoToEnvPath, getOs, getResourcesPath, getRomPath, getWorkspaceRoot } from "../../common/functions";
 import { VesStateModel } from "../../common/vesStateModel";
 import { VesProcessWatcher } from "../../services/process-service/process-watcher";
-import { VesBuildDumpElfPreference, VesBuildEnableWslPreference, VesBuildEngineCorePathPreference, VesBuildEnginePluginsPathPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "../preferences";
+import { VesBuildDumpElfPreference, VesBuildEngineCorePathPreference, VesBuildEnginePluginsPathPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "../preferences";
 
 export async function buildCommand(
   fileService: FileService,
   preferenceService: PreferenceService,
-  terminalService: TerminalService,
+  storageService: StorageService,
   vesProcessService: VesProcessService,
   vesProcessWatcher: VesProcessWatcher,
-  vesState: VesStateModel
+  vesState: VesStateModel,
+  workspaceService: WorkspaceService
 ) {
-  if (vesState.isBuilding) {
-    vesProcessService.killProcess(vesState.isBuilding);
+  if (!workspaceService.opened) {
+    return;
+  }
+
+  if (vesState.buildStatus.active) {
+    vesProcessService.killProcess(vesState.buildStatus.processId);
   } else {
-    build(fileService, preferenceService, terminalService, vesProcessService, vesProcessWatcher, vesState);
+    build(fileService, preferenceService, storageService, vesProcessService, vesProcessWatcher, vesState);
   }
 }
 
 async function build(
   fileService: FileService,
   preferenceService: PreferenceService,
-  terminalService: TerminalService,
+  storageService: StorageService,
   vesProcessService: VesProcessService,
   vesProcessWatcher: VesProcessWatcher,
   vesState: VesStateModel
@@ -47,20 +52,23 @@ async function build(
     makefile = convertoToEnvPath(preferenceService, joinPath(engineCorePath, "makefile-game"));
   }
 
-  fileService.delete(new URI(getRomPath()));
+  const romUri = new URI(getRomPath());
+  if (fileService.exists(romUri)) {
+    fileService.delete(romUri);
+  }
 
   // Support for building through WSL
-  let shellPath = "";
-  let shellArgs = [""];
-  if (isWindows) {
-    const enableWsl = preferenceService.get(VesBuildEnableWslPreference.id);
-    if (enableWsl) {
-      shellPath = process.env.windir + '\\System32\\wsl.exe';
-    } else {
-      shellPath = joinPath(getResourcesPath(), "binaries", "vuengine-studio-tools", "win", "msys", "usr", "bin", "bash.exe");
-      shellArgs = ['--login'];
-    }
-  }
+  // let shellPath = "";
+  // let shellArgs = [""];
+  // if (isWindows) {
+  //   const enableWsl = preferenceService.get(VesBuildEnableWslPreference.id);
+  //   if (enableWsl) {
+  //     shellPath = process.env.windir + '\\System32\\wsl.exe';
+  //   } else {
+  //     shellPath = joinPath(getResourcesPath(), "binaries", "vuengine-studio-tools", "win", "msys", "usr", "bin", "bash.exe");
+  //     shellArgs = ['--login'];
+  //   }
+  // }
 
   // fix permissions
   // TODO: do this only once on app startup
@@ -79,7 +87,7 @@ async function build(
   // note: should no longer be necessary due to .gitattributes directive
   //preCallMake = 'find "' + convertoToEnvPath(engineCorePath) + 'lib/compiler/preprocessor/" -name "*.sh" -exec sed -i -e "s/$(printf \'\\r\')//" {} \\; ';
 
-  const { terminalProcessId, processManagerId } = await vesProcessService.launchProcess({
+  const { processManagerId } = await vesProcessService.launchProcess({
     command: "make",
     args: [
       "all",
@@ -101,36 +109,42 @@ async function build(
     },
   });
 
-  const terminalWidget = terminalService.getById(getTerminalId()) || await terminalService.newTerminal({
-    title: "Build",
-    id: getTerminalId(),
-    shellPath,
-    shellArgs,
-  });
-  await terminalWidget.start(terminalProcessId);
-  terminalWidget.clearOutput();
-  terminalWidget.onTerminalDidClose(() => {
-    // TODO: kill process (if necessary?)
-  });
-  terminalService.open(terminalWidget);
-
   vesProcessWatcher.onExit(({ pId }) => {
     if (processManagerId === pId) {
-      vesState.isBuilding = 0;
+      vesState.resetBuildStatus();
     }
   });
 
-  vesProcessWatcher.onData(({ pId, data }) => {
-    if (processManagerId === pId) {
-      console.log(data);
-    }
-  });
+  vesState.buildStatus = {
+    active: true,
+    processId: processManagerId,
+    progress: 0,
+    log: {
+      startTimestamp: Date.now(),
+      log: [],
+    },
+  };
 
-  vesState.isBuilding = processManagerId;
+  monitorBuild(vesProcessWatcher, vesState);
 }
 
-function getTerminalId(): string {
-  return "ves-build";
+async function monitorBuild(
+  vesProcessWatcher: VesProcessWatcher,
+  vesState: VesStateModel
+) {
+  vesProcessWatcher.onData(({ pId, data }) => {
+    if (vesState.buildStatus.processId === pId) {
+      vesState.pushBuildLogLine({
+        text: data,
+        timestamp: Date.now(),
+      });
+    }
+  });
+}
+
+export function abortBuild(vesProcessService: VesProcessService, vesState: VesStateModel) {
+  vesProcessService.killProcess(vesState.buildStatus.processId);
+  vesState.resetBuildStatus();
 }
 
 async function getEngineCorePath(fileService: FileService, preferenceService: PreferenceService) {

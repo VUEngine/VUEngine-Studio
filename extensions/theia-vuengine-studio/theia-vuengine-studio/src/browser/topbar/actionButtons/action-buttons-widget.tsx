@@ -40,7 +40,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
         this.addClass(`os-${getOs()}`);
 
         this.vesState.onDidChangeIsCleaning(() => this.update());
-        this.vesState.onDidChangeIsBuilding(() => this.update());
+        this.vesState.onDidChangeBuildStatus(() => this.update());
         this.vesState.onDidChangeIsExportQueued(() => this.update());
         this.vesState.onDidChangeIsFlashQueued(() => this.update());
         this.vesState.onDidChangeIsFlashing(() => this.update());
@@ -88,7 +88,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                 <button
                     className={"theia-button secondary clean" + (this.vesState.isCleaning ? " active" : "")}
                     title={this.vesState.isCleaning ? "Cleaning..." : `${VesBuildCleanCommand.label}${this.getKeybindingLabel(VesBuildCleanCommand.id)}`}
-                    disabled={this.vesState.isBuilding > 0 || !this.vesState.buildFolderExists[buildMode]}
+                    disabled={this.vesState.buildStatus.active || !this.vesState.buildFolderExists[buildMode]}
                     onClick={() => this.commandService.executeCommand(VesBuildCleanCommand.id)}
                 >
                     {this.vesState.isCleaning
@@ -96,11 +96,11 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                         : <i className="fa fa-trash"></i>}
                 </button>
                 <button
-                    className={"theia-button secondary build" + (this.vesState.isBuilding ? " active" : "")}
-                    title={this.vesState.isBuilding ? "Building..." : `${VesBuildCommand.label}${this.getKeybindingLabel(VesBuildCommand.id)}`}
+                    className={"theia-button secondary build" + (this.vesState.buildStatus.active ? " active" : "")}
+                    title={this.vesState.buildStatus.active ? "Building..." : `${VesBuildCommand.label}${this.getKeybindingLabel(VesBuildCommand.id)}`}
                     onClick={() => this.commandService.executeCommand(VesBuildCommand.id)}
                 >
-                    {this.vesState.isBuilding
+                    {this.vesState.buildStatus.active
                         ? <i className="fa fa-cog fa-spin"></i>
                         : <i className="fa fa-wrench"></i>}
                 </button>

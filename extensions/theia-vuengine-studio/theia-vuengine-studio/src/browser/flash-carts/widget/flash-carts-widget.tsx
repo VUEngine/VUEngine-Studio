@@ -65,7 +65,7 @@ export class VesFlashCartsWidget extends ReactWidget {
           }
           {!this.vesState.isFlashQueued && this.vesState.flashingProgress > -1 &&
             <div className="flashingPanel">
-              <div className="progressBar">
+              <div className="vesProgressBar">
                 <div style={{ width: this.vesState.flashingProgress + "%" }}>
                   <span>
                     {this.vesState.flashingProgress === 100

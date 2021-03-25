@@ -17,7 +17,7 @@ export class VesBuildStatusBarContribution implements FrontendApplicationContrib
     updateStatusBar() {
         this.setBuildModeStatusBar();
 
-        this.vesState.onDidChangeIsBuilding(() => this.setBuildModeStatusBar());
+        this.vesState.onDidChangeBuildStatus(() => this.setBuildModeStatusBar());
         this.preferenceService.onPreferenceChanged(({ preferenceName, newValue }) => {
             if (preferenceName === VesBuildModePreference.id) {
                 this.setBuildModeStatusBar();
@@ -28,7 +28,7 @@ export class VesBuildStatusBarContribution implements FrontendApplicationContrib
     setBuildModeStatusBar() {
         let label = "";
         const command = VesBuildSetModeCommand.id;
-        if (this.vesState.isBuilding) {
+        if (this.vesState.buildStatus.active) {
             label = "Building...";
         } else {
             label = this.preferenceService.get(VesBuildModePreference.id) || "Build Mode";

@@ -10,12 +10,12 @@
 }
 
 #vesFlashCartsWidget .noFlashCarts {
-  padding: 10px 19px;
+  padding: calc(var(--theia-ui-padding) * 2);
 }
 
 #vesFlashCartsWidget .flashingActions {
   border-bottom: 1px solid var(--theia-activityBar-background);
-  padding: 19px;
+  padding: calc(var(--theia-ui-padding) * 2);
 }
 
 #vesFlashCartsWidget > div:last-child {
@@ -25,7 +25,7 @@
 
 #vesFlashCartsWidget .flashCart {
   border-bottom: 1px solid var(--theia-activityBar-background);
-  padding: 19px;
+  padding: calc(var(--theia-ui-padding) * 2);
 }
 
 #vesFlashCartsWidget .theia-button {
@@ -71,22 +71,6 @@
 
 #vesFlashCartsWidget .flashingPanel {
   margin-bottom: calc(var(--theia-ui-padding) * 2);
-}
-
-#vesFlashCartsWidget .progressBar {
-  background: rgba(0, 0, 0, 0.2);
-}
-
-#vesFlashCartsWidget .progressBar div {
-  color: var(--theia-button-foreground);
-  background-color: /*var(--theia-button-background)*/ #4aa94e;
-  line-height: 32px;
-  text-align: center;
-  width: 0px;
-}
-
-#vesFlashCartsWidget .progressBar div span {
-  padding: 0 var(--theia-ui-padding);
 }
 
 #vesFlashCartsWidget .flashLogWrapper {

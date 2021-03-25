@@ -7,3 +7,20 @@ export enum BuildMode {
 }
 
 export const DEFAULT_BUILD_MODE = BuildMode.Beta;
+
+export type buildStatus = {
+  active: boolean
+  processId: number
+  progress: number
+  log: BuildLog
+}
+
+export type BuildLog = {
+  startTimestamp: number,
+  log: BuildLogLine[],
+}
+
+export type BuildLogLine = {
+  timestamp: number,
+  text: string,
+}

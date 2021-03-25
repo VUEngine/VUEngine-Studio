@@ -4,6 +4,8 @@ import { bindVesBuildKeybindings } from "./keybindings-contribution";
 import { bindVesBuildMenu } from "./menu-contribution";
 import { bindVesBuildPreferences } from "./preferences-contribution";
 import { bindVesBuildStatusBar } from './statusbar-contribution';
+import { bindVesBuildView } from './widget/build-view';
+import "../../../src/browser/build/style/index.css";
 
 export function bindVesBuildContributions(bind: interfaces.Bind): void {
     bindVesBuildPreferences(bind);
@@ -11,4 +13,5 @@ export function bindVesBuildContributions(bind: interfaces.Bind): void {
     bindVesBuildMenu(bind);
     bindVesBuildKeybindings(bind);
     bindVesBuildStatusBar(bind);
+    bindVesBuildView(bind);
 }

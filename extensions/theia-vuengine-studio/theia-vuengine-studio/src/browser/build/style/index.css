@@ -1,0 +1,65 @@
+#vesBuildWidget {
+  display: flex;
+  flex-direction: column;
+  line-height: 130%;
+  min-width: 250px;
+}
+
+#vesBuildWidget .buildActions {
+  border-bottom: 1px solid var(--theia-activityBar-background);
+  padding: 19px;
+}
+
+#vesBuildWidget .buildButtons {
+  display: flex;
+  flex-direction: row;
+}
+#vesBuildWidget .buildButtons > div:first-child {
+  flex-grow: 1;
+  padding-right: var(--theia-ui-padding);
+}
+
+#vesBuildWidget .theia-button {
+  margin: 0;
+}
+#vesBuildWidget .theia-button.build {
+  height: 26px;
+  width: 100%;
+}
+
+#vesBuildWidget .mainPanel {
+  flex-grow: 1;
+  overflow: auto;
+  padding: calc(var(--theia-ui-padding) * 2);
+}
+
+#vesBuildWidget .buildLogWrapper {
+  background: rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+  height: 100%;
+  overflow: auto;
+  padding: calc(var(--theia-ui-padding) * 2);
+  width: 100%;
+}
+
+#vesBuildWidget .buildLog {
+  display: table;
+  font-family: monospace;
+  font-size: 80%;
+  width: 100%;
+}
+
+#vesBuildWidget .buildLog div {
+  display: table-row;
+}
+
+#vesBuildWidget .buildLog .timestamp {
+  display: table-cell;
+  opacity: .5;
+  padding-right: 5px;
+}
+
+#vesBuildWidget .buildLog .text {
+  display: table-cell;
+  width: 100%;
+}

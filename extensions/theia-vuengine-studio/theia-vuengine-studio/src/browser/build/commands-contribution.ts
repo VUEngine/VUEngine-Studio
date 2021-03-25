@@ -8,8 +8,7 @@ import {
 } from "@theia/core/lib/common";
 import { QuickPickService } from "@theia/core/lib/common/quick-pick-service";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
-import { PreferenceService } from "@theia/core/lib/browser";
-import { TerminalService } from "@theia/terminal/lib/browser/base/terminal-service";
+import { PreferenceService, StorageService } from "@theia/core/lib/browser";
 import { FileDialogService } from "@theia/filesystem/lib/browser";
 import { buildCommand } from "./commands/build";
 import { exportCommand } from "./commands/export";
@@ -24,6 +23,7 @@ import { VesBuildDumpElfPreference, VesBuildEnableWslPreference, VesBuildPedanti
 import { VesProcessService } from "../../common/process-service-protocol";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
 import { VesProcessWatcher } from "../services/process-service/process-watcher";
+import { BuildMode } from "./types";
 
 @injectable()
 export class VesBuildCommandContribution implements CommandContribution {
@@ -33,7 +33,7 @@ export class VesBuildCommandContribution implements CommandContribution {
     @inject(FileDialogService) private readonly fileDialogService: FileDialogService,
     @inject(MessageService) private readonly messageService: MessageService,
     @inject(PreferenceService) private readonly preferenceService: PreferenceService,
-    @inject(TerminalService) private readonly terminalService: TerminalService,
+    @inject(StorageService) private readonly storageService: StorageService,
     @inject(QuickPickService) private readonly quickPickService: QuickPickService,
     @inject(VesProcessService) private readonly vesProcessService: VesProcessService,
     @inject(VesProcessWatcher) private readonly vesProcessWatcher: VesProcessWatcher,
@@ -57,10 +57,11 @@ export class VesBuildCommandContribution implements CommandContribution {
         buildCommand(
           this.fileService,
           this.preferenceService,
-          this.terminalService,
+          this.storageService,
           this.vesProcessService,
           this.vesProcessWatcher,
           this.vesState,
+          this.workspaceService,
         ),
     });
     commandRegistry.registerCommand(VesBuildExportCommand, {
@@ -75,7 +76,7 @@ export class VesBuildCommandContribution implements CommandContribution {
     });
 
     commandRegistry.registerCommand(VesBuildSetModeCommand, {
-      execute: () => setModeCommand(this.preferenceService, this.quickPickService)
+      execute: (buildMode?: BuildMode) => setModeCommand(this.preferenceService, this.quickPickService, buildMode)
     });
 
     commandRegistry.registerCommand(VesBuildToggleDumpElfCommand, {
