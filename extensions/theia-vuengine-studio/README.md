@@ -19,46 +19,62 @@ Install yarn.
 
 ## Running the browser example
 
+    yarn start:browser
+
+_or:_
+
     yarn rebuild:browser
     cd browser-app
     yarn start
+
+_or:_ launch `Start Browser Backend` configuration from VS code.
 
 Open http://localhost:3000 in the browser.
 
 ## Running the Electron example
 
+    yarn start:electron
+
+_or:_
+
     yarn rebuild:electron
     cd electron-app
     yarn start
 
+_or:_ launch `Start Electron Backend` configuration from VS code.
+
 ## Developing with the browser example
 
-Start watching of theia-vuengine-studio.
+Start watching all packages, including `browser-app`, of your application with
+
+    yarn watch
+
+_or_ watch only specific packages with
 
     cd theia-vuengine-studio
     yarn watch
 
-Start watching of the browser example.
+and the browser example.
 
-    yarn rebuild:browser
     cd browser-app
     yarn watch
 
-Launch `Start Browser Backend` configuration from VS code.
-
-Open http://localhost:3000 in the browser.
+Run the example as [described above](#Running-the-browser-example)
 
 ## Developing with the Electron example
 
-Start watching of theia-vuengine-studio.
+Start watching all packages, including `electron-app`, of your application with
+
+    yarn watch
+
+_or_ watch only specific packages with
 
     cd theia-vuengine-studio
     yarn watch
 
-Start watching of the electron example.
+and the Electron example.
 
-    yarn rebuild:electron
     cd electron-app
     yarn watch
 
-Launch `Start Electron Backend` configuration from VS code.
+Run the example as [described above](#Running-the-Electron-example)
