@@ -221,6 +221,8 @@ export class VesStateModel {
     log: [],
     buildMode: BuildMode.Beta,
     step: "",
+    plugins: 0,
+    stepsDone: -1,
   };
   protected readonly onDidChangeBuildStatusEmitter = new Emitter<BuildStatus>();
   readonly onDidChangeBuildStatus = this.onDidChangeBuildStatusEmitter.event;

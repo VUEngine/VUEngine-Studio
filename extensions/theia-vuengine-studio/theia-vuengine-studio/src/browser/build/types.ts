@@ -3,26 +3,28 @@ export enum BuildMode {
   Beta = "Beta",
   Tools = "Tools",
   Debug = "Debug",
-  Preprocessor = "Preprocessor"
+  Preprocessor = "Preprocessor",
 }
 
 export const DEFAULT_BUILD_MODE = BuildMode.Beta;
 
 export type BuildStatus = {
-  active: boolean
-  processManagerId: number
-  processId: number
-  progress: number
-  log: BuildLogLine[]
-  buildMode: BuildMode
-  step: string
-}
+  active: boolean;
+  processManagerId: number;
+  processId: number;
+  progress: number;
+  log: BuildLogLine[];
+  buildMode: BuildMode;
+  step: string;
+  plugins: number;
+  stepsDone: number;
+};
 
 export type BuildLogLine = {
-  timestamp: number
-  text: string
-  type: BuildLogLineType
-}
+  timestamp: number;
+  text: string;
+  type: BuildLogLineType;
+};
 
 export enum BuildLogLineType {
   Normal = "normal",

@@ -1,10 +1,10 @@
+import { cpus } from "os";
+import { join as joinPath } from "path";
 import { CommandService, isWindows } from "@theia/core";
 import { PreferenceService, StorageService } from "@theia/core/lib/browser";
 import URI from "@theia/core/lib/common/uri";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
-import { cpus } from "os";
-import { join as joinPath } from "path";
 import { VesProcessService } from "../../../common/process-service-protocol";
 import {
   convertoToEnvPath,
@@ -175,6 +175,8 @@ async function build(
     }
   });
 
+  const plugins = await getPlugins(fileService, preferenceService);
+
   vesState.buildStatus = {
     active: true,
     processManagerId: processManagerId,
@@ -183,6 +185,8 @@ async function build(
     log: [],
     buildMode: preferenceService.get(VesBuildModePreference.id) as BuildMode,
     step: "Building",
+    plugins: plugins.length,
+    stepsDone: 0,
   };
 
   monitorBuild(vesProcessWatcher, vesState);
@@ -208,12 +212,20 @@ function parseBuildOutput(vesState: VesStateModel, data: string) {
 
   if (data.startsWith("STARTING BUILD")) {
     type = BuildLogLineType.Headline;
+  } else if (data.startsWith("BUILD FINISHED")) {
+    type = BuildLogLineType.Headline;
+    vesState.buildStatus.progress = 100;
   } else if (
     data.startsWith("Preprocessing ") ||
     data.startsWith("Building ")
   ) {
     type = BuildLogLineType.Headline;
     vesState.buildStatus.step = data.trimEnd();
+    vesState.buildStatus.stepsDone++;
+    vesState.buildStatus.progress = Math.floor(
+      (vesState.buildStatus.stepsDone * 100) /
+        (vesState.buildStatus.plugins * 2 + 2)
+    );
   } else if (data.startsWith("make") || data.includes(" Error ")) {
     type = BuildLogLineType.Error;
   } else if (data.includes("No such file or directory")) {
@@ -284,4 +296,43 @@ function getThreads() {
   }
 
   return threads;
+}
+
+async function getPlugins(
+  fileService: FileService,
+  preferenceService: PreferenceService
+) {
+  let plugins = [];
+
+  // get project's plugins
+  try {
+    const configFileUri = new URI(
+      joinPath(getWorkspaceRoot(), ".vuengine", "plugins.json")
+    );
+    const configFileContents = await fileService.readFile(configFileUri);
+    plugins = JSON.parse(configFileContents.value.toString());
+  } catch (e) {}
+
+  // for each of the project's plugins, get it's dependencies
+  // TODO: we only search one level deep here, recurse instead
+  plugins.map(async (pluginName: string) => {
+    const pluginFileUri = new URI(
+      joinPath(
+        await getEnginePluginsPath(fileService, preferenceService),
+        ...pluginName.split("/"),
+        ".vuengine",
+        "plugins.json"
+      )
+    );
+
+    try {
+      const pluginFileContents = await fileService.readFile(pluginFileUri);
+      JSON.parse(pluginFileContents.value.toString()).map((plugin: string) => {
+        plugins.push(plugin);
+      });
+    } catch (e) {}
+  });
+
+  // remove duplicates and return
+  return [...new Set(plugins)];
 }
