@@ -8,19 +8,25 @@ export enum BuildMode {
 
 export const DEFAULT_BUILD_MODE = BuildMode.Beta;
 
-export type buildStatus = {
+export type BuildStatus = {
   active: boolean
+  processManagerId: number
   processId: number
   progress: number
-  log: BuildLog
-}
-
-export type BuildLog = {
-  startTimestamp: number,
-  log: BuildLogLine[],
+  log: BuildLogLine[]
+  buildMode: BuildMode
+  step: string
 }
 
 export type BuildLogLine = {
-  timestamp: number,
-  text: string,
+  timestamp: number
+  text: string
+  type: BuildLogLineType
+}
+
+export enum BuildLogLineType {
+  Normal = "normal",
+  Headline = "headline",
+  Warning = "warning",
+  Error = "error",
 }

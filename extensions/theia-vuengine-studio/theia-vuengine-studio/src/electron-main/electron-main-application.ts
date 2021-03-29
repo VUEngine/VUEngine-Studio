@@ -5,7 +5,7 @@ import { isOSX, MaybePromise } from "@theia/core";
 import { VesRunCommand } from "../browser/run/commands";
 import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand } from "../browser/build/commands";
 import { VesFlashCartsCommand } from "../browser/flash-carts/commands";
-import { BuildMode, buildStatus } from "../browser/build/types";
+import { BuildMode, BuildStatus } from "../browser/build/types";
 
 @injectable()
 export class VesElectronMainApplication extends ElectronMainApplication {
@@ -179,7 +179,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             buildModeButton.label = buildMode.replace("Preprocessor", "Preproc.");
         });
         // @ts-ignore
-        app.on("ves-change-build-status", (buildStatus: buildStatus) => {
+        app.on("ves-change-build-status", (buildStatus: BuildStatus) => {
             if (buildStatus.active) {
                 spinnerIconIntervall = setInterval(() => animateSpinner(buildMenuBuildButton, spinnerIcon), 130);
             } else {

@@ -1,0 +1,159 @@
+
+-e  STARTING BUILD 
+Starting at: Fri Mar 26 21:33:51 CET 2021
+Build type:  beta
+Compiler:    v810 4.7
+Make Jobs:   11
+
+
+-e Preprocessing Game 
+
+-e Preprocessing core 
+Preprocessed class: Object
+...
+Preprocessed class: Mem
+Setting up plugin: coreSetupClasses
+
+-e Preprocessing SteeringBehaviors 
+Preprocessed class: SteeringBehavior
+...
+Preprocessed class: SeekSteeringBehavior
+Setting up plugin: SteeringBehaviorsSetupClasses
+
+-e Preprocessing LocalizedEntity 
+
+-e Preprocessing I18n 
+Preprocessed class: I18n
+Setting up plugin: I18nSetupClasses
+Preprocessed class: LocalizedEntity
+Setting up plugin: LocalizedEntitySetupClasses
+
+-e Preprocessing LowPowerEntity 
+
+-e Preprocessing GuiBgmapAnimatedSprite 
+Preprocessed class: GuiBgmapAnimatedSprite
+Setting up plugin: GuiBgmapAnimatedSpriteSetupClasses
+Preprocessed class: LowPowerEntity
+Setting up plugin: LowPowerEntitySetupClasses
+
+-e Preprocessing ReflectiveEntity 
+Preprocessed class: ReflectiveEntity
+Setting up plugin: ReflectiveEntitySetupClasses
+
+-e Preprocessing LowPowerIndicator 
+Preprocessed class: LowPowerManager
+Setting up plugin: LowPowerIndicatorSetupClasses
+
+-e Preprocessing SaveDataManager 
+
+-e Preprocessing AutomaticPause 
+Preprocessed class: AutoPauseScreenState
+Preprocessed class: AutoPauseManager
+Setting up plugin: AutomaticPauseSetupClasses
+Preprocessed class: SaveDataManager
+Setting up plugin: SaveDataManagerSetupClasses
+
+-e Preprocessing watchdog 
+Preprocessed class: DRAMExecutionChecker
+Preprocessed class: BitStringBugChecker
+Setting up plugin: watchdogSetupClasses
+Preprocessed class: FastEntity
+...
+Preprocessed class: RacerSelectionScreenState
+Setting up plugin: GameSetupClasses
+
+-e Building core 
+Compiling class: AnimationInspector (complexity: 5)
+...
+Compiling file:  setupClasses.c
+-e Linking libcore-beta
+
+-e Building SteeringBehaviors 
+Compiling file:  vuengine/behaviors/SteeringBehaviors/SteeringBehaviorsSetupClasses.c
+Compiling class: AvoidSteeringBehavior (complexity: 7)
+...
+Compiling class: Vehicle (complexity: 2)
+-e Linking libSteeringBehaviors-beta
+
+-e Building I18n 
+Compiling file:  vuengine/other/I18n/I18nSetupClasses.c
+Compiling asset: languages/Languages.c
+Compiling class: I18n (complexity: 1)
+-e Linking libI18n-beta
+
+-e Building LocalizedEntity 
+Compiling file:  vuengine/entities/LocalizedEntity/LocalizedEntitySetupClasses.c
+Compiling asset: Spec/LocalizedEntityAnimationSpec.c
+Compiling class: LocalizedEntity (complexity: 3)
+-e Linking libLocalizedEntity-beta
+
+-e Building GuiBgmapAnimatedSprite 
+Compiling file:  vuengine/graphics/GuiBgmapAnimatedSprite/GuiBgmapAnimatedSpriteSetupClasses.c
+Compiling class: GuiBgmapAnimatedSprite (complexity: 0)
+-e Linking libGuiBgmapAnimatedSprite-beta
+
+-e Building LowPowerEntity 
+Compiling asset: images/LowPowerIndicator/Spec/LowPowerIndicatorSpec.c
+Compiling file:  vuengine/entities/LowPowerEntity/LowPowerEntitySetupClasses.c
+Compiling asset: images/LowPowerIndicator/Binary/LowPowerIndicator.c
+Compiling class: LowPowerEntity (complexity: 3)
+-e Linking libLowPowerEntity-beta
+
+-e Building ReflectiveEntity 
+Compiling file:  vuengine/entities/ReflectiveEntity/ReflectiveEntitySetupClasses.c
+Compiling class: ReflectiveEntity (complexity: 2)
+-e Linking libReflectiveEntity-beta
+
+-e Building LowPowerIndicator 
+Compiling file:  vuengine/other/LowPowerIndicator/LowPowerIndicatorSetupClasses.c
+Compiling class: LowPowerManager (complexity: 3)
+-e Linking libLowPowerIndicator-beta
+
+-e Building AutomaticPause 
+Compiling asset: images/AutoPauseLogo/Spec/AutoPauseLogoSpec.c
+Compiling class: AutoPauseScreenState (complexity: 0)
+Compiling asset: images/AutoPauseLogo/Binary/AutoPauseLogo.c
+Compiling file:  vuengine/other/AutomaticPause/AutomaticPauseSetupClasses.c
+Compiling asset: stages/AutoPauseScreenStageSpec.c
+Compiling class: AutoPauseManager (complexity: 3)
+-e Linking libAutomaticPause-beta
+
+-e Building SaveDataManager 
+Compiling file:  vuengine/other/SaveDataManager/SaveDataManagerSetupClasses.c
+Compiling class: SaveDataManager (complexity: 1)
+-e Linking libSaveDataManager-beta
+
+-e Building watchdog 
+Compiling file:  watchdog/watchdogSetupClasses.c
+Compiling class: DRAMExecutionChecker (complexity: 0)
+Compiling class: BitStringBugChecker (complexity: 0)
+-e Linking libwatchdog-beta
+
+-e Building Game 
+Compiling file:  globals.c
+Compiling class: GameSaveDataManager (complexity: 1)
+...
+Compiling asset: entities/SpriteTVSpec.c
+Linking build/beta/output-beta.elf...
+Linked sounds
+
+8.0K    build/libAutomaticPause.a
+4.5M    build/libGame.a
+4.0K    build/libGuiBgmapAnimatedSprite.a
+4.0K    build/libI18n.a
+4.0K    build/libLocalizedEntity.a
+4.0K    build/libLowPowerEntity.a
+4.0K    build/libLowPowerIndicator.a
+4.0K    build/libReflectiveEntity.a
+8.0K    build/libSaveDataManager.a
+8.0K    build/libSteeringBehaviors.a
+ 84K    build/libcore.a
+4.0K    build/libwatchdog.a
+
+4.0M    build/output.vb
+
+-e  BUILD FINISHED 
+Done compiling in beta mode with GCC 4.7
+Started at: 21:30:42
+Ended at:   21:32:16
+Total time: 1 min. 34 sec.

@@ -8,6 +8,7 @@ import "../../../src/browser/theia-customizations/style/dialog.css";
 import "../../../src/browser/theia-customizations/style/input.css";
 import "../../../src/browser/theia-customizations/style/menu.css";
 import "../../../src/browser/theia-customizations/style/quick-open.css";
+import "../../../src/browser/theia-customizations/style/sidepanel.css";
 import "../../../src/browser/theia-customizations/style/statusbar.css";
 
 export function rebindtheiaContributions(bind: interfaces.Bind, rebind: interfaces.Rebind): void {

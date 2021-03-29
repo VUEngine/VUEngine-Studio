@@ -12,7 +12,7 @@ import { VesRunDefaultEmulatorPreference, VesRunEmulatorConfigsPreference } from
 import { getDefaultEmulatorConfig, getEmulatorConfigs } from "../run/commands/runInEmulator";
 import { EmulatorConfig } from "../run/types";
 import { VesFlashCartWatcher } from "../services/flash-cart-service/flash-cart-watcher";
-import { BuildLogLine, BuildMode, buildStatus } from "../build/types";
+import { BuildLogLine, BuildMode, BuildStatus } from "../build/types";
 import { VesFlashCartService } from "../../common/flash-cart-service-protocol";
 import { VesFlashCartsPreference } from "../flash-carts/preferences";
 
@@ -167,34 +167,38 @@ export class VesStateModel {
     }
 
     // build status
-    protected _buildStatus: buildStatus = {
+    protected _buildStatus: BuildStatus = {
         active: false,
+        processManagerId: -1,
         processId: -1,
         progress: -1,
-        log: {
-            startTimestamp: 0,
-            log: [],
-        },
+        log: [],
+        buildMode: BuildMode.Beta,
+        step: "",
     };
-    protected readonly onDidChangeBuildStatusEmitter = new Emitter<buildStatus>();
+    protected readonly onDidChangeBuildStatusEmitter = new Emitter<BuildStatus>();
     readonly onDidChangeBuildStatus = this.onDidChangeBuildStatusEmitter.event;
-    set buildStatus(status: buildStatus) {
+    set buildStatus(status: BuildStatus) {
         this._buildStatus = status;
         this.onDidChangeBuildStatusEmitter.fire(this._buildStatus);
     }
-    get buildStatus(): buildStatus {
+    get buildStatus(): BuildStatus {
         return this._buildStatus;
     }
-    public resetBuildStatus() {
-        this.buildStatus = {
+    public resetBuildStatus(step?: string) {
+        const newBuildStatus = {
             ...this.buildStatus,
             active: false,
-            processId: -1,
-            progress: -1,
         }
+
+        if (step) {
+            newBuildStatus.step = step
+        }
+
+        this.buildStatus = newBuildStatus
     }
     public pushBuildLogLine(buildLogLine: BuildLogLine) {
-        this._buildStatus.log.log.push(buildLogLine);
+        this._buildStatus.log.push(buildLogLine);
         this.onDidChangeBuildStatusEmitter.fire(this._buildStatus);
     }
 

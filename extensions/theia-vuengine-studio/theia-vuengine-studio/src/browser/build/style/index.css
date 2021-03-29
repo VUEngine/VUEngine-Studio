@@ -2,64 +2,127 @@
   display: flex;
   flex-direction: column;
   line-height: 130%;
+  padding: calc(var(--theia-ui-padding) * 2);
   min-width: 250px;
 }
 
-#vesBuildWidget .buildActions {
-  border-bottom: 1px solid var(--theia-activityBar-background);
-  padding: 19px;
+#vesBuildWidget .vesProgressBar {
+  margin-bottom: var(--theia-ui-padding);
 }
 
 #vesBuildWidget .buildButtons {
   display: flex;
   flex-direction: row;
 }
-#vesBuildWidget .buildButtons > div:first-child {
-  flex-grow: 1;
-  padding-right: var(--theia-ui-padding);
+#vesBuildWidget .buildButtons > :first-child {
+  margin-right: var(--theia-ui-padding);
 }
 
 #vesBuildWidget .theia-button {
   margin: 0;
+  min-width: unset;
 }
+
 #vesBuildWidget .theia-button.build {
+  flex-grow: 1;
   height: 26px;
   width: 100%;
 }
 
-#vesBuildWidget .mainPanel {
+#vesBuildWidget .buildOptions {
+  display: block;
+}
+
+#vesBuildWidget .buildSelector .theia-select {
+  width: 100%;
+}
+
+#vesBuildWidget .buildSelector {
+  margin-top: calc(var(--theia-ui-padding) * 2);
+}
+
+#vesBuildWidget .buildMeta {
+  display: flex;
+  flex-direction: row;
+  margin: calc(var(--theia-ui-padding) * 2) 0;
+}
+
+#vesBuildWidget .buildMeta > div {
+  align-self: flex-end;
+}
+
+#vesBuildWidget .buildStatus {
   flex-grow: 1;
-  overflow: auto;
-  padding: calc(var(--theia-ui-padding) * 2);
+}
+
+#vesBuildWidget .buildStatus > div:last-child {
+  font-size: 80%;
+}
+
+#vesBuildWidget .buildStatus .success {
+  color: #4aa94e;
+}
+#vesBuildWidget .buildStatus .error {
+  color: red;
+}
+
+#vesBuildWidget .buildMode,
+#vesBuildWidget .buildProcess {
+  padding: 0 calc(var(--theia-ui-padding) * 2);
 }
 
 #vesBuildWidget .buildLogWrapper {
-  background: rgba(0, 0, 0, 0.2);
-  box-sizing: border-box;
-  height: 100%;
-  overflow: auto;
-  padding: calc(var(--theia-ui-padding) * 2);
-  width: 100%;
+  display: flex;
+  flex-grow: 1;
+  height: 0;
 }
 
 #vesBuildWidget .buildLog {
+  border: 1px solid var(--theia-activityBar-background);
+  flex-grow: 1;
+  box-sizing: border-box;
+  overflow: auto;
+}
+
+#vesBuildWidget .buildLog > div {
   display: table;
   font-family: monospace;
-  font-size: 80%;
+  padding: var(--theia-ui-padding) 0;
   width: 100%;
 }
 
-#vesBuildWidget .buildLog div {
+#vesBuildWidget .buildLog > div > div {
   display: table-row;
+}
+
+#vesBuildWidget .buildLog > div > div:hover {
+  background: rgba(0,0,0,0.2);
 }
 
 #vesBuildWidget .buildLog .timestamp {
   display: table-cell;
   opacity: .5;
-  padding-right: 5px;
+  padding: 0 var(--theia-ui-padding);
 }
 
 #vesBuildWidget .buildLog .text {
   display: table-cell;
+  padding-right: var(--theia-ui-padding);
   width: 100%;
+  word-break: break-all;
+}
+
+#vesBuildWidget .buildLog .headline .text {
+  font-weight: bold;
+}
+#vesBuildWidget .buildLog .headline .text:before {
+  content: "➜ ";
+}
+
+#vesBuildWidget .buildLog .warning .text {
+  color: yellow;
+}
+
+#vesBuildWidget .buildLog .error .text {
+  color: red;
 }

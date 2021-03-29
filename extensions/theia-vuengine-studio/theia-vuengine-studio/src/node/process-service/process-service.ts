@@ -16,7 +16,11 @@ export class VesProcessServiceImpl implements VesProcessService {
         this.client = client;
     }
 
-    async launchProcess(options: TerminalProcessOptions): Promise<{ terminalProcessId: number, processManagerId: number }> {
+    async launchProcess(options: TerminalProcessOptions): Promise<{
+        terminalProcessId: number,
+        processManagerId: number,
+        processId: number,
+    }> {
         const terminalProcess = this.terminalProcessFactory(options);
         await new Promise((resolve, reject) => {
             terminalProcess.onStart(resolve);
@@ -29,6 +33,10 @@ export class VesProcessServiceImpl implements VesProcessService {
             this.client?.onClose(processManagerId, event);
         });
 
+        terminalProcess.onError((event: ProcessErrorEvent) => {
+            this.client?.onError(processManagerId, event);
+        });
+
         terminalProcess.onExit((event: IProcessExitEvent) => {
             this.client?.onExit(processManagerId, event);
         });
@@ -37,9 +45,12 @@ export class VesProcessServiceImpl implements VesProcessService {
             this.client?.onData(processManagerId, data.toString());
         });
 
+        const process = this.processManager.get(processManagerId);
+
         return {
             terminalProcessId: terminalProcess.id,
             processManagerId: processManagerId,
+            processId: process?.pid || -1,
         };
     }
 
@@ -49,7 +60,7 @@ export class VesProcessServiceImpl implements VesProcessService {
             return false;
         }
 
-        process.kill();
+        process.kill("SIGKILL");
         return true;
     }
 }

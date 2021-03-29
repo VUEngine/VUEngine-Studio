@@ -10,6 +10,7 @@ import { QuickPickService } from "@theia/core/lib/common/quick-pick-service";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { PreferenceService, StorageService } from "@theia/core/lib/browser";
 import { FileDialogService } from "@theia/filesystem/lib/browser";
+import { WorkspaceService } from "@theia/workspace/lib/browser";
 import { buildCommand } from "./commands/build";
 import { exportCommand } from "./commands/export";
 import { setModeCommand } from "./commands/setMode";
@@ -18,16 +19,18 @@ import { toggleDumpElf } from "./commands/toggleDumpElf";
 import { togglePedanticWarnings } from "./commands/togglePedanticWarnings";
 import { VesStateModel } from "../common/vesStateModel";
 import { toggleEnableWsl } from "./commands/toggleEnableWSL";
-import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand, VesBuildSetModeCommand, VesBuildToggleDumpElfCommand, VesBuildToggleEnableWslCommand, VesBuildTogglePedanticWarningsCommand } from "./commands";
+import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand, VesBuildSetModeCommand, VesBuildToggleDumpElfCommand, VesBuildToggleEnableWslCommand, VesBuildTogglePedanticWarningsCommand, VesBuildOpenWidgetCommand } from "./commands";
 import { VesBuildDumpElfPreference, VesBuildEnableWslPreference, VesBuildPedanticWarningsPreference } from "./preferences";
 import { VesProcessService } from "../../common/process-service-protocol";
-import { WorkspaceService } from "@theia/workspace/lib/browser";
 import { VesProcessWatcher } from "../services/process-service/process-watcher";
+import { VesBuildWidgetContribution } from "./widget/build-view";
+import { showBuildWidgetCommand } from "./commands/showBuildWidget";
 import { BuildMode } from "./types";
 
 @injectable()
 export class VesBuildCommandContribution implements CommandContribution {
   constructor(
+    @inject(VesBuildWidgetContribution) private readonly vesBuildWidget: VesBuildWidgetContribution,
     @inject(CommandService) private readonly commandService: CommandService,
     @inject(FileService) private readonly fileService: FileService,
     @inject(FileDialogService) private readonly fileDialogService: FileDialogService,
@@ -55,6 +58,7 @@ export class VesBuildCommandContribution implements CommandContribution {
       isVisible: () => this.workspaceService.opened,
       execute: () =>
         buildCommand(
+          this.commandService,
           this.fileService,
           this.preferenceService,
           this.storageService,
@@ -95,6 +99,14 @@ export class VesBuildCommandContribution implements CommandContribution {
         isToggled: () => !!this.preferenceService.get(VesBuildEnableWslPreference.id),
       });
     }
+
+    commandRegistry.registerCommand(VesBuildOpenWidgetCommand, {
+      execute: (forceOpen: boolean = false) =>
+        showBuildWidgetCommand(
+          forceOpen,
+          this.vesBuildWidget,
+        ),
+    });
   }
 }
 

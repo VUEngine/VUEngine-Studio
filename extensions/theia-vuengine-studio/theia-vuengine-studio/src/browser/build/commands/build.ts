@@ -1,4 +1,4 @@
-import { isWindows } from "@theia/core";
+import { CommandService, isWindows } from "@theia/core";
 import { PreferenceService, StorageService } from "@theia/core/lib/browser";
 import URI from "@theia/core/lib/common/uri";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
@@ -9,9 +9,12 @@ import { VesProcessService } from "../../../common/process-service-protocol";
 import { convertoToEnvPath, getOs, getResourcesPath, getRomPath, getWorkspaceRoot } from "../../common/functions";
 import { VesStateModel } from "../../common/vesStateModel";
 import { VesProcessWatcher } from "../../services/process-service/process-watcher";
+import { VesBuildOpenWidgetCommand } from "../commands";
 import { VesBuildDumpElfPreference, VesBuildEngineCorePathPreference, VesBuildEnginePluginsPathPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "../preferences";
+import { BuildLogLineType, BuildMode } from "../types";
 
 export async function buildCommand(
+  commandService: CommandService,
   fileService: FileService,
   preferenceService: PreferenceService,
   storageService: StorageService,
@@ -24,9 +27,9 @@ export async function buildCommand(
     return;
   }
 
-  if (vesState.buildStatus.active) {
-    vesProcessService.killProcess(vesState.buildStatus.processId);
-  } else {
+  commandService.executeCommand(VesBuildOpenWidgetCommand.id, !vesState.buildStatus.active);
+
+  if (!vesState.buildStatus.active) {
     build(fileService, preferenceService, storageService, vesProcessService, vesProcessWatcher, vesState);
   }
 }
@@ -53,7 +56,7 @@ async function build(
   }
 
   const romUri = new URI(getRomPath());
-  if (fileService.exists(romUri)) {
+  if (await fileService.exists(romUri)) {
     fileService.delete(romUri);
   }
 
@@ -87,7 +90,7 @@ async function build(
   // note: should no longer be necessary due to .gitattributes directive
   //preCallMake = 'find "' + convertoToEnvPath(engineCorePath) + 'lib/compiler/preprocessor/" -name "*.sh" -exec sed -i -e "s/$(printf \'\\r\')//" {} \\; ';
 
-  const { processManagerId } = await vesProcessService.launchProcess({
+  const { processManagerId, processId } = await vesProcessService.launchProcess({
     command: "make",
     args: [
       "all",
@@ -109,20 +112,26 @@ async function build(
     },
   });
 
+  vesProcessWatcher.onError(({ pId }) => {
+    if (processManagerId === pId) {
+      vesState.resetBuildStatus("failed");
+    }
+  });
+
   vesProcessWatcher.onExit(({ pId }) => {
     if (processManagerId === pId) {
-      vesState.resetBuildStatus();
+      //vesState.resetBuildStatus("done");
     }
   });
 
   vesState.buildStatus = {
     active: true,
-    processId: processManagerId,
+    processManagerId: processManagerId,
+    processId: processId,
     progress: 0,
-    log: {
-      startTimestamp: Date.now(),
-      log: [],
-    },
+    log: [],
+    buildMode: preferenceService.get(VesBuildModePreference.id) as BuildMode,
+    step: "Building",
   };
 
   monitorBuild(vesProcessWatcher, vesState);
@@ -133,18 +142,36 @@ async function monitorBuild(
   vesState: VesStateModel
 ) {
   vesProcessWatcher.onData(({ pId, data }) => {
-    if (vesState.buildStatus.processId === pId) {
+    if (vesState.buildStatus.processManagerId === pId) {
       vesState.pushBuildLogLine({
-        text: data,
+        ...parseBuildOutput(vesState, data),
         timestamp: Date.now(),
       });
     }
   });
 }
 
+function parseBuildOutput(vesState: VesStateModel, data: string) {
+  let text = data;
+  let type = BuildLogLineType.Normal;
+
+  if (data.startsWith("STARTING BUILD")) {
+    type = BuildLogLineType.Headline;
+  } else if (data.startsWith("Preprocessing ") || data.startsWith("Building ")) {
+    type = BuildLogLineType.Headline;
+    vesState.buildStatus.step = data.trimEnd();
+  } else if (data.startsWith("make") || data.includes(" Error ")) {
+    type = BuildLogLineType.Error;
+  } else if (data.includes("No such file or directory")) {
+    type = BuildLogLineType.Error;
+  }
+
+  return { text, type };
+}
+
 export function abortBuild(vesProcessService: VesProcessService, vesState: VesStateModel) {
-  vesProcessService.killProcess(vesState.buildStatus.processId);
-  vesState.resetBuildStatus();
+  vesProcessService.killProcess(vesState.buildStatus.processManagerId);
+  vesState.resetBuildStatus("aborted");
 }
 
 async function getEngineCorePath(fileService: FileService, preferenceService: PreferenceService) {

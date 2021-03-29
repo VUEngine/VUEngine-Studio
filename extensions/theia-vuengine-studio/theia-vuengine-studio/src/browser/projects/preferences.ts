@@ -16,7 +16,7 @@ export const VesProjectsMakerCodePreference: VesProperty = {
         type: "string",
         minLength: 2,
         maxLength: 2,
-        description: "Default Maker Code to place in ROM header of new projects",
+        description: "Default Maker Code to place in ROM header of new projects.",
         default: "VS",
     },
 };

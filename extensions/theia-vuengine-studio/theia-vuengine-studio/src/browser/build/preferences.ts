@@ -20,7 +20,7 @@ export const VesBuildDumpElfPreference: VesProperty = {
     id: "build.dumpElf",
     property: {
         type: "boolean",
-        description: "Dump assembly code and memory sections",
+        description: "Dump assembly code and memory sections.",
         default: false,
     },
 };
@@ -29,7 +29,7 @@ export const VesBuildPedanticWarningsPreference: VesProperty = {
     id: "build.pedanticWarnings",
     property: {
         type: "boolean",
-        description: "Enable pedantic compiler warnigns",
+        description: "Enable pedantic compiler warnings.",
         default: false,
     },
 };
@@ -38,7 +38,7 @@ export const VesBuildEnableWslPreference: VesProperty = {
     id: "build.enableWsl",
     property: {
         type: "boolean",
-        description: "Build in WSL for faster compilation times",
+        description: "Build in WSL for faster compilation times.",
         default: false,
     },
 };

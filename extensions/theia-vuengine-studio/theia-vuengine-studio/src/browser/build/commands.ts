@@ -44,3 +44,9 @@ export const VesBuildToggleEnableWslCommand: Command = {
     label: "Toggle use WSL for building",
     category: "Build",
 };
+
+export const VesBuildOpenWidgetCommand: Command = {
+    id: "VesBuild.commands.openWidget",
+    label: "Open Build Widget",
+    category: "Build",
+};

@@ -68,7 +68,7 @@ export class VesFlashCartServiceImpl implements VesFlashCartService {
                             config: flashCartConfig,
                             device: devices[i],
                             status: {
-                                processId: 0,
+                                processId: -1,
                                 step: "",
                                 progress: -1,
                                 log: "",

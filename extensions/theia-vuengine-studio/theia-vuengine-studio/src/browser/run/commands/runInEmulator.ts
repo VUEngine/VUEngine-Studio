@@ -18,6 +18,8 @@ export async function runInEmulatorCommand(
 ) {
   if (vesState.isRunQueued) {
     vesState.isRunQueued = false;
+  } else if (vesState.buildStatus.active) {
+    vesState.isRunQueued = true;
   } else if (vesState.outputRomExists) {
     run(openerService, preferenceService, vesProcessService);
   } else {
@@ -43,7 +45,6 @@ async function run(
     const romUri = new URI(getRomPath());
     const opener = await openerService.getOpener(romUri);
     await opener.open(romUri);
-    console.log(opener);
   } else {
     const emulatorPath = defaultEmulatorConfig.path;
     const emulatorArgs = defaultEmulatorConfig.args.replace("%ROM%", getRomPath()).split(" ");

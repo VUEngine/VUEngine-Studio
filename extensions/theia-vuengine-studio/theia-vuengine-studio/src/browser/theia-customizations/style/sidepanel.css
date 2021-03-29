@@ -1,0 +1,3 @@
+.p-Widget.theia-sidepanel-toolbar {
+    border-bottom: 1px solid var(--theia-activityBar-background);
+}

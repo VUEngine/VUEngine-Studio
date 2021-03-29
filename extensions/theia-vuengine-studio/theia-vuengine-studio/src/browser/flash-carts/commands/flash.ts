@@ -53,15 +53,27 @@ export async function flashCommand(
 ) {
   if (vesState.isFlashQueued) {
     vesState.isFlashQueued = false;
-    return;
+  } else if (vesState.buildStatus.active) {
+    vesState.isFlashQueued = true;
   } else if (vesState.isFlashing || vesState.connectedFlashCarts.length === 0) {
     commandService.executeCommand(VesOpenFlashCartsWidgetCommand.id);
-    return;
-  }
+  } else {
+    vesState.onDidChangeOutputRomExists(outputRomExists => {
+      if (outputRomExists && vesState.isFlashQueued) {
+        vesState.isFlashQueued = false;
+        flash(
+          commandService,
+          fileService,
+          messageService,
+          preferenceService,
+          vesProcessService,
+          vesProcessWatcher,
+          vesState,
+        );
+      }
+    })
 
-  vesState.onDidChangeOutputRomExists(outputRomExists => {
-    if (outputRomExists && vesState.isFlashQueued) {
-      vesState.isFlashQueued = false;
+    if (vesState.outputRomExists) {
       flash(
         commandService,
         fileService,
@@ -71,22 +83,10 @@ export async function flashCommand(
         vesProcessWatcher,
         vesState,
       );
+    } else {
+      commandService.executeCommand(VesBuildCommand.id);
+      vesState.isFlashQueued = true;
     }
-  })
-
-  if (vesState.outputRomExists) {
-    flash(
-      commandService,
-      fileService,
-      messageService,
-      preferenceService,
-      vesProcessService,
-      vesProcessWatcher,
-      vesState,
-    );
-  } else {
-    commandService.executeCommand(VesBuildCommand.id);
-    vesState.isFlashQueued = true;
   }
 }
 
