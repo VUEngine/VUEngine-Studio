@@ -4,14 +4,14 @@ export const VesFlashCartsCommand: Command = {
     id: "VesFlashCarts.commands.flash",
     label: "Flash to Flash Cart",
     category: "Flash",
-    iconClass: "usb",
+    iconClass: "fa fa-usb",
 };
 
 export const VesOpenFlashCartsWidgetCommand: Command = {
     id: "VesFlashCarts.commands.openWidget",
     label: "Open Flash Carts Widget",
     category: "Flash",
-    iconClass: "usb",
+    iconClass: "fa fa-usb",
 };
 
 export const VesDetectConnectedFlashCartsCommand: Command = {

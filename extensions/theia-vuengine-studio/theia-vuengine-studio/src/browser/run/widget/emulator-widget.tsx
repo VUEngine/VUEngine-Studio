@@ -11,10 +11,9 @@ import {
   VesRunEmulatorStereoModePreference,
 } from "../preferences";
 import { IMAGE_VB_CONTROLLER } from "../images/vb-controller";
+import { CommandService } from "@theia/core";
 
 const datauri = require("datauri");
-
-// TODO: create overlay(s?) to view/remap button assigments for both emulator commands and controller input
 
 export const VesEmulatorWidgetOptions = Symbol("VesEmulatorWidgetOptions");
 export interface VesEmulatorWidgetOptions {
@@ -30,6 +29,8 @@ export type vesEmulatorWidgetState = {
 
 @injectable()
 export class VesEmulatorWidget extends ReactWidget {
+  @inject(CommandService)
+  protected readonly commandService: CommandService;
   @inject(PreferenceService)
   protected readonly preferenceService: PreferenceService;
   @inject(VesEmulatorWidgetOptions)
@@ -77,7 +78,7 @@ export class VesEmulatorWidget extends ReactWidget {
     status: "running",
     lowBattery: false,
     muted: false,
-    showControls: true,
+    showControls: false,
   };
 
   @postConstruct()
@@ -124,6 +125,7 @@ export class VesEmulatorWidget extends ReactWidget {
               className="theia-button secondary"
               title={this.state.status === "paused" ? "Resume" : "Pause"}
               onClick={() => this.togglePause()}
+              disabled={this.state.showControls}
             >
               <i
                 className={
@@ -135,6 +137,7 @@ export class VesEmulatorWidget extends ReactWidget {
               className="theia-button secondary"
               title="Reset"
               onClick={() => this.reset()}
+              disabled={this.state.showControls}
             >
               <i className="fa fa-refresh"></i>
             </button>
@@ -143,6 +146,7 @@ export class VesEmulatorWidget extends ReactWidget {
                 className="theia-button secondary"
                 title="Clean"
                 onClick={() => this.sendCommand("clean")}
+                disabled={this.state.showControls}
               >
                 <i className="fa fa-trash"></i>
               </button>
@@ -154,6 +158,7 @@ export class VesEmulatorWidget extends ReactWidget {
               className="theia-button secondary"
               title="Rewind"
               onClick={() => this.sendCommand("rewind")}
+              disabled={this.state.showControls}
             >
               <i className="fa fa-backward"></i>
             </button>
@@ -165,14 +170,16 @@ export class VesEmulatorWidget extends ReactWidget {
                 this.sendCommand("frameAdvance");
                 this.update();
               }}
+              disabled={this.state.showControls}
             >
               <i className="fa fa-step-forward"></i>
             </button>
 
             <button
               className="theia-button secondary"
-              title="Fast Forward"
+              title="Toggle Fast Forward"
               onClick={() => this.sendCommand("fastForward")}
+              disabled={this.state.showControls}
             >
               <i className="fa fa-forward"></i>
             </button>
@@ -186,6 +193,7 @@ export class VesEmulatorWidget extends ReactWidget {
                 this.sendCommand("mute");
                 this.update();
               }}
+              disabled={this.state.showControls}
             >
               <i
                 className={
@@ -201,6 +209,7 @@ export class VesEmulatorWidget extends ReactWidget {
                   className="theia-button secondary"
                   title="Increase Save State Slot"
                   onClick={() => this.sendCommand("increaseSaveSlot")}
+                  disabled={this.state.showControls}
                 >
                   <i className="fa fa-chevron-up"></i>
                 </button>
@@ -208,6 +217,7 @@ export class VesEmulatorWidget extends ReactWidget {
                   className="theia-button secondary"
                   title="Decrease Save State Slot"
                   onClick={() => this.sendCommand("decreaseSaveSlot")}
+                  disabled={this.state.showControls}
                 >
                   <i className="fa fa-chevron-down"></i>
                 </button>
@@ -215,6 +225,7 @@ export class VesEmulatorWidget extends ReactWidget {
                   className="theia-button secondary"
                   title="Save State"
                   onClick={() => this.sendCommand("saveState")}
+                  disabled={this.state.showControls}
                 >
                   <i className="fa fa-level-down"></i>{" "}
                   <i className="fa fa-bookmark-o"></i>
@@ -223,6 +234,7 @@ export class VesEmulatorWidget extends ReactWidget {
                   className="theia-button secondary"
                   title="Load State"
                   onClick={() => this.sendCommand("loadState")}
+                  disabled={this.state.showControls}
                 >
                   <i className="fa fa-bookmark-o"></i>{" "}
                   <i className="fa fa-level-up"></i>
@@ -239,6 +251,7 @@ export class VesEmulatorWidget extends ReactWidget {
                     VesRunEmulatorScalePreference.id
                   )}
                   onChange={(value) => this.setScale(value)}
+                  disabled={this.state.showControls}
                 >
                   {Object.keys(EmulatorScale).map((value, index) => {
                     return (
@@ -255,6 +268,7 @@ export class VesEmulatorWidget extends ReactWidget {
                     VesRunEmulatorStereoModePreference.id
                   )}
                   onChange={(value) => this.setStereoMode(value)}
+                  disabled={this.state.showControls}
                 >
                   {Object.keys(StereoMode).map((value, index) => {
                     return (
@@ -271,6 +285,7 @@ export class VesEmulatorWidget extends ReactWidget {
                     VesRunEmulatorEmulationModePreference.id
                   )}
                   onChange={(value) => this.setEmulationMode(value)}
+                  disabled={this.state.showControls}
                 >
                   {Object.keys(EmulationMode).map((value, index) => {
                     return (
@@ -288,6 +303,7 @@ export class VesEmulatorWidget extends ReactWidget {
               className="theia-button secondary"
               title="Fullscreen"
               onClick={() => this.sendCommand("fullscreen")}
+              disabled={this.state.showControls}
             >
               <i className="fa fa-arrows-alt"></i>
             </button>
@@ -299,6 +315,7 @@ export class VesEmulatorWidget extends ReactWidget {
               className="theia-button secondary"
               title="Save screenshot"
               onClick={() => this.saveScreenshot()}
+              disabled={this.state.showControls}
             >
               <i className="fa fa-camera"></i>
             </button>
@@ -310,6 +327,7 @@ export class VesEmulatorWidget extends ReactWidget {
               className="theia-button secondary"
               title="Toggle Low Battery flag"
               onClick={() => this.toggleBatteryLow()}
+              disabled={this.state.showControls}
             >
               <i className={this.state.lowBattery ? "fa fa-battery-empty" : "fa fa-battery-full"}></i>
             </button>
@@ -345,6 +363,17 @@ export class VesEmulatorWidget extends ReactWidget {
               <div className="controlsController">
                 <div className="buttonAssignmentGroup">
                   <div
+                    ref={this.controllerButtonAssignmentLTRef}
+                    onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonLTRef)}
+                    onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonLTRef)}
+                  >
+                    <span>Left Trigger</span>
+                    <span>
+                      <button className="theia-button secondary">G</button>
+                    </span>
+                  </div>
+                  <br />
+                  <div
                     ref={this.controllerButtonAssignmentLUpRef}
                     onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonLUpRef)}
                     onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonLUpRef)}
@@ -352,16 +381,6 @@ export class VesEmulatorWidget extends ReactWidget {
                     <span>Left D-Pad <i className="fa fa-fw fa-arrow-up"></i></span>
                     <span>
                       <button className="theia-button secondary">E</button>
-                    </span>
-                  </div>
-                  <div
-                    ref={this.controllerButtonAssignmentLLeftRef}
-                    onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonLLeftRef)}
-                    onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonLLeftRef)}
-                  >
-                    <span>Left D-Pad <i className="fa fa-fw fa-arrow-left"></i></span>
-                    <span>
-                      <button className="theia-button secondary">S</button>
                     </span>
                   </div>
                   <div
@@ -384,6 +403,16 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">D</button>
                     </span>
                   </div>
+                  <div
+                    ref={this.controllerButtonAssignmentLLeftRef}
+                    onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonLLeftRef)}
+                    onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonLLeftRef)}
+                  >
+                    <span>Left D-Pad <i className="fa fa-fw fa-arrow-left"></i></span>
+                    <span>
+                      <button className="theia-button secondary">S</button>
+                    </span>
+                  </div>
                   <br />
                   <div
                     ref={this.controllerButtonAssignmentSelectRef}
@@ -403,17 +432,6 @@ export class VesEmulatorWidget extends ReactWidget {
                     <span>Start </span>
                     <span>
                       <button className="theia-button secondary">B</button>
-                    </span>
-                  </div>
-                  <br />
-                  <div
-                    ref={this.controllerButtonAssignmentLTRef}
-                    onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonLTRef)}
-                    onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonLTRef)}
-                  >
-                    <span>Left Trigger</span>
-                    <span>
-                      <button className="theia-button secondary">G</button>
                     </span>
                   </div>
                 </div>
@@ -508,6 +526,17 @@ export class VesEmulatorWidget extends ReactWidget {
                 </div>
                 <div className="buttonAssignmentGroup">
                   <div
+                    ref={this.controllerButtonAssignmentRTRef}
+                    onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonRTRef)}
+                    onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonRTRef)}
+                  >
+                    <span>Right Trigger</span>
+                    <span>
+                      <button className="theia-button secondary">H</button>
+                    </span>
+                  </div>
+                  <br />
+                  <div
                     ref={this.controllerButtonAssignmentRUpRef}
                     onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonRUpRef)}
                     onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonRUpRef)}
@@ -515,16 +544,6 @@ export class VesEmulatorWidget extends ReactWidget {
                     <span>Right D-Pad <i className="fa fa-fw fa-arrow-up"></i></span>
                     <span>
                       <button className="theia-button secondary">I</button>
-                    </span>
-                  </div>
-                  <div
-                    ref={this.controllerButtonAssignmentRLeftRef}
-                    onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonRLeftRef)}
-                    onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonRLeftRef)}
-                  >
-                    <span>Right D-Pad <i className="fa fa-fw fa-arrow-left"></i></span>
-                    <span>
-                      <button className="theia-button secondary">J</button>
                     </span>
                   </div>
                   <div
@@ -547,17 +566,17 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">K</button>
                     </span>
                   </div>
-                  <br />
                   <div
-                    ref={this.controllerButtonAssignmentARef}
-                    onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonARef)}
-                    onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonARef)}
+                    ref={this.controllerButtonAssignmentRLeftRef}
+                    onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonRLeftRef)}
+                    onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonRLeftRef)}
                   >
-                    <span>A</span>
+                    <span>Right D-Pad <i className="fa fa-fw fa-arrow-left"></i></span>
                     <span>
-                      <button className="theia-button secondary">N</button>
+                      <button className="theia-button secondary">J</button>
                     </span>
                   </div>
+                  <br />
                   <div
                     ref={this.controllerButtonAssignmentBRef}
                     onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonBRef)}
@@ -568,15 +587,14 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">M</button>
                     </span>
                   </div>
-                  <br />
                   <div
-                    ref={this.controllerButtonAssignmentRTRef}
-                    onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonRTRef)}
-                    onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonRTRef)}
+                    ref={this.controllerButtonAssignmentARef}
+                    onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonARef)}
+                    onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonARef)}
                   >
-                    <span>Right Trigger</span>
+                    <span>A</span>
                     <span>
-                      <button className="theia-button secondary">H</button>
+                      <button className="theia-button secondary">N</button>
                     </span>
                   </div>
                 </div>
@@ -596,17 +614,18 @@ export class VesEmulatorWidget extends ReactWidget {
                     </span>
                   </div>
                   <div>
-                    <span>Audio Mute</span>
+                    <span>Mute Audio</span>
                     <span>
                       <button className="theia-button secondary">F3</button>
                     </span>
                   </div>
-                  <div>
+                  {/*<div>
                     <span>Toggle Low Power</span>
                     <span>
                       <button className="theia-button secondary">W</button>
                     </span>
                   </div>
+                  */}
                 </div>
                 <div className="buttonAssignmentGroup">
                   <div>
@@ -622,13 +641,13 @@ export class VesEmulatorWidget extends ReactWidget {
                     </span>
                   </div>
                   <div>
-                    <span>State Slot Decrease</span>
+                    <span>Decrease Save Slot</span>
                     <span>
                       <button className="theia-button secondary">F6</button>
                     </span>
                   </div>
                   <div>
-                    <span>State Slot Increase</span>
+                    <span>Increase Save Slot</span>
                     <span>
                       <button className="theia-button secondary">F7</button>
                     </span>
@@ -654,13 +673,19 @@ export class VesEmulatorWidget extends ReactWidget {
                     </span>
                   </div>
                   <div>
-                    <span>Toggle Slowmotion_btn</span>
+                    <span>Toggle Slow Motion</span>
                     <span>
                       <button className="theia-button secondary"><i className="fa fa-fw fa-arrow-down"></i></button>
                     </span>
                   </div>
                 </div>
               </div>
+              {/*
+              // TODO: make keyboard shortcuts configurable
+              <div className="controlsHint">
+                <button className="theia-button secondary" onClick={() => this.commandService.executeCommand(KeymapsCommands.OPEN_KEYMAPS.id)}>Open Shortcut Editor</button>
+              </div>
+              */}
             </div>
           </div>
         )
