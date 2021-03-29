@@ -77,6 +77,13 @@
   height: 0;
 }
 
+#vesBuildWidget .buildLogWrapper.filterWarning .buildLogLine:not(.warning) {
+  display: none;
+}
+#vesBuildWidget .buildLogWrapper.filterError .buildLogLine:not(.error) {
+  display: none;
+}
+
 #vesBuildWidget .buildLog {
   border: 1px solid var(--theia-activityBar-background);
   flex-grow: 1;
@@ -91,38 +98,39 @@
   width: 100%;
 }
 
-#vesBuildWidget .buildLog > div > div {
+#vesBuildWidget .buildLogLine {
   display: table-row;
 }
 
-#vesBuildWidget .buildLog > div > div:hover {
-  background: rgba(0,0,0,0.2);
+#vesBuildWidget .buildLogLine:hover {
+  background: rgba(0, 0, 0, 0.2);
 }
 
-#vesBuildWidget .buildLog .timestamp {
+#vesBuildWidget .buildLogLine .timestamp {
   display: table-cell;
-  opacity: .5;
+  opacity: 0.5;
   padding: 0 var(--theia-ui-padding);
 }
 
-#vesBuildWidget .buildLog .text {
+#vesBuildWidget .buildLogLine .text {
   display: table-cell;
   padding-right: var(--theia-ui-padding);
+  white-space: pre-wrap;
   width: 100%;
   word-break: break-all;
 }
 
-#vesBuildWidget .buildLog .headline .text {
+#vesBuildWidget .buildLogLine.headline .text {
   font-weight: bold;
 }
-#vesBuildWidget .buildLog .headline .text:before {
+#vesBuildWidget .buildLogLine.headline .text:before {
   content: "➜ ";
 }
 
-#vesBuildWidget .buildLog .warning .text {
+#vesBuildWidget .buildLogLine.warning .text {
   color: yellow;
 }
 
-#vesBuildWidget .buildLog .error .text {
+#vesBuildWidget .buildLogLine.error .text {
   color: red;
 }

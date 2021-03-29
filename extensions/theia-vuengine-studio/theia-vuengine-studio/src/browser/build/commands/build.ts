@@ -6,11 +6,23 @@ import { WorkspaceService } from "@theia/workspace/lib/browser";
 import { cpus } from "os";
 import { join as joinPath } from "path";
 import { VesProcessService } from "../../../common/process-service-protocol";
-import { convertoToEnvPath, getOs, getResourcesPath, getRomPath, getWorkspaceRoot } from "../../common/functions";
+import {
+  convertoToEnvPath,
+  getOs,
+  getResourcesPath,
+  getRomPath,
+  getWorkspaceRoot,
+} from "../../common/functions";
 import { VesStateModel } from "../../common/vesStateModel";
 import { VesProcessWatcher } from "../../services/process-service/process-watcher";
 import { VesBuildOpenWidgetCommand } from "../commands";
-import { VesBuildDumpElfPreference, VesBuildEngineCorePathPreference, VesBuildEnginePluginsPathPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "../preferences";
+import {
+  VesBuildDumpElfPreference,
+  VesBuildEngineCorePathPreference,
+  VesBuildEnginePluginsPathPreference,
+  VesBuildModePreference,
+  VesBuildPedanticWarningsPreference,
+} from "../preferences";
 import { BuildLogLineType, BuildMode } from "../types";
 
 export async function buildCommand(
@@ -27,10 +39,20 @@ export async function buildCommand(
     return;
   }
 
-  commandService.executeCommand(VesBuildOpenWidgetCommand.id, !vesState.buildStatus.active);
+  commandService.executeCommand(
+    VesBuildOpenWidgetCommand.id,
+    !vesState.buildStatus.active
+  );
 
   if (!vesState.buildStatus.active) {
-    build(fileService, preferenceService, storageService, vesProcessService, vesProcessWatcher, vesState);
+    build(
+      fileService,
+      preferenceService,
+      storageService,
+      vesProcessService,
+      vesProcessWatcher,
+      vesState
+    );
   }
 }
 
@@ -42,17 +64,33 @@ async function build(
   vesProcessWatcher: VesProcessWatcher,
   vesState: VesStateModel
 ) {
-  const workspaceRoot = getWorkspaceRoot()
+  const workspaceRoot = getWorkspaceRoot();
   const buildMode = preferenceService.get(VesBuildModePreference.id) as string;
-  const dumpElf = preferenceService.get(VesBuildDumpElfPreference.id) as boolean;
-  const pedanticWarnings = preferenceService.get(VesBuildPedanticWarningsPreference.id) as boolean;
-  const engineCorePath = await getEngineCorePath(fileService, preferenceService);
-  const enginePluginsPath = await getEnginePluginsPath(fileService, preferenceService);
+  const dumpElf = preferenceService.get(
+    VesBuildDumpElfPreference.id
+  ) as boolean;
+  const pedanticWarnings = preferenceService.get(
+    VesBuildPedanticWarningsPreference.id
+  ) as boolean;
+  const engineCorePath = await getEngineCorePath(
+    fileService,
+    preferenceService
+  );
+  const enginePluginsPath = await getEnginePluginsPath(
+    fileService,
+    preferenceService
+  );
   const compilerPath = getCompilerPath();
 
-  let makefile = convertoToEnvPath(preferenceService, joinPath(workspaceRoot, "makefile"));
-  if (!await fileService.exists(new URI(makefile))) {
-    makefile = convertoToEnvPath(preferenceService, joinPath(engineCorePath, "makefile-game"));
+  let makefile = convertoToEnvPath(
+    preferenceService,
+    joinPath(workspaceRoot, "makefile")
+  );
+  if (!(await fileService.exists(new URI(makefile)))) {
+    makefile = convertoToEnvPath(
+      preferenceService,
+      joinPath(engineCorePath, "makefile-game")
+    );
   }
 
   const romUri = new URI(getRomPath());
@@ -78,11 +116,15 @@ async function build(
   if (!isWindows) {
     vesProcessService.launchProcess({
       command: "chmod",
-      args: ["-R", "a+x", joinPath(compilerPath, "bin")]
+      args: ["-R", "a+x", joinPath(compilerPath, "bin")],
     });
     vesProcessService.launchProcess({
       command: "chmod",
-      args: ["-R", "a+x", joinPath(engineCorePath, "lib", "compiler", "preprocessor")]
+      args: [
+        "-R",
+        "a+x",
+        joinPath(engineCorePath, "lib", "compiler", "preprocessor"),
+      ],
     });
   }
 
@@ -90,27 +132,36 @@ async function build(
   // note: should no longer be necessary due to .gitattributes directive
   //preCallMake = 'find "' + convertoToEnvPath(engineCorePath) + 'lib/compiler/preprocessor/" -name "*.sh" -exec sed -i -e "s/$(printf \'\\r\')//" {} \\; ';
 
-  const { processManagerId, processId } = await vesProcessService.launchProcess({
-    command: "make",
-    args: [
-      "all",
-      "-e", `TYPE=${buildMode.toLowerCase()}`,
-      "-e", `PATH=${joinPath(compilerPath, "bin")}:${process.env.PATH}`,
-      "-f", makefile,
-      "-C", convertoToEnvPath(preferenceService, workspaceRoot),
-    ],
-    options: {
-      cwd: workspaceRoot,
-      env: {
-        "DUMP_ELF": dumpElf ? 1 : 0,
-        "ENGINE_FOLDER": convertoToEnvPath(preferenceService, engineCorePath),
-        "LC_ALL": "C",
-        "MAKE_JOBS": getThreads(),
-        "PLUGINS_FOLDER": convertoToEnvPath(preferenceService, enginePluginsPath),
-        "PRINT_PEDANTIC_WARNINGS": pedanticWarnings ? 1 : 0,
-      }
-    },
-  });
+  const { processManagerId, processId } = await vesProcessService.launchProcess(
+    {
+      command: "make",
+      args: [
+        "all",
+        "-e",
+        `TYPE=${buildMode.toLowerCase()}`,
+        "-e",
+        `PATH=${joinPath(compilerPath, "bin")}:${process.env.PATH}`,
+        "-f",
+        makefile,
+        "-C",
+        convertoToEnvPath(preferenceService, workspaceRoot),
+      ],
+      options: {
+        cwd: workspaceRoot,
+        env: {
+          DUMP_ELF: dumpElf ? 1 : 0,
+          ENGINE_FOLDER: convertoToEnvPath(preferenceService, engineCorePath),
+          LC_ALL: "C",
+          MAKE_JOBS: getThreads(),
+          PLUGINS_FOLDER: convertoToEnvPath(
+            preferenceService,
+            enginePluginsPath
+          ),
+          PRINT_PEDANTIC_WARNINGS: pedanticWarnings ? 1 : 0,
+        },
+      },
+    }
+  );
 
   vesProcessWatcher.onError(({ pId }) => {
     if (processManagerId === pId) {
@@ -157,7 +208,10 @@ function parseBuildOutput(vesState: VesStateModel, data: string) {
 
   if (data.startsWith("STARTING BUILD")) {
     type = BuildLogLineType.Headline;
-  } else if (data.startsWith("Preprocessing ") || data.startsWith("Building ")) {
+  } else if (
+    data.startsWith("Preprocessing ") ||
+    data.startsWith("Building ")
+  ) {
     type = BuildLogLineType.Headline;
     vesState.buildStatus.step = data.trimEnd();
   } else if (data.startsWith("make") || data.includes(" Error ")) {
@@ -169,31 +223,54 @@ function parseBuildOutput(vesState: VesStateModel, data: string) {
   return { text, type };
 }
 
-export function abortBuild(vesProcessService: VesProcessService, vesState: VesStateModel) {
+export function abortBuild(
+  vesProcessService: VesProcessService,
+  vesState: VesStateModel
+) {
   vesProcessService.killProcess(vesState.buildStatus.processManagerId);
   vesState.resetBuildStatus("aborted");
 }
 
-async function getEngineCorePath(fileService: FileService, preferenceService: PreferenceService) {
+async function getEngineCorePath(
+  fileService: FileService,
+  preferenceService: PreferenceService
+) {
   const defaultPath = joinPath(getResourcesPath(), "vuengine", "vuengine-core");
-  const customPath = preferenceService.get(VesBuildEngineCorePathPreference.id) as string;
+  const customPath = preferenceService.get(
+    VesBuildEngineCorePathPreference.id
+  ) as string;
 
-  return customPath && await fileService.exists(new URI(customPath))
+  return customPath && (await fileService.exists(new URI(customPath)))
     ? customPath
     : defaultPath;
 }
 
-async function getEnginePluginsPath(fileService: FileService, preferenceService: PreferenceService) {
-  const defaultPath = joinPath(getResourcesPath(), "vuengine", "vuengine-plugins");
-  const customPath = preferenceService.get(VesBuildEnginePluginsPathPreference.id) as string;
+async function getEnginePluginsPath(
+  fileService: FileService,
+  preferenceService: PreferenceService
+) {
+  const defaultPath = joinPath(
+    getResourcesPath(),
+    "vuengine",
+    "vuengine-plugins"
+  );
+  const customPath = preferenceService.get(
+    VesBuildEnginePluginsPathPreference.id
+  ) as string;
 
-  return customPath && await fileService.exists(new URI(customPath))
+  return customPath && (await fileService.exists(new URI(customPath)))
     ? customPath
     : defaultPath;
 }
 
 function getCompilerPath() {
-  return joinPath(getResourcesPath(), "binaries", "vuengine-studio-tools", getOs(), "gcc");
+  return joinPath(
+    getResourcesPath(),
+    "binaries",
+    "vuengine-studio-tools",
+    getOs(),
+    "gcc"
+  );
 }
 
 // function getMsysPath() {

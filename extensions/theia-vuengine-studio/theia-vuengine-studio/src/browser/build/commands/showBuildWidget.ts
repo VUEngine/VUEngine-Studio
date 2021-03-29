@@ -2,10 +2,10 @@ import { VesBuildWidgetContribution } from "../widget/build-view";
 
 export async function showBuildWidgetCommand(
   forceOpen: boolean,
-  vesBuildWidget: VesBuildWidgetContribution,
+  vesBuildWidget: VesBuildWidgetContribution
 ) {
   if (forceOpen) {
-    vesBuildWidget.openView();
+    vesBuildWidget.openView({ activate: true, reveal: true });
   } else {
     vesBuildWidget.toggleView();
   }
