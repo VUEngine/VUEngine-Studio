@@ -1,7 +1,7 @@
 import { dirname, join as joinPath } from "path";
 import { env } from "process";
 import { shell } from "electron";
-import { PreferenceService } from "@theia/core/lib/browser";
+import { KeybindingRegistry, PreferenceService } from "@theia/core/lib/browser";
 import { isOSX, isWindows } from "@theia/core";
 import { VesBuildEnableWslPreference } from "../build/preferences";
 
@@ -48,3 +48,12 @@ export function convertoToEnvPath(
 export function openUrl(url: string) {
   shell.openExternal(url);
 }
+
+export function getKeybindingLabel(keybindingRegistry: KeybindingRegistry, commandId: string, wrapInBrackets: boolean = false): string {
+    const keybinding = keybindingRegistry.getKeybindingsForCommand(commandId)[0];
+    let keybindingAccelerator = keybinding ? keybindingRegistry.acceleratorFor(keybinding, "+").join(", ") : "";
+    if (wrapInBrackets && keybindingAccelerator !== "") {
+      keybindingAccelerator = ` (${keybindingAccelerator})`
+    }
+    return keybindingAccelerator;
+};

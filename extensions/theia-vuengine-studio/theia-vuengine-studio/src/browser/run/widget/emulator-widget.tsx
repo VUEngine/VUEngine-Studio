@@ -2,9 +2,9 @@ import * as React from "react";
 import { basename, join as joinPath } from "path";
 import { inject, injectable, postConstruct } from "inversify";
 import { ReactWidget } from "@theia/core/lib/browser/widgets/react-widget";
-import { PreferenceScope, PreferenceService } from "@theia/core/lib/browser";
+import { KeybindingRegistry, PreferenceScope, PreferenceService } from "@theia/core/lib/browser";
 import { EmulationMode, EmulatorScale, StereoMode } from "../types";
-import { getResourcesPath, getRomPath } from "../../common/functions";
+import { getKeybindingLabel, getResourcesPath, getRomPath } from "../../common/functions";
 import {
   VesRunEmulatorEmulationModePreference,
   VesRunEmulatorScalePreference,
@@ -12,6 +12,23 @@ import {
 } from "../preferences";
 import { IMAGE_VB_CONTROLLER } from "../images/vb-controller";
 import { CommandService } from "@theia/core";
+import {
+  VesEmulatorInputLUpCommand,
+  VesEmulatorInputLRightCommand,
+  VesEmulatorInputLDownCommand,
+  VesEmulatorInputLLeftCommand,
+  VesEmulatorInputStartCommand,
+  VesEmulatorInputSelectCommand,
+  VesEmulatorInputLTriggerCommand,
+  VesEmulatorInputRUpCommand,
+  VesEmulatorInputRRightCommand,
+  VesEmulatorInputRDownCommand,
+  VesEmulatorInputRLeftCommand,
+  VesEmulatorInputBCommand,
+  VesEmulatorInputACommand,
+  VesEmulatorInputRTriggerCommand,
+} from "../commands";
+import { KeymapsCommands } from "@theia/keymaps/lib/browser";
 
 const datauri = require("datauri");
 
@@ -31,6 +48,8 @@ export type vesEmulatorWidgetState = {
 export class VesEmulatorWidget extends ReactWidget {
   @inject(CommandService)
   protected readonly commandService: CommandService;
+  @inject(KeybindingRegistry)
+  protected readonly keybindingRegistry!: KeybindingRegistry;
   @inject(PreferenceService)
   protected readonly preferenceService: PreferenceService;
   @inject(VesEmulatorWidgetOptions)
@@ -93,6 +112,8 @@ export class VesEmulatorWidget extends ReactWidget {
     this.title.iconClass = "fa fa-play";
     this.title.closable = true;
     this.update();
+
+    this.keybindingRegistry.onKeybindingsChanged(() => this.update());
   }
 
   protected startEmulator(self: any) {
@@ -369,7 +390,9 @@ export class VesEmulatorWidget extends ReactWidget {
                   >
                     <span>Left Trigger</span>
                     <span>
-                      <button className="theia-button secondary">G</button>
+                      <button className="theia-button secondary">
+                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputLTriggerCommand.id, false)}
+                      </button>
                     </span>
                   </div>
                   <br />
@@ -380,7 +403,9 @@ export class VesEmulatorWidget extends ReactWidget {
                   >
                     <span>Left D-Pad <i className="fa fa-fw fa-arrow-up"></i></span>
                     <span>
-                      <button className="theia-button secondary">E</button>
+                      <button className="theia-button secondary">
+                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputLUpCommand.id, false)}
+                      </button>
                     </span>
                   </div>
                   <div
@@ -390,7 +415,9 @@ export class VesEmulatorWidget extends ReactWidget {
                   >
                     <span>Left D-Pad <i className="fa fa-fw fa-arrow-right"></i></span>
                     <span>
-                      <button className="theia-button secondary">F</button>
+                      <button className="theia-button secondary">
+                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputLRightCommand.id, false)}
+                      </button>
                     </span>
                   </div>
                   <div
@@ -400,7 +427,9 @@ export class VesEmulatorWidget extends ReactWidget {
                   >
                     <span>Left D-Pad <i className="fa fa-fw fa-arrow-down"></i></span>
                     <span>
-                      <button className="theia-button secondary">D</button>
+                      <button className="theia-button secondary">
+                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputLDownCommand.id, false)}
+                      </button>
                     </span>
                   </div>
                   <div
@@ -410,7 +439,9 @@ export class VesEmulatorWidget extends ReactWidget {
                   >
                     <span>Left D-Pad <i className="fa fa-fw fa-arrow-left"></i></span>
                     <span>
-                      <button className="theia-button secondary">S</button>
+                      <button className="theia-button secondary">
+                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputLLeftCommand.id, false)}
+                      </button>
                     </span>
                   </div>
                   <br />
@@ -421,7 +452,9 @@ export class VesEmulatorWidget extends ReactWidget {
                   >
                     <span>Select </span>
                     <span>
-                      <button className="theia-button secondary">V</button>
+                      <button className="theia-button secondary">
+                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputSelectCommand.id, false)}
+                      </button>
                     </span>
                   </div>
                   <div
@@ -431,7 +464,9 @@ export class VesEmulatorWidget extends ReactWidget {
                   >
                     <span>Start </span>
                     <span>
-                      <button className="theia-button secondary">B</button>
+                      <button className="theia-button secondary">
+                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputStartCommand.id, false)}
+                      </button>
                     </span>
                   </div>
                 </div>
@@ -532,7 +567,9 @@ export class VesEmulatorWidget extends ReactWidget {
                   >
                     <span>Right Trigger</span>
                     <span>
-                      <button className="theia-button secondary">H</button>
+                      <button className="theia-button secondary">
+                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputRTriggerCommand.id, false)}
+                      </button>
                     </span>
                   </div>
                   <br />
@@ -543,7 +580,9 @@ export class VesEmulatorWidget extends ReactWidget {
                   >
                     <span>Right D-Pad <i className="fa fa-fw fa-arrow-up"></i></span>
                     <span>
-                      <button className="theia-button secondary">I</button>
+                      <button className="theia-button secondary">
+                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputRUpCommand.id, false)}
+                      </button>
                     </span>
                   </div>
                   <div
@@ -553,7 +592,9 @@ export class VesEmulatorWidget extends ReactWidget {
                   >
                     <span>Right D-Pad <i className="fa fa-fw fa-arrow-right"></i></span>
                     <span>
-                      <button className="theia-button secondary">L</button>
+                      <button className="theia-button secondary">
+                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputRRightCommand.id, false)}
+                      </button>
                     </span>
                   </div>
                   <div
@@ -563,7 +604,9 @@ export class VesEmulatorWidget extends ReactWidget {
                   >
                     <span>Right D-Pad <i className="fa fa-fw fa-arrow-down"></i></span>
                     <span>
-                      <button className="theia-button secondary">K</button>
+                      <button className="theia-button secondary">
+                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputRDownCommand.id, false)}
+                      </button>
                     </span>
                   </div>
                   <div
@@ -573,7 +616,9 @@ export class VesEmulatorWidget extends ReactWidget {
                   >
                     <span>Right D-Pad <i className="fa fa-fw fa-arrow-left"></i></span>
                     <span>
-                      <button className="theia-button secondary">J</button>
+                      <button className="theia-button secondary">
+                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputRLeftCommand.id, false)}
+                      </button>
                     </span>
                   </div>
                   <br />
@@ -584,7 +629,9 @@ export class VesEmulatorWidget extends ReactWidget {
                   >
                     <span>B</span>
                     <span>
-                      <button className="theia-button secondary">M</button>
+                      <button className="theia-button secondary">
+                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputBCommand.id, false)}
+                      </button>
                     </span>
                   </div>
                   <div
@@ -594,7 +641,9 @@ export class VesEmulatorWidget extends ReactWidget {
                   >
                     <span>A</span>
                     <span>
-                      <button className="theia-button secondary">N</button>
+                      <button className="theia-button secondary">
+                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputACommand.id, false)}
+                      </button>
                     </span>
                   </div>
                 </div>
@@ -680,12 +729,9 @@ export class VesEmulatorWidget extends ReactWidget {
                   </div>
                 </div>
               </div>
-              {/*
-              // TODO: make keyboard shortcuts configurable
               <div className="controlsHint">
                 <button className="theia-button secondary" onClick={() => this.commandService.executeCommand(KeymapsCommands.OPEN_KEYMAPS.id)}>Open Shortcut Editor</button>
               </div>
-              */}
             </div>
           </div>
         )
@@ -839,7 +885,7 @@ export class VesEmulatorWidget extends ReactWidget {
         pause_nonactive = true
 
         input_player1_select = "v"
-        input_player1_start = "b"
+        input_player1_start = "${getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputStartCommand.id, false)}"
         input_player1_l = "g"
         input_player1_r = "h"
         input_player1_a = "m"
