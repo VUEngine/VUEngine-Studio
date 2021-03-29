@@ -5,27 +5,35 @@ import { ReactWidget } from "@theia/core/lib/browser/widgets/react-widget";
 import { PreferenceScope, PreferenceService } from "@theia/core/lib/browser";
 import { EmulationMode, EmulatorScale, StereoMode } from "../types";
 import { getResourcesPath, getRomPath } from "../../common/functions";
-import { VesRunEmulatorEmulationModePreference, VesRunEmulatorScalePreference, VesRunEmulatorStereoModePreference } from "../preferences";
+import {
+  VesRunEmulatorEmulationModePreference,
+  VesRunEmulatorScalePreference,
+  VesRunEmulatorStereoModePreference,
+} from "../preferences";
+import { IMAGE_VB_CONTROLLER } from "../images/vb-controller";
 
 const datauri = require("datauri");
 
 // TODO: create overlay(s?) to view/remap button assigments for both emulator commands and controller input
 
-export const VesEmulatorWidgetOptions = Symbol('VesEmulatorWidgetOptions');
+export const VesEmulatorWidgetOptions = Symbol("VesEmulatorWidgetOptions");
 export interface VesEmulatorWidgetOptions {
-  uri: string
+  uri: string;
 }
 
 export type vesEmulatorWidgetState = {
   status: string;
   lowBattery: boolean;
   muted: boolean;
+  showControls: boolean;
 };
 
 @injectable()
 export class VesEmulatorWidget extends ReactWidget {
-  @inject(PreferenceService) protected readonly preferenceService: PreferenceService;
-  @inject(VesEmulatorWidgetOptions) protected readonly options: VesEmulatorWidgetOptions;
+  @inject(PreferenceService)
+  protected readonly preferenceService: PreferenceService;
+  @inject(VesEmulatorWidgetOptions)
+  protected readonly options: VesEmulatorWidgetOptions;
 
   static readonly ID = "vesEmulatorWidget";
   static readonly LABEL = "Emulator";
@@ -40,6 +48,7 @@ export class VesEmulatorWidget extends ReactWidget {
     status: "running",
     lowBattery: false,
     muted: false,
+    showControls: false,
   };
 
   @postConstruct()
@@ -57,9 +66,7 @@ export class VesEmulatorWidget extends ReactWidget {
   }
 
   protected startEmulator(self: any) {
-    const romPath = this.options
-      ? this.options.uri
-      : getRomPath();
+    const romPath = this.options ? this.options.uri : getRomPath();
 
     datauri(romPath, (err: any) => {
       if (err) throw err;
@@ -89,7 +96,11 @@ export class VesEmulatorWidget extends ReactWidget {
               title={this.state.status === "paused" ? "Resume" : "Pause"}
               onClick={() => this.togglePause()}
             >
-              <i className={this.state.status === "paused" ? "fa fa-play" : "fa fa-pause"}></i>
+              <i
+                className={
+                  this.state.status === "paused" ? "fa fa-play" : "fa fa-pause"
+                }
+              ></i>
             </button>
             <button
               className="theia-button secondary"
@@ -147,83 +158,101 @@ export class VesEmulatorWidget extends ReactWidget {
                 this.update();
               }}
             >
-              <i className={this.state.muted ? "fa fa-volume-off" : "fa fa-volume-up"}></i>
+              <i
+                className={
+                  this.state.muted ? "fa fa-volume-off" : "fa fa-volume-up"
+                }
+              ></i>
             </button>
           </div>
-          {this.wrapperRef.current && this.wrapperRef.current?.offsetWidth > 900 &&
-            <div>
-              <button
-                className="theia-button secondary"
-                title="Increase Save State Slot"
-                onClick={() => this.sendCommand("increaseSaveSlot")}
-              >
-                <i className="fa fa-chevron-up"></i>
-              </button>
-              <button
-                className="theia-button secondary"
-                title="Decrease Save State Slot"
-                onClick={() => this.sendCommand("decreaseSaveSlot")}
-              >
-                <i className="fa fa-chevron-down"></i>
-              </button>
-              <button
-                className="theia-button secondary"
-                title="Save State"
-                onClick={() => this.sendCommand("saveState")}
-              >
-                <i className="fa fa-level-down"></i>{" "}
-                <i className="fa fa-bookmark-o"></i>
-              </button>
-              <button
-                className="theia-button secondary"
-                title="Load State"
-                onClick={() => this.sendCommand("loadState")}
-              >
-                <i className="fa fa-bookmark-o"></i>{" "}
-                <i className="fa fa-level-up"></i>
-              </button>
-            </div>
-          }
-          {this.wrapperRef.current && this.wrapperRef.current?.offsetWidth > 750 &&
-            <div>
-              <select
-                className="theia-select"
-                title="Scale"
-                value={this.preferenceService.get(VesRunEmulatorScalePreference.id)}
-                onChange={(value) => this.setScale(value)}
-              >
-                {Object.keys(EmulatorScale).map((value, index) => {
-                  return <option value={value}>
-                    {Object.values(EmulatorScale)[index]}
-                  </option>
-                })}
-              </select>
-              <select
-                className="theia-select"
-                title="Stereo Mode"
-                value={this.preferenceService.get(VesRunEmulatorStereoModePreference.id)}
-                onChange={(value) => this.setStereoMode(value)}
-              >
-                {Object.keys(StereoMode).map((value, index) => {
-                  return <option value={value}>
-                    {Object.values(StereoMode)[index]}
-                  </option>
-                })}
-              </select>
-              <select
-                className="theia-select"
-                title="Emulation Mode"
-                value={this.preferenceService.get(VesRunEmulatorEmulationModePreference.id)}
-                onChange={(value) => this.setEmulationMode(value)}
-              >
-                {Object.keys(EmulationMode).map((value, index) => {
-                  return <option value={value}>
-                    {Object.values(EmulationMode)[index]}
-                  </option>
-                })}
-              </select>
-            </div>
-          }
+          {this.wrapperRef.current &&
+            this.wrapperRef.current?.offsetWidth > 900 && (
+              <div>
+                <button
+                  className="theia-button secondary"
+                  title="Increase Save State Slot"
+                  onClick={() => this.sendCommand("increaseSaveSlot")}
+                >
+                  <i className="fa fa-chevron-up"></i>
+                </button>
+                <button
+                  className="theia-button secondary"
+                  title="Decrease Save State Slot"
+                  onClick={() => this.sendCommand("decreaseSaveSlot")}
+                >
+                  <i className="fa fa-chevron-down"></i>
+                </button>
+                <button
+                  className="theia-button secondary"
+                  title="Save State"
+                  onClick={() => this.sendCommand("saveState")}
+                >
+                  <i className="fa fa-level-down"></i>{" "}
+                  <i className="fa fa-bookmark-o"></i>
+                </button>
+                <button
+                  className="theia-button secondary"
+                  title="Load State"
+                  onClick={() => this.sendCommand("loadState")}
+                >
+                  <i className="fa fa-bookmark-o"></i>{" "}
+                  <i className="fa fa-level-up"></i>
+                </button>
+              </div>
+            )}
+          {this.wrapperRef.current &&
+            this.wrapperRef.current?.offsetWidth > 750 && (
+              <div>
+                <select
+                  className="theia-select"
+                  title="Scale"
+                  value={this.preferenceService.get(
+                    VesRunEmulatorScalePreference.id
+                  )}
+                  onChange={(value) => this.setScale(value)}
+                >
+                  {Object.keys(EmulatorScale).map((value, index) => {
+                    return (
+                      <option value={value}>
+                        {Object.values(EmulatorScale)[index]}
+                      </option>
+                    );
+                  })}
+                </select>
+                <select
+                  className="theia-select"
+                  title="Stereo Mode"
+                  value={this.preferenceService.get(
+                    VesRunEmulatorStereoModePreference.id
+                  )}
+                  onChange={(value) => this.setStereoMode(value)}
+                >
+                  {Object.keys(StereoMode).map((value, index) => {
+                    return (
+                      <option value={value}>
+                        {Object.values(StereoMode)[index]}
+                      </option>
+                    );
+                  })}
+                </select>
+                <select
+                  className="theia-select"
+                  title="Emulation Mode"
+                  value={this.preferenceService.get(
+                    VesRunEmulatorEmulationModePreference.id
+                  )}
+                  onChange={(value) => this.setEmulationMode(value)}
+                >
+                  {Object.keys(EmulationMode).map((value, index) => {
+                    return (
+                      <option value={value}>
+                        {Object.values(EmulationMode)[index]}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+            )}
           {/*/}
           <div>
             <button
@@ -257,13 +286,19 @@ export class VesEmulatorWidget extends ReactWidget {
             </button>
           </div>
           {/**/}
-          {/*/}
           <div>
-            <button className="theia-button secondary" title="Configure Input">
+            <button
+              className={
+                this.state.showControls
+                  ? `theia-button`
+                  : `theia-button secondary`
+              }
+              title="Configure Input"
+              onClick={() => this.toggleControlsOverlay()}
+            >
               <i className="fa fa-keyboard-o"></i>
             </button>
           </div>
-          {/**/}
         </div>
         <div id="vesEmulatorWrapper" ref={this.wrapperRef}>
           <iframe
@@ -275,6 +310,75 @@ export class VesEmulatorWidget extends ReactWidget {
             onLoad={() => this.startEmulator(this)}
           ></iframe>
         </div>
+        {this.state.showControls && (
+          <div className="controlsOverlay">
+            <div>
+              <div>
+                Left D-Pad ↑{" "}
+                <button className="theia-button secondary">E</button>
+              </div>
+              <div>
+                Left D-Pad ←{" "}
+                <button className="theia-button secondary">S</button>
+              </div>
+              <div>
+                Left D-Pad →{" "}
+                <button className="theia-button secondary">F</button>
+              </div>
+              <div>
+                Left D-Pad ↓{" "}
+                <button className="theia-button secondary">D</button>
+              </div>
+              <div>
+                Select <button className="theia-button secondary">V</button>
+              </div>
+              <div>
+                Start <button className="theia-button secondary">B</button>
+              </div>
+              <div>
+                Left Trigger{" "}
+                <button className="theia-button secondary">G</button>
+              </div>
+            </div>
+            <div>
+              <div className="controllerImage">
+                <img src={IMAGE_VB_CONTROLLER} />
+                <div className="buttonOverlay select"></div>
+                <div className="buttonOverlay start"></div>
+                <div className="buttonOverlay a"></div>
+                <div className="buttonOverlay b"></div>
+              </div>
+            </div>
+            <div>
+              <div>
+                Right D-Pad ↑{" "}
+                <button className="theia-button secondary">I</button>
+              </div>
+              <div>
+                Right D-Pad ←{" "}
+                <button className="theia-button secondary">J</button>
+              </div>
+              <div>
+                Right D-Pad →{" "}
+                <button className="theia-button secondary">L</button>
+              </div>
+              <div>
+                Right D-Pad ↓{" "}
+                <button className="theia-button secondary">K</button>
+              </div>
+              <div>
+                A <button className="theia-button secondary">N</button>
+              </div>
+              <div>
+                B <button className="theia-button secondary">M</button>
+              </div>
+              <div>
+                Right Trigger{" "}
+                <button className="theia-button secondary">H</button>
+              </div>
+            </div>
+          </div>
+        )}
       </>
     );
   }
@@ -299,8 +403,10 @@ export class VesEmulatorWidget extends ReactWidget {
 
   protected saveScreenshot() {
     // TODO: this does not work
-    const canvas = this.iframeRef.current?.contentDocument?.getElementById("canvas") as HTMLCanvasElement;
-    var lnk = document.createElement('a');
+    const canvas = this.iframeRef.current?.contentDocument?.getElementById(
+      "canvas"
+    ) as HTMLCanvasElement;
+    var lnk = document.createElement("a");
     lnk.download = "filename.png";
     lnk.href = canvas?.toDataURL("image/png;base64");
     lnk.click();
@@ -335,25 +441,41 @@ export class VesEmulatorWidget extends ReactWidget {
   }
 
   protected async setEmulationMode(e: React.ChangeEvent<HTMLSelectElement>) {
-    await this.preferenceService.set(VesRunEmulatorEmulationModePreference.id, e.target.value, PreferenceScope.User);
+    await this.preferenceService.set(
+      VesRunEmulatorEmulationModePreference.id,
+      e.target.value,
+      PreferenceScope.User
+    );
     this.sendCoreOptions();
     this.reload();
   }
 
   protected async setStereoMode(e: React.ChangeEvent<HTMLSelectElement>) {
-    await this.preferenceService.set(VesRunEmulatorStereoModePreference.id, e.target.value, PreferenceScope.User);
+    await this.preferenceService.set(
+      VesRunEmulatorStereoModePreference.id,
+      e.target.value,
+      PreferenceScope.User
+    );
     this.sendCoreOptions();
     this.reload();
   }
 
   protected async setScale(e: React.ChangeEvent<HTMLSelectElement>) {
-    await this.preferenceService.set(VesRunEmulatorScalePreference.id, e.target.value, PreferenceScope.User);
+    await this.preferenceService.set(
+      VesRunEmulatorScalePreference.id,
+      e.target.value,
+      PreferenceScope.User
+    );
     this.update();
   }
 
   protected sendCoreOptions() {
-    const emulationMode = this.preferenceService.get(VesRunEmulatorEmulationModePreference.id) as string;
-    let stereoMode = this.preferenceService.get(VesRunEmulatorStereoModePreference.id) as string;
+    const emulationMode = this.preferenceService.get(
+      VesRunEmulatorEmulationModePreference.id
+    ) as string;
+    let stereoMode = this.preferenceService.get(
+      VesRunEmulatorStereoModePreference.id
+    ) as string;
     let anaglyphPreset = "disabled";
     let colorMode = "black & red";
 
@@ -404,7 +526,7 @@ export class VesEmulatorWidget extends ReactWidget {
         quit_press_twice = false
         rewind_enable = true
         pause_nonactive = true
-        
+
         input_player1_select = "v"
         input_player1_start = "b"
         input_player1_l = "g"
@@ -457,10 +579,14 @@ export class VesEmulatorWidget extends ReactWidget {
   }
 
   protected getCanvasDimensions(): { height: number; width: number } {
-    const canvasScale = this.preferenceService.get(VesRunEmulatorScalePreference.id) as string;
+    const canvasScale = this.preferenceService.get(
+      VesRunEmulatorScalePreference.id
+    ) as string;
     const screenResolution = this.getScreenResolution();
-    const wrapperHeight = this.wrapperRef.current?.offsetHeight || screenResolution.height;
-    const wrapperWidth = this.wrapperRef.current?.offsetWidth || screenResolution.width;
+    const wrapperHeight =
+      this.wrapperRef.current?.offsetHeight || screenResolution.height;
+    const wrapperWidth =
+      this.wrapperRef.current?.offsetWidth || screenResolution.width;
 
     if (canvasScale === "full") {
       const fullSizeCanvasScale = Math.min.apply(Math, [
@@ -490,8 +616,10 @@ export class VesEmulatorWidget extends ReactWidget {
 
   protected determineMaxCanvasScaleFactor(): number {
     const screenResolution = this.getScreenResolution();
-    const wrapperHeight = this.wrapperRef.current?.offsetHeight || screenResolution.height;
-    const wrapperWidth = this.wrapperRef.current?.offsetWidth || screenResolution.width;
+    const wrapperHeight =
+      this.wrapperRef.current?.offsetHeight || screenResolution.height;
+    const wrapperWidth =
+      this.wrapperRef.current?.offsetWidth || screenResolution.width;
 
     return Math.min.apply(Math, [
       Math.floor(wrapperHeight / screenResolution.height),
@@ -499,8 +627,10 @@ export class VesEmulatorWidget extends ReactWidget {
     ]);
   }
 
-  protected getScreenResolution(): { height: number, width: number } {
-    const stereoMode = this.preferenceService.get(VesRunEmulatorStereoModePreference.id) as string;
+  protected getScreenResolution(): { height: number; width: number } {
+    const stereoMode = this.preferenceService.get(
+      VesRunEmulatorStereoModePreference.id
+    ) as string;
     let x = VesEmulatorWidget.RESOLUTIONX;
     let y = VesEmulatorWidget.RESOLUTIONY;
 
@@ -516,5 +646,10 @@ export class VesEmulatorWidget extends ReactWidget {
     }
 
     return { height: y, width: x };
+  }
+
+  protected toggleControlsOverlay() {
+    this.state.showControls = !this.state.showControls;
+    this.update();
   }
 }

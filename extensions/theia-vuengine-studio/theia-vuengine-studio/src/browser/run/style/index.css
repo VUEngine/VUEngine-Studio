@@ -39,3 +39,59 @@ iframe#vesEmulatorFrame {
   border: none;
   overflow: hidden;
 }
+
+#vesEmulatorWidget .controlsOverlay {
+  background-color: var(--theia-editor-background);
+  bottom: 0;
+  display: flex;
+  left: 0;
+  padding: calc(var(--theia-ui-padding) * 2);
+  position: absolute;
+  right: 0;
+  top: 50px;
+}
+
+#vesEmulatorWidget .controlsOverlay .controllerImage {
+  position: relative;
+}
+
+#vesEmulatorWidget .controlsOverlay .controllerImage img {
+  width: 100%;
+}
+
+#vesEmulatorWidget .controlsOverlay .controllerImage .buttonOverlay {
+  border: 0.6vw solid green;
+  display: none;
+  position: absolute;
+}
+
+#vesEmulatorWidget .controlsOverlay .controllerImage .buttonOverlay.select,
+#vesEmulatorWidget .controlsOverlay .controllerImage .buttonOverlay.start,
+#vesEmulatorWidget .controlsOverlay .controllerImage .buttonOverlay.a,
+#vesEmulatorWidget .controlsOverlay .controllerImage .buttonOverlay.b,
+#vesEmulatorWidget .controlsOverlay .controllerImage .buttonOverlay.lt,
+#vesEmulatorWidget .controlsOverlay .controllerImage .buttonOverlay.rt {
+  border-radius: 50%;
+  height: 6.8%;
+  width: calc(6.8% * 0.88);
+}
+
+#vesEmulatorWidget .controlsOverlay .controllerImage .buttonOverlay.select {
+  left: 25.9%;
+  top: 19.2%;
+}
+
+#vesEmulatorWidget .controlsOverlay .controllerImage .buttonOverlay.start {
+  left: 33.5%;
+  top: 23.7%;
+}
+
+#vesEmulatorWidget .controlsOverlay .controllerImage .buttonOverlay.a {
+  left: 57.2%;
+  top: 23.7%;
+}
+
+#vesEmulatorWidget .controlsOverlay .controllerImage .buttonOverlay.b {
+  left: 65.9%;
+  top: 19.2%;
+}
