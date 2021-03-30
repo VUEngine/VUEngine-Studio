@@ -103,5 +103,7 @@ export class VesRunKeybindingContribution implements KeybindingContribution {
 }
 
 export function bindVesRunKeybindings(bind: interfaces.Bind): void {
-  bind(KeybindingContribution).to(VesRunKeybindingContribution).inSingletonScope();
+  bind(KeybindingContribution)
+    .to(VesRunKeybindingContribution)
+    .inSingletonScope();
 }

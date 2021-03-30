@@ -54,6 +54,7 @@ export class VesBuildWidget extends ReactWidget {
     this.title.closable = true;
     this.title.label = VesBuildWidget.LABEL;
     this.title.caption = VesBuildWidget.LABEL;
+    this.node.tabIndex = 0; // required for this.node.focus() to work in this.onActivateRequest()
     this.update();
 
     this.vesState.onDidChangeBuildStatus(() => this.update());
@@ -67,6 +68,11 @@ export class VesBuildWidget extends ReactWidget {
           break;
       }
     });
+  }
+
+  protected onActivateRequest(msg: Message): void {
+    super.onActivateRequest(msg);
+    this.node.focus();
   }
 
   protected render(): React.ReactNode {

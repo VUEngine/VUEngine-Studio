@@ -2,9 +2,18 @@ import * as React from "react";
 import { basename, join as joinPath } from "path";
 import { inject, injectable, postConstruct } from "inversify";
 import { ReactWidget } from "@theia/core/lib/browser/widgets/react-widget";
-import { KeybindingRegistry, PreferenceScope, PreferenceService } from "@theia/core/lib/browser";
+import {
+  KeybindingRegistry,
+  Message,
+  PreferenceScope,
+  PreferenceService,
+} from "@theia/core/lib/browser";
 import { EmulationMode, EmulatorScale, StereoMode } from "../types";
-import { getKeybindingLabel, getResourcesPath, getRomPath } from "../../common/functions";
+import {
+  getKeybindingLabel,
+  getResourcesPath,
+  getRomPath,
+} from "../../common/functions";
 import {
   VesRunEmulatorEmulationModePreference,
   VesRunEmulatorScalePreference,
@@ -64,18 +73,38 @@ export class VesEmulatorWidget extends ReactWidget {
   protected wrapperRef = React.createRef<HTMLDivElement>();
   protected iframeRef = React.createRef<HTMLIFrameElement>();
 
-  protected controllerButtonAssignmentSelectRef = React.createRef<HTMLDivElement>();
-  protected controllerButtonAssignmentStartRef = React.createRef<HTMLDivElement>();
+  protected controllerButtonAssignmentSelectRef = React.createRef<
+    HTMLDivElement
+  >();
+  protected controllerButtonAssignmentStartRef = React.createRef<
+    HTMLDivElement
+  >();
   protected controllerButtonAssignmentARef = React.createRef<HTMLDivElement>();
   protected controllerButtonAssignmentBRef = React.createRef<HTMLDivElement>();
-  protected controllerButtonAssignmentLUpRef = React.createRef<HTMLDivElement>();
-  protected controllerButtonAssignmentLLeftRef = React.createRef<HTMLDivElement>();
-  protected controllerButtonAssignmentLRightRef = React.createRef<HTMLDivElement>();
-  protected controllerButtonAssignmentLDownRef = React.createRef<HTMLDivElement>();
-  protected controllerButtonAssignmentRUpRef = React.createRef<HTMLDivElement>();
-  protected controllerButtonAssignmentRLeftRef = React.createRef<HTMLDivElement>();
-  protected controllerButtonAssignmentRRightRef = React.createRef<HTMLDivElement>();
-  protected controllerButtonAssignmentRDownRef = React.createRef<HTMLDivElement>();
+  protected controllerButtonAssignmentLUpRef = React.createRef<
+    HTMLDivElement
+  >();
+  protected controllerButtonAssignmentLLeftRef = React.createRef<
+    HTMLDivElement
+  >();
+  protected controllerButtonAssignmentLRightRef = React.createRef<
+    HTMLDivElement
+  >();
+  protected controllerButtonAssignmentLDownRef = React.createRef<
+    HTMLDivElement
+  >();
+  protected controllerButtonAssignmentRUpRef = React.createRef<
+    HTMLDivElement
+  >();
+  protected controllerButtonAssignmentRLeftRef = React.createRef<
+    HTMLDivElement
+  >();
+  protected controllerButtonAssignmentRRightRef = React.createRef<
+    HTMLDivElement
+  >();
+  protected controllerButtonAssignmentRDownRef = React.createRef<
+    HTMLDivElement
+  >();
   protected controllerButtonAssignmentLTRef = React.createRef<HTMLDivElement>();
   protected controllerButtonAssignmentRTRef = React.createRef<HTMLDivElement>();
   protected controllerButtonSelectRef = React.createRef<HTMLDivElement>();
@@ -111,6 +140,7 @@ export class VesEmulatorWidget extends ReactWidget {
     this.title.caption = label;
     this.title.iconClass = "fa fa-play";
     this.title.closable = true;
+    this.node.tabIndex = 0; // required for this.node.focus() to work in this.onActivateRequest()
     this.update();
 
     this.keybindingRegistry.onKeybindingsChanged(() => this.update());
@@ -134,6 +164,11 @@ export class VesEmulatorWidget extends ReactWidget {
 
   protected onAfterShow() {
     this.iframeRef.current?.focus();
+  }
+
+  protected onActivateRequest(msg: Message): void {
+    super.onActivateRequest(msg);
+    this.node.focus();
   }
 
   protected render(): React.ReactNode {
@@ -385,87 +420,151 @@ export class VesEmulatorWidget extends ReactWidget {
                 <div className="buttonAssignmentGroup">
                   <div
                     ref={this.controllerButtonAssignmentLTRef}
-                    onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonLTRef)}
-                    onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonLTRef)}
+                    onMouseEnter={() =>
+                      this.toggleRefHighlighted(this.controllerButtonLTRef)
+                    }
+                    onMouseLeave={() =>
+                      this.toggleRefHighlighted(this.controllerButtonLTRef)
+                    }
                   >
                     <span>Left Trigger</span>
                     <span>
                       <button className="theia-button secondary">
-                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputLTriggerCommand.id, false)}
+                        {getKeybindingLabel(
+                          this.keybindingRegistry,
+                          VesEmulatorInputLTriggerCommand.id,
+                          false
+                        )}
                       </button>
                     </span>
                   </div>
                   <br />
                   <div
                     ref={this.controllerButtonAssignmentLUpRef}
-                    onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonLUpRef)}
-                    onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonLUpRef)}
+                    onMouseEnter={() =>
+                      this.toggleRefHighlighted(this.controllerButtonLUpRef)
+                    }
+                    onMouseLeave={() =>
+                      this.toggleRefHighlighted(this.controllerButtonLUpRef)
+                    }
                   >
-                    <span>Left D-Pad <i className="fa fa-fw fa-arrow-up"></i></span>
+                    <span>
+                      Left D-Pad <i className="fa fa-fw fa-arrow-up"></i>
+                    </span>
                     <span>
                       <button className="theia-button secondary">
-                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputLUpCommand.id, false)}
+                        {getKeybindingLabel(
+                          this.keybindingRegistry,
+                          VesEmulatorInputLUpCommand.id,
+                          false
+                        )}
                       </button>
                     </span>
                   </div>
                   <div
                     ref={this.controllerButtonAssignmentLRightRef}
-                    onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonLRightRef)}
-                    onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonLRightRef)}
+                    onMouseEnter={() =>
+                      this.toggleRefHighlighted(this.controllerButtonLRightRef)
+                    }
+                    onMouseLeave={() =>
+                      this.toggleRefHighlighted(this.controllerButtonLRightRef)
+                    }
                   >
-                    <span>Left D-Pad <i className="fa fa-fw fa-arrow-right"></i></span>
+                    <span>
+                      Left D-Pad <i className="fa fa-fw fa-arrow-right"></i>
+                    </span>
                     <span>
                       <button className="theia-button secondary">
-                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputLRightCommand.id, false)}
+                        {getKeybindingLabel(
+                          this.keybindingRegistry,
+                          VesEmulatorInputLRightCommand.id,
+                          false
+                        )}
                       </button>
                     </span>
                   </div>
                   <div
                     ref={this.controllerButtonAssignmentLDownRef}
-                    onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonLDownRef)}
-                    onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonLDownRef)}
+                    onMouseEnter={() =>
+                      this.toggleRefHighlighted(this.controllerButtonLDownRef)
+                    }
+                    onMouseLeave={() =>
+                      this.toggleRefHighlighted(this.controllerButtonLDownRef)
+                    }
                   >
-                    <span>Left D-Pad <i className="fa fa-fw fa-arrow-down"></i></span>
+                    <span>
+                      Left D-Pad <i className="fa fa-fw fa-arrow-down"></i>
+                    </span>
                     <span>
                       <button className="theia-button secondary">
-                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputLDownCommand.id, false)}
+                        {getKeybindingLabel(
+                          this.keybindingRegistry,
+                          VesEmulatorInputLDownCommand.id,
+                          false
+                        )}
                       </button>
                     </span>
                   </div>
                   <div
                     ref={this.controllerButtonAssignmentLLeftRef}
-                    onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonLLeftRef)}
-                    onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonLLeftRef)}
+                    onMouseEnter={() =>
+                      this.toggleRefHighlighted(this.controllerButtonLLeftRef)
+                    }
+                    onMouseLeave={() =>
+                      this.toggleRefHighlighted(this.controllerButtonLLeftRef)
+                    }
                   >
-                    <span>Left D-Pad <i className="fa fa-fw fa-arrow-left"></i></span>
+                    <span>
+                      Left D-Pad <i className="fa fa-fw fa-arrow-left"></i>
+                    </span>
                     <span>
                       <button className="theia-button secondary">
-                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputLLeftCommand.id, false)}
+                        {getKeybindingLabel(
+                          this.keybindingRegistry,
+                          VesEmulatorInputLLeftCommand.id,
+                          false
+                        )}
                       </button>
                     </span>
                   </div>
                   <br />
                   <div
                     ref={this.controllerButtonAssignmentSelectRef}
-                    onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonSelectRef)}
-                    onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonSelectRef)}
+                    onMouseEnter={() =>
+                      this.toggleRefHighlighted(this.controllerButtonSelectRef)
+                    }
+                    onMouseLeave={() =>
+                      this.toggleRefHighlighted(this.controllerButtonSelectRef)
+                    }
                   >
                     <span>Select </span>
                     <span>
                       <button className="theia-button secondary">
-                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputSelectCommand.id, false)}
+                        {getKeybindingLabel(
+                          this.keybindingRegistry,
+                          VesEmulatorInputSelectCommand.id,
+                          false
+                        )}
                       </button>
                     </span>
                   </div>
                   <div
                     ref={this.controllerButtonAssignmentStartRef}
-                    onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonStartRef)}
-                    onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonStartRef)}
+                    onMouseEnter={() =>
+                      this.toggleRefHighlighted(this.controllerButtonStartRef)
+                    }
+                    onMouseLeave={() =>
+                      this.toggleRefHighlighted(this.controllerButtonStartRef)
+                    }
                   >
                     <span>Start </span>
                     <span>
                       <button className="theia-button secondary">
-                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputStartCommand.id, false)}
+                        {getKeybindingLabel(
+                          this.keybindingRegistry,
+                          VesEmulatorInputStartCommand.id,
+                          false
+                        )}
                       </button>
                     </span>
                   </div>
@@ -476,173 +575,349 @@ export class VesEmulatorWidget extends ReactWidget {
                     <div
                       className="buttonOverlay select"
                       ref={this.controllerButtonSelectRef}
-                      onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentSelectRef)}
-                      onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentSelectRef)}
+                      onMouseEnter={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentSelectRef
+                        )
+                      }
+                      onMouseLeave={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentSelectRef
+                        )
+                      }
                     ></div>
                     <div
                       className="buttonOverlay start"
                       ref={this.controllerButtonStartRef}
-                      onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentStartRef)}
-                      onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentStartRef)}
+                      onMouseEnter={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentStartRef
+                        )
+                      }
+                      onMouseLeave={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentStartRef
+                        )
+                      }
                     ></div>
                     <div
                       className="buttonOverlay a"
                       ref={this.controllerButtonARef}
-                      onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentARef)}
-                      onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentARef)}
+                      onMouseEnter={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentARef
+                        )
+                      }
+                      onMouseLeave={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentARef
+                        )
+                      }
                     ></div>
                     <div
                       className="buttonOverlay b"
                       ref={this.controllerButtonBRef}
-                      onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentBRef)}
-                      onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentBRef)}
+                      onMouseEnter={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentBRef
+                        )
+                      }
+                      onMouseLeave={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentBRef
+                        )
+                      }
                     ></div>
                     <div
                       className="buttonOverlay lup"
                       ref={this.controllerButtonLUpRef}
-                      onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLUpRef)}
-                      onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLUpRef)}
+                      onMouseEnter={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentLUpRef
+                        )
+                      }
+                      onMouseLeave={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentLUpRef
+                        )
+                      }
                     ></div>
                     <div
                       className="buttonOverlay lleft"
                       ref={this.controllerButtonLLeftRef}
-                      onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLLeftRef)}
-                      onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLLeftRef)}
+                      onMouseEnter={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentLLeftRef
+                        )
+                      }
+                      onMouseLeave={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentLLeftRef
+                        )
+                      }
                     ></div>
                     <div
                       className="buttonOverlay lright"
                       ref={this.controllerButtonLRightRef}
-                      onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLRightRef)}
-                      onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLRightRef)}
+                      onMouseEnter={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentLRightRef
+                        )
+                      }
+                      onMouseLeave={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentLRightRef
+                        )
+                      }
                     ></div>
                     <div
                       className="buttonOverlay ldown"
                       ref={this.controllerButtonLDownRef}
-                      onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLDownRef)}
-                      onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLDownRef)}
+                      onMouseEnter={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentLDownRef
+                        )
+                      }
+                      onMouseLeave={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentLDownRef
+                        )
+                      }
                     ></div>
                     <div
                       className="buttonOverlay rup"
                       ref={this.controllerButtonRUpRef}
-                      onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRUpRef)}
-                      onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRUpRef)}
+                      onMouseEnter={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentRUpRef
+                        )
+                      }
+                      onMouseLeave={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentRUpRef
+                        )
+                      }
                     ></div>
                     <div
                       className="buttonOverlay rleft"
                       ref={this.controllerButtonRLeftRef}
-                      onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRLeftRef)}
-                      onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRLeftRef)}
+                      onMouseEnter={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentRLeftRef
+                        )
+                      }
+                      onMouseLeave={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentRLeftRef
+                        )
+                      }
                     ></div>
                     <div
                       className="buttonOverlay rright"
                       ref={this.controllerButtonRRightRef}
-                      onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRRightRef)}
-                      onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRRightRef)}
+                      onMouseEnter={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentRRightRef
+                        )
+                      }
+                      onMouseLeave={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentRRightRef
+                        )
+                      }
                     ></div>
                     <div
                       className="buttonOverlay rdown"
                       ref={this.controllerButtonRDownRef}
-                      onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRDownRef)}
-                      onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRDownRef)}
+                      onMouseEnter={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentRDownRef
+                        )
+                      }
+                      onMouseLeave={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentRDownRef
+                        )
+                      }
                     ></div>
                     <div
                       className="buttonOverlay lt"
                       ref={this.controllerButtonLTRef}
-                      onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLTRef)}
-                      onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentLTRef)}
+                      onMouseEnter={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentLTRef
+                        )
+                      }
+                      onMouseLeave={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentLTRef
+                        )
+                      }
                     ></div>
                     <div
                       className="buttonOverlay rt"
                       ref={this.controllerButtonRTRef}
-                      onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRTRef)}
-                      onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentRTRef)}
+                      onMouseEnter={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentRTRef
+                        )
+                      }
+                      onMouseLeave={() =>
+                        this.toggleRefHighlighted(
+                          this.controllerButtonAssignmentRTRef
+                        )
+                      }
                     ></div>
                   </div>
                 </div>
                 <div className="buttonAssignmentGroup">
                   <div
                     ref={this.controllerButtonAssignmentRTRef}
-                    onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonRTRef)}
-                    onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonRTRef)}
+                    onMouseEnter={() =>
+                      this.toggleRefHighlighted(this.controllerButtonRTRef)
+                    }
+                    onMouseLeave={() =>
+                      this.toggleRefHighlighted(this.controllerButtonRTRef)
+                    }
                   >
                     <span>Right Trigger</span>
                     <span>
                       <button className="theia-button secondary">
-                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputRTriggerCommand.id, false)}
+                        {getKeybindingLabel(
+                          this.keybindingRegistry,
+                          VesEmulatorInputRTriggerCommand.id,
+                          false
+                        )}
                       </button>
                     </span>
                   </div>
                   <br />
                   <div
                     ref={this.controllerButtonAssignmentRUpRef}
-                    onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonRUpRef)}
-                    onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonRUpRef)}
+                    onMouseEnter={() =>
+                      this.toggleRefHighlighted(this.controllerButtonRUpRef)
+                    }
+                    onMouseLeave={() =>
+                      this.toggleRefHighlighted(this.controllerButtonRUpRef)
+                    }
                   >
-                    <span>Right D-Pad <i className="fa fa-fw fa-arrow-up"></i></span>
+                    <span>
+                      Right D-Pad <i className="fa fa-fw fa-arrow-up"></i>
+                    </span>
                     <span>
                       <button className="theia-button secondary">
-                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputRUpCommand.id, false)}
+                        {getKeybindingLabel(
+                          this.keybindingRegistry,
+                          VesEmulatorInputRUpCommand.id,
+                          false
+                        )}
                       </button>
                     </span>
                   </div>
                   <div
                     ref={this.controllerButtonAssignmentRRightRef}
-                    onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonRRightRef)}
-                    onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonRRightRef)}
+                    onMouseEnter={() =>
+                      this.toggleRefHighlighted(this.controllerButtonRRightRef)
+                    }
+                    onMouseLeave={() =>
+                      this.toggleRefHighlighted(this.controllerButtonRRightRef)
+                    }
                   >
-                    <span>Right D-Pad <i className="fa fa-fw fa-arrow-right"></i></span>
+                    <span>
+                      Right D-Pad <i className="fa fa-fw fa-arrow-right"></i>
+                    </span>
                     <span>
                       <button className="theia-button secondary">
-                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputRRightCommand.id, false)}
+                        {getKeybindingLabel(
+                          this.keybindingRegistry,
+                          VesEmulatorInputRRightCommand.id,
+                          false
+                        )}
                       </button>
                     </span>
                   </div>
                   <div
                     ref={this.controllerButtonAssignmentRDownRef}
-                    onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonRDownRef)}
-                    onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonRDownRef)}
+                    onMouseEnter={() =>
+                      this.toggleRefHighlighted(this.controllerButtonRDownRef)
+                    }
+                    onMouseLeave={() =>
+                      this.toggleRefHighlighted(this.controllerButtonRDownRef)
+                    }
                   >
-                    <span>Right D-Pad <i className="fa fa-fw fa-arrow-down"></i></span>
+                    <span>
+                      Right D-Pad <i className="fa fa-fw fa-arrow-down"></i>
+                    </span>
                     <span>
                       <button className="theia-button secondary">
-                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputRDownCommand.id, false)}
+                        {getKeybindingLabel(
+                          this.keybindingRegistry,
+                          VesEmulatorInputRDownCommand.id,
+                          false
+                        )}
                       </button>
                     </span>
                   </div>
                   <div
                     ref={this.controllerButtonAssignmentRLeftRef}
-                    onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonRLeftRef)}
-                    onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonRLeftRef)}
+                    onMouseEnter={() =>
+                      this.toggleRefHighlighted(this.controllerButtonRLeftRef)
+                    }
+                    onMouseLeave={() =>
+                      this.toggleRefHighlighted(this.controllerButtonRLeftRef)
+                    }
                   >
-                    <span>Right D-Pad <i className="fa fa-fw fa-arrow-left"></i></span>
+                    <span>
+                      Right D-Pad <i className="fa fa-fw fa-arrow-left"></i>
+                    </span>
                     <span>
                       <button className="theia-button secondary">
-                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputRLeftCommand.id, false)}
+                        {getKeybindingLabel(
+                          this.keybindingRegistry,
+                          VesEmulatorInputRLeftCommand.id,
+                          false
+                        )}
                       </button>
                     </span>
                   </div>
                   <br />
                   <div
                     ref={this.controllerButtonAssignmentBRef}
-                    onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonBRef)}
-                    onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonBRef)}
+                    onMouseEnter={() =>
+                      this.toggleRefHighlighted(this.controllerButtonBRef)
+                    }
+                    onMouseLeave={() =>
+                      this.toggleRefHighlighted(this.controllerButtonBRef)
+                    }
                   >
                     <span>B</span>
                     <span>
                       <button className="theia-button secondary">
-                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputBCommand.id, false)}
+                        {getKeybindingLabel(
+                          this.keybindingRegistry,
+                          VesEmulatorInputBCommand.id,
+                          false
+                        )}
                       </button>
                     </span>
                   </div>
                   <div
                     ref={this.controllerButtonAssignmentARef}
-                    onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonARef)}
-                    onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonARef)}
+                    onMouseEnter={() =>
+                      this.toggleRefHighlighted(this.controllerButtonARef)
+                    }
+                    onMouseLeave={() =>
+                      this.toggleRefHighlighted(this.controllerButtonARef)
+                    }
                   >
                     <span>A</span>
                     <span>
                       <button className="theia-button secondary">
-                        {getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputACommand.id, false)}
+                        {getKeybindingLabel(
+                          this.keybindingRegistry,
+                          VesEmulatorInputACommand.id,
+                          false
+                        )}
                       </button>
                     </span>
                   </div>
@@ -706,36 +981,52 @@ export class VesEmulatorWidget extends ReactWidget {
                   <div>
                     <span>Frame Advance</span>
                     <span>
-                      <button className="theia-button secondary"><i className="fa fa-fw fa-arrow-up"></i></button>
+                      <button className="theia-button secondary">
+                        <i className="fa fa-fw fa-arrow-up"></i>
+                      </button>
                     </span>
                   </div>
                   <div>
                     <span>Rewind</span>
                     <span>
-                      <button className="theia-button secondary"><i className="fa fa-fw fa-arrow-left"></i></button>
+                      <button className="theia-button secondary">
+                        <i className="fa fa-fw fa-arrow-left"></i>
+                      </button>
                     </span>
                   </div>
                   <div>
                     <span>Toggle Fast Forward</span>
                     <span>
-                      <button className="theia-button secondary"><i className="fa fa-fw fa-arrow-right"></i></button>
+                      <button className="theia-button secondary">
+                        <i className="fa fa-fw fa-arrow-right"></i>
+                      </button>
                     </span>
                   </div>
                   <div>
                     <span>Toggle Slow Motion</span>
                     <span>
-                      <button className="theia-button secondary"><i className="fa fa-fw fa-arrow-down"></i></button>
+                      <button className="theia-button secondary">
+                        <i className="fa fa-fw fa-arrow-down"></i>
+                      </button>
                     </span>
                   </div>
                 </div>
               </div>
               <div className="controlsHint">
-                <button className="theia-button secondary" onClick={() => this.commandService.executeCommand(KeymapsCommands.OPEN_KEYMAPS.id)}>Open Shortcut Editor</button>
+                <button
+                  className="theia-button secondary"
+                  onClick={() =>
+                    this.commandService.executeCommand(
+                      KeymapsCommands.OPEN_KEYMAPS.id
+                    )
+                  }
+                >
+                  Open Shortcut Editor
+                </button>
               </div>
             </div>
           </div>
-        )
-        }
+        )}
       </>
     );
   }
@@ -885,7 +1176,11 @@ export class VesEmulatorWidget extends ReactWidget {
         pause_nonactive = true
 
         input_player1_select = "v"
-        input_player1_start = "${getKeybindingLabel(this.keybindingRegistry, VesEmulatorInputStartCommand.id, false)}"
+        input_player1_start = "${getKeybindingLabel(
+          this.keybindingRegistry,
+          VesEmulatorInputStartCommand.id,
+          false
+        )}"
         input_player1_l = "g"
         input_player1_r = "h"
         input_player1_a = "m"
@@ -1013,7 +1308,9 @@ export class VesEmulatorWidget extends ReactWidget {
     }
   }
 
-  protected toggleRefHighlighted(buttonOverlayRef: React.RefObject<HTMLDivElement>) {
+  protected toggleRefHighlighted(
+    buttonOverlayRef: React.RefObject<HTMLDivElement>
+  ) {
     buttonOverlayRef.current?.classList.toggle("highlighted");
   }
 }
