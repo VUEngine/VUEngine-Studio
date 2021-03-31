@@ -69,7 +69,7 @@ export enum EmulatorFunctionKeyCode {
   StateSlotIncrease = "F7",
   ToggleFastForward = "ArrowRight",
   PauseToggle = "Space",
-  ToggleSlowmotionBtn = "ArrowDown",
+  ToggleSlowmotion = "ArrowDown",
   Rewind = "ArrowLeft",
   FrameAdvance = "ArrowUp",
   Reset = "F10",
