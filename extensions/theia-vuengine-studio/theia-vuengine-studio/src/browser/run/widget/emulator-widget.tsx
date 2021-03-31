@@ -70,6 +70,14 @@ export type vesEmulatorWidgetState = {
   showControls: boolean;
 };
 
+// TODO: handling key presses through key bindings and a command does not 
+// support keeping a key pressed.
+// Might have to go back to keeping the emulator focused and just modify the 
+// buttons in RetroArch config according to Key Bindings.
+
+// TODO: slow motion seems to be hard wired to E key. 
+// Reconfiguring seemingly has no effect. File bug ticket with RetroArch?
+
 @injectable()
 export class VesEmulatorWidget extends ReactWidget {
   @inject(CommandService)
@@ -1309,29 +1317,29 @@ export class VesEmulatorWidget extends ReactWidget {
         input_player1_turbo = nul
 
         input_toggle_fullscreen = ${this.toButton(
-          EmulatorFunctionKeyCode.ToggleFullscreen
-        )}
+        EmulatorFunctionKeyCode.ToggleFullscreen
+      )}
         input_save_state = ${this.toButton(EmulatorFunctionKeyCode.SaveState)}
         input_load_state = ${this.toButton(EmulatorFunctionKeyCode.LoadState)}
         input_state_slot_decrease = ${this.toButton(
-          EmulatorFunctionKeyCode.StateSlotDecrease
-        )}
+        EmulatorFunctionKeyCode.StateSlotDecrease
+      )}
         input_state_slot_increase = ${this.toButton(
-          EmulatorFunctionKeyCode.StateSlotIncrease
-        )}
+        EmulatorFunctionKeyCode.StateSlotIncrease
+      )}
         input_toggle_fast_forward = ${this.toButton(
-          EmulatorFunctionKeyCode.ToggleFastForward
-        )}
+        EmulatorFunctionKeyCode.ToggleFastForward
+      )}
         input_pause_toggle = ${this.toButton(
-          EmulatorFunctionKeyCode.PauseToggle
-        )}
+        EmulatorFunctionKeyCode.PauseToggle
+      )}
         input_toggle_slowmotion_btn = ${this.toButton(
-          EmulatorFunctionKeyCode.ToggleSlowmotion
-        )}
+        EmulatorFunctionKeyCode.ToggleSlowmotion
+      )}
         input_rewind = ${this.toButton(EmulatorFunctionKeyCode.Rewind)}
         input_frame_advance = ${this.toButton(
-          EmulatorFunctionKeyCode.FrameAdvance
-        )}
+        EmulatorFunctionKeyCode.FrameAdvance
+      )}
         input_reset = ${this.toButton(EmulatorFunctionKeyCode.Reset)}
         input_audio_mute = ${this.toButton(EmulatorFunctionKeyCode.AudioMute)}
 
