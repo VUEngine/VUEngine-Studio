@@ -42,3 +42,36 @@ export enum EmulatorScale {
   x3 = "×3",
   full = "Full size",
 }
+
+export enum EmulatorGamePadKeyCode {
+  A = "KeyM",
+  B = "KeyN",
+  Start = "KeyB",
+  Select = "KeyV",
+  LUp = "KeyE",
+  LRight = "KeyF",
+  LDown = "KeyD",
+  LLeft = "KeyS",
+  RUp = "KeyI",
+  RRight = "KeyL",
+  RDown = "KeyK",
+  RLeft = "KeyJ",
+  LT = "KeyG",
+  RT = "KeyH",
+}
+
+export enum EmulatorFunctionKeyCode {
+  ToggleFullscreen = "nul",
+  ToggleLowBattery = "KeyW",
+  SaveState = "F4",
+  LoadState = "F5",
+  StateSlotDecrease = "F6",
+  StateSlotIncrease = "F7",
+  ToggleFastForward = "ArrowRight",
+  PauseToggle = "Space",
+  ToggleSlowmotionBtn = "ArrowDown",
+  Rewind = "ArrowLeft",
+  FrameAdvance = "ArrowUp",
+  Reset = "F10",
+  AudioMute = "F3",
+}

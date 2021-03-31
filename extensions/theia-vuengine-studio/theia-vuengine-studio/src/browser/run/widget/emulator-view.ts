@@ -11,9 +11,7 @@ import { VesEmulatorOpenHandler } from "./emulator-open-handler";
 import { VesEmulatorContextKeyService } from "../context-key-service";
 
 @injectable()
-export class VesEmulatorContribution extends AbstractViewContribution<
-  VesEmulatorWidget
-> {
+export class VesEmulatorContribution extends AbstractViewContribution<VesEmulatorWidget> {
   @inject(VesEmulatorContextKeyService)
   protected readonly contextKeyService: VesEmulatorContextKeyService;
 
@@ -55,5 +53,5 @@ export function bindVesEmulatorView(bind: interfaces.Bind): void {
         return child.get(VesEmulatorWidget);
       },
     }))
-    .inSingletonScope();
+  //.inSingletonScope();
 }
