@@ -3,6 +3,7 @@ import { bindTheiaCustomizationScmHistoryModule } from './history/scm-history-fr
 import { bindTheiaCustomizationDebugModule } from './debug/debug-frontend-module';
 import { bindTheiaCustomizationPluginModule } from './plugin/plugin-frontend-module';
 
+import "../../../src/browser/theia-customizations/logo/style/index.css";
 import "../../../src/browser/theia-customizations/style/buttons.css";
 import "../../../src/browser/theia-customizations/style/dialog.css";
 import "../../../src/browser/theia-customizations/style/input.css";

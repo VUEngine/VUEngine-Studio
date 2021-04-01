@@ -4,7 +4,7 @@ import { VesSupportUsCommand } from "./commands";
 import { CommonMenus } from "@theia/core/lib/browser";
 
 @injectable()
-export class VesBrandingMenuContribution implements MenuContribution {
+export class VesSupportUsMenuContribution implements MenuContribution {
   registerMenus(menus: MenuModelRegistry): void {
     menus.registerMenuAction(CommonMenus.HELP, {
       commandId: VesSupportUsCommand.id,
@@ -14,6 +14,6 @@ export class VesBrandingMenuContribution implements MenuContribution {
   }
 }
 
-export function bindVesBrandingMenu(bind: interfaces.Bind): void {
-  bind(MenuContribution).to(VesBrandingMenuContribution).inSingletonScope();
+export function bindVesSupportUsMenu(bind: interfaces.Bind): void {
+  bind(MenuContribution).to(VesSupportUsMenuContribution).inSingletonScope();
 }

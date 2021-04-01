@@ -10,7 +10,7 @@ export const VesSupportUsCommand: Command = {
 };
 
 @injectable()
-export class VesBrandingCommandContribution implements CommandContribution {
+export class VesSupportUsCommandContribution implements CommandContribution {
   registerCommands(commandRegistry: CommandRegistry): void {
     commandRegistry.registerCommand(VesSupportUsCommand, {
       execute: () => supportUsCommand()
@@ -18,6 +18,6 @@ export class VesBrandingCommandContribution implements CommandContribution {
   }
 }
 
-export function bindVesBrandingCommands(bind: interfaces.Bind): void {
-  bind(CommandContribution).to(VesBrandingCommandContribution).inSingletonScope();
+export function bindVesSupportUsCommands(bind: interfaces.Bind): void {
+  bind(CommandContribution).to(VesSupportUsCommandContribution).inSingletonScope();
 }
