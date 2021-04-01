@@ -8,8 +8,8 @@ import {
   VesBuildSetModeCommand,
   VesBuildToggleDumpElfCommand,
   VesBuildTogglePedanticWarningsCommand,
-} from "../commands";
-import { VesStateModel } from "../../common/vesStateModel";
+} from "../build-commands";
+import { VesState } from "../../common/ves-state";
 import { VesProcessService } from "../../../common/process-service-protocol";
 import { abortBuild } from "../commands/build";
 import { Message, PreferenceService } from "@theia/core/lib/browser";
@@ -17,8 +17,8 @@ import {
   VesBuildDumpElfPreference,
   VesBuildModePreference,
   VesBuildPedanticWarningsPreference,
-} from "../preferences";
-import { BuildLogLine, BuildLogLineType, BuildMode } from "../types";
+} from "../build-preferences";
+import { BuildLogLine, BuildLogLineType, BuildMode } from "../build-types";
 
 @injectable()
 export class VesBuildWidget extends ReactWidget {
@@ -27,7 +27,7 @@ export class VesBuildWidget extends ReactWidget {
   private readonly preferenceService: PreferenceService;
   @inject(VesProcessService)
   private readonly vesProcessService: VesProcessService;
-  @inject(VesStateModel) private readonly vesState: VesStateModel;
+  @inject(VesState) private readonly vesState: VesState;
   @inject(WorkspaceService) private readonly workspaceService: WorkspaceService;
 
   static readonly ID = "vesBuildWidget";
@@ -282,8 +282,8 @@ export class VesBuildWidget extends ReactWidget {
           className={
             this.state.logFilter !== BuildLogLineType.Normal
               ? `buildLogWrapper filter${this.state.logFilter
-                  .charAt(0)
-                  .toUpperCase()}${this.state.logFilter.slice(1)}`
+                .charAt(0)
+                .toUpperCase()}${this.state.logFilter.slice(1)}`
               : "buildLogWrapper"
           }
         >
@@ -338,9 +338,9 @@ export class VesBuildWidget extends ReactWidget {
       .getMinutes()
       .toString()
       .padStart(2, "0")}:${durationDate
-      .getSeconds()
-      .toString()
-      .padStart(2, "0")}`;
+        .getSeconds()
+        .toString()
+        .padStart(2, "0")}`;
   }
 
   protected toggleFilter(type: BuildLogLineType) {

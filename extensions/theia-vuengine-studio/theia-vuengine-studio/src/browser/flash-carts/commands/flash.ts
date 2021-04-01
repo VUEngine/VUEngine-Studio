@@ -5,14 +5,14 @@ import { PreferenceService } from "@theia/core/lib/browser";
 import { CommandService, isWindows, MessageService } from "@theia/core/lib/common";
 import URI from "@theia/core/lib/common/uri";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
-import { VesBuildCommand } from "../../build/commands";
-import { VesBuildEnableWslPreference } from "../../build/preferences";
-import { convertoToEnvPath, getOs, getResourcesPath, getRomPath } from "../../common/functions";
-import { VesStateModel } from "../../common/vesStateModel";
+import { VesBuildCommand } from "../../build/build-commands";
+import { VesBuildEnableWslPreference } from "../../build/build-preferences";
+import { convertoToEnvPath, getOs, getResourcesPath, getRomPath } from "../../common/common-functions";
+import { VesState } from "../../common/ves-state";
 import { VesProcessService } from "../../../common/process-service-protocol";
-import { VesFlashCartsPreference } from "../preferences";
+import { VesFlashCartsPreference } from "../flash-carts-preferences";
 import { VesProcessWatcher } from "../../services/process-service/process-watcher";
-import { VesOpenFlashCartsWidgetCommand } from "../commands";
+import { VesOpenFlashCartsWidgetCommand } from "../flash-carts-commands";
 import { IMAGE_HYPERFLASH32 } from "../images/hyperflash32";
 import { IMAGE_FLASHBOY_PLUS } from "../images/flashboy-plus";
 
@@ -49,7 +49,7 @@ export async function flashCommand(
   preferenceService: PreferenceService,
   vesProcessService: VesProcessService,
   vesProcessWatcher: VesProcessWatcher,
-  vesState: VesStateModel,
+  vesState: VesState,
 ) {
   if (vesState.isFlashQueued) {
     vesState.isFlashQueued = false;
@@ -97,7 +97,7 @@ async function flash(
   preferenceService: PreferenceService,
   vesProcessService: VesProcessService,
   vesProcessWatcher: VesProcessWatcher,
-  vesState: VesStateModel
+  vesState: VesState
 ) {
   for (const connectedFlashCart of vesState.connectedFlashCarts) {
     if (!connectedFlashCart.config.path) {
@@ -180,7 +180,7 @@ async function flash(
   commandService.executeCommand(VesOpenFlashCartsWidgetCommand.id, true);
 }
 
-export function abortFlash(vesProcessService: VesProcessService, vesState: VesStateModel) {
+export function abortFlash(vesProcessService: VesProcessService, vesState: VesState) {
   for (const connectedFlashCart of vesState.connectedFlashCarts) {
     vesProcessService.killProcess(connectedFlashCart.status.processId)
     connectedFlashCart.status.progress = -1;
@@ -193,7 +193,7 @@ export function abortFlash(vesProcessService: VesProcessService, vesState: VesSt
   vesState.flashingProgress = -1;
 }
 
-async function padRom(fileService: FileService, vesState: VesStateModel, size: number): Promise<boolean> {
+async function padRom(fileService: FileService, vesState: VesState, size: number): Promise<boolean> {
   const romPath = getRomPath();
   const paddedRomPath = getPaddedRomPath();
 
@@ -263,7 +263,7 @@ export function getFlashCartConfigs(preferenceService: PreferenceService): Flash
 
 async function monitorFlashing(
   vesProcessWatcher: VesProcessWatcher,
-  vesState: VesStateModel
+  vesState: VesState
 ) {
   for (const connectedFlashCart of vesState.connectedFlashCarts) {
     connectedFlashCart.status = {
@@ -299,7 +299,7 @@ async function monitorFlashing(
 async function monitorFlashingHyperFlash32(
   connectedFlashCart: ConnectedFlashCart,
   vesProcessWatcher: VesProcessWatcher,
-  vesState: VesStateModel,
+  vesState: VesState,
 ) {
   /* Number of # is only fixed (to 20) on HF32 firmware version 1.9 and above. 
      On lower firmwares, the number of # depends on file size.
@@ -333,7 +333,7 @@ async function monitorFlashingHyperFlash32(
 async function monitorFlashingFlashBoy(
   connectedFlashCart: ConnectedFlashCart,
   vesProcessWatcher: VesProcessWatcher,
-  vesState: VesStateModel,
+  vesState: VesState,
 ) {
   connectedFlashCart.status.step = "Erasing";
 

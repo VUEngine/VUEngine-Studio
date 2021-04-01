@@ -3,8 +3,8 @@ import * as React from 'react';
 import { join as joinPath } from 'path';
 import { AboutDialog, ABOUT_CONTENT_CLASS } from '@theia/core/lib/browser/about-dialog';
 import { FrontendApplicationConfigProvider } from '@theia/core/lib/browser/frontend-application-config-provider';
-import { getResourcesPath, openUrl } from '../common/functions';
-import { VesUrls } from '../common/urls';
+import { getResourcesPath, openUrl } from '../common/common-functions';
+import { VesUrls } from '../common/common-urls';
 
 @injectable()
 export class VesAboutDialog extends AboutDialog {

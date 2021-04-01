@@ -12,18 +12,18 @@ import {
   getResourcesPath,
   getRomPath,
   getWorkspaceRoot,
-} from "../../common/functions";
-import { VesStateModel } from "../../common/vesStateModel";
+} from "../../common/common-functions";
+import { VesState } from "../../common/ves-state";
 import { VesProcessWatcher } from "../../services/process-service/process-watcher";
-import { VesBuildOpenWidgetCommand } from "../commands";
+import { VesBuildOpenWidgetCommand } from "../build-commands";
 import {
   VesBuildDumpElfPreference,
   VesBuildEngineCorePathPreference,
   VesBuildEnginePluginsPathPreference,
   VesBuildModePreference,
   VesBuildPedanticWarningsPreference,
-} from "../preferences";
-import { BuildLogLineType, BuildMode } from "../types";
+} from "../build-preferences";
+import { BuildLogLineType, BuildMode } from "../build-types";
 
 export async function buildCommand(
   commandService: CommandService,
@@ -32,7 +32,7 @@ export async function buildCommand(
   storageService: StorageService,
   vesProcessService: VesProcessService,
   vesProcessWatcher: VesProcessWatcher,
-  vesState: VesStateModel,
+  vesState: VesState,
   workspaceService: WorkspaceService
 ) {
   if (!workspaceService.opened) {
@@ -62,7 +62,7 @@ async function build(
   storageService: StorageService,
   vesProcessService: VesProcessService,
   vesProcessWatcher: VesProcessWatcher,
-  vesState: VesStateModel
+  vesState: VesState
 ) {
   const workspaceRoot = getWorkspaceRoot();
   const buildMode = preferenceService.get(VesBuildModePreference.id) as string;
@@ -194,7 +194,7 @@ async function build(
 
 async function monitorBuild(
   vesProcessWatcher: VesProcessWatcher,
-  vesState: VesStateModel
+  vesState: VesState
 ) {
   vesProcessWatcher.onData(({ pId, data }) => {
     if (vesState.buildStatus.processManagerId === pId) {
@@ -206,7 +206,7 @@ async function monitorBuild(
   });
 }
 
-function parseBuildOutput(vesState: VesStateModel, data: string) {
+function parseBuildOutput(vesState: VesState, data: string) {
   let text = data;
   let type = BuildLogLineType.Normal;
 
@@ -224,7 +224,7 @@ function parseBuildOutput(vesState: VesStateModel, data: string) {
     vesState.buildStatus.stepsDone++;
     vesState.buildStatus.progress = Math.floor(
       (vesState.buildStatus.stepsDone * 100) /
-        (vesState.buildStatus.plugins * 2 + 2)
+      (vesState.buildStatus.plugins * 2 + 2)
     );
   } else if (data.startsWith("make") || data.includes(" Error ")) {
     type = BuildLogLineType.Error;
@@ -237,7 +237,7 @@ function parseBuildOutput(vesState: VesStateModel, data: string) {
 
 export function abortBuild(
   vesProcessService: VesProcessService,
-  vesState: VesStateModel
+  vesState: VesState
 ) {
   vesProcessService.killProcess(vesState.buildStatus.processManagerId);
   vesState.resetBuildStatus("aborted");
@@ -311,7 +311,7 @@ async function getPlugins(
     );
     const configFileContents = await fileService.readFile(configFileUri);
     plugins = JSON.parse(configFileContents.value.toString());
-  } catch (e) {}
+  } catch (e) { }
 
   // for each of the project's plugins, get it's dependencies
   // TODO: we only search one level deep here, recurse instead
@@ -330,7 +330,7 @@ async function getPlugins(
       JSON.parse(pluginFileContents.value.toString()).map((plugin: string) => {
         plugins.push(plugin);
       });
-    } catch (e) {}
+    } catch (e) { }
   });
 
   // remove duplicates and return

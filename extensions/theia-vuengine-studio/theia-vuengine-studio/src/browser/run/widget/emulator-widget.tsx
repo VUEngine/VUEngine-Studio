@@ -19,7 +19,7 @@ import {
   getKeybindingLabel,
   getResourcesPath,
   getRomPath,
-} from "../../common/functions";
+} from "../../common/common-functions";
 import {
   VesRunEmulatorEmulationModePreference,
   VesRunEmulatorScalePreference,

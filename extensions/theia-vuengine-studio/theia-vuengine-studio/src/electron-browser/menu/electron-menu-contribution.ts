@@ -3,17 +3,17 @@ import { remote } from "electron";
 import { FrontendApplication, PreferenceScope, PreferenceService } from "@theia/core/lib/browser";
 import { ElectronMenuContribution } from "@theia/core/lib/electron-browser/menu/electron-menu-contribution";
 import { CommandService, isOSX } from "@theia/core";
-import { VesStateModel } from "../../browser/common/vesStateModel";
-import { VesBuildDumpElfPreference, VesBuildEnableWslPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "../../browser/build/preferences";
+import { VesState } from "../../browser/common/ves-state";
+import { VesBuildDumpElfPreference, VesBuildEnableWslPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "../../browser/build/build-preferences";
 import { VesRunDefaultEmulatorPreference } from "../../browser/run/preferences";
 import { getDefaultEmulatorConfig, getEmulatorConfigs } from "../../browser/run/commands/runInEmulator";
-import { BuildMode } from "../../browser/build/types";
+import { BuildMode } from "../../browser/build/build-types";
 
 @injectable()
 export class VesElectronMenuContribution extends ElectronMenuContribution {
     @inject(CommandService) protected readonly commandService!: CommandService;
     @inject(PreferenceService) protected readonly preferenceService: PreferenceService;
-    @inject(VesStateModel) protected readonly vesState: VesStateModel;
+    @inject(VesState) protected readonly vesState: VesState;
 
     onStart(app: FrontendApplication): void {
         super.onStart(app);

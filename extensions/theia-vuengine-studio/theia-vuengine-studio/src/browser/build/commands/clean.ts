@@ -2,15 +2,15 @@ import { PreferenceService } from "@theia/core/lib/browser";
 import { MessageService } from "@theia/core/lib/common";
 import { join as joinPath } from "path";
 import * as rimraf from "rimraf";
-import { getBuildPath } from "../../common/functions";
-import { VesStateModel } from "../../common/vesStateModel";
-import { VesBuildModePreference } from "../preferences";
-import { BuildMode } from "../types";
+import { getBuildPath } from "../../common/common-functions";
+import { VesState } from "../../common/ves-state";
+import { VesBuildModePreference } from "../build-preferences";
+import { BuildMode } from "../build-types";
 
 export async function cleanCommand(
     messageService: MessageService,
     preferenceService: PreferenceService,
-    vesState: VesStateModel
+    vesState: VesState
 ) {
     if (vesState.isCleaning) {
         return;
@@ -27,7 +27,7 @@ export async function cleanCommand(
 
 async function clean(
     messageService: MessageService,
-    vesState: VesStateModel,
+    vesState: VesState,
     buildMode: BuildMode
 ) {
     const cleanPath = getCleanPath(buildMode);

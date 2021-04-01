@@ -1,6 +1,6 @@
 import { injectable, interfaces } from "inversify";
 import { MenuContribution, MenuModelRegistry } from "@theia/core/lib/common";
-import { BuildMenuSection } from "../build/menu-contribution";
+import { BuildMenuSection } from "../build/build-menu-contribution";
 import { VesRunCommand, VesSelectEmulatorCommand } from "./commands";
 
 @injectable()

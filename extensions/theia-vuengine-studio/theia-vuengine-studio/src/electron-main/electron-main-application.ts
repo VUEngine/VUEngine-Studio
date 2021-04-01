@@ -3,9 +3,9 @@ import { app, BrowserWindow, nativeImage, TouchBar } from "electron";
 import { ElectronMainApplication, TheiaBrowserWindowOptions } from "@theia/core/lib/electron-main/electron-main-application";
 import { isOSX, MaybePromise } from "@theia/core";
 import { VesRunCommand } from "../browser/run/commands";
-import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand } from "../browser/build/commands";
-import { VesFlashCartsCommand } from "../browser/flash-carts/commands";
-import { BuildMode, BuildStatus } from "../browser/build/types";
+import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand } from "../browser/build/build-commands";
+import { VesFlashCartsCommand } from "../browser/flash-carts/flash-carts-commands";
+import { BuildMode, BuildStatus } from "../browser/build/build-types";
 
 @injectable()
 export class VesElectronMainApplication extends ElectronMainApplication {

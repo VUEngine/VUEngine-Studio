@@ -6,15 +6,15 @@ import {
   SaveFileDialogProps,
 } from "@theia/filesystem/lib/browser";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
-import { getRomPath } from "../../common/functions";
-import { VesStateModel } from "../../common/vesStateModel";
-import { VesBuildCommand } from "../commands";
+import { getRomPath } from "../../common/common-functions";
+import { VesState } from "../../common/ves-state";
+import { VesBuildCommand } from "../build-commands";
 
 export async function exportCommand(
   commandService: CommandService,
   fileService: FileService,
   fileDialogService: FileDialogService,
-  vesState: VesStateModel
+  vesState: VesState
 ) {
   if (vesState.isExportQueued) {
     vesState.isExportQueued = false;

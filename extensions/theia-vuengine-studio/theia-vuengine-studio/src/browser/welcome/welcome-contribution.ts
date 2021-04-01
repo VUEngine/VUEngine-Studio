@@ -1,7 +1,7 @@
 import { injectable, inject } from "inversify";
 import { Command, CommandRegistry, MenuModelRegistry } from "@theia/core/lib/common";
 import { CommonMenus, AbstractViewContribution, FrontendApplicationContribution, FrontendApplication } from "@theia/core/lib/browser";
-import { WelcomeWidget } from "./welcome-widget";
+import { WelcomeWidget } from "./widget/welcome-widget";
 import { FrontendApplicationStateService } from "@theia/core/lib/browser/frontend-application-state";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
 

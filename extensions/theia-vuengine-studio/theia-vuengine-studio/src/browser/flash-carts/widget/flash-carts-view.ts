@@ -2,10 +2,10 @@ import { inject, injectable, interfaces } from 'inversify';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { AbstractViewContribution, bindViewContribution, FrontendApplication, FrontendApplicationContribution, WidgetFactory } from '@theia/core/lib/browser';
 import { VesFlashCartsWidget } from './flash-carts-widget';
-import { VesDetectConnectedFlashCartsCommand } from "../commands";
+import { VesDetectConnectedFlashCartsCommand } from "../flash-carts-commands";
 import { Command, CommandRegistry } from '@theia/core';
-import { detectConnectedFlashCarts } from '../commands/detectConnectedFlashCarts';
-import { VesStateModel } from '../../common/vesStateModel';
+import { detectConnectedFlashCarts } from '../commands/detect-connected-flash-carts';
+import { VesState } from '../../common/ves-state';
 
 export namespace VesFlashCartsWidgetContributionCommands {
     export const REFRESH: Command = {
@@ -17,7 +17,7 @@ export namespace VesFlashCartsWidgetContributionCommands {
 
 @injectable()
 export class VesFlashCartsWidgetContribution extends AbstractViewContribution<VesFlashCartsWidget> implements TabBarToolbarContribution {
-    @inject(VesStateModel) private readonly vesState: VesStateModel;
+    @inject(VesState) private readonly vesState: VesState;
 
     constructor() {
         super({

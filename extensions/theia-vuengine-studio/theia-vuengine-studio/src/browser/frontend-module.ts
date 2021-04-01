@@ -1,17 +1,17 @@
 import { ContainerModule } from "inversify";
-import { bindVesStateContributions } from "./common/frontend-module";
-import { bindVesBuildContributions } from "./build/frontend-module";
-import { bindVesFlashCartsContributions } from "./flash-carts/frontend-module";
+import { bindVesStateContributions } from "./common/common-frontend-module";
+import { bindVesBuildContributions } from "./build/build-frontend-module";
+import { bindVesFlashCartsContributions } from "./flash-carts/flash-carts-frontend-module";
 import { bindVesRunContributions } from "./run/frontend-module";
-import { bindVesSupportUsContributions } from "./support-us/frontend-module";
+import { bindVesSupportUsContributions } from "./support-us/support-us-frontend-module";
 import { bindVesTopBarContributions } from "./topbar/frontend-module";
 import { rebindtheiaContributions } from "./theia-customizations/frontend-module";
-import { bindVesServices } from "./services/frontend-module";
-import { bindVesDocumentationContributions } from "./documentation/frontend-module";
+import { bindVesServices } from "./services/services-frontend-module";
+import { bindVesDocumentationContributions } from "./documentation/documentation-frontend-module";
 import { bindVesWelcomeContributions } from "./welcome/welcome-frontend-module";
 import { bindTheiaCustomizationAboutDialogModule } from "./about/about-dialog-frontend-module";
-import { bindVesZoomContributions } from "./zoom/frontend-module";
-import { bindVesProjectsContributions } from "./projects/frontend-module";
+import { bindVesZoomContributions } from "./zoom/zoom-frontend-module";
+import { bindVesProjectsContributions } from "./projects/projects-frontend-module";
 import "./themes/index";
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
