@@ -18,21 +18,19 @@ export async function exportCommand(
 ) {
   if (vesState.isExportQueued) {
     vesState.isExportQueued = false;
-    return;
-  }
-
-  vesState.onDidChangeOutputRomExists(outputRomExists => {
-    if (outputRomExists && vesState.isExportQueued) {
-      vesState.isExportQueued = false;
-      exportRom(commandService, fileService, fileDialogService);
-    }
-  })
-
-  if (vesState.outputRomExists) {
+  } else if (vesState.buildStatus.active) {
+    vesState.isExportQueued = true;
+  } else if (vesState.outputRomExists) {
     exportRom(commandService, fileService, fileDialogService);
   } else {
-    commandService.executeCommand(VesBuildCommand.id);
+    vesState.onDidChangeOutputRomExists(outputRomExists => {
+      if (outputRomExists && vesState.isExportQueued) {
+        vesState.isExportQueued = false;
+        exportRom(commandService, fileService, fileDialogService);
+      }
+    })
     vesState.isExportQueued = true;
+    commandService.executeCommand(VesBuildCommand.id);
   }
 }
 

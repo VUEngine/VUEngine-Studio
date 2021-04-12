@@ -163,14 +163,15 @@ async function build(
     }
   );
 
+  // TODO: bind process watchers only once
   vesProcessWatcher.onError(({ pId }) => {
-    if (processManagerId === pId) {
+    if (vesState.buildStatus.processManagerId === pId) {
       vesState.resetBuildStatus("failed");
     }
   });
 
   vesProcessWatcher.onExit(({ pId }) => {
-    if (processManagerId === pId) {
+    if (vesState.buildStatus.processManagerId === pId) {
       //vesState.resetBuildStatus("done");
     }
   });

@@ -14,13 +14,14 @@
   display: flex;
   flex-direction: row;
 }
-#vesBuildWidget .buildButtons > :first-child {
-  margin-right: var(--theia-ui-padding);
-}
 
 #vesBuildWidget .theia-button {
-  margin: 0;
+  margin: 0 var(--theia-ui-padding) 0 0;
   min-width: unset;
+}
+
+#vesBuildWidget .theia-button:last-child {
+  margin-right: 0;
 }
 
 #vesBuildWidget .theia-button.build {

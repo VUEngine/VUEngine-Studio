@@ -12,7 +12,7 @@ import {
 import { VesState } from "../../common/ves-state";
 import { VesProcessService } from "../../../common/process-service-protocol";
 import { abortBuild } from "../commands/build";
-import { Message, PreferenceService } from "@theia/core/lib/browser";
+import { ApplicationShell, Message, PreferenceService } from "@theia/core/lib/browser";
 import {
   VesBuildDumpElfPreference,
   VesBuildModePreference,
@@ -22,6 +22,7 @@ import { BuildLogLine, BuildLogLineType, BuildMode } from "../build-types";
 
 @injectable()
 export class VesBuildWidget extends ReactWidget {
+  @inject(ApplicationShell) protected readonly applicationShell: ApplicationShell;
   @inject(CommandService) private readonly commandService: CommandService;
   @inject(PreferenceService)
   private readonly preferenceService: PreferenceService;
@@ -34,6 +35,7 @@ export class VesBuildWidget extends ReactWidget {
   static readonly LABEL = VesBuildCommand.label || "Build";
 
   protected state = {
+    isWide: false,
     showOptions: false,
     logFilter: BuildLogLineType.Normal,
   };
@@ -55,7 +57,6 @@ export class VesBuildWidget extends ReactWidget {
     this.title.label = VesBuildWidget.LABEL;
     this.title.caption = VesBuildWidget.LABEL;
     this.node.tabIndex = 0; // required for this.node.focus() to work in this.onActivateRequest()
-    this.update();
 
     this.vesState.onDidChangeBuildStatus(() => this.update());
     this.vesState.onDidChangeBuildMode(() => this.update());
@@ -72,6 +73,7 @@ export class VesBuildWidget extends ReactWidget {
 
   protected onActivateRequest(msg: Message): void {
     super.onActivateRequest(msg);
+    this.update();
     this.node.focus();
   }
 
@@ -102,6 +104,12 @@ export class VesBuildWidget extends ReactWidget {
           {!this.vesState.buildStatus.active && (
             <>
               <div className="buildButtons">
+                {this.applicationShell.getAreaFor(this) == "right" && <button
+                  className="theia-button secondary"
+                  onClick={() => this.toggleWidgetWidth()}
+                >
+                  <i className={this.state.isWide ? "fa fa-chevron-right" : "fa fa-chevron-left"}></i>
+                </button>}
                 <button
                   className="theia-button build"
                   disabled={!this.workspaceService.opened}
@@ -117,6 +125,12 @@ export class VesBuildWidget extends ReactWidget {
                 >
                   <i className="fa fa-cog"></i>
                 </button>
+                {this.applicationShell.getAreaFor(this) == "left" && <button
+                  className="theia-button secondary"
+                  onClick={() => this.toggleWidgetWidth()}
+                >
+                  <i className={this.state.isWide ? "fa fa-chevron-left" : "fa fa-chevron-right"}></i>
+                </button>}
               </div>
               {this.state.showOptions && (
                 <div className="buildOptions theia-settings-container">
@@ -205,6 +219,12 @@ export class VesBuildWidget extends ReactWidget {
           {this.vesState.buildStatus.active && (
             <>
               <div className="buildButtons">
+                {this.applicationShell.getAreaFor(this) == "right" && <button
+                  className="theia-button secondary"
+                  onClick={() => this.toggleWidgetWidth()}
+                >
+                  <i className={this.state.isWide ? "fa fa-chevron-right" : "fa fa-chevron-left"}></i>
+                </button>}
                 <button
                   className="theia-button secondary"
                   onClick={() =>
@@ -213,6 +233,12 @@ export class VesBuildWidget extends ReactWidget {
                 >
                   Abort
                 </button>
+                {this.applicationShell.getAreaFor(this) == "left" && <button
+                  className="theia-button secondary"
+                  onClick={() => this.toggleWidgetWidth()}
+                >
+                  <i className={this.state.isWide ? "fa fa-chevron-left" : "fa fa-chevron-right"}></i>
+                </button>}
               </div>
             </>
           )}
@@ -324,6 +350,18 @@ export class VesBuildWidget extends ReactWidget {
   protected toggleBuildOptions() {
     this.state.showOptions = !this.state.showOptions;
     this.update();
+  }
+
+  protected toggleWidgetWidth() {
+    this.state.isWide = !this.state.isWide;
+    this.update();
+    const targetWidth = this.state.isWide
+      ? Math.round(window.innerWidth * 0.5)
+      : 350
+    const widgetArea = this.applicationShell.getAreaFor(this);
+    if (widgetArea) {
+      this.applicationShell.resize(targetWidth, widgetArea);
+    }
   }
 
   protected getDuration() {
