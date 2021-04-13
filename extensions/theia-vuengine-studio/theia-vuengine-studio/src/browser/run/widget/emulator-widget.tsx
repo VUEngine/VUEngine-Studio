@@ -1316,34 +1316,21 @@ export class VesEmulatorWidget extends ReactWidget {
         input_player1_r_y_plus = ${this.toButton(EmulatorGamePadKeyCode.RUp)}
         input_player1_turbo = nul
 
-        input_toggle_fullscreen = ${this.toButton(
-        EmulatorFunctionKeyCode.ToggleFullscreen
-      )}
+        input_toggle_fullscreen = ${this.toButton(EmulatorFunctionKeyCode.ToggleFullscreen)}
         input_save_state = ${this.toButton(EmulatorFunctionKeyCode.SaveState)}
         input_load_state = ${this.toButton(EmulatorFunctionKeyCode.LoadState)}
-        input_state_slot_decrease = ${this.toButton(
-        EmulatorFunctionKeyCode.StateSlotDecrease
-      )}
-        input_state_slot_increase = ${this.toButton(
-        EmulatorFunctionKeyCode.StateSlotIncrease
-      )}
-        input_toggle_fast_forward = ${this.toButton(
-        EmulatorFunctionKeyCode.ToggleFastForward
-      )}
-        input_pause_toggle = ${this.toButton(
-        EmulatorFunctionKeyCode.PauseToggle
-      )}
-        input_toggle_slowmotion_btn = ${this.toButton(
-        EmulatorFunctionKeyCode.ToggleSlowmotion
-      )}
+        input_state_slot_decrease = ${this.toButton(EmulatorFunctionKeyCode.StateSlotDecrease)}
+        input_state_slot_increase = ${this.toButton(EmulatorFunctionKeyCode.StateSlotIncrease)}
+        input_toggle_fast_forward = ${this.toButton(EmulatorFunctionKeyCode.ToggleFastForward)}
+        input_toggle_slowmotion = ${this.toButton(EmulatorFunctionKeyCode.ToggleSlowmotion)}
+        input_pause_toggle = ${this.toButton(EmulatorFunctionKeyCode.PauseToggle)}
         input_rewind = ${this.toButton(EmulatorFunctionKeyCode.Rewind)}
-        input_frame_advance = ${this.toButton(
-        EmulatorFunctionKeyCode.FrameAdvance
-      )}
+        input_frame_advance = ${this.toButton(EmulatorFunctionKeyCode.FrameAdvance)}
         input_reset = ${this.toButton(EmulatorFunctionKeyCode.Reset)}
         input_audio_mute = ${this.toButton(EmulatorFunctionKeyCode.AudioMute)}
 
         input_hold_fast_forward = nul
+        input_hold_slowmotion = nul
         input_exit_emulator = nul
         input_shader_next = nul
         input_shader_prev = nul
