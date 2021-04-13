@@ -44,8 +44,6 @@ import {
 import { VesProcessService } from "../../common/process-service-protocol";
 import { runInEmulatorCommand } from "./commands/runInEmulator";
 import { selectEmulatorCommand } from "./commands/selectEmulator";
-import { emulatorInput } from "./commands/emulatorInput";
-import { EmulatorFunctionKeyCode, EmulatorGamePadKeyCode } from "./types";
 
 @injectable()
 export class VesRunCommandContribution implements CommandContribution {
@@ -82,113 +80,104 @@ export class VesRunCommandContribution implements CommandContribution {
     });
 
     commandRegistry.registerCommand(VesEmulatorInputLUpCommand, {
-      execute: () => emulatorInput(this.shell, EmulatorGamePadKeyCode.LUp),
+      execute: () => { },
       isVisible: () => false,
     });
     commandRegistry.registerCommand(VesEmulatorInputLRightCommand, {
-      execute: () => emulatorInput(this.shell, EmulatorGamePadKeyCode.LRight),
+      execute: () => { },
       isVisible: () => false,
     });
     commandRegistry.registerCommand(VesEmulatorInputLDownCommand, {
-      execute: () => emulatorInput(this.shell, EmulatorGamePadKeyCode.LDown),
+      execute: () => { },
       isVisible: () => false,
     });
     commandRegistry.registerCommand(VesEmulatorInputLLeftCommand, {
-      execute: () => emulatorInput(this.shell, EmulatorGamePadKeyCode.LLeft),
+      execute: () => { },
       isVisible: () => false,
     });
     commandRegistry.registerCommand(VesEmulatorInputStartCommand, {
-      execute: () => emulatorInput(this.shell, EmulatorGamePadKeyCode.Start),
+      execute: () => { },
       isVisible: () => false,
     });
     commandRegistry.registerCommand(VesEmulatorInputSelectCommand, {
-      execute: () => emulatorInput(this.shell, EmulatorGamePadKeyCode.Select),
+      execute: () => { },
       isVisible: () => false,
     });
     commandRegistry.registerCommand(VesEmulatorInputLTriggerCommand, {
-      execute: () => emulatorInput(this.shell, EmulatorGamePadKeyCode.LT),
+      execute: () => { },
       isVisible: () => false,
     });
     commandRegistry.registerCommand(VesEmulatorInputRUpCommand, {
-      execute: () => emulatorInput(this.shell, EmulatorGamePadKeyCode.RUp),
+      execute: () => { },
       isVisible: () => false,
     });
     commandRegistry.registerCommand(VesEmulatorInputRRightCommand, {
-      execute: () => emulatorInput(this.shell, EmulatorGamePadKeyCode.RRight),
+      execute: () => { },
       isVisible: () => false,
     });
     commandRegistry.registerCommand(VesEmulatorInputRDownCommand, {
-      execute: () => emulatorInput(this.shell, EmulatorGamePadKeyCode.RDown),
+      execute: () => { },
       isVisible: () => false,
     });
     commandRegistry.registerCommand(VesEmulatorInputRLeftCommand, {
-      execute: () => emulatorInput(this.shell, EmulatorGamePadKeyCode.RLeft),
+      execute: () => { },
       isVisible: () => false,
     });
     commandRegistry.registerCommand(VesEmulatorInputBCommand, {
-      execute: () => emulatorInput(this.shell, EmulatorGamePadKeyCode.B),
+      execute: () => { },
       isVisible: () => false,
     });
     commandRegistry.registerCommand(VesEmulatorInputACommand, {
-      execute: () => emulatorInput(this.shell, EmulatorGamePadKeyCode.A),
+      execute: () => { },
       isVisible: () => false,
     });
     commandRegistry.registerCommand(VesEmulatorInputRTriggerCommand, {
-      execute: () => emulatorInput(this.shell, EmulatorGamePadKeyCode.RT),
+      execute: () => { },
       isVisible: () => false,
     });
 
     commandRegistry.registerCommand(VesEmulatorInputSaveStateCommand, {
-      execute: () =>
-        emulatorInput(this.shell, EmulatorFunctionKeyCode.SaveState),
+      execute: () => { },
       isVisible: () => false,
     });
     commandRegistry.registerCommand(VesEmulatorInputLoadStateCommand, {
-      execute: () =>
-        emulatorInput(this.shell, EmulatorFunctionKeyCode.LoadState),
+      execute: () => { },
       isVisible: () => false,
     });
     commandRegistry.registerCommand(VesEmulatorInputStateSlotDecreaseCommand, {
-      execute: () =>
-        emulatorInput(this.shell, EmulatorFunctionKeyCode.StateSlotDecrease),
+      execute: () => { },
       isVisible: () => false,
     });
     commandRegistry.registerCommand(VesEmulatorInputStateSlotIncreaseCommand, {
-      execute: () =>
-        emulatorInput(this.shell, EmulatorFunctionKeyCode.StateSlotIncrease),
+      execute: () => { },
       isVisible: () => false,
     });
     commandRegistry.registerCommand(VesEmulatorInputToggleFastForwardCommand, {
-      execute: () =>
-        emulatorInput(this.shell, EmulatorFunctionKeyCode.ToggleFastForward),
+      execute: () => { },
       isVisible: () => false,
     });
     commandRegistry.registerCommand(VesEmulatorInputPauseToggleCommand, {
-      execute: () =>
-        emulatorInput(this.shell, EmulatorFunctionKeyCode.PauseToggle),
+      execute: () => { },
       isVisible: () => false,
     });
     commandRegistry.registerCommand(VesEmulatorInputToggleSlowmotionCommand, {
-      execute: () =>
-        emulatorInput(this.shell, EmulatorFunctionKeyCode.ToggleSlowmotion),
+      execute: () => { },
       isVisible: () => false,
     });
     commandRegistry.registerCommand(VesEmulatorInputRewindCommand, {
-      execute: () => emulatorInput(this.shell, EmulatorFunctionKeyCode.Rewind),
+      execute: () => { },
       isVisible: () => false,
     });
     commandRegistry.registerCommand(VesEmulatorInputFrameAdvanceCommand, {
-      execute: () =>
-        emulatorInput(this.shell, EmulatorFunctionKeyCode.FrameAdvance),
+      execute: () => { },
       isVisible: () => false,
     });
     commandRegistry.registerCommand(VesEmulatorInputResetCommand, {
-      execute: () => emulatorInput(this.shell, EmulatorFunctionKeyCode.Reset),
+      execute: () => { },
       isVisible: () => false,
     });
     commandRegistry.registerCommand(VesEmulatorInputAudioMuteCommand, {
-      execute: () =>
-        emulatorInput(this.shell, EmulatorFunctionKeyCode.AudioMute),
+      execute: () => { },
       isVisible: () => false,
     });
   }

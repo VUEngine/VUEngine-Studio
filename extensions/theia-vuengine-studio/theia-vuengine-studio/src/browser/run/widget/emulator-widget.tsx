@@ -1,12 +1,16 @@
 import * as React from "react";
-import { basename, join as joinPath } from "path";
 import { inject, injectable, postConstruct } from "inversify";
+import { basename, join as joinPath } from "path";
+import { CommandService } from "@theia/core";
 import { ReactWidget } from "@theia/core/lib/browser/widgets/react-widget";
+import { KeymapsCommands } from "@theia/keymaps/lib/browser";
+import { FrontendApplicationState, FrontendApplicationStateService } from "@theia/core/lib/browser/frontend-application-state";
 import {
   KeybindingRegistry,
   Message,
   PreferenceScope,
   PreferenceService,
+  ScopedKeybinding,
 } from "@theia/core/lib/browser";
 import {
   EmulationMode,
@@ -26,7 +30,6 @@ import {
   VesRunEmulatorStereoModePreference,
 } from "../preferences";
 import { IMAGE_VB_CONTROLLER } from "../images/vb-controller";
-import { CommandService } from "@theia/core";
 import {
   VesEmulatorInputLUpCommand,
   VesEmulatorInputLRightCommand,
@@ -54,7 +57,6 @@ import {
   VesEmulatorInputToggleFastForwardCommand,
   VesEmulatorInputToggleSlowmotionCommand,
 } from "../commands";
-import { KeymapsCommands } from "@theia/keymaps/lib/browser";
 
 const datauri = require("datauri");
 
@@ -68,26 +70,16 @@ export type vesEmulatorWidgetState = {
   lowBattery: boolean;
   muted: boolean;
   showControls: boolean;
+  input: any;
 };
-
-// TODO: handling key presses through key bindings and a command does not 
-// support keeping a key pressed.
-// Might have to go back to keeping the emulator focused and just modify the 
-// buttons in RetroArch config according to Key Bindings.
-
-// TODO: slow motion seems to be hard wired to E key. 
-// Reconfiguring seemingly has no effect. File bug ticket with RetroArch?
 
 @injectable()
 export class VesEmulatorWidget extends ReactWidget {
-  @inject(CommandService)
-  protected readonly commandService: CommandService;
-  @inject(KeybindingRegistry)
-  protected readonly keybindingRegistry!: KeybindingRegistry;
-  @inject(PreferenceService)
-  protected readonly preferenceService: PreferenceService;
-  @inject(VesEmulatorWidgetOptions)
-  protected readonly options: VesEmulatorWidgetOptions;
+  @inject(FrontendApplicationStateService) protected readonly frontendApplicationStateService: FrontendApplicationStateService;
+  @inject(CommandService) protected readonly commandService: CommandService;
+  @inject(KeybindingRegistry) protected readonly keybindingRegistry!: KeybindingRegistry;
+  @inject(PreferenceService) protected readonly preferenceService: PreferenceService;
+  @inject(VesEmulatorWidgetOptions) protected readonly options: VesEmulatorWidgetOptions;
 
   static readonly ID = "vesEmulatorWidget";
   static readonly LABEL = "Emulator";
@@ -98,38 +90,18 @@ export class VesEmulatorWidget extends ReactWidget {
   protected wrapperRef = React.createRef<HTMLDivElement>();
   protected iframeRef = React.createRef<HTMLIFrameElement>();
 
-  protected controllerButtonAssignmentSelectRef = React.createRef<
-    HTMLDivElement
-  >();
-  protected controllerButtonAssignmentStartRef = React.createRef<
-    HTMLDivElement
-  >();
+  protected controllerButtonAssignmentSelectRef = React.createRef<HTMLDivElement>();
+  protected controllerButtonAssignmentStartRef = React.createRef<HTMLDivElement>();
   protected controllerButtonAssignmentARef = React.createRef<HTMLDivElement>();
   protected controllerButtonAssignmentBRef = React.createRef<HTMLDivElement>();
-  protected controllerButtonAssignmentLUpRef = React.createRef<
-    HTMLDivElement
-  >();
-  protected controllerButtonAssignmentLLeftRef = React.createRef<
-    HTMLDivElement
-  >();
-  protected controllerButtonAssignmentLRightRef = React.createRef<
-    HTMLDivElement
-  >();
-  protected controllerButtonAssignmentLDownRef = React.createRef<
-    HTMLDivElement
-  >();
-  protected controllerButtonAssignmentRUpRef = React.createRef<
-    HTMLDivElement
-  >();
-  protected controllerButtonAssignmentRLeftRef = React.createRef<
-    HTMLDivElement
-  >();
-  protected controllerButtonAssignmentRRightRef = React.createRef<
-    HTMLDivElement
-  >();
-  protected controllerButtonAssignmentRDownRef = React.createRef<
-    HTMLDivElement
-  >();
+  protected controllerButtonAssignmentLUpRef = React.createRef<HTMLDivElement>();
+  protected controllerButtonAssignmentLLeftRef = React.createRef<HTMLDivElement>();
+  protected controllerButtonAssignmentLRightRef = React.createRef<HTMLDivElement>();
+  protected controllerButtonAssignmentLDownRef = React.createRef<HTMLDivElement>();
+  protected controllerButtonAssignmentRUpRef = React.createRef<HTMLDivElement>();
+  protected controllerButtonAssignmentRLeftRef = React.createRef<HTMLDivElement>();
+  protected controllerButtonAssignmentRRightRef = React.createRef<HTMLDivElement>();
+  protected controllerButtonAssignmentRDownRef = React.createRef<HTMLDivElement>();
   protected controllerButtonAssignmentLTRef = React.createRef<HTMLDivElement>();
   protected controllerButtonAssignmentRTRef = React.createRef<HTMLDivElement>();
   protected controllerButtonSelectRef = React.createRef<HTMLDivElement>();
@@ -152,6 +124,7 @@ export class VesEmulatorWidget extends ReactWidget {
     lowBattery: false,
     muted: false,
     showControls: false,
+    input: {},
   };
 
   @postConstruct()
@@ -167,10 +140,101 @@ export class VesEmulatorWidget extends ReactWidget {
     this.title.iconClass = "fa fa-play";
     this.title.closable = true;
     this.node.tabIndex = 0; // required for this.node.focus() to work in this.onActivateRequest()
-    this.update();
 
     // TODO: this shrinks down emulator viewport. Theia bug?
-    this.keybindingRegistry.onKeybindingsChanged(() => this.update());
+    this.keybindingRegistry.onKeybindingsChanged(() => {
+      this.keybindingToState();
+      this.update();
+    });
+
+    this.frontendApplicationStateService.onStateChanged((state: FrontendApplicationState) => {
+      if (state === "ready") {
+        this.keybindingToState();
+        this.bindKeys();
+        this.update();
+      }
+    });
+  }
+
+  protected keybindingToState() {
+    this.state.input = {
+      lUp: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputLUpCommand.id),
+      lRight: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputLRightCommand.id),
+      lDown: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputLDownCommand.id),
+      lLeft: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputLLeftCommand.id),
+      start: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputStartCommand.id),
+      select: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputSelectCommand.id),
+      lTrigger: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputLTriggerCommand.id),
+      rUp: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputRUpCommand.id),
+      rRight: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputRRightCommand.id),
+      rDown: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputRDownCommand.id),
+      rLeft: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputRLeftCommand.id),
+      b: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputBCommand.id),
+      a: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputACommand.id),
+      rTrigger: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputRTriggerCommand.id),
+      pauseToggle: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputPauseToggleCommand.id),
+      reset: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputResetCommand.id),
+      audioMute: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputAudioMuteCommand.id),
+      saveState: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputSaveStateCommand.id),
+      loadState: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputLoadStateCommand.id),
+      stateSlotDecrease: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputStateSlotDecreaseCommand.id),
+      stateSlotIncrease: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputStateSlotIncreaseCommand.id),
+      frameAdvance: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputFrameAdvanceCommand.id),
+      rewind: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputRewindCommand.id),
+      toggleFastForward: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputToggleFastForwardCommand.id),
+      toggleSlowmotion: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputToggleSlowmotionCommand.id),
+    }
+  }
+
+  protected bindKeys() {
+    this.node.addEventListener("keydown", event => {
+      this.processKeyEvent("keydown", event);
+    });
+    this.node.addEventListener("keyup", event => {
+      this.processKeyEvent("keyup", event);
+    });
+  }
+
+  protected processKeyEvent(type: "keydown" | "keyup", event: KeyboardEvent) {
+    if (event.repeat || this.state.status === "paused") return;
+
+    if (this.matchKey(this.state.input.lUp, event.code)) this.sendCommand(type, EmulatorGamePadKeyCode.LUp);
+    if (this.matchKey(this.state.input.lRight, event.code)) this.sendCommand(type, EmulatorGamePadKeyCode.LRight);
+    if (this.matchKey(this.state.input.lDown, event.code)) this.sendCommand(type, EmulatorGamePadKeyCode.LDown);
+    if (this.matchKey(this.state.input.lLeft, event.code)) this.sendCommand(type, EmulatorGamePadKeyCode.LLeft);
+    if (this.matchKey(this.state.input.start, event.code)) this.sendCommand(type, EmulatorGamePadKeyCode.Start);
+    if (this.matchKey(this.state.input.select, event.code)) this.sendCommand(type, EmulatorGamePadKeyCode.Select);
+    if (this.matchKey(this.state.input.lTrigger, event.code)) this.sendCommand(type, EmulatorGamePadKeyCode.LT);
+    if (this.matchKey(this.state.input.rUp, event.code)) this.sendCommand(type, EmulatorGamePadKeyCode.RUp);
+    if (this.matchKey(this.state.input.rRight, event.code)) this.sendCommand(type, EmulatorGamePadKeyCode.RRight);
+    if (this.matchKey(this.state.input.rDown, event.code)) this.sendCommand(type, EmulatorGamePadKeyCode.RDown);
+    if (this.matchKey(this.state.input.rLeft, event.code)) this.sendCommand(type, EmulatorGamePadKeyCode.RLeft);
+    if (this.matchKey(this.state.input.b, event.code)) this.sendCommand(type, EmulatorGamePadKeyCode.B);
+    if (this.matchKey(this.state.input.a, event.code)) this.sendCommand(type, EmulatorGamePadKeyCode.A);
+    if (this.matchKey(this.state.input.rTrigger, event.code)) this.sendCommand(type, EmulatorGamePadKeyCode.RT);
+    if (this.matchKey(this.state.input.pauseToggle, event.code)) this.sendCommand(type, EmulatorFunctionKeyCode.PauseToggle);
+    if (this.matchKey(this.state.input.reset, event.code)) this.sendCommand(type, EmulatorFunctionKeyCode.Reset);
+    if (this.matchKey(this.state.input.audioMute, event.code)) this.sendCommand(type, EmulatorFunctionKeyCode.AudioMute);
+    if (this.matchKey(this.state.input.saveState, event.code)) this.sendCommand(type, EmulatorFunctionKeyCode.SaveState);
+    if (this.matchKey(this.state.input.loadState, event.code)) this.sendCommand(type, EmulatorFunctionKeyCode.LoadState);
+    if (this.matchKey(this.state.input.stateSlotDecrease, event.code)) this.sendCommand(type, EmulatorFunctionKeyCode.StateSlotDecrease);
+    if (this.matchKey(this.state.input.stateSlotIncrease, event.code)) this.sendCommand(type, EmulatorFunctionKeyCode.StateSlotIncrease);
+    if (this.matchKey(this.state.input.frameAdvance, event.code)) this.sendCommand(type, EmulatorFunctionKeyCode.FrameAdvance);
+    if (this.matchKey(this.state.input.rewind, event.code)) this.sendCommand(type, EmulatorFunctionKeyCode.Rewind);
+    if (this.matchKey(this.state.input.toggleFastForward, event.code)) this.sendCommand(type, EmulatorFunctionKeyCode.ToggleFastForward);
+    if (this.matchKey(this.state.input.toggleSlowmotion, event.code)) this.sendCommand(type, EmulatorFunctionKeyCode.ToggleSlowmotion);
+  }
+
+  protected matchKey(scopedKeybindings: ScopedKeybinding[], keyCode: string) {
+    for (const keyBinding of scopedKeybindings) {
+      //@ts-ignore
+      for (const resolvedKeyBinding of keyBinding.resolved) {
+        if (keyCode === resolvedKeyBinding.key.code) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   protected startEmulator(self: any) {

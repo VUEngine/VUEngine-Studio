@@ -30,9 +30,11 @@ export class VesEmulatorContribution extends AbstractViewContribution<VesEmulato
   }
 
   protected updateFocusedView(): void {
-    this.contextKeyService.emulatorFocus.set(
+    // emulatorFocus is just a faux context to allow remapping of emulator input, 
+    // it should never be true, otherwise keydown won't work in emulator
+    /*this.contextKeyService.emulatorFocus.set(
       this.shell.activeWidget instanceof VesEmulatorWidget
-    );
+    );*/
   }
 }
 
