@@ -1,54 +1,27 @@
 import { inject, injectable, interfaces } from "inversify";
-import {
-  CommandContribution,
-  CommandRegistry,
-  CommandService,
-} from "@theia/core/lib/common";
-import {
-  ApplicationShell,
-  OpenerService,
-  PreferenceService,
-} from "@theia/core/lib/browser";
-import { QuickPickService } from "@theia/core/lib/common/quick-pick-service";
+import { CommandContribution, CommandRegistry } from "@theia/core/lib/common";
+import { ApplicationShell } from "@theia/core/lib/browser";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
-import { VesState } from "../common/ves-state";
 import { VesEmulatorCommands } from "./emulator-commands";
-import { VesProcessService } from "../../common/process-service-protocol";
-import { runInEmulatorCommand } from "./commands/runInEmulator";
-import { selectEmulatorCommand } from "./commands/selectEmulator";
+import { VesEmulatorRunCommand } from "./commands/runInEmulator";
+import { VesEmulatorSelectCommand } from "./commands/selectEmulator";
 
 @injectable()
 export class VesRunCommandContribution implements CommandContribution {
   constructor(
-    @inject(CommandService) private readonly commandService: CommandService,
-    @inject(OpenerService) private readonly openerService: OpenerService,
-    @inject(PreferenceService)
-    private readonly preferenceService: PreferenceService,
-    @inject(QuickPickService)
-    private readonly quickPickService: QuickPickService,
     @inject(ApplicationShell) protected readonly shell: ApplicationShell,
-    @inject(VesProcessService)
-    private readonly vesProcessService: VesProcessService,
-    @inject(VesState) private readonly vesState: VesState,
-    @inject(WorkspaceService)
-    private readonly workspaceService: WorkspaceService
+    @inject(VesEmulatorRunCommand) private readonly runCommand: VesEmulatorRunCommand,
+    @inject(VesEmulatorSelectCommand) private readonly selectCommand: VesEmulatorSelectCommand,
+    @inject(WorkspaceService) private readonly workspaceService: WorkspaceService
   ) { }
 
   registerCommands(commandRegistry: CommandRegistry): void {
     commandRegistry.registerCommand(VesEmulatorCommands.RUN, {
       isVisible: () => this.workspaceService.opened,
-      execute: () =>
-        runInEmulatorCommand(
-          this.commandService,
-          this.openerService,
-          this.preferenceService,
-          this.vesProcessService,
-          this.vesState
-        ),
+      execute: () => this.runCommand.execute(),
     });
     commandRegistry.registerCommand(VesEmulatorCommands.SELECT, {
-      execute: () =>
-        selectEmulatorCommand(this.preferenceService, this.quickPickService),
+      execute: () => this.selectCommand.execute(),
     });
 
     commandRegistry.registerCommand(VesEmulatorCommands.INPUT_L_UP, {
@@ -107,7 +80,6 @@ export class VesRunCommandContribution implements CommandContribution {
       execute: () => { },
       isVisible: () => false,
     });
-
     commandRegistry.registerCommand(VesEmulatorCommands.INPUT_SAVE_STATE, {
       execute: () => { },
       isVisible: () => false,
@@ -156,6 +128,8 @@ export class VesRunCommandContribution implements CommandContribution {
 }
 
 export function bindVesRunCommands(bind: interfaces.Bind): void {
+  bind(VesEmulatorRunCommand).toSelf().inSingletonScope();
+  bind(VesEmulatorSelectCommand).toSelf().inSingletonScope();
   bind(CommandContribution)
     .to(VesRunCommandContribution)
     .inSingletonScope();

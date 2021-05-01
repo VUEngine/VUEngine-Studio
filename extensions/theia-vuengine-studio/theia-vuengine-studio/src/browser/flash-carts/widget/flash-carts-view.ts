@@ -4,8 +4,7 @@ import { AbstractViewContribution, bindViewContribution, FrontendApplication, Fr
 import { VesFlashCartsWidget } from './flash-carts-widget';
 import { VesFlashCartsCommands } from "../flash-carts-commands";
 import { Command, CommandRegistry } from '@theia/core';
-import { detectConnectedFlashCarts } from '../commands/detect-connected-flash-carts';
-import { VesState } from '../../common/ves-state';
+import { VesFlashCartsDetectCommand } from '../commands/detect-connected-flash-carts';
 
 export namespace VesFlashCartsWidgetContributionCommands {
     export const REFRESH: Command = {
@@ -17,7 +16,7 @@ export namespace VesFlashCartsWidgetContributionCommands {
 
 @injectable()
 export class VesFlashCartsWidgetContribution extends AbstractViewContribution<VesFlashCartsWidget> implements TabBarToolbarContribution {
-    @inject(VesState) private readonly vesState: VesState;
+    @inject(VesFlashCartsDetectCommand) private readonly detectCommand: VesFlashCartsDetectCommand;
 
     constructor() {
         super({
@@ -38,9 +37,7 @@ export class VesFlashCartsWidgetContribution extends AbstractViewContribution<Ve
         commandRegistry.registerCommand(VesFlashCartsWidgetContributionCommands.REFRESH, {
             isEnabled: widget => widget.id === VesFlashCartsWidget.ID,
             isVisible: widget => widget.id === VesFlashCartsWidget.ID,
-            execute: () => detectConnectedFlashCarts(
-                this.vesState,
-            )
+            execute: () => this.detectCommand.execute(),
         });
     }
 

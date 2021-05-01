@@ -4,27 +4,18 @@ import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import URI from "@theia/core/lib/common/uri";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { FileChangesEvent } from "@theia/filesystem/lib/common/files";
-import {
-  FrontendApplicationState,
-  FrontendApplicationStateService,
-} from "@theia/core/lib/browser/frontend-application-state";
-import {
-  ConnectedFlashCart,
-  FlashCartConfig,
-  getFlashCartConfigs,
-} from "../flash-carts/commands/flash";
+import { FrontendApplicationState, FrontendApplicationStateService } from "@theia/core/lib/browser/frontend-application-state";
 import { getBuildPath, getRomPath } from "./common-functions";
 import { VesBuildPrefs } from "../build/build-preferences";
 import { VesEmulatorPrefs } from "../emulator/emulator-preferences";
-import {
-  getDefaultEmulatorConfig,
-  getEmulatorConfigs,
-} from "../emulator/commands/runInEmulator";
 import { EmulatorConfig } from "../emulator/emulator-types";
 import { VesFlashCartWatcher } from "../services/flash-cart-service/flash-cart-watcher";
 import { BuildLogLine, BuildMode, BuildStatus } from "../build/build-types";
 import { VesFlashCartService } from "../../common/flash-cart-service-protocol";
 import { VesFlashCartsPrefs } from "../flash-carts/flash-carts-preferences";
+import { getDefaultEmulatorConfig, getEmulatorConfigs } from "../emulator/emulator-functions";
+import { ConnectedFlashCart, FlashCartConfig } from "../flash-carts/flash-carts-types";
+import { getFlashCartConfigs } from "../flash-carts/flash-carts-functions";
 
 type BuildFolderFlags = {
   [key: string]: boolean;
@@ -33,14 +24,10 @@ type BuildFolderFlags = {
 @injectable()
 export class VesState {
   @inject(FileService) protected fileService: FileService;
-  @inject(FrontendApplicationStateService)
-  protected readonly frontendApplicationStateService: FrontendApplicationStateService;
-  @inject(PreferenceService)
-  protected readonly preferenceService: PreferenceService;
-  @inject(VesFlashCartService)
-  protected readonly vesFlashCartService: VesFlashCartService;
-  @inject(VesFlashCartWatcher)
-  protected readonly vesFlashCartWatcher: VesFlashCartWatcher;
+  @inject(FrontendApplicationStateService) protected readonly frontendApplicationStateService: FrontendApplicationStateService;
+  @inject(PreferenceService) protected readonly preferenceService: PreferenceService;
+  @inject(VesFlashCartService) protected readonly vesFlashCartService: VesFlashCartService;
+  @inject(VesFlashCartWatcher) protected readonly vesFlashCartWatcher: VesFlashCartWatcher;
 
   @postConstruct()
   protected async init(): Promise<void> {

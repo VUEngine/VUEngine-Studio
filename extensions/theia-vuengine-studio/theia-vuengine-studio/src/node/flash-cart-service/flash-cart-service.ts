@@ -1,6 +1,6 @@
 import { injectable, postConstruct } from "inversify";
 import { Device, getDeviceList, on } from "usb";
-import { ConnectedFlashCart, FlashCartConfig } from "../../browser/flash-carts/commands/flash";
+import { ConnectedFlashCart, FlashCartConfig } from "../../browser/flash-carts/flash-carts-types";
 import { VesFlashCartService, VesFlashCartServiceClient } from "../../common/flash-cart-service-protocol";
 
 @injectable()

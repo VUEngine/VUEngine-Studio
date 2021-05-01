@@ -1,92 +1,75 @@
+import { injectable, inject, postConstruct } from "inversify";
 import { basename, dirname, sep } from "path";
 import { OpenerService, PreferenceService } from "@theia/core/lib/browser";
 import { CommandService, isWindows } from "@theia/core/lib/common";
 import { VesBuildCommands } from "../../build/build-commands";
 import { getRomPath } from "../../common/common-functions";
 import { VesState } from "../../common/ves-state";
-import { VesEmulatorPrefs } from "../emulator-preferences";
-import { DEFAULT_EMULATOR, EmulatorConfig } from "../emulator-types";
+import { DEFAULT_EMULATOR } from "../emulator-types";
 import { VesProcessService } from "../../../common/process-service-protocol";
 import URI from "@theia/core/lib/common/uri";
+import { getDefaultEmulatorConfig } from "../emulator-functions";
 
-export async function runInEmulatorCommand(
-  commandService: CommandService,
-  openerService: OpenerService,
-  preferenceService: PreferenceService,
-  vesProcessService: VesProcessService,
-  vesState: VesState,
-) {
-  if (vesState.isRunQueued) {
-    vesState.isRunQueued = false;
-  } else if (vesState.buildStatus.active) {
-    vesState.isRunQueued = true;
-  } else if (vesState.outputRomExists) {
-    run(openerService, preferenceService, vesProcessService);
-  } else {
-    vesState.onDidChangeOutputRomExists(outputRomExists => {
-      if (outputRomExists && vesState.isRunQueued) {
-        vesState.isRunQueued = false;
-        run(openerService, preferenceService, vesProcessService);
+@injectable()
+export class VesEmulatorRunCommand {
+  @inject(CommandService) protected readonly commandService: CommandService;
+  @inject(OpenerService) protected readonly openerService: OpenerService;
+  @inject(PreferenceService) protected readonly preferenceService: PreferenceService;
+  @inject(VesProcessService) protected readonly vesProcessService: VesProcessService;
+  @inject(VesState) protected readonly vesState: VesState;
+
+  @postConstruct()
+  protected init(): void {
+    this.bindEvents();
+  }
+
+  async execute() {
+    if (this.vesState.isRunQueued) {
+      this.vesState.isRunQueued = false;
+    } else if (this.vesState.buildStatus.active) {
+      this.vesState.isRunQueued = true;
+    } else if (this.vesState.outputRomExists) {
+      run();
+    } else {
+      this.vesState.isRunQueued = true;
+      this.commandService.executeCommand(VesBuildCommands.BUILD.id);
+    }
+  }
+
+  protected bindEvents() {
+    this.vesState.onDidChangeOutputRomExists(outputRomExists => {
+      if (outputRomExists && this.vesState.isRunQueued) {
+        this.vesState.isRunQueued = false;
+        run();
       }
     })
-    vesState.isRunQueued = true;
-    commandService.executeCommand(VesBuildCommands.BUILD.id);
   }
-}
 
-async function run(
-  openerService: OpenerService,
-  preferenceService: PreferenceService,
-  vesProcessService: VesProcessService,
-) {
-  const defaultEmulatorConfig = getDefaultEmulatorConfig(preferenceService);
+  protected async run() {
+    const defaultEmulatorConfig = getDefaultEmulatorConfig(this.preferenceService);
 
-  if (defaultEmulatorConfig === DEFAULT_EMULATOR) {
-    const romUri = new URI(getRomPath());
-    const opener = await openerService.getOpener(romUri);
-    await opener.open(romUri);
-  } else {
-    const emulatorPath = defaultEmulatorConfig.path;
-    const emulatorArgs = defaultEmulatorConfig.args.replace("%ROM%", getRomPath()).split(" ");
+    if (defaultEmulatorConfig === DEFAULT_EMULATOR) {
+      const romUri = new URI(getRomPath());
+      const opener = await this.openerService.getOpener(romUri);
+      await opener.open(romUri);
+    } else {
+      const emulatorPath = defaultEmulatorConfig.path;
+      const emulatorArgs = defaultEmulatorConfig.args.replace("%ROM%", getRomPath()).split(" ");
 
-    if (!isWindows) {
-      vesProcessService.launchProcess({
-        command: "chmod",
-        args: ["a+x", emulatorPath]
+      if (!isWindows) {
+        this.vesProcessService.launchProcess({
+          command: "chmod",
+          args: ["a+x", emulatorPath]
+        });
+      }
+
+      await this.vesProcessService.launchProcess({
+        command: "." + sep + basename(emulatorPath),
+        args: emulatorArgs,
+        options: {
+          cwd: dirname(emulatorPath),
+        },
       });
     }
-
-    await vesProcessService.launchProcess({
-      command: "." + sep + basename(emulatorPath),
-      args: emulatorArgs,
-      options: {
-        cwd: dirname(emulatorPath),
-      },
-    });
   }
-}
-
-export function getDefaultEmulatorConfig(preferenceService: PreferenceService): EmulatorConfig {
-  const emulatorConfigs: EmulatorConfig[] = getEmulatorConfigs(preferenceService);
-  const defaultEmulatorName: string = preferenceService.get(VesEmulatorPrefs.DEFAULT_EMULATOR.id) as string;
-
-  let defaultEmulatorConfig = DEFAULT_EMULATOR;
-  for (const emulatorConfig of emulatorConfigs) {
-    if (emulatorConfig.name === defaultEmulatorName) {
-      defaultEmulatorConfig = emulatorConfig;
-    }
-  }
-
-  return defaultEmulatorConfig;
-}
-
-export function getEmulatorConfigs(preferenceService: PreferenceService) {
-  const customEmulatorConfigs: EmulatorConfig[] = preferenceService.get(VesEmulatorPrefs.EMULATORS.id) ?? [];
-
-  const emulatorConfigs = [
-    DEFAULT_EMULATOR,
-    ...customEmulatorConfigs,
-  ]
-
-  return emulatorConfigs;
 }

@@ -1,20 +1,19 @@
 import * as React from "react";
 import { basename } from "path";
 import { inject, injectable, postConstruct } from "inversify";
+import { Message } from "@phosphor/messaging";
+import { CommandService } from "@theia/core";
 import { ReactWidget } from "@theia/core/lib/browser/widgets/react-widget";
 import { VesState } from "../../common/ves-state";
-import { CommandService } from "@theia/core";
 import { VesFlashCartsCommands } from "../flash-carts-commands";
-import { VesProcessService } from "../../../common/process-service-protocol";
 import { VesFlashCartsPrefs } from "../flash-carts-preferences";
-import { abortFlash, ConnectedFlashCart } from "../commands/flash";
-import { Message } from "@phosphor/messaging";
+import { VesFlashCartsFlashCommand } from "../commands/flash";
+import { ConnectedFlashCart } from "../flash-carts-types";
 
 @injectable()
 export class VesFlashCartsWidget extends ReactWidget {
   @inject(CommandService) private readonly commandService: CommandService;
-  @inject(VesProcessService)
-  private readonly vesProcessService: VesProcessService;
+  @inject(VesFlashCartsFlashCommand) private readonly flashCommand: VesFlashCartsFlashCommand;
   @inject(VesState) private readonly vesState: VesState;
 
   static readonly ID = "vesFlashCartsWidget";
@@ -110,7 +109,7 @@ export class VesFlashCartsWidget extends ReactWidget {
           {this.vesState.isFlashing && (
             <button
               className="theia-button secondary"
-              onClick={() => abortFlash(this.vesProcessService, this.vesState)}
+              onClick={() => this.flashCommand.abort()}
             >
               Abort
             </button>

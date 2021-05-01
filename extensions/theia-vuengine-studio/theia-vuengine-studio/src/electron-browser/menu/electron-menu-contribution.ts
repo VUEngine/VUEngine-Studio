@@ -6,13 +6,15 @@ import { CommandService, isOSX } from "@theia/core";
 import { VesState } from "../../browser/common/ves-state";
 import { VesBuildPrefs } from "../../browser/build/build-preferences";
 import { VesEmulatorPrefs } from "../../browser/emulator/emulator-preferences";
-import { getDefaultEmulatorConfig, getEmulatorConfigs } from "../../browser/emulator/commands/runInEmulator";
+import { VesEmulatorRunCommand } from "../../browser/emulator/commands/runInEmulator";
 import { BuildMode } from "../../browser/build/build-types";
+import { getDefaultEmulatorConfig, getEmulatorConfigs } from "../../browser/emulator/emulator-functions";
 
 @injectable()
 export class VesElectronMenuContribution extends ElectronMenuContribution {
     @inject(CommandService) protected readonly commandService!: CommandService;
     @inject(PreferenceService) protected readonly preferenceService: PreferenceService;
+    @inject(VesEmulatorRunCommand) protected readonly runCommand: VesEmulatorRunCommand;
     @inject(VesState) protected readonly vesState: VesState;
 
     onStart(app: FrontendApplication): void {
