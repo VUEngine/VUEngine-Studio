@@ -1,11 +1,11 @@
 import { basename, dirname, sep } from "path";
 import { OpenerService, PreferenceService } from "@theia/core/lib/browser";
 import { CommandService, isWindows } from "@theia/core/lib/common";
-import { VesBuildCommand } from "../../build/build-commands";
+import { VesBuildCommands } from "../../build/build-commands";
 import { getRomPath } from "../../common/common-functions";
 import { VesState } from "../../common/ves-state";
-import { VesRunDefaultEmulatorPreference, VesRunEmulatorConfigsPreference } from "../preferences";
-import { DEFAULT_EMULATOR, EmulatorConfig } from "../types";
+import { VesRunDefaultEmulatorPreference, VesRunEmulatorConfigsPreference } from "../emulator-preferences";
+import { DEFAULT_EMULATOR, EmulatorConfig } from "../emulator-types";
 import { VesProcessService } from "../../../common/process-service-protocol";
 import URI from "@theia/core/lib/common/uri";
 
@@ -30,7 +30,7 @@ export async function runInEmulatorCommand(
       }
     })
     vesState.isRunQueued = true;
-    commandService.executeCommand(VesBuildCommand.id);
+    commandService.executeCommand(VesBuildCommands.BUILD.id);
   }
 }
 

@@ -8,7 +8,7 @@ import {
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { getRomPath } from "../../common/common-functions";
 import { VesState } from "../../common/ves-state";
-import { VesBuildCommand } from "../build-commands";
+import { VesBuildCommands } from "../build-commands";
 
 export async function exportCommand(
   commandService: CommandService,
@@ -30,7 +30,7 @@ export async function exportCommand(
       }
     })
     vesState.isExportQueued = true;
-    commandService.executeCommand(VesBuildCommand.id);
+    commandService.executeCommand(VesBuildCommands.BUILD.id);
   }
 }
 

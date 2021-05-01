@@ -2,7 +2,7 @@ import { inject, injectable, interfaces } from 'inversify';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { AbstractViewContribution, bindViewContribution, FrontendApplication, FrontendApplicationContribution, WidgetFactory } from '@theia/core/lib/browser';
 import { VesFlashCartsWidget } from './flash-carts-widget';
-import { VesDetectConnectedFlashCartsCommand } from "../flash-carts-commands";
+import { VesFlashCartsCommands } from "../flash-carts-commands";
 import { Command, CommandRegistry } from '@theia/core';
 import { detectConnectedFlashCarts } from '../commands/detect-connected-flash-carts';
 import { VesState } from '../../common/ves-state';
@@ -10,7 +10,7 @@ import { VesState } from '../../common/ves-state';
 export namespace VesFlashCartsWidgetContributionCommands {
     export const REFRESH: Command = {
         id: `${VesFlashCartsWidget.ID}.refresh`,
-        label: VesDetectConnectedFlashCartsCommand.label,
+        label: VesFlashCartsCommands.DETECT.label,
         iconClass: "refresh",
     };
 }

@@ -4,13 +4,13 @@ import { ReactWidget } from "@theia/core/lib/browser/widgets/react-widget";
 import { CommandService, environment, isOSX, MessageService } from "@theia/core";
 import { KeybindingRegistry } from "@theia/core/lib/browser/keybinding";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
-import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand } from "../../build/build-commands";
+import { VesBuildCommands } from "../../build/build-commands";
 import { VesState } from "../../common/ves-state";
 import { getKeybindingLabel, getOs } from "../../common/common-functions";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { BuildMode } from "../../build/build-types";
-import { VesRunCommand } from "../../run/commands";
-import { VesFlashCartsCommand } from "../../flash-carts/flash-carts-commands";
+import { VesEmulatorCommands } from "../../emulator/emulator-commands";
+import { VesFlashCartsCommands } from "../../flash-carts/flash-carts-commands";
 import { VesBuildModePreference } from "../../build/build-preferences";
 import { FrontendApplicationState, FrontendApplicationStateService } from "@theia/core/lib/browser/frontend-application-state";
 import { WorkspaceCommands, WorkspaceService } from "@theia/workspace/lib/browser";
@@ -87,9 +87,9 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
             : <>
                 <button
                     className={"theia-button secondary clean" + (this.vesState.isCleaning ? " active" : "")}
-                    title={this.vesState.isCleaning ? "Cleaning..." : `${VesBuildCleanCommand.label}${getKeybindingLabel(this.keybindingRegistry, VesBuildCleanCommand.id, true)}`}
+                    title={this.vesState.isCleaning ? "Cleaning..." : `${VesBuildCommands.CLEAN.label}${getKeybindingLabel(this.keybindingRegistry, VesBuildCommands.CLEAN.id, true)}`}
                     disabled={this.vesState.buildStatus.active || !this.vesState.buildFolderExists[buildMode]}
-                    onClick={() => this.commandService.executeCommand(VesBuildCleanCommand.id)}
+                    onClick={() => this.commandService.executeCommand(VesBuildCommands.CLEAN.id)}
                 >
                     {this.vesState.isCleaning
                         ? <i className="fa fa-refresh fa-spin"></i>
@@ -97,8 +97,8 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                 </button>
                 <button
                     className={"theia-button secondary build" + (this.vesState.buildStatus.active ? " active" : "")}
-                    title={this.vesState.buildStatus.active ? "Building..." : `${VesBuildCommand.label}${getKeybindingLabel(this.keybindingRegistry, VesBuildCommand.id, true)}`}
-                    onClick={() => this.commandService.executeCommand(VesBuildCommand.id)}
+                    title={this.vesState.buildStatus.active ? "Building..." : `${VesBuildCommands.BUILD.label}${getKeybindingLabel(this.keybindingRegistry, VesBuildCommands.BUILD.id, true)}`}
+                    onClick={() => this.commandService.executeCommand(VesBuildCommands.BUILD.id)}
                 >
                     {this.vesState.buildStatus.active
                         ? <i className="fa fa-cog fa-spin"></i>
@@ -106,8 +106,8 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                 </button>
                 <button
                     className={"theia-button secondary run" + (this.vesState.isRunQueued ? " active" : "")}
-                    title={this.vesState.isRunQueued ? "Run Queued..." : `${VesRunCommand.label}${getKeybindingLabel(this.keybindingRegistry, VesRunCommand.id, true)}`}
-                    onClick={() => this.commandService.executeCommand(VesRunCommand.id)}
+                    title={this.vesState.isRunQueued ? "Run Queued..." : `${VesEmulatorCommands.RUN.label}${getKeybindingLabel(this.keybindingRegistry, VesEmulatorCommands.RUN.id, true)}`}
+                    onClick={() => this.commandService.executeCommand(VesEmulatorCommands.RUN.id)}
                 >
                     {this.vesState.isRunQueued
                         ? <i className="fa fa-hourglass-half"></i>
@@ -116,9 +116,9 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                 </button>
                 <button
                     className={"theia-button secondary flash" + (this.vesState.isFlashQueued || this.vesState.isFlashing ? " active" : "")}
-                    title={this.vesState.isFlashQueued ? "Flash Queued..." : `${VesFlashCartsCommand.label}${getKeybindingLabel(this.keybindingRegistry, VesFlashCartsCommand.id, true)}`}
+                    title={this.vesState.isFlashQueued ? "Flash Queued..." : `${VesFlashCartsCommands.FLASH.label}${getKeybindingLabel(this.keybindingRegistry, VesFlashCartsCommands.FLASH.id, true)}`}
                     disabled={!this.vesState.connectedFlashCarts}
-                    onClick={() => this.commandService.executeCommand(VesFlashCartsCommand.id)}
+                    onClick={() => this.commandService.executeCommand(VesFlashCartsCommands.FLASH.id)}
                 >
                     {this.vesState.isFlashQueued
                         ? <i className="fa fa-hourglass-half"></i>
@@ -128,8 +128,8 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                 </button>
                 <button
                     className={"theia-button secondary export" + (this.vesState.isExportQueued ? " active" : "")}
-                    title={this.vesState.isExportQueued ? "Export Queued..." : `${VesBuildExportCommand.label}${getKeybindingLabel(this.keybindingRegistry, VesBuildExportCommand.id, true)}`}
-                    onClick={() => this.commandService.executeCommand(VesBuildExportCommand.id)}
+                    title={this.vesState.isExportQueued ? "Export Queued..." : `${VesBuildCommands.EXPORT.label}${getKeybindingLabel(this.keybindingRegistry, VesBuildCommands.EXPORT.id, true)}`}
+                    onClick={() => this.commandService.executeCommand(VesBuildCommands.EXPORT.id)}
                 >
                     {this.vesState.isExportQueued
                         ? <i className="fa fa-hourglass-half"></i>

@@ -3,166 +3,139 @@ import {
   KeybindingContribution,
   KeybindingRegistry,
 } from "@theia/core/lib/browser/keybinding";
-import {
-  VesRunCommand,
-  VesEmulatorInputLUpCommand,
-  VesEmulatorInputLRightCommand,
-  VesEmulatorInputLDownCommand,
-  VesEmulatorInputLLeftCommand,
-  VesEmulatorInputStartCommand,
-  VesEmulatorInputSelectCommand,
-  VesEmulatorInputLTriggerCommand,
-  VesEmulatorInputRUpCommand,
-  VesEmulatorInputRRightCommand,
-  VesEmulatorInputRDownCommand,
-  VesEmulatorInputRLeftCommand,
-  VesEmulatorInputBCommand,
-  VesEmulatorInputACommand,
-  VesEmulatorInputRTriggerCommand,
-  VesEmulatorInputSaveStateCommand,
-  VesEmulatorInputLoadStateCommand,
-  VesEmulatorInputStateSlotDecreaseCommand,
-  VesEmulatorInputStateSlotIncreaseCommand,
-  VesEmulatorInputToggleFastForwardCommand,
-  VesEmulatorInputPauseToggleCommand,
-  VesEmulatorInputToggleSlowmotionCommand,
-  VesEmulatorInputRewindCommand,
-  VesEmulatorInputFrameAdvanceCommand,
-  VesEmulatorInputResetCommand,
-  VesEmulatorInputAudioMuteCommand,
-} from "./commands";
+import { VesEmulatorCommands } from "./emulator-commands";
 
 @injectable()
 export class VesRunKeybindingContribution implements KeybindingContribution {
   registerKeybindings(registry: KeybindingRegistry): void {
     registry.registerKeybinding({
-      command: VesRunCommand.id,
+      command: VesEmulatorCommands.RUN.id,
       keybinding: "alt+shift+r",
     });
 
     registry.registerKeybinding({
-      command: VesEmulatorInputLUpCommand.id,
+      command: VesEmulatorCommands.INPUT_L_UP.id,
       keybinding: "e",
       when: "emulatorFocus",
     });
     registry.registerKeybinding({
-      command: VesEmulatorInputLRightCommand.id,
+      command: VesEmulatorCommands.INPUT_L_RIGHT.id,
       keybinding: "f",
       when: "emulatorFocus",
     });
     registry.registerKeybinding({
-      command: VesEmulatorInputLDownCommand.id,
+      command: VesEmulatorCommands.INPUT_L_DOWN.id,
       keybinding: "d",
       when: "emulatorFocus",
     });
     registry.registerKeybinding({
-      command: VesEmulatorInputLLeftCommand.id,
+      command: VesEmulatorCommands.INPUT_L_LEFT.id,
       keybinding: "s",
       when: "emulatorFocus",
     });
     registry.registerKeybinding({
-      command: VesEmulatorInputStartCommand.id,
+      command: VesEmulatorCommands.INPUT_START.id,
       keybinding: "b",
       when: "emulatorFocus",
     });
     registry.registerKeybinding({
-      command: VesEmulatorInputSelectCommand.id,
+      command: VesEmulatorCommands.INPUT_SELECT.id,
       keybinding: "v",
       when: "emulatorFocus",
     });
     registry.registerKeybinding({
-      command: VesEmulatorInputLTriggerCommand.id,
+      command: VesEmulatorCommands.INPUT_L_TRIGGER.id,
       keybinding: "g",
       when: "emulatorFocus",
     });
     registry.registerKeybinding({
-      command: VesEmulatorInputRUpCommand.id,
+      command: VesEmulatorCommands.INPUT_R_UP.id,
       keybinding: "i",
       when: "emulatorFocus",
     });
     registry.registerKeybinding({
-      command: VesEmulatorInputRRightCommand.id,
+      command: VesEmulatorCommands.INPUT_R_RIGHT.id,
       keybinding: "l",
       when: "emulatorFocus",
     });
     registry.registerKeybinding({
-      command: VesEmulatorInputRDownCommand.id,
+      command: VesEmulatorCommands.INPUT_R_DOWN.id,
       keybinding: "k",
       when: "emulatorFocus",
     });
     registry.registerKeybinding({
-      command: VesEmulatorInputRLeftCommand.id,
+      command: VesEmulatorCommands.INPUT_R_LEFT.id,
       keybinding: "j",
       when: "emulatorFocus",
     });
     registry.registerKeybinding({
-      command: VesEmulatorInputBCommand.id,
+      command: VesEmulatorCommands.INPUT_B.id,
       keybinding: "n",
       when: "emulatorFocus",
     });
     registry.registerKeybinding({
-      command: VesEmulatorInputACommand.id,
+      command: VesEmulatorCommands.INPUT_A.id,
       keybinding: "m",
       when: "emulatorFocus",
     });
     registry.registerKeybinding({
-      command: VesEmulatorInputRTriggerCommand.id,
+      command: VesEmulatorCommands.INPUT_R_TRIGGER.id,
       keybinding: "h",
       when: "emulatorFocus",
     });
 
     registry.registerKeybinding({
-      command: VesEmulatorInputSaveStateCommand.id,
+      command: VesEmulatorCommands.INPUT_SAVE_STATE.id,
       keybinding: "1",
       when: "emulatorFocus",
     });
     registry.registerKeybinding({
-      command: VesEmulatorInputLoadStateCommand.id,
+      command: VesEmulatorCommands.INPUT_LOAD_STATE.id,
       keybinding: "2",
       when: "emulatorFocus",
     });
     registry.registerKeybinding({
-      command: VesEmulatorInputStateSlotIncreaseCommand.id,
+      command: VesEmulatorCommands.INPUT_STATE_SLOT_INCREASE.id,
       keybinding: "3",
       when: "emulatorFocus",
     });
     registry.registerKeybinding({
-      command: VesEmulatorInputStateSlotDecreaseCommand.id,
+      command: VesEmulatorCommands.INPUT_STATE_SLOT_DECREASE.id,
       keybinding: "4",
       when: "emulatorFocus",
     });
     registry.registerKeybinding({
-      command: VesEmulatorInputToggleFastForwardCommand.id,
+      command: VesEmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.id,
       keybinding: "right",
       when: "emulatorFocus",
     });
     registry.registerKeybinding({
-      command: VesEmulatorInputPauseToggleCommand.id,
+      command: VesEmulatorCommands.INPUT_PAUSE_TOGGLE.id,
       keybinding: "space",
       when: "emulatorFocus",
     });
     registry.registerKeybinding({
-      command: VesEmulatorInputToggleSlowmotionCommand.id,
+      command: VesEmulatorCommands.INPUT_TOGGLE_SLOWMOTION.id,
       keybinding: "down",
       when: "emulatorFocus",
     });
     registry.registerKeybinding({
-      command: VesEmulatorInputRewindCommand.id,
+      command: VesEmulatorCommands.INPUT_REWIND.id,
       keybinding: "left",
       when: "emulatorFocus",
     });
     registry.registerKeybinding({
-      command: VesEmulatorInputFrameAdvanceCommand.id,
+      command: VesEmulatorCommands.INPUT_FRAME_ADVANCE.id,
       keybinding: "up",
       when: "emulatorFocus",
     });
     registry.registerKeybinding({
-      command: VesEmulatorInputResetCommand.id,
+      command: VesEmulatorCommands.INPUT_RESET.id,
       keybinding: "f10",
       when: "emulatorFocus",
     });
     registry.registerKeybinding({
-      command: VesEmulatorInputAudioMuteCommand.id,
+      command: VesEmulatorCommands.INPUT_AUDIO_MUTE.id,
       keybinding: "q",
       when: "emulatorFocus",
     });

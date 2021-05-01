@@ -18,7 +18,7 @@ import {
   EmulatorFunctionKeyCode,
   EmulatorScale,
   StereoMode,
-} from "../types";
+} from "../emulator-types";
 import {
   getKeybindingLabel,
   getResourcesPath,
@@ -28,35 +28,9 @@ import {
   VesRunEmulatorEmulationModePreference,
   VesRunEmulatorScalePreference,
   VesRunEmulatorStereoModePreference,
-} from "../preferences";
+} from "../emulator-preferences";
 import { IMAGE_VB_CONTROLLER } from "../images/vb-controller";
-import {
-  VesEmulatorInputLUpCommand,
-  VesEmulatorInputLRightCommand,
-  VesEmulatorInputLDownCommand,
-  VesEmulatorInputLLeftCommand,
-  VesEmulatorInputStartCommand,
-  VesEmulatorInputSelectCommand,
-  VesEmulatorInputLTriggerCommand,
-  VesEmulatorInputRUpCommand,
-  VesEmulatorInputRRightCommand,
-  VesEmulatorInputRDownCommand,
-  VesEmulatorInputRLeftCommand,
-  VesEmulatorInputBCommand,
-  VesEmulatorInputACommand,
-  VesEmulatorInputRTriggerCommand,
-  VesEmulatorInputPauseToggleCommand,
-  VesEmulatorInputResetCommand,
-  VesEmulatorInputAudioMuteCommand,
-  VesEmulatorInputSaveStateCommand,
-  VesEmulatorInputLoadStateCommand,
-  VesEmulatorInputStateSlotDecreaseCommand,
-  VesEmulatorInputStateSlotIncreaseCommand,
-  VesEmulatorInputFrameAdvanceCommand,
-  VesEmulatorInputRewindCommand,
-  VesEmulatorInputToggleFastForwardCommand,
-  VesEmulatorInputToggleSlowmotionCommand,
-} from "../commands";
+import { VesEmulatorCommands } from "../emulator-commands";
 
 const datauri = require("datauri");
 
@@ -158,31 +132,31 @@ export class VesEmulatorWidget extends ReactWidget {
 
   protected keybindingToState() {
     this.state.input = {
-      lUp: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputLUpCommand.id),
-      lRight: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputLRightCommand.id),
-      lDown: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputLDownCommand.id),
-      lLeft: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputLLeftCommand.id),
-      start: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputStartCommand.id),
-      select: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputSelectCommand.id),
-      lTrigger: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputLTriggerCommand.id),
-      rUp: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputRUpCommand.id),
-      rRight: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputRRightCommand.id),
-      rDown: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputRDownCommand.id),
-      rLeft: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputRLeftCommand.id),
-      b: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputBCommand.id),
-      a: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputACommand.id),
-      rTrigger: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputRTriggerCommand.id),
-      pauseToggle: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputPauseToggleCommand.id),
-      reset: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputResetCommand.id),
-      audioMute: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputAudioMuteCommand.id),
-      saveState: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputSaveStateCommand.id),
-      loadState: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputLoadStateCommand.id),
-      stateSlotDecrease: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputStateSlotDecreaseCommand.id),
-      stateSlotIncrease: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputStateSlotIncreaseCommand.id),
-      frameAdvance: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputFrameAdvanceCommand.id),
-      rewind: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputRewindCommand.id),
-      toggleFastForward: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputToggleFastForwardCommand.id),
-      toggleSlowmotion: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorInputToggleSlowmotionCommand.id),
+      lUp: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_L_UP.id),
+      lRight: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_L_RIGHT.id),
+      lDown: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_L_DOWN.id),
+      lLeft: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_L_LEFT.id),
+      start: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_START.id),
+      select: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_SELECT.id),
+      lTrigger: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_L_TRIGGER.id),
+      rUp: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_R_UP.id),
+      rRight: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_R_RIGHT.id),
+      rDown: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_R_DOWN.id),
+      rLeft: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_R_LEFT.id),
+      b: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_B.id),
+      a: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_A.id),
+      rTrigger: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_R_TRIGGER.id),
+      pauseToggle: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_PAUSE_TOGGLE.id),
+      reset: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_RESET.id),
+      audioMute: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_AUDIO_MUTE.id),
+      saveState: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_SAVE_STATE.id),
+      loadState: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_LOAD_STATE.id),
+      stateSlotDecrease: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_STATE_SLOT_DECREASE.id),
+      stateSlotIncrease: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_STATE_SLOT_INCREASE.id),
+      frameAdvance: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_FRAME_ADVANCE.id),
+      rewind: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_REWIND.id),
+      toggleFastForward: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.id),
+      toggleSlowmotion: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_TOGGLE_SLOWMOTION.id),
     }
   }
 
@@ -555,7 +529,7 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">
                         {getKeybindingLabel(
                           this.keybindingRegistry,
-                          VesEmulatorInputLTriggerCommand.id,
+                          VesEmulatorCommands.INPUT_L_TRIGGER.id,
                           false
                         )}
                       </button>
@@ -578,7 +552,7 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">
                         {getKeybindingLabel(
                           this.keybindingRegistry,
-                          VesEmulatorInputLUpCommand.id,
+                          VesEmulatorCommands.INPUT_L_UP.id,
                           false
                         )}
                       </button>
@@ -600,7 +574,7 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">
                         {getKeybindingLabel(
                           this.keybindingRegistry,
-                          VesEmulatorInputLRightCommand.id,
+                          VesEmulatorCommands.INPUT_L_RIGHT.id,
                           false
                         )}
                       </button>
@@ -622,7 +596,7 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">
                         {getKeybindingLabel(
                           this.keybindingRegistry,
-                          VesEmulatorInputLDownCommand.id,
+                          VesEmulatorCommands.INPUT_L_DOWN.id,
                           false
                         )}
                       </button>
@@ -644,7 +618,7 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">
                         {getKeybindingLabel(
                           this.keybindingRegistry,
-                          VesEmulatorInputLLeftCommand.id,
+                          VesEmulatorCommands.INPUT_L_LEFT.id,
                           false
                         )}
                       </button>
@@ -665,7 +639,7 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">
                         {getKeybindingLabel(
                           this.keybindingRegistry,
-                          VesEmulatorInputSelectCommand.id,
+                          VesEmulatorCommands.INPUT_SELECT.id,
                           false
                         )}
                       </button>
@@ -685,7 +659,7 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">
                         {getKeybindingLabel(
                           this.keybindingRegistry,
-                          VesEmulatorInputStartCommand.id,
+                          VesEmulatorCommands.INPUT_START.id,
                           false
                         )}
                       </button>
@@ -908,7 +882,7 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">
                         {getKeybindingLabel(
                           this.keybindingRegistry,
-                          VesEmulatorInputRTriggerCommand.id,
+                          VesEmulatorCommands.INPUT_R_TRIGGER.id,
                           false
                         )}
                       </button>
@@ -931,7 +905,7 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">
                         {getKeybindingLabel(
                           this.keybindingRegistry,
-                          VesEmulatorInputRUpCommand.id,
+                          VesEmulatorCommands.INPUT_R_UP.id,
                           false
                         )}
                       </button>
@@ -953,7 +927,7 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">
                         {getKeybindingLabel(
                           this.keybindingRegistry,
-                          VesEmulatorInputRRightCommand.id,
+                          VesEmulatorCommands.INPUT_R_RIGHT.id,
                           false
                         )}
                       </button>
@@ -975,7 +949,7 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">
                         {getKeybindingLabel(
                           this.keybindingRegistry,
-                          VesEmulatorInputRDownCommand.id,
+                          VesEmulatorCommands.INPUT_R_DOWN.id,
                           false
                         )}
                       </button>
@@ -997,7 +971,7 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">
                         {getKeybindingLabel(
                           this.keybindingRegistry,
-                          VesEmulatorInputRLeftCommand.id,
+                          VesEmulatorCommands.INPUT_R_LEFT.id,
                           false
                         )}
                       </button>
@@ -1018,7 +992,7 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">
                         {getKeybindingLabel(
                           this.keybindingRegistry,
-                          VesEmulatorInputBCommand.id,
+                          VesEmulatorCommands.INPUT_B.id,
                           false
                         )}
                       </button>
@@ -1038,7 +1012,7 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">
                         {getKeybindingLabel(
                           this.keybindingRegistry,
-                          VesEmulatorInputACommand.id,
+                          VesEmulatorCommands.INPUT_A.id,
                           false
                         )}
                       </button>
@@ -1054,7 +1028,7 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">
                         {getKeybindingLabel(
                           this.keybindingRegistry,
-                          VesEmulatorInputPauseToggleCommand.id,
+                          VesEmulatorCommands.INPUT_PAUSE_TOGGLE.id,
                           false
                         )}
                       </button>
@@ -1066,7 +1040,7 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">
                         {getKeybindingLabel(
                           this.keybindingRegistry,
-                          VesEmulatorInputResetCommand.id,
+                          VesEmulatorCommands.INPUT_RESET.id,
                           false
                         )}
                       </button>
@@ -1078,7 +1052,7 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">
                         {getKeybindingLabel(
                           this.keybindingRegistry,
-                          VesEmulatorInputAudioMuteCommand.id,
+                          VesEmulatorCommands.INPUT_AUDIO_MUTE.id,
                           false
                         )}
                       </button>
@@ -1099,7 +1073,7 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">
                         {getKeybindingLabel(
                           this.keybindingRegistry,
-                          VesEmulatorInputSaveStateCommand.id,
+                          VesEmulatorCommands.INPUT_SAVE_STATE.id,
                           false
                         )}
                       </button>
@@ -1111,7 +1085,7 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">
                         {getKeybindingLabel(
                           this.keybindingRegistry,
-                          VesEmulatorInputLoadStateCommand.id,
+                          VesEmulatorCommands.INPUT_LOAD_STATE.id,
                           false
                         )}
                       </button>
@@ -1123,7 +1097,7 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">
                         {getKeybindingLabel(
                           this.keybindingRegistry,
-                          VesEmulatorInputStateSlotIncreaseCommand.id,
+                          VesEmulatorCommands.INPUT_STATE_SLOT_INCREASE.id,
                           false
                         )}
                       </button>
@@ -1135,7 +1109,7 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">
                         {getKeybindingLabel(
                           this.keybindingRegistry,
-                          VesEmulatorInputStateSlotDecreaseCommand.id,
+                          VesEmulatorCommands.INPUT_STATE_SLOT_DECREASE.id,
                           false
                         )}
                       </button>
@@ -1149,7 +1123,7 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">
                         {getKeybindingLabel(
                           this.keybindingRegistry,
-                          VesEmulatorInputFrameAdvanceCommand.id,
+                          VesEmulatorCommands.INPUT_FRAME_ADVANCE.id,
                           false
                         )}
                       </button>
@@ -1161,7 +1135,7 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">
                         {getKeybindingLabel(
                           this.keybindingRegistry,
-                          VesEmulatorInputToggleFastForwardCommand.id,
+                          VesEmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.id,
                           false
                         )}
                       </button>
@@ -1173,7 +1147,7 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">
                         {getKeybindingLabel(
                           this.keybindingRegistry,
-                          VesEmulatorInputToggleSlowmotionCommand.id,
+                          VesEmulatorCommands.INPUT_TOGGLE_SLOWMOTION.id,
                           false
                         )}
                       </button>
@@ -1185,7 +1159,7 @@ export class VesEmulatorWidget extends ReactWidget {
                       <button className="theia-button secondary">
                         {getKeybindingLabel(
                           this.keybindingRegistry,
-                          VesEmulatorInputRewindCommand.id,
+                          VesEmulatorCommands.INPUT_REWIND.id,
                           false
                         )}
                       </button>

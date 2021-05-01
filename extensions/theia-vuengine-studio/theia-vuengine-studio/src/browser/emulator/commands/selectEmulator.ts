@@ -1,6 +1,6 @@
 import { PreferenceScope, PreferenceService } from "@theia/core/lib/browser";
 import { QuickPickItem, QuickPickOptions, QuickPickService } from "@theia/core/lib/common/quick-pick-service";
-import { VesRunDefaultEmulatorPreference } from "../preferences";
+import { VesRunDefaultEmulatorPreference } from "../emulator-preferences";
 import { getDefaultEmulatorConfig, getEmulatorConfigs } from "./runInEmulator";
 
 export async function selectEmulatorCommand(

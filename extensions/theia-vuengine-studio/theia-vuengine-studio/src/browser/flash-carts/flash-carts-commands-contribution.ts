@@ -4,7 +4,7 @@ import { flashCommand } from "./commands/flash";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { VesState } from "../common/ves-state";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
-import { VesDetectConnectedFlashCartsCommand, VesFlashCartsCommand, VesOpenFlashCartsWidgetCommand } from "./flash-carts-commands";
+import { VesFlashCartsCommands } from "./flash-carts-commands";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
 import { VesProcessService } from "../../common/process-service-protocol";
 import { VesProcessWatcher } from "../services/process-service/process-watcher";
@@ -27,7 +27,7 @@ export class VesFlashCartsCommandContribution implements CommandContribution {
   ) { }
 
   registerCommands(commandRegistry: CommandRegistry): void {
-    commandRegistry.registerCommand(VesFlashCartsCommand, {
+    commandRegistry.registerCommand(VesFlashCartsCommands.FLASH, {
       isVisible: () => this.workspaceService.opened,
       execute: () =>
         flashCommand(
@@ -41,7 +41,7 @@ export class VesFlashCartsCommandContribution implements CommandContribution {
         ),
     });
 
-    commandRegistry.registerCommand(VesOpenFlashCartsWidgetCommand, {
+    commandRegistry.registerCommand(VesFlashCartsCommands.OPEN_WIDGET, {
       execute: (forceOpen: boolean = false) =>
         showFlashCartsWidgetCommand(
           forceOpen,
@@ -49,7 +49,7 @@ export class VesFlashCartsCommandContribution implements CommandContribution {
         ),
     });
 
-    commandRegistry.registerCommand(VesDetectConnectedFlashCartsCommand, {
+    commandRegistry.registerCommand(VesFlashCartsCommands.DETECT, {
       execute: () =>
         detectConnectedFlashCarts(
           this.vesState,

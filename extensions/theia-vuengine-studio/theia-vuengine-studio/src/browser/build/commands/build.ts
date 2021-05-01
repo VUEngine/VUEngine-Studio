@@ -15,7 +15,7 @@ import {
 } from "../../common/common-functions";
 import { VesState } from "../../common/ves-state";
 import { VesProcessWatcher } from "../../services/process-service/process-watcher";
-import { VesBuildOpenWidgetCommand } from "../build-commands";
+import { VesBuildCommands } from "../build-commands";
 import {
   VesBuildDumpElfPreference,
   VesBuildEngineCorePathPreference,
@@ -40,7 +40,7 @@ export async function buildCommand(
   }
 
   commandService.executeCommand(
-    VesBuildOpenWidgetCommand.id,
+    VesBuildCommands.OPEN_WIDGET.id,
     !vesState.buildStatus.active
   );
 

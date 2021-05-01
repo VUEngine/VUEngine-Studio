@@ -2,7 +2,7 @@ import { ContainerModule } from "inversify";
 import { bindVesStateContributions } from "./common/common-frontend-module";
 import { bindVesBuildContributions } from "./build/build-frontend-module";
 import { bindVesFlashCartsContributions } from "./flash-carts/flash-carts-frontend-module";
-import { bindVesRunContributions } from "./run/frontend-module";
+import { bindVesRunContributions } from "./emulator/emulator-frontend-module";
 import { bindVesSupportUsContributions } from "./support-us/support-us-frontend-module";
 import { bindVesTopBarContributions } from "./topbar/frontend-module";
 import { rebindtheiaContributions } from "./theia-customizations/frontend-module";

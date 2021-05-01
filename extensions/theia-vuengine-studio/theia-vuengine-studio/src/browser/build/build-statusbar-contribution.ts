@@ -1,7 +1,7 @@
 import { inject, injectable, interfaces } from "inversify";
 import { FrontendApplication, FrontendApplicationContribution, PreferenceService, StatusBar, StatusBarAlignment } from "@theia/core/lib/browser";
 import { VesState } from "../common/ves-state";
-import { VesBuildOpenWidgetCommand, VesBuildSetModeCommand } from "./build-commands";
+import { VesBuildCommands } from "./build-commands";
 import { VesBuildModePreference } from "./build-preferences";
 
 @injectable()
@@ -27,17 +27,17 @@ export class VesBuildStatusBarContribution implements FrontendApplicationContrib
 
     setBuildModeStatusBar() {
         let label = this.preferenceService.get(VesBuildModePreference.id) || "Build Mode";;
-        let command = VesBuildSetModeCommand.id;
+        let command = VesBuildCommands.SET_MODE.id;
         if (this.vesState.buildStatus.active) {
             label = `${this.vesState.buildStatus.step}... ${this.vesState.buildStatus.progress}%`;
-            command = VesBuildOpenWidgetCommand.id;
+            command = VesBuildCommands.OPEN_WIDGET.id;
         }
         this.statusBar.setElement("ves-build-mode", {
             alignment: StatusBarAlignment.LEFT,
             command: command,
             priority: 3,
             text: `$(wrench) ${label}`,
-            tooltip: VesBuildSetModeCommand.label,
+            tooltip: VesBuildCommands.SET_MODE.label,
         });
     }
 }

@@ -19,7 +19,7 @@ import { toggleDumpElf } from "./commands/toggle-dump-elf";
 import { togglePedanticWarnings } from "./commands/toggle-pedantic-warnings";
 import { VesState } from "../common/ves-state";
 import { toggleEnableWsl } from "./commands/toggle-enable-wsl";
-import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand, VesBuildSetModeCommand, VesBuildToggleDumpElfCommand, VesBuildToggleEnableWslCommand, VesBuildTogglePedanticWarningsCommand, VesBuildOpenWidgetCommand } from "./build-commands";
+import { VesBuildCommands } from "./build-commands";
 import { VesBuildDumpElfPreference, VesBuildEnableWslPreference, VesBuildPedanticWarningsPreference } from "./build-preferences";
 import { VesProcessService } from "../../common/process-service-protocol";
 import { VesProcessWatcher } from "../services/process-service/process-watcher";
@@ -45,7 +45,7 @@ export class VesBuildCommandContribution implements CommandContribution {
   ) { }
 
   registerCommands(commandRegistry: CommandRegistry): void {
-    commandRegistry.registerCommand(VesBuildCleanCommand, {
+    commandRegistry.registerCommand(VesBuildCommands.CLEAN, {
       isVisible: () => this.workspaceService.opened,
       execute: () =>
         cleanCommand(
@@ -54,7 +54,7 @@ export class VesBuildCommandContribution implements CommandContribution {
           this.vesState,
         ),
     });
-    commandRegistry.registerCommand(VesBuildCommand, {
+    commandRegistry.registerCommand(VesBuildCommands.BUILD, {
       isVisible: () => this.workspaceService.opened,
       execute: () =>
         buildCommand(
@@ -68,7 +68,7 @@ export class VesBuildCommandContribution implements CommandContribution {
           this.workspaceService,
         ),
     });
-    commandRegistry.registerCommand(VesBuildExportCommand, {
+    commandRegistry.registerCommand(VesBuildCommands.EXPORT, {
       isVisible: () => this.workspaceService.opened,
       execute: () =>
         exportCommand(
@@ -79,28 +79,28 @@ export class VesBuildCommandContribution implements CommandContribution {
         ),
     });
 
-    commandRegistry.registerCommand(VesBuildSetModeCommand, {
+    commandRegistry.registerCommand(VesBuildCommands.SET_MODE, {
       execute: (buildMode?: BuildMode) => setModeCommand(this.preferenceService, this.quickPickService, buildMode)
     });
 
-    commandRegistry.registerCommand(VesBuildToggleDumpElfCommand, {
+    commandRegistry.registerCommand(VesBuildCommands.TOGGLE_DUMP_ELF, {
       execute: () => toggleDumpElf(this.preferenceService),
       isToggled: () => !!this.preferenceService.get(VesBuildDumpElfPreference.id),
     });
 
-    commandRegistry.registerCommand(VesBuildTogglePedanticWarningsCommand, {
+    commandRegistry.registerCommand(VesBuildCommands.TOGGLE_PEDANTIC_WARNINGS, {
       execute: () => togglePedanticWarnings(this.preferenceService),
       isToggled: () => !!this.preferenceService.get(VesBuildPedanticWarningsPreference.id),
     });
 
     if (isWindows) {
-      commandRegistry.registerCommand(VesBuildToggleEnableWslCommand, {
+      commandRegistry.registerCommand(VesBuildCommands.TOGGLE_ENABLE_WSL, {
         execute: () => toggleEnableWsl(this.preferenceService),
         isToggled: () => !!this.preferenceService.get(VesBuildEnableWslPreference.id),
       });
     }
 
-    commandRegistry.registerCommand(VesBuildOpenWidgetCommand, {
+    commandRegistry.registerCommand(VesBuildCommands.OPEN_WIDGET, {
       execute: (forceOpen: boolean = false) =>
         showBuildWidgetCommand(
           forceOpen,

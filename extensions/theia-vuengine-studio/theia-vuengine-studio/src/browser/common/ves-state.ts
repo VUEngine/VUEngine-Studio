@@ -18,12 +18,12 @@ import { VesBuildModePreference } from "../build/build-preferences";
 import {
   VesRunDefaultEmulatorPreference,
   VesRunEmulatorConfigsPreference,
-} from "../run/preferences";
+} from "../emulator/emulator-preferences";
 import {
   getDefaultEmulatorConfig,
   getEmulatorConfigs,
-} from "../run/commands/runInEmulator";
-import { EmulatorConfig } from "../run/types";
+} from "../emulator/commands/runInEmulator";
+import { EmulatorConfig } from "../emulator/emulator-types";
 import { VesFlashCartWatcher } from "../services/flash-cart-service/flash-cart-watcher";
 import { BuildLogLine, BuildMode, BuildStatus } from "../build/build-types";
 import { VesFlashCartService } from "../../common/flash-cart-service-protocol";

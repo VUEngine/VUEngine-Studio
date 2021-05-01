@@ -8,7 +8,7 @@ import {
 } from "@theia/core/lib/browser";
 import { VesEmulatorWidget, VesEmulatorWidgetOptions } from "./emulator-widget";
 import { VesEmulatorOpenHandler } from "./emulator-open-handler";
-import { VesEmulatorContextKeyService } from "../context-key-service";
+import { VesEmulatorContextKeyService } from "../emulator-context-key-service";
 
 @injectable()
 export class VesEmulatorContribution extends AbstractViewContribution<VesEmulatorWidget> {

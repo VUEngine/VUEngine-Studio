@@ -5,14 +5,14 @@ import { PreferenceService } from "@theia/core/lib/browser";
 import { CommandService, isWindows, MessageService } from "@theia/core/lib/common";
 import URI from "@theia/core/lib/common/uri";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
-import { VesBuildCommand } from "../../build/build-commands";
+import { VesBuildCommands } from "../../build/build-commands";
 import { VesBuildEnableWslPreference } from "../../build/build-preferences";
 import { convertoToEnvPath, getOs, getResourcesPath, getRomPath } from "../../common/common-functions";
 import { VesState } from "../../common/ves-state";
 import { VesProcessService } from "../../../common/process-service-protocol";
 import { VesFlashCartsPreference } from "../flash-carts-preferences";
 import { VesProcessWatcher } from "../../services/process-service/process-watcher";
-import { VesOpenFlashCartsWidgetCommand } from "../flash-carts-commands";
+import { VesFlashCartsCommands } from "../flash-carts-commands";
 import { IMAGE_HYPERFLASH32 } from "../images/hyperflash32";
 import { IMAGE_FLASHBOY_PLUS } from "../images/flashboy-plus";
 
@@ -56,7 +56,7 @@ export async function flashCommand(
   } else if (vesState.buildStatus.active) {
     vesState.isFlashQueued = true;
   } else if (vesState.isFlashing || vesState.connectedFlashCarts.length === 0) {
-    commandService.executeCommand(VesOpenFlashCartsWidgetCommand.id);
+    commandService.executeCommand(VesFlashCartsCommands.OPEN_WIDGET.id);
   } else {
     vesState.onDidChangeOutputRomExists(outputRomExists => {
       if (outputRomExists && vesState.isFlashQueued) {
@@ -84,7 +84,7 @@ export async function flashCommand(
         vesState,
       );
     } else {
-      commandService.executeCommand(VesBuildCommand.id);
+      commandService.executeCommand(VesBuildCommands.BUILD.id);
       vesState.isFlashQueued = true;
     }
   }
@@ -177,7 +177,7 @@ async function flash(
   }
 
   vesState.isFlashing = true;
-  commandService.executeCommand(VesOpenFlashCartsWidgetCommand.id, true);
+  commandService.executeCommand(VesFlashCartsCommands.OPEN_WIDGET.id, true);
 }
 
 export function abortFlash(vesProcessService: VesProcessService, vesState: VesState) {

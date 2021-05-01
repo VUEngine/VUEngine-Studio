@@ -3,12 +3,7 @@ import { inject, injectable, postConstruct } from "inversify";
 import { ReactWidget } from "@theia/core/lib/browser/widgets/react-widget";
 import { CommandService } from "@theia/core";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
-import {
-  VesBuildCommand,
-  VesBuildSetModeCommand,
-  VesBuildToggleDumpElfCommand,
-  VesBuildTogglePedanticWarningsCommand,
-} from "../build-commands";
+import { VesBuildCommands } from "../build-commands";
 import { VesState } from "../../common/ves-state";
 import { VesProcessService } from "../../../common/process-service-protocol";
 import { abortBuild } from "../commands/build";
@@ -32,7 +27,7 @@ export class VesBuildWidget extends ReactWidget {
   @inject(WorkspaceService) private readonly workspaceService: WorkspaceService;
 
   static readonly ID = "vesBuildWidget";
-  static readonly LABEL = VesBuildCommand.label || "Build";
+  static readonly LABEL = VesBuildCommands.BUILD.label || "Build";
 
   protected state = {
     isWide: false,
@@ -114,7 +109,7 @@ export class VesBuildWidget extends ReactWidget {
                   className="theia-button build"
                   disabled={!this.workspaceService.opened}
                   onClick={() =>
-                    this.commandService.executeCommand(VesBuildCommand.id)
+                    this.commandService.executeCommand(VesBuildCommands.BUILD.id)
                   }
                 >
                   <i className="fa fa-wrench"></i> Build
@@ -145,7 +140,7 @@ export class VesBuildWidget extends ReactWidget {
                           )}
                           onChange={(e) => {
                             this.commandService.executeCommand(
-                              VesBuildSetModeCommand.id,
+                              VesBuildCommands.SET_MODE.id,
                               e.currentTarget.value
                             );
                           }}
@@ -177,7 +172,7 @@ export class VesBuildWidget extends ReactWidget {
                             )}
                             onClick={() =>
                               this.commandService.executeCommand(
-                                VesBuildToggleDumpElfCommand.id
+                                VesBuildCommands.TOGGLE_PEDANTIC_WARNINGS.id
                               )
                             }
                           />
@@ -204,7 +199,7 @@ export class VesBuildWidget extends ReactWidget {
                             )}
                             onClick={() =>
                               this.commandService.executeCommand(
-                                VesBuildTogglePedanticWarningsCommand.id
+                                VesBuildCommands.TOGGLE_PEDANTIC_WARNINGS.id
                               )
                             }
                           />

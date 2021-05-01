@@ -1,5 +1,5 @@
 import { VesProperty } from "../common/common-types";
-import { EmulationMode, EmulatorScale, StereoMode } from "./types";
+import { EmulationMode, EmulatorScale, StereoMode } from "./emulator-types";
 
 export const VesRunEmulatorConfigsPreference: VesProperty = {
     id: "emulator.custom.configs",

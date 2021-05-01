@@ -1,13 +1,13 @@
 import { injectable, interfaces } from 'inversify';
 import { KeybindingContribution, KeybindingRegistry } from '@theia/core/lib/browser/keybinding';
-import { VesFlashCartsCommand } from './flash-carts-commands';
+import { VesFlashCartsCommands } from './flash-carts-commands';
 
 @injectable()
 export class VesFlashCartsKeybindingContribution implements KeybindingContribution {
   registerKeybindings(registry: KeybindingRegistry): void {
     registry.registerKeybinding((
       {
-        command: VesFlashCartsCommand.id,
+        command: VesFlashCartsCommands.FLASH.id,
         keybinding: "alt+shift+f"
       }
     ));

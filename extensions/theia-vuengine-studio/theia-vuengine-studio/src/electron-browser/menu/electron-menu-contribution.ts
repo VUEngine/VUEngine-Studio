@@ -5,8 +5,8 @@ import { ElectronMenuContribution } from "@theia/core/lib/electron-browser/menu/
 import { CommandService, isOSX } from "@theia/core";
 import { VesState } from "../../browser/common/ves-state";
 import { VesBuildDumpElfPreference, VesBuildEnableWslPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "../../browser/build/build-preferences";
-import { VesRunDefaultEmulatorPreference } from "../../browser/run/preferences";
-import { getDefaultEmulatorConfig, getEmulatorConfigs } from "../../browser/run/commands/runInEmulator";
+import { VesRunDefaultEmulatorPreference } from "../../browser/emulator/emulator-preferences";
+import { getDefaultEmulatorConfig, getEmulatorConfigs } from "../../browser/emulator/commands/runInEmulator";
 import { BuildMode } from "../../browser/build/build-types";
 
 @injectable()

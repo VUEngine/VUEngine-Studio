@@ -4,7 +4,7 @@ import { inject, injectable, postConstruct } from "inversify";
 import { ReactWidget } from "@theia/core/lib/browser/widgets/react-widget";
 import { VesState } from "../../common/ves-state";
 import { CommandService } from "@theia/core";
-import { VesFlashCartsCommand } from "../flash-carts-commands";
+import { VesFlashCartsCommands } from "../flash-carts-commands";
 import { VesProcessService } from "../../../common/process-service-protocol";
 import { VesFlashCartsPreference } from "../flash-carts-preferences";
 import { abortFlash, ConnectedFlashCart } from "../commands/flash";
@@ -71,7 +71,7 @@ export class VesFlashCartsWidget extends ReactWidget {
               <button
                 className="theia-button secondary"
                 onClick={() =>
-                  this.commandService.executeCommand(VesFlashCartsCommand.id)
+                  this.commandService.executeCommand(VesFlashCartsCommands.FLASH.id)
                 }
               >
                 Cancel
@@ -100,7 +100,7 @@ export class VesFlashCartsWidget extends ReactWidget {
               <button
                 className="theia-button flash"
                 onClick={() =>
-                  this.commandService.executeCommand(VesFlashCartsCommand.id)
+                  this.commandService.executeCommand(VesFlashCartsCommands.FLASH.id)
                 }
               >
                 <i className="fa fa-usb"></i> Flash

@@ -2,9 +2,9 @@ import { injectable } from "inversify";
 import { app, BrowserWindow, nativeImage, TouchBar } from "electron";
 import { ElectronMainApplication, TheiaBrowserWindowOptions } from "@theia/core/lib/electron-main/electron-main-application";
 import { isOSX, MaybePromise } from "@theia/core";
-import { VesRunCommand } from "../browser/run/commands";
-import { VesBuildCleanCommand, VesBuildCommand, VesBuildExportCommand } from "../browser/build/build-commands";
-import { VesFlashCartsCommand } from "../browser/flash-carts/flash-carts-commands";
+import { VesEmulatorCommands } from "../browser/emulator/emulator-commands";
+import { VesBuildCommands } from "../browser/build/build-commands";
+import { VesFlashCartsCommands } from "../browser/flash-carts/flash-carts-commands";
 import { BuildMode, BuildStatus } from "../browser/build/build-types";
 
 @injectable()
@@ -92,23 +92,23 @@ export class VesElectronMainApplication extends ElectronMainApplication {
 
         const buildMenuCleanButton = new TouchBarButton({
             icon: cleanIcon,
-            accessibilityLabel: VesBuildCleanCommand.id,
+            accessibilityLabel: VesBuildCommands.CLEAN.id,
         });
         const buildMenuBuildButton = new TouchBarButton({
             icon: buildIcon,
-            accessibilityLabel: VesBuildCommand.id,
+            accessibilityLabel: VesBuildCommands.BUILD.id,
         });
         const buildMenuRunButton = new TouchBarButton({
             icon: runIcon,
-            accessibilityLabel: VesRunCommand.id,
+            accessibilityLabel: VesEmulatorCommands.RUN.id,
         });
         const buildMenuFlashButton = new TouchBarButton({
             icon: flashIcon,
-            accessibilityLabel: VesFlashCartsCommand.id,
+            accessibilityLabel: VesFlashCartsCommands.FLASH.id,
         });
         const buildMenuExportButton = new TouchBarButton({
             icon: exportIcon,
-            accessibilityLabel: VesBuildExportCommand.id,
+            accessibilityLabel: VesBuildCommands.EXPORT.id,
         });
 
         const buildMenuSegmentedControlSegments = [

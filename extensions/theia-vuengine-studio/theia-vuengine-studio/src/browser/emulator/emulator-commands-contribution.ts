@@ -12,35 +12,7 @@ import {
 import { QuickPickService } from "@theia/core/lib/common/quick-pick-service";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
 import { VesState } from "../common/ves-state";
-import {
-  VesRunCommand,
-  VesSelectEmulatorCommand,
-  VesEmulatorInputLUpCommand,
-  VesEmulatorInputLRightCommand,
-  VesEmulatorInputLDownCommand,
-  VesEmulatorInputLLeftCommand,
-  VesEmulatorInputStartCommand,
-  VesEmulatorInputSelectCommand,
-  VesEmulatorInputLTriggerCommand,
-  VesEmulatorInputRUpCommand,
-  VesEmulatorInputRRightCommand,
-  VesEmulatorInputRDownCommand,
-  VesEmulatorInputRLeftCommand,
-  VesEmulatorInputBCommand,
-  VesEmulatorInputACommand,
-  VesEmulatorInputRTriggerCommand,
-  VesEmulatorInputSaveStateCommand,
-  VesEmulatorInputLoadStateCommand,
-  VesEmulatorInputStateSlotDecreaseCommand,
-  VesEmulatorInputStateSlotIncreaseCommand,
-  VesEmulatorInputToggleFastForwardCommand,
-  VesEmulatorInputPauseToggleCommand,
-  VesEmulatorInputToggleSlowmotionCommand,
-  VesEmulatorInputRewindCommand,
-  VesEmulatorInputFrameAdvanceCommand,
-  VesEmulatorInputResetCommand,
-  VesEmulatorInputAudioMuteCommand,
-} from "./commands";
+import { VesEmulatorCommands } from "./emulator-commands";
 import { VesProcessService } from "../../common/process-service-protocol";
 import { runInEmulatorCommand } from "./commands/runInEmulator";
 import { selectEmulatorCommand } from "./commands/selectEmulator";
@@ -63,7 +35,7 @@ export class VesRunCommandContribution implements CommandContribution {
   ) { }
 
   registerCommands(commandRegistry: CommandRegistry): void {
-    commandRegistry.registerCommand(VesRunCommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.RUN, {
       isVisible: () => this.workspaceService.opened,
       execute: () =>
         runInEmulatorCommand(
@@ -74,109 +46,109 @@ export class VesRunCommandContribution implements CommandContribution {
           this.vesState
         ),
     });
-    commandRegistry.registerCommand(VesSelectEmulatorCommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.SELECT, {
       execute: () =>
         selectEmulatorCommand(this.preferenceService, this.quickPickService),
     });
 
-    commandRegistry.registerCommand(VesEmulatorInputLUpCommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_L_UP, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorInputLRightCommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_L_RIGHT, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorInputLDownCommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_L_DOWN, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorInputLLeftCommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_L_LEFT, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorInputStartCommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_START, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorInputSelectCommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_SELECT, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorInputLTriggerCommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_L_TRIGGER, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorInputRUpCommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_R_UP, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorInputRRightCommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_R_RIGHT, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorInputRDownCommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_R_DOWN, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorInputRLeftCommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_R_LEFT, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorInputBCommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_B, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorInputACommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_A, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorInputRTriggerCommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_R_TRIGGER, {
       execute: () => { },
       isVisible: () => false,
     });
 
-    commandRegistry.registerCommand(VesEmulatorInputSaveStateCommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_SAVE_STATE, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorInputLoadStateCommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_LOAD_STATE, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorInputStateSlotDecreaseCommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_STATE_SLOT_DECREASE, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorInputStateSlotIncreaseCommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_STATE_SLOT_INCREASE, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorInputToggleFastForwardCommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_TOGGLE_FAST_FORWARD, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorInputPauseToggleCommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_PAUSE_TOGGLE, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorInputToggleSlowmotionCommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_TOGGLE_SLOWMOTION, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorInputRewindCommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_REWIND, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorInputFrameAdvanceCommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_FRAME_ADVANCE, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorInputResetCommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_RESET, {
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorInputAudioMuteCommand, {
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_AUDIO_MUTE, {
       execute: () => { },
       isVisible: () => false,
     });
