@@ -7,7 +7,7 @@ import URI from "@theia/core/lib/common/uri";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { VesBuildCommands } from "../../build/build-commands";
 import { VesBuildPrefs } from "../../build/build-preferences";
-import { convertoToEnvPath, getRomPath } from "../../common/common-functions";
+import { VesCommonFunctions } from "../../common/common-functions";
 import { VesState } from "../../common/ves-state";
 import { VesProcessService } from "../../../common/process-service-protocol";
 import { VesFlashCartsPrefs } from "../flash-carts-preferences";
@@ -21,6 +21,7 @@ export class VesFlashCartsFlashCommand {
   @inject(FileService) protected readonly fileService: FileService;
   @inject(MessageService) protected readonly messageService: MessageService;
   @inject(PreferenceService) protected readonly preferenceService: PreferenceService;
+  @inject(VesCommonFunctions) protected readonly commonFunctions: VesCommonFunctions;
   @inject(VesProcessService) protected readonly vesProcessService: VesProcessService;
   @inject(VesProcessWatcher) protected readonly vesProcessWatcher: VesProcessWatcher;
   @inject(VesState) protected readonly vesState: VesState;
@@ -64,10 +65,7 @@ export class VesFlashCartsFlashCommand {
         continue;
       }
 
-      let flasherEnvPath = convertoToEnvPath(
-        this.preferenceService,
-        connectedFlashCart.config.path
-      );
+      let flasherEnvPath = this.commonFunctions.convertoToEnvPath(connectedFlashCart.config.path);
 
       const enableWsl = this.preferenceService.get(VesBuildPrefs.ENABLE_WSL.id);
       if (isWindows && enableWsl) {
@@ -77,7 +75,7 @@ export class VesFlashCartsFlashCommand {
       const romPath = connectedFlashCart.config.padRom &&
         await this.padRom(connectedFlashCart.config.size)
         ? this.getPaddedRomPath()
-        : getRomPath();
+        : this.commonFunctions.getRomPath();
 
       const flasherArgs = connectedFlashCart.config.args
         ? connectedFlashCart.config.args
@@ -182,7 +180,7 @@ export class VesFlashCartsFlashCommand {
   }
 
   protected async padRom(size: number): Promise<boolean> {
-    const romPath = getRomPath();
+    const romPath = this.commonFunctions.getRomPath();
     const paddedRomPath = this.getPaddedRomPath();
 
     if (!this.vesState.outputRomExists) {
@@ -212,7 +210,7 @@ export class VesFlashCartsFlashCommand {
   }
 
   protected getPaddedRomPath() {
-    return getRomPath().replace("output.vb", "outputPadded.vb");
+    return this.commonFunctions.getRomPath().replace("output.vb", "outputPadded.vb");
   }
 
   protected async parseDataHyperFlash32(connectedFlashCart: ConnectedFlashCart, data: any) {

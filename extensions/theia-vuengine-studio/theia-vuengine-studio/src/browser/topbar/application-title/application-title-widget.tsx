@@ -2,11 +2,12 @@ import * as React from "react";
 import { inject, injectable, postConstruct } from "inversify";
 import { ReactWidget } from "@theia/core/lib/browser/widgets/react-widget";
 import { FrontendApplicationConfigProvider } from "@theia/core/lib/browser/frontend-application-config-provider";
-import { getOs } from "../../common/common-functions";
+import { VesCommonFunctions } from "../../common/common-functions";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
 
 @injectable()
 export class VesTopbarApplicationTitleWidget extends ReactWidget {
+  @inject(VesCommonFunctions) protected readonly commonFunctions: VesCommonFunctions;
   @inject(WorkspaceService) private readonly workspaceService: WorkspaceService
 
   static readonly ID = "ves-topbar-application-title";
@@ -18,7 +19,7 @@ export class VesTopbarApplicationTitleWidget extends ReactWidget {
     this.title.label = VesTopbarApplicationTitleWidget.LABEL;
     this.title.caption = VesTopbarApplicationTitleWidget.LABEL;
     this.title.closable = false;
-    this.addClass(`os-${getOs()}`);
+    this.addClass(`os-${this.commonFunctions.getOs()}`);
     this.update();
 
     this.workspaceService.onWorkspaceChanged(() => this.update())

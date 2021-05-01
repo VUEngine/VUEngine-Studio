@@ -7,13 +7,7 @@ import URI from "@theia/core/lib/common/uri";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
 import { VesProcessService } from "../../../common/process-service-protocol";
-import {
-  convertoToEnvPath,
-  getOs,
-  getResourcesPath,
-  getRomPath,
-  getWorkspaceRoot,
-} from "../../common/common-functions";
+import { VesCommonFunctions } from "../../common/common-functions";
 import { VesState } from "../../common/ves-state";
 import { VesProcessWatcher } from "../../services/process-service/process-watcher";
 import { VesBuildCommands } from "../build-commands";
@@ -26,6 +20,7 @@ export class VesBuildBuildCommand {
   @inject(FileService) protected readonly fileService: FileService;
   @inject(PreferenceService) protected readonly preferenceService: PreferenceService;
   @inject(StorageService) protected readonly storageService: StorageService;
+  @inject(VesCommonFunctions) protected readonly commonFunctions: VesCommonFunctions;
   @inject(VesProcessService) protected readonly vesProcessService: VesProcessService;
   @inject(VesProcessWatcher) protected readonly vesProcessWatcher: VesProcessWatcher;
   @inject(VesState) protected readonly vesState: VesState;
@@ -58,7 +53,7 @@ export class VesBuildBuildCommand {
   }
 
   protected async build() {
-    const workspaceRoot = getWorkspaceRoot();
+    const workspaceRoot = this.commonFunctions.getWorkspaceRoot();
     const buildMode = this.preferenceService.get(VesBuildPrefs.BUILD_MODE.id) as string;
     const dumpElf = this.preferenceService.get(VesBuildPrefs.DUMP_ELF.id) as boolean;
     const pedanticWarnings = this.preferenceService.get(VesBuildPrefs.PEDANTIC_WARNINGS.id) as boolean;
@@ -67,18 +62,16 @@ export class VesBuildBuildCommand {
     const compilerPath = this.getCompilerPath();
     const plugins = await this.getPlugins();
 
-    let makefile = convertoToEnvPath(
-      this.preferenceService,
+    let makefile = this.commonFunctions.convertoToEnvPath(
       joinPath(workspaceRoot, "makefile")
     );
     if (!(await this.fileService.exists(new URI(makefile)))) {
-      makefile = convertoToEnvPath(
-        this.preferenceService,
+      makefile = this.commonFunctions.convertoToEnvPath(
         joinPath(engineCorePath, "makefile-game")
       );
     }
 
-    const romUri = new URI(getRomPath());
+    const romUri = new URI(this.commonFunctions.getRomPath());
     if (await this.fileService.exists(romUri)) {
       this.fileService.delete(romUri);
     }
@@ -112,19 +105,16 @@ export class VesBuildBuildCommand {
           "-f",
           makefile,
           "-C",
-          convertoToEnvPath(this.preferenceService, workspaceRoot),
+          this.commonFunctions.convertoToEnvPath(workspaceRoot),
         ],
         options: {
           cwd: workspaceRoot,
           env: {
             DUMP_ELF: dumpElf ? 1 : 0,
-            ENGINE_FOLDER: convertoToEnvPath(this.preferenceService, engineCorePath),
+            ENGINE_FOLDER: this.commonFunctions.convertoToEnvPath(engineCorePath),
             LC_ALL: "C",
             MAKE_JOBS: this.getThreads(),
-            PLUGINS_FOLDER: convertoToEnvPath(
-              this.preferenceService,
-              enginePluginsPath
-            ),
+            PLUGINS_FOLDER: this.commonFunctions.convertoToEnvPath(enginePluginsPath),
             PRINT_PEDANTIC_WARNINGS: pedanticWarnings ? 1 : 0,
           },
         },
@@ -217,7 +207,7 @@ export class VesBuildBuildCommand {
   }
 
   protected async getEngineCorePath() {
-    const defaultPath = joinPath(getResourcesPath(), "vuengine", "vuengine-core");
+    const defaultPath = joinPath(this.commonFunctions.getResourcesPath(), "vuengine", "vuengine-core");
     const customPath = this.preferenceService.get(
       VesBuildPrefs.ENGINE_CORE_PATH.id
     ) as string;
@@ -229,7 +219,7 @@ export class VesBuildBuildCommand {
 
   protected async getEnginePluginsPath() {
     const defaultPath = joinPath(
-      getResourcesPath(),
+      this.commonFunctions.getResourcesPath(),
       "vuengine",
       "vuengine-plugins"
     );
@@ -244,10 +234,10 @@ export class VesBuildBuildCommand {
 
   protected getCompilerPath() {
     return joinPath(
-      getResourcesPath(),
+      this.commonFunctions.getResourcesPath(),
       "binaries",
       "vuengine-studio-tools",
-      getOs(),
+      this.commonFunctions.getOs(),
       "gcc"
     );
   }
@@ -271,7 +261,7 @@ export class VesBuildBuildCommand {
     // get project's plugins
     try {
       const configFileUri = new URI(
-        joinPath(getWorkspaceRoot(), ".vuengine", "plugins.json")
+        joinPath(this.commonFunctions.getWorkspaceRoot(), ".vuengine", "plugins.json")
       );
       const configFileContents = await this.fileService.readFile(configFileUri);
       plugins = JSON.parse(configFileContents.value.toString());

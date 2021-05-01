@@ -11,7 +11,7 @@ import { EnvVariablesServer } from "@theia/core/lib/common/env-variables";
 import { Key, PreferenceService } from "@theia/core/lib/browser";
 import URI from "@theia/core/lib/common/uri";
 import { VesNewProjectForm } from "./new-project-form";
-import { getResourcesPath } from "../../common/common-functions";
+import { VesCommonFunctions } from "../../common/common-functions";
 import { VesProjectsPrefs } from "../projects-preferences";
 
 @injectable()
@@ -25,6 +25,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
     @inject(FileService) protected readonly fileService: FileService;
     @inject(FileDialogService) protected readonly fileDialogService: FileDialogService;
     @inject(PreferenceService) protected readonly preferenceService: PreferenceService;
+    @inject(VesCommonFunctions) protected readonly commonFunctions: VesCommonFunctions;
     @inject(WorkspaceService) protected readonly workspaceService: WorkspaceService;
 
     protected createProjectFormComponent: React.RefObject<VesNewProjectForm> = React.createRef();
@@ -114,7 +115,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
     }
 
     protected getTemplateFolder(template: string) {
-        return joinPath(getResourcesPath(), "vuengine", template);
+        return joinPath(this.commonFunctions.getResourcesPath(), "vuengine", template);
     }
 
     protected setIsCreating(isCreating: boolean) {

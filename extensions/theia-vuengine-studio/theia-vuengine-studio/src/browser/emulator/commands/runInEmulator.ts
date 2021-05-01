@@ -3,7 +3,7 @@ import { basename, dirname, sep } from "path";
 import { OpenerService, PreferenceService } from "@theia/core/lib/browser";
 import { CommandService, isWindows } from "@theia/core/lib/common";
 import { VesBuildCommands } from "../../build/build-commands";
-import { getRomPath } from "../../common/common-functions";
+import { VesCommonFunctions } from "../../common/common-functions";
 import { VesState } from "../../common/ves-state";
 import { DEFAULT_EMULATOR } from "../emulator-types";
 import { VesProcessService } from "../../../common/process-service-protocol";
@@ -15,6 +15,7 @@ export class VesEmulatorRunCommand {
   @inject(CommandService) protected readonly commandService: CommandService;
   @inject(OpenerService) protected readonly openerService: OpenerService;
   @inject(PreferenceService) protected readonly preferenceService: PreferenceService;
+  @inject(VesCommonFunctions) protected readonly commonFunctions: VesCommonFunctions;
   @inject(VesProcessService) protected readonly vesProcessService: VesProcessService;
   @inject(VesState) protected readonly vesState: VesState;
 
@@ -49,12 +50,12 @@ export class VesEmulatorRunCommand {
     const defaultEmulatorConfig = getDefaultEmulatorConfig(this.preferenceService);
 
     if (defaultEmulatorConfig === DEFAULT_EMULATOR) {
-      const romUri = new URI(getRomPath());
+      const romUri = new URI(this.commonFunctions.getRomPath());
       const opener = await this.openerService.getOpener(romUri);
       await opener.open(romUri);
     } else {
       const emulatorPath = defaultEmulatorConfig.path;
-      const emulatorArgs = defaultEmulatorConfig.args.replace("%ROM%", getRomPath()).split(" ");
+      const emulatorArgs = defaultEmulatorConfig.args.replace("%ROM%", this.commonFunctions.getRomPath()).split(" ");
 
       if (!isWindows) {
         this.vesProcessService.launchProcess({

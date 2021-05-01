@@ -5,7 +5,7 @@ import URI from "@theia/core/lib/common/uri";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { FileChangesEvent } from "@theia/filesystem/lib/common/files";
 import { FrontendApplicationState, FrontendApplicationStateService } from "@theia/core/lib/browser/frontend-application-state";
-import { getBuildPath, getRomPath } from "./common-functions";
+import { VesCommonFunctions } from "./common-functions";
 import { VesBuildPrefs } from "../build/build-preferences";
 import { VesEmulatorPrefs } from "../emulator/emulator-preferences";
 import { EmulatorConfig } from "../emulator/emulator-types";
@@ -26,6 +26,7 @@ export class VesState {
   @inject(FileService) protected fileService: FileService;
   @inject(FrontendApplicationStateService) protected readonly frontendApplicationStateService: FrontendApplicationStateService;
   @inject(PreferenceService) protected readonly preferenceService: PreferenceService;
+  @inject(VesCommonFunctions) protected readonly commonFunctions: VesCommonFunctions;
   @inject(VesFlashCartService) protected readonly vesFlashCartService: VesFlashCartService;
   @inject(VesFlashCartWatcher) protected readonly vesFlashCartWatcher: VesFlashCartWatcher;
 
@@ -37,7 +38,7 @@ export class VesState {
         if (state === "attached_shell") {
           for (const buildMode in BuildMode) {
             this.fileService
-              .exists(new URI(getBuildPath(buildMode)))
+              .exists(new URI(this.commonFunctions.getBuildPath(buildMode)))
               .then((exists: boolean) => {
                 this.setBuildFolderExists(buildMode, exists);
               });
@@ -45,7 +46,7 @@ export class VesState {
 
           // TODO: fileService.exists does not seem to work on Windows
           this.fileService
-            .exists(new URI(getRomPath()))
+            .exists(new URI(this.commonFunctions.getRomPath()))
             .then((exists: boolean) => {
               this.outputRomExists = exists;
             });
@@ -63,18 +64,18 @@ export class VesState {
     // const test = this.fileService.watch(new URI(cleanPath));
     this.fileService.onDidFilesChange((fileChangesEvent: FileChangesEvent) => {
       for (const buildMode in BuildMode) {
-        if (fileChangesEvent.contains(new URI(getBuildPath(buildMode)))) {
+        if (fileChangesEvent.contains(new URI(this.commonFunctions.getBuildPath(buildMode)))) {
           this.fileService
-            .exists(new URI(getBuildPath(buildMode)))
+            .exists(new URI(this.commonFunctions.getBuildPath(buildMode)))
             .then((exists: boolean) => {
               this.setBuildFolderExists(buildMode, exists);
             });
         }
       }
 
-      if (fileChangesEvent.contains(new URI(getRomPath()))) {
+      if (fileChangesEvent.contains(new URI(this.commonFunctions.getRomPath()))) {
         this.fileService
-          .exists(new URI(getRomPath()))
+          .exists(new URI(this.commonFunctions.getRomPath()))
           .then((exists: boolean) => {
             this.outputRomExists = exists;
           });
@@ -135,6 +136,7 @@ export class VesState {
 
   detectConnectedFlashCarts = async () => {
     const flashCartConfigs: FlashCartConfig[] = getFlashCartConfigs(
+      this.commonFunctions,
       this.preferenceService
     );
     this.connectedFlashCarts = await this.vesFlashCartService.detectFlashCarts(

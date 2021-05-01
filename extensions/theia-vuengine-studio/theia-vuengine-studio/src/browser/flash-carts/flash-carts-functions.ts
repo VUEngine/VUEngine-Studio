@@ -1,13 +1,16 @@
 import { join as joinPath } from "path";
 import { isWindows } from "@theia/core";
 import { PreferenceService } from "@theia/core/lib/browser";
-import { getOs, getResourcesPath } from "../common/common-functions";
+import { VesCommonFunctions } from "../common/common-functions";
 import { VesFlashCartsPrefs } from "./flash-carts-preferences";
 import { FlashCartConfig } from "./flash-carts-types";
 import { IMAGE_FLASHBOY_PLUS } from "./images/flashboy-plus";
 import { IMAGE_HYPERFLASH32 } from "./images/hyperflash32";
 
-export function getFlashCartConfigs(preferenceService: PreferenceService): FlashCartConfig[] {
+export function getFlashCartConfigs(
+    commonFunctions: VesCommonFunctions,
+    preferenceService: PreferenceService
+): FlashCartConfig[] {
     const flashCartConfigs: FlashCartConfig[] = preferenceService.get(VesFlashCartsPrefs.FLASH_CARTS.id) ?? [];
 
     const effectiveFlashCartConfigs = flashCartConfigs.length > 0
@@ -19,18 +22,18 @@ export function getFlashCartConfigs(preferenceService: PreferenceService): Flash
             ...flashCartConfig,
             path: flashCartConfig.path
                 .replace("%HFCLI%", joinPath(
-                    getResourcesPath(),
+                    commonFunctions.getResourcesPath(),
                     "binaries",
                     "vuengine-studio-tools",
-                    getOs(),
+                    commonFunctions.getOs(),
                     "hf-cli",
                     isWindows ? "hfcli.exe" : "hfcli"
                 ))
                 .replace("%PROGVB%", joinPath(
-                    getResourcesPath(),
+                    commonFunctions.getResourcesPath(),
                     "binaries",
                     "vuengine-studio-tools",
-                    getOs(),
+                    commonFunctions.getOs(),
                     "prog-vb",
                     isWindows ? "prog-vb.exe" : "prog-vb"
                 )),

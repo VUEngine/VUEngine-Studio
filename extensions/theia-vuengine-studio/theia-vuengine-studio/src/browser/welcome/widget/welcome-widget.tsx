@@ -20,7 +20,7 @@ import {
 } from "@theia/core/lib/common/application-protocol";
 import { FrontendApplicationConfigProvider } from "@theia/core/lib/browser/frontend-application-config-provider";
 import { EnvVariablesServer } from "@theia/core/lib/common/env-variables";
-import { openUrl } from "../../common/common-functions";
+import { VesCommonFunctions } from "../../common/common-functions";
 import { VesUrls } from "../../common/common-urls";
 import { VesProjectsCommands } from "../../projects/projects-commands";
 
@@ -30,19 +30,17 @@ export class WelcomeWidget extends ReactWidget {
   static readonly LABEL = "Welcome";
 
   protected applicationInfo: ApplicationInfo | undefined;
-  protected applicationName = FrontendApplicationConfigProvider.get()
-    .applicationName;
+  protected applicationName = FrontendApplicationConfigProvider.get().applicationName;
   protected home: string | undefined;
   protected recentLimit = 10;
   protected recentWorkspaces: string[] = [];
 
   @inject(ApplicationServer) protected readonly appServer: ApplicationServer;
   @inject(CommandRegistry) protected readonly commandRegistry: CommandRegistry;
-  @inject(EnvVariablesServer)
-  protected readonly environments: EnvVariablesServer;
+  @inject(EnvVariablesServer) protected readonly environments: EnvVariablesServer;
   @inject(LabelProvider) protected readonly labelProvider: LabelProvider;
-  @inject(WorkspaceService)
-  protected readonly workspaceService: WorkspaceService;
+  @inject(WorkspaceService) protected readonly workspaceService: WorkspaceService;
+  @inject(VesCommonFunctions) protected readonly commonFunctions: VesCommonFunctions;
 
   @postConstruct()
   protected async init(): Promise<void> {
@@ -268,21 +266,12 @@ export class WelcomeWidget extends ReactWidget {
       this.commandRegistry.executeCommand(WorkspaceCommands.OPEN_FOLDER.id);
     }
   };
-  protected openFile = () =>
-    this.commandRegistry.executeCommand(WorkspaceCommands.OPEN_FILE.id);
-  protected openWorkspace = () =>
-    this.commandRegistry.executeCommand(WorkspaceCommands.OPEN_WORKSPACE.id);
-  protected openRecentWorkspace = () =>
-    this.commandRegistry.executeCommand(
-      WorkspaceCommands.OPEN_RECENT_WORKSPACE.id
-    );
-  protected openPreferences = () =>
-    this.commandRegistry.executeCommand(CommonCommands.OPEN_PREFERENCES.id);
-  protected openKeyboardShortcuts = () =>
-    this.commandRegistry.executeCommand(KeymapsCommands.OPEN_KEYMAPS.id);
-  protected openWorkspaceServiceUri = (uri: URI) =>
-    this.workspaceService.open(uri);
-  protected openUrl = (url: string) => openUrl(url);
-  protected newProject = () =>
-    this.commandRegistry.executeCommand(VesProjectsCommands.NEW.id);
+  protected openFile = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN_FILE.id);
+  protected openWorkspace = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN_WORKSPACE.id);
+  protected openRecentWorkspace = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN_RECENT_WORKSPACE.id);
+  protected openPreferences = () => this.commandRegistry.executeCommand(CommonCommands.OPEN_PREFERENCES.id);
+  protected openKeyboardShortcuts = () => this.commandRegistry.executeCommand(KeymapsCommands.OPEN_KEYMAPS.id);
+  protected openWorkspaceServiceUri = (uri: URI) => this.workspaceService.open(uri);
+  protected openUrl = (url: string) => this.commonFunctions.openUrl(url);
+  protected newProject = () => this.commandRegistry.executeCommand(VesProjectsCommands.NEW.id);
 }

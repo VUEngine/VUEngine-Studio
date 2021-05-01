@@ -3,7 +3,7 @@ import { PreferenceService } from "@theia/core/lib/browser";
 import { MessageService } from "@theia/core/lib/common";
 import { join as joinPath } from "path";
 import * as rimraf from "rimraf";
-import { getBuildPath } from "../../common/common-functions";
+import { VesCommonFunctions } from "../../common/common-functions";
 import { VesState } from "../../common/ves-state";
 import { VesBuildPrefs } from "../build-preferences";
 import { BuildMode } from "../build-types";
@@ -12,6 +12,7 @@ import { BuildMode } from "../build-types";
 export class VesBuildCleanCommand {
     @inject(MessageService) protected readonly messageService: MessageService;
     @inject(PreferenceService) protected readonly preferenceService: PreferenceService;
+    @inject(VesCommonFunctions) protected readonly commonFunctions: VesCommonFunctions;
     @inject(VesState) protected readonly vesState: VesState;
 
     async execute() {
@@ -51,6 +52,6 @@ export class VesBuildCleanCommand {
     }
 
     protected getCleanPath(buildMode: BuildMode): string {
-        return joinPath(getBuildPath(), buildMode);
+        return joinPath(this.commonFunctions.getBuildPath(), buildMode);
     }
 }

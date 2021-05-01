@@ -1,59 +1,64 @@
+import { injectable, inject } from "inversify";
 import { dirname, join as joinPath } from "path";
 import { env } from "process";
-import { shell } from "electron";
 import { KeybindingRegistry, PreferenceService } from "@theia/core/lib/browser";
+import { WindowService } from "@theia/core/lib/browser/window/window-service";
 import { isOSX, isWindows } from "@theia/core";
 import { VesBuildPrefs } from "../build/build-preferences";
 
-export function getWorkspaceRoot(): string {
-  const substrNum = isWindows ? 2 : 1;
-  return (window.location.hash.slice(-9) === "workspace")
-    ? dirname(window.location.hash.substring(substrNum))
-    : window.location.hash.substring(substrNum);
-}
+@injectable()
+export class VesCommonFunctions {
+  @inject(KeybindingRegistry) protected readonly keybindingRegistry: KeybindingRegistry;
+  @inject(PreferenceService) protected readonly preferenceService: PreferenceService;
+  @inject(WindowService) protected readonly windowService: WindowService;
 
-export function getBuildPath(buildMode?: string) {
-  const buildRoot = joinPath(getWorkspaceRoot(), "build");
-  return buildMode ? joinPath(buildRoot, buildMode.toLowerCase()) : buildRoot;
-}
-
-export function getRomPath(): string {
-  const buildRoot = joinPath(getWorkspaceRoot(), "build");
-  return joinPath(buildRoot, "output.vb");
-}
-
-export function getOs() {
-  return isWindows ? "win" : isOSX ? "osx" : "linux";
-}
-
-export function getResourcesPath() {
-  return env.THEIA_APP_PROJECT_PATH ?? "";
-}
-
-export function convertoToEnvPath(
-  preferenceService: PreferenceService,
-  path: string
-) {
-  const enableWsl = preferenceService.get(VesBuildPrefs.ENABLE_WSL.id);
-  let envPath = path.replace(/\\/g, '/').replace(/^[a-zA-Z]:\//, function (x) {
-    return `/${x.substr(0, 1).toLowerCase()}/`;
-  });
-
-  if (isWindows && enableWsl) {
-    envPath = "/mnt/" + envPath;
+  getWorkspaceRoot(): string {
+    const substrNum = isWindows ? 2 : 1;
+    return (window.location.hash.slice(-9) === "workspace")
+      ? dirname(window.location.hash.substring(substrNum))
+      : window.location.hash.substring(substrNum);
   }
-  return envPath;
-}
 
-export function openUrl(url: string) {
-  shell.openExternal(url);
-}
-
-export function getKeybindingLabel(keybindingRegistry: KeybindingRegistry, commandId: string, wrapInBrackets: boolean = false): string {
-  const keybinding = keybindingRegistry.getKeybindingsForCommand(commandId)[0];
-  let keybindingAccelerator = keybinding ? keybindingRegistry.acceleratorFor(keybinding, "+").join(", ") : "";
-  if (wrapInBrackets && keybindingAccelerator !== "") {
-    keybindingAccelerator = ` (${keybindingAccelerator})`
+  getBuildPath(buildMode?: string) {
+    const buildRoot = joinPath(this.getWorkspaceRoot(), "build");
+    return buildMode ? joinPath(buildRoot, buildMode.toLowerCase()) : buildRoot;
   }
-  return keybindingAccelerator;
+
+  getRomPath(): string {
+    const buildRoot = joinPath(this.getWorkspaceRoot(), "build");
+    return joinPath(buildRoot, "output.vb");
+  }
+
+  getOs() {
+    return isWindows ? "win" : isOSX ? "osx" : "linux";
+  }
+
+  getResourcesPath() {
+    return env.THEIA_APP_PROJECT_PATH ?? "";
+  }
+
+  convertoToEnvPath(path: string) {
+    const enableWsl = this.preferenceService.get(VesBuildPrefs.ENABLE_WSL.id);
+    let envPath = path.replace(/\\/g, '/').replace(/^[a-zA-Z]:\//, function (x) {
+      return `/${x.substr(0, 1).toLowerCase()}/`;
+    });
+
+    if (isWindows && enableWsl) {
+      envPath = "/mnt/" + envPath;
+    }
+    return envPath;
+  }
+
+  openUrl(url: string) {
+    this.windowService.openNewWindow(url, { external: true });
+  }
+
+  getKeybindingLabel(commandId: string, wrapInBrackets: boolean = false): string {
+    const keybinding = this.keybindingRegistry.getKeybindingsForCommand(commandId)[0];
+    let keybindingAccelerator = keybinding ? this.keybindingRegistry.acceleratorFor(keybinding, "+").join(", ") : "";
+    if (wrapInBrackets && keybindingAccelerator !== "") {
+      keybindingAccelerator = ` (${keybindingAccelerator})`
+    }
+    return keybindingAccelerator;
+  }
 };

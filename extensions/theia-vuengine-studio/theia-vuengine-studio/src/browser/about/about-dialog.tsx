@@ -1,13 +1,14 @@
-import { injectable } from 'inversify';
+import { inject, injectable } from 'inversify';
 import * as React from 'react';
 import { join as joinPath } from 'path';
 import { AboutDialog, ABOUT_CONTENT_CLASS } from '@theia/core/lib/browser/about-dialog';
 import { FrontendApplicationConfigProvider } from '@theia/core/lib/browser/frontend-application-config-provider';
-import { getResourcesPath, openUrl } from '../common/common-functions';
+import { VesCommonFunctions } from '../common/common-functions';
 import { VesUrls } from '../common/common-urls';
 
 @injectable()
 export class VesAboutDialog extends AboutDialog {
+    @inject(VesCommonFunctions) protected readonly commonFunctions: VesCommonFunctions;
 
     constructor() {
         super({
@@ -31,7 +32,7 @@ export class VesAboutDialog extends AboutDialog {
     }
 
     protected render(): React.ReactNode {
-        const iconPath = joinPath(getResourcesPath(), "resources", "splash", "logo.png");
+        const iconPath = joinPath(this.commonFunctions.getResourcesPath(), "resources", "splash", "logo.png");
         const applicationInfo = this.applicationInfo;
         const applicationName = FrontendApplicationConfigProvider.get().applicationName;
 
@@ -127,5 +128,5 @@ export class VesAboutDialog extends AboutDialog {
         </div >;
     }
 
-    protected openUrl = (url: string) => openUrl(url);
+    protected openUrl = (url: string) => this.commonFunctions.openUrl(url);
 }

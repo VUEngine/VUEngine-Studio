@@ -6,7 +6,7 @@ import { KeybindingRegistry } from "@theia/core/lib/browser/keybinding";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { VesBuildCommands } from "../../build/build-commands";
 import { VesState } from "../../common/ves-state";
-import { getKeybindingLabel, getOs } from "../../common/common-functions";
+import { VesCommonFunctions } from "../../common/common-functions";
 import { PreferenceService } from "@theia/core/lib/browser";
 import { BuildMode } from "../../build/build-types";
 import { VesEmulatorCommands } from "../../emulator/emulator-commands";
@@ -28,6 +28,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
     @inject(KeybindingRegistry) protected readonly keybindingRegistry!: KeybindingRegistry;
     @inject(MessageService) protected readonly messageService!: MessageService;
     @inject(PreferenceService) protected readonly preferenceService!: PreferenceService;
+    @inject(VesCommonFunctions) protected readonly commonFunctions: VesCommonFunctions;
     @inject(VesState) protected readonly vesState: VesState;
     @inject(WorkspaceService) protected readonly workspaceService: WorkspaceService;
 
@@ -37,7 +38,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
         this.title.label = VesTopbarActionButtonsWidget.LABEL;
         this.title.caption = VesTopbarActionButtonsWidget.LABEL;
         this.title.closable = false;
-        this.addClass(`os-${getOs()}`);
+        this.addClass(`os-${this.commonFunctions.getOs()}`);
 
         this.vesState.onDidChangeIsCleaning(() => this.update());
         this.vesState.onDidChangeBuildStatus(() => this.update());
@@ -64,21 +65,21 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
         return !this.workspaceService.opened ? <>
             <button
                 className="theia-button secondary new-project"
-                title={`Create New Project${getKeybindingLabel(this.keybindingRegistry, VesProjectsCommands.NEW.id, true)}`}
+                title={`Create New Project${this.commonFunctions.getKeybindingLabel(VesProjectsCommands.NEW.id, true)}`}
                 onClick={() => this.commandService.executeCommand(VesProjectsCommands.NEW.id)}
             >
                 <i className="fa fa-plus"></i>
             </button>
             <button
                 className="theia-button secondary new-project"
-                title={`Open Project${getKeybindingLabel(this.keybindingRegistry, openProjectId, true)}`}
+                title={`Open Project${this.commonFunctions.getKeybindingLabel(openProjectId, true)}`}
                 onClick={() => this.commandService.executeCommand(openProjectId)}
             >
                 <i className="fa fa-folder-open"></i>
             </button>
             <button
                 className="theia-button secondary new-project"
-                title={`Open Workspace${getKeybindingLabel(this.keybindingRegistry, WorkspaceCommands.OPEN_WORKSPACE.id, true)}`}
+                title={`Open Workspace${this.commonFunctions.getKeybindingLabel(WorkspaceCommands.OPEN_WORKSPACE.id, true)}`}
                 onClick={() => this.commandService.executeCommand(WorkspaceCommands.OPEN_WORKSPACE.id)}
             >
                 <i className="fa fa-file-code-o"></i>
@@ -87,7 +88,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
             : <>
                 <button
                     className={"theia-button secondary clean" + (this.vesState.isCleaning ? " active" : "")}
-                    title={this.vesState.isCleaning ? "Cleaning..." : `${VesBuildCommands.CLEAN.label}${getKeybindingLabel(this.keybindingRegistry, VesBuildCommands.CLEAN.id, true)}`}
+                    title={this.vesState.isCleaning ? "Cleaning..." : `${VesBuildCommands.CLEAN.label}${this.commonFunctions.getKeybindingLabel(VesBuildCommands.CLEAN.id, true)}`}
                     disabled={this.vesState.buildStatus.active || !this.vesState.buildFolderExists[buildMode]}
                     onClick={() => this.commandService.executeCommand(VesBuildCommands.CLEAN.id)}
                 >
@@ -97,7 +98,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                 </button>
                 <button
                     className={"theia-button secondary build" + (this.vesState.buildStatus.active ? " active" : "")}
-                    title={this.vesState.buildStatus.active ? "Building..." : `${VesBuildCommands.BUILD.label}${getKeybindingLabel(this.keybindingRegistry, VesBuildCommands.BUILD.id, true)}`}
+                    title={this.vesState.buildStatus.active ? "Building..." : `${VesBuildCommands.BUILD.label}${this.commonFunctions.getKeybindingLabel(VesBuildCommands.BUILD.id, true)}`}
                     onClick={() => this.commandService.executeCommand(VesBuildCommands.BUILD.id)}
                 >
                     {this.vesState.buildStatus.active
@@ -106,7 +107,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                 </button>
                 <button
                     className={"theia-button secondary run" + (this.vesState.isRunQueued ? " active" : "")}
-                    title={this.vesState.isRunQueued ? "Run Queued..." : `${VesEmulatorCommands.RUN.label}${getKeybindingLabel(this.keybindingRegistry, VesEmulatorCommands.RUN.id, true)}`}
+                    title={this.vesState.isRunQueued ? "Run Queued..." : `${VesEmulatorCommands.RUN.label}${this.commonFunctions.getKeybindingLabel(VesEmulatorCommands.RUN.id, true)}`}
                     onClick={() => this.commandService.executeCommand(VesEmulatorCommands.RUN.id)}
                 >
                     {this.vesState.isRunQueued
@@ -116,7 +117,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                 </button>
                 <button
                     className={"theia-button secondary flash" + (this.vesState.isFlashQueued || this.vesState.isFlashing ? " active" : "")}
-                    title={this.vesState.isFlashQueued ? "Flash Queued..." : `${VesFlashCartsCommands.FLASH.label}${getKeybindingLabel(this.keybindingRegistry, VesFlashCartsCommands.FLASH.id, true)}`}
+                    title={this.vesState.isFlashQueued ? "Flash Queued..." : `${VesFlashCartsCommands.FLASH.label}${this.commonFunctions.getKeybindingLabel(VesFlashCartsCommands.FLASH.id, true)}`}
                     disabled={!this.vesState.connectedFlashCarts}
                     onClick={() => this.commandService.executeCommand(VesFlashCartsCommands.FLASH.id)}
                 >
@@ -128,7 +129,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                 </button>
                 <button
                     className={"theia-button secondary export" + (this.vesState.isExportQueued ? " active" : "")}
-                    title={this.vesState.isExportQueued ? "Export Queued..." : `${VesBuildCommands.EXPORT.label}${getKeybindingLabel(this.keybindingRegistry, VesBuildCommands.EXPORT.id, true)}`}
+                    title={this.vesState.isExportQueued ? "Export Queued..." : `${VesBuildCommands.EXPORT.label}${this.commonFunctions.getKeybindingLabel(VesBuildCommands.EXPORT.id, true)}`}
                     onClick={() => this.commandService.executeCommand(VesBuildCommands.EXPORT.id)}
                 >
                     {this.vesState.isExportQueued

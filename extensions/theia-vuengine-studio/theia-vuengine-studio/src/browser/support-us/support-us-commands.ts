@@ -1,6 +1,7 @@
-import { injectable, interfaces } from "inversify";
+import { inject, injectable, interfaces } from "inversify";
 import { Command, CommandContribution, CommandRegistry } from "@theia/core/lib/common";
-import { supportUsCommand } from "./commands/support-us";
+import { VesCommonFunctions } from "../common/common-functions";
+import { VesUrls } from "../common/common-urls";
 
 export const VesSupportUsCommand: Command = {
   id: "Ves.commands.supportUs",
@@ -11,9 +12,11 @@ export const VesSupportUsCommand: Command = {
 
 @injectable()
 export class VesSupportUsCommandContribution implements CommandContribution {
+  @inject(VesCommonFunctions) protected readonly commonFunctions: VesCommonFunctions;
+
   registerCommands(commandRegistry: CommandRegistry): void {
     commandRegistry.registerCommand(VesSupportUsCommand, {
-      execute: () => supportUsCommand()
+      execute: () => this.commonFunctions.openUrl(VesUrls.PATREON),
     });
   }
 }

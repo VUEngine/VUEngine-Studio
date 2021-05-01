@@ -4,7 +4,7 @@ import { CommonCommands, ConfirmDialog } from "@theia/core/lib/browser";
 import URI from "@theia/core/lib/common/uri";
 import { FileDialogService, SaveFileDialogProps } from "@theia/filesystem/lib/browser";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
-import { getRomPath } from "../../common/common-functions";
+import { VesCommonFunctions } from "../../common/common-functions";
 import { VesState } from "../../common/ves-state";
 import { VesBuildCommands } from "../build-commands";
 
@@ -13,6 +13,7 @@ export class VesBuildExportCommand {
   @inject(CommandService) protected readonly commandService: CommandService;
   @inject(FileService) protected readonly fileService: FileService;
   @inject(FileDialogService) protected readonly fileDialogService: FileDialogService;
+  @inject(VesCommonFunctions) protected readonly commonFunctions: VesCommonFunctions;
   @inject(VesState) protected readonly vesState: VesState;
 
   async execute() {
@@ -35,7 +36,7 @@ export class VesBuildExportCommand {
   }
 
   protected async exportRom() {
-    const romPath = getRomPath();
+    const romPath = this.commonFunctions.getRomPath();
     const romUri = new URI(romPath);
     let exists: boolean = false;
     let overwrite: boolean = false;
