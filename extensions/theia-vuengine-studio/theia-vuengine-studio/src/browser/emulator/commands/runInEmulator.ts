@@ -4,7 +4,7 @@ import { CommandService, isWindows } from "@theia/core/lib/common";
 import { VesBuildCommands } from "../../build/build-commands";
 import { getRomPath } from "../../common/common-functions";
 import { VesState } from "../../common/ves-state";
-import { VesRunDefaultEmulatorPreference, VesRunEmulatorConfigsPreference } from "../emulator-preferences";
+import { VesEmulatorPrefs } from "../emulator-preferences";
 import { DEFAULT_EMULATOR, EmulatorConfig } from "../emulator-types";
 import { VesProcessService } from "../../../common/process-service-protocol";
 import URI from "@theia/core/lib/common/uri";
@@ -68,7 +68,7 @@ async function run(
 
 export function getDefaultEmulatorConfig(preferenceService: PreferenceService): EmulatorConfig {
   const emulatorConfigs: EmulatorConfig[] = getEmulatorConfigs(preferenceService);
-  const defaultEmulatorName: string = preferenceService.get(VesRunDefaultEmulatorPreference.id) as string;
+  const defaultEmulatorName: string = preferenceService.get(VesEmulatorPrefs.DEFAULT_EMULATOR.id) as string;
 
   let defaultEmulatorConfig = DEFAULT_EMULATOR;
   for (const emulatorConfig of emulatorConfigs) {
@@ -81,7 +81,7 @@ export function getDefaultEmulatorConfig(preferenceService: PreferenceService): 
 }
 
 export function getEmulatorConfigs(preferenceService: PreferenceService) {
-  const customEmulatorConfigs: EmulatorConfig[] = preferenceService.get(VesRunEmulatorConfigsPreference.id) ?? [];
+  const customEmulatorConfigs: EmulatorConfig[] = preferenceService.get(VesEmulatorPrefs.EMULATORS.id) ?? [];
 
   const emulatorConfigs = [
     DEFAULT_EMULATOR,

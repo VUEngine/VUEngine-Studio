@@ -20,7 +20,7 @@ import { togglePedanticWarnings } from "./commands/toggle-pedantic-warnings";
 import { VesState } from "../common/ves-state";
 import { toggleEnableWsl } from "./commands/toggle-enable-wsl";
 import { VesBuildCommands } from "./build-commands";
-import { VesBuildDumpElfPreference, VesBuildEnableWslPreference, VesBuildPedanticWarningsPreference } from "./build-preferences";
+import { VesBuildPrefs } from "./build-preferences";
 import { VesProcessService } from "../../common/process-service-protocol";
 import { VesProcessWatcher } from "../services/process-service/process-watcher";
 import { VesBuildWidgetContribution } from "./widget/build-view";
@@ -85,18 +85,18 @@ export class VesBuildCommandContribution implements CommandContribution {
 
     commandRegistry.registerCommand(VesBuildCommands.TOGGLE_DUMP_ELF, {
       execute: () => toggleDumpElf(this.preferenceService),
-      isToggled: () => !!this.preferenceService.get(VesBuildDumpElfPreference.id),
+      isToggled: () => !!this.preferenceService.get(VesBuildPrefs.DUMP_ELF.id),
     });
 
     commandRegistry.registerCommand(VesBuildCommands.TOGGLE_PEDANTIC_WARNINGS, {
       execute: () => togglePedanticWarnings(this.preferenceService),
-      isToggled: () => !!this.preferenceService.get(VesBuildPedanticWarningsPreference.id),
+      isToggled: () => !!this.preferenceService.get(VesBuildPrefs.PEDANTIC_WARNINGS.id),
     });
 
     if (isWindows) {
       commandRegistry.registerCommand(VesBuildCommands.TOGGLE_ENABLE_WSL, {
         execute: () => toggleEnableWsl(this.preferenceService),
-        isToggled: () => !!this.preferenceService.get(VesBuildEnableWslPreference.id),
+        isToggled: () => !!this.preferenceService.get(VesBuildPrefs.ENABLE_WSL.id),
       });
     }
 

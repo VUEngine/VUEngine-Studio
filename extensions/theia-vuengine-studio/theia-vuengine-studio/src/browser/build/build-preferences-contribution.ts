@@ -7,21 +7,21 @@ import {
   PreferenceContribution,
   PreferenceSchema,
 } from "@theia/core/lib/browser";
-import { VesBuildDumpElfPreference, VesBuildEnableWslPreference, VesBuildEngineCorePathPreference, VesBuildEnginePluginsPathPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "./build-preferences";
+import { VesBuildPrefs } from "./build-preferences";
 
 const VesBuildPreferenceSchema: PreferenceSchema = {
   type: "object",
   properties: {
-    [VesBuildModePreference.id]: VesBuildModePreference.property,
-    [VesBuildDumpElfPreference.id]: VesBuildDumpElfPreference.property,
-    [VesBuildPedanticWarningsPreference.id]: VesBuildPedanticWarningsPreference.property,
-    [VesBuildEngineCorePathPreference.id]: VesBuildEngineCorePathPreference.property,
-    [VesBuildEnginePluginsPathPreference.id]: VesBuildEnginePluginsPathPreference.property,
+    [VesBuildPrefs.BUILD_MODE.id]: VesBuildPrefs.BUILD_MODE.property,
+    [VesBuildPrefs.DUMP_ELF.id]: VesBuildPrefs.DUMP_ELF.property,
+    [VesBuildPrefs.PEDANTIC_WARNINGS.id]: VesBuildPrefs.PEDANTIC_WARNINGS.property,
+    [VesBuildPrefs.ENGINE_CORE_PATH.id]: VesBuildPrefs.ENGINE_CORE_PATH.property,
+    [VesBuildPrefs.ENGINE_PLUGINS_PATH.id]: VesBuildPrefs.ENGINE_PLUGINS_PATH.property,
   }
 };
 
 if (isWindows) {
-  VesBuildPreferenceSchema.properties[VesBuildEnableWslPreference.id] = VesBuildEnableWslPreference.property;
+  VesBuildPreferenceSchema.properties[VesBuildPrefs.ENABLE_WSL.id] = VesBuildPrefs.ENABLE_WSL.property;
 }
 
 const VesBuildPreferences = Symbol("VesBuildPreferences");

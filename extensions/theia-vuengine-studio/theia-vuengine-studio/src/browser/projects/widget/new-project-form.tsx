@@ -4,7 +4,7 @@ import * as filenamify from "filenamify";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { FileDialogService, OpenFileDialogProps } from "@theia/filesystem/lib/browser";
 import { PreferenceService } from "@theia/core/lib/browser";
-import { VesProjectsBaseFolderPreference } from "../projects-preferences";
+import { VesProjectsPrefs } from "../projects-preferences";
 import URI from "@theia/core/lib/common/uri";
 
 export interface VesNewProjectFormProps {
@@ -36,13 +36,13 @@ export class VesNewProjectForm extends React.Component<VesNewProjectFormProps, V
         this.state = {
             name: "",
             template: "vuengine-barebone",
-            path: this.removeTrailingSlash(this.preferenceService.get(VesProjectsBaseFolderPreference.id) as string),
+            path: this.removeTrailingSlash(this.preferenceService.get(VesProjectsPrefs.BASE_FOLDER.id) as string),
             folder: "new-project",
             isCreating: false
         }
 
         this.preferenceService.onPreferenceChanged(({ preferenceName, newValue }) => {
-            if (preferenceName === VesProjectsBaseFolderPreference.id) {
+            if (preferenceName === VesProjectsPrefs.BASE_FOLDER.id) {
                 this.setState({ path: this.removeTrailingSlash(newValue) });
             }
         });

@@ -24,11 +24,7 @@ import {
   getResourcesPath,
   getRomPath,
 } from "../../common/common-functions";
-import {
-  VesRunEmulatorEmulationModePreference,
-  VesRunEmulatorScalePreference,
-  VesRunEmulatorStereoModePreference,
-} from "../emulator-preferences";
+import { VesEmulatorPrefs } from "../emulator-preferences";
 import { IMAGE_VB_CONTROLLER } from "../images/vb-controller";
 import { VesEmulatorCommands } from "../emulator-commands";
 
@@ -401,7 +397,7 @@ export class VesEmulatorWidget extends ReactWidget {
                   className="theia-select"
                   title="Scale"
                   value={this.preferenceService.get(
-                    VesRunEmulatorScalePreference.id
+                    VesEmulatorPrefs.EMULATOR_SCALE.id
                   )}
                   onChange={(value) => this.setScale(value)}
                   disabled={this.state.showControls}
@@ -418,7 +414,7 @@ export class VesEmulatorWidget extends ReactWidget {
                   className="theia-select"
                   title="Stereo Mode"
                   value={this.preferenceService.get(
-                    VesRunEmulatorStereoModePreference.id
+                    VesEmulatorPrefs.EMULATOR_STEREO_MODE.id
                   )}
                   onChange={(value) => this.setStereoMode(value)}
                   disabled={this.state.showControls}
@@ -435,7 +431,7 @@ export class VesEmulatorWidget extends ReactWidget {
                   className="theia-select"
                   title="Emulation Mode"
                   value={this.preferenceService.get(
-                    VesRunEmulatorEmulationModePreference.id
+                    VesEmulatorPrefs.EMULATOR_EMULATION_MODE.id
                   )}
                   onChange={(value) => this.setEmulationMode(value)}
                   disabled={this.state.showControls}
@@ -1245,7 +1241,7 @@ export class VesEmulatorWidget extends ReactWidget {
 
   protected async setEmulationMode(e: React.ChangeEvent<HTMLSelectElement>) {
     await this.preferenceService.set(
-      VesRunEmulatorEmulationModePreference.id,
+      VesEmulatorPrefs.EMULATOR_EMULATION_MODE.id,
       e.target.value,
       PreferenceScope.User
     );
@@ -1255,7 +1251,7 @@ export class VesEmulatorWidget extends ReactWidget {
 
   protected async setStereoMode(e: React.ChangeEvent<HTMLSelectElement>) {
     await this.preferenceService.set(
-      VesRunEmulatorStereoModePreference.id,
+      VesEmulatorPrefs.EMULATOR_STEREO_MODE.id,
       e.target.value,
       PreferenceScope.User
     );
@@ -1265,7 +1261,7 @@ export class VesEmulatorWidget extends ReactWidget {
 
   protected async setScale(e: React.ChangeEvent<HTMLSelectElement>) {
     await this.preferenceService.set(
-      VesRunEmulatorScalePreference.id,
+      VesEmulatorPrefs.EMULATOR_SCALE.id,
       e.target.value,
       PreferenceScope.User
     );
@@ -1274,10 +1270,10 @@ export class VesEmulatorWidget extends ReactWidget {
 
   protected sendCoreOptions() {
     const emulationMode = this.preferenceService.get(
-      VesRunEmulatorEmulationModePreference.id
+      VesEmulatorPrefs.EMULATOR_EMULATION_MODE.id
     ) as string;
     let stereoMode = this.preferenceService.get(
-      VesRunEmulatorStereoModePreference.id
+      VesEmulatorPrefs.EMULATOR_STEREO_MODE.id
     ) as string;
     let anaglyphPreset = "disabled";
     let colorMode = "black & red";
@@ -1386,7 +1382,7 @@ export class VesEmulatorWidget extends ReactWidget {
 
   protected getCanvasDimensions(): { height: number; width: number } {
     const canvasScale = this.preferenceService.get(
-      VesRunEmulatorScalePreference.id
+      VesEmulatorPrefs.EMULATOR_SCALE.id
     ) as string;
     const screenResolution = this.getScreenResolution();
     const wrapperHeight =
@@ -1435,7 +1431,7 @@ export class VesEmulatorWidget extends ReactWidget {
 
   protected getScreenResolution(): { height: number; width: number } {
     const stereoMode = this.preferenceService.get(
-      VesRunEmulatorStereoModePreference.id
+      VesEmulatorPrefs.EMULATOR_STEREO_MODE.id
     ) as string;
     let x = VesEmulatorWidget.RESOLUTIONX;
     let y = VesEmulatorWidget.RESOLUTIONY;

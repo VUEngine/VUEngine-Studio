@@ -16,13 +16,7 @@ import {
 import { VesState } from "../../common/ves-state";
 import { VesProcessWatcher } from "../../services/process-service/process-watcher";
 import { VesBuildCommands } from "../build-commands";
-import {
-  VesBuildDumpElfPreference,
-  VesBuildEngineCorePathPreference,
-  VesBuildEnginePluginsPathPreference,
-  VesBuildModePreference,
-  VesBuildPedanticWarningsPreference,
-} from "../build-preferences";
+import { VesBuildPrefs } from "../build-preferences";
 import { BuildLogLineType, BuildMode } from "../build-types";
 
 export async function buildCommand(
@@ -65,12 +59,12 @@ async function build(
   vesState: VesState
 ) {
   const workspaceRoot = getWorkspaceRoot();
-  const buildMode = preferenceService.get(VesBuildModePreference.id) as string;
+  const buildMode = preferenceService.get(VesBuildPrefs.BUILD_MODE.id) as string;
   const dumpElf = preferenceService.get(
-    VesBuildDumpElfPreference.id
+    VesBuildPrefs.DUMP_ELF.id
   ) as boolean;
   const pedanticWarnings = preferenceService.get(
-    VesBuildPedanticWarningsPreference.id
+    VesBuildPrefs.PEDANTIC_WARNINGS.id
   ) as boolean;
   const engineCorePath = await getEngineCorePath(
     fileService,
@@ -184,7 +178,7 @@ async function build(
     processId: processId,
     progress: 0,
     log: [],
-    buildMode: preferenceService.get(VesBuildModePreference.id) as BuildMode,
+    buildMode: preferenceService.get(VesBuildPrefs.BUILD_MODE.id) as BuildMode,
     step: "Building",
     plugins: plugins.length,
     stepsDone: 0,
@@ -250,7 +244,7 @@ async function getEngineCorePath(
 ) {
   const defaultPath = joinPath(getResourcesPath(), "vuengine", "vuengine-core");
   const customPath = preferenceService.get(
-    VesBuildEngineCorePathPreference.id
+    VesBuildPrefs.ENGINE_CORE_PATH.id
   ) as string;
 
   return customPath && (await fileService.exists(new URI(customPath)))
@@ -268,7 +262,7 @@ async function getEnginePluginsPath(
     "vuengine-plugins"
   );
   const customPath = preferenceService.get(
-    VesBuildEnginePluginsPathPreference.id
+    VesBuildPrefs.ENGINE_PLUGINS_PATH.id
   ) as string;
 
   return customPath && (await fileService.exists(new URI(customPath)))

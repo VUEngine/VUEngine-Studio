@@ -6,13 +6,13 @@ import {
   PreferenceContribution,
   PreferenceSchema,
 } from "@theia/core/lib/browser";
-import { VesProjectsBaseFolderPreference, VesProjectsMakerCodePreference } from "./projects-preferences";
+import { VesProjectsPrefs } from "./projects-preferences";
 
 const VesProjectsPreferenceSchema: PreferenceSchema = {
   type: "object",
   properties: {
-    [VesProjectsBaseFolderPreference.id]: VesProjectsBaseFolderPreference.property,
-    [VesProjectsMakerCodePreference.id]: VesProjectsMakerCodePreference.property,
+    [VesProjectsPrefs.BASE_FOLDER.id]: VesProjectsPrefs.BASE_FOLDER.property,
+    [VesProjectsPrefs.MAKER_CODE.id]: VesProjectsPrefs.MAKER_CODE.property,
   }
 };
 

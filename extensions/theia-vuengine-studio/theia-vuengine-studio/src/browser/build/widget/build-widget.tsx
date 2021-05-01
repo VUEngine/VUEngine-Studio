@@ -8,11 +8,7 @@ import { VesState } from "../../common/ves-state";
 import { VesProcessService } from "../../../common/process-service-protocol";
 import { abortBuild } from "../commands/build";
 import { ApplicationShell, Message, PreferenceService } from "@theia/core/lib/browser";
-import {
-  VesBuildDumpElfPreference,
-  VesBuildModePreference,
-  VesBuildPedanticWarningsPreference,
-} from "../build-preferences";
+import { VesBuildPrefs } from "../build-preferences";
 import { BuildLogLine, BuildLogLineType, BuildMode } from "../build-types";
 
 @injectable()
@@ -57,9 +53,9 @@ export class VesBuildWidget extends ReactWidget {
     this.vesState.onDidChangeBuildMode(() => this.update());
     this.preferenceService.onPreferenceChanged(({ preferenceName }) => {
       switch (preferenceName) {
-        case VesBuildModePreference.id:
-        case VesBuildDumpElfPreference.id:
-        case VesBuildPedanticWarningsPreference.id:
+        case VesBuildPrefs.BUILD_MODE.id:
+        case VesBuildPrefs.DUMP_ELF.id:
+        case VesBuildPrefs.PEDANTIC_WARNINGS.id:
           this.update();
           break;
       }
@@ -136,7 +132,7 @@ export class VesBuildWidget extends ReactWidget {
                         <select
                           className="theia-select"
                           value={this.preferenceService.get(
-                            VesBuildModePreference.id
+                            VesBuildPrefs.BUILD_MODE.id
                           )}
                           onChange={(e) => {
                             this.commandService.executeCommand(
@@ -160,7 +156,7 @@ export class VesBuildWidget extends ReactWidget {
                     <div className="pref-name">Dump Elf</div>
                     <div className="pref-content-container boolean">
                       <div className="pref-description">
-                        {VesBuildDumpElfPreference.property.description}
+                        {VesBuildPrefs.DUMP_ELF.property.description}
                       </div>
                       <div className="pref-input">
                         <label>
@@ -168,7 +164,7 @@ export class VesBuildWidget extends ReactWidget {
                             type="checkbox"
                             className="theia-input"
                             checked={this.preferenceService.get(
-                              VesBuildDumpElfPreference.id
+                              VesBuildPrefs.DUMP_ELF.id
                             )}
                             onClick={() =>
                               this.commandService.executeCommand(
@@ -185,7 +181,7 @@ export class VesBuildWidget extends ReactWidget {
                     <div className="pref-content-container boolean">
                       <div className="pref-description">
                         {
-                          VesBuildPedanticWarningsPreference.property
+                          VesBuildPrefs.PEDANTIC_WARNINGS.property
                             .description
                         }
                       </div>
@@ -195,7 +191,7 @@ export class VesBuildWidget extends ReactWidget {
                             type="checkbox"
                             className="theia-input"
                             checked={this.preferenceService.get(
-                              VesBuildPedanticWarningsPreference.id
+                              VesBuildPrefs.PEDANTIC_WARNINGS.id
                             )}
                             onClick={() =>
                               this.commandService.executeCommand(

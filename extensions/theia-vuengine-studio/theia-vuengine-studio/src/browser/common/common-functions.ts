@@ -3,7 +3,7 @@ import { env } from "process";
 import { shell } from "electron";
 import { KeybindingRegistry, PreferenceService } from "@theia/core/lib/browser";
 import { isOSX, isWindows } from "@theia/core";
-import { VesBuildEnableWslPreference } from "../build/build-preferences";
+import { VesBuildPrefs } from "../build/build-preferences";
 
 export function getWorkspaceRoot(): string {
   const substrNum = isWindows ? 2 : 1;
@@ -34,7 +34,7 @@ export function convertoToEnvPath(
   preferenceService: PreferenceService,
   path: string
 ) {
-  const enableWsl = preferenceService.get(VesBuildEnableWslPreference.id);
+  const enableWsl = preferenceService.get(VesBuildPrefs.ENABLE_WSL.id);
   let envPath = path.replace(/\\/g, '/').replace(/^[a-zA-Z]:\//, function (x) {
     return `/${x.substr(0, 1).toLowerCase()}/`;
   });

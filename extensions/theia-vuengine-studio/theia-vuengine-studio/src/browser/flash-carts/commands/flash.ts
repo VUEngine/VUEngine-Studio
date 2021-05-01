@@ -6,11 +6,11 @@ import { CommandService, isWindows, MessageService } from "@theia/core/lib/commo
 import URI from "@theia/core/lib/common/uri";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { VesBuildCommands } from "../../build/build-commands";
-import { VesBuildEnableWslPreference } from "../../build/build-preferences";
+import { VesBuildPrefs } from "../../build/build-preferences";
 import { convertoToEnvPath, getOs, getResourcesPath, getRomPath } from "../../common/common-functions";
 import { VesState } from "../../common/ves-state";
 import { VesProcessService } from "../../../common/process-service-protocol";
-import { VesFlashCartsPreference } from "../flash-carts-preferences";
+import { VesFlashCartsPrefs } from "../flash-carts-preferences";
 import { VesProcessWatcher } from "../../services/process-service/process-watcher";
 import { VesFlashCartsCommands } from "../flash-carts-commands";
 import { IMAGE_HYPERFLASH32 } from "../images/hyperflash32";
@@ -119,7 +119,7 @@ async function flash(
       connectedFlashCart.config.path
     );
 
-    const enableWsl = preferenceService.get(VesBuildEnableWslPreference.id);
+    const enableWsl = preferenceService.get(VesBuildPrefs.ENABLE_WSL.id);
     if (isWindows && enableWsl) {
       flasherEnvPath.replace(/\.[^/.]+$/, "");
     }
@@ -228,11 +228,11 @@ function getPaddedRomPath() {
 }
 
 export function getFlashCartConfigs(preferenceService: PreferenceService): FlashCartConfig[] {
-  const flashCartConfigs: FlashCartConfig[] = preferenceService.get(VesFlashCartsPreference.id) ?? [];
+  const flashCartConfigs: FlashCartConfig[] = preferenceService.get(VesFlashCartsPrefs.FLASH_CARTS.id) ?? [];
 
   const effectiveFlashCartConfigs = flashCartConfigs.length > 0
     ? flashCartConfigs
-    : VesFlashCartsPreference.property.default;
+    : VesFlashCartsPrefs.FLASH_CARTS.property.default;
 
   return effectiveFlashCartConfigs.map((flashCartConfig: FlashCartConfig) => {
     return {
@@ -285,11 +285,11 @@ async function monitorFlashing(
 
     switch (connectedFlashCart.config.name) {
       // FlashBoy (Plus)
-      case VesFlashCartsPreference.property.default[0].name:
+      case VesFlashCartsPrefs.FLASH_CARTS.property.default[0].name:
         monitorFlashingFlashBoy(connectedFlashCart, vesProcessWatcher, vesState);
         break;
       // HyperFlash32:
-      case VesFlashCartsPreference.property.default[1].name:
+      case VesFlashCartsPrefs.FLASH_CARTS.property.default[1].name:
         monitorFlashingHyperFlash32(connectedFlashCart, vesProcessWatcher, vesState);
         break;
     }

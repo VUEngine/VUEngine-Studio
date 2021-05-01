@@ -6,16 +6,16 @@ import {
   PreferenceContribution,
   PreferenceSchema,
 } from "@theia/core/lib/browser";
-import { VesRunDefaultEmulatorPreference, VesRunEmulatorConfigsPreference, VesRunEmulatorEmulationModePreference, VesRunEmulatorScalePreference, VesRunEmulatorStereoModePreference } from "./emulator-preferences";
+import { VesEmulatorPrefs } from "./emulator-preferences";
 
 const VesRunPreferenceSchema: PreferenceSchema = {
   type: "object",
   properties: {
-    [VesRunEmulatorStereoModePreference.id]: VesRunEmulatorStereoModePreference.property,
-    [VesRunEmulatorEmulationModePreference.id]: VesRunEmulatorEmulationModePreference.property,
-    [VesRunEmulatorScalePreference.id]: VesRunEmulatorScalePreference.property,
-    [VesRunEmulatorConfigsPreference.id]: VesRunEmulatorConfigsPreference.property,
-    [VesRunDefaultEmulatorPreference.id]: VesRunDefaultEmulatorPreference.property,
+    [VesEmulatorPrefs.EMULATOR_STEREO_MODE.id]: VesEmulatorPrefs.EMULATOR_STEREO_MODE.property,
+    [VesEmulatorPrefs.EMULATOR_EMULATION_MODE.id]: VesEmulatorPrefs.EMULATOR_EMULATION_MODE.property,
+    [VesEmulatorPrefs.EMULATOR_SCALE.id]: VesEmulatorPrefs.EMULATOR_SCALE.property,
+    [VesEmulatorPrefs.EMULATORS.id]: VesEmulatorPrefs.EMULATORS.property,
+    [VesEmulatorPrefs.DEFAULT_EMULATOR.id]: VesEmulatorPrefs.DEFAULT_EMULATOR.property,
   },
 };
 

@@ -4,8 +4,8 @@ import { FrontendApplication, PreferenceScope, PreferenceService } from "@theia/
 import { ElectronMenuContribution } from "@theia/core/lib/electron-browser/menu/electron-menu-contribution";
 import { CommandService, isOSX } from "@theia/core";
 import { VesState } from "../../browser/common/ves-state";
-import { VesBuildDumpElfPreference, VesBuildEnableWslPreference, VesBuildModePreference, VesBuildPedanticWarningsPreference } from "../../browser/build/build-preferences";
-import { VesRunDefaultEmulatorPreference } from "../../browser/emulator/emulator-preferences";
+import { VesBuildPrefs } from "../../browser/build/build-preferences";
+import { VesEmulatorPrefs } from "../../browser/emulator/emulator-preferences";
 import { getDefaultEmulatorConfig, getEmulatorConfigs } from "../../browser/emulator/commands/runInEmulator";
 import { BuildMode } from "../../browser/build/build-types";
 
@@ -34,9 +34,9 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
 
             this.preferenceService.onPreferenceChanged(({ preferenceName }) => {
                 if ([
-                    VesBuildDumpElfPreference.id,
-                    VesBuildPedanticWarningsPreference.id,
-                    VesBuildEnableWslPreference.id,
+                    VesBuildPrefs.DUMP_ELF.id,
+                    VesBuildPrefs.PEDANTIC_WARNINGS.id,
+                    VesBuildPrefs.ENABLE_WSL.id,
                 ].includes(preferenceName)) {
                     rebuildMenu();
                 }
@@ -49,14 +49,14 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
 
         app.on("ves-execute-command", (command: string) => this.commandService.executeCommand(command));
         app.on("ves-set-build-mode", (buildMode: BuildMode) => this.preferenceService.set(
-            VesBuildModePreference.id, buildMode, PreferenceScope.User
+            VesBuildPrefs.BUILD_MODE.id, buildMode, PreferenceScope.User
         ));
         app.on("ves-set-emulator", (emulatorName: string) => this.preferenceService.set(
-            VesRunDefaultEmulatorPreference.id, emulatorName, PreferenceScope.User
+            VesEmulatorPrefs.DEFAULT_EMULATOR.id, emulatorName, PreferenceScope.User
         ));
 
         // init touchbar values
-        app.emit("ves-change-build-mode", this.preferenceService.get(VesBuildModePreference.id));
+        app.emit("ves-change-build-mode", this.preferenceService.get(VesBuildPrefs.BUILD_MODE.id));
         app.emit("ves-change-connected-flash-cart", this.vesState.connectedFlashCarts);
         app.emit("ves-change-build-folder", this.vesState.buildFolderExists);
         app.emit("ves-change-emulator", getDefaultEmulatorConfig(this.preferenceService).name);

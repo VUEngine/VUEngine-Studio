@@ -14,11 +14,8 @@ import {
   getFlashCartConfigs,
 } from "../flash-carts/commands/flash";
 import { getBuildPath, getRomPath } from "./common-functions";
-import { VesBuildModePreference } from "../build/build-preferences";
-import {
-  VesRunDefaultEmulatorPreference,
-  VesRunEmulatorConfigsPreference,
-} from "../emulator/emulator-preferences";
+import { VesBuildPrefs } from "../build/build-preferences";
+import { VesEmulatorPrefs } from "../emulator/emulator-preferences";
 import {
   getDefaultEmulatorConfig,
   getEmulatorConfigs,
@@ -27,7 +24,7 @@ import { EmulatorConfig } from "../emulator/emulator-types";
 import { VesFlashCartWatcher } from "../services/flash-cart-service/flash-cart-watcher";
 import { BuildLogLine, BuildMode, BuildStatus } from "../build/build-types";
 import { VesFlashCartService } from "../../common/flash-cart-service-protocol";
-import { VesFlashCartsPreference } from "../flash-carts/flash-carts-preferences";
+import { VesFlashCartsPrefs } from "../flash-carts/flash-carts-preferences";
 
 type BuildFolderFlags = {
   [key: string]: boolean;
@@ -101,21 +98,21 @@ export class VesState {
     this.preferenceService.onPreferenceChanged(
       ({ preferenceName, newValue }) => {
         switch (preferenceName) {
-          case VesBuildModePreference.id:
+          case VesBuildPrefs.BUILD_MODE.id:
             this.onDidChangeBuildModeEmitter.fire(newValue);
             this.onDidChangeBuildFolderEmitter.fire(this._buildFolderExists);
             break;
-          case VesRunEmulatorConfigsPreference.id:
+          case VesEmulatorPrefs.EMULATORS.id:
             this.onDidChangeEmulatorConfigsEmitter.fire(
               getEmulatorConfigs(this.preferenceService)
             );
             break;
-          case VesRunDefaultEmulatorPreference.id:
+          case VesEmulatorPrefs.DEFAULT_EMULATOR.id:
             this.onDidChangeEmulatorEmitter.fire(
               getDefaultEmulatorConfig(this.preferenceService).name
             );
             break;
-          case VesFlashCartsPreference.id:
+          case VesFlashCartsPrefs.FLASH_CARTS.id:
             this.detectConnectedFlashCarts();
             break;
         }

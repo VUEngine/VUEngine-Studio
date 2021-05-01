@@ -2,7 +2,7 @@ import { inject, injectable, interfaces } from "inversify";
 import { FrontendApplication, FrontendApplicationContribution, PreferenceService, StatusBar, StatusBarAlignment } from "@theia/core/lib/browser";
 import { VesState } from "../common/ves-state";
 import { VesBuildCommands } from "./build-commands";
-import { VesBuildModePreference } from "./build-preferences";
+import { VesBuildPrefs } from "./build-preferences";
 
 @injectable()
 export class VesBuildStatusBarContribution implements FrontendApplicationContribution {
@@ -19,14 +19,14 @@ export class VesBuildStatusBarContribution implements FrontendApplicationContrib
 
         this.vesState.onDidChangeBuildStatus(() => this.setBuildModeStatusBar());
         this.preferenceService.onPreferenceChanged(({ preferenceName, newValue }) => {
-            if (preferenceName === VesBuildModePreference.id) {
+            if (preferenceName === VesBuildPrefs.BUILD_MODE.id) {
                 this.setBuildModeStatusBar();
             }
         });
     }
 
     setBuildModeStatusBar() {
-        let label = this.preferenceService.get(VesBuildModePreference.id) || "Build Mode";;
+        let label = this.preferenceService.get(VesBuildPrefs.BUILD_MODE.id) || "Build Mode";;
         let command = VesBuildCommands.SET_MODE.id;
         if (this.vesState.buildStatus.active) {
             label = `${this.vesState.buildStatus.step}... ${this.vesState.buildStatus.progress}%`;

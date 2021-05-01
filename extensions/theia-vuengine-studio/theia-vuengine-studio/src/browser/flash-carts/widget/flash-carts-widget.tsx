@@ -6,7 +6,7 @@ import { VesState } from "../../common/ves-state";
 import { CommandService } from "@theia/core";
 import { VesFlashCartsCommands } from "../flash-carts-commands";
 import { VesProcessService } from "../../../common/process-service-protocol";
-import { VesFlashCartsPreference } from "../flash-carts-preferences";
+import { VesFlashCartsPrefs } from "../flash-carts-preferences";
 import { abortFlash, ConnectedFlashCart } from "../commands/flash";
 import { Message } from "@phosphor/messaging";
 
@@ -153,7 +153,7 @@ export class VesFlashCartsWidget extends ReactWidget {
                       src={connectedFlashCart.config.image}
                       style={
                         connectedFlashCart.config.name ===
-                          VesFlashCartsPreference.property.default[1].name
+                          VesFlashCartsPrefs.FLASH_CARTS.property.default[1].name
                           ? {
                             /* HyperFlash32 eInk label */
                             backgroundImage:

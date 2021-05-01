@@ -1,6 +1,6 @@
 import { PreferenceScope, PreferenceService } from "@theia/core/lib/browser";
 import { QuickPickItem, QuickPickOptions, QuickPickService } from "@theia/core/lib/common/quick-pick-service";
-import { VesRunDefaultEmulatorPreference } from "../emulator-preferences";
+import { VesEmulatorPrefs } from "../emulator-preferences";
 import { getDefaultEmulatorConfig, getEmulatorConfigs } from "./runInEmulator";
 
 export async function selectEmulatorCommand(
@@ -40,7 +40,7 @@ async function selectEmulator(
 
     const selectedEmulator = (selection === emulatorConfigs[0].name) ? "" : selection;
 
-    preferenceService.set(VesRunDefaultEmulatorPreference.id, selectedEmulator, PreferenceScope.User);
+    preferenceService.set(VesEmulatorPrefs.DEFAULT_EMULATOR.id, selectedEmulator, PreferenceScope.User);
   });
 }
 

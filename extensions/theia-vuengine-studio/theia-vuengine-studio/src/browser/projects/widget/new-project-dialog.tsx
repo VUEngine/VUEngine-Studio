@@ -12,7 +12,7 @@ import { Key, PreferenceService } from "@theia/core/lib/browser";
 import URI from "@theia/core/lib/common/uri";
 import { VesNewProjectForm } from "./new-project-form";
 import { getResourcesPath } from "../../common/common-functions";
-import { VesProjectsBaseFolderPreference } from "../projects-preferences";
+import { VesProjectsPrefs } from "../projects-preferences";
 
 @injectable()
 export class VesNewProjectDialogProps extends DialogProps {
@@ -74,7 +74,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
 
         this.setStatusMessage(`${spinnerIcon} Verifying...`);
 
-        const name = this.createProjectFormComponent.current?.state.name ?? VesProjectsBaseFolderPreference.property.default;
+        const name = this.createProjectFormComponent.current?.state.name ?? VesProjectsPrefs.BASE_FOLDER.property.default;
 
         if (!name) {
             this.setIsCreating(false);
@@ -82,7 +82,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
             return;
         }
 
-        const path = this.createProjectFormComponent.current?.state.path ?? VesProjectsBaseFolderPreference.property.default;
+        const path = this.createProjectFormComponent.current?.state.path ?? VesProjectsPrefs.BASE_FOLDER.property.default;
         const pathUri = new URI(path);
         const pathExists = await this.fileService.exists(pathUri) && (await this.fileService.resolve(pathUri)).isDirectory;
 

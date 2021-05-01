@@ -11,7 +11,7 @@ import { PreferenceService } from "@theia/core/lib/browser";
 import { BuildMode } from "../../build/build-types";
 import { VesEmulatorCommands } from "../../emulator/emulator-commands";
 import { VesFlashCartsCommands } from "../../flash-carts/flash-carts-commands";
-import { VesBuildModePreference } from "../../build/build-preferences";
+import { VesBuildPrefs } from "../../build/build-preferences";
 import { FrontendApplicationState, FrontendApplicationStateService } from "@theia/core/lib/browser/frontend-application-state";
 import { WorkspaceCommands, WorkspaceService } from "@theia/workspace/lib/browser";
 import { VesProjectsCommands } from "../../projects/projects-commands";
@@ -58,7 +58,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
     }
 
     protected render(): React.ReactNode {
-        const buildMode = this.preferenceService.get(VesBuildModePreference.id) as BuildMode;
+        const buildMode = this.preferenceService.get(VesBuildPrefs.BUILD_MODE.id) as BuildMode;
         const requireSingleOpen = isOSX || !environment.electron.is();
         const openProjectId = requireSingleOpen ? WorkspaceCommands.OPEN.id : WorkspaceCommands.OPEN_FOLDER.id;
         return !this.workspaceService.opened ? <>

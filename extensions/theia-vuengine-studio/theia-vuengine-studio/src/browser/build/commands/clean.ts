@@ -4,7 +4,7 @@ import { join as joinPath } from "path";
 import * as rimraf from "rimraf";
 import { getBuildPath } from "../../common/common-functions";
 import { VesState } from "../../common/ves-state";
-import { VesBuildModePreference } from "../build-preferences";
+import { VesBuildPrefs } from "../build-preferences";
 import { BuildMode } from "../build-types";
 
 export async function cleanCommand(
@@ -16,7 +16,7 @@ export async function cleanCommand(
         return;
     }
 
-    const buildMode = preferenceService.get(VesBuildModePreference.id) as BuildMode;
+    const buildMode = preferenceService.get(VesBuildPrefs.BUILD_MODE.id) as BuildMode;
 
     if (vesState.buildFolderExists[buildMode]) {
         clean(messageService, vesState, buildMode);
