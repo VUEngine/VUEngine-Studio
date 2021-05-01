@@ -1,84 +1,81 @@
+import { injectable, inject } from "inversify";
 import { CommandService, environment } from "@theia/core";
 import { CommonCommands, ConfirmDialog } from "@theia/core/lib/browser";
 import URI from "@theia/core/lib/common/uri";
-import {
-  FileDialogService,
-  SaveFileDialogProps,
-} from "@theia/filesystem/lib/browser";
+import { FileDialogService, SaveFileDialogProps } from "@theia/filesystem/lib/browser";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { getRomPath } from "../../common/common-functions";
 import { VesState } from "../../common/ves-state";
 import { VesBuildCommands } from "../build-commands";
 
-export async function exportCommand(
-  commandService: CommandService,
-  fileService: FileService,
-  fileDialogService: FileDialogService,
-  vesState: VesState
-) {
-  if (vesState.isExportQueued) {
-    vesState.isExportQueued = false;
-  } else if (vesState.buildStatus.active) {
-    vesState.isExportQueued = true;
-  } else if (vesState.outputRomExists) {
-    exportRom(commandService, fileService, fileDialogService);
-  } else {
-    vesState.onDidChangeOutputRomExists(outputRomExists => {
-      if (outputRomExists && vesState.isExportQueued) {
-        vesState.isExportQueued = false;
-        exportRom(commandService, fileService, fileDialogService);
-      }
-    })
-    vesState.isExportQueued = true;
-    commandService.executeCommand(VesBuildCommands.BUILD.id);
-  }
-}
+@injectable()
+export class VesBuildExportCommand {
+  @inject(CommandService) protected readonly commandService: CommandService;
+  @inject(FileService) protected readonly fileService: FileService;
+  @inject(FileDialogService) protected readonly fileDialogService: FileDialogService;
+  @inject(VesState) protected readonly vesState: VesState;
 
-async function exportRom(
-  commandService: CommandService,
-  fileService: FileService,
-  fileDialogService: FileDialogService
-) {
-  const romPath = getRomPath();
-  const romUri = new URI(romPath);
-  let exists: boolean = false;
-  let overwrite: boolean = false;
-  let selected: URI | undefined;
-  const saveFilterDialogProps: SaveFileDialogProps = {
-    title: "Export ROM",
-    // TODO: file name based on project title
-    inputValue: "Game Title.vb", //romUri.path.base
-  };
-  const romStat = await fileService.resolve(romUri);
-  do {
-    selected = await fileDialogService.showSaveDialog(
-      saveFilterDialogProps,
-      romStat
-    );
+  async execute() {
+    if (this.vesState.isExportQueued) {
+      this.vesState.isExportQueued = false;
+    } else if (this.vesState.buildStatus.active) {
+      this.vesState.isExportQueued = true;
+    } else if (this.vesState.outputRomExists) {
+      this.exportRom();
+    } else {
+      this.vesState.onDidChangeOutputRomExists(outputRomExists => {
+        if (outputRomExists && this.vesState.isExportQueued) {
+          this.vesState.isExportQueued = false;
+          this.exportRom();
+        }
+      })
+      this.vesState.isExportQueued = true;
+      this.commandService.executeCommand(VesBuildCommands.BUILD.id);
+    }
+  }
+
+  protected async exportRom() {
+    const romPath = getRomPath();
+    const romUri = new URI(romPath);
+    let exists: boolean = false;
+    let overwrite: boolean = false;
+    let selected: URI | undefined;
+    const saveFilterDialogProps: SaveFileDialogProps = {
+      title: "Export ROM",
+      // TODO: file name based on project title
+      inputValue: "Game Title.vb", //romUri.path.base
+    };
+    const romStat = await this.fileService.resolve(romUri);
+    do {
+      selected = await this.fileDialogService.showSaveDialog(
+        saveFilterDialogProps,
+        romStat
+      );
+      if (selected) {
+        exists = await this.fileService.exists(selected);
+        if (exists) {
+          overwrite = await this.confirmOverwrite(selected);
+        }
+      }
+    } while (selected && exists && !overwrite);
     if (selected) {
-      exists = await fileService.exists(selected);
-      if (exists) {
-        overwrite = await confirmOverwrite(selected);
+      try {
+        await this.commandService.executeCommand(CommonCommands.SAVE.id);
+        await this.fileService.copy(romUri, selected, { overwrite });
+      } catch (e) {
+        console.warn(e);
       }
     }
-  } while (selected && exists && !overwrite);
-  if (selected) {
-    try {
-      await commandService.executeCommand(CommonCommands.SAVE.id);
-      await fileService.copy(romUri, selected, { overwrite });
-    } catch (e) {
-      console.warn(e);
-    }
   }
-}
 
-async function confirmOverwrite(uri: URI): Promise<boolean> {
-  if (environment.electron.is()) {
-    return true;
+  protected async confirmOverwrite(uri: URI): Promise<boolean> {
+    if (environment.electron.is()) {
+      return true;
+    }
+    const confirmed = await new ConfirmDialog({
+      title: "Overwrite",
+      msg: `Do you really want to overwrite "${uri.toString()}"?`,
+    }).open();
+    return !!confirmed;
   }
-  const confirmed = await new ConfirmDialog({
-    title: "Overwrite",
-    msg: `Do you really want to overwrite "${uri.toString()}"?`,
-  }).open();
-  return !!confirmed;
 }

@@ -1,66 +1,69 @@
+import { injectable, inject } from "inversify";
 import { PreferenceScope, PreferenceService } from "@theia/core/lib/browser";
 import { QuickPickOptions, QuickPickService } from "@theia/core/lib/common/quick-pick-service";
 import { VesBuildPrefs } from "../build-preferences";
 import { BuildMode } from "../build-types";
 
-export async function setModeCommand(
-  preferenceService: PreferenceService,
-  quickPickService: QuickPickService,
-  buildMode?: BuildMode
-) {
-  if (buildMode) {
-    setBuildMode(preferenceService, buildMode);
-    return;
-  }
+@injectable()
+export class VesBuildSetModeCommand {
+  @inject(PreferenceService) protected readonly preferenceService: PreferenceService;
+  @inject(QuickPickService) protected readonly quickPickService: QuickPickService;
 
-  const currentBuildMode = preferenceService.get(VesBuildPrefs.BUILD_MODE.id) as BuildMode;
-
-  const quickPickOptions: QuickPickOptions = {
-    title: "Set Build Mode",
-    placeholder: "Select which mode to build in"
-  };
-
-  const buildTypes = [
-    {
-      label: BuildMode.Release,
-      value: BuildMode.Release,
-      detail: "Includes no asserts or debug flags, for shipping only.",
-      iconClass: (BuildMode.Release === currentBuildMode) ? "fa fa-check" : "",
-    },
-    {
-      label: BuildMode.Beta,
-      value: BuildMode.Beta,
-      detail: "Includes selected asserts, for testing the performance on hardware.",
-      iconClass: (BuildMode.Beta === currentBuildMode) ? "fa fa-check" : "",
-    },
-    {
-      label: BuildMode.Tools,
-      value: BuildMode.Tools,
-      detail: "Includes selected asserts, includes debugging tools.",
-      iconClass: (BuildMode.Tools === currentBuildMode) ? "fa fa-check" : "",
-    },
-    {
-      label: BuildMode.Debug,
-      value: BuildMode.Debug,
-      detail: "Includes all runtime assertions, includes debugging tools.",
-      iconClass: (BuildMode.Debug === currentBuildMode) ? "fa fa-check" : "",
-    },
-    {
-      label: BuildMode.Preprocessor,
-      value: BuildMode.Preprocessor,
-      detail: "The .o files are preprocessor output instead of compiler output.",
-      iconClass: (BuildMode.Preprocessor === currentBuildMode) ? "fa fa-check" : "",
-    }
-  ];
-
-  quickPickService.show<string>(buildTypes, quickPickOptions).then(selection => {
-    if (!selection) {
+  async execute(buildMode?: BuildMode) {
+    if (buildMode) {
+      this.setBuildMode(buildMode);
       return;
     }
-    setBuildMode(preferenceService, selection);
-  });
-}
 
-function setBuildMode(preferenceService: PreferenceService, buildMode: string) {
-  preferenceService.set(VesBuildPrefs.BUILD_MODE.id, buildMode, PreferenceScope.User);
+    const currentBuildMode = this.preferenceService.get(VesBuildPrefs.BUILD_MODE.id) as BuildMode;
+
+    const quickPickOptions: QuickPickOptions = {
+      title: "Set Build Mode",
+      placeholder: "Select which mode to build in"
+    };
+
+    const buildTypes = [
+      {
+        label: BuildMode.Release,
+        value: BuildMode.Release,
+        detail: "Includes no asserts or debug flags, for shipping only.",
+        iconClass: (BuildMode.Release === currentBuildMode) ? "fa fa-check" : "",
+      },
+      {
+        label: BuildMode.Beta,
+        value: BuildMode.Beta,
+        detail: "Includes selected asserts, for testing the performance on hardware.",
+        iconClass: (BuildMode.Beta === currentBuildMode) ? "fa fa-check" : "",
+      },
+      {
+        label: BuildMode.Tools,
+        value: BuildMode.Tools,
+        detail: "Includes selected asserts, includes debugging tools.",
+        iconClass: (BuildMode.Tools === currentBuildMode) ? "fa fa-check" : "",
+      },
+      {
+        label: BuildMode.Debug,
+        value: BuildMode.Debug,
+        detail: "Includes all runtime assertions, includes debugging tools.",
+        iconClass: (BuildMode.Debug === currentBuildMode) ? "fa fa-check" : "",
+      },
+      {
+        label: BuildMode.Preprocessor,
+        value: BuildMode.Preprocessor,
+        detail: "The .o files are preprocessor output instead of compiler output.",
+        iconClass: (BuildMode.Preprocessor === currentBuildMode) ? "fa fa-check" : "",
+      }
+    ];
+
+    this.quickPickService.show<string>(buildTypes, quickPickOptions).then(selection => {
+      if (!selection) {
+        return;
+      }
+      this.setBuildMode(selection);
+    });
+  }
+
+  protected setBuildMode(buildMode: string) {
+    this.preferenceService.set(VesBuildPrefs.BUILD_MODE.id, buildMode, PreferenceScope.User);
+  }
 }

@@ -5,8 +5,7 @@ import { CommandService } from "@theia/core";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
 import { VesBuildCommands } from "../build-commands";
 import { VesState } from "../../common/ves-state";
-import { VesProcessService } from "../../../common/process-service-protocol";
-import { abortBuild } from "../commands/build";
+import { VesBuildBuildCommand } from "../commands/build";
 import { ApplicationShell, Message, PreferenceService } from "@theia/core/lib/browser";
 import { VesBuildPrefs } from "../build-preferences";
 import { BuildLogLine, BuildLogLineType, BuildMode } from "../build-types";
@@ -15,10 +14,8 @@ import { BuildLogLine, BuildLogLineType, BuildMode } from "../build-types";
 export class VesBuildWidget extends ReactWidget {
   @inject(ApplicationShell) protected readonly applicationShell: ApplicationShell;
   @inject(CommandService) private readonly commandService: CommandService;
-  @inject(PreferenceService)
-  private readonly preferenceService: PreferenceService;
-  @inject(VesProcessService)
-  private readonly vesProcessService: VesProcessService;
+  @inject(PreferenceService) private readonly preferenceService: PreferenceService;
+  @inject(VesBuildBuildCommand) private readonly buildCommand: VesBuildBuildCommand;
   @inject(VesState) private readonly vesState: VesState;
   @inject(WorkspaceService) private readonly workspaceService: WorkspaceService;
 
@@ -218,9 +215,7 @@ export class VesBuildWidget extends ReactWidget {
                 </button>}
                 <button
                   className="theia-button secondary"
-                  onClick={() =>
-                    abortBuild(this.vesProcessService, this.vesState)
-                  }
+                  onClick={() => this.buildCommand.abortBuild()}
                 >
                   Abort
                 </button>

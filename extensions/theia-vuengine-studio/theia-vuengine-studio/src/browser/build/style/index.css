@@ -118,7 +118,6 @@
   padding-right: var(--theia-ui-padding);
   white-space: pre-wrap;
   width: 100%;
-  word-break: break-all;
 }
 
 #vesBuildWidget .buildLogLine.headline .text {
