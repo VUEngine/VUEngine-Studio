@@ -30,7 +30,7 @@ export class VesEmulatorRunCommand {
     } else if (this.vesState.buildStatus.active) {
       this.vesState.isRunQueued = true;
     } else if (this.vesState.outputRomExists) {
-      run();
+      this.run();
     } else {
       this.vesState.isRunQueued = true;
       this.commandService.executeCommand(VesBuildCommands.BUILD.id);
@@ -41,7 +41,7 @@ export class VesEmulatorRunCommand {
     this.vesState.onDidChangeOutputRomExists(outputRomExists => {
       if (outputRomExists && this.vesState.isRunQueued) {
         this.vesState.isRunQueued = false;
-        run();
+        this.run();
       }
     })
   }
