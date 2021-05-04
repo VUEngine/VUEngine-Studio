@@ -342,7 +342,7 @@ export class VesBuildWidget extends ReactWidget {
     this.state.isWide = !this.state.isWide;
     this.update();
     const targetWidth = this.state.isWide
-      ? Math.round(window.innerWidth * 0.5)
+      ? Math.round(window.innerWidth * 0.8)
       : 350
     const widgetArea = this.applicationShell.getAreaFor(this);
     if (widgetArea) {

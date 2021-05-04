@@ -62,14 +62,7 @@ export class VesBuildBuildCommand {
     const compilerPath = this.getCompilerPath();
     const plugins = await this.getPlugins();
 
-    let makefile = this.commonFunctions.convertoToEnvPath(
-      joinPath(workspaceRoot, "makefile")
-    );
-    if (!(await this.fileService.exists(new URI(makefile)))) {
-      makefile = this.commonFunctions.convertoToEnvPath(
-        joinPath(engineCorePath, "makefile-game")
-      );
-    }
+    const makefile = await this.getMakefilePath(workspaceRoot, engineCorePath);
 
     const romUri = new URI(this.commonFunctions.getRomPath());
     if (await this.fileService.exists(romUri)) {
@@ -89,23 +82,14 @@ export class VesBuildBuildCommand {
     //   }
     // }
 
-    // fix line endings of preprocessor scripts
-    // note: should no longer be necessary due to .gitattributes directive
-    //preCallMake = 'find "' + convertoToEnvPath(engineCorePath) + 'lib/compiler/preprocessor/" -name "*.sh" -exec sed -i -e "s/$(printf \'\\r\')//" {} \\; ';
-
     const { processManagerId, processId } = await this.vesProcessService.launchProcess(
       {
         command: "make",
         args: [
           "all",
-          "-e",
-          `TYPE=${buildMode.toLowerCase()}`,
-          "-e",
-          `PATH=${joinPath(compilerPath, "bin")}:${process.env.PATH}`,
-          "-f",
-          makefile,
-          "-C",
-          this.commonFunctions.convertoToEnvPath(workspaceRoot),
+          "-e", `TYPE=${buildMode.toLowerCase()}`,
+          "-f", makefile,
+          "-C", this.commonFunctions.convertoToEnvPath(workspaceRoot),
         ],
         options: {
           cwd: workspaceRoot,
@@ -114,6 +98,10 @@ export class VesBuildBuildCommand {
             ENGINE_FOLDER: this.commonFunctions.convertoToEnvPath(engineCorePath),
             LC_ALL: "C",
             MAKE_JOBS: this.getThreads(),
+            PATH: process.env.PATH + ":" +
+              joinPath(compilerPath, "bin") + ":" +
+              joinPath(compilerPath, "libexec", "gcc", "v810", "4.7.4") + ":" +
+              joinPath(compilerPath, "v810", "bin"),
             PLUGINS_FOLDER: this.commonFunctions.convertoToEnvPath(enginePluginsPath),
             PRINT_PEDANTIC_WARNINGS: pedanticWarnings ? 1 : 0,
           },
@@ -132,6 +120,19 @@ export class VesBuildBuildCommand {
       plugins: plugins.length,
       stepsDone: 0,
     };
+  }
+
+  protected async getMakefilePath(workspaceRoot: string, engineCorePath: string) {
+    let makefilePath = this.commonFunctions.convertoToEnvPath(
+      joinPath(workspaceRoot, "makefile")
+    );
+    if (!(await this.fileService.exists(new URI(makefilePath)))) {
+      makefilePath = this.commonFunctions.convertoToEnvPath(
+        joinPath(engineCorePath, "makefile-game")
+      );
+    }
+
+    return makefilePath;
   }
 
   protected bindEvents() {
@@ -166,6 +167,17 @@ export class VesBuildBuildCommand {
         command: "chmod",
         args: ["-R", "a+x", joinPath(compilerPath, "bin")],
       });
+
+      this.vesProcessService.launchProcess({
+        command: "chmod",
+        args: ["-R", "a+x", joinPath(compilerPath, "libexec", "gcc", "v810", "4.7.4")],
+      });
+
+      this.vesProcessService.launchProcess({
+        command: "chmod",
+        args: ["-R", "a+x", joinPath(compilerPath, "v810", "bin")],
+      });
+
       this.vesProcessService.launchProcess({
         command: "chmod",
         args: [
@@ -197,10 +209,12 @@ export class VesBuildBuildCommand {
         (this.vesState.buildStatus.stepsDone * 100) /
         (this.vesState.buildStatus.plugins * 2 + 2)
       );
-    } else if (data.startsWith("make") || data.includes(" Error ")) {
+    } else if (data.startsWith("make") || data.includes("Error: ")) {
       type = BuildLogLineType.Error;
     } else if (data.includes("No such file or directory")) {
       type = BuildLogLineType.Error;
+    } else if (data.includes("warning: ")) {
+      type = BuildLogLineType.Warning;
     }
 
     return { text, type };
