@@ -35,8 +35,12 @@ export class VesFlashCartsWidgetContribution extends AbstractViewContribution<Ve
 
     registerCommands(commandRegistry: CommandRegistry): void {
         commandRegistry.registerCommand(VesFlashCartsWidgetContributionCommands.REFRESH, {
-            isEnabled: widget => widget.id === VesFlashCartsWidget.ID,
-            isVisible: widget => widget.id === VesFlashCartsWidget.ID,
+            isEnabled: widget => widget !== undefined &&
+                widget.id !== undefined &&
+                widget.id === VesFlashCartsWidget.ID,
+            isVisible: widget => widget !== undefined &&
+                widget.id !== undefined &&
+                widget.id === VesFlashCartsWidget.ID,
             execute: () => this.detectCommand.execute(),
         });
     }
