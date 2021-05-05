@@ -7,7 +7,7 @@ A Virtual Boy development environment.
 After cloning, load the submodules with
 
 ```sh
-git submodule update --init
+yarn modules:init
 ```
 
 ### Bundled extensions

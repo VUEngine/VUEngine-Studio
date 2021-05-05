@@ -39,7 +39,8 @@
     "package": "electron-builder",
     "package:preview": "electron-builder --dir",
     "download:plugins": "theia download:plugins",
-    "update": "git submodule update --recursive --remote"
+    "modules:init": "git submodule update --init",
+    "modules:update": "git submodule update --recursive --remote"
   },
   "dependencies": {
     "@theia/core": "^1.13.0",
