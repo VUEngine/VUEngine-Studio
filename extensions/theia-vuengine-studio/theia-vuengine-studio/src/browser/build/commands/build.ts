@@ -29,7 +29,6 @@ export class VesBuildBuildCommand {
   @postConstruct()
   protected init(): void {
     this.bindEvents();
-    this.fixPermissions();
   }
 
   async execute() {
@@ -82,32 +81,33 @@ export class VesBuildBuildCommand {
     //   }
     // }
 
-    const { processManagerId, processId } = await this.vesProcessService.launchProcess(
-      {
-        command: "make",
-        args: [
-          "all",
-          "-e", `TYPE=${buildMode.toLowerCase()}`,
-          "-f", makefile,
-          "-C", this.commonFunctions.convertoToEnvPath(workspaceRoot),
-        ],
-        options: {
-          cwd: workspaceRoot,
-          env: {
-            DUMP_ELF: dumpElf ? 1 : 0,
-            ENGINE_FOLDER: this.commonFunctions.convertoToEnvPath(engineCorePath),
-            LC_ALL: "C",
-            MAKE_JOBS: this.getThreads(),
-            PATH: process.env.PATH + ":" +
-              joinPath(compilerPath, "bin") + ":" +
-              joinPath(compilerPath, "libexec", "gcc", "v810", "4.7.4") + ":" +
-              joinPath(compilerPath, "v810", "bin"),
-            PLUGINS_FOLDER: this.commonFunctions.convertoToEnvPath(enginePluginsPath),
-            PRINT_PEDANTIC_WARNINGS: pedanticWarnings ? 1 : 0,
-          },
+    await this.fixPermissions();
+
+    const { processManagerId, processId } = await this.vesProcessService.launchProcess({
+      command: "make",
+      args: [
+        "all",
+        "-e", `TYPE=${buildMode.toLowerCase()}`,
+        "-f", makefile,
+        "-C", this.commonFunctions.convertoToEnvPath(workspaceRoot),
+      ],
+      options: {
+        cwd: workspaceRoot,
+        env: {
+          DUMP_ELF: dumpElf ? 1 : 0,
+          ENGINE_FOLDER: this.commonFunctions.convertoToEnvPath(engineCorePath),
+          LC_ALL: "C",
+          MAKE_JOBS: this.getThreads(),
+          PATH:
+            process.env.PATH + ":" +
+            joinPath(compilerPath, "bin") + ":" +
+            joinPath(compilerPath, "libexec", "gcc", "v810", "4.7.4") + ":" +
+            joinPath(compilerPath, "v810", "bin"),
+          PLUGINS_FOLDER: this.commonFunctions.convertoToEnvPath(enginePluginsPath),
+          PRINT_PEDANTIC_WARNINGS: pedanticWarnings ? 1 : 0,
         },
-      }
-    );
+      },
+    });
 
     this.vesState.buildStatus = {
       active: true,
@@ -122,7 +122,10 @@ export class VesBuildBuildCommand {
     };
   }
 
-  protected async getMakefilePath(workspaceRoot: string, engineCorePath: string) {
+  protected async getMakefilePath(
+    workspaceRoot: string,
+    engineCorePath: string
+  ) {
     let makefilePath = this.commonFunctions.convertoToEnvPath(
       joinPath(workspaceRoot, "makefile")
     );
@@ -158,34 +161,35 @@ export class VesBuildBuildCommand {
     });
   }
 
+  /**
+   * Give executables respective permission on UNIX systems.
+   * Must be executed before every build to ensure permissions are right,
+   * even right after reconfiguring engine paths.
+   */
   protected async fixPermissions() {
     const engineCorePath = await this.getEngineCorePath();
     const compilerPath = this.getCompilerPath();
 
     if (!isWindows) {
-      this.vesProcessService.launchProcess({
-        command: "chmod",
-        args: ["-R", "a+x", joinPath(compilerPath, "bin")],
-      });
-
-      this.vesProcessService.launchProcess({
-        command: "chmod",
-        args: ["-R", "a+x", joinPath(compilerPath, "libexec", "gcc", "v810", "4.7.4")],
-      });
-
-      this.vesProcessService.launchProcess({
-        command: "chmod",
-        args: ["-R", "a+x", joinPath(compilerPath, "v810", "bin")],
-      });
-
-      this.vesProcessService.launchProcess({
-        command: "chmod",
-        args: [
-          "-R",
-          "a+x",
-          joinPath(engineCorePath, "lib", "compiler", "preprocessor"),
-        ],
-      });
+      await Promise.all([
+        this.vesProcessService.launchProcess({
+          command: "chmod",
+          args: ["-R", "a+x", joinPath(compilerPath, "bin")],
+        }),
+        this.vesProcessService.launchProcess({
+          command: "chmod",
+          args: ["-R", "a+x", joinPath(compilerPath, "libexec")],
+        }),
+        this.vesProcessService.launchProcess({
+          command: "chmod",
+          args: ["-R", "a+x", joinPath(compilerPath, "v810", "bin")],
+        }),
+        this.vesProcessService.launchProcess({
+          command: "chmod",
+          args: ["-R", "a+x", joinPath(engineCorePath, "lib", "compiler", "preprocessor"),
+          ],
+        }),
+      ]);
     }
   }
 
@@ -207,7 +211,7 @@ export class VesBuildBuildCommand {
       this.vesState.buildStatus.stepsDone++;
       this.vesState.buildStatus.progress = Math.floor(
         (this.vesState.buildStatus.stepsDone * 100) /
-        (this.vesState.buildStatus.plugins * 2 + 2)
+          (this.vesState.buildStatus.plugins * 2 + 2)
       );
     } else if (data.startsWith("make") || data.includes("Error: ")) {
       type = BuildLogLineType.Error;
@@ -221,7 +225,11 @@ export class VesBuildBuildCommand {
   }
 
   protected async getEngineCorePath() {
-    const defaultPath = joinPath(this.commonFunctions.getResourcesPath(), "vuengine", "vuengine-core");
+    const defaultPath = joinPath(
+      this.commonFunctions.getResourcesPath(),
+      "vuengine",
+      "vuengine-core"
+    );
     const customPath = this.preferenceService.get(
       VesBuildPrefs.ENGINE_CORE_PATH.id
     ) as string;
@@ -275,11 +283,15 @@ export class VesBuildBuildCommand {
     // get project's plugins
     try {
       const configFileUri = new URI(
-        joinPath(this.commonFunctions.getWorkspaceRoot(), ".vuengine", "plugins.json")
+        joinPath(
+          this.commonFunctions.getWorkspaceRoot(),
+          ".vuengine",
+          "plugins.json"
+        )
       );
       const configFileContents = await this.fileService.readFile(configFileUri);
       plugins = JSON.parse(configFileContents.value.toString());
-    } catch (e) { }
+    } catch (e) {}
 
     // for each of the project's plugins, get it's dependencies
     // TODO: we only search one level deep here, recurse instead
@@ -294,11 +306,15 @@ export class VesBuildBuildCommand {
       );
 
       try {
-        const pluginFileContents = await this.fileService.readFile(pluginFileUri);
-        JSON.parse(pluginFileContents.value.toString()).map((plugin: string) => {
-          plugins.push(plugin);
-        });
-      } catch (e) { }
+        const pluginFileContents = await this.fileService.readFile(
+          pluginFileUri
+        );
+        JSON.parse(pluginFileContents.value.toString()).map(
+          (plugin: string) => {
+            plugins.push(plugin);
+          }
+        );
+      } catch (e) {}
     });
 
     // remove duplicates and return

@@ -122,6 +122,8 @@ export class WelcomeWidget extends ReactWidget {
       </button>
     );
 
+    // TODO: New Project from GIT
+
     return (
       <div className="ves-welcome-section">
         {newProject}

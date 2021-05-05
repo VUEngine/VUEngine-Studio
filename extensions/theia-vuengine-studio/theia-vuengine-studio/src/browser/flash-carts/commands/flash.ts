@@ -28,7 +28,6 @@ export class VesFlashCartsFlashCommand {
 
   @postConstruct()
   protected init(): void {
-    this.fixPermissions();
     this.bindEvents();
   }
 
@@ -83,6 +82,8 @@ export class VesFlashCartsFlashCommand {
           .split(" ")
         : [];
 
+      await this.fixPermissions();
+
       const { processManagerId } = await this.vesProcessService.launchProcess({
         command: "." + sep + basename(connectedFlashCart.config.path),
         args: flasherArgs,
@@ -122,10 +123,15 @@ export class VesFlashCartsFlashCommand {
     this.vesState.flashingProgress = -1;
   }
 
-  protected fixPermissions() {
+  /**
+   * Give executables respective permission on UNIX systems.
+   * Must be executed before every run to ensure permissions are right,
+   * even right after reconfiguring paths.
+   */
+  protected async fixPermissions() {
     if (!isWindows) {
       for (const connectedFlashCart of this.vesState.connectedFlashCarts) {
-        this.vesProcessService.launchProcess({
+        await this.vesProcessService.launchProcess({
           command: "chmod",
           args: ["a+x", connectedFlashCart.config.path]
         });
@@ -215,7 +221,7 @@ export class VesFlashCartsFlashCommand {
 
   protected async parseDataHyperFlash32(connectedFlashCart: ConnectedFlashCart, data: any) {
     if (connectedFlashCart.config.name === VesFlashCartsPrefs.FLASH_CARTS.property.default[1].name) {
-      /* Number of # is only fixed (to 20) on HF32 firmware version 1.9 and above. 
+      /* Number of # is only fixed (to 20) on HF32 firmware version 1.9 and above.
         On lower firmwares, the number of # depends on file size.
         TODO: support older firmwares as well? Can the firmware be detected? */
 
