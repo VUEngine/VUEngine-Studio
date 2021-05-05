@@ -145,9 +145,12 @@ export class VesBuildBuildCommand {
       }
     });
 
-    this.vesProcessWatcher.onExit(({ pId }) => {
+    this.vesProcessWatcher.onExit(({ pId, event }) => {
       if (this.vesState.buildStatus.processManagerId === pId) {
-        //this.vesState.resetBuildStatus("done");
+        this.vesState.resetBuildStatus(event.code === 0
+          ? "done"
+          : "failed"
+        );
       }
     });
 
