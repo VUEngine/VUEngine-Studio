@@ -14,19 +14,28 @@ export class VesCommonFunctions {
 
   getWorkspaceRoot(): string {
     const substrNum = isWindows ? 2 : 1;
-    return (window.location.hash.slice(-9) === "workspace")
+
+    return window.location.hash.slice(-9) === "workspace"
       ? dirname(window.location.hash.substring(substrNum))
       : window.location.hash.substring(substrNum);
   }
 
-  getBuildPath(buildMode?: string) {
-    const buildRoot = joinPath(this.getWorkspaceRoot(), "build");
-    return buildMode ? joinPath(buildRoot, buildMode.toLowerCase()) : buildRoot;
+  getBuildFolder(): string {
+    return joinPath(this.getWorkspaceRoot(), "build");
+  }
+
+  getBuildPath(buildMode?: string): string {
+    const buildFolder = this.getBuildFolder();
+
+    return buildMode
+      ? joinPath(buildFolder, buildMode.toLowerCase())
+      : buildFolder;
   }
 
   getRomPath(): string {
-    const buildRoot = joinPath(this.getWorkspaceRoot(), "build");
-    return joinPath(buildRoot, "output.vb");
+    const buildFolder = this.getBuildFolder();
+
+    return joinPath(buildFolder, "output.vb");
   }
 
   getOs() {
@@ -39,13 +48,14 @@ export class VesCommonFunctions {
 
   convertoToEnvPath(path: string) {
     const enableWsl = this.preferenceService.get(VesBuildPrefs.ENABLE_WSL.id);
-    let envPath = path.replace(/\\/g, '/').replace(/^[a-zA-Z]:\//, function (x) {
+    let envPath = path.replace(/\\/g, "/").replace(/^[a-zA-Z]:\//, function(x) {
       return `/${x.substr(0, 1).toLowerCase()}/`;
     });
 
     if (isWindows && enableWsl) {
       envPath = "/mnt/" + envPath;
     }
+
     return envPath;
   }
 
@@ -53,12 +63,18 @@ export class VesCommonFunctions {
     this.windowService.openNewWindow(url, { external: true });
   }
 
-  getKeybindingLabel(commandId: string, wrapInBrackets: boolean = false): string {
+  getKeybindingLabel(
+    commandId: string,
+    wrapInBrackets: boolean = false
+  ): string {
     const keybinding = this.keybindingRegistry.getKeybindingsForCommand(commandId)[0];
-    let keybindingAccelerator = keybinding ? this.keybindingRegistry.acceleratorFor(keybinding, "+").join(", ") : "";
+    let keybindingAccelerator = keybinding
+      ? this.keybindingRegistry.acceleratorFor(keybinding, "+").join(", ")
+      : "";
     if (wrapInBrackets && keybindingAccelerator !== "") {
-      keybindingAccelerator = ` (${keybindingAccelerator})`
+      keybindingAccelerator = ` (${keybindingAccelerator})`;
     }
+
     return keybindingAccelerator;
   }
-};
+}
