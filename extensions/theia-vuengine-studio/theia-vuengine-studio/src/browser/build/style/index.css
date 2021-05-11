@@ -34,6 +34,15 @@
   display: block;
 }
 
+#vesBuildWidget .buildOptions.theia-settings-container .single-pref {
+  padding: var(--theia-ui-padding) 0;
+}
+
+#vesBuildWidget .buildOptions.theia-settings-container .pref-content-container .pref-input {
+  display: flex;
+  max-width: unset;
+}
+
 #vesBuildWidget .buildSelector .theia-select {
   width: 100%;
 }

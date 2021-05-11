@@ -1,12 +1,14 @@
 import * as React from "react";
 import { inject, injectable, postConstruct } from "inversify";
+import { CommandService, isWindows } from "@theia/core";
+import { ApplicationShell, Message, PreferenceScope, PreferenceService } from "@theia/core/lib/browser";
 import { ReactWidget } from "@theia/core/lib/browser/widgets/react-widget";
-import { CommandService } from "@theia/core";
+import { FileDialogService, OpenFileDialogProps } from "@theia/filesystem/lib/browser";
+import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
 import { VesBuildCommands } from "../build-commands";
 import { VesState } from "../../common/ves-state";
 import { VesBuildBuildCommand } from "../commands/build";
-import { ApplicationShell, Message, PreferenceService } from "@theia/core/lib/browser";
 import { VesBuildPrefs } from "../build-preferences";
 import { BuildLogLine, BuildLogLineType, BuildMode } from "../build-types";
 
@@ -14,6 +16,8 @@ import { BuildLogLine, BuildLogLineType, BuildMode } from "../build-types";
 export class VesBuildWidget extends ReactWidget {
   @inject(ApplicationShell) protected readonly applicationShell: ApplicationShell;
   @inject(CommandService) private readonly commandService: CommandService;
+  @inject(FileService) private readonly fileService: FileService;
+  @inject(FileDialogService) private readonly fileDialogService: FileDialogService;
   @inject(PreferenceService) private readonly preferenceService: PreferenceService;
   @inject(VesBuildBuildCommand) private readonly buildCommand: VesBuildBuildCommand;
   @inject(VesState) private readonly vesState: VesState;
@@ -52,6 +56,9 @@ export class VesBuildWidget extends ReactWidget {
       switch (preferenceName) {
         case VesBuildPrefs.BUILD_MODE.id:
         case VesBuildPrefs.DUMP_ELF.id:
+        case VesBuildPrefs.ENGINE_CORE_PATH.id:
+        case VesBuildPrefs.ENGINE_PLUGINS_PATH.id:
+        case VesBuildPrefs.ENABLE_WSL.id:
         case VesBuildPrefs.PEDANTIC_WARNINGS.id:
           this.update();
           break;
@@ -108,7 +115,7 @@ export class VesBuildWidget extends ReactWidget {
                   <i className="fa fa-wrench"></i> Build
                 </button>
                 <button
-                  className="theia-button secondary"
+                  className={this.state.showOptions ? "theia-button primary" : "theia-button secondary"}
                   onClick={() => this.toggleBuildOptions()}
                 >
                   <i className="fa fa-cog"></i>
@@ -128,9 +135,7 @@ export class VesBuildWidget extends ReactWidget {
                       <div className="pref-input">
                         <select
                           className="theia-select"
-                          value={this.preferenceService.get(
-                            VesBuildPrefs.BUILD_MODE.id
-                          )}
+                          value={this.preferenceService.get(VesBuildPrefs.BUILD_MODE.id)}
                           onChange={(e) => {
                             this.commandService.executeCommand(
                               VesBuildCommands.SET_MODE.id,
@@ -149,7 +154,7 @@ export class VesBuildWidget extends ReactWidget {
                       </div>
                     </div>
                   </div>
-                  <div className="singe-pref">
+                  <div className="single-pref">
                     <div className="pref-name">Dump Elf</div>
                     <div className="pref-content-container boolean">
                       <div className="pref-description">
@@ -160,9 +165,7 @@ export class VesBuildWidget extends ReactWidget {
                           <input
                             type="checkbox"
                             className="theia-input"
-                            checked={this.preferenceService.get(
-                              VesBuildPrefs.DUMP_ELF.id
-                            )}
+                            checked={this.preferenceService.get(VesBuildPrefs.DUMP_ELF.id)}
                             onClick={() =>
                               this.commandService.executeCommand(
                                 VesBuildCommands.TOGGLE_PEDANTIC_WARNINGS.id
@@ -173,23 +176,18 @@ export class VesBuildWidget extends ReactWidget {
                       </div>
                     </div>
                   </div>
-                  <div className="singe-pref">
+                  <div className="single-pref">
                     <div className="pref-name">Pedantic Warnings</div>
                     <div className="pref-content-container boolean">
                       <div className="pref-description">
-                        {
-                          VesBuildPrefs.PEDANTIC_WARNINGS.property
-                            .description
-                        }
+                        {VesBuildPrefs.PEDANTIC_WARNINGS.property.description}
                       </div>
                       <div className="pref-input">
                         <label>
                           <input
                             type="checkbox"
                             className="theia-input"
-                            checked={this.preferenceService.get(
-                              VesBuildPrefs.PEDANTIC_WARNINGS.id
-                            )}
+                            checked={this.preferenceService.get(VesBuildPrefs.PEDANTIC_WARNINGS.id)}
                             onClick={() =>
                               this.commandService.executeCommand(
                                 VesBuildCommands.TOGGLE_PEDANTIC_WARNINGS.id
@@ -197,6 +195,74 @@ export class VesBuildWidget extends ReactWidget {
                             }
                           />
                         </label>
+                      </div>
+                    </div>
+                  </div>
+                  {isWindows && <div className="single-pref">
+                    <div className="pref-name">Enable WSL</div>
+                    <div className="pref-content-container boolean">
+                      <div className="pref-description">
+                        {VesBuildPrefs.ENABLE_WSL.property.description}
+                      </div>
+                      <div className="pref-input">
+                        <label>
+                          <input
+                            type="checkbox"
+                            className="theia-input"
+                            checked={this.preferenceService.get(VesBuildPrefs.ENABLE_WSL.id)}
+                            onClick={() =>
+                              this.commandService.executeCommand(
+                                VesBuildCommands.TOGGLE_ENABLE_WSL.id
+                              )
+                            }
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  </div>}
+                  <div className="single-pref">
+                    <div className="pref-name">Engine Path</div>
+                    <div className="pref-content-container string">
+                      <div className="pref-description">
+                        {VesBuildPrefs.ENGINE_CORE_PATH.property.description}
+                      </div>
+                      <div className="pref-input">
+                        <input
+                          type="text"
+                          className="theia-input"
+                          value={this.preferenceService.get(VesBuildPrefs.ENGINE_CORE_PATH.id)}
+                          // TODO: this should not fire on every single keypress. use timeout?
+                          onChange={(e) => this.preferenceService.set(VesBuildPrefs.ENGINE_CORE_PATH.id, e.currentTarget.value, PreferenceScope.User)}
+                        />
+                        <button
+                          className="theia-button secondary"
+                          onClick={() => this.selectFolder("Select core engine root folder", VesBuildPrefs.ENGINE_CORE_PATH.id)}
+                        >
+                          <i className="fa fa-ellipsis-h" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="single-pref">
+                    <div className="pref-name">Plugins Library Path</div>
+                    <div className="pref-content-container string">
+                      <div className="pref-description">
+                        {VesBuildPrefs.ENGINE_PLUGINS_PATH.property.description}
+                      </div>
+                      <div className="pref-input">
+                        <input
+                          type="text"
+                          className="theia-input"
+                          value={this.preferenceService.get(VesBuildPrefs.ENGINE_PLUGINS_PATH.id)}
+                          // TODO: this should not fire on every single keypress. use timeout?
+                          onChange={(e) => this.preferenceService.set(VesBuildPrefs.ENGINE_PLUGINS_PATH.id, e.currentTarget.value, PreferenceScope.User)}
+                        />
+                        <button
+                          className="theia-button secondary"
+                          onClick={() => this.selectFolder("Select plugins root folder", VesBuildPrefs.ENGINE_PLUGINS_PATH.id)}
+                        >
+                          <i className="fa fa-ellipsis-h" />
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -342,8 +408,8 @@ export class VesBuildWidget extends ReactWidget {
     this.state.isWide = !this.state.isWide;
     this.update();
     const targetWidth = this.state.isWide
-      ? Math.round(window.innerWidth * 0.8)
-      : 350
+      ? window.innerWidth
+      : Math.round(window.innerWidth * 0.25)
     const widgetArea = this.applicationShell.getAreaFor(this);
     if (widgetArea) {
       this.applicationShell.resize(targetWidth, widgetArea);
@@ -371,5 +437,20 @@ export class VesBuildWidget extends ReactWidget {
     this.state.logFilter =
       this.state.logFilter !== type ? type : BuildLogLineType.Normal;
     this.update();
+  }
+
+  protected async selectFolder(title: string, preferenceId: string) {
+    const props: OpenFileDialogProps = {
+      title,
+      canSelectFolders: true,
+      canSelectFiles: false
+    };
+    const destinationFolderUri = await this.fileDialogService.showOpenDialog(props);
+    if (destinationFolderUri) {
+      const destinationFolder = await this.fileService.resolve(destinationFolderUri);
+      if (destinationFolder.isDirectory) {
+        this.preferenceService.set(preferenceId, destinationFolder.resource.path.toString(), PreferenceScope.User);
+      }
+    }
   }
 }
