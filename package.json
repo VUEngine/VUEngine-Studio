@@ -2,7 +2,7 @@
   "private": true,
   "name": "vuengine-studio",
   "version": "1.0.0",
-  "description": "VUEngine",
+  "description": "VUEngine Studio",
   "author": "KR155E <c.radke@posteo.de>",
   "license": "Apache-2.0",
   "engines": {
