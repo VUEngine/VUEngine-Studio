@@ -181,11 +181,16 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         // @ts-ignore
         app.on("ves-change-build-status", (buildStatus: BuildStatus) => {
             if (buildStatus.active) {
-                spinnerIconIntervall = setInterval(() => animateSpinner(buildMenuBuildButton, spinnerIcon), 130);
+                if (!spinnerIconIntervall) {
+                    spinnerIconIntervall = setInterval(() => animateSpinner(buildMenuBuildButton, spinnerIcon), 200);
+                }
             } else {
-                if (spinnerIconIntervall) clearInterval(spinnerIconIntervall);
-                buildMenuBuildButton.icon = buildIcon;
-                redrawMenuSegmentedControl();
+                if (spinnerIconIntervall) {
+                    clearInterval(spinnerIconIntervall);
+                    spinnerIconIntervall = null;
+                    buildMenuBuildButton.icon = buildIcon;
+                    redrawMenuSegmentedControl();
+                };
             }
         });
         // @ts-ignore
@@ -201,11 +206,16 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         // @ts-ignore
         app.on("ves-change-is-flashing", (isFlashing: boolean) => {
             if (isFlashing) {
-                spinnerIconIntervall = setInterval(() => animateSpinner(buildMenuFlashButton, spinnerIcon), 130);
+                if (!spinnerIconIntervall) {
+                    spinnerIconIntervall = setInterval(() => animateSpinner(buildMenuFlashButton, spinnerIcon), 200);
+                }
             } else {
-                if (spinnerIconIntervall) clearInterval(spinnerIconIntervall);
-                buildMenuFlashButton.icon = flashIcon;
-                redrawMenuSegmentedControl();
+                if (spinnerIconIntervall) {
+                    clearInterval(spinnerIconIntervall);
+                    spinnerIconIntervall = null;
+                    buildMenuFlashButton.icon = flashIcon;
+                    redrawMenuSegmentedControl();
+                }
             }
         });
         // @ts-ignore
@@ -227,7 +237,9 @@ export class VesElectronMainApplication extends ElectronMainApplication {
 
         const animateSpinner = (button: Electron.TouchBarButton, spinnerIcon: Electron.NativeImage[]) => {
             spinnerIconFrame++;
-            if (spinnerIconFrame >= spinnerIcon.length) spinnerIconFrame = 0;
+            if (spinnerIconFrame >= spinnerIcon.length) {
+                spinnerIconFrame = 0
+            };
             button.icon = spinnerIcon[spinnerIconFrame];
             redrawMenuSegmentedControl();
         };

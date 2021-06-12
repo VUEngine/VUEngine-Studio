@@ -145,11 +145,8 @@ export class VesState {
   };
 
   // emulator configs
-  protected readonly onDidChangeEmulatorConfigsEmitter = new Emitter<
-    EmulatorConfig[]
-  >();
-  readonly onDidChangeEmulatorConfigs = this.onDidChangeEmulatorConfigsEmitter
-    .event;
+  protected readonly onDidChangeEmulatorConfigsEmitter = new Emitter<EmulatorConfig[]>();
+  readonly onDidChangeEmulatorConfigs = this.onDidChangeEmulatorConfigsEmitter.event;
 
   // default emulator
   protected readonly onDidChangeEmulatorEmitter = new Emitter<string>();
@@ -160,9 +157,7 @@ export class VesState {
   readonly onDidChangeBuildMode = this.onDidChangeBuildModeEmitter.event;
 
   // build folder
-  protected readonly onDidChangeBuildFolderEmitter = new Emitter<
-    BuildFolderFlags
-  >();
+  protected readonly onDidChangeBuildFolderEmitter = new Emitter<BuildFolderFlags>();
   readonly onDidChangeBuildFolder = this.onDidChangeBuildFolderEmitter.event;
   protected _buildFolderExists: BuildFolderFlags = {};
   setBuildFolderExists(buildMode: string, flag: boolean) {
@@ -175,8 +170,7 @@ export class VesState {
 
   // output rom exists
   protected readonly onDidChangeOutputRomExistsEmitter = new Emitter<boolean>();
-  readonly onDidChangeOutputRomExists = this.onDidChangeOutputRomExistsEmitter
-    .event;
+  readonly onDidChangeOutputRomExists = this.onDidChangeOutputRomExistsEmitter.event;
   protected _outputRomExists: boolean = false;
   set outputRomExists(flag: boolean) {
     this._outputRomExists = flag;

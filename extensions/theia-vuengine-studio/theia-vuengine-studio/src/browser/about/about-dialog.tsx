@@ -77,11 +77,11 @@ export class VesAboutDialog extends AboutDialog {
                     Includes the following third party binaries:
                 </div>
                 <ul>
-                    <li>GCC 4.7 <i>– The GNU Project, with patches for V810 by ElmerPCFX</i></li>
-                    <li>Grit 0.8.6 <i>– Jasper Vijn, with patches for Virtual Boy by dasi</i></li>
-                    <li>hf-cli 1.0.0.0 <i>– thunderstruck</i></li>
+                    <li>GCC <i>– The GNU Project, with patches for V810 by ElmerPCFX</i></li>
+                    <li>Grit <i>– Jasper Vijn, with patches for Virtual Boy by dasi</i></li>
+                    <li>hf-cli <i>– thunderstruck</i></li>
                     <li>MSYS <i>– The MinGW Project</i></li>
-                    <li>prog-vb 0.10.0 <i>– William D. Jones</i></li>
+                    <li>prog-vb <i>– William D. Jones</i></li>
                     <li>RetroArch Web w/ Beetle VB core <i>– RetroArch and Mednafen teams</i></li>
                 </ul>
             </div>
