@@ -7,7 +7,7 @@ export namespace VesFlashCartsPrefs {
         property: {
             type: "array",
             label: "Flash Cart Configurations",
-            description: "Additional configurations for custom flash carts.",
+            description: "Configurations for flash cart auto-detection and flashing.",
             items: {
                 type: "object",
                 title: "Flash cart config",

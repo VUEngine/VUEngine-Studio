@@ -193,7 +193,13 @@ export class VesFlashCartsWidget extends ReactWidget {
         </div>
       </>
     ) : (
-      <div className="noFlashCarts">No flash carts connected.</div>
+      <div className="noFlashCarts">
+        <p>
+          <i className="fa fa-usb"></i> Connect your Virtual Boy flash cart(s) to your computer via USB.
+        </p>
+
+        <p>You can connect, and flash to, any number of flash carts at once.</p>
+      </div>
     );
   }
 
