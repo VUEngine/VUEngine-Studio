@@ -1,5 +1,4 @@
 #ves-topbar-application-title {
-  /* color: #ccc; */
   flex-grow: 1;
   height: var(--theia-private-menubar-height);
   line-height: var(--theia-private-menubar-height);

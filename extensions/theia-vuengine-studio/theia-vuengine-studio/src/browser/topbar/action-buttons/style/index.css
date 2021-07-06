@@ -24,7 +24,6 @@
 #ves-topbar-action-buttons .theia-button {
   background-color: rgba(0,0,0,0.4);
   border-radius: 3px;
-  color: #ececec !important;
   font-size: 17px;
   line-height: 27px;
   margin-left: 4px;
@@ -37,8 +36,7 @@
   width: 16px;
 }
 
-#ves-topbar-action-buttons .theia-button:hover,
-#ves-topbar-action-buttons .theia-button.active {
+#ves-topbar-action-buttons .theia-button:hover {
   background-color: rgba(0,0,0,0.6);
 }
 
@@ -49,4 +47,22 @@
 
 #ves-topbar-action-buttons .theia-button.build {
   min-width: 64px;
+}
+
+#ves-topbar-action-buttons .theia-button.queued {
+  animation-name: pulseQueued;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes pulseQueued {
+  0% {
+    background-color: rgba(0,0,0,0.6);
+  }
+  50% {
+    background-color: rgba(74,169,78,0.6);
+  }
+  100% {
+    background-color: rgba(0,0,0,0.6);
+  }
 }

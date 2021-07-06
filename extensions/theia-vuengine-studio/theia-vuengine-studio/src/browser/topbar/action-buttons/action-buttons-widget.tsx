@@ -98,7 +98,12 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                 </button>
                 <button
                     className={"theia-button secondary build" + (this.vesState.buildStatus.active ? " active" : "")}
-                    title={this.vesState.buildStatus.active ? "Building..." : `${VesBuildCommands.BUILD.label}${this.commonFunctions.getKeybindingLabel(VesBuildCommands.BUILD.id, true)}`}
+                    style={this.vesState.buildStatus.active ? {
+                        backgroundImage: "linear-gradient(90deg, rgba(74,169,78,0.6) 0%, rgba(74,169,78,0.6) " + this.vesState.buildStatus.progress + "%, rgba(0,0,0,0.6) " + this.vesState.buildStatus.progress + "%)"
+                    } : {}}
+                    title={this.vesState.buildStatus.active
+                        ? "Building... " + this.vesState.buildStatus.progress + "%"
+                        : `${VesBuildCommands.BUILD.label}${this.commonFunctions.getKeybindingLabel(VesBuildCommands.BUILD.id, true)}`}
                     onClick={() => this.commandService.executeCommand(VesBuildCommands.BUILD.id)}
                 >
                     {this.vesState.buildStatus.active
@@ -106,7 +111,7 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                         : <i className="fa fa-wrench"></i>}
                 </button>
                 <button
-                    className={"theia-button secondary run" + (this.vesState.isRunQueued ? " active" : "")}
+                    className={"theia-button secondary run" + (this.vesState.isRunQueued ? " queued" : "")}
                     title={this.vesState.isRunQueued ? "Run Queued..." : `${VesEmulatorCommands.RUN.label}${this.commonFunctions.getKeybindingLabel(VesEmulatorCommands.RUN.id, true)}`}
                     onClick={() => this.commandService.executeCommand(VesEmulatorCommands.RUN.id)}
                 >
@@ -116,8 +121,15 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
 
                 </button>
                 <button
-                    className={"theia-button secondary flash" + (this.vesState.isFlashQueued || this.vesState.isFlashing ? " active" : "")}
-                    title={this.vesState.isFlashQueued ? "Flash Queued..." : `${VesFlashCartsCommands.FLASH.label}${this.commonFunctions.getKeybindingLabel(VesFlashCartsCommands.FLASH.id, true)}`}
+                    className={"theia-button secondary flash" + (this.vesState.isFlashQueued ? " queued" : "") + (this.vesState.isFlashing ? " active" : "")}
+                    style={this.vesState.isFlashing ? {
+                        backgroundImage: "linear-gradient(90deg, rgba(74,169,78,0.6) 0%, rgba(74,169,78,0.6) " + this.vesState.flashingProgress + "%, rgba(0,0,0,0.6) " + this.vesState.flashingProgress + "%)"
+                    } : {}}
+                    title={this.vesState.isFlashQueued
+                        ? "Flash Queued..."
+                        : this.vesState.isFlashing
+                            ? "Flashing... " + this.vesState.flashingProgress + "%"
+                            : `${VesFlashCartsCommands.FLASH.label}${this.commonFunctions.getKeybindingLabel(VesFlashCartsCommands.FLASH.id, true)}`}
                     disabled={!this.vesState.connectedFlashCarts}
                     onClick={() => this.commandService.executeCommand(VesFlashCartsCommands.FLASH.id)}
                 >
@@ -128,8 +140,8 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
                             : <i className="fa fa-usb"></i>}
                 </button>
                 <button
-                    className={"theia-button secondary export" + (this.vesState.isExportQueued ? " active" : "")}
-                    title={this.vesState.isExportQueued ? "Export Queued..." : `${VesBuildCommands.EXPORT.label}${this.commonFunctions.getKeybindingLabel(VesBuildCommands.EXPORT.id, true)}`}
+                    className={"theia-button secondary export" + (this.vesState.isExportQueued ? " queued" : "")}
+                    title={this.vesState.isExportQueued ? "Export Queued..." : `${VesBuildCommands.EXPORT.label} ${this.commonFunctions.getKeybindingLabel(VesBuildCommands.EXPORT.id, true)}`}
                     onClick={() => this.commandService.executeCommand(VesBuildCommands.EXPORT.id)}
                 >
                     {this.vesState.isExportQueued
