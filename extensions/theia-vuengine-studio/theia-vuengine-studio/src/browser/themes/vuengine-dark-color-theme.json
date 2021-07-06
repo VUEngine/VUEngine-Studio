@@ -16,6 +16,7 @@
 		"statusBar.border": "#1e1e1e",
 		"textBlockQuote.border": "#d3142280",
 		"titleBar.activeBackground": "#d31422",
+		"titleBar.activeForeground": "#ffffff",
 		"titleBar.border": "#1e1e1e"
 	}
 }

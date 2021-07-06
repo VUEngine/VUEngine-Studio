@@ -21,7 +21,7 @@
 		"statusBar.border": "#ffffff",
 		"textBlockQuote.border": "#d3142280",
 		"titleBar.activeBackground": "#d31422",
-		"titleBar.activeForeground": "#cccccc",
+		"titleBar.activeForeground": "#ffffff",
 		"titleBar.border": "#ffffff"
 	}
 }
