@@ -1,4 +1,4 @@
-#ves-topbar-action-buttons {
+#ves-titlebar-action-buttons {
   -webkit-app-region: no-drag;
   flex-shrink: 0;
   float: right;
@@ -9,19 +9,19 @@
   width: 260px;
 }
 
-#ves-topbar-action-buttons.os-linux,
-#ves-topbar-action-buttons.os-win {
+#ves-titlebar-action-buttons.os-linux,
+#ves-titlebar-action-buttons.os-win {
   margin-right: 162px;
 }
 
 @media (max-width: 800px) {
-  #ves-topbar-action-buttons.os-linux,
-  #ves-topbar-action-buttons.os-win {
+  #ves-titlebar-action-buttons.os-linux,
+  #ves-titlebar-action-buttons.os-win {
     display: none;
   }
 }
 
-#ves-topbar-action-buttons .theia-button {
+#ves-titlebar-action-buttons .theia-button {
   background-color: rgba(0,0,0,0.4);
   border-radius: 3px;
   font-size: 17px;
@@ -31,25 +31,25 @@
   padding: 1px 0 0;
 }
 
-#ves-topbar-action-buttons .theia-button i {
+#ves-titlebar-action-buttons .theia-button i {
   line-height: 16px;
   width: 16px;
 }
 
-#ves-topbar-action-buttons .theia-button:hover {
+#ves-titlebar-action-buttons .theia-button:hover {
   background-color: rgba(0,0,0,0.6);
 }
 
-#ves-topbar-action-buttons .theia-button[disabled] {
+#ves-titlebar-action-buttons .theia-button[disabled] {
   background-color: rgba(0,0,0,0.2);
   opacity: unset;
 }
 
-#ves-topbar-action-buttons .theia-button.build {
+#ves-titlebar-action-buttons .theia-button.build {
   min-width: 64px;
 }
 
-#ves-topbar-action-buttons .theia-button.queued {
+#ves-titlebar-action-buttons .theia-button.queued {
   animation-name: pulseQueued;
   animation-duration: 2s;
   animation-iteration-count: infinite;

@@ -1,4 +1,4 @@
-#ves-topbar-application-title {
+#ves-titlebar-application-title {
   flex-grow: 1;
   height: var(--theia-private-menubar-height);
   line-height: var(--theia-private-menubar-height);
@@ -6,12 +6,12 @@
   text-align: center;
 }
 
-#ves-topbar-application-title.os-osx {
+#ves-titlebar-application-title.os-osx {
   padding-left: 260px;
 }
 
 @media (max-width: 1000px) {
-  #ves-topbar-application-title:not(.os-osx) {
+  #ves-titlebar-application-title:not(.os-osx) {
     visibility: hidden;
   }
 }

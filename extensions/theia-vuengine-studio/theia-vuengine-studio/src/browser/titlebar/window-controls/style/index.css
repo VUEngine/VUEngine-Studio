@@ -1,11 +1,11 @@
-#ves-topbar-window-controls {
+#ves-titlebar-window-controls {
   -webkit-app-region: no-drag;
   position: absolute;
   right: 0;
   z-index: 1;
 }
 
-#ves-topbar-window-controls .topbar-window-controls-separator {
+#ves-titlebar-window-controls .titlebar-window-controls-separator {
   border-left: 1px solid;
   float: left;
   height: 23px;
@@ -13,7 +13,7 @@
   opacity: 0.2;
 }
 
-#ves-topbar-window-controls .topbar-window-controls-button {
+#ves-titlebar-window-controls .titlebar-window-controls-button {
   display: block;
   fill: var(--theia-titleBar-activeForeground);
   float: left;
@@ -23,17 +23,17 @@
   text-align: center;
   width: 46px;
 }
-#ves-topbar-window-controls .topbar-window-controls-button:hover {
+#ves-titlebar-window-controls .titlebar-window-controls-button:hover {
   background: rgba(255, 255, 255, 0.1);
 }
-#ves-topbar-window-controls .topbar-window-controls-button:active {
+#ves-titlebar-window-controls .titlebar-window-controls-button:active {
   background: rgba(255, 255, 255, 0.2);
 }
 /*
-#ves-topbar-window-controls #ves-topbar-window-controls-close:hover {
+#ves-titlebar-window-controls #ves-titlebar-window-controls-close:hover {
   background: #e81123;
 }
-#ves-topbar-window-controls #ves-topbar-window-controls-close:active {
+#ves-titlebar-window-controls #ves-titlebar-window-controls-close:active {
   background: #f1707a;
 }
 */

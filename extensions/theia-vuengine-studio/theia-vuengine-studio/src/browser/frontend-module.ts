@@ -4,7 +4,7 @@ import { bindVesBuildContributions } from "./build/build-frontend-module";
 import { bindVesFlashCartsContributions } from "./flash-carts/flash-carts-frontend-module";
 import { bindVesRunContributions } from "./emulator/emulator-frontend-module";
 import { bindVesSupportUsContributions } from "./support-us/support-us-frontend-module";
-import { bindVesTopBarContributions } from "./topbar/frontend-module";
+import { bindVesTitleBarContributions } from "./titlebar/frontend-module";
 import { rebindtheiaContributions } from "./theia-customizations/frontend-module";
 import { bindVesServices } from "./services/services-frontend-module";
 import { bindVesDocumentationContributions } from "./documentation/documentation-frontend-module";
@@ -16,7 +16,7 @@ import "./themes/index";
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
   rebindtheiaContributions(bind, rebind);
-  bindVesTopBarContributions(bind);
+  bindVesTitleBarContributions(bind);
   bindVesServices(bind);
   bindVesSupportUsContributions(bind);
   bindVesStateContributions(bind);

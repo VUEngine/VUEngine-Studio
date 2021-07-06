@@ -6,18 +6,18 @@ import { VesCommonFunctions } from "../../common/common-functions";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
 
 @injectable()
-export class VesTopbarApplicationTitleWidget extends ReactWidget {
+export class VesTitlebarApplicationTitleWidget extends ReactWidget {
   @inject(VesCommonFunctions) protected readonly commonFunctions: VesCommonFunctions;
   @inject(WorkspaceService) private readonly workspaceService: WorkspaceService
 
-  static readonly ID = "ves-topbar-application-title";
-  static readonly LABEL = "Topbar Action Buttons";
+  static readonly ID = "ves-titlebar-application-title";
+  static readonly LABEL = "Titlebar Action Buttons";
 
   @postConstruct()
   protected async init(): Promise<void> {
-    this.id = VesTopbarApplicationTitleWidget.ID;
-    this.title.label = VesTopbarApplicationTitleWidget.LABEL;
-    this.title.caption = VesTopbarApplicationTitleWidget.LABEL;
+    this.id = VesTitlebarApplicationTitleWidget.ID;
+    this.title.label = VesTitlebarApplicationTitleWidget.LABEL;
+    this.title.caption = VesTitlebarApplicationTitleWidget.LABEL;
     this.title.closable = false;
     this.addClass(`os-${this.commonFunctions.getOs()}`);
     this.update();

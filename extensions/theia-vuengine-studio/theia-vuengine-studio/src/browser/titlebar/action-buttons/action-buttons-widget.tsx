@@ -17,10 +17,10 @@ import { WorkspaceCommands, WorkspaceService } from "@theia/workspace/lib/browse
 import { VesProjectsCommands } from "../../projects/projects-commands";
 
 @injectable()
-export class VesTopbarActionButtonsWidget extends ReactWidget {
+export class VesTitlebarActionButtonsWidget extends ReactWidget {
 
-    static readonly ID = "ves-topbar-action-buttons";
-    static readonly LABEL = "Topbar Action Buttons";
+    static readonly ID = "ves-titlebar-action-buttons";
+    static readonly LABEL = "Titlebar Action Buttons";
 
     @inject(CommandService) protected readonly commandService!: CommandService;
     @inject(FileService) protected readonly fileService!: FileService;
@@ -34,9 +34,9 @@ export class VesTopbarActionButtonsWidget extends ReactWidget {
 
     @postConstruct()
     protected async init(): Promise<void> {
-        this.id = VesTopbarActionButtonsWidget.ID;
-        this.title.label = VesTopbarActionButtonsWidget.LABEL;
-        this.title.caption = VesTopbarActionButtonsWidget.LABEL;
+        this.id = VesTitlebarActionButtonsWidget.ID;
+        this.title.label = VesTitlebarActionButtonsWidget.LABEL;
+        this.title.caption = VesTitlebarActionButtonsWidget.LABEL;
         this.title.closable = false;
         this.addClass(`os-${this.commonFunctions.getOs()}`);
 

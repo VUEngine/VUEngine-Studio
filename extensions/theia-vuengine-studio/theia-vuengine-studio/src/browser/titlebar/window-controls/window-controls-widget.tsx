@@ -11,18 +11,18 @@ import {
 } from "./window-controls-commands";
 
 @injectable()
-export class VesTopbarWindowControlsWidget extends ReactWidget {
-  static readonly ID = "ves-topbar-window-controls";
-  static readonly LABEL = "Topbar Window Controls";
+export class VesTitlebarWindowControlsWidget extends ReactWidget {
+  static readonly ID = "ves-titlebar-window-controls";
+  static readonly LABEL = "Titlebar Window Controls";
 
   @inject(CommandService)
   protected readonly commandService!: CommandService;
 
   @postConstruct()
   protected async init(): Promise<void> {
-    this.id = VesTopbarWindowControlsWidget.ID;
-    this.title.label = VesTopbarWindowControlsWidget.LABEL;
-    this.title.caption = VesTopbarWindowControlsWidget.LABEL;
+    this.id = VesTitlebarWindowControlsWidget.ID;
+    this.title.label = VesTitlebarWindowControlsWidget.LABEL;
+    this.title.caption = VesTitlebarWindowControlsWidget.LABEL;
     this.title.closable = false;
     remote.getCurrentWindow().on("maximize", () => this.update());
     remote.getCurrentWindow().on("unmaximize", () => this.update());
@@ -32,10 +32,10 @@ export class VesTopbarWindowControlsWidget extends ReactWidget {
   protected render(): React.ReactNode {
     return (
       <>
-        <div className="topbar-window-controls-separator"></div>
+        <div className="titlebar-window-controls-separator"></div>
         <div
-          className="topbar-window-controls-button"
-          id="ves-topbar-window-controls-minimize"
+          className="titlebar-window-controls-button"
+          id="ves-titlebar-window-controls-minimize"
           onClick={() =>
             this.commandService.executeCommand(VesMinimizeWindowCommand.id)
           }
@@ -47,8 +47,8 @@ export class VesTopbarWindowControlsWidget extends ReactWidget {
         </div>
         {!this.isMaximized() && (
           <div
-            className="topbar-window-controls-button"
-            id="ves-topbar-window-controls-maximize"
+            className="titlebar-window-controls-button"
+            id="ves-titlebar-window-controls-maximize"
             onClick={() =>
               this.commandService.executeCommand(VesMaximizeWindowCommand.id)
             }
@@ -61,8 +61,8 @@ export class VesTopbarWindowControlsWidget extends ReactWidget {
         )}
         {this.isMaximized() && (
           <div
-            className="topbar-window-controls-button"
-            id="ves-topbar-window-controls-restore"
+            className="titlebar-window-controls-button"
+            id="ves-titlebar-window-controls-restore"
             onClick={() =>
               this.commandService.executeCommand(VesUnmaximizeWindowCommand.id)
             }
@@ -74,8 +74,8 @@ export class VesTopbarWindowControlsWidget extends ReactWidget {
           </div>
         )}
         <div
-          className="topbar-window-controls-button"
-          id="ves-topbar-window-controls-close"
+          className="titlebar-window-controls-button"
+          id="ves-titlebar-window-controls-close"
           onClick={() =>
             this.commandService.executeCommand(ElectronCommands.CLOSE_WINDOW.id)
           }
