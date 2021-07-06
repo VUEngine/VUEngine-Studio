@@ -6,7 +6,7 @@
 }
 
 #ves-topbar-window-controls .topbar-window-controls-separator {
-  border-left: 1px solid #ccc;
+  border-left: 1px solid;
   float: left;
   height: 23px;
   margin: 8px 10px 0 4px;
@@ -15,7 +15,7 @@
 
 #ves-topbar-window-controls .topbar-window-controls-button {
   display: block;
-  fill: #ccc;
+  fill: var(--theia-titleBar-activeForeground);
   float: left;
   font-size: 18px;
   height: 37px;
