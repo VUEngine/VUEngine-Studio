@@ -2,6 +2,7 @@ import { interfaces } from 'inversify';
 import { bindTheiaCustomizationDebugModule } from './debug/debug-frontend-module';
 import { bindTheiaCustomizationScmHistoryModule } from './history/scm-history-frontend-module';
 import { bindTheiaCustomizationPluginModule } from './plugin/plugin-frontend-module';
+import { bindTheiaCustomizationPreferencesModule } from './preferences/frontend-module';
 
 import "../../../src/browser/theia-customizations/logo/style/index.css";
 import "../../../src/browser/theia-customizations/style/buttons.css";
@@ -16,4 +17,5 @@ export function rebindtheiaContributions(bind: interfaces.Bind, rebind: interfac
     bindTheiaCustomizationDebugModule(bind, rebind);
     bindTheiaCustomizationScmHistoryModule(bind, rebind);
     bindTheiaCustomizationPluginModule(bind, rebind);
+    bindTheiaCustomizationPreferencesModule(bind, rebind);
 }
