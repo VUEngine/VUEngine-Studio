@@ -36,13 +36,13 @@ export class VesBuildBuildCommand {
       return;
     }
 
-    this.commandService.executeCommand(
-      VesBuildCommands.OPEN_WIDGET.id,
-      !this.vesState.buildStatus.active
-    );
-
     if (!this.vesState.buildStatus.active) {
       this.build();
+    } else {
+      this.commandService.executeCommand(
+        VesBuildCommands.OPEN_WIDGET.id,
+        !this.vesState.buildStatus.active
+      );
     }
   }
 
@@ -214,7 +214,7 @@ export class VesBuildBuildCommand {
       this.vesState.buildStatus.stepsDone++;
       this.vesState.buildStatus.progress = Math.floor(
         (this.vesState.buildStatus.stepsDone * 100) /
-          (this.vesState.buildStatus.plugins * 2 + 2)
+        (this.vesState.buildStatus.plugins * 2 + 2)
       );
     } else if (data.startsWith("make") || data.includes("Error: ")) {
       type = BuildLogLineType.Error;
@@ -294,7 +294,7 @@ export class VesBuildBuildCommand {
       );
       const configFileContents = await this.fileService.readFile(configFileUri);
       plugins = JSON.parse(configFileContents.value.toString());
-    } catch (e) {}
+    } catch (e) { }
 
     // for each of the project's plugins, get it's dependencies
     // TODO: we only search one level deep here, recurse instead
@@ -317,7 +317,7 @@ export class VesBuildBuildCommand {
             plugins.push(plugin);
           }
         );
-      } catch (e) {}
+      } catch (e) { }
     });
 
     // remove duplicates and return
