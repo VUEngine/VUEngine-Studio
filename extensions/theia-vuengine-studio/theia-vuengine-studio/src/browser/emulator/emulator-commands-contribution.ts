@@ -108,6 +108,10 @@ export class VesRunCommandContribution implements CommandContribution {
       execute: () => { },
       isVisible: () => false,
     });
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_TOGGLE_LOW_POWER, {
+      execute: () => { },
+      isVisible: () => false,
+    });
     commandRegistry.registerCommand(VesEmulatorCommands.INPUT_REWIND, {
       execute: () => { },
       isVisible: () => false,

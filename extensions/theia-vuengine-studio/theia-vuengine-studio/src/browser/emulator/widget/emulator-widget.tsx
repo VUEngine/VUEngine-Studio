@@ -33,8 +33,6 @@ export interface VesEmulatorWidgetOptions {
 
 export type vesEmulatorWidgetState = {
   status: string;
-  lowBattery: boolean;
-  muted: boolean;
   showControls: boolean;
   input: any;
 };
@@ -88,8 +86,6 @@ export class VesEmulatorWidget extends ReactWidget {
 
   protected state: vesEmulatorWidgetState = {
     status: "running",
-    lowBattery: false,
-    muted: false,
     showControls: false,
     input: {},
   };
@@ -150,6 +146,7 @@ export class VesEmulatorWidget extends ReactWidget {
       rewind: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_REWIND.id),
       toggleFastForward: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.id),
       toggleSlowmotion: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_TOGGLE_SLOWMOTION.id),
+      toggleLowPower: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_TOGGLE_LOW_POWER.id),
     }
   }
 
@@ -261,19 +258,22 @@ export class VesEmulatorWidget extends ReactWidget {
             </button>
             <button
               className="theia-button secondary"
-              title={this.state.muted ? "Unmute" : "Mute"}
+              title="Mute"
               onClick={() => {
-                this.state.muted = !this.state.muted;
                 this.sendCommand("keyPress", EmulatorFunctionKeyCode.AudioMute);
                 this.update();
               }}
               disabled={this.state.showControls}
             >
-              <i
-                className={
-                  this.state.muted ? "fa fa-volume-off" : "fa fa-volume-up"
-                }
-              ></i>
+              <i className="fa fa-volume-up"></i>
+            </button>
+            <button
+              className="theia-button secondary"
+              title="Toggle Low Power Signal"
+              onClick={() => this.toggleLowPower()}
+              disabled={this.state.showControls}
+            >
+              <i className="fa fa-battery-quarter"></i>
             </button>
             {/*/}
               <button
@@ -464,18 +464,6 @@ export class VesEmulatorWidget extends ReactWidget {
               disabled={this.state.showControls}
             >
               <i className="fa fa-camera"></i>
-            </button>
-          </div>
-          {/**/}
-          {/*/}
-          <div>
-            <button
-              className="theia-button secondary"
-              title="Toggle Low Battery flag"
-              onClick={() => this.toggleBatteryLow()}
-              disabled={this.state.showControls}
-            >
-              <i className={this.state.lowBattery ? "fa fa-battery-empty" : "fa fa-battery-full"}></i>
             </button>
           </div>
           {/**/}
@@ -1034,13 +1022,17 @@ export class VesEmulatorWidget extends ReactWidget {
                       </button>
                     </span>
                   </div>
-                  {/*<div>
+                  <div>
                     <span>Toggle Low Power</span>
                     <span>
-                      <button className="theia-button secondary">W</button>
+                      <button className="theia-button secondary">
+                        {this.commonFunctions.getKeybindingLabel(
+                          VesEmulatorCommands.INPUT_TOGGLE_LOW_POWER.id,
+                          false
+                        )}
+                      </button>
                     </span>
                   </div>
-                  */}
                 </div>
                 <div className="buttonAssignmentGroup">
                   <div>
@@ -1185,9 +1177,8 @@ export class VesEmulatorWidget extends ReactWidget {
     lnk.click();
   }
 
-  protected toggleBatteryLow() {
-    this.state.lowBattery = !this.state.lowBattery;
-    this.sendCommand("keyPress", EmulatorFunctionKeyCode.ToggleLowBattery);
+  protected toggleLowPower() {
+    this.sendCommand("keyPress", EmulatorFunctionKeyCode.ToggleLowPower);
     this.update();
   }
 
@@ -1320,6 +1311,7 @@ export class VesEmulatorWidget extends ReactWidget {
         input_player1_r_x_plus = ${this.toButton(EmulatorGamePadKeyCode.RRight)}
         input_player1_r_y_minus = ${this.toButton(EmulatorGamePadKeyCode.RDown)}
         input_player1_r_y_plus = ${this.toButton(EmulatorGamePadKeyCode.RUp)}
+        input_player1_x_btn = ${this.toButton(EmulatorFunctionKeyCode.ToggleLowPower)}
         input_player1_turbo = nul
 
         input_toggle_fullscreen = ${this.toButton(EmulatorFunctionKeyCode.ToggleFullscreen)}

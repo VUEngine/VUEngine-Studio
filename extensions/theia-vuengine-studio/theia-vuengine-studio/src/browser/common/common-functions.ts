@@ -48,7 +48,7 @@ export class VesCommonFunctions {
 
   convertoToEnvPath(path: string) {
     const enableWsl = this.preferenceService.get(VesBuildPrefs.ENABLE_WSL.id);
-    let envPath = path.replace(/\\/g, "/").replace(/^[a-zA-Z]:\//, function(x) {
+    let envPath = path.replace(/\\/g, "/").replace(/^[a-zA-Z]:\//, function (x) {
       return `/${x.substr(0, 1).toLowerCase()}/`;
     });
 
@@ -71,6 +71,10 @@ export class VesCommonFunctions {
     let keybindingAccelerator = keybinding
       ? this.keybindingRegistry.acceleratorFor(keybinding, "+").join(", ")
       : "";
+
+    keybindingAccelerator = keybindingAccelerator
+      .replace(' ', 'Space');
+
     if (wrapInBrackets && keybindingAccelerator !== "") {
       keybindingAccelerator = ` (${keybindingAccelerator})`;
     }

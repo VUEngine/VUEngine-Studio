@@ -140,6 +140,12 @@ export namespace VesEmulatorCommands {
     category: "Emulator",
   };
 
+  export const INPUT_TOGGLE_LOW_POWER: Command = {
+    id: "VesRun.commands.emulatorInputToggleLowPower",
+    label: "Toggle Low Power Signal",
+    category: "Emulator",
+  };
+
   export const INPUT_REWIND: Command = {
     id: "VesRun.commands.emulatorInputRewindCommand",
     label: "Rewind",

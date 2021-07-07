@@ -168,7 +168,7 @@ export class VesBuildWidget extends ReactWidget {
                             checked={this.preferenceService.get(VesBuildPrefs.DUMP_ELF.id)}
                             onClick={() =>
                               this.commandService.executeCommand(
-                                VesBuildCommands.TOGGLE_PEDANTIC_WARNINGS.id
+                                VesBuildCommands.TOGGLE_DUMP_ELF.id
                               )
                             }
                           />

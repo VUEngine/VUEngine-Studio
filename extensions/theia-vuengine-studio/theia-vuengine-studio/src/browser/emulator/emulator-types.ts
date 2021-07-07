@@ -62,7 +62,6 @@ export enum EmulatorGamePadKeyCode {
 
 export enum EmulatorFunctionKeyCode {
   ToggleFullscreen = "nul",
-  ToggleLowBattery = "KeyW",
   SaveState = "F4",
   LoadState = "F5",
   StateSlotDecrease = "F6",
@@ -70,6 +69,7 @@ export enum EmulatorFunctionKeyCode {
   ToggleFastForward = "ArrowRight",
   PauseToggle = "Space",
   ToggleSlowmotion = "ArrowDown",
+  ToggleLowPower = "KeyW",
   Rewind = "ArrowLeft",
   FrameAdvance = "ArrowUp",
   Reset = "F10",

@@ -120,6 +120,11 @@ export class VesRunKeybindingContribution implements KeybindingContribution {
       when: "emulatorFocus",
     });
     registry.registerKeybinding({
+      command: VesEmulatorCommands.INPUT_TOGGLE_LOW_POWER.id,
+      keybinding: "w",
+      when: "emulatorFocus",
+    });
+    registry.registerKeybinding({
       command: VesEmulatorCommands.INPUT_REWIND.id,
       keybinding: "left",
       when: "emulatorFocus",
