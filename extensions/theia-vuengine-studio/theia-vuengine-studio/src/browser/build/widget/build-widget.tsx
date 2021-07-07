@@ -370,15 +370,17 @@ export class VesBuildWidget extends ReactWidget {
               <div>
                 {this.vesState.buildStatus.log.map(
                   (line: BuildLogLine, index: number) => (
-                    <div
-                      className={`buildLogLine ${line.type}`}
-                      key={`buildLogLine${index}`}
-                    >
-                      <span className="timestamp">
-                        {new Date(line.timestamp).toTimeString().substr(0, 8)}
-                      </span>
-                      <span className="text">{line.text}</span>
-                    </div>
+                    line.text !== ''
+                      ? <div
+                        className={`buildLogLine ${line.type}`}
+                        key={`buildLogLine${index}`}
+                      >
+                        <span className="timestamp">
+                          {new Date(line.timestamp).toTimeString().substr(0, 8)}
+                        </span>
+                        <span className="text">{line.text}</span>
+                      </div>
+                      : <div className="buildLogLine"></div>
                   )
                 )}
                 <div ref={this.buildLogLastElementRef}></div>
@@ -390,8 +392,8 @@ export class VesBuildWidget extends ReactWidget {
           <select className="theia-select" title="Build">
             <option value="latest">
               {`✔ – ${new Date(
-                this.vesState.buildStatus.log[0]?.timestamp
-              ).toUTCString()} – ${this.vesState.buildStatus.buildMode}`}
+                          this.vesState.buildStatus.log[0]?.timestamp
+                        ).toUTCString()} – ${this.vesState.buildStatus.buildMode}`}
             </option>
           </select>
         </div> */}

@@ -112,6 +112,10 @@
   display: table-row;
 }
 
+#vesBuildWidget .buildLogLine:empty {
+  height: 10px;
+}
+
 #vesBuildWidget .buildLogLine:hover {
   background: rgba(0, 0, 0, 0.2);
 }

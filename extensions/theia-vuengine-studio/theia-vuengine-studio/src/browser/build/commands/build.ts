@@ -197,7 +197,7 @@ export class VesBuildBuildCommand {
   }
 
   protected parseBuildOutput(data: string) {
-    let text = data;
+    let text = data.trim();
     let type = BuildLogLineType.Normal;
 
     if (data.startsWith("STARTING BUILD")) {

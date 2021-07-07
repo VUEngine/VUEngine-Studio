@@ -125,7 +125,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                         backgroundImage: "linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) " + this.vesState.flashingProgress + "%, var(--theia-titleBar-hoverButtonBackground) " + this.vesState.flashingProgress + "%)"
                     } : {}}
                     title={this.vesState.isFlashQueued
-                        ? "Flash Queued..."
+                        ? "Flashing Queued..."
                         : this.vesState.isFlashing
                             ? "Flashing... " + this.vesState.flashingProgress + "%"
                             : `${VesFlashCartsCommands.FLASH.label}${this.commonFunctions.getKeybindingLabel(VesFlashCartsCommands.FLASH.id, true)}`}
