@@ -99,7 +99,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                 <button
                     className={"theia-button secondary build" + (this.vesState.buildStatus.active ? " active" : "")}
                     style={this.vesState.buildStatus.active ? {
-                        backgroundImage: "linear-gradient(90deg, rgba(74,169,78,0.6) 0%, rgba(74,169,78,0.6) " + this.vesState.buildStatus.progress + "%, rgba(0,0,0,0.6) " + this.vesState.buildStatus.progress + "%)"
+                        backgroundImage: "linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) " + this.vesState.buildStatus.progress + "%, var(--theia-titleBar-hoverButtonBackground) " + this.vesState.buildStatus.progress + "%)"
                     } : {}}
                     title={this.vesState.buildStatus.active
                         ? "Building... " + this.vesState.buildStatus.progress + "%"
@@ -118,12 +118,11 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                     {this.vesState.isRunQueued
                         ? <i className="fa fa-hourglass-half"></i>
                         : <i className="fa fa-play"></i>}
-
                 </button>
                 <button
                     className={"theia-button secondary flash" + (this.vesState.isFlashQueued ? " queued" : "") + (this.vesState.isFlashing ? " active" : "")}
                     style={this.vesState.isFlashing ? {
-                        backgroundImage: "linear-gradient(90deg, rgba(74,169,78,0.6) 0%, rgba(74,169,78,0.6) " + this.vesState.flashingProgress + "%, rgba(0,0,0,0.6) " + this.vesState.flashingProgress + "%)"
+                        backgroundImage: "linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) " + this.vesState.flashingProgress + "%, var(--theia-titleBar-hoverButtonBackground) " + this.vesState.flashingProgress + "%)"
                     } : {}}
                     title={this.vesState.isFlashQueued
                         ? "Flash Queued..."

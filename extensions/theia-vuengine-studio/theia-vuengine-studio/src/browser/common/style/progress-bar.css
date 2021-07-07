@@ -4,7 +4,7 @@
 
 .vesProgressBar div {
   color: var(--theia-button-foreground);
-  background-color: /*var(--theia-button-background)*/ #4aa94e;
+  background-color: var(--theia-progressBar-background);
   line-height: 32px;
   text-align: center;
   width: 0px;

@@ -12,6 +12,7 @@ import { bindVesWelcomeContributions } from "./welcome/welcome-frontend-module";
 import { bindTheiaCustomizationAboutDialogModule } from "./about/about-dialog-frontend-module";
 import { bindVesZoomContributions } from "./zoom/zoom-frontend-module";
 import { bindVesProjectsContributions } from "./projects/projects-frontend-module";
+import { bindVesThemeContributions } from "./themes/frontend-module";
 import "./themes/index";
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
@@ -28,4 +29,5 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
   bindTheiaCustomizationAboutDialogModule(bind, rebind);
   bindVesZoomContributions(bind);
   bindVesProjectsContributions(bind);
+  bindVesThemeContributions(bind);
 });

@@ -84,7 +84,7 @@ iframe#vesEmulatorFrame {
 }
 #vesEmulatorWidget .controlsOverlay .buttonAssignmentGroup > div:hover,
 #vesEmulatorWidget .controlsOverlay .buttonAssignmentGroup > div.highlighted {
-  background-color: #4aa94e;
+  background-color: var(--theia-button-background);
 }
 #vesEmulatorWidget .controlsOverlay .buttonAssignmentGroup > div > span {
   display: table-cell;
@@ -109,7 +109,7 @@ iframe#vesEmulatorFrame {
 }
 
 #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay {
-  border: 6px solid #4aa94e;
+  border: 6px solid var(--theia-button-background);
   opacity: 0;
   position: absolute;
 }

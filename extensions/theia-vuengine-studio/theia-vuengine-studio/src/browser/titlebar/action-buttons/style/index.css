@@ -22,7 +22,7 @@
 }
 
 #ves-titlebar-action-buttons .theia-button {
-  background-color: rgba(0,0,0,0.4);
+  background-color: var(--theia-titleBar-buttonBackground);
   border-radius: 3px;
   font-size: 17px;
   line-height: 27px;
@@ -37,12 +37,7 @@
 }
 
 #ves-titlebar-action-buttons .theia-button:hover {
-  background-color: rgba(0,0,0,0.6);
-}
-
-#ves-titlebar-action-buttons .theia-button[disabled] {
-  background-color: rgba(0,0,0,0.2);
-  opacity: unset;
+  background-color: var(--theia-titleBar-hoverButtonBackground);
 }
 
 #ves-titlebar-action-buttons .theia-button.build {
@@ -57,12 +52,12 @@
 
 @keyframes pulseQueued {
   0% {
-    background-color: rgba(0,0,0,0.6);
+    background-color: var(--theia-titleBar-buttonBackground);
   }
   50% {
-    background-color: rgba(74,169,78,0.6);
+    background-color: var(--theia-titleBar-hoverButtonBackground);
   }
   100% {
-    background-color: rgba(0,0,0,0.6);
+    background-color: var(--theia-titleBar-buttonBackground);
   }
 }

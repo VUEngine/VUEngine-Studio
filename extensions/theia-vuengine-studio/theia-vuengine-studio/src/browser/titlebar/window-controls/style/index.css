@@ -24,16 +24,8 @@
   width: 46px;
 }
 #ves-titlebar-window-controls .titlebar-window-controls-button:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--theia-titleBar-buttonBackground);
 }
 #ves-titlebar-window-controls .titlebar-window-controls-button:active {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--theia-titleBar-hoverButtonBackground);
 }
-/*
-#ves-titlebar-window-controls #ves-titlebar-window-controls-close:hover {
-  background: #e81123;
-}
-#ves-titlebar-window-controls #ves-titlebar-window-controls-close:active {
-  background: #f1707a;
-}
-*/
