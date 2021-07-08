@@ -12,8 +12,10 @@ export class VesAboutDialog extends AboutDialog {
 
     constructor() {
         super({
-            title: FrontendApplicationConfigProvider.get().applicationName,
+            title: '',
         });
+
+        this.titleNode.textContent = `About ${FrontendApplicationConfigProvider.get().applicationName}`;
 
         const updateButton = this.createButton("Check for Updates");
         // TODO: link respective command
@@ -65,16 +67,7 @@ export class VesAboutDialog extends AboutDialog {
             <hr className="ves-about-hr" />
             <div className="ves-about-paragraph">
                 <div>
-                    Built with <a href="#" onClick={() => this.openUrl(VesUrls.THEIA_WEBSITE)}>Eclipse Theia</a> – <a href="#" onClick={() => this.openUrl(VesUrls.LICENSE)}>Eclipse Public License 2.0</a> or
-                </div>
-                <div>
-                    <a href="#" onClick={() => this.openUrl(VesUrls.LICENSE)}>(Secondary) GNU General Public License, version 2 with the GNU Classpath Exception</a>
-                </div>
-            </div>
-            <hr className="ves-about-hr" />
-            <div className="ves-about-paragraph">
-                <div>
-                    Includes the following third party binaries:
+                    Built with <a href="#" onClick={() => this.openUrl(VesUrls.THEIA_WEBSITE)}>Eclipse Theia</a>. Includes the following third party binaries:
                 </div>
                 <ul>
                     <li>GCC <i>– The GNU Project, with patches for V810 by ElmerPCFX</i></li>
