@@ -8,7 +8,7 @@ import { VesBuildCommands } from "../../build/build-commands";
 import { VesState } from "../../common/ves-state";
 import { VesCommonFunctions } from "../../common/common-functions";
 import { PreferenceService } from "@theia/core/lib/browser";
-import { BuildMode } from "../../build/build-types";
+import { BuildMode, BuildResult } from "../../build/build-types";
 import { VesEmulatorCommands } from "../../emulator/emulator-commands";
 import { VesFlashCartsCommands } from "../../flash-carts/flash-carts-commands";
 import { VesBuildPrefs } from "../../build/build-preferences";
@@ -97,7 +97,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                         : <i className="fa fa-trash"></i>}
                 </button>
                 <button
-                    className={"theia-button secondary build" + (this.vesState.buildStatus.active ? " active" : "")}
+                    className={"theia-button secondary build" + (this.vesState.buildStatus.active ? " active" : (this.vesState.buildStatus.step == BuildResult.done as string && this.vesState.outputRomExists) ? " success" : (this.vesState.buildStatus.step == BuildResult.failed as string) ? " error" : "")}
                     style={this.vesState.buildStatus.active ? {
                         backgroundImage: "linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) " + this.vesState.buildStatus.progress + "%, var(--theia-titleBar-hoverButtonBackground) " + this.vesState.buildStatus.progress + "%)"
                     } : {}}

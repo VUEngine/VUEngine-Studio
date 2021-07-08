@@ -36,12 +36,18 @@
   width: 16px;
 }
 
-#ves-titlebar-action-buttons .theia-button:hover {
+#ves-titlebar-action-buttons .theia-button:enabled:hover {
   background-color: var(--theia-titleBar-hoverButtonBackground);
 }
 
 #ves-titlebar-action-buttons .theia-button.build {
   min-width: 64px;
+}
+#ves-titlebar-action-buttons .theia-button.build.success {
+  background-color: var(--theia-progressBar-background);
+}
+#ves-titlebar-action-buttons .theia-button.build.error {
+  background-color: red;
 }
 
 #ves-titlebar-action-buttons .theia-button.queued {

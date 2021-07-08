@@ -6,6 +6,12 @@ export enum BuildMode {
   Preprocessor = "Preprocessor",
 }
 
+export enum BuildResult {
+  aborted = "aborted",
+  done = "done",
+  failed = "failed",
+}
+
 export const DEFAULT_BUILD_MODE = BuildMode.Beta;
 
 export type BuildStatus = {

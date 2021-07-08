@@ -12,7 +12,7 @@ import { VesState } from "../../common/ves-state";
 import { VesProcessWatcher } from "../../services/process-service/process-watcher";
 import { VesBuildCommands } from "../build-commands";
 import { VesBuildPrefs } from "../build-preferences";
-import { BuildLogLineType, BuildMode } from "../build-types";
+import { BuildLogLineType, BuildMode, BuildResult } from "../build-types";
 
 @injectable()
 export class VesBuildBuildCommand {
@@ -48,7 +48,7 @@ export class VesBuildBuildCommand {
 
   abortBuild() {
     this.vesProcessService.killProcess(this.vesState.buildStatus.processManagerId);
-    this.vesState.resetBuildStatus("aborted");
+    this.vesState.resetBuildStatus(BuildResult.aborted);
   }
 
   protected async build() {
@@ -141,15 +141,15 @@ export class VesBuildBuildCommand {
   protected bindEvents() {
     this.vesProcessWatcher.onError(({ pId }) => {
       if (this.vesState.buildStatus.processManagerId === pId) {
-        this.vesState.resetBuildStatus("failed");
+        this.vesState.resetBuildStatus(BuildResult.failed);
       }
     });
 
     this.vesProcessWatcher.onExit(({ pId, event }) => {
       if (this.vesState.buildStatus.processManagerId === pId) {
         this.vesState.resetBuildStatus(event.code === 0
-          ? "done"
-          : "failed"
+          ? BuildResult.done
+          : BuildResult.failed
         );
       }
     });
@@ -197,30 +197,31 @@ export class VesBuildBuildCommand {
   }
 
   protected parseBuildOutput(data: string) {
-    let text = data.trim();
+    const text = data.trim();
+    const textLowerCase = text.toLowerCase();
     let type = BuildLogLineType.Normal;
 
-    if (data.startsWith("STARTING BUILD")) {
+    if (textLowerCase.startsWith("starting build")) {
       type = BuildLogLineType.Headline;
-    } else if (data.startsWith("BUILD FINISHED")) {
+    } else if (textLowerCase.startsWith("build finished")) {
       type = BuildLogLineType.Headline;
       this.vesState.buildStatus.progress = 100;
     } else if (
-      data.startsWith("Preprocessing ") ||
-      data.startsWith("Building ")
+      textLowerCase.startsWith("preprocessing ") ||
+      textLowerCase.startsWith("building ")
     ) {
       type = BuildLogLineType.Headline;
-      this.vesState.buildStatus.step = data.trimEnd();
+      this.vesState.buildStatus.step = text;
       this.vesState.buildStatus.stepsDone++;
       this.vesState.buildStatus.progress = Math.floor(
         (this.vesState.buildStatus.stepsDone * 100) /
         (this.vesState.buildStatus.plugins * 2 + 2)
       );
-    } else if (data.startsWith("make") || data.includes("Error: ")) {
+    } else if (textLowerCase.startsWith("make") || textLowerCase.includes("error: ")) {
       type = BuildLogLineType.Error;
-    } else if (data.includes("No such file or directory")) {
+    } else if (textLowerCase.includes("no such file or directory")) {
       type = BuildLogLineType.Error;
-    } else if (data.includes("warning: ")) {
+    } else if (textLowerCase.includes("warning: ")) {
       type = BuildLogLineType.Warning;
     }
 
