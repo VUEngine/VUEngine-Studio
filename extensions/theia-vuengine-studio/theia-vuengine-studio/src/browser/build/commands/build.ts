@@ -93,10 +93,10 @@ export class VesBuildBuildCommand {
       const args = [
         "cd", this.commonFunctions.convertoToEnvPath(workspaceRoot), "&&",
         "export", `PATH=${this.commonFunctions.convertoToEnvPath(joinPath(compilerPath, "bin"))}:$PATH`, "&&",
-        "make", "all", 
+        "make", "all",
         "-e", `TYPE=${buildMode}`,
-          `ENGINE_FOLDER=${this.commonFunctions.convertoToEnvPath(engineCorePath)}`,
-          `PLUGINS_FOLDER=${this.commonFunctions.convertoToEnvPath(enginePluginsPath)}`,
+        `ENGINE_FOLDER=${this.commonFunctions.convertoToEnvPath(engineCorePath)}`,
+        `PLUGINS_FOLDER=${this.commonFunctions.convertoToEnvPath(enginePluginsPath)}`,
         "-f", makefile,
       ];
 
@@ -133,9 +133,7 @@ export class VesBuildBuildCommand {
           ENGINE_FOLDER: this.commonFunctions.convertoToEnvPath(engineCorePath),
           LC_ALL: "C",
           MAKE_JOBS: this.getThreads(),
-          PATH:  process.env.PATH + ":" + joinPath(compilerPath, "bin")/* + ":" +
-            joinPath(compilerPath, "libexec", "gcc", "v810", "4.7.4") + ":" +
-            joinPath(compilerPath, "v810", "bin")*/,
+          PATH: [joinPath(compilerPath, "bin"), process.env.PATH].join(":"),
           PLUGINS_FOLDER: this.commonFunctions.convertoToEnvPath(enginePluginsPath),
           PRINT_PEDANTIC_WARNINGS: pedanticWarnings ? 1 : 0,
         },
@@ -296,8 +294,8 @@ export class VesBuildBuildCommand {
       "vuengine-studio-tools",
       this.commonFunctions.getOs(),
       "msys",
-      "usr", 
-      "bin", 
+      "usr",
+      "bin",
       "bash.exe"
     );
   }

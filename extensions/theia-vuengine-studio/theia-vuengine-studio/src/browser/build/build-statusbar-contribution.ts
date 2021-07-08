@@ -26,10 +26,10 @@ export class VesBuildStatusBarContribution implements FrontendApplicationContrib
     }
 
     setBuildModeStatusBar() {
-        let label = this.preferenceService.get(VesBuildPrefs.BUILD_MODE.id) || "Build Mode";;
+        let label = this.preferenceService.get(VesBuildPrefs.BUILD_MODE.id) || "Build Mode";
         let command = VesBuildCommands.SET_MODE.id;
         if (this.vesState.buildStatus.active) {
-            label = `${this.vesState.buildStatus.step}... ${this.vesState.buildStatus.progress}%`;
+            label = `Building... ${this.vesState.buildStatus.progress}%`;
             command = VesBuildCommands.OPEN_WIDGET.id;
         }
         this.statusBar.setElement("ves-build-mode", {
