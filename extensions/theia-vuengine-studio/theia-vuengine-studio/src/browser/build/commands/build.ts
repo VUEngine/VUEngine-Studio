@@ -6,6 +6,7 @@ import { PreferenceService, StorageService } from "@theia/core/lib/browser";
 import URI from "@theia/core/lib/common/uri";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
+import { ProcessOptions } from "@theia/process/lib/node";
 import { VesProcessService } from "../../../common/process-service-protocol";
 import { VesCommonFunctions } from "../../common/common-functions";
 import { VesState } from "../../common/ves-state";
@@ -52,62 +53,16 @@ export class VesBuildBuildCommand {
   }
 
   protected async build() {
-    const workspaceRoot = this.commonFunctions.getWorkspaceRoot();
-    const buildMode = this.preferenceService.get(VesBuildPrefs.BUILD_MODE.id) as string;
-    const dumpElf = this.preferenceService.get(VesBuildPrefs.DUMP_ELF.id) as boolean;
-    const pedanticWarnings = this.preferenceService.get(VesBuildPrefs.PEDANTIC_WARNINGS.id) as boolean;
-    const engineCorePath = await this.getEngineCorePath();
-    const enginePluginsPath = await this.getEnginePluginsPath();
-    const compilerPath = this.getCompilerPath();
     const plugins = await this.getPlugins();
-
-    const makefile = await this.getMakefilePath(workspaceRoot, engineCorePath);
 
     const romUri = new URI(this.commonFunctions.getRomPath());
     if (await this.fileService.exists(romUri)) {
       this.fileService.delete(romUri);
     }
 
-    // Support for building through WSL
-    // let shellPath = "";
-    // let shellArgs = [""];
-    // if (isWindows) {
-    //   const enableWsl = this.preferenceService.get(VesBuildEnableWslPreference.id);
-    //   if (enableWsl) {
-    //     shellPath = process.env.windir + '\\System32\\wsl.exe';
-    //   } else {
-    //     shellPath = joinPath(getResourcesPath(), "binaries", "vuengine-studio-tools", "win", "msys", "usr", "bin", "bash.exe");
-    //     shellArgs = ['--login'];
-    //   }
-    // }
-
     await this.fixPermissions();
 
-    const { processManagerId, processId } = await this.vesProcessService.launchProcess({
-      command: "make",
-      args: [
-        "all",
-        "-e", `TYPE=${buildMode.toLowerCase()}`,
-        "-f", makefile,
-        "-C", this.commonFunctions.convertoToEnvPath(workspaceRoot),
-      ],
-      options: {
-        cwd: workspaceRoot,
-        env: {
-          DUMP_ELF: dumpElf ? 1 : 0,
-          ENGINE_FOLDER: this.commonFunctions.convertoToEnvPath(engineCorePath),
-          LC_ALL: "C",
-          MAKE_JOBS: this.getThreads(),
-          PATH:
-            process.env.PATH + ":" +
-            joinPath(compilerPath, "bin") + ":" +
-            joinPath(compilerPath, "libexec", "gcc", "v810", "4.7.4") + ":" +
-            joinPath(compilerPath, "v810", "bin"),
-          PLUGINS_FOLDER: this.commonFunctions.convertoToEnvPath(enginePluginsPath),
-          PRINT_PEDANTIC_WARNINGS: pedanticWarnings ? 1 : 0,
-        },
-      },
-    });
+    const { processManagerId, processId } = await this.vesProcessService.launchProcess(await this.getBuildProcessParams());
 
     this.vesState.buildStatus = {
       active: true,
@@ -119,6 +74,72 @@ export class VesBuildBuildCommand {
       step: "Building",
       plugins: plugins.length,
       stepsDone: 0,
+    };
+  }
+
+  protected async getBuildProcessParams(): Promise<ProcessOptions> {
+    const workspaceRoot = this.commonFunctions.getWorkspaceRoot();
+    const buildMode = (this.preferenceService.get(VesBuildPrefs.BUILD_MODE.id) as string).toLowerCase();
+    const dumpElf = this.preferenceService.get(VesBuildPrefs.DUMP_ELF.id) as boolean;
+    const pedanticWarnings = this.preferenceService.get(VesBuildPrefs.PEDANTIC_WARNINGS.id) as boolean;
+    const engineCorePath = await this.getEngineCorePath();
+    const enginePluginsPath = await this.getEnginePluginsPath();
+    const compilerPath = this.getCompilerPath();
+    const makefile = await this.getMakefilePath(workspaceRoot, engineCorePath);
+
+    if (isWindows) {
+      // if (enableWsl) shellPath = process.env.windir + '\\System32\\wsl.exe';
+
+      const args = [
+        "cd", this.commonFunctions.convertoToEnvPath(workspaceRoot), "&&",
+        "export", `PATH=${this.commonFunctions.convertoToEnvPath(joinPath(compilerPath, "bin"))}:$PATH`, "&&",
+        "make", "all", 
+        "-e", `TYPE=${buildMode}`,
+          `ENGINE_FOLDER=${this.commonFunctions.convertoToEnvPath(engineCorePath)}`,
+          `PLUGINS_FOLDER=${this.commonFunctions.convertoToEnvPath(enginePluginsPath)}`,
+        "-f", makefile,
+      ];
+
+      return {
+        command: this.getMsysBashPath(),
+        args: [
+          "--login",
+          "-c", args.join(" "),
+        ],
+        options: {
+          cwd: workspaceRoot,
+          env: {
+            DUMP_ELF: dumpElf ? 1 : 0,
+            LC_ALL: "C",
+            MAKE_JOBS: this.getThreads(),
+            PRINT_PEDANTIC_WARNINGS: pedanticWarnings ? 1 : 0,
+          },
+        },
+      };
+    }
+
+    return {
+      command: "make",
+      args: [
+        "all",
+        "-e", `TYPE=${buildMode}`,
+        "-f", makefile,
+        "-C", this.commonFunctions.convertoToEnvPath(workspaceRoot),
+      ],
+      options: {
+        cwd: workspaceRoot,
+        env: {
+          DUMP_ELF: dumpElf ? 1 : 0,
+          ENGINE_FOLDER: this.commonFunctions.convertoToEnvPath(engineCorePath),
+          LC_ALL: "C",
+          MAKE_JOBS: this.getThreads(),
+          PATH:  process.env.PATH + ":" + joinPath(compilerPath, "bin")/* + ":" +
+            joinPath(compilerPath, "libexec", "gcc", "v810", "4.7.4") + ":" +
+            joinPath(compilerPath, "v810", "bin")*/,
+          PLUGINS_FOLDER: this.commonFunctions.convertoToEnvPath(enginePluginsPath),
+          PRINT_PEDANTIC_WARNINGS: pedanticWarnings ? 1 : 0,
+        },
+      },
     };
   }
 
@@ -170,30 +191,32 @@ export class VesBuildBuildCommand {
    * even right after reconfiguring engine paths.
    */
   protected async fixPermissions() {
+    if (isWindows) {
+      return;
+    }
+
     const engineCorePath = await this.getEngineCorePath();
     const compilerPath = this.getCompilerPath();
 
-    if (!isWindows) {
-      await Promise.all([
-        this.vesProcessService.launchProcess({
-          command: "chmod",
-          args: ["-R", "a+x", joinPath(compilerPath, "bin")],
-        }),
-        this.vesProcessService.launchProcess({
-          command: "chmod",
-          args: ["-R", "a+x", joinPath(compilerPath, "libexec")],
-        }),
-        this.vesProcessService.launchProcess({
-          command: "chmod",
-          args: ["-R", "a+x", joinPath(compilerPath, "v810", "bin")],
-        }),
-        this.vesProcessService.launchProcess({
-          command: "chmod",
-          args: ["-R", "a+x", joinPath(engineCorePath, "lib", "compiler", "preprocessor"),
-          ],
-        }),
-      ]);
-    }
+    await Promise.all([
+      this.vesProcessService.launchProcess({
+        command: "chmod",
+        args: ["-R", "a+x", joinPath(compilerPath, "bin")],
+      }),
+      this.vesProcessService.launchProcess({
+        command: "chmod",
+        args: ["-R", "a+x", joinPath(compilerPath, "libexec")],
+      }),
+      this.vesProcessService.launchProcess({
+        command: "chmod",
+        args: ["-R", "a+x", joinPath(compilerPath, "v810", "bin")],
+      }),
+      this.vesProcessService.launchProcess({
+        command: "chmod",
+        args: ["-R", "a+x", joinPath(engineCorePath, "lib", "compiler", "preprocessor"),
+        ],
+      }),
+    ]);
   }
 
   protected parseBuildOutput(data: string) {
@@ -217,12 +240,7 @@ export class VesBuildBuildCommand {
         (this.vesState.buildStatus.stepsDone * 100) /
         (this.vesState.buildStatus.plugins * 2 + 2)
       );
-    } else if (
-      (textLowerCase.startsWith("make") && !textLowerCase.startsWith("make jobs"))
-      || textLowerCase.includes("error: ")
-    ) {
-      type = BuildLogLineType.Error;
-    } else if (textLowerCase.includes("no such file or directory")) {
+    } else if (textLowerCase.includes("error: ") || textLowerCase.includes(" not found") || textLowerCase.includes("no such file or directory")) {
       type = BuildLogLineType.Error;
     } else if (textLowerCase.includes("warning: ")) {
       type = BuildLogLineType.Warning;
@@ -271,9 +289,18 @@ export class VesBuildBuildCommand {
     );
   }
 
-  // protected getMsysPath() {
-  //   return joinPath(getResourcesPath(), "binaries", "vuengine-studio-tools", "win", "msys");
-  // }
+  protected getMsysBashPath() {
+    return joinPath(
+      this.commonFunctions.getResourcesPath(),
+      "binaries",
+      "vuengine-studio-tools",
+      this.commonFunctions.getOs(),
+      "msys",
+      "usr", 
+      "bin", 
+      "bash.exe"
+    );
+  }
 
   protected getThreads() {
     let threads = cpus().length;

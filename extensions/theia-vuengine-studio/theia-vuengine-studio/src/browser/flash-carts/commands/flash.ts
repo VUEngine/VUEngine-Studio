@@ -133,13 +133,15 @@ export class VesFlashCartsFlashCommand {
    * even right after reconfiguring paths.
    */
   protected async fixPermissions() {
-    if (!isWindows) {
-      for (const connectedFlashCart of this.vesState.connectedFlashCarts) {
-        await this.vesProcessService.launchProcess({
-          command: "chmod",
-          args: ["a+x", connectedFlashCart.config.path]
-        });
-      }
+    if (isWindows) {
+      return
+    }
+
+    for (const connectedFlashCart of this.vesState.connectedFlashCarts) {
+      await this.vesProcessService.launchProcess({
+        command: "chmod",
+        args: ["a+x", connectedFlashCart.config.path]
+      });
     }
   }
 
