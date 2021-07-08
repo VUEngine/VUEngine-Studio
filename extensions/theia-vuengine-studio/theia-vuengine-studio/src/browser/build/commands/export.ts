@@ -1,4 +1,4 @@
-import { injectable, inject } from "inversify";
+import { injectable, inject, postConstruct } from "inversify";
 import { CommandService, environment } from "@theia/core";
 import { CommonCommands, ConfirmDialog } from "@theia/core/lib/browser";
 import URI from "@theia/core/lib/common/uri";
@@ -15,6 +15,20 @@ export class VesBuildExportCommand {
   @inject(FileDialogService) protected readonly fileDialogService: FileDialogService;
   @inject(VesCommonFunctions) protected readonly commonFunctions: VesCommonFunctions;
   @inject(VesState) protected readonly vesState: VesState;
+
+  @postConstruct()
+  protected init(): void {
+    this.bindEvents();
+  }
+
+  protected bindEvents() {
+    this.vesState.onDidChangeOutputRomExists(outputRomExists => {
+      if (outputRomExists && this.vesState.isExportQueued) {
+        this.vesState.isExportQueued = false;
+        this.exportRom();
+      }
+    })
+  }
 
   async execute() {
     if (this.vesState.isExportQueued) {

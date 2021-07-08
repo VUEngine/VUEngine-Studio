@@ -10,7 +10,7 @@ import { VesBuildCommands } from "../build-commands";
 import { VesState } from "../../common/ves-state";
 import { VesBuildBuildCommand } from "../commands/build";
 import { VesBuildPrefs } from "../build-preferences";
-import { BuildLogLine, BuildLogLineType, BuildMode } from "../build-types";
+import { BuildLogLine, BuildLogLineType, BuildMode, BuildResult } from "../build-types";
 
 @injectable()
 export class VesBuildWidget extends ReactWidget {
@@ -304,7 +304,7 @@ export class VesBuildWidget extends ReactWidget {
                     <i className="fa fa-cog fa-spin"></i>{" "}
                     {this.vesState.buildStatus.step}...
                   </div>
-                ) : this.vesState.buildStatus.step === "done" ? (
+                ) : this.vesState.buildStatus.step === BuildResult.done ? (
                   <div className="success">
                     <i className="fa fa-check"></i> Build successful
                   </div>

@@ -10,7 +10,7 @@ import { VesBuildPrefs } from "../build/build-preferences";
 import { VesEmulatorPrefs } from "../emulator/emulator-preferences";
 import { EmulatorConfig } from "../emulator/emulator-types";
 import { VesFlashCartWatcher } from "../services/flash-cart-service/flash-cart-watcher";
-import { BuildLogLine, BuildMode, BuildStatus } from "../build/build-types";
+import { BuildLogLine, BuildMode, BuildResult, BuildStatus } from "../build/build-types";
 import { VesFlashCartService } from "../../common/flash-cart-service-protocol";
 import { VesFlashCartsPrefs } from "../flash-carts/flash-carts-preferences";
 import { getDefaultEmulatorConfig, getEmulatorConfigs } from "../emulator/emulator-functions";
@@ -225,9 +225,11 @@ export class VesState {
 
     this.buildStatus = newBuildStatus;
 
-    this.isExportQueued = false;
-    this.isRunQueued = false;
-    this.isFlashQueued = false;
+    if (step !== BuildResult.done) {
+      this.isExportQueued = false;
+      this.isRunQueued = false;
+      this.isFlashQueued = false;
+    }
   }
   public pushBuildLogLine(buildLogLine: BuildLogLine) {
     this._buildStatus.log.push(buildLogLine);

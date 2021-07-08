@@ -59,7 +59,7 @@ export class VesEmulatorRunCommand {
 
       if (!emulatorPath) {
         // TODO: error message
-       return;
+        return;
       }
 
       await this.fixPermissions(emulatorPath);
@@ -79,7 +79,7 @@ export class VesEmulatorRunCommand {
    * Must be executed before every run to ensure permissions are right,
    * even right after reconfiguring paths.
    */
-   protected async fixPermissions(emulatorPath: string) {
+  protected async fixPermissions(emulatorPath: string) {
     if (!isWindows && emulatorPath) {
       await this.vesProcessService.launchProcess({
         command: "chmod",

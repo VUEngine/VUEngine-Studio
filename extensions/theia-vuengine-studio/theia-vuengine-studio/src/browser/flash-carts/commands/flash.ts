@@ -49,6 +49,10 @@ export class VesFlashCartsFlashCommand {
   }
 
   async flash() {
+    if (this.vesState.connectedFlashCarts.length === 0) {
+      return;
+    }
+
     for (const connectedFlashCart of this.vesState.connectedFlashCarts) {
       if (!connectedFlashCart.config.path) {
         this.messageService.error(
@@ -107,7 +111,7 @@ export class VesFlashCartsFlashCommand {
     }
 
     this.vesState.isFlashing = true;
-    this.commandService.executeCommand(VesFlashCartsCommands.OPEN_WIDGET.id, true);
+    //this.commandService.executeCommand(VesFlashCartsCommands.OPEN_WIDGET.id, true);
   }
 
   abort() {

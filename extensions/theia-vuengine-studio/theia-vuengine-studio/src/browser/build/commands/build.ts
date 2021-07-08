@@ -217,7 +217,10 @@ export class VesBuildBuildCommand {
         (this.vesState.buildStatus.stepsDone * 100) /
         (this.vesState.buildStatus.plugins * 2 + 2)
       );
-    } else if (textLowerCase.startsWith("make") || textLowerCase.includes("error: ")) {
+    } else if (
+      (textLowerCase.startsWith("make") && !textLowerCase.startsWith("make jobs"))
+      || textLowerCase.includes("error: ")
+    ) {
       type = BuildLogLineType.Error;
     } else if (textLowerCase.includes("no such file or directory")) {
       type = BuildLogLineType.Error;
