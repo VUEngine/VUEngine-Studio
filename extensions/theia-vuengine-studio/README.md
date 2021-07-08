@@ -17,6 +17,8 @@ Install yarn.
 
     npm install -g yarn
 
+Install Python.
+
 ## Running the browser example
 
     yarn start:browser
