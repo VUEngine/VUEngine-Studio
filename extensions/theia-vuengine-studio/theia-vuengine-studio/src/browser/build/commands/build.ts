@@ -234,10 +234,7 @@ export class VesBuildBuildCommand {
       type = BuildLogLineType.Headline;
       this.vesState.buildStatus.step = text;
       this.vesState.buildStatus.stepsDone++;
-      this.vesState.buildStatus.progress = Math.floor(
-        (this.vesState.buildStatus.stepsDone * 100) /
-        (this.vesState.buildStatus.plugins * 2 + 2)
-      );
+      this.vesState.buildStatus.progress = this.computeProgress();
     } else if (textLowerCase.includes("error: ") || textLowerCase.includes(" not found") || textLowerCase.includes("no such file or directory")) {
       type = BuildLogLineType.Error;
     } else if (textLowerCase.includes("warning: ")) {
@@ -310,7 +307,8 @@ export class VesBuildBuildCommand {
   }
 
   protected async getPlugins() {
-    let plugins = [];
+    let allPlugins: string[] = [];
+    const enginePluginsPath = await this.getEnginePluginsPath();
 
     // get project's plugins
     try {
@@ -322,34 +320,42 @@ export class VesBuildBuildCommand {
         )
       );
       const configFileContents = await this.fileService.readFile(configFileUri);
-      plugins = JSON.parse(configFileContents.value.toString());
-    } catch (e) { }
+      const projectPlugins = JSON.parse(configFileContents.value.toString());
+      allPlugins = projectPlugins;
 
-    // for each of the project's plugins, get it's dependencies
-    // TODO: we only search one level deep here, recurse instead
-    plugins.map(async (pluginName: string) => {
-      const pluginFileUri = new URI(
-        joinPath(
-          await this.getEnginePluginsPath(),
-          ...pluginName.split("/"),
-          ".vuengine",
-          "plugins.json"
-        )
-      );
+      // for each of the project's plugins, get its dependencies
+      // TODO: we only search one level deep here, recurse instead
+      await Promise.all(projectPlugins.map(async (pluginName: string) => {
+        const pluginFileUri = new URI(
+          joinPath(
+            enginePluginsPath,
+            ...pluginName.split("/"),
+            ".vuengine",
+            "plugins.json"
+          )
+        );
 
-      try {
         const pluginFileContents = await this.fileService.readFile(
           pluginFileUri
         );
         JSON.parse(pluginFileContents.value.toString()).map(
           (plugin: string) => {
-            plugins.push(plugin);
+            if (!allPlugins.includes(plugin)) {
+              allPlugins.push(plugin);
+            }
           }
         );
-      } catch (e) { }
-    });
+      }));
+    } catch (e) { }
 
     // remove duplicates and return
-    return [...new Set(plugins)];
+    return allPlugins;
+  }
+
+  protected computeProgress() {
+    return Math.floor(
+      ((this.vesState.buildStatus.stepsDone - 1) * 100) /
+      ((this.vesState.buildStatus.plugins + 2) * 2)
+    );
   }
 }
