@@ -113,7 +113,7 @@
 }
 
 #vesBuildWidget .buildLogLine:empty {
-  height: 10px;
+  height: 6px;
 }
 
 #vesBuildWidget .buildLogLine:hover {
@@ -135,9 +135,6 @@
 
 #vesBuildWidget .buildLogLine.headline .text {
   font-weight: bold;
-}
-#vesBuildWidget .buildLogLine.headline .text:before {
-  content: "➜ ";
 }
 
 #vesBuildWidget .buildLogLine.warning .text {

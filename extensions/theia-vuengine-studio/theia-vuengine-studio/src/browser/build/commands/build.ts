@@ -14,6 +14,7 @@ import { VesProcessWatcher } from "../../services/process-service/process-watche
 import { VesBuildCommands } from "../build-commands";
 import { VesBuildPrefs } from "../build-preferences";
 import { BuildLogLineType, BuildMode, BuildResult } from "../build-types";
+import { integer } from "@theia/core/shared/vscode-languageserver-types";
 
 @injectable()
 export class VesBuildBuildCommand {
@@ -73,7 +74,6 @@ export class VesBuildBuildCommand {
       buildMode: this.preferenceService.get(VesBuildPrefs.BUILD_MODE.id) as BuildMode,
       step: "Building",
       plugins: plugins.length,
-      stepsDone: 0,
     };
   }
 
@@ -222,19 +222,27 @@ export class VesBuildBuildCommand {
     const textLowerCase = text.toLowerCase();
     let type = BuildLogLineType.Normal;
 
+    const headlineRegex = /\((\d+)\/(\d+)\) (preprocessing (.+)|building (.+))/gi;
+    const headlineMatches: string[] = [];
+    let m;
+    while ((m = headlineRegex.exec(text)) !== null) {
+      if (m.index === headlineRegex.lastIndex) {
+        headlineRegex.lastIndex++;
+      }
+      m.forEach((match, groupIndex) => {
+        headlineMatches[groupIndex] = match;
+      });
+    }
+
     if (textLowerCase.startsWith("starting build")) {
       type = BuildLogLineType.Headline;
+    } else if (headlineMatches.length) {
+      type = BuildLogLineType.Headline;
+      this.vesState.buildStatus.step = headlineMatches[3] as unknown as string;
+      this.vesState.buildStatus.progress = this.computeProgress(headlineMatches);
     } else if (textLowerCase.startsWith("build finished")) {
       type = BuildLogLineType.Headline;
       this.vesState.buildStatus.progress = 100;
-    } else if (
-      textLowerCase.startsWith("preprocessing ") ||
-      textLowerCase.startsWith("building ")
-    ) {
-      type = BuildLogLineType.Headline;
-      this.vesState.buildStatus.step = text;
-      this.vesState.buildStatus.stepsDone++;
-      this.vesState.buildStatus.progress = this.computeProgress();
     } else if (textLowerCase.includes("error: ") || textLowerCase.includes(" not found") || textLowerCase.includes("no such file or directory")) {
       type = BuildLogLineType.Error;
     } else if (textLowerCase.includes("warning: ")) {
@@ -352,10 +360,11 @@ export class VesBuildBuildCommand {
     return allPlugins;
   }
 
-  protected computeProgress() {
-    return Math.floor(
-      ((this.vesState.buildStatus.stepsDone - 1) * 100) /
-      ((this.vesState.buildStatus.plugins + 2) * 2)
-    );
+  protected computeProgress(matches: string[]): integer {
+    const stepsDone = parseInt(matches[1]) ?? 0;
+    const stepsTotal = parseInt(matches[2]) ?? 1;
+
+    // each headline indicates that a new chunk of work is being _started_, not finishing, hence -1
+    return Math.floor((stepsDone - 1) * 100 / stepsTotal);
   }
 }

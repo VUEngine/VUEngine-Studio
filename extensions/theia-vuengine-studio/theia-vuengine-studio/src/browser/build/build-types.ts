@@ -23,7 +23,6 @@ export type BuildStatus = {
   buildMode: BuildMode;
   step: string;
   plugins: number;
-  stepsDone: number;
 };
 
 export type BuildLogLine = {
