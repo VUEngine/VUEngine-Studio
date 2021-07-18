@@ -33,17 +33,6 @@ yarn modules:update
 Documentation on how to package Theia as a Desktop Product may be found [here](https://theia-ide.org/docs/blueprint_documentation/)
 
 
-### Repository structure
-
-- Root level configures mono-repo build with lerna
-- `applications` groups the different app targets
-  - `electron` contains app to package, packaging configuration, and E2E tests for the electron target.
-- `extensions` groups the various custom theia extensions for VUEngine Studio
-  - `vuengine-studio-branding` contains a Theia extension contributing the product branding (about dialog, welcome page, various modifications, title bar, etc).
-  - `vuengine-studio-projects` contains a Theia extension contributing project management functionality.
-  - `vuengine-studio-updater` contains a Theia extension contributing the update mechanism and corresponding UI elements (based on the electron updater).
-
-
 ### Build
 
 ```sh

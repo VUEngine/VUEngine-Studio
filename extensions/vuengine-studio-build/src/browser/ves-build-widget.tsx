@@ -79,19 +79,16 @@ export class VesBuildWidget extends ReactWidget {
             this.vesBuildService.buildStatus.progress > -1 && (
               <div className='buildPanel'>
                 <div className='vesProgressBar'>
-                  <div
-                    style={{ width: this.vesBuildService.buildStatus.progress + '%' }}
-                  >
-                    <span>
-                      {this.vesBuildService.buildStatus.progress === 100 ? (
-                        <>
-                          <i className='fa fa-check'></i> Done
-                        </>
-                      ) : (
-                        <>{this.vesBuildService.buildStatus.progress}%</>
-                      )}
-                    </span>
-                  </div>
+                  <div style={{ width: this.vesBuildService.buildStatus.progress + '%' }}></div>
+                  <span>
+                    {this.vesBuildService.buildStatus.progress === 100 ? (
+                      <>
+                        <i className='fa fa-check'></i> Done
+                      </>
+                    ) : (
+                      <>{this.vesBuildService.buildStatus.progress}%</>
+                    )}
+                  </span>
                 </div>
               </div>
             )}

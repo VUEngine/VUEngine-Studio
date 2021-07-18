@@ -80,17 +80,16 @@ export class VesFlashCartWidget extends ReactWidget {
           {!this.vesFlashCartService.isQueued && this.vesFlashCartService.flashingProgress > -1 && (
             <div className='flashingPanel'>
               <div className='vesProgressBar'>
-                <div style={{ width: this.vesFlashCartService.flashingProgress + '%' }}>
-                  <span>
-                    {this.vesFlashCartService.flashingProgress === 100 ? (
-                      <>
-                        <i className='fa fa-check'></i> Done
-                      </>
-                    ) : (
-                      <>{this.vesFlashCartService.flashingProgress}%</>
-                    )}
-                  </span>
-                </div>
+                <div style={{ width: this.vesFlashCartService.flashingProgress + '%' }}></div>
+                <span>
+                  {this.vesFlashCartService.flashingProgress === 100 ? (
+                    <>
+                      <i className='fa fa-check'></i> Done
+                    </>
+                  ) : (
+                    <>{this.vesFlashCartService.flashingProgress}%</>
+                  )}
+                </span>
               </div>
             </div>
           )}
