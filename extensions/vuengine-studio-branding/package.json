@@ -30,8 +30,8 @@
   },
   "theiaExtensions": [
     {
-      "frontendElectron": "lib/electron-browser/electron-frontend-module",
-      "electronMain": "lib/electron-main/electron-main-application-module"
+      "frontendElectron": "lib/electron-browser/ves-branding-electron-frontend-module",
+      "electronMain": "lib/electron-main/ves-branding-electron-main-application-module"
     },
     {
       "frontend": "lib/browser/ves-branding-frontend-module",

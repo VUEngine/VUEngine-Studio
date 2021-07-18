@@ -1,5 +1,5 @@
 import { inject, injectable, postConstruct } from 'inversify';
-import { basename, dirname, join as joinPath } from 'path';
+import { basename, dirname, join as joinPath, sep } from 'path';
 import { env } from 'process';
 import { createWriteStream, readFileSync, unlinkSync } from 'fs';
 import { CommandService, isOSX, isWindows, MessageService } from '@theia/core/lib/common';
@@ -189,12 +189,12 @@ export class VesFlashCartService {
         continue;
       }
 
-      const flasherEnvPath = this.convertoToEnvPath(connectedFlashCart.config.path);
+      /* const flasherEnvPath = this.convertoToEnvPath(connectedFlashCart.config.path);
 
       const enableWsl = this.preferenceService.get(VesBuildPreferenceIds.ENABLE_WSL);
       if (isWindows && enableWsl) {
         flasherEnvPath.replace(/\.[^/.]+$/, '');
-      }
+      } */
 
       const romPath = connectedFlashCart.config.padRom &&
         await this.padRom(connectedFlashCart.config.size)
@@ -209,13 +209,21 @@ export class VesFlashCartService {
 
       await this.fixPermissions();
 
+      console.log(
+        'command', `.${sep}${basename(connectedFlashCart.config.path)}`,
+        'args', flasherArgs,
+        'cwd', dirname(connectedFlashCart.config.path),
+      );
+
       const { processManagerId } = await this.vesProcessService.launchProcess({
-        command: joinPath('.', basename(connectedFlashCart.config.path)),
+        command: `.${sep}${basename(connectedFlashCart.config.path)}`,
         args: flasherArgs,
         options: {
           cwd: dirname(connectedFlashCart.config.path),
         },
       });
+
+      console.log('processManagerId', processManagerId);
 
       connectedFlashCart.status = {
         ...connectedFlashCart.status,
@@ -270,7 +278,7 @@ export class VesFlashCartService {
     this.vesBuildService.onDidChangeOutputRomExists(outputRomExists => {
       if (outputRomExists && this.isQueued) {
         this.isQueued = false;
-        // this.flash();
+        this.doFlash();
       }
     });
 

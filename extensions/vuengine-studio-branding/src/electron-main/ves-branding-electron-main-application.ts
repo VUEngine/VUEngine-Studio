@@ -9,6 +9,7 @@ import { VesFlashCartCommands } from 'vuengine-studio-flash-cart/lib/browser/ves
 import { BuildMode } from 'vuengine-studio-build/lib/browser/ves-build-types';
 
 import { VesTouchBarIcons } from './icons/touch-bar-icons';
+import { VesTouchBarCommands } from 'src/common/ves-branding-types';
 
 @injectable()
 export class VesElectronMainApplication extends ElectronMainApplication {
@@ -33,7 +34,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
     protected registerVesTouchBar(electronWindow: BrowserWindow): void {
         const { TouchBarButton, TouchBarLabel, TouchBarPopover, TouchBarSegmentedControl } = TouchBar;
 
-        const vesIcon = nativeImage.createFromDataURL(VesTouchBarIcons.VES).resize({ height: 16 });
+        // const vesIcon = nativeImage.createFromDataURL(VesTouchBarIcons.VES).resize({ height: 16 });
         const cleanIcon = nativeImage.createFromDataURL(VesTouchBarIcons.CLEAN).resize({ height: 16 });
         const buildIcon = nativeImage.createFromDataURL(VesTouchBarIcons.BUILD).resize({ height: 18 });
         // const buildIconWide = nativeImage.createFromDataURL(VesTouchBarIcons.BUILD_WIDE).resize({ height: 18 });
@@ -67,12 +68,12 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         //     nativeImage.createFromDataURL(VesTouchBarIcons.SPINNER_WIDE[7]).resize({ height: spinnerIconSize }),
         // ];
 
-        const vesButton = new TouchBarButton({
+        /* const vesButton = new TouchBarButton({
             backgroundColor: '#a22929',
             icon: vesIcon,
-            // click: () => app.emit('ves-execute-command', 'core.about'),
-            click: () => app.emit('ves-execute-command', 'workbench.action.showCommands'),
-        });
+            // click: () => app.emit(VesTouchBarCommands.executeCommand, 'core.about'),
+            click: () => app.emit(VesTouchBarCommands.executeCommand, 'workbench.action.showCommands'),
+        }); */
 
         const buildMenuCleanButton = new TouchBarButton({
             icon: cleanIcon,
@@ -108,7 +109,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             selectedIndex: 0,
             mode: 'buttons',
             segments: buildMenuSegmentedControlSegments,
-            change: selectedIndex => app.emit('ves-execute-command', buildMenuSegmentedControlSegments[selectedIndex].accessibilityLabel),
+            change: selectedIndex => app.emit(VesTouchBarCommands.executeCommand, buildMenuSegmentedControlSegments[selectedIndex].accessibilityLabel),
         });
 
         const buildModes = [{
@@ -128,7 +129,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             mode: 'single',
             segments: buildModes,
             selectedIndex: 1,
-            change: selectedIndex => app.emit('ves-set-build-mode', buildModes[selectedIndex].label),
+            change: selectedIndex => app.emit(VesTouchBarCommands.setBuildMode, buildModes[selectedIndex].label),
         });
 
         const buildModeButton = new TouchBarPopover({
@@ -144,12 +145,12 @@ export class VesElectronMainApplication extends ElectronMainApplication {
 
         const MenuButton = new TouchBarButton({
             icon: menuIcon,
-            click: () => app.emit('ves-execute-command', 'workbench.action.showCommands'),
+            click: () => app.emit(VesTouchBarCommands.executeCommand, 'workbench.action.showCommands'),
         });
 
         const vesTouchBar = new TouchBar({
             items: [
-                vesButton,
+                // vesButton,
                 buildMenuSegmentedControl,
                 buildModeButton,
                 MenuButton,
@@ -159,11 +160,11 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         electronWindow.setTouchBar(vesTouchBar);
 
         // @ts-ignore
-        app.on('ves-change-build-mode', (buildMode: BuildMode) => {
+        app.on(VesTouchBarCommands.changeBuildMode, (buildMode: BuildMode) => {
             buildModeButton.label = buildMode.replace('Preprocessor', 'Preproc.');
         });
         // @ts-ignore
-        app.on('ves-change-build-status', (buildStatus: BuildStatus) => {
+        app.on(VesTouchBarCommands.changeBuildStatus, (buildStatus: BuildStatus) => {
             if (buildStatus.active) {
                 if (!spinnerIconIntervall) {
                     spinnerIconIntervall = setInterval(() => animateSpinner(buildMenuBuildButton), 200);
@@ -178,17 +179,17 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             }
         });
         // @ts-ignore
-        app.on('ves-change-is-run-queued', (isQueued: boolean) => {
+        app.on(VesTouchBarCommands.changeIsRunQueued, (isQueued: boolean) => {
             buildMenuRunButton.icon = isQueued ? queuedIcon : runIcon;
             redrawMenuSegmentedControl();
         });
         // @ts-ignore
-        app.on('ves-change-is-flash-queued', (isQueued: boolean) => {
+        app.on(VesTouchBarCommands.changeIsFlashQueued, (isQueued: boolean) => {
             buildMenuFlashButton.icon = isQueued ? queuedIcon : flashIcon;
             redrawMenuSegmentedControl();
         });
         // @ts-ignore
-        app.on('ves-change-is-flashing', (isFlashing: boolean) => {
+        app.on(VesTouchBarCommands.changeIsFlashing, (isFlashing: boolean) => {
             if (isFlashing) {
                 if (!spinnerIconIntervall) {
                     spinnerIconIntervall = setInterval(() => animateSpinner(buildMenuFlashButton), 200);
@@ -203,17 +204,17 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             }
         });
         // @ts-ignore
-        app.on('ves-change-is-export-queued', (isQueued: boolean) => {
+        app.on(VesTouchBarCommands.changeIsExportQueued, (isQueued: boolean) => {
             buildMenuExportButton.icon = isQueued ? queuedIcon : exportIcon;
             redrawMenuSegmentedControl();
         });
         // @ts-ignore
-        app.on('ves-change-connected-flash-cart', flashCartConfig => {
+        app.on(VesTouchBarCommands.changeConnectedFlashCart, flashCartConfig => {
             buildMenuFlashButton.enabled = !!flashCartConfig;
             redrawMenuSegmentedControl();
         });
         // @ts-ignore
-        app.on('ves-change-build-folder', flags => {
+        app.on(VesTouchBarCommands.changeBuildFolder, flags => {
             const buildMode = buildModeButton.label;
             buildMenuCleanButton.enabled = flags[buildMode];
             redrawMenuSegmentedControl();

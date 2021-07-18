@@ -29,7 +29,7 @@ export class VesPreferenceTreeGenerator extends PreferenceTreeGenerator {
         ['comments', 'features'],
         ['debug', 'features'],
         ['emulator', 'features'], // custom category
-        ['flash-carts', 'features'], // custom category
+        ['flashCarts', 'features'], // custom category
         ['explorer', 'features'],
         ['extensions', 'features'],
         ['hosted-plugin', 'features'],

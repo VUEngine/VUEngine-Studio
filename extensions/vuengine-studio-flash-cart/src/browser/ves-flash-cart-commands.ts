@@ -10,7 +10,7 @@ export namespace VesFlashCartCommands {
 
   export const OPEN_WIDGET: Command = {
     id: 'vesFlashCart.commands.openWidget',
-    label: 'Open Flash Carts Widget',
+    label: 'Toggle Flash Carts Widget',
     category: 'Flash',
     iconClass: 'fa fa-usb',
   };

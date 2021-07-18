@@ -40,6 +40,21 @@ yarn
 ```
 
 
+### Development
+
+Open two terminals and execute one of the following commands in each.
+
+```sh
+yarn watch
+```
+
+```sh
+yarn electron start
+```
+
+The first will do an incremental build on every code change you do. The latter will start the Electron frontend. Reload (CMD/Ctrl+R) to load your changes.
+
+
 ### Package the application
 
 ```sh
