@@ -10,7 +10,8 @@ import { VesEmulatorService } from 'vuengine-studio-emulator/lib/browser/ves-emu
 import { VesEmulatorPreferenceIds } from 'vuengine-studio-emulator/lib/browser/ves-emulator-preferences';
 import { VesFlashCartService } from 'vuengine-studio-flash-cart/lib/browser/ves-flash-cart-service';
 import { VesExportService } from 'vuengine-studio-export/lib/browser/ves-export-service';
-import { VesTouchBarCommands } from 'src/common/ves-branding-types';
+
+import { VesTouchBarCommands } from '../common/ves-branding-types';
 
 @injectable()
 export class VesElectronMenuContribution extends ElectronMenuContribution {

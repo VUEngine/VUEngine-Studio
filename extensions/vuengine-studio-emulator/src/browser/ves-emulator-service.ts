@@ -1,5 +1,5 @@
 import { inject, injectable, postConstruct } from 'inversify';
-import { basename, dirname, join as joinPath, sep } from 'path';
+import { dirname, join as joinPath } from 'path';
 import { CommandService, isWindows } from '@theia/core/lib/common';
 import { ApplicationShell, OpenerService, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';
@@ -146,11 +146,8 @@ export class VesEmulatorService {
       await this.fixPermissions(emulatorPath);
 
       await this.vesProcessService.launchProcess({
-        command: `.${sep}${basename(emulatorPath)}`,
+        command: emulatorPath,
         args: emulatorArgs,
-        options: {
-          cwd: dirname(emulatorPath),
-        },
       });
     }
   }

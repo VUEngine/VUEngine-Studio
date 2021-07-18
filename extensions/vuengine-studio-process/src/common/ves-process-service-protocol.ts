@@ -9,7 +9,8 @@ export const VES_PROCESS_SERVICE_PATH = '/ves/services/process';
 export const VesProcessService = Symbol('VesProcessService');
 
 export interface VesProcessServiceClient {
-  onData(pId: number, data: string): void;
+  onErrorStreamData(pId: number, data: string): void;
+  onOutputStreamData(pId: number, data: string): void;
   onError(pId: number, event: ProcessErrorEvent): void;
   onExit(pId: number, event: IProcessExitEvent): void;
   onClose(pId: number, event: IProcessExitEvent): void;

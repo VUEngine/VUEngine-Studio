@@ -9,7 +9,7 @@ import { VesFlashCartCommands } from 'vuengine-studio-flash-cart/lib/browser/ves
 import { BuildMode } from 'vuengine-studio-build/lib/browser/ves-build-types';
 
 import { VesTouchBarIcons } from './icons/touch-bar-icons';
-import { VesTouchBarCommands } from 'src/common/ves-branding-types';
+import { VesTouchBarCommands } from '../common/ves-branding-types';
 
 @injectable()
 export class VesElectronMainApplication extends ElectronMainApplication {

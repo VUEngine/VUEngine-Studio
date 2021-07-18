@@ -1,5 +1,5 @@
 import { inject, injectable, postConstruct } from 'inversify';
-import { basename, dirname, join as joinPath, sep } from 'path';
+import { dirname, join as joinPath } from 'path';
 import { env } from 'process';
 import { createWriteStream, readFileSync, unlinkSync } from 'fs';
 import { CommandService, isOSX, isWindows, MessageService } from '@theia/core/lib/common';
@@ -103,7 +103,6 @@ export class VesFlashCartService {
 
   @postConstruct()
   protected async init(): Promise<void> {
-    // init flags
     this.frontendApplicationStateService.onStateChanged(
       async (state: FrontendApplicationState) => {
         if (state === 'attached_shell') {
@@ -209,25 +208,14 @@ export class VesFlashCartService {
 
       await this.fixPermissions();
 
-      console.log(
-        'command', `.${sep}${basename(connectedFlashCart.config.path)}`,
-        'args', flasherArgs,
-        'cwd', dirname(connectedFlashCart.config.path),
-      );
-
       const { processManagerId } = await this.vesProcessService.launchProcess({
-        command: `.${sep}${basename(connectedFlashCart.config.path)}`,
+        command: connectedFlashCart.config.path,
         args: flasherArgs,
-        options: {
-          cwd: dirname(connectedFlashCart.config.path),
-        },
       });
-
-      console.log('processManagerId', processManagerId);
 
       connectedFlashCart.status = {
         ...connectedFlashCart.status,
-        step: (connectedFlashCart.config.name === VesFlashCartPreferenceSchema.properties[VesFlashCartPreferenceIds.FLASH_CARTS].property.default[0].name) // FlashBoy
+        step: (connectedFlashCart.config.name === VesFlashCartPreferenceSchema.properties[VesFlashCartPreferenceIds.FLASH_CARTS].default[0].name) // FlashBoy
           ? 'Erasing'
           : 'Flashing',
         processId: processManagerId,
@@ -283,6 +271,7 @@ export class VesFlashCartService {
     });
 
     this.vesProcessWatcher.onExit(({ pId }) => {
+      console.log('exit', pId);
       for (const connectedFlashCart of this.connectedFlashCarts) {
         if (connectedFlashCart.status.processId === pId) {
           // TODO: differenciate between done and error
@@ -305,7 +294,23 @@ export class VesFlashCartService {
       }
     });
 
-    this.vesProcessWatcher.onData(({ pId, data }) => {
+    this.vesProcessWatcher.onOutputStreamData(({ pId, data }) => {
+      console.log('data', pId, data);
+      for (const connectedFlashCart of this.connectedFlashCarts) {
+        if (connectedFlashCart.status.processId === pId) {
+          connectedFlashCart.status.log += data;
+
+          this.parseDataFlashBoy(connectedFlashCart, data);
+          this.parseDataHyperFlash32(connectedFlashCart, data);
+
+          // trigger change event
+          this.connectedFlashCarts = this.connectedFlashCarts;
+        }
+      }
+    });
+
+    this.vesProcessWatcher.onErrorStreamData(({ pId, data }) => {
+      console.log('error data', pId, data);
       for (const connectedFlashCart of this.connectedFlashCarts) {
         if (connectedFlashCart.status.processId === pId) {
           connectedFlashCart.status.log += data;
@@ -355,7 +360,7 @@ export class VesFlashCartService {
   }
 
   protected async parseDataHyperFlash32(connectedFlashCart: ConnectedFlashCart, data: any): Promise<void> { /* eslint-disable-line */
-    if (connectedFlashCart.config.name === VesFlashCartPreferenceSchema.properties[VesFlashCartPreferenceIds.FLASH_CARTS].property.default[1].name) {
+    if (connectedFlashCart.config.name === VesFlashCartPreferenceSchema.properties[VesFlashCartPreferenceIds.FLASH_CARTS].default[1].name) {
       /* Number of # is only fixed (to 20) on HF32 firmware version 1.9 and above.
         On lower firmwares, the number of # depends on file size.
         TODO: support older firmwares as well? Can the firmware be detected? */
@@ -377,7 +382,7 @@ export class VesFlashCartService {
   }
 
   protected async parseDataFlashBoy(connectedFlashCart: ConnectedFlashCart, data: any): Promise<void> { /* eslint-disable-line */
-    if (connectedFlashCart.config.name === VesFlashCartPreferenceSchema.properties[VesFlashCartPreferenceIds.FLASH_CARTS].property.default[0].name) {
+    if (connectedFlashCart.config.name === VesFlashCartPreferenceSchema.properties[VesFlashCartPreferenceIds.FLASH_CARTS].default[0].name) {
       if (data.includes('/2048')) {
         const packetsWritten = parseInt(data.substring(data.lastIndexOf(']') + 2, data.lastIndexOf('/')));
         connectedFlashCart.status = {

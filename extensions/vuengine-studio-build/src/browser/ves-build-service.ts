@@ -224,7 +224,7 @@ export class VesBuildService {
       }
     });
 
-    this.vesProcessWatcher.onData(({ pId, data }) => {
+    this.vesProcessWatcher.onOutputStreamData(({ pId, data }) => {
       if (this.buildStatus.processManagerId === pId) {
         this.pushBuildLogLine({
           ...this.parseBuildOutput(data),
