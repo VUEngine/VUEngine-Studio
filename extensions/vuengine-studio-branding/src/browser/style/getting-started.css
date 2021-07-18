@@ -1,0 +1,83 @@
+.ves-welcome-col {
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+}
+
+.ves-welcome-flex-grid {
+    display: flex;
+}
+
+.ves-welcome-flex-grid.emulated-flex-gap > .ves-welcome-flex-grid-column {
+    margin-left: 40px;
+}
+
+.ves-welcome-flex-grid.emulated-flex-gap {
+    display: inline-flex;
+    flex-wrap: wrap;
+    margin-left: -40px;
+    width: calc(100% + 40px);
+}
+
+.ves-welcome-flex-grid.open {
+    padding: 20px 0;
+}
+.ves-welcome-flex-grid.open .theia-button:first-child {
+    margin-left: 0;
+}
+
+.ves-welcome-action-container {
+    line-height: 20px;
+}
+
+.ves-welcome-action-details {
+    padding-left: 5px;
+    color: var(--theia-descriptionForeground);
+}
+
+.ves-welcome-container {
+    padding: 20px;
+}
+
+.ves-welcome-header h1 {
+    flex: 1;
+    font-weight: 600;
+}
+
+.ves-welcome-hr {
+    background-color: var(--theia-contrastBorder);
+    height: 1px;
+    border: 0;
+    margin: 0px;
+}
+
+.ves-welcome-empty {
+    color: var(--theia-descriptionForeground);
+    font-style: italic;
+}
+
+.ves-welcome-section a {
+    border: none;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.ves-welcome-section a:hover {
+    text-decoration: underline;
+}
+
+.ves-welcome-section-header {
+    font-size: var(--theia-ui-font-size2);
+    font-weight: 600;
+    margin: 20px 0 5px;
+}
+
+.ves-welcome-section-header i {
+    padding-right: 5px;
+}
+
+.ves-welcome-sub-header {
+    color: var(--theia-descriptionForeground);
+    text-transform: capitalize;
+    font-weight: 400;
+}

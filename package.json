@@ -1,104 +1,49 @@
 {
   "private": true,
-  "name": "vuengine-studio",
   "version": "1.0.0",
-  "description": "VUEngine Studio",
+  "license": "EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0",
   "author": "KR155E <c.radke@posteo.de>",
-  "license": "Apache-2.0",
+  "homepage": "https://github.com/VUEngine/VUEngine-Studio",
+  "bugs": {
+    "url": "https://github.com/VUEngine/VUEngine-Studio/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VUEngine/VUEngine-Studio.git"
+  },
   "engines": {
     "yarn": "1.0.x || >=1.2.1",
     "node": ">=12.14.1 <13"
   },
-  "keywords": [],
-  "theia": {
-    "target": "electron",
-    "frontend": {
-      "config": {
-        "applicationName": "VUEngine Studio",
-        "defaultTheme": "dark",
-        "defaultIconTheme": "theia-file-icons"
-      }
-    },
-    "backend": {
-      "config": {
-        "startupTimeout": -1
-      }
-    },
-    "generator": {
-      "config": {
-        "preloadTemplate": "resources/splash/index.html"
-      }
-    }
+  "devDependencies": {
+    "@theia/cli": "1.15.0",
+    "@typescript-eslint/eslint-plugin": "^4.25.0",
+    "@typescript-eslint/eslint-plugin-tslint": "^4.25.0",
+    "@typescript-eslint/parser": "^4.25.0",
+    "eslint": "^7.27.0",
+    "eslint-plugin-deprecation": "^1.2.1",
+    "eslint-plugin-import": "^2.23.3",
+    "eslint-plugin-no-null": "^1.0.2",
+    "eslint-plugin-no-unsanitized": "^3.1.5",
+    "eslint-plugin-react": "^7.23.2",
+    "lerna": "2.11.0",
+    "rimraf": "^2.7.1"
   },
-  "main": "scripts/theia-electron-main.js",
   "scripts": {
-    "all": "cd extensions/theia-vuengine-studio && yarn && yarn theia rebuild:electron && yarn electron-rebuild && cd ../.. && yarn && yarn theia rebuild:electron && yarn electron-rebuild && yarn start",
-    "prepare": "yarn build && yarn download:plugins",
-    "build": "theia rebuild:electron && theia build",
-    "start": "electron scripts/theia-electron-main.js",
-    "package": "electron-builder",
-    "package:preview": "electron-builder --dir",
-    "download:plugins": "theia download:plugins",
+    "prepare": "lerna run prepare",
+    "lint": "lerna run lint",
+    "lint:fix": "lerna run lint:fix",
+    "clean": "lerna run clean && rimraf node_modules",
+    "build": "lerna run build",
+    "bundle": "lerna run bundle",
+    "watch": "lerna run --parallel watch",
+    "test": "lerna run test",
+    "electron": "yarn --cwd applications/electron",
     "modules:init": "git submodule update --init",
     "modules:update": "git submodule update --recursive --remote"
   },
-  "dependencies": {
-    "@theia/core": "^1.13.0",
-    "@theia/editor": "^1.13.0",
-    "@theia/electron": "^1.13.0",
-    "@theia/file-search": "^1.13.0",
-    "@theia/filesystem": "^1.13.0",
-    "@theia/git": "^1.13.0",
-    "@theia/keymaps": "^1.13.0",
-    "@theia/markers": "^1.13.0",
-    "@theia/messages": "^1.13.0",
-    "@theia/mini-browser": "^1.13.0",
-    "@theia/monaco": "^1.13.0",
-    "@theia/navigator": "^1.13.0",
-    "@theia/outline-view": "^1.13.0",
-    "@theia/output": "^1.13.0",
-    "@theia/preferences": "^1.13.0",
-    "@theia/preview": "^1.13.0",
-    "@theia/process": "^1.13.0",
-    "@theia/scm": "^1.13.0",
-    "@theia/scm-extra": "^1.13.0",
-    "@theia/search-in-workspace": "^1.13.0",
-    "@theia/task": "^1.13.0",
-    "@theia/terminal": "^1.13.0",
-    "@theia/userstorage": "^1.13.0",
-    "@theia/vsx-registry": "^1.13.0",
-    "@theia/workspace": "^1.13.0",
-    "cross-env": "^7.0.3",
-    "theia-vuengine-studio": "./extensions/theia-vuengine-studio/theia-vuengine-studio"
-  },
-  "devDependencies": {
-    "@theia/cli": "^1.13.0",
-    "electron-builder": "^22.10.5",
-    "bufferutil": "^4.0.3",
-    "utf-8-validate": "^5.0.5"
-  },
-  "// Notes:": [
-    "The resolution for `fs-extra` was required due to this: https://spectrum.chat/theia/general/our-theia-electron-builder-app-no-longer-starts~f5cf09a0-6d88-448b-8818-24ad0ec2ee7c"
-  ],
-  "resolutions": {
-    "**/fs-extra": "^4.0.3"
-  },
-  "theiaPluginsDir": "theia_plugins",
-  "theiaPlugins": {
-    "evgeniypeshkov-syntax-highlighter": "https://open-vsx.org/api/evgeniypeshkov/syntax-highlighter/0.5.1/file/evgeniypeshkov.syntax-highlighter-0.5.1.vsix",
-    "vscode-builtin-cpp": "https://open-vsx.org/api/vscode/cpp/1.57.1/file/vscode.cpp-1.57.1.vsix",
-    "vscode-builtin-image-preview": "https://open-vsx.org/api/vscode/image-preview/1.57.1/file/vscode.image-preview-1.57.1.vsix",
-    "vscode-builtin-json-language-features": "https://open-vsx.org/api/vscode/json-language-features/1.57.1/file/vscode.json-language-features-1.57.1.vsix",
-    "vscode-builtin-json": "https://open-vsx.org/api/vscode/json/1.57.1/file/vscode.json-1.57.1.vsix",
-    "vscode-builtin-make": "https://open-vsx.org/api/vscode/make/1.57.1/file/vscode.make-1.57.1.vsix",
-    "vscode-builtin-markdown": "https://open-vsx.org/api/vscode/markdown/1.57.1/file/vscode.markdown-1.57.1.vsix",
-    "vscode-builtin-merge-conflict": "https://open-vsx.org/api/vscode/merge-conflict/1.57.1/file/vscode.merge-conflict-1.57.1.vsix",
-    "vscode-builtin-shellscript": "https://open-vsx.org/api/vscode/shellscript/1.57.1/file/vscode.shellscript-1.57.1.vsix",
-    "vscode-editorconfig": "https://open-vsx.org/api/EditorConfig/EditorConfig/0.16.5/file/EditorConfig.EditorConfig-0.16.5.vsix",
-    "vscode-references-view": "https://open-vsx.org/api/ms-vscode/references-view/0.0.80/file/ms-vscode.references-view-0.0.80.vsix"
-  },
   "workspaces": [
-    ".",
+    "applications/*",
     "extensions/*"
   ]
 }

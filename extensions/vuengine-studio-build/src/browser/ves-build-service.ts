@@ -1,0 +1,575 @@
+import { inject, injectable, postConstruct } from 'inversify';
+import { dirname, join as joinPath } from 'path';
+import { cpus } from 'os';
+import { env } from 'process';
+import { ApplicationShell, PreferenceService } from '@theia/core/lib/browser';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
+import URI from '@theia/core/lib/common/uri';
+import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
+import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
+import { CommandService, isOSX, isWindows } from '@theia/core';
+import { ProcessOptions } from '@theia/process/lib/node';
+import { VesProcessService } from 'vuengine-studio-process/lib/common/ves-process-service-protocol';
+import { VesProcessWatcher } from 'vuengine-studio-process/lib/browser/ves-process-service-watcher';
+
+import { BuildLogLine, BuildLogLineType, BuildMode, BuildResult, BuildStatus } from './ves-build-types';
+import { VesBuildPreferenceIds } from './ves-build-preferences';
+import { VesBuildCommands } from './ves-build-commands';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
+
+interface BuildFolderFlags {
+  [key: string]: boolean;
+};
+
+@injectable()
+export class VesBuildService {
+  constructor(
+    @inject(ApplicationShell)
+    protected readonly shell: ApplicationShell,
+    @inject(CommandService)
+    protected readonly commandService: CommandService,
+    @inject(FileService)
+    protected fileService: FileService,
+    @inject(FrontendApplicationStateService)
+    protected readonly frontendApplicationStateService: FrontendApplicationStateService,
+    @inject(PreferenceService)
+    protected readonly preferenceService: PreferenceService,
+    @inject(VesProcessService)
+    protected readonly vesProcessService: VesProcessService,
+    @inject(VesProcessWatcher)
+    protected readonly vesProcessWatcher: VesProcessWatcher,
+    @inject(WorkspaceService)
+    protected readonly workspaceService: WorkspaceService,
+  ) { }
+
+  @postConstruct()
+  protected async init(): Promise<void> {
+    // init flags
+    this.frontendApplicationStateService.onStateChanged(
+      async (state: FrontendApplicationState) => {
+        if (state === 'attached_shell') {
+          for (const buildMode in BuildMode) {
+            if (BuildMode.hasOwnProperty(buildMode)) {
+              this.fileService
+                .exists(new URI(this.getBuildPath(buildMode)))
+                .then((exists: boolean) => {
+                  this.setBuildFolderExists(buildMode, exists);
+                });
+            }
+          }
+
+          // TODO: fileService.exists does not seem to work on Windows
+          this.fileService
+            .exists(new URI(this.getRomPath()))
+            .then((exists: boolean) => {
+              this.outputRomExists = exists;
+            });
+        }
+      }
+    );
+
+    this.resetBuildStatus();
+
+    // watch for file changes
+    // TODO: watch only respective folders
+    // const cleanPath = joinPath(getWorkspaceRoot(), 'build', BuildMode.Release)
+    // const test = this.fileService.watch(new URI(cleanPath));
+    this.fileService.onDidFilesChange((fileChangesEvent: FileChangesEvent) => {
+      for (const buildMode in BuildMode) {
+        if (fileChangesEvent.contains(new URI(this.getBuildPath(buildMode)))) {
+          this.fileService
+            .exists(new URI(this.getBuildPath(buildMode)))
+            .then((exists: boolean) => {
+              this.setBuildFolderExists(buildMode, exists);
+            });
+        }
+      }
+
+      if (fileChangesEvent.contains(new URI(this.getRomPath()))) {
+        this.fileService
+          .exists(new URI(this.getRomPath()))
+          .then((exists: boolean) => {
+            this.outputRomExists = exists;
+          });
+      }
+    });
+
+    // watch for preference changes
+    this.preferenceService.onPreferenceChanged(
+      ({ preferenceName, newValue }) => {
+        switch (preferenceName) {
+          case VesBuildPreferenceIds.BUILD_MODE:
+            this.onDidChangeBuildModeEmitter.fire(newValue);
+            this.onDidChangeBuildFolderEmitter.fire(this._buildFolderExists);
+            break;
+        }
+      }
+    );
+
+    this.bindEvents();
+  }
+
+  // build mode
+  protected readonly onDidChangeBuildModeEmitter = new Emitter<BuildMode>();
+  readonly onDidChangeBuildMode = this.onDidChangeBuildModeEmitter.event;
+
+  // build folder
+  protected readonly onDidChangeBuildFolderEmitter = new Emitter<BuildFolderFlags>();
+  readonly onDidChangeBuildFolder = this.onDidChangeBuildFolderEmitter.event;
+  protected _buildFolderExists: BuildFolderFlags = {};
+  setBuildFolderExists(buildMode: string, flag: boolean): void {
+    this._buildFolderExists[buildMode] = flag;
+    this.onDidChangeBuildFolderEmitter.fire(this._buildFolderExists);
+  }
+  get buildFolderExists(): BuildFolderFlags {
+    return this._buildFolderExists;
+  }
+
+  // output rom exists
+  protected readonly onDidChangeOutputRomExistsEmitter = new Emitter<boolean>();
+  readonly onDidChangeOutputRomExists = this.onDidChangeOutputRomExistsEmitter.event;
+  protected _outputRomExists: boolean = false;
+  set outputRomExists(flag: boolean) {
+    this._outputRomExists = flag;
+    this.onDidChangeOutputRomExistsEmitter.fire(this._outputRomExists);
+  }
+  get outputRomExists(): boolean {
+    return this._outputRomExists;
+  }
+
+  // is cleaning
+  protected _isCleaning: boolean = false;
+  protected readonly onDidChangeIsCleaningEmitter = new Emitter<boolean>();
+  readonly onDidChangeIsCleaning = this.onDidChangeIsCleaningEmitter.event;
+  set isCleaning(flag: boolean) {
+    this._isCleaning = flag;
+    this.onDidChangeIsCleaningEmitter.fire(this._isCleaning);
+  }
+  get isCleaning(): boolean {
+    return this._isCleaning;
+  }
+
+  // build status
+  protected _buildStatus: BuildStatus = {
+    active: false,
+    processManagerId: -1,
+    processId: -1,
+    progress: -1,
+    log: [],
+    buildMode: BuildMode.Beta,
+    step: '',
+    plugins: 0,
+  };
+  protected readonly onDidChangeBuildStatusEmitter = new Emitter<BuildStatus>();
+  readonly onDidChangeBuildStatus = this.onDidChangeBuildStatusEmitter.event;
+  set buildStatus(status: BuildStatus) {
+    this._buildStatus = status;
+    this.onDidChangeBuildStatusEmitter.fire(this._buildStatus);
+  }
+  get buildStatus(): BuildStatus {
+    return this._buildStatus;
+  }
+  resetBuildStatus(step?: string): void {
+    const newBuildStatus = {
+      ...this.buildStatus,
+      active: false,
+    };
+
+    if (step) {
+      newBuildStatus.step = step;
+    }
+
+    this.buildStatus = newBuildStatus;
+
+    if (step !== BuildResult.done) {
+      // this.isExportQueued = false;
+      // this.isRunQueued = false;
+      // this.isFlashQueued = false;
+    }
+  }
+  pushBuildLogLine(buildLogLine: BuildLogLine): void {
+    this._buildStatus.log.push(buildLogLine);
+    this.onDidChangeBuildStatusEmitter.fire(this._buildStatus);
+  }
+
+  async doBuild(): Promise<void> {
+    if (!this.workspaceService.opened) {
+      return;
+    }
+
+    if (!this.buildStatus.active) {
+      this.build();
+    } else {
+      this.commandService.executeCommand(
+        VesBuildCommands.OPEN_WIDGET.id,
+        !this.buildStatus.active
+      );
+    }
+  }
+
+  protected bindEvents(): void {
+    this.vesProcessWatcher.onError(({ pId }) => {
+      if (this.buildStatus.processManagerId === pId) {
+        this.resetBuildStatus(BuildResult.failed);
+      }
+    });
+
+    this.vesProcessWatcher.onExit(({ pId, event }) => {
+      if (this.buildStatus.processManagerId === pId) {
+        this.resetBuildStatus(event.code === 0
+          ? BuildResult.done
+          : BuildResult.failed
+        );
+      }
+    });
+
+    this.vesProcessWatcher.onData(({ pId, data }) => {
+      if (this.buildStatus.processManagerId === pId) {
+        this.pushBuildLogLine({
+          ...this.parseBuildOutput(data),
+          timestamp: Date.now(),
+        });
+      }
+    });
+  }
+
+  protected async build(): Promise<void> {
+    const plugins = await this.getPlugins();
+
+    const romUri = new URI(this.getRomPath());
+    if (await this.fileService.exists(romUri)) {
+      this.fileService.delete(romUri);
+    }
+
+    await this.fixPermissions();
+
+    const { processManagerId, processId } = await this.vesProcessService.launchProcess(await this.getBuildProcessParams());
+
+    this.buildStatus = {
+      active: true,
+      processManagerId: processManagerId,
+      processId: processId,
+      progress: 0,
+      log: [],
+      buildMode: this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode,
+      step: 'Building',
+      plugins: plugins.length,
+    };
+  }
+
+  protected async getBuildProcessParams(): Promise<ProcessOptions> {
+    const workspaceRoot = this.getWorkspaceRoot();
+    const buildMode = (this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as string).toLowerCase();
+    const dumpElf = this.preferenceService.get(VesBuildPreferenceIds.DUMP_ELF) as boolean;
+    const pedanticWarnings = this.preferenceService.get(VesBuildPreferenceIds.PEDANTIC_WARNINGS) as boolean;
+    const engineCorePath = await this.getEngineCorePath();
+    const enginePluginsPath = await this.getEnginePluginsPath();
+    const compilerPath = this.getCompilerPath();
+    const makefile = await this.getMakefilePath(workspaceRoot, engineCorePath);
+
+    if (isWindows) {
+      // if (enableWsl) shellPath = process.env.windir + '\\System32\\wsl.exe';
+
+      const args = [
+        'cd', this.convertoToEnvPath(workspaceRoot), '&&',
+        'export', `PATH=${this.convertoToEnvPath(joinPath(compilerPath, 'bin'))}:$PATH`, '&&',
+        'make', 'all',
+        '-e', `TYPE=${buildMode}`,
+        `ENGINE_FOLDER=${this.convertoToEnvPath(engineCorePath)}`,
+        `PLUGINS_FOLDER=${this.convertoToEnvPath(enginePluginsPath)}`,
+        '-f', makefile,
+      ];
+
+      return {
+        command: this.getMsysBashPath(),
+        args: [
+          '--login',
+          '-c', args.join(' '),
+        ],
+        options: {
+          cwd: workspaceRoot,
+          env: {
+            DUMP_ELF: dumpElf ? 1 : 0,
+            LC_ALL: 'C',
+            MAKE_JOBS: this.getThreads(),
+            PRINT_PEDANTIC_WARNINGS: pedanticWarnings ? 1 : 0,
+          },
+        },
+      };
+    }
+
+    return {
+      command: 'make',
+      args: [
+        'all',
+        '-e', `TYPE=${buildMode}`,
+        '-f', makefile,
+        '-C', this.convertoToEnvPath(workspaceRoot),
+      ],
+      options: {
+        cwd: workspaceRoot,
+        env: {
+          DUMP_ELF: dumpElf ? 1 : 0,
+          ENGINE_FOLDER: this.convertoToEnvPath(engineCorePath),
+          LC_ALL: 'C',
+          MAKE_JOBS: this.getThreads(),
+          PATH: [joinPath(compilerPath, 'bin'), process.env.PATH].join(':'),
+          PLUGINS_FOLDER: this.convertoToEnvPath(enginePluginsPath),
+          PRINT_PEDANTIC_WARNINGS: pedanticWarnings ? 1 : 0,
+        },
+      },
+    };
+  }
+
+  protected parseBuildOutput(data: string): { text: string, type: BuildLogLineType } {
+    const text = data.trim();
+    const textLowerCase = text.toLowerCase();
+    let type = BuildLogLineType.Normal;
+
+    const headlineRegex = /\((\d+)\/(\d+)\) (preprocessing (.+)|building (.+))/gi;
+    const headlineMatches: string[] = [];
+    let m;
+    while ((m = headlineRegex.exec(text)) !== null) { /* eslint-disable-line */
+      if (m.index === headlineRegex.lastIndex) {
+        headlineRegex.lastIndex++;
+      }
+      m.forEach((match, groupIndex) => {
+        headlineMatches[groupIndex] = match;
+      });
+    }
+
+    if (textLowerCase.startsWith('starting build')) {
+      type = BuildLogLineType.Headline;
+    } else if (headlineMatches.length) {
+      type = BuildLogLineType.Headline;
+      this.buildStatus.step = headlineMatches[3] as unknown as string;
+      this.buildStatus.progress = this.computeProgress(headlineMatches);
+    } else if (textLowerCase.startsWith('build finished')) {
+      type = BuildLogLineType.Headline;
+      this.buildStatus.progress = 100;
+    } else if (textLowerCase.includes('error: ') || textLowerCase.includes(' not found') || textLowerCase.includes('no such file or directory')) {
+      type = BuildLogLineType.Error;
+    } else if (textLowerCase.includes('warning: ')) {
+      type = BuildLogLineType.Warning;
+    }
+
+    return { text, type };
+  }
+
+  protected async getMakefilePath(
+    workspaceRoot: string,
+    engineCorePath: string
+  ): Promise<string> {
+    let makefilePath = this.convertoToEnvPath(
+      joinPath(workspaceRoot, 'makefile')
+    );
+    if (!(await this.fileService.exists(new URI(makefilePath)))) {
+      makefilePath = this.convertoToEnvPath(
+        joinPath(engineCorePath, 'makefile-game')
+      );
+    }
+
+    return makefilePath;
+  }
+
+  getWorkspaceRoot(): string {
+    const substrNum = isWindows ? 2 : 1;
+
+    return window.location.hash.slice(-9) === 'workspace'
+      ? dirname(window.location.hash.substring(substrNum))
+      : window.location.hash.substring(substrNum);
+  }
+
+  getBuildFolder(): string {
+    return joinPath(this.getWorkspaceRoot(), 'build');
+  }
+
+  getBuildPath(buildMode?: string): string {
+    const buildFolder = this.getBuildFolder();
+
+    return buildMode
+      ? joinPath(buildFolder, buildMode.toLowerCase())
+      : buildFolder;
+  }
+
+  getRomPath(): string {
+    return joinPath(this.getBuildPath(), 'output.vb');
+  }
+
+  abortBuild(): void {
+    this.vesProcessService.killProcess(this.buildStatus.processManagerId);
+    this.resetBuildStatus(BuildResult.aborted);
+  }
+
+  getResourcesPath(): string {
+    return env.THEIA_APP_PROJECT_PATH ?? '';
+  }
+
+  convertoToEnvPath(path: string): string {
+    const enableWsl = this.preferenceService.get(VesBuildPreferenceIds.ENABLE_WSL);
+    let envPath = path.replace(/\\/g, '/').replace(/^[a-zA-Z]:\//, function (x): string {
+      return `/${x.substr(0, 1).toLowerCase()}/`;
+    });
+
+    if (isWindows && enableWsl) {
+      envPath = '/mnt/' + envPath;
+    }
+
+    return envPath;
+  }
+
+  protected async getEngineCorePath(): Promise<string> {
+    const defaultPath = joinPath(
+      this.getResourcesPath(),
+      'vuengine',
+      'vuengine-core'
+    );
+    const customPath = this.preferenceService.get(
+      VesBuildPreferenceIds.ENGINE_CORE_PATH
+    ) as string;
+
+    return customPath && (await this.fileService.exists(new URI(customPath)))
+      ? customPath
+      : defaultPath;
+  }
+
+  protected async getEnginePluginsPath(): Promise<string> {
+    const defaultPath = joinPath(
+      this.getResourcesPath(),
+      'vuengine',
+      'vuengine-plugins'
+    );
+    const customPath = this.preferenceService.get(
+      VesBuildPreferenceIds.ENGINE_PLUGINS_PATH
+    ) as string;
+
+    return customPath && (await this.fileService.exists(new URI(customPath)))
+      ? customPath
+      : defaultPath;
+  }
+
+  protected getCompilerPath(): string {
+    return joinPath(
+      this.getResourcesPath(),
+      'binaries',
+      'vuengine-studio-tools',
+      this.getOs(),
+      'gcc'
+    );
+  }
+
+  protected getMsysBashPath(): string {
+    return joinPath(
+      this.getResourcesPath(),
+      'binaries',
+      'vuengine-studio-tools',
+      this.getOs(),
+      'msys',
+      'usr',
+      'bin',
+      'bash.exe'
+    );
+  }
+
+  protected getOs(): string {
+    return isWindows ? 'win' : isOSX ? 'osx' : 'linux';
+  }
+
+  protected getThreads(): number {
+    let threads = cpus().length;
+    if (threads > 2) {
+      threads--;
+    }
+
+    return threads;
+  }
+
+  protected async getPlugins(): Promise<string[]> {
+    let allPlugins: string[] = [];
+    const enginePluginsPath = await this.getEnginePluginsPath();
+
+    // get project's plugins
+    try {
+      const configFileUri = new URI(
+        joinPath(
+          this.getWorkspaceRoot(),
+          '.vuengine',
+          'plugins.json'
+        )
+      );
+      const configFileContents = await this.fileService.readFile(configFileUri);
+      const projectPlugins = JSON.parse(configFileContents.value.toString());
+      allPlugins = projectPlugins;
+
+      // for each of the project's plugins, get its dependencies
+      // TODO: we only search one level deep here, recurse instead
+      await Promise.all(projectPlugins.map(async (pluginName: string) => {
+        const pluginFileUri = new URI(
+          joinPath(
+            enginePluginsPath,
+            ...pluginName.split('/'),
+            '.vuengine',
+            'plugins.json'
+          )
+        );
+
+        const pluginFileContents = await this.fileService.readFile(
+          pluginFileUri
+        );
+        JSON.parse(pluginFileContents.value.toString()).map(
+          (plugin: string) => {
+            if (!allPlugins.includes(plugin)) {
+              allPlugins.push(plugin);
+            }
+          }
+        );
+      }));
+    } catch (e) { }
+
+    // remove duplicates and return
+    return allPlugins;
+  }
+
+  protected computeProgress(matches: string[]): number {
+    const stepsDone = parseInt(matches[1]) ?? 0;
+    const stepsTotal = parseInt(matches[2]) ?? 1;
+
+    // each headline indicates that a new chunk of work is being _started_, not finishing, hence -1
+    return Math.floor((stepsDone - 1) * 100 / stepsTotal);
+  }
+
+  /**
+   * Give executables respective permission on UNIX systems.
+   * Must be executed before every build to ensure permissions are right,
+   * even right after reconfiguring engine paths.
+   */
+  protected async fixPermissions(): Promise<void> {
+    if (isWindows) {
+      return;
+    }
+
+    const engineCorePath = await this.getEngineCorePath();
+    const compilerPath = this.getCompilerPath();
+
+    await Promise.all([
+      this.vesProcessService.launchProcess({
+        command: 'chmod',
+        args: ['-R', 'a+x', joinPath(compilerPath, 'bin')],
+      }),
+      this.vesProcessService.launchProcess({
+        command: 'chmod',
+        args: ['-R', 'a+x', joinPath(compilerPath, 'libexec')],
+      }),
+      this.vesProcessService.launchProcess({
+        command: 'chmod',
+        args: ['-R', 'a+x', joinPath(compilerPath, 'v810', 'bin')],
+      }),
+      this.vesProcessService.launchProcess({
+        command: 'chmod',
+        args: ['-R', 'a+x', joinPath(engineCorePath, 'lib', 'compiler', 'preprocessor'),
+        ],
+      }),
+    ]);
+  }
+}

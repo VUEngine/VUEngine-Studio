@@ -1,0 +1,78 @@
+appId: vuengine.studio
+productName: VUEngineStudio
+copyright: Copyright © 2006-2021 Team VUEngine
+electronDist: ../../node_modules/electron/dist
+electronVersion: 9.3.2
+# Although it is generally not recommended to disable asar, it is required for Theia.
+# Enabling this leads to: process ERROR Error: spawn ENOTDIR
+# because binaries can not be executed from the asar archive.
+# See asar file API limitations: https://www.electronjs.org/docs/tutorial/application-packaging#limitations-of-the-node-api
+asar: false
+
+directories:
+  buildResources: resources
+
+# node_modules and package.json are copied automatically
+# Copying node_modules must be automatic for correct resolvement of binaries.
+# Furthermore, This reduces bundle sizes significantly because it avoids duplicates of the electron runtime.
+files:
+  - src-gen
+  - lib
+  - scripts
+extraResources:
+  - from: plugins
+    to: app/plugins
+  # TODO: dynamically pass in OS
+  - from: binaries/vuengine-studio-tools/osx
+    to: app/binaries/osx
+  - from: vuengine
+    to: app/vuengine
+
+win:
+  icon: resources/icons/WindowsLauncherIcon/VUEngineStudio.ico
+  target:
+    - nsis
+  publish:
+    provider: generic
+    url: "https://download.eclipse.org/theia/latest/windows"
+mac:
+  icon: resources/icons/MacLauncherIcon/512-512-2.icns
+  category: public.app-category.developer-tools
+  darkModeSupport: true
+  target:
+    - dmg
+  publish:
+    provider: generic
+    url: "https://download.eclipse.org/theia/latest/macos"
+linux:
+  icon: resources/icons/LinuxLauncherIcon/512-512.png
+  category: Development
+  vendor: Team VUEngine
+  target:
+    - deb
+    - AppImage
+  publish:
+    provider: generic
+    url: "https://download.eclipse.org/theia/latest/linux"
+
+nsis:
+  menuCategory: true
+  oneClick: false
+  perMachine: false
+  installerHeaderIcon: resources/icons/WindowsLauncherIcon/VUEngineStudio.ico
+  installerIcon: resources/icons/WindowsLauncherIcon/VUEngineStudio.ico
+  uninstallerIcon: resources/icons/WindowsLauncherIcon/VUEngineStudio.ico
+  installerSidebar: resources/icons/InstallerSidebarImage/164-314Windows.bmp
+  uninstallerSidebar: resources/icons/InstallerSidebarImage/164-314Windows.bmp
+  allowToChangeInstallationDirectory: true
+  runAfterFinish: false
+  artifactName: ${productName}.${ext}
+  license: LICENSE
+dmg:
+  artifactName: ${productName}.${ext}
+deb:
+  artifactName: ${productName}.${ext}
+appImage:
+  artifactName: ${productName}.${ext}
+
+afterPack: ./scripts/after-pack.js
