@@ -46,7 +46,6 @@ export class VesTitlebarApplicationTitleWidget extends ReactWidget {
     return <div onDoubleClick={this.handleDoubleClick}>{title}</div>;
   }
 
-  // TODO stretch title to fill all free space on title bar. position: absolute?
   protected handleDoubleClick(): void {
     const win = remote.getCurrentWindow();
     if (!win) { return; }

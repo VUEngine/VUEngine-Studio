@@ -1,13 +1,9 @@
 #ves-titlebar-application-title {
-  flex-grow: 1;
   height: var(--theia-private-menubar-height);
   line-height: var(--theia-private-menubar-height);
-  order: 3;
+  position: absolute;
   text-align: center;
-}
-
-#ves-titlebar-application-title.os-osx {
-  padding-left: 260px;
+  width: 100%;
 }
 
 @media (max-width: 1000px) {

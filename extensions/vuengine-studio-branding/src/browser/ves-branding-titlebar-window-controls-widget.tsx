@@ -31,7 +31,7 @@ export class VesTitlebarWindowControlsWidget extends ReactWidget {
       <>
         <div className='titlebar-window-controls-separator'></div>
         <div
-          className='titlebar-window-controls-button'
+          className='titlebar-window-controls-button minimize'
           id='ves-titlebar-window-controls-minimize'
           onClick={() =>
             this.commandService.executeCommand(VesTitlebarWindowControlCommands.MINIMIZE.id)
@@ -44,7 +44,7 @@ export class VesTitlebarWindowControlsWidget extends ReactWidget {
         </div>
         {!this.isMaximized() && (
           <div
-            className='titlebar-window-controls-button'
+            className='titlebar-window-controls-button maximize'
             id='ves-titlebar-window-controls-maximize'
             onClick={() =>
               this.commandService.executeCommand(VesTitlebarWindowControlCommands.MAXIMIZE.id)
@@ -58,7 +58,7 @@ export class VesTitlebarWindowControlsWidget extends ReactWidget {
         )}
         {this.isMaximized() && (
           <div
-            className='titlebar-window-controls-button'
+            className='titlebar-window-controls-button restore'
             id='ves-titlebar-window-controls-restore'
             onClick={() =>
               this.commandService.executeCommand(VesTitlebarWindowControlCommands.UNMAXIMIZE.id)
@@ -74,7 +74,7 @@ export class VesTitlebarWindowControlsWidget extends ReactWidget {
           </div>
         )}
         <div
-          className='titlebar-window-controls-button'
+          className='titlebar-window-controls-button close'
           id='ves-titlebar-window-controls-close'
           onClick={() =>
             this.commandService.executeCommand(ElectronCommands.CLOSE_WINDOW.id)

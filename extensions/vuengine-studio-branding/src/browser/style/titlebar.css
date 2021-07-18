@@ -4,17 +4,13 @@
 
 #theia-top-panel {
   -webkit-app-region: drag;
-  display: flex;
-  flex-wrap: nowrap;
   user-select: none;
 }
 [id="theia:icon"] {
   -webkit-app-region: no-drag;
-  flex-shrink: 0;
-  order: 1;
+  z-index: 1;
 }
 [id="theia:menubar"] {
   -webkit-app-region: no-drag;
-  flex-shrink: 0;
-  order: 2;
+  z-index: 1;
 }

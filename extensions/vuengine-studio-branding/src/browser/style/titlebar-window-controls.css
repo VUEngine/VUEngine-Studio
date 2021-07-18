@@ -23,9 +23,11 @@
   text-align: center;
   width: 46px;
 }
-#ves-titlebar-window-controls .titlebar-window-controls-button:hover {
-  background: var(--theia-titleBar-buttonBackground);
-}
+#ves-titlebar-window-controls .titlebar-window-controls-button:hover,
 #ves-titlebar-window-controls .titlebar-window-controls-button:active {
-  background: var(--theia-titleBar-hoverButtonBackground);
+  background: var(--theia-menubar-selectionBackground);
+}
+#ves-titlebar-window-controls .titlebar-window-controls-button.close:hover,
+#ves-titlebar-window-controls .titlebar-window-controls-button.close:active {
+  background: red;
 }

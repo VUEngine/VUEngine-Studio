@@ -1,22 +1,20 @@
 #ves-titlebar-action-buttons {
   -webkit-app-region: no-drag;
-  flex-shrink: 0;
-  float: right;
-  order: 4;
   margin-right: 8px;
   padding-top: 5px;
+  position: absolute;
+  right: 0;
   text-align: right;
   width: 260px;
+  z-index: 1;
 }
 
-#ves-titlebar-action-buttons.os-linux,
-#ves-titlebar-action-buttons.os-win {
+#ves-titlebar-action-buttons:not(.os-osx) {
   margin-right: 162px;
 }
 
 @media (max-width: 800px) {
-  #ves-titlebar-action-buttons.os-linux,
-  #ves-titlebar-action-buttons.os-win {
+  #ves-titlebar-action-buttons:not(.os-osx) {
     display: none;
   }
 }
