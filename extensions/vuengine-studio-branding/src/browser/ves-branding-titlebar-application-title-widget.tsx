@@ -1,18 +1,16 @@
 import * as React from 'react';
 import { inject, injectable, postConstruct } from 'inversify';
-import { dirname, join as joinPath } from 'path';
 import { remote } from 'electron'; /* eslint-disable-line */
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { isOSX, isWindows } from '@theia/core';
-import URI from '@theia/core/lib/common/uri';
-import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FrontendApplicationConfigProvider } from '@theia/core/lib/browser/frontend-application-config-provider';
+import { VesProjectsService } from 'vuengine-studio-projects/lib/browser/ves-projects-service';
 
 @injectable()
 export class VesTitlebarApplicationTitleWidget extends ReactWidget {
-  @inject(FileService)
-  private readonly fileService: FileService;
+  @inject(VesProjectsService)
+  protected readonly vesProjectsService: VesProjectsService;
   @inject(WorkspaceService)
   private readonly workspaceService: WorkspaceService;
 
@@ -27,51 +25,33 @@ export class VesTitlebarApplicationTitleWidget extends ReactWidget {
     this.title.caption = VesTitlebarApplicationTitleWidget.LABEL;
     this.title.closable = false;
     this.addClass(`os-${this.getOs()}`);
-    this.applicationTitle = '';
 
-    // Attempt to retrieve project name from configuration file
-    const projectFileUri = new URI(
-      joinPath(
-        this.getWorkspaceRoot(),
-        '.vuengine',
-        'project.json'
-      )
-    );
-    if (await this.fileService.exists(projectFileUri)) {
-      const configFileContents = await this.fileService.readFile(projectFileUri);
-      const projectData = JSON.parse(configFileContents.value.toString());
-      if (projectData.name) {
-        this.applicationTitle = `${projectData.name} (Project)`;
-      }
-    };
+    const { applicationName: title } = FrontendApplicationConfigProvider.get();
+    this.applicationTitle = title;
 
     this.update();
 
-    this.workspaceService.onWorkspaceChanged(() => this.update());
+    this.vesProjectsService.onDidChangeProjectFile(() => { this.setTitle(); });
+    this.workspaceService.onWorkspaceChanged(() => { this.setTitle(); });
   }
 
   protected getOs(): string {
     return isWindows ? 'win' : isOSX ? 'osx' : 'linux';
   }
 
-  protected render(): React.ReactNode {
-    let { applicationName: title } = FrontendApplicationConfigProvider.get();
-    if (this.applicationTitle === '') {
-      const workspace = this.workspaceService.workspace;
-      if (workspace !== undefined) {
-        if (this.workspaceService.workspace?.isFile) {
-          const workspaceParts = workspace.name.split('.');
-          workspaceParts.pop();
-          title = `${workspaceParts.join('.')} (Workspace)`;
-        } else {
-          title = workspace.name;
-        }
+  protected setTitle(): void {
+    this.vesProjectsService.getProjectName().then(projectTitle => {
+      if (projectTitle !== '') {
+        this.applicationTitle = projectTitle;
+        this.update();
       }
-    } else {
-      title = this.applicationTitle;
-    }
+    });
+  }
 
-    return <div onDoubleClick={this.handleDoubleClick}>{title}</div>;
+  protected render(): React.ReactNode {
+    this.setTitle();
+
+    return <div onDoubleClick={this.handleDoubleClick}>{this.applicationTitle}</div>;
   }
 
   protected handleDoubleClick(): void {
@@ -84,13 +64,5 @@ export class VesTitlebarApplicationTitleWidget extends ReactWidget {
     }
     if (win.isMaximized()) { return win.unmaximize(); };
     return win.maximize();
-  }
-
-  getWorkspaceRoot(): string {
-    const substrNum = isWindows ? 2 : 1;
-
-    return window.location.hash.slice(-9) === 'workspace'
-      ? dirname(window.location.hash.substring(substrNum))
-      : window.location.hash.substring(substrNum);
   }
 }

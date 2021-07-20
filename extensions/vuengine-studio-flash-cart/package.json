@@ -12,7 +12,8 @@
     "filenamify": "^4.3.0",
     "usb": "^1.7.0",
     "vuengine-studio-build": "1.0.0",
-    "vuengine-studio-process": "1.0.0"
+    "vuengine-studio-process": "1.0.0",
+    "vuengine-studio-projects": "1.0.0"
   },
   "devDependencies": {
     "@types/usb": "^1.5.2",

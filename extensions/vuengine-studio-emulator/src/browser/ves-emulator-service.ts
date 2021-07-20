@@ -1,5 +1,5 @@
 import { inject, injectable, postConstruct } from 'inversify';
-import { dirname, join as joinPath } from 'path';
+import { join as joinPath } from 'path';
 import { CommandService, isWindows } from '@theia/core/lib/common';
 import { ApplicationShell, OpenerService, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';
@@ -7,6 +7,7 @@ import { QuickPickItem, QuickPickOptions, QuickPickService } from '@theia/core/l
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { VesBuildCommands } from 'vuengine-studio-build/lib/browser/ves-build-commands';
 import { VesBuildService } from 'vuengine-studio-build/lib/browser/ves-build-service';
+import { VesProjectsService } from 'vuengine-studio-projects/lib/browser/ves-projects-service';
 import { VesProcessService } from 'vuengine-studio-process/lib/common/ves-process-service-protocol';
 
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
@@ -27,6 +28,8 @@ export class VesEmulatorService {
     private readonly vesBuildService: VesBuildService,
     @inject(VesProcessService)
     private readonly vesProcessService: VesProcessService,
+    @inject(VesProjectsService)
+    protected readonly vesProjectsService: VesProjectsService,
     @inject(QuickPickService)
     private readonly quickPickService: QuickPickService,
   ) { }
@@ -160,16 +163,8 @@ export class VesEmulatorService {
     return word.slice(0, length) + '…';
   }
 
-  getWorkspaceRoot(): string {
-    const substrNum = isWindows ? 2 : 1;
-
-    return window.location.hash.slice(-9) === 'workspace'
-      ? dirname(window.location.hash.substring(substrNum))
-      : window.location.hash.substring(substrNum);
-  }
-
   getRomPath(): string {
-    return joinPath(this.getWorkspaceRoot(), 'build', 'output.vb');
+    return joinPath(this.vesProjectsService.getWorkspaceRoot(), 'build', 'output.vb');
   }
 
   getDefaultEmulatorConfig(): EmulatorConfig {

@@ -11,7 +11,8 @@
     "inversify": "^5.1.1",
     "filenamify": "^4.3.0",
     "rimraf": "^2.7.1",
-    "vuengine-studio-process": "1.0.0"
+    "vuengine-studio-process": "1.0.0",
+    "vuengine-studio-projects": "1.0.0"
   },
   "devDependencies": {
     "@types/usb": "^1.5.2",

@@ -1,5 +1,5 @@
 import { inject, injectable, postConstruct } from 'inversify';
-import { dirname, join as joinPath } from 'path';
+import { join as joinPath } from 'path';
 import { cpus } from 'os';
 import { env } from 'process';
 import { ApplicationShell, PreferenceService } from '@theia/core/lib/browser';
@@ -12,6 +12,7 @@ import { CommandService, isOSX, isWindows } from '@theia/core';
 import { ProcessOptions } from '@theia/process/lib/node';
 import { VesProcessService } from 'vuengine-studio-process/lib/common/ves-process-service-protocol';
 import { VesProcessWatcher } from 'vuengine-studio-process/lib/browser/ves-process-service-watcher';
+import { VesProjectsService } from 'vuengine-studio-projects/lib/browser/ves-projects-service';
 
 import { BuildLogLine, BuildLogLineType, BuildMode, BuildResult, BuildStatus } from './ves-build-types';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
@@ -39,76 +40,11 @@ export class VesBuildService {
     protected readonly vesProcessService: VesProcessService,
     @inject(VesProcessWatcher)
     protected readonly vesProcessWatcher: VesProcessWatcher,
+    @inject(VesProjectsService)
+    protected readonly vesProjectsService: VesProjectsService,
     @inject(WorkspaceService)
     protected readonly workspaceService: WorkspaceService,
   ) { }
-
-  @postConstruct()
-  protected async init(): Promise<void> {
-    // init flags
-    this.frontendApplicationStateService.onStateChanged(
-      async (state: FrontendApplicationState) => {
-        if (state === 'attached_shell') {
-          for (const buildMode in BuildMode) {
-            if (BuildMode.hasOwnProperty(buildMode)) {
-              this.fileService
-                .exists(new URI(this.getBuildPath(buildMode)))
-                .then((exists: boolean) => {
-                  this.setBuildFolderExists(buildMode, exists);
-                });
-            }
-          }
-
-          // TODO: fileService.exists does not seem to work on Windows
-          this.fileService
-            .exists(new URI(this.getRomPath()))
-            .then((exists: boolean) => {
-              this.outputRomExists = exists;
-            });
-        }
-      }
-    );
-
-    this.resetBuildStatus();
-
-    // watch for file changes
-    // TODO: watch only respective folders
-    // const cleanPath = joinPath(getWorkspaceRoot(), 'build', BuildMode.Release)
-    // const test = this.fileService.watch(new URI(cleanPath));
-    this.fileService.onDidFilesChange((fileChangesEvent: FileChangesEvent) => {
-      for (const buildMode in BuildMode) {
-        if (fileChangesEvent.contains(new URI(this.getBuildPath(buildMode)))) {
-          this.fileService
-            .exists(new URI(this.getBuildPath(buildMode)))
-            .then((exists: boolean) => {
-              this.setBuildFolderExists(buildMode, exists);
-            });
-        }
-      }
-
-      if (fileChangesEvent.contains(new URI(this.getRomPath()))) {
-        this.fileService
-          .exists(new URI(this.getRomPath()))
-          .then((exists: boolean) => {
-            this.outputRomExists = exists;
-          });
-      }
-    });
-
-    // watch for preference changes
-    this.preferenceService.onPreferenceChanged(
-      ({ preferenceName, newValue }) => {
-        switch (preferenceName) {
-          case VesBuildPreferenceIds.BUILD_MODE:
-            this.onDidChangeBuildModeEmitter.fire(newValue);
-            this.onDidChangeBuildFolderEmitter.fire(this._buildFolderExists);
-            break;
-        }
-      }
-    );
-
-    this.bindEvents();
-  }
 
   // build mode
   protected readonly onDidChangeBuildModeEmitter = new Emitter<BuildMode>();
@@ -193,6 +129,73 @@ export class VesBuildService {
     this.onDidChangeBuildStatusEmitter.fire(this._buildStatus);
   }
 
+  @postConstruct()
+  protected async init(): Promise<void> {
+    // init flags
+    this.frontendApplicationStateService.onStateChanged(
+      async (state: FrontendApplicationState) => {
+        if (state === 'attached_shell') {
+          for (const buildMode in BuildMode) {
+            if (BuildMode.hasOwnProperty(buildMode)) {
+              this.fileService
+                .exists(new URI(this.getBuildPath(buildMode)))
+                .then((exists: boolean) => {
+                  this.setBuildFolderExists(buildMode, exists);
+                });
+            }
+          }
+
+          // TODO: fileService.exists does not seem to work on Windows
+          this.fileService
+            .exists(new URI(this.getRomPath()))
+            .then((exists: boolean) => {
+              this.outputRomExists = exists;
+            });
+        }
+      }
+    );
+
+    this.resetBuildStatus();
+
+    // watch for file changes
+    // TODO: watch only respective folders
+    // const cleanPath = joinPath(getWorkspaceRoot(), 'build', BuildMode.Release)
+    // const test = this.fileService.watch(new URI(cleanPath));
+    this.fileService.onDidFilesChange((fileChangesEvent: FileChangesEvent) => {
+      for (const buildMode in BuildMode) {
+        if (fileChangesEvent.contains(new URI(this.getBuildPath(buildMode)))) {
+          this.fileService
+            .exists(new URI(this.getBuildPath(buildMode)))
+            .then((exists: boolean) => {
+              this.setBuildFolderExists(buildMode, exists);
+            });
+        }
+      }
+
+      if (fileChangesEvent.contains(new URI(this.getRomPath()))) {
+        this.fileService
+          .exists(new URI(this.getRomPath()))
+          .then((exists: boolean) => {
+            this.outputRomExists = exists;
+          });
+      }
+    });
+
+    // watch for preference changes
+    this.preferenceService.onPreferenceChanged(
+      ({ preferenceName, newValue }) => {
+        switch (preferenceName) {
+          case VesBuildPreferenceIds.BUILD_MODE:
+            this.onDidChangeBuildModeEmitter.fire(newValue);
+            this.onDidChangeBuildFolderEmitter.fire(this._buildFolderExists);
+            break;
+        }
+      }
+    );
+
+    this.bindEvents();
+  }
+
   async doBuild(): Promise<void> {
     if (!this.workspaceService.opened) {
       return;
@@ -259,7 +262,7 @@ export class VesBuildService {
   }
 
   protected async getBuildProcessParams(): Promise<ProcessOptions> {
-    const workspaceRoot = this.getWorkspaceRoot();
+    const workspaceRoot = this.vesProjectsService.getWorkspaceRoot();
     const buildMode = (this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as string).toLowerCase();
     const dumpElf = this.preferenceService.get(VesBuildPreferenceIds.DUMP_ELF) as boolean;
     const pedanticWarnings = this.preferenceService.get(VesBuildPreferenceIds.PEDANTIC_WARNINGS) as boolean;
@@ -373,16 +376,8 @@ export class VesBuildService {
     return makefilePath;
   }
 
-  getWorkspaceRoot(): string {
-    const substrNum = isWindows ? 2 : 1;
-
-    return window.location.hash.slice(-9) === 'workspace'
-      ? dirname(window.location.hash.substring(substrNum))
-      : window.location.hash.substring(substrNum);
-  }
-
   getBuildFolder(): string {
-    return joinPath(this.getWorkspaceRoot(), 'build');
+    return joinPath(this.vesProjectsService.getWorkspaceRoot(), 'build');
   }
 
   getBuildPath(buildMode?: string): string {
@@ -493,7 +488,7 @@ export class VesBuildService {
     try {
       const configFileUri = new URI(
         joinPath(
-          this.getWorkspaceRoot(),
+          this.vesProjectsService.getWorkspaceRoot(),
           '.vuengine',
           'plugins.json'
         )

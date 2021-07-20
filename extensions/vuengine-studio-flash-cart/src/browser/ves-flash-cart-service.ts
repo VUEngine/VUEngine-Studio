@@ -12,6 +12,7 @@ import { VesBuildCommands } from 'vuengine-studio-build/lib/browser/ves-build-co
 import { VesBuildService } from 'vuengine-studio-build/lib/browser/ves-build-service';
 import { VesProcessService } from 'vuengine-studio-process/lib/common/ves-process-service-protocol';
 import { VesProcessWatcher } from 'vuengine-studio-process/lib/browser/ves-process-service-watcher';
+import { VesProjectsService } from 'vuengine-studio-projects/lib/browser/ves-projects-service';
 import { VesBuildPreferenceIds } from 'vuengine-studio-build/lib/browser/ves-build-preferences';
 
 import { VesFlashCartPreferenceIds, VesFlashCartPreferenceSchema } from './ves-flash-cart-preferences';
@@ -47,6 +48,8 @@ export class VesFlashCartService {
     protected readonly vesProcessService: VesProcessService,
     @inject(VesProcessWatcher)
     protected readonly vesProcessWatcher: VesProcessWatcher,
+    @inject(VesProjectsService)
+    protected readonly vesProjectsService: VesProjectsService,
   ) { }
 
   // is queued
@@ -433,16 +436,8 @@ export class VesFlashCartService {
     }));
   }
 
-  getWorkspaceRoot(): string {
-    const substrNum = isWindows ? 2 : 1;
-
-    return window.location.hash.slice(-9) === 'workspace'
-      ? dirname(window.location.hash.substring(substrNum))
-      : window.location.hash.substring(substrNum);
-  }
-
   getRomPath(): string {
-    return joinPath(this.getWorkspaceRoot(), 'build', 'output.vb');
+    return joinPath(this.vesProjectsService.getWorkspaceRoot(), 'build', 'output.vb');
   }
 
   getResourcesPath(): string {

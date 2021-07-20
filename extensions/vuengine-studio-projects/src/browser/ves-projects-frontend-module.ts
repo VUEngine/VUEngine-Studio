@@ -5,6 +5,7 @@ import { CommandContribution } from '@theia/core/lib/common/command';
 import { VesProjectsContribution } from './ves-projects-contribution';
 import { VesProjectsPreferenceSchema } from './ves-projects-preferences';
 import { VesNewProjectDialog, VesNewProjectDialogProps } from './ves-projects-new-project-dialog';
+import { VesProjectsService } from './ves-projects-service';
 
 import '../../src/browser/style/index.css';
 
@@ -15,6 +16,9 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     // preferences
     bind(PreferenceContribution).toConstantValue({ schema: VesProjectsPreferenceSchema });
+
+    // project service
+    bind(VesProjectsService).toSelf().inSingletonScope();
 
     // new project dialog
     bind(VesNewProjectDialog).toSelf().inSingletonScope();

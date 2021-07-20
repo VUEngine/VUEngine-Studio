@@ -12,7 +12,8 @@
     "datauri": "^3.0.0",
     "inversify": "^5.1.1",
     "vuengine-studio-build": "1.0.0",
-    "vuengine-studio-process": "1.0.0"
+    "vuengine-studio-process": "1.0.0",
+    "vuengine-studio-projects": "1.0.0"
   },
   "devDependencies": {
     "rimraf": "^2.7.1",
