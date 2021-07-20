@@ -16,13 +16,9 @@ export class VesBrandingContribution implements CommandContribution, MenuContrib
     protected readonly windowService: WindowService;
 
     static REPORT_ISSUE_URL = 'https://github.com/VUEngine/VUEngine-Studio/issues/new';
-    static DOCUMENTATION_URL = 'https://theia-ide.org/docs/blueprint_documentation';
     static SUPPORT_URL = 'https://www.patreon.com/VUEngine';
 
     registerCommands(commandRegistry: CommandRegistry): void {
-        commandRegistry.registerCommand(VesBrandingCommands.DOCUMENTATION, {
-            execute: () => this.windowService.openNewWindow(VesBrandingContribution.DOCUMENTATION_URL, { external: true })
-        });
         commandRegistry.registerCommand(VesBrandingCommands.REPORT_ISSUE, {
             execute: () => this.windowService.openNewWindow(VesBrandingContribution.REPORT_ISSUE_URL, { external: true })
         });
@@ -46,11 +42,6 @@ export class VesBrandingContribution implements CommandContribution, MenuContrib
             commandId: VesBrandingCommands.REPORT_ISSUE.id,
             label: VesBrandingCommands.REPORT_ISSUE.label,
             order: '1',
-        });
-        menus.registerMenuAction(VesBrandingMenus.VES_HELP, {
-            commandId: VesBrandingCommands.DOCUMENTATION.id,
-            label: VesBrandingCommands.DOCUMENTATION.label,
-            order: '2',
         });
         menus.registerMenuAction(VesBrandingMenus.VES_HELP, {
             commandId: VesBrandingCommands.SUPPORT.id,

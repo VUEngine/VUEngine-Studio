@@ -83,6 +83,7 @@
     "fs-extra": "^9.0.1",
     "vuengine-studio-branding": "1.0.0",
     "vuengine-studio-build": "1.0.0",
+    "vuengine-studio-documentation": "1.0.0",
     "vuengine-studio-emulator": "1.0.0",
     "vuengine-studio-export": "1.0.0",
     "vuengine-studio-flash-cart": "1.0.0",
