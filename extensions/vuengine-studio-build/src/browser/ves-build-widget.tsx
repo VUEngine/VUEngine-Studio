@@ -48,6 +48,7 @@ export class VesBuildWidget extends ReactWidget {
     this.title.label = VesBuildWidget.LABEL;
     this.title.caption = VesBuildWidget.LABEL;
     this.node.tabIndex = 0; // required for this.node.focus() to work in this.onActivateRequest()
+    this.update();
 
     this.vesBuildService.onDidChangeBuildStatus(() => this.update());
     this.vesBuildService.onDidChangeBuildMode(() => this.update());
