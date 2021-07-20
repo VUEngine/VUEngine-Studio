@@ -3,7 +3,7 @@ import { WidgetOpenHandler } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';
 import { EditorManager } from '@theia/editor/lib/browser';
 
-import { VesEmulatorWidget, VesEmulatorWidgetOptions } from './ves-emulator-widget';
+import { VesEmulatorWidget, VesEmulatorWidgetOptions } from './widget/ves-emulator-widget';
 
 @injectable()
 export class VesEmulatorOpenHandler extends WidgetOpenHandler<VesEmulatorWidget> {

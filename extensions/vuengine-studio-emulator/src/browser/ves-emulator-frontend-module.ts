@@ -8,7 +8,7 @@ import { VesEmulatorOpenHandler } from './ves-emulator-open-handler';
 import { VesEmulatorPreferenceSchema } from './ves-emulator-preferences';
 import { VesEmulatorService } from './ves-emulator-service';
 import { VesEmulatorViewContribution } from './ves-emulator-view';
-import { VesEmulatorWidget, VesEmulatorWidgetOptions } from './ves-emulator-widget';
+import { VesEmulatorWidget, VesEmulatorWidgetOptions } from './widget/ves-emulator-widget';
 
 import '../../src/browser/style/index.css';
 

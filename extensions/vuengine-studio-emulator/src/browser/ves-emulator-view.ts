@@ -1,7 +1,7 @@
 import { inject, injectable, postConstruct } from 'inversify';
 import { AbstractViewContribution } from '@theia/core/lib/browser';
 
-import { VesEmulatorWidget } from './ves-emulator-widget';
+import { VesEmulatorWidget } from './widget/ves-emulator-widget';
 import { VesEmulatorContextKeyService } from './ves-emulator-context-key-service';
 
 @injectable()

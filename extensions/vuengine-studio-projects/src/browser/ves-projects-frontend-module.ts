@@ -4,7 +4,7 @@ import { CommandContribution } from '@theia/core/lib/common/command';
 
 import { VesProjectsContribution } from './ves-projects-contribution';
 import { VesProjectsPreferenceSchema } from './ves-projects-preferences';
-import { VesNewProjectDialog, VesNewProjectDialogProps } from './ves-projects-new-project-dialog';
+import { VesNewProjectDialog, VesNewProjectDialogProps } from './new-project/ves-projects-new-project-dialog';
 import { VesProjectsService } from './ves-projects-service';
 
 import '../../src/browser/style/index.css';

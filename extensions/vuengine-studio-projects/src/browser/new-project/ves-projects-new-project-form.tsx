@@ -5,15 +5,15 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import { PreferenceService } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';
-import { VesProjectsPreferenceIds } from './ves-projects-preferences';
+import { VesProjectsPreferenceIds } from '../ves-projects-preferences';
 
-export interface VesNewProjectFormProps {
+export interface VesNewProjectFormComponentProps {
     fileService: FileService
     fileDialogService: FileDialogService
     preferenceService: PreferenceService
 }
 
-export interface VesNewProjectFormState {
+export interface VesNewProjectFormComponentState {
     name: string
     template: string
     path: string
@@ -21,12 +21,12 @@ export interface VesNewProjectFormState {
     isCreating: boolean
 }
 
-export class VesNewProjectForm extends React.Component<VesNewProjectFormProps, VesNewProjectFormState> {
+export class VesNewProjectFormComponent extends React.Component<VesNewProjectFormComponentProps, VesNewProjectFormComponentState> {
     protected fileService: FileService;
     protected fileDialogService: FileDialogService;
     protected preferenceService: PreferenceService;
 
-    constructor(props: VesNewProjectFormProps) {
+    constructor(props: VesNewProjectFormComponentProps) {
         super(props);
 
         this.fileService = props.fileService;

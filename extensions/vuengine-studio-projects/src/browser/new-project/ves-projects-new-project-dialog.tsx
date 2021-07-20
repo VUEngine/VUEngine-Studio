@@ -12,8 +12,8 @@ import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import { Key, PreferenceService } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';
 
-import { VesNewProjectForm } from './ves-projects-new-project-form';
-import { VesProjectsPreferenceIds } from './ves-projects-preferences';
+import { VesNewProjectFormComponent } from './ves-projects-new-project-form';
+import { VesProjectsPreferenceIds } from '../ves-projects-preferences';
 
 @injectable()
 export class VesNewProjectDialogProps extends DialogProps {
@@ -33,7 +33,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
     @inject(WorkspaceService)
     protected readonly workspaceService: WorkspaceService;
 
-    protected createProjectFormComponent: React.RefObject<VesNewProjectForm> = React.createRef();
+    protected createProjectFormComponent: React.RefObject<VesNewProjectFormComponent> = React.createRef();
     protected isCreating: boolean = false;
 
     constructor(
@@ -65,7 +65,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
     }
 
     protected render(): React.ReactNode {
-        return <VesNewProjectForm
+        return <VesNewProjectFormComponent
             fileService={this.fileService}
             fileDialogService={this.fileDialogService}
             preferenceService={this.preferenceService}
