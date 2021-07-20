@@ -1,4 +1,5 @@
 import { inject, injectable } from 'inversify';
+import sanitize = require('sanitize-filename');
 import { dirname, join as joinPath } from 'path';
 import { ApplicationShell, CommonCommands, ConfirmDialog, PreferenceService } from '@theia/core/lib/browser';
 import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
@@ -10,6 +11,7 @@ import { FileDialogService, SaveFileDialogProps } from '@theia/filesystem/lib/br
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { VesBuildCommands } from 'vuengine-studio-build/lib/browser/ves-build-commands';
 import { VesBuildService } from 'vuengine-studio-build/lib/browser/ves-build-service';
+import { VesProjectsService } from 'vuengine-studio-projects/lib/browser/ves-projects-service';
 
 @injectable()
 export class VesExportService {
@@ -28,6 +30,8 @@ export class VesExportService {
     protected readonly preferenceService: PreferenceService,
     @inject(VesBuildService)
     protected readonly vesBuildService: VesBuildService,
+    @inject(VesProjectsService)
+    protected readonly vesProjectsService: VesProjectsService,
     @inject(WorkspaceService)
     protected readonly workspaceService: WorkspaceService,
   ) { }
@@ -72,8 +76,7 @@ export class VesExportService {
     let selected: URI | undefined;
     const saveFilterDialogProps: SaveFileDialogProps = {
       title: 'Export ROM',
-      // TODO: file name based on project title
-      inputValue: 'Game Title.vb', // romUri.path.base
+      inputValue: await this.getRomName(),
     };
     const romStat = await this.fileService.resolve(romUri);
     do {
@@ -107,6 +110,12 @@ export class VesExportService {
       msg: `Do you really want to overwrite '${uri.toString()}'?`,
     }).open();
     return !!confirmed;
+  }
+
+  protected async getRomName(): Promise<string> {
+    const projectName = await this.vesProjectsService.getProjectName();
+    const romName = projectName ?? 'output';
+    return `${sanitize(romName)}.vb`;
   }
 
   getWorkspaceRoot(): string {
