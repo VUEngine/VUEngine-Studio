@@ -61,7 +61,7 @@ export class VesProjectsService {
   }
 
   protected getProjectConfigFilePath(): string {
-    return joinPath(this.getWorkspaceRoot(), '.vuengine', 'project.json');
+    return joinPath(this.getWorkspaceRoot(), 'Project.config');
   }
 
   getWorkspaceRoot(): string {

@@ -1,6 +1,7 @@
 import { inject, injectable } from 'inversify';
 import sanitize = require('sanitize-filename');
 import { dirname, join as joinPath } from 'path';
+import { homedir } from 'os';
 import { ApplicationShell, CommonCommands, ConfirmDialog, PreferenceService } from '@theia/core/lib/browser';
 import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import URI from '@theia/core/lib/common/uri';
@@ -78,7 +79,7 @@ export class VesExportService {
       title: 'Export ROM',
       inputValue: await this.getRomName(),
     };
-    const romStat = await this.fileService.resolve(romUri);
+    const romStat = await this.fileService.resolve(new URI(homedir()));
     do {
       selected = await this.fileDialogService.showSaveDialog(
         saveFilterDialogProps,
