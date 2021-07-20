@@ -80,7 +80,8 @@ export class VesEmulatorWidget extends ReactWidget {
     this.title.caption = caption;
     this.title.iconClass = 'fa fa-play';
     this.title.closable = true;
-    this.node.tabIndex = 0; // required for this.node.focus() to work in this.onActivateRequest()
+
+    this.update();
 
     // TODO: this shrinks down emulator viewport. Theia bug?
     this.keybindingRegistry.onKeybindingsChanged(() => {
@@ -415,12 +416,12 @@ export class VesEmulatorWidget extends ReactWidget {
                 </select>
               </div>
             )}
-          {/* /}
+          {/* */}
           <div>
             <button
               className='theia-button secondary'
               title='Fullscreen'
-              onClick={() => this.sendCommand('keyPress', EmulatorFunctionKeyCode.ToggleFullscreen)}
+              onClick={() => this.enterFullscreen()}
               disabled={this.state.showControls}
             >
               <i className='fa fa-arrows-alt'></i>
@@ -461,6 +462,7 @@ export class VesEmulatorWidget extends ReactWidget {
             width={canvasDimensions.width}
             height={canvasDimensions.height}
             onLoad={() => this.startEmulator(this)}
+            tabIndex={0}
           ></iframe>
         </div>
         {this.state.showControls && (
@@ -741,6 +743,11 @@ export class VesEmulatorWidget extends ReactWidget {
     }
 
     return { height: y, width: x };
+  }
+
+  protected enterFullscreen(): void {
+    this.wrapperRef.current?.requestFullscreen();
+    this.iframeRef.current?.focus();
   }
 
   protected toggleControlsOverlay(): void {
