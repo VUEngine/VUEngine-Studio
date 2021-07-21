@@ -416,7 +416,6 @@ export class VesEmulatorWidget extends ReactWidget {
                 </select>
               </div>
             )}
-          {/* */}
           <div>
             <button
               className='theia-button secondary'
@@ -427,7 +426,6 @@ export class VesEmulatorWidget extends ReactWidget {
               <i className='fa fa-arrows-alt'></i>
             </button>
           </div>
-          {/**/}
           {/* /}
           <div>
             <button
