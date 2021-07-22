@@ -10,3 +10,6 @@
 [submodule "binaries/vuengine-studio-tools"]
 	path = binaries/vuengine-studio-tools
 	url = git@github.com:VUEngine/VUEngine-Studio-Tools.git
+[submodule "documentation/vuengine-studio-documentation"]
+	path = documentation/vuengine-studio-documentation
+	url = git@github.com:VUEngine/VUEngine-Studio-Documentation.git
