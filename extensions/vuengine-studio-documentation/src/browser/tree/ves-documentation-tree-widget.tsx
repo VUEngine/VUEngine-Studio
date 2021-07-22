@@ -1,6 +1,8 @@
 import { inject, injectable } from 'inversify';
 import * as React from 'react';
 import { join as joinPath } from 'path';
+import { env } from 'process';
+import { CommandService } from '@theia/core';
 import {
   ContextMenuRenderer,
   TreeProps,
@@ -11,19 +13,21 @@ import {
   NodeProps,
   open,
   OpenerService,
+  TreeModel,
 } from '@theia/core/lib/browser';
 import { PreviewUri } from '@theia/preview/lib/browser';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import URI from '@theia/core/lib/common/uri';
 
-import { VesDocumentationChildNode, VesDocumentationRootNode } from './ves-documentation-tree';
-import { VesDocumentationTreeModel } from './ves-documentation-tree-model';
-import { CommandService } from '@theia/core';
+import { VesDocumentationChild, VesDocumentationChildNode, VesDocumentationRootNode, VesDocumentTree } from './ves-documentation-tree';
 import { VesDocumentationCommands } from '../ves-documentation-commands';
 
 @injectable()
 export class VesDocumentationTreeWidget extends TreeWidget {
   @inject(CommandService)
   protected readonly commandService: CommandService;
+  @inject(FileService)
+  protected readonly fileService: FileService;
   @inject(LabelProvider)
   protected readonly labelProvider: LabelProvider;
   @inject(OpenerService)
@@ -34,7 +38,7 @@ export class VesDocumentationTreeWidget extends TreeWidget {
 
   constructor(
     @inject(ContextMenuRenderer) contextMenuRenderer: ContextMenuRenderer,
-    @inject(VesDocumentationTreeModel) readonly model: VesDocumentationTreeModel,
+    @inject(TreeModel) readonly model: TreeModel,
     @inject(TreeProps) readonly props: TreeProps,
   ) {
     super(props, model, contextMenuRenderer);
@@ -43,6 +47,67 @@ export class VesDocumentationTreeWidget extends TreeWidget {
     this.id = VesDocumentationTreeWidget.ID;
     this.title.iconClass = 'fa fa-book';
     this.title.closable = true;
+  }
+
+  async init(): Promise<void> {
+    super.init();
+
+    const documents: VesDocumentTree = {
+      members: [
+        {
+          name: 'Handbook',
+          file: '<handbook>',
+          children: []
+        },
+        {
+          name: 'Engine Code Docs',
+          children: [
+            {
+              name: 'Graphics',
+            },
+            {
+              name: 'Printing',
+            }
+          ]
+        },
+        {
+          name: 'Hardware Documentation',
+          file: '<vbsts>'
+        }
+      ]
+    };
+
+    const handbookIndexUri = new URI(this.getHandbookIndex());
+    const handbookIndexContents = await this.fileService.readFile(handbookIndexUri); /* eslint-disable-line */
+    const handbookIndex = JSON.parse(handbookIndexContents.value.toString());
+
+    for (const index in handbookIndex) {
+      if (handbookIndex.hasOwnProperty(index)) {
+        const newNode: VesDocumentationChild = {
+          name: index,
+          children: []
+        };
+
+        for (const documentIndex in handbookIndex[index]) {
+          if (handbookIndex[index].hasOwnProperty(documentIndex)) {
+            newNode.children?.push(handbookIndex[index][documentIndex]);
+          }
+        }
+
+        documents.members[0].children?.push(newNode);
+      }
+    }
+
+    const root: VesDocumentationRootNode = {
+      id: 'ves-documentation-root',
+      name: 'ves-documentation-root',
+      visible: false,
+      parent: undefined,
+      children: [],
+      documents
+    };
+
+    this.model.root = root;
   }
 
   protected handleClickEvent(node: VesDocumentationChildNode | undefined, event: React.MouseEvent<HTMLElement>): void {
@@ -59,7 +124,7 @@ export class VesDocumentationTreeWidget extends TreeWidget {
     if (node) {
       if (node.member.file === '<vbsts>') {
         this.commandService.executeCommand(VesDocumentationCommands.OPEN_TECH_SCROLL.id);
-      } else if (node.member.file && node.member.file !== '') {
+      } else if (node.member.file && node.member.file !== '' && !node.member.file.startsWith('<')) {
         open(this.openerService, this.getHandbookUri(node.member.file ?? ''));
       }
     }
@@ -86,11 +151,32 @@ export class VesDocumentationTreeWidget extends TreeWidget {
     return false;
   }
 
+  protected getResourcesPath(): string {
+    return env.THEIA_APP_PROJECT_PATH ?? '';
+  }
+
+  protected getHandbookRoot(): string {
+    return joinPath(
+      this.getResourcesPath(),
+      'documentation',
+      'vuengine-studio-documentation',
+    );
+  }
+
+  protected getHandbookIndex(): string {
+    return joinPath(
+      this.getHandbookRoot(),
+      'index.json',
+    );
+  }
+
   protected getHandbookUri(file: string): URI {
     const docUri = new URI(joinPath(
-      this.model.getHandbookRoot(),
+      this.getHandbookRoot(),
       ...(file + '.md').split('/'),
     ));
+
+    console.log(docUri.toString());
 
     return PreviewUri.encode(docUri);
   }

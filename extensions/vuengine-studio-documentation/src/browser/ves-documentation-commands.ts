@@ -9,6 +9,12 @@ export namespace VesDocumentationCommands {
     label: 'Open Documentation Sidebar'
   };
 
+  export const OPEN_HANDBOOK: Command = {
+    id: 'ves:documentation:handbook:open',
+    category: CATEGORY,
+    label: 'Open Handbook'
+  };
+
   export const OPEN_TECH_SCROLL: Command = {
     id: 'ves:documentation:tech-scroll:open',
     category: CATEGORY,

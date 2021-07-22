@@ -21,7 +21,7 @@ export class VesDocumentationTree extends TreeImpl {
       id: uuid(),
       name: m.name,
       parent: undefined,
-      expanded: true,
+      expanded: m.file === '<handbook>',
       selected: false,
       children: [],
       member: m
