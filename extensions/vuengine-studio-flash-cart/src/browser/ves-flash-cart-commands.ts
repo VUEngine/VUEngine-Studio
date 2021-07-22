@@ -1,24 +1,26 @@
 import { Command } from '@theia/core';
 
 export namespace VesFlashCartCommands {
+  export const CATEGORY = 'Flash';
+
   export const FLASH: Command = {
     id: 'vesFlashCart.commands.flash',
     label: 'Flash to Flash Cart',
-    category: 'Flash',
+    category: CATEGORY,
     iconClass: 'fa fa-usb',
   };
 
   export const OPEN_WIDGET: Command = {
     id: 'vesFlashCart.commands.openWidget',
     label: 'Toggle Flash Carts Widget',
-    category: 'Flash',
+    category: CATEGORY,
     iconClass: 'fa fa-usb',
   };
 
   export const DETECT: Command = {
     id: 'vesFlashCart.commands.detectConnected',
     label: 'Detect Connected Flash Carts',
-    category: 'Flash',
+    category: CATEGORY,
     iconClass: 'refresh',
   };
 };

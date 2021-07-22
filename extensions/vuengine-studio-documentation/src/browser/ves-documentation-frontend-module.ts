@@ -1,22 +1,21 @@
 import { ContainerModule, interfaces } from 'inversify';
-import { CommandContribution, MenuContribution } from '@theia/core';
+import { MenuContribution } from '@theia/core';
 import {
-    bindViewContribution, createTreeContainer, FrontendApplicationContribution, Tree, TreeImpl, TreeWidget, WidgetFactory
+    bindViewContribution, createTreeContainer, FrontendApplicationContribution, Tree, TreeImpl, TreeModel, TreeWidget, WidgetFactory
 } from '@theia/core/lib/browser';
 
 import { VesDocumentationContribution } from './ves-documentation-contribution';
 import { VesDocumentationIFrameViewContribution } from './ves-documentation-iframe-view';
 import { VesDocumentationIFrameWidget } from './ves-documentation-iframe-widget';
 import { VesDocumentationTreeWidget } from './tree/ves-documentation-tree-widget';
-import { VesDocumentationTree } from './tree/ves-documentation-tree';
-import { VesDocumentationTreeViewContribution } from './tree/ves-documentation-tree-contribution';
+import { VesDocumentationTreeViewContribution } from './tree/ves-documentation-tree-view-contribution';
 
 import '../../src/browser/style/index.css';
+import { createVesDocumentationTreeWidget } from './tree/ves-documentation-tree-container';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
-    // commands and menus
+    // menus
     bind(VesDocumentationContribution).toSelf().inSingletonScope();
-    bind(CommandContribution).toService(VesDocumentationContribution);
     bind(MenuContribution).toService(VesDocumentationContribution);
 
     // iframe view
@@ -31,25 +30,8 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // sidebar view
     bindViewContribution(bind, VesDocumentationTreeViewContribution);
     bind(FrontendApplicationContribution).toService(VesDocumentationTreeViewContribution);
-    bind(WidgetFactory)
-        .toDynamicValue(ctx => ({
-            id: VesDocumentationTreeWidget.ID,
-            createWidget: () => createVesDocumentationTreeWidget(ctx.container)
-        }))
-        .inSingletonScope();
+    bind(WidgetFactory).toDynamicValue(ctx => ({
+        id: VesDocumentationTreeWidget.ID,
+        createWidget: () => createVesDocumentationTreeWidget(ctx.container)
+    })).inSingletonScope();
 });
-
-function createVesDocumentationTreeWidget(
-    parent: interfaces.Container
-): VesDocumentationTreeWidget {
-    const child = createTreeContainer(parent);
-
-    child.unbind(TreeImpl);
-    child.bind(VesDocumentationTree).toSelf();
-    child.rebind(Tree).toService(VesDocumentationTree);
-
-    child.unbind(TreeWidget);
-    child.bind(VesDocumentationTreeWidget).toSelf();
-
-    return child.get(VesDocumentationTreeWidget);
-}

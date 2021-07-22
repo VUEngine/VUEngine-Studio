@@ -1,31 +1,3 @@
-.ves-welcome-col {
-    flex: 1;
-    align-items: center;
-    justify-content: center;
-}
-
-.ves-welcome-flex-grid {
-    display: flex;
-}
-
-.ves-welcome-flex-grid.emulated-flex-gap > .ves-welcome-flex-grid-column {
-    margin-left: 40px;
-}
-
-.ves-welcome-flex-grid.emulated-flex-gap {
-    display: inline-flex;
-    flex-wrap: wrap;
-    margin-left: -40px;
-    width: calc(100% + 40px);
-}
-
-.ves-welcome-flex-grid.open {
-    padding: 20px 0;
-}
-.ves-welcome-flex-grid.open .theia-button:first-child {
-    margin-left: 0;
-}
-
 .ves-welcome-action-container {
     line-height: 20px;
 }

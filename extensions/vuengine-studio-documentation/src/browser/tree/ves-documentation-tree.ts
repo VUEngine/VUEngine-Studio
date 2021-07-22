@@ -16,7 +16,7 @@ export class VesDocumentationTree extends TreeImpl {
     return Promise.resolve(Array.from(parent.children));
   }
 
-  makeMemberNode(m: VesDocumentationChild) {
+  makeMemberNode(m: VesDocumentationChild): VesDocumentationChildNode {
     const node: VesDocumentationChildNode = {
       id: uuid(),
       name: m.name,

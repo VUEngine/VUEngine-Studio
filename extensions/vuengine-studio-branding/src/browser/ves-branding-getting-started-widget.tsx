@@ -3,7 +3,7 @@ import * as React from 'react';
 
 import { environment, isOSX } from '@theia/core';
 import { GettingStartedWidget } from '@theia/getting-started/lib/browser/getting-started-widget';
-
+import { VesDocumentationCommands } from 'vuengine-studio-documentation/lib/browser/ves-documentation-commands';
 import { VesProjectsCommands } from 'vuengine-studio-projects/lib/browser/ves-projects-commands';
 
 @injectable()
@@ -13,30 +13,12 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
     protected render(): React.ReactNode {
         return <div className="ves-welcome-container">
             {this.renderHeader()}
-            <div className="ves-welcome-flex-grid open">
-                <div className="ves-welcome-col">{this.renderOpen()}</div>
-            </div>
-            <div className="ves-welcome-flex-grid emulated-flex-gap">
-                <div className="ves-welcome-flex-grid-column">
-                    <div className="ves-welcome-flex-grid recent">
-                        <div className="ves-welcome-col">
-                            {this.renderRecentWorkspaces()}
-                        </div>
-                    </div>
-                    <div className="ves-welcome-flex-grid settings">
-                        <div className="ves-welcome-col">{this.renderSettings()}</div>
-                    </div>
-                    <div className="ves-welcome-flex-grid links">
-                        <div className="ves-welcome-col">{this.renderLinks()}</div>
-                    </div>
-                </div>
-                <div className="ves-welcome-flex-grid-column">
-                    <div className="ves-welcome-flex-grid help">
-                        <div className="ves-welcome-col">{this.renderHelp()}</div>
-                    </div>
-                </div>
-            </div>
-        </div>;
+            {this.renderOpen()}
+            {this.renderRecentWorkspaces()}
+            {this.renderSettings()}
+            {this.renderLinks()}
+            {this.renderHelp()}
+        </div >;
     }
 
     protected renderHeader(): React.ReactNode {
@@ -56,7 +38,7 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
         const requireSingleOpen = isOSX || !environment.electron.is();
 
         const newProject = (
-            <button className="theia-button large" onClick={this.newProject}>
+            <button className="theia-button large" onClick={() => this.commandRegistry.executeCommand(VesProjectsCommands.NEW.id)}>
                 <i className="fa fa-plus"></i> Create New Project
             </button>
         );
@@ -111,7 +93,9 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
                     Help
                 </h3>
                 <div className="ves-welcome-action-container">
-                    <p className="ves-welcome-empty">Tutorials coming soon...</p>
+                    <a href="#" onClick={() => this.commandRegistry.executeCommand(VesDocumentationCommands.OPEN.id)}>
+                        Show documentation
+                    </a>
                 </div>
             </div>
         );
@@ -147,6 +131,4 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
             </div>
         );
     }
-
-    protected newProject = () => this.commandRegistry.executeCommand(VesProjectsCommands.NEW.id);
 }

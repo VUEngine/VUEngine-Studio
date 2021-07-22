@@ -1,7 +1,9 @@
-import { injectable, interfaces } from 'inversify';
-import { AbstractViewContribution, bindViewContribution, FrontendApplicationContribution, WidgetFactory } from '@theia/core/lib/browser';
+import { injectable } from 'inversify';
+import { AbstractViewContribution } from '@theia/core/lib/browser';
 
 import { VesDocumentationIFrameWidget } from './ves-documentation-iframe-widget';
+import { CommandRegistry } from '@theia/core';
+import { VesDocumentationCommands } from './ves-documentation-commands';
 
 @injectable()
 export class VesDocumentationIFrameViewContribution extends AbstractViewContribution<VesDocumentationIFrameWidget> {
@@ -13,16 +15,10 @@ export class VesDocumentationIFrameViewContribution extends AbstractViewContribu
             defaultWidgetOptions: { area: 'main' },
         });
     }
-}
 
-export function bindVesDocumentationIFrameViewViews(bind: interfaces.Bind): void {
-    bindViewContribution(bind, VesDocumentationIFrameViewContribution);
-    bind(FrontendApplicationContribution).toService(
-        VesDocumentationIFrameViewContribution
-    );
-    bind(VesDocumentationIFrameWidget).toSelf();
-    bind(WidgetFactory).toDynamicValue(ctx => ({
-        id: VesDocumentationIFrameWidget.ID,
-        createWidget: () => ctx.container.get<VesDocumentationIFrameWidget>(VesDocumentationIFrameWidget),
-    })).inSingletonScope();
+    registerCommands(commands: CommandRegistry): void {
+        commands.registerCommand(VesDocumentationCommands.OPEN_TECH_SCROLL, {
+            execute: () => super.openView({ activate: false, reveal: true })
+        });
+    }
 }

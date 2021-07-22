@@ -1,15 +1,8 @@
 import { AbstractViewContribution, FrontendApplication } from '@theia/core/lib/browser';
 import { injectable } from 'inversify';
 import { VesDocumentationTreeWidget } from './ves-documentation-tree-widget';
-import { Command, CommandRegistry, MenuModelRegistry } from '@theia/core';
-
-export namespace VesDocumentationTreeCommands {
-  export const OPEN: Command = {
-    id: 'ves:documentation:tree:open',
-    category: 'Documentation',
-    label: 'Open Documentation Sidebar'
-  };
-}
+import { CommandRegistry, MenuModelRegistry } from '@theia/core';
+import { VesDocumentationCommands } from '../ves-documentation-commands';
 
 @injectable()
 export class VesDocumentationTreeViewContribution extends AbstractViewContribution<
@@ -21,7 +14,7 @@ VesDocumentationTreeWidget
       widgetName: VesDocumentationTreeWidget.LABEL,
       defaultWidgetOptions: {
         area: 'right',
-        rank: 800,
+        rank: 900,
       },
     });
   }
@@ -31,7 +24,7 @@ VesDocumentationTreeWidget
   }
 
   registerCommands(commands: CommandRegistry): void {
-    commands.registerCommand(VesDocumentationTreeCommands.OPEN, {
+    commands.registerCommand(VesDocumentationCommands.OPEN, {
       execute: () => super.openView({ activate: false, reveal: true })
     });
   }

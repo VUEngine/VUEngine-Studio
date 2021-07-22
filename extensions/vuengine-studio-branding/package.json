@@ -17,6 +17,7 @@
     "@theia/plugin-ext-vscode": "^1.15.0",
     "inversify": "^5.1.1",
     "vuengine-studio-build": "1.0.0",
+    "vuengine-studio-documentation": "1.0.0",
     "vuengine-studio-emulator": "1.0.0",
     "vuengine-studio-export": "1.0.0",
     "vuengine-studio-flash-cart": "1.0.0",

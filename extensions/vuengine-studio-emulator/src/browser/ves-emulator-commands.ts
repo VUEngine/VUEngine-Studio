@@ -1,17 +1,19 @@
 import { Command } from '@theia/core';
 
 export namespace VesEmulatorCommands {
+  export const CATEGORY = 'Emulator';
+
   export const RUN: Command = {
     id: 'VesRun.commands.run',
     label: 'Run on Emulator',
-    category: 'Run',
+    category: CATEGORY,
     iconClass: 'fa fa-play',
   };
 
   export const SELECT: Command = {
     id: 'VesRun.commands.selectEmulator',
     label: 'Set Default Emulator Config...',
-    category: 'Run',
+    category: CATEGORY,
   };
 
   export const INPUT_L_UP: Command = {
@@ -101,72 +103,72 @@ export namespace VesEmulatorCommands {
   export const INPUT_SAVE_STATE: Command = {
     id: 'VesRun.commands.emulatorInputSaveStateCommand',
     label: 'Save State',
-    category: 'Emulator',
+    category: CATEGORY,
   };
 
   export const INPUT_LOAD_STATE: Command = {
     id: 'VesRun.commands.emulatorInputLoadStateCommand',
     label: 'Load State',
-    category: 'Emulator',
+    category: CATEGORY,
   };
 
   export const INPUT_STATE_SLOT_DECREASE: Command = {
     id: 'VesRun.commands.emulatorInputStateSlotDecreaseCommand',
     label: 'Decrease Save State Slot',
-    category: 'Emulator',
+    category: CATEGORY,
   };
 
   export const INPUT_STATE_SLOT_INCREASE: Command = {
     id: 'VesRun.commands.emulatorInputStateSlotIncreaseCommand',
     label: 'Increase Save State Slot',
-    category: 'Emulator',
+    category: CATEGORY,
   };
 
   export const INPUT_TOGGLE_FAST_FORWARD: Command = {
     id: 'VesRun.commands.emulatorInputToggleFastForwardCommand',
     label: 'Toggle Fast Forward',
-    category: 'Emulator',
+    category: CATEGORY,
   };
 
   export const INPUT_PAUSE_TOGGLE: Command = {
     id: 'VesRun.commands.emulatorInputPauseToggleCommand',
     label: 'Toggle Pause',
-    category: 'Emulator',
+    category: CATEGORY,
   };
 
   export const INPUT_TOGGLE_SLOWMOTION: Command = {
     id: 'VesRun.commands.emulatorInputToggleSlowmotionCommand',
     label: 'Toggle Slow Motion',
-    category: 'Emulator',
+    category: CATEGORY,
   };
 
   export const INPUT_TOGGLE_LOW_POWER: Command = {
     id: 'VesRun.commands.emulatorInputToggleLowPower',
     label: 'Toggle Low Power Signal',
-    category: 'Emulator',
+    category: CATEGORY,
   };
 
   export const INPUT_REWIND: Command = {
     id: 'VesRun.commands.emulatorInputRewindCommand',
     label: 'Rewind',
-    category: 'Emulator',
+    category: CATEGORY,
   };
 
   export const INPUT_FRAME_ADVANCE: Command = {
     id: 'VesRun.commands.emulatorInputFrameAdvanceCommand',
     label: 'Frame Advance',
-    category: 'Emulator',
+    category: CATEGORY,
   };
 
   export const INPUT_RESET: Command = {
     id: 'VesRun.commands.emulatorInputResetCommand',
     label: 'Reset',
-    category: 'Emulator',
+    category: CATEGORY,
   };
 
   export const INPUT_AUDIO_MUTE: Command = {
     id: 'VesRun.commands.emulatorInputAudioMuteCommand',
     label: 'Audio Mute',
-    category: 'Emulator',
+    category: CATEGORY,
   };
 };
