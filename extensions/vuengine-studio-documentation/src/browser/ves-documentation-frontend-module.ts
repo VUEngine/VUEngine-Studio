@@ -1,7 +1,7 @@
-import { ContainerModule, interfaces } from 'inversify';
+import { ContainerModule } from 'inversify';
 import { MenuContribution } from '@theia/core';
 import {
-    bindViewContribution, createTreeContainer, FrontendApplicationContribution, Tree, TreeImpl, TreeModel, TreeWidget, WidgetFactory
+    bindViewContribution, FrontendApplicationContribution, WidgetFactory
 } from '@theia/core/lib/browser';
 
 import { VesDocumentationContribution } from './ves-documentation-contribution';

@@ -30,16 +30,16 @@ export class VesDocumentationTreeModel extends TreeModelImpl {
                     name: 'Engine Code Docs',
                     children: [
                         {
-                            name: 'Digns',
+                            name: 'Graphics',
                         },
                         {
-                            name: 'Brät',
+                            name: 'Printing',
                         }
                     ]
                 },
                 {
                     name: 'Hardware Documentation',
-                    file: 'vbsts'
+                    file: '<vbsts>'
                 }
             ]
         };
@@ -77,16 +77,11 @@ export class VesDocumentationTreeModel extends TreeModelImpl {
         this.tree.root = root;
     }
 
-    protected doOpenNode(node: VesDocumentationChildNode): void {
-        super.doOpenNode(node);
-        console.log('YEAH');
-    }
-
-    getResourcesPath(): string {
+    protected getResourcesPath(): string {
         return env.THEIA_APP_PROJECT_PATH ?? '';
     }
 
-    protected getHandbookRoot(): string {
+    getHandbookRoot(): string {
         return joinPath(
             this.getResourcesPath(),
             'documentation',

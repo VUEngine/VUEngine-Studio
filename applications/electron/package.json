@@ -135,6 +135,7 @@
     "vscode.json": "https://open-vsx.org/api/vscode/json/1.52.1/file/vscode.json-1.52.1.vsix",
     "vscode.json-language-features": "https://open-vsx.org/api/vscode/json-language-features/1.46.1/file/vscode.json-language-features-1.46.1.vsix",
     "vscode.log": "https://open-vsx.org/api/vscode/log/1.52.1/file/vscode.log-1.52.1.vsix",
+    "vscode.make": "https://open-vsx.org/api/vscode/make/1.57.1/file/vscode.make-1.57.1.vsix",
     "vscode.markdown": "https://open-vsx.org/api/vscode/markdown/1.52.1/file/vscode.markdown-1.52.1.vsix",
     "vscode.powershell": "https://open-vsx.org/api/vscode/powershell/1.52.1/file/vscode.powershell-1.52.1.vsix",
     "vscode.shellscript": "https://open-vsx.org/api/vscode/shellscript/1.52.1/file/vscode.shellscript-1.52.1.vsix",
