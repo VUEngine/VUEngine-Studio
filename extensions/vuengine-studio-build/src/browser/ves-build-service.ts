@@ -509,9 +509,7 @@ export class VesBuildService {
           )
         );
 
-        const pluginFileContents = await this.fileService.readFile(
-          pluginFileUri
-        );
+        const pluginFileContents = await this.fileService.readFile(pluginFileUri);
         JSON.parse(pluginFileContents.value.toString()).map(
           (plugin: string) => {
             if (!allPlugins.includes(plugin)) {

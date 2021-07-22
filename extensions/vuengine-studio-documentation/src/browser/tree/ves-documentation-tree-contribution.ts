@@ -3,9 +3,13 @@ import { injectable } from 'inversify';
 import { VesDocumentationTreeWidget } from './ves-documentation-tree-widget';
 import { Command, CommandRegistry, MenuModelRegistry } from '@theia/core';
 
-export const VesDocumentationTreeWidgetCommand: Command = {
-  id: 'ves-documentation-tree-widget:command'
-};
+export namespace VesDocumentationTreeCommands {
+  export const OPEN: Command = {
+    id: 'ves:documentation:tree:open',
+    category: 'Documentation',
+    label: 'Open Documentation Sidebar'
+  };
+}
 
 @injectable()
 export class VesDocumentationTreeViewContribution extends AbstractViewContribution<
@@ -19,7 +23,6 @@ VesDocumentationTreeWidget
         area: 'right',
         rank: 800,
       },
-      toggleCommandId: VesDocumentationTreeWidgetCommand.id
     });
   }
 
@@ -28,7 +31,7 @@ VesDocumentationTreeWidget
   }
 
   registerCommands(commands: CommandRegistry): void {
-    commands.registerCommand(VesDocumentationTreeWidgetCommand, {
+    commands.registerCommand(VesDocumentationTreeCommands.OPEN, {
       execute: () => super.openView({ activate: false, reveal: true })
     });
   }

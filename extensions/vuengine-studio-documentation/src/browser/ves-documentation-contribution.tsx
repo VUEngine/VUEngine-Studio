@@ -3,8 +3,8 @@ import { CommandContribution, CommandRegistry } from '@theia/core/lib/common/com
 import { MenuContribution, MenuModelRegistry } from '@theia/core/lib/common/menu';
 import { VesBrandingMenus } from 'vuengine-studio-branding/lib/browser/ves-branding-menus';
 
-import { VesDocumentationCommands } from './ves-documentation-commands';
 import { VesDocumentationIFrameViewContribution } from './ves-documentation-iframe-view';
+import { VesDocumentationTreeCommands } from './tree/ves-documentation-tree-contribution';
 
 @injectable()
 export class VesDocumentationContribution implements CommandContribution, MenuContribution {
@@ -13,15 +13,15 @@ export class VesDocumentationContribution implements CommandContribution, MenuCo
     protected readonly iframeView: VesDocumentationIFrameViewContribution;
 
     registerCommands(commandRegistry: CommandRegistry): void {
-        commandRegistry.registerCommand(VesDocumentationCommands.OPEN_HANDBOOK, {
+        commandRegistry.registerCommand(VesDocumentationTreeCommands.OPEN, {
             execute: () => this.iframeView.openView({ reveal: true }),
         });
     }
 
     registerMenus(menus: MenuModelRegistry): void {
         menus.registerMenuAction(VesBrandingMenus.VES_HELP, {
-            commandId: VesDocumentationCommands.OPEN_HANDBOOK.id,
-            label: VesDocumentationCommands.OPEN_HANDBOOK.label,
+            commandId: VesDocumentationTreeCommands.OPEN.id,
+            label: VesDocumentationTreeCommands.OPEN.label,
             order: '2',
         });
     }

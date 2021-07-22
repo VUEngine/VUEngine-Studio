@@ -1,0 +1,110 @@
+{
+  "Setup": [
+    {
+      "name": "Installation",
+      "file": "setup/installation"
+    }
+  ],
+  "The Basics": [
+    {
+      "name": "The editor window",
+      "file": ""
+    },
+    {
+      "name": "Keyboard Shortcuts",
+      "file": ""
+    },
+    {
+      "name": "Version Control",
+      "file": ""
+    },
+    {
+      "name": "Building",
+      "file": ""
+    }
+  ],
+  "Assets": [
+    {
+      "name": "Images",
+      "file": ""
+    },
+    {
+      "name": "Music",
+      "file": ""
+    }
+  ],
+  "Settings": [
+    {
+      "name": "Project config",
+      "file": ""
+    },
+    {
+      "name": "Engine config",
+      "file": ""
+    },
+    {
+      "name": "ROM Header",
+      "file": ""
+    }
+  ],
+  "Engine": [
+    {
+      "name": "Introduction",
+      "file": "engine/introduction"
+    },
+    {
+      "name": "Coding Standards",
+      "file": "engine/coding-standards"
+    },
+    {
+      "name": "Config Files",
+      "file": "engine/config-files"
+    },
+    {
+      "name": "Graphics",
+      "file": "engine/graphics"
+    },
+    {
+      "name": "In-game Object Types",
+      "file": "engine/in-game-object-types"
+    },
+    {
+      "name": "Object Interaction",
+      "file": "engine/object-interaction"
+    },
+    {
+      "name": "Object Oriented Programming",
+      "file": "engine/object-oriented-programming"
+    },
+    {
+      "name": "Post Processing",
+      "file": "engine/post-processing"
+    },
+    {
+      "name": "Printing",
+      "file": "engine/printing"
+    },
+    {
+      "name": "Sprite Effects",
+      "file": "engine/sprite-effects"
+    },
+    {
+      "name": "Stage",
+      "file": "engine/stage"
+    },
+    {
+      "name": "Work RAM",
+      "file": "engine/work-ram"
+    }
+  ],
+  "Troubleshooting": [
+    {
+      "name": "FAQ",
+      "file": ""
+    },
+    {
+      "name": "Debugging",
+      "file": ""
+    }
+  ]
+}

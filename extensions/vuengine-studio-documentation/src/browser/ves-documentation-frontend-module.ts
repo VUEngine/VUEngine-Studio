@@ -1,15 +1,17 @@
 import { ContainerModule, interfaces } from 'inversify';
 import { CommandContribution, MenuContribution } from '@theia/core';
-import { bindViewContribution, createTreeContainer, FrontendApplicationContribution, Tree, TreeImpl, TreeWidget, WidgetFactory } from '@theia/core/lib/browser';
+import {
+    bindViewContribution, createTreeContainer, FrontendApplicationContribution, Tree, TreeImpl, TreeWidget, WidgetFactory
+} from '@theia/core/lib/browser';
 
 import { VesDocumentationContribution } from './ves-documentation-contribution';
 import { VesDocumentationIFrameViewContribution } from './ves-documentation-iframe-view';
 import { VesDocumentationIFrameWidget } from './ves-documentation-iframe-widget';
-
-import '../../src/browser/style/index.css';
 import { VesDocumentationTreeWidget } from './tree/ves-documentation-tree-widget';
 import { VesDocumentationTree } from './tree/ves-documentation-tree';
 import { VesDocumentationTreeViewContribution } from './tree/ves-documentation-tree-contribution';
+
+import '../../src/browser/style/index.css';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // commands and menus

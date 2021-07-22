@@ -1,13 +1,21 @@
+import { inject, injectable } from 'inversify';
+import * as React from 'react';
+import { join as joinPath } from 'path';
+import { env } from 'process';
 import {
   ContextMenuRenderer,
   TreeModel,
   TreeProps,
   TreeWidget,
   TreeNode,
-  ExpandableTreeNode
+  ExpandableTreeNode,
+  LabelProvider,
+  NodeProps
 } from '@theia/core/lib/browser';
-import { inject, injectable } from 'inversify';
-import { MemberNode, VesDocumentationRootNode } from './ves-documentation-tree';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
+
+import { VesDocumentationChild, VesDocumentationChildNode, VesDocumentationRootNode, VesDocumentTree } from './ves-documentation-tree';
+import URI from '@theia/core/lib/common/uri';
 
 @injectable()
 export class VesDocumentationTreeWidget extends TreeWidget {
@@ -15,9 +23,11 @@ export class VesDocumentationTreeWidget extends TreeWidget {
   static readonly LABEL = 'Documentation';
 
   constructor(
-    @inject(TreeProps) readonly props: TreeProps,
+    @inject(ContextMenuRenderer) contextMenuRenderer: ContextMenuRenderer,
+    @inject(FileService) protected readonly fileService: FileService,
+    @inject(LabelProvider) protected readonly labelProvider: LabelProvider,
     @inject(TreeModel) readonly model: TreeModel,
-    @inject(ContextMenuRenderer) contextMenuRenderer: ContextMenuRenderer
+    @inject(TreeProps) readonly props: TreeProps,
   ) {
     super(props, model, contextMenuRenderer);
 
@@ -25,54 +35,57 @@ export class VesDocumentationTreeWidget extends TreeWidget {
     this.id = VesDocumentationTreeWidget.ID;
     this.title.iconClass = 'fa fa-book';
     this.title.closable = true;
+  }
 
-    const documents: VesDocuments = {
-      name: 'Vestrit',
+  protected async init(): Promise<void> {
+    super.init();
+
+
+
+    const documents: VesDocumentTree = {
       members: [
         {
           name: 'Handbook',
-          file: 'Ephy',
-          children: [
-            {
-              name: 'Installation',
-              file: 'Keff'
-            },
-            {
-              name: 'Building',
-              file: 'Alth',
-              children: [
-                {
-                  name: 'Build',
-                  file: 'Keff'
-                },
-                {
-                  name: 'Run',
-                  file: 'Alth'
-                }
-              ]
-            }
-          ]
+          children: []
         },
         {
           name: 'Engine Code Docs',
-          file: 'Palle',
           children: [
             {
               name: 'Digns',
-              file: 'Bums'
             },
             {
               name: 'Brät',
-              file: 'AltBrot'
             }
           ]
         },
         {
           name: 'Hardware Documentation',
-          file: 'Palle'
+          file: 'vbsts'
         }
       ]
     };
+
+    const handbookIndexUri = new URI(this.getHandbookIndex());
+    const handbookIndexContents = await this.fileService.readFile(handbookIndexUri); /* eslint-disable-line */
+    const handbookIndex = JSON.parse(handbookIndexContents.value.toString());
+
+    for (const index in handbookIndex) {
+      if (handbookIndex.hasOwnProperty(index)) {
+        const newNode: VesDocumentationChild = {
+          name: index,
+          children: []
+        };
+
+        for (const documentIndex in handbookIndex[index]) {
+          if (handbookIndex[index].hasOwnProperty(documentIndex)) {
+            newNode.children?.push(handbookIndex[index][documentIndex]);
+          }
+        }
+
+        documents.members[0].children?.push(newNode);
+      }
+    }
 
     const root: VesDocumentationRootNode = {
       id: 'ves-documentation-root',
@@ -86,11 +99,35 @@ export class VesDocumentationTreeWidget extends TreeWidget {
     this.model.root = root;
   }
 
+  protected renderIcon(node: VesDocumentationChildNode, props: NodeProps): React.ReactNode {
+    const iconClass = node.member.children !== undefined && node.member.children.length > 0 ? 'fa fa-folder' : 'fa fa-file-o';
+    return <i className={iconClass} style={{ marginRight: 5 }} />;
+  }
+
   protected isExpandable(node: TreeNode): node is ExpandableTreeNode {
     if (VesDocumentationRootNode.is(node)) { return true; }
 
-    if (MemberNode.is(node) && node.member.children) { return node.member.children.length > 0; }
+    if (VesDocumentationChildNode.is(node) && node.member.children) { return node.member.children.length > 0; }
 
     return false;
+  }
+
+  getResourcesPath(): string {
+    return env.THEIA_APP_PROJECT_PATH ?? '';
+  }
+
+  protected getHandbookRoot(): string {
+    return joinPath(
+      this.getResourcesPath(),
+      'documentation',
+      'vuengine-studio-documentation',
+    );
+  }
+
+  protected getHandbookIndex(): string {
+    return joinPath(
+      this.getHandbookRoot(),
+      'index.json',
+    );
   }
 }
