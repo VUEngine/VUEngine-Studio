@@ -1,0 +1,5 @@
+#ves-documentation-tech-scroll {
+  /* TODO: use theia's scrollbar instead */
+  overflow: auto;
+  padding: var(--theia-ui-padding);
+}

@@ -3,8 +3,8 @@ import { MenuContribution } from '@theia/core';
 import { bindViewContribution, FrontendApplicationContribution, WidgetFactory } from '@theia/core/lib/browser';
 
 import { VesDocumentationContribution } from './ves-documentation-contribution';
-import { VesDocumentationIFrameViewContribution } from './ves-documentation-iframe-view';
-import { VesDocumentationIFrameWidget } from './ves-documentation-iframe-widget';
+import { VesDocumentationTechScrollViewContribution } from './ves-documentation-tech-scroll-view';
+import { VesDocumentationTechScrollWidget } from './ves-documentation-tech-scroll-widget';
 import { VesDocumentationTreeWidget } from './tree/ves-documentation-tree-widget';
 import { VesDocumentationTreeViewContribution } from './tree/ves-documentation-tree-view-contribution';
 import { createVesDocumentationTreeWidget } from './tree/ves-documentation-tree-container';
@@ -27,13 +27,13 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
         createWidget: () => ctx.container.get<VesDocumentationHandbookWidget>(VesDocumentationHandbookWidget),
     })).inSingletonScope();
 
-    // iframe view
-    bindViewContribution(bind, VesDocumentationIFrameViewContribution);
-    bind(FrontendApplicationContribution).toService(VesDocumentationIFrameViewContribution);
-    bind(VesDocumentationIFrameWidget).toSelf();
+    // tech scroll view
+    bindViewContribution(bind, VesDocumentationTechScrollViewContribution);
+    bind(FrontendApplicationContribution).toService(VesDocumentationTechScrollViewContribution);
+    bind(VesDocumentationTechScrollWidget).toSelf();
     bind(WidgetFactory).toDynamicValue(ctx => ({
-        id: VesDocumentationIFrameWidget.ID,
-        createWidget: () => ctx.container.get<VesDocumentationIFrameWidget>(VesDocumentationIFrameWidget),
+        id: VesDocumentationTechScrollWidget.ID,
+        createWidget: () => ctx.container.get<VesDocumentationTechScrollWidget>(VesDocumentationTechScrollWidget),
     })).inSingletonScope();
 
     // sidebar view

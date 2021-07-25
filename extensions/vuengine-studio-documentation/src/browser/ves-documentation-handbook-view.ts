@@ -21,13 +21,19 @@ export class VesDocumentationHandbookViewContribution extends AbstractViewContri
 
     registerCommands(commands: CommandRegistry): void {
         commands.registerCommand(VesDocumentationCommands.OPEN_HANDBOOK, {
-            execute: (documentUri?: URI) => {
+            execute: async (documentUri?: URI) => {
                 this.vesDocumentationTreeViewContribution.openView({ reveal: true });
                 if (documentUri) {
                     super.openView({ activate: false, reveal: true });
-                    const widget = super.tryGetWidget();
+                    let widget = super.tryGetWidget();
                     if (widget) {
                         widget.openDocument(documentUri);
+                    } else {
+                        // TODO: retry a few times instead of only once
+                        setTimeout(() => {
+                            widget = super.tryGetWidget();
+                            widget?.openDocument(documentUri);
+                        }, 300);
                     }
                 }
             },
