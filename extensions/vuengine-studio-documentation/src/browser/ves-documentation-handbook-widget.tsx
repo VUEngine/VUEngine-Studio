@@ -1,4 +1,4 @@
-import { inject, injectable, postConstruct } from 'inversify';
+import { inject, injectable } from 'inversify';
 import { BaseWidget } from '@theia/core/lib/browser';
 import { PreviewHandler, PreviewHandlerProvider } from '@theia/preview/lib/browser/preview-handler';
 import URI from '@theia/core/lib/common/uri';
@@ -25,20 +25,8 @@ export class VesDocumentationHandbookWidget extends BaseWidget {
         this.node.tabIndex = 0;
     }
 
-    @postConstruct()
-    protected async init(): Promise<void> {
-        const contentElement = await this.render();
-        this.node.innerHTML = '';
-        if (contentElement) {
-            this.node.appendChild(contentElement);
-        }
-        this.update();
-    }
-
-    protected async render(): Promise<HTMLElement | undefined> {
-        const file = '/Users/chris/dev/vuengine-studio/applications/electron/documentation/vuengine-studio-documentation/engine/post-processing.md';
-        const originUri = new URI(file);
-        const fileContent = await this.fileService.readFile(originUri);
+    async openDocument(documentUri: URI): Promise<void> {
+        const fileContent = await this.fileService.readFile(documentUri);
         const content = fileContent.value.toString();
 
         const docTitle = content.substring(
@@ -56,12 +44,17 @@ export class VesDocumentationHandbookWidget extends BaseWidget {
         // fix image urls
         fixedContent = fixedContent.replace(/\/documentation\/images\//g, '../images/');
 
-        this.previewHandler = this.previewHandlerProvider.findContribution(originUri)[0];
+        this.previewHandler = this.previewHandlerProvider.findContribution(documentUri)[0];
 
         if (!this.previewHandler) {
             return undefined;
         }
-
-        return this.previewHandler.renderContent({ content: fixedContent, originUri });
+        const contentElement = this.previewHandler.renderContent({ content: fixedContent, originUri: documentUri });
+        this.node.innerHTML = '';
+        if (contentElement) {
+            // @ts-ignore
+            this.node.appendChild(contentElement);
+        }
+        this.update();
     }
 }

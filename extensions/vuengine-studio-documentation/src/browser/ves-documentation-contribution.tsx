@@ -8,8 +8,8 @@ import { CommonMenus } from '@theia/core/lib/browser';
 export class VesDocumentationContribution implements MenuContribution {
     registerMenus(menus: MenuModelRegistry): void {
         menus.registerMenuAction(CommonMenus.HELP, {
-            commandId: VesDocumentationCommands.OPEN.id,
-            label: VesDocumentationCommands.OPEN.label,
+            commandId: VesDocumentationCommands.OPEN_HANDBOOK.id,
+            label: VesDocumentationCommands.OPEN_HANDBOOK.label,
             order: '2',
         });
     }

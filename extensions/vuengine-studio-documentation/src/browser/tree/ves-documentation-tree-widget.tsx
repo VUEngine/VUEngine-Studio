@@ -11,8 +11,6 @@ import {
   ExpandableTreeNode,
   LabelProvider,
   NodeProps,
-  open,
-  OpenerService,
   TreeModel,
 } from '@theia/core/lib/browser';
 import { PreviewUri } from '@theia/preview/lib/browser';
@@ -30,8 +28,6 @@ export class VesDocumentationTreeWidget extends TreeWidget {
   protected readonly fileService: FileService;
   @inject(LabelProvider)
   protected readonly labelProvider: LabelProvider;
-  @inject(OpenerService)
-  protected readonly openerService: OpenerService;
 
   static readonly ID = 'ves-documentation-tree-widget';
   static readonly LABEL = 'Documentation';
@@ -125,7 +121,7 @@ export class VesDocumentationTreeWidget extends TreeWidget {
       if (node.member.file === '<vbsts>') {
         this.commandService.executeCommand(VesDocumentationCommands.OPEN_TECH_SCROLL.id);
       } else if (node.member.file && node.member.file !== '' && !node.member.file.startsWith('<')) {
-        open(this.openerService, this.getHandbookUri(node.member.file ?? ''));
+        this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, this.getHandbookUri(node.member.file ?? ''));
       }
     }
   }
@@ -175,8 +171,6 @@ export class VesDocumentationTreeWidget extends TreeWidget {
       this.getHandbookRoot(),
       ...(file + '.md').split('/'),
     ));
-
-    console.log(docUri.toString());
 
     return PreviewUri.encode(docUri);
   }

@@ -93,7 +93,7 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
                     Help
                 </h3>
                 <div className="ves-welcome-action-container">
-                    <a href="#" onClick={() => this.commandRegistry.executeCommand(VesDocumentationCommands.OPEN.id)}>
+                    <a href="#" onClick={() => this.commandRegistry.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id)}>
                         Show documentation
                     </a>
                 </div>
