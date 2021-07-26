@@ -18,10 +18,7 @@ export class VesDocumentationTechScrollViewContribution extends AbstractViewCont
 
     registerCommands(commands: CommandRegistry): void {
         commands.registerCommand(VesDocumentationCommands.OPEN_TECH_SCROLL, {
-            execute: () => {
-                // TODO: this does not work too well. Just open latest on PVB in external browser?
-                super.openView({ activate: false, reveal: true });
-            },
+            execute: () => super.openView({ activate: false, reveal: true }),
         });
     }
 }

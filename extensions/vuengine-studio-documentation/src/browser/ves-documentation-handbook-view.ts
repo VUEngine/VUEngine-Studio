@@ -25,18 +25,24 @@ export class VesDocumentationHandbookViewContribution extends AbstractViewContri
                 this.vesDocumentationTreeViewContribution.openView({ reveal: true });
                 if (documentUri) {
                     super.openView({ activate: false, reveal: true });
+
                     let widget = super.tryGetWidget();
+                    let tries = 0;
+                    while (!widget && tries < 50) {
+                        widget = super.tryGetWidget();
+                        tries++;
+                        await this.sleep(50);
+                    }
+
                     if (widget) {
                         widget.openDocument(documentUri);
-                    } else {
-                        // TODO: retry a few times instead of only once
-                        setTimeout(() => {
-                            widget = super.tryGetWidget();
-                            widget?.openDocument(documentUri);
-                        }, 300);
                     }
                 }
             },
         });
+    }
+
+    private async sleep(ms: number): Promise<unknown> {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 }

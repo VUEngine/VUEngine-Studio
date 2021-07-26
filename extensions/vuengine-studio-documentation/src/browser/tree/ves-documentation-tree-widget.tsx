@@ -39,8 +39,9 @@ export class VesDocumentationTreeWidget extends TreeWidget {
   ) {
     super(props, model, contextMenuRenderer);
 
-    this.title.label = VesDocumentationTreeWidget.LABEL;
     this.id = VesDocumentationTreeWidget.ID;
+    this.title.label = VesDocumentationTreeWidget.LABEL;
+    this.title.caption = VesDocumentationTreeWidget.LABEL;
     this.title.iconClass = 'fa fa-book';
     this.title.closable = true;
   }
