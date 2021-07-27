@@ -511,25 +511,6 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                         </div>
                         <br />
                         <div
-                            ref={this.controllerButtonAssignmentBRef}
-                            onMouseEnter={() =>
-                                this.toggleRefHighlighted(this.controllerButtonBRef)
-                            }
-                            onMouseLeave={() =>
-                                this.toggleRefHighlighted(this.controllerButtonBRef)
-                            }
-                        >
-                            <span>B</span>
-                            <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_B.id,
-                                        false
-                                    )}
-                                </button>
-                            </span>
-                        </div>
-                        <div
                             ref={this.controllerButtonAssignmentARef}
                             onMouseEnter={() =>
                                 this.toggleRefHighlighted(this.controllerButtonARef)
@@ -543,6 +524,25 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                                 <button className='theia-button secondary'>
                                     {this.getKeybindingLabel(
                                         VesEmulatorCommands.INPUT_A.id,
+                                        false
+                                    )}
+                                </button>
+                            </span>
+                        </div>
+                        <div
+                            ref={this.controllerButtonAssignmentBRef}
+                            onMouseEnter={() =>
+                                this.toggleRefHighlighted(this.controllerButtonBRef)
+                            }
+                            onMouseLeave={() =>
+                                this.toggleRefHighlighted(this.controllerButtonBRef)
+                            }
+                        >
+                            <span>B</span>
+                            <span>
+                                <button className='theia-button secondary'>
+                                    {this.getKeybindingLabel(
+                                        VesEmulatorCommands.INPUT_B.id,
                                         false
                                     )}
                                 </button>
