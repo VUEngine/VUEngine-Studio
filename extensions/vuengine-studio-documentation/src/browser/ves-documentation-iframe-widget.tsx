@@ -9,7 +9,7 @@ export class VesDocumentationIFrameWidget extends ReactWidget {
     @inject(ColorRegistry) private readonly colorRegistry: ColorRegistry;
     @inject(ThemeService) private readonly themeService: ThemeService;
 
-    static readonly ID = 'ves-documentation-vbsts';
+    static readonly ID = 'ves-documentation-stsvb';
     static readonly LABEL = 'Hardware Documentation';
 
     @postConstruct()

@@ -1,5 +1,5 @@
 import { interfaces } from 'inversify';
-import { createTreeContainer, Tree, TreeImpl, TreeWidget } from '@theia/core/lib/browser';
+import { createTreeContainer, defaultTreeProps, Tree, TreeImpl, TreeProps, TreeWidget } from '@theia/core/lib/browser';
 
 import { VesDocumentationTree } from './ves-documentation-tree';
 import { VesDocumentationTreeWidget } from './ves-documentation-tree-widget';
@@ -14,6 +14,11 @@ function createVesDocumentationTreeContainer(parent: interfaces.Container): Cont
 
     child.bind(VesDocumentationTreeWidget).toSelf();
     child.rebind(TreeWidget).toService(VesDocumentationTreeWidget);
+
+    child.rebind(TreeProps).toConstantValue({
+        ...defaultTreeProps,
+        search: true,
+    });
 
     return child;
 }

@@ -58,18 +58,12 @@ export class VesDocumentationTreeWidget extends TreeWidget {
         },
         {
           name: 'Engine Code Docs',
-          children: [
-            {
-              name: 'Graphics',
-            },
-            {
-              name: 'Printing',
-            }
-          ]
+          // file: '<doxy>',
+          children: []
         },
         {
           name: 'Hardware Documentation',
-          file: '<vbsts>'
+          file: '<stsvb>'
         }
       ]
     };
@@ -119,7 +113,7 @@ export class VesDocumentationTreeWidget extends TreeWidget {
 
   protected handleDocOpen(node: VesDocumentationChildNode | undefined): void {
     if (node) {
-      if (node.member.file === '<vbsts>') {
+      if (node.member.file === '<stsvb>') {
         this.commandService.executeCommand(VesDocumentationCommands.OPEN_TECH_SCROLL.id);
       } else if (node.member.file && node.member.file !== '' && !node.member.file.startsWith('<')) {
         this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, this.getHandbookUri(node.member.file ?? ''));
