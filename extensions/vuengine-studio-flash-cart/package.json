@@ -5,9 +5,9 @@
   "description": "VUEngine Studio flash carts support",
   "dependencies": {
     "@phosphor/messaging": "^1.3.0",
-    "@theia/core": "1.15.0",
-    "@theia/filesystem": "^1.15.0",
-    "@theia/workspace": "^1.15.0",
+    "@theia/core": "1.16.0",
+    "@theia/filesystem": "^1.16.0",
+    "@theia/workspace": "^1.16.0",
     "inversify": "^5.1.1",
     "filenamify": "^4.3.0",
     "usb": "^1.7.0",

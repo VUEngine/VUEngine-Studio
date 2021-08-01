@@ -4,8 +4,8 @@
   "version": "1.0.0",
   "description": "VUEngine Studio process service",
   "dependencies": {
-    "@theia/core": "1.15.0",
-    "@theia/process": "^1.15.0",
+    "@theia/core": "1.16.0",
+    "@theia/process": "^1.16.0",
     "inversify": "^5.1.1",
     "filenamify": "^4.3.0"
   },

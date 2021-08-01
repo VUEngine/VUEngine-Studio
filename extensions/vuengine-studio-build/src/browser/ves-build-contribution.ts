@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify';
 import { join as joinPath } from 'path';
 import * as rimraf from 'rimraf';
 import { CommandContribution, CommandRegistry, isWindows, MAIN_MENU_BAR, MenuContribution, MenuModelRegistry, MessageService } from '@theia/core/lib/common';
-import { ApplicationShell, KeybindingContribution, KeybindingRegistry, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
+import { ApplicationShell, KeybindingContribution, KeybindingRegistry, PreferenceScope, PreferenceService, QuickPickItem, QuickPickOptions } from '@theia/core/lib/browser';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 
 import { VesBuildCommands } from './ves-build-commands';
@@ -10,7 +10,7 @@ import { VesBuildViewContribution } from './ves-build-view';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
 import { VesBuildService } from './ves-build-service';
 import { BuildMode } from './ves-build-types';
-import { QuickPickOptions, QuickPickService } from '@theia/core/lib/common/quick-pick-service';
+import { QuickPickService } from '@theia/core/lib/common/quick-pick-service';
 
 export const buildMenuPath = [...MAIN_MENU_BAR, 'vesBuild'];
 export namespace VesBuildMenuSection {
@@ -165,7 +165,7 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
   async buildModeQuickPick(buildMode?: BuildMode): Promise<void> {
     const currentBuildMode = this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode;
 
-    const quickPickOptions: QuickPickOptions = {
+    const quickPickOptions: QuickPickOptions<QuickPickItem> = {
       title: 'Set Build Mode',
       placeholder: 'Select which mode to build in'
     };
@@ -203,11 +203,11 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
       }
     ];
 
-    this.quickPickService.show<string>(buildTypes, quickPickOptions).then(selection => {
+    this.quickPickService.show<QuickPickItem>(buildTypes, quickPickOptions).then(selection => {
       if (!selection) {
         return;
       }
-      this.setBuildMode(selection);
+      this.setBuildMode(selection.label);
     });
   }
 

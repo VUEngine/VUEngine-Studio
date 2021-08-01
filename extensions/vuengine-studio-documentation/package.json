@@ -4,11 +4,11 @@
   "version": "1.0.0",
   "description": "VUEngine Studio documentation",
   "dependencies": {
-    "@theia/core": "1.15.0",
-    "@theia/editor": "1.15.0",
-    "@theia/filesystem": "1.15.0",
-    "@theia/preview": "1.15.0",
-    "@theia/workspace": "1.15.0",
+    "@theia/core": "1.16.0",
+    "@theia/editor": "1.16.0",
+    "@theia/filesystem": "1.16.0",
+    "@theia/preview": "1.16.0",
+    "@theia/workspace": "1.16.0",
     "inversify": "^5.1.1",
     "uuid": "^8.3.2",
     "vuengine-studio-branding": "1.0.0"

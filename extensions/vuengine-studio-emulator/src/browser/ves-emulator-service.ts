@@ -1,9 +1,9 @@
 import { inject, injectable, postConstruct } from 'inversify';
 import { join as joinPath } from 'path';
 import { CommandService, isWindows } from '@theia/core/lib/common';
-import { ApplicationShell, OpenerService, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
+import { ApplicationShell, OpenerService, PreferenceScope, PreferenceService, QuickPickItem, QuickPickOptions } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';
-import { QuickPickItem, QuickPickOptions, QuickPickService } from '@theia/core/lib/common/quick-pick-service';
+import { QuickPickService } from '@theia/core/lib/common/quick-pick-service';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { VesBuildCommands } from 'vuengine-studio-build/lib/browser/ves-build-commands';
 import { VesBuildService } from 'vuengine-studio-build/lib/browser/ves-build-service';
@@ -78,11 +78,11 @@ export class VesEmulatorService {
   }
 
   async selectEmulator(): Promise<void> {
-    const quickPickOptions: QuickPickOptions = {
+    const quickPickOptions: QuickPickOptions<QuickPickItem> = {
       title: 'Select default emulator configuration',
       placeholder: 'Which emulator configuration should be used to run compiled projects?',
     };
-    const quickPickItems: QuickPickItem<string>[] = [];
+    const quickPickItems: QuickPickItem[] = [];
 
     const defaultEmulator = this.getDefaultEmulatorConfig().name;
     const emulatorConfigs = this.getEmulatorConfigs();
@@ -90,19 +90,18 @@ export class VesEmulatorService {
     for (const emulatorConfig of emulatorConfigs) {
       quickPickItems.push({
         label: emulatorConfig.name,
-        value: emulatorConfig.name,
         description: emulatorConfig.path,
         detail: this.shorten(emulatorConfig.args, 98),
-        iconClass: (emulatorConfig.name === defaultEmulator) ? 'fa fa-check' : '',
+        iconClasses: (emulatorConfig.name === defaultEmulator) ? ['fa', 'fa-check'] : [],
       });
     }
 
-    this.quickPickService.show<string>(quickPickItems, quickPickOptions).then(selection => {
+    this.quickPickService.show<QuickPickItem>(quickPickItems, quickPickOptions).then(selection => {
       if (!selection) {
         return;
       }
 
-      const selectedEmulator = (selection === emulatorConfigs[0].name) ? '' : selection;
+      const selectedEmulator = (selection.id === emulatorConfigs[0].name) ? '' : selection;
 
       this.preferenceService.set(VesEmulatorPreferenceIds.DEFAULT_EMULATOR, selectedEmulator, PreferenceScope.User);
     });

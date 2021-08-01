@@ -4,9 +4,9 @@
   "version": "1.0.0",
   "description": "VUEngine Studio Updater",
   "dependencies": {
-    "@theia/core": "1.15.0",
-    "@theia/output": "1.15.0",
-    "@theia/preferences": "1.15.0",
+    "@theia/core": "1.16.0",
+    "@theia/output": "1.16.0",
+    "@theia/preferences": "1.16.0",
     "electron": "^9.3.2",
     "electron-log": "^4.3.0",
     "electron-updater": "^4.3.5",
