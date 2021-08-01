@@ -5,14 +5,6 @@
   z-index: 1;
 }
 
-#ves-titlebar-window-controls .titlebar-window-controls-separator {
-  border-left: 1px solid;
-  float: left;
-  height: 23px;
-  margin: 8px 10px 0 4px;
-  opacity: 0.2;
-}
-
 #ves-titlebar-window-controls .titlebar-window-controls-button {
   display: block;
   fill: var(--theia-titleBar-activeForeground);

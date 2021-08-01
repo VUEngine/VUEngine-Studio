@@ -10,7 +10,7 @@
 }
 
 #ves-titlebar-action-buttons:not(.os-osx) {
-  margin-right: 162px;
+  margin-right: 150px;
 }
 
 @media (max-width: 800px) {

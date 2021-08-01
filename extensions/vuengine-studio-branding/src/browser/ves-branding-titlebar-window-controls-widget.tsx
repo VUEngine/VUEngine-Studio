@@ -29,7 +29,6 @@ export class VesTitlebarWindowControlsWidget extends ReactWidget {
   protected render(): React.ReactNode {
     return (
       <>
-        <div className='titlebar-window-controls-separator'></div>
         <div
           className='titlebar-window-controls-button minimize'
           id='ves-titlebar-window-controls-minimize'
