@@ -1,0 +1,11 @@
+.ves-file-icon {
+    width: 16px;
+}
+
+.ves-file-icon:before {
+    margin-right: 16px;
+}
+
+.ves-file-icon.fa-play {
+    font-size: calc(var(--theia-content-font-size) * 0.8);
+}

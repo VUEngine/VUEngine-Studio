@@ -2,7 +2,7 @@ import { ContainerModule } from '@theia/core/shared/inversify';
 import { isOSX } from '@theia/core';
 import { AboutDialog } from '@theia/core/lib/browser/about-dialog';
 import { CommandContribution } from '@theia/core/lib/common/command';
-import { FrontendApplicationContribution, WidgetFactory, bindViewContribution } from '@theia/core/lib/browser';
+import { FrontendApplicationContribution, WidgetFactory, bindViewContribution, LabelProviderContribution } from '@theia/core/lib/browser';
 import { GettingStartedWidget } from '@theia/getting-started/lib/browser/getting-started-widget';
 import { MenuContribution } from '@theia/core/lib/common/menu';
 import { PreferenceConfigurations } from '@theia/core/lib/browser/preferences/preference-configurations';
@@ -33,6 +33,7 @@ import { VesTitlebarActionButtonsWidget } from './ves-branding-titlebar-action-b
 import { VesTitlebarActionButtonsContribution } from './ves-branding-titlebar-action-buttons-view';
 import { VesPreferenceTreeGenerator } from './ves-branding-preference-tree-generator.';
 import { VesDefaultFileIconThemeContribution } from './ves-branding-icon-theme-contribution';
+import { VesBrandingLabelProviderContribution } from './ves-branding-label-provider';
 
 import '../../src/browser/style/index.css';
 
@@ -80,6 +81,10 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // add custom preference tree categories
     bind(VesPreferenceTreeGenerator).toSelf().inSingletonScope();
     rebind(PreferenceTreeGenerator).to(VesPreferenceTreeGenerator);
+
+    // file icons & labels
+    bind(VesBrandingLabelProviderContribution).toSelf().inSingletonScope();
+    bind(LabelProviderContribution).toService(VesBrandingLabelProviderContribution);
 
     // remove debug features
     bind(VesDebugContribution).toSelf().inSingletonScope();
