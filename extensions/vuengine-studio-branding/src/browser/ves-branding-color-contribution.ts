@@ -1,4 +1,4 @@
-import { injectable } from 'inversify';
+import { injectable } from '@theia/core/shared/inversify';
 import { ColorContribution } from '@theia/core/lib/browser/color-application-contribution';
 import { Color, ColorRegistry } from '@theia/core/lib/browser/color-registry';
 

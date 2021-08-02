@@ -1,6 +1,7 @@
-import { injectable, postConstruct } from 'inversify';
-import { VesTitlebarActionButtonsWidget } from './ves-branding-titlebar-action-buttons-widget';
+import { injectable, postConstruct } from '@theia/core/shared/inversify';
 import { AbstractViewContribution } from '@theia/core/lib/browser';
+
+import { VesTitlebarActionButtonsWidget } from './ves-branding-titlebar-action-buttons-widget';
 
 @injectable()
 export class VesTitlebarActionButtonsContribution extends AbstractViewContribution<VesTitlebarActionButtonsWidget> {

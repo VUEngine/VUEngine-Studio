@@ -1,4 +1,4 @@
-import { injectable, postConstruct, inject } from 'inversify';
+import { injectable, postConstruct, inject } from '@theia/core/shared/inversify';
 import { Event, Emitter } from '@theia/core';
 import { IProcessExitEvent, ProcessErrorEvent } from '@theia/process/lib/node';
 

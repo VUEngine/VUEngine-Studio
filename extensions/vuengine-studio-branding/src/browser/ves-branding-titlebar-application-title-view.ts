@@ -1,4 +1,4 @@
-import { injectable, postConstruct } from 'inversify';
+import { injectable, postConstruct } from '@theia/core/shared/inversify';
 import { AbstractViewContribution } from '@theia/core/lib/browser';
 
 import { VesTitlebarApplicationTitleWidget } from './ves-branding-titlebar-application-title-widget';

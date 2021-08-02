@@ -1,14 +1,14 @@
-import { inject, injectable, postConstruct } from 'inversify';
 import { join as joinPath } from 'path';
 import { cpus } from 'os';
-import { env } from 'process';
+import { CommandService, isOSX, isWindows } from '@theia/core';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { ApplicationShell, PreferenceService } from '@theia/core/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import URI from '@theia/core/lib/common/uri';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
-import { CommandService, isOSX, isWindows } from '@theia/core';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { ProcessOptions } from '@theia/process/lib/node';
 import { VesProcessService } from 'vuengine-studio-process/lib/common/ves-process-service-protocol';
 import { VesProcessWatcher } from 'vuengine-studio-process/lib/browser/ves-process-service-watcher';
@@ -17,7 +17,7 @@ import { VesProjectsService } from 'vuengine-studio-projects/lib/browser/ves-pro
 import { BuildLogLine, BuildLogLineType, BuildMode, BuildResult, BuildStatus } from './ves-build-types';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
 import { VesBuildCommands } from './ves-build-commands';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 
 interface BuildFolderFlags {
   [key: string]: boolean;
@@ -25,26 +25,26 @@ interface BuildFolderFlags {
 
 @injectable()
 export class VesBuildService {
-  constructor(
-    @inject(ApplicationShell)
-    protected readonly shell: ApplicationShell,
-    @inject(CommandService)
-    protected readonly commandService: CommandService,
-    @inject(FileService)
-    protected fileService: FileService,
-    @inject(FrontendApplicationStateService)
-    protected readonly frontendApplicationStateService: FrontendApplicationStateService,
-    @inject(PreferenceService)
-    protected readonly preferenceService: PreferenceService,
-    @inject(VesProcessService)
-    protected readonly vesProcessService: VesProcessService,
-    @inject(VesProcessWatcher)
-    protected readonly vesProcessWatcher: VesProcessWatcher,
-    @inject(VesProjectsService)
-    protected readonly vesProjectsService: VesProjectsService,
-    @inject(WorkspaceService)
-    protected readonly workspaceService: WorkspaceService,
-  ) { }
+  @inject(ApplicationShell)
+  protected readonly shell: ApplicationShell;
+  @inject(CommandService)
+  protected readonly commandService: CommandService;
+  @inject(EnvVariablesServer)
+  protected readonly envVariablesServer: EnvVariablesServer;
+  @inject(FileService)
+  protected fileService: FileService;
+  @inject(FrontendApplicationStateService)
+  protected readonly frontendApplicationStateService: FrontendApplicationStateService;
+  @inject(PreferenceService)
+  protected readonly preferenceService: PreferenceService;
+  @inject(VesProcessService)
+  protected readonly vesProcessService: VesProcessService;
+  @inject(VesProcessWatcher)
+  protected readonly vesProcessWatcher: VesProcessWatcher;
+  @inject(VesProjectsService)
+  protected readonly vesProjectsService: VesProjectsService;
+  @inject(WorkspaceService)
+  protected readonly workspaceService: WorkspaceService;
 
   // build mode
   protected readonly onDidChangeBuildModeEmitter = new Emitter<BuildMode>();
@@ -204,7 +204,7 @@ export class VesBuildService {
     if (!this.buildStatus.active) {
       this.build();
     } else {
-      this.commandService.executeCommand(VesBuildCommands.TOGGLE_WIDGET.id, true);
+      this.commandService.executeCommand(VesBuildCommands.TOGGLE_WIDGET.id);
     }
   }
 
@@ -265,7 +265,7 @@ export class VesBuildService {
     const pedanticWarnings = this.preferenceService.get(VesBuildPreferenceIds.PEDANTIC_WARNINGS) as boolean;
     const engineCorePath = await this.getEngineCorePath();
     const enginePluginsPath = await this.getEnginePluginsPath();
-    const compilerPath = this.getCompilerPath();
+    const compilerPath = await this.getCompilerPath();
     const makefile = await this.getMakefilePath(workspaceRoot, engineCorePath);
 
     if (isWindows) {
@@ -282,7 +282,7 @@ export class VesBuildService {
       ];
 
       return {
-        command: this.getMsysBashPath(),
+        command: await this.getMsysBashPath(),
         args: [
           '--login',
           '-c', args.join(' '),
@@ -394,8 +394,10 @@ export class VesBuildService {
     this.resetBuildStatus(BuildResult.aborted);
   }
 
-  getResourcesPath(): string {
-    return env.THEIA_APP_PROJECT_PATH ?? '';
+  protected async getResourcesPath(): Promise<string> {
+    const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
+    const applicationPath = envVar && envVar.value ? envVar.value : '';
+    return applicationPath;
   }
 
   convertoToEnvPath(path: string): string {
@@ -413,7 +415,7 @@ export class VesBuildService {
 
   protected async getEngineCorePath(): Promise<string> {
     const defaultPath = joinPath(
-      this.getResourcesPath(),
+      await this.getResourcesPath(),
       'vuengine',
       'vuengine-core'
     );
@@ -428,7 +430,7 @@ export class VesBuildService {
 
   protected async getEnginePluginsPath(): Promise<string> {
     const defaultPath = joinPath(
-      this.getResourcesPath(),
+      await this.getResourcesPath(),
       'vuengine',
       'vuengine-plugins'
     );
@@ -441,9 +443,9 @@ export class VesBuildService {
       : defaultPath;
   }
 
-  protected getCompilerPath(): string {
+  protected async getCompilerPath(): Promise<string> {
     return joinPath(
-      this.getResourcesPath(),
+      await this.getResourcesPath(),
       'binaries',
       'vuengine-studio-tools',
       this.getOs(),
@@ -451,9 +453,9 @@ export class VesBuildService {
     );
   }
 
-  protected getMsysBashPath(): string {
+  protected async getMsysBashPath(): Promise<string> {
     return joinPath(
-      this.getResourcesPath(),
+      await this.getResourcesPath(),
       'binaries',
       'vuengine-studio-tools',
       this.getOs(),
@@ -540,7 +542,7 @@ export class VesBuildService {
     }
 
     const engineCorePath = await this.getEngineCorePath();
-    const compilerPath = this.getCompilerPath();
+    const compilerPath = await this.getCompilerPath();
 
     await Promise.all([
       this.vesProcessService.launchProcess({

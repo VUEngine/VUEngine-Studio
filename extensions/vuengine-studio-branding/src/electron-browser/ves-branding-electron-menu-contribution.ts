@@ -1,6 +1,6 @@
-import { inject, injectable } from 'inversify';
-import { remote } from 'electron'; /* eslint-disable-line */
-import { FrontendApplication, PreferenceScope, /* PreferenceScope, */ PreferenceService } from '@theia/core/lib/browser';
+import { inject, injectable } from '@theia/core/shared/inversify';
+import { remote } from '@theia/core/shared/electron';
+import { FrontendApplication, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
 import { ElectronMenuContribution } from '@theia/core/lib/electron-browser/menu/electron-menu-contribution';
 import { CommandService, isOSX } from '@theia/core';
 import { VesBuildService } from 'vuengine-studio-build/lib/browser/ves-build-service';
@@ -58,7 +58,7 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
     }
 
     protected vesBindTouchBar(): void {
-        const { app } = require('electron').remote; /* eslint-disable-line */
+        const { app } = require('@theia/core/shared/electron').remote;
 
         app.on(VesTouchBarCommands.executeCommand, (command: string) => this.commandService.executeCommand(command));
         app.on(VesTouchBarCommands.setBuildMode, (buildMode: BuildMode) => this.preferenceService.set(

@@ -1,5 +1,5 @@
-import { inject, injectable, postConstruct } from 'inversify';
 import { join as joinPath } from 'path';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { CommandService, isWindows } from '@theia/core/lib/common';
 import { ApplicationShell, OpenerService, PreferenceScope, PreferenceService, QuickPickItem, QuickPickOptions } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';

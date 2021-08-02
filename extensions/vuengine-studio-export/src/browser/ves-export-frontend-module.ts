@@ -1,4 +1,4 @@
-import { ContainerModule } from 'inversify';
+import { ContainerModule } from '@theia/core/shared/inversify';
 import { CommandContribution } from '@theia/core';
 import { KeybindingContribution } from '@theia/core/lib/browser';
 

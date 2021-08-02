@@ -1,4 +1,4 @@
-import { injectable, postConstruct } from 'inversify';
+import { injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Device, getDeviceList, on } from 'usb';
 
 import { ConnectedFlashCart, FlashCartConfig } from '../browser/ves-flash-cart-types';

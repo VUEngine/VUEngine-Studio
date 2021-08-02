@@ -1,10 +1,11 @@
-import * as React from 'react';
 import { sep } from 'path';
 import * as filenamify from 'filenamify';
+import * as React from '@theia/core/shared/react';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import { PreferenceService } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';
+
 import { VesProjectsPreferenceIds } from '../ves-projects-preferences';
 
 export interface VesNewProjectFormComponentProps {

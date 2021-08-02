@@ -1,8 +1,7 @@
-import { inject, injectable } from 'inversify';
-import * as React from 'react';
 import { join as joinPath } from 'path';
-import { env } from 'process';
 import { CommandService } from '@theia/core';
+import { inject, injectable } from '@theia/core/shared/inversify';
+import * as React from '@theia/core/shared/react';
 import {
   ContextMenuRenderer,
   TreeProps,
@@ -16,6 +15,7 @@ import {
 import { PreviewUri } from '@theia/preview/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import URI from '@theia/core/lib/common/uri';
+import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 
 import { VesDocumentationChild, VesDocumentationChildNode, VesDocumentationRootNode, VesDocumentTree } from './ves-documentation-tree';
 import { VesDocumentationCommands } from '../ves-documentation-commands';
@@ -24,6 +24,8 @@ import { VesDocumentationCommands } from '../ves-documentation-commands';
 export class VesDocumentationTreeWidget extends TreeWidget {
   @inject(CommandService)
   protected readonly commandService: CommandService;
+  @inject(EnvVariablesServer)
+  protected readonly envVariablesServer: EnvVariablesServer;
   @inject(FileService)
   protected readonly fileService: FileService;
   @inject(LabelProvider)
@@ -68,7 +70,7 @@ export class VesDocumentationTreeWidget extends TreeWidget {
       ]
     };
 
-    const handbookIndexUri = new URI(this.getHandbookIndex());
+    const handbookIndexUri = new URI(await this.getHandbookIndex());
     const handbookIndexContents = await this.fileService.readFile(handbookIndexUri); /* eslint-disable-line */
     const handbookIndex = JSON.parse(handbookIndexContents.value.toString());
 
@@ -101,22 +103,22 @@ export class VesDocumentationTreeWidget extends TreeWidget {
     this.model.root = root;
   }
 
-  protected handleClickEvent(node: VesDocumentationChildNode | undefined, event: React.MouseEvent<HTMLElement>): void {
+  protected async handleClickEvent(node: VesDocumentationChildNode | undefined, event: React.MouseEvent<HTMLElement>): Promise<void> {
     super.handleClickEvent(node, event);
     this.handleDocOpen(node);
   }
 
-  protected handleDblClickEvent(node: VesDocumentationChildNode | undefined, event: React.MouseEvent<HTMLElement>): void {
+  protected async handleDblClickEvent(node: VesDocumentationChildNode | undefined, event: React.MouseEvent<HTMLElement>): Promise<void> {
     super.handleDblClickEvent(node, event);
     this.handleDocOpen(node);
   }
 
-  protected handleDocOpen(node: VesDocumentationChildNode | undefined): void {
+  protected async handleDocOpen(node: VesDocumentationChildNode | undefined): Promise<void> {
     if (node) {
       if (node.member.file === '<stsvb>') {
         this.commandService.executeCommand(VesDocumentationCommands.OPEN_TECH_SCROLL.id);
       } else if (node.member.file && node.member.file !== '' && !node.member.file.startsWith('<')) {
-        this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, this.getHandbookUri(node.member.file ?? ''));
+        this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, await this.getHandbookUri(node.member.file ?? ''));
       }
     }
   }
@@ -142,28 +144,29 @@ export class VesDocumentationTreeWidget extends TreeWidget {
     return false;
   }
 
-  protected getResourcesPath(): string {
-    return env.THEIA_APP_PROJECT_PATH ?? '';
+  protected async getResourcesPath(): Promise<string> {
+    const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
+    const applicationPath = envVar && envVar.value ? envVar.value : '';
+    return applicationPath;
   }
 
-  protected getHandbookRoot(): string {
+  protected async getHandbookRoot(): Promise<string> {
     return joinPath(
-      this.getResourcesPath(),
+      await this.getResourcesPath(),
       'documentation',
       'vuengine-studio-documentation',
     );
   }
 
-  protected getHandbookIndex(): string {
-    return joinPath(
-      this.getHandbookRoot(),
-      'index.json',
-    );
+  protected async getHandbookIndex(): Promise<string> {
+    const handbookRoot = await this.getHandbookRoot();
+    return joinPath(handbookRoot, 'index.json');
   }
 
-  protected getHandbookUri(file: string): URI {
+  protected async getHandbookUri(file: string): Promise<URI> {
+    const handbookRoot = await this.getHandbookRoot();
     const docUri = new URI(joinPath(
-      this.getHandbookRoot(),
+      handbookRoot,
       ...(file + '.md').split('/'),
     ));
 

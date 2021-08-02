@@ -1,6 +1,6 @@
-import { remote } from 'electron'; /* eslint-disable-line */
-import * as React from 'react';
-import { inject, injectable, postConstruct } from 'inversify';
+import { remote } from '@theia/core/shared/electron'; /* eslint-disable-line */
+import * as React from '@theia/core/shared/react';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { ElectronCommands } from '@theia/core/lib/electron-browser/menu/electron-menu-contribution';
 import { CommandService } from '@theia/core';

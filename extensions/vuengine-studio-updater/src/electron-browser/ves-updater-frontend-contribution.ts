@@ -1,5 +1,5 @@
-import { inject, injectable, postConstruct } from 'inversify';
-import { BrowserWindow, Menu, remote } from 'electron';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { BrowserWindow, Menu, remote } from '@theia/core/shared/electron';
 import {
     CommandContribution,
     CommandRegistry,

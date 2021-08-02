@@ -1,4 +1,4 @@
-import { ContainerModule } from 'inversify';
+import { ContainerModule } from '@theia/core/shared/inversify';
 import { WebSocketConnectionProvider } from '@theia/core/lib/browser';
 
 import { VesProcessService, VES_PROCESS_SERVICE_PATH } from '../common/ves-process-service-protocol';

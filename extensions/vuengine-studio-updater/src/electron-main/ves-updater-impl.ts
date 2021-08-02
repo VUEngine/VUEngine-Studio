@@ -1,9 +1,8 @@
-import { injectable } from 'inversify';
-import * as fs from 'fs-extra';
 import * as http from 'http';
 import * as os from 'os';
 import * as path from 'path';
-
+import { injectable } from '@theia/core/shared/inversify';
+import * as fs from '@theia/core/shared/fs-extra';
 import { ElectronMainApplication, ElectronMainApplicationContribution } from '@theia/core/lib/electron-main/electron-main-application';
 
 import { VesUpdater, VesUpdaterClient } from '../common/ves-updater';

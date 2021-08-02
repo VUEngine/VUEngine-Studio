@@ -1,4 +1,4 @@
-import { injectable } from 'inversify';
+import { injectable } from '@theia/core/shared/inversify';
 import { PreferenceConfigurations } from '@theia/core/lib/browser/preferences/preference-configurations';
 
 @injectable()

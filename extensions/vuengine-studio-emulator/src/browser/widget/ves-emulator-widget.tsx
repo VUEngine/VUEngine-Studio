@@ -1,7 +1,6 @@
-import * as React from 'react';
-import { inject, injectable, postConstruct } from 'inversify';
 import { basename, join as joinPath } from 'path';
-import { env } from 'process';
+import * as React from '@theia/core/shared/react';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { CommandService } from '@theia/core';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
@@ -24,6 +23,7 @@ import { VesEmulatorCommands } from '../ves-emulator-commands';
 import { VesEmulatorPreferenceIds } from '../ves-emulator-preferences';
 import { VesEmulatorService } from '../ves-emulator-service';
 import { VesEmulatorControls } from './ves-emulator-controls-component';
+import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 
 const datauri = require('datauri');
 
@@ -44,6 +44,8 @@ export class VesEmulatorWidget extends ReactWidget {
   protected readonly frontendApplicationStateService: FrontendApplicationStateService;
   @inject(CommandService)
   protected readonly commandService: CommandService;
+  @inject(EnvVariablesServer)
+  protected readonly envVariablesServer: EnvVariablesServer;
   @inject(KeybindingRegistry)
   protected readonly keybindingRegistry!: KeybindingRegistry;
   @inject(PreferenceService)
@@ -61,6 +63,8 @@ export class VesEmulatorWidget extends ReactWidget {
 
   protected wrapperRef = React.createRef<HTMLDivElement>();
   protected iframeRef = React.createRef<HTMLIFrameElement>();
+
+  protected resource = '';
 
   protected state: vesEmulatorWidgetState = {
     status: 'running',
@@ -81,6 +85,8 @@ export class VesEmulatorWidget extends ReactWidget {
     this.title.iconClass = 'fa fa-play';
     this.title.closable = true;
 
+    this.resource = await this.getResource();
+
     this.update();
 
     // TODO: this shrinks down emulator viewport. Theia bug?
@@ -89,7 +95,7 @@ export class VesEmulatorWidget extends ReactWidget {
       this.update();
     });
 
-    this.frontendApplicationStateService.onStateChanged((state: FrontendApplicationState) => {
+    this.frontendApplicationStateService.onStateChanged(async (state: FrontendApplicationState) => {
       if (state === 'ready') {
         this.keybindingToState();
         this.bindKeys();
@@ -456,7 +462,7 @@ export class VesEmulatorWidget extends ReactWidget {
           <iframe
             id='vesEmulatorFrame'
             ref={this.iframeRef}
-            src={this.getResource()}
+            src={this.resource}
             width={canvasDimensions.width}
             height={canvasDimensions.height}
             onLoad={() => this.startEmulator(this)}
@@ -475,9 +481,9 @@ export class VesEmulatorWidget extends ReactWidget {
     );
   }
 
-  protected getResource(): string {
+  protected async getResource(): Promise<string> {
     return joinPath(
-      this.getResourcesPath(),
+      await this.getResourcesPath(),
       'binaries',
       'vuengine-studio-tools',
       'web',
@@ -486,10 +492,10 @@ export class VesEmulatorWidget extends ReactWidget {
     );
   }
 
-  protected sendCommand(command: string, data?: any): void { /* eslint-disable-line */
+  protected async sendCommand(command: string, data?: any): Promise<void> { /* eslint-disable-line */
     this.iframeRef.current?.contentWindow?.postMessage(
       { command, data },
-      'file://' + this.getResource()
+      'file://' + await this.getResource()
     );
     // remove focus from button
     this.node.focus();
@@ -506,8 +512,8 @@ export class VesEmulatorWidget extends ReactWidget {
     lnk.click();
   }
 
-  protected toggleLowPower(): void {
-    this.sendCommand('keyPress', EmulatorFunctionKeyCode.ToggleLowPower);
+  protected async toggleLowPower(): Promise<void> {
+    await this.sendCommand('keyPress', EmulatorFunctionKeyCode.ToggleLowPower);
     this.update();
   }
 
@@ -516,8 +522,8 @@ export class VesEmulatorWidget extends ReactWidget {
     this.update();
   }
 
-  protected reset(): void {
-    this.sendCommand('keyPress', EmulatorFunctionKeyCode.Reset);
+  protected async reset(): Promise<void> {
+    await this.sendCommand('keyPress', EmulatorFunctionKeyCode.Reset);
     this.update();
   }
 
@@ -527,7 +533,7 @@ export class VesEmulatorWidget extends ReactWidget {
     } else if (this.state.status === 'running') {
       this.state.status = 'paused';
     }
-    this.sendCommand('keyPress', EmulatorFunctionKeyCode.PauseToggle);
+    await this.sendCommand('keyPress', EmulatorFunctionKeyCode.PauseToggle);
     this.update();
   }
 
@@ -765,7 +771,9 @@ export class VesEmulatorWidget extends ReactWidget {
     return button.toLowerCase();
   }
 
-  getResourcesPath(): string {
-    return env.THEIA_APP_PROJECT_PATH ?? '';
+  protected async getResourcesPath(): Promise<string> {
+    const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
+    const applicationPath = envVar && envVar.value ? envVar.value : '';
+    return applicationPath;
   }
 }

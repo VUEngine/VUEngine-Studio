@@ -1,4 +1,4 @@
-import { injectable } from 'inversify';
+import { injectable } from '@theia/core/shared/inversify';
 import { homedir } from 'os';
 import { join as joinPath } from 'path';
 import { EnvVariablesServerImpl } from '@theia/core/lib/node/env-variables';

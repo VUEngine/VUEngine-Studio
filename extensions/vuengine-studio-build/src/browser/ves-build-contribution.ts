@@ -1,6 +1,6 @@
-import { inject, injectable } from 'inversify';
 import { join as joinPath } from 'path';
 import * as rimraf from 'rimraf';
+import { inject, injectable } from '@theia/core/shared/inversify';
 import { CommandContribution, CommandRegistry, isWindows, MAIN_MENU_BAR, MenuContribution, MenuModelRegistry, MessageService } from '@theia/core/lib/common';
 import { ApplicationShell, KeybindingContribution, KeybindingRegistry, PreferenceScope, PreferenceService, QuickPickItem, QuickPickOptions } from '@theia/core/lib/browser';
 import { WorkspaceService } from '@theia/workspace/lib/browser';

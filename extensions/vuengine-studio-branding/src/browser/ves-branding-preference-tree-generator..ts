@@ -1,6 +1,5 @@
-import { injectable } from 'inversify';
+import { injectable } from '@theia/core/shared/inversify';
 import { COMMONLY_USED_SECTION_PREFIX, PreferenceTreeGenerator } from '@theia/preferences/lib/browser/util/preference-tree-generator';
-
 import { VesUpdaterPreferenceIds } from 'vuengine-studio-updater/lib/electron-browser/ves-updater-preferences';
 
 @injectable()

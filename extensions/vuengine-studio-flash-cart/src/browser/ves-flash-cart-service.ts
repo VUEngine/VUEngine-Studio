@@ -1,7 +1,7 @@
-import { inject, injectable, postConstruct } from 'inversify';
 import { dirname, join as joinPath } from 'path';
-import { env } from 'process';
+// TODO: refactor to use fileservice
 import { createWriteStream, readFileSync, unlinkSync } from 'fs';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { CommandService, isOSX, isWindows, MessageService } from '@theia/core/lib/common';
 import URI from '@theia/core/lib/common/uri';
 import { ApplicationShell, PreferenceService } from '@theia/core/lib/browser';
@@ -22,35 +22,36 @@ import { VesFlashCartUsbWatcher } from './ves-flash-cart-usb-watcher';
 import { IMAGE_FLASHBOY_PLUS } from './images/flashboy-plus';
 import { IMAGE_HYPERFLASH32 } from './images/hyperflash32';
 import { VesFlashCartCommands } from './ves-flash-cart-commands';
+import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 
 @injectable()
 export class VesFlashCartService {
-  constructor(
-    @inject(ApplicationShell)
-    protected readonly shell: ApplicationShell,
-    @inject(CommandService)
-    protected commandService: CommandService,
-    @inject(FileService)
-    protected fileService: FileService,
-    @inject(FrontendApplicationStateService)
-    protected readonly frontendApplicationStateService: FrontendApplicationStateService,
-    @inject(MessageService)
-    protected readonly messageService: MessageService,
-    @inject(PreferenceService)
-    protected readonly preferenceService: PreferenceService,
-    @inject(VesBuildService)
-    protected readonly vesBuildService: VesBuildService,
-    @inject(VesFlashCartUsbService)
-    protected readonly vesFlashCartUsbService: VesFlashCartUsbService,
-    @inject(VesFlashCartUsbWatcher)
-    protected readonly vesFlashCartUsbWatcher: VesFlashCartUsbWatcher,
-    @inject(VesProcessService)
-    protected readonly vesProcessService: VesProcessService,
-    @inject(VesProcessWatcher)
-    protected readonly vesProcessWatcher: VesProcessWatcher,
-    @inject(VesProjectsService)
-    protected readonly vesProjectsService: VesProjectsService,
-  ) { }
+  @inject(ApplicationShell)
+  protected readonly shell: ApplicationShell;
+  @inject(CommandService)
+  protected commandService: CommandService;
+  @inject(EnvVariablesServer)
+  protected readonly envVariablesServer: EnvVariablesServer;
+  @inject(FileService)
+  protected fileService: FileService;
+  @inject(FrontendApplicationStateService)
+  protected readonly frontendApplicationStateService: FrontendApplicationStateService;
+  @inject(MessageService)
+  protected readonly messageService: MessageService;
+  @inject(PreferenceService)
+  protected readonly preferenceService: PreferenceService;
+  @inject(VesBuildService)
+  protected readonly vesBuildService: VesBuildService;
+  @inject(VesFlashCartUsbService)
+  protected readonly vesFlashCartUsbService: VesFlashCartUsbService;
+  @inject(VesFlashCartUsbWatcher)
+  protected readonly vesFlashCartUsbWatcher: VesFlashCartUsbWatcher;
+  @inject(VesProcessService)
+  protected readonly vesProcessService: VesProcessService;
+  @inject(VesProcessWatcher)
+  protected readonly vesProcessWatcher: VesProcessWatcher;
+  @inject(VesProjectsService)
+  protected readonly vesProjectsService: VesProjectsService;
 
   // is queued
   protected _isQueued: boolean = false;
@@ -398,24 +399,26 @@ export class VesFlashCartService {
   }
 
   async detectConnectedFlashCarts(): Promise<void> {
-    const flashCartConfigs: FlashCartConfig[] = this.getFlashCartConfigs();
+    const flashCartConfigs: FlashCartConfig[] = await this.getFlashCartConfigs();
     this.connectedFlashCarts = await this.vesFlashCartUsbService.detectFlashCarts(
       ...flashCartConfigs
     );
   };
 
-  getFlashCartConfigs(): FlashCartConfig[] {
+  async getFlashCartConfigs(): Promise<FlashCartConfig[]> {
     const flashCartConfigs: FlashCartConfig[] = this.preferenceService.get(VesFlashCartPreferenceIds.FLASH_CARTS) ?? [];
 
     const effectiveFlashCartConfigs = flashCartConfigs.length > 0
       ? flashCartConfigs
       : VesFlashCartPreferenceSchema.properties[VesFlashCartPreferenceIds.FLASH_CARTS].default;
 
+    const resourcesPath = await this.getResourcesPath();
+
     return effectiveFlashCartConfigs.map((flashCartConfig: FlashCartConfig) => ({
       ...flashCartConfig,
       path: flashCartConfig.path
         .replace('%HFCLI%', joinPath(
-          this.getResourcesPath(),
+          resourcesPath,
           'binaries',
           'vuengine-studio-tools',
           this.getOs(),
@@ -423,7 +426,7 @@ export class VesFlashCartService {
           isWindows ? 'hfcli.exe' : 'hfcli'
         ))
         .replace('%PROGVB%', joinPath(
-          this.getResourcesPath(),
+          resourcesPath,
           'binaries',
           'vuengine-studio-tools',
           this.getOs(),
@@ -440,8 +443,10 @@ export class VesFlashCartService {
     return joinPath(this.vesProjectsService.getWorkspaceRoot(), 'build', 'output.vb');
   }
 
-  getResourcesPath(): string {
-    return env.THEIA_APP_PROJECT_PATH ?? '';
+  async getResourcesPath(): Promise<string> {
+    const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
+    const applicationPath = envVar && envVar.value ? envVar.value : '';
+    return applicationPath;
   }
 
   getOs(): string {

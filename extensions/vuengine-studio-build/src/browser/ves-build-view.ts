@@ -1,4 +1,4 @@
-import { injectable } from 'inversify';
+import { injectable } from '@theia/core/shared/inversify';
 import { AbstractViewContribution, FrontendApplication } from '@theia/core/lib/browser';
 
 import { VesBuildWidget } from './ves-build-widget';

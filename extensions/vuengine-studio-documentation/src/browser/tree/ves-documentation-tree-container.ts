@@ -1,4 +1,4 @@
-import { interfaces } from 'inversify';
+import { interfaces } from '@theia/core/shared/inversify';
 import { createTreeContainer, defaultTreeProps, Tree, TreeImpl, TreeProps, TreeWidget } from '@theia/core/lib/browser';
 
 import { VesDocumentationTree } from './ves-documentation-tree';

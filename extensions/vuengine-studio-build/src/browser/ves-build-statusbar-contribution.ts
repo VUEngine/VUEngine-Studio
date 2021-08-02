@@ -1,4 +1,4 @@
-import { inject, injectable, interfaces } from 'inversify';
+import { inject, injectable, interfaces } from '@theia/core/shared/inversify';
 import { FrontendApplication, FrontendApplicationContribution, PreferenceService, StatusBar, StatusBarAlignment } from '@theia/core/lib/browser';
 
 import { VesBuildPreferenceIds } from './ves-build-preferences';

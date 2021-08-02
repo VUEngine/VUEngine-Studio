@@ -1,4 +1,4 @@
-import { injectable, inject, postConstruct } from 'inversify';
+import { injectable, inject, postConstruct } from '@theia/core/shared/inversify';
 import { ContextKeyService, ContextKey } from '@theia/core/lib/browser/context-key-service';
 
 @injectable()

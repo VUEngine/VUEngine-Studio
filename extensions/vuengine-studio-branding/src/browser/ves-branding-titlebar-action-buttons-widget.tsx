@@ -1,6 +1,6 @@
-import * as React from 'react';
-import { injectable, postConstruct, inject } from 'inversify';
+import * as React from '@theia/core/shared/react';
 import { CommandService, environment, isOSX, isWindows, MessageService } from '@theia/core';
+import { injectable, postConstruct, inject } from '@theia/core/shared/inversify';
 import { PreferenceService } from '@theia/core/lib/browser';
 import { KeybindingRegistry } from '@theia/core/lib/browser/keybinding';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';

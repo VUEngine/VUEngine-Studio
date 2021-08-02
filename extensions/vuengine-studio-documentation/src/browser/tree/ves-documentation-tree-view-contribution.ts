@@ -1,5 +1,5 @@
 import { AbstractViewContribution, FrontendApplication } from '@theia/core/lib/browser';
-import { injectable } from 'inversify';
+import { injectable } from '@theia/core/shared/inversify';
 import { VesDocumentationTreeWidget } from './ves-documentation-tree-widget';
 import { MenuModelRegistry } from '@theia/core';
 

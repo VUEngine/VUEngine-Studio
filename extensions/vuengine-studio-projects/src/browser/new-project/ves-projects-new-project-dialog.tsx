@@ -1,7 +1,6 @@
-import * as React from 'react';
 import { join as joinPath } from 'path';
-import { env } from 'process';
-import { inject, injectable, postConstruct } from 'inversify';
+import * as React from '@theia/core/shared/react';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { DialogProps } from '@theia/core/lib/browser/dialogs';
 import { ReactDialog } from '@theia/core/lib/browser/dialogs/react-dialog';
 import { Message } from '@theia/core/lib/browser/widgets/widget';
@@ -109,7 +108,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
         const template = this.createProjectFormComponent.current?.state.template ?? 'vuengine-barebone';
         const folder = this.createProjectFormComponent.current?.state.folder ?? 'new-project';
 
-        const templateFolderUri = new URI(this.getTemplateFolder(template));
+        const templateFolderUri = new URI(await this.getTemplateFolder(template));
         const newProjectFolderUri = new URI(joinPath(path, folder));
 
         await this.fileService.copy(templateFolderUri, newProjectFolderUri);
@@ -125,8 +124,10 @@ export class VesNewProjectDialog extends ReactDialog<void> {
         this.update();
     }
 
-    protected getTemplateFolder(template: string): string {
-        return joinPath(env.THEIA_APP_PROJECT_PATH ?? '', 'vuengine', template);
+    protected async getTemplateFolder(template: string): Promise<string> {
+        const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
+        const applicationPath = envVar && envVar.value ? envVar.value : '';
+        return joinPath(applicationPath, 'vuengine', template);
     }
 
     protected setIsCreating(isCreating: boolean): void {

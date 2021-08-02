@@ -1,7 +1,6 @@
-import { injectable } from 'inversify';
-import * as React from 'react';
-
+import * as React from '@theia/core/shared/react';
 import { environment, isOSX } from '@theia/core';
+import { injectable } from '@theia/core/shared/inversify';
 import { GettingStartedWidget } from '@theia/getting-started/lib/browser/getting-started-widget';
 import { VesDocumentationCommands } from 'vuengine-studio-documentation/lib/browser/ves-documentation-commands';
 import { VesProjectsCommands } from 'vuengine-studio-projects/lib/browser/ves-projects-commands';

@@ -1,7 +1,6 @@
-import { injectable, inject } from 'inversify';
-import * as React from 'react';
-
+import * as React from '@theia/core/shared/react';
 import { CommandService } from '@theia/core';
+import { injectable, inject } from '@theia/core/shared/inversify';
 import { AboutDialog, AboutDialogProps, ABOUT_CONTENT_CLASS } from '@theia/core/lib/browser/about-dialog';
 import { FrontendApplicationConfigProvider } from '@theia/core/lib/browser/frontend-application-config-provider';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';

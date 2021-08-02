@@ -1,7 +1,7 @@
-import * as React from 'react';
 import { basename } from 'path';
-import { inject, injectable, postConstruct } from 'inversify';
-import { Message } from '@phosphor/messaging';
+import * as React from '@theia/core/shared/react';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { Message } from '@theia/core/shared/@phosphor/messaging';
 import { CommandService } from '@theia/core';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 

@@ -1,5 +1,5 @@
-import { inject, injectable } from 'inversify';
-import { remote } from 'electron'; /* eslint-disable-line */
+import { remote } from '@theia/core/shared/electron'; /* eslint-disable-line */
+import { inject, injectable } from '@theia/core/shared/inversify';
 import { CommandContribution, CommandRegistry } from '@theia/core/lib/common/command';
 import { MenuContribution, MenuModelRegistry } from '@theia/core/lib/common/menu';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';

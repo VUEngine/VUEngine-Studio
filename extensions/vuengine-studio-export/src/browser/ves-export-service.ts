@@ -1,7 +1,7 @@
-import { inject, injectable, postConstruct } from 'inversify';
-import sanitize = require('sanitize-filename');
 import { dirname, join as joinPath } from 'path';
 import { homedir } from 'os';
+import sanitize = require('sanitize-filename');
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { ApplicationShell, CommonCommands, ConfirmDialog, PreferenceService } from '@theia/core/lib/browser';
 import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import URI from '@theia/core/lib/common/uri';
