@@ -204,10 +204,7 @@ export class VesBuildService {
     if (!this.buildStatus.active) {
       this.build();
     } else {
-      this.commandService.executeCommand(
-        VesBuildCommands.OPEN_WIDGET.id,
-        !this.buildStatus.active
-      );
+      this.commandService.executeCommand(VesBuildCommands.TOGGLE_WIDGET.id, true);
     }
   }
 

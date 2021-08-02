@@ -1,4 +1,4 @@
-import { inject, injectable } from 'inversify';
+import { inject, injectable, postConstruct } from 'inversify';
 import sanitize = require('sanitize-filename');
 import { dirname, join as joinPath } from 'path';
 import { homedir } from 'os';
@@ -50,6 +50,20 @@ export class VesExportService {
     return this._isQueued;
   }
 
+  @postConstruct()
+  protected async init(): Promise<void> {
+    this.bindEvents();
+  }
+
+  bindEvents(): void {
+    this.vesBuildService.onDidChangeOutputRomExists(outputRomExists => {
+      if (outputRomExists && this.isQueued) {
+        this.isQueued = false;
+        this.exportRom();
+      }
+    });
+  }
+
   async doExport(): Promise<void> {
     if (this.isQueued) {
       this.isQueued = false;
@@ -58,12 +72,6 @@ export class VesExportService {
     } else if (this.vesBuildService.outputRomExists) {
       this.exportRom();
     } else {
-      this.vesBuildService.onDidChangeOutputRomExists(outputRomExists => {
-        if (outputRomExists && this.isQueued) {
-          this.isQueued = false;
-          this.exportRom();
-        }
-      });
       this.isQueued = true;
       this.commandService.executeCommand(VesBuildCommands.BUILD.id);
     }

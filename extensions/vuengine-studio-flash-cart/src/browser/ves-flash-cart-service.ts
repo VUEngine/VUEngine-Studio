@@ -165,8 +165,8 @@ export class VesFlashCartService {
       if (this.vesBuildService.outputRomExists) {
         this.flash();
       } else {
-        this.commandService.executeCommand(VesBuildCommands.BUILD.id);
         this.isQueued = true;
+        this.commandService.executeCommand(VesBuildCommands.BUILD.id);
       }
     }
   }

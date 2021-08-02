@@ -41,7 +41,7 @@ export namespace VesBuildCommands {
     category: CATEGORY,
   };
 
-  export const OPEN_WIDGET: Command = {
+  export const TOGGLE_WIDGET: Command = {
     id: 'VesBuild.commands.openWidget',
     label: 'Toggle Build Widget',
     category: CATEGORY,

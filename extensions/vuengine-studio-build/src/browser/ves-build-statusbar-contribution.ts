@@ -32,7 +32,7 @@ export class VesBuildStatusBarContribution implements FrontendApplicationContrib
         let className = undefined;
         if (this.vesBuildService.buildStatus.active) {
             label = `Building... ${this.vesBuildService.buildStatus.progress}%`;
-            command = VesBuildCommands.OPEN_WIDGET.id;
+            command = VesBuildCommands.TOGGLE_WIDGET.id;
             className = 'active';
         }
         this.statusBar.setElement('ves-build-mode', {

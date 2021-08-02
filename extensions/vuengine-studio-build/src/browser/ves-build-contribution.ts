@@ -96,7 +96,7 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
       });
     }
 
-    commandRegistry.registerCommand(VesBuildCommands.OPEN_WIDGET, {
+    commandRegistry.registerCommand(VesBuildCommands.TOGGLE_WIDGET, {
       execute: (forceOpen: boolean = false) => {
         if (forceOpen) {
           this.VesBuildView.openView({ activate: true, reveal: true });
