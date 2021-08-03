@@ -9,9 +9,7 @@
     "@theia/preferences": "1.16.0",
     "electron": "^9.3.2",
     "electron-log": "^4.3.0",
-    "electron-updater": "^4.3.5",
-    "fs-extra": "^10.0.0",
-    "inversify": "^5.1.1"
+    "electron-updater": "^4.3.5"
   },
   "devDependencies": {
     "rimraf": "^2.7.1",

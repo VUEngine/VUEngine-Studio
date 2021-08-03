@@ -28,7 +28,7 @@ export class VesFlashCartWidget extends ReactWidget {
   @postConstruct()
   protected async init(): Promise<void> {
     this.id = VesFlashCartWidget.ID;
-    this.title.iconClass = 'fa fa-usb';
+    this.title.iconClass = 'fa fa fa-microchip';
     // this.title.iconClass = 'ves-flash-cart-tab-icon';
     this.title.closable = true;
     this.setTitle();
@@ -125,7 +125,7 @@ export class VesFlashCartWidget extends ReactWidget {
                 </div>
                 <div className='flashCartInfo'>
                   <div>
-                    <i className='fa fa-fw fa-microchip'></i>{' '}
+                    <i className='fa fa-fw fas-microchip'></i>{' '}
                     {connectedFlashCart.config.size} MBit (
                     {connectedFlashCart.config.padRom
                       ? 'Auto Padding'
@@ -133,7 +133,7 @@ export class VesFlashCartWidget extends ReactWidget {
                     )
                   </div>
                   <div>
-                    <i className='fa fa-fw fa-usb'></i>{' '}
+                    <i className='fa fa-fw fas-microchip'></i>{' '}
                     {connectedFlashCart.config.vid}:
                     {connectedFlashCart.config.pid}
                     <br />

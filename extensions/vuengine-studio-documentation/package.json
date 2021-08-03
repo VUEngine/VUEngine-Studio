@@ -9,7 +9,6 @@
     "@theia/filesystem": "1.16.0",
     "@theia/preview": "1.16.0",
     "@theia/workspace": "1.16.0",
-    "inversify": "^5.1.1",
     "uuid": "^8.3.2",
     "vuengine-studio-branding": "1.0.0"
   },

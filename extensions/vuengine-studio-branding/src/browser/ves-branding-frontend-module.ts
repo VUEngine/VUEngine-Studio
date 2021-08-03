@@ -36,6 +36,9 @@ import { VesDefaultFileIconThemeContribution } from './ves-branding-icon-theme-c
 import { VesBrandingLabelProviderContribution } from './ves-branding-label-provider';
 
 import '../../src/browser/style/index.css';
+// Must load FA 5 first, then FA 4
+import '@fortawesome/fontawesome-free/css/fontawesome.min.css';
+import 'font-awesome/css/font-awesome.min.css';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // rename default icon theme

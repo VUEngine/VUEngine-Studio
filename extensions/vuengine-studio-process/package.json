@@ -6,7 +6,6 @@
   "dependencies": {
     "@theia/core": "1.16.0",
     "@theia/process": "^1.16.0",
-    "inversify": "^5.1.1",
     "filenamify": "^4.3.0"
   },
   "devDependencies": {

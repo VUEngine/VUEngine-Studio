@@ -166,7 +166,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                         ? <i className='fa fa-hourglass-half'></i>
                         : this.vesFlashCartService.isFlashing
                             ? <i className='fa fa-refresh fa-spin'></i>
-                            : <i className='fa fa-usb'></i>}
+                            : <i className='fa fa-microchip'></i>}
                 </button>
                 <button
                     className={'theia-button secondary export' + (this.vesExportService.isQueued ? ' queued' : '')}
