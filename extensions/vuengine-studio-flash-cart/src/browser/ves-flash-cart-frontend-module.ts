@@ -1,7 +1,14 @@
 import { ContainerModule } from '@theia/core/shared/inversify';
 
 import { CommandContribution } from '@theia/core';
-import { bindViewContribution, FrontendApplicationContribution, KeybindingContribution, WebSocketConnectionProvider, WidgetFactory } from '@theia/core/lib/browser';
+import {
+    bindViewContribution,
+    FrontendApplicationContribution,
+    KeybindingContribution,
+    PreferenceContribution,
+    WebSocketConnectionProvider,
+    WidgetFactory
+} from '@theia/core/lib/browser';
 import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 
 import { VesFlashCartUsbService, VES_FLASH_CART_USB_SERVICE_PATH } from '../common/ves-flash-cart-usb-service-protocol';
@@ -10,11 +17,15 @@ import { VesFlashCartContribution } from './ves-flash-cart-contribution';
 import { VesFlashCartService } from './ves-flash-cart-service';
 import { VesFlashCartViewContribution } from './ves-flash-cart-view';
 import { VesFlashCartWidget } from './ves-flash-cart-widget';
+import { VesFlashCartStatusBarContribution } from './ves-flash-cart-statusbar-contribution';
+import { VesFlashCartPreferenceSchema } from './ves-flash-cart-preferences';
 
 import '../../src/browser/style/index.css';
-import { VesFlashCartStatusBarContribution } from './ves-flash-cart-statusbar-contribution';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
+    // preferences
+    bind(PreferenceContribution).toConstantValue({ schema: VesFlashCartPreferenceSchema });
+
     // commands and menus
     bind(VesFlashCartContribution).toSelf().inSingletonScope();
     bind(CommandContribution).toService(VesFlashCartContribution);
