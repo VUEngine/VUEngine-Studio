@@ -125,7 +125,7 @@ export class VesFlashCartWidget extends ReactWidget {
                 </div>
                 <div className='flashCartInfo'>
                   <div>
-                    <i className='fa fa-fw fas-microchip'></i>{' '}
+                    <i className='fa fa-fw fa-microchip'></i>{' '}
                     {connectedFlashCart.config.size} MBit (
                     {connectedFlashCart.config.padRom
                       ? 'Auto Padding'
@@ -133,7 +133,7 @@ export class VesFlashCartWidget extends ReactWidget {
                     )
                   </div>
                   <div>
-                    <i className='fa fa-fw fas-microchip'></i>{' '}
+                    <i className='fa fa-fw fa-usb'></i>{' '}
                     {connectedFlashCart.config.vid}:
                     {connectedFlashCart.config.pid}
                     <br />
