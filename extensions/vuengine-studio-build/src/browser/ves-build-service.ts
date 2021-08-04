@@ -209,12 +209,14 @@ export class VesBuildService {
   }
 
   protected bindEvents(): void {
+    // @ts-ignore
     this.vesProcessWatcher.onError(({ pId }) => {
       if (this.buildStatus.processManagerId === pId) {
         this.resetBuildStatus(BuildResult.failed);
       }
     });
 
+    // @ts-ignore
     this.vesProcessWatcher.onExit(({ pId, event }) => {
       if (this.buildStatus.processManagerId === pId) {
         this.resetBuildStatus(event.code === 0
@@ -224,14 +226,18 @@ export class VesBuildService {
       }
     });
 
-    this.vesProcessWatcher.onOutputStreamData(({ pId, data }) => {
+    // @ts-ignore
+    const onData = ({ pId, data }) => {
       if (this.buildStatus.processManagerId === pId) {
         this.pushBuildLogLine({
           ...this.parseBuildOutput(data),
           timestamp: Date.now(),
         });
       }
-    });
+    };
+
+    this.vesProcessWatcher.onOutputStreamData(onData);
+    this.vesProcessWatcher.onErrorStreamData(onData);
   }
 
   protected async build(): Promise<void> {
@@ -311,11 +317,13 @@ export class VesBuildService {
         cwd: workspaceRoot,
         env: {
           DUMP_ELF: dumpElf ? 1 : 0,
-          ENGINE_FOLDER: this.convertoToEnvPath(engineCorePath),
+          ENGINE_FOLDER: this.convertoToEnvPath(engineCorePath)
+            .replace(/\s/g, '\\ '), // escape whitespaces
           LC_ALL: 'C',
           MAKE_JOBS: this.getThreads(),
           PATH: [joinPath(compilerPath, 'bin'), process.env.PATH].join(':'),
-          PLUGINS_FOLDER: this.convertoToEnvPath(enginePluginsPath),
+          PLUGINS_FOLDER: this.convertoToEnvPath(enginePluginsPath)
+            .replace(/\s/g, '\\ '), // escape whitespaces
           PRINT_PEDANTIC_WARNINGS: pedanticWarnings ? 1 : 0,
         },
       },
@@ -348,7 +356,11 @@ export class VesBuildService {
     } else if (textLowerCase.startsWith('build finished')) {
       type = BuildLogLineType.Headline;
       this.buildStatus.progress = 100;
-    } else if (textLowerCase.includes('error: ') || textLowerCase.includes(' not found') || textLowerCase.includes('no such file or directory')) {
+    } else if (textLowerCase.includes('error: ') ||
+      textLowerCase.includes('] Error ') ||
+      textLowerCase.includes(' not found') ||
+      textLowerCase.includes('no such file or directory') ||
+      textLowerCase.includes(' No rule to make target')) {
       type = BuildLogLineType.Error;
     } else if (textLowerCase.includes('warning: ')) {
       type = BuildLogLineType.Warning;
@@ -402,9 +414,11 @@ export class VesBuildService {
 
   convertoToEnvPath(path: string): string {
     const enableWsl = this.preferenceService.get(VesBuildPreferenceIds.ENABLE_WSL);
-    let envPath = path.replace(/\\/g, '/').replace(/^[a-zA-Z]:\//, function (x): string {
-      return `/${x.substr(0, 1).toLowerCase()}/`;
-    });
+    let envPath = path
+      .replace(/\\/g, '/')
+      .replace(/^[a-zA-Z]:\//, function (x): string {
+        return `/${x.substr(0, 1).toLowerCase()}/`;
+      });
 
     if (isWindows && enableWsl) {
       envPath = '/mnt/' + envPath;
