@@ -17,7 +17,7 @@ export class VesEmulatorOpenHandler extends WidgetOpenHandler<VesEmulatorWidget>
 
     canHandle(uri: URI): number {
         if (this.supported.includes(uri.path.ext)) {
-            return this.editorManager.canHandle(uri) * 2;
+            return Number.MAX_SAFE_INTEGER;
         }
 
         return 0;
