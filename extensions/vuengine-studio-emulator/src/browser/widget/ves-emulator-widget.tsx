@@ -482,7 +482,9 @@ export class VesEmulatorWidget extends ReactWidget {
   }
 
   protected async getResource(): Promise<string> {
+    // TODO: load via localhost
     return joinPath(
+      'file://',
       await this.getResourcesPath(),
       'binaries',
       'vuengine-studio-tools',
@@ -493,10 +495,7 @@ export class VesEmulatorWidget extends ReactWidget {
   }
 
   protected async sendCommand(command: string, data?: any): Promise<void> { /* eslint-disable-line */
-    this.iframeRef.current?.contentWindow?.postMessage(
-      { command, data },
-      'file://' + await this.getResource()
-    );
+    this.iframeRef.current?.contentWindow?.postMessage({ command, data }, this.resource);
     // remove focus from button
     this.node.focus();
   }

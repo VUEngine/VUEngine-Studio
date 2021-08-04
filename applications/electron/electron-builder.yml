@@ -1,5 +1,5 @@
 appId: vuengine.studio
-productName: VUEngineStudio
+productName: VUEngine
 copyright: Copyright © 2006-2021 Team VUEngine
 electronDist: ../../node_modules/electron/dist
 electronVersion: 9.3.2
@@ -19,12 +19,10 @@ files:
   - src-gen
   - lib
   - scripts
-extraResources:
   - from: plugins
     to: app/plugins
-  # TODO: dynamically pass in OS
-  - from: binaries/vuengine-studio-tools/osx
-    to: app/binaries/osx
+  - from: documentation
+    to: app/documentation
   - from: vuengine
     to: app/vuengine
 
@@ -33,10 +31,15 @@ win:
   target:
     - nsis
   publish:
-    provider: generic
-    url: "https://download.eclipse.org/theia/latest/windows"
+    provider: github
+    owner: VUEngine
+    repo: VUEngine-Studio
+    token: "<your github token>"
+  extraResources:
+    - from: binaries/vuengine-studio-tools/win
+      to: app/binaries/vuengine-studio-tools/win
 mac:
-  icon: resources/icons/MacLauncherIcon/512-512-2.icns
+  icon: resources/icons/MacLauncherIcon/512-512.icns
   category: public.app-category.developer-tools
   darkModeSupport: true
   target:
@@ -44,6 +47,9 @@ mac:
   publish:
     provider: generic
     url: "https://download.eclipse.org/theia/latest/macos"
+  extraResources:
+    - from: binaries/vuengine-studio-tools/osx
+      to: app/binaries/vuengine-studio-tools/osx
 linux:
   icon: resources/icons/LinuxLauncherIcon/512-512.png
   category: Development
@@ -54,6 +60,9 @@ linux:
   publish:
     provider: generic
     url: "https://download.eclipse.org/theia/latest/linux"
+  extraResources:
+    - from: binaries/vuengine-studio-tools/linux
+      to: app/binaries/vuengine-studio-tools/linux
 
 nsis:
   menuCategory: true
@@ -65,9 +74,9 @@ nsis:
   installerSidebar: resources/icons/InstallerSidebarImage/164-314Windows.bmp
   uninstallerSidebar: resources/icons/InstallerSidebarImage/164-314Windows.bmp
   allowToChangeInstallationDirectory: true
-  runAfterFinish: false
+  runAfterFinish: true
   artifactName: ${productName}.${ext}
-  license: LICENSE
+  license: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
 dmg:
   artifactName: ${productName}.${ext}
 deb:
