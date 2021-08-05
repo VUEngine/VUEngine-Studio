@@ -11,7 +11,7 @@ import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import { Key, PreferenceService } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';
 
-import { VesNewProjectFormComponent } from './ves-projects-new-project-form';
+import { VesNewProjectFormComponent, VES_NEW_PROJECT_TEMPLATES } from './ves-projects-new-project-form';
 import { VesProjectsPreferenceIds } from '../ves-projects-preferences';
 
 @injectable()
@@ -105,10 +105,11 @@ export class VesNewProjectDialog extends ReactDialog<void> {
 
         this.setStatusMessage(`${spinnerIcon} Setting up new project...`);
 
-        const template = this.createProjectFormComponent.current?.state.template ?? 'vuengine-barebone';
+        const templateIndex = this.createProjectFormComponent.current?.state.template ?? 0;
+        const template = VES_NEW_PROJECT_TEMPLATES[templateIndex];
         const folder = this.createProjectFormComponent.current?.state.folder ?? 'new-project';
 
-        const templateFolderUri = new URI(await this.getTemplateFolder(template));
+        const templateFolderUri = new URI(await this.getTemplateFolder(template.id));
         const newProjectFolderUri = new URI(joinPath(path, folder));
 
         await this.fileService.copy(templateFolderUri, newProjectFolderUri);

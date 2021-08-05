@@ -17,15 +17,18 @@ export class VesElectronMainApplication extends ElectronMainApplication {
 
     async createWindow(asyncOptions: MaybePromise<TheiaBrowserWindowOptions> = this.getDefaultBrowserWindowOptions()): Promise<BrowserWindow> {
         const electronWindow = await super.createWindow(asyncOptions);
+
         electronWindow.on('focus', async () => {
             if (this.grayscaleCss !== '') {
                 await electronWindow.webContents.removeInsertedCSS(this.grayscaleCss);
             }
         });
         electronWindow.on('blur', async () => {
-            this.grayscaleCss = await electronWindow.webContents.insertCSS('html { filter: grayscale(1); transition: filter 1.5s ease; }');
+            this.grayscaleCss = await electronWindow.webContents.insertCSS('html { filter: grayscale(1); transition: filter 1s; }');
         });
+
         this.registerVesTouchBar(electronWindow);
+
         return electronWindow;
     }
 

@@ -13,3 +13,12 @@
 [submodule "documentation/vuengine-studio-documentation"]
 	path = documentation/vuengine-studio-documentation
 	url = git@github.com:VUEngine/VUEngine-Studio-Documentation.git
+[submodule "vuengine/vuengine-platformer-demo"]
+	path = vuengine/vuengine-platformer-demo
+	url = git@github.com:VUEngine/VUEngine-Platformer-Demo.git
+[submodule "vuengine/vue-master"]
+	path = vuengine/vue-master
+	url = git@github.com:VUEngine/VUE-MASTER.git
+[submodule "vuengine/spong"]
+	path = vuengine/spong
+	url = git@github.com:VUEngine/SPONG.git

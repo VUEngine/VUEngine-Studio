@@ -202,10 +202,10 @@ export class VesFlashCartWidget extends ReactWidget {
             No flash carts found
           </div>
           <div className="theia-message-content">
-            <p>Connect your Virtual Boy flash cart(s) to your computer via USB.</p>
-            <p>You can connect, and flash to, any number of flash carts at once.</p>
           </div>
         </div>
+        <p>Connect your Virtual Boy flash cart(s) to your computer via USB.</p>
+        <p>You can connect, and flash to, any number of flash carts at once.</p>
       </div >
 
     );

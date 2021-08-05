@@ -8,3 +8,47 @@
     line-height: 24px;
     padding: 0 4px;
 }
+
+.ves-new-project-templates-container {
+    display: flex;
+    flex-direction: row;
+    margin: 3px 0;
+}
+
+.ves-new-project-template {
+    background-position: center;
+    background-size: cover;
+    filter: grayscale(1);
+    height: 112px;
+    margin-right: 12px;
+    width: 192px;
+}
+.ves-new-project-template:last-child {
+    margin-right: 0px;
+}
+
+.ves-new-project-template.selected {
+    filter: none;
+    outline: 4px solid var(--theia-button-background);
+}
+
+.ves-new-project-template-vuengine-platformer-demo {
+    background-image: url('../images/templates/vuengine-platformer-demo.png');
+}
+.ves-new-project-template-vuengine-barebone {
+    background-image: url('../images/templates/vuengine-barebone.png');
+}
+.ves-new-project-template-spong {
+    background-image: url('../images/templates/spong.png');
+}
+.ves-new-project-template-vue-master {
+    background-image: url('../images/templates/vue-master.png');
+}
+
+.ves-new-project-template-name {
+    margin: 8px 0 3px;
+}
+.ves-new-project-template-description {
+    font-style: italic;
+    min-height: 32px;
+}
