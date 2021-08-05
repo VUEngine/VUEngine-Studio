@@ -13,10 +13,18 @@ import { VesTouchBarCommands } from '../common/ves-branding-types';
 
 @injectable()
 export class VesElectronMainApplication extends ElectronMainApplication {
+    protected grayscaleCss: string = '';
+
     async createWindow(asyncOptions: MaybePromise<TheiaBrowserWindowOptions> = this.getDefaultBrowserWindowOptions()): Promise<BrowserWindow> {
         const electronWindow = await super.createWindow(asyncOptions);
-        // electronWindow.on('focus', () => electronWindow.setOpacity(1));
-        // electronWindow.on('blur', () => electronWindow.setOpacity(0.95));
+        electronWindow.on('focus', async () => {
+            if (this.grayscaleCss !== '') {
+                await electronWindow.webContents.removeInsertedCSS(this.grayscaleCss);
+            }
+        });
+        electronWindow.on('blur', async () => {
+            this.grayscaleCss = await electronWindow.webContents.insertCSS('html { filter: grayscale(1); transition: filter 1.5s ease; }');
+        });
         this.registerVesTouchBar(electronWindow);
         return electronWindow;
     }
