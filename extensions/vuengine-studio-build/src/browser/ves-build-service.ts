@@ -307,6 +307,9 @@ export class VesBuildService {
     const compilerPath = await this.getCompilerPath();
     const makefile = await this.getMakefilePath(workspaceRoot, engineCorePath);
 
+    // TODO: remove check when https://github.com/VUEngine/VUEngine-Studio/issues/15 is resolved
+    this.checkPathsForSpaces(workspaceRoot, engineCorePath, enginePluginsPath);
+
     if (isWindows) {
       // if (enableWsl) shellPath = process.env.windir + '\\System32\\wsl.exe';
 
@@ -363,6 +366,16 @@ export class VesBuildService {
     };
   }
 
+  protected checkPathsForSpaces(workspaceRoot: string, engineCorePath: string, enginePluginsPath: string): void {
+    if (workspaceRoot.includes('%20')) {
+      throw new Error('Error: Your workspace path must not contain spaces.');
+    } else if (engineCorePath.includes(' ')) {
+      throw new Error('Error: Your engine path must not contain spaces.');
+    } else if (enginePluginsPath.includes(' ')) {
+      throw new Error('Error: Your plugins path must not contain spaces.');
+    }
+  }
+
   protected async deleteRom(): Promise<void> {
     const romUri = new URI(this.getRomPath());
     if (await this.fileService.exists(romUri)) {
@@ -416,7 +429,7 @@ export class VesBuildService {
       const engineMakefilePath = this.convertoToEnvPath(joinPath(engineCorePath, 'makefile-game'));
       makefilePath = engineMakefilePath;
       if (!(await this.fileService.exists(new URI(makefilePath)))) {
-        throw new Error(`Could not find a makefile. Tried the following locations:\n1) ${gameMakefilePath}\n2) ${engineMakefilePath}`);
+        throw new Error(`Error: Could not find a makefile. Tried the following locations:\n1) ${gameMakefilePath}\n2) ${engineMakefilePath}`);
       }
     }
 
