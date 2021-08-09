@@ -276,7 +276,7 @@ export class VesBuildWidget extends ReactWidget {
                 </button>}
                 <button
                   className='theia-button secondary'
-                  onClick={() => this.vesBuildService.abortBuild()}
+                  onClick={async () => this.vesBuildService.abortBuild()}
                 >
                   Abort
                 </button>
@@ -309,13 +309,17 @@ export class VesBuildWidget extends ReactWidget {
                     {this.vesBuildService.buildStatus.step}
                   </div>
                 )}
-                <div>
-                  {this.getDuration()} – {this.vesBuildService.buildStatus.buildMode} –
-                  PID {this.vesBuildService.buildStatus.processId}
+                <div className='buildStatusMeta'>
+                  <span><i className='fa fa-clock-o'></i> {this.getDuration()}</span>
+                  <span><i className='fa fa-wrench'></i> {this.vesBuildService.buildStatus.buildMode}</span>
+                  {this.vesBuildService.buildStatus.active && this.vesBuildService.buildStatus.processId > 0 &&
+                    <span><i className='fa fa-terminal'></i> PID {this.vesBuildService.buildStatus.processId}</span>}
+                  {this.vesBuildService.buildStatus.romSize > 0 &&
+                    <span><i className='fa fa-microchip'></i> {this.vesBuildService.bytesToMbit(this.vesBuildService.buildStatus.romSize)} MBit</span>}
                 </div>
               </div>
               <div className='buildProblems'>
-                <button
+                {this.getNumberOfWarnings() > 0 && <button
                   className={
                     this.state.logFilter === BuildLogLineType.Warning
                       ? 'theia-button'
@@ -325,13 +329,9 @@ export class VesBuildWidget extends ReactWidget {
                   onClick={() => this.toggleFilter(BuildLogLineType.Warning)}
                 >
                   <i className='fa fa-exclamation-triangle'></i>{' '}
-                  {
-                    this.vesBuildService.buildStatus.log.filter(
-                      l => l.type === BuildLogLineType.Warning
-                    ).length
-                  }
-                </button>
-                <button
+                  {this.getNumberOfWarnings()}
+                </button>}
+                {this.getNumberOfErrors() > 0 && <button
                   className={
                     this.state.logFilter === BuildLogLineType.Error
                       ? 'theia-button'
@@ -341,12 +341,8 @@ export class VesBuildWidget extends ReactWidget {
                   onClick={() => this.toggleFilter(BuildLogLineType.Error)}
                 >
                   <i className='fa fa-times-circle-o'></i>{' '}
-                  {
-                    this.vesBuildService.buildStatus.log.filter(
-                      l => l.type === BuildLogLineType.Error
-                    ).length
-                  }
-                </button>
+                  {this.getNumberOfErrors()}
+                </button>}
               </div>
             </>
           )}
@@ -449,5 +445,17 @@ export class VesBuildWidget extends ReactWidget {
         this.preferenceService.set(preferenceId, destinationFolder.resource.path.toString(), PreferenceScope.User);
       }
     }
+  }
+
+  protected getNumberOfWarnings(): number {
+    return this.vesBuildService.buildStatus.log.filter(
+      l => l.type === BuildLogLineType.Warning
+    ).length;
+  }
+
+  protected getNumberOfErrors(): number {
+    return this.vesBuildService.buildStatus.log.filter(
+      l => l.type === BuildLogLineType.Error
+    ).length;
   }
 }

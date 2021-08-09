@@ -95,6 +95,7 @@ export class VesBuildService {
     log: [],
     buildMode: BuildMode.Beta,
     step: '',
+    romSize: 0,
   };
   protected readonly onDidChangeBuildStatusEmitter = new Emitter<BuildStatus>();
   readonly onDidChangeBuildStatus = this.onDidChangeBuildStatusEmitter.event;
@@ -105,7 +106,7 @@ export class VesBuildService {
   get buildStatus(): BuildStatus {
     return this._buildStatus;
   }
-  resetBuildStatus(step?: string): void {
+  async resetBuildStatus(step?: string): Promise<void> {
     const newBuildStatus = {
       ...this.buildStatus,
       active: false,
@@ -118,6 +119,7 @@ export class VesBuildService {
     this.buildStatus = newBuildStatus;
 
     if (step !== BuildResult.done) {
+      // TODO
       // this.isExportQueued = false;
       // this.isRunQueued = false;
       // this.isFlashQueued = false;
@@ -154,7 +156,7 @@ export class VesBuildService {
       }
     );
 
-    this.resetBuildStatus();
+    await this.resetBuildStatus();
 
     // watch for file changes
     // TODO: watch only respective folders
@@ -209,16 +211,16 @@ export class VesBuildService {
 
   protected bindEvents(): void {
     // @ts-ignore
-    this.vesProcessWatcher.onError(({ pId }) => {
+    this.vesProcessWatcher.onError(async ({ pId }) => {
       if (this.buildStatus.processManagerId === pId) {
-        this.resetBuildStatus(BuildResult.failed);
+        await this.resetBuildStatus(BuildResult.failed);
       }
     });
 
     // @ts-ignore
-    this.vesProcessWatcher.onExit(({ pId, event }) => {
+    this.vesProcessWatcher.onExit(async ({ pId, event }) => {
       if (this.buildStatus.processManagerId === pId) {
-        this.resetBuildStatus(event.code === 0
+        await this.resetBuildStatus(event.code === 0
           ? BuildResult.done
           : BuildResult.failed
         );
@@ -237,6 +239,18 @@ export class VesBuildService {
 
     this.vesProcessWatcher.onOutputStreamData(onData);
     this.vesProcessWatcher.onErrorStreamData(onData);
+
+    this.onDidChangeOutputRomExists(async outputRomExists => {
+      if (outputRomExists) {
+        const outputRom = await this.fileService.readFile(new URI(this.getRomPath()));
+        this.buildStatus.romSize = outputRom.size;
+      } else {
+        this.buildStatus.romSize = 0;
+      }
+
+      // trigger change event
+      this.buildStatus = this.buildStatus;
+    });
   }
 
   protected async build(): Promise<void> {
@@ -279,6 +293,7 @@ export class VesBuildService {
       log,
       buildMode: this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode,
       step,
+      romSize: 0,
     };
   }
 
@@ -424,9 +439,9 @@ export class VesBuildService {
     return joinPath(this.getBuildPath(), 'output.vb');
   }
 
-  abortBuild(): void {
+  async abortBuild(): Promise<void> {
     this.vesProcessService.killProcess(this.buildStatus.processManagerId);
-    this.resetBuildStatus(BuildResult.aborted);
+    await this.resetBuildStatus(BuildResult.aborted);
   }
 
   protected async getResourcesPath(): Promise<string> {
@@ -602,5 +617,9 @@ export class VesBuildService {
         ],
       }),
     ]);
+  }
+
+  bytesToMbit(bytes: number): number {
+    return bytes / 1024 / 128;
   }
 }

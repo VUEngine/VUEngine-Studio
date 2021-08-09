@@ -76,6 +76,13 @@
   color: red;
 }
 
+#vesBuildWidget .buildStatusMeta {
+  margin-top: 5px;
+}
+#vesBuildWidget .buildStatusMeta span {
+  margin-right: 5px;
+}
+
 #vesBuildWidget .buildMode,
 #vesBuildWidget .buildProcess {
   padding: 0 calc(var(--theia-ui-padding) * 2);

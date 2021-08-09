@@ -22,6 +22,7 @@ export interface BuildStatus {
   log: BuildLogLine[];
   buildMode: BuildMode;
   step: string;
+  romSize: number;
 };
 
 export interface BuildLogLine {
