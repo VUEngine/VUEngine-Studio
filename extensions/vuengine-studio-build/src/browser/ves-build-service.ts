@@ -95,7 +95,6 @@ export class VesBuildService {
     log: [],
     buildMode: BuildMode.Beta,
     step: '',
-    plugins: 0,
   };
   protected readonly onDidChangeBuildStatusEmitter = new Emitter<BuildStatus>();
   readonly onDidChangeBuildStatus = this.onDidChangeBuildStatusEmitter.event;
@@ -241,7 +240,6 @@ export class VesBuildService {
   }
 
   protected async build(): Promise<void> {
-    let plugins = 0;
     const log: BuildLogLine[] = [];
     let processManagerId = 0;
     let processId = 0;
@@ -255,7 +253,6 @@ export class VesBuildService {
       await this.fixPermissions();
       ({ processManagerId, processId } = await this.vesProcessService.launchProcess(buildParams));
       active = true;
-      plugins = (await this.getPlugins()).length;
 
     } catch (e: unknown) {
       let error = 'An error occured';
@@ -282,7 +279,6 @@ export class VesBuildService {
       log,
       buildMode: this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode,
       step,
-      plugins,
     };
   }
 
@@ -520,7 +516,7 @@ export class VesBuildService {
     return threads;
   }
 
-  protected async getPlugins(): Promise<string[]> {
+  /* protected async getPlugins(): Promise<string[]> {
     let allPlugins: string[] = [];
     const enginePluginsPath = await this.getEnginePluginsPath();
 
@@ -564,7 +560,7 @@ export class VesBuildService {
 
     // remove duplicates and return
     return allPlugins;
-  }
+  } */
 
   protected computeProgress(matches: string[]): number {
     const stepsDone = parseInt(matches[1]) ?? 0;

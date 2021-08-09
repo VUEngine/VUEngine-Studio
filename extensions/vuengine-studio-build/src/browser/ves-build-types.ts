@@ -22,7 +22,6 @@ export interface BuildStatus {
   log: BuildLogLine[];
   buildMode: BuildMode;
   step: string;
-  plugins: number;
 };
 
 export interface BuildLogLine {
