@@ -241,26 +241,48 @@ export class VesBuildService {
   }
 
   protected async build(): Promise<void> {
-    const plugins = await this.getPlugins();
+    let plugins = 0;
+    const log: BuildLogLine[] = [];
+    let processManagerId = 0;
+    let processId = 0;
+    let active = false;
+    let step = 'Building';
 
-    const romUri = new URI(this.getRomPath());
-    if (await this.fileService.exists(romUri)) {
-      this.fileService.delete(romUri);
+    try {
+
+      const buildParams = await this.getBuildProcessParams();
+      await this.deleteRom();
+      await this.fixPermissions();
+      ({ processManagerId, processId } = await this.vesProcessService.launchProcess(buildParams));
+      active = true;
+      plugins = (await this.getPlugins()).length;
+
+    } catch (e: unknown) {
+      let error = 'An error occured';
+
+      if (typeof e === 'string') {
+        error = e;
+      } else if (e instanceof Error) {
+        error = e.message;
+      }
+
+      log.push({
+        text: error,
+        timestamp: Date.now(),
+        type: BuildLogLineType.Error,
+      });
+      step = 'failed';
     }
 
-    await this.fixPermissions();
-
-    const { processManagerId, processId } = await this.vesProcessService.launchProcess(await this.getBuildProcessParams());
-
     this.buildStatus = {
-      active: true,
-      processManagerId: processManagerId,
-      processId: processId,
+      active,
+      processManagerId,
+      processId,
       progress: 0,
-      log: [],
+      log,
       buildMode: this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode,
-      step: 'Building',
-      plugins: plugins.length,
+      step,
+      plugins,
     };
   }
 
@@ -330,6 +352,13 @@ export class VesBuildService {
     };
   }
 
+  protected async deleteRom(): Promise<void> {
+    const romUri = new URI(this.getRomPath());
+    if (await this.fileService.exists(romUri)) {
+      this.fileService.delete(romUri);
+    }
+  }
+
   protected parseBuildOutput(data: string): { text: string, type: BuildLogLineType } {
     const text = data.trim();
     const textLowerCase = text.toLowerCase();
@@ -369,17 +398,15 @@ export class VesBuildService {
     return { text, type };
   }
 
-  protected async getMakefilePath(
-    workspaceRoot: string,
-    engineCorePath: string
-  ): Promise<string> {
-    let makefilePath = this.convertoToEnvPath(
-      joinPath(workspaceRoot, 'makefile')
-    );
+  protected async getMakefilePath(workspaceRoot: string, engineCorePath: string): Promise<string> {
+    const gameMakefilePath = this.convertoToEnvPath(joinPath(workspaceRoot, 'makefile'));
+    let makefilePath = gameMakefilePath;
     if (!(await this.fileService.exists(new URI(makefilePath)))) {
-      makefilePath = this.convertoToEnvPath(
-        joinPath(engineCorePath, 'makefile-game')
-      );
+      const engineMakefilePath = this.convertoToEnvPath(joinPath(engineCorePath, 'makefile-game'));
+      makefilePath = engineMakefilePath;
+      if (!(await this.fileService.exists(new URI(makefilePath)))) {
+        throw new Error(`Could not find a makefile. Tried the following locations:\n1) ${gameMakefilePath}\n2) ${engineMakefilePath}`);
+      }
     }
 
     return makefilePath;
@@ -531,7 +558,9 @@ export class VesBuildService {
           }
         );
       }));
-    } catch (e) { }
+    } catch (e) {
+      // TODO
+    }
 
     // remove duplicates and return
     return allPlugins;
