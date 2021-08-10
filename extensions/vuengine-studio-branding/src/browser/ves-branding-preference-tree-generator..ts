@@ -5,6 +5,7 @@ import { VesFlashCartPreferenceIds } from 'vuengine-studio-flash-cart/lib/browse
 import { VesEmulatorPreferenceIds } from 'vuengine-studio-emulator/lib/browser/ves-emulator-preferences';
 import { VesProjectsPreferenceIds } from 'vuengine-studio-projects/lib/browser/ves-projects-preferences';
 import { VesUpdaterPreferenceIds } from 'vuengine-studio-updater/lib/electron-browser/ves-updater-preferences';
+import { VesPluginsPreferenceIds } from 'vuengine-studio-plugins/lib/browser/ves-plugins-preferences';
 
 @injectable()
 export class VesPreferenceTreeGenerator extends PreferenceTreeGenerator {
@@ -44,6 +45,7 @@ export class VesPreferenceTreeGenerator extends PreferenceTreeGenerator {
         ['task', 'features'],
         ['terminal', 'features'],
         [VesUpdaterPreferenceIds.CATEGORY, 'features'], // custom category
+        [VesPluginsPreferenceIds.CATEGORY, VesBuildPreferenceIds.CATEGORY], // custom category
         ['webview', 'features'],
     ]);
 }

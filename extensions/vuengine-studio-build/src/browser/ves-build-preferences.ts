@@ -9,7 +9,6 @@ export namespace VesBuildPreferenceIds {
     export const PEDANTIC_WARNINGS = [CATEGORY, 'pedanticWarnings'].join('.');
     export const ENABLE_WSL = [CATEGORY, 'enableWsl'].join('.');
     export const ENGINE_CORE_PATH = [CATEGORY, 'engine', 'coreLibraryPath'].join('.');
-    export const ENGINE_PLUGINS_PATH = [CATEGORY, 'engine', 'pluginsLibraryPath'].join('.');
 }
 
 export const VesBuildPreferenceSchema: PreferenceSchema = {
@@ -44,11 +43,6 @@ export const VesBuildPreferenceSchema: PreferenceSchema = {
         [VesBuildPreferenceIds.ENGINE_CORE_PATH]: {
             type: 'string',
             description: 'Full path to the core library. Uses built-in vuengine-core when left blank.',
-            default: '',
-        },
-        [VesBuildPreferenceIds.ENGINE_PLUGINS_PATH]: {
-            type: 'string',
-            description: 'Full path to the plugins library. Uses built-in vuengine-plugins when left blank.',
             default: '',
         },
     },

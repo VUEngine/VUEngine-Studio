@@ -12,6 +12,7 @@ import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { ProcessOptions } from '@theia/process/lib/node';
 import { VesProcessService } from 'vuengine-studio-process/lib/common/ves-process-service-protocol';
 import { VesProcessWatcher } from 'vuengine-studio-process/lib/browser/ves-process-service-watcher';
+import { VesPluginsService } from 'vuengine-studio-plugins/lib/browser/ves-plugins-service';
 import { VesProjectsService } from 'vuengine-studio-projects/lib/browser/ves-projects-service';
 
 import { BuildLogLine, BuildLogLineType, BuildMode, BuildResult, BuildStatus } from './ves-build-types';
@@ -39,6 +40,8 @@ export class VesBuildService {
   protected readonly preferenceService: PreferenceService;
   @inject(VesProcessService)
   protected readonly vesProcessService: VesProcessService;
+  @inject(VesPluginsService)
+  protected readonly vesPluginsService: VesPluginsService;
   @inject(VesProcessWatcher)
   protected readonly vesProcessWatcher: VesProcessWatcher;
   @inject(VesProjectsService)
@@ -254,6 +257,11 @@ export class VesBuildService {
   }
 
   protected async build(): Promise<void> {
+
+    this.vesPluginsService.writePluginsMap();
+    return;
+
+
     const log: BuildLogLine[] = [];
     let processManagerId = 0;
     let processId = 0;
@@ -268,7 +276,7 @@ export class VesBuildService {
       ({ processManagerId, processId } = await this.vesProcessService.launchProcess(buildParams));
       active = true;
 
-    } catch (e: unknown) {
+    } catch (e) {
       let error = 'An error occured';
 
       if (typeof e === 'string') {
@@ -303,7 +311,7 @@ export class VesBuildService {
     const dumpElf = this.preferenceService.get(VesBuildPreferenceIds.DUMP_ELF) as boolean;
     const pedanticWarnings = this.preferenceService.get(VesBuildPreferenceIds.PEDANTIC_WARNINGS) as boolean;
     const engineCorePath = await this.getEngineCorePath();
-    const enginePluginsPath = await this.getEnginePluginsPath();
+    const enginePluginsPath = await this.vesPluginsService.getEnginePluginsPath();
     const compilerPath = await this.getCompilerPath();
     const makefile = await this.getMakefilePath(workspaceRoot, engineCorePath);
 
@@ -493,21 +501,6 @@ export class VesBuildService {
       : defaultPath;
   }
 
-  protected async getEnginePluginsPath(): Promise<string> {
-    const defaultPath = joinPath(
-      await this.getResourcesPath(),
-      'vuengine',
-      'vuengine-plugins'
-    );
-    const customPath = this.preferenceService.get(
-      VesBuildPreferenceIds.ENGINE_PLUGINS_PATH
-    ) as string;
-
-    return customPath && (await this.fileService.exists(new URI(customPath)))
-      ? customPath
-      : defaultPath;
-  }
-
   protected async getCompilerPath(): Promise<string> {
     return joinPath(
       await this.getResourcesPath(),
@@ -543,52 +536,6 @@ export class VesBuildService {
 
     return threads;
   }
-
-  /* protected async getPlugins(): Promise<string[]> {
-    let allPlugins: string[] = [];
-    const enginePluginsPath = await this.getEnginePluginsPath();
-
-    // get project's plugins
-    try {
-      const configFileUri = new URI(
-        joinPath(
-          this.vesProjectsService.getWorkspaceRoot(),
-          '.vuengine',
-          'plugins.json'
-        )
-      );
-      const configFileContents = await this.fileService.readFile(configFileUri);
-      const projectPlugins = JSON.parse(configFileContents.value.toString());
-      allPlugins = projectPlugins;
-
-      // for each of the project's plugins, get its dependencies
-      // TODO: we only search one level deep here, recurse instead
-      await Promise.all(projectPlugins.map(async (pluginName: string) => {
-        const pluginFileUri = new URI(
-          joinPath(
-            enginePluginsPath,
-            ...pluginName.split('/'),
-            '.vuengine',
-            'plugins.json'
-          )
-        );
-
-        const pluginFileContents = await this.fileService.readFile(pluginFileUri);
-        JSON.parse(pluginFileContents.value.toString()).map(
-          (plugin: string) => {
-            if (!allPlugins.includes(plugin)) {
-              allPlugins.push(plugin);
-            }
-          }
-        );
-      }));
-    } catch (e) {
-      // TODO
-    }
-
-    // remove duplicates and return
-    return allPlugins;
-  } */
 
   protected computeProgress(matches: string[]): number {
     const stepsDone = parseInt(matches[1]) ?? 0;

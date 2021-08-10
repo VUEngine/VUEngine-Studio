@@ -20,6 +20,7 @@
     "vuengine-studio-emulator": "1.0.0",
     "vuengine-studio-export": "1.0.0",
     "vuengine-studio-flash-cart": "1.0.0",
+    "vuengine-studio-plugins": "1.0.0",
     "vuengine-studio-projects": "1.0.0",
     "vuengine-studio-updater": "1.0.0"
   },

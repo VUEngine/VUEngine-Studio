@@ -6,6 +6,7 @@ import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { VesPluginsPreferenceIds } from 'vuengine-studio-plugins/lib/browser/ves-plugins-preferences';
 
 import { VesBuildCommands } from './ves-build-commands';
 import { BuildLogLine, BuildLogLineType, BuildMode, BuildResult } from './ves-build-types';
@@ -57,7 +58,7 @@ export class VesBuildWidget extends ReactWidget {
         case VesBuildPreferenceIds.BUILD_MODE:
         case VesBuildPreferenceIds.DUMP_ELF:
         case VesBuildPreferenceIds.ENGINE_CORE_PATH:
-        case VesBuildPreferenceIds.ENGINE_PLUGINS_PATH:
+        case VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH:
         case VesBuildPreferenceIds.ENABLE_WSL:
         case VesBuildPreferenceIds.PEDANTIC_WARNINGS:
           this.update();
@@ -242,19 +243,19 @@ export class VesBuildWidget extends ReactWidget {
                     <div className='pref-name'>Plugins Library Path</div>
                     <div className='pref-content-container string'>
                       <div className='pref-description'>
-                        {VesBuildPreferenceSchema.properties[VesBuildPreferenceIds.ENGINE_PLUGINS_PATH].description}
+                        {VesBuildPreferenceSchema.properties[VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH].description}
                       </div>
                       <div className='pref-input'>
                         <input
                           type='text'
                           className='theia-input'
-                          value={this.preferenceService.get(VesBuildPreferenceIds.ENGINE_PLUGINS_PATH)}
+                          value={this.preferenceService.get(VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH)}
                           // TODO: this should not fire on every single keypress. use timeout?
-                          onChange={e => this.preferenceService.set(VesBuildPreferenceIds.ENGINE_PLUGINS_PATH, e.currentTarget.value, PreferenceScope.User)}
+                          onChange={e => this.preferenceService.set(VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH, e.currentTarget.value, PreferenceScope.User)}
                         />
                         <button
                           className='theia-button secondary'
-                          onClick={() => this.selectFolder('Select plugins root folder', VesBuildPreferenceIds.ENGINE_PLUGINS_PATH)}
+                          onClick={() => this.selectFolder('Select plugins root folder', VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH)}
                         >
                           <i className='fa fa-ellipsis-h' />
                         </button>

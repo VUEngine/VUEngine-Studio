@@ -1,28 +1,24 @@
 {
   "private": true,
-  "name": "vuengine-studio-build",
+  "name": "vuengine-studio-plugins",
   "version": "1.0.0",
-  "description": "VUEngine Studio build system",
+  "description": "VUEngine Studio plugins management",
   "dependencies": {
     "@theia/core": "1.16.0",
     "@theia/filesystem": "^1.16.0",
-    "@theia/process": "^1.16.0",
     "@theia/workspace": "^1.16.0",
+    "vuengine-studio-build": "1.0.0",
     "filenamify": "^4.3.0",
-    "rimraf": "^2.7.1",
-    "vuengine-studio-process": "1.0.0",
-    "vuengine-studio-plugins": "1.0.0",
-    "vuengine-studio-projects": "1.0.0"
+    "glob": "^7.1.7"
   },
   "devDependencies": {
-    "@types/usb": "^1.5.2",
     "rimraf": "^2.7.1",
     "tslint": "^5.12.0",
     "typescript": "^3.9.2"
   },
   "theiaExtensions": [
     {
-      "frontend": "lib/browser/ves-build-frontend-module"
+      "frontend": "lib/browser/ves-plugins-frontend-module"
     }
   ],
   "keywords": [

@@ -86,6 +86,8 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(VesBrandingLabelProviderContribution).toSelf().inSingletonScope();
     bind(LabelProviderContribution).toService(VesBrandingLabelProviderContribution);
 
+    // TODO: unbind plugins view, type hierarchy view and  call hierarchy view
+
     // remove debug features
     bind(VesDebugContribution).toSelf().inSingletonScope();
     rebind(DebugFrontendApplicationContribution).toService(VesDebugContribution);
