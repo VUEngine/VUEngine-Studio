@@ -39,8 +39,8 @@ export class VesPluginsModel {
     @postConstruct()
     protected async init(): Promise<void> {
         await Promise.all([
-            this.initInstalled(),
             this.initSearchResult(),
+            this.initInstalled(),
             this.initRecommended(),
         ]);
         this.initialized.resolve();
@@ -223,40 +223,27 @@ export class VesPluginsModel {
     protected async refresh(id: string): Promise<VesPlugin | undefined> {
         try {
             const plugin = this.getPlugin(id);
-            if (!this.shouldRefresh(plugin)) {
-                return plugin;
-            }
+            return plugin;
             /* const data = await this.client.getLatestCompatiblePluginVersion(id);
-            if (!data) {
-                return;
-            }
-            if (data.error) {
-                return this.onDidFailRefresh(id, data.error);
-            }
-            plugin = this.setPlugin(id);
-            plugin.update(Object.assign(data, {
-                publisher: data.namespace,
-                downloadUrl: data.files.download,
-                iconUrl: data.files.icon,
-                readmeUrl: data.files.readme,
-                licenseUrl: data.files.license,
-                version: data.version
-            }));
-            return plugin; */
+                if (!data) {
+                    return;
+                }
+                if (data.error) {
+                    return this.onDidFailRefresh(id, data.error);
+                }
+                plugin = this.setPlugin(id);
+                plugin.update(Object.assign(data, {
+                    publisher: data.namespace,
+                    downloadUrl: data.files.download,
+                    iconUrl: data.files.icon,
+                    readmeUrl: data.files.readme,
+                    licenseUrl: data.files.license,
+                    version: data.version
+                }));
+                return plugin; */
         } catch (e) {
             return this.onDidFailRefresh(id, e);
         }
-    }
-
-    /**
-     * Determines if the given plugin should be refreshed.
-     * @param plugin the plugin to refresh.
-     */
-    protected shouldRefresh(plugin?: VesPlugin): boolean {
-        if (plugin === undefined) {
-            return true;
-        }
-        return !plugin.builtin;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -73,13 +73,12 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
             const widgetManager = child.get(WidgetManager);
             for (const id of [
                 VesPluginsSourceOptions.SEARCH_RESULT,
-                VesPluginsSourceOptions.RECOMMENDED,
                 VesPluginsSourceOptions.INSTALLED,
-                VesPluginsSourceOptions.BUILT_IN,
+                VesPluginsSourceOptions.RECOMMENDED,
             ]) {
                 const widget = await widgetManager.getOrCreateWidget(VesPluginsWidget.ID, { id });
                 viewContainer.addWidget(widget, {
-                    initiallyCollapsed: id === VesPluginsSourceOptions.BUILT_IN
+                    // initiallyCollapsed: id === VesPluginsSourceOptions.RECOMMENDED
                 });
             }
             return viewContainer;

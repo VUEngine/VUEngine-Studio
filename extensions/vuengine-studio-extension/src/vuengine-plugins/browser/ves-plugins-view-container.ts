@@ -10,7 +10,7 @@ import { VesPluginsSearchBar } from './ves-plugins-search-bar';
 
 export namespace VesPluginsViewCommands {
 
-    const CATEGORY = 'VUEngine Plugins';
+    const CATEGORY = 'Plugins';
 
     export const CLEAR_ALL: Command = {
         id: 'vesPlugins.clearAll',
@@ -23,7 +23,7 @@ export namespace VesPluginsViewCommands {
 @injectable()
 export class VesPluginsViewContainer extends ViewContainer implements TabBarToolbarContribution {
 
-    static LABEL = 'VUEngine Plugins';
+    static LABEL = 'Plugins';
     static ID = 'ves-plugins-view-container';
 
     @inject(VesPluginsSearchBar)
@@ -115,8 +115,6 @@ export class VesPluginsViewContainer extends ViewContainer implements TabBarTool
 
     protected getWidgetsForMode(): string[] {
         switch (this.currentMode) {
-            case VesPluginsSearchMode.Builtin:
-                return [generateWidgetId(VesPluginsSourceOptions.BUILT_IN)];
             case VesPluginsSearchMode.Installed:
                 return [generateWidgetId(VesPluginsSourceOptions.INSTALLED)];
             case VesPluginsSearchMode.Recommended:

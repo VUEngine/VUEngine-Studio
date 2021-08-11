@@ -110,12 +110,6 @@ export class VesPlugin implements VesPluginData, TreeElement {
         return !!this.plugin;
     }
 
-    get builtin(): boolean {
-        const plugin = this.plugin;
-        const type = plugin && plugin.type;
-        return type === PluginType.System;
-    }
-
     update(data: Partial<VesPluginData>): void {
         for (const key of VesPluginData.KEYS) {
             if (key in data) {
@@ -321,10 +315,7 @@ export abstract class AbstractVesPluginComponent extends React.Component<Abstrac
 
     protected renderAction(): React.ReactNode {
         const plugin = this.props.plugin;
-        const { builtin, busy, installed } = plugin;
-        if (builtin) {
-            return <div className="codicon codicon-settings-gear action" onClick={this.manage} > </div>;
-        }
+        const { busy, installed } = plugin;
         if (busy) {
             if (installed) {
                 return <button className="theia-button action theia-mod-disabled" > Uninstalling </button>;
@@ -389,7 +380,7 @@ export class VesPluginEditorComponent extends AbstractVesPluginComponent {
 
     render(): React.ReactNode {
         const {
-            builtin, preview, id, iconUrl, publisher, displayName, description, version,
+            preview, id, iconUrl, publisher, displayName, description, version,
             averageRating, downloadCount, repository, license, readme
         } = this.props.plugin;
 
@@ -406,10 +397,7 @@ export class VesPluginEditorComponent extends AbstractVesPluginComponent {
                     <div className='title'>
                         <span title='Plugin name' className='name' onClick={this.openPlugin} > {displayName} </span>
                         < span title='Plugin identifier' className='identifier'> {id} </span>
-                        {
-                            preview && <span className='preview'> Preview </span>}
-                        {
-                            builtin && <span className='builtin'> Built -in </span>}
+                        {preview && <span className='preview'> Preview </span>}
                     </div>
                     < div className='subtitle'>
                         <span title='Publisher name' className='publisher' onClick={this.searchPublisher} >

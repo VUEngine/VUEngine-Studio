@@ -51,12 +51,10 @@ export class VesPluginsWidget extends SourceTreeWidget {
         switch (this.options.id) {
             case VesPluginsSourceOptions.INSTALLED:
                 return 'Installed';
-            case VesPluginsSourceOptions.BUILT_IN:
-                return 'Built-in';
             case VesPluginsSourceOptions.RECOMMENDED:
                 return 'Recommended';
             case VesPluginsSourceOptions.SEARCH_RESULT:
-                return 'Open VSX Registry';
+                return 'Search';
             default:
                 return '';
         }

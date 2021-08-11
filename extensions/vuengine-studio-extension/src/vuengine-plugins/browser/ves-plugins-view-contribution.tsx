@@ -5,7 +5,7 @@ import { AbstractViewContribution } from '@theia/core/lib/browser/shell/view-con
 import { VesPluginsCommands } from './ves-plugins-commands';
 import { VesPluginsViewCommands, VesPluginsViewContainer } from './ves-plugins-view-container';
 import { VesPluginsModel } from './ves-plugins-model';
-import { BUILTIN_QUERY, INSTALLED_QUERY, RECOMMENDED_QUERY } from './ves-plugins-search-model';
+import { INSTALLED_QUERY, RECOMMENDED_QUERY } from './ves-plugins-search-model';
 
 @injectable()
 export class VesPluginsViewContribution extends AbstractViewContribution<VesPluginsViewContainer> implements CommandContribution {
@@ -39,10 +39,6 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
             isVisible: () => true,
         });
 
-        commands.registerCommand(VesPluginsCommands.SHOW_BUILTINS, {
-            execute: () => this.showBuiltinPlugins()
-        });
-
         commands.registerCommand(VesPluginsCommands.SHOW_INSTALLED, {
             execute: () => this.showInstalledPlugins()
         });
@@ -50,11 +46,6 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
         commands.registerCommand(VesPluginsCommands.SHOW_RECOMMENDATIONS, {
             execute: () => this.showRecommendedPlugins()
         });
-    }
-
-    protected async showBuiltinPlugins(): Promise<void> {
-        await this.openView({ activate: true });
-        this.model.search.query = BUILTIN_QUERY;
     }
 
     protected async showInstalledPlugins(): Promise<void> {

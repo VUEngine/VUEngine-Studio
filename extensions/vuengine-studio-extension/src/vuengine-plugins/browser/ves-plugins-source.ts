@@ -5,9 +5,8 @@ import { VesPluginsModel } from './ves-plugins-model';
 @injectable()
 export class VesPluginsSourceOptions {
     static INSTALLED = 'installed';
-    static BUILT_IN = 'builtin';
-    static SEARCH_RESULT = 'searchResult';
     static RECOMMENDED = 'recommended';
+    static SEARCH_RESULT = 'searchResult';
     readonly id: string;
 }
 
@@ -36,13 +35,6 @@ export class VesPluginsSource extends TreeSource {
                 if (this.model.isInstalled(id)) {
                     continue;
                 }
-            }
-            if (this.options.id === VesPluginsSourceOptions.BUILT_IN) {
-                if (plugin.builtin) {
-                    yield plugin;
-                }
-            } else if (!plugin.builtin) {
-                yield plugin;
             }
         }
     }
