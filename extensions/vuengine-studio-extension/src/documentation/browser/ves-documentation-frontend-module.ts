@@ -8,12 +8,16 @@ import { createVesDocumentationTreeWidget } from './tree/ves-documentation-tree-
 import { VesDocumentationHandbookViewContribution } from './ves-documentation-handbook-view';
 import { VesDocumentationHandbookWidget } from './ves-documentation-Handbook-widget';
 import '../../../src/documentation/browser/style/index.css';
+import { VesDocumentationService } from './ves-documentation-service';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // menus
     bind(VesDocumentationContribution).toSelf().inSingletonScope();
     bind(MenuContribution).toService(VesDocumentationContribution);
     bind(CommandContribution).toService(VesDocumentationContribution);
+
+    // documentation service
+    bind(VesDocumentationService).toSelf().inSingletonScope();
 
     // handbook view
     bindViewContribution(bind, VesDocumentationHandbookViewContribution);

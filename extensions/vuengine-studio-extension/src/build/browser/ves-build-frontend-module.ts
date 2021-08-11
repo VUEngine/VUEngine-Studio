@@ -1,6 +1,7 @@
 import { ContainerModule } from '@theia/core/shared/inversify';
 import { CommandContribution } from '@theia/core';
 import { bindViewContribution, FrontendApplicationContribution, KeybindingContribution, PreferenceContribution, WidgetFactory } from '@theia/core/lib/browser';
+import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { VesBuildContribution } from './ves-build-contribution';
 import { VesBuildPreferenceSchema } from './ves-build-preferences';
 import { VesBuildService } from './ves-build-service';
@@ -29,6 +30,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // build view
     bindViewContribution(bind, VesBuildViewContribution);
     bind(FrontendApplicationContribution).toService(VesBuildViewContribution);
+    bind(TabBarToolbarContribution).toService(VesBuildViewContribution);
     bind(VesBuildWidget).toSelf();
     bind(WidgetFactory).toDynamicValue(ctx => ({
         id: VesBuildWidget.ID,

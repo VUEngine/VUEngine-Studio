@@ -1,10 +1,23 @@
+import { Command, CommandRegistry, CommandService } from '@theia/core';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { AbstractViewContribution } from '@theia/core/lib/browser';
 import { VesEmulatorWidget } from './widget/ves-emulator-widget';
 import { VesEmulatorContextKeyService } from './ves-emulator-context-key-service';
+import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
+
+export namespace VesEmulatorViewContributionCommands {
+  export const HELP: Command = {
+    id: `${VesEmulatorWidget.ID}.help`,
+    label: 'Open Handbook Page',
+    iconClass: 'fa fa-book',
+  };
+}
 
 @injectable()
-export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmulatorWidget> {
+export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmulatorWidget> implements TabBarToolbarContribution {
+  @inject(CommandService)
+  private readonly commandService: CommandService;
   @inject(VesEmulatorContextKeyService)
   protected readonly contextKeyService: VesEmulatorContextKeyService;
 
@@ -28,5 +41,27 @@ export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmu
     /* this.contextKeyService.emulatorFocus.set(
       this.shell.activeWidget instanceof VesEmulatorWidget
     );*/
+  }
+
+  registerCommands(commandRegistry: CommandRegistry): void {
+    commandRegistry.registerCommand(VesEmulatorViewContributionCommands.HELP, {
+      isEnabled: widget => widget !== undefined &&
+        widget.id !== undefined &&
+        widget.id === VesEmulatorWidget.ID,
+      isVisible: widget => widget !== undefined &&
+        widget.id !== undefined &&
+        widget.id === VesEmulatorWidget.ID,
+      // TODO: link correct handbook page
+      execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'engine/post-processing', false),
+    });
+  }
+
+  registerToolbarItems(toolbar: TabBarToolbarRegistry): void {
+    toolbar.registerItem({
+      id: VesEmulatorViewContributionCommands.HELP.id,
+      command: VesEmulatorViewContributionCommands.HELP.id,
+      tooltip: VesEmulatorViewContributionCommands.HELP.label,
+      priority: 0,
+    });
   }
 }

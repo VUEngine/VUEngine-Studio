@@ -5,10 +5,14 @@ import URI from '@theia/core/lib/common/uri';
 import { VesDocumentationHandbookWidget } from './ves-documentation-Handbook-widget';
 import { VesDocumentationCommands } from './ves-documentation-commands';
 import { VesDocumentationTreeViewContribution } from './tree/ves-documentation-tree-view-contribution';
+import { VesDocumentationService } from './ves-documentation-service';
 
 @injectable()
 export class VesDocumentationHandbookViewContribution extends AbstractViewContribution<VesDocumentationHandbookWidget> {
-    @inject(VesDocumentationTreeViewContribution) protected readonly vesDocumentationTreeViewContribution: VesDocumentationTreeViewContribution;
+    @inject(VesDocumentationService)
+    protected readonly vesDocumentationService: VesDocumentationService;
+    @inject(VesDocumentationTreeViewContribution)
+    protected readonly vesDocumentationTreeViewContribution: VesDocumentationTreeViewContribution;
 
     constructor() {
         super({
@@ -20,9 +24,11 @@ export class VesDocumentationHandbookViewContribution extends AbstractViewContri
 
     registerCommands(commands: CommandRegistry): void {
         commands.registerCommand(VesDocumentationCommands.OPEN_HANDBOOK, {
-            execute: async (documentUri?: URI) => {
-                this.vesDocumentationTreeViewContribution.openView({ reveal: true });
-                if (documentUri) {
+            execute: async (document?: string, openView?: boolean) => {
+                if (openView !== false) {
+                    this.vesDocumentationTreeViewContribution.openView({ reveal: true });
+                }
+                if (document !== undefined && document !== '') {
                     super.openView({ activate: false, reveal: true });
 
                     let widget = super.tryGetWidget();
@@ -34,6 +40,7 @@ export class VesDocumentationHandbookViewContribution extends AbstractViewContri
                     }
 
                     if (widget) {
+                        const documentUri = await this.vesDocumentationService.getHandbookUri(document);
                         widget.openDocument(documentUri);
                     }
                 }

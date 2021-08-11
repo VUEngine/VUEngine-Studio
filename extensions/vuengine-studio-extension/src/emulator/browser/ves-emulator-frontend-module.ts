@@ -1,6 +1,7 @@
 import { ContainerModule } from '@theia/core/shared/inversify';
 import { CommandContribution } from '@theia/core';
 import { bindViewContribution, FrontendApplicationContribution, KeybindingContribution, OpenHandler, PreferenceContribution, WidgetFactory } from '@theia/core/lib/browser';
+import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { VesEmulatorContextKeyService } from './ves-emulator-context-key-service';
 import { VesEmulatorContribution } from './ves-emulator-contribution';
 import { VesEmulatorOpenHandler } from './ves-emulator-open-handler';
@@ -31,6 +32,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // emulator view
     bindViewContribution(bind, VesEmulatorViewContribution);
     bind(FrontendApplicationContribution).toService(VesEmulatorViewContribution);
+    bind(TabBarToolbarContribution).toService(VesEmulatorViewContribution);
     bind(OpenHandler).to(VesEmulatorOpenHandler).inSingletonScope();
     bind(VesEmulatorWidget).toSelf();
     bind(WidgetFactory).toDynamicValue(({ container }) => ({

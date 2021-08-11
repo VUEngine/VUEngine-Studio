@@ -3,10 +3,16 @@ import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/li
 import { AbstractViewContribution, FrontendApplication } from '@theia/core/lib/browser';
 import { VesFlashCartWidget } from './ves-flash-cart-widget';
 import { VesFlashCartCommands } from './ves-flash-cart-commands';
-import { Command, CommandRegistry } from '@theia/core';
+import { Command, CommandRegistry, CommandService } from '@theia/core';
 import { VesFlashCartService } from './ves-flash-cart-service';
+import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
 
 export namespace VesFlashCartViewContributionCommands {
+    export const HELP: Command = {
+        id: `${VesFlashCartWidget.ID}.help`,
+        label: 'Open Handbook Page',
+        iconClass: 'fa fa-book',
+    };
     export const REFRESH: Command = {
         id: `${VesFlashCartWidget.ID}.refresh`,
         label: VesFlashCartCommands.DETECT.label,
@@ -16,6 +22,8 @@ export namespace VesFlashCartViewContributionCommands {
 
 @injectable()
 export class VesFlashCartViewContribution extends AbstractViewContribution<VesFlashCartWidget> implements TabBarToolbarContribution {
+    @inject(CommandService)
+    private readonly commandService: CommandService;
     @inject(VesFlashCartService)
     private readonly vesFlashCartService: VesFlashCartService;
 
@@ -35,6 +43,16 @@ export class VesFlashCartViewContribution extends AbstractViewContribution<VesFl
     }
 
     registerCommands(commandRegistry: CommandRegistry): void {
+        commandRegistry.registerCommand(VesFlashCartViewContributionCommands.HELP, {
+            isEnabled: widget => widget !== undefined &&
+                widget.id !== undefined &&
+                widget.id === VesFlashCartWidget.ID,
+            isVisible: widget => widget !== undefined &&
+                widget.id !== undefined &&
+                widget.id === VesFlashCartWidget.ID,
+            // TODO: link correct handbook page
+            execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'engine/post-processing', false),
+        });
         commandRegistry.registerCommand(VesFlashCartViewContributionCommands.REFRESH, {
             isEnabled: widget => widget !== undefined &&
                 widget.id !== undefined &&
@@ -47,6 +65,12 @@ export class VesFlashCartViewContribution extends AbstractViewContribution<VesFl
     }
 
     registerToolbarItems(toolbar: TabBarToolbarRegistry): void {
+        toolbar.registerItem({
+            id: VesFlashCartViewContributionCommands.HELP.id,
+            command: VesFlashCartViewContributionCommands.HELP.id,
+            tooltip: VesFlashCartViewContributionCommands.HELP.label,
+            priority: 0,
+        });
         toolbar.registerItem({
             id: VesFlashCartViewContributionCommands.REFRESH.id,
             command: VesFlashCartViewContributionCommands.REFRESH.id,

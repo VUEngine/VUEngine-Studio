@@ -1,4 +1,3 @@
-import { join as joinPath } from 'path';
 import { CommandService } from '@theia/core';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
@@ -12,23 +11,22 @@ import {
   NodeProps,
   TreeModel,
 } from '@theia/core/lib/browser';
-import { PreviewUri } from '@theia/preview/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import URI from '@theia/core/lib/common/uri';
-import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import { VesDocumentationChild, VesDocumentationChildNode, VesDocumentationRootNode, VesDocumentTree } from './ves-documentation-tree';
 import { VesDocumentationCommands } from '../ves-documentation-commands';
+import { VesDocumentationService } from '../ves-documentation-service';
 
 @injectable()
 export class VesDocumentationTreeWidget extends TreeWidget {
   @inject(CommandService)
   protected readonly commandService: CommandService;
-  @inject(EnvVariablesServer)
-  protected readonly envVariablesServer: EnvVariablesServer;
   @inject(FileService)
   protected readonly fileService: FileService;
   @inject(LabelProvider)
   protected readonly labelProvider: LabelProvider;
+  @inject(VesDocumentationService)
+  protected readonly vesDocumentationService: VesDocumentationService;
 
   static readonly ID = 'ves-documentation-tree-widget';
   static readonly LABEL = 'Documentation';
@@ -69,7 +67,7 @@ export class VesDocumentationTreeWidget extends TreeWidget {
       ]
     };
 
-    const handbookIndexUri = new URI(await this.getHandbookIndex());
+    const handbookIndexUri = new URI(await this.vesDocumentationService.getHandbookIndex());
     const handbookIndexContents = await this.fileService.readFile(handbookIndexUri); /* eslint-disable-line */
     const handbookIndex = JSON.parse(handbookIndexContents.value.toString());
 
@@ -117,7 +115,7 @@ export class VesDocumentationTreeWidget extends TreeWidget {
       if (node.member.file === '<stsvb>') {
         this.commandService.executeCommand(VesDocumentationCommands.OPEN_TECH_SCROLL.id);
       } else if (node.member.file && node.member.file !== '' && !node.member.file.startsWith('<')) {
-        this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, await this.getHandbookUri(node.member.file ?? ''));
+        this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, node.member.file ?? '');
       }
     }
   }
@@ -141,34 +139,5 @@ export class VesDocumentationTreeWidget extends TreeWidget {
     }
 
     return false;
-  }
-
-  protected async getResourcesPath(): Promise<string> {
-    const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
-    const applicationPath = envVar && envVar.value ? envVar.value : '';
-    return applicationPath;
-  }
-
-  protected async getHandbookRoot(): Promise<string> {
-    return joinPath(
-      await this.getResourcesPath(),
-      'documentation',
-      'vuengine-studio-documentation',
-    );
-  }
-
-  protected async getHandbookIndex(): Promise<string> {
-    const handbookRoot = await this.getHandbookRoot();
-    return joinPath(handbookRoot, 'index.json');
-  }
-
-  protected async getHandbookUri(file: string): Promise<URI> {
-    const handbookRoot = await this.getHandbookRoot();
-    const docUri = new URI(joinPath(
-      handbookRoot,
-      ...(file + '.md').split('/'),
-    ));
-
-    return PreviewUri.encode(docUri);
   }
 }
