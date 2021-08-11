@@ -1,7 +1,7 @@
 import * as React from '@theia/core/shared/react';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { CommandService, isWindows } from '@theia/core';
-import { ApplicationShell, Message, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
+import { Message, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
@@ -14,7 +14,6 @@ import { VesBuildService } from './ves-build-service';
 
 @injectable()
 export class VesBuildWidget extends ReactWidget {
-  @inject(ApplicationShell) protected readonly applicationShell: ApplicationShell;
   @inject(CommandService) private readonly commandService: CommandService;
   @inject(FileService) private readonly fileService: FileService;
   @inject(FileDialogService) private readonly fileDialogService: FileDialogService;
@@ -26,7 +25,6 @@ export class VesBuildWidget extends ReactWidget {
   static readonly LABEL = VesBuildCommands.BUILD.label || 'Build';
 
   protected state = {
-    isWide: false,
     showOptions: false,
     logFilter: BuildLogLineType.Normal,
   };
@@ -96,12 +94,6 @@ export class VesBuildWidget extends ReactWidget {
           {!this.vesBuildService.buildStatus.active && (
             <>
               <div className='buildButtons'>
-                {this.applicationShell.getAreaFor(this) === 'right' && <button
-                  className='theia-button secondary'
-                  onClick={() => this.toggleWidgetWidth()}
-                >
-                  <i className={this.state.isWide ? 'fa fa-chevron-right' : 'fa fa-chevron-left'}></i>
-                </button>}
                 <button
                   className='theia-button build'
                   disabled={!this.workspaceService.opened}
@@ -109,18 +101,6 @@ export class VesBuildWidget extends ReactWidget {
                 >
                   <i className='fa fa-wrench'></i> Build
                 </button>
-                <button
-                  className={this.state.showOptions ? 'theia-button primary' : 'theia-button secondary'}
-                  onClick={() => this.toggleBuildOptions()}
-                >
-                  <i className='fa fa-cog'></i>
-                </button>
-                {this.applicationShell.getAreaFor(this) === 'left' && <button
-                  className='theia-button secondary'
-                  onClick={() => this.toggleWidgetWidth()}
-                >
-                  <i className={this.state.isWide ? 'fa fa-chevron-left' : 'fa fa-chevron-right'}></i>
-                </button>}
               </div>
               {this.state.showOptions && (
                 <div className='buildOptions theia-settings-container'>
@@ -266,24 +246,12 @@ export class VesBuildWidget extends ReactWidget {
           {this.vesBuildService.buildStatus.active && (
             <>
               <div className='buildButtons'>
-                {this.applicationShell.getAreaFor(this) === 'right' && <button
-                  className='theia-button secondary'
-                  onClick={() => this.toggleWidgetWidth()}
-                >
-                  <i className={this.state.isWide ? 'fa fa-chevron-right' : 'fa fa-chevron-left'}></i>
-                </button>}
                 <button
                   className='theia-button secondary'
                   onClick={async () => this.vesBuildService.abortBuild()}
                 >
                   Abort
                 </button>
-                {this.applicationShell.getAreaFor(this) === 'left' && <button
-                  className='theia-button secondary'
-                  onClick={() => this.toggleWidgetWidth()}
-                >
-                  <i className={this.state.isWide ? 'fa fa-chevron-left' : 'fa fa-chevron-right'}></i>
-                </button>}
               </div>
             </>
           )}
@@ -390,21 +358,9 @@ export class VesBuildWidget extends ReactWidget {
     );
   }
 
-  protected toggleBuildOptions(): void {
+  toggleBuildOptions(): void {
     this.state.showOptions = !this.state.showOptions;
     this.update();
-  }
-
-  protected toggleWidgetWidth(): void {
-    this.state.isWide = !this.state.isWide;
-    this.update();
-    const targetWidth = this.state.isWide
-      ? window.innerWidth
-      : Math.round(window.innerWidth * 0.25);
-    const widgetArea = this.applicationShell.getAreaFor(this);
-    if (widgetArea) {
-      this.applicationShell.resize(targetWidth, widgetArea);
-    }
   }
 
   protected getDuration(): string {

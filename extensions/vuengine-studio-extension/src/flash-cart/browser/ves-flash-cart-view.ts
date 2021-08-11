@@ -10,7 +10,7 @@ import { VesDocumentationCommands } from '../../documentation/browser/ves-docume
 export namespace VesFlashCartViewContributionCommands {
     export const HELP: Command = {
         id: `${VesFlashCartWidget.ID}.help`,
-        label: 'Open Handbook Page',
+        label: 'Show Handbook Page',
         iconClass: 'fa fa-book',
     };
     export const REFRESH: Command = {

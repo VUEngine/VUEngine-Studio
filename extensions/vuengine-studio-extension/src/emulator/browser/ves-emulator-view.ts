@@ -9,7 +9,7 @@ import { VesDocumentationCommands } from '../../documentation/browser/ves-docume
 export namespace VesEmulatorViewContributionCommands {
   export const HELP: Command = {
     id: `${VesEmulatorWidget.ID}.help`,
-    label: 'Open Handbook Page',
+    label: 'Show Handbook Page',
     iconClass: 'fa fa-book',
   };
 }
