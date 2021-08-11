@@ -1,5 +1,6 @@
 import { injectable } from '@theia/core/shared/inversify';
 import { CommandContribution, CommandRegistry } from '@theia/core/lib/common/command';
+
 import { VesPluginsCommands } from './ves-plugins-commands';
 
 @injectable()

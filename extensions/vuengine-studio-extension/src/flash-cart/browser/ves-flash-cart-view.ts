@@ -35,11 +35,12 @@ export class VesFlashCartViewContribution extends AbstractViewContribution<VesFl
                 area: 'right',
                 rank: 800,
             },
+            // toggleCommandId: 'vesFlashCart.toggle',
         });
     }
 
     async initializeLayout(app: FrontendApplication): Promise<void> {
-        await this.openView();
+        await this.openView({ activate: false, reveal: false });
     }
 
     registerCommands(commandRegistry: CommandRegistry): void {

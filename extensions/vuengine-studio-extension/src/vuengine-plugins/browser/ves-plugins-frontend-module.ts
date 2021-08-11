@@ -1,9 +1,27 @@
 import { ContainerModule } from '@theia/core/shared/inversify';
-import { PreferenceContribution } from '@theia/core/lib/browser';
+import {
+    bindViewContribution,
+    FrontendApplicationContribution,
+    OpenHandler,
+    PreferenceContribution,
+    WidgetFactory,
+    ViewContainerIdentifier,
+    WidgetManager
+} from '@theia/core/lib/browser';
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { VesPluginsContribution } from './ves-plugins-contribution';
 import { VesPluginsPreferenceSchema } from './ves-plugins-preferences';
 import { VesPluginsService } from './ves-plugins-service';
+import { VesPluginsViewContainer } from './ves-plugins-view-container';
+import { VesPluginsWidget, VesPluginsWidgetOptions } from './ves-plugins-widget';
+import { VesPluginsSourceOptions } from './ves-plugins-source';
+import { VesPlugin, VesPluginFactory, VesPluginOptions } from './ves-plugin';
+import { VesPluginsModel } from './ves-plugins-model';
+import { VesPluginsSearchModel } from './ves-plugins-search-model';
+import { VesPluginsSearchBar } from './ves-plugins-search-bar';
+import { VesPluginEditorManager } from './ves-plugin-editor-manager';
+import { VesPluginEditor } from './ves-plugin-editor';
+import { VesPluginsViewContribution } from './ves-plugins-view-contribution';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // commands
@@ -13,6 +31,64 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // preferences
     bind(PreferenceContribution).toConstantValue({ schema: VesPluginsPreferenceSchema });
 
-    // project service
+    // service
     bind(VesPluginsService).toSelf().inSingletonScope();
+
+    // view
+    bind(VesPlugin).toSelf();
+    bind(VesPluginFactory).toFactory(ctx => (option: VesPluginOptions) => {
+        const child = ctx.container.createChild();
+        child.bind(VesPluginOptions).toConstantValue(option);
+        return child.get(VesPlugin);
+    });
+    bind(VesPluginsModel).toSelf().inSingletonScope();
+
+    bind(VesPluginEditor).toSelf();
+    bind(WidgetFactory).toDynamicValue(ctx => ({
+        id: VesPluginEditor.ID,
+        createWidget: async (options: VesPluginOptions) => {
+            const plugin = await ctx.container.get(VesPluginsModel).resolve(options.id);
+            const child = ctx.container.createChild();
+            child.bind(VesPlugin).toConstantValue(plugin);
+            return child.get(VesPluginEditor);
+        }
+    })).inSingletonScope();
+    bind(VesPluginEditorManager).toSelf().inSingletonScope();
+    bind(OpenHandler).toService(VesPluginEditorManager);
+
+    bind(WidgetFactory).toDynamicValue(({ container }) => ({
+        id: VesPluginsWidget.ID,
+        createWidget: async (options: VesPluginsWidgetOptions) => VesPluginsWidget.createWidget(container, options)
+    })).inSingletonScope();
+    bind(WidgetFactory).toDynamicValue(ctx => ({
+        id: VesPluginsViewContainer.ID,
+        createWidget: async () => {
+            const child = ctx.container.createChild();
+            child.bind(ViewContainerIdentifier).toConstantValue({
+                id: VesPluginsViewContainer.ID,
+                progressLocationId: 'vuengine-plugins'
+            });
+            child.bind(VesPluginsViewContainer).toSelf();
+            const viewContainer = child.get(VesPluginsViewContainer);
+            const widgetManager = child.get(WidgetManager);
+            for (const id of [
+                VesPluginsSourceOptions.SEARCH_RESULT,
+                VesPluginsSourceOptions.RECOMMENDED,
+                VesPluginsSourceOptions.INSTALLED,
+                VesPluginsSourceOptions.BUILT_IN,
+            ]) {
+                const widget = await widgetManager.getOrCreateWidget(VesPluginsWidget.ID, { id });
+                viewContainer.addWidget(widget, {
+                    initiallyCollapsed: id === VesPluginsSourceOptions.BUILT_IN
+                });
+            }
+            return viewContainer;
+        }
+    })).inSingletonScope();
+
+    bind(VesPluginsSearchModel).toSelf().inSingletonScope();
+    bind(VesPluginsSearchBar).toSelf().inSingletonScope();
+
+    bindViewContribution(bind, VesPluginsViewContribution);
+    bind(FrontendApplicationContribution).toService(VesPluginsContribution);
 });

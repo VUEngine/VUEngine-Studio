@@ -8,4 +8,20 @@ export namespace VesPluginsCommands {
         label: 'New Plugin',
         category: CATEGORY,
     };
+
+    export const SHOW_BUILTINS: Command = {
+        id: 'ves:plugins:showBuiltins',
+        label: 'Show Built-in Plugins',
+        category: CATEGORY,
+    };
+    export const SHOW_INSTALLED: Command = {
+        id: 'ves:plugins:showInstalled',
+        label: 'Show Installed Plugins',
+        category: CATEGORY,
+    };
+    export const SHOW_RECOMMENDATIONS: Command = {
+        id: 'ves:plugins:showRecommendations',
+        label: 'Show Recommended Plugins',
+        category: CATEGORY,
+    };
 }

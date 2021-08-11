@@ -4,9 +4,7 @@ import { VesDocumentationTreeWidget } from './ves-documentation-tree-widget';
 import { MenuModelRegistry } from '@theia/core';
 
 @injectable()
-export class VesDocumentationTreeViewContribution extends AbstractViewContribution<
-VesDocumentationTreeWidget
-> {
+export class VesDocumentationTreeViewContribution extends AbstractViewContribution<VesDocumentationTreeWidget> {
   constructor() {
     super({
       widgetId: VesDocumentationTreeWidget.ID,
@@ -15,11 +13,12 @@ VesDocumentationTreeWidget
         area: 'right',
         rank: 900,
       },
+      toggleCommandId: 'vesDocumentation.toggle',
     });
   }
 
   async initializeLayout(app: FrontendApplication): Promise<void> {
-    this.openView();
+    this.openView({ activate: false, reveal: false });
   }
 
   registerMenus(menus: MenuModelRegistry): void {

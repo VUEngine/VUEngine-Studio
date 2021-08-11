@@ -38,6 +38,7 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
                 area: 'right',
                 rank: 700,
             },
+            // toggleCommandId: 'vesBuild.toggle',
         });
     }
 
@@ -46,7 +47,7 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
     };
 
     async initializeLayout(app: FrontendApplication): Promise<void> {
-        await this.openView();
+        await this.openView({ activate: false, reveal: false });
     }
 
     toggleWidgetWidth(widget: Widget): void {
