@@ -249,11 +249,11 @@ export namespace AbstractVesPluginComponent {
 
 export class VesPluginComponent extends AbstractVesPluginComponent {
     render(): React.ReactNode {
-        const { icon, author, displayName, description } = this.props.plugin;
+        const { icon, displayName, description, categories } = this.props.plugin;
         return <div className='theia-vsx-extension ves-plugin'>
             {icon
                 ? <img className='theia-vsx-extension-icon' src={icon} />
-                : <div className='theia-vsx-extension-icon placeholder' />}
+                : <div className='theia-vsx-extension-icon ves-preview'><i className="fa fa-plug" /></div>}
             <div className='theia-vsx-extension-content'>
                 <div className='title'>
                     <div className='noWrapInfo'>
@@ -263,11 +263,11 @@ export class VesPluginComponent extends AbstractVesPluginComponent {
                     </div>
                 </div>
                 <div className='noWrapInfo theia-vsx-extension-description'>{description}</div>
-                {/* categories && <div className='noWrapInfo ves-plugin-categories'>{
-                    categories.map((category: string, i: number) => <span key={i}>{category}</span>)
-                }</div> */}
                 <div className='theia-vsx-extension-action-bar'>
-                    <span className='noWrapInfo theia-vsx-extension-publisher'>{author}</span>
+                    {categories && <span className='noWrapInfo ves-plugin-categories'>{
+                        categories.map((category: string, i: number) => <span key={i}>{category}</span>)
+                    }</span>}
+                    {/* <span className='noWrapInfo theia-vsx-extension-publisher'>{author}</span> */}
                     {this.renderAction()}
                 </div>
             </div>

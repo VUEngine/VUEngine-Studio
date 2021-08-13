@@ -40,7 +40,7 @@ export class VesPluginsViewContainer extends ViewContainer implements TabBarTool
 
         this.setTitleOptions({
             label: VesPluginsViewContainer.LABEL,
-            iconClass: 'fa fa-puzzle-piece',
+            iconClass: 'fa fa-plug',
             closeable: true
         });
     }

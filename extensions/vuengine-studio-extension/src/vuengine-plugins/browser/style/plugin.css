@@ -1,0 +1,22 @@
+.theia-vsx-extension-icon.ves-preview i {
+    background: var(--theia-foreground);
+    border-radius: 50%;
+    color: var(--theia-sideBar-background);
+    font-size: 20px;
+    height: var(--theia-vsx-extension-icon-size);
+    line-height: var(--theia-vsx-extension-icon-size);
+    opacity: .3;
+    text-align: center;
+    width: var(--theia-vsx-extension-icon-size);
+}
+
+.ves-plugin-categories span {
+    background: var(--theia-foreground);
+    border-radius: 10px;
+    color: var(--theia-sideBar-background);
+    display: inline-block;
+    font-size: 80%;
+    line-height: 140%;
+    margin-right: var(--theia-ui-padding);
+    padding: 0 var(--theia-ui-padding);
+}

@@ -24,7 +24,7 @@ export class VesPluginEditor extends ReactWidget {
         this.id = VesPluginEditor.ID + ':' + this.plugin.id;
         this.title.closable = true;
         this.updateTitle();
-        this.title.iconClass = 'fa fa-puzzle-piece';
+        this.title.iconClass = 'fa fa-plug';
         this.node.tabIndex = -1;
         this.update();
         this.toDispose.push(this.model.onDidChange(() => this.update()));
