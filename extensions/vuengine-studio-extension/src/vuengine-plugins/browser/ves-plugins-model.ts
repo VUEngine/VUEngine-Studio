@@ -1,14 +1,13 @@
 import { injectable, inject, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/lib/common/event';
-import { CancellationToken, CancellationTokenSource } from '@theia/core/lib/common/cancellation';
-import { HostedPluginSupport } from '@theia/plugin-ext/lib/hosted/browser/hosted-plugin';
 import { ProgressService } from '@theia/core/lib/common/progress-service';
 import { Deferred } from '@theia/core/lib/common/promise-util';
-import { PreferenceInspectionScope, PreferenceService } from '@theia/core/lib/browser';
+import { PreferenceService } from '@theia/core/lib/browser';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import URI from '@theia/core/lib/common/uri';
 import { VesPluginsSearchModel } from './ves-plugins-search-model';
+import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { VesPlugin, VesPluginFactory } from './ves-plugin';
+import { VesPluginsService } from './ves-plugins-service';
 
 @injectable()
 export class VesPluginsModel {
@@ -16,8 +15,8 @@ export class VesPluginsModel {
     protected readonly onDidChangeEmitter = new Emitter<void>();
     readonly onDidChange = this.onDidChangeEmitter.event;
 
-    @inject(HostedPluginSupport)
-    protected readonly pluginSupport: HostedPluginSupport;
+    @inject(FrontendApplicationStateService)
+    protected readonly frontendApplicationStateService: FrontendApplicationStateService;
 
     @inject(VesPluginFactory)
     protected readonly pluginFactory: VesPluginFactory;
@@ -34,21 +33,27 @@ export class VesPluginsModel {
     @inject(VesPluginsSearchModel)
     readonly search: VesPluginsSearchModel;
 
+    @inject(VesPluginsService)
+    readonly pluginsService: VesPluginsService;
+
     protected readonly initialized = new Deferred<void>();
 
     @postConstruct()
     protected async init(): Promise<void> {
-        await Promise.all([
-            this.initSearchResult(),
-            this.initInstalled(),
-            this.initRecommended(),
-        ]);
-        this.initialized.resolve();
+        this.frontendApplicationStateService.onStateChanged(async (state: FrontendApplicationState) => {
+            if (state === 'attached_shell') {
+                await this.pluginsService.setPluginsData();
+                await Promise.all([
+                    this.initSearchResult(),
+                    this.initInstalled(),
+                    this.initRecommended(),
+                ]);
+                this.initialized.resolve();
+            };
+        });
     }
 
     protected async initInstalled(): Promise<void> {
-        await this.pluginSupport.willStart;
-        this.pluginSupport.onDidChangePlugins(() => this.updateInstalled());
         try {
             await this.updateInstalled();
         } catch (e) {
@@ -117,48 +122,50 @@ export class VesPluginsModel {
     }
 
     protected doChange<T>(task: () => Promise<T>): Promise<T>;
-    protected doChange<T>(task: () => Promise<T>, token: CancellationToken): Promise<T | undefined>;
-    protected doChange<T>(task: () => Promise<T>, token: CancellationToken = CancellationToken.None): Promise<T | undefined> {
+    protected doChange<T>(task: () => Promise<T>): Promise<T | undefined> {
         return this.progressService.withProgress('', 'plugins', async () => {
-            if (token && token.isCancellationRequested) {
-                return undefined;
-            }
             const result = await task();
-            if (token && token.isCancellationRequested) {
-                return undefined;
-            }
             this.onDidChangeEmitter.fire(undefined);
             return result;
         });
     }
 
-    protected searchCancellationTokenSource = new CancellationTokenSource();
-    protected updateSearchResult = () => console.log('NOOP');
-    protected doUpdateSearchResult(param: string, token: CancellationToken): Promise<void> {
+    protected updateSearchResult(): Promise<void> {
         return this.doChange(async () => {
-            // this._searchResult = searchResult;
-        }, token);
-    }
+            const query = this.search.query;
+            const results = this.pluginsService.searchPluginsData(query);
+            const searchResult = new Set<string>();
+
+            for (const data of results) {
+                if (data) {
+                    const id = data.name;
+                    if (id) {
+                        this.setPlugin(id).update(Object.assign(data, {
+                            displayName: data.displayName,
+                            author: data.author,
+                            description: data.description,
+                            icon: data.icon,
+                            readme: data.readme,
+                        }));
+                        searchResult.add(id);
+                    }
+                }
+            }
+
+            this._searchResult = searchResult;
+        });
+    };
 
     protected async updateInstalled(): Promise<void> {
         const prevInstalled = this._installed;
         return this.doChange(async () => {
-            const plugins = this.pluginSupport.plugins;
+            const pluginIds = await this.pluginsService.getInstalledPlugins();
             const currInstalled = new Set<string>();
-            const refreshing = [];
-            for (const plugin of plugins) {
-                if (plugin.model.engine.type === 'vscode') {
-                    const id = plugin.model.id;
-                    this._installed.delete(id);
-                    const plg = this.setPlugin(id);
-                    currInstalled.add(plg.id);
-                    refreshing.push(this.refresh(id));
-                }
+            for (const pluginId of pluginIds) {
+                this._installed.delete(pluginId);
+                const vesPlugin = this.setPlugin(pluginId);
+                currInstalled.add(vesPlugin.id);
             }
-            for (const id of this._installed) {
-                refreshing.push(this.refresh(id));
-            }
-            Promise.all(refreshing);
             const installed = new Set([...prevInstalled, ...currInstalled]);
             const installedSorted = Array.from(installed).sort((a, b) => this.comparePlugins(a, b));
             this._installed = new Set(installedSorted.values());
@@ -168,31 +175,14 @@ export class VesPluginsModel {
     protected updateRecommended(): Promise<Array<VesPlugin | undefined>> {
         return this.doChange<Array<VesPlugin | undefined>>(async () => {
             const allRecommendations = new Set<string>();
-            const allUnwantedRecommendations = new Set<string>();
 
-            const updateRecommendationsForScope = (scope: PreferenceInspectionScope, root?: URI) => {
-                // const recommendations = this.getRecommendationsForScope(scope, root);
-                // recommendations.forEach(recommendation => allRecommendations.add(recommendation));
-            };
+            const recommendations = this.pluginsService.getRecommendedPlugins();
+            recommendations.forEach(recommendation => allRecommendations.add(recommendation));
 
-            updateRecommendationsForScope('defaultValue'); // In case there are application-default recommendations.
-            const roots = await this.workspaceService.roots;
-            for (const root of roots) {
-                updateRecommendationsForScope('workspaceFolderValue', root.resource);
-            }
-            if (this.workspaceService.saved) {
-                updateRecommendationsForScope('workspaceValue');
-            }
             const recommendedSorted = new Set(Array.from(allRecommendations).sort((a, b) => this.comparePlugins(a, b)).values());
-            allUnwantedRecommendations.forEach(unwantedRecommendation => recommendedSorted.delete(unwantedRecommendation));
             this._recommended = recommendedSorted;
             return Promise.all(Array.from(recommendedSorted, plugin => this.refresh(plugin)));
         });
-    }
-
-    protected getRecommendationsForScope(scope: PreferenceInspectionScope, root?: URI): Required<string[]> {
-        // const configuredValue = this.preferences.inspect<Required<string[]>>('plugins', root?.toString())?.[scope];
-        return [];
     }
 
     resolve(id: string): Promise<VesPlugin> {
@@ -202,9 +192,9 @@ export class VesPluginsModel {
             if (!plugin) {
                 throw new Error(`Failed to resolve ${id} plugin.`);
             }
-            if (plugin.readmeUrl) {
+            if (plugin.readme) {
                 try {
-                    // const rawReadme = await this.client.fetchText(plugin.readmeUrl);
+                    // const rawReadme = await this.client.fetchText(plugin.readme);
                     // const readme = this.compileReadme(rawReadme);
                     // plugin.update({ readme });
                     console.log('NOOP');
@@ -222,25 +212,20 @@ export class VesPluginsModel {
 
     protected async refresh(id: string): Promise<VesPlugin | undefined> {
         try {
-            const plugin = this.getPlugin(id);
+            let plugin = this.getPlugin(id);
+            const data = this.pluginsService.getPluginById(id);
+            if (!data) {
+                return;
+            }
+            plugin = this.setPlugin(id);
+            plugin.update(Object.assign(data, {
+                displayName: data.displayName,
+                author: data.author,
+                description: data.description,
+                icon: data.icon,
+                readme: data.readme,
+            }));
             return plugin;
-            /* const data = await this.client.getLatestCompatiblePluginVersion(id);
-                if (!data) {
-                    return;
-                }
-                if (data.error) {
-                    return this.onDidFailRefresh(id, data.error);
-                }
-                plugin = this.setPlugin(id);
-                plugin.update(Object.assign(data, {
-                    publisher: data.namespace,
-                    downloadUrl: data.files.download,
-                    iconUrl: data.files.icon,
-                    readmeUrl: data.files.readme,
-                    licenseUrl: data.files.license,
-                    version: data.version
-                }));
-                return plugin; */
         } catch (e) {
             return this.onDidFailRefresh(id, e);
         }
@@ -257,7 +242,7 @@ export class VesPluginsModel {
     }
 
     /**
-     * Compare two plugins based on their display name, and publisher if applicable.
+     * Compare two plugins based on their display name, and author if applicable.
      * @param a the first plugin id for comparison.
      * @param b the second plugin id for comparison.
      */
@@ -270,8 +255,8 @@ export class VesPluginsModel {
         if (pluginA.displayName && pluginB.displayName) {
             return pluginA.displayName.localeCompare(pluginB.displayName);
         }
-        if (pluginA.publisher && pluginB.publisher) {
-            return pluginA.publisher.localeCompare(pluginB.publisher);
+        if (pluginA.author && pluginB.author) {
+            return pluginA.author.localeCompare(pluginB.author);
         }
         return 0;
     }

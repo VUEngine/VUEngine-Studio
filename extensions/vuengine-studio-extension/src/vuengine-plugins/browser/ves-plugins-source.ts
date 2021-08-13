@@ -36,6 +36,7 @@ export class VesPluginsSource extends TreeSource {
                     continue;
                 }
             }
+            yield plugin;
         }
     }
 

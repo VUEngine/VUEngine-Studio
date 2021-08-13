@@ -1,7 +1,7 @@
 import { Command } from '@theia/core';
 
 export namespace VesPluginsCommands {
-    export const CATEGORY = 'Plugins';
+    export const CATEGORY = 'VUEngine Plugins';
 
     export const NEW: Command = {
         id: 'ves:plugins:new',

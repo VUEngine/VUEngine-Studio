@@ -8,6 +8,7 @@ import {
     ViewContainerIdentifier,
     WidgetManager
 } from '@theia/core/lib/browser';
+import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { VesPluginsContribution } from './ves-plugins-contribution';
 import { VesPluginsPreferenceSchema } from './ves-plugins-preferences';
@@ -22,6 +23,7 @@ import { VesPluginsSearchBar } from './ves-plugins-search-bar';
 import { VesPluginEditorManager } from './ves-plugin-editor-manager';
 import { VesPluginEditor } from './ves-plugin-editor';
 import { VesPluginsViewContribution } from './ves-plugins-view-contribution';
+import '../../../src/vuengine-plugins/browser/style/index.css';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // commands
@@ -66,7 +68,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
             const child = ctx.container.createChild();
             child.bind(ViewContainerIdentifier).toConstantValue({
                 id: VesPluginsViewContainer.ID,
-                progressLocationId: 'vuengine-plugins'
+                progressLocationId: 'vuengine-plugins',
             });
             child.bind(VesPluginsViewContainer).toSelf();
             const viewContainer = child.get(VesPluginsViewContainer);
@@ -78,7 +80,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
             ]) {
                 const widget = await widgetManager.getOrCreateWidget(VesPluginsWidget.ID, { id });
                 viewContainer.addWidget(widget, {
-                    // initiallyCollapsed: id === VesPluginsSourceOptions.RECOMMENDED
+                    initiallyCollapsed: id === VesPluginsSourceOptions.RECOMMENDED
                 });
             }
             return viewContainer;
@@ -90,4 +92,5 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     bindViewContribution(bind, VesPluginsViewContribution);
     bind(FrontendApplicationContribution).toService(VesPluginsContribution);
+    bind(TabBarToolbarContribution).toService(VesPluginsContribution);
 });

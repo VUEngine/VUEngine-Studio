@@ -1,4 +1,5 @@
 import { injectable, inject } from '@theia/core/shared/inversify';
+import { FrontendApplicationContribution } from '@theia/core/lib/browser';
 import { CommandContribution, CommandRegistry } from '@theia/core/lib/common/command';
 import { FrontendApplication } from '@theia/core/lib/browser/frontend-application';
 import { AbstractViewContribution } from '@theia/core/lib/browser/shell/view-contribution';
@@ -8,7 +9,9 @@ import { VesPluginsModel } from './ves-plugins-model';
 import { INSTALLED_QUERY, RECOMMENDED_QUERY } from './ves-plugins-search-model';
 
 @injectable()
-export class VesPluginsViewContribution extends AbstractViewContribution<VesPluginsViewContainer> implements CommandContribution {
+export class VesPluginsViewContribution extends AbstractViewContribution<VesPluginsViewContainer>
+    implements CommandContribution, FrontendApplicationContribution {
+
     @inject(VesPluginsModel) protected readonly model: VesPluginsModel;
     @inject(CommandRegistry) protected readonly commandRegistry: CommandRegistry;
 
@@ -27,7 +30,7 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
     }
 
     async initializeLayout(app: FrontendApplication): Promise<void> {
-        await this.openView();
+        await this.openView({ activate: false });
     }
 
     registerCommands(commands: CommandRegistry): void {

@@ -124,6 +124,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                 {VES_NEW_PROJECT_TEMPLATES.map((template, index) => {
                     const selected = index === this.state.template ? ' selected' : '';
                     return <div
+                        key={`ves-new-project-template-${index}`}
                         data-template={VES_NEW_PROJECT_TEMPLATES[this.state.template].id}
                         className={`ves-new-project-template ves-new-project-template-${template.id}${selected}`}
                         onClick={() => this.updateTemplate(index)}

@@ -3,6 +3,8 @@ import { injectable } from '@theia/core/shared/inversify';
 import { VesDocumentationTreeWidget } from './ves-documentation-tree-widget';
 import { MenuModelRegistry } from '@theia/core';
 
+// TODO: add "collapse all" command to tab tool bar
+
 @injectable()
 export class VesDocumentationTreeViewContribution extends AbstractViewContribution<VesDocumentationTreeWidget> {
   constructor() {

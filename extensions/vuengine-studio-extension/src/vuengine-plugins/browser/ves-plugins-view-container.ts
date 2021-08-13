@@ -10,7 +10,7 @@ import { VesPluginsSearchBar } from './ves-plugins-search-bar';
 
 export namespace VesPluginsViewCommands {
 
-    const CATEGORY = 'Plugins';
+    const CATEGORY = 'VUEngine Plugins';
 
     export const CLEAR_ALL: Command = {
         id: 'vesPlugins.clearAll',
@@ -23,7 +23,7 @@ export namespace VesPluginsViewCommands {
 @injectable()
 export class VesPluginsViewContainer extends ViewContainer implements TabBarToolbarContribution {
 
-    static LABEL = 'Plugins';
+    static LABEL = 'VUEngine Plugins';
     static ID = 'ves-plugins-view-container';
 
     @inject(VesPluginsSearchBar)
@@ -140,12 +140,13 @@ export class VesPluginsViewContainer extends ViewContainer implements TabBarTool
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     protected doRestoreState(state: any): void {
-        // eslint-disable-next-line guard-for-in
         for (const key in state.modes) {
-            const mode = Number(key) as VesPluginsSearchMode;
-            const modeState = state.modes[mode];
-            if (modeState) {
-                this.lastModeState.set(mode, modeState);
+            if (state.modes.hasOwnProperty(key)) {
+                const mode = Number(key) as VesPluginsSearchMode;
+                const modeState = state.modes[mode];
+                if (modeState) {
+                    this.lastModeState.set(mode, modeState);
+                }
             }
         }
         this.model.search.query = state.query;

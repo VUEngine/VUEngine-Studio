@@ -1,4 +1,4 @@
-import { basename, dirname, join as joinPath, relative as relativePath } from 'path';
+import { dirname, join as joinPath, relative as relativePath } from 'path';
 import * as glob from 'glob';
 import { isWindows } from '@theia/core';
 import { EncodingService } from '@theia/core/lib/common/encoding-service';
@@ -7,41 +7,27 @@ import URI from '@theia/core/lib/common/uri';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { PreferenceService } from '@theia/core/lib/browser';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
-import { VesBuildPreferenceIds } from '../../build/browser/ves-build-preferences';
 import { VesPluginsPreferenceIds } from './ves-plugins-preferences';
+import { VesPluginData, VesPluginsData } from './ves-plugin';
 
 @injectable()
 export class VesPluginsService {
-  constructor(
-    @inject(EncodingService)
-    protected encodingService: EncodingService,
-    @inject(EnvVariablesServer)
-    protected envVariablesServer: EnvVariablesServer,
-    @inject(FileService)
-    protected fileService: FileService,
-    @inject(PreferenceService)
-    protected preferenceService: PreferenceService,
-  ) { }
+
+  @inject(EncodingService)
+  protected encodingService: EncodingService;
+  @inject(EnvVariablesServer)
+  protected envVariablesServer: EnvVariablesServer;
+  @inject(FileService)
+  protected fileService: FileService;
+  @inject(PreferenceService)
+  protected preferenceService: PreferenceService;
+
+  protected pluginsData: VesPluginsData;
 
   protected async getResourcesPath(): Promise<string> {
     const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
     const applicationPath = envVar && envVar.value ? envVar.value : '';
     return applicationPath;
-  }
-
-  protected async getEngineCorePath(): Promise<string> {
-    const defaultPath = joinPath(
-      await this.getResourcesPath(),
-      'vuengine',
-      'vuengine-core'
-    );
-    const customPath = this.preferenceService.get(
-      VesBuildPreferenceIds.ENGINE_CORE_PATH
-    ) as string;
-
-    return customPath && (await this.fileService.exists(new URI(customPath)))
-      ? customPath
-      : defaultPath;
   }
 
   async getEnginePluginsPath(): Promise<string> {
@@ -59,6 +45,14 @@ export class VesPluginsService {
       : defaultPath;
   }
 
+  async getUserPluginsPath(): Promise<string> {
+    const path = this.preferenceService.get(
+      VesPluginsPreferenceIds.USER_PLUGINS_PATH
+    ) as string;
+
+    return path;
+  }
+
   protected getWorkspaceRoot(): string {
     const substrNum = isWindows ? 2 : 1;
 
@@ -67,35 +61,87 @@ export class VesPluginsService {
       : window.location.hash.substring(substrNum);
   }
 
-  /**
-   * Writes a map file for all VUEngine plugins to the build directory for the makefiles to work with
-   */
-  async writePluginsMap(): Promise<boolean> {
-    // const engineCorePath = await this.getEngineCorePath();
+  // TODO: properly handle plugin not found
+  getPluginById(id: string): VesPluginData {
+    return this.pluginsData[id] ?? this.pluginsData[0];
+  }
+
+  async getInstalledPlugins(): Promise<string[]> {
+    const pluginsFilePath = joinPath(this.getWorkspaceRoot(), '.vuengine', 'plugins.json');
+    const pluginsFileUri = new URI(pluginsFilePath);
+
+    try {
+      const fileContent = await this.fileService.readFile(pluginsFileUri);
+      return JSON.parse(fileContent.value.toString());
+    } catch (e) {
+      return [];
+    }
+  }
+
+  getRecommendedPlugins(): string[] {
+    return [
+      'vuengine/other/I18n',
+      'vuengine/other/SaveDataManager',
+      'vuengine/states/SplashScreens'
+    ];
+  }
+
+  async setPluginsData(): Promise<void> {
     const enginePluginsPath = await this.getEnginePluginsPath();
-    let pluginsMap = 'core:$(ENGINE_FOLDER)\n';
-    const self = this;
+    const userPluginsPath = await this.getUserPluginsPath();
 
-    glob(joinPath(enginePluginsPath, '/**/', '.vuengine', 'plugin.json'), {}, function (error, matches) { /* eslint-disable-line */
-      if (!error) {
-        for (const match of matches) {
-          const matchSplit = match.split('/.vuengine/plugin.json');
-          const pluginPathFull = matchSplit[0];
-          const pluginPathRelative = relativePath(enginePluginsPath, pluginPathFull);
-          const pluginId = 'vuengine/' + basename(pluginPathRelative).toLowerCase();
-          pluginsMap += `${pluginId}:$(PLUGINS_FOLDER)${pluginPathRelative}\n`;
+    const findPlugins = async (path: string, prefix: string) => {
+      const pluginsMap: any = {}; /* eslint-disable-line */
+
+      await Promise.all(glob.sync(joinPath(path, '/**/', 'plugin.json')).map(async file => {
+        const fileSplit = file.split('/plugin.json');
+        const pluginPathFull = fileSplit[0];
+
+        const pluginPathRelative = relativePath(path, pluginPathFull);
+        const fileContent = await this.fileService.readFile(new URI(file));
+        const fileContentJson = JSON.parse(fileContent.value.toString());
+
+        const pluginId = `${prefix}/${pluginPathRelative}`;
+
+        if (fileContentJson.icon !== '' && !fileContentJson.icon.includes('../')) {
+          fileContentJson.icon = joinPath(pluginPathFull, fileContentJson.icon);
         }
+        if (fileContentJson.readme !== '' && !fileContentJson.readme.includes('../')) {
+          fileContentJson.readme = joinPath(pluginPathFull, fileContentJson.readme);
+        }
+
+        fileContentJson.name = pluginId;
+
+        pluginsMap[pluginId] = fileContentJson;
+      }));
+
+      return pluginsMap;
+    };
+
+    const pluginsMap = {
+      ...await findPlugins(enginePluginsPath, 'vuengine'),
+      ...await findPlugins(userPluginsPath, 'user'),
+    };
+
+    this.pluginsData = pluginsMap;
+  }
+
+  searchPluginsData(query: string): VesPluginData[] {
+    const searchResult = [];
+
+    // TODO: weighted search through all fields, then order by score desc
+
+    for (const pluginData of Object.values(this.pluginsData)) {
+      if (pluginData.name?.includes(query) && pluginData.name) {
+        searchResult.push(pluginData);
       }
+    }
 
-      const encoded = self.encodingService.encode(pluginsMap);
-      self.fileService.writeFile(new URI(joinPath(self.getWorkspaceRoot(), 'build', 'plugins.txt')), encoded);
-    });
-
-    return true;
+    return searchResult;
   }
 
   /**
-   * Returns a list of all plugins the current project uses
+   * Returns a list of all plugins the current project uses, including implicitly included ones through dependencies
    */
   /* protected async getProjectPlugins(): Promise<string[]> {
     let allPlugins: string[] = [];
