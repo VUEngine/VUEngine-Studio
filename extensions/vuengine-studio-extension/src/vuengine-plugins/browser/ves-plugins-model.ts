@@ -1,3 +1,5 @@
+import * as showdown from 'showdown';
+import * as sanitize from 'sanitize-html';
 import { injectable, inject, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/lib/common/event';
 import { ProgressService } from '@theia/core/lib/common/progress-service';
@@ -6,14 +8,19 @@ import { PreferenceService } from '@theia/core/lib/browser';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesPluginsSearchModel } from './ves-plugins-search-model';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { VesPlugin, VesPluginFactory } from './ves-plugin';
 import { VesPluginsService } from './ves-plugins-service';
+import URI from '@theia/core/lib/common/uri';
 
 @injectable()
 export class VesPluginsModel {
 
     protected readonly onDidChangeEmitter = new Emitter<void>();
     readonly onDidChange = this.onDidChangeEmitter.event;
+
+    @inject(FileService)
+    protected readonly fileService: FileService;
 
     @inject(FrontendApplicationStateService)
     protected readonly frontendApplicationStateService: FrontendApplicationStateService;
@@ -194,10 +201,9 @@ export class VesPluginsModel {
             }
             if (plugin.readme) {
                 try {
-                    // const rawReadme = await this.client.fetchText(plugin.readme);
-                    // const readme = this.compileReadme(rawReadme);
-                    // plugin.update({ readme });
-                    console.log('NOOP');
+                    const rawReadme = await this.fileService.readFile(new URI(plugin.readme));
+                    const readme = this.compileReadme(rawReadme.value.toString());
+                    plugin.update({ readme });
                 } catch (e) {
                     console.error(`[${id}]: failed to compile readme, reason:`, e);
                 }
@@ -207,7 +213,16 @@ export class VesPluginsModel {
     }
 
     protected compileReadme(readmeMarkdown: string): string {
-        return 'test';
+        const markdownConverter = new showdown.Converter({
+            noHeaderId: true,
+            strikethrough: true,
+            headerLevelStart: 2
+        });
+
+        const readmeHtml = markdownConverter.makeHtml(readmeMarkdown);
+        return sanitize(readmeHtml, {
+            allowedTags: sanitize.defaults.allowedTags.concat(['h1', 'h2', 'img'])
+        });
     }
 
     protected async refresh(id: string): Promise<VesPlugin | undefined> {

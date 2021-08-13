@@ -29,6 +29,8 @@
     "glob": "^7.1.7",
     "rimraf": "^2.7.1",
     "sanitize-filename": "^1.6.3",
+    "sanitize-html": "^2.3.2",
+    "showdown": "^1.9.1",
     "usb": "^1.7.0",
     "uuid": "^8.3.2"
   },

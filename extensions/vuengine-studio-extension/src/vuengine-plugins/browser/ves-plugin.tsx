@@ -1,9 +1,9 @@
 import * as React from '@theia/core/shared/react';
+import * as DOMPurify from '@theia/core/shared/dompurify';
 import { injectable, inject } from '@theia/core/shared/inversify';
 import URI from '@theia/core/lib/common/uri';
 import { TreeElement } from '@theia/core/lib/browser/source-tree';
 import { OpenerService, open, OpenerOptions } from '@theia/core/lib/browser/opener-service';
-import { Endpoint } from '@theia/core/lib/browser/endpoint';
 import { MenuPath } from '@theia/core/lib/common';
 import { ContextMenuRenderer } from '@theia/core/lib/browser';
 import { VesPluginsSearchModel } from './ves-plugins-search-model';
@@ -111,7 +111,7 @@ export class VesPlugin implements VesPluginData, TreeElement {
     }
 
     get icon(): string | undefined {
-        return this.getData('icon');
+        return this.data['icon'];
         /* const plugin = this.plugin;
         const icon = plugin && plugin.icon;
         if (icon) {
@@ -134,11 +134,6 @@ export class VesPlugin implements VesPluginData, TreeElement {
     }
 
     get readme(): string | undefined {
-        const plugin = this.plugin;
-        const readme = plugin && plugin.readme;
-        if (readme) {
-            return new Endpoint({ path: readme }).getRestUrl().toString();
-        }
         return this.data['readme'];
     }
 
@@ -253,7 +248,7 @@ export class VesPluginComponent extends AbstractVesPluginComponent {
         return <div className='theia-vsx-extension ves-plugin'>
             {icon
                 ? <img className='theia-vsx-extension-icon' src={icon} />
-                : <div className='theia-vsx-extension-icon ves-preview'><i className="fa fa-plug" /></div>}
+                : <div className='theia-vsx-extension-icon ves-placeholder'><i className="fa fa-plug" /></div>}
             <div className='theia-vsx-extension-content'>
                 <div className='title'>
                     <div className='noWrapInfo'>
@@ -284,33 +279,52 @@ export class VesPluginEditorComponent extends AbstractVesPluginComponent {
         return this._scrollContainer;
     }
 
+    // TODO: list dependencies
     render(): React.ReactNode {
-        const {
-            id, icon, author, displayName, description
-        } = this.props.plugin;
+        const { id, icon, author, displayName, description, repository, license, categories, readme } = this.props.plugin;
 
-        const { baseStyle } = this.getSubcomponentStyles();
+        const { baseStyle, scrollStyle } = this.getSubcomponentStyles();
+        const sanitizedReadme = !!readme ? DOMPurify.sanitize(readme) : undefined;
 
         return <>
-            <div className='header' style={baseStyle} ref={ref => this.header = (ref || undefined)} >
+            <div className='header' style={baseStyle} ref={ref => this.header = (ref || undefined)}>
                 {icon ?
                     <img className='icon-container' src={icon} /> :
-                    <div className='icon-container placeholder' />}
+                    <div className='icon-container ves-placeholder'><i className="fa fa-plug" /></div>}
                 <div className='details'>
                     <div className='title'>
-                        <span title='Plugin name' className='name' onClick={this.openPlugin} > {displayName} </span>
-                        <span title='Plugin identifier' className='identifier'> {id} </span>
+                        <span title='Plugin name' className='name'>{displayName}</span>
+                        <span title='Plugin identifier' className='identifier'>{id}</span>
                     </div>
                     <div className='subtitle'>
-                        <span title='Author' className='publisher' onClick={this.searchAuthor} >
+                        <span title='Author' className='publisher' onClick={this.searchAuthor}>
                             {author}
                         </span>
+                        {repository && <span className='repository' onClick={this.openRepository}>Repository</span>}
+                        {license && <span className='license'>{license}</span>}
+                        {categories && <span className='noWrapInfo ves-plugin-categories'>{
+                            categories.map((category: string, i: number) => <span key={i}>{category}</span>)
+                        }</span>}
                     </div>
                     <div className='description noWrapInfo'> {description} </div>
                     {this.renderAction()}
                 </div>
             </div>
-        </ >;
+            {
+                sanitizedReadme &&
+                <div className='scroll-container'
+                    style={scrollStyle}
+                    ref={ref => this._scrollContainer = (ref || undefined)}>
+                    <div className='body'
+                        ref={ref => this.body = (ref || undefined)}
+                        onClick={this.openLink}
+                        style={baseStyle}
+                        // eslint-disable-next-line react/no-danger
+                        dangerouslySetInnerHTML={{ __html: sanitizedReadme }}
+                    />
+                </div>
+            }
+        </>;
     }
 
     protected getSubcomponentStyles(): { baseStyle: React.CSSProperties, scrollStyle: React.CSSProperties; } {
@@ -321,14 +335,31 @@ export class VesPluginEditorComponent extends AbstractVesPluginComponent {
         return { baseStyle, scrollStyle };
     }
 
-    readonly openPlugin = async (e: React.MouseEvent) => {
-        e.stopPropagation();
-        e.preventDefault();
-
-        // const plugin = this.props.plugin;
-        // const uri = await plugin.getRegistryLink();
-        // plugin.doOpen(uri);
+    readonly openLink = (event: React.MouseEvent) => {
+        if (!this.body) {
+            return;
+        }
+        const target = event.nativeEvent.target;
+        if (!(target instanceof HTMLElement)) {
+            return;
+        }
+        let node = target;
+        while (node.tagName.toLowerCase() !== 'a') {
+            if (node === this.body) {
+                return;
+            }
+            if (!(node.parentElement instanceof HTMLElement)) {
+                return;
+            }
+            node = node.parentElement;
+        }
+        const href = node.getAttribute('href');
+        if (href && !href.startsWith('#')) {
+            event.preventDefault();
+            this.props.plugin.doOpen(new URI(href));
+        }
     };
+
     readonly searchAuthor = (e: React.MouseEvent) => {
         e.stopPropagation();
         e.preventDefault();
@@ -336,6 +367,15 @@ export class VesPluginEditorComponent extends AbstractVesPluginComponent {
         const plugin = this.props.plugin;
         if (plugin.author) {
             plugin.search.query = plugin.author;
+        }
+    };
+    readonly openRepository = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        const plugin = this.props.plugin;
+        if (plugin.repository) {
+            plugin.doOpen(new URI(plugin.repository));
         }
     };
 }

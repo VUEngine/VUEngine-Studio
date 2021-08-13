@@ -20,8 +20,8 @@ export class VesPluginEditor extends ReactWidget {
 
     @postConstruct()
     protected init(): void {
-        this.addClass('ves-plugin-editor');
-        this.id = VesPluginEditor.ID + ':' + this.plugin.id;
+        this.addClass('theia-vsx-extension-editor');
+        this.id = `${VesPluginEditor.ID}:${this.plugin.id}`;
         this.title.closable = true;
         this.updateTitle();
         this.title.iconClass = 'fa fa-plug';
@@ -50,7 +50,7 @@ export class VesPluginEditor extends ReactWidget {
     }
 
     protected updateTitle(): void {
-        const label = 'Plugin: ' + (this.plugin.displayName || this.plugin.name);
+        const label = `Plugin: ${(this.plugin.displayName || this.plugin.name)}`;
         this.title.label = label;
         this.title.caption = label;
     }
