@@ -23,7 +23,7 @@ import { VesPluginsSearchBar } from './ves-plugins-search-bar';
 import { VesPluginEditorManager } from './ves-plugin-editor-manager';
 import { VesPluginEditor } from './ves-plugin-editor';
 import { VesPluginsViewContribution } from './ves-plugins-view-contribution';
-import '../../../src/vuengine-plugins/browser/style/index.css';
+import '../../../src/plugins/browser/style/index.css';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // commands

@@ -14,7 +14,7 @@ import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import { VesProcessService } from '../../process/common/ves-process-service-protocol';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProjectsService } from '../../projects/browser/ves-projects-service';
-import { VesPluginsService } from '../../vuengine-plugins/browser/ves-plugins-service';
+import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { BuildLogLine, BuildLogLineType, BuildMode, BuildResult, BuildStatus } from './ves-build-types';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
 import { VesBuildCommands } from './ves-build-commands';

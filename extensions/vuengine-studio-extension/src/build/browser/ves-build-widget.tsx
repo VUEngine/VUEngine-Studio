@@ -6,7 +6,7 @@ import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { VesPluginsPreferenceIds, VesPluginsPreferenceSchema } from '../../vuengine-plugins/browser/ves-plugins-preferences';
+import { VesPluginsPreferenceIds, VesPluginsPreferenceSchema } from '../../plugins/browser/ves-plugins-preferences';
 import { VesBuildCommands } from './ves-build-commands';
 import { BuildLogLine, BuildLogLineType, BuildMode, BuildResult } from './ves-build-types';
 import { VesBuildPreferenceIds, VesBuildPreferenceSchema } from './ves-build-preferences';
