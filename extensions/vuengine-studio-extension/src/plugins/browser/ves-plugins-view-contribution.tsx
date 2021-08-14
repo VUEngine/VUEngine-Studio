@@ -51,8 +51,7 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
             isVisible: widget => widget !== undefined &&
                 widget.id !== undefined &&
                 widget.id === VesPluginsViewContainer.ID,
-            // TODO: link correct handbook page
-            execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'engine/post-processing', false),
+            execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'user-interface/plugins-view', false),
         });
 
         commandRegistry.registerCommand(VesPluginsCommands.SHOW_INSTALLED, {
