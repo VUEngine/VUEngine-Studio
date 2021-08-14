@@ -63,9 +63,7 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
 
     registerCommands(commandRegistry: CommandRegistry): void {
         commandRegistry.registerCommand(VesBuildViewContributionCommands.EXPAND, {
-            isEnabled: widget => widget !== undefined &&
-                widget.id !== undefined &&
-                widget.id === VesBuildWidget.ID,
+            isEnabled: () => true,
             isVisible: widget => widget !== undefined &&
                 widget.id !== undefined &&
                 widget.id === VesBuildWidget.ID,
@@ -75,9 +73,7 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
                 this.toggleWidgetWidth(widget),
         });
         commandRegistry.registerCommand(VesBuildViewContributionCommands.HELP, {
-            isEnabled: widget => widget !== undefined &&
-                widget.id !== undefined &&
-                widget.id === VesBuildWidget.ID,
+            isEnabled: () => true,
             isVisible: widget => widget !== undefined &&
                 widget.id !== undefined &&
                 widget.id === VesBuildWidget.ID,
@@ -85,9 +81,7 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
             execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'engine/post-processing', false),
         });
         commandRegistry.registerCommand(VesBuildViewContributionCommands.SETTINGS, {
-            isEnabled: widget => widget !== undefined &&
-                widget.id !== undefined &&
-                widget.id === VesBuildWidget.ID,
+            isEnabled: () => true,
             isVisible: widget => widget !== undefined &&
                 widget.id !== undefined &&
                 widget.id === VesBuildWidget.ID,

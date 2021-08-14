@@ -1,7 +1,6 @@
 import { injectable, inject, postConstruct } from '@theia/core/shared/inversify';
 import { Command } from '@theia/core/lib/common';
 import { ViewContainer, PanelLayout, ViewContainerPart, Message } from '@theia/core/lib/browser';
-import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { generateWidgetId } from './ves-plugins-widget';
 import { VesPluginsSourceOptions } from './ves-plugins-source';
 import { VesPluginsModel } from './ves-plugins-model';
@@ -18,10 +17,15 @@ export namespace VesPluginsViewCommands {
         label: 'Clear Search Results',
         iconClass: 'clear-all'
     };
+    export const HELP: Command = {
+        id: 'vesPlugins.help',
+        label: 'Show Handbook Page',
+        iconClass: 'fa fa-book',
+    };
 }
 
 @injectable()
-export class VesPluginsViewContainer extends ViewContainer implements TabBarToolbarContribution {
+export class VesPluginsViewContainer extends ViewContainer {
 
     static LABEL = 'VUEngine Plugins';
     static ID = 'ves-plugins-view-container';
@@ -150,16 +154,6 @@ export class VesPluginsViewContainer extends ViewContainer implements TabBarTool
             }
         }
         this.model.search.query = state.query;
-    }
-
-    registerToolbarItems(toolbar: TabBarToolbarRegistry): void {
-        toolbar.registerItem({
-            id: VesPluginsViewCommands.CLEAR_ALL.id,
-            command: VesPluginsViewCommands.CLEAR_ALL.id,
-            tooltip: VesPluginsViewCommands.CLEAR_ALL.label,
-            priority: 0,
-            onDidChange: this.model.onDidChange,
-        });
     }
 
     protected getToggleVisibilityGroupLabel(): string {

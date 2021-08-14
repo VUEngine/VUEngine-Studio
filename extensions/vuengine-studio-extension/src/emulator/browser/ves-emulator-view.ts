@@ -45,9 +45,7 @@ export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmu
 
   registerCommands(commandRegistry: CommandRegistry): void {
     commandRegistry.registerCommand(VesEmulatorViewContributionCommands.HELP, {
-      isEnabled: widget => widget !== undefined &&
-        widget.id !== undefined &&
-        widget.id === VesEmulatorWidget.ID,
+      isEnabled: () => true,
       isVisible: widget => widget !== undefined &&
         widget.id !== undefined &&
         widget.id === VesEmulatorWidget.ID,

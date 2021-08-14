@@ -92,5 +92,5 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     bindViewContribution(bind, VesPluginsViewContribution);
     bind(FrontendApplicationContribution).toService(VesPluginsContribution);
-    bind(TabBarToolbarContribution).toService(VesPluginsContribution);
+    bind(TabBarToolbarContribution).toService(VesPluginsViewContribution);
 });

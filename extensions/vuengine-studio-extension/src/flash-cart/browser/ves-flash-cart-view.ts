@@ -45,9 +45,7 @@ export class VesFlashCartViewContribution extends AbstractViewContribution<VesFl
 
     registerCommands(commandRegistry: CommandRegistry): void {
         commandRegistry.registerCommand(VesFlashCartViewContributionCommands.HELP, {
-            isEnabled: widget => widget !== undefined &&
-                widget.id !== undefined &&
-                widget.id === VesFlashCartWidget.ID,
+            isEnabled: () => true,
             isVisible: widget => widget !== undefined &&
                 widget.id !== undefined &&
                 widget.id === VesFlashCartWidget.ID,
@@ -55,9 +53,7 @@ export class VesFlashCartViewContribution extends AbstractViewContribution<VesFl
             execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'engine/post-processing', false),
         });
         commandRegistry.registerCommand(VesFlashCartViewContributionCommands.REFRESH, {
-            isEnabled: widget => widget !== undefined &&
-                widget.id !== undefined &&
-                widget.id === VesFlashCartWidget.ID,
+            isEnabled: () => true,
             isVisible: widget => widget !== undefined &&
                 widget.id !== undefined &&
                 widget.id === VesFlashCartWidget.ID,

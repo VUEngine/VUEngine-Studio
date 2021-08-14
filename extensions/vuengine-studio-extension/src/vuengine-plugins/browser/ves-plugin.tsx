@@ -115,8 +115,7 @@ export class VesPlugin implements VesPluginData, TreeElement {
         /* const plugin = this.plugin;
         const icon = plugin && plugin.icon;
         if (icon) {
-            return icon;
-            // return new Endpoint({ path: icon }).getRestUrl().toString();
+            return new Endpoint({ path: icon }).getRestUrl().toString();
         }
         return this.data['icon']; */
     }
