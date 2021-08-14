@@ -18,7 +18,6 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
     @inject(CommandRegistry) protected readonly commandRegistry: CommandRegistry;
     @inject(CommandService) protected readonly commandService: CommandService;
 
-    // TODO: show in initial layout
     constructor() {
         super({
             widgetId: VesPluginsViewContainer.ID,

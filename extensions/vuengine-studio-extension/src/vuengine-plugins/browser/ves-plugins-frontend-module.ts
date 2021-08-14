@@ -91,6 +91,6 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(VesPluginsSearchBar).toSelf().inSingletonScope();
 
     bindViewContribution(bind, VesPluginsViewContribution);
-    bind(FrontendApplicationContribution).toService(VesPluginsContribution);
+    bind(FrontendApplicationContribution).toService(VesPluginsViewContribution);
     bind(TabBarToolbarContribution).toService(VesPluginsViewContribution);
 });
