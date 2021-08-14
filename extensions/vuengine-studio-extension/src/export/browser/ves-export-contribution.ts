@@ -4,6 +4,7 @@ import { CommandContribution, CommandRegistry, MenuContribution, MenuModelRegist
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesExportCommands } from './ves-export-commands';
 import { VesExportService } from './ves-export-service';
+import { VesBuildMenuSection } from '../../build/browser/ves-build-contribution';
 
 @injectable()
 export class VesExportContribution implements CommandContribution, KeybindingContribution, MenuContribution {
@@ -31,12 +32,10 @@ export class VesExportContribution implements CommandContribution, KeybindingCon
   }
 
   registerMenus(menus: MenuModelRegistry): void {
-    /*
     menus.registerMenuAction(VesBuildMenuSection.ACTION, {
       commandId: VesExportCommands.EXPORT.id,
       label: VesExportCommands.EXPORT.label,
       order: '5'
     });
-    */
   }
 }

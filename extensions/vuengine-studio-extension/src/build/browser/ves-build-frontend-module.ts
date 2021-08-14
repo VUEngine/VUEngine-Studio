@@ -1,5 +1,5 @@
 import { ContainerModule } from '@theia/core/shared/inversify';
-import { CommandContribution } from '@theia/core';
+import { CommandContribution, MenuContribution } from '@theia/core';
 import { bindViewContribution, FrontendApplicationContribution, KeybindingContribution, PreferenceContribution, WidgetFactory } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { VesBuildContribution } from './ves-build-contribution';
@@ -18,7 +18,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(VesBuildContribution).toSelf().inSingletonScope();
     bind(CommandContribution).toService(VesBuildContribution);
     bind(KeybindingContribution).toService(VesBuildContribution);
-    // bind(MenuContribution).toService(VesBuildContribution);
+    bind(MenuContribution).toService(VesBuildContribution);
 
     // status bar entry
     bind(VesBuildStatusBarContribution).toSelf().inSingletonScope();

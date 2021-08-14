@@ -120,7 +120,6 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
   }
 
   registerMenus(menus: MenuModelRegistry): void {
-    /*
     menus.registerSubmenu(buildMenuPath, 'Build', {
       order: '6'
     });
@@ -152,13 +151,13 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
       label: 'Pedantic Warnings',
       order: '2'
     });
-    /*if (isWindows) {
+    /* if (isWindows) {
       menus.registerMenuAction(VesBuildMenuSection.OPTION, {
         commandId: VesBuildCommands.TOGGLE_ENABLE_WSL.id,
         label: 'Enable WSL',
         order: '3'
       });
-    }*/
+    } */
   }
 
   async buildModeQuickPick(buildMode?: BuildMode): Promise<void> {

@@ -5,6 +5,7 @@ import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesFlashCartCommands } from './ves-flash-cart-commands';
 import { VesFlashCartService } from './ves-flash-cart-service';
 import { VesFlashCartViewContribution } from './ves-flash-cart-view-contribution';
+import { VesBuildMenuSection } from '../../build/browser/ves-build-contribution';
 
 @injectable()
 export class VesFlashCartContribution implements CommandContribution, KeybindingContribution, MenuContribution {
@@ -50,12 +51,10 @@ export class VesFlashCartContribution implements CommandContribution, Keybinding
   }
 
   registerMenus(menus: MenuModelRegistry): void {
-    /*
     menus.registerMenuAction(VesBuildMenuSection.ACTION, {
-      commandId: vesFlashCartCommands.FLASH.id,
-      label: vesFlashCartCommands.FLASH.label,
+      commandId: VesFlashCartCommands.FLASH.id,
+      label: VesFlashCartCommands.FLASH.label,
       order: '4'
     });
-    */
   }
 }

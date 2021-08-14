@@ -1,5 +1,5 @@
 import { ContainerModule } from '@theia/core/shared/inversify';
-import { CommandContribution } from '@theia/core';
+import { CommandContribution, MenuContribution } from '@theia/core';
 import {
     bindViewContribution,
     FrontendApplicationContribution,
@@ -27,7 +27,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(VesFlashCartContribution).toSelf().inSingletonScope();
     bind(CommandContribution).toService(VesFlashCartContribution);
     bind(KeybindingContribution).toService(VesFlashCartContribution);
-    // bind(MenuContribution).toService(VesFlashCartContribution);
+    bind(MenuContribution).toService(VesFlashCartContribution);
 
     // status bar entry
     bind(VesFlashCartStatusBarContribution).toSelf().inSingletonScope();

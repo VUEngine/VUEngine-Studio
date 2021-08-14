@@ -4,6 +4,7 @@ import { CommandContribution, CommandRegistry, MenuContribution, MenuModelRegist
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesEmulatorCommands } from './ves-emulator-commands';
 import { VesEmulatorService } from './ves-emulator-service';
+import { VesBuildMenuSection } from '../../build/browser/ves-build-contribution';
 
 @injectable()
 export class VesEmulatorContribution implements CommandContribution, KeybindingContribution, MenuContribution {
@@ -271,7 +272,6 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
   }
 
   registerMenus(menus: MenuModelRegistry): void {
-    /*
     menus.registerMenuAction(VesBuildMenuSection.ACTION, {
       commandId: VesEmulatorCommands.RUN.id,
       label: VesEmulatorCommands.RUN.label,
@@ -282,6 +282,5 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
       label: VesEmulatorCommands.SELECT.label,
       order: '2',
     });
-    */
   }
 }
