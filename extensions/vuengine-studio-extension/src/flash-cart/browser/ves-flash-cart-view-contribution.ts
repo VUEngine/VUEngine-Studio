@@ -35,7 +35,9 @@ export class VesFlashCartViewContribution extends AbstractViewContribution<VesFl
                 area: 'right',
                 rank: 800,
             },
+            // TODO
             // toggleCommandId: 'vesFlashCart.toggle',
+            // toggleKeybinding: 'ctrlcmd+shift+k',
         });
     }
 

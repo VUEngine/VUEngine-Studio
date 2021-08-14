@@ -6,7 +6,7 @@ import { ApplicationShell, KeybindingContribution, KeybindingRegistry, Preferenc
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { QuickPickService } from '@theia/core/lib/common/quick-pick-service';
 import { VesBuildCommands } from './ves-build-commands';
-import { VesBuildViewContribution } from './ves-build-view';
+import { VesBuildViewContribution } from './ves-build-view-contribution';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
 import { VesBuildService } from './ves-build-service';
 import { BuildMode } from './ves-build-types';

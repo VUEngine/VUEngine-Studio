@@ -6,7 +6,7 @@ import { VesBuildContribution } from './ves-build-contribution';
 import { VesBuildPreferenceSchema } from './ves-build-preferences';
 import { VesBuildService } from './ves-build-service';
 import { VesBuildStatusBarContribution } from './ves-build-statusbar-contribution';
-import { VesBuildViewContribution } from './ves-build-view';
+import { VesBuildViewContribution } from './ves-build-view-contribution';
 import { VesBuildWidget } from './ves-build-widget';
 import '../../../src/build/browser/style/index.css';
 

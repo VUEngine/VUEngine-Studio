@@ -36,7 +36,7 @@ Documentation on how to package Theia as a Desktop Product may be found [here](h
 ### Build
 
 ```sh
-yarn
+yarn --ignore-engines
 ```
 
 

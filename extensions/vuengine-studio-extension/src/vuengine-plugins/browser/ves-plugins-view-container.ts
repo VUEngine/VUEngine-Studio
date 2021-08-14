@@ -9,7 +9,7 @@ import { VesPluginsSearchBar } from './ves-plugins-search-bar';
 
 export namespace VesPluginsViewCommands {
 
-    const CATEGORY = 'VUEngine Plugins';
+    const CATEGORY = 'Plugins';
 
     export const CLEAR_ALL: Command = {
         id: 'vesPlugins.clearAll',
@@ -27,7 +27,7 @@ export namespace VesPluginsViewCommands {
 @injectable()
 export class VesPluginsViewContainer extends ViewContainer {
 
-    static LABEL = 'VUEngine Plugins';
+    static LABEL = 'Plugins';
     static ID = 'ves-plugins-view-container';
 
     @inject(VesPluginsSearchBar)

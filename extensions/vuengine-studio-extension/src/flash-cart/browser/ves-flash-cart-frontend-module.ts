@@ -13,7 +13,7 @@ import { VesFlashCartUsbService, VES_FLASH_CART_USB_SERVICE_PATH } from '../comm
 import { VesFlashCartUsbWatcher } from './ves-flash-cart-usb-watcher';
 import { VesFlashCartContribution } from './ves-flash-cart-contribution';
 import { VesFlashCartService } from './ves-flash-cart-service';
-import { VesFlashCartViewContribution } from './ves-flash-cart-view';
+import { VesFlashCartViewContribution } from './ves-flash-cart-view-contribution';
 import { VesFlashCartWidget } from './ves-flash-cart-widget';
 import { VesFlashCartStatusBarContribution } from './ves-flash-cart-statusbar-contribution';
 import { VesFlashCartPreferenceSchema } from './ves-flash-cart-preferences';

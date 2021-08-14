@@ -38,7 +38,9 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
                 area: 'right',
                 rank: 700,
             },
+            // TODO
             // toggleCommandId: 'vesBuild.toggle',
+            // toggleKeybinding: 'ctrlcmd+shift+b',
         });
     }
 

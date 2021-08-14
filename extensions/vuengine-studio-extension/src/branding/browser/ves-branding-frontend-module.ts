@@ -15,6 +15,8 @@ import { PluginViewRegistry } from '@theia/plugin-ext/lib/main/browser/view/plug
 import { BrowserMainMenuFactory, BrowserMenuBarContribution } from '@theia/core/lib/browser/menu/browser-menu-plugin';
 import { PreferenceTreeGenerator } from '@theia/preferences/lib/browser/util/preference-tree-generator';
 import { DefaultFileIconThemeContribution } from '@theia/core/lib/browser/icon-theme-contribution';
+import { PluginFrontendViewContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-view-contribution';
+import { PluginApiFrontendContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-contribution';
 import { VesAboutDialog } from './ves-branding-about-dialog';
 import { VesColorContribution } from './ves-branding-color-contribution';
 import { VesBrandingContribution } from './ves-branding-contribution';
@@ -84,8 +86,6 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(VesBrandingLabelProviderContribution).toSelf().inSingletonScope();
     bind(LabelProviderContribution).toService(VesBrandingLabelProviderContribution);
 
-    // TODO: unbind plugins view, type hierarchy view and  call hierarchy view
-
     // remove debug features
     bind(VesDebugContribution).toSelf().inSingletonScope();
     rebind(DebugFrontendApplicationContribution).toService(VesDebugContribution);
@@ -96,6 +96,20 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
         registerToolbarItems: () => { }
     } as any); /* eslint-disable-line */
     rebind(DebugPrefixConfiguration).toConstantValue({
+        registerCommands: () => { },
+        registerMenus: () => { },
+        registerKeybindings: () => { },
+        registerToolbarItems: () => { }
+    } as any); /* eslint-disable-line */
+
+    // remove plugin frontend feature
+    rebind(PluginFrontendViewContribution).toConstantValue({
+        registerCommands: () => { },
+        registerMenus: () => { },
+        registerKeybindings: () => { },
+        registerToolbarItems: () => { }
+    } as any); /* eslint-disable-line */
+    rebind(PluginApiFrontendContribution).toConstantValue({
         registerCommands: () => { },
         registerMenus: () => { },
         registerKeybindings: () => { },

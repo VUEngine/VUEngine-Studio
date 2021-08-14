@@ -4,7 +4,7 @@ import { ApplicationShell, KeybindingContribution, KeybindingRegistry } from '@t
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesFlashCartCommands } from './ves-flash-cart-commands';
 import { VesFlashCartService } from './ves-flash-cart-service';
-import { VesFlashCartViewContribution } from './ves-flash-cart-view';
+import { VesFlashCartViewContribution } from './ves-flash-cart-view-contribution';
 
 @injectable()
 export class VesFlashCartContribution implements CommandContribution, KeybindingContribution, MenuContribution {

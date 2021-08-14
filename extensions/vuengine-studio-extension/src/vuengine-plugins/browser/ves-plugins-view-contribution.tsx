@@ -27,7 +27,7 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
                 rank: 200,
             },
             toggleCommandId: 'vesPlugins.toggle',
-            // toggleKeybinding: 'ctrlcmd+shift+x',
+            toggleKeybinding: 'ctrlcmd+shift+l',
         });
     }
 

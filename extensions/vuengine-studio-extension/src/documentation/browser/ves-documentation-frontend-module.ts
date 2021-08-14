@@ -7,8 +7,8 @@ import { VesDocumentationTreeViewContribution } from './tree/ves-documentation-t
 import { createVesDocumentationTreeWidget } from './tree/ves-documentation-tree-container';
 import { VesDocumentationHandbookViewContribution } from './ves-documentation-handbook-view';
 import { VesDocumentationHandbookWidget } from './ves-documentation-Handbook-widget';
-import '../../../src/documentation/browser/style/index.css';
 import { VesDocumentationService } from './ves-documentation-service';
+import '../../../src/documentation/browser/style/index.css';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // menus

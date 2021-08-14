@@ -16,6 +16,7 @@ export class VesDocumentationTreeViewContribution extends AbstractViewContributi
         rank: 900,
       },
       toggleCommandId: 'vesDocumentation.toggle',
+      toggleKeybinding: 'ctrlcmd+shift+d',
     });
   }
 
