@@ -42,41 +42,18 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         };
     }
     protected registerVesTouchBar(electronWindow: BrowserWindow): void {
-        const { TouchBarButton, TouchBarLabel, TouchBarPopover, TouchBarSegmentedControl } = TouchBar;
+        const { TouchBarButton, TouchBarLabel, TouchBarPopover, TouchBarSegmentedControl, TouchBarSpacer } = TouchBar;
 
+        const blankIcon = nativeImage.createFromDataURL(VesTouchBarIcons.BLANK).resize({ height: 18 });
+        const blankIconWide = nativeImage.createFromDataURL(VesTouchBarIcons.BLANK_WIDE).resize({ height: 18 });
         // const vesIcon = nativeImage.createFromDataURL(VesTouchBarIcons.VES).resize({ height: 16 });
         const cleanIcon = nativeImage.createFromDataURL(VesTouchBarIcons.CLEAN).resize({ height: 16 });
-        const buildIcon = nativeImage.createFromDataURL(VesTouchBarIcons.BUILD).resize({ height: 18 });
-        // const buildIconWide = nativeImage.createFromDataURL(VesTouchBarIcons.BUILD_WIDE).resize({ height: 18 });
+        const buildIcon = nativeImage.createFromDataURL(VesTouchBarIcons.BUILD_WIDE).resize({ height: 18 });
         const runIcon = nativeImage.createFromDataURL(VesTouchBarIcons.RUN).resize({ height: 16 });
         const flashIcon = nativeImage.createFromDataURL(VesTouchBarIcons.FLASH).resize({ height: 18 });
         const exportIcon = nativeImage.createFromDataURL(VesTouchBarIcons.EXPORT).resize({ height: 16 });
         const menuIcon = nativeImage.createFromDataURL(VesTouchBarIcons.MENU).resize({ height: 16 });
         const queuedIcon = nativeImage.createFromDataURL(VesTouchBarIcons.QUEUED).resize({ height: 16 });
-
-        let spinnerIconFrame = 0;
-        let spinnerIconIntervall: NodeJS.Timer | null = null; /* eslint-disable-line */
-        const spinnerIconSize = 18;
-        const spinnerIcon = [
-            nativeImage.createFromDataURL(VesTouchBarIcons.SPINNER[0]).resize({ height: spinnerIconSize }),
-            nativeImage.createFromDataURL(VesTouchBarIcons.SPINNER[1]).resize({ height: spinnerIconSize }),
-            nativeImage.createFromDataURL(VesTouchBarIcons.SPINNER[2]).resize({ height: spinnerIconSize }),
-            nativeImage.createFromDataURL(VesTouchBarIcons.SPINNER[3]).resize({ height: spinnerIconSize }),
-            nativeImage.createFromDataURL(VesTouchBarIcons.SPINNER[4]).resize({ height: spinnerIconSize }),
-            nativeImage.createFromDataURL(VesTouchBarIcons.SPINNER[5]).resize({ height: spinnerIconSize }),
-            nativeImage.createFromDataURL(VesTouchBarIcons.SPINNER[6]).resize({ height: spinnerIconSize }),
-            nativeImage.createFromDataURL(VesTouchBarIcons.SPINNER[7]).resize({ height: spinnerIconSize }),
-        ];
-        // const spinnerIconWide = [
-        //     nativeImage.createFromDataURL(VesTouchBarIcons.SPINNER_WIDE[0]).resize({ height: spinnerIconSize }),
-        //     nativeImage.createFromDataURL(VesTouchBarIcons.SPINNER_WIDE[1]).resize({ height: spinnerIconSize }),
-        //     nativeImage.createFromDataURL(VesTouchBarIcons.SPINNER_WIDE[2]).resize({ height: spinnerIconSize }),
-        //     nativeImage.createFromDataURL(VesTouchBarIcons.SPINNER_WIDE[3]).resize({ height: spinnerIconSize }),
-        //     nativeImage.createFromDataURL(VesTouchBarIcons.SPINNER_WIDE[4]).resize({ height: spinnerIconSize }),
-        //     nativeImage.createFromDataURL(VesTouchBarIcons.SPINNER_WIDE[5]).resize({ height: spinnerIconSize }),
-        //     nativeImage.createFromDataURL(VesTouchBarIcons.SPINNER_WIDE[6]).resize({ height: spinnerIconSize }),
-        //     nativeImage.createFromDataURL(VesTouchBarIcons.SPINNER_WIDE[7]).resize({ height: spinnerIconSize }),
-        // ];
 
         /* const vesButton = new TouchBarButton({
             backgroundColor: '#a22929',
@@ -87,39 +64,23 @@ export class VesElectronMainApplication extends ElectronMainApplication {
 
         const buildMenuCleanButton = new TouchBarButton({
             icon: cleanIcon,
-            accessibilityLabel: VesBuildCommands.CLEAN.id,
+            click: () => app.emit(VesTouchBarCommands.executeCommand, VesBuildCommands.CLEAN.id),
         });
         const buildMenuBuildButton = new TouchBarButton({
             icon: buildIcon,
-            accessibilityLabel: VesBuildCommands.BUILD.id,
+            click: () => app.emit(VesTouchBarCommands.executeCommand, VesBuildCommands.BUILD.id),
         });
         const buildMenuRunButton = new TouchBarButton({
             icon: runIcon,
-            accessibilityLabel: VesEmulatorCommands.RUN.id,
+            click: () => app.emit(VesTouchBarCommands.executeCommand, VesEmulatorCommands.RUN.id),
         });
         const buildMenuFlashButton = new TouchBarButton({
             icon: flashIcon,
-            accessibilityLabel: VesFlashCartCommands.FLASH.id,
+            click: () => app.emit(VesTouchBarCommands.executeCommand, VesFlashCartCommands.FLASH.id),
         });
         const buildMenuExportButton = new TouchBarButton({
             icon: exportIcon,
-            accessibilityLabel: VesExportCommands.EXPORT.id,
-        });
-
-        const buildMenuSegmentedControlSegments = [
-            buildMenuCleanButton,
-            buildMenuBuildButton,
-            buildMenuRunButton,
-            buildMenuFlashButton,
-            buildMenuExportButton,
-        ];
-
-        const buildMenuSegmentedControl = new TouchBarSegmentedControl({
-            segmentStyle: 'automatic',
-            selectedIndex: 0,
-            mode: 'buttons',
-            segments: buildMenuSegmentedControlSegments,
-            change: selectedIndex => app.emit(VesTouchBarCommands.executeCommand, buildMenuSegmentedControlSegments[selectedIndex].accessibilityLabel),
+            click: () => app.emit(VesTouchBarCommands.executeCommand, VesExportCommands.EXPORT.id),
         });
 
         const buildModes = [{
@@ -142,6 +103,10 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             change: selectedIndex => app.emit(VesTouchBarCommands.setBuildMode, buildModes[selectedIndex].label),
         });
 
+        const buildMenuSpacer = new TouchBarSpacer({
+            size: 'large',
+        });
+
         const buildModeButton = new TouchBarPopover({
             label: 'Mode',
             showCloseButton: true,
@@ -161,7 +126,12 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         const vesTouchBar = new TouchBar({
             items: [
                 // vesButton,
-                buildMenuSegmentedControl,
+                buildMenuCleanButton,
+                buildMenuBuildButton,
+                buildMenuRunButton,
+                buildMenuFlashButton,
+                buildMenuExportButton,
+                buildMenuSpacer,
                 buildModeButton,
                 MenuButton,
             ]
@@ -176,71 +146,47 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         // @ts-ignore
         app.on(VesTouchBarCommands.changeBuildStatus, (buildStatus: BuildStatus) => {
             if (buildStatus.active) {
-                if (!spinnerIconIntervall) {
-                    spinnerIconIntervall = setInterval(() => animateSpinner(buildMenuBuildButton), 200);
-                }
+                buildMenuBuildButton.label = `${buildStatus.progress}%`;
+                buildMenuBuildButton.icon = blankIconWide;
             } else {
-                if (spinnerIconIntervall) {
-                    clearInterval(spinnerIconIntervall);
-                    spinnerIconIntervall = null; /* eslint-disable-line */
-                    buildMenuBuildButton.icon = buildIcon;
-                    redrawMenuSegmentedControl();
-                };
+                buildMenuBuildButton.label = '';
+                buildMenuBuildButton.icon = buildIcon;
             }
         });
         // @ts-ignore
         app.on(VesTouchBarCommands.changeIsRunQueued, (isQueued: boolean) => {
             buildMenuRunButton.icon = isQueued ? queuedIcon : runIcon;
-            redrawMenuSegmentedControl();
         });
         // @ts-ignore
         app.on(VesTouchBarCommands.changeIsFlashQueued, (isQueued: boolean) => {
             buildMenuFlashButton.icon = isQueued ? queuedIcon : flashIcon;
-            redrawMenuSegmentedControl();
         });
         // @ts-ignore
         app.on(VesTouchBarCommands.changeIsFlashing, (isFlashing: boolean) => {
             if (isFlashing) {
-                if (!spinnerIconIntervall) {
-                    spinnerIconIntervall = setInterval(() => animateSpinner(buildMenuFlashButton), 200);
-                }
+                buildMenuBuildButton.label = '0%';
+                buildMenuBuildButton.icon = blankIcon;
             } else {
-                if (spinnerIconIntervall) {
-                    clearInterval(spinnerIconIntervall);
-                    spinnerIconIntervall = null; /* eslint-disable-line */
-                    buildMenuFlashButton.icon = flashIcon;
-                    redrawMenuSegmentedControl();
-                }
+                buildMenuBuildButton.label = '';
+                buildMenuBuildButton.icon = flashIcon;
             }
+        });
+        // @ts-ignore
+        app.on(VesTouchBarCommands.onDidChangeFlashingProgress, (progress: number) => {
+            buildMenuBuildButton.label = `${progress}%`;
         });
         // @ts-ignore
         app.on(VesTouchBarCommands.changeIsExportQueued, (isQueued: boolean) => {
             buildMenuExportButton.icon = isQueued ? queuedIcon : exportIcon;
-            redrawMenuSegmentedControl();
         });
         // @ts-ignore
         app.on(VesTouchBarCommands.changeConnectedFlashCart, flashCartConfig => {
             buildMenuFlashButton.enabled = !!flashCartConfig;
-            redrawMenuSegmentedControl();
         });
         // @ts-ignore
         app.on(VesTouchBarCommands.changeBuildFolder, flags => {
             const buildMode = buildModeButton.label;
             buildMenuCleanButton.enabled = flags[buildMode];
-            redrawMenuSegmentedControl();
         });
-
-        const animateSpinner = (button: Electron.TouchBarButton) => {
-            spinnerIconFrame++;
-            if (spinnerIconFrame >= spinnerIcon.length) {
-                spinnerIconFrame = 0;
-            };
-            button.icon = spinnerIcon[spinnerIconFrame];
-            redrawMenuSegmentedControl();
-        };
-
-        const redrawMenuSegmentedControl = () => {
-            buildMenuSegmentedControl.selectedIndex = 0; // have to update element somehow to trigger redrawing of its children
-        };
     }
 }

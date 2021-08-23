@@ -82,6 +82,7 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
         this.vesEmulatorService.onDidChangeEmulatorConfigs(emulatorConfigs => app.emit(VesTouchBarCommands.changeEmulatorConfigs, emulatorConfigs));
         this.vesFlashCartService.onDidChangeIsQueued(flag => app.emit(VesTouchBarCommands.changeIsFlashQueued, flag));
         this.vesFlashCartService.onDidChangeIsFlashing(flag => app.emit(VesTouchBarCommands.changeIsFlashing, flag));
+        this.vesFlashCartService.onDidChangeFlashingProgress(progress => app.emit(VesTouchBarCommands.onDidChangeFlashingProgress, progress));
         this.vesFlashCartService.onDidChangeConnectedFlashCarts(config => app.emit(VesTouchBarCommands.changeConnectedFlashCart, config));
         this.vesExportService.onDidChangeIsQueued(flag => app.emit(VesTouchBarCommands.changeIsExportQueued, flag));
     }

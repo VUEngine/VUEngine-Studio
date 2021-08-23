@@ -7,6 +7,7 @@ export enum VesTouchBarCommands {
     changeEmulatorConfigs = 'ves-change-emulator-configs',
     changeIsExportQueued = 'ves-change-is-export-queued',
     changeIsFlashing = 'ves-change-is-flashing',
+    onDidChangeFlashingProgress = 'ves-change-flashing-progress',
     changeIsFlashQueued = 'ves-change-is-flash-queued',
     changeIsRunQueued = 'ves-change-is-run-queued',
     executeCommand = 'ves-execute-command',
