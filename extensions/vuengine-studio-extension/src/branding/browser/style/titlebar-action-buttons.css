@@ -1,10 +1,12 @@
 #ves-titlebar-action-buttons {
   -webkit-app-region: no-drag;
+  bottom: 0;
   margin-right: 8px;
   padding-top: 5px;
   position: absolute;
   right: 0;
   text-align: right;
+  top: 0;
   width: 260px;
   z-index: 1;
 }

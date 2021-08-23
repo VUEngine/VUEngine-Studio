@@ -1,4 +1,4 @@
-import { dirname, join as joinPath, relative as relativePath } from 'path';
+import { dirname, join as joinPath, normalize, relative as relativePath } from 'path';
 import * as glob from 'glob';
 import { isWindows } from '@theia/core';
 import { EncodingService } from '@theia/core/lib/common/encoding-service';
@@ -36,9 +36,9 @@ export class VesPluginsService {
       'vuengine',
       'vuengine-plugins'
     );
-    const customPath = this.preferenceService.get(
+    const customPath = normalize(this.preferenceService.get(
       VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH
-    ) as string;
+    ) as string);
 
     return customPath && (await this.fileService.exists(new URI(customPath)))
       ? customPath
@@ -46,9 +46,9 @@ export class VesPluginsService {
   }
 
   async getUserPluginsPath(): Promise<string> {
-    const path = this.preferenceService.get(
+    const path = normalize(this.preferenceService.get(
       VesPluginsPreferenceIds.USER_PLUGINS_PATH
-    ) as string;
+    ) as string);
 
     return path;
   }
@@ -80,9 +80,12 @@ export class VesPluginsService {
 
   getRecommendedPlugins(): string[] {
     return [
-      'vuengine/other/I18n',
-      'vuengine/other/SaveDataManager',
-      'vuengine/states/SplashScreens'
+      'vuengine//other/I18n',
+      'vuengine//other/SaveDataManager',
+      'vuengine//states/AdjustmentScreenNintendo',
+      'vuengine//states/AutomaticPauseSelectionScreen',
+      'vuengine//states/LanguageSelectionScreen',
+      'vuengine//states/PrecautionScreen',
     ];
   }
 
@@ -101,7 +104,7 @@ export class VesPluginsService {
         const fileContent = await this.fileService.readFile(new URI(file));
         const fileContentJson = JSON.parse(fileContent.value.toString());
 
-        const pluginId = `${prefix}/${pluginPathRelative}`;
+        const pluginId = `${prefix}//${pluginPathRelative}`;
 
         if (fileContentJson.icon !== '' && !fileContentJson.icon.includes('../')) {
           fileContentJson.icon = joinPath(pluginPathFull, fileContentJson.icon);
@@ -132,7 +135,7 @@ export class VesPluginsService {
     // TODO: weighted search through all fields, then order by score desc
 
     for (const pluginData of Object.values(this.pluginsData)) {
-      if (pluginData.name?.includes(query) && pluginData.name) {
+      if (pluginData.name?.toLowerCase().includes(query.toLowerCase()) && pluginData.name) {
         searchResult.push(pluginData);
       }
     }

@@ -55,7 +55,7 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
     toggleWidgetWidth(widget: Widget): void {
         this.state.isWide = !this.state.isWide;
         const targetWidth = this.state.isWide
-            ? window.innerWidth
+            ? Math.round(window.innerWidth * 0.75)
             : Math.round(window.innerWidth * 0.25);
         const widgetArea = this.applicationShell.getAreaFor(widget);
         if (widgetArea) {

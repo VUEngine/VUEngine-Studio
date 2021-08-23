@@ -1,4 +1,4 @@
-import { join as joinPath } from 'path';
+import { join as joinPath, normalize } from 'path';
 import { cpus } from 'os';
 import { CommandService, isOSX, isWindows } from '@theia/core';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -306,6 +306,7 @@ export class VesBuildService {
     const pedanticWarnings = this.preferenceService.get(VesBuildPreferenceIds.PEDANTIC_WARNINGS) as boolean;
     const engineCorePath = await this.getEngineCorePath();
     const enginePluginsPath = await this.vesPluginsService.getEnginePluginsPath();
+    const userPluginsPath = await this.vesPluginsService.getUserPluginsPath();
     const compilerPath = await this.getCompilerPath();
     const makefile = await this.getMakefilePath(workspaceRoot, engineCorePath);
 
@@ -322,6 +323,7 @@ export class VesBuildService {
         '-e', `TYPE=${buildMode}`,
         `ENGINE_FOLDER=${this.convertoToEnvPath(engineCorePath)}`,
         `PLUGINS_FOLDER=${this.convertoToEnvPath(enginePluginsPath)}`,
+        `USER_PLUGINS_FOLDER=${this.convertoToEnvPath(userPluginsPath)}`,
         '-f', makefile,
       ];
 
@@ -361,6 +363,8 @@ export class VesBuildService {
           MAKE_JOBS: this.getThreads(),
           PATH: [joinPath(compilerPath, 'bin'), process.env.PATH].join(':'),
           PLUGINS_FOLDER: this.convertoToEnvPath(enginePluginsPath)
+            .replace(/\s/g, '\\ '), // escape whitespaces
+          USER_PLUGINS_FOLDER: this.convertoToEnvPath(userPluginsPath)
             .replace(/\s/g, '\\ '), // escape whitespaces
           PRINT_PEDANTIC_WARNINGS: pedanticWarnings ? 1 : 0,
         },
@@ -415,7 +419,8 @@ export class VesBuildService {
       textLowerCase.includes('] Error ') ||
       textLowerCase.includes(' not found') ||
       textLowerCase.includes('no such file or directory') ||
-      textLowerCase.includes(' No rule to make target')) {
+      textLowerCase.includes(' No rule to make target') ||
+      textLowerCase.includes(' *** ')) {
       type = BuildLogLineType.Error;
     } else if (textLowerCase.includes('warning: ')) {
       type = BuildLogLineType.Warning;
@@ -486,9 +491,9 @@ export class VesBuildService {
       'vuengine',
       'vuengine-core'
     );
-    const customPath = this.preferenceService.get(
+    const customPath = normalize(this.preferenceService.get(
       VesBuildPreferenceIds.ENGINE_CORE_PATH
-    ) as string;
+    ) as string);
 
     return customPath && (await this.fileService.exists(new URI(customPath)))
       ? customPath
