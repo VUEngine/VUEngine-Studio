@@ -278,12 +278,12 @@ export class VesPluginEditorComponent extends AbstractVesPluginComponent {
         return this._scrollContainer;
     }
 
-    // TODO: list dependencies
     render(): React.ReactNode {
-        const { id, icon, author, displayName, description, repository, license, categories, readme } = this.props.plugin;
+        const { id, icon, author, displayName, description, repository, license, categories, readme, dependencies } = this.props.plugin;
 
         const { baseStyle, scrollStyle } = this.getSubcomponentStyles();
         const sanitizedReadme = !!readme ? DOMPurify.sanitize(readme) : undefined;
+        const dependenciesList = this.renderDependenciesList(dependencies || []);
 
         return <>
             <div className='header' style={baseStyle} ref={ref => this.header = (ref || undefined)}>
@@ -319,11 +319,27 @@ export class VesPluginEditorComponent extends AbstractVesPluginComponent {
                         onClick={this.openLink}
                         style={baseStyle}
                         // eslint-disable-next-line react/no-danger
-                        dangerouslySetInnerHTML={{ __html: sanitizedReadme }}
+                        dangerouslySetInnerHTML={{ __html: sanitizedReadme + dependenciesList }}
                     />
                 </div>
             }
         </>;
+    }
+
+    protected renderDependenciesList(dependencies: string[]): string {
+        let dependenciesList = "<h3>Dependencies</h3>";
+
+        if (dependencies?.length) {
+            dependenciesList += "<ul>";
+            for (const dependency of dependencies) {
+                dependenciesList += `<li>${dependency}</li>`;
+            }
+            dependenciesList += "</ul>";
+        } else {
+            dependenciesList += "<i>None</i>";
+        }
+
+        return dependenciesList;
     }
 
     protected getSubcomponentStyles(): { baseStyle: React.CSSProperties, scrollStyle: React.CSSProperties; } {
