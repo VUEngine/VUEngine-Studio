@@ -159,7 +159,7 @@ export class VesFlashCartService {
       this.isQueued = false;
     } else if (this.vesBuildService.buildStatus.active) {
       this.isQueued = true;
-    } else if (this.isFlashing || this.connectedFlashCarts.length === 0) {
+    } else if (this.vesBuildService.outputRomExists && (this.isFlashing || this.connectedFlashCarts.length === 0)) {
       this.commandService.executeCommand(VesFlashCartCommands.OPEN_WIDGET.id);
     } else {
       if (this.vesBuildService.outputRomExists) {
