@@ -12,6 +12,7 @@ export class VesPluginEditorManager extends WidgetOpenHandler<VesPluginEditor> {
 
     canHandle(uri: URI): number {
         const id = VesPluginUri.toId(uri);
+
         return !!id ? 500 : 0;
     }
 
@@ -20,6 +21,7 @@ export class VesPluginEditorManager extends WidgetOpenHandler<VesPluginEditor> {
         if (!id) {
             throw new Error('Invalid URI: ' + uri.toString());
         }
+
         return { id };
     }
 }
