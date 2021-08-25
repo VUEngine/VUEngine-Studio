@@ -37,7 +37,7 @@ win:
     token: "<your github token>"
   extraResources:
     - from: binaries/vuengine-studio-tools/win
-      to: binaries/vuengine-studio-tools/win
+      to: app/binaries/vuengine-studio-tools/win
 mac:
   icon: resources/icons/MacLauncherIcon/512-512.icns
   category: public.app-category.developer-tools
@@ -49,7 +49,7 @@ mac:
     url: "https://download.eclipse.org/theia/latest/macos"
   extraResources:
     - from: binaries/vuengine-studio-tools/osx
-      to: binaries/vuengine-studio-tools/osx
+      to: app/binaries/vuengine-studio-tools/osx
 linux:
   icon: resources/icons/LinuxLauncherIcon/512-512.png
   category: Development
@@ -62,7 +62,7 @@ linux:
     url: "https://download.eclipse.org/theia/latest/linux"
   extraResources:
     - from: binaries/vuengine-studio-tools/linux
-      to: binaries/vuengine-studio-tools/linux
+      to: app/binaries/vuengine-studio-tools/linux
 
 nsis:
   menuCategory: true
