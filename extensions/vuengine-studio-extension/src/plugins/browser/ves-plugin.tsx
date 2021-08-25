@@ -86,12 +86,12 @@ export class VesPlugin implements VesPluginData, TreeElement {
         return !!this.name;
     }
 
-    get plugin(): VesPluginData {
+    get plugin(): VesPluginData | undefined {
         return this.pluginsService.getPluginById(this.id);
     }
 
     get installed(): boolean {
-        return !!this.plugin;
+        return this.pluginsService.isInstalled(this.id);
     }
 
     update(data: Partial<VesPluginData>): void {
@@ -157,11 +157,11 @@ export class VesPlugin implements VesPluginData, TreeElement {
     }
 
     async install(): Promise<void> {
-        // TODO install
+        this.pluginsService.installPlugin(this.id);
     }
 
     async uninstall(): Promise<void> {
-        // TODO uninstall
+        this.pluginsService.uninstallPlugin(this.id);
     }
 
     handleContextMenu(e: React.MouseEvent<HTMLElement, MouseEvent>): void {
@@ -332,7 +332,7 @@ export class VesPluginEditorComponent extends AbstractVesPluginComponent {
         if (dependencies?.length) {
             dependenciesList += "<ul>";
             for (const dependency of dependencies) {
-                dependenciesList += `<li>${dependency}</li>`;
+                dependenciesList += `<li><code>${dependency}</code></li>`;
             }
             dependenciesList += "</ul>";
         } else {

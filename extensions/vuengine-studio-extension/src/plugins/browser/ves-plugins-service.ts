@@ -1,14 +1,16 @@
 import { dirname, join as joinPath, normalize, relative as relativePath } from 'path';
 import * as glob from 'glob';
 import { isWindows } from '@theia/core';
+import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { EncodingService } from '@theia/core/lib/common/encoding-service';
-import { inject, injectable } from '@theia/core/shared/inversify';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import URI from '@theia/core/lib/common/uri';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { PreferenceService } from '@theia/core/lib/browser';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import { VesPluginsPreferenceIds } from './ves-plugins-preferences';
 import { VesPluginData, VesPluginsData } from './ves-plugin';
+import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 
 @injectable()
 export class VesPluginsService {
@@ -23,6 +25,37 @@ export class VesPluginsService {
   protected preferenceService: PreferenceService;
 
   protected pluginsData: VesPluginsData;
+
+  protected _installedPlugins: string[] = [];
+  protected readonly onDidChangeinstalledPluginsEmitter = new Emitter<string[]>();
+  readonly onDidChangeinstalledPlugins = this.onDidChangeinstalledPluginsEmitter.event;
+  set installedPlugins(plugins: string[]) {
+    this._installedPlugins = plugins;
+    this.onDidChangeinstalledPluginsEmitter.fire(this._installedPlugins);
+  }
+  get installedPlugins(): string[] {
+    return this._installedPlugins;
+  }
+
+  @postConstruct()
+  protected async init(): Promise<void> {
+    this.onDidChangeinstalledPlugins(async () => {
+      try {
+        // read
+        const pluginsFileUri = this.getPluginsFileUri();
+        const fileContent = await this.fileService.readFile(pluginsFileUri);
+        let fileContentParsed = JSON.parse(fileContent.value.toString());
+        // update
+        fileContentParsed.plugins = this.installedPlugins;
+        fileContentParsed.plugins.sort();
+        // write
+        const updatedFileContent = JSON.stringify(fileContentParsed, null, 4);
+        /* await */ this.fileService.writeFile(pluginsFileUri, BinaryBuffer.fromString(updatedFileContent));
+      } catch (e) {
+        // no-op
+      }
+    });
+  }
 
   protected async getResourcesPath(): Promise<string> {
     const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
@@ -61,18 +94,44 @@ export class VesPluginsService {
       : window.location.hash.substring(substrNum);
   }
 
-  // TODO: properly handle plugin not found
-  getPluginById(id: string): VesPluginData {
-    return this.pluginsData[id] ?? this.pluginsData[0];
+  getPluginById(id: string): VesPluginData | undefined {
+    return this.pluginsData[id] ?? undefined;
   }
 
-  async getInstalledPlugins(): Promise<string[]> {
-    const pluginsFilePath = joinPath(this.getWorkspaceRoot(), '.vuengine', 'plugins.json');
-    const pluginsFileUri = new URI(pluginsFilePath);
+  isInstalled(id: string): boolean {
+    return this.installedPlugins.includes(id);
+  }
 
+  installPlugin(id: string): void {
+    if (!this.installedPlugins.includes(id)) {
+      this.installedPlugins.push(id);
+      // trigger change event
+      this.installedPlugins = this.installedPlugins;
+    }
+  }
+
+  uninstallPlugin(id: string): void {
+    const index = this.installedPlugins.indexOf(id);
+    if (index > -1) {
+      this.installedPlugins.splice(index, 1);
+      // trigger change event
+      this.installedPlugins = this.installedPlugins;
+    }
+  }
+
+  protected getPluginsFileUri(): URI {
+    const path = joinPath(this.getWorkspaceRoot(), 'config', 'Compiler.json');
+    return new URI(path);
+  }
+
+  async determineInstalledPlugins(): Promise<string[]> {
     try {
+      const pluginsFileUri = this.getPluginsFileUri();
       const fileContent = await this.fileService.readFile(pluginsFileUri);
-      return JSON.parse(fileContent.value.toString());
+      const fileContentParsed = JSON.parse(fileContent.value.toString());
+      // write directly to property to not trigger change event
+      this._installedPlugins = fileContentParsed.plugins;
+      return this.installedPlugins;
     } catch (e) {
       return [];
     }
@@ -82,10 +141,10 @@ export class VesPluginsService {
     return [
       'vuengine//other/I18n',
       'vuengine//other/SaveDataManager',
-      'vuengine//states/AdjustmentScreenNintendo',
-      'vuengine//states/AutomaticPauseSelectionScreen',
-      'vuengine//states/LanguageSelectionScreen',
-      'vuengine//states/PrecautionScreen',
+      'vuengine//states/splash/AdjustmentScreenNintendo',
+      'vuengine//states/splash/AutomaticPauseSelectionScreen',
+      'vuengine//states/splash/LanguageSelectionScreen',
+      'vuengine//states/splash/PrecautionScreen',
     ];
   }
 

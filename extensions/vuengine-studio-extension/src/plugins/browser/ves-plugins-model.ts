@@ -50,12 +50,15 @@ export class VesPluginsModel {
         this.frontendApplicationStateService.onStateChanged(async (state: FrontendApplicationState) => {
             if (state === 'attached_shell') {
                 await this.pluginsService.setPluginsData();
+                await this.pluginsService.determineInstalledPlugins();
                 await Promise.all([
                     this.initSearchResult(),
                     this.initInstalled(),
                     this.initRecommended(),
                 ]);
                 this.initialized.resolve();
+
+                this.pluginsService.onDidChangeinstalledPlugins(() => this.updateInstalled());
             };
         });
     }
@@ -166,7 +169,7 @@ export class VesPluginsModel {
     protected async updateInstalled(): Promise<void> {
         const prevInstalled = this._installed;
         return this.doChange(async () => {
-            const pluginIds = await this.pluginsService.getInstalledPlugins();
+            const pluginIds = this.pluginsService.installedPlugins;
             const currInstalled = new Set<string>();
             for (const pluginId of pluginIds) {
                 this._installed.delete(pluginId);

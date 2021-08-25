@@ -1,0 +1,3 @@
+.ves-plugin-editor .body {
+    padding-top: calc(var(--theia-ui-padding)*2);
+}

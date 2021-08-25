@@ -3,7 +3,8 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import URI from '@theia/core/lib/common/uri';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { Emitter, isWindows } from '@theia/core';
+import { isWindows } from '@theia/core';
+import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
 
 @injectable()

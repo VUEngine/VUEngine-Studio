@@ -21,6 +21,7 @@ export class VesPluginEditor extends ReactWidget {
     @postConstruct()
     protected init(): void {
         this.addClass('theia-vsx-extension-editor');
+        this.addClass('ves-plugin-editor');
         this.id = `${VesPluginEditor.ID}:${this.plugin.id}`;
         this.title.closable = true;
         this.updateTitle();
