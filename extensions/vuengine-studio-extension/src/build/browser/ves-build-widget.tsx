@@ -97,7 +97,10 @@ export class VesBuildWidget extends ReactWidget {
                 <button
                   className='theia-button build'
                   disabled={!this.workspaceService.opened}
-                  onClick={() => this.commandService.executeCommand(VesBuildCommands.BUILD.id)}
+                  onClick={() => {
+                    this.state.logFilter = BuildLogLineType.Normal;
+                    this.commandService.executeCommand(VesBuildCommands.BUILD.id);
+                  }}
                 >
                   <i className='fa fa-wrench'></i> Build
                 </button>
