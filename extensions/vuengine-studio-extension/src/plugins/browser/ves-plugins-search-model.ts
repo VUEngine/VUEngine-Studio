@@ -11,6 +11,8 @@ export enum VesPluginsSearchMode {
 
 export const INSTALLED_QUERY = '@installed';
 export const RECOMMENDED_QUERY = '@recommended';
+export const TAG_SEARCH_QUERY = '@tag:';
+export const AUTHOR_SEARCH_QUERY = '@author:';
 
 @injectable()
 export class VesPluginsSearchModel {

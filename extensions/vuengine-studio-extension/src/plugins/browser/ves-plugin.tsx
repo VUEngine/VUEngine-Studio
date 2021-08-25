@@ -6,7 +6,7 @@ import { TreeElement } from '@theia/core/lib/browser/source-tree';
 import { OpenerService, open, OpenerOptions } from '@theia/core/lib/browser/opener-service';
 import { MenuPath } from '@theia/core/lib/common';
 import { ContextMenuRenderer } from '@theia/core/lib/browser';
-import { VesPluginsSearchModel } from './ves-plugins-search-model';
+import { AUTHOR_SEARCH_QUERY, TAG_SEARCH_QUERY, VesPluginsSearchModel } from './ves-plugins-search-model';
 import { VesPluginsService } from './ves-plugins-service';
 import { VesPluginUri } from '../common/ves-plugin-uri';
 
@@ -378,7 +378,7 @@ export class VesPluginEditorComponent extends AbstractVesPluginComponent {
     readonly searchTag = (tag: string) => {
         const plugin = this.props.plugin;
         if (tag) {
-            plugin.search.query = `@tag:${tag}`;
+            plugin.search.query = `${TAG_SEARCH_QUERY}${tag}`;
         }
     };
 
@@ -388,7 +388,7 @@ export class VesPluginEditorComponent extends AbstractVesPluginComponent {
 
         const plugin = this.props.plugin;
         if (plugin.author) {
-            plugin.search.query = `@author:${plugin.author}`;
+            plugin.search.query = `${AUTHOR_SEARCH_QUERY}${plugin.author}`;
         }
     };
 

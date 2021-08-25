@@ -6,7 +6,7 @@ import { AbstractViewContribution } from '@theia/core/lib/browser/shell/view-con
 import { VesPluginsCommands } from './ves-plugins-commands';
 import { VesPluginsViewCommands, VesPluginsViewContainer } from './ves-plugins-view-container';
 import { VesPluginsModel } from './ves-plugins-model';
-import { INSTALLED_QUERY, RECOMMENDED_QUERY } from './ves-plugins-search-model';
+import { AUTHOR_SEARCH_QUERY, INSTALLED_QUERY, RECOMMENDED_QUERY, TAG_SEARCH_QUERY } from './ves-plugins-search-model';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
 
@@ -61,6 +61,14 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
         commandRegistry.registerCommand(VesPluginsCommands.SHOW_RECOMMENDATIONS, {
             execute: () => this.showRecommendedPlugins()
         });
+
+        commandRegistry.registerCommand(VesPluginsCommands.SEARCH_BY_TAG, {
+            execute: () => this.showSearchByTag()
+        });
+
+        commandRegistry.registerCommand(VesPluginsCommands.SEARCH_BY_AUTHOR, {
+            execute: () => this.showSearchByAuthor()
+        });
     }
 
     protected async showInstalledPlugins(): Promise<void> {
@@ -71,6 +79,16 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
     protected async showRecommendedPlugins(): Promise<void> {
         await this.openView({ activate: true });
         this.model.search.query = RECOMMENDED_QUERY;
+    }
+
+    protected async showSearchByTag(): Promise<void> {
+        await this.openView({ activate: true });
+        this.model.search.query = TAG_SEARCH_QUERY;
+    }
+
+    protected async showSearchByAuthor(): Promise<void> {
+        await this.openView({ activate: true });
+        this.model.search.query = AUTHOR_SEARCH_QUERY;
     }
 
     registerToolbarItems(toolbar: TabBarToolbarRegistry): void {

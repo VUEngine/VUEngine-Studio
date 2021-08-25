@@ -6,7 +6,7 @@ import { ProgressService } from '@theia/core/lib/common/progress-service';
 import { Deferred } from '@theia/core/lib/common/promise-util';
 import { PreferenceService } from '@theia/core/lib/browser';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { VesPluginsSearchModel } from './ves-plugins-search-model';
+import { AUTHOR_SEARCH_QUERY, TAG_SEARCH_QUERY, VesPluginsSearchModel } from './ves-plugins-search-model';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { VesPlugin, VesPluginFactory } from './ves-plugin';
@@ -145,10 +145,10 @@ export class VesPluginsModel {
             const query = this.search.query;
 
             let results = [];
-            if (query.startsWith('@tag:')) {
-                results = this.pluginsService.searchPluginsByTag(query.slice(5));
-            } else if (query.startsWith('@author:')) {
-                results = this.pluginsService.searchPluginsByAuthor(query.slice(8));
+            if (query.startsWith(TAG_SEARCH_QUERY)) {
+                results = this.pluginsService.searchPluginsByTag(query.slice(TAG_SEARCH_QUERY.length));
+            } else if (query.startsWith(AUTHOR_SEARCH_QUERY)) {
+                results = this.pluginsService.searchPluginsByAuthor(query.slice(AUTHOR_SEARCH_QUERY.length));
             } else {
                 results = this.pluginsService.searchPluginsData(query);
             }
