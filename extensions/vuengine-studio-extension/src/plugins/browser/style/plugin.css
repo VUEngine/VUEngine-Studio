@@ -1,4 +1,5 @@
-.theia-vsx-extension-icon.ves-placeholder i {
+.theia-vsx-extension-icon.ves-placeholder i,
+.icon-container.ves-placeholder i {
     background: var(--theia-foreground);
     border-radius: 50%;
     color: var(--theia-sideBar-background);
@@ -8,6 +9,13 @@
     opacity: .3;
     text-align: center;
     width: var(--theia-vsx-extension-icon-size);
+}
+
+.icon-container.ves-placeholder i {
+    font-size: 64px;
+    height: 126px;
+    line-height: 126px;
+    width: 126px;
 }
 
 .ves-plugin-tags span {

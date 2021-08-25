@@ -258,9 +258,9 @@ export class VesPluginComponent extends AbstractVesPluginComponent {
                 </div>
                 <div className='noWrapInfo theia-vsx-extension-description'>{description}</div>
                 <div className='theia-vsx-extension-action-bar'>
-                    {tags && <span className='noWrapInfo ves-plugin-tags'>{
-                        tags.map((tag: string, i: number) => <span key={i}>{tag}</span>)
-                    }</span>}
+                    <span className='noWrapInfo ves-plugin-tags'>
+                        {tags && tags.map((tag: string, i: number) => <span key={i}>{tag}</span>)}
+                    </span>
                     {/* <span className='noWrapInfo theia-vsx-extension-publisher'>{author}</span> */}
                     {this.renderAction()}
                 </div>
@@ -336,7 +336,7 @@ export class VesPluginEditorComponent extends AbstractVesPluginComponent {
             }
             dependenciesList += "</ul>";
         } else {
-            dependenciesList += "<i>None</i>";
+            dependenciesList += "<li><i>None</i></li>";
         }
 
         return dependenciesList;
