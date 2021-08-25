@@ -1,4 +1,4 @@
-import { inject, injectable, interfaces } from '@theia/core/shared/inversify';
+import { inject, injectable } from '@theia/core/shared/inversify';
 import { FrontendApplication, FrontendApplicationContribution, PreferenceService, StatusBar, StatusBarAlignment } from '@theia/core/lib/browser';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
 import { VesBuildCommands } from './ves-build-commands';
@@ -26,26 +26,13 @@ export class VesBuildStatusBarContribution implements FrontendApplicationContrib
     }
 
     setBuildModeStatusBar(): void {
-        let label = this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) || 'Build Mode';
-        let command = VesBuildCommands.SET_MODE.id;
-        let className = undefined;
-        if (this.vesBuildService.buildStatus.active) {
-            label = `Building... ${this.vesBuildService.buildStatus.progress}%`;
-            command = VesBuildCommands.TOGGLE_WIDGET.id;
-            className = 'active';
-        }
+        const label = this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) || 'Build Mode';
         this.statusBar.setElement('ves-build-mode', {
             alignment: StatusBarAlignment.LEFT,
-            className,
-            command,
+            command: VesBuildCommands.SET_MODE.id,
             priority: 3,
             text: `$(wrench) ${label}`,
             tooltip: VesBuildCommands.SET_MODE.label,
         });
     }
-}
-
-export function bindVesBuildStatusBar(bind: interfaces.Bind): void {
-    bind(VesBuildStatusBarContribution).toSelf().inSingletonScope();
-    bind(FrontendApplicationContribution).toService(VesBuildStatusBarContribution);
 }

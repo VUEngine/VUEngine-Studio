@@ -26,10 +26,7 @@ export class VesFlashCartStatusBarContribution implements FrontendApplicationCon
     setConnectedFlashCartStatusBar(): void {
         let label = '';
         let className = '';
-        if (this.vesFlashCartService.isFlashing) {
-            label = `Flashing... ${this.vesFlashCartService.flashingProgress}%`;
-            className = 'active';
-        } else if (this.vesFlashCartService.connectedFlashCarts.length > 0) {
+        if (this.vesFlashCartService.connectedFlashCarts.length > 0) {
             const connectedFlashCartsNames = [];
             for (const connectedFlashCart of this.vesFlashCartService.connectedFlashCarts) {
                 connectedFlashCartsNames.push(connectedFlashCart.config.name);
@@ -44,7 +41,7 @@ export class VesFlashCartStatusBarContribution implements FrontendApplicationCon
             command: VesFlashCartCommands.OPEN_WIDGET.id,
             className: className,
             priority: 1,
-            text: `$(usb) ${label}`,
+            text: `$(microchip) ${label}`,
             tooltip: 'Connected Flash Carts'
         });
     }
