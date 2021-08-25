@@ -495,7 +495,7 @@ export class VesBuildService {
       VesBuildPreferenceIds.ENGINE_CORE_PATH
     ) as string);
 
-    return customPath && (await this.fileService.exists(new URI(customPath)))
+    return customPath && (customPath !== '.' && await this.fileService.exists(new URI(customPath)))
       ? customPath
       : defaultPath;
   }

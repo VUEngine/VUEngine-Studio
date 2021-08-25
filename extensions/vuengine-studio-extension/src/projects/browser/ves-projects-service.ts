@@ -62,7 +62,7 @@ export class VesProjectsService {
   }
 
   protected getProjectConfigFilePath(): string {
-    return joinPath(this.getWorkspaceRoot(), 'Project.config');
+    return joinPath(this.getWorkspaceRoot(), 'config', 'Project.json');
   }
 
   getWorkspaceRoot(): string {

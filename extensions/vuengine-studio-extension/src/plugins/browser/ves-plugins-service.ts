@@ -73,7 +73,7 @@ export class VesPluginsService {
       VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH
     ) as string);
 
-    return customPath && (await this.fileService.exists(new URI(customPath)))
+    return customPath && (customPath !== '.' && await this.fileService.exists(new URI(customPath)))
       ? customPath
       : defaultPath;
   }
