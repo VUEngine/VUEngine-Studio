@@ -10,7 +10,7 @@
     width: var(--theia-vsx-extension-icon-size);
 }
 
-.ves-plugin-categories span {
+.ves-plugin-tags span {
     background: var(--theia-foreground);
     border-radius: 10px;
     color: var(--theia-sideBar-background);

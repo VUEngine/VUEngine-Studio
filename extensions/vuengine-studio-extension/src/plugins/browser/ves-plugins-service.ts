@@ -202,6 +202,30 @@ export class VesPluginsService {
     return searchResult;
   }
 
+  searchPluginsByTag(tag: string): VesPluginData[] {
+    const searchResult = [];
+
+    for (const pluginData of Object.values(this.pluginsData)) {
+      if (pluginData.tags?.map(tag => tag.toLowerCase()).includes(tag.toLowerCase()) && pluginData.name) {
+        searchResult.push(pluginData);
+      }
+    }
+
+    return searchResult;
+  }
+
+  searchPluginsByAuthor(author: string): VesPluginData[] {
+    const searchResult = [];
+
+    for (const pluginData of Object.values(this.pluginsData)) {
+      if (pluginData.author?.toLowerCase().includes(author.toLowerCase()) && pluginData.name) {
+        searchResult.push(pluginData);
+      }
+    }
+
+    return searchResult;
+  }
+
   /**
    * Returns a list of all plugins the current project uses, including implicitly included ones through dependencies
    */

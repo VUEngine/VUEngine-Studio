@@ -30,7 +30,7 @@ export class VesPluginData {
     readonly readme?: string;
     readonly repository?: string;
     readonly license?: string;
-    readonly categories?: string[];
+    readonly tags?: string[];
     readonly dependencies?: string[];
     static KEYS: Set<(keyof VesPluginData)> = new Set([
         'name',
@@ -41,7 +41,7 @@ export class VesPluginData {
         'readme',
         'repository',
         'license',
-        'categories',
+        'tags',
         'dependencies'
     ]);
 }
@@ -144,8 +144,8 @@ export class VesPlugin implements VesPluginData, TreeElement {
         return this.getData('license');
     }
 
-    get categories(): string[] | undefined {
-        return this.getData('categories');
+    get tags(): string[] | undefined {
+        return this.getData('tags');
     }
 
     get dependencies(): string[] | undefined {
@@ -243,7 +243,7 @@ export namespace AbstractVesPluginComponent {
 
 export class VesPluginComponent extends AbstractVesPluginComponent {
     render(): React.ReactNode {
-        const { icon, displayName, description, categories } = this.props.plugin;
+        const { icon, displayName, description, tags } = this.props.plugin;
         return <div className='theia-vsx-extension ves-plugin'>
             {icon
                 ? <img className='theia-vsx-extension-icon' src={icon} />
@@ -258,8 +258,8 @@ export class VesPluginComponent extends AbstractVesPluginComponent {
                 </div>
                 <div className='noWrapInfo theia-vsx-extension-description'>{description}</div>
                 <div className='theia-vsx-extension-action-bar'>
-                    {categories && <span className='noWrapInfo ves-plugin-categories'>{
-                        categories.map((category: string, i: number) => <span key={i}>{category}</span>)
+                    {tags && <span className='noWrapInfo ves-plugin-tags'>{
+                        tags.map((tag: string, i: number) => <span key={i}>{tag}</span>)
                     }</span>}
                     {/* <span className='noWrapInfo theia-vsx-extension-publisher'>{author}</span> */}
                     {this.renderAction()}
@@ -279,7 +279,7 @@ export class VesPluginEditorComponent extends AbstractVesPluginComponent {
     }
 
     render(): React.ReactNode {
-        const { id, icon, author, displayName, description, repository, license, categories, readme, dependencies } = this.props.plugin;
+        const { id, icon, author, displayName, description, repository, license, tags, readme, dependencies } = this.props.plugin;
 
         const { baseStyle, scrollStyle } = this.getSubcomponentStyles();
         const sanitizedReadme = !!readme ? DOMPurify.sanitize(readme) : undefined;
@@ -301,8 +301,8 @@ export class VesPluginEditorComponent extends AbstractVesPluginComponent {
                         </span>
                         {repository && <span className='repository' onClick={this.openRepository}>Repository</span>}
                         {license && <span className='license'>{license}</span>}
-                        {categories && <span className='noWrapInfo ves-plugin-categories'>{
-                            categories.map((category: string, i: number) => <span key={i}>{category}</span>)
+                        {tags && <span className='noWrapInfo ves-plugin-tags'>{
+                            tags.map((tag: string, i: number) => <span onClick={() => this.searchTag(tag)} key={i}>{tag}</span>)
                         }</span>}
                     </div>
                     <div className='description noWrapInfo'> {description} </div>
@@ -375,15 +375,23 @@ export class VesPluginEditorComponent extends AbstractVesPluginComponent {
         }
     };
 
+    readonly searchTag = (tag: string) => {
+        const plugin = this.props.plugin;
+        if (tag) {
+            plugin.search.query = `@tag:${tag}`;
+        }
+    };
+
     readonly searchAuthor = (e: React.MouseEvent) => {
         e.stopPropagation();
         e.preventDefault();
 
         const plugin = this.props.plugin;
         if (plugin.author) {
-            plugin.search.query = plugin.author;
+            plugin.search.query = `@author:${plugin.author}`;
         }
     };
+
     readonly openRepository = (e: React.MouseEvent) => {
         e.stopPropagation();
         e.preventDefault();

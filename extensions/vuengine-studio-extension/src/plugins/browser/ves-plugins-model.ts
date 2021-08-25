@@ -143,7 +143,16 @@ export class VesPluginsModel {
     protected updateSearchResult(): Promise<void> {
         return this.doChange(async () => {
             const query = this.search.query;
-            const results = this.pluginsService.searchPluginsData(query);
+
+            let results = [];
+            if (query.startsWith('@tag:')) {
+                results = this.pluginsService.searchPluginsByTag(query.slice(5));
+            } else if (query.startsWith('@author:')) {
+                results = this.pluginsService.searchPluginsByAuthor(query.slice(8));
+            } else {
+                results = this.pluginsService.searchPluginsData(query);
+            }
+
             const searchResult = new Set<string>();
 
             for (const data of results) {
