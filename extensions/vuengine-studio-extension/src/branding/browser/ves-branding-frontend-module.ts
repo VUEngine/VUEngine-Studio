@@ -2,7 +2,7 @@ import { ContainerModule } from '@theia/core/shared/inversify';
 import { isOSX } from '@theia/core';
 import { AboutDialog } from '@theia/core/lib/browser/about-dialog';
 import { CommandContribution } from '@theia/core/lib/common/command';
-import { FrontendApplicationContribution, WidgetFactory, bindViewContribution, LabelProviderContribution } from '@theia/core/lib/browser';
+import { FrontendApplicationContribution, WidgetFactory, bindViewContribution, LabelProviderContribution, ApplicationShell } from '@theia/core/lib/browser';
 import { GettingStartedWidget } from '@theia/getting-started/lib/browser/getting-started-widget';
 import { MenuContribution } from '@theia/core/lib/common/menu';
 import { PreferenceConfigurations } from '@theia/core/lib/browser/preferences/preference-configurations';
@@ -35,6 +35,7 @@ import { VesTitlebarActionButtonsContribution } from './ves-branding-titlebar-ac
 import { VesPreferenceTreeGenerator } from './ves-branding-preference-tree-generator.';
 import { VesDefaultFileIconThemeContribution } from './ves-branding-icon-theme-contribution';
 import { VesBrandingLabelProviderContribution } from './ves-branding-label-provider';
+import { VesApplicationShell } from './ves-branding-application-shell';
 import '../../../src/branding/browser/style/index.css';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
@@ -47,11 +48,11 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(ColorContribution).to(VesColorContribution).inSingletonScope();
 
     // enable main menu
-    if (!isOSX) {
-        bind(BrowserMainMenuFactory).toSelf().inSingletonScope();
-        bind(BrowserMenuBarContribution).toSelf().inSingletonScope();
-        bind(FrontendApplicationContribution).toService(BrowserMenuBarContribution);
-    }
+    // if (!isOSX) {
+    bind(BrowserMainMenuFactory).toSelf().inSingletonScope();
+    bind(BrowserMenuBarContribution).toSelf().inSingletonScope();
+    bind(FrontendApplicationContribution).toService(BrowserMenuBarContribution);
+    // }
 
     // getting started view
     bindViewContribution(bind, VesGettingStartedViewContribution);
@@ -81,6 +82,9 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // add custom preference tree categories
     bind(VesPreferenceTreeGenerator).toSelf().inSingletonScope();
     rebind(PreferenceTreeGenerator).to(VesPreferenceTreeGenerator);
+
+    // application shell overrides
+    rebind(ApplicationShell).to(VesApplicationShell).inSingletonScope();
 
     // file icons & labels
     bind(VesBrandingLabelProviderContribution).toSelf().inSingletonScope();

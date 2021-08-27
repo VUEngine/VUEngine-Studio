@@ -14,7 +14,7 @@ import { VesTouchBarCommands } from '../common/ves-branding-types';
 export class VesElectronMainApplication extends ElectronMainApplication {
     protected grayscaleCss: string = '';
 
-    async createWindow(asyncOptions: MaybePromise<TheiaBrowserWindowOptions> = this.getDefaultBrowserWindowOptions()): Promise<BrowserWindow> {
+    async createWindow(asyncOptions: MaybePromise<TheiaBrowserWindowOptions> = this.getDefaultOptions()): Promise<BrowserWindow> {
         const electronWindow = await super.createWindow(asyncOptions);
 
         electronWindow.on('focus', async () => {
@@ -31,9 +31,9 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         return electronWindow;
     }
 
-    protected async getDefaultBrowserWindowOptions(): Promise<TheiaBrowserWindowOptions> {
+    protected getDefaultOptions(): TheiaBrowserWindowOptions {
         return {
-            ...await super.getDefaultBrowserWindowOptions(),
+            ...super.getDefaultOptions(),
             backgroundColor: '#222',
             frame: isOSX,
             minHeight: 560,
@@ -41,6 +41,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             titleBarStyle: 'hiddenInset'
         };
     }
+
     protected registerVesTouchBar(electronWindow: BrowserWindow): void {
         const { TouchBarButton, TouchBarLabel, TouchBarPopover, TouchBarSegmentedControl, TouchBarSpacer } = TouchBar;
 

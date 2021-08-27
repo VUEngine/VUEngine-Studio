@@ -11,6 +11,11 @@
     width: 50px;
 }
 
+#theia-top-panel.os-osx .theia-icon {
+    background-color: transparent;
+    width: 75px;
+}
+
 #theia-main-content-panel {
     background: transparent;
 }

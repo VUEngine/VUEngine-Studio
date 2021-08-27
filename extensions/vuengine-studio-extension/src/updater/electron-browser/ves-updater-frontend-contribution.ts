@@ -1,5 +1,4 @@
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { BrowserWindow, Menu, remote } from '@theia/core/shared/electron';
 import {
     CommandContribution,
     CommandRegistry,
@@ -12,7 +11,6 @@ import {
 import { PreferenceScope, PreferenceService } from '@theia/core/lib/browser/preferences';
 import { CommonMenus } from '@theia/core/lib/browser';
 import { ElectronMainMenuFactory } from '@theia/core/lib/electron-browser/menu/electron-main-menu-factory';
-import { isOSX } from '@theia/core/lib/common/os';
 import { VesUpdater, VesUpdaterClient } from '../common/ves-updater';
 import { VesUpdaterPreferenceIds } from './ves-updater-preferences';
 import { VesUpdaterCommands } from './ves-updater-commands';
@@ -71,16 +69,17 @@ export class ElectronMenuUpdater {
     protected readonly factory: ElectronMainMenuFactory;
 
     public update(): void {
-        this.setMenu();
+        // this.setMenu();
     }
 
-    private setMenu(menu: Menu = this.factory.createMenuBar(), electronWindow: BrowserWindow = remote.getCurrentWindow()): void {
+    // TODO
+    /* private setMenu(menu: Menu = this.factory.createMenuBar(), electronWindow: BrowserWindow = remote.getCurrentWindow()): void {
         if (isOSX) {
             remote.Menu.setApplicationMenu(menu);
         } else {
             electronWindow.setMenu(menu);
         }
-    }
+    } */
 }
 
 @injectable()

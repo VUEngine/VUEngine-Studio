@@ -1,13 +1,15 @@
 #ves-titlebar-application-title {
+  flex-grow: 1;
   height: var(--theia-private-menubar-height);
   line-height: var(--theia-private-menubar-height);
-  position: absolute;
+  order: 2;
+  padding: 0 10px;
   text-align: center;
-  width: 100%;
+  white-space: nowrap;
 }
 
 @media (max-width: 1000px) {
-  #ves-titlebar-application-title:not(.os-osx) {
+  #theia-top-panel:not(.os-osx) #ves-titlebar-application-title {
     visibility: hidden;
   }
 }

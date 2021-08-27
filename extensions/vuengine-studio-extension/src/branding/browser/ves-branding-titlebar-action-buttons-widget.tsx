@@ -1,5 +1,5 @@
 import * as React from '@theia/core/shared/react';
-import { CommandService, environment, isOSX, isWindows, MessageService } from '@theia/core';
+import { CommandService, environment, isOSX, MessageService } from '@theia/core';
 import { injectable, postConstruct, inject } from '@theia/core/shared/inversify';
 import { PreferenceService } from '@theia/core/lib/browser';
 import { KeybindingRegistry } from '@theia/core/lib/browser/keybinding';
@@ -54,7 +54,6 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
         this.title.label = VesTitlebarActionButtonsWidget.LABEL;
         this.title.caption = VesTitlebarActionButtonsWidget.LABEL;
         this.title.closable = false;
-        this.addClass(`os-${this.getOs()}`);
 
         this.vesBuildService.onDidChangeIsCleaning(() => this.update());
         this.vesBuildService.onDidChangeBuildStatus(() => this.update());
@@ -74,10 +73,6 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                 this.update();
             };
         });
-    }
-
-    protected getOs(): string {
-        return isWindows ? 'win' : isOSX ? 'osx' : 'linux';
     }
 
     protected render(): React.ReactNode {
