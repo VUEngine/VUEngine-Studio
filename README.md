@@ -15,15 +15,11 @@ VUEngine Studio is build upon Eclipse Theia.
 
 After cloning, load git submodules with
 
-```sh
-yarn modules:init
-```
+    yarn modules:init
 
 They can be updated at a later point with
 
-```sh
-yarn modules:update
-```
+    yarn modules:update
 
 
 ## Development
@@ -35,40 +31,29 @@ Documentation on how to package Theia as a Desktop Product may be found [here](h
 
 ### Build
 
-```sh
-yarn --ignore-engines
-```
+    yarn --ignore-engines
 
 
 ### Development
 
 Open two terminals and execute one of the following commands in each.
 
-```sh
-yarn watch
-```
-
-```sh
-yarn electron start
-```
+    yarn watch
+    yarn electron start
 
 The first will do an incremental build on every code change you do. The latter will start the Electron frontend. Reload (CMD/Ctrl+R) to load your changes.
 
 
 ### Package the application
 
-```sh
-yarn electron package
-```
+    yarn electron package
 
 The packaged application is located in `applications/electron/dist`.
 
 
 ### Create a preview application (without packaging it)
 
-```sh
-yarn electron package:preview
-```
+    yarn electron package:preview
 
 The packaged application is located in `applications/electron/dist`.
 
@@ -78,10 +63,8 @@ The packaged application is located in `applications/electron/dist`.
 The E2E tests basic UI tests of the actual application.
 This is done based on the preview of the packaged application.
 
-```sh
-yarn electron package:preview
-yarn electron test
-```
+    yarn electron package:preview
+    yarn electron test
 
 
 ### Troubleshooting
