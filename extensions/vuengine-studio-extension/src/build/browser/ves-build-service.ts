@@ -374,11 +374,11 @@ export class VesBuildService {
 
   protected checkPathsForSpaces(workspaceRoot: string, engineCorePath: string, enginePluginsPath: string): void {
     if (workspaceRoot.includes('%20')) {
-      throw new Error('Error: Your workspace path must not contain spaces.');
+      throw new Error(`Error: Workspace path must not contain spaces.\nYour workspace path: ${workspaceRoot}`);
     } else if (engineCorePath.includes(' ')) {
-      throw new Error('Error: Your engine path must not contain spaces.');
+      throw new Error(`Error: Engine path must not contain spaces.\nYour engine path: ${engineCorePath}`);
     } else if (enginePluginsPath.includes(' ')) {
-      throw new Error('Error: Your plugins path must not contain spaces.');
+      throw new Error(`Error: Plugins path must not contain spaces.\nYour plugins path: ${enginePluginsPath}`);
     }
   }
 
