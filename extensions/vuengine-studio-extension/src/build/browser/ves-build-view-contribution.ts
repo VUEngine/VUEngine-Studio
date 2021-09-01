@@ -56,7 +56,7 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
         this.state.isWide = !this.state.isWide;
         const targetWidth = this.state.isWide
             ? Math.round(window.innerWidth * 0.75)
-            : Math.round(window.innerWidth * 0.25);
+            : 500;
         const widgetArea = this.applicationShell.getAreaFor(widget);
         if (widgetArea) {
             this.applicationShell.resize(targetWidth, widgetArea);

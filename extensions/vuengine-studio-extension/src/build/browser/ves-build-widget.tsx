@@ -8,15 +8,17 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesPluginsPreferenceIds, VesPluginsPreferenceSchema } from '../../plugins/browser/ves-plugins-preferences';
 import { VesBuildCommands } from './ves-build-commands';
-import { BuildLogLine, BuildLogLineType, BuildMode, BuildResult } from './ves-build-types';
+import { BuildLogLine, BuildLogLineFileLink, BuildLogLineType, BuildMode, BuildResult } from './ves-build-types';
 import { VesBuildPreferenceIds, VesBuildPreferenceSchema } from './ves-build-preferences';
 import { VesBuildService } from './ves-build-service';
+import { EditorManager } from '@theia/editor/lib/browser';
 
 @injectable()
 export class VesBuildWidget extends ReactWidget {
   @inject(CommandService) private readonly commandService: CommandService;
   @inject(FileService) private readonly fileService: FileService;
   @inject(FileDialogService) private readonly fileDialogService: FileDialogService;
+  @inject(EditorManager) private readonly editorManager: EditorManager;
   @inject(PreferenceService) private readonly preferenceService: PreferenceService;
   @inject(VesBuildService) private readonly vesBuildService: VesBuildService;
   @inject(WorkspaceService) private readonly workspaceService: WorkspaceService;
@@ -329,16 +331,29 @@ export class VesBuildWidget extends ReactWidget {
             <div className='buildLog'>
               <div>
                 {this.vesBuildService.buildStatus.log.map(
+                  // TODO: context menu with option to copy (full) error message
                   (line: BuildLogLine, index: number) => (
                     line.text !== ''
                       ? <div
-                        className={`buildLogLine ${line.type}`}
+                        className={`buildLogLine ${line.type} ${line.file && 'hasFileLink'}`}
                         key={`buildLogLine${index}`}
+                        onClick={(e: React.MouseEvent) => line.file && this.openFile(e, line.file)}
+                        title={`${new Date(line.timestamp).toTimeString().substr(0, 8)} ${line.text}`}
                       >
                         <span className='timestamp'>
-                          {new Date(line.timestamp).toTimeString().substr(0, 8)}
+                          {line.type === BuildLogLineType.Error
+                            ? <i className='fa fa-times-circle-o' />
+                            : line.type === BuildLogLineType.Warning
+                              ? <i className='fa fa-exclamation-triangle' />
+                              : line.type === BuildLogLineType.Headline
+                                ? <i className='fa fa-arrow-circle-right' />
+                                : line.type === BuildLogLineType.Done
+                                  ? <i className='fa fa-check' />
+                                  : <></>}
                         </span>
-                        <span className='text'>{line.text}</span>
+                        <span className='text'>
+                          {line.optimizedText ? line.optimizedText : line.text}
+                        </span>
                       </div>
                       : <div className='buildLogLine'></div>
                   )
@@ -414,5 +429,17 @@ export class VesBuildWidget extends ReactWidget {
     return this.vesBuildService.buildStatus.log.filter(
       l => l.type === BuildLogLineType.Error
     ).length;
+  }
+
+  protected async openFile(e: React.MouseEvent, fileLink: BuildLogLineFileLink): Promise<void> {
+    e.stopPropagation();
+    e.preventDefault();
+
+    const editorWidget = await this.editorManager.open(fileLink.uri, { mode: 'reveal' });
+    editorWidget.editor.cursor = {
+      line: fileLink.line > 0 ? fileLink.line - 1 : 0,
+      character: fileLink.column > 0 ? fileLink.column - 1 : 0,
+    };
+    editorWidget.editor.revealPosition(editorWidget.editor.cursor);
   }
 }

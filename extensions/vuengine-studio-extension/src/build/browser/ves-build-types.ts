@@ -1,3 +1,5 @@
+import URI from '@theia/core/lib/common/uri';
+
 export enum BuildMode {
   Release = 'Release',
   Beta = 'Beta',
@@ -25,15 +27,32 @@ export interface BuildStatus {
   romSize: number;
 };
 
+export interface BuildLogLineFileLink {
+  uri: URI;
+  line: number;
+  column: number;
+}
+
 export interface BuildLogLine {
   timestamp: number;
   text: string;
   type: BuildLogLineType;
+  file?: BuildLogLineFileLink;
+  optimizedText?: string;
 };
+
+export interface GccMatchedProblem {
+  file: string;
+  line: number;
+  column: number;
+  severity: string;
+  message: string;
+}
 
 export enum BuildLogLineType {
   Normal = 'normal',
   Headline = 'headline',
   Warning = 'warning',
   Error = 'error',
+  Done = 'done',
 }

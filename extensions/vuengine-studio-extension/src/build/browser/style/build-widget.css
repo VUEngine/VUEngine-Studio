@@ -127,10 +127,18 @@
   background: rgba(0, 0, 0, 0.2);
 }
 
+#vesBuildWidget .buildLogLine.hasFileLink {
+  cursor: pointer;
+}
+
 #vesBuildWidget .buildLogLine .timestamp {
   display: table-cell;
-  opacity: 0.5;
   padding: 0 var(--theia-ui-padding);
+}
+
+#vesBuildWidget .buildLogLine.headline .timestamp,
+#vesBuildWidget .buildLogLine.normal .timestamp {
+  opacity: 0.5;
 }
 
 #vesBuildWidget .buildLogLine .text {
@@ -140,14 +148,19 @@
   width: 100%;
 }
 
-#vesBuildWidget .buildLogLine.headline .text {
+#vesBuildWidget .buildLogLine.headline .text,
+#vesBuildWidget .buildLogLine.done .text {
   font-weight: bold;
 }
 
-#vesBuildWidget .buildLogLine.warning .text {
+#vesBuildWidget .buildLogLine.warning {
   color: yellow;
 }
 
-#vesBuildWidget .buildLogLine.error .text {
+#vesBuildWidget .buildLogLine.error {
   color: red;
+}
+
+#vesBuildWidget .buildLogLine.done {
+  color: #4aa94e;
 }

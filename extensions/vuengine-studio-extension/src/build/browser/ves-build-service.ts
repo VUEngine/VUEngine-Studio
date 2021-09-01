@@ -15,7 +15,7 @@ import { VesProcessService } from '../../process/common/ves-process-service-prot
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProjectsService } from '../../projects/browser/ves-projects-service';
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
-import { BuildLogLine, BuildLogLineType, BuildMode, BuildResult, BuildStatus } from './ves-build-types';
+import { BuildLogLine, BuildLogLineFileLink, BuildLogLineType, BuildMode, BuildResult, BuildStatus, GccMatchedProblem } from './ves-build-types';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
 import { VesBuildCommands } from './ves-build-commands';
 
@@ -232,10 +232,7 @@ export class VesBuildService {
     // @ts-ignore
     const onData = ({ pId, data }) => {
       if (this.buildStatus.processManagerId === pId) {
-        this.pushBuildLogLine({
-          ...this.parseBuildOutput(data),
-          timestamp: Date.now(),
-        });
+        this.pushBuildLogLine(this.parseBuildOutput(data));
       }
     };
 
@@ -389,44 +386,104 @@ export class VesBuildService {
     }
   }
 
-  protected parseBuildOutput(data: string): { text: string, type: BuildLogLineType } {
+  protected parseBuildOutput(data: string): BuildLogLine {
     const text = data.trim();
     const textLowerCase = text.toLowerCase();
+    let optimizedText;
     let type = BuildLogLineType.Normal;
-
-    const headlineRegex = /\((\d+)\/(\d+)\) (preprocessing (.+)|building (.+))/gi;
-    const headlineMatches: string[] = [];
-    let m;
-    while ((m = headlineRegex.exec(text)) !== null) { /* eslint-disable-line */
-      if (m.index === headlineRegex.lastIndex) {
-        headlineRegex.lastIndex++;
-      }
-      m.forEach((match, groupIndex) => {
-        headlineMatches[groupIndex] = match;
-      });
-    }
+    let file: BuildLogLineFileLink | undefined;
+    let headlineMatches;
+    let problem;
 
     if (textLowerCase.startsWith('starting build')) {
       type = BuildLogLineType.Headline;
-    } else if (headlineMatches.length) {
+    } else if (textLowerCase.startsWith('build finished')) {
+      type = BuildLogLineType.Done;
+    } else if ((headlineMatches = this.matchHeadlines(text)).length) {
       type = BuildLogLineType.Headline;
       this.buildStatus.step = headlineMatches[3] as unknown as string;
       this.buildStatus.progress = this.computeProgress(headlineMatches);
     } else if (textLowerCase.startsWith('build finished')) {
       type = BuildLogLineType.Headline;
       this.buildStatus.progress = 100;
+    } else if ((problem = this.matchGccProblem(text)) !== undefined) {
+      type = (problem.severity === BuildLogLineType.Warning)
+        ? BuildLogLineType.Warning
+        : BuildLogLineType.Error;
+      file = {
+        uri: new URI(problem.file),
+        line: problem.line,
+        column: problem.column,
+      };
+
+      const functionReference = text.split(':')[1].trim();
+      const errorMessage = problem.message.split(' [-W')[0].trim();
+      optimizedText = `${functionReference}:\n${errorMessage[0].toUpperCase()}${errorMessage.slice(1)}.`;
     } else if (textLowerCase.includes('error: ') ||
-      textLowerCase.includes('] Error ') ||
+      textLowerCase.includes('] error ') ||
       textLowerCase.includes(' not found') ||
       textLowerCase.includes('no such file or directory') ||
-      textLowerCase.includes(' No rule to make target') ||
-      textLowerCase.includes(' *** ')) {
+      textLowerCase.includes('undefined reference to') ||
+      textLowerCase.includes('undefined symbol') ||
+      textLowerCase.includes(' no rule to make target') ||
+      textLowerCase.includes(' *** ') ||
+      textLowerCase.endsWith(': undefined')) {
       type = BuildLogLineType.Error;
-    } else if (textLowerCase.includes('warning: ')) {
+    } else if (textLowerCase.includes('warning: ') ||
+      textLowerCase.endsWith(': no such file or directory')) {
       type = BuildLogLineType.Warning;
     }
 
-    return { text, type };
+    return {
+      text: this.replaceFunctionNames(text),
+      type,
+      file,
+      timestamp: Date.now(),
+      optimizedText: optimizedText && this.replaceFunctionNames(optimizedText),
+    };
+  }
+
+  protected matchHeadlines(message: string): string[] {
+    const regEx = /\((\d+)\/(\d+)\) (preprocessing (.+)|building (.+))/gi;
+    const headlineMatches: string[] = [];
+
+    let m;
+    while (m = regEx.exec(message)) {
+      // Avoid infinite loops with zero-width matches
+      if (m.index === regEx.lastIndex) {
+        regEx.lastIndex++;
+      }
+
+      m.forEach((match, groupIndex) => {
+        headlineMatches[groupIndex] = match;
+      });
+    }
+
+    return headlineMatches;
+  }
+
+  protected matchGccProblem(message: string): GccMatchedProblem | undefined {
+    // GCC problem matcher from https://github.com/microsoft/vscode-cpptools/blob/main/Extension/package.json
+    const regEx = /^(.*):(\d+):(\d+):\s+(?:fatal\s+)?(warning|error):\s+(.*)$/gmi;
+    let matchedProblem: GccMatchedProblem | undefined;
+
+    const match = regEx.exec(message);
+    if (match) {
+      matchedProblem = {
+        file: match[1],
+        line: parseInt(match[2]),
+        column: parseInt(match[3]),
+        severity: match[4],
+        message: match[5],
+      };
+    }
+
+    return matchedProblem;
+  }
+
+  // Converts function names Class_function to Class::function
+  protected replaceFunctionNames(name: string): string {
+    return name.replace(/\'([a-zA-Z0-9]*)_([a-zA-Z0-9]*)\'/g, '"$1::$2"');
   }
 
   protected async getMakefilePath(workspaceRoot: string, engineCorePath: string): Promise<string> {
