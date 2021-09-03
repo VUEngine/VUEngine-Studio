@@ -11,7 +11,7 @@ import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { ProcessOptions } from '@theia/process/lib/node';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
-import { VesProcessService } from '../../process/common/ves-process-service-protocol';
+import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProjectsService } from '../../projects/browser/ves-projects-service';
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
@@ -264,7 +264,7 @@ export class VesBuildService {
       const buildParams = await this.getBuildProcessParams();
       await this.deleteRom();
       await this.fixPermissions();
-      ({ processManagerId, processId } = await this.vesProcessService.launchProcess(buildParams));
+      ({ processManagerId, processId } = await this.vesProcessService.launchProcess(VesProcessType.Raw, buildParams));
       active = true;
 
     } catch (e) {
@@ -615,19 +615,19 @@ export class VesBuildService {
     const compilerPath = await this.getCompilerPath();
 
     await Promise.all([
-      this.vesProcessService.launchProcess({
+      this.vesProcessService.launchProcess(VesProcessType.Raw, {
         command: 'chmod',
         args: ['-R', 'a+x', joinPath(compilerPath, 'bin')],
       }),
-      this.vesProcessService.launchProcess({
+      this.vesProcessService.launchProcess(VesProcessType.Raw, {
         command: 'chmod',
         args: ['-R', 'a+x', joinPath(compilerPath, 'libexec')],
       }),
-      this.vesProcessService.launchProcess({
+      this.vesProcessService.launchProcess(VesProcessType.Raw, {
         command: 'chmod',
         args: ['-R', 'a+x', joinPath(compilerPath, 'v810', 'bin')],
       }),
-      this.vesProcessService.launchProcess({
+      this.vesProcessService.launchProcess(VesProcessType.Raw, {
         command: 'chmod',
         args: ['-R', 'a+x', joinPath(engineCorePath, 'lib', 'compiler', 'preprocessor'),
         ],

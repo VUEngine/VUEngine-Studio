@@ -8,7 +8,7 @@ import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesProjectsService } from '../../projects/browser/ves-projects-service';
-import { VesProcessService } from '../../process/common/ves-process-service-protocol';
+import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
 import { DEFAULT_EMULATOR, EmulatorConfig } from './ves-emulator-types';
 
@@ -146,7 +146,7 @@ export class VesEmulatorService {
 
       await this.fixPermissions(emulatorPath);
 
-      await this.vesProcessService.launchProcess({
+      await this.vesProcessService.launchProcess(VesProcessType.Raw, {
         command: emulatorPath,
         args: emulatorArgs,
       });
@@ -197,7 +197,7 @@ export class VesEmulatorService {
    */
   async fixPermissions(emulatorPath: string): Promise<void> {
     if (!isWindows && emulatorPath) {
-      await this.vesProcessService.launchProcess({
+      await this.vesProcessService.launchProcess(VesProcessType.Raw, {
         command: 'chmod',
         args: ['a+x', emulatorPath]
       });

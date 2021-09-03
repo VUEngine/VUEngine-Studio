@@ -11,7 +11,7 @@ import { FrontendApplicationState, FrontendApplicationStateService } from '@thei
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { VesBuildService } from '../../build/browser/ves-build-service';
-import { VesProcessService } from '../../process/common/ves-process-service-protocol';
+import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProjectsService } from '../../projects/browser/ves-projects-service';
 import { VesBuildPreferenceIds } from '../../build/browser/ves-build-preferences';
@@ -211,7 +211,7 @@ export class VesFlashCartService {
 
       await this.fixPermissions();
 
-      const { processManagerId } = await this.vesProcessService.launchProcess({
+      const { processManagerId } = await this.vesProcessService.launchProcess(VesProcessType.Terminal, {
         command: connectedFlashCart.config.path,
         args: flasherArgs,
       });
@@ -258,7 +258,7 @@ export class VesFlashCartService {
     }
 
     for (const connectedFlashCart of this.connectedFlashCarts) {
-      await this.vesProcessService.launchProcess({
+      await this.vesProcessService.launchProcess(VesProcessType.Raw, {
         command: 'chmod',
         args: ['a+x', connectedFlashCart.config.path]
       });

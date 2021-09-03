@@ -6,13 +6,17 @@ import {
   ProcessManager,
   ProcessOptions,
   RawProcessFactory,
+  TerminalProcessFactory,
+  TerminalProcessOptions
 } from '@theia/process/lib/node';
-import { VesProcessService, VesProcessServiceClient } from '../common/ves-process-service-protocol';
+import { VesProcessService, VesProcessServiceClient, VesProcessType } from '../common/ves-process-service-protocol';
 
 @injectable()
 export class VesProcessServiceImpl implements VesProcessService {
   @inject(RawProcessFactory)
   protected readonly rawProcessFactory: RawProcessFactory;
+  @inject(TerminalProcessFactory)
+  protected readonly terminalProcessFactory: TerminalProcessFactory;
   @inject(ProcessManager) protected readonly processManager: ProcessManager;
   protected client: VesProcessServiceClient | undefined;
 
@@ -24,35 +28,37 @@ export class VesProcessServiceImpl implements VesProcessService {
     this.client = client;
   }
 
-  async launchProcess(options: ProcessOptions): Promise<{
+  async launchProcess(type: VesProcessType, options: ProcessOptions | TerminalProcessOptions): Promise<{
     processManagerId: number;
     processId: number;
   }> {
-    const rawProcess = this.rawProcessFactory(options);
+    const newProcess = type === VesProcessType.Terminal
+      ? this.terminalProcessFactory(options)
+      : this.rawProcessFactory(options);
     await new Promise((resolve, reject) => {
-      rawProcess.onStart(resolve);
-      rawProcess.onError((error: ProcessErrorEvent) => console.log(error));
+      newProcess.onStart(resolve);
+      newProcess.onError((error: ProcessErrorEvent) => console.log(error));
     });
 
-    const processManagerId = this.processManager.register(rawProcess);
+    const processManagerId = this.processManager.register(newProcess);
 
-    rawProcess.onClose((event: IProcessExitEvent) => {
+    newProcess.onClose((event: IProcessExitEvent) => {
       this.client?.onClose(processManagerId, event);
     });
 
-    rawProcess.onError((event: ProcessErrorEvent) => {
+    newProcess.onError((event: ProcessErrorEvent) => {
       this.client?.onError(processManagerId, event);
     });
 
-    rawProcess.onExit((event: IProcessExitEvent) => {
+    newProcess.onExit((event: IProcessExitEvent) => {
       this.client?.onExit(processManagerId, event);
     });
 
-    rawProcess.outputStream.on('data', (chunk: any) => { /* eslint-disable-line */
+    newProcess.outputStream.on('data', (chunk: any) => { /* eslint-disable-line */
       this.client?.onOutputStreamData(processManagerId, chunk.toString());
     });
 
-    rawProcess.errorStream.on('data', (chunk: any) => { /* eslint-disable-line */
+    newProcess.errorStream.on('data', (chunk: any) => { /* eslint-disable-line */
       this.client?.onErrorStreamData(processManagerId, chunk.toString());
     });
 

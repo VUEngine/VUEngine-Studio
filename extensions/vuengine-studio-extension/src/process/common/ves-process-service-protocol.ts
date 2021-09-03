@@ -8,6 +8,11 @@ import {
 export const VES_PROCESS_SERVICE_PATH = '/ves/services/process';
 export const VesProcessService = Symbol('VesProcessService');
 
+export enum VesProcessType {
+  Raw = 'raw',
+  Terminal = 'terminal',
+}
+
 export interface VesProcessServiceClient {
   onErrorStreamData(pId: number, data: string): void;
   onOutputStreamData(pId: number, data: string): void;
@@ -18,7 +23,7 @@ export interface VesProcessServiceClient {
 
 export interface VesProcessService
   extends JsonRpcServer<VesProcessServiceClient> {
-  launchProcess(options: ProcessOptions): Promise<{
+  launchProcess(type: VesProcessType, options: ProcessOptions): Promise<{
     processManagerId: number;
     processId: number;
   }>;
