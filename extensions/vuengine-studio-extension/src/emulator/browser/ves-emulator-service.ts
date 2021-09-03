@@ -100,7 +100,7 @@ export class VesEmulatorService {
         return;
       }
 
-      const selectedEmulator = (selection.id === emulatorConfigs[0].name) ? '' : selection;
+      const selectedEmulator = (selection.id === emulatorConfigs[0].name) ? '' : selection.label;
 
       this.preferenceService.set(VesEmulatorPreferenceIds.DEFAULT_EMULATOR, selectedEmulator, PreferenceScope.User);
     });
