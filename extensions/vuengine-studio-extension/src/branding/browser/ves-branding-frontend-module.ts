@@ -20,7 +20,7 @@ import { DebugPrefixConfiguration } from '@theia/debug/lib/browser/debug-prefix-
 import { VesAboutDialog } from './ves-branding-about-dialog';
 import { VesColorContribution } from './ves-branding-color-contribution';
 import { VesBrandingContribution } from './ves-branding-contribution';
-import { VesDebugContribution } from './ves-branding-debug-contribution';
+import { VesDebugFrontendApplicationContribution } from './ves-branding-debug-contribution';
 import { VesGettingStartedViewContribution } from './ves-branding-getting-started-view-contribution';
 import { VesGettingStartedWidget } from './ves-branding-getting-started-widget';
 import { VesScmHistoryContribution } from './ves-branding-history-contribution';
@@ -90,8 +90,8 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(LabelProviderContribution).toService(VesBrandingLabelProviderContribution);
 
     // remove debug features
-    bind(VesDebugContribution).toSelf().inSingletonScope();
-    rebind(DebugFrontendApplicationContribution).toService(VesDebugContribution);
+    bind(VesDebugFrontendApplicationContribution).toSelf().inSingletonScope();
+    rebind(DebugFrontendApplicationContribution).toService(VesDebugFrontendApplicationContribution);
     rebind(DebugConsoleContribution).toConstantValue({
         registerCommands: () => { },
         registerMenus: () => { },
