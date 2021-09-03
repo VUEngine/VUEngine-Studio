@@ -8,7 +8,6 @@ import { MenuContribution } from '@theia/core/lib/common/menu';
 import { PreferenceConfigurations } from '@theia/core/lib/browser/preferences/preference-configurations';
 import { DebugConsoleContribution } from '@theia/debug/lib/browser/console/debug-console-contribution';
 import { DebugFrontendApplicationContribution } from '@theia/debug/lib/browser/debug-frontend-application-contribution';
-import { DebugPrefixConfiguration } from '@theia/debug/lib/browser/debug-prefix-configuration';
 import { ColorContribution } from '@theia/core/lib/browser/color-application-contribution';
 import { ScmHistoryContribution } from '@theia/scm-extra/lib/browser/history/scm-history-contribution';
 import { PluginViewRegistry } from '@theia/plugin-ext/lib/main/browser/view/plugin-view-registry';
@@ -17,6 +16,7 @@ import { PreferenceTreeGenerator } from '@theia/preferences/lib/browser/util/pre
 import { DefaultFileIconThemeContribution } from '@theia/core/lib/browser/icon-theme-contribution';
 import { PluginFrontendViewContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-view-contribution';
 import { PluginApiFrontendContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-contribution';
+import { DebugPrefixConfiguration } from '@theia/debug/lib/browser/debug-prefix-configuration';
 import { VesAboutDialog } from './ves-branding-about-dialog';
 import { VesColorContribution } from './ves-branding-color-contribution';
 import { VesBrandingContribution } from './ves-branding-contribution';
@@ -36,6 +36,7 @@ import { VesPreferenceTreeGenerator } from './ves-branding-preference-tree-gener
 import { VesDefaultFileIconThemeContribution } from './ves-branding-icon-theme-contribution';
 import { VesBrandingLabelProviderContribution } from './ves-branding-label-provider';
 import { VesApplicationShell } from './ves-branding-application-shell';
+import { VesDebugPrefixConfiguration } from './ves-branding-debug-prefix-configuration';
 import '../../../src/branding/browser/style/index.css';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
@@ -97,12 +98,8 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
         registerKeybindings: () => { },
         registerToolbarItems: () => { }
     } as any); /* eslint-disable-line */
-    rebind(DebugPrefixConfiguration).toConstantValue({
-        registerCommands: () => { },
-        registerMenus: () => { },
-        registerKeybindings: () => { },
-        registerToolbarItems: () => { }
-    } as any); /* eslint-disable-line */
+    rebind(DebugPrefixConfiguration).to(VesDebugPrefixConfiguration).inSingletonScope();
+    // TODO: remove Preferences->Extensions->Debug (-> bindDebugPreferences)
 
     // remove plugin frontend feature
     rebind(PluginFrontendViewContribution).toConstantValue({

@@ -11,6 +11,7 @@ import { VesPluginsPreferenceIds } from '../../plugins/browser/ves-plugins-prefe
 export class VesPreferenceTreeGenerator extends PreferenceTreeGenerator {
 
     // reorder preferences categories and add custom ones
+    // TODO: keep up to date (or, better yet, figure our a better solution to add custom categories)
 
     protected readonly topLevelCategories = new Map([
         [COMMONLY_USED_SECTION_PREFIX, 'Commonly Used'],
@@ -31,7 +32,7 @@ export class VesPreferenceTreeGenerator extends PreferenceTreeGenerator {
         ['files', 'editor'],
 
         ['comments', 'features'],
-        ['debug', 'features'],
+        // ['debug', 'features'], // remove debug
         [VesEmulatorPreferenceIds.CATEGORY, 'features'], // custom category
         [VesFlashCartPreferenceIds.CATEGORY, 'features'], // custom category
         ['explorer', 'features'],
