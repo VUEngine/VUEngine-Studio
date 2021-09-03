@@ -48,11 +48,9 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(ColorContribution).to(VesColorContribution).inSingletonScope();
 
     // enable main menu
-    // if (!isOSX) {
     bind(BrowserMainMenuFactory).toSelf().inSingletonScope();
     bind(BrowserMenuBarContribution).toSelf().inSingletonScope();
     bind(FrontendApplicationContribution).toService(BrowserMenuBarContribution);
-    // }
 
     // getting started view
     bindViewContribution(bind, VesGettingStartedViewContribution);

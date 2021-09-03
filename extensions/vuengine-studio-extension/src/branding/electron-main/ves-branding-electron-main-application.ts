@@ -141,8 +141,9 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         electronWindow.setTouchBar(vesTouchBar);
 
         // @ts-ignore
-        app.on(VesTouchBarCommands.changeBuildMode, (buildMode: BuildMode) => {
-            buildModeButton.label = buildMode.replace('Preprocessor', 'Preproc.');
+        app.on(VesTouchBarCommands.changeBuildFolder, flags => {
+            const buildMode = buildModeButton.label;
+            buildMenuCleanButton.enabled = flags[buildMode];
         });
         // @ts-ignore
         app.on(VesTouchBarCommands.changeBuildStatus, (buildStatus: BuildStatus) => {
@@ -165,29 +166,28 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         // @ts-ignore
         app.on(VesTouchBarCommands.changeIsFlashing, (isFlashing: boolean) => {
             if (isFlashing) {
-                buildMenuBuildButton.label = '0%';
-                buildMenuBuildButton.icon = blankIcon;
+                buildMenuFlashButton.label = '0%';
+                buildMenuFlashButton.icon = blankIcon;
             } else {
-                buildMenuBuildButton.label = '';
-                buildMenuBuildButton.icon = flashIcon;
+                buildMenuFlashButton.label = '';
+                buildMenuFlashButton.icon = flashIcon;
             }
         });
         // @ts-ignore
         app.on(VesTouchBarCommands.onDidChangeFlashingProgress, (progress: number) => {
-            buildMenuBuildButton.label = `${progress}%`;
-        });
-        // @ts-ignore
-        app.on(VesTouchBarCommands.changeIsExportQueued, (isQueued: boolean) => {
-            buildMenuExportButton.icon = isQueued ? queuedIcon : exportIcon;
+            buildMenuFlashButton.label = `${progress}%`;
         });
         // @ts-ignore
         app.on(VesTouchBarCommands.changeConnectedFlashCart, flashCartConfig => {
             buildMenuFlashButton.enabled = !!flashCartConfig;
         });
         // @ts-ignore
-        app.on(VesTouchBarCommands.changeBuildFolder, flags => {
-            const buildMode = buildModeButton.label;
-            buildMenuCleanButton.enabled = flags[buildMode];
+        app.on(VesTouchBarCommands.changeIsExportQueued, (isQueued: boolean) => {
+            buildMenuExportButton.icon = isQueued ? queuedIcon : exportIcon;
+        });
+        // @ts-ignore
+        app.on(VesTouchBarCommands.changeBuildMode, (buildMode: BuildMode) => {
+            buildModeButton.label = buildMode.replace('Preprocessor', 'Preproc.');
         });
     }
 }
