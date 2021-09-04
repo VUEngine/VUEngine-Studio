@@ -1,5 +1,6 @@
 {
 	"$schema": "vscode://schemas/color-theme",
+	"name": "Light (VUEngine Studio)",
 	"type": "light",
 	"colors": {
 		"activityBar.activeBorder": "#000000",
