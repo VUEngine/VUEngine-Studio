@@ -1,6 +1,6 @@
 {
 	"$schema": "vscode://schemas/color-theme",
-	"name": "Dark (VUEngine Studio)",
+	"name": "Dark",
 	"type": "dark",
 	"colors": {
 		"activityBarBadge.background": "#d31422",
