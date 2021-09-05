@@ -1,4 +1,4 @@
-import { dirname, join as joinPath, normalize, relative as relativePath } from 'path';
+import { dirname, join as joinPath, normalize, relative as relativePath, sep } from 'path';
 import * as glob from 'glob';
 import { isWindows } from '@theia/core';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
@@ -8,9 +8,9 @@ import URI from '@theia/core/lib/common/uri';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { PreferenceService } from '@theia/core/lib/browser';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
+import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import { VesPluginsPreferenceIds } from './ves-plugins-preferences';
 import { VesPluginData, VesPluginsData } from './ves-plugin';
-import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 
 @injectable()
 export class VesPluginsService {
@@ -155,8 +155,8 @@ export class VesPluginsService {
     const findPlugins = async (path: string, prefix: string) => {
       const pluginsMap: any = {}; /* eslint-disable-line */
 
-      await Promise.all(glob.sync(joinPath(path, '/**/', 'plugin.json')).map(async file => {
-        const fileSplit = file.split('/plugin.json');
+      await Promise.all(glob.sync(joinPath(path, '**', 'plugin.json')).map(async file => {
+        const fileSplit = file.split(`${sep}plugin.json`);
         const pluginPathFull = fileSplit[0];
 
         const pluginPathRelative = relativePath(path, pluginPathFull);
@@ -165,10 +165,10 @@ export class VesPluginsService {
 
         const pluginId = `${prefix}//${pluginPathRelative}`;
 
-        if (fileContentJson.icon !== '' && !fileContentJson.icon.includes('../')) {
+        if (fileContentJson.icon !== '' && !fileContentJson.icon.includes('..')) {
           fileContentJson.icon = joinPath(pluginPathFull, fileContentJson.icon);
         }
-        if (fileContentJson.readme !== '' && !fileContentJson.readme.includes('../')) {
+        if (fileContentJson.readme !== '' && !fileContentJson.readme.includes('..')) {
           fileContentJson.readme = joinPath(pluginPathFull, fileContentJson.readme);
         }
 
