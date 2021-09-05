@@ -36,8 +36,8 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             ...super.getDefaultOptions(),
             backgroundColor: '#222',
             frame: isOSX,
-            minHeight: 560,
-            minWidth: 820,
+            minHeight: 600,
+            minWidth: 850,
             titleBarStyle: 'hiddenInset'
         };
     }

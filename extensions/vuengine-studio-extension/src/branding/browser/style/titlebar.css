@@ -8,9 +8,11 @@
 }
 [id="theia:icon"] {
   -webkit-app-region: no-drag;
+  min-width: 50px;
   z-index: 1;
 }
 [id="theia:menubar"] {
   -webkit-app-region: no-drag;
+  min-width: 375px;
   z-index: 1;
 }

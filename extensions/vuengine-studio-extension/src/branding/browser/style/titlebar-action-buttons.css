@@ -1,17 +1,12 @@
 #ves-titlebar-action-buttons {
   -webkit-app-region: no-drag;
   margin-right: 8px;
+  min-width: 250px;
   order: 3;
   padding-top: 5px;
   text-align: right;
   white-space: nowrap;
   z-index: 1;
-}
-
-@media (max-width: 800px) {
-  #theia-top-panel:not(.os-osx) #ves-titlebar-action-buttons {
-    display: none;
-  }
 }
 
 #ves-titlebar-action-buttons .theia-button {
