@@ -97,7 +97,7 @@ export class VesBuildWidget extends ReactWidget {
             <>
               <div className='buildButtons'>
                 <button
-                  className='theia-button build'
+                  className='theia-button large build'
                   disabled={!this.workspaceService.opened}
                   onClick={() => {
                     this.state.logFilter = BuildLogLineType.Normal;

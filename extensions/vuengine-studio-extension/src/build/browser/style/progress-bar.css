@@ -1,12 +1,12 @@
 .vesProgressBar {
     background: rgba(0, 0, 0, 0.2);
+    color: var(--theia-button-foreground);
     line-height: 32px;
     position: relative;
     text-align: center;
   }
   
   .vesProgressBar div {
-    color: var(--theia-button-foreground);
     background-color: var(--theia-progressBar-background);
     height: 100%;
     position: absolute;

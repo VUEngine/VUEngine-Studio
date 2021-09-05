@@ -1584,7 +1584,7 @@
     onigasm "^2.2.0"
     vscode-textmate "^4.4.0"
 
-"@theia/navigator@1.17.2":
+"@theia/navigator@1.17.2", "@theia/navigator@^1.17.2":
   version "1.17.2"
   resolved "https://registry.yarnpkg.com/@theia/navigator/-/navigator-1.17.2.tgz#cad78f6ef4411f011735c79025c38755c76893d2"
   integrity sha512-nEEsW51Sby5kY0yWviFAvFaW/EPaskpZQ1CmvGrUHKvs+/95lXiQrzauJ/tR8WNmR1yCgSbZTqHXEdm3egoQRw==
@@ -1767,7 +1767,7 @@
     react-autosize-textarea "^7.0.0"
     ts-md5 "^1.2.2"
 
-"@theia/search-in-workspace@1.17.2":
+"@theia/search-in-workspace@1.17.2", "@theia/search-in-workspace@^1.17.2":
   version "1.17.2"
   resolved "https://registry.yarnpkg.com/@theia/search-in-workspace/-/search-in-workspace-1.17.2.tgz#23cc3488d2caf7a08707f8a6b7226c8f7319b4a7"
   integrity sha512-Y2JPU/EbMYu9ZCSfarK5ckuYhUAYkJd5rngaeQKFUOZGRtAqBNppjIoQwsMKnUfV+SOM0bYFzJ9hbDx5BpEIWA==

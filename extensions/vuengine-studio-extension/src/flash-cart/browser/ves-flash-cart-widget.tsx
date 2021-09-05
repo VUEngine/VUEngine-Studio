@@ -97,12 +97,12 @@ export class VesFlashCartWidget extends ReactWidget {
           {!this.vesFlashCartService.isQueued && !this.vesFlashCartService.isFlashing && (
             <>
               <button
-                className='theia-button flash'
+                className='theia-button large flash'
                 onClick={() =>
                   this.commandService.executeCommand(VesFlashCartCommands.FLASH.id)
                 }
               >
-                <i className='fa fa-usb'></i> Flash
+                <i className='fa fa-microchip'></i> Flash
               </button>
             </>
           )}
@@ -119,52 +119,50 @@ export class VesFlashCartWidget extends ReactWidget {
           {this.vesFlashCartService.connectedFlashCarts.map(
             (connectedFlashCart: ConnectedFlashCart, index: number) => (
               <div className='flashCart'>
-                <div className='flashCartTitle'>
-                  {connectedFlashCart.config.name}
-                </div>
                 <div className='flashCartInfo'>
                   <div>
-                    <i className='fa fa-fw fa-microchip'></i>{' '}
-                    {connectedFlashCart.config.size} MBit (
-                    {connectedFlashCart.config.padRom
-                      ? 'Auto Padding'
-                      : 'No Auto Padding'}
-                    )
+                    <h2>{connectedFlashCart.config.name}</h2>
+                    <div>
+                      <i className='fa fa-fw fa-microchip'></i>{' '}
+                      {connectedFlashCart.config.size} MBit<br />
+                      ({connectedFlashCart.config.padRom
+                        ? 'Padding Enabled'
+                        : 'Padding Disabled'})
+                    </div>
+                    <div>
+                      <i className='fa fa-fw fa-usb'></i>{' '}
+                      {connectedFlashCart.config.vid}:
+                      {connectedFlashCart.config.pid}<br />
+                      {connectedFlashCart.config.manufacturer}<br />
+                      {connectedFlashCart.config.product}
+                    </div>
+                    <div>
+                      <i className='fa fa-fw fa-terminal'></i>{' '}
+                      {basename(connectedFlashCart.config.path)}{' '}
+                      {connectedFlashCart.config.args}
+                    </div>
                   </div>
-                  <div>
-                    <i className='fa fa-fw fa-usb'></i>{' '}
-                    {connectedFlashCart.config.vid}:
-                    {connectedFlashCart.config.pid}
-                    <br />
-                    {connectedFlashCart.config.manufacturer}
-                    <br />
-                    {connectedFlashCart.config.product}
-                  </div>
-                  <div>
-                    <i className='fa fa-fw fa-terminal'></i>{' '}
-                    {basename(connectedFlashCart.config.path)}{' '}
-                    {connectedFlashCart.config.args}
-                  </div>
+                  {connectedFlashCart.config.image && (
+                    <div>
+                      <img
+                        src={connectedFlashCart.config.image}
+                        style={
+                          connectedFlashCart.config.name ===
+                            VesFlashCartPreferenceSchema.properties[VesFlashCartPreferenceIds.FLASH_CARTS].default[1].name
+                            ? {
+                              /* HyperFlash32 eInk label */
+                              backgroundImage: `url(${IMAGE_HYPERFLASH32_LABEL})`,
+                              backgroundPosition: '69% 28%',
+                              backgroundRepeat: 'no-repeat',
+                              backgroundSize: '76%',
+                            }
+                            : {}
+                        }
+                      />
+                    </div>
+                  )}
                 </div>
-                {connectedFlashCart.config.image && (
-                  <div className='cartImgWrapper'>
-                    <img
-                      src={connectedFlashCart.config.image}
-                      style={
-                        connectedFlashCart.config.name ===
-                          VesFlashCartPreferenceSchema.properties[VesFlashCartPreferenceIds.FLASH_CARTS].default[1].name
-                          ? {
-                            /* HyperFlash32 eInk label */
-                            backgroundImage: `url(${IMAGE_HYPERFLASH32_LABEL})`,
-                            backgroundPosition: '69% 28%',
-                            backgroundRepeat: 'no-repeat',
-                            backgroundSize: '76%',
-                          }
-                          : {}
-                      }
-                    />
-                  </div>
-                )}
+
                 {connectedFlashCart.status.progress > -1 && (
                   <div className='flashingPanel'>
                     <i className='fa fa-fw fa-refresh fa-spin'></i>{' '}

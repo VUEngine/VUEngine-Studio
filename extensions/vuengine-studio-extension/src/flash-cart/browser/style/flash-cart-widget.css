@@ -36,51 +36,51 @@
   width: 100%;
 }
 
-#vesFlashCartWidget .flashCartTitle {
-  font-size: 150%;
-  line-height: 150%;
-}
-
 #vesFlashCartWidget .flashCartInfo {
-  padding: var(--theia-ui-padding) 0;
+  display: flex;
 }
 
-#vesFlashCartWidget .flashCartInfo div {
+#vesFlashCartWidget .flashCartInfo h2 {
+  margin-top: 0;
+}
+
+#vesFlashCartWidget .flashCartInfo > div:first-child {
+  width: 70%;
+}
+#vesFlashCartWidget .flashCartInfo > div:nth-child(2) {
+  padding-left: calc(var(--theia-ui-padding) * 2);
+  width: 30%;
+}
+
+#vesFlashCartWidget .flashCartInfo > div:first-child > div {
   margin: var(--theia-ui-padding) 0;
   padding-left: 24px;
   position: relative;
 }
 
-#vesFlashCartWidget .flashCartInfo div i {
+#vesFlashCartWidget .flashCartInfo > div:first-child > div > i {
   left: 0;
   position: absolute;
   top: 1px;
 }
 
-#vesFlashCartWidget .cartImgWrapper {
-  background: rgba(0, 0, 0, 0.2);
-  margin-bottom: calc(var(--theia-ui-padding) * 2);
-  padding: calc(var(--theia-ui-padding) * 2);
-  text-align: center;
-}
-
-#vesFlashCartWidget .cartImgWrapper img {
+#vesFlashCartWidget .flashCartInfo img {
   max-width: 100%;
-  width: 200px;
+  width: 150px;
 }
 
 #vesFlashCartWidget .flashingPanel {
   margin-bottom: calc(var(--theia-ui-padding) * 2);
 }
 
-#vesFlashCartWidget .flashLogWrapper {
-  margin-bottom: calc(var(--theia-ui-padding) * 2);
+#vesFlashCartWidget .flashLogWrapper button {
+  margin: calc(var(--theia-ui-padding) * 2) 0;
 }
 
 #vesFlashCartWidget .flashLog {
   background: rgba(0, 0, 0, 0.2);
   font-size: 80%;
-  margin-top: calc(var(--theia-ui-padding) * 2);
+  margin: 0;
   max-height: 300px;
   overflow: auto;
   padding: calc(var(--theia-ui-padding) * 2);
