@@ -82,7 +82,7 @@
       "frontendElectron": "lib/updater/electron-browser/ves-updater-frontend-module"
     },
     {
-      "frontend": "lib/zoom/browser/ves-zoom-frontend-module"
+      "frontendElectron": "lib/zoom/electron-browser/ves-zoom-frontend-module"
     }
   ],
   "keywords": [
