@@ -1,6 +1,6 @@
 import * as React from '@theia/core/shared/react';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { remote } from '@theia/core/shared/electron'; /* eslint-disable-line */
+import { remote } from '@theia/core/shared/electron';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { isOSX, isWindows } from '@theia/core';

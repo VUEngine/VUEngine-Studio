@@ -1,5 +1,5 @@
 import { injectable } from '@theia/core/shared/inversify';
-import { app, BrowserWindow, nativeImage, TouchBar } from '@theia/core/shared/electron'; /* eslint-disable-line */
+import { app, BrowserWindow, nativeImage, TouchBar } from '@theia/core/shared/electron';
 import { ElectronMainApplication, TheiaBrowserWindowOptions } from '@theia/core/lib/electron-main/electron-main-application';
 import { isOSX, MaybePromise } from '@theia/core';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';

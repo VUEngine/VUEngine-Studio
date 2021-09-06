@@ -1,4 +1,4 @@
-import { remote } from '@theia/core/shared/electron'; /* eslint-disable-line */
+import { remote } from '@theia/core/shared/electron';
 import * as React from '@theia/core/shared/react';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';

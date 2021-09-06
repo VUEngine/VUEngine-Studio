@@ -28,13 +28,18 @@
     font-style: italic;
 }
 
-.ves-welcome-section a {
+.ves-welcome-container a {
     border: none;
+    cursor: pointer;
     font-weight: 500;
     text-decoration: none;
 }
 
-.ves-welcome-section a:hover {
+.ves-welcome-container .theia-button:first-child {
+    margin-left: 0;
+}
+
+.ves-welcome-container a:hover {
     text-decoration: underline;
 }
 

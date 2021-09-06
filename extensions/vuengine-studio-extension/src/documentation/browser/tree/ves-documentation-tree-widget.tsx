@@ -68,7 +68,7 @@ export class VesDocumentationTreeWidget extends TreeWidget {
     };
 
     const handbookIndexUri = new URI(await this.vesDocumentationService.getHandbookIndex());
-    const handbookIndexContents = await this.fileService.readFile(handbookIndexUri); /* eslint-disable-line */
+    const handbookIndexContents = await this.fileService.readFile(handbookIndexUri);
     const handbookIndex = JSON.parse(handbookIndexContents.value.toString());
 
     for (const index in handbookIndex) {

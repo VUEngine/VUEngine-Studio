@@ -1,4 +1,4 @@
-import { remote } from '@theia/core/shared/electron'; /* eslint-disable-line */
+import { remote } from '@theia/core/shared/electron';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { CommandContribution, CommandRegistry } from '@theia/core/lib/common/command';
 import { MenuContribution, MenuModelRegistry } from '@theia/core/lib/common/menu';
