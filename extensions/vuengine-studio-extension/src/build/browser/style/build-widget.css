@@ -70,6 +70,9 @@
 #vesBuildWidget .buildStatus .success {
   color: #4aa94e;
 }
+#vesBuildWidget .buildStatus .warning {
+  color: yellow;
+}
 #vesBuildWidget .buildStatus .error {
   color: red;
 }

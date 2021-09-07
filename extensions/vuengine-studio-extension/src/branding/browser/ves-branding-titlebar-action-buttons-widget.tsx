@@ -75,6 +75,12 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
         });
     }
 
+    protected getProgressBarColor(): string {
+        return this.vesBuildService.getNumberOfWarnings() > 0
+            ? 'yellow'
+            : 'var(--theia-progressBar-background)';
+    }
+
     protected render(): React.ReactNode {
         const buildMode = this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode;
         const requireSingleOpen = isOSX || !environment.electron.is();
@@ -122,8 +128,11 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                                 ? ' error'
                                 : '')}
                     style={this.vesBuildService.buildStatus.active ? {
-                        backgroundImage: 'linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) '
-                            + this.vesBuildService.buildStatus.progress + '%, var(--theia-titleBar-hoverButtonBackground) ' + this.vesBuildService.buildStatus.progress + '%)'
+                        backgroundImage: `linear-gradient(
+                            90deg, 
+                            ${this.getProgressBarColor()} 0%, 
+                            ${this.getProgressBarColor()} ${this.vesBuildService.buildStatus.progress}%, 
+                            var(--theia-titleBar-hoverButtonBackground) ${this.vesBuildService.buildStatus.progress}%)`
                     } : {}}
                     title={this.vesBuildService.buildStatus.active
                         ? 'Building... ' + this.vesBuildService.buildStatus.progress + '%'

@@ -34,6 +34,9 @@
 /* #ves-titlebar-action-buttons .theia-button.build.success {
   background-color: var(--theia-progressBar-background);
 } */
+#ves-titlebar-action-buttons .theia-button.build.warning {
+  background-color: yellow;
+}
 #ves-titlebar-action-buttons .theia-button.build.error {
   background-color: red;
 }

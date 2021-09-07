@@ -4,7 +4,7 @@ export namespace VesZoomPreferenceIds {
     export const CATEGORY = 'window';
 
     export const ZOOM_LEVEL = [CATEGORY, 'zoomLevel'].join('.');
-    export const SHOW_STATUS_BAR_ENTRY = [CATEGORY, 'showZoomStatusBarEntry'].join('.');
+    export const SHOW_STATUS_BAR_ENTRY = [CATEGORY, 'showZoomInStatusBar'].join('.');
 }
 
 export const VesZoomPreferenceSchema: PreferenceSchema = {

@@ -211,11 +211,24 @@ export class VesBuildService {
     }
   }
 
+  getNumberOfWarnings(): number {
+    return this.buildStatus.log.filter(
+      l => l.type === BuildLogLineType.Warning
+    ).length;
+  }
+
+  getNumberOfErrors(): number {
+    return this.buildStatus.log.filter(
+      l => l.type === BuildLogLineType.Error
+    ).length;
+  }
+
   protected bindEvents(): void {
     // @ts-ignore
     this.vesProcessWatcher.onError(async ({ pId }) => {
       if (this.buildStatus.processManagerId === pId) {
         await this.resetBuildStatus(BuildResult.failed);
+        this.commandService.executeCommand(VesBuildCommands.TOGGLE_WIDGET.id, true);
       }
     });
 
@@ -226,6 +239,9 @@ export class VesBuildService {
           ? BuildResult.done
           : BuildResult.failed
         );
+        if (event.code !== 0) {
+          this.commandService.executeCommand(VesBuildCommands.TOGGLE_WIDGET.id, true);
+        }
       }
     });
 
