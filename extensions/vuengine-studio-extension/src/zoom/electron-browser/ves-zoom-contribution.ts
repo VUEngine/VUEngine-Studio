@@ -86,9 +86,6 @@ export class VesZoomContribution implements CommandContribution, KeybindingContr
     }
 
     protected setZoomFactor(zoomFactor: number): void {
-        const currentWindow = remote.getCurrentWindow();
-        currentWindow.webContents.setZoomFactor(zoomFactor);
-
         this.preferenceService.set(
             VesZoomPreferenceIds.ZOOM_LEVEL,
             this.fromZoomFactor(zoomFactor),
@@ -97,8 +94,9 @@ export class VesZoomContribution implements CommandContribution, KeybindingContr
     }
 
     protected applyConfiguredZoomFactor(): void {
-        const currentZoomFactor = this.toZoomFactor(this.preferenceService.get(VesZoomPreferenceIds.ZOOM_LEVEL) as string);
-        this.setZoomFactor(currentZoomFactor);
+        const zoomFactor = this.toZoomFactor(this.preferenceService.get(VesZoomPreferenceIds.ZOOM_LEVEL) as string);
+        const currentWindow = remote.getCurrentWindow();
+        currentWindow.webContents.setZoomFactor(zoomFactor);
     }
 
     protected toZoomFactor(value: string): number {

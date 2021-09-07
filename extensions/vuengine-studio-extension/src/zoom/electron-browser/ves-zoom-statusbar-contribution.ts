@@ -27,14 +27,14 @@ export class VesZoomStatusBarContribution implements FrontendApplicationContribu
         const zoomLevel = this.preferenceService.get(VesZoomPreferenceIds.ZOOM_LEVEL) as string;
         const zoomLevelInt = parseInt(zoomLevel.replace('%', ''));
 
-        if (!show) {
+        if (!show || zoomLevelInt === 100) {
             this.statusBar.removeElement('ves-zoom-factor');
         } else {
-            const icon = (zoomLevelInt === 100)
-                ? 'search'
-                : (zoomLevelInt < 100)
-                    ? 'search-minus'
-                    : 'search-plus';
+            const icon = (zoomLevelInt < 100)
+                ? 'search-minus'
+                : (zoomLevelInt > 100)
+                    ? 'search-plus'
+                    : 'search';
 
             this.statusBar.setElement('ves-zoom-factor', {
                 alignment: StatusBarAlignment.LEFT,

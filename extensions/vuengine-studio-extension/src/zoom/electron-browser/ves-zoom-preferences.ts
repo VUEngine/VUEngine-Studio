@@ -3,9 +3,7 @@ import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-
 export namespace VesZoomPreferenceIds {
     export const CATEGORY = 'window';
 
-    // TODO: unregister window.zoomLevel preference, then rename this
-    // https://github.com/eclipse-theia/theia/discussions/9144
-    export const ZOOM_LEVEL = [CATEGORY, 'zoomLevel2'].join('.');
+    export const ZOOM_LEVEL = [CATEGORY, 'zoomLevel'].join('.');
     export const SHOW_STATUS_BAR_ENTRY = [CATEGORY, 'showZoomStatusBarEntry'].join('.');
 }
 
@@ -37,7 +35,7 @@ export const VesZoomPreferenceSchema: PreferenceSchema = {
         [VesZoomPreferenceIds.SHOW_STATUS_BAR_ENTRY]: {
             type: 'boolean',
             label: 'Status Bar Entry',
-            description: 'Show zoom level in status bar.',
+            description: 'Show zoom level in status bar (only when not 100%).',
             default: false
         },
     },
