@@ -271,8 +271,8 @@ export class VesBuildWidget extends ReactWidget {
                     {this.vesBuildService.buildStatus.step}...
                   </div>
                 ) : this.vesBuildService.buildStatus.step === BuildResult.done ? (
-                  <div className={this.vesBuildService.getNumberOfWarnings() >= 0 ? 'warning' : 'success'}>
-                    <i className='fa fa-check'></i> Build successful {this.vesBuildService.getNumberOfWarnings() >= 0 && '(with warnings)'}
+                  <div className={this.vesBuildService.getNumberOfWarnings() > 0 ? 'warning' : 'success'}>
+                    <i className='fa fa-check'></i> Build successful {this.vesBuildService.getNumberOfWarnings() > 0 && '(with warnings)'}
                   </div>
                 ) : (
                   <div className='error'>

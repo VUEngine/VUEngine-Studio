@@ -11,7 +11,7 @@ export class VesColorContribution implements ColorContribution {
         defaults: {
           dark: Color.darken('titleBar.activeBackground', 0.3),
           light: Color.darken('titleBar.activeBackground', 0.3),
-          hc: Color.darken('titleBar.activeBackground', 0.3)
+          hc: '#000'
         },
         description: 'Background of title bar buttons'
       },
@@ -20,7 +20,7 @@ export class VesColorContribution implements ColorContribution {
         defaults: {
           dark: Color.darken('titleBar.activeBackground', 0.6),
           light: Color.darken('titleBar.activeBackground', 0.6),
-          hc: Color.darken('titleBar.activeBackground', 0.6)
+          hc: '#000',
         },
         description: 'Background of title bar buttons when hovered over'
       }
