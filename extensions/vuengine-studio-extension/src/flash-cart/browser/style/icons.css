@@ -1,3 +1,14 @@
-.p-TabBar.theia-app-sides .p-TabBar-tabIcon.iconFlashCart {
+.p-TabBar-tabIcon.iconFlashCart {
     -webkit-mask-image: url(../images/flash-cart.svg);
+}
+
+#ves-titlebar-action-buttons .theia-button .iconFlashCart {
+    align-self: center;
+    background-color: #fff;
+    display: inline-block;
+    height: 19px;
+    margin-bottom: -4px;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 19px;
+    width: 19px !important;
 }
