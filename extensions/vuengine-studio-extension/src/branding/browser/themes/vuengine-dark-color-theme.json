@@ -9,6 +9,7 @@
 		"extensionBadge.remoteBackground": "#d31422",
 		"inputOption.activeBorder": "#d31422",
 		"inputValidation.infoBorder": "#d31422",
+		"list.activeSelectionBackground": "#d3142220",
 		"menu.selectionBackground": "#d31422",
 		"menu.separatorBackground": "#555555",
 		"peekView.border": "#d31422",

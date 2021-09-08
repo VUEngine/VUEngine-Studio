@@ -1,7 +1,12 @@
-.p-TabBar-tabIcon.iconFlashCart {
+.iconFlash {
+    -webkit-mask-image: url(../images/flash.svg);
+}
+
+.iconFlashCart {
     -webkit-mask-image: url(../images/flash-cart.svg);
 }
 
+.p-TabBar.theia-app-sides .p-TabBar-tabIcon.iconFlash,
 .p-TabBar.theia-app-sides .p-TabBar-tabIcon.iconFlashCart {
     -webkit-mask-size: calc(var(--theia-private-sidebar-icon-size) - 4px) !important;
 }

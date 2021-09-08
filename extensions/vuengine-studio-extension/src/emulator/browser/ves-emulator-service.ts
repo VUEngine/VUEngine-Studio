@@ -87,10 +87,11 @@ export class VesEmulatorService {
     const emulatorConfigs = this.getEmulatorConfigs();
 
     for (const emulatorConfig of emulatorConfigs) {
+      const detail = this.shorten(emulatorConfig.args, 98);
       quickPickItems.push({
         label: emulatorConfig.name,
         description: emulatorConfig.path,
-        detail: this.shorten(emulatorConfig.args, 98),
+        detail: detail ? `   ${detail} ` : '',
         iconClasses: (emulatorConfig.name === defaultEmulator) ? ['fa', 'fa-check-square-o'] : ['fa', 'fa-square-o'],
       });
     }

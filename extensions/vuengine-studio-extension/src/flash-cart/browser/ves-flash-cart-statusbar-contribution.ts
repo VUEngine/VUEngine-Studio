@@ -41,7 +41,7 @@ export class VesFlashCartStatusBarContribution implements FrontendApplicationCon
             command: VesFlashCartCommands.OPEN_WIDGET.id,
             className: className,
             priority: 1,
-            text: `$(window-maximize fa-flip-vertical) ${label}`,
+            text: `$(microchip) ${label}`,
             tooltip: 'Connected Flash Carts'
         });
     }
