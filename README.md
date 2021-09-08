@@ -29,6 +29,13 @@ They can be updated at a later point with
 Documentation on how to package Theia as a Desktop Product may be found [here](https://theia-ide.org/docs/blueprint_documentation/)
 
 
+### Prerequisites
+
+Make sure you're using node 12.14.1.
+
+    nvm use 12.14.1
+
+
 ### Build
 
     yarn --ignore-engines

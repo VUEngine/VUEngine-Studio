@@ -6,6 +6,7 @@ export namespace VesProjectsPreferenceIds {
     export const CATEGORY = 'projects';
 
     export const BASE_FOLDER = [CATEGORY, 'baseFolder'].join('.');
+    export const AUTHOR = [CATEGORY, 'author'].join('.');
     export const MAKER_CODE = [CATEGORY, 'makerCode'].join('.');
 }
 
@@ -16,6 +17,11 @@ export const VesProjectsPreferenceSchema: PreferenceSchema = {
             type: 'string',
             description: 'Base folder for new projects.',
             default: joinPath(homedir(), 'vuengine', 'projects'),
+        },
+        [VesProjectsPreferenceIds.AUTHOR]: {
+            type: 'string',
+            description: 'Default author name to use for new projects.',
+            default: 'VUEngine Studio',
         },
         [VesProjectsPreferenceIds.MAKER_CODE]: {
             type: 'string',

@@ -20,5 +20,5 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     // new project dialog
     bind(VesNewProjectDialog).toSelf().inSingletonScope();
-    bind(VesNewProjectDialogProps).toConstantValue({ title: 'New Project' });
+    bind(VesNewProjectDialogProps).toConstantValue({ title: 'Create New Project' });
 });

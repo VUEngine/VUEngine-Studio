@@ -15,6 +15,8 @@ export interface VesNewProjectFormComponentProps {
 
 export interface VesNewProjectFormComponentState {
     name: string
+    author: string
+    makerCode: string
     template: number
     path: string
     folder: string,
@@ -50,6 +52,8 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
     protected fileDialogService: FileDialogService;
     protected preferenceService: PreferenceService;
 
+    protected nameInputComponentRef: React.RefObject<HTMLInputElement> = React.createRef();
+
     constructor(props: VesNewProjectFormComponentProps) {
         super(props);
 
@@ -58,17 +62,33 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
         this.preferenceService = props.preferenceService;
 
         this.state = {
-            name: '',
+            name: 'My Project',
             template: 0,
-            path: this.removeTrailingSlash(this.preferenceService.get(VesProjectsPreferenceIds.BASE_FOLDER) as string),
-            folder: 'new-project',
+            author: '',
+            makerCode: '',
+            path: '',
+            folder: 'my-project',
             isCreating: false
         };
 
+        this.preferenceService.ready.then(() => this.setStateFromPreferences());
+
         this.preferenceService.onPreferenceChanged(({ preferenceName, newValue }) => {
-            if (preferenceName === VesProjectsPreferenceIds.BASE_FOLDER) {
-                this.setState({ path: this.removeTrailingSlash(newValue) });
+            switch (preferenceName) {
+                case VesProjectsPreferenceIds.BASE_FOLDER:
+                case VesProjectsPreferenceIds.AUTHOR:
+                case VesProjectsPreferenceIds.MAKER_CODE:
+                    this.setStateFromPreferences();
+                    break;
             }
+        });
+    }
+
+    protected setStateFromPreferences(): void {
+        this.setState({
+            author: this.preferenceService.get(VesProjectsPreferenceIds.AUTHOR) as string,
+            makerCode: this.preferenceService.get(VesProjectsPreferenceIds.MAKER_CODE) as string,
+            path: this.removeTrailingSlash(this.preferenceService.get(VesProjectsPreferenceIds.BASE_FOLDER) as string),
         });
     }
 
@@ -82,7 +102,38 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                 value={this.state.name}
                 onChange={this.updateName}
                 disabled={this.state.isCreating}
+                tabIndex={1}
+                ref={this.nameInputComponentRef}
             />
+            <br />
+            <div style={{ display: 'flex' }}>
+                <div style={{ flexGrow: 1, paddingRight: 8 }}>
+                    <div className="ves-new-project-input-label">Author</div>
+                    <input
+                        type="text"
+                        className="theia-input"
+                        value={this.state.author}
+                        onChange={this.updateAuthor}
+                        disabled={this.state.isCreating}
+                        style={{ boxSizing: 'border-box', width: '100%' }}
+                        tabIndex={2}
+                    />
+                </div>
+                <div>
+                    <div className="ves-new-project-input-label">Maker Code</div>
+                    <input
+                        type="text"
+                        className="theia-input"
+                        value={this.state.makerCode}
+                        onChange={this.updateMakerCode}
+                        disabled={this.state.isCreating}
+                        size={2}
+                        maxLength={2}
+                        minLength={2}
+                        tabIndex={3}
+                    />
+                </div>
+            </div>
             <br />
             <div className="ves-new-project-input-label">Path</div>
             <div style={{ display: 'flex' }}>
@@ -94,6 +145,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                     size={this.state.path.length}
                     style={{ fontFamily: 'monospace', maxWidth: 332 }}
                     disabled={this.state.isCreating}
+                    tabIndex={4}
                 />
                 <span className="ves-new-project-path-separator">
                     {sep}
@@ -105,12 +157,14 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                     onChange={this.updatePathName}
                     style={{ flexGrow: 1, fontFamily: 'monospace' }}
                     disabled={this.state.isCreating}
+                    tabIndex={5}
                 />
                 <button
                     className="theia-button secondary"
                     onClick={() => this.selectProjectFolder()}
                     style={{ minWidth: 40 }}
                     disabled={this.state.isCreating}
+                    tabIndex={6}
                 >
                     <i
                         style={{ fontSize: 16, verticalAlign: 'bottom' }}
@@ -128,6 +182,8 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                         data-template={VES_NEW_PROJECT_TEMPLATES[this.state.template].id}
                         className={`ves-new-project-template ves-new-project-template-${template.id}${selected}`}
                         onClick={() => this.updateTemplate(index)}
+                        onFocus={() => this.updateTemplate(index)}
+                        tabIndex={7 + index}
                     ></div>;
                 })}
             </div>
@@ -143,6 +199,14 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
     protected updateName = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({
         name: e.currentTarget.value,
         folder: this.getPathName(e.currentTarget.value),
+    });
+
+    protected updateAuthor = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({
+        author: e.currentTarget.value,
+    });
+
+    protected updateMakerCode = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({
+        makerCode: e.currentTarget.value,
     });
 
     protected updateTemplate = (index: number) => this.setState({
@@ -183,7 +247,12 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
         }
     }
 
-    removeTrailingSlash(string: string): string {
+    protected removeTrailingSlash(string: string): string {
         return string.replace(/\/$/, '');
+    }
+
+    focusNameInput(): void {
+        // TODO: why is this not working?
+        this.nameInputComponentRef.current?.select();
     }
 }

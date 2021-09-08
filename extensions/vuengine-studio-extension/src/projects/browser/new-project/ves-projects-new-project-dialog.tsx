@@ -7,11 +7,11 @@ import { Message } from '@theia/core/lib/browser/widgets/widget';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import { Key, PreferenceService } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';
 import { VesNewProjectFormComponent, VES_NEW_PROJECT_TEMPLATES } from './ves-projects-new-project-form';
 import { VesProjectsPreferenceIds } from '../ves-projects-preferences';
+import { VesProjectsService } from '../ves-projects-service';
 
 @injectable()
 export class VesNewProjectDialogProps extends DialogProps {
@@ -19,19 +19,18 @@ export class VesNewProjectDialogProps extends DialogProps {
 
 @injectable()
 export class VesNewProjectDialog extends ReactDialog<void> {
-
-    @inject(EnvVariablesServer)
-    protected readonly envVariablesServer: EnvVariablesServer;
     @inject(FileService)
     protected readonly fileService: FileService;
     @inject(FileDialogService)
     protected readonly fileDialogService: FileDialogService;
     @inject(PreferenceService)
     protected readonly preferenceService: PreferenceService;
+    @inject(VesProjectsService)
+    protected readonly vesProjectsService: VesProjectsService;
     @inject(WorkspaceService)
     protected readonly workspaceService: WorkspaceService;
 
-    protected createProjectFormComponent: React.RefObject<VesNewProjectFormComponent> = React.createRef();
+    protected createProjectFormComponentRef: React.RefObject<VesNewProjectFormComponent> = React.createRef();
     protected isCreating: boolean = false;
 
     constructor(
@@ -39,12 +38,15 @@ export class VesNewProjectDialog extends ReactDialog<void> {
         protected readonly props: VesNewProjectDialogProps
     ) {
         super({
-            title: 'New Project',
+            title: 'Create New Project',
             maxWidth: 600
         });
 
         this.appendCloseButton();
         this.appendAcceptButton('Create');
+
+        // this.closeButton?.tabIndex = 11;
+        // this.acceptButton?.tabIndex = 12;
     }
 
     @postConstruct()
@@ -67,7 +69,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
             fileService={this.fileService}
             fileDialogService={this.fileDialogService}
             preferenceService={this.preferenceService}
-            ref={this.createProjectFormComponent}
+            ref={this.createProjectFormComponentRef}
         />;
     }
 
@@ -83,7 +85,9 @@ export class VesNewProjectDialog extends ReactDialog<void> {
 
         this.setStatusMessage(`${spinnerIcon} Verifying...`);
 
-        const name = this.createProjectFormComponent.current?.state.name;
+        const name = this.createProjectFormComponentRef.current?.state.name;
+        const author = this.createProjectFormComponentRef.current?.state.author || '';
+        const makerCode = this.createProjectFormComponentRef.current?.state.makerCode || '';
 
         if (!name) {
             this.setIsCreating(false);
@@ -92,9 +96,9 @@ export class VesNewProjectDialog extends ReactDialog<void> {
         }
 
         const projectsBaseFolder = this.preferenceService.get(VesProjectsPreferenceIds.BASE_FOLDER) as string;
-        const path = this.createProjectFormComponent.current?.state.path ?? projectsBaseFolder;
-        const pathUri = new URI(path);
-        const pathExists = await this.fileService.exists(pathUri) && (await this.fileService.resolve(pathUri)).isDirectory;
+        const basePath = this.createProjectFormComponentRef.current?.state.path ?? projectsBaseFolder;
+        const basePathUri = new URI(basePath);
+        const pathExists = await this.fileService.exists(basePathUri) && (await this.fileService.resolve(basePathUri)).isDirectory;
 
         if (!pathExists) {
             this.setIsCreating(false);
@@ -104,36 +108,39 @@ export class VesNewProjectDialog extends ReactDialog<void> {
 
         this.setStatusMessage(`${spinnerIcon} Setting up new project...`);
 
-        const templateIndex = this.createProjectFormComponent.current?.state.template ?? 0;
+        const templateIndex = this.createProjectFormComponentRef.current?.state.template ?? 0;
         const template = VES_NEW_PROJECT_TEMPLATES[templateIndex];
-        const folder = this.createProjectFormComponent.current?.state.folder ?? 'new-project';
+        const folder = this.createProjectFormComponentRef.current?.state.folder ?? 'new-project';
+        const newProjectPath = joinPath(basePath, folder);
+        const newProjectPathUri = new URI(newProjectPath);
 
-        const templateFolderUri = new URI(await this.getTemplateFolder(template.id));
-        const newProjectFolderUri = new URI(joinPath(path, folder));
-
-        await this.fileService.copy(templateFolderUri, newProjectFolderUri);
-
-        // TODO: adjust new folder with custom name and maker code
+        const response = await this.vesProjectsService.createProjectFromTemplate(
+            template.id,
+            newProjectPath,
+            name,
+            author,
+            makerCode,
+        );
+        if (response !== true) {
+            this.setIsCreating(false);
+            this.setStatusMessage(`${warningIcon} ${response}`);
+            return;
+        }
 
         await this.accept();
-        this.workspaceService.open(newProjectFolderUri);
+        this.workspaceService.open(newProjectPathUri);
     }
 
     protected onAfterAttach(msg: Message): void {
         super.onAfterAttach(msg);
         this.update();
-    }
-
-    protected async getTemplateFolder(template: string): Promise<string> {
-        const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
-        const applicationPath = envVar && envVar.value ? envVar.value : '';
-        return joinPath(applicationPath, 'vuengine', template);
+        this.createProjectFormComponentRef.current?.focusNameInput();
     }
 
     protected setIsCreating(isCreating: boolean): void {
         this.isCreating = isCreating;
 
-        this.createProjectFormComponent.current?.setState({
+        this.createProjectFormComponentRef.current?.setState({
             isCreating: isCreating
         });
 

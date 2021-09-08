@@ -14,8 +14,8 @@
     "@theia/monaco": "^1.17.2",
     "@theia/navigator": "^1.17.2",
     "@theia/output": "1.17.2",
-    "@theia/plugin-ext": "1.17.2",
     "@theia/plugin-ext-vscode": "^1.17.2",
+    "@theia/plugin-ext": "1.17.2",
     "@theia/preferences": "^1.17.2",
     "@theia/preview": "1.17.2",
     "@theia/process": "^1.17.2",
@@ -29,6 +29,7 @@
     "electron": "^9.3.2",
     "filenamify": "^4.3.0",
     "glob": "^7.1.7",
+    "replace-in-files": "^3.0.0",
     "rimraf": "^2.7.1",
     "sanitize-filename": "^1.6.3",
     "sanitize-html": "^2.3.2",
@@ -102,12 +103,12 @@
     "src"
   ],
   "scripts": {
-    "prepare": "yarn clean && yarn build",
-    "clean": "rimraf lib *.tsbuildinfo",
     "build": "tsc -b",
-    "watch": "tsc -w",
+    "clean": "rimraf lib *.tsbuildinfo",
+    "lint:fix": "eslint --ext js,jsx,ts,tsx src --fix",
     "lint": "eslint --ext js,jsx,ts,tsx src",
-    "lint:fix": "eslint --ext js,jsx,ts,tsx src --fix"
+    "prepare": "yarn clean && yarn build",
+    "watch": "tsc -w"
   },
   "peerDependencies": {
     "react": "^16.8.0"
