@@ -9,6 +9,7 @@ import { ConnectedFlashCart } from './ves-flash-cart-types';
 import { VesFlashCartService } from './ves-flash-cart-service';
 import { VesFlashCartPreferenceIds, VesFlashCartPreferenceSchema } from './ves-flash-cart-preferences';
 import { IMAGE_HYPERFLASH32_LABEL } from './images/hyperflash32-label';
+import { NO_FLASH_CARTS } from './images/no-flash-carts';
 
 @injectable()
 export class VesFlashCartWidget extends ReactWidget {
@@ -192,17 +193,20 @@ export class VesFlashCartWidget extends ReactWidget {
     ) : (
 
       <div className="theia-alert-message-container">
-        <div className="theia-warning-alert">
-          <div className="theia-message-header">
-            <i className="fa fa-exclamation-circle"></i>&nbsp;
-            No flash carts found
-          </div>
-          <div className="theia-message-content">
+        <div className='flashCart'>
+          <div className='flashCartInfo'>
+            <div>
+              <h2>No flash carts found</h2>
+              <p>Connect your Virtual Boy flash cart(s) to your computer via USB.</p>
+              <p>You can connect, and flash to, any number of flash carts at once.</p>
+            </div>
+            <div>
+              <img src={NO_FLASH_CARTS} />
+            </div>
           </div>
         </div>
-        <p>Connect your Virtual Boy flash cart(s) to your computer via USB.</p>
-        <p>You can connect, and flash to, any number of flash carts at once.</p>
-      </div >
+
+      </div>
 
     );
   }
