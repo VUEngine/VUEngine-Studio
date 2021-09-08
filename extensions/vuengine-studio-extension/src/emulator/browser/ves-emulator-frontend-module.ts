@@ -10,6 +10,7 @@ import { VesEmulatorService } from './ves-emulator-service';
 import { VesEmulatorViewContribution } from './ves-emulator-view';
 import { VesEmulatorWidget, VesEmulatorWidgetOptions } from './widget/ves-emulator-widget';
 import '../../../src/emulator/browser/style/index.css';
+import { VesEmulatorStatusBarContribution } from './ves-emulator-statusbar-contribution';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // preferences
@@ -20,6 +21,10 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(CommandContribution).toService(VesEmulatorContribution);
     bind(KeybindingContribution).toService(VesEmulatorContribution);
     bind(MenuContribution).toService(VesEmulatorContribution);
+
+    // status bar entry
+    bind(VesEmulatorStatusBarContribution).toSelf().inSingletonScope();
+    bind(FrontendApplicationContribution).toService(VesEmulatorStatusBarContribution);
 
     // emulator service
     bind(VesEmulatorService).toSelf().inSingletonScope();
