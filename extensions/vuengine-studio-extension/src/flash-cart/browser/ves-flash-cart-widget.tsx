@@ -27,8 +27,7 @@ export class VesFlashCartWidget extends ReactWidget {
   @postConstruct()
   protected async init(): Promise<void> {
     this.id = VesFlashCartWidget.ID;
-    this.title.iconClass = 'fa fa fa-microchip';
-    // this.title.iconClass = 'ves-flash-cart-tab-icon';
+    this.title.iconClass = 'iconFlashCart';
     this.title.closable = true;
     this.setTitle();
     this.node.tabIndex = 0; // required for this.node.focus() to work in this.onActivateRequest()
@@ -102,7 +101,7 @@ export class VesFlashCartWidget extends ReactWidget {
                   this.commandService.executeCommand(VesFlashCartCommands.FLASH.id)
                 }
               >
-                <i className='fa fa-microchip'></i> Flash
+                <i className='fa fa-bolt'></i> Flash
               </button>
             </>
           )}

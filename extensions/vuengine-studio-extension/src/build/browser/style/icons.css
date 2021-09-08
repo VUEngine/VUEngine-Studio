@@ -1,0 +1,3 @@
+.p-TabBar.theia-app-sides .p-TabBar-tabIcon.iconBuild {
+    -webkit-mask-image: url(../images/build.svg);
+}

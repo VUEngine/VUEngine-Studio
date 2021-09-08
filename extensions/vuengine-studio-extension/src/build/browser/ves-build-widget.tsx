@@ -43,7 +43,7 @@ export class VesBuildWidget extends ReactWidget {
   @postConstruct()
   protected async init(): Promise<void> {
     this.id = VesBuildWidget.ID;
-    this.title.iconClass = 'fa fa-wrench';
+    this.title.iconClass = 'iconBuild';
     this.title.closable = true;
     this.title.label = VesBuildWidget.LABEL;
     this.title.caption = VesBuildWidget.LABEL;
