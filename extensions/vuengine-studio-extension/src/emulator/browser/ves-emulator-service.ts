@@ -91,7 +91,7 @@ export class VesEmulatorService {
         label: emulatorConfig.name,
         description: emulatorConfig.path,
         detail: this.shorten(emulatorConfig.args, 98),
-        iconClasses: (emulatorConfig.name === defaultEmulator) ? ['fa', 'fa-check'] : [],
+        iconClasses: (emulatorConfig.name === defaultEmulator) ? ['fa', 'fa-check-square-o'] : ['fa', 'fa-square-o'],
       });
     }
 
