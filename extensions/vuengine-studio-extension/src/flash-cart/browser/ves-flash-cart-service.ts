@@ -274,7 +274,7 @@ export class VesFlashCartService {
     });
 
     this.vesProcessWatcher.onExit(({ pId }) => {
-      console.log('exit', pId);
+      // console.log('exit', pId);
       for (const connectedFlashCart of this.connectedFlashCarts) {
         if (connectedFlashCart.status.processId === pId) {
           // TODO: differenciate between done and error
@@ -298,7 +298,7 @@ export class VesFlashCartService {
     });
 
     this.vesProcessWatcher.onOutputStreamData(({ pId, data }) => {
-      console.log('data', pId, data);
+      // console.log('data', pId, data);
       for (const connectedFlashCart of this.connectedFlashCarts) {
         if (connectedFlashCart.status.processId === pId) {
           connectedFlashCart.status.log += data;
@@ -313,7 +313,7 @@ export class VesFlashCartService {
     });
 
     this.vesProcessWatcher.onErrorStreamData(({ pId, data }) => {
-      console.log('error data', pId, data);
+      // console.log('error data', pId, data);
       for (const connectedFlashCart of this.connectedFlashCarts) {
         if (connectedFlashCart.status.processId === pId) {
           connectedFlashCart.status.log += data;

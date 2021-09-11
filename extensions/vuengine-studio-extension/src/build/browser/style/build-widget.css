@@ -68,13 +68,13 @@
 }
 
 #vesBuildWidget .buildStatus .success {
-  color: #4aa94e;
+  color: var(--theia-editorSuccess-foreground);
 }
 #vesBuildWidget .buildStatus .warning {
-  color: yellow;
+  color: var(--theia-editorWarning-foreground);
 }
 #vesBuildWidget .buildStatus .error {
-  color: red;
+  color: var(--theia-editorError-foreground);
 }
 
 #vesBuildWidget .buildStatusMeta {
@@ -155,13 +155,13 @@
 }
 
 #vesBuildWidget .buildLogLine.warning {
-  color: yellow;
+  color: var(--theia-editorWarning-foreground);
 }
 
 #vesBuildWidget .buildLogLine.error {
-  color: red;
+  color: var(--theia-editorError-foreground);
 }
 
 #vesBuildWidget .buildLogLine.done {
-  color: #4aa94e;
+  color: var(--theia-editorSuccess-foreground);
 }

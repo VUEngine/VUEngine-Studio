@@ -32,13 +32,13 @@
   min-width: 64px;
 }
 /* #ves-titlebar-action-buttons .theia-button.build.success {
-  background-color: var(--theia-progressBar-background);
+  background-color: var(--theia-editorSuccess-foreground);
 } */
 #ves-titlebar-action-buttons .theia-button.build.warning {
-  background-color: yellow;
+  background-color: var(--theia-editorWarning-foreground);
 }
 #ves-titlebar-action-buttons .theia-button.build.error {
-  background-color: red;
+  background-color: var(--theia-editorError-foreground);
 }
 
 #ves-titlebar-action-buttons .theia-button.queued {

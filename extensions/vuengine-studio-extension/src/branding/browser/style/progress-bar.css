@@ -1,6 +1,6 @@
 .vesProgressBar {
     background: rgba(0, 0, 0, 0.2);
-    color: var(--theia-button-foreground);
+    color: var(--theia-progressBar-foreground);
     line-height: 32px;
     position: relative;
     text-align: center;
@@ -15,10 +15,11 @@
   }
 
   .vesProgressBar.withWarnings div {
-    background-color: yellow;
+    background-color: var(--theia-editorWarning-foreground);
   }
   
   .vesProgressBar span {
+    font-weight: bold;
     padding: 0 var(--theia-ui-padding);
     position: relative;
     z-index: 1;

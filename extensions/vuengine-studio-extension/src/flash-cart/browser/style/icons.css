@@ -13,7 +13,7 @@
 
 #ves-titlebar-action-buttons .theia-button .iconFlashCart {
     align-self: center;
-    background-color: #fff;
+    background-color: var(--theia-titleBar-activeForeground);
     display: inline-block;
     height: 19px;
     margin-bottom: -4px;

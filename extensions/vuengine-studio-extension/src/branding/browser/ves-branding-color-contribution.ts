@@ -7,6 +7,15 @@ export class VesColorContribution implements ColorContribution {
   registerColors(colors: ColorRegistry): void {
     colors.register(
       {
+        id: 'editorSuccess-foreground',
+        defaults: {
+          dark: '#4aa94e',
+          light: '#4aa94e',
+          hc: '#fff'
+        },
+        description: 'Background of title bar buttons'
+      },
+      {
         id: 'titleBar.buttonBackground',
         defaults: {
           dark: Color.darken('titleBar.activeBackground', 0.3),

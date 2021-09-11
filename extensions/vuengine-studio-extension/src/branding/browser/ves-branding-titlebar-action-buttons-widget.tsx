@@ -77,7 +77,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
 
     protected getProgressBarColor(): string {
         return this.vesBuildService.getNumberOfWarnings() > 0
-            ? 'yellow'
+            ? 'var(--theia-editorWarning-foreground)'
             : 'var(--theia-progressBar-background)';
     }
 
