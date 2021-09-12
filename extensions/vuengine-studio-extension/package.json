@@ -29,6 +29,7 @@
     "electron": "^9.3.2",
     "filenamify": "^4.3.0",
     "glob": "^7.1.7",
+    "nunjucks": "^3.2.3",
     "replace-in-files": "^3.0.0",
     "rimraf": "^2.7.1",
     "sanitize-filename": "^1.6.3",
@@ -39,6 +40,7 @@
   },
   "devDependencies": {
     "@types/usb": "^1.5.2",
+    "@types/nunjucks": "^3.1.5",
     "rimraf": "^2.7.1",
     "tslint": "^5.12.0",
     "typescript": "^3.9.2"
@@ -54,6 +56,9 @@
     },
     {
       "frontend": "lib/build/browser/ves-build-frontend-module"
+    },
+    {
+      "frontend": "lib/codegen/browser/ves-codegen-frontend-module"
     },
     {
       "frontend": "lib/documentation/browser/ves-documentation-frontend-module"

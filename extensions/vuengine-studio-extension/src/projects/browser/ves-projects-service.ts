@@ -27,9 +27,9 @@ export class VesProjectsService {
   @postConstruct()
   protected async init(): Promise<void> {
     // watch for project config file changes
-    // TODO: watch only respective file?
+    const configFileUri = new URI(this.getProjectConfigFilePath());
     this.fileService.onDidFilesChange((fileChangesEvent: FileChangesEvent) => {
-      if (fileChangesEvent.contains(new URI(this.getProjectConfigFilePath()))) {
+      if (fileChangesEvent.contains(configFileUri)) {
         this.onDidChangeProjectFileEmitter.fire();
       }
     });

@@ -7,7 +7,7 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import URI from '@theia/core/lib/common/uri';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
-import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
+import { FileChangesEvent, FileChangeType } from '@theia/filesystem/lib/common/files';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { ProcessOptions } from '@theia/process/lib/node';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
@@ -108,6 +108,12 @@ export class VesBuildService {
   get buildStatus(): BuildStatus {
     return this._buildStatus;
   }
+
+  protected readonly onDidBuildFailEmitter = new Emitter<void>();
+  readonly onDidBuildFail = this.onDidBuildFailEmitter.event;
+  protected readonly onDidBuildSucceedEmitter = new Emitter<void>();
+  readonly onDidBuildSucceed = this.onDidBuildSucceedEmitter.event;
+
   async resetBuildStatus(step?: string): Promise<void> {
     const newBuildStatus = {
       ...this.buildStatus,
@@ -121,10 +127,9 @@ export class VesBuildService {
     this.buildStatus = newBuildStatus;
 
     if (step !== BuildResult.done) {
-      // TODO
-      // this.isExportQueued = false;
-      // this.isRunQueued = false;
-      // this.isFlashQueued = false;
+      this.onDidBuildFailEmitter.fire();
+    } else {
+      this.onDidBuildSucceedEmitter.fire();
     }
   }
   pushBuildLogLine(buildLogLine: BuildLogLine): void {
@@ -161,26 +166,20 @@ export class VesBuildService {
     await this.resetBuildStatus();
 
     // watch for file changes
-    // TODO: watch only respective folders
-    // const cleanPath = joinPath(getWorkspaceRoot(), 'build', BuildMode.Release)
-    // const test = this.fileService.watch(new URI(cleanPath));
+    const romPathUri = new URI(this.getRomPath());
     this.fileService.onDidFilesChange((fileChangesEvent: FileChangesEvent) => {
       for (const buildMode in BuildMode) {
-        if (fileChangesEvent.contains(new URI(this.getBuildPath(buildMode)))) {
-          this.fileService
-            .exists(new URI(this.getBuildPath(buildMode)))
-            .then((exists: boolean) => {
-              this.setBuildFolderExists(buildMode, exists);
-            });
+        if (fileChangesEvent.contains(new URI(this.getBuildPath(buildMode))), FileChangeType.ADDED) {
+          this.setBuildFolderExists(buildMode, true);
+        } else if (fileChangesEvent.contains(new URI(this.getBuildPath(buildMode))), FileChangeType.DELETED) {
+          this.setBuildFolderExists(buildMode, false);
         }
       }
 
-      if (fileChangesEvent.contains(new URI(this.getRomPath()))) {
-        this.fileService
-          .exists(new URI(this.getRomPath()))
-          .then((exists: boolean) => {
-            this.outputRomExists = exists;
-          });
+      if (fileChangesEvent.contains(romPathUri, FileChangeType.ADDED)) {
+        this.outputRomExists = true;
+      } else if (fileChangesEvent.contains(romPathUri, FileChangeType.DELETED)) {
+        this.outputRomExists = false;
       }
     });
 
@@ -255,13 +254,16 @@ export class VesBuildService {
     this.vesProcessWatcher.onOutputStreamData(onData);
     this.vesProcessWatcher.onErrorStreamData(onData);
 
-    this.onDidChangeOutputRomExists(async outputRomExists => {
-      if (outputRomExists) {
-        const outputRom = await this.fileService.readFile(new URI(this.getRomPath()));
-        this.buildStatus.romSize = outputRom.size;
-      } else {
-        this.buildStatus.romSize = 0;
-      }
+    this.onDidBuildSucceed(async () => {
+      const outputRom = await this.fileService.readFile(new URI(this.getRomPath()));
+      this.buildStatus.romSize = outputRom.size;
+
+      // trigger change event
+      this.buildStatus = this.buildStatus;
+    });
+
+    this.onDidBuildFail(async () => {
+      this.buildStatus.romSize = 0;
 
       // trigger change event
       this.buildStatus = this.buildStatus;
@@ -558,7 +560,7 @@ export class VesBuildService {
     return envPath;
   }
 
-  protected async getEngineCorePath(): Promise<string> {
+  async getEngineCorePath(): Promise<string> {
     const defaultPath = joinPath(
       await this.getResourcesPath(),
       'vuengine',

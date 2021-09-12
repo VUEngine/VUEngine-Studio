@@ -11,27 +11,28 @@ import { VesProjectsService } from '../../projects/browser/ves-projects-service'
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
 import { DEFAULT_EMULATOR, EmulatorConfig } from './ves-emulator-types';
+import { VesCodegenService } from '../../codegen/browser/ves-codegen-service';
 
 @injectable()
 export class VesEmulatorService {
-  constructor(
-    @inject(ApplicationShell)
-    protected readonly shell: ApplicationShell,
-    @inject(CommandService)
-    protected readonly commandService: CommandService,
-    @inject(OpenerService)
-    private readonly openerService: OpenerService,
-    @inject(PreferenceService)
-    private readonly preferenceService: PreferenceService,
-    @inject(VesBuildService)
-    private readonly vesBuildService: VesBuildService,
-    @inject(VesProcessService)
-    private readonly vesProcessService: VesProcessService,
-    @inject(VesProjectsService)
-    protected readonly vesProjectsService: VesProjectsService,
-    @inject(QuickPickService)
-    private readonly quickPickService: QuickPickService,
-  ) { }
+  @inject(ApplicationShell)
+  protected readonly shell: ApplicationShell;
+  @inject(CommandService)
+  protected readonly commandService: CommandService;
+  @inject(OpenerService)
+  private readonly openerService: OpenerService;
+  @inject(PreferenceService)
+  private readonly preferenceService: PreferenceService;
+  @inject(VesBuildService)
+  private readonly vesBuildService: VesBuildService;
+  @inject(VesCodegenService)
+  protected readonly vesCodegenService: VesCodegenService;
+  @inject(VesProcessService)
+  private readonly vesProcessService: VesProcessService;
+  @inject(VesProjectsService)
+  protected readonly vesProjectsService: VesProjectsService;
+  @inject(QuickPickService)
+  private readonly quickPickService: QuickPickService;
 
   // is queued
   protected _isQueued: boolean = false;
@@ -121,11 +122,14 @@ export class VesEmulatorService {
   }
 
   bindEvents(): void {
-    this.vesBuildService.onDidChangeOutputRomExists(outputRomExists => {
-      if (outputRomExists && this.isQueued) {
+    this.vesBuildService.onDidBuildSucceed(() => {
+      if (this.isQueued) {
         this.isQueued = false;
         this.run();
       }
+    });
+    this.vesBuildService.onDidBuildFail(() => {
+      this.isQueued = false;
     });
   }
 
