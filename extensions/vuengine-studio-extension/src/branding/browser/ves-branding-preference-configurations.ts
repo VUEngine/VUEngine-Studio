@@ -1,11 +1,13 @@
 import { injectable } from '@theia/core/shared/inversify';
 import { PreferenceConfigurations } from '@theia/core/lib/browser/preferences/preference-configurations';
 
+export const VES_PREFERENCE_DIR = '.vuengine-studio';
+
 @injectable()
 export class VesPreferenceConfigurations extends PreferenceConfigurations {
     getPaths(): string[] {
         const paths = super.getPaths();
-        paths.unshift('.vuengine-studio');
+        paths.unshift(VES_PREFERENCE_DIR);
         return paths;
     }
 }

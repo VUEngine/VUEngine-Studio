@@ -7,6 +7,7 @@ import { isWindows } from '@theia/core';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
+import { VES_PREFERENCE_DIR } from '../../branding/browser/ves-branding-preference-configurations';
 
 const replaceInFiles = require('replace-in-files');
 
@@ -91,13 +92,13 @@ export class VesProjectsService {
       await this.fileService.copy(templatePathUri, targetPathUri);
 
       // read template fields mapping
-      const templateLabelMappingFileURI = new URI(joinPath(path, '.vuengine-studio', 'templateLabelMapping.json'));
+      const templateLabelMappingFileURI = new URI(joinPath(path, VES_PREFERENCE_DIR, 'templateLabelMapping.json'));
       const templateLabelMappingFileContents = await this.fileService.readFile(templateLabelMappingFileURI);
       const templateLabelMapping = JSON.parse(templateLabelMappingFileContents.value.toString());
 
       // delete unwanted files and folders
       // await this.fileService.delete(templateLabelMappingFileURI);
-      await this.fileService.delete(new URI(joinPath(path, '.vuengine-studio')), { recursive: true });
+      await this.fileService.delete(new URI(joinPath(path, VES_PREFERENCE_DIR)), { recursive: true });
       await this.fileService.delete(new URI(joinPath(path, '.github')), { recursive: true });
 
       // replace labels according to mapping file

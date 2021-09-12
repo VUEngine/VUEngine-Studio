@@ -7,6 +7,7 @@ import { isWindows } from '@theia/core';
 import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import { VesBuildService } from '../../build/browser/ves-build-service';
+import { VES_PREFERENCE_DIR } from '../../branding/browser/ves-branding-preference-configurations';
 import { registeredTemplate, registeredTemplateExtra, registeredTemplateTarget } from './ves-codegen-types';
 
 @injectable()
@@ -50,7 +51,7 @@ export class VesCodegenService {
 
     // TODO: support plugin and project level templates as well
     const templatesFileContent = await this.fileService.readFile(new URI(joinPath(
-      engineCorePath, '.vuengine-studio', 'templates.json'
+      engineCorePath, VES_PREFERENCE_DIR, 'templates.json'
     )));
     const templatesFileJson = JSON.parse(templatesFileContent.value.toString());
     for (const template of templatesFileJson) {
@@ -61,7 +62,7 @@ export class VesCodegenService {
       for (const target of template.targets) {
         targets.push({
           uri: new URI(joinPath(workspaceRoot, ...target.uri.split('/'))),
-          template: new URI(joinPath(engineCorePath, '.vuengine-studio', ...target.template.split('/')))
+          template: new URI(joinPath(engineCorePath, VES_PREFERENCE_DIR, ...target.template.split('/')))
         });
       }
 
