@@ -372,15 +372,12 @@ export class VesBuildService {
         cwd: workspaceRoot,
         env: {
           DUMP_ELF: dumpElf ? 1 : 0,
-          ENGINE_FOLDER: this.convertoToEnvPath(engineCorePath)
-            .replace(/\s/g, '\\ '), // escape whitespaces
+          ENGINE_FOLDER: this.convertoToEnvPath(engineCorePath),
           LC_ALL: 'C',
           MAKE_JOBS: this.getThreads(),
           PATH: [joinPath(compilerPath, 'bin'), process.env.PATH].join(':'),
-          PLUGINS_FOLDER: this.convertoToEnvPath(enginePluginsPath)
-            .replace(/\s/g, '\\ '), // escape whitespaces
-          USER_PLUGINS_FOLDER: this.convertoToEnvPath(userPluginsPath)
-            .replace(/\s/g, '\\ '), // escape whitespaces
+          PLUGINS_FOLDER: this.convertoToEnvPath(enginePluginsPath),
+          USER_PLUGINS_FOLDER: this.convertoToEnvPath(userPluginsPath),
           PRINT_PEDANTIC_WARNINGS: pedanticWarnings ? 1 : 0,
         },
       },

@@ -20,34 +20,23 @@
   }
 
   .loader {
-    width: 16vh;
-    margin: 0 auto;
-    border-radius: 10vh;
-    border: 0.4vh solid transparent;
-    position: relative;
-    padding: 0.2vh;
-    top: 68vh;
     animation: fadein 2s ease-out;
-  }
-
-  .loader:before {
-    content: '';
-    border: 0.1vh solid #666;
+    background: linear-gradient(90deg, #4e48bf 0%, #831f73 35%, #00d9ff 100%);
     border-radius: 10vh;
-    position: absolute;
-    top: -0.4vh;
-    right: -0.4vh;
-    bottom: -0.4vh;
-    left: -0.4vh;
+    margin: 0 auto;
+    padding: 0.3vh;
+    position: relative;
+    top: 67vh;
+    width: 16vh;
   }
 
   .loader .loaderBar {
-    position: absolute;
-    border-radius: 10vh;
-    top: 0;
-    bottom: 0;
-    background: #666;
     animation: loaderBar 6s linear infinite;
+    background: var(--theia-editor-background);
+    bottom: 0;
+    margin: .1vh;
+    position: absolute;
+    top: 0;
   }
 
   @keyframes fadein {
