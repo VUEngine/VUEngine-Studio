@@ -502,7 +502,10 @@ export class VesBuildService {
 
   // Converts function names Class_function to Class::function
   protected replaceFunctionNames(name: string): string {
-    return name.replace(/\'([a-zA-Z0-9]*)_([a-zA-Z0-9]*)\'/g, '"$1::$2"');
+    // TODO: Disabled this because we cannot be sure that what rename is
+    // actually a function name. Find a way to make sure it is!
+    // return name.replace(/\'([a-zA-Z0-9]*)_([a-zA-Z0-9]*)\'/g, '"$1::$2"');
+    return name;
   }
 
   protected async getMakefilePath(workspaceRoot: string, engineCorePath: string): Promise<string> {
