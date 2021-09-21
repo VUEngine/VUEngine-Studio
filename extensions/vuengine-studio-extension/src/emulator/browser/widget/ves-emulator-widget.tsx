@@ -285,6 +285,16 @@ export class VesEmulatorWidget extends ReactWidget {
             </button>
             <button
               className='theia-button secondary'
+              title='Toggle Slow Motion'
+              onClick={() =>
+                this.sendCommand('keyPress', EmulatorFunctionKeyCode.ToggleSlowmotion)
+              }
+              disabled={this.state.showControls}
+            >
+              <i className='fa fa-eject fa-rotate-90'></i>
+            </button>
+            <button
+              className='theia-button secondary'
               title='Frame Advance'
               onClick={() => {
                 this.state.status = 'paused';
