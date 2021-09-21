@@ -38,14 +38,13 @@ export class VesBuildWidget extends ReactWidget {
     logFilter: BuildLogLineType.Normal,
   };
 
+  protected buildLogLastElementRef = React.createRef<HTMLDivElement>();
+
   protected onUpdateRequest(msg: Message): void {
     super.onUpdateRequest(msg);
-    // TODO: only scroll into view if it already is in view,
-    // otherwise the user can't scroll in the logs which build is active
+    // TODO: the user can't currently scroll in the logs when build is active
     this.buildLogLastElementRef.current?.scrollIntoView();
   }
-
-  protected buildLogLastElementRef = React.createRef<HTMLDivElement>();
 
   @postConstruct()
   protected async init(): Promise<void> {

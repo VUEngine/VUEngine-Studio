@@ -5,7 +5,7 @@ import { Message } from '@theia/core/shared/@phosphor/messaging';
 import { CommandService } from '@theia/core';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { VesFlashCartCommands } from './ves-flash-cart-commands';
-import { ConnectedFlashCart } from './ves-flash-cart-types';
+import { ConnectedFlashCart, FlashLogLine } from './ves-flash-cart-types';
 import { VesFlashCartService } from './ves-flash-cart-service';
 import { VesFlashCartPreferenceIds, VesFlashCartPreferenceSchema } from './ves-flash-cart-preferences';
 import { IMAGE_HYPERFLASH32_LABEL } from './images/hyperflash32-label';
@@ -142,12 +142,23 @@ export class VesFlashCartWidget extends ReactWidget {
                       {connectedFlashCart.config.args}
                     </div>
                     {!connectedFlashCart.canHoldRom &&
-                      <div className="warning">
+                      <div className="infoPanel warning">
                         <i className='fa fa-fw fa-exclamation-triangle'></i>{' '}
                         Insufficient space to hold ROM
                         ({this.vesBuildService.bytesToMbit(this.vesBuildService.romSize)} MBit)
                       </div>
                     }
+                    {connectedFlashCart.status.progress === 100 ? (
+                      <div className='infoPanel success'>
+                        <i className='fa fa-fw fa-check'></i> Done
+                      </div>
+                    ) : connectedFlashCart.status.progress > -1 ? (
+                      <div className='infoPanel'>
+                        <i className='fa fa-fw fa-refresh fa-spin'></i>{' '}
+                        {connectedFlashCart.status.step}...{' '}
+                        {connectedFlashCart.status.progress}%
+                      </div>
+                    ) : <></>}
                   </div>
                   {connectedFlashCart.config.image && (
                     <div>
@@ -170,21 +181,7 @@ export class VesFlashCartWidget extends ReactWidget {
                   )}
                 </div>
 
-                <div className='flashingPanel'>
-                  {connectedFlashCart.status.progress === 100 ? (
-                    <>
-                      <i className='fa fa-fw fa-check'></i> Done
-                    </>
-                  ) : connectedFlashCart.status.progress > -1 ? (
-                    <>
-                      <i className='fa fa-fw fa-refresh fa-spin'></i>{' '}
-                      {connectedFlashCart.status.step}...{' '}
-                      {connectedFlashCart.status.progress}%
-                    </>
-                  ) : <></>}
-                </div>
-
-                {connectedFlashCart.status.log &&
+                {connectedFlashCart.status.log.length > 0 &&
                   <div className='flashLogWrapper'>
                     <button
                       className='theia-button secondary'
@@ -193,12 +190,28 @@ export class VesFlashCartWidget extends ReactWidget {
                       {this.state.showLog[index] ? 'Hide Log' : 'Show Log'}
                     </button>
                     {this.state.showLog[index] && (
-                      <pre className='flashLog'>
-                        {connectedFlashCart.status.log}
-                      </pre>
+                      <div className='flashLog'>
+                        <div>
+                          {connectedFlashCart.status.log.map(
+                            (line: FlashLogLine, idx: number) => (
+                              line.text !== ''
+                                ? <div className="flashLogLine" key={`flashLogLine${idx}`}>
+                                  <span className='timestamp'>
+                                    {new Date(line.timestamp).toTimeString().substr(0, 8)}
+                                  </span>
+                                  <span className='text'>
+                                    {line.text}
+                                  </span>
+                                </div>
+                                : <div className='flashLogLine'></div>
+                            )
+                          )}
+                        </div>
+                      </div>
                     )}
                   </div>
                 }
+
               </div>
             )
           )}

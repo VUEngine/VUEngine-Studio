@@ -24,5 +24,10 @@ export interface FlashCartStatus {
   processId: number
   progress: number
   step: string
-  log: string
+  log: FlashLogLine[]
 }
+
+export interface FlashLogLine {
+  timestamp: number;
+  text: string;
+};

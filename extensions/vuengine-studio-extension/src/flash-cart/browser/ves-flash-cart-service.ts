@@ -247,7 +247,7 @@ export class VesFlashCartService {
           : 'Flashing',
         processId: processManagerId,
         progress: 0,
-        log: '',
+        log: [],
       };
 
       // trigger change event
@@ -305,13 +305,13 @@ export class VesFlashCartService {
       this.determineAllCanHoldRom();
     });
 
-    this.vesProcessWatcher.onExit(({ pId }) => {
+    this.vesProcessWatcher.onExit(({ pId, event }) => {
+      const successful = (event.code === 0);
       this.flashingProgress = -1;
       // console.log('exit', pId);
       for (const connectedFlashCart of this.connectedFlashCarts) {
         if (connectedFlashCart.status.processId === pId) {
-          // TODO: differenciate between done and error
-          connectedFlashCart.status.progress = -1;
+          connectedFlashCart.status.progress = successful ? 100 : -1;
 
           // trigger change event
           this.connectedFlashCarts = this.connectedFlashCarts;
@@ -344,7 +344,10 @@ export class VesFlashCartService {
   protected processStreamData(pId: number, data: any): void { /* eslint-disable-line */
     for (const connectedFlashCart of this.connectedFlashCarts) {
       if (connectedFlashCart.status.processId === pId) {
-        connectedFlashCart.status.log += data;
+        connectedFlashCart.status.log.push({
+          timestamp: Date.now(),
+          text: data
+        });
 
         switch (connectedFlashCart.config.path) {
           case PROG_VB_PLACEHOLDER:
@@ -390,6 +393,7 @@ export class VesFlashCartService {
     [...Array(timesToMirror)].forEach(function (): void {
       paddedRomBuffer.write(romContent.value);
     });
+    paddedRomBuffer.end();
     await this.fileService.writeFile(paddedRomUri, paddedRomBuffer);
 
     return true;

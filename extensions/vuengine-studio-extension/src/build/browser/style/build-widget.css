@@ -104,14 +104,16 @@
 
 #vesBuildWidget .buildLog {
   border: 1px solid var(--theia-activityBar-background);
-  flex-grow: 1;
   box-sizing: border-box;
+  flex-grow: 1;
+  font-family: monospace;
+  font-size: 90%;
+  line-height: 130%;
   overflow: auto;
 }
 
 #vesBuildWidget .buildLog > div {
   display: table;
-  font-family: monospace;
   padding: var(--theia-ui-padding) 0;
   width: 100%;
 }
@@ -121,7 +123,7 @@
 }
 
 #vesBuildWidget .buildLogLine:empty {
-  height: 6px;
+  height: 5px;
 }
 
 #vesBuildWidget .buildLogLine:hover {

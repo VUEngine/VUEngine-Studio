@@ -23,6 +23,10 @@
   overflow: auto;
 }
 
+#vesFlashCartWidget .flashingPanel {
+  margin-bottom: calc(var(--theia-ui-padding) * 2);
+}
+
 #vesFlashCartWidget .flashCart {
   border-bottom: 1px solid var(--theia-activityBar-background);
   padding: calc(var(--theia-ui-padding) * 2);
@@ -57,9 +61,6 @@
   padding-left: 24px;
   position: relative;
 }
-#vesFlashCartWidget .flashCartInfo > div:first-child > div.warning {
-  color: var(--theia-editorWarning-foreground);
-}
 
 #vesFlashCartWidget .flashCartInfo > div:first-child > div > i {
   left: 0;
@@ -72,8 +73,19 @@
   width: 150px;
 }
 
-#vesFlashCartWidget .flashingPanel {
-  margin-bottom: calc(var(--theia-ui-padding) * 2);
+#vesFlashCartWidget .infoPanel {
+  padding-top: calc(var(--theia-ui-padding) * 2);
+}
+#vesFlashCartWidget .flashCartInfo > div:first-child > div.infoPanel > i {
+  top: calc(1px + (var(--theia-ui-padding) * 2));
+}
+
+#vesFlashCartWidget .infoPanel.success { 
+  color: var(--theia-editorSuccess-foreground);
+}
+
+#vesFlashCartWidget .infoPanel.warning { 
+  color: var(--theia-editorWarning-foreground);
 }
 
 #vesFlashCartWidget .flashLogWrapper button {
@@ -81,10 +93,43 @@
 }
 
 #vesFlashCartWidget .flashLog {
-  background: rgba(0, 0, 0, 0.2);
-  font-size: 80%;
-  margin: 0;
-  max-height: 300px;
+  border: 1px solid var(--theia-activityBar-background);
+  box-sizing: border-box;
+  flex-grow: 1;
+  font-family: monospace;
+  font-size: 90%;
+  line-height: 130%;
+  height: 300px;
   overflow: auto;
-  padding: calc(var(--theia-ui-padding) * 2);
+}
+
+#vesFlashCartWidget .flashLog > div {
+  display: table;
+  padding: var(--theia-ui-padding) 0;
+  width: 100%;
+}
+
+#vesFlashCartWidget .flashLogLine {
+  display: table-row;
+}
+
+#vesFlashCartWidget .flashLogLine:empty {
+  height: 5px;
+}
+
+#vesFlashCartWidget .flashLogLine:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+#vesFlashCartWidget .flashLogLine .timestamp {
+  display: table-cell;
+  opacity: 0.5;
+  padding: 0 var(--theia-ui-padding);
+}
+
+#vesFlashCartWidget .flashLogLine .text {
+  display: table-cell;
+  padding-right: var(--theia-ui-padding);
+  white-space: pre-wrap;
+  width: 100%;
 }
