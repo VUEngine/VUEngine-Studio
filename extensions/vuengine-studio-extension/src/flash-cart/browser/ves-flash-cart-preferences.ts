@@ -1,5 +1,6 @@
 import { isOSX } from '@theia/core';
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
+import { FLASHBOY_PLUS_IMAGE_PLACEHOLDER, HFCLI_PLACEHOLDER, HYPERFLASH32_IMAGE_PLACEHOLDER, PROG_VB_PLACEHOLDER, ROM_PLACEHOLDER } from './ves-flash-cart-service';
 
 export namespace VesFlashCartPreferenceIds {
     export const CATEGORY = 'flashCarts';
@@ -78,10 +79,10 @@ export const VesFlashCartPreferenceSchema: PreferenceSchema = {
                     manufacturer: 'Richard Hutchinson',
                     product: 'FlashBoy',
                     size: 16,
-                    path: '%PROGVB%',
-                    args: '%ROM%',
+                    path: PROG_VB_PLACEHOLDER,
+                    args: ROM_PLACEHOLDER,
                     padRom: true,
-                    image: '%FBP_IMG%'
+                    image: FLASHBOY_PLUS_IMAGE_PLACEHOLDER,
                 },
                 {
                     name: 'HyperFlash32',
@@ -90,12 +91,12 @@ export const VesFlashCartPreferenceSchema: PreferenceSchema = {
                     manufacturer: 'FTDI',
                     product: 'FT232R',
                     size: 32,
-                    path: '%HFCLI%',
+                    path: HFCLI_PLACEHOLDER,
                     args: isOSX
-                        ? '-p %PORT% -s %ROM% -u --slow'
-                        : '-p %PORT% -s %ROM% -u',
+                        ? `-p %PORT% -s ${ROM_PLACEHOLDER} -u --slow`
+                        : `-p %PORT% -s ${ROM_PLACEHOLDER} -u`,
                     padRom: false,
-                    image: '%HF32_IMG%'
+                    image: HYPERFLASH32_IMAGE_PLACEHOLDER,
                 },
             ],
         },

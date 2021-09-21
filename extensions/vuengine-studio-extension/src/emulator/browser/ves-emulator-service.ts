@@ -13,6 +13,8 @@ import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
 import { DEFAULT_EMULATOR, EmulatorConfig } from './ves-emulator-types';
 import { VesCodegenService } from '../../codegen/browser/ves-codegen-service';
 
+export const ROM_PLACEHOLDER = '%ROM%';
+
 @injectable()
 export class VesEmulatorService {
   @inject(ApplicationShell)
@@ -142,7 +144,7 @@ export class VesEmulatorService {
       await opener.open(romUri);
     } else {
       const emulatorPath = defaultEmulatorConfig.path;
-      const emulatorArgs = defaultEmulatorConfig.args.replace('%ROM%', this.getRomPath()).split(' ');
+      const emulatorArgs = defaultEmulatorConfig.args.replace(ROM_PLACEHOLDER, this.getRomPath()).split(' ');
 
       if (!emulatorPath) {
         // TODO: error message

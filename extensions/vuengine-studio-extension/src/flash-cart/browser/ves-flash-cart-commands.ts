@@ -7,14 +7,14 @@ export namespace VesFlashCartCommands {
     id: 'vesFlashCart.commands.flash',
     label: 'Flash to Flash Cart',
     category: CATEGORY,
-    iconClass: 'fa fa-bolt',
+    iconClass: 'fa fa-microchip',
   };
 
   export const OPEN_WIDGET: Command = {
     id: 'vesFlashCart.commands.openWidget',
     label: 'Toggle Flash Carts Widget',
     category: CATEGORY,
-    iconClass: 'fa fa-bolt',
+    iconClass: 'fa fa-microchip',
   };
 
   export const DETECT: Command = {

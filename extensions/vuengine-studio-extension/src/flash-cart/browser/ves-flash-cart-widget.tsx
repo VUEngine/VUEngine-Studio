@@ -78,22 +78,17 @@ export class VesFlashCartWidget extends ReactWidget {
               </button>
             </>
           )}
-          {!this.vesFlashCartService.isQueued && this.vesFlashCartService.flashingProgress > -1 && (
-            <div className='flashingPanel'>
-              <div className='vesProgressBar'>
-                <div style={{ width: this.vesFlashCartService.flashingProgress + '%' }}></div>
-                <span>
-                  {this.vesFlashCartService.flashingProgress === 100 ? (
-                    <>
-                      <i className='fa fa-check'></i> Done
-                    </>
-                  ) : (
-                    <>{this.vesFlashCartService.flashingProgress}%</>
-                  )}
-                </span>
+          {!this.vesFlashCartService.isQueued &&
+            this.vesFlashCartService.flashingProgress > -1 && this.vesFlashCartService.flashingProgress < 100 && (
+              <div className='flashingPanel'>
+                <div className='vesProgressBar'>
+                  <div style={{ width: this.vesFlashCartService.flashingProgress + '%' }}></div>
+                  <span>
+                    {this.vesFlashCartService.flashingProgress}%
+                  </span>
+                </div>
               </div>
-            </div>
-          )}
+            )}
           {!this.vesFlashCartService.isQueued && !this.vesFlashCartService.isFlashing && (
             <>
               <button
@@ -102,7 +97,7 @@ export class VesFlashCartWidget extends ReactWidget {
                   this.commandService.executeCommand(VesFlashCartCommands.FLASH.id)
                 }
               >
-                <i className='fa fa-bolt'></i> Flash
+                <i className='fa fa-microchip'></i> Flash
               </button>
             </>
           )}
@@ -118,7 +113,7 @@ export class VesFlashCartWidget extends ReactWidget {
         <div>
           {this.vesFlashCartService.connectedFlashCarts.map(
             (connectedFlashCart: ConnectedFlashCart, index: number) => (
-              <div className='flashCart'>
+              <div className='flashCart' key={`flashCart${index}`}>
                 <div className='flashCartInfo'>
                   <div>
                     <h2>{connectedFlashCart.config.name}</h2>
@@ -163,13 +158,19 @@ export class VesFlashCartWidget extends ReactWidget {
                   )}
                 </div>
 
-                {connectedFlashCart.status.progress > -1 && (
-                  <div className='flashingPanel'>
-                    <i className='fa fa-fw fa-refresh fa-spin'></i>{' '}
-                    {connectedFlashCart.status.step}...{' '}
-                    {connectedFlashCart.status.progress}%
-                  </div>
-                )}
+                <div className='flashingPanel'>
+                  {connectedFlashCart.status.progress === 100 ? (
+                    <>
+                      <i className='fa fa-fw fa-check'></i> Done
+                    </>
+                  ) : connectedFlashCart.status.progress > -1 ? (
+                    <>
+                      <i className='fa fa-fw fa-refresh fa-spin'></i>{' '}
+                      {connectedFlashCart.status.step}...{' '}
+                      {connectedFlashCart.status.progress}%
+                    </>
+                  ) : <></>}
+                </div>
 
                 <div className='flashLogWrapper'>
                   <button

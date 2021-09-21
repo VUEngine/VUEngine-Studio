@@ -23,6 +23,12 @@ import { IMAGE_FLASHBOY_PLUS } from './images/flashboy-plus';
 import { IMAGE_HYPERFLASH32 } from './images/hyperflash32';
 import { VesFlashCartCommands } from './ves-flash-cart-commands';
 
+export const PROG_VB_PLACEHOLDER = '%PROGVB%';
+export const HFCLI_PLACEHOLDER = '%HFCLI%';
+export const ROM_PLACEHOLDER = '%ROM%';
+export const FLASHBOY_PLUS_IMAGE_PLACEHOLDER = '%FBP_IMG%';
+export const HYPERFLASH32_IMAGE_PLACEHOLDER = '%HF32_IMG%';
+
 @injectable()
 export class VesFlashCartService {
   @inject(ApplicationShell)
@@ -177,21 +183,23 @@ export class VesFlashCartService {
     }
 
     for (const connectedFlashCart of this.connectedFlashCarts) {
-      if (!connectedFlashCart.config.path) {
+      const flasherPath = await this.replaceFlasherPath(connectedFlashCart.config.path);
+
+      if (!flasherPath) {
         this.messageService.error(
           `No path to flasher software provided for cart '${connectedFlashCart.config.name}'`
         );
         continue;
       }
 
-      if (!await this.fileService.exists(new URI(dirname(connectedFlashCart.config.path)))) {
+      if (!await this.fileService.exists(new URI(dirname(flasherPath)))) {
         this.messageService.error(
-          `Flasher software does not exist at '${connectedFlashCart.config.path}'`
+          `Flasher software does not exist at '${flasherPath}'`
         );
         continue;
       }
 
-      /* const flasherEnvPath = this.convertoToEnvPath(connectedFlashCart.config.path);
+      /* const flasherEnvPath = this.convertoToEnvPath(flasherPath);
 
       const enableWsl = this.preferenceService.get(VesBuildPreferenceIds.ENABLE_WSL);
       if (isWindows && enableWsl) {
@@ -205,14 +213,14 @@ export class VesFlashCartService {
 
       const flasherArgs = connectedFlashCart.config.args
         ? connectedFlashCart.config.args
-          .replace('%ROM%', romPath)
+          .replace(ROM_PLACEHOLDER, romPath)
           .split(' ')
         : [];
 
       await this.fixPermissions();
 
       const { processManagerId } = await this.vesProcessService.launchProcess(VesProcessType.Terminal, {
-        command: connectedFlashCart.config.path,
+        command: flasherPath,
         args: flasherArgs,
       });
 
@@ -258,9 +266,10 @@ export class VesFlashCartService {
     }
 
     for (const connectedFlashCart of this.connectedFlashCarts) {
+      const flasherPath = await this.replaceFlasherPath(connectedFlashCart.config.path);
       await this.vesProcessService.launchProcess(VesProcessType.Raw, {
         command: 'chmod',
-        args: ['a+x', connectedFlashCart.config.path]
+        args: ['a+x', flasherPath]
       });
     }
   }
@@ -302,33 +311,39 @@ export class VesFlashCartService {
 
     this.vesProcessWatcher.onOutputStreamData(({ pId, data }) => {
       // console.log('data', pId, data);
-      for (const connectedFlashCart of this.connectedFlashCarts) {
-        if (connectedFlashCart.status.processId === pId) {
-          connectedFlashCart.status.log += data;
-
-          this.parseDataFlashBoy(connectedFlashCart, data);
-          this.parseDataHyperFlash32(connectedFlashCart, data);
-
-          // trigger change event
-          this.connectedFlashCarts = this.connectedFlashCarts;
-        }
-      }
+      this.processStreamData(pId, data);
     });
 
     this.vesProcessWatcher.onErrorStreamData(({ pId, data }) => {
       // console.log('error data', pId, data);
-      for (const connectedFlashCart of this.connectedFlashCarts) {
-        if (connectedFlashCart.status.processId === pId) {
-          connectedFlashCart.status.log += data;
+      this.processStreamData(pId, data);
+    });
+  }
 
-          this.parseDataFlashBoy(connectedFlashCart, data);
-          this.parseDataHyperFlash32(connectedFlashCart, data);
+  protected processStreamData(pId: number, data: any): void { /* eslint-disable-line */
+    for (const connectedFlashCart of this.connectedFlashCarts) {
+      if (connectedFlashCart.status.processId === pId) {
+        connectedFlashCart.status.log += data;
 
-          // trigger change event
-          this.connectedFlashCarts = this.connectedFlashCarts;
+        switch (connectedFlashCart.config.path) {
+          case PROG_VB_PLACEHOLDER:
+            this.parseStreamDataProgVb(connectedFlashCart, data);
+            break;
+          case HFCLI_PLACEHOLDER:
+            this.parseStreamDataHyperFlasherCli32(connectedFlashCart, data);
+            break;
         }
       }
-    });
+    }
+
+    // trigger change event
+    this.connectedFlashCarts = this.connectedFlashCarts;
+  }
+
+  protected async replaceFlasherPath(flasherPath: string): Promise<string> {
+    return flasherPath
+      .replace(HFCLI_PLACEHOLDER, await this.getHfCliPath())
+      .replace(PROG_VB_PLACEHOLDER, await this.getProgVbPath());
   }
 
   protected async padRom(size: number): Promise<boolean> {
@@ -365,7 +380,7 @@ export class VesFlashCartService {
     return this.getRomPath().replace('output.vb', 'outputPadded.vb');
   }
 
-  protected async parseDataHyperFlash32(connectedFlashCart: ConnectedFlashCart, data: any): Promise<void> { /* eslint-disable-line */
+  protected async parseStreamDataHyperFlasherCli32(connectedFlashCart: ConnectedFlashCart, data: any): Promise<void> { /* eslint-disable-line */
     if (connectedFlashCart.config.name === VesFlashCartPreferenceSchema.properties[VesFlashCartPreferenceIds.FLASH_CARTS].default[1].name) {
       /* Number of # is only fixed (to 20) on HF32 firmware version 1.9 and above.
         On lower firmwares, the number of # depends on file size.
@@ -387,7 +402,7 @@ export class VesFlashCartService {
     }
   }
 
-  protected async parseDataFlashBoy(connectedFlashCart: ConnectedFlashCart, data: any): Promise<void> { /* eslint-disable-line */
+  protected async parseStreamDataProgVb(connectedFlashCart: ConnectedFlashCart, data: any): Promise<void> { /* eslint-disable-line */
     if (connectedFlashCart.config.name === VesFlashCartPreferenceSchema.properties[VesFlashCartPreferenceIds.FLASH_CARTS].default[0].name) {
       if (data.includes('/2048')) {
         const packetsWritten = parseInt(data.substring(data.lastIndexOf(']') + 2, data.lastIndexOf('/')));
@@ -401,44 +416,47 @@ export class VesFlashCartService {
   }
 
   async detectConnectedFlashCarts(): Promise<void> {
-    const flashCartConfigs: FlashCartConfig[] = await this.getFlashCartConfigs();
+    const flashCartConfigs: FlashCartConfig[] = this.getFlashCartConfigs();
     this.connectedFlashCarts = await this.vesFlashCartUsbService.detectFlashCarts(
       ...flashCartConfigs
     );
   };
 
-  async getFlashCartConfigs(): Promise<FlashCartConfig[]> {
+  getFlashCartConfigs(): FlashCartConfig[] {
     const flashCartConfigs: FlashCartConfig[] = this.preferenceService.get(VesFlashCartPreferenceIds.FLASH_CARTS) ?? [];
 
     const effectiveFlashCartConfigs = flashCartConfigs.length > 0
       ? flashCartConfigs
       : VesFlashCartPreferenceSchema.properties[VesFlashCartPreferenceIds.FLASH_CARTS].default;
 
-    const resourcesPath = await this.getResourcesPath();
-
     return effectiveFlashCartConfigs.map((flashCartConfig: FlashCartConfig) => ({
       ...flashCartConfig,
-      path: flashCartConfig.path
-        .replace('%HFCLI%', joinPath(
-          resourcesPath,
-          'binaries',
-          'vuengine-studio-tools',
-          this.getOs(),
-          'hf-cli',
-          isWindows ? 'hfcli.exe' : 'hfcli'
-        ))
-        .replace('%PROGVB%', joinPath(
-          resourcesPath,
-          'binaries',
-          'vuengine-studio-tools',
-          this.getOs(),
-          'prog-vb',
-          isWindows ? 'prog-vb.exe' : 'prog-vb'
-        )),
       image: flashCartConfig.image
-        .replace('%FBP_IMG%', IMAGE_FLASHBOY_PLUS)
-        .replace('%HF32_IMG%', IMAGE_HYPERFLASH32),
+        .replace(FLASHBOY_PLUS_IMAGE_PLACEHOLDER, IMAGE_FLASHBOY_PLUS)
+        .replace(HYPERFLASH32_IMAGE_PLACEHOLDER, IMAGE_HYPERFLASH32),
     }));
+  }
+
+  async getProgVbPath(): Promise<string> {
+    return joinPath(
+      await this.getResourcesPath(),
+      'binaries',
+      'vuengine-studio-tools',
+      this.getOs(),
+      'prog-vb',
+      isWindows ? 'prog-vb.exe' : 'prog-vb'
+    );
+  }
+
+  async getHfCliPath(): Promise<string> {
+    return joinPath(
+      await this.getResourcesPath(),
+      'binaries',
+      'vuengine-studio-tools',
+      this.getOs(),
+      'hf-cli',
+      isWindows ? 'hfcli.exe' : 'hfcli'
+    );
   }
 
   getRomPath(): string {
