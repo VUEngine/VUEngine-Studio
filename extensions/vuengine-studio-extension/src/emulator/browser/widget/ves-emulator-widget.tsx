@@ -204,7 +204,7 @@ export class VesEmulatorWidget extends ReactWidget {
 
   protected onActivateRequest(msg: Message): void {
     super.onActivateRequest(msg);
-    this.node.focus();
+    this.iframeRef.current?.focus();
   }
 
   public sendKeypress(
@@ -468,14 +468,14 @@ export class VesEmulatorWidget extends ReactWidget {
             </button>
           </div>
         </div>
-        <div id='vesEmulatorWrapper' ref={this.wrapperRef}>
+        <div id='vesEmulatorWrapper' ref={this.wrapperRef} onClick={() => { this.iframeRef.current?.focus(); }}>
           <iframe
             id='vesEmulatorFrame'
             ref={this.iframeRef}
             src={this.resource}
             width={canvasDimensions.width}
             height={canvasDimensions.height}
-            onLoad={() => this.startEmulator(this)}
+            onLoad={() => { this.startEmulator(this); this.iframeRef.current?.focus(); }}
             tabIndex={0}
           ></iframe>
         </div>
@@ -498,7 +498,7 @@ export class VesEmulatorWidget extends ReactWidget {
   protected async sendCommand(command: string, data?: any): Promise<void> { /* eslint-disable-line */
     this.iframeRef.current?.contentWindow?.postMessage({ command, data }, this.resource);
     // remove focus from button
-    this.node.focus();
+    this.iframeRef.current?.focus();
   }
 
   protected saveScreenshot(): void {

@@ -110,6 +110,7 @@
   
   #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay {
     border: 6px solid var(--theia-button-background);
+    cursor: pointer;
     opacity: 0;
     position: absolute;
   }

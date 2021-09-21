@@ -60,6 +60,7 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                     <div className='buttonAssignmentGroup'>
                         <div
                             ref={this.controllerButtonAssignmentLTRef}
+                            onClick={() => this.openKeymaps()}
                             onMouseEnter={() =>
                                 this.toggleRefHighlighted(this.controllerButtonLTRef)
                             }
@@ -69,17 +70,18 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                         >
                             <span>Left Trigger</span>
                             <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_L_TRIGGER.id,
-                                        false
-                                    )}
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_L_TRIGGER.id, false)}
                                 </button>
                             </span>
                         </div>
                         <br />
                         <div
                             ref={this.controllerButtonAssignmentLUpRef}
+                            onClick={() => this.openKeymaps()}
                             onMouseEnter={() =>
                                 this.toggleRefHighlighted(this.controllerButtonLUpRef)
                             }
@@ -91,16 +93,17 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                                 Left D-Pad <i className='fa fa-fw fa-arrow-up'></i>
                             </span>
                             <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_L_UP.id,
-                                        false
-                                    )}
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_L_UP.id, false)}
                                 </button>
                             </span>
                         </div>
                         <div
                             ref={this.controllerButtonAssignmentLRightRef}
+                            onClick={() => this.openKeymaps()}
                             onMouseEnter={() =>
                                 this.toggleRefHighlighted(this.controllerButtonLRightRef)
                             }
@@ -112,16 +115,17 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                                 Left D-Pad <i className='fa fa-fw fa-arrow-right'></i>
                             </span>
                             <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_L_RIGHT.id,
-                                        false
-                                    )}
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_L_RIGHT.id, false)}
                                 </button>
                             </span>
                         </div>
                         <div
                             ref={this.controllerButtonAssignmentLDownRef}
+                            onClick={() => this.openKeymaps()}
                             onMouseEnter={() =>
                                 this.toggleRefHighlighted(this.controllerButtonLDownRef)
                             }
@@ -133,16 +137,17 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                                 Left D-Pad <i className='fa fa-fw fa-arrow-down'></i>
                             </span>
                             <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_L_DOWN.id,
-                                        false
-                                    )}
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_L_DOWN.id, false)}
                                 </button>
                             </span>
                         </div>
                         <div
                             ref={this.controllerButtonAssignmentLLeftRef}
+                            onClick={() => this.openKeymaps()}
                             onMouseEnter={() =>
                                 this.toggleRefHighlighted(this.controllerButtonLLeftRef)
                             }
@@ -154,17 +159,18 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                                 Left D-Pad <i className='fa fa-fw fa-arrow-left'></i>
                             </span>
                             <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_L_LEFT.id,
-                                        false
-                                    )}
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_L_LEFT.id, false)}
                                 </button>
                             </span>
                         </div>
                         <br />
                         <div
                             ref={this.controllerButtonAssignmentSelectRef}
+                            onClick={() => this.openKeymaps()}
                             onMouseEnter={() =>
                                 this.toggleRefHighlighted(this.controllerButtonSelectRef)
                             }
@@ -174,16 +180,17 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                         >
                             <span>Select </span>
                             <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_SELECT.id,
-                                        false
-                                    )}
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_SELECT.id, false)}
                                 </button>
                             </span>
                         </div>
                         <div
                             ref={this.controllerButtonAssignmentStartRef}
+                            onClick={() => this.openKeymaps()}
                             onMouseEnter={() =>
                                 this.toggleRefHighlighted(this.controllerButtonStartRef)
                             }
@@ -193,11 +200,11 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                         >
                             <span>Start </span>
                             <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_START.id,
-                                        false
-                                    )}
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_START.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -208,6 +215,7 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                             <div
                                 className='buttonOverlay select'
                                 ref={this.controllerButtonSelectRef}
+                                onClick={() => this.openKeymaps()}
                                 onMouseEnter={() =>
                                     this.toggleRefHighlighted(
                                         this.controllerButtonAssignmentSelectRef
@@ -222,6 +230,7 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                             <div
                                 className='buttonOverlay start'
                                 ref={this.controllerButtonStartRef}
+                                onClick={() => this.openKeymaps()}
                                 onMouseEnter={() =>
                                     this.toggleRefHighlighted(
                                         this.controllerButtonAssignmentStartRef
@@ -236,6 +245,7 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                             <div
                                 className='buttonOverlay a'
                                 ref={this.controllerButtonARef}
+                                onClick={() => this.openKeymaps()}
                                 onMouseEnter={() =>
                                     this.toggleRefHighlighted(
                                         this.controllerButtonAssignmentARef
@@ -250,6 +260,7 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                             <div
                                 className='buttonOverlay b'
                                 ref={this.controllerButtonBRef}
+                                onClick={() => this.openKeymaps()}
                                 onMouseEnter={() =>
                                     this.toggleRefHighlighted(
                                         this.controllerButtonAssignmentBRef
@@ -264,6 +275,7 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                             <div
                                 className='buttonOverlay lup'
                                 ref={this.controllerButtonLUpRef}
+                                onClick={() => this.openKeymaps()}
                                 onMouseEnter={() =>
                                     this.toggleRefHighlighted(
                                         this.controllerButtonAssignmentLUpRef
@@ -278,6 +290,7 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                             <div
                                 className='buttonOverlay lleft'
                                 ref={this.controllerButtonLLeftRef}
+                                onClick={() => this.openKeymaps()}
                                 onMouseEnter={() =>
                                     this.toggleRefHighlighted(
                                         this.controllerButtonAssignmentLLeftRef
@@ -292,6 +305,7 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                             <div
                                 className='buttonOverlay lright'
                                 ref={this.controllerButtonLRightRef}
+                                onClick={() => this.openKeymaps()}
                                 onMouseEnter={() =>
                                     this.toggleRefHighlighted(
                                         this.controllerButtonAssignmentLRightRef
@@ -306,6 +320,7 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                             <div
                                 className='buttonOverlay ldown'
                                 ref={this.controllerButtonLDownRef}
+                                onClick={() => this.openKeymaps()}
                                 onMouseEnter={() =>
                                     this.toggleRefHighlighted(
                                         this.controllerButtonAssignmentLDownRef
@@ -320,6 +335,7 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                             <div
                                 className='buttonOverlay rup'
                                 ref={this.controllerButtonRUpRef}
+                                onClick={() => this.openKeymaps()}
                                 onMouseEnter={() =>
                                     this.toggleRefHighlighted(
                                         this.controllerButtonAssignmentRUpRef
@@ -334,6 +350,7 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                             <div
                                 className='buttonOverlay rleft'
                                 ref={this.controllerButtonRLeftRef}
+                                onClick={() => this.openKeymaps()}
                                 onMouseEnter={() =>
                                     this.toggleRefHighlighted(
                                         this.controllerButtonAssignmentRLeftRef
@@ -348,6 +365,7 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                             <div
                                 className='buttonOverlay rright'
                                 ref={this.controllerButtonRRightRef}
+                                onClick={() => this.openKeymaps()}
                                 onMouseEnter={() =>
                                     this.toggleRefHighlighted(
                                         this.controllerButtonAssignmentRRightRef
@@ -362,6 +380,7 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                             <div
                                 className='buttonOverlay rdown'
                                 ref={this.controllerButtonRDownRef}
+                                onClick={() => this.openKeymaps()}
                                 onMouseEnter={() =>
                                     this.toggleRefHighlighted(
                                         this.controllerButtonAssignmentRDownRef
@@ -376,6 +395,7 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                             <div
                                 className='buttonOverlay lt'
                                 ref={this.controllerButtonLTRef}
+                                onClick={() => this.openKeymaps()}
                                 onMouseEnter={() =>
                                     this.toggleRefHighlighted(
                                         this.controllerButtonAssignmentLTRef
@@ -390,6 +410,7 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                             <div
                                 className='buttonOverlay rt'
                                 ref={this.controllerButtonRTRef}
+                                onClick={() => this.openKeymaps()}
                                 onMouseEnter={() =>
                                     this.toggleRefHighlighted(
                                         this.controllerButtonAssignmentRTRef
@@ -406,6 +427,7 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                     <div className='buttonAssignmentGroup'>
                         <div
                             ref={this.controllerButtonAssignmentRTRef}
+                            onClick={() => this.openKeymaps()}
                             onMouseEnter={() =>
                                 this.toggleRefHighlighted(this.controllerButtonRTRef)
                             }
@@ -415,17 +437,18 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                         >
                             <span>Right Trigger</span>
                             <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_R_TRIGGER.id,
-                                        false
-                                    )}
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_R_TRIGGER.id, false)}
                                 </button>
                             </span>
                         </div>
                         <br />
                         <div
                             ref={this.controllerButtonAssignmentRUpRef}
+                            onClick={() => this.openKeymaps()}
                             onMouseEnter={() =>
                                 this.toggleRefHighlighted(this.controllerButtonRUpRef)
                             }
@@ -437,16 +460,17 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                                 Right D-Pad <i className='fa fa-fw fa-arrow-up'></i>
                             </span>
                             <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_R_UP.id,
-                                        false
-                                    )}
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_R_UP.id, false)}
                                 </button>
                             </span>
                         </div>
                         <div
                             ref={this.controllerButtonAssignmentRRightRef}
+                            onClick={() => this.openKeymaps()}
                             onMouseEnter={() =>
                                 this.toggleRefHighlighted(this.controllerButtonRRightRef)
                             }
@@ -458,16 +482,17 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                                 Right D-Pad <i className='fa fa-fw fa-arrow-right'></i>
                             </span>
                             <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_R_RIGHT.id,
-                                        false
-                                    )}
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_R_RIGHT.id, false)}
                                 </button>
                             </span>
                         </div>
                         <div
                             ref={this.controllerButtonAssignmentRDownRef}
+                            onClick={() => this.openKeymaps()}
                             onMouseEnter={() =>
                                 this.toggleRefHighlighted(this.controllerButtonRDownRef)
                             }
@@ -479,16 +504,17 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                                 Right D-Pad <i className='fa fa-fw fa-arrow-down'></i>
                             </span>
                             <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_R_DOWN.id,
-                                        false
-                                    )}
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_R_DOWN.id, false)}
                                 </button>
                             </span>
                         </div>
                         <div
                             ref={this.controllerButtonAssignmentRLeftRef}
+                            onClick={() => this.openKeymaps()}
                             onMouseEnter={() =>
                                 this.toggleRefHighlighted(this.controllerButtonRLeftRef)
                             }
@@ -500,17 +526,18 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                                 Right D-Pad <i className='fa fa-fw fa-arrow-left'></i>
                             </span>
                             <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_R_LEFT.id,
-                                        false
-                                    )}
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_R_LEFT.id, false)}
                                 </button>
                             </span>
                         </div>
                         <br />
                         <div
                             ref={this.controllerButtonAssignmentARef}
+                            onClick={() => this.openKeymaps()}
                             onMouseEnter={() =>
                                 this.toggleRefHighlighted(this.controllerButtonARef)
                             }
@@ -520,16 +547,17 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                         >
                             <span>A</span>
                             <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_A.id,
-                                        false
-                                    )}
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_A.id, false)}
                                 </button>
                             </span>
                         </div>
                         <div
                             ref={this.controllerButtonAssignmentBRef}
+                            onClick={() => this.openKeymaps()}
                             onMouseEnter={() =>
                                 this.toggleRefHighlighted(this.controllerButtonBRef)
                             }
@@ -539,11 +567,11 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                         >
                             <span>B</span>
                             <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_B.id,
-                                        false
-                                    )}
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_B.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -554,44 +582,44 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                         <div>
                             <span>Toggle Pause</span>
                             <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_PAUSE_TOGGLE.id,
-                                        false
-                                    )}
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_PAUSE_TOGGLE.id, false)}
                                 </button>
                             </span>
                         </div>
                         <div>
                             <span>Reset</span>
                             <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_RESET.id,
-                                        false
-                                    )}
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_RESET.id, false)}
                                 </button>
                             </span>
                         </div>
                         <div>
                             <span>Mute Audio</span>
                             <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_AUDIO_MUTE.id,
-                                        false
-                                    )}
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_AUDIO_MUTE.id, false)}
                                 </button>
                             </span>
                         </div>
                         <div>
                             <span>Toggle Low Power</span>
                             <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_TOGGLE_LOW_POWER.id,
-                                        false
-                                    )}
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_TOGGLE_LOW_POWER.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -600,44 +628,44 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                         <div>
                             <span>Save State</span>
                             <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_SAVE_STATE.id,
-                                        false
-                                    )}
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_SAVE_STATE.id, false)}
                                 </button>
                             </span>
                         </div>
                         <div>
                             <span>Load State</span>
                             <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_LOAD_STATE.id,
-                                        false
-                                    )}
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_LOAD_STATE.id, false)}
                                 </button>
                             </span>
                         </div>
                         <div>
                             <span>Increase Save Slot</span>
                             <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_STATE_SLOT_INCREASE.id,
-                                        false
-                                    )}
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_STATE_SLOT_INCREASE.id, false)}
                                 </button>
                             </span>
                         </div>
                         <div>
                             <span>Decrease Save Slot</span>
                             <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_STATE_SLOT_DECREASE.id,
-                                        false
-                                    )}
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_STATE_SLOT_DECREASE.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -646,44 +674,44 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                         <div>
                             <span>Frame Advance</span>
                             <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_FRAME_ADVANCE.id,
-                                        false
-                                    )}
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_FRAME_ADVANCE.id, false)}
                                 </button>
                             </span>
                         </div>
                         <div>
                             <span>Toggle Fast Forward</span>
                             <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.id,
-                                        false
-                                    )}
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.id, false)}
                                 </button>
                             </span>
                         </div>
                         <div>
                             <span>Toggle Slow Motion</span>
                             <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_TOGGLE_SLOWMOTION.id,
-                                        false
-                                    )}
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_TOGGLE_SLOWMOTION.id, false)}
                                 </button>
                             </span>
                         </div>
                         <div>
                             <span>Rewind</span>
                             <span>
-                                <button className='theia-button secondary'>
-                                    {this.getKeybindingLabel(
-                                        VesEmulatorCommands.INPUT_REWIND.id,
-                                        false
-                                    )}
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_REWIND.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -692,11 +720,7 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                 <div className='controlsHint'>
                     <button
                         className='theia-button secondary'
-                        onClick={() =>
-                            this.commandService.executeCommand(
-                                KeymapsCommands.OPEN_KEYMAPS.id
-                            )
-                        }
+                        onClick={() => this.openKeymaps()}
                     >
                         Open Shortcut Editor
                     </button>
@@ -709,6 +733,10 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
         buttonOverlayRef: React.RefObject<HTMLDivElement>
     ): void {
         buttonOverlayRef.current?.classList.toggle('highlighted');
+    }
+
+    protected openKeymaps(): void {
+        this.commandService.executeCommand(KeymapsCommands.OPEN_KEYMAPS.id);
     }
 
     protected getKeybindingLabel(
