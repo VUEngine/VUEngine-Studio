@@ -1,6 +1,7 @@
 import { join as joinPath, normalize } from 'path';
 import { cpus } from 'os';
-import { CommandService, isOSX, isWindows } from '@theia/core';
+import * as rimraf from 'rimraf';
+import { CommandService, isOSX, isWindows, MessageService } from '@theia/core';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { ApplicationShell, PreferenceService } from '@theia/core/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
@@ -35,6 +36,8 @@ export class VesBuildService {
   protected fileService: FileService;
   @inject(FrontendApplicationStateService)
   protected readonly frontendApplicationStateService: FrontendApplicationStateService;
+  @inject(MessageService)
+  protected readonly messageService: MessageService;
   @inject(PreferenceService)
   protected readonly preferenceService: PreferenceService;
   @inject(VesProcessService)
@@ -47,6 +50,18 @@ export class VesBuildService {
   protected readonly vesProjectsService: VesProjectsService;
   @inject(WorkspaceService)
   protected readonly workspaceService: WorkspaceService;
+
+  // is queued
+  protected _isQueued: boolean = false;
+  protected readonly onDidChangeIsQueuedEmitter = new Emitter<boolean>();
+  readonly onDidChangeIsQueued = this.onDidChangeIsQueuedEmitter.event;
+  set isQueued(flag: boolean) {
+    this._isQueued = flag;
+    this.onDidChangeIsQueuedEmitter.fire(this._isQueued);
+  }
+  get isQueued(): boolean {
+    return this._isQueued;
+  }
 
   // build mode
   protected readonly onDidChangeBuildModeEmitter = new Emitter<BuildMode>();
@@ -202,15 +217,23 @@ export class VesBuildService {
     this.bindEvents();
   }
 
-  async doBuild(): Promise<void> {
+  async doBuild(force: boolean = false): Promise<void> {
     if (!this.workspaceService.opened) {
       return;
     }
 
-    if (!this.buildStatus.active) {
-      this.build();
+    if (this.isQueued) {
+      if (!force) {
+        this.isQueued = false;
+      }
+    } else if (this.isCleaning) {
+      this.isQueued = true;
+    } else if (this.buildStatus.active) {
+      if (!force) {
+        this.commandService.executeCommand(VesBuildCommands.TOGGLE_WIDGET.id);
+      }
     } else {
-      this.commandService.executeCommand(VesBuildCommands.TOGGLE_WIDGET.id);
+      this.build();
     }
   }
 
@@ -659,5 +682,53 @@ export class VesBuildService {
 
   bytesToMbit(bytes: number): number {
     return bytes / 1024 / 128;
+  }
+
+  protected getCleanPath(buildMode: BuildMode): string {
+    return joinPath(this.getBuildPath(), buildMode);
+  }
+
+  async doClean(): Promise<void> {
+    if (this.isCleaning) {
+      return;
+    }
+
+    const buildMode = this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode;
+
+    if (this.buildFolderExists[buildMode]) {
+      this.clean(buildMode);
+    } else {
+      // messageService.info(`Build folder for ${buildMode} mode does not exist. Nothing to clean.`);
+    }
+  }
+
+  async clean(buildMode: BuildMode): Promise<void> {
+    const cleanPath = this.getCleanPath(buildMode);
+
+    if (!this.buildFolderExists[buildMode]) {
+      // messageService.info(`Build folder for ${buildMode} mode does not exist.`);
+      return;
+    }
+
+    const progressMessage = await this.messageService.showProgress({
+      text: `Cleaning build folder for ${buildMode} Mode...`,
+    });
+
+    this.isCleaning = true;
+    const self = this;
+    const buildFolder = this.getBuildPath();
+    rimraf(cleanPath, function (): void {
+      rimraf(joinPath(buildFolder, '*.*'), function (): void {
+        progressMessage.cancel();
+        self.isCleaning = false;
+        self.setBuildFolderExists(buildMode, false);
+
+        if (self.isQueued) {
+          self.isQueued = false;
+          self.commandService.executeCommand(VesBuildCommands.BUILD.id, true);
+        }
+        // messageService.info(`Build folder for ${buildMode} mode has been cleaned.`);
+      });
+    });
   }
 }

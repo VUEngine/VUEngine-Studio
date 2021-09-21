@@ -56,6 +56,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
         this.title.closable = false;
 
         this.vesBuildService.onDidChangeIsCleaning(() => this.update());
+        this.vesBuildService.onDidChangeIsQueued(() => this.update());
         this.vesBuildService.onDidChangeBuildStatus(() => this.update());
         this.vesBuildService.onDidChangeBuildFolder(() => this.update());
         this.vesBuildService.onDidChangeOutputRomExists(() => this.update());
@@ -120,13 +121,15 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                         : <i className='fa fa-trash'></i>}
                 </button>
                 <button
-                    className={'theia-button secondary build' + (this.vesBuildService.buildStatus.active
-                        ? ' active'
-                        : (this.vesBuildService.buildStatus.step === BuildResult.done as string && this.vesBuildService.outputRomExists)
-                            ? ' success'
-                            : (this.vesBuildService.buildStatus.step === BuildResult.failed as string)
-                                ? ' error'
-                                : '')}
+                    className={'theia-button secondary build' + (this.vesBuildService.isQueued
+                        ? ' queued'
+                        : this.vesBuildService.buildStatus.active
+                            ? ' active'
+                            : (this.vesBuildService.buildStatus.step === BuildResult.done as string && this.vesBuildService.outputRomExists)
+                                ? ' success'
+                                : (this.vesBuildService.buildStatus.step === BuildResult.failed as string)
+                                    ? ' error'
+                                    : '')}
                     style={this.vesBuildService.buildStatus.active ? {
                         backgroundImage: `linear-gradient(
                             90deg, 
@@ -141,7 +144,9 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                 >
                     {this.vesBuildService.buildStatus.active
                         ? <i className='fa fa-cog fa-spin'></i>
-                        : <i className='fa fa-wrench'></i>}
+                        : this.vesBuildService.isQueued
+                            ? <i className='fa fa-hourglass-half'></i>
+                            : <i className='fa fa-wrench'></i>}
                 </button>
                 <button
                     className={'theia-button secondary run' + (this.vesEmulatorService.isQueued ? ' queued' : '')}

@@ -1,7 +1,5 @@
-import { join as joinPath } from 'path';
-import * as rimraf from 'rimraf';
 import { inject, injectable } from '@theia/core/shared/inversify';
-import { CommandContribution, CommandRegistry, isWindows, MAIN_MENU_BAR, MenuContribution, MenuModelRegistry, MessageService } from '@theia/core/lib/common';
+import { CommandContribution, CommandRegistry, isWindows, MAIN_MENU_BAR, MenuContribution, MenuModelRegistry } from '@theia/core/lib/common';
 import { ApplicationShell, KeybindingContribution, KeybindingRegistry, PreferenceScope, PreferenceService, QuickPickItem, QuickPickOptions } from '@theia/core/lib/browser';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { QuickPickService } from '@theia/core/lib/common/quick-pick-service';
@@ -23,8 +21,6 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
   constructor(
     @inject(ApplicationShell)
     protected readonly shell: ApplicationShell,
-    @inject(MessageService)
-    protected readonly messageService: MessageService,
     @inject(PreferenceService)
     private readonly preferenceService: PreferenceService,
     @inject(QuickPickService)
@@ -40,23 +36,11 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
   registerCommands(commandRegistry: CommandRegistry): void {
     commandRegistry.registerCommand(VesBuildCommands.CLEAN, {
       isVisible: () => this.workspaceService.opened,
-      execute: async () => {
-        if (this.vesBuildService.isCleaning) {
-          return;
-        }
-
-        const buildMode = this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode;
-
-        if (this.vesBuildService.buildFolderExists[buildMode]) {
-          this.clean(buildMode);
-        } else {
-          // messageService.info(`Build folder for ${buildMode} mode does not exist. Nothing to clean.`);
-        }
-      },
+      execute: () => this.vesBuildService.doClean(),
     });
     commandRegistry.registerCommand(VesBuildCommands.BUILD, {
       isVisible: () => this.workspaceService.opened,
-      execute: () => this.vesBuildService.doBuild(),
+      execute: (force: boolean = false) => this.vesBuildService.doBuild(force),
     });
 
     commandRegistry.registerCommand(VesBuildCommands.SET_MODE, {
@@ -211,34 +195,5 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
 
   protected setBuildMode(buildMode: string): void {
     this.preferenceService.set(VesBuildPreferenceIds.BUILD_MODE, buildMode, PreferenceScope.User);
-  }
-
-  protected async clean(buildMode: BuildMode): Promise<void> {
-    const cleanPath = this.getCleanPath(buildMode);
-
-    if (!this.vesBuildService.buildFolderExists[buildMode]) {
-      // messageService.info(`Build folder for ${buildMode} mode does not exist.`);
-      return;
-    }
-
-    const progressMessage = await this.messageService.showProgress({
-      text: `Cleaning build folder for ${buildMode} Mode...`,
-    });
-
-    this.vesBuildService.isCleaning = true;
-    const vesBuildService = this.vesBuildService;
-    const buildFolder = this.vesBuildService.getBuildPath();
-    rimraf(cleanPath, function (): void {
-      rimraf(joinPath(buildFolder, '*.*'), function (): void {
-        progressMessage.cancel();
-        vesBuildService.isCleaning = false;
-        vesBuildService.setBuildFolderExists(buildMode, false);
-        // messageService.info(`Build folder for ${buildMode} mode has been cleaned.`);
-      });
-    });
-  }
-
-  protected getCleanPath(buildMode: BuildMode): string {
-    return joinPath(this.vesBuildService.getBuildPath(), buildMode);
   }
 }

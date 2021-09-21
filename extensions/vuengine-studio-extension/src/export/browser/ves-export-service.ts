@@ -76,7 +76,7 @@ export class VesExportService {
       this.exportRom();
     } else {
       this.isQueued = true;
-      this.commandService.executeCommand(VesBuildCommands.BUILD.id);
+      this.commandService.executeCommand(VesBuildCommands.BUILD.id, true);
     }
   }
 
