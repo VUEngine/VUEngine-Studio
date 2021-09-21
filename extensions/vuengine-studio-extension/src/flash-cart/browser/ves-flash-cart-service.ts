@@ -1,6 +1,4 @@
 import { dirname, join as joinPath } from 'path';
-// TODO: refactor to use fileservice
-import { createWriteStream, readFileSync, unlinkSync } from 'fs';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { CommandService, isOSX, isWindows, MessageService } from '@theia/core/lib/common';
 import URI from '@theia/core/lib/common/uri';
@@ -22,6 +20,7 @@ import { VesFlashCartUsbWatcher } from './ves-flash-cart-usb-watcher';
 import { IMAGE_FLASHBOY_PLUS } from './images/flashboy-plus';
 import { IMAGE_HYPERFLASH32 } from './images/hyperflash32';
 import { VesFlashCartCommands } from './ves-flash-cart-commands';
+import { BinaryBufferWriteableStream } from '@theia/core/lib/common/buffer';
 
 export const PROG_VB_PLACEHOLDER = '%PROGVB%';
 export const HFCLI_PLACEHOLDER = '%HFCLI%';
@@ -225,7 +224,7 @@ export class VesFlashCartService {
 
       const romPath = connectedFlashCart.config.padRom &&
         await this.padRom(connectedFlashCart.config.size)
-        ? this.getPaddedRomPath()
+        ? this.getPaddedRomPath(connectedFlashCart.config.size)
         : this.getRomPath();
 
       const flasherArgs = connectedFlashCart.config.args
@@ -370,42 +369,41 @@ export class VesFlashCartService {
 
   protected async padRom(size: number): Promise<boolean> {
     const romPath = this.getRomPath();
-    const paddedRomPath = this.getPaddedRomPath();
+    const romUri = new URI(romPath);
+    const paddedRomPath = this.getPaddedRomPath(size);
+    const paddedRomUri = new URI(paddedRomPath);
 
     if (!this.vesBuildService.outputRomExists) {
       return false;
     }
 
     const targetSize = size * 128;
-    const romContent = readFileSync(romPath);
-    const romSize = romContent.length / 1024;
+    const romContent = await this.fileService.readFile(romUri);
+    const romSize = romContent.size / 1024;
     const timesToMirror = targetSize / romSize;
 
     if (romSize >= targetSize) {
       return false;
     }
 
-    if (await this.fileService.exists(new URI(paddedRomPath))) {
-      unlinkSync(paddedRomPath);
-    }
-
-    const stream = createWriteStream(paddedRomPath, { flags: 'a' });
+    const paddedRomBuffer = BinaryBufferWriteableStream.create();
     [...Array(timesToMirror)].forEach(function (): void {
-      stream.write(romContent);
+      paddedRomBuffer.write(romContent.value);
     });
-    stream.end();
+    await this.fileService.writeFile(paddedRomUri, paddedRomBuffer);
 
     return true;
   }
 
-  protected getPaddedRomPath(): string {
-    return this.getRomPath().replace('output.vb', 'outputPadded.vb');
+  protected getPaddedRomPath(size: number): string {
+    return this.getRomPath().replace('output.vb', `outputPadded${size}.vb`);
   }
 
   protected async parseStreamDataHyperFlasherCli32(connectedFlashCart: ConnectedFlashCart, data: any): Promise<void> { /* eslint-disable-line */
     if (connectedFlashCart.config.name === VesFlashCartPreferenceSchema.properties[VesFlashCartPreferenceIds.FLASH_CARTS].default[1].name) {
-      /* Number of # is only fixed (to 20) on HF32 firmware version 1.9 and above.
+      /* - Number of # is only fixed (to 20) on HF32 firmware version 1.9 and above.
         On lower firmwares, the number of # depends on file size.
+        - Direct-to-flash (-x option) is only supported on HF32 firmware version 2.2 and above.
         TODO: support older firmwares as well? Can the firmware be detected? */
 
       if (data.includes('Transmitting:')) {
