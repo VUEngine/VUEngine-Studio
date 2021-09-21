@@ -57,6 +57,9 @@
   padding-left: 24px;
   position: relative;
 }
+#vesFlashCartWidget .flashCartInfo > div:first-child > div.warning {
+  color: var(--theia-editorWarning-foreground);
+}
 
 #vesFlashCartWidget .flashCartInfo > div:first-child > div > i {
   left: 0;

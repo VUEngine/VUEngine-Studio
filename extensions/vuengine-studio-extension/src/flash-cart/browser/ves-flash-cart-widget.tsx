@@ -10,11 +10,14 @@ import { VesFlashCartService } from './ves-flash-cart-service';
 import { VesFlashCartPreferenceIds, VesFlashCartPreferenceSchema } from './ves-flash-cart-preferences';
 import { IMAGE_HYPERFLASH32_LABEL } from './images/hyperflash32-label';
 import { NO_FLASH_CARTS } from './images/no-flash-carts';
+import { VesBuildService } from '../../build/browser/ves-build-service';
 
 @injectable()
 export class VesFlashCartWidget extends ReactWidget {
   @inject(CommandService)
   private readonly commandService: CommandService;
+  @inject(VesBuildService)
+  private readonly vesBuildService: VesBuildService;
   @inject(VesFlashCartService)
   private readonly vesFlashCartService: VesFlashCartService;
 
@@ -41,6 +44,7 @@ export class VesFlashCartWidget extends ReactWidget {
     this.vesFlashCartService.onDidChangeIsFlashing(() => this.update());
     this.vesFlashCartService.onDidChangeIsQueued(() => this.update());
     this.vesFlashCartService.onDidChangeFlashingProgress(() => this.update());
+    this.vesFlashCartService.onDidChangeAtLeastOneCanHoldRom(() => this.update());
   }
 
   protected setTitle(): void {
@@ -96,6 +100,7 @@ export class VesFlashCartWidget extends ReactWidget {
                 onClick={() =>
                   this.commandService.executeCommand(VesFlashCartCommands.FLASH.id)
                 }
+                disabled={!this.vesFlashCartService.atLeastOneCanHoldRom}
               >
                 <i className='fa fa-microchip'></i> Flash
               </button>
@@ -117,7 +122,7 @@ export class VesFlashCartWidget extends ReactWidget {
                 <div className='flashCartInfo'>
                   <div>
                     <h2>{connectedFlashCart.config.name}</h2>
-                    <div>
+                    <div className={!connectedFlashCart.canHoldRom ? 'warning' : ''}>
                       <i className='fa fa-fw fa-microchip'></i>{' '}
                       {connectedFlashCart.config.size} MBit<br />
                       ({connectedFlashCart.config.padRom
@@ -136,6 +141,13 @@ export class VesFlashCartWidget extends ReactWidget {
                       {basename(connectedFlashCart.config.path)}{' '}
                       {connectedFlashCart.config.args}
                     </div>
+                    {!connectedFlashCart.canHoldRom &&
+                      <div className="warning">
+                        <i className='fa fa-fw fa-exclamation-triangle'></i>{' '}
+                        Insufficient space to hold ROM
+                        ({this.vesBuildService.bytesToMbit(this.vesBuildService.romSize)} MBit)
+                      </div>
+                    }
                   </div>
                   {connectedFlashCart.config.image && (
                     <div>
@@ -172,19 +184,21 @@ export class VesFlashCartWidget extends ReactWidget {
                   ) : <></>}
                 </div>
 
-                <div className='flashLogWrapper'>
-                  <button
-                    className='theia-button secondary'
-                    onClick={() => this.toggleLog(index)}
-                  >
-                    {this.state.showLog[index] ? 'Hide Log' : 'Show Log'}
-                  </button>
-                  {this.state.showLog[index] && (
-                    <pre className='flashLog'>
-                      {connectedFlashCart.status.log}
-                    </pre>
-                  )}
-                </div>
+                {connectedFlashCart.status.log &&
+                  <div className='flashLogWrapper'>
+                    <button
+                      className='theia-button secondary'
+                      onClick={() => this.toggleLog(index)}
+                    >
+                      {this.state.showLog[index] ? 'Hide Log' : 'Show Log'}
+                    </button>
+                    {this.state.showLog[index] && (
+                      <pre className='flashLog'>
+                        {connectedFlashCart.status.log}
+                      </pre>
+                    )}
+                  </div>
+                }
               </div>
             )
           )}

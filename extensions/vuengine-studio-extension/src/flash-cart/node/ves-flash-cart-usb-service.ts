@@ -73,6 +73,7 @@ export class VesFlashCartUsbServiceImpl implements VesFlashCartUsbService {
                                 progress: -1,
                                 log: '',
                             },
+                            canHoldRom: true,
                         });
                     }
                 }

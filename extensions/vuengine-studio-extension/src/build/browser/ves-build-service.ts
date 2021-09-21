@@ -103,6 +103,18 @@ export class VesBuildService {
     return this._isCleaning;
   }
 
+  // rom size
+  protected _romSize: number = 0;
+  protected readonly onDidChangeRomSizeEmitter = new Emitter<number>();
+  readonly onDidChangeRomSize = this.onDidChangeRomSizeEmitter.event;
+  set romSize(size: number) {
+    this._romSize = size;
+    this.onDidChangeRomSizeEmitter.fire(this._romSize);
+  }
+  get romSize(): number {
+    return this._romSize;
+  }
+
   // build status
   protected _buildStatus: BuildStatus = {
     active: false,
@@ -112,7 +124,6 @@ export class VesBuildService {
     log: [],
     buildMode: BuildMode.Beta,
     step: '',
-    romSize: 0,
   };
   protected readonly onDidChangeBuildStatusEmitter = new Emitter<BuildStatus>();
   readonly onDidChangeBuildStatus = this.onDidChangeBuildStatusEmitter.event;
@@ -173,6 +184,7 @@ export class VesBuildService {
             .exists(new URI(this.getRomPath()))
             .then((exists: boolean) => {
               this.outputRomExists = exists;
+              /* await */ this.determineRomSize();
             });
         }
       }
@@ -249,6 +261,12 @@ export class VesBuildService {
     ).length;
   }
 
+  protected async determineRomSize(): Promise<void> {
+    const RomPath = this.getRomPath();
+    const outputRom = await this.fileService.readFile(new URI(RomPath));
+    this.romSize = outputRom.size;
+  }
+
   protected bindEvents(): void {
     // @ts-ignore
     this.vesProcessWatcher.onError(async ({ pId }) => {
@@ -282,18 +300,11 @@ export class VesBuildService {
     this.vesProcessWatcher.onErrorStreamData(onData);
 
     this.onDidBuildSucceed(async () => {
-      const outputRom = await this.fileService.readFile(new URI(this.getRomPath()));
-      this.buildStatus.romSize = outputRom.size;
-
-      // trigger change event
-      this.buildStatus = this.buildStatus;
+        /* await */ this.determineRomSize();
     });
 
     this.onDidBuildFail(async () => {
-      this.buildStatus.romSize = 0;
-
-      // trigger change event
-      this.buildStatus = this.buildStatus;
+      this.romSize = 0;
     });
   }
 
@@ -337,7 +348,6 @@ export class VesBuildService {
       log,
       buildMode: this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode,
       step,
-      romSize: 0,
     };
   }
 

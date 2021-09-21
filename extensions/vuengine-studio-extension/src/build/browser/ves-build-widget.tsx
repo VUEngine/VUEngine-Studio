@@ -15,13 +15,20 @@ import { EditorManager } from '@theia/editor/lib/browser';
 
 @injectable()
 export class VesBuildWidget extends ReactWidget {
-  @inject(CommandService) private readonly commandService: CommandService;
-  @inject(FileService) private readonly fileService: FileService;
-  @inject(FileDialogService) private readonly fileDialogService: FileDialogService;
-  @inject(EditorManager) private readonly editorManager: EditorManager;
-  @inject(PreferenceService) private readonly preferenceService: PreferenceService;
-  @inject(VesBuildService) private readonly vesBuildService: VesBuildService;
-  @inject(WorkspaceService) private readonly workspaceService: WorkspaceService;
+  @inject(CommandService)
+  private readonly commandService: CommandService;
+  @inject(FileService)
+  private readonly fileService: FileService;
+  @inject(FileDialogService)
+  private readonly fileDialogService: FileDialogService;
+  @inject(EditorManager)
+  private readonly editorManager: EditorManager;
+  @inject(PreferenceService)
+  private readonly preferenceService: PreferenceService;
+  @inject(VesBuildService)
+  private readonly vesBuildService: VesBuildService;
+  @inject(WorkspaceService)
+  private readonly workspaceService: WorkspaceService;
 
   static readonly ID = 'vesBuildWidget';
   static readonly LABEL = VesBuildCommands.BUILD.label || 'Build';
@@ -50,6 +57,7 @@ export class VesBuildWidget extends ReactWidget {
     this.node.tabIndex = 0; // required for this.node.focus() to work in this.onActivateRequest()
     this.update();
 
+    this.vesBuildService.onDidChangeRomSize(() => this.update());
     this.vesBuildService.onDidChangeBuildStatus(() => this.update());
     this.vesBuildService.onDidChangeBuildMode(() => this.update());
     this.preferenceService.onPreferenceChanged(({ preferenceName }) => {
@@ -285,8 +293,8 @@ export class VesBuildWidget extends ReactWidget {
                   <span><i className='fa fa-wrench'></i> {this.vesBuildService.buildStatus.buildMode}</span>
                   {this.vesBuildService.buildStatus.active && this.vesBuildService.buildStatus.processId > 0 &&
                     <span><i className='fa fa-terminal'></i> PID {this.vesBuildService.buildStatus.processId}</span>}
-                  {this.vesBuildService.buildStatus.romSize > 0 &&
-                    <span><i className='fa fa-microchip'></i> {this.vesBuildService.bytesToMbit(this.vesBuildService.buildStatus.romSize)} MBit</span>}
+                  {this.vesBuildService.romSize > 0 &&
+                    <span><i className='fa fa-microchip'></i> {this.vesBuildService.bytesToMbit(this.vesBuildService.romSize)} MBit</span>}
                 </div>
               </div>
               <div className='buildProblems'>

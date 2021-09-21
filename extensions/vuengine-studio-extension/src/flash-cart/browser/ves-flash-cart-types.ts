@@ -17,6 +17,7 @@ export interface ConnectedFlashCart {
   config: FlashCartConfig
   device: Device
   status: FlashCartStatus
+  canHoldRom: boolean
 }
 
 export interface FlashCartStatus {

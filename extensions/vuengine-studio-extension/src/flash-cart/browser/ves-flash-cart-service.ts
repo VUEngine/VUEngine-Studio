@@ -70,6 +70,18 @@ export class VesFlashCartService {
     return this._isQueued;
   }
 
+  // at least one of the connected flash carts can hold the rom
+  protected _atLeastOneCanHoldRom: boolean = false;
+  protected readonly onDidChangeAtLeastOneCanHoldRomEmitter = new Emitter<boolean>();
+  readonly onDidChangeAtLeastOneCanHoldRom = this.onDidChangeAtLeastOneCanHoldRomEmitter.event;
+  set atLeastOneCanHoldRom(flag: boolean) {
+    this._atLeastOneCanHoldRom = flag;
+    this.onDidChangeAtLeastOneCanHoldRomEmitter.fire(this._atLeastOneCanHoldRom);
+  }
+  get atLeastOneCanHoldRom(): boolean {
+    return this._atLeastOneCanHoldRom;
+  }
+
   // connected flash carts
   protected _connectedFlashCarts: ConnectedFlashCart[] = [];
   protected readonly onDidChangeConnectedFlashCartsEmitter = new Emitter<
@@ -165,7 +177,8 @@ export class VesFlashCartService {
       this.isQueued = false;
     } else if (this.vesBuildService.buildStatus.active) {
       this.isQueued = true;
-    } else if (this.vesBuildService.outputRomExists && (this.isFlashing || this.connectedFlashCarts.length === 0)) {
+    } else if (this.vesBuildService.outputRomExists && (this.isFlashing ||
+      !this.atLeastOneCanHoldRom || this.connectedFlashCarts.length === 0)) {
       this.commandService.executeCommand(VesFlashCartCommands.OPEN_WIDGET.id);
     } else {
       if (this.vesBuildService.outputRomExists) {
@@ -178,11 +191,15 @@ export class VesFlashCartService {
   }
 
   async flash(): Promise<void> {
-    if (this.connectedFlashCarts.length === 0) {
+    if (!this.atLeastOneCanHoldRom || this.connectedFlashCarts.length === 0) {
       return;
     }
 
     for (const connectedFlashCart of this.connectedFlashCarts) {
+      if (!connectedFlashCart.canHoldRom) {
+        continue;
+      }
+
       const flasherPath = await this.replaceFlasherPath(connectedFlashCart.config.path);
 
       if (!flasherPath) {
@@ -285,7 +302,12 @@ export class VesFlashCartService {
       this.isQueued = false;
     });
 
+    this.vesBuildService.onDidChangeRomSize(() => {
+      this.determineAllCanHoldRom();
+    });
+
     this.vesProcessWatcher.onExit(({ pId }) => {
+      this.flashingProgress = -1;
       // console.log('exit', pId);
       for (const connectedFlashCart of this.connectedFlashCarts) {
         if (connectedFlashCart.status.processId === pId) {
@@ -420,6 +442,7 @@ export class VesFlashCartService {
     this.connectedFlashCarts = await this.vesFlashCartUsbService.detectFlashCarts(
       ...flashCartConfigs
     );
+    this.determineAllCanHoldRom();
   };
 
   getFlashCartConfigs(): FlashCartConfig[] {
@@ -461,6 +484,26 @@ export class VesFlashCartService {
 
   getRomPath(): string {
     return joinPath(this.vesProjectsService.getWorkspaceRoot(), 'build', 'output.vb');
+  }
+
+  protected determineCanHoldRom(flashSize: number): boolean {
+    return flashSize >= this.vesBuildService.bytesToMbit(this.vesBuildService.romSize);
+  }
+
+  protected determineAllCanHoldRom(): void {
+    this.connectedFlashCarts = this.connectedFlashCarts.map((connectedFlashCart: ConnectedFlashCart) => ({
+      ...connectedFlashCart,
+      canHoldRom: this.determineCanHoldRom(connectedFlashCart.config.size),
+    }));
+
+    let atLeastOneCanHoldRom = false;
+    this.connectedFlashCarts.forEach((connectedFlashCart: ConnectedFlashCart) => {
+      if (connectedFlashCart.canHoldRom) {
+        atLeastOneCanHoldRom = true;
+      }
+    });
+
+    this.atLeastOneCanHoldRom = atLeastOneCanHoldRom;
   }
 
   async getResourcesPath(): Promise<string> {
