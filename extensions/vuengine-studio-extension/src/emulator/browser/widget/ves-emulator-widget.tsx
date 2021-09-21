@@ -1,10 +1,11 @@
-import { basename, join as joinPath } from 'path';
+import { basename } from 'path';
 import * as React from '@theia/core/shared/react';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { CommandService } from '@theia/core';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import {
+  Endpoint,
   KeybindingRegistry,
   Message,
   PreferenceScope,
@@ -481,16 +482,7 @@ export class VesEmulatorWidget extends ReactWidget {
   }
 
   protected async getResource(): Promise<string> {
-    // TODO: load via localhost
-    return joinPath(
-      'file://',
-      await this.getResourcesPath(),
-      'binaries',
-      'vuengine-studio-tools',
-      'web',
-      'retroarch',
-      'index.html'
-    );
+    return new Endpoint({ path: '/emulator/index.html' }).getRestUrl().toString();
   }
 
   protected async sendCommand(command: string, data?: any): Promise<void> { /* eslint-disable-line */

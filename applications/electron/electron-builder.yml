@@ -25,6 +25,8 @@ files:
     to: documentation
   - from: vuengine
     to: vuengine
+  - from: binaries/vuengine-studio-tools/web
+    to: binaries/vuengine-studio-tools/web
 
 win:
   icon: resources/icons/WindowsLauncherIcon/VUEngineStudio.ico
