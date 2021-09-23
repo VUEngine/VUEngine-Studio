@@ -130,6 +130,14 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
       execute: () => { },
       isVisible: () => false,
     });
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_TOGGLE_FULLSCREEN, {
+      execute: () => { },
+      isVisible: () => false,
+    });
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_TOGGLE_CONTROLS_OVERLAY, {
+      execute: () => { },
+      isVisible: () => false,
+    });
   }
 
   registerKeybindings(registry: KeybindingRegistry): void {
@@ -267,6 +275,16 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
     registry.registerKeybinding({
       command: VesEmulatorCommands.INPUT_AUDIO_MUTE.id,
       keybinding: 'q',
+      when: 'emulatorFocus',
+    });
+    registry.registerKeybinding({
+      command: VesEmulatorCommands.INPUT_TOGGLE_FULLSCREEN.id,
+      keybinding: 'o',
+      when: 'emulatorFocus',
+    });
+    registry.registerKeybinding({
+      command: VesEmulatorCommands.INPUT_TOGGLE_CONTROLS_OVERLAY.id,
+      keybinding: 'p',
       when: 'emulatorFocus',
     });
   }
