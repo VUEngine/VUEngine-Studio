@@ -93,7 +93,11 @@ export class VesEmulatorWidget extends ReactWidget {
 
     await this.initState();
     this.bindKeys();
-    this.update();
+
+    // TODO: find out why the emulator is only x1 size initially, without setTimeout
+    setTimeout(() => {
+      this.update();
+    }, 50);
 
     this.keybindingRegistry.onKeybindingsChanged(() => {
       this.keybindingToState();
@@ -128,11 +132,6 @@ export class VesEmulatorWidget extends ReactWidget {
   protected onBeforeDetach(msg: Message): void {
     super.onBeforeDetach(msg);
     this.unbindKeys();
-  }
-
-  protected onAfterShow(msg: Message): void {
-    super.onAfterShow(msg);
-    this.update();
   }
 
   protected keybindingToState(): void {
