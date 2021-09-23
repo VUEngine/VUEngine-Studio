@@ -35,6 +35,9 @@ export interface vesEmulatorWidgetState {
   paused: boolean
   lowPower: boolean
   muted: boolean
+  slowmotion: boolean
+  fastForward: boolean
+  frameAdvance: boolean
   showControls: boolean
   input: any /* eslint-disable-line */
 };
@@ -97,6 +100,9 @@ export class VesEmulatorWidget extends ReactWidget {
       paused: false,
       lowPower: false,
       muted: false,
+      slowmotion: false,
+      fastForward: false,
+      frameAdvance: false,
       showControls: false,
       input: {},
     };
@@ -245,8 +251,9 @@ export class VesEmulatorWidget extends ReactWidget {
 
     for (const key in this.state.input) {
       if (this.state.input.hasOwnProperty(key)) {
-        if (this.matchKey(this.state.input[key].keys, e.code)) {
-          if (!this.state.paused || this.state.input[key].command === EmulatorFunctionKeyCode.PauseToggle) {
+        if (!this.state.paused || this.state.input[key].command === EmulatorFunctionKeyCode.PauseToggle ||
+          (this.state.frameAdvance && this.state.input[key].command === EmulatorFunctionKeyCode.FrameAdvance)) {
+          if (this.matchKey(this.state.input[key].keys, e.code)) {
             this.sendCommand(e.type, this.state.input[key].command);
           }
         }
@@ -298,17 +305,14 @@ export class VesEmulatorWidget extends ReactWidget {
         <div id='vesEmulatorUi'>
           <div>
             <button
-              className='theia-button secondary'
+              className={this.state.paused
+                ? 'theia-button'
+                : 'theia-button secondary'}
               title={this.state.paused ? 'Resume' : 'Pause'}
               onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.PauseToggle, e)}
               disabled={this.state.showControls}
             >
-              <i
-                className={this.state.paused
-                  ? 'fa fa-pause'
-                  : 'fa fa-play'
-                }
-              ></i>
+              <i className='fa fa-pause'></i>
             </button>
             <button
               className='theia-button secondary'
@@ -319,7 +323,9 @@ export class VesEmulatorWidget extends ReactWidget {
               <i className='fa fa-refresh'></i>
             </button>
             <button
-              className='theia-button secondary'
+              className={this.state.muted
+                ? 'theia-button'
+                : 'theia-button secondary'}
               title='Mute'
               onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.AudioMute, e)}
               disabled={this.state.showControls}
@@ -329,7 +335,9 @@ export class VesEmulatorWidget extends ReactWidget {
                 : 'fa fa-volume-up'}></i>
             </button>
             <button
-              className='theia-button secondary'
+              className={this.state.lowPower
+                ? 'theia-button'
+                : 'theia-button secondary'}
               title='Toggle Low Power Signal'
               onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.ToggleLowPower, e)}
               disabled={this.state.showControls}
@@ -360,7 +368,9 @@ export class VesEmulatorWidget extends ReactWidget {
               <i className='fa fa-backward'></i>
             </button>
             <button
-              className='theia-button secondary'
+              className={this.state.slowmotion
+                ? 'theia-button'
+                : 'theia-button secondary'}
               title='Toggle Slow Motion'
               onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.ToggleSlowmotion, e)}
               disabled={this.state.showControls}
@@ -368,7 +378,9 @@ export class VesEmulatorWidget extends ReactWidget {
               <i className='fa fa-eject fa-rotate-90'></i>
             </button>
             <button
-              className='theia-button secondary'
+              className={this.state.frameAdvance
+                ? 'theia-button'
+                : 'theia-button secondary'}
               title='Frame Advance'
               onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.FrameAdvance, e)}
               disabled={this.state.showControls}
@@ -377,7 +389,9 @@ export class VesEmulatorWidget extends ReactWidget {
             </button>
 
             <button
-              className='theia-button secondary'
+              className={this.state.fastForward
+                ? 'theia-button'
+                : 'theia-button secondary'}
               title='Toggle Fast Forward'
               onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.ToggleFastForward, e)}
               disabled={this.state.showControls}
@@ -548,10 +562,24 @@ export class VesEmulatorWidget extends ReactWidget {
           break;
         case EmulatorFunctionKeyCode.PauseToggle:
           this.state.paused = !this.state.paused;
+          this.state.frameAdvance = false;
           this.update();
           break;
         case EmulatorFunctionKeyCode.ToggleLowPower:
           this.state.lowPower = !this.state.lowPower;
+          this.update();
+          break;
+        case EmulatorFunctionKeyCode.ToggleSlowmotion:
+          this.state.slowmotion = !this.state.slowmotion;
+          this.update();
+          break;
+        case EmulatorFunctionKeyCode.ToggleFastForward:
+          this.state.fastForward = !this.state.fastForward;
+          this.update();
+          break;
+        case EmulatorFunctionKeyCode.FrameAdvance:
+          this.state.paused = true;
+          this.state.frameAdvance = true;
           this.update();
           break;
       }
