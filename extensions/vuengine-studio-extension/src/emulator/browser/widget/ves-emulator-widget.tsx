@@ -1,7 +1,7 @@
-import { basename } from 'path';
+import { basename, dirname, join as joinPath } from 'path';
 import * as React from '@theia/core/shared/react';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { CommandService } from '@theia/core';
+import { CommandService, isWindows } from '@theia/core';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import {
   Endpoint,
@@ -24,6 +24,9 @@ import { VesEmulatorCommands } from '../ves-emulator-commands';
 import { VesEmulatorPreferenceIds } from '../ves-emulator-preferences';
 import { VesEmulatorService } from '../ves-emulator-service';
 import { VesEmulatorControls } from './ves-emulator-controls-component';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import URI from '@theia/core/lib/common/uri';
+import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 
 const datauri = require('datauri');
 
@@ -50,6 +53,8 @@ export class VesEmulatorWidget extends ReactWidget {
   protected readonly commandService: CommandService;
   @inject(EnvVariablesServer)
   protected readonly envVariablesServer: EnvVariablesServer;
+  @inject(FileService)
+  protected readonly fileService: FileService;
   @inject(KeybindingRegistry)
   protected readonly keybindingRegistry!: KeybindingRegistry;
   @inject(LocalStorageService)
@@ -259,15 +264,18 @@ export class VesEmulatorWidget extends ReactWidget {
   // Otherwise, there could be inconsistencies between UI state and emulator.
 
   protected keyEventListerner = (e: KeyboardEvent) => this.processKeyEvent(e);
+  protected messageEventListerner = (e: MessageEvent) => this.processIframeMessage(e);
 
   protected bindKeys(): void {
     document.addEventListener('keydown', this.keyEventListerner);
     document.addEventListener('keyup', this.keyEventListerner);
+    window.addEventListener('message', this.messageEventListerner);
   }
 
   protected unbindKeys(): void {
     document.removeEventListener('keydown', this.keyEventListerner);
     document.removeEventListener('keyup', this.keyEventListerner);
+    window.removeEventListener('message', this.messageEventListerner);
   }
 
   protected processKeyEvent(e: KeyboardEvent): void {
@@ -278,15 +286,24 @@ export class VesEmulatorWidget extends ReactWidget {
 
     for (const key in this.state.input) {
       if (this.state.input.hasOwnProperty(key)) {
-        if (!this.state.paused || this.state.input[key].command === EmulatorFunctionKeyCode.PauseToggle ||
+        if ((!this.state.paused && !this.state.showControls) ||
+          (!this.state.showControls && this.state.input[key].command === EmulatorFunctionKeyCode.PauseToggle) ||
           this.state.input[key].command === EmulatorFunctionKeyCode.ToggleControlsOverlay ||
-          this.state.input[key].command === EmulatorFunctionKeyCode.Fullscreen ||
+          (!this.state.showControls && this.state.input[key].command === EmulatorFunctionKeyCode.Fullscreen) ||
           (this.state.frameAdvance && this.state.input[key].command === EmulatorFunctionKeyCode.FrameAdvance)) {
           if (this.matchKey(this.state.input[key].keys, e.code)) {
             this.sendCommand(e.type, this.state.input[key].command);
           }
         }
       }
+    }
+  }
+
+  protected processIframeMessage(e: MessageEvent): void {
+    switch (e.data.type) {
+      case 'screenshot':
+        this.processScreenshot(e.data.data);
+        break;
     }
   }
 
@@ -528,9 +545,9 @@ export class VesEmulatorWidget extends ReactWidget {
             </button>
             <button
               className='theia-button secondary'
-              title='Take screenshot'
+              title={`Take screenshot${this.getKeybindingLabel(VesEmulatorCommands.INPUT_SCREENSHOT.id, true)}`}
               onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.Screenshot, e)}
-              disabled={this.state.showControls}
+              disabled={this.state.showControls || this.state.paused}
             >
               <i className='fa fa-camera'></i>
             </button>
@@ -627,21 +644,25 @@ export class VesEmulatorWidget extends ReactWidget {
           this.update();
           await this.localStorageService.setData('ves-emulator-state-save-slot', this.state.saveSlot);
           break;
+        case EmulatorFunctionKeyCode.Screenshot:
+          setTimeout(() => {
+            this.sendCommand('sendScreenshot');
+          }, 500);
+          break;
       }
     }
   }
 
-  protected saveScreenshot(): void {
-    // TODO: this does not work
-    // instead, try using the emulator's screenshot function, read the screenshot from BrowserFS
-    // and send it back to parent frame as base64
-    const canvas = this.iframeRef.current?.contentDocument?.getElementById(
-      'canvas'
-    ) as HTMLCanvasElement;
-    const lnk = document.createElement('a');
-    lnk.download = 'filename.png';
-    lnk.href = canvas?.toDataURL('image/png;base64');
-    lnk.click();
+  protected processScreenshot(data: string): void {
+    const byteString = atob(data);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+
+    const fileUri = new URI(joinPath(this.getWorkspaceRoot(), 'output.png'));
+    this.fileService.writeFile(fileUri, BinaryBuffer.wrap(ia));
   }
 
   protected async reload(): Promise<void> {
@@ -780,6 +801,9 @@ export class VesEmulatorWidget extends ReactWidget {
         input_audio_mute = ${this.toButton(EmulatorFunctionKeyCode.AudioMute)}
         input_screenshot = ${this.toButton(EmulatorFunctionKeyCode.Screenshot)}
 
+        auto_screenshot_filename = "false"
+        screenshot_directory = "/home/web_user/retroarch/userdata"
+
         input_reset = nul
         input_toggle_fullscreen = nul
         input_hold_fast_forward = nul
@@ -909,5 +933,13 @@ export class VesEmulatorWidget extends ReactWidget {
     }
 
     return keybindingAccelerator;
+  }
+
+  protected getWorkspaceRoot(): string {
+    const substrNum = isWindows ? 2 : 1;
+
+    return window.location.hash.slice(-9) === 'workspace'
+      ? dirname(window.location.hash.substring(substrNum))
+      : window.location.hash.substring(substrNum);
   }
 }

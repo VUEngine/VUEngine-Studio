@@ -138,6 +138,10 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
       execute: () => { },
       isVisible: () => false,
     });
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_SCREENSHOT, {
+      execute: () => { },
+      isVisible: () => false,
+    });
   }
 
   registerKeybindings(registry: KeybindingRegistry): void {
@@ -285,6 +289,11 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
     registry.registerKeybinding({
       command: VesEmulatorCommands.INPUT_TOGGLE_CONTROLS_OVERLAY.id,
       keybinding: 'p',
+      when: 'emulatorFocus',
+    });
+    registry.registerKeybinding({
+      command: VesEmulatorCommands.INPUT_SCREENSHOT.id,
+      keybinding: 'f9',
       when: 'emulatorFocus',
     });
   }

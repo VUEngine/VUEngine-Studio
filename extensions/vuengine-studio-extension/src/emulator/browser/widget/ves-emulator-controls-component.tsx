@@ -626,6 +626,52 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                     </div>
                     <div className='buttonAssignmentGroup'>
                         <div>
+                            <span>Frame Advance</span>
+                            <span>
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_FRAME_ADVANCE.id, false)}
+                                </button>
+                            </span>
+                        </div>
+                        <div>
+                            <span>Toggle Fast Forward</span>
+                            <span>
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.id, false)}
+                                </button>
+                            </span>
+                        </div>
+                        <div>
+                            <span>Toggle Slow Motion</span>
+                            <span>
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_TOGGLE_SLOWMOTION.id, false)}
+                                </button>
+                            </span>
+                        </div>
+                        <div>
+                            <span>Rewind</span>
+                            <span>
+                                <button
+                                    className='theia-button secondary'
+                                    onClick={() => this.openKeymaps()}
+                                >
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_REWIND.id, false)}
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                    <div className='buttonAssignmentGroup'>
+                        <div>
                             <span>Save State</span>
                             <span>
                                 <button
@@ -672,46 +718,35 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                     </div>
                     <div className='buttonAssignmentGroup'>
                         <div>
-                            <span>Frame Advance</span>
+                            <span>Enter Fullscreen</span>
                             <span>
                                 <button
                                     className='theia-button secondary'
                                     onClick={() => this.openKeymaps()}
                                 >
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_FRAME_ADVANCE.id, false)}
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_FULLSCREEN.id, false)}
                                 </button>
                             </span>
                         </div>
                         <div>
-                            <span>Toggle Fast Forward</span>
+                            <span>Take Screenshot</span>
                             <span>
                                 <button
                                     className='theia-button secondary'
                                     onClick={() => this.openKeymaps()}
                                 >
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.id, false)}
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_SCREENSHOT.id, false)}
                                 </button>
                             </span>
                         </div>
                         <div>
-                            <span>Toggle Slow Motion</span>
+                            <span>Toggle Controls Overlay</span>
                             <span>
                                 <button
                                     className='theia-button secondary'
                                     onClick={() => this.openKeymaps()}
                                 >
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_TOGGLE_SLOWMOTION.id, false)}
-                                </button>
-                            </span>
-                        </div>
-                        <div>
-                            <span>Rewind</span>
-                            <span>
-                                <button
-                                    className='theia-button secondary'
-                                    onClick={() => this.openKeymaps()}
-                                >
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_REWIND.id, false)}
+                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_TOGGLE_CONTROLS_OVERLAY.id, false)}
                                 </button>
                             </span>
                         </div>

@@ -4,188 +4,188 @@ export namespace VesEmulatorCommands {
   export const CATEGORY = 'Emulator';
 
   export const RUN: Command = {
-    id: 'VesRun.commands.run',
+    id: 'VesEmulator.commands.run',
     label: 'Run on Emulator',
     category: CATEGORY,
     iconClass: 'fa fa-play',
   };
 
   export const SELECT: Command = {
-    id: 'VesRun.commands.selectEmulator',
+    id: 'VesEmulator.commands.selectEmulator',
     label: 'Set Default Emulator Config...',
     category: CATEGORY,
   };
 
   export const INPUT_L_UP: Command = {
-    id: 'VesRun.commands.emulatorInputLUpCommand',
+    id: 'VesEmulator.commands.emulatorInputLUpCommand',
     label: 'Left D-Pad Up',
     category: 'Emulator Game Pad',
   };
 
   export const INPUT_L_RIGHT: Command = {
-    id: 'VesRun.commands.emulatorInputLRightCommand',
+    id: 'VesEmulator.commands.emulatorInputLRightCommand',
     label: 'Left D-Pad Right',
     category: 'Emulator Game Pad',
   };
 
   export const INPUT_L_DOWN: Command = {
-    id: 'VesRun.commands.emulatorInputLDownCommand',
+    id: 'VesEmulator.commands.emulatorInputLDownCommand',
     label: 'Left D-Pad Down',
     category: 'Emulator Game Pad',
   };
 
   export const INPUT_L_LEFT: Command = {
-    id: 'VesRun.commands.emulatorInputLLeftCommand',
+    id: 'VesEmulator.commands.emulatorInputLLeftCommand',
     label: 'Left D-Pad Left',
     category: 'Emulator Game Pad',
   };
 
   export const INPUT_START: Command = {
-    id: 'VesRun.commands.emulatorInputStartCommand',
+    id: 'VesEmulator.commands.emulatorInputStartCommand',
     label: 'Start',
     category: 'Emulator Game Pad',
   };
 
   export const INPUT_SELECT: Command = {
-    id: 'VesRun.commands.emulatorInputSelectCommand',
+    id: 'VesEmulator.commands.emulatorInputSelectCommand',
     label: 'Select',
     category: 'Emulator Game Pad',
   };
 
   export const INPUT_L_TRIGGER: Command = {
-    id: 'VesRun.commands.emulatorInputLTriggerCommand',
+    id: 'VesEmulator.commands.emulatorInputLTriggerCommand',
     label: 'Left Trigger',
     category: 'Emulator Game Pad',
   };
 
   export const INPUT_R_UP: Command = {
-    id: 'VesRun.commands.emulatorInputRUpCommand',
+    id: 'VesEmulator.commands.emulatorInputRUpCommand',
     label: 'Right D-Pad Up',
     category: 'Emulator Game Pad',
   };
 
   export const INPUT_R_RIGHT: Command = {
-    id: 'VesRun.commands.emulatorInputRRightCommand',
+    id: 'VesEmulator.commands.emulatorInputRRightCommand',
     label: 'Right D-Pad Right',
     category: 'Emulator Game Pad',
   };
 
   export const INPUT_R_DOWN: Command = {
-    id: 'VesRun.commands.emulatorInputRDownCommand',
+    id: 'VesEmulator.commands.emulatorInputRDownCommand',
     label: 'Right D-Pad Down',
     category: 'Emulator Game Pad',
   };
 
   export const INPUT_R_LEFT: Command = {
-    id: 'VesRun.commands.emulatorInputRLeftCommand',
+    id: 'VesEmulator.commands.emulatorInputRLeftCommand',
     label: 'Right D-Pad Left',
     category: 'Emulator Game Pad',
   };
 
   export const INPUT_B: Command = {
-    id: 'VesRun.commands.emulatorInputBCommand',
+    id: 'VesEmulator.commands.emulatorInputBCommand',
     label: 'B',
     category: 'Emulator Game Pad',
   };
 
   export const INPUT_A: Command = {
-    id: 'VesRun.commands.emulatorInputACommand',
+    id: 'VesEmulator.commands.emulatorInputACommand',
     label: 'A',
     category: 'Emulator Game Pad',
   };
 
   export const INPUT_R_TRIGGER: Command = {
-    id: 'VesRun.commands.emulatorInputRTriggerCommand',
+    id: 'VesEmulator.commands.emulatorInputRTriggerCommand',
     label: 'Right Trigger',
     category: 'Emulator Game Pad',
   };
 
   export const INPUT_SAVE_STATE: Command = {
-    id: 'VesRun.commands.emulatorInputSaveStateCommand',
+    id: 'VesEmulator.commands.emulatorInputSaveStateCommand',
     label: 'Save State',
     category: CATEGORY,
   };
 
   export const INPUT_LOAD_STATE: Command = {
-    id: 'VesRun.commands.emulatorInputLoadStateCommand',
+    id: 'VesEmulator.commands.emulatorInputLoadStateCommand',
     label: 'Load State',
     category: CATEGORY,
   };
 
   export const INPUT_STATE_SLOT_DECREASE: Command = {
-    id: 'VesRun.commands.emulatorInputStateSlotDecreaseCommand',
+    id: 'VesEmulator.commands.emulatorInputStateSlotDecreaseCommand',
     label: 'Decrease Save State Slot',
     category: CATEGORY,
   };
 
   export const INPUT_STATE_SLOT_INCREASE: Command = {
-    id: 'VesRun.commands.emulatorInputStateSlotIncreaseCommand',
+    id: 'VesEmulator.commands.emulatorInputStateSlotIncreaseCommand',
     label: 'Increase Save State Slot',
     category: CATEGORY,
   };
 
   export const INPUT_TOGGLE_FAST_FORWARD: Command = {
-    id: 'VesRun.commands.emulatorInputToggleFastForwardCommand',
+    id: 'VesEmulator.commands.emulatorInputToggleFastForwardCommand',
     label: 'Toggle Fast Forward',
     category: CATEGORY,
   };
 
   export const INPUT_PAUSE_TOGGLE: Command = {
-    id: 'VesRun.commands.emulatorInputPauseToggleCommand',
+    id: 'VesEmulator.commands.emulatorInputPauseToggleCommand',
     label: 'Toggle Pause',
     category: CATEGORY,
   };
 
   export const INPUT_TOGGLE_SLOWMOTION: Command = {
-    id: 'VesRun.commands.emulatorInputToggleSlowmotionCommand',
+    id: 'VesEmulator.commands.emulatorInputToggleSlowmotionCommand',
     label: 'Toggle Slow Motion',
     category: CATEGORY,
   };
 
   export const INPUT_TOGGLE_LOW_POWER: Command = {
-    id: 'VesRun.commands.emulatorInputToggleLowPower',
+    id: 'VesEmulator.commands.emulatorInputToggleLowPower',
     label: 'Toggle Low Power Signal',
     category: CATEGORY,
   };
 
   export const INPUT_REWIND: Command = {
-    id: 'VesRun.commands.emulatorInputRewindCommand',
+    id: 'VesEmulator.commands.emulatorInputRewindCommand',
     label: 'Rewind',
     category: CATEGORY,
   };
 
   export const INPUT_FRAME_ADVANCE: Command = {
-    id: 'VesRun.commands.emulatorInputFrameAdvanceCommand',
+    id: 'VesEmulator.commands.emulatorInputFrameAdvanceCommand',
     label: 'Frame Advance',
     category: CATEGORY,
   };
 
   export const INPUT_RESET: Command = {
-    id: 'VesRun.commands.emulatorInputResetCommand',
+    id: 'VesEmulator.commands.emulatorInputResetCommand',
     label: 'Reset',
     category: CATEGORY,
   };
 
   export const INPUT_AUDIO_MUTE: Command = {
-    id: 'VesRun.commands.emulatorInputAudioMuteCommand',
+    id: 'VesEmulator.commands.emulatorInputAudioMuteCommand',
     label: 'Audio Mute',
     category: CATEGORY,
   };
 
   export const INPUT_FULLSCREEN: Command = {
-    id: 'VesRun.commands.emulatorInputFullscreenCommand',
+    id: 'VesEmulator.commands.emulatorInputFullscreenCommand',
     label: 'Fullscreen',
     category: CATEGORY,
   };
 
   export const INPUT_TOGGLE_CONTROLS_OVERLAY: Command = {
-    id: 'VesRun.commands.emulatorInputToggleControlsOverlayCommand',
+    id: 'VesEmulator.commands.emulatorInputToggleControlsOverlayCommand',
     label: 'Toggle Controls Overlay',
     category: CATEGORY,
   };
 
   export const INPUT_SCREENSHOT: Command = {
-    id: 'VesRun.commands.emulatorInputScreenshotCommand',
+    id: 'VesEmulator.commands.emulatorInputScreenshotCommand',
     label: 'Take Screenshot',
     category: CATEGORY,
   };
