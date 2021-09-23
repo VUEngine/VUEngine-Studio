@@ -95,6 +95,7 @@ export class VesBrandingContribution implements CommandContribution, MenuContrib
 
         // Add Virtual Boy HC theme
         // this is implemented through a filter in style/virtual-boy-theme.css
+        // TODO: Exclude certain areas from filter, such as the emulator
         MonacoThemeRegistry.SINGLETON.register({
             ...require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/hc_theia.json'),
             ...require('../../../src/branding/browser/themes/vuengine-virtual-boy-color-theme.json'),

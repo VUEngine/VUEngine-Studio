@@ -717,14 +717,6 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                         </div>
                     </div>
                 </div>
-                <div className='controlsHint'>
-                    <button
-                        className='theia-button secondary'
-                        onClick={() => this.openKeymaps()}
-                    >
-                        Open Shortcut Editor
-                    </button>
-                </div>
             </div>
         </>;
     }

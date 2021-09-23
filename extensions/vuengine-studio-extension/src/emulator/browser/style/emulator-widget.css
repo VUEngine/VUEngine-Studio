@@ -83,9 +83,11 @@
     display: table-row;
   }
   #vesEmulatorWidget .controlsOverlay .buttonAssignmentGroup > div:hover,
-  #vesEmulatorWidget .controlsOverlay .buttonAssignmentGroup > div.highlighted {
-    background-color: var(--theia-button-background);
+    #vesEmulatorWidget .controlsOverlay .buttonAssignmentGroup > div.highlighted {
+    background-color: var(--theia-list-hoverBackground);
+    color: var(--theia-list-hoverForeground);
   }
+
   #vesEmulatorWidget .controlsOverlay .buttonAssignmentGroup > div > span {
     display: table-cell;
     padding: var(--theia-ui-padding) calc(var(--theia-ui-padding) * 2);
@@ -93,11 +95,7 @@
   #vesEmulatorWidget .controlsOverlay .buttonAssignmentGroup .theia-button {
     min-width: 100px;
   }
-  
-  #vesEmulatorWidget .controlsOverlay .controlsHint {
-    justify-content: center;
-  }
-  
+    
   #vesEmulatorWidget .controlsController .controllerImage {
     margin: 0 calc(var(--theia-ui-padding) * 4);
     position: relative;
@@ -109,7 +107,7 @@
   }
   
   #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay {
-    border: 6px solid var(--theia-button-background);
+    background-color: #fff;
     cursor: pointer;
     opacity: 0;
     position: absolute;
@@ -126,8 +124,8 @@
   #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.lt,
   #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.rt {
     border-radius: 50%;
-    height: 6%;
-    width: 6%;
+    height: 7.8%;
+    width: 7.8%;
   }
   
   #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.lup,
@@ -138,85 +136,85 @@
   #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.rleft,
   #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.rright,
   #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.rdown {
-    height: 4%;
-    width: 4%;
+    height: 5.5%;
+    width: 5.5%;
   }
   
   #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.select {
-    left: 27%;
-    top: 38%;
+    left: 27.2%;
+    top: 38.7%;
   }
   
   #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.start {
-    left: 34.5%;
-    top: 41.7%;
+    left: 34.8%;
+    top: 42.2%;
   }
   
   #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.lup {
     border-bottom-width: 0;
-    left: 14.5%;
-    top: 29.5%;
+    left: 15%;
+    top: 30%;
   }
   
   #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.lleft {
     border-right-width: 0;
-    left: 10.4%;
-    top: 33.4%;
+    left: 10.9%;
+    top: 33.9%;
   }
   
   #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.lright {
     border-left-width: 0;
-    left: 19.9%;
-    top: 33.4%;
+    left: 19.5%;
+    top: 33.9%;
   }
   
   #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.ldown {
     border-top-width: 0;
-    left: 14.5%;
-    top: 38.5%;
+    left: 15%;
+    top: 38.4%;
   }
   
   #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.lt {
-    left: 13.4%;
-    top: 7.2%;
+    left: 13.8%;
+    top: 7.7%;
   }
   
   #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.b {
-    right: 34.5%;
-    top: 41.7%;
+    right: 34.8%;
+    top: 42.2%;
   }
   
   #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.a {
-    right: 27%;
-    top: 38%;
+    right: 27.2%;
+    top: 38.7%;
   }
   
   #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.rup {
     border-bottom-width: 0;
-    right: 14.5%;
-    top: 29.5%;
+    right: 15%;
+    top: 30%;
   }
   
   #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.rleft {
     border-right-width: 0;
-    right: 19.9%;
-    top: 33.4%;
+    right: 19.5%;
+    top: 33.9%;
   }
   
   #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.rright {
     border-left-width: 0;
-    right: 10.4%;
-    top: 33.4%;
+    right: 10.9%;
+    top: 33.9%;
   }
   
   #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.rdown {
     border-top-width: 0;
-    right: 14.5%;
-    top: 38.5%;
+    right: 15%;
+    top: 38.4%;
   }
   
   #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.rt {
-    right: 13.4%;
-    top: 7.2%;
+    right: 13.8%;
+    top: 7.7%;
   }
   
