@@ -51,7 +51,7 @@ export enum EmulatorGamePadKeyCode {
   LUp = 'KeyE',
   LRight = 'KeyF',
   LDown = 'KeyD',
-  LLeft = 'KeyS',
+  LLeft = 'KeyA', // KeyS is blocked by non-remappable low power toggle
   RUp = 'KeyI',
   RRight = 'KeyL',
   RDown = 'KeyK',
@@ -69,7 +69,7 @@ export enum EmulatorFunctionKeyCode {
   ToggleFastForward = 'ArrowRight',
   PauseToggle = 'Space',
   ToggleSlowmotion = 'ArrowDown',
-  ToggleLowPower = 'KeyW',
+  ToggleLowPower = 'KeyS',
   Rewind = 'ArrowLeft',
   FrameAdvance = 'ArrowUp',
   Reset = 'F10',
