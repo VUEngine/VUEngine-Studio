@@ -4,6 +4,8 @@ import URI from '@theia/core/lib/common/uri';
 import { EditorManager } from '@theia/editor/lib/browser';
 import { VesEmulatorWidget, VesEmulatorWidgetOptions } from './widget/ves-emulator-widget';
 
+// Start vb files in the configured default emulator
+
 @injectable()
 export class VesEmulatorOpenHandler extends WidgetOpenHandler<VesEmulatorWidget> {
     readonly id = VesEmulatorWidget.ID;

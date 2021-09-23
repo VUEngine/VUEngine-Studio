@@ -273,6 +273,7 @@ export class VesEmulatorWidget extends ReactWidget {
     return false;
   }
 
+  // TODO: backport EmulatorLoaded event from PVB's emulator? (required modifications to emulator)
   protected startEmulator(self: any): void { /* eslint-disable-line */
     const romPath = this.options ? this.options.uri : this.vesEmulatorService.getRomPath();
 
