@@ -6,6 +6,7 @@ import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import {
   Endpoint,
   KeybindingRegistry,
+  LocalStorageService,
   Message,
   PreferenceScope,
   PreferenceService,
@@ -35,6 +36,7 @@ export interface vesEmulatorWidgetState {
   paused: boolean
   lowPower: boolean
   muted: boolean
+  saveSlot: number
   slowmotion: boolean
   fastForward: boolean
   frameAdvance: boolean
@@ -50,6 +52,8 @@ export class VesEmulatorWidget extends ReactWidget {
   protected readonly envVariablesServer: EnvVariablesServer;
   @inject(KeybindingRegistry)
   protected readonly keybindingRegistry!: KeybindingRegistry;
+  @inject(LocalStorageService)
+  protected readonly localStorageService: LocalStorageService;
   @inject(PreferenceService)
   protected readonly preferenceService: PreferenceService;
   @inject(VesEmulatorService)
@@ -87,7 +91,7 @@ export class VesEmulatorWidget extends ReactWidget {
 
     window.indexedDB.deleteDatabase('RetroArch');
 
-    this.initState();
+    await this.initState();
     this.bindKeys();
     this.update();
 
@@ -106,11 +110,12 @@ export class VesEmulatorWidget extends ReactWidget {
     });
   }
 
-  protected initState(): void {
+  protected async initState(): Promise<void> {
     this.state = {
       paused: false,
       lowPower: false,
-      muted: false,
+      muted: (await this.localStorageService.getData('ves-emulator-state-muted')) || false,
+      saveSlot: (await this.localStorageService.getData('ves-emulator-state-save-slot')) || 0,
       slowmotion: false,
       fastForward: false,
       frameAdvance: false,
@@ -236,13 +241,17 @@ export class VesEmulatorWidget extends ReactWidget {
         keys: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_TOGGLE_LOW_POWER.id),
         command: EmulatorFunctionKeyCode.ToggleLowPower,
       },
-      toggleFullscreen: {
-        keys: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_TOGGLE_FULLSCREEN.id),
-        command: EmulatorFunctionKeyCode.ToggleFullscreen,
+      fullscreen: {
+        keys: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_FULLSCREEN.id),
+        command: EmulatorFunctionKeyCode.Fullscreen,
       },
       toggleControlsOverlay: {
         keys: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_TOGGLE_CONTROLS_OVERLAY.id),
         command: EmulatorFunctionKeyCode.ToggleControlsOverlay,
+      },
+      screenshot: {
+        keys: this.keybindingRegistry.getKeybindingsForCommand(VesEmulatorCommands.INPUT_SCREENSHOT.id),
+        command: EmulatorFunctionKeyCode.Screenshot,
       },
     };
   }
@@ -272,7 +281,7 @@ export class VesEmulatorWidget extends ReactWidget {
       if (this.state.input.hasOwnProperty(key)) {
         if (!this.state.paused || this.state.input[key].command === EmulatorFunctionKeyCode.PauseToggle ||
           this.state.input[key].command === EmulatorFunctionKeyCode.ToggleControlsOverlay ||
-          this.state.input[key].command === EmulatorFunctionKeyCode.ToggleFullscreen ||
+          this.state.input[key].command === EmulatorFunctionKeyCode.Fullscreen ||
           (this.state.frameAdvance && this.state.input[key].command === EmulatorFunctionKeyCode.FrameAdvance)) {
           if (this.matchKey(this.state.input[key].keys, e.code)) {
             this.sendCommand(e.type, this.state.input[key].command);
@@ -345,9 +354,7 @@ export class VesEmulatorWidget extends ReactWidget {
               <i className='fa fa-refresh'></i>
             </button>
             <button
-              className={this.state.muted
-                ? 'theia-button'
-                : 'theia-button secondary'}
+              className='theia-button secondary'
               title={`${this.state.muted ? 'Unmute' : 'Mute'}${this.getKeybindingLabel(VesEmulatorCommands.INPUT_AUDIO_MUTE.id, true)}`}
               onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.AudioMute, e)}
               disabled={this.state.showControls || this.state.paused}
@@ -421,118 +428,113 @@ export class VesEmulatorWidget extends ReactWidget {
               <i className='fa fa-forward'></i>
             </button>
           </div>
-          {this.wrapperRef.current &&
-            this.wrapperRef.current?.offsetWidth > 900 && (
-              <div>
-                <button
-                  className='theia-button secondary'
-                  title={`Save State${this.getKeybindingLabel(VesEmulatorCommands.INPUT_SAVE_STATE.id, true)}`}
-                  onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.SaveState, e)}
-                  disabled={this.state.showControls || this.state.paused}
-                >
-                  <i className='fa fa-level-down'></i>{' '}
-                  <i className='fa fa-bookmark-o'></i>
-                </button>
-                <button
-                  className='theia-button secondary'
-                  title={`Load State${this.getKeybindingLabel(VesEmulatorCommands.INPUT_LOAD_STATE.id, true)}`}
-                  onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.LoadState, e)}
-                  disabled={this.state.showControls || this.state.paused}
-                >
-                  <i className='fa fa-bookmark-o'></i>{' '}
-                  <i className='fa fa-level-up'></i>
-                </button>
-                <button
-                  className='theia-button secondary'
-                  title={`Increase Save State Slot${this.getKeybindingLabel(VesEmulatorCommands.INPUT_STATE_SLOT_INCREASE.id, true)}`}
-                  onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.StateSlotIncrease, e)}
-                  disabled={this.state.showControls || this.state.paused}
-                >
-                  <i className='fa fa-chevron-up'></i>
-                </button>
-                <button
-                  className='theia-button secondary'
-                  title={`Decrease Save State Slot${this.getKeybindingLabel(VesEmulatorCommands.INPUT_STATE_SLOT_DECREASE.id, true)}`}
-                  onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.StateSlotDecrease, e)}
-                  disabled={this.state.showControls || this.state.paused}
-                >
-                  <i className='fa fa-chevron-down'></i>
-                </button>
-              </div>
-            )}
-          {this.wrapperRef.current &&
-            this.wrapperRef.current?.offsetWidth > 750 && (
-              <div>
-                <select
-                  className='theia-select'
-                  title='Scale'
-                  value={this.preferenceService.get(
-                    VesEmulatorPreferenceIds.EMULATOR_SCALE
-                  )}
-                  onChange={e => this.setScale(e)}
-                  disabled={this.state.showControls}
-                >
-                  {Object.keys(EmulatorScale).map((value, index) => (
-                    <option value={value}>
-                      {Object.values(EmulatorScale)[index]}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  className='theia-select'
-                  title='Stereo Mode'
-                  value={this.preferenceService.get(
-                    VesEmulatorPreferenceIds.EMULATOR_STEREO_MODE
-                  )}
-                  onChange={e => this.setStereoMode(e)}
-                  disabled={this.state.showControls}
-                >
-                  {Object.keys(StereoMode).map((value, index) => (
-                    <option value={value}>
-                      {Object.values(StereoMode)[index]}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  className='theia-select'
-                  title='Emulation Mode'
-                  value={this.preferenceService.get(
-                    VesEmulatorPreferenceIds.EMULATOR_EMULATION_MODE
-                  )}
-                  onChange={e => this.setEmulationMode(e)}
-                  disabled={this.state.showControls}
-                >
-                  {Object.keys(EmulationMode).map((value, index) => (
-                    <option value={value}>
-                      {Object.values(EmulationMode)[index]}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
           <div>
             <button
               className='theia-button secondary'
-              title={`Toggle Fullscreen${this.getKeybindingLabel(VesEmulatorCommands.INPUT_TOGGLE_FULLSCREEN.id, true)}`}
-              onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.ToggleFullscreen, e)}
+              title={`Save State${this.getKeybindingLabel(VesEmulatorCommands.INPUT_SAVE_STATE.id, true)}`}
+              onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.SaveState, e)}
+              disabled={this.state.showControls || this.state.paused}
+            >
+              <i className='fa fa-level-down'></i>{' '}
+              <i className='fa fa-bookmark-o'></i>
+            </button>
+            <button
+              className='theia-button secondary'
+              title={`Load State${this.getKeybindingLabel(VesEmulatorCommands.INPUT_LOAD_STATE.id, true)}`}
+              onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.LoadState, e)}
+              disabled={this.state.showControls || this.state.paused}
+            >
+              <i className='fa fa-bookmark-o'></i>{' '}
+              <i className='fa fa-level-up'></i>
+            </button>
+            <button
+              className='theia-button secondary'
+              title='Current Save State'
+              disabled={this.state.showControls || this.state.paused}
+            >
+              <i className='fa fa-bookmark-o'></i> {this.state.saveSlot}
+            </button>
+            <button
+              className='theia-button secondary'
+              title={`Decrease Save State Slot${this.getKeybindingLabel(VesEmulatorCommands.INPUT_STATE_SLOT_DECREASE.id, true)}`}
+              onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.StateSlotDecrease, e)}
+              disabled={this.state.showControls || this.state.paused || this.state.saveSlot <= 0}
+            >
+              <i className='fa fa-chevron-down'></i>
+            </button>
+            <button
+              className='theia-button secondary'
+              title={`Increase Save State Slot${this.getKeybindingLabel(VesEmulatorCommands.INPUT_STATE_SLOT_INCREASE.id, true)}`}
+              onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.StateSlotIncrease, e)}
+              disabled={this.state.showControls || this.state.paused}
+            >
+              <i className='fa fa-chevron-up'></i>
+            </button>
+          </div>
+          <div>
+            <select
+              className='theia-select'
+              title='Scale'
+              value={this.preferenceService.get(
+                VesEmulatorPreferenceIds.EMULATOR_SCALE
+              )}
+              onChange={e => this.setScale(e)}
+              disabled={this.state.showControls}
+            >
+              {Object.keys(EmulatorScale).map((value, index) => (
+                <option value={value}>
+                  {Object.values(EmulatorScale)[index]}
+                </option>
+              ))}
+            </select>
+            <select
+              className='theia-select'
+              title='Stereo Mode'
+              value={this.preferenceService.get(
+                VesEmulatorPreferenceIds.EMULATOR_STEREO_MODE
+              )}
+              onChange={e => this.setStereoMode(e)}
+              disabled={this.state.showControls}
+            >
+              {Object.keys(StereoMode).map((value, index) => (
+                <option value={value}>
+                  {Object.values(StereoMode)[index]}
+                </option>
+              ))}
+            </select>
+            <select
+              className='theia-select'
+              title='Emulation Mode'
+              value={this.preferenceService.get(
+                VesEmulatorPreferenceIds.EMULATOR_EMULATION_MODE
+              )}
+              onChange={e => this.setEmulationMode(e)}
+              disabled={this.state.showControls}
+            >
+              {Object.keys(EmulationMode).map((value, index) => (
+                <option value={value}>
+                  {Object.values(EmulationMode)[index]}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <button
+              className='theia-button secondary'
+              title={`Fullscreen${this.getKeybindingLabel(VesEmulatorCommands.INPUT_FULLSCREEN.id, true)}`}
+              onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.Fullscreen, e)}
               disabled={this.state.showControls}
             >
               <i className='fa fa-arrows-alt'></i>
             </button>
-          </div>
-          {/* /}
-          <div>
             <button
               className='theia-button secondary'
-              title='Save screenshot'
-              onClick={() => this.saveScreenshot()}
+              title='Take screenshot'
+              onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.Screenshot, e)}
               disabled={this.state.showControls}
             >
               <i className='fa fa-camera'></i>
             </button>
-          </div>
-          {/**/}
-          <div>
             <button
               className={
                 this.state.showControls
@@ -580,6 +582,7 @@ export class VesEmulatorWidget extends ReactWidget {
       switch (data) {
         case EmulatorFunctionKeyCode.AudioMute:
           this.state.muted = !this.state.muted;
+          await this.localStorageService.setData('ves-emulator-state-muted', this.state.muted);
           this.update();
           break;
         case EmulatorFunctionKeyCode.PauseToggle:
@@ -604,14 +607,26 @@ export class VesEmulatorWidget extends ReactWidget {
           this.state.frameAdvance = true;
           this.update();
           break;
-        case EmulatorFunctionKeyCode.ToggleFullscreen:
+        case EmulatorFunctionKeyCode.Fullscreen:
           this.enterFullscreen();
           break;
         case EmulatorFunctionKeyCode.ToggleControlsOverlay:
           this.toggleControlsOverlay();
           break;
         case EmulatorFunctionKeyCode.Reset:
-          this.reload();
+          await this.reload();
+          break;
+        case EmulatorFunctionKeyCode.StateSlotDecrease:
+          if (this.state.saveSlot > 0) {
+            this.state.saveSlot--;
+            this.update();
+            await this.localStorageService.setData('ves-emulator-state-save-slot', this.state.saveSlot);
+          }
+          break;
+        case EmulatorFunctionKeyCode.StateSlotIncrease:
+          this.state.saveSlot++;
+          this.update();
+          await this.localStorageService.setData('ves-emulator-state-save-slot', this.state.saveSlot);
           break;
       }
     }
@@ -619,6 +634,8 @@ export class VesEmulatorWidget extends ReactWidget {
 
   protected saveScreenshot(): void {
     // TODO: this does not work
+    // instead, try using the emulator's screenshot function, read the screenshot from BrowserFS
+    // and send it back to parent frame as base64
     const canvas = this.iframeRef.current?.contentDocument?.getElementById(
       'canvas'
     ) as HTMLCanvasElement;
@@ -628,11 +645,11 @@ export class VesEmulatorWidget extends ReactWidget {
     lnk.click();
   }
 
-  protected reload(): void {
+  protected async reload(): Promise<void> {
     if (this.iframeRef.current) {
       this.sendCoreOptions();
       this.iframeRef.current.src += '';
-      this.initState();
+      await this.initState();
       this.update();
     }
   }
@@ -644,7 +661,7 @@ export class VesEmulatorWidget extends ReactWidget {
       e.target.value,
       PreferenceScope.User
     );
-    this.reload();
+    await this.reload();
   }
 
   protected async setStereoMode(e: React.ChangeEvent<HTMLSelectElement>): Promise<void> {
@@ -654,7 +671,7 @@ export class VesEmulatorWidget extends ReactWidget {
       e.target.value,
       PreferenceScope.User
     );
-    this.reload();
+    await this.reload();
   }
 
   protected async setScale(e: React.ChangeEvent<HTMLSelectElement>): Promise<void> {
@@ -724,6 +741,9 @@ export class VesEmulatorWidget extends ReactWidget {
         quit_press_twice = false
         rewind_enable = true
         pause_nonactive = true
+        
+        audio_mute_enable = ${this.state.muted}
+        state_slot = ${this.state.saveSlot}
 
         input_player1_select = ${this.toButton(EmulatorGamePadKeyCode.Select)}
         input_player1_start = ${this.toButton(EmulatorGamePadKeyCode.Start)}
@@ -759,7 +779,8 @@ export class VesEmulatorWidget extends ReactWidget {
         input_rewind = ${this.toButton(EmulatorFunctionKeyCode.Rewind)}
         input_frame_advance = ${this.toButton(EmulatorFunctionKeyCode.FrameAdvance)}
         input_audio_mute = ${this.toButton(EmulatorFunctionKeyCode.AudioMute)}
-        
+        input_screenshot = ${this.toButton(EmulatorFunctionKeyCode.Screenshot)}
+
         input_reset = nul
         input_toggle_fullscreen = nul
         input_hold_fast_forward = nul
@@ -768,7 +789,6 @@ export class VesEmulatorWidget extends ReactWidget {
         input_shader_next = nul
         input_shader_prev = nul
         input_movie_record_toggle = nul
-        input_screenshot = nul
         input_slowmotion = nul
         input_enable_hotkey_btn = nul
         input_hotkey_block_delay = nul

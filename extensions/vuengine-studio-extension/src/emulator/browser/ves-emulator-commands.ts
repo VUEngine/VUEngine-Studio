@@ -172,15 +172,21 @@ export namespace VesEmulatorCommands {
     category: CATEGORY,
   };
 
-  export const INPUT_TOGGLE_FULLSCREEN: Command = {
-    id: 'VesRun.commands.emulatorInputToggleFullscreenCommand',
-    label: 'Toggle Fullscreen',
+  export const INPUT_FULLSCREEN: Command = {
+    id: 'VesRun.commands.emulatorInputFullscreenCommand',
+    label: 'Fullscreen',
     category: CATEGORY,
   };
 
   export const INPUT_TOGGLE_CONTROLS_OVERLAY: Command = {
     id: 'VesRun.commands.emulatorInputToggleControlsOverlayCommand',
     label: 'Toggle Controls Overlay',
+    category: CATEGORY,
+  };
+
+  export const INPUT_SCREENSHOT: Command = {
+    id: 'VesRun.commands.emulatorInputScreenshotCommand',
+    label: 'Take Screenshot',
     category: CATEGORY,
   };
 };

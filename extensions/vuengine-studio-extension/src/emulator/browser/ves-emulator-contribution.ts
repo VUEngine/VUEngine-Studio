@@ -130,7 +130,7 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
       execute: () => { },
       isVisible: () => false,
     });
-    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_TOGGLE_FULLSCREEN, {
+    commandRegistry.registerCommand(VesEmulatorCommands.INPUT_FULLSCREEN, {
       execute: () => { },
       isVisible: () => false,
     });
@@ -228,12 +228,12 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_STATE_SLOT_INCREASE.id,
+      command: VesEmulatorCommands.INPUT_STATE_SLOT_DECREASE.id,
       keybinding: '3',
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_STATE_SLOT_DECREASE.id,
+      command: VesEmulatorCommands.INPUT_STATE_SLOT_INCREASE.id,
       keybinding: '4',
       when: 'emulatorFocus',
     });
@@ -278,7 +278,7 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
       when: 'emulatorFocus',
     });
     registry.registerKeybinding({
-      command: VesEmulatorCommands.INPUT_TOGGLE_FULLSCREEN.id,
+      command: VesEmulatorCommands.INPUT_FULLSCREEN.id,
       keybinding: 'o',
       when: 'emulatorFocus',
     });

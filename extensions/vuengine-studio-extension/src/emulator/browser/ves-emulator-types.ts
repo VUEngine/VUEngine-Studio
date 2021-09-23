@@ -61,7 +61,7 @@ export enum EmulatorGamePadKeyCode {
 }
 
 export enum EmulatorFunctionKeyCode {
-  ToggleFullscreen = 'KeyO',
+  Fullscreen = 'KeyO',
   ToggleControlsOverlay = 'KeyP',
   SaveState = 'F4',
   LoadState = 'F5',
@@ -75,4 +75,5 @@ export enum EmulatorFunctionKeyCode {
   FrameAdvance = 'ArrowUp',
   Reset = 'F10',
   AudioMute = 'KeyQ',
+  Screenshot = 'F9',
 }
