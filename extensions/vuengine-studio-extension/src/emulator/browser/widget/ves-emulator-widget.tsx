@@ -302,7 +302,7 @@ export class VesEmulatorWidget extends ReactWidget {
   protected processIframeMessage(e: MessageEvent): void {
     switch (e.data.type) {
       case 'screenshot':
-        this.processScreenshot(e.data.data);
+        this.processScreenshot(e.data.data, e.data.filename);
         break;
     }
   }
@@ -645,15 +645,13 @@ export class VesEmulatorWidget extends ReactWidget {
           await this.localStorageService.setData('ves-emulator-state-save-slot', this.state.saveSlot);
           break;
         case EmulatorFunctionKeyCode.Screenshot:
-          setTimeout(() => {
-            this.sendCommand('sendScreenshot');
-          }, 500);
+          this.sendCommand('sendScreenshot');
           break;
       }
     }
   }
 
-  protected processScreenshot(data: string): void {
+  protected processScreenshot(data: string, filename: string): void {
     const byteString = atob(data);
     const ab = new ArrayBuffer(byteString.length);
     const ia = new Uint8Array(ab);
@@ -661,7 +659,7 @@ export class VesEmulatorWidget extends ReactWidget {
       ia[i] = byteString.charCodeAt(i);
     }
 
-    const fileUri = new URI(joinPath(this.getWorkspaceRoot(), 'output.png'));
+    const fileUri = new URI(joinPath(this.getWorkspaceRoot(), 'screenshots', filename));
     this.fileService.writeFile(fileUri, BinaryBuffer.wrap(ia));
   }
 
@@ -801,7 +799,7 @@ export class VesEmulatorWidget extends ReactWidget {
         input_audio_mute = ${this.toButton(EmulatorFunctionKeyCode.AudioMute)}
         input_screenshot = ${this.toButton(EmulatorFunctionKeyCode.Screenshot)}
 
-        auto_screenshot_filename = "false"
+        auto_screenshot_filename = "true"
         screenshot_directory = "/home/web_user/retroarch/userdata"
 
         input_reset = nul
