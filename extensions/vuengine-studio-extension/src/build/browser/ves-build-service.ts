@@ -135,6 +135,8 @@ export class VesBuildService {
     return this._buildStatus;
   }
 
+  protected readonly onDidBuildStartEmitter = new Emitter<void>();
+  readonly onDidBuildStart = this.onDidBuildStartEmitter.event;
   protected readonly onDidBuildFailEmitter = new Emitter<void>();
   readonly onDidBuildFail = this.onDidBuildFailEmitter.event;
   protected readonly onDidBuildSucceedEmitter = new Emitter<void>();
@@ -322,6 +324,7 @@ export class VesBuildService {
       await this.fixPermissions();
       ({ processManagerId, processId } = await this.vesProcessService.launchProcess(VesProcessType.Raw, buildParams));
       active = true;
+      this.onDidBuildStartEmitter.fire();
 
     } catch (e) {
       let error = 'An error occured';

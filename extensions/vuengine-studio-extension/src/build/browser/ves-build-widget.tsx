@@ -55,10 +55,16 @@ export class VesBuildWidget extends ReactWidget {
     this.title.caption = VesBuildWidget.LABEL;
     this.node.tabIndex = 0; // required for this.node.focus() to work in this.onActivateRequest()
     this.update();
+    this.title.className = '';
 
     this.vesBuildService.onDidChangeRomSize(() => this.update());
     this.vesBuildService.onDidChangeBuildStatus(() => this.update());
     this.vesBuildService.onDidChangeBuildMode(() => this.update());
+    this.vesBuildService.onDidBuildStart(() => this.title.className = 'ves-decorator-progress');
+    this.vesBuildService.onDidBuildSucceed(() => this.title.className = this.vesBuildService.getNumberOfWarnings() > 0
+      ? 'ves-decorator-warning'
+      : 'ves-decorator-success');
+    this.vesBuildService.onDidBuildFail(() => this.title.className = 'ves-decorator-error');
     this.preferenceService.onPreferenceChanged(({ preferenceName }) => {
       switch (preferenceName) {
         case VesBuildPreferenceIds.BUILD_MODE:

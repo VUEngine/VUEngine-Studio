@@ -1,0 +1,32 @@
+/* Custom tabbar decorators */
+.p-TabBar.theia-app-sides .p-TabBar-tab[class*=ves-decorator]:after {
+    background-color: var(--theia-activityBarBadge-background);
+    border-radius: 20px;
+    color: var(--theia-activityBarBadge-foreground);
+    font-family: FontAwesome;
+    font-size: calc(var(--theia-ui-font-size0) * 0.85);
+    line-height: var(--theia-notification-count-height);
+    position: absolute;
+    right: calc(var(--theia-ui-padding) * 1.33);
+    text-align: center;
+    top: calc(var(--theia-ui-padding) * 4);
+    width: var(--theia-notification-count-width);
+}
+.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-queued:after {
+    content: "\f252";
+}
+.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress:after {
+    content: "\f013";
+}
+.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-success:after {
+    background-color: var(--theia-editorSuccess-foreground);
+    content: "\f00c";
+}
+.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-warning:after {
+    background-color: var(--theia-editorWarning-foreground);
+    content: "\f071";
+}
+.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-error:after {
+    background-color: var(--theia-editorError-foreground);
+    content: "\f00d";
+}
