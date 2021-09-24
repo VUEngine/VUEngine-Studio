@@ -45,13 +45,24 @@ export class VesNewProjectDialog extends ReactDialog<void> {
         this.appendCloseButton();
         this.appendAcceptButton('Create');
 
-        // this.closeButton?.tabIndex = 11;
-        // this.acceptButton?.tabIndex = 12;
+        if (this.closeButton) {
+            this.closeButton.tabIndex = 11;
+        }
+        if (this.acceptButton) {
+            this.acceptButton.tabIndex = 12;
+        }
     }
 
     @postConstruct()
     protected async init(): Promise<void> {
         this.update();
+    }
+
+    protected onActivateRequest(msg: Message): void {
+        super.onActivateRequest(msg);
+
+        this.update();
+        this.createProjectFormComponentRef.current?.focusNameInput();
     }
 
     close(): void {
@@ -129,12 +140,6 @@ export class VesNewProjectDialog extends ReactDialog<void> {
 
         await this.accept();
         this.workspaceService.open(newProjectPathUri);
-    }
-
-    protected onAfterAttach(msg: Message): void {
-        super.onAfterAttach(msg);
-        this.update();
-        this.createProjectFormComponentRef.current?.focusNameInput();
     }
 
     protected setIsCreating(isCreating: boolean): void {

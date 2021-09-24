@@ -127,7 +127,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                         value={this.state.makerCode}
                         onChange={this.updateMakerCode}
                         disabled={this.state.isCreating}
-                        size={2}
+                        size={4}
                         maxLength={2}
                         minLength={2}
                         tabIndex={3}
@@ -147,6 +147,18 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                     disabled={this.state.isCreating}
                     tabIndex={4}
                 />
+                <button
+                    className="theia-button secondary"
+                    onClick={() => this.selectProjectFolder()}
+                    style={{ marginLeft: 0, minWidth: 40, paddingBottom: 0 }}
+                    disabled={this.state.isCreating}
+                    tabIndex={5}
+                >
+                    <i
+                        style={{ fontSize: 16, verticalAlign: 'bottom' }}
+                        className="fa fa-ellipsis-h"
+                    />
+                </button>
                 <span className="ves-new-project-path-separator">
                     {sep}
                 </span>
@@ -157,20 +169,8 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                     onChange={this.updatePathName}
                     style={{ flexGrow: 1, fontFamily: 'monospace' }}
                     disabled={this.state.isCreating}
-                    tabIndex={5}
-                />
-                <button
-                    className="theia-button secondary"
-                    onClick={() => this.selectProjectFolder()}
-                    style={{ minWidth: 40 }}
-                    disabled={this.state.isCreating}
                     tabIndex={6}
-                >
-                    <i
-                        style={{ fontSize: 16, verticalAlign: 'bottom' }}
-                        className="fa fa-ellipsis-h"
-                    />
-                </button>
+                />
             </div>
             <br />
             <div className="ves-new-project-input-label">Template</div>
@@ -252,7 +252,6 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
     }
 
     focusNameInput(): void {
-        // TODO: why is this not working?
         this.nameInputComponentRef.current?.select();
     }
 }
