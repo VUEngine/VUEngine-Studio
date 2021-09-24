@@ -18,6 +18,9 @@
 .p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress:after {
     content: "\f013";
 }
+.p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-info:after {
+    content: "\f129";
+}
 .p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-success:after {
     background-color: var(--theia-editorSuccess-foreground);
     content: "\f00c";
