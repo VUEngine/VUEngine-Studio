@@ -17,18 +17,22 @@ export class VesElectronMainApplication extends ElectronMainApplication {
     async createWindow(asyncOptions: MaybePromise<TheiaBrowserWindowOptions> = this.getDefaultOptions()): Promise<BrowserWindow> {
         const electronWindow = await super.createWindow(asyncOptions);
 
-        electronWindow.on('focus', async () => {
-            if (this.grayscaleCss !== '') {
-                await electronWindow.webContents.removeInsertedCSS(this.grayscaleCss);
-            }
-        });
-        electronWindow.on('blur', async () => {
-            this.grayscaleCss = await electronWindow.webContents.insertCSS('html { filter: grayscale(1); transition: filter 1s; }');
-        });
+        electronWindow.on('focus', async () => this.removeGreyOutWindow(electronWindow));
+        electronWindow.on('blur', async () => this.greyOutWindow(electronWindow));
 
         this.registerVesTouchBar(electronWindow);
 
         return electronWindow;
+    }
+
+    protected async greyOutWindow(electronWindow: BrowserWindow): Promise<void> {
+        await electronWindow.webContents.removeInsertedCSS(this.grayscaleCss);
+        this.grayscaleCss = await electronWindow.webContents.insertCSS('html { filter: grayscale(1); transition: filter 1s; }');
+    }
+
+    protected async removeGreyOutWindow(electronWindow: BrowserWindow): Promise<void> {
+        await electronWindow.webContents.removeInsertedCSS(this.grayscaleCss);
+        this.grayscaleCss = await electronWindow.webContents.insertCSS('html { filter: unset; transition: unset; }');
     }
 
     protected getDefaultOptions(): TheiaBrowserWindowOptions {
