@@ -30,7 +30,10 @@ export class VesCodegenService {
         if (fileChangesEvent.contains(template.source)) {
           try {
             this.fileService.readFile(template.source).then(async content => {
-              let contentJson = JSON.parse(content.value.toString());
+              const dataKey = template.key || basename(template.source.toString()).split('.')[0].toLowerCase();
+              let contentJson = {
+                [dataKey]: JSON.parse(content.value.toString())
+              };
               if (template.extra) {
                 contentJson = await this.appendExtraContent(contentJson, template.extra);
               }
@@ -74,7 +77,7 @@ export class VesCodegenService {
         }
       }
 
-      templates.push({ source, targets, extra });
+      templates.push({ ...template, source, targets, extra });
     }
 
     return templates;
@@ -95,7 +98,7 @@ export class VesCodegenService {
     return contentJson;
   }
 
-  protected async writeTemplate(targets: { uri: URI, template: URI }[], data: JSON): Promise<void> {
+  protected async writeTemplate(targets: { uri: URI, template: URI }[], data: any): Promise<void> {
     for (const target of targets) {
       const templateData = (await this.fileService.readFile(target.template)).value.toString();
       const renaderedTemplateData = nunjucks.renderString(templateData, data);
