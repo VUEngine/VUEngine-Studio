@@ -1,5 +1,5 @@
 <style type="text/css">
-  @keyframes fadeIn {
+  @keyframes splashFadeIn {
     0% {
       opacity: 0;
     }
@@ -9,7 +9,7 @@
     }
   }
 
-  @keyframes pulse {
+  @keyframes splashPulse {
     0% {
       opacity: 0.2;
     }
@@ -26,7 +26,7 @@
   .theia-preload {
     -webkit-app-region: drag;
     background: none;
-    animation-name: fadeIn, pulse;
+    animation-name: splashFadeIn, splashPulse;
     animation-duration: 0.5s, 2s;
     animation-delay: 0s, 0.5s;
     animation-timing-function: linear, linear;

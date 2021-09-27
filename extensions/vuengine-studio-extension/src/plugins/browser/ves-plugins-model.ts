@@ -63,6 +63,7 @@ export class VesPluginsModel {
         });
     }
 
+    // TODO: re-init installed when Compiler.json has been edited
     protected async initInstalled(): Promise<void> {
         try {
             await this.updateInstalled();

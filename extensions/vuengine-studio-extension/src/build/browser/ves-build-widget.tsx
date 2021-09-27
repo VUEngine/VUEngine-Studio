@@ -60,10 +60,15 @@ export class VesBuildWidget extends ReactWidget {
     this.vesBuildService.onDidChangeRomSize(() => this.update());
     this.vesBuildService.onDidChangeBuildStatus(() => this.update());
     this.vesBuildService.onDidChangeBuildMode(() => this.update());
-    this.vesBuildService.onDidBuildStart(() => this.title.className = 'ves-decorator-progress');
-    this.vesBuildService.onDidBuildSucceed(() => this.title.className = this.vesBuildService.getNumberOfWarnings() > 0
-      ? 'ves-decorator-warning'
-      : 'ves-decorator-success');
+    this.vesBuildService.onDidBuildStart(() => {
+      this.state.logFilter = BuildLogLineType.Normal;
+      this.title.className = 'ves-decorator-progress';
+    });
+    this.vesBuildService.onDidBuildSucceed(() => {
+      this.title.className = this.vesBuildService.getNumberOfWarnings() > 0
+        ? 'ves-decorator-warning'
+        : 'ves-decorator-success';
+    });
     this.vesBuildService.onDidBuildFail(() => this.title.className = 'ves-decorator-error');
     this.preferenceService.onPreferenceChanged(({ preferenceName }) => {
       switch (preferenceName) {
@@ -368,10 +373,10 @@ export class VesBuildWidget extends ReactWidget {
                           {line.optimizedText ? line.optimizedText : line.text}
                         </span>
                       </div>
-                      : <div className='buildLogLine'></div>
+                      : <div className='buildLogLine' key={`buildLogLine${index}`}></div>
                   )
                 )}
-                <div ref={this.buildLogLastElementRef}></div>
+                <div ref={this.buildLogLastElementRef} key={'buildLogLineLast'}></div>
               </div>
             </div>
           )}

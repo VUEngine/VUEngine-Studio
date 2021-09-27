@@ -91,20 +91,23 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                 className='theia-button secondary new-project'
                 title={`Create New Project${this.getKeybindingLabel(VesProjectsCommands.NEW.id, true)}`}
                 onClick={() => this.commandService.executeCommand(VesProjectsCommands.NEW.id)}
+                key='action-button-new-project'
             >
                 <i className='fa fa-plus'></i>
             </button>
             <button
-                className='theia-button secondary new-project'
+                className='theia-button secondary open-project'
                 title={`Open Project${this.getKeybindingLabel(openProjectId, true)}`}
                 onClick={() => this.commandService.executeCommand(openProjectId)}
+                key='action-button-open-project'
             >
                 <i className='fa fa-folder-open'></i>
             </button>
             <button
-                className='theia-button secondary new-project'
+                className='theia-button secondary open-workspace'
                 title={`Open Workspace${this.getKeybindingLabel(WorkspaceCommands.OPEN_WORKSPACE.id, true)}`}
                 onClick={() => this.commandService.executeCommand(WorkspaceCommands.OPEN_WORKSPACE.id)}
+                key='action-button-open-workspace'
             >
                 <i className='fa fa-file-code-o'></i>
             </button>
@@ -115,6 +118,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                     title={this.vesBuildService.isCleaning ? 'Cleaning...' : `${VesBuildCommands.CLEAN.label}${this.getKeybindingLabel(VesBuildCommands.CLEAN.id, true)}`}
                     disabled={this.vesBuildService.buildStatus.active || !this.vesBuildService.buildFolderExists[buildMode]}
                     onClick={() => this.commandService.executeCommand(VesBuildCommands.CLEAN.id)}
+                    key='action-button-clean'
                 >
                     {this.vesBuildService.isCleaning
                         ? <i className='fa fa-refresh fa-spin'></i>
@@ -141,6 +145,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                         ? 'Building... ' + this.vesBuildService.buildStatus.progress + '%'
                         : `${VesBuildCommands.BUILD.label}${this.getKeybindingLabel(VesBuildCommands.BUILD.id, true)}`}
                     onClick={() => this.commandService.executeCommand(VesBuildCommands.BUILD.id)}
+                    key='action-button-build'
                 >
                     {this.vesBuildService.buildStatus.active
                         ? <i className='fa fa-cog fa-spin'></i>
@@ -152,6 +157,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                     className={'theia-button secondary run' + (this.vesEmulatorService.isQueued ? ' queued' : '')}
                     title={this.vesEmulatorService.isQueued ? 'Run Queued...' : `${VesEmulatorCommands.RUN.label}${this.getKeybindingLabel(VesEmulatorCommands.RUN.id, true)}`}
                     onClick={() => this.commandService.executeCommand(VesEmulatorCommands.RUN.id)}
+                    key='action-button-run'
                 >
                     {this.vesEmulatorService.isQueued
                         ? <i className='fa fa-hourglass-half'></i>
@@ -170,6 +176,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                             : `${VesFlashCartCommands.FLASH.label}${this.getKeybindingLabel(VesFlashCartCommands.FLASH.id, true)}`}
                     disabled={!this.vesFlashCartService.connectedFlashCarts}
                     onClick={() => this.commandService.executeCommand(VesFlashCartCommands.FLASH.id)}
+                    key='action-button-flash'
                 >
                     {this.vesFlashCartService.isQueued
                         ? <i className='fa fa-hourglass-half'></i>
@@ -183,6 +190,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                         ? 'Export Queued...'
                         : `${VesExportCommands.EXPORT.label} ${this.getKeybindingLabel(VesExportCommands.EXPORT.id, true)}`}
                     onClick={() => this.commandService.executeCommand(VesExportCommands.EXPORT.id)}
+                    key='action-button-export'
                 >
                     {this.vesExportService.isQueued
                         ? <i className='fa fa-hourglass-half'></i>

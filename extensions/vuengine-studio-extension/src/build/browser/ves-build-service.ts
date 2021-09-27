@@ -264,9 +264,14 @@ export class VesBuildService {
   }
 
   protected async determineRomSize(): Promise<void> {
-    const RomPath = this.getRomPath();
-    const outputRom = await this.fileService.readFile(new URI(RomPath));
-    this.romSize = outputRom.size;
+    const romPath = this.getRomPath();
+    const romUri = new URI(romPath);
+    if (await this.fileService.exists(romUri)) {
+      const outputRom = await this.fileService.readFile(romUri);
+      this.romSize = outputRom.size;
+    } else {
+      this.romSize = 0;
+    }
   }
 
   protected bindEvents(): void {
