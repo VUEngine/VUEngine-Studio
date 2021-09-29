@@ -287,9 +287,12 @@ export class VesEmulatorWidget extends ReactWidget {
     for (const key in this.state.input) {
       if (this.state.input.hasOwnProperty(key)) {
         if ((!this.state.paused && !this.state.showControls) ||
-          (!this.state.showControls && this.state.input[key].command === EmulatorFunctionKeyCode.PauseToggle) ||
           this.state.input[key].command === EmulatorFunctionKeyCode.ToggleControlsOverlay ||
+          (!this.state.showControls && this.state.input[key].command === EmulatorFunctionKeyCode.PauseToggle) ||
           (!this.state.showControls && this.state.input[key].command === EmulatorFunctionKeyCode.Fullscreen) ||
+          (!this.state.showControls && this.state.input[key].command === EmulatorFunctionKeyCode.AudioMute) ||
+          (!this.state.showControls && this.state.input[key].command === EmulatorFunctionKeyCode.Reset) ||
+          (!this.state.showControls && this.state.input[key].command === EmulatorFunctionKeyCode.Screenshot) ||
           (this.state.frameAdvance && this.state.input[key].command === EmulatorFunctionKeyCode.FrameAdvance)) {
           if (this.matchKey(this.state.input[key].keys, e.code)) {
             this.sendCommand(e.type, this.state.input[key].command);
@@ -365,7 +368,7 @@ export class VesEmulatorWidget extends ReactWidget {
               className='theia-button secondary'
               title={`Reset${this.getKeybindingLabel(VesEmulatorCommands.INPUT_RESET.id, true)}`}
               onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.Reset, e)}
-              disabled={this.state.showControls || this.state.paused}
+              disabled={this.state.showControls}
             >
               <i className='fa fa-refresh'></i>
             </button>
@@ -373,7 +376,7 @@ export class VesEmulatorWidget extends ReactWidget {
               className='theia-button secondary'
               title={`${this.state.muted ? 'Unmute' : 'Mute'}${this.getKeybindingLabel(VesEmulatorCommands.INPUT_AUDIO_MUTE.id, true)}`}
               onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.AudioMute, e)}
-              disabled={this.state.showControls || this.state.paused}
+              disabled={this.state.showControls}
             >
               <i className={this.state.muted
                 ? 'fa fa-volume-off'
@@ -547,7 +550,7 @@ export class VesEmulatorWidget extends ReactWidget {
               className='theia-button secondary'
               title={`Take screenshot${this.getKeybindingLabel(VesEmulatorCommands.INPUT_SCREENSHOT.id, true)}`}
               onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.Screenshot, e)}
-              disabled={this.state.showControls || this.state.paused}
+              disabled={this.state.showControls}
             >
               <i className='fa fa-camera'></i>
             </button>

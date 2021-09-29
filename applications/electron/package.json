@@ -35,7 +35,8 @@
             "**/build/*.a": true,
             "**/node_modules/**": true
           },
-          "window.menuBarVisibility": "compact"
+          "window.menuBarVisibility": "compact",
+          "workspace.preserveWindow": true
         }
       }
     },
