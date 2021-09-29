@@ -76,6 +76,7 @@ export class VesBuildWidget extends ReactWidget {
         case VesBuildPreferenceIds.DUMP_ELF:
         case VesBuildPreferenceIds.ENGINE_CORE_PATH:
         case VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH:
+        case VesPluginsPreferenceIds.USER_PLUGINS_PATH:
         case VesBuildPreferenceIds.ENABLE_WSL:
         case VesBuildPreferenceIds.PEDANTIC_WARNINGS:
           this.update();
@@ -127,7 +128,7 @@ export class VesBuildWidget extends ReactWidget {
               </div>
               {this.state.showOptions && (
                 <div className='buildOptions theia-settings-container'>
-                  <div className='single-pref'>
+                  <div className='single-pref' key={`pref-${VesBuildPreferenceIds.BUILD_MODE}`}>
                     <div className='pref-name'>Build Mode</div>
                     <div className='pref-content-container string'>
                       <div className='pref-input'>
@@ -150,7 +151,7 @@ export class VesBuildWidget extends ReactWidget {
                       </div>
                     </div>
                   </div>
-                  <div className='single-pref'>
+                  <div className='single-pref' key={`pref-${VesBuildPreferenceIds.DUMP_ELF}`}>
                     <div className='pref-name'>Dump Elf</div>
                     <div className='pref-content-container boolean'>
                       <div className='pref-description'>
@@ -172,7 +173,7 @@ export class VesBuildWidget extends ReactWidget {
                       </div>
                     </div>
                   </div>
-                  <div className='single-pref'>
+                  <div className='single-pref' key={`pref-${VesBuildPreferenceIds.PEDANTIC_WARNINGS}`}>
                     <div className='pref-name'>Pedantic Warnings</div>
                     <div className='pref-content-container boolean'>
                       <div className='pref-description'>
@@ -194,7 +195,7 @@ export class VesBuildWidget extends ReactWidget {
                       </div>
                     </div>
                   </div>
-                  {isWindows && <div className='single-pref'>
+                  {isWindows && <div className='single-pref' key={`pref-${VesBuildPreferenceIds.ENABLE_WSL}`}>
                     <div className='pref-name'>Enable WSL</div>
                     <div className='pref-content-container boolean'>
                       <div className='pref-description'>
@@ -216,7 +217,7 @@ export class VesBuildWidget extends ReactWidget {
                       </div>
                     </div>
                   </div>}
-                  <div className='single-pref'>
+                  <div className='single-pref' key={`pref-${VesBuildPreferenceIds.ENGINE_CORE_PATH}`}>
                     <div className='pref-name'>Engine Path</div>
                     <div className='pref-content-container string'>
                       <div className='pref-description'>
@@ -239,7 +240,7 @@ export class VesBuildWidget extends ReactWidget {
                       </div>
                     </div>
                   </div>
-                  <div className='single-pref'>
+                  <div className='single-pref' key={`pref-${VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH}`}>
                     <div className='pref-name'>Plugins Library Path</div>
                     <div className='pref-content-container string'>
                       <div className='pref-description'>
@@ -256,6 +257,29 @@ export class VesBuildWidget extends ReactWidget {
                         <button
                           className='theia-button secondary'
                           onClick={() => this.selectFolder('Select plugins root folder', VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH)}
+                        >
+                          <i className='fa fa-ellipsis-h' />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div className='single-pref' key={`pref-${VesPluginsPreferenceIds.USER_PLUGINS_PATH}`}>
+                    <div className='pref-name'>User Plugins Path</div>
+                    <div className='pref-content-container string'>
+                      <div className='pref-description'>
+                        {VesPluginsPreferenceSchema.properties[VesPluginsPreferenceIds.USER_PLUGINS_PATH].description}
+                      </div>
+                      <div className='pref-input'>
+                        <input
+                          type='text'
+                          className='theia-input'
+                          value={this.preferenceService.get(VesPluginsPreferenceIds.USER_PLUGINS_PATH)}
+                          // TODO: this should not fire on every single keypress. use timeout?
+                          onChange={e => this.preferenceService.set(VesPluginsPreferenceIds.USER_PLUGINS_PATH, e.currentTarget.value, PreferenceScope.User)}
+                        />
+                        <button
+                          className='theia-button secondary'
+                          onClick={() => this.selectFolder('Select plugins root folder', VesPluginsPreferenceIds.USER_PLUGINS_PATH)}
                         >
                           <i className='fa fa-ellipsis-h' />
                         </button>
