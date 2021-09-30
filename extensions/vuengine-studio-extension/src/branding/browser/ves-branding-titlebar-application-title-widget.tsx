@@ -2,13 +2,15 @@ import * as React from '@theia/core/shared/react';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { remote } from '@theia/core/shared/electron';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { isOSX, isWindows } from '@theia/core';
+import { WorkspaceCommands, WorkspaceService } from '@theia/workspace/lib/browser';
+import { CommandService, isOSX, isWindows } from '@theia/core';
 import { FrontendApplicationConfigProvider } from '@theia/core/lib/browser/frontend-application-config-provider';
 import { VesProjectsService } from '../../projects/browser/ves-projects-service';
 
 @injectable()
 export class VesTitlebarApplicationTitleWidget extends ReactWidget {
+  @inject(CommandService)
+  protected readonly commandService: CommandService;
   @inject(VesProjectsService)
   protected readonly vesProjectsService: VesProjectsService;
   @inject(WorkspaceService)
@@ -51,7 +53,11 @@ export class VesTitlebarApplicationTitleWidget extends ReactWidget {
   protected render(): React.ReactNode {
     this.setTitle();
 
-    return <div onDoubleClick={this.handleDoubleClick}>{this.applicationTitle}</div>;
+    return <div onDoubleClick={this.handleDoubleClick}>
+      <div className="applicationTitle" onClick={() => this.commandService.executeCommand(WorkspaceCommands.OPEN_RECENT_WORKSPACE.id)}>
+        {this.applicationTitle}
+      </div >
+    </div>;
   }
 
   protected handleDoubleClick(): void {

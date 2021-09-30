@@ -8,6 +8,11 @@
   white-space: nowrap;
 }
 
+#ves-titlebar-application-title .applicationTitle {
+  cursor: pointer;
+  display: inline-block;
+}
+
 @media (max-width: 1000px) {
   #theia-top-panel:not(.os-osx) #ves-titlebar-application-title {
     visibility: hidden;
