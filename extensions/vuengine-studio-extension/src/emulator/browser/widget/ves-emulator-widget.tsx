@@ -746,7 +746,7 @@ export class VesEmulatorWidget extends ReactWidget {
     this.sendCommand(
       'setRetroArchConfig',
       `
-        menu_driver = "default"
+        menu_driver = "glui"
         history_list_enable = false
         perfcnt_enable = false
         config_save_on_exit = false

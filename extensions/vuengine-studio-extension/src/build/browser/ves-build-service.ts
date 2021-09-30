@@ -196,7 +196,7 @@ export class VesBuildService {
 
     // watch for file changes
     const romPathUri = new URI(this.getRomPath());
-    this.fileService.onDidFilesChange((fileChangesEvent: FileChangesEvent) => {
+    this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
       for (const buildMode in BuildMode) {
         if (fileChangesEvent.contains(new URI(this.getBuildPath(buildMode)))) {
           this.fileService
@@ -208,11 +208,7 @@ export class VesBuildService {
       }
 
       if (fileChangesEvent.contains(romPathUri)) {
-        this.fileService
-          .exists(new URI(this.getRomPath()))
-          .then((exists: boolean) => {
-            this.outputRomExists = exists;
-          });
+        this.outputRomExists = await this.fileService.exists(new URI(this.getRomPath()));
       }
     });
 
