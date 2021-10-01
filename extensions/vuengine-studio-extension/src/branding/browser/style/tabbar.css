@@ -1,3 +1,7 @@
+.p-TabBar.theia-app-sides .p-TabBar-tabIcon.codicon-plug {
+    font-size: 30px;
+}
+
 /* Custom tabbar decorators */
 .p-TabBar.theia-app-sides .p-TabBar-tab[class*=ves-decorator]:after {
     background-color: var(--theia-activityBarBadge-background);

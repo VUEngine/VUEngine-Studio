@@ -3,7 +3,7 @@
     background: var(--theia-foreground);
     border-radius: 50%;
     color: var(--theia-sideBar-background);
-    font-size: 20px;
+    font-size: 26px;
     height: var(--theia-vsx-extension-icon-size);
     line-height: var(--theia-vsx-extension-icon-size);
     opacity: .3;

@@ -9,7 +9,12 @@ export namespace VesBuildViewContributionCommands {
     export const EXPAND: Command = {
         id: `${VesBuildWidget.ID}.expand`,
         label: 'Expand View',
-        iconClass: 'codicon codicon-arrow-both',
+        iconClass: 'codicon codicon-unfold',
+    };
+    export const SHRINK: Command = {
+        id: `${VesBuildWidget.ID}.shrink`,
+        label: 'Shrink View',
+        iconClass: 'codicon codicon-fold',
     };
     export const HELP: Command = {
         id: `${VesBuildWidget.ID}.help`,
@@ -19,7 +24,7 @@ export namespace VesBuildViewContributionCommands {
     export const SETTINGS: Command = {
         id: `${VesBuildWidget.ID}.settings`,
         label: 'Show Build Settings',
-        iconClass: 'codicon codicon-settings-gear',
+        iconClass: 'codicon codicon-settings',
     };
 }
 
@@ -39,7 +44,7 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
                 rank: 700,
             },
             // TODO
-            // toggleCommandId: 'vesBuild.toggle',
+            // toggleCommandId: `${VesBuildWidget.ID}.toggle`,
             // toggleKeybinding: 'ctrlcmd+shift+b',
         });
     }
@@ -60,6 +65,8 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
         const widgetArea = this.applicationShell.getAreaFor(widget);
         if (widgetArea) {
             this.applicationShell.resize(targetWidth, widgetArea);
+            // rerender view
+            this.applicationShell.activateWidget(this.viewId);
         }
     }
 
@@ -67,7 +74,17 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
         commandRegistry.registerCommand(VesBuildViewContributionCommands.EXPAND, {
             isEnabled: () => true,
             isVisible: widget => widget !== undefined &&
-                widget.id === VesBuildWidget.ID,
+                widget.id === VesBuildWidget.ID &&
+                !this.state.isWide,
+            execute: widget => widget !== undefined &&
+                widget.id === VesBuildWidget.ID &&
+                this.toggleWidgetWidth(widget),
+        });
+        commandRegistry.registerCommand(VesBuildViewContributionCommands.SHRINK, {
+            isEnabled: () => true,
+            isVisible: widget => widget !== undefined &&
+                widget.id === VesBuildWidget.ID &&
+                this.state.isWide,
             execute: widget => widget !== undefined &&
                 widget.id === VesBuildWidget.ID &&
                 this.toggleWidgetWidth(widget),
@@ -96,16 +113,22 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
             priority: 0,
         });
         toolbar.registerItem({
+            id: VesBuildViewContributionCommands.SHRINK.id,
+            command: VesBuildViewContributionCommands.SHRINK.id,
+            tooltip: VesBuildViewContributionCommands.SHRINK.label,
+            priority: 1,
+        });
+        toolbar.registerItem({
             id: VesBuildViewContributionCommands.SETTINGS.id,
             command: VesBuildViewContributionCommands.SETTINGS.id,
             tooltip: VesBuildViewContributionCommands.SETTINGS.label,
-            priority: 1,
+            priority: 2,
         });
         toolbar.registerItem({
             id: VesBuildViewContributionCommands.HELP.id,
             command: VesBuildViewContributionCommands.HELP.id,
             tooltip: VesBuildViewContributionCommands.HELP.label,
-            priority: 2,
+            priority: 3,
         });
     }
 }
