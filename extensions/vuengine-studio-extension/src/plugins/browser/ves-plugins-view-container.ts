@@ -15,12 +15,12 @@ export namespace VesPluginsViewCommands {
         id: 'vesPlugins.clearAll',
         category: CATEGORY,
         label: 'Clear Search Results',
-        iconClass: 'clear-all'
+        iconClass: 'codicon codicon-clear-all'
     };
     export const HELP: Command = {
         id: 'vesPlugins.help',
         label: 'Show Handbook Page',
-        iconClass: 'fa fa-book',
+        iconClass: 'codicon codicon-book',
     };
 }
 
@@ -44,7 +44,7 @@ export class VesPluginsViewContainer extends ViewContainer {
 
         this.setTitleOptions({
             label: VesPluginsViewContainer.LABEL,
-            iconClass: 'fa fa-plug',
+            iconClass: 'codicon codicon-plug',
             closeable: true
         });
     }

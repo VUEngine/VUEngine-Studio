@@ -134,13 +134,18 @@
   cursor: pointer;
 }
 
-#vesBuildWidget .buildLogLine .timestamp {
+#vesBuildWidget .buildLogLine .icon {
   display: table-cell;
   padding: 0 var(--theia-ui-padding);
 }
 
-#vesBuildWidget .buildLogLine.headline .timestamp,
-#vesBuildWidget .buildLogLine.normal .timestamp {
+#vesBuildWidget .buildLogLine .icon .codicon {
+  font-size: 100%;
+  vertical-align: text-bottom;
+}
+
+#vesBuildWidget .buildLogLine.headline .icon,
+#vesBuildWidget .buildLogLine.normal .icon {
   opacity: 0.5;
 }
 

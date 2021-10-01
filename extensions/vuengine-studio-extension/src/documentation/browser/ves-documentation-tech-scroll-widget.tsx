@@ -25,7 +25,7 @@ export class VesDocumentationTechScrollWidget extends BaseWidget {
         this.id = VesDocumentationTechScrollWidget.ID;
         this.title.label = VesDocumentationTechScrollWidget.LABEL;
         this.title.caption = VesDocumentationTechScrollWidget.LABEL;
-        this.title.iconClass = 'fa fa-book';
+        this.title.iconClass = 'codicon codicon-book';
         this.title.closable = true;
         this.node.tabIndex = 0;
     }

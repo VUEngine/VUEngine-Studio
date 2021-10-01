@@ -10,7 +10,7 @@ export namespace VesEmulatorViewContributionCommands {
   export const HELP: Command = {
     id: `${VesEmulatorWidget.ID}.help`,
     label: 'Show Handbook Page',
-    iconClass: 'fa fa-book',
+    iconClass: 'codicon codicon-book',
   };
 }
 

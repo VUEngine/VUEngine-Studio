@@ -11,19 +11,19 @@ interface FileType {
 
 const FILE_TYPES: FileType[] = [{
     base: 'Compiler.config',
-    icon: 'ves-file-icon fa fa-cog medium-blue',
+    icon: 'ves-file-icon codicon codicon-settings-gear medium-blue',
     name: 'Compiler Config',
 }, {
     base: 'Engine.config',
-    icon: 'ves-file-icon fa fa-cog medium-blue',
+    icon: 'ves-file-icon codicon codicon-settings-gear medium-blue',
     name: 'Engine Config',
 }, {
     base: 'Project.config',
-    icon: 'ves-file-icon fa fa-cog medium-blue',
+    icon: 'ves-file-icon codicon codicon-settings-gear medium-blue',
     name: 'Project Config',
 }, {
     ext: '.vb',
-    icon: 'ves-file-icon fa fa-play',
+    icon: 'ves-file-icon codicon codicon-play',
 }];
 
 @injectable()

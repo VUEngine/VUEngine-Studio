@@ -41,7 +41,7 @@ export class VesDocumentationTreeWidget extends TreeWidget {
     this.id = VesDocumentationTreeWidget.ID;
     this.title.label = VesDocumentationTreeWidget.LABEL;
     this.title.caption = VesDocumentationTreeWidget.LABEL;
-    this.title.iconClass = 'fa fa-book';
+    this.title.iconClass = 'codicon codicon-book';
     this.title.closable = true;
   }
 
@@ -51,12 +51,12 @@ export class VesDocumentationTreeWidget extends TreeWidget {
     const documents: VesDocumentTree = {
       members: [
         {
-          name: 'Handbook',
+          name: 'VUEngine Studio Handbook',
           file: '<handbook>',
           children: []
         },
         {
-          name: 'Engine Code Docs',
+          name: 'VUEngine Code Docs',
           // file: '<doxy>',
           children: []
         },
@@ -122,7 +122,7 @@ export class VesDocumentationTreeWidget extends TreeWidget {
 
   protected renderIcon(node: VesDocumentationChildNode, props: NodeProps): React.ReactNode {
     const iconClass = props.depth === 0
-      ? 'fa fa-book'
+      ? 'codicon codicon-book'
       : node.member.children !== undefined && node.member.children.length > 0 && node.member.file === undefined
         ? 'fa fa-folder'
         : 'fa fa-file-text-o';

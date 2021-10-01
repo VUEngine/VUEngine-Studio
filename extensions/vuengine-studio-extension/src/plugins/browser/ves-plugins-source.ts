@@ -6,7 +6,7 @@ import { VesPluginsModel } from './ves-plugins-model';
 export class VesPluginsSourceOptions {
     static INSTALLED = 'installed';
     static RECOMMENDED = 'recommended';
-    static SEARCH_RESULT = 'searchResult';
+    static SEARCH_RESULT = 'search-result';
     readonly id: string;
 }
 

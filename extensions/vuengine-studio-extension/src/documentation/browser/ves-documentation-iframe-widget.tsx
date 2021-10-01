@@ -17,7 +17,7 @@ export class VesDocumentationIFrameWidget extends ReactWidget {
         this.id = VesDocumentationIFrameWidget.ID;
         this.title.label = VesDocumentationIFrameWidget.LABEL;
         this.title.caption = VesDocumentationIFrameWidget.LABEL;
-        this.title.iconClass = 'fa fa-book';
+        this.title.iconClass = 'codicon codicon-book';
         this.title.closable = true;
         this.themeService.onDidColorThemeChange(() => setTimeout(() => { this.injectCssVariables(); }, 1));
         // TODO: hook into electron rerender as well

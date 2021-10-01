@@ -20,7 +20,7 @@ export class VesDocumentationHandbookWidget extends BaseWidget {
         this.id = VesDocumentationHandbookWidget.ID;
         this.title.label = VesDocumentationHandbookWidget.LABEL;
         this.title.caption = VesDocumentationHandbookWidget.LABEL;
-        this.title.iconClass = 'fa fa-book';
+        this.title.iconClass = 'codicon codicon-book';
         this.title.closable = true;
         this.node.tabIndex = 0;
     }

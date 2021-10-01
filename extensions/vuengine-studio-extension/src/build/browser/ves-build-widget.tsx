@@ -49,7 +49,7 @@ export class VesBuildWidget extends ReactWidget {
   @postConstruct()
   protected async init(): Promise<void> {
     this.id = VesBuildWidget.ID;
-    this.title.iconClass = 'iconBuild';
+    this.title.iconClass = 'codicon codicon-tools';
     this.title.closable = true;
     this.title.label = VesBuildWidget.LABEL;
     this.title.caption = VesBuildWidget.LABEL;
@@ -123,7 +123,7 @@ export class VesBuildWidget extends ReactWidget {
                     this.commandService.executeCommand(VesBuildCommands.BUILD.id);
                   }}
                 >
-                  <i className='fa fa-wrench'></i> Build
+                  Build
                 </button>
               </div>
               {this.state.showOptions && (
@@ -377,20 +377,20 @@ export class VesBuildWidget extends ReactWidget {
                   (line: BuildLogLine, index: number) => (
                     line.text !== ''
                       ? <div
-                        className={`buildLogLine ${line.type} ${line.file && 'hasFileLink'}`}
+                        className={`buildLogLine ${line.type}${line.file ? ' hasFileLink' : ''}`}
                         key={`buildLogLine${index}`}
                         onClick={(e: React.MouseEvent) => line.file && this.openFile(e, line.file)}
                         title={`${new Date(line.timestamp).toTimeString().substr(0, 8)} ${line.text}`}
                       >
-                        <span className='timestamp'>
+                        <span className='icon'>
                           {line.type === BuildLogLineType.Error
-                            ? <i className='fa fa-times-circle-o' />
+                            ? <i className='codicon codicon-error' />
                             : line.type === BuildLogLineType.Warning
-                              ? <i className='fa fa-exclamation-triangle' />
+                              ? <i className='codicon codicon-warning' />
                               : line.type === BuildLogLineType.Headline
-                                ? <i className='fa fa-arrow-circle-right' />
+                                ? <i className='codicon codicon-info' />
                                 : line.type === BuildLogLineType.Done
-                                  ? <i className='fa fa-check' />
+                                  ? <i className='codicon codicon-pass-filled' />
                                   : <></>}
                         </span>
                         <span className='text'>

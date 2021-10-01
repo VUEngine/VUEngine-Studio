@@ -11,12 +11,12 @@ export namespace VesFlashCartViewContributionCommands {
     export const HELP: Command = {
         id: `${VesFlashCartWidget.ID}.help`,
         label: 'Show Handbook Page',
-        iconClass: 'fa fa-book',
+        iconClass: 'codicon codicon-book',
     };
     export const REFRESH: Command = {
         id: `${VesFlashCartWidget.ID}.refresh`,
         label: VesFlashCartCommands.DETECT.label,
-        iconClass: 'refresh',
+        iconClass: 'codicon codicon-refresh',
     };
 }
 

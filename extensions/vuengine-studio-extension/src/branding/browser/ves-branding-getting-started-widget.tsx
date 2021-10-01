@@ -4,10 +4,17 @@ import { injectable } from '@theia/core/shared/inversify';
 import { GettingStartedWidget } from '@theia/getting-started/lib/browser/getting-started-widget';
 import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
 import { VesProjectsCommands } from '../../projects/browser/ves-projects-commands';
+import { codicon } from '@theia/core/lib/browser';
 
 @injectable()
 export class VesGettingStartedWidget extends GettingStartedWidget {
     protected openUrl = (url: string) => this.windowService.openNewWindow(url, { external: true });
+
+    protected async init(): Promise<void> {
+        super.init();
+
+        this.title.iconClass = 'codicon codicon-info';
+    }
 
     protected render(): React.ReactNode {
         return <div className="ves-welcome-container">
@@ -88,7 +95,7 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
         return (
             <div className="ves-welcome-section">
                 <h3 className="ves-welcome-section-header">
-                    <i className="fa fa-question-circle"></i>
+                    <i className={codicon('question')}></i>
                     Help
                 </h3>
                 <div className="ves-welcome-action-container">
@@ -104,7 +111,7 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
         return (
             <div className="ves-welcome-section">
                 <h3 className="ves-welcome-section-header">
-                    <i className="fa fa-link"></i>
+                    <i className={codicon('link')}></i>
                     Links
                 </h3>
                 <div className="ves-welcome-action-container">

@@ -31,7 +31,7 @@ export class VesFlashCartWidget extends ReactWidget {
   @postConstruct()
   protected async init(): Promise<void> {
     this.id = VesFlashCartWidget.ID;
-    this.title.iconClass = 'iconFlash';
+    this.title.iconClass = 'codicon codicon-browser codicon-flip-y';
     this.title.closable = true;
     this.setTitle();
     this.node.tabIndex = 0; // required for this.node.focus() to work in this.onActivateRequest()
@@ -102,7 +102,7 @@ export class VesFlashCartWidget extends ReactWidget {
                 }
                 disabled={!this.vesFlashCartService.atLeastOneCanHoldRom}
               >
-                <i className='fa fa-microchip'></i> Flash
+                Flash
               </button>
             </>
           )}

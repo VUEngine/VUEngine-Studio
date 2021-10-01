@@ -31,7 +31,7 @@ export class VesEmulatorStatusBarContribution implements FrontendApplicationCont
             alignment: StatusBarAlignment.LEFT,
             command: VesEmulatorCommands.SELECT.id,
             priority: 2,
-            text: `$(play) ${label}`,
+            text: `$(codicon-play) ${label}`,
             tooltip: VesEmulatorCommands.SELECT.label,
         });
     }

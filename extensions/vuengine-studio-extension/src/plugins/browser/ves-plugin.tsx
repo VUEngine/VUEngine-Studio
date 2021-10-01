@@ -247,7 +247,7 @@ export class VesPluginComponent extends AbstractVesPluginComponent {
         return <div className='theia-vsx-extension ves-plugin'>
             {icon
                 ? <img className='theia-vsx-extension-icon' src={icon} />
-                : <div className='theia-vsx-extension-icon ves-placeholder'><i className="fa fa-plug" /></div>}
+                : <div className='theia-vsx-extension-icon ves-placeholder'><i className="codicon codicon-plug" /></div>}
             <div className='theia-vsx-extension-content'>
                 <div className='title'>
                     <div className='noWrapInfo'>
@@ -289,7 +289,7 @@ export class VesPluginEditorComponent extends AbstractVesPluginComponent {
             <div className='header' style={baseStyle} ref={ref => this.header = (ref || undefined)}>
                 {icon ?
                     <img className='icon-container' src={icon} /> :
-                    <div className='icon-container ves-placeholder'><i className="fa fa-plug" /></div>}
+                    <div className='icon-container ves-placeholder'><i className="codicon codicon-plug" /></div>}
                 <div className='details'>
                     <div className='title'>
                         <span title='Plugin name' className='name'>{displayName}</span>

@@ -31,7 +31,7 @@ export class VesBuildStatusBarContribution implements FrontendApplicationContrib
             alignment: StatusBarAlignment.LEFT,
             command: VesBuildCommands.SET_MODE.id,
             priority: 3,
-            text: `$(wrench) ${label}`,
+            text: `$(codicon-tools) ${label}`,
             tooltip: VesBuildCommands.SET_MODE.label,
         });
     }

@@ -12,7 +12,7 @@ export class VesApplicationShell extends ApplicationShell {
         return topPanel;
     }
 
-    protected setTopPanelVisibily(preference: string): void {
+    protected setTopPanelVisibility(preference: string): void {
         // always show the top panel
         this.topPanel.show();
     }

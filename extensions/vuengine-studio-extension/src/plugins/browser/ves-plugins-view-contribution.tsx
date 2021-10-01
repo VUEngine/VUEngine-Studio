@@ -9,6 +9,8 @@ import { VesPluginsModel } from './ves-plugins-model';
 import { AUTHOR_SEARCH_QUERY, INSTALLED_QUERY, RECOMMENDED_QUERY, TAG_SEARCH_QUERY } from './ves-plugins-search-model';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
+import { VesPluginsWidget } from './ves-plugins-widget';
+import { VesPluginsSourceOptions } from './ves-plugins-source';
 
 @injectable()
 export class VesPluginsViewContribution extends AbstractViewContribution<VesPluginsViewContainer>
@@ -41,16 +43,20 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
         commandRegistry.registerCommand(VesPluginsViewCommands.CLEAR_ALL, {
             isEnabled: () => !!this.model.search.query,
             isVisible: widget => widget !== undefined &&
-                widget.id !== undefined &&
-                widget.id === VesPluginsViewContainer.ID,
+                [
+                    `${VesPluginsWidget.ID}:${VesPluginsSourceOptions.SEARCH_RESULT}`,
+                    VesPluginsViewContainer.ID
+                ].includes(widget.id),
             execute: () => this.model.search.query = '',
         });
 
         commandRegistry.registerCommand(VesPluginsViewCommands.HELP, {
             isEnabled: () => true,
             isVisible: widget => widget !== undefined &&
-                widget.id !== undefined &&
-                widget.id === VesPluginsViewContainer.ID,
+                [
+                    `${VesPluginsWidget.ID}:${VesPluginsSourceOptions.SEARCH_RESULT}`,
+                    VesPluginsViewContainer.ID
+                ].includes(widget.id),
             execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'user-interface/plugins-view', false),
         });
 

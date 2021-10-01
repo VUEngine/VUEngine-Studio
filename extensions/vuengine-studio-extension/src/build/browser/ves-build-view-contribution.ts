@@ -9,17 +9,17 @@ export namespace VesBuildViewContributionCommands {
     export const EXPAND: Command = {
         id: `${VesBuildWidget.ID}.expand`,
         label: 'Expand View',
-        iconClass: 'fa fa-expand',
+        iconClass: 'codicon codicon-arrow-both',
     };
     export const HELP: Command = {
         id: `${VesBuildWidget.ID}.help`,
         label: 'Show Handbook Page',
-        iconClass: 'fa fa-book',
+        iconClass: 'codicon codicon-book',
     };
     export const SETTINGS: Command = {
         id: `${VesBuildWidget.ID}.settings`,
         label: 'Show Build Settings',
-        iconClass: 'fa fa-cog',
+        iconClass: 'codicon codicon-settings-gear',
     };
 }
 
@@ -67,27 +67,22 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
         commandRegistry.registerCommand(VesBuildViewContributionCommands.EXPAND, {
             isEnabled: () => true,
             isVisible: widget => widget !== undefined &&
-                widget.id !== undefined &&
                 widget.id === VesBuildWidget.ID,
             execute: widget => widget !== undefined &&
-                widget.id !== undefined &&
                 widget.id === VesBuildWidget.ID &&
                 this.toggleWidgetWidth(widget),
         });
         commandRegistry.registerCommand(VesBuildViewContributionCommands.HELP, {
             isEnabled: () => true,
             isVisible: widget => widget !== undefined &&
-                widget.id !== undefined &&
                 widget.id === VesBuildWidget.ID,
             execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'user-interface/build-view', false),
         });
         commandRegistry.registerCommand(VesBuildViewContributionCommands.SETTINGS, {
             isEnabled: () => true,
             isVisible: widget => widget !== undefined &&
-                widget.id !== undefined &&
                 widget.id === VesBuildWidget.ID,
             execute: widget => widget !== undefined &&
-                widget.id !== undefined &&
                 widget.id === VesBuildWidget.ID &&
                 widget.toggleBuildOptions(),
         });

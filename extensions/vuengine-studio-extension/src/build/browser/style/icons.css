@@ -1,7 +1,0 @@
-.iconBuild {
-    -webkit-mask-image: url(../images/build.svg);
-}
-
-.p-TabBar.theia-app-sides .p-TabBar-tabIcon.iconBuild {
-    -webkit-mask-size: calc(var(--theia-private-sidebar-icon-size) - 4px) !important;
-}

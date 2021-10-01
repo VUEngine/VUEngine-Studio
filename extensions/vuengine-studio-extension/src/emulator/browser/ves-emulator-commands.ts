@@ -7,7 +7,7 @@ export namespace VesEmulatorCommands {
     id: 'VesEmulator.commands.run',
     label: 'Run on Emulator',
     category: CATEGORY,
-    iconClass: 'fa fa-play',
+    iconClass: 'codicon codicon-play',
   };
 
   export const SELECT: Command = {
