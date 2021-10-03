@@ -14,7 +14,7 @@
   font-size: 17px;
   line-height: 27px;
   margin-left: 4px;
-  min-width: 40px;
+  min-width: 36px;
   padding: 1px 0 0;
 }
 
@@ -28,7 +28,7 @@
 }
 
 #ves-titlebar-action-buttons .theia-button.build {
-  min-width: 64px;
+  min-width: 72px;
 }
 /* #ves-titlebar-action-buttons .theia-button.build.success {
   background-color: var(--theia-editorSuccess-foreground);

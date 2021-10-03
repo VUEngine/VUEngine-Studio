@@ -64,6 +64,7 @@ export class VesBuildWidget extends ReactWidget {
     this.update();
     this.title.className = '';
 
+    this.vesBuildService.onDidChangeIsQueued(isQueued => this.title.className = isQueued ? 'ves-decorator-queued' : '');
     this.vesBuildService.onDidChangeRomSize(() => this.update());
     this.vesBuildService.onDidChangeBuildStatus(() => this.update());
     this.vesBuildService.onDidChangeBuildMode(() => this.update());

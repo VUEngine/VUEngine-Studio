@@ -74,6 +74,7 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
         app.emit(VesTouchBarCommands.changeEmulator, this.vesEmulatorService.getDefaultEmulatorConfig().name);
         app.emit(VesTouchBarCommands.changeEmulatorConfigs, this.vesEmulatorService.getEmulatorConfigs());
 
+        this.vesBuildService.onDidChangeIsQueued(buildStatus => app.emit(VesTouchBarCommands.changeBuildIsQueued, buildStatus));
         this.vesBuildService.onDidChangeBuildStatus(buildStatus => app.emit(VesTouchBarCommands.changeBuildStatus, buildStatus));
         this.vesBuildService.onDidChangeBuildMode(buildMode => app.emit(VesTouchBarCommands.changeBuildMode, buildMode));
         this.vesBuildService.onDidChangeBuildFolder(flags => app.emit(VesTouchBarCommands.changeBuildFolder, flags));

@@ -147,10 +147,10 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                     onClick={() => this.commandService.executeCommand(VesBuildCommands.BUILD.id)}
                     key='action-button-build'
                 >
-                    {this.vesBuildService.buildStatus.active
-                        ? <i className='fa fa-cog fa-spin'></i>
-                        : this.vesBuildService.isQueued
-                            ? <i className='fa fa-hourglass-half'></i>
+                    {this.vesBuildService.isQueued
+                        ? <i className='fa fa-hourglass-half'></i>
+                        : this.vesBuildService.buildStatus.active
+                            ? <i className='fa fa-cog fa-spin'></i>
                             : <i className='fa fa-wrench'></i>}
                 </button>
                 <button

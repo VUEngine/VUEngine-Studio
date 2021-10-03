@@ -59,6 +59,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         const exportIcon = nativeImage.createFromDataURL(VesTouchBarIcons.EXPORT).resize({ height: 16 });
         const menuIcon = nativeImage.createFromDataURL(VesTouchBarIcons.MENU).resize({ height: 16 });
         const queuedIcon = nativeImage.createFromDataURL(VesTouchBarIcons.QUEUED).resize({ height: 16 });
+        const queuedIconWide = nativeImage.createFromDataURL(VesTouchBarIcons.QUEUED_WIDE).resize({ height: 16 });
 
         /* const vesButton = new TouchBarButton({
             backgroundColor: '#a22929',
@@ -150,6 +151,11 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             buildMenuCleanButton.enabled = flags[buildMode];
         });
         // @ts-ignore
+        app.on(VesTouchBarCommands.changeBuildIsQueued, (isQueued: boolean) => {
+            buildMenuBuildButton.label = '';
+            buildMenuBuildButton.icon = isQueued ? queuedIconWide : buildIcon;
+        });
+        // @ts-ignore
         app.on(VesTouchBarCommands.changeBuildStatus, (buildStatus: BuildStatus) => {
             if (buildStatus.active) {
                 buildMenuBuildButton.label = `${buildStatus.progress}%`;
@@ -161,10 +167,12 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         });
         // @ts-ignore
         app.on(VesTouchBarCommands.changeIsRunQueued, (isQueued: boolean) => {
+            buildMenuRunButton.label = '';
             buildMenuRunButton.icon = isQueued ? queuedIcon : runIcon;
         });
         // @ts-ignore
         app.on(VesTouchBarCommands.changeIsFlashQueued, (isQueued: boolean) => {
+            buildMenuFlashButton.label = '';
             buildMenuFlashButton.icon = isQueued ? queuedIcon : flashIcon;
         });
         // @ts-ignore
@@ -179,7 +187,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         });
         // @ts-ignore
         app.on(VesTouchBarCommands.onDidChangeFlashingProgress, (progress: number) => {
-            buildMenuFlashButton.label = `${progress}%`;
+            buildMenuFlashButton.label = progress > -1 ? `${progress}%` : '';
         });
         // @ts-ignore
         app.on(VesTouchBarCommands.changeConnectedFlashCart, flashCartConfig => {
