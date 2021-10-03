@@ -124,6 +124,8 @@ export class VesBuildService {
     log: [],
     buildMode: BuildMode.Beta,
     step: '',
+    startDate: undefined,
+    endDate: undefined,
   };
   protected readonly onDidChangeBuildStatusEmitter = new Emitter<BuildStatus>();
   readonly onDidChangeBuildStatus = this.onDidChangeBuildStatusEmitter.event;
@@ -146,6 +148,7 @@ export class VesBuildService {
     const newBuildStatus = {
       ...this.buildStatus,
       active: false,
+      endDate: new Date(),
     };
 
     if (step) {
@@ -317,6 +320,8 @@ export class VesBuildService {
     let processId = 0;
     let active = false;
     let step = 'Building';
+    const startDate = new Date();
+    const endDate = undefined;
 
     try {
 
@@ -352,6 +357,8 @@ export class VesBuildService {
       log,
       buildMode: this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode,
       step,
+      startDate,
+      endDate,
     };
   }
 

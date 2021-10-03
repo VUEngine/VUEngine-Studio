@@ -455,7 +455,7 @@ export class VesEmulatorWidget extends ReactWidget {
               disabled={this.state.showControls || this.state.paused}
             >
               <i className='fa fa-level-down'></i>{' '}
-              <i className='codicon codicon-bookmark-o'></i>
+              <i className='fa fa-bookmark-o'></i>
             </button>
             <button
               className='theia-button secondary'
@@ -463,7 +463,7 @@ export class VesEmulatorWidget extends ReactWidget {
               onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.LoadState, e)}
               disabled={this.state.showControls || this.state.paused}
             >
-              <i className='codicon codicon-bookmark-o'></i>{' '}
+              <i className='fa fa-bookmark-o'></i>{' '}
               <i className='fa fa-level-up'></i>
             </button>
             <button
@@ -471,7 +471,7 @@ export class VesEmulatorWidget extends ReactWidget {
               title='Current Save State'
               disabled={this.state.showControls || this.state.paused}
             >
-              <i className='codicon codicon-bookmark-o'></i> {this.state.saveSlot}
+              <i className='fa fa-bookmark-o'></i> {this.state.saveSlot}
             </button>
             <button
               className='theia-button secondary'

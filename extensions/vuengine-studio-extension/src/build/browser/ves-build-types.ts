@@ -24,6 +24,8 @@ export interface BuildStatus {
   log: BuildLogLine[];
   buildMode: BuildMode;
   step: string;
+  startDate?: Date,
+  endDate?: Date,
 };
 
 export interface BuildLogLineFileLink {

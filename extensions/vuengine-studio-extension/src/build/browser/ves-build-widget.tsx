@@ -13,6 +13,12 @@ import { VesBuildPreferenceIds, VesBuildPreferenceSchema } from './ves-build-pre
 import { VesBuildService } from './ves-build-service';
 import { EditorManager } from '@theia/editor/lib/browser';
 
+interface buildWidgetState {
+  showOptions: boolean,
+  logFilter: BuildLogLineType,
+  timerInterval: NodeJS.Timer | undefined,
+}
+
 @injectable()
 export class VesBuildWidget extends ReactWidget {
   @inject(CommandService)
@@ -33,9 +39,10 @@ export class VesBuildWidget extends ReactWidget {
   static readonly ID = 'vesBuildWidget';
   static readonly LABEL = VesBuildCommands.BUILD.label || 'Build';
 
-  protected state = {
+  protected state: buildWidgetState = {
     showOptions: false,
     logFilter: BuildLogLineType.Normal,
+    timerInterval: undefined,
   };
 
   protected buildLogLastElementRef = React.createRef<HTMLDivElement>();
@@ -61,15 +68,20 @@ export class VesBuildWidget extends ReactWidget {
     this.vesBuildService.onDidChangeBuildStatus(() => this.update());
     this.vesBuildService.onDidChangeBuildMode(() => this.update());
     this.vesBuildService.onDidBuildStart(() => {
+      this.startTimerInterval();
       this.state.logFilter = BuildLogLineType.Normal;
       this.title.className = 'ves-decorator-progress';
     });
     this.vesBuildService.onDidBuildSucceed(() => {
+      this.stopTimerInterval();
       this.title.className = this.vesBuildService.getNumberOfWarnings() > 0
         ? 'ves-decorator-warning'
         : 'ves-decorator-success';
     });
-    this.vesBuildService.onDidBuildFail(() => this.title.className = 'ves-decorator-error');
+    this.vesBuildService.onDidBuildFail(() => {
+      this.stopTimerInterval();
+      this.title.className = 'ves-decorator-error';
+    });
     this.preferenceService.onPreferenceChanged(({ preferenceName }) => {
       switch (preferenceName) {
         case VesBuildPreferenceIds.BUILD_MODE:
@@ -314,7 +326,10 @@ export class VesBuildWidget extends ReactWidget {
                   </div>
                 ) : this.vesBuildService.buildStatus.step === BuildResult.done ? (
                   <div className={this.vesBuildService.getNumberOfWarnings() > 0 ? 'warning' : 'success'}>
-                    <i className='fa fa-check'></i> Build successful {this.vesBuildService.getNumberOfWarnings() > 0 && '(with warnings)'}
+                    {this.vesBuildService.getNumberOfWarnings() > 0
+                      ? <><i className='fa fa-exclamation-triangle'></i> Build successful (with warnings)</>
+                      : <><i className='fa fa-check'></i> Build successful</>}
+                    {this.vesBuildService.getNumberOfWarnings() > 0 && ''}
                   </div>
                 ) : (
                   <div className='error'>
@@ -327,7 +342,7 @@ export class VesBuildWidget extends ReactWidget {
                   <span><i className='fa fa-wrench'></i> {this.vesBuildService.buildStatus.buildMode}</span>
                   {this.vesBuildService.buildStatus.active && this.vesBuildService.buildStatus.processId > 0 &&
                     <span><i className='fa fa-terminal'></i> PID {this.vesBuildService.buildStatus.processId}</span>}
-                  {this.vesBuildService.romSize > 0 &&
+                  {!this.vesBuildService.buildStatus.active && this.vesBuildService.romSize > 0 &&
                     <span><i className='fa fa-microchip'></i> {this.vesBuildService.bytesToMbit(this.vesBuildService.romSize)} MBit</span>}
                 </div>
               </div>
@@ -419,17 +434,30 @@ export class VesBuildWidget extends ReactWidget {
     );
   }
 
+  protected startTimerInterval(): void {
+    this.stopTimerInterval();
+    const self = this;
+    this.state.timerInterval = setInterval(() => {
+      self.update();
+    }, 1000);
+  }
+
+  protected stopTimerInterval(): void {
+    if (this.state.timerInterval !== undefined) {
+      clearInterval(this.state.timerInterval);
+      this.state.timerInterval = undefined;
+    }
+  }
+
   toggleBuildOptions(): void {
     this.state.showOptions = !this.state.showOptions;
     this.update();
   }
 
   protected getDuration(): string {
-    const startTimestamp = this.vesBuildService.buildStatus.log[0]?.timestamp || 0;
-    const endTimestamp =
-      this.vesBuildService.buildStatus.log[this.vesBuildService.buildStatus.log.length - 1]
-        ?.timestamp || 0;
-    const duration = endTimestamp - startTimestamp;
+    const startDate = this.vesBuildService.buildStatus.startDate || new Date();
+    const endDate = this.vesBuildService.buildStatus.endDate || new Date();
+    const duration = endDate.getTime() - startDate.getTime();
     const durationDate = new Date(duration);
 
     return `${durationDate
