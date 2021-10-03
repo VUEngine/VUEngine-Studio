@@ -89,7 +89,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
             return;
         };
 
-        const spinnerIcon = '<i class="fa fa-refresh fa-spin"></i>';
+        const spinnerIcon = '<i class="fa fa-cog fa-spin"></i>';
         const warningIcon = '<i class="fa fa-warning"></i>';
 
         this.setIsCreating(true);

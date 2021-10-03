@@ -121,6 +121,13 @@ export class VesFlashCartService {
     return this._flashingProgress;
   }
 
+  protected readonly onDidFlashingStartEmitter = new Emitter<void>();
+  readonly onDidFlashingStart = this.onDidFlashingStartEmitter.event;
+  protected readonly onDidFlashingFailEmitter = new Emitter<void>();
+  readonly onDidFlashingFail = this.onDidFlashingFailEmitter.event;
+  protected readonly onDidFlashingSucceedEmitter = new Emitter<void>();
+  readonly onDidFlashingSucceed = this.onDidFlashingSucceedEmitter.event;
+
   @postConstruct()
   protected async init(): Promise<void> {
     this.frontendApplicationStateService.onStateChanged(
@@ -255,6 +262,7 @@ export class VesFlashCartService {
     }
 
     this.isFlashing = true;
+    this.onDidFlashingStartEmitter.fire();
     // this.commandService.executeCommand(VesFlashCartCommands.OPEN_WIDGET.id, true);
   }
 
@@ -268,6 +276,7 @@ export class VesFlashCartService {
     this.connectedFlashCarts = this.connectedFlashCarts;
 
     this.isFlashing = false;
+    this.onDidFlashingFailEmitter.fire();
     this.flashingProgress = -1;
   }
 
@@ -325,6 +334,7 @@ export class VesFlashCartService {
 
           if (finished === this.connectedFlashCarts.length) {
             this.isFlashing = false;
+            this.onDidFlashingSucceedEmitter.fire();
           }
         }
       }

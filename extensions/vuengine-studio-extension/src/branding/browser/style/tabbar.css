@@ -10,6 +10,8 @@
     font-family: FontAwesome;
     font-size: calc(var(--theia-ui-font-size0) * 0.85);
     line-height: var(--theia-notification-count-height);
+    margin: -1px;
+    padding: 2px;
     position: absolute;
     right: calc(var(--theia-ui-padding) * 1.33);
     text-align: center;

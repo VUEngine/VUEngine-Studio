@@ -121,7 +121,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                     key='action-button-clean'
                 >
                     {this.vesBuildService.isCleaning
-                        ? <i className='fa fa-refresh fa-spin'></i>
+                        ? <i className='fa fa-cog fa-spin'></i>
                         : <i className='fa fa-trash'></i>}
                 </button>
                 <button
@@ -181,7 +181,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                     {this.vesFlashCartService.isQueued
                         ? <i className='fa fa-hourglass-half'></i>
                         : this.vesFlashCartService.isFlashing
-                            ? <i className='fa fa-refresh fa-spin'></i>
+                            ? <i className='fa fa-cog fa-spin'></i>
                             : <i className='fa fa-microchip'></i>}
                 </button>
                 <button

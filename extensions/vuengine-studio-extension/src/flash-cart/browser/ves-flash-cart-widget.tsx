@@ -42,9 +42,16 @@ export class VesFlashCartWidget extends ReactWidget {
       this.update();
     });
     this.vesFlashCartService.onDidChangeIsFlashing(() => this.update());
-    this.vesFlashCartService.onDidChangeIsQueued(() => this.update());
+    this.vesFlashCartService.onDidChangeIsQueued(isQueued => {
+      this.title.className = isQueued ? 'ves-decorator-queued' : '';
+      this.update();
+    });
     this.vesFlashCartService.onDidChangeFlashingProgress(() => this.update());
     this.vesFlashCartService.onDidChangeAtLeastOneCanHoldRom(() => this.update());
+
+    this.vesFlashCartService.onDidFlashingStart(() => this.title.className = 'ves-decorator-progress');
+    this.vesFlashCartService.onDidFlashingSucceed(() => this.title.className = 'ves-decorator-success');
+    this.vesFlashCartService.onDidFlashingFail(() => this.title.className = 'ves-decorator-error');
   }
 
   protected setTitle(): void {
@@ -154,7 +161,7 @@ export class VesFlashCartWidget extends ReactWidget {
                       </div>
                     ) : connectedFlashCart.status.progress > -1 ? (
                       <div className='infoPanel'>
-                        <i className='fa fa-fw fa-refresh fa-spin'></i>{' '}
+                        <i className='fa fa-fw fa-cog fa-spin'></i>{' '}
                         {connectedFlashCart.status.step}...{' '}
                         {connectedFlashCart.status.progress}%
                       </div>
