@@ -332,6 +332,7 @@ export class VesBuildWidget extends ReactWidget {
                 </div>
               </div>
               <div className='buildProblems'>
+                {/* TODO: allow to filter for both warnings AND problems */}
                 {this.vesBuildService.getNumberOfWarnings() > 0 && <button
                   className={
                     this.state.logFilter === BuildLogLineType.Warning

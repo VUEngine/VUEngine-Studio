@@ -3,7 +3,6 @@
   height: var(--theia-private-menubar-height);
   line-height: var(--theia-private-menubar-height);
   order: 2;
-  padding: 0 10px;
   text-align: center;
   white-space: nowrap;
 }
@@ -11,6 +10,7 @@
 #ves-titlebar-application-title .applicationTitle {
   cursor: pointer;
   display: inline-block;
+  padding: 0 10px;
 }
 
 @media (max-width: 1000px) {
