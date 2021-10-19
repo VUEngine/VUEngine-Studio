@@ -107,7 +107,6 @@
     "electron-mocha": "^9.3.2",
     "electron": "9.3.2",
     "mocha": "^8.2.1",
-    "rimraf": "^2.7.1",
     "wdio-chromedriver-service": "^6.0.4",
     "webdriverio": "^6.10.2"
   },
@@ -118,7 +117,7 @@
     "build": "theia rebuild:electron && yarn bundle",
     "bundle": "theia build",
     "watch": "node_modules/.bin/concurrently -n compile,bundle \"theiaext watch --preserveWatchOutput\" \"theia build --watch --mode development\"",
-    "start": "electron scripts/vuengine-studio-electron-main.js",
+    "start": "electron scripts/ves-electron-main.js",
     "start:debug": "yarn start --log-level=debug",
     "package": "yarn clean:dist && electron-builder -c.mac.identity=null --publish never",
     "deploy": "yarn clean:dist && electron-builder -c.mac.identity=null --publish always",

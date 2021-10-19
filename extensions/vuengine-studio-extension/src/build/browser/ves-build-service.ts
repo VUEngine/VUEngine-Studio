@@ -1,7 +1,6 @@
 import { join as joinPath, normalize } from 'path';
 import { cpus } from 'os';
-import * as rimraf from 'rimraf';
-import { CommandService, isOSX, isWindows, MessageService } from '@theia/core';
+import { CommandService, isOSX, isWindows } from '@theia/core';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { ApplicationShell, PreferenceService } from '@theia/core/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
@@ -36,8 +35,6 @@ export class VesBuildService {
   protected fileService: FileService;
   @inject(FrontendApplicationStateService)
   protected readonly frontendApplicationStateService: FrontendApplicationStateService;
-  @inject(MessageService)
-  protected readonly messageService: MessageService;
   @inject(PreferenceService)
   protected readonly preferenceService: PreferenceService;
   @inject(VesProcessService)
@@ -720,40 +717,35 @@ export class VesBuildService {
 
     if (this.buildFolderExists[buildMode]) {
       this.clean(buildMode);
-    } else {
-      // messageService.info(`Build folder for ${buildMode} mode does not exist. Nothing to clean.`);
     }
   }
 
   async clean(buildMode: BuildMode): Promise<void> {
-    const cleanPath = this.getCleanPath(buildMode);
-
     if (!this.buildFolderExists[buildMode]) {
-      // messageService.info(`Build folder for ${buildMode} mode does not exist.`);
       return;
     }
 
-    const progressMessage = await this.messageService.showProgress({
-      text: `Cleaning build folder for ${buildMode} Mode...`,
-    });
-
     this.isCleaning = true;
-    const self = this;
-    const buildFolder = this.getBuildPath();
-    // TODO: try to use FileService instead of rimraf
-    // await this.fileService.delete(new URI(cleanPath), { recursive: true });
-    rimraf(cleanPath, function (): void {
-      rimraf(joinPath(buildFolder, '*.*'), function (): void {
-        progressMessage.cancel();
-        self.isCleaning = false;
-        self.setBuildFolderExists(buildMode, false);
 
-        if (self.isQueued) {
-          self.isQueued = false;
-          self.commandService.executeCommand(VesBuildCommands.BUILD.id, true);
+    const cleanPath = this.getCleanPath(buildMode);
+    const buildFolder = this.getBuildPath();
+
+    await this.fileService.delete(new URI(cleanPath), { recursive: true });
+    const files = await this.fileService.resolve(new URI(buildFolder));
+    if (files.children) {
+      await Promise.all(files.children.map((value, index) => {
+        if (value.name.endsWith('.a')) {
+          this.fileService.delete(value.resource);
         }
-        // messageService.info(`Build folder for ${buildMode} mode has been cleaned.`);
-      });
-    });
+      }));
+    }
+
+    this.isCleaning = false;
+    this.setBuildFolderExists(buildMode, false);
+
+    if (this.isQueued) {
+      this.isQueued = false;
+      this.commandService.executeCommand(VesBuildCommands.BUILD.id, true);
+    }
   }
 }

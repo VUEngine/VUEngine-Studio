@@ -155,6 +155,7 @@ export class VesPluginsService {
     const findPlugins = async (path: string, prefix: string) => {
       const pluginsMap: any = {}; /* eslint-disable-line */
 
+      // TODO: refactor to use fileservice
       await Promise.all(glob.sync(joinPath(path, '**', 'plugin.json')).map(async file => {
         const fileSplit = file.split(`${sep}plugin.json`);
         const pluginPathFull = fileSplit[0];
