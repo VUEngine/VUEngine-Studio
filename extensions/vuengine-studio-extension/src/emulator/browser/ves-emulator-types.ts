@@ -36,11 +36,11 @@ export enum EmulationMode {
 }
 
 export enum EmulatorScale {
-  auto = 'Auto scale',
+  auto = 'Auto',
   x1 = '×1',
   x2 = '×2',
   x3 = '×3',
-  full = 'Full size',
+  full = 'Stretch',
 }
 
 export enum EmulatorGamePadKeyCode {

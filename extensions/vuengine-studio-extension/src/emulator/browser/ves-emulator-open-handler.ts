@@ -5,6 +5,7 @@ import { EditorManager } from '@theia/editor/lib/browser';
 import { VesEmulatorWidget, VesEmulatorWidgetOptions } from './widget/ves-emulator-widget';
 
 // Start vb files in the configured default emulator
+// TODO: does not work when trying to run vb files with VUEngine Studio from external (e.g. file explorer)
 
 @injectable()
 export class VesEmulatorOpenHandler extends WidgetOpenHandler<VesEmulatorWidget> {

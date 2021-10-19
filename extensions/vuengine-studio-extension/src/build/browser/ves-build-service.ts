@@ -460,6 +460,8 @@ export class VesBuildService {
 
     if (textLowerCase.startsWith('starting build')) {
       type = BuildLogLineType.Headline;
+    } else if (textLowerCase.startsWith('finding ')) {
+      type = BuildLogLineType.Headline;
     } else if (textLowerCase.startsWith('build finished')) {
       type = BuildLogLineType.Done;
     } else if ((headlineMatches = this.matchHeadlines(text)).length) {
@@ -738,6 +740,8 @@ export class VesBuildService {
     this.isCleaning = true;
     const self = this;
     const buildFolder = this.getBuildPath();
+    // TODO: try to use FileService instead of rimraf
+    // await this.fileService.delete(new URI(cleanPath), { recursive: true });
     rimraf(cleanPath, function (): void {
       rimraf(joinPath(buildFolder, '*.*'), function (): void {
         progressMessage.cancel();
