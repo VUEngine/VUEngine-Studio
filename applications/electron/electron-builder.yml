@@ -21,12 +21,14 @@ files:
   - scripts
   - from: plugins
     to: plugins
-  - from: documentation
-    to: documentation
-  - from: vuengine
-    to: vuengine
   - from: binaries/vuengine-studio-tools/web
     to: binaries/vuengine-studio-tools/web
+  - from: documentation
+    to: documentation
+  - from: templates
+    to: templates
+  - from: vuengine
+    to: vuengine
 
 win:
   icon: resources/icons/WindowsLauncherIcon/VUEngineStudio.ico

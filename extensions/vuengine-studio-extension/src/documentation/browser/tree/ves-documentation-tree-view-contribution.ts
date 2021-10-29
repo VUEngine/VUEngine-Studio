@@ -13,7 +13,7 @@ export class VesDocumentationTreeViewContribution extends AbstractViewContributi
       widgetName: VesDocumentationTreeWidget.LABEL,
       defaultWidgetOptions: {
         area: 'right',
-        rank: 900,
+        rank: 1100,
       },
       toggleCommandId: 'vesDocumentation.toggle',
       toggleKeybinding: 'ctrlcmd+shift+d',

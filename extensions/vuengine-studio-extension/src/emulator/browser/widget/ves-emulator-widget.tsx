@@ -94,8 +94,6 @@ export class VesEmulatorWidget extends ReactWidget {
 
     this.resource = await this.getResource();
 
-    window.indexedDB.deleteDatabase('RetroArch');
-
     await this.initState();
     this.bindKeys();
 
@@ -322,7 +320,7 @@ export class VesEmulatorWidget extends ReactWidget {
     return false;
   }
 
-  // TODO: backport EmulatorLoaded event from PVB's emulator? (required modifications to emulator)
+  // TODO: backport EmulatorLoaded event from PVB's emulator? (requires modifications to emulator)
   protected startEmulator(self: any): void { /* eslint-disable-line */
     const romPath = this.options ? this.options.uri : this.vesEmulatorService.getRomPath();
 
@@ -394,19 +392,8 @@ export class VesEmulatorWidget extends ReactWidget {
                 ? 'fa fa-battery-quarter'
                 : 'fa fa-battery-full'}></i>
             </button>
-            {/* /}
-              <button
-                className='theia-button secondary'
-                title='Clean'
-                onClick={() => this.sendCommand('clean')}
-                disabled={this.state.showControls}
-              >
-                <i className='fa fa-trash'></i>
-              </button>
-            {/**/}
           </div>
           <div>
-            {/* TODO: find way to _toggle_ rewind */}
             <button
               className='theia-button secondary'
               title={`Rewind${this.getKeybindingLabel(VesEmulatorCommands.INPUT_REWIND.id, true)}`}
@@ -553,6 +540,14 @@ export class VesEmulatorWidget extends ReactWidget {
               disabled={this.state.showControls}
             >
               <i className='fa fa-camera'></i>
+            </button>
+            <button
+              className='theia-button secondary'
+              title='Clear Emulator Cache'
+              onClick={this.cleanStorage}
+              disabled={this.state.showControls}
+            >
+              <i className='fa fa-trash-o'></i>
             </button>
             <button
               className={
@@ -942,5 +937,19 @@ export class VesEmulatorWidget extends ReactWidget {
     return window.location.hash.slice(-9) === 'workspace'
       ? dirname(window.location.hash.substring(substrNum))
       : window.location.hash.substring(substrNum);
+  }
+
+  protected cleanStorage(): void {
+    localStorage.clear();
+    const req = indexedDB.deleteDatabase('RetroArch');
+    req.onsuccess = () => {
+      console.log('Deleted database successfully');
+    };
+    req.onerror = () => {
+      console.log('Couldn\'t delete database');
+    };
+    req.onblocked = () => {
+      console.log('Couldn\'t delete database due to the operation being blocked');
+    };
   }
 }

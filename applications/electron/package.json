@@ -4,7 +4,7 @@
   "description": "Nintendo Virtual Boy development environment",
   "productName": "VUEngine Studio",
   "version": "1.0.0",
-  "main": "scripts/vuengine-studio-electron-main.js",
+  "main": "scripts/ves-electron-main.js",
   "license": "EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0",
   "author": "KR155E <c.radke@posteo.de>",
   "homepage": "https://github.com/VUEngine/VUEngine-Studio",

@@ -57,3 +57,11 @@ export enum BuildLogLineType {
   Error = 'error',
   Done = 'done',
 }
+
+export enum MemorySection {
+  DYNAMIC_RAM = 'dram',
+  EXPANSION_SPACE = 'exp',
+  ROM = 'rom',
+  STATIC_RAM = 'sram',
+  WORK_RAM = 'wram',
+}

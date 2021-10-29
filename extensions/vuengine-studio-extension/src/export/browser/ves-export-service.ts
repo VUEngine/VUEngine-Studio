@@ -40,8 +40,7 @@ export class VesExportService {
   // is queued
   protected _isQueued: boolean = false;
   protected readonly onDidChangeIsQueuedEmitter = new Emitter<boolean>();
-  readonly onDidChangeIsQueued = this.onDidChangeIsQueuedEmitter
-    .event;
+  readonly onDidChangeIsQueued = this.onDidChangeIsQueuedEmitter.event;
   set isQueued(flag: boolean) {
     this._isQueued = flag;
     this.onDidChangeIsQueuedEmitter.fire(this._isQueued);

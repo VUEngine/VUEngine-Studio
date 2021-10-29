@@ -733,9 +733,9 @@ export class VesBuildService {
     await this.fileService.delete(new URI(cleanPath), { recursive: true });
     const files = await this.fileService.resolve(new URI(buildFolder));
     if (files.children) {
-      await Promise.all(files.children.map((value, index) => {
-        if (value.name.endsWith('.a')) {
-          this.fileService.delete(value.resource);
+      await Promise.all(files.children.map(child => {
+        if (child.name.endsWith('.a')) {
+          this.fileService.delete(child.resource);
         }
       }));
     }

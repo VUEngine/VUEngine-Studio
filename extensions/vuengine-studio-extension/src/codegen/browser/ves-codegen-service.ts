@@ -37,7 +37,9 @@ export class VesCodegenService {
               if (template.extra) {
                 contentJson = await this.appendExtraContent(contentJson, template.extra);
               }
-              this.writeTemplate(template.targets, contentJson);
+              for (const target of template.targets) {
+                this.writeTemplate(target.uri, target.template, contentJson);
+              }
             });
           } catch (e) {
             console.warn(e);
@@ -45,6 +47,13 @@ export class VesCodegenService {
         }
       }
     });
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async writeTemplate(targetUri: URI, templateUri: URI, data: any): Promise<void> {
+    const templateData = (await this.fileService.readFile(templateUri)).value.toString();
+    const renaderedTemplateData = nunjucks.renderString(templateData, data);
+    this.fileService.writeFile(targetUri, BinaryBuffer.fromString(renaderedTemplateData));
   }
 
   protected async getTemplateDefinitions(): Promise<registeredTemplate[]> {
@@ -98,15 +107,7 @@ export class VesCodegenService {
     return contentJson;
   }
 
-  protected async writeTemplate(targets: { uri: URI, template: URI }[], data: any): Promise<void> {
-    for (const target of targets) {
-      const templateData = (await this.fileService.readFile(target.template)).value.toString();
-      const renaderedTemplateData = nunjucks.renderString(templateData, data);
-      /* await */ this.fileService.writeFile(target.uri, BinaryBuffer.fromString(renaderedTemplateData));
-    }
-  }
-
-  configureTemplateEngine(): void {
+  protected configureTemplateEngine(): void {
     const env = nunjucks.configure({});
 
     // add filters
@@ -137,7 +138,7 @@ export class VesCodegenService {
     return convertedKey;
   }
 
-  getWorkspaceRoot(): string {
+  protected getWorkspaceRoot(): string {
     const substrNum = isWindows ? 2 : 1;
 
     return window.location.hash.slice(-9) === 'workspace'
