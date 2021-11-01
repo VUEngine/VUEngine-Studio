@@ -111,6 +111,8 @@ export class VesImageConverterService {
     this.bindEvents();
   }
 
+  // TODO: add file watcher to detect changes of .image.json or image files and automatically convert
+
   // TODO: add queue for to be converted images.
   // this will be mainly needed for when an image file gets changed while a conversion is already running and the
   // file watcher needs to queue the conversion for that image.
@@ -124,7 +126,7 @@ export class VesImageConverterService {
   }
 
   getConvertedDirName(): string {
-    return /*/'Binary'; //**/ 'Converted';
+    return 'Converted';
   }
 
   protected async doConvertFiles(changedOnly: boolean): Promise<void> {
@@ -174,14 +176,6 @@ export class VesImageConverterService {
     if (!(await this.fileService.exists(convertedDirUri))) {
       await this.fileService.createFolder(convertedDirUri);
     }
-
-    // TODO: REMOVE ME AFTER CONVERTING ALL PROJECTS
-    /**/
-    const oldBinaryDirUri = new URI(joinPath(fileDir, 'Binary'));
-    if (await this.fileService.exists(oldBinaryDirUri)) {
-      await this.fileService.delete(oldBinaryDirUri, { recursive: true });
-    }
-    /**/
 
     const processInfo = await this.vesProcessService.launchProcess(VesProcessType.Raw, {
       command: gritPath,
@@ -660,133 +654,5 @@ export class VesImageConverterService {
         });
       }
     });
-  }
-
-  // TODO: REMOVE ME AFTER CONVERTING ALL PROJECTS
-  async convertImagesJson(): Promise<void> {
-    const imagesJsonUri = new URI(joinPath(this.getWorkspaceRoot(), '.vuengine', 'images.json'));
-    const imagesJsonContent = await this.fileService.readFile(imagesJsonUri);
-    const images = JSON.parse(imagesJsonContent.value.toString());
-    await Promise.all(Object.keys(images.folders).map(async key => {
-      const config = images.folders[key];
-      const filename = config.name !== undefined
-        ? joinPath(this.getWorkspaceRoot(), 'assets', 'images', key, config.name! + '.image.json')
-        // @ts-ignore
-        : joinPath(this.getWorkspaceRoot(), 'assets', 'images', key, key.split('/').pop() + '.image.json');
-
-      let template = {};
-      switch (config.template) {
-        case 'animatedEntity':
-          template = {
-            tileset: {
-              shared: false,
-              reduce: false
-            },
-            map: {
-              generate: true,
-              reduce: {
-                flipped: false,
-                unique: false
-              }
-            },
-            stackFrames: false
-          };
-          break;
-
-        case 'entity':
-          template = {
-            tileset: {
-              shared: false,
-              reduce: true
-            },
-            map: {
-              generate: true,
-              reduce: {
-                flipped: true,
-                unique: true
-              }
-            },
-            stackFrames: false
-          };
-          break;
-
-        case 'entityAffine':
-          template = {
-            tileset: {
-              shared: false,
-              reduce: true
-            },
-            map: {
-              generate: true,
-              reduce: {
-                flipped: false,
-                unique: true
-              }
-            },
-            stackFrames: false
-          };
-          break;
-
-        case 'entitySharedTileset':
-          template = {
-            tileset: {
-              shared: true,
-              reduce: true
-            },
-            map: {
-              generate: true,
-              reduce: {
-                flipped: true,
-                unique: true
-              }
-            },
-            stackFrames: false
-          };
-          break;
-
-        case 'entityStacked':
-          template = {
-            tileset: {
-              shared: false,
-              reduce: true
-            },
-            map: {
-              generate: true,
-              reduce: {
-                flipped: true,
-                unique: true
-              }
-            },
-            stackFrames: true
-          };
-          break;
-
-        case 'font':
-          template = {
-            tileset: {
-              shared: false,
-              reduce: false
-            },
-            map: {
-              generate: false,
-              reduce: {
-                flipped: false,
-                unique: false
-              }
-            },
-            stackFrames: false
-          };
-          break;
-      }
-
-      await this.fileService.writeFile(new URI(filename), BinaryBuffer.fromString(JSON.stringify({
-        images: ['.'],
-        converter: template,
-        name: config.name ? config.name : '',
-        section: 'rom'
-      }, null, 4))); /* eslint-disable-line */
-    }));
-
-    await this.fileService.delete(imagesJsonUri);
   }
 }
