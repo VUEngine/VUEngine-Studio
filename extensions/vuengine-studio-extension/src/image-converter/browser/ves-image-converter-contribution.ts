@@ -19,11 +19,13 @@ export class VesImageConverterContribution implements CommandContribution, Keybi
   registerCommands(commandRegistry: CommandRegistry): void {
     commandRegistry.registerCommand(VesImageConverterCommands.CONVERT_ALL, {
       isVisible: () => this.workspaceService.opened,
-      execute: async () => this.vesImageConverterService.convertAll(),
+      isEnabled: () => !this.vesImageConverterService.isConverting,
+      execute: async () => this.vesImageConverterService.convertAll(false),
     });
     commandRegistry.registerCommand(VesImageConverterCommands.CONVERT_CHANGED, {
       isVisible: () => this.workspaceService.opened,
-      execute: async () => this.vesImageConverterService.convertChanged(),
+      isEnabled: () => !this.vesImageConverterService.isConverting,
+      execute: async () => this.vesImageConverterService.convertAll(true),
     });
 
     // TODO: REMOVE ME AFTER CONVERTING ALL PROJECTS

@@ -111,22 +111,20 @@ export class VesImageConverterService {
     this.bindEvents();
   }
 
-  // TODO: add queue for to be converted images, but disable convertAll and convertChanged when conversion is active.
+  // TODO: add queue for to be converted images.
   // this will be mainly needed for when an image file gets changed while a conversion is already running and the
-  // file watcher needs to queue the conversion for that image
+  // file watcher needs to queue the conversion for that image.
 
-  async convertAll(): Promise<void> {
-    const changedOnly = false;
-    await this.doConvertFiles(changedOnly);
-  }
+  async convertAll(changedOnly: boolean): Promise<void> {
+    if (this.isConverting) {
+      return;
+    }
 
-  async convertChanged(): Promise<void> {
-    const changedOnly = true;
     await this.doConvertFiles(changedOnly);
   }
 
   getConvertedDirName(): string {
-    return 'Converted';
+    return /*/'Binary'; //**/ 'Converted';
   }
 
   protected async doConvertFiles(changedOnly: boolean): Promise<void> {
@@ -178,10 +176,12 @@ export class VesImageConverterService {
     }
 
     // TODO: REMOVE ME AFTER CONVERTING ALL PROJECTS
+    /**/
     const oldBinaryDirUri = new URI(joinPath(fileDir, 'Binary'));
     if (await this.fileService.exists(oldBinaryDirUri)) {
       await this.fileService.delete(oldBinaryDirUri, { recursive: true });
     }
+    /**/
 
     const processInfo = await this.vesProcessService.launchProcess(VesProcessType.Raw, {
       command: gritPath,
@@ -419,7 +419,7 @@ export class VesImageConverterService {
     const imageConfigFilesToBeConverted: Array<ImageConfigFileToBeConverted> = [];
 
     // TODO: refactor to use fileservice instead of glob
-    const fileMatcher = joinPath(workspaceRoot, 'assets', '**', '*.image.json');
+    const fileMatcher = joinPath(workspaceRoot, '**', '*.image.json');
     await Promise.all(glob.sync(fileMatcher).map(async imageConfigFile => {
       const config = await this.getConverterConfig(new URI(imageConfigFile));
       const name = config.name ? config.name : parsePath(imageConfigFile).name;
@@ -664,9 +664,10 @@ export class VesImageConverterService {
 
   // TODO: REMOVE ME AFTER CONVERTING ALL PROJECTS
   async convertImagesJson(): Promise<void> {
-    const imagesJsonContent = await this.fileService.readFile(new URI(joinPath(this.getWorkspaceRoot(), '.vuengine', 'images.json')));
+    const imagesJsonUri = new URI(joinPath(this.getWorkspaceRoot(), '.vuengine', 'images.json'));
+    const imagesJsonContent = await this.fileService.readFile(imagesJsonUri);
     const images = JSON.parse(imagesJsonContent.value.toString());
-    for (const key of Object.keys(images.folders)) {
+    await Promise.all(Object.keys(images.folders).map(async key => {
       const config = images.folders[key];
       const filename = config.name !== undefined
         ? joinPath(this.getWorkspaceRoot(), 'assets', 'images', key, config.name! + '.image.json')
@@ -784,6 +785,8 @@ export class VesImageConverterService {
         name: config.name ? config.name : '',
         section: 'rom'
       }, null, 4))); /* eslint-disable-line */
-    };
+    }));
+
+    await this.fileService.delete(imagesJsonUri);
   }
 }
