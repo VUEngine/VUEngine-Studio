@@ -147,12 +147,12 @@ export class VesEmulatorWidget extends ReactWidget {
 
   protected onBeforeAttach(msg: Message): void {
     super.onBeforeAttach(msg);
-    this.bindKeys();
+    this.bindListeners();
   }
 
   protected onBeforeDetach(msg: Message): void {
     super.onBeforeDetach(msg);
-    this.unbindKeys();
+    this.unbindListeners();
   }
 
   protected keybindingToState(): void {
@@ -279,21 +279,24 @@ export class VesEmulatorWidget extends ReactWidget {
   protected keyEventListerner = (e: KeyboardEvent) => this.processKeyEvent(e);
   protected messageEventListerner = (e: MessageEvent) => this.processIframeMessage(e);
 
-  protected bindKeys(): void {
+  protected bindListeners(): void {
     document.addEventListener('keydown', this.keyEventListerner);
     document.addEventListener('keyup', this.keyEventListerner);
     window.addEventListener('message', this.messageEventListerner);
   }
 
-  protected unbindKeys(): void {
+  protected unbindListeners(): void {
     document.removeEventListener('keydown', this.keyEventListerner);
     document.removeEventListener('keyup', this.keyEventListerner);
     window.removeEventListener('message', this.messageEventListerner);
   }
 
   protected processKeyEvent(e: KeyboardEvent): void {
-    // TODO: only process if widget is currently active (e.g. not being typed in search widget)
-    if (e.repeat || !this.isVisible || !this.state.loaded) {
+    // do not process key input...
+    if (e.repeat || // ... on repeated event firing
+      !this.isVisible || // ... if emulator is not visible
+      !this.state.loaded || // ... if emulator has not loaded yet
+      document.activeElement !== document.body) { // ... if the body is not focused (emulator focus is equivalent to body focus)
       return;
     };
 
