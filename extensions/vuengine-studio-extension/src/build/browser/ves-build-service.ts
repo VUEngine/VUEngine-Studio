@@ -7,6 +7,7 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import URI from '@theia/core/lib/common/uri';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
+import { FileChangeType } from '@theia/filesystem/lib/browser';
 import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { ProcessOptions } from '@theia/process/lib/node';
@@ -197,18 +198,21 @@ export class VesBuildService {
     // watch for file changes
     const romPathUri = new URI(this.getRomPath());
     this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
-      for (const buildMode in BuildMode) {
-        if (fileChangesEvent.contains(new URI(this.getBuildPath(buildMode)))) {
-          this.fileService
-            .exists(new URI(this.getBuildPath(buildMode)))
-            .then((exists: boolean) => {
-              this.setBuildFolderExists(buildMode, exists);
-            });
-        }
+      if (fileChangesEvent.contains(romPathUri, FileChangeType.ADDED)) {
+        this.outputRomExists = true;
+      } else if (fileChangesEvent.contains(romPathUri, FileChangeType.DELETED)) {
+        this.outputRomExists = false;
       }
 
-      if (fileChangesEvent.contains(romPathUri)) {
-        this.outputRomExists = await this.fileService.exists(new URI(this.getRomPath()));
+      for (const buildMode in BuildMode) {
+        if (BuildMode.hasOwnProperty(buildMode)) {
+          const buildPathUri = new URI(this.getBuildPath(buildMode));
+          if (fileChangesEvent.contains(buildPathUri, FileChangeType.ADDED)) {
+            this.setBuildFolderExists(buildMode, true);
+          } else if (fileChangesEvent.contains(buildPathUri, FileChangeType.DELETED)) {
+            this.setBuildFolderExists(buildMode, false);
+          }
+        }
       }
     });
 
