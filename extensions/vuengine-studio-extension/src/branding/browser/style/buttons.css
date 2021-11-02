@@ -2,3 +2,8 @@
     line-height: 16px;
     padding: 8px 18px;
 }
+
+.theia-button:active {
+    transition: transform .1s;
+    transform: scale(.8);
+}
