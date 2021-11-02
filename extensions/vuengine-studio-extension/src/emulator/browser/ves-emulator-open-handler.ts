@@ -1,5 +1,5 @@
 import { injectable, inject } from '@theia/core/shared/inversify';
-import { WidgetOpenHandler } from '@theia/core/lib/browser';
+import { WidgetOpenerOptions, WidgetOpenHandler } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';
 import { EditorManager } from '@theia/editor/lib/browser';
 import { VesEmulatorWidget, VesEmulatorWidgetOptions } from './widget/ves-emulator-widget';
@@ -15,7 +15,8 @@ export class VesEmulatorOpenHandler extends WidgetOpenHandler<VesEmulatorWidget>
         '.vb',
     ];
 
-    @inject(EditorManager) protected readonly editorManager: EditorManager;
+    @inject(EditorManager)
+    protected readonly editorManager: EditorManager;
 
     canHandle(uri: URI): number {
         if (this.supported.includes(uri.path.ext)) {
@@ -23,6 +24,16 @@ export class VesEmulatorOpenHandler extends WidgetOpenHandler<VesEmulatorWidget>
         }
 
         return 0;
+    }
+
+    async open(uri: URI, options?: WidgetOpenerOptions): Promise<VesEmulatorWidget> {
+        // When the emulator is already active, it should be opened and reset.
+        const widget = await this.getOrCreateWidget(uri, options);
+        if (widget.isLoaded()) {
+            widget.reload();
+        }
+
+        return super.open(uri, options);
     }
 
     protected createWidgetOptions(uri: URI): VesEmulatorWidgetOptions {

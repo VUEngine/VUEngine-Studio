@@ -118,6 +118,19 @@ export class VesEmulatorWidget extends ReactWidget {
     });
   }
 
+  isLoaded(): boolean {
+    return this.state.loaded;
+  }
+
+  async reload(): Promise<void> {
+    if (this.iframeRef.current) {
+      this.sendCoreOptions();
+      this.iframeRef.current.src += '';
+      await this.initState();
+      this.update();
+    }
+  }
+
   protected async initState(): Promise<void> {
     this.state = {
       loaded: false,
@@ -277,7 +290,7 @@ export class VesEmulatorWidget extends ReactWidget {
 
   protected processKeyEvent(e: KeyboardEvent): void {
     // TODO: only process if widget is currently active (e.g. not being typed in search widget)
-    if (e.repeat || !this.isVisible) {
+    if (e.repeat || !this.isVisible || !this.state.loaded) {
       return;
     };
 
@@ -302,8 +315,10 @@ export class VesEmulatorWidget extends ReactWidget {
   protected processIframeMessage(e: MessageEvent): void {
     switch (e.data.type) {
       case 'loaded':
-        this.state.loaded = true;
-        this.update();
+        setTimeout(() => {
+          this.state.loaded = true;
+          this.update();
+        }, 200);
         break;
       case 'screenshot':
         this.processScreenshot(e.data.data, e.data.filename);
@@ -323,7 +338,6 @@ export class VesEmulatorWidget extends ReactWidget {
     return false;
   }
 
-  // TODO: backport EmulatorLoaded event from PVB's emulator? (requires modifications to emulator)
   protected startEmulator(self: any): void { /* eslint-disable-line */
     const romPath = this.options ? this.options.uri : this.vesEmulatorService.getRomPath();
 
@@ -341,7 +355,7 @@ export class VesEmulatorWidget extends ReactWidget {
   }
 
   public sendKeypress(keyCode: EmulatorGamePadKeyCode | EmulatorFunctionKeyCode, e?: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
-    if (!this.state.showControls || keyCode === EmulatorFunctionKeyCode.ToggleControlsOverlay) {
+    if (this.state.loaded && (!this.state.showControls || keyCode === EmulatorFunctionKeyCode.ToggleControlsOverlay)) {
       this.sendCommand('keyPress', keyCode);
     }
     if (e) {
@@ -663,15 +677,6 @@ export class VesEmulatorWidget extends ReactWidget {
 
     const fileUri = new URI(joinPath(this.getWorkspaceRoot(), 'screenshots', filename));
     this.fileService.writeFile(fileUri, BinaryBuffer.wrap(ia));
-  }
-
-  protected async reload(): Promise<void> {
-    if (this.iframeRef.current) {
-      this.sendCoreOptions();
-      this.iframeRef.current.src += '';
-      await this.initState();
-      this.update();
-    }
   }
 
   protected async setEmulationMode(e: React.ChangeEvent<HTMLSelectElement>): Promise<void> {
