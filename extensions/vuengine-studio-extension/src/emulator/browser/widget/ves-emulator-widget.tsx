@@ -96,8 +96,6 @@ export class VesEmulatorWidget extends ReactWidget {
     this.resource = await this.getResource();
 
     await this.initState();
-    this.bindKeys();
-
     // TODO: find out why the emulator is only x1 size initially, without setTimeout
     setTimeout(() => {
       this.update();
@@ -145,6 +143,11 @@ export class VesEmulatorWidget extends ReactWidget {
       input: {},
     };
     this.keybindingToState();
+  }
+
+  protected onBeforeAttach(msg: Message): void {
+    super.onBeforeAttach(msg);
+    this.bindKeys();
   }
 
   protected onBeforeDetach(msg: Message): void {
