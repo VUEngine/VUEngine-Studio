@@ -140,6 +140,7 @@ export class VesPluginsService {
       this._ready.resolve();
       return this.installedPlugins;
     } catch (e) {
+      this._ready.resolve();
       return [];
     }
   }
