@@ -5,5 +5,5 @@
 
 .theia-button:active {
     transition: transform .1s;
-    transform: scale(.8);
+    transform: scale(.85);
 }

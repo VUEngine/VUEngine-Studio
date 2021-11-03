@@ -1,17 +1,44 @@
-import URI from '@theia/core/lib/common/uri';
-
-export interface registeredTemplate {
-  source: URI
+export interface RegisteredTemplate {
+  source: RegisteredTemplateSource
   key?: string
-  extra?: registeredTemplateExtra
-  targets: registeredTemplateTarget[]
+  extra?: Array<RegisteredTemplateExtra>
+  targets: Array<RegisteredTemplateTarget>
+  root: string
 }
 
-export interface registeredTemplateExtra {
-  [key: string]: URI
+export interface RegisteredTemplateSource {
+  type: RegisteredTemplateSourceType
+  value: string
 }
 
-export interface registeredTemplateTarget {
-  uri: URI
-  template: URI
+export interface RegisteredTemplateExtra {
+  key: string
+  type: RegisteredTemplateSourceType
+  root: RegisteredTemplateRoot
+  value: string
+}
+
+export interface RegisteredTemplateTarget {
+  root: RegisteredTemplateRoot
+  value: string
+  template: string
+  encoding?: RegisteredTemplateEncoding
+}
+
+export enum RegisteredTemplateSourceType {
+  uri = 'uri',
+  filetype = 'filetype',
+}
+
+export enum RegisteredTemplateRoot {
+  activePlugins = 'activePlugins',
+  engine = 'engine',
+  plugins = 'plugins',
+  relative = 'relative',
+  workspace = 'workspace',
+}
+
+export enum RegisteredTemplateEncoding {
+  utf8 = 'utf8',
+  win1252 = 'win1252',
 }

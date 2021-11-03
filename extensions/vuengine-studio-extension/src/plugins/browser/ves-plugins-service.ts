@@ -8,6 +8,7 @@ import URI from '@theia/core/lib/common/uri';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { PreferenceService } from '@theia/core/lib/browser';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
+import { Deferred } from '@theia/core/lib/common/promise-util';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import { VesPluginsPreferenceIds } from './ves-plugins-preferences';
 import { VesPluginData, VesPluginsData } from './ves-plugin';
@@ -25,6 +26,11 @@ export class VesPluginsService {
   protected preferenceService: PreferenceService;
 
   protected pluginsData: VesPluginsData;
+
+  protected readonly _ready = new Deferred<void>();
+  get ready(): Promise<void> {
+    return this._ready.promise;
+  }
 
   protected _installedPlugins: string[] = [];
   protected readonly onDidChangeinstalledPluginsEmitter = new Emitter<string[]>();
@@ -131,6 +137,7 @@ export class VesPluginsService {
       const fileContentParsed = JSON.parse(fileContent.value.toString());
       // write directly to property to not trigger change event
       this._installedPlugins = fileContentParsed.plugins;
+      this._ready.resolve();
       return this.installedPlugins;
     } catch (e) {
       return [];

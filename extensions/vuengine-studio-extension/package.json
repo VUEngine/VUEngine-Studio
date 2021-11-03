@@ -31,6 +31,7 @@
     "express": "^4.17.1",
     "filenamify": "^4.3.0",
     "glob": "^7.1.7",
+    "iconv-lite": "^0.6.3",
     "inversify": "^5.1.1",
     "nunjucks": "^3.2.3",
     "replace-in-files": "^3.0.0",
