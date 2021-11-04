@@ -15,6 +15,8 @@ import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { VES_PREFERENCE_DIR } from '../../branding/browser/ves-branding-preference-configurations';
 import { RegisteredTemplate, RegisteredTemplateEncoding, RegisteredTemplateExtra, RegisteredTemplateRoot, RegisteredTemplateSourceType } from './ves-codegen-types';
 
+export const VES_PREFERENCE_TEMPLATES_DIR = 'templates';
+
 @injectable()
 export class VesCodegenService {
   @inject(FileService)
@@ -33,7 +35,7 @@ export class VesCodegenService {
     this.preferenceService.ready.then(async () => {
       this.vesPluginsService.ready.then(async () => {
         const workspaceRoot = this.getWorkspaceRoot();
-        this.configureTemplateEngine();
+        await this.configureTemplateEngine();
 
         this.templates = await this.getTemplateDefinitions();
 
@@ -70,7 +72,7 @@ export class VesCodegenService {
                       const roots = await this.resolveRoot(target.root, fileChange.resource.toString());
                       await Promise.all(roots.map(async root => {
                         const targetValue = new URI(joinPath(root, ...targetFile.split('/')));
-                        const targetTemplate = new URI(joinPath(template.root, VES_PREFERENCE_DIR, ...target.template.split('/')));
+                        const targetTemplate = new URI(joinPath(template.root, VES_PREFERENCE_DIR, VES_PREFERENCE_TEMPLATES_DIR, ...target.template.split('/')));
                         const encoding = target.encoding ? target.encoding : RegisteredTemplateEncoding.utf8;
                         await this.writeTemplate(targetValue, targetTemplate, contentJson, encoding);
                       }));
@@ -149,8 +151,9 @@ export class VesCodegenService {
     return extraJson;
   }
 
-  protected configureTemplateEngine(): void {
-    const env = nunjucks.configure({});
+  protected async configureTemplateEngine(): Promise<void> {
+    const engineCorePath = await this.vesBuildService.getEngineCorePath();
+    const env = nunjucks.configure(joinPath(engineCorePath, VES_PREFERENCE_DIR, VES_PREFERENCE_TEMPLATES_DIR));
 
     // add filters
     env.addFilter('basename', (value: string, ending: boolean = true) => {
@@ -169,7 +172,10 @@ export class VesCodegenService {
     ));
 
     // add functions
-    env.addGlobal('fileExists', async (value: string) => this.fileService.exists(new URI(value)));
+    /* env.addGlobal('fileExists', async (value: string) => {
+      const exists = await this.fileService.exists(new URI(value));
+      return exists;
+    }); */
   }
 
   protected toUpperSnakeCase(key: string): string {
