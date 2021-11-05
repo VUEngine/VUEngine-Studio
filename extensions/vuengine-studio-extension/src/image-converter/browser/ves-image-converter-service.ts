@@ -655,4 +655,68 @@ export class VesImageConverterService {
       }
     });
   }
+
+  // TODO: REMOVE ME AFTER CONVERTING ALL PROJECTS
+  async convertSpecNames(): Promise<void> {
+    let matches: string[] = [];
+
+    const workspaceRoot = this.getWorkspaceRoot();
+    const fileMatcher = joinPath(workspaceRoot, '**', '*Spec.c');
+    await Promise.all(glob.sync(fileMatcher).map(async specFile => {
+      const specFileContent = (await this.fileService.readFile(new URI(specFile))).value.toString();
+      matches = [...matches, ...specFileContent.match(/[\s\S]StageROMSpec ([A-Z0-9_]*) \=/g)?.map(match => match.split(' ')[1]) ?? []];
+
+      matches = [...matches, ...specFileContent.match(/[\s\S]extern ([a-zA-Z]*) ([A-Z0-9_]*);/g)?.map(match => match.split(' ')[2].replace(';', '')) ?? []];
+      matches = [...matches, ...specFileContent.match(/[\s\S]extern ([a-zA-Z]*) ([A-Z0-9_]*)\[/g)?.map(match => match.split(' ')[2].replace('[', '')) ?? []];
+      matches = [...matches, ...specFileContent.match(/[\s\S]([a-zA-Z]*)Spec ([A-Z0-9_]*)\[/g)?.map(match => match.split(' ')[1].replace('[', '')) ?? []];
+      matches = [...matches, ...specFileContent.match(/[\s\S]([a-zA-Z]*)Spec ([A-Z0-9_]*) \=/g)?.map(match => match.split(' ')[1]) ?? []];
+      matches = [...matches, ...specFileContent.match(/[\s\S]([a-zA-Z]*)Spec\* const ([A-Z0-9_]*)\[/g)?.map(match => match.split(' ')[2].replace('[', '')) ?? []];
+      matches = [...matches, ...specFileContent.match(/[\s\S]([a-zA-Z]*)ROM ([A-Z0-9_]*) \=/g)?.map(match => match.split(' ')[1]) ?? []];
+      matches = [...matches, ...specFileContent.match(/[\s\S]([a-zA-Z]*)ROM\* ([A-Z0-9_]*)\[/g)?.map(match => match.split(' ')[1].replace('[', '')) ?? []];
+    }));
+
+    matches = [...new Set(matches)].sort((a, b) => a < b && 1 || -1);
+
+    const convertSpecName = (name: string): string => {
+      name = name.replace('_AC_', '_');
+      name = name.replace('_IM_', '_');
+      name = name.replace('_SND_', '_SOUND_');
+      name = name.replace('_STAGE_ST_', '_STAGE_');
+
+      if (name.endsWith('_ANIM')) { name = name.slice(0, -4) + 'ANIMATION'; }
+      if (name.endsWith('_CH')) { name = name.slice(0, -2) + 'CHARSET'; }
+      if (name.endsWith('_EN') || name.endsWith('_AC') || name.endsWith('_IM') || name.endsWith('_LB')) { name = name.slice(0, -2) + 'ENTITY'; }
+      if (name.endsWith('_EP')) { name = name.slice(0, -2) + 'ENTRY_POINT'; }
+      if (name.endsWith('_LV')) { name = name.slice(0, -3); }
+      if (name.endsWith('_PS')) { name = name.slice(0, -2) + 'PARTICLE_SYSTEM'; }
+      if (name.endsWith('_SND')) { name = name.slice(0, -3) + 'SOUND'; }
+      if (name.endsWith('_STAGE_ST')) { name = name.slice(0, -3); }
+      if (name.endsWith('_TX')) { name = name.slice(0, -2) + 'TEXTURE'; }
+
+      name = name.split('_').map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()).join('');
+
+      name = name.replace('Vuengine', 'VUEngine');
+
+      return name;
+    };
+
+    await Promise.all(glob.sync(joinPath(workspaceRoot, '**', '*.*')).map(async file => {
+      const fileContentOriginal = (await this.fileService.readFile(new URI(file))).value.toString();
+      let fileContentChanged = fileContentOriginal;
+
+      await Promise.all(matches.map(async (match, number) => {
+        const convertedSpecName = convertSpecName(match);
+        fileContentChanged = fileContentChanged.replace(new RegExp(match, 'g'), convertedSpecName);
+      }));
+
+      fileContentChanged = fileContentChanged.replace(new RegExp('__FONTS', 'g'), '_fonts');
+      fileContentChanged = fileContentChanged.replace(new RegExp('__LANGUAGES', 'g'), '_languages');
+
+      if (fileContentChanged !== fileContentOriginal) {
+        await this.fileService.writeFile(new URI(file), BinaryBuffer.fromString(fileContentChanged));
+      }
+    }));
+
+    console.log('DONE');
+  }
 }
