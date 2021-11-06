@@ -665,15 +665,15 @@ export class VesImageConverterService {
     const fileMatcher = joinPath(workspaceRoot, '**', '*Spec.c');
     await Promise.all(glob.sync(fileMatcher).map(async specFile => {
       const specFileContent = (await this.fileService.readFile(new URI(specFile))).value.toString();
-      matches = [...matches, ...specFileContent.match(/[\s\S]StageROMSpec ((?=.*_+)[A-Z0-9_]*) \=/g)?.map(match => match.split(' ')[1]) ?? []];
+      matches = [...matches, ...specFileContent.match(/[\s\S]StageROMSpec ((?=.*_+)[xA-Z0-9_]*) \=/g)?.map(match => match.split(' ')[1]) ?? []];
 
-      matches = [...matches, ...specFileContent.match(/[\s\S]extern ([a-zA-Z]*) ((?=.*_+)[A-Z0-9_]*);/g)?.map(match => match.split(' ')[2].replace(';', '')) ?? []];
-      matches = [...matches, ...specFileContent.match(/[\s\S]extern ([a-zA-Z]*) ((?=.*_+)[A-Z0-9_]*)\[/g)?.map(match => match.split(' ')[2].replace('[', '')) ?? []];
-      matches = [...matches, ...specFileContent.match(/[\s\S]([a-zA-Z]*)Spec ((?=.*_+)[A-Z0-9_]*)\[/g)?.map(match => match.split(' ')[1].replace('[', '')) ?? []];
-      matches = [...matches, ...specFileContent.match(/[\s\S]([a-zA-Z]*)Spec ((?=.*_+)[A-Z0-9_]*) \=/g)?.map(match => match.split(' ')[1]) ?? []];
-      matches = [...matches, ...specFileContent.match(/[\s\S]([a-zA-Z]*)Spec\* const ((?=.*_+)[A-Z0-9_]*)\[/g)?.map(match => match.split(' ')[2].replace('[', '')) ?? []];
-      matches = [...matches, ...specFileContent.match(/[\s\S]([a-zA-Z]*)ROM ((?=.*_+)[A-Z0-9_]*) \=/g)?.map(match => match.split(' ')[1]) ?? []];
-      matches = [...matches, ...specFileContent.match(/[\s\S]([a-zA-Z]*)ROM\* ((?=.*_+)[A-Z0-9_]*)\[/g)?.map(match => match.split(' ')[1].replace('[', '')) ?? []];
+      matches = [...matches, ...specFileContent.match(/[\s\S]extern ([a-zA-Z]*) ((?=.*_+)[xA-Z0-9_]*);/g)?.map(match => match.split(' ')[2].replace(';', '')) ?? []];
+      matches = [...matches, ...specFileContent.match(/[\s\S]extern ([a-zA-Z]*) ((?=.*_+)[xA-Z0-9_]*)\[/g)?.map(match => match.split(' ')[2].replace('[', '')) ?? []];
+      matches = [...matches, ...specFileContent.match(/[\s\S]([a-zA-Z]*)Spec ((?=.*_+)[xA-Z0-9_]*)\[/g)?.map(match => match.split(' ')[1].replace('[', '')) ?? []];
+      matches = [...matches, ...specFileContent.match(/[\s\S]([a-zA-Z]*)Spec ((?=.*_+)[xA-Z0-9_]*) \=/g)?.map(match => match.split(' ')[1]) ?? []];
+      matches = [...matches, ...specFileContent.match(/[\s\S]([a-zA-Z]*)Spec\* const ((?=.*_+)[xA-Z0-9_]*)\[/g)?.map(match => match.split(' ')[2].replace('[', '')) ?? []];
+      matches = [...matches, ...specFileContent.match(/[\s\S]([a-zA-Z]*)ROM ((?=.*_+)[xA-Z0-9_]*) \=/g)?.map(match => match.split(' ')[1]) ?? []];
+      matches = [...matches, ...specFileContent.match(/[\s\S]([a-zA-Z]*)ROM\* ((?=.*_+)[xA-Z0-9_]*)\[/g)?.map(match => match.split(' ')[1].replace('[', '')) ?? []];
     }));
 
     matches = [...new Set(matches)].sort((a, b) => a < b && 1 || -1);
@@ -693,7 +693,7 @@ export class VesImageConverterService {
       if (name.endsWith('_ANIM')) { name = name.slice(0, -4) + 'ANIMATION'; }
       if (name.endsWith('_ANIMS')) { name = name.slice(0, -5) + 'ANIMATIONS'; }
       if (name.endsWith('_CH')) { name = name.slice(0, -2) + 'CHARSET'; }
-      if (name.endsWith('_EN') || name.endsWith('_AC') || name.endsWith('_IM') || name.endsWith('_LB')) { name = name.slice(0, -2) + 'ENTITY'; }
+      if (name.endsWith('_EN') || name.endsWith('_AC') || name.endsWith('_AG') || name.endsWith('_IM') || name.endsWith('_LB')) { name = name.slice(0, -2) + 'ENTITY'; }
       if (name.endsWith('_EP')) { name = name.slice(0, -2) + 'ENTRY_POINT'; }
       if (name.endsWith('_LV')) { name = name.slice(0, -3); }
       if (name.endsWith('_PS')) { name = name.slice(0, -2) + 'PARTICLE_SYSTEM'; }
