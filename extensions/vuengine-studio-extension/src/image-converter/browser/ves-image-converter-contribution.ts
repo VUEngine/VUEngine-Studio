@@ -27,15 +27,6 @@ export class VesImageConverterContribution implements CommandContribution, Keybi
       isEnabled: () => !this.vesImageConverterService.isConverting,
       execute: async () => this.vesImageConverterService.convertAll(true),
     });
-
-    // TODO: REMOVE ME AFTER CONVERTING ALL PROJECTS
-    commandRegistry.registerCommand({
-      id: 'VesImageConverter.commands.convertSpecNames',
-      label: 'CONVERT SPEC NAMES',
-    }, {
-      isVisible: () => this.workspaceService.opened,
-      execute: async () => this.vesImageConverterService.convertSpecNames(),
-    });
   }
 
   registerKeybindings(registry: KeybindingRegistry): void {
