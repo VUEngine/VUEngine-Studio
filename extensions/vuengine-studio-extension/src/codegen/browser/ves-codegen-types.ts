@@ -1,44 +1,48 @@
-export interface RegisteredTemplate {
-  source: RegisteredTemplateSource
-  key?: string
-  extra?: Array<RegisteredTemplateExtra>
-  targets: Array<RegisteredTemplateTarget>
+export interface Template {
+  event: TemplateEvent
+  data?: Array<TemplateDataSource>
+  targets: Array<TemplateTarget>
   root: string
 }
 
-export interface RegisteredTemplateSource {
-  type: RegisteredTemplateSourceType
+export interface TemplateEvent {
+  type: TemplateEventType
   value: string
 }
 
-export interface RegisteredTemplateExtra {
+export enum TemplateEventType {
+  fileChanged = 'fileChanged',
+  fileWithEndingChanged = 'fileWithEndingChanged',
+}
+
+export interface TemplateDataSource {
   key: string
-  type: RegisteredTemplateSourceType
-  root: RegisteredTemplateRoot
+  type: TemplateDataType
+  root: TemplateRoot
   value: string
 }
 
-export interface RegisteredTemplateTarget {
-  root: RegisteredTemplateRoot
-  value: string
-  template: string
-  encoding?: RegisteredTemplateEncoding
-}
-
-export enum RegisteredTemplateSourceType {
-  uri = 'uri',
-  filetype = 'filetype',
-}
-
-export enum RegisteredTemplateRoot {
-  activePlugins = 'activePlugins',
+export enum TemplateRoot {
   engine = 'engine',
+  installedPlugins = 'installedPlugins',
   plugins = 'plugins',
   relative = 'relative',
   workspace = 'workspace',
 }
 
-export enum RegisteredTemplateEncoding {
+export enum TemplateDataType {
+  file = 'file',
+  filesWithEnding = 'filesWithEnding',
+}
+
+export interface TemplateTarget {
+  root: TemplateRoot
+  value: string
+  template: string
+  encoding?: TemplateEncoding
+}
+
+export enum TemplateEncoding {
   utf8 = 'utf8',
   win1252 = 'win1252',
 }

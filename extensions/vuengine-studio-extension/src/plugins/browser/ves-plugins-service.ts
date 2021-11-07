@@ -12,6 +12,7 @@ import { Deferred } from '@theia/core/lib/common/promise-util';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import { VesPluginsPreferenceIds } from './ves-plugins-preferences';
 import { VesPluginData, VesPluginsData } from './ves-plugin';
+import { VUENGINE_PLUGINS_PREFIX } from './ves-plugins-types';
 
 @injectable()
 export class VesPluginsService {
@@ -32,41 +33,18 @@ export class VesPluginsService {
     return this._ready.promise;
   }
 
-  protected _installedPlugins: string[] = [];
-  protected readonly onDidChangeinstalledPluginsEmitter = new Emitter<string[]>();
-  readonly onDidChangeinstalledPlugins = this.onDidChangeinstalledPluginsEmitter.event;
-  set installedPlugins(plugins: string[]) {
-    this._installedPlugins = plugins;
-    this.onDidChangeinstalledPluginsEmitter.fire(this._installedPlugins);
-  }
-  get installedPlugins(): string[] {
-    return this._installedPlugins;
-  }
+  protected installedPlugins: Array<string> = [];
+
+  // events
+  protected readonly onPluginInstalledEmitter = new Emitter<string>();
+  readonly onPluginInstalled = this.onPluginInstalledEmitter.event;
+  protected readonly onPluginUninstalledEmitter = new Emitter<string>();
+  readonly onPluginUninstalled = this.onPluginUninstalledEmitter.event;
 
   @postConstruct()
   protected async init(): Promise<void> {
-    this.onDidChangeinstalledPlugins(async () => {
-      try {
-        // read
-        const pluginsFileUri = this.getPluginsFileUri();
-        const fileContent = await this.fileService.readFile(pluginsFileUri);
-        let fileContentParsed = JSON.parse(fileContent.value.toString());
-        // update
-        fileContentParsed.plugins = this.installedPlugins;
-        fileContentParsed.plugins.sort();
-        // write
-        const updatedFileContent = JSON.stringify(fileContentParsed, null, 4);
-        /* await */ this.fileService.writeFile(pluginsFileUri, BinaryBuffer.fromString(updatedFileContent));
-      } catch (e) {
-        // no-op
-      }
-    });
-  }
-
-  protected async getResourcesPath(): Promise<string> {
-    const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
-    const applicationPath = envVar && envVar.value ? envVar.value : '';
-    return applicationPath;
+    this.onPluginInstalled(async () => /* await */ this.handleInstalledPluginsChange());
+    this.onPluginUninstalled(async () => /* await */ this.handleInstalledPluginsChange());
   }
 
   async getEnginePluginsPath(): Promise<string> {
@@ -111,8 +89,7 @@ export class VesPluginsService {
   installPlugin(id: string): void {
     if (!this.installedPlugins.includes(id)) {
       this.installedPlugins.push(id);
-      // trigger change event
-      this.installedPlugins = this.installedPlugins;
+      this.onPluginInstalledEmitter.fire(id);
     }
   }
 
@@ -120,23 +97,16 @@ export class VesPluginsService {
     const index = this.installedPlugins.indexOf(id);
     if (index > -1) {
       this.installedPlugins.splice(index, 1);
-      // trigger change event
-      this.installedPlugins = this.installedPlugins;
+      this.onPluginUninstalledEmitter.fire(id);
     }
   }
 
-  protected getPluginsFileUri(): URI {
-    const path = joinPath(this.getWorkspaceRoot(), 'config', 'Compiler.json');
-    return new URI(path);
-  }
-
-  async determineInstalledPlugins(): Promise<string[]> {
+  async determineInstalledPlugins(): Promise<Array<string>> {
     try {
       const pluginsFileUri = this.getPluginsFileUri();
       const fileContent = await this.fileService.readFile(pluginsFileUri);
       const fileContentParsed = JSON.parse(fileContent.value.toString());
-      // write directly to property to not trigger change event
-      this._installedPlugins = fileContentParsed.plugins;
+      this.installedPlugins = fileContentParsed.plugins;
       this._ready.resolve();
       return this.installedPlugins;
     } catch (e) {
@@ -145,14 +115,18 @@ export class VesPluginsService {
     }
   }
 
-  getRecommendedPlugins(): string[] {
+  getInstalledPlugins(): Array<string> {
+    return this.installedPlugins;
+  }
+
+  getRecommendedPlugins(): Array<string> {
     return [
-      'vuengine//other/I18n',
-      'vuengine//other/SaveDataManager',
-      'vuengine//states/splash/AdjustmentScreenNintendo',
-      'vuengine//states/splash/AutomaticPauseSelectionScreen',
-      'vuengine//states/splash/LanguageSelectionScreen',
-      'vuengine//states/splash/PrecautionScreen',
+      `${VUENGINE_PLUGINS_PREFIX}other/I18n`,
+      `${VUENGINE_PLUGINS_PREFIX}other/SaveDataManager`,
+      `${VUENGINE_PLUGINS_PREFIX}states/splash/AdjustmentScreenNintendo`,
+      `${VUENGINE_PLUGINS_PREFIX}states/splash/AutomaticPauseSelectionScreen`,
+      `${VUENGINE_PLUGINS_PREFIX}states/splash/LanguageSelectionScreen`,
+      `${VUENGINE_PLUGINS_PREFIX}states/splash/PrecautionScreen`,
     ];
   }
 
@@ -197,7 +171,7 @@ export class VesPluginsService {
     this.pluginsData = pluginsMap;
   }
 
-  searchPluginsData(query: string): VesPluginData[] {
+  searchPluginsData(query: string): Array<VesPluginData> {
     const searchResult = [];
 
     // TODO: weighted search through all fields, then order by score desc
@@ -211,7 +185,7 @@ export class VesPluginsService {
     return searchResult;
   }
 
-  searchPluginsByTag(tag: string): VesPluginData[] {
+  searchPluginsByTag(tag: string): Array<VesPluginData> {
     const searchResult = [];
 
     for (const pluginData of Object.values(this.pluginsData)) {
@@ -223,7 +197,7 @@ export class VesPluginsService {
     return searchResult;
   }
 
-  searchPluginsByAuthor(author: string): VesPluginData[] {
+  searchPluginsByAuthor(author: string): Array<VesPluginData> {
     const searchResult = [];
 
     for (const pluginData of Object.values(this.pluginsData)) {
@@ -235,11 +209,39 @@ export class VesPluginsService {
     return searchResult;
   }
 
+  protected async handleInstalledPluginsChange(): Promise<void> {
+    try {
+      // read
+      const pluginsFileUri = this.getPluginsFileUri();
+      const fileContent = await this.fileService.readFile(pluginsFileUri);
+      let fileContentParsed = JSON.parse(fileContent.value.toString());
+      // update
+      fileContentParsed.plugins = this.installedPlugins;
+      fileContentParsed.plugins.sort();
+      // write
+      const updatedFileContent = JSON.stringify(fileContentParsed, null, 4);
+      /* await */ this.fileService.writeFile(pluginsFileUri, BinaryBuffer.fromString(updatedFileContent));
+    } catch (e) {
+      // no-op
+    }
+  }
+
+  protected async getResourcesPath(): Promise<string> {
+    const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
+    const applicationPath = envVar && envVar.value ? envVar.value : '';
+    return applicationPath;
+  }
+
+  protected getPluginsFileUri(): URI {
+    const path = joinPath(this.getWorkspaceRoot(), 'config', 'Compiler.json');
+    return new URI(path);
+  }
+
   /**
    * Returns a list of all plugins the current project uses, including implicitly included ones through dependencies
    */
-  /* protected async getProjectPlugins(): Promise<string[]> {
-    let allPlugins: string[] = [];
+  /* protected async getProjectPlugins(): Promise<Array<string>> {
+    let allPlugins: Array<string> = [];
     const enginePluginsPath = await this.getEnginePluginsPath();
 
     // get project's plugins

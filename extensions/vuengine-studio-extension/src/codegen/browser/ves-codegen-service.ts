@@ -1,19 +1,20 @@
-import { basename, dirname, join as joinPath, parse as parsePath } from 'path';
 import * as glob from 'glob';
 import * as iconv from 'iconv-lite';
 import * as nunjucks from 'nunjucks';
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { basename, dirname, join as joinPath, parse as parsePath } from 'path';
+import { isWindows } from '@theia/core';
+import { PreferenceService } from '@theia/core/lib/browser';
+import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import URI from '@theia/core/lib/common/uri';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { FileChangeType } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { isWindows } from '@theia/core';
 import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
-import { BinaryBuffer } from '@theia/core/lib/common/buffer';
-import { PreferenceService } from '@theia/core/lib/browser';
+import { VES_PREFERENCE_DIR } from '../../branding/browser/ves-branding-preference-configurations';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
-import { VES_PREFERENCE_DIR } from '../../branding/browser/ves-branding-preference-configurations';
-import { RegisteredTemplate, RegisteredTemplateEncoding, RegisteredTemplateExtra, RegisteredTemplateRoot, RegisteredTemplateSourceType } from './ves-codegen-types';
+import { USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } from '../../plugins/browser/ves-plugins-types';
+import { Template, TemplateEncoding, TemplateDataSource, TemplateRoot, TemplateEventType, TemplateDataType } from './ves-codegen-types';
 
 export const VES_PREFERENCE_TEMPLATES_DIR = 'templates';
 
@@ -28,7 +29,7 @@ export class VesCodegenService {
   @inject(VesPluginsService)
   protected vesPluginsService: VesPluginsService;
 
-  protected templates: RegisteredTemplate[] = [];
+  protected templates: Template[] = [];
 
   @postConstruct()
   protected async init(): Promise<void> {
@@ -41,27 +42,28 @@ export class VesCodegenService {
 
         this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
           fileChangesEvent.changes.map(fileChange => {
+            console.log('>>>>>>>>>>>> fileChange', fileChange.resource.toString());
             this.templates.map(template => {
               if ([FileChangeType.ADDED, FileChangeType.UPDATED].includes(fileChange.type) &&
-                (template.source.type === RegisteredTemplateSourceType.uri &&
-                  fileChange.resource.isEqual(new URI(joinPath(workspaceRoot, ...template.source.value.split('/'))))) ||
-                (template.source.type === RegisteredTemplateSourceType.filetype &&
-                  fileChange.resource.toString().endsWith(template.source.value))
+                (template.event.type === TemplateEventType.fileChanged &&
+                  fileChange.resource.isEqual(new URI(joinPath(workspaceRoot, ...template.event.value.split('/'))))) ||
+                (template.event.type === TemplateEventType.fileWithEndingChanged &&
+                  fileChange.resource.toString().endsWith(template.event.value))
               ) {
                 try {
                   this.fileService.readFile(fileChange.resource).then(async content => {
-                    const dataKey = template.key || basename(template.source.toString()).split('.')[0].toLowerCase();
+                    const dataKey = 'v';
                     let contentJson = {
                       [dataKey]: JSON.parse(content.value.toString())
                     };
-                    if (template.extra) {
+                    if (template.data) {
                       contentJson = {
                         ...contentJson,
-                        ...await this.getExtraContent(fileChange.resource, template.extra)
+                        ...await this.getAdditionalTemplateData(fileChange.resource, template.data)
                       };
                     }
                     await Promise.all(template.targets.map(async target => {
-                      const targetFile = target.value.replace(/\$\{\w+\}/ig, (match, number) => {
+                      const targetFile = target.value.replace(/\$\{\w+\}/ig, match => {
                         match = match.substr(2, match.length - 3);
                         if (match === 'sourceBasename') {
                           return parsePath(fileChange.resource.toString()).name;
@@ -73,7 +75,7 @@ export class VesCodegenService {
                       await Promise.all(roots.map(async root => {
                         const targetValue = new URI(joinPath(root, ...targetFile.split('/')));
                         const targetTemplate = new URI(joinPath(template.root, VES_PREFERENCE_DIR, VES_PREFERENCE_TEMPLATES_DIR, ...target.template.split('/')));
-                        const encoding = target.encoding ? target.encoding : RegisteredTemplateEncoding.utf8;
+                        const encoding = target.encoding ? target.encoding : TemplateEncoding.utf8;
                         await this.writeTemplate(targetValue, targetTemplate, contentJson, encoding);
                       }));
                     }));
@@ -90,18 +92,18 @@ export class VesCodegenService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async writeTemplate(targetUri: URI, templateUri: URI, data: any, encoding: RegisteredTemplateEncoding = RegisteredTemplateEncoding.utf8): Promise<void> {
+  async writeTemplate(targetUri: URI, templateUri: URI, data: any, encoding: TemplateEncoding = TemplateEncoding.utf8): Promise<void> {
     const templateData = (await this.fileService.readFile(templateUri)).value.toString();
     const renaderedTemplateData = nunjucks.renderString(templateData, data);
     await this.fileService.writeFile(targetUri, BinaryBuffer.wrap(iconv.encode(renaderedTemplateData, encoding)));
   }
 
-  protected async getTemplateDefinitions(): Promise<RegisteredTemplate[]> {
-    const templates: RegisteredTemplate[] = [];
+  protected async getTemplateDefinitions(): Promise<Template[]> {
+    const templates: Template[] = [];
     const roots = [
-      ...await this.resolveRoot(RegisteredTemplateRoot.engine),
-      ...await this.resolveRoot(RegisteredTemplateRoot.activePlugins),
-      ...await this.resolveRoot(RegisteredTemplateRoot.workspace),
+      ...await this.resolveRoot(TemplateRoot.engine),
+      ...await this.resolveRoot(TemplateRoot.installedPlugins),
+      ...await this.resolveRoot(TemplateRoot.workspace),
     ];
 
     await Promise.all(roots.map(async root => {
@@ -120,35 +122,35 @@ export class VesCodegenService {
   }
 
   /* eslint-disable-next-line */
-  protected async getExtraContent(file: URI, extraTemplates: Array<RegisteredTemplateExtra>): Promise<any> {
+  protected async getAdditionalTemplateData(file: URI, dataSources: Array<TemplateDataSource>): Promise<any> {
     /* eslint-disable-next-line */
-    const extraJson: { [key: string]: any } = {};
-    await Promise.all(extraTemplates.map(async extraTemplate => {
-      const roots = await this.resolveRoot(extraTemplate.root, file.toString());
-      if (extraTemplate.type === RegisteredTemplateSourceType.uri) {
+    const dataSourceJson: { [key: string]: any } = {};
+    await Promise.all(dataSources.map(async dataSource => {
+      const roots = await this.resolveRoot(dataSource.root, file.toString());
+      if (dataSource.type === TemplateDataType.file) {
         await Promise.all(roots.map(async root => {
-          const uri = new URI(joinPath(root, ...extraTemplate.value.split('/')));
+          const uri = new URI(joinPath(root, ...dataSource.value.split('/')));
           if (await this.fileService.exists(uri)) {
             const fileContent = await this.fileService.readFile(uri);
-            extraJson[extraTemplate.key] = JSON.parse(fileContent.value.toString());
+            dataSourceJson[dataSource.key] = JSON.parse(fileContent.value.toString());
           }
         }));
-      } else if (extraTemplate.type === RegisteredTemplateSourceType.filetype) {
-        if (!extraJson[extraTemplate.key]) {
-          extraJson[extraTemplate.key] = [];
+      } else if (dataSource.type === TemplateDataType.filesWithEnding) {
+        if (!dataSourceJson[dataSource.key]) {
+          dataSourceJson[dataSource.key] = [];
         }
         await Promise.all(roots.map(async root => {
           // TODO: refactor to use fileservice instead of glob
-          const fileMatcher = joinPath(root, '**', `*${extraTemplate.value}`);
-          await Promise.all(glob.sync(fileMatcher).map(async extraFile => {
-            const fileContent = await this.fileService.readFile(new URI(extraFile));
-            extraJson[extraTemplate.key].push(JSON.parse(fileContent.value.toString()));
+          const fileMatcher = joinPath(root, '**', `*${dataSource.value}`);
+          await Promise.all(glob.sync(fileMatcher).map(async dataSourceFile => {
+            const fileContent = await this.fileService.readFile(new URI(dataSourceFile));
+            dataSourceJson[dataSource.key].push(JSON.parse(fileContent.value.toString()));
           }));
         }));
       }
     }));
 
-    return extraJson;
+    return dataSourceJson;
   }
 
   protected async configureTemplateEngine(): Promise<void> {
@@ -189,35 +191,35 @@ export class VesCodegenService {
     return convertedKey;
   }
 
-  protected async resolveRoot(root: RegisteredTemplateRoot, filepath?: string): Promise<Array<string>> {
+  protected async resolveRoot(root: TemplateRoot, filepath?: string): Promise<Array<string>> {
     const roots: Array<string> = [];
 
     switch (root) {
-      case RegisteredTemplateRoot.activePlugins:
+      case TemplateRoot.installedPlugins:
         const enginePluginsPath = await this.vesPluginsService.getEnginePluginsPath();
         const userPluginsPath = await this.vesPluginsService.getUserPluginsPath();
-        this.vesPluginsService.installedPlugins.map(installedPlugin => {
-          if (installedPlugin.startsWith('vuengine//')) {
-            roots.push(joinPath(enginePluginsPath, installedPlugin.replace('vuengine//', '')));
-          } else if (installedPlugin.startsWith('user//')) {
-            roots.push(joinPath(userPluginsPath, installedPlugin.replace('user//', '')));
+        this.vesPluginsService.getInstalledPlugins().map(installedPlugin => {
+          if (installedPlugin.startsWith(VUENGINE_PLUGINS_PREFIX)) {
+            roots.push(joinPath(enginePluginsPath, installedPlugin.replace(VUENGINE_PLUGINS_PREFIX, '')));
+          } else if (installedPlugin.startsWith(USER_PLUGINS_PREFIX)) {
+            roots.push(joinPath(userPluginsPath, installedPlugin.replace(USER_PLUGINS_PREFIX, '')));
           }
         });
         break;
-      case RegisteredTemplateRoot.engine:
+      case TemplateRoot.engine:
         roots.push(await this.vesBuildService.getEngineCorePath());
         break;
-      case RegisteredTemplateRoot.plugins:
+      case TemplateRoot.plugins:
         roots.push(await this.vesPluginsService.getEnginePluginsPath());
         roots.push(await this.vesPluginsService.getUserPluginsPath());
         break;
-      case RegisteredTemplateRoot.relative:
+      case TemplateRoot.relative:
         if (filepath) {
           roots.push(dirname(filepath));
         }
         break;
       default:
-      case RegisteredTemplateRoot.workspace:
+      case TemplateRoot.workspace:
         roots.push(this.getWorkspaceRoot());
         break;
     }

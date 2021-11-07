@@ -135,6 +135,7 @@ export class VesBuildService {
     return this._buildStatus;
   }
 
+  // events
   protected readonly onDidBuildStartEmitter = new Emitter<void>();
   readonly onDidBuildStart = this.onDidBuildStartEmitter.event;
   protected readonly onDidBuildFailEmitter = new Emitter<void>();

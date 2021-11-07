@@ -58,7 +58,8 @@ export class VesPluginsModel {
                 ]);
                 this.initialized.resolve();
 
-                this.pluginsService.onDidChangeinstalledPlugins(() => this.updateInstalled());
+                this.pluginsService.onPluginInstalled(() => this.updateInstalled());
+                this.pluginsService.onPluginUninstalled(() => this.updateInstalled());
             };
         });
     }
@@ -179,7 +180,7 @@ export class VesPluginsModel {
     protected async updateInstalled(): Promise<void> {
         const prevInstalled = this._installed;
         return this.doChange(async () => {
-            const pluginIds = this.pluginsService.installedPlugins;
+            const pluginIds = this.pluginsService.getInstalledPlugins();
             const currInstalled = new Set<string>();
             for (const pluginId of pluginIds) {
                 this._installed.delete(pluginId);
