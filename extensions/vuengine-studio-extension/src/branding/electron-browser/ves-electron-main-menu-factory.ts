@@ -9,7 +9,7 @@ import { remote } from 'electron';
 @injectable()
 export class VesElectronMainMenuFactory extends ElectronMainMenuFactory {
     async setMenuBar(): Promise<void> {
-        const createdMenuBar = this.createMenuBar();
+        const createdMenuBar = this.createElectronMenuBar();
         if (isOSX) {
             remote.Menu.setApplicationMenu(createdMenuBar);
         } else {
@@ -17,7 +17,7 @@ export class VesElectronMainMenuFactory extends ElectronMainMenuFactory {
         }
     }
 
-    createMenuBar(): Electron.Menu | null {
+    createElectronMenuBar(): Electron.Menu | null {
         const menuModel = this.menuProvider.getMenu(MAIN_MENU_BAR);
         const template = this.fillMenuTemplate([], menuModel);
         if (isOSX) {

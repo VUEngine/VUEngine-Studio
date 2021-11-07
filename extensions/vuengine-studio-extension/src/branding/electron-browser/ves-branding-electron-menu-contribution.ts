@@ -42,7 +42,7 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
         // @see: https://github.com/eclipse-theia/theia/issues/446
         // TODO: remove this function when issue resolved
         if (isOSX) {
-            const rebuildMenu = () => remote.Menu.setApplicationMenu(this.factory.createMenuBar());
+            const rebuildMenu = () => remote.Menu.setApplicationMenu(this.factory.createElectronMenuBar());
 
             this.preferenceService.onPreferenceChanged(({ preferenceName }) => {
                 if ([
