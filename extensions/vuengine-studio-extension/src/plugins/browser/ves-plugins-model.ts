@@ -213,15 +213,6 @@ export class VesPluginsModel {
             if (!plugin) {
                 throw new Error(`Failed to resolve ${id} plugin.`);
             }
-            if (plugin.readme) {
-                try {
-                    const rawReadme = await this.fileService.readFile(new URI(plugin.readme));
-                    const readme = this.compileReadme(rawReadme.value.toString());
-                    plugin.update({ readme });
-                } catch (e) {
-                    console.error(`[${id}]: failed to compile readme, reason:`, e);
-                }
-            }
             return plugin;
         });
     }
@@ -247,12 +238,21 @@ export class VesPluginsModel {
                 return;
             }
             plugin = this.setPlugin(id);
+
+            let renderedReadme = '';
+            const readmeUri = new URI(data.readme);
+            if (data.readme && await this.fileService.exists(readmeUri)) {
+                const rawReadme = await this.fileService.readFile(readmeUri);
+                const readme = this.compileReadme(rawReadme.value.toString());
+                renderedReadme = readme;
+            }
+
             plugin.update(Object.assign(data, {
                 displayName: data.displayName,
                 author: data.author,
                 description: data.description,
                 icon: data.icon,
-                readme: data.readme,
+                readme: renderedReadme,
             }));
             return plugin;
         } catch (e) {
