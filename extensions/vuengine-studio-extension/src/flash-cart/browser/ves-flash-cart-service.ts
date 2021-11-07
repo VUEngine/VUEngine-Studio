@@ -1,32 +1,34 @@
 import { dirname, join as joinPath } from 'path';
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { CommandService, isOSX, isWindows, MessageService } from '@theia/core/lib/common';
-import URI from '@theia/core/lib/common/uri';
 import { ApplicationShell, PreferenceService } from '@theia/core/lib/browser';
+import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
+import { CommandService, isOSX, isWindows, MessageService } from '@theia/core/lib/common';
+import { BinaryBufferWriteableStream } from '@theia/core/lib/common/buffer';
+import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
+import URI from '@theia/core/lib/common/uri';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
-import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
-import { VesBuildService } from '../../build/browser/ves-build-service';
-import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
-import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
-import { VesProjectsService } from '../../projects/browser/ves-projects-service';
 import { VesBuildPreferenceIds } from '../../build/browser/ves-build-preferences';
-import { VesFlashCartPreferenceIds, VesFlashCartPreferenceSchema } from './ves-flash-cart-preferences';
-import { ConnectedFlashCart, FlashCartConfig } from './ves-flash-cart-types';
+import { VesBuildService } from '../../build/browser/ves-build-service';
+import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
+import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
+import { VesProjectsService } from '../../projects/browser/ves-projects-service';
 import { VesFlashCartUsbService } from '../common/ves-flash-cart-usb-service-protocol';
-import { VesFlashCartUsbWatcher } from './ves-flash-cart-usb-watcher';
 import { IMAGE_FLASHBOY_PLUS } from './images/flashboy-plus';
 import { IMAGE_HYPERFLASH32 } from './images/hyperflash32';
 import { VesFlashCartCommands } from './ves-flash-cart-commands';
-import { BinaryBufferWriteableStream } from '@theia/core/lib/common/buffer';
-
-export const PROG_VB_PLACEHOLDER = '%PROGVB%';
-export const HFCLI_PLACEHOLDER = '%HFCLI%';
-export const ROM_PLACEHOLDER = '%ROM%';
-export const FLASHBOY_PLUS_IMAGE_PLACEHOLDER = '%FBP_IMG%';
-export const HYPERFLASH32_IMAGE_PLACEHOLDER = '%HF32_IMG%';
+import { VesFlashCartPreferenceIds, VesFlashCartPreferenceSchema } from './ves-flash-cart-preferences';
+import {
+  ConnectedFlashCart,
+  FLASHBOY_PLUS_IMAGE_PLACEHOLDER,
+  FlashCartConfig,
+  HFCLI_PLACEHOLDER,
+  HYPERFLASH32_IMAGE_PLACEHOLDER,
+  PROG_VB_PLACEHOLDER,
+  ROM_PLACEHOLDER
+} from './ves-flash-cart-types';
+import { VesFlashCartUsbWatcher } from './ves-flash-cart-usb-watcher';
 
 @injectable()
 export class VesFlashCartService {

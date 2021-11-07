@@ -1,6 +1,6 @@
 import { isOSX } from '@theia/core';
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
-import { FLASHBOY_PLUS_IMAGE_PLACEHOLDER, HFCLI_PLACEHOLDER, HYPERFLASH32_IMAGE_PLACEHOLDER, PROG_VB_PLACEHOLDER, ROM_PLACEHOLDER } from './ves-flash-cart-service';
+import { FLASHBOY_PLUS_IMAGE_PLACEHOLDER, HFCLI_PLACEHOLDER, HYPERFLASH32_IMAGE_PLACEHOLDER, PROG_VB_PLACEHOLDER, ROM_PLACEHOLDER } from './ves-flash-cart-types';
 
 export namespace VesFlashCartPreferenceIds {
     export const CATEGORY = 'flashCarts';
