@@ -56,8 +56,6 @@ export class VesAboutDialog extends AboutDialog {
             <hr className="ves-about-hr" />
             {this.renderVersions()}
             <hr className="ves-about-hr" />
-            {this.renderBuiltWith()}
-            <hr className="ves-about-hr" />
             {this.renderPatreon()}
         </div >;
     }
@@ -94,7 +92,7 @@ export class VesAboutDialog extends AboutDialog {
                     </a>
                 </div>
                 <div>
-                    <i className="fa fa-link" /> <a href="#" onClick={() => this.openUrl('https://github.com/VUEngine/VUEngine-Studio')}>
+                    <i className="fa fa-github" /> <a href="#" onClick={() => this.openUrl('https://github.com/VUEngine/VUEngine-Studio')}>
                         {'https://github.com/VUEngine/VUEngine-Studio'}
                     </a>
                 </div>
@@ -109,22 +107,6 @@ export class VesAboutDialog extends AboutDialog {
         </div>;
     }
 
-    protected renderBuiltWith(): React.ReactNode {
-        return <div className="ves-about-paragraph">
-            <div>
-                Built with <a href="#" onClick={() => this.openUrl('https://theia-ide.org/')}>Eclipse Theia</a>. Includes the following third party binaries:
-            </div>
-            <ul>
-                <li>GCC <i>– The GNU Project, with patches for V810 by ElmerPCFX</i></li>
-                <li>Grit <i>– Jasper Vijn, with patches for Virtual Boy by dasi</i></li>
-                <li>hf-cli <i>– thunderstruck</i></li>
-                <li>MSYS <i>– The MinGW Project</i></li>
-                <li>prog-vb <i>– William D. Jones</i></li>
-                <li>RetroArch Web w/ Beetle VB core <i>– RetroArch and Mednafen teams</i></li>
-            </ul>
-        </div>;
-    }
-
     protected renderPatreon(): React.ReactNode {
         return <>
             <div className="ves-about-paragraph">
@@ -136,39 +118,34 @@ export class VesAboutDialog extends AboutDialog {
 
     protected renderPatrons(): React.ReactNode {
         return <div className="ves-about-paragraph">
-            {/* 30 patrons with highest lifetime support */}
-            Adam Wannamaker,
-            Alec Kafka,
-            Amos Bieler,
-            Benjamin Stevens,
-            Bernardo Compagnoni,
-            Cesar Henzelin,
-            Christopher Garland,
-            Daniel Lhota,
-            David Baisley,
-            Domenic Umberto Raso,
-            Eric Freeman,
-            IanelGreenleaf,
-            Jon Zrostlik,
-            Jose Zagal,
-            Kevin L Mellott,
-            Luke Gerhardt,
-            Marc Andre Sigle,
-            Marten Reiß,
-            Massih Naisan,
-            Michael Ortega,
-            Mike Boodle,
-            NeGiZON,
-            Patrick Fenton,
-            Patrick-VB,
-            Randy Jeffery,
-            Sean Machan,
-            Steven Hagelgans,
-            Tony,
-            Troy Bonneau,
+            {/* 25 patrons with highest lifetime support */}
+            Adam Wannamaker
+            Alec Kafka
+            Benjamin Stevens
+            Bnjmn Mrph
+            Cameron Hollaway
+            Christopher Garland
+            David Baisley
+            Domenic Umberto Raso
+            Eric Freeman
+            IanelGreenleaf
+            Jesse Levine
+            Jose Zagal
+            Marten Reiß
+            Michael Ortega
+            NeGiZON
+            norty
+            Patrick Fenton
+            Patrick-VB
+            Randy Jeffery
+            RetroOnyx
+            Sean Machan
+            Steven Hagelgans
+            Tony
+            Troy Bonneau
             tydyedsyko
 
-            et al... <a href="#" onClick={() => this.openUrl('https://github.com/VUEngine/VUEngine-Studio/blob/master/SUPPORTERS')}>View full list</a>
+            et al.
         </div>;
     }
 }

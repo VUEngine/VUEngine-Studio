@@ -5,10 +5,19 @@ A Nintendo Virtual Boy development environment.
 
 ## License
 
-VUEngine Studio is build upon Eclipse Theia.
+VUEngine Studio is build with Eclipse Theia.
 
 - [Eclipse Public License 2.0](LICENSE)
 - [一 (Secondary) GNU General Public License, version 2 with the GNU Classpath Exception](LICENSE)
+
+Excluded are the following third party binaries that are shipped with VUEngine Studio: 
+
+- GCC by The GNU Project, with patches for V810 by ElmerPCFX
+- Grit by Jasper Vijn, with patches for Virtual Boy by dasi
+- hf-cli by thunderstruck
+- MSYS by The MinGW Project
+- prog-vb by William D. Jones
+- RetroArch Web w/ Beetle VB core by the RetroArch and Mednafen teams
 
 
 ## Init
