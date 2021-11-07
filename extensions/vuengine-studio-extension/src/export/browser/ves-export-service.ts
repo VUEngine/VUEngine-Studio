@@ -55,8 +55,8 @@ export class VesExportService {
   }
 
   bindEvents(): void {
-    this.vesBuildService.onDidChangeOutputRomExists(outputRomExists => {
-      if (outputRomExists && this.isQueued) {
+    this.vesBuildService.onDidBuildSucceed(async () => {
+      if (await this.vesBuildService.outputRomExists() && this.isQueued) {
         this.isQueued = false;
         this.exportRom();
       }
@@ -71,7 +71,7 @@ export class VesExportService {
       this.isQueued = false;
     } else if (this.vesBuildService.buildStatus.active) {
       this.isQueued = true;
-    } else if (this.vesBuildService.outputRomExists) {
+    } else if (await this.vesBuildService.outputRomExists()) {
       this.exportRom();
     } else {
       this.isQueued = true;

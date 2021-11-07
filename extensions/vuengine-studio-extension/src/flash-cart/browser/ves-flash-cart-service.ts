@@ -179,15 +179,16 @@ export class VesFlashCartService {
   }
 
   async doFlash(): Promise<void> {
+    const outputRomExists = await this.vesBuildService.outputRomExists();
     if (this.isQueued) {
       this.isQueued = false;
     } else if (this.vesBuildService.buildStatus.active) {
       this.isQueued = true;
-    } else if (this.vesBuildService.outputRomExists && (this.isFlashing ||
+    } else if (outputRomExists && (this.isFlashing ||
       !this.atLeastOneCanHoldRom || this.connectedFlashCarts.length === 0)) {
       this.commandService.executeCommand(VesFlashCartCommands.OPEN_WIDGET.id);
     } else {
-      if (this.vesBuildService.outputRomExists) {
+      if (outputRomExists) {
         this.flash();
       } else {
         this.isQueued = true;
@@ -300,8 +301,8 @@ export class VesFlashCartService {
   }
 
   protected bindEvents(): void {
-    this.vesBuildService.onDidChangeOutputRomExists(outputRomExists => {
-      if (outputRomExists && this.isQueued) {
+    this.vesBuildService.onDidBuildSucceed(async () => {
+      if (await this.vesBuildService.outputRomExists() && this.isQueued) {
         this.isQueued = false;
         this.doFlash();
       }
@@ -386,7 +387,7 @@ export class VesFlashCartService {
     const paddedRomPath = this.getPaddedRomPath(size);
     const paddedRomUri = new URI(paddedRomPath);
 
-    if (!this.vesBuildService.outputRomExists) {
+    if (!await this.vesBuildService.outputRomExists()) {
       return false;
     }
 

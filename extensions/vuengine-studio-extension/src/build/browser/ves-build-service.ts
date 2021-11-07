@@ -77,18 +77,6 @@ export class VesBuildService {
     return this._buildFolderExists;
   }
 
-  // output rom exists
-  protected readonly onDidChangeOutputRomExistsEmitter = new Emitter<boolean>();
-  readonly onDidChangeOutputRomExists = this.onDidChangeOutputRomExistsEmitter.event;
-  protected _outputRomExists: boolean = false;
-  set outputRomExists(flag: boolean) {
-    this._outputRomExists = flag;
-    this.onDidChangeOutputRomExistsEmitter.fire(this._outputRomExists);
-  }
-  get outputRomExists(): boolean {
-    return this._outputRomExists;
-  }
-
   // is cleaning
   protected _isCleaning: boolean = false;
   protected readonly onDidChangeIsCleaningEmitter = new Emitter<boolean>();
@@ -159,9 +147,18 @@ export class VesBuildService {
     if (step !== BuildResult.done) {
       this.onDidBuildFailEmitter.fire();
     } else {
-      this.onDidBuildSucceedEmitter.fire();
+      // Wait for up to two seconds for output ROM to have been copied by makefile
+      // (The copy command has finished, but the kernel might still be writing out the buffered data.)
+      let tries = 0;
+      const romExistsCheckInterval = setInterval(async () => {
+        if (await this.outputRomExists() || ++tries === 5) {
+          clearInterval(romExistsCheckInterval);
+          this.onDidBuildSucceedEmitter.fire();
+        }
+      }, 400);
     }
   }
+
   pushBuildLogLine(buildLogLine: BuildLogLine): void {
     this._buildStatus.log.push(buildLogLine);
     this.onDidChangeBuildStatusEmitter.fire(this._buildStatus);
@@ -183,13 +180,7 @@ export class VesBuildService {
             }
           }
 
-          // TODO: fileService.exists does not seem to work on Windows
-          this.fileService
-            .exists(new URI(this.getRomPath()))
-            .then((exists: boolean) => {
-              this.outputRomExists = exists;
-              /* await */ this.determineRomSize();
-            });
+          this.determineRomSize();
         }
       }
     );
@@ -197,14 +188,7 @@ export class VesBuildService {
     await this.resetBuildStatus();
 
     // watch for file changes
-    const romPathUri = new URI(this.getRomPath());
     this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
-      if (fileChangesEvent.contains(romPathUri, FileChangeType.ADDED)) {
-        this.outputRomExists = true;
-      } else if (fileChangesEvent.contains(romPathUri, FileChangeType.DELETED)) {
-        this.outputRomExists = false;
-      }
-
       for (const buildMode in BuildMode) {
         if (BuildMode.hasOwnProperty(buildMode)) {
           const buildPathUri = new URI(this.getBuildPath(buildMode));
@@ -264,11 +248,15 @@ export class VesBuildService {
     ).length;
   }
 
+  async outputRomExists(): Promise<boolean> {
+    return this.fileService.exists(new URI(this.getRomPath()));
+  }
+
   protected async determineRomSize(): Promise<void> {
     const romPath = this.getRomPath();
     const romUri = new URI(romPath);
     if (await this.fileService.exists(romUri)) {
-      const outputRom = await this.fileService.readFile(romUri);
+      const outputRom = await this.fileService.resolve(romUri, { resolveMetadata: true });
       this.romSize = outputRom.size;
     } else {
       this.romSize = 0;

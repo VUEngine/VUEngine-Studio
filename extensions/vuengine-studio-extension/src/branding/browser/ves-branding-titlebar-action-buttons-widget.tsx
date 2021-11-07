@@ -59,7 +59,6 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
         this.vesBuildService.onDidChangeIsQueued(() => this.update());
         this.vesBuildService.onDidChangeBuildStatus(() => this.update());
         this.vesBuildService.onDidChangeBuildFolder(() => this.update());
-        this.vesBuildService.onDidChangeOutputRomExists(() => this.update());
         this.vesExportService.onDidChangeIsQueued(() => this.update());
         this.vesFlashCartService.onDidChangeIsQueued(() => this.update());
         this.vesFlashCartService.onDidChangeIsFlashing(() => this.update());
@@ -129,7 +128,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                         ? ' queued'
                         : this.vesBuildService.buildStatus.active
                             ? ' active'
-                            : (this.vesBuildService.buildStatus.step === BuildResult.done as string && this.vesBuildService.outputRomExists)
+                            : (this.vesBuildService.buildStatus.step === BuildResult.done as string)
                                 ? ' success'
                                 : (this.vesBuildService.buildStatus.step === BuildResult.failed as string)
                                     ? ' error'

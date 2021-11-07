@@ -115,7 +115,7 @@ export class VesEmulatorService {
       this.isQueued = false;
     } else if (this.vesBuildService.buildStatus.active) {
       this.isQueued = true;
-    } else if (this.vesBuildService.outputRomExists) {
+    } else if (await this.vesBuildService.outputRomExists()) {
       this.runInEmulator();
     } else {
       this.isQueued = true;
@@ -123,9 +123,9 @@ export class VesEmulatorService {
     }
   }
 
-  bindEvents(): void {
-    this.vesBuildService.onDidChangeOutputRomExists(outputRomExists => {
-      if (outputRomExists && this.isQueued) {
+  protected bindEvents(): void {
+    this.vesBuildService.onDidBuildSucceed(async () => {
+      if (await this.vesBuildService.outputRomExists() && this.isQueued) {
         this.isQueued = false;
         this.run();
       }
