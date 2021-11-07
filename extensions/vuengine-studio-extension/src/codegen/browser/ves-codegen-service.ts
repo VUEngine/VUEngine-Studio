@@ -35,58 +35,14 @@ export class VesCodegenService {
   protected async init(): Promise<void> {
     this.preferenceService.ready.then(async () => {
       this.vesPluginsService.ready.then(async () => {
-        const workspaceRoot = this.getWorkspaceRoot();
         await this.configureTemplateEngine();
-
         this.templates = await this.getTemplateDefinitions();
 
-        this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
-          fileChangesEvent.changes.map(fileChange => {
-            console.log('>>>>>>>>>>>> fileChange', fileChange.resource.toString());
-            this.templates.map(template => {
-              if ([FileChangeType.ADDED, FileChangeType.UPDATED].includes(fileChange.type) &&
-                (template.event.type === TemplateEventType.fileChanged &&
-                  fileChange.resource.isEqual(new URI(joinPath(workspaceRoot, ...template.event.value.split('/'))))) ||
-                (template.event.type === TemplateEventType.fileWithEndingChanged &&
-                  fileChange.resource.toString().endsWith(template.event.value))
-              ) {
-                try {
-                  this.fileService.readFile(fileChange.resource).then(async content => {
-                    const dataKey = 'v';
-                    let contentJson = {
-                      [dataKey]: JSON.parse(content.value.toString())
-                    };
-                    if (template.data) {
-                      contentJson = {
-                        ...contentJson,
-                        ...await this.getAdditionalTemplateData(fileChange.resource, template.data)
-                      };
-                    }
-                    await Promise.all(template.targets.map(async target => {
-                      const targetFile = target.value.replace(/\$\{\w+\}/ig, match => {
-                        match = match.substr(2, match.length - 3);
-                        if (match === 'sourceBasename') {
-                          return parsePath(fileChange.resource.toString()).name;
-                        } else {
-                          return contentJson[dataKey][match];
-                        }
-                      });
-                      const roots = await this.resolveRoot(target.root, fileChange.resource.toString());
-                      await Promise.all(roots.map(async root => {
-                        const targetValue = new URI(joinPath(root, ...targetFile.split('/')));
-                        const targetTemplate = new URI(joinPath(template.root, VES_PREFERENCE_DIR, VES_PREFERENCE_TEMPLATES_DIR, ...target.template.split('/')));
-                        const encoding = target.encoding ? target.encoding : TemplateEncoding.utf8;
-                        await this.writeTemplate(targetValue, targetTemplate, contentJson, encoding);
-                      }));
-                    }));
-                  });
-                } catch (e) {
-                  console.warn(e);
-                }
-              }
-            });
-          });
-        });
+        // TODO: disable file change listener while a template file is being written
+        this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => this.handleFileChange(fileChangesEvent));
+
+        this.vesPluginsService.onPluginInstalled(async pluginId => this.handlePluginChange(pluginId));
+        this.vesPluginsService.onPluginUninstalled(async pluginId => this.handlePluginChange(pluginId));
       });
     });
   }
@@ -96,6 +52,63 @@ export class VesCodegenService {
     const templateData = (await this.fileService.readFile(templateUri)).value.toString();
     const renaderedTemplateData = nunjucks.renderString(templateData, data);
     await this.fileService.writeFile(targetUri, BinaryBuffer.wrap(iconv.encode(renaderedTemplateData, encoding)));
+  }
+
+  protected async handleFileChange(fileChangesEvent: FileChangesEvent): Promise<void> {
+    const workspaceRoot = this.getWorkspaceRoot();
+
+    fileChangesEvent.changes.map(fileChange => {
+      this.templates.map(template => {
+        if ([FileChangeType.ADDED, FileChangeType.UPDATED].includes(fileChange.type) &&
+          (template.event.type === TemplateEventType.fileChanged &&
+            fileChange.resource.isEqual(new URI(joinPath(workspaceRoot, ...template.event.value.split('/'))))) ||
+          (template.event.type === TemplateEventType.fileWithEndingChanged &&
+            fileChange.resource.toString().endsWith(template.event.value))
+        ) {
+          try {
+            this.fileService.readFile(fileChange.resource).then(async content => {
+              const dataKey = 'v';
+              let contentJson = {
+                [dataKey]: JSON.parse(content.value.toString())
+              };
+              if (template.data) {
+                contentJson = {
+                  ...contentJson,
+                  ...await this.getAdditionalTemplateData(fileChange.resource, template.data)
+                };
+              }
+              await Promise.all(template.targets.map(async target => {
+                const targetFile = target.value.replace(/\$\{\w+\}/ig, match => {
+                  match = match.substr(2, match.length - 3);
+                  if (match === 'sourceBasename') {
+                    return parsePath(fileChange.resource.toString()).name;
+                  } else {
+                    return contentJson[dataKey][match];
+                  }
+                });
+                const roots = await this.resolveRoot(target.root, fileChange.resource.toString());
+                await Promise.all(roots.map(async root => {
+                  const targetValue = new URI(joinPath(root, ...targetFile.split('/')));
+                  const targetTemplate = new URI(joinPath(template.root, VES_PREFERENCE_DIR, VES_PREFERENCE_TEMPLATES_DIR, ...target.template.split('/')));
+                  const encoding = target.encoding ? target.encoding : TemplateEncoding.utf8;
+                  await this.writeTemplate(targetValue, targetTemplate, contentJson, encoding);
+                }));
+              }));
+            });
+          } catch (e) {
+            console.warn(e);
+          }
+        }
+      });
+    });
+  }
+
+  protected async handlePluginChange(pluginId: string): Promise<void> {
+    this.templates.map(template => {
+      if (template.event.type === TemplateEventType.installedPluginsChanged) {
+        // TODO
+      }
+    });
   }
 
   protected async getTemplateDefinitions(): Promise<Template[]> {

@@ -13,6 +13,7 @@ export interface TemplateEvent {
 export enum TemplateEventType {
   fileChanged = 'fileChanged',
   fileWithEndingChanged = 'fileWithEndingChanged',
+  installedPluginsChanged = 'installedPluginsChanged',
 }
 
 export interface TemplateDataSource {
