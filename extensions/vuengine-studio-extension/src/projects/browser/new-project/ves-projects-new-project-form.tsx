@@ -15,6 +15,7 @@ export interface VesNewProjectFormComponentProps {
 
 export interface VesNewProjectFormComponentState {
     name: string
+    gameCode: string
     author: string
     makerCode: string
     template: number
@@ -64,6 +65,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
         this.state = {
             name: 'My Project',
             template: 0,
+            gameCode: 'MP',
             author: '',
             makerCode: '',
             path: '',
@@ -95,16 +97,35 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
     render(): JSX.Element {
         return <>
             <div style={{ width: 600 }} />
-            <div className="ves-new-project-input-label">Name</div>
-            <input
-                type="text"
-                className="theia-input"
-                value={this.state.name}
-                onChange={this.updateName}
-                disabled={this.state.isCreating}
-                tabIndex={1}
-                ref={this.nameInputComponentRef}
-            />
+            <div style={{ display: 'flex' }}>
+                <div style={{ flexGrow: 1, paddingRight: 8 }}>
+                    <div className="ves-new-project-input-label">Name</div>
+                    <input
+                        type="text"
+                        className="theia-input"
+                        value={this.state.name}
+                        onChange={this.updateName}
+                        disabled={this.state.isCreating}
+                        style={{ boxSizing: 'border-box', width: '100%' }}
+                        tabIndex={1}
+                        ref={this.nameInputComponentRef}
+                    />
+                </div>
+                <div>
+                    <div className="ves-new-project-input-label">Game Code</div>
+                    <input
+                        type="text"
+                        className="theia-input"
+                        value={this.state.gameCode}
+                        onChange={this.updateGameCode}
+                        disabled={this.state.isCreating}
+                        size={10}
+                        maxLength={2}
+                        minLength={2}
+                        tabIndex={2}
+                    />
+                </div>
+            </div>
             <br />
             <div style={{ display: 'flex' }}>
                 <div style={{ flexGrow: 1, paddingRight: 8 }}>
@@ -116,7 +137,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                         onChange={this.updateAuthor}
                         disabled={this.state.isCreating}
                         style={{ boxSizing: 'border-box', width: '100%' }}
-                        tabIndex={2}
+                        tabIndex={3}
                     />
                 </div>
                 <div>
@@ -127,10 +148,10 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                         value={this.state.makerCode}
                         onChange={this.updateMakerCode}
                         disabled={this.state.isCreating}
-                        size={12}
+                        size={10}
                         maxLength={2}
                         minLength={2}
-                        tabIndex={3}
+                        tabIndex={4}
                     />
                 </div>
             </div>
@@ -145,14 +166,14 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                     size={this.state.path.length}
                     style={{ fontFamily: 'monospace', maxWidth: 332 }}
                     disabled={this.state.isCreating}
-                    tabIndex={4}
+                    tabIndex={5}
                 />
                 <button
                     className="theia-button secondary"
                     onClick={() => this.selectProjectFolder()}
                     style={{ marginLeft: 0, minWidth: 40, paddingBottom: 0 }}
                     disabled={this.state.isCreating}
-                    tabIndex={5}
+                    tabIndex={6}
                 >
                     <i
                         style={{ fontSize: 16, verticalAlign: 'bottom' }}
@@ -169,12 +190,12 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                     onChange={this.updatePathName}
                     style={{ flexGrow: 1, fontFamily: 'monospace' }}
                     disabled={this.state.isCreating}
-                    tabIndex={6}
+                    tabIndex={7}
                 />
             </div>
             <br />
             <div className="ves-new-project-input-label">Template</div>
-            <div className="ves-new-project-templates-container" onKeyDown={this.handleTemplateKeyPress.bind(this)} tabIndex={7}>
+            <div className="ves-new-project-templates-container" onKeyDown={this.handleTemplateKeyPress.bind(this)} tabIndex={8}>
                 {VES_NEW_PROJECT_TEMPLATES.map((template, index) => {
                     const selected = index === this.state.template ? ' selected' : '';
                     return <div
@@ -212,7 +233,12 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
 
     protected updateName = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({
         name: e.currentTarget.value,
+        gameCode: this.makeGameCode(e.currentTarget.value),
         folder: this.getPathName(e.currentTarget.value),
+    });
+
+    protected updateGameCode = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({
+        gameCode: e.currentTarget.value,
     });
 
     protected updateAuthor = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({
@@ -234,6 +260,15 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
     protected updatePathName = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({
         folder: e.currentTarget.value
     });
+
+    protected makeGameCode(name: string): string {
+        const nameparts = name.trim().split(' ');
+        if (nameparts.length > 1) {
+            return `${nameparts[0][0]}${nameparts[1][0]}`.toUpperCase();
+        } else {
+            return name.substring(0, 2).padEnd(2, 'X').toUpperCase();
+        }
+    }
 
     protected getPathName(name: string): string {
         return filenamify(name, { replacement: ' ' })

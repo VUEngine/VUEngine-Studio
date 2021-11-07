@@ -46,10 +46,10 @@ export class VesNewProjectDialog extends ReactDialog<void> {
         this.appendAcceptButton('Create');
 
         if (this.closeButton) {
-            this.closeButton.tabIndex = 8;
+            this.closeButton.tabIndex = 9;
         }
         if (this.acceptButton) {
-            this.acceptButton.tabIndex = 9;
+            this.acceptButton.tabIndex = 10;
         }
     }
 
@@ -97,6 +97,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
         this.setStatusMessage(`${spinnerIcon} Verifying...`);
 
         const name = this.createProjectFormComponentRef.current?.state.name;
+        const gameCode = this.createProjectFormComponentRef.current?.state.gameCode || '';
         const author = this.createProjectFormComponentRef.current?.state.author || '';
         const makerCode = this.createProjectFormComponentRef.current?.state.makerCode || '';
 
@@ -129,6 +130,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
             template.id,
             newProjectPath,
             name,
+            gameCode,
             author,
             makerCode,
         );

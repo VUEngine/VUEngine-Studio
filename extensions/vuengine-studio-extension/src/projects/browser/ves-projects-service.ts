@@ -78,7 +78,7 @@ export class VesProjectsService {
       : window.location.hash.substring(substrNum);
   }
 
-  async createProjectFromTemplate(templateId: string, path: string, name: string, author: string, makerCode: string): Promise<boolean | string> {
+  async createProjectFromTemplate(templateId: string, path: string, name: string, gameCode: string, author: string, makerCode: string): Promise<boolean | string> {
     const templatePath = await this.getTemplateFolder(templateId);
     const templatePathUri = new URI(templatePath);
     const targetPathUri = new URI(path);
@@ -101,6 +101,16 @@ export class VesProjectsService {
       await this.fileService.delete(new URI(joinPath(path, '.github')), { recursive: true });
 
       // replace labels according to mapping file
+      // the first three are most sensitive and should be replaced first
+      await this.replaceInProject(path, templateLabelMapping['headerName'].substr(0, 20).padEnd(20, ' '), name.substr(0, 20).padEnd(20, ' '));
+      const templateGameCode = templateLabelMapping['gameCode'].substr(0, 4).padEnd(4, 'X');
+      await this.replaceInProject(path,
+        `"gameCodeId": "${templateGameCode.substr(1, 2)}",`,
+        `"gameCodeId": "${gameCode.substr(0, 2).padEnd(2, 'X')}",`
+      );
+      await this.replaceInProject(path, `"${templateGameCode}"`, `"${templateGameCode.substr(0, 1)}${gameCode.substr(0, 2).padEnd(2, 'X')}${templateGameCode.substr(3, 1)}"`);
+      await this.replaceInProject(path, `"${templateLabelMapping['makerCode'].substr(0, 2).padEnd(2, ' ')}"`, `"${makerCode.substr(0, 2).padEnd(2, ' ')}"`);
+      await this.replaceInProject(path, templateLabelMapping['headerName'], name);
       await Promise.all(templateLabelMapping['name']?.map(async (value: string) => {
         await this.replaceInProject(path, value, name);
       }));
@@ -108,9 +118,6 @@ export class VesProjectsService {
         await this.replaceInProject(path, value, author);
       }));
       await this.replaceInProject(path, templateLabelMapping['description'], 'Description');
-      await this.replaceInProject(path, templateLabelMapping['headerName'].substring(0, 20).padEnd(20, ' '), name.substring(0, 20).padEnd(20, ' '));
-      await this.replaceInProject(path, templateLabelMapping['headerName'], name);
-      await this.replaceInProject(path, `"${templateLabelMapping['makerCode'].substring(0, 2).padEnd(2, ' ')}"`, `"${makerCode.substring(0, 2).padEnd(2, ' ')}"`);
     } catch (e) {
       return e;
     }
