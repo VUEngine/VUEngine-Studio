@@ -69,11 +69,11 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
         });
 
         commandRegistry.registerCommand(VesPluginsCommands.SEARCH_BY_TAG, {
-            execute: () => this.showSearchByTag()
+            execute: (tag?: string) => this.showSearchByTag(tag)
         });
 
         commandRegistry.registerCommand(VesPluginsCommands.SEARCH_BY_AUTHOR, {
-            execute: () => this.showSearchByAuthor()
+            execute: (author?: string) => this.showSearchByAuthor(author)
         });
     }
 
@@ -87,14 +87,14 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
         this.model.search.query = RECOMMENDED_QUERY;
     }
 
-    protected async showSearchByTag(): Promise<void> {
+    protected async showSearchByTag(tag?: string): Promise<void> {
         await this.openView({ activate: true });
-        this.model.search.query = TAG_SEARCH_QUERY;
+        this.model.search.query = `${TAG_SEARCH_QUERY}${tag ?? ''}`;
     }
 
-    protected async showSearchByAuthor(): Promise<void> {
+    protected async showSearchByAuthor(author?: string): Promise<void> {
         await this.openView({ activate: true });
-        this.model.search.query = AUTHOR_SEARCH_QUERY;
+        this.model.search.query = `${AUTHOR_SEARCH_QUERY}${author ?? ''}`;
     }
 
     registerToolbarItems(toolbar: TabBarToolbarRegistry): void {

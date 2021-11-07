@@ -1,14 +1,16 @@
-import * as React from '@theia/core/shared/react';
-import * as DOMPurify from '@theia/core/shared/dompurify';
-import { injectable, inject } from '@theia/core/shared/inversify';
-import URI from '@theia/core/lib/common/uri';
-import { TreeElement } from '@theia/core/lib/browser/source-tree';
-import { OpenerService, open, OpenerOptions } from '@theia/core/lib/browser/opener-service';
-import { MenuPath } from '@theia/core/lib/common';
+import { CommandService } from '@theia/core';
 import { ContextMenuRenderer } from '@theia/core/lib/browser';
-import { AUTHOR_SEARCH_QUERY, TAG_SEARCH_QUERY, VesPluginsSearchModel } from './ves-plugins-search-model';
-import { VesPluginsService } from './ves-plugins-service';
+import { open, OpenerOptions, OpenerService } from '@theia/core/lib/browser/opener-service';
+import { TreeElement } from '@theia/core/lib/browser/source-tree';
+import { MenuPath } from '@theia/core/lib/common';
+import URI from '@theia/core/lib/common/uri';
+import * as DOMPurify from '@theia/core/shared/dompurify';
+import { inject, injectable } from '@theia/core/shared/inversify';
+import * as React from '@theia/core/shared/react';
 import { VesPluginUri } from '../common/ves-plugin-uri';
+import { VesPluginsCommands } from './ves-plugins-commands';
+import { VesPluginsSearchModel } from './ves-plugins-search-model';
+import { VesPluginsService } from './ves-plugins-service';
 
 export const PLUGINS_CONTEXT_MENU: MenuPath = ['plugins_context_menu'];
 
@@ -57,14 +59,14 @@ export type VesPluginFactory = (options: VesPluginOptions) => VesPlugin;
 @injectable()
 export class VesPlugin implements VesPluginData, TreeElement {
 
-    @inject(VesPluginOptions)
-    protected readonly options: VesPluginOptions;
-
     @inject(OpenerService)
     protected readonly openerService: OpenerService;
 
     @inject(ContextMenuRenderer)
     protected readonly contextMenuRenderer: ContextMenuRenderer;
+
+    @inject(VesPluginOptions)
+    protected readonly options: VesPluginOptions;
 
     @inject(VesPluginsSearchModel)
     readonly search: VesPluginsSearchModel;
@@ -238,6 +240,7 @@ export abstract class AbstractVesPluginComponent extends React.Component<Abstrac
 export namespace AbstractVesPluginComponent {
     export interface Props {
         plugin: VesPlugin;
+        commandService?: CommandService;
     }
 }
 
@@ -376,10 +379,7 @@ export class VesPluginEditorComponent extends AbstractVesPluginComponent {
     };
 
     readonly searchTag = (tag: string) => {
-        const plugin = this.props.plugin;
-        if (tag) {
-            plugin.search.query = `${TAG_SEARCH_QUERY}${tag}`;
-        }
+        this.props.commandService?.executeCommand(VesPluginsCommands.SEARCH_BY_TAG.id, tag);
     };
 
     readonly searchAuthor = (e: React.MouseEvent) => {
@@ -388,7 +388,7 @@ export class VesPluginEditorComponent extends AbstractVesPluginComponent {
 
         const plugin = this.props.plugin;
         if (plugin.author) {
-            plugin.search.query = `${AUTHOR_SEARCH_QUERY}${plugin.author}`;
+            this.props.commandService?.executeCommand(VesPluginsCommands.SEARCH_BY_AUTHOR.id, plugin.author);
         }
     };
 

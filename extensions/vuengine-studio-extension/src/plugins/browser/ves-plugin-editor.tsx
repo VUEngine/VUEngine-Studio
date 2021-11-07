@@ -1,14 +1,17 @@
-import * as React from '@theia/core/shared/react';
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { ReactWidget, Message, Widget } from '@theia/core/lib/browser';
+import { CommandService } from '@theia/core';
+import { Message, ReactWidget, Widget } from '@theia/core/lib/browser';
 import { Deferred } from '@theia/core/lib/common/promise-util';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import * as React from '@theia/core/shared/react';
 import { VesPlugin, VesPluginEditorComponent } from './ves-plugin';
 import { VesPluginsModel } from './ves-plugins-model';
 
 @injectable()
 export class VesPluginEditor extends ReactWidget {
-
     static ID = 'ves-plugin-editor';
+
+    @inject(CommandService)
+    protected readonly commandService: CommandService;
 
     @inject(VesPlugin)
     protected readonly plugin: VesPlugin;
@@ -69,6 +72,7 @@ export class VesPluginEditor extends ReactWidget {
         return <VesPluginEditorComponent
             ref={this.resolveScrollContainer}
             plugin={this.plugin}
+            commandService={this.commandService}
         />;
     }
 }
