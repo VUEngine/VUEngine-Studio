@@ -487,7 +487,10 @@ export class VesImageConverterService {
       await Promise.all(foundImages.map(async foundImage => {
         const foundImageStat = await this.fileService.resolve(new URI(foundImage), { resolveMetadata: true });
         const convertedFile = this.getGeneratedFile(imageConfigFile, foundImage);
-        const convertedFileStat = await this.fileService.resolve(new URI(convertedFile), { resolveMetadata: true });
+        const convertedFileUri = new URI(convertedFile);
+        const convertedFileStat = await this.fileService.exists(convertedFileUri)
+          ? await this.fileService.resolve(convertedFileUri, { resolveMetadata: true })
+          : undefined;
         if (this.imageHasChanged(foundImageStat, convertedFileStat)) {
           changedImages.push(foundImage);
         }
@@ -498,10 +501,10 @@ export class VesImageConverterService {
     return foundImages;
   }
 
-  protected imageHasChanged(imageStat: FileStatWithMetadata, convertedFileStat: FileStatWithMetadata): boolean {
+  protected imageHasChanged(imageStat: FileStatWithMetadata, convertedFileStat?: FileStatWithMetadata): boolean {
     // if an image has been edited (mtime) or has been moved or copied to this folder (ctime)
     // after the converted file has been generated/last edited, consider it a change
-    return (imageStat.ctime > convertedFileStat.mtime || imageStat.mtime > convertedFileStat.mtime);
+    return (!convertedFileStat || imageStat.ctime > convertedFileStat.mtime || imageStat.mtime > convertedFileStat.mtime);
   }
 
   protected async atLeastOneImageNewerThanCollectiveConvertedFile(images: Array<string>, dir: string, name: string): Promise<boolean> {
@@ -511,7 +514,9 @@ export class VesImageConverterService {
     }
 
     let atLeastOneImageNewer = false;
-    const convertedFileStat = await this.fileService.resolve(convertedFile, { resolveMetadata: true });
+    const convertedFileStat = await this.fileService.exists(convertedFile)
+      ? await this.fileService.resolve(convertedFile, { resolveMetadata: true })
+      : undefined;
     await Promise.all(images.map(async image => {
       if (!atLeastOneImageNewer) {
         const imageStat = await this.fileService.resolve(new URI(image), { resolveMetadata: true });
