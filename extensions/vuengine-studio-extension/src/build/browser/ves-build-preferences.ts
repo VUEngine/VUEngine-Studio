@@ -44,6 +44,9 @@ export const VesBuildPreferenceSchema: PreferenceSchema = {
             type: 'string',
             description: 'Full path to the core library. Uses built-in vuengine-core when left blank.',
             default: '',
+            additionalProperties: {
+                isDirectory: true,
+            },
         },
     },
 };

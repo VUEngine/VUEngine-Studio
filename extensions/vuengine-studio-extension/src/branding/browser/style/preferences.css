@@ -1,0 +1,9 @@
+.ves-pref-input-wrapper {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.ves-pref-input-wrapper .theia-input {
+    flex-grow: 1;
+}

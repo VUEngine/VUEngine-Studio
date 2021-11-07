@@ -1,42 +1,44 @@
-import { ContainerModule } from '@theia/core/shared/inversify';
 import { isOSX } from '@theia/core';
+import { ApplicationShell, bindViewContribution, FrontendApplicationContribution, LabelProviderContribution, WidgetFactory } from '@theia/core/lib/browser';
 import { AboutDialog } from '@theia/core/lib/browser/about-dialog';
-import { CommandContribution } from '@theia/core/lib/common/command';
-import { FrontendApplicationContribution, WidgetFactory, bindViewContribution, LabelProviderContribution, ApplicationShell } from '@theia/core/lib/browser';
-import { GettingStartedWidget } from '@theia/getting-started/lib/browser/getting-started-widget';
-import { MenuContribution } from '@theia/core/lib/common/menu';
+import { ColorContribution } from '@theia/core/lib/browser/color-application-contribution';
+import { DefaultFileIconThemeContribution } from '@theia/core/lib/browser/icon-theme-contribution';
+import { BrowserMainMenuFactory, BrowserMenuBarContribution } from '@theia/core/lib/browser/menu/browser-menu-plugin';
 import { PreferenceConfigurations } from '@theia/core/lib/browser/preferences/preference-configurations';
+import { CommandContribution } from '@theia/core/lib/common/command';
+import { MenuContribution } from '@theia/core/lib/common/menu';
+import { ContainerModule } from '@theia/core/shared/inversify';
 import { DebugConsoleContribution } from '@theia/debug/lib/browser/console/debug-console-contribution';
 import { DebugFrontendApplicationContribution } from '@theia/debug/lib/browser/debug-frontend-application-contribution';
-import { ColorContribution } from '@theia/core/lib/browser/color-application-contribution';
-import { ScmHistoryContribution } from '@theia/scm-extra/lib/browser/history/scm-history-contribution';
-import { PluginViewRegistry } from '@theia/plugin-ext/lib/main/browser/view/plugin-view-registry';
-import { BrowserMainMenuFactory, BrowserMenuBarContribution } from '@theia/core/lib/browser/menu/browser-menu-plugin';
-import { PreferenceTreeGenerator } from '@theia/preferences/lib/browser/util/preference-tree-generator';
-import { DefaultFileIconThemeContribution } from '@theia/core/lib/browser/icon-theme-contribution';
-import { PluginFrontendViewContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-view-contribution';
-import { PluginApiFrontendContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-contribution';
 import { DebugPrefixConfiguration } from '@theia/debug/lib/browser/debug-prefix-configuration';
+import { GettingStartedWidget } from '@theia/getting-started/lib/browser/getting-started-widget';
+import { PluginApiFrontendContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-contribution';
+import { PluginFrontendViewContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-view-contribution';
+import { PluginViewRegistry } from '@theia/plugin-ext/lib/main/browser/view/plugin-view-registry';
+import { PreferenceTreeGenerator } from '@theia/preferences/lib/browser/util/preference-tree-generator';
+import { PreferenceStringInputRenderer } from '@theia/preferences/lib/browser/views/components/preference-string-input';
+import { ScmHistoryContribution } from '@theia/scm-extra/lib/browser/history/scm-history-contribution';
 import { VesAboutDialog } from './ves-branding-about-dialog';
+import { VesApplicationShell } from './ves-branding-application-shell';
 import { VesColorContribution } from './ves-branding-color-contribution';
 import { VesBrandingContribution } from './ves-branding-contribution';
 import { VesDebugFrontendApplicationContribution } from './ves-branding-debug-contribution';
+import { VesDebugPrefixConfiguration } from './ves-branding-debug-prefix-configuration';
 import { VesGettingStartedViewContribution } from './ves-branding-getting-started-view-contribution';
 import { VesGettingStartedWidget } from './ves-branding-getting-started-widget';
 import { VesScmHistoryContribution } from './ves-branding-history-contribution';
-import { VesPreferenceConfigurations } from './ves-branding-preference-configurations';
-import { VesPluginContribution } from './ves-branding-plugin-contribution';
-import { VesTitlebarApplicationTitleContribution } from './ves-branding-titlebar-application-title-view';
-import { VesTitlebarApplicationTitleWidget } from './ves-branding-titlebar-application-title-widget';
-import { VesTitlebarWindowControlsWidget } from './ves-branding-titlebar-window-controls-widget';
-import { VesTitlebarWindowControlsContribution } from './ves-branding-titlebar-window-controls-view';
-import { VesTitlebarActionButtonsWidget } from './ves-branding-titlebar-action-buttons-widget';
-import { VesTitlebarActionButtonsContribution } from './ves-branding-titlebar-action-buttons-view';
-import { VesPreferenceTreeGenerator } from './ves-branding-preference-tree-generator.';
 import { VesDefaultFileIconThemeContribution } from './ves-branding-icon-theme-contribution';
 import { VesBrandingLabelProviderContribution } from './ves-branding-label-provider';
-import { VesApplicationShell } from './ves-branding-application-shell';
-import { VesDebugPrefixConfiguration } from './ves-branding-debug-prefix-configuration';
+import { VesPluginContribution } from './ves-branding-plugin-contribution';
+import { VesPreferenceConfigurations } from './ves-branding-preference-configurations';
+import { VesPreferenceTreeGenerator } from './ves-branding-preference-tree-generator.';
+import { VesTitlebarActionButtonsContribution } from './ves-branding-titlebar-action-buttons-view';
+import { VesTitlebarActionButtonsWidget } from './ves-branding-titlebar-action-buttons-widget';
+import { VesTitlebarApplicationTitleContribution } from './ves-branding-titlebar-application-title-view';
+import { VesTitlebarApplicationTitleWidget } from './ves-branding-titlebar-application-title-widget';
+import { VesTitlebarWindowControlsContribution } from './ves-branding-titlebar-window-controls-view';
+import { VesTitlebarWindowControlsWidget } from './ves-branding-titlebar-window-controls-widget';
+import { VesPreferenceStringInputRenderer } from './ves-preference-string-input-renderer';
 import '../../../src/branding/browser/style/index.css';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
@@ -168,4 +170,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
                 ),
         }))
         .inSingletonScope();
+
+    bind(VesPreferenceStringInputRenderer).toSelf();
+    rebind(PreferenceStringInputRenderer).to(VesPreferenceStringInputRenderer);
 });
