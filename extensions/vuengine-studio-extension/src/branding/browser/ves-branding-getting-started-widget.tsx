@@ -9,7 +9,7 @@ import { codicon } from '@theia/core/lib/browser';
 @injectable()
 export class VesGettingStartedWidget extends GettingStartedWidget {
     protected openUrl = (url: string) => this.windowService.openNewWindow(url, { external: true });
-
+    protected recentLimit = 10;
     protected async init(): Promise<void> {
         super.init();
 

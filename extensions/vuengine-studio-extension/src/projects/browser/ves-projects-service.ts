@@ -107,9 +107,10 @@ export class VesProjectsService {
       await Promise.all(templateLabelMapping['authors']?.map(async (value: string) => {
         await this.replaceInProject(path, value, author);
       }));
-      await this.replaceInProject(path, templateLabelMapping['headerName'].padEnd(20, ' '), name.padEnd(20, ' '));
+      await this.replaceInProject(path, templateLabelMapping['description'], 'Description');
+      await this.replaceInProject(path, templateLabelMapping['headerName'].substring(0, 20).padEnd(20, ' '), name.substring(0, 20).padEnd(20, ' '));
       await this.replaceInProject(path, templateLabelMapping['headerName'], name);
-      await this.replaceInProject(path, `"${templateLabelMapping['makerCode']}"`, `"${makerCode.padEnd(2, ' ')}"`);
+      await this.replaceInProject(path, `"${templateLabelMapping['makerCode'].substring(0, 2).padEnd(2, ' ')}"`, `"${makerCode.substring(0, 2).padEnd(2, ' ')}"`);
     } catch (e) {
       return e;
     }
@@ -124,14 +125,16 @@ export class VesProjectsService {
   }
 
   protected async replaceInProject(path: string, from: string, to: string): Promise<void> {
-    return replaceInFiles({
-      files: [
-        `${path}/**/*.*`,
-        `${path}/*.*`,
-        `${path}/*`
-      ],
-      from,
-      to,
-    });
+    if (to && from) {
+      return replaceInFiles({
+        files: [
+          `${path}/**/*.*`,
+          `${path}/*.*`,
+          `${path}/*`
+        ],
+        from,
+        to,
+      });
+    }
   }
 }
