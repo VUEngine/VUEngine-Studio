@@ -46,10 +46,10 @@ export class VesNewProjectDialog extends ReactDialog<void> {
         this.appendAcceptButton('Create');
 
         if (this.closeButton) {
-            this.closeButton.tabIndex = 11;
+            this.closeButton.tabIndex = 8;
         }
         if (this.acceptButton) {
-            this.acceptButton.tabIndex = 12;
+            this.acceptButton.tabIndex = 9;
         }
     }
 

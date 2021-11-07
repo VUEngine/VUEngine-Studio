@@ -127,7 +127,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                         value={this.state.makerCode}
                         onChange={this.updateMakerCode}
                         disabled={this.state.isCreating}
-                        size={4}
+                        size={12}
                         maxLength={2}
                         minLength={2}
                         tabIndex={3}
@@ -174,7 +174,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
             </div>
             <br />
             <div className="ves-new-project-input-label">Template</div>
-            <div className="ves-new-project-templates-container">
+            <div className="ves-new-project-templates-container" onKeyDown={this.handleTemplateKeyPress.bind(this)} tabIndex={7}>
                 {VES_NEW_PROJECT_TEMPLATES.map((template, index) => {
                     const selected = index === this.state.template ? ' selected' : '';
                     return <div
@@ -182,8 +182,6 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                         data-template={VES_NEW_PROJECT_TEMPLATES[this.state.template].id}
                         className={`ves-new-project-template ves-new-project-template-${template.id}${selected}`}
                         onClick={() => this.updateTemplate(index)}
-                        onFocus={() => this.updateTemplate(index)}
-                        tabIndex={7 + index}
                     ></div>;
                 })}
             </div>
@@ -194,6 +192,22 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                 {VES_NEW_PROJECT_TEMPLATES[this.state.template].description}
             </div>
         </>;
+    }
+
+    protected handleTemplateKeyPress(e: React.KeyboardEvent): void {
+        if (e.key === 'ArrowLeft') {
+            if (this.state.template === 0) {
+                this.updateTemplate(VES_NEW_PROJECT_TEMPLATES.length - 1);
+            } else {
+                this.updateTemplate(this.state.template - 1);
+            }
+        } else if (e.key === 'ArrowRight') {
+            if (this.state.template === VES_NEW_PROJECT_TEMPLATES.length - 1) {
+                this.updateTemplate(0);
+            } else {
+                this.updateTemplate(this.state.template + 1);
+            }
+        }
     }
 
     protected updateName = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({

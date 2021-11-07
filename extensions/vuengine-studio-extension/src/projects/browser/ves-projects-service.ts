@@ -97,7 +97,6 @@ export class VesProjectsService {
       const templateLabelMapping = JSON.parse(templateLabelMappingFileContents.value.toString());
 
       // delete unwanted files and folders
-      // await this.fileService.delete(templateLabelMappingFileURI);
       await this.fileService.delete(new URI(joinPath(path, VES_PREFERENCE_DIR)), { recursive: true });
       await this.fileService.delete(new URI(joinPath(path, '.github')), { recursive: true });
 

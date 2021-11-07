@@ -14,6 +14,9 @@
     flex-direction: row;
     margin: 3px 0;
 }
+.ves-new-project-templates-container:focus {
+    box-shadow: none;
+}
 
 .ves-new-project-template {
     background-position: center;
@@ -22,6 +25,7 @@
     height: 112px;
     margin-right: 12px;
     width: 192px;
+    z-index: 1;
 }
 .ves-new-project-template:last-child {
     margin-right: 0px;
@@ -29,7 +33,11 @@
 
 .ves-new-project-template.selected {
     filter: none;
-    outline: 4px solid var(--theia-button-background);
+    outline: 4px solid var(--theia-secondaryButton-background);
+}
+
+.ves-new-project-templates-container:focus .ves-new-project-template.selected {
+    outline-color: var(--theia-button-background);
 }
 
 .ves-new-project-template-vuengine-platformer-demo {
