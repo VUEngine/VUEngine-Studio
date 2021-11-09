@@ -65,39 +65,7 @@ export class VesCodegenService {
           (template.event.type === TemplateEventType.fileWithEndingChanged &&
             fileChange.resource.toString().endsWith(template.event.value))
         ) {
-          try {
-            this.fileService.readFile(fileChange.resource).then(async content => {
-              const dataKey = 'v';
-              let contentJson = {
-                [dataKey]: JSON.parse(content.value.toString())
-              };
-              if (template.data) {
-                contentJson = {
-                  ...contentJson,
-                  ...await this.getAdditionalTemplateData(fileChange.resource, template.data)
-                };
-              }
-              await Promise.all(template.targets.map(async target => {
-                const targetFile = target.value.replace(/\$\{\w+\}/ig, match => {
-                  match = match.substr(2, match.length - 3);
-                  if (match === 'sourceBasename') {
-                    return parsePath(fileChange.resource.toString()).name;
-                  } else {
-                    return contentJson[dataKey][match];
-                  }
-                });
-                const roots = await this.resolveRoot(target.root, fileChange.resource.toString());
-                await Promise.all(roots.map(async root => {
-                  const targetValue = new URI(joinPath(root, ...targetFile.split('/')));
-                  const targetTemplate = new URI(joinPath(template.root, VES_PREFERENCE_DIR, VES_PREFERENCE_TEMPLATES_DIR, ...target.template.split('/')));
-                  const encoding = target.encoding ? target.encoding : TemplateEncoding.utf8;
-                  await this.writeTemplate(targetValue, targetTemplate, contentJson, encoding);
-                }));
-              }));
-            });
-          } catch (e) {
-            console.warn(e);
-          }
+          this.processTemplate(template, fileChange.resource);
         }
       });
     });
@@ -105,10 +73,47 @@ export class VesCodegenService {
 
   protected async handlePluginChange(pluginId: string): Promise<void> {
     this.templates.map(template => {
+      console.log(template.event.type, TemplateEventType.installedPluginsChanged);
       if (template.event.type === TemplateEventType.installedPluginsChanged) {
-        // TODO
+        console.log('PROCESS');
+        this.processTemplate(template);
       }
     });
+  }
+
+  protected async processTemplate(template: Template, resource?: URI): Promise<void> {
+    const dataKey = 'v';
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let contentJson: { [key: string]: any } = {};
+    if (resource) {
+      const content = await this.fileService.readFile(resource);
+      contentJson[dataKey] = JSON.parse(content.value.toString());
+    }
+
+    if (template.data) {
+      contentJson = {
+        ...contentJson,
+        ...await this.getAdditionalTemplateData(template.data, resource)
+      };
+    }
+
+    await Promise.all(template.targets.map(async target => {
+      const targetFile = target.value.replace(/\$\{\w+\}/ig, match => {
+        match = match.substr(2, match.length - 3);
+        if (match === 'sourceBasename') {
+          return resource ? parsePath(resource.toString()).name : '';
+        } else {
+          return contentJson[dataKey][match];
+        }
+      });
+      const roots = await this.resolveRoot(target.root, resource?.toString());
+      await Promise.all(roots.map(async root => {
+        const targetValue = new URI(joinPath(root, ...targetFile.split('/')));
+        const targetTemplate = new URI(joinPath(template.root, VES_PREFERENCE_DIR, VES_PREFERENCE_TEMPLATES_DIR, ...target.template.split('/')));
+        const encoding = target.encoding ? target.encoding : TemplateEncoding.utf8;
+        await this.writeTemplate(targetValue, targetTemplate, contentJson, encoding);
+      }));
+    }));
   }
 
   protected async getTemplateDefinitions(): Promise<Template[]> {
@@ -135,11 +140,11 @@ export class VesCodegenService {
   }
 
   /* eslint-disable-next-line */
-  protected async getAdditionalTemplateData(file: URI, dataSources: Array<TemplateDataSource>): Promise<any> {
+  protected async getAdditionalTemplateData(dataSources: Array<TemplateDataSource>, file?: URI): Promise<any> {
     /* eslint-disable-next-line */
     const dataSourceJson: { [key: string]: any } = {};
     await Promise.all(dataSources.map(async dataSource => {
-      const roots = await this.resolveRoot(dataSource.root, file.toString());
+      const roots = await this.resolveRoot(dataSource.root, file?.toString());
       if (dataSource.type === TemplateDataType.file) {
         await Promise.all(roots.map(async root => {
           const uri = new URI(joinPath(root, ...dataSource.value.split('/')));
