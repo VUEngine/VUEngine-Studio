@@ -2,7 +2,8 @@
   --theia-private-menubar-height: 39px;
 }
 
-#theia-top-panel {
+#theia-top-panel,
+#theia-top-panel > div {
   -webkit-app-region: drag;
   user-select: none;
 }
