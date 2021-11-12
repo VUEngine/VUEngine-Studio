@@ -8,6 +8,7 @@ import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import { VES_PREFERENCE_DIR } from '../../branding/browser/ves-branding-preference-configurations';
+import { VesNewProjectTemplate } from './new-project/ves-projects-new-project-form';
 
 const replaceInFiles = require('replace-in-files');
 
@@ -78,8 +79,16 @@ export class VesProjectsService {
       : window.location.hash.substring(substrNum);
   }
 
-  async createProjectFromTemplate(templateId: string, path: string, name: string, gameCode: string, author: string, makerCode: string): Promise<boolean | string> {
-    const templatePath = await this.getTemplateFolder(templateId);
+  async createProjectFromTemplate(
+    template: VesNewProjectTemplate,
+    folder: string,
+    path: string,
+    name: string,
+    gameCode: string,
+    author: string,
+    makerCode: string
+  ): Promise<boolean | string> {
+    const templatePath = await this.getTemplateFolder(template.id);
     const templatePathUri = new URI(templatePath);
     const targetPathUri = new URI(path);
 
@@ -91,33 +100,32 @@ export class VesProjectsService {
       // copy template folder to new project location
       await this.fileService.copy(templatePathUri, targetPathUri);
 
-      // read template fields mapping
-      const templateLabelMappingFileURI = new URI(joinPath(path, VES_PREFERENCE_DIR, 'templateLabelMapping.json'));
-      const templateLabelMappingFileContents = await this.fileService.readFile(templateLabelMappingFileURI);
-      const templateLabelMapping = JSON.parse(templateLabelMappingFileContents.value.toString());
-
-      // delete unwanted files and folders
+      // modify files and folders
       await this.fileService.delete(new URI(joinPath(path, VES_PREFERENCE_DIR)), { recursive: true });
       await this.fileService.delete(new URI(joinPath(path, '.github')), { recursive: true });
+      await this.fileService.move(
+        new URI(joinPath(path, `${template.id}.theia-workspace`)),
+        new URI(joinPath(path, `${folder}.theia-workspace`)),
+      );
 
       // replace labels according to mapping file
       // the first three are most sensitive and should be replaced first
-      await this.replaceInProject(path, templateLabelMapping['headerName'].substr(0, 20).padEnd(20, ' '), name.substr(0, 20).padEnd(20, ' '));
-      const templateGameCode = templateLabelMapping['gameCode'].substr(0, 4).padEnd(4, 'X');
+      await this.replaceInProject(path, template.labels['headerName'].substr(0, 20).padEnd(20, ' '), name.substr(0, 20).padEnd(20, ' '));
+      const templateGameCode = template.labels['gameCode'].substr(0, 4).padEnd(4, 'X');
       await this.replaceInProject(path,
         `"gameCodeId": "${templateGameCode.substr(1, 2)}",`,
         `"gameCodeId": "${gameCode.substr(0, 2).padEnd(2, 'X')}",`
       );
       await this.replaceInProject(path, `"${templateGameCode}"`, `"${templateGameCode.substr(0, 1)}${gameCode.substr(0, 2).padEnd(2, 'X')}${templateGameCode.substr(3, 1)}"`);
-      await this.replaceInProject(path, `"${templateLabelMapping['makerCode'].substr(0, 2).padEnd(2, ' ')}"`, `"${makerCode.substr(0, 2).padEnd(2, ' ')}"`);
-      await this.replaceInProject(path, templateLabelMapping['headerName'], name);
-      await Promise.all(templateLabelMapping['name']?.map(async (value: string) => {
+      await this.replaceInProject(path, `"${template.labels['makerCode'].substr(0, 2).padEnd(2, ' ')}"`, `"${makerCode.substr(0, 2).padEnd(2, ' ')}"`);
+      await this.replaceInProject(path, template.labels['headerName'], name);
+      await Promise.all(template.labels['name']?.map(async (value: string) => {
         await this.replaceInProject(path, value, name);
       }));
-      await Promise.all(templateLabelMapping['authors']?.map(async (value: string) => {
+      await Promise.all(template.labels['authors']?.map(async (value: string) => {
         await this.replaceInProject(path, value, author);
       }));
-      await this.replaceInProject(path, templateLabelMapping['description'], 'Description');
+      await this.replaceInProject(path, template.labels['description'], 'Description');
     } catch (e) {
       return e;
     }

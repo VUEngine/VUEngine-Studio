@@ -28,24 +28,81 @@ export interface VesNewProjectTemplate {
     name: string
     id: string
     description: string
+    labels: {
+        name: Array<string>
+        gameCode: string
+        authors: Array<string>
+        description: string
+        headerName: string
+        makerCode: string
+    }
 }
 
 export const VES_NEW_PROJECT_TEMPLATES: VesNewProjectTemplate[] = [{
     name: 'Barebone',
     id: 'vuengine-barebone',
     description: 'An (almost) empty project that includes a single "Hello World" screen plus the most important plugins to add splash screens, automatic pause and more.',
+    labels: {
+        name: [
+            'VUEngine Barebone'
+        ],
+        gameCode: 'VXXM',
+        authors: [
+            'Jorge Eremiev <jorgech3@gmail.com> and Christian Radke <c.radke@posteo.de>'
+        ],
+        description: 'Barebone project to be used as the foundation of new VUEngine projects.',
+        headerName: 'VUENGINE PROJECT',
+        makerCode: 'VU',
+    }
 }, {
     name: 'Platform Game',
     id: 'vuengine-platformer-demo',
     description: 'A full featured single level platforming game.',
+    labels: {
+        name: [
+            'VUEngine Platformer Demo'
+        ],
+        gameCode: 'VVPM',
+        authors: [
+            'Jorge Eremiev <jorgech3@gmail.com> and Christian Radke <c.radke@posteo.de>'
+        ],
+        description: 'A platform demo game created using VUEngine to show off some of the engine\'s capabilities.',
+        headerName: 'VUENGINE PLATFORMER',
+        makerCode: 'VU'
+    }
 }, {
     name: 'Multiplayer Game',
     id: 'spong',
     description: 'A simple Pong-like game that utilizes the engine\'s communication class for multiplayer matches over a link cable.',
+    labels: {
+        name: [
+            'SPONG'
+        ],
+        gameCode: 'VSPM',
+        authors: [
+            'Jorge Eremiev <jorgech3@gmail.com> and Christian Radke <c.radke@posteo.de>'
+        ],
+        description: 'A simple Pong-like game that demonstrates VUEngine\'s multiplayer capabilities.',
+        headerName: 'SPONG',
+        makerCode: 'VU'
+    }
 }, {
     name: 'Image Viewer',
     id: 'vue-master',
     description: 'Stereo image viewer.',
+    labels: {
+        name: [
+            'VUE-MASTER'
+        ],
+        gameCode: 'VVME',
+        authors: [
+            'STEREO BOY and KR155E'
+        ],
+        // eslint-disable-next-line max-len
+        description: 'VUE-MASTER (read: "View Master") is a take on the classic toy stereo image viewer. It\'s a Virtual Boy stereo viewer by Stereo Boy and KR155E, containing several stereo images. First and foremost, though, it is meant as a VUEngine template which allows anyone to compile their own stereo images into a ROM to view on real Virtual Boy hardware, without any programming knowledge.',
+        headerName: 'VUE-MASTER',
+        makerCode: 'CR'
+    }
 }];
 
 export class VesNewProjectFormComponent extends React.Component<VesNewProjectFormComponentProps, VesNewProjectFormComponentState> {
