@@ -1,19 +1,30 @@
 export interface Templates {
-  events: Array<Template>
-}
-
-export interface Template {
-  type: TemplateEventType
-  value: string
-  data?: Array<TemplateDataSource>
-  targets: Array<TemplateTarget>
-  root: string
+  events: {
+    [TemplateEventType.fileChanged]: {
+      [key: string]: Array<string>
+    }
+    [TemplateEventType.fileWithEndingChanged]: {
+      [key: string]: Array<string>
+    }
+    [TemplateEventType.installedPluginsChanged]: Array<string>
+  }
+  templates: {
+    [key: string]: Template
+  }
 }
 
 export enum TemplateEventType {
   fileChanged = 'fileChanged',
   fileWithEndingChanged = 'fileWithEndingChanged',
   installedPluginsChanged = 'installedPluginsChanged',
+}
+
+export interface Template {
+  data?: Array<TemplateDataSource>
+  root: TemplateRoot
+  target: string
+  template: string
+  encoding?: TemplateEncoding
 }
 
 export interface TemplateDataSource {
@@ -32,15 +43,9 @@ export enum TemplateRoot {
 }
 
 export enum TemplateDataType {
+  changedFile = 'changedFile',
   file = 'file',
   filesWithEnding = 'filesWithEnding',
-}
-
-export interface TemplateTarget {
-  root: TemplateRoot
-  value: string
-  template: string
-  encoding?: TemplateEncoding
 }
 
 export enum TemplateEncoding {

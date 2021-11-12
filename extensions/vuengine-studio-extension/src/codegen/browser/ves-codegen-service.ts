@@ -1,6 +1,7 @@
 import * as glob from 'glob';
 import * as iconv from 'iconv-lite';
 import * as nunjucks from 'nunjucks';
+import { deepmerge } from 'deepmerge-ts';
 import { basename, dirname, join as joinPath, parse as parsePath } from 'path';
 import { PreferenceService } from '@theia/core/lib/browser';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
@@ -16,12 +17,12 @@ import { VesBuildPathsService } from '../../build/browser/ves-build-paths-servic
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-service';
 import { USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } from '../../plugins/browser/ves-plugins-types';
-import { Template, TemplateEncoding, TemplateDataSource, TemplateRoot, TemplateEventType, TemplateDataType, Templates } from './ves-codegen-types';
+import { TemplateEncoding, TemplateDataSource, TemplateRoot, TemplateEventType, TemplateDataType, Templates } from './ves-codegen-types';
 
 export const VES_PREFERENCE_TEMPLATES_DIR = 'templates';
 
 @injectable()
-export class VesCodegenService {
+export class VesCodeGenService {
   @inject(FileService)
   protected fileService: FileService;
   @inject(PreferenceService)
@@ -38,7 +39,12 @@ export class VesCodegenService {
   protected vesPluginsPathsService: VesPluginsPathsService;
 
   protected templates: Templates = {
-    events: [],
+    events: {
+      [TemplateEventType.fileChanged]: {},
+      [TemplateEventType.fileWithEndingChanged]: {},
+      [TemplateEventType.installedPluginsChanged]: []
+    },
+    templates: {},
   };
 
   @postConstruct()
@@ -46,15 +52,21 @@ export class VesCodegenService {
     this.preferenceService.ready.then(async () => {
       this.vesPluginsService.ready.then(async () => {
         await this.configureTemplateEngine();
-        this.templates = await this.getTemplateDefinitions();
+        await this.getTemplateDefinitions();
 
-        // TODO: disable file change listener while a template file is being written
+        // TODO: disable file change listener while template files are being written
         this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => this.handleFileChange(fileChangesEvent));
 
         this.vesPluginsService.onPluginInstalled(async pluginId => this.handlePluginChange(pluginId));
         this.vesPluginsService.onPluginUninstalled(async pluginId => this.handlePluginChange(pluginId));
       });
     });
+  }
+
+  async generateAll(): Promise<void> {
+    await Promise.all(Object.keys(this.templates.templates).map(async templateId => {
+      await this.renderTemplate(templateId);
+    }));
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -67,69 +79,80 @@ export class VesCodegenService {
   protected async handleFileChange(fileChangesEvent: FileChangesEvent): Promise<void> {
     const workspaceRoot = this.vesCommonService.getWorkspaceRoot();
 
-    fileChangesEvent.changes.map(fileChange => {
-      this.templates.events.map(template => {
-        if ([FileChangeType.ADDED, FileChangeType.UPDATED].includes(fileChange.type) &&
-          (template.type === TemplateEventType.fileChanged &&
-            fileChange.resource.isEqual(new URI(joinPath(workspaceRoot, ...template.value.split('/'))))) ||
-          (template.type === TemplateEventType.fileWithEndingChanged &&
-            fileChange.resource.toString().endsWith(template.value))
-        ) {
-          this.processTemplate(template, fileChange.resource);
-        }
-      });
-    });
-  }
-
-  protected async handlePluginChange(pluginId: string): Promise<void> {
-    this.templates.events.map(template => {
-      console.log(template.type, TemplateEventType.installedPluginsChanged);
-      if (template.type === TemplateEventType.installedPluginsChanged) {
-        console.log('PROCESS');
-        this.processTemplate(template);
+    fileChangesEvent.changes.map(async fileChange => {
+      if ([FileChangeType.ADDED, FileChangeType.UPDATED].includes(fileChange.type)) {
+        Object.keys(this.templates.events.fileChanged).map(async file => {
+          const templateFileUri = new URI(joinPath(workspaceRoot, ...file.split('/')));
+          if (fileChange.resource.isEqual(templateFileUri)) {
+            await Promise.all(this.templates.events.fileChanged[file].map(async templateId => {
+              await this.renderTemplate(templateId, fileChange.resource);
+            }));
+          }
+        });
+        Object.keys(this.templates.events.fileWithEndingChanged).map(async fileEnding => {
+          if (fileChange.resource.toString().endsWith(fileEnding)) {
+            await Promise.all(this.templates.events.fileWithEndingChanged[fileEnding].map(async templateId => {
+              await this.renderTemplate(templateId, fileChange.resource);
+            }));
+          }
+        });
       }
     });
   }
 
-  protected async processTemplate(template: Template, resource?: URI): Promise<void> {
-    const dataKey = 'v';
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let contentJson: { [key: string]: any } = {};
-    if (resource) {
-      const content = await this.fileService.readFile(resource);
-      contentJson[dataKey] = JSON.parse(content.value.toString());
+  protected async handlePluginChange(pluginId: string): Promise<void> {
+    this.templates.events.installedPluginsChanged.map(async templateId => {
+      await this.renderTemplate(templateId);
+    });
+  }
+
+  protected async renderTemplate(templateId: string, resource?: URI): Promise<void> {
+    const template = this.templates.templates[templateId];
+    if (!template) {
+      console.warn(`Template with ID ${templateId} not found.`);
+      return;
     }
 
-    if (template.data) {
-      contentJson = {
-        ...contentJson,
-        ...await this.getAdditionalTemplateData(template.data, resource)
-      };
-    }
+    const data = await this.getTemplateData(template.data ?? [], resource);
 
-    await Promise.all(template.targets.map(async target => {
-      const targetFile = target.value.replace(/\$\{\w+\}/ig, match => {
-        match = match.substr(2, match.length - 3);
-        if (match === 'sourceBasename') {
-          return resource ? parsePath(resource.toString()).name : '';
-        } else {
-          return contentJson[dataKey][match];
-        }
-      });
-      const roots = await this.resolveRoot(target.root, resource?.toString());
-      await Promise.all(roots.map(async root => {
-        const targetValue = new URI(joinPath(root, ...targetFile.split('/')));
-        const targetTemplate = new URI(joinPath(template.root, VES_PREFERENCE_DIR, VES_PREFERENCE_TEMPLATES_DIR, ...target.template.split('/')));
-        const encoding = target.encoding ? target.encoding : TemplateEncoding.utf8;
-        await this.writeTemplate(targetValue, targetTemplate, contentJson, encoding);
-      }));
+    const targetFile = template.target.replace(/\$\{([\s\S]*?)\}/ig, match => {
+      match = match.substr(2, match.length - 3);
+      if (match === 'sourceBasename') {
+        return resource ? parsePath(resource.toString()).name : '';
+      } else {
+        return this.getByKey(data, match);
+      }
+    });
+
+    const roots = await this.resolveRoot(template.root, resource?.toString());
+
+    await Promise.all(roots.map(async root => {
+      const targetUri = new URI(joinPath(root, ...targetFile.split('/')));
+      const templateUri = new URI(template.template);
+      const encoding = template.encoding ? template.encoding : TemplateEncoding.utf8;
+      await this.writeTemplate(targetUri, templateUri, data, encoding);
     }));
   }
 
-  protected async getTemplateDefinitions(): Promise<Templates> {
-    let templates: Templates = {
-      events: [],
-    };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  protected getByKey(o: any, s: string): any {
+    // convert indexes to properties
+    s = s.replace(/\[(\w+)\]/g, '.$1');
+    // strip leading dot
+    s = s.replace(/^\./, '');
+    const a = s.split('.');
+    for (let i = 0, n = a.length; i < n; ++i) {
+      const k = a[i];
+      if (k in o) {
+        o = o[k];
+      } else {
+        return '';
+      }
+    }
+    return o;
+  }
+
+  protected async getTemplateDefinitions(): Promise<void> {
     const roots = [
       ...await this.resolveRoot(TemplateRoot.engine),
       ...await this.resolveRoot(TemplateRoot.installedPlugins),
@@ -140,46 +163,53 @@ export class VesCodegenService {
       const templatesFileUri = new URI(joinPath(root, VES_PREFERENCE_DIR, 'templates.json'));
       if (await this.fileService.exists(templatesFileUri)) {
         const templatesFileContent = await this.fileService.readFile(templatesFileUri);
-        templates = JSON.parse(templatesFileContent.value.toString());
-        for (const event of templates.events) {
-          event.root = root;
-        }
+        const templatesFileJson = JSON.parse(templatesFileContent.value.toString()) as Templates;
+        Object.values(templatesFileJson.templates).map(template => {
+          template.template = joinPath(root, VES_PREFERENCE_DIR, VES_PREFERENCE_TEMPLATES_DIR, ...template.template.split('/'));
+        });
+
+        this.templates = deepmerge(this.templates, templatesFileJson);
       }
     }));
 
-    return templates;
+    return;
   }
 
-  /* eslint-disable-next-line */
-  protected async getAdditionalTemplateData(dataSources: Array<TemplateDataSource>, file?: URI): Promise<any> {
-    /* eslint-disable-next-line */
-    const dataSourceJson: { [key: string]: any } = {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  protected async getTemplateData(dataSources: Array<TemplateDataSource>, file?: URI): Promise<any> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data: { [key: string]: any } = {};
     await Promise.all(dataSources.map(async dataSource => {
       const roots = await this.resolveRoot(dataSource.root, file?.toString());
-      if (dataSource.type === TemplateDataType.file) {
+      if (dataSource.type === TemplateDataType.changedFile) {
+        if (file && await this.fileService.exists(file)) {
+          const fileContent = await this.fileService.readFile(file);
+          data[dataSource.key] = JSON.parse(fileContent.value.toString());
+        }
+      } else if (dataSource.type === TemplateDataType.file) {
         await Promise.all(roots.map(async root => {
           const uri = new URI(joinPath(root, ...dataSource.value.split('/')));
           if (await this.fileService.exists(uri)) {
             const fileContent = await this.fileService.readFile(uri);
-            dataSourceJson[dataSource.key] = JSON.parse(fileContent.value.toString());
+            data[dataSource.key] = JSON.parse(fileContent.value.toString());
           }
         }));
       } else if (dataSource.type === TemplateDataType.filesWithEnding) {
-        if (!dataSourceJson[dataSource.key]) {
-          dataSourceJson[dataSource.key] = [];
+        if (!data[dataSource.key]) {
+          data[dataSource.key] = [];
         }
         await Promise.all(roots.map(async root => {
           // TODO: refactor to use fileservice instead of glob
           const fileMatcher = joinPath(root, '**', `*${dataSource.value}`);
           await Promise.all(glob.sync(fileMatcher).map(async dataSourceFile => {
             const fileContent = await this.fileService.readFile(new URI(dataSourceFile));
-            dataSourceJson[dataSource.key].push(JSON.parse(fileContent.value.toString()));
+            data[dataSource.key].push(JSON.parse(fileContent.value.toString()));
           }));
         }));
       }
     }));
 
-    return dataSourceJson;
+    return data;
   }
 
   protected async configureTemplateEngine(): Promise<void> {

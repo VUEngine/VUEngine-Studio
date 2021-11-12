@@ -11,7 +11,6 @@ import { VesProjectsService } from '../../projects/browser/ves-projects-service'
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
 import { DEFAULT_EMULATOR, EmulatorConfig } from './ves-emulator-types';
-import { VesCodegenService } from '../../codegen/browser/ves-codegen-service';
 
 export const ROM_PLACEHOLDER = '%ROM%';
 
@@ -27,8 +26,6 @@ export class VesEmulatorService {
   private readonly preferenceService: PreferenceService;
   @inject(VesBuildService)
   private readonly vesBuildService: VesBuildService;
-  @inject(VesCodegenService)
-  protected readonly vesCodegenService: VesCodegenService;
   @inject(VesProcessService)
   private readonly vesProcessService: VesProcessService;
   @inject(VesProjectsService)

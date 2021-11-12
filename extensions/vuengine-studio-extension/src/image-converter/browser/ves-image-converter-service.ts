@@ -10,7 +10,7 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileStatWithMetadata } from '@theia/filesystem/lib/common/files';
 import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { MemorySection } from '../../build/browser/ves-build-types';
-import { VesCodegenService } from '../../codegen/browser/ves-codegen-service';
+import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import {
@@ -28,8 +28,8 @@ export class VesImageConverterService {
   protected envVariablesServer: EnvVariablesServer;
   @inject(FileService)
   protected fileService: FileService;
-  @inject(VesCodegenService)
-  protected vesCodegenService: VesCodegenService;
+  @inject(VesCodeGenService)
+  protected vesCodeGenService: VesCodeGenService;
   @inject(VesCommonService)
   protected vesCommonService: VesCommonService;
   @inject(VesProcessService)
@@ -279,7 +279,7 @@ export class VesImageConverterService {
     // sort frames by filename
     frames.sort((a, b) => a.filename > b.filename && 1 || -1);
 
-    this.vesCodegenService.writeTemplate(targetFileUri, templateFileUri, {
+    this.vesCodeGenService.writeTemplate(targetFileUri, templateFileUri, {
       name,
       largestFrame,
       numberOfFrames,
