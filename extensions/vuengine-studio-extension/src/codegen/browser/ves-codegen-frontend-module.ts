@@ -1,7 +1,13 @@
+import { CommandContribution } from '@theia/core';
 import { ContainerModule } from '@theia/core/shared/inversify';
-import { VesCodegenService } from './ves-codegen-service';
+import { VesCodeGenContribution } from './ves-codegen-contribution';
+import { VesCodeGenService } from './ves-codegen-service';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
+    // commands
+    bind(VesCodeGenContribution).toSelf().inSingletonScope();
+    bind(CommandContribution).toService(VesCodeGenContribution);
+
     // service
-    bind(VesCodegenService).toSelf().inSingletonScope();
+    bind(VesCodeGenService).toSelf().inSingletonScope();
 });
