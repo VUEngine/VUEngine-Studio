@@ -9,7 +9,6 @@ import { BuildMode } from '../../build/browser/ves-build-types';
 import { VesEmulatorService } from '../../emulator/browser/ves-emulator-service';
 import { VesEmulatorPreferenceIds } from '../../emulator/browser/ves-emulator-preferences';
 import { VesFlashCartService } from '../../flash-cart/browser/ves-flash-cart-service';
-import { VesExportService } from '../../export/browser/ves-export-service';
 import { VesTouchBarCommands } from '../common/ves-branding-types';
 
 @injectable()
@@ -22,8 +21,6 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
     protected readonly vesBuildService: VesBuildService;
     @inject(VesEmulatorService)
     protected readonly vesEmulatorService: VesEmulatorService;
-    @inject(VesExportService)
-    protected readonly vesExportService: VesExportService;
     @inject(VesFlashCartService)
     protected readonly vesFlashCartService: VesFlashCartService;
 
@@ -85,6 +82,5 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
         this.vesFlashCartService.onDidChangeIsFlashing(flag => app.emit(VesTouchBarCommands.changeIsFlashing, flag));
         this.vesFlashCartService.onDidChangeFlashingProgress(progress => app.emit(VesTouchBarCommands.onDidChangeFlashingProgress, progress));
         this.vesFlashCartService.onDidChangeConnectedFlashCarts(config => app.emit(VesTouchBarCommands.changeConnectedFlashCart, config));
-        this.vesExportService.onDidChangeIsQueued(flag => app.emit(VesTouchBarCommands.changeIsExportQueued, flag));
     }
 }

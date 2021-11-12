@@ -4,7 +4,6 @@ import { ElectronMainApplication, TheiaBrowserWindowOptions } from '@theia/core/
 import { isOSX, MaybePromise } from '@theia/core';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { VesEmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
-import { VesExportCommands } from '../../export/browser/ves-export-commands';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
 import { BuildMode } from '../../build/browser/ves-build-types';
 import { VesTouchBarIcons } from './icons/touch-bar-icons';
@@ -50,28 +49,20 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         const { TouchBarButton, TouchBarLabel, TouchBarPopover, TouchBarSegmentedControl, TouchBarSpacer } = TouchBar;
 
         const blankIcon = nativeImage.createFromDataURL(VesTouchBarIcons.BLANK).resize({ height: 18 });
-        const blankIconWide = nativeImage.createFromDataURL(VesTouchBarIcons.BLANK_WIDE).resize({ height: 18 });
-        // const vesIcon = nativeImage.createFromDataURL(VesTouchBarIcons.VES).resize({ height: 16 });
+        const vesIcon = nativeImage.createFromDataURL(VesTouchBarIcons.VES).resize({ height: 16 });
         const cleanIcon = nativeImage.createFromDataURL(VesTouchBarIcons.CLEAN).resize({ height: 16 });
-        const buildIcon = nativeImage.createFromDataURL(VesTouchBarIcons.BUILD_WIDE).resize({ height: 18 });
+        const buildIcon = nativeImage.createFromDataURL(VesTouchBarIcons.BUILD).resize({ height: 18 });
         const runIcon = nativeImage.createFromDataURL(VesTouchBarIcons.RUN).resize({ height: 16 });
         const flashIcon = nativeImage.createFromDataURL(VesTouchBarIcons.FLASH).resize({ height: 18 });
-        const exportIcon = nativeImage.createFromDataURL(VesTouchBarIcons.EXPORT).resize({ height: 16 });
-        const menuIcon = nativeImage.createFromDataURL(VesTouchBarIcons.MENU).resize({ height: 16 });
         const queuedIcon = nativeImage.createFromDataURL(VesTouchBarIcons.QUEUED).resize({ height: 16 });
-        const queuedIconWide = nativeImage.createFromDataURL(VesTouchBarIcons.QUEUED_WIDE).resize({ height: 16 });
 
-        /* const vesButton = new TouchBarButton({
+        const vesButton = new TouchBarButton({
             backgroundColor: '#a22929',
             icon: vesIcon,
             // click: () => app.emit(VesTouchBarCommands.executeCommand, 'core.about'),
             click: () => app.emit(VesTouchBarCommands.executeCommand, 'workbench.action.showCommands'),
-        }); */
-
-        const buildMenuCleanButton = new TouchBarButton({
-            icon: cleanIcon,
-            click: () => app.emit(VesTouchBarCommands.executeCommand, VesBuildCommands.CLEAN.id),
         });
+
         const buildMenuBuildButton = new TouchBarButton({
             icon: buildIcon,
             click: () => app.emit(VesTouchBarCommands.executeCommand, VesBuildCommands.BUILD.id),
@@ -84,9 +75,9 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             icon: flashIcon,
             click: () => app.emit(VesTouchBarCommands.executeCommand, VesFlashCartCommands.FLASH.id),
         });
-        const buildMenuExportButton = new TouchBarButton({
-            icon: exportIcon,
-            click: () => app.emit(VesTouchBarCommands.executeCommand, VesExportCommands.EXPORT.id),
+        const buildMenuCleanButton = new TouchBarButton({
+            icon: cleanIcon,
+            click: () => app.emit(VesTouchBarCommands.executeCommand, VesBuildCommands.CLEAN.id),
         });
 
         const buildModes = [{
@@ -124,22 +115,15 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             }),
         });
 
-        const MenuButton = new TouchBarButton({
-            icon: menuIcon,
-            click: () => app.emit(VesTouchBarCommands.executeCommand, 'workbench.action.showCommands'),
-        });
-
         const vesTouchBar = new TouchBar({
             items: [
-                // vesButton,
-                buildMenuCleanButton,
+                vesButton,
                 buildMenuBuildButton,
                 buildMenuRunButton,
                 buildMenuFlashButton,
-                buildMenuExportButton,
+                buildMenuCleanButton,
                 buildMenuSpacer,
                 buildModeButton,
-                MenuButton,
             ]
         });
 
@@ -153,13 +137,13 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         // @ts-ignore
         app.on(VesTouchBarCommands.changeBuildIsQueued, (isQueued: boolean) => {
             buildMenuBuildButton.label = '';
-            buildMenuBuildButton.icon = isQueued ? queuedIconWide : buildIcon;
+            buildMenuBuildButton.icon = isQueued ? queuedIcon : buildIcon;
         });
         // @ts-ignore
         app.on(VesTouchBarCommands.changeBuildStatus, (buildStatus: BuildStatus) => {
             if (buildStatus.active) {
                 buildMenuBuildButton.label = `${buildStatus.progress}%`;
-                buildMenuBuildButton.icon = blankIconWide;
+                buildMenuBuildButton.icon = blankIcon;
             } else {
                 buildMenuBuildButton.label = '';
                 buildMenuBuildButton.icon = buildIcon;
@@ -192,10 +176,6 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         // @ts-ignore
         app.on(VesTouchBarCommands.changeConnectedFlashCart, flashCartConfig => {
             buildMenuFlashButton.enabled = !!flashCartConfig;
-        });
-        // @ts-ignore
-        app.on(VesTouchBarCommands.changeIsExportQueued, (isQueued: boolean) => {
-            buildMenuExportButton.icon = isQueued ? queuedIcon : exportIcon;
         });
         // @ts-ignore
         app.on(VesTouchBarCommands.changeBuildMode, (buildMode: BuildMode) => {

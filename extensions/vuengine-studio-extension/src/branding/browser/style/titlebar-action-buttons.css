@@ -1,7 +1,7 @@
 #ves-titlebar-action-buttons {
   -webkit-app-region: no-drag;
   margin-right: 8px;
-  min-width: 250px;
+  min-width: 170px;
   order: 3;
   padding-top: 5px;
   text-align: right;
@@ -27,9 +27,6 @@
   background-color: var(--theia-titleBar-hoverButtonBackground);
 }
 
-#ves-titlebar-action-buttons .theia-button.build {
-  min-width: 72px;
-}
 /* #ves-titlebar-action-buttons .theia-button.build.success {
   background-color: var(--theia-editorSuccess-foreground);
 } */

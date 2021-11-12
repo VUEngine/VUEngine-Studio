@@ -13,8 +13,6 @@ import { VesBuildService } from '../../build/browser/ves-build-service';
 import { BuildMode, BuildResult } from '../../build/browser/ves-build-types';
 import { VesEmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
 import { VesEmulatorService } from '../../emulator/browser/ves-emulator-service';
-import { VesExportCommands } from '../../export/browser/ves-export-commands';
-import { VesExportService } from '../../export/browser/ves-export-service';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
 import { VesFlashCartService } from '../../flash-cart/browser/ves-flash-cart-service';
 import { VesProjectsCommands } from '../../projects/browser/ves-projects-commands';
@@ -41,8 +39,6 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
     protected readonly vesBuildService: VesBuildService;
     @inject(VesEmulatorService)
     protected readonly vesEmulatorService: VesEmulatorService;
-    @inject(VesExportService)
-    protected readonly vesExportService: VesExportService;
     @inject(VesFlashCartService)
     protected readonly vesFlashCartService: VesFlashCartService;
     @inject(WorkspaceService)
@@ -59,7 +55,6 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
         this.vesBuildService.onDidChangeIsQueued(() => this.update());
         this.vesBuildService.onDidChangeBuildStatus(() => this.update());
         this.vesBuildService.onDidChangeBuildFolder(() => this.update());
-        this.vesExportService.onDidChangeIsQueued(() => this.update());
         this.vesFlashCartService.onDidChangeIsQueued(() => this.update());
         this.vesFlashCartService.onDidChangeIsFlashing(() => this.update());
         this.vesFlashCartService.onDidChangeConnectedFlashCarts(() => this.update());
@@ -112,17 +107,6 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
             </button>
         </>
             : <>
-                <button
-                    className={'theia-button secondary clean' + (this.vesBuildService.isCleaning ? ' active' : '')}
-                    title={this.vesBuildService.isCleaning ? 'Cleaning...' : `${VesBuildCommands.CLEAN.label}${this.getKeybindingLabel(VesBuildCommands.CLEAN.id, true)}`}
-                    disabled={this.vesBuildService.buildStatus.active || !this.vesBuildService.buildFolderExists[buildMode]}
-                    onClick={() => this.commandService.executeCommand(VesBuildCommands.CLEAN.id)}
-                    key='action-button-clean'
-                >
-                    {this.vesBuildService.isCleaning
-                        ? <i className='fa fa-cog fa-spin'></i>
-                        : <i className='fa fa-trash'></i>}
-                </button>
                 <button
                     className={'theia-button secondary build' + (this.vesBuildService.isQueued
                         ? ' queued'
@@ -184,16 +168,15 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                             : <i className='fa fa-microchip'></i>}
                 </button>
                 <button
-                    className={'theia-button secondary export' + (this.vesExportService.isQueued ? ' queued' : '')}
-                    title={this.vesExportService.isQueued
-                        ? 'Export Queued...'
-                        : `${VesExportCommands.EXPORT.label} ${this.getKeybindingLabel(VesExportCommands.EXPORT.id, true)}`}
-                    onClick={() => this.commandService.executeCommand(VesExportCommands.EXPORT.id)}
-                    key='action-button-export'
+                    className={'theia-button secondary clean' + (this.vesBuildService.isCleaning ? ' active' : '')}
+                    title={this.vesBuildService.isCleaning ? 'Cleaning...' : `${VesBuildCommands.CLEAN.label}${this.getKeybindingLabel(VesBuildCommands.CLEAN.id, true)}`}
+                    disabled={this.vesBuildService.buildStatus.active || !this.vesBuildService.buildFolderExists[buildMode]}
+                    onClick={() => this.commandService.executeCommand(VesBuildCommands.CLEAN.id)}
+                    key='action-button-clean'
                 >
-                    {this.vesExportService.isQueued
-                        ? <i className='fa fa-hourglass-half'></i>
-                        : <i className='fa fa-share-square-o'></i>}
+                    {this.vesBuildService.isCleaning
+                        ? <i className='fa fa-cog fa-spin'></i>
+                        : <i className='fa fa-trash'></i>}
                 </button>
             </>;
     }
