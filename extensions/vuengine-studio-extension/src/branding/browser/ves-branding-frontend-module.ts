@@ -8,6 +8,8 @@ import { PreferenceConfigurations } from '@theia/core/lib/browser/preferences/pr
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { MenuContribution } from '@theia/core/lib/common/menu';
 import { ContainerModule } from '@theia/core/shared/inversify';
+import { OutlineViewContribution } from '@theia/outline-view/lib/browser/outline-view-contribution';
+import { CallHierarchyContribution } from '@theia/callhierarchy/lib/browser/callhierarchy-contribution';
 import { DebugConsoleContribution } from '@theia/debug/lib/browser/console/debug-console-contribution';
 import { DebugFrontendApplicationContribution } from '@theia/debug/lib/browser/debug-frontend-application-contribution';
 import { DebugPrefixConfiguration } from '@theia/debug/lib/browser/debug-prefix-configuration';
@@ -102,7 +104,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
         registerMenus: () => { },
         registerKeybindings: () => { },
         registerToolbarItems: () => { }
-    } as any); /* eslint-disable-line */
+    } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
     rebind(DebugPrefixConfiguration).to(VesDebugPrefixConfiguration).inSingletonScope();
     // TODO: remove Preferences->Extensions->Debug (-> bindDebugPreferences)
 
@@ -112,13 +114,32 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
         registerMenus: () => { },
         registerKeybindings: () => { },
         registerToolbarItems: () => { }
-    } as any); /* eslint-disable-line */
+    } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
     rebind(PluginApiFrontendContribution).toConstantValue({
         registerCommands: () => { },
         registerMenus: () => { },
         registerKeybindings: () => { },
         registerToolbarItems: () => { }
-    } as any); /* eslint-disable-line */
+    } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+
+    // remove outline view
+    rebind(OutlineViewContribution).toConstantValue({
+        registerCommands: () => { },
+        registerMenus: () => { },
+        registerKeybindings: () => { },
+        registerToolbarItems: () => { }
+    } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+
+    // common service
+    bind(VesCommonService).toSelf().inSingletonScope();
+
+    // remove call hierarchy
+    rebind(CallHierarchyContribution).toConstantValue({
+        registerCommands: () => { },
+        registerMenus: () => { },
+        registerKeybindings: () => { },
+        registerToolbarItems: () => { }
+    } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
     // git history
     bind(VesScmHistoryContribution).toSelf().inSingletonScope();
@@ -127,9 +148,6 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // remove "test" view
     bind(VesPluginContribution).toSelf().inSingletonScope();
     rebind(PluginViewRegistry).toService(VesPluginContribution);
-
-    // common service
-    bind(VesCommonService).toSelf().inSingletonScope();
 
     // workspace service
     bind(VesWorkspaceService).toSelf().inSingletonScope();

@@ -28,8 +28,10 @@ export class VesWorkspaceService extends WorkspaceService {
                 case VesPluginsPreferenceIds.ENGINE_PLUGINS_INCLUDE_IN_WORKSPACE:
                 case VesPluginsPreferenceIds.USER_PLUGINS_PATH:
                 case VesPluginsPreferenceIds.USER_PLUGINS_INCLUDE_IN_WORKSPACE:
-                    await this.computeRoots();
-                    this.updateWorkspace();
+                    if (!this._workspace?.isDirectory) {
+                        await this.computeRoots();
+                        this.updateWorkspace();
+                    }
                     break;
             }
         });

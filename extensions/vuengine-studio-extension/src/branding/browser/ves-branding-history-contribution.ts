@@ -15,6 +15,6 @@ export class VesScmHistoryContribution extends ScmHistoryContribution {
 
     @postConstruct()
     protected async openInitially(): Promise<void> {
-        this.openView({ activate: true, reveal: true });
+        // this.openView({ activate: true, reveal: true });
     }
 }

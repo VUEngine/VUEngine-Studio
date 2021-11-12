@@ -72,7 +72,6 @@
     "@theia/mini-browser": "1.19.0",
     "@theia/monaco": "1.19.0",
     "@theia/navigator": "1.19.0",
-    "@theia/outline-view": "1.19.0",
     "@theia/output": "1.19.0",
     "@theia/plugin-ext-vscode": "1.19.0",
     "@theia/plugin-ext": "1.19.0",
