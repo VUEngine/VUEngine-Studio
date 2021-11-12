@@ -638,7 +638,7 @@ export class VesBuildService {
   }
 
   async doClean(): Promise<void> {
-    if (this.isCleaning) {
+    if (this.isCleaning || this.buildStatus.active) {
       return;
     }
 
