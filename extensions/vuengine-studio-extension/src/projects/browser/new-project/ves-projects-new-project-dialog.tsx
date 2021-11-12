@@ -124,7 +124,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
         const template = VES_NEW_PROJECT_TEMPLATES[templateIndex];
         const folder = this.createProjectFormComponentRef.current?.state.folder ?? 'new-project';
         const newProjectPath = joinPath(basePath, folder);
-        const newProjectWorkspaceFileUri = new URI(joinPath(basePath, `${folder}.theia-workspace`));
+        const newProjectWorkspaceFileUri = new URI(joinPath(newProjectPath, `${folder}.theia-workspace`));
 
         const response = await this.vesProjectsService.createProjectFromTemplate(
             template,

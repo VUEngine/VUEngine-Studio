@@ -101,8 +101,14 @@ export class VesProjectsService {
       await this.fileService.copy(templatePathUri, targetPathUri);
 
       // modify files and folders
-      await this.fileService.delete(new URI(joinPath(path, VES_PREFERENCE_DIR)), { recursive: true });
-      await this.fileService.delete(new URI(joinPath(path, '.github')), { recursive: true });
+      const prefDirUri = new URI(joinPath(path, VES_PREFERENCE_DIR));
+      if (await this.fileService.exists(prefDirUri)) {
+        await this.fileService.delete(prefDirUri, { recursive: true });
+      }
+      const githubDirUri = new URI(joinPath(path, '.github'));
+      if (await this.fileService.exists(githubDirUri)) {
+        await this.fileService.delete(githubDirUri, { recursive: true });
+      }
       await this.fileService.move(
         new URI(joinPath(path, `${template.id}.theia-workspace`)),
         new URI(joinPath(path, `${folder}.theia-workspace`)),
