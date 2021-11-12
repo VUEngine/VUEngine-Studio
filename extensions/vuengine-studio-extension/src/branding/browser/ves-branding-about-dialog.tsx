@@ -119,30 +119,30 @@ export class VesAboutDialog extends AboutDialog {
     protected renderPatrons(): React.ReactNode {
         return <div className="ves-about-paragraph">
             {/* 25 patrons with highest lifetime support */}
-            Adam Wannamaker
-            Alec Kafka
-            Benjamin Stevens
-            Bnjmn Mrph
-            Cameron Hollaway
-            Christopher Garland
-            David Baisley
-            Domenic Umberto Raso
-            Eric Freeman
-            IanelGreenleaf
-            Jesse Levine
-            Jose Zagal
-            Marten Reiß
-            Michael Ortega
-            NeGiZON
-            norty
-            Patrick Fenton
-            Patrick-VB
-            Randy Jeffery
-            RetroOnyx
-            Sean Machan
-            Steven Hagelgans
-            Tony
-            Troy Bonneau
+            Adam Wannamaker,
+            Alec Kafka,
+            Benjamin Stevens,
+            Bnjmn Mrph,
+            Cameron Hollaway,
+            Christopher Garland,
+            David Baisley,
+            Domenic Umberto Raso,
+            Eric Freeman,
+            IanelGreenleaf,
+            Jesse Levine,
+            Jose Zagal,
+            Marten Reiß,
+            Michael Ortega,
+            NeGiZON,
+            norty,
+            Patrick Fenton,
+            Patrick-VB,
+            Randy Jeffery,
+            RetroOnyx,
+            Sean Machan,
+            Steven Hagelgans,
+            Tony,
+            Troy Bonneau,
             tydyedsyko
 
             et al.
