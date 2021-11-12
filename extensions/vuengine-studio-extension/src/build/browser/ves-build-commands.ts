@@ -7,14 +7,12 @@ export namespace VesBuildCommands {
     id: 'VesBuild.commands.build',
     label: 'Build Project',
     category: CATEGORY,
-    iconClass: 'fa fa-wrench',
   };
 
   export const CLEAN: Command = {
     id: 'VesBuild.commands.clean',
     label: 'Clean Build Folder',
     category: CATEGORY,
-    iconClass: 'fa fa-trash',
   };
 
   export const SET_MODE: Command = {

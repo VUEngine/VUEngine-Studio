@@ -7,6 +7,5 @@ export namespace VesExportCommands {
     id: 'VesExport.commands.export',
     label: 'Export ROM...',
     category: CATEGORY,
-    iconClass: 'fa fa-share-square-o',
   };
 };
