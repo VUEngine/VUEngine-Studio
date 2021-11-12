@@ -23,6 +23,7 @@ import { VesPluginsSearchBar } from './ves-plugins-search-bar';
 import { VesPluginEditorManager } from './ves-plugin-editor-manager';
 import { VesPluginEditor } from './ves-plugin-editor';
 import { VesPluginsViewContribution } from './ves-plugins-view-contribution';
+import { VesPluginsPathsService } from './ves-plugins-paths-service';
 import '../../../src/plugins/browser/style/index.css';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
@@ -33,8 +34,9 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // preferences
     bind(PreferenceContribution).toConstantValue({ schema: VesPluginsPreferenceSchema });
 
-    // service
+    // services
     bind(VesPluginsService).toSelf().inSingletonScope();
+    bind(VesPluginsPathsService).toSelf().inSingletonScope();
 
     // view
     bind(VesPlugin).toSelf();

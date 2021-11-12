@@ -3,14 +3,17 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import { remote } from '@theia/core/shared/electron';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { WorkspaceCommands, WorkspaceService } from '@theia/workspace/lib/browser';
-import { CommandService, isOSX, isWindows } from '@theia/core';
+import { CommandService } from '@theia/core';
 import { FrontendApplicationConfigProvider } from '@theia/core/lib/browser/frontend-application-config-provider';
 import { VesProjectsService } from '../../projects/browser/ves-projects-service';
+import { VesCommonService } from './ves-common-service';
 
 @injectable()
 export class VesTitlebarApplicationTitleWidget extends ReactWidget {
   @inject(CommandService)
   protected readonly commandService: CommandService;
+  @inject(VesCommonService)
+  protected readonly vesCommonService: VesCommonService;
   @inject(VesProjectsService)
   protected readonly vesProjectsService: VesProjectsService;
   @inject(WorkspaceService)
@@ -26,7 +29,7 @@ export class VesTitlebarApplicationTitleWidget extends ReactWidget {
     this.title.label = VesTitlebarApplicationTitleWidget.LABEL;
     this.title.caption = VesTitlebarApplicationTitleWidget.LABEL;
     this.title.closable = false;
-    this.addClass(`os-${this.getOs()}`);
+    this.addClass(`os-${this.vesCommonService.getOs()}`);
 
     const { applicationName: title } = FrontendApplicationConfigProvider.get();
     this.applicationTitle = title;
@@ -35,10 +38,6 @@ export class VesTitlebarApplicationTitleWidget extends ReactWidget {
 
     this.vesProjectsService.onDidChangeProjectFile(() => { this.setTitle(); });
     this.workspaceService.onWorkspaceChanged(() => { this.setTitle(); });
-  }
-
-  protected getOs(): string {
-    return isWindows ? 'win' : isOSX ? 'osx' : 'linux';
   }
 
   protected setTitle(): void {

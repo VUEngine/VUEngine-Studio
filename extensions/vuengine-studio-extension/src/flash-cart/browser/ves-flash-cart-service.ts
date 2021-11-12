@@ -1,13 +1,13 @@
 import { dirname, join as joinPath } from 'path';
 import { ApplicationShell, PreferenceService } from '@theia/core/lib/browser';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
-import { CommandService, isOSX, isWindows, MessageService } from '@theia/core/lib/common';
+import { CommandService, isWindows, MessageService } from '@theia/core/lib/common';
 import { BinaryBufferWriteableStream } from '@theia/core/lib/common/buffer';
-import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { VesBuildPreferenceIds } from '../../build/browser/ves-build-preferences';
 import { VesBuildService } from '../../build/browser/ves-build-service';
@@ -36,8 +36,6 @@ export class VesFlashCartService {
   protected readonly shell: ApplicationShell;
   @inject(CommandService)
   protected commandService: CommandService;
-  @inject(EnvVariablesServer)
-  protected readonly envVariablesServer: EnvVariablesServer;
   @inject(FileService)
   protected fileService: FileService;
   @inject(FrontendApplicationStateService)
@@ -48,6 +46,8 @@ export class VesFlashCartService {
   protected readonly preferenceService: PreferenceService;
   @inject(VesBuildService)
   protected readonly vesBuildService: VesBuildService;
+  @inject(VesCommonService)
+  protected readonly vesCommonService: VesCommonService;
   @inject(VesFlashCartUsbService)
   protected readonly vesFlashCartUsbService: VesFlashCartUsbService;
   @inject(VesFlashCartUsbWatcher)
@@ -477,10 +477,10 @@ export class VesFlashCartService {
 
   async getProgVbPath(): Promise<string> {
     return joinPath(
-      await this.getResourcesPath(),
+      await this.vesCommonService.getResourcesPath(),
       'binaries',
       'vuengine-studio-tools',
-      this.getOs(),
+      this.vesCommonService.getOs(),
       'prog-vb',
       isWindows ? 'prog-vb.exe' : 'prog-vb'
     );
@@ -488,10 +488,10 @@ export class VesFlashCartService {
 
   async getHfCliPath(): Promise<string> {
     return joinPath(
-      await this.getResourcesPath(),
+      await this.vesCommonService.getResourcesPath(),
       'binaries',
       'vuengine-studio-tools',
-      this.getOs(),
+      this.vesCommonService.getOs(),
       'hf-cli',
       isWindows ? 'hfcli.exe' : 'hfcli'
     );
@@ -519,16 +519,6 @@ export class VesFlashCartService {
     });
 
     this.atLeastOneCanHoldRom = atLeastOneCanHoldRom;
-  }
-
-  async getResourcesPath(): Promise<string> {
-    const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
-    const applicationPath = envVar && envVar.value ? envVar.value : '';
-    return applicationPath;
-  }
-
-  getOs(): string {
-    return isWindows ? 'win' : isOSX ? 'osx' : 'linux';
   }
 
   convertoToEnvPath(path: string): string {

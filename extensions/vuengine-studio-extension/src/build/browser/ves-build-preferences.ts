@@ -8,7 +8,8 @@ export namespace VesBuildPreferenceIds {
     export const DUMP_ELF = [CATEGORY, 'dumpElf'].join('.');
     export const PEDANTIC_WARNINGS = [CATEGORY, 'pedanticWarnings'].join('.');
     export const ENABLE_WSL = [CATEGORY, 'enableWsl'].join('.');
-    export const ENGINE_CORE_PATH = [CATEGORY, 'engine', 'coreLibraryPath'].join('.');
+    export const ENGINE_CORE_PATH = [CATEGORY, 'engine', 'core', 'path'].join('.');
+    export const ENGINE_CORE_INCLUDE_IN_WORKSPACE = [CATEGORY, 'engine', 'core', 'includeInWorkspace'].join('.');
 }
 
 export const VesBuildPreferenceSchema: PreferenceSchema = {
@@ -42,11 +43,16 @@ export const VesBuildPreferenceSchema: PreferenceSchema = {
         },
         [VesBuildPreferenceIds.ENGINE_CORE_PATH]: {
             type: 'string',
-            description: 'Full path to the core library. Uses built-in vuengine-core when left blank.',
+            description: 'Full path to core library. Uses built-in VUEngine Core when left blank.',
             default: '',
             additionalProperties: {
                 isDirectory: true,
             },
+        },
+        [VesBuildPreferenceIds.ENGINE_CORE_INCLUDE_IN_WORKSPACE]: {
+            type: 'boolean',
+            description: 'Automatically include core library in workspaces.',
+            default: false,
         },
     },
 };

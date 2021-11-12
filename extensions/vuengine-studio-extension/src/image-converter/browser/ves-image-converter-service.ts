@@ -1,13 +1,14 @@
 import * as glob from 'glob';
 import { deepmerge } from 'deepmerge-ts';
 import { basename, dirname, join as joinPath, parse as parsePath } from 'path';
-import { Emitter, isOSX, isWindows } from '@theia/core';
+import { Emitter, isWindows } from '@theia/core';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import URI from '@theia/core/lib/common/uri';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileStatWithMetadata } from '@theia/filesystem/lib/common/files';
+import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { MemorySection } from '../../build/browser/ves-build-types';
 import { VesCodegenService } from '../../codegen/browser/ves-codegen-service';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
@@ -29,6 +30,8 @@ export class VesImageConverterService {
   protected fileService: FileService;
   @inject(VesCodegenService)
   protected vesCodegenService: VesCodegenService;
+  @inject(VesCommonService)
+  protected vesCommonService: VesCommonService;
   @inject(VesProcessService)
   protected vesProcessService: VesProcessService;
   @inject(VesProcessWatcher)
@@ -244,7 +247,7 @@ export class VesImageConverterService {
       `${name}.c`
     ));
     const templateFileUri = new URI(joinPath(
-      await this.getResourcesPath(),
+      await this.vesCommonService.getResourcesPath(),
       'templates',
       'stacked.c.nj',
     ));
@@ -408,7 +411,7 @@ export class VesImageConverterService {
   }
 
   protected async getImageConfigFilesToBeConverted(changedOnly: boolean): Promise<Array<ImageConfigFileToBeConverted>> {
-    const workspaceRoot = this.getWorkspaceRoot();
+    const workspaceRoot = this.vesCommonService.getWorkspaceRoot();
 
     const imageConfigFilesToBeConverted: Array<ImageConfigFileToBeConverted> = [];
 
@@ -613,30 +616,12 @@ export class VesImageConverterService {
     }
   }
 
-  protected getWorkspaceRoot(): string {
-    const substrNum = isWindows ? 2 : 1;
-
-    return window.location.hash.slice(-9) === 'workspace'
-      ? dirname(window.location.hash.substring(substrNum))
-      : window.location.hash.substring(substrNum);
-  }
-
-  protected getOs(): string {
-    return isWindows ? 'win' : isOSX ? 'osx' : 'linux';
-  }
-
-  protected async getResourcesPath(): Promise<string> {
-    const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
-    const applicationPath = envVar && envVar.value ? envVar.value : '';
-    return applicationPath;
-  }
-
   protected async getGritPath(): Promise<string> {
     return joinPath(
-      await this.getResourcesPath(),
+      await this.vesCommonService.getResourcesPath(),
       'binaries',
       'vuengine-studio-tools',
-      this.getOs(),
+      this.vesCommonService.getOs(),
       'grit',
       isWindows ? 'grit.exe' : 'grit'
     );

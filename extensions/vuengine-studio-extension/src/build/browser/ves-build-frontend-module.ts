@@ -3,6 +3,7 @@ import { CommandContribution, MenuContribution } from '@theia/core';
 import { bindViewContribution, FrontendApplicationContribution, KeybindingContribution, PreferenceContribution, WidgetFactory } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { VesBuildContribution } from './ves-build-contribution';
+import { VesBuildPathsService } from './ves-build-paths-service';
 import { VesBuildPreferenceSchema } from './ves-build-preferences';
 import { VesBuildService } from './ves-build-service';
 import { VesBuildStatusBarContribution } from './ves-build-statusbar-contribution';
@@ -24,8 +25,9 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(VesBuildStatusBarContribution).toSelf().inSingletonScope();
     bind(FrontendApplicationContribution).toService(VesBuildStatusBarContribution);
 
-    // build service
+    // build services
     bind(VesBuildService).toSelf().inSingletonScope();
+    bind(VesBuildPathsService).toSelf().inSingletonScope();
 
     // build view
     bindViewContribution(bind, VesBuildViewContribution);

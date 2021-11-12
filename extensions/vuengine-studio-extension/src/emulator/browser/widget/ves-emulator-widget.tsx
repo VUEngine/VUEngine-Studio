@@ -1,7 +1,7 @@
-import { basename, dirname, join as joinPath } from 'path';
+import { basename, join as joinPath } from 'path';
 import * as React from '@theia/core/shared/react';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { CommandService, isWindows } from '@theia/core';
+import { CommandService } from '@theia/core';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import {
   Endpoint,
@@ -12,7 +12,9 @@ import {
   PreferenceService,
   ScopedKeybinding,
 } from '@theia/core/lib/browser';
-import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import URI from '@theia/core/lib/common/uri';
+import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import {
   EmulationMode,
   EmulatorGamePadKeyCode,
@@ -24,9 +26,7 @@ import { VesEmulatorCommands } from '../ves-emulator-commands';
 import { VesEmulatorPreferenceIds } from '../ves-emulator-preferences';
 import { VesEmulatorService } from '../ves-emulator-service';
 import { VesEmulatorControls } from './ves-emulator-controls-component';
-import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import URI from '@theia/core/lib/common/uri';
-import { BinaryBuffer } from '@theia/core/lib/common/buffer';
+import { VesCommonService } from '../../../branding/browser/ves-common-service';
 
 const datauri = require('datauri');
 
@@ -52,8 +52,6 @@ export interface vesEmulatorWidgetState {
 export class VesEmulatorWidget extends ReactWidget {
   @inject(CommandService)
   protected readonly commandService: CommandService;
-  @inject(EnvVariablesServer)
-  protected readonly envVariablesServer: EnvVariablesServer;
   @inject(FileService)
   protected readonly fileService: FileService;
   @inject(KeybindingRegistry)
@@ -62,6 +60,8 @@ export class VesEmulatorWidget extends ReactWidget {
   protected readonly localStorageService: LocalStorageService;
   @inject(PreferenceService)
   protected readonly preferenceService: PreferenceService;
+  @inject(VesCommonService)
+  protected readonly vesCommonService: VesCommonService;
   @inject(VesEmulatorService)
   protected readonly vesEmulatorService: VesEmulatorService;
   @inject(VesEmulatorWidgetOptions)
@@ -681,7 +681,7 @@ export class VesEmulatorWidget extends ReactWidget {
       ia[i] = byteString.charCodeAt(i);
     }
 
-    const fileUri = new URI(joinPath(this.getWorkspaceRoot(), 'screenshots', filename));
+    const fileUri = new URI(joinPath(this.vesCommonService.getWorkspaceRoot(), 'screenshots', filename));
     this.fileService.writeFile(fileUri, BinaryBuffer.wrap(ia));
   }
 
@@ -924,12 +924,6 @@ export class VesEmulatorWidget extends ReactWidget {
     return button.toLowerCase();
   }
 
-  protected async getResourcesPath(): Promise<string> {
-    const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
-    const applicationPath = envVar && envVar.value ? envVar.value : '';
-    return applicationPath;
-  }
-
   protected getKeybindingLabel(commandId: string, wrapInBrackets: boolean = false): string {
     const keybinding = this.keybindingRegistry.getKeybindingsForCommand(commandId)[0];
     let keybindingAccelerator = keybinding
@@ -944,14 +938,6 @@ export class VesEmulatorWidget extends ReactWidget {
     }
 
     return keybindingAccelerator;
-  }
-
-  protected getWorkspaceRoot(): string {
-    const substrNum = isWindows ? 2 : 1;
-
-    return window.location.hash.slice(-9) === 'workspace'
-      ? dirname(window.location.hash.substring(substrNum))
-      : window.location.hash.substring(substrNum);
   }
 
   protected cleanStorage(): void {

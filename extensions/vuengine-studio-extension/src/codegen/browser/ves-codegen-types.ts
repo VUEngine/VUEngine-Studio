@@ -1,13 +1,13 @@
+export interface Templates {
+  events: Array<Template>
+}
+
 export interface Template {
-  event: TemplateEvent
+  type: TemplateEventType
+  value: string
   data?: Array<TemplateDataSource>
   targets: Array<TemplateTarget>
   root: string
-}
-
-export interface TemplateEvent {
-  type: TemplateEventType
-  value: string
 }
 
 export enum TemplateEventType {

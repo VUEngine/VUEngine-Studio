@@ -2,7 +2,6 @@ import * as glob from 'glob';
 import * as iconv from 'iconv-lite';
 import * as nunjucks from 'nunjucks';
 import { basename, dirname, join as joinPath, parse as parsePath } from 'path';
-import { isWindows } from '@theia/core';
 import { PreferenceService } from '@theia/core/lib/browser';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import URI from '@theia/core/lib/common/uri';
@@ -11,10 +10,13 @@ import { FileChangeType } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { VES_PREFERENCE_DIR } from '../../branding/browser/ves-branding-preference-configurations';
+import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { VesBuildService } from '../../build/browser/ves-build-service';
+import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
+import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-service';
 import { USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } from '../../plugins/browser/ves-plugins-types';
-import { Template, TemplateEncoding, TemplateDataSource, TemplateRoot, TemplateEventType, TemplateDataType } from './ves-codegen-types';
+import { Template, TemplateEncoding, TemplateDataSource, TemplateRoot, TemplateEventType, TemplateDataType, Templates } from './ves-codegen-types';
 
 export const VES_PREFERENCE_TEMPLATES_DIR = 'templates';
 
@@ -26,10 +28,18 @@ export class VesCodegenService {
   protected preferenceService: PreferenceService;
   @inject(VesBuildService)
   protected vesBuildService: VesBuildService;
+  @inject(VesBuildPathsService)
+  protected vesBuildPathsService: VesBuildPathsService;
+  @inject(VesCommonService)
+  protected vesCommonService: VesCommonService;
   @inject(VesPluginsService)
   protected vesPluginsService: VesPluginsService;
+  @inject(VesPluginsPathsService)
+  protected vesPluginsPathsService: VesPluginsPathsService;
 
-  protected templates: Template[] = [];
+  protected templates: Templates = {
+    events: [],
+  };
 
   @postConstruct()
   protected async init(): Promise<void> {
@@ -55,15 +65,15 @@ export class VesCodegenService {
   }
 
   protected async handleFileChange(fileChangesEvent: FileChangesEvent): Promise<void> {
-    const workspaceRoot = this.getWorkspaceRoot();
+    const workspaceRoot = this.vesCommonService.getWorkspaceRoot();
 
     fileChangesEvent.changes.map(fileChange => {
-      this.templates.map(template => {
+      this.templates.events.map(template => {
         if ([FileChangeType.ADDED, FileChangeType.UPDATED].includes(fileChange.type) &&
-          (template.event.type === TemplateEventType.fileChanged &&
-            fileChange.resource.isEqual(new URI(joinPath(workspaceRoot, ...template.event.value.split('/'))))) ||
-          (template.event.type === TemplateEventType.fileWithEndingChanged &&
-            fileChange.resource.toString().endsWith(template.event.value))
+          (template.type === TemplateEventType.fileChanged &&
+            fileChange.resource.isEqual(new URI(joinPath(workspaceRoot, ...template.value.split('/'))))) ||
+          (template.type === TemplateEventType.fileWithEndingChanged &&
+            fileChange.resource.toString().endsWith(template.value))
         ) {
           this.processTemplate(template, fileChange.resource);
         }
@@ -72,9 +82,9 @@ export class VesCodegenService {
   }
 
   protected async handlePluginChange(pluginId: string): Promise<void> {
-    this.templates.map(template => {
-      console.log(template.event.type, TemplateEventType.installedPluginsChanged);
-      if (template.event.type === TemplateEventType.installedPluginsChanged) {
+    this.templates.events.map(template => {
+      console.log(template.type, TemplateEventType.installedPluginsChanged);
+      if (template.type === TemplateEventType.installedPluginsChanged) {
         console.log('PROCESS');
         this.processTemplate(template);
       }
@@ -116,8 +126,10 @@ export class VesCodegenService {
     }));
   }
 
-  protected async getTemplateDefinitions(): Promise<Template[]> {
-    const templates: Template[] = [];
+  protected async getTemplateDefinitions(): Promise<Templates> {
+    let templates: Templates = {
+      events: [],
+    };
     const roots = [
       ...await this.resolveRoot(TemplateRoot.engine),
       ...await this.resolveRoot(TemplateRoot.installedPlugins),
@@ -128,10 +140,9 @@ export class VesCodegenService {
       const templatesFileUri = new URI(joinPath(root, VES_PREFERENCE_DIR, 'templates.json'));
       if (await this.fileService.exists(templatesFileUri)) {
         const templatesFileContent = await this.fileService.readFile(templatesFileUri);
-        const templatesFileJson = JSON.parse(templatesFileContent.value.toString());
-        for (const template of templatesFileJson) {
-          template.root = root;
-          templates.push(template);
+        templates = JSON.parse(templatesFileContent.value.toString());
+        for (const event of templates.events) {
+          event.root = root;
         }
       }
     }));
@@ -172,7 +183,7 @@ export class VesCodegenService {
   }
 
   protected async configureTemplateEngine(): Promise<void> {
-    const engineCorePath = await this.vesBuildService.getEngineCorePath();
+    const engineCorePath = await this.vesBuildPathsService.getEngineCorePath();
     const env = nunjucks.configure(joinPath(engineCorePath, VES_PREFERENCE_DIR, VES_PREFERENCE_TEMPLATES_DIR));
 
     // add filters
@@ -214,8 +225,8 @@ export class VesCodegenService {
 
     switch (root) {
       case TemplateRoot.installedPlugins:
-        const enginePluginsPath = await this.vesPluginsService.getEnginePluginsPath();
-        const userPluginsPath = await this.vesPluginsService.getUserPluginsPath();
+        const enginePluginsPath = await this.vesPluginsPathsService.getEnginePluginsPath();
+        const userPluginsPath = await this.vesPluginsPathsService.getUserPluginsPath();
         this.vesPluginsService.getInstalledPlugins().map(installedPlugin => {
           if (installedPlugin.startsWith(VUENGINE_PLUGINS_PREFIX)) {
             roots.push(joinPath(enginePluginsPath, installedPlugin.replace(VUENGINE_PLUGINS_PREFIX, '')));
@@ -225,11 +236,11 @@ export class VesCodegenService {
         });
         break;
       case TemplateRoot.engine:
-        roots.push(await this.vesBuildService.getEngineCorePath());
+        roots.push(await this.vesBuildPathsService.getEngineCorePath());
         break;
       case TemplateRoot.plugins:
-        roots.push(await this.vesPluginsService.getEnginePluginsPath());
-        roots.push(await this.vesPluginsService.getUserPluginsPath());
+        roots.push(await this.vesPluginsPathsService.getEnginePluginsPath());
+        roots.push(await this.vesPluginsPathsService.getUserPluginsPath());
         break;
       case TemplateRoot.relative:
         if (filepath) {
@@ -238,18 +249,10 @@ export class VesCodegenService {
         break;
       default:
       case TemplateRoot.workspace:
-        roots.push(this.getWorkspaceRoot());
+        roots.push(this.vesCommonService.getWorkspaceRoot());
         break;
     }
 
     return roots;
-  }
-
-  protected getWorkspaceRoot(): string {
-    const substrNum = isWindows ? 2 : 1;
-
-    return window.location.hash.slice(-9) === 'workspace'
-      ? dirname(window.location.hash.substring(substrNum))
-      : window.location.hash.substring(substrNum);
   }
 }

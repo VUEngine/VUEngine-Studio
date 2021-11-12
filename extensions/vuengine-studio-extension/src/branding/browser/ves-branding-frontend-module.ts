@@ -18,6 +18,7 @@ import { PluginViewRegistry } from '@theia/plugin-ext/lib/main/browser/view/plug
 import { PreferenceTreeGenerator } from '@theia/preferences/lib/browser/util/preference-tree-generator';
 import { PreferenceStringInputRenderer } from '@theia/preferences/lib/browser/views/components/preference-string-input';
 import { ScmHistoryContribution } from '@theia/scm-extra/lib/browser/history/scm-history-contribution';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesAboutDialog } from './ves-branding-about-dialog';
 import { VesApplicationShell } from './ves-branding-application-shell';
 import { VesColorContribution } from './ves-branding-color-contribution';
@@ -39,6 +40,8 @@ import { VesTitlebarApplicationTitleWidget } from './ves-branding-titlebar-appli
 import { VesTitlebarWindowControlsContribution } from './ves-branding-titlebar-window-controls-view';
 import { VesTitlebarWindowControlsWidget } from './ves-branding-titlebar-window-controls-widget';
 import { VesPreferenceStringInputRenderer } from './ves-preference-string-input-renderer';
+import { VesCommonService } from './ves-common-service';
+import { VesWorkspaceService } from './ves-workspace-service';
 import '../../../src/branding/browser/style/index.css';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
@@ -124,6 +127,13 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // remove "test" view
     bind(VesPluginContribution).toSelf().inSingletonScope();
     rebind(PluginViewRegistry).toService(VesPluginContribution);
+
+    // common service
+    bind(VesCommonService).toSelf().inSingletonScope();
+
+    // workspace service
+    bind(VesWorkspaceService).toSelf().inSingletonScope();
+    rebind(WorkspaceService).toService(VesWorkspaceService);
 
     // title bar application title
     bindViewContribution(bind, VesTitlebarApplicationTitleContribution);

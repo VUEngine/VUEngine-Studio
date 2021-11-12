@@ -1,6 +1,6 @@
-import { join as joinPath, normalize } from 'path';
+import { join as joinPath } from 'path';
 import { cpus } from 'os';
-import { CommandService, isOSX, isWindows } from '@theia/core';
+import { CommandService, isWindows } from '@theia/core';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { ApplicationShell, PreferenceService } from '@theia/core/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
@@ -9,16 +9,16 @@ import URI from '@theia/core/lib/common/uri';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileChangeType } from '@theia/filesystem/lib/browser';
 import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { ProcessOptions } from '@theia/process/lib/node';
-import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
+import { VesCommonService } from '../../branding/browser/ves-common-service';
+import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-service';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
-import { VesProjectsService } from '../../projects/browser/ves-projects-service';
-import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { BuildLogLine, BuildLogLineFileLink, BuildLogLineType, BuildMode, BuildResult, BuildStatus, GccMatchedProblem } from './ves-build-types';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
 import { VesBuildCommands } from './ves-build-commands';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { VesBuildPathsService } from './ves-build-paths-service';
 
 interface BuildFolderFlags {
   [key: string]: boolean;
@@ -30,22 +30,22 @@ export class VesBuildService {
   protected readonly shell: ApplicationShell;
   @inject(CommandService)
   protected readonly commandService: CommandService;
-  @inject(EnvVariablesServer)
-  protected readonly envVariablesServer: EnvVariablesServer;
   @inject(FileService)
   protected fileService: FileService;
   @inject(FrontendApplicationStateService)
   protected readonly frontendApplicationStateService: FrontendApplicationStateService;
   @inject(PreferenceService)
   protected readonly preferenceService: PreferenceService;
+  @inject(VesBuildPathsService)
+  protected readonly vesBuildPathsService: VesBuildPathsService;
+  @inject(VesCommonService)
+  protected readonly vesCommonService: VesCommonService;
   @inject(VesProcessService)
   protected readonly vesProcessService: VesProcessService;
-  @inject(VesPluginsService)
-  protected readonly vesPluginsService: VesPluginsService;
+  @inject(VesPluginsPathsService)
+  protected readonly vesPluginsPathsService: VesPluginsPathsService;
   @inject(VesProcessWatcher)
   protected readonly vesProcessWatcher: VesProcessWatcher;
-  @inject(VesProjectsService)
-  protected readonly vesProjectsService: VesProjectsService;
   @inject(WorkspaceService)
   protected readonly workspaceService: WorkspaceService;
 
@@ -173,7 +173,7 @@ export class VesBuildService {
           for (const buildMode in BuildMode) {
             if (BuildMode.hasOwnProperty(buildMode)) {
               this.fileService
-                .exists(new URI(this.getBuildPath(buildMode)))
+                .exists(new URI(this.vesBuildPathsService.getBuildPath(buildMode)))
                 .then((exists: boolean) => {
                   this.setBuildFolderExists(buildMode, exists);
                 });
@@ -191,7 +191,7 @@ export class VesBuildService {
     this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
       for (const buildMode in BuildMode) {
         if (BuildMode.hasOwnProperty(buildMode)) {
-          const buildPathUri = new URI(this.getBuildPath(buildMode));
+          const buildPathUri = new URI(this.vesBuildPathsService.getBuildPath(buildMode));
           if (fileChangesEvent.contains(buildPathUri, FileChangeType.ADDED)) {
             this.setBuildFolderExists(buildMode, true);
           } else if (fileChangesEvent.contains(buildPathUri, FileChangeType.DELETED)) {
@@ -249,11 +249,11 @@ export class VesBuildService {
   }
 
   async outputRomExists(): Promise<boolean> {
-    return this.fileService.exists(new URI(this.getRomPath()));
+    return this.fileService.exists(new URI(this.vesBuildPathsService.getRomPath()));
   }
 
   protected async determineRomSize(): Promise<void> {
-    const romPath = this.getRomPath();
+    const romPath = this.vesBuildPathsService.getRomPath();
     const romUri = new URI(romPath);
     if (await this.fileService.exists(romUri)) {
       const outputRom = await this.fileService.resolve(romUri, { resolveMetadata: true });
@@ -353,14 +353,14 @@ export class VesBuildService {
   }
 
   protected async getBuildProcessParams(): Promise<ProcessOptions> {
-    const workspaceRoot = this.vesProjectsService.getWorkspaceRoot();
+    const workspaceRoot = this.vesCommonService.getWorkspaceRoot();
     const buildMode = (this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as string).toLowerCase();
     const dumpElf = this.preferenceService.get(VesBuildPreferenceIds.DUMP_ELF) as boolean;
     const pedanticWarnings = this.preferenceService.get(VesBuildPreferenceIds.PEDANTIC_WARNINGS) as boolean;
-    const engineCorePath = await this.getEngineCorePath();
-    const enginePluginsPath = await this.vesPluginsService.getEnginePluginsPath();
-    const userPluginsPath = await this.vesPluginsService.getUserPluginsPath();
-    const compilerPath = await this.getCompilerPath();
+    const engineCorePath = await this.vesBuildPathsService.getEngineCorePath();
+    const enginePluginsPath = await this.vesPluginsPathsService.getEnginePluginsPath();
+    const userPluginsPath = await this.vesPluginsPathsService.getUserPluginsPath();
+    const compilerPath = await this.vesBuildPathsService.getCompilerPath();
     const makefile = await this.getMakefilePath(workspaceRoot, engineCorePath);
 
     // TODO: remove check when https://github.com/VUEngine/VUEngine-Studio/issues/15 is resolved
@@ -381,7 +381,7 @@ export class VesBuildService {
       ];
 
       return {
-        command: await this.getMsysBashPath(),
+        command: await this.vesBuildPathsService.getMsysBashPath(),
         args: [
           '--login',
           '-c', args.join(' '),
@@ -433,7 +433,7 @@ export class VesBuildService {
   }
 
   protected async deleteRom(): Promise<void> {
-    const romUri = new URI(this.getRomPath());
+    const romUri = new URI(this.vesBuildPathsService.getRomPath());
     if (await this.fileService.exists(romUri)) {
       this.fileService.delete(romUri);
     }
@@ -558,31 +558,9 @@ export class VesBuildService {
     return makefilePath;
   }
 
-  getBuildFolder(): string {
-    return joinPath(this.vesProjectsService.getWorkspaceRoot(), 'build');
-  }
-
-  getBuildPath(buildMode?: string): string {
-    const buildFolder = this.getBuildFolder();
-
-    return buildMode
-      ? joinPath(buildFolder, buildMode.toLowerCase())
-      : buildFolder;
-  }
-
-  getRomPath(): string {
-    return joinPath(this.getBuildPath(), 'output.vb');
-  }
-
   async abortBuild(): Promise<void> {
     this.vesProcessService.killProcess(this.buildStatus.processManagerId);
     await this.resetBuildStatus(BuildResult.aborted);
-  }
-
-  protected async getResourcesPath(): Promise<string> {
-    const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
-    const applicationPath = envVar && envVar.value ? envVar.value : '';
-    return applicationPath;
   }
 
   convertoToEnvPath(path: string): string {
@@ -598,48 +576,6 @@ export class VesBuildService {
     }
 
     return envPath;
-  }
-
-  async getEngineCorePath(): Promise<string> {
-    const defaultPath = joinPath(
-      await this.getResourcesPath(),
-      'vuengine',
-      'vuengine-core'
-    );
-    const customPath = normalize(this.preferenceService.get(
-      VesBuildPreferenceIds.ENGINE_CORE_PATH
-    ) as string);
-
-    return customPath && (customPath !== '.' && await this.fileService.exists(new URI(customPath)))
-      ? customPath
-      : defaultPath;
-  }
-
-  protected async getCompilerPath(): Promise<string> {
-    return joinPath(
-      await this.getResourcesPath(),
-      'binaries',
-      'vuengine-studio-tools',
-      this.getOs(),
-      'gcc'
-    );
-  }
-
-  protected async getMsysBashPath(): Promise<string> {
-    return joinPath(
-      await this.getResourcesPath(),
-      'binaries',
-      'vuengine-studio-tools',
-      this.getOs(),
-      'msys',
-      'usr',
-      'bin',
-      'bash.exe'
-    );
-  }
-
-  protected getOs(): string {
-    return isWindows ? 'win' : isOSX ? 'osx' : 'linux';
   }
 
   protected getThreads(): number {
@@ -669,8 +605,8 @@ export class VesBuildService {
       return;
     }
 
-    const engineCorePath = await this.getEngineCorePath();
-    const compilerPath = await this.getCompilerPath();
+    const engineCorePath = await this.vesBuildPathsService.getEngineCorePath();
+    const compilerPath = await this.vesBuildPathsService.getCompilerPath();
 
     await Promise.all([
       this.vesProcessService.launchProcess(VesProcessType.Raw, {
@@ -698,7 +634,7 @@ export class VesBuildService {
   }
 
   protected getCleanPath(buildMode: BuildMode): string {
-    return joinPath(this.getBuildPath(), buildMode);
+    return joinPath(this.vesBuildPathsService.getBuildPath(), buildMode);
   }
 
   async doClean(): Promise<void> {
@@ -721,7 +657,7 @@ export class VesBuildService {
     this.isCleaning = true;
 
     const cleanPath = this.getCleanPath(buildMode);
-    const buildFolder = this.getBuildPath();
+    const buildFolder = this.vesBuildPathsService.getBuildPath();
 
     await this.fileService.delete(new URI(cleanPath), { recursive: true });
     const files = await this.fileService.resolve(new URI(buildFolder));

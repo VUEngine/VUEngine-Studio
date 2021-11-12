@@ -1,30 +1,31 @@
-import { dirname, join as joinPath, normalize, relative as relativePath, sep } from 'path';
 import * as glob from 'glob';
-import { isWindows } from '@theia/core';
-import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
-import { EncodingService } from '@theia/core/lib/common/encoding-service';
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import URI from '@theia/core/lib/common/uri';
-import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { join as joinPath, relative as relativePath, sep } from 'path';
 import { PreferenceService } from '@theia/core/lib/browser';
-import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
-import { Deferred } from '@theia/core/lib/common/promise-util';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
-import { VesPluginsPreferenceIds } from './ves-plugins-preferences';
+import { EncodingService } from '@theia/core/lib/common/encoding-service';
+import { Deferred } from '@theia/core/lib/common/promise-util';
+import URI from '@theia/core/lib/common/uri';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { VesPluginData, VesPluginsData } from './ves-plugin';
 import { VUENGINE_PLUGINS_PREFIX } from './ves-plugins-types';
+import { VesPluginsPathsService } from './ves-plugins-paths-service';
 
 @injectable()
 export class VesPluginsService {
 
   @inject(EncodingService)
   protected encodingService: EncodingService;
-  @inject(EnvVariablesServer)
-  protected envVariablesServer: EnvVariablesServer;
   @inject(FileService)
   protected fileService: FileService;
   @inject(PreferenceService)
   protected preferenceService: PreferenceService;
+  @inject(VesCommonService)
+  protected vesCommonService: VesCommonService;
+  @inject(VesPluginsPathsService)
+  protected vesPluginsPathsService: VesPluginsPathsService;
 
   protected pluginsData: VesPluginsData;
 
@@ -43,39 +44,8 @@ export class VesPluginsService {
 
   @postConstruct()
   protected async init(): Promise<void> {
-    this.onPluginInstalled(async () => /* await */ this.handleInstalledPluginsChange());
-    this.onPluginUninstalled(async () => /* await */ this.handleInstalledPluginsChange());
-  }
-
-  async getEnginePluginsPath(): Promise<string> {
-    const defaultPath = joinPath(
-      await this.getResourcesPath(),
-      'vuengine',
-      'vuengine-plugins'
-    );
-    const customPath = normalize(this.preferenceService.get(
-      VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH
-    ) as string);
-
-    return customPath && (customPath !== '.' && await this.fileService.exists(new URI(customPath)))
-      ? customPath
-      : defaultPath;
-  }
-
-  async getUserPluginsPath(): Promise<string> {
-    const path = normalize(this.preferenceService.get(
-      VesPluginsPreferenceIds.USER_PLUGINS_PATH
-    ) as string);
-
-    return path;
-  }
-
-  protected getWorkspaceRoot(): string {
-    const substrNum = isWindows ? 2 : 1;
-
-    return window.location.hash.slice(-9) === 'workspace'
-      ? dirname(window.location.hash.substring(substrNum))
-      : window.location.hash.substring(substrNum);
+    this.onPluginInstalled(async () => await this.handleInstalledPluginsChange());
+    this.onPluginUninstalled(async () => await this.handleInstalledPluginsChange());
   }
 
   getPluginById(id: string): VesPluginData | undefined {
@@ -131,8 +101,8 @@ export class VesPluginsService {
   }
 
   async setPluginsData(): Promise<void> {
-    const enginePluginsPath = await this.getEnginePluginsPath();
-    const userPluginsPath = await this.getUserPluginsPath();
+    const enginePluginsPath = await this.vesPluginsPathsService.getEnginePluginsPath();
+    const userPluginsPath = await this.vesPluginsPathsService.getUserPluginsPath();
 
     const findPlugins = async (path: string, prefix: string) => {
       const pluginsMap: any = {}; /* eslint-disable-line */
@@ -226,14 +196,8 @@ export class VesPluginsService {
     }
   }
 
-  protected async getResourcesPath(): Promise<string> {
-    const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
-    const applicationPath = envVar && envVar.value ? envVar.value : '';
-    return applicationPath;
-  }
-
   protected getPluginsFileUri(): URI {
-    const path = joinPath(this.getWorkspaceRoot(), 'config', 'Compiler.json');
+    const path = joinPath(this.vesCommonService.getWorkspaceRoot(), 'config', 'Compiler.json');
     return new URI(path);
   }
 
@@ -242,7 +206,7 @@ export class VesPluginsService {
    */
   /* protected async getProjectPlugins(): Promise<Array<string>> {
     let allPlugins: Array<string> = [];
-    const enginePluginsPath = await this.getEnginePluginsPath();
+    const enginePluginsPath = await this.vesPluginsPathsService.getEnginePluginsPath();
 
     // get project's plugins
     try {
