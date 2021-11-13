@@ -12,6 +12,7 @@ import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { VesPluginData, VesPluginsData } from './ves-plugin';
 import { VUENGINE_PLUGINS_PREFIX } from './ves-plugins-types';
 import { VesPluginsPathsService } from './ves-plugins-paths-service';
+import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
 
 @injectable()
 export class VesPluginsService {
@@ -37,15 +38,21 @@ export class VesPluginsService {
   protected installedPlugins: Array<string> = [];
 
   // events
-  protected readonly onPluginInstalledEmitter = new Emitter<string>();
-  readonly onPluginInstalled = this.onPluginInstalledEmitter.event;
-  protected readonly onPluginUninstalledEmitter = new Emitter<string>();
-  readonly onPluginUninstalled = this.onPluginUninstalledEmitter.event;
+  protected readonly onInstalledPluginsChangedEmitter = new Emitter<void>();
+  readonly onInstalledPluginsChanged = this.onInstalledPluginsChangedEmitter.event;
 
   @postConstruct()
   protected async init(): Promise<void> {
-    this.onPluginInstalled(async () => await this.handleInstalledPluginsChange());
-    this.onPluginUninstalled(async () => await this.handleInstalledPluginsChange());
+    this.onInstalledPluginsChanged(async () => await this.writeInstalledPluginsToFile());
+
+    // Re-determine installedPlugins when plugins file changes
+    this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
+      const pluginsFileUri = this.getPluginsFileUri();
+      if (fileChangesEvent.contains(pluginsFileUri)) {
+        await this.determineInstalledPlugins();
+        this.onInstalledPluginsChangedEmitter.fire();
+      }
+    });
   }
 
   getPluginById(id: string): VesPluginData | undefined {
@@ -59,7 +66,7 @@ export class VesPluginsService {
   installPlugin(id: string): void {
     if (!this.installedPlugins.includes(id)) {
       this.installedPlugins.push(id);
-      this.onPluginInstalledEmitter.fire(id);
+      this.onInstalledPluginsChangedEmitter.fire();
     }
   }
 
@@ -67,7 +74,7 @@ export class VesPluginsService {
     const index = this.installedPlugins.indexOf(id);
     if (index > -1) {
       this.installedPlugins.splice(index, 1);
-      this.onPluginUninstalledEmitter.fire(id);
+      this.onInstalledPluginsChangedEmitter.fire();
     }
   }
 
@@ -179,7 +186,7 @@ export class VesPluginsService {
     return searchResult;
   }
 
-  protected async handleInstalledPluginsChange(): Promise<void> {
+  protected async writeInstalledPluginsToFile(): Promise<void> {
     try {
       // read
       const pluginsFileUri = this.getPluginsFileUri();
@@ -190,7 +197,7 @@ export class VesPluginsService {
       fileContentParsed.plugins.sort();
       // write
       const updatedFileContent = JSON.stringify(fileContentParsed, null, 4);
-      /* await */ this.fileService.writeFile(pluginsFileUri, BinaryBuffer.fromString(updatedFileContent));
+      await this.fileService.writeFile(pluginsFileUri, BinaryBuffer.fromString(updatedFileContent));
     } catch (e) {
       // no-op
     }

@@ -58,8 +58,7 @@ export class VesPluginsModel {
                 ]);
                 this.initialized.resolve();
 
-                this.pluginsService.onPluginInstalled(() => this.updateInstalled());
-                this.pluginsService.onPluginUninstalled(() => this.updateInstalled());
+                this.pluginsService.onInstalledPluginsChanged(() => this.updateInstalled());
             };
         });
     }

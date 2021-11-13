@@ -56,9 +56,7 @@ export class VesCodeGenService {
 
         // TODO: disable file change listener while template files are being written
         this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => this.handleFileChange(fileChangesEvent));
-
-        this.vesPluginsService.onPluginInstalled(async pluginId => this.handlePluginChange(pluginId));
-        this.vesPluginsService.onPluginUninstalled(async pluginId => this.handlePluginChange(pluginId));
+        this.vesPluginsService.onInstalledPluginsChanged(async () => this.handlePluginChange());
       });
     });
   }
@@ -100,7 +98,7 @@ export class VesCodeGenService {
     });
   }
 
-  protected async handlePluginChange(pluginId: string): Promise<void> {
+  protected async handlePluginChange(): Promise<void> {
     await this.getTemplateDefinitions();
 
     this.templates.events.installedPluginsChanged.map(async templateId => {
@@ -257,7 +255,16 @@ export class VesCodeGenService {
       return base;
     });
     env.addFilter('toUpperSnakeCase', (value: string) => this.toUpperSnakeCase(value));
-    env.addFilter('unique', (values: string[]) => values.filter((value, index, self) => self.indexOf(value) === index));
+    env.addFilter('unique', (values: Array<string>, attribute?: string) => {
+      if (attribute) {
+        // array of objects with unique given attribute
+        // @ts-ignore
+        return [...new Map(values.map(item => [item[attribute], item])).values()];
+      } else {
+        // array of unique values
+        return values.filter((value, index, self) => self.indexOf(value) === index);
+      }
+    });
     env.addFilter('hexToInt', (value: string) => parseInt(value, 16));
     env.addFilter('intToHex', (value: number, length?: number) => value.toString(16).toUpperCase().padStart(
       length === 8 ? 10 : length === 2 ? 4 : 6,
