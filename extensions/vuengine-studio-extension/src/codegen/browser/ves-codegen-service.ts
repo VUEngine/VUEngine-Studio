@@ -17,7 +17,7 @@ import { VesBuildPathsService } from '../../build/browser/ves-build-paths-servic
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-service';
 import { USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } from '../../plugins/browser/ves-plugins-types';
-import { TemplateEncoding, TemplateDataSource, TemplateRoot, TemplateEventType, TemplateDataType, Templates } from './ves-codegen-types';
+import { TemplateEncoding, TemplateDataSource, TemplateRoot, TemplateEventType, TemplateDataType, Templates, Template, TemplateMode } from './ves-codegen-types';
 
 export const VES_PREFERENCE_TEMPLATES_DIR = 'templates';
 
@@ -115,6 +115,27 @@ export class VesCodeGenService {
       return;
     }
 
+    switch (template.mode) {
+      case TemplateMode.single:
+        await this.renderFileFromTemplate(template, resource);
+        break;
+      case TemplateMode.withEnding:
+        if (!template.ending) {
+          return;
+        }
+        // TODO: refactor to use fileservice instead of glob
+        const workspaceRoot = this.vesCommonService.getWorkspaceRoot();
+        const fileMatcher = joinPath(workspaceRoot, '**', `*${template.ending}`);
+        await Promise.all(glob.sync(fileMatcher).map(async file => {
+          // TODO: cache all data except of type changedFile
+          // TODO: cache template file content
+          await this.renderFileFromTemplate(template, new URI(file));
+        }));
+        break;
+    }
+  }
+
+  protected async renderFileFromTemplate(template: Template, resource?: URI): Promise<void> {
     const data = await this.getTemplateData(template.data ?? [], resource);
 
     const targetFile = template.target.replace(/\$\{([\s\S]*?)\}/ig, match => {

@@ -20,11 +20,18 @@ export enum TemplateEventType {
 }
 
 export interface Template {
+  mode: TemplateMode
+  ending?: string
   data?: Array<TemplateDataSource>
   root: TemplateRoot
   target: string
   template: string
   encoding?: TemplateEncoding
+}
+
+export enum TemplateMode {
+  single = 'single',
+  withEnding = 'withEnding',
 }
 
 export interface TemplateDataSource {
