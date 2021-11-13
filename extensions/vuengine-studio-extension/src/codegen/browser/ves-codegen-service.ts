@@ -101,6 +101,8 @@ export class VesCodeGenService {
   }
 
   protected async handlePluginChange(pluginId: string): Promise<void> {
+    await this.getTemplateDefinitions();
+
     this.templates.events.installedPluginsChanged.map(async templateId => {
       await this.renderTemplate(templateId);
     });
@@ -153,6 +155,15 @@ export class VesCodeGenService {
   }
 
   protected async getTemplateDefinitions(): Promise<void> {
+    this.templates = {
+      events: {
+        [TemplateEventType.fileChanged]: {},
+        [TemplateEventType.fileWithEndingChanged]: {},
+        [TemplateEventType.installedPluginsChanged]: []
+      },
+      templates: {},
+    };
+
     const roots = [
       ...await this.resolveRoot(TemplateRoot.engine),
       ...await this.resolveRoot(TemplateRoot.installedPlugins),
