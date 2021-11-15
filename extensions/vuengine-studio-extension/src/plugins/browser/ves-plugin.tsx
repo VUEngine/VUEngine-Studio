@@ -159,11 +159,11 @@ export class VesPlugin implements VesPluginData, TreeElement {
     }
 
     async install(): Promise<void> {
-        this.pluginsService.installPlugin(this.id);
+        await this.pluginsService.installPlugin(this.id);
     }
 
     async uninstall(): Promise<void> {
-        this.pluginsService.uninstallPlugin(this.id);
+        await this.pluginsService.uninstallPlugin(this.id);
     }
 
     handleContextMenu(e: React.MouseEvent<HTMLElement, MouseEvent>): void {

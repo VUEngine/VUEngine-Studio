@@ -56,13 +56,16 @@ export class VesCodeGenService {
 
         // TODO: disable file change listener while template files are being written
         this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => this.handleFileChange(fileChangesEvent));
-        this.vesPluginsService.onInstalledPluginsChanged(async () => this.handlePluginChange());
+        // TODO: re-enable once performance issues are solved
+        /* this.vesPluginsService.onInstalledPluginsChanged(async () => this.handlePluginChange()); */
       });
     });
   }
 
   async generateAll(): Promise<void> {
     await Promise.all(Object.keys(this.templates.templates).map(async templateId => {
+      // TODO: make it possible to render all dynamic templates triggered by fileWithEndingChanged,
+      // like BrightnessRepeatSpec.c
       await this.renderTemplate(templateId);
     }));
   }

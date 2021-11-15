@@ -11,7 +11,6 @@ export const generateWidgetId = (widgetId: string): string => VesPluginsWidget.I
 
 @injectable()
 export class VesPluginsWidget extends SourceTreeWidget {
-
     static ID = 'ves-plugins';
 
     static createWidget(parent: interfaces.Container, options: VesPluginsWidgetOptions): VesPluginsWidget {

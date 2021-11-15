@@ -43,8 +43,6 @@ export class VesPluginsService {
 
   @postConstruct()
   protected async init(): Promise<void> {
-    this.onInstalledPluginsChanged(async () => await this.writeInstalledPluginsToFile());
-
     // Re-determine installedPlugins when plugins file changes
     this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
       const pluginsFileUri = this.getPluginsFileUri();
@@ -63,18 +61,20 @@ export class VesPluginsService {
     return this.installedPlugins.includes(id);
   }
 
-  installPlugin(id: string): void {
+  async installPlugin(id: string): Promise<void> {
     if (!this.installedPlugins.includes(id)) {
       this.installedPlugins.push(id);
       this.onInstalledPluginsChangedEmitter.fire();
+      await this.writeInstalledPluginsToFile();
     }
   }
 
-  uninstallPlugin(id: string): void {
+  async uninstallPlugin(id: string): Promise<void> {
     const index = this.installedPlugins.indexOf(id);
     if (index > -1) {
       this.installedPlugins.splice(index, 1);
       this.onInstalledPluginsChangedEmitter.fire();
+      await this.writeInstalledPluginsToFile();
     }
   }
 
@@ -83,7 +83,7 @@ export class VesPluginsService {
       const pluginsFileUri = this.getPluginsFileUri();
       const fileContent = await this.fileService.readFile(pluginsFileUri);
       const fileContentParsed = JSON.parse(fileContent.value.toString());
-      this.installedPlugins = fileContentParsed.plugins;
+      this.installedPlugins = fileContentParsed;
       this._ready.resolve();
       return this.installedPlugins;
     } catch (e) {
@@ -186,74 +186,14 @@ export class VesPluginsService {
     return searchResult;
   }
 
-  protected async writeInstalledPluginsToFile(): Promise<void> {
-    try {
-      // read
-      const pluginsFileUri = this.getPluginsFileUri();
-      const fileContent = await this.fileService.readFile(pluginsFileUri);
-      let fileContentParsed = JSON.parse(fileContent.value.toString());
-      // update
-      fileContentParsed.plugins = this.installedPlugins;
-      fileContentParsed.plugins.sort();
-      // write
-      const updatedFileContent = JSON.stringify(fileContentParsed, null, 4);
-      await this.fileService.writeFile(pluginsFileUri, BinaryBuffer.fromString(updatedFileContent));
-    } catch (e) {
-      // no-op
-    }
-  }
-
-  protected getPluginsFileUri(): URI {
-    const path = joinPath(this.vesCommonService.getWorkspaceRoot(), 'config', 'Compiler.json');
+  getPluginsFileUri(): URI {
+    const path = joinPath(this.vesCommonService.getWorkspaceRoot(), 'config', 'Plugins.json');
     return new URI(path);
   }
 
-  /**
-   * Returns a list of all plugins the current project uses, including implicitly included ones through dependencies
-   */
-  /* protected async getProjectPlugins(): Promise<Array<string>> {
-    let allPlugins: Array<string> = [];
-    const enginePluginsPath = await this.vesPluginsPathsService.getEnginePluginsPath();
-
-    // get project's plugins
-    try {
-      const configFileUri = new URI(
-        joinPath(
-          this.getWorkspaceRoot(),
-          '.vuengine',
-          'plugins.json'
-        )
-      );
-      const configFileContents = await this.fileService.readFile(configFileUri);
-      const projectPlugins = JSON.parse(configFileContents.value.toString());
-      allPlugins = projectPlugins;
-
-      // for each of the project's plugins, get its dependencies
-      // TODO: we only search one level deep here, recurse instead
-      await Promise.all(projectPlugins.map(async (pluginName: string) => {
-        const pluginFileUri = new URI(
-          joinPath(
-            enginePluginsPath,
-            ...pluginName.split('/'),
-            '.vuengine',
-            'plugins.json'
-          )
-        );
-
-        const pluginFileContents = await this.fileService.readFile(pluginFileUri);
-        JSON.parse(pluginFileContents.value.toString()).map(
-          (plugin: string) => {
-            if (!allPlugins.includes(plugin)) {
-              allPlugins.push(plugin);
-            }
-          }
-        );
-      }));
-    } catch (e) {
-      // TODO
-    }
-
-    // remove duplicates and return
-    return allPlugins;
-  } */
+  protected async writeInstalledPluginsToFile(): Promise<void> {
+    const pluginsFileUri = this.getPluginsFileUri();
+    const updatedFileContent = JSON.stringify(this.installedPlugins.sort(), null, 4);
+    await this.fileService.writeFile(pluginsFileUri, BinaryBuffer.fromString(updatedFileContent));
+  }
 }

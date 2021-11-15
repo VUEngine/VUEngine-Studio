@@ -24,6 +24,7 @@ import { VesPluginEditorManager } from './ves-plugin-editor-manager';
 import { VesPluginEditor } from './ves-plugin-editor';
 import { VesPluginsViewContribution } from './ves-plugins-view-contribution';
 import { VesPluginsPathsService } from './ves-plugins-paths-service';
+import { VesPluginsOpenHandler } from './ves-plugins-open-handler';
 import '../../../src/plugins/browser/style/index.css';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
@@ -95,4 +96,6 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bindViewContribution(bind, VesPluginsViewContribution);
     bind(FrontendApplicationContribution).toService(VesPluginsViewContribution);
     bind(TabBarToolbarContribution).toService(VesPluginsViewContribution);
+
+    bind(OpenHandler).to(VesPluginsOpenHandler).inSingletonScope();
 });
