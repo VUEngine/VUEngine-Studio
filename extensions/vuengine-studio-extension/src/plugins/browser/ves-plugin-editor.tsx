@@ -3,6 +3,7 @@ import { Message, ReactWidget, Widget } from '@theia/core/lib/browser';
 import { Deferred } from '@theia/core/lib/common/promise-util';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesPlugin, VesPluginEditorComponent } from './ves-plugin';
 import { VesPluginsModel } from './ves-plugins-model';
 
@@ -18,6 +19,9 @@ export class VesPluginEditor extends ReactWidget {
 
     @inject(VesPluginsModel)
     protected readonly model: VesPluginsModel;
+
+    @inject(WorkspaceService)
+    protected readonly workspaceService: WorkspaceService;
 
     protected readonly deferredScrollContainer = new Deferred<HTMLElement>();
 
@@ -73,6 +77,7 @@ export class VesPluginEditor extends ReactWidget {
             ref={this.resolveScrollContainer}
             plugin={this.plugin}
             commandService={this.commandService}
+            workspaceService={this.workspaceService}
         />;
     }
 }

@@ -7,6 +7,7 @@ import URI from '@theia/core/lib/common/uri';
 import * as DOMPurify from '@theia/core/shared/dompurify';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesPluginUri } from '../common/ves-plugin-uri';
 import { VesPluginsCommands } from './ves-plugins-commands';
 import { VesPluginsSearchModel } from './ves-plugins-search-model';
@@ -73,6 +74,9 @@ export class VesPlugin implements VesPluginData, TreeElement {
 
     @inject(VesPluginsService)
     readonly pluginsService: VesPluginsService;
+
+    @inject(WorkspaceService)
+    readonly workspaceService: WorkspaceService;
 
     protected readonly data: Partial<VesPluginData> = {};
 
@@ -196,7 +200,7 @@ export class VesPlugin implements VesPluginData, TreeElement {
     }
 
     render(): React.ReactNode {
-        return <VesPluginComponent plugin={this} />;
+        return <VesPluginComponent plugin={this} workspaceService={this.workspaceService} />;
     }
 }
 
@@ -228,6 +232,10 @@ export abstract class AbstractVesPluginComponent extends React.Component<Abstrac
     };
 
     protected renderAction(): React.ReactNode {
+        if (!this.props.workspaceService.opened) {
+            return;
+        }
+
         const plugin = this.props.plugin;
         const { installed } = plugin;
         if (installed) {
@@ -241,6 +249,7 @@ export namespace AbstractVesPluginComponent {
     export interface Props {
         plugin: VesPlugin;
         commandService?: CommandService;
+        workspaceService: WorkspaceService
     }
 }
 

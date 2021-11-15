@@ -21,9 +21,9 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
             {this.renderHeader()}
             {this.renderOpen()}
             {this.renderRecentWorkspaces()}
+            {this.renderHelp()}
             {this.renderSettings()}
             {this.renderLinks()}
-            {this.renderHelp()}
         </div >;
     }
 
@@ -88,6 +88,8 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
             {openFile}
             {openFolder}
             {openWorkspace}
+            <br />
+            <br />
         </div>;
     }
 
