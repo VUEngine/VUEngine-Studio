@@ -20,6 +20,28 @@ Excluded are the following third party binaries that are shipped with VUEngine S
 - RetroArch Web w/ Beetle VB core by the RetroArch and Mednafen teams
 
 
+## Prerequisites
+
+Download node.js 12.14.1 and install. You can download it from https://nodejs.org/en/download/releases/ or alternatively use nvm (Node Version Manager). On Windows, you'll need to grab nvm-windows from https://github.com/coreybutler/nvm-windows instead.
+
+Make sure you're using node 12.14.1.
+
+    nvm install 12.14.1
+    nvm use 12.14.1
+
+Install yarn.
+
+    npm i -g yarn
+
+On Linux systems, you'll need the following packages:
+
+    sudo apt-get install -y g++ gcc make python2.7 pkg-config libx11-dev libxkbfile-dev libsecret-1-dev
+
+On Windows, install Visual Studio Build Tools.
+
+Install Python.
+
+
 ## Init
 
 After cloning, load git submodules with
@@ -36,13 +58,6 @@ They can be updated at a later point with
 ### Documentation
 
 Documentation on how to package Theia as a Desktop Product may be found [here](https://theia-ide.org/docs/blueprint_documentation/)
-
-
-### Prerequisites
-
-Make sure you're using node 12.14.1.
-
-    nvm use 12.14.1
 
 
 ### Build
