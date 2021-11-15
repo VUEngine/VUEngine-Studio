@@ -107,19 +107,21 @@ export class VesPluginsService {
     ];
   }
 
+  // note: tests with caching plugin data in a single did not increase performance much
   async setPluginsData(): Promise<void> {
+    const startTime = performance.now();
     const enginePluginsPath = await this.vesPluginsPathsService.getEnginePluginsPath();
     const userPluginsPath = await this.vesPluginsPathsService.getUserPluginsPath();
 
-    const findPlugins = async (path: string, prefix: string) => {
+    const findPlugins = async (rootPath: string, prefix: string) => {
       const pluginsMap: any = {}; /* eslint-disable-line */
 
       // TODO: refactor to use fileservice
-      await Promise.all(glob.sync(joinPath(path, '**', 'plugin.json')).map(async file => {
+      await Promise.all(glob.sync(joinPath(rootPath, '**', 'plugin.json')).map(async file => {
         const fileSplit = file.split(`${sep}plugin.json`);
         const pluginPathFull = fileSplit[0];
 
-        const pluginPathRelative = relativePath(path, pluginPathFull);
+        const pluginPathRelative = relativePath(rootPath, pluginPathFull);
         const fileContent = await this.fileService.readFile(new URI(file));
         const fileContentJson = JSON.parse(fileContent.value.toString());
 
@@ -144,6 +146,9 @@ export class VesPluginsService {
       ...await findPlugins(enginePluginsPath, 'vuengine'),
       ...await findPlugins(userPluginsPath, 'user'),
     };
+
+    const duration = performance.now() - startTime;
+    console.log(`Getting VUEngine plugins data took: ${Math.round(duration)} ms.`);
 
     this.pluginsData = pluginsMap;
   }
