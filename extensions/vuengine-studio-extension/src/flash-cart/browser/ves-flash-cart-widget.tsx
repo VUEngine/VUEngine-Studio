@@ -11,6 +11,7 @@ import { VesFlashCartPreferenceIds, VesFlashCartPreferenceSchema } from './ves-f
 import { IMAGE_HYPERFLASH32_LABEL } from './images/hyperflash32-label';
 import { NO_FLASH_CARTS } from './images/no-flash-carts';
 import { VesBuildService } from '../../build/browser/ves-build-service';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
 
 @injectable()
 export class VesFlashCartWidget extends ReactWidget {
@@ -20,6 +21,8 @@ export class VesFlashCartWidget extends ReactWidget {
   private readonly vesBuildService: VesBuildService;
   @inject(VesFlashCartService)
   private readonly vesFlashCartService: VesFlashCartService;
+  @inject(WorkspaceService)
+  private readonly workspaceService: WorkspaceService;
 
   static readonly ID = 'vesFlashCartWidget';
   static readonly LABEL = 'Connected Flash Carts';
@@ -107,7 +110,7 @@ export class VesFlashCartWidget extends ReactWidget {
                 onClick={() =>
                   this.commandService.executeCommand(VesFlashCartCommands.FLASH.id)
                 }
-                disabled={!this.vesFlashCartService.atLeastOneCanHoldRom}
+                disabled={!this.workspaceService.opened || !this.vesFlashCartService.atLeastOneCanHoldRom}
               >
                 Flash
               </button>

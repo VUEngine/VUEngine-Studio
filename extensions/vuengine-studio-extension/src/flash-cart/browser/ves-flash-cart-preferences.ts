@@ -1,6 +1,12 @@
 import { isOSX } from '@theia/core';
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
-import { FLASHBOY_PLUS_IMAGE_PLACEHOLDER, HFCLI_PLACEHOLDER, HYPERFLASH32_IMAGE_PLACEHOLDER, PROG_VB_PLACEHOLDER, ROM_PLACEHOLDER } from './ves-flash-cart-types';
+import {
+    FLASHBOY_PLUS_IMAGE_PLACEHOLDER,
+    HFCLI_PLACEHOLDER,
+    HYPERFLASH32_IMAGE_PLACEHOLDER,
+    NAME_NO_SPACES_PLACEHOLDER,
+    PROG_VB_PLACEHOLDER, ROM_PLACEHOLDER
+} from './ves-flash-cart-types';
 
 export namespace VesFlashCartPreferenceIds {
     export const CATEGORY = 'flashCarts';
@@ -58,6 +64,8 @@ export const VesFlashCartPreferenceSchema: PreferenceSchema = {
                         type: 'string',
                         multiline: true,
                         description: 'Arguments to pass to flasher software. You can use the following placeholders: '
+                            + '%NAME%: project\'s name '
+                            + '%NAME_NO_SPACE%: project\'s name with spaces removed '
                             + '%ROM%: project\'s output ROM image path '
                             + '%PORT%: port the flash cart is connected to ',
                     },
@@ -93,8 +101,8 @@ export const VesFlashCartPreferenceSchema: PreferenceSchema = {
                     size: 32,
                     path: HFCLI_PLACEHOLDER,
                     args: isOSX
-                        ? `-p %PORT% -s ${ROM_PLACEHOLDER} -u --slow`
-                        : `-p %PORT% -s ${ROM_PLACEHOLDER} -u`,
+                        ? `-p %PORT% -x ${ROM_PLACEHOLDER} -n ${NAME_NO_SPACES_PLACEHOLDER} --slow`
+                        : `-p %PORT% -x ${ROM_PLACEHOLDER} -n ${NAME_NO_SPACES_PLACEHOLDER}`,
                     padRom: false,
                     image: HYPERFLASH32_IMAGE_PLACEHOLDER,
                 },

@@ -25,6 +25,8 @@ import {
   FlashCartConfig,
   HFCLI_PLACEHOLDER,
   HYPERFLASH32_IMAGE_PLACEHOLDER,
+  NAME_PLACEHOLDER,
+  NAME_NO_SPACES_PLACEHOLDER,
   PROG_VB_PLACEHOLDER,
   ROM_PLACEHOLDER
 } from './ves-flash-cart-types';
@@ -237,8 +239,12 @@ export class VesFlashCartService {
         ? this.getPaddedRomPath(connectedFlashCart.config.size)
         : this.getRomPath();
 
+      const projectName = await this.vesProjectsService.getProjectName();
+
       const flasherArgs = connectedFlashCart.config.args
         ? connectedFlashCart.config.args
+          .replace(NAME_PLACEHOLDER, projectName)
+          .replace(NAME_NO_SPACES_PLACEHOLDER, projectName.replace(/ /g, ''))
           .replace(ROM_PLACEHOLDER, romPath)
           .split(' ')
         : [];
@@ -252,9 +258,7 @@ export class VesFlashCartService {
 
       connectedFlashCart.status = {
         ...connectedFlashCart.status,
-        step: (connectedFlashCart.config.name === VesFlashCartPreferenceSchema.properties[VesFlashCartPreferenceIds.FLASH_CARTS].default[0].name) // FlashBoy
-          ? 'Erasing'
-          : 'Flashing',
+        step: 'Preparing',
         processId: processManagerId,
         progress: 0,
         log: [],
@@ -423,17 +427,21 @@ export class VesFlashCartService {
         - Direct-to-flash (-x option) is only supported on HF32 firmware version 2.2 and above.
         TODO: support older firmwares as well? Can the firmware be detected? */
 
-      if (data.includes('Transmitting:')) {
+      if (data.startsWith('Sending file')) {
         connectedFlashCart.status = {
           ...connectedFlashCart.status,
-          step: 'Transmitting',
-          progress: Math.floor(data.split('Transmitting: ')[1].length * 2.5),
+          step: 'Erasing',
         };
-      } else if (data.includes('Flashing:')) {
+      } else if (data.startsWith('Flash Cleared')) {
         connectedFlashCart.status = {
           ...connectedFlashCart.status,
           step: 'Flashing',
-          progress: 50 + Math.floor(data.split('Flashing: ')[1].length * 2.5),
+        };
+      } else if (data.startsWith('#')) {
+        connectedFlashCart.status = {
+          ...connectedFlashCart.status,
+          step: 'Flashing',
+          progress: connectedFlashCart.status.progress + 5,
         };
       }
     }
@@ -441,7 +449,12 @@ export class VesFlashCartService {
 
   protected async parseStreamDataProgVb(connectedFlashCart: ConnectedFlashCart, data: any): Promise<void> { /* eslint-disable-line */
     if (connectedFlashCart.config.name === VesFlashCartPreferenceSchema.properties[VesFlashCartPreferenceIds.FLASH_CARTS].default[0].name) {
-      if (data.includes('/2048')) {
+      if (data.startsWith('Erasing device')) {
+        connectedFlashCart.status = {
+          ...connectedFlashCart.status,
+          step: 'Erasing',
+        };
+      } else if (data.includes('/2048')) {
         const packetsWritten = parseInt(data.substring(data.lastIndexOf(']') + 2, data.lastIndexOf('/')));
         connectedFlashCart.status = {
           ...connectedFlashCart.status,
