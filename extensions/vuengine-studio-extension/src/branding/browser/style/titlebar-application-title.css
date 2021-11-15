@@ -8,6 +8,7 @@
 }
 
 #ves-titlebar-application-title .applicationTitle {
+  -webkit-app-region: no-drag;
   cursor: pointer;
   display: inline-block;
   padding: 0 10px;

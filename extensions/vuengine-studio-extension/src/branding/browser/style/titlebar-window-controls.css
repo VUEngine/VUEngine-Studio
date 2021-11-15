@@ -1,5 +1,4 @@
 #ves-titlebar-window-controls {
-  -webkit-app-region: no-drag;
   min-width: 140px;
   order: 4;
   text-align: right;
@@ -7,6 +6,7 @@
 }
 
 #ves-titlebar-window-controls .titlebar-window-controls-button {
+  -webkit-app-region: no-drag;
   display: inline-block;
   fill: var(--theia-titleBar-activeForeground);
   font-size: 18px;

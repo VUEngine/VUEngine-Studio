@@ -7,12 +7,13 @@
   -webkit-app-region: drag;
   user-select: none;
 }
-[id="theia:icon"] {
-  -webkit-app-region: no-drag;
+
+#theia-top-panel .theia-icon {
   min-width: 50px;
   z-index: 1;
 }
-[id="theia:menubar"] {
+
+#theia-top-panel .p-MenuBar-content {
   -webkit-app-region: no-drag;
   z-index: 1;
 }

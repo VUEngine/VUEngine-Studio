@@ -1,5 +1,4 @@
 #ves-titlebar-action-buttons {
-  -webkit-app-region: no-drag;
   margin-right: 8px;
   min-width: 170px;
   order: 3;
@@ -10,6 +9,7 @@
 }
 
 #ves-titlebar-action-buttons .theia-button {
+  -webkit-app-region: no-drag;
   background-color: var(--theia-titleBar-buttonBackground);
   font-size: 17px;
   line-height: 27px;
