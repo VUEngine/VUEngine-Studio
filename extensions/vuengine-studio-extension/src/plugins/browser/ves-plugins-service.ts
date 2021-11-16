@@ -38,8 +38,8 @@ export class VesPluginsService {
   protected installedPlugins: Array<string> = [];
 
   // events
-  protected readonly onInstalledPluginsChangedEmitter = new Emitter<void>();
-  readonly onInstalledPluginsChanged = this.onInstalledPluginsChangedEmitter.event;
+  protected readonly onDidChangeInstalledPluginsEmitter = new Emitter<void>();
+  readonly onDidChangeInstalledPlugins = this.onDidChangeInstalledPluginsEmitter.event;
 
   @postConstruct()
   protected async init(): Promise<void> {
@@ -48,7 +48,7 @@ export class VesPluginsService {
       const pluginsFileUri = this.getPluginsFileUri();
       if (fileChangesEvent.contains(pluginsFileUri)) {
         await this.determineInstalledPlugins();
-        this.onInstalledPluginsChangedEmitter.fire();
+        this.onDidChangeInstalledPluginsEmitter.fire();
       }
     });
   }
@@ -64,7 +64,7 @@ export class VesPluginsService {
   async installPlugin(id: string): Promise<void> {
     if (!this.installedPlugins.includes(id)) {
       this.installedPlugins.push(id);
-      this.onInstalledPluginsChangedEmitter.fire();
+      this.onDidChangeInstalledPluginsEmitter.fire();
       await this.writeInstalledPluginsToFile();
     }
   }
@@ -73,7 +73,7 @@ export class VesPluginsService {
     const index = this.installedPlugins.indexOf(id);
     if (index > -1) {
       this.installedPlugins.splice(index, 1);
-      this.onInstalledPluginsChangedEmitter.fire();
+      this.onDidChangeInstalledPluginsEmitter.fire();
       await this.writeInstalledPluginsToFile();
     }
   }

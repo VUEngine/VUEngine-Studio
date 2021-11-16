@@ -16,8 +16,8 @@ import URI from '@theia/core/lib/common/uri';
 @injectable()
 export class VesPluginsModel {
 
-    protected readonly onDidChangeEmitter = new Emitter<void>();
-    readonly onDidChange = this.onDidChangeEmitter.event;
+    protected readonly onDidChangeDataEmitter = new Emitter<void>();
+    readonly onDidChangeData = this.onDidChangeDataEmitter.event;
 
     @inject(FileService)
     protected readonly fileService: FileService;
@@ -58,7 +58,7 @@ export class VesPluginsModel {
                 ]);
                 this.initialized.resolve();
 
-                this.pluginsService.onInstalledPluginsChanged(() => this.updateInstalled());
+                this.pluginsService.onDidChangeInstalledPlugins(() => this.updateInstalled());
             };
         });
     }
@@ -135,7 +135,7 @@ export class VesPluginsModel {
     protected doChange<T>(task: () => Promise<T>): Promise<T | undefined> {
         return this.progressService.withProgress('', 'plugins', async () => {
             const result = await task();
-            this.onDidChangeEmitter.fire(undefined);
+            this.onDidChangeDataEmitter.fire(undefined);
             return result;
         });
     }

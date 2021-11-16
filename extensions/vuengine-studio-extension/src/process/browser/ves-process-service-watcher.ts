@@ -5,16 +5,16 @@ import { VesProcessService } from '../common/ves-process-service-protocol';
 
 @injectable()
 export class VesProcessWatcher {
-    public readonly onErrorStreamDataEmitter = new Emitter<{ pId: number, data: string }>();
-    public readonly onErrorStreamData: Event<{ pId: number, data: string }> = this.onErrorStreamDataEmitter.event;
-    public readonly onOutputStreamDataEmitter = new Emitter<{ pId: number, data: string }>();
-    public readonly onOutputStreamData: Event<{ pId: number, data: string }> = this.onOutputStreamDataEmitter.event;
-    public readonly onErrorEmitter = new Emitter<{ pId: number, event: ProcessErrorEvent }>();
-    public readonly onError: Event<{ pId: number, event: ProcessErrorEvent }> = this.onErrorEmitter.event;
-    public readonly onExitEmitter = new Emitter<{ pId: number, event: IProcessExitEvent }>();
-    public readonly onExit: Event<{ pId: number, event: IProcessExitEvent }> = this.onExitEmitter.event;
-    public readonly onCloseEmitter = new Emitter<{ pId: number, event: IProcessExitEvent }>();
-    public readonly onClose: Event<{ pId: number, event: IProcessExitEvent }> = this.onCloseEmitter.event;
+    public readonly onDidReceiveErrorStreamDataEmitter = new Emitter<{ pId: number, data: string }>();
+    public readonly onDidReceiveErrorStreamData: Event<{ pId: number, data: string }> = this.onDidReceiveErrorStreamDataEmitter.event;
+    public readonly onDidReceiveOutputStreamDataEmitter = new Emitter<{ pId: number, data: string }>();
+    public readonly onDidReceiveOutputStreamData: Event<{ pId: number, data: string }> = this.onDidReceiveOutputStreamDataEmitter.event;
+    public readonly onDidReceiveErrorEmitter = new Emitter<{ pId: number, event: ProcessErrorEvent }>();
+    public readonly onDidReceiveError: Event<{ pId: number, event: ProcessErrorEvent }> = this.onDidReceiveErrorEmitter.event;
+    public readonly onDidExitProcessEmitter = new Emitter<{ pId: number, event: IProcessExitEvent }>();
+    public readonly onDidExitProcess: Event<{ pId: number, event: IProcessExitEvent }> = this.onDidExitProcessEmitter.event;
+    public readonly onDidCloseProcessEmitter = new Emitter<{ pId: number, event: IProcessExitEvent }>();
+    public readonly onDidCloseProcess: Event<{ pId: number, event: IProcessExitEvent }> = this.onDidCloseProcessEmitter.event;
 
     @inject(VesProcessService) protected readonly server: VesProcessService;
 
@@ -22,11 +22,11 @@ export class VesProcessWatcher {
     protected async init(): Promise<void> {
         // TODO: do we have to manually dispose event handlers when the respective processes are killed?
         this.server.setClient({
-            onErrorStreamData: (pId: number, data: string) => this.onErrorStreamDataEmitter.fire({ pId, data }),
-            onOutputStreamData: (pId: number, data: string) => this.onOutputStreamDataEmitter.fire({ pId, data }),
-            onError: (pId: number, event: ProcessErrorEvent) => this.onErrorEmitter.fire({ pId, event }),
-            onExit: (pId: number, event: IProcessExitEvent) => this.onExitEmitter.fire({ pId, event }),
-            onClose: (pId: number, event: IProcessExitEvent) => this.onCloseEmitter.fire({ pId, event }),
+            onDidReceiveErrorStreamData: (pId: number, data: string) => this.onDidReceiveErrorStreamDataEmitter.fire({ pId, data }),
+            onDidReceiveOutputStreamData: (pId: number, data: string) => this.onDidReceiveOutputStreamDataEmitter.fire({ pId, data }),
+            onDidReceiveError: (pId: number, event: ProcessErrorEvent) => this.onDidReceiveErrorEmitter.fire({ pId, event }),
+            onDidExitProcess: (pId: number, event: IProcessExitEvent) => this.onDidExitProcessEmitter.fire({ pId, event }),
+            onDidCloseProcess: (pId: number, event: IProcessExitEvent) => this.onDidCloseProcessEmitter.fire({ pId, event }),
         });
     }
 }

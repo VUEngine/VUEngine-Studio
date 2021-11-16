@@ -125,12 +125,12 @@ export class VesFlashCartService {
     return this._flashingProgress;
   }
 
-  protected readonly onDidFlashingStartEmitter = new Emitter<void>();
-  readonly onDidFlashingStart = this.onDidFlashingStartEmitter.event;
-  protected readonly onDidFlashingFailEmitter = new Emitter<void>();
-  readonly onDidFlashingFail = this.onDidFlashingFailEmitter.event;
-  protected readonly onDidFlashingSucceedEmitter = new Emitter<void>();
-  readonly onDidFlashingSucceed = this.onDidFlashingSucceedEmitter.event;
+  protected readonly onDidStartFlashingEmitter = new Emitter<void>();
+  readonly onDidStartFlashing = this.onDidStartFlashingEmitter.event;
+  protected readonly onDidFailFlashingEmitter = new Emitter<void>();
+  readonly onDidFailFlashing = this.onDidFailFlashingEmitter.event;
+  protected readonly onDidSucceedFlashingEmitter = new Emitter<void>();
+  readonly onDidSucceedFlashing = this.onDidSucceedFlashingEmitter.event;
 
   @postConstruct()
   protected async init(): Promise<void> {
@@ -154,10 +154,10 @@ export class VesFlashCartService {
     );
 
     // watch for flash cart attach/detach
-    this.vesFlashCartUsbWatcher.onAttach(async () =>
+    this.vesFlashCartUsbWatcher.onDidAttachDevice(async () =>
       this.detectConnectedFlashCarts()
     );
-    this.vesFlashCartUsbWatcher.onDetach(async () =>
+    this.vesFlashCartUsbWatcher.onDidDetachDevice(async () =>
       this.detectConnectedFlashCarts()
     );
 
@@ -269,7 +269,7 @@ export class VesFlashCartService {
     }
 
     this.isFlashing = true;
-    this.onDidFlashingStartEmitter.fire();
+    this.onDidStartFlashingEmitter.fire();
     // this.commandService.executeCommand(VesFlashCartCommands.OPEN_WIDGET.id, true);
   }
 
@@ -283,7 +283,7 @@ export class VesFlashCartService {
     this.connectedFlashCarts = this.connectedFlashCarts;
 
     this.isFlashing = false;
-    this.onDidFlashingFailEmitter.fire();
+    this.onDidFailFlashingEmitter.fire();
     this.flashingProgress = -1;
   }
 
@@ -307,13 +307,13 @@ export class VesFlashCartService {
   }
 
   protected bindEvents(): void {
-    this.vesBuildService.onDidBuildSucceed(async () => {
+    this.vesBuildService.onDidSucceedBuild(async () => {
       if (await this.vesBuildService.outputRomExists() && this.isQueued) {
         this.isQueued = false;
         this.doFlash();
       }
     });
-    this.vesBuildService.onDidBuildFail(() => {
+    this.vesBuildService.onDidFailBuild(() => {
       this.isQueued = false;
     });
 
@@ -321,7 +321,7 @@ export class VesFlashCartService {
       this.determineAllCanHoldRom();
     });
 
-    this.vesProcessWatcher.onExit(({ pId, event }) => {
+    this.vesProcessWatcher.onDidExitProcess(({ pId, event }) => {
       const successful = (event.code === 0);
       this.flashingProgress = -1;
       // console.log('exit', pId);
@@ -341,18 +341,18 @@ export class VesFlashCartService {
 
           if (finished === this.connectedFlashCarts.length) {
             this.isFlashing = false;
-            this.onDidFlashingSucceedEmitter.fire();
+            this.onDidSucceedFlashingEmitter.fire();
           }
         }
       }
     });
 
-    this.vesProcessWatcher.onOutputStreamData(({ pId, data }) => {
+    this.vesProcessWatcher.onDidReceiveOutputStreamData(({ pId, data }) => {
       // console.log('data', pId, data);
       this.processStreamData(pId, data);
     });
 
-    this.vesProcessWatcher.onErrorStreamData(({ pId, data }) => {
+    this.vesProcessWatcher.onDidReceiveErrorStreamData(({ pId, data }) => {
       // console.log('error data', pId, data);
       this.processStreamData(pId, data);
     });

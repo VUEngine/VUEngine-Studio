@@ -124,12 +124,12 @@ export class VesBuildService {
   }
 
   // events
-  protected readonly onDidBuildStartEmitter = new Emitter<void>();
-  readonly onDidBuildStart = this.onDidBuildStartEmitter.event;
-  protected readonly onDidBuildFailEmitter = new Emitter<void>();
-  readonly onDidBuildFail = this.onDidBuildFailEmitter.event;
-  protected readonly onDidBuildSucceedEmitter = new Emitter<void>();
-  readonly onDidBuildSucceed = this.onDidBuildSucceedEmitter.event;
+  protected readonly onDidStartBuildEmitter = new Emitter<void>();
+  readonly onDidStartBuild = this.onDidStartBuildEmitter.event;
+  protected readonly onDidFailBuildEmitter = new Emitter<void>();
+  readonly onDidFailBuild = this.onDidFailBuildEmitter.event;
+  protected readonly onDidSucceedBuildEmitter = new Emitter<void>();
+  readonly onDidSucceedBuild = this.onDidSucceedBuildEmitter.event;
 
   async resetBuildStatus(step?: string): Promise<void> {
     const newBuildStatus = {
@@ -145,7 +145,7 @@ export class VesBuildService {
     this.buildStatus = newBuildStatus;
 
     if (step !== BuildResult.done) {
-      this.onDidBuildFailEmitter.fire();
+      this.onDidFailBuildEmitter.fire();
     } else {
       // Wait for up to two seconds for output ROM to have been copied by makefile
       // (The copy command has finished, but the kernel might still be writing out the buffered data.)
@@ -153,7 +153,7 @@ export class VesBuildService {
       const romExistsCheckInterval = setInterval(async () => {
         if (await this.outputRomExists() || ++tries === 5) {
           clearInterval(romExistsCheckInterval);
-          this.onDidBuildSucceedEmitter.fire();
+          this.onDidSucceedBuildEmitter.fire();
         }
       }, 400);
     }
@@ -265,7 +265,7 @@ export class VesBuildService {
 
   protected bindEvents(): void {
     // @ts-ignore
-    this.vesProcessWatcher.onError(async ({ pId }) => {
+    this.vesProcessWatcher.onDidReceiveError(async ({ pId }) => {
       if (this.buildStatus.processManagerId === pId) {
         await this.resetBuildStatus(BuildResult.failed);
         this.commandService.executeCommand(VesBuildCommands.TOGGLE_WIDGET.id, true);
@@ -273,7 +273,7 @@ export class VesBuildService {
     });
 
     // @ts-ignore
-    this.vesProcessWatcher.onExit(async ({ pId, event }) => {
+    this.vesProcessWatcher.onDidExitProcess(async ({ pId, event }) => {
       if (this.buildStatus.processManagerId === pId) {
         await this.resetBuildStatus(event.code === 0
           ? BuildResult.done
@@ -292,14 +292,14 @@ export class VesBuildService {
       }
     };
 
-    this.vesProcessWatcher.onOutputStreamData(onData);
-    this.vesProcessWatcher.onErrorStreamData(onData);
+    this.vesProcessWatcher.onDidReceiveOutputStreamData(onData);
+    this.vesProcessWatcher.onDidReceiveErrorStreamData(onData);
 
-    this.onDidBuildSucceed(async () => {
-        /* await */ this.determineRomSize();
+    this.onDidSucceedBuild(async () => {
+      await this.determineRomSize();
     });
 
-    this.onDidBuildFail(async () => {
+    this.onDidFailBuild(async () => {
       this.romSize = 0;
     });
   }
@@ -320,7 +320,7 @@ export class VesBuildService {
       await this.fixPermissions();
       ({ processManagerId, processId } = await this.vesProcessService.launchProcess(VesProcessType.Raw, buildParams));
       active = true;
-      this.onDidBuildStartEmitter.fire();
+      this.onDidStartBuildEmitter.fire();
 
     } catch (e) {
       let error = 'An error occured';

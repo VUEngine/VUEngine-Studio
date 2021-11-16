@@ -27,17 +27,17 @@ export class VesUpdaterClientImpl implements VesUpdaterClient {
     @inject(PreferenceService)
     private readonly preferenceService: PreferenceService;
 
-    protected readonly onReadyToInstallEmitter = new Emitter<void>();
-    readonly onReadyToInstall = this.onReadyToInstallEmitter.event;
+    protected readonly onDidChangeReadyToInstallEmitter = new Emitter<void>();
+    readonly onDidChangeReadyToInstall = this.onDidChangeReadyToInstallEmitter.event;
 
-    protected readonly onUpdateAvailableEmitter = new Emitter<boolean>();
-    readonly onUpdateAvailable = this.onUpdateAvailableEmitter.event;
+    protected readonly onDidFindUpdateEmitter = new Emitter<boolean>();
+    readonly onDidFindUpdate = this.onDidFindUpdateEmitter.event;
 
-    protected readonly onErrorEmitter = new Emitter<string>();
-    readonly onError = this.onErrorEmitter.event;
+    protected readonly onDidEncounterErrorEmitter = new Emitter<string>();
+    readonly onDidEncounterError = this.onDidEncounterErrorEmitter.event;
 
     notifyReadyToInstall(): void {
-        this.onReadyToInstallEmitter.fire();
+        this.onDidChangeReadyToInstallEmitter.fire();
     }
 
     updateAvailable(available: boolean, startupCheck: boolean): void {
@@ -49,18 +49,18 @@ export class VesUpdaterClientImpl implements VesUpdaterClient {
                     setTimeout(() => {
                         const reportOnStart: boolean = this.preferenceService.get(VesUpdaterPreferenceIds.REPORT_ON_START, true);
                         if (reportOnStart) {
-                            this.onUpdateAvailableEmitter.fire(available);
+                            this.onDidFindUpdateEmitter.fire(available);
                         }
                     }, 10000);
                 });
         } else {
-            this.onUpdateAvailableEmitter.fire(available);
+            this.onDidFindUpdateEmitter.fire(available);
         }
 
     }
 
     reportError(error: string): void {
-        this.onErrorEmitter.fire(error);
+        this.onDidEncounterErrorEmitter.fire(error);
     }
 }
 
@@ -105,7 +105,7 @@ export class VesUpdaterFrontendContribution implements CommandContribution, Menu
 
     @postConstruct()
     protected init(): void {
-        this.updaterClient.onUpdateAvailable(available => {
+        this.updaterClient.onDidFindUpdate(available => {
             if (available) {
                 this.handleDownloadUpdate();
             } else {
@@ -113,13 +113,13 @@ export class VesUpdaterFrontendContribution implements CommandContribution, Menu
             }
         });
 
-        this.updaterClient.onReadyToInstall(async () => {
+        this.updaterClient.onDidChangeReadyToInstall(async () => {
             this.readyToUpdate = true;
             this.menuUpdater.update();
             this.handleUpdatesAvailable();
         });
 
-        this.updaterClient.onError(error => this.handleError(error));
+        this.updaterClient.onDidEncounterError(error => this.handleError(error));
     }
 
     registerCommands(registry: CommandRegistry): void {

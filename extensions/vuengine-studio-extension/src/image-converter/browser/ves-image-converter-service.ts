@@ -192,7 +192,7 @@ export class VesImageConverterService {
     });
 
     // wait for converting process to finish, then post process
-    const exitListener = this.vesProcessWatcher.onExit(async ({ pId, event }) => {
+    const exitListener = this.vesProcessWatcher.onDidExitProcess(async ({ pId, event }) => {
       if (pId === processInfo.processManagerId) {
         if (imageConfigFileToBeConverted.config.converter.stackFrames) {
           await this.stackFrames(imageConfigFileToBeConverted);

@@ -43,23 +43,23 @@ export class VesProcessServiceImpl implements VesProcessService {
     const processManagerId = this.processManager.register(newProcess);
 
     newProcess.onClose((event: IProcessExitEvent) => {
-      this.client?.onClose(processManagerId, event);
+      this.client?.onDidCloseProcess(processManagerId, event);
     });
 
     newProcess.onError((event: ProcessErrorEvent) => {
-      this.client?.onError(processManagerId, event);
+      this.client?.onDidReceiveError(processManagerId, event);
     });
 
     newProcess.onExit((event: IProcessExitEvent) => {
-      this.client?.onExit(processManagerId, event);
+      this.client?.onDidExitProcess(processManagerId, event);
     });
 
     newProcess.outputStream.on('data', (chunk: any) => { /* eslint-disable-line */
-      this.client?.onOutputStreamData(processManagerId, chunk.toString());
+      this.client?.onDidReceiveOutputStreamData(processManagerId, chunk.toString());
     });
 
     newProcess.errorStream.on('data', (chunk: any) => { /* eslint-disable-line */
-      this.client?.onErrorStreamData(processManagerId, chunk.toString());
+      this.client?.onDidReceiveErrorStreamData(processManagerId, chunk.toString());
     });
 
     const process = this.processManager.get(processManagerId);

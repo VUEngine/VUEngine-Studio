@@ -1,5 +1,5 @@
 import { injectable, inject, postConstruct } from '@theia/core/shared/inversify';
-import { Emitter, Event } from '@theia/core/lib/common/event';
+import { Emitter } from '@theia/core/lib/common/event';
 import { TabBarDecorator } from '@theia/core/lib/browser/shell/tab-bar-decorator';
 import { Title, Widget } from '@theia/core/lib/browser';
 import { WidgetDecoration } from '@theia/core/lib/browser/widget-decoration';
@@ -13,13 +13,15 @@ export class VesFlashCartTabBarDecorator implements TabBarDecorator {
     protected readonly flashCartService: VesFlashCartService;
 
     readonly id = 'ves-flash-cart-tabbar-decorator';
-    protected readonly emitter = new Emitter<void>();
     protected toDispose = new DisposableCollection();
+
+    protected readonly onDidChangeDecorationsEmitter = new Emitter<void>();
+    readonly onDidChangeDecorations = this.onDidChangeDecorationsEmitter.event;
 
     @postConstruct()
     protected init(): void {
         this.toDispose.pushAll([
-            this.flashCartService.onDidChangeConnectedFlashCarts(() => this.fireDidChangeDecorations()),
+            this.flashCartService.onDidChangeConnectedFlashCarts(() => this.onDidChangeDecorationsEmitter.fire()),
         ]);
     }
 
@@ -30,13 +32,5 @@ export class VesFlashCartTabBarDecorator implements TabBarDecorator {
             this.flashCartService.connectedFlashCarts.length)
             ? [{ badge: this.flashCartService.connectedFlashCarts.length }]
             : [];
-    }
-
-    get onDidChangeDecorations(): Event<void> {
-        return this.emitter.event;
-    }
-
-    protected fireDidChangeDecorations(): void {
-        this.emitter.fire(undefined);
     }
 }

@@ -22,7 +22,7 @@ export class VesPluginsSource extends TreeSource {
     @postConstruct()
     protected async init(): Promise<void> {
         this.fireDidChange();
-        this.toDispose.push(this.model.onDidChange(() => this.fireDidChange()));
+        this.toDispose.push(this.model.onDidChangeData(() => this.fireDidChange()));
     }
 
     *getElements(): IterableIterator<TreeElement> {

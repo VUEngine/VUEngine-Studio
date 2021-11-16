@@ -18,8 +18,8 @@ export class VesFlashCartUsbServiceImpl implements VesFlashCartUsbService {
     @postConstruct()
     protected init(): void {
         const self = this;
-        on('attach', async () => self.client?.onAttach());
-        on('detach', async () => self.client?.onDetach());
+        on('attach', async () => self.client?.onDidAttachDevice());
+        on('detach', async () => self.client?.onDidDetachDevice());
     }
 
     async detectFlashCarts(...flashCartConfigs: FlashCartConfig[]): Promise<ConnectedFlashCart[]> {

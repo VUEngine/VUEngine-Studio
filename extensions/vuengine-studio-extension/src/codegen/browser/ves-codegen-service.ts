@@ -57,7 +57,7 @@ export class VesCodeGenService {
         // TODO: disable file change listener while template files are being written
         this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => this.handleFileChange(fileChangesEvent));
         // TODO: re-enable once performance issues are solved
-        /* this.vesPluginsService.onInstalledPluginsChanged(async () => this.handlePluginChange()); */
+        /* this.vesPluginsService.onDidChangeInstalledPlugins(async () => this.handlePluginChange()); */
       });
     });
   }

@@ -52,9 +52,9 @@ export class VesFlashCartWidget extends ReactWidget {
     this.vesFlashCartService.onDidChangeFlashingProgress(() => this.update());
     this.vesFlashCartService.onDidChangeAtLeastOneCanHoldRom(() => this.update());
 
-    this.vesFlashCartService.onDidFlashingStart(() => this.title.className = 'ves-decorator-progress');
-    this.vesFlashCartService.onDidFlashingSucceed(() => this.title.className = 'ves-decorator-success');
-    this.vesFlashCartService.onDidFlashingFail(() => this.title.className = 'ves-decorator-error');
+    this.vesFlashCartService.onDidStartFlashing(() => this.title.className = 'ves-decorator-progress');
+    this.vesFlashCartService.onDidSucceedFlashing(() => this.title.className = 'ves-decorator-success');
+    this.vesFlashCartService.onDidFailFlashing(() => this.title.className = 'ves-decorator-error');
   }
 
   protected setTitle(): void {

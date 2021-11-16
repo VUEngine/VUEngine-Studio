@@ -14,11 +14,11 @@ export enum VesProcessType {
 }
 
 export interface VesProcessServiceClient {
-  onErrorStreamData(pId: number, data: string): void;
-  onOutputStreamData(pId: number, data: string): void;
-  onError(pId: number, event: ProcessErrorEvent): void;
-  onExit(pId: number, event: IProcessExitEvent): void;
-  onClose(pId: number, event: IProcessExitEvent): void;
+  onDidReceiveErrorStreamData(pId: number, data: string): void;
+  onDidReceiveOutputStreamData(pId: number, data: string): void;
+  onDidReceiveError(pId: number, event: ProcessErrorEvent): void;
+  onDidExitProcess(pId: number, event: IProcessExitEvent): void;
+  onDidCloseProcess(pId: number, event: IProcessExitEvent): void;
 }
 
 export interface VesProcessService

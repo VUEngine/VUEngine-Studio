@@ -55,13 +55,13 @@ export class VesExportService {
   }
 
   bindEvents(): void {
-    this.vesBuildService.onDidBuildSucceed(async () => {
+    this.vesBuildService.onDidSucceedBuild(async () => {
       if (await this.vesBuildService.outputRomExists() && this.isQueued) {
         this.isQueued = false;
         this.exportRom();
       }
     });
-    this.vesBuildService.onDidBuildFail(() => {
+    this.vesBuildService.onDidFailBuild(() => {
       this.isQueued = false;
     });
   }

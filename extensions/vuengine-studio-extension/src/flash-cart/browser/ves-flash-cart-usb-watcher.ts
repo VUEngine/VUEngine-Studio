@@ -4,18 +4,18 @@ import { VesFlashCartUsbService } from '../common/ves-flash-cart-usb-service-pro
 
 @injectable()
 export class VesFlashCartUsbWatcher {
-    public readonly onAttachEmitter = new Emitter<void>();
-    public readonly onAttach: Event<void> = this.onAttachEmitter.event;
-    public readonly onDetachEmitter = new Emitter<void>();
-    public readonly onDetach: Event<void> = this.onDetachEmitter.event;
+    public readonly onDidAttachDeviceEmitter = new Emitter<void>();
+    public readonly onDidAttachDevice: Event<void> = this.onDidAttachDeviceEmitter.event;
+    public readonly onDidDetachDeviceEmitter = new Emitter<void>();
+    public readonly onDidDetachDevice: Event<void> = this.onDidDetachDeviceEmitter.event;
 
     @inject(VesFlashCartUsbService) protected readonly server: VesFlashCartUsbService;
 
     @postConstruct()
     protected async init(): Promise<void> {
         this.server.setClient({
-            onAttach: () => this.onAttachEmitter.fire(),
-            onDetach: () => this.onDetachEmitter.fire(),
+            onDidAttachDevice: () => this.onDidAttachDeviceEmitter.fire(),
+            onDidDetachDevice: () => this.onDidDetachDeviceEmitter.fire(),
         });
     }
 }

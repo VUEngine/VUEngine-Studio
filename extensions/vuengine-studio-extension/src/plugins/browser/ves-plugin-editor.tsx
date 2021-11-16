@@ -35,7 +35,7 @@ export class VesPluginEditor extends ReactWidget {
         this.title.iconClass = 'codicon codicon-plug';
         this.node.tabIndex = -1;
         this.update();
-        this.toDispose.push(this.model.onDidChange(() => this.update()));
+        this.toDispose.push(this.model.onDidChangeData(() => this.update()));
     }
 
     getScrollContainer(): Promise<HTMLElement> {
