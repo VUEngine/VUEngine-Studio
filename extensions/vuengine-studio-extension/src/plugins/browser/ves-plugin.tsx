@@ -387,9 +387,7 @@ export class VesPluginEditorComponent extends AbstractVesPluginComponent {
         }
     };
 
-    readonly searchTag = (tag: string) => {
-        this.props.commandService?.executeCommand(VesPluginsCommands.SEARCH_BY_TAG.id, tag);
-    };
+    readonly searchTag = async (tag: string) => this.props.commandService?.executeCommand(VesPluginsCommands.SEARCH_BY_TAG.id, tag);
 
     readonly searchAuthor = (e: React.MouseEvent) => {
         e.stopPropagation();

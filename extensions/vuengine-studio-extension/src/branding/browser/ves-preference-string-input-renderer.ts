@@ -24,8 +24,8 @@ export class VesPreferenceStringInputRenderer extends PreferenceStringInputRende
             button.classList.add('theia-button');
             button.classList.add('secondary');
             button.style.minWidth = '40px';
-            button.onclick = this.selectDirectory.bind(this);
-            button.onblur = this.handleBlur.bind(this);
+            button.onclick = this.selectDirectory;
+            button.onblur = this.handleBlur;
             const buttonIcon = document.createElement('i');
             buttonIcon.style.fontSize = '16px';
             button.classList.add('fa');
@@ -40,7 +40,7 @@ export class VesPreferenceStringInputRenderer extends PreferenceStringInputRende
         }
     }
 
-    protected async selectDirectory(): Promise<void> {
+    protected selectDirectory = async (): Promise<void> => {
         const props: OpenFileDialogProps = {
             title: 'Select directory',
             canSelectFolders: true,
@@ -57,5 +57,9 @@ export class VesPreferenceStringInputRenderer extends PreferenceStringInputRende
                 this.setPreferenceWithDebounce(destinationFolder.resource.path.toString());
             }
         }
-    }
+    };
+
+    protected handleBlur = async (): Promise<void> => {
+        await super.handleBlur();
+    };
 }

@@ -360,14 +360,14 @@ export class VesEmulatorWidget extends ReactWidget {
     this.update();
   }
 
-  public sendKeypress(keyCode: EmulatorGamePadKeyCode | EmulatorFunctionKeyCode, e?: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+  public sendKeypress = (keyCode: EmulatorGamePadKeyCode | EmulatorFunctionKeyCode, e?: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
     if (this.state.loaded && (!this.state.showControls || keyCode === EmulatorFunctionKeyCode.ToggleControlsOverlay)) {
       this.sendCommand('keyPress', keyCode);
     }
     if (e) {
       e.currentTarget.blur();
     }
-  }
+  };
 
   protected render(): React.ReactNode {
     const canvasDimensions = this.getCanvasDimensions();
@@ -685,7 +685,7 @@ export class VesEmulatorWidget extends ReactWidget {
     this.fileService.writeFile(fileUri, BinaryBuffer.wrap(ia));
   }
 
-  protected async setEmulationMode(e: React.ChangeEvent<HTMLSelectElement>): Promise<void> {
+  protected setEmulationMode = async (e: React.ChangeEvent<HTMLSelectElement>): Promise<void> => {
     e.target.blur();
     await this.preferenceService.set(
       VesEmulatorPreferenceIds.EMULATOR_EMULATION_MODE,
@@ -693,9 +693,9 @@ export class VesEmulatorWidget extends ReactWidget {
       PreferenceScope.User
     );
     await this.reload();
-  }
+  };
 
-  protected async setStereoMode(e: React.ChangeEvent<HTMLSelectElement>): Promise<void> {
+  protected setStereoMode = async (e: React.ChangeEvent<HTMLSelectElement>): Promise<void> => {
     e.target.blur();
     await this.preferenceService.set(
       VesEmulatorPreferenceIds.EMULATOR_STEREO_MODE,
@@ -703,9 +703,9 @@ export class VesEmulatorWidget extends ReactWidget {
       PreferenceScope.User
     );
     await this.reload();
-  }
+  };
 
-  protected async setScale(e: React.ChangeEvent<HTMLSelectElement>): Promise<void> {
+  protected setScale = async (e: React.ChangeEvent<HTMLSelectElement>): Promise<void> => {
     e.target.blur();
     await this.preferenceService.set(
       VesEmulatorPreferenceIds.EMULATOR_SCALE,
@@ -713,7 +713,7 @@ export class VesEmulatorWidget extends ReactWidget {
       PreferenceScope.User
     );
     this.update();
-  }
+  };
 
   protected sendCoreOptions(): void {
     const emulationMode = this.preferenceService.get(
@@ -940,7 +940,7 @@ export class VesEmulatorWidget extends ReactWidget {
     return keybindingAccelerator;
   }
 
-  protected cleanStorage(): void {
+  protected cleanStorage = () => {
     localStorage.clear();
     const req = indexedDB.deleteDatabase('RetroArch');
     req.onsuccess = () => {
@@ -952,5 +952,5 @@ export class VesEmulatorWidget extends ReactWidget {
     req.onblocked = () => {
       console.log('Couldn\'t delete database due to the operation being blocked');
     };
-  }
+  };
 }

@@ -31,9 +31,7 @@ export class VesTitlebarWindowControlsWidget extends ReactWidget {
         <div
           className='titlebar-window-controls-button minimize'
           id='ves-titlebar-window-controls-minimize'
-          onClick={() =>
-            this.commandService.executeCommand(VesTitlebarWindowControlCommands.MINIMIZE.id)
-          }
+          onClick={this.minimizeWindow}
         >
           {/* ‒ */}
           <svg width='11' height='11' viewBox='0 0 11 1'>
@@ -44,9 +42,7 @@ export class VesTitlebarWindowControlsWidget extends ReactWidget {
           <div
             className='titlebar-window-controls-button maximize'
             id='ves-titlebar-window-controls-maximize'
-            onClick={() =>
-              this.commandService.executeCommand(VesTitlebarWindowControlCommands.MAXIMIZE.id)
-            }
+            onClick={this.maximizeWindow}
           >
             {/* ◻ */}
             <svg width='10' height='10' viewBox='0 0 10 10'>
@@ -58,9 +54,7 @@ export class VesTitlebarWindowControlsWidget extends ReactWidget {
           <div
             className='titlebar-window-controls-button restore'
             id='ves-titlebar-window-controls-restore'
-            onClick={() =>
-              this.commandService.executeCommand(VesTitlebarWindowControlCommands.UNMAXIMIZE.id)
-            }
+            onClick={this.unmaximizeWindow}
           >
             {/* ❐ */}
             <svg width='11' height='11' viewBox='0 0 11 11'>
@@ -74,9 +68,7 @@ export class VesTitlebarWindowControlsWidget extends ReactWidget {
         <div
           className='titlebar-window-controls-button close'
           id='ves-titlebar-window-controls-close'
-          onClick={() =>
-            this.commandService.executeCommand(ElectronCommands.CLOSE_WINDOW.id)
-          }
+          onClick={this.closeWindow}
         >
           {/* ⨉ */}
           <svg width='12' height='12' viewBox='0 0 12 12'>
@@ -94,4 +86,9 @@ export class VesTitlebarWindowControlsWidget extends ReactWidget {
   protected isMaximized(): boolean {
     return remote.getCurrentWindow().isMaximized();
   }
+
+  protected maximizeWindow = async () => this.commandService.executeCommand(VesTitlebarWindowControlCommands.MAXIMIZE.id);
+  protected minimizeWindow = async () => this.commandService.executeCommand(VesTitlebarWindowControlCommands.MINIMIZE.id);
+  protected unmaximizeWindow = async () => this.commandService.executeCommand(VesTitlebarWindowControlCommands.UNMAXIMIZE.id);
+  protected closeWindow = async () => this.commandService.executeCommand(ElectronCommands.CLOSE_WINDOW.id);
 }

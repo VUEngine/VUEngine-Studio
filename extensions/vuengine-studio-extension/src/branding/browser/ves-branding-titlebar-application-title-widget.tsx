@@ -53,7 +53,7 @@ export class VesTitlebarApplicationTitleWidget extends ReactWidget {
     this.setTitle();
 
     return <div onDoubleClick={this.handleDoubleClick}>
-      <div className="applicationTitle" onClick={() => this.commandService.executeCommand(WorkspaceCommands.OPEN_RECENT_WORKSPACE.id)}>
+      <div className="applicationTitle" onClick={this.openRecentWorkspace}>
         {this.applicationTitle}
       </div >
     </div>;
@@ -70,4 +70,6 @@ export class VesTitlebarApplicationTitleWidget extends ReactWidget {
     if (win.isMaximized()) { return win.unmaximize(); };
     return win.maximize();
   }
+
+  protected openRecentWorkspace = async () => this.commandService.executeCommand(WorkspaceCommands.OPEN_RECENT_WORKSPACE.id);
 }

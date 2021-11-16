@@ -90,9 +90,7 @@ export class VesImageConverterWidget extends ReactWidget {
                 <button
                   className="theia-button large convert"
                   disabled={!this.workspaceService.opened}
-                  onClick={() => {
-                    this.commandService.executeCommand(VesImageConverterCommands.CONVERT_ALL.id);
-                  }}
+                  onClick={this.convertAll}
                 >
                   Convert
                 </button>
@@ -104,7 +102,7 @@ export class VesImageConverterWidget extends ReactWidget {
               <div className="convertButtons">
                 <button
                   className="theia-button secondary"
-                  onClick={async () => this.vesImageConverterService.abortConverting()}
+                  onClick={this.abort}
                 >
                   Abort
                 </button>
@@ -122,7 +120,7 @@ export class VesImageConverterWidget extends ReactWidget {
                       line.text !== ''
                         ? <div className={`convertLogLine ${line.type}${line.uri ? ' hasFileLink' : ''}`}
                           key={`convertLogLine${index}`}
-                          onClick={(e: React.MouseEvent) => line.uri && this.openFile(e, line.uri)}
+                          onClick={e => this.openFile(e, line.uri)}
                           title={`${new Date(line.timestamp).toTimeString().substr(0, 8)} ${line.text}`}
                         >
                           <span className='icon'>
@@ -153,7 +151,7 @@ export class VesImageConverterWidget extends ReactWidget {
             <div className="convertLogButtons">
               <button
                 className="theia-button secondary"
-                onClick={async () => this.vesImageConverterService.clearLog()}
+                onClick={this.clearLog}
                 disabled={this.vesImageConverterService.isConverting}
               >
                 Clear Logs
@@ -180,10 +178,16 @@ export class VesImageConverterWidget extends ReactWidget {
     }
   }
 
-  protected async openFile(e: React.MouseEvent, uri: URI): Promise<void> {
+  protected async openFile(e: React.MouseEvent, uri?: URI): Promise<void> {
     e.stopPropagation();
     e.preventDefault();
 
-    await this.editorManager.open(uri, { mode: 'reveal' });
+    if (uri) {
+      await this.editorManager.open(uri, { mode: 'reveal' });
+    }
   }
+
+  protected convertAll = async () => this.commandService.executeCommand(VesImageConverterCommands.CONVERT_ALL.id);
+  protected clearLog = () => this.vesImageConverterService.clearLog();
+  // protected abort = () => this.vesImageConverterService.abortConverting();
 }

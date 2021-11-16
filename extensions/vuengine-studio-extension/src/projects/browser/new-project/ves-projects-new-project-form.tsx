@@ -227,7 +227,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                 />
                 <button
                     className="theia-button secondary"
-                    onClick={() => this.selectProjectFolder()}
+                    onClick={this.selectProjectFolder}
                     style={{ marginLeft: 0, minWidth: 40, paddingBottom: 0 }}
                     disabled={this.state.isCreating}
                     tabIndex={6}
@@ -252,7 +252,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
             </div>
             <br />
             <div className="ves-new-project-input-label">Template</div>
-            <div className="ves-new-project-templates-container" onKeyDown={this.handleTemplateKeyPress.bind(this)} tabIndex={8}>
+            <div className="ves-new-project-templates-container" onKeyDown={this.handleTemplateKeyPress} tabIndex={8}>
                 {VES_NEW_PROJECT_TEMPLATES.map((template, index) => {
                     const selected = index === this.state.template ? ' selected' : '';
                     return <div
@@ -272,7 +272,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
         </>;
     }
 
-    protected handleTemplateKeyPress(e: React.KeyboardEvent): void {
+    protected handleTemplateKeyPress = (e: React.KeyboardEvent): void => {
         if (e.key === 'ArrowLeft') {
             if (this.state.template === 0) {
                 this.updateTemplate(VES_NEW_PROJECT_TEMPLATES.length - 1);
@@ -286,7 +286,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                 this.updateTemplate(this.state.template + 1);
             }
         }
-    }
+    };
 
     protected updateName = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({
         name: e.currentTarget.value,
@@ -333,7 +333,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
             .toLowerCase();
     }
 
-    protected async selectProjectFolder(): Promise<void> {
+    protected selectProjectFolder = async (): Promise<void> => {
         const props: OpenFileDialogProps = {
             title: "Select new project's parent folder",
             canSelectFolders: true,
@@ -351,7 +351,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                 });
             }
         }
-    }
+    };
 
     protected removeTrailingSlash(string: string): string {
         return string.replace(/\/$/, '');

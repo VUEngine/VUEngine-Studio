@@ -135,10 +135,7 @@ export class VesBuildWidget extends ReactWidget {
                 <button
                   className='theia-button large build'
                   disabled={!this.workspaceService.opened}
-                  onClick={() => {
-                    this.state.logFilter = BuildLogLineType.Normal;
-                    this.commandService.executeCommand(VesBuildCommands.BUILD.id);
-                  }}
+                  onClick={this.build}
                 >
                   Build
                 </button>
@@ -152,12 +149,7 @@ export class VesBuildWidget extends ReactWidget {
                         <select
                           className='theia-select'
                           value={this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE)}
-                          onChange={e => {
-                            this.commandService.executeCommand(
-                              VesBuildCommands.SET_MODE.id,
-                              e.currentTarget.value
-                            );
-                          }}
+                          onChange={e => this.setMode(e.currentTarget.value)}
                         >
                           {Object.keys(BuildMode).map((value, index) => (
                             <option value={value}>
@@ -180,11 +172,7 @@ export class VesBuildWidget extends ReactWidget {
                             type='checkbox'
                             className='theia-input'
                             checked={this.preferenceService.get(VesBuildPreferenceIds.DUMP_ELF)}
-                            onChange={() =>
-                              this.commandService.executeCommand(
-                                VesBuildCommands.TOGGLE_DUMP_ELF.id
-                              )
-                            }
+                            onChange={this.toggleDumpElf}
                           />
                         </label>
                       </div>
@@ -202,11 +190,7 @@ export class VesBuildWidget extends ReactWidget {
                             type='checkbox'
                             className='theia-input'
                             checked={this.preferenceService.get(VesBuildPreferenceIds.PEDANTIC_WARNINGS)}
-                            onChange={() =>
-                              this.commandService.executeCommand(
-                                VesBuildCommands.TOGGLE_PEDANTIC_WARNINGS.id
-                              )
-                            }
+                            onChange={this.togglePedanticWarnings}
                           />
                         </label>
                       </div>
@@ -224,11 +208,7 @@ export class VesBuildWidget extends ReactWidget {
                             type='checkbox'
                             className='theia-input'
                             checked={this.preferenceService.get(VesBuildPreferenceIds.ENABLE_WSL)}
-                            onChange={() =>
-                              this.commandService.executeCommand(
-                                VesBuildCommands.TOGGLE_ENABLE_WSL.id
-                              )
-                            }
+                            onChange={this.toggleEnableWsl}
                           />
                         </label>
                       </div>
@@ -246,7 +226,7 @@ export class VesBuildWidget extends ReactWidget {
                           className='theia-input'
                           value={this.preferenceService.get(VesBuildPreferenceIds.ENGINE_CORE_PATH)}
                           // TODO: this should not fire on every single keypress. use timeout?
-                          onChange={e => this.preferenceService.set(VesBuildPreferenceIds.ENGINE_CORE_PATH, e.currentTarget.value, PreferenceScope.User)}
+                          onChange={e => this.setEngineCorePath(e.currentTarget.value)}
                         />
                         <button
                           className='theia-button secondary'
@@ -269,7 +249,7 @@ export class VesBuildWidget extends ReactWidget {
                           className='theia-input'
                           value={this.preferenceService.get(VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH)}
                           // TODO: this should not fire on every single keypress. use timeout?
-                          onChange={e => this.preferenceService.set(VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH, e.currentTarget.value, PreferenceScope.User)}
+                          onChange={e => this.setEnginePluginsPath(e.currentTarget.value)}
                         />
                         <button
                           className='theia-button secondary'
@@ -292,7 +272,7 @@ export class VesBuildWidget extends ReactWidget {
                           className='theia-input'
                           value={this.preferenceService.get(VesPluginsPreferenceIds.USER_PLUGINS_PATH)}
                           // TODO: this should not fire on every single keypress. use timeout?
-                          onChange={e => this.preferenceService.set(VesPluginsPreferenceIds.USER_PLUGINS_PATH, e.currentTarget.value, PreferenceScope.User)}
+                          onChange={e => this.setUserPluginsPath(e.currentTarget.value)}
                         />
                         <button
                           className='theia-button secondary'
@@ -312,7 +292,7 @@ export class VesBuildWidget extends ReactWidget {
               <div className='buildButtons'>
                 <button
                   className='theia-button secondary'
-                  onClick={async () => this.vesBuildService.abortBuild()}
+                  onClick={this.abort}
                 >
                   Abort
                 </button>
@@ -400,7 +380,7 @@ export class VesBuildWidget extends ReactWidget {
                       ? <div
                         className={`buildLogLine ${line.type}${line.file ? ' hasFileLink' : ''}`}
                         key={`buildLogLine${index}`}
-                        onClick={(e: React.MouseEvent) => line.file && this.openFile(e, line.file)}
+                        onClick={e => this.openFile(e, line.file)}
                         title={`${new Date(line.timestamp).toTimeString().substr(0, 8)} ${line.text}`}
                       >
                         <span className='icon'>
@@ -474,13 +454,13 @@ export class VesBuildWidget extends ReactWidget {
         .padStart(2, '0')}`;
   }
 
-  protected toggleFilter(type: BuildLogLineType): void {
+  protected toggleFilter = (type: BuildLogLineType): void => {
     this.state.logFilter =
       this.state.logFilter !== type ? type : BuildLogLineType.Normal;
     this.update();
-  }
+  };
 
-  protected async selectFolder(title: string, preferenceId: string): Promise<void> {
+  protected selectFolder = async (title: string, preferenceId: string): Promise<void> => {
     const props: OpenFileDialogProps = {
       title,
       canSelectFolders: true,
@@ -493,17 +473,34 @@ export class VesBuildWidget extends ReactWidget {
         this.preferenceService.set(preferenceId, destinationFolder.resource.path.toString(), PreferenceScope.User);
       }
     }
-  }
+  };
 
-  protected async openFile(e: React.MouseEvent, fileLink: BuildLogLineFileLink): Promise<void> {
+  protected openFile = async (e: React.MouseEvent, fileLink?: BuildLogLineFileLink): Promise<void> => {
     e.stopPropagation();
     e.preventDefault();
 
-    const editorWidget = await this.editorManager.open(fileLink.uri, { mode: 'reveal' });
-    editorWidget.editor.cursor = {
-      line: fileLink.line > 0 ? fileLink.line - 1 : 0,
-      character: fileLink.column > 0 ? fileLink.column - 1 : 0,
-    };
-    editorWidget.editor.revealPosition(editorWidget.editor.cursor);
-  }
+    if (fileLink) {
+      const editorWidget = await this.editorManager.open(fileLink.uri, { mode: 'reveal' });
+      editorWidget.editor.cursor = {
+        line: fileLink.line > 0 ? fileLink.line - 1 : 0,
+        character: fileLink.column > 0 ? fileLink.column - 1 : 0,
+      };
+      editorWidget.editor.revealPosition(editorWidget.editor.cursor);
+    }
+  };
+
+  protected build = () => {
+    this.state.logFilter = BuildLogLineType.Normal;
+    this.commandService.executeCommand(VesBuildCommands.BUILD.id);
+  };
+
+  protected abort = async () => this.vesBuildService.abortBuild();
+
+  protected setMode = (mode: string) => this.commandService.executeCommand(VesBuildCommands.SET_MODE.id, mode);
+  protected toggleDumpElf = () => this.commandService.executeCommand(VesBuildCommands.TOGGLE_DUMP_ELF.id);
+  protected togglePedanticWarnings = () => this.commandService.executeCommand(VesBuildCommands.TOGGLE_PEDANTIC_WARNINGS.id);
+  protected toggleEnableWsl = () => this.commandService.executeCommand(VesBuildCommands.TOGGLE_ENABLE_WSL.id);
+  protected setEngineCorePath = (path: string) => this.preferenceService.set(VesBuildPreferenceIds.ENGINE_CORE_PATH, path, PreferenceScope.User);
+  protected setEnginePluginsPath = (path: string) => this.preferenceService.set(VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH, path, PreferenceScope.User);
+  protected setUserPluginsPath = (path: string) => this.preferenceService.set(VesPluginsPreferenceIds.USER_PLUGINS_PATH, path, PreferenceScope.User);
 }

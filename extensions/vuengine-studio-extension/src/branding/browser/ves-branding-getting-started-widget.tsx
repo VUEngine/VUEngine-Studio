@@ -44,7 +44,7 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
         const requireSingleOpen = isOSX || !environment.electron.is();
 
         const newProject = (
-            <button className="theia-button large" onClick={() => this.commandRegistry.executeCommand(VesProjectsCommands.NEW.id)}>
+            <button className="theia-button large" onClick={this.createNewProject}>
                 <i className="fa fa-plus"></i> Create New Project
             </button>
         );
@@ -57,13 +57,13 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
             <i className="fa fa-folder-open"></i> Open Project
         </button>;
 
-        const openFile = !requireSingleOpen && <button
+        /* const openFile = !requireSingleOpen && <button
             className="theia-button large"
             tabIndex={0}
             onClick={this.doOpenFile}
             onKeyDown={this.doOpenFileEnter}>
             <i className="fa fa-file-o"></i> Open File
-        </button>;
+        </button>; */
 
         const openFolder = !requireSingleOpen && <button
             className="theia-button large"
@@ -81,11 +81,10 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
             <i className="fa fa-file-code-o"></i> Open Workspace
         </button>;
 
-        // TODO: New Project from GIT
         return <div className="ves-welcome-section">
             {newProject}
             {open}
-            {openFile}
+            {/* openFile */}
             {openFolder}
             {openWorkspace}
             <br />
@@ -101,7 +100,7 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
                     Help
                 </h3>
                 <div className="ves-welcome-action-container">
-                    <a href="#" onClick={() => this.commandRegistry.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id)}>
+                    <a href="#" onClick={this.openHandbook}>
                         Show documentation
                     </a>
                 </div>
@@ -139,4 +138,7 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
             </div>
         );
     }
+
+    protected createNewProject = async () => this.commandRegistry.executeCommand(VesProjectsCommands.NEW.id);
+    protected openHandbook = async () => this.commandRegistry.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id);
 }

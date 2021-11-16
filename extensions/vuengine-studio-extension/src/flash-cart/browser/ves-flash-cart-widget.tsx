@@ -84,9 +84,7 @@ export class VesFlashCartWidget extends ReactWidget {
               </div>
               <button
                 className='theia-button secondary'
-                onClick={() =>
-                  this.commandService.executeCommand(VesFlashCartCommands.FLASH.id)
-                }
+                onClick={this.flash}
               >
                 Cancel
               </button>
@@ -107,9 +105,7 @@ export class VesFlashCartWidget extends ReactWidget {
             <>
               <button
                 className='theia-button large flash'
-                onClick={() =>
-                  this.commandService.executeCommand(VesFlashCartCommands.FLASH.id)
-                }
+                onClick={this.flash}
                 disabled={!this.workspaceService.opened || !this.vesFlashCartService.atLeastOneCanHoldRom}
               >
                 Flash
@@ -119,7 +115,7 @@ export class VesFlashCartWidget extends ReactWidget {
           {this.vesFlashCartService.isFlashing && (
             <button
               className='theia-button secondary'
-              onClick={() => this.vesFlashCartService.abort()}
+              onClick={this.abort}
             >
               Abort
             </button>
@@ -249,8 +245,11 @@ export class VesFlashCartWidget extends ReactWidget {
     );
   }
 
-  protected toggleLog(index: number): void {
+  protected toggleLog = (index: number) => {
     this.state.showLog[index] = !this.state.showLog[index];
     this.update();
-  }
+  };
+
+  protected flash = () => this.commandService.executeCommand(VesFlashCartCommands.FLASH.id);
+  protected abort = () => this.vesFlashCartService.abort();
 }

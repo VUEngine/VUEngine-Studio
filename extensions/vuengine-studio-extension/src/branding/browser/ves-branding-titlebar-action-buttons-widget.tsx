@@ -78,21 +78,19 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
 
     protected render(): React.ReactNode {
         const buildMode = this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode;
-        const requireSingleOpen = isOSX || !environment.electron.is();
-        const openProjectId = requireSingleOpen ? WorkspaceCommands.OPEN.id : WorkspaceCommands.OPEN_FOLDER.id;
         return !this.workspaceService.opened ? <>
             <button
                 className='theia-button secondary new-project'
                 title={`Create New Project${this.getKeybindingLabel(VesProjectsCommands.NEW.id, true)}`}
-                onClick={() => this.commandService.executeCommand(VesProjectsCommands.NEW.id)}
+                onClick={this.createNewProject}
                 key='action-button-new-project'
             >
                 <i className='fa fa-plus'></i>
             </button>
             <button
                 className='theia-button secondary open-project'
-                title={`Open Project${this.getKeybindingLabel(openProjectId, true)}`}
-                onClick={() => this.commandService.executeCommand(openProjectId)}
+                title={`Open Project${this.getKeybindingLabel(this.getOpenProjectCommandId(), true)}`}
+                onClick={this.openProject}
                 key='action-button-open-project'
             >
                 <i className='fa fa-folder-open'></i>
@@ -100,7 +98,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
             <button
                 className='theia-button secondary open-workspace'
                 title={`Open Workspace${this.getKeybindingLabel(WorkspaceCommands.OPEN_WORKSPACE.id, true)}`}
-                onClick={() => this.commandService.executeCommand(WorkspaceCommands.OPEN_WORKSPACE.id)}
+                onClick={this.openWorkspaceFile}
                 key='action-button-open-workspace'
             >
                 <i className='fa fa-file-code-o'></i>
@@ -127,7 +125,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                     title={this.vesBuildService.buildStatus.active
                         ? 'Building... ' + this.vesBuildService.buildStatus.progress + '%'
                         : `${VesBuildCommands.BUILD.label}${this.getKeybindingLabel(VesBuildCommands.BUILD.id, true)}`}
-                    onClick={() => this.commandService.executeCommand(VesBuildCommands.BUILD.id)}
+                    onClick={this.build}
                     key='action-button-build'
                 >
                     {this.vesBuildService.isQueued
@@ -139,7 +137,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                 <button
                     className={'theia-button secondary run' + (this.vesEmulatorService.isQueued ? ' queued' : '')}
                     title={this.vesEmulatorService.isQueued ? 'Run Queued...' : `${VesEmulatorCommands.RUN.label}${this.getKeybindingLabel(VesEmulatorCommands.RUN.id, true)}`}
-                    onClick={() => this.commandService.executeCommand(VesEmulatorCommands.RUN.id)}
+                    onClick={this.run}
                     key='action-button-run'
                 >
                     {this.vesEmulatorService.isQueued
@@ -158,7 +156,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                             ? 'Flashing... ' + this.vesFlashCartService.flashingProgress + '%'
                             : `${VesFlashCartCommands.FLASH.label}${this.getKeybindingLabel(VesFlashCartCommands.FLASH.id, true)}`}
                     disabled={!this.vesFlashCartService.connectedFlashCarts}
-                    onClick={() => this.commandService.executeCommand(VesFlashCartCommands.FLASH.id)}
+                    onClick={this.flash}
                     key='action-button-flash'
                 >
                     {this.vesFlashCartService.isQueued
@@ -171,7 +169,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                     className={'theia-button secondary clean' + (this.vesBuildService.isCleaning ? ' active' : '')}
                     title={this.vesBuildService.isCleaning ? 'Cleaning...' : `${VesBuildCommands.CLEAN.label}${this.getKeybindingLabel(VesBuildCommands.CLEAN.id, true)}`}
                     disabled={this.vesBuildService.buildStatus.active || !this.vesBuildService.buildFolderExists[buildMode]}
-                    onClick={() => this.commandService.executeCommand(VesBuildCommands.CLEAN.id)}
+                    onClick={this.clean}
                     key='action-button-clean'
                 >
                     {this.vesBuildService.isCleaning
@@ -199,4 +197,16 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
 
         return keybindingAccelerator;
     }
+
+    protected getOpenProjectCommandId(): string {
+        const requireSingleOpen = isOSX || !environment.electron.is();
+        return requireSingleOpen ? WorkspaceCommands.OPEN.id : WorkspaceCommands.OPEN_FOLDER.id;
+    }
+    protected createNewProject = async () => this.commandService.executeCommand(VesProjectsCommands.NEW.id);
+    protected openProject = async () => this.commandService.executeCommand(this.getOpenProjectCommandId());
+    protected openWorkspaceFile = async () => this.commandService.executeCommand(WorkspaceCommands.OPEN_WORKSPACE.id);
+    protected build = async () => this.commandService.executeCommand(VesBuildCommands.BUILD.id);
+    protected run = async () => this.commandService.executeCommand(VesEmulatorCommands.RUN.id);
+    protected flash = async () => this.commandService.executeCommand(VesFlashCartCommands.FLASH.id);
+    protected clean = async () => this.commandService.executeCommand(VesBuildCommands.CLEAN.id);
 }
