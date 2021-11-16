@@ -7,14 +7,12 @@ import { VesImageConverterService } from './ves-image-converter-service';
 
 @injectable()
 export class VesImageConverterContribution implements CommandContribution, KeybindingContribution {
-  constructor(
-    @inject(ApplicationShell)
-    protected readonly shell: ApplicationShell,
-    @inject(VesImageConverterService)
-    private readonly vesImageConverterService: VesImageConverterService,
-    @inject(WorkspaceService)
-    private readonly workspaceService: WorkspaceService,
-  ) { }
+  @inject(ApplicationShell)
+  protected readonly shell: ApplicationShell;
+  @inject(VesImageConverterService)
+  private readonly vesImageConverterService: VesImageConverterService;
+  @inject(WorkspaceService)
+  private readonly workspaceService: WorkspaceService;
 
   registerCommands(commandRegistry: CommandRegistry): void {
     commandRegistry.registerCommand(VesImageConverterCommands.CONVERT_ALL, {

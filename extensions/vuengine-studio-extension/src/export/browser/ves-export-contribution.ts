@@ -8,14 +8,12 @@ import { VesBuildMenuSection } from '../../build/browser/ves-build-contribution'
 
 @injectable()
 export class VesExportContribution implements CommandContribution, KeybindingContribution, MenuContribution {
-  constructor(
-    @inject(ApplicationShell)
-    protected readonly shell: ApplicationShell,
-    @inject(VesExportService)
-    private readonly vesExportService: VesExportService,
-    @inject(WorkspaceService)
-    private readonly workspaceService: WorkspaceService,
-  ) { }
+  @inject(ApplicationShell)
+  protected readonly shell: ApplicationShell;
+  @inject(VesExportService)
+  private readonly vesExportService: VesExportService;
+  @inject(WorkspaceService)
+  private readonly workspaceService: WorkspaceService;
 
   registerCommands(commandRegistry: CommandRegistry): void {
     commandRegistry.registerCommand(VesExportCommands.EXPORT, {

@@ -16,9 +16,12 @@ import { VesPluginsSourceOptions } from './ves-plugins-source';
 export class VesPluginsViewContribution extends AbstractViewContribution<VesPluginsViewContainer>
     implements CommandContribution, FrontendApplicationContribution, TabBarToolbarContribution {
 
-    @inject(VesPluginsModel) protected readonly model: VesPluginsModel;
-    @inject(CommandRegistry) protected readonly commandRegistry: CommandRegistry;
-    @inject(CommandService) protected readonly commandService: CommandService;
+    @inject(VesPluginsModel)
+    protected readonly model: VesPluginsModel;
+    @inject(CommandRegistry)
+    protected readonly commandRegistry: CommandRegistry;
+    @inject(CommandService)
+    protected readonly commandService: CommandService;
 
     constructor() {
         super({

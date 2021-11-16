@@ -5,10 +5,8 @@ import { VesCodeGenService } from './ves-codegen-service';
 
 @injectable()
 export class VesCodeGenContribution implements CommandContribution {
-  constructor(
-    @inject(VesCodeGenService)
-    private readonly vesCodeGenService: VesCodeGenService,
-  ) { }
+  @inject(VesCodeGenService)
+  private readonly vesCodeGenService: VesCodeGenService;
 
   registerCommands(commandRegistry: CommandRegistry): void {
     commandRegistry.registerCommand(VesCodeGenCommands.GENERATE_ALL, {

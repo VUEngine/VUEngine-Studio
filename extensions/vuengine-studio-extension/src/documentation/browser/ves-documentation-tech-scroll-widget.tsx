@@ -12,14 +12,14 @@ export class VesDocumentationTechScrollWidget extends BaseWidget {
     protected readonly envVariablesServer: EnvVariablesServer;
     @inject(FileService)
     protected readonly fileService: FileService;
+    @inject(PreviewHandlerProvider)
+    protected readonly previewHandlerProvider: PreviewHandlerProvider;
 
     protected previewHandler: PreviewHandler | undefined;
     static readonly ID = 'ves-documentation-tech-scroll';
     static readonly LABEL = 'Hardware Documentation';
 
-    constructor(
-        @inject(PreviewHandlerProvider) protected readonly previewHandlerProvider: PreviewHandlerProvider,
-    ) {
+    constructor() {
         super();
 
         this.id = VesDocumentationTechScrollWidget.ID;

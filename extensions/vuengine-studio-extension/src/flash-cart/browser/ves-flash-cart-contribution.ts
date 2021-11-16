@@ -9,16 +9,14 @@ import { VesBuildMenuSection } from '../../build/browser/ves-build-contribution'
 
 @injectable()
 export class VesFlashCartContribution implements CommandContribution, KeybindingContribution, MenuContribution {
-  constructor(
-    @inject(ApplicationShell)
-    protected readonly shell: ApplicationShell,
-    @inject(VesFlashCartService)
-    private readonly vesFlashCartService: VesFlashCartService,
-    @inject(VesFlashCartViewContribution)
-    private readonly VesFlashCartView: VesFlashCartViewContribution,
-    @inject(WorkspaceService)
-    private readonly workspaceService: WorkspaceService,
-  ) { }
+  @inject(ApplicationShell)
+  protected readonly shell: ApplicationShell;
+  @inject(VesFlashCartService)
+  private readonly vesFlashCartService: VesFlashCartService;
+  @inject(VesFlashCartViewContribution)
+  private readonly VesFlashCartView: VesFlashCartViewContribution;
+  @inject(WorkspaceService)
+  private readonly workspaceService: WorkspaceService;
 
   registerCommands(commandRegistry: CommandRegistry): void {
     commandRegistry.registerCommand(VesFlashCartCommands.FLASH, {

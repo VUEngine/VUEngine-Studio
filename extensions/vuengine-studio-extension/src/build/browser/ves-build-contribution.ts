@@ -18,20 +18,18 @@ export namespace VesBuildMenuSection {
 
 @injectable()
 export class VesBuildContribution implements CommandContribution, KeybindingContribution, MenuContribution {
-  constructor(
-    @inject(ApplicationShell)
-    protected readonly shell: ApplicationShell,
-    @inject(PreferenceService)
-    private readonly preferenceService: PreferenceService,
-    @inject(QuickPickService)
-    protected readonly quickPickService: QuickPickService,
-    @inject(VesBuildService)
-    private readonly vesBuildService: VesBuildService,
-    @inject(VesBuildViewContribution)
-    private readonly VesBuildView: VesBuildViewContribution,
-    @inject(WorkspaceService)
-    private readonly workspaceService: WorkspaceService,
-  ) { }
+  @inject(ApplicationShell)
+  protected readonly shell: ApplicationShell;
+  @inject(PreferenceService)
+  private readonly preferenceService: PreferenceService;
+  @inject(QuickPickService)
+  protected readonly quickPickService: QuickPickService;
+  @inject(VesBuildService)
+  private readonly vesBuildService: VesBuildService;
+  @inject(VesBuildViewContribution)
+  private readonly VesBuildView: VesBuildViewContribution;
+  @inject(WorkspaceService)
+  private readonly workspaceService: WorkspaceService;
 
   registerCommands(commandRegistry: CommandRegistry): void {
     commandRegistry.registerCommand(VesBuildCommands.CLEAN, {

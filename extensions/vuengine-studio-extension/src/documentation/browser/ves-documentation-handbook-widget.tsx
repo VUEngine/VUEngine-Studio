@@ -6,15 +6,16 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 
 @injectable()
 export class VesDocumentationHandbookWidget extends BaseWidget {
-    @inject(FileService) protected readonly fileService: FileService;
+    @inject(FileService)
+    protected readonly fileService: FileService;
+    @inject(PreviewHandlerProvider)
+    protected readonly previewHandlerProvider: PreviewHandlerProvider;
 
     protected previewHandler: PreviewHandler | undefined;
     static readonly ID = 'ves-documentation-handbook';
     static readonly LABEL = 'Handbook';
 
-    constructor(
-        @inject(PreviewHandlerProvider) protected readonly previewHandlerProvider: PreviewHandlerProvider,
-    ) {
+    constructor() {
         super();
 
         this.id = VesDocumentationHandbookWidget.ID;
