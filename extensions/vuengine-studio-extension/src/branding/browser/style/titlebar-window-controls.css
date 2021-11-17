@@ -10,8 +10,8 @@
   display: inline-block;
   fill: var(--theia-titleBar-activeForeground);
   font-size: 18px;
-  height: 37px;
-  line-height: 37px;
+  height: 38px;
+  line-height: 38px;
   text-align: center;
   width: 46px;
 }
