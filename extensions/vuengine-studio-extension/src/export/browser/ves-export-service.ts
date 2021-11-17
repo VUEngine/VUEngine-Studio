@@ -1,41 +1,41 @@
-import { dirname, join as joinPath } from 'path';
-import { homedir } from 'os';
-import sanitize = require('sanitize-filename');
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { CommandService, environment } from '@theia/core';
 import { ApplicationShell, CommonCommands, ConfirmDialog, PreferenceService } from '@theia/core/lib/browser';
 import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import URI from '@theia/core/lib/common/uri';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
-import { CommandService, environment, isWindows } from '@theia/core';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { FileDialogService, SaveFileDialogProps } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { homedir } from 'os';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
+import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesProjectsService } from '../../projects/browser/ves-projects-service';
+import sanitize = require('sanitize-filename');
 
 @injectable()
 export class VesExportService {
-  constructor(
-    @inject(ApplicationShell)
-    protected readonly shell: ApplicationShell,
-    @inject(CommandService)
-    protected readonly commandService: CommandService,
-    @inject(FileDialogService)
-    protected readonly fileDialogService: FileDialogService,
-    @inject(FileService)
-    protected readonly fileService: FileService,
-    @inject(FrontendApplicationStateService)
-    protected readonly frontendApplicationStateService: FrontendApplicationStateService,
-    @inject(PreferenceService)
-    protected readonly preferenceService: PreferenceService,
-    @inject(VesBuildService)
-    protected readonly vesBuildService: VesBuildService,
-    @inject(VesProjectsService)
-    protected readonly vesProjectsService: VesProjectsService,
-    @inject(WorkspaceService)
-    protected readonly workspaceService: WorkspaceService,
-  ) { }
+  @inject(ApplicationShell)
+  protected readonly shell: ApplicationShell;
+  @inject(CommandService)
+  protected readonly commandService: CommandService;
+  @inject(FileDialogService)
+  protected readonly fileDialogService: FileDialogService;
+  @inject(FileService)
+  protected readonly fileService: FileService;
+  @inject(FrontendApplicationStateService)
+  protected readonly frontendApplicationStateService: FrontendApplicationStateService;
+  @inject(PreferenceService)
+  protected readonly preferenceService: PreferenceService;
+  @inject(VesBuildService)
+  protected readonly vesBuildService: VesBuildService;
+  @inject(VesBuildPathsService)
+  private readonly vesBuildPathsService: VesBuildPathsService;
+  @inject(VesProjectsService)
+  protected readonly vesProjectsService: VesProjectsService;
+  @inject(WorkspaceService)
+  protected readonly workspaceService: WorkspaceService;
 
   // is queued
   protected _isQueued: boolean = false;
@@ -80,8 +80,7 @@ export class VesExportService {
   }
 
   protected async exportRom(): Promise<void> {
-    const romPath = this.getRomPath();
-    const romUri = new URI(romPath);
+    const romUri = this.vesBuildPathsService.getRomUri();
     let exists: boolean = false;
     let overwrite: boolean = false;
     let selected: URI | undefined;
@@ -127,17 +126,5 @@ export class VesExportService {
     const projectName = await this.vesProjectsService.getProjectName();
     const romName = projectName ?? 'output';
     return `${sanitize(romName)}.vb`;
-  }
-
-  getWorkspaceRoot(): string {
-    const substrNum = isWindows ? 2 : 1;
-
-    return window.location.hash.slice(-9) === 'workspace'
-      ? dirname(window.location.hash.substring(substrNum))
-      : window.location.hash.substring(substrNum);
-  }
-
-  getRomPath(): string {
-    return joinPath(this.getWorkspaceRoot(), 'build', 'output.vb');
   }
 }

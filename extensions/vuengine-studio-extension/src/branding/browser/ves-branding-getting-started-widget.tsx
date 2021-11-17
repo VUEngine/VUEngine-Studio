@@ -54,7 +54,7 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
             tabIndex={0}
             onClick={this.doOpen}
             onKeyDown={this.doOpenEnter}>
-            <i className="fa fa-folder-open"></i> Open Project
+            <i className="fa fa-folder-open"></i> Open Folder
         </button>;
 
         /* const openFile = !requireSingleOpen && <button
@@ -70,7 +70,7 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
             tabIndex={0}
             onClick={this.doOpenFolder}
             onKeyDown={this.doOpenFolderEnter}>
-            <i className="fa fa-folder-open"></i> Open Project
+            <i className="fa fa-folder-open"></i> Open Folder
         </button>;
 
         const openWorkspace = <button

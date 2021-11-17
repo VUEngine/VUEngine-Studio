@@ -1,10 +1,11 @@
-import { join as joinPath, normalize } from 'path';
-import { inject, injectable } from '@theia/core/shared/inversify';
 import { PreferenceService } from '@theia/core/lib/browser';
-import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import URI from '@theia/core/lib/common/uri';
+import { inject, injectable } from '@theia/core/shared/inversify';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { join } from 'path';
 import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
+import { BuildMode } from './ves-build-types';
 
 @injectable()
 export class VesBuildPathsService {
@@ -15,50 +16,46 @@ export class VesBuildPathsService {
   @inject(VesCommonService)
   protected readonly vesCommonService: VesCommonService;
 
-  getBuildFolder(): string {
-    return joinPath(this.vesCommonService.getWorkspaceRoot(), 'build');
-  }
-
-  getBuildPath(buildMode?: string): string {
-    const buildFolder = this.getBuildFolder();
+  getBuildPathUri(buildMode?: BuildMode): URI {
+    const buildPathUri = this.vesCommonService.getWorkspaceRootUri().resolve('build');
 
     return buildMode
-      ? joinPath(buildFolder, buildMode.toLowerCase())
-      : buildFolder;
+      ? buildPathUri.resolve(buildMode.toLowerCase())
+      : buildPathUri;
   }
 
-  getRomPath(): string {
-    return joinPath(this.getBuildPath(), 'output.vb');
+  getRomUri(): URI {
+    return this.getBuildPathUri().resolve('output.vb');
   }
 
-  async getEngineCorePath(): Promise<string> {
-    const defaultPath = joinPath(
-      await this.vesCommonService.getResourcesPath(),
+  async getEngineCoreUri(): Promise<URI> {
+    const resourcesUri = await this.vesCommonService.getResourcesUri();
+    const defaultUri = resourcesUri.resolve(join(
       'vuengine',
       'vuengine-core'
-    );
-    const customPath = normalize(this.preferenceService.get(
+    ));
+    const customUri = new URI(this.preferenceService.get(
       VesBuildPreferenceIds.ENGINE_CORE_PATH
     ) as string);
 
-    return customPath && (customPath !== '.' && await this.fileService.exists(new URI(customPath)))
-      ? customPath
-      : defaultPath;
+    return (!customUri.isEqual(new URI('')) && await this.fileService.exists(customUri))
+      ? customUri
+      : defaultUri;
   }
 
-  async getCompilerPath(): Promise<string> {
-    return joinPath(
-      await this.vesCommonService.getResourcesPath(),
+  async getCompilerUri(): Promise<URI> {
+    const resourcesUri = await this.vesCommonService.getResourcesUri();
+    return resourcesUri.resolve(join(
       'binaries',
       'vuengine-studio-tools',
       this.vesCommonService.getOs(),
       'gcc'
-    );
+    ));
   }
 
-  async getMsysBashPath(): Promise<string> {
-    return joinPath(
-      await this.vesCommonService.getResourcesPath(),
+  async getMsysBashUri(): Promise<URI> {
+    const resourcesUri = await this.vesCommonService.getResourcesUri();
+    return resourcesUri.resolve(join(
       'binaries',
       'vuengine-studio-tools',
       this.vesCommonService.getOs(),
@@ -66,6 +63,6 @@ export class VesBuildPathsService {
       'usr',
       'bin',
       'bash.exe'
-    );
+    ));
   }
 }

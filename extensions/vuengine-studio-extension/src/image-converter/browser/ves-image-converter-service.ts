@@ -1,18 +1,17 @@
-import * as glob from 'glob';
-import { deepmerge } from 'deepmerge-ts';
-import { basename, dirname, join as joinPath, parse as parsePath } from 'path';
 import { Emitter, isWindows } from '@theia/core';
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import URI from '@theia/core/lib/common/uri';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileStatWithMetadata } from '@theia/filesystem/lib/common/files';
+import { deepmerge } from 'deepmerge-ts';
+import * as glob from 'glob';
+import { basename, dirname, join, parse as parsePath } from 'path';
 import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { MemorySection } from '../../build/browser/ves-build-types';
 import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
-import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
+import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 import {
   FileContentsMap,
   ImageConfigFileToBeConverted,
@@ -24,8 +23,6 @@ import {
 
 @injectable()
 export class VesImageConverterService {
-  @inject(EnvVariablesServer)
-  protected envVariablesServer: EnvVariablesServer;
   @inject(FileService)
   protected fileService: FileService;
   @inject(VesCodeGenService)
@@ -115,7 +112,6 @@ export class VesImageConverterService {
   }
 
   // TODO: add file watcher to detect changes of .image.json or image files and automatically convert
-
   // TODO: add queue for to be converted images.
   // this will be mainly needed for when an image file gets changed while a conversion is already running and the
   // file watcher needs to queue the conversion for that image.
@@ -155,8 +151,8 @@ export class VesImageConverterService {
     this.totalToConvert = this.getTotalImagesToBeConverted(imageConfigFilesToBeConverted);
     this.leftToConvert = this.totalToConvert;
 
-    const gritPath = await this.getGritPath();
-    await this.fixPermissions(gritPath);
+    const gritUri = await this.getGritUri();
+    await this.fixPermissions(gritUri);
 
     this.pushLog({
       timestamp: Date.now(),
@@ -165,15 +161,15 @@ export class VesImageConverterService {
     });
 
     imageConfigFilesToBeConverted.map(async imageConfigFileToBeConverted => {
-      this.doConvertFile(imageConfigFileToBeConverted, gritPath);
+      this.doConvertFile(imageConfigFileToBeConverted, gritUri);
     });
 
     return;
   }
 
-  protected async doConvertFile(imageConfigFileToBeConverted: ImageConfigFileToBeConverted, gritPath: string): Promise<void> {
+  protected async doConvertFile(imageConfigFileToBeConverted: ImageConfigFileToBeConverted, gritUri: URI): Promise<void> {
     const fileDir = dirname(imageConfigFileToBeConverted.imageConfigFile);
-    const convertedDir = joinPath(fileDir, this.getConvertedDirName());
+    const convertedDir = join(fileDir, this.getConvertedDirName());
     const convertedDirUri = new URI(convertedDir);
 
     if (!(await this.fileService.exists(convertedDirUri))) {
@@ -181,7 +177,7 @@ export class VesImageConverterService {
     }
 
     const processInfo = await this.vesProcessService.launchProcess(VesProcessType.Raw, {
-      command: gritPath,
+      command: await this.fileService.fsPath(gritUri),
       args: [
         ...imageConfigFileToBeConverted.images,
         ...imageConfigFileToBeConverted.gritArguments
@@ -229,7 +225,7 @@ export class VesImageConverterService {
   }
 
   protected getGeneratedFile(imageConfigFile: string, imagePath: string): string {
-    return joinPath(
+    return join(
       dirname(imageConfigFile),
       this.getConvertedDirName(),
       `${parsePath(imagePath).name}.c`
@@ -241,13 +237,13 @@ export class VesImageConverterService {
     const name = imageConfigFileToBeConverted.config.name
       ? imageConfigFileToBeConverted.config.name
       : parsePath(imageConfigFileToBeConverted.imageConfigFile).name;
-    const targetFileUri = new URI(joinPath(
+    const targetFileUri = new URI(join(
       dirname(imageConfigFileToBeConverted.imageConfigFile),
       this.getConvertedDirName(),
       `${name}.c`
     ));
-    const templateFileUri = new URI(joinPath(
-      await this.vesCommonService.getResourcesPath(),
+    const resourcesUri = await this.vesCommonService.getResourcesUri();
+    const templateFileUri = resourcesUri.resolve(join(
       'templates',
       'stacked.c.nj',
     ));
@@ -312,7 +308,7 @@ export class VesImageConverterService {
       const name = imageConfigFileToBeConverted.config.name
         ? imageConfigFileToBeConverted.config.name
         : parsePath(imageConfigFileToBeConverted.imageConfigFile).name;
-      tilesetFile = joinPath(
+      tilesetFile = join(
         dirname(imageConfigFileToBeConverted.imageConfigFile),
         this.getConvertedDirName(),
         `${name}.c`
@@ -412,12 +408,12 @@ export class VesImageConverterService {
   }
 
   protected async getImageConfigFilesToBeConverted(changedOnly: boolean): Promise<Array<ImageConfigFileToBeConverted>> {
-    const workspaceRoot = this.vesCommonService.getWorkspaceRoot();
+    const workspaceRootUri = this.vesCommonService.getWorkspaceRootUri();
 
     const imageConfigFilesToBeConverted: Array<ImageConfigFileToBeConverted> = [];
 
     // TODO: refactor to use fileservice instead of glob
-    const fileMatcher = joinPath(workspaceRoot, '**', '*.image.json');
+    const fileMatcher = join(await this.fileService.fsPath(workspaceRootUri), '**', '*.image.json');
     await Promise.all(glob.sync(fileMatcher).map(async imageConfigFile => {
       const config = await this.getConverterConfig(new URI(imageConfigFile));
       const name = config.name ? config.name : parsePath(imageConfigFile).name;
@@ -459,7 +455,7 @@ export class VesImageConverterService {
           }));
         }
       } else {
-        const filepath = joinPath(imageConfigFileDir, image);
+        const filepath = join(imageConfigFileDir, image);
         if (image.endsWith('.png') && await this.fileService.exists(new URI(filepath))) {
           foundImages.push(filepath);
         }
@@ -512,7 +508,7 @@ export class VesImageConverterService {
   }
 
   protected async atLeastOneImageNewerThanCollectiveConvertedFile(images: Array<string>, dir: string, name: string): Promise<boolean> {
-    const convertedFile = new URI(joinPath(dir, this.getConvertedDirName(), `${name}.c`));
+    const convertedFile = new URI(join(dir, this.getConvertedDirName(), `${name}.c`));
     if (!await this.fileService.exists(convertedFile)) {
       return true;
     }
@@ -606,26 +602,26 @@ export class VesImageConverterService {
    * Must be executed before every run to ensure permissions are right,
    * even right after reconfiguring paths.
    */
-  async fixPermissions(gritPath: string): Promise<void> {
+  async fixPermissions(gritUri: URI): Promise<void> {
     if (!isWindows) {
-      if (await this.fileService.exists(new URI(gritPath))) {
+      if (await this.fileService.exists(gritUri)) {
         await this.vesProcessService.launchProcess(VesProcessType.Raw, {
           command: 'chmod',
-          args: ['a+x', gritPath]
+          args: ['a+x', await this.fileService.fsPath(gritUri)]
         });
       }
     }
   }
 
-  protected async getGritPath(): Promise<string> {
-    return joinPath(
-      await this.vesCommonService.getResourcesPath(),
+  protected async getGritUri(): Promise<URI> {
+    const resourcesUri = await this.vesCommonService.getResourcesUri();
+    return resourcesUri.resolve(join(
       'binaries',
       'vuengine-studio-tools',
       this.vesCommonService.getOs(),
       'grit',
       isWindows ? 'grit.exe' : 'grit'
-    );
+    ));
   }
 
   protected bindEvents(): void {

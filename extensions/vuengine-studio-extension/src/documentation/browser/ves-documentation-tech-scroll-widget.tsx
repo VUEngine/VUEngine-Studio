@@ -1,19 +1,18 @@
-import { join as joinPath } from 'path';
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { BaseWidget } from '@theia/core/lib/browser';
-import { PreviewHandler, PreviewHandlerProvider } from '@theia/preview/lib/browser/preview-handler';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import URI from '@theia/core/lib/common/uri';
-import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
+import { PreviewHandler, PreviewHandlerProvider } from '@theia/preview/lib/browser/preview-handler';
+import { join } from 'path';
+import { VesCommonService } from 'src/branding/browser/ves-common-service';
 
 @injectable()
 export class VesDocumentationTechScrollWidget extends BaseWidget {
-    @inject(EnvVariablesServer)
-    protected readonly envVariablesServer: EnvVariablesServer;
     @inject(FileService)
     protected readonly fileService: FileService;
     @inject(PreviewHandlerProvider)
     protected readonly previewHandlerProvider: PreviewHandlerProvider;
+    @inject(VesCommonService)
+    protected readonly vesCommonService: VesCommonService;
 
     protected previewHandler: PreviewHandler | undefined;
     static readonly ID = 'ves-documentation-tech-scroll';
@@ -32,10 +31,8 @@ export class VesDocumentationTechScrollWidget extends BaseWidget {
 
     @postConstruct()
     async init(): Promise<void> {
-        const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
-        const applicationPath = envVar && envVar.value ? envVar.value : '';
-        const stsUri = new URI(joinPath(
-            applicationPath,
+        const resourcesURi = await this.vesCommonService.getResourcesUri();
+        const stsUri = resourcesURi.resolve(join(
             'documentation',
             'stsvb.html',
         ));

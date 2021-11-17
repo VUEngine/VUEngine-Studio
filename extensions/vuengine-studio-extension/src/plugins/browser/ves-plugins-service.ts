@@ -1,5 +1,3 @@
-import * as glob from 'glob';
-import { join as joinPath, relative as relativePath, sep } from 'path';
 import { PreferenceService } from '@theia/core/lib/browser';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import { EncodingService } from '@theia/core/lib/common/encoding-service';
@@ -8,11 +6,13 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
+import * as glob from 'glob';
+import { join, relative as relativePath, sep } from 'path';
 import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { VesPluginData, VesPluginsData } from './ves-plugin';
-import { VUENGINE_PLUGINS_PREFIX } from './ves-plugins-types';
 import { VesPluginsPathsService } from './ves-plugins-paths-service';
-import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
+import { VUENGINE_PLUGINS_PREFIX } from './ves-plugins-types';
 
 @injectable()
 export class VesPluginsService {
@@ -107,17 +107,18 @@ export class VesPluginsService {
     ];
   }
 
-  // note: tests with caching plugin data in a single did not increase performance much
+  // note: tests with caching plugin data in a single file did not increase performance much
   async setPluginsData(): Promise<void> {
     const startTime = performance.now();
-    const enginePluginsPath = await this.vesPluginsPathsService.getEnginePluginsPath();
-    const userPluginsPath = await this.vesPluginsPathsService.getUserPluginsPath();
+    const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
+    const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
 
-    const findPlugins = async (rootPath: string, prefix: string) => {
+    const findPlugins = async (rootUri: URI, prefix: string) => {
+      const rootPath = await this.fileService.fsPath(rootUri);
       const pluginsMap: any = {}; /* eslint-disable-line */
 
       // TODO: refactor to use fileservice
-      await Promise.all(glob.sync(joinPath(rootPath, '**', 'plugin.json')).map(async file => {
+      await Promise.all(glob.sync(join(rootPath, '**', 'plugin.json')).map(async file => {
         const fileSplit = file.split(`${sep}plugin.json`);
         const pluginPathFull = fileSplit[0];
 
@@ -128,10 +129,10 @@ export class VesPluginsService {
         const pluginId = `${prefix}//${pluginPathRelative}`;
 
         if (fileContentJson.icon !== '' && !fileContentJson.icon.includes('..')) {
-          fileContentJson.icon = joinPath(pluginPathFull, fileContentJson.icon);
+          fileContentJson.icon = join(pluginPathFull, fileContentJson.icon);
         }
         if (fileContentJson.readme !== '' && !fileContentJson.readme.includes('..')) {
-          fileContentJson.readme = joinPath(pluginPathFull, fileContentJson.readme);
+          fileContentJson.readme = join(pluginPathFull, fileContentJson.readme);
         }
 
         fileContentJson.name = pluginId;
@@ -143,8 +144,8 @@ export class VesPluginsService {
     };
 
     const pluginsMap = {
-      ...await findPlugins(enginePluginsPath, 'vuengine'),
-      ...await findPlugins(userPluginsPath, 'user'),
+      ...await findPlugins(enginePluginsUri, 'vuengine'),
+      ...await findPlugins(userPluginsUri, 'user'),
     };
 
     const duration = performance.now() - startTime;
@@ -192,8 +193,8 @@ export class VesPluginsService {
   }
 
   getPluginsFileUri(): URI {
-    const path = joinPath(this.vesCommonService.getWorkspaceRoot(), 'config', 'Plugins.json');
-    return new URI(path);
+    const workspaceRootUri = this.vesCommonService.getWorkspaceRootUri();
+    return workspaceRootUri.resolve(join('config', 'Plugins.json'));
   }
 
   protected async writeInstalledPluginsToFile(): Promise<void> {

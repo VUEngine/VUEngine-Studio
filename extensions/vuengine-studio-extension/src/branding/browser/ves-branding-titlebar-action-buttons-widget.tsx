@@ -89,7 +89,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
             </button>
             <button
                 className='theia-button secondary open-project'
-                title={`Open Project${this.getKeybindingLabel(this.getOpenProjectCommandId(), true)}`}
+                title={`Open Folder${this.getKeybindingLabel(this.getOpenProjectCommandId(), true)}`}
                 onClick={this.openProject}
                 key='action-button-open-project'
             >

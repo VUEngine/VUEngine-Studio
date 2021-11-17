@@ -1,39 +1,30 @@
-import { join as joinPath } from 'path';
-import { inject, injectable } from '@theia/core/shared/inversify';
 import URI from '@theia/core/lib/common/uri';
-import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
+import { inject, injectable } from '@theia/core/shared/inversify';
 import { PreviewUri } from '@theia/preview/lib/browser';
+import { join } from 'path';
+import { VesCommonService } from '../../branding/browser/ves-common-service';
 
 @injectable()
 export class VesDocumentationService {
-  @inject(EnvVariablesServer)
-  protected readonly envVariablesServer: EnvVariablesServer;
+  @inject(VesCommonService)
+  protected readonly vesCommonService: VesCommonService;
 
-  protected async getResourcesPath(): Promise<string> {
-    const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
-    const applicationPath = envVar && envVar.value ? envVar.value : '';
-    return applicationPath;
-  }
-
-  protected async getHandbookRoot(): Promise<string> {
-    return joinPath(
-      await this.getResourcesPath(),
+  protected async getHandbookRootUri(): Promise<URI> {
+    const resourcesUri = await this.vesCommonService.getResourcesUri();
+    return resourcesUri.resolve(join(
       'documentation',
       'vuengine-studio-documentation',
-    );
+    ));
   }
 
-  async getHandbookIndex(): Promise<string> {
-    const handbookRoot = await this.getHandbookRoot();
-    return joinPath(handbookRoot, 'index.json');
+  async getHandbookIndex(): Promise<URI> {
+    const handbookRootUri = await this.getHandbookRootUri();
+    return handbookRootUri.resolve(join('index.json'));
   }
 
   async getHandbookUri(file: string): Promise<URI> {
-    const handbookRoot = await this.getHandbookRoot();
-    const docUri = new URI(joinPath(
-      handbookRoot,
-      ...(file + '.md').split('/'),
-    ));
+    const handbookRootUri = await this.getHandbookRootUri();
+    const docUri = handbookRootUri.resolve(join(...(`${file}.md`).split('/')));
 
     return PreviewUri.encode(docUri);
   }

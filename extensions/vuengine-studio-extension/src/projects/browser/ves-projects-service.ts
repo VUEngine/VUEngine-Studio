@@ -1,24 +1,22 @@
-import { dirname, join as joinPath } from 'path';
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import URI from '@theia/core/lib/common/uri';
-import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { isWindows } from '@theia/core';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
-import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { join } from 'path';
 import { VES_PREFERENCE_DIR } from '../../branding/browser/ves-branding-preference-configurations';
+import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { VesNewProjectTemplate } from './new-project/ves-projects-new-project-form';
 
 const replaceInFiles = require('replace-in-files');
 
 @injectable()
 export class VesProjectsService {
-
-  @inject(EnvVariablesServer)
-  protected readonly envVariablesServer: EnvVariablesServer;
   @inject(FileService)
   protected fileService: FileService;
+  @inject(VesCommonService)
+  private readonly vesCommonService: VesCommonService;
   @inject(WorkspaceService)
   private readonly workspaceService: WorkspaceService;
 
@@ -29,7 +27,7 @@ export class VesProjectsService {
   @postConstruct()
   protected async init(): Promise<void> {
     // watch for project config file changes
-    const configFileUri = new URI(this.getProjectConfigFilePath());
+    const configFileUri = this.getProjectConfigFileUri();
     this.fileService.onDidFilesChange((fileChangesEvent: FileChangesEvent) => {
       if (fileChangesEvent.contains(configFileUri)) {
         this.onDidChangeProjectFileEmitter.fire();
@@ -39,9 +37,8 @@ export class VesProjectsService {
 
   async getProjectName(): Promise<string> {
     let projectTitle = '';
-
     // Attempt to retrieve project name from configuration file
-    const projectFileUri = new URI(this.getProjectConfigFilePath());
+    const projectFileUri = this.getProjectConfigFileUri();
     if (await this.fileService.exists(projectFileUri)) {
       const configFileContents = await this.fileService.readFile(projectFileUri);
       const projectData = JSON.parse(configFileContents.value.toString());
@@ -67,71 +64,62 @@ export class VesProjectsService {
     return projectTitle;
   }
 
-  protected getProjectConfigFilePath(): string {
-    return joinPath(this.getWorkspaceRoot(), 'config', 'Project.json');
-  }
-
-  getWorkspaceRoot(): string {
-    const substrNum = isWindows ? 2 : 1;
-
-    return window.location.hash.slice(-9) === 'workspace'
-      ? dirname(window.location.hash.substring(substrNum))
-      : window.location.hash.substring(substrNum);
+  protected getProjectConfigFileUri(): URI {
+    const workspaceRootUri = this.vesCommonService.getWorkspaceRootUri();
+    return workspaceRootUri.resolve(join('config', 'Project.json'));
   }
 
   async createProjectFromTemplate(
     template: VesNewProjectTemplate,
     folder: string,
-    path: string,
+    targetUri: URI,
     name: string,
     gameCode: string,
     author: string,
     makerCode: string
   ): Promise<boolean | string> {
-    const templatePath = await this.getTemplateFolder(template.id);
-    const templatePathUri = new URI(templatePath);
-    const targetPathUri = new URI(path);
+    const templateUri = await this.getTemplatesUri(template.id);
 
-    if (await this.fileService.exists(targetPathUri)) {
+    if (await this.fileService.exists(targetUri)) {
       return 'Error: path does already exist';
     }
 
     try {
       // copy template folder to new project location
-      await this.fileService.copy(templatePathUri, targetPathUri);
+      await this.fileService.copy(templateUri, targetUri);
 
       // modify files and folders
-      const prefDirUri = new URI(joinPath(path, VES_PREFERENCE_DIR));
+      const prefDirUri = targetUri.resolve(VES_PREFERENCE_DIR);
       if (await this.fileService.exists(prefDirUri)) {
         await this.fileService.delete(prefDirUri, { recursive: true });
       }
-      const githubDirUri = new URI(joinPath(path, '.github'));
+      const githubDirUri = targetUri.resolve('.github');
       if (await this.fileService.exists(githubDirUri)) {
         await this.fileService.delete(githubDirUri, { recursive: true });
       }
       await this.fileService.move(
-        new URI(joinPath(path, `${template.id}.theia-workspace`)),
-        new URI(joinPath(path, `${folder}.theia-workspace`)),
+        targetUri.resolve(`${template.id}.theia-workspace`),
+        targetUri.resolve(`${folder}.theia-workspace`),
       );
 
       // replace labels according to mapping file
       // the first three are most sensitive and should be replaced first
-      await this.replaceInProject(path, template.labels['headerName'].substr(0, 20).padEnd(20, ' '), name.substr(0, 20).padEnd(20, ' '));
+      await this.replaceInProject(targetUri, template.labels['headerName'].substr(0, 20).padEnd(20, ' '), name.substr(0, 20).padEnd(20, ' '));
       const templateGameCode = template.labels['gameCode'].substr(0, 4).padEnd(4, 'X');
-      await this.replaceInProject(path,
+      await this.replaceInProject(targetUri,
         `"gameCodeId": "${templateGameCode.substr(1, 2)}",`,
         `"gameCodeId": "${gameCode.substr(0, 2).padEnd(2, 'X')}",`
       );
-      await this.replaceInProject(path, `"${templateGameCode}"`, `"${templateGameCode.substr(0, 1)}${gameCode.substr(0, 2).padEnd(2, 'X')}${templateGameCode.substr(3, 1)}"`);
-      await this.replaceInProject(path, `"${template.labels['makerCode'].substr(0, 2).padEnd(2, ' ')}"`, `"${makerCode.substr(0, 2).padEnd(2, ' ')}"`);
-      await this.replaceInProject(path, template.labels['headerName'], name);
+      await this.replaceInProject(targetUri, `"${templateGameCode}"`, `"${templateGameCode.substr(0, 1)}${gameCode.substr(0, 2).padEnd(2, 'X')}${templateGameCode.substr(3, 1)}"`);
+      await this.replaceInProject(targetUri, `"${template.labels['makerCode'].substr(0, 2).padEnd(2, ' ')}"`, `"${makerCode.substr(0, 2).padEnd(2, ' ')}"`);
+      await this.replaceInProject(targetUri, template.labels['headerName'], name);
       await Promise.all(template.labels['name']?.map(async (value: string) => {
-        await this.replaceInProject(path, value, name);
+        await this.replaceInProject(targetUri, value, name);
       }));
       await Promise.all(template.labels['authors']?.map(async (value: string) => {
-        await this.replaceInProject(path, value, author);
+        await this.replaceInProject(targetUri, value, author);
       }));
-      await this.replaceInProject(path, template.labels['description'], 'Description');
+      await this.replaceInProject(targetUri, template.labels['description'], 'Description');
     } catch (e) {
       return e;
     }
@@ -139,19 +127,20 @@ export class VesProjectsService {
     return true;
   }
 
-  protected async getTemplateFolder(template: string): Promise<string> {
-    const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
-    const applicationPath = envVar && envVar.value ? envVar.value : '';
-    return joinPath(applicationPath, 'vuengine', template);
+  protected async getTemplatesUri(template: string): Promise<URI> {
+    const resourcesUri = await this.vesCommonService.getResourcesUri();
+    return resourcesUri.resolve(join('vuengine', template));
   }
 
-  protected async replaceInProject(path: string, from: string, to: string): Promise<void> {
+  protected async replaceInProject(uri: URI, from: string, to: string): Promise<void> {
+    const basepath = await this.fileService.fsPath(uri);
+
     if (to && from) {
       return replaceInFiles({
         files: [
-          `${path}/**/*.*`,
-          `${path}/*.*`,
-          `${path}/*`
+          join(basepath, '**', '*.*'),
+          join(basepath, '*.*'),
+          join(basepath, '*'),
         ],
         from,
         to,

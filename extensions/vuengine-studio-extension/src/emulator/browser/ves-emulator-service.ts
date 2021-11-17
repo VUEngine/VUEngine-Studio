@@ -1,14 +1,15 @@
-import { join as joinPath } from 'path';
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { CommandService, isWindows } from '@theia/core/lib/common';
 import { ApplicationShell, OpenerService, PreferenceScope, PreferenceService, QuickPickItem, QuickPickOptions } from '@theia/core/lib/browser';
-import URI from '@theia/core/lib/common/uri';
+import { CommandService, isWindows } from '@theia/core/lib/common';
 import { QuickPickService } from '@theia/core/lib/common/quick-pick-service';
+import URI from '@theia/core/lib/common/uri';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
+import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesBuildService } from '../../build/browser/ves-build-service';
-import { VesProjectsService } from '../../projects/browser/ves-projects-service';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
+import { VesProjectsService } from '../../projects/browser/ves-projects-service';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
 import { DEFAULT_EMULATOR, EmulatorConfig } from './ves-emulator-types';
 
@@ -20,18 +21,22 @@ export class VesEmulatorService {
   protected readonly shell: ApplicationShell;
   @inject(CommandService)
   protected readonly commandService: CommandService;
+  @inject(FileService)
+  private readonly fileService: FileService;
   @inject(OpenerService)
   private readonly openerService: OpenerService;
   @inject(PreferenceService)
   private readonly preferenceService: PreferenceService;
+  @inject(QuickPickService)
+  private readonly quickPickService: QuickPickService;
   @inject(VesBuildService)
   private readonly vesBuildService: VesBuildService;
+  @inject(VesBuildPathsService)
+  private readonly vesBuildPathsService: VesBuildPathsService;
   @inject(VesProcessService)
   private readonly vesProcessService: VesProcessService;
   @inject(VesProjectsService)
   protected readonly vesProjectsService: VesProjectsService;
-  @inject(QuickPickService)
-  private readonly quickPickService: QuickPickService;
 
   // is queued
   protected _isQueued: boolean = false;
@@ -136,22 +141,23 @@ export class VesEmulatorService {
     const defaultEmulatorConfig = this.getDefaultEmulatorConfig();
 
     if (defaultEmulatorConfig === DEFAULT_EMULATOR) {
-      const romUri = new URI(this.getRomPath());
+      const romUri = this.vesBuildPathsService.getRomUri();
       const opener = await this.openerService.getOpener(romUri);
       await opener.open(romUri);
     } else {
-      const emulatorPath = defaultEmulatorConfig.path;
-      const emulatorArgs = defaultEmulatorConfig.args.replace(ROM_PLACEHOLDER, this.getRomPath()).split(' ');
+      const emulatorUri = new URI(defaultEmulatorConfig.path);
+      const romPath = await this.fileService.fsPath(this.vesBuildPathsService.getRomUri());
+      const emulatorArgs = defaultEmulatorConfig.args.replace(ROM_PLACEHOLDER, romPath).split(' ');
 
-      if (!emulatorPath) {
+      if (emulatorUri.isEqual(new URI('')) || !await this.fileService.exists(emulatorUri)) {
         // TODO: error message
         return;
       }
 
-      await this.fixPermissions(emulatorPath);
+      await this.fixPermissions(emulatorUri);
 
       await this.vesProcessService.launchProcess(VesProcessType.Raw, {
-        command: emulatorPath,
+        command: await this.fileService.fsPath(emulatorUri),
         args: emulatorArgs,
       });
     }
@@ -163,10 +169,6 @@ export class VesEmulatorService {
     };
 
     return word.slice(0, length) + '…';
-  }
-
-  getRomPath(): string {
-    return joinPath(this.vesProjectsService.getWorkspaceRoot(), 'build', 'output.vb');
   }
 
   getDefaultEmulatorConfig(): EmulatorConfig {
@@ -199,11 +201,11 @@ export class VesEmulatorService {
    * Must be executed before every run to ensure permissions are right,
    * even right after reconfiguring paths.
    */
-  async fixPermissions(emulatorPath: string): Promise<void> {
-    if (!isWindows && emulatorPath) {
+  async fixPermissions(emulatorUri: URI): Promise<void> {
+    if (!isWindows) {
       await this.vesProcessService.launchProcess(VesProcessType.Raw, {
         command: 'chmod',
-        args: ['a+x', emulatorPath]
+        args: ['a+x', await this.fileService.fsPath(emulatorUri)]
       });
     }
   }

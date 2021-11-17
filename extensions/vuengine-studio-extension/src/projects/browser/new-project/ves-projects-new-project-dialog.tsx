@@ -1,17 +1,16 @@
-import { join as joinPath } from 'path';
-import * as React from '@theia/core/shared/react';
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { Key, PreferenceService } from '@theia/core/lib/browser';
 import { DialogProps } from '@theia/core/lib/browser/dialogs';
 import { ReactDialog } from '@theia/core/lib/browser/dialogs/react-dialog';
 import { Message } from '@theia/core/lib/browser/widgets/widget';
-import { FileDialogService } from '@theia/filesystem/lib/browser';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { Key, PreferenceService } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';
-import { VesNewProjectFormComponent, VES_NEW_PROJECT_TEMPLATES } from './ves-projects-new-project-form';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import * as React from '@theia/core/shared/react';
+import { FileDialogService } from '@theia/filesystem/lib/browser';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesProjectsPreferenceIds } from '../ves-projects-preferences';
 import { VesProjectsService } from '../ves-projects-service';
+import { VesNewProjectFormComponent, VES_NEW_PROJECT_TEMPLATES } from './ves-projects-new-project-form';
 
 @injectable()
 export class VesNewProjectDialogProps extends DialogProps {
@@ -123,13 +122,13 @@ export class VesNewProjectDialog extends ReactDialog<void> {
         const templateIndex = this.createProjectFormComponentRef.current?.state.template ?? 0;
         const template = VES_NEW_PROJECT_TEMPLATES[templateIndex];
         const folder = this.createProjectFormComponentRef.current?.state.folder ?? 'new-project';
-        const newProjectPath = joinPath(basePath, folder);
-        const newProjectWorkspaceFileUri = new URI(joinPath(newProjectPath, `${folder}.theia-workspace`));
+        const newProjectUri = basePathUri.resolve(folder);
+        const newProjectWorkspaceFileUri = newProjectUri.resolve(`${folder}.theia-workspace`);
 
         const response = await this.vesProjectsService.createProjectFromTemplate(
             template,
             folder,
-            newProjectPath,
+            newProjectUri,
             name,
             gameCode,
             author,

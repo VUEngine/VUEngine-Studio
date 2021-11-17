@@ -1,8 +1,8 @@
-import { join as joinPath } from 'path';
+import { join } from 'path';
 import { cpus } from 'os';
 import { CommandService, isWindows } from '@theia/core';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { ApplicationShell, PreferenceService } from '@theia/core/lib/browser';
+import { ApplicationShell, LabelProvider, PreferenceService } from '@theia/core/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import URI from '@theia/core/lib/common/uri';
@@ -34,6 +34,8 @@ export class VesBuildService {
   protected fileService: FileService;
   @inject(FrontendApplicationStateService)
   protected readonly frontendApplicationStateService: FrontendApplicationStateService;
+  @inject(LabelProvider)
+  protected readonly labelProvider: LabelProvider;
   @inject(PreferenceService)
   protected readonly preferenceService: PreferenceService;
   @inject(VesBuildPathsService)
@@ -173,7 +175,7 @@ export class VesBuildService {
           for (const buildMode in BuildMode) {
             if (BuildMode.hasOwnProperty(buildMode)) {
               this.fileService
-                .exists(new URI(this.vesBuildPathsService.getBuildPath(buildMode)))
+                .exists(this.vesBuildPathsService.getBuildPathUri(buildMode as BuildMode))
                 .then((exists: boolean) => {
                   this.setBuildFolderExists(buildMode, exists);
                 });
@@ -191,7 +193,7 @@ export class VesBuildService {
     this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
       for (const buildMode in BuildMode) {
         if (BuildMode.hasOwnProperty(buildMode)) {
-          const buildPathUri = new URI(this.vesBuildPathsService.getBuildPath(buildMode));
+          const buildPathUri = this.vesBuildPathsService.getBuildPathUri(buildMode as BuildMode);
           if (fileChangesEvent.contains(buildPathUri, FileChangeType.ADDED)) {
             this.setBuildFolderExists(buildMode, true);
           } else if (fileChangesEvent.contains(buildPathUri, FileChangeType.DELETED)) {
@@ -249,12 +251,11 @@ export class VesBuildService {
   }
 
   async outputRomExists(): Promise<boolean> {
-    return this.fileService.exists(new URI(this.vesBuildPathsService.getRomPath()));
+    return this.fileService.exists(this.vesBuildPathsService.getRomUri());
   }
 
   protected async determineRomSize(): Promise<void> {
-    const romPath = this.vesBuildPathsService.getRomPath();
-    const romUri = new URI(romPath);
+    const romUri = this.vesBuildPathsService.getRomUri();
     if (await this.fileService.exists(romUri)) {
       const outputRom = await this.fileService.resolve(romUri, { resolveMetadata: true });
       this.romSize = outputRom.size;
@@ -268,7 +269,6 @@ export class VesBuildService {
     this.vesProcessWatcher.onDidReceiveError(async ({ pId }) => {
       if (this.buildStatus.processManagerId === pId) {
         await this.resetBuildStatus(BuildResult.failed);
-        this.commandService.executeCommand(VesBuildCommands.TOGGLE_WIDGET.id, true);
       }
     });
 
@@ -279,9 +279,6 @@ export class VesBuildService {
           ? BuildResult.done
           : BuildResult.failed
         );
-        if (event.code !== 0) {
-          this.commandService.executeCommand(VesBuildCommands.TOGGLE_WIDGET.id, true);
-        }
       }
     });
 
@@ -301,6 +298,7 @@ export class VesBuildService {
 
     this.onDidFailBuild(async () => {
       this.romSize = 0;
+      this.commandService.executeCommand(VesBuildCommands.TOGGLE_WIDGET.id, true);
     });
   }
 
@@ -314,7 +312,6 @@ export class VesBuildService {
     const endDate = undefined;
 
     try {
-
       const buildParams = await this.getBuildProcessParams();
       await this.deleteRom();
       await this.fixPermissions();
@@ -337,6 +334,8 @@ export class VesBuildService {
         type: BuildLogLineType.Error,
       });
       step = 'failed';
+
+      this.onDidFailBuildEmitter.fire();
     }
 
     this.buildStatus = {
@@ -353,41 +352,41 @@ export class VesBuildService {
   }
 
   protected async getBuildProcessParams(): Promise<ProcessOptions> {
-    const workspaceRoot = this.vesCommonService.getWorkspaceRoot();
+    const workspaceRootUri = this.vesCommonService.getWorkspaceRootUri();
     const buildMode = (this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as string).toLowerCase();
     const dumpElf = this.preferenceService.get(VesBuildPreferenceIds.DUMP_ELF) as boolean;
     const pedanticWarnings = this.preferenceService.get(VesBuildPreferenceIds.PEDANTIC_WARNINGS) as boolean;
-    const engineCorePath = await this.vesBuildPathsService.getEngineCorePath();
-    const enginePluginsPath = await this.vesPluginsPathsService.getEnginePluginsPath();
-    const userPluginsPath = await this.vesPluginsPathsService.getUserPluginsPath();
-    const compilerPath = await this.vesBuildPathsService.getCompilerPath();
-    const makefile = await this.getMakefilePath(workspaceRoot, engineCorePath);
+    const engineCoreUri = await this.vesBuildPathsService.getEngineCoreUri();
+    const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
+    const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
+    const compilerUri = await this.vesBuildPathsService.getCompilerUri();
+    const makefile = await this.getMakefilePath(workspaceRootUri, engineCoreUri);
 
     // TODO: remove check when https://github.com/VUEngine/VUEngine-Studio/issues/15 is resolved
-    this.checkPathsForSpaces(workspaceRoot, engineCorePath, enginePluginsPath);
+    await this.checkPathsForSpaces(workspaceRootUri, engineCoreUri, enginePluginsUri, userPluginsUri);
 
     if (isWindows) {
       // if (enableWsl) shellPath = process.env.windir + '\\System32\\wsl.exe';
 
       const args = [
-        'cd', this.convertoToEnvPath(workspaceRoot), '&&',
-        'export', `PATH=${this.convertoToEnvPath(joinPath(compilerPath, 'bin'))}:$PATH`, '&&',
+        'cd', await this.convertoToEnvPath(workspaceRootUri), '&&',
+        'export', `PATH=${await this.convertoToEnvPath(compilerUri.resolve('bin'))}:$PATH`, '&&',
         'make', 'all',
         '-e', `TYPE=${buildMode}`,
-        `ENGINE_FOLDER=${this.convertoToEnvPath(engineCorePath)}`,
-        `PLUGINS_FOLDER=${this.convertoToEnvPath(enginePluginsPath)}`,
-        `USER_PLUGINS_FOLDER=${this.convertoToEnvPath(userPluginsPath)}`,
+        `ENGINE_FOLDER=${await this.convertoToEnvPath(engineCoreUri)}`,
+        `PLUGINS_FOLDER=${await this.convertoToEnvPath(enginePluginsUri)}`,
+        `USER_PLUGINS_FOLDER=${await this.convertoToEnvPath(userPluginsUri)}`,
         '-f', makefile,
       ];
 
       return {
-        command: await this.vesBuildPathsService.getMsysBashPath(),
+        command: await this.fileService.fsPath(await this.vesBuildPathsService.getMsysBashUri()),
         args: [
           '--login',
           '-c', args.join(' '),
         ],
         options: {
-          cwd: workspaceRoot,
+          cwd: await this.fileService.fsPath(workspaceRootUri),
           env: {
             DUMP_ELF: dumpElf ? 1 : 0,
             LC_ALL: 'C',
@@ -404,36 +403,38 @@ export class VesBuildService {
         'all',
         '-e', `TYPE=${buildMode}`,
         '-f', makefile,
-        '-C', this.convertoToEnvPath(workspaceRoot),
+        '-C', await this.convertoToEnvPath(workspaceRootUri),
       ],
       options: {
-        cwd: workspaceRoot,
+        cwd: await this.fileService.fsPath(workspaceRootUri),
         env: {
           DUMP_ELF: dumpElf ? 1 : 0,
-          ENGINE_FOLDER: this.convertoToEnvPath(engineCorePath),
+          ENGINE_FOLDER: await this.convertoToEnvPath(engineCoreUri),
           LC_ALL: 'C',
           MAKE_JOBS: this.getThreads(),
-          PATH: [joinPath(compilerPath, 'bin'), process.env.PATH].join(':'),
-          PLUGINS_FOLDER: this.convertoToEnvPath(enginePluginsPath),
-          USER_PLUGINS_FOLDER: this.convertoToEnvPath(userPluginsPath),
+          PATH: [await this.fileService.fsPath(compilerUri.resolve('bin')), process.env.PATH].join(':'),
+          PLUGINS_FOLDER: await this.convertoToEnvPath(enginePluginsUri),
+          USER_PLUGINS_FOLDER: await this.convertoToEnvPath(userPluginsUri),
           PRINT_PEDANTIC_WARNINGS: pedanticWarnings ? 1 : 0,
         },
       },
     };
   }
 
-  protected checkPathsForSpaces(workspaceRoot: string, engineCorePath: string, enginePluginsPath: string): void {
-    if (workspaceRoot.includes('%20')) {
-      throw new Error(`Error: Workspace path must not contain spaces.\nYour workspace path: ${workspaceRoot}`);
-    } else if (engineCorePath.includes(' ')) {
-      throw new Error(`Error: Engine path must not contain spaces.\nYour engine path: ${engineCorePath}`);
-    } else if (enginePluginsPath.includes(' ')) {
-      throw new Error(`Error: Plugins path must not contain spaces.\nYour plugins path: ${enginePluginsPath}`);
+  protected async checkPathsForSpaces(workspaceRootUri: URI, engineCoreUri: URI, enginePluginsUri: URI, userPluginsUri: URI): Promise<void> {
+    if (/\s/.test(await this.fileService.fsPath(workspaceRootUri))) {
+      throw new Error(`Error: Workspace path must not contain spaces. Your workspace path:\n${this.labelProvider.getLongName(workspaceRootUri)}`);
+    } else if (/\s/.test(await this.fileService.fsPath(engineCoreUri))) {
+      throw new Error(`Error: Engine path must not contain spaces. Your engine path:\n${this.labelProvider.getLongName(engineCoreUri)}`);
+    } else if (/\s/.test(await this.fileService.fsPath(enginePluginsUri))) {
+      throw new Error(`Error: Plugins path must not contain spaces. Your plugins path:\n${this.labelProvider.getLongName(enginePluginsUri)}`);
+    } else if (/\s/.test(await this.fileService.fsPath(userPluginsUri))) {
+      throw new Error(`Error: User Plugins path must not contain spaces. Your user plugins path:\n${this.labelProvider.getLongName(userPluginsUri)}`);
     }
   }
 
   protected async deleteRom(): Promise<void> {
-    const romUri = new URI(this.vesBuildPathsService.getRomPath());
+    const romUri = this.vesBuildPathsService.getRomUri();
     if (await this.fileService.exists(romUri)) {
       this.fileService.delete(romUri);
     }
@@ -544,11 +545,11 @@ export class VesBuildService {
     return name;
   }
 
-  protected async getMakefilePath(workspaceRoot: string, engineCorePath: string): Promise<string> {
-    const gameMakefilePath = this.convertoToEnvPath(joinPath(workspaceRoot, 'makefile'));
+  protected async getMakefilePath(workspaceRootUri: URI, engineCoreUri: URI): Promise<string> {
+    const gameMakefilePath = await this.convertoToEnvPath(workspaceRootUri.resolve('makefile'));
     let makefilePath = gameMakefilePath;
     if (!(await this.fileService.exists(new URI(makefilePath)))) {
-      const engineMakefilePath = this.convertoToEnvPath(joinPath(engineCorePath, 'makefile-game'));
+      const engineMakefilePath = await this.convertoToEnvPath(engineCoreUri.resolve('makefile-game'));
       makefilePath = engineMakefilePath;
       if (!(await this.fileService.exists(new URI(makefilePath)))) {
         throw new Error(`Error: Could not find a makefile. Tried the following locations:\n1) ${gameMakefilePath}\n2) ${engineMakefilePath}`);
@@ -563,8 +564,9 @@ export class VesBuildService {
     await this.resetBuildStatus(BuildResult.aborted);
   }
 
-  convertoToEnvPath(path: string): string {
+  async convertoToEnvPath(uri: URI): Promise<string> {
     const enableWsl = this.preferenceService.get(VesBuildPreferenceIds.ENABLE_WSL);
+    const path = await this.fileService.fsPath(uri);
     let envPath = path
       .replace(/\\/g, '/')
       .replace(/^[a-zA-Z]:\//, function (x): string {
@@ -605,36 +607,31 @@ export class VesBuildService {
       return;
     }
 
-    const engineCorePath = await this.vesBuildPathsService.getEngineCorePath();
-    const compilerPath = await this.vesBuildPathsService.getCompilerPath();
+    const engineCorePath = await this.vesBuildPathsService.getEngineCoreUri();
+    const compilerUri = await this.vesBuildPathsService.getCompilerUri();
 
     await Promise.all([
       this.vesProcessService.launchProcess(VesProcessType.Raw, {
         command: 'chmod',
-        args: ['-R', 'a+x', joinPath(compilerPath, 'bin')],
+        args: ['-R', 'a+x', await this.fileService.fsPath(compilerUri.resolve('bin'))],
       }),
       this.vesProcessService.launchProcess(VesProcessType.Raw, {
         command: 'chmod',
-        args: ['-R', 'a+x', joinPath(compilerPath, 'libexec')],
+        args: ['-R', 'a+x', await this.fileService.fsPath(compilerUri.resolve('libexec'))],
       }),
       this.vesProcessService.launchProcess(VesProcessType.Raw, {
         command: 'chmod',
-        args: ['-R', 'a+x', joinPath(compilerPath, 'v810', 'bin')],
+        args: ['-R', 'a+x', await this.fileService.fsPath(compilerUri.resolve(join('v810', 'bin')))],
       }),
       this.vesProcessService.launchProcess(VesProcessType.Raw, {
         command: 'chmod',
-        args: ['-R', 'a+x', joinPath(engineCorePath, 'lib', 'compiler', 'preprocessor'),
-        ],
+        args: ['-R', 'a+x', await this.fileService.fsPath(engineCorePath.resolve(join('lib', 'compiler', 'preprocessor')))],
       }),
     ]);
   }
 
   bytesToMbit(bytes: number): number {
     return bytes / 1024 / 128;
-  }
-
-  protected getCleanPath(buildMode: BuildMode): string {
-    return joinPath(this.vesBuildPathsService.getBuildPath(), buildMode);
   }
 
   async doClean(): Promise<void> {
@@ -656,11 +653,11 @@ export class VesBuildService {
 
     this.isCleaning = true;
 
-    const cleanPath = this.getCleanPath(buildMode);
-    const buildFolder = this.vesBuildPathsService.getBuildPath();
+    const buildModePathUri = this.vesBuildPathsService.getBuildPathUri(buildMode);
+    const buildPathUri = this.vesBuildPathsService.getBuildPathUri();
 
-    await this.fileService.delete(new URI(cleanPath), { recursive: true });
-    const files = await this.fileService.resolve(new URI(buildFolder));
+    await this.fileService.delete(buildModePathUri, { recursive: true });
+    const files = await this.fileService.resolve(buildPathUri);
     if (files.children) {
       await Promise.all(files.children.map(child => {
         if (child.name.endsWith('.a')) {

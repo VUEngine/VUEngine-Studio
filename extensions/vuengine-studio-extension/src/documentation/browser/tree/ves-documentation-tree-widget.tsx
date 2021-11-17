@@ -1,21 +1,17 @@
 import { CommandService } from '@theia/core';
-import { inject, injectable } from '@theia/core/shared/inversify';
-import * as React from '@theia/core/shared/react';
 import {
-  ContextMenuRenderer,
-  TreeProps,
-  TreeWidget,
-  TreeNode,
-  ExpandableTreeNode,
+  ContextMenuRenderer, ExpandableTreeNode,
   LabelProvider,
   NodeProps,
-  TreeModel,
+  TreeModel, TreeNode, TreeProps,
+  TreeWidget
 } from '@theia/core/lib/browser';
+import { inject, injectable } from '@theia/core/shared/inversify';
+import * as React from '@theia/core/shared/react';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import URI from '@theia/core/lib/common/uri';
-import { VesDocumentationChild, VesDocumentationChildNode, VesDocumentationRootNode, VesDocumentTree } from './ves-documentation-tree';
 import { VesDocumentationCommands } from '../ves-documentation-commands';
 import { VesDocumentationService } from '../ves-documentation-service';
+import { VesDocumentationChild, VesDocumentationChildNode, VesDocumentationRootNode, VesDocumentTree } from './ves-documentation-tree';
 
 @injectable()
 export class VesDocumentationTreeWidget extends TreeWidget {
@@ -67,7 +63,7 @@ export class VesDocumentationTreeWidget extends TreeWidget {
       ]
     };
 
-    const handbookIndexUri = new URI(await this.vesDocumentationService.getHandbookIndex());
+    const handbookIndexUri = await this.vesDocumentationService.getHandbookIndex();
     const handbookIndexContents = await this.fileService.readFile(handbookIndexUri);
     const handbookIndex = JSON.parse(handbookIndexContents.value.toString());
 

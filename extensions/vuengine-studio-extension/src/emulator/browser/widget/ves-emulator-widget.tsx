@@ -1,8 +1,4 @@
-import { basename, join as joinPath } from 'path';
-import * as React from '@theia/core/shared/react';
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { CommandService } from '@theia/core';
-import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import {
   Endpoint,
   KeybindingRegistry,
@@ -10,23 +6,24 @@ import {
   Message,
   PreferenceScope,
   PreferenceService,
-  ScopedKeybinding,
+  ScopedKeybinding
 } from '@theia/core/lib/browser';
-import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import URI from '@theia/core/lib/common/uri';
+import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
-import {
-  EmulationMode,
-  EmulatorGamePadKeyCode,
-  EmulatorFunctionKeyCode,
-  EmulatorScale,
-  StereoMode,
-} from '../ves-emulator-types';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import * as React from '@theia/core/shared/react';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { basename, join } from 'path';
+import { VesCommonService } from '../../../branding/browser/ves-common-service';
+import { VesBuildPathsService } from '../../../build/browser/ves-build-paths-service';
 import { VesEmulatorCommands } from '../ves-emulator-commands';
 import { VesEmulatorPreferenceIds } from '../ves-emulator-preferences';
 import { VesEmulatorService } from '../ves-emulator-service';
+import {
+  EmulationMode, EmulatorFunctionKeyCode, EmulatorGamePadKeyCode, EmulatorScale,
+  StereoMode
+} from '../ves-emulator-types';
 import { VesEmulatorControls } from './ves-emulator-controls-component';
-import { VesCommonService } from '../../../branding/browser/ves-common-service';
 
 const datauri = require('datauri');
 
@@ -60,6 +57,8 @@ export class VesEmulatorWidget extends ReactWidget {
   protected readonly localStorageService: LocalStorageService;
   @inject(PreferenceService)
   protected readonly preferenceService: PreferenceService;
+  @inject(VesBuildPathsService)
+  private readonly vesBuildPathsService: VesBuildPathsService;
   @inject(VesCommonService)
   protected readonly vesCommonService: VesCommonService;
   @inject(VesEmulatorService)
@@ -344,17 +343,18 @@ export class VesEmulatorWidget extends ReactWidget {
     return false;
   }
 
-  protected startEmulator(self: any): void { /* eslint-disable-line */
-    const romPath = this.options ? this.options.uri : this.vesEmulatorService.getRomPath();
+  protected startEmulator = () => {
+    const romUri = this.options ? this.options.uri : this.vesBuildPathsService.getRomUri();
 
-    datauri(romPath, (err: any) => { /* eslint-disable-line */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    datauri(romUri, (err: any) => {
       if (err) { throw err; };
     }).then((content: string) => {
-      self.sendRetroArchConfig();
-      self.sendCoreOptions();
-      self.sendCommand('start', content);
+      this.sendRetroArchConfig();
+      this.sendCoreOptions();
+      this.sendCommand('start', content);
     });
-  }
+  };
 
   protected onResize(): void {
     this.update();
@@ -593,7 +593,7 @@ export class VesEmulatorWidget extends ReactWidget {
             src={this.resource}
             width={canvasDimensions.width}
             height={canvasDimensions.height}
-            onLoad={() => this.startEmulator(this)}
+            onLoad={this.startEmulator}
             tabIndex={0}
           ></iframe>
         </div>
@@ -674,6 +674,7 @@ export class VesEmulatorWidget extends ReactWidget {
   }
 
   protected processScreenshot(data: string, filename: string): void {
+    // eslint-disable-next-line deprecation/deprecation
     const byteString = atob(data);
     const ab = new ArrayBuffer(byteString.length);
     const ia = new Uint8Array(ab);
@@ -681,7 +682,8 @@ export class VesEmulatorWidget extends ReactWidget {
       ia[i] = byteString.charCodeAt(i);
     }
 
-    const fileUri = new URI(joinPath(this.vesCommonService.getWorkspaceRoot(), 'screenshots', filename));
+    const workspaceRootUri = this.vesCommonService.getWorkspaceRootUri();
+    const fileUri = workspaceRootUri.resolve(join('screenshots', filename));
     this.fileService.writeFile(fileUri, BinaryBuffer.wrap(ia));
   }
 

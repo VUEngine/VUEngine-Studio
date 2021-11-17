@@ -1,4 +1,3 @@
-import { dirname, join as joinPath } from 'path';
 import { ApplicationShell, PreferenceService } from '@theia/core/lib/browser';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { CommandService, isWindows, MessageService } from '@theia/core/lib/common';
@@ -7,9 +6,10 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { dirname, join } from 'path';
 import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
-import { VesBuildPreferenceIds } from '../../build/browser/ves-build-preferences';
+import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
@@ -24,10 +24,7 @@ import {
   FLASHBOY_PLUS_IMAGE_PLACEHOLDER,
   FlashCartConfig,
   HFCLI_PLACEHOLDER,
-  HYPERFLASH32_IMAGE_PLACEHOLDER,
-  NAME_PLACEHOLDER,
-  NAME_NO_SPACES_PLACEHOLDER,
-  PROG_VB_PLACEHOLDER,
+  HYPERFLASH32_IMAGE_PLACEHOLDER, NAME_NO_SPACES_PLACEHOLDER, NAME_PLACEHOLDER, PROG_VB_PLACEHOLDER,
   ROM_PLACEHOLDER
 } from './ves-flash-cart-types';
 import { VesFlashCartUsbWatcher } from './ves-flash-cart-usb-watcher';
@@ -48,6 +45,8 @@ export class VesFlashCartService {
   protected readonly preferenceService: PreferenceService;
   @inject(VesBuildService)
   protected readonly vesBuildService: VesBuildService;
+  @inject(VesBuildPathsService)
+  private readonly vesBuildPathsService: VesBuildPathsService;
   @inject(VesCommonService)
   protected readonly vesCommonService: VesCommonService;
   @inject(VesFlashCartUsbService)
@@ -134,51 +133,6 @@ export class VesFlashCartService {
 
   @postConstruct()
   protected async init(): Promise<void> {
-    this.frontendApplicationStateService.onStateChanged(
-      async (state: FrontendApplicationState) => {
-        if (state === 'attached_shell') {
-          this.detectConnectedFlashCarts();
-        }
-      }
-    );
-
-    // watch for preference changes
-    this.preferenceService.onPreferenceChanged(
-      ({ preferenceName, newValue }) => {
-        switch (preferenceName) {
-          case VesFlashCartPreferenceIds.FLASH_CARTS:
-            this.detectConnectedFlashCarts();
-            break;
-        }
-      }
-    );
-
-    // watch for flash cart attach/detach
-    this.vesFlashCartUsbWatcher.onDidAttachDevice(async () =>
-      this.detectConnectedFlashCarts()
-    );
-    this.vesFlashCartUsbWatcher.onDidDetachDevice(async () =>
-      this.detectConnectedFlashCarts()
-    );
-
-    // compute overall flashing progress
-    this.onDidChangeConnectedFlashCarts(() => {
-      let activeCarts = 0;
-      let activeCartsProgress = 0;
-      for (const connectedFlashCart of this.connectedFlashCarts) {
-        if (connectedFlashCart.status.progress > -1) {
-          activeCarts++;
-          activeCartsProgress += connectedFlashCart.status.progress;
-        }
-      }
-      if (activeCarts > 0) {
-        const overallProgress = Math.floor(activeCartsProgress / activeCarts);
-        if (this.flashingProgress !== overallProgress) {
-          this.flashingProgress = overallProgress;
-        }
-      }
-    });
-
     this.bindEvents();
   }
 
@@ -227,17 +181,10 @@ export class VesFlashCartService {
         continue;
       }
 
-      /* const flasherEnvPath = this.convertoToEnvPath(flasherPath);
-
-      const enableWsl = this.preferenceService.get(VesBuildPreferenceIds.ENABLE_WSL);
-      if (isWindows && enableWsl) {
-        flasherEnvPath.replace(/\.[^/.]+$/, '');
-      } */
-
-      const romPath = connectedFlashCart.config.padRom &&
+      const romUri = connectedFlashCart.config.padRom &&
         await this.padRom(connectedFlashCart.config.size)
-        ? this.getPaddedRomPath(connectedFlashCart.config.size)
-        : this.getRomPath();
+        ? this.getPaddedRomUri(connectedFlashCart.config.size)
+        : this.vesBuildPathsService.getRomUri();
 
       const projectName = await this.vesProjectsService.getProjectName();
 
@@ -245,7 +192,7 @@ export class VesFlashCartService {
         ? connectedFlashCart.config.args
           .replace(NAME_PLACEHOLDER, projectName)
           .replace(NAME_NO_SPACES_PLACEHOLDER, projectName.replace(/ /g, ''))
-          .replace(ROM_PLACEHOLDER, romPath)
+          .replace(ROM_PLACEHOLDER, await this.fileService.fsPath(romUri))
           .split(' ')
         : [];
 
@@ -307,6 +254,51 @@ export class VesFlashCartService {
   }
 
   protected bindEvents(): void {
+    this.frontendApplicationStateService.onStateChanged(
+      async (state: FrontendApplicationState) => {
+        if (state === 'attached_shell') {
+          this.detectConnectedFlashCarts();
+        }
+      }
+    );
+
+    // watch for preference changes
+    this.preferenceService.onPreferenceChanged(
+      ({ preferenceName }) => {
+        switch (preferenceName) {
+          case VesFlashCartPreferenceIds.FLASH_CARTS:
+            this.detectConnectedFlashCarts();
+            break;
+        }
+      }
+    );
+
+    // watch for flash cart attach/detach
+    this.vesFlashCartUsbWatcher.onDidAttachDevice(async () =>
+      this.detectConnectedFlashCarts()
+    );
+    this.vesFlashCartUsbWatcher.onDidDetachDevice(async () =>
+      this.detectConnectedFlashCarts()
+    );
+
+    // compute overall flashing progress
+    this.onDidChangeConnectedFlashCarts(() => {
+      let activeCarts = 0;
+      let activeCartsProgress = 0;
+      for (const connectedFlashCart of this.connectedFlashCarts) {
+        if (connectedFlashCart.status.progress > -1) {
+          activeCarts++;
+          activeCartsProgress += connectedFlashCart.status.progress;
+        }
+      }
+      if (activeCarts > 0) {
+        const overallProgress = Math.floor(activeCartsProgress / activeCarts);
+        if (this.flashingProgress !== overallProgress) {
+          this.flashingProgress = overallProgress;
+        }
+      }
+    });
+
     this.vesBuildService.onDidSucceedBuild(async () => {
       if (await this.vesBuildService.outputRomExists() && this.isQueued) {
         this.isQueued = false;
@@ -383,16 +375,13 @@ export class VesFlashCartService {
 
   protected async replaceFlasherPath(flasherPath: string): Promise<string> {
     return flasherPath
-      .replace(HFCLI_PLACEHOLDER, await this.getHfCliPath())
-      .replace(PROG_VB_PLACEHOLDER, await this.getProgVbPath());
+      .replace(HFCLI_PLACEHOLDER, await this.fileService.fsPath(await this.getHfCliUri()))
+      .replace(PROG_VB_PLACEHOLDER, await this.fileService.fsPath(await this.getProgVbUri()));
   }
 
   protected async padRom(size: number): Promise<boolean> {
-    const romPath = this.getRomPath();
-    const romUri = new URI(romPath);
-    const paddedRomPath = this.getPaddedRomPath(size);
-    const paddedRomUri = new URI(paddedRomPath);
-
+    const romUri = this.vesBuildPathsService.getRomUri();
+    const paddedRomUri = this.getPaddedRomUri(size);
     if (!await this.vesBuildService.outputRomExists()) {
       return false;
     }
@@ -416,8 +405,8 @@ export class VesFlashCartService {
     return true;
   }
 
-  protected getPaddedRomPath(size: number): string {
-    return this.getRomPath().replace('output.vb', `outputPadded${size}.vb`);
+  protected getPaddedRomUri(size: number): URI {
+    return this.vesBuildPathsService.getRomUri().parent.resolve(`outputPadded${size}.vb`);
   }
 
   protected async parseStreamDataHyperFlasherCli32(connectedFlashCart: ConnectedFlashCart, data: any): Promise<void> { /* eslint-disable-line */
@@ -488,30 +477,26 @@ export class VesFlashCartService {
     }));
   }
 
-  async getProgVbPath(): Promise<string> {
-    return joinPath(
-      await this.vesCommonService.getResourcesPath(),
+  async getProgVbUri(): Promise<URI> {
+    const resourcesUri = await this.vesCommonService.getResourcesUri();
+    return resourcesUri.resolve(join(
       'binaries',
       'vuengine-studio-tools',
       this.vesCommonService.getOs(),
       'prog-vb',
       isWindows ? 'prog-vb.exe' : 'prog-vb'
-    );
+    ));
   }
 
-  async getHfCliPath(): Promise<string> {
-    return joinPath(
-      await this.vesCommonService.getResourcesPath(),
+  async getHfCliUri(): Promise<URI> {
+    const resourcesUri = await this.vesCommonService.getResourcesUri();
+    return resourcesUri.resolve(join(
       'binaries',
       'vuengine-studio-tools',
       this.vesCommonService.getOs(),
       'hf-cli',
       isWindows ? 'hfcli.exe' : 'hfcli'
-    );
-  }
-
-  getRomPath(): string {
-    return joinPath(this.vesProjectsService.getWorkspaceRoot(), 'build', 'output.vb');
+    ));
   }
 
   protected determineCanHoldRom(flashSize: number): boolean {
@@ -532,18 +517,5 @@ export class VesFlashCartService {
     });
 
     this.atLeastOneCanHoldRom = atLeastOneCanHoldRom;
-  }
-
-  convertoToEnvPath(path: string): string {
-    const enableWsl = this.preferenceService.get(VesBuildPreferenceIds.ENABLE_WSL);
-    let envPath = path.replace(/\\/g, '/').replace(/^[a-zA-Z]:\//, function (x): string {
-      return `/${x.substr(0, 1).toLowerCase()}/`;
-    });
-
-    if (isWindows && enableWsl) {
-      envPath = '/mnt/' + envPath;
-    }
-
-    return envPath;
   }
 }

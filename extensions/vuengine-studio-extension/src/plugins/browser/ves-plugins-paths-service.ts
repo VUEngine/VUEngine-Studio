@@ -1,10 +1,10 @@
-import { join as joinPath, normalize } from 'path';
 import { PreferenceService } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { join } from 'path';
 import { VesCommonService } from '../../branding/browser/ves-common-service';
-import { VesPluginsPreferenceIds } from './ves-plugins-preferences';
+import { VesPluginsPreferenceIds, VesPluginsPreferenceSchema } from './ves-plugins-preferences';
 
 @injectable()
 export class VesPluginsPathsService {
@@ -16,26 +16,29 @@ export class VesPluginsPathsService {
   @inject(VesCommonService)
   protected vesCommonService: VesCommonService;
 
-  async getEnginePluginsPath(): Promise<string> {
-    const defaultPath = joinPath(
-      await this.vesCommonService.getResourcesPath(),
+  async getEnginePluginsUri(): Promise<URI> {
+    const resourcesUri = await this.vesCommonService.getResourcesUri();
+    const defaultUri = resourcesUri.resolve(join(
       'vuengine',
       'vuengine-plugins'
-    );
-    const customPath = normalize(this.preferenceService.get<string>(
+    ));
+    const customUri = new URI(this.preferenceService.get(
       VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH
-    ) ?? '');
+    ) as string);
 
-    return customPath && (customPath !== '.' && await this.fileService.exists(new URI(customPath)))
-      ? customPath
-      : defaultPath;
+    return (!customUri.isEqual(new URI('')) && await this.fileService.exists(customUri))
+      ? customUri
+      : defaultUri;
   }
 
-  async getUserPluginsPath(): Promise<string> {
-    const path = normalize(this.preferenceService.get<string>(
+  async getUserPluginsUri(): Promise<URI> {
+    const defaultUri = VesPluginsPreferenceSchema.properties[VesPluginsPreferenceIds.USER_PLUGINS_PATH].default;
+    const customUri = new URI(this.preferenceService.get(
       VesPluginsPreferenceIds.USER_PLUGINS_PATH
-    ) ?? '');
+    ) as string);
 
-    return path;
+    return (!customUri.isEqual(new URI('')) && await this.fileService.exists(customUri))
+      ? customUri
+      : defaultUri;
   }
 }

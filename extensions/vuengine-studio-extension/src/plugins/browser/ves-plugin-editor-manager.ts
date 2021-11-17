@@ -1,9 +1,9 @@
-import { injectable } from '@theia/core/shared/inversify';
-import URI from '@theia/core/lib/common/uri';
 import { WidgetOpenHandler } from '@theia/core/lib/browser';
+import URI from '@theia/core/lib/common/uri';
+import { injectable } from '@theia/core/shared/inversify';
+import { VesPluginUri } from '../common/ves-plugin-uri';
 import { VesPluginOptions } from './ves-plugin';
 import { VesPluginEditor } from './ves-plugin-editor';
-import { VesPluginUri } from '../common/ves-plugin-uri';
 
 @injectable()
 export class VesPluginEditorManager extends WidgetOpenHandler<VesPluginEditor> {
@@ -19,7 +19,7 @@ export class VesPluginEditorManager extends WidgetOpenHandler<VesPluginEditor> {
     protected createWidgetOptions(uri: URI): VesPluginOptions {
         const id = VesPluginUri.toId(uri);
         if (!id) {
-            throw new Error('Invalid URI: ' + uri.toString());
+            throw new Error(`Invalid URI: ${uri.toString()}`);
         }
 
         return { id };

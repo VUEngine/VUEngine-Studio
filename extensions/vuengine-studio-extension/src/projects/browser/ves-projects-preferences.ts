@@ -1,6 +1,6 @@
-import { homedir } from 'os';
-import { join as joinPath } from 'path';
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
+import { homedir } from 'os';
+import { join } from 'path';
 
 export namespace VesProjectsPreferenceIds {
     export const CATEGORY = 'projects';
@@ -16,7 +16,7 @@ export const VesProjectsPreferenceSchema: PreferenceSchema = {
         [VesProjectsPreferenceIds.BASE_FOLDER]: {
             type: 'string',
             description: 'Base folder for new projects.',
-            default: joinPath(homedir(), 'vuengine', 'projects'),
+            default: join(homedir(), 'vuengine', 'projects'),
         },
         [VesProjectsPreferenceIds.AUTHOR]: {
             type: 'string',

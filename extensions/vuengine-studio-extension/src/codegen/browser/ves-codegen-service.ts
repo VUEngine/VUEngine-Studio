@@ -1,8 +1,3 @@
-import * as glob from 'glob';
-import * as iconv from 'iconv-lite';
-import * as nunjucks from 'nunjucks';
-import { deepmerge } from 'deepmerge-ts';
-import { basename, dirname, join as joinPath, parse as parsePath } from 'path';
 import { PreferenceService } from '@theia/core/lib/browser';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import URI from '@theia/core/lib/common/uri';
@@ -10,14 +5,19 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import { FileChangeType } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
+import { deepmerge } from 'deepmerge-ts';
+import * as glob from 'glob';
+import * as iconv from 'iconv-lite';
+import * as nunjucks from 'nunjucks';
+import { basename, join, parse as parsePath } from 'path';
 import { VES_PREFERENCE_DIR } from '../../branding/browser/ves-branding-preference-configurations';
 import { VesCommonService } from '../../branding/browser/ves-common-service';
-import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
-import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
+import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-service';
+import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } from '../../plugins/browser/ves-plugins-types';
-import { TemplateEncoding, TemplateDataSource, TemplateRoot, TemplateEventType, TemplateDataType, Templates, Template, TemplateMode } from './ves-codegen-types';
+import { Template, TemplateDataSource, TemplateDataType, TemplateEncoding, TemplateEventType, TemplateMode, TemplateRoot, Templates } from './ves-codegen-types';
 
 export const VES_PREFERENCE_TEMPLATES_DIR = 'templates';
 
@@ -75,12 +75,10 @@ export class VesCodeGenService {
   }
 
   protected async handleFileChange(fileChangesEvent: FileChangesEvent): Promise<void> {
-    const workspaceRoot = this.vesCommonService.getWorkspaceRoot();
-
     fileChangesEvent.changes.map(async fileChange => {
       if ([FileChangeType.ADDED, FileChangeType.UPDATED].includes(fileChange.type)) {
         Object.keys(this.templates.events.fileChanged).map(async file => {
-          const templateFileUri = new URI(joinPath(workspaceRoot, ...file.split('/')));
+          const templateFileUri = this.vesCommonService.getWorkspaceRootUri().resolve(join(...file.split('/')));
           if (fileChange.resource.isEqual(templateFileUri)) {
             await Promise.all(this.templates.events.fileChanged[file].map(async templateId => {
               await this.renderTemplate(templateId, fileChange.resource);
@@ -127,9 +125,8 @@ export class VesCodeGenService {
           return;
         }
         // TODO: refactor to use fileservice instead of glob
-        const workspaceRoot = this.vesCommonService.getWorkspaceRoot();
-        const fileMatcher = joinPath(workspaceRoot, '**', `*${template.ending}`);
-        const files = glob.sync(fileMatcher);
+        const workspaceRootUri = this.vesCommonService.getWorkspaceRootUri();
+        const files = glob.sync(join(await this.fileService.fsPath(workspaceRootUri), '**', `*${template.ending}`));
         await Promise.all(files.map(async file => {
           await this.renderFileFromTemplate(template, templateString, additionalTemplateData, encoding, new URI(file));
         }));
@@ -153,9 +150,9 @@ export class VesCodeGenService {
       }
     });
 
-    const roots = await this.resolveRoot(template.root, resource?.toString());
+    const roots = await this.resolveRoot(template.root, resource);
     await Promise.all(roots.map(async root => {
-      const targetUri = new URI(joinPath(root, ...targetFile.split('/')));
+      const targetUri = root.resolve(join(...targetFile.split('/')));
       await this.renderTemplateToFile(targetUri, templateString, data, encoding);
     }));
   }
@@ -195,13 +192,13 @@ export class VesCodeGenService {
     ];
 
     await Promise.all(roots.map(async root => {
-      const templatesFileUri = new URI(joinPath(root, VES_PREFERENCE_DIR, 'templates.json'));
+      const templatesFileUri = root.resolve(join(VES_PREFERENCE_DIR, 'templates.json'));
       if (await this.fileService.exists(templatesFileUri)) {
         const templatesFileContent = await this.fileService.readFile(templatesFileUri);
         const templatesFileJson = JSON.parse(templatesFileContent.value.toString()) as Templates;
-        Object.values(templatesFileJson.templates).map(template => {
-          template.template = joinPath(root, VES_PREFERENCE_DIR, VES_PREFERENCE_TEMPLATES_DIR, ...template.template.split('/'));
-        });
+        await Promise.all(Object.values(templatesFileJson.templates).map(async template => {
+          template.template = await this.fileService.fsPath(root.resolve(join(VES_PREFERENCE_DIR, VES_PREFERENCE_TEMPLATES_DIR, ...template.template.split('/'))));
+        }));
 
         this.templates = deepmerge(this.templates, templatesFileJson);
       }
@@ -231,10 +228,10 @@ export class VesCodeGenService {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data: { [key: string]: any } = {};
     await Promise.all(dataSources.map(async dataSource => {
-      const roots = await this.resolveRoot(dataSource.root, file?.toString());
+      const roots = await this.resolveRoot(dataSource.root, file);
       if (dataSource.type === TemplateDataType.file) {
         await Promise.all(roots.map(async root => {
-          const uri = new URI(joinPath(root, ...dataSource.value.split('/')));
+          const uri = root.resolve(join(...dataSource.value.split('/')));
           if (await this.fileService.exists(uri)) {
             const fileContent = await this.fileService.readFile(uri);
             data[dataSource.key] = JSON.parse(fileContent.value.toString());
@@ -246,7 +243,7 @@ export class VesCodeGenService {
         }
         await Promise.all(roots.map(async root => {
           // TODO: refactor to use fileservice instead of glob
-          const fileMatcher = joinPath(root, '**', `*${dataSource.value}`);
+          const fileMatcher = join(await this.fileService.fsPath(root), '**', `*${dataSource.value}`);
           await Promise.all(glob.sync(fileMatcher).map(async dataSourceFile => {
             const fileContent = await this.fileService.readFile(new URI(dataSourceFile));
             data[dataSource.key].push(JSON.parse(fileContent.value.toString()));
@@ -259,8 +256,8 @@ export class VesCodeGenService {
   }
 
   protected async configureTemplateEngine(): Promise<void> {
-    const engineCorePath = await this.vesBuildPathsService.getEngineCorePath();
-    const env = nunjucks.configure(joinPath(engineCorePath, VES_PREFERENCE_DIR, VES_PREFERENCE_TEMPLATES_DIR));
+    const engineCoreUri = await this.vesBuildPathsService.getEngineCoreUri();
+    const env = nunjucks.configure(await this.fileService.fsPath(engineCoreUri.resolve(join(VES_PREFERENCE_DIR, VES_PREFERENCE_TEMPLATES_DIR))));
 
     // add filters
     env.addFilter('basename', (value: string, ending: boolean = true) => {
@@ -305,36 +302,36 @@ export class VesCodeGenService {
     return convertedKey;
   }
 
-  protected async resolveRoot(root: TemplateRoot, filepath?: string): Promise<Array<string>> {
-    const roots: Array<string> = [];
+  protected async resolveRoot(root: TemplateRoot, uri?: URI): Promise<Array<URI>> {
+    const roots: Array<URI> = [];
 
     switch (root) {
       case TemplateRoot.installedPlugins:
-        const enginePluginsPath = await this.vesPluginsPathsService.getEnginePluginsPath();
-        const userPluginsPath = await this.vesPluginsPathsService.getUserPluginsPath();
+        const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
+        const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
         this.vesPluginsService.getInstalledPlugins().map(installedPlugin => {
           if (installedPlugin.startsWith(VUENGINE_PLUGINS_PREFIX)) {
-            roots.push(joinPath(enginePluginsPath, installedPlugin.replace(VUENGINE_PLUGINS_PREFIX, '')));
+            roots.push(enginePluginsUri.resolve(join(installedPlugin.replace(VUENGINE_PLUGINS_PREFIX, ''))));
           } else if (installedPlugin.startsWith(USER_PLUGINS_PREFIX)) {
-            roots.push(joinPath(userPluginsPath, installedPlugin.replace(USER_PLUGINS_PREFIX, '')));
+            roots.push(userPluginsUri.resolve(join(installedPlugin.replace(USER_PLUGINS_PREFIX, ''))));
           }
         });
         break;
       case TemplateRoot.engine:
-        roots.push(await this.vesBuildPathsService.getEngineCorePath());
+        roots.push(await this.vesBuildPathsService.getEngineCoreUri());
         break;
       case TemplateRoot.plugins:
-        roots.push(await this.vesPluginsPathsService.getEnginePluginsPath());
-        roots.push(await this.vesPluginsPathsService.getUserPluginsPath());
+        roots.push(await this.vesPluginsPathsService.getEnginePluginsUri());
+        roots.push(await this.vesPluginsPathsService.getUserPluginsUri());
         break;
       case TemplateRoot.relative:
-        if (filepath) {
-          roots.push(dirname(filepath));
+        if (uri) {
+          roots.push(uri.parent);
         }
         break;
       default:
       case TemplateRoot.workspace:
-        roots.push(this.vesCommonService.getWorkspaceRoot());
+        roots.push(this.vesCommonService.getWorkspaceRootUri());
         break;
     }
 
