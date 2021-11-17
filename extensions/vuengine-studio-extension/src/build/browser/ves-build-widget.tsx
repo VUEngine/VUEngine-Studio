@@ -441,7 +441,7 @@ export class VesBuildWidget extends ReactWidget {
 
   protected getDuration(): string {
     const startDate = this.vesBuildService.buildStatus.startDate || new Date();
-    const endDate = this.vesBuildService.buildStatus.endDate || new Date();
+    const endDate = this.vesBuildService.buildStatus.endDate || startDate;
     const duration = endDate.getTime() - startDate.getTime();
     const durationDate = new Date(duration);
 
