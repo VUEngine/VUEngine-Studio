@@ -123,7 +123,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                             var(--theia-titleBar-hoverButtonBackground) ${this.vesBuildService.buildStatus.progress}%)`
                     } : {}}
                     title={this.vesBuildService.buildStatus.active
-                        ? 'Building... ' + this.vesBuildService.buildStatus.progress + '%'
+                        ? `Building... ${this.vesBuildService.buildStatus.progress}%`
                         : `${VesBuildCommands.BUILD.label}${this.getKeybindingLabel(VesBuildCommands.BUILD.id, true)}`}
                     onClick={this.build}
                     key='action-button-build'
@@ -153,7 +153,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                     title={this.vesFlashCartService.isQueued
                         ? 'Flashing Queued...'
                         : this.vesFlashCartService.isFlashing
-                            ? 'Flashing... ' + this.vesFlashCartService.flashingProgress + '%'
+                            ? `Flashing... ${this.vesFlashCartService.flashingProgress}%`
                             : `${VesFlashCartCommands.FLASH.label}${this.getKeybindingLabel(VesFlashCartCommands.FLASH.id, true)}`}
                     disabled={!this.vesFlashCartService.connectedFlashCarts}
                     onClick={this.flash}

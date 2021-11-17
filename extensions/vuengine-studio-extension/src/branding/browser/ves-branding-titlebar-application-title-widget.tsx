@@ -36,15 +36,20 @@ export class VesTitlebarApplicationTitleWidget extends ReactWidget {
 
     this.update();
 
-    this.vesProjectsService.onDidChangeProjectFile(() => { this.setTitle(); });
-    this.workspaceService.onWorkspaceChanged(() => { this.setTitle(); });
+    this.vesProjectsService.onDidChangeProjectFile(() => {
+      this.setTitle();
+      this.update();
+    });
+    this.workspaceService.onWorkspaceChanged(() => {
+      this.setTitle();
+      this.update();
+    });
   }
 
   protected setTitle(): void {
     this.vesProjectsService.getProjectName().then(projectTitle => {
       if (projectTitle !== '') {
         this.applicationTitle = projectTitle;
-        this.update();
       }
     });
   }
@@ -52,14 +57,14 @@ export class VesTitlebarApplicationTitleWidget extends ReactWidget {
   protected render(): React.ReactNode {
     this.setTitle();
 
-    return <div onDoubleClick={this.handleDoubleClick}>
+    return <div onDoubleClick={this.maximizeWindow}>
       <div className="applicationTitle" onClick={this.openRecentWorkspace}>
         {this.applicationTitle}
       </div >
     </div>;
   }
 
-  protected handleDoubleClick(): void {
+  protected maximizeWindow(): void {
     const win = remote.getCurrentWindow();
     if (!win) { return; }
     if (process.platform === 'darwin') {
