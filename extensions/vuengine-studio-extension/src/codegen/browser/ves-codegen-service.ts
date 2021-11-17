@@ -54,10 +54,8 @@ export class VesCodeGenService {
         await this.configureTemplateEngine();
         await this.getTemplateDefinitions();
 
-        // TODO: disable file change listener while template files are being written
         this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => this.handleFileChange(fileChangesEvent));
-        // TODO: re-enable once performance issues are solved
-        /* this.vesPluginsService.onDidChangeInstalledPlugins(async () => this.handlePluginChange()); */
+        this.vesPluginsService.onDidChangeInstalledPlugins(async () => this.handlePluginChange());
       });
     });
   }
@@ -71,9 +69,8 @@ export class VesCodeGenService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async writeTemplate(targetUri: URI, templateUri: URI, data: any, encoding: TemplateEncoding = TemplateEncoding.utf8): Promise<void> {
-    const templateData = (await this.fileService.readFile(templateUri)).value.toString();
-    const renaderedTemplateData = nunjucks.renderString(templateData, data);
+  async renderTemplateToFile(targetUri: URI, template: string, data: any, encoding: TemplateEncoding = TemplateEncoding.utf8): Promise<void> {
+    const renaderedTemplateData = nunjucks.renderString(template, data);
     await this.fileService.writeFile(targetUri, BinaryBuffer.wrap(iconv.encode(renaderedTemplateData, encoding)));
   }
 
@@ -116,9 +113,14 @@ export class VesCodeGenService {
       return;
     }
 
+    const encoding = template.encoding ? template.encoding : TemplateEncoding.utf8;
+    const templateUri = new URI(template.template);
+    const templateString = (await this.fileService.readFile(templateUri)).value.toString();
+    const additionalTemplateData = await this.getAdditionalTemplateData(template.data ?? [], resource);
+
     switch (template.mode) {
       case TemplateMode.single:
-        await this.renderFileFromTemplate(template, resource);
+        await this.renderFileFromTemplate(template, templateString, additionalTemplateData, encoding, resource);
         break;
       case TemplateMode.withEnding:
         if (!template.ending) {
@@ -127,17 +129,20 @@ export class VesCodeGenService {
         // TODO: refactor to use fileservice instead of glob
         const workspaceRoot = this.vesCommonService.getWorkspaceRoot();
         const fileMatcher = joinPath(workspaceRoot, '**', `*${template.ending}`);
-        await Promise.all(glob.sync(fileMatcher).map(async file => {
-          // TODO: cache all data except of type changedFile
-          // TODO: cache template file content
-          await this.renderFileFromTemplate(template, new URI(file));
+        const files = glob.sync(fileMatcher);
+        await Promise.all(files.map(async file => {
+          await this.renderFileFromTemplate(template, templateString, additionalTemplateData, encoding, new URI(file));
         }));
         break;
     }
   }
 
-  protected async renderFileFromTemplate(template: Template, resource?: URI): Promise<void> {
-    const data = await this.getTemplateData(template.data ?? [], resource);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  protected async renderFileFromTemplate(template: Template, templateString: string, data: any, encoding: TemplateEncoding, resource?: URI): Promise<void> {
+    if (resource && template.data) {
+      const changedFileData = await this.getChangedFileTemplateData(template.data, resource);
+      data = deepmerge(data, changedFileData);
+    }
 
     const targetFile = template.target.replace(/\$\{([\s\S]*?)\}/ig, match => {
       match = match.substr(2, match.length - 3);
@@ -149,12 +154,9 @@ export class VesCodeGenService {
     });
 
     const roots = await this.resolveRoot(template.root, resource?.toString());
-
     await Promise.all(roots.map(async root => {
       const targetUri = new URI(joinPath(root, ...targetFile.split('/')));
-      const templateUri = new URI(template.template);
-      const encoding = template.encoding ? template.encoding : TemplateEncoding.utf8;
-      await this.writeTemplate(targetUri, templateUri, data, encoding);
+      await this.renderTemplateToFile(targetUri, templateString, data, encoding);
     }));
   }
 
@@ -209,17 +211,28 @@ export class VesCodeGenService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  protected async getTemplateData(dataSources: Array<TemplateDataSource>, file?: URI): Promise<any> {
+  protected async getChangedFileTemplateData(dataSources: Array<TemplateDataSource>, file: URI): Promise<any> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data: { [key: string]: any } = {};
     await Promise.all(dataSources.map(async dataSource => {
-      const roots = await this.resolveRoot(dataSource.root, file?.toString());
       if (dataSource.type === TemplateDataType.changedFile) {
         if (file && await this.fileService.exists(file)) {
           const fileContent = await this.fileService.readFile(file);
           data[dataSource.key] = JSON.parse(fileContent.value.toString());
         }
-      } else if (dataSource.type === TemplateDataType.file) {
+      }
+    }));
+
+    return data;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  protected async getAdditionalTemplateData(dataSources: Array<TemplateDataSource>, file?: URI): Promise<any> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data: { [key: string]: any } = {};
+    await Promise.all(dataSources.map(async dataSource => {
+      const roots = await this.resolveRoot(dataSource.root, file?.toString());
+      if (dataSource.type === TemplateDataType.file) {
         await Promise.all(roots.map(async root => {
           const uri = new URI(joinPath(root, ...dataSource.value.split('/')));
           if (await this.fileService.exists(uri)) {

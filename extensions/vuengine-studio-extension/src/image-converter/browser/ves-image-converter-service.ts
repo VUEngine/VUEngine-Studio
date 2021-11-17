@@ -279,7 +279,8 @@ export class VesImageConverterService {
     // sort frames by filename
     frames.sort((a, b) => a.filename > b.filename && 1 || -1);
 
-    this.vesCodeGenService.writeTemplate(targetFileUri, templateFileUri, {
+    const templateString = (await this.fileService.readFile(templateFileUri)).value.toString();
+    this.vesCodeGenService.renderTemplateToFile(targetFileUri, templateString, {
       name,
       largestFrame,
       numberOfFrames,
