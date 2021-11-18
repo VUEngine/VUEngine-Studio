@@ -9,7 +9,6 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { homedir } from 'os';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
-import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesProjectsService } from '../../projects/browser/ves-projects-service';
 import sanitize = require('sanitize-filename');
@@ -30,8 +29,6 @@ export class VesExportService {
   protected readonly preferenceService: PreferenceService;
   @inject(VesBuildService)
   protected readonly vesBuildService: VesBuildService;
-  @inject(VesBuildPathsService)
-  private readonly vesBuildPathsService: VesBuildPathsService;
   @inject(VesProjectsService)
   protected readonly vesProjectsService: VesProjectsService;
   @inject(WorkspaceService)
@@ -80,7 +77,8 @@ export class VesExportService {
   }
 
   protected async exportRom(): Promise<void> {
-    const romUri = this.vesBuildPathsService.getRomUri();
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+    const romUri = workspaceRootUri.resolve('build').resolve('output.vb');
     let exists: boolean = false;
     let overwrite: boolean = false;
     let selected: URI | undefined;

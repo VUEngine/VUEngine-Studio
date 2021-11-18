@@ -6,10 +6,10 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { dirname, join } from 'path';
 import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
-import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
@@ -45,8 +45,6 @@ export class VesFlashCartService {
   protected readonly preferenceService: PreferenceService;
   @inject(VesBuildService)
   protected readonly vesBuildService: VesBuildService;
-  @inject(VesBuildPathsService)
-  private readonly vesBuildPathsService: VesBuildPathsService;
   @inject(VesCommonService)
   protected readonly vesCommonService: VesCommonService;
   @inject(VesFlashCartUsbService)
@@ -59,6 +57,8 @@ export class VesFlashCartService {
   protected readonly vesProcessWatcher: VesProcessWatcher;
   @inject(VesProjectsService)
   protected readonly vesProjectsService: VesProjectsService;
+  @inject(WorkspaceService)
+  private readonly workspaceService: WorkspaceService;
 
   // is queued
   protected _isQueued: boolean = false;
@@ -181,10 +181,12 @@ export class VesFlashCartService {
         continue;
       }
 
+      const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+      const defaultRomUri = workspaceRootUri.resolve('build').resolve('output.vb');
       const romUri = connectedFlashCart.config.padRom &&
         await this.padRom(connectedFlashCart.config.size)
         ? this.getPaddedRomUri(connectedFlashCart.config.size)
-        : this.vesBuildPathsService.getRomUri();
+        : defaultRomUri;
 
       const projectName = await this.vesProjectsService.getProjectName();
 
@@ -380,7 +382,8 @@ export class VesFlashCartService {
   }
 
   protected async padRom(size: number): Promise<boolean> {
-    const romUri = this.vesBuildPathsService.getRomUri();
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+    const romUri = workspaceRootUri.resolve('build').resolve('output.vb');
     const paddedRomUri = this.getPaddedRomUri(size);
     if (!await this.vesBuildService.outputRomExists()) {
       return false;
@@ -406,7 +409,8 @@ export class VesFlashCartService {
   }
 
   protected getPaddedRomUri(size: number): URI {
-    return this.vesBuildPathsService.getRomUri().parent.resolve(`outputPadded${size}.vb`);
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+    return workspaceRootUri.resolve('build').resolve(`outputPadded${size}.vb`);
   }
 
   protected async parseStreamDataHyperFlasherCli32(connectedFlashCart: ConnectedFlashCart, data: any): Promise<void> { /* eslint-disable-line */

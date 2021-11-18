@@ -27,6 +27,7 @@ export class VesProjectsService {
   @postConstruct()
   protected async init(): Promise<void> {
     // watch for project config file changes
+    await this.workspaceService.ready;
     const configFileUri = this.getProjectConfigFileUri();
     this.fileService.onDidFilesChange((fileChangesEvent: FileChangesEvent) => {
       if (fileChangesEvent.contains(configFileUri)) {
@@ -65,8 +66,8 @@ export class VesProjectsService {
   }
 
   protected getProjectConfigFileUri(): URI {
-    const workspaceRootUri = this.vesCommonService.getWorkspaceRootUri();
-    return workspaceRootUri.resolve(join('config', 'Project.json'));
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+    return workspaceRootUri.resolve('config').resolve('Project.json');
   }
 
   async createProjectFromTemplate(

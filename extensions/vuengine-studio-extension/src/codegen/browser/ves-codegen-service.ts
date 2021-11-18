@@ -5,13 +5,13 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import { FileChangeType } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { deepmerge } from 'deepmerge-ts';
 import * as glob from 'glob';
 import * as iconv from 'iconv-lite';
 import * as nunjucks from 'nunjucks';
 import { basename, join, parse as parsePath } from 'path';
 import { VES_PREFERENCE_DIR } from '../../branding/browser/ves-branding-preference-configurations';
-import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-service';
@@ -31,12 +31,12 @@ export class VesCodeGenService {
   protected vesBuildService: VesBuildService;
   @inject(VesBuildPathsService)
   protected vesBuildPathsService: VesBuildPathsService;
-  @inject(VesCommonService)
-  protected vesCommonService: VesCommonService;
   @inject(VesPluginsService)
   protected vesPluginsService: VesPluginsService;
   @inject(VesPluginsPathsService)
   protected vesPluginsPathsService: VesPluginsPathsService;
+  @inject(WorkspaceService)
+  protected workspaceService: WorkspaceService;
 
   protected templates: Templates = {
     events: {
@@ -78,7 +78,8 @@ export class VesCodeGenService {
     fileChangesEvent.changes.map(async fileChange => {
       if ([FileChangeType.ADDED, FileChangeType.UPDATED].includes(fileChange.type)) {
         Object.keys(this.templates.events.fileChanged).map(async file => {
-          const templateFileUri = this.vesCommonService.getWorkspaceRootUri().resolve(join(...file.split('/')));
+          const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+          const templateFileUri = workspaceRootUri.resolve(join(...file.split('/')));
           if (fileChange.resource.isEqual(templateFileUri)) {
             await Promise.all(this.templates.events.fileChanged[file].map(async templateId => {
               await this.renderTemplate(templateId, fileChange.resource);
@@ -125,7 +126,7 @@ export class VesCodeGenService {
           return;
         }
         // TODO: refactor to use fileservice instead of glob
-        const workspaceRootUri = this.vesCommonService.getWorkspaceRootUri();
+        const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
         const files = glob.sync(join(await this.fileService.fsPath(workspaceRootUri), '**', `*${template.ending}`));
         await Promise.all(files.map(async file => {
           await this.renderFileFromTemplate(template, templateString, additionalTemplateData, encoding, new URI(file));
@@ -331,7 +332,8 @@ export class VesCodeGenService {
         break;
       default:
       case TemplateRoot.workspace:
-        roots.push(this.vesCommonService.getWorkspaceRootUri());
+        const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+        roots.push(workspaceRootUri);
         break;
     }
 

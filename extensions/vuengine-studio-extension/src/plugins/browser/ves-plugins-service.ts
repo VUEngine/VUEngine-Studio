@@ -7,9 +7,9 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
 import * as glob from 'glob';
 import { join, relative as relativePath, sep } from 'path';
-import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { VesPluginData, VesPluginsData } from './ves-plugin';
 import { VesPluginsPathsService } from './ves-plugins-paths-service';
 import { VUENGINE_PLUGINS_PREFIX } from './ves-plugins-types';
@@ -23,10 +23,10 @@ export class VesPluginsService {
   protected fileService: FileService;
   @inject(PreferenceService)
   protected preferenceService: PreferenceService;
-  @inject(VesCommonService)
-  protected vesCommonService: VesCommonService;
   @inject(VesPluginsPathsService)
   protected vesPluginsPathsService: VesPluginsPathsService;
+  @inject(WorkspaceService)
+  protected workspaceService: WorkspaceService;
 
   protected pluginsData: VesPluginsData;
 
@@ -80,6 +80,7 @@ export class VesPluginsService {
 
   async determineInstalledPlugins(): Promise<Array<string>> {
     try {
+      await this.workspaceService.ready;
       const pluginsFileUri = this.getPluginsFileUri();
       const fileContent = await this.fileService.readFile(pluginsFileUri);
       const fileContentParsed = JSON.parse(fileContent.value.toString());
@@ -193,7 +194,7 @@ export class VesPluginsService {
   }
 
   getPluginsFileUri(): URI {
-    const workspaceRootUri = this.vesCommonService.getWorkspaceRootUri();
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
     return workspaceRootUri.resolve(join('config', 'Plugins.json'));
   }
 

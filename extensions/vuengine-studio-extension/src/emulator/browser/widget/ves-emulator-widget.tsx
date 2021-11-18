@@ -13,9 +13,8 @@ import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { basename, join } from 'path';
-import { VesCommonService } from '../../../branding/browser/ves-common-service';
-import { VesBuildPathsService } from '../../../build/browser/ves-build-paths-service';
 import { VesEmulatorCommands } from '../ves-emulator-commands';
 import { VesEmulatorPreferenceIds } from '../ves-emulator-preferences';
 import { VesEmulatorService } from '../ves-emulator-service';
@@ -57,14 +56,12 @@ export class VesEmulatorWidget extends ReactWidget {
   protected readonly localStorageService: LocalStorageService;
   @inject(PreferenceService)
   protected readonly preferenceService: PreferenceService;
-  @inject(VesBuildPathsService)
-  private readonly vesBuildPathsService: VesBuildPathsService;
-  @inject(VesCommonService)
-  protected readonly vesCommonService: VesCommonService;
   @inject(VesEmulatorService)
   protected readonly vesEmulatorService: VesEmulatorService;
   @inject(VesEmulatorWidgetOptions)
   protected readonly options: VesEmulatorWidgetOptions;
+  @inject(WorkspaceService)
+  protected readonly workspaceService: WorkspaceService;
 
   static readonly ID = 'vesEmulatorWidget';
   static readonly LABEL = 'Emulator';
@@ -344,7 +341,9 @@ export class VesEmulatorWidget extends ReactWidget {
   }
 
   protected startEmulator = () => {
-    const romUri = this.options ? this.options.uri : this.vesBuildPathsService.getRomUri();
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+    const defaultRomUri = workspaceRootUri.resolve('build').resolve('output.vb');
+    const romUri = this.options ? this.options.uri : defaultRomUri;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     datauri(romUri, (err: any) => {
@@ -682,7 +681,7 @@ export class VesEmulatorWidget extends ReactWidget {
       ia[i] = byteString.charCodeAt(i);
     }
 
-    const workspaceRootUri = this.vesCommonService.getWorkspaceRootUri();
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
     const fileUri = workspaceRootUri.resolve(join('screenshots', filename));
     this.fileService.writeFile(fileUri, BinaryBuffer.wrap(ia));
   }

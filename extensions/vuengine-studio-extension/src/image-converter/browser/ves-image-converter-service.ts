@@ -4,6 +4,7 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileStatWithMetadata } from '@theia/filesystem/lib/common/files';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { deepmerge } from 'deepmerge-ts';
 import * as glob from 'glob';
 import { basename, dirname, join, parse as parsePath } from 'path';
@@ -33,6 +34,8 @@ export class VesImageConverterService {
   protected vesProcessService: VesProcessService;
   @inject(VesProcessWatcher)
   protected readonly vesProcessWatcher: VesProcessWatcher;
+  @inject(WorkspaceService)
+  protected readonly workspaceService: WorkspaceService;
 
   // is converting
   protected _isConverting: boolean = false;
@@ -408,7 +411,7 @@ export class VesImageConverterService {
   }
 
   protected async getImageConfigFilesToBeConverted(changedOnly: boolean): Promise<Array<ImageConfigFileToBeConverted>> {
-    const workspaceRootUri = this.vesCommonService.getWorkspaceRootUri();
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
 
     const imageConfigFilesToBeConverted: Array<ImageConfigFileToBeConverted> = [];
 

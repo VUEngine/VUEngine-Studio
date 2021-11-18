@@ -34,29 +34,26 @@ export class VesTitlebarApplicationTitleWidget extends ReactWidget {
     const { applicationName: title } = FrontendApplicationConfigProvider.get();
     this.applicationTitle = title;
 
-    this.update();
+    await this.workspaceService.ready;
+    await this.setTitle();
 
-    this.vesProjectsService.onDidChangeProjectFile(() => {
-      this.setTitle();
-      this.update();
+    this.vesProjectsService.onDidChangeProjectFile(async () => {
+      await this.setTitle();
     });
-    this.workspaceService.onWorkspaceChanged(() => {
-      this.setTitle();
-      this.update();
+    this.workspaceService.onWorkspaceChanged(async () => {
+      await this.setTitle();
     });
   }
 
-  protected setTitle(): void {
-    this.vesProjectsService.getProjectName().then(projectTitle => {
-      if (projectTitle !== '') {
-        this.applicationTitle = projectTitle;
-      }
-    });
+  protected async setTitle(): Promise<void> {
+    const projectTitle = await this.vesProjectsService.getProjectName();
+    if (projectTitle !== '') {
+      this.applicationTitle = projectTitle;
+      this.update();
+    }
   }
 
   protected render(): React.ReactNode {
-    this.setTitle();
-
     return <div onDoubleClick={this.maximizeWindow}>
       <div className="applicationTitle" onClick={this.openRecentWorkspace}>
         {this.applicationTitle}

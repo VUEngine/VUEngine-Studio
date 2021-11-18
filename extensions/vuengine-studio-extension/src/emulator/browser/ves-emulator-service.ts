@@ -5,8 +5,8 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
-import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 import { VesProjectsService } from '../../projects/browser/ves-projects-service';
@@ -31,12 +31,12 @@ export class VesEmulatorService {
   private readonly quickPickService: QuickPickService;
   @inject(VesBuildService)
   private readonly vesBuildService: VesBuildService;
-  @inject(VesBuildPathsService)
-  private readonly vesBuildPathsService: VesBuildPathsService;
   @inject(VesProcessService)
   private readonly vesProcessService: VesProcessService;
   @inject(VesProjectsService)
   protected readonly vesProjectsService: VesProjectsService;
+  @inject(WorkspaceService)
+  private readonly workspaceService: WorkspaceService;
 
   // is queued
   protected _isQueued: boolean = false;
@@ -139,14 +139,14 @@ export class VesEmulatorService {
 
   async runInEmulator(): Promise<void> {
     const defaultEmulatorConfig = this.getDefaultEmulatorConfig();
-
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+    const romUri = workspaceRootUri.resolve('build').resolve('output.vb');
     if (defaultEmulatorConfig === DEFAULT_EMULATOR) {
-      const romUri = this.vesBuildPathsService.getRomUri();
       const opener = await this.openerService.getOpener(romUri);
       await opener.open(romUri);
     } else {
       const emulatorUri = new URI(defaultEmulatorConfig.path);
-      const romPath = await this.fileService.fsPath(this.vesBuildPathsService.getRomUri());
+      const romPath = await this.fileService.fsPath(romUri);
       const emulatorArgs = defaultEmulatorConfig.args.replace(ROM_PLACEHOLDER, romPath).split(' ');
 
       if (emulatorUri.isEqual(new URI('')) || !await this.fileService.exists(emulatorUri)) {

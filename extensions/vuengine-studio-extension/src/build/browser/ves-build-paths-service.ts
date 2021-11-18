@@ -5,7 +5,6 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { join } from 'path';
 import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
-import { BuildMode } from './ves-build-types';
 
 @injectable()
 export class VesBuildPathsService {
@@ -15,18 +14,6 @@ export class VesBuildPathsService {
   protected readonly preferenceService: PreferenceService;
   @inject(VesCommonService)
   protected readonly vesCommonService: VesCommonService;
-
-  getBuildPathUri(buildMode?: BuildMode): URI {
-    const buildPathUri = this.vesCommonService.getWorkspaceRootUri().resolve('build');
-
-    return buildMode
-      ? buildPathUri.resolve(buildMode.toLowerCase())
-      : buildPathUri;
-  }
-
-  getRomUri(): URI {
-    return this.getBuildPathUri().resolve('output.vb');
-  }
 
   async getEngineCoreUri(): Promise<URI> {
     const resourcesUri = await this.vesCommonService.getResourcesUri();
