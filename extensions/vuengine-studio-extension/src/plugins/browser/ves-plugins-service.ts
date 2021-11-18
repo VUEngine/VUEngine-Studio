@@ -124,7 +124,7 @@ export class VesPluginsService {
         const pluginPathFull = fileSplit[0];
 
         const pluginPathRelative = relativePath(rootPath, pluginPathFull);
-        const fileContent = await this.fileService.readFile(new URI(file));
+        const fileContent = await this.fileService.readFile(new URI(file).withScheme('file'));
         const fileContentJson = JSON.parse(fileContent.value.toString());
 
         const pluginId = `${prefix}//${pluginPathRelative}`;

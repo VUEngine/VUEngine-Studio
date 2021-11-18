@@ -30,6 +30,7 @@ export const VesPluginsPreferenceSchema: PreferenceSchema = {
         [VesPluginsPreferenceIds.USER_PLUGINS_PATH]: {
             type: 'string',
             description: 'Full path to base folder for all user plugins.',
+            // TODO: use EnvVariablesServer.getHomeDirUri()
             default: join(homedir(), 'vuengine', 'plugins'),
             additionalProperties: {
                 isDirectory: true,

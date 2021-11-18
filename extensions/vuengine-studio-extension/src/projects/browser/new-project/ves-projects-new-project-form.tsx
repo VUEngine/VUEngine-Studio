@@ -339,8 +339,8 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
             canSelectFolders: true,
             canSelectFiles: false
         };
-        const currentPath = await this.fileService.exists(new URI(this.state.path))
-            ? await this.fileService.resolve(new URI(this.state.path))
+        const currentPath = await this.fileService.exists(new URI(this.state.path).withScheme('file'))
+            ? await this.fileService.resolve(new URI(this.state.path).withScheme('file'))
             : undefined;
         const destinationFolderUri = await this.fileDialogService.showOpenDialog(props, currentPath);
         if (destinationFolderUri) {

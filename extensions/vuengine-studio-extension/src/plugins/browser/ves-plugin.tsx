@@ -383,7 +383,7 @@ export class VesPluginEditorComponent extends AbstractVesPluginComponent {
         const href = node.getAttribute('href');
         if (href && !href.startsWith('#')) {
             event.preventDefault();
-            this.props.plugin.doOpen(new URI(href));
+            this.props.plugin.doOpen(new URI(href).withScheme('file'));
         }
     };
 
@@ -405,7 +405,7 @@ export class VesPluginEditorComponent extends AbstractVesPluginComponent {
 
         const plugin = this.props.plugin;
         if (plugin.repository) {
-            plugin.doOpen(new URI(plugin.repository));
+            plugin.doOpen(new URI(plugin.repository).withScheme('file'));
         }
     };
 }

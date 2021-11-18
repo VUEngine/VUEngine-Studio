@@ -3,7 +3,6 @@ import URI from '@theia/core/lib/common/uri';
 import { BackendApplicationContribution, FileUri } from '@theia/core/lib/node';
 import * as express from 'express';
 import { inject, injectable } from 'inversify';
-import { join } from 'path';
 
 @injectable()
 export class EmulatorBackendContribution implements BackendApplicationContribution {
@@ -13,13 +12,12 @@ export class EmulatorBackendContribution implements BackendApplicationContributi
 
     async configure(app: express.Application): Promise<void> {
         const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
-        const applicationUri = new URI(envVar && envVar.value ? envVar.value : '');
-        const emulatorUri = applicationUri.resolve(join(
-            'binaries',
-            'vuengine-studio-tools',
-            'web',
-            'retroarch'
-        ));
+        const applicationUri = new URI(envVar && envVar.value ? envVar.value : '').withScheme('file');
+        const emulatorUri = applicationUri
+            .resolve('binaries')
+            .resolve('vuengine-studio-tools')
+            .resolve('web')
+            .resolve('retroarch');
 
         app.use('/emulator', express.static(FileUri.fsPath(emulatorUri), { dotfiles: 'allow' }));
     }

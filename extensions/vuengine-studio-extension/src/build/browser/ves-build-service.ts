@@ -362,7 +362,7 @@ export class VesBuildService {
     const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
     const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
     const compilerUri = await this.vesBuildPathsService.getCompilerUri();
-    const makefile = await this.getMakefilePath(workspaceRootUri, engineCoreUri);
+    const makefileUri = await this.getMakefileUri(workspaceRootUri, engineCoreUri);
 
     // TODO: remove check when https://github.com/VUEngine/VUEngine-Studio/issues/15 is resolved
     await this.checkPathsForSpaces(workspaceRootUri, engineCoreUri, enginePluginsUri, userPluginsUri);
@@ -378,7 +378,7 @@ export class VesBuildService {
         `ENGINE_FOLDER=${await this.convertoToEnvPath(engineCoreUri)}`,
         `PLUGINS_FOLDER=${await this.convertoToEnvPath(enginePluginsUri)}`,
         `USER_PLUGINS_FOLDER=${await this.convertoToEnvPath(userPluginsUri)}`,
-        '-f', makefile,
+        '-f', await this.convertoToEnvPath(makefileUri),
       ];
 
       return {
@@ -404,7 +404,7 @@ export class VesBuildService {
       args: [
         'all',
         '-e', `TYPE=${buildMode}`,
-        '-f', makefile,
+        '-f', await this.convertoToEnvPath(makefileUri),
         '-C', await this.convertoToEnvPath(workspaceRootUri),
       ],
       options: {
@@ -479,7 +479,7 @@ export class VesBuildService {
         ? BuildLogLineType.Warning
         : BuildLogLineType.Error;
       file = {
-        uri: new URI(problem.file),
+        uri: new URI(problem.file).withScheme('file'),
         line: problem.line,
         column: problem.column,
       };
@@ -557,18 +557,20 @@ export class VesBuildService {
     return name;
   }
 
-  protected async getMakefilePath(workspaceRootUri: URI, engineCoreUri: URI): Promise<string> {
-    const gameMakefilePath = await this.convertoToEnvPath(workspaceRootUri.resolve('makefile'));
-    let makefilePath = gameMakefilePath;
-    if (!(await this.fileService.exists(new URI(makefilePath)))) {
-      const engineMakefilePath = await this.convertoToEnvPath(engineCoreUri.resolve('makefile-game'));
-      makefilePath = engineMakefilePath;
-      if (!(await this.fileService.exists(new URI(makefilePath)))) {
-        throw new Error(`Error: Could not find a makefile. Tried the following locations:\n1) ${gameMakefilePath}\n2) ${engineMakefilePath}`);
+  protected async getMakefileUri(workspaceRootUri: URI, engineCoreUri: URI): Promise<URI> {
+    const gameMakefileUri = workspaceRootUri.resolve('makefile');
+    let makefileUri = gameMakefileUri;
+    if (!(await this.fileService.exists(makefileUri))) {
+      const engineMakefileUri = engineCoreUri.resolve('makefile-game');
+      makefileUri = engineMakefileUri;
+      if (!(await this.fileService.exists(makefileUri))) {
+        throw new Error('Error: Could not find a makefile. Tried the following locations:\n' +
+          `1) ${this.labelProvider.getLongName(gameMakefileUri)}\n` +
+          `2) ${this.labelProvider.getLongName(engineMakefileUri)}`);
       }
     }
 
-    return makefilePath;
+    return makefileUri;
   }
 
   async abortBuild(): Promise<void> {

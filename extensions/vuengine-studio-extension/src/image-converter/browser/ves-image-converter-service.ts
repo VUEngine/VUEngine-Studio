@@ -173,7 +173,7 @@ export class VesImageConverterService {
   protected async doConvertFile(imageConfigFileToBeConverted: ImageConfigFileToBeConverted, gritUri: URI): Promise<void> {
     const fileDir = dirname(imageConfigFileToBeConverted.imageConfigFile);
     const convertedDir = join(fileDir, this.getConvertedDirName());
-    const convertedDirUri = new URI(convertedDir);
+    const convertedDirUri = new URI(convertedDir).withScheme('file');
 
     if (!(await this.fileService.exists(convertedDirUri))) {
       await this.fileService.createFolder(convertedDirUri);
@@ -209,7 +209,7 @@ export class VesImageConverterService {
       timestamp: Date.now(),
       text: `Created ${basename(convertedImagePath)}`,
       type: ImageConverterLogLineType.Normal,
-      uri: new URI(convertedImagePath),
+      uri: new URI(convertedImagePath).withScheme('file'),
     });
 
     this.leftToConvert--;
@@ -244,7 +244,7 @@ export class VesImageConverterService {
       dirname(imageConfigFileToBeConverted.imageConfigFile),
       this.getConvertedDirName(),
       `${name}.c`
-    ));
+    )).withScheme('file');
     const resourcesUri = await this.vesCommonService.getResourcesUri();
     const templateFileUri = resourcesUri.resolve(join(
       'templates',
@@ -256,7 +256,7 @@ export class VesImageConverterService {
     const numberOfFrames = generatedFiles.length;
     const frames: Array<StackedFrameData> = [];
     await Promise.all(generatedFiles.map(async file => {
-      const fileUri = new URI(file);
+      const fileUri = new URI(file).withScheme('file');
       const fileContent = (await this.fileService.readFile(fileUri)).value.toString();
 
       const tiles = fileContent.match(/0x([0-9A-Fa-f]{8}),/g) ?? [];
@@ -289,7 +289,7 @@ export class VesImageConverterService {
 
     // delete frame files and report done
     await Promise.all(generatedFiles.map(async file => {
-      const fileUri = new URI(file);
+      const fileUri = new URI(file).withScheme('file');
       await this.fileService.delete(fileUri);
       this.reportConverted(file);
     }));
@@ -301,7 +301,7 @@ export class VesImageConverterService {
     // write all file contents to map and clean on the way
     const fileContents: FileContentsMap = {};
     await Promise.all(generatedFiles.map(async file => {
-      const fileUri = new URI(file);
+      const fileUri = new URI(file).withScheme('file');
       const fileContent = (await this.fileService.readFile(fileUri)).value.toString();
       fileContents[file] = this.cleanFileContent(fileContent, imageConfigFileToBeConverted.config.section);
     }));
@@ -316,7 +316,7 @@ export class VesImageConverterService {
         this.getConvertedDirName(),
         `${name}.c`
       );
-      const tilesetFileContent = (await this.fileService.readFile(new URI(tilesetFile))).value.toString();
+      const tilesetFileContent = (await this.fileService.readFile(new URI(tilesetFile).withScheme('file'))).value.toString();
       fileContents[tilesetFile] = this.cleanFileContent(tilesetFileContent, imageConfigFileToBeConverted.config.section);
     }
 
@@ -325,7 +325,7 @@ export class VesImageConverterService {
 
     // write back all contents to files
     await Promise.all(Object.keys(fileContents).map(async file => {
-      this.fileService.writeFile(new URI(file), BinaryBuffer.fromString(fileContents[file]));
+      this.fileService.writeFile(new URI(file).withScheme('file'), BinaryBuffer.fromString(fileContents[file]));
       this.reportConverted(file);
     }));
   }
@@ -418,7 +418,7 @@ export class VesImageConverterService {
     // TODO: refactor to use fileservice instead of glob
     const fileMatcher = join(await this.fileService.fsPath(workspaceRootUri), '**', '*.image.json');
     await Promise.all(glob.sync(fileMatcher).map(async imageConfigFile => {
-      const config = await this.getConverterConfig(new URI(imageConfigFile));
+      const config = await this.getConverterConfig(new URI(imageConfigFile).withScheme('file'));
       const name = config.name ? config.name : parsePath(imageConfigFile).name;
 
       const images = await this.getRelevantImageFiles(changedOnly, imageConfigFile, config, name);
@@ -449,7 +449,7 @@ export class VesImageConverterService {
     const imageConfigFileDir = dirname(imageConfigFile);
     await Promise.all(config.images.map(async image => {
       if (image === '.') {
-        const resolved = await this.fileService.resolve(new URI(imageConfigFileDir));
+        const resolved = await this.fileService.resolve(new URI(imageConfigFileDir).withScheme('file'));
         if (resolved.children) {
           await Promise.all(resolved.children.map(async child => {
             if (child.name.endsWith('.png') && await this.fileService.exists(child.resource)) {
@@ -459,7 +459,7 @@ export class VesImageConverterService {
         }
       } else {
         const filepath = join(imageConfigFileDir, image);
-        if (image.endsWith('.png') && await this.fileService.exists(new URI(filepath))) {
+        if (image.endsWith('.png') && await this.fileService.exists(new URI(filepath).withScheme('file'))) {
           foundImages.push(filepath);
         }
       }
@@ -488,9 +488,9 @@ export class VesImageConverterService {
     } else {
       const changedImages: Array<string> = [];
       await Promise.all(foundImages.map(async foundImage => {
-        const foundImageStat = await this.fileService.resolve(new URI(foundImage), { resolveMetadata: true });
+        const foundImageStat = await this.fileService.resolve(new URI(foundImage).withScheme('file'), { resolveMetadata: true });
         const convertedFile = this.getGeneratedFile(imageConfigFile, foundImage);
-        const convertedFileUri = new URI(convertedFile);
+        const convertedFileUri = new URI(convertedFile).withScheme('file');
         const convertedFileStat = await this.fileService.exists(convertedFileUri)
           ? await this.fileService.resolve(convertedFileUri, { resolveMetadata: true })
           : undefined;
@@ -511,7 +511,7 @@ export class VesImageConverterService {
   }
 
   protected async atLeastOneImageNewerThanCollectiveConvertedFile(images: Array<string>, dir: string, name: string): Promise<boolean> {
-    const convertedFile = new URI(join(dir, this.getConvertedDirName(), `${name}.c`));
+    const convertedFile = new URI(join(dir, this.getConvertedDirName(), `${name}.c`)).withScheme('file');
     if (!await this.fileService.exists(convertedFile)) {
       return true;
     }
@@ -522,7 +522,7 @@ export class VesImageConverterService {
       : undefined;
     await Promise.all(images.map(async image => {
       if (!atLeastOneImageNewer) {
-        const imageStat = await this.fileService.resolve(new URI(image), { resolveMetadata: true });
+        const imageStat = await this.fileService.resolve(new URI(image).withScheme('file'), { resolveMetadata: true });
         if (this.imageHasChanged(imageStat, convertedFileStat)) {
           atLeastOneImageNewer = true;
         }

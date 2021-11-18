@@ -174,7 +174,7 @@ export class VesFlashCartService {
         continue;
       }
 
-      if (!await this.fileService.exists(new URI(dirname(flasherPath)))) {
+      if (!await this.fileService.exists(new URI(dirname(flasherPath)).withScheme('file'))) {
         this.messageService.error(
           `Flasher software does not exist at '${flasherPath}'`
         );

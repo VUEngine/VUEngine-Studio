@@ -145,11 +145,11 @@ export class VesEmulatorService {
       const opener = await this.openerService.getOpener(romUri);
       await opener.open(romUri);
     } else {
-      const emulatorUri = new URI(defaultEmulatorConfig.path);
+      const emulatorUri = new URI(defaultEmulatorConfig.path).withScheme('file');
       const romPath = await this.fileService.fsPath(romUri);
       const emulatorArgs = defaultEmulatorConfig.args.replace(ROM_PLACEHOLDER, romPath).split(' ');
 
-      if (emulatorUri.isEqual(new URI('')) || !await this.fileService.exists(emulatorUri)) {
+      if (emulatorUri.isEqual(new URI('').withScheme('file')) || !await this.fileService.exists(emulatorUri)) {
         // TODO: error message
         return;
       }

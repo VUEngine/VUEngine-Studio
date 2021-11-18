@@ -113,7 +113,7 @@ export class VesCodeGenService {
     }
 
     const encoding = template.encoding ? template.encoding : TemplateEncoding.utf8;
-    const templateUri = new URI(template.template);
+    const templateUri = new URI(template.template).withScheme('file');
     const templateString = (await this.fileService.readFile(templateUri)).value.toString();
     const additionalTemplateData = await this.getAdditionalTemplateData(template.data ?? [], resource);
 
@@ -129,7 +129,7 @@ export class VesCodeGenService {
         const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
         const files = glob.sync(join(await this.fileService.fsPath(workspaceRootUri), '**', `*${template.ending}`));
         await Promise.all(files.map(async file => {
-          await this.renderFileFromTemplate(template, templateString, additionalTemplateData, encoding, new URI(file));
+          await this.renderFileFromTemplate(template, templateString, additionalTemplateData, encoding, new URI(file).withScheme('file'));
         }));
         break;
     }
@@ -246,7 +246,7 @@ export class VesCodeGenService {
           // TODO: refactor to use fileservice instead of glob
           const fileMatcher = join(await this.fileService.fsPath(root), '**', `*${dataSource.value}`);
           await Promise.all(glob.sync(fileMatcher).map(async dataSourceFile => {
-            const fileContent = await this.fileService.readFile(new URI(dataSourceFile));
+            const fileContent = await this.fileService.readFile(new URI(dataSourceFile).withScheme('file'));
             data[dataSource.key].push(JSON.parse(fileContent.value.toString()));
           }));
         }));
@@ -287,7 +287,7 @@ export class VesCodeGenService {
 
     // add functions
     /* env.addGlobal('fileExists', async (value: string) => {
-      const exists = await this.fileService.exists(new URI(value));
+      const exists = await this.fileService.exists(new URI(value).withScheme('file'));
       return exists;
     }); */
   }

@@ -7,11 +7,11 @@ import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileDialogService, SaveFileDialogProps } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { homedir } from 'os';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesProjectsService } from '../../projects/browser/ves-projects-service';
 import sanitize = require('sanitize-filename');
+import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 
 @injectable()
 export class VesExportService {
@@ -19,6 +19,8 @@ export class VesExportService {
   protected readonly shell: ApplicationShell;
   @inject(CommandService)
   protected readonly commandService: CommandService;
+  @inject(EnvVariablesServer)
+  protected readonly envVariablesServer: EnvVariablesServer;
   @inject(FileDialogService)
   protected readonly fileDialogService: FileDialogService;
   @inject(FileService)
@@ -86,7 +88,8 @@ export class VesExportService {
       title: 'Export ROM',
       inputValue: await this.getRomName(),
     };
-    const romStat = await this.fileService.resolve(new URI(homedir()));
+    const homedir = await this.envVariablesServer.getHomeDirUri();
+    const romStat = await this.fileService.resolve(new URI(homedir).withScheme('file'));
     do {
       selected = await this.fileDialogService.showSaveDialog(
         saveFilterDialogProps,

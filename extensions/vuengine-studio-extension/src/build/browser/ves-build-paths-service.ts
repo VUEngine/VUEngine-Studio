@@ -23,9 +23,9 @@ export class VesBuildPathsService {
     ));
     const customUri = new URI(this.preferenceService.get(
       VesBuildPreferenceIds.ENGINE_CORE_PATH
-    ) as string);
+    ) as string).withScheme('file');
 
-    return (!customUri.isEqual(new URI('')) && await this.fileService.exists(customUri))
+    return (!customUri.isEqual(new URI('').withScheme('file')) && await this.fileService.exists(customUri))
       ? customUri
       : defaultUri;
   }

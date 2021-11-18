@@ -47,8 +47,8 @@ export class VesPreferenceStringInputRenderer extends PreferenceStringInputRende
             canSelectFiles: false
         };
         const currentValue = this.getValue();
-        const currentPath = (currentValue && await this.fileService.exists(new URI(currentValue)))
-            ? await this.fileService.resolve(new URI(currentValue))
+        const currentPath = (currentValue && await this.fileService.exists(new URI(currentValue).withScheme('file')))
+            ? await this.fileService.resolve(new URI(currentValue).withScheme('file'))
             : undefined;
         const dirUri = await this.fileDialogService.showOpenDialog(props, currentPath);
         if (dirUri) {

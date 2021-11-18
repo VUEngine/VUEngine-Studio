@@ -24,9 +24,9 @@ export class VesPluginsPathsService {
     ));
     const customUri = new URI(this.preferenceService.get(
       VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH
-    ) as string);
+    ) as string).withScheme('file');
 
-    return (!customUri.isEqual(new URI('')) && await this.fileService.exists(customUri))
+    return (!customUri.isEqual(new URI('').withScheme('file')) && await this.fileService.exists(customUri))
       ? customUri
       : defaultUri;
   }
@@ -35,9 +35,9 @@ export class VesPluginsPathsService {
     const defaultUri = VesPluginsPreferenceSchema.properties[VesPluginsPreferenceIds.USER_PLUGINS_PATH].default;
     const customUri = new URI(this.preferenceService.get(
       VesPluginsPreferenceIds.USER_PLUGINS_PATH
-    ) as string);
+    ) as string).withScheme('file');
 
-    return (!customUri.isEqual(new URI('')) && await this.fileService.exists(customUri))
+    return (!customUri.isEqual(new URI('').withScheme('file')) && await this.fileService.exists(customUri))
       ? customUri
       : defaultUri;
   }

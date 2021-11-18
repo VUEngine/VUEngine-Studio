@@ -15,6 +15,6 @@ export class VesCommonService {
   async getResourcesUri(): Promise<URI> {
     const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
     const applicationPath = envVar && envVar.value ? envVar.value : '';
-    return new URI(applicationPath);
+    return new URI(applicationPath).withScheme('file');
   }
 }

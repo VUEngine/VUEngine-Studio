@@ -16,6 +16,7 @@ export const VesProjectsPreferenceSchema: PreferenceSchema = {
         [VesProjectsPreferenceIds.BASE_FOLDER]: {
             type: 'string',
             description: 'Base folder for new projects.',
+            // TODO: use EnvVariablesServer.getHomeDirUri()
             default: join(homedir(), 'vuengine', 'projects'),
         },
         [VesProjectsPreferenceIds.AUTHOR]: {
