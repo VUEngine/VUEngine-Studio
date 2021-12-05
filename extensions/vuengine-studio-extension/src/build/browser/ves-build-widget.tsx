@@ -13,7 +13,7 @@ import { VesBuildPreferenceIds, VesBuildPreferenceSchema } from './ves-build-pre
 import { VesBuildService } from './ves-build-service';
 import { EditorManager } from '@theia/editor/lib/browser';
 
-interface buildWidgetState {
+interface VesBuildWidgetState {
   showOptions: boolean,
   logFilter: BuildLogLineType,
   timerInterval: NodeJS.Timer | undefined,
@@ -39,7 +39,7 @@ export class VesBuildWidget extends ReactWidget {
   static readonly ID = 'vesBuildWidget';
   static readonly LABEL = VesBuildCommands.BUILD.label || 'Build';
 
-  protected state: buildWidgetState = {
+  protected state: VesBuildWidgetState = {
     showOptions: false,
     logFilter: BuildLogLineType.Normal,
     timerInterval: undefined,
