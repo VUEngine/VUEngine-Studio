@@ -1,0 +1,22 @@
+[type="checkbox"] {
+    background-color: transparent;
+    margin: 0;
+    outline: none;
+    padding: 0;
+    -webkit-appearance: none;
+}
+
+[type="checkbox"]::before {
+    font-size: 120%;
+    margin-right: var(--theia-ui-padding);
+    content: "\ebb5";
+    display: inline-block;
+    font-family: codicon;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    vertical-align: bottom;
+}
+
+[type="checkbox"]:checked::before {
+    content: "\ebb3";
+}
