@@ -12,6 +12,10 @@ import { VesImageConverterService } from './ves-image-converter-service';
 import { ImageConverterLogLine, ImageConverterLogLineType } from './ves-image-converter-types';
 import URI from '@theia/core/lib/common/uri';
 
+interface VesImageConverterWidgetState {
+  changedOnly: boolean,
+}
+
 @injectable()
 export class VesImageConverterWidget extends ReactWidget {
   @inject(CommandService)
@@ -31,6 +35,10 @@ export class VesImageConverterWidget extends ReactWidget {
 
   static readonly ID = 'vesImageConverterWidget';
   static readonly LABEL = 'Image Converter';
+
+  protected state: VesImageConverterWidgetState = {
+    changedOnly: true,
+  };
 
   protected imageConversionLogLastElementRef = React.createRef<HTMLDivElement>();
 
@@ -90,10 +98,21 @@ export class VesImageConverterWidget extends ReactWidget {
                 <button
                   className="theia-button large convert"
                   disabled={!this.workspaceService.opened}
-                  onClick={this.convertAll}
+                  onClick={this.convert}
                 >
                   Convert
                 </button>
+                <div>
+                  <label>
+                    <input
+                      type="checkbox"
+                      className="theia-input"
+                      checked={this.state.changedOnly}
+                      onChange={this.toggleChangedOnly}
+                    />
+                    Changed images only
+                  </label>
+                </div>
               </div>
             </>
           )}
@@ -187,7 +206,17 @@ export class VesImageConverterWidget extends ReactWidget {
     }
   }
 
-  protected convertAll = async () => this.commandService.executeCommand(VesImageConverterCommands.CONVERT_ALL.id);
   protected clearLog = () => this.vesImageConverterService.clearLog();
+  protected toggleChangedOnly = () => {
+    this.state.changedOnly = !this.state.changedOnly;
+    this.update();
+  };
+  protected convert = async () => {
+    if (this.state.changedOnly) {
+      this.commandService.executeCommand(VesImageConverterCommands.CONVERT_CHANGED.id);
+    } else {
+      this.commandService.executeCommand(VesImageConverterCommands.CONVERT_ALL.id);
+    }
+  };
   // protected abort = () => this.vesImageConverterService.abortConverting();
 }

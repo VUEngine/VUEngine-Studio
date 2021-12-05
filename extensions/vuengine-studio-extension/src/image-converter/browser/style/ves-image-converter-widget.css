@@ -6,21 +6,16 @@
   min-width: 250px;
 }
 
-#vesImageConverterWidget .convertButtons {
-  display: flex;
-  flex-direction: row;
+#vesImageConverterWidget .convertButtons div {
+  margin-top: var(--theia-ui-padding);
 }
 
 #vesImageConverterWidget .theia-button {
-  margin: 0 var(--theia-ui-padding) 0 0;
-  min-width: unset;
-}
-
-#vesImageConverterWidget .theia-button:last-child {
-  margin-right: 0;
+  margin: 0;
 }
 
 #vesImageConverterWidget .theia-button.convert {
+  margin: 0;
   width: 100%;
 }
 
@@ -96,6 +91,10 @@
   background: rgba(0, 0, 0, 0.2);
 }
 
+#vesImageConverterWidget .convertLogLine.headline {
+  font-weight: bold;
+}
+
 #vesImageConverterWidget .convertLogLine.hasFileLink {
   cursor: pointer;
 }
@@ -142,8 +141,4 @@
 
 #vesImageConverterWidget .convertLogLine.done {
   color: var(--theia-editorSuccess-foreground);
-}
-
-#vesImageConverterWidget .convertLogButtons {
-
 }
