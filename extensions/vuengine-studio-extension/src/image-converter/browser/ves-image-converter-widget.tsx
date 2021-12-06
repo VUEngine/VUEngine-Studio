@@ -93,40 +93,36 @@ export class VesImageConverterWidget extends ReactWidget {
             </div>
           )}
           {!this.vesImageConverterService.isConverting && (
-            <>
-              <div className="convertButtons">
-                <button
-                  className="theia-button large convert"
-                  disabled={!this.workspaceService.opened}
-                  onClick={this.convert}
-                >
-                  Convert
-                </button>
-                <div>
-                  <label>
-                    <input
-                      type="checkbox"
-                      className="theia-input"
-                      checked={this.state.changedOnly}
-                      onChange={this.toggleChangedOnly}
-                    />
-                    Changed images only
-                  </label>
-                </div>
+            <div className="convertButtons">
+              <button
+                className="theia-button large convert"
+                disabled={!this.workspaceService.opened}
+                onClick={this.convert}
+              >
+                Convert
+              </button>
+              <div>
+                <label>
+                  <input
+                    type="checkbox"
+                    className="theia-input"
+                    checked={this.state.changedOnly}
+                    onChange={this.toggleChangedOnly}
+                  />
+                  Changed images only
+                </label>
               </div>
-            </>
+            </div>
           )}
           {/* this.vesImageConverterService.isConverting && (
-            <>
-              <div className="convertButtons">
-                <button
-                  className="theia-button secondary"
-                  onClick={this.abort}
-                >
-                  Abort
-                </button>
-              </div>
-            </>
+            <div className="convertButtons">
+              <button
+                className="theia-button secondary"
+                onClick={this.abort}
+              >
+                Abort
+              </button>
+            </div>
           ) */}
         </div>
         {this.vesImageConverterService.log.length > 0 && (

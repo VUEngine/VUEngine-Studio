@@ -1,5 +1,4 @@
 import { Emitter, isWindows } from '@theia/core';
-import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
@@ -7,20 +6,13 @@ import { FileStatWithMetadata } from '@theia/filesystem/lib/common/files';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { deepmerge } from 'deepmerge-ts';
 import * as glob from 'glob';
-import { basename, dirname, join, parse as parsePath } from 'path';
+import { join } from 'path';
 import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { MemorySection } from '../../build/browser/ves-build-types';
 import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
-import {
-  FileContentsMap,
-  ImageConfigFileToBeConverted,
-  ImageConverterConfig,
-  ImageConverterLogLine,
-  ImageConverterLogLineType,
-  StackedFrameData
-} from './ves-image-converter-types';
+import { ImageConfigFileToBeConverted, ImageConverterCompressor, ImageConverterConfig, ImageConverterLogLine, ImageConverterLogLineType } from './ves-image-converter-types';
 
 @injectable()
 export class VesImageConverterService {
@@ -132,13 +124,19 @@ export class VesImageConverterService {
   }
 
   protected async doConvertFiles(changedOnly: boolean): Promise<void> {
+    this.pushLog({
+      timestamp: Date.now(),
+      text: `Convert ${changedOnly ? 'changed' : 'all'} images`,
+      type: ImageConverterLogLineType.Headline,
+    });
+
     const imageConfigFilesToBeConverted = await this.getImageConfigFilesToBeConverted(changedOnly);
 
     if (imageConfigFilesToBeConverted.length === 0) {
       this.pushLog({
         timestamp: Date.now(),
-        text: 'Did not find any images to convert',
-        type: ImageConverterLogLineType.Headline,
+        text: 'None found',
+        type: ImageConverterLogLineType.Normal,
       });
       this.pushLog({
         timestamp: Date.now(),
@@ -154,49 +152,75 @@ export class VesImageConverterService {
     this.totalToConvert = this.getTotalImagesToBeConverted(imageConfigFilesToBeConverted);
     this.leftToConvert = this.totalToConvert;
 
+    this.pushLog({
+      timestamp: Date.now(),
+      text: `Found ${this.totalToConvert} images`,
+      type: ImageConverterLogLineType.Normal,
+    });
+
     const gritUri = await this.getGritUri();
     await this.fixPermissions(gritUri);
 
-    this.pushLog({
-      timestamp: Date.now(),
-      text: `Starting to convert ${changedOnly ? 'changed' : 'all'} images (${this.totalToConvert})`,
-      type: ImageConverterLogLineType.Headline,
-    });
-
-    imageConfigFilesToBeConverted.map(async imageConfigFileToBeConverted => {
-      this.doConvertFile(imageConfigFileToBeConverted, gritUri);
-    });
+    await Promise.all(imageConfigFilesToBeConverted.map(async imageConfigFileToBeConverted => {
+      await this.doConvertFile(imageConfigFileToBeConverted, gritUri);
+    }));
 
     return;
   }
 
   protected async doConvertFile(imageConfigFileToBeConverted: ImageConfigFileToBeConverted, gritUri: URI): Promise<void> {
-    const fileDir = dirname(imageConfigFileToBeConverted.imageConfigFile);
-    const convertedDir = join(fileDir, this.getConvertedDirName());
-    const convertedDirUri = new URI(convertedDir).withScheme('file');
+    const convertedDirUri = imageConfigFileToBeConverted.imageConfigFileUri.parent.resolve(this.getConvertedDirName());
 
     if (!(await this.fileService.exists(convertedDirUri))) {
       await this.fileService.createFolder(convertedDirUri);
     }
 
+    const imagePaths: Array<string> = [];
+    await Promise.all(imageConfigFileToBeConverted.images.map(async image => {
+      const imagePath = await this.fileService.fsPath(image);
+      imagePaths.push(imagePath);
+    }));
+
+    // throw at grit
     const processInfo = await this.vesProcessService.launchProcess(VesProcessType.Raw, {
       command: await this.fileService.fsPath(gritUri),
       args: [
-        ...imageConfigFileToBeConverted.images,
+        ...imagePaths,
         ...imageConfigFileToBeConverted.gritArguments
       ],
       options: {
-        cwd: convertedDir
+        cwd: await this.fileService.fsPath(convertedDirUri)
       },
     });
 
-    // wait for converting process to finish, then post process
-    const exitListener = this.vesProcessWatcher.onDidExitProcess(async ({ pId, event }) => {
+    // wait for converting process to finish, then process further
+    const exitListener = this.vesProcessWatcher.onDidExitProcess(async ({ pId }) => {
       if (pId === processInfo.processManagerId) {
+        imageConfigFileToBeConverted = await this.appendConvertedFilesData(imageConfigFileToBeConverted);
+        imageConfigFileToBeConverted = this.removeUnusedEmptyTileAddedByGrit(imageConfigFileToBeConverted);
+
+        // TODO: this can only be done at this point for stacked frames when they no longer need to be padded to the same size
+        imageConfigFileToBeConverted = await this.compress(imageConfigFileToBeConverted);
+
         if (imageConfigFileToBeConverted.config.converter.stackFrames) {
           await this.stackFrames(imageConfigFileToBeConverted);
         } else {
-          await this.postProcessConvertedImages(imageConfigFileToBeConverted);
+          // render files, overwrite original converted ones
+          const resourcesUri = await this.vesCommonService.getResourcesUri();
+          const templateFileUri = resourcesUri.resolve('templates').resolve('image.c.nj');
+          const templateString = (await this.fileService.readFile(templateFileUri)).value.toString();
+          await Promise.all(imageConfigFileToBeConverted.output.map(async output => {
+            await this.vesCodeGenService.renderTemplateToFile(output.fileUri, templateString, {
+              name: output.name,
+              tilesData: output.tilesData,
+              tilesCompression: imageConfigFileToBeConverted.config.converter.tileset.compress,
+              mapData: output.mapData,
+              mapCompression: imageConfigFileToBeConverted.config.converter.map.compress,
+              section: imageConfigFileToBeConverted.config.section,
+              meta: output.meta,
+            });
+            this.reportConverted(output.fileUri);
+          }));
         }
 
         exitListener.dispose();
@@ -204,12 +228,39 @@ export class VesImageConverterService {
     });
   }
 
-  protected reportConverted(convertedImagePath: string): void {
+  protected async appendConvertedFilesData(imageConfigFileToBeConverted: ImageConfigFileToBeConverted): Promise<ImageConfigFileToBeConverted> {
+    const generatedFiles = await this.getGeneratedFiles(imageConfigFileToBeConverted);
+
+    // write all file contents to map
+    await Promise.all(generatedFiles.map(async file => {
+      const fileUri = file;
+      const fileContent = (await this.fileService.readFile(fileUri)).value.toString();
+      const name = fileContent.match(/\/\/\t(\w+)\, ([0-9]+)x([0-9]+)@2/) ?? ['', ''];
+      const tilesData = fileContent.match(/0x([0-9A-Fa-f]{8}),/g)?.map(hex => hex.substr(2, 8)) ?? [];
+      const mapData = fileContent.match(/0x([0-9A-Fa-f]{4}),/g)?.map(hex => hex.substr(2, 4)) ?? [];
+      const imageDimensions = fileContent.match(/, ([0-9]+)x([0-9]+)@2/) ?? [0, 0];
+      const mapDimensions = fileContent.match(/, not compressed, ([0-9]+)x([0-9]+)/) ?? [0, 0];
+      const meta = {
+        tilesCount: tilesData.length / 4,
+        imageHeight: imageDimensions[2] as number,
+        imageWidth: imageDimensions[1] as number,
+        mapHeight: mapDimensions[2] as number,
+        mapWidth: mapDimensions[1] as number,
+        mapReduceFlipped: imageConfigFileToBeConverted.config.converter.map.reduce.flipped,
+        mapReduceUnique: imageConfigFileToBeConverted.config.converter.map.reduce.unique,
+      };
+      imageConfigFileToBeConverted.output.push({ name: name[1], fileUri, tilesData, mapData, meta });
+    }));
+
+    return imageConfigFileToBeConverted;
+  }
+
+  protected reportConverted(convertedImageUri: URI): void {
     this.pushLog({
       timestamp: Date.now(),
-      text: `Created ${basename(convertedImagePath)}`,
+      text: `Created ${convertedImageUri.path.base}`,
       type: ImageConverterLogLineType.Normal,
-      uri: new URI(convertedImagePath).withScheme('file'),
+      uri: convertedImageUri,
     });
 
     this.leftToConvert--;
@@ -217,197 +268,202 @@ export class VesImageConverterService {
 
   }
 
-  protected getGeneratedFiles(imageConfigFileToBeConverted: ImageConfigFileToBeConverted): Array<string> {
-    const generatedFiles: Array<string> = [];
+  protected async getGeneratedFiles(imageConfigFileToBeConverted: ImageConfigFileToBeConverted): Promise<Array<URI>> {
+    const generatedFiles: Array<URI> = [];
 
-    imageConfigFileToBeConverted.images.map(imagePath => {
-      generatedFiles.push(this.getGeneratedFile(imageConfigFileToBeConverted.imageConfigFile, imagePath));
+    imageConfigFileToBeConverted.images.map(imageUri => {
+      generatedFiles.push(this.getGeneratedFileUri(imageConfigFileToBeConverted.imageConfigFileUri, imageUri));
     });
+
+    // there might be a separate file containing only tiles
+    if (imageConfigFileToBeConverted.config.converter.tileset.shared) {
+      const filename = imageConfigFileToBeConverted.config.name
+        ? imageConfigFileToBeConverted.config.name
+        : imageConfigFileToBeConverted.imageConfigFileUri.path.name;
+      const tilesetFileUri = imageConfigFileToBeConverted.imageConfigFileUri.parent
+        .resolve(this.getConvertedDirName())
+        .resolve(`${filename}.c`);
+      if (await this.fileService.exists(tilesetFileUri)) {
+        generatedFiles.push(tilesetFileUri);
+      }
+    }
 
     return generatedFiles;
   }
 
-  protected getGeneratedFile(imageConfigFile: string, imagePath: string): string {
-    return join(
-      dirname(imageConfigFile),
-      this.getConvertedDirName(),
-      `${parsePath(imagePath).name}.c`
-    );
+  protected getGeneratedFileUri(imageConfigFileUri: URI, imageUri: URI): URI {
+    return imageConfigFileUri.parent
+      .resolve(this.getConvertedDirName())
+      .resolve(`${imageUri.path.name}.c`);
   }
 
   protected async stackFrames(imageConfigFileToBeConverted: ImageConfigFileToBeConverted): Promise<void> {
-    const generatedFiles = this.getGeneratedFiles(imageConfigFileToBeConverted);
     const name = imageConfigFileToBeConverted.config.name
       ? imageConfigFileToBeConverted.config.name
-      : parsePath(imageConfigFileToBeConverted.imageConfigFile).name;
-    const targetFileUri = new URI(join(
-      dirname(imageConfigFileToBeConverted.imageConfigFile),
-      this.getConvertedDirName(),
-      `${name}.c`
-    )).withScheme('file');
+      : imageConfigFileToBeConverted.imageConfigFileUri.path.name;
+    const targetFileUri = imageConfigFileToBeConverted.imageConfigFileUri.parent
+      .resolve(this.getConvertedDirName())
+      .resolve(`${name}.c`);
     const resourcesUri = await this.vesCommonService.getResourcesUri();
-    const templateFileUri = resourcesUri.resolve(join(
-      'templates',
-      'stacked.c.nj',
-    ));
+    const templateFileUri = resourcesUri.resolve('templates').resolve('image.c.nj');
 
-    // read tile and map data from all converted files and find largest frame
+    // find largest frame
     let largestFrame = 0;
-    const numberOfFrames = generatedFiles.length;
-    const frames: Array<StackedFrameData> = [];
-    await Promise.all(generatedFiles.map(async file => {
-      const fileUri = new URI(file).withScheme('file');
-      const fileContent = (await this.fileService.readFile(fileUri)).value.toString();
-
-      const tiles = fileContent.match(/0x([0-9A-Fa-f]{8}),/g) ?? [];
-      const maps = fileContent.match(/0x([0-9A-Fa-f]{4}),/g) ?? [];
-
-      const numberOfTiles = tiles.length;
+    const numberOfFrames = imageConfigFileToBeConverted.output.filter(output => output.mapData.length > 0).length;
+    imageConfigFileToBeConverted.output.map(async output => {
+      const numberOfTiles = output.tilesData.length;
       if (numberOfTiles > largestFrame) {
         largestFrame = numberOfTiles;
       }
-
-      frames.push({ filename: basename(file), tiles, maps });
-    }));
+    });
 
     // pad all tiles and maps to largest frame's size
-    frames.forEach((part, idx) => {
-      frames[idx].tiles = Array.from({ ...part.tiles, length: largestFrame }, (v, i) => v || '0x00000000,');
+    imageConfigFileToBeConverted.output.map(async output => {
+      output.tilesData = Array.from({ ...output.tilesData, length: largestFrame }, (v, i) => v || '00000000');
     });
 
     // sort frames by filename
-    frames.sort((a, b) => a.filename > b.filename && 1 || -1);
+    imageConfigFileToBeConverted.output.sort((a, b) => a.fileUri.path.base > b.fileUri.path.base && 1 || -1);
 
+    // delete frame files and report done
+    await Promise.all(imageConfigFileToBeConverted.output.map(async output => {
+      await this.fileService.delete(output.fileUri);
+      this.reportConverted(output.fileUri);
+    }));
+
+    let tilesData: Array<string> = [];
+    let mapData: Array<string> = [];
+    imageConfigFileToBeConverted.output.map(output => {
+      tilesData = tilesData.concat(output.tilesData);
+      mapData = mapData.concat(output.mapData);
+    });
+
+    // render stacked file
     const templateString = (await this.fileService.readFile(templateFileUri)).value.toString();
     this.vesCodeGenService.renderTemplateToFile(targetFileUri, templateString, {
       name,
-      largestFrame,
-      numberOfFrames,
-      frames,
+      tilesData,
+      tilesCompression: imageConfigFileToBeConverted.config.converter.tileset.compress,
+      mapData,
+      mapCompression: imageConfigFileToBeConverted.config.converter.map.compress,
       section: imageConfigFileToBeConverted.config.section,
+      meta: {
+        ...imageConfigFileToBeConverted.output[0].meta,
+        numberOfFrames,
+        largestFrame,
+      },
+    });
+  }
+
+  protected async compress(imageConfigFileToBeConverted: ImageConfigFileToBeConverted): Promise<ImageConfigFileToBeConverted> {
+    if (imageConfigFileToBeConverted.config.converter.tileset.compress === ImageConverterCompressor.RLE) {
+      imageConfigFileToBeConverted = this.compressTilesRle(imageConfigFileToBeConverted);
+    }
+    if (imageConfigFileToBeConverted.config.converter.map.compress === ImageConverterCompressor.RLE) {
+      imageConfigFileToBeConverted = this.compressMapRle(imageConfigFileToBeConverted);
+    }
+
+    return imageConfigFileToBeConverted;
+  }
+
+  // Normal RLE applied to pixel pairs (4 bits or 1 hexadecimal digit)
+  protected compressTilesRle(imageConfigFileToBeConverted: ImageConfigFileToBeConverted): ImageConfigFileToBeConverted {
+    const addToCompressedData = () => {
+      currentBlock += (counter - 1).toString(16).toUpperCase() + previousDigit;
+
+      if (currentBlock.length === 8) {
+        compressedData.push(currentBlock);
+        currentBlock = '';
+      }
+
+      previousDigit = '';
+      counter = 0;
+    };
+
+    let uncompressedLength = 0;
+    let compressedData: Array<string> = [];
+    let currentBlock = '';
+    let counter = 0;
+    let previousDigit = '';
+
+    imageConfigFileToBeConverted.output.map(output => {
+      uncompressedLength = output.tilesData.length;
+      compressedData = [];
+      // currentBlock = '01'; // initialize with a custom compression algorithm flag, 01 meaning RLE
+      currentBlock = '';
+      counter = 0;
+      previousDigit = '';
+
+      output.tilesData.map(tileData => {
+        for (const digit of tileData) {
+          if (digit === previousDigit) {
+            if (++counter === 16) {
+              addToCompressedData();
+            }
+          } else {
+            if (previousDigit !== '') {
+              addToCompressedData();
+            }
+            previousDigit = digit;
+            counter = 1;
+          }
+        }
+      });
+
+      if (counter > 0) {
+        addToCompressedData();
+        compressedData.push(currentBlock.padEnd(8, '0'));
+      }
+
+      output.tilesData = compressedData;
+      output.meta.tilesCompressionRatio = (100 - ((uncompressedLength - compressedData.length) / uncompressedLength * 100)).toFixed(2);
     });
 
-    // delete frame files and report done
-    await Promise.all(generatedFiles.map(async file => {
-      const fileUri = new URI(file).withScheme('file');
-      await this.fileService.delete(fileUri);
-      this.reportConverted(file);
-    }));
+    return imageConfigFileToBeConverted;
   }
 
-  protected async postProcessConvertedImages(imageConfigFileToBeConverted: ImageConfigFileToBeConverted): Promise<void> {
-    const generatedFiles = this.getGeneratedFiles(imageConfigFileToBeConverted);
-
-    // write all file contents to map and clean on the way
-    const fileContents: FileContentsMap = {};
-    await Promise.all(generatedFiles.map(async file => {
-      const fileUri = new URI(file).withScheme('file');
-      const fileContent = (await this.fileService.readFile(fileUri)).value.toString();
-      fileContents[file] = this.cleanFileContent(fileContent, imageConfigFileToBeConverted.config.section);
-    }));
-
-    let tilesetFile = '';
-    if (imageConfigFileToBeConverted.config.converter.tileset.shared) {
-      const name = imageConfigFileToBeConverted.config.name
-        ? imageConfigFileToBeConverted.config.name
-        : parsePath(imageConfigFileToBeConverted.imageConfigFile).name;
-      tilesetFile = join(
-        dirname(imageConfigFileToBeConverted.imageConfigFile),
-        this.getConvertedDirName(),
-        `${name}.c`
-      );
-      const tilesetFileContent = (await this.fileService.readFile(new URI(tilesetFile).withScheme('file'))).value.toString();
-      fileContents[tilesetFile] = this.cleanFileContent(tilesetFileContent, imageConfigFileToBeConverted.config.section);
-    }
-
-    // remove prepended empty tile
-    this.removeUnusedEmptyTilePrependedByGrit(fileContents, imageConfigFileToBeConverted, tilesetFile);
-
-    // write back all contents to files
-    await Promise.all(Object.keys(fileContents).map(async file => {
-      this.fileService.writeFile(new URI(file).withScheme('file'), BinaryBuffer.fromString(fileContents[file]));
-      this.reportConverted(file);
-    }));
-  }
-
-  protected cleanFileContent(fileContent: string, section: MemorySection): string {
-    // remove "time-stamp"
-    fileContent = fileContent.split('\n').filter(line => line.indexOf('Time-stamp:') === -1).join('\n');
-
-    // remove "external tile file"
-    fileContent = fileContent.split('\n').filter(line => line.indexOf('External tile file: (null)') === -1).join('\n');
-
-    // remove block comments
-    fileContent = fileContent.split('\n').filter(line =>
-      line.indexOf('//{{BLOCK(') === -1 && line.indexOf('//}}BLOCK(') === -1
-    ).join('\n');
-
-    // fix types
-    fileContent = fileContent
-      .replace('const unsigned int', 'const uint32')
-      .replace('const unsigned short', 'const uint16');
-
-    // change memory section to exp if configured
-    if (section === MemorySection.EXPANSION_SPACE) {
-      fileContent = fileContent.replace(' __attribute__((aligned(4)))', ' __attribute__((aligned(4))) __attribute((section(".expdata")))');
-    }
-    // remove surrounding whitespaces and newlines
-    fileContent = fileContent.trim() + '\n';
-
-    return fileContent;
+  protected compressMapRle(imageConfigFileToBeConverted: ImageConfigFileToBeConverted): ImageConfigFileToBeConverted {
+    return imageConfigFileToBeConverted;
   }
 
   /**
    * For unknown (and unnecessary) reasons, grit prepends an empty tile to a charset if there is none already.
-   * We check if the empty is used and, if not, remove it and update the map indices accordingly.
+   * We check if the empty tile is used and, if not, remove it and update the map indices accordingly.
+   * Grit also appends an empty tile to maps with an odd number of chars, which we remove.
    */
-  protected removeUnusedEmptyTilePrependedByGrit(fileContents: FileContentsMap, imageConfigFileToBeConverted: ImageConfigFileToBeConverted, tilesetFile: string): FileContentsMap {
-    const hasTileSetFile = tilesetFile !== '';
+  protected removeUnusedEmptyTileAddedByGrit(imageConfigFileToBeConverted: ImageConfigFileToBeConverted): ImageConfigFileToBeConverted {
+    const hasTileSetFile = imageConfigFileToBeConverted.config.converter.tileset.shared;
     const forceCleanup = imageConfigFileToBeConverted.config.converter.map.generate
       && !imageConfigFileToBeConverted.config.converter.map.reduce.flipped
       && !imageConfigFileToBeConverted.config.converter.map.reduce.unique;
 
-    const emptyCharIsUsed = () => hasTileSetFile && Object.values(fileContents).filter(fileContent => fileContent.includes('0x0000,')).length;
-    if (!imageConfigFileToBeConverted.config.converter.map.generate || (!forceCleanup && emptyCharIsUsed())) {
-      return fileContents;
-    }
-
-    Object.keys(fileContents).map(file => {
-      let fileContent = fileContents[file];
-      if (!hasTileSetFile && !forceCleanup && fileContent.includes('0x0000,')) {
-        return;
+    // fix maps
+    imageConfigFileToBeConverted.output.map(output => {
+      if (output.mapData.length > output.meta.mapHeight * output.meta.mapWidth) {
+        output.mapData.pop();
       }
-
-      if (fileContent.includes('Tiles[')) {
-        // remove empty tile at beginning of charset
-        fileContent = fileContent.replace('{\n\t0x00000000,0x00000000,0x00000000,0x00000000,', '{\n\t');
-
-        // decrement reported tile count
-        fileContent = fileContent.replace(/ (\d+) tiles/, (match, number) => match.replace(number, (parseInt(number) - 1).toString()));
-
-        // decrease tile count in charset definition
-        fileContent = fileContent.replace(/Tiles\[(\d+)\] /, (match, number) => match.replace(number, (parseInt(number) - 4).toString()));
-
-        // decrease reported total size
-        fileContent = fileContent.replace(/Total size: (\d+) /, (match, number) => match.replace(number, (parseInt(number) - 16).toString()));
-        fileContent = fileContent.replace(/ = (\d+)/, (match, number) => match.replace(number, (parseInt(number) - 16).toString()));
-      }
-
-      if (fileContent.includes('Map[')) {
-        // decrement all map indices
-        fileContent = fileContent.replace(/0x([0-9A-Fa-f]{4}),/g, (match, number) => {
-          let value = parseInt(number.replace(',', ''), 16);
-          value = value > 0 ? value - 1 : value;
-          return match.replace(number, value.toString(16).padStart(4, '0'));
-        });
-
-        // TODO: Grit also appends an empty tile to maps with an odd number of chars. Remove?
-      }
-
-      fileContents[file] = fileContent;
     });
 
-    return fileContents;
+    const emptyCharIsUsed = () => hasTileSetFile && imageConfigFileToBeConverted.output.filter(output => output.mapData.includes('0000')).length;
+    if (!imageConfigFileToBeConverted.config.converter.map.generate || (!forceCleanup && emptyCharIsUsed())) {
+      return imageConfigFileToBeConverted;
+    }
+
+    // remove empty tile at beginning of charset (0x00000000,0x00000000,0x00000000,0x00000000,) and decrement all map indices
+    imageConfigFileToBeConverted.output.map(output => {
+      if (!hasTileSetFile && !forceCleanup && output.mapData.includes('0000')) {
+        return imageConfigFileToBeConverted;
+      }
+
+      output.tilesData.splice(0, 4);
+      output.mapData = output.mapData.map(mapData => {
+        const decreasedIntValue = parseInt(mapData, 16) - 1;
+        return decreasedIntValue.toString(16).toUpperCase().padStart(4, '0000');
+      });
+      output.meta.tilesCount = output.meta.tilesCount - 1;
+    });
+
+    return imageConfigFileToBeConverted;
   }
 
   protected async getImageConfigFilesToBeConverted(changedOnly: boolean): Promise<Array<ImageConfigFileToBeConverted>> {
@@ -418,18 +474,26 @@ export class VesImageConverterService {
     // TODO: refactor to use fileservice instead of glob
     const fileMatcher = join(await this.fileService.fsPath(workspaceRootUri), '**', '*.image.json');
     await Promise.all(glob.sync(fileMatcher).map(async imageConfigFile => {
-      const config = await this.getConverterConfig(new URI(imageConfigFile).withScheme('file'));
-      const name = config.name ? config.name : parsePath(imageConfigFile).name;
+      const imageConfigFileUri = new URI(imageConfigFile).withScheme('file');
+      const config = await this.getConverterConfig(imageConfigFileUri);
+      const name = config.name ? config.name : imageConfigFileUri.path.name;
 
-      const images = await this.getRelevantImageFiles(changedOnly, imageConfigFile, config, name);
+      const images = await this.getRelevantImageFiles(changedOnly, imageConfigFileUri, config, name);
       if (images.length === 0) {
-        // console.log(`No relevant images for ${imageConfigFile}`);
+        // console.log(`No relevant images for ${imageConfigFileUri.path.base}`);
         return;
       }
 
-      const gritArguments = this.getGritArguments(name, config, images);
+      const gritArguments = this.getGritArguments(name, config);
 
-      imageConfigFilesToBeConverted.push({ imageConfigFile, images, name, config, gritArguments });
+      imageConfigFilesToBeConverted.push({
+        imageConfigFileUri,
+        images,
+        name,
+        config,
+        gritArguments,
+        output: []
+      });
     }));
 
     return imageConfigFilesToBeConverted;
@@ -444,30 +508,29 @@ export class VesImageConverterService {
     return totalImagesToBeConverted;
   }
 
-  protected async getRelevantImageFiles(changedOnly: boolean, imageConfigFile: string, config: ImageConverterConfig, name: string): Promise<Array<string>> {
-    let foundImages: Array<string> = [];
-    const imageConfigFileDir = dirname(imageConfigFile);
+  protected async getRelevantImageFiles(changedOnly: boolean, imageConfigFileUri: URI, config: ImageConverterConfig, name: string): Promise<Array<URI>> {
+    let foundImages: Array<URI> = [];
     await Promise.all(config.images.map(async image => {
       if (image === '.') {
-        const resolved = await this.fileService.resolve(new URI(imageConfigFileDir).withScheme('file'));
+        const resolved = await this.fileService.resolve(imageConfigFileUri.parent);
         if (resolved.children) {
           await Promise.all(resolved.children.map(async child => {
             if (child.name.endsWith('.png') && await this.fileService.exists(child.resource)) {
-              foundImages.push(child.resource.path.toString());
+              foundImages.push(child.resource);
             }
           }));
         }
       } else {
-        const filepath = join(imageConfigFileDir, image);
-        if (image.endsWith('.png') && await this.fileService.exists(new URI(filepath).withScheme('file'))) {
-          foundImages.push(filepath);
+        const fileUri = imageConfigFileUri.parent.resolve(image);
+        if (image.endsWith('.png') && await this.fileService.exists(fileUri)) {
+          foundImages.push(fileUri);
         }
       }
     }));
 
     // if changedOnly flag is set, remove files that have not been changed
     if (changedOnly) {
-      foundImages = await this.getOnlyChangedImages(foundImages, config, imageConfigFile, imageConfigFileDir, name);
+      foundImages = await this.getOnlyChangedImages(foundImages, config, imageConfigFileUri, name);
     }
 
     // remove duplicates and return
@@ -475,22 +538,20 @@ export class VesImageConverterService {
   }
 
   protected async getOnlyChangedImages(
-    foundImages: Array<string>,
+    foundImages: Array<URI>,
     config: ImageConverterConfig,
-    imageConfigFile: string,
-    imageConfigFileDir: string,
+    imageConfigFileUri: URI,
     name: string,
-  ): Promise<Array<string>> {
+  ): Promise<Array<URI>> {
     if (config.converter.stackFrames || config.converter.tileset.shared) {
-      if (!await this.atLeastOneImageNewerThanCollectiveConvertedFile(foundImages, imageConfigFileDir, name)) {
+      if (!await this.atLeastOneImageNewerThanCollectiveConvertedFile(foundImages, imageConfigFileUri, name)) {
         return [];
       }
     } else {
-      const changedImages: Array<string> = [];
+      const changedImages: Array<URI> = [];
       await Promise.all(foundImages.map(async foundImage => {
-        const foundImageStat = await this.fileService.resolve(new URI(foundImage).withScheme('file'), { resolveMetadata: true });
-        const convertedFile = this.getGeneratedFile(imageConfigFile, foundImage);
-        const convertedFileUri = new URI(convertedFile).withScheme('file');
+        const foundImageStat = await this.fileService.resolve(foundImage, { resolveMetadata: true });
+        const convertedFileUri = this.getGeneratedFileUri(imageConfigFileUri, foundImage);
         const convertedFileStat = await this.fileService.exists(convertedFileUri)
           ? await this.fileService.resolve(convertedFileUri, { resolveMetadata: true })
           : undefined;
@@ -510,19 +571,19 @@ export class VesImageConverterService {
     return (!convertedFileStat || imageStat.ctime > convertedFileStat.mtime || imageStat.mtime > convertedFileStat.mtime);
   }
 
-  protected async atLeastOneImageNewerThanCollectiveConvertedFile(images: Array<string>, dir: string, name: string): Promise<boolean> {
-    const convertedFile = new URI(join(dir, this.getConvertedDirName(), `${name}.c`)).withScheme('file');
-    if (!await this.fileService.exists(convertedFile)) {
+  protected async atLeastOneImageNewerThanCollectiveConvertedFile(images: Array<URI>, imageConfigFileUri: URI, name: string): Promise<boolean> {
+    const convertedFileUri = imageConfigFileUri.parent.resolve(this.getConvertedDirName()).resolve(`${name}.c`);
+    if (!await this.fileService.exists(convertedFileUri)) {
       return true;
     }
 
     let atLeastOneImageNewer = false;
-    const convertedFileStat = await this.fileService.exists(convertedFile)
-      ? await this.fileService.resolve(convertedFile, { resolveMetadata: true })
+    const convertedFileStat = await this.fileService.exists(convertedFileUri)
+      ? await this.fileService.resolve(convertedFileUri, { resolveMetadata: true })
       : undefined;
     await Promise.all(images.map(async image => {
       if (!atLeastOneImageNewer) {
-        const imageStat = await this.fileService.resolve(new URI(image).withScheme('file'), { resolveMetadata: true });
+        const imageStat = await this.fileService.resolve(image, { resolveMetadata: true });
         if (this.imageHasChanged(imageStat, convertedFileStat)) {
           atLeastOneImageNewer = true;
         }
@@ -565,7 +626,7 @@ export class VesImageConverterService {
     return merged;
   }
 
-  protected getGritArguments(name: string, config: ImageConverterConfig, files: Array<string>): Array<string> {
+  protected getGritArguments(name: string, config: ImageConverterConfig): Array<string> {
     const gritArguments = ['-fh!', '-ftc', '-gB2', '-p!'];
 
     if (config.converter.tileset.reduce) {
@@ -618,13 +679,12 @@ export class VesImageConverterService {
 
   protected async getGritUri(): Promise<URI> {
     const resourcesUri = await this.vesCommonService.getResourcesUri();
-    return resourcesUri.resolve(join(
-      'binaries',
-      'vuengine-studio-tools',
-      this.vesCommonService.getOs(),
-      'grit',
-      isWindows ? 'grit.exe' : 'grit'
-    ));
+    return resourcesUri
+      .resolve('binaries')
+      .resolve('vuengine-studio-tools')
+      .resolve(this.vesCommonService.getOs())
+      .resolve('grit')
+      .resolve(isWindows ? 'grit.exe' : 'grit');
   }
 
   protected bindEvents(): void {

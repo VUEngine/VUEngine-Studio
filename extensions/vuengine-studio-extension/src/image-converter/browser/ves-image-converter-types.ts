@@ -7,6 +7,7 @@ export interface ImageConverterConfig {
     tileset: {
       shared: boolean
       reduce: boolean
+      compress: false | ImageConverterCompressor
     }
     map: {
       generate: boolean
@@ -14,6 +15,7 @@ export interface ImageConverterConfig {
         flipped: boolean
         unique: boolean
       }
+      compress: false | ImageConverterCompressor
     }
     stackFrames: boolean
   }
@@ -22,11 +24,12 @@ export interface ImageConverterConfig {
 }
 
 export interface ImageConfigFileToBeConverted {
-  imageConfigFile: string
-  images: Array<string>
+  imageConfigFileUri: URI
+  images: Array<URI>
   name: string
   config: ImageConverterConfig
   gritArguments: Array<string>
+  output: Array<ConvertedFileData>
 }
 
 export interface ImageConverterLogLine {
@@ -34,6 +37,28 @@ export interface ImageConverterLogLine {
   text: string;
   type: ImageConverterLogLineType;
   uri?: URI;
+}
+
+export interface ConvertedFileData {
+  name: string,
+  fileUri: URI,
+  tilesData: Array<string>;
+  mapData: Array<string>;
+  meta: ConvertedFileDataMeta
+}
+
+export interface ConvertedFileDataMeta {
+  tilesCount: number,
+  tilesCompressionRatio?: string,
+  mapCompressionRatio?: number,
+  imageHeight: number,
+  imageWidth: number,
+  mapHeight: number,
+  mapWidth: number,
+  mapReduceFlipped: boolean,
+  mapReduceUnique: boolean,
+  numberOfFrames?: number,
+  largestFrame?: number,
 }
 
 export enum ImageConverterLogLineType {
@@ -44,12 +69,6 @@ export enum ImageConverterLogLineType {
   Done = 'done',
 }
 
-export interface FileContentsMap {
-  [key: string]: string
-}
-
-export interface StackedFrameData {
-  filename: string,
-  tiles: Array<string>
-  maps: Array<string>
+export enum ImageConverterCompressor {
+  RLE = 'rle',
 }

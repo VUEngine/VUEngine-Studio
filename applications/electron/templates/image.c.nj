@@ -1,0 +1,56 @@
+{%- set reducedTiles = '' -%}
+{%- if meta.mapReduceFlipped is defined and meta.mapReduceUnique is defined -%}
+    {%- if meta.mapReduceFlipped and meta.mapReduceUnique -%}
+        {%- set reducedTiles = ', reduced by non-unique and flipped tiles' -%}
+    {%- elseif meta.mapReduceFlipped -%}
+        {%- set reducedTiles = ', reduced by flipped tiles' -%}
+    {%- elseif meta.mapReduceUnique -%}
+        {%- set reducedTiles = ', reduced by non-unique tiles' -%}
+    {%- endif -%}
+{%- endif -%}
+{%- set tilesCompressionLabel = 'not compressed' -%}
+{%- if tilesCompression is defined and tilesCompression != false -%}
+    {%- set tilesCompressionLabel = tilesCompression | upper ~ ' compressed' -%}
+    {%- if meta.tilesCompressionRatio is defined -%}
+        {%- set tilesCompressionLabel = tilesCompressionLabel ~ ' (' ~ meta.tilesCompressionRatio ~ '%)' -%}
+    {%- endif -%}
+{%- endif -%}
+//---------------------------------------------------------------------------------------------------------
+//
+//	{{ name }}
+//  • {{ meta.imageWidth }}x{{ meta.imageHeight }} pixels
+{%- if tilesData.length %}
+//  • {{ meta.tilesCount }} tiles{{ reducedTiles }}, {{ tilesCompressionLabel }}
+{%- endif %}
+{%- if mapData.length %}
+//  • {{ meta.mapWidth }}x{{ meta.mapHeight }} map, not compressed
+{%- endif %}
+{%- if meta.numberOfFrames is defined and meta.largestFrame is defined %}
+//  • {{ meta.numberOfFrames }} stacked animation frames of {{ meta.largestFrame / 4 }} tiles each
+{%- endif %}
+{%- if tilesData.length and mapData.length %}
+//  Size: {{ tilesData.length * 4 }} + {{ mapData.length * 2 }} = {{ (tilesData.length * 4) + (mapData.length * 2) }}
+{%- elseif tilesData.length %}
+//  Size: {{ tilesData.length * 4 }}
+{%- elseif mapData.length %}
+//  Size: {{ mapData.length * 2 }}
+{%- endif %}
+//
+//---------------------------------------------------------------------------------------------------------
+{% if tilesData.length %}
+const uint32 {{ name }}Tiles[{{ tilesData.length }}] __attribute__((aligned(4))){% if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
+{
+    {% for tileData in tilesData -%}
+    0x{{ tileData }},
+    {%- if loop.index % 8 == 0 and not loop.last %}{{ "\n    " }}{% endif -%}
+    {%- endfor %}
+};
+{% endif %}{% if mapData.length %}
+const uint16 {{ name }}Map[{{ mapData.length }}] __attribute__((aligned(4))){% if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
+{
+    {% for mapTile in mapData -%}
+    0x{{ mapTile }},
+    {%- if loop.index % 8 == 0 and not loop.last %}{{ "\n    " }}{% endif -%}
+    {%- endfor %}
+};
+{% endif %}
