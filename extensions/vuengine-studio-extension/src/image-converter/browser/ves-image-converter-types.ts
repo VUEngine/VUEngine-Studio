@@ -23,6 +23,28 @@ export interface ImageConverterConfig {
   section: MemorySection
 }
 
+export const DefaultImageConverterConfig: ImageConverterConfig = {
+  images: [],
+  converter: {
+    tileset: {
+      shared: false,
+      reduce: true,
+      compress: false
+    },
+    map: {
+      generate: true,
+      reduce: {
+        flipped: true,
+        unique: true
+      },
+      compress: false
+    },
+    stackFrames: false
+  },
+  name: '',
+  section: MemorySection.ROM
+};
+
 export interface ImageConfigFileToBeConverted {
   imageConfigFileUri: URI
   images: Array<URI>
@@ -44,6 +66,7 @@ export interface ConvertedFileData {
   fileUri: URI,
   tilesData: Array<string>;
   mapData: Array<string>;
+  frameTileOffsets: Array<number>;
   meta: ConvertedFileDataMeta
 }
 
@@ -57,8 +80,6 @@ export interface ConvertedFileDataMeta {
   mapWidth: number,
   mapReduceFlipped: boolean,
   mapReduceUnique: boolean,
-  numberOfFrames?: number,
-  largestFrame?: number,
 }
 
 export enum ImageConverterLogLineType {

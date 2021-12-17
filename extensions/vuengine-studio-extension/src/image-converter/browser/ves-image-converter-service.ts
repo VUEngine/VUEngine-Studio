@@ -8,11 +8,17 @@ import { deepmerge } from 'deepmerge-ts';
 import * as glob from 'glob';
 import { join } from 'path';
 import { VesCommonService } from '../../branding/browser/ves-common-service';
-import { MemorySection } from '../../build/browser/ves-build-types';
 import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
-import { ImageConfigFileToBeConverted, ImageConverterCompressor, ImageConverterConfig, ImageConverterLogLine, ImageConverterLogLineType } from './ves-image-converter-types';
+import {
+  DefaultImageConverterConfig,
+  ImageConfigFileToBeConverted,
+  ImageConverterCompressor,
+  ImageConverterConfig,
+  ImageConverterLogLine,
+  ImageConverterLogLineType
+} from './ves-image-converter-types';
 
 @injectable()
 export class VesImageConverterService {
@@ -199,11 +205,59 @@ export class VesImageConverterService {
         imageConfigFileToBeConverted = await this.appendConvertedFilesData(imageConfigFileToBeConverted);
         imageConfigFileToBeConverted = this.removeUnusedEmptyTileAddedByGrit(imageConfigFileToBeConverted);
 
-        // TODO: this can only be done at this point for stacked frames when they no longer need to be padded to the same size
-        imageConfigFileToBeConverted = await this.compress(imageConfigFileToBeConverted);
+        // sort by filename
+        imageConfigFileToBeConverted.output.sort((a, b) => a.fileUri.path.base > b.fileUri.path.base && 1 || -1);
+
+        imageConfigFileToBeConverted = await this.handleCompression(imageConfigFileToBeConverted);
 
         if (imageConfigFileToBeConverted.config.converter.stackFrames) {
-          await this.stackFrames(imageConfigFileToBeConverted);
+          // delete source files and report done
+          await Promise.all(imageConfigFileToBeConverted.output.map(async output => {
+            await this.fileService.delete(output.fileUri);
+            this.reportConverted(output.fileUri);
+          }));
+
+          let totalTilesCount = 0;
+          let tilesData: Array<string> = [];
+          let mapData: Array<string> = [];
+          let frameTileOffsets: Array<number> = [1];
+          imageConfigFileToBeConverted.output.map(output => {
+            totalTilesCount += output.meta.tilesCount;
+            tilesData = tilesData.concat(output.tilesData);
+            mapData = mapData.concat(output.mapData);
+            frameTileOffsets = frameTileOffsets.concat(tilesData.length + 1);
+          });
+
+          // remove last element from frameTileOffsets
+          frameTileOffsets.pop();
+
+          // render animation file
+          const name = imageConfigFileToBeConverted.config.name
+            ? imageConfigFileToBeConverted.config.name
+            : imageConfigFileToBeConverted.imageConfigFileUri.path.name;
+          const targetFileUri = imageConfigFileToBeConverted.imageConfigFileUri.parent
+            .resolve(this.getConvertedDirName())
+            .resolve(`${name}.c`);
+          const resourcesUri = await this.vesCommonService.getResourcesUri();
+          const templateFileUri = resourcesUri.resolve('templates').resolve('image.c.nj');
+
+          const templateString = (await this.fileService.readFile(templateFileUri)).value.toString();
+          this.vesCodeGenService.renderTemplateToFile(targetFileUri, templateString, {
+            name,
+            tilesData,
+            tilesCompression: imageConfigFileToBeConverted.config.converter.tileset.compress,
+            mapData,
+            mapCompression: imageConfigFileToBeConverted.config.converter.map.compress,
+            frameTileOffsets,
+            section: imageConfigFileToBeConverted.config.section,
+            meta: {
+              ...imageConfigFileToBeConverted.output[0].meta,
+              tilesCount: totalTilesCount,
+              tilesCompressionRatio: (- (((totalTilesCount * 4) - tilesData.length) / (totalTilesCount * 4) * 100)).toFixed(2),
+            },
+          });
+
+          this.reportConverted(targetFileUri);
         } else {
           // render files, overwrite original converted ones
           const resourcesUri = await this.vesCommonService.getResourcesUri();
@@ -249,7 +303,14 @@ export class VesImageConverterService {
         mapReduceFlipped: imageConfigFileToBeConverted.config.converter.map.reduce.flipped,
         mapReduceUnique: imageConfigFileToBeConverted.config.converter.map.reduce.unique,
       };
-      imageConfigFileToBeConverted.output.push({ name: name[1], fileUri, tilesData, mapData, meta });
+      imageConfigFileToBeConverted.output.push({
+        name: name[1],
+        fileUri,
+        tilesData,
+        mapData,
+        meta,
+        frameTileOffsets: [],
+      });
     }));
 
     return imageConfigFileToBeConverted;
@@ -297,68 +358,11 @@ export class VesImageConverterService {
       .resolve(`${imageUri.path.name}.c`);
   }
 
-  protected async stackFrames(imageConfigFileToBeConverted: ImageConfigFileToBeConverted): Promise<void> {
-    const name = imageConfigFileToBeConverted.config.name
-      ? imageConfigFileToBeConverted.config.name
-      : imageConfigFileToBeConverted.imageConfigFileUri.path.name;
-    const targetFileUri = imageConfigFileToBeConverted.imageConfigFileUri.parent
-      .resolve(this.getConvertedDirName())
-      .resolve(`${name}.c`);
-    const resourcesUri = await this.vesCommonService.getResourcesUri();
-    const templateFileUri = resourcesUri.resolve('templates').resolve('image.c.nj');
-
-    // find largest frame
-    let largestFrame = 0;
-    const numberOfFrames = imageConfigFileToBeConverted.output.filter(output => output.mapData.length > 0).length;
-    imageConfigFileToBeConverted.output.map(async output => {
-      const numberOfTiles = output.tilesData.length;
-      if (numberOfTiles > largestFrame) {
-        largestFrame = numberOfTiles;
-      }
-    });
-
-    // pad all tiles and maps to largest frame's size
-    imageConfigFileToBeConverted.output.map(async output => {
-      output.tilesData = Array.from({ ...output.tilesData, length: largestFrame }, (v, i) => v || '00000000');
-    });
-
-    // sort frames by filename
-    imageConfigFileToBeConverted.output.sort((a, b) => a.fileUri.path.base > b.fileUri.path.base && 1 || -1);
-
-    // delete frame files and report done
-    await Promise.all(imageConfigFileToBeConverted.output.map(async output => {
-      await this.fileService.delete(output.fileUri);
-      this.reportConverted(output.fileUri);
-    }));
-
-    let tilesData: Array<string> = [];
-    let mapData: Array<string> = [];
-    imageConfigFileToBeConverted.output.map(output => {
-      tilesData = tilesData.concat(output.tilesData);
-      mapData = mapData.concat(output.mapData);
-    });
-
-    // render stacked file
-    const templateString = (await this.fileService.readFile(templateFileUri)).value.toString();
-    this.vesCodeGenService.renderTemplateToFile(targetFileUri, templateString, {
-      name,
-      tilesData,
-      tilesCompression: imageConfigFileToBeConverted.config.converter.tileset.compress,
-      mapData,
-      mapCompression: imageConfigFileToBeConverted.config.converter.map.compress,
-      section: imageConfigFileToBeConverted.config.section,
-      meta: {
-        ...imageConfigFileToBeConverted.output[0].meta,
-        numberOfFrames,
-        largestFrame,
-      },
-    });
-  }
-
-  protected async compress(imageConfigFileToBeConverted: ImageConfigFileToBeConverted): Promise<ImageConfigFileToBeConverted> {
+  protected async handleCompression(imageConfigFileToBeConverted: ImageConfigFileToBeConverted): Promise<ImageConfigFileToBeConverted> {
     if (imageConfigFileToBeConverted.config.converter.tileset.compress === ImageConverterCompressor.RLE) {
       imageConfigFileToBeConverted = this.compressTilesRle(imageConfigFileToBeConverted);
     }
+
     if (imageConfigFileToBeConverted.config.converter.map.compress === ImageConverterCompressor.RLE) {
       imageConfigFileToBeConverted = this.compressMapRle(imageConfigFileToBeConverted);
     }
@@ -368,55 +372,52 @@ export class VesImageConverterService {
 
   // Normal RLE applied to pixel pairs (4 bits or 1 hexadecimal digit)
   protected compressTilesRle(imageConfigFileToBeConverted: ImageConfigFileToBeConverted): ImageConfigFileToBeConverted {
-    const addToCompressedData = () => {
-      currentBlock += (counter - 1).toString(16).toUpperCase() + previousDigit;
-
-      if (currentBlock.length === 8) {
-        compressedData.push(currentBlock);
-        currentBlock = '';
-      }
-
-      previousDigit = '';
-      counter = 0;
-    };
-
     let uncompressedLength = 0;
     let compressedData: Array<string> = [];
     let currentBlock = '';
     let counter = 0;
-    let previousDigit = '';
+    let currentDigit = '';
 
     imageConfigFileToBeConverted.output.map(output => {
       uncompressedLength = output.tilesData.length;
+      if (!uncompressedLength) {
+        return output;
+      }
       compressedData = [];
-      // currentBlock = '01'; // initialize with a custom compression algorithm flag, 01 meaning RLE
       currentBlock = '';
       counter = 0;
-      previousDigit = '';
+      currentDigit = output.tilesData[0][0] ?? '';
 
-      output.tilesData.map(tileData => {
+      for (const tileData of output.tilesData) {
         for (const digit of tileData) {
-          if (digit === previousDigit) {
-            if (++counter === 16) {
-              addToCompressedData();
+          if (digit === currentDigit) {
+            if (counter === 16) {
+              currentBlock += (counter - 1).toString(16).toUpperCase() + currentDigit;
+              if (currentBlock.length === 8) {
+                compressedData.push(currentBlock);
+                currentBlock = '';
+              }
+              counter = 1;
+            } else {
+              counter++;
             }
           } else {
-            if (previousDigit !== '') {
-              addToCompressedData();
+            currentBlock += (counter - 1).toString(16).toUpperCase() + currentDigit;
+            if (currentBlock.length === 8) {
+              compressedData.push(currentBlock);
+              currentBlock = '';
             }
-            previousDigit = digit;
+            currentDigit = digit;
             counter = 1;
           }
         }
-      });
+      };
 
-      if (counter > 0) {
-        addToCompressedData();
-        compressedData.push(currentBlock.padEnd(8, '0'));
-      }
+      currentBlock += (counter - 1).toString(16).toUpperCase() + currentDigit;
+      compressedData.push(currentBlock.padEnd(8, '0'));
 
       output.tilesData = compressedData;
-      output.meta.tilesCompressionRatio = (100 - ((uncompressedLength - compressedData.length) / uncompressedLength * 100)).toFixed(2);
+      output.meta.tilesCompressionRatio = (- ((uncompressedLength - compressedData.length) / uncompressedLength * 100)).toFixed(2);
     });
 
     return imageConfigFileToBeConverted;
@@ -543,8 +544,9 @@ export class VesImageConverterService {
     imageConfigFileUri: URI,
     name: string,
   ): Promise<Array<URI>> {
+    const imageConfigFileStat = await this.fileService.resolve(imageConfigFileUri, { resolveMetadata: true });
     if (config.converter.stackFrames || config.converter.tileset.shared) {
-      if (!await this.atLeastOneImageNewerThanCollectiveConvertedFile(foundImages, imageConfigFileUri, name)) {
+      if (!await this.atLeastOneFileNewerThanCollectiveConvertedFile(foundImages, imageConfigFileUri, imageConfigFileStat, name)) {
         return [];
       }
     } else {
@@ -555,7 +557,7 @@ export class VesImageConverterService {
         const convertedFileStat = await this.fileService.exists(convertedFileUri)
           ? await this.fileService.resolve(convertedFileUri, { resolveMetadata: true })
           : undefined;
-        if (this.imageHasChanged(foundImageStat, convertedFileStat)) {
+        if (this.fileHasChanged(imageConfigFileStat, foundImageStat, convertedFileStat)) {
           changedImages.push(foundImage);
         }
       }));
@@ -565,59 +567,47 @@ export class VesImageConverterService {
     return foundImages;
   }
 
-  protected imageHasChanged(imageStat: FileStatWithMetadata, convertedFileStat?: FileStatWithMetadata): boolean {
-    // if an image has been edited (mtime) or has been moved or copied to this folder (ctime)
+  protected fileHasChanged(imageConfigFileStat: FileStatWithMetadata, fileStat: FileStatWithMetadata, convertedFileStat?: FileStatWithMetadata): boolean {
+    // if an image file (or the image config file) has been edited (mtime) or has been moved or copied to this folder (ctime)
     // after the converted file has been generated/last edited, consider it a change
-    return (!convertedFileStat || imageStat.ctime > convertedFileStat.mtime || imageStat.mtime > convertedFileStat.mtime);
+    return (!convertedFileStat
+      || fileStat.ctime > convertedFileStat.mtime
+      || fileStat.mtime > convertedFileStat.mtime
+      || imageConfigFileStat.ctime > convertedFileStat.mtime
+      || imageConfigFileStat.mtime > convertedFileStat.mtime
+    );
   }
 
-  protected async atLeastOneImageNewerThanCollectiveConvertedFile(images: Array<URI>, imageConfigFileUri: URI, name: string): Promise<boolean> {
+  protected async atLeastOneFileNewerThanCollectiveConvertedFile(
+    files: Array<URI>,
+    imageConfigFileUri: URI,
+    imageConfigFileStat: FileStatWithMetadata,
+    name: string): Promise<boolean> {
     const convertedFileUri = imageConfigFileUri.parent.resolve(this.getConvertedDirName()).resolve(`${name}.c`);
     if (!await this.fileService.exists(convertedFileUri)) {
       return true;
     }
 
-    let atLeastOneImageNewer = false;
+    let atLeastOneFileNewer = false;
     const convertedFileStat = await this.fileService.exists(convertedFileUri)
       ? await this.fileService.resolve(convertedFileUri, { resolveMetadata: true })
       : undefined;
-    await Promise.all(images.map(async image => {
-      if (!atLeastOneImageNewer) {
-        const imageStat = await this.fileService.resolve(image, { resolveMetadata: true });
-        if (this.imageHasChanged(imageStat, convertedFileStat)) {
-          atLeastOneImageNewer = true;
+    await Promise.all(files.map(async file => {
+      if (!atLeastOneFileNewer) {
+        const fileStat = await this.fileService.resolve(file, { resolveMetadata: true });
+        if (this.fileHasChanged(imageConfigFileStat, fileStat, convertedFileStat)) {
+          atLeastOneFileNewer = true;
         }
       }
     }));
 
-    return atLeastOneImageNewer;
+    return atLeastOneFileNewer;
   }
 
   protected async getConverterConfig(file: URI): Promise<ImageConverterConfig> {
     const fileContents = await this.fileService.readFile(file);
     const config = JSON.parse(fileContents.value.toString());
-
-    const defaultConverterConfig = {
-      images: [],
-      converter: {
-        tileset: {
-          shared: false,
-          reduce: true
-        },
-        map: {
-          generate: true,
-          reduce: {
-            flipped: true,
-            unique: true
-          }
-        },
-        stackFrames: false
-      },
-      name: '',
-      section: MemorySection.ROM
-    };
-
-    const merged = deepmerge(defaultConverterConfig, config);
+    const merged = deepmerge(DefaultImageConverterConfig, config);
 
     if (!Array.isArray(merged.images) || !merged.images.length) {
       merged.images = ['.'];
