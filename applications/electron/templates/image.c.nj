@@ -33,15 +33,15 @@
 //---------------------------------------------------------------------------------------------------------
 //
 //	{{ name }}
-//  • {{ meta.imageWidth }}x{{ meta.imageHeight }} pixels
+//  • {{ meta.imageWidth }}×{{ meta.imageHeight }} pixels
 {%- if tilesData.length %}
 //  • {{ meta.tilesCount }} tiles{{ reducedTiles }}, {{ tilesCompressionLabel }}
 {%- endif %}
 {%- if mapData.length %}
-//  • {{ meta.mapWidth }}x{{ meta.mapHeight }} map, not compressed
+//  • {{ meta.mapWidth }}×{{ meta.mapHeight }} map, not compressed
 {%- endif %}
 {%- if frameTileOffsets.length > 0 %}
-//  • {{ frameTileOffsets.length }} animation frames
+//  • {{ frameTileOffsets.length }} animation frames, {{ meta.animation.frameWidth }}×{{ meta.animation.frameHeight }}, {% if meta.animation.individualFiles %}individual files{% else %}spritesheet{% endif %}
 {%- endif %}
 {%- if tilesData.length and mapData.length %}
 //  Size: {{ tilesData.length * 4 }} + {{ mapData.length * 2 }} = {{ (tilesData.length * 4) + (mapData.length * 2) }}

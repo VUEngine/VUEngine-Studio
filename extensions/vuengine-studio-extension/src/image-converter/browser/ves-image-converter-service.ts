@@ -1,4 +1,5 @@
 import { Emitter, isWindows } from '@theia/core';
+import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
@@ -8,17 +9,44 @@ import { deepmerge } from 'deepmerge-ts';
 import * as glob from 'glob';
 import { join } from 'path';
 import { VesCommonService } from '../../branding/browser/ves-common-service';
+import { MemorySection } from '../../build/browser/ves-build-types';
 import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 import {
-  DefaultImageConverterConfig,
   ImageConfigFileToBeConverted,
   ImageConverterCompressor,
   ImageConverterConfig,
   ImageConverterLogLine,
   ImageConverterLogLineType
 } from './ves-image-converter-types';
+
+const DEFAULT_IMAGE_CONVERTER_CONFIG: ImageConverterConfig = {
+  images: [],
+  name: '',
+  section: MemorySection.ROM,
+  tileset: {
+    shared: false,
+    reduce: true,
+    compress: false
+  },
+  map: {
+    generate: true,
+    reduce: {
+      flipped: true,
+      unique: true
+    },
+    compress: false
+  },
+  animation: {
+    isAnimation: false,
+    individualFiles: false,
+    frameWidth: 0,
+    frameHeight: 0
+  }
+};
+
+const COMPRESSION_FLAG_LENGTH = 8;
 
 @injectable()
 export class VesImageConverterService {
@@ -208,9 +236,22 @@ export class VesImageConverterService {
         // sort by filename
         imageConfigFileToBeConverted.output.sort((a, b) => a.fileUri.path.base > b.fileUri.path.base && 1 || -1);
 
+        // compute frame offsets for spritesheet animations
+        if (imageConfigFileToBeConverted.config.animation.isAnimation && !imageConfigFileToBeConverted.config.animation.individualFiles) {
+          const frameSize = 32 * imageConfigFileToBeConverted.config.animation.frameHeight * imageConfigFileToBeConverted.config.animation.frameWidth;
+          imageConfigFileToBeConverted.output.map(async output => {
+            const frameCount = output.tilesData.length * 8 / frameSize;
+            output.frameTileOffsets = [COMPRESSION_FLAG_LENGTH];
+            for (let i = 1; i < frameCount; i++) {
+              output.frameTileOffsets.push(COMPRESSION_FLAG_LENGTH + (frameSize * i));
+            }
+          });
+        }
+
         imageConfigFileToBeConverted = await this.handleCompression(imageConfigFileToBeConverted);
 
-        if (imageConfigFileToBeConverted.config.converter.stackFrames) {
+        if (imageConfigFileToBeConverted.config.animation.isAnimation
+          && imageConfigFileToBeConverted.config.animation.individualFiles) {
           // delete source files and report done
           await Promise.all(imageConfigFileToBeConverted.output.map(async output => {
             await this.fileService.delete(output.fileUri);
@@ -220,12 +261,12 @@ export class VesImageConverterService {
           let totalTilesCount = 0;
           let tilesData: Array<string> = [];
           let mapData: Array<string> = [];
-          let frameTileOffsets: Array<number> = [1];
+          let frameTileOffsets: Array<number> = [COMPRESSION_FLAG_LENGTH];
           imageConfigFileToBeConverted.output.map(output => {
             totalTilesCount += output.meta.tilesCount;
             tilesData = tilesData.concat(output.tilesData);
             mapData = mapData.concat(output.mapData);
-            frameTileOffsets = frameTileOffsets.concat(tilesData.length + 1);
+            frameTileOffsets = frameTileOffsets.concat(8 * (tilesData.length + 1));
           });
 
           // remove last element from frameTileOffsets
@@ -245,15 +286,15 @@ export class VesImageConverterService {
           this.vesCodeGenService.renderTemplateToFile(targetFileUri, templateString, {
             name,
             tilesData,
-            tilesCompression: imageConfigFileToBeConverted.config.converter.tileset.compress,
+            tilesCompression: imageConfigFileToBeConverted.config.tileset.compress,
             mapData,
-            mapCompression: imageConfigFileToBeConverted.config.converter.map.compress,
+            mapCompression: imageConfigFileToBeConverted.config.map.compress,
             frameTileOffsets,
             section: imageConfigFileToBeConverted.config.section,
             meta: {
               ...imageConfigFileToBeConverted.output[0].meta,
               tilesCount: totalTilesCount,
-              tilesCompressionRatio: (- (((totalTilesCount * 4) - tilesData.length) / (totalTilesCount * 4) * 100)).toFixed(2),
+              tilesCompressionRatio: (- (((totalTilesCount * 4) - tilesData.length) / (totalTilesCount * 4) * 100)).toFixed(2)
             },
           });
 
@@ -267,9 +308,10 @@ export class VesImageConverterService {
             await this.vesCodeGenService.renderTemplateToFile(output.fileUri, templateString, {
               name: output.name,
               tilesData: output.tilesData,
-              tilesCompression: imageConfigFileToBeConverted.config.converter.tileset.compress,
+              tilesCompression: imageConfigFileToBeConverted.config.tileset.compress,
               mapData: output.mapData,
-              mapCompression: imageConfigFileToBeConverted.config.converter.map.compress,
+              mapCompression: imageConfigFileToBeConverted.config.map.compress,
+              frameTileOffsets: output.frameTileOffsets,
               section: imageConfigFileToBeConverted.config.section,
               meta: output.meta,
             });
@@ -300,8 +342,9 @@ export class VesImageConverterService {
         imageWidth: imageDimensions[1] as number,
         mapHeight: mapDimensions[2] as number,
         mapWidth: mapDimensions[1] as number,
-        mapReduceFlipped: imageConfigFileToBeConverted.config.converter.map.reduce.flipped,
-        mapReduceUnique: imageConfigFileToBeConverted.config.converter.map.reduce.unique,
+        mapReduceFlipped: imageConfigFileToBeConverted.config.map.reduce.flipped,
+        mapReduceUnique: imageConfigFileToBeConverted.config.map.reduce.unique,
+        animation: imageConfigFileToBeConverted.config.animation,
       };
       imageConfigFileToBeConverted.output.push({
         name: name[1],
@@ -337,7 +380,7 @@ export class VesImageConverterService {
     });
 
     // there might be a separate file containing only tiles
-    if (imageConfigFileToBeConverted.config.converter.tileset.shared) {
+    if (imageConfigFileToBeConverted.config.tileset.shared) {
       const filename = imageConfigFileToBeConverted.config.name
         ? imageConfigFileToBeConverted.config.name
         : imageConfigFileToBeConverted.imageConfigFileUri.path.name;
@@ -359,11 +402,11 @@ export class VesImageConverterService {
   }
 
   protected async handleCompression(imageConfigFileToBeConverted: ImageConfigFileToBeConverted): Promise<ImageConfigFileToBeConverted> {
-    if (imageConfigFileToBeConverted.config.converter.tileset.compress === ImageConverterCompressor.RLE) {
+    if (imageConfigFileToBeConverted.config.tileset.compress === ImageConverterCompressor.RLE) {
       imageConfigFileToBeConverted = this.compressTilesRle(imageConfigFileToBeConverted);
     }
 
-    if (imageConfigFileToBeConverted.config.converter.map.compress === ImageConverterCompressor.RLE) {
+    if (imageConfigFileToBeConverted.config.map.compress === ImageConverterCompressor.RLE) {
       imageConfigFileToBeConverted = this.compressMapRle(imageConfigFileToBeConverted);
     }
 
@@ -378,6 +421,11 @@ export class VesImageConverterService {
     let counter = 0;
     let currentDigit = '';
 
+    const isSpritesheet = imageConfigFileToBeConverted.config.animation.isAnimation && !imageConfigFileToBeConverted.config.animation.individualFiles;
+    const frameSize = isSpritesheet
+      ? 4 * imageConfigFileToBeConverted.config.animation.frameWidth * imageConfigFileToBeConverted.config.animation.frameHeight
+      : 0;
+
     imageConfigFileToBeConverted.output.map(output => {
       uncompressedLength = output.tilesData.length;
       if (!uncompressedLength) {
@@ -388,7 +436,11 @@ export class VesImageConverterService {
       counter = 0;
       currentDigit = output.tilesData[0][0] ?? '';
 
-      for (const tileData of output.tilesData) {
+      if (isSpritesheet) {
+        output.frameTileOffsets = [COMPRESSION_FLAG_LENGTH];
+      }
+
+      for (const [index, tileData] of output.tilesData.entries()) {
         for (const digit of tileData) {
           if (digit === currentDigit) {
             if (counter === 16) {
@@ -411,19 +463,34 @@ export class VesImageConverterService {
             counter = 1;
           }
         }
+
+        if (isSpritesheet && (index + 1) % frameSize === 0) {
+          // right-pad individual frames
+          if (currentBlock.length > 0) {
+            compressedData.push(currentBlock.padEnd(8, '0'));
+          }
+
+          output.frameTileOffsets.push(compressedData.length * 8);
+        }
       };
 
       currentBlock += (counter - 1).toString(16).toUpperCase() + currentDigit;
+      // right-pad last block
       compressedData.push(currentBlock.padEnd(8, '0'));
 
       output.tilesData = compressedData;
       output.meta.tilesCompressionRatio = (- ((uncompressedLength - compressedData.length) / uncompressedLength * 100)).toFixed(2);
+
+      if (isSpritesheet) {
+        output.frameTileOffsets.pop();
+      }
     });
 
     return imageConfigFileToBeConverted;
   }
 
   protected compressMapRle(imageConfigFileToBeConverted: ImageConfigFileToBeConverted): ImageConfigFileToBeConverted {
+    // TODO
     return imageConfigFileToBeConverted;
   }
 
@@ -433,10 +500,10 @@ export class VesImageConverterService {
    * Grit also appends an empty tile to maps with an odd number of chars, which we remove.
    */
   protected removeUnusedEmptyTileAddedByGrit(imageConfigFileToBeConverted: ImageConfigFileToBeConverted): ImageConfigFileToBeConverted {
-    const hasTileSetFile = imageConfigFileToBeConverted.config.converter.tileset.shared;
-    const forceCleanup = imageConfigFileToBeConverted.config.converter.map.generate
-      && !imageConfigFileToBeConverted.config.converter.map.reduce.flipped
-      && !imageConfigFileToBeConverted.config.converter.map.reduce.unique;
+    const hasTileSetFile = imageConfigFileToBeConverted.config.tileset.shared;
+    const forceCleanup = imageConfigFileToBeConverted.config.map.generate
+      && !imageConfigFileToBeConverted.config.map.reduce.flipped
+      && !imageConfigFileToBeConverted.config.map.reduce.unique;
 
     // fix maps
     imageConfigFileToBeConverted.output.map(output => {
@@ -446,7 +513,7 @@ export class VesImageConverterService {
     });
 
     const emptyCharIsUsed = () => hasTileSetFile && imageConfigFileToBeConverted.output.filter(output => output.mapData.includes('0000')).length;
-    if (!imageConfigFileToBeConverted.config.converter.map.generate || (!forceCleanup && emptyCharIsUsed())) {
+    if (!imageConfigFileToBeConverted.config.map.generate || (!forceCleanup && emptyCharIsUsed())) {
       return imageConfigFileToBeConverted;
     }
 
@@ -545,7 +612,7 @@ export class VesImageConverterService {
     name: string,
   ): Promise<Array<URI>> {
     const imageConfigFileStat = await this.fileService.resolve(imageConfigFileUri, { resolveMetadata: true });
-    if (config.converter.stackFrames || config.converter.tileset.shared) {
+    if ((config.animation.isAnimation && config.animation.individualFiles) || config.tileset.shared) {
       if (!await this.atLeastOneFileNewerThanCollectiveConvertedFile(foundImages, imageConfigFileUri, imageConfigFileStat, name)) {
         return [];
       }
@@ -607,7 +674,7 @@ export class VesImageConverterService {
   protected async getConverterConfig(file: URI): Promise<ImageConverterConfig> {
     const fileContents = await this.fileService.readFile(file);
     const config = JSON.parse(fileContents.value.toString());
-    const merged = deepmerge(DefaultImageConverterConfig, config);
+    const merged = deepmerge(DEFAULT_IMAGE_CONVERTER_CONFIG, config);
 
     if (!Array.isArray(merged.images) || !merged.images.length) {
       merged.images = ['.'];
@@ -619,19 +686,19 @@ export class VesImageConverterService {
   protected getGritArguments(name: string, config: ImageConverterConfig): Array<string> {
     const gritArguments = ['-fh!', '-ftc', '-gB2', '-p!'];
 
-    if (config.converter.tileset.reduce) {
+    if (config.tileset.reduce) {
       gritArguments.push('-mB16:hv_i11');
     } else {
       gritArguments.push('-mB16:i11');
     }
 
-    if (config.converter.map.generate) {
-      if (config.converter.map.reduce.flipped || config.converter.map.reduce.unique) {
+    if (config.map.generate) {
+      if (config.map.reduce.flipped || config.map.reduce.unique) {
         let mapReduceArg = '-mR';
-        if (config.converter.map.reduce.unique) {
+        if (config.map.reduce.unique) {
           mapReduceArg += 't';
         }
-        if (config.converter.map.reduce.flipped) {
+        if (config.map.reduce.flipped) {
           mapReduceArg += 'f';
         }
         gritArguments.push(mapReduceArg);
@@ -642,7 +709,7 @@ export class VesImageConverterService {
       gritArguments.push('-m!');
     }
 
-    if (config.converter.tileset.shared) {
+    if (config.tileset.shared) {
       gritArguments.push('-gS');
       gritArguments.push('-O');
       gritArguments.push(name);
@@ -694,5 +761,56 @@ export class VesImageConverterService {
         });
       }
     });
+  }
+
+  async updateImageJsonFiles(): Promise<void> {
+    /* const sortJSON = (object: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+      if (object instanceof Array) {
+        for (let i = 0; i < object.length; i++) {
+          object[i] = sortJSON(object[i]);
+        }
+        return object;
+      } else if (typeof object != 'object') {
+        return object;
+      }
+
+      let keys = Object.keys(object);
+      keys = keys.sort();
+      const newObject = {};
+      for (let i = 0; i < keys.length; i++) {
+        // @ts-ignore
+        newObject[keys[i]] = sortJSON(object[keys[i]]);
+      }
+      return newObject;
+    };*/
+
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+    const fileMatcher = join(await this.fileService.fsPath(workspaceRootUri), '**', '*.image.json');
+    await Promise.all(glob.sync(fileMatcher).map(async imageConfigFile => {
+      const imageConfigFileUri = new URI(imageConfigFile).withScheme('file');
+      const fileContents = await this.fileService.readFile(imageConfigFileUri);
+      const config = JSON.parse(fileContents.value.toString());
+      config.tileset = config.converter.tileset;
+      config.tileset.compress = false;
+      config.map = config.converter.map;
+      config.map.compress = false;
+      config.animation = config.converter.stackFrames ? {
+        isAnimation: true,
+        individualFiles: true,
+        frameWidth: 0,
+        frameHeight: 0,
+      } : {
+        isAnimation: false,
+        individualFiles: false,
+        frameWidth: 0,
+        frameHeight: 0,
+      };
+      config.converter = undefined;
+
+      const updatedFileContent = JSON.stringify(config, null, 4);  // eslint-disable-line
+      await this.fileService.writeFile(imageConfigFileUri, BinaryBuffer.fromString(updatedFileContent));
+    }));
+
+    alert('done');
   }
 }
