@@ -13,9 +13,11 @@
 #vesBuildWidget .buildButtons {
   display: flex;
   flex-direction: row;
+  margin-bottom: var(--theia-ui-padding);
 }
 
 #vesBuildWidget .theia-button {
+  flex-grow: 1;
   margin: 0 var(--theia-ui-padding) 0 0;
   min-width: unset;
 }
