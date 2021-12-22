@@ -1,3 +1,4 @@
+import { isWindows } from '@theia/core';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import URI from '@theia/core/lib/common/uri';
 import { BackendApplicationContribution, FileUri } from '@theia/core/lib/node';
@@ -11,8 +12,7 @@ export class EmulatorBackendContribution implements BackendApplicationContributi
     protected readonly envVariablesServer: EnvVariablesServer;
 
     async configure(app: express.Application): Promise<void> {
-        const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
-        const applicationUri = new URI(envVar && envVar.value ? envVar.value : '').withScheme('file');
+        const applicationUri = await this.getResourcesUri();
         const emulatorUri = applicationUri
             .resolve('binaries')
             .resolve('vuengine-studio-tools')
@@ -20,5 +20,16 @@ export class EmulatorBackendContribution implements BackendApplicationContributi
             .resolve('retroarch');
 
         app.use('/emulator', express.static(FileUri.fsPath(emulatorUri), { dotfiles: 'allow' }));
+    }
+
+    protected async getResourcesUri(): Promise<URI> {
+      const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
+      const applicationPath = envVar && envVar.value 
+        ? isWindows
+          ? `${envVar.value.replace(/\\/g, '/')}`
+          : envVar.value
+        : '';
+  
+      return new URI(applicationPath).withScheme('file');
     }
 }

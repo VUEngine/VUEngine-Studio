@@ -1,4 +1,4 @@
-import { CommandService, isWindows } from '@theia/core';
+import { CommandService } from '@theia/core';
 import { KeybindingRegistry, Message, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -68,8 +68,8 @@ export class VesBuildWidget extends ReactWidget {
     this.title.label = VesBuildWidget.LABEL;
     this.title.caption = VesBuildWidget.LABEL;
     this.node.tabIndex = 0; // required for this.node.focus() to work in this.onActivateRequest()
-    this.state.outputRomExists = await this.vesBuildService.outputRomExists();
     this.title.className = '';
+    this.state.outputRomExists = await this.vesBuildService.outputRomExists();
 
     this.update();
     this.bindEvents();
@@ -107,7 +107,6 @@ export class VesBuildWidget extends ReactWidget {
         case VesBuildPreferenceIds.ENGINE_CORE_PATH:
         case VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH:
         case VesPluginsPreferenceIds.USER_PLUGINS_PATH:
-        case VesBuildPreferenceIds.ENABLE_WSL:
         case VesBuildPreferenceIds.PEDANTIC_WARNINGS:
           this.update();
           break;
@@ -256,24 +255,6 @@ export class VesBuildWidget extends ReactWidget {
                 </div>
               </div>
             </div>
-            {isWindows && <div className='single-pref' key={`pref-${VesBuildPreferenceIds.ENABLE_WSL}`}>
-              <div className='pref-name'>Enable WSL</div>
-              <div className='pref-content-container boolean'>
-                <div className='pref-description'>
-                  {VesBuildPreferenceSchema.properties[VesBuildPreferenceIds.ENABLE_WSL].description}
-                </div>
-                <div className='pref-input'>
-                  <label>
-                    <input
-                      type='checkbox'
-                      className='theia-input'
-                      checked={this.preferenceService.get(VesBuildPreferenceIds.ENABLE_WSL)}
-                      onChange={this.toggleEnableWsl}
-                    />
-                  </label>
-                </div>
-              </div>
-            </div>}
             <div className='single-pref' key={`pref-${VesBuildPreferenceIds.ENGINE_CORE_PATH}`}>
               <div className='pref-name'>Engine Path</div>
               <div className='pref-content-container string'>
@@ -372,6 +353,8 @@ export class VesBuildWidget extends ReactWidget {
                   <span><i className='fa fa-wrench'></i> {this.vesBuildService.buildStatus.buildMode}</span>
                   {this.vesBuildService.buildStatus.active && this.vesBuildService.buildStatus.processId > 0 &&
                     <span><i className='fa fa-terminal'></i> PID {this.vesBuildService.buildStatus.processId}</span>}
+                  {this.vesBuildService.isWslInstalled &&
+                    <span><i className='fa fa-linux'></i> WSL</span>}
                   {!this.vesBuildService.buildStatus.active && this.vesBuildService.romSize > 0 &&
                     <span><i className='fa fa-microchip'></i> {this.vesBuildService.bytesToMbit(this.vesBuildService.romSize)} MBit</span>}
                 </div>
@@ -568,7 +551,6 @@ export class VesBuildWidget extends ReactWidget {
   protected setMode = (mode: string) => this.commandService.executeCommand(VesBuildCommands.SET_MODE.id, mode);
   protected toggleDumpElf = () => this.commandService.executeCommand(VesBuildCommands.TOGGLE_DUMP_ELF.id);
   protected togglePedanticWarnings = () => this.commandService.executeCommand(VesBuildCommands.TOGGLE_PEDANTIC_WARNINGS.id);
-  protected toggleEnableWsl = () => this.commandService.executeCommand(VesBuildCommands.TOGGLE_ENABLE_WSL.id);
   protected setEngineCorePath = (path: string) => this.preferenceService.set(VesBuildPreferenceIds.ENGINE_CORE_PATH, path, PreferenceScope.User);
   protected setEnginePluginsPath = (path: string) => this.preferenceService.set(VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH, path, PreferenceScope.User);
   protected setUserPluginsPath = (path: string) => this.preferenceService.set(VesPluginsPreferenceIds.USER_PLUGINS_PATH, path, PreferenceScope.User);

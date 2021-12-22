@@ -9,7 +9,7 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import * as glob from 'glob';
-import { join, relative as relativePath, sep } from 'path';
+import { join, relative as relativePath } from 'path';
 import { VesPluginData, VesPluginsData } from './ves-plugin';
 import { VesPluginsPathsService } from './ves-plugins-paths-service';
 import { VUENGINE_PLUGINS_PREFIX } from './ves-plugins-types';
@@ -120,14 +120,14 @@ export class VesPluginsService {
 
       // TODO: refactor to use fileservice
       await Promise.all(glob.sync(join(rootPath, '**', 'plugin.json')).map(async file => {
-        const fileSplit = file.split(`${sep}plugin.json`);
+        const fileSplit = file.split('/plugin.json');
         const pluginPathFull = fileSplit[0];
 
         const pluginPathRelative = relativePath(rootPath, pluginPathFull);
         const fileContent = await this.fileService.readFile(new URI(file).withScheme('file'));
         const fileContentJson = JSON.parse(fileContent.value.toString());
 
-        const pluginId = `${prefix}//${pluginPathRelative}`;
+        const pluginId = `${prefix}//${pluginPathRelative.replace(/\\/g, '/')}`;
 
         if (fileContentJson.icon !== '' && !fileContentJson.icon.includes('..')) {
           fileContentJson.icon = join(pluginPathFull, fileContentJson.icon);
@@ -195,7 +195,9 @@ export class VesPluginsService {
 
   getPluginsFileUri(): URI {
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
-    return workspaceRootUri.resolve(join('config', 'Plugins.json'));
+    return workspaceRootUri
+      .resolve('config')
+      .resolve('Plugins.json');
   }
 
   protected async writeInstalledPluginsToFile(): Promise<void> {

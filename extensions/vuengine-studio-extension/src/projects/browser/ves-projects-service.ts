@@ -130,7 +130,9 @@ export class VesProjectsService {
 
   protected async getTemplatesUri(template: string): Promise<URI> {
     const resourcesUri = await this.vesCommonService.getResourcesUri();
-    return resourcesUri.resolve(join('vuengine', template));
+    return resourcesUri
+      .resolve('vuengine')
+      .resolve(template);
   }
 
   protected async replaceInProject(uri: URI, from: string, to: string): Promise<void> {

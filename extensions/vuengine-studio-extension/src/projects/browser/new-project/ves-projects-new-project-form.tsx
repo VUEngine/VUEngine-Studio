@@ -1,16 +1,18 @@
-import { sep } from 'path';
-import * as filenamify from 'filenamify';
-import * as React from '@theia/core/shared/react';
-import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import { PreferenceService } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';
+import * as React from '@theia/core/shared/react';
+import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import * as filenamify from 'filenamify';
+import { sep } from 'path';
+import { VesProjectsPathsService } from '../ves-projects-paths-service';
 import { VesProjectsPreferenceIds } from '../ves-projects-preferences';
 
 export interface VesNewProjectFormComponentProps {
     fileService: FileService
     fileDialogService: FileDialogService
     preferenceService: PreferenceService
+    vesProjectsPathsService: VesProjectsPathsService
 }
 
 export interface VesNewProjectFormComponentState {
@@ -109,6 +111,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
     protected fileService: FileService;
     protected fileDialogService: FileDialogService;
     protected preferenceService: PreferenceService;
+    protected vesProjectsPathsService: VesProjectsPathsService;
 
     protected nameInputComponentRef: React.RefObject<HTMLInputElement> = React.createRef();
 
@@ -118,6 +121,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
         this.fileService = props.fileService;
         this.fileDialogService = props.fileDialogService;
         this.preferenceService = props.preferenceService;
+        this.vesProjectsPathsService = props.vesProjectsPathsService;
 
         this.state = {
             name: 'My Project',
@@ -130,24 +134,24 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
             isCreating: false
         };
 
-        this.preferenceService.ready.then(() => this.setStateFromPreferences());
+        this.preferenceService.ready.then(async () => await this.setStateFromPreferences());
 
-        this.preferenceService.onPreferenceChanged(({ preferenceName, newValue }) => {
+        this.preferenceService.onPreferenceChanged(async ({ preferenceName, newValue }) => {
             switch (preferenceName) {
-                case VesProjectsPreferenceIds.BASE_FOLDER:
+                case VesProjectsPreferenceIds.BASE_PATH:
                 case VesProjectsPreferenceIds.AUTHOR:
                 case VesProjectsPreferenceIds.MAKER_CODE:
-                    this.setStateFromPreferences();
+                    await this.setStateFromPreferences();
                     break;
             }
         });
     }
 
-    protected setStateFromPreferences(): void {
+    protected async setStateFromPreferences(): Promise<void> {
         this.setState({
             author: this.preferenceService.get(VesProjectsPreferenceIds.AUTHOR) as string,
             makerCode: this.preferenceService.get(VesProjectsPreferenceIds.MAKER_CODE) as string,
-            path: this.removeTrailingSlash(this.preferenceService.get(VesProjectsPreferenceIds.BASE_FOLDER) as string),
+            path: await this.fileService.fsPath(await this.vesProjectsPathsService.getProjectsBaseUri()),
         });
     }
 
@@ -353,8 +357,8 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
         }
     };
 
-    protected removeTrailingSlash(string: string): string {
-        return string.replace(/\/$/, '');
+    protected removeTrailingSlash(path: string): string {
+        return path.replace(/\/$/, '');
     }
 
     focusNameInput(): void {

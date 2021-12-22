@@ -7,7 +7,6 @@ export namespace VesBuildPreferenceIds {
     export const BUILD_MODE = [CATEGORY, 'mode'].join('.');
     export const DUMP_ELF = [CATEGORY, 'dumpElf'].join('.');
     export const PEDANTIC_WARNINGS = [CATEGORY, 'pedanticWarnings'].join('.');
-    export const ENABLE_WSL = [CATEGORY, 'enableWsl'].join('.');
     export const ENGINE_CORE_PATH = [CATEGORY, 'engine', 'core', 'path'].join('.');
     export const ENGINE_CORE_INCLUDE_IN_WORKSPACE = [CATEGORY, 'engine', 'core', 'includeInWorkspace'].join('.');
 }
@@ -34,11 +33,6 @@ export const VesBuildPreferenceSchema: PreferenceSchema = {
         [VesBuildPreferenceIds.PEDANTIC_WARNINGS]: {
             type: 'boolean',
             description: 'Enable pedantic compiler warnings.',
-            default: false,
-        },
-        [VesBuildPreferenceIds.ENABLE_WSL]: {
-            type: 'boolean',
-            description: 'Build in WSL for faster compilation times.',
             default: false,
         },
         [VesBuildPreferenceIds.ENGINE_CORE_PATH]: {

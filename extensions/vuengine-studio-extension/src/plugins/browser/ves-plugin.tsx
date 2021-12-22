@@ -294,7 +294,7 @@ export class VesPluginEditorComponent extends AbstractVesPluginComponent {
         const { id, icon, author, displayName, description, repository, license, tags, readme, dependencies } = this.props.plugin;
 
         const { baseStyle, scrollStyle } = this.getSubcomponentStyles();
-        const sanitizedReadme = !!readme ? DOMPurify.sanitize(readme) : undefined;
+        const sanitizedReadme = !!readme ? DOMPurify.sanitize(readme) : '';
         const dependenciesList = this.renderDependenciesList(dependencies || []);
 
         return <>
@@ -322,7 +322,6 @@ export class VesPluginEditorComponent extends AbstractVesPluginComponent {
                 </div>
             </div>
             {
-                sanitizedReadme &&
                 <div className='scroll-container'
                     style={scrollStyle}
                     ref={ref => this._scrollContainer = (ref || undefined)}>

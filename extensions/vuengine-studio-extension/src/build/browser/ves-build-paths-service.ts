@@ -2,7 +2,6 @@ import { PreferenceService } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { join } from 'path';
 import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
 
@@ -17,10 +16,9 @@ export class VesBuildPathsService {
 
   async getEngineCoreUri(): Promise<URI> {
     const resourcesUri = await this.vesCommonService.getResourcesUri();
-    const defaultUri = resourcesUri.resolve(join(
-      'vuengine',
-      'vuengine-core'
-    ));
+    const defaultUri = resourcesUri
+      .resolve('vuengine')
+      .resolve('vuengine-core');
     const customUri = new URI(this.preferenceService.get(
       VesBuildPreferenceIds.ENGINE_CORE_PATH
     ) as string).withScheme('file');
@@ -30,26 +28,24 @@ export class VesBuildPathsService {
       : defaultUri;
   }
 
-  async getCompilerUri(): Promise<URI> {
+  async getCompilerUri(isWslInstalled: boolean = false): Promise<URI> {
     const resourcesUri = await this.vesCommonService.getResourcesUri();
-    return resourcesUri.resolve(join(
-      'binaries',
-      'vuengine-studio-tools',
-      this.vesCommonService.getOs(),
-      'gcc'
-    ));
+    return resourcesUri
+      .resolve('binaries')
+      .resolve('vuengine-studio-tools')
+      .resolve(isWslInstalled ? 'linux' : this.vesCommonService.getOs())
+      .resolve('gcc');
   }
 
   async getMsysBashUri(): Promise<URI> {
     const resourcesUri = await this.vesCommonService.getResourcesUri();
-    return resourcesUri.resolve(join(
-      'binaries',
-      'vuengine-studio-tools',
-      this.vesCommonService.getOs(),
-      'msys',
-      'usr',
-      'bin',
-      'bash.exe'
-    ));
+    return resourcesUri
+      .resolve('binaries')
+      .resolve('vuengine-studio-tools')
+      .resolve(this.vesCommonService.getOs())
+      .resolve('msys')
+      .resolve('usr')
+      .resolve('bin')
+      .resolve('bash.exe');
   }
 }

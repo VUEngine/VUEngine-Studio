@@ -1,14 +1,15 @@
 import { PreferenceService } from '@theia/core/lib/browser';
+import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { join } from 'path';
 import { VesCommonService } from '../../branding/browser/ves-common-service';
-import { VesPluginsPreferenceIds, VesPluginsPreferenceSchema } from './ves-plugins-preferences';
+import { VesPluginsPreferenceIds } from './ves-plugins-preferences';
 
 @injectable()
 export class VesPluginsPathsService {
-
+  @inject(EnvVariablesServer)
+  protected envVariablesServer: EnvVariablesServer;
   @inject(FileService)
   protected fileService: FileService;
   @inject(PreferenceService)
@@ -18,10 +19,9 @@ export class VesPluginsPathsService {
 
   async getEnginePluginsUri(): Promise<URI> {
     const resourcesUri = await this.vesCommonService.getResourcesUri();
-    const defaultUri = resourcesUri.resolve(join(
-      'vuengine',
-      'vuengine-plugins'
-    ));
+    const defaultUri = resourcesUri
+      .resolve('vuengine')
+      .resolve('vuengine-plugins');
     const customUri = new URI(this.preferenceService.get(
       VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH
     ) as string).withScheme('file');
@@ -32,7 +32,11 @@ export class VesPluginsPathsService {
   }
 
   async getUserPluginsUri(): Promise<URI> {
-    const defaultUri = VesPluginsPreferenceSchema.properties[VesPluginsPreferenceIds.USER_PLUGINS_PATH].default;
+    const homedir = await this.envVariablesServer.getHomeDirUri();
+    const homedirUri = new URI(homedir).withScheme('file');
+    const defaultUri = homedirUri
+      .resolve('vuengine')
+      .resolve('plugins');
     const customUri = new URI(this.preferenceService.get(
       VesPluginsPreferenceIds.USER_PLUGINS_PATH
     ) as string).withScheme('file');

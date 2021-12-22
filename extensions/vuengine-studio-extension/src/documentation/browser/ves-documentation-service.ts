@@ -11,15 +11,14 @@ export class VesDocumentationService {
 
   protected async getHandbookRootUri(): Promise<URI> {
     const resourcesUri = await this.vesCommonService.getResourcesUri();
-    return resourcesUri.resolve(join(
-      'documentation',
-      'vuengine-studio-documentation',
-    ));
+    return resourcesUri
+      .resolve('documentation')
+      .resolve('vuengine-studio-documentation');
   }
 
   async getHandbookIndex(): Promise<URI> {
     const handbookRootUri = await this.getHandbookRootUri();
-    return handbookRootUri.resolve(join('index.json'));
+    return handbookRootUri.resolve('index.json');
   }
 
   async getHandbookUri(file: string): Promise<URI> {

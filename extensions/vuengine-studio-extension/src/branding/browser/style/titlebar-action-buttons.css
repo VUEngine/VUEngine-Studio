@@ -11,6 +11,7 @@
 #ves-titlebar-action-buttons .theia-button {
   -webkit-app-region: no-drag;
   background-color: var(--theia-titleBar-buttonBackground);
+  cursor: pointer;
   font-size: 17px;
   line-height: 27px;
   margin-left: 4px;

@@ -1,24 +1,23 @@
-import { join } from 'path';
-import { cpus } from 'os';
 import { CommandService, isWindows } from '@theia/core';
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { ApplicationShell, LabelProvider, PreferenceService } from '@theia/core/lib/browser';
-import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import URI from '@theia/core/lib/common/uri';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileChangeType } from '@theia/filesystem/lib/browser';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { ProcessOptions } from '@theia/process/lib/node';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { cpus } from 'os';
 import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-service';
-import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
-import { BuildLogLine, BuildLogLineFileLink, BuildLogLineType, BuildMode, BuildResult, BuildStatus, GccMatchedProblem } from './ves-build-types';
-import { VesBuildPreferenceIds } from './ves-build-preferences';
+import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 import { VesBuildCommands } from './ves-build-commands';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesBuildPathsService } from './ves-build-paths-service';
+import { VesBuildPreferenceIds } from './ves-build-preferences';
+import { BuildLogLine, BuildLogLineFileLink, BuildLogLineType, BuildMode, BuildResult, BuildStatus, GccMatchedProblem } from './ves-build-types';
 
 interface BuildFolderFlags {
   [key: string]: boolean;
@@ -50,6 +49,8 @@ export class VesBuildService {
   protected readonly vesProcessWatcher: VesProcessWatcher;
   @inject(WorkspaceService)
   protected readonly workspaceService: WorkspaceService;
+
+  isWslInstalled: boolean = false;
 
   // is queued
   protected _isQueued: boolean = false;
@@ -170,6 +171,7 @@ export class VesBuildService {
   protected async init(): Promise<void> {
     await this.resetBuildStatus();
     this.bindEvents();
+    //await this.determineIsWslInstalled();
   }
 
   async doBuild(force: boolean = false): Promise<void> {
@@ -208,6 +210,33 @@ export class VesBuildService {
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
     const romUri = workspaceRootUri.resolve('build').resolve('output.vb');
     return this.fileService.exists(romUri);
+  }
+
+  protected async determineIsWslInstalled(): Promise<void> {
+    if (!isWindows) {
+      this.isWslInstalled = false;
+      return;
+    }
+
+    const checkProcess = await this.vesProcessService.launchProcess(VesProcessType.Raw, {
+      command: 'wsl.exe',
+      args: ['--list', '--verbose']
+    });
+
+    await new Promise((resolve, reject) => {
+      this.vesProcessWatcher.onDidReceiveOutputStreamData(({ pId, data }) => {
+        if (checkProcess.processManagerId === pId) {
+          data = data.replace(/\0/g, ''); // clean of NUL characters
+          this.isWslInstalled = data.includes('NAME') && data.includes('STATE') && data.includes('VERSION');
+          resolve;
+        }
+      });
+      this.vesProcessWatcher.onDidExitProcess(({ pId }) => {
+        if (checkProcess.processManagerId === pId) {
+          resolve;
+        }
+      });
+    });
   }
 
   protected async determineRomSize(): Promise<void> {
@@ -361,42 +390,60 @@ export class VesBuildService {
     const engineCoreUri = await this.vesBuildPathsService.getEngineCoreUri();
     const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
     const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
-    const compilerUri = await this.vesBuildPathsService.getCompilerUri();
+    const compilerUri = await this.vesBuildPathsService.getCompilerUri(this.isWslInstalled);
     const makefileUri = await this.getMakefileUri(workspaceRootUri, engineCoreUri);
 
     // TODO: remove check when https://github.com/VUEngine/VUEngine-Studio/issues/15 is resolved
     await this.checkPathsForSpaces(workspaceRootUri, engineCoreUri, enginePluginsUri, userPluginsUri);
 
     if (isWindows) {
-      // if (enableWsl) shellPath = process.env.windir + '\\System32\\wsl.exe';
-
       const args = [
         'cd', await this.convertoToEnvPath(workspaceRootUri), '&&',
-        'export', `PATH=${await this.convertoToEnvPath(compilerUri.resolve('bin'))}:$PATH`, '&&',
+        'export', `PATH=${await this.convertoToEnvPath(compilerUri.resolve('bin'))}:$PATH`, 
+          `LC_ALL='C'`,
+          `MAKE_JOBS=${this.getThreads()}`, 
+          `DUMP_ELF=${dumpElf ? 1 : 0}`, 
+          `PRINT_PEDANTIC_WARNINGS=${pedanticWarnings ? 1 : 0}`, '&&',
         'make', 'all',
         '-e', `TYPE=${buildMode}`,
-        `ENGINE_FOLDER=${await this.convertoToEnvPath(engineCoreUri)}`,
-        `PLUGINS_FOLDER=${await this.convertoToEnvPath(enginePluginsUri)}`,
-        `USER_PLUGINS_FOLDER=${await this.convertoToEnvPath(userPluginsUri)}`,
+          `ENGINE_FOLDER=${await this.convertoToEnvPath(engineCoreUri)}`,
+          `PLUGINS_FOLDER=${await this.convertoToEnvPath(enginePluginsUri)}`,
+          `USER_PLUGINS_FOLDER=${await this.convertoToEnvPath(userPluginsUri)}`,
         '-f', await this.convertoToEnvPath(makefileUri),
       ];
 
-      return {
-        command: await this.fileService.fsPath(await this.vesBuildPathsService.getMsysBashUri()),
-        args: [
-          '--login',
-          '-c', args.join(' '),
-        ],
-        options: {
-          cwd: await this.fileService.fsPath(workspaceRootUri),
-          env: {
-            DUMP_ELF: dumpElf ? 1 : 0,
-            LC_ALL: 'C',
-            MAKE_JOBS: this.getThreads(),
-            PRINT_PEDANTIC_WARNINGS: pedanticWarnings ? 1 : 0,
+      if (this.isWslInstalled) {
+
+        /* const winDir = await this.envVariablesServer.getValue('winDir');
+        if (!winDir || !winDir.value) {
+          return;
+        }
+    
+        const winDirUri = new URI(winDir.value.replace(/\\/g, '/')).withScheme('file');
+        const wslExeUri = winDirUri
+          .resolve('System32')
+          .resolve('wsl.exe');
+          */
+  
+        return {
+          command: 'wsl.exe',
+          args: args,
+          options: {
+            cwd: await this.fileService.fsPath(workspaceRootUri)
           },
-        },
-      };
+        };
+      } else {
+        return {
+          command: await this.fileService.fsPath(await this.vesBuildPathsService.getMsysBashUri()),
+          args: [
+            '--login',
+            '-c', args.join(' '),
+          ],
+          options: {
+            cwd: await this.fileService.fsPath(workspaceRootUri),
+          },
+        };
+      }
     }
 
     return {
@@ -490,6 +537,7 @@ export class VesBuildService {
     } else if (textLowerCase.includes('error: ') ||
       textLowerCase.includes('] error ') ||
       textLowerCase.includes(' not found') ||
+      textLowerCase.includes('Invalid argument') ||
       textLowerCase.includes('no such file or directory') ||
       textLowerCase.includes('undefined reference to') ||
       textLowerCase.includes('undefined symbol') ||
@@ -579,16 +627,15 @@ export class VesBuildService {
   }
 
   async convertoToEnvPath(uri: URI): Promise<string> {
-    const enableWsl = this.preferenceService.get(VesBuildPreferenceIds.ENABLE_WSL);
     const path = await this.fileService.fsPath(uri);
     let envPath = path
       .replace(/\\/g, '/')
       .replace(/^[a-zA-Z]:\//, function (x): string {
-        return `/${x.substr(0, 1).toLowerCase()}/`;
+        return `/${x.substring(0, 1).toLowerCase()}/`;
       });
 
-    if (isWindows && enableWsl) {
-      envPath = '/mnt/' + envPath;
+    if (this.isWslInstalled) {
+      envPath = '/mnt' + envPath;
     }
 
     return envPath;
@@ -617,12 +664,12 @@ export class VesBuildService {
    * even right after reconfiguring engine paths.
    */
   protected async fixPermissions(): Promise<void> {
-    if (isWindows) {
+    if (isWindows && !this.isWslInstalled) {
       return;
     }
 
     const engineCorePath = await this.vesBuildPathsService.getEngineCoreUri();
-    const compilerUri = await this.vesBuildPathsService.getCompilerUri();
+    const compilerUri = await this.vesBuildPathsService.getCompilerUri(this.isWslInstalled);
 
     await Promise.all([
       this.vesProcessService.launchProcess(VesProcessType.Raw, {
@@ -635,11 +682,11 @@ export class VesBuildService {
       }),
       this.vesProcessService.launchProcess(VesProcessType.Raw, {
         command: 'chmod',
-        args: ['-R', 'a+x', await this.fileService.fsPath(compilerUri.resolve(join('v810', 'bin')))],
+        args: ['-R', 'a+x', await this.fileService.fsPath(compilerUri.resolve('v810').resolve('bin'))],
       }),
       this.vesProcessService.launchProcess(VesProcessType.Raw, {
         command: 'chmod',
-        args: ['-R', 'a+x', await this.fileService.fsPath(engineCorePath.resolve(join('lib', 'compiler', 'preprocessor')))],
+        args: ['-R', 'a+x', await this.fileService.fsPath(engineCorePath.resolve('lib').resolve('compiler').resolve('preprocessor'))],
       }),
     ]);
   }

@@ -193,7 +193,7 @@ export class VesCodeGenService {
     ];
 
     await Promise.all(roots.map(async root => {
-      const templatesFileUri = root.resolve(join(VES_PREFERENCE_DIR, 'templates.json'));
+      const templatesFileUri = root.resolve(VES_PREFERENCE_DIR).resolve('templates.json');
       if (await this.fileService.exists(templatesFileUri)) {
         const templatesFileContent = await this.fileService.readFile(templatesFileUri);
         const templatesFileJson = JSON.parse(templatesFileContent.value.toString()) as Templates;
@@ -258,7 +258,7 @@ export class VesCodeGenService {
 
   protected async configureTemplateEngine(): Promise<void> {
     const engineCoreUri = await this.vesBuildPathsService.getEngineCoreUri();
-    const env = nunjucks.configure(await this.fileService.fsPath(engineCoreUri.resolve(join(VES_PREFERENCE_DIR, VES_PREFERENCE_TEMPLATES_DIR))));
+    const env = nunjucks.configure(await this.fileService.fsPath(engineCoreUri.resolve(VES_PREFERENCE_DIR).resolve(VES_PREFERENCE_TEMPLATES_DIR)));
 
     // add filters
     env.addFilter('basename', (value: string, ending: boolean = true) => {

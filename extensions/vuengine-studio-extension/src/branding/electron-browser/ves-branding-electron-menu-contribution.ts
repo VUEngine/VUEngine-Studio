@@ -45,7 +45,6 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
                 if ([
                     VesBuildPreferenceIds.DUMP_ELF,
                     VesBuildPreferenceIds.PEDANTIC_WARNINGS,
-                    VesBuildPreferenceIds.ENABLE_WSL,
                 ].includes(preferenceName)) {
                     rebuildMenu();
                 }

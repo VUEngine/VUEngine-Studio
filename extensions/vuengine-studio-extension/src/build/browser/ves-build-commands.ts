@@ -33,12 +33,6 @@ export namespace VesBuildCommands {
     category: CATEGORY,
   };
 
-  export const TOGGLE_ENABLE_WSL: Command = {
-    id: 'VesBuild.commands.enableWsl.toggle',
-    label: 'Toggle use WSL for building',
-    category: CATEGORY,
-  };
-
   export const TOGGLE_WIDGET: Command = {
     id: 'VesBuild.commands.openWidget',
     label: 'Toggle Build Widget',

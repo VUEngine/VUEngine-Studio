@@ -2,7 +2,6 @@ import { BaseWidget } from '@theia/core/lib/browser';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { PreviewHandler, PreviewHandlerProvider } from '@theia/preview/lib/browser/preview-handler';
-import { join } from 'path';
 import { VesCommonService } from 'src/branding/browser/ves-common-service';
 
 @injectable()
@@ -32,10 +31,9 @@ export class VesDocumentationTechScrollWidget extends BaseWidget {
     @postConstruct()
     async init(): Promise<void> {
         const resourcesURi = await this.vesCommonService.getResourcesUri();
-        const stsUri = resourcesURi.resolve(join(
-            'documentation',
-            'stsvb.html',
-        ));
+        const stsUri = resourcesURi
+            .resolve('documentation')
+            .resolve('stsvb.html');
         const stsContent = await this.fileService.readFile(stsUri);
         const stsContentStr = stsContent.value.toString();
 

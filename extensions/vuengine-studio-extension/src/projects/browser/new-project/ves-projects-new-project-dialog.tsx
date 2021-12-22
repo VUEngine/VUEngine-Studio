@@ -8,7 +8,7 @@ import * as React from '@theia/core/shared/react';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { VesProjectsPreferenceIds } from '../ves-projects-preferences';
+import { VesProjectsPathsService } from '../ves-projects-paths-service';
 import { VesProjectsService } from '../ves-projects-service';
 import { VesNewProjectFormComponent, VES_NEW_PROJECT_TEMPLATES } from './ves-projects-new-project-form';
 
@@ -26,6 +26,8 @@ export class VesNewProjectDialog extends ReactDialog<void> {
     protected readonly preferenceService: PreferenceService;
     @inject(VesProjectsService)
     protected readonly vesProjectsService: VesProjectsService;
+    @inject(VesProjectsPathsService)
+    protected readonly vesProjectsPathsService: VesProjectsPathsService;
     @inject(WorkspaceService)
     protected readonly workspaceService: WorkspaceService;
 
@@ -79,6 +81,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
             fileService={this.fileService}
             fileDialogService={this.fileDialogService}
             preferenceService={this.preferenceService}
+            vesProjectsPathsService={this.vesProjectsPathsService}
             ref={this.createProjectFormComponentRef}
         />;
     }
@@ -106,10 +109,11 @@ export class VesNewProjectDialog extends ReactDialog<void> {
             return;
         }
 
-        const projectsBaseFolder = this.preferenceService.get(VesProjectsPreferenceIds.BASE_FOLDER) as string;
-        const basePath = this.createProjectFormComponentRef.current?.state.path ?? projectsBaseFolder;
-        const basePathUri = new URI(basePath).withScheme('file');
-        const pathExists = await this.fileService.exists(basePathUri) && (await this.fileService.resolve(basePathUri)).isDirectory;
+        const projectsBaseUri = this.createProjectFormComponentRef.current?.state.path
+            ? new URI(this.createProjectFormComponentRef.current?.state.path).withScheme('file')
+            : await this.vesProjectsPathsService.getProjectsBaseUri();
+        const pathExists = await this.fileService.exists(projectsBaseUri) 
+            && (await this.fileService.resolve(projectsBaseUri)).isDirectory;
 
         if (!pathExists) {
             this.setIsCreating(false);
@@ -122,7 +126,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
         const templateIndex = this.createProjectFormComponentRef.current?.state.template ?? 0;
         const template = VES_NEW_PROJECT_TEMPLATES[templateIndex];
         const folder = this.createProjectFormComponentRef.current?.state.folder ?? 'new-project';
-        const newProjectUri = basePathUri.resolve(folder);
+        const newProjectUri = projectsBaseUri.resolve(folder);
         const newProjectWorkspaceFileUri = newProjectUri.resolve(`${folder}.theia-workspace`);
 
         const response = await this.vesProjectsService.createProjectFromTemplate(

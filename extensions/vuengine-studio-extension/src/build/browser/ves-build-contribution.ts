@@ -1,5 +1,5 @@
 import { inject, injectable } from '@theia/core/shared/inversify';
-import { CommandContribution, CommandRegistry, isWindows, MAIN_MENU_BAR, MenuContribution, MenuModelRegistry } from '@theia/core/lib/common';
+import { CommandContribution, CommandRegistry, MAIN_MENU_BAR, MenuContribution, MenuModelRegistry } from '@theia/core/lib/common';
 import { ApplicationShell, KeybindingContribution, KeybindingRegistry, PreferenceScope, PreferenceService, QuickPickItem, QuickPickOptions } from '@theia/core/lib/browser';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { QuickPickService } from '@theia/core/lib/common/quick-pick-service';
@@ -67,16 +67,6 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
       isToggled: () => !!this.preferenceService.get(VesBuildPreferenceIds.PEDANTIC_WARNINGS),
     });
 
-    if (isWindows) {
-      commandRegistry.registerCommand(VesBuildCommands.TOGGLE_ENABLE_WSL, {
-        execute: () => {
-          const current = this.preferenceService.get(VesBuildPreferenceIds.ENABLE_WSL);
-          this.preferenceService.set(VesBuildPreferenceIds.ENABLE_WSL, !current, PreferenceScope.User);
-        },
-        isToggled: () => !!this.preferenceService.get(VesBuildPreferenceIds.ENABLE_WSL),
-      });
-    }
-
     commandRegistry.registerCommand(VesBuildCommands.TOGGLE_WIDGET, {
       execute: (forceOpen: boolean = false) => {
         if (forceOpen) {
@@ -133,13 +123,6 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
       label: 'Pedantic Warnings',
       order: '2'
     });
-    /* if (isWindows) {
-      menus.registerMenuAction(VesBuildMenuSection.OPTION, {
-        commandId: VesBuildCommands.TOGGLE_ENABLE_WSL.id,
-        label: 'Enable WSL',
-        order: '3'
-      });
-    } */
   }
 
   async buildModeQuickPick(buildMode?: BuildMode): Promise<void> {

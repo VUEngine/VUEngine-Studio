@@ -238,7 +238,7 @@ export class VesPluginsModel {
             plugin = this.setPlugin(id);
 
             let renderedReadme = '';
-            const readmeUri = new URI(data.readme);
+            const readmeUri = new URI(data.readme?.replace(/\\/g, '/')).withScheme('file');
             if (data.readme && await this.fileService.exists(readmeUri)) {
                 const rawReadme = await this.fileService.readFile(readmeUri);
                 const readme = this.compileReadme(rawReadme.value.toString());

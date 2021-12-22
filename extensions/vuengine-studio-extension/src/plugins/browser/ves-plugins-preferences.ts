@@ -1,6 +1,4 @@
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
-import { homedir } from 'os';
-import { join } from 'path';
 
 export namespace VesPluginsPreferenceIds {
     export const CATEGORY = 'plugins';
@@ -19,7 +17,7 @@ export const VesPluginsPreferenceSchema: PreferenceSchema = {
             description: 'Full path to plugins library. Uses built-in VUEngine Plugins library when left blank.',
             default: '',
             additionalProperties: {
-                isDirectory: true
+                isDirectory: true,
             },
         },
         [VesPluginsPreferenceIds.ENGINE_PLUGINS_INCLUDE_IN_WORKSPACE]: {
@@ -30,8 +28,6 @@ export const VesPluginsPreferenceSchema: PreferenceSchema = {
         [VesPluginsPreferenceIds.USER_PLUGINS_PATH]: {
             type: 'string',
             description: 'Full path to base folder for all user plugins.',
-            // TODO: use EnvVariablesServer.getHomeDirUri()
-            default: join(homedir(), 'vuengine', 'plugins'),
             additionalProperties: {
                 isDirectory: true,
             },
