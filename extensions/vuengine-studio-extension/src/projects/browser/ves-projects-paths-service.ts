@@ -21,7 +21,7 @@ export class VesProjectsPathsService {
     const homedirUri = new URI(homedir).withScheme('file');
 
     return homedirUri
-        .resolve('vuengine')
-        .resolve('projects');
+      .resolve('vuengine')
+      .resolve('projects');
   }
 }

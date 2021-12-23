@@ -7,7 +7,6 @@ import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { VesFlashCartCommands } from './ves-flash-cart-commands';
 import { ConnectedFlashCart, FlashLogLine } from './ves-flash-cart-types';
 import { VesFlashCartService } from './ves-flash-cart-service';
-import { VesFlashCartPreferenceIds, VesFlashCartPreferenceSchema } from './ves-flash-cart-preferences';
 import { IMAGE_HYPERFLASH32_LABEL } from './images/hyperflash32-label';
 import { NO_FLASH_CARTS } from './images/no-flash-carts';
 import { VesBuildService } from '../../build/browser/ves-build-service';

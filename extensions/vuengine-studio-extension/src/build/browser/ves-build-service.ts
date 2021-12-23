@@ -171,7 +171,7 @@ export class VesBuildService {
   protected async init(): Promise<void> {
     await this.resetBuildStatus();
     this.bindEvents();
-    //await this.determineIsWslInstalled();
+    await this.determineIsWslInstalled();
   }
 
   async doBuild(force: boolean = false): Promise<void> {
@@ -223,17 +223,17 @@ export class VesBuildService {
       args: ['--list', '--verbose']
     });
 
-    await new Promise((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
       this.vesProcessWatcher.onDidReceiveOutputStreamData(({ pId, data }) => {
         if (checkProcess.processManagerId === pId) {
           data = data.replace(/\0/g, ''); // clean of NUL characters
           this.isWslInstalled = data.includes('NAME') && data.includes('STATE') && data.includes('VERSION');
-          resolve;
+          resolve();
         }
       });
       this.vesProcessWatcher.onDidExitProcess(({ pId }) => {
         if (checkProcess.processManagerId === pId) {
-          resolve;
+          resolve();
         }
       });
     });
@@ -399,16 +399,16 @@ export class VesBuildService {
     if (isWindows) {
       const args = [
         'cd', await this.convertoToEnvPath(workspaceRootUri), '&&',
-        'export', `PATH=${await this.convertoToEnvPath(compilerUri.resolve('bin'))}:$PATH`, 
-          `LC_ALL='C'`,
-          `MAKE_JOBS=${this.getThreads()}`, 
-          `DUMP_ELF=${dumpElf ? 1 : 0}`, 
-          `PRINT_PEDANTIC_WARNINGS=${pedanticWarnings ? 1 : 0}`, '&&',
+        'export', `PATH=${await this.convertoToEnvPath(compilerUri.resolve('bin'))}:$PATH`,
+        'LC_ALL=C',
+        `MAKE_JOBS=${this.getThreads()}`,
+        `DUMP_ELF=${dumpElf ? 1 : 0}`,
+        `PRINT_PEDANTIC_WARNINGS=${pedanticWarnings ? 1 : 0}`, '&&',
         'make', 'all',
         '-e', `TYPE=${buildMode}`,
-          `ENGINE_FOLDER=${await this.convertoToEnvPath(engineCoreUri)}`,
-          `PLUGINS_FOLDER=${await this.convertoToEnvPath(enginePluginsUri)}`,
-          `USER_PLUGINS_FOLDER=${await this.convertoToEnvPath(userPluginsUri)}`,
+        `ENGINE_FOLDER=${await this.convertoToEnvPath(engineCoreUri)}`,
+        `PLUGINS_FOLDER=${await this.convertoToEnvPath(enginePluginsUri)}`,
+        `USER_PLUGINS_FOLDER=${await this.convertoToEnvPath(userPluginsUri)}`,
         '-f', await this.convertoToEnvPath(makefileUri),
       ];
 
@@ -418,13 +418,13 @@ export class VesBuildService {
         if (!winDir || !winDir.value) {
           return;
         }
-    
+
         const winDirUri = new URI(winDir.value.replace(/\\/g, '/')).withScheme('file');
         const wslExeUri = winDirUri
           .resolve('System32')
           .resolve('wsl.exe');
           */
-  
+
         return {
           command: 'wsl.exe',
           args: args,
