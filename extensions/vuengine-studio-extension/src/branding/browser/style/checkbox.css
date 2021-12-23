@@ -9,14 +9,16 @@
 [type="checkbox"]::before {
     font-size: 120%;
     margin-right: var(--theia-ui-padding);
-    content: "\ebb5";
+    content: "\f14a";
     display: inline-block;
-    font-family: codicon;
+    font-family: "FontAwesome";
+    text-align: left;
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
     vertical-align: bottom;
+    width: 1em;
 }
 
 [type="checkbox"]:checked::before {
-    content: "\ebb3";
+    content: "\f096";
 }

@@ -97,7 +97,7 @@ export class VesEmulatorService {
         label: emulatorConfig.name,
         description: emulatorConfig.path,
         detail: detail ? `   ${detail} ` : '',
-        iconClasses: (emulatorConfig.name === defaultEmulator) ? ['codicon', 'codicon-pass-filled'] : ['codicon', 'codicon-circle-large-outline'],
+        iconClasses: (emulatorConfig.name === defaultEmulator) ? ['fa', 'fa-check-square'] : ['fa', 'fa-square-o'],
       });
     }
 
