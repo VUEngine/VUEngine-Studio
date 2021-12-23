@@ -46,7 +46,7 @@ const DEFAULT_IMAGE_CONVERTER_CONFIG: ImageConverterConfig = {
   }
 };
 
-const COMPRESSION_FLAG_LENGTH = 8;
+const COMPRESSION_FLAG_LENGTH = 1;
 
 @injectable()
 export class VesImageConverterService {
@@ -238,9 +238,9 @@ export class VesImageConverterService {
 
         // compute frame offsets for spritesheet animations
         if (imageConfigFileToBeConverted.config.animation.isAnimation && !imageConfigFileToBeConverted.config.animation.individualFiles) {
-          const frameSize = 32 * imageConfigFileToBeConverted.config.animation.frameHeight * imageConfigFileToBeConverted.config.animation.frameWidth;
+          const frameSize = 4 * imageConfigFileToBeConverted.config.animation.frameHeight * imageConfigFileToBeConverted.config.animation.frameWidth;
           imageConfigFileToBeConverted.output.map(async output => {
-            const frameCount = output.tilesData.length * 8 / frameSize;
+            const frameCount = output.tilesData.length / frameSize;
             output.frameTileOffsets = [COMPRESSION_FLAG_LENGTH];
             for (let i = 1; i < frameCount; i++) {
               output.frameTileOffsets.push(COMPRESSION_FLAG_LENGTH + (frameSize * i));
@@ -266,7 +266,7 @@ export class VesImageConverterService {
             totalTilesCount += output.meta.tilesCount;
             tilesData = tilesData.concat(output.tilesData);
             mapData = mapData.concat(output.mapData);
-            frameTileOffsets = frameTileOffsets.concat(8 * (tilesData.length + 1));
+            frameTileOffsets = frameTileOffsets.concat(tilesData.length + 1);
           });
 
           // remove last element from frameTileOffsets
@@ -423,7 +423,7 @@ export class VesImageConverterService {
 
     const isSpritesheet = imageConfigFileToBeConverted.config.animation.isAnimation && !imageConfigFileToBeConverted.config.animation.individualFiles;
     const frameSize = isSpritesheet
-      ? 4 * imageConfigFileToBeConverted.config.animation.frameWidth * imageConfigFileToBeConverted.config.animation.frameHeight
+      ? 32 * imageConfigFileToBeConverted.config.animation.frameWidth * imageConfigFileToBeConverted.config.animation.frameHeight
       : 0;
 
     imageConfigFileToBeConverted.output.map(output => {
@@ -470,7 +470,7 @@ export class VesImageConverterService {
             compressedData.push(currentBlock.padEnd(8, '0'));
           }
 
-          output.frameTileOffsets.push(compressedData.length * 8);
+          output.frameTileOffsets.push(compressedData.length);
         }
       };
 

@@ -41,7 +41,7 @@
 //  • {{ meta.mapWidth }}×{{ meta.mapHeight }} map, not compressed
 {%- endif %}
 {%- if frameTileOffsets.length > 0 %}
-//  • {{ frameTileOffsets.length }} animation frames, {{ meta.animation.frameWidth }}×{{ meta.animation.frameHeight }}, {% if meta.animation.individualFiles %}individual files{% else %}spritesheet{% endif %}
+//  • {{ frameTileOffsets.length }} animation frames{% if meta.animation.frameWidth > 0 and meta.animation.frameHeight > 0 %}, {{ meta.animation.frameWidth }}×{{ meta.animation.frameHeight }}{% endif %}, {% if meta.animation.individualFiles %}individual files{% else %}spritesheet{% endif %}
 {%- endif %}
 {%- if tilesData.length and mapData.length %}
 //  Size: {{ tilesData.length * 4 }} + {{ mapData.length * 2 }} = {{ (tilesData.length * 4) + (mapData.length * 2) }}
