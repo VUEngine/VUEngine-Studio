@@ -9,7 +9,7 @@
 [type="checkbox"]::before {
     font-size: 120%;
     margin-right: var(--theia-ui-padding);
-    content: "\f14a";
+    content: "\f096";
     display: inline-block;
     font-family: "FontAwesome";
     text-align: left;
@@ -20,5 +20,5 @@
 }
 
 [type="checkbox"]:checked::before {
-    content: "\f096";
+    content: "\f046";
 }
