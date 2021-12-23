@@ -33,29 +33,29 @@ export class VesFlashCartUsbServiceImpl implements VesFlashCartUsbService {
         // 1) multiple carts of the same type can be used
         // 2) the same device cannot be detected for two different configurations with the same
         //    vid, hid, etc, because we continue to the next device when we match a config
-        for (let i = 0; i < devices.length; i++) {
+        for (const device of devices) {
             deviceIsFlashCart = false;
             for (const flashCartConfig of flashCartConfigs) {
-                const deviceDesc = devices[i].deviceDescriptor;
+                const deviceDesc = device.deviceDescriptor;
                 if (
                     !deviceIsFlashCart &&
                     deviceDesc.idVendor === flashCartConfig.vid &&
                     deviceDesc.idProduct === flashCartConfig.pid
                 ) {
-                    devices[i].open();
+                    device.open();
                     manufacturer = await new Promise((resolve, reject) => {
-                        devices[i].getStringDescriptor(
-                            devices[i].deviceDescriptor.iManufacturer,
+                        device.getStringDescriptor(
+                            device.deviceDescriptor.iManufacturer,
                             (error, data) => resolve(data)
                         );
                     });
                     product = await new Promise((resolve, reject) => {
-                        devices[i].getStringDescriptor(
-                            devices[i].deviceDescriptor.iProduct,
+                        device.getStringDescriptor(
+                            device.deviceDescriptor.iProduct,
                             (error, data) => resolve(data)
                         );
                     });
-                    devices[i].close();
+                    device.close();
 
                     if (
                         (flashCartConfig.manufacturer === '' ||
@@ -66,7 +66,7 @@ export class VesFlashCartUsbServiceImpl implements VesFlashCartUsbService {
                         deviceIsFlashCart = true;
                         connectedFlashCarts.push({
                             config: flashCartConfig,
-                            device: devices[i],
+                            device: device,
                             status: {
                                 processId: -1,
                                 step: '',

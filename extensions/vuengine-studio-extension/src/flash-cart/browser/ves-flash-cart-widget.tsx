@@ -171,8 +171,7 @@ export class VesFlashCartWidget extends ReactWidget {
                       <img
                         src={connectedFlashCart.config.image}
                         style={
-                          connectedFlashCart.config.name ===
-                            VesFlashCartPreferenceSchema.properties[VesFlashCartPreferenceIds.FLASH_CARTS].default[1].name
+                          connectedFlashCart.config.name === 'HyperFlash32'
                             ? {
                               /* HyperFlash32 eInk label */
                               backgroundImage: `url(${IMAGE_HYPERFLASH32_LABEL})`,

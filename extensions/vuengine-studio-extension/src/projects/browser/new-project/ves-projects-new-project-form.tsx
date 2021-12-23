@@ -1,10 +1,10 @@
+import { isWindows } from '@theia/core';
 import { PreferenceService } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';
 import * as React from '@theia/core/shared/react';
 import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import * as filenamify from 'filenamify';
-import { sep } from 'path';
 import { VesProjectsPathsService } from '../ves-projects-paths-service';
 import { VesProjectsPreferenceIds } from '../ves-projects-preferences';
 
@@ -134,7 +134,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
             isCreating: false
         };
 
-        this.preferenceService.ready.then(async () => await this.setStateFromPreferences());
+        this.preferenceService.ready.then(async () => this.setStateFromPreferences());
 
         this.preferenceService.onPreferenceChanged(async ({ preferenceName, newValue }) => {
             switch (preferenceName) {
@@ -242,7 +242,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                     />
                 </button>
                 <span className="ves-new-project-path-separator">
-                    {sep}
+                    {isWindows ? '\\' : '/'}
                 </span>
                 <input
                     type="text"

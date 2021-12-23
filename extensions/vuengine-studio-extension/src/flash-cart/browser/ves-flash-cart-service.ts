@@ -7,7 +7,6 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { dirname, join } from 'path';
 import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { VesBuildService } from '../../build/browser/ves-build-service';
@@ -16,6 +15,7 @@ import { VesProcessService, VesProcessType } from '../../process/common/ves-proc
 import { VesProjectsService } from '../../projects/browser/ves-projects-service';
 import { VesFlashCartUsbService } from '../common/ves-flash-cart-usb-service-protocol';
 import { IMAGE_FLASHBOY_PLUS } from './images/flashboy-plus';
+import { IMAGE_HYPERBOY } from './images/hyperboy';
 import { IMAGE_HYPERFLASH32 } from './images/hyperflash32';
 import { VesFlashCartCommands } from './ves-flash-cart-commands';
 import { VesFlashCartPreferenceIds, VesFlashCartPreferenceSchema } from './ves-flash-cart-preferences';
@@ -23,7 +23,9 @@ import {
   ConnectedFlashCart,
   FLASHBOY_PLUS_IMAGE_PLACEHOLDER,
   FlashCartConfig,
+  HBCLI_PLACEHOLDER,
   HFCLI_PLACEHOLDER,
+  HYPERBOY_IMAGE_PLACEHOLDER,
   HYPERFLASH32_IMAGE_PLACEHOLDER, NAME_NO_SPACES_PLACEHOLDER, NAME_PLACEHOLDER, PROG_VB_PLACEHOLDER,
   ROM_PLACEHOLDER
 } from './ves-flash-cart-types';
@@ -174,7 +176,7 @@ export class VesFlashCartService {
         continue;
       }
 
-      if (!await this.fileService.exists(new URI(dirname(flasherPath)).withScheme('file'))) {
+      if (!await this.fileService.exists(new URI(flasherPath).withScheme('file'))) {
         this.messageService.error(
           `Flasher software does not exist at '${flasherPath}'`
         );
@@ -377,6 +379,7 @@ export class VesFlashCartService {
 
   protected async replaceFlasherPath(flasherPath: string): Promise<string> {
     return flasherPath
+      .replace(HBCLI_PLACEHOLDER, await this.fileService.fsPath(await this.getHbCliUri()))
       .replace(HFCLI_PLACEHOLDER, await this.fileService.fsPath(await this.getHfCliUri()))
       .replace(PROG_VB_PLACEHOLDER, await this.fileService.fsPath(await this.getProgVbUri()));
   }
@@ -477,30 +480,39 @@ export class VesFlashCartService {
       ...flashCartConfig,
       image: flashCartConfig.image
         .replace(FLASHBOY_PLUS_IMAGE_PLACEHOLDER, IMAGE_FLASHBOY_PLUS)
-        .replace(HYPERFLASH32_IMAGE_PLACEHOLDER, IMAGE_HYPERFLASH32),
+        .replace(HYPERFLASH32_IMAGE_PLACEHOLDER, IMAGE_HYPERFLASH32)
+        .replace(HYPERBOY_IMAGE_PLACEHOLDER, IMAGE_HYPERBOY),
     }));
   }
 
   async getProgVbUri(): Promise<URI> {
     const resourcesUri = await this.vesCommonService.getResourcesUri();
-    return resourcesUri.resolve(join(
-      'binaries',
-      'vuengine-studio-tools',
-      this.vesCommonService.getOs(),
-      'prog-vb',
-      isWindows ? 'prog-vb.exe' : 'prog-vb'
-    ));
+    return resourcesUri
+      .resolve('binaries')
+      .resolve('vuengine-studio-tools')
+      .resolve(this.vesCommonService.getOs())
+      .resolve('prog-vb')
+      .resolve(isWindows ? 'prog-vb.exe' : 'prog-vb');
+  }
+
+  async getHbCliUri(): Promise<URI> {
+    const resourcesUri = await this.vesCommonService.getResourcesUri();
+    return resourcesUri
+      .resolve('binaries')
+      .resolve('vuengine-studio-tools')
+      .resolve(this.vesCommonService.getOs())
+      .resolve('hb-cli')
+      .resolve(isWindows ? 'hbcli.exe' : 'hbcli');
   }
 
   async getHfCliUri(): Promise<URI> {
     const resourcesUri = await this.vesCommonService.getResourcesUri();
-    return resourcesUri.resolve(join(
-      'binaries',
-      'vuengine-studio-tools',
-      this.vesCommonService.getOs(),
-      'hf-cli',
-      isWindows ? 'hfcli.exe' : 'hfcli'
-    ));
+    return resourcesUri
+      .resolve('binaries')
+      .resolve('vuengine-studio-tools')
+      .resolve(this.vesCommonService.getOs())
+      .resolve('hf-cli')
+      .resolve(isWindows ? 'hfcli.exe' : 'hfcli');
   }
 
   protected determineCanHoldRom(flashSize: number): boolean {

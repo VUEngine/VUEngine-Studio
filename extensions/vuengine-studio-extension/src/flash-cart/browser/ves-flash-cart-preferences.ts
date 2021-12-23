@@ -2,7 +2,9 @@ import { isOSX } from '@theia/core';
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
 import {
     FLASHBOY_PLUS_IMAGE_PLACEHOLDER,
+    HBCLI_PLACEHOLDER,
     HFCLI_PLACEHOLDER,
+    HYPERBOY_IMAGE_PLACEHOLDER,
     HYPERFLASH32_IMAGE_PLACEHOLDER,
     NAME_NO_SPACES_PLACEHOLDER,
     PROG_VB_PLACEHOLDER, ROM_PLACEHOLDER
@@ -105,6 +107,20 @@ export const VesFlashCartPreferenceSchema: PreferenceSchema = {
                         : `-p %PORT% -x ${ROM_PLACEHOLDER} -n ${NAME_NO_SPACES_PLACEHOLDER}`,
                     padRom: false,
                     image: HYPERFLASH32_IMAGE_PLACEHOLDER,
+                },
+                {
+                    name: 'HyperBoy',
+                    vid: 0, // TODO
+                    pid: 0, // TODO
+                    manufacturer: '', // TODO
+                    product: '', // TODO
+                    size: 32,
+                    path: HBCLI_PLACEHOLDER,
+                    args: isOSX
+                        ? `-p %PORT% -f ${ROM_PLACEHOLDER} --slow`
+                        : `-p %PORT% -f ${ROM_PLACEHOLDER}`,
+                    padRom: false,
+                    image: HYPERBOY_IMAGE_PLACEHOLDER,
                 },
             ],
         },

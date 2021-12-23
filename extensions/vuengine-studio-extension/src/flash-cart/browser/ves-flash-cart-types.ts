@@ -2,11 +2,13 @@ import { Device } from 'usb';
 
 export const PROG_VB_PLACEHOLDER = '%PROGVB%';
 export const HFCLI_PLACEHOLDER = '%HFCLI%';
+export const HBCLI_PLACEHOLDER = '%HBCLI%';
 export const NAME_PLACEHOLDER = '%NAME%';
 export const NAME_NO_SPACES_PLACEHOLDER = '%NAME_NO_SPACES%';
 export const ROM_PLACEHOLDER = '%ROM%';
 export const FLASHBOY_PLUS_IMAGE_PLACEHOLDER = '%FBP_IMG%';
 export const HYPERFLASH32_IMAGE_PLACEHOLDER = '%HF32_IMG%';
+export const HYPERBOY_IMAGE_PLACEHOLDER = '%HB_IMG%';
 
 export interface FlashCartConfig {
   name: string

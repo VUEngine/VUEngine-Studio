@@ -312,9 +312,9 @@ export class VesCodeGenService {
         const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
         this.vesPluginsService.getInstalledPlugins().map(installedPlugin => {
           if (installedPlugin.startsWith(VUENGINE_PLUGINS_PREFIX)) {
-            roots.push(enginePluginsUri.resolve(join(installedPlugin.replace(VUENGINE_PLUGINS_PREFIX, ''))));
+            roots.push(enginePluginsUri.resolve(installedPlugin.replace(VUENGINE_PLUGINS_PREFIX, '')));
           } else if (installedPlugin.startsWith(USER_PLUGINS_PREFIX)) {
-            roots.push(userPluginsUri.resolve(join(installedPlugin.replace(USER_PLUGINS_PREFIX, ''))));
+            roots.push(userPluginsUri.resolve(installedPlugin.replace(USER_PLUGINS_PREFIX, '')));
           }
         });
         break;

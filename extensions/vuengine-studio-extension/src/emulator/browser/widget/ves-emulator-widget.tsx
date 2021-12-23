@@ -14,7 +14,7 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import * as React from '@theia/core/shared/react';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { basename, join } from 'path';
+import { basename } from 'path';
 import { VesEmulatorCommands } from '../ves-emulator-commands';
 import { VesEmulatorPreferenceIds } from '../ves-emulator-preferences';
 import { VesEmulatorService } from '../ves-emulator-service';
@@ -682,7 +682,9 @@ export class VesEmulatorWidget extends ReactWidget {
     }
 
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
-    const fileUri = workspaceRootUri.resolve(join('screenshots', filename));
+    const fileUri = workspaceRootUri
+      .resolve('screenshots')
+      .resolve(filename);
     this.fileService.writeFile(fileUri, BinaryBuffer.wrap(ia));
   }
 
