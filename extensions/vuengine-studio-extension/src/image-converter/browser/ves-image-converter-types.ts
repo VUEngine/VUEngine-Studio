@@ -66,6 +66,7 @@ export interface ConvertedFileDataMeta {
     individualFiles: boolean
     frameWidth: number
     frameHeight: number
+    largestFrame: number
   }
 }
 

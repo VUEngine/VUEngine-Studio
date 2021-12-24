@@ -262,11 +262,15 @@ export class VesImageConverterService {
           let tilesData: Array<string> = [];
           let mapData: Array<string> = [];
           let frameTileOffsets: Array<number> = [COMPRESSION_FLAG_LENGTH];
+          let largestFrame = 0;
           imageConfigFileToBeConverted.output.map(output => {
             totalTilesCount += output.meta.tilesCount;
             tilesData = tilesData.concat(output.tilesData);
             mapData = mapData.concat(output.mapData);
             frameTileOffsets = frameTileOffsets.concat(tilesData.length + 1);
+            if (output.meta.tilesCount > largestFrame) {
+              largestFrame = output.meta.tilesCount;
+            }
           });
 
           // remove last element from frameTileOffsets
@@ -294,7 +298,11 @@ export class VesImageConverterService {
             meta: {
               ...imageConfigFileToBeConverted.output[0].meta,
               tilesCount: totalTilesCount,
-              tilesCompressionRatio: (- (((totalTilesCount * 4) - tilesData.length) / (totalTilesCount * 4) * 100)).toFixed(2)
+              tilesCompressionRatio: (- (((totalTilesCount * 4) - tilesData.length) / (totalTilesCount * 4) * 100)).toFixed(2),
+              animation: {
+                ...imageConfigFileToBeConverted.output[0].meta.animation,
+                largestFrame
+              }
             },
           });
 
@@ -344,7 +352,10 @@ export class VesImageConverterService {
         mapWidth: mapDimensions[1] as number,
         mapReduceFlipped: imageConfigFileToBeConverted.config.map.reduce.flipped,
         mapReduceUnique: imageConfigFileToBeConverted.config.map.reduce.unique,
-        animation: imageConfigFileToBeConverted.config.animation,
+        animation: {
+          ...imageConfigFileToBeConverted.config.animation,
+          largestFrame: 0
+        },
       };
       imageConfigFileToBeConverted.output.push({
         name: name[1],
@@ -763,6 +774,7 @@ export class VesImageConverterService {
     });
   }
 
+  /* TODO: remove me when done updating all .image.json files */
   async updateImageJsonFiles(): Promise<void> {
     /* const sortJSON = (object: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
       if (object instanceof Array) {
