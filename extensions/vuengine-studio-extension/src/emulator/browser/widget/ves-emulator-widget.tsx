@@ -273,7 +273,7 @@ export class VesEmulatorWidget extends ReactWidget {
   }
 
   protected keyEventListerner = (e: KeyboardEvent) => this.processKeyEvent(e);
-  protected messageEventListerner = (e: MessageEvent) => this.processIframeMessage(e);
+  protected messageEventListerner = async (e: MessageEvent) => this.processIframeMessage(e);
 
   protected bindListeners(): void {
     document.addEventListener('keydown', this.keyEventListerner);
@@ -314,7 +314,7 @@ export class VesEmulatorWidget extends ReactWidget {
     }
   }
 
-  protected processIframeMessage(e: MessageEvent): void {
+  protected async processIframeMessage(e: MessageEvent): Promise<void> {
     switch (e.data.type) {
       case 'loaded':
         setTimeout(() => {
@@ -323,7 +323,7 @@ export class VesEmulatorWidget extends ReactWidget {
         }, 200);
         break;
       case 'screenshot':
-        this.processScreenshot(e.data.data, e.data.filename);
+        await this.processScreenshot(e.data.data, e.data.filename);
         break;
     }
   }
@@ -340,7 +340,8 @@ export class VesEmulatorWidget extends ReactWidget {
     return false;
   }
 
-  protected startEmulator = () => {
+  protected startEmulator = async () => {
+    await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
     const defaultRomUri = workspaceRootUri.resolve('build').resolve('output.vb');
     const romUri = this.options ? this.options.uri : defaultRomUri;
@@ -672,7 +673,7 @@ export class VesEmulatorWidget extends ReactWidget {
     }
   }
 
-  protected processScreenshot(data: string, filename: string): void {
+  protected async processScreenshot(data: string, filename: string): Promise<void> {
     // eslint-disable-next-line deprecation/deprecation
     const byteString = atob(data);
     const ab = new ArrayBuffer(byteString.length);
@@ -681,6 +682,7 @@ export class VesEmulatorWidget extends ReactWidget {
       ia[i] = byteString.charCodeAt(i);
     }
 
+    await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
     const fileUri = workspaceRootUri
       .resolve('screenshots')

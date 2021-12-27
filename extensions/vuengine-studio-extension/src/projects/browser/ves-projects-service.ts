@@ -28,7 +28,7 @@ export class VesProjectsService {
   protected async init(): Promise<void> {
     // watch for project config file changes
     await this.workspaceService.ready;
-    const configFileUri = this.getProjectConfigFileUri();
+    const configFileUri = await this.getProjectConfigFileUri();
     this.fileService.onDidFilesChange((fileChangesEvent: FileChangesEvent) => {
       if (fileChangesEvent.contains(configFileUri)) {
         this.onDidChangeProjectFileEmitter.fire();
@@ -39,7 +39,7 @@ export class VesProjectsService {
   async getProjectName(): Promise<string> {
     let projectTitle = '';
     // Attempt to retrieve project name from configuration file
-    const projectFileUri = this.getProjectConfigFileUri();
+    const projectFileUri = await this.getProjectConfigFileUri();
     if (await this.fileService.exists(projectFileUri)) {
       const configFileContents = await this.fileService.readFile(projectFileUri);
       const projectData = JSON.parse(configFileContents.value.toString());
@@ -65,7 +65,8 @@ export class VesProjectsService {
     return projectTitle;
   }
 
-  protected getProjectConfigFileUri(): URI {
+  protected async getProjectConfigFileUri(): Promise<URI> {
+    await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
     return workspaceRootUri.resolve('config').resolve('Project.json');
   }

@@ -57,7 +57,7 @@ export class VesExportService {
     this.vesBuildService.onDidSucceedBuild(async () => {
       if (await this.vesBuildService.outputRomExists() && this.isQueued) {
         this.isQueued = false;
-        this.exportRom();
+        await this.exportRom();
       }
     });
     this.vesBuildService.onDidFailBuild(() => {
@@ -71,7 +71,7 @@ export class VesExportService {
     } else if (this.vesBuildService.buildStatus.active) {
       this.isQueued = true;
     } else if (await this.vesBuildService.outputRomExists()) {
-      this.exportRom();
+      await this.exportRom();
     } else {
       this.isQueued = true;
       this.commandService.executeCommand(VesBuildCommands.BUILD.id, true);
@@ -79,6 +79,7 @@ export class VesExportService {
   }
 
   protected async exportRom(): Promise<void> {
+    await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
     const romUri = workspaceRootUri.resolve('build').resolve('output.vb');
     let exists: boolean = false;

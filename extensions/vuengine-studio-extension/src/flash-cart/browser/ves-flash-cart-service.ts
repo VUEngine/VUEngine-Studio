@@ -183,11 +183,12 @@ export class VesFlashCartService {
         continue;
       }
 
+      await this.workspaceService.ready;
       const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
       const defaultRomUri = workspaceRootUri.resolve('build').resolve('output.vb');
       const romUri = connectedFlashCart.config.padRom &&
         await this.padRom(connectedFlashCart.config.size)
-        ? this.getPaddedRomUri(connectedFlashCart.config.size)
+        ? await this.getPaddedRomUri(connectedFlashCart.config.size)
         : defaultRomUri;
 
       const projectName = await this.vesProjectsService.getProjectName();
@@ -385,9 +386,10 @@ export class VesFlashCartService {
   }
 
   protected async padRom(size: number): Promise<boolean> {
+    await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
     const romUri = workspaceRootUri.resolve('build').resolve('output.vb');
-    const paddedRomUri = this.getPaddedRomUri(size);
+    const paddedRomUri = await this.getPaddedRomUri(size);
     if (!await this.vesBuildService.outputRomExists()) {
       return false;
     }
@@ -411,7 +413,8 @@ export class VesFlashCartService {
     return true;
   }
 
-  protected getPaddedRomUri(size: number): URI {
+  protected async getPaddedRomUri(size: number): Promise<URI> {
+    await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
     return workspaceRootUri.resolve('build').resolve(`outputPadded${size}.vb`);
   }

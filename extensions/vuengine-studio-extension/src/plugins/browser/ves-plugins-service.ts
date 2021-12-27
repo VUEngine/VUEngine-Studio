@@ -45,7 +45,7 @@ export class VesPluginsService {
   protected async init(): Promise<void> {
     // Re-determine installedPlugins when plugins file changes
     this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
-      const pluginsFileUri = this.getPluginsFileUri();
+      const pluginsFileUri = await this.getPluginsFileUri();
       if (fileChangesEvent.contains(pluginsFileUri)) {
         await this.determineInstalledPlugins();
         this.onDidChangeInstalledPluginsEmitter.fire();
@@ -80,8 +80,7 @@ export class VesPluginsService {
 
   async determineInstalledPlugins(): Promise<Array<string>> {
     try {
-      await this.workspaceService.ready;
-      const pluginsFileUri = this.getPluginsFileUri();
+      const pluginsFileUri = await this.getPluginsFileUri();
       const fileContent = await this.fileService.readFile(pluginsFileUri);
       const fileContentParsed = JSON.parse(fileContent.value.toString());
       this.installedPlugins = fileContentParsed;
@@ -193,7 +192,8 @@ export class VesPluginsService {
     return searchResult;
   }
 
-  getPluginsFileUri(): URI {
+  async getPluginsFileUri(): Promise<URI> {
+    await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
     return workspaceRootUri
       .resolve('config')
@@ -201,7 +201,7 @@ export class VesPluginsService {
   }
 
   protected async writeInstalledPluginsToFile(): Promise<void> {
-    const pluginsFileUri = this.getPluginsFileUri();
+    const pluginsFileUri = await this.getPluginsFileUri();
     const updatedFileContent = JSON.stringify(this.installedPlugins.sort(), null, 4);
     await this.fileService.writeFile(pluginsFileUri, BinaryBuffer.fromString(updatedFileContent));
   }

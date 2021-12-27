@@ -13,8 +13,8 @@ export class VesPluginsOpenHandler extends WidgetOpenHandler<VesPluginsWidget> {
     @inject(VesPluginsService)
     protected readonly vesPluginsService: VesPluginsService;
 
-    canHandle(uri: URI): number {
-        const pluginsFileUri = this.vesPluginsService.getPluginsFileUri();
+    async canHandle(uri: URI): Promise<number> {
+        const pluginsFileUri = await this.vesPluginsService.getPluginsFileUri();
         if (uri.isEqual(pluginsFileUri)) {
             return Number.MAX_SAFE_INTEGER;
         }

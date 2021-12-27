@@ -207,6 +207,7 @@ export class VesBuildService {
   }
 
   async outputRomExists(): Promise<boolean> {
+    await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
     const romUri = workspaceRootUri.resolve('build').resolve('output.vb');
     return this.fileService.exists(romUri);
@@ -240,6 +241,7 @@ export class VesBuildService {
   }
 
   protected async determineRomSize(): Promise<void> {
+    await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
     const romUri = workspaceRootUri.resolve('build').resolve('output.vb');
     if (await this.fileService.exists(romUri)) {
@@ -258,14 +260,14 @@ export class VesBuildService {
           for (const buildMode in BuildMode) {
             if (BuildMode.hasOwnProperty(buildMode)) {
               this.fileService
-                .exists(this.getBuildPathUri(buildMode as BuildMode))
+                .exists(await this.getBuildPathUri(buildMode as BuildMode))
                 .then((exists: boolean) => {
                   this.setBuildFolderExists(buildMode, exists);
                 });
             }
           }
 
-          this.determineRomSize();
+          await this.determineRomSize();
         }
       }
     );
@@ -274,7 +276,7 @@ export class VesBuildService {
     this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
       for (const buildMode in BuildMode) {
         if (BuildMode.hasOwnProperty(buildMode)) {
-          const buildPathUri = this.getBuildPathUri(buildMode as BuildMode);
+          const buildPathUri = await this.getBuildPathUri(buildMode as BuildMode);
           if (fileChangesEvent.contains(buildPathUri, FileChangeType.ADDED)) {
             this.setBuildFolderExists(buildMode, true);
           } else if (fileChangesEvent.contains(buildPathUri, FileChangeType.DELETED)) {
@@ -383,6 +385,7 @@ export class VesBuildService {
   }
 
   protected async getBuildProcessParams(): Promise<ProcessOptions> {
+    await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
     const buildMode = (this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as string).toLowerCase();
     const dumpElf = this.preferenceService.get(VesBuildPreferenceIds.DUMP_ELF) as boolean;
@@ -483,6 +486,7 @@ export class VesBuildService {
   }
 
   protected async deleteRom(): Promise<void> {
+    await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
     const romUri = workspaceRootUri.resolve('build').resolve('output.vb');
     if (await this.fileService.exists(romUri)) {
@@ -490,7 +494,8 @@ export class VesBuildService {
     }
   }
 
-  protected getBuildPathUri(buildMode?: BuildMode): URI {
+  protected async getBuildPathUri(buildMode?: BuildMode): Promise<URI> {
+    await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
     const buildPathUri = workspaceRootUri.resolve('build');
 
@@ -714,8 +719,8 @@ export class VesBuildService {
 
     this.isCleaning = true;
 
-    const buildModePathUri = this.getBuildPathUri(buildMode);
-    const buildPathUri = this.getBuildPathUri();
+    const buildModePathUri = await this.getBuildPathUri(buildMode);
+    const buildPathUri = await this.getBuildPathUri();
 
     await this.fileService.delete(buildModePathUri, { recursive: true });
     const files = await this.fileService.resolve(buildPathUri);

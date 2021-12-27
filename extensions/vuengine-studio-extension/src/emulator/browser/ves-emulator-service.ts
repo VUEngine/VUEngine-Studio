@@ -118,7 +118,7 @@ export class VesEmulatorService {
     } else if (this.vesBuildService.buildStatus.active) {
       this.isQueued = true;
     } else if (await this.vesBuildService.outputRomExists()) {
-      this.runInEmulator();
+      await this.runInEmulator();
     } else {
       this.isQueued = true;
       this.commandService.executeCommand(VesBuildCommands.BUILD.id, true);
@@ -139,6 +139,7 @@ export class VesEmulatorService {
 
   async runInEmulator(): Promise<void> {
     const defaultEmulatorConfig = this.getDefaultEmulatorConfig();
+    await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
     const romUri = workspaceRootUri.resolve('build').resolve('output.vb');
     if (defaultEmulatorConfig === DEFAULT_EMULATOR) {

@@ -78,6 +78,7 @@ export class VesCodeGenService {
     fileChangesEvent.changes.map(async fileChange => {
       if ([FileChangeType.ADDED, FileChangeType.UPDATED].includes(fileChange.type)) {
         Object.keys(this.templates.events.fileChanged).map(async file => {
+          await this.workspaceService.ready;
           const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
           const templateFileUri = workspaceRootUri.resolve(join(...file.split('/')));
           if (fileChange.resource.isEqual(templateFileUri)) {
@@ -126,6 +127,7 @@ export class VesCodeGenService {
           return;
         }
         // TODO: refactor to use fileservice instead of glob
+        await this.workspaceService.ready;
         const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
         const files = glob.sync(join(await this.fileService.fsPath(workspaceRootUri), '**', `*${template.ending}`));
         await Promise.all(files.map(async file => {
@@ -332,6 +334,7 @@ export class VesCodeGenService {
         break;
       default:
       case TemplateRoot.workspace:
+        await this.workspaceService.ready;
         const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
         roots.push(workspaceRootUri);
         break;
