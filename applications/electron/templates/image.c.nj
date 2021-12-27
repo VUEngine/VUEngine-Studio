@@ -1,8 +1,10 @@
 {#- prepend tile data with a custom compression algorithm flag -#}
-{%- if tilesCompression is defined and tilesCompression != false -%}
-    {%- set tilesData = (tilesData.unshift('00000001'),tilesData) -%}
-{%- else -%}
-    {%- set tilesData = (tilesData.unshift('00000000'),tilesData) -%}
+{%- if tilesData.length -%}
+    {%- if tilesCompression is defined and tilesCompression != false -%}
+        {%- set tilesData = (tilesData.unshift('00000001'),tilesData) -%}
+    {%- else -%}
+        {%- set tilesData = (tilesData.unshift('00000000'),tilesData) -%}
+    {%- endif -%}
 {%- endif -%}
 
 {%- set reducedTiles = '' -%}
