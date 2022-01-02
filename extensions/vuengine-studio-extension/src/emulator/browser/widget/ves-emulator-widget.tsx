@@ -1,4 +1,4 @@
-import { CommandService } from '@theia/core';
+import { CommandService, isWindows } from '@theia/core';
 import {
   Endpoint,
   KeybindingRegistry,
@@ -344,16 +344,23 @@ export class VesEmulatorWidget extends ReactWidget {
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
     const defaultRomUri = workspaceRootUri.resolve('build').resolve('output.vb');
-    const romUri = this.options ? this.options.uri : defaultRomUri;
+    let romPath = this.options ? this.options.uri : defaultRomUri;
+    if (typeof romPath !== 'string') {
+      romPath = await this.fileService.fsPath(romPath);
+    }
+    if (isWindows) {
+      romPath = romPath.replace(/\\/g, '/');
+      if (romPath.charAt(0) === '/') {
+        romPath = romPath.substring(1);
+      }
+    }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    datauri(romUri, (err: any) => {
-      if (err) { throw err; };
-    }).then((content: string) => {
-      this.sendRetroArchConfig();
-      this.sendCoreOptions();
-      this.sendCommand('start', content);
-    });
+    const datauri = require('datauri');
+    const content = await datauri(romPath);
+
+    this.sendRetroArchConfig();
+    this.sendCoreOptions();
+    this.sendCommand('start', content);
   };
 
   protected onResize(): void {
