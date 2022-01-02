@@ -3,6 +3,7 @@ import { BaseWidget } from '@theia/core/lib/browser';
 import { PreviewHandler, PreviewHandlerProvider } from '@theia/preview/lib/browser/preview-handler';
 import URI from '@theia/core/lib/common/uri';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { isWindows } from '@theia/core';
 
 @injectable()
 export class VesDocumentationHandbookWidget extends BaseWidget {
@@ -32,7 +33,7 @@ export class VesDocumentationHandbookWidget extends BaseWidget {
 
         const docTitle = content.substring(
             content.indexOf('title: ') + 6,
-            content.indexOf('\n---\n')
+            content.indexOf('\n---')
         );
         const tabTitle = `${VesDocumentationHandbookWidget.LABEL}: ${docTitle}`;
         this.title.label = tabTitle;
@@ -43,7 +44,7 @@ export class VesDocumentationHandbookWidget extends BaseWidget {
         contentLines.splice(0, 5);
         let fixedContent = contentLines.join('\n');
         // fix image urls
-        fixedContent = fixedContent.replace(/\/documentation\/images\//g, '../images/');
+        fixedContent = fixedContent.replace(/\/documentation\/images\//g, isWindows ? 'images/' : '../images/');
 
         this.previewHandler = this.previewHandlerProvider.findContribution(documentUri)[0];
 
