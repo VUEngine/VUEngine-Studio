@@ -1,4 +1,4 @@
-import { CommandService } from '@theia/core';
+import { CommandService, isWindows } from '@theia/core';
 import { KeybindingRegistry, Message, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -7,6 +7,7 @@ import { EditorManager } from '@theia/editor/lib/browser';
 import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
 import { VesEmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
 import { VesExportCommands } from '../../export/browser/ves-export-commands';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
@@ -198,6 +199,11 @@ export class VesBuildWidget extends ReactWidget {
               <i className='fa fa-trash'></i>
             </button>
           </div>
+        {isWindows && !this.vesBuildService.isWslInstalled && (
+          <div>
+            <i className='fa fa-exclamation-triangle'></i> Please consider <a href='#' onClick={this.openWslDocs}>installing WSL</a> to massively improve build times.
+          </div>
+        )}
         </div>
         {this.state.showOptions && (
           <div className='buildOptions theia-settings-container'>
@@ -554,4 +560,6 @@ export class VesBuildWidget extends ReactWidget {
   protected setEngineCorePath = (path: string) => this.preferenceService.set(VesBuildPreferenceIds.ENGINE_CORE_PATH, path, PreferenceScope.User);
   protected setEnginePluginsPath = (path: string) => this.preferenceService.set(VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH, path, PreferenceScope.User);
   protected setUserPluginsPath = (path: string) => this.preferenceService.set(VesPluginsPreferenceIds.USER_PLUGINS_PATH, path, PreferenceScope.User);
+  
+  protected openWslDocs = () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'setup/enhancing-build-times-on-windows', false);
 }
