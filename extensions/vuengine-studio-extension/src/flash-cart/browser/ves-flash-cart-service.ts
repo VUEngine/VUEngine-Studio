@@ -382,7 +382,8 @@ export class VesFlashCartService {
     return flasherPath
       .replace(HBCLI_PLACEHOLDER, await this.fileService.fsPath(await this.getHbCliUri()))
       .replace(HFCLI_PLACEHOLDER, await this.fileService.fsPath(await this.getHfCliUri()))
-      .replace(PROG_VB_PLACEHOLDER, await this.fileService.fsPath(await this.getProgVbUri()));
+      .replace(PROG_VB_PLACEHOLDER, await this.fileService.fsPath(await this.getProgVbUri()))
+      .replace(/\\/g, '/');
   }
 
   protected async padRom(size: number): Promise<boolean> {

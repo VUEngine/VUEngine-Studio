@@ -24,8 +24,6 @@ import {
 } from '../ves-emulator-types';
 import { VesEmulatorControls } from './ves-emulator-controls-component';
 
-const datauri = require('datauri');
-
 export const VesEmulatorWidgetOptions = Symbol('VesEmulatorWidgetOptions');
 export interface VesEmulatorWidgetOptions {
   uri: string;
