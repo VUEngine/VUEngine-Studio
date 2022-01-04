@@ -1,3 +1,4 @@
+import { CallHierarchyContribution } from '@theia/callhierarchy/lib/browser/callhierarchy-contribution';
 import { isOSX } from '@theia/core';
 import { ApplicationShell, bindViewContribution, FrontendApplicationContribution, LabelProviderContribution, WidgetFactory } from '@theia/core/lib/browser';
 import { AboutDialog } from '@theia/core/lib/browser/about-dialog';
@@ -8,12 +9,12 @@ import { PreferenceConfigurations } from '@theia/core/lib/browser/preferences/pr
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { MenuContribution } from '@theia/core/lib/common/menu';
 import { ContainerModule } from '@theia/core/shared/inversify';
-import { OutlineViewContribution } from '@theia/outline-view/lib/browser/outline-view-contribution';
-import { CallHierarchyContribution } from '@theia/callhierarchy/lib/browser/callhierarchy-contribution';
 import { DebugConsoleContribution } from '@theia/debug/lib/browser/console/debug-console-contribution';
 import { DebugFrontendApplicationContribution } from '@theia/debug/lib/browser/debug-frontend-application-contribution';
 import { DebugPrefixConfiguration } from '@theia/debug/lib/browser/debug-prefix-configuration';
 import { GettingStartedWidget } from '@theia/getting-started/lib/browser/getting-started-widget';
+import { NavigatorWidgetFactory } from '@theia/navigator/lib/browser/navigator-widget-factory';
+import { OutlineViewContribution } from '@theia/outline-view/lib/browser/outline-view-contribution';
 import { PluginApiFrontendContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-contribution';
 import { PluginFrontendViewContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-view-contribution';
 import { PluginViewRegistry } from '@theia/plugin-ext/lib/main/browser/view/plugin-view-registry';
@@ -41,8 +42,9 @@ import { VesTitlebarApplicationTitleContribution } from './ves-branding-titlebar
 import { VesTitlebarApplicationTitleWidget } from './ves-branding-titlebar-application-title-widget';
 import { VesTitlebarWindowControlsContribution } from './ves-branding-titlebar-window-controls-view';
 import { VesTitlebarWindowControlsWidget } from './ves-branding-titlebar-window-controls-widget';
-import { VesPreferenceStringInputRenderer } from './ves-preference-string-input-renderer';
 import { VesCommonService } from './ves-common-service';
+import { VesNavigatorWidgetFactory } from './ves-navigator-widget-factory';
+import { VesPreferenceStringInputRenderer } from './ves-preference-string-input-renderer';
 import { VesWorkspaceService } from './ves-workspace-service';
 import '../../../src/branding/browser/style/index.css';
 
@@ -199,6 +201,11 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
         }))
         .inSingletonScope();
 
+    // add button to select path to respective settings
     bind(VesPreferenceStringInputRenderer).toSelf();
     rebind(PreferenceStringInputRenderer).to(VesPreferenceStringInputRenderer);
+
+    // initially hide "open editors" tab of navigator
+    bind(VesNavigatorWidgetFactory).toSelf();
+    rebind(NavigatorWidgetFactory).to(VesNavigatorWidgetFactory);
 });

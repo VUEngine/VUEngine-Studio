@@ -699,6 +699,7 @@ export class VesImageConverterService {
     const gritArguments = ['-fh!', '-ftc', '-gB2', '-p!'];
 
     if (config.tileset.reduce) {
+      // TODO: what is this doing exactly?
       gritArguments.push('-mB16:hv_i11');
     } else {
       gritArguments.push('-mB16:i11');
