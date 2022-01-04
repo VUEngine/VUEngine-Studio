@@ -41,7 +41,10 @@ export class VesWorkspaceService extends WorkspaceService {
         const roots = await super.computeRoots();
         const engineRoots = await this.getEngineRoots();
 
-        return [...roots, ...engineRoots];
+        return [
+            ...roots,
+            ...engineRoots
+        ];
     }
 
     protected async getEngineRoots(): Promise<Array<FileStat>> {

@@ -206,7 +206,8 @@ export class VesPlugin implements VesPluginData, TreeElement {
 
 export abstract class AbstractVesPluginComponent extends React.Component<AbstractVesPluginComponent.Props> {
 
-    readonly install = async () => {
+    readonly install = async (event?: React.MouseEvent) => {
+        event?.stopPropagation();
         this.forceUpdate();
         try {
             const pending = this.props.plugin.install();
@@ -217,7 +218,8 @@ export abstract class AbstractVesPluginComponent extends React.Component<Abstrac
         }
     };
 
-    readonly uninstall = async () => {
+    readonly uninstall = async (event?: React.MouseEvent) => {
+        event?.stopPropagation();
         try {
             const pending = this.props.plugin.uninstall();
             this.forceUpdate();
@@ -228,6 +230,7 @@ export abstract class AbstractVesPluginComponent extends React.Component<Abstrac
     };
 
     protected readonly manage = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+        e.stopPropagation();
         this.props.plugin.handleContextMenu(e);
     };
 
