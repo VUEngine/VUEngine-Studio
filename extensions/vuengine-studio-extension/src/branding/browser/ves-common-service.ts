@@ -16,7 +16,7 @@ export class VesCommonService {
     const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
     const applicationPath = envVar && envVar.value 
       ? isWindows 
-        ? `/${envVar.value.replace(/\\/g, '/')}`
+        ? `/${envVar.value}`
         : envVar.value
       : '';
 

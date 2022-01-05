@@ -405,6 +405,7 @@ export class VesBuildService {
         'export', `PATH=${await this.convertoToEnvPath(compilerUri.resolve('bin'))}:$PATH`,
         'LC_ALL=C',
         `MAKE_JOBS=${this.getThreads()}`,
+        `PREPROCESSING_WAIT_FOR_LOCK_DELAY_FACTOR=0.0`,
         `DUMP_ELF=${dumpElf ? 1 : 0}`,
         `PRINT_PEDANTIC_WARNINGS=${pedanticWarnings ? 1 : 0}`, '&&',
         'make', 'all',
@@ -422,11 +423,11 @@ export class VesBuildService {
           return;
         }
 
-        const winDirUri = new URI(winDir.value.replace(/\\/g, '/')).withScheme('file');
+        const winDirUri = new URI(winDir.value).withScheme('file');
         const wslExeUri = winDirUri
           .resolve('System32')
           .resolve('wsl.exe');
-          */
+        */
 
         return {
           command: 'wsl.exe',
@@ -463,6 +464,7 @@ export class VesBuildService {
           DUMP_ELF: dumpElf ? 1 : 0,
           ENGINE_FOLDER: await this.convertoToEnvPath(engineCoreUri),
           LC_ALL: 'C',
+          PREPROCESSING_WAIT_FOR_LOCK_DELAY_FACTOR: '0.000',
           MAKE_JOBS: this.getThreads(),
           PATH: [await this.fileService.fsPath(compilerUri.resolve('bin')), process.env.PATH].join(':'),
           PLUGINS_FOLDER: await this.convertoToEnvPath(enginePluginsUri),
@@ -636,8 +638,8 @@ export class VesBuildService {
     let envPath = path
       .replace(/\\/g, '/')
       .replace(/^[a-zA-Z]:\//, function (x): string {
-        return `/${x.substring(0, 1).toLowerCase()}/`;
-      });
+      return `/${x.substring(0, 1).toLowerCase()}/`;
+    });
 
     if (this.isWslInstalled) {
       envPath = '/mnt' + envPath;

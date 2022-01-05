@@ -346,11 +346,8 @@ export class VesEmulatorWidget extends ReactWidget {
     if (typeof romPath !== 'string') {
       romPath = await this.fileService.fsPath(romPath);
     }
-    if (isWindows) {
-      romPath = romPath.replace(/\\/g, '/');
-      if (romPath.charAt(0) === '/') {
-        romPath = romPath.substring(1);
-      }
+    if (isWindows && romPath.charAt(0) === '/') {
+      romPath = romPath.substring(1);
     }
 
     const datauri = require('datauri');

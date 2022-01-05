@@ -1,4 +1,3 @@
-import { isWindows } from '@theia/core';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import URI from '@theia/core/lib/common/uri';
 import { BackendApplicationContribution, FileUri } from '@theia/core/lib/node';
@@ -25,9 +24,7 @@ export class EmulatorBackendContribution implements BackendApplicationContributi
     protected async getResourcesUri(): Promise<URI> {
       const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
       const applicationPath = envVar && envVar.value 
-        ? isWindows
-          ? `${envVar.value.replace(/\\/g, '/')}`
-          : envVar.value
+        ? envVar.value
         : '';
   
       return new URI(applicationPath).withScheme('file');
