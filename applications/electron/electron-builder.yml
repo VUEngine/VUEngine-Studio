@@ -1,8 +1,8 @@
-appId: vuengine.studio
+appId: dev.vuengine.studio
 productName: VUEngine
-copyright: Copyright © 2006-2021 Team VUEngine
+copyright: Copyright © 2006-2021 VUEngine
 electronDist: ../../node_modules/electron/dist
-electronVersion: 9.3.2
+electronVersion: 9.4.4
 # Although it is generally not recommended to disable asar, it is required for Theia.
 # Enabling this leads to: process ERROR Error: spawn ENOTDIR
 # because binaries can not be executed from the asar archive.
@@ -19,6 +19,7 @@ files:
   - src-gen
   - lib
   - scripts
+  - "!**node_modules/electron/**"
   - from: plugins
     to: plugins
   - from: binaries/vuengine-studio-tools/web
@@ -42,12 +43,15 @@ win:
   extraResources:
     - from: binaries/vuengine-studio-tools/win
       to: app/binaries/vuengine-studio-tools/win
+    - from: binaries/vuengine-studio-tools/linux/gcc
+      to: app/binaries/vuengine-studio-tools/linux/gcc
 mac:
   icon: resources/icons/MacLauncherIcon/512-512.icns
   category: public.app-category.developer-tools
   darkModeSupport: true
   target:
     - dmg
+    - zip
   publish:
     provider: generic
     url: "https://download.eclipse.org/theia/latest/macos"
@@ -57,7 +61,7 @@ mac:
 linux:
   icon: resources/icons/LinuxLauncherIcon/512-512.png
   category: Development
-  vendor: Team VUEngine
+  vendor: VUEngine
   target:
     - deb
     - AppImage
@@ -69,18 +73,21 @@ linux:
       to: app/binaries/vuengine-studio-tools/linux
 
 nsis:
-  menuCategory: true
-  oneClick: false
-  perMachine: false
+  include: windows-installer.nsh
+  menuCategory: false
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  oneClick: true
+  perMachine: true
+  allowToChangeInstallationDirectory: false
+  runAfterFinish: true
   installerHeaderIcon: resources/icons/WindowsLauncherIcon/VUEngineStudio.ico
   installerIcon: resources/icons/WindowsLauncherIcon/VUEngineStudio.ico
   uninstallerIcon: resources/icons/WindowsLauncherIcon/VUEngineStudio.ico
   installerSidebar: resources/icons/InstallerSidebarImage/164-314Windows.bmp
   uninstallerSidebar: resources/icons/InstallerSidebarImage/164-314Windows.bmp
-  allowToChangeInstallationDirectory: true
-  runAfterFinish: true
-  artifactName: ${productName}.${ext}
-  license: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
+  artifactName: ${productName} Setup ${version}.${ext}
+  uninstallDisplayName: ${productName}
 dmg:
   artifactName: ${productName}.${ext}
 deb:
