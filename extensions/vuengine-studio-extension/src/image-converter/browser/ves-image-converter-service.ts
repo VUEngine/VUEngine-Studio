@@ -1,4 +1,5 @@
 import { Emitter, isWindows } from '@theia/core';
+import { LabelProvider } from '@theia/core/lib/browser';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -52,6 +53,8 @@ const COMPRESSION_FLAG_LENGTH = 1;
 export class VesImageConverterService {
   @inject(FileService)
   protected fileService: FileService;
+  @inject(LabelProvider)
+  protected readonly labelProvider: LabelProvider;
   @inject(VesCodeGenService)
   protected vesCodeGenService: VesCodeGenService;
   @inject(VesCommonService)
@@ -160,7 +163,7 @@ export class VesImageConverterService {
   protected async doConvertFiles(changedOnly: boolean): Promise<void> {
     this.pushLog({
       timestamp: Date.now(),
-      text: `Convert ${changedOnly ? 'changed' : 'all'} images`,
+      text: `Starting to convert ${changedOnly ? 'changed' : 'all'} images...`,
       type: ImageConverterLogLineType.Headline,
     });
 
@@ -238,7 +241,7 @@ export class VesImageConverterService {
 
         // compute frame offsets for spritesheet animations
         if (imageConfigFileToBeConverted.config.animation.isAnimation && !imageConfigFileToBeConverted.config.animation.individualFiles) {
-          const frameSize = 4 * imageConfigFileToBeConverted.config.animation.frameHeight * imageConfigFileToBeConverted.config.animation.frameWidth;
+          const frameSize = (4 * imageConfigFileToBeConverted.config.animation.frameHeight * imageConfigFileToBeConverted.config.animation.frameWidth) || 4;
           imageConfigFileToBeConverted.output.map(async output => {
             const frameCount = output.tilesData.length / frameSize;
             output.frameTileOffsets = [COMPRESSION_FLAG_LENGTH];
@@ -434,8 +437,8 @@ export class VesImageConverterService {
 
     const isSpritesheet = imageConfigFileToBeConverted.config.animation.isAnimation && !imageConfigFileToBeConverted.config.animation.individualFiles;
     const frameSize = isSpritesheet
-      ? 32 * imageConfigFileToBeConverted.config.animation.frameWidth * imageConfigFileToBeConverted.config.animation.frameHeight
-      : 0;
+      ? (32 * imageConfigFileToBeConverted.config.animation.frameWidth * imageConfigFileToBeConverted.config.animation.frameHeight) || 32
+      : 32;
 
     imageConfigFileToBeConverted.output.map(output => {
       uncompressedLength = output.tilesData.length;
@@ -556,6 +559,11 @@ export class VesImageConverterService {
     await Promise.all(glob.sync(fileMatcher).map(async imageConfigFile => {
       const imageConfigFileUri = new URI(imageConfigFile).withScheme('file');
       const config = await this.getConverterConfig(imageConfigFileUri);
+
+      if (!this.validateImageConverterConfig(config, imageConfigFileUri)) {
+        return; // continue with next
+      }
+
       const name = config.name ? config.name : imageConfigFileUri.path.name;
 
       const images = await this.getRelevantImageFiles(changedOnly, imageConfigFileUri, config, name);
@@ -693,6 +701,22 @@ export class VesImageConverterService {
     }
 
     return merged;
+  }
+
+  // check converter config for validity
+  protected validateImageConverterConfig(config: ImageConverterConfig, imageConfigFileUri: URI): boolean {
+    if (config.animation.isAnimation && !config.animation.individualFiles
+      && config.animation.frameHeight * config.animation.frameWidth === 0) {
+      this.pushLog({
+        timestamp: Date.now(),
+        text: `${this.labelProvider.getName(imageConfigFileUri)}: No frame dimensions specified for spritesheet animation.`,
+        type: ImageConverterLogLineType.Error,
+        uri: imageConfigFileUri
+      });
+      return false;
+    }
+
+    return true;
   }
 
   protected getGritArguments(name: string, config: ImageConverterConfig): Array<string> {
