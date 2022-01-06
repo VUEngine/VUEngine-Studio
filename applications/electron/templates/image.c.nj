@@ -7,14 +7,14 @@
     {%- endif -%}
 {%- endif -%}
 
-{%- set reducedTiles = '' -%}
+{%- set reducedTiles = 'unreduced' -%}
 {%- if meta.mapReduceFlipped is defined and meta.mapReduceUnique is defined -%}
     {%- if meta.mapReduceFlipped and meta.mapReduceUnique -%}
-        {%- set reducedTiles = ', reduced by non-unique and flipped tiles' -%}
+        {%- set reducedTiles = 'reduced by non-unique and flipped tiles' -%}
     {%- elseif meta.mapReduceFlipped -%}
-        {%- set reducedTiles = ', reduced by flipped tiles' -%}
+        {%- set reducedTiles = 'reduced by flipped tiles' -%}
     {%- elseif meta.mapReduceUnique -%}
-        {%- set reducedTiles = ', reduced by non-unique tiles' -%}
+        {%- set reducedTiles = 'reduced by non-unique tiles' -%}
     {%- endif -%}
 {%- endif -%}
 
@@ -34,10 +34,10 @@
 
 //---------------------------------------------------------------------------------------------------------
 //
-//	{{ name }}
+//  {{ name }}
 //  • {{ meta.imageWidth }}×{{ meta.imageHeight }} pixels
 {%- if tilesData.length %}
-//  • {{ meta.tilesCount }} tiles{{ reducedTiles }}, {{ tilesCompressionLabel }}
+//  • {{ meta.tilesCount }} tiles, {{ reducedTiles }}, {{ tilesCompressionLabel }}
 {%- endif %}
 {%- if mapData.length %}
 //  • {{ meta.mapWidth }}×{{ meta.mapHeight }} map, not compressed
