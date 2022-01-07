@@ -7,11 +7,11 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { deepmerge } from 'deepmerge-ts';
-import * as glob from 'glob';
 import * as iconv from 'iconv-lite';
 import * as nunjucks from 'nunjucks';
 import { basename, join, parse as parsePath } from 'path';
 import { VES_PREFERENCE_DIR } from '../../branding/browser/ves-branding-preference-configurations';
+import { VesGlobService } from '../../branding/common/ves-glob-service-protocol';
 import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-service';
@@ -31,6 +31,8 @@ export class VesCodeGenService {
   protected vesBuildService: VesBuildService;
   @inject(VesBuildPathsService)
   protected vesBuildPathsService: VesBuildPathsService;
+  @inject(VesGlobService)
+  protected vesGlobService: VesGlobService;
   @inject(VesPluginsService)
   protected vesPluginsService: VesPluginsService;
   @inject(VesPluginsPathsService)
@@ -126,13 +128,12 @@ export class VesCodeGenService {
         if (!template.ending) {
           return;
         }
-        // TODO: refactor to use fileservice instead of glob
         await this.workspaceService.ready;
         const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
-        const files = glob.sync(join(await this.fileService.fsPath(workspaceRootUri), '**', `*${template.ending}`));
-        await Promise.all(files.map(async file => {
+        const files = await this.vesGlobService.find(await this.fileService.fsPath(workspaceRootUri), `**/*${template.ending}`);
+        for (const file of files) {
           await this.renderFileFromTemplate(template, templateString, additionalTemplateData, encoding, new URI(file).withScheme('file'));
-        }));
+        }
         break;
     }
   }
@@ -230,30 +231,30 @@ export class VesCodeGenService {
   protected async getAdditionalTemplateData(dataSources: Array<TemplateDataSource>, file?: URI): Promise<any> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const data: { [key: string]: any } = {};
-    await Promise.all(dataSources.map(async dataSource => {
+    for (const dataSource of dataSources) {
       const roots = await this.resolveRoot(dataSource.root, file);
       if (dataSource.type === TemplateDataType.file) {
-        await Promise.all(roots.map(async root => {
+        for (const root of roots) {
           const uri = root.resolve(join(...dataSource.value.split('/')));
           if (await this.fileService.exists(uri)) {
             const fileContent = await this.fileService.readFile(uri);
             data[dataSource.key] = JSON.parse(fileContent.value.toString());
           }
-        }));
+        }
       } else if (dataSource.type === TemplateDataType.filesWithEnding) {
         if (!data[dataSource.key]) {
           data[dataSource.key] = [];
         }
-        await Promise.all(roots.map(async root => {
-          // TODO: refactor to use fileservice instead of glob
-          const fileMatcher = join(await this.fileService.fsPath(root), '**', `*${dataSource.value}`);
-          await Promise.all(glob.sync(fileMatcher).map(async dataSourceFile => {
+
+        for (const root of roots) {
+          const dataSourceFiles = await this.vesGlobService.find(await this.fileService.fsPath(root), `**/*${dataSource.value}`);
+          for (const dataSourceFile of dataSourceFiles) {
             const fileContent = await this.fileService.readFile(new URI(dataSourceFile).withScheme('file'));
             data[dataSource.key].push(JSON.parse(fileContent.value.toString()));
-          }));
-        }));
+          }
+        }
       }
-    }));
+    }
 
     return data;
   }

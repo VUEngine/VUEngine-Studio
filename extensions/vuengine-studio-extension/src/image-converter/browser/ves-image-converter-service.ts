@@ -7,9 +7,8 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileStatWithMetadata } from '@theia/filesystem/lib/common/files';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { deepmerge } from 'deepmerge-ts';
-import * as glob from 'glob';
-import { join } from 'path';
 import { VesCommonService } from '../../branding/browser/ves-common-service';
+import { VesGlobService } from '../../branding/common/ves-glob-service-protocol';
 import { MemorySection } from '../../build/browser/ves-build-types';
 import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
@@ -59,6 +58,8 @@ export class VesImageConverterService {
   protected vesCodeGenService: VesCodeGenService;
   @inject(VesCommonService)
   protected vesCommonService: VesCommonService;
+  @inject(VesGlobService)
+  protected vesGlobService: VesGlobService;
   @inject(VesProcessService)
   protected vesProcessService: VesProcessService;
   @inject(VesProcessWatcher)
@@ -553,15 +554,13 @@ export class VesImageConverterService {
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
 
     const imageConfigFilesToBeConverted: Array<ImageConfigFileToBeConverted> = [];
-
-    // TODO: refactor to use fileservice instead of glob
-    const fileMatcher = join(await this.fileService.fsPath(workspaceRootUri), '**', '*.image.json');
-    await Promise.all(glob.sync(fileMatcher).map(async imageConfigFile => {
+    const imageConfigFiles = await this.vesGlobService.find(await this.fileService.fsPath(workspaceRootUri), '**/*.image.json');
+    for (const imageConfigFile of imageConfigFiles) {
       const imageConfigFileUri = new URI(imageConfigFile).withScheme('file');
       const config = await this.getConverterConfig(imageConfigFileUri);
 
       if (!this.validateImageConverterConfig(config, imageConfigFileUri)) {
-        return; // continue with next
+        continue;
       }
 
       const name = config.name ? config.name : imageConfigFileUri.path.name;
@@ -569,7 +568,7 @@ export class VesImageConverterService {
       const images = await this.getRelevantImageFiles(changedOnly, imageConfigFileUri, config, name);
       if (images.length === 0) {
         // console.log(`No relevant images for ${imageConfigFileUri.path.base}`);
-        return;
+        continue;
       }
 
       const gritArguments = this.getGritArguments(name, config);
@@ -582,7 +581,7 @@ export class VesImageConverterService {
         gritArguments,
         output: []
       });
-    }));
+    }
 
     return imageConfigFilesToBeConverted;
   }
@@ -824,8 +823,10 @@ export class VesImageConverterService {
 
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
-    const fileMatcher = join(await this.fileService.fsPath(workspaceRootUri), '**', '*.image.json');
-    await Promise.all(glob.sync(fileMatcher).map(async imageConfigFile => {
+
+    const imageConfigFiles = await this.vesGlobService.find(await this.fileService.fsPath(workspaceRootUri), '**/*.image.json');
+
+    await Promise.all(imageConfigFiles.map(async imageConfigFile => {
       const imageConfigFileUri = new URI(imageConfigFile).withScheme('file');
       const fileContents = await this.fileService.readFile(imageConfigFileUri);
       const config = JSON.parse(fileContents.value.toString());

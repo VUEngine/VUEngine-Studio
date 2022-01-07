@@ -1,10 +1,20 @@
 import { CallHierarchyContribution } from '@theia/callhierarchy/lib/browser/callhierarchy-contribution';
 import { isOSX } from '@theia/core';
-import { ApplicationShell, bindViewContribution, FrontendApplicationContribution, LabelProviderContribution, WidgetFactory } from '@theia/core/lib/browser';
+import {
+    ApplicationShell,
+    bindViewContribution,
+    FrontendApplicationContribution,
+    LabelProviderContribution,
+    WebSocketConnectionProvider,
+    WidgetFactory
+} from '@theia/core/lib/browser';
 import { AboutDialog } from '@theia/core/lib/browser/about-dialog';
 import { ColorContribution } from '@theia/core/lib/browser/color-application-contribution';
 import { DefaultFileIconThemeContribution } from '@theia/core/lib/browser/icon-theme-contribution';
-import { BrowserMainMenuFactory, BrowserMenuBarContribution } from '@theia/core/lib/browser/menu/browser-menu-plugin';
+import {
+    BrowserMainMenuFactory,
+    BrowserMenuBarContribution
+} from '@theia/core/lib/browser/menu/browser-menu-plugin';
 import { PreferenceConfigurations } from '@theia/core/lib/browser/preferences/preference-configurations';
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { MenuContribution } from '@theia/core/lib/common/menu';
@@ -22,6 +32,8 @@ import { PreferenceTreeGenerator } from '@theia/preferences/lib/browser/util/pre
 import { PreferenceStringInputRenderer } from '@theia/preferences/lib/browser/views/components/preference-string-input';
 import { ScmHistoryContribution } from '@theia/scm-extra/lib/browser/history/scm-history-contribution';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import '../../../src/branding/browser/style/index.css';
+import { VesGlobService, VES_GLOB_SERVICE_PATH } from '../common/ves-glob-service-protocol';
 import { VesAboutDialog } from './ves-branding-about-dialog';
 import { VesApplicationShell } from './ves-branding-application-shell';
 import { VesColorContribution } from './ves-branding-color-contribution';
@@ -46,7 +58,6 @@ import { VesCommonService } from './ves-common-service';
 import { VesNavigatorWidgetFactory } from './ves-navigator-widget-factory';
 import { VesPreferenceStringInputRenderer } from './ves-preference-string-input-renderer';
 import { VesWorkspaceService } from './ves-workspace-service';
-import '../../../src/branding/browser/style/index.css';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // rename default icon theme
@@ -208,4 +219,10 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // initially hide "open editors" tab of navigator
     bind(VesNavigatorWidgetFactory).toSelf();
     rebind(NavigatorWidgetFactory).to(VesNavigatorWidgetFactory);
+
+    // glob service
+    bind(VesGlobService).toDynamicValue(ctx => {
+        const connection = ctx.container.get(WebSocketConnectionProvider);
+        return connection.createProxy<VesGlobService>(VES_GLOB_SERVICE_PATH);
+    }).inSingletonScope();
 });

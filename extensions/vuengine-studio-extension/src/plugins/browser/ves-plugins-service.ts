@@ -8,8 +8,8 @@ import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import * as glob from 'glob';
 import { join, relative as relativePath } from 'path';
+import { VesGlobService } from '../../branding/common/ves-glob-service-protocol';
 import { VesPluginData, VesPluginsData } from './ves-plugin';
 import { VesPluginsPathsService } from './ves-plugins-paths-service';
 import { VUENGINE_PLUGINS_PREFIX } from './ves-plugins-types';
@@ -23,6 +23,8 @@ export class VesPluginsService {
   protected fileService: FileService;
   @inject(PreferenceService)
   protected preferenceService: PreferenceService;
+  @inject(VesGlobService)
+  protected vesGlobService: VesGlobService;
   @inject(VesPluginsPathsService)
   protected vesPluginsPathsService: VesPluginsPathsService;
   @inject(WorkspaceService)
@@ -114,16 +116,17 @@ export class VesPluginsService {
     const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
 
     const findPlugins = async (rootUri: URI, prefix: string) => {
-      const rootPath = await this.fileService.fsPath(rootUri);
+      const rootPath = (await this.fileService.fsPath(rootUri)).replace(/\\/g, '/');
       const pluginsMap: any = {}; /* eslint-disable-line */
 
-      // TODO: refactor to use fileservice
-      await Promise.all(glob.sync(join(rootPath, '**', 'plugin.json')).map(async file => {
-        const fileSplit = file.split('/plugin.json');
+      const pluginFiles = await this.vesGlobService.find(rootPath, '**/plugin.json');
+      for (const pluginFile of pluginFiles) {
+        const pluginFileUri = new URI(pluginFile).withScheme('file');
+        const fileSplit = pluginFile.split('/plugin.json');
         const pluginPathFull = fileSplit[0];
 
         const pluginPathRelative = relativePath(rootPath, pluginPathFull);
-        const fileContent = await this.fileService.readFile(new URI(file).withScheme('file'));
+        const fileContent = await this.fileService.readFile(pluginFileUri);
         const fileContentJson = JSON.parse(fileContent.value.toString());
 
         const pluginId = `${prefix}//${pluginPathRelative.replace(/\\/g, '/')}`;
@@ -138,7 +141,7 @@ export class VesPluginsService {
         fileContentJson.name = pluginId;
 
         pluginsMap[pluginId] = fileContentJson;
-      }));
+      }
 
       return pluginsMap;
     };
