@@ -405,7 +405,7 @@ export class VesBuildService {
         'export', `PATH=${await this.convertoToEnvPath(compilerUri.resolve('bin'))}:$PATH`,
         'LC_ALL=C',
         `MAKE_JOBS=${this.getThreads()}`,
-        `PREPROCESSING_WAIT_FOR_LOCK_DELAY_FACTOR=0.0`,
+        'PREPROCESSING_WAIT_FOR_LOCK_DELAY_FACTOR=0.0',
         `DUMP_ELF=${dumpElf ? 1 : 0}`,
         `PRINT_PEDANTIC_WARNINGS=${pedanticWarnings ? 1 : 0}`, '&&',
         'make', 'all',
@@ -537,10 +537,13 @@ export class VesBuildService {
         line: problem.line,
         column: problem.column,
       };
-
-      const functionReference = text.split(':')[1].trim();
-      const errorMessage = problem.message.split(' [-W')[0].trim();
-      optimizedText = `${functionReference}:\n${errorMessage[0].toUpperCase()}${errorMessage.slice(1)}.`;
+      // TODO: disabled shortening of error messages and warnings for now.
+      // Make sure it works fine in all possible cases!
+      /*
+        const functionReference = text.split(':')[1].trim();
+        const errorMessage = problem.message.split(' [-W')[0].trim();
+        optimizedText = `${functionReference}:\n${errorMessage[0].toUpperCase()}${errorMessage.slice(1)}.`;
+      */
     } else if (textLowerCase.includes('error: ') ||
       textLowerCase.includes('] error ') ||
       textLowerCase.includes(' not found') ||
@@ -586,7 +589,6 @@ export class VesBuildService {
   }
 
   protected matchGccProblem(message: string): GccMatchedProblem | undefined {
-    // GCC problem matcher from https://github.com/microsoft/vscode-cpptools/blob/main/Extension/package.json
     const regEx = /^(.*):(\d+):(\d+):\s+(?:fatal\s+)?(warning|error):\s+(.*)$/gmi;
     let matchedProblem: GccMatchedProblem | undefined;
 
@@ -597,7 +599,7 @@ export class VesBuildService {
         line: parseInt(match[2]),
         column: parseInt(match[3]),
         severity: match[4],
-        message: match[5],
+        message: match[5].trim(),
       };
     }
 
@@ -606,7 +608,7 @@ export class VesBuildService {
 
   // Converts function names Class_function to Class::function
   protected replaceFunctionNames(name: string): string {
-    // TODO: Disabled this because we cannot be sure that what rename is
+    // TODO: Disabled this because we cannot be sure that what we rename is
     // actually a function name. Find a way to make sure it is!
     // return name.replace(/\'([a-zA-Z0-9]*)_([a-zA-Z0-9]*)\'/g, '"$1::$2"');
     return name;
@@ -638,8 +640,8 @@ export class VesBuildService {
     let envPath = path
       .replace(/\\/g, '/')
       .replace(/^[a-zA-Z]:\//, function (x): string {
-      return `/${x.substring(0, 1).toLowerCase()}/`;
-    });
+        return `/${x.substring(0, 1).toLowerCase()}/`;
+      });
 
     if (this.isWslInstalled) {
       envPath = '/mnt' + envPath;
