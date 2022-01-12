@@ -2,10 +2,13 @@ import { isOSX } from '@theia/core';
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
 import {
     FLASHBOY_PLUS_IMAGE_PLACEHOLDER,
+    FLASHBOY_PLUS_PREFERENCE_NAME,
     HBCLI_PLACEHOLDER,
     HFCLI_PLACEHOLDER,
     HYPERBOY_IMAGE_PLACEHOLDER,
+    HYPERBOY_PREFERENCE_NAME,
     HYPERFLASH32_IMAGE_PLACEHOLDER,
+    HYPERFLASH32_PREFERENCE_NAME,
     NAME_NO_SPACES_PLACEHOLDER,
     PROG_VB_PLACEHOLDER, ROM_PLACEHOLDER
 } from './ves-flash-cart-types';
@@ -83,7 +86,7 @@ export const VesFlashCartPreferenceSchema: PreferenceSchema = {
             },
             default: [
                 {
-                    name: 'FlashBoy (Plus)',
+                    name: FLASHBOY_PLUS_PREFERENCE_NAME,
                     vid: 6017,
                     pid: 2466,
                     manufacturer: 'Richard Hutchinson',
@@ -95,7 +98,7 @@ export const VesFlashCartPreferenceSchema: PreferenceSchema = {
                     image: FLASHBOY_PLUS_IMAGE_PLACEHOLDER,
                 },
                 {
-                    name: 'HyperFlash32',
+                    name: HYPERFLASH32_PREFERENCE_NAME,
                     vid: 1027,
                     pid: 24577,
                     manufacturer: 'FTDI',
@@ -109,11 +112,11 @@ export const VesFlashCartPreferenceSchema: PreferenceSchema = {
                     image: HYPERFLASH32_IMAGE_PLACEHOLDER,
                 },
                 {
-                    name: 'HyperBoy',
-                    vid: 0, // TODO
-                    pid: 0, // TODO
-                    manufacturer: '', // TODO
-                    product: '', // TODO
+                    name: HYPERBOY_PREFERENCE_NAME,
+                    vid: 1027,
+                    pid: 24577,
+                    manufacturer: 'RETROONYX',
+                    product: 'HYPERBOY',
                     size: 32,
                     path: HBCLI_PLACEHOLDER,
                     args: isOSX

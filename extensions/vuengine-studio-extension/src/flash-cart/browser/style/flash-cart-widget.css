@@ -18,13 +18,13 @@
   padding: calc(var(--theia-ui-padding) * 2);
 }
 
+#vesFlashCartWidget .flashingActions .flashingPanel {
+  padding-bottom: var(--theia-ui-padding);
+}
+
 #vesFlashCartWidget > div:last-child {
   flex-grow: 1;
   overflow: auto;
-}
-
-#vesFlashCartWidget .flashingPanel {
-  margin-bottom: calc(var(--theia-ui-padding) * 2);
 }
 
 #vesFlashCartWidget .flashCart {

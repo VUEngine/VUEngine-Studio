@@ -1,16 +1,16 @@
-import { basename } from 'path';
-import * as React from '@theia/core/shared/react';
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { Message } from '@theia/core/shared/@phosphor/messaging';
 import { CommandService } from '@theia/core';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
-import { VesFlashCartCommands } from './ves-flash-cart-commands';
-import { ConnectedFlashCart, FlashLogLine } from './ves-flash-cart-types';
-import { VesFlashCartService } from './ves-flash-cart-service';
+import { Message } from '@theia/core/shared/@phosphor/messaging';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import * as React from '@theia/core/shared/react';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { basename } from 'path';
+import { VesBuildService } from '../../build/browser/ves-build-service';
 import { IMAGE_HYPERFLASH32_LABEL } from './images/hyperflash32-label';
 import { NO_FLASH_CARTS } from './images/no-flash-carts';
-import { VesBuildService } from '../../build/browser/ves-build-service';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { VesFlashCartCommands } from './ves-flash-cart-commands';
+import { VesFlashCartService } from './ves-flash-cart-service';
+import { ConnectedFlashCart, FlashLogLine, HYPERFLASH32_PREFERENCE_NAME } from './ves-flash-cart-types';
 
 @injectable()
 export class VesFlashCartWidget extends ReactWidget {
@@ -73,13 +73,11 @@ export class VesFlashCartWidget extends ReactWidget {
         <div className='flashingActions'>
           {this.vesFlashCartService.isQueued && (
             <>
-              <div className='flashCartInfo'>
-                <div>
-                  <i className='fa fa-fw fa-hourglass-half'></i>{' '}
-                  <em>
-                    Flashing is queued and will start once the build is ready
-                  </em>
-                </div>
+              <div className='flashingPanel'>
+                <i className='fa fa-fw fa-hourglass-half'></i>{' '}
+                <em>
+                  Flashing is queued and will start once the build is ready
+                </em>
               </div>
               <button
                 className='theia-button secondary'
@@ -170,7 +168,7 @@ export class VesFlashCartWidget extends ReactWidget {
                       <img
                         src={connectedFlashCart.config.image}
                         style={
-                          connectedFlashCart.config.name === 'HyperFlash32'
+                          connectedFlashCart.config.name === HYPERFLASH32_PREFERENCE_NAME
                             ? {
                               /* HyperFlash32 eInk label */
                               backgroundImage: `url(${IMAGE_HYPERFLASH32_LABEL})`,

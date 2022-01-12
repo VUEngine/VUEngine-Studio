@@ -26,7 +26,10 @@ import {
   HBCLI_PLACEHOLDER,
   HFCLI_PLACEHOLDER,
   HYPERBOY_IMAGE_PLACEHOLDER,
-  HYPERFLASH32_IMAGE_PLACEHOLDER, NAME_NO_SPACES_PLACEHOLDER, NAME_PLACEHOLDER, PROG_VB_PLACEHOLDER,
+  HYPERFLASH32_IMAGE_PLACEHOLDER,
+  NAME_NO_SPACES_PLACEHOLDER,
+  NAME_PLACEHOLDER,
+  PROG_VB_PLACEHOLDER,
   ROM_PLACEHOLDER
 } from './ves-flash-cart-types';
 import { VesFlashCartUsbWatcher } from './ves-flash-cart-usb-watcher';
@@ -346,12 +349,12 @@ export class VesFlashCartService {
 
     this.vesProcessWatcher.onDidReceiveOutputStreamData(({ pId, data }) => {
       // console.log('data', pId, data);
-      this.processStreamData(pId, data);
+      this.processStreamData(pId, data.trim());
     });
 
     this.vesProcessWatcher.onDidReceiveErrorStreamData(({ pId, data }) => {
       // console.log('error data', pId, data);
-      this.processStreamData(pId, data);
+      this.processStreamData(pId, data.trim());
     });
   }
 
@@ -363,14 +366,9 @@ export class VesFlashCartService {
           text: data
         });
 
-        switch (connectedFlashCart.config.path) {
-          case PROG_VB_PLACEHOLDER:
-            this.parseStreamDataProgVb(connectedFlashCart, data);
-            break;
-          case HFCLI_PLACEHOLDER:
-            this.parseStreamDataHyperFlasherCli32(connectedFlashCart, data);
-            break;
-        }
+        this.parseStreamDataProgVb(connectedFlashCart, data);
+        this.parseStreamDataHyperFlasherCli32(connectedFlashCart, data);
+        this.parseStreamDataHyperBoyCli(connectedFlashCart, data);
       }
     }
 
@@ -421,7 +419,7 @@ export class VesFlashCartService {
   }
 
   protected async parseStreamDataHyperFlasherCli32(connectedFlashCart: ConnectedFlashCart, data: any): Promise<void> { /* eslint-disable-line */
-    if (connectedFlashCart.config.name === VesFlashCartPreferenceSchema.properties[VesFlashCartPreferenceIds.FLASH_CARTS].default[1].name) {
+    if (connectedFlashCart.config.path === HFCLI_PLACEHOLDER) {
       /* - Number of # is only fixed (to 20) on HF32 firmware version 1.9 and above.
         On lower firmwares, the number of # depends on file size.
         - Direct-to-flash (-x option) is only supported on HF32 firmware version 2.2 and above.
@@ -447,8 +445,30 @@ export class VesFlashCartService {
     }
   }
 
+  protected async parseStreamDataHyperBoyCli(connectedFlashCart: ConnectedFlashCart, data: any): Promise<void> { /* eslint-disable-line */
+    if (connectedFlashCart.config.path === HBCLI_PLACEHOLDER) {
+      if (data.startsWith('Clearing')) {
+        connectedFlashCart.status = {
+          ...connectedFlashCart.status,
+          step: 'Erasing',
+        };
+      } else if (data.startsWith('Flash Cleared')) {
+        connectedFlashCart.status = {
+          ...connectedFlashCart.status,
+          step: 'Flashing',
+        };
+      } else if (data.startsWith('#')) {
+        connectedFlashCart.status = {
+          ...connectedFlashCart.status,
+          step: 'Flashing',
+          progress: connectedFlashCart.status.progress + 5,
+        };
+      }
+    }
+  }
+
   protected async parseStreamDataProgVb(connectedFlashCart: ConnectedFlashCart, data: any): Promise<void> { /* eslint-disable-line */
-    if (connectedFlashCart.config.name === VesFlashCartPreferenceSchema.properties[VesFlashCartPreferenceIds.FLASH_CARTS].default[0].name) {
+    if (connectedFlashCart.config.path === PROG_VB_PLACEHOLDER) {
       if (data.startsWith('Erasing device')) {
         connectedFlashCart.status = {
           ...connectedFlashCart.status,
