@@ -1,6 +1,5 @@
 #ves-titlebar-action-buttons {
-  margin-right: 8px;
-  min-width: 170px;
+  margin: 0 8px;
   order: 3;
   padding-top: 5px;
   text-align: right;
@@ -24,6 +23,7 @@
   width: 16px;
 }
 
+#ves-titlebar-action-buttons .theia-button.active,
 #ves-titlebar-action-buttons .theia-button:enabled:hover {
   background-color: var(--theia-titleBar-hoverButtonBackground);
 }

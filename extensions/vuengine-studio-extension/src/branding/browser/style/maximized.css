@@ -1,0 +1,3 @@
+.theia-maximized {
+    top: var(--theia-private-menubar-height) !important;
+}

@@ -199,11 +199,11 @@ export class VesBuildWidget extends ReactWidget {
               <i className='fa fa-trash'></i>
             </button>
           </div>
-        {isWindows && !this.vesBuildService.isWslInstalled && (
-          <div>
-            <i className='fa fa-exclamation-triangle'></i> Please consider <a href='#' onClick={this.openWslDocs}>installing WSL</a> to massively improve build times.
-          </div>
-        )}
+          {isWindows && !this.vesBuildService.isWslInstalled && (
+            <div>
+              <i className='fa fa-exclamation-triangle'></i> Please consider <a href='#' onClick={this.openWslDocs}>installing WSL</a> to massively improve build times.
+            </div>
+          )}
         </div>
         {this.state.showOptions && (
           <div className='buildOptions theia-settings-container'>
@@ -560,6 +560,6 @@ export class VesBuildWidget extends ReactWidget {
   protected setEngineCorePath = (path: string) => this.preferenceService.set(VesBuildPreferenceIds.ENGINE_CORE_PATH, path, PreferenceScope.User);
   protected setEnginePluginsPath = (path: string) => this.preferenceService.set(VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH, path, PreferenceScope.User);
   protected setUserPluginsPath = (path: string) => this.preferenceService.set(VesPluginsPreferenceIds.USER_PLUGINS_PATH, path, PreferenceScope.User);
-  
+
   protected openWslDocs = () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'setup/enhancing-build-times-on-windows', false);
 }

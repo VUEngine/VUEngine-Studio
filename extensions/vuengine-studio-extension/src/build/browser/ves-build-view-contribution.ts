@@ -1,20 +1,15 @@
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { Command, CommandRegistry, CommandService } from '@theia/core';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
-import { ApplicationShell, AbstractViewContribution, FrontendApplication, Widget } from '@theia/core/lib/browser';
+import { AbstractViewContribution, CommonCommands, FrontendApplication } from '@theia/core/lib/browser';
 import { VesBuildWidget } from './ves-build-widget';
 import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
 
 export namespace VesBuildViewContributionCommands {
     export const EXPAND: Command = {
         id: `${VesBuildWidget.ID}.expand`,
-        label: 'Expand View',
-        iconClass: 'codicon codicon-unfold',
-    };
-    export const SHRINK: Command = {
-        id: `${VesBuildWidget.ID}.shrink`,
-        label: 'Shrink View',
-        iconClass: 'codicon codicon-fold',
+        label: 'Toggle Maximized',
+        iconClass: 'codicon codicon-arrow-both',
     };
     export const HELP: Command = {
         id: `${VesBuildWidget.ID}.help`,
@@ -30,8 +25,6 @@ export namespace VesBuildViewContributionCommands {
 
 @injectable()
 export class VesBuildViewContribution extends AbstractViewContribution<VesBuildWidget> implements TabBarToolbarContribution {
-    @inject(ApplicationShell)
-    protected readonly applicationShell: ApplicationShell;
     @inject(CommandService)
     private readonly commandService: CommandService;
 
@@ -49,45 +42,19 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
         });
     }
 
-    protected state = {
-        isWide: false,
-    };
-
     async initializeLayout(app: FrontendApplication): Promise<void> {
         await this.openView({ activate: false, reveal: false });
-    }
-
-    toggleWidgetWidth(widget: Widget): void {
-        this.state.isWide = !this.state.isWide;
-        const targetWidth = this.state.isWide
-            ? Math.round(window.innerWidth * 0.75)
-            : 500;
-        const widgetArea = this.applicationShell.getAreaFor(widget);
-        if (widgetArea) {
-            this.applicationShell.resize(targetWidth, widgetArea);
-            // rerender view
-            this.applicationShell.activateWidget(this.viewId);
-        }
     }
 
     registerCommands(commandRegistry: CommandRegistry): void {
         commandRegistry.registerCommand(VesBuildViewContributionCommands.EXPAND, {
             isEnabled: () => true,
             isVisible: widget => widget !== undefined &&
+                widget.id === VesBuildWidget.ID,
+            execute: async widget => widget !== undefined &&
                 widget.id === VesBuildWidget.ID &&
-                !this.state.isWide,
-            execute: widget => widget !== undefined &&
-                widget.id === VesBuildWidget.ID &&
-                this.toggleWidgetWidth(widget),
-        });
-        commandRegistry.registerCommand(VesBuildViewContributionCommands.SHRINK, {
-            isEnabled: () => true,
-            isVisible: widget => widget !== undefined &&
-                widget.id === VesBuildWidget.ID &&
-                this.state.isWide,
-            execute: widget => widget !== undefined &&
-                widget.id === VesBuildWidget.ID &&
-                this.toggleWidgetWidth(widget),
+                await this.openView({ activate: true, reveal: true }) &&
+                this.commandService.executeCommand(CommonCommands.TOGGLE_MAXIMIZED.id)
         });
         commandRegistry.registerCommand(VesBuildViewContributionCommands.HELP, {
             isEnabled: () => true,
@@ -111,12 +78,6 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
             command: VesBuildViewContributionCommands.EXPAND.id,
             tooltip: VesBuildViewContributionCommands.EXPAND.label,
             priority: 0,
-        });
-        toolbar.registerItem({
-            id: VesBuildViewContributionCommands.SHRINK.id,
-            command: VesBuildViewContributionCommands.SHRINK.id,
-            tooltip: VesBuildViewContributionCommands.SHRINK.label,
-            priority: 1,
         });
         toolbar.registerItem({
             id: VesBuildViewContributionCommands.SETTINGS.id,

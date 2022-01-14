@@ -1,11 +1,11 @@
-import * as React from '@theia/core/shared/react';
 import { CommandService, environment, isOSX, MessageService } from '@theia/core';
-import { injectable, postConstruct, inject } from '@theia/core/shared/inversify';
-import { PreferenceService } from '@theia/core/lib/browser';
-import { KeybindingRegistry } from '@theia/core/lib/browser/keybinding';
-import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
+import { CommonCommands, PreferenceService } from '@theia/core/lib/browser';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
+import { KeybindingRegistry } from '@theia/core/lib/browser/keybinding';
+import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import * as React from '@theia/core/shared/react';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceCommands, WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { VesBuildPreferenceIds } from '../../build/browser/ves-build-preferences';
@@ -16,6 +16,7 @@ import { VesEmulatorService } from '../../emulator/browser/ves-emulator-service'
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
 import { VesFlashCartService } from '../../flash-cart/browser/ves-flash-cart-service';
 import { VesProjectsCommands } from '../../projects/browser/ves-projects-commands';
+import { VesCommonService } from './ves-common-service';
 
 @injectable()
 export class VesTitlebarActionButtonsWidget extends ReactWidget {
@@ -37,6 +38,8 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
     protected readonly preferenceService!: PreferenceService;
     @inject(VesBuildService)
     protected readonly vesBuildService: VesBuildService;
+    @inject(VesCommonService)
+    protected readonly vesCommonService: VesCommonService;
     @inject(VesEmulatorService)
     protected readonly vesEmulatorService: VesEmulatorService;
     @inject(VesFlashCartService)
@@ -60,6 +63,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
         this.vesFlashCartService.onDidChangeConnectedFlashCarts(() => this.update());
         this.vesEmulatorService.onDidChangeIsQueued(() => this.update());
         this.keybindingRegistry.onKeybindingsChanged(() => this.update());
+        this.vesCommonService.onDidChangeIsMaximized(() => this.update());
 
         this.update();
 
@@ -176,6 +180,15 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                         ? <i className='fa fa-cog fa-spin'></i>
                         : <i className='fa fa-trash'></i>}
                 </button>
+                {this.vesCommonService.isMaximized &&
+                    <button
+                        className="theia-button secondary collapse active"
+                        title={`${CommonCommands.TOGGLE_MAXIMIZED.label}${this.getKeybindingLabel(CommonCommands.TOGGLE_MAXIMIZED.id, true)}`}
+                        onClick={this.collapse}
+                        key='action-button-collapse'
+                    >
+                        <i className="fa fa-compress"></i>
+                    </button>}
             </>;
     }
 
@@ -209,4 +222,5 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
     protected run = async () => this.commandService.executeCommand(VesEmulatorCommands.RUN.id);
     protected flash = async () => this.commandService.executeCommand(VesFlashCartCommands.FLASH.id);
     protected clean = async () => this.commandService.executeCommand(VesBuildCommands.CLEAN.id);
+    protected collapse = async () => this.commandService.executeCommand(CommonCommands.TOGGLE_MAXIMIZED.id, this.vesCommonService.isMaximized);
 }
