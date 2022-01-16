@@ -6,6 +6,7 @@ import { VesEmulatorPreferenceIds } from '../../emulator/browser/ves-emulator-pr
 import { VesProjectsPreferenceIds } from '../../projects/browser/ves-projects-preferences';
 import { VesUpdaterPreferenceIds } from '../../updater/electron-browser/ves-updater-preferences';
 import { VesPluginsPreferenceIds } from '../../plugins/browser/ves-plugins-preferences';
+import { VesBrandingPreferenceIds } from './ves-branding-preferences';
 
 @injectable()
 export class VesPreferenceTreeGenerator extends PreferenceTreeGenerator {
@@ -37,6 +38,7 @@ export class VesPreferenceTreeGenerator extends PreferenceTreeGenerator {
         [VesFlashCartPreferenceIds.CATEGORY, 'features'], // custom category
         ['explorer', 'features'],
         ['extensions', 'features'],
+        [VesBrandingPreferenceIds.CATEGORY, 'features'], // custom category
         ['hosted-plugin', 'features'],
         ['output', 'features'],
         ['preview', 'features'],

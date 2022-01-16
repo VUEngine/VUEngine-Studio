@@ -5,6 +5,7 @@ import {
     bindViewContribution,
     FrontendApplicationContribution,
     LabelProviderContribution,
+    PreferenceContribution,
     WebSocketConnectionProvider,
     WidgetFactory
 } from '@theia/core/lib/browser';
@@ -48,6 +49,7 @@ import { VesBrandingLabelProviderContribution } from './ves-branding-label-provi
 import { VesPluginContribution } from './ves-branding-plugin-contribution';
 import { VesPreferenceConfigurations } from './ves-branding-preference-configurations';
 import { VesPreferenceTreeGenerator } from './ves-branding-preference-tree-generator.';
+import { VesBrandingPreferenceSchema } from './ves-branding-preferences';
 import { VesTitlebarActionButtonsContribution } from './ves-branding-titlebar-action-buttons-view';
 import { VesTitlebarActionButtonsWidget } from './ves-branding-titlebar-action-buttons-widget';
 import { VesTitlebarApplicationTitleContribution } from './ves-branding-titlebar-application-title-view';
@@ -60,6 +62,9 @@ import { VesPreferenceStringInputRenderer } from './ves-preference-string-input-
 import { VesWorkspaceService } from './ves-workspace-service';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
+    // preferences
+    bind(PreferenceContribution).toConstantValue({ schema: VesBrandingPreferenceSchema });
+
     // rename default icon theme
     bind(VesDefaultFileIconThemeContribution).toSelf().inSingletonScope();
     // @ts-ignore

@@ -58,3 +58,9 @@
     text-transform: capitalize;
     font-weight: 400;
 }
+
+.ves-welcome-preference{
+    margin-top: 20px;
+    align-items: center;
+    display: flex;
+}

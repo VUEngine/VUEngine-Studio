@@ -1,19 +1,26 @@
 import * as React from '@theia/core/shared/react';
-import { environment, isOSX } from '@theia/core';
-import { injectable } from '@theia/core/shared/inversify';
+import { DisposableCollection, environment, isOSX } from '@theia/core';
+import { injectable, inject } from '@theia/core/shared/inversify';
 import { GettingStartedWidget } from '@theia/getting-started/lib/browser/getting-started-widget';
 import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
 import { VesProjectsCommands } from '../../projects/browser/ves-projects-commands';
-import { codicon } from '@theia/core/lib/browser';
+import { codicon, PreferenceService } from '@theia/core/lib/browser';
+import { VesBrandingPreferenceIds } from './ves-branding-preferences';
 
 @injectable()
 export class VesGettingStartedWidget extends GettingStartedWidget {
+    @inject(PreferenceService)
+    protected readonly preferenceService: PreferenceService;
+
+    protected readonly toDispose = new DisposableCollection();
+
     protected openUrl = (url: string) => this.windowService.openNewWindow(url, { external: true });
     protected recentLimit = 10;
     protected async init(): Promise<void> {
         super.init();
-
         this.title.iconClass = 'codicon codicon-info';
+        await this.preferenceService.ready;
+        this.update();
     }
 
     protected render(): React.ReactNode {
@@ -24,6 +31,7 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
             {this.renderHelp()}
             {this.renderSettings()}
             {this.renderLinks()}
+            {this.renderPreferences()}
         </div >;
     }
 
@@ -139,6 +147,39 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
         );
     }
 
+    protected renderPreferences(): React.ReactNode {
+        return <div className="ves-welcome-section">
+            <div className="ves-welcome-preference">
+                <VesPreferences preferenceService={this.preferenceService}></VesPreferences>
+            </div>
+        </div>;
+    }
+
     protected createNewProject = async () => this.commandRegistry.executeCommand(VesProjectsCommands.NEW.id);
     protected openHandbook = async () => this.commandRegistry.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id);
+}
+
+export interface PreferencesProps {
+    preferenceService: PreferenceService;
+}
+
+function VesPreferences(props: PreferencesProps): JSX.Element {
+    const [alwaysShowWelcomePage, setAlwaysShowWelcomePage] = React.useState<boolean>(props.preferenceService.get(VesBrandingPreferenceIds.ALWAYS_SHOW_WELCOME_PAGE, true));
+    React.useEffect(() => {
+        const preflistener = props.preferenceService.onPreferenceChanged(change => {
+            if (change.preferenceName === VesBrandingPreferenceIds.ALWAYS_SHOW_WELCOME_PAGE) {
+                const prefValue: boolean = change.newValue;
+                setAlwaysShowWelcomePage(prefValue);
+            }
+        });
+        return () => preflistener.dispose();
+    }, [props.preferenceService]);
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newChecked = e.target.checked;
+        props.preferenceService.updateValue(VesBrandingPreferenceIds.ALWAYS_SHOW_WELCOME_PAGE, newChecked);
+    };
+    return <div className='ves-preference'>
+        <input type="checkbox" className="theia-input" id="alwaysShowWelcomePage" onChange={handleChange} checked={alwaysShowWelcomePage}></input>
+        <label htmlFor="alwaysShowWelcomePage">Always show this page when no workspace is loaded.</label>
+    </div>;
 }
