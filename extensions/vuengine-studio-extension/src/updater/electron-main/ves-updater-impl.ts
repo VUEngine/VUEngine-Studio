@@ -1,12 +1,13 @@
+import { ElectronMainApplication, ElectronMainApplicationContribution } from '@theia/core/lib/electron-main/electron-main-application';
+import { injectable } from '@theia/core/shared/inversify';
+import * as fs from 'fs-extra';
 import * as http from 'http';
 import * as os from 'os';
 import * as path from 'path';
-import { injectable } from '@theia/core/shared/inversify';
-import * as fs from '@theia/core/shared/fs-extra';
-import { ElectronMainApplication, ElectronMainApplicationContribution } from '@theia/core/lib/electron-main/electron-main-application';
 import { VesUpdater, VesUpdaterClient } from '../common/ves-updater';
 
 const { autoUpdater } = require('electron-updater');
+
 autoUpdater.logger = require('electron-log');
 autoUpdater.logger.transports.file.level = 'info';
 
@@ -44,7 +45,10 @@ export class VesUpdaterImpl implements VesUpdater, ElectronMainApplicationContri
         });
 
         autoUpdater.on('error', (err: unknown) => {
-            this.clients.forEach(c => c.reportError('Error during update'));
+            const errorLogPath = autoUpdater.logger.transports.file.getFile().path;
+            this.clients.forEach(c => c.reportError({
+                message: 'An error has occurred while attempting to update.', errorLogPath
+            }));
         });
     }
 
@@ -60,10 +64,10 @@ export class VesUpdaterImpl implements VesUpdater, ElectronMainApplicationContri
         autoUpdater.downloadUpdate();
 
         // record download stat, ignore errors
-        fs.mkdtemp(path.join(os.tmpdir(), 'vuengine-studio-updater-'))
+        fs.mkdtemp(path.join(os.tmpdir(), 'ves-updater-'))
             .then(tmpDir => {
                 const file = fs.createWriteStream(path.join(tmpDir, 'update'));
-                http.get('https://www.eclipse.org/downloads/download.php?file=/theia/update&r=1', response => {
+                http.get('https://www.eclipse.org/downloads/download.php?file=/ves/update&r=1', response => {
                     response.pipe(file);
                     file.on('finish', () => {
                         file.close();
@@ -78,7 +82,7 @@ export class VesUpdaterImpl implements VesUpdater, ElectronMainApplicationContri
     }
 
     onStop(application: ElectronMainApplication): void {
-        // Invoked when the contribution is stopping. You can clean up things here. You are not allowed call async code from here.
+        // Invoked when the contribution is stopping. You can clean up things here. You are not allowed to call async code from here.
     }
 
     setClient(client: VesUpdaterClient | undefined): void {

@@ -1,20 +1,22 @@
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { CommonMenus, OpenerService } from '@theia/core/lib/browser';
+import { PreferenceScope, PreferenceService } from '@theia/core/lib/browser/preferences';
 import {
     CommandContribution,
     CommandRegistry,
     Emitter,
-    isOSX,
     MenuContribution,
     MenuModelRegistry,
     MenuPath,
-    MessageService
+    MessageService,
+    Progress
 } from '@theia/core/lib/common';
-import { PreferenceScope, PreferenceService } from '@theia/core/lib/browser/preferences';
-import { CommonMenus } from '@theia/core/lib/browser';
+import { isOSX } from '@theia/core/lib/common/os';
+import URI from '@theia/core/lib/common/uri';
 import { ElectronMainMenuFactory } from '@theia/core/lib/electron-browser/menu/electron-main-menu-factory';
 import { BrowserWindow, Menu, remote } from '@theia/core/shared/electron';
-import { VesUpdater, VesUpdaterClient } from '../common/ves-updater';
-import { VesUpdaterPreferenceIds } from './ves-updater-preferences';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { clearInterval, setInterval } from 'timers';
+import { UpdaterError, VesUpdater, VesUpdaterClient } from '../common/ves-updater';
 import { VesUpdaterCommands } from './ves-updater-commands';
 
 export namespace VesUpdaterMenu {
@@ -23,21 +25,19 @@ export namespace VesUpdaterMenu {
 
 @injectable()
 export class VesUpdaterClientImpl implements VesUpdaterClient {
+    @inject(PreferenceService) private readonly preferenceService: PreferenceService;
 
-    @inject(PreferenceService)
-    private readonly preferenceService: PreferenceService;
+    protected readonly onReadyToInstallEmitter = new Emitter<void>();
+    readonly onReadyToInstall = this.onReadyToInstallEmitter.event;
 
-    protected readonly onDidChangeReadyToInstallEmitter = new Emitter<void>();
-    readonly onDidChangeReadyToInstall = this.onDidChangeReadyToInstallEmitter.event;
+    protected readonly onUpdateAvailableEmitter = new Emitter<boolean>();
+    readonly onUpdateAvailable = this.onUpdateAvailableEmitter.event;
 
-    protected readonly onDidFindUpdateEmitter = new Emitter<boolean>();
-    readonly onDidFindUpdate = this.onDidFindUpdateEmitter.event;
-
-    protected readonly onDidEncounterErrorEmitter = new Emitter<string>();
-    readonly onDidEncounterError = this.onDidEncounterErrorEmitter.event;
+    protected readonly onErrorEmitter = new Emitter<UpdaterError>();
+    readonly onError = this.onErrorEmitter.event;
 
     notifyReadyToInstall(): void {
-        this.onDidChangeReadyToInstallEmitter.fire();
+        this.onReadyToInstallEmitter.fire();
     }
 
     updateAvailable(available: boolean, startupCheck: boolean): void {
@@ -47,20 +47,19 @@ export class VesUpdaterClientImpl implements VesUpdaterClient {
             this.preferenceService.ready
                 .then(() => {
                     setTimeout(() => {
-                        const reportOnStart: boolean = this.preferenceService.get(VesUpdaterPreferenceIds.REPORT_ON_START, true);
+                        const reportOnStart: boolean = this.preferenceService.get('updates.reportOnStart', true);
                         if (reportOnStart) {
-                            this.onDidFindUpdateEmitter.fire(available);
+                            this.onUpdateAvailableEmitter.fire(available);
                         }
                     }, 10000);
                 });
         } else {
-            this.onDidFindUpdateEmitter.fire(available);
+            this.onUpdateAvailableEmitter.fire(available);
         }
-
     }
 
-    reportError(error: string): void {
-        this.onDidEncounterErrorEmitter.fire(error);
+    reportError(error: UpdaterError): void {
+        this.onErrorEmitter.fire(error);
     }
 }
 
@@ -101,11 +100,17 @@ export class VesUpdaterFrontendContribution implements CommandContribution, Menu
     @inject(PreferenceService)
     private readonly preferenceService: PreferenceService;
 
+    @inject(OpenerService)
+    protected readonly openerService: OpenerService;
+
     protected readyToUpdate = false;
+
+    private progress: Progress | undefined;
+    private intervalId: NodeJS.Timeout | undefined;
 
     @postConstruct()
     protected init(): void {
-        this.updaterClient.onDidFindUpdate(available => {
+        this.updaterClient.onUpdateAvailable(available => {
             if (available) {
                 this.handleDownloadUpdate();
             } else {
@@ -113,13 +118,13 @@ export class VesUpdaterFrontendContribution implements CommandContribution, Menu
             }
         });
 
-        this.updaterClient.onDidChangeReadyToInstall(async () => {
+        this.updaterClient.onReadyToInstall(async () => {
             this.readyToUpdate = true;
             this.menuUpdater.update();
             this.handleUpdatesAvailable();
         });
 
-        this.updaterClient.onDidEncounterError(error => this.handleError(error));
+        this.updaterClient.onError(error => this.handleError(error));
     }
 
     registerCommands(registry: CommandRegistry): void {
@@ -149,10 +154,21 @@ export class VesUpdaterFrontendContribution implements CommandContribution, Menu
     protected async handleDownloadUpdate(): Promise<void> {
         const answer = await this.messageService.info('Updates found, do you want to download the update?', 'No', 'Yes', 'Never');
         if (answer === 'Never') {
-            this.preferenceService.set('updater.reportOnStart', false, PreferenceScope.User);
+            this.preferenceService.set('updates.reportOnStart', false, PreferenceScope.User);
             return;
         }
         if (answer === 'Yes') {
+            this.stopProgress();
+            this.progress = await this.messageService.showProgress({
+                text: 'Application Update'
+            });
+            let dots = 0;
+            this.intervalId = setInterval(() => {
+                if (this.progress !== undefined) {
+                    dots = (dots + 1) % 4;
+                    this.progress.report({ message: 'Downloading' + '.'.repeat(dots) });
+                }
+            }, 1000);
             this.updater.downloadUpdate();
         }
     }
@@ -162,14 +178,39 @@ export class VesUpdaterFrontendContribution implements CommandContribution, Menu
     }
 
     protected async handleUpdatesAvailable(): Promise<void> {
+        if (this.progress !== undefined) {
+            this.progress.report({ work: { done: 1, total: 1 } });
+            this.stopProgress();
+        }
         const answer = await this.messageService.info('Ready to update. Do you want to update now? (This will restart the application)', 'No', 'Yes');
         if (answer === 'Yes') {
             this.updater.onRestartToUpdateRequested();
         }
     }
 
-    protected async handleError(error: string): Promise<void> {
-        this.messageService.error(error);
+    protected async handleError(error: UpdaterError): Promise<void> {
+        this.stopProgress();
+        if (error.errorLogPath) {
+            const viewLogAction = 'View Error Log';
+            const answer = await this.messageService.error(error.message, viewLogAction);
+            if (answer === viewLogAction) {
+                const uri = new URI(error.errorLogPath);
+                const opener = await this.openerService.getOpener(uri);
+                opener.open(uri);
+            }
+        } else {
+            this.messageService.error(error.message);
+        }
     }
 
+    private stopProgress(): void {
+        if (this.intervalId !== undefined) {
+            clearInterval(this.intervalId);
+            this.intervalId = undefined;
+        }
+        if (this.progress !== undefined) {
+            this.progress.cancel();
+            this.progress = undefined;
+        }
+    }
 }
