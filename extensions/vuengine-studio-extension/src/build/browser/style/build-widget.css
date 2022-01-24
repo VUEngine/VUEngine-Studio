@@ -53,12 +53,8 @@
 
 #vesBuildWidget .buildMeta {
   display: flex;
-  flex-direction: row;
-  margin: calc(var(--theia-ui-padding) * 2) 0;
-}
-
-#vesBuildWidget .buildMeta > div {
-  align-self: flex-end;
+  flex-direction: column;
+  margin: var(--theia-ui-padding) 0;
 }
 
 #vesBuildWidget .buildStatus {
@@ -80,15 +76,25 @@
 }
 
 #vesBuildWidget .buildStatusMeta {
-  margin-top: 5px;
+  margin-top: var(--theia-ui-padding);
 }
 #vesBuildWidget .buildStatusMeta span {
-  margin-right: 5px;
+  margin-right: var(--theia-ui-padding);
 }
 
 #vesBuildWidget .buildMode,
 #vesBuildWidget .buildProcess {
   padding: 0 calc(var(--theia-ui-padding) * 2);
+}
+
+#vesBuildWidget .buildLogButtons {
+  display: flex;
+  margin-top: var(--theia-ui-padding);
+}
+
+#vesBuildWidget .buildLogButtons .theia-button {
+  flex-grow: 1;
+  font-size: 75%;
 }
 
 #vesBuildWidget .buildLogWrapper {

@@ -22,6 +22,7 @@ interface VesBuildWidgetState {
   logFilter: BuildLogLineType
   timerInterval: NodeJS.Timer | undefined
   outputRomExists: boolean
+  autoScroll: boolean
 }
 
 @injectable()
@@ -51,14 +52,16 @@ export class VesBuildWidget extends ReactWidget {
     logFilter: BuildLogLineType.Normal,
     timerInterval: undefined,
     outputRomExists: false,
+    autoScroll: true,
   };
 
   protected buildLogLastElementRef = React.createRef<HTMLDivElement>();
 
   protected onUpdateRequest(msg: Message): void {
     super.onUpdateRequest(msg);
-    // TODO: the user can't currently scroll in the logs when build is active
-    this.buildLogLastElementRef.current?.scrollIntoView();
+    if (this.state.autoScroll) {
+      this.buildLogLastElementRef.current?.scrollIntoView();
+    }
   }
 
   @postConstruct()
@@ -334,65 +337,36 @@ export class VesBuildWidget extends ReactWidget {
         )}
         <div className='buildMeta'>
           {this.vesBuildService.buildStatus.log.length > 0 && (
-            <>
-              <div className='buildStatus'>
-                {this.vesBuildService.buildStatus.active ? (
-                  <div>
-                    <i className='fa fa-cog fa-spin'></i>{' '}
-                    {this.vesBuildService.buildStatus.step}...
-                  </div>
-                ) : this.vesBuildService.buildStatus.step === BuildResult.done ? (
-                  <div className={this.vesBuildService.getNumberOfWarnings() > 0 ? 'warning' : 'success'}>
-                    {this.vesBuildService.getNumberOfWarnings() > 0
-                      ? <><i className='fa fa-exclamation-triangle'></i> Build successful (with warnings)</>
-                      : <><i className='fa fa-check'></i> Build successful</>}
-                    {this.vesBuildService.getNumberOfWarnings() > 0 && ''}
-                  </div>
-                ) : (
-                  <div className='error'>
-                    <i className='fa fa-times-circle-o'></i> Build{' '}
-                    {this.vesBuildService.buildStatus.step}
-                  </div>
-                )}
-                <div className='buildStatusMeta'>
-                  <span><i className='fa fa-clock-o'></i> {this.getDuration()}</span>
-                  <span><i className='fa fa-wrench'></i> {this.vesBuildService.buildStatus.buildMode}</span>
-                  {this.vesBuildService.buildStatus.active && this.vesBuildService.buildStatus.processId > 0 &&
-                    <span><i className='fa fa-terminal'></i> PID {this.vesBuildService.buildStatus.processId}</span>}
-                  {this.vesBuildService.isWslInstalled &&
-                    <span><i className='fa fa-linux'></i> WSL</span>}
-                  {!this.vesBuildService.buildStatus.active && this.vesBuildService.romSize > 0 &&
-                    <span><i className='fa fa-microchip'></i> {this.vesBuildService.bytesToMbit(this.vesBuildService.romSize)} MBit</span>}
+            <div className='buildStatus'>
+              {this.vesBuildService.buildStatus.active ? (
+                <div>
+                  <i className='fa fa-cog fa-spin'></i>{' '}
+                  {this.vesBuildService.buildStatus.step}...
                 </div>
+              ) : this.vesBuildService.buildStatus.step === BuildResult.done ? (
+                <div className={this.vesBuildService.getNumberOfWarnings() > 0 ? 'warning' : 'success'}>
+                  {this.vesBuildService.getNumberOfWarnings() > 0
+                    ? <><i className='fa fa-exclamation-triangle'></i> Build successful (with warnings)</>
+                    : <><i className='fa fa-check'></i> Build successful</>}
+                  {this.vesBuildService.getNumberOfWarnings() > 0 && ''}
+                </div>
+              ) : (
+                <div className='error'>
+                  <i className='fa fa-times-circle-o'></i> Build{' '}
+                  {this.vesBuildService.buildStatus.step}
+                </div>
+              )}
+              <div className='buildStatusMeta'>
+                <span><i className='fa fa-clock-o'></i> {this.getDuration()}</span>
+                <span><i className='fa fa-wrench'></i> {this.vesBuildService.buildStatus.buildMode}</span>
+                {this.vesBuildService.buildStatus.active && this.vesBuildService.buildStatus.processId > 0 &&
+                  <span><i className='fa fa-terminal'></i> PID {this.vesBuildService.buildStatus.processId}</span>}
+                {this.vesBuildService.isWslInstalled &&
+                  <span><i className='fa fa-linux'></i> WSL</span>}
+                {!this.vesBuildService.buildStatus.active && this.vesBuildService.romSize > 0 &&
+                  <span><i className='fa fa-microchip'></i> {this.vesBuildService.bytesToMbit(this.vesBuildService.romSize)} MBit</span>}
               </div>
-              <div className='buildProblems'>
-                {/* TODO: allow to filter for both warnings AND problems */}
-                {this.vesBuildService.getNumberOfWarnings() > 0 && <button
-                  className={
-                    this.state.logFilter === BuildLogLineType.Warning
-                      ? 'theia-button'
-                      : 'theia-button secondary'
-                  }
-                  title='Show only warnings'
-                  onClick={() => this.toggleFilter(BuildLogLineType.Warning)}
-                >
-                  <i className='fa fa-exclamation-triangle'></i>{' '}
-                  {this.vesBuildService.getNumberOfWarnings()}
-                </button>}
-                {this.vesBuildService.getNumberOfErrors() > 0 && <button
-                  className={
-                    this.state.logFilter === BuildLogLineType.Error
-                      ? 'theia-button'
-                      : 'theia-button secondary'
-                  }
-                  title='Show only errors'
-                  onClick={() => this.toggleFilter(BuildLogLineType.Error)}
-                >
-                  <i className='fa fa-times-circle-o'></i>{' '}
-                  {this.vesBuildService.getNumberOfErrors()}
-                </button>}
-              </div>
-            </>
+            </div>
           )}
         </div>
         <div
@@ -440,6 +414,45 @@ export class VesBuildWidget extends ReactWidget {
             </div>
           )}
         </div>
+        {this.vesBuildService.buildStatus.log.length > 0 && (
+          <div className='buildLogButtons'>
+            <button
+              className="theia-button secondary"
+              title='Toggle automatic scrolling'
+              onClick={() => this.toggleAutoScroll()}
+            >
+              <i className={this.state.autoScroll
+                ? 'fa fa-fw fa-long-arrow-down'
+                : 'fa fa-fw fa-minus'
+              }></i>
+            </button>
+            {/* TODO: allow to filter for both warnings AND problems */}
+            <button
+              className={
+                this.state.logFilter === BuildLogLineType.Warning
+                  ? 'theia-button'
+                  : 'theia-button secondary'
+              }
+              title='Show only warnings'
+              onClick={() => this.toggleFilter(BuildLogLineType.Warning)}
+            >
+              <i className='fa fa-exclamation-triangle'></i>{' '}
+              {this.vesBuildService.getNumberOfWarnings()}
+            </button>
+            <button
+              className={
+                this.state.logFilter === BuildLogLineType.Error
+                  ? 'theia-button'
+                  : 'theia-button secondary'
+              }
+              title='Show only errors'
+              onClick={() => this.toggleFilter(BuildLogLineType.Error)}
+            >
+              <i className='fa fa-times-circle-o'></i>{' '}
+              {this.vesBuildService.getNumberOfErrors()}
+            </button>
+          </div>
+        )}
         {/* <div className='buildSelector'>
           <select className='theia-select' title='Build'>
             <option value='latest'>
@@ -491,6 +504,11 @@ export class VesBuildWidget extends ReactWidget {
   protected toggleFilter = (type: BuildLogLineType): void => {
     this.state.logFilter =
       this.state.logFilter !== type ? type : BuildLogLineType.Normal;
+    this.update();
+  };
+
+  protected toggleAutoScroll = (): void => {
+    this.state.autoScroll = !this.state.autoScroll;
     this.update();
   };
 
