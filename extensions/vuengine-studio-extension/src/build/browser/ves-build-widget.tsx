@@ -11,14 +11,13 @@ import { VesDocumentationCommands } from '../../documentation/browser/ves-docume
 import { VesEmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
 import { VesExportCommands } from '../../export/browser/ves-export-commands';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
-import { VesPluginsPreferenceIds, VesPluginsPreferenceSchema } from '../../plugins/browser/ves-plugins-preferences';
+import { VesPluginsPreferenceIds } from '../../plugins/browser/ves-plugins-preferences';
 import { VesBuildCommands } from './ves-build-commands';
-import { VesBuildPreferenceIds, VesBuildPreferenceSchema } from './ves-build-preferences';
+import { VesBuildPreferenceIds } from './ves-build-preferences';
 import { VesBuildService } from './ves-build-service';
 import { BuildLogLine, BuildLogLineFileLink, BuildLogLineType, BuildMode, BuildResult } from './ves-build-types';
 
 interface VesBuildWidgetState {
-  showOptions: boolean
   logFilter: BuildLogLineType
   timerInterval: NodeJS.Timer | undefined
   outputRomExists: boolean
@@ -48,7 +47,6 @@ export class VesBuildWidget extends ReactWidget {
   static readonly LABEL = VesBuildCommands.BUILD.label || 'Build';
 
   protected state: VesBuildWidgetState = {
-    showOptions: false,
     logFilter: BuildLogLineType.Normal,
     timerInterval: undefined,
     outputRomExists: false,
@@ -208,133 +206,6 @@ export class VesBuildWidget extends ReactWidget {
             </div>
           )}
         </div>
-        {this.state.showOptions && (
-          <div className='buildOptions theia-settings-container'>
-            <div className='single-pref' key={`pref-${VesBuildPreferenceIds.BUILD_MODE}`}>
-              <div className='pref-name'>Build Mode</div>
-              <div className='pref-content-container string'>
-                <div className='pref-input'>
-                  <select
-                    className='theia-select'
-                    value={this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE)}
-                    onChange={e => this.setMode(e.currentTarget.value)}
-                  >
-                    {Object.keys(BuildMode).map((value, index) => (
-                      <option value={value}>
-                        {Object.values(BuildMode)[index]}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-            <div className='single-pref' key={`pref-${VesBuildPreferenceIds.DUMP_ELF}`}>
-              <div className='pref-name'>Dump Elf</div>
-              <div className='pref-content-container boolean'>
-                <div className='pref-description'>
-                  {VesBuildPreferenceSchema.properties[VesBuildPreferenceIds.DUMP_ELF].description}
-                </div>
-                <div className='pref-input'>
-                  <label>
-                    <input
-                      type='checkbox'
-                      className='theia-input'
-                      checked={this.preferenceService.get(VesBuildPreferenceIds.DUMP_ELF)}
-                      onChange={this.toggleDumpElf}
-                    />
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div className='single-pref' key={`pref-${VesBuildPreferenceIds.PEDANTIC_WARNINGS}`}>
-              <div className='pref-name'>Pedantic Warnings</div>
-              <div className='pref-content-container boolean'>
-                <div className='pref-description'>
-                  {VesBuildPreferenceSchema.properties[VesBuildPreferenceIds.PEDANTIC_WARNINGS].description}
-                </div>
-                <div className='pref-input'>
-                  <label>
-                    <input
-                      type='checkbox'
-                      className='theia-input'
-                      checked={this.preferenceService.get(VesBuildPreferenceIds.PEDANTIC_WARNINGS)}
-                      onChange={this.togglePedanticWarnings}
-                    />
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div className='single-pref' key={`pref-${VesBuildPreferenceIds.ENGINE_CORE_PATH}`}>
-              <div className='pref-name'>Engine Path</div>
-              <div className='pref-content-container string'>
-                <div className='pref-description'>
-                  {VesBuildPreferenceSchema.properties[VesBuildPreferenceIds.ENGINE_CORE_PATH].description}
-                </div>
-                <div className='pref-input'>
-                  <input
-                    type='text'
-                    className='theia-input'
-                    value={this.preferenceService.get(VesBuildPreferenceIds.ENGINE_CORE_PATH)}
-                    // TODO: this should not fire on every single keypress. use timeout?
-                    onChange={e => this.setEngineCorePath(e.currentTarget.value)}
-                  />
-                  <button
-                    className='theia-button secondary'
-                    onClick={() => this.selectFolder('Select core engine root folder', VesBuildPreferenceIds.ENGINE_CORE_PATH)}
-                  >
-                    <i className='fa fa-ellipsis-h' />
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div className='single-pref' key={`pref-${VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH}`}>
-              <div className='pref-name'>Plugins Library Path</div>
-              <div className='pref-content-container string'>
-                <div className='pref-description'>
-                  {VesPluginsPreferenceSchema.properties[VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH].description}
-                </div>
-                <div className='pref-input'>
-                  <input
-                    type='text'
-                    className='theia-input'
-                    value={this.preferenceService.get(VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH)}
-                    // TODO: this should not fire on every single keypress. use timeout?
-                    onChange={e => this.setEnginePluginsPath(e.currentTarget.value)}
-                  />
-                  <button
-                    className='theia-button secondary'
-                    onClick={() => this.selectFolder('Select plugins root folder', VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH)}
-                  >
-                    <i className='fa fa-ellipsis-h' />
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div className='single-pref' key={`pref-${VesPluginsPreferenceIds.USER_PLUGINS_PATH}`}>
-              <div className='pref-name'>User Plugins Path</div>
-              <div className='pref-content-container string'>
-                <div className='pref-description'>
-                  {VesPluginsPreferenceSchema.properties[VesPluginsPreferenceIds.USER_PLUGINS_PATH].description}
-                </div>
-                <div className='pref-input'>
-                  <input
-                    type='text'
-                    className='theia-input'
-                    value={this.preferenceService.get(VesPluginsPreferenceIds.USER_PLUGINS_PATH)}
-                    // TODO: this should not fire on every single keypress. use timeout?
-                    onChange={e => this.setUserPluginsPath(e.currentTarget.value)}
-                  />
-                  <button
-                    className='theia-button secondary'
-                    onClick={() => this.selectFolder('Select plugins root folder', VesPluginsPreferenceIds.USER_PLUGINS_PATH)}
-                  >
-                    <i className='fa fa-ellipsis-h' />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
         <div className='buildMeta'>
           {this.vesBuildService.buildStatus.log.length > 0 && (
             <div className='buildStatus'>
@@ -481,11 +352,6 @@ export class VesBuildWidget extends ReactWidget {
     }
   }
 
-  toggleBuildOptions(): void {
-    this.state.showOptions = !this.state.showOptions;
-    this.update();
-  }
-
   protected getDuration(): string {
     const startDate = this.vesBuildService.buildStatus.startDate || new Date();
     const endDate = this.vesBuildService.buildStatus.endDate || startDate;
@@ -571,13 +437,6 @@ export class VesBuildWidget extends ReactWidget {
   protected flash = () => this.commandService.executeCommand(VesFlashCartCommands.FLASH.id);
   protected export = () => this.commandService.executeCommand(VesExportCommands.EXPORT.id);
   protected clean = () => this.commandService.executeCommand(VesBuildCommands.CLEAN.id);
-
-  protected setMode = (mode: string) => this.commandService.executeCommand(VesBuildCommands.SET_MODE.id, mode);
-  protected toggleDumpElf = () => this.commandService.executeCommand(VesBuildCommands.TOGGLE_DUMP_ELF.id);
-  protected togglePedanticWarnings = () => this.commandService.executeCommand(VesBuildCommands.TOGGLE_PEDANTIC_WARNINGS.id);
-  protected setEngineCorePath = (path: string) => this.preferenceService.set(VesBuildPreferenceIds.ENGINE_CORE_PATH, path, PreferenceScope.User);
-  protected setEnginePluginsPath = (path: string) => this.preferenceService.set(VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH, path, PreferenceScope.User);
-  protected setUserPluginsPath = (path: string) => this.preferenceService.set(VesPluginsPreferenceIds.USER_PLUGINS_PATH, path, PreferenceScope.User);
 
   protected openWslDocs = () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'setup/enhancing-build-times-on-windows', false);
 }

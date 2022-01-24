@@ -18,7 +18,7 @@ export namespace VesBuildViewContributionCommands {
     };
     export const SETTINGS: Command = {
         id: `${VesBuildWidget.ID}.settings`,
-        label: 'Show Build Settings',
+        label: 'Show Build Preferences',
         iconClass: 'codicon codicon-settings',
     };
 }
@@ -66,9 +66,7 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
             isEnabled: () => true,
             isVisible: widget => widget !== undefined &&
                 widget.id === VesBuildWidget.ID,
-            execute: widget => widget !== undefined &&
-                widget.id === VesBuildWidget.ID &&
-                widget.toggleBuildOptions(),
+            execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'build'),
         });
     }
 

@@ -8,7 +8,6 @@ import { VesPluginsSearchMode } from './ves-plugins-search-model';
 import { VesPluginsSearchBar } from './ves-plugins-search-bar';
 
 export namespace VesPluginsViewCommands {
-
     const CATEGORY = 'Plugins';
 
     export const CLEAR_ALL: Command = {
@@ -17,10 +16,17 @@ export namespace VesPluginsViewCommands {
         label: 'Clear Search Results',
         iconClass: 'codicon codicon-clear-all'
     };
+
     export const HELP: Command = {
         id: 'vesPlugins.help',
         label: 'Show Handbook Page',
         iconClass: 'codicon codicon-book',
+    };
+
+    export const SETTINGS: Command = {
+        id: 'vesPlugins.settings',
+        label: 'Show Plugins Preferences',
+        iconClass: 'codicon codicon-settings',
     };
 }
 

@@ -1,16 +1,16 @@
-import { injectable, inject } from '@theia/core/shared/inversify';
-import { FrontendApplicationContribution } from '@theia/core/lib/browser';
-import { CommandContribution, CommandRegistry, CommandService } from '@theia/core/lib/common/command';
+import { CommonCommands, FrontendApplicationContribution } from '@theia/core/lib/browser';
 import { FrontendApplication } from '@theia/core/lib/browser/frontend-application';
+import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { AbstractViewContribution } from '@theia/core/lib/browser/shell/view-contribution';
+import { CommandContribution, CommandRegistry, CommandService } from '@theia/core/lib/common/command';
+import { inject, injectable } from '@theia/core/shared/inversify';
+import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
 import { VesPluginsCommands } from './ves-plugins-commands';
-import { VesPluginsViewCommands, VesPluginsViewContainer } from './ves-plugins-view-container';
 import { VesPluginsModel } from './ves-plugins-model';
 import { AUTHOR_SEARCH_QUERY, INSTALLED_QUERY, RECOMMENDED_QUERY, TAG_SEARCH_QUERY } from './ves-plugins-search-model';
-import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
-import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
-import { VesPluginsWidget } from './ves-plugins-widget';
 import { VesPluginsSourceOptions } from './ves-plugins-source';
+import { VesPluginsViewCommands, VesPluginsViewContainer } from './ves-plugins-view-container';
+import { VesPluginsWidget } from './ves-plugins-widget';
 
 @injectable()
 export class VesPluginsViewContribution extends AbstractViewContribution<VesPluginsViewContainer>
@@ -78,6 +78,16 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
         commandRegistry.registerCommand(VesPluginsCommands.SEARCH_BY_AUTHOR, {
             execute: (author?: string) => this.showSearchByAuthor(author)
         });
+
+        commandRegistry.registerCommand(VesPluginsViewCommands.SETTINGS, {
+            isEnabled: () => true,
+            isVisible: widget => widget !== undefined &&
+                [
+                    `${VesPluginsWidget.ID}:${VesPluginsSourceOptions.SEARCH_RESULT}`,
+                    VesPluginsViewContainer.ID
+                ].includes(widget.id),
+            execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'plugins'),
+        });
     }
 
     protected async showInstalledPlugins(): Promise<void> {
@@ -112,6 +122,12 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
             command: VesPluginsViewCommands.HELP.id,
             tooltip: VesPluginsViewCommands.HELP.label,
             priority: 1,
+        });
+        toolbar.registerItem({
+            id: VesPluginsViewCommands.SETTINGS.id,
+            command: VesPluginsViewCommands.SETTINGS.id,
+            tooltip: VesPluginsViewCommands.SETTINGS.label,
+            priority: 2,
         });
     }
 }
