@@ -7,6 +7,7 @@ import { EditorManager } from '@theia/editor/lib/browser';
 import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
 import { VesEmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
 import { VesExportCommands } from '../../export/browser/ves-export-commands';
@@ -40,6 +41,8 @@ export class VesBuildWidget extends ReactWidget {
   private readonly preferenceService: PreferenceService;
   @inject(VesBuildService)
   private readonly vesBuildService: VesBuildService;
+  @inject(VesCommonService)
+  private readonly vesCommonService: VesCommonService;
   @inject(WorkspaceService)
   private readonly workspaceService: WorkspaceService;
 
@@ -200,7 +203,7 @@ export class VesBuildWidget extends ReactWidget {
               <i className='fa fa-trash'></i>
             </button>
           </div>
-          {isWindows && !this.vesBuildService.isWslInstalled && (
+          {isWindows && !this.vesCommonService.isWslInstalled && (
             <div>
               <i className='fa fa-exclamation-triangle'></i> Please consider <a href='#' onClick={this.openWslDocs}>installing WSL</a> to massively improve build times.
             </div>
@@ -232,7 +235,7 @@ export class VesBuildWidget extends ReactWidget {
                 <span><i className='fa fa-wrench'></i> {this.vesBuildService.buildStatus.buildMode}</span>
                 {this.vesBuildService.buildStatus.active && this.vesBuildService.buildStatus.processId > 0 &&
                   <span><i className='fa fa-terminal'></i> PID {this.vesBuildService.buildStatus.processId}</span>}
-                {this.vesBuildService.isWslInstalled &&
+                {this.vesCommonService.isWslInstalled &&
                   <span><i className='fa fa-linux'></i> WSL</span>}
                 {!this.vesBuildService.buildStatus.active && this.vesBuildService.romSize > 0 &&
                   <span><i className='fa fa-microchip'></i> {this.vesBuildService.bytesToMbit(this.vesBuildService.romSize)} MBit</span>}

@@ -6,6 +6,7 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
@@ -31,6 +32,8 @@ export class VesEmulatorService {
   private readonly quickPickService: QuickPickService;
   @inject(VesBuildService)
   private readonly vesBuildService: VesBuildService;
+  @inject(VesCommonService)
+  private readonly vesCommonService: VesCommonService;
   @inject(VesProcessService)
   private readonly vesProcessService: VesProcessService;
   @inject(VesProjectsService)
@@ -203,11 +206,21 @@ export class VesEmulatorService {
    * even right after reconfiguring paths.
    */
   async fixPermissions(emulatorUri: URI): Promise<void> {
-    if (!isWindows) {
-      await this.vesProcessService.launchProcess(VesProcessType.Raw, {
-        command: 'chmod',
-        args: ['a+x', await this.fileService.fsPath(emulatorUri)]
-      });
+    let command = 'chmod';
+    let args = ['-R', 'a+x'];
+
+    if (isWindows) {
+      if (this.vesCommonService.isWslInstalled) {
+        command = 'wsl.exe';
+        args = ['chmod'].concat(args);
+      } else {
+        return;
+      }
     }
+
+    await this.vesProcessService.launchProcess(VesProcessType.Raw, {
+      command,
+      args: args.concat(await this.fileService.fsPath(emulatorUri)),
+    });
   }
 }

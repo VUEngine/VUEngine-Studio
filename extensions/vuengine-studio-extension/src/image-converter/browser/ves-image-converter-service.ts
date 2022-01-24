@@ -760,14 +760,22 @@ export class VesImageConverterService {
    * even right after reconfiguring paths.
    */
   async fixPermissions(gritUri: URI): Promise<void> {
-    if (!isWindows) {
-      if (await this.fileService.exists(gritUri)) {
-        await this.vesProcessService.launchProcess(VesProcessType.Raw, {
-          command: 'chmod',
-          args: ['a+x', await this.fileService.fsPath(gritUri)]
-        });
+    let command = 'chmod';
+    let args = ['-R', 'a+x'];
+
+    if (isWindows) {
+      if (this.vesCommonService.isWslInstalled) {
+        command = 'wsl.exe';
+        args = ['chmod'].concat(args);
+      } else {
+        return;
       }
     }
+
+    await this.vesProcessService.launchProcess(VesProcessType.Raw, {
+      command,
+      args: args.concat(await this.fileService.fsPath(gritUri)),
+    });
   }
 
   protected async getGritUri(): Promise<URI> {

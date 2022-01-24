@@ -248,15 +248,23 @@ export class VesFlashCartService {
    * even right after reconfiguring paths.
    */
   protected async fixPermissions(): Promise<void> {
+    let command = 'chmod';
+    let args = ['-R', 'a+x'];
+
     if (isWindows) {
-      return;
+      if (this.vesCommonService.isWslInstalled) {
+        command = 'wsl.exe';
+        args = ['chmod'].concat(args);
+      } else {
+        return;
+      }
     }
 
     for (const connectedFlashCart of this.connectedFlashCarts) {
       const flasherPath = await this.replaceFlasherPath(connectedFlashCart.config.path);
       await this.vesProcessService.launchProcess(VesProcessType.Raw, {
-        command: 'chmod',
-        args: ['a+x', flasherPath]
+        command,
+        args: args.concat(flasherPath),
       });
     }
   }
