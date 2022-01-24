@@ -26,12 +26,19 @@ export class VesFlashCartStatusBarContribution implements FrontendApplicationCon
     setConnectedFlashCartStatusBar(): void {
         let label = '';
         let className = '';
+        const labelMaxLength = 16;
         if (this.vesFlashCartService.connectedFlashCarts.length > 0) {
             const connectedFlashCartsNames = [];
             for (const connectedFlashCart of this.vesFlashCartService.connectedFlashCarts) {
                 connectedFlashCartsNames.push(connectedFlashCart.config.name);
             }
             label = connectedFlashCartsNames.join(', ');
+            if (label.length > labelMaxLength) {
+                label = `${label.substring(0, labelMaxLength)}...`;
+                if (connectedFlashCartsNames.length > 1) {
+                    label += ` (${connectedFlashCartsNames.length})`;
+                }
+            }
         } else {
             label = 'No Flash Carts';
             className = 'disabled';
