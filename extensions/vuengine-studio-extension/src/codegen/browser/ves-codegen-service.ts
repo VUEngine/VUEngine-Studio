@@ -116,7 +116,7 @@ export class VesCodeGenService {
     }
 
     const encoding = template.encoding ? template.encoding : TemplateEncoding.utf8;
-    const templateUri = new URI(template.template).withScheme('file');
+    const templateUri = template.template as URI;
     const templateString = (await this.fileService.readFile(templateUri)).value.toString();
     const additionalTemplateData = await this.getAdditionalTemplateData(template.data ?? [], resource);
 
@@ -200,8 +200,15 @@ export class VesCodeGenService {
       if (await this.fileService.exists(templatesFileUri)) {
         const templatesFileContent = await this.fileService.readFile(templatesFileUri);
         const templatesFileJson = JSON.parse(templatesFileContent.value.toString()) as Templates;
+        const templateDirUri = root
+          .resolve(VES_PREFERENCE_DIR)
+          .resolve(VES_PREFERENCE_TEMPLATES_DIR);
         await Promise.all(Object.values(templatesFileJson.templates).map(async template => {
-          template.template = await this.fileService.fsPath(root.resolve(join(VES_PREFERENCE_DIR, VES_PREFERENCE_TEMPLATES_DIR, ...template.template.split('/'))));
+          let templateUri = templateDirUri;
+          for (const part of (template.template as string).split('/')) {
+            templateUri = templateUri.resolve(part);
+          };
+          template.template = templateUri;
         }));
 
         this.templates = deepmerge(this.templates, templatesFileJson);

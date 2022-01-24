@@ -1,3 +1,5 @@
+import URI from '@theia/core/lib/common/uri';
+
 export interface Templates {
   events: {
     [TemplateEventType.fileChanged]: {
@@ -25,7 +27,7 @@ export interface Template {
   data?: Array<TemplateDataSource>
   root: TemplateRoot
   target: string
-  template: string
+  template: string | URI
   encoding?: TemplateEncoding
 }
 
