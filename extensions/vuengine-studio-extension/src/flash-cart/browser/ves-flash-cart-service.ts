@@ -18,7 +18,7 @@ import { IMAGE_FLASHBOY_PLUS } from './images/flashboy-plus';
 import { IMAGE_HYPERBOY } from './images/hyperboy';
 import { IMAGE_HYPERFLASH32 } from './images/hyperflash32';
 import { VesFlashCartCommands } from './ves-flash-cart-commands';
-import { VesFlashCartPreferenceIds, VesFlashCartPreferenceSchema } from './ves-flash-cart-preferences';
+import { BUILT_IN_FLASH_CART_CONFIGS, VesFlashCartPreferenceIds } from './ves-flash-cart-preferences';
 import {
   ConnectedFlashCart,
   FLASHBOY_PLUS_IMAGE_PLACEHOLDER,
@@ -495,12 +495,9 @@ export class VesFlashCartService {
 
   getFlashCartConfigs(): FlashCartConfig[] {
     const flashCartConfigs: FlashCartConfig[] = this.preferenceService.get(VesFlashCartPreferenceIds.FLASH_CARTS) ?? [];
+    const mergedFlashCartConfigs = flashCartConfigs.concat(BUILT_IN_FLASH_CART_CONFIGS);
 
-    const effectiveFlashCartConfigs = flashCartConfigs.length > 0
-      ? flashCartConfigs
-      : VesFlashCartPreferenceSchema.properties[VesFlashCartPreferenceIds.FLASH_CARTS].default;
-
-    return effectiveFlashCartConfigs.map((flashCartConfig: FlashCartConfig) => ({
+    return mergedFlashCartConfigs.map((flashCartConfig: FlashCartConfig) => ({
       ...flashCartConfig,
       image: flashCartConfig.image
         .replace(FLASHBOY_PLUS_IMAGE_PLACEHOLDER, IMAGE_FLASHBOY_PLUS)
