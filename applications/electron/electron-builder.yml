@@ -1,5 +1,5 @@
 appId: dev.vuengine.studio
-productName: VUEngine
+productName: VUEngine Studio
 copyright: Copyright © 2006-2021 VUEngine
 electronDist: ../../node_modules/electron/dist
 electronVersion: 9.4.4
