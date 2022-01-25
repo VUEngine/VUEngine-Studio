@@ -143,7 +143,7 @@ export class VesEmulatorService {
   async runInEmulator(): Promise<void> {
     const defaultEmulatorConfig = this.getDefaultEmulatorConfig();
     await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     const romUri = workspaceRootUri.resolve('build').resolve('output.vb');
     if (defaultEmulatorConfig === DEFAULT_EMULATOR) {
       const opener = await this.openerService.getOpener(romUri);

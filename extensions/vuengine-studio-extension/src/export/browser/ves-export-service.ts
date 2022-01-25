@@ -80,7 +80,7 @@ export class VesExportService {
 
   protected async exportRom(): Promise<void> {
     await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     const romUri = workspaceRootUri.resolve('build').resolve('output.vb');
     let exists: boolean = false;
     let overwrite: boolean = false;

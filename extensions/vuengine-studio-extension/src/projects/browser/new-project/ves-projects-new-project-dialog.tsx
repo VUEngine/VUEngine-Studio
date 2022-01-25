@@ -112,7 +112,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
         const projectsBaseUri = this.createProjectFormComponentRef.current?.state.path
             ? new URI(this.createProjectFormComponentRef.current?.state.path).withScheme('file')
             : await this.vesProjectsPathsService.getProjectsBaseUri();
-        const pathExists = await this.fileService.exists(projectsBaseUri) 
+        const pathExists = await this.fileService.exists(projectsBaseUri)
             && (await this.fileService.resolve(projectsBaseUri)).isDirectory;
 
         if (!pathExists) {

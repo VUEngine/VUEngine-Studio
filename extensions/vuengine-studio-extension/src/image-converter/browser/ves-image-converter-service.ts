@@ -551,7 +551,7 @@ export class VesImageConverterService {
 
   protected async getImageConfigFilesToBeConverted(changedOnly: boolean): Promise<Array<ImageConfigFileToBeConverted>> {
     await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
 
     const imageConfigFilesToBeConverted: Array<ImageConfigFileToBeConverted> = [];
     const imageConfigFiles = await this.vesGlobService.find(await this.fileService.fsPath(workspaceRootUri), '**/*.image.json');
@@ -830,7 +830,7 @@ export class VesImageConverterService {
     };*/
 
     await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
 
     const imageConfigFiles = await this.vesGlobService.find(await this.fileService.fsPath(workspaceRootUri), '**/*.image.json');
 

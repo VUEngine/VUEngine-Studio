@@ -197,7 +197,7 @@ export class VesPluginsService {
 
   async getPluginsFileUri(): Promise<URI> {
     await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     return workspaceRootUri
       .resolve('config')
       .resolve('Plugins.json');

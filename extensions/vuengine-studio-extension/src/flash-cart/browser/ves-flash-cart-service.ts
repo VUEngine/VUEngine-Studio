@@ -187,7 +187,7 @@ export class VesFlashCartService {
       }
 
       await this.workspaceService.ready;
-      const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+      const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
       const defaultRomUri = workspaceRootUri.resolve('build').resolve('output.vb');
       const romUri = connectedFlashCart.config.padRom &&
         await this.padRom(connectedFlashCart.config.size)
@@ -394,7 +394,7 @@ export class VesFlashCartService {
 
   protected async padRom(size: number): Promise<boolean> {
     await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     const romUri = workspaceRootUri.resolve('build').resolve('output.vb');
     const paddedRomUri = await this.getPaddedRomUri(size);
     if (!await this.vesBuildService.outputRomExists()) {
@@ -422,7 +422,7 @@ export class VesFlashCartService {
 
   protected async getPaddedRomUri(size: number): Promise<URI> {
     await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     return workspaceRootUri.resolve('build').resolve(`outputPadded${size}.vb`);
   }
 

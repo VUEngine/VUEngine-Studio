@@ -205,14 +205,14 @@ export class VesBuildService {
 
   async outputRomExists(): Promise<boolean> {
     await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     const romUri = workspaceRootUri.resolve('build').resolve('output.vb');
     return this.fileService.exists(romUri);
   }
 
   protected async determineRomSize(): Promise<void> {
     await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     const romUri = workspaceRootUri.resolve('build').resolve('output.vb');
     if (await this.fileService.exists(romUri)) {
       const outputRom = await this.fileService.resolve(romUri, { resolveMetadata: true });
@@ -356,7 +356,7 @@ export class VesBuildService {
 
   protected async getBuildProcessParams(): Promise<ProcessOptions> {
     await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     const buildMode = (this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as string).toLowerCase();
     const dumpElf = this.preferenceService.get(VesBuildPreferenceIds.DUMP_ELF) as boolean;
     const pedanticWarnings = this.preferenceService.get(VesBuildPreferenceIds.PEDANTIC_WARNINGS) as boolean;
@@ -459,7 +459,7 @@ export class VesBuildService {
 
   protected async deleteRom(): Promise<void> {
     await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     const romUri = workspaceRootUri.resolve('build').resolve('output.vb');
     if (await this.fileService.exists(romUri)) {
       this.fileService.delete(romUri);
@@ -468,7 +468,7 @@ export class VesBuildService {
 
   protected async getBuildPathUri(buildMode?: BuildMode): Promise<URI> {
     await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     const buildPathUri = workspaceRootUri.resolve('build');
 
     return buildMode

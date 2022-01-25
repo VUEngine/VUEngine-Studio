@@ -27,48 +27,63 @@ export class VesProjectsService {
   @postConstruct()
   protected async init(): Promise<void> {
     // watch for project config file changes
-    await this.workspaceService.ready;
     const configFileUri = await this.getProjectConfigFileUri();
-    this.fileService.onDidFilesChange((fileChangesEvent: FileChangesEvent) => {
-      if (fileChangesEvent.contains(configFileUri)) {
-        this.onDidChangeProjectFileEmitter.fire();
-      }
-    });
+    if (configFileUri) {
+      this.fileService.onDidFilesChange((fileChangesEvent: FileChangesEvent) => {
+        if (fileChangesEvent.contains(configFileUri)) {
+          this.onDidChangeProjectFileEmitter.fire();
+        }
+      });
+    }
   }
 
-  async getProjectName(): Promise<string> {
+  async getProjectName(projectRootUri?: URI): Promise<string> {
     let projectTitle = '';
+    let isWorkspace = this.workspaceService.workspace?.isFile || false;
+
+    if (projectRootUri && !(await this.fileService.resolve(projectRootUri)).isDirectory) {
+      projectRootUri = projectRootUri.parent;
+      isWorkspace = true;
+    }
+
     // Attempt to retrieve project name from configuration file
-    const projectFileUri = await this.getProjectConfigFileUri();
-    if (await this.fileService.exists(projectFileUri)) {
+    const projectFileUri = await this.getProjectConfigFileUri(projectRootUri);
+    if (projectFileUri && await this.fileService.exists(projectFileUri)) {
       const configFileContents = await this.fileService.readFile(projectFileUri);
       const projectData = JSON.parse(configFileContents.value.toString());
       if (projectData.name) {
         projectTitle = projectData.name;
+        if (isWorkspace) {
+          projectTitle += ' (Workspace)';
+        }
       }
     };
 
-    // Get from workspace service
-    if (projectTitle === '') {
-      const workspace = this.workspaceService.workspace;
-      if (workspace !== undefined) {
-        if (this.workspaceService.workspace?.isFile) {
-          const workspaceParts = workspace.name.split('.');
-          workspaceParts.pop();
-          projectTitle = workspaceParts.join('.');
-        } else {
-          projectTitle = workspace.name;
-        }
+    // Get from workspace service instead
+    if (projectTitle === '' && this.workspaceService.workspace) {
+      if (this.workspaceService.workspace?.isFile) {
+        const workspaceParts = this.workspaceService.workspace.name.split('.');
+        workspaceParts.pop();
+        projectTitle = workspaceParts.join('.');
+      } else {
+        projectTitle = this.workspaceService.workspace.name;
       }
     }
 
-    return projectTitle;
+    return projectTitle || projectRootUri?.path?.base || 'VUEngine Studio';
   }
 
-  protected async getProjectConfigFileUri(): Promise<URI> {
-    await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
-    return workspaceRootUri.resolve('config').resolve('Project.json');
+  protected async getProjectConfigFileUri(projectRootUri?: URI): Promise<URI | undefined> {
+    let workspaceRootUri = undefined;
+
+    if (projectRootUri) {
+      workspaceRootUri = projectRootUri;
+    } else {
+      await this.workspaceService.ready;
+      workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
+    }
+
+    return workspaceRootUri && workspaceRootUri.resolve('config').resolve('Project.json');
   }
 
   async createProjectFromTemplate(

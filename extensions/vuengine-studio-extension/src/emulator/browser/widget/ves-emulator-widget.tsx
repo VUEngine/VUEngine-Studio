@@ -340,7 +340,7 @@ export class VesEmulatorWidget extends ReactWidget {
 
   protected startEmulator = async () => {
     await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     const defaultRomUri = workspaceRootUri.resolve('build').resolve('output.vb');
     let romPath = this.options ? this.options.uri : defaultRomUri;
     if (typeof romPath !== 'string') {
@@ -685,7 +685,7 @@ export class VesEmulatorWidget extends ReactWidget {
     }
 
     await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     const fileUri = workspaceRootUri
       .resolve('screenshots')
       .resolve(filename);

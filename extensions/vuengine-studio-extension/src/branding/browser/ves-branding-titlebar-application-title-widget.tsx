@@ -46,11 +46,8 @@ export class VesTitlebarApplicationTitleWidget extends ReactWidget {
   }
 
   protected async setTitle(): Promise<void> {
-    const projectTitle = await this.vesProjectsService.getProjectName();
-    if (projectTitle !== '') {
-      this.applicationTitle = projectTitle;
-      this.update();
-    }
+    this.applicationTitle = await this.vesProjectsService.getProjectName();
+    this.update();
   }
 
   protected render(): React.ReactNode {

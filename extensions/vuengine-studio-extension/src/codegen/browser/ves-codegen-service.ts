@@ -81,7 +81,7 @@ export class VesCodeGenService {
       if ([FileChangeType.ADDED, FileChangeType.UPDATED].includes(fileChange.type)) {
         Object.keys(this.templates.events.fileChanged).map(async file => {
           await this.workspaceService.ready;
-          const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+          const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
           const templateFileUri = workspaceRootUri.resolve(join(...file.split('/')));
           if (fileChange.resource.isEqual(templateFileUri)) {
             await Promise.all(this.templates.events.fileChanged[file].map(async templateId => {
@@ -129,7 +129,7 @@ export class VesCodeGenService {
           return;
         }
         await this.workspaceService.ready;
-        const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+        const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
         const files = await this.vesGlobService.find(await this.fileService.fsPath(workspaceRootUri), `**/*${template.ending}`);
         for (const file of files) {
           await this.renderFileFromTemplate(template, templateString, additionalTemplateData, encoding, new URI(file).withScheme('file'));
@@ -343,7 +343,7 @@ export class VesCodeGenService {
       default:
       case TemplateRoot.workspace:
         await this.workspaceService.ready;
-        const workspaceRootUri = this.workspaceService.tryGetRoots()[0].resource;
+        const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
         roots.push(workspaceRootUri);
         break;
     }

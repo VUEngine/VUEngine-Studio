@@ -1,65 +1,67 @@
-.ves-welcome-action-container {
+.gs-action-container {
     line-height: 20px;
 }
 
-.ves-welcome-action-details {
+.gs-action-details {
     padding-left: 5px;
     color: var(--theia-descriptionForeground);
 }
 
-.ves-welcome-container {
+.gs-container {
     padding: 20px;
 }
 
-.ves-welcome-header h1 {
+.gs-header h1 {
     flex: 1;
     font-weight: 600;
 }
 
-.ves-welcome-hr {
+.gs-hr {
     background-color: var(--theia-contrastBorder);
     height: 1px;
     border: 0;
     margin: 0px;
 }
 
-.ves-welcome-empty {
+.gs-empty {
     color: var(--theia-descriptionForeground);
     font-style: italic;
 }
 
-.ves-welcome-container a {
+.gs-container a {
     border: none;
     cursor: pointer;
     font-weight: 500;
     text-decoration: none;
 }
 
-.ves-welcome-container .theia-button:first-child {
+.gs-container .theia-button:first-child {
     margin-left: 0;
 }
 
-.ves-welcome-container a:hover {
+.gs-container a:hover {
     text-decoration: underline;
 }
 
-.ves-welcome-section-header {
+.gs-section-header {
     font-size: var(--theia-ui-font-size2);
     font-weight: 600;
     margin: 20px 0 5px;
 }
 
-.ves-welcome-section-header i {
+.gs-section-header i.codicon {
+    font-size: 18px;
     padding-right: 5px;
+    vertical-align: text-top;
 }
 
-.ves-welcome-sub-header {
+.gs-sub-header {
     color: var(--theia-descriptionForeground);
     text-transform: capitalize;
     font-weight: 400;
 }
 
-.ves-welcome-preference{
+.gs-preference{
     margin-top: 20px;
     align-items: center;
     display: flex;
