@@ -109,7 +109,7 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
                 </h3>
                 <div className="ves-welcome-action-container">
                     <a href="#" onClick={this.openHandbook}>
-                        Show documentation
+                        Show Documentation
                     </a>
                 </div>
             </div>

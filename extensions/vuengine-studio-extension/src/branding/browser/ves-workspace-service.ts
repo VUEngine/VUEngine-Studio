@@ -21,18 +21,20 @@ export class VesWorkspaceService extends WorkspaceService {
         super.init();
 
         this.preferenceService.onPreferenceChanged(async ({ preferenceName }) => {
-            switch (preferenceName) {
-                case VesBuildPreferenceIds.ENGINE_CORE_PATH:
-                case VesBuildPreferenceIds.ENGINE_CORE_INCLUDE_IN_WORKSPACE:
-                case VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH:
-                case VesPluginsPreferenceIds.ENGINE_PLUGINS_INCLUDE_IN_WORKSPACE:
-                case VesPluginsPreferenceIds.USER_PLUGINS_PATH:
-                case VesPluginsPreferenceIds.USER_PLUGINS_INCLUDE_IN_WORKSPACE:
-                    if (!this._workspace?.isDirectory) {
-                        await this.computeRoots();
-                        this.updateWorkspace();
-                    }
-                    break;
+            if (this.opened) {
+                switch (preferenceName) {
+                    case VesBuildPreferenceIds.ENGINE_CORE_PATH:
+                    case VesBuildPreferenceIds.ENGINE_CORE_INCLUDE_IN_WORKSPACE:
+                    case VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH:
+                    case VesPluginsPreferenceIds.ENGINE_PLUGINS_INCLUDE_IN_WORKSPACE:
+                    case VesPluginsPreferenceIds.USER_PLUGINS_PATH:
+                    case VesPluginsPreferenceIds.USER_PLUGINS_INCLUDE_IN_WORKSPACE:
+                        if (!this._workspace?.isDirectory) {
+                            await this.computeRoots();
+                            this.updateWorkspace();
+                        }
+                        break;
+                }
             }
         });
     }
@@ -50,7 +52,7 @@ export class VesWorkspaceService extends WorkspaceService {
     protected async getEngineRoots(): Promise<Array<FileStat>> {
         const roots: Array<FileStat> = [];
 
-        if (!this._workspace?.isDirectory) {
+        if (this.opened && !this._workspace?.isDirectory) {
             const engineCoreInclude = this.preferenceService.get<boolean>(VesBuildPreferenceIds.ENGINE_CORE_INCLUDE_IN_WORKSPACE);
             if (engineCoreInclude) {
                 const engineCoreUri = await this.vesBuildPathsService.getEngineCoreUri();
