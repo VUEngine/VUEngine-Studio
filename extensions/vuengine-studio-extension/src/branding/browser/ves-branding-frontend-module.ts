@@ -33,7 +33,7 @@ import { PreferenceTreeGenerator } from '@theia/preferences/lib/browser/util/pre
 import { PreferenceStringInputRenderer } from '@theia/preferences/lib/browser/views/components/preference-string-input';
 import { ScmHistoryContribution } from '@theia/scm-extra/lib/browser/history/scm-history-contribution';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import '../../../src/branding/browser/style/index.css';
+import { QuickOpenWorkspace } from '@theia/workspace/lib/browser/quick-open-workspace';
 import { VesGlobService, VES_GLOB_SERVICE_PATH } from '../common/ves-glob-service-protocol';
 import { VesAboutDialog } from './ves-branding-about-dialog';
 import { VesApplicationShell } from './ves-branding-application-shell';
@@ -59,7 +59,9 @@ import { VesTitlebarWindowControlsWidget } from './ves-branding-titlebar-window-
 import { VesCommonService } from './ves-common-service';
 import { VesNavigatorWidgetFactory } from './ves-navigator-widget-factory';
 import { VesPreferenceStringInputRenderer } from './ves-preference-string-input-renderer';
+import { VesQuickOpenWorkspace } from './ves-quick-open-workspace';
 import { VesWorkspaceService } from './ves-workspace-service';
+import '../../../src/branding/browser/style/index.css';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // preferences
@@ -166,6 +168,10 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // remove "test" view
     bind(VesPluginContribution).toSelf().inSingletonScope();
     rebind(PluginViewRegistry).toService(VesPluginContribution);
+
+    // quick open workspace
+    bind(VesQuickOpenWorkspace).toSelf().inSingletonScope();
+    rebind(QuickOpenWorkspace).toService(VesQuickOpenWorkspace);
 
     // workspace service
     bind(VesWorkspaceService).toSelf().inSingletonScope();

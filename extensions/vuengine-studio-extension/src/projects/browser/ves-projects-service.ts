@@ -39,7 +39,7 @@ export class VesProjectsService {
 
   async getProjectName(projectRootUri?: URI): Promise<string> {
     let projectTitle = '';
-    let isWorkspace = this.workspaceService.workspace?.isFile || false;
+    let isWorkspace = !projectRootUri && this.workspaceService.workspace?.isFile || false;
 
     if (projectRootUri && !(await this.fileService.resolve(projectRootUri)).isDirectory) {
       projectRootUri = projectRootUri.parent;
@@ -53,14 +53,11 @@ export class VesProjectsService {
       const projectData = JSON.parse(configFileContents.value.toString());
       if (projectData.name) {
         projectTitle = projectData.name;
-        if (isWorkspace) {
-          projectTitle += ' (Workspace)';
-        }
       }
     };
 
     // Get from workspace service instead
-    if (projectTitle === '' && this.workspaceService.workspace) {
+    if (!projectTitle && !projectRootUri && this.workspaceService.workspace) {
       if (this.workspaceService.workspace?.isFile) {
         const workspaceParts = this.workspaceService.workspace.name.split('.');
         workspaceParts.pop();
@@ -70,7 +67,17 @@ export class VesProjectsService {
       }
     }
 
-    return projectTitle || projectRootUri?.path?.base || 'VUEngine Studio';
+    // Use base path instead
+    if (!projectTitle) {
+      projectTitle = projectRootUri?.path?.base || '';
+    }
+
+    // Append workspace suffix if applicable
+    if (projectTitle && isWorkspace) {
+      projectTitle += ' (Workspace)';
+    }
+
+    return projectTitle || 'VUEngine Studio';
   }
 
   protected async getProjectConfigFileUri(projectRootUri?: URI): Promise<URI | undefined> {
