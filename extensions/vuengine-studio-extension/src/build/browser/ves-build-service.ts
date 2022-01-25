@@ -206,15 +206,15 @@ export class VesBuildService {
   async outputRomExists(): Promise<boolean> {
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-    const romUri = workspaceRootUri.resolve('build').resolve('output.vb');
-    return this.fileService.exists(romUri);
+    const romUri = workspaceRootUri && workspaceRootUri.resolve('build').resolve('output.vb');
+    return romUri && this.fileService.exists(romUri);
   }
 
   protected async determineRomSize(): Promise<void> {
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-    const romUri = workspaceRootUri.resolve('build').resolve('output.vb');
-    if (await this.fileService.exists(romUri)) {
+    const romUri = workspaceRootUri && workspaceRootUri.resolve('build').resolve('output.vb');
+    if (romUri && await this.fileService.exists(romUri)) {
       const outputRom = await this.fileService.resolve(romUri, { resolveMetadata: true });
       this.romSize = outputRom.size;
     } else {
@@ -229,11 +229,14 @@ export class VesBuildService {
         if (state === 'attached_shell') {
           for (const buildMode in BuildMode) {
             if (BuildMode.hasOwnProperty(buildMode)) {
-              this.fileService
-                .exists(await this.getBuildPathUri(buildMode as BuildMode))
-                .then((exists: boolean) => {
-                  this.setBuildFolderExists(buildMode, exists);
-                });
+              const buildPathUri = await this.getBuildPathUri(buildMode as BuildMode);
+              if (buildPathUri) {
+                this.fileService
+                  .exists(buildPathUri)
+                  .then((exists: boolean) => {
+                    this.setBuildFolderExists(buildMode, exists);
+                  });
+              }
             }
           }
 
@@ -247,10 +250,12 @@ export class VesBuildService {
       for (const buildMode in BuildMode) {
         if (BuildMode.hasOwnProperty(buildMode)) {
           const buildPathUri = await this.getBuildPathUri(buildMode as BuildMode);
-          if (fileChangesEvent.contains(buildPathUri, FileChangeType.ADDED)) {
-            this.setBuildFolderExists(buildMode, true);
-          } else if (fileChangesEvent.contains(buildPathUri, FileChangeType.DELETED)) {
-            this.setBuildFolderExists(buildMode, false);
+          if (buildPathUri) {
+            if (fileChangesEvent.contains(buildPathUri, FileChangeType.ADDED)) {
+              this.setBuildFolderExists(buildMode, true);
+            } else if (fileChangesEvent.contains(buildPathUri, FileChangeType.DELETED)) {
+              this.setBuildFolderExists(buildMode, false);
+            }
           }
         }
       }
@@ -466,9 +471,13 @@ export class VesBuildService {
     }
   }
 
-  protected async getBuildPathUri(buildMode?: BuildMode): Promise<URI> {
+  protected async getBuildPathUri(buildMode?: BuildMode): Promise<URI | undefined> {
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
+    if (!workspaceRootUri) {
+      return;
+    }
+
     const buildPathUri = workspaceRootUri.resolve('build');
 
     return buildMode
@@ -704,12 +713,17 @@ export class VesBuildService {
     const buildModePathUri = await this.getBuildPathUri(buildMode);
     const buildPathUri = await this.getBuildPathUri();
 
-    await this.fileService.delete(buildModePathUri, { recursive: true });
-    const files = await this.fileService.resolve(buildPathUri);
-    if (files.children) {
-      for (const child of files.children) {
-        if (child.name.endsWith('.a')) {
-          this.fileService.delete(child.resource);
+    if (buildModePathUri) {
+      await this.fileService.delete(buildModePathUri, { recursive: true });
+    }
+
+    if (buildPathUri) {
+      const files = await this.fileService.resolve(buildPathUri);
+      if (files.children) {
+        for (const child of files.children) {
+          if (child.name.endsWith('.a')) {
+            this.fileService.delete(child.resource);
+          }
         }
       }
     }

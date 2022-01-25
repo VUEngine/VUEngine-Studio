@@ -48,7 +48,7 @@ export class VesPluginsService {
     // Re-determine installedPlugins when plugins file changes
     this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
       const pluginsFileUri = await this.getPluginsFileUri();
-      if (fileChangesEvent.contains(pluginsFileUri)) {
+      if (pluginsFileUri && fileChangesEvent.contains(pluginsFileUri)) {
         await this.determineInstalledPlugins();
         this.onDidChangeInstalledPluginsEmitter.fire();
       }
@@ -83,9 +83,11 @@ export class VesPluginsService {
   async determineInstalledPlugins(): Promise<Array<string>> {
     try {
       const pluginsFileUri = await this.getPluginsFileUri();
-      const fileContent = await this.fileService.readFile(pluginsFileUri);
-      const fileContentParsed = JSON.parse(fileContent.value.toString());
-      this.installedPlugins = fileContentParsed;
+      if (pluginsFileUri) {
+        const fileContent = await this.fileService.readFile(pluginsFileUri);
+        const fileContentParsed = JSON.parse(fileContent.value.toString());
+        this.installedPlugins = fileContentParsed;
+      }
       this._ready.resolve();
       return this.installedPlugins;
     } catch (e) {
@@ -195,17 +197,19 @@ export class VesPluginsService {
     return searchResult;
   }
 
-  async getPluginsFileUri(): Promise<URI> {
+  async getPluginsFileUri(): Promise<URI | undefined> {
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-    return workspaceRootUri
+    return workspaceRootUri && workspaceRootUri
       .resolve('config')
       .resolve('Plugins.json');
   }
 
   protected async writeInstalledPluginsToFile(): Promise<void> {
     const pluginsFileUri = await this.getPluginsFileUri();
-    const updatedFileContent = JSON.stringify(this.installedPlugins.sort(), null, 4);
-    await this.fileService.writeFile(pluginsFileUri, BinaryBuffer.fromString(updatedFileContent));
+    if (pluginsFileUri) {
+      const updatedFileContent = JSON.stringify(this.installedPlugins.sort(), null, 4);
+      await this.fileService.writeFile(pluginsFileUri, BinaryBuffer.fromString(updatedFileContent));
+    }
   }
 }

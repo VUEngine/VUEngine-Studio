@@ -82,11 +82,13 @@ export class VesCodeGenService {
         Object.keys(this.templates.events.fileChanged).map(async file => {
           await this.workspaceService.ready;
           const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-          const templateFileUri = workspaceRootUri.resolve(join(...file.split('/')));
-          if (fileChange.resource.isEqual(templateFileUri)) {
-            await Promise.all(this.templates.events.fileChanged[file].map(async templateId => {
-              await this.renderTemplate(templateId, fileChange.resource);
-            }));
+          if (workspaceRootUri) {
+            const templateFileUri = workspaceRootUri.resolve(join(...file.split('/')));
+            if (fileChange.resource.isEqual(templateFileUri)) {
+              await Promise.all(this.templates.events.fileChanged[file].map(async templateId => {
+                await this.renderTemplate(templateId, fileChange.resource);
+              }));
+            }
           }
         });
         Object.keys(this.templates.events.fileWithEndingChanged).map(async fileEnding => {
@@ -344,7 +346,9 @@ export class VesCodeGenService {
       case TemplateRoot.workspace:
         await this.workspaceService.ready;
         const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-        roots.push(workspaceRootUri);
+        if (workspaceRootUri) {
+          roots.push(workspaceRootUri);
+        }
         break;
     }
 

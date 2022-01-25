@@ -15,7 +15,7 @@ export class VesPluginsOpenHandler extends WidgetOpenHandler<VesPluginsWidget> {
 
     async canHandle(uri: URI): Promise<number> {
         const pluginsFileUri = await this.vesPluginsService.getPluginsFileUri();
-        if (uri.isEqual(pluginsFileUri)) {
+        if (pluginsFileUri && uri.isEqual(pluginsFileUri)) {
             return Number.MAX_SAFE_INTEGER;
         }
 
