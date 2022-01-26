@@ -7,6 +7,7 @@
 @import "icons.css";
 @import "input.css";
 @import "logo.css";
+/* @import "monaco.css"; */
 @import "maximized.css";
 @import "menu.css";
 @import "preferences.css";
@@ -15,6 +16,7 @@
 @import "sidepanel.css";
 @import "statusbar.css";
 @import "tabbar.css";
+/* @import "tabs.css"; */
 @import "titlebar.css";
 @import "titlebar-action-buttons.css";
 @import "titlebar-application-title.css";

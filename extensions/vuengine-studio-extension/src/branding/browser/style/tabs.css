@@ -1,0 +1,4 @@
+#theia-main-content-panel,
+#theia-main-content-panel .p-Widget.p-DockPanel-widget {
+    background: transparent;
+}

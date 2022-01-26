@@ -1,10 +1,10 @@
+import { isWindows } from '@theia/core';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { join } from 'path';
 import { VES_PREFERENCE_DIR } from '../../branding/browser/ves-branding-preference-configurations';
 import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { VesNewProjectTemplate } from './new-project/ves-projects-new-project-form';
@@ -159,14 +159,18 @@ export class VesProjectsService {
   }
 
   protected async replaceInProject(uri: URI, from: string, to: string): Promise<void> {
-    const basepath = await this.fileService.fsPath(uri);
+    let basepath = await this.fileService.fsPath(uri);
+
+    if (isWindows) {
+      basepath = basepath.replace(/\\/g, '/');
+    }
 
     if (to && from) {
       return replaceInFiles({
         files: [
-          join(basepath, '**', '*.*'),
-          join(basepath, '*.*'),
-          join(basepath, '*'),
+          `${basepath}/**/*.*`,
+          `${basepath}/*.*`,
+          `${basepath}/*`,
         ],
         from,
         to,
