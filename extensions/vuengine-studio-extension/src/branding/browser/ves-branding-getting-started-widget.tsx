@@ -8,11 +8,14 @@ import { VesDocumentationCommands } from '../../documentation/browser/ves-docume
 import { VesProjectsCommands } from '../../projects/browser/ves-projects-commands';
 import { VesProjectsService } from '../../projects/browser/ves-projects-service';
 import { VesBrandingPreferenceIds } from './ves-branding-preferences';
+import { VesCommonService } from './ves-common-service';
 
 @injectable()
 export class VesGettingStartedWidget extends GettingStartedWidget {
     @inject(PreferenceService)
     protected readonly preferenceService: PreferenceService;
+    @inject(VesCommonService)
+    protected readonly vesCommonService: VesCommonService;
     @inject(VesProjectsService)
     protected readonly vesProjectsService: VesProjectsService;
 
@@ -211,7 +214,7 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
         for (const workspace of this.recentWorkspaces.slice(0, this.recentLimit)) {
             const uri = new URI(workspace);
             const pathLabel = this.labelProvider.getLongName(uri);
-            const path = this.home ? Path.tildify(pathLabel, this.home) : pathLabel;
+            const path = this.vesCommonService.formatPath(this.home ? Path.tildify(pathLabel, this.home) : pathLabel);
             const name = await this.vesProjectsService.getProjectName(uri);
 
             this.vesRecentWorkspaces.push({

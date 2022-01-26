@@ -4,13 +4,16 @@ import { inject, injectable } from '@theia/core/shared/inversify';
 import { FileStat } from '@theia/filesystem/lib/common/files';
 import { QuickOpenWorkspace } from '@theia/workspace/lib/browser/quick-open-workspace';
 import { VesProjectsService } from '../../projects/browser/ves-projects-service';
+import { VesCommonService } from './ves-common-service';
 
 @injectable()
 export class VesQuickOpenWorkspace extends QuickOpenWorkspace {
+    @inject(VesCommonService)
+    protected readonly vesCommonService: VesCommonService;
     @inject(VesProjectsService)
     protected readonly vesProjectsService: VesProjectsService;
 
-    // TODO: had to override the entire function to change a single line (marked below),
+    // TODO: had to override the entire function to change two lines (marked below),
     // ensure to keep this up to date with Theia
     async open(workspaces: string[]): Promise<void> {
         this.items = [];
@@ -42,7 +45,7 @@ export class VesQuickOpenWorkspace extends QuickOpenWorkspace {
 
             this.items.push({
                 label: await this.vesProjectsService.getProjectName(uri), // Modified line
-                description: Path.tildify(uri.path.toString(), home),
+                description: this.vesCommonService.formatPath(Path.tildify(uri.path.toString(), home)), // Modified line
                 iconClasses,
                 buttons: [this.removeRecentWorkspaceButton],
                 resource: uri,
