@@ -1,16 +1,18 @@
 # VUEngine Studio
 
-A Nintendo Virtual Boy development environment.
+VUEngine Studio is a custom integrated development environment (IDE), tailor-made for Virtual Boy game development with [VUEngine](https://github.com/VUEngine/VUEngine-Core), our versatile, object oriented Nintendo Virtual Boy game engine.
+
+<img src="VUEngine-Studio.png?raw=true" style="max-width:800px;margin-left:-30px;">
 
 
 ## License
 
-VUEngine Studio is build with Eclipse Theia.
+VUEngine Studio is built upon Eclipse Theia, a framework for building cloud and desktop IDEs using modern, state-of-the-art web technologies.
 
 - [Eclipse Public License 2.0](LICENSE)
 - [一 (Secondary) GNU General Public License, version 2 with the GNU Classpath Exception](LICENSE)
 
-Excluded are the following third party binaries that are shipped with VUEngine Studio: 
+The following third party binaries that are shipped with VUEngine Studio come with their own licenses: 
 
 - GCC by The GNU Project, with patches for V810 by ElmerPCFX
 - Grit by Jasper Vijn, with patches for Virtual Boy by dasi
@@ -20,7 +22,14 @@ Excluded are the following third party binaries that are shipped with VUEngine S
 - RetroArch Web w/ Beetle VB core by the RetroArch and Mednafen teams
 
 
-## Prerequisites
+## Usage
+
+Documentation on how to use VUEngine Studio can be found at https://www.vuengine.dev/documentation/.
+
+
+## Building
+
+### Prerequisites
 
 Download node.js 12.14.1 and install. You can download it from https://nodejs.org/en/download/releases/ or alternatively use nvm (Node Version Manager). On Windows, you'll need to grab nvm-windows from https://github.com/coreybutler/nvm-windows instead.
 
@@ -42,7 +51,7 @@ On Windows, install Visual Studio Build Tools.
 Install Python.
 
 
-## Init
+### Init
 
 After cloning, load git submodules with
 
@@ -51,13 +60,6 @@ After cloning, load git submodules with
 They can be updated at a later point with
 
     yarn modules:update
-
-
-## Development
-
-### Documentation
-
-Documentation on how to package Theia as a Desktop Product may be found [here](https://theia-ide.org/docs/blueprint_documentation/)
 
 
 ### Build
