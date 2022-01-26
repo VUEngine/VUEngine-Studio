@@ -4,6 +4,7 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { VesCommonService } from '../../branding/browser/ves-common-service';
+import { VesProjectsPreferenceIds } from './ves-projects-preferences';
 
 @injectable()
 export class VesProjectsPathsService {
@@ -19,9 +20,16 @@ export class VesProjectsPathsService {
   async getProjectsBaseUri(): Promise<URI> {
     const homedir = await this.envVariablesServer.getHomeDirUri();
     const homedirUri = new URI(homedir).withScheme('file');
-
-    return homedirUri
+    const defaultUri = homedirUri
       .resolve('vuengine')
       .resolve('projects');
+
+      const customUri = new URI(this.preferenceService.get(
+        VesProjectsPreferenceIds.BASE_PATH
+      ) as string).withScheme('file');
+
+      return (!customUri.isEqual(new URI('').withScheme('file')) && await this.fileService.exists(customUri))
+        ? customUri
+        : defaultUri;
   }
 }

@@ -13,19 +13,22 @@ export const VesProjectsPreferenceSchema: PreferenceSchema = {
     'properties': {
         [VesProjectsPreferenceIds.BASE_PATH]: {
             type: 'string',
-            description: 'Base folder for new projects.'
+            description: 'Base path for new projects.',
+            additionalProperties: {
+                isDirectory: true,
+            },
         },
         [VesProjectsPreferenceIds.AUTHOR]: {
             type: 'string',
             description: 'Default author name to use for new projects.',
-            default: 'VUEngine Studio',
+            default: 'VUEngine Studio User',
         },
         [VesProjectsPreferenceIds.MAKER_CODE]: {
             type: 'string',
             minLength: 2,
             maxLength: 2,
             description: 'Default Maker Code to place in ROM header of new projects.',
-            default: 'VS',
+            default: 'VU',
         },
     },
 };

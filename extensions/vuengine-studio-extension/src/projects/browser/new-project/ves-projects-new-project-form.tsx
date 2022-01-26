@@ -5,6 +5,7 @@ import * as React from '@theia/core/shared/react';
 import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import * as filenamify from 'filenamify';
+import { VesCommonService } from '../../../branding/browser/ves-common-service';
 import { VesProjectsPathsService } from '../ves-projects-paths-service';
 import { VesProjectsPreferenceIds } from '../ves-projects-preferences';
 
@@ -12,6 +13,7 @@ export interface VesNewProjectFormComponentProps {
     fileService: FileService
     fileDialogService: FileDialogService
     preferenceService: PreferenceService
+    vesCommonService: VesCommonService
     vesProjectsPathsService: VesProjectsPathsService
 }
 
@@ -111,6 +113,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
     protected fileService: FileService;
     protected fileDialogService: FileDialogService;
     protected preferenceService: PreferenceService;
+    protected vesCommonService: VesCommonService;
     protected vesProjectsPathsService: VesProjectsPathsService;
 
     protected nameInputComponentRef: React.RefObject<HTMLInputElement> = React.createRef();
@@ -121,6 +124,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
         this.fileService = props.fileService;
         this.fileDialogService = props.fileDialogService;
         this.preferenceService = props.preferenceService;
+        this.vesCommonService = props.vesCommonService;
         this.vesProjectsPathsService = props.vesProjectsPathsService;
 
         this.state = {
@@ -222,7 +226,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                 <input
                     type="text"
                     className="theia-input"
-                    value={this.state.path}
+                    value={this.vesCommonService.formatPath(this.state.path)}
                     onChange={this.updatePathFolder}
                     size={this.state.path.length}
                     style={{ fontFamily: 'monospace', maxWidth: 332 }}
@@ -315,7 +319,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
     });
 
     protected updatePathFolder = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({
-        path: e.currentTarget.value
+        path: this.vesCommonService.formatPath(e.currentTarget.value)
     });
 
     protected updatePathName = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({
@@ -351,7 +355,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
             const destinationFolder = await this.fileService.resolve(destinationFolderUri);
             if (destinationFolder.isDirectory) {
                 this.setState({
-                    path: destinationFolder.resource.path.toString()
+                    path: this.vesCommonService.formatPath(destinationFolder.resource.path.toString())
                 });
             }
         }

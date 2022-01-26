@@ -1,3 +1,4 @@
+import { isWindows } from '@theia/core';
 import { Key, PreferenceService } from '@theia/core/lib/browser';
 import { DialogProps } from '@theia/core/lib/browser/dialogs';
 import { ReactDialog } from '@theia/core/lib/browser/dialogs/react-dialog';
@@ -8,6 +9,7 @@ import * as React from '@theia/core/shared/react';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { VesCommonService } from '../../../branding/browser/ves-common-service';
 import { VesProjectsPathsService } from '../ves-projects-paths-service';
 import { VesProjectsService } from '../ves-projects-service';
 import { VesNewProjectFormComponent, VES_NEW_PROJECT_TEMPLATES } from './ves-projects-new-project-form';
@@ -24,6 +26,8 @@ export class VesNewProjectDialog extends ReactDialog<void> {
     protected readonly fileDialogService: FileDialogService;
     @inject(PreferenceService)
     protected readonly preferenceService: PreferenceService;
+    @inject(VesCommonService)
+    protected readonly vesCommonService: VesCommonService;
     @inject(VesProjectsService)
     protected readonly vesProjectsService: VesProjectsService;
     @inject(VesProjectsPathsService)
@@ -81,6 +85,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
             fileService={this.fileService}
             fileDialogService={this.fileDialogService}
             preferenceService={this.preferenceService}
+            vesCommonService={this.vesCommonService}
             vesProjectsPathsService={this.vesProjectsPathsService}
             ref={this.createProjectFormComponentRef}
         />;
@@ -110,7 +115,9 @@ export class VesNewProjectDialog extends ReactDialog<void> {
         }
 
         const projectsBaseUri = this.createProjectFormComponentRef.current?.state.path
-            ? new URI(this.createProjectFormComponentRef.current?.state.path).withScheme('file')
+            ? isWindows
+                ? new URI(`/${this.createProjectFormComponentRef.current?.state.path.replace(/\\/g, '/')}`).withScheme('file')
+                : new URI(this.createProjectFormComponentRef.current?.state.path).withScheme('file')
             : await this.vesProjectsPathsService.getProjectsBaseUri();
         const pathExists = await this.fileService.exists(projectsBaseUri)
             && (await this.fileService.resolve(projectsBaseUri)).isDirectory;

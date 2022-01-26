@@ -55,6 +55,15 @@ export class VesCommonService {
     return new URI(applicationPath).withScheme('file');
   }
 
+  formatPath(path: string): string {
+    return isWindows
+      ? path.replace(/\//g, '\\') // replace slashes with backslashes
+        .replace(/^\/|\/$/g, '') // remove leading and trailing slashes
+        .replace(/^\\|\\$/g, '') // remove leading and trailing backslashes
+        .replace(/^[a-z]:\\/, x => x.toUpperCase()) // uppercase drive number
+      : path;
+  }
+
   protected handleToggleMaximized(widget: Widget): void {
     this.isMaximized = !this.isMaximized && widget;
   }
