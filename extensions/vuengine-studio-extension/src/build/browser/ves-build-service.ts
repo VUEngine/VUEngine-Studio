@@ -465,9 +465,11 @@ export class VesBuildService {
   protected async deleteRom(): Promise<void> {
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-    const romUri = workspaceRootUri.resolve('build').resolve('output.vb');
-    if (await this.fileService.exists(romUri)) {
-      this.fileService.delete(romUri);
+    if (workspaceRootUri) {
+      const romUri = workspaceRootUri.resolve('build').resolve('output.vb');
+      if (await this.fileService.exists(romUri)) {
+        this.fileService.delete(romUri);
+      }
     }
   }
 

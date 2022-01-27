@@ -144,6 +144,9 @@ export class VesEmulatorService {
     const defaultEmulatorConfig = this.getDefaultEmulatorConfig();
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
+    if (!workspaceRootUri) {
+      return;
+    }
     const romUri = workspaceRootUri.resolve('build').resolve('output.vb');
     if (defaultEmulatorConfig === DEFAULT_EMULATOR) {
       const opener = await this.openerService.getOpener(romUri);

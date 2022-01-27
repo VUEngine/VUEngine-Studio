@@ -132,9 +132,11 @@ export class VesCodeGenService {
         }
         await this.workspaceService.ready;
         const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-        const files = await this.vesGlobService.find(await this.fileService.fsPath(workspaceRootUri), `**/*${template.ending}`);
-        for (const file of files) {
-          await this.renderFileFromTemplate(template, templateString, additionalTemplateData, encoding, new URI(file).withScheme('file'));
+        if (workspaceRootUri) {
+          const files = await this.vesGlobService.find(await this.fileService.fsPath(workspaceRootUri), `**/*${template.ending}`);
+          for (const file of files) {
+            await this.renderFileFromTemplate(template, templateString, additionalTemplateData, encoding, new URI(file).withScheme('file'));
+          }
         }
         break;
     }
