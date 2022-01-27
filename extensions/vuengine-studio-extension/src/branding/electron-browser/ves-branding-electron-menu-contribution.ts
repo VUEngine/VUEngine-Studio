@@ -10,6 +10,7 @@ import { VesEmulatorService } from '../../emulator/browser/ves-emulator-service'
 import { VesEmulatorPreferenceIds } from '../../emulator/browser/ves-emulator-preferences';
 import { VesFlashCartService } from '../../flash-cart/browser/ves-flash-cart-service';
 import { VesTouchBarCommands } from '../common/ves-branding-types';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
 
 @injectable()
 export class VesElectronMenuContribution extends ElectronMenuContribution {
@@ -23,6 +24,8 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
     protected readonly vesEmulatorService: VesEmulatorService;
     @inject(VesFlashCartService)
     protected readonly vesFlashCartService: VesFlashCartService;
+    @inject(WorkspaceService)
+    protected readonly workspaceService: WorkspaceService;
 
     onStart(app: FrontendApplication): void {
         super.onStart(app);
@@ -52,8 +55,12 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
         }
     }
 
-    protected vesBindTouchBar(): void {
+    protected async vesBindTouchBar(): Promise<void> {
         const { app } = require('@theia/core/shared/electron').remote;
+
+        await this.workspaceService.ready;
+        // TODO: add more touchbar modes for emulator etc
+        app.emit(VesTouchBarCommands.init, this.workspaceService.opened);
 
         app.on(VesTouchBarCommands.executeCommand, (command: string) => this.commandService.executeCommand(command));
         app.on(VesTouchBarCommands.setBuildMode, (buildMode: BuildMode) => this.preferenceService.set(
