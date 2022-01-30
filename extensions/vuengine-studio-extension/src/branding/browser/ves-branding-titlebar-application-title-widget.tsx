@@ -1,6 +1,6 @@
 import * as React from '@theia/core/shared/react';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { remote } from '@theia/core/shared/electron';
+import { getCurrentWindow, systemPreferences } from '@theia/core/electron-shared/@electron/remote';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { WorkspaceCommands, WorkspaceService } from '@theia/workspace/lib/browser';
 import { CommandService } from '@theia/core';
@@ -59,10 +59,10 @@ export class VesTitlebarApplicationTitleWidget extends ReactWidget {
   }
 
   protected maximizeWindow(): void {
-    const win = remote.getCurrentWindow();
+    const win = getCurrentWindow();
     if (!win) { return; }
     if (process.platform === 'darwin') {
-      const action = remote.systemPreferences.getUserDefault('AppleActionOnDoubleClick', 'string');
+      const action = systemPreferences.getUserDefault('AppleActionOnDoubleClick', 'string');
       if (action === 'None') { return; }
       if (action === 'Minimize') { return win.minimize(); }
     }
