@@ -2636,7 +2636,7 @@
     minimatch "^3.0.4"
     vscode-ripgrep "^1.2.4"
 
-"@theia/task@1.22.1":
+"@theia/task@1.22.1", "@theia/task@^1.22.1":
   version "1.22.1"
   resolved "https://registry.yarnpkg.com/@theia/task/-/task-1.22.1.tgz#f5229aa5cb568413e08a95dae47df8ea1453eecb"
   integrity sha512-dnxk1emRKCoQQ2BTbUAkDuTE6BTAtJI55r8Fo5M/FOpByRrb+9iKzED7Ehge4VzqDXeYtJDTMlIFrzBiJ1avQg==

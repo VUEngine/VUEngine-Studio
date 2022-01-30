@@ -65,3 +65,13 @@ export enum MemorySection {
   STATIC_RAM = 'sram',
   WORK_RAM = 'wram',
 }
+
+export interface PrePostBuildTask {
+  type: PrePostBuildTaskType
+  name: string
+}
+
+export enum PrePostBuildTaskType {
+  Task = 'Task',
+  Command = 'Command',
+}

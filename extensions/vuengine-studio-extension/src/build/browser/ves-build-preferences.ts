@@ -1,5 +1,5 @@
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
-import { BuildMode, DEFAULT_BUILD_MODE } from './ves-build-types';
+import { BuildMode, DEFAULT_BUILD_MODE, PrePostBuildTaskType } from './ves-build-types';
 
 export namespace VesBuildPreferenceIds {
     export const CATEGORY = 'build';
@@ -9,6 +9,8 @@ export namespace VesBuildPreferenceIds {
     export const PEDANTIC_WARNINGS = [CATEGORY, 'pedanticWarnings'].join('.');
     export const ENGINE_CORE_PATH = [CATEGORY, 'engine', 'core', 'path'].join('.');
     export const ENGINE_CORE_INCLUDE_IN_WORKSPACE = [CATEGORY, 'engine', 'core', 'includeInWorkspace'].join('.');
+    export const PRE_BUILD_TASKS = [CATEGORY, 'tasks', 'pre'].join('.');
+    export const POST_BUILD_TASKS = [CATEGORY, 'tasks', 'post'].join('.');
 }
 
 export const VesBuildPreferenceSchema: PreferenceSchema = {
@@ -47,6 +49,58 @@ export const VesBuildPreferenceSchema: PreferenceSchema = {
             type: 'boolean',
             description: 'Automatically include core library in workspaces.',
             default: false,
+        },
+        [VesBuildPreferenceIds.PRE_BUILD_TASKS]: {
+            type: 'array',
+            label: 'Pre-Build Tasks',
+            description: 'List of Tasks and Commands to execute before building.',
+            items: {
+                type: 'object',
+                title: 'Tasks & Commands',
+                properties: {
+                    type: {
+                        type: 'string',
+                        description: 'Type - Task or Command',
+                        enum: [
+                            PrePostBuildTaskType.Task,
+                            PrePostBuildTaskType.Command,
+                        ],
+                        label: 'Type',
+                    },
+                    name: {
+                        type: 'string',
+                        description: 'Name/ID of Task or Command',
+                        label: 'Name/ID',
+                    },
+                },
+            },
+            default: [],
+        },
+        [VesBuildPreferenceIds.POST_BUILD_TASKS]: {
+            type: 'array',
+            label: 'Post-Build Tasks',
+            description: 'List of Tasks and Commands to execute after building.',
+            items: {
+                type: 'object',
+                title: 'Tasks & Commands',
+                properties: {
+                    type: {
+                        type: 'string',
+                        description: 'Type - Task or Command',
+                        enum: [
+                            PrePostBuildTaskType.Task,
+                            PrePostBuildTaskType.Command,
+                        ],
+                        label: 'Type',
+                    },
+                    name: {
+                        type: 'string',
+                        description: 'Name/ID of Task or Command',
+                        label: 'Name/ID',
+                    },
+                },
+            },
+            default: [],
         },
     },
 };

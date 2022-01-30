@@ -1,4 +1,4 @@
-import { CommandService, isWindows } from '@theia/core';
+import { CommandRegistry, CommandService, isWindows } from '@theia/core';
 import { ApplicationShell, LabelProvider, PreferenceService } from '@theia/core/lib/browser';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import URI from '@theia/core/lib/common/uri';
@@ -8,6 +8,7 @@ import { FileChangeType } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { ProcessOptions } from '@theia/process/lib/node';
+import { TaskEndedInfo, TaskEndedTypes, TaskService } from '@theia/task/lib/browser/task-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { cpus } from 'os';
 import { VesCommonService } from '../../branding/browser/ves-common-service';
@@ -17,7 +18,17 @@ import { VesProcessService, VesProcessType } from '../../process/common/ves-proc
 import { VesBuildCommands } from './ves-build-commands';
 import { VesBuildPathsService } from './ves-build-paths-service';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
-import { BuildLogLine, BuildLogLineFileLink, BuildLogLineType, BuildMode, BuildResult, BuildStatus, GccMatchedProblem } from './ves-build-types';
+import {
+  BuildLogLine,
+  BuildLogLineFileLink,
+  BuildLogLineType,
+  BuildMode,
+  BuildResult,
+  BuildStatus,
+  GccMatchedProblem,
+  PrePostBuildTask,
+  PrePostBuildTaskType
+} from './ves-build-types';
 
 interface BuildFolderFlags {
   [key: string]: boolean;
@@ -27,6 +38,8 @@ interface BuildFolderFlags {
 export class VesBuildService {
   @inject(ApplicationShell)
   protected readonly shell: ApplicationShell;
+  @inject(CommandRegistry)
+  protected readonly commandRegistry: CommandRegistry;
   @inject(CommandService)
   protected readonly commandService: CommandService;
   @inject(FileService)
@@ -37,6 +50,8 @@ export class VesBuildService {
   protected readonly labelProvider: LabelProvider;
   @inject(PreferenceService)
   protected readonly preferenceService: PreferenceService;
+  @inject(TaskService)
+  protected readonly taskService: TaskService;
   @inject(VesBuildPathsService)
   protected readonly vesBuildPathsService: VesBuildPathsService;
   @inject(VesCommonService)
@@ -301,7 +316,8 @@ export class VesBuildService {
     this.vesProcessWatcher.onDidReceiveErrorStreamData(onData);
 
     this.onDidSucceedBuild(async () => {
-      await this.determineRomSize();
+      /* await */ this.determineRomSize();
+      await this.runPostBuildTasks();
     });
 
     this.onDidFailBuild(async () => {
@@ -311,21 +327,35 @@ export class VesBuildService {
   }
 
   protected async build(): Promise<void> {
-    const log: BuildLogLine[] = [];
     let processManagerId = 0;
     let processId = 0;
-    let active = false;
-    let step = 'Building';
-    const startDate = new Date();
-    const endDate = undefined;
+
+    this.buildStatus = {
+      active: true,
+      processManagerId,
+      processId,
+      progress: 0,
+      log: [],
+      buildMode: this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode,
+      step: '',
+      startDate: new Date(),
+      endDate: undefined,
+    };
+
+    this.onDidStartBuildEmitter.fire();
+
+    await this.runPreBuildTasks();
 
     try {
+      this.buildStatus = {
+        ...this.buildStatus,
+        step: 'Building',
+      };
+
       const buildParams = await this.getBuildProcessParams();
       await this.deleteRom();
       await this.fixPermissions();
       ({ processManagerId, processId } = await this.vesProcessService.launchProcess(VesProcessType.Raw, buildParams));
-      active = true;
-      this.onDidStartBuildEmitter.fire();
 
     } catch (e) {
       let error = 'An error occured';
@@ -336,26 +366,24 @@ export class VesBuildService {
         error = e.message;
       }
 
-      log.push({
+      this.pushBuildLogLine({
         text: error,
         timestamp: Date.now(),
         type: BuildLogLineType.Error,
       });
-      step = 'failed';
+
+      this.buildStatus = {
+        ...this.buildStatus,
+        step: 'failed',
+      };
 
       this.onDidFailBuildEmitter.fire();
     }
 
     this.buildStatus = {
-      active,
+      ...this.buildStatus,
       processManagerId,
       processId,
-      progress: 0,
-      log,
-      buildMode: this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode,
-      step,
-      startDate,
-      endDate,
     };
   }
 
@@ -703,6 +731,161 @@ export class VesBuildService {
     if (this.buildFolderExists[buildMode]) {
       this.clean(buildMode);
     }
+  }
+
+  protected async runCommand(commandName: string): Promise<void> {
+    const command = this.commandRegistry.getCommand(commandName);
+    if (!command) {
+      return this.pushBuildLogLine({
+        type: BuildLogLineType.Error,
+        text: `Could not find command "${commandName}".`,
+        timestamp: Date.now(),
+      });
+    }
+
+    await this.commandService.executeCommand(commandName);
+
+    this.pushBuildLogLine({
+      type: BuildLogLineType.Normal,
+      text: `Command "${command?.label}" completed.`,
+      timestamp: Date.now(),
+    });
+  }
+
+  protected async runTask(taskName: string): Promise<void> {
+    await this.workspaceService.ready;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
+
+    const taskInfo = await this.taskService.runWorkspaceTask(this.taskService.startUserAction(), workspaceRootUri.toString(), taskName);
+
+    if (!taskInfo) {
+      return this.pushBuildLogLine({
+        type: BuildLogLineType.Error,
+        text: `Could not run the task "${taskName}".`,
+        timestamp: Date.now(),
+      });
+    }
+
+    const getExitCodePromise: Promise<TaskEndedInfo> = this.taskService.getExitCode(taskInfo.taskId).then(result =>
+      ({ taskEndedType: TaskEndedTypes.TaskExited, value: result }));
+    const isBackgroundTaskEndedPromise: Promise<TaskEndedInfo> = this.taskService.isBackgroundTaskEnded(taskInfo.taskId).then(result =>
+      ({ taskEndedType: TaskEndedTypes.BackgroundTaskEnded, value: result }));
+
+    // After start running the task, we wait for the task process to exit and if it is a background task, we also wait for a feedback
+    // that a background task is active, as soon as one of the promises fulfills, we can continue and analyze the results.
+    const taskEndedInfo: TaskEndedInfo = await Promise.race([getExitCodePromise, isBackgroundTaskEndedPromise]);
+
+    if (taskEndedInfo.taskEndedType === TaskEndedTypes.BackgroundTaskEnded && taskEndedInfo.value) {
+      return this.pushBuildLogLine({
+        type: BuildLogLineType.Normal,
+        text: `Task "${taskName}" completed.`,
+        timestamp: Date.now(),
+      });
+    }
+    if (taskEndedInfo.taskEndedType === TaskEndedTypes.TaskExited && taskEndedInfo.value === 0) {
+      return this.pushBuildLogLine({
+        type: BuildLogLineType.Normal,
+        text: `Task "${taskName}" completed.`,
+        timestamp: Date.now(),
+      });
+    } else if (taskEndedInfo.taskEndedType === TaskEndedTypes.TaskExited && taskEndedInfo.value !== undefined) {
+      return this.pushBuildLogLine({
+        type: BuildLogLineType.Error,
+        text: `Task "${taskName}" terminated with exit code ${taskEndedInfo.value}.`,
+        timestamp: Date.now(),
+      });
+    } else {
+      const signal = await this.taskService.getTerminateSignal(taskInfo.taskId);
+      if (signal !== undefined) {
+        return this.pushBuildLogLine({
+          type: BuildLogLineType.Error,
+          text: `Task "${taskName}" terminated by signal ${signal}.`,
+          timestamp: Date.now(),
+        });
+      } else {
+        return this.pushBuildLogLine({
+          type: BuildLogLineType.Error,
+          text: `Task "${taskName}" terminated for unknown reason.`,
+          timestamp: Date.now(),
+        });
+      }
+    }
+  }
+
+  protected async runTasks(tasks: Array<PrePostBuildTask>): Promise<void> {
+    let completed = 0;
+
+    for (const task of tasks) {
+      if (!task.name) {
+        continue;
+      }
+
+      switch (task.type) {
+        case PrePostBuildTaskType.Task:
+          await this.runTask(task.name);
+          completed++;
+          break;
+        case PrePostBuildTaskType.Command:
+          await this.runCommand(task.name);
+          completed++;
+          break;
+      }
+    }
+
+    if (!completed) {
+      this.pushBuildLogLine({
+        type: BuildLogLineType.Normal,
+        text: 'No tasks found.',
+        timestamp: Date.now(),
+      });
+    }
+  }
+
+  protected async runPreBuildTasks(): Promise<void> {
+    this.buildStatus = {
+      ...this.buildStatus,
+      step: 'Pre-build tasks...',
+    };
+    this.pushBuildLogLine({
+      type: BuildLogLineType.Headline,
+      text: 'Running pre-build tasks...',
+      timestamp: Date.now(),
+    });
+
+    const tasks = this.preferenceService.get(VesBuildPreferenceIds.PRE_BUILD_TASKS) as Array<PrePostBuildTask>;
+    await this.runTasks(tasks);
+
+    this.pushBuildLogLine({
+      type: BuildLogLineType.Normal,
+      text: '',
+      timestamp: Date.now(),
+    });
+  }
+
+  protected async runPostBuildTasks(): Promise<void> {
+    this.buildStatus = {
+      ...this.buildStatus,
+      step: 'Post-build tasks...',
+    };
+    this.pushBuildLogLine({
+      type: BuildLogLineType.Normal,
+      text: '',
+      timestamp: Date.now(),
+    });
+
+    this.pushBuildLogLine({
+      type: BuildLogLineType.Headline,
+      text: 'Running post-build tasks...',
+      timestamp: Date.now(),
+    });
+
+    const tasks = this.preferenceService.get(VesBuildPreferenceIds.POST_BUILD_TASKS) as Array<PrePostBuildTask>;
+    await this.runTasks(tasks);
+
+    this.buildStatus = {
+      ...this.buildStatus,
+      step: 'done',
+    };
   }
 
   async clean(buildMode: BuildMode): Promise<void> {
