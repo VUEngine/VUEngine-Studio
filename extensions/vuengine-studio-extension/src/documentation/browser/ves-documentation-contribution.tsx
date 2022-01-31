@@ -20,7 +20,7 @@ export class VesDocumentationContribution implements MenuContribution, CommandCo
         menus.registerMenuAction(CommonMenus.HELP, {
             commandId: VesDocumentationCommands.OPEN_HANDBOOK.id,
             label: VesDocumentationCommands.OPEN_HANDBOOK.label,
-            order: '2',
+            order: 'a20',
         });
     }
 

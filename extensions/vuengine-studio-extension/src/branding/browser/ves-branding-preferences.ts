@@ -1,9 +1,9 @@
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
 
 export namespace VesBrandingPreferenceIds {
-    export const CATEGORY = 'Getting Started Page';
+    export const CATEGORY = 'gettingStartedPage';
 
-    export const ALWAYS_SHOW_WELCOME_PAGE = [CATEGORY, 'alwaysShowWelcomePage'].join('.');
+    export const ALWAYS_SHOW_WELCOME_PAGE = [CATEGORY, 'alwaysShow'].join('.');
 }
 
 export const VesBrandingPreferenceSchema: PreferenceSchema = {

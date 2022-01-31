@@ -2326,16 +2326,6 @@
     uuid "^8.0.0"
     vscode-languageserver-textdocument "^1.0.1"
 
-"@theia/getting-started@1.22.1", "@theia/getting-started@^1.22.1":
-  version "1.22.1"
-  resolved "https://registry.yarnpkg.com/@theia/getting-started/-/getting-started-1.22.1.tgz#a1f7f88927314e51b7c6566253094e8bedbdfa75"
-  integrity sha512-rfhBRuvpq4xe/ltIgblwr05n4qmcrkU5Oigyk1sAHTC3RHsCw8SaVcQX0WVCy2miedb690lHoQcLxM0DmJs8LA==
-  dependencies:
-    "@theia/core" "1.22.1"
-    "@theia/filesystem" "1.22.1"
-    "@theia/keymaps" "1.22.1"
-    "@theia/workspace" "1.22.1"
-
 "@theia/git@1.22.1":
   version "1.22.1"
   resolved "https://registry.yarnpkg.com/@theia/git/-/git-1.22.1.tgz#902ff74e50d077301e48978c8ba553faa70a5148"

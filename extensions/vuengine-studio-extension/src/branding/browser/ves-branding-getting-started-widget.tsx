@@ -1,9 +1,14 @@
-import { DisposableCollection, environment, isOSX, nls, Path } from '@theia/core';
-import { codicon, PreferenceService } from '@theia/core/lib/browser';
+import { CommandRegistry, DisposableCollection, environment, isOSX, nls, Path } from '@theia/core';
+import { codicon, CommonCommands, Key, KeyCode, LabelProvider, PreferenceService, ReactWidget } from '@theia/core/lib/browser';
+import { FrontendApplicationConfigProvider } from '@theia/core/lib/browser/frontend-application-config-provider';
+import { WindowService } from '@theia/core/lib/browser/window/window-service';
+import { ApplicationInfo, ApplicationServer } from '@theia/core/lib/common/application-protocol';
+import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
-import { GettingStartedWidget } from '@theia/getting-started/lib/browser/getting-started-widget';
+import { KeymapsCommands } from '@theia/keymaps/lib/browser';
+import { WorkspaceCommands, WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
 import { VesProjectsCommands } from '../../projects/browser/ves-projects-commands';
 import { VesProjectsService } from '../../projects/browser/ves-projects-service';
@@ -11,25 +16,52 @@ import { VesBrandingPreferenceIds } from './ves-branding-preferences';
 import { VesCommonService } from './ves-common-service';
 
 @injectable()
-export class VesGettingStartedWidget extends GettingStartedWidget {
+export class VesGettingStartedWidget extends ReactWidget {
+    @inject(ApplicationServer)
+    protected readonly appServer: ApplicationServer;
+    @inject(CommandRegistry)
+    protected readonly commandRegistry: CommandRegistry;
+    @inject(EnvVariablesServer)
+    protected readonly environments: EnvVariablesServer;
+    @inject(LabelProvider)
+    protected readonly labelProvider: LabelProvider;
     @inject(PreferenceService)
     protected readonly preferenceService: PreferenceService;
     @inject(VesCommonService)
     protected readonly vesCommonService: VesCommonService;
     @inject(VesProjectsService)
     protected readonly vesProjectsService: VesProjectsService;
+    @inject(WindowService)
+    protected readonly windowService: WindowService;
+    @inject(WorkspaceService)
+    protected readonly workspaceService: WorkspaceService;
+
+    static readonly ID = 'ves.gettingStartedWidget';
+    static readonly LABEL = nls.localizeByDefault('Getting Started');
+
+    protected applicationInfo: ApplicationInfo | undefined;
+    protected applicationName = FrontendApplicationConfigProvider.get().applicationName;
+
+    protected home: string | undefined;
+
+    protected recentLimit = 10;
+    protected recentWorkspaces: string[] = [];
 
     protected readonly toDispose = new DisposableCollection();
     protected vesRecentWorkspaces: Array<{ name: string, uri: URI, path: string }> = [];
 
-    protected openUrl = (url: string) => this.windowService.openNewWindow(url, { external: true });
-    protected recentLimit = 10;
-
     @postConstruct()
     protected async init(): Promise<void> {
-        await super.init();
-
+        this.id = VesGettingStartedWidget.ID;
+        this.title.label = VesGettingStartedWidget.LABEL;
+        this.title.caption = VesGettingStartedWidget.LABEL;
         this.title.iconClass = 'codicon codicon-info';
+        this.title.closable = true;
+
+        this.applicationInfo = await this.appServer.getApplicationInfo();
+        this.recentWorkspaces = await this.workspaceService.recentWorkspaces();
+        this.home = new URI(await this.environments.getHomeDirUri()).path.toString();
+
         await this.preferenceService.ready;
         await this.vesGetRecentWorkspaces();
         this.update();
@@ -46,6 +78,132 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
             {this.renderPreferences()}
         </div>;
     }
+
+    protected renderSettings(): React.ReactNode {
+        return <div className='gs-section'>
+            <h3 className='gs-section-header'>
+                <i className={codicon('settings-gear')}></i>
+                {nls.localizeByDefault('Settings')}
+            </h3>
+            <div className='gs-action-container'>
+                <a
+                    role={'button'}
+                    tabIndex={0}
+                    onClick={this.doOpenPreferences}
+                    onKeyDown={this.doOpenPreferencesEnter}>
+                    {nls.localizeByDefault('Open Settings')}
+                </a>
+            </div>
+            <div className='gs-action-container'>
+                <a
+                    role={'button'}
+                    tabIndex={0}
+                    onClick={this.doOpenKeyboardShortcuts}
+                    onKeyDown={this.doOpenKeyboardShortcutsEnter}>
+                    {nls.localizeByDefault('Open Keyboard Shortcuts')}
+                </a>
+            </div>
+        </div>;
+    }
+
+    /**
+     * Trigger the open command.
+     */
+    protected doOpen = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN.id);
+    protected doOpenEnter = (e: React.KeyboardEvent) => {
+        if (this.isEnterKey(e)) {
+            this.doOpen();
+        }
+    };
+
+    /**
+     * Trigger the open file command.
+     */
+    protected doOpenFile = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN_FILE.id);
+    protected doOpenFileEnter = (e: React.KeyboardEvent) => {
+        if (this.isEnterKey(e)) {
+            this.doOpenFile();
+        }
+    };
+
+    /**
+     * Trigger the open folder command.
+     */
+    protected doOpenFolder = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN_FOLDER.id);
+    protected doOpenFolderEnter = (e: React.KeyboardEvent) => {
+        if (this.isEnterKey(e)) {
+            this.doOpenFolder();
+        }
+    };
+
+    /**
+     * Trigger the open workspace command.
+     */
+    protected doOpenWorkspace = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN_WORKSPACE.id);
+    protected doOpenWorkspaceEnter = (e: React.KeyboardEvent) => {
+        if (this.isEnterKey(e)) {
+            this.doOpenWorkspace();
+        }
+    };
+
+    /**
+     * Trigger the open recent workspace command.
+     */
+    protected doOpenRecentWorkspace = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN_RECENT_WORKSPACE.id);
+    protected doOpenRecentWorkspaceEnter = (e: React.KeyboardEvent) => {
+        if (this.isEnterKey(e)) {
+            this.doOpenRecentWorkspace();
+        }
+    };
+
+    /**
+     * Trigger the open preferences command.
+     * Used to open the preferences widget.
+     */
+    protected doOpenPreferences = () => this.commandRegistry.executeCommand(CommonCommands.OPEN_PREFERENCES.id);
+    protected doOpenPreferencesEnter = (e: React.KeyboardEvent) => {
+        if (this.isEnterKey(e)) {
+            this.doOpenPreferences();
+        }
+    };
+
+    /**
+     * Trigger the open keyboard shortcuts command.
+     * Used to open the keyboard shortcuts widget.
+     */
+    protected doOpenKeyboardShortcuts = () => this.commandRegistry.executeCommand(KeymapsCommands.OPEN_KEYMAPS.id);
+    protected doOpenKeyboardShortcutsEnter = (e: React.KeyboardEvent) => {
+        if (this.isEnterKey(e)) {
+            this.doOpenKeyboardShortcuts();
+        }
+    };
+
+    /**
+     * Open a workspace given its uri.
+     * @param uri {URI} the workspace uri.
+     */
+    protected open = (uri: URI) => this.workspaceService.open(uri);
+    protected openEnter = (e: React.KeyboardEvent, uri: URI) => {
+        if (this.isEnterKey(e)) {
+            this.open(uri);
+        }
+    };
+
+    /**
+     * Open a link in an external window.
+     * @param url the link.
+     */
+    protected doOpenExternalLink = (url: string) => this.windowService.openNewWindow(url, { external: true });
+    protected doOpenExternalLinkEnter = (e: React.KeyboardEvent, url: string) => {
+        if (this.isEnterKey(e)) {
+            this.doOpenExternalLink(url);
+        }
+    };
+
+    protected isEnterKey(e: React.KeyboardEvent): boolean {
+        return Key.ENTER.keyCode === KeyCode.createKeyCode(e.nativeEvent).key?.keyCode;
+    }
+    protected openUrl = (url: string) => this.windowService.openNewWindow(url, { external: true });
 
     protected renderHeader(): React.ReactNode {
         return (
@@ -229,12 +387,12 @@ export interface PreferencesProps {
 }
 
 function VesPreferences(props: PreferencesProps): JSX.Element {
-    const [alwaysShowWelcomePage, setAlwaysShowWelcomePage] = React.useState<boolean>(props.preferenceService.get(VesBrandingPreferenceIds.ALWAYS_SHOW_WELCOME_PAGE, true));
+    const [alwaysShow, setAlwaysShow] = React.useState<boolean>(props.preferenceService.get(VesBrandingPreferenceIds.ALWAYS_SHOW_WELCOME_PAGE, true));
     React.useEffect(() => {
         const preflistener = props.preferenceService.onPreferenceChanged(change => {
             if (change.preferenceName === VesBrandingPreferenceIds.ALWAYS_SHOW_WELCOME_PAGE) {
                 const prefValue: boolean = change.newValue;
-                setAlwaysShowWelcomePage(prefValue);
+                setAlwaysShow(prefValue);
             }
         });
         return () => preflistener.dispose();
@@ -244,7 +402,7 @@ function VesPreferences(props: PreferencesProps): JSX.Element {
         props.preferenceService.updateValue(VesBrandingPreferenceIds.ALWAYS_SHOW_WELCOME_PAGE, newChecked);
     };
     return <div className='ves-preference'>
-        <input type="checkbox" className="theia-input" id="alwaysShowWelcomePage" onChange={handleChange} checked={alwaysShowWelcomePage}></input>
-        <label htmlFor="alwaysShowWelcomePage">Always show this page when no workspace is loaded.</label>
+        <input type="checkbox" className="theia-input" id="alwaysShow" onChange={handleChange} checked={alwaysShow}></input>
+        <label htmlFor="alwaysShow">Always show this page when no workspace is loaded.</label>
     </div>;
 }

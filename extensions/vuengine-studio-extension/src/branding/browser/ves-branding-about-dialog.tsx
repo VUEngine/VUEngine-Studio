@@ -5,7 +5,6 @@ import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { VSCODE_DEFAULT_API_VERSION } from '@theia/plugin-ext-vscode/lib/common/plugin-vscode-types';
-import { VesUpdaterCommands } from '../../updater/electron-browser/ves-updater-commands';
 
 @injectable()
 export class VesAboutDialog extends AboutDialog {
@@ -21,13 +20,6 @@ export class VesAboutDialog extends AboutDialog {
         super(props);
 
         this.titleNode.textContent = `About ${FrontendApplicationConfigProvider.get().applicationName}`;
-
-        const updateButton = this.createButton('Check for Updates');
-        updateButton.onclick = () => {
-            this.commandService.executeCommand(VesUpdaterCommands.CHECK_FOR_UPDATES.id);
-        };
-        this.controlPanel.appendChild(updateButton);
-        updateButton.classList.add('secondary');
 
         this.acceptButton = this.createButton('OK');
         this.controlPanel.appendChild(this.acceptButton);

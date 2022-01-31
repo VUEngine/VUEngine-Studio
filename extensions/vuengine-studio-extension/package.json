@@ -11,7 +11,6 @@
     "@theia/debug": "1.22.1",
     "@theia/editor": "1.22.1",
     "@theia/filesystem": "1.22.1",
-    "@theia/getting-started": "^1.22.1",
     "@theia/keymaps": "^1.22.1",
     "@theia/monaco": "^1.22.1",
     "@theia/navigator": "^1.22.1",

@@ -1,10 +1,17 @@
-import { AbstractViewContribution, FrontendApplication, FrontendApplicationContribution, PreferenceService } from '@theia/core/lib/browser';
-import { inject, injectable } from '@theia/core/shared/inversify';
+import { Command, CommandRegistry, MenuModelRegistry } from '@theia/core';
+import { AbstractViewContribution, CommonMenus, FrontendApplication, FrontendApplicationContribution, PreferenceService } from '@theia/core/lib/browser';
 import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
-import { GettingStartedWidget } from '@theia/getting-started/lib/browser/getting-started-widget';
+import { inject, injectable } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesGettingStartedWidget } from './ves-branding-getting-started-widget';
 import { VesBrandingPreferenceIds } from './ves-branding-preferences';
+
+export namespace VesGettingStartedCommands {
+    export const SHOW: Command = {
+        id: VesGettingStartedWidget.ID,
+        label: VesGettingStartedWidget.LABEL
+    };
+}
 
 @injectable()
 export class VesGettingStartedViewContribution extends AbstractViewContribution<VesGettingStartedWidget> implements FrontendApplicationContribution {
@@ -17,8 +24,8 @@ export class VesGettingStartedViewContribution extends AbstractViewContribution<
 
     constructor() {
         super({
-            widgetId: GettingStartedWidget.ID,
-            widgetName: GettingStartedWidget.LABEL,
+            widgetId: VesGettingStartedWidget.ID,
+            widgetName: VesGettingStartedWidget.LABEL,
             defaultWidgetOptions: {
                 area: 'main',
             }
@@ -31,10 +38,24 @@ export class VesGettingStartedViewContribution extends AbstractViewContribution<
                 () => this.preferenceService.ready.then(() => {
                     const showWelcomePage: boolean = this.preferenceService.get(VesBrandingPreferenceIds.ALWAYS_SHOW_WELCOME_PAGE, true);
                     if (showWelcomePage) {
-                        this.openView({ reveal: true });
+                        this.openView({ reveal: showWelcomePage });
                     }
                 })
             );
         }
+    }
+
+    registerCommands(registry: CommandRegistry): void {
+        registry.registerCommand(VesGettingStartedCommands.SHOW, {
+            execute: () => this.openView({ reveal: true }),
+        });
+    }
+
+    registerMenus(menus: MenuModelRegistry): void {
+        menus.registerMenuAction(CommonMenus.HELP, {
+            commandId: VesGettingStartedCommands.SHOW.id,
+            label: VesGettingStartedCommands.SHOW.label,
+            order: 'a10'
+        });
     }
 }

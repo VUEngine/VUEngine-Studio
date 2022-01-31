@@ -23,7 +23,6 @@ import { ContainerModule } from '@theia/core/shared/inversify';
 import { DebugConsoleContribution } from '@theia/debug/lib/browser/console/debug-console-contribution';
 import { DebugFrontendApplicationContribution } from '@theia/debug/lib/browser/debug-frontend-application-contribution';
 import { DebugPrefixConfiguration } from '@theia/debug/lib/browser/debug-prefix-configuration';
-import { GettingStartedWidget } from '@theia/getting-started/lib/browser/getting-started-widget';
 import { NavigatorWidgetFactory } from '@theia/navigator/lib/browser/navigator-widget-factory';
 import { OutlineViewContribution } from '@theia/outline-view/lib/browser/outline-view-contribution';
 import { PluginApiFrontendContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-contribution';
@@ -85,7 +84,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(FrontendApplicationContribution).toService(VesGettingStartedViewContribution);
     bind(VesGettingStartedWidget).toSelf();
     bind(WidgetFactory).toDynamicValue(context => ({
-        id: GettingStartedWidget.ID,
+        id: VesGettingStartedWidget.ID,
         createWidget: () => context.container.get<VesGettingStartedWidget>(VesGettingStartedWidget),
     })).inSingletonScope();
 
