@@ -14,7 +14,7 @@ const DELETE_PATHS = [
 ];
 
 const signCommand = path.join(__dirname, 'sign.sh');
-const notarizeCommand = path.join(__dirname, 'notarize.sh');
+// const notarizeCommand = path.join(__dirname, 'notarize.sh');
 const entitlements = path.resolve(__dirname, '..', 'entitlements.plist');
 
 const signFile = file => {
@@ -36,8 +36,11 @@ const signFile = file => {
     }
 };
 
-exports.default = async function(context) {
-    const appPath = path.resolve(context.appOutDir, `${context.packager.appInfo.productFilename}.app`);
+exports.default = async function (context) {
+    // TODO: update electron-builder >= 22.10.5 and use "mac.executableName: VUEngine" instead of fs.renameSync
+    const originalAppPath = path.resolve(context.appOutDir, `${context.packager.appInfo.productFilename}.app`);
+    const appPath = path.resolve(context.appOutDir, 'VUEngine.app');
+    fs.renameSync(originalAppPath, appPath);
 
     // Remove anything we don't want in the final package
     for (const deletePath of DELETE_PATHS) {
@@ -50,27 +53,29 @@ exports.default = async function(context) {
     if (context.packager.platform.name !== 'mac') {
         return;
     }
-
-    // Use app-builder-lib to find all binaries to sign, at this level it will include the final .app
-    let childPaths = await sign_util.walkAsync(context.appOutDir);
-
-    // Sign deepest first
-    // From https://github.com/electron-userland/electron-builder/blob/master/packages/app-builder-lib/electron-osx-sign/sign.js#L120
-    childPaths = childPaths.sort((a, b) => {
-        const aDepth = a.split(path.sep).length;
-        const bDepth = b.split(path.sep).length;
-        return bDepth - aDepth;
-    });
-
-    // Sign binaries
-    childPaths.forEach(file => signFile(file, context.appOutDir));
-
-    // Notarize app
-    child_process.execFileSync(notarizeCommand, [
-        path.basename(appPath),
-        context.packager.appInfo.info._configuration.appId
-    ], {
-        cwd: path.dirname(appPath),
-        maxBuffer: 1024 * 10000
-    });
+    /*
+        // Use app-builder-lib to find all binaries to sign, at this level it will include the final .app
+        let childPaths = await sign_util.walkAsync(context.appOutDir);
+    
+        // Sign deepest first
+        // From https://github.com/electron-userland/electron-builder/blob/master/packages/app-builder-lib/electron-osx-sign/sign.js#L120
+        childPaths = childPaths.sort((a, b) => {
+            const aDepth = a.split(path.sep).length;
+            const bDepth = b.split(path.sep).length;
+            return bDepth - aDepth;
+        });
+    
+        // Sign binaries
+        childPaths.forEach(file => signFile(file, context.appOutDir));
+    */
+    /*
+        // Notarize app
+        child_process.execFileSync(notarizeCommand, [
+            path.basename(appPath),
+            context.packager.appInfo.info._configuration.appId
+        ], {
+            cwd: path.dirname(appPath),
+            maxBuffer: 1024 * 10000
+        }); 
+    */
 }

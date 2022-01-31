@@ -50,8 +50,7 @@ mac:
   category: public.app-category.developer-tools
   darkModeSupport: true
   target:
-    - dmg
-    - zip
+    - pkg
   publish:
     provider: generic
     url: "https://download.eclipse.org/theia/latest/macos"
@@ -88,8 +87,15 @@ nsis:
   uninstallerSidebar: resources/icons/InstallerSidebarImage/164-314Windows.bmp
   artifactName: ${productName} Setup ${version}.${ext}
   uninstallDisplayName: ${productName}
-dmg:
-  artifactName: ${productName}.${ext}
+pkg:
+  artifactName: ${productName} Setup ${version}.${ext}
+  installLocation: /Applications
+  allowAnywhere: false
+  allowCurrentUserHome: false
+  allowRootDirectory: true
+  isVersionChecked: true
+  isRelocatable: false
+  overwriteAction: upgrade
 deb:
   artifactName: ${productName}.${ext}
 appImage:
