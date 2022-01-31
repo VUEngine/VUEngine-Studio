@@ -1,5 +1,5 @@
 .p-Widget.dialogOverlay {
-    top: var(--theia-private-menubar-height);
+    padding: var(--theia-private-menubar-height);
 }
 
 .p-Widget.dialogOverlay .dialogTitle {
