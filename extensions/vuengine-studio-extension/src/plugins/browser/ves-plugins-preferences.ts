@@ -21,12 +21,14 @@ export const VesPluginsPreferenceSchema: PreferenceSchema = {
                 isDirectory: true,
             },
             scope: PreferenceScope.Folder,
+            overridable: true,
         },
         [VesPluginsPreferenceIds.ENGINE_PLUGINS_INCLUDE_IN_WORKSPACE]: {
             type: 'boolean',
             description: 'Automatically include plugins library in workspaces.',
             default: false,
             scope: PreferenceScope.Folder,
+            overridable: true,
         },
         [VesPluginsPreferenceIds.USER_PLUGINS_PATH]: {
             type: 'string',
@@ -35,12 +37,14 @@ export const VesPluginsPreferenceSchema: PreferenceSchema = {
                 isDirectory: true,
             },
             scope: PreferenceScope.Folder,
+            overridable: true,
         },
         [VesPluginsPreferenceIds.USER_PLUGINS_INCLUDE_IN_WORKSPACE]: {
             type: 'boolean',
             description: 'Automatically include user plugins in workspaces.',
             default: false,
             scope: PreferenceScope.Folder,
+            overridable: true,
         },
     },
 };

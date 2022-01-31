@@ -15,6 +15,7 @@ export const VesBrandingPreferenceSchema: PreferenceSchema = {
             description: 'Show Getting Started page when no workspace is loaded.',
             default: true,
             scope: PreferenceScope.User,
+            overridable: true,
         },
     },
 };

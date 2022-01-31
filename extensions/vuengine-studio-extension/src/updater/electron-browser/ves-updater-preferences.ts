@@ -15,6 +15,7 @@ export const VesUpdaterPreferenceSchema: PreferenceSchema = {
             description: 'Report available updates after application start.',
             default: true,
             scope: PreferenceScope.User,
+            overridable: true,
         }
     }
 };

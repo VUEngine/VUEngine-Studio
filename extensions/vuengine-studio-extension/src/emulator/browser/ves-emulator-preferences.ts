@@ -43,6 +43,7 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
             },
             default: [],
             scope: PreferenceScope.Folder,
+            overridable: true,
         },
         [VesEmulatorPreferenceIds.DEFAULT_EMULATOR]: {
             type: 'string',
@@ -50,6 +51,7 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
             description: 'Emulator configuration that shall be used to run compiled ROMs. Uses built-in emulator if left blank.',
             default: '',
             scope: PreferenceScope.Folder,
+            overridable: true,
         },
         [VesEmulatorPreferenceIds.EMULATOR_STEREO_MODE]: {
             type: 'string',
@@ -59,6 +61,7 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
             /* enumDescriptions: Object.values(StereoMode), */
             default: Object.keys(StereoMode)[0],
             scope: PreferenceScope.Folder,
+            overridable: true,
         },
         [VesEmulatorPreferenceIds.EMULATOR_EMULATION_MODE]: {
             type: 'string',
@@ -68,6 +71,7 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
             /* enumDescriptions: Object.values(EmulationMode), */
             default: Object.keys(EmulationMode)[0],
             scope: PreferenceScope.Folder,
+            overridable: true,
         },
         [VesEmulatorPreferenceIds.EMULATOR_SCALE]: {
             type: 'string',
@@ -77,6 +81,7 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
             /* enumDescriptions: Object.values(EmulatorScale), */
             default: Object.keys(EmulatorScale)[0],
             scope: PreferenceScope.Folder,
+            overridable: true,
         },
     },
 };

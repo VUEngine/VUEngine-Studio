@@ -28,18 +28,21 @@ export const VesBuildPreferenceSchema: PreferenceSchema = {
                 BuildMode.Preprocessor,
             ],
             scope: PreferenceScope.Folder,
+            overridable: true,
         },
         [VesBuildPreferenceIds.DUMP_ELF]: {
             type: 'boolean',
             description: 'Dump assembly code and memory sections.',
             default: false,
             scope: PreferenceScope.Folder,
+            overridable: true,
         },
         [VesBuildPreferenceIds.PEDANTIC_WARNINGS]: {
             type: 'boolean',
             description: 'Enable pedantic compiler warnings.',
             default: false,
             scope: PreferenceScope.Folder,
+            overridable: true,
         },
         [VesBuildPreferenceIds.ENGINE_CORE_PATH]: {
             type: 'string',
@@ -49,12 +52,14 @@ export const VesBuildPreferenceSchema: PreferenceSchema = {
                 isDirectory: true,
             },
             scope: PreferenceScope.Folder,
+            overridable: true,
         },
         [VesBuildPreferenceIds.ENGINE_CORE_INCLUDE_IN_WORKSPACE]: {
             type: 'boolean',
             description: 'Automatically include core library in workspaces.',
             default: false,
             scope: PreferenceScope.Folder,
+            overridable: true,
         },
         [VesBuildPreferenceIds.PRE_BUILD_TASKS]: {
             type: 'array',
@@ -82,6 +87,7 @@ export const VesBuildPreferenceSchema: PreferenceSchema = {
             },
             default: [],
             scope: PreferenceScope.Folder,
+            overridable: true,
         },
         [VesBuildPreferenceIds.POST_BUILD_TASKS]: {
             type: 'array',
@@ -109,6 +115,7 @@ export const VesBuildPreferenceSchema: PreferenceSchema = {
             },
             default: [],
             scope: PreferenceScope.Folder,
+            overridable: true,
         },
     },
 };

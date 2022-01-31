@@ -872,7 +872,7 @@ export class VesBuildService {
       timestamp: Date.now(),
     });
 
-    const tasks = this.preferenceService.get(VesBuildPreferenceIds.PRE_BUILD_TASKS) as Array<PrePostBuildTask>;
+    const tasks = this.preferenceService.get(VesBuildPreferenceIds.PRE_BUILD_TASKS, []) as Array<PrePostBuildTask>;
     await this.runTasks(tasks);
 
     this.pushBuildLogLine({
@@ -899,7 +899,7 @@ export class VesBuildService {
       timestamp: Date.now(),
     });
 
-    const tasks = this.preferenceService.get(VesBuildPreferenceIds.POST_BUILD_TASKS) as Array<PrePostBuildTask>;
+    const tasks = this.preferenceService.get(VesBuildPreferenceIds.POST_BUILD_TASKS, []) as Array<PrePostBuildTask>;
     await this.runTasks(tasks);
 
     this.buildStatus = {

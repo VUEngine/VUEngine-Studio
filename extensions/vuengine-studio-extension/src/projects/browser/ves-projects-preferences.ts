@@ -19,12 +19,14 @@ export const VesProjectsPreferenceSchema: PreferenceSchema = {
                 isDirectory: true,
             },
             scope: PreferenceScope.User,
+            overridable: true,
         },
         [VesProjectsPreferenceIds.AUTHOR]: {
             type: 'string',
             description: 'Default author name to use for new projects.',
             default: 'VUEngine Studio User',
             scope: PreferenceScope.User,
+            overridable: true,
         },
         [VesProjectsPreferenceIds.MAKER_CODE]: {
             type: 'string',
@@ -33,6 +35,7 @@ export const VesProjectsPreferenceSchema: PreferenceSchema = {
             description: 'Default Maker Code to place in ROM header of new projects.',
             default: 'VU',
             scope: PreferenceScope.User,
+            overridable: true,
         },
     },
 };

@@ -131,6 +131,7 @@ export const VesFlashCartPreferenceSchema: PreferenceSchema = {
             },
             default: [],
             scope: PreferenceScope.Folder,
+            overridable: true,
         },
     },
 };

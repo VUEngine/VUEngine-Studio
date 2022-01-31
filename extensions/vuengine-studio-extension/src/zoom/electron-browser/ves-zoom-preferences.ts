@@ -33,6 +33,7 @@ export const VesZoomPreferenceSchema: PreferenceSchema = {
             ],
             default: '100%',
             scope: PreferenceScope.Folder,
+            overridable: true,
         },
         [VesZoomPreferenceIds.SHOW_STATUS_BAR_ENTRY]: {
             type: 'boolean',
@@ -40,6 +41,7 @@ export const VesZoomPreferenceSchema: PreferenceSchema = {
             description: 'Show zoom level in status bar (only when not 100%).',
             default: false,
             scope: PreferenceScope.Folder,
+            overridable: true,
         },
     },
 };
