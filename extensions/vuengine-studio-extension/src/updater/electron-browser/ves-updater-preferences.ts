@@ -1,3 +1,4 @@
+import { PreferenceScope } from '@theia/core/lib/browser';
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
 
 export namespace VesUpdaterPreferenceIds {
@@ -12,7 +13,8 @@ export const VesUpdaterPreferenceSchema: PreferenceSchema = {
         [VesUpdaterPreferenceIds.REPORT_ON_START]: {
             type: 'boolean',
             description: 'Report available updates after application start.',
-            default: true
+            default: true,
+            scope: PreferenceScope.User,
         }
     }
 };

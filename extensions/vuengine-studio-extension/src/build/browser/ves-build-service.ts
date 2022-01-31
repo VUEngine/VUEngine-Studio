@@ -331,7 +331,7 @@ export class VesBuildService {
     let processId = 0;
 
     this.buildStatus = {
-      active: true,
+      active: false,
       processManagerId,
       processId,
       progress: 0,
@@ -342,13 +342,14 @@ export class VesBuildService {
       endDate: undefined,
     };
 
-    this.onDidStartBuildEmitter.fire();
-
     await this.runPreBuildTasks();
 
     try {
+      this.onDidStartBuildEmitter.fire();
+
       this.buildStatus = {
         ...this.buildStatus,
+        active: true,
         step: 'Building',
       };
 

@@ -1,3 +1,4 @@
+import { PreferenceScope } from '@theia/core/lib/browser';
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
 import { EmulationMode, EmulatorScale, StereoMode } from './ves-emulator-types';
 
@@ -41,12 +42,14 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
                 },
             },
             default: [],
+            scope: PreferenceScope.Folder,
         },
         [VesEmulatorPreferenceIds.DEFAULT_EMULATOR]: {
             type: 'string',
             label: 'Default Emulator',
             description: 'Emulator configuration that shall be used to run compiled ROMs. Uses built-in emulator if left blank.',
             default: '',
+            scope: PreferenceScope.Folder,
         },
         [VesEmulatorPreferenceIds.EMULATOR_STEREO_MODE]: {
             type: 'string',
@@ -55,6 +58,7 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
             enum: Object.keys(StereoMode),
             /* enumDescriptions: Object.values(StereoMode), */
             default: Object.keys(StereoMode)[0],
+            scope: PreferenceScope.Folder,
         },
         [VesEmulatorPreferenceIds.EMULATOR_EMULATION_MODE]: {
             type: 'string',
@@ -63,6 +67,7 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
             enum: Object.keys(EmulationMode),
             /* enumDescriptions: Object.values(EmulationMode), */
             default: Object.keys(EmulationMode)[0],
+            scope: PreferenceScope.Folder,
         },
         [VesEmulatorPreferenceIds.EMULATOR_SCALE]: {
             type: 'string',
@@ -71,6 +76,7 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
             enum: Object.keys(EmulatorScale),
             /* enumDescriptions: Object.values(EmulatorScale), */
             default: Object.keys(EmulatorScale)[0],
+            scope: PreferenceScope.Folder,
         },
     },
 };

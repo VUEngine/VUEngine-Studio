@@ -1,3 +1,4 @@
+import { PreferenceScope } from '@theia/core/lib/browser';
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
 import { BuildMode, DEFAULT_BUILD_MODE, PrePostBuildTaskType } from './ves-build-types';
 
@@ -26,16 +27,19 @@ export const VesBuildPreferenceSchema: PreferenceSchema = {
                 BuildMode.Debug,
                 BuildMode.Preprocessor,
             ],
+            scope: PreferenceScope.Folder,
         },
         [VesBuildPreferenceIds.DUMP_ELF]: {
             type: 'boolean',
             description: 'Dump assembly code and memory sections.',
             default: false,
+            scope: PreferenceScope.Folder,
         },
         [VesBuildPreferenceIds.PEDANTIC_WARNINGS]: {
             type: 'boolean',
             description: 'Enable pedantic compiler warnings.',
             default: false,
+            scope: PreferenceScope.Folder,
         },
         [VesBuildPreferenceIds.ENGINE_CORE_PATH]: {
             type: 'string',
@@ -44,11 +48,13 @@ export const VesBuildPreferenceSchema: PreferenceSchema = {
             additionalProperties: {
                 isDirectory: true,
             },
+            scope: PreferenceScope.Folder,
         },
         [VesBuildPreferenceIds.ENGINE_CORE_INCLUDE_IN_WORKSPACE]: {
             type: 'boolean',
             description: 'Automatically include core library in workspaces.',
             default: false,
+            scope: PreferenceScope.Folder,
         },
         [VesBuildPreferenceIds.PRE_BUILD_TASKS]: {
             type: 'array',
@@ -75,6 +81,7 @@ export const VesBuildPreferenceSchema: PreferenceSchema = {
                 },
             },
             default: [],
+            scope: PreferenceScope.Folder,
         },
         [VesBuildPreferenceIds.POST_BUILD_TASKS]: {
             type: 'array',
@@ -101,6 +108,7 @@ export const VesBuildPreferenceSchema: PreferenceSchema = {
                 },
             },
             default: [],
+            scope: PreferenceScope.Folder,
         },
     },
 };

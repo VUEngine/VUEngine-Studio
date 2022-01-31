@@ -1,3 +1,4 @@
+import { PreferenceScope } from '@theia/core/lib/browser';
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
 
 export namespace VesZoomPreferenceIds {
@@ -31,12 +32,14 @@ export const VesZoomPreferenceSchema: PreferenceSchema = {
                 // '300%',
             ],
             default: '100%',
+            scope: PreferenceScope.Folder,
         },
         [VesZoomPreferenceIds.SHOW_STATUS_BAR_ENTRY]: {
             type: 'boolean',
             label: 'Status Bar Entry',
             description: 'Show zoom level in status bar (only when not 100%).',
-            default: false
+            default: false,
+            scope: PreferenceScope.Folder,
         },
     },
 };

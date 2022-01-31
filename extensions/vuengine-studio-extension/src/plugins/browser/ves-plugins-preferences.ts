@@ -1,3 +1,4 @@
+import { PreferenceScope } from '@theia/core/lib/browser';
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
 
 export namespace VesPluginsPreferenceIds {
@@ -19,11 +20,13 @@ export const VesPluginsPreferenceSchema: PreferenceSchema = {
             additionalProperties: {
                 isDirectory: true,
             },
+            scope: PreferenceScope.Folder,
         },
         [VesPluginsPreferenceIds.ENGINE_PLUGINS_INCLUDE_IN_WORKSPACE]: {
             type: 'boolean',
             description: 'Automatically include plugins library in workspaces.',
             default: false,
+            scope: PreferenceScope.Folder,
         },
         [VesPluginsPreferenceIds.USER_PLUGINS_PATH]: {
             type: 'string',
@@ -31,11 +34,13 @@ export const VesPluginsPreferenceSchema: PreferenceSchema = {
             additionalProperties: {
                 isDirectory: true,
             },
+            scope: PreferenceScope.Folder,
         },
         [VesPluginsPreferenceIds.USER_PLUGINS_INCLUDE_IN_WORKSPACE]: {
             type: 'boolean',
             description: 'Automatically include user plugins in workspaces.',
             default: false,
+            scope: PreferenceScope.Folder,
         },
     },
 };

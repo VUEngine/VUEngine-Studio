@@ -1,4 +1,5 @@
 import { isOSX } from '@theia/core';
+import { PreferenceScope } from '@theia/core/lib/browser';
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
 import {
     FLASHBOY_PLUS_IMAGE_PLACEHOLDER,
@@ -129,6 +130,7 @@ export const VesFlashCartPreferenceSchema: PreferenceSchema = {
                 },
             },
             default: [],
+            scope: PreferenceScope.Folder,
         },
     },
 };

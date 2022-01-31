@@ -1,3 +1,4 @@
+import { PreferenceScope } from '@theia/core/lib/browser';
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
 
 export namespace VesBrandingPreferenceIds {
@@ -13,6 +14,7 @@ export const VesBrandingPreferenceSchema: PreferenceSchema = {
             type: 'boolean',
             description: 'Show Getting Started page when no workspace is loaded.',
             default: true,
+            scope: PreferenceScope.User,
         },
     },
 };

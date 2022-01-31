@@ -1,3 +1,4 @@
+import { PreferenceScope } from '@theia/core/lib/browser';
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
 
 export namespace VesProjectsPreferenceIds {
@@ -17,11 +18,13 @@ export const VesProjectsPreferenceSchema: PreferenceSchema = {
             additionalProperties: {
                 isDirectory: true,
             },
+            scope: PreferenceScope.User,
         },
         [VesProjectsPreferenceIds.AUTHOR]: {
             type: 'string',
             description: 'Default author name to use for new projects.',
             default: 'VUEngine Studio User',
+            scope: PreferenceScope.User,
         },
         [VesProjectsPreferenceIds.MAKER_CODE]: {
             type: 'string',
@@ -29,6 +32,7 @@ export const VesProjectsPreferenceSchema: PreferenceSchema = {
             maxLength: 2,
             description: 'Default Maker Code to place in ROM header of new projects.',
             default: 'VU',
+            scope: PreferenceScope.User,
         },
     },
 };
