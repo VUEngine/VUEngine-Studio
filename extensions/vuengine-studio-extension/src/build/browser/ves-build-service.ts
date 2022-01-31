@@ -815,9 +815,28 @@ export class VesBuildService {
   protected async runTasks(tasks: Array<PrePostBuildTask>): Promise<void> {
     let completed = 0;
 
+    if (!Array.isArray(tasks)) {
+      return this.pushBuildLogLine({
+        type: BuildLogLineType.Error,
+        text: 'Malformed preference: not an array.',
+        timestamp: Date.now(),
+      });
+    }
+
     for (const task of tasks) {
       if (!task.name) {
-        continue;
+        return this.pushBuildLogLine({
+          type: BuildLogLineType.Error,
+          text: 'Malformed preference: missing task name.',
+          timestamp: Date.now(),
+        });
+      }
+      if (!task.type) {
+        return this.pushBuildLogLine({
+          type: BuildLogLineType.Error,
+          text: `Malformed preference: missing type for task ${task.name}.`,
+          timestamp: Date.now(),
+        });
       }
 
       switch (task.type) {
