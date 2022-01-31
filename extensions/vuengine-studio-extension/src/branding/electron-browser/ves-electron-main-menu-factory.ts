@@ -27,4 +27,34 @@ export class VesElectronMainMenuFactory extends ElectronMainMenuFactory {
         this._menu = menu;
         return this._menu;
     }
+
+    protected createOSXMenu(): Electron.MenuItemConstructorOptions {
+        return {
+            label: 'VUEngine Studio',
+            submenu: [
+                {
+                    role: 'services',
+                    submenu: []
+                },
+                {
+                    type: 'separator'
+                },
+                {
+                    role: 'hide'
+                },
+                {
+                    role: 'hideOthers'
+                },
+                {
+                    role: 'unhide'
+                },
+                {
+                    type: 'separator'
+                },
+                {
+                    role: 'quit'
+                }
+            ]
+        };
+    }
 }
