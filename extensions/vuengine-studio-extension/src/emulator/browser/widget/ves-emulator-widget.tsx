@@ -597,6 +597,7 @@ export class VesEmulatorWidget extends ReactWidget {
             height={canvasDimensions.height}
             onLoad={this.startEmulator}
             tabIndex={0}
+            allow="gamepad"
           ></iframe>
         </div>
         {this.state.showControls && (

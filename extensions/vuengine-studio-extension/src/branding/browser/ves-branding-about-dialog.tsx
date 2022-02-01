@@ -72,7 +72,7 @@ export class VesAboutDialog extends AboutDialog {
     protected renderCopyright(): React.ReactNode {
         return <>
             <div className="ves-about-paragraph">
-                © 2021 <a href={'mailto:c.radke@posteo.de'}>Christian Radke</a> and <a href={'mailto:jorgech3@gmail.com'}>Jorge Andres Eremiev</a>
+                © 2022 <a href={'mailto:c.radke@posteo.de'}>Christian Radke</a> and <a href={'mailto:jorgech3@gmail.com'}>Jorge Andres Eremiev</a>
             </div>
             <div className="ves-about-paragraph">
                 <div>

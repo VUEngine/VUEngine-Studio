@@ -199,7 +199,7 @@ export class VesFlashCartService {
       const flasherArgs = connectedFlashCart.config.args
         ? connectedFlashCart.config.args
           .replace(NAME_PLACEHOLDER, projectName)
-          .replace(NAME_NO_SPACES_PLACEHOLDER, projectName.replace(/ /g, ''))
+          .replace(NAME_NO_SPACES_PLACEHOLDER, projectName.replace(/ /g, '').replace('(Workspace)', ''))
           .replace(ROM_PLACEHOLDER, await this.fileService.fsPath(romUri))
           .split(' ')
         : [];
