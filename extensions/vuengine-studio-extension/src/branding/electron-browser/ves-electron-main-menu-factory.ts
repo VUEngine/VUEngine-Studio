@@ -1,7 +1,7 @@
-import { isOSX, MAIN_MENU_BAR } from '@theia/core';
-import { getCurrentWindow, Menu } from '@theia/core/electron-shared/@electron/remote';
-import { ElectronMainMenuFactory } from '@theia/core/lib/electron-browser/menu/electron-main-menu-factory';
 import { injectable } from '@theia/core/shared/inversify';
+import { ElectronMainMenuFactory } from '@theia/core/lib/electron-browser/menu/electron-main-menu-factory';
+import { isOSX, MAIN_MENU_BAR } from '@theia/core';
+import { remote } from 'electron';
 
 // This fixes a bug in Theia where the main menu would not render on Mac if the MenuBarVisibility preference is set to "compact"
 // TODO: remove once fixed in Theia
@@ -11,9 +11,9 @@ export class VesElectronMainMenuFactory extends ElectronMainMenuFactory {
     async setMenuBar(): Promise<void> {
         const createdMenuBar = this.createElectronMenuBar();
         if (isOSX) {
-            Menu.setApplicationMenu(createdMenuBar);
+            remote.Menu.setApplicationMenu(createdMenuBar);
         } else {
-            getCurrentWindow().setMenu(createdMenuBar);
+            remote.getCurrentWindow().setMenu(createdMenuBar);
         }
     }
 
@@ -23,7 +23,7 @@ export class VesElectronMainMenuFactory extends ElectronMainMenuFactory {
         if (isOSX) {
             template.unshift(this.createOSXMenu());
         }
-        const menu = Menu.buildFromTemplate(template);
+        const menu = remote.Menu.buildFromTemplate(template);
         this._menu = menu;
         return this._menu;
     }

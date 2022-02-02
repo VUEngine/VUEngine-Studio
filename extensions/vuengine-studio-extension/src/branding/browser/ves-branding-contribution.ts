@@ -1,13 +1,13 @@
-import { getCurrentWindow } from '@theia/core/electron-shared/@electron/remote';
-import { BuiltinThemeProvider, ThemeService } from '@theia/core/lib/browser/theming';
-import { WindowService } from '@theia/core/lib/browser/window/window-service';
+import { remote } from '@theia/core/shared/electron';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { CommandContribution, CommandRegistry } from '@theia/core/lib/common/command';
 import { MenuContribution, MenuModelRegistry } from '@theia/core/lib/common/menu';
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { MonacoThemeRegistry } from '@theia/monaco/lib/browser/textmate/monaco-theme-registry';
+import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { VesBrandingCommands } from './ves-branding-commands';
 import { VesBrandingMenus } from './ves-branding-menus';
 import { VesTitlebarWindowControlCommands } from './ves-branding-titlebar-window-controls-commands';
+import { BuiltinThemeProvider, ThemeService } from '@theia/core/lib/browser/theming';
+import { MonacoThemeRegistry } from '@theia/monaco/lib/browser/textmate/monaco-theme-registry';
 
 @injectable()
 export class VesBrandingContribution implements CommandContribution, MenuContribution {
@@ -127,13 +127,13 @@ export class VesBrandingContribution implements CommandContribution, MenuContrib
         });
 
         commandRegistry.registerCommand(VesTitlebarWindowControlCommands.MINIMIZE, {
-            execute: () => getCurrentWindow().minimize()
+            execute: () => remote.getCurrentWindow().minimize()
         });
         commandRegistry.registerCommand(VesTitlebarWindowControlCommands.MAXIMIZE, {
-            execute: () => getCurrentWindow().maximize()
+            execute: () => remote.getCurrentWindow().maximize()
         });
         commandRegistry.registerCommand(VesTitlebarWindowControlCommands.UNMAXIMIZE, {
-            execute: () => getCurrentWindow().unmaximize()
+            execute: () => remote.getCurrentWindow().unmaximize()
         });
     }
 
