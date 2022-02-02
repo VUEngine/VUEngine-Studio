@@ -331,8 +331,8 @@ export class VesBuildWidget extends ReactWidget {
           <select className='theia-select' title='Build'>
             <option value='latest'>
               {`✔ – ${new Date(
-                          this.vesBuildService.buildStatus.log[0]?.timestamp
-                        ).toUTCString()} – ${this.vesBuildService.buildStatus.buildMode}`}
+                  this.vesBuildService.buildStatus.log[0]?.timestamp
+                ).toUTCString()} – ${this.vesBuildService.buildStatus.buildMode}`}
             </option>
           </select>
         </div> */}
@@ -356,9 +356,12 @@ export class VesBuildWidget extends ReactWidget {
   }
 
   protected getDuration(): string {
-    const startDate = this.vesBuildService.buildStatus.startDate || new Date();
-    const endDate = this.vesBuildService.buildStatus.endDate || startDate;
-    const duration = endDate.getTime() - startDate.getTime();
+    let duration = 0;
+    const startDate = this.vesBuildService.buildStatus.startDate;
+    if (startDate) {
+      const endDate = this.vesBuildService.buildStatus.endDate || new Date();
+      duration = endDate.getTime() - startDate.getTime();
+    }
     const durationDate = new Date(duration);
 
     return `${durationDate
