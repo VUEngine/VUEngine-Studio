@@ -113,14 +113,19 @@ export class VesProjectsService {
       await this.fileService.copy(templateUri, targetUri);
 
       // modify files and folders
-      const prefDirUri = targetUri.resolve(VES_PREFERENCE_DIR);
-      if (await this.fileService.exists(prefDirUri)) {
-        await this.fileService.delete(prefDirUri, { recursive: true });
+      const dirsToDelete = [
+        VES_PREFERENCE_DIR,
+        '.git',
+        '.github'
+      ];
+
+      for (const dirToDelete of dirsToDelete) {
+        const dirToDeleteUri = targetUri.resolve(dirToDelete);
+        if (await this.fileService.exists(dirToDeleteUri)) {
+          await this.fileService.delete(dirToDeleteUri, { recursive: true });
+        }
       }
-      const githubDirUri = targetUri.resolve('.github');
-      if (await this.fileService.exists(githubDirUri)) {
-        await this.fileService.delete(githubDirUri, { recursive: true });
-      }
+
       await this.fileService.move(
         targetUri.resolve(`${template.id}.theia-workspace`),
         targetUri.resolve(`${folder}.theia-workspace`),
@@ -128,14 +133,20 @@ export class VesProjectsService {
 
       // replace labels according to mapping file
       // the first three are most sensitive and should be replaced first
-      await this.replaceInProject(targetUri, template.labels['headerName'].substr(0, 20).padEnd(20, ' '), name.substr(0, 20).padEnd(20, ' '));
-      const templateGameCode = template.labels['gameCode'].substr(0, 4).padEnd(4, 'X');
-      await this.replaceInProject(targetUri,
-        `"gameCodeId": "${templateGameCode.substr(1, 2)}",`,
-        `"gameCodeId": "${gameCode.substr(0, 2).padEnd(2, 'X')}",`
+      await this.replaceInProject(
+        targetUri,
+        template.labels['headerName'].substring(0, 20).padEnd(20, ' '), name.substring(0, 20).padEnd(20, ' ')
       );
-      await this.replaceInProject(targetUri, `"${templateGameCode}"`, `"${templateGameCode.substr(0, 1)}${gameCode.substr(0, 2).padEnd(2, 'X')}${templateGameCode.substr(3, 1)}"`);
-      await this.replaceInProject(targetUri, `"${template.labels['makerCode'].substr(0, 2).padEnd(2, ' ')}"`, `"${makerCode.substr(0, 2).padEnd(2, ' ')}"`);
+      const templateGameCode = template.labels['gameCode'].substring(0, 4).padEnd(4, 'X');
+      await this.replaceInProject(targetUri,
+        `"gameCodeId": "${templateGameCode.substring(1, 3)}",`,
+        `"gameCodeId": "${gameCode.substring(0, 2).padEnd(2, 'X')}",`
+      );
+      await this.replaceInProject(
+        targetUri,
+        `"${templateGameCode}"`, `"${templateGameCode.substring(0, 1)}${gameCode.substring(0, 2).padEnd(2, 'X')}${templateGameCode.substring(3, 4)}"`
+      );
+      await this.replaceInProject(targetUri, `"${template.labels['makerCode'].substring(0, 2).padEnd(2, ' ')}"`, `"${makerCode.substring(0, 2).padEnd(2, ' ')}"`);
       await this.replaceInProject(targetUri, template.labels['headerName'], name);
       await Promise.all(template.labels['name']?.map(async (value: string) => {
         await this.replaceInProject(targetUri, value, name);
