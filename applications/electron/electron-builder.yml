@@ -31,6 +31,14 @@ files:
   - from: vuengine
     to: vuengine
 
+fileAssociations:
+  - ext: theia-workspace
+    name: VUEngine Studio Workspace
+    description: Workspace file of a VUEngine Studio project
+    role: Editor
+    rank: Owner
+    isPackage: false
+
 win:
   icon: resources/icons/WindowsLauncherIcon/VUEngineStudio.ico
   target:
@@ -45,6 +53,7 @@ win:
       to: app/binaries/vuengine-studio-tools/win
     - from: binaries/vuengine-studio-tools/linux/gcc
       to: app/binaries/vuengine-studio-tools/linux/gcc
+
 mac:
   icon: resources/icons/MacLauncherIcon/512-512.icns
   category: public.app-category.developer-tools
@@ -57,6 +66,7 @@ mac:
   extraResources:
     - from: binaries/vuengine-studio-tools/osx
       to: app/binaries/vuengine-studio-tools/osx
+
 linux:
   icon: resources/icons/LinuxLauncherIcon/512-512.png
   category: Development
