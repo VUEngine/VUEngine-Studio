@@ -106,6 +106,10 @@ pkg:
   isVersionChecked: true
   isRelocatable: false
   overwriteAction: upgrade
+  background:
+    file: resources/icons/MacPkgBackground.png
+    alignment: bottomleft
+    scaling: proportional
 deb:
   artifactName: ${productName}.${ext}
 appImage:
