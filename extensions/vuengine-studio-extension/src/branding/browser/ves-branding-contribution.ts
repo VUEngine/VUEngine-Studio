@@ -1,17 +1,22 @@
-import { remote } from '@theia/core/shared/electron';
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { MAIN_MENU_BAR, nls } from '@theia/core';
+import { ApplicationShell, PreferenceService } from '@theia/core/lib/browser';
+import { BuiltinThemeProvider, ThemeService } from '@theia/core/lib/browser/theming';
+import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { CommandContribution, CommandRegistry } from '@theia/core/lib/common/command';
 import { MenuContribution, MenuModelRegistry } from '@theia/core/lib/common/menu';
-import { WindowService } from '@theia/core/lib/browser/window/window-service';
+import { remote } from '@theia/core/shared/electron';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { MonacoThemeRegistry } from '@theia/monaco/lib/browser/textmate/monaco-theme-registry';
 import { VesBrandingCommands } from './ves-branding-commands';
 import { VesBrandingMenus } from './ves-branding-menus';
 import { VesTitlebarWindowControlCommands } from './ves-branding-titlebar-window-controls-commands';
-import { BuiltinThemeProvider, ThemeService } from '@theia/core/lib/browser/theming';
-import { MonacoThemeRegistry } from '@theia/monaco/lib/browser/textmate/monaco-theme-registry';
 
 @injectable()
 export class VesBrandingContribution implements CommandContribution, MenuContribution {
-
+    @inject(ApplicationShell)
+    protected readonly shell: ApplicationShell;
+    @inject(PreferenceService)
+    protected readonly preferenceService: PreferenceService;
     @inject(ThemeService)
     protected readonly themeService: ThemeService;
     @inject(WindowService)
@@ -21,6 +26,26 @@ export class VesBrandingContribution implements CommandContribution, MenuContrib
     static SUPPORT_URL = 'https://www.patreon.com/VUEngine';
 
     @postConstruct()
+    init(): void {
+        this.initMenubar();
+        this.initThemes();
+    }
+
+    initMenubar(): void {
+        // work around Theia bug with main menu not being initialized when the default
+        // value is "compact"
+        const menuBarVisibility = this.preferenceService.get('window.menuBarVisibility');
+        if (menuBarVisibility === 'compact') {
+            this.shell.leftPanelHandler.addTopMenu({
+                id: 'main-menu',
+                iconClass: 'codicon codicon-menu',
+                title: nls.localizeByDefault('Application Menu'),
+                menuPath: MAIN_MENU_BAR,
+                order: 0,
+            });
+        }
+    }
+
     initThemes(): void {
         // @ref https://github.com/eclipse-theia/theia/blob/master/packages/core/src/browser/theming.ts
         // @ref https://github.com/eclipse-theia/theia/blob/master/packages/monaco/src/browser/textmate/monaco-theme-registry.ts
