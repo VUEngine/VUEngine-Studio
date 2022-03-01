@@ -95,10 +95,10 @@ nsis:
   uninstallerIcon: resources/icons/WindowsLauncherIcon/VUEngineStudio.ico
   installerSidebar: resources/icons/InstallerSidebarImage/164-314Windows.bmp
   uninstallerSidebar: resources/icons/InstallerSidebarImage/164-314Windows.bmp
-  artifactName: ${productName} Setup ${version}.${ext}
+  artifactName: ${productName} ${version} Setup Windows.${ext}
   uninstallDisplayName: ${productName}
 pkg:
-  artifactName: ${productName} Setup ${version}.${ext}
+  artifactName: ${productName} ${version} Setup Mac.${ext}
   installLocation: /Applications
   allowAnywhere: false
   allowCurrentUserHome: false

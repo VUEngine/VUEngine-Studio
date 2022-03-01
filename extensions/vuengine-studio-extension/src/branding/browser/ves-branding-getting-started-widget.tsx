@@ -211,7 +211,7 @@ export class VesGettingStartedWidget extends ReactWidget {
                 <h1>
                     {this.applicationName}
                     <span className="gs-sub-header">
-                        {this.applicationInfo && ` ${this.applicationInfo.version}`}
+                        {/* this.applicationInfo && ` ${this.applicationInfo.version}` */} Preview
                     </span>
                 </h1>
             </div>
