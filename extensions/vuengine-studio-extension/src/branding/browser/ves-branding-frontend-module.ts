@@ -17,6 +17,7 @@ import {
     BrowserMenuBarContribution
 } from '@theia/core/lib/browser/menu/browser-menu-plugin';
 import { PreferenceConfigurations } from '@theia/core/lib/browser/preferences/preference-configurations';
+import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { MenuContribution } from '@theia/core/lib/common/menu';
 import { ContainerModule } from '@theia/core/shared/inversify';
@@ -82,6 +83,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // getting started view
     bindViewContribution(bind, VesGettingStartedViewContribution);
     bind(FrontendApplicationContribution).toService(VesGettingStartedViewContribution);
+    bind(TabBarToolbarContribution).toService(VesGettingStartedViewContribution);
     bind(VesGettingStartedWidget).toSelf();
     bind(WidgetFactory).toDynamicValue(context => ({
         id: VesGettingStartedWidget.ID,

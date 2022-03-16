@@ -4,7 +4,6 @@ VUEngine Studio is a custom integrated development environment (IDE), tailor-mad
 
 ![](VUEngine-Studio.png?raw=true)
 
-
 ## License
 
 VUEngine Studio is built upon Eclipse Theia, a framework for building cloud and desktop IDEs using modern, state-of-the-art web technologies.
@@ -12,7 +11,7 @@ VUEngine Studio is built upon Eclipse Theia, a framework for building cloud and 
 - [Eclipse Public License 2.0](LICENSE)
 - [一 (Secondary) GNU General Public License, version 2 with the GNU Classpath Exception](LICENSE)
 
-The following third party binaries that are shipped with VUEngine Studio come with their own licenses: 
+The following third party binaries that are shipped with VUEngine Studio come with their own licenses:
 
 - GCC by The GNU Project, with patches for V810 by ElmerPCFX
 - Grit by Jasper Vijn, with patches for Virtual Boy by dasi
@@ -21,11 +20,9 @@ The following third party binaries that are shipped with VUEngine Studio come wi
 - prog-vb by William D. Jones
 - RetroArch Web w/ Beetle VB core by the RetroArch and Mednafen teams
 
-
 ## Usage
 
 Documentation on how to use VUEngine Studio can be found at https://www.vuengine.dev/documentation/.
-
 
 ## Building
 
@@ -50,7 +47,6 @@ On Windows, install Visual Studio Build Tools.
 
 Install Python.
 
-
 ### Init
 
 After cloning, load git submodules with
@@ -61,13 +57,21 @@ They can be updated at a later point with
 
     yarn modules:update
 
-
 ### Build
+
+Make sure you're using node 12.14.1.
+
+    nvm use 12.14.1
+
+Then, build the application.
 
     yarn --ignore-engines
 
-
 ### Development
+
+Make sure you're using node 12.14.1.
+
+    nvm use 12.14.1
 
 Open two terminals and execute one of the following commands in each.
 
@@ -76,20 +80,17 @@ Open two terminals and execute one of the following commands in each.
 
 The first will do an incremental build on every code change you do. The latter will start the Electron frontend. Reload (CMD/Ctrl+R) to load your changes.
 
-
 ### Package the application
 
     yarn electron package
 
 The packaged application is located in `applications/electron/dist`.
 
-
 ### Create a preview application (without packaging it)
 
     yarn electron package:preview
 
 The packaged application is located in `applications/electron/dist`.
-
 
 ### Running E2E Tests
 
@@ -98,12 +99,6 @@ This is done based on the preview of the packaged application.
 
     yarn electron package:preview
     yarn electron test
-
-
-### Troubleshooting
-
-- [_"Don't expect that you can build app for all platforms on one platform."_](https://www.electron.build/multi-platform-build)
-
 
 ### Reporting feature requests and bugs
 

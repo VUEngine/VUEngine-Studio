@@ -22,6 +22,13 @@ export class VesDocumentationService {
   }
 
   async getHandbookUri(file: string): Promise<URI> {
+    if (file.startsWith('/documentation/')) {
+      file = file.substring(14);
+    }
+    if (file.endsWith('/')) {
+      file = file.substring(0, file.length - 1);
+    }
+
     const handbookRootUri = await this.getHandbookRootUri();
     const docUri = handbookRootUri.resolve(join(...(`${file}.md`).split('/')));
 

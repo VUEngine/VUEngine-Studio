@@ -48,17 +48,17 @@ export class VesDocumentationTreeWidget extends TreeWidget {
       members: [
         {
           name: 'VUEngine Studio Handbook',
-          file: '<handbook>',
+          url: '<handbook>',
           children: []
         },
         {
           name: 'VUEngine Code Docs',
-          // file: '<doxy>',
+          // url: '<doxy>',
           children: []
         },
         {
           name: 'Hardware Documentation',
-          file: '<stsvb>'
+          url: '<stsvb>'
         }
       ]
     };
@@ -108,10 +108,10 @@ export class VesDocumentationTreeWidget extends TreeWidget {
 
   protected async handleDocOpen(node: VesDocumentationChildNode | undefined): Promise<void> {
     if (node) {
-      if (node.member.file === '<stsvb>') {
+      if (node.member.url === '<stsvb>') {
         this.commandService.executeCommand(VesDocumentationCommands.OPEN_TECH_SCROLL.id);
-      } else if (node.member.file && node.member.file !== '' && !node.member.file.startsWith('<')) {
-        this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, node.member.file ?? '');
+      } else if (node.member.url && node.member.url !== '' && !node.member.url.startsWith('<')) {
+        this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, node.member.url ?? '');
       }
     }
   }
@@ -119,7 +119,7 @@ export class VesDocumentationTreeWidget extends TreeWidget {
   protected renderIcon(node: VesDocumentationChildNode, props: NodeProps): React.ReactNode {
     const iconClass = props.depth === 0
       ? 'codicon codicon-book'
-      : node.member.children !== undefined && node.member.children.length > 0 && node.member.file === undefined
+      : node.member.children !== undefined && node.member.children.length > 0 && node.member.url === undefined
         ? 'fa fa-folder'
         : 'fa fa-file-text-o';
     return <i className={iconClass} style={{ marginRight: 5 }} />;

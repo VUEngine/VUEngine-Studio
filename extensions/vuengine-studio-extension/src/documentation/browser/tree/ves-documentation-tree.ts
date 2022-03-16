@@ -21,7 +21,7 @@ export class VesDocumentationTree extends TreeImpl {
       id: uuid(),
       name: m.name,
       parent: undefined,
-      expanded: m.file === '<handbook>',
+      expanded: m.url === '<handbook>',
       selected: false,
       children: [],
       member: m
@@ -60,6 +60,6 @@ export interface VesDocumentTree {
 
 export interface VesDocumentationChild {
   name: string;
-  file?: string;
+  url?: string;
   children?: VesDocumentationChild[];
 }
