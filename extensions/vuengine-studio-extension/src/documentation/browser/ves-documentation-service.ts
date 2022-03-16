@@ -28,6 +28,9 @@ export class VesDocumentationService {
     if (file.endsWith('/')) {
       file = file.substring(0, file.length - 1);
     }
+    if (file === '') {
+      file = '/index';
+    }
 
     const handbookRootUri = await this.getHandbookRootUri();
     const docUri = handbookRootUri.resolve(join(...(`${file}.md`).split('/')));

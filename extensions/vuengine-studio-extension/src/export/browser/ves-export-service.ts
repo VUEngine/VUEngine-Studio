@@ -1,6 +1,7 @@
 import { CommandService, environment } from '@theia/core';
 import { ApplicationShell, CommonCommands, ConfirmDialog, PreferenceService } from '@theia/core/lib/browser';
 import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
+import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
@@ -11,7 +12,6 @@ import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesProjectsService } from '../../projects/browser/ves-projects-service';
 import sanitize = require('sanitize-filename');
-import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 
 @injectable()
 export class VesExportService {
