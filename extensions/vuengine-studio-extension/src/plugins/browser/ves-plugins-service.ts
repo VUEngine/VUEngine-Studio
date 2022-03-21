@@ -1,6 +1,4 @@
-import { PreferenceService } from '@theia/core/lib/browser';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
-import { EncodingService } from '@theia/core/lib/common/encoding-service';
 import { Deferred } from '@theia/core/lib/common/promise-util';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -17,12 +15,8 @@ import { VUENGINE_PLUGINS_PREFIX } from './ves-plugins-types';
 @injectable()
 export class VesPluginsService {
 
-  @inject(EncodingService)
-  protected encodingService: EncodingService;
   @inject(FileService)
   protected fileService: FileService;
-  @inject(PreferenceService)
-  protected preferenceService: PreferenceService;
   @inject(VesGlobService)
   protected vesGlobService: VesGlobService;
   @inject(VesPluginsPathsService)
