@@ -49,7 +49,7 @@ export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmu
       isVisible: widget => widget !== undefined &&
         widget.id !== undefined &&
         widget.id === VesEmulatorWidget.ID,
-      execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'user-interface/emulator', false),
+      execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'user-guide/emulator', false),
     });
   }
 

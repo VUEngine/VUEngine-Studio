@@ -43,7 +43,7 @@ export class VesImageConverterViewContribution extends AbstractViewContribution<
             isEnabled: () => true,
             isVisible: widget => widget !== undefined &&
                 widget.id === VesImageConverterWidget.ID,
-            execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'user-interface/image-converter-view', false),
+            execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'user-guide/assets', false),
         });
     }
 

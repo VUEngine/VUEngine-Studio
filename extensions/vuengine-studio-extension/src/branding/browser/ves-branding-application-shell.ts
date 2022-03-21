@@ -1,4 +1,3 @@
-import { isOSX, isWindows } from '@theia/core';
 import { ApplicationShell, Panel, Widget } from '@theia/core/lib/browser';
 import { TheiaDockPanel } from '@theia/core/lib/browser/shell/theia-dock-panel';
 import { injectable } from '@theia/core/shared/inversify';
@@ -28,16 +27,11 @@ export class VesApplicationShell extends ApplicationShell {
         const topPanel = super.createTopPanel();
         // show the top panel
         topPanel.show();
-        topPanel.addClass(`os-${this.getOs()}`);
         return topPanel;
     }
 
     protected setTopPanelVisibility(preference: string): void {
         // always show the top panel
         this.topPanel.show();
-    }
-
-    protected getOs(): string {
-        return isWindows ? 'win' : isOSX ? 'osx' : 'linux';
     }
 }

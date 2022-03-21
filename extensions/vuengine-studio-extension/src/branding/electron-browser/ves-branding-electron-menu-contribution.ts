@@ -1,16 +1,17 @@
-import { inject, injectable } from '@theia/core/shared/inversify';
-import { remote } from '@theia/core/shared/electron';
+import { CommandService, isOSX } from '@theia/core';
 import { FrontendApplication, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
 import { ElectronMenuContribution } from '@theia/core/lib/electron-browser/menu/electron-menu-contribution';
-import { CommandService, isOSX } from '@theia/core';
-import { VesBuildService } from '../../build/browser/ves-build-service';
-import { VesBuildPreferenceIds } from '../../build/browser/ves-build-preferences';
-import { BuildMode } from '../../build/browser/ves-build-types';
-import { VesEmulatorService } from '../../emulator/browser/ves-emulator-service';
-import { VesEmulatorPreferenceIds } from '../../emulator/browser/ves-emulator-preferences';
-import { VesFlashCartService } from '../../flash-cart/browser/ves-flash-cart-service';
-import { VesTouchBarCommands } from '../common/ves-branding-types';
+import { remote } from '@theia/core/shared/electron';
+import { inject, injectable } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { VesBuildPreferenceIds } from '../../build/browser/ves-build-preferences';
+import { VesBuildService } from '../../build/browser/ves-build-service';
+import { BuildMode } from '../../build/browser/ves-build-types';
+import { VesEmulatorPreferenceIds } from '../../emulator/browser/ves-emulator-preferences';
+import { VesEmulatorService } from '../../emulator/browser/ves-emulator-service';
+import { VesFlashCartService } from '../../flash-cart/browser/ves-flash-cart-service';
+import { VesCommonService } from '../browser/ves-common-service';
+import { VesTouchBarCommands } from '../common/ves-branding-types';
 
 @injectable()
 export class VesElectronMenuContribution extends ElectronMenuContribution {
@@ -20,6 +21,8 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
     protected readonly preferenceService: PreferenceService;
     @inject(VesBuildService)
     protected readonly vesBuildService: VesBuildService;
+    @inject(VesCommonService)
+    protected readonly vesCommonService: VesCommonService;
     @inject(VesEmulatorService)
     protected readonly vesEmulatorService: VesEmulatorService;
     @inject(VesFlashCartService)
@@ -31,6 +34,7 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
         super.onStart(app);
         this.vesBindTouchBar();
         this.vesBindDynamicMenu();
+        app.shell.addClass(`os-${this.vesCommonService.getOs()}`);
     }
 
     protected hideTopPanel(app: FrontendApplication): void {

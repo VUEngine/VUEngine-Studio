@@ -157,12 +157,6 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
         value: BuildMode.Debug,
         detail: '   Includes all runtime assertions, includes debugging tools.',
         iconClasses: (BuildMode.Debug === currentBuildMode) ? ['fa', 'fa-check-square-o'] : ['fa', 'fa-square-o'],
-      },
-      {
-        label: BuildMode.Preprocessor,
-        value: BuildMode.Preprocessor,
-        detail: '   The .o files are preprocessor output instead of compiler output.',
-        iconClasses: (BuildMode.Preprocessor === currentBuildMode) ? ['fa', 'fa-check-square-o'] : ['fa', 'fa-square-o'],
       }
     ];
 

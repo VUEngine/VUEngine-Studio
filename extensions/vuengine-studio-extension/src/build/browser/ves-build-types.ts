@@ -5,7 +5,6 @@ export enum BuildMode {
   Beta = 'Beta',
   Tools = 'Tools',
   Debug = 'Debug',
-  Preprocessor = 'Preprocessor',
 }
 
 export enum BuildResult {

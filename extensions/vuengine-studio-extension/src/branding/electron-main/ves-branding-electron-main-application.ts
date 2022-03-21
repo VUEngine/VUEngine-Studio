@@ -108,8 +108,6 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             label: BuildMode.Tools,
         }, {
             label: BuildMode.Debug,
-        }, {
-            label: BuildMode.Preprocessor,
         }];
 
         const buildModeButtonSegmentedControl = new TouchBarSegmentedControl({
@@ -185,7 +183,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         });
         // @ts-ignore
         app.on(VesTouchBarCommands.changeBuildMode, (buildMode: BuildMode) => {
-            buildModeButton.label = buildMode.replace('Preprocessor', 'Preproc.');
+            buildModeButton.label = buildMode;
         });
 
         return [

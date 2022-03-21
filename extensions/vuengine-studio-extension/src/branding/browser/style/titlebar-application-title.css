@@ -15,7 +15,7 @@
 }
 
 @media (max-width: 1000px) {
-  #theia-top-panel:not(.os-osx) #ves-titlebar-application-title {
+  .theia-ApplicationShell:not(.os-osx) #ves-titlebar-application-title {
     visibility: hidden;
   }
 }

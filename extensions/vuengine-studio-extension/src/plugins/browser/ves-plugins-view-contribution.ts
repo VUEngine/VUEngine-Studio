@@ -60,7 +60,7 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
                     `${VesPluginsWidget.ID}:${VesPluginsSourceOptions.SEARCH_RESULT}`,
                     VesPluginsViewContainer.ID
                 ].includes(widget.id),
-            execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'user-interface/plugins-view', false),
+            execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'user-guide/vuengine-plugins', false),
         });
 
         commandRegistry.registerCommand(VesPluginsCommands.SHOW_INSTALLED, {

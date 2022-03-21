@@ -2,3 +2,29 @@
   /* TODO: use theia's scrollbar instead */
   overflow: auto;
 }
+
+.theia-ApplicationShell.os-osx .target-os-win,
+.theia-ApplicationShell.os-linux .target-os-win,
+.theia-ApplicationShell.os-win .target-os-osx,
+.theia-ApplicationShell.os-linux .target-os-osx,
+.theia-ApplicationShell.os-win .target-os-linux,
+.theia-ApplicationShell.os-osx .target-os-linux,
+.theia-ApplicationShell.os-win .target-os-not-win,
+.theia-ApplicationShell.os-osx .target-os-not-osx,
+.theia-ApplicationShell.os-linux .target-os-not-linux {
+  display: none;
+}
+
+.keys {
+  background-color: #6c757d;
+  border-radius: 0.25rem;
+  color: #fff;
+  display: inline-block;
+  font-size: 0.8em;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0.3em 0.5em;
+  text-align: center;
+  vertical-align: baseline;
+  white-space: nowrap;
+}

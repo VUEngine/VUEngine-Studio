@@ -6,14 +6,11 @@ import { WorkspaceCommands, WorkspaceService } from '@theia/workspace/lib/browse
 import { CommandService } from '@theia/core';
 import { FrontendApplicationConfigProvider } from '@theia/core/lib/browser/frontend-application-config-provider';
 import { VesProjectsService } from '../../projects/browser/ves-projects-service';
-import { VesCommonService } from './ves-common-service';
 
 @injectable()
 export class VesTitlebarApplicationTitleWidget extends ReactWidget {
   @inject(CommandService)
   protected readonly commandService: CommandService;
-  @inject(VesCommonService)
-  protected readonly vesCommonService: VesCommonService;
   @inject(VesProjectsService)
   protected readonly vesProjectsService: VesProjectsService;
   @inject(WorkspaceService)
@@ -29,7 +26,6 @@ export class VesTitlebarApplicationTitleWidget extends ReactWidget {
     this.title.label = VesTitlebarApplicationTitleWidget.LABEL;
     this.title.caption = VesTitlebarApplicationTitleWidget.LABEL;
     this.title.closable = false;
-    this.addClass(`os-${this.vesCommonService.getOs()}`);
 
     const { applicationName: title } = FrontendApplicationConfigProvider.get();
     this.applicationTitle = title;

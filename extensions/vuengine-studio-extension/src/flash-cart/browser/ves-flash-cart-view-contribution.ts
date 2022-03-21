@@ -70,7 +70,7 @@ export class VesFlashCartViewContribution extends AbstractViewContribution<VesFl
             isVisible: widget => widget !== undefined &&
                 widget.id !== undefined &&
                 widget.id === VesFlashCartWidget.ID,
-            execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'user-interface/flash-carts-view', false),
+            execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'user-guide/flash-carts', false),
         });
         commandRegistry.registerCommand(VesFlashCartViewContributionCommands.REFRESH, {
             isEnabled: () => true,

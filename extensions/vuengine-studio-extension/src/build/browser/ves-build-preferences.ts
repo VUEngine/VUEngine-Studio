@@ -25,7 +25,6 @@ export const VesBuildPreferenceSchema: PreferenceSchema = {
                 BuildMode.Beta,
                 BuildMode.Tools,
                 BuildMode.Debug,
-                BuildMode.Preprocessor,
             ],
             scope: PreferenceScope.Folder,
             overridable: true,
