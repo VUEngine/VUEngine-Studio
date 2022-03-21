@@ -56,7 +56,7 @@ export const VesBuildPreferenceSchema: PreferenceSchema = {
         [VesBuildPreferenceIds.ENGINE_CORE_INCLUDE_IN_WORKSPACE]: {
             type: 'boolean',
             description: 'Automatically include core library in workspaces.',
-            default: false,
+            default: true,
             scope: PreferenceScope.Folder,
             overridable: true,
         },
