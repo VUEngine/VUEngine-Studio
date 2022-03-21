@@ -51,11 +51,11 @@ export class VesDocumentationTreeWidget extends TreeWidget {
           url: '<handbook>',
           children: []
         },
-        {
+        /* {
           name: 'VUEngine Code Docs',
           // url: '<doxy>',
           children: []
-        },
+        }, */
         {
           name: 'Hardware Documentation',
           url: '<stsvb>'
