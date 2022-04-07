@@ -85,7 +85,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
         return !this.workspaceService.opened ? <>
             <button
                 className='theia-button secondary new-project'
-                title={`Create New Project${this.getKeybindingLabel(VesProjectsCommands.NEW.id, true)}`}
+                title={`${VesProjectsCommands.NEW.label}${this.getKeybindingLabel(VesProjectsCommands.NEW.id, true)}`}
                 onClick={this.createNewProject}
                 key='action-button-new-project'
             >

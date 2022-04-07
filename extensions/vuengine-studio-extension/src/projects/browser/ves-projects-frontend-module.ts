@@ -1,12 +1,13 @@
 import { PreferenceContribution } from '@theia/core/lib/browser';
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { ContainerModule } from '@theia/core/shared/inversify';
+import '../../../src/projects/browser/style/index.css';
 import { VesNewProjectDialog, VesNewProjectDialogProps } from './new-project/ves-projects-new-project-dialog';
+import { VesProjectsCommands } from './ves-projects-commands';
 import { VesProjectsContribution } from './ves-projects-contribution';
 import { VesProjectsPathsService } from './ves-projects-paths-service';
 import { VesProjectsPreferenceSchema } from './ves-projects-preferences';
 import { VesProjectsService } from './ves-projects-service';
-import '../../../src/projects/browser/style/index.css';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // commands
@@ -22,5 +23,5 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     // new project dialog
     bind(VesNewProjectDialog).toSelf().inSingletonScope();
-    bind(VesNewProjectDialogProps).toConstantValue({ title: 'Create New Project' });
+    bind(VesNewProjectDialogProps).toConstantValue({ title: VesProjectsCommands.NEW.label! });
 });

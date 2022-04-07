@@ -5,7 +5,7 @@ export namespace VesProjectsCommands {
 
     export const NEW: Command = {
         id: 'ves:projects:new',
-        label: 'Create New Project',
+        label: 'New Project',
         category: CATEGORY,
     };
 }

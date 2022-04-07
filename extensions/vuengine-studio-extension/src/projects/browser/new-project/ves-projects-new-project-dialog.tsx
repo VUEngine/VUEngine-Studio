@@ -10,6 +10,7 @@ import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesCommonService } from '../../../branding/browser/ves-common-service';
+import { VesProjectsCommands } from '../ves-projects-commands';
 import { VesProjectsPathsService } from '../ves-projects-paths-service';
 import { VesProjectsService } from '../ves-projects-service';
 import { VesNewProjectFormComponent, VES_NEW_PROJECT_TEMPLATES } from './ves-projects-new-project-form';
@@ -43,7 +44,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
         protected readonly props: VesNewProjectDialogProps
     ) {
         super({
-            title: 'Create New Project',
+            title: VesProjectsCommands.NEW.label!,
             maxWidth: 600
         });
 

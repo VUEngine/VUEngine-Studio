@@ -223,7 +223,7 @@ export class VesGettingStartedWidget extends ReactWidget {
 
         const newProject = (
             <button className="theia-button large" onClick={this.createNewProject}>
-                <i className="fa fa-plus"></i> Create New Project
+                <i className="fa fa-plus"></i> {VesProjectsCommands.NEW.label}
             </button>
         );
 
