@@ -1,6 +1,5 @@
 import { Emitter, isWindows } from '@theia/core';
 import { LabelProvider } from '@theia/core/lib/browser';
-import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
