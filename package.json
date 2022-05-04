@@ -13,10 +13,10 @@
   },
   "engines": {
     "yarn": "1.0.x || >=1.2.1",
-    "node": ">=12.14.1 <13"
+    "node": ">=14.0.0 <15"
   },
   "devDependencies": {
-    "@theia/cli": "1.21.0",
+    "@theia/cli": "1.22.1",
     "@typescript-eslint/eslint-plugin-tslint": "^4.25.0",
     "@typescript-eslint/eslint-plugin": "^4.25.0",
     "@typescript-eslint/parser": "^4.25.0",

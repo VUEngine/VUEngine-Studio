@@ -1,9 +1,9 @@
-import { remote } from '@theia/core/shared/electron';
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { CommandContribution, CommandRegistry } from '@theia/core/lib/common/command';
-import { VesZoomCommands } from './ves-zoom-commands';
-import { ElectronCommands } from '@theia/core/lib/electron-browser/menu/electron-menu-contribution';
+import { getCurrentWindow } from '@theia/core/electron-shared/@electron/remote';
 import { KeybindingContribution, KeybindingRegistry, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
+import { CommandContribution, CommandRegistry } from '@theia/core/lib/common/command';
+import { ElectronCommands } from '@theia/core/lib/electron-browser/menu/electron-menu-contribution';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { VesZoomCommands } from './ves-zoom-commands';
 import { VesZoomPreferenceIds, VesZoomPreferenceSchema } from './ves-zoom-preferences';
 import { VesZoomStatusBarContribution } from './ves-zoom-statusbar-contribution';
 
@@ -95,7 +95,7 @@ export class VesZoomContribution implements CommandContribution, KeybindingContr
 
     protected applyConfiguredZoomFactor(): void {
         const zoomFactor = this.toZoomFactor(this.preferenceService.get(VesZoomPreferenceIds.ZOOM_LEVEL) as string);
-        const currentWindow = remote.getCurrentWindow();
+        const currentWindow = getCurrentWindow();
         currentWindow.webContents.setZoomFactor(zoomFactor);
     }
 

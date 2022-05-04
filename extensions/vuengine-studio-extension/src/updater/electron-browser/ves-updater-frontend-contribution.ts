@@ -1,3 +1,5 @@
+import { getCurrentWindow } from '@theia/core/electron-shared/@electron/remote';
+import { BrowserWindow, Menu } from '@theia/core/electron-shared/electron';
 import { CommonMenus, OpenerService } from '@theia/core/lib/browser';
 import { PreferenceScope, PreferenceService } from '@theia/core/lib/browser/preferences';
 import {
@@ -13,7 +15,6 @@ import {
 import { isOSX } from '@theia/core/lib/common/os';
 import URI from '@theia/core/lib/common/uri';
 import { ElectronMainMenuFactory } from '@theia/core/lib/electron-browser/menu/electron-main-menu-factory';
-import { BrowserWindow, Menu, remote } from '@theia/core/shared/electron';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { clearInterval, setInterval } from 'timers';
 import { UpdaterError, VesUpdater, VesUpdaterClient } from '../common/ves-updater';
@@ -73,9 +74,9 @@ export class ElectronMenuUpdater {
         this.setMenu();
     }
 
-    private setMenu(menu: Menu | null = this.factory.createElectronMenuBar(), electronWindow: BrowserWindow = remote.getCurrentWindow()): void {
+    private setMenu(menu: Menu | null = this.factory.createElectronMenuBar(), electronWindow: BrowserWindow = getCurrentWindow()): void {
         if (isOSX) {
-            remote.Menu.setApplicationMenu(menu);
+            Menu.setApplicationMenu(menu);
         } else {
             electronWindow.setMenu(menu);
         }

@@ -1,10 +1,10 @@
 import { MAIN_MENU_BAR, nls } from '@theia/core';
+import { getCurrentWindow } from '@theia/core/electron-shared/@electron/remote';
 import { ApplicationShell, PreferenceService } from '@theia/core/lib/browser';
 import { BuiltinThemeProvider, ThemeService } from '@theia/core/lib/browser/theming';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { CommandContribution, CommandRegistry } from '@theia/core/lib/common/command';
 import { MenuContribution, MenuModelRegistry } from '@theia/core/lib/common/menu';
-import { remote } from '@theia/core/shared/electron';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { MonacoThemeRegistry } from '@theia/monaco/lib/browser/textmate/monaco-theme-registry';
 import { VesBrandingCommands } from './ves-branding-commands';
@@ -152,13 +152,13 @@ export class VesBrandingContribution implements CommandContribution, MenuContrib
         });
 
         commandRegistry.registerCommand(VesTitlebarWindowControlCommands.MINIMIZE, {
-            execute: () => remote.getCurrentWindow().minimize()
+            execute: () => getCurrentWindow().minimize()
         });
         commandRegistry.registerCommand(VesTitlebarWindowControlCommands.MAXIMIZE, {
-            execute: () => remote.getCurrentWindow().maximize()
+            execute: () => getCurrentWindow().maximize()
         });
         commandRegistry.registerCommand(VesTitlebarWindowControlCommands.UNMAXIMIZE, {
-            execute: () => remote.getCurrentWindow().unmaximize()
+            execute: () => getCurrentWindow().unmaximize()
         });
     }
 

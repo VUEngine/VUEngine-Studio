@@ -28,12 +28,12 @@ Documentation on how to use VUEngine Studio can be found at https://www.vuengine
 
 ### Prerequisites
 
-Download node.js 12.14.1 and install. You can download it from https://nodejs.org/en/download/releases/ or alternatively use nvm (Node Version Manager). On Windows, you'll need to grab nvm-windows from https://github.com/coreybutler/nvm-windows instead.
+Download node.js 14 and install. You can download it from https://nodejs.org/en/download/releases/ or alternatively use nvm (Node Version Manager). On Windows, you'll need to grab nvm-windows from https://github.com/coreybutler/nvm-windows instead.
 
-Make sure you're using node 12.14.1.
+Make sure you're using node 14.
 
-    nvm install 12.14.1
-    nvm use 12.14.1
+    nvm install 14
+    nvm use 14
 
 Install yarn.
 
@@ -59,9 +59,9 @@ They can be updated at a later point with
 
 ### Build
 
-Make sure you're using node 12.14.1.
+Make sure you're using node 14.
 
-    nvm use 12.14.1
+    nvm use 14
 
 Then, build the application.
 
@@ -69,9 +69,9 @@ Then, build the application.
 
 ### Development
 
-Make sure you're using node 12.14.1.
+Make sure you're using node 14.
 
-    nvm use 12.14.1
+    nvm use 14
 
 Open two terminals and execute one of the following commands in each.
 

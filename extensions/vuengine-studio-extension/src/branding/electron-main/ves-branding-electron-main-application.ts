@@ -1,6 +1,6 @@
 import { isOSX, MaybePromise } from '@theia/core';
+import { app, BrowserWindow, nativeImage, TouchBar } from '@theia/core/electron-shared/electron';
 import { ElectronMainApplication, TheiaBrowserWindowOptions } from '@theia/core/lib/electron-main/electron-main-application';
-import { app, BrowserWindow, nativeImage, TouchBar } from '@theia/core/shared/electron';
 import { injectable } from '@theia/core/shared/inversify';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { BuildMode } from '../../build/browser/ves-build-types';
@@ -73,7 +73,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         electronWindow.setTouchBar(vesTouchBar);
     }
 
-    protected getProjectToolbarButtons(): Array<Electron.TouchBarButton | Electron.TouchBarSpacer> {
+    protected getProjectToolbarButtons(): Array<Electron.TouchBarButton | Electron.TouchBarPopover | Electron.TouchBarSpacer> {
         const { TouchBarButton, TouchBarLabel, TouchBarPopover, TouchBarSegmentedControl, TouchBarSpacer } = TouchBar;
 
         const blankIcon = nativeImage.createFromDataURL(VesTouchBarIcons.BLANK).resize({ height: 18 });
@@ -115,7 +115,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             mode: 'single',
             segments: buildModes,
             selectedIndex: 1,
-            change: selectedIndex => app.emit(VesTouchBarCommands.setBuildMode, buildModes[selectedIndex].label),
+            change: (selectedIndex: number) => app.emit(VesTouchBarCommands.setBuildMode, buildModes[selectedIndex].label),
         });
 
         const buildMenuSpacer = new TouchBarSpacer({

@@ -1,10 +1,10 @@
-import * as React from '@theia/core/shared/react';
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { remote } from '@theia/core/shared/electron';
-import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
-import { WorkspaceCommands, WorkspaceService } from '@theia/workspace/lib/browser';
 import { CommandService } from '@theia/core';
+import { getCurrentWindow, systemPreferences } from '@theia/core/electron-shared/@electron/remote';
 import { FrontendApplicationConfigProvider } from '@theia/core/lib/browser/frontend-application-config-provider';
+import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import * as React from '@theia/core/shared/react';
+import { WorkspaceCommands, WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesProjectsService } from '../../projects/browser/ves-projects-service';
 
 @injectable()
@@ -55,10 +55,10 @@ export class VesTitlebarApplicationTitleWidget extends ReactWidget {
   }
 
   protected maximizeWindow(): void {
-    const win = remote.getCurrentWindow();
+    const win = getCurrentWindow();
     if (!win) { return; }
     if (process.platform === 'darwin') {
-      const action = remote.systemPreferences.getUserDefault('AppleActionOnDoubleClick', 'string');
+      const action = systemPreferences.getUserDefault('AppleActionOnDoubleClick', 'string');
       if (action === 'None') { return; }
       if (action === 'Minimize') { return win.minimize(); }
     }
