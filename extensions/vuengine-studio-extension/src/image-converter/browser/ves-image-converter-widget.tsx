@@ -136,7 +136,7 @@ export class VesImageConverterWidget extends ReactWidget {
                         ? <div className={`convertLogLine ${line.type}${line.uri ? ' hasFileLink' : ''}`}
                           key={`convertLogLine${index}`}
                           onClick={e => this.openFile(e, line.uri)}
-                          title={`${new Date(line.timestamp).toTimeString().substr(0, 8)} ${line.text}`}
+                          title={`${new Date(line.timestamp).toTimeString().substring(0, 8)} ${line.text}`}
                         >
                           <span className='icon'>
                             {line.type === ImageConverterLogLineType.Error
@@ -151,7 +151,7 @@ export class VesImageConverterWidget extends ReactWidget {
                           </span>
                           <span className="text">
                             <span className="timestamp">
-                              {new Date(line.timestamp).toTimeString().substr(0, 5)}
+                              {new Date(line.timestamp).toTimeString().substring(0, 5)}
                             </span>
                             {line.text}
                           </span>

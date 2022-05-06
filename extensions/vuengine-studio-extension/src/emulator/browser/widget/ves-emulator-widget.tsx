@@ -737,14 +737,14 @@ export class VesEmulatorWidget extends ReactWidget {
 
     if (stereoMode.startsWith('2d')) {
       colorMode = stereoMode
-        .substr(3)
+        .substring(3)
         .replace('-', ' & ')
         .replace('-', ' ');
       anaglyphPreset = 'disabled';
       stereoMode = 'anaglyph';
     } else if (stereoMode.startsWith('anaglyph')) {
       anaglyphPreset = stereoMode
-        .substr(9)
+        .substring(9)
         .replace('-', ' & ')
         .replace('-', ' ');
       stereoMode = 'anaglyph';
@@ -869,7 +869,7 @@ export class VesEmulatorWidget extends ReactWidget {
         width: maxScale * screenResolution.width,
       };
     } else {
-      const preferredScale = parseInt(canvasScale.substr(1));
+      const preferredScale = parseInt(canvasScale.substring(1));
       const maxScale = this.determineMaxCanvasScaleFactor();
       const actualScale = Math.min.apply(Math, [maxScale, preferredScale]);
       return {
@@ -927,9 +927,9 @@ export class VesEmulatorWidget extends ReactWidget {
   ): string {
     let button: string = keyCode;
     if (keyCode.startsWith('Key')) {
-      button = keyCode.substr(3);
+      button = keyCode.substring(3);
     } else if (keyCode.startsWith('Arrow')) {
-      button = keyCode.substr(5);
+      button = keyCode.substring(5);
     }
     return button.toLowerCase();
   }

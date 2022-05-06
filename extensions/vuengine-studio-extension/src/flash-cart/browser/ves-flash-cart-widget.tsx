@@ -199,7 +199,7 @@ export class VesFlashCartWidget extends ReactWidget {
                               line.text !== ''
                                 ? <div className="flashLogLine" key={`flashLogLine${idx}`}>
                                   <span className='timestamp'>
-                                    {new Date(line.timestamp).toTimeString().substr(0, 8)}
+                                    {new Date(line.timestamp).toTimeString().substring(0, 8)}
                                   </span>
                                   <span className='text'>
                                     {line.text}

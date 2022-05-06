@@ -150,7 +150,7 @@ export class VesCodeGenService {
     }
 
     const targetFile = template.target.replace(/\$\{([\s\S]*?)\}/ig, match => {
-      match = match.substr(2, match.length - 3);
+      match = match.substring(2, match.length - 1);
       if (match === 'sourceBasename') {
         return resource ? parsePath(resource.toString()).name : '';
       } else {

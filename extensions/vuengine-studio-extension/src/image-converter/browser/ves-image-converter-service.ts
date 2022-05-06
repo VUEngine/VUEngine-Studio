@@ -343,8 +343,8 @@ export class VesImageConverterService {
       const fileUri = file;
       const fileContent = (await this.fileService.readFile(fileUri)).value.toString();
       const name = fileContent.match(/\/\/\t(\w+)\, ([0-9]+)x([0-9]+)@2/) ?? ['', ''];
-      const tilesData = fileContent.match(/0x([0-9A-Fa-f]{8}),/g)?.map(hex => hex.substr(2, 8)) ?? [];
-      const mapData = fileContent.match(/0x([0-9A-Fa-f]{4}),/g)?.map(hex => hex.substr(2, 4)) ?? [];
+      const tilesData = fileContent.match(/0x([0-9A-Fa-f]{8}),/g)?.map(hex => hex.substring(2, 10)) ?? [];
+      const mapData = fileContent.match(/0x([0-9A-Fa-f]{4}),/g)?.map(hex => hex.substring(2, 6)) ?? [];
       const imageDimensions = fileContent.match(/, ([0-9]+)x([0-9]+)@2/) ?? [0, 0];
       const mapDimensions = fileContent.match(/, not compressed, ([0-9]+)x([0-9]+)/) ?? [0, 0];
       const meta = {

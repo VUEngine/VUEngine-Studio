@@ -1,13 +1,3 @@
-quick-input-container {
-    top: var(--theia-private-menubar-height) !important;
-}
-
 .quick-input-widget {
     border-radius: 0 0 5px 5px;
-}
-
-.quick-input-titlebar {
-    font-weight: bold;
-    padding-bottom: 0;
-    padding-top: var(--theia-ui-padding);
 }
