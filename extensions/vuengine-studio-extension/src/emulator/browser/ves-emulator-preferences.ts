@@ -26,18 +26,17 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
                     name: {
                         type: 'string',
                         description: 'Name of the emulator configuration.',
-                        label: 'Name',
+                        title: 'Name',
                     },
                     path: {
                         type: 'string',
                         description: 'Full path to emulator.',
-                        label: 'Path',
+                        title: 'Path',
                     },
                     args: {
                         type: 'string',
-                        multiline: true,
                         description: 'Arguments to pass to emulator. You can use the placeholder %ROM% for the project\'s output ROM image path.',
-                        label: 'Arguments',
+                        title: 'Arguments',
                     },
                 },
             },

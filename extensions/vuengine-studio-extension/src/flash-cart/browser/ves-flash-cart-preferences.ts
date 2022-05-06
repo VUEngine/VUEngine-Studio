@@ -112,7 +112,6 @@ export const VesFlashCartPreferenceSchema: PreferenceSchema = {
                     },
                     args: {
                         type: 'string',
-                        multiline: true,
                         description: 'Arguments to pass to flasher software. You can use the following placeholders: '
                             + '%NAME%: project\'s name '
                             + '%NAME_NO_SPACE%: project\'s name with spaces removed '

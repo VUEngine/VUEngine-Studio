@@ -4,7 +4,7 @@ import URI from '@theia/core/lib/common/uri';
 import * as React from '@theia/core/shared/react';
 import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import * as filenamify from 'filenamify';
+import filenamify from 'filenamify';
 import { VesCommonService } from '../../../branding/browser/ves-common-service';
 import { VesProjectsPathsService } from '../ves-projects-paths-service';
 import { VesProjectsPreferenceIds } from '../ves-projects-preferences';

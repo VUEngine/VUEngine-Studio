@@ -1,6 +1,7 @@
 import { isOSX, MaybePromise } from '@theia/core';
 import { app, BrowserWindow, nativeImage, TouchBar } from '@theia/core/electron-shared/electron';
-import { ElectronMainApplication, TheiaBrowserWindowOptions } from '@theia/core/lib/electron-main/electron-main-application';
+import { ElectronMainApplication } from '@theia/core/lib/electron-main/electron-main-application';
+import { TheiaBrowserWindowOptions } from '@theia/core/lib/electron-main/theia-electron-window';
 import { injectable } from '@theia/core/shared/inversify';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { BuildMode } from '../../build/browser/ves-build-types';

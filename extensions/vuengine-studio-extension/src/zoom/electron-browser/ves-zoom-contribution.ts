@@ -72,7 +72,7 @@ export class VesZoomContribution implements CommandContribution, KeybindingContr
         if (!zoomFactors) {
             return;
         }
-        const convertedZoomFactors = zoomFactors.map(value => this.toZoomFactor(value));
+        const convertedZoomFactors = zoomFactors.map(value => this.toZoomFactor(value as string));
         let newZoomFactor = this.toZoomFactor(this.preferenceService.get(VesZoomPreferenceIds.ZOOM_LEVEL) as string);
 
         for (let index = 0; index < zoomFactors.length; index++) {

@@ -1,5 +1,5 @@
 import * as showdown from 'showdown';
-import * as sanitize from 'sanitize-html';
+import sanitize from 'sanitize-html';
 import { injectable, inject, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/lib/common/event';
 import { ProgressService } from '@theia/core/lib/common/progress-service';

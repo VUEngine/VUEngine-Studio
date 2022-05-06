@@ -48,6 +48,7 @@ export const VesBuildPreferenceSchema: PreferenceSchema = {
             description: 'Full path to core library. Uses built-in VUEngine Core when left blank.',
             default: '',
             additionalProperties: {
+                // @ts-ignore
                 isDirectory: true,
             },
             scope: PreferenceScope.Folder,

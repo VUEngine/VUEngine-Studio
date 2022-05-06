@@ -61,7 +61,7 @@ export class VesAboutDialog extends AboutDialog {
                 <h1>
                     {applicationName}
                     <span className="ves-about-sub-header">
-                        {/* applicationInfo && ` ${applicationInfo.version}` */} Preview
+                        {/* applicationInfo && ` ${applicationInfo.version}` */} Preview 2
                     </span>
                 </h1>
                 {this.renderCopyright()}

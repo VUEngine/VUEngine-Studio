@@ -19,6 +19,7 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import { clearInterval, setInterval } from 'timers';
 import { UpdaterError, VesUpdater, VesUpdaterClient } from '../common/ves-updater';
 import { VesUpdaterCommands } from './ves-updater-commands';
+import { URI as VSCodeURI } from 'vscode-uri';
 
 export namespace VesUpdaterMenu {
     export const MENU_PATH: MenuPath = [...CommonMenus.FILE_SETTINGS_SUBMENU, '3_settings_submenu_update'];
@@ -195,7 +196,7 @@ export class VesUpdaterFrontendContribution implements CommandContribution, Menu
             const viewLogAction = 'View Error Log';
             const answer = await this.messageService.error(error.message, viewLogAction);
             if (answer === viewLogAction) {
-                const uri = new URI(error.errorLogPath);
+                const uri = new URI(VSCodeURI.file(error.errorLogPath));
                 const opener = await this.openerService.getOpener(uri);
                 opener.open(uri);
             }

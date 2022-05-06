@@ -18,6 +18,7 @@ export const VesPluginsPreferenceSchema: PreferenceSchema = {
             description: 'Full path to plugins library. Uses built-in VUEngine Plugins library when left blank.',
             default: '',
             additionalProperties: {
+                // @ts-ignore
                 isDirectory: true,
             },
             scope: PreferenceScope.Folder,
@@ -34,6 +35,7 @@ export const VesPluginsPreferenceSchema: PreferenceSchema = {
             type: 'string',
             description: 'Full path to base folder for all user plugins.',
             additionalProperties: {
+                // @ts-ignore
                 isDirectory: true,
             },
             scope: PreferenceScope.Folder,

@@ -47,7 +47,7 @@ export class VesGettingStartedViewContribution extends AbstractViewContribution<
                 () => this.preferenceService.ready.then(() => {
                     const showWelcomePage: boolean = this.preferenceService.get(VesBrandingPreferenceIds.ALWAYS_SHOW_WELCOME_PAGE, true);
                     if (showWelcomePage) {
-                        this.openView({ reveal: showWelcomePage });
+                        this.openView({ reveal: true, activate: true });
                     }
                 })
             );
@@ -56,7 +56,7 @@ export class VesGettingStartedViewContribution extends AbstractViewContribution<
 
     registerCommands(commandRegistry: CommandRegistry): void {
         commandRegistry.registerCommand(VesGettingStartedCommands.SHOW, {
-            execute: () => this.openView({ reveal: true }),
+            execute: () => this.openView({ reveal: true, activate: true }),
         });
         commandRegistry.registerCommand(VesGettingStartedCommands.HELP, {
             isEnabled: () => true,

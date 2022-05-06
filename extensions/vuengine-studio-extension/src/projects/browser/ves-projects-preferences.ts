@@ -16,6 +16,7 @@ export const VesProjectsPreferenceSchema: PreferenceSchema = {
             type: 'string',
             description: 'Base path for new projects.',
             additionalProperties: {
+                // @ts-ignore
                 isDirectory: true,
             },
             scope: PreferenceScope.User,
