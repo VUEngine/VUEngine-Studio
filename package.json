@@ -12,11 +12,11 @@
     "url": "git+https://github.com/VUEngine/VUEngine-Studio.git"
   },
   "engines": {
-    "yarn": "1.0.x || >=1.2.1",
-    "node": ">=14.0.0 <15"
+    "yarn": ">=1.7.0 <2",
+    "node": ">=12.14.1"
   },
   "devDependencies": {
-    "@theia/cli": "1.23.0",
+    "@theia/cli": "1.24.0",
     "@typescript-eslint/eslint-plugin-tslint": "^4.25.0",
     "@typescript-eslint/eslint-plugin": "^4.25.0",
     "@typescript-eslint/parser": "^4.25.0",
