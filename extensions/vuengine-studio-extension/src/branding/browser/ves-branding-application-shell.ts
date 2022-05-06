@@ -1,9 +1,10 @@
-import { ApplicationShell, Panel, Widget } from '@theia/core/lib/browser';
+import { Panel, Widget } from '@theia/core/lib/browser';
 import { TheiaDockPanel } from '@theia/core/lib/browser/shell/theia-dock-panel';
 import { injectable } from '@theia/core/shared/inversify';
+import { ApplicationShellWithToolbarOverride } from '@theia/toolbar/lib/browser/application-shell-with-toolbar-override';
 
 @injectable()
-export class VesApplicationShell extends ApplicationShell {
+export class VesApplicationShell extends ApplicationShellWithToolbarOverride {
 
     canToggleMaximized(widget: Widget | undefined = this.currentWidget): boolean {
         const area = widget && this.getAreaFor(widget);

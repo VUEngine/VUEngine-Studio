@@ -17,6 +17,7 @@
 		"inputValidation.infoBorder": "#d31422",
 		"list.activeSelectionBackground": "#d3142240",
 		"list.activeSelectionForeground": "#616161",
+		"mainToolbar.background": "#616161",
 		"menu.selectionBackground": "#d3142240",
 		"menu.separatorBackground": "#dddddd",
 		"minimap.selectionHighlight": "#d3142240",
@@ -27,7 +28,7 @@
 		"quickInputList.focusBackground": "#d3142240",
 		"selection.background": "#d3142240",
 		"statusBar.background": "#616161",
-		"statusBar.border": "#ffffff",
+		"statusBar.border": "#616161",
 		"statusBar.noFolderBackground": "#616161",
 		"statusBarItem.hoverBackground": "#cccccc",
 		"textBlockQuote.border": "#d3142280",
@@ -35,6 +36,6 @@
 		"textLink.foreground": "#d31422",
 		"titleBar.activeBackground": "#d31422",
 		"titleBar.activeForeground": "#ffffff",
-		"titleBar.border": "#ffffff"
+		"titleBar.border": "#d31422"
 	}
 }

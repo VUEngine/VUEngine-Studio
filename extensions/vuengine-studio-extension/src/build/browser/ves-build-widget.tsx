@@ -1,11 +1,9 @@
 import { CommandService, isWindows } from '@theia/core';
-import { KeybindingRegistry, Message, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
+import { KeybindingRegistry, Message, PreferenceService } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { EditorManager } from '@theia/editor/lib/browser';
-import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
-import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
@@ -29,10 +27,6 @@ interface VesBuildWidgetState {
 export class VesBuildWidget extends ReactWidget {
   @inject(CommandService)
   private readonly commandService: CommandService;
-  @inject(FileService)
-  private readonly fileService: FileService;
-  @inject(FileDialogService)
-  private readonly fileDialogService: FileDialogService;
   @inject(EditorManager)
   private readonly editorManager: EditorManager;
   @inject(KeybindingRegistry)
@@ -263,7 +257,7 @@ export class VesBuildWidget extends ReactWidget {
                         className={`buildLogLine ${line.type}${line.file ? ' hasFileLink' : ''}`}
                         key={`buildLogLine${index}`}
                         onClick={e => this.openFile(e, line.file)}
-                        title={`${new Date(line.timestamp).toTimeString().substr(0, 8)} ${line.text}`}
+                        title={`${new Date(line.timestamp).toTimeString().substring(0, 8)} ${line.text}`}
                       >
                         <span className='icon'>
                           {line.type === BuildLogLineType.Error
@@ -382,21 +376,6 @@ export class VesBuildWidget extends ReactWidget {
   protected toggleAutoScroll = (): void => {
     this.state.autoScroll = !this.state.autoScroll;
     this.update();
-  };
-
-  protected selectFolder = async (title: string, preferenceId: string): Promise<void> => {
-    const props: OpenFileDialogProps = {
-      title,
-      canSelectFolders: true,
-      canSelectFiles: false
-    };
-    const destinationFolderUri = await this.fileDialogService.showOpenDialog(props);
-    if (destinationFolderUri) {
-      const destinationFolder = await this.fileService.resolve(destinationFolderUri);
-      if (destinationFolder.isDirectory) {
-        this.preferenceService.set(preferenceId, destinationFolder.resource.path.toString(), PreferenceScope.User);
-      }
-    }
   };
 
   protected openFile = async (e: React.MouseEvent, fileLink?: BuildLogLineFileLink): Promise<void> => {

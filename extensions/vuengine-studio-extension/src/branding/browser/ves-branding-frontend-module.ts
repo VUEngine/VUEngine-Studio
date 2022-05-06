@@ -61,6 +61,8 @@ import { VesNavigatorWidgetFactory } from './ves-navigator-widget-factory';
 import { VesPreferenceStringInputRenderer } from './ves-preference-string-input-renderer';
 import { VesQuickOpenWorkspace } from './ves-quick-open-workspace';
 import { VesWorkspaceService } from './ves-workspace-service';
+import { ToolbarDefaultsFactory } from '@theia/toolbar/lib/browser/toolbar-defaults';
+import { VesToolbarDefaultsOverride } from './ves-branding-toolbar-defaults-override';
 import '../../../src/branding/browser/style/index.css';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
@@ -177,6 +179,9 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // workspace service
     bind(VesWorkspaceService).toSelf().inSingletonScope();
     rebind(WorkspaceService).toService(VesWorkspaceService);
+
+    // toolbar default config
+    rebind(ToolbarDefaultsFactory).toConstantValue(VesToolbarDefaultsOverride);
 
     // title bar application title
     bindViewContribution(bind, VesTitlebarApplicationTitleContribution);

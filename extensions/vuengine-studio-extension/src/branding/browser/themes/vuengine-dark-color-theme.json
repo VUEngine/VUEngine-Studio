@@ -12,6 +12,8 @@
 		"inputOption.activeBorder": "#d31422",
 		"inputValidation.infoBorder": "#d31422",
 		"list.activeSelectionBackground": "#d3142240",
+		"toolbar.activeBackground": "#bada55",
+		"mainToolbar.background": "#111111",
 		"menu.selectionBackground": "#d3142240",
 		"menu.separatorBackground": "#555555",
 		"minimap.selectionHighlight": "#d3142240",

@@ -36,6 +36,7 @@
             "**/build/*.a": true,
             "**/node_modules/**": true
           },
+          "toolbar.showToolbar": true,
           "window.menuBarVisibility": "compact",
           "workspace.preserveWindow": true
         }
@@ -85,6 +86,7 @@
     "@theia/task": "1.24.0",
     "@theia/terminal": "1.24.0",
     "@theia/timeline": "1.24.0",
+    "@theia/toolbar": "1.24.0",
     "@theia/userstorage": "1.24.0",
     "@theia/variable-resolver": "1.24.0",
     "@theia/vsx-registry": "1.24.0",

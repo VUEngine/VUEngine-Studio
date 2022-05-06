@@ -59,19 +59,11 @@ They can be updated at a later point with
 
 ### Build
 
-Make sure you're using node 14.
+To build the applicationm, simply call the yarn build command.
 
-    nvm use 14
-
-Then, build the application.
-
-    yarn --ignore-engines
+    yarn
 
 ### Development
-
-Make sure you're using node 14.
-
-    nvm use 14
 
 Open two terminals and execute one of the following commands in each.
 
