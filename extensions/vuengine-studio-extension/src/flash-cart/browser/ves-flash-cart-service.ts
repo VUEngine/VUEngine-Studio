@@ -26,6 +26,7 @@ import {
   HYPERFLASH32_IMAGE_PLACEHOLDER,
   NAME_NO_SPACES_PLACEHOLDER,
   NAME_PLACEHOLDER,
+  PORT_PLACEHOLDER,
   PROG_VB_PLACEHOLDER,
   ROM_PLACEHOLDER
 } from './ves-flash-cart-types';
@@ -201,6 +202,7 @@ export class VesFlashCartService {
           .replace(NAME_PLACEHOLDER, projectName)
           .replace(NAME_NO_SPACES_PLACEHOLDER, projectName.replace(/ /g, '').replace('(Workspace)', ''))
           .replace(ROM_PLACEHOLDER, await this.fileService.fsPath(romUri))
+          .replace(PORT_PLACEHOLDER, connectedFlashCart.port)
           .split(' ')
         : [];
 

@@ -6,6 +6,7 @@ export const HBCLI_PLACEHOLDER = '%HBCLI%';
 export const NAME_PLACEHOLDER = '%NAME%';
 export const NAME_NO_SPACES_PLACEHOLDER = '%NAME_NO_SPACES%';
 export const ROM_PLACEHOLDER = '%ROM%';
+export const PORT_PLACEHOLDER = '%PORT%';
 export const FLASHBOY_PLUS_PREFERENCE_NAME = 'FlashBoy (Plus)';
 export const HYPERFLASH32_PREFERENCE_NAME = 'HyperFlash32';
 export const HYPERBOY_PREFERENCE_NAME = 'HyperBoy';
@@ -29,6 +30,7 @@ export interface FlashCartConfig {
 export interface ConnectedFlashCart {
   config: FlashCartConfig
   device: usb.Device
+  port: string
   status: FlashCartStatus
   canHoldRom: boolean
 }

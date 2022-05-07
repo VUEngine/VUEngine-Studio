@@ -2,6 +2,7 @@ import { injectable, postConstruct } from '@theia/core/shared/inversify';
 import { usb, getDeviceList } from 'usb';
 import { ConnectedFlashCart, FlashCartConfig } from '../browser/ves-flash-cart-types';
 import { VesFlashCartUsbService, VesFlashCartUsbServiceClient } from '../common/ves-flash-cart-usb-service-protocol';
+import { SerialPort } from 'serialport';
 
 @injectable()
 export class VesFlashCartUsbServiceImpl implements VesFlashCartUsbService {
@@ -24,6 +25,8 @@ export class VesFlashCartUsbServiceImpl implements VesFlashCartUsbService {
     async detectFlashCarts(...flashCartConfigs: FlashCartConfig[]): Promise<ConnectedFlashCart[]> {
         const connectedFlashCarts = [];
         const devices: usb.Device[] = getDeviceList();
+        // @ts-ignore
+        const ports = await SerialPort.list();
         let manufacturer: string | undefined;
         let product: string | undefined;
         let deviceIsFlashCart = false;
@@ -64,10 +67,16 @@ export class VesFlashCartUsbServiceImpl implements VesFlashCartUsbService {
                         (flashCartConfig.product === '' ||
                             product?.includes(flashCartConfig.product))
                     ) {
+                        const portName = ports.find(port =>
+                            parseInt(port.productId || '0', 16) === flashCartConfig.pid &&
+                            parseInt(port.vendorId || '0', 16) === flashCartConfig.vid &&
+                            port.manufacturer === flashCartConfig.manufacturer);
+
                         deviceIsFlashCart = true;
                         connectedFlashCarts.push({
                             config: flashCartConfig,
                             device: device,
+                            port: portName?.path || '',
                             status: {
                                 processId: -1,
                                 step: '',

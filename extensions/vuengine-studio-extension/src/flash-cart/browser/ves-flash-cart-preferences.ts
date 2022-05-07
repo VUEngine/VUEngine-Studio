@@ -12,6 +12,7 @@ import {
     HYPERFLASH32_IMAGE_PLACEHOLDER,
     HYPERFLASH32_PREFERENCE_NAME,
     NAME_NO_SPACES_PLACEHOLDER,
+    PORT_PLACEHOLDER,
     PROG_VB_PLACEHOLDER, ROM_PLACEHOLDER
 } from './ves-flash-cart-types';
 
@@ -43,8 +44,8 @@ export const BUILT_IN_FLASH_CART_CONFIGS: Array<FlashCartConfig> = [
         size: 32,
         path: HFCLI_PLACEHOLDER,
         args: isOSX
-            ? `-p %PORT% -x ${ROM_PLACEHOLDER} -n ${NAME_NO_SPACES_PLACEHOLDER} --slow`
-            : `-p %PORT% -x ${ROM_PLACEHOLDER} -n ${NAME_NO_SPACES_PLACEHOLDER}`,
+            ? `-p ${PORT_PLACEHOLDER} -x ${ROM_PLACEHOLDER} -n ${NAME_NO_SPACES_PLACEHOLDER} --slow`
+            : `-p ${PORT_PLACEHOLDER} -x ${ROM_PLACEHOLDER} -n ${NAME_NO_SPACES_PLACEHOLDER}`,
         padRom: false,
         image: HYPERFLASH32_IMAGE_PLACEHOLDER,
     },
@@ -57,8 +58,8 @@ export const BUILT_IN_FLASH_CART_CONFIGS: Array<FlashCartConfig> = [
         size: 32,
         path: HBCLI_PLACEHOLDER,
         args: isOSX
-            ? `-p %PORT% -f ${ROM_PLACEHOLDER} --slow`
-            : `-p %PORT% -f ${ROM_PLACEHOLDER}`,
+            ? `-p ${PORT_PLACEHOLDER} -f ${ROM_PLACEHOLDER} --slow`
+            : `-p ${PORT_PLACEHOLDER} -f ${ROM_PLACEHOLDER}`,
         padRom: false,
         image: HYPERBOY_IMAGE_PLACEHOLDER,
     },
