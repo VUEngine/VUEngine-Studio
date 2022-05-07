@@ -25,7 +25,6 @@ export class VesFlashCartStatusBarContribution implements FrontendApplicationCon
 
     setConnectedFlashCartStatusBar(): void {
         let label = '';
-        let className = '';
         const labelMaxLength = 16;
         if (this.vesFlashCartService.connectedFlashCarts.length > 0) {
             const connectedFlashCartsNames = [];
@@ -39,17 +38,15 @@ export class VesFlashCartStatusBarContribution implements FrontendApplicationCon
                     label += ` (${connectedFlashCartsNames.length})`;
                 }
             }
+            this.statusBar.setElement('ves-flash-carts', {
+                alignment: StatusBarAlignment.LEFT,
+                command: VesFlashCartCommands.OPEN_WIDGET.id,
+                priority: 1,
+                text: `$(codicon-browser codicon-flip-y) ${label}`,
+                tooltip: 'Connected Flash Carts'
+            });
         } else {
-            label = 'No Flash Carts';
-            className = 'disabled';
+            this.statusBar.removeElement('ves-flash-carts');
         }
-        this.statusBar.setElement('ves-flash-carts', {
-            alignment: StatusBarAlignment.LEFT,
-            command: VesFlashCartCommands.OPEN_WIDGET.id,
-            className: className,
-            priority: 1,
-            text: `$(codicon-browser codicon-flip-y) ${label}`,
-            tooltip: 'Connected Flash Carts'
-        });
     }
 }
