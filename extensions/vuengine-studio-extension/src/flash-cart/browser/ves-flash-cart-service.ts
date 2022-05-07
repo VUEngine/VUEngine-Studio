@@ -290,12 +290,8 @@ export class VesFlashCartService {
     );
 
     // watch for flash cart attach/detach
-    this.vesFlashCartUsbWatcher.onDidAttachDevice(async () =>
-      this.detectConnectedFlashCarts()
-    );
-    this.vesFlashCartUsbWatcher.onDidDetachDevice(async () =>
-      this.detectConnectedFlashCarts()
-    );
+    this.vesFlashCartUsbWatcher.onDidAttachDevice(async () => this.detectConnectedFlashCarts());
+    this.vesFlashCartUsbWatcher.onDidDetachDevice(async () => this.detectConnectedFlashCarts());
 
     // compute overall flashing progress
     this.onDidChangeConnectedFlashCarts(() => {

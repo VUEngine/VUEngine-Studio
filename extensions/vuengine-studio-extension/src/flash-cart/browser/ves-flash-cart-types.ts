@@ -1,4 +1,4 @@
-import { Device } from 'usb';
+import { usb } from 'usb';
 
 export const PROG_VB_PLACEHOLDER = '%PROGVB%';
 export const HFCLI_PLACEHOLDER = '%HFCLI%';
@@ -28,7 +28,7 @@ export interface FlashCartConfig {
 
 export interface ConnectedFlashCart {
   config: FlashCartConfig
-  device: Device
+  device: usb.Device
   status: FlashCartStatus
   canHoldRom: boolean
 }

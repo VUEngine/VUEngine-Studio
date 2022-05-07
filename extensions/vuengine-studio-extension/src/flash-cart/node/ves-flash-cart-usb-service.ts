@@ -1,5 +1,5 @@
 import { injectable, postConstruct } from '@theia/core/shared/inversify';
-import { Device, getDeviceList, on } from 'usb';
+import { usb, getDeviceList } from 'usb';
 import { ConnectedFlashCart, FlashCartConfig } from '../browser/ves-flash-cart-types';
 import { VesFlashCartUsbService, VesFlashCartUsbServiceClient } from '../common/ves-flash-cart-usb-service-protocol';
 
@@ -17,14 +17,13 @@ export class VesFlashCartUsbServiceImpl implements VesFlashCartUsbService {
 
     @postConstruct()
     protected init(): void {
-        const self = this;
-        on('attach', async () => self.client?.onDidAttachDevice());
-        on('detach', async () => self.client?.onDidDetachDevice());
+        usb.on('attach', async () => this.client?.onDidAttachDevice());
+        usb.on('detach', async () => this.client?.onDidDetachDevice());
     }
 
     async detectFlashCarts(...flashCartConfigs: FlashCartConfig[]): Promise<ConnectedFlashCart[]> {
         const connectedFlashCarts = [];
-        const devices: Device[] = getDeviceList();
+        const devices: usb.Device[] = getDeviceList();
         let manufacturer: string | undefined;
         let product: string | undefined;
         let deviceIsFlashCart = false;
@@ -46,12 +45,14 @@ export class VesFlashCartUsbServiceImpl implements VesFlashCartUsbService {
                     manufacturer = await new Promise((resolve, reject) => {
                         device.getStringDescriptor(
                             device.deviceDescriptor.iManufacturer,
+                            // @ts-ignore
                             (error, data) => resolve(data)
                         );
                     });
                     product = await new Promise((resolve, reject) => {
                         device.getStringDescriptor(
                             device.deviceDescriptor.iProduct,
+                            // @ts-ignore
                             (error, data) => resolve(data)
                         );
                     });

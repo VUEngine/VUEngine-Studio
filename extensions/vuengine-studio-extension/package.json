@@ -43,12 +43,12 @@
     "sanitize-filename": "^1.6.3",
     "sanitize-html": "^2.5.3",
     "showdown": "^1.9.1",
-    "usb": "^1.7.0",
+    "usb": "^2.4.1",
     "uuid": "^8.3.2",
     "vscode-uri": "^2.1.1"
   },
   "devDependencies": {
-    "@types/usb": "^1.5.2",
+    "@types/usb": "^2.0.5",
     "@types/sanitize-html": "^2.5.0",
     "@types/nunjucks": "^3.1.5",
     "rimraf": "^2.7.1",

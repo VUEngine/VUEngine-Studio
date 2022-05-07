@@ -4,12 +4,13 @@ import { VesFlashCartUsbService } from '../common/ves-flash-cart-usb-service-pro
 
 @injectable()
 export class VesFlashCartUsbWatcher {
+    @inject(VesFlashCartUsbService)
+    protected readonly server: VesFlashCartUsbService;
+
     public readonly onDidAttachDeviceEmitter = new Emitter<void>();
     public readonly onDidAttachDevice: Event<void> = this.onDidAttachDeviceEmitter.event;
     public readonly onDidDetachDeviceEmitter = new Emitter<void>();
     public readonly onDidDetachDevice: Event<void> = this.onDidDetachDeviceEmitter.event;
-
-    @inject(VesFlashCartUsbService) protected readonly server: VesFlashCartUsbService;
 
     @postConstruct()
     protected async init(): Promise<void> {
