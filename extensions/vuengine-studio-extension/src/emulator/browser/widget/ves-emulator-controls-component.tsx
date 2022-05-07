@@ -3,7 +3,7 @@ import { CommandService } from '@theia/core';
 import { KeybindingRegistry } from '@theia/core/lib/browser';
 import { KeymapsCommands } from '@theia/keymaps/lib/browser';
 import { VesEmulatorCommands } from '../ves-emulator-commands';
-import { IMAGE_VB_CONTROLLER } from '../images/vb-controller';
+import IMAGE_VB_CONTROLLER from '../../../../src/emulator/browser/images/vb-controller.png';
 
 export interface VesEmulatorControlsProps {
     commandService: CommandService

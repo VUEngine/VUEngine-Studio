@@ -9,7 +9,19 @@ import { VesEmulatorCommands } from '../../emulator/browser/ves-emulator-command
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
 import { VesProjectsCommands } from '../../projects/browser/ves-projects-commands';
 import { VesTouchBarCommands } from '../common/ves-branding-types';
-import { VesTouchBarIcons } from './icons/touch-bar-icons';
+import { VesTouchBarIcons } from './images/touch-bar-icons';
+// import IMAGE_BLANK from '../../../src/branding/electron-main/images/blank.png';
+// import IMAGE_VES from '../../../src/branding/electron-main/images/ves.png';
+// import IMAGE_CLEAN from '../../../src/branding/electron-main/images/clean.png';
+// import IMAGE_BUILD from '../../../src/branding/electron-main/images/build.png';
+// import IMAGE_RUN from '../../../src/branding/electron-main/images/run.png';
+// import IMAGE_FLASH from '../../../src/branding/electron-main/images/flash.png';
+// import IMAGE_EXPORT from '../../../src/branding/electron-main/images/export.png';
+// import IMAGE_MENU from '../../../src/branding/electron-main/images/menu.png';
+// import IMAGE_QUEUED from '../../../src/branding/electron-main/images/queued.png';
+// import IMAGE_PLUS from '../../../src/branding/electron-main/images/plus.png';
+// import IMAGE_OPEN_FOLDER from '../../../src/branding/electron-main/images/open-folder.png';
+// import IMAGE_FILE_CODE from '../../../src/branding/electron-main/images/file-code.png';
 
 @injectable()
 export class VesElectronMainApplication extends ElectronMainApplication {
@@ -50,6 +62,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
 
     protected registerVesTouchBar(electronWindow: BrowserWindow, workspaceOpened: boolean): void {
         const { TouchBarButton } = TouchBar;
+
         const vesIcon = nativeImage.createFromDataURL(VesTouchBarIcons.VES).resize({ height: 16 });
 
         const vesButton = new TouchBarButton({

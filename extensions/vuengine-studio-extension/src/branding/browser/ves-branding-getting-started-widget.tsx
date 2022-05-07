@@ -1,5 +1,5 @@
 import { CommandRegistry, DisposableCollection, environment, isOSX, nls, Path } from '@theia/core';
-import { codicon, CommonCommands, Key, KeyCode, LabelProvider, PreferenceService, ReactWidget } from '@theia/core/lib/browser';
+import { codicon, CommonCommands, Key, KeyCode, LabelProvider, Message, PreferenceService, ReactWidget } from '@theia/core/lib/browser';
 import { FrontendApplicationConfigProvider } from '@theia/core/lib/browser/frontend-application-config-provider';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { ApplicationInfo, ApplicationServer } from '@theia/core/lib/common/application-protocol';
@@ -36,7 +36,7 @@ export class VesGettingStartedWidget extends ReactWidget {
     @inject(WorkspaceService)
     protected readonly workspaceService: WorkspaceService;
 
-    static readonly ID = 'ves.gettingStartedWidget';
+    static readonly ID = 'vesGettingStartedWidget';
     static readonly LABEL = nls.localizeByDefault('Getting Started');
 
     protected applicationInfo: ApplicationInfo | undefined;
@@ -65,6 +65,14 @@ export class VesGettingStartedWidget extends ReactWidget {
         await this.preferenceService.ready;
         await this.vesGetRecentWorkspaces();
         this.update();
+    }
+
+    protected onActivateRequest(msg: Message): void {
+        super.onActivateRequest(msg);
+        const htmlElement = document.getElementById(this.id);
+        if (htmlElement) {
+            htmlElement.focus();
+        }
     }
 
     protected render(): React.ReactNode {

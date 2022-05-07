@@ -14,9 +14,6 @@ import { VesProcessWatcher } from '../../process/browser/ves-process-service-wat
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 import { VesProjectsService } from '../../projects/browser/ves-projects-service';
 import { VesFlashCartUsbService } from '../common/ves-flash-cart-usb-service-protocol';
-import { IMAGE_FLASHBOY_PLUS } from './images/flashboy-plus';
-import { IMAGE_HYPERBOY } from './images/hyperboy';
-import { IMAGE_HYPERFLASH32 } from './images/hyperflash32';
 import { VesFlashCartCommands } from './ves-flash-cart-commands';
 import { BUILT_IN_FLASH_CART_CONFIGS, VesFlashCartPreferenceIds } from './ves-flash-cart-preferences';
 import {
@@ -33,6 +30,9 @@ import {
   ROM_PLACEHOLDER
 } from './ves-flash-cart-types';
 import { VesFlashCartUsbWatcher } from './ves-flash-cart-usb-watcher';
+import IMAGE_FLASHBOY_PLUS from '../../../src/flash-cart/browser/images/flashboy-plus.png';
+import IMAGE_HYPERBOY from '../../../src/flash-cart/browser/images/HyperBoy.png';
+import IMAGE_HYPERFLASH32 from '../../../src/flash-cart/browser/images/hyperflash32-with-label.png';
 
 @injectable()
 export class VesFlashCartService {

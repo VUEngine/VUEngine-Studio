@@ -6,11 +6,11 @@ import * as React from '@theia/core/shared/react';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { basename } from 'path';
 import { VesBuildService } from '../../build/browser/ves-build-service';
-import { IMAGE_HYPERFLASH32_LABEL } from './images/hyperflash32-label';
-import { NO_FLASH_CARTS } from './images/no-flash-carts';
 import { VesFlashCartCommands } from './ves-flash-cart-commands';
 import { VesFlashCartService } from './ves-flash-cart-service';
 import { ConnectedFlashCart, FlashLogLine, HYPERFLASH32_PREFERENCE_NAME } from './ves-flash-cart-types';
+import IMAGE_HYPERFLASH32_LABEL from '../../../src/flash-cart/browser/images/hyperflash32-label.png';
+import IMAGE_NO_FLASH_CARTS from '../../../src/flash-cart/browser/images/no-flash-carts.png';
 
 @injectable()
 export class VesFlashCartWidget extends ReactWidget {
@@ -231,7 +231,7 @@ export class VesFlashCartWidget extends ReactWidget {
               <p>You can connect, and flash to, any number of flash carts at once.</p>
             </div>
             <div>
-              <img src={NO_FLASH_CARTS} />
+              <img src={IMAGE_NO_FLASH_CARTS} />
             </div>
           </div>
         </div>
