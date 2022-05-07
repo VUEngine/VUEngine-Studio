@@ -371,10 +371,7 @@ export class VesBuildService {
         type: BuildLogLineType.Error,
       });
 
-      this.buildStatus = {
-        ...this.buildStatus,
-        step: 'failed',
-      };
+      await this.resetBuildStatus(BuildResult.failed);
 
       this.onDidFailBuildEmitter.fire();
     }
