@@ -28,7 +28,7 @@
     "@theia/vsx-registry": "1.24.0",
     "@theia/workspace": "1.24.0",
     "datauri": "^3.0.0",
-    "deepmerge-ts": "^1.1.5",
+    "deepmerge-ts": "^4.0.3",
     "electron-log": "^4.3.0",
     "electron-updater": "4.3.9",
     "electron": "^15.5.1",

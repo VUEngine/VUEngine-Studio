@@ -1,5 +1,5 @@
 import { CommandRegistry, CommandService, isWindows } from '@theia/core';
-import { ApplicationShell, LabelProvider, PreferenceService } from '@theia/core/lib/browser';
+import { ApplicationShell, LabelProvider, PreferenceScope, PreferenceService, QuickPickItem, QuickPickOptions, QuickPickService } from '@theia/core/lib/browser';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -50,6 +50,8 @@ export class VesBuildService {
   protected readonly labelProvider: LabelProvider;
   @inject(PreferenceService)
   protected readonly preferenceService: PreferenceService;
+  @inject(QuickPickService)
+  protected readonly quickPickService: QuickPickService;
   @inject(TaskService)
   protected readonly taskService: TaskService;
   @inject(VesBuildPathsService)
@@ -219,16 +221,12 @@ export class VesBuildService {
   }
 
   async outputRomExists(): Promise<boolean> {
-    await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-    const romUri = workspaceRootUri && workspaceRootUri.resolve('build').resolve('output.vb');
-    return romUri && this.fileService.exists(romUri);
+    const romUri = await this.getDefaultRomUri();
+    return romUri !== undefined && this.fileService.exists(romUri);
   }
 
   protected async determineRomSize(): Promise<void> {
-    await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-    const romUri = workspaceRootUri && workspaceRootUri.resolve('build').resolve('output.vb');
+    const romUri = await this.getDefaultRomUri();
     if (romUri && await this.fileService.exists(romUri)) {
       const outputRom = await this.fileService.resolve(romUri, { resolveMetadata: true });
       this.romSize = outputRom.size;
@@ -492,13 +490,9 @@ export class VesBuildService {
   }
 
   protected async deleteRom(): Promise<void> {
-    await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-    if (workspaceRootUri) {
-      const romUri = workspaceRootUri.resolve('build').resolve('output.vb');
-      if (await this.fileService.exists(romUri)) {
-        this.fileService.delete(romUri);
-      }
+    const romUri = await this.getDefaultRomUri();
+    if (romUri && await this.fileService.exists(romUri)) {
+      await this.fileService.delete(romUri);
     }
   }
 
@@ -940,5 +934,89 @@ export class VesBuildService {
       this.isQueued = false;
       this.commandService.executeCommand(VesBuildCommands.BUILD.id, true);
     }
+  }
+
+  async buildModeQuickPick(buildMode?: BuildMode): Promise<void> {
+    const currentBuildMode = this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode;
+
+    const quickPickOptions: QuickPickOptions<QuickPickItem> = {
+      title: 'Set Build Mode',
+      placeholder: 'Select which mode to build in'
+    };
+
+    const buildTypes = [
+      {
+        label: BuildMode.Release,
+        value: BuildMode.Release,
+        detail: '   Includes no asserts or debug flags, for shipping only.',
+        iconClasses: (BuildMode.Release === currentBuildMode) ? ['fa', 'fa-check-square-o'] : ['fa', 'fa-square-o'],
+      },
+      {
+        label: BuildMode.Beta,
+        value: BuildMode.Beta,
+        detail: '   Includes selected asserts, for testing the performance on hardware.',
+        iconClasses: (BuildMode.Beta === currentBuildMode) ? ['fa', 'fa-check-square-o'] : ['fa', 'fa-square-o'],
+      },
+      {
+        label: BuildMode.Tools,
+        value: BuildMode.Tools,
+        detail: '   Includes selected asserts, includes debugging tools.',
+        iconClasses: (BuildMode.Tools === currentBuildMode) ? ['fa', 'fa-check-square-o'] : ['fa', 'fa-square-o'],
+      },
+      {
+        label: BuildMode.Debug,
+        value: BuildMode.Debug,
+        detail: '   Includes all runtime assertions, includes debugging tools.',
+        iconClasses: (BuildMode.Debug === currentBuildMode) ? ['fa', 'fa-check-square-o'] : ['fa', 'fa-square-o'],
+      }
+    ];
+
+    this.quickPickService.show<QuickPickItem>(buildTypes, quickPickOptions).then(selection => {
+      if (!selection) {
+        return;
+      }
+      this.setBuildMode(selection.label as BuildMode);
+    });
+  }
+
+  async setBuildMode(buildMode: BuildMode): Promise<void> {
+    this.preferenceService.set(VesBuildPreferenceIds.BUILD_MODE, buildMode, PreferenceScope.User);
+
+    // To keep default ROM in sync with the currently selected build mode,
+    // delete default ROM and copy over build mode ROM to this location, if it exists.
+    await this.deleteRom();
+    const defaultRomUri = await this.getDefaultRomUri();
+    const modeRomUri = await this.getBuildModeRomUri(buildMode);
+
+    if (defaultRomUri !== undefined && modeRomUri !== undefined) {
+      if (await this.fileService.exists(modeRomUri)) {
+        await this.fileService.copy(modeRomUri, defaultRomUri);
+      }
+    }
+  }
+
+  async getDefaultRomUri(): Promise<URI | undefined> {
+    await this.workspaceService.ready;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
+    if (!workspaceRootUri) {
+      return;
+    }
+
+    return workspaceRootUri
+      .resolve('build')
+      .resolve('output.vb');
+  }
+
+  async getBuildModeRomUri(buildMode: BuildMode): Promise<URI | undefined> {
+    await this.workspaceService.ready;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
+    if (!workspaceRootUri) {
+      return;
+    }
+
+    return workspaceRootUri
+      .resolve('build')
+      .resolve(buildMode.toLowerCase())
+      .resolve(`output-${buildMode.toLowerCase()}.vb`);
   }
 }

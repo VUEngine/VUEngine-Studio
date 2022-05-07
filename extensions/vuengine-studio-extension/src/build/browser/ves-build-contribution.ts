@@ -1,13 +1,12 @@
-import { inject, injectable } from '@theia/core/shared/inversify';
+import { ApplicationShell, KeybindingContribution, KeybindingRegistry, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
 import { CommandContribution, CommandRegistry, MAIN_MENU_BAR, MenuContribution, MenuModelRegistry } from '@theia/core/lib/common';
-import { ApplicationShell, KeybindingContribution, KeybindingRegistry, PreferenceScope, PreferenceService, QuickPickItem, QuickPickOptions } from '@theia/core/lib/browser';
+import { inject, injectable } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { QuickPickService } from '@theia/core/lib/common/quick-pick-service';
 import { VesBuildCommands } from './ves-build-commands';
-import { VesBuildViewContribution } from './ves-build-view-contribution';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
 import { VesBuildService } from './ves-build-service';
 import { BuildMode } from './ves-build-types';
+import { VesBuildViewContribution } from './ves-build-view-contribution';
 
 export const buildMenuPath = [...MAIN_MENU_BAR, 'vesBuild'];
 export namespace VesBuildMenuSection {
@@ -22,8 +21,6 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
   protected readonly shell: ApplicationShell;
   @inject(PreferenceService)
   private readonly preferenceService: PreferenceService;
-  @inject(QuickPickService)
-  protected readonly quickPickService: QuickPickService;
   @inject(VesBuildService)
   private readonly vesBuildService: VesBuildService;
   @inject(VesBuildViewContribution)
@@ -42,11 +39,11 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
     });
 
     commandRegistry.registerCommand(VesBuildCommands.SET_MODE, {
-      execute: (buildMode?: BuildMode) => {
+      execute: async (buildMode?: BuildMode) => {
         if (buildMode) {
-          this.setBuildMode(buildMode);
+          await this.vesBuildService.setBuildMode(buildMode);
         } else {
-          this.buildModeQuickPick();
+          await this.vesBuildService.buildModeQuickPick();
         }
       }
     });
@@ -123,52 +120,5 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
       label: 'Pedantic Warnings',
       order: '2'
     });
-  }
-
-  async buildModeQuickPick(buildMode?: BuildMode): Promise<void> {
-    const currentBuildMode = this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode;
-
-    const quickPickOptions: QuickPickOptions<QuickPickItem> = {
-      title: 'Set Build Mode',
-      placeholder: 'Select which mode to build in'
-    };
-
-    const buildTypes = [
-      {
-        label: BuildMode.Release,
-        value: BuildMode.Release,
-        detail: '   Includes no asserts or debug flags, for shipping only.',
-        iconClasses: (BuildMode.Release === currentBuildMode) ? ['fa', 'fa-check-square-o'] : ['fa', 'fa-square-o'],
-      },
-      {
-        label: BuildMode.Beta,
-        value: BuildMode.Beta,
-        detail: '   Includes selected asserts, for testing the performance on hardware.',
-        iconClasses: (BuildMode.Beta === currentBuildMode) ? ['fa', 'fa-check-square-o'] : ['fa', 'fa-square-o'],
-      },
-      {
-        label: BuildMode.Tools,
-        value: BuildMode.Tools,
-        detail: '   Includes selected asserts, includes debugging tools.',
-        iconClasses: (BuildMode.Tools === currentBuildMode) ? ['fa', 'fa-check-square-o'] : ['fa', 'fa-square-o'],
-      },
-      {
-        label: BuildMode.Debug,
-        value: BuildMode.Debug,
-        detail: '   Includes all runtime assertions, includes debugging tools.',
-        iconClasses: (BuildMode.Debug === currentBuildMode) ? ['fa', 'fa-check-square-o'] : ['fa', 'fa-square-o'],
-      }
-    ];
-
-    this.quickPickService.show<QuickPickItem>(buildTypes, quickPickOptions).then(selection => {
-      if (!selection) {
-        return;
-      }
-      this.setBuildMode(selection.label);
-    });
-  }
-
-  protected setBuildMode(buildMode: string): void {
-    this.preferenceService.set(VesBuildPreferenceIds.BUILD_MODE, buildMode, PreferenceScope.User);
   }
 }
