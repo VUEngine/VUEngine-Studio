@@ -78,7 +78,13 @@ export class VesBuildWidget extends ReactWidget {
     this.vesBuildService.onDidChangeIsCleaning(() => this.update());
     this.vesBuildService.onDidChangeIsQueued(isQueued => this.title.className = isQueued ? 'ves-decorator-queued' : '');
     this.vesBuildService.onDidChangeRomSize(() => this.update());
-    this.vesBuildService.onDidChangeBuildStatus(() => this.update());
+    this.vesBuildService.onDidChangeBuildStatus(status => {
+      this.handleProgressDecorator();
+      this.update();
+    });
+    this.onDidChangeVisibility(() => {
+      this.handleProgressDecorator();
+    });
     this.vesBuildService.onDidChangeBuildMode(() => this.update());
     this.vesBuildService.onDidStartBuild(() => {
       this.startTimerInterval();
@@ -117,6 +123,14 @@ export class VesBuildWidget extends ReactWidget {
     super.onActivateRequest(msg);
     this.update();
     this.node.focus();
+  }
+
+  protected handleProgressDecorator(): void {
+    if (this.vesBuildService.buildStatus.active) {
+      this.title.className = this.isVisible
+        ? 'ves-decorator-progress'
+        : `ves-decorator-progress ves-decorator-progress-${this.vesBuildService.buildStatus.progress}`;
+    }
   }
 
   // TODO: allow queueing run, flash and export

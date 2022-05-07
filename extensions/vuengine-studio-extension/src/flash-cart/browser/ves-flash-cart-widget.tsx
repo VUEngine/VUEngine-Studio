@@ -48,10 +48,15 @@ export class VesFlashCartWidget extends ReactWidget {
       this.title.className = isQueued ? 'ves-decorator-queued' : '';
       this.update();
     });
-    this.vesFlashCartService.onDidChangeFlashingProgress(() => this.update());
+    this.vesFlashCartService.onDidChangeFlashingProgress(() => {
+      this.handleProgressDecorator();
+      this.update();
+    });
+    this.onDidChangeVisibility(() => {
+      this.handleProgressDecorator();
+    });
     this.vesFlashCartService.onDidChangeAtLeastOneCanHoldRom(() => this.update());
 
-    this.vesFlashCartService.onDidStartFlashing(() => this.title.className = 'ves-decorator-progress');
     this.vesFlashCartService.onDidSucceedFlashing(() => this.title.className = 'ves-decorator-success');
     this.vesFlashCartService.onDidFailFlashing(() => this.title.className = 'ves-decorator-error');
   }
@@ -65,6 +70,14 @@ export class VesFlashCartWidget extends ReactWidget {
   protected onActivateRequest(msg: Message): void {
     super.onActivateRequest(msg);
     this.node.focus();
+  }
+
+  protected handleProgressDecorator(): void {
+    if (this.vesFlashCartService.isFlashing) {
+      this.title.className = this.isVisible
+        ? 'ves-decorator-progress'
+        : `ves-decorator-progress ves-decorator-progress-${this.vesFlashCartService.flashingProgress}`;
+    }
   }
 
   protected render(): React.ReactNode {
