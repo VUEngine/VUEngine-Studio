@@ -27,7 +27,8 @@ export namespace VesUpdaterMenu {
 
 @injectable()
 export class VesUpdaterClientImpl implements VesUpdaterClient {
-    @inject(PreferenceService) private readonly preferenceService: PreferenceService;
+    @inject(PreferenceService)
+    private readonly preferenceService: PreferenceService;
 
     protected readonly onReadyToInstallEmitter = new Emitter<void>();
     readonly onReadyToInstall = this.onReadyToInstallEmitter.event;
@@ -86,22 +87,16 @@ export class ElectronMenuUpdater {
 
 @injectable()
 export class VesUpdaterFrontendContribution implements CommandContribution, MenuContribution {
-
     @inject(MessageService)
     protected readonly messageService: MessageService;
-
     @inject(ElectronMenuUpdater)
     protected readonly menuUpdater: ElectronMenuUpdater;
-
     @inject(VesUpdater)
     protected readonly updater: VesUpdater;
-
     @inject(VesUpdaterClientImpl)
     protected readonly updaterClient: VesUpdaterClientImpl;
-
     @inject(PreferenceService)
     private readonly preferenceService: PreferenceService;
-
     @inject(OpenerService)
     protected readonly openerService: OpenerService;
 
@@ -158,8 +153,7 @@ export class VesUpdaterFrontendContribution implements CommandContribution, Menu
         if (answer === 'Never') {
             this.preferenceService.set('updates.reportOnStart', false, PreferenceScope.User);
             return;
-        }
-        if (answer === 'Yes') {
+        } else if (answer === 'Yes') {
             this.stopProgress();
             this.progress = await this.messageService.showProgress({
                 text: 'Application Update'
@@ -176,7 +170,7 @@ export class VesUpdaterFrontendContribution implements CommandContribution, Menu
     }
 
     protected async handleNoUpdate(): Promise<void> {
-        this.messageService.info('Already using the latest version');
+        this.messageService.info('You are already using the latest version of VUEngine Studio.');
     }
 
     protected async handleUpdatesAvailable(): Promise<void> {
@@ -184,7 +178,7 @@ export class VesUpdaterFrontendContribution implements CommandContribution, Menu
             this.progress.report({ work: { done: 1, total: 1 } });
             this.stopProgress();
         }
-        const answer = await this.messageService.info('An update has been downloaded and will be automatically installed on exit. Do you want to restart now?', 'No', 'Yes');
+        const answer = await this.messageService.info('An update has been downloaded. Do you want to restart to install now?', 'No', 'Yes');
         if (answer === 'Yes') {
             this.updater.onRestartToUpdateRequested();
         }

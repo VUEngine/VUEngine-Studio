@@ -75,10 +75,4 @@ exports.default = async function (context) {
             maxBuffer: 1024 * 10000
         }); 
     */
-
-    /*
-    // TODO: update electron-builder >= 22.10.5 and use "mac.executableName: VUEngine" instead of fs.renameSync
-    const fixedAppPath = path.resolve(context.appOutDir, 'VUEngine.app');
-    fs.renameSync(appPath, fixedAppPath);
-    */
 }

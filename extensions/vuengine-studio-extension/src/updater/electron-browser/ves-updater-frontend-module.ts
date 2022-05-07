@@ -1,13 +1,12 @@
-// import { PreferenceContribution } from '@theia/core/lib/browser';
-// import { CommandContribution, MenuContribution } from '@theia/core/lib/common';
-// import { ElectronIpcConnectionProvider } from '@theia/core/lib/electron-browser/messaging/electron-ipc-connection-provider';
+import { PreferenceContribution } from '@theia/core/lib/browser';
+import { CommandContribution, MenuContribution } from '@theia/core/lib/common';
+import { ElectronIpcConnectionProvider } from '@theia/core/lib/electron-browser/messaging/electron-ipc-connection-provider';
 import { ContainerModule } from '@theia/core/shared/inversify';
-// import { VesUpdater, VesUpdaterClient, VesUpdaterPath } from '../common/ves-updater';
-// import { ElectronMenuUpdater, VesUpdaterClientImpl, VesUpdaterFrontendContribution } from './ves-updater-frontend-contribution';
-// import { VesUpdaterPreferenceSchema } from './ves-updater-preferences';
+import { VesUpdater, VesUpdaterClient, VesUpdaterPath } from '../common/ves-updater';
+import { ElectronMenuUpdater, VesUpdaterClientImpl, VesUpdaterFrontendContribution } from './ves-updater-frontend-contribution';
+import { VesUpdaterPreferenceSchema } from './ves-updater-preferences';
 
 export default new ContainerModule((bind, _unbind, isBound, rebind) => {
-/*
     bind(ElectronMenuUpdater).toSelf().inSingletonScope();
     bind(VesUpdaterClientImpl).toSelf().inSingletonScope();
     bind(VesUpdaterClient).toService(VesUpdaterClientImpl);
@@ -20,5 +19,4 @@ export default new ContainerModule((bind, _unbind, isBound, rebind) => {
     bind(CommandContribution).toService(VesUpdaterFrontendContribution);
 
     bind(PreferenceContribution).toConstantValue({ schema: VesUpdaterPreferenceSchema });
-*/
 });

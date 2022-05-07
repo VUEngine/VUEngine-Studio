@@ -1,12 +1,11 @@
-// import { JsonRpcConnectionHandler } from '@theia/core/lib/common/messaging/proxy-factory';
-// import { ElectronConnectionHandler } from '@theia/core/lib/electron-common/messaging/electron-connection-handler';
-// import { ElectronMainApplicationContribution } from '@theia/core/lib/electron-main/electron-main-application';
+import { JsonRpcConnectionHandler } from '@theia/core/lib/common/messaging/proxy-factory';
+import { ElectronConnectionHandler } from '@theia/core/lib/electron-common/messaging/electron-connection-handler';
+import { ElectronMainApplicationContribution } from '@theia/core/lib/electron-main/electron-main-application';
 import { ContainerModule } from '@theia/core/shared/inversify';
-// import { VesUpdater, VesUpdaterClient, VesUpdaterPath } from '../common/ves-updater';
-// import { VesUpdaterImpl } from './ves-updater-impl';
+import { VesUpdater, VesUpdaterClient, VesUpdaterPath } from '../common/ves-updater';
+import { VesUpdaterImpl } from './ves-updater-impl';
 
 export default new ContainerModule(bind => {
-/*
     bind(VesUpdaterImpl).toSelf().inSingletonScope();
     bind(VesUpdater).toService(VesUpdaterImpl);
     bind(ElectronMainApplicationContribution).toService(VesUpdater);
@@ -18,5 +17,4 @@ export default new ContainerModule(bind => {
             return server;
         })
     ).inSingletonScope();
-*/
 });

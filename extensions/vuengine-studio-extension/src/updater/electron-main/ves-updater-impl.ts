@@ -1,15 +1,16 @@
 import { ElectronMainApplication, ElectronMainApplicationContribution } from '@theia/core/lib/electron-main/electron-main-application';
 import { injectable } from '@theia/core/shared/inversify';
-import * as fs from 'fs-extra';
-import * as http from 'http';
-import * as os from 'os';
-import * as path from 'path';
 import { VesUpdater, VesUpdaterClient } from '../common/ves-updater';
 
 const { autoUpdater } = require('electron-updater');
 
 autoUpdater.logger = require('electron-log');
 autoUpdater.logger.transports.file.level = 'info';
+autoUpdater.setFeedURL({
+    provider: 'github',
+    owner: 'VUEngine',
+    repo: 'VUEngine-Studio',
+});
 
 @injectable()
 export class VesUpdaterImpl implements VesUpdater, ElectronMainApplicationContribution {
@@ -62,18 +63,6 @@ export class VesUpdaterImpl implements VesUpdater, ElectronMainApplicationContri
 
     downloadUpdate(): void {
         autoUpdater.downloadUpdate();
-
-        // record download stat, ignore errors
-        fs.mkdtemp(path.join(os.tmpdir(), 'ves-updater-'))
-            .then(tmpDir => {
-                const file = fs.createWriteStream(path.join(tmpDir, 'update'));
-                http.get('https://www.eclipse.org/downloads/download.php?file=/ves/update&r=1', response => {
-                    response.pipe(file);
-                    file.on('finish', () => {
-                        file.close();
-                    });
-                });
-            });
     }
 
     onStart(application: ElectronMainApplication): void {
