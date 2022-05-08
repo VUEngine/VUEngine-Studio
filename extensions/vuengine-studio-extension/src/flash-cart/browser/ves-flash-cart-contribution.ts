@@ -14,7 +14,7 @@ export class VesFlashCartContribution implements CommandContribution, Keybinding
   @inject(VesFlashCartService)
   private readonly vesFlashCartService: VesFlashCartService;
   @inject(VesFlashCartViewContribution)
-  private readonly VesFlashCartView: VesFlashCartViewContribution;
+  private readonly vesFlashCartView: VesFlashCartViewContribution;
   @inject(WorkspaceService)
   private readonly workspaceService: WorkspaceService;
 
@@ -27,9 +27,9 @@ export class VesFlashCartContribution implements CommandContribution, Keybinding
     commandRegistry.registerCommand(VesFlashCartCommands.OPEN_WIDGET, {
       execute: (forceOpen: boolean = false) => {
         if (forceOpen) {
-          this.VesFlashCartView.openView({ activate: true, reveal: true });
+          this.vesFlashCartView.openView({ activate: true, reveal: true });
         } else {
-          this.VesFlashCartView.toggleView();
+          this.vesFlashCartView.toggleView();
         }
       }
     });

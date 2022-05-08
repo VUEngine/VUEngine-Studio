@@ -99,6 +99,10 @@
       "frontend": "lib/projects/browser/ves-projects-frontend-module"
     },
     {
+      "frontend": "lib/rumble-pack/browser/ves-rumble-pack-frontend-module",
+      "backend": "lib/rumble-pack/node/ves-rumble-pack-backend-module"
+    },
+    {
       "electronMain": "lib/updater/electron-main/ves-updater-main-module",
       "frontendElectron": "lib/updater/electron-browser/ves-updater-frontend-module"
     },

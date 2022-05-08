@@ -8,7 +8,7 @@ import { basename } from 'path';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesFlashCartCommands } from './ves-flash-cart-commands';
 import { VesFlashCartService } from './ves-flash-cart-service';
-import { ConnectedFlashCart, FlashLogLine, HYPERFLASH32_PREFERENCE_NAME } from './ves-flash-cart-types';
+import { ConnectedFlashCart, FlashLogLine, HYPERFLASH32_PREFERENCE_NAME } from '../common/ves-flash-cart-types';
 import IMAGE_HYPERFLASH32_LABEL from '../../../src/flash-cart/browser/images/hyperflash32-label.png';
 import IMAGE_NO_FLASH_CARTS from '../../../src/flash-cart/browser/images/no-flash-carts.png';
 
@@ -33,6 +33,7 @@ export class VesFlashCartWidget extends ReactWidget {
   @postConstruct()
   protected async init(): Promise<void> {
     this.id = VesFlashCartWidget.ID;
+    // TODO: change to codicon-layout-statusbar once codicon version in Theia got updated
     this.title.iconClass = 'codicon codicon-browser codicon-flip-y';
     this.title.closable = true;
     this.setTitle();

@@ -1,0 +1,21 @@
+#vesRumblePackWidget {
+  padding: calc(var(--theia-ui-padding) * 2);
+}
+
+#vesRumblePackWidget .rumble-pack-container {
+  display: flex;
+  flex-direction: row;
+  padding-top: calc(var(--theia-ui-padding) * 2);
+}
+
+#vesRumblePackWidget .rumble-pack-container>div {
+  flex-grow: 1;
+}
+
+#vesRumblePackWidget .connected {
+  color: var(--theia-editorSuccess-foreground);
+}
+
+#vesRumblePackWidget .disconnected {
+  color: var(--theia-editorError-foreground);
+}

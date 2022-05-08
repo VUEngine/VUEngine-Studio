@@ -1,6 +1,6 @@
 import { injectable, postConstruct } from '@theia/core/shared/inversify';
 import { usb, getDeviceList } from 'usb';
-import { ConnectedFlashCart, FlashCartConfig } from '../browser/ves-flash-cart-types';
+import { ConnectedFlashCart, FlashCartConfig } from '../common/ves-flash-cart-types';
 import { VesFlashCartUsbService, VesFlashCartUsbServiceClient } from '../common/ves-flash-cart-usb-service-protocol';
 import { SerialPort } from 'serialport';
 
@@ -75,7 +75,6 @@ export class VesFlashCartUsbServiceImpl implements VesFlashCartUsbService {
                         deviceIsFlashCart = true;
                         connectedFlashCarts.push({
                             config: flashCartConfig,
-                            device: device,
                             port: portName?.path || '',
                             status: {
                                 processId: -1,

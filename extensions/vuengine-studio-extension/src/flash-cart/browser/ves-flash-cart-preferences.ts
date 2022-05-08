@@ -14,7 +14,7 @@ import {
     NAME_NO_SPACES_PLACEHOLDER,
     PORT_PLACEHOLDER,
     PROG_VB_PLACEHOLDER, ROM_PLACEHOLDER
-} from './ves-flash-cart-types';
+} from '../common/ves-flash-cart-types';
 
 export namespace VesFlashCartPreferenceIds {
     export const CATEGORY = 'flashCarts';

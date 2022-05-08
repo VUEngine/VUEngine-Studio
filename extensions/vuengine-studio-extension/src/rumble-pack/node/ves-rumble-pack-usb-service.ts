@@ -1,0 +1,70 @@
+import { injectable, postConstruct } from '@theia/core/shared/inversify';
+import { SerialPort } from 'serialport';
+import { usb } from 'usb';
+import { HapticBuiltInEffect, HapticFrequency, HapticLibrary, RUMBLE_PACK_IDS } from '../common/ves-rumble-pack-types';
+import { VesRumblePackUsbService, VesRumblePackUsbServiceClient } from '../common/ves-rumble-pack-usb-service-protocol';
+
+@injectable()
+export class VesRumblePackUsbServiceImpl implements VesRumblePackUsbService {
+    protected client: VesRumblePackUsbServiceClient | undefined;
+    protected port: SerialPort | undefined;
+
+    dispose(): void {
+        throw new Error('Method not implemented.');
+    }
+
+    async setClient(client: VesRumblePackUsbServiceClient): Promise<void> {
+        this.client = client;
+    }
+
+    @postConstruct()
+    protected init(): void {
+        usb.on('attach', async () => this.client?.onDidAttachDevice());
+        usb.on('detach', async () => this.client?.onDidDetachDevice());
+    }
+
+    async detectRumblePack(): Promise<boolean> {
+        let connectedRumblePack = false;
+
+        const ports = await SerialPort.list();
+        ports.map(port =>
+            RUMBLE_PACK_IDS.map(rumblePackId => {
+                if (port.productId === rumblePackId.productId &&
+                    port.vendorId === rumblePackId.vendoriId &&
+                    port.manufacturer === rumblePackId.manufacturer) {
+                    connectedRumblePack = true;
+                    this.port = new SerialPort({
+                        path: port.path,
+                        baudRate: 115200,
+                        dataBits: 8,
+                        stopBits: 1,
+                        parity: 'none',
+                    });
+                    this.port.on('data', data => this.client?.onDidReceiveData(data.toString()));
+                }
+            })
+        );
+
+        if (!connectedRumblePack) {
+            this.port = undefined;
+        }
+
+        return connectedRumblePack;
+    }
+
+    sendCommand(command: string): boolean {
+        return this.port?.write(`<${command}>`) || false;
+    }
+
+    sendCommandPrintMenu(): boolean {
+        return this.sendCommand('PM');
+    }
+
+    sendCommandTriggerSingleHaptic(
+        library: HapticLibrary,
+        effect: HapticBuiltInEffect,
+        frequency: HapticFrequency
+    ): boolean {
+        return this.sendCommand(`HAP ${library} ${effect} ${frequency}`);
+    }
+}

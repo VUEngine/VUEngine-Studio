@@ -1,5 +1,5 @@
 import { JsonRpcServer } from '@theia/core';
-import { ConnectedFlashCart, FlashCartConfig } from '../browser/ves-flash-cart-types';
+import { ConnectedFlashCart, FlashCartConfig } from './ves-flash-cart-types';
 
 export const VES_FLASH_CART_USB_SERVICE_PATH = '/ves/services/flashCarts/usb';
 export const VesFlashCartUsbService = Symbol('VesFlashCartUsbService');

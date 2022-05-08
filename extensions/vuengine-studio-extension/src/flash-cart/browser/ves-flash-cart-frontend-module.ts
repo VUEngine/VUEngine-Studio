@@ -17,9 +17,9 @@ import { VesFlashCartViewContribution } from './ves-flash-cart-view-contribution
 import { VesFlashCartWidget } from './ves-flash-cart-widget';
 import { VesFlashCartStatusBarContribution } from './ves-flash-cart-statusbar-contribution';
 import { VesFlashCartPreferenceSchema } from './ves-flash-cart-preferences';
-import '../../../src/flash-cart/browser/style/index.css';
 import { TabBarDecorator } from '@theia/core/lib/browser/shell/tab-bar-decorator';
 import { VesFlashCartTabBarDecorator } from './ves-flash-cart-tab-bar-decorator';
+import '../../../src/flash-cart/browser/style/index.css';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // preferences

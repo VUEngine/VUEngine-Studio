@@ -29,7 +29,7 @@ import {
   PORT_PLACEHOLDER,
   PROG_VB_PLACEHOLDER,
   ROM_PLACEHOLDER
-} from './ves-flash-cart-types';
+} from '../common/ves-flash-cart-types';
 import { VesFlashCartUsbWatcher } from './ves-flash-cart-usb-watcher';
 import IMAGE_FLASHBOY_PLUS from '../../../src/flash-cart/browser/images/flashboy-plus.png';
 import IMAGE_HYPERBOY from '../../../src/flash-cart/browser/images/HyperBoy.png';
