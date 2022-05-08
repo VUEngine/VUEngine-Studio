@@ -28,7 +28,7 @@ export class VesRumblePackStatusBarContribution implements FrontendApplicationCo
                 alignment: StatusBarAlignment.LEFT,
                 command: VesRumblePackCommands.OPEN_WIDGET.id,
                 priority: 2,
-                text: '$(usb) Rumble Pack',
+                text: '$(codicon-screen-full codicon-rotate-90) Rumble Pack',
                 tooltip: 'Rumble Pack Connected'
             });
         } else {

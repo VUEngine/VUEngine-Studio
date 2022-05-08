@@ -9,7 +9,7 @@ import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService } from '../../process/common/ves-process-service-protocol';
 import { VesProjectsService } from '../../projects/browser/ves-projects-service';
-import { HapticBuiltInEffect, HapticFrequency, HapticLibrary, RumblePakLogLine } from '../common/ves-rumble-pack-types';
+import { HapticBuiltInEffect, HapticFrequency, RumblePakLogLine } from '../common/ves-rumble-pack-types';
 import { VesRumblePackUsbService } from '../common/ves-rumble-pack-usb-service-protocol';
 import { VesRumblePackUsbWatcher } from './ves-rumble-pack-usb-watcher';
 
@@ -98,11 +98,43 @@ export class VesRumblePackService {
     return this.vesRumblePackUsbService.sendCommandPrintMenu();
   };
 
-  sendCommandTriggerSingleHaptic(
-    library: HapticLibrary,
-    effect: HapticBuiltInEffect,
-    frequency: HapticFrequency
-  ): boolean {
-    return this.vesRumblePackUsbService.sendCommandTriggerSingleHaptic(library, effect, frequency);
+  sendCommandPrintVbCommandLineState(): boolean {
+    return this.vesRumblePackUsbService.sendCommandPrintVbCommandLineState();
+  }
+
+  sendCommandPrintVbSyncLineState(): boolean {
+    return this.vesRumblePackUsbService.sendCommandPrintVbSyncLineState();
+  }
+
+  sendCommandPlayLastEffect(): boolean {
+    return this.vesRumblePackUsbService.sendCommandPlayLastEffect();
+  }
+
+  sendCommandStopCurrentEffect(): boolean {
+    return this.vesRumblePackUsbService.sendCommandStopCurrentEffect();
+  }
+
+  sendCommandPlayEffect(effect: HapticBuiltInEffect): boolean {
+    return this.vesRumblePackUsbService.sendCommandPlayEffect(effect);
   };
+
+  sendCommandSetFrequency(frequency: HapticFrequency): boolean {
+    return this.vesRumblePackUsbService.sendCommandSetFrequency(frequency);
+  }
+
+  sendCommandSetOverdrive(overdrive: number): boolean {
+    return this.vesRumblePackUsbService.sendCommandSetOverdrive(overdrive);
+  }
+
+  sendCommandSetPositiveSustain(sustain: number): boolean {
+    return this.vesRumblePackUsbService.sendCommandSetPositiveSustain(sustain);
+  }
+
+  sendCommandSetNegativeSustain(sustain: number): boolean {
+    return this.vesRumblePackUsbService.sendCommandSetNegativeSustain(sustain);
+  }
+
+  sendCommandSetBreak(breakValue: number): boolean {
+    return this.vesRumblePackUsbService.sendCommandSetBreak(breakValue);
+  }
 }

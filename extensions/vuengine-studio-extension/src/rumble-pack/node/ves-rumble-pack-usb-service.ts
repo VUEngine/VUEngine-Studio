@@ -1,7 +1,7 @@
 import { injectable, postConstruct } from '@theia/core/shared/inversify';
 import { SerialPort } from 'serialport';
 import { usb } from 'usb';
-import { HapticBuiltInEffect, HapticFrequency, HapticLibrary, RUMBLE_PACK_IDS } from '../common/ves-rumble-pack-types';
+import { HapticBuiltInEffect, HapticFrequency, RUMBLE_PACK_IDS } from '../common/ves-rumble-pack-types';
 import { VesRumblePackUsbService, VesRumblePackUsbServiceClient } from '../common/ves-rumble-pack-usb-service-protocol';
 
 @injectable()
@@ -60,11 +60,47 @@ export class VesRumblePackUsbServiceImpl implements VesRumblePackUsbService {
         return this.sendCommand('PM');
     }
 
-    sendCommandTriggerSingleHaptic(
-        library: HapticLibrary,
-        effect: HapticBuiltInEffect,
-        frequency: HapticFrequency
-    ): boolean {
-        return this.sendCommand(`HAP ${library} ${effect} ${frequency}`);
+    sendCommandPrintVbCommandLineState(): boolean {
+        return this.sendCommand('VBC');
+    }
+
+    sendCommandPrintVbSyncLineState(): boolean {
+        return this.sendCommand('VBS');
+    }
+
+    sendCommandPlayLastEffect(): boolean {
+        return this.sendCommand('GO');
+    }
+
+    sendCommandStopCurrentEffect(): boolean {
+        return this.sendCommand('STP');
+    }
+
+    sendCommandPlayEffect(effect: HapticBuiltInEffect): boolean {
+        return this.sendCommand(`HAP ${effect}`);
+    }
+
+    sendCommandSetFrequency(frequency: HapticFrequency): boolean {
+        return this.sendCommand(`FRQ ${frequency}`);
+    }
+
+    sendCommandSetOverdrive(overdrive: number): boolean {
+        return this.sendCommand(`ODT ${overdrive.toString().padStart(3, '0')}`);
+    }
+
+    sendCommandSetPositiveSustain(sustain: number): boolean {
+        return this.sendCommand(`SPT ${sustain.toString().padStart(3, '0')}`);
+    }
+
+    sendCommandSetNegativeSustain(sustain: number): boolean {
+        return this.sendCommand(`SNT ${sustain.toString().padStart(3, '0')}`);
+    }
+
+    sendCommandSetBreak(breakValue: number): boolean {
+        return this.sendCommand(`BRT ${breakValue.toString().padStart(3, '0')}`);
+    }
+
+    sendCommandEmulateVbByte(byte: string): boolean {
+        return this.sendCommand(`VB ${byte}`);
     }
 }
