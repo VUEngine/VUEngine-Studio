@@ -150,7 +150,8 @@ export class VesFlashCartWidget extends ReactWidget {
                       {connectedFlashCart.config.vid}:
                       {connectedFlashCart.config.pid}<br />
                       {connectedFlashCart.config.manufacturer}<br />
-                      {connectedFlashCart.config.product}
+                      {connectedFlashCart.config.product}<br />
+                      {connectedFlashCart.port}
                     </div>
                     <div>
                       <i className='fa fa-fw fa-terminal'></i>{' '}
