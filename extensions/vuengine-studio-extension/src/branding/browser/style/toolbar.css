@@ -1,5 +1,5 @@
 #main-toolbar {
-  --theia-toolbar-height: 28px;
+  --theia-toolbar-height: 32px;
   --theia-toolbar-item-padding: 4px;
-  --theia-toolbar-icon-size: 14px;
+  --theia-toolbar-icon-size: 18px;
 }

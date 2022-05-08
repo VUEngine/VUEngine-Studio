@@ -205,7 +205,7 @@ export class VesRumblePackWidget extends ReactWidget {
                 <label>Effect</label>
                 <select
                   className='theia-select'
-                  title='Built-In Haptic Effects'
+                  title="Built-In Haptic Effects"
                   onChange={e => this.setStateEffect(e.target.value as unknown as HapticBuiltInEffect)}
                   value={this.state.effect}
                 >
@@ -222,7 +222,7 @@ export class VesRumblePackWidget extends ReactWidget {
                 <label>Frequency</label>
                 <select
                   className='theia-select'
-                  title='Frequency'
+                  title="Frequency"
                   onChange={e => this.setStateFrequency(e.target.value as unknown as HapticFrequency)}
                   value={this.state.frequency}
                 >
@@ -236,8 +236,8 @@ export class VesRumblePackWidget extends ReactWidget {
                 <label>Sustain (Pos.)</label>
                 <input
                   type="number"
-                  className='theia-input'
-                  title='Positive Sustain'
+                  className="theia-input"
+                  title="Positive Sustain"
                   onChange={e => this.setStateSustainPos(parseInt(e.target.value))}
                   value={this.state.sustainPos}
                   min="0"
@@ -248,8 +248,8 @@ export class VesRumblePackWidget extends ReactWidget {
                 <label>Sustain (Neg.)</label>
                 <input
                   type="number"
-                  className='theia-input'
-                  title='Negative Sustain'
+                  className="theia-input"
+                  title="Negative Sustain"
                   onChange={e => this.setStateSustainNeg(parseInt(e.target.value))}
                   value={this.state.sustainNeg}
                   min="0"
@@ -260,8 +260,8 @@ export class VesRumblePackWidget extends ReactWidget {
                 <label>Overdrive</label>
                 <input
                   type="number"
-                  className='theia-input'
-                  title='Overdrive'
+                  className="theia-input"
+                  title="Overdrive"
                   onChange={e => this.setStateOverdrive(parseInt(e.target.value))}
                   value={this.state.overdrive}
                   min="0"
@@ -272,8 +272,8 @@ export class VesRumblePackWidget extends ReactWidget {
                 <label>Break</label>
                 <input
                   type="number"
-                  className='theia-input'
-                  title='Break'
+                  className="theia-input"
+                  title="Break"
                   onChange={e => this.setStateBreak(parseInt(e.target.value))}
                   value={this.state.break}
                   min="0"
@@ -286,7 +286,7 @@ export class VesRumblePackWidget extends ReactWidget {
               <div className='flex-row'>
                 <button
                   className='theia-button'
-                  title='Run effect'
+                  title="Run effect"
                   onClick={this.sendCommandPlayEffect}
                   disabled={!this.vesRumblePackService.rumblePackIsConnected}
                 >
@@ -294,7 +294,7 @@ export class VesRumblePackWidget extends ReactWidget {
                 </button>
                 <button
                   className='theia-button secondary'
-                  title='Re-run last effect'
+                  title="Re-run last effect"
                   onClick={this.sendCommandPlayLastEffect}
                   disabled={!this.vesRumblePackService.rumblePackIsConnected}
                 >
@@ -302,7 +302,7 @@ export class VesRumblePackWidget extends ReactWidget {
                 </button>
                 <button
                   className='theia-button secondary'
-                  title='Stop current effect'
+                  title="Stop current effect"
                   onClick={this.sendCommandStopCurrentEffect}
                   disabled={!this.vesRumblePackService.rumblePackIsConnected}
                 >
@@ -358,17 +358,12 @@ export class VesRumblePackWidget extends ReactWidget {
             <label>Log</label>
             <div className='rumblePakLog'>
               <div>
-                {this.vesRumblePackService.rumblePackLog.length > 0 ? this.vesRumblePackService.rumblePackLog.map((line: RumblePakLogLine, index: number) => (
+                {this.vesRumblePackService.rumblePackLog.map((line: RumblePakLogLine, index: number) => (
                   <div className='rumblePakLogLine' key={`rumblePakLogLine${index}`}>
                     <span>{new Date(line.timestamp).toTimeString().substring(0, 8)}</span>
                     <span>{line.text}</span>
                   </div>
-                )) : (
-                  <div className='rumblePakLogLine' key={'rumblePakLogLineEmpty'}>
-                    <span>-</span>
-                    <span></span>
-                  </div>
-                )}
+                ))}
                 <div ref={this.rumblePakLogLineLastElementRef} key={'rumblePakLogLineLast'}></div>
               </div>
             </div>

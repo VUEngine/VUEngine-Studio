@@ -18,6 +18,7 @@
 		"list.activeSelectionBackground": "#d3142240",
 		"list.activeSelectionForeground": "#616161",
 		"mainToolbar.background": "#616161",
+		"mainToolbar.foreground": "#ffffff",
 		"menu.selectionBackground": "#d3142240",
 		"menu.separatorBackground": "#dddddd",
 		"minimap.selectionHighlight": "#d3142240",
