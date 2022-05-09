@@ -1,5 +1,4 @@
-import { Emitter, isOSX, isWindows } from '@theia/core';
-import { ApplicationShell, Widget } from '@theia/core/lib/browser';
+import { isOSX, isWindows } from '@theia/core';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -8,8 +7,6 @@ import { VesProcessService, VesProcessType } from '../../process/common/ves-proc
 
 @injectable()
 export class VesCommonService {
-  @inject(ApplicationShell)
-  protected applicationShell: ApplicationShell;
   @inject(EnvVariablesServer)
   protected envVariablesServer: EnvVariablesServer;
   @inject(VesProcessService)
@@ -20,25 +17,9 @@ export class VesCommonService {
   @postConstruct()
   protected async init(): Promise<void> {
     await this.determineIsWslInstalled();
-
-    this.applicationShell.mainPanel.onDidToggleMaximized(widget => this.handleToggleMaximized(widget));
-    this.applicationShell.bottomPanel.onDidToggleMaximized(widget => this.handleToggleMaximized(widget));
-    this.applicationShell.leftPanelHandler.dockPanel.onDidToggleMaximized(widget => this.handleToggleMaximized(widget));
-    this.applicationShell.rightPanelHandler.dockPanel.onDidToggleMaximized(widget => this.handleToggleMaximized(widget));
   }
 
   isWslInstalled: boolean = false;
-
-  protected _isMaximized: Widget | false = false;
-  protected readonly onDidChangeIsMaximizedEmitter = new Emitter<Widget | false>();
-  readonly onDidChangeIsMaximized = this.onDidChangeIsMaximizedEmitter.event;
-  set isMaximized(flag: Widget | false) {
-    this._isMaximized = flag;
-    this.onDidChangeIsMaximizedEmitter.fire(this._isMaximized);
-  }
-  get isMaximized(): Widget | false {
-    return this._isMaximized;
-  }
 
   getOs(): string {
     return isWindows ? 'win' : isOSX ? 'osx' : 'linux';
@@ -62,10 +43,6 @@ export class VesCommonService {
         .replace(/^\\|\\$/g, '') // remove leading and trailing backslashes
         .replace(/^[a-z]:\\/, x => x.toUpperCase()) // uppercase drive number
       : path;
-  }
-
-  protected handleToggleMaximized(widget: Widget): void {
-    this.isMaximized = !this.isMaximized && widget;
   }
 
   protected async determineIsWslInstalled(): Promise<void> {

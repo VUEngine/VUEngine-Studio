@@ -1,11 +1,11 @@
 import { injectable } from '@theia/core/shared/inversify';
 import { COMMONLY_USED_SECTION_PREFIX, PreferenceTreeGenerator } from '@theia/preferences/lib/browser/util/preference-tree-generator';
 import { VesBuildPreferenceIds } from '../../build/browser/ves-build-preferences';
-import { VesFlashCartPreferenceIds } from '../../flash-cart/browser/ves-flash-cart-preferences';
 import { VesEmulatorPreferenceIds } from '../../emulator/browser/ves-emulator-preferences';
+import { VesFlashCartPreferenceIds } from '../../flash-cart/browser/ves-flash-cart-preferences';
+import { VesPluginsPreferenceIds } from '../../plugins/browser/ves-plugins-preferences';
 import { VesProjectsPreferenceIds } from '../../projects/browser/ves-projects-preferences';
 import { VesUpdaterPreferenceIds } from '../../updater/electron-browser/ves-updater-preferences';
-import { VesPluginsPreferenceIds } from '../../plugins/browser/ves-plugins-preferences';
 import { VesBrandingPreferenceIds } from './ves-branding-preferences';
 
 @injectable()
@@ -16,39 +16,39 @@ export class VesPreferenceTreeGenerator extends PreferenceTreeGenerator {
 
     protected readonly topLevelCategories = new Map([
         [COMMONLY_USED_SECTION_PREFIX, 'Commonly Used'],
-        ['application', 'Application'],
-        [VesBuildPreferenceIds.CATEGORY, 'Build'], // custom category
         ['editor', 'Text Editor'],
-        ['features', 'Features'],
-        ['window', 'Window'],
         ['workbench', 'Workbench'],
-        ['extensions', 'Extensions'],
+        ['window', 'Window'],
+        [VesBuildPreferenceIds.CATEGORY, 'Build'], // custom category
+        ['features', 'Features'],
+        ['application', 'Application'],
+        ['security', 'Security'],
+        ['extensions', 'Extensions']
     ]);
 
     protected readonly sectionAssignments = new Map([
-        ['keyboard', 'application'],
-        ['workspace', 'application'],
-
-        ['diffEditor', 'editor'],
-        ['files', 'editor'],
-
+        ['breadcrumbs', 'workbench'],
         ['comments', 'features'],
         // ['debug', 'features'], // remove debug
+        ['diffEditor', 'editor'],
         [VesEmulatorPreferenceIds.CATEGORY, 'features'], // custom category
         [VesFlashCartPreferenceIds.CATEGORY, 'features'], // custom category
         ['explorer', 'features'],
         ['extensions', 'features'],
         [VesBrandingPreferenceIds.CATEGORY, 'features'], // custom category
+        ['files', 'editor'],
         ['hosted-plugin', 'features'],
+        ['keyboard', 'application'],
         ['output', 'features'],
-        ['preview', 'features'],
+        [VesPluginsPreferenceIds.CATEGORY, VesBuildPreferenceIds.CATEGORY], // custom category
         ['problems', 'features'],
+        ['preview', 'features'],
         [VesProjectsPreferenceIds.CATEGORY, 'features'], // custom category
         ['search', 'features'],
         ['task', 'features'],
         ['terminal', 'features'],
         [VesUpdaterPreferenceIds.CATEGORY, 'features'], // custom category
-        [VesPluginsPreferenceIds.CATEGORY, VesBuildPreferenceIds.CATEGORY], // custom category
         ['webview', 'features'],
+        ['workspace', 'application'],
     ]);
 }
