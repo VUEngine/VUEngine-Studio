@@ -50,24 +50,6 @@ jobs:
           NODE_OPTIONS: --max_old_space_size=4096
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # https://github.com/microsoft/vscode-ripgrep/issues/9
 
-      - name: Test (Linux)
-        if: matrix.tests != 'skip' && runner.os == 'Linux'
-        uses: GabrielBB/xvfb-action@v1
-        with:
-          run: yarn electron test
-
-      - name: Test (Windows)
-        if: matrix.tests != 'skip' && runner.os == 'Windows'
-        shell: bash
-        run: |
-          yarn electron test
-
-      - name: Test (macOS)
-        if: matrix.tests != 'skip' && runner.os == 'macOS'
-        shell: bash
-        run: |
-          yarn electron test
-
       - name: Lint
         if: matrix.tests != 'skip'
         shell: bash
