@@ -6,7 +6,7 @@
   "version": "0.2.0",
   "main": "scripts/ves-electron-main.js",
   "license": "EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0",
-  "author": "VUEngine",
+  "author": "KR155E <c.radke@posteo.de>",
   "homepage": "https://github.com/VUEngine/VUEngine-Studio",
   "bugs": {
     "url": "https://github.com/VUEngine/VUEngine-Studio/issues"

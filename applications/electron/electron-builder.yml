@@ -41,13 +41,10 @@ fileAssociations:
 
 win:
   icon: resources/icons/WindowsLauncherIcon/VUEngineStudio.ico
+  artifactName: ${productName} ${version} Windows.${ext}
   target:
     - nsis
-  publish:
-    provider: github
-    owner: VUEngine
-    repo: VUEngine-Studio
-    token: "<your github token>"
+    - zip
   extraResources:
     - from: binaries/vuengine-studio-tools/win
       to: app/binaries/vuengine-studio-tools/win
@@ -56,28 +53,26 @@ win:
 
 mac:
   #executableName: VUEngine
+  artifactName: ${productName} ${version} Mac.${ext}
   icon: resources/icons/MacLauncherIcon/512-512.icns
   category: public.app-category.developer-tools
   darkModeSupport: true
   target:
     - pkg
-  publish:
-    provider: generic
-    url: "https://download.eclipse.org/theia/latest/macos"
+    - zip
   extraResources:
     - from: binaries/vuengine-studio-tools/osx
       to: app/binaries/vuengine-studio-tools/osx
 
 linux:
   icon: resources/icons/LinuxLauncherIcon/512-512.png
+  artifactName: ${productName} ${version} Linux.${ext}
   category: Development
   vendor: VUEngine
+  maintainer: VUEngine
   target:
     - deb
     - AppImage
-  publish:
-    provider: generic
-    url: "https://download.eclipse.org/theia/latest/linux"
   extraResources:
     - from: binaries/vuengine-studio-tools/linux
       to: app/binaries/vuengine-studio-tools/linux
@@ -112,8 +107,8 @@ pkg:
     alignment: bottomleft
     scaling: proportional
 deb:
-  artifactName: ${productName}.${ext}
+  artifactName: ${productName} ${version} Setup Linux.${ext}
 appImage:
-  artifactName: ${productName}.${ext}
+  artifactName: ${productName} ${version} Linux.${ext}
 
 afterPack: ./scripts/after-pack.js

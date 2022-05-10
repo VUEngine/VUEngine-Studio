@@ -46,7 +46,15 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: dist
-          path: applications/electron/dist
+          path: |
+            applications/electron/dist/*.pkg
+            applications/electron/dist/*.deb
+            applications/electron/dist/*.exe
+            applications/electron/dist/*.APPIMAGE
+            applications/electron/dist/*.zip
+            applications/electron/dist/latest.yml
+            applications/electron/dist/latest-mac.yml
+            applications/electron/dist/latest-linux.yml
 
       - name: Lint
         if: matrix.tests != 'skip'
