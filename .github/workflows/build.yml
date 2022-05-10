@@ -46,13 +46,15 @@ jobs:
         run: |
           yarn --skip-integrity-check --network-timeout 100000
           yarn electron package
+        env:
+          NODE_OPTIONS: --max_old_space_size=4096
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # https://github.com/microsoft/vscode-ripgrep/issues/9
+
+      - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: dist
           path: dist/*
-        env:
-          NODE_OPTIONS: --max_old_space_size=4096
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # https://github.com/microsoft/vscode-ripgrep/issues/9
 
       - name: Lint
         if: matrix.tests != 'skip'
