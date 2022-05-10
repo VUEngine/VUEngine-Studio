@@ -46,7 +46,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: dist
-          path: dist
+          path: applications/electron/dist
 
       - name: Lint
         if: matrix.tests != 'skip'
