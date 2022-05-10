@@ -46,7 +46,7 @@ jobs:
         run: |
           yarn --skip-integrity-check --network-timeout 100000
           yarn electron package
-      - uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3
         with:
           name: dist
           path: dist/*
