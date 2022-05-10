@@ -1,7 +1,7 @@
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { AbstractViewContribution } from '@theia/core/lib/browser';
 import { CommandRegistry } from '@theia/core';
-import { VesDocumentationHandbookWidget } from './ves-documentation-Handbook-widget';
+import { VesDocumentationHandbookWidget } from './ves-documentation-handbook-widget';
 import { VesDocumentationCommands } from './ves-documentation-commands';
 import { VesDocumentationTreeViewContribution } from './tree/ves-documentation-tree-view-contribution';
 import { VesDocumentationService } from './ves-documentation-service';

@@ -6,7 +6,7 @@ import { VesDocumentationTreeWidget } from './tree/ves-documentation-tree-widget
 import { VesDocumentationTreeViewContribution } from './tree/ves-documentation-tree-view-contribution';
 import { createVesDocumentationTreeWidget } from './tree/ves-documentation-tree-container';
 import { VesDocumentationHandbookViewContribution } from './ves-documentation-handbook-view';
-import { VesDocumentationHandbookWidget } from './ves-documentation-Handbook-widget';
+import { VesDocumentationHandbookWidget } from './ves-documentation-handbook-widget';
 import { VesDocumentationService } from './ves-documentation-service';
 import '../../../src/documentation/browser/style/index.css';
 
