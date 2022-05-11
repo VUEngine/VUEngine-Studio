@@ -5,6 +5,18 @@ export const VesToolbarDefaultsOverride: () => DeflatedToolbarTree = () => ({
         [ToolbarAlignment.LEFT]: [
             [
                 {
+                    'id': 'workspace:openWorkspace',
+                    'command': 'workspace:openWorkspace',
+                    'icon': 'codicon codicon-file-code'
+                },
+                {
+                    'id': 'workspace:openRecent',
+                    'command': 'workspace:openRecent',
+                    'icon': 'codicon codicon-list-unordered'
+                }
+            ],
+            [
+                {
                     'id': 'core.undo',
                     'command': 'core.undo',
                     'icon': 'codicon codicon-discard'
@@ -41,21 +53,15 @@ export const VesToolbarDefaultsOverride: () => DeflatedToolbarTree = () => ({
             ]
         ],
         [ToolbarAlignment.CENTER]: [
-            [
-                {
-                    'id': 'workspace:openWorkspace',
-                    'command': 'workspace:openWorkspace',
-                    'icon': 'codicon codicon-file-code'
-                },
-                {
-                    'id': 'workspace:openRecent',
-                    'command': 'workspace:openRecent',
-                    'icon': 'codicon codicon-list-unordered'
-                }
-            ]
         ],
         [ToolbarAlignment.RIGHT]: [
             [
+                {
+                    'id': 'workbench.action.showCommands',
+                    'command': 'workbench.action.showCommands',
+                    'icon': 'codicon codicon-terminal',
+                },
+                /*
                 {
                     'id': 'VesBuild.commands.build',
                     'command': 'VesBuild.commands.build',
@@ -81,6 +87,7 @@ export const VesToolbarDefaultsOverride: () => DeflatedToolbarTree = () => ({
                     'command': 'VesBuild.commands.clean',
                     'icon': 'codicon codicon-trash'
                 }
+                */
             ]
         ]
     },
