@@ -2,6 +2,7 @@
 
 ## v0.2.0 - ??/??/2022
 
+- [Studio] Fixed emulator not persisting save
 - [Engine] Added new code templates for rumble effects and debug macros
 - [Studio] Added Rumble Pack tool
 - [Studio] Added automatic port detection for serialport-based flash carts like HyperFlash32 and HyperBoy

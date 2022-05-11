@@ -110,16 +110,27 @@ export class VesEmulatorWidget extends ReactWidget {
     });
   }
 
+  protected onCloseRequest(msg: Message): void {
+    this.sendCommand('saveSram');
+    setTimeout(() => {
+      super.onCloseRequest(msg);
+    }, 250);
+  }
+
   isLoaded(): boolean {
     return this.state.loaded;
   }
 
   async reload(): Promise<void> {
     if (this.iframeRef.current) {
-      this.sendCoreOptions();
-      this.iframeRef.current.src += '';
-      await this.initState();
-      this.update();
+      this.sendCommand('saveSram');
+      const currentIframeRef = this.iframeRef.current;
+      setTimeout(async () => {
+        this.sendCoreOptions();
+        currentIframeRef.src += '';
+        await this.initState();
+        this.update();
+      }, 250);
     }
   }
 
