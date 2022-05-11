@@ -338,7 +338,7 @@ export class VesEmulatorWidget extends ReactWidget {
     return false;
   }
 
-  protected startEmulator = async () => {
+  protected getRomPath = async () => {
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     const defaultRomUri = workspaceRootUri && workspaceRootUri.resolve('build').resolve('output.vb');
@@ -350,8 +350,17 @@ export class VesEmulatorWidget extends ReactWidget {
       romPath = romPath.substring(1);
     }
 
+    return romPath;
+  };
+
+  protected startEmulator = async () => {
+    const romPath = await this.getRomPath();
+
     const datauri = require('datauri');
-    const content = await datauri(romPath);
+    const content = {
+      namespace: romPath,
+      rom: await datauri(romPath)
+    };
 
     this.sendRetroArchConfig();
     this.sendCoreOptions();
@@ -566,6 +575,8 @@ export class VesEmulatorWidget extends ReactWidget {
             >
               <i className='fa fa-camera'></i>
             </button>
+            { /* }
+            // TODO: Investigate why the clean command does not work
             <button
               className='theia-button secondary'
               title='Clear Emulator Cache'
@@ -574,6 +585,7 @@ export class VesEmulatorWidget extends ReactWidget {
             >
               <i className='fa fa-trash-o'></i>
             </button>
+            { */ }
             <button
               className={
                 this.state.showControls
@@ -600,14 +612,16 @@ export class VesEmulatorWidget extends ReactWidget {
             allow="gamepad"
           ></iframe>
         </div>
-        {this.state.showControls && (
-          <div className='controlsOverlay'>
-            <VesEmulatorControls
-              commandService={this.commandService}
-              keybindingRegistry={this.keybindingRegistry}
-            />
-          </div>
-        )}
+        {
+          this.state.showControls && (
+            <div className='controlsOverlay'>
+              <VesEmulatorControls
+                commandService={this.commandService}
+                keybindingRegistry={this.keybindingRegistry}
+              />
+            </div>
+          )
+        }
       </>
     );
   }
@@ -950,17 +964,20 @@ export class VesEmulatorWidget extends ReactWidget {
     return keybindingAccelerator;
   }
 
-  protected cleanStorage = () => {
+  protected cleanStorage = async () => {
+    const romPath = await this.getRomPath();
+    const dbName = `RetroArch ${romPath}`;
+    console.info(`Attempting to delete Indexed DB "${dbName}"`);
     localStorage.clear();
-    const req = indexedDB.deleteDatabase('RetroArch');
+    const req = indexedDB.deleteDatabase(dbName);
     req.onsuccess = () => {
-      console.log('Deleted database successfully');
+      console.info('Deleted database successfully');
     };
     req.onerror = () => {
-      console.log('Couldn\'t delete database');
+      console.info('Couldn\'t delete database');
     };
     req.onblocked = () => {
-      console.log('Couldn\'t delete database due to the operation being blocked');
+      console.info('Couldn\'t delete database due to the operation being blocked');
     };
   };
 }
