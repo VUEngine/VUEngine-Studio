@@ -1,11 +1,11 @@
-import { inject, injectable } from '@theia/core/shared/inversify';
-import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
-import { AbstractViewContribution, CommonCommands, FrontendApplication } from '@theia/core/lib/browser';
-import { VesRumblePackWidget } from './ves-rumble-pack-widget';
-import { VesRumblePackCommands } from './ves-rumble-pack-commands';
 import { Command, CommandRegistry, CommandService } from '@theia/core';
-import { VesRumblePackService } from './ves-rumble-pack-service';
+import { AbstractViewContribution, CommonCommands } from '@theia/core/lib/browser';
+import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
+import { inject, injectable } from '@theia/core/shared/inversify';
 import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
+import { VesRumblePackCommands } from './ves-rumble-pack-commands';
+import { VesRumblePackService } from './ves-rumble-pack-service';
+import { VesRumblePackWidget } from './ves-rumble-pack-widget';
 
 export namespace VesRumblePackViewContributionCommands {
     export const EXPAND: Command = {
@@ -40,10 +40,6 @@ export class VesRumblePackViewContribution extends AbstractViewContribution<VesR
                 area: 'main',
             },
         });
-    }
-
-    async initializeLayout(app: FrontendApplication): Promise<void> {
-        await this.openView({ activate: false, reveal: false });
     }
 
     registerCommands(commandRegistry: CommandRegistry): void {
