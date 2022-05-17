@@ -1,16 +1,20 @@
-#ves-project-tree-widget .theia-TreeNode.root-node>.theia-TreeNodeContent {
-    line-height: calc(var(--theia-content-line-height) * 1.5);
+#ves-project-tree-widget {
+    padding-top: var(--theia-ui-padding);
 }
 
-#ves-project-tree-widget .theia-TreeNode.root-node>.theia-TreeNodeContent>.codicon,
-#ves-project-tree-widget .theia-TreeNode.root-node>.theia-TreeNodeContent>.fa {
+#ves-project-tree-widget .theia-TreeNode .theia-TreeNodeContent {
+    line-height: calc(var(--theia-content-line-height) * 1.3);
+}
+
+#ves-project-tree-widget .theia-TreeNode.root-node .theia-TreeNodeContent .codicon,
+#ves-project-tree-widget .theia-TreeNode.root-node .theia-TreeNodeContent .fa {
     font-size: 1.1em;
     padding: 0;
     text-align: center;
     width: 20px;
 }
 
-#ves-project-tree-widget .theia-TreeNode.root-node>.theia-TreeNodeContent>.theia-TreeNodeSegment {
+#ves-project-tree-widget .theia-TreeNode.root-node .theia-TreeNodeContent .theia-TreeNodeSegment {
     font-size: 1.1em;
 }
 

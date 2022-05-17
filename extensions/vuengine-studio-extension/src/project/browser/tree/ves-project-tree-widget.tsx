@@ -125,17 +125,17 @@ export class VesProjectTreeWidget extends TreeWidget {
     return classNames;
   }
 
-  protected async handleClickEvent(node: VesProjectChildNode | undefined, event: React.MouseEvent<HTMLElement>): Promise<void> {
+  protected handleClickEvent(node: VesProjectChildNode | undefined, event: React.MouseEvent<HTMLElement>): void {
     super.handleClickEvent(node, event);
     this.handleDocOpen(node);
   }
 
-  protected async handleDblClickEvent(node: VesProjectChildNode | undefined, event: React.MouseEvent<HTMLElement>): Promise<void> {
+  protected handleDblClickEvent(node: VesProjectChildNode | undefined, event: React.MouseEvent<HTMLElement>): void {
     super.handleDblClickEvent(node, event);
     this.handleDocOpen(node);
   }
 
-  protected async handleDocOpen(node: VesProjectChildNode | undefined): Promise<void> {
+  protected handleDocOpen(node: VesProjectChildNode | undefined): void {
     if (node) {
       // this.commandService.executeCommand(VesProjectCommands.OPEN_HANDBOOK.id, node.member.url ?? '');
     }
