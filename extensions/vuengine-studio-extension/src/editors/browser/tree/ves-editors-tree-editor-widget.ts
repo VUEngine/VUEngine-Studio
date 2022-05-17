@@ -1,6 +1,4 @@
-import {
-    MasterTreeWidget, NavigatableTreeEditorOptions, ResourceTreeEditorWidget, TreeEditor
-} from '@eclipse-emfcloud/theia-tree-editor';
+import { NavigatableTreeEditorOptions, ResourceTreeEditorWidget, TreeEditor } from '@eclipse-emfcloud/theia-tree-editor';
 import { Title, Widget } from '@theia/core/lib/browser';
 import { DefaultResourceProvider, ILogger } from '@theia/core/lib/common';
 import { inject, injectable } from '@theia/core/shared/inversify';
@@ -31,7 +29,7 @@ export class VesEditorsTreeEditorWidget extends ResourceTreeEditorWidget {
         protected readonly editorPreferences: EditorPreferences
     ) {
         super(
-            treeWidget as unknown as MasterTreeWidget,
+            treeWidget,
             formWidget,
             workspaceService,
             logger,

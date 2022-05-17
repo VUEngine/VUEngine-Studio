@@ -32,7 +32,6 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
         createWidget: (options: NavigatableWidgetOptions) => {
             const treeContainer = createBasicTreeContainer(
                 context.container,
-                // @ts-ignore
                 VesEditorsTreeEditorWidget,
                 VesEditorsTreeModelService,
                 VesEditorsTreeNodeFactory
@@ -45,7 +44,6 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     }));
 
     bind(VesMasterTreeWidget).toDynamicValue(context => {
-        // eslint-disable-next-line import/no-deprecated
         const treeContainer = createTreeContainer(context.container);
         treeContainer.unbind(TreeWidget);
         treeContainer.bind(VesMasterTreeWidget).toSelf();
