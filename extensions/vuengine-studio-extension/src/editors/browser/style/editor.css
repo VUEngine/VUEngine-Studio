@@ -57,3 +57,13 @@
 .control>.validation {
   margin-bottom: 0.25em;
 }
+
+#ves-tree-editor.form-only>.p-SplitPanel>.theia-Tree,
+#ves-tree-editor.form-only>.p-SplitPanel>.p-SplitPanel-handle {
+  display: none;
+}
+
+#ves-tree-editor.form-only>.p-SplitPanel>.theia-tree-editor-form {
+  left: 0 !important;
+  width: 100% !important;
+}
