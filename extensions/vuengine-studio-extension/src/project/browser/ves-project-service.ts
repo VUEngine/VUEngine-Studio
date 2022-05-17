@@ -7,12 +7,12 @@ import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VES_PREFERENCE_DIR } from '../../branding/browser/ves-branding-preference-configurations';
 import { VesCommonService } from '../../branding/browser/ves-common-service';
-import { VesNewProjectTemplate } from './new-project/ves-projects-new-project-form';
+import { VesNewProjectTemplate } from './new-project/ves-new-project-form';
 
 const replaceInFiles = require('replace-in-files');
 
 @injectable()
-export class VesProjectsService {
+export class VesProjectService {
   @inject(FileService)
   protected fileService: FileService;
   @inject(VesCommonService)

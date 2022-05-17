@@ -27,7 +27,8 @@
         "defaultTheme": "dark",
         "defaultIconTheme": "vuengine-studio-file-icons",
         "preferences": {
-          "editor.autoSave": "on",
+          "files.autoSave": "onFocusChange",
+          "workbench.tree.renderIndentGuides": "none",
           "editor.insertSpaces": false,
           "files.watcherExclude": {
             "**/.git/objects/**": true,

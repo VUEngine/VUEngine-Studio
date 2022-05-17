@@ -1,0 +1,29 @@
+.palette-renderer .theia-select-component {
+  display: inline-flex;
+  min-width: 48px;
+  width: 48px;
+}
+
+/* .theia-select-component-dropdown .theia-select-component-option:nth-child(1), */
+.palette-renderer span.value-11 .theia-select-component {
+  background-color: #ff0000;
+  color: #fff;
+}
+
+/* .theia-select-component-dropdown .theia-select-component-option:nth-child(2), */
+.palette-renderer span.value-10 .theia-select-component {
+  background-color: #aa0000;
+  color: #fff;
+}
+
+/* .theia-select-component-dropdown .theia-select-component-option:nth-child(3), */
+.palette-renderer span.value-01 .theia-select-component {
+  background-color: #550000;
+  color: #fff;
+}
+
+/* .theia-select-component-dropdown .theia-select-component-option:nth-child(4), */
+.palette-renderer span.value-00 .theia-select-component {
+  background-color: #000000;
+  color: #fff;
+}

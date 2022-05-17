@@ -5,14 +5,14 @@ import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { WorkspaceCommands, WorkspaceService } from '@theia/workspace/lib/browser';
-import { VesProjectsService } from '../../projects/browser/ves-projects-service';
+import { VesProjectService } from '../../project/browser/ves-project-service';
 
 @injectable()
 export class VesTitlebarApplicationTitleWidget extends ReactWidget {
   @inject(CommandService)
   protected readonly commandService: CommandService;
-  @inject(VesProjectsService)
-  protected readonly vesProjectsService: VesProjectsService;
+  @inject(VesProjectService)
+  protected readonly vesProjectsService: VesProjectService;
   @inject(WorkspaceService)
   private readonly workspaceService: WorkspaceService;
 

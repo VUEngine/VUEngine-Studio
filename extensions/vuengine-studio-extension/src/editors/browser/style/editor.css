@@ -1,0 +1,59 @@
+/* JSON Form Overrides */
+
+.theia-tree-editor .control>label {
+  font-size: unset;
+  font-weight: normal;
+}
+
+.control>.input-description,
+.control>.validation {
+  min-height: unset;
+}
+
+.theia-tree-editor .control {
+  margin: 0 0 1em;
+}
+
+.group-layout {
+  border-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.group-layout>legend {
+  padding: 0;
+  font-weight: normal;
+  margin-top: 0.5em;
+}
+
+.control>* {
+  margin: 0;
+}
+
+.horizontal-layout {
+  gap: var(--theia-ui-padding);
+}
+
+/* Custom */
+
+.theia-tree-editor {
+  padding: calc(var(--theia-ui-padding) * 2);
+}
+
+.theia-tree-editor-form {
+  /* border-left: 1px solid var(--theia-input-background); */
+  padding: 0 calc(var(--theia-ui-padding) * 2);
+}
+
+.theia-tree-editor-form {
+  display: flex;
+}
+
+.theia-tree-editor-form>.jsonforms-container {
+  flex-grow: 1;
+}
+
+.control>.input-description,
+.control>.validation {
+  margin-bottom: 0.25em;
+}

@@ -15,7 +15,7 @@ import { VesEmulatorCommands } from '../../emulator/browser/ves-emulator-command
 import { VesEmulatorService } from '../../emulator/browser/ves-emulator-service';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
 import { VesFlashCartService } from '../../flash-cart/browser/ves-flash-cart-service';
-import { VesProjectsCommands } from '../../projects/browser/ves-projects-commands';
+import { VesProjectCommands } from '../../project/browser/ves-project-commands';
 
 @injectable()
 export class VesTitlebarActionButtonsWidget extends ReactWidget {
@@ -104,7 +104,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
         return !this.workspaceService.opened ? <>
             <button
                 className='theia-button secondary new-project'
-                title={`${VesProjectsCommands.NEW.label}${this.getKeybindingLabel(VesProjectsCommands.NEW.id, true)}`}
+                title={`${VesProjectCommands.NEW.label}${this.getKeybindingLabel(VesProjectCommands.NEW.id, true)}`}
                 onClick={this.createNewProject}
                 key='action-button-new-project'
             >
@@ -234,7 +234,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
         const requireSingleOpen = isOSX || !environment.electron.is();
         return requireSingleOpen ? WorkspaceCommands.OPEN.id : WorkspaceCommands.OPEN_FOLDER.id;
     }
-    protected createNewProject = async () => this.commandService.executeCommand(VesProjectsCommands.NEW.id);
+    protected createNewProject = async () => this.commandService.executeCommand(VesProjectCommands.NEW.id);
     protected openProject = async () => this.commandService.executeCommand(this.getOpenProjectCommandId());
     protected openWorkspaceFile = async () => this.commandService.executeCommand(WorkspaceCommands.OPEN_WORKSPACE.id);
     protected build = async () => this.commandService.executeCommand(VesBuildCommands.BUILD.id);

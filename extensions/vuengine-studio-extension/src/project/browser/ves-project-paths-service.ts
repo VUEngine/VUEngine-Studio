@@ -4,10 +4,10 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { VesCommonService } from '../../branding/browser/ves-common-service';
-import { VesProjectsPreferenceIds } from './ves-projects-preferences';
+import { VesProjectPreferenceIds } from './ves-project-preferences';
 
 @injectable()
-export class VesProjectsPathsService {
+export class VesProjectPathsService {
   @inject(EnvVariablesServer)
   protected envVariablesServer: EnvVariablesServer;
   @inject(FileService)
@@ -24,12 +24,12 @@ export class VesProjectsPathsService {
       .resolve('vuengine')
       .resolve('projects');
 
-      const customUri = new URI(this.preferenceService.get(
-        VesProjectsPreferenceIds.BASE_PATH
-      ) as string).withScheme('file');
+    const customUri = new URI(this.preferenceService.get(
+      VesProjectPreferenceIds.BASE_PATH
+    ) as string).withScheme('file');
 
-      return (!customUri.isEqual(new URI('').withScheme('file')) && await this.fileService.exists(customUri))
-        ? customUri
-        : defaultUri;
+    return (!customUri.isEqual(new URI('').withScheme('file')) && await this.fileService.exists(customUri))
+      ? customUri
+      : defaultUri;
   }
 }

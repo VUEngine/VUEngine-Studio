@@ -1,7 +1,7 @@
 import { PreferenceScope } from '@theia/core/lib/browser';
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
 
-export namespace VesProjectsPreferenceIds {
+export namespace VesProjectPreferenceIds {
     export const CATEGORY = 'projects';
 
     export const BASE_PATH = [CATEGORY, 'basePath'].join('.');
@@ -9,10 +9,10 @@ export namespace VesProjectsPreferenceIds {
     export const MAKER_CODE = [CATEGORY, 'makerCode'].join('.');
 }
 
-export const VesProjectsPreferenceSchema: PreferenceSchema = {
+export const VesProjectPreferenceSchema: PreferenceSchema = {
     'type': 'object',
     'properties': {
-        [VesProjectsPreferenceIds.BASE_PATH]: {
+        [VesProjectPreferenceIds.BASE_PATH]: {
             type: 'string',
             description: 'Base path for new projects.',
             additionalProperties: {
@@ -22,14 +22,14 @@ export const VesProjectsPreferenceSchema: PreferenceSchema = {
             scope: PreferenceScope.User,
             overridable: true,
         },
-        [VesProjectsPreferenceIds.AUTHOR]: {
+        [VesProjectPreferenceIds.AUTHOR]: {
             type: 'string',
             description: 'Default author name to use for new projects.',
             default: 'VUEngine Studio User',
             scope: PreferenceScope.User,
             overridable: true,
         },
-        [VesProjectsPreferenceIds.MAKER_CODE]: {
+        [VesProjectPreferenceIds.MAKER_CODE]: {
             type: 'string',
             minLength: 2,
             maxLength: 2,
