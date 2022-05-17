@@ -10,10 +10,10 @@ import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesCommonService } from '../../../branding/browser/ves-common-service';
-import { VesProjectsCommands } from '../ves-projects-commands';
-import { VesProjectsPathsService } from '../ves-projects-paths-service';
-import { VesProjectsService } from '../ves-projects-service';
-import { VesNewProjectFormComponent, VES_NEW_PROJECT_TEMPLATES } from './ves-projects-new-project-form';
+import { VesProjectCommands } from '../ves-project-commands';
+import { VesProjectPathsService } from '../ves-project-paths-service';
+import { VesProjectService } from '../ves-project-service';
+import { VesNewProjectFormComponent, VES_NEW_PROJECT_TEMPLATES } from './ves-new-project-form';
 
 @injectable()
 export class VesNewProjectDialogProps extends DialogProps {
@@ -29,10 +29,10 @@ export class VesNewProjectDialog extends ReactDialog<void> {
     protected readonly preferenceService: PreferenceService;
     @inject(VesCommonService)
     protected readonly vesCommonService: VesCommonService;
-    @inject(VesProjectsService)
-    protected readonly vesProjectsService: VesProjectsService;
-    @inject(VesProjectsPathsService)
-    protected readonly vesProjectsPathsService: VesProjectsPathsService;
+    @inject(VesProjectService)
+    protected readonly vesProjectsService: VesProjectService;
+    @inject(VesProjectPathsService)
+    protected readonly vesProjectsPathsService: VesProjectPathsService;
     @inject(WorkspaceService)
     protected readonly workspaceService: WorkspaceService;
 
@@ -44,7 +44,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
         protected readonly props: VesNewProjectDialogProps
     ) {
         super({
-            title: VesProjectsCommands.NEW.label!,
+            title: VesProjectCommands.NEW.label!,
             maxWidth: 600
         });
 

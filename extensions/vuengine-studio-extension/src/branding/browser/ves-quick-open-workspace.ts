@@ -3,15 +3,15 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { FileStat } from '@theia/filesystem/lib/common/files';
 import { QuickOpenWorkspace } from '@theia/workspace/lib/browser/quick-open-workspace';
-import { VesProjectsService } from '../../projects/browser/ves-projects-service';
+import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesCommonService } from './ves-common-service';
 
 @injectable()
 export class VesQuickOpenWorkspace extends QuickOpenWorkspace {
     @inject(VesCommonService)
     protected readonly vesCommonService: VesCommonService;
-    @inject(VesProjectsService)
-    protected readonly vesProjectsService: VesProjectsService;
+    @inject(VesProjectService)
+    protected readonly vesProjectsService: VesProjectService;
 
     // TODO: had to override the entire function to change two lines (marked below),
     // ensure to keep this up to date with Theia

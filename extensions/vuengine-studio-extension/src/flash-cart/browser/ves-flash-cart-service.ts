@@ -12,7 +12,7 @@ import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
-import { VesProjectsService } from '../../projects/browser/ves-projects-service';
+import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesFlashCartUsbService } from '../common/ves-flash-cart-usb-service-protocol';
 import { VesFlashCartCommands } from './ves-flash-cart-commands';
 import { BUILT_IN_FLASH_CART_CONFIGS, VesFlashCartPreferenceIds } from './ves-flash-cart-preferences';
@@ -61,8 +61,8 @@ export class VesFlashCartService {
   protected readonly vesProcessService: VesProcessService;
   @inject(VesProcessWatcher)
   protected readonly vesProcessWatcher: VesProcessWatcher;
-  @inject(VesProjectsService)
-  protected readonly vesProjectsService: VesProjectsService;
+  @inject(VesProjectService)
+  protected readonly vesProjectsService: VesProjectService;
   @inject(WorkspaceService)
   private readonly workspaceService: WorkspaceService;
 

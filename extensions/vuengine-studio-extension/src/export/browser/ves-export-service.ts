@@ -10,7 +10,7 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { VesBuildService } from '../../build/browser/ves-build-service';
-import { VesProjectsService } from '../../projects/browser/ves-projects-service';
+import { VesProjectService } from '../../project/browser/ves-project-service';
 import sanitize = require('sanitize-filename');
 
 @injectable()
@@ -31,8 +31,8 @@ export class VesExportService {
   protected readonly preferenceService: PreferenceService;
   @inject(VesBuildService)
   protected readonly vesBuildService: VesBuildService;
-  @inject(VesProjectsService)
-  protected readonly vesProjectsService: VesProjectsService;
+  @inject(VesProjectService)
+  protected readonly vesProjectsService: VesProjectService;
   @inject(WorkspaceService)
   protected readonly workspaceService: WorkspaceService;
 

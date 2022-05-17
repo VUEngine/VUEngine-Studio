@@ -4,7 +4,7 @@ import { VesBuildPreferenceIds } from '../../build/browser/ves-build-preferences
 import { VesEmulatorPreferenceIds } from '../../emulator/browser/ves-emulator-preferences';
 import { VesFlashCartPreferenceIds } from '../../flash-cart/browser/ves-flash-cart-preferences';
 import { VesPluginsPreferenceIds } from '../../plugins/browser/ves-plugins-preferences';
-import { VesProjectsPreferenceIds } from '../../projects/browser/ves-projects-preferences';
+import { VesProjectPreferenceIds } from '../../project/browser/ves-project-preferences';
 import { VesUpdaterPreferenceIds } from '../../updater/electron-browser/ves-updater-preferences';
 import { VesBrandingPreferenceIds } from './ves-branding-preferences';
 
@@ -43,7 +43,7 @@ export class VesPreferenceTreeGenerator extends PreferenceTreeGenerator {
         [VesPluginsPreferenceIds.CATEGORY, VesBuildPreferenceIds.CATEGORY], // custom category
         ['problems', 'features'],
         ['preview', 'features'],
-        [VesProjectsPreferenceIds.CATEGORY, 'features'], // custom category
+        [VesProjectPreferenceIds.CATEGORY, 'features'], // custom category
         ['search', 'features'],
         ['task', 'features'],
         ['terminal', 'features'],

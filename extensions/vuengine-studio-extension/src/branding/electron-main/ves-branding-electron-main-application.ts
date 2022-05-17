@@ -7,7 +7,7 @@ import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { BuildMode } from '../../build/browser/ves-build-types';
 import { VesEmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
-import { VesProjectsCommands } from '../../projects/browser/ves-projects-commands';
+import { VesProjectCommands } from '../../project/browser/ves-project-commands';
 import { VesTouchBarCommands } from '../common/ves-branding-types';
 import { VesTouchBarIcons } from './images/touch-bar-icons';
 // import IMAGE_BLANK from '../../../src/branding/electron-main/images/blank.png';
@@ -219,7 +219,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
 
         const newProjectButton = new TouchBarButton({
             icon: newProjectIcon,
-            click: () => app.emit(VesTouchBarCommands.executeCommand, VesProjectsCommands.NEW.id),
+            click: () => app.emit(VesTouchBarCommands.executeCommand, VesProjectCommands.NEW.id),
         });
         const openButton = new TouchBarButton({
             icon: openIcon,

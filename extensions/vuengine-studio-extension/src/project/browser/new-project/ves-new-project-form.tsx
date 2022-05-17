@@ -6,15 +6,15 @@ import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/br
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import filenamify from 'filenamify';
 import { VesCommonService } from '../../../branding/browser/ves-common-service';
-import { VesProjectsPathsService } from '../ves-projects-paths-service';
-import { VesProjectsPreferenceIds } from '../ves-projects-preferences';
+import { VesProjectPathsService } from '../ves-project-paths-service';
+import { VesProjectPreferenceIds } from '../ves-project-preferences';
 
 export interface VesNewProjectFormComponentProps {
     fileService: FileService
     fileDialogService: FileDialogService
     preferenceService: PreferenceService
     vesCommonService: VesCommonService
-    vesProjectsPathsService: VesProjectsPathsService
+    vesProjectsPathsService: VesProjectPathsService
 }
 
 export interface VesNewProjectFormComponentState {
@@ -114,7 +114,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
     protected fileDialogService: FileDialogService;
     protected preferenceService: PreferenceService;
     protected vesCommonService: VesCommonService;
-    protected vesProjectsPathsService: VesProjectsPathsService;
+    protected vesProjectsPathsService: VesProjectPathsService;
 
     protected nameInputComponentRef: React.RefObject<HTMLInputElement> = React.createRef();
 
@@ -142,9 +142,9 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
 
         this.preferenceService.onPreferenceChanged(async ({ preferenceName, newValue }) => {
             switch (preferenceName) {
-                case VesProjectsPreferenceIds.BASE_PATH:
-                case VesProjectsPreferenceIds.AUTHOR:
-                case VesProjectsPreferenceIds.MAKER_CODE:
+                case VesProjectPreferenceIds.BASE_PATH:
+                case VesProjectPreferenceIds.AUTHOR:
+                case VesProjectPreferenceIds.MAKER_CODE:
                     await this.setStateFromPreferences();
                     break;
             }
@@ -153,8 +153,8 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
 
     protected async setStateFromPreferences(): Promise<void> {
         this.setState({
-            author: this.preferenceService.get(VesProjectsPreferenceIds.AUTHOR) as string,
-            makerCode: this.preferenceService.get(VesProjectsPreferenceIds.MAKER_CODE) as string,
+            author: this.preferenceService.get(VesProjectPreferenceIds.AUTHOR) as string,
+            makerCode: this.preferenceService.get(VesProjectPreferenceIds.MAKER_CODE) as string,
             path: await this.fileService.fsPath(await this.vesProjectsPathsService.getProjectsBaseUri()),
         });
     }

@@ -1,10 +1,10 @@
 import { Command } from '@theia/core';
 
-export namespace VesProjectsCommands {
-    export const CATEGORY = 'Projects';
+export namespace VesProjectCommands {
+    export const CATEGORY = 'Project';
 
     export const NEW: Command = {
-        id: 'ves:projects:new',
+        id: 'ves:project:new',
         label: 'New Project',
         category: CATEGORY,
     };

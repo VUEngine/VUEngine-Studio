@@ -10,8 +10,8 @@ import * as React from '@theia/core/shared/react';
 import { KeymapsCommands } from '@theia/keymaps/lib/browser';
 import { WorkspaceCommands, WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
-import { VesProjectsCommands } from '../../projects/browser/ves-projects-commands';
-import { VesProjectsService } from '../../projects/browser/ves-projects-service';
+import { VesProjectCommands } from '../../project/browser/ves-project-commands';
+import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesBrandingPreferenceIds } from './ves-branding-preferences';
 import { VesCommonService } from './ves-common-service';
 
@@ -29,8 +29,8 @@ export class VesGettingStartedWidget extends ReactWidget {
     protected readonly preferenceService: PreferenceService;
     @inject(VesCommonService)
     protected readonly vesCommonService: VesCommonService;
-    @inject(VesProjectsService)
-    protected readonly vesProjectsService: VesProjectsService;
+    @inject(VesProjectService)
+    protected readonly vesProjectsService: VesProjectService;
     @inject(WindowService)
     protected readonly windowService: WindowService;
     @inject(WorkspaceService)
@@ -231,7 +231,7 @@ export class VesGettingStartedWidget extends ReactWidget {
 
         const newProject = (
             <button className="theia-button large" onClick={this.createNewProject}>
-                <i className="fa fa-plus"></i> {VesProjectsCommands.NEW.label}
+                <i className="fa fa-plus"></i> {VesProjectCommands.NEW.label}
             </button>
         );
 
@@ -373,7 +373,7 @@ export class VesGettingStartedWidget extends ReactWidget {
         </div>;
     }
 
-    protected createNewProject = async () => this.commandRegistry.executeCommand(VesProjectsCommands.NEW.id);
+    protected createNewProject = async () => this.commandRegistry.executeCommand(VesProjectCommands.NEW.id);
     protected openHandbook = async () => this.commandRegistry.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id);
 
     protected async vesGetRecentWorkspaces(): Promise<void> {

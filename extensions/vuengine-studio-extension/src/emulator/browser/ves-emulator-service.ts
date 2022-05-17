@@ -10,7 +10,7 @@ import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
-import { VesProjectsService } from '../../projects/browser/ves-projects-service';
+import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
 import { DEFAULT_EMULATOR, EmulatorConfig } from './ves-emulator-types';
 
@@ -36,8 +36,8 @@ export class VesEmulatorService {
   private readonly vesCommonService: VesCommonService;
   @inject(VesProcessService)
   private readonly vesProcessService: VesProcessService;
-  @inject(VesProjectsService)
-  protected readonly vesProjectsService: VesProjectsService;
+  @inject(VesProjectService)
+  protected readonly vesProjectsService: VesProjectService;
   @inject(WorkspaceService)
   private readonly workspaceService: WorkspaceService;
 

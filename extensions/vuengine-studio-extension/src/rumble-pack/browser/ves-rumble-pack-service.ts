@@ -8,7 +8,7 @@ import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService } from '../../process/common/ves-process-service-protocol';
-import { VesProjectsService } from '../../projects/browser/ves-projects-service';
+import { VesProjectService } from '../../project/browser/ves-project-service';
 import { HapticBuiltInEffect, HapticFrequency, RumblePakLogLine } from '../common/ves-rumble-pack-types';
 import { VesRumblePackUsbService } from '../common/ves-rumble-pack-usb-service-protocol';
 import { VesRumblePackUsbWatcher } from './ves-rumble-pack-usb-watcher';
@@ -39,8 +39,8 @@ export class VesRumblePackService {
   protected readonly vesProcessService: VesProcessService;
   @inject(VesProcessWatcher)
   protected readonly vesProcessWatcher: VesProcessWatcher;
-  @inject(VesProjectsService)
-  protected readonly vesProjectsService: VesProjectsService;
+  @inject(VesProjectService)
+  protected readonly vesProjectsService: VesProjectService;
 
   // connected rumble pack
   protected _rumblePackIsConnected: boolean = false;
