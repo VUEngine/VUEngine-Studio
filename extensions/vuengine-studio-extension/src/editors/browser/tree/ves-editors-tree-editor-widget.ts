@@ -41,6 +41,13 @@ export class VesEditorsTreeEditorWidget extends ResourceTreeEditorWidget {
         );
     }
 
+    protected async load(): Promise<void> {
+        await super.load();
+        if (this.instanceData.children === undefined) {
+            this.addClass('form-only');
+        }
+    }
+
     protected getTypeProperty(): string {
         return 'typeId';
     }

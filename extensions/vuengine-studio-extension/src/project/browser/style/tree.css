@@ -1,5 +1,5 @@
 #ves-project-tree-widget {
-    padding-top: var(--theia-ui-padding);
+    margin-top: var(--theia-ui-padding);
 }
 
 #ves-project-tree-widget .theia-TreeNode .theia-TreeNodeContent {

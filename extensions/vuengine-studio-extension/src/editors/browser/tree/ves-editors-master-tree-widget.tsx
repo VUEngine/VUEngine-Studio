@@ -53,9 +53,11 @@ export class VesMasterTreeWidget extends MasterTreeWidget {
     protected vesCreateRemoveHandler(node: TreeEditor.Node): (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void {
         return event => {
             event.stopPropagation();
+            // @ts-ignore
+            const typeLabel = registeredTypes[node.jsonforms.type].schema.title;
             const dialog = new ConfirmDialog({
                 title: 'Delete Node?',
-                msg: 'Are you sure you want to delete the selected node?'
+                msg: `Are you sure you want to delete the ${typeLabel} "${node.name}"?`
             });
             dialog.open().then(remove => {
                 if (remove && node.parent && node.parent && TreeEditor.Node.is(node.parent)) {
