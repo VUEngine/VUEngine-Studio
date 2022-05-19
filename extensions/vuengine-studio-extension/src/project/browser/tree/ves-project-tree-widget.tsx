@@ -4,13 +4,15 @@ import {
   ContextMenuRenderer, ExpandableTreeNode,
   LabelProvider,
   NodeProps,
-  TreeModel, TreeNode, TreeProps,
+  open,
+  OpenerService, TreeModel, TreeNode, TreeProps,
   TreeWidget
 } from '@theia/core/lib/browser';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { registeredProjectNodes } from '../../../editors/browser/tree/ves-editors-tree-schema';
+import { registeredProjectNodes, registeredTypes } from '../../../editors/browser/tree/ves-editors-tree-schema';
+import { VesEditorUri } from '../../../editors/browser/ves-editor-uri';
 import { VesProjectService } from '../ves-project-service';
 import { VesProjectChildNode, VesProjectDocumentChild, VesProjectDocumentsTree, VesProjectRootNode } from './ves-project-tree';
 
@@ -22,6 +24,8 @@ export class VesProjectTreeWidget extends TreeWidget {
   protected readonly fileService: FileService;
   @inject(LabelProvider)
   protected readonly labelProvider: LabelProvider;
+  @inject(OpenerService)
+  protected readonly openerService: OpenerService;
   @inject(VesProjectService)
   protected readonly vesProjectService: VesProjectService;
 
@@ -45,34 +49,53 @@ export class VesProjectTreeWidget extends TreeWidget {
   async init(): Promise<void> {
     super.init();
 
+    this.vesProjectService.onDidChangeProjectData(async () => {
+      await this.setModelRoot();
+    });
+
     const projectName = await this.vesProjectService.getProjectName();
     if (projectName) {
       this.title.label = `${VesProjectTreeWidget.LABEL}: ${projectName}`;
     }
 
+    await this.setModelRoot();
+  }
+
+  protected async setModelRoot(): Promise<void> {
     const documents: VesProjectDocumentsTree = {
       members: []
     };
 
-    Object.keys(registeredProjectNodes).forEach(key => {
-      // @ts-ignore
-      const registeredProjectNode = registeredProjectNodes[key];
+    await this.vesProjectService.ready;
+    Object.values(registeredProjectNodes).forEach(registeredProjectNode => {
       const childNode: VesProjectDocumentChild = {
+        typeId: registeredProjectNode.typeId,
         name: registeredProjectNode.title,
-        iconClass: registeredProjectNode.icon
+        iconClass: registeredProjectNode.icon,
+        children: [],
       };
-      if (!registeredProjectNode.leaf) {
-        childNode.children = [{
-          name: 'FinishLine',
-          iconClass: 'fa fa-id-card-o'
-        }, {
-          name: 'Racer',
-          iconClass: 'fa fa-id-card-o'
-        }, {
-          name: 'Test',
-          iconClass: 'fa fa-id-card-o'
-        }];
+      if (registeredProjectNode.typeId) {
+        // find which types can be children of current project node
+        const childTypes = Object.values(registeredTypes).filter(registeredType =>
+          registeredType.parent?.typeId === registeredProjectNode.typeId
+        );
+        // get items of all types
+        childTypes.forEach(childType => {
+          const childTypeId = childType.schema.properties?.typeId.const;
+          Object.keys(this.vesProjectService.getProjectDataType(childTypeId)).forEach(id => {
+            const item = this.vesProjectService.getProjectDataItem(childTypeId, id);
+            childNode.children!.push({
+              typeId: childTypeId,
+              uri: VesEditorUri.toUri(`${childTypeId}/${id}`),
+              name: item.name
+                || registeredTypes[childTypeId]?.schema?.title
+                || childTypeId,
+              iconClass: childType.icon,
+            });
+          });
+        });
       }
+
       documents.members.push(childNode);
     });
 
@@ -103,6 +126,7 @@ export class VesProjectTreeWidget extends TreeWidget {
           ? (
             <div
               className={`node-button ${codicon('plus')}`}
+              onClick={this.createAddHandler(node)}
             />
           )
           : ('')}
@@ -110,11 +134,61 @@ export class VesProjectTreeWidget extends TreeWidget {
           ? (
             <div
               className={`node-button ${codicon('trash')}`}
+              onClickCapture={this.createRemoveHandler(node)}
             />
           )
           : ('')}
       </div>
     );
+  }
+
+  protected createRemoveHandler(node: TreeNode): (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void {
+    return event => {
+      event.stopPropagation();
+      /*
+      const typeLabel = registeredTypes[node.jsonforms.type].schema.title;
+      const dialog = new ConfirmDialog({
+        title: 'Delete Node?',
+        msg: `Are you sure you want to delete the ${typeLabel} "${node.name}"?`
+      });
+      dialog.open().then(remove => {
+        if (remove && node.parent && node.parent && TreeNode.is(node.parent)) {
+          this.onDeleteEmitter.fire(node);
+        }
+      });
+      */
+    };
+  }
+
+  protected createAddHandler(node: TreeNode): (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void {
+    return event => {
+      event.stopPropagation();
+      /*
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const addHandler = (property: string, type: string): any =>
+        this.onAddEmitter.fire({ node, property, type });
+
+      // find which types can be children of current project node
+      const childTypes = Object.values(registeredTypes).filter(registeredType =>
+        registeredType.parent?.typeId === node.typeId;
+      );
+      if (childTypes.length === 1) {
+        addHandler('children', childTypes[0].schema.properties?.typeId.const);
+      } else {
+        const treeAnchor: TreeAnchor = {
+          x: event.nativeEvent.x,
+          y: event.nativeEvent.y,
+          node: node,
+          onClick: addHandler
+        };
+        const renderOptions: RenderContextMenuOptions = {
+          menuPath: TreeContextMenu.ADD_MENU,
+          anchor: treeAnchor
+        };
+        this.contextMenuRenderer.render(renderOptions);
+      }
+      */
+    };
   }
 
   protected createNodeClassNames(node: TreeNode, props: NodeProps): string[] {
@@ -125,19 +199,19 @@ export class VesProjectTreeWidget extends TreeWidget {
     return classNames;
   }
 
-  protected handleClickEvent(node: VesProjectChildNode | undefined, event: React.MouseEvent<HTMLElement>): void {
+  protected async handleClickEvent(node: VesProjectChildNode | undefined, event: React.MouseEvent<HTMLElement>): Promise<void> {
     super.handleClickEvent(node, event);
-    this.handleDocOpen(node);
+    await this.handleDocOpen(node);
   }
 
-  protected handleDblClickEvent(node: VesProjectChildNode | undefined, event: React.MouseEvent<HTMLElement>): void {
+  protected async handleDblClickEvent(node: VesProjectChildNode | undefined, event: React.MouseEvent<HTMLElement>): Promise<void> {
     super.handleDblClickEvent(node, event);
-    this.handleDocOpen(node);
+    await this.handleDocOpen(node);
   }
 
-  protected handleDocOpen(node: VesProjectChildNode | undefined): void {
-    if (node) {
-      // this.commandService.executeCommand(VesProjectCommands.OPEN_HANDBOOK.id, node.member.url ?? '');
+  protected async handleDocOpen(node: VesProjectChildNode | undefined): Promise<void> {
+    if (node && node.member.uri) {
+      await open(this.openerService, node.member.uri, { mode: 'reveal' });
     }
   }
 

@@ -17,10 +17,8 @@ export class VesEditorsTreeLabelProvider implements LabelProviderContribution {
     public getIcon(element: object): string | undefined {
         let iconClass: string | undefined;
         if (TreeEditor.CommandIconInfo.is(element)) {
-            // @ts-ignore
             iconClass = registeredTypes[element.type]?.icon || 'fa fa-question-circle';
         } else if (TreeEditor.Node.is(element)) {
-            // @ts-ignore
             iconClass = registeredTypes[element.jsonforms.type]?.icon || 'fa fa-question-circle';
         }
 
@@ -39,7 +37,6 @@ export class VesEditorsTreeLabelProvider implements LabelProviderContribution {
     }
 
     private getTypeName(typeId: string): string {
-        // @ts-ignore
         return registeredTypes[typeId]?.schema?.title || typeId;
     }
 }

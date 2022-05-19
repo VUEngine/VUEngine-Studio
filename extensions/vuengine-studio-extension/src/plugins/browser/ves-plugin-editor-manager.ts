@@ -1,7 +1,7 @@
 import { WidgetOpenHandler } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';
 import { injectable } from '@theia/core/shared/inversify';
-import { VesPluginUri } from '../common/ves-plugin-uri';
+import { VesPluginUri } from './ves-plugin-uri';
 import { VesPluginOptions } from './ves-plugin';
 import { VesPluginEditor } from './ves-plugin-editor';
 

@@ -19,8 +19,8 @@
 }
 
 #ves-project-tree-widget .node-buttons {
+    display: none;
     visibility: hidden;
-    display: flex;
 }
 
 #ves-project-tree-widget .node-button {
@@ -28,5 +28,6 @@
 }
 
 #ves-project-tree-widget .theia-TreeNode:hover .node-buttons {
+    display: flex;
     visibility: inherit;
 }

@@ -1,4 +1,6 @@
 import { isWindows } from '@theia/core';
+import { BinaryBuffer } from '@theia/core/lib/common/buffer';
+import { Deferred } from '@theia/core/lib/common/promise-util';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
@@ -8,6 +10,7 @@ import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VES_PREFERENCE_DIR } from '../../branding/browser/ves-branding-preference-configurations';
 import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { VesNewProjectTemplate } from './new-project/ves-new-project-form';
+import { ProjectFile, ProjectFileType } from './ves-project-types';
 
 const replaceInFiles = require('replace-in-files');
 
@@ -24,16 +27,63 @@ export class VesProjectService {
   protected readonly onDidChangeProjectFileEmitter = new Emitter<void>();
   readonly onDidChangeProjectFile = this.onDidChangeProjectFileEmitter.event;
 
+  protected readonly _ready = new Deferred<void>();
+  get ready(): Promise<void> {
+    return this._ready.promise;
+  }
+
+  // project data
+  protected _projectData: ProjectFile = { types: {} };
+  protected readonly onDidChangeProjectDataEmitter = new Emitter<void>();
+  readonly onDidChangeProjectData = this.onDidChangeProjectDataEmitter.event;
+  getProjectDataType(typeId: string): ProjectFileType {
+    return this._projectData.types[typeId];
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getProjectDataItem(typeId: string, itemId: string): any {
+    return this._projectData.types[typeId][itemId];
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async setProjectDataItem(typeId: string, itemId: string, data: any): Promise<boolean> {
+    this._projectData.types[typeId][itemId] = data;
+    this.onDidChangeProjectDataEmitter.fire();
+    return this.saveProjectFile();
+  }
+
   @postConstruct()
   protected async init(): Promise<void> {
     // watch for project config file changes
-    const configFileUri = await this.getProjectConfigFileUri();
-    if (configFileUri) {
+    const projectFileUri = await this.getProjectConfigFileUri();
+    if (projectFileUri) {
+      if (await this.fileService.exists(projectFileUri)) {
+        const configFileContents = await this.fileService.readFile(projectFileUri);
+        this._projectData = JSON.parse(configFileContents.value.toString()) as ProjectFile;
+      };
+
       this.fileService.onDidFilesChange((fileChangesEvent: FileChangesEvent) => {
-        if (fileChangesEvent.contains(configFileUri)) {
+        if (fileChangesEvent.contains(projectFileUri)) {
           this.onDidChangeProjectFileEmitter.fire();
         }
       });
+    }
+
+    this._ready.resolve();
+  }
+
+  async saveProjectFile(): Promise<boolean> {
+    const projectFileUri = await this.getProjectConfigFileUri();
+    if (!projectFileUri) {
+      return false;
+    }
+
+    try {
+      this.fileService.writeFile(
+        projectFileUri,
+        BinaryBuffer.fromString(JSON.stringify(this._projectData))
+      );
+      return true;
+    } catch (error) {
+      return false;
     }
   }
 
@@ -50,9 +100,12 @@ export class VesProjectService {
     const projectFileUri = await this.getProjectConfigFileUri(projectRootUri);
     if (projectFileUri && await this.fileService.exists(projectFileUri)) {
       const configFileContents = await this.fileService.readFile(projectFileUri);
-      const projectData = JSON.parse(configFileContents.value.toString());
-      if (projectData.name) {
-        projectTitle = projectData.name;
+      const projectData = JSON.parse(configFileContents.value.toString()) as ProjectFile;
+      if (projectData?.types?.Project) {
+        const first = Object.values(projectData.types.Project)[0];
+        if (first && first.title) {
+          projectTitle = first.title;
+        }
       }
     };
 
@@ -90,7 +143,7 @@ export class VesProjectService {
       workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     }
 
-    return workspaceRootUri && workspaceRootUri.resolve('config').resolve('Project.json');
+    return workspaceRootUri && workspaceRootUri.resolve(VES_PREFERENCE_DIR).resolve('Project.json');
   }
 
   async createProjectFromTemplate(

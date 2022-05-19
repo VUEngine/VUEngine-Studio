@@ -53,7 +53,6 @@ export class VesMasterTreeWidget extends MasterTreeWidget {
     protected vesCreateRemoveHandler(node: TreeEditor.Node): (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void {
         return event => {
             event.stopPropagation();
-            // @ts-ignore
             const typeLabel = registeredTypes[node.jsonforms.type].schema.title;
             const dialog = new ConfirmDialog({
                 title: 'Delete Node?',
@@ -70,14 +69,14 @@ export class VesMasterTreeWidget extends MasterTreeWidget {
     protected vesCreateAddHandler(node: TreeEditor.Node): (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void {
         return event => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const addHandler = (property: string, type: string): any => this.onAddEmitter.fire({ node, property, type });
+            const addHandler = (property: string, type: string): any =>
+                this.onAddEmitter.fire({ node, property, type });
 
-            // @ts-ignore
-            if (registeredTypes[node.jsonforms.type]?.children !== undefined &&
-                // @ts-ignore
-                Object.keys(registeredTypes[node.jsonforms.type].children).length === 1) {
-                // @ts-ignore
-                addHandler('children', Object.keys(registeredTypes[node.jsonforms.type].children)[0]);
+            const childTypes = Object.values(registeredTypes).filter(registeredType =>
+                registeredType.parent?.typeId === node.jsonforms.type
+            );
+            if (childTypes.length === 1) {
+                addHandler('children', childTypes[0].schema.properties?.typeId.const);
             } else {
                 const treeAnchor: TreeAnchor = {
                     x: event.nativeEvent.x,
@@ -101,5 +100,12 @@ export class VesMasterTreeWidget extends MasterTreeWidget {
 
     protected isExpandable(node: TreeNode): node is ExpandableTreeNode {
         return node.parent?.parent !== undefined && super.isExpandable(node);
+    }
+
+    protected handleDblClickEvent(node: TreeNode | undefined, event: React.MouseEvent<HTMLElement>): void {
+        // do not allow collapsing of root node
+        if (node && node?.parent?.parent) {
+            super.handleDblClickEvent(node, event);
+        }
     }
 }

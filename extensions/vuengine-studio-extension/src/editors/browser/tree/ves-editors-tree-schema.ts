@@ -1,106 +1,59 @@
-/* See https://jsonforms.io for more information on how to configure data and ui schemas. */
+import { ProjectNodes, RegisteredTypes } from '../../../project/browser/ves-project-types';
 
-export const registeredProjectNodes = {
-  Project: {
+export const registeredProjectNodes: ProjectNodes = {
+  ProjectSettings: {
+    typeId: 'ProjectSettings',
     title: 'Project Settings',
-    leaf: true,
-    children: {
-    },
     icon: 'fa fa-cog'
   },
   BrightnessRepeats: {
+    typeId: 'BrightnessRepeats',
     title: 'Brightness Repeat',
-    leaf: false,
-    children: {
-      BrightnessRepeat: {
-        addOrRemovable: true
-      }
-    },
     icon: 'fa fa-sun-o'
   },
   ColumnTables: {
+    typeId: 'ColumnTables',
     title: 'Column Table',
-    leaf: false,
-    children: {
-      ColumnTable: {
-        addOrRemovable: true
-      }
-    },
     icon: 'fa fa-table'
   },
   Entities: {
+    typeId: 'Entities',
     title: 'Entities',
-    leaf: false,
-    children: {
-      Entity: {
-        addOrRemovable: true
-      }
-    },
     icon: 'fa fa-id-card-o'
   },
   Fonts: {
+    typeId: 'Fonts',
     title: 'Fonts',
-    leaf: false,
-    children: {
-      Font: {
-        addOrRemovable: true
-      }
-    },
     icon: 'fa fa-font'
   },
   Images: {
+    typeId: 'Images',
     title: 'Images',
-    leaf: false,
-    children: {
-      Image: {
-        addOrRemovable: true
-      }
-    },
     icon: 'fa fa-image'
   },
   Languages: {
+    typeId: 'Languages',
     title: 'Internationalization',
-    leaf: false,
-    children: {
-      Language: {
-        addOrRemovable: true
-      }
-    },
     icon: 'fa fa-language'
   },
   RumbleEffects: {
+    typeId: 'RumbleEffects',
     title: 'RumbleEffects',
-    leaf: false,
-    children: {
-      RumbleEffect: {
-        addOrRemovable: true
-      }
-    },
     icon: 'codicon codicon-screen-full codicon-rotate-90'
   },
   Sounds: {
+    typeId: 'Sounds',
     title: 'Sound & Music',
-    leaf: false,
-    children: {
-      Sound: {
-        addOrRemovable: true
-      }
-    },
     icon: 'fa fa-music'
   },
   Stages: {
+    typeId: 'Stages',
     title: 'Stages',
-    leaf: false,
-    children: {
-      Stage: {
-        addOrRemovable: true
-      }
-    },
     icon: 'fa fa-cube'
   },
 };
 
-export const registeredTypes = {
+export const registeredTypes: RegisteredTypes = {
   Entity: {
     schema: {
       title: 'Entity',
@@ -185,28 +138,9 @@ export const registeredTypes = {
         }
       ]
     },
-    children: {
-      EntityAnimations: {
-        addOrRemovable: false
-      },
-      EntityBehaviors: {
-        addOrRemovable: false
-      },
-      EntityChildren: {
-        addOrRemovable: false
-      },
-      EntityCollisions: {
-        addOrRemovable: false
-      },
-      EntityMeshes: {
-        addOrRemovable: false
-      },
-      EntityPhysics: {
-        addOrRemovable: false
-      },
-      EntitySprites: {
-        addOrRemovable: false
-      },
+    parent: {
+      typeId: 'Entities',
+      multiple: true
     },
     icon: 'fa fa-id-card-o'
   },
@@ -225,10 +159,9 @@ export const registeredTypes = {
       ],
       additionalProperties: false
     },
-    children: {
-      EntityAnimation: {
-        addOrRemovable: true
-      }
+    parent: {
+      typeId: 'Entity',
+      multiple: false
     },
     icon: 'fa fa-film'
   },
@@ -268,6 +201,10 @@ export const registeredTypes = {
       ],
       additionalProperties: false
     },
+    parent: {
+      typeId: 'EntityAnimations',
+      multiple: true
+    },
     icon: 'fa fa-film'
   },
   EntityBehaviors: {
@@ -282,6 +219,10 @@ export const registeredTypes = {
       ],
       additionalProperties: false
     },
+    parent: {
+      typeId: 'Entity',
+      multiple: false
+    },
     icon: 'fa fa-map-signs'
   },
   EntityChildren: {
@@ -295,6 +236,10 @@ export const registeredTypes = {
       required: [
       ],
       additionalProperties: false
+    },
+    parent: {
+      typeId: 'Entity',
+      multiple: false
     },
     icon: 'fa fa-sitemap'
   },
@@ -413,6 +358,10 @@ export const registeredTypes = {
       ],
       additionalProperties: false
     },
+    parent: {
+      typeId: 'Entity',
+      multiple: false
+    },
     icon: 'fa fa-object-ungroup'
   },
   EntityMeshes: {
@@ -447,6 +396,10 @@ export const registeredTypes = {
       required: [
       ],
       additionalProperties: false
+    },
+    parent: {
+      typeId: 'Entity',
+      multiple: false
     },
     icon: 'codicon codicon-globe'
   },
@@ -566,6 +519,10 @@ export const registeredTypes = {
         }
       ]
     },
+    parent: {
+      typeId: 'Entity',
+      multiple: false
+    },
     icon: 'fa fa-compass'
   },
   EntitySprites: {
@@ -592,10 +549,9 @@ export const registeredTypes = {
       ],
       additionalProperties: false
     },
-    children: {
-      EntitySprite: {
-        addOrRemovable: true
-      }
+    parent: {
+      typeId: 'Entity',
+      multiple: false
     },
     icon: 'fa fa-picture-o'
   },
@@ -885,6 +841,10 @@ export const registeredTypes = {
         }
       ]
     },
+    parent: {
+      typeId: 'EntitySprites',
+      multiple: true
+    },
     icon: 'fa fa-picture-o'
   },
   Image: {
@@ -1115,7 +1075,12 @@ export const registeredTypes = {
           ]
         }
       ]
-    }
+    },
+    parent: {
+      typeId: 'Images',
+      multiple: true
+    },
+    icon: 'fa fa-image'
   },
   Project: {
     schema: {
@@ -1124,7 +1089,7 @@ export const registeredTypes = {
         typeId: {
           const: 'Project'
         },
-        name: {
+        title: {
           type: 'string',
           default: 'VUEngine Project'
         },
@@ -1146,7 +1111,7 @@ export const registeredTypes = {
         {
           type: 'Control',
           label: 'Project Name',
-          scope: '#/properties/name'
+          scope: '#/properties/title'
         },
         {
           type: 'Control',
@@ -1160,10 +1125,9 @@ export const registeredTypes = {
         }
       ]
     },
-    children: {
-      Font: {
-        RomHeader: false
-      }
+    parent: {
+      typeId: 'ProjectSettings',
+      multiple: false
     },
     icon: 'fa fa-cog'
   },
@@ -1265,6 +1229,10 @@ export const registeredTypes = {
           scope: '#/properties/revision'
         }
       ]
+    },
+    parent: {
+      typeId: 'ProjectSettings',
+      multiple: false
     },
     icon: 'fa fa-microchip'
   },

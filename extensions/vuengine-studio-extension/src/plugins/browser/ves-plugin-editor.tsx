@@ -9,20 +9,16 @@ import { VesPluginsModel } from './ves-plugins-model';
 
 @injectable()
 export class VesPluginEditor extends ReactWidget {
-    static ID = 'ves-plugin-editor';
-
     @inject(CommandService)
     protected readonly commandService: CommandService;
-
     @inject(VesPlugin)
     protected readonly plugin: VesPlugin;
-
     @inject(VesPluginsModel)
     protected readonly model: VesPluginsModel;
-
     @inject(WorkspaceService)
     protected readonly workspaceService: WorkspaceService;
 
+    static ID = 'ves-plugin-editor';
     protected readonly deferredScrollContainer = new Deferred<HTMLElement>();
 
     @postConstruct()
