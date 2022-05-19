@@ -60,29 +60,21 @@ export class VesEditorsTreeNodeFactory implements TreeEditor.NodeFactory {
     }
 
     hasCreatableChildren(node: TreeEditor.Node): boolean {
-        if (!node ||
-            // @ts-ignore
-            registeredTypes[node.jsonforms.type]?.children === undefined ||
-            // @ts-ignore
-            Object.values(registeredTypes[node.jsonforms.type].children).filter(child => child.addOrRemovable === true).length === 0) {
+        if (!node) {
             return false;
         }
 
-        return true;
+        const childTypes = Object.values(registeredTypes).filter(registeredType =>
+            registeredType.parent?.typeId === node.jsonforms.type &&
+            registeredType.parent?.multiple === true
+        );
+
+        return childTypes.length > 0;
     }
 
     canBeDeleted(node: TreeEditor.Node): boolean {
-        if (node &&
-            // @ts-ignore
-            registeredTypes[node.parent.jsonforms.type]?.children !== undefined &&
-            // @ts-ignore
-            registeredTypes[node.parent.jsonforms.type]?.children[node.jsonforms.type] !== undefined &&
-            // @ts-ignore
-            registeredTypes[node.parent.jsonforms.type]?.children[node.jsonforms.type].addOrRemovable === true) {
-            return true;
-        }
-
-        return false;
+        // @ts-ignore
+        return this.hasCreatableChildren(node.parent);
     }
 
     protected defaultNode(): Omit<TreeEditor.Node, 'editorId'> {

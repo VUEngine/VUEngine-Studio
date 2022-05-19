@@ -8,7 +8,7 @@ import * as DOMPurify from '@theia/core/shared/dompurify';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { VesPluginUri } from '../common/ves-plugin-uri';
+import { VesPluginUri } from './ves-plugin-uri';
 import { VesPluginsCommands } from './ves-plugins-commands';
 import { VesPluginsSearchModel } from './ves-plugins-search-model';
 import { VesPluginsService } from './ves-plugins-service';

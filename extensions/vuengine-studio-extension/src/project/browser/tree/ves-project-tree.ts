@@ -1,6 +1,7 @@
+import { CompositeTreeNode, ExpandableTreeNode, SelectableTreeNode, TreeImpl, TreeNode } from '@theia/core/lib/browser';
+import URI from '@theia/core/lib/common/uri';
 import { injectable } from '@theia/core/shared/inversify';
 import { v4 as uuid } from 'uuid';
-import { TreeImpl, CompositeTreeNode, TreeNode, ExpandableTreeNode, SelectableTreeNode } from '@theia/core/lib/browser';
 
 @injectable()
 export class VesProjectTree extends TreeImpl {
@@ -59,8 +60,10 @@ export interface VesProjectDocumentsTree {
 }
 
 export interface VesProjectDocumentChild {
+  typeId: string;
   name: string;
-  url?: string;
+  uri?: URI;
+  url?: string; // TODO: remove
   iconClass: string;
   children?: VesProjectDocumentChild[];
 }
