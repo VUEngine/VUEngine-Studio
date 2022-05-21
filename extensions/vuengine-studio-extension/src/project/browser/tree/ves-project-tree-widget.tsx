@@ -11,7 +11,7 @@ import {
 import { inject, injectable } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { registeredProjectNodes, registeredTypes } from '../../../editors/browser/tree/ves-editors-tree-schema';
+import { registeredTypes } from '../../../editors/browser/tree/ves-editors-tree-schema';
 import { VesEditorUri } from '../../../editors/browser/ves-editor-uri';
 import { VesProjectService } from '../ves-project-service';
 import { VesProjectChildNode, VesProjectDocumentChild, VesProjectDocumentsTree, VesProjectRootNode } from './ves-project-tree';
@@ -50,53 +50,62 @@ export class VesProjectTreeWidget extends TreeWidget {
     super.init();
 
     this.vesProjectService.onDidChangeProjectData(async () => {
-      await this.setModelRoot();
+      await this.setTreeData();
+      await this.setTitle();
     });
 
-    const projectName = await this.vesProjectService.getProjectName();
-    if (projectName) {
-      this.title.label = `${VesProjectTreeWidget.LABEL}: ${projectName}`;
-    }
-
-    await this.setModelRoot();
+    this.setTitle();
+    this.setTreeData();
   }
 
-  protected async setModelRoot(): Promise<void> {
+  protected async setTreeData(): Promise<void> {
     const documents: VesProjectDocumentsTree = {
       members: []
     };
 
     await this.vesProjectService.ready;
-    Object.values(registeredProjectNodes).forEach(registeredProjectNode => {
-      const childNode: VesProjectDocumentChild = {
-        typeId: registeredProjectNode.typeId,
-        name: registeredProjectNode.title,
-        iconClass: registeredProjectNode.icon,
-        children: [],
-      };
-      if (registeredProjectNode.typeId) {
-        // find which types can be children of current project node
-        const childTypes = Object.values(registeredTypes).filter(registeredType =>
-          registeredType.parent?.typeId === registeredProjectNode.typeId
-        );
-        // get items of all types
-        childTypes.forEach(childType => {
-          const childTypeId = childType.schema.properties?.typeId.const;
-          Object.keys(this.vesProjectService.getProjectDataType(childTypeId)).forEach(id => {
-            const item = this.vesProjectService.getProjectDataItem(childTypeId, id);
-            childNode.children!.push({
-              typeId: childTypeId,
-              uri: VesEditorUri.toUri(`${childTypeId}/${id}`),
-              name: item.name
-                || registeredTypes[childTypeId]?.schema?.title
-                || childTypeId,
-              iconClass: childType.icon,
-            });
-          });
-        });
-      }
+    Object.values(registeredTypes).forEach(registeredType => {
+      if (!registeredType.parent) {
+        const typeId = registeredType.schema.properties?.typeId.const;
+        const name = registeredType.schema.title;
+        const iconClass = registeredType.icon;
+        if (typeId && name && iconClass) {
+          const childNode: VesProjectDocumentChild = { typeId, name, iconClass };
 
-      documents.members.push(childNode);
+          if (registeredType.leaf === true) {
+            const registeredTypeChildren = this.vesProjectService.getProjectDataType(typeId);
+            if (registeredTypeChildren) {
+              const id = Object.keys(registeredTypeChildren)[0];
+              childNode.uri = VesEditorUri.toUri(`${typeId}/${id}`);
+            }
+          } else {
+            // find which types can be children of current project node
+            const childTypes = Object.values(registeredTypes).filter(registeredTypeInner =>
+              registeredTypeInner.parent?.typeId === typeId
+            );
+            // get items of all types
+            childTypes.forEach(childType => {
+              const childTypeId = childType.schema.properties?.typeId.const;
+              Object.keys(this.vesProjectService.getProjectDataType(childTypeId) || {}).forEach(id => {
+                const item = this.vesProjectService.getProjectDataItem(childTypeId, id);
+                if (!childNode.children) {
+                  childNode.children = [];
+                }
+                childNode.children.push({
+                  typeId: childTypeId,
+                  uri: VesEditorUri.toUri(`${childTypeId}/${id}`),
+                  name: item.name
+                    || registeredTypes[childTypeId]?.schema?.title
+                    || childTypeId,
+                  iconClass: childType.icon,
+                });
+              });
+            });
+          }
+
+          documents.members.push(childNode);
+        }
+      }
     });
 
     const root: VesProjectRootNode = {
@@ -109,6 +118,13 @@ export class VesProjectTreeWidget extends TreeWidget {
     };
 
     this.model.root = root;
+  }
+
+  protected async setTitle(): Promise<void> {
+    const projectName = await this.vesProjectService.getProjectName();
+    if (projectName) {
+      this.title.label = `${VesProjectTreeWidget.LABEL}: ${projectName}`;
+    }
   }
 
   protected renderTailDecorations(

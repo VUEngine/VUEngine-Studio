@@ -29,11 +29,12 @@ export class VesTitlebarApplicationTitleWidget extends ReactWidget {
 
     const { applicationName: title } = FrontendApplicationConfigProvider.get();
     this.applicationTitle = title;
+    this.update();
 
     await this.workspaceService.ready;
     await this.setTitle();
 
-    this.vesProjectsService.onDidChangeProjectFile(async () => {
+    this.vesProjectsService.onDidChangeProjectData(async () => {
       await this.setTitle();
     });
     this.workspaceService.onWorkspaceChanged(async () => {

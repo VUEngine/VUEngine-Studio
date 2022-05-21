@@ -1,30 +1,26 @@
-import { ContainerModule } from '@theia/core/shared/inversify';
 import {
     bindViewContribution,
     FrontendApplicationContribution,
     OpenHandler,
-    PreferenceContribution,
-    WidgetFactory,
-    ViewContainerIdentifier,
-    WidgetManager
+    PreferenceContribution, ViewContainerIdentifier, WidgetFactory, WidgetManager
 } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { CommandContribution } from '@theia/core/lib/common/command';
-import { VesPluginsContribution } from './ves-plugins-contribution';
-import { VesPluginsPreferenceSchema } from './ves-plugins-preferences';
-import { VesPluginsService } from './ves-plugins-service';
-import { VesPluginsViewContainer } from './ves-plugins-view-container';
-import { VesPluginsWidget, VesPluginsWidgetOptions } from './ves-plugins-widget';
-import { VesPluginsSourceOptions } from './ves-plugins-source';
+import { ContainerModule } from '@theia/core/shared/inversify';
 import { VesPlugin, VesPluginFactory, VesPluginOptions } from './ves-plugin';
-import { VesPluginsModel } from './ves-plugins-model';
-import { VesPluginsSearchModel } from './ves-plugins-search-model';
-import { VesPluginsSearchBar } from './ves-plugins-search-bar';
-import { VesPluginEditorManager } from './ves-plugin-editor-manager';
 import { VesPluginEditor } from './ves-plugin-editor';
-import { VesPluginsViewContribution } from './ves-plugins-view-contribution';
+import { VesPluginEditorManager } from './ves-plugin-editor-manager';
+import { VesPluginsContribution } from './ves-plugins-contribution';
+import { VesPluginsModel } from './ves-plugins-model';
 import { VesPluginsPathsService } from './ves-plugins-paths-service';
-import { VesPluginsOpenHandler } from './ves-plugins-open-handler';
+import { VesPluginsPreferenceSchema } from './ves-plugins-preferences';
+import { VesPluginsSearchBar } from './ves-plugins-search-bar';
+import { VesPluginsSearchModel } from './ves-plugins-search-model';
+import { VesPluginsService } from './ves-plugins-service';
+import { VesPluginsSourceOptions } from './ves-plugins-source';
+import { VesPluginsViewContainer } from './ves-plugins-view-container';
+import { VesPluginsViewContribution } from './ves-plugins-view-contribution';
+import { VesPluginsWidget, VesPluginsWidgetOptions } from './ves-plugins-widget';
 import '../../../src/plugins/browser/style/index.css';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
@@ -96,6 +92,4 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bindViewContribution(bind, VesPluginsViewContribution);
     bind(FrontendApplicationContribution).toService(VesPluginsViewContribution);
     bind(TabBarToolbarContribution).toService(VesPluginsViewContribution);
-
-    bind(OpenHandler).to(VesPluginsOpenHandler).inSingletonScope();
 });

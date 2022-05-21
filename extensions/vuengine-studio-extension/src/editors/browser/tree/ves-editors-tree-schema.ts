@@ -1,59 +1,1088 @@
-import { ProjectNodes, RegisteredTypes } from '../../../project/browser/ves-project-types';
-
-export const registeredProjectNodes: ProjectNodes = {
-  ProjectSettings: {
-    typeId: 'ProjectSettings',
-    title: 'Project Settings',
-    icon: 'fa fa-cog'
-  },
-  BrightnessRepeats: {
-    typeId: 'BrightnessRepeats',
-    title: 'Brightness Repeat',
-    icon: 'fa fa-sun-o'
-  },
-  ColumnTables: {
-    typeId: 'ColumnTables',
-    title: 'Column Table',
-    icon: 'fa fa-table'
-  },
-  Entities: {
-    typeId: 'Entities',
-    title: 'Entities',
-    icon: 'fa fa-id-card-o'
-  },
-  Fonts: {
-    typeId: 'Fonts',
-    title: 'Fonts',
-    icon: 'fa fa-font'
-  },
-  Images: {
-    typeId: 'Images',
-    title: 'Images',
-    icon: 'fa fa-image'
-  },
-  Languages: {
-    typeId: 'Languages',
-    title: 'Internationalization',
-    icon: 'fa fa-language'
-  },
-  RumbleEffects: {
-    typeId: 'RumbleEffects',
-    title: 'RumbleEffects',
-    icon: 'codicon codicon-screen-full codicon-rotate-90'
-  },
-  Sounds: {
-    typeId: 'Sounds',
-    title: 'Sound & Music',
-    icon: 'fa fa-music'
-  },
-  Stages: {
-    typeId: 'Stages',
-    title: 'Stages',
-    icon: 'fa fa-cube'
-  },
-};
+import { RegisteredTypes } from '../../../project/browser/ves-project-types';
 
 export const registeredTypes: RegisteredTypes = {
+  BrightnessRepeats: {
+    schema: {
+      title: 'Brightness Repeat',
+      properties: {
+        typeId: {
+          const: 'BrightnessRepeats'
+        }
+      }
+    },
+    icon: 'fa fa-sun-o'
+  },
+  BrightnessRepeat: {
+    schema: {
+      title: 'Brightness Repeat',
+      properties: {
+        typeId: {
+          const: 'BrightnessRepeat'
+        },
+        name: {
+          type: 'string'
+        },
+        mirror: {
+          type: 'boolean',
+          default: true
+        },
+        values: {
+          type: 'array',
+          items: {
+            type: 'integer',
+            default: 15,
+            minimum: 0,
+            maximum: 15
+          }
+        }
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'BrightnessRepeats',
+      multiple: true
+    },
+    icon: 'fa fa-table'
+  },
+  ColumnTables: {
+    schema: {
+      title: 'Column Table',
+      properties: {
+        typeId: {
+          const: 'ColumnTables'
+        }
+      }
+    },
+    icon: 'fa fa-table'
+  },
+  ColumnTable: {
+    schema: {
+      title: 'Column Table',
+      properties: {
+        typeId: {
+          const: 'ColumnTable'
+        },
+        name: {
+          type: 'string'
+        },
+        description: {
+          type: 'string'
+        },
+        mirror: {
+          type: 'boolean',
+          default: true
+        },
+        values: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              repeat: {
+                type: 'integer',
+                default: 15,
+                minimum: 0,
+                maximum: 15
+              },
+              time: {
+                type: 'integer',
+                default: 15,
+                minimum: 0,
+                maximum: 15
+              },
+            }
+          },
+          maxItems: 256,
+          minItems: 128
+        }
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'ColumnTables',
+      multiple: true
+    },
+    icon: 'fa fa-table'
+  },
+  Compiler: {
+    schema: {
+      title: 'Compiler Config',
+      properties: {
+        typeId: {
+          const: 'Compiler'
+        },
+        framePointer: {
+          type: 'boolean',
+          default: false
+        },
+        optimization: {
+          type: 'string',
+          enum: [
+            'O0',
+            'O1',
+            'O2',
+            'O3',
+            'Ofast',
+            'Os',
+          ],
+          default: 'O2'
+        },
+        output: {
+          type: 'string',
+          enum: [
+            'c',
+          ],
+          default: 'c'
+        },
+        prologFunctions: {
+          type: 'boolean',
+          default: false
+        },
+        scrambleBinary: {
+          type: 'boolean',
+          default: false
+        }
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'ProjectSettings',
+      multiple: false
+    },
+    icon: 'fa fa-cogs'
+  },
+  CompilerMemorySections: {
+    schema: {
+      title: 'Memory Sections',
+      properties: {
+        typeId: {
+          const: 'CompilerMemorySections'
+        },
+        dram: {
+          type: 'object',
+          properties: {
+            length: {
+              type: 'integer',
+              default: -24,
+              maximum: 0
+            },
+            origin: {
+              type: 'string'
+            }
+          }
+        },
+        exp: {
+          type: 'object',
+          properties: {
+            length: {
+              type: 'integer',
+              default: 16,
+              minimum: 0
+            },
+            origin: {
+              type: 'string',
+              default: '0x04000000'
+            }
+          }
+        },
+        rom: {
+          type: 'object',
+          properties: {
+            length: {
+              type: 'integer',
+              default: 16,
+              minimum: 0
+            },
+            origin: {
+              type: 'string',
+              default: '0x07000000'
+            }
+          }
+        },
+        sram: {
+          type: 'object',
+          properties: {
+            length: {
+              type: 'integer',
+              default: 16,
+              minimum: 0
+            },
+            origin: {
+              type: 'string',
+              default: '0x06000000'
+            }
+          }
+        },
+        wram: {
+          type: 'object',
+          properties: {
+            length: {
+              type: 'integer',
+              default: 64,
+              minimum: 0
+            },
+            origin: {
+              type: 'string',
+              default: '0x05000000'
+            }
+          }
+        }
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'Compiler',
+      multiple: false
+    },
+    icon: 'fa fa-cogs'
+  },
+  CompilerMemoryUsage: {
+    schema: {
+      title: 'Memory Usage',
+      properties: {
+        typeId: {
+          const: 'CompilerMemoryUsage'
+        },
+        initializedData: {
+          type: 'string',
+          enum: [
+            '.dram_bss',
+            '.sbss',
+            '.sdata',
+            '.sram_bss'
+          ],
+          default: '.sdata'
+        },
+        memoryPool: {
+          type: 'string',
+          enum: [
+            '.dram_bss',
+            '.sbss',
+            '.sdata',
+            '.sram_bss'
+          ],
+          default: '.sdata'
+        },
+        staticSingletons: {
+          type: 'string',
+          enum: [
+            '.dram_bss',
+            '.sbss',
+            '.sdata',
+            '.sram_bss'
+          ],
+          default: '.dram_bss'
+        },
+        uninitializedData: {
+          type: 'string',
+          enum: [
+            '.dram_bss',
+            '.sbss',
+            '.sdata',
+            '.sram_bss'
+          ],
+          default: '.sbss'
+        },
+        virtualTables: {
+          type: 'string',
+          enum: [
+            '.dram_bss',
+            '.sbss',
+            '.sdata',
+          ],
+          default: '.dram_bss'
+        },
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'Compiler',
+      multiple: false
+    },
+    icon: 'fa fa-cogs'
+  },
+  DebugMacros: {
+    schema: {
+      title: 'Debug Macros',
+      properties: {
+        typeId: {
+          const: 'DebugMacros'
+        },
+        macros: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              name: {
+                type: 'string'
+              },
+              value: {
+                type: 'string'
+              },
+              define: {
+                type: 'boolean',
+                default: false
+              },
+              dependent: {
+                type: 'array',
+                items: {
+                  type: 'string'
+                }
+              }
+            }
+          }
+        }
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'ProjectSettings',
+      multiple: false
+    },
+    icon: 'fa fa-bug'
+  },
+  EngineConfig: {
+    schema: {
+      title: 'Engine Config',
+      properties: {
+        typeId: {
+          const: 'EngineConfig'
+        }
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'ProjectSettings',
+      multiple: false
+    },
+    icon: 'fa fa-sliders'
+  },
+  EngineConfigAffine: {
+    schema: {
+      title: 'Affine',
+      properties: {
+        typeId: {
+          const: 'EngineConfigAffine'
+        },
+        maxRowsPerCall: {
+          type: 'integer',
+          default: 16
+        },
+        maxScale: {
+          type: 'integer',
+          default: 2
+        }
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'EngineConfig',
+      multiple: false
+    },
+    icon: 'fa fa-clone'
+  },
+  EngineConfigAnimation: {
+    schema: {
+      title: 'Animation',
+      properties: {
+        typeId: {
+          const: 'EngineConfigAnimation'
+        },
+        maxAnimationFunctionNameLength: {
+          type: 'integer',
+          default: 16
+        },
+        maxAnimationFunctions: {
+          type: 'integer',
+          default: 32
+        },
+        maxFramesPerAnimationFunction: {
+          type: 'integer',
+          default: 16
+        }
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'EngineConfig',
+      multiple: false
+    },
+    icon: 'fa fa-film'
+  },
+  EngineConfigBrightness: {
+    schema: {
+      title: 'Brightness',
+      properties: {
+        typeId: {
+          const: 'EngineConfigBrightness'
+        },
+        brightRed: {
+          type: 'integer',
+          default: 128
+        },
+        mediumRed: {
+          type: 'integer',
+          default: 64
+        },
+        darkRed: {
+          type: 'integer',
+          default: 32
+        },
+        fadeDelay: {
+          type: 'integer',
+          default: 16
+        },
+        fadeIncrement: {
+          type: 'integer',
+          default: 1
+        }
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'EngineConfig',
+      multiple: false
+    },
+    icon: 'fa fa-sun-o'
+  },
+  EngineConfigChars: {
+    schema: {
+      title: 'Chars',
+      properties: {
+        typeId: {
+          const: 'EngineConfigChars'
+        },
+        totalChars: {
+          type: 'integer',
+          default: 2048
+        }
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'EngineConfig',
+      multiple: false
+    },
+    icon: 'fa fa-table'
+  },
+  EngineConfigCommunications: {
+    schema: {
+      title: 'Communications',
+      properties: {
+        typeId: {
+          const: 'EngineConfigCommunications'
+        },
+        enabled: {
+          type: 'boolean',
+          default: false
+        }
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'EngineConfig',
+      multiple: false
+    },
+    icon: 'fa fa-commenting-o'
+  },
+  EngineConfigDebug: {
+    schema: {
+      title: 'Debug',
+      properties: {
+        typeId: {
+          const: 'EngineConfigDebug'
+        },
+        alertForTornFrames: {
+          type: 'boolean',
+          default: false
+        },
+        alertStackOverflow: {
+          type: 'boolean',
+          default: false
+        },
+        alertVipOvertime: {
+          type: 'boolean',
+          default: false
+        },
+        dimmForProfiling: {
+          type: 'boolean',
+          default: false
+        },
+        enableProfiler: {
+          type: 'boolean',
+          default: false
+        },
+        printDetailedMemoryPoolStatus: {
+          type: 'boolean',
+          default: false
+        },
+        printFramerate: {
+          type: 'boolean',
+          default: false
+        },
+        printMemoryPoolStatus: {
+          type: 'boolean',
+          default: false
+        },
+        profileGame: {
+          type: 'boolean',
+          default: false
+        },
+        profileGameStateDuringVipInterrupt: {
+          type: 'boolean',
+          default: false
+        },
+        profileStreaming: {
+          type: 'boolean',
+          default: false
+        },
+        showDetailedMemoryPoolStatus: {
+          type: 'boolean',
+          default: false
+        },
+        showGameProfiling: {
+          type: 'boolean',
+          default: false
+        },
+        showMemoryPoolStatus: {
+          type: 'boolean',
+          default: false
+        },
+        showStackOverflowAlert: {
+          type: 'boolean',
+          default: false
+        },
+        showStreamingProfiling: {
+          type: 'boolean',
+          default: false
+        },
+        stackHeadroom: {
+          type: 'integer',
+          default: 1000
+        }
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'EngineConfig',
+      multiple: false
+    },
+    icon: 'fa fa-bug'
+  },
+  EngineConfigExceptions: {
+    schema: {
+      title: 'Exceptions',
+      properties: {
+        typeId: {
+          const: 'EngineConfigExceptions'
+        },
+        position: {
+          type: 'object',
+          properties: {
+            x: {
+              type: 'integer',
+              default: 0,
+              maximum: 47,
+              minimum: 0
+            },
+            y: {
+              type: 'integer',
+              default: 0,
+              maximum: 27,
+              minimum: 0
+            }
+          }
+        }
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'EngineConfig',
+      multiple: false
+    },
+    icon: 'fa fa-exclamation-circle'
+  },
+  EngineConfigFrameRate: {
+    schema: {
+      title: 'Frame Rate',
+      properties: {
+        typeId: {
+          const: 'EngineConfigFrameRate'
+        },
+        forceVipSync: {
+          type: 'boolean',
+          default: false
+        },
+        frameCycle: {
+          type: 'integer',
+          default: 0,
+          minimum: 0
+        },
+        runDelayedMessagesAtHalfFrameRate: {
+          type: 'boolean',
+          default: false
+        },
+        timerResolution: {
+          type: 'integer',
+          default: 10
+        }
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'EngineConfig',
+      multiple: false
+    },
+    icon: 'fa fa-fast-forward'
+  },
+  EngineConfigMemoryPools: {
+    schema: {
+      title: 'Memory Pools',
+      properties: {
+        typeId: {
+          const: 'EngineConfigMemoryPools'
+        },
+        cleanUp: {
+          type: 'boolean',
+          default: false
+        },
+        warningThreshold: {
+          type: 'integer',
+          default: 85,
+          minimum: 25
+        },
+        pools: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              objects: {
+                type: 'integer',
+                default: 1,
+                minimum: 1
+              },
+              size: {
+                type: 'integer',
+                default: 1,
+                minimum: 1
+              }
+            }
+          }
+        }
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'EngineConfig',
+      multiple: false
+    },
+    icon: 'fa fa-database'
+  },
+  EngineConfigOptics: {
+    schema: {
+      title: 'Optics',
+      properties: {
+        typeId: {
+          const: 'EngineConfigOptics'
+        },
+        baseFactor: {
+          type: 'integer',
+          default: 32,
+          minimum: 0
+        },
+        cameraMinimumDisplacementPixelsPower: {
+          type: 'integer',
+          default: 1,
+          minimum: 0
+        },
+        distanceEyeScreen: {
+          type: 'integer',
+          default: 384,
+          minimum: 0
+        },
+        horizontalViewPointCenter: {
+          type: 'integer',
+          default: 192,
+          minimum: 0
+        },
+        maximumXViewDistance: {
+          type: 'integer',
+          default: 2048,
+          minimum: 0
+        },
+        maximumYViewDistance: {
+          type: 'integer',
+          default: 4096,
+          minimum: 0
+        },
+        parallaxCorrectionFactor: {
+          type: 'integer',
+          default: 4,
+          minimum: 0
+        },
+        scalingModifierFactor: {
+          type: 'integer',
+          default: 1,
+          minimum: 0
+        },
+        screenDepth: {
+          type: 'integer',
+          default: 2048,
+          minimum: 0
+        },
+        screenHeight: {
+          type: 'integer',
+          default: 224,
+          minimum: 0
+        },
+        screenWidth: {
+          type: 'integer',
+          default: 384,
+          minimum: 0
+        },
+        verticalViewPointCenter: {
+          type: 'integer',
+          default: 112,
+          minimum: 0
+        },
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'EngineConfig',
+      multiple: false
+    },
+    icon: 'fa fa-eye'
+  },
+  EngineConfigPalettes: {
+    schema: {
+      title: 'Palettes',
+      properties: {
+        typeId: {
+          const: 'EngineConfigPalettes'
+        },
+        bgMapPalette0: {
+          type: 'string',
+          default: '11100100'
+        },
+        bgMapPalette1: {
+          type: 'string',
+          default: '11100000'
+        },
+        bgMapPalette2: {
+          type: 'string',
+          default: '10010000'
+        },
+        bgMapPalette3: {
+          type: 'string',
+          default: '01010000'
+        },
+        objectPalette0: {
+          type: 'string',
+          default: '11100100'
+        },
+        objectPalette1: {
+          type: 'string',
+          default: '11100000'
+        },
+        objectPalette2: {
+          type: 'string',
+          default: '10010000'
+        },
+        objectPalette3: {
+          type: 'string',
+          default: '01010000'
+        },
+        printingPalette: {
+          type: 'integer',
+          default: 0,
+          maximum: 3,
+          minimum: 0,
+        }
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'EngineConfig',
+      multiple: false
+    },
+    icon: 'fa fa-paint-brush'
+  },
+  EngineConfigPhysics: {
+    schema: {
+      title: 'Physics',
+      properties: {
+        typeId: {
+          const: 'EngineConfigPhysics'
+        },
+        bodiesToCheckForGravity: {
+          type: 'integer',
+          default: 10,
+          minimum: 0
+        },
+        frictionForceFactorPower: {
+          type: 'integer',
+          default: 2,
+          minimum: 0
+        },
+        gravity: {
+          type: 'number',
+          default: 20,
+          minimum: 0
+        },
+        maximumBouncinessCoefficient: {
+          type: 'integer',
+          default: 1,
+          minimum: 0
+        },
+        stopBouncingVelocityThreshold: {
+          type: 'integer',
+          default: 48,
+          minimum: 0
+        },
+        stopVelocityThreshold: {
+          type: 'integer',
+          default: 8,
+          minimum: 0
+        },
+        timeElapsedDivisor: {
+          type: 'integer',
+          default: 2,
+          minimum: 0
+        }
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'EngineConfig',
+      multiple: false
+    },
+    icon: 'fa fa-compass'
+  },
+  EngineConfigRandom: {
+    schema: {
+      title: 'Random',
+      properties: {
+        typeId: {
+          const: 'EngineConfigRandom'
+        },
+        addUserInputAndTimeToRandomSeed: {
+          type: 'boolean',
+          default: false
+        },
+        seedCycles: {
+          type: 'integer',
+          default: 2,
+          minimum: 1
+        }
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'EngineConfig',
+      multiple: false
+    },
+    icon: 'fa fa-random'
+  },
+  EngineConfigSound: {
+    schema: {
+      title: 'Sound',
+      properties: {
+        typeId: {
+          const: 'EngineConfigSound'
+        },
+        leftEarCenter: {
+          type: 'integer',
+          default: 96
+        },
+        rightEarCenter: {
+          type: 'integer',
+          default: 288
+        },
+        stereoHorizontalAttenuationFactor: {
+          type: 'integer',
+          default: 50,
+          minimum: 0
+        },
+        stereoVerticalAttenuationFactor: {
+          type: 'integer',
+          default: 50,
+          minimum: 0
+        }
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'EngineConfig',
+      multiple: false
+    },
+    icon: 'fa fa-volume-up'
+  },
+  EngineConfigSprite: {
+    schema: {
+      title: 'Sprite',
+      properties: {
+        typeId: {
+          const: 'EngineConfigSprite'
+        },
+        totalLayers: {
+          type: 'integer',
+          default: 32,
+          minimum: 1
+        },
+        hackBgmapSpriteHeight: {
+          type: 'boolean',
+          default: true
+        }
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'EngineConfig',
+      multiple: false
+    },
+    icon: 'fa fa-image'
+  },
+  EngineConfigSram: {
+    schema: {
+      title: 'SRAM',
+      properties: {
+        typeId: {
+          const: 'EngineConfigSram'
+        },
+        totalSram: {
+          type: 'integer',
+          default: 8192,
+          minimum: 0
+        }
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'EngineConfig',
+      multiple: false
+    },
+    icon: 'fa fa-microchip'
+  },
+  EngineConfigTexture: {
+    schema: {
+      title: 'Texture',
+      properties: {
+        typeId: {
+          const: 'EngineConfigTexture'
+        },
+        bgmapsPerSegments: {
+          type: 'integer',
+          default: 14,
+          minimum: 0
+        },
+        printing: {
+          type: 'object',
+          properties: {
+            offset: {
+              type: 'object',
+              properties: {
+                x: {
+                  type: 'integer',
+                  default: 0,
+                  minimum: 0
+                },
+                y: {
+                  type: 'integer',
+                  default: 0,
+                  minimum: 0
+                },
+                z: {
+                  type: 'integer',
+                  default: 0,
+                  minimum: 0
+                },
+                parallax: {
+                  type: 'integer',
+                  default: 0,
+                  minimum: 0
+                }
+              }
+            },
+            printableArea: {
+              type: 'integer',
+              default: 1792,
+              minimum: 0
+            }
+          }
+        },
+        paramTableSegments: {
+          type: 'integer',
+          default: 1,
+          minimum: 0
+        }
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'EngineConfig',
+      multiple: false
+    },
+    icon: 'fa fa-file-image-o'
+  },
+  Events: {
+    schema: {
+      title: 'Events',
+      properties: {
+        typeId: {
+          const: 'Events'
+        },
+        events: {
+          type: 'array',
+          items: {
+            type: 'string',
+            default: 'NewEvent'
+          }
+        }
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'ProjectSettings',
+      multiple: false
+    },
+    icon: 'fa fa-bullhorn'
+  },
+  Entities: {
+    schema: {
+      title: 'Entities',
+      properties: {
+        typeId: {
+          const: 'Entities'
+        }
+      }
+    },
+    icon: 'fa fa-id-card-o'
+  },
   Entity: {
     schema: {
       title: 'Entity',
@@ -372,8 +1401,6 @@ export const registeredTypes: RegisteredTypes = {
           const: 'EntityMeshes'
         },
         meshes: {
-          type: 'string'
-          /*
           type: 'array',
           items: {
             type: 'object',
@@ -390,7 +1417,7 @@ export const registeredTypes: RegisteredTypes = {
                 maximum: 255
               }
             }
-          }*/
+          }
         }
       },
       required: [
@@ -847,6 +1874,86 @@ export const registeredTypes: RegisteredTypes = {
     },
     icon: 'fa fa-picture-o'
   },
+  Fonts: {
+    schema: {
+      title: 'Fonts',
+      properties: {
+        typeId: {
+          const: 'Fonts'
+        }
+      }
+    },
+    icon: 'fa fa-font'
+  },
+  Font: {
+    schema: {
+      title: 'Font',
+      properties: {
+        typeId: {
+          const: 'Font'
+        },
+        name: {
+          type: 'string'
+        },
+        tiles: {
+          type: 'string'
+        },
+        type: {
+          type: 'string',
+          enum: ['bgmap', 'object'],
+          default: 'bgmap'
+        },
+        offset: {
+          type: 'integer',
+          default: 0,
+          minimum: 0
+        },
+        characterCount: {
+          type: 'integer',
+          default: 256,
+          minimum: 0
+        },
+        charactersPerLine: {
+          type: 'integer',
+          default: 16,
+          minimum: 0
+        },
+        size: {
+          type: 'object',
+          properties: {
+            x: {
+              type: 'integer',
+              default: 1,
+              minimum: 1
+            },
+            y: {
+              type: 'integer',
+              default: 1,
+              minimum: 1
+            }
+          }
+        }
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'Fonts',
+      multiple: true
+    },
+    icon: 'fa fa-font'
+  },
+  Images: {
+    schema: {
+      title: 'Images',
+      properties: {
+        typeId: {
+          const: 'Images'
+        }
+      }
+    },
+    icon: 'fa fa-image'
+  },
   Image: {
     schema: {
       title: 'Image',
@@ -1082,6 +2189,86 @@ export const registeredTypes: RegisteredTypes = {
     },
     icon: 'fa fa-image'
   },
+  I18n: {
+    schema: {
+      title: 'Internationalization',
+      properties: {
+        typeId: {
+          const: 'I18n'
+        },
+        strings: {
+          type: 'array',
+          items: {
+            type: 'string'
+          }
+        }
+      },
+      required: [],
+      additionalProperties: false
+    },
+    icon: 'fa fa-language',
+    leaf: true
+  },
+  I18nLanguage: {
+    schema: {
+      title: 'Language',
+      properties: {
+        typeId: {
+          const: 'I18nLanguage'
+        },
+        name: {
+          type: 'string'
+        },
+        code: {
+          type: 'string',
+          maxLength: 2,
+          minLength: 2
+        },
+        id: {
+          type: 'string'
+        },
+        flag: {
+          type: 'string'
+        },
+        order: {
+          type: 'integer',
+          minimum: 0
+        },
+        strings: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: {
+                type: 'string'
+              },
+              translation: {
+                type: 'string'
+              }
+            }
+          }
+        }
+      },
+      required: [],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'I18n',
+      multiple: true
+    },
+    icon: 'fa fa-language'
+  },
+  ProjectSettings: {
+    schema: {
+      title: 'Project Settings',
+      properties: {
+        typeId: {
+          const: 'ProjectSettings'
+        }
+      }
+    },
+    icon: 'fa fa-cog'
+  },
   Project: {
     schema: {
       title: 'Project',
@@ -1235,5 +2422,98 @@ export const registeredTypes: RegisteredTypes = {
       multiple: false
     },
     icon: 'fa fa-microchip'
+  },
+  RumbleEffects: {
+    schema: {
+      title: 'Rumble Effects',
+      properties: {
+        typeId: {
+          const: 'RumbleEffects'
+        }
+      }
+    },
+    icon: 'codicon codicon-screen-full codicon-rotate-90'
+  },
+  RumbleEffect: {
+    schema: {
+      title: 'Rumble Effect',
+      properties: {
+        typeId: {
+          const: 'RumbleEffect'
+        },
+        name: {
+          type: 'string'
+        },
+        effect: {
+          type: 'integer',
+          default: 0,
+          maximum: 123,
+          minimum: 0
+        },
+        frequency: {
+          type: 'integer',
+          enum: [160, 240, 320, 400],
+          default: 160
+        },
+        sustainPositive: {
+          type: 'integer',
+          maximum: 255,
+          minimum: 0,
+          default: 255
+        },
+        sustainNegative: {
+          type: 'integer',
+          maximum: 255,
+          minimum: 0,
+          default: 255
+        },
+        overdrive: {
+          type: 'integer',
+          maximum: 255,
+          minimum: 0,
+          default: 255
+        },
+        break: {
+          type: 'integer',
+          maximum: 255,
+          minimum: 0,
+          default: 255
+        },
+        stopBeforeStarting: {
+          type: 'boolean',
+          default: true
+        }
+      },
+      required: [
+      ],
+      additionalProperties: false
+    },
+    parent: {
+      typeId: 'RumbleEffects',
+      multiple: true
+    },
+    icon: 'codicon codicon-screen-full codicon-rotate-90'
+  },
+  Sounds: {
+    schema: {
+      title: 'Sound & Music',
+      properties: {
+        typeId: {
+          const: 'Sounds'
+        }
+      }
+    },
+    icon: 'fa fa-music'
+  },
+  Stages: {
+    schema: {
+      title: 'Stages',
+      properties: {
+        typeId: {
+          const: 'Stages'
+        }
+      }
+    },
+    icon: 'fa fa-cube'
   },
 };
