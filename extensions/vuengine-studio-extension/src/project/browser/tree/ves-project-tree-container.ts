@@ -8,10 +8,10 @@ function createVesProjectTreeContainer(parent: interfaces.Container): Container 
     const child = createTreeContainer(parent);
 
     child.unbind(TreeImpl);
-    child.bind(VesProjectTree).toSelf();
+    child.bind(VesProjectTree).toSelf().inSingletonScope();
     child.rebind(Tree).toService(VesProjectTree);
 
-    child.bind(VesProjectTreeWidget).toSelf();
+    child.bind(VesProjectTreeWidget).toSelf().inSingletonScope();
     child.rebind(TreeWidget).toService(VesProjectTreeWidget);
 
     child.rebind(TreeProps).toConstantValue({

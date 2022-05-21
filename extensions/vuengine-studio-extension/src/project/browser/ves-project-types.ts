@@ -6,16 +6,9 @@ export interface ProjectFileType {
 };
 
 export interface ProjectFile {
+  plugins: string[]
   types: {
     [typeId: string]: ProjectFileType
-  }
-};
-
-export interface ProjectNodes {
-  [typeId: string]: {
-    typeId: string,
-    title: string,
-    icon: string,
   }
 };
 
@@ -29,6 +22,7 @@ export interface RegisteredType {
   uiSchema?: any, // eslint-disable-line @typescript-eslint/no-explicit-any
   parent?: RegisteredTypeParent,
   icon: string,
+  leaf?: boolean,
 };
 
 export interface RegisteredTypes {

@@ -1,16 +1,15 @@
-import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import { Deferred } from '@theia/core/lib/common/promise-util';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { join, relative as relativePath } from 'path';
 import { VesGlobService } from '../../branding/common/ves-glob-service-protocol';
 import { VesPluginData, VesPluginsData } from './ves-plugin';
 import { VesPluginsPathsService } from './ves-plugins-paths-service';
 import { VUENGINE_PLUGINS_PREFIX } from './ves-plugins-types';
+import { VesProjectService } from '../../project/browser/ves-project-service';
 
 @injectable()
 export class VesPluginsService {
@@ -21,6 +20,8 @@ export class VesPluginsService {
   protected vesGlobService: VesGlobService;
   @inject(VesPluginsPathsService)
   protected vesPluginsPathsService: VesPluginsPathsService;
+  @inject(VesProjectService)
+  protected vesProjectService: VesProjectService;
   @inject(WorkspaceService)
   protected workspaceService: WorkspaceService;
 
@@ -40,12 +41,9 @@ export class VesPluginsService {
   @postConstruct()
   protected async init(): Promise<void> {
     // Re-determine installedPlugins when plugins file changes
-    this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
-      const pluginsFileUri = await this.getPluginsFileUri();
-      if (pluginsFileUri && fileChangesEvent.contains(pluginsFileUri)) {
-        await this.determineInstalledPlugins();
-        this.onDidChangeInstalledPluginsEmitter.fire();
-      }
+    this.vesProjectService.onDidChangeProjectData(async () => {
+      await this.determineInstalledPlugins();
+      this.onDidChangeInstalledPluginsEmitter.fire();
     });
   }
 
@@ -74,20 +72,11 @@ export class VesPluginsService {
     }
   }
 
-  async determineInstalledPlugins(): Promise<Array<string>> {
-    try {
-      const pluginsFileUri = await this.getPluginsFileUri();
-      if (pluginsFileUri) {
-        const fileContent = await this.fileService.readFile(pluginsFileUri);
-        const fileContentParsed = JSON.parse(fileContent.value.toString());
-        this.installedPlugins = fileContentParsed;
-      }
-      this._ready.resolve();
-      return this.installedPlugins;
-    } catch (e) {
-      this._ready.resolve();
-      return [];
-    }
+  async determineInstalledPlugins(): Promise<string[]> {
+    await this.vesProjectService.ready;
+    this.installedPlugins = this.vesProjectService.getProjectPlugins();
+    this._ready.resolve();
+    return this.installedPlugins;
   }
 
   getInstalledPlugins(): Array<string> {
@@ -191,19 +180,7 @@ export class VesPluginsService {
     return searchResult;
   }
 
-  async getPluginsFileUri(): Promise<URI | undefined> {
-    await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-    return workspaceRootUri && workspaceRootUri
-      .resolve('config')
-      .resolve('Plugins.json');
-  }
-
   protected async writeInstalledPluginsToFile(): Promise<void> {
-    const pluginsFileUri = await this.getPluginsFileUri();
-    if (pluginsFileUri) {
-      const updatedFileContent = JSON.stringify(this.installedPlugins.sort(), null, 4);
-      await this.fileService.writeFile(pluginsFileUri, BinaryBuffer.fromString(updatedFileContent));
-    }
+    await this.vesProjectService.setProjectPlugins(this.installedPlugins.sort());
   }
 }
