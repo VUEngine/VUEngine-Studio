@@ -8,7 +8,6 @@ import { WorkspaceService } from '@theia/workspace/lib/browser/workspace-service
 import { VesProjectService } from '../../../project/browser/ves-project-service';
 import { VesDetailFormWidget } from '../ves-editors-detail-form-widget';
 import { VesMasterTreeWidget } from './ves-editors-master-tree-widget';
-import { registeredTypes } from './ves-editors-tree-schema';
 
 export const VesEditorsTreeEditorOptions = Symbol(
     'VesEditorsTreeEditorOptions'
@@ -93,7 +92,7 @@ export class VesEditorsTreeEditorWidget extends NavigatableTreeEditorWidget {
     protected configureTitle(title: Title<Widget>): void {
         super.configureTitle(title);
 
-        const typeData = registeredTypes[this.instanceData.typeId];
+        const typeData = this.vesProjectService.getRegisteredTypes()[this.instanceData.typeId];
         title.label = this.instanceData.name
             ? `${typeData.schema.title}: ${this.instanceData.name}`
             : typeData.schema.title!;

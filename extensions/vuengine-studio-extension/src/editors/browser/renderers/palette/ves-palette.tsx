@@ -2,8 +2,8 @@ import { SelectComponent, SelectOption } from '@theia/core/lib/browser/widgets/s
 import React from 'react';
 
 interface VesPaletteProps {
-    id?: string;
     value: string;
+    label: string;
     updateValue: (newValue: string) => void;
 }
 
@@ -14,7 +14,7 @@ const paletteValues: SelectOption[] = [
     { value: '00', label: '00', description: 'Black' },
 ];
 
-export const VesPalette: React.FC<VesPaletteProps> = ({ id, value, updateValue }) => {
+export const VesPalette: React.FC<VesPaletteProps> = ({ value, updateValue, label }) => {
     const index0 = value.substring(0, 2);
     const index1 = value.substring(2, 4);
     const index2 = value.substring(4, 6);
@@ -28,33 +28,36 @@ export const VesPalette: React.FC<VesPaletteProps> = ({ id, value, updateValue }
     // const uiSchema = jsonforms.core?.uischema;
 
     return (
-        <div className='palette-renderer'>
-            <span className={`value-${index0}`}>
-                <SelectComponent
-                    key="paletteIndex0"
-                    options={paletteValues}
-                    value={index0}
-                    onChange={option => updateValue(getUpdatedValue(0, option.value!))} />
-            </span>
-            <span className={`value-${index1}`}>
-                <SelectComponent
-                    key="paletteIndex1"
-                    options={paletteValues}
-                    value={index1}
-                    onChange={option => updateValue(getUpdatedValue(1, option.value!))} />
-            </span>
-            <span className={`value-${index2}`}>
-                <SelectComponent
-                    key="paletteIndex2"
-                    options={paletteValues}
-                    value={index2}
-                    onChange={option => updateValue(getUpdatedValue(2, option.value!))} />
-            </span>
-            <span className="value-00">
-                <div className="theia-select-component">
-                    <div className="theia-select-component-label">00</div>
+        <div className='control palette-renderer'>
+            <label>{label}</label>
+            <div className='input'>
+                <div className={`value-${index0}`}>
+                    <SelectComponent
+                        key="paletteIndex0"
+                        options={paletteValues}
+                        value={index0}
+                        onChange={option => updateValue(getUpdatedValue(0, option.value!))} />
                 </div>
-            </span>
+                <div className={`value-${index1}`}>
+                    <SelectComponent
+                        key="paletteIndex1"
+                        options={paletteValues}
+                        value={index1}
+                        onChange={option => updateValue(getUpdatedValue(1, option.value!))} />
+                </div>
+                <div className={`value-${index2}`}>
+                    <SelectComponent
+                        key="paletteIndex2"
+                        options={paletteValues}
+                        value={index2}
+                        onChange={option => updateValue(getUpdatedValue(2, option.value!))} />
+                </div>
+                <div className="value-00">
+                    <div className="theia-select-component">
+                        <div className="theia-select-component-label">00</div>
+                    </div>
+                </div>
+            </div>
         </div >
     );
 };

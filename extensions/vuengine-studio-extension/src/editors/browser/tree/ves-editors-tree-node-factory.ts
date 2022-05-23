@@ -2,12 +2,15 @@ import { TreeEditor } from '@eclipse-emfcloud/theia-tree-editor';
 import { ILogger } from '@theia/core';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { v4 } from 'uuid';
+import { VesProjectService } from '../../../project/browser/ves-project-service';
 import { VesEditorsTreeEditorWidget } from './ves-editors-tree-editor-widget';
 import { VesEditorsTreeLabelProvider } from './ves-editors-tree-label-provider';
-import { registeredTypes } from './ves-editors-tree-schema';
 
 @injectable()
 export class VesEditorsTreeNodeFactory implements TreeEditor.NodeFactory {
+    @inject(VesProjectService)
+    private readonly vesProjectService: VesProjectService;
+
     constructor(
         @inject(VesEditorsTreeLabelProvider)
         private readonly labelProvider: VesEditorsTreeLabelProvider,
@@ -64,7 +67,7 @@ export class VesEditorsTreeNodeFactory implements TreeEditor.NodeFactory {
             return false;
         }
 
-        const childTypes = Object.values(registeredTypes).filter(registeredType =>
+        const childTypes = Object.values(this.vesProjectService.getRegisteredTypes()).filter(registeredType =>
             registeredType.parent?.typeId === node.jsonforms.type &&
             registeredType.parent?.multiple === true
         );

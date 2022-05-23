@@ -7,10 +7,12 @@ interface VesPaletteControlProps {
     data: string;
     handleChange(path: string, value: string): void;
     path: string;
+    label: string;
 }
 
-const VesPaletteControl = ({ data, handleChange, path }: VesPaletteControlProps) => (
+const VesPaletteControl = ({ data, handleChange, path, label }: VesPaletteControlProps) => (
     <VesPalette
+        label={label}
         value={data}
         updateValue={(newValue: string) => handleChange(path, newValue)}
     />

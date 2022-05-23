@@ -3,9 +3,9 @@ import { codicon, ConfirmDialog, ExpandableTreeNode } from '@theia/core/lib/brow
 import { RenderContextMenuOptions } from '@theia/core/lib/browser/context-menu-renderer';
 import { TreeNode } from '@theia/core/lib/browser/tree/tree';
 import { NodeProps, TreeProps } from '@theia/core/lib/browser/tree/tree-widget';
-import { injectable } from 'inversify';
+import { inject, injectable } from 'inversify';
 import * as React from 'react';
-import { registeredTypes } from './ves-editors-tree-schema';
+import { VesProjectService } from '../../../project/browser/ves-project-service';
 
 export const VES_TREE_PROPS = {
     ...TREE_PROPS,
@@ -14,6 +14,9 @@ export const VES_TREE_PROPS = {
 
 @injectable()
 export class VesMasterTreeWidget extends MasterTreeWidget {
+    @inject(VesProjectService)
+    protected readonly vesProjectService: VesProjectService;
+
     protected renderTailDecorations(
         node: TreeNode,
         props: NodeProps
@@ -53,6 +56,7 @@ export class VesMasterTreeWidget extends MasterTreeWidget {
     protected vesCreateRemoveHandler(node: TreeEditor.Node): (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void {
         return event => {
             event.stopPropagation();
+            const registeredTypes = this.vesProjectService.getRegisteredTypes();
             const typeLabel = registeredTypes[node.jsonforms.type].schema.title;
             const dialog = new ConfirmDialog({
                 title: 'Delete Node?',
@@ -68,6 +72,7 @@ export class VesMasterTreeWidget extends MasterTreeWidget {
 
     protected vesCreateAddHandler(node: TreeEditor.Node): (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void {
         return event => {
+            const registeredTypes = this.vesProjectService.getRegisteredTypes();
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const addHandler = (property: string, type: string): any =>
                 this.onAddEmitter.fire({ node, property, type });
