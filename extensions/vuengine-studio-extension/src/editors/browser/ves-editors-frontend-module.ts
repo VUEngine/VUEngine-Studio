@@ -25,7 +25,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(VesEditorsTreeModelService).toSelf().inSingletonScope();
     bind(VesEditorsTreeLabelProvider).toSelf().inSingletonScope();
 
-    bind(VesDetailFormWidget).toSelf().inSingletonScope();
+    bind(VesDetailFormWidget).toSelf();
 
     bind<WidgetFactory>(WidgetFactory).toDynamicValue(context => ({
         id: VesEditorsTreeEditorWidget.WIDGET_ID,

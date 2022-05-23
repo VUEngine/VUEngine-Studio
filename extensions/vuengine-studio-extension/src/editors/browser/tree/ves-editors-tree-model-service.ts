@@ -1,11 +1,14 @@
 import { TreeEditor } from '@eclipse-emfcloud/theia-tree-editor';
 import { JsonSchema, UISchemaElement } from '@jsonforms/core';
 import { MaybePromise } from '@theia/core';
-import { injectable } from '@theia/core/shared/inversify';
-import { registeredTypes } from './ves-editors-tree-schema';
+import { inject, injectable } from '@theia/core/shared/inversify';
+import { VesProjectService } from '../../../project/browser/ves-project-service';
 
 @injectable()
 export class VesEditorsTreeModelService implements TreeEditor.ModelService {
+    @inject(VesProjectService)
+    readonly vesProjectService: VesProjectService;
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     getDataForNode(node: TreeEditor.Node): MaybePromise<any> {
         return node.jsonforms.data;
@@ -13,6 +16,7 @@ export class VesEditorsTreeModelService implements TreeEditor.ModelService {
 
     getSchemaForNode(node: TreeEditor.Node): MaybePromise<JsonSchema | undefined> {
         const definitions = {};
+        const registeredTypes = this.vesProjectService.getRegisteredTypes();
         Object.keys(registeredTypes).forEach(key => {
             if (registeredTypes[key] !== undefined) {
                 // @ts-ignore
@@ -31,11 +35,13 @@ export class VesEditorsTreeModelService implements TreeEditor.ModelService {
             return undefined;
         }
 
+        const registeredTypes = this.vesProjectService.getRegisteredTypes();
         return registeredTypes[type]?.schema;
     }
 
     getUiSchemaForNode(node: TreeEditor.Node): MaybePromise<UISchemaElement | undefined> {
         const type = node.jsonforms.type;
+        const registeredTypes = this.vesProjectService.getRegisteredTypes();
 
         if (registeredTypes[type].uiSchema !== undefined) {
             return registeredTypes[type].uiSchema;
@@ -47,6 +53,8 @@ export class VesEditorsTreeModelService implements TreeEditor.ModelService {
     getChildrenMapping(): Map<string, TreeEditor.ChildrenDescriptor[]> {
         const childrenMapping: Map<string, TreeEditor.ChildrenDescriptor[]> = new Map([]);
 
+        /* const registeredTypes = this.vesProjectService.getRegisteredTypes();
+
         Object.keys(registeredTypes).forEach(key => {
             const childTypes = Object.values(registeredTypes).filter(registeredType =>
                 registeredType.parent?.typeId === key
@@ -57,12 +65,13 @@ export class VesEditorsTreeModelService implements TreeEditor.ModelService {
                 property: 'children',
                 children: childTypeIds
             }]);
-        });
+        }); */
 
         return childrenMapping;
     }
 
     getNameForType(typeId: string): string {
+        const registeredTypes = this.vesProjectService.getRegisteredTypes();
         return registeredTypes[typeId]?.schema?.title || typeId;
     }
 }

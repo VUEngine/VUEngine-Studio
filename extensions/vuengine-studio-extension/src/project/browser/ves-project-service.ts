@@ -5,12 +5,14 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VES_PREFERENCE_DIR } from '../../branding/browser/ves-branding-preference-configurations';
 import { VesCommonService } from '../../branding/browser/ves-common-service';
+import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
+import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-service';
+import { USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } from '../../plugins/browser/ves-plugins-types';
 import { VesNewProjectTemplate } from './new-project/ves-new-project-form';
-import { ProjectFile, ProjectFileType } from './ves-project-types';
+import { ProjectFile, ProjectFileType, ProjectFileTypes, ProjectFileTypesCombined, ProjectFileWithContributor, RegisteredTypes } from './ves-project-types';
 
 const replaceInFiles = require('replace-in-files');
 
@@ -18,8 +20,12 @@ const replaceInFiles = require('replace-in-files');
 export class VesProjectService {
   @inject(FileService)
   protected fileService: FileService;
+  @inject(VesBuildPathsService)
+  private readonly vesBuildPathsService: VesBuildPathsService;
   @inject(VesCommonService)
   private readonly vesCommonService: VesCommonService;
+  @inject(VesPluginsPathsService)
+  private readonly vesPluginsPathsService: VesPluginsPathsService;
   @inject(WorkspaceService)
   private readonly workspaceService: WorkspaceService;
 
@@ -28,10 +34,18 @@ export class VesProjectService {
     return this._ready.promise;
   }
 
+  // registered types
+  protected _registeredTypes: RegisteredTypes;
+  getRegisteredTypes(): RegisteredTypes {
+    return this._registeredTypes;
+  }
+
   // project data
-  protected _projectData: ProjectFile = {
+  protected _projectData: ProjectFile & ProjectFileTypesCombined = {
     plugins: [],
     types: {},
+    typesCombined: {},
+    contributions: {},
   };
   protected readonly onDidChangeProjectDataEmitter = new Emitter<void>();
   readonly onDidChangeProjectData = this.onDidChangeProjectDataEmitter.event;
@@ -59,33 +73,115 @@ export class VesProjectService {
 
   @postConstruct()
   protected async init(): Promise<void> {
-    // watch for project config file changes
     await this.readProjectData();
-    const projectFileUri = await this.getProjectConfigFileUri();
+    /* const projectFileUri = await this.getProjectConfigFileUri();
     if (projectFileUri) {
+      // watch for project config file changes
       this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
         if (fileChangesEvent.contains(projectFileUri)) {
           await this.readProjectData();
           this.onDidChangeProjectDataEmitter.fire();
         }
       });
-    }
+    } */
 
     this._ready.resolve();
   }
 
   protected async readProjectData(): Promise<void> {
-    const projectFileUri = await this.getProjectConfigFileUri();
+    const typesCombined: ProjectFileTypes = {};
+
+    // workspace
+    const workspaceProjectFileData = await this.readProjectFileData();
+
+    // engine
+    const engineCoreUri = await this.vesBuildPathsService.getEngineCoreUri();
+    const engineCoreProjectFileData = await this.readProjectFileData(engineCoreUri);
+
+    // installed plugins
+    const pluginsProjectDataWithContributors: ProjectFileWithContributor[] = [];
+    const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
+    const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
+    await Promise.all(workspaceProjectFileData.plugins.map(async installedPlugin => {
+      let uri: URI | undefined;
+      if (installedPlugin.startsWith(VUENGINE_PLUGINS_PREFIX)) {
+        uri = enginePluginsUri.resolve(installedPlugin.replace(VUENGINE_PLUGINS_PREFIX, ''));
+      } else if (installedPlugin.startsWith(USER_PLUGINS_PREFIX)) {
+        uri = userPluginsUri.resolve(installedPlugin.replace(USER_PLUGINS_PREFIX, ''));
+      }
+      if (uri) {
+        const data = await this.readProjectFileData(uri);
+        pluginsProjectDataWithContributors.push({
+          contributor: `plugin:${installedPlugin}`,
+          data
+        });
+      }
+    }));
+
+    const projectDataWithContributors: ProjectFileWithContributor[] = [
+      {
+        contributor: 'engine',
+        data: engineCoreProjectFileData
+      },
+      ...pluginsProjectDataWithContributors,
+      {
+        contributor: 'workspace',
+        data: workspaceProjectFileData
+      },
+    ];
+
+    this._registeredTypes = {};
+    projectDataWithContributors.forEach(projectDataWithContributor => {
+      // add to combined types
+      if (projectDataWithContributor.data.types) {
+        Object.keys(projectDataWithContributor.data.types).forEach(typeId => {
+          Object.keys(projectDataWithContributor.data.types[typeId]).forEach(itemId => {
+            if (typesCombined[typeId] === undefined) {
+              typesCombined[typeId] = {};
+            }
+            typesCombined[typeId][itemId] = {
+              _contributor: projectDataWithContributor.contributor,
+              ...projectDataWithContributor.data.types[typeId][itemId],
+            };
+          });
+        });
+      }
+
+      // add to registered types
+      if (projectDataWithContributor.data.contributions?.types) {
+        Object.keys(projectDataWithContributor.data.contributions.types).forEach(typeId => {
+          this._registeredTypes[typeId] = {
+            _contributor: projectDataWithContributor.contributor,
+            schema: {},
+            ...projectDataWithContributor.data.contributions?.types![typeId],
+          };
+        });
+      }
+    });
+
+    this._projectData = {
+      plugins: workspaceProjectFileData.plugins,
+      types: workspaceProjectFileData.types,
+      typesCombined,
+    };
+  }
+
+  protected async readProjectFileData(projectRootUri?: URI): Promise<ProjectFile> {
+    const projectFileUri = await this.getProjectConfigFileUri(projectRootUri);
     if (projectFileUri) {
       if (await this.fileService.exists(projectFileUri)) {
         const configFileContents = await this.fileService.readFile(projectFileUri);
         try {
-          this._projectData = JSON.parse(configFileContents.value.toString()) as ProjectFile;
+          return JSON.parse(configFileContents.value.toString());
         } catch (error) {
-          console.error('Malformed project file could not be parsed.');
+          console.error('Malformed project file could not be parsed.', projectRootUri?.path.toString());
         }
       };
     }
+    return {
+      plugins: [],
+      types: {}
+    };
   }
 
   async saveProjectFile(): Promise<boolean> {
@@ -97,7 +193,10 @@ export class VesProjectService {
     try {
       this.fileService.writeFile(
         projectFileUri,
-        BinaryBuffer.fromString(JSON.stringify(this._projectData, undefined, 4))
+        BinaryBuffer.fromString(JSON.stringify({
+          plugins: this._projectData.plugins,
+          types: this._projectData.types,
+        }, undefined, 4))
       );
       return true;
     } catch (error) {

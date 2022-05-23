@@ -1,0 +1,11 @@
+.theia-tree-editor .control .input-with-decoration {
+  align-items: baseline;
+  background: var(--theia-input-background);
+  display: flex;
+  flex-direction: row;
+}
+
+.theia-tree-editor .input-with-decoration input,
+.theia-tree-editor .input-with-decoration .theia-select-component {
+  flex-grow: 1;
+}

@@ -1,11 +1,14 @@
-import { injectable } from '@theia/core/shared/inversify';
-import { LabelProviderContribution } from '@theia/core/lib/browser';
-import { VesEditorsTreeEditorWidget } from './ves-editors-tree-editor-widget';
 import { TreeEditor } from '@eclipse-emfcloud/theia-tree-editor';
-import { registeredTypes } from './ves-editors-tree-schema';
+import { LabelProviderContribution } from '@theia/core/lib/browser';
+import { inject, injectable } from '@theia/core/shared/inversify';
+import { VesProjectService } from '../../../project/browser/ves-project-service';
+import { VesEditorsTreeEditorWidget } from './ves-editors-tree-editor-widget';
 
 @injectable()
 export class VesEditorsTreeLabelProvider implements LabelProviderContribution {
+    @inject(VesProjectService)
+    readonly vesProjectService: VesProjectService;
+
     public canHandle(element: object): number {
         if ((TreeEditor.Node.is(element) || TreeEditor.CommandIconInfo.is(element))
             && element.editorId === VesEditorsTreeEditorWidget.WIDGET_ID) {
@@ -16,6 +19,7 @@ export class VesEditorsTreeLabelProvider implements LabelProviderContribution {
 
     public getIcon(element: object): string | undefined {
         let iconClass: string | undefined;
+        const registeredTypes = this.vesProjectService.getRegisteredTypes();
         if (TreeEditor.CommandIconInfo.is(element)) {
             iconClass = registeredTypes[element.type]?.icon || 'fa fa-question-circle';
         } else if (TreeEditor.Node.is(element)) {
@@ -37,6 +41,7 @@ export class VesEditorsTreeLabelProvider implements LabelProviderContribution {
     }
 
     private getTypeName(typeId: string): string {
+        const registeredTypes = this.vesProjectService.getRegisteredTypes();
         return registeredTypes[typeId]?.schema?.title || typeId;
     }
 }

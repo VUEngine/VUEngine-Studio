@@ -1,28 +1,46 @@
 import { JsonSchema } from '@jsonforms/core';
 
+export interface ProjectFileWithContributor {
+  contributor: string
+  data: ProjectFile
+}
+
 export interface ProjectFileType {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [id: string]: any;
+  [id: string]: any
+};
+
+export interface ProjectFileTypes {
+  [typeId: string]: ProjectFileType
+};
+
+export interface ProjectFileContribution {
+  types?: ProjectFileTypes
 };
 
 export interface ProjectFile {
   plugins: string[]
-  types: {
-    [typeId: string]: ProjectFileType
-  }
+  types: ProjectFileTypes
+  contributions?: ProjectFileContribution
+};
+
+export interface ProjectFileTypesCombined {
+  typesCombined: ProjectFileTypes
 };
 
 export interface RegisteredTypeParent {
-  typeId: string,
-  multiple: boolean,
+  typeId: string
+  multiple: boolean
 };
 
 export interface RegisteredType {
-  schema: JsonSchema,
-  uiSchema?: any, // eslint-disable-line @typescript-eslint/no-explicit-any
-  parent?: RegisteredTypeParent,
-  icon: string,
-  leaf?: boolean,
+  _contributor: string
+  schema: JsonSchema
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  uiSchema?: any
+  parent?: RegisteredTypeParent
+  icon?: string
+  leaf?: boolean
 };
 
 export interface RegisteredTypes {

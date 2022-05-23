@@ -11,7 +11,6 @@ import {
 import { inject, injectable } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { registeredTypes } from '../../../editors/browser/tree/ves-editors-tree-schema';
 import { VesEditorUri } from '../../../editors/browser/ves-editor-uri';
 import { VesProjectService } from '../ves-project-service';
 import { VesProjectChildNode, VesProjectDocumentChild, VesProjectDocumentsTree, VesProjectRootNode } from './ves-project-tree';
@@ -64,6 +63,7 @@ export class VesProjectTreeWidget extends TreeWidget {
     };
 
     await this.vesProjectService.ready;
+    const registeredTypes = this.vesProjectService.getRegisteredTypes();
     Object.values(registeredTypes).forEach(registeredType => {
       if (!registeredType.parent) {
         const typeId = registeredType.schema.properties?.typeId.const;
@@ -97,9 +97,12 @@ export class VesProjectTreeWidget extends TreeWidget {
                   name: item.name
                     || registeredTypes[childTypeId]?.schema?.title
                     || childTypeId,
-                  iconClass: childType.icon,
+                  iconClass: childType.icon ?? '',
                 });
               });
+
+              // sort children by name
+              childNode.children?.sort((a, b) => a.name > b.name && 1 || -1);
             });
           }
 
@@ -107,6 +110,9 @@ export class VesProjectTreeWidget extends TreeWidget {
         }
       }
     });
+
+    // sort entries by name
+    documents.members.sort((a, b) => a.name > b.name && 1 || -1);
 
     const root: VesProjectRootNode = {
       id: 'ves-project-root',

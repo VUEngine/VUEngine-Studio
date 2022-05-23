@@ -30,12 +30,22 @@
   margin: 0;
 }
 
+.control>.input-description,
+.control>.validation {
+  margin-bottom: 4px !important;
+}
+
 .horizontal-layout {
   gap: var(--theia-ui-padding);
 }
 
 .theia-tree-editor-tree .tree-icon-container .fa {
   margin: 0 auto;
+}
+
+.theia-tree-editor .control>.input-description {
+  /* font-size: 80%; */
+  opacity: .5;
 }
 
 /* Custom */
