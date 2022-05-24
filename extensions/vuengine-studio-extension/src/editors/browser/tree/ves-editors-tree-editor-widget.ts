@@ -45,7 +45,7 @@ export class VesEditorsTreeEditorWidget extends NavigatableTreeEditorWidget {
             formWidget,
             workspaceService,
             logger,
-            VesEditorsTreeEditorWidget.WIDGET_ID,
+            `${VesEditorsTreeEditorWidget.WIDGET_ID}:${options.id}`,
             options
         );
     }
@@ -60,6 +60,8 @@ export class VesEditorsTreeEditorWidget extends NavigatableTreeEditorWidget {
         if (this.instanceData.children === undefined && !this.hasClass('form-only')) {
             this.addClass('form-only');
         }
+
+        this.addClass('loaded');
 
         this.autoSave = this.editorPreferences['files.autoSave'];
         this.autoSaveDelay = this.editorPreferences['files.autoSaveDelay'];
