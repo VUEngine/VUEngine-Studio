@@ -54,6 +54,14 @@
   padding: calc(var(--theia-ui-padding) * 2);
 }
 
+.theia-tree-editor>.p-Widget {
+  visibility: hidden;
+}
+
+.theia-tree-editor.loaded>.p-Widget {
+  visibility: visible;
+}
+
 .theia-tree-editor-form {
   /* border-left: 1px solid var(--theia-input-background); */
   padding: 0 calc(var(--theia-ui-padding) * 2);
@@ -72,12 +80,12 @@
   margin-bottom: 0.25em;
 }
 
-#ves-tree-editor.form-only>.p-SplitPanel>.theia-Tree,
-#ves-tree-editor.form-only>.p-SplitPanel>.p-SplitPanel-handle {
+.theia-tree-editor.form-only>.p-SplitPanel>.theia-Tree,
+.theia-tree-editor.form-only>.p-SplitPanel>.p-SplitPanel-handle {
   display: none;
 }
 
-#ves-tree-editor.form-only>.p-SplitPanel>.theia-tree-editor-form {
+.theia-tree-editor.form-only>.p-SplitPanel>.theia-tree-editor-form {
   left: 0 !important;
   width: 100% !important;
 }

@@ -6,7 +6,6 @@ import { VesEditorUri } from './ves-editor-uri';
 
 @injectable()
 export class VesEditorsOpenHandler extends WidgetOpenHandler<VesEditorsTreeEditorWidget> {
-
     readonly id = VesEditorsTreeEditorWidget.WIDGET_ID;
 
     canHandle(uri: URI): number {
