@@ -82,6 +82,10 @@ export class VesEditorsTreeEditorWidget extends NavigatableTreeEditorWidget {
         return this.load();
     }
 
+    getResourceUri(): URI | undefined {
+        return;
+    }
+
     applySnapshot(snapshot: { value: string }): void {
         super.applySnapshot(snapshot);
         this.setTreeData(false);
