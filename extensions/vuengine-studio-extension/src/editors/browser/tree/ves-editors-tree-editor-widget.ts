@@ -52,6 +52,8 @@ export class VesEditorsTreeEditorWidget extends NavigatableTreeEditorWidget {
 
     @postConstruct()
     protected async init(): Promise<void> {
+        await this.vesProjectService.ready;
+
         await this.load();
         super.init();
 
@@ -90,18 +92,17 @@ export class VesEditorsTreeEditorWidget extends NavigatableTreeEditorWidget {
     }
 
     protected configureTitle(title: Title<Widget>): void {
-        super.configureTitle(title);
-
         const typeData = this.vesProjectService.getRegisteredTypes()[this.instanceData.typeId];
         title.label = this.instanceData.name
             ? `${typeData.schema.title}: ${this.instanceData.name}`
             : typeData.schema.title!;
         title.caption = '';
+        title.closable = true;
         title.iconClass = typeData?.icon ?? 'fa fa-file';
     }
 
     public async save(): Promise<void> {
-        const idParts = this.options.id.substring(1).split('/');
+        const idParts = this.options.id.split('/');
         const typeId = idParts[0];
         const itemId = idParts[1];
         const success = await this.vesProjectService.setProjectDataItem(typeId, itemId, this.instanceData);
@@ -116,7 +117,7 @@ export class VesEditorsTreeEditorWidget extends NavigatableTreeEditorWidget {
     }
 
     protected async load(): Promise<void> {
-        const idParts = this.options.id.substring(1).split('/');
+        const idParts = this.options.id.split('/');
         const typeId = idParts[0];
         const itemId = idParts[1];
         this.instanceData = this.vesProjectService.getProjectDataItem(typeId, itemId);
