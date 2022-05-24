@@ -12,11 +12,9 @@ import { VesEditorsTreeNodeFactory } from './tree/ves-editors-tree-node-factory'
 import { VesDetailFormWidget } from './ves-editors-detail-form-widget';
 import { VesEditorsOpenHandler } from './ves-editors-open-handler';
 import { VesEditorsTreeContribution } from './ves-editors-tree-contribution';
-import { VesEditorsTreeLabelProviderContribution } from './ves-editors-tree-label-provider-contribution';
 import '../../../src/editors/browser/style/index.css';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
-    bind(LabelProviderContribution).to(VesEditorsTreeLabelProviderContribution);
     bind(OpenHandler).to(VesEditorsTreeContribution);
     bind(MenuContribution).to(VesEditorsTreeContribution);
     bind(CommandContribution).to(VesEditorsTreeContribution);

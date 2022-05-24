@@ -27,12 +27,6 @@ export class VesEditorsTreeContribution extends BaseTreeEditorContribution {
     readonly label = 'Visual Editor';
 
     canHandle(uri: URI): number {
-        if (uri.path.ext === '.entity' ||
-            uri.path.ext === '.image' ||
-            uri.path.ext === '.project' ||
-            uri.path.ext === '.romHeader') {
-            return 1000;
-        }
         return 0;
     }
 
