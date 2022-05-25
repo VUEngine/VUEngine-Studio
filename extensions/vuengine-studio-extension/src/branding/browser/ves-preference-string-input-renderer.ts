@@ -28,8 +28,9 @@ export class VesPreferenceStringInputRenderer extends PreferenceStringInputRende
             button.onblur = this.handleBlur;
             const buttonIcon = document.createElement('i');
             buttonIcon.style.fontSize = '16px';
-            button.classList.add('fa');
-            button.classList.add('fa-ellipsis-h');
+            buttonIcon.style.verticalAlign = 'middle';
+            buttonIcon.classList.add('fa');
+            buttonIcon.classList.add('fa-ellipsis-h');
             button.appendChild(buttonIcon);
             wrapper.appendChild(button);
 
