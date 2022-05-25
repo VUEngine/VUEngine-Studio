@@ -1,3 +1,5 @@
+import vesImagesControl from './images/ves-images-control';
+import vesImagesControlTester from './images/ves-images-control-tester';
 import vesInputControl from './input/ves-input-control';
 import vesInputControlTester from './input/ves-input-control-tester';
 import vesIntroControl from './intro/ves-intro-control';
@@ -10,6 +12,7 @@ import vesRatingControl from './starRating/ves-rating-control';
 import vesRatingControlTester from './starRating/ves-rating-control-tester';
 
 export const VES_RENDERERS = [
+    { tester: vesImagesControlTester, renderer: vesImagesControl },
     { tester: vesIntroControlTester, renderer: vesIntroControl },
     { tester: vesInputControlTester, renderer: vesInputControl },
     { tester: vesMeshesControlTester, renderer: vesMeshesControl },

@@ -5,7 +5,8 @@ import {
     EnumCellProps,
     isControl,
     isDescriptionHidden, isIntegerControl, isOneOfControl, RankedTester,
-    rankWith
+    rankWith,
+    scopeEndsWith
 } from '@jsonforms/core';
 import {
     Control,
@@ -17,6 +18,7 @@ import { withVanillaControlProps } from '@jsonforms/vanilla-renderers/lib/util';
 import VesInteger from './ves-integer';
 import merge from 'lodash/merge';
 import VesDropdown from './ves-dropdown';
+import VesFolder from './ves-folder';
 
 export class VesInputControl extends Control<
     ControlProps & EnumCellProps & VanillaRendererProps,
@@ -83,6 +85,15 @@ export class VesInputControl extends Control<
                     id={id + '-input'}
                     options={options}
                 />}
+                {scopeEndsWith('/folder') &&
+                    !isOneOfControl(uischema, schema) &&
+                    !isIntegerControl(uischema, schema) &&
+                    <VesFolder
+                        uischema={uischema}
+                        schema={schema}
+                        path={path}
+                        id={id + '-input'}
+                    />}
                 <div className={divClassNames}>
                     {!isValid ? errors : showDescription ? description : undefined}
                 </div>

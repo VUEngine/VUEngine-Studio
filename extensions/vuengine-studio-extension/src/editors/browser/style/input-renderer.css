@@ -1,6 +1,4 @@
 .theia-tree-editor .control .input-with-decoration {
-  align-items: baseline;
-  background: var(--theia-input-background);
   display: flex;
   flex-direction: row;
 }
@@ -8,4 +6,18 @@
 .theia-tree-editor .input-with-decoration input,
 .theia-tree-editor .input-with-decoration .theia-select-component {
   flex-grow: 1;
+}
+
+.theia-tree-editor .input-with-decoration .prefix {
+  align-items: center;
+  display: flex;
+}
+
+.theia-tree-editor .input-with-decoration button {
+  min-width: 40px;
+}
+
+.theia-tree-editor .input-with-decoration button i {
+  font-size: 16px;
+  vertical-align: middle;
 }
