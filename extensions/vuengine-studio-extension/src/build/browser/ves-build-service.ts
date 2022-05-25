@@ -941,28 +941,24 @@ export class VesBuildService {
       placeholder: 'Select which mode to build in'
     };
 
-    const buildTypes = [
+    const buildTypes: QuickPickItem[] = [
       {
         label: BuildMode.Release,
-        value: BuildMode.Release,
         detail: '   Includes no asserts or debug flags, for shipping only.',
         iconClasses: (BuildMode.Release === currentBuildMode) ? ['fa', 'fa-check-square-o'] : ['fa', 'fa-square-o'],
       },
       {
         label: BuildMode.Beta,
-        value: BuildMode.Beta,
         detail: '   Includes selected asserts, for testing the performance on hardware.',
         iconClasses: (BuildMode.Beta === currentBuildMode) ? ['fa', 'fa-check-square-o'] : ['fa', 'fa-square-o'],
       },
       {
         label: BuildMode.Tools,
-        value: BuildMode.Tools,
         detail: '   Includes selected asserts, includes debugging tools.',
         iconClasses: (BuildMode.Tools === currentBuildMode) ? ['fa', 'fa-check-square-o'] : ['fa', 'fa-square-o'],
       },
       {
         label: BuildMode.Debug,
-        value: BuildMode.Debug,
         detail: '   Includes all runtime assertions, includes debugging tools.',
         iconClasses: (BuildMode.Debug === currentBuildMode) ? ['fa', 'fa-check-square-o'] : ['fa', 'fa-square-o'],
       }
