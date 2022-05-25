@@ -10,7 +10,7 @@ import { SelectComponent } from '@theia/core/lib/browser/widgets/select-componen
 import React from 'react';
 
 export const VesDropdown = (props: EnumCellProps & VanillaRendererProps) => {
-    const { data, id, uischema, path, handleChange, options } = props;
+    const { data, id, schema, uischema, path, handleChange, options } = props;
     return (
         <div className='input-with-decoration'>
             {uischema.options?.inputPrefix &&
@@ -18,7 +18,11 @@ export const VesDropdown = (props: EnumCellProps & VanillaRendererProps) => {
             <SelectComponent
                 key={id}
                 value={data}
-                options={options || []}
+                options={schema.oneOf?.map(option => ({
+                    label: option.title || option.const,
+                    value: option.const,
+                    description: option.description || '',
+                })) || options || []}
                 onChange={option => handleChange(path, option.value)} />
         </div>
     );
