@@ -55,6 +55,10 @@ export class VesEditorsTreeEditorWidget extends NavigatableTreeEditorWidget {
         await this.vesProjectService.ready;
 
         await this.load();
+        if (!this.instanceData) {
+            return this.close();
+        }
+
         super.init();
 
         if (this.instanceData.children === undefined && !this.hasClass('form-only')) {
@@ -127,7 +131,9 @@ export class VesEditorsTreeEditorWidget extends NavigatableTreeEditorWidget {
         const typeId = idParts[0];
         const itemId = idParts[1];
         this.instanceData = this.vesProjectService.getProjectDataItem(typeId, itemId);
-        await this.setTreeData(false);
+        if (this.instanceData) {
+            await this.setTreeData(false);
+        }
     }
 
     protected setTreeData(error: boolean): Promise<void> {

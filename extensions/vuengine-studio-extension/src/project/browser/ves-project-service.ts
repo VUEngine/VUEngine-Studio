@@ -62,6 +62,12 @@ export class VesProjectService {
     this.onDidChangeProjectDataEmitter.fire();
     return this.saveProjectFile();
   }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async deleteProjectDataItem(typeId: string, itemId: string): Promise<boolean> {
+    delete (this._projectData.types[typeId][itemId]);
+    this.onDidChangeProjectDataEmitter.fire();
+    return this.saveProjectFile();
+  }
   getProjectPlugins(): string[] {
     return this._projectData.plugins;
   }

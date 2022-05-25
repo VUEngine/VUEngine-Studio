@@ -1,6 +1,7 @@
 import { CommandService } from '@theia/core';
 import {
   codicon,
+  ConfirmDialog,
   ContextMenuRenderer, ExpandableTreeNode,
   LabelProvider,
   NodeProps,
@@ -11,6 +12,7 @@ import {
 import { inject, injectable } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { v4 as uuid } from 'uuid';
 import { VesEditorUri } from '../../../editors/browser/ves-editor-uri';
 import { VesProjectService } from '../ves-project-service';
 import { VesProjectChildNode, VesProjectDocumentChild, VesProjectDocumentsTree, VesProjectRootNode } from './ves-project-tree';
@@ -94,7 +96,7 @@ export class VesProjectTreeWidget extends TreeWidget {
                 childNode.children.push({
                   typeId: childTypeId,
                   uri: VesEditorUri.toUri(`${childTypeId}/${id}`),
-                  name: item.name
+                  name: item?.name
                     || registeredTypes[childTypeId]?.schema?.title
                     || childTypeId,
                   iconClass: childType.icon ?? '',
@@ -148,7 +150,7 @@ export class VesProjectTreeWidget extends TreeWidget {
           ? (
             <div
               className={`node-button ${codicon('plus')}`}
-              onClick={this.createAddHandler(node)}
+              onClick={this.createAddHandler(node as VesProjectChildNode)}
             />
           )
           : ('')}
@@ -156,7 +158,7 @@ export class VesProjectTreeWidget extends TreeWidget {
           ? (
             <div
               className={`node-button ${codicon('trash')}`}
-              onClickCapture={this.createRemoveHandler(node)}
+              onClickCapture={this.createRemoveHandler(node as VesProjectChildNode)}
             />
           )
           : ('')}
@@ -164,53 +166,63 @@ export class VesProjectTreeWidget extends TreeWidget {
     );
   }
 
-  protected createRemoveHandler(node: TreeNode): (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void {
+  protected createRemoveHandler(node: VesProjectChildNode): (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void {
     return event => {
       event.stopPropagation();
-      /*
-      const typeLabel = registeredTypes[node.jsonforms.type].schema.title;
+      const name = node.name ? `"${node.name}"` : 'this node';
       const dialog = new ConfirmDialog({
         title: 'Delete Node?',
-        msg: `Are you sure you want to delete the ${typeLabel} "${node.name}"?`
+        msg: `Are you sure you want to delete ${name}?`
       });
       dialog.open().then(remove => {
         if (remove && node.parent && node.parent && TreeNode.is(node.parent)) {
-          this.onDeleteEmitter.fire(node);
+          this.deleteNode(node as VesProjectChildNode);
         }
       });
-      */
     };
   }
 
-  protected createAddHandler(node: TreeNode): (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void {
+  protected createAddHandler(node: VesProjectChildNode): (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void {
     return event => {
       event.stopPropagation();
-      /*
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const addHandler = (property: string, type: string): any =>
-        this.onAddEmitter.fire({ node, property, type });
-
       // find which types can be children of current project node
+      const registeredTypes = this.vesProjectService.getRegisteredTypes();
       const childTypes = Object.values(registeredTypes).filter(registeredType =>
-        registeredType.parent?.typeId === node.typeId;
+        registeredType.parent?.typeId === node.member?.typeId
       );
       if (childTypes.length === 1) {
-        addHandler('children', childTypes[0].schema.properties?.typeId.const);
+        this.addNode(node as VesProjectChildNode, childTypes[0].schema.properties?.typeId.const);
       } else {
-        const treeAnchor: TreeAnchor = {
-          x: event.nativeEvent.x,
-          y: event.nativeEvent.y,
-          node: node,
-          onClick: addHandler
-        };
-        const renderOptions: RenderContextMenuOptions = {
-          menuPath: TreeContextMenu.ADD_MENU,
-          anchor: treeAnchor
-        };
-        this.contextMenuRenderer.render(renderOptions);
+        // TODO: add context menu for type selection
+        console.error('multiple child types are not supported');
       }
-      */
     };
+  }
+
+  protected async deleteNode(node: Readonly<VesProjectChildNode>): Promise<void> {
+    const nodeId = node.member?.uri?.path.toString();
+    const nodeIdParts = nodeId?.split('/');
+    const typeId = nodeIdParts && nodeIdParts[0];
+    const itemId = nodeIdParts && nodeIdParts[1];
+
+    if (typeId && itemId) {
+      this.vesProjectService.deleteProjectDataItem(typeId, itemId);
+      await this.setTreeData();
+    } else {
+      console.error('Could not delete', typeId, itemId);
+    }
+  }
+
+  protected async addNode(node: Readonly<VesProjectChildNode>, typeId: string): Promise<void> {
+    const newItemId = uuid();
+    // TODO: properly create new item with default values
+    this.vesProjectService.setProjectDataItem(typeId, newItemId, {
+      typeId,
+      name: 'New'
+    });
+    await this.setTreeData();
+    const uri = VesEditorUri.toUri(`${typeId}/${newItemId}`);
+    await open(this.openerService, uri, { mode: 'reveal' });
   }
 
   protected createNodeClassNames(node: TreeNode, props: NodeProps): string[] {

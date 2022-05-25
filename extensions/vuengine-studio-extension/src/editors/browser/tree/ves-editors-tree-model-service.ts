@@ -15,16 +15,15 @@ export class VesEditorsTreeModelService implements TreeEditor.ModelService {
     }
 
     getSchemaForNode(node: TreeEditor.Node): MaybePromise<JsonSchema | undefined> {
-        const definitions = {};
+        const definitions: { [typeId: string]: JsonSchema } = {};
         const registeredTypes = this.vesProjectService.getRegisteredTypes();
         Object.keys(registeredTypes).forEach(key => {
             if (registeredTypes[key] !== undefined) {
-                // @ts-ignore
                 definitions[key] = registeredTypes[key].schema;
             }
-
         });
         return {
+            // @ts-ignore
             definitions,
             ...this.getSchemaForType(node.jsonforms.type),
         };
