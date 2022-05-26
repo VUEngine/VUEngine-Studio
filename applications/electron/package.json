@@ -3,7 +3,7 @@
   "name": "vuengine-studio",
   "description": "Nintendo Virtual Boy development environment",
   "productName": "VUEngine Studio",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "main": "scripts/ves-electron-main.js",
   "license": "EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0",
   "author": "KR155E <c.radke@posteo.de>",
@@ -37,7 +37,7 @@
             "**/build/*.a": true,
             "**/node_modules/**": true
           },
-          "toolbar.showToolbar": true,
+          "toolbar.showToolbar": false,
           "window.menuBarVisibility": "compact",
           "workspace.preserveWindow": true
         }

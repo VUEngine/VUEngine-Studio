@@ -50,7 +50,7 @@ export class VesAboutDialog extends AboutDialog {
     }
 
     protected renderHeader(): React.ReactNode {
-        // const applicationInfo = this.applicationInfo;
+        const applicationInfo = this.applicationInfo;
         const applicationName = FrontendApplicationConfigProvider.get().applicationName;
 
         return <div className="ves-about-paragraph ves-about-flex-grid">
@@ -61,7 +61,7 @@ export class VesAboutDialog extends AboutDialog {
                 <h1>
                     {applicationName}
                     <span className="ves-about-sub-header">
-                        {/* applicationInfo && ` ${applicationInfo.version}` */} Preview 2
+                        {applicationInfo && ` ${applicationInfo.version}`}
                     </span>
                 </h1>
                 {this.renderCopyright()}
