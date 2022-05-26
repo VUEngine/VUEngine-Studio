@@ -324,13 +324,16 @@ export class VesCodeGenService {
       case TemplateRoot.installedPlugins:
         const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
         const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
-        this.vesPluginsService.getInstalledPlugins().map(installedPlugin => {
-          if (installedPlugin.startsWith(VUENGINE_PLUGINS_PREFIX)) {
-            roots.push(enginePluginsUri.resolve(installedPlugin.replace(VUENGINE_PLUGINS_PREFIX, '')));
-          } else if (installedPlugin.startsWith(USER_PLUGINS_PREFIX)) {
-            roots.push(userPluginsUri.resolve(installedPlugin.replace(USER_PLUGINS_PREFIX, '')));
-          }
-        });
+        const plugins = this.vesPluginsService.getInstalledPlugins();
+        if (plugins) {
+          plugins.map(installedPlugin => {
+            if (installedPlugin.startsWith(VUENGINE_PLUGINS_PREFIX)) {
+              roots.push(enginePluginsUri.resolve(installedPlugin.replace(VUENGINE_PLUGINS_PREFIX, '')));
+            } else if (installedPlugin.startsWith(USER_PLUGINS_PREFIX)) {
+              roots.push(userPluginsUri.resolve(installedPlugin.replace(USER_PLUGINS_PREFIX, '')));
+            }
+          });
+        }
         break;
       case TemplateRoot.engine:
         roots.push(await this.vesBuildPathsService.getEngineCoreUri());

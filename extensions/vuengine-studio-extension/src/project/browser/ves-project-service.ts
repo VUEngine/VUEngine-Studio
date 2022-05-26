@@ -43,6 +43,9 @@ export class VesProjectService {
 
   // project data
   protected _projectData: ProjectFile & ProjectFileTypesCombined = {
+    folders: [{
+      'path': '.'
+    }],
     plugins: [],
     types: {},
     typesCombined: {},
@@ -81,7 +84,11 @@ export class VesProjectService {
   @postConstruct()
   protected async init(): Promise<void> {
     await this.readProjectData();
-    /* const projectFileUri = await this.getProjectConfigFileUri();
+
+    // TODO: react on workspace folders changing
+
+    /* await this.workspaceService.ready;
+    const projectFileUri = this.workspaceService.workspace?.resource;
     if (projectFileUri) {
       // watch for project config file changes
       this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
@@ -97,33 +104,42 @@ export class VesProjectService {
 
   protected async readProjectData(): Promise<void> {
     const typesCombined: ProjectFileTypes = {};
+    await this.workspaceService.ready;
 
     // workspace
-    const workspaceProjectFileData = await this.readProjectFileData();
+    const workspaceProjectFileUri = this.workspaceService.workspace?.resource;
+    const workspaceProjectFileData = await this.readProjectFileData(workspaceProjectFileUri);
 
     // engine
     const engineCoreUri = await this.vesBuildPathsService.getEngineCoreUri();
-    const engineCoreProjectFileData = await this.readProjectFileData(engineCoreUri);
+    const engineCoreProjectFileUri = engineCoreUri.resolve(`core.${VUENGINE_EXT}`);
+    const engineCoreProjectFileData = await this.readProjectFileData(engineCoreProjectFileUri);
 
     // installed plugins
     const pluginsProjectDataWithContributors: ProjectFileWithContributor[] = [];
-    const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
-    const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
-    await Promise.all(workspaceProjectFileData.plugins.map(async installedPlugin => {
-      let uri: URI | undefined;
-      if (installedPlugin.startsWith(VUENGINE_PLUGINS_PREFIX)) {
-        uri = enginePluginsUri.resolve(installedPlugin.replace(VUENGINE_PLUGINS_PREFIX, ''));
-      } else if (installedPlugin.startsWith(USER_PLUGINS_PREFIX)) {
-        uri = userPluginsUri.resolve(installedPlugin.replace(USER_PLUGINS_PREFIX, ''));
-      }
-      if (uri) {
-        const data = await this.readProjectFileData(uri);
-        pluginsProjectDataWithContributors.push({
-          contributor: `plugin:${installedPlugin}`,
-          data
-        });
-      }
-    }));
+    if (workspaceProjectFileData.plugins) {
+      const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
+      const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
+      await Promise.all(workspaceProjectFileData.plugins.map(async installedPlugin => {
+        let uri: URI | undefined;
+        if (installedPlugin.startsWith(VUENGINE_PLUGINS_PREFIX)) {
+          uri = enginePluginsUri
+            .resolve(installedPlugin.replace(VUENGINE_PLUGINS_PREFIX, ''))
+            .resolve(`plugin.${VUENGINE_EXT}`);
+        } else if (installedPlugin.startsWith(USER_PLUGINS_PREFIX)) {
+          uri = userPluginsUri
+            .resolve(installedPlugin.replace(USER_PLUGINS_PREFIX, ''))
+            .resolve(`plugin.${VUENGINE_EXT}`);
+        }
+        if (uri) {
+          const data = await this.readProjectFileData(uri);
+          pluginsProjectDataWithContributors.push({
+            contributor: `plugin:${installedPlugin}`,
+            data
+          });
+        }
+      }));
+    }
 
     const projectDataWithContributors: ProjectFileWithContributor[] = [
       {
@@ -167,32 +183,34 @@ export class VesProjectService {
     });
 
     this._projectData = {
+      folders: workspaceProjectFileData.folders,
       plugins: workspaceProjectFileData.plugins,
       types: workspaceProjectFileData.types,
       typesCombined,
     };
   }
 
-  protected async readProjectFileData(projectRootUri?: URI): Promise<ProjectFile> {
-    const projectFileUri = await this.getProjectConfigFileUri(projectRootUri);
-    if (projectFileUri) {
-      if (await this.fileService.exists(projectFileUri)) {
-        const configFileContents = await this.fileService.readFile(projectFileUri);
-        try {
-          return JSON.parse(configFileContents.value.toString());
-        } catch (error) {
-          console.error('Malformed project file could not be parsed.', projectRootUri?.path.toString());
-        }
-      };
+  protected async readProjectFileData(projectFileUri?: URI): Promise<ProjectFile> {
+    if (projectFileUri && await this.fileService.exists(projectFileUri)) {
+      const configFileContents = await this.fileService.readFile(projectFileUri);
+      try {
+        return JSON.parse(configFileContents.value.toString());
+      } catch (error) {
+        console.error('Malformed project file could not be parsed.', projectFileUri?.path.toString());
+      }
     }
+
     return {
+      folders: [{
+        'path': '.'
+      }],
       plugins: [],
       types: {}
     };
   }
 
   async saveProjectFile(): Promise<boolean> {
-    const projectFileUri = await this.getProjectConfigFileUri();
+    const projectFileUri = this.workspaceService.workspace?.resource;
     if (!projectFileUri) {
       return false;
     }
@@ -201,6 +219,7 @@ export class VesProjectService {
       this.fileService.writeFile(
         projectFileUri,
         BinaryBuffer.fromString(JSON.stringify({
+          folders: this._projectData.folders,
           plugins: this._projectData.plugins,
           types: this._projectData.types,
         }, undefined, 4))
@@ -211,18 +230,13 @@ export class VesProjectService {
     }
   }
 
-  async getProjectName(projectRootUri?: URI): Promise<string> {
+  async getProjectName(projectFileUri?: URI): Promise<string> {
     let projectTitle = '';
-
-    if (projectRootUri && !(await this.fileService.resolve(projectRootUri)).isDirectory) {
-      projectRootUri = projectRootUri.parent;
-    }
 
     // Attempt to retrieve project name from configuration file
     let projectData;
-    if (projectRootUri) {
-      const projectFileUri = await this.getProjectConfigFileUri(projectRootUri);
-      if (projectFileUri && await this.fileService.exists(projectFileUri)) {
+    if (projectFileUri) {
+      if (await this.fileService.exists(projectFileUri)) {
         const configFileContents = await this.fileService.readFile(projectFileUri);
         projectData = JSON.parse(configFileContents.value.toString()) as ProjectFile;
       }
@@ -238,7 +252,7 @@ export class VesProjectService {
     }
 
     // Get from workspace service instead
-    if (!projectTitle && !projectRootUri && this.workspaceService.workspace) {
+    if (!projectTitle && !projectFileUri && this.workspaceService.workspace) {
       if (this.workspaceService.workspace?.isFile) {
         const workspaceParts = this.workspaceService.workspace.name.split('.');
         workspaceParts.pop();
@@ -250,23 +264,10 @@ export class VesProjectService {
 
     // Use base path instead
     if (!projectTitle) {
-      projectTitle = projectRootUri?.path?.base || '';
+      projectTitle = projectFileUri?.path?.base || '';
     }
 
     return projectTitle || 'VUEngine Studio';
-  }
-
-  async getProjectConfigFileUri(projectRootUri?: URI): Promise<URI | undefined> {
-    let workspaceRootUri = undefined;
-
-    if (projectRootUri) {
-      workspaceRootUri = projectRootUri;
-    } else {
-      await this.workspaceService.ready;
-      workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-    }
-
-    return workspaceRootUri && workspaceRootUri.resolve(VES_PREFERENCE_DIR).resolve('Project.json');
   }
 
   async createProjectFromTemplate(
