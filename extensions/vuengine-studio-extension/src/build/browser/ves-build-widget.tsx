@@ -41,7 +41,7 @@ export class VesBuildWidget extends ReactWidget {
   private readonly workspaceService: WorkspaceService;
 
   static readonly ID = 'vesBuildWidget';
-  static readonly LABEL = VesBuildCommands.BUILD.label || 'Build';
+  static readonly LABEL = 'Build';
 
   protected state: VesBuildWidgetState = {
     logFilter: BuildLogLineType.Normal,

@@ -40,7 +40,7 @@ export class VesFlashCartStatusBarContribution implements FrontendApplicationCon
             }
             this.statusBar.setElement('ves-flash-carts', {
                 alignment: StatusBarAlignment.LEFT,
-                command: VesFlashCartCommands.OPEN_WIDGET.id,
+                command: VesFlashCartCommands.WIDGET_TOGGLE.id,
                 priority: 1,
                 // TODO: change to codicon-layout-statusbar once codicon version in Theia got updated
                 text: `$(codicon-browser codicon-flip-y) ${label}`,

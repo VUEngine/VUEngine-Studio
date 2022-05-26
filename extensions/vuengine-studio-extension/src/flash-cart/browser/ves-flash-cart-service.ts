@@ -150,7 +150,7 @@ export class VesFlashCartService {
       this.isQueued = true;
     } else if (outputRomExists && (this.isFlashing ||
       !this.atLeastOneCanHoldRom || this.connectedFlashCarts.length === 0)) {
-      this.commandService.executeCommand(VesFlashCartCommands.OPEN_WIDGET.id);
+      this.commandService.executeCommand(VesFlashCartCommands.WIDGET_TOGGLE.id);
     } else {
       if (outputRomExists) {
         this.flash();
@@ -200,7 +200,7 @@ export class VesFlashCartService {
       const flasherArgs = connectedFlashCart.config.args
         ? connectedFlashCart.config.args
           .replace(NAME_PLACEHOLDER, projectName)
-          .replace(NAME_NO_SPACES_PLACEHOLDER, projectName.replace(/ /g, '').replace('(Workspace)', ''))
+          .replace(NAME_NO_SPACES_PLACEHOLDER, projectName.replace(/ /g, ''))
           .replace(ROM_PLACEHOLDER, await this.fileService.fsPath(romUri))
           .replace(PORT_PLACEHOLDER, connectedFlashCart.port)
           .split(' ')
@@ -227,7 +227,7 @@ export class VesFlashCartService {
 
     this.isFlashing = true;
     this.onDidStartFlashingEmitter.fire();
-    // this.commandService.executeCommand(VesFlashCartCommands.OPEN_WIDGET.id, true);
+    // this.commandService.executeCommand(VesFlashCartCommands.WIDGET_TOGGLE.id, true);
   }
 
   abort(): void {

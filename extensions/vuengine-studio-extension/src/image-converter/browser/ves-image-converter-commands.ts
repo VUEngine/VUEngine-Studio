@@ -14,4 +14,15 @@ export namespace VesImageConverterCommands {
     label: 'Convert changed',
     category: CATEGORY,
   };
+
+  export const WIDGET_TOGGLE: Command = {
+    id: 'VesImageConverter.commands.view.toggle',
+    label: 'Toggle Image Converter View'
+  };
+
+  export const WIDGET_HELP: Command = {
+    id: 'VesImageConverter.commands.view.help',
+    label: 'Show Handbook Page',
+    iconClass: 'codicon codicon-book',
+  };
 };

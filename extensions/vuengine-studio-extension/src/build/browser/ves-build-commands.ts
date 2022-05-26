@@ -33,9 +33,23 @@ export namespace VesBuildCommands {
     category: CATEGORY,
   };
 
-  export const TOGGLE_WIDGET: Command = {
-    id: 'VesBuild.commands.openWidget',
-    label: 'Toggle Build Widget',
-    category: CATEGORY,
+  export const WIDGET_TOGGLE: Command = {
+    id: 'VesBuild.commands.view.toggle',
+    label: 'Toggle Build View'
+  };
+  export const WIDGET_EXPAND: Command = {
+    id: 'VesBuild.commands.view.expand',
+    label: 'Toggle Maximized',
+    iconClass: 'codicon codicon-arrow-both',
+  };
+  export const WIDGET_HELP: Command = {
+    id: 'VesBuild.commands.view.help',
+    label: 'Show Handbook Page',
+    iconClass: 'codicon codicon-book',
+  };
+  export const WIDGET_SETTINGS: Command = {
+    id: 'VesBuild.commands.view.settings',
+    label: 'Show Build Preferences',
+    iconClass: 'codicon codicon-settings',
   };
 };

@@ -6,7 +6,6 @@ import { VesBuildCommands } from './ves-build-commands';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
 import { VesBuildService } from './ves-build-service';
 import { BuildMode } from './ves-build-types';
-import { VesBuildViewContribution } from './ves-build-view-contribution';
 
 export const buildMenuPath = [...MAIN_MENU_BAR, 'vesBuild'];
 export namespace VesBuildMenuSection {
@@ -23,8 +22,6 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
   private readonly preferenceService: PreferenceService;
   @inject(VesBuildService)
   private readonly vesBuildService: VesBuildService;
-  @inject(VesBuildViewContribution)
-  private readonly VesBuildView: VesBuildViewContribution;
   @inject(WorkspaceService)
   private readonly workspaceService: WorkspaceService;
 
@@ -62,16 +59,6 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
         this.preferenceService.set(VesBuildPreferenceIds.PEDANTIC_WARNINGS, !current, PreferenceScope.User);
       },
       isToggled: () => !!this.preferenceService.get(VesBuildPreferenceIds.PEDANTIC_WARNINGS),
-    });
-
-    commandRegistry.registerCommand(VesBuildCommands.TOGGLE_WIDGET, {
-      execute: (forceOpen: boolean = false) => {
-        if (forceOpen) {
-          this.VesBuildView.openView({ activate: true, reveal: true });
-        } else {
-          this.VesBuildView.toggleView();
-        }
-      },
     });
   }
 

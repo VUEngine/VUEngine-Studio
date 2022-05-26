@@ -24,7 +24,7 @@ export class VesFlashCartWidget extends ReactWidget {
   private readonly workspaceService: WorkspaceService;
 
   static readonly ID = 'vesFlashCartWidget';
-  static readonly LABEL = 'Connected Flash Carts';
+  static readonly LABEL = 'Flash Carts';
 
   protected state = {
     showLog: [] as boolean[],

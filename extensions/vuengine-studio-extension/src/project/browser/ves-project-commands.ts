@@ -8,4 +8,9 @@ export namespace VesProjectCommands {
         label: 'New Project',
         category: CATEGORY,
     };
+
+    export const TOGGLE_WIDGET: Command = {
+        id: 'ves:project:toggleView',
+        label: 'Toggle Project View'
+    };
 }
