@@ -12,7 +12,7 @@ export const VesBrandingPreferenceSchema: PreferenceSchema = {
     'properties': {
         [VesBrandingPreferenceIds.ALWAYS_SHOW_WELCOME_PAGE]: {
             type: 'boolean',
-            description: 'Show Getting Started page when no workspace is loaded.',
+            description: 'Show Getting Started page when no project is opened.',
             default: true,
             scope: PreferenceScope.User,
             overridable: true,

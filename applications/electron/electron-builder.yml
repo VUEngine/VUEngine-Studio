@@ -32,9 +32,9 @@ files:
     to: vuengine
 
 fileAssociations:
-  - ext: theia-workspace
-    name: VUEngine Studio Workspace
-    description: Workspace file of a VUEngine Studio project
+  - ext: vuengine
+    name: VUEngine Studio Project
+    description: VUEngine Studio project file
     role: Editor
     rank: Owner
     isPackage: false

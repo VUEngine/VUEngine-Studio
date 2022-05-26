@@ -1,4 +1,4 @@
-import { CommandRegistry, DisposableCollection, environment, isOSX, nls, Path } from '@theia/core';
+import { CommandRegistry, DisposableCollection, nls, Path } from '@theia/core';
 import { codicon, CommonCommands, Key, KeyCode, LabelProvider, Message, PreferenceService, ReactWidget } from '@theia/core/lib/browser';
 import { FrontendApplicationConfigProvider } from '@theia/core/lib/browser/frontend-application-config-provider';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
@@ -114,39 +114,6 @@ export class VesGettingStartedWidget extends ReactWidget {
         </div>;
     }
 
-    /**
-     * Trigger the open command.
-     */
-    protected doOpen = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN.id);
-    protected doOpenEnter = (e: React.KeyboardEvent) => {
-        if (this.isEnterKey(e)) {
-            this.doOpen();
-        }
-    };
-
-    /**
-     * Trigger the open file command.
-     */
-    protected doOpenFile = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN_FILE.id);
-    protected doOpenFileEnter = (e: React.KeyboardEvent) => {
-        if (this.isEnterKey(e)) {
-            this.doOpenFile();
-        }
-    };
-
-    /**
-     * Trigger the open folder command.
-     */
-    protected doOpenFolder = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN_FOLDER.id);
-    protected doOpenFolderEnter = (e: React.KeyboardEvent) => {
-        if (this.isEnterKey(e)) {
-            this.doOpenFolder();
-        }
-    };
-
-    /**
-     * Trigger the open workspace command.
-     */
     protected doOpenWorkspace = () => this.commandRegistry.executeCommand(WorkspaceCommands.OPEN_WORKSPACE.id);
     protected doOpenWorkspaceEnter = (e: React.KeyboardEvent) => {
         if (this.isEnterKey(e)) {
@@ -219,7 +186,7 @@ export class VesGettingStartedWidget extends ReactWidget {
                 <h1>
                     {this.applicationName}
                     <span className="gs-sub-header">
-                        {/* this.applicationInfo && ` ${this.applicationInfo.version}` */} Preview 2
+                        {this.applicationInfo && ` ${this.applicationInfo.version}`}
                     </span>
                 </h1>
             </div>
@@ -227,52 +194,23 @@ export class VesGettingStartedWidget extends ReactWidget {
     }
 
     protected renderOpen(): React.ReactNode {
-        const requireSingleOpen = isOSX || !environment.electron.is();
-
         const newProject = (
             <button className="theia-button large" onClick={this.createNewProject}>
                 <i className="fa fa-plus"></i> {VesProjectCommands.NEW.label}
             </button>
         );
 
-        const open = requireSingleOpen && <button
-            className="theia-button large"
-            tabIndex={0}
-            onClick={this.doOpen}
-            onKeyDown={this.doOpenEnter}>
-            <i className="fa fa-folder-open"></i> Open Folder
-        </button>;
-
-        /* const openFile = !requireSingleOpen && <button
-            className="theia-button large"
-            tabIndex={0}
-            onClick={this.doOpenFile}
-            onKeyDown={this.doOpenFileEnter}>
-            <i className="fa fa-file-o"></i> Open File
-        </button>; */
-
-        const openFolder = !requireSingleOpen && <button
-            className="theia-button large"
-            tabIndex={0}
-            onClick={this.doOpenFolder}
-            onKeyDown={this.doOpenFolderEnter}>
-            <i className="fa fa-folder-open"></i> Open Folder
-        </button>;
-
-        const openWorkspace = <button
+        const openProject = <button
             className="theia-button large"
             tabIndex={0}
             onClick={this.doOpenWorkspace}
             onKeyDown={this.doOpenWorkspaceEnter}>
-            <i className="fa fa-file-code-o"></i> Open Workspace
+            <i className="fa fa-file-code-o"></i> Open Project
         </button>;
 
         return <div className="gs-section">
+            {openProject}
             {newProject}
-            {open}
-            {/* openFile */}
-            {openFolder}
-            {openWorkspace}
             <br />
             <br />
         </div>;
@@ -411,6 +349,6 @@ function VesPreferences(props: PreferencesProps): JSX.Element {
     };
     return <div className='ves-preference'>
         <input type="checkbox" className="theia-input" id="alwaysShow" onChange={handleChange} checked={alwaysShow}></input>
-        <label htmlFor="alwaysShow">Always show this page when no workspace is loaded.</label>
+        <label htmlFor="alwaysShow">Always show this page when no project is opened.</label>
     </div>;
 }

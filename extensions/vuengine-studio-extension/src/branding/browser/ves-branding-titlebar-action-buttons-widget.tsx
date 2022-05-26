@@ -111,16 +111,8 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                 <i className='fa fa-plus'></i>
             </button>
             <button
-                className='theia-button secondary open-project'
-                title={`Open Folder${this.getKeybindingLabel(this.getOpenProjectCommandId(), true)}`}
-                onClick={this.openProject}
-                key='action-button-open-project'
-            >
-                <i className='fa fa-folder-open'></i>
-            </button>
-            <button
                 className='theia-button secondary open-workspace'
-                title={`Open Workspace${this.getKeybindingLabel(WorkspaceCommands.OPEN_WORKSPACE.id, true)}`}
+                title={`Open Project${this.getKeybindingLabel(WorkspaceCommands.OPEN_WORKSPACE.id, true)}`}
                 onClick={this.openWorkspaceFile}
                 key='action-button-open-workspace'
             >

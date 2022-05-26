@@ -10,6 +10,7 @@ import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesCommonService } from '../../../branding/browser/ves-common-service';
+import { VUENGINE_EXT } from '../../common/custom-project-file/ves-project-utils';
 import { VesProjectCommands } from '../ves-project-commands';
 import { VesProjectPathsService } from '../ves-project-paths-service';
 import { VesProjectService } from '../ves-project-service';
@@ -135,7 +136,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
         const template = VES_NEW_PROJECT_TEMPLATES[templateIndex];
         const folder = this.createProjectFormComponentRef.current?.state.folder ?? 'new-project';
         const newProjectUri = projectsBaseUri.resolve(folder);
-        const newProjectWorkspaceFileUri = newProjectUri.resolve(`${folder}.theia-workspace`);
+        const newProjectWorkspaceFileUri = newProjectUri.resolve(`${folder}.${VUENGINE_EXT}`);
 
         const response = await this.vesProjectsService.createProjectFromTemplate(
             template,

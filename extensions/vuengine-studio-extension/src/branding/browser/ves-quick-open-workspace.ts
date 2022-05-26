@@ -13,7 +13,7 @@ export class VesQuickOpenWorkspace extends QuickOpenWorkspace {
     @inject(VesProjectService)
     protected readonly vesProjectsService: VesProjectService;
 
-    // TODO: had to override the entire function to change two lines (marked below),
+    // TODO: had to override the entire function to change few lines (marked below),
     // ensure to keep this up to date with Theia
     async open(workspaces: string[]): Promise<void> {
         this.items = [];
@@ -23,10 +23,7 @@ export class VesQuickOpenWorkspace extends QuickOpenWorkspace {
         ]);
         const home = new URI(homeDirUri).path.toString();
         await this.preferences.ready;
-        this.items.push({
-            type: 'separator',
-            label: nls.localizeByDefault('folders & workspaces')
-        });
+        // Removed lines
         for (const workspace of workspaces) {
             const uri = new URI(workspace);
             let stat: FileStat | undefined;
@@ -61,9 +58,9 @@ export class VesQuickOpenWorkspace extends QuickOpenWorkspace {
         this.quickInputService?.showQuickPick(this.items, {
             placeholder: nls.localize(
                 'theia/workspace/openRecentPlaceholder',
-                'Type the name of the workspace you want to open'),
+                'Type the name of the project you want to open'), // Modified line
             onDidTriggerItemButton: async context => {
-                const resource = context.item.resource;
+                const resource = (context.item).resource;
                 if (resource) {
                     await this.workspaceService.removeRecentWorkspace(resource.toString());
                     context.removeItem();
