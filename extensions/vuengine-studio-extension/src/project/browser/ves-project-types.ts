@@ -19,6 +19,9 @@ export interface ProjectFileContribution {
 };
 
 export interface ProjectFile {
+  folders: {
+    path: string
+  }[],
   plugins: string[]
   types: ProjectFileTypes
   contributions?: ProjectFileContribution

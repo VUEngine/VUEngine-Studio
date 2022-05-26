@@ -180,10 +180,12 @@ export class VesPluginsModel {
         return this.doChange(async () => {
             const pluginIds = this.pluginsService.getInstalledPlugins();
             const currInstalled = new Set<string>();
-            for (const pluginId of pluginIds) {
-                this._installed.delete(pluginId);
-                const vesPlugin = this.setPlugin(pluginId);
-                currInstalled.add(vesPlugin.id);
+            if (pluginIds) {
+                for (const pluginId of pluginIds) {
+                    this._installed.delete(pluginId);
+                    const vesPlugin = this.setPlugin(pluginId);
+                    currInstalled.add(vesPlugin.id);
+                }
             }
             const installed = new Set([...prevInstalled, ...currInstalled]);
             const installedSorted = Array.from(installed).sort((a, b) => this.comparePlugins(a, b));
