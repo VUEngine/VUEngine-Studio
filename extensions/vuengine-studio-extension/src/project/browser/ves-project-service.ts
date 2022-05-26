@@ -54,23 +54,42 @@ export class VesProjectService {
   protected readonly onDidChangeProjectDataEmitter = new Emitter<void>();
   readonly onDidChangeProjectData = this.onDidChangeProjectDataEmitter.event;
   getProjectDataType(typeId: string): ProjectFileType | undefined {
-    return this._projectData.types[typeId];
+    return this._projectData.types && this._projectData.types[typeId];
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getProjectDataItem(typeId: string, itemId: string): any | undefined {
-    return this._projectData.types[typeId][itemId];
+    return this._projectData.types && this._projectData.types[typeId][itemId];
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async setProjectDataItem(typeId: string, itemId: string, data: any): Promise<boolean> {
+    if (!this._projectData.types) {
+      this._projectData.types = {};
+    }
+    if (!this._projectData.types[typeId]) {
+      this._projectData.types[typeId] = {};
+    }
     this._projectData.types[typeId][itemId] = data;
+
     this.onDidChangeProjectDataEmitter.fire();
     return this.saveProjectFile();
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async deleteProjectDataItem(typeId: string, itemId: string): Promise<boolean> {
-    delete (this._projectData.types[typeId][itemId]);
-    this.onDidChangeProjectDataEmitter.fire();
-    return this.saveProjectFile();
+    if (this._projectData.types
+      && this._projectData.types[typeId]
+      && this._projectData.types[typeId][itemId]) {
+      delete (this._projectData.types[typeId][itemId]);
+      if (!this._projectData.types[typeId].length) {
+        delete this._projectData.types[typeId];
+      }
+      if (!this._projectData.types.length) {
+        delete this._projectData.types;
+      }
+      this.onDidChangeProjectDataEmitter.fire();
+      return this.saveProjectFile();
+    }
+
+    return false;
   }
   getProjectPlugins(): string[] {
     return this._projectData.plugins;
@@ -158,13 +177,13 @@ export class VesProjectService {
       // add to combined types
       if (projectDataWithContributor.data.types) {
         Object.keys(projectDataWithContributor.data.types).forEach(typeId => {
-          Object.keys(projectDataWithContributor.data.types[typeId]).forEach(itemId => {
+          Object.keys(projectDataWithContributor.data.types![typeId]).forEach(itemId => {
             if (typesCombined[typeId] === undefined) {
               typesCombined[typeId] = {};
             }
             typesCombined[typeId][itemId] = {
               _contributor: projectDataWithContributor.contributor,
-              ...projectDataWithContributor.data.types[typeId][itemId],
+              ...projectDataWithContributor.data.types![typeId][itemId],
             };
           });
         });
@@ -183,9 +202,7 @@ export class VesProjectService {
     });
 
     this._projectData = {
-      folders: workspaceProjectFileData.folders,
-      plugins: workspaceProjectFileData.plugins,
-      types: workspaceProjectFileData.types,
+      ...workspaceProjectFileData,
       typesCombined,
     };
   }
@@ -219,9 +236,8 @@ export class VesProjectService {
       this.fileService.writeFile(
         projectFileUri,
         BinaryBuffer.fromString(JSON.stringify({
-          folders: this._projectData.folders,
-          plugins: this._projectData.plugins,
-          types: this._projectData.types,
+          ...this._projectData,
+          typesCombined: undefined
         }, undefined, 4))
       );
       return true;
