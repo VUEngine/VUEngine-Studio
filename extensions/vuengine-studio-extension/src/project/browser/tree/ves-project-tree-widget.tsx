@@ -73,6 +73,9 @@ export class VesProjectTreeWidget extends TreeWidget {
         const iconClass = registeredType.icon;
         if (typeId && name && iconClass) {
           const childNode: VesProjectDocumentChild = { typeId, name, iconClass };
+          if (!registeredType.leaf) {
+            childNode.children = [];
+          }
 
           if (registeredType.leaf === true) {
             const registeredTypeChildren = this.vesProjectService.getProjectDataType(typeId);
@@ -190,11 +193,13 @@ export class VesProjectTreeWidget extends TreeWidget {
       const childTypes = Object.values(registeredTypes).filter(registeredType =>
         registeredType.parent?.typeId === node.member?.typeId
       );
-      if (childTypes.length === 1) {
-        this.addNode(node as VesProjectChildNode, childTypes[0].schema.properties?.typeId.const);
-      } else {
+      if (childTypes.length > 1) {
         // TODO: add context menu for type selection
         console.error('multiple child types are not supported');
+      } else if (childTypes.length === 1) {
+        this.addNode(childTypes[0].schema.properties?.typeId.const);
+      } else {
+        console.error('no child type defined');
       }
     };
   }
@@ -213,7 +218,7 @@ export class VesProjectTreeWidget extends TreeWidget {
     }
   }
 
-  protected async addNode(node: Readonly<VesProjectChildNode>, typeId: string): Promise<void> {
+  protected async addNode(typeId: string): Promise<void> {
     const newItemId = uuid();
     // TODO: properly create new item with default values
     this.vesProjectService.setProjectDataItem(typeId, newItemId, {
@@ -244,8 +249,12 @@ export class VesProjectTreeWidget extends TreeWidget {
   }
 
   protected async handleDocOpen(node: VesProjectChildNode | undefined): Promise<void> {
-    if (node && node.member.uri) {
-      await open(this.openerService, node.member.uri, { mode: 'reveal' });
+    if (node) {
+      if (node.member.uri) {
+        await open(this.openerService, node.member.uri, { mode: 'reveal' });
+      } else if (node.member.typeId) {
+        await this.addNode(node.member.typeId);
+      }
     }
   }
 

@@ -23,8 +23,11 @@ export interface ProjectFile {
     path: string
   }[],
   plugins: string[]
-  types: ProjectFileTypes
-  contributions?: ProjectFileContribution
+  types?: ProjectFileTypes
+  contributions?: ProjectFileContribution,
+  settings?: {
+    [settingId: string]: unknown
+  };
 };
 
 export interface ProjectFileTypesCombined {
