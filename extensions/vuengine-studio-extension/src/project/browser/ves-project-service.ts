@@ -11,6 +11,7 @@ import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-service';
 import { USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } from '../../plugins/browser/ves-plugins-types';
+import { VUENGINE_EXT } from '../common/custom-project-file/ves-project-utils';
 import { VesNewProjectTemplate } from './new-project/ves-new-project-form';
 import { ProjectFile, ProjectFileType, ProjectFileTypes, ProjectFileTypesCombined, ProjectFileWithContributor, RegisteredTypes } from './ves-project-types';
 
@@ -212,11 +213,9 @@ export class VesProjectService {
 
   async getProjectName(projectRootUri?: URI): Promise<string> {
     let projectTitle = '';
-    let isWorkspace = !projectRootUri && this.workspaceService.workspace?.isFile || false;
 
     if (projectRootUri && !(await this.fileService.resolve(projectRootUri)).isDirectory) {
       projectRootUri = projectRootUri.parent;
-      isWorkspace = true;
     }
 
     // Attempt to retrieve project name from configuration file
@@ -252,11 +251,6 @@ export class VesProjectService {
     // Use base path instead
     if (!projectTitle) {
       projectTitle = projectRootUri?.path?.base || '';
-    }
-
-    // Append workspace suffix if applicable
-    if (projectTitle && isWorkspace) {
-      projectTitle += ' (Workspace)';
     }
 
     return projectTitle || 'VUEngine Studio';
@@ -309,8 +303,8 @@ export class VesProjectService {
       }
 
       await this.fileService.move(
-        targetUri.resolve(`${template.id}.theia-workspace`),
-        targetUri.resolve(`${folder}.theia-workspace`),
+        targetUri.resolve(`${template.id}.${VUENGINE_EXT}`),
+        targetUri.resolve(`${folder}.${VUENGINE_EXT}`),
       );
 
       // replace labels according to mapping file
