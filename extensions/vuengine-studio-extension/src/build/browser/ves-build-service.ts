@@ -201,7 +201,7 @@ export class VesBuildService {
       this.isQueued = true;
     } else if (this.buildStatus.active) {
       if (!force) {
-        this.commandService.executeCommand(VesBuildCommands.TOGGLE_WIDGET.id);
+        this.commandService.executeCommand(VesBuildCommands.WIDGET_TOGGLE.id);
       }
     } else {
       this.build();
@@ -320,7 +320,7 @@ export class VesBuildService {
 
     this.onDidFailBuild(async () => {
       this.romSize = 0;
-      this.commandService.executeCommand(VesBuildCommands.TOGGLE_WIDGET.id, true);
+      this.commandService.executeCommand(VesBuildCommands.WIDGET_TOGGLE.id, true);
     });
   }
 

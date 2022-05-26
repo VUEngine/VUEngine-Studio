@@ -1,32 +1,18 @@
 import { inject, injectable } from '@theia/core/shared/inversify';
-import { Command, CommandRegistry, CommandService } from '@theia/core';
+import { CommandRegistry, CommandService, MenuModelRegistry } from '@theia/core';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
-import { AbstractViewContribution, CommonCommands, FrontendApplication } from '@theia/core/lib/browser';
+import { AbstractViewContribution, CommonCommands, CommonMenus, FrontendApplication, KeybindingRegistry } from '@theia/core/lib/browser';
 import { VesBuildWidget } from './ves-build-widget';
 import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
-
-export namespace VesBuildViewContributionCommands {
-    export const EXPAND: Command = {
-        id: `${VesBuildWidget.ID}.expand`,
-        label: 'Toggle Maximized',
-        iconClass: 'codicon codicon-arrow-both',
-    };
-    export const HELP: Command = {
-        id: `${VesBuildWidget.ID}.help`,
-        label: 'Show Handbook Page',
-        iconClass: 'codicon codicon-book',
-    };
-    export const SETTINGS: Command = {
-        id: `${VesBuildWidget.ID}.settings`,
-        label: 'Show Build Preferences',
-        iconClass: 'codicon codicon-settings',
-    };
-}
+import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { VesBuildCommands } from './ves-build-commands';
 
 @injectable()
 export class VesBuildViewContribution extends AbstractViewContribution<VesBuildWidget> implements TabBarToolbarContribution {
     @inject(CommandService)
     private readonly commandService: CommandService;
+    @inject(WorkspaceService)
+    protected readonly workspaceService: WorkspaceService;
 
     constructor() {
         super({
@@ -36,58 +22,94 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
                 area: 'right',
                 rank: 700,
             },
-            // TODO
-            // toggleCommandId: `${VesBuildWidget.ID}.toggle`,
-            // toggleKeybinding: 'ctrlcmd+shift+b',
         });
     }
 
     async initializeLayout(app: FrontendApplication): Promise<void> {
-        await this.openView({ activate: false, reveal: false });
+        await this.workspaceService.ready;
+        if (this.workspaceService.opened) {
+            await this.openView({ activate: false, reveal: false });
+        }
     }
 
-    registerCommands(commandRegistry: CommandRegistry): void {
-        commandRegistry.registerCommand(VesBuildViewContributionCommands.EXPAND, {
-            isEnabled: () => true,
-            isVisible: widget => widget !== undefined &&
-                widget.id === VesBuildWidget.ID,
-            execute: async widget => widget !== undefined &&
-                widget.id === VesBuildWidget.ID &&
-                await this.openView({ activate: true, reveal: true }) &&
-                this.commandService.executeCommand(CommonCommands.TOGGLE_MAXIMIZED.id)
-        });
-        commandRegistry.registerCommand(VesBuildViewContributionCommands.HELP, {
-            isEnabled: () => true,
-            isVisible: widget => widget !== undefined &&
-                widget.id === VesBuildWidget.ID,
-            execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'user-guide/building', false),
-        });
-        commandRegistry.registerCommand(VesBuildViewContributionCommands.SETTINGS, {
-            isEnabled: () => true,
-            isVisible: widget => widget !== undefined &&
-                widget.id === VesBuildWidget.ID,
-            execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'build'),
-        });
+    async registerCommands(commandRegistry: CommandRegistry): Promise<void> {
+        super.registerCommands(commandRegistry);
+
+        await this.workspaceService.ready;
+        if (this.workspaceService.opened) {
+            commandRegistry.registerCommand(VesBuildCommands.WIDGET_TOGGLE, {
+                execute: () => this.toggleView()
+            });
+
+            commandRegistry.registerCommand(VesBuildCommands.WIDGET_EXPAND, {
+                isEnabled: () => true,
+                isVisible: widget => widget !== undefined &&
+                    widget.id === VesBuildWidget.ID,
+                execute: async widget => widget !== undefined &&
+                    widget.id === VesBuildWidget.ID &&
+                    await this.openView({ activate: true, reveal: true }) &&
+                    this.commandService.executeCommand(CommonCommands.TOGGLE_MAXIMIZED.id)
+            });
+            commandRegistry.registerCommand(VesBuildCommands.WIDGET_HELP, {
+                isEnabled: () => true,
+                isVisible: widget => widget !== undefined &&
+                    widget.id === VesBuildWidget.ID,
+                execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'user-guide/building', false),
+            });
+            commandRegistry.registerCommand(VesBuildCommands.WIDGET_SETTINGS, {
+                isEnabled: () => true,
+                isVisible: widget => widget !== undefined &&
+                    widget.id === VesBuildWidget.ID,
+                execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'build'),
+            });
+        }
     }
 
-    registerToolbarItems(toolbar: TabBarToolbarRegistry): void {
-        toolbar.registerItem({
-            id: VesBuildViewContributionCommands.EXPAND.id,
-            command: VesBuildViewContributionCommands.EXPAND.id,
-            tooltip: VesBuildViewContributionCommands.EXPAND.label,
-            priority: 0,
-        });
-        toolbar.registerItem({
-            id: VesBuildViewContributionCommands.SETTINGS.id,
-            command: VesBuildViewContributionCommands.SETTINGS.id,
-            tooltip: VesBuildViewContributionCommands.SETTINGS.label,
-            priority: 2,
-        });
-        toolbar.registerItem({
-            id: VesBuildViewContributionCommands.HELP.id,
-            command: VesBuildViewContributionCommands.HELP.id,
-            tooltip: VesBuildViewContributionCommands.HELP.label,
-            priority: 3,
-        });
+    async registerToolbarItems(toolbar: TabBarToolbarRegistry): Promise<void> {
+        await this.workspaceService.ready;
+        if (this.workspaceService.opened) {
+            toolbar.registerItem({
+                id: VesBuildCommands.WIDGET_EXPAND.id,
+                command: VesBuildCommands.WIDGET_EXPAND.id,
+                tooltip: VesBuildCommands.WIDGET_EXPAND.label,
+                priority: 0,
+            });
+            toolbar.registerItem({
+                id: VesBuildCommands.WIDGET_SETTINGS.id,
+                command: VesBuildCommands.WIDGET_SETTINGS.id,
+                tooltip: VesBuildCommands.WIDGET_SETTINGS.label,
+                priority: 2,
+            });
+            toolbar.registerItem({
+                id: VesBuildCommands.WIDGET_HELP.id,
+                command: VesBuildCommands.WIDGET_HELP.id,
+                tooltip: VesBuildCommands.WIDGET_HELP.label,
+                priority: 3,
+            });
+        }
+    }
+
+    async registerMenus(menus: MenuModelRegistry): Promise<void> {
+        super.registerMenus(menus);
+
+        await this.workspaceService.ready;
+        if (this.workspaceService.opened) {
+            menus.registerMenuAction(CommonMenus.VIEW_VIEWS, {
+                commandId: VesBuildCommands.WIDGET_TOGGLE.id,
+                label: this.viewLabel
+            });
+        }
+    }
+
+    async registerKeybindings(keybindings: KeybindingRegistry): Promise<void> {
+        super.registerKeybindings(keybindings);
+
+        await this.workspaceService.ready;
+        if (this.workspaceService.opened) {
+            keybindings.registerKeybinding({
+                command: VesBuildCommands.WIDGET_TOGGLE.id,
+                keybinding: 'ctrlcmd+shift+b'
+            });
+        }
     }
 }

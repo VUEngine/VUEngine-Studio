@@ -129,12 +129,7 @@ export class VesExportService {
 
   protected async getRomName(): Promise<string> {
     const projectName = await this.vesProjectsService.getProjectName();
-    let romName = projectName ?? 'output';
-
-    const workspaceSuffix = ' (Workspace)';
-    if (romName.endsWith(workspaceSuffix)) {
-      romName = romName.substring(0, romName.length - workspaceSuffix.length);
-    }
+    const romName = projectName ?? 'output';
 
     return `${sanitize(romName)}.vb`;
   }

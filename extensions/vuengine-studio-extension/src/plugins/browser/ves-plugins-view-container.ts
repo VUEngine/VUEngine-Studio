@@ -10,6 +10,11 @@ import { VesPluginsSearchBar } from './ves-plugins-search-bar';
 export namespace VesPluginsViewCommands {
     const CATEGORY = 'Plugins';
 
+    export const TOGGLE_WIDGET: Command = {
+        id: 'vesPlugins.toggleView',
+        label: 'Toggle Plugins View'
+    };
+
     export const CLEAR_ALL: Command = {
         id: 'vesPlugins.clearAll',
         category: CATEGORY,

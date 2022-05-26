@@ -24,7 +24,7 @@ export class VesFlashCartContribution implements CommandContribution, Keybinding
       execute: () => this.vesFlashCartService.doFlash(),
     });
 
-    commandRegistry.registerCommand(VesFlashCartCommands.OPEN_WIDGET, {
+    commandRegistry.registerCommand(VesFlashCartCommands.WIDGET_TOGGLE, {
       execute: (forceOpen: boolean = false) => {
         if (forceOpen) {
           this.vesFlashCartView.openView({ activate: true, reveal: true });
