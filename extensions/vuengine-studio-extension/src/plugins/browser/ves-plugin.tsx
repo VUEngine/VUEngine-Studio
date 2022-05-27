@@ -346,15 +346,14 @@ export class VesPluginEditorComponent extends AbstractVesPluginComponent {
 
     protected renderDependenciesList(dependencies: string[]): string {
         let dependenciesList = `<h3>${nls.localize('vuengine/plugins/dependencies', 'Dependencies')}</h3> `;
-
         if (dependencies?.length) {
             dependenciesList += "<ul>";
             for (const dependency of dependencies) {
-                dependenciesList += `< li > <code>${dependency}</code></li > `;
+                dependenciesList += `<li><code>${dependency}</code></li>`;
             }
             dependenciesList += "</ul>";
         } else {
-            dependenciesList += "<li><i>None</i></li>";
+            dependenciesList += `<li><i>${nls.localize('vuengine/plugins/noDependencies', 'None')}</i></li>`;
         }
 
         return dependenciesList;

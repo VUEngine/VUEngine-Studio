@@ -3,7 +3,7 @@ import { PreferenceScope } from '@theia/core/lib/browser';
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
 
 export namespace VesBrandingPreferenceIds {
-    export const CATEGORY = 'gettingStartedPage';
+    export const CATEGORY = 'gettingStarted';
 
     export const ALWAYS_SHOW_WELCOME_PAGE = [CATEGORY, 'alwaysShow'].join('.');
 }

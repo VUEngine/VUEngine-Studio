@@ -104,7 +104,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
         return !this.workspaceService.opened ? <>
             <button
                 className='theia-button secondary new-project'
-                title={nls.localize('vuengine/project/commands/newProject', 'New Project') +
+                title={nls.localize('vuengine/projects/commands/newProject', 'New Project') +
                     this.getKeybindingLabel(VesProjectCommands.NEW.id, true)}
                 onClick={this.createNewProject}
                 key='action-button-new-project'
@@ -113,7 +113,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
             </button>
             <button
                 className='theia-button secondary open-workspace'
-                title={nls.localize('vuengine/project/commands/openProject', 'Open Project...') +
+                title={nls.localize('vuengine/projects/commands/openProject', 'Open Project...') +
                     this.getKeybindingLabel(WorkspaceCommands.OPEN_WORKSPACE.id, true)}
                 onClick={this.openWorkspaceFile}
                 key='action-button-open-workspace'

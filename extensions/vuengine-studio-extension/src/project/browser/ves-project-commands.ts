@@ -7,8 +7,8 @@ export namespace VesProjectCommands {
             label: 'New Project',
             category: 'Projects',
         },
-        'vuengine/project/commands/newProject',
-        'vuengine/project/commands/category'
+        'vuengine/projects/commands/newProject',
+        'vuengine/projects/commands/category'
     );
 
     export const TOGGLE_WIDGET: Command = Command.toLocalizedCommand(
@@ -17,7 +17,7 @@ export namespace VesProjectCommands {
             label: 'Toggle Project View',
             category: 'Projects',
         },
-        'vuengine/project/commands/toggleView',
-        'vuengine/project/commands/category'
+        'vuengine/projects/commands/toggleView',
+        'vuengine/projects/commands/category'
     );
 }

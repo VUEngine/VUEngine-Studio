@@ -196,7 +196,7 @@ export class VesGettingStartedWidget extends ReactWidget {
     protected renderOpen(): React.ReactNode {
         const newProject = (
             <button className="theia-button large" onClick={this.createNewProject}>
-                <i className="fa fa-plus"></i> {nls.localize('vuengine/project/commands/newProject', 'New Project')}
+                <i className="fa fa-plus"></i> {nls.localize('vuengine/projects/commands/newProject', 'New Project')}
             </button>
         );
 
@@ -205,7 +205,7 @@ export class VesGettingStartedWidget extends ReactWidget {
             tabIndex={0}
             onClick={this.doOpenWorkspace}
             onKeyDown={this.doOpenWorkspaceEnter}>
-            <i className="fa fa-file-code-o"></i> {nls.localize('vuengine/project/commands/openProject', 'Open Project...')}
+            <i className="fa fa-file-code-o"></i> {nls.localize('vuengine/projects/commands/openProject', 'Open Project...')}
         </button>;
 
         return <div className="gs-section">

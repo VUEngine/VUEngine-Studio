@@ -4,12 +4,15 @@ import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/li
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
 import { VesRumblePackCommands } from './ves-rumble-pack-commands';
+import { VesRumblePackService } from './ves-rumble-pack-service';
 import { VesRumblePackWidget } from './ves-rumble-pack-widget';
 
 @injectable()
 export class VesRumblePackViewContribution extends AbstractViewContribution<VesRumblePackWidget> implements TabBarToolbarContribution {
     @inject(CommandService)
     private readonly commandService: CommandService;
+    @inject(VesRumblePackService)
+    private readonly vesRumblePackService: VesRumblePackService;
 
     constructor() {
         super({
@@ -51,7 +54,7 @@ export class VesRumblePackViewContribution extends AbstractViewContribution<VesR
             isVisible: widget => widget !== undefined &&
                 widget.id !== undefined &&
                 widget.id === VesRumblePackWidget.ID,
-            execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'user-guide/rumble-pack', false),
+            execute: () => this.vesRumblePackService.detectRumblePackIsConnected(),
         });
     }
 

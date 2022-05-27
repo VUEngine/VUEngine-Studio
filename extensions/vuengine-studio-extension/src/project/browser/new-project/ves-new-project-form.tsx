@@ -43,9 +43,12 @@ export interface VesNewProjectTemplate {
 }
 
 export const VES_NEW_PROJECT_TEMPLATES: VesNewProjectTemplate[] = [{
-    name: 'Barebone',
+    name: nls.localize('vuengine/projects/templates/bareboneTitle', 'Barebone'),
     id: 'vuengine-barebone',
-    description: 'An (almost) empty project that includes a single "Hello World" screen plus the most important plugins to add splash screens, automatic pause and more.',
+    description: nls.localize(
+        'vuengine/projects/templates/bareboneDescription',
+        'An (almost) empty project that includes a single "Hello World" screen plus the most important plugins to add splash screens, automatic pause and more.'
+    ),
     labels: {
         name: [
             'VUEngine Barebone'
@@ -59,9 +62,12 @@ export const VES_NEW_PROJECT_TEMPLATES: VesNewProjectTemplate[] = [{
         makerCode: 'VU',
     }
 }, {
-    name: 'Platform Game',
+    name: nls.localize('vuengine/projects/templates/platformerTitle', 'Platform Game'),
     id: 'vuengine-platformer-demo',
-    description: 'A full featured single level platforming game.',
+    description: nls.localize(
+        'vuengine/projects/templates/platformerDescription',
+        'A full featured single level platforming game.'
+    ),
     labels: {
         name: [
             'VUEngine Platformer Demo'
@@ -75,9 +81,12 @@ export const VES_NEW_PROJECT_TEMPLATES: VesNewProjectTemplate[] = [{
         makerCode: 'VU'
     }
 }, {
-    name: 'Multiplayer Game',
+    name: nls.localize('vuengine/projects/templates/multiplayerTitle', 'Multiplayer Game'),
     id: 'spong',
-    description: 'A simple Pong-like game that utilizes the engine\'s communication class for multiplayer matches over a link cable.',
+    description: nls.localize(
+        'vuengine/projects/templates/multiplayerDescription',
+        'A simple Pong-like game that utilizes the engine\'s communication class for multiplayer matches over a link cable.'
+    ),
     labels: {
         name: [
             'SPONG'
@@ -91,9 +100,12 @@ export const VES_NEW_PROJECT_TEMPLATES: VesNewProjectTemplate[] = [{
         makerCode: 'VU'
     }
 }, {
-    name: 'Image Viewer',
+    name: nls.localize('vuengine/projects/templates/imageViewerTitle', 'Image Viewer'),
     id: 'vue-master',
-    description: 'Stereo image viewer.',
+    description: nls.localize(
+        'vuengine/projects/templates/imageViewerDescription',
+        'Stereo image viewer.'
+    ),
     labels: {
         name: [
             'VUE-MASTER'
@@ -128,7 +140,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
         this.vesProjectsPathsService = props.vesProjectsPathsService;
 
         this.state = {
-            name: 'My Project',
+            name: nls.localize('vuengine/projects/myProject', 'My Project'),
             template: 0,
             gameCode: 'MP',
             author: '',
@@ -164,7 +176,9 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
             <div style={{ width: 600 }} />
             <div style={{ display: 'flex' }}>
                 <div style={{ flexGrow: 1, paddingRight: 8 }}>
-                    <div className="ves-new-project-input-label">Name</div>
+                    <div className="ves-new-project-input-label">
+                        {nls.localize('vuengine/projects/name', 'Name')}
+                    </div>
                     <input
                         type="text"
                         className="theia-input"
@@ -177,7 +191,9 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                     />
                 </div>
                 <div>
-                    <div className="ves-new-project-input-label">Game Code</div>
+                    <div className="ves-new-project-input-label">
+                        {nls.localize('vuengine/projects/gameCode', 'Game Code')}
+                    </div>
                     <input
                         type="text"
                         className="theia-input"
@@ -194,7 +210,9 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
             <br />
             <div style={{ display: 'flex' }}>
                 <div style={{ flexGrow: 1, paddingRight: 8 }}>
-                    <div className="ves-new-project-input-label">Author</div>
+                    <div className="ves-new-project-input-label">
+                        {nls.localize('vuengine/projects/author', 'Author')}
+                    </div>
                     <input
                         type="text"
                         className="theia-input"
@@ -206,7 +224,9 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                     />
                 </div>
                 <div>
-                    <div className="ves-new-project-input-label">Maker Code</div>
+                    <div className="ves-new-project-input-label">
+                        {nls.localize('vuengine/projects/makerCode', 'Maker Code')}
+                    </div>
                     <input
                         type="text"
                         className="theia-input"
@@ -221,7 +241,9 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                 </div>
             </div>
             <br />
-            <div className="ves-new-project-input-label">Path</div>
+            <div className="ves-new-project-input-label">
+                {nls.localize('vuengine/projects/path', 'Path')}
+            </div>
             <div style={{ display: 'flex' }}>
                 <input
                     type="text"
@@ -259,7 +281,9 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                 />
             </div>
             <br />
-            <div className="ves-new-project-input-label">Template</div>
+            <div className="ves-new-project-input-label">
+                {nls.localize('vuengine/projects/template', 'Template')}
+            </div>
             <div className="ves-new-project-templates-container" onKeyDown={this.handleTemplateKeyPress} tabIndex={8}>
                 {VES_NEW_PROJECT_TEMPLATES.map((template, index) => {
                     const selected = index === this.state.template ? ' selected' : '';
@@ -343,7 +367,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
 
     protected selectProjectFolder = async (): Promise<void> => {
         const props: OpenFileDialogProps = {
-            title: nls.localize('vuengine/project/selectParentFolder', "Select new project's parent folder"),
+            title: nls.localize('vuengine/projects/selectParentFolder', "Select new project's parent folder"),
             canSelectFolders: true,
             canSelectFiles: false
         };

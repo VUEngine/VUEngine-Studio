@@ -1,3 +1,7 @@
 .ves-plugin-editor .body {
     padding-top: calc(var(--theia-ui-padding)*2);
 }
+
+.ves-plugin-editor>.scroll-container {
+    position: unset;
+}
