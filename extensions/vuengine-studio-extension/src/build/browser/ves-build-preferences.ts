@@ -1,3 +1,4 @@
+import { nls } from '@theia/core';
 import { PreferenceScope } from '@theia/core/lib/browser';
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
 import { BuildMode, DEFAULT_BUILD_MODE, PrePostBuildTaskType } from './ves-build-types';
@@ -31,21 +32,21 @@ export const VesBuildPreferenceSchema: PreferenceSchema = {
         },
         [VesBuildPreferenceIds.DUMP_ELF]: {
             type: 'boolean',
-            description: 'Dump assembly code and memory sections.',
+            description: nls.localize('vuengine/build/preferences/dumpElfDescription', 'Dump assembly code and memory sections.'),
             default: false,
             scope: PreferenceScope.Folder,
             overridable: true,
         },
         [VesBuildPreferenceIds.PEDANTIC_WARNINGS]: {
             type: 'boolean',
-            description: 'Enable pedantic compiler warnings.',
+            description: nls.localize('vuengine/build/preferences/pedanticWarningsDescription', 'Enable pedantic compiler warnings.'),
             default: false,
             scope: PreferenceScope.Folder,
             overridable: true,
         },
         [VesBuildPreferenceIds.ENGINE_CORE_PATH]: {
             type: 'string',
-            description: 'Full path to core library. Uses built-in VUEngine Core when left blank.',
+            description: nls.localize('vuengine/build/preferences/engineCorePathDescription', 'Full path to core library. Uses built-in VUEngine Core when left blank.'),
             default: '',
             additionalProperties: {
                 // @ts-ignore
@@ -56,7 +57,7 @@ export const VesBuildPreferenceSchema: PreferenceSchema = {
         },
         [VesBuildPreferenceIds.ENGINE_CORE_INCLUDE_IN_WORKSPACE]: {
             type: 'boolean',
-            description: 'Automatically include core library in workspaces.',
+            description: nls.localize('vuengine/build/preferences/includeEngineCoreInWorkspaceDescription', 'Automatically include core library in workspaces.'),
             default: true,
             scope: PreferenceScope.Folder,
             overridable: true,
@@ -64,7 +65,7 @@ export const VesBuildPreferenceSchema: PreferenceSchema = {
         [VesBuildPreferenceIds.PRE_BUILD_TASKS]: {
             type: 'array',
             label: 'Pre-Build Tasks',
-            description: 'List of Tasks and Commands to execute before building.',
+            description: nls.localize('vuengine/build/preferences/preBuildTasksDescription', 'List of Tasks and Commands to execute before building.'),
             items: {
                 type: 'object',
                 title: 'Tasks & Commands',
@@ -92,7 +93,7 @@ export const VesBuildPreferenceSchema: PreferenceSchema = {
         [VesBuildPreferenceIds.POST_BUILD_TASKS]: {
             type: 'array',
             label: 'Post-Build Tasks',
-            description: 'List of Tasks and Commands to execute after building.',
+            description: nls.localize('vuengine/build/preferences/postBuildTasksDescription', 'List of Tasks and Commands to execute after building.'),
             items: {
                 type: 'object',
                 title: 'Tasks & Commands',

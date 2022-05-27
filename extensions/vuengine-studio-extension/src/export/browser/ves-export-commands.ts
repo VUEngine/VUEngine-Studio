@@ -1,11 +1,13 @@
 import { Command } from '@theia/core';
 
 export namespace VesExportCommands {
-  export const CATEGORY = 'Export';
-
-  export const EXPORT: Command = {
-    id: 'VesExport.commands.export',
-    label: 'Export ROM...',
-    category: CATEGORY,
-  };
+  export const EXPORT: Command = Command.toLocalizedCommand(
+    {
+      id: 'ves:export:export',
+      label: 'Export ROM...',
+      category: 'Export',
+    },
+    'vuengine/export/commands/export',
+    'vuengine/export/commands/category'
+  );
 };

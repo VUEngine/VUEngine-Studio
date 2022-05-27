@@ -1,4 +1,4 @@
-import { CommandService } from '@theia/core';
+import { CommandService, nls } from '@theia/core';
 import {
   ContextMenuRenderer, ExpandableTreeNode,
   LabelProvider,
@@ -25,7 +25,7 @@ export class VesDocumentationTreeWidget extends TreeWidget {
   protected readonly vesDocumentationService: VesDocumentationService;
 
   static readonly ID = 'ves-documentation-tree-widget';
-  static readonly LABEL = 'Documentation';
+  static readonly LABEL = nls.localize('vuengine/documentation/documentation', 'Documentation');
 
   constructor(
     @inject(ContextMenuRenderer) contextMenuRenderer: ContextMenuRenderer,
@@ -47,7 +47,7 @@ export class VesDocumentationTreeWidget extends TreeWidget {
     const documents: VesDocumentTree = {
       members: [
         {
-          name: 'VUEngine Studio Handbook',
+          name: nls.localize('vuengine/documentation/vuengineStudioHandbook', 'VUEngine Studio Handbook'),
           url: '<handbook>',
           children: []
         },
@@ -57,7 +57,7 @@ export class VesDocumentationTreeWidget extends TreeWidget {
           children: []
         }, */
         {
-          name: 'Hardware Documentation',
+          name: nls.localize('vuengine/documentation/hardwareDocumentation', 'Hardware Documentation'),
           url: '<stsvb>'
         }
       ]

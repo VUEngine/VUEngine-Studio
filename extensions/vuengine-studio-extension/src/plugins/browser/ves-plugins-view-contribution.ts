@@ -11,7 +11,7 @@ import { VesPluginsCommands } from './ves-plugins-commands';
 import { VesPluginsModel } from './ves-plugins-model';
 import { AUTHOR_SEARCH_QUERY, INSTALLED_QUERY, RECOMMENDED_QUERY, TAG_SEARCH_QUERY } from './ves-plugins-search-model';
 import { VesPluginsSourceOptions } from './ves-plugins-source';
-import { VesPluginsViewCommands, VesPluginsViewContainer } from './ves-plugins-view-container';
+import { VesPluginsViewContainer } from './ves-plugins-view-container';
 import { VesPluginsWidget } from './ves-plugins-widget';
 
 @injectable()
@@ -50,11 +50,11 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
 
         await this.workspaceService.ready;
         if (this.workspaceService.opened) {
-            commandRegistry.registerCommand(VesPluginsViewCommands.TOGGLE_WIDGET, {
+            commandRegistry.registerCommand(VesPluginsCommands.WIDGET_TOGGLE, {
                 execute: () => this.toggleView()
             });
 
-            commandRegistry.registerCommand(VesPluginsViewCommands.CLEAR_ALL, {
+            commandRegistry.registerCommand(VesPluginsCommands.WIDGET_CLEAR_ALL, {
                 isEnabled: () => !!this.model.search.query,
                 isVisible: widget => widget !== undefined &&
                     [
@@ -64,7 +64,7 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
                 execute: () => this.model.search.query = '',
             });
 
-            commandRegistry.registerCommand(VesPluginsViewCommands.HELP, {
+            commandRegistry.registerCommand(VesPluginsCommands.WIDGET_HELP, {
                 isEnabled: () => true,
                 isVisible: widget => widget !== undefined &&
                     [
@@ -90,7 +90,7 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
                 execute: (author?: string) => this.showSearchByAuthor(author)
             });
 
-            commandRegistry.registerCommand(VesPluginsViewCommands.SETTINGS, {
+            commandRegistry.registerCommand(VesPluginsCommands.WIDGET_SETTINGS, {
                 isEnabled: () => true,
                 isVisible: widget => widget !== undefined &&
                     [
@@ -126,21 +126,21 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
         await this.workspaceService.ready;
         if (this.workspaceService.opened) {
             toolbar.registerItem({
-                id: VesPluginsViewCommands.CLEAR_ALL.id,
-                command: VesPluginsViewCommands.CLEAR_ALL.id,
-                tooltip: VesPluginsViewCommands.CLEAR_ALL.label,
+                id: VesPluginsCommands.WIDGET_CLEAR_ALL.id,
+                command: VesPluginsCommands.WIDGET_CLEAR_ALL.id,
+                tooltip: VesPluginsCommands.WIDGET_CLEAR_ALL.label,
                 priority: 0,
             });
             toolbar.registerItem({
-                id: VesPluginsViewCommands.HELP.id,
-                command: VesPluginsViewCommands.HELP.id,
-                tooltip: VesPluginsViewCommands.HELP.label,
+                id: VesPluginsCommands.WIDGET_HELP.id,
+                command: VesPluginsCommands.WIDGET_HELP.id,
+                tooltip: VesPluginsCommands.WIDGET_HELP.label,
                 priority: 1,
             });
             toolbar.registerItem({
-                id: VesPluginsViewCommands.SETTINGS.id,
-                command: VesPluginsViewCommands.SETTINGS.id,
-                tooltip: VesPluginsViewCommands.SETTINGS.label,
+                id: VesPluginsCommands.WIDGET_SETTINGS.id,
+                command: VesPluginsCommands.WIDGET_SETTINGS.id,
+                tooltip: VesPluginsCommands.WIDGET_SETTINGS.label,
                 priority: 2,
             });
         }
@@ -152,7 +152,7 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
         await this.workspaceService.ready;
         if (this.workspaceService.opened) {
             menus.registerMenuAction(CommonMenus.VIEW_VIEWS, {
-                commandId: VesPluginsViewCommands.TOGGLE_WIDGET.id,
+                commandId: VesPluginsCommands.WIDGET_TOGGLE.id,
                 label: this.viewLabel
             });
         }
@@ -164,7 +164,7 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
         await this.workspaceService.ready;
         if (this.workspaceService.opened) {
             keybindings.registerKeybinding({
-                command: VesPluginsViewCommands.TOGGLE_WIDGET.id,
+                command: VesPluginsCommands.WIDGET_TOGGLE.id,
                 keybinding: 'ctrlcmd+shift+l'
             });
         }

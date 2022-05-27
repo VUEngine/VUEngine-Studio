@@ -1,4 +1,4 @@
-import { CommandService, environment } from '@theia/core';
+import { CommandService, environment, nls } from '@theia/core';
 import { ApplicationShell, CommonCommands, ConfirmDialog, PreferenceService } from '@theia/core/lib/browser';
 import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
@@ -89,7 +89,7 @@ export class VesExportService {
     let overwrite: boolean = false;
     let selected: URI | undefined;
     const saveFilterDialogProps: SaveFileDialogProps = {
-      title: 'Export ROM',
+      title: nls.localize('vuengine/export/exportRom', 'Export ROM'),
       inputValue: await this.getRomName(),
     };
     const homedir = await this.envVariablesServer.getHomeDirUri();
@@ -121,8 +121,8 @@ export class VesExportService {
       return true;
     }
     const confirmed = await new ConfirmDialog({
-      title: 'Overwrite',
-      msg: `Do you really want to overwrite '${uri.toString()}'?`,
+      title: nls.localize('vuengine/export/overwrite', 'Overwrite'),
+      msg: nls.localize('vuengine/export/doYouReallyWantToOverwrite', 'Do you really want to overwrite "${}"?', uri.toString()),
     }).open();
     return !!confirmed;
   }

@@ -196,7 +196,7 @@ export class VesGettingStartedWidget extends ReactWidget {
     protected renderOpen(): React.ReactNode {
         const newProject = (
             <button className="theia-button large" onClick={this.createNewProject}>
-                <i className="fa fa-plus"></i> {VesProjectCommands.NEW.label}
+                <i className="fa fa-plus"></i> {nls.localize('vuengine/project/commands/newProject', 'New Project')}
             </button>
         );
 
@@ -205,7 +205,7 @@ export class VesGettingStartedWidget extends ReactWidget {
             tabIndex={0}
             onClick={this.doOpenWorkspace}
             onKeyDown={this.doOpenWorkspaceEnter}>
-            <i className="fa fa-file-code-o"></i> Open Project
+            <i className="fa fa-file-code-o"></i> {nls.localize('vuengine/project/commands/openProject', 'Open Project...')}
         </button>;
 
         return <div className="gs-section">
@@ -261,11 +261,11 @@ export class VesGettingStartedWidget extends ReactWidget {
             <div className="gs-section">
                 <h3 className="gs-section-header">
                     <i className={codicon('question')}></i>
-                    Help
+                    {nls.localizeByDefault('Help')}
                 </h3>
                 <div className="gs-action-container">
                     <a href="#" onClick={this.openHandbook}>
-                        Show Documentation
+                        {nls.localize('vuengine/gettingStarted/showDocumentation', 'Show Documentation')}
                     </a>
                 </div>
             </div>
@@ -277,11 +277,11 @@ export class VesGettingStartedWidget extends ReactWidget {
             <div className="gs-section">
                 <h3 className="gs-section-header">
                     <i className={codicon('link')}></i>
-                    Links
+                    {nls.localize('vuengine/gettingStarted/links', 'Links')}
                 </h3>
                 <div className="gs-action-container">
                     <a href="#" onClick={() => this.openUrl('https://www.patreon.com/VUEngine')}>
-                        Support Us on Patreon
+                        {nls.localize('vuengine/gettingStarted/supportUsOnPatreon', 'Support Us on Patreon')}
                     </a>
                 </div>
                 <div className="gs-action-container">
@@ -291,7 +291,7 @@ export class VesGettingStartedWidget extends ReactWidget {
                 </div>
                 <div className="gs-action-container">
                     <a href="#" onClick={() => this.openUrl('https://www.vuengine.dev')}>
-                        VUEngine Website
+                        {nls.localize('vuengine/gettingStarted/vuengineWebsite', 'VUEngine Website')}
                     </a>
                 </div>
                 <div className="gs-action-container">
@@ -349,6 +349,8 @@ function VesPreferences(props: PreferencesProps): JSX.Element {
     };
     return <div className='ves-preference'>
         <input type="checkbox" className="theia-input" id="alwaysShow" onChange={handleChange} checked={alwaysShow}></input>
-        <label htmlFor="alwaysShow">Always show this page when no project is opened.</label>
+        <label htmlFor="alwaysShow">
+            {nls.localize('vuengine/gettingStarted/alwaysShowThisPage', 'Always show this page when no project is opened.')}
+        </label>
     </div>;
 }

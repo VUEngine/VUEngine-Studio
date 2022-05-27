@@ -10,6 +10,7 @@ import {
     MenuModelRegistry,
     MenuPath,
     MessageService,
+    nls,
     Progress
 } from '@theia/core/lib/common';
 import { isOSX } from '@theia/core/lib/common/os';
@@ -149,20 +150,26 @@ export class VesUpdaterFrontendContribution implements CommandContribution, Menu
     }
 
     protected async handleDownloadUpdate(): Promise<void> {
-        const answer = await this.messageService.info('Updates found. Do you want to update?', 'No', 'Yes', 'Never');
-        if (answer === 'Never') {
+        const no = nls.localize('vuengine/updater/no', 'No');
+        const yes = nls.localize('vuengine/updater/yes', 'Yes');
+        const never = nls.localize('vuengine/updater/never', 'Never');
+        const answer = await this.messageService.info(
+            nls.localize('vuengine/updater/updateFoundWannaUpdate', 'Updates found. Do you want to update?'),
+            no, yes, never
+        );
+        if (answer === never) {
             this.preferenceService.set('updates.reportOnStart', false, PreferenceScope.User);
             return;
-        } else if (answer === 'Yes') {
+        } else if (answer === yes) {
             this.stopProgress();
             this.progress = await this.messageService.showProgress({
-                text: 'Application Update'
+                text: nls.localize('vuengine/updater/applicationUpdate', 'Application Update')
             });
             let dots = 0;
             this.intervalId = setInterval(() => {
                 if (this.progress !== undefined) {
                     dots = (dots + 1) % 4;
-                    this.progress.report({ message: 'Downloading' + '.'.repeat(dots) });
+                    this.progress.report({ message: nls.localize('vuengine/updater/downloading', 'Downloading') + '.'.repeat(dots) });
                 }
             }, 1000);
             this.updater.downloadUpdate();
@@ -170,7 +177,7 @@ export class VesUpdaterFrontendContribution implements CommandContribution, Menu
     }
 
     protected async handleNoUpdate(): Promise<void> {
-        this.messageService.info('You are already using the latest version of VUEngine Studio.');
+        this.messageService.info(nls.localize('vuengine/updater/alreadyUsingLatestVersion', 'You are already using the latest version of VUEngine Studio.'));
     }
 
     protected async handleUpdatesAvailable(): Promise<void> {
@@ -178,8 +185,13 @@ export class VesUpdaterFrontendContribution implements CommandContribution, Menu
             this.progress.report({ work: { done: 1, total: 1 } });
             this.stopProgress();
         }
-        const answer = await this.messageService.info('An update has been downloaded. Do you want to restart to install now?', 'No', 'Yes');
-        if (answer === 'Yes') {
+        const no = nls.localize('vuengine/updater/no', 'No');
+        const yes = nls.localize('vuengine/updater/yes', 'Yes');
+        const answer = await this.messageService.info(
+            nls.localize('vuengine/updater/updateHasBeenDownloaded', 'An update has been downloaded. Do you want to restart to install now?'),
+            no, yes,
+        );
+        if (answer === yes) {
             this.updater.onRestartToUpdateRequested();
         }
     }
@@ -187,7 +199,7 @@ export class VesUpdaterFrontendContribution implements CommandContribution, Menu
     protected async handleError(error: UpdaterError): Promise<void> {
         this.stopProgress();
         if (error.errorLogPath) {
-            const viewLogAction = 'View Error Log';
+            const viewLogAction = nls.localize('vuengine/updater/viewErrorLog', 'View Error Log');
             const answer = await this.messageService.error(error.message, viewLogAction);
             if (answer === viewLogAction) {
                 const uri = new URI(VSCodeURI.file(error.errorLogPath));

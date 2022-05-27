@@ -43,6 +43,7 @@ export class VesFlashCartViewContribution extends AbstractViewContribution<VesFl
             commandRegistry.registerCommand(VesFlashCartCommands.WIDGET_TOGGLE, {
                 execute: () => this.toggleView()
             });
+
             commandRegistry.registerCommand(VesFlashCartCommands.WIDGET_EXPAND, {
                 isEnabled: () => true,
                 isVisible: widget => widget !== undefined &&
@@ -52,6 +53,7 @@ export class VesFlashCartViewContribution extends AbstractViewContribution<VesFl
                     await this.openView({ activate: true, reveal: true }) &&
                     this.commandService.executeCommand(CommonCommands.TOGGLE_MAXIMIZED.id)
             });
+
             commandRegistry.registerCommand(VesFlashCartCommands.WIDGET_HELP, {
                 isEnabled: () => true,
                 isVisible: widget => widget !== undefined &&
@@ -59,18 +61,20 @@ export class VesFlashCartViewContribution extends AbstractViewContribution<VesFl
                     widget.id === VesFlashCartWidget.ID,
                 execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'user-guide/flash-carts', false),
             });
+
+            commandRegistry.registerCommand(VesFlashCartCommands.WIDGET_SETTINGS, {
+                isEnabled: () => true,
+                isVisible: widget => widget !== undefined &&
+                    widget.id === VesFlashCartWidget.ID,
+                execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'flash carts'),
+            });
+
             commandRegistry.registerCommand(VesFlashCartCommands.WIDGET_REFRESH, {
                 isEnabled: () => true,
                 isVisible: widget => widget !== undefined &&
                     widget.id !== undefined &&
                     widget.id === VesFlashCartWidget.ID,
                 execute: () => this.vesFlashCartService.detectConnectedFlashCarts(),
-            });
-            commandRegistry.registerCommand(VesFlashCartCommands.WIDGET_SETTINGS, {
-                isEnabled: () => true,
-                isVisible: widget => widget !== undefined &&
-                    widget.id === VesFlashCartWidget.ID,
-                execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'flash carts'),
             });
         }
     }

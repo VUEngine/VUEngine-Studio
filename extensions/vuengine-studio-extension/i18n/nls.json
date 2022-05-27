@@ -1,0 +1,393 @@
+{
+  "theia": {
+    "workspace": {
+      "closeWorkspace": "Do you really want to close the project?",
+      "openRecentPlaceholder": "Type the name of the project you want to open",
+      "preserveWindow": "Enable opening projects in current window."
+    }
+  },
+  "vuengine": {
+    "about": {
+      "and": "and",
+      "thankYouToOurSupporters": "Thank you to our supporters on Patreon!",
+      "title": "About {0}",
+      "version": "Version",
+      "vsCodeApiVersion": "VSCode API Version"
+    },
+    "build": {
+      "abortBuild": "Abort build",
+      "build": "Build",
+      "buildMode": "Build Mode",
+      "buildProject": "Build Project",
+      "buildSuccessful": "Build successful",
+      "buildSuccessfulWithWarnings": "Build successful (with warnings)",
+      "building": "Building",
+      "commandCompleted": "Command \"{0}\" completed.",
+      "commands": {
+        "build": "Build Project",
+        "category": "Build",
+        "clean": "Clean Build Folder",
+        "expandView": "Toggle Maximized",
+        "setMode": "Set Build Mode...",
+        "showHelp": "Show Handbook Page",
+        "showSettings": "Show Build Preferences",
+        "toggleDumpElf": "Toggle Dump ELF",
+        "togglePedanticWarnings": "Toggle Pedantic Warnings",
+        "toggleView": "Toggle Build View"
+      },
+      "couldNotFindCommand": "Could not find command \"{0}\".",
+      "couldNotRunTask": "Could not run task \"{0}\".",
+      "done": "Done",
+      "dumpElf": "Dump ELF",
+      "errorCouldNotFindMakefile": "Error: Could not find a makefile. Tried the following locations:",
+      "errorEnginePathMustNotContainSpaces": "Error: Engine path must not contain spaces. Your engine path:",
+      "errorPluginsPathMustNotContainSpaces": "Error: Plugins path must not contain spaces. Your plugins path:",
+      "errorProjectPathMustNotContainSpaces": "Error: Project path must not contain spaces. Your project path:",
+      "errorUserPluginsPathMustNotContainSpaces": "Error: User Plugins path must not contain spaces. Your user plugins path:",
+      "malformedPreferenceMissingTaskName": "Malformed preference: missing task name.",
+      "malformedPreferenceMissingTaskType": "Malformed preference: missing type for task {0}.",
+      "malformedPreferenceNotAnArray": "Malformed preference: not an array.",
+      "mode": "Mode",
+      "modes": {
+        "betaDescription": "Includes selected asserts, for testing the performance on hardware.",
+        "debugDescription": "Includes all runtime assertions, includes debugging tools.",
+        "releaseDescription": "Includes no asserts or debug flags, for shipping only.",
+        "toolsDescription": "Includes selected asserts, includes debugging tools."
+      },
+      "noTasksFound": "No tasks found.",
+      "pedanticWarnings": "Pedantic Warnings",
+      "pleaseInstallWsl": "Please consider installing WSL to massively improve build times.",
+      "postBuildTasks": "Post-build tasks",
+      "preBuildTasks": "Pre-build tasks",
+      "preferences": {
+        "dumpElfDescription": "Dump assembly code and memory sections.",
+        "engineCorePathDescription": "Full path to core library. Uses built-in VUEngine Core when left blank.",
+        "includeEngineCoreInWorkspaceDescription": "Automatically include core library in workspaces.",
+        "pedanticWarningsDescription": "Enable pedantic compiler warnings.",
+        "postBuildTasksDescription": "List of Tasks and Commands to execute after building.",
+        "preBuildTasksDescription": "List of Tasks and Commands to execute before building."
+      },
+      "runningPostBuildTasks": "Running post-build tasks",
+      "runningPreBuildTasks": "Running pre-build tasks",
+      "setBuildModePlaceholder": "Select which mode to build in",
+      "setBuildModeTitle": "Set Build Mode",
+      "showOnlyErrors": "Show only errors",
+      "showOnlyWarnings": "Show only warnings",
+      "taskCompleted": "Task \"{0}\" completed.",
+      "taskTerminatedBySignal": "Task \"{0}\" terminated by signal {1}.",
+      "taskTerminatedForUnknownReason": "Task \"{0}\" terminated for unknown reason.",
+      "taskTerminatedWithExitCode": "Task \"{0}\" terminated with exit code {1}.",
+      "toggleAutomaticScrolling": "Toggle automatic scrolling"
+    },
+    "codegen": {
+      "commands": {
+        "category": "Code Generator",
+        "generateAll": "Generate all"
+      }
+    },
+    "documentation": {
+      "commands": {
+        "category": "Documentation",
+        "openHandbook": "Open Handbook",
+        "openTechScroll": "Open Hardware Documentation"
+      },
+      "documentation": "Documentation",
+      "hardwareDocumentation": "Hardware Documentation",
+      "vuengineStudioHandbook": "VUEngine Studio Handbook"
+    },
+    "editors": {
+      "areYouSureYouWantToDeleteItem": "Are you sure you want to delete the {0} \"{1}\"?",
+      "chooseAnItemPlaceholder": "Select which item you want to edit",
+      "chooseAnItemTitle": "Choose an item",
+      "commands": {
+        "category": "Editors",
+        "open": "Open Editor"
+      },
+      "deleteNodeQuestion": "Delete Node?",
+      "palette": {
+        "black": "Black",
+        "brightRed": "Bright Red",
+        "darkRed": "Dark Red",
+        "mediumRed": "Medium Red"
+      },
+      "visualEditor": "Visual Editor"
+    },
+    "emulator": {
+      "builtIn": "Built-In",
+      "commands": {
+        "category": "Emulator",
+        "run": "Run on Emulator",
+        "selectEmulator": "Set Default Emulator Config..."
+      },
+      "configureInput": "Configure Input",
+      "controller": {
+        "aCommand": "A",
+        "bCommand": "B",
+        "category": "Emulator Game Pad",
+        "lDownCommand": "Left D-Pad ⇩",
+        "lLeftCommand": "Left D-Pad ⇦",
+        "lRightCommand": "Left D-Pad ⇨",
+        "lTriggerCommand": "Left Trigger",
+        "lUpCommand": "Left D-Pad ⇧",
+        "rDownCommand": "Right D-Pad ⇩",
+        "rLeftCommand": "Right D-Pad ⇦",
+        "rRightCommand": "Right D-Pad ⇨",
+        "rTriggerCommand": "Right Trigger",
+        "rUpCommand": "Right D-Pad ⇧",
+        "selectCommand": "Select",
+        "startCommand": "Start"
+      },
+      "currentSaveState": "Current Save State",
+      "emulationMode": "Emulation Mode",
+      "emulationModes": {
+        "accurate": "Accurate",
+        "fast": "Fast"
+      },
+      "emulator": "Emulator",
+      "input": {
+        "audioMuteCommand": "Audio Mute",
+        "frameAdvanceCommand": "Frame Advance",
+        "fullscreenCommand": "Fullscreen",
+        "loadStateCommand": "Load State",
+        "pauseToggleCommand": "Toggle Pause",
+        "resetCommand": "Reset",
+        "rewindCommand": "Rewind",
+        "saveStateCommand": "Save State",
+        "screenshotCommand": "Take Screenshot",
+        "stateSlotDecreaseCommand": "Decrease Save State Slot",
+        "stateSlotIncreaseCommand": "Increase Save State Slot",
+        "toggleControlsOverlayCommand": "Toggle Controls Overlay",
+        "toggleFastForwardCommand": "Toggle Fast Forward",
+        "toggleLowPower": "Toggle Low Power Signal",
+        "toggleSlowmotionCommand": "Toggle Slow Motion"
+      },
+      "mute": "Mute",
+      "pause": "Pause",
+      "preferences": {
+        "builtInEmulationModeDescription": "Emulation mode of built-in emulator.",
+        "builtInScalingModeDescription": "Scaling mode of built-in emulator.",
+        "builtInStereoModeDescription": "Stereoscopy display mode of built-in emulator.",
+        "customConfigsDescription": "User-defined emulator configurations for running compiled ROMs.",
+        "customDefaultDescription": "Emulator configuration that shall be used to run compiled ROMs. Uses built-in emulator if left blank."
+      },
+      "resume": "Resume",
+      "runQueued": "Run Queued",
+      "scale": "Scale",
+      "scales": {
+        "auto": "Auto",
+        "stretch": "Stretch"
+      },
+      "selectDefaultEmulatorPlaceholder": "Which emulator configuration should be used to run compiled projects?",
+      "selectDefaultEmulatorTitle": "Select default emulator configuration",
+      "showHelp": "Show Handbook Page",
+      "stereoMode": "Stereo Mode",
+      "stereoModes": {
+        "2dBlackBlue": "2D (Blue/Black)",
+        "2dBlackCyan": "2D (Cyan/Black)",
+        "2dBlackElectricCyan": "2D (El.Cyan/Black)",
+        "2dBlackGreen": "2D (Green/Black)",
+        "2dBlackMagenta": "2D (Magenta/Black)",
+        "2dBlackRed": "2D (Red/Black)",
+        "2dBlackWhite": "2D (White/Black)",
+        "2dBlackYellow": "2D (Yellow/Black)",
+        "anaglyph-redElectricCyan": "Anaglyph (Red/El.Cyan)",
+        "anaglyphGreenMagenta": "Anaglyph (Red/Green)",
+        "anaglyphRedBlue": "Anaglyph (Red/Blue)",
+        "anaglyphRedCyan": "Anaglyph (Red/Cyan)",
+        "anaglyphYellowBlue": "Anaglyph (Yellow/Blue)",
+        "cyberscope": "CyberScope",
+        "hli": "Horizontal Line Interlaced",
+        "sideBySide": "Side By Side",
+        "vli": "Vertical Line Interlaced"
+      },
+      "unmute": "Unmute"
+    },
+    "export": {
+      "commands": {
+        "category": "Export",
+        "export": "Export ROM..."
+      },
+      "doYouReallyWantToOverwrite": "Do you really want to overwrite \"${}\"?",
+      "exportRom": "Export ROM",
+      "overwrite": "Overwrite"
+    },
+    "flashCarts": {
+      "abort": "Abort",
+      "cancel": "Cancel",
+      "commands": {
+        "category": "Flash Carts",
+        "detectConnected": "Detect Connected Flash Carts",
+        "expandView": "Toggle Maximized",
+        "flash": "Flash to Flash Cart",
+        "showHelp": "Show Handbook Page",
+        "showSettings": "Show Flash Carts Preferences",
+        "toggleView": "Toggle Flash Carts View"
+      },
+      "connectYourFlashCarts": "Connect your Virtual Boy flash cart(s) to your computer via USB.",
+      "connectedFlashCarts": "Connected Flash Carts",
+      "done": "Done",
+      "flash": "Flash",
+      "flashCarts": "Flash Carts",
+      "flashingIsQueued": "Flashing is queued and will start once the build is ready",
+      "flashingQueued": "Flashing Queued",
+      "insufficientSpaceToHoldRom": "Insufficient space to hold ROM",
+      "noneFound": "No flash carts found",
+      "preferences": {
+        "flashCartsDescription": "Configurations for flash cart auto-detection and flashing."
+      },
+      "youCanConnectAnyNumberOfCarts": "You can connect, and flash to, any number of flash carts at once."
+    },
+    "general": {
+      "commands": {
+        "category": "VUEngine Studio",
+        "reportIssue": "Report Issue",
+        "support": "Support VUEngine Studio"
+      },
+      "selectDirectory": "Select directory",
+      "space": "Space",
+      "themes": {
+        "dark": "Dark",
+        "highContrast": "High Contrast",
+        "light": "Light",
+        "virtualBoy": "Virtual Boy"
+      }
+    },
+    "gettingStarted": {
+      "alwaysShowThisPage": "Always show this page when no project is opened.",
+      "commands": {
+        "showHelp": "Show Handbook Page",
+        "showWidget": "Getting Started"
+      },
+      "links": "Links",
+      "preferences": {
+        "showGettingStartedDescription": "Show Getting Started page when no project is opened."
+      },
+      "showDocumentation": "Show Documentation",
+      "supportUsOnPatreon": "Support Us on Patreon",
+      "vuengineWebsite": "VUEngine Website"
+    },
+    "handbook": {
+      "handbook": "Handbook"
+    },
+    "imageConverter": {
+      "changedImagesOnly": "Changed images only",
+      "clearLogs": "Clear Logs",
+      "commands": {
+        "category": "Image Converter",
+        "convertAll": "Convert all",
+        "convertChanged": "Convert changed",
+        "showHelp": "Show Handbook Page",
+        "toggleView": "Toggle Image Converter View"
+      },
+      "convert": "Convert",
+      "done": "Done",
+      "foundXImages": "Found {0} images",
+      "imageConverter": "Image Converter",
+      "noneFound": "None found.",
+      "startingToConvertAll": "Starting to convert all images...",
+      "startingToConvertChanged": "Starting to convert changed images..."
+    },
+    "plugins": {
+      "add": "Add",
+      "commands": {
+        "category": "Plugins",
+        "clearAll": "Clear Search Results",
+        "new": "New Plugin",
+        "searchByAuthor": "Search By Author",
+        "searchByTag": "Search By Tag",
+        "showHelp": "Show Handbook Page",
+        "showInstalled": "Show Installed Plugins",
+        "showRecommendations": "Show Recommended Plugins",
+        "showSettings": "Show Plugins Preferences",
+        "toggleView": "Toggle Plugins View"
+      },
+      "dependencies": "Dependencies",
+      "installed": "Installed",
+      "plugin": "Plugin",
+      "plugins": "Plugins",
+      "preferences": {
+        "includeLibraryInWorkspaceDescription": "Automatically include plugins library in workspaces.",
+        "includeUserLibraryInWorkspaceDescription": "Automatically include user plugins in workspaces.",
+        "libraryPathDescription": "Full path to plugins library. Uses built-in VUEngine Plugins library when left blank.",
+        "userLibraryPathDescription": "Full path to base folder for all user plugins."
+      },
+      "recommended": "Recommended",
+      "remove": "Remove",
+      "search": "Search",
+      "searchPlugins": "Search Plugins"
+    },
+    "project": {
+      "areYouSureYouWantToDelete": "Are you sure you want to delete \"{0}\"?",
+      "commands": {
+        "category": "Projects",
+        "closeProject": "Close Project",
+        "newProject": "New Project",
+        "openProject": "Open Project...",
+        "openProjectFile": "Open Project File",
+        "openRecentProject": "Open Recent Project...",
+        "saveProjectAs": "Save Project As...",
+        "toggleView": "Toggle Project View"
+      },
+      "deleteNodeQuestion": "Delete Node?",
+      "preferences": {
+        "authorDescription": "Default author name to use for new projects.",
+        "basePathDescription": "Base path for new projects.",
+        "makerCodeDescription": "Default Maker Code to place in ROM header of new projects."
+      },
+      "project": "Project",
+      "selectParentFolder": "Select new project's parent folder"
+    },
+    "rumblePack": {
+      "commands": {
+        "category": "Rumble Pack",
+        "detectConnected": "Detect Connected Rumble Pack",
+        "expand": "Toggle Maximized",
+        "help": "Show Handbook Page",
+        "openWidget": "Open Rumble Pack Tool"
+      },
+      "rumblePack": "Rumble Pack",
+      "rumblePackConnected": "Rumble Pack Connected",
+      "rumblePackTool": "Rumble Pack Tool"
+    },
+    "titlebar": {
+      "commands": {
+        "category": "Window",
+        "maximizeWindow": "Maximize Window",
+        "minimizeWindow": "Minimize Window",
+        "unmaximizeWindow": "Unmaximize Window"
+      }
+    },
+    "updater": {
+      "alreadyUsingLatestVersion": "You are already using the latest version of VUEngine Studio.",
+      "applicationUpdate": "Application Update",
+      "commands": {
+        "category": "Updater",
+        "checkForUpdates": "Check for Updates...",
+        "restartToUpdate": "Restart to Update"
+      },
+      "downloading": "Downloading",
+      "never": "Never",
+      "no": "No",
+      "preferences": {
+        "reportOnStartDescription": "Report available updates after application start."
+      },
+      "updateFoundWannaUpdate": "Updates found. Do you want to update?",
+      "updateHasBeenDownloaded": "An update has been downloaded. Do you want to restart to install now?",
+      "viewErrorLog": "View Error Log",
+      "yes": "Yes"
+    },
+    "zoom": {
+      "commands": {
+        "category": "View",
+        "resetZoom": "Reset Zoom",
+        "zoomIn": "Zoom In",
+        "zoomOut": "Zoom Out"
+      },
+      "preferences": {
+        "showZoomLevelInStatusBarDescription": "Show zoom level in status bar (only when not 100%).",
+        "zoomLevelDescription": "Adjust the zoom level of the window."
+      },
+      "resetZoom": "Reset zoom"
+    }
+  }
+}

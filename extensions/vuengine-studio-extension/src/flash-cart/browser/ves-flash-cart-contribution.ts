@@ -4,7 +4,6 @@ import { ApplicationShell, KeybindingContribution, KeybindingRegistry } from '@t
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesFlashCartCommands } from './ves-flash-cart-commands';
 import { VesFlashCartService } from './ves-flash-cart-service';
-import { VesFlashCartViewContribution } from './ves-flash-cart-view-contribution';
 import { VesBuildMenuSection } from '../../build/browser/ves-build-contribution';
 
 @injectable()
@@ -13,8 +12,6 @@ export class VesFlashCartContribution implements CommandContribution, Keybinding
   protected readonly shell: ApplicationShell;
   @inject(VesFlashCartService)
   private readonly vesFlashCartService: VesFlashCartService;
-  @inject(VesFlashCartViewContribution)
-  private readonly vesFlashCartView: VesFlashCartViewContribution;
   @inject(WorkspaceService)
   private readonly workspaceService: WorkspaceService;
 
@@ -22,16 +19,6 @@ export class VesFlashCartContribution implements CommandContribution, Keybinding
     commandRegistry.registerCommand(VesFlashCartCommands.FLASH, {
       isVisible: () => this.workspaceService.opened,
       execute: () => this.vesFlashCartService.doFlash(),
-    });
-
-    commandRegistry.registerCommand(VesFlashCartCommands.WIDGET_TOGGLE, {
-      execute: (forceOpen: boolean = false) => {
-        if (forceOpen) {
-          this.vesFlashCartView.openView({ activate: true, reveal: true });
-        } else {
-          this.vesFlashCartView.toggleView();
-        }
-      }
     });
 
     commandRegistry.registerCommand(VesFlashCartCommands.DETECT, {

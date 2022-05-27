@@ -23,7 +23,7 @@ export const VesFolder = (props: CellProps & VanillaRendererProps) => {
     const selectDirectory = async (currentValue: string) => {
         /*
         const openFileDialogProps: OpenFileDialogProps = {
-            title: 'Select image(s) folder',
+            title: nls.localize('vuengine/editors/selectImageFolder', 'Select image(s) folder'),
             canSelectFolders: true,
             canSelectFiles: false
         };

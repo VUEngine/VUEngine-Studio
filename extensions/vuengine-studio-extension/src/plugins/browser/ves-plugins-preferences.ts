@@ -1,3 +1,4 @@
+import { nls } from '@theia/core';
 import { PreferenceScope } from '@theia/core/lib/browser';
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
 
@@ -15,7 +16,7 @@ export const VesPluginsPreferenceSchema: PreferenceSchema = {
     'properties': {
         [VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH]: {
             type: 'string',
-            description: 'Full path to plugins library. Uses built-in VUEngine Plugins library when left blank.',
+            description: nls.localize('vuengine/plugins/preferences/libraryPathDescription', 'Full path to plugins library. Uses built-in VUEngine Plugins library when left blank.'),
             default: '',
             additionalProperties: {
                 // @ts-ignore
@@ -26,14 +27,14 @@ export const VesPluginsPreferenceSchema: PreferenceSchema = {
         },
         [VesPluginsPreferenceIds.ENGINE_PLUGINS_INCLUDE_IN_WORKSPACE]: {
             type: 'boolean',
-            description: 'Automatically include plugins library in workspaces.',
+            description: nls.localize('vuengine/plugins/preferences/includeLibraryInWorkspaceDescription', 'Automatically include plugins library in workspaces.'),
             default: true,
             scope: PreferenceScope.Folder,
             overridable: true,
         },
         [VesPluginsPreferenceIds.USER_PLUGINS_PATH]: {
             type: 'string',
-            description: 'Full path to base folder for all user plugins.',
+            description: nls.localize('vuengine/plugins/preferences/userLibraryPathDescription', 'Full path to base folder for all user plugins.'),
             additionalProperties: {
                 // @ts-ignore
                 isDirectory: true,
@@ -43,7 +44,7 @@ export const VesPluginsPreferenceSchema: PreferenceSchema = {
         },
         [VesPluginsPreferenceIds.USER_PLUGINS_INCLUDE_IN_WORKSPACE]: {
             type: 'boolean',
-            description: 'Automatically include user plugins in workspaces.',
+            description: nls.localize('vuengine/plugins/preferences/includeUserLibraryInWorkspaceDescription', 'Automatically include user plugins in workspaces.'),
             default: true,
             scope: PreferenceScope.Folder,
             overridable: true,

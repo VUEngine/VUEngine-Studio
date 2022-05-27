@@ -1,4 +1,4 @@
-import { CommandService } from '@theia/core';
+import { CommandService, nls } from '@theia/core';
 import { ContextMenuRenderer } from '@theia/core/lib/browser';
 import { open, OpenerOptions, OpenerService } from '@theia/core/lib/browser/opener-service';
 import { TreeElement } from '@theia/core/lib/browser/source-tree';
@@ -242,9 +242,13 @@ export abstract class AbstractVesPluginComponent extends React.Component<Abstrac
         const plugin = this.props.plugin;
         const { installed } = plugin;
         if (installed) {
-            return <button className="theia-button action" onClick={this.uninstall}>Remove</button>;
+            return <button className="theia-button action" onClick={this.uninstall}>
+                {nls.localize('vuengine/plugins/remove', 'Remove')}
+            </button>;
         }
-        return <button className="theia-button prominent action" onClick={this.install}>Add</button>;
+        return <button className="theia-button prominent action" onClick={this.install}>
+            {nls.localize('vuengine/plugins/add', 'Add')}
+        </button>;
     }
 
 }
@@ -341,12 +345,12 @@ export class VesPluginEditorComponent extends AbstractVesPluginComponent {
     }
 
     protected renderDependenciesList(dependencies: string[]): string {
-        let dependenciesList = "<h3>Dependencies</h3>";
+        let dependenciesList = `<h3>${nls.localize('vuengine/plugins/dependencies', 'Dependencies')}</h3> `;
 
         if (dependencies?.length) {
             dependenciesList += "<ul>";
             for (const dependency of dependencies) {
-                dependenciesList += `<li><code>${dependency}</code></li>`;
+                dependenciesList += `< li > <code>${dependency}</code></li > `;
             }
             dependenciesList += "</ul>";
         } else {
@@ -359,7 +363,7 @@ export class VesPluginEditorComponent extends AbstractVesPluginComponent {
     protected getSubcomponentStyles(): { baseStyle: React.CSSProperties, scrollStyle: React.CSSProperties; } {
         const visibility: 'unset' | 'hidden' = this.header ? 'unset' : 'hidden';
         const baseStyle = { visibility };
-        const scrollStyle = this.header?.clientHeight ? { visibility, height: `calc(100% - (${this.header.clientHeight}px + 1px))` } : baseStyle;
+        const scrollStyle = this.header?.clientHeight ? { visibility, height: `calc(100 % - (${this.header.clientHeight}px + 1px))` } : baseStyle;
 
         return { baseStyle, scrollStyle };
     }

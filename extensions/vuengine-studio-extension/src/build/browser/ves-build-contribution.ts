@@ -1,5 +1,5 @@
 import { ApplicationShell, KeybindingContribution, KeybindingRegistry, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
-import { CommandContribution, CommandRegistry, MAIN_MENU_BAR, MenuContribution, MenuModelRegistry } from '@theia/core/lib/common';
+import { CommandContribution, CommandRegistry, MAIN_MENU_BAR, MenuContribution, MenuModelRegistry, nls } from '@theia/core/lib/common';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesBuildCommands } from './ves-build-commands';
@@ -76,7 +76,7 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
   }
 
   registerMenus(menus: MenuModelRegistry): void {
-    menus.registerSubmenu(buildMenuPath, 'Build', {
+    menus.registerSubmenu(buildMenuPath, nls.localize('vuengine/build/build', 'Build'), {
       order: '6'
     });
 
@@ -99,12 +99,12 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
 
     menus.registerMenuAction(VesBuildMenuSection.BUILD_OPTION, {
       commandId: VesBuildCommands.TOGGLE_DUMP_ELF.id,
-      label: 'Dump ELF',
+      label: nls.localize('vuengine/build/dumpElf', 'Dump ELF'),
       order: '1'
     });
     menus.registerMenuAction(VesBuildMenuSection.BUILD_OPTION, {
       commandId: VesBuildCommands.TOGGLE_PEDANTIC_WARNINGS.id,
-      label: 'Pedantic Warnings',
+      label: nls.localize('vuengine/build/pedanticWarnings', 'Pedantic Warnings'),
       order: '2'
     });
   }

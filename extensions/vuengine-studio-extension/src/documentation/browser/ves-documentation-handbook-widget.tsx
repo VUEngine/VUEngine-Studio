@@ -3,7 +3,7 @@ import { BaseWidget } from '@theia/core/lib/browser';
 import { PreviewHandler, PreviewHandlerProvider } from '@theia/preview/lib/browser/preview-handler';
 import URI from '@theia/core/lib/common/uri';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { isWindows } from '@theia/core';
+import { isWindows, nls } from '@theia/core';
 
 @injectable()
 export class VesDocumentationHandbookWidget extends BaseWidget {
@@ -14,7 +14,7 @@ export class VesDocumentationHandbookWidget extends BaseWidget {
 
     protected previewHandler: PreviewHandler | undefined;
     static readonly ID = 'ves-documentation-handbook';
-    static readonly LABEL = 'Handbook';
+    static readonly LABEL = nls.localize('vuengine/handbook/handbook', 'Handbook');
 
     constructor() {
         super();

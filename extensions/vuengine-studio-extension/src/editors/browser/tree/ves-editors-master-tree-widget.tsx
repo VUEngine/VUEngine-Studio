@@ -1,4 +1,5 @@
 import { MasterTreeWidget, TreeAnchor, TreeContextMenu, TreeEditor, TREE_PROPS } from '@eclipse-emfcloud/theia-tree-editor';
+import { nls } from '@theia/core';
 import { codicon, ConfirmDialog, ExpandableTreeNode } from '@theia/core/lib/browser';
 import { RenderContextMenuOptions } from '@theia/core/lib/browser/context-menu-renderer';
 import { TreeNode } from '@theia/core/lib/browser/tree/tree';
@@ -59,8 +60,8 @@ export class VesMasterTreeWidget extends MasterTreeWidget {
             const registeredTypes = this.vesProjectService.getRegisteredTypes();
             const typeLabel = registeredTypes[node.jsonforms.type].schema.title;
             const dialog = new ConfirmDialog({
-                title: 'Delete Node?',
-                msg: `Are you sure you want to delete the ${typeLabel} "${node.name}"?`
+                title: nls.localize('vuengine/editors/deleteNodeQuestion', 'Delete Node?'),
+                msg: nls.localize('vuengine/editors/areYouSureYouWantToDeleteItem', 'Are you sure you want to delete the {0} "{1}"?', typeLabel, node.name),
             });
             dialog.open().then(remove => {
                 if (remove && node.parent && node.parent && TreeEditor.Node.is(node.parent)) {

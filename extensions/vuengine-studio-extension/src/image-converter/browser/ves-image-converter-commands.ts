@@ -1,28 +1,42 @@
 import { Command } from '@theia/core';
 
 export namespace VesImageConverterCommands {
-  export const CATEGORY = 'Image Converter';
+  export const CONVERT_ALL: Command = Command.toLocalizedCommand(
+    {
+      id: 'ves:imageConverter:convertAll',
+      label: 'Convert all',
+      category: 'Image Converter',
+    },
+    'vuengine/imageConverter/commands/convertAll',
+    'vuengine/imageConverter/commands/category'
+  );
 
-  export const CONVERT_ALL: Command = {
-    id: 'VesImageConverter.commands.convertAll',
-    label: 'Convert all',
-    category: CATEGORY,
-  };
+  export const CONVERT_CHANGED: Command = Command.toLocalizedCommand(
+    {
+      id: 'ves:imageConverter:convertChanged',
+      label: 'Convert changed',
+      category: 'Image Converter',
+    },
+    'vuengine/imageConverter/commands/convertChanged',
+    'vuengine/imageConverter/commands/category'
+  );
 
-  export const CONVERT_CHANGED: Command = {
-    id: 'VesImageConverter.commands.convertChanged',
-    label: 'Convert changed',
-    category: CATEGORY,
-  };
+  export const WIDGET_TOGGLE: Command = Command.toLocalizedCommand(
+    {
+      id: 'ves:imageConverter:toggleView',
+      label: 'Toggle Image Converter View',
+    },
+    'vuengine/imageConverter/commands/toggleView',
+    'vuengine/imageConverter/commands/category'
+  );
 
-  export const WIDGET_TOGGLE: Command = {
-    id: 'VesImageConverter.commands.view.toggle',
-    label: 'Toggle Image Converter View'
-  };
-
-  export const WIDGET_HELP: Command = {
-    id: 'VesImageConverter.commands.view.help',
-    label: 'Show Handbook Page',
-    iconClass: 'codicon codicon-book',
-  };
+  export const WIDGET_HELP: Command = Command.toLocalizedCommand(
+    {
+      id: 'ves:imageConverter:showHelp',
+      label: 'Show Handbook Page',
+      iconClass: 'codicon codicon-book',
+    },
+    'vuengine/imageConverter/commands/showHelp',
+    'vuengine/imageConverter/commands/category'
+  );
 };

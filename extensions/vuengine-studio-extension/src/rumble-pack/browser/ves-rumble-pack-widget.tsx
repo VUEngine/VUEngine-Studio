@@ -1,3 +1,4 @@
+import { nls } from '@theia/core';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { Message } from '@theia/core/shared/@phosphor/messaging';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -146,7 +147,7 @@ export class VesRumblePackWidget extends ReactWidget {
   private readonly vesRumblePackService: VesRumblePackService;
 
   static readonly ID = 'vesRumblePackWidget';
-  static readonly LABEL = 'Rumble Pack Tool';
+  static readonly LABEL = nls.localize('vuengine/rumblePack/rumblePackTool', 'Rumble Pack Tool');
 
   protected state: vesRumblePackWidgetState;
 

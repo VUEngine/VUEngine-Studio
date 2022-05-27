@@ -1,4 +1,4 @@
-import { CommandService, isWindows } from '@theia/core';
+import { CommandService, isWindows, nls } from '@theia/core';
 import { KeybindingRegistry, Message, PreferenceService } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -41,7 +41,7 @@ export class VesBuildWidget extends ReactWidget {
   private readonly workspaceService: WorkspaceService;
 
   static readonly ID = 'vesBuildWidget';
-  static readonly LABEL = 'Build';
+  static readonly LABEL = nls.localize('vuengine/build/buildProject', 'Build Project');
 
   protected state: VesBuildWidgetState = {
     logFilter: BuildLogLineType.Normal,
@@ -147,7 +147,7 @@ export class VesBuildWidget extends ReactWidget {
                   <span>
                     {this.vesBuildService.buildStatus.progress === 100 ? (
                       <>
-                        <i className='fa fa-check'></i> Done
+                        <i className='fa fa-check'></i> {nls.localize('vuengine/build/done', 'Done')}
                       </>
                     ) : (
                       <>{this.vesBuildService.buildStatus.progress}%</>
@@ -164,7 +164,7 @@ export class VesBuildWidget extends ReactWidget {
                   disabled={!this.workspaceService.opened}
                   onClick={this.build}
                 >
-                  Build
+                  {nls.localize('vuengine/build/build', 'Build')}
                 </button>
               </div>
             </>
@@ -174,7 +174,7 @@ export class VesBuildWidget extends ReactWidget {
               className='theia-button secondary'
               disabled={!this.vesBuildService.buildStatus.active}
               onClick={this.abort}
-              title="Abort build"
+              title={nls.localize('vuengine/build/abortBuild', 'Abort build')}
             >
               <i className='fa fa-ban'></i>
             </button>
@@ -182,7 +182,7 @@ export class VesBuildWidget extends ReactWidget {
               className='theia-button secondary'
               disabled={this.vesBuildService.buildStatus.active || !this.state.outputRomExists}
               onClick={this.run}
-              title={`${VesEmulatorCommands.RUN.label}${this.getKeybindingLabel(VesEmulatorCommands.RUN.id, true)}`}
+              title={`${nls.localize('vuengine/emulator/commands/run', 'Run on Emulator')}${this.getKeybindingLabel(VesEmulatorCommands.RUN.id, true)}`}
             >
               <i className='fa fa-play'></i>
             </button>
@@ -190,7 +190,7 @@ export class VesBuildWidget extends ReactWidget {
               className='theia-button secondary'
               disabled={this.vesBuildService.buildStatus.active || !this.state.outputRomExists}
               onClick={this.flash}
-              title={`${VesFlashCartCommands.FLASH.label}${this.getKeybindingLabel(VesFlashCartCommands.FLASH.id, true)}`}
+              title={`${nls.localize('vuengine/flashCarts/commands/flash', 'Flash to Flash Cart')}${this.getKeybindingLabel(VesFlashCartCommands.FLASH.id, true)}`}
             >
               <i className='fa fa-microchip'></i>
             </button>
@@ -198,7 +198,7 @@ export class VesBuildWidget extends ReactWidget {
               className='theia-button secondary'
               disabled={this.vesBuildService.buildStatus.active || !this.state.outputRomExists}
               onClick={this.export}
-              title={`${VesExportCommands.EXPORT.label}${this.getKeybindingLabel(VesExportCommands.EXPORT.id, true)}`}
+              title={`${nls.localize('vuengine/export/commands/export', 'Export ROM...')}${this.getKeybindingLabel(VesExportCommands.EXPORT.id, true)}`}
             >
               <i className='fa fa-share-square-o'></i>
             </button>
@@ -206,14 +206,18 @@ export class VesBuildWidget extends ReactWidget {
               className='theia-button secondary'
               disabled={this.vesBuildService.buildStatus.active || !this.vesBuildService.buildFolderExists[buildMode]}
               onClick={this.clean}
-              title={`${VesBuildCommands.CLEAN.label}${this.getKeybindingLabel(VesBuildCommands.CLEAN.id, true)}`}
+              title={`${nls.localize('vuengine/build/commands/clean', 'Clean Build Folder')}${this.getKeybindingLabel(VesBuildCommands.CLEAN.id, true)}`}
             >
               <i className='fa fa-trash'></i>
             </button>
           </div>
           {isWindows && !this.vesCommonService.isWslInstalled && (
             <div>
-              <i className='fa fa-exclamation-triangle'></i> Please consider <a href='#' onClick={this.openWslDocs}>installing WSL</a> to massively improve build times.
+              <i className='fa fa-exclamation-triangle'></i> {nls.localize('vuengine/build/pleaseInstallWsl',
+                'Please consider installing WSL to massively improve build times.')} (
+              <a href="#" onClick={this.openWslDocs}>{nls.localize('vuengine/documentation/documentation',
+                'Documentation')}</a>
+              )
             </div>
           )}
         </div>
@@ -228,8 +232,8 @@ export class VesBuildWidget extends ReactWidget {
               ) : this.vesBuildService.buildStatus.step === BuildResult.done ? (
                 <div className={this.vesBuildService.getNumberOfWarnings() > 0 ? 'warning' : 'success'}>
                   {this.vesBuildService.getNumberOfWarnings() > 0
-                    ? <><i className='fa fa-exclamation-triangle'></i> Build successful (with warnings)</>
-                    : <><i className='fa fa-check'></i> Build successful</>}
+                    ? <><i className='fa fa-exclamation-triangle'></i> {nls.localize('vuengine/build/buildSuccessfulWithWarnings', 'Build successful (with warnings)')}</>
+                    : <><i className='fa fa-check'></i> {nls.localize('vuengine/build/buildSuccessful', 'Build successful')}</>}
                   {this.vesBuildService.getNumberOfWarnings() > 0 && ''}
                 </div>
               ) : (
@@ -300,7 +304,7 @@ export class VesBuildWidget extends ReactWidget {
           <div className='buildLogButtons'>
             <button
               className="theia-button secondary"
-              title='Toggle automatic scrolling'
+              title={nls.localize('vuengine/build/toggleAutomaticScrolling', 'Toggle automatic scrolling')}
               onClick={() => this.toggleAutoScroll()}
             >
               <i className={this.state.autoScroll
@@ -315,7 +319,7 @@ export class VesBuildWidget extends ReactWidget {
                   ? 'theia-button'
                   : 'theia-button secondary'
               }
-              title='Show only warnings'
+              title={nls.localize('vuengine/build/showOnlyWarnings', 'Show only warnings')}
               onClick={() => this.toggleFilter(BuildLogLineType.Warning)}
             >
               <i className='fa fa-exclamation-triangle'></i>{' '}
@@ -327,7 +331,7 @@ export class VesBuildWidget extends ReactWidget {
                   ? 'theia-button'
                   : 'theia-button secondary'
               }
-              title='Show only errors'
+              title={nls.localize('vuengine/build/showOnlyErrors', 'Show only errors')}
               onClick={() => this.toggleFilter(BuildLogLineType.Error)}
             >
               <i className='fa fa-times-circle-o'></i>{' '}
@@ -417,7 +421,7 @@ export class VesBuildWidget extends ReactWidget {
       : '';
 
     keybindingAccelerator = keybindingAccelerator
-      .replace(' ', 'Space');
+      .replace(' ', nls.localize('vuengine/general/space', 'Space'));
 
     if (wrapInBrackets && keybindingAccelerator !== '') {
       keybindingAccelerator = ` (${keybindingAccelerator})`;

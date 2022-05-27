@@ -2,6 +2,7 @@ import { inject, injectable } from '@theia/core/shared/inversify';
 import { FrontendApplication, FrontendApplicationContribution, StatusBar, StatusBarAlignment } from '@theia/core/lib/browser';
 import { VesRumblePackCommands } from './ves-rumble-pack-commands';
 import { VesRumblePackService } from './ves-rumble-pack-service';
+import { nls } from '@theia/core';
 
 @injectable()
 export class VesRumblePackStatusBarContribution implements FrontendApplicationContribution {
@@ -26,10 +27,10 @@ export class VesRumblePackStatusBarContribution implements FrontendApplicationCo
         if (this.vesRumblePackService.rumblePackIsConnected) {
             this.statusBar.setElement('ves-rumble-pack', {
                 alignment: StatusBarAlignment.LEFT,
-                command: VesRumblePackCommands.OPEN_WIDGET.id,
+                command: VesRumblePackCommands.WIDGET_OPEN.id,
                 priority: 2,
-                text: '$(codicon-screen-full codicon-rotate-90) Rumble Pack',
-                tooltip: 'Rumble Pack Connected'
+                text: `$(codicon-screen-full codicon-rotate-90) ${nls.localize('vuengine/rumblePack/rumblePack', 'Rumble Pack')}`,
+                tooltip: nls.localize('vuengine/rumblePack/rumblePackConnected', 'Rumble Pack Connected')
             });
         } else {
             this.statusBar.removeElement('ves-rumble-pack');

@@ -1,4 +1,4 @@
-import { CommandService } from '@theia/core';
+import { CommandService, nls } from '@theia/core';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { Message } from '@theia/core/shared/@phosphor/messaging';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -24,7 +24,7 @@ export class VesFlashCartWidget extends ReactWidget {
   private readonly workspaceService: WorkspaceService;
 
   static readonly ID = 'vesFlashCartWidget';
-  static readonly LABEL = 'Flash Carts';
+  static readonly LABEL = nls.localize('vuengine/flashCarts/flashCarts', 'Flash Carts');
 
   protected state = {
     showLog: [] as boolean[],
@@ -64,8 +64,8 @@ export class VesFlashCartWidget extends ReactWidget {
 
   protected setTitle(): void {
     const count = this.vesFlashCartService.connectedFlashCarts.length;
-    this.title.label = `${VesFlashCartWidget.LABEL}: ${count}`;
-    this.title.caption = `${VesFlashCartWidget.LABEL}: ${count}`;
+    this.title.label = `${nls.localize('vuengine/flashCarts/connectedFlashCarts', 'Connected Flash Carts')}: ${count}`;
+    this.title.caption = this.title.label;
   }
 
   protected onActivateRequest(msg: Message): void {
@@ -90,14 +90,14 @@ export class VesFlashCartWidget extends ReactWidget {
               <div className='flashingPanel'>
                 <i className='fa fa-fw fa-hourglass-half'></i>{' '}
                 <em>
-                  Flashing is queued and will start once the build is ready
+                  {nls.localize('vuengine/flashCarts/flashingIsQueued', 'Flashing is queued and will start once the build is ready')}
                 </em>
               </div>
               <button
                 className='theia-button secondary'
                 onClick={this.flash}
               >
-                Cancel
+                {nls.localize('vuengine/flashCarts/cancel', 'Cancel')}
               </button>
             </>
           )}
@@ -119,7 +119,7 @@ export class VesFlashCartWidget extends ReactWidget {
                 onClick={this.flash}
                 disabled={!this.workspaceService.opened || !this.vesFlashCartService.atLeastOneCanHoldRom}
               >
-                Flash
+                {nls.localize('vuengine/flashCarts/flash', 'Flash')}
               </button>
             </>
           )}
@@ -128,7 +128,7 @@ export class VesFlashCartWidget extends ReactWidget {
               className='theia-button secondary'
               onClick={this.abort}
             >
-              Abort
+              {nls.localize('vuengine/flashCarts/abort', 'Abort')}
             </button>
           )}
         </div>
@@ -162,13 +162,13 @@ export class VesFlashCartWidget extends ReactWidget {
                     {!connectedFlashCart.canHoldRom &&
                       <div className="infoPanel warning">
                         <i className='fa fa-fw fa-exclamation-triangle'></i>{' '}
-                        Insufficient space to hold ROM
+                        {nls.localize('vuengine/flashCarts/insufficientSpaceToHoldRom', 'Insufficient space to hold ROM')}
                         ({this.vesBuildService.bytesToMbit(this.vesBuildService.romSize)} MBit)
                       </div>
                     }
                     {connectedFlashCart.status.progress === 100 ? (
                       <div className='infoPanel success'>
-                        <i className='fa fa-fw fa-check'></i> Done
+                        <i className='fa fa-fw fa-check'></i> {nls.localize('vuengine/flashCarts/done', 'Done')}
                       </div>
                     ) : connectedFlashCart.status.progress > -1 ? (
                       <div className='infoPanel'>
@@ -241,9 +241,9 @@ export class VesFlashCartWidget extends ReactWidget {
         <div className='flashCart'>
           <div className='flashCartInfo'>
             <div>
-              <h2>No flash carts found</h2>
-              <p>Connect your Virtual Boy flash cart(s) to your computer via USB.</p>
-              <p>You can connect, and flash to, any number of flash carts at once.</p>
+              <h2>{nls.localize('vuengine/flashCarts/noneFound', 'No flash carts found')}</h2>
+              <p>{nls.localize('vuengine/flashCarts/connectYourFlashCarts', 'Connect your Virtual Boy flash cart(s) to your computer via USB.')}</p>
+              <p>{nls.localize('vuengine/flashCarts/youCanConnectAnyNumberOfCarts', 'You can connect, and flash to, any number of flash carts at once.')}</p>
             </div>
             <div>
               <img src={IMAGE_NO_FLASH_CARTS} />

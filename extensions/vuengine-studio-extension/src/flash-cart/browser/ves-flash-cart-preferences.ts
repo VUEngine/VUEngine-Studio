@@ -1,4 +1,4 @@
-import { isOSX } from '@theia/core';
+import { isOSX, nls } from '@theia/core';
 import { PreferenceScope } from '@theia/core/lib/browser';
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
 import {
@@ -71,7 +71,7 @@ export const VesFlashCartPreferenceSchema: PreferenceSchema = {
         [VesFlashCartPreferenceIds.FLASH_CARTS]: {
             type: 'array',
             label: 'Custom Flash Cart Configurations',
-            description: 'Configurations for flash cart auto-detection and flashing.',
+            description: nls.localize('vuengine/flashCarts/preferences/flashCartsDescription', 'Configurations for flash cart auto-detection and flashing.'),
             items: {
                 type: 'object',
                 title: 'Flash cart config',

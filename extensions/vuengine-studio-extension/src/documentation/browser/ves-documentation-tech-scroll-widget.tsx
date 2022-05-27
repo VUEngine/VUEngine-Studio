@@ -1,3 +1,4 @@
+import { nls } from '@theia/core';
 import { BaseWidget } from '@theia/core/lib/browser';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
@@ -15,7 +16,7 @@ export class VesDocumentationTechScrollWidget extends BaseWidget {
 
     protected previewHandler: PreviewHandler | undefined;
     static readonly ID = 'ves-documentation-tech-scroll';
-    static readonly LABEL = 'Hardware Documentation';
+    static readonly LABEL = nls.localize('vuengine/documentation/hardwareDocumentation', 'Hardware Documentation');
 
     constructor() {
         super();

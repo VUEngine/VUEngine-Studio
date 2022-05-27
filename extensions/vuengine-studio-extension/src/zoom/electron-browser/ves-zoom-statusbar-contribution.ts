@@ -2,6 +2,7 @@ import { inject, injectable } from '@theia/core/shared/inversify';
 import { FrontendApplication, FrontendApplicationContribution, PreferenceService, StatusBar, StatusBarAlignment } from '@theia/core/lib/browser';
 import { VesZoomPreferenceIds } from './ves-zoom-preferences';
 import { VesZoomCommands } from './ves-zoom-commands';
+import { nls } from '@theia/core';
 
 @injectable()
 export class VesZoomStatusBarContribution implements FrontendApplicationContribution {
@@ -41,7 +42,7 @@ export class VesZoomStatusBarContribution implements FrontendApplicationContribu
                 command: VesZoomCommands.RESET_ZOOM.id,
                 priority: -100,
                 text: `$(${icon}) ${zoomLevel}`,
-                tooltip: 'Reset zoom',
+                tooltip: nls.localize('vuengine/zoom/resetZoom', 'Reset zoom'),
             });
         }
     }

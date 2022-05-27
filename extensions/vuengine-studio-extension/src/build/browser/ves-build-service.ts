@@ -1,4 +1,4 @@
-import { CommandRegistry, CommandService, isWindows } from '@theia/core';
+import { CommandRegistry, CommandService, isWindows, nls } from '@theia/core';
 import { ApplicationShell, LabelProvider, PreferenceScope, PreferenceService, QuickPickItem, QuickPickOptions, QuickPickService } from '@theia/core/lib/browser';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import URI from '@theia/core/lib/common/uri';
@@ -348,7 +348,7 @@ export class VesBuildService {
       this.buildStatus = {
         ...this.buildStatus,
         active: true,
-        step: 'Building',
+        step: nls.localize('vuengine/build/building', 'Building'),
       };
 
       const buildParams = await this.getBuildProcessParams();
@@ -476,13 +476,21 @@ export class VesBuildService {
 
   protected async checkPathsForSpaces(workspaceRootUri: URI, engineCoreUri: URI, enginePluginsUri: URI, userPluginsUri: URI): Promise<void> {
     if (/\s/.test(await this.fileService.fsPath(workspaceRootUri))) {
-      throw new Error(`Error: Workspace path must not contain spaces. Your workspace path:\n${this.labelProvider.getLongName(workspaceRootUri)}`);
+      throw new Error(
+        `${nls.localize('vuengine/build/errorProjectPathMustNotContainSpaces', 'Error: Project path must not contain spaces. Your project path:')}\n` +
+        this.labelProvider.getLongName(workspaceRootUri));
     } else if (/\s/.test(await this.fileService.fsPath(engineCoreUri))) {
-      throw new Error(`Error: Engine path must not contain spaces. Your engine path:\n${this.labelProvider.getLongName(engineCoreUri)}`);
+      throw new Error(
+        `${nls.localize('vuengine/build/errorEnginePathMustNotContainSpaces', 'Error: Engine path must not contain spaces. Your engine path:')}\n` +
+        this.labelProvider.getLongName(engineCoreUri));
     } else if (/\s/.test(await this.fileService.fsPath(enginePluginsUri))) {
-      throw new Error(`Error: Plugins path must not contain spaces. Your plugins path:\n${this.labelProvider.getLongName(enginePluginsUri)}`);
+      throw new Error(
+        `${nls.localize('vuengine/build/errorPluginsPathMustNotContainSpaces', 'Error: Plugins path must not contain spaces. Your plugins path:')}\n` +
+        this.labelProvider.getLongName(enginePluginsUri));
     } else if (/\s/.test(await this.fileService.fsPath(userPluginsUri))) {
-      throw new Error(`Error: User Plugins path must not contain spaces. Your user plugins path:\n${this.labelProvider.getLongName(userPluginsUri)}`);
+      throw new Error(
+        `${nls.localize('vuengine/build/errorUserPluginsPathMustNotContainSpaces', 'Error: User Plugins path must not contain spaces. Your user plugins path:')}\n` +
+        this.labelProvider.getLongName(userPluginsUri));
     }
   }
 
@@ -622,7 +630,7 @@ export class VesBuildService {
       const engineMakefileUri = engineCoreUri.resolve('makefile-game');
       makefileUri = engineMakefileUri;
       if (!(await this.fileService.exists(makefileUri))) {
-        throw new Error('Error: Could not find a makefile. Tried the following locations:\n' +
+        throw new Error(`${nls.localize('vuengine/build/errorCouldNotFindMakefile', 'Error: Could not find a makefile. Tried the following locations:')}\n` +
           `1) ${this.labelProvider.getLongName(gameMakefileUri)}\n` +
           `2) ${this.labelProvider.getLongName(engineMakefileUri)}`);
       }
@@ -730,7 +738,7 @@ export class VesBuildService {
     if (!command) {
       return this.pushBuildLogLine({
         type: BuildLogLineType.Error,
-        text: `Could not find command "${commandName}".`,
+        text: nls.localize('vuengine/build/couldNotFindCommand', 'Could not find command "{0}".', commandName),
         timestamp: Date.now(),
       });
     }
@@ -739,7 +747,7 @@ export class VesBuildService {
 
     this.pushBuildLogLine({
       type: BuildLogLineType.Normal,
-      text: `Command "${command?.label}" completed.`,
+      text: nls.localize('vuengine/build/commandCompleted', 'Command "{0}" completed.', command?.label),
       timestamp: Date.now(),
     });
   }
@@ -753,7 +761,7 @@ export class VesBuildService {
     if (!taskInfo) {
       return this.pushBuildLogLine({
         type: BuildLogLineType.Error,
-        text: `Could not run the task "${taskName}".`,
+        text: nls.localize('vuengine/build/couldNotRunTask', 'Could not run task "{0}".', taskName),
         timestamp: Date.now(),
       });
     }
@@ -770,20 +778,20 @@ export class VesBuildService {
     if (taskEndedInfo.taskEndedType === TaskEndedTypes.BackgroundTaskEnded && taskEndedInfo.value) {
       return this.pushBuildLogLine({
         type: BuildLogLineType.Normal,
-        text: `Task "${taskName}" completed.`,
+        text: nls.localize('vuengine/build/taskCompleted', 'Task "{0}" completed.', taskName),
         timestamp: Date.now(),
       });
     }
     if (taskEndedInfo.taskEndedType === TaskEndedTypes.TaskExited && taskEndedInfo.value === 0) {
       return this.pushBuildLogLine({
         type: BuildLogLineType.Normal,
-        text: `Task "${taskName}" completed.`,
+        text: nls.localize('vuengine/build/taskCompleted', 'Task "{0}" completed.', taskName),
         timestamp: Date.now(),
       });
     } else if (taskEndedInfo.taskEndedType === TaskEndedTypes.TaskExited && taskEndedInfo.value !== undefined) {
       return this.pushBuildLogLine({
         type: BuildLogLineType.Error,
-        text: `Task "${taskName}" terminated with exit code ${taskEndedInfo.value}.`,
+        text: nls.localize('vuengine/build/taskTerminatedWithExitCode', 'Task "{0}" terminated with exit code {1}.', taskName, taskEndedInfo.value),
         timestamp: Date.now(),
       });
     } else {
@@ -791,13 +799,13 @@ export class VesBuildService {
       if (signal !== undefined) {
         return this.pushBuildLogLine({
           type: BuildLogLineType.Error,
-          text: `Task "${taskName}" terminated by signal ${signal}.`,
+          text: nls.localize('vuengine/build/taskTerminatedBySignal', 'Task "{0}" terminated by signal {1}.', taskName, signal),
           timestamp: Date.now(),
         });
       } else {
         return this.pushBuildLogLine({
           type: BuildLogLineType.Error,
-          text: `Task "${taskName}" terminated for unknown reason.`,
+          text: nls.localize('vuengine/build/taskTerminatedForUnknownReason', 'Task "{0}" terminated for unknown reason.', taskName),
           timestamp: Date.now(),
         });
       }
@@ -810,7 +818,7 @@ export class VesBuildService {
     if (!Array.isArray(tasks)) {
       return this.pushBuildLogLine({
         type: BuildLogLineType.Error,
-        text: 'Malformed preference: not an array.',
+        text: nls.localize('vuengine/build/malformedPreferenceNotAnArray', 'Malformed preference: not an array.'),
         timestamp: Date.now(),
       });
     }
@@ -819,14 +827,14 @@ export class VesBuildService {
       if (!task.name) {
         return this.pushBuildLogLine({
           type: BuildLogLineType.Error,
-          text: 'Malformed preference: missing task name.',
+          text: nls.localize('vuengine/build/malformedPreferenceMissingTaskName', 'Malformed preference: missing task name.'),
           timestamp: Date.now(),
         });
       }
       if (!task.type) {
         return this.pushBuildLogLine({
           type: BuildLogLineType.Error,
-          text: `Malformed preference: missing type for task ${task.name}.`,
+          text: nls.localize('vuengine/build/malformedPreferenceMissingTaskType', 'Malformed preference: missing type for task {0}.', task.name),
           timestamp: Date.now(),
         });
       }
@@ -846,7 +854,7 @@ export class VesBuildService {
     if (!completed) {
       this.pushBuildLogLine({
         type: BuildLogLineType.Normal,
-        text: 'No tasks found.',
+        text: nls.localize('vuengine/build/noTasksFound', 'No tasks found.'),
         timestamp: Date.now(),
       });
     }
@@ -855,11 +863,11 @@ export class VesBuildService {
   protected async runPreBuildTasks(): Promise<void> {
     this.buildStatus = {
       ...this.buildStatus,
-      step: 'Pre-build tasks...',
+      step: `${nls.localize('vuengine/build/preBuildTasks', 'Pre-build tasks')}...`,
     };
     this.pushBuildLogLine({
       type: BuildLogLineType.Headline,
-      text: 'Running pre-build tasks...',
+      text: `${nls.localize('vuengine/build/runningPreBuildTasks', 'Running pre-build tasks')}...`,
       timestamp: Date.now(),
     });
 
@@ -876,7 +884,7 @@ export class VesBuildService {
   protected async runPostBuildTasks(): Promise<void> {
     this.buildStatus = {
       ...this.buildStatus,
-      step: 'Post-build tasks...',
+      step: `${nls.localize('vuengine/build/postBuildTasks', 'Post-build tasks')}...`,
     };
     this.pushBuildLogLine({
       type: BuildLogLineType.Normal,
@@ -886,7 +894,7 @@ export class VesBuildService {
 
     this.pushBuildLogLine({
       type: BuildLogLineType.Headline,
-      text: 'Running post-build tasks...',
+      text: `${nls.localize('vuengine/build/runningPostBuildTasks', 'Running post-build tasks')}...`,
       timestamp: Date.now(),
     });
 
@@ -895,7 +903,7 @@ export class VesBuildService {
 
     this.buildStatus = {
       ...this.buildStatus,
-      step: 'done',
+      step: nls.localize('vuengine/build/done', 'Done'),
     };
   }
 
@@ -937,29 +945,29 @@ export class VesBuildService {
     const currentBuildMode = this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode;
 
     const quickPickOptions: QuickPickOptions<QuickPickItem> = {
-      title: 'Set Build Mode',
-      placeholder: 'Select which mode to build in'
+      title: nls.localize('vuengine/build/setBuildModeTitle', 'Set Build Mode'),
+      placeholder: nls.localize('vuengine/build/setBuildModePlaceholder', 'Select which mode to build in'),
     };
 
     const buildTypes: QuickPickItem[] = [
       {
         label: BuildMode.Release,
-        detail: '   Includes no asserts or debug flags, for shipping only.',
+        detail: `   ${nls.localize('vuengine/build/modes/releaseDescription', 'Includes no asserts or debug flags, for shipping only.')}`,
         iconClasses: (BuildMode.Release === currentBuildMode) ? ['fa', 'fa-check-square-o'] : ['fa', 'fa-square-o'],
       },
       {
         label: BuildMode.Beta,
-        detail: '   Includes selected asserts, for testing the performance on hardware.',
+        detail: `   ${nls.localize('vuengine/build/modes/betaDescription', 'Includes selected asserts, for testing the performance on hardware.')}`,
         iconClasses: (BuildMode.Beta === currentBuildMode) ? ['fa', 'fa-check-square-o'] : ['fa', 'fa-square-o'],
       },
       {
         label: BuildMode.Tools,
-        detail: '   Includes selected asserts, includes debugging tools.',
+        detail: `   ${nls.localize('vuengine/build/modes/toolsDescription', 'Includes selected asserts, includes debugging tools.')}`,
         iconClasses: (BuildMode.Tools === currentBuildMode) ? ['fa', 'fa-check-square-o'] : ['fa', 'fa-square-o'],
       },
       {
         label: BuildMode.Debug,
-        detail: '   Includes all runtime assertions, includes debugging tools.',
+        detail: `   ${nls.localize('vuengine/build/modes/debugDescription', 'Includes all runtime assertions, includes debugging tools.')}`,
         iconClasses: (BuildMode.Debug === currentBuildMode) ? ['fa', 'fa-check-square-o'] : ['fa', 'fa-square-o'],
       }
     ];

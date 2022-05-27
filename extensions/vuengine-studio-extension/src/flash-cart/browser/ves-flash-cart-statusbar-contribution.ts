@@ -2,6 +2,7 @@ import { inject, injectable } from '@theia/core/shared/inversify';
 import { FrontendApplication, FrontendApplicationContribution, StatusBar, StatusBarAlignment } from '@theia/core/lib/browser';
 import { VesFlashCartCommands } from './ves-flash-cart-commands';
 import { VesFlashCartService } from './ves-flash-cart-service';
+import { nls } from '@theia/core';
 
 @injectable()
 export class VesFlashCartStatusBarContribution implements FrontendApplicationContribution {
@@ -44,7 +45,7 @@ export class VesFlashCartStatusBarContribution implements FrontendApplicationCon
                 priority: 1,
                 // TODO: change to codicon-layout-statusbar once codicon version in Theia got updated
                 text: `$(codicon-browser codicon-flip-y) ${label}`,
-                tooltip: 'Connected Flash Carts'
+                tooltip: nls.localize('vuengine/flashCarts/connectedFlashCarts', 'Connected Flash Carts')
             });
         } else {
             this.statusBar.removeElement('ves-flash-carts');

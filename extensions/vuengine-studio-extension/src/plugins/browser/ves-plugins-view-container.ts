@@ -1,44 +1,15 @@
 import { injectable, inject, postConstruct } from '@theia/core/shared/inversify';
-import { Command } from '@theia/core/lib/common';
 import { ViewContainer, PanelLayout, ViewContainerPart, Message } from '@theia/core/lib/browser';
 import { generateWidgetId } from './ves-plugins-widget';
 import { VesPluginsSourceOptions } from './ves-plugins-source';
 import { VesPluginsModel } from './ves-plugins-model';
 import { VesPluginsSearchMode } from './ves-plugins-search-model';
 import { VesPluginsSearchBar } from './ves-plugins-search-bar';
-
-export namespace VesPluginsViewCommands {
-    const CATEGORY = 'Plugins';
-
-    export const TOGGLE_WIDGET: Command = {
-        id: 'vesPlugins.toggleView',
-        label: 'Toggle Plugins View'
-    };
-
-    export const CLEAR_ALL: Command = {
-        id: 'vesPlugins.clearAll',
-        category: CATEGORY,
-        label: 'Clear Search Results',
-        iconClass: 'codicon codicon-clear-all'
-    };
-
-    export const HELP: Command = {
-        id: 'vesPlugins.help',
-        label: 'Show Handbook Page',
-        iconClass: 'codicon codicon-book',
-    };
-
-    export const SETTINGS: Command = {
-        id: 'vesPlugins.settings',
-        label: 'Show Plugins Preferences',
-        iconClass: 'codicon codicon-settings',
-    };
-}
+import { nls } from '@theia/core';
 
 @injectable()
 export class VesPluginsViewContainer extends ViewContainer {
-
-    static LABEL = 'Plugins';
+    static LABEL = nls.localize('vuengine/plugins/plugins', 'Plugins');
     static ID = 'ves-plugins-view-container';
 
     @inject(VesPluginsSearchBar)

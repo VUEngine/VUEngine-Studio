@@ -1,5 +1,5 @@
 import { BaseTreeEditorContribution, TreeEditor } from '@eclipse-emfcloud/theia-tree-editor';
-import { CommandRegistry, MenuModelRegistry } from '@theia/core';
+import { CommandRegistry, MenuModelRegistry, nls } from '@theia/core';
 import { ApplicationShell, NavigatableWidgetOptions, open, OpenerService, QuickPickItem, QuickPickOptions, QuickPickService, WidgetOpenerOptions } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable } from '@theia/core/shared/inversify';
@@ -31,7 +31,7 @@ export class VesEditorsTreeContribution extends BaseTreeEditorContribution {
     }
 
     readonly id = VesEditorsTreeEditorWidget.WIDGET_ID;
-    readonly label = 'Visual Editor';
+    readonly label = nls.localize('vuengine/editors/visualEditor', 'Visual Editor');
 
     canHandle(uri: URI): number {
         return 0;
@@ -76,8 +76,8 @@ export class VesEditorsTreeContribution extends BaseTreeEditorContribution {
 
     async itemSelectQuickPick(types: string[]): Promise<void> {
         const quickPickOptions: QuickPickOptions<QuickPickItem> = {
-            title: 'Choose an item',
-            placeholder: 'Select which item you want to edit'
+            title: nls.localize('vuengine/editors/chooseAnItemTitle', 'Choose an item'),
+            placeholder: nls.localize('vuengine/editors/chooseAnItemPlaceholder', 'Select which item you want to edit'),
         };
         const items: QuickPickItem[] = [];
 

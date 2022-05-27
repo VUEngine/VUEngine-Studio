@@ -62,7 +62,7 @@ export class VesBrandingContribution implements CommandContribution, MenuContrib
         this.themeService.register({
             id: 'light',
             type: 'light',
-            label: 'Light',
+            label: nls.localize('vuengine/general/themes/light', 'Light'),
             editorTheme: 'light-vuengine-studio',
             activate(): void {
                 BuiltinThemeProvider.lightCss.use();
@@ -84,7 +84,7 @@ export class VesBrandingContribution implements CommandContribution, MenuContrib
         this.themeService.register({
             id: 'dark',
             type: 'dark',
-            label: 'Dark',
+            label: nls.localize('vuengine/general/themes/dark', 'Dark'),
             editorTheme: 'dark-vuengine-studio',
             activate(): void {
                 BuiltinThemeProvider.darkCss.use();
@@ -105,7 +105,7 @@ export class VesBrandingContribution implements CommandContribution, MenuContrib
         this.themeService.register({
             id: 'hc-theia',
             type: 'hc',
-            label: 'High Contrast',
+            label: nls.localize('vuengine/general/themes/highContrast', 'High Contrast'),
             editorTheme: 'hc-vuengine-studio',
             activate(): void {
                 BuiltinThemeProvider.darkCss.use();
@@ -128,7 +128,7 @@ export class VesBrandingContribution implements CommandContribution, MenuContrib
         this.themeService.register({
             id: 'virtual-boy',
             type: 'hc',
-            label: 'Virtual Boy',
+            label: nls.localize('vuengine/general/themes/virtualBoy', 'Virtual Boy'),
             editorTheme: 'hc-virtual-boy',
             activate(): void {
                 BuiltinThemeProvider.darkCss.use();
