@@ -1,5 +1,5 @@
 import { ApplicationShell, OpenerService, PreferenceScope, PreferenceService, QuickPickItem, QuickPickOptions } from '@theia/core/lib/browser';
-import { CommandService, isWindows } from '@theia/core/lib/common';
+import { CommandService, isWindows, nls } from '@theia/core/lib/common';
 import { QuickPickService } from '@theia/core/lib/common/quick-pick-service';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -86,8 +86,8 @@ export class VesEmulatorService {
 
   async selectEmulator(): Promise<void> {
     const quickPickOptions: QuickPickOptions<QuickPickItem> = {
-      title: 'Select default emulator configuration',
-      placeholder: 'Which emulator configuration should be used to run compiled projects?',
+      title: nls.localize('vuengine/emulator/selectDefaultEmulatorTitle', 'Select default emulator configuration'),
+      placeholder: nls.localize('vuengine/emulator/selectDefaultEmulatorPlaceholder', 'Which emulator configuration should be used to run compiled projects?'),
     };
     const quickPickItems: QuickPickItem[] = [];
 

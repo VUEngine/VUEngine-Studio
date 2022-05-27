@@ -1,4 +1,4 @@
-import { isOSX, MaybePromise } from '@theia/core';
+import { isOSX, MaybePromise, nls } from '@theia/core';
 import { app, BrowserWindow, nativeImage, TouchBar } from '@theia/core/electron-shared/electron';
 import { ElectronMainApplication } from '@theia/core/lib/electron-main/electron-main-application';
 import { TheiaBrowserWindowOptions } from '@theia/core/lib/electron-main/theia-electron-window';
@@ -137,11 +137,11 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         });
 
         const buildModeButton = new TouchBarPopover({
-            label: 'Mode',
+            label: nls.localize('vuengine/build/mode', 'Mode'),
             showCloseButton: true,
             items: new TouchBar({
                 items: [
-                    new TouchBarLabel({ label: 'Build Mode:' }),
+                    new TouchBarLabel({ label: nls.localize('vuengine/build/buildMode', 'Build Mode') }),
                     buildModeButtonSegmentedControl
                 ]
             }),

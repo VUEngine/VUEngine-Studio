@@ -1,4 +1,4 @@
-import { isWindows } from '@theia/core';
+import { isWindows, nls } from '@theia/core';
 import { PreferenceService } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';
 import * as React from '@theia/core/shared/react';
@@ -343,7 +343,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
 
     protected selectProjectFolder = async (): Promise<void> => {
         const props: OpenFileDialogProps = {
-            title: "Select new project's parent folder",
+            title: nls.localize('vuengine/project/selectParentFolder', "Select new project's parent folder"),
             canSelectFolders: true,
             canSelectFiles: false
         };

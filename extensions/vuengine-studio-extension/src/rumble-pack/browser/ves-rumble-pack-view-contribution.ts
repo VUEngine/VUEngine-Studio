@@ -1,36 +1,15 @@
-import { Command, CommandRegistry, CommandService } from '@theia/core';
+import { CommandRegistry, CommandService } from '@theia/core';
 import { AbstractViewContribution, CommonCommands } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
 import { VesRumblePackCommands } from './ves-rumble-pack-commands';
-import { VesRumblePackService } from './ves-rumble-pack-service';
 import { VesRumblePackWidget } from './ves-rumble-pack-widget';
-
-export namespace VesRumblePackViewContributionCommands {
-    export const EXPAND: Command = {
-        id: `${VesRumblePackWidget.ID}.expand`,
-        label: 'Toggle Maximized',
-        iconClass: 'codicon codicon-arrow-both',
-    };
-    export const HELP: Command = {
-        id: `${VesRumblePackWidget.ID}.help`,
-        label: 'Show Handbook Page',
-        iconClass: 'codicon codicon-book',
-    };
-    export const REFRESH: Command = {
-        id: `${VesRumblePackWidget.ID}.refresh`,
-        label: VesRumblePackCommands.DETECT.label,
-        iconClass: 'codicon codicon-refresh',
-    };
-}
 
 @injectable()
 export class VesRumblePackViewContribution extends AbstractViewContribution<VesRumblePackWidget> implements TabBarToolbarContribution {
     @inject(CommandService)
     private readonly commandService: CommandService;
-    @inject(VesRumblePackService)
-    private readonly vesRumblePackService: VesRumblePackService;
 
     constructor() {
         super({
@@ -43,7 +22,13 @@ export class VesRumblePackViewContribution extends AbstractViewContribution<VesR
     }
 
     registerCommands(commandRegistry: CommandRegistry): void {
-        commandRegistry.registerCommand(VesRumblePackViewContributionCommands.EXPAND, {
+        commandRegistry.registerCommand(VesRumblePackCommands.WIDGET_OPEN, {
+            execute: () => {
+                this.openView({ activate: true, reveal: true });
+            }
+        });
+
+        commandRegistry.registerCommand(VesRumblePackCommands.WIDGET_EXPAND, {
             isEnabled: () => true,
             isVisible: widget => widget !== undefined &&
                 widget.id === VesRumblePackWidget.ID,
@@ -52,39 +37,41 @@ export class VesRumblePackViewContribution extends AbstractViewContribution<VesR
                 await this.openView({ activate: true, reveal: true }) &&
                 this.commandService.executeCommand(CommonCommands.TOGGLE_MAXIMIZED.id)
         });
-        commandRegistry.registerCommand(VesRumblePackViewContributionCommands.HELP, {
+
+        commandRegistry.registerCommand(VesRumblePackCommands.WIDGET_HELP, {
             isEnabled: () => true,
             isVisible: widget => widget !== undefined &&
                 widget.id !== undefined &&
                 widget.id === VesRumblePackWidget.ID,
             execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'user-guide/rumble-pack', false),
         });
-        commandRegistry.registerCommand(VesRumblePackViewContributionCommands.REFRESH, {
+
+        commandRegistry.registerCommand(VesRumblePackCommands.WIDGET_REFRESH, {
             isEnabled: () => true,
             isVisible: widget => widget !== undefined &&
                 widget.id !== undefined &&
                 widget.id === VesRumblePackWidget.ID,
-            execute: () => this.vesRumblePackService.detectRumblePackIsConnected(),
+            execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'user-guide/rumble-pack', false),
         });
     }
 
     registerToolbarItems(toolbar: TabBarToolbarRegistry): void {
         toolbar.registerItem({
-            id: VesRumblePackViewContributionCommands.EXPAND.id,
-            command: VesRumblePackViewContributionCommands.EXPAND.id,
-            tooltip: VesRumblePackViewContributionCommands.EXPAND.label,
+            id: VesRumblePackCommands.WIDGET_EXPAND.id,
+            command: VesRumblePackCommands.WIDGET_EXPAND.id,
+            tooltip: VesRumblePackCommands.WIDGET_EXPAND.label,
             priority: 1,
         });
         toolbar.registerItem({
-            id: VesRumblePackViewContributionCommands.HELP.id,
-            command: VesRumblePackViewContributionCommands.HELP.id,
-            tooltip: VesRumblePackViewContributionCommands.HELP.label,
+            id: VesRumblePackCommands.WIDGET_HELP.id,
+            command: VesRumblePackCommands.WIDGET_HELP.id,
+            tooltip: VesRumblePackCommands.WIDGET_HELP.label,
             priority: 2,
         });
         toolbar.registerItem({
-            id: VesRumblePackViewContributionCommands.REFRESH.id,
-            command: VesRumblePackViewContributionCommands.REFRESH.id,
-            tooltip: VesRumblePackViewContributionCommands.REFRESH.label,
+            id: VesRumblePackCommands.WIDGET_REFRESH.id,
+            command: VesRumblePackCommands.WIDGET_REFRESH.id,
+            tooltip: VesRumblePackCommands.WIDGET_REFRESH.label,
             priority: 3,
         });
     }

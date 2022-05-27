@@ -1,16 +1,23 @@
 import { Command } from '@theia/core';
 
 export namespace VesProjectCommands {
-    export const CATEGORY = 'Project';
+    export const NEW: Command = Command.toLocalizedCommand(
+        {
+            id: 'ves:project:new',
+            label: 'New Project',
+            category: 'Projects',
+        },
+        'vuengine/project/commands/newProject',
+        'vuengine/project/commands/category'
+    );
 
-    export const NEW: Command = {
-        id: 'ves:project:new',
-        label: 'New Project',
-        category: CATEGORY,
-    };
-
-    export const TOGGLE_WIDGET: Command = {
-        id: 'ves:project:toggleView',
-        label: 'Toggle Project View'
-    };
+    export const TOGGLE_WIDGET: Command = Command.toLocalizedCommand(
+        {
+            id: 'ves:project:toggleView',
+            label: 'Toggle Project View',
+            category: 'Projects',
+        },
+        'vuengine/project/commands/toggleView',
+        'vuengine/project/commands/category'
+    );
 }

@@ -1,6 +1,6 @@
 import * as React from '@theia/core/shared/react';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { CommandService } from '@theia/core';
+import { CommandService, nls } from '@theia/core';
 import { Message, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
@@ -34,7 +34,7 @@ export class VesImageConverterWidget extends ReactWidget {
   private readonly workspaceService: WorkspaceService;
 
   static readonly ID = 'vesImageConverterWidget';
-  static readonly LABEL = 'Image Converter';
+  static readonly LABEL = nls.localize('vuengine/imageConverter/imageConverter', 'Image Converter');
 
   protected state: VesImageConverterWidgetState = {
     changedOnly: true,
@@ -99,7 +99,7 @@ export class VesImageConverterWidget extends ReactWidget {
                 disabled={!this.workspaceService.opened}
                 onClick={this.convert}
               >
-                Convert
+                {nls.localize('vuengine/imageConverter/convert', 'Convert')}
               </button>
               <div>
                 <label>
@@ -109,7 +109,7 @@ export class VesImageConverterWidget extends ReactWidget {
                     checked={this.state.changedOnly}
                     onChange={this.toggleChangedOnly}
                   />
-                  Changed images only
+                  {nls.localize('vuengine/imageConverter/changedImagesOnly', 'Changed images only')}
                 </label>
               </div>
             </div>
@@ -169,7 +169,7 @@ export class VesImageConverterWidget extends ReactWidget {
                 onClick={this.clearLog}
                 disabled={this.vesImageConverterService.isConverting}
               >
-                Clear Logs
+                {nls.localize('vuengine/imageConverter/clearLogs', 'Clear Logs')}
               </button>
             </div>
           </>

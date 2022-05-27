@@ -1,3 +1,4 @@
+import { nls } from '@theia/core';
 import { PreferenceScope } from '@theia/core/lib/browser';
 import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-schema';
 
@@ -14,7 +15,7 @@ export const VesZoomPreferenceSchema: PreferenceSchema = {
         [VesZoomPreferenceIds.ZOOM_LEVEL]: {
             type: 'string',
             label: 'Zoom Factor',
-            description: 'Adjust the zoom level of the window.',
+            description: nls.localize('vuengine/zoom/preferences/zoomLevelDescription', 'Adjust the zoom level of the window.'),
             enum: [
                 // '30%',
                 // '50%',
@@ -38,7 +39,7 @@ export const VesZoomPreferenceSchema: PreferenceSchema = {
         [VesZoomPreferenceIds.SHOW_STATUS_BAR_ENTRY]: {
             type: 'boolean',
             label: 'Status Bar Entry',
-            description: 'Show zoom level in status bar (only when not 100%).',
+            description: nls.localize('vuengine/zoom/preferences/showZoomLevelInStatusBarDescription', 'Show zoom level in status bar (only when not 100%).'),
             default: false,
             scope: PreferenceScope.Folder,
             overridable: true,

@@ -1,3 +1,4 @@
+import { nls } from '@theia/core';
 import { SelectComponent, SelectOption } from '@theia/core/lib/browser/widgets/select-component';
 import React from 'react';
 
@@ -8,10 +9,10 @@ interface VesPaletteProps {
 }
 
 const paletteValues: SelectOption[] = [
-    { value: '11', label: '11', description: 'Bright Red' },
-    { value: '10', label: '10', description: 'Medium Red' },
-    { value: '01', label: '01', description: 'Dark Red' },
-    { value: '00', label: '00', description: 'Black' },
+    { value: '11', label: '11', description: nls.localize('vuengine/editors/palette/brightRed', 'Bright Red') },
+    { value: '10', label: '10', description: nls.localize('vuengine/editors/palette/mediumRed', 'Medium Red') },
+    { value: '01', label: '01', description: nls.localize('vuengine/editors/palette/darkRed', 'Dark Red') },
+    { value: '00', label: '00', description: nls.localize('vuengine/editors/palette/black', 'Black') },
 ];
 
 export const VesPalette: React.FC<VesPaletteProps> = ({ value, updateValue, label }) => {

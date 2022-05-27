@@ -1,3 +1,4 @@
+import { nls } from '@theia/core';
 import { TreeNode } from '@theia/core/lib/browser';
 import { SourceTreeWidget } from '@theia/core/lib/browser/source-tree';
 import { inject, injectable, interfaces, postConstruct } from '@theia/core/shared/inversify';
@@ -50,11 +51,11 @@ export class VesPluginsWidget extends SourceTreeWidget {
     protected computeTitle(): string {
         switch (this.options.id) {
             case VesPluginsSourceOptions.INSTALLED:
-                return 'Installed';
+                return nls.localize('vuengine/plugins/installed', 'Installed');
             case VesPluginsSourceOptions.RECOMMENDED:
-                return 'Recommended';
+                return nls.localize('vuengine/plugins/recommended', 'Recommended');
             case VesPluginsSourceOptions.SEARCH_RESULT:
-                return 'Search';
+                return nls.localize('vuengine/plugins/search', 'Search');
             default:
                 return '';
         }

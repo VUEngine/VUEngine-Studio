@@ -2,6 +2,7 @@ import * as React from '@theia/core/shared/react';
 import { injectable, postConstruct, inject } from '@theia/core/shared/inversify';
 import { ReactWidget, Message } from '@theia/core/lib/browser/widgets';
 import { VesPluginsSearchModel } from './ves-plugins-search-model';
+import { nls } from '@theia/core';
 
 @injectable()
 export class VesPluginsSearchBar extends ReactWidget {
@@ -23,7 +24,7 @@ export class VesPluginsSearchBar extends ReactWidget {
             ref={input => this.input = input || undefined}
             defaultValue={this.model.query}
             className='theia-input'
-            placeholder='Search Plugins'
+            placeholder={nls.localize('vuengine/plugins/searchPlugins', 'Search Plugins')}
             onChange={this.updateQuery}>
         </input>;
     }

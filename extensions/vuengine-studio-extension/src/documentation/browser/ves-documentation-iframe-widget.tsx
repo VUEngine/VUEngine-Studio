@@ -3,6 +3,7 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { ColorRegistry } from '@theia/core/lib/browser/color-registry';
 import { ThemeService } from '@theia/core/lib/browser/theming';
+import { nls } from '@theia/core';
 
 @injectable()
 export class VesDocumentationIFrameWidget extends ReactWidget {
@@ -10,7 +11,7 @@ export class VesDocumentationIFrameWidget extends ReactWidget {
     @inject(ThemeService) private readonly themeService: ThemeService;
 
     static readonly ID = 'ves-documentation-stsvb';
-    static readonly LABEL = 'Hardware Documentation';
+    static readonly LABEL = nls.localize('vuengine/documentation/hardwareDocumentation', 'Hardware Documentation');
 
     @postConstruct()
     protected async init(): Promise<void> {

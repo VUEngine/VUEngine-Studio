@@ -1,4 +1,4 @@
-import { CommandService } from '@theia/core';
+import { CommandService, nls } from '@theia/core';
 import { AboutDialog, AboutDialogProps, ABOUT_CONTENT_CLASS } from '@theia/core/lib/browser/about-dialog';
 import { FrontendApplicationConfigProvider } from '@theia/core/lib/browser/frontend-application-config-provider';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
@@ -19,7 +19,7 @@ export class VesAboutDialog extends AboutDialog {
     ) {
         super(props);
 
-        this.titleNode.textContent = `About ${FrontendApplicationConfigProvider.get().applicationName}`;
+        this.titleNode.textContent = nls.localize('vuengine/about/title', 'About {0}', FrontendApplicationConfigProvider.get().applicationName);
 
         this.acceptButton = this.createButton('OK');
         this.controlPanel.appendChild(this.acceptButton);
@@ -72,7 +72,11 @@ export class VesAboutDialog extends AboutDialog {
     protected renderCopyright(): React.ReactNode {
         return <>
             <div className="ves-about-paragraph">
-                © 2022 <a href={'mailto:c.radke@posteo.de'}>Christian Radke</a> and <a href={'mailto:jorgech3@gmail.com'}>Jorge Andres Eremiev</a>
+                © 2022 <a href={'mailto:c.radke@posteo.de'}>
+                    Christian Radke
+                </a> {nls.localize('vuengine/about/and', 'and')} <a href={'mailto:jorgech3@gmail.com'}>
+                    Jorge Andres Eremiev
+                </a>
             </div>
             <div className="ves-about-paragraph">
                 <div>
@@ -91,15 +95,16 @@ export class VesAboutDialog extends AboutDialog {
 
     protected renderVersions(): React.ReactNode {
         return <div className="ves-about-paragraph">
-            <div>Version: {this.applicationInfo && this.applicationInfo.version}</div>
-            <div>VSCode API version: {VSCODE_DEFAULT_API_VERSION}</div>
+            <div>{nls.localize('vuengine/about/version', 'Version')}: {this.applicationInfo && this.applicationInfo.version}</div>
+            <div>{nls.localize('vuengine/about/vsCodeApiVersion', 'VSCode API Version')}: {VSCODE_DEFAULT_API_VERSION}</div>
         </div>;
     }
 
     protected renderPatreon(): React.ReactNode {
         return <>
             <div className="ves-about-paragraph">
-                Thank you to our supporters on Patreon! <a href="#" onClick={() => this.openUrl('https://www.patreon.com/VUEngine')}>{'https://www.patreon.com/VUEngine'}</a>
+                {nls.localize('vuengine/about/thankYouToOurSupporters', 'Thank you to our supporters on Patreon!')}
+                <a href="#" onClick={() => this.openUrl('https://www.patreon.com/VUEngine')}>{'https://www.patreon.com/VUEngine'}</a>
             </div>
             {this.renderPatrons()}
         </>;

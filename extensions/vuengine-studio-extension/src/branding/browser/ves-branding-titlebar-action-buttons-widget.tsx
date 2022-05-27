@@ -1,4 +1,4 @@
-import { CommandService, Emitter, environment, isOSX, MessageService } from '@theia/core';
+import { CommandService, Emitter, environment, isOSX, MessageService, nls } from '@theia/core';
 import { ApplicationShell, CommonCommands, PreferenceService, Widget } from '@theia/core/lib/browser';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { KeybindingRegistry } from '@theia/core/lib/browser/keybinding';
@@ -104,7 +104,8 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
         return !this.workspaceService.opened ? <>
             <button
                 className='theia-button secondary new-project'
-                title={`${VesProjectCommands.NEW.label}${this.getKeybindingLabel(VesProjectCommands.NEW.id, true)}`}
+                title={nls.localize('vuengine/project/commands/newProject', 'New Project') +
+                    this.getKeybindingLabel(VesProjectCommands.NEW.id, true)}
                 onClick={this.createNewProject}
                 key='action-button-new-project'
             >
@@ -112,7 +113,8 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
             </button>
             <button
                 className='theia-button secondary open-workspace'
-                title={`Open Project${this.getKeybindingLabel(WorkspaceCommands.OPEN_WORKSPACE.id, true)}`}
+                title={nls.localize('vuengine/project/commands/openProject', 'Open Project...') +
+                    this.getKeybindingLabel(WorkspaceCommands.OPEN_WORKSPACE.id, true)}
                 onClick={this.openWorkspaceFile}
                 key='action-button-open-workspace'
             >
@@ -138,7 +140,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                             var(--theia-titleBar-hoverButtonBackground) ${this.vesBuildService.buildStatus.progress}%)`
                     } : {}}
                     title={this.vesBuildService.buildStatus.active
-                        ? `Building... ${this.vesBuildService.buildStatus.progress}%`
+                        ? `${nls.localize('vuengine/build/building', 'Building')}... ${this.vesBuildService.buildStatus.progress}%`
                         : `${VesBuildCommands.BUILD.label}${this.getKeybindingLabel(VesBuildCommands.BUILD.id, true)}`}
                     onClick={this.build}
                     key='action-button-build'
@@ -151,7 +153,9 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                 </button>
                 <button
                     className={'theia-button secondary run' + (this.vesEmulatorService.isQueued ? ' queued' : '')}
-                    title={this.vesEmulatorService.isQueued ? 'Run Queued...' : `${VesEmulatorCommands.RUN.label}${this.getKeybindingLabel(VesEmulatorCommands.RUN.id, true)}`}
+                    title={this.vesEmulatorService.isQueued
+                        ? `${nls.localize('vuengine/emulator/runQueued', 'Run Queued')}...`
+                        : `${VesEmulatorCommands.RUN.label}${this.getKeybindingLabel(VesEmulatorCommands.RUN.id, true)}`}
                     onClick={this.run}
                     key='action-button-run'
                 >
@@ -166,7 +170,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                             + this.vesFlashCartService.flashingProgress + '%, var(--theia-titleBar-hoverButtonBackground) ' + this.vesFlashCartService.flashingProgress + '%)'
                     } : {}}
                     title={this.vesFlashCartService.isQueued
-                        ? 'Flashing Queued...'
+                        ? `${nls.localize('vuengine/flashCarts/flashingQueued', 'Flashing Queued')}...`
                         : this.vesFlashCartService.isFlashing
                             ? `Flashing... ${this.vesFlashCartService.flashingProgress}%`
                             : `${VesFlashCartCommands.FLASH.label}${this.getKeybindingLabel(VesFlashCartCommands.FLASH.id, true)}`}
@@ -213,7 +217,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
             : '';
 
         keybindingAccelerator = keybindingAccelerator
-            .replace(' ', 'Space');
+            .replace(' ', nls.localize('vuengine/general/space', 'Space'));
 
         if (wrapInBrackets && keybindingAccelerator !== '') {
             keybindingAccelerator = ` (${keybindingAccelerator})`;

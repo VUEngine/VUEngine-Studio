@@ -3,6 +3,7 @@ import { FrontendApplication, FrontendApplicationContribution, PreferenceService
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
 import { VesEmulatorCommands } from './ves-emulator-commands';
 import { VesEmulatorService } from './ves-emulator-service';
+import { nls } from '@theia/core';
 
 @injectable()
 export class VesEmulatorStatusBarContribution implements FrontendApplicationContribution {
@@ -26,7 +27,8 @@ export class VesEmulatorStatusBarContribution implements FrontendApplicationCont
     }
 
     setEmulatorStatusBar(): void {
-        const label = this.preferenceService.get(VesEmulatorPreferenceIds.DEFAULT_EMULATOR) || 'Built-In';
+        const label = this.preferenceService.get(VesEmulatorPreferenceIds.DEFAULT_EMULATOR) ||
+            nls.localize('vuengine/emulator/builtIn', 'Built-In');
         this.statusBar.setElement('ves-emulator', {
             alignment: StatusBarAlignment.LEFT,
             command: VesEmulatorCommands.SELECT.id,

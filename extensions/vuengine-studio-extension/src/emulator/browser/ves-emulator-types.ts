@@ -1,3 +1,5 @@
+import { nls } from '@theia/core';
+
 export interface EmulatorConfig {
   name: string
   path: string
@@ -5,43 +7,43 @@ export interface EmulatorConfig {
 };
 
 export const DEFAULT_EMULATOR: EmulatorConfig = {
-  name: 'Built-In',
+  name: nls.localize('vuengine/emulator/builtIn', 'Built-In'),
   path: '',
   args: '',
 };
 
-export enum StereoMode {
-  '2d-black-red' = '2D (Red/Black)',
-  '2d-black-white' = '2D (White/Black)',
-  '2d-black-blue' = '2D (Blue/Black)',
-  '2d-black-cyan' = '2D (Cyan/Black)',
-  '2d-black-electric-cyan' = '2D (El.Cyan/Black)',
-  '2d-black-green' = '2D (Green/Black)',
-  '2d-black-magenta' = '2D (Magenta/Black)',
-  '2d-black-yellow' = '2D (Yellow/Black)',
-  'anaglyph-red-blue' = 'Anaglyph (Red/Blue)',
-  'anaglyph-red-cyan' = 'Anaglyph (Red/Cyan)',
-  'anaglyph-red-electric-cyan' = 'Anaglyph (Red/El.Cyan)',
-  'anaglyph-green-magenta' = 'Anaglyph (Red/Green)',
-  'anaglyph-yellow-blue' = 'Anaglyph (Yellow/Blue)',
-  'side-by-side' = 'Side By Side',
-  'cyberscope' = 'CyberScope',
-  'hli' = 'Horizontal Line Interlaced',
-  'vli' = 'Vertical Line Interlaced',
-}
+export const EMULATION_STEREO_MODES = {
+  '2d-black-red': nls.localize('vuengine/emulator/stereoModes/2dBlackRed', '2D (Red/Black)'),
+  '2d-black-white': nls.localize('vuengine/emulator/stereoModes/2dBlackWhite', '2D (White/Black)'),
+  '2d-black-blue': nls.localize('vuengine/emulator/stereoModes/2dBlackBlue', '2D (Blue/Black)'),
+  '2d-black-cyan': nls.localize('vuengine/emulator/stereoModes/2dBlackCyan', '2D (Cyan/Black)'),
+  '2d-black-electric-cyan': nls.localize('vuengine/emulator/stereoModes/2dBlackElectricCyan', '2D (El.Cyan/Black)'),
+  '2d-black-green': nls.localize('vuengine/emulator/stereoModes/2dBlackGreen', '2D (Green/Black)'),
+  '2d-black-magenta': nls.localize('vuengine/emulator/stereoModes/2dBlackMagenta', '2D (Magenta/Black)'),
+  '2d-black-yellow': nls.localize('vuengine/emulator/stereoModes/2dBlackYellow', '2D (Yellow/Black)'),
+  'anaglyph-red-blue': nls.localize('vuengine/emulator/stereoModes/anaglyphRedBlue', 'Anaglyph (Red/Blue)'),
+  'anaglyph-red-cyan': nls.localize('vuengine/emulator/stereoModes/anaglyphRedCyan', 'Anaglyph (Red/Cyan)'),
+  'anaglyph-red-electric-cyan': nls.localize('vuengine/emulator/stereoModes/anaglyph-redElectricCyan', 'Anaglyph (Red/El.Cyan)'),
+  'anaglyph-green-magenta': nls.localize('vuengine/emulator/stereoModes/anaglyphGreenMagenta', 'Anaglyph (Red/Green)'),
+  'anaglyph-yellow-blue': nls.localize('vuengine/emulator/stereoModes/anaglyphYellowBlue', 'Anaglyph (Yellow/Blue)'),
+  'side-by-side': nls.localize('vuengine/emulator/stereoModes/sideBySide', 'Side By Side'),
+  'cyberscope': nls.localize('vuengine/emulator/stereoModes/cyberscope', 'CyberScope'),
+  'hli': nls.localize('vuengine/emulator/stereoModes/hli', 'Horizontal Line Interlaced'),
+  'vli': nls.localize('vuengine/emulator/stereoModes/vli', 'Vertical Line Interlaced'),
+};
 
-export enum EmulationMode {
-  accurate = 'Accurate',
-  fast = 'Fast',
-}
+export const EMULATION_MODES = {
+  accurate: nls.localize('vuengine/emulator/emulationModes/accurate', 'Accurate'),
+  fast: nls.localize('vuengine/emulator/emulationModes/fast', 'Fast'),
+};
 
-export enum EmulatorScale {
-  auto = 'Auto',
-  x1 = '×1',
-  x2 = '×2',
-  x3 = '×3',
-  full = 'Stretch',
-}
+export const EMULATION_SCALES = {
+  auto: nls.localize('vuengine/emulator/scales/auto', 'Auto'),
+  x1: '×1',
+  x2: '×2',
+  x3: '×3',
+  full: nls.localize('vuengine/emulator/scales/stretch', 'Stretch'),
+};
 
 export enum EmulatorGamePadKeyCode {
   A = 'KeyM',

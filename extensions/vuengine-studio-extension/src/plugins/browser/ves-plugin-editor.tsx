@@ -1,4 +1,4 @@
-import { CommandService } from '@theia/core';
+import { CommandService, nls } from '@theia/core';
 import { Message, ReactWidget, Widget } from '@theia/core/lib/browser';
 import { Deferred } from '@theia/core/lib/common/promise-util';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -54,7 +54,9 @@ export class VesPluginEditor extends ReactWidget {
     }
 
     protected updateTitle(): void {
-        const label = `Plugin: ${(this.plugin.displayName || this.plugin.name)}`;
+        const prefix = nls.localize('vuengine/plugins/plugin', 'Plugin');
+        const pluginName = this.plugin.displayName || this.plugin.name;
+        const label = `${prefix}: ${pluginName}`;
         this.title.label = label;
         this.title.caption = label;
     }

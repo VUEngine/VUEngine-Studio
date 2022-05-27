@@ -89,6 +89,9 @@
       "backend": "lib/emulator/node/ves-emulator-backend-module"
     },
     {
+      "frontend": "lib/editors/browser/ves-editors-frontend-module"
+    },
+    {
       "frontend": "lib/export/browser/ves-export-frontend-module"
     },
     {
@@ -97,6 +100,10 @@
     },
     {
       "frontend": "lib/image-converter/browser/ves-image-converter-frontend-module"
+    },
+    {
+      "frontend": "lib/i18n/browser/ves-i18n-frontend-module",
+      "backend": "lib/i18n/node/ves-i18n-backend-module"
     },
     {
       "frontend": "lib/plugins/browser/ves-plugins-frontend-module"
@@ -111,9 +118,6 @@
     {
       "frontend": "lib/rumble-pack/browser/ves-rumble-pack-frontend-module",
       "backend": "lib/rumble-pack/node/ves-rumble-pack-backend-module"
-    },
-    {
-      "frontend": "lib/editors/browser/ves-editors-frontend-module"
     },
     {
       "electronMain": "lib/updater/electron-main/ves-updater-main-module",

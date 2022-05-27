@@ -1,4 +1,4 @@
-import { Emitter, isWindows } from '@theia/core';
+import { Emitter, isWindows, nls } from '@theia/core';
 import { LabelProvider } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -163,7 +163,9 @@ export class VesImageConverterService {
   protected async doConvertFiles(changedOnly: boolean): Promise<void> {
     this.pushLog({
       timestamp: Date.now(),
-      text: `Starting to convert ${changedOnly ? 'changed' : 'all'} images...`,
+      text: changedOnly
+        ? nls.localize('vuengine/imageConverter/startingToConvertChanged', 'Starting to convert changed images...')
+        : nls.localize('vuengine/imageConverter/startingToConvertAll', 'Starting to convert all images...'),
       type: ImageConverterLogLineType.Headline,
     });
 
@@ -172,7 +174,7 @@ export class VesImageConverterService {
     if (imageConfigFilesToBeConverted.length === 0) {
       this.pushLog({
         timestamp: Date.now(),
-        text: 'None found',
+        text: nls.localize('vuengine/imageConverter/noneFound', 'None found.'),
         type: ImageConverterLogLineType.Normal,
       });
       this.pushLog({
@@ -191,7 +193,7 @@ export class VesImageConverterService {
 
     this.pushLog({
       timestamp: Date.now(),
-      text: `Found ${this.totalToConvert} images`,
+      text: nls.localize('vuengine/imageConverter/foundXImages', 'Found {0} images', this.totalToConvert),
       type: ImageConverterLogLineType.Normal,
     });
 
@@ -794,7 +796,7 @@ export class VesImageConverterService {
         this.progress = 100;
         this.pushLog({
           timestamp: Date.now(),
-          text: 'Done',
+          text: nls.localize('vuengine/imageConverter/done', 'Done'),
           type: ImageConverterLogLineType.Done,
         });
         this.pushLog({

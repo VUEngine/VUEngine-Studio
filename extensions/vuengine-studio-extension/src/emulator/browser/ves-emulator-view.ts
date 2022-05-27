@@ -1,18 +1,11 @@
-import { Command, CommandRegistry, CommandService } from '@theia/core';
+import { CommandRegistry, CommandService } from '@theia/core';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { AbstractViewContribution } from '@theia/core/lib/browser';
 import { VesEmulatorWidget } from './widget/ves-emulator-widget';
 import { VesEmulatorContextKeyService } from './ves-emulator-context-key-service';
 import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
-
-export namespace VesEmulatorViewContributionCommands {
-  export const HELP: Command = {
-    id: `${VesEmulatorWidget.ID}.help`,
-    label: 'Show Handbook Page',
-    iconClass: 'codicon codicon-book',
-  };
-}
+import { VesEmulatorCommands } from './ves-emulator-commands';
 
 @injectable()
 export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmulatorWidget> implements TabBarToolbarContribution {
@@ -44,7 +37,7 @@ export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmu
   }
 
   registerCommands(commandRegistry: CommandRegistry): void {
-    commandRegistry.registerCommand(VesEmulatorViewContributionCommands.HELP, {
+    commandRegistry.registerCommand(VesEmulatorCommands.WIDGET_HELP, {
       isEnabled: () => true,
       isVisible: widget => widget !== undefined &&
         widget.id !== undefined &&
@@ -55,9 +48,9 @@ export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmu
 
   registerToolbarItems(toolbar: TabBarToolbarRegistry): void {
     toolbar.registerItem({
-      id: VesEmulatorViewContributionCommands.HELP.id,
-      command: VesEmulatorViewContributionCommands.HELP.id,
-      tooltip: VesEmulatorViewContributionCommands.HELP.label,
+      id: VesEmulatorCommands.WIDGET_HELP.id,
+      command: VesEmulatorCommands.WIDGET_HELP.id,
+      tooltip: VesEmulatorCommands.WIDGET_HELP.label,
       priority: 0,
     });
   }

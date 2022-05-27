@@ -38,6 +38,7 @@
     "lint": "lerna run lint",
     "modules:init": "git submodule update --init",
     "modules:update": "git submodule update --recursive --remote",
+    "nls-extract": "theia nls-extract -o extensions/vuengine-studio-extension/i18n/nls.json -r extensions/vuengine-studio-extension -m",
     "prepare": "lerna run prepare",
     "test": "lerna run test",
     "watch": "lerna run --parallel watch"

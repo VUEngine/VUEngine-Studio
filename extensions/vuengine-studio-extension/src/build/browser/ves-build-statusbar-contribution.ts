@@ -3,6 +3,7 @@ import { FrontendApplication, FrontendApplicationContribution, PreferenceService
 import { VesBuildPreferenceIds } from './ves-build-preferences';
 import { VesBuildCommands } from './ves-build-commands';
 import { VesBuildService } from './ves-build-service';
+import { nls } from '@theia/core';
 
 @injectable()
 export class VesBuildStatusBarContribution implements FrontendApplicationContribution {
@@ -26,7 +27,8 @@ export class VesBuildStatusBarContribution implements FrontendApplicationContrib
     }
 
     setBuildModeStatusBar(): void {
-        const label = this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) || 'Build Mode';
+        const label = this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) ||
+            nls.localize('vuengine/build/buildMode', 'Build Mode');
         this.statusBar.setElement('ves-build-mode', {
             alignment: StatusBarAlignment.LEFT,
             command: VesBuildCommands.SET_MODE.id,

@@ -1,3 +1,4 @@
+import { nls } from '@theia/core';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
@@ -43,7 +44,7 @@ export class VesPreferenceStringInputRenderer extends PreferenceStringInputRende
 
     protected selectDirectory = async (): Promise<void> => {
         const props: OpenFileDialogProps = {
-            title: 'Select directory',
+            title: nls.localize('vuengine/general/selectDirectory', 'Select directory'),
             canSelectFolders: true,
             canSelectFiles: false
         };
