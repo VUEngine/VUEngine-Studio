@@ -31,7 +31,7 @@ export class VesProjectTreeWidget extends TreeWidget {
   protected readonly vesProjectService: VesProjectService;
 
   static readonly ID = 'ves-project-tree-widget';
-  static readonly LABEL = nls.localize('vuengine/project/project', 'Project');
+  static readonly LABEL = nls.localize('vuengine/projects/project', 'Project');
 
   constructor(
     @inject(ContextMenuRenderer) contextMenuRenderer: ContextMenuRenderer,
@@ -174,8 +174,8 @@ export class VesProjectTreeWidget extends TreeWidget {
       event.stopPropagation();
       const name = node.name ? `"${node.name}"` : 'this node';
       const dialog = new ConfirmDialog({
-        title: nls.localize('vuengine/project/deleteNodeQuestion', 'Delete Node?'),
-        msg: nls.localize('vuengine/project/areYouSureYouWantToDelete', 'Are you sure you want to delete "{0}"?', name),
+        title: nls.localize('vuengine/projects/deleteNodeQuestion', 'Delete Node?'),
+        msg: nls.localize('vuengine/projects/areYouSureYouWantToDelete', 'Are you sure you want to delete "{0}"?', name),
       });
       dialog.open().then(remove => {
         if (remove && node.parent && node.parent && TreeNode.is(node.parent)) {

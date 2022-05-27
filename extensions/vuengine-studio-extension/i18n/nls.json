@@ -10,7 +10,7 @@
     "about": {
       "and": "and",
       "thankYouToOurSupporters": "Thank you to our supporters on Patreon!",
-      "title": "About {0}",
+      "title": "About VUEngine Studio",
       "version": "Version",
       "vsCodeApiVersion": "VSCode API Version"
     },
@@ -303,6 +303,7 @@
       },
       "dependencies": "Dependencies",
       "installed": "Installed",
+      "noDependencies": "None",
       "plugin": "Plugin",
       "plugins": "Plugins",
       "preferences": {
@@ -316,8 +317,9 @@
       "search": "Search",
       "searchPlugins": "Search Plugins"
     },
-    "project": {
+    "projects": {
       "areYouSureYouWantToDelete": "Are you sure you want to delete \"{0}\"?",
+      "author": "Author",
       "commands": {
         "category": "Projects",
         "closeProject": "Close Project",
@@ -328,14 +330,36 @@
         "saveProjectAs": "Save Project As...",
         "toggleView": "Toggle Project View"
       },
+      "create": "Create",
       "deleteNodeQuestion": "Delete Node?",
+      "errorBasePathDoesNotExist": "Error: base path does not exist",
+      "errorNoProjectName": "Error: no project name provided",
+      "gameCode": "Game Code",
+      "makerCode": "Maker Code",
+      "myProject": "My Project",
+      "name": "Name",
+      "path": "Path",
       "preferences": {
+        "authorDefault": "VUEngine Studio User",
         "authorDescription": "Default author name to use for new projects.",
         "basePathDescription": "Base path for new projects.",
         "makerCodeDescription": "Default Maker Code to place in ROM header of new projects."
       },
       "project": "Project",
-      "selectParentFolder": "Select new project's parent folder"
+      "selectParentFolder": "Select new project's parent folder",
+      "settingUpNewProject": "Setting up new project",
+      "template": "Template",
+      "templates": {
+        "bareboneDescription": "An (almost) empty project that includes a single \"Hello World\" screen plus the most important plugins to add splash screens, automatic pause and more.",
+        "bareboneTitle": "Barebone",
+        "imageViewerDescription": "Stereo image viewer.",
+        "imageViewerTitle": "Image Viewer",
+        "multiplayerDescription": "A simple Pong-like game that utilizes the engine's communication class for multiplayer matches over a link cable.",
+        "multiplayerTitle": "Multiplayer Game",
+        "platformerDescription": "A full featured single level platforming game.",
+        "platformerTitle": "Platform Game"
+      },
+      "verifying": "Verifying"
     },
     "rumblePack": {
       "commands": {

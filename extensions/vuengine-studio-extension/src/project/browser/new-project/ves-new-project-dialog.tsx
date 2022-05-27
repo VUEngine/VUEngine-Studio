@@ -1,4 +1,4 @@
-import { isWindows } from '@theia/core';
+import { isWindows, nls } from '@theia/core';
 import { Key, PreferenceService } from '@theia/core/lib/browser';
 import { DialogProps } from '@theia/core/lib/browser/dialogs';
 import { ReactDialog } from '@theia/core/lib/browser/dialogs/react-dialog';
@@ -50,7 +50,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
         });
 
         this.appendCloseButton();
-        this.appendAcceptButton('Create');
+        this.appendAcceptButton(nls.localize('vuengine/projects/create', 'Create'));
 
         if (this.closeButton) {
             this.closeButton.tabIndex = 9;
@@ -103,7 +103,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
 
         this.setIsCreating(true);
 
-        this.setStatusMessage(`${spinnerIcon} Verifying...`);
+        this.setStatusMessage(`${spinnerIcon} ${nls.localize('vuengine/projects/verifying', 'Verifying')}...`);
 
         const name = this.createProjectFormComponentRef.current?.state.name;
         const gameCode = this.createProjectFormComponentRef.current?.state.gameCode || '';
@@ -112,7 +112,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
 
         if (!name) {
             this.setIsCreating(false);
-            this.setStatusMessage(`${warningIcon} Error: no project name provided`);
+            this.setStatusMessage(`${warningIcon} ${nls.localize('vuengine/projects/errorNoProjectName', 'Error: no project name provided')}`);
             return;
         }
 
@@ -126,11 +126,11 @@ export class VesNewProjectDialog extends ReactDialog<void> {
 
         if (!pathExists) {
             this.setIsCreating(false);
-            this.setStatusMessage(`${warningIcon} Error: base path does not exist`);
+            this.setStatusMessage(`${warningIcon} ${nls.localize('vuengine/projects/errorBasePathDoesNotExist', 'Error: base path does not exist')}`);
             return;
         }
 
-        this.setStatusMessage(`${spinnerIcon} Setting up new project...`);
+        this.setStatusMessage(`${spinnerIcon} ${nls.localize('vuengine/projects/settingUpNewProject', 'Setting up new project')}...`);
 
         const templateIndex = this.createProjectFormComponentRef.current?.state.template ?? 0;
         const template = VES_NEW_PROJECT_TEMPLATES[templateIndex];

@@ -15,7 +15,7 @@ export const VesProjectPreferenceSchema: PreferenceSchema = {
     'properties': {
         [VesProjectPreferenceIds.BASE_PATH]: {
             type: 'string',
-            description: nls.localize('vuengine/project/preferences/basePathDescription', 'Base path for new projects.'),
+            description: nls.localize('vuengine/projects/preferences/basePathDescription', 'Base path for new projects.'),
             additionalProperties: {
                 // @ts-ignore
                 isDirectory: true,
@@ -25,8 +25,8 @@ export const VesProjectPreferenceSchema: PreferenceSchema = {
         },
         [VesProjectPreferenceIds.AUTHOR]: {
             type: 'string',
-            description: nls.localize('vuengine/project/preferences/authorDescription', 'Default author name to use for new projects.'),
-            default: 'VUEngine Studio User',
+            description: nls.localize('vuengine/projects/preferences/authorDescription', 'Default author name to use for new projects.'),
+            default: nls.localize('vuengine/projects/preferences/authorDefault', 'VUEngine Studio User'),
             scope: PreferenceScope.User,
             overridable: true,
         },
@@ -34,7 +34,7 @@ export const VesProjectPreferenceSchema: PreferenceSchema = {
             type: 'string',
             minLength: 2,
             maxLength: 2,
-            description: nls.localize('vuengine/project/preferences/makerCodeDescription', 'Default Maker Code to place in ROM header of new projects.'),
+            description: nls.localize('vuengine/projects/preferences/makerCodeDescription', 'Default Maker Code to place in ROM header of new projects.'),
             default: 'VU',
             scope: PreferenceScope.User,
             overridable: true,

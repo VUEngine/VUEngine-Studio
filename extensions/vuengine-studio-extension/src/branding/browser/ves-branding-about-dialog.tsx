@@ -19,7 +19,7 @@ export class VesAboutDialog extends AboutDialog {
     ) {
         super(props);
 
-        this.titleNode.textContent = nls.localize('vuengine/about/title', 'About {0}', FrontendApplicationConfigProvider.get().applicationName);
+        this.titleNode.textContent = nls.localize('vuengine/about/title', 'About VUEngine Studio');
 
         this.acceptButton = this.createButton('OK');
         this.controlPanel.appendChild(this.acceptButton);

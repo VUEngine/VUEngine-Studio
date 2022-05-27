@@ -5,7 +5,8 @@ import { LocalizationContribution, LocalizationRegistry } from '@theia/core/lib/
 export class VesLocalizationContribution implements LocalizationContribution {
   async registerLocalizations(registry: LocalizationRegistry): Promise<void> {
     // registry.registerLocalizationFromRequire('cs', require('../../../i18n/nls.cs.json'));
-    // registry.registerLocalizationFromRequire('de', require('../../../i18n/nls.de.json'));
+    registry.registerLocalizationFromRequire('de', require('../../../i18n/nls.de.json'));
+    registry.registerLocalizationFromRequire('en', require('../../../i18n/nls.json'));
     // registry.registerLocalizationFromRequire('es', require('../../../i18n/nls.es.json'));
     // registry.registerLocalizationFromRequire('fr', require('../../../i18n/nls.fr.json'));
     // registry.registerLocalizationFromRequire('hu', require('../../../i18n/nls.hu.json'));
