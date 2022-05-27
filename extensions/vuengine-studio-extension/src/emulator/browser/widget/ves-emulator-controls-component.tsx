@@ -31,6 +31,7 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
     protected controllerButtonAssignmentRDownRef = React.createRef<HTMLDivElement>();
     protected controllerButtonAssignmentLTRef = React.createRef<HTMLDivElement>();
     protected controllerButtonAssignmentRTRef = React.createRef<HTMLDivElement>();
+    protected controllerButtonAssignmentPowerRef = React.createRef<HTMLDivElement>();
     protected controllerButtonSelectRef = React.createRef<HTMLDivElement>();
     protected controllerButtonStartRef = React.createRef<HTMLDivElement>();
     protected controllerButtonARef = React.createRef<HTMLDivElement>();
@@ -45,6 +46,7 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
     protected controllerButtonRDownRef = React.createRef<HTMLDivElement>();
     protected controllerButtonLTRef = React.createRef<HTMLDivElement>();
     protected controllerButtonRTRef = React.createRef<HTMLDivElement>();
+    protected controllerButtonPowerRef = React.createRef<HTMLDivElement>();
 
     constructor(props: VesEmulatorControlsProps) {
         super(props);
@@ -169,6 +171,13 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                     <div>
                         <div className='controllerImage'>
                             <img src={IMAGE_VB_CONTROLLER} />
+                            <div
+                                className='buttonOverlay power'
+                                ref={this.controllerButtonPowerRef}
+                                onClick={this.openKeymaps}
+                                onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonAssignmentPowerRef)}
+                                onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonAssignmentPowerRef)}
+                            ></div>
                             <div
                                 className='buttonOverlay select'
                                 ref={this.controllerButtonSelectRef}
@@ -389,7 +398,12 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
                                 </button>
                             </span>
                         </div>
-                        <div>
+                        <div
+                            ref={this.controllerButtonAssignmentPowerRef}
+                            onClick={this.openKeymaps}
+                            onMouseEnter={() => this.toggleRefHighlighted(this.controllerButtonPowerRef)}
+                            onMouseLeave={() => this.toggleRefHighlighted(this.controllerButtonPowerRef)}
+                        >
                             <span>{VesEmulatorCommands.INPUT_RESET.label}</span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>

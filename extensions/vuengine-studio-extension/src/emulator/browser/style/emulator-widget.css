@@ -128,6 +128,15 @@ iframe#vesEmulatorFrame {
   opacity: 1;
 }
 
+#vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.power {
+  height: 4%;
+  left: 44.5%;
+  top: 36.3%;
+  transform: perspective(7px) rotateX(-10deg);
+  width: 11%;
+  border-radius: 2px;
+}
+
 #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.select,
 #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.start,
 #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.a,
@@ -147,6 +156,7 @@ iframe#vesEmulatorFrame {
 #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.rleft,
 #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.rright,
 #vesEmulatorWidget .controlsController .controllerImage .buttonOverlay.rdown {
+  border-radius: 2px;
   height: 5.5%;
   width: 5.5%;
 }
