@@ -4,7 +4,7 @@ import { FrontendApplicationState, FrontendApplicationStateService } from '@thei
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
-import { FileChangeType } from '@theia/filesystem/lib/browser';
+import { FileChangeType } from '@theia/filesystem/lib/common/files';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { ProcessOptions } from '@theia/process/lib/node';
