@@ -4,14 +4,14 @@ import { FrontendApplication, PreferenceScope, PreferenceService } from '@theia/
 import { ElectronMenuContribution } from '@theia/core/lib/electron-browser/menu/electron-menu-contribution';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { VesBuildPreferenceIds } from '../../build/browser/ves-build-preferences';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { BuildMode } from '../../build/browser/ves-build-types';
 import { VesEmulatorPreferenceIds } from '../../emulator/browser/ves-emulator-preferences';
 import { VesEmulatorService } from '../../emulator/browser/ves-emulator-service';
 import { VesFlashCartService } from '../../flash-cart/browser/ves-flash-cart-service';
-import { VesCommonService } from '../browser/ves-common-service';
-import { VesTouchBarCommands } from '../common/ves-branding-types';
+import { VesTouchBarCommands } from '../common/ves-touchbar-types';
 
 @injectable()
 export class VesElectronMenuContribution extends ElectronMenuContribution {

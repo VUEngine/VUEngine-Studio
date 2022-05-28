@@ -5,7 +5,7 @@ import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { join, relative as relativePath } from 'path';
-import { VesGlobService } from '../../branding/common/ves-glob-service-protocol';
+import { VesGlobService } from '../../glob/common/ves-glob-service-protocol';
 import { VesPluginData, VesPluginsData } from './ves-plugin';
 import { VesPluginsPathsService } from './ves-plugins-paths-service';
 import { VUENGINE_PLUGINS_PREFIX } from './ves-plugins-types';

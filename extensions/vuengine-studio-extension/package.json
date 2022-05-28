@@ -71,8 +71,7 @@
       "frontend": "lib/about/browser/ves-about-frontend-module"
     },
     {
-      "frontendElectron": "lib/branding/electron-browser/ves-branding-electron-frontend-module",
-      "electronMain": "lib/branding/electron-main/ves-branding-electron-main-application-module"
+      "frontendElectron": "lib/branding/electron-browser/ves-branding-electron-frontend-module"
     },
     {
       "frontend": "lib/branding/browser/ves-branding-frontend-module",
@@ -105,6 +104,10 @@
       "frontend": "lib/getting-started/browser/ves-getting-started-frontend-module"
     },
     {
+      "frontend": "lib/glob/browser/ves-glob-frontend-module",
+      "backend": "lib/glob/node/ves-glob-backend-module"
+    },
+    {
       "frontend": "lib/image-converter/browser/ves-image-converter-frontend-module"
     },
     {
@@ -127,6 +130,10 @@
     },
     {
       "frontend": "lib/titlebar/browser/ves-titlebar-frontend-module"
+    },
+    {
+      "frontendElectron": "lib/touchbar/electron-browser/ves-touchbar-electron-frontend-module",
+      "electronMain": "lib/touchbar/electron-main/ves-touchbar-electron-main-application-module"
     },
     {
       "electronMain": "lib/updater/electron-main/ves-updater-main-module",
