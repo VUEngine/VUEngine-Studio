@@ -226,7 +226,7 @@ export class VesPluginsModel {
 
         const readmeHtml = markdownConverter.makeHtml(readmeMarkdown);
         return sanitize(readmeHtml, {
-            allowedTags: sanitize.defaults.allowedTags.concat(['h1', 'h2', 'img'])
+            allowedTags: sanitize.defaults.allowedTags.concat(['h1', 'h2', 'h3', 'h4', 'img'])
         });
     }
 

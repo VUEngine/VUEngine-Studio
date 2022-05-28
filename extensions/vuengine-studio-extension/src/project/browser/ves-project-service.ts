@@ -214,6 +214,12 @@ export class VesProjectService {
         return JSON.parse(configFileContents.value.toString());
       } catch (error) {
         console.error('Malformed project file could not be parsed.', projectFileUri?.path.toString());
+        return {
+          folders: [{
+            path: '.'
+          }],
+          plugins: []
+        };
       }
     }
 
