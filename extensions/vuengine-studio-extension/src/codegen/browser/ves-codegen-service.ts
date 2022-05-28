@@ -11,7 +11,7 @@ import * as iconv from 'iconv-lite';
 import * as nunjucks from 'nunjucks';
 import { basename, join, parse as parsePath } from 'path';
 import { VES_PREFERENCE_DIR } from '../../branding/browser/ves-branding-preference-configurations';
-import { VesGlobService } from '../../branding/common/ves-glob-service-protocol';
+import { VesGlobService } from '../../glob/common/ves-glob-service-protocol';
 import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-service';

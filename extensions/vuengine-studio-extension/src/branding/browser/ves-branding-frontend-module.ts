@@ -1,7 +1,7 @@
 import { CallHierarchyContribution } from '@theia/callhierarchy/lib/browser/callhierarchy-contribution';
 import {
     ApplicationShell, FrontendApplicationContribution,
-    LabelProviderContribution, WebSocketConnectionProvider
+    LabelProviderContribution
 } from '@theia/core/lib/browser';
 import { ColorContribution } from '@theia/core/lib/browser/color-application-contribution';
 import { DefaultFileIconThemeContribution } from '@theia/core/lib/browser/icon-theme-contribution';
@@ -28,7 +28,6 @@ import { ToolbarDefaultsFactory } from '@theia/toolbar/lib/browser/toolbar-defau
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { QuickOpenWorkspace } from '@theia/workspace/lib/browser/quick-open-workspace';
 import '../../../src/branding/browser/style/index.css';
-import { VesGlobService, VES_GLOB_SERVICE_PATH } from '../common/ves-glob-service-protocol';
 import { VesApplicationShell } from './ves-branding-application-shell';
 import { VesColorContribution } from './ves-branding-color-contribution';
 import { VesBrandingContribution } from './ves-branding-contribution';
@@ -152,10 +151,4 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // initially hide "open editors" tab of navigator
     bind(VesNavigatorWidgetFactory).toSelf();
     rebind(NavigatorWidgetFactory).to(VesNavigatorWidgetFactory);
-
-    // glob service
-    bind(VesGlobService).toDynamicValue(ctx => {
-        const connection = ctx.container.get(WebSocketConnectionProvider);
-        return connection.createProxy<VesGlobService>(VES_GLOB_SERVICE_PATH);
-    }).inSingletonScope();
 });
