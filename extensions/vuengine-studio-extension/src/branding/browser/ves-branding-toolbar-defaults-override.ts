@@ -63,28 +63,28 @@ export const VesToolbarDefaultsOverride: () => DeflatedToolbarTree = () => ({
                 },
                 /*
                 {
-                    'id': 'VesBuild.commands.build',
-                    'command': 'VesBuild.commands.build',
+                    'id': 'ves:build:build',
+                    'command': 'ves:build:build',
                     'icon': 'codicon codicon-wrench'
                 },
                 {
-                    'id': 'VesEmulator.commands.run',
-                    'command': 'VesEmulator.commands.run',
+                    'id': 'ves:emulator:run',
+                    'command': 'ves:emulator:run',
                     'icon': 'codicon codicon-run'
                 },
                 {
-                    'id': 'vesFlashCart.commands.flash',
-                    'command': 'vesFlashCart.commands.flash',
+                    'id': 'ves:flashCarts:flash',
+                    'command': 'ves:flashCarts:flash',
                     'icon': 'fa fa-microchip'
                 },
                 {
-                    'id': 'VesExport.commands.export',
-                    'command': 'VesExport.commands.export',
+                    'id': 'ves:export:export',
+                    'command': 'ves:export:export',
                     'icon': 'codicon codicon-desktop-download'
                 },
                 {
-                    'id': 'VesBuild.commands.clean',
-                    'command': 'VesBuild.commands.clean',
+                    'id': 'ves:build:clean',
+                    'command': 'ves:build:clean',
                     'icon': 'codicon codicon-trash'
                 }
                 */

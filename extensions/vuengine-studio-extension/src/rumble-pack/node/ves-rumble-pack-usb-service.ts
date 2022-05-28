@@ -1,7 +1,7 @@
 import { injectable, postConstruct } from '@theia/core/shared/inversify';
 import { SerialPort } from 'serialport';
 import { usb } from 'usb';
-import { HapticBuiltInEffect, HapticFrequency, RUMBLE_PACK_IDS } from '../common/ves-rumble-pack-types';
+import { HapticFrequency, RUMBLE_PACK_IDS } from '../common/ves-rumble-pack-types';
 import { VesRumblePackUsbService, VesRumblePackUsbServiceClient } from '../common/ves-rumble-pack-usb-service-protocol';
 
 @injectable()
@@ -76,7 +76,7 @@ export class VesRumblePackUsbServiceImpl implements VesRumblePackUsbService {
         return this.sendCommand('STP');
     }
 
-    sendCommandPlayEffect(effect: HapticBuiltInEffect): boolean {
+    sendCommandPlayEffect(effect: string): boolean {
         return this.sendCommand(`HAP ${effect}`);
     }
 
