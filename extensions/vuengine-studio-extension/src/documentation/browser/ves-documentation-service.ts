@@ -2,7 +2,7 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { PreviewUri } from '@theia/preview/lib/browser';
 import { join } from 'path';
-import { VesCommonService } from '../../branding/browser/ves-common-service';
+import { VesCommonService } from '../../core/browser/ves-common-service';
 
 @injectable()
 export class VesDocumentationService {

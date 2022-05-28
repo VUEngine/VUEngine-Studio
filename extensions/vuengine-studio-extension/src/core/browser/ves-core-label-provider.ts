@@ -27,7 +27,7 @@ const FILE_TYPES: FileType[] = [{
 }];
 
 @injectable()
-export class VesBrandingLabelProviderContribution implements LabelProviderContribution {
+export class VesCoreLabelProviderContribution implements LabelProviderContribution {
     canHandle(element: object): number {
         // @ts-ignore
         return (isCustomFile(element.uri ?? element))

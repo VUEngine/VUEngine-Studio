@@ -1,6 +1,6 @@
 import { Command } from '@theia/core';
 
-export namespace VesBrandingCommands {
+export namespace VesCoreCommands {
     export const REPORT_ISSUE: Command = Command.toLocalizedCommand(
         {
             id: 'ves:general:reportIssue',

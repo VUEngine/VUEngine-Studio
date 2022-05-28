@@ -3,7 +3,7 @@ import { FileUri } from '@theia/core/lib/node/file-uri';
 import { injectable } from '@theia/core/shared/inversify';
 import { homedir } from 'os';
 import { join } from 'path';
-import { VES_PREFERENCE_DIR } from '../browser/ves-branding-preference-configurations';
+import { VES_PREFERENCE_DIR } from '../browser/ves-preference-configurations';
 
 @injectable()
 export class VesEnvVariablesServer extends EnvVariablesServerImpl {
