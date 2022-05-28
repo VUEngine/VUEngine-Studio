@@ -68,6 +68,9 @@
   },
   "theiaExtensions": [
     {
+      "frontend": "lib/about/browser/ves-about-frontend-module"
+    },
+    {
       "frontendElectron": "lib/branding/electron-browser/ves-branding-electron-frontend-module",
       "electronMain": "lib/branding/electron-main/ves-branding-electron-main-application-module"
     },
@@ -99,6 +102,9 @@
       "backend": "lib/flash-cart/node/ves-flash-cart-backend-module"
     },
     {
+      "frontend": "lib/getting-started/browser/ves-getting-started-frontend-module"
+    },
+    {
       "frontend": "lib/image-converter/browser/ves-image-converter-frontend-module"
     },
     {
@@ -118,6 +124,9 @@
     {
       "frontend": "lib/rumble-pack/browser/ves-rumble-pack-frontend-module",
       "backend": "lib/rumble-pack/node/ves-rumble-pack-backend-module"
+    },
+    {
+      "frontend": "lib/titlebar/browser/ves-titlebar-frontend-module"
     },
     {
       "electronMain": "lib/updater/electron-main/ves-updater-main-module",

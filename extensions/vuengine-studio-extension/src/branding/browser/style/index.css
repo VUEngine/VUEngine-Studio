@@ -1,10 +1,8 @@
-@import "about.css";
 @import "application.css";
 @import "buttons.css";
 @import "checkbox.css";
 @import "dialog.css";
 @import "file-icons.css";
-@import "getting-started.css";
 @import "icons.css";
 @import "input.css";
 @import "logo.css";
@@ -18,9 +16,5 @@
 @import "statusbar.css";
 @import "tabbar.css";
 /* @import "tabs.css"; */
-@import "titlebar.css";
-@import "titlebar-action-buttons.css";
-@import "titlebar-application-title.css";
-@import "titlebar-window-controls.css";
 @import "toolbar.css";
 @import "virtual-boy-theme.css";

@@ -1,14 +1,14 @@
 import { injectable, postConstruct } from '@theia/core/shared/inversify';
 import { AbstractViewContribution } from '@theia/core/lib/browser';
-import { VesTitlebarActionButtonsWidget } from './ves-branding-titlebar-action-buttons-widget';
+import { VesTitlebarApplicationTitleWidget } from './ves-titlebar-application-title-widget';
 
 @injectable()
-export class VesTitlebarActionButtonsContribution extends AbstractViewContribution<VesTitlebarActionButtonsWidget> {
+export class VesTitlebarApplicationTitleContribution extends AbstractViewContribution<VesTitlebarApplicationTitleWidget> {
 
     constructor() {
         super({
-            widgetId: VesTitlebarActionButtonsWidget.ID,
-            widgetName: VesTitlebarActionButtonsWidget.LABEL,
+            widgetId: VesTitlebarApplicationTitleWidget.ID,
+            widgetName: VesTitlebarApplicationTitleWidget.LABEL,
             defaultWidgetOptions: { area: 'top' }
         });
     }

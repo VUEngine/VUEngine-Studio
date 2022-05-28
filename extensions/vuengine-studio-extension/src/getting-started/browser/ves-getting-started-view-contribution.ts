@@ -1,33 +1,13 @@
-import { Command, CommandRegistry, CommandService, MenuModelRegistry } from '@theia/core';
+import { CommandRegistry, CommandService, MenuModelRegistry } from '@theia/core';
 import { AbstractViewContribution, CommonMenus, FrontendApplication, FrontendApplicationContribution, PreferenceService } from '@theia/core/lib/browser';
 import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
-import { VesGettingStartedWidget } from './ves-branding-getting-started-widget';
-import { VesBrandingPreferenceIds } from './ves-branding-preferences';
-
-export namespace VesGettingStartedCommands {
-    export const SHOW: Command = Command.toLocalizedCommand(
-        {
-            id: 'ves:gettingStarted:showWidget',
-            label: 'Getting Started',
-        },
-        'vuengine/gettingStarted/commands/showWidget',
-        'vuengine/gettingStarted/commands/category'
-    );
-
-    export const HELP: Command = Command.toLocalizedCommand(
-        {
-            id: 'ves:gettingStarted:showHelp',
-            label: 'Show Handbook Page',
-            iconClass: 'codicon codicon-book',
-        },
-        'vuengine/gettingStarted/commands/showHelp',
-        'vuengine/gettingStarted/commands/category'
-    );
-}
+import { VesGettingStartedCommands } from './ves-getting-started-commands';
+import { VesGettingStartedPreferenceIds } from './ves-getting-started-preferences';
+import { VesGettingStartedWidget } from './ves-getting-started-widget';
 
 @injectable()
 export class VesGettingStartedViewContribution extends AbstractViewContribution<VesGettingStartedWidget> implements FrontendApplicationContribution {
@@ -54,7 +34,7 @@ export class VesGettingStartedViewContribution extends AbstractViewContribution<
         if (!this.workspaceService.opened) {
             this.stateService.reachedState('ready').then(
                 () => this.preferenceService.ready.then(() => {
-                    const showWelcomePage: boolean = this.preferenceService.get(VesBrandingPreferenceIds.ALWAYS_SHOW_WELCOME_PAGE, true);
+                    const showWelcomePage: boolean = this.preferenceService.get(VesGettingStartedPreferenceIds.ALWAYS_SHOW_WELCOME_PAGE, true);
                     if (showWelcomePage) {
                         this.openView({ reveal: true, activate: true });
                     }
@@ -64,7 +44,7 @@ export class VesGettingStartedViewContribution extends AbstractViewContribution<
     }
 
     registerCommands(commandRegistry: CommandRegistry): void {
-        commandRegistry.registerCommand(VesGettingStartedCommands.SHOW, {
+        commandRegistry.registerCommand(VesGettingStartedCommands.WIDGET_SHOW, {
             execute: () => this.openView({ reveal: true, activate: true }),
         });
         commandRegistry.registerCommand(VesGettingStartedCommands.HELP, {
@@ -77,8 +57,8 @@ export class VesGettingStartedViewContribution extends AbstractViewContribution<
 
     registerMenus(menus: MenuModelRegistry): void {
         menus.registerMenuAction(CommonMenus.HELP, {
-            commandId: VesGettingStartedCommands.SHOW.id,
-            label: VesGettingStartedCommands.SHOW.label,
+            commandId: VesGettingStartedCommands.WIDGET_SHOW.id,
+            label: VesGettingStartedCommands.WIDGET_SHOW.label,
             order: 'a10'
         });
     }

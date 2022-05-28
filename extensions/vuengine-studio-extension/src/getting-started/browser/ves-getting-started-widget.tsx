@@ -9,11 +9,11 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import * as React from '@theia/core/shared/react';
 import { KeymapsCommands } from '@theia/keymaps/lib/browser';
 import { WorkspaceCommands, WorkspaceService } from '@theia/workspace/lib/browser';
+import { VesCommonService } from '../../branding/browser/ves-common-service';
 import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
 import { VesProjectCommands } from '../../project/browser/ves-project-commands';
 import { VesProjectService } from '../../project/browser/ves-project-service';
-import { VesBrandingPreferenceIds } from './ves-branding-preferences';
-import { VesCommonService } from './ves-common-service';
+import { VesGettingStartedPreferenceIds } from './ves-getting-started-preferences';
 
 @injectable()
 export class VesGettingStartedWidget extends ReactWidget {
@@ -333,10 +333,10 @@ export interface PreferencesProps {
 }
 
 function VesPreferences(props: PreferencesProps): JSX.Element {
-    const [alwaysShow, setAlwaysShow] = React.useState<boolean>(props.preferenceService.get(VesBrandingPreferenceIds.ALWAYS_SHOW_WELCOME_PAGE, true));
+    const [alwaysShow, setAlwaysShow] = React.useState<boolean>(props.preferenceService.get(VesGettingStartedPreferenceIds.ALWAYS_SHOW_WELCOME_PAGE, true));
     React.useEffect(() => {
         const preflistener = props.preferenceService.onPreferenceChanged(change => {
-            if (change.preferenceName === VesBrandingPreferenceIds.ALWAYS_SHOW_WELCOME_PAGE) {
+            if (change.preferenceName === VesGettingStartedPreferenceIds.ALWAYS_SHOW_WELCOME_PAGE) {
                 const prefValue: boolean = change.newValue;
                 setAlwaysShow(prefValue);
             }
@@ -345,7 +345,7 @@ function VesPreferences(props: PreferencesProps): JSX.Element {
     }, [props.preferenceService]);
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newChecked = e.target.checked;
-        props.preferenceService.updateValue(VesBrandingPreferenceIds.ALWAYS_SHOW_WELCOME_PAGE, newChecked);
+        props.preferenceService.updateValue(VesGettingStartedPreferenceIds.ALWAYS_SHOW_WELCOME_PAGE, newChecked);
     };
     return <div className='ves-preference'>
         <input type="checkbox" className="theia-input" id="alwaysShow" onChange={handleChange} checked={alwaysShow}></input>

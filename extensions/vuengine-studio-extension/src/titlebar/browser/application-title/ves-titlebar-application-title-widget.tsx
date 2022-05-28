@@ -5,7 +5,7 @@ import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { WorkspaceCommands, WorkspaceService } from '@theia/workspace/lib/browser';
-import { VesProjectService } from '../../project/browser/ves-project-service';
+import { VesProjectService } from '../../../project/browser/ves-project-service';
 
 @injectable()
 export class VesTitlebarApplicationTitleWidget extends ReactWidget {
