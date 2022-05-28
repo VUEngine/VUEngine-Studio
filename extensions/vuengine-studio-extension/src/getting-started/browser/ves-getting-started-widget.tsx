@@ -9,7 +9,7 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import * as React from '@theia/core/shared/react';
 import { KeymapsCommands } from '@theia/keymaps/lib/browser';
 import { WorkspaceCommands, WorkspaceService } from '@theia/workspace/lib/browser';
-import { VesCommonService } from '../../branding/browser/ves-common-service';
+import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
 import { VesProjectCommands } from '../../project/browser/ves-project-commands';
 import { VesProjectService } from '../../project/browser/ves-project-service';

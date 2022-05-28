@@ -7,7 +7,7 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { VesCommonService } from '../../branding/browser/ves-common-service';
+import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';

@@ -6,8 +6,8 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { VES_PREFERENCE_DIR } from '../../branding/browser/ves-branding-preference-configurations';
-import { VesCommonService } from '../../branding/browser/ves-common-service';
+import { VES_PREFERENCE_DIR } from '../../core/browser/ves-preference-configurations';
+import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-service';
 import { USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } from '../../plugins/browser/ves-plugins-types';

@@ -27,19 +27,19 @@ import { ScmHistoryContribution } from '@theia/scm-extra/lib/browser/history/scm
 import { ToolbarDefaultsFactory } from '@theia/toolbar/lib/browser/toolbar-defaults';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { QuickOpenWorkspace } from '@theia/workspace/lib/browser/quick-open-workspace';
-import '../../../src/branding/browser/style/index.css';
-import { VesApplicationShell } from './ves-branding-application-shell';
-import { VesColorContribution } from './ves-branding-color-contribution';
-import { VesBrandingContribution } from './ves-branding-contribution';
-import { VesDebugFrontendApplicationContribution } from './ves-branding-debug-contribution';
-import { VesDebugPrefixConfiguration } from './ves-branding-debug-prefix-configuration';
-import { VesScmHistoryContribution } from './ves-branding-history-contribution';
-import { VesDefaultFileIconThemeContribution } from './ves-branding-icon-theme-contribution';
-import { VesBrandingLabelProviderContribution } from './ves-branding-label-provider';
-import { VesPluginContribution } from './ves-branding-plugin-contribution';
-import { VesPreferenceConfigurations } from './ves-branding-preference-configurations';
-import { VesPreferenceTreeGenerator } from './ves-branding-preference-tree-generator.';
-import { VesToolbarDefaultsOverride } from './ves-branding-toolbar-defaults-override';
+import '../../../src/core/browser/style/index.css';
+import { VesApplicationShell } from './ves-core-application-shell';
+import { VesColorContribution } from './ves-core-color-contribution';
+import { VesCoreContribution } from './ves-core-contribution';
+import { VesDebugFrontendApplicationContribution } from './ves-core-debug-contribution';
+import { VesDebugPrefixConfiguration } from './ves-core-debug-prefix-configuration';
+import { VesScmHistoryContribution } from './ves-core-history-contribution';
+import { VesDefaultFileIconThemeContribution } from './ves-core-icon-theme-contribution';
+import { VesCoreLabelProviderContribution } from './ves-core-label-provider';
+import { VesPluginContribution } from './ves-plugin-contribution';
+import { VesPreferenceConfigurations } from './ves-preference-configurations';
+import { VesPreferenceTreeGenerator } from './ves-preference-tree-generator.';
+import { VesToolbarDefaultsOverride } from './ves-toolbar-defaults-override';
 import { VesCommonService } from './ves-common-service';
 import { VesNavigatorWidgetFactory } from './ves-navigator-widget-factory';
 import { VesPreferenceStringInputRenderer } from './ves-preference-string-input-renderer';
@@ -60,10 +60,10 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(BrowserMenuBarContribution).toSelf().inSingletonScope();
     bind(FrontendApplicationContribution).toService(BrowserMenuBarContribution);
 
-    // branding commands and menus
-    bind(VesBrandingContribution).toSelf().inSingletonScope();
-    bind(CommandContribution).toService(VesBrandingContribution);
-    bind(MenuContribution).toService(VesBrandingContribution);
+    // commands and menus
+    bind(VesCoreContribution).toSelf().inSingletonScope();
+    bind(CommandContribution).toService(VesCoreContribution);
+    bind(MenuContribution).toService(VesCoreContribution);
 
     // default configurations
     bind(VesPreferenceConfigurations).toSelf().inSingletonScope();
@@ -77,8 +77,8 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     rebind(ApplicationShell).to(VesApplicationShell).inSingletonScope();
 
     // file icons & labels
-    bind(VesBrandingLabelProviderContribution).toSelf().inSingletonScope();
-    bind(LabelProviderContribution).toService(VesBrandingLabelProviderContribution);
+    bind(VesCoreLabelProviderContribution).toSelf().inSingletonScope();
+    bind(LabelProviderContribution).toService(VesCoreLabelProviderContribution);
 
     // remove debug features
     bind(VesDebugFrontendApplicationContribution).toSelf().inSingletonScope();

@@ -71,17 +71,17 @@
       "frontend": "lib/about/browser/ves-about-frontend-module"
     },
     {
-      "frontendElectron": "lib/branding/electron-browser/ves-branding-electron-frontend-module"
-    },
-    {
-      "frontend": "lib/branding/browser/ves-branding-frontend-module",
-      "backend": "lib/branding/node/ves-branding-backend-module"
-    },
-    {
       "frontend": "lib/build/browser/ves-build-frontend-module"
     },
     {
       "frontend": "lib/codegen/browser/ves-codegen-frontend-module"
+    },
+    {
+      "frontendElectron": "lib/core/electron-browser/ves-core-electron-frontend-module"
+    },
+    {
+      "frontend": "lib/core/browser/ves-core-frontend-module",
+      "backend": "lib/core/node/ves-core-backend-module"
     },
     {
       "frontend": "lib/documentation/browser/ves-documentation-frontend-module"

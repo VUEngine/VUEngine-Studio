@@ -9,7 +9,7 @@ import * as React from '@theia/core/shared/react';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { VesCommonService } from '../../../branding/browser/ves-common-service';
+import { VesCommonService } from '../../../core/browser/ves-common-service';
 import { VUENGINE_EXT } from '../../common/custom-project-file/ves-project-utils';
 import { VesProjectCommands } from '../ves-project-commands';
 import { VesProjectPathsService } from '../ves-project-paths-service';

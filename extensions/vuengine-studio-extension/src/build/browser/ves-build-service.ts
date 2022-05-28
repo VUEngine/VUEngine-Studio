@@ -11,7 +11,7 @@ import { ProcessOptions } from '@theia/process/lib/node';
 import { TaskEndedInfo, TaskEndedTypes, TaskService } from '@theia/task/lib/browser/task-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { cpus } from 'os';
-import { VesCommonService } from '../../branding/browser/ves-common-service';
+import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';

@@ -6,7 +6,7 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileStatWithMetadata } from '@theia/filesystem/lib/common/files';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { deepmerge } from 'deepmerge-ts';
-import { VesCommonService } from '../../branding/browser/ves-common-service';
+import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesGlobService } from '../../glob/common/ves-glob-service-protocol';
 import { MemorySection } from '../../build/browser/ves-build-types';
 import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';

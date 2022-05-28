@@ -3,7 +3,7 @@ import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { VesCommonService } from '../../branding/browser/ves-common-service';
+import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesPluginsPreferenceIds } from './ves-plugins-preferences';
 
 @injectable()

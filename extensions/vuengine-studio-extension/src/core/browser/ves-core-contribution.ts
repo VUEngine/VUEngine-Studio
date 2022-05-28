@@ -6,11 +6,11 @@ import { CommandContribution, CommandRegistry } from '@theia/core/lib/common/com
 import { MenuContribution, MenuModelRegistry } from '@theia/core/lib/common/menu';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { MonacoThemeRegistry } from '@theia/monaco/lib/browser/textmate/monaco-theme-registry';
-import { VesBrandingCommands } from './ves-branding-commands';
-import { VesBrandingMenus } from './ves-branding-menus';
+import { VesCoreCommands } from './ves-core-commands';
+import { VesCoreMenus } from './ves-core-menus';
 
 @injectable()
-export class VesBrandingContribution implements CommandContribution, MenuContribution {
+export class VesCoreContribution implements CommandContribution, MenuContribution {
     @inject(ApplicationShell)
     protected readonly shell: ApplicationShell;
     @inject(PreferenceService)
@@ -138,23 +138,23 @@ export class VesBrandingContribution implements CommandContribution, MenuContrib
     }
 
     registerCommands(commandRegistry: CommandRegistry): void {
-        commandRegistry.registerCommand(VesBrandingCommands.REPORT_ISSUE, {
-            execute: () => this.windowService.openNewWindow(VesBrandingContribution.REPORT_ISSUE_URL, { external: true })
+        commandRegistry.registerCommand(VesCoreCommands.REPORT_ISSUE, {
+            execute: () => this.windowService.openNewWindow(VesCoreContribution.REPORT_ISSUE_URL, { external: true })
         });
-        commandRegistry.registerCommand(VesBrandingCommands.SUPPORT, {
-            execute: () => this.windowService.openNewWindow(VesBrandingContribution.SUPPORT_URL, { external: true })
+        commandRegistry.registerCommand(VesCoreCommands.SUPPORT, {
+            execute: () => this.windowService.openNewWindow(VesCoreContribution.SUPPORT_URL, { external: true })
         });
     }
 
     registerMenus(menus: MenuModelRegistry): void {
-        menus.registerMenuAction(VesBrandingMenus.VES_HELP, {
-            commandId: VesBrandingCommands.REPORT_ISSUE.id,
-            label: VesBrandingCommands.REPORT_ISSUE.label,
+        menus.registerMenuAction(VesCoreMenus.VES_HELP, {
+            commandId: VesCoreCommands.REPORT_ISSUE.id,
+            label: VesCoreCommands.REPORT_ISSUE.label,
             order: '1',
         });
-        menus.registerMenuAction(VesBrandingMenus.VES_HELP, {
-            commandId: VesBrandingCommands.SUPPORT.id,
-            label: VesBrandingCommands.SUPPORT.label,
+        menus.registerMenuAction(VesCoreMenus.VES_HELP, {
+            commandId: VesCoreCommands.SUPPORT.id,
+            label: VesCoreCommands.SUPPORT.label,
             order: '3',
         });
     }

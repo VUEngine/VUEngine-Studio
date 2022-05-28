@@ -3,7 +3,7 @@ import { BaseWidget } from '@theia/core/lib/browser';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { PreviewHandler, PreviewHandlerProvider } from '@theia/preview/lib/browser/preview-handler';
-import { VesCommonService } from 'src/branding/browser/ves-common-service';
+import { VesCommonService } from 'src/core/browser/ves-common-service';
 
 @injectable()
 export class VesDocumentationTechScrollWidget extends BaseWidget {

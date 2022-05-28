@@ -4,7 +4,7 @@ import { FrontendApplication, PreferenceScope, PreferenceService } from '@theia/
 import { ElectronMenuContribution } from '@theia/core/lib/electron-browser/menu/electron-menu-contribution';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { VesCommonService } from '../../branding/browser/ves-common-service';
+import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesBuildPreferenceIds } from '../../build/browser/ves-build-preferences';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { BuildMode } from '../../build/browser/ves-build-types';

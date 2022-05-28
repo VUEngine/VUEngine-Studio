@@ -1,6 +1,5 @@
 import { WebSocketConnectionProvider } from '@theia/core/lib/browser';
 import { ContainerModule } from '@theia/core/shared/inversify';
-import '../../../src/branding/browser/style/index.css';
 import { VesGlobService, VES_GLOB_SERVICE_PATH } from '../common/ves-glob-service-protocol';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
