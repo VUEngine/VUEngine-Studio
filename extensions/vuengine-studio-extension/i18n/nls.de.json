@@ -375,7 +375,7 @@
             "disconnected": "Nicht verbunden",
             "effect": "Effekt",
             "effects": {
-                "1000MsAlert": "1000-ms-Warnung",
+                "1000MsAlert": "1000 ms Warnung",
                 "750MsAlert": "750 ms Warnung",
                 "buzz": "Summen",
                 "doubleClick": "Doppelklick",

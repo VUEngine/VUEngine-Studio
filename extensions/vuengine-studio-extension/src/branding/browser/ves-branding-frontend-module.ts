@@ -1,15 +1,8 @@
 import { CallHierarchyContribution } from '@theia/callhierarchy/lib/browser/callhierarchy-contribution';
-import { isOSX } from '@theia/core';
 import {
-    ApplicationShell,
-    bindViewContribution,
-    FrontendApplicationContribution,
-    LabelProviderContribution,
-    PreferenceContribution,
-    WebSocketConnectionProvider,
-    WidgetFactory
+    ApplicationShell, FrontendApplicationContribution,
+    LabelProviderContribution, WebSocketConnectionProvider
 } from '@theia/core/lib/browser';
-import { AboutDialog } from '@theia/core/lib/browser/about-dialog';
 import { ColorContribution } from '@theia/core/lib/browser/color-application-contribution';
 import { DefaultFileIconThemeContribution } from '@theia/core/lib/browser/icon-theme-contribution';
 import {
@@ -17,7 +10,6 @@ import {
     BrowserMenuBarContribution
 } from '@theia/core/lib/browser/menu/browser-menu-plugin';
 import { PreferenceConfigurations } from '@theia/core/lib/browser/preferences/preference-configurations';
-import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { MenuContribution } from '@theia/core/lib/common/menu';
 import { ContainerModule } from '@theia/core/shared/inversify';
@@ -32,43 +24,30 @@ import { PluginViewRegistry } from '@theia/plugin-ext/lib/main/browser/view/plug
 import { PreferenceTreeGenerator } from '@theia/preferences/lib/browser/util/preference-tree-generator';
 import { PreferenceStringInputRenderer } from '@theia/preferences/lib/browser/views/components/preference-string-input';
 import { ScmHistoryContribution } from '@theia/scm-extra/lib/browser/history/scm-history-contribution';
+import { ToolbarDefaultsFactory } from '@theia/toolbar/lib/browser/toolbar-defaults';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { QuickOpenWorkspace } from '@theia/workspace/lib/browser/quick-open-workspace';
+import '../../../src/branding/browser/style/index.css';
 import { VesGlobService, VES_GLOB_SERVICE_PATH } from '../common/ves-glob-service-protocol';
-import { VesAboutDialog } from './ves-branding-about-dialog';
 import { VesApplicationShell } from './ves-branding-application-shell';
 import { VesColorContribution } from './ves-branding-color-contribution';
 import { VesBrandingContribution } from './ves-branding-contribution';
 import { VesDebugFrontendApplicationContribution } from './ves-branding-debug-contribution';
 import { VesDebugPrefixConfiguration } from './ves-branding-debug-prefix-configuration';
-import { VesGettingStartedViewContribution } from './ves-branding-getting-started-view-contribution';
-import { VesGettingStartedWidget } from './ves-branding-getting-started-widget';
 import { VesScmHistoryContribution } from './ves-branding-history-contribution';
 import { VesDefaultFileIconThemeContribution } from './ves-branding-icon-theme-contribution';
 import { VesBrandingLabelProviderContribution } from './ves-branding-label-provider';
 import { VesPluginContribution } from './ves-branding-plugin-contribution';
 import { VesPreferenceConfigurations } from './ves-branding-preference-configurations';
 import { VesPreferenceTreeGenerator } from './ves-branding-preference-tree-generator.';
-import { VesBrandingPreferenceSchema } from './ves-branding-preferences';
-import { VesTitlebarActionButtonsContribution } from './ves-branding-titlebar-action-buttons-view';
-import { VesTitlebarActionButtonsWidget } from './ves-branding-titlebar-action-buttons-widget';
-import { VesTitlebarApplicationTitleContribution } from './ves-branding-titlebar-application-title-view';
-import { VesTitlebarApplicationTitleWidget } from './ves-branding-titlebar-application-title-widget';
-import { VesTitlebarWindowControlsContribution } from './ves-branding-titlebar-window-controls-view';
-import { VesTitlebarWindowControlsWidget } from './ves-branding-titlebar-window-controls-widget';
+import { VesToolbarDefaultsOverride } from './ves-branding-toolbar-defaults-override';
 import { VesCommonService } from './ves-common-service';
 import { VesNavigatorWidgetFactory } from './ves-navigator-widget-factory';
 import { VesPreferenceStringInputRenderer } from './ves-preference-string-input-renderer';
 import { VesQuickOpenWorkspace } from './ves-quick-open-workspace';
 import { VesWorkspaceService } from './ves-workspace-service';
-import { ToolbarDefaultsFactory } from '@theia/toolbar/lib/browser/toolbar-defaults';
-import { VesToolbarDefaultsOverride } from './ves-branding-toolbar-defaults-override';
-import '../../../src/branding/browser/style/index.css';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
-    // preferences
-    bind(PreferenceContribution).toConstantValue({ schema: VesBrandingPreferenceSchema });
-
     // rename default icon theme
     bind(VesDefaultFileIconThemeContribution).toSelf().inSingletonScope();
     // @ts-ignore
@@ -81,23 +60,6 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(BrowserMainMenuFactory).toSelf().inSingletonScope();
     bind(BrowserMenuBarContribution).toSelf().inSingletonScope();
     bind(FrontendApplicationContribution).toService(BrowserMenuBarContribution);
-
-    // getting started view
-    bindViewContribution(bind, VesGettingStartedViewContribution);
-    bind(FrontendApplicationContribution).toService(VesGettingStartedViewContribution);
-    bind(TabBarToolbarContribution).toService(VesGettingStartedViewContribution);
-    bind(VesGettingStartedWidget).toSelf();
-    bind(WidgetFactory).toDynamicValue(context => ({
-        id: VesGettingStartedWidget.ID,
-        createWidget: () => context.container.get<VesGettingStartedWidget>(VesGettingStartedWidget),
-    })).inSingletonScope();
-
-    // about dialog
-    if (isBound(AboutDialog)) {
-        rebind(AboutDialog).to(VesAboutDialog).inSingletonScope();
-    } else {
-        bind(AboutDialog).to(VesAboutDialog).inSingletonScope();
-    }
 
     // branding commands and menus
     bind(VesBrandingContribution).toSelf().inSingletonScope();
@@ -182,52 +144,6 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     // toolbar default config
     rebind(ToolbarDefaultsFactory).toConstantValue(VesToolbarDefaultsOverride);
-
-    // title bar application title
-    bindViewContribution(bind, VesTitlebarApplicationTitleContribution);
-    bind(FrontendApplicationContribution).toService(
-        VesTitlebarApplicationTitleContribution
-    );
-    bind(VesTitlebarApplicationTitleWidget).toSelf();
-    bind(WidgetFactory)
-        .toDynamicValue(ctx => ({
-            id: VesTitlebarApplicationTitleWidget.ID,
-            createWidget: () =>
-                ctx.container.get<VesTitlebarApplicationTitleWidget>(
-                    VesTitlebarApplicationTitleWidget
-                ),
-        }))
-        .inSingletonScope();
-
-    // title bar window controls
-    if (!isOSX) {
-        bindViewContribution(bind, VesTitlebarWindowControlsContribution);
-        bind(FrontendApplicationContribution).toService(VesTitlebarWindowControlsContribution);
-        bind(VesTitlebarWindowControlsWidget).toSelf();
-        bind(WidgetFactory)
-            .toDynamicValue(ctx => ({
-                id: VesTitlebarWindowControlsWidget.ID,
-                createWidget: () =>
-                    ctx.container.get<VesTitlebarWindowControlsWidget>(
-                        VesTitlebarWindowControlsWidget
-                    ),
-            }))
-            .inSingletonScope();
-    }
-
-    // title bar action buttons
-    bindViewContribution(bind, VesTitlebarActionButtonsContribution);
-    bind(FrontendApplicationContribution).toService(VesTitlebarActionButtonsContribution);
-    bind(VesTitlebarActionButtonsWidget).toSelf();
-    bind(WidgetFactory)
-        .toDynamicValue(ctx => ({
-            id: VesTitlebarActionButtonsWidget.ID,
-            createWidget: () =>
-                ctx.container.get<VesTitlebarActionButtonsWidget>(
-                    VesTitlebarActionButtonsWidget
-                ),
-        }))
-        .inSingletonScope();
 
     // add button to select path to respective settings
     bind(VesPreferenceStringInputRenderer).toSelf();

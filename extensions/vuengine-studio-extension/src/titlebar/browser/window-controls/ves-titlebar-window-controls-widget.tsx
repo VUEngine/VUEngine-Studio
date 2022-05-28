@@ -4,7 +4,7 @@ import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { ElectronCommands } from '@theia/core/lib/electron-browser/menu/electron-menu-contribution';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
-import { VesTitlebarWindowControlCommands } from './ves-branding-titlebar-window-controls-commands';
+import { VesTitlebarWindowControlCommands } from './ves-titlebar-window-controls-commands';
 
 @injectable()
 export class VesTitlebarWindowControlsWidget extends ReactWidget {

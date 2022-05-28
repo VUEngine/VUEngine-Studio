@@ -3,10 +3,10 @@ import { COMMONLY_USED_SECTION_PREFIX, PreferenceTreeGenerator } from '@theia/pr
 import { VesBuildPreferenceIds } from '../../build/browser/ves-build-preferences';
 import { VesEmulatorPreferenceIds } from '../../emulator/browser/ves-emulator-preferences';
 import { VesFlashCartPreferenceIds } from '../../flash-cart/browser/ves-flash-cart-preferences';
+import { VesGettingStartedPreferenceIds } from '../../getting-started/browser/ves-getting-started-preferences';
 import { VesPluginsPreferenceIds } from '../../plugins/browser/ves-plugins-preferences';
 import { VesProjectPreferenceIds } from '../../project/browser/ves-project-preferences';
 import { VesUpdaterPreferenceIds } from '../../updater/electron-browser/ves-updater-preferences';
-import { VesBrandingPreferenceIds } from './ves-branding-preferences';
 
 @injectable()
 export class VesPreferenceTreeGenerator extends PreferenceTreeGenerator {
@@ -35,7 +35,7 @@ export class VesPreferenceTreeGenerator extends PreferenceTreeGenerator {
         [VesFlashCartPreferenceIds.CATEGORY, 'features'], // custom category
         ['explorer', 'features'],
         ['extensions', 'features'],
-        [VesBrandingPreferenceIds.CATEGORY, 'features'], // custom category
+        [VesGettingStartedPreferenceIds.CATEGORY, 'features'], // custom category
         ['files', 'editor'],
         ['hosted-plugin', 'features'],
         ['keyboard', 'application'],
