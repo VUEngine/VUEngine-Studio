@@ -251,9 +251,14 @@ export class VesProjectTreeWidget extends TreeWidget {
   protected async handleDocOpen(node: VesProjectChildNode | undefined): Promise<void> {
     if (node) {
       if (node.member.uri) {
+        // Open item (menu entries that have an URI)
         await open(this.openerService, node.member.uri, { mode: 'reveal' });
       } else if (node.member.typeId) {
-        await this.addNode(node.member.typeId);
+        // Create a new item for menu entries which are a leaf, but do not have an item yet
+        const type = this.vesProjectService.getProjectDataType(node.member.typeId);
+        if (type?.leaf) {
+          await this.addNode(node.member.typeId);
+        }
       }
     }
   }
