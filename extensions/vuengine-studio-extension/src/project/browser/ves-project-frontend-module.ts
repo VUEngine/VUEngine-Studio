@@ -2,12 +2,10 @@ import { bindViewContribution, FrontendApplicationContribution, PreferenceContri
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { ContainerModule } from '@theia/core/shared/inversify';
 import { WorkspaceFrontendContribution } from '@theia/workspace/lib/browser';
-import { WorkspaceSchemaUpdater } from '@theia/workspace/lib/browser/workspace-schema-updater';
 import { CommonWorkspaceUtils } from '@theia/workspace/lib/common';
 import '../../../src/project/browser/style/index.css';
 import { VesCommonWorkspaceUtils } from '../common/custom-project-file/ves-project-utils';
 import { VesWorkspaceFrontendContribution } from './custom-project-file/ves-project-workspace-frontend-contribution';
-import { VesWorkspaceSchemaUpdater } from './custom-project-file/ves-project-workspace-schema-updater';
 import { VesNewProjectDialog, VesNewProjectDialogProps } from './new-project/ves-new-project-dialog';
 import { createVesProjectTreeWidget } from './tree/ves-project-tree-container';
 import { VesProjectTreeViewContribution } from './tree/ves-project-tree-view-contribution';
@@ -47,6 +45,6 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     rebind(CommonWorkspaceUtils).to(VesCommonWorkspaceUtils);
     bind(VesWorkspaceFrontendContribution).toSelf().inSingletonScope();
     rebind(WorkspaceFrontendContribution).to(VesWorkspaceFrontendContribution);
-    bind(VesWorkspaceSchemaUpdater).toSelf().inSingletonScope();
-    rebind(WorkspaceSchemaUpdater).to(VesWorkspaceSchemaUpdater);
+    // bind(VesWorkspaceSchemaUpdater).toSelf().inSingletonScope();
+    // rebind(WorkspaceSchemaUpdater).to(VesWorkspaceSchemaUpdater);
 });

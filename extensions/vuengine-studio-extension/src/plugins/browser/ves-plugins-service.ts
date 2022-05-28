@@ -4,12 +4,12 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { join, relative as relativePath } from 'path';
 import { VesGlobService } from '../../glob/common/ves-glob-service-protocol';
 import { VesPluginData, VesPluginsData } from './ves-plugin';
 import { VesPluginsPathsService } from './ves-plugins-paths-service';
 import { VUENGINE_PLUGINS_PREFIX } from './ves-plugins-types';
 import { VesProjectService } from '../../project/browser/ves-project-service';
+import { nls } from '@theia/core';
 
 @injectable()
 export class VesPluginsService {
@@ -34,13 +34,11 @@ export class VesPluginsService {
 
   protected installedPlugins: Array<string> = [];
 
-  // events
   protected readonly onDidChangeInstalledPluginsEmitter = new Emitter<void>();
   readonly onDidChangeInstalledPlugins = this.onDidChangeInstalledPluginsEmitter.event;
 
   @postConstruct()
   protected async init(): Promise<void> {
-    // Re-determine installedPlugins when plugins file changes
     this.vesProjectService.onDidChangeProjectData(async () => {
       await this.determineInstalledPlugins();
       this.onDidChangeInstalledPluginsEmitter.fire();
@@ -102,30 +100,47 @@ export class VesPluginsService {
 
     const findPlugins = async (rootUri: URI, prefix: string) => {
       const rootPath = (await this.fileService.fsPath(rootUri)).replace(/\\/g, '/');
-      const pluginsMap: any = {}; /* eslint-disable-line */
+      const pluginsMap: any = {};
 
-      const pluginFiles = await this.vesGlobService.find(rootPath, '**/plugin.json');
+      const pluginFiles = await this.vesGlobService.find(rootPath, '**/plugin.vuengine');
       for (const pluginFile of pluginFiles) {
         const pluginFileUri = new URI(pluginFile).withScheme('file');
-        const fileSplit = pluginFile.split('/plugin.json');
-        const pluginPathFull = fileSplit[0];
+        const pluginFolderUri = pluginFileUri.parent;
 
-        const pluginPathRelative = relativePath(rootPath, pluginPathFull);
+        const pluginPathRelative = rootUri.relative(pluginFolderUri)!.toString();
         const fileContent = await this.fileService.readFile(pluginFileUri);
-        const fileContentJson = JSON.parse(fileContent.value.toString());
+        try {
+          let fileContentJson = JSON.parse(fileContent.value.toString()).plugin;
 
-        const pluginId = `${prefix}//${pluginPathRelative.replace(/\\/g, '/')}`;
+          const pluginId = `${prefix}//${pluginPathRelative.replace(/\\/g, '/')}`;
 
-        if (fileContentJson.icon !== '' && !fileContentJson.icon.includes('..')) {
-          fileContentJson.icon = join(pluginPathFull, fileContentJson.icon);
+          fileContentJson.name = pluginId;
+          const iconUri = pluginFolderUri.resolve('icon.png');
+          fileContentJson.icon = await this.fileService.exists(iconUri)
+            ? iconUri.path.toString()
+            : '';
+          fileContentJson.readme = pluginFolderUri.resolve('readme.md').path.toString();
+
+          fileContentJson.displayName = this.translateField(fileContentJson.displayName, nls.locale || 'en');
+          fileContentJson.author = this.translateField(fileContentJson.author, nls.locale || 'en');
+          fileContentJson.description = this.translateField(fileContentJson.description, nls.locale || 'en');
+          fileContentJson.license = this.translateField(fileContentJson.license, nls.locale || 'en');
+
+          if (Array.isArray(fileContentJson.tags)) {
+            const tagsObject = {};
+            fileContentJson.tags.forEach((tag: any) => {
+              // @ts-ignore
+              tagsObject[this.translateField(tag, 'en')] = this.translateField(tag, nls.locale);
+            });
+            fileContentJson.tags = tagsObject;
+          } else {
+            fileContentJson.tags = {};
+          }
+
+          pluginsMap[pluginId] = fileContentJson;
+        } catch (e) {
+          console.error(pluginPathRelative, e);
         }
-        if (fileContentJson.readme !== '' && !fileContentJson.readme.includes('..')) {
-          fileContentJson.readme = join(pluginPathFull, fileContentJson.readme);
-        }
-
-        fileContentJson.name = pluginId;
-
-        pluginsMap[pluginId] = fileContentJson;
       }
 
       return pluginsMap;
@@ -142,11 +157,19 @@ export class VesPluginsService {
     this.pluginsData = pluginsMap;
   }
 
+  protected translateField(field: Object | string, locale: string): string {
+    if (field instanceof Object) {
+      // @ts-ignore
+      return field[locale] || field.en || '';
+    }
+
+    return field;
+  }
+
   searchPluginsData(query: string): Array<VesPluginData> {
     const searchResult = [];
 
     // TODO: weighted search through all fields, then order by score desc
-
     for (const pluginData of Object.values(this.pluginsData)) {
       if (pluginData.name?.toLowerCase().includes(query.toLowerCase()) && pluginData.name) {
         searchResult.push(pluginData);
@@ -160,8 +183,10 @@ export class VesPluginsService {
     const searchResult = [];
 
     for (const pluginData of Object.values(this.pluginsData)) {
-      if (pluginData.tags?.map(tag => tag.toLowerCase()).includes(tag.toLowerCase()) && pluginData.name) {
-        searchResult.push(pluginData);
+      if (pluginData.tags) {
+        if (Object.keys(pluginData.tags).map(tag => tag.toLowerCase()).includes(tag.toLowerCase()) && pluginData.name) {
+          searchResult.push(pluginData);
+        }
       }
     }
 

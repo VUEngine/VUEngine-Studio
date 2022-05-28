@@ -278,7 +278,10 @@ export class VesPluginComponent extends AbstractVesPluginComponent {
                 <div className='noWrapInfo theia-vsx-extension-description'>{description}</div>
                 <div className='theia-vsx-extension-action-bar'>
                     <span className='noWrapInfo ves-plugin-tags'>
-                        {tags && tags.map((tag: string, i: number) => <span key={i}>{tag}</span>)}
+                        {
+                            // @ts-ignore
+                            tags && Object.keys(tags).map(key => <span key={key}>{tags[key]}</span>)
+                        }
                     </span>
                     {/* <span className='noWrapInfo theia-vsx-extension-publisher'>{author}</span> */}
                     {this.renderAction()}
@@ -321,7 +324,8 @@ export class VesPluginEditorComponent extends AbstractVesPluginComponent {
                         {repository && <span className='repository' onClick={this.openRepository}>Repository</span>}
                         {license && <span className='license'>{license}</span>}
                         {tags && <span className='noWrapInfo ves-plugin-tags'>{
-                            tags.map((tag: string, i: number) => <span onClick={() => this.searchTag(tag)} key={i}>{tag}</span>)
+                            // @ts-ignore
+                            Object.keys(tags).map(key => <span onClick={() => this.searchTag(key)} key={key}>{tags[key]}</span>)
                         }</span>}
                     </div>
                     <div className='description noWrapInfo'> {description} </div>
