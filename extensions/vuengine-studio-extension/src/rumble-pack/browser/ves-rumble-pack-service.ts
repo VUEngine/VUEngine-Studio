@@ -9,7 +9,7 @@ import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService } from '../../process/common/ves-process-service-protocol';
 import { VesProjectService } from '../../project/browser/ves-project-service';
-import { HapticBuiltInEffect, HapticFrequency, RumblePakLogLine } from '../common/ves-rumble-pack-types';
+import { HapticFrequency, RumblePakLogLine } from '../common/ves-rumble-pack-types';
 import { VesRumblePackUsbService } from '../common/ves-rumble-pack-usb-service-protocol';
 import { VesRumblePackUsbWatcher } from './ves-rumble-pack-usb-watcher';
 
@@ -114,7 +114,7 @@ export class VesRumblePackService {
     return this.vesRumblePackUsbService.sendCommandStopCurrentEffect();
   }
 
-  sendCommandPlayEffect(effect: HapticBuiltInEffect): boolean {
+  sendCommandPlayEffect(effect: string): boolean {
     return this.vesRumblePackUsbService.sendCommandPlayEffect(effect);
   };
 

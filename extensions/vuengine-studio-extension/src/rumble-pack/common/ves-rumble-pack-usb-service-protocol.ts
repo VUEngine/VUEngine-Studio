@@ -1,5 +1,5 @@
 import { JsonRpcServer } from '@theia/core';
-import { HapticBuiltInEffect, HapticFrequency } from './ves-rumble-pack-types';
+import { HapticFrequency } from './ves-rumble-pack-types';
 
 export const VES_RUMBLE_PACK_USB_SERVICE_PATH = '/ves/services/rumblePack/usb';
 export const VesRumblePackUsbService = Symbol('VesRumblePackUsbService');
@@ -18,7 +18,7 @@ export interface VesRumblePackUsbService extends JsonRpcServer<VesRumblePackUsbS
     sendCommandPrintVbSyncLineState(): boolean;
     sendCommandPlayLastEffect(): boolean;
     sendCommandStopCurrentEffect(): boolean;
-    sendCommandPlayEffect(effect: HapticBuiltInEffect): boolean;
+    sendCommandPlayEffect(effect: string): boolean;
     sendCommandSetFrequency(frequency: HapticFrequency): boolean;
     sendCommandSetOverdrive(overdrive: number): boolean;
     sendCommandSetPositiveSustain(sustain: number): boolean;
