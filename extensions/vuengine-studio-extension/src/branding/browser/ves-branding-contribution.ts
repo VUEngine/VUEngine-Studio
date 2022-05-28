@@ -53,7 +53,7 @@ export class VesBrandingContribution implements CommandContribution, MenuContrib
         // Override Light Theme
         MonacoThemeRegistry.SINGLETON.register({
             ...require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/light_theia.json'),
-            ...require('../../../src/branding/browser/themes/vuengine-light-color-theme.json'),
+            ...require('../../../themes/vuengine-light-color-theme.json'),
         }, {
             './light_vs.json': require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/light_vs.json'),
             './light_plus.json': require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/light_plus.json')
@@ -75,7 +75,7 @@ export class VesBrandingContribution implements CommandContribution, MenuContrib
         // Override Dark Theme
         MonacoThemeRegistry.SINGLETON.register({
             ...require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/dark_theia.json'),
-            ...require('../../../src/branding/browser/themes/vuengine-dark-color-theme.json'),
+            ...require('../../../themes/vuengine-dark-color-theme.json'),
         }, {
             './dark_vs.json': require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/dark_vs.json'),
             './dark_plus.json': require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/dark_plus.json')
@@ -97,7 +97,7 @@ export class VesBrandingContribution implements CommandContribution, MenuContrib
         // Override HC Theme
         MonacoThemeRegistry.SINGLETON.register({
             ...require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/hc_theia.json'),
-            ...require('../../../src/branding/browser/themes/vuengine-high-contrast-color-theme.json'),
+            ...require('../../../themes/vuengine-high-contrast-color-theme.json'),
         }, {
             './hc_black.json': require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/hc_black.json')
         }, 'hc-vuengine-studio', 'hc-black').name!;
@@ -120,7 +120,7 @@ export class VesBrandingContribution implements CommandContribution, MenuContrib
         // TODO: Exclude certain areas from filter, such as the emulator
         MonacoThemeRegistry.SINGLETON.register({
             ...require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/hc_theia.json'),
-            ...require('../../../src/branding/browser/themes/vuengine-virtual-boy-color-theme.json'),
+            ...require('../../../themes/vuengine-virtual-boy-color-theme.json'),
         }, {
             './hc_black.json': require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/hc_black.json')
         }, 'hc-virtual-boy', 'hc-black').name!;
