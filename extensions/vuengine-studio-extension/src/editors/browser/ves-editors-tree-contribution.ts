@@ -53,7 +53,7 @@ export class VesEditorsTreeContribution extends BaseTreeEditorContribution {
                     }, {
                         execute: async () => {
                             if (registeredType.leaf) {
-                                const projectDataType = this.vesProjectService.getProjectDataItems(typeId);
+                                const projectDataType = this.vesProjectService.getProjectDataItemsForType(typeId);
                                 if (projectDataType) {
                                     const ids = Object.keys(projectDataType);
                                     if (ids.length) {
@@ -84,7 +84,7 @@ export class VesEditorsTreeContribution extends BaseTreeEditorContribution {
         const items: QuickPickItem[] = [];
 
         types.forEach(type => {
-            const projectDataType = this.vesProjectService.getProjectDataItems(type);
+            const projectDataType = this.vesProjectService.getProjectDataItemsForType(type);
             if (projectDataType) {
                 Object.keys(projectDataType).forEach(key => {
                     const item = projectDataType[key];

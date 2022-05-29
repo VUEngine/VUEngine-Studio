@@ -18,6 +18,7 @@
     "@theia/filesystem": "1.26.0",
     "@theia/keymaps": "1.26.0",
     "@theia/monaco": "1.26.0",
+    "@theia/monaco-editor-core": "1.26.0",
     "@theia/navigator": "1.26.0",
     "@theia/outline-view": "1.26.0",
     "@theia/output": "1.26.0",
