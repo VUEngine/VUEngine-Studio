@@ -9,22 +9,17 @@ interface FileType {
     name?: string;
 };
 
-const FILE_TYPES: FileType[] = [{
-    base: 'Compiler.config',
-    icon: 'ves-file-icon codicon codicon-settings-gear medium-blue',
-    name: 'Compiler Config',
-}, {
-    base: 'Engine.config',
-    icon: 'ves-file-icon codicon codicon-settings-gear medium-blue',
-    name: 'Engine Config',
-}, {
-    base: 'Project.config',
+const FILE_TYPES: FileType[] = [/* {
+    base: 'file.ending',
     icon: 'ves-file-icon codicon codicon-settings-gear medium-blue',
     name: 'Project Config',
-}, {
-    ext: '.vb',
-    icon: 'ves-file-icon codicon codicon-play',
-}];
+},*/{
+        ext: '.vuengine',
+        icon: 'ves-file-icon codicon codicon-primitive-square codicon-rotate-45 medium-purple',
+    }, {
+        ext: '.vb',
+        icon: 'ves-file-icon codicon codicon-play',
+    }];
 
 @injectable()
 export class VesCoreLabelProviderContribution implements LabelProviderContribution {
