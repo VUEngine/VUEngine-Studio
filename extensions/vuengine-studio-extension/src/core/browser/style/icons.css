@@ -1,9 +1,14 @@
-.codicon-rotate-90 {
-    padding-top: 8px;
-    padding-right: 0;
+.codicon-rotate-45:before {
+    display: inline-block;
+    transform: rotate(45deg);
+}
+
+.codicon-rotate-90:before {
+    display: inline-block;
     transform: rotate(90deg);
 }
 
-.codicon-flip-y {
+.codicon-flip-y:before {
+    display: inline-block;
     transform: rotate(180deg);
 }

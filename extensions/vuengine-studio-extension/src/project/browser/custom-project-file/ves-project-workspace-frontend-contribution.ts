@@ -5,7 +5,9 @@ import URI from '@theia/core/lib/common/uri';
 import { injectable } from '@theia/core/shared/inversify';
 import { FileDialogTreeFilters, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import { WorkspaceCommands, WorkspaceFrontendContribution } from '@theia/workspace/lib/browser';
+import { VesEncodingOverride } from 'src/core/browser/ves-encoding-registry';
 import { VUENGINE_EXT } from '../../common/custom-project-file/ves-project-utils';
+import { ProjectFileTemplateEncoding } from '../ves-project-types';
 
 @injectable()
 export class VesWorkspaceFrontendContribution extends WorkspaceFrontendContribution {
@@ -13,6 +15,8 @@ export class VesWorkspaceFrontendContribution extends WorkspaceFrontendContribut
         super.configure();
 
         this.encodingRegistry.registerOverride({ encoding: UTF8, extension: VUENGINE_EXT });
+        this.encodingRegistry.registerOverride({ encoding: ProjectFileTemplateEncoding.win1252, endsWith: 'LanguageSpec.c' } as VesEncodingOverride);
+
         this.updateEncodingOverrides();
     }
 
@@ -42,7 +46,7 @@ export class VesWorkspaceFrontendContribution extends WorkspaceFrontendContribut
                 await this.workspaceService.save(selected);
                 return true;
             } catch {
-                this.messageService.error(nls.localizeByDefault("Unable to save workspace '{0}'", selected.path.fsPath()));
+                this.messageService.error(nls.localizeByDefault('Unable to save workspace "{0}"', selected.path.fsPath()));
             }
         }
         return false;
