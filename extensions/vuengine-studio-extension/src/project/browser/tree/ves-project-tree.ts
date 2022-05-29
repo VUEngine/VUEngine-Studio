@@ -1,10 +1,13 @@
 import { CompositeTreeNode, ExpandableTreeNode, SelectableTreeNode, TreeImpl, TreeNode } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';
-import { injectable } from '@theia/core/shared/inversify';
-import { v4 as uuid } from 'uuid';
+import { inject, injectable } from '@theia/core/shared/inversify';
+import { VesCommonService } from '../../../core/browser/ves-common-service';
 
 @injectable()
 export class VesProjectTree extends TreeImpl {
+  @inject(VesCommonService)
+  private readonly vesCommonService: VesCommonService;
+
   protected resolveChildren(parent: CompositeTreeNode): Promise<TreeNode[]> {
     if (VesProjectRootNode.is(parent)) {
       return Promise.resolve(parent.documents.members.map(m => this.makeMemberNode(m)));
@@ -19,7 +22,7 @@ export class VesProjectTree extends TreeImpl {
 
   makeMemberNode(m: VesProjectDocumentChild): VesProjectChildNode {
     const node: VesProjectChildNode = {
-      id: uuid(),
+      id: this.vesCommonService.nanoid(),
       name: m.name,
       parent: undefined,
       expanded: false,
