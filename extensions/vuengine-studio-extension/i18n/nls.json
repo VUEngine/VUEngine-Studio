@@ -22,7 +22,7 @@
       "buildSuccessful": "Build successful",
       "buildSuccessfulWithWarnings": "Build successful (with warnings)",
       "building": "Building",
-      "commandCompleted": "Command \"{0}\" completed.",
+      "commandCompleted": "Command ${0} completed.",
       "commands": {
         "build": "Build Project",
         "category": "Build",
@@ -35,8 +35,8 @@
         "togglePedanticWarnings": "Toggle Pedantic Warnings",
         "toggleView": "Toggle Build View"
       },
-      "couldNotFindCommand": "Could not find command \"{0}\".",
-      "couldNotRunTask": "Could not run task \"{0}\".",
+      "couldNotFindCommand": "Could not find command ${0}.",
+      "couldNotRunTask": "Could not run task ${0}.",
       "done": "Done",
       "dumpElf": "Dump ELF",
       "errorCouldNotFindMakefile": "Error: Could not find a makefile. Tried the following locations:",
@@ -73,17 +73,18 @@
       "setBuildModeTitle": "Set Build Mode",
       "showOnlyErrors": "Show only errors",
       "showOnlyWarnings": "Show only warnings",
-      "taskCompleted": "Task \"{0}\" completed.",
-      "taskTerminatedBySignal": "Task \"{0}\" terminated by signal {1}.",
-      "taskTerminatedForUnknownReason": "Task \"{0}\" terminated for unknown reason.",
-      "taskTerminatedWithExitCode": "Task \"{0}\" terminated with exit code {1}.",
+      "taskCompleted": "Task ${0} completed.",
+      "taskTerminatedBySignal": "Task ${0} terminated by signal {1}.",
+      "taskTerminatedForUnknownReason": "Task ${0} terminated for unknown reason.",
+      "taskTerminatedWithExitCode": "Task ${0} terminated with exit code {1}.",
       "toggleAutomaticScrolling": "Toggle automatic scrolling"
     },
     "codegen": {
       "commands": {
         "category": "Code Generator",
         "generateAll": "Generate all"
-      }
+      },
+      "generateAllDone": "Done generating files."
     },
     "documentation": {
       "commands": {
@@ -228,9 +229,11 @@
       "done": "Done",
       "flash": "Flash",
       "flashCarts": "Flash Carts",
+      "flasherSoftwareDoesNotExist": "Flasher software does not exist at ${0}",
       "flashingIsQueued": "Flashing is queued and will start once the build is ready",
       "flashingQueued": "Flashing Queued",
       "insufficientSpaceToHoldRom": "Insufficient space to hold ROM",
+      "noPathToFlasherSoftwareProvided": "No path to flasher software provided for cart ${0}",
       "noneFound": "No flash carts found",
       "preferences": {
         "flashCartsDescription": "Configurations for flash cart auto-detection and flashing."
@@ -318,7 +321,7 @@
       "searchPlugins": "Search Plugins"
     },
     "projects": {
-      "areYouSureYouWantToDelete": "Are you sure you want to delete \"{0}\"?",
+      "areYouSureYouWantToDelete": "Are you sure you want to delete ${0}?",
       "author": "Author",
       "commands": {
         "category": "Projects",

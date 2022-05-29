@@ -35,8 +35,8 @@
         "togglePedanticWarnings": "警告を表示する",
         "toggleView": "ビルドビューの切り替え"
       },
-      "couldNotFindCommand": "コマンド\"{0}\"が見つかりませんでした.",
-      "couldNotRunTask": "タスク\"{0}\"を実行できませんでした.",
+      "couldNotFindCommand": "コマンド{0}が見つかりませんでした.",
+      "couldNotRunTask": "タスク{0}を実行できませんでした.",
       "done": "完了",
       "dumpElf": "ELFをダンプする",
       "errorCouldNotFindMakefile": "エラーです。makefileが見つかりません。以下の場所を試してみました。",
@@ -73,17 +73,18 @@
       "setBuildModeTitle": "ビルドモードを設定する",
       "showOnlyErrors": "エラーのみを表示する",
       "showOnlyWarnings": "警告のみを表示する",
-      "taskCompleted": "タスク\"{0}\"が完了しました。",
-      "taskTerminatedBySignal": "信号{1}によりタスク\"{0}\"を終了。",
-      "taskTerminatedForUnknownReason": "タスク\"{0}\"が原因不明で終了しました。",
-      "taskTerminatedWithExitCode": "タスク\"{0}\"は終了コード{1}で終了しました。",
+      "taskCompleted": "タスク{0}が完了しました。",
+      "taskTerminatedBySignal": "信号{1}によりタスク{0}を終了。",
+      "taskTerminatedForUnknownReason": "タスク{0}が原因不明で終了しました。",
+      "taskTerminatedWithExitCode": "タスク{0}は終了コード{1}で終了しました。",
       "toggleAutomaticScrolling": "自動スクロールのトグル"
     },
     "codegen": {
       "commands": {
         "category": "コードジェネレーター",
         "generateAll": "すべて生成する"
-      }
+      },
+      "generateAllDone": "ファイルの生成が完了しました。"
     },
     "documentation": {
       "commands": {
@@ -228,9 +229,11 @@
       "done": "完了",
       "flash": "フラッシュ",
       "flashCarts": "フラッシュカート",
+      "flasherSoftwareDoesNotExist": "フラッシャーソフトウェアが{0}に存在しない。",
       "flashingIsQueued": "フラッシュはキューに入れられ、ビルドの準備ができ次第開始されます",
       "flashingQueued": "フラッシュ待機中",
       "insufficientSpaceToHoldRom": "ROM を保持するための十分なスペースがありません。",
+      "noPathToFlasherSoftwareProvided": "カート {0} で提供されたフラッシャーソフトウェアのパスがありません。",
       "noneFound": "フラッシュカートが見つかりません",
       "preferences": {
         "flashCartsDescription": "フラッシュカートの自動検出とフラッシュの設定。"

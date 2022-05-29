@@ -1,0 +1,481 @@
+{
+  "theia": {
+    "workspace": {
+      "closeWorkspace": "Tényleg le akarja zárni a projektet?",
+      "openRecentPlaceholder": "Írja be a megnyitni kívánt projekt nevét",
+      "preserveWindow": "Engedélyezi a projektek megnyitását az aktuális ablakban."
+    }
+  },
+  "vuengine": {
+    "about": {
+      "and": "és",
+      "thankYouToOurSupporters": "Köszönjük támogatóinknak a Patreonon!",
+      "title": "A VUEngine Studio-ról",
+      "version": "Verzió",
+      "vsCodeApiVersion": "VSCode API verzió"
+    },
+    "build": {
+      "abortBuild": "Építés megszakítása",
+      "build": "Build",
+      "buildMode": "Építési mód",
+      "buildProject": "Építs projektet",
+      "buildSuccessful": "Sikeres építkezés",
+      "buildSuccessfulWithWarnings": "Sikeres építés (figyelmeztetésekkel)",
+      "building": "Épület",
+      "commandCompleted": "A {0} parancs befejeződött.",
+      "commands": {
+        "build": "Építs projektet",
+        "category": "Build",
+        "clean": "Tiszta építési mappa",
+        "expandView": "Maximált kapcsoló",
+        "setMode": "Build Mode beállítása...",
+        "showHelp": "Kézikönyv oldal megjelenítése",
+        "showSettings": "Építési beállítások megjelenítése",
+        "toggleDumpElf": "Toggle Dump ELF",
+        "togglePedanticWarnings": "Pedáns figyelmeztetések váltása",
+        "toggleView": "Építési nézet váltása"
+      },
+      "couldNotFindCommand": "Nem találta a {0} parancsot.",
+      "couldNotRunTask": "Nem sikerült futtatni a {0} feladatot.",
+      "done": "Kész",
+      "dumpElf": "ELF ürítése",
+      "errorCouldNotFindMakefile": "Hiba: Nem talált makefile-t. A következő helyeken próbáltam:",
+      "errorEnginePathMustNotContainSpaces": "Hiba: Engine path must not contain spaces. A motor elérési útvonala:",
+      "errorPluginsPathMustNotContainSpaces": "Hiba: Nem tartalmazhat szóközöket. A pluginok elérési útvonala:",
+      "errorProjectPathMustNotContainSpaces": "Hiba: A projekt elérési útja nem tartalmazhat szóközöket. A projekt elérési útvonala:",
+      "errorUserPluginsPathMustNotContainSpaces": "Hiba: Nem tartalmazhat szóközöket. A felhasználói bővítmények elérési útvonala:",
+      "malformedPreferenceMissingTaskName": "Hibás beállítás: hiányzó feladatnév.",
+      "malformedPreferenceMissingTaskType": "Hibás beállítás: hiányzó típus a {0} feladathoz.",
+      "malformedPreferenceNotAnArray": "Hibás preferencia: nem tömb.",
+      "mode": "Mód",
+      "modes": {
+        "betaDescription": "Kiválasztott asserteket tartalmaz a hardveres teljesítmény teszteléséhez.",
+        "debugDescription": "Tartalmazza az összes futásidejű kijelentést, hibakeresési eszközöket tartalmaz.",
+        "releaseDescription": "Nem tartalmaz asserteket vagy debug flageket, csak szállításra.",
+        "toolsDescription": "Kijelölt asserteket tartalmaz, hibakeresési eszközöket tartalmaz."
+      },
+      "noTasksFound": "Nem találtak feladatokat.",
+      "pedanticWarnings": "Pedáns figyelmeztetések",
+      "pleaseInstallWsl": "Kérjük, fontolja meg a WSL telepítését, hogy jelentősen javítsa az építési időt.",
+      "postBuildTasks": "Építés utáni feladatok",
+      "preBuildTasks": "Építés előtti feladatok",
+      "preferences": {
+        "dumpElfDescription": "Assembly kód és memóriarészek kiürítése.",
+        "engineCorePathDescription": "A core könyvtár teljes elérési útvonala. Ha üresen hagyjuk, a beépített VUEngine Core-t használja.",
+        "includeEngineCoreInWorkspaceDescription": "A core könyvtár automatikus felvétele a munkaterületekbe.",
+        "pedanticWarningsDescription": "Pedáns fordítói figyelmeztetések engedélyezése.",
+        "postBuildTasksDescription": "Az építés után végrehajtandó feladatok és parancsok listája.",
+        "preBuildTasksDescription": "Az építés előtt végrehajtandó feladatok és parancsok listája."
+      },
+      "runningPostBuildTasks": "Építés utáni feladatok futtatása",
+      "runningPreBuildTasks": "Előépítési feladatok futtatása",
+      "setBuildModePlaceholder": "Válassza ki, hogy melyik üzemmódban kíván építkezni",
+      "setBuildModeTitle": "Építési mód beállítása",
+      "showOnlyErrors": "Csak hibák megjelenítése",
+      "showOnlyWarnings": "Csak figyelmeztetések megjelenítése",
+      "taskCompleted": "A {0} feladat befejeződött.",
+      "taskTerminatedBySignal": "A {0} feladatot a {1} jel szakította meg.",
+      "taskTerminatedForUnknownReason": "A {0} feladat ismeretlen okból megszakadt.",
+      "taskTerminatedWithExitCode": "A {0} feladat {1} kilépési kóddal fejeződött be.",
+      "toggleAutomaticScrolling": "Automatikus görgetés bekapcsolása"
+    },
+    "codegen": {
+      "commands": {
+        "category": "Kódgenerátor",
+        "generateAll": "Generálja az összes"
+      },
+      "generateAllDone": "A fájlok generálása befejeződött."
+    },
+    "documentation": {
+      "commands": {
+        "category": "Dokumentáció",
+        "openHandbook": "Nyílt kézikönyv",
+        "openTechScroll": "Nyílt hardver dokumentáció"
+      },
+      "documentation": "Dokumentáció",
+      "hardwareDocumentation": "Hardver dokumentáció",
+      "vuengineStudioHandbook": "VUEngine Studio kézikönyv"
+    },
+    "editors": {
+      "areYouSureYouWantToDeleteItem": "Biztos, hogy törölni akarja a {0} {1}-t?",
+      "chooseAnItemPlaceholder": "Válassza ki a szerkeszteni kívánt elemet",
+      "chooseAnItemTitle": "Válasszon egy elemet",
+      "commands": {
+        "category": "Szerkesztők",
+        "open": "Nyitott szerkesztő"
+      },
+      "deleteNodeQuestion": "Delete Node?",
+      "palette": {
+        "black": "Fekete",
+        "brightRed": "Élénkvörös",
+        "darkRed": "Sötétvörös",
+        "mediumRed": "Közepes piros"
+      },
+      "visualEditor": "Vizuális szerkesztő"
+    },
+    "emulator": {
+      "builtIn": "Beépített",
+      "commands": {
+        "category": "Emulátor",
+        "run": "Futtatás emulátoron",
+        "selectEmulator": "Alapértelmezett emulátor konfiguráció beállítása..."
+      },
+      "configureInput": "Bemenet konfigurálása",
+      "controller": {
+        "aCommand": "A",
+        "bCommand": "B",
+        "category": "Emulátor Game Pad",
+        "lDownCommand": "Bal D-Pad ⇩",
+        "lLeftCommand": "Bal D-Pad ⇦",
+        "lRightCommand": "Bal D-Pad ⇨",
+        "lTriggerCommand": "Bal ravasz",
+        "lUpCommand": "Bal D-Pad ⇧",
+        "rDownCommand": "Jobb D-Pad ⇩",
+        "rLeftCommand": "Jobb D-Pad ⇦",
+        "rRightCommand": "Jobb D-Pad ⇨",
+        "rTriggerCommand": "Jobb ravasz",
+        "rUpCommand": "Jobb D-Pad ⇧",
+        "selectCommand": "Válassza ki a  címet.",
+        "startCommand": "Indítsa el a  oldalt."
+      },
+      "currentSaveState": "Jelenlegi mentési állapot",
+      "emulationMode": "Emulációs mód",
+      "emulationModes": {
+        "accurate": "Pontos",
+        "fast": "Gyors"
+      },
+      "emulator": "Emulátor",
+      "input": {
+        "audioMuteCommand": "Audio némítás",
+        "frameAdvanceCommand": "Frame Advance",
+        "fullscreenCommand": "Teljes képernyő",
+        "loadStateCommand": "Terhelési állapot",
+        "pauseToggleCommand": "Szünet kapcsolása",
+        "resetCommand": "Reset",
+        "rewindCommand": "Visszatekerés",
+        "saveStateCommand": "Állam mentése",
+        "screenshotCommand": "Képernyőkép készítése",
+        "stateSlotDecreaseCommand": "Csökkentse Save State Slot",
+        "stateSlotIncreaseCommand": "Állapot mentésének növelése Slot",
+        "toggleControlsOverlayCommand": "Vezérlőelemek átkapcsolása Overlay",
+        "toggleFastForwardCommand": "Gyors előre kapcsolás",
+        "toggleLowPower": "Alacsony teljesítményű jel átkapcsolása",
+        "toggleSlowmotionCommand": "Lassított felvétel bekapcsolása"
+      },
+      "mute": "Mute",
+      "pause": "Szünet",
+      "preferences": {
+        "builtInEmulationModeDescription": "A beépített emulátor emulációs módja.",
+        "builtInScalingModeDescription": "A beépített emulátor méretezési módja.",
+        "builtInStereoModeDescription": "A beépített emulátor sztereoszkópikus megjelenítési módja.",
+        "customConfigsDescription": "Felhasználó által definiált emulátor-konfigurációk a lefordított ROM-ok futtatásához.",
+        "customDefaultDescription": "Emulátor-konfiguráció, amelyet a lefordított ROM-ok futtatására kell használni. Beépített emulátort használ, ha üresen hagyja."
+      },
+      "resume": "Önéletrajz",
+      "runQueued": "Run Queued",
+      "scale": "Lépcsők",
+      "scales": {
+        "auto": "Autó",
+        "stretch": "Stretch"
+      },
+      "selectDefaultEmulatorPlaceholder": "Milyen emulátorkonfigurációt kell használni a lefordított projektek futtatásához?",
+      "selectDefaultEmulatorTitle": "Alapértelmezett emulátor-konfiguráció kiválasztása",
+      "showHelp": "Kézikönyv oldal megjelenítése",
+      "stereoMode": "Sztereó mód",
+      "stereoModes": {
+        "2dBlackBlue": "2D (kék/fekete)",
+        "2dBlackCyan": "2D (cián/fekete)",
+        "2dBlackElectricCyan": "2D (El.Cyan/Fekete)",
+        "2dBlackGreen": "2D (zöld/fekete)",
+        "2dBlackMagenta": "2D (Magenta/Fekete)",
+        "2dBlackRed": "2D (piros/fekete)",
+        "2dBlackWhite": "2D (fehér/fekete)",
+        "2dBlackYellow": "2D (sárga/fekete)",
+        "anaglyph-redElectricCyan": "Anaglif (piros/el.cián)",
+        "anaglyphGreenMagenta": "Anaglif (piros/zöld)",
+        "anaglyphRedBlue": "Anaglif (piros/kék)",
+        "anaglyphRedCyan": "Anaglif (piros/cián)",
+        "anaglyphYellowBlue": "Anaglif (sárga/kék)",
+        "cyberscope": "CyberScope",
+        "hli": "Vízszintes vonal Interlaced",
+        "sideBySide": "Side By Side",
+        "vli": "Függőleges vonal Interlaced"
+      },
+      "unmute": "Unmute"
+    },
+    "export": {
+      "commands": {
+        "category": "Exportálás",
+        "export": "Export ROM..."
+      },
+      "doYouReallyWantToOverwrite": "Tényleg felül akarja írni a {0} szót?",
+      "exportRom": "ROM exportálása",
+      "overwrite": "Felülírás"
+    },
+    "flashCarts": {
+      "abort": "Megszakítás",
+      "cancel": "Törölje",
+      "commands": {
+        "category": "Flash kocsik",
+        "detectConnected": "Csatlakoztatott flash kocsik észlelése",
+        "expandView": "Maximált kapcsoló",
+        "flash": "Flash to Flash kosár",
+        "showHelp": "Kézikönyv oldal megjelenítése",
+        "showSettings": "Flash kosarak beállításainak megjelenítése",
+        "toggleView": "Flash kosarak nézetének váltása"
+      },
+      "connectYourFlashCarts": "Csatlakoztassa a Virtual Boy flash cart(ok)at a számítógéphez USB-n keresztül.",
+      "connectedFlashCarts": "Összekapcsolt flash kocsik",
+      "done": "Kész",
+      "flash": "Flash",
+      "flashCarts": "Flash kocsik",
+      "flasherSoftwareDoesNotExist": "A flasher szoftver nem létezik a {0} címen.",
+      "flashingIsQueued": "A villogás várakozik, és elindul, amint a build készen áll.",
+      "flashingQueued": "Villogó sorban állás",
+      "insufficientSpaceToHoldRom": "Nem elegendő hely a ROM tárolására",
+      "noPathToFlasherSoftwareProvided": "A {0} kosárhoz nincs megadva a flasher szoftver elérési útvonala.",
+      "noneFound": "Nem találtunk flash kocsikat",
+      "preferences": {
+        "flashCartsDescription": "Konfigurációk a villanókocsik automatikus felismeréséhez és villogásához."
+      },
+      "youCanConnectAnyNumberOfCarts": "Egyszerre tetszőleges számú flash-kocsit csatlakoztathat és villanthat."
+    },
+    "general": {
+      "commands": {
+        "category": "VUEngine Studio",
+        "reportIssue": "Jelentés kiadás",
+        "support": "Támogatás VUEngine Studio"
+      },
+      "selectDirectory": "Válasszon könyvtárat",
+      "space": "Űr",
+      "themes": {
+        "dark": "Sötét",
+        "highContrast": "Nagy kontraszt",
+        "light": "Fény",
+        "virtualBoy": "Virtual Boy"
+      }
+    },
+    "gettingStarted": {
+      "alwaysShowThisPage": "Mindig megjeleníti ezt az oldalt, ha nincs megnyitva projekt.",
+      "commands": {
+        "showHelp": "Kézikönyv oldal megjelenítése",
+        "showWidget": "Kezdő lépések"
+      },
+      "links": "Linkek",
+      "preferences": {
+        "showGettingStartedDescription": "A Kezdőlap megjelenítése, ha nincs megnyitva projekt."
+      },
+      "showDocumentation": "Dokumentáció megjelenítése",
+      "supportUsOnPatreon": "Támogass minket a Patreonon",
+      "vuengineWebsite": "VUEngine weboldal"
+    },
+    "handbook": {
+      "handbook": "Kézikönyv"
+    },
+    "imageConverter": {
+      "changedImagesOnly": "Csak megváltozott képek",
+      "clearLogs": "Naplók törlése",
+      "commands": {
+        "category": "Kép konverter",
+        "convertAll": "Az összes",
+        "convertChanged": "Átalakítás megváltozott",
+        "showHelp": "Kézikönyv oldal megjelenítése",
+        "toggleView": "Képátalakító nézet váltása"
+      },
+      "convert": "Átalakítás",
+      "done": "Kész",
+      "foundXImages": "Talált {0} képek",
+      "imageConverter": "Kép konverter",
+      "noneFound": "Nem találtak.",
+      "startingToConvertAll": "Kezdjük az összes kép átalakítását...",
+      "startingToConvertChanged": "Megváltozott képek konvertálásának megkezdése..."
+    },
+    "plugins": {
+      "add": "Add",
+      "commands": {
+        "category": "Plugins",
+        "clearAll": "Tiszta keresési eredmények",
+        "new": "Új bővítmény",
+        "searchByAuthor": "Keresés szerző szerint",
+        "searchByTag": "Keresés címke szerint",
+        "showHelp": "Kézikönyv oldal megjelenítése",
+        "showInstalled": "Telepített bővítmények megjelenítése",
+        "showRecommendations": "Ajánlott bővítmények megjelenítése",
+        "showSettings": "Pluginok beállításainak megjelenítése",
+        "toggleView": "Pluginok nézet váltása"
+      },
+      "dependencies": "Függőségek",
+      "installed": "Telepített",
+      "noDependencies": "Nincs",
+      "plugin": "Plugin",
+      "plugins": "Plugins",
+      "preferences": {
+        "includeLibraryInWorkspaceDescription": "Automatikusan beépíti a plugin könyvtárat a munkaterületekbe.",
+        "includeUserLibraryInWorkspaceDescription": "A felhasználói bővítmények automatikus felvétele a munkaterületekbe.",
+        "libraryPathDescription": "A bővítménykönyvtár teljes elérési útja. Ha üresen hagyja, a beépített VUEngine Plugins könyvtárat használja.",
+        "userLibraryPathDescription": "Az összes felhasználói bővítmény alapmappájának teljes elérési útja."
+      },
+      "recommended": "Ajánlott",
+      "remove": "Távolítsa el a",
+      "search": "Keresés",
+      "searchPlugins": "Pluginok keresése"
+    },
+    "projects": {
+      "areYouSureYouWantToDelete": "Biztos, hogy törölni akarja a {0}-t?",
+      "author": "Szerző",
+      "commands": {
+        "category": "Projektek",
+        "closeProject": "Projekt bezárása",
+        "newProject": "Új projekt",
+        "openProject": "Nyitott projekt...",
+        "openProjectFile": "Projekt fájl megnyitása",
+        "openRecentProject": "Legutóbbi projekt megnyitása...",
+        "saveProjectAs": "Projekt mentése mint...",
+        "toggleView": "Projekt nézet váltása"
+      },
+      "create": "Hozzon létre",
+      "deleteNodeQuestion": "Delete Node?",
+      "errorBasePathDoesNotExist": "Hiba: az alap elérési útvonal nem létezik",
+      "errorNoProjectName": "Hiba: nincs megadva projektnév",
+      "gameCode": "Játék kód",
+      "makerCode": "Gyártó kód",
+      "myProject": "Az én projektem",
+      "name": "Név",
+      "path": "Útvonal",
+      "preferences": {
+        "authorDefault": "VUEngine Studio felhasználó",
+        "authorDescription": "Az új projektekhez használt alapértelmezett szerzői név.",
+        "basePathDescription": "Új projektek alapútvonala.",
+        "makerCodeDescription": "Az új projektek ROM fejlécében elhelyezendő alapértelmezett gyártói kód."
+      },
+      "project": "Projekt",
+      "selectParentFolder": "Válassza ki az új projekt szülői mappáját",
+      "settingUpNewProject": "Új projekt beállítása",
+      "template": "Sablon",
+      "templates": {
+        "bareboneDescription": "Egy (majdnem) üres projekt, amely egyetlen \"Hello World\" képernyőt és a legfontosabb pluginokat tartalmazza, amelyekkel splash képernyőket, automatikus szünetet és egyebeket adhatsz hozzá.",
+        "bareboneTitle": "Barebone",
+        "imageViewerDescription": "Sztereó képnézegető.",
+        "imageViewerTitle": "Képnézegető",
+        "multiplayerDescription": "Egy egyszerű Pong-szerű játék, amely a motor kommunikációs osztályát használja a linkkábelen keresztüli többjátékos mérkőzésekhez.",
+        "multiplayerTitle": "Többjátékos játék",
+        "platformerDescription": "Egy teljes értékű, egyszintes platformjáték.",
+        "platformerTitle": "Platform játék"
+      },
+      "verifying": "A  oldal ellenőrzése"
+    },
+    "rumblePack": {
+      "actions": "Tevékenységek",
+      "break": "Szünet",
+      "builtInHapticEffects": "Beépített haptikus effektek",
+      "commands": {
+        "category": "Rumble Pack",
+        "detectConnected": "Érzékelje a csatlakoztatott Rumble csomagot",
+        "expand": "Maximált kapcsoló",
+        "help": "Kézikönyv oldal megjelenítése",
+        "openWidget": "Rumble Pack eszköz megnyitása"
+      },
+      "connected": "Csatlakoztatva",
+      "disconnected": "Kikapcsolt",
+      "effect": "Hatás",
+      "effects": {
+        "1000MsAlert": "1000 ms Riasztás",
+        "750MsAlert": "750 ms Riasztás",
+        "buzz": "Buzz",
+        "doubleClick": "Dupla kattintás",
+        "longBuzzForProgrammaticStopping": "Hosszú zúgás a programozott leállításért",
+        "longDoubleSharpClickMedium": "Hosszú Dupla éles kattintás Közepes",
+        "longDoubleSharpClickStrong": "Hosszú dupla éles kattintás Erős",
+        "longDoubleSharpTick": "Hosszú dupla éles pipa",
+        "mediumClick": "Közepes kattintás",
+        "pulsingMedium": "Pulzáló közeg",
+        "pulsingSharp": "Pulzáló éles",
+        "pulsingStrong": "Pulzáló erős",
+        "sharpClick": "Éles kattintás",
+        "sharpTick": "Éles kullancs",
+        "shortDoubleClickMedium": "Rövid dupla kattintás Közepes",
+        "shortDoubleClickStrong": "Rövid dupla kattintás Erős",
+        "shortDoubleSharpTick": "Rövid dupla éles kullancs",
+        "smoothHum": "Smooth Hum {0} (Nincs rúgás vagy fékimpulzus)",
+        "softBump": "Soft Bump",
+        "softFuzz": "Soft Fuzz",
+        "strongBuzz": "Erős Buzz",
+        "strongClick": "Erős kattintás",
+        "transitionClick": "Átmeneti kattintás",
+        "transitionHum": "Átmenet Hum",
+        "transitionRampDownLongSharp": "Átmeneti rámpa lefelé hosszú éles",
+        "transitionRampDownLongSmooth": "Átmeneti rámpa lefelé hosszú sima",
+        "transitionRampDownMediumSharp": "Átmeneti rámpa lefelé Közepesen éles",
+        "transitionRampDownMediumSmooth": "Átmeneti rámpa lefelé Közepes sima",
+        "transitionRampDownShortSharp": "Átmeneti rámpa lefelé rövid éles",
+        "transitionRampDownShortSmooth": "Átmeneti rámpa lefelé rövid sima",
+        "transitionRampUpLongSharp": "Átmenet Ramp Up Hosszú éles",
+        "transitionRampUpLongSmooth": "Átmenet Ramp Up Hosszú sima",
+        "transitionRampUpMediumSharp": "Átmenet Ramp Up közepes éles",
+        "transitionRampUpMediumSmooth": "Átmenet Ramp Up Közepes Smooth",
+        "transitionRampUpShortSharp": "Átmenet Ramp Up rövid éles",
+        "transitionRampUpShortSmooth": "Átmenet Ramp Up rövid sima",
+        "tripleClick": "Háromszoros kattintás"
+      },
+      "frequency": "Frekvencia",
+      "jsonFormat": "JSON formátum",
+      "log": "Napló",
+      "menu": "Menü",
+      "negativeSustain": "Negatív fenntartás",
+      "overdrive": "Overdrive",
+      "positiveSustain": "Pozitív fenntartás",
+      "printCommands": "Nyomtatási parancsok",
+      "reRunLastEffect": "Utolsó hatás újrafuttatása",
+      "rumblePack": "Rumble Pack",
+      "rumblePackConnected": "Rumble Pack csatlakoztatva",
+      "rumblePackConnectionStatus": "Rumble Pack kapcsolat állapota",
+      "rumblePackTool": "Rumble Pack eszköz",
+      "runEffect": "Futás hatása",
+      "stopCurrentEffect": "Állítsa le az aktuális hatást",
+      "sustainNeg": "Fenntartás (Neg.)",
+      "sustainPos": "Fenntartás (pos.)",
+      "vbCommandLineState": "VB parancssori állapot",
+      "vbSyncLineState": "VB szinkronizálási vonal állapota"
+    },
+    "titlebar": {
+      "commands": {
+        "category": "Window",
+        "maximizeWindow": "Ablak maximalizálása",
+        "minimizeWindow": "Ablak minimalizálása",
+        "unmaximizeWindow": "Unmaximize ablak"
+      }
+    },
+    "updater": {
+      "alreadyUsingLatestVersion": "Ön már a VUEngine Studio legújabb verzióját használja.",
+      "applicationUpdate": "Alkalmazás frissítése",
+      "commands": {
+        "category": "Frissítő",
+        "checkForUpdates": "Ellenőrizze a frissítéseket...",
+        "restartToUpdate": "Újraindítás a frissítéshez"
+      },
+      "downloading": "Letöltés",
+      "never": "Soha",
+      "no": "Nem",
+      "preferences": {
+        "reportOnStartDescription": "Jelentse az elérhető frissítéseket az alkalmazás indítása után."
+      },
+      "updateFoundWannaUpdate": "Frissítéseket találtunk. Szeretne frissíteni?",
+      "updateHasBeenDownloaded": "A frissítés letöltésre került. Szeretné újraindítani a telepítést?",
+      "viewErrorLog": "Hibanapló megtekintése",
+      "yes": "Igen"
+    },
+    "zoom": {
+      "commands": {
+        "category": "A  megtekintése",
+        "resetZoom": "Zoom visszaállítása",
+        "zoomIn": "Nagyítás",
+        "zoomOut": "Kicsinyítés"
+      },
+      "preferences": {
+        "showZoomLevelInStatusBarDescription": "Nagyítási szint megjelenítése az állapotsorban (csak ha nem 100%).",
+        "zoomLevelDescription": "Az ablak nagyítási szintjének beállítása."
+      },
+      "resetZoom": "Zoom visszaállítása"
+    }
+  }
+}

@@ -1,0 +1,481 @@
+{
+  "theia": {
+    "workspace": {
+      "closeWorkspace": "Opravdu chcete projekt uzavřít?",
+      "openRecentPlaceholder": "Zadejte název projektu, který chcete otevřít.",
+      "preserveWindow": "Povolit otevírání projektů v aktuálním okně."
+    }
+  },
+  "vuengine": {
+    "about": {
+      "and": "a",
+      "thankYouToOurSupporters": "Děkujeme našim podporovatelům na Patreonu!",
+      "title": "O společnosti VUEngine Studio",
+      "version": "Verze",
+      "vsCodeApiVersion": "Verze rozhraní VSCode API"
+    },
+    "build": {
+      "abortBuild": "Přerušit sestavení",
+      "build": "Sestavte",
+      "buildMode": "Režim sestavení",
+      "buildProject": "Sestavit projekt",
+      "buildSuccessful": "Vybudovat úspěšný",
+      "buildSuccessfulWithWarnings": "Úspěšná stavba (s varováním)",
+      "building": "Budova",
+      "commandCompleted": "Příkaz {0} byl dokončen.",
+      "commands": {
+        "build": "Sestavit projekt",
+        "category": "Sestavte",
+        "clean": "Čistá složka sestavení",
+        "expandView": "Přepínání Maximalizováno",
+        "setMode": "Nastavení režimu sestavení...",
+        "showHelp": "Zobrazit stránku příručky",
+        "showSettings": "Zobrazit předvolby sestavení",
+        "toggleDumpElf": "Přepínač Dump ELF",
+        "togglePedanticWarnings": "Přepínání pedantických varování",
+        "toggleView": "Přepnout zobrazení sestavení"
+      },
+      "couldNotFindCommand": "Nepodařilo se najít příkaz {0}.",
+      "couldNotRunTask": "Nepodařilo se spustit úlohu {0}.",
+      "done": "Hotovo",
+      "dumpElf": "Vyhodit ELF",
+      "errorCouldNotFindMakefile": "Chyba: Chyba: Nepodařilo se najít makefile. Zkoušel jsem následující umístění:",
+      "errorEnginePathMustNotContainSpaces": "Chyba: Cesta k motoru nesmí obsahovat mezery. Vaše cesta k motoru:",
+      "errorPluginsPathMustNotContainSpaces": "Chyba: Cesta k zásuvným modulům nesmí obsahovat mezery. Vaše cesta k zásuvným modulům:",
+      "errorProjectPathMustNotContainSpaces": "Chyba: Cesta k projektu nesmí obsahovat mezery. Vaše cesta k projektu:",
+      "errorUserPluginsPathMustNotContainSpaces": "Chyba: Cesta k uživatelským pluginům nesmí obsahovat mezery. Vaše cesta k uživatelským zásuvným modulům:",
+      "malformedPreferenceMissingTaskName": "Chybná předvolba: chybí název úlohy.",
+      "malformedPreferenceMissingTaskType": "Chybná předvolba: chybí typ pro úlohu {0}.",
+      "malformedPreferenceNotAnArray": "Chybně formulovaná předvolba: není to pole.",
+      "mode": "Režim",
+      "modes": {
+        "betaDescription": "Obsahuje vybrané asserty pro testování výkonu na hardwaru.",
+        "debugDescription": "Zahrnuje všechna tvrzení za běhu, obsahuje nástroje pro ladění.",
+        "releaseDescription": "Neobsahuje žádné asserty ani ladicí příznaky, pouze pro přepravu.",
+        "toolsDescription": "Obsahuje vybrané asserty, obsahuje ladicí nástroje."
+      },
+      "noTasksFound": "Nebyly nalezeny žádné úkoly.",
+      "pedanticWarnings": "Pedantická varování",
+      "pleaseInstallWsl": "Zvažte prosím instalaci WSL, která výrazně zlepší časy sestavení.",
+      "postBuildTasks": "Úkoly po dokončení stavby",
+      "preBuildTasks": "Úkoly před stavbou",
+      "preferences": {
+        "dumpElfDescription": "Výpis kódu assembleru a částí paměti.",
+        "engineCorePathDescription": "Úplná cesta k základní knihovně. Pokud je ponecháno prázdné, použije se integrované jádro VUEngine.",
+        "includeEngineCoreInWorkspaceDescription": "Automatické zahrnutí základní knihovny do pracovních prostorů.",
+        "pedanticWarningsDescription": "Povolení pedantských varování překladače.",
+        "postBuildTasksDescription": "Seznam úloh a příkazů, které se mají po sestavení spustit.",
+        "preBuildTasksDescription": "Seznam úloh a příkazů, které je třeba provést před zahájením stavby."
+      },
+      "runningPostBuildTasks": "Spuštění úloh po sestavení",
+      "runningPreBuildTasks": "Spuštění úloh před sestavením",
+      "setBuildModePlaceholder": "Výběr režimu sestavení",
+      "setBuildModeTitle": "Nastavení režimu sestavení",
+      "showOnlyErrors": "Zobrazit pouze chyby",
+      "showOnlyWarnings": "Zobrazit pouze varování",
+      "taskCompleted": "Úloha {0} byla dokončena.",
+      "taskTerminatedBySignal": "Úloha {0} ukončena signálem {1}.",
+      "taskTerminatedForUnknownReason": "Úloha {0} byla ukončena z neznámého důvodu.",
+      "taskTerminatedWithExitCode": "Úloha {0} byla ukončena s kódem ukončení {1}.",
+      "toggleAutomaticScrolling": "Přepnutí automatického posouvání"
+    },
+    "codegen": {
+      "commands": {
+        "category": "Generátor kódu",
+        "generateAll": "Generovat všechny"
+      },
+      "generateAllDone": "Generování souborů je dokončeno."
+    },
+    "documentation": {
+      "commands": {
+        "category": "Dokumentace",
+        "openHandbook": "Otevřená příručka",
+        "openTechScroll": "Dokumentace otevřeného hardwaru"
+      },
+      "documentation": "Dokumentace",
+      "hardwareDocumentation": "Hardwarová dokumentace",
+      "vuengineStudioHandbook": "Příručka ke studiu VUEngine"
+    },
+    "editors": {
+      "areYouSureYouWantToDeleteItem": "Jste si jisti, že chcete odstranit {0} {1}?",
+      "chooseAnItemPlaceholder": "Vyberte položku, kterou chcete upravit",
+      "chooseAnItemTitle": "Výběr položky",
+      "commands": {
+        "category": "Redakce",
+        "open": "Otevřený editor"
+      },
+      "deleteNodeQuestion": "Smazat uzel?",
+      "palette": {
+        "black": "Černá",
+        "brightRed": "Jasně červená",
+        "darkRed": "Tmavě červená",
+        "mediumRed": "Středně červená"
+      },
+      "visualEditor": "Vizuální editor"
+    },
+    "emulator": {
+      "builtIn": "Vestavěný",
+      "commands": {
+        "category": "Emulátor",
+        "run": "Spustit na emulátoru",
+        "selectEmulator": "Nastavení výchozí konfigurace emulátoru..."
+      },
+      "configureInput": "Konfigurace vstupu",
+      "controller": {
+        "aCommand": "A",
+        "bCommand": "B",
+        "category": "Herní podložka emulátoru",
+        "lDownCommand": "Levý D-Pad ⇩",
+        "lLeftCommand": "Levý D-Pad ⇦",
+        "lRightCommand": "Levý D-Pad ⇨",
+        "lTriggerCommand": "Levá spoušť",
+        "lUpCommand": "Levý D-Pad ⇧",
+        "rDownCommand": "Pravý D-Pad ⇩",
+        "rLeftCommand": "Pravý D-Pad ⇦",
+        "rRightCommand": "Pravý D-Pad ⇨",
+        "rTriggerCommand": "Pravá spoušť",
+        "rUpCommand": "Pravý D-Pad ⇧",
+        "selectCommand": "Vyberte",
+        "startCommand": "Start"
+      },
+      "currentSaveState": "Aktuální stav uložení",
+      "emulationMode": "Režim emulace",
+      "emulationModes": {
+        "accurate": "Přesné",
+        "fast": "Rychle"
+      },
+      "emulator": "Emulátor",
+      "input": {
+        "audioMuteCommand": "Ztlumení zvuku",
+        "frameAdvanceCommand": "Předstih rámu",
+        "fullscreenCommand": "Celá obrazovka",
+        "loadStateCommand": "Stav zatížení",
+        "pauseToggleCommand": "Přepínání pauzy",
+        "resetCommand": "Obnovení",
+        "rewindCommand": "Přetáčení",
+        "saveStateCommand": "Uložit stát",
+        "screenshotCommand": "Pořízení snímku obrazovky",
+        "stateSlotDecreaseCommand": "Snížení Slot Save State",
+        "stateSlotIncreaseCommand": "Zvýšení slotu Save State",
+        "toggleControlsOverlayCommand": "Překrytí přepínacích prvků",
+        "toggleFastForwardCommand": "Přepínání Rychlý posun vpřed",
+        "toggleLowPower": "Přepínání signálu nízkého výkonu",
+        "toggleSlowmotionCommand": "Přepínání zpomaleného pohybu"
+      },
+      "mute": "Ztlumit",
+      "pause": "Pauza",
+      "preferences": {
+        "builtInEmulationModeDescription": "Režim emulace vestavěného emulátoru.",
+        "builtInScalingModeDescription": "Režim škálování vestavěného emulátoru.",
+        "builtInStereoModeDescription": "Režim zobrazení stereoskopie vestavěného emulátoru.",
+        "customConfigsDescription": "Uživatelem definované konfigurace emulátoru pro spouštění zkompilovaných ROM.",
+        "customDefaultDescription": "Konfigurace emulátoru, která se použije ke spuštění zkompilovaných ROM. Pokud zůstane prázdná, použije se vestavěný emulátor."
+      },
+      "resume": "Životopis",
+      "runQueued": "Spustit ve frontě",
+      "scale": "Schody",
+      "scales": {
+        "auto": "Auto",
+        "stretch": "Stretch"
+      },
+      "selectDefaultEmulatorPlaceholder": "Která konfigurace emulátoru by měla být použita ke spuštění zkompilovaných projektů?",
+      "selectDefaultEmulatorTitle": "Výběr výchozí konfigurace emulátoru",
+      "showHelp": "Zobrazit stránku příručky",
+      "stereoMode": "Stereofonní režim",
+      "stereoModes": {
+        "2dBlackBlue": "2D (modrá/černá)",
+        "2dBlackCyan": "2D (azurová/černá)",
+        "2dBlackElectricCyan": "2D (azurová/černá)",
+        "2dBlackGreen": "2D (zelená/černá)",
+        "2dBlackMagenta": "2D (purpurová/černá)",
+        "2dBlackRed": "2D (červená/černá)",
+        "2dBlackWhite": "2D (bílá/černá)",
+        "2dBlackYellow": "2D (žlutá/černá)",
+        "anaglyph-redElectricCyan": "Anaglyf (Červená/El.Cyan)",
+        "anaglyphGreenMagenta": "Anaglyf (červený/zelený)",
+        "anaglyphRedBlue": "Anaglyf (červený/modrý)",
+        "anaglyphRedCyan": "Anaglyf (červený/cyan)",
+        "anaglyphYellowBlue": "Anaglyf (žlutá/modrá)",
+        "cyberscope": "CyberScope",
+        "hli": "Horizontální prokládaný řádek",
+        "sideBySide": "Side By Side",
+        "vli": "Vertikální prokládaná čára"
+      },
+      "unmute": "Zrušit ztlumení"
+    },
+    "export": {
+      "commands": {
+        "category": "Export",
+        "export": "Export ROM..."
+      },
+      "doYouReallyWantToOverwrite": "Opravdu chcete přepsat {0}?",
+      "exportRom": "Export ROM",
+      "overwrite": "Přepsat"
+    },
+    "flashCarts": {
+      "abort": "Přerušit",
+      "cancel": "Zrušit",
+      "commands": {
+        "category": "Bleskové vozíky",
+        "detectConnected": "Detekce připojených vozíků Flash",
+        "expandView": "Přepínání Maximalizováno",
+        "flash": "Flash na Flash Košík",
+        "showHelp": "Zobrazit stránku příručky",
+        "showSettings": "Zobrazit předvolby Flash Carts",
+        "toggleView": "Přepnout zobrazení flashových vozíků"
+      },
+      "connectYourFlashCarts": "Připojte svůj flashový košík (košíky) Virtual Boy k počítači přes USB.",
+      "connectedFlashCarts": "Připojené flashové vozíky",
+      "done": "Hotovo",
+      "flash": "Flash",
+      "flashCarts": "Bleskové vozíky",
+      "flasherSoftwareDoesNotExist": "Flasher software neexistuje na adrese {0}.",
+      "flashingIsQueued": "Blikání je zařazeno do fronty a spustí se, jakmile bude sestavení připraveno.",
+      "flashingQueued": "Bliká ve frontě",
+      "insufficientSpaceToHoldRom": "Nedostatečný prostor pro uložení paměti ROM",
+      "noPathToFlasherSoftwareProvided": "Pro košík {0} nebyla poskytnuta cesta k softwaru flasheru.",
+      "noneFound": "Nebyly nalezeny žádné flashové vozíky",
+      "preferences": {
+        "flashCartsDescription": "Konfigurace pro automatickou detekci a blikání zábleskového vozíku."
+      },
+      "youCanConnectAnyNumberOfCarts": "Můžete připojit a flashovat libovolný počet flashových vozíků najednou."
+    },
+    "general": {
+      "commands": {
+        "category": "Studio VUEngine",
+        "reportIssue": "Problém s hlášením",
+        "support": "Podpora VUEngine Studio"
+      },
+      "selectDirectory": "Vybrat adresář",
+      "space": "Prostor",
+      "themes": {
+        "dark": "Dark",
+        "highContrast": "Vysoký kontrast",
+        "light": "Světlo",
+        "virtualBoy": "Virtual Boy"
+      }
+    },
+    "gettingStarted": {
+      "alwaysShowThisPage": "Tuto stránku zobrazte vždy, když není otevřen žádný projekt.",
+      "commands": {
+        "showHelp": "Zobrazit stránku příručky",
+        "showWidget": "Začínáme"
+      },
+      "links": "Odkazy",
+      "preferences": {
+        "showGettingStartedDescription": "Zobrazit stránku Začínáme, když není otevřen žádný projekt."
+      },
+      "showDocumentation": "Zobrazit dokumentaci",
+      "supportUsOnPatreon": "Podpořte nás na Patreonu",
+      "vuengineWebsite": "Webové stránky společnosti VUEngine"
+    },
+    "handbook": {
+      "handbook": "Příručka"
+    },
+    "imageConverter": {
+      "changedImagesOnly": "Pouze změněné obrázky",
+      "clearLogs": "Vymazat protokoly",
+      "commands": {
+        "category": "Převodník obrázků",
+        "convertAll": "Převést všechny",
+        "convertChanged": "Převést změněno",
+        "showHelp": "Zobrazit stránku příručky",
+        "toggleView": "Přepnutí zobrazení konvertoru obrázků"
+      },
+      "convert": "Převést",
+      "done": "Hotovo",
+      "foundXImages": "Nalezeno {0} obrázků",
+      "imageConverter": "Převodník obrázků",
+      "noneFound": "Nebyl nalezen žádný.",
+      "startingToConvertAll": "Začíná konverze všech obrázků...",
+      "startingToConvertChanged": "Začíná převod změněných obrázků..."
+    },
+    "plugins": {
+      "add": "Přidat",
+      "commands": {
+        "category": "Zásuvné moduly",
+        "clearAll": "Vymazat výsledky vyhledávání",
+        "new": "Nový plugin",
+        "searchByAuthor": "Vyhledávání podle autora",
+        "searchByTag": "Vyhledávání podle štítku",
+        "showHelp": "Zobrazit stránku příručky",
+        "showInstalled": "Zobrazit nainstalované zásuvné moduly",
+        "showRecommendations": "Zobrazit doporučené pluginy",
+        "showSettings": "Zobrazit předvolby zásuvných modulů",
+        "toggleView": "Přepnutí zobrazení zásuvných modulů"
+      },
+      "dependencies": "Závislosti",
+      "installed": "Nainstalováno",
+      "noDependencies": "Žádné",
+      "plugin": "Zásuvný modul",
+      "plugins": "Zásuvné moduly",
+      "preferences": {
+        "includeLibraryInWorkspaceDescription": "Automatické zahrnutí knihovny zásuvných modulů do pracovních prostorů.",
+        "includeUserLibraryInWorkspaceDescription": "Automatické zahrnutí uživatelských zásuvných modulů do pracovních prostorů.",
+        "libraryPathDescription": "Úplná cesta ke knihovně zásuvných modulů. Pokud je ponechána prázdná, použije se vestavěná knihovna zásuvných modulů VUEngine.",
+        "userLibraryPathDescription": "Úplná cesta k základní složce pro všechny uživatelské zásuvné moduly."
+      },
+      "recommended": "Doporučené stránky",
+      "remove": "Odstranění stránky",
+      "search": "Vyhledávání",
+      "searchPlugins": "Vyhledávání zásuvných modulů"
+    },
+    "projects": {
+      "areYouSureYouWantToDelete": "Určitě chcete odstranit {0}?",
+      "author": "Autor",
+      "commands": {
+        "category": "Projekty",
+        "closeProject": "Zavřít projekt",
+        "newProject": "Nový projekt",
+        "openProject": "Otevřený projekt...",
+        "openProjectFile": "Otevřít soubor projektu",
+        "openRecentProject": "Otevřít nedávný projekt...",
+        "saveProjectAs": "Uložit projekt jako...",
+        "toggleView": "Přepnutí zobrazení projektu"
+      },
+      "create": "Vytvořit",
+      "deleteNodeQuestion": "Smazat uzel?",
+      "errorBasePathDoesNotExist": "Chyba: základní cesta neexistuje",
+      "errorNoProjectName": "Chyba: nebyl zadán žádný název projektu",
+      "gameCode": "Kód hry",
+      "makerCode": "Kód výrobce",
+      "myProject": "Můj projekt",
+      "name": "Název",
+      "path": "Cesta",
+      "preferences": {
+        "authorDefault": "Uživatel VUEngine Studio",
+        "authorDescription": "Výchozí jméno autora, které se použije pro nové projekty.",
+        "basePathDescription": "Základní cesta pro nové projekty.",
+        "makerCodeDescription": "Výchozí kód tvůrce, který se umístí do záhlaví ROM nových projektů."
+      },
+      "project": "Projekt",
+      "selectParentFolder": "Vyberte nadřazenou složku nového projektu",
+      "settingUpNewProject": "Nastavení nového projektu",
+      "template": "Šablona",
+      "templates": {
+        "bareboneDescription": "(Téměř) prázdný projekt, který obsahuje jedinou obrazovku \"Hello World\" a nejdůležitější zásuvné moduly pro přidání úvodní obrazovky, automatické pauzy a dalších funkcí.",
+        "bareboneTitle": "Barebone",
+        "imageViewerDescription": "Prohlížeč stereoskopických snímků.",
+        "imageViewerTitle": "Prohlížeč obrázků",
+        "multiplayerDescription": "Jednoduchá hra podobná hře Pong, která využívá komunikační třídu enginu pro zápasy více hráčů přes propojovací kabel.",
+        "multiplayerTitle": "Hra pro více hráčů",
+        "platformerDescription": "Plnohodnotná jednoúrovňová plošinovka.",
+        "platformerTitle": "Hra na platformě"
+      },
+      "verifying": "Ověřování"
+    },
+    "rumblePack": {
+      "actions": "Akce",
+      "break": "Přestávka",
+      "builtInHapticEffects": "Vestavěné haptické efekty",
+      "commands": {
+        "category": "Balení Rumble Pack",
+        "detectConnected": "Detekce připojeného balíčku Rumble Pack",
+        "expand": "Přepínání Maximalizováno",
+        "help": "Zobrazit stránku příručky",
+        "openWidget": "Otevřít nástroj Rumble Pack"
+      },
+      "connected": "Připojeno",
+      "disconnected": "Odpojení",
+      "effect": "Efekt",
+      "effects": {
+        "1000MsAlert": "Upozornění 1000 ms",
+        "750MsAlert": "Výstraha 750 ms",
+        "buzz": "Buzz",
+        "doubleClick": "Dvojité kliknutí",
+        "longBuzzForProgrammaticStopping": "Dlouhý šum pro programové zastavení",
+        "longDoubleSharpClickMedium": "Dlouhý dvojitý ostrý klik Střední",
+        "longDoubleSharpClickStrong": "Dlouhé dvojité ostré kliknutí Strong",
+        "longDoubleSharpTick": "Dlouhý dvojitý ostrý klíště",
+        "mediumClick": "Střední kliknutí",
+        "pulsingMedium": "Pulzující médium",
+        "pulsingSharp": "Pulzující ostrý",
+        "pulsingStrong": "Pulsing Strong",
+        "sharpClick": "Ostré kliknutí",
+        "sharpTick": "Ostré klíště",
+        "shortDoubleClickMedium": "Krátké dvojité kliknutí Medium",
+        "shortDoubleClickStrong": "Krátké dvojité kliknutí Strong",
+        "shortDoubleSharpTick": "Krátký dvojitý ostrý klíště",
+        "smoothHum": "Plynulé hučení {0} (bez impulzu při rozjezdu nebo brzdění)",
+        "softBump": "Měkký náraz",
+        "softFuzz": "Soft Fuzz",
+        "strongBuzz": "Silný Buzz",
+        "strongClick": "Silné kliknutí",
+        "transitionClick": "Přechodové kliknutí",
+        "transitionHum": "Přechod Hum",
+        "transitionRampDownLongSharp": "Přechodová rampa dolů Long Sharp",
+        "transitionRampDownLongSmooth": "Přechodová rampa dolů Long Smooth",
+        "transitionRampDownMediumSharp": "Přechodová rampa dolů Středně ostrá",
+        "transitionRampDownMediumSmooth": "Přechodová rampa dolů Středně hladká",
+        "transitionRampDownShortSharp": "Přechodová rampa dolů Krátká ostrá",
+        "transitionRampDownShortSmooth": "Přechodová rampa dolů Krátká hladká",
+        "transitionRampUpLongSharp": "Přechodová rampa Long Sharp",
+        "transitionRampUpLongSmooth": "Přechodová rampa nahoru Long Smooth",
+        "transitionRampUpMediumSharp": "Přechodový náběh Středně ostrý",
+        "transitionRampUpMediumSmooth": "Přechodový náběh Středně hladký",
+        "transitionRampUpShortSharp": "Přechodová rampa krátká ostrá",
+        "transitionRampUpShortSmooth": "Přechodová rampa Krátká plynulá",
+        "tripleClick": "Trojité kliknutí"
+      },
+      "frequency": "Frekvence",
+      "jsonFormat": "Formát JSON",
+      "log": "Přihlásit se",
+      "menu": "Nabídka",
+      "negativeSustain": "Negativní udržitelnost",
+      "overdrive": "Overdrive",
+      "positiveSustain": "Pozitivní udržitelnost",
+      "printCommands": "Příkazy pro tisk",
+      "reRunLastEffect": "Opětovné spuštění posledního efektu",
+      "rumblePack": "Balení Rumble Pack",
+      "rumblePackConnected": "Připojení balíčku Rumble Pack",
+      "rumblePackConnectionStatus": "Stav připojení balíčku Rumble Pack",
+      "rumblePackTool": "Nástroj Rumble Pack",
+      "runEffect": "Efekt běhu",
+      "stopCurrentEffect": "Zastavení proudového efektu",
+      "sustainNeg": "Udržitelnost (Neg.)",
+      "sustainPos": "Udržení (poz.)",
+      "vbCommandLineState": "Stav příkazového řádku VB",
+      "vbSyncLineState": "Stav synchronizační linky VB"
+    },
+    "titlebar": {
+      "commands": {
+        "category": "Okno",
+        "maximizeWindow": "Maximalizovat okno",
+        "minimizeWindow": "Minimalizovat okno",
+        "unmaximizeWindow": "Odmaximalizovat okno"
+      }
+    },
+    "updater": {
+      "alreadyUsingLatestVersion": "Již používáte nejnovější verzi aplikace VUEngine Studio.",
+      "applicationUpdate": "Aktualizace aplikace",
+      "commands": {
+        "category": "Updater",
+        "checkForUpdates": "Zkontrolujte aktualizace...",
+        "restartToUpdate": "Restartovat na aktualizaci"
+      },
+      "downloading": "Stahování",
+      "never": "Nikdy",
+      "no": "Ne",
+      "preferences": {
+        "reportOnStartDescription": "Hlášení dostupných aktualizací po spuštění aplikace."
+      },
+      "updateFoundWannaUpdate": "Nalezené aktualizace. Chcete provést aktualizaci?",
+      "updateHasBeenDownloaded": "Byla stažena aktualizace. Chcete ji nyní restartovat a nainstalovat?",
+      "viewErrorLog": "Zobrazit protokol chyb",
+      "yes": "Ano"
+    },
+    "zoom": {
+      "commands": {
+        "category": "Zobrazit",
+        "resetZoom": "Obnovení zvětšení",
+        "zoomIn": "Přiblížení",
+        "zoomOut": "Zvětšení"
+      },
+      "preferences": {
+        "showZoomLevelInStatusBarDescription": "Zobrazení úrovně přiblížení ve stavovém řádku (pouze pokud není 100 %).",
+        "zoomLevelDescription": "Upravte úroveň přiblížení okna."
+      },
+      "resetZoom": "Obnovení zoomu"
+    }
+  }
+}

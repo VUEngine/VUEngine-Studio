@@ -22,7 +22,7 @@
       "buildSuccessful": "Build successful",
       "buildSuccessfulWithWarnings": "Build successful (with warnings)",
       "building": "Construction",
-      "commandCompleted": "Commande \"{0}\" terminée.",
+      "commandCompleted": "Commande {0} terminée.",
       "commands": {
         "build": "Construire le projet",
         "category": "Build",
@@ -35,8 +35,8 @@
         "togglePedanticWarnings": "Basculer vers les avertissements pédants",
         "toggleView": "Basculer l'affichage de la compilation"
       },
-      "couldNotFindCommand": "Impossible de trouver la commande \"{0}\".",
-      "couldNotRunTask": "Impossible d'exécuter la tâche \"{0}\".",
+      "couldNotFindCommand": "Impossible de trouver la commande {0}.",
+      "couldNotRunTask": "Impossible d'exécuter la tâche {0}.",
       "done": "Terminé",
       "dumpElf": "Dump ELF",
       "errorCouldNotFindMakefile": "Erreur : Impossible de trouver un makefile. J'ai essayé les emplacements suivants :",
@@ -73,17 +73,18 @@
       "setBuildModeTitle": "Définir le mode de construction",
       "showOnlyErrors": "Afficher uniquement les erreurs",
       "showOnlyWarnings": "Afficher uniquement les avertissements",
-      "taskCompleted": "Tâche \"{0}\" terminée.",
-      "taskTerminatedBySignal": "Tâche \"{0}\" terminée par le signal {1}.",
-      "taskTerminatedForUnknownReason": "Tâche \"{0}\" terminée pour une raison inconnue.",
-      "taskTerminatedWithExitCode": "Tâche \"{0}\" terminée avec le code de sortie {1}.",
+      "taskCompleted": "Tâche {0} terminée.",
+      "taskTerminatedBySignal": "Tâche {0} terminée par le signal {1}.",
+      "taskTerminatedForUnknownReason": "Tâche {0} terminée pour une raison inconnue.",
+      "taskTerminatedWithExitCode": "Tâche {0} terminée avec le code de sortie {1}.",
       "toggleAutomaticScrolling": "Activer le défilement automatique"
     },
     "codegen": {
       "commands": {
         "category": "Générateur de code",
         "generateAll": "Générer tout"
-      }
+      },
+      "generateAllDone": "Fin de la génération des fichiers."
     },
     "documentation": {
       "commands": {
@@ -96,7 +97,7 @@
       "vuengineStudioHandbook": "Manuel de VUEngine Studio"
     },
     "editors": {
-      "areYouSureYouWantToDeleteItem": "Êtes-vous sûr de vouloir supprimer le {0} \"{1}\" ?",
+      "areYouSureYouWantToDeleteItem": "Êtes-vous sûr de vouloir supprimer le {0} {1} ?",
       "chooseAnItemPlaceholder": "Sélectionnez l'élément que vous voulez modifier",
       "chooseAnItemTitle": "Choisir un élément",
       "commands": {
@@ -207,7 +208,7 @@
         "category": "Exportation",
         "export": "Exporter ROM..."
       },
-      "doYouReallyWantToOverwrite": "Voulez-vous vraiment écraser \"${}\" ?",
+      "doYouReallyWantToOverwrite": "Voulez-vous vraiment écraser {0} ?",
       "exportRom": "Exporter ROM",
       "overwrite": "Écraser"
     },
@@ -228,9 +229,11 @@
       "done": "Terminé",
       "flash": "Flash",
       "flashCarts": "Chariots Flash",
+      "flasherSoftwareDoesNotExist": "Le logiciel du clignotant n'existe pas dans {0}.",
       "flashingIsQueued": "Le flashage est en file d'attente et commencera dès que la construction sera prête",
       "flashingQueued": "Flashing en attente",
       "insufficientSpaceToHoldRom": "Espace insuffisant pour contenir la ROM",
+      "noPathToFlasherSoftwareProvided": "Aucun chemin vers le logiciel de flashage n'a été fourni pour le panier {0}.",
       "noneFound": "Aucune cartouche flash trouvée",
       "preferences": {
         "flashCartsDescription": "Configurations pour l'auto-détection et le flashage des cartes flash."
@@ -318,7 +321,7 @@
       "searchPlugins": "Plugins de recherche"
     },
     "projects": {
-      "areYouSureYouWantToDelete": "Êtes-vous sûr de vouloir supprimer \"{0}\" ?",
+      "areYouSureYouWantToDelete": "Êtes-vous sûr de vouloir supprimer {0} ?",
       "author": "Auteur",
       "commands": {
         "category": "Projets",

@@ -22,7 +22,7 @@
       "buildSuccessful": "Construir con éxito",
       "buildSuccessfulWithWarnings": "Construir con éxito (con advertencias)",
       "building": "Construcción",
-      "commandCompleted": "Comando \"{0}\" completado.",
+      "commandCompleted": "Comando {0} completado.",
       "commands": {
         "build": "Construir proyecto",
         "category": "Construir",
@@ -35,8 +35,8 @@
         "togglePedanticWarnings": "Activar las advertencias pedantes",
         "toggleView": "Activar la vista de construcción"
       },
-      "couldNotFindCommand": "No se pudo encontrar el comando \"{0}\".",
-      "couldNotRunTask": "No se ha podido ejecutar la tarea \"{0}\".",
+      "couldNotFindCommand": "No se pudo encontrar el comando {0}.",
+      "couldNotRunTask": "No se ha podido ejecutar la tarea {0}.",
       "done": "Hecho",
       "dumpElf": "Volcar ELF",
       "errorCouldNotFindMakefile": "Error: No se pudo encontrar un archivo makefile. Probado en las siguientes ubicaciones:",
@@ -73,17 +73,18 @@
       "setBuildModeTitle": "Establecer el modo de compilación",
       "showOnlyErrors": "Mostrar sólo los errores",
       "showOnlyWarnings": "Mostrar sólo las advertencias",
-      "taskCompleted": "Tarea \"{0}\" completada.",
-      "taskTerminatedBySignal": "Tarea \"{0}\"terminada por señal {1}.",
-      "taskTerminatedForUnknownReason": "Tarea \"{0}\" terminada por razón desconocida.",
-      "taskTerminatedWithExitCode": "Tarea \"{0}\" terminada con código de salida {1}.",
+      "taskCompleted": "Tarea {0} completada.",
+      "taskTerminatedBySignal": "Tarea {0} terminada por señal {1}.",
+      "taskTerminatedForUnknownReason": "Tarea {0} terminada por razón desconocida.",
+      "taskTerminatedWithExitCode": "Tarea {0} terminada con código de salida {1}.",
       "toggleAutomaticScrolling": "Activar el desplazamiento automático"
     },
     "codegen": {
       "commands": {
         "category": "Generador de código",
         "generateAll": "Generar toda la"
-      }
+      },
+      "generateAllDone": "Terminada la generación de archivos."
     },
     "documentation": {
       "commands": {
@@ -96,7 +97,7 @@
       "vuengineStudioHandbook": "Manual de VUEngine Studio"
     },
     "editors": {
-      "areYouSureYouWantToDeleteItem": "¿Estás seguro de que quieres borrar el {0} \"{1}\"?",
+      "areYouSureYouWantToDeleteItem": "¿Estás seguro de que quieres borrar el {0} {1}?",
       "chooseAnItemPlaceholder": "Seleccione el elemento que desea editar",
       "chooseAnItemTitle": "Seleccione un elemento",
       "commands": {
@@ -207,7 +208,7 @@
         "category": "Exportar",
         "export": "Exportar ROM..."
       },
-      "doYouReallyWantToOverwrite": "¿Realmente quiere sobrescribir el \"${}\"",
+      "doYouReallyWantToOverwrite": "¿Realmente quiere sobrescribir el {0}",
       "exportRom": "Exportar ROM",
       "overwrite": "Sobrescribir"
     },
@@ -228,9 +229,11 @@
       "done": "Listo",
       "flash": "Flash",
       "flashCarts": "Carros flash",
+      "flasherSoftwareDoesNotExist": "El software de intermitencia no existe en {0}",
       "flashingIsQueued": "El flasheo está en cola y se iniciará cuando la construcción esté lista",
       "flashingQueued": "Flasheo en cola",
       "insufficientSpaceToHoldRom": "No hay espacio suficiente para la ROM",
+      "noPathToFlasherSoftwareProvided": "No se ha proporcionado la ruta de acceso al software de flasheo para el carro {0}",
       "noneFound": "No se han encontrado carros flash",
       "preferences": {
         "flashCartsDescription": "Configuraciones para la autodetección de carros flash y el flasheo."
@@ -318,7 +321,7 @@
       "searchPlugins": "Plugins de búsqueda"
     },
     "projects": {
-      "areYouSureYouWantToDelete": "¿Está seguro de que desea eliminar \"{0}\"?",
+      "areYouSureYouWantToDelete": "¿Está seguro de que desea eliminar {0}?",
       "author": "Autor",
       "commands": {
         "category": "Proyectos",

@@ -1,0 +1,481 @@
+{
+  "theia": {
+    "workspace": {
+      "closeWorkspace": "你真的想关闭这个项目吗?",
+      "openRecentPlaceholder": "输入你要打开的项目名称",
+      "preserveWindow": "启用在当前窗口打开项目。"
+    }
+  },
+  "vuengine": {
+    "about": {
+      "and": "和",
+      "thankYouToOurSupporters": "感谢我们在Patreon上的支持者!",
+      "title": "关于VUEngine Studio",
+      "version": "版本",
+      "vsCodeApiVersion": "VSCode API版本"
+    },
+    "build": {
+      "abortBuild": "终止构建",
+      "build": "构建",
+      "buildMode": "建设模式",
+      "buildProject": "建立项目",
+      "buildSuccessful": "建立成功的",
+      "buildSuccessfulWithWarnings": "建设成功(有警告)。",
+      "building": "建筑物",
+      "commandCompleted": "命令{0}完成。",
+      "commands": {
+        "build": "建立项目",
+        "category": "构建",
+        "clean": "清洁构建文件夹",
+        "expandView": "切换到最大限度",
+        "setMode": "设置构建模式...",
+        "showHelp": "展会手册页",
+        "showSettings": "显示构建首选项",
+        "toggleDumpElf": "切换转储 ELF",
+        "togglePedanticWarnings": "切换迂腐的警告",
+        "toggleView": "切换构建视图"
+      },
+      "couldNotFindCommand": "无法找到命令{0}。",
+      "couldNotRunTask": "无法运行任务{0}。",
+      "done": "已完成",
+      "dumpElf": "倾倒ELF",
+      "errorCouldNotFindMakefile": "错误。找不到makefile。尝试了以下位置。",
+      "errorEnginePathMustNotContainSpaces": "错误。引擎路径不能包含空格。你的引擎路径。",
+      "errorPluginsPathMustNotContainSpaces": "错误。插件路径不能包含空格。你的插件路径。",
+      "errorProjectPathMustNotContainSpaces": "错误。项目路径不能包含空格。你的项目路径。",
+      "errorUserPluginsPathMustNotContainSpaces": "错误。用户插件路径不能包含空格。你的用户插件路径。",
+      "malformedPreferenceMissingTaskName": "畸形的偏好:缺少任务名称。",
+      "malformedPreferenceMissingTaskType": "畸形偏好:缺少任务{0}的类型。",
+      "malformedPreferenceNotAnArray": "畸形的偏好:不是一个数组。",
+      "mode": "模式",
+      "modes": {
+        "betaDescription": "包括选定的断言,用于测试硬件上的性能。",
+        "debugDescription": "包括所有运行时断言,包括调试工具。",
+        "releaseDescription": "不包括断言或调试标志,只用于运输。",
+        "toolsDescription": "包括选定的断言,包括调试工具。"
+      },
+      "noTasksFound": "没有发现任务。",
+      "pedanticWarnings": "迂腐的警告",
+      "pleaseInstallWsl": "请考虑安装WSL,以大规模地改善构建时间。",
+      "postBuildTasks": "构建后的任务",
+      "preBuildTasks": "建设前的任务",
+      "preferences": {
+        "dumpElfDescription": "倾倒汇编代码和内存部分。",
+        "engineCorePathDescription": "核心库的完整路径。当留空时,使用内置的VUEngine核心。",
+        "includeEngineCoreInWorkspaceDescription": "在工作空间中自动包括核心库。",
+        "pedanticWarningsDescription": "启用迂回的编译器警告。",
+        "postBuildTasksDescription": "构建后要执行的任务和命令列表。",
+        "preBuildTasksDescription": "构建前要执行的任务和命令清单。"
+      },
+      "runningPostBuildTasks": "运行构建后的任务",
+      "runningPreBuildTasks": "运行预编译任务",
+      "setBuildModePlaceholder": "选择在哪种模式下建造",
+      "setBuildModeTitle": "设置构建模式",
+      "showOnlyErrors": "只显示错误",
+      "showOnlyWarnings": "只显示警告",
+      "taskCompleted": "任务{0}完成。",
+      "taskTerminatedBySignal": "任务{0}被信号{1}终止。",
+      "taskTerminatedForUnknownReason": "任务{0}因未知原因终止。",
+      "taskTerminatedWithExitCode": "任务{0}终止,退出代码{1}。",
+      "toggleAutomaticScrolling": "切换自动滚动"
+    },
+    "codegen": {
+      "commands": {
+        "category": "代码生成器",
+        "generateAll": "产生所有"
+      },
+      "generateAllDone": "已经完成了文件的生成。"
+    },
+    "documentation": {
+      "commands": {
+        "category": "文件",
+        "openHandbook": "开放式手册",
+        "openTechScroll": "开放式硬件文档"
+      },
+      "documentation": "文件",
+      "hardwareDocumentation": "硬件文件",
+      "vuengineStudioHandbook": "VUEngine Studio手册"
+    },
+    "editors": {
+      "areYouSureYouWantToDeleteItem": "你确定要删除{0}{1}吗?",
+      "chooseAnItemPlaceholder": "选择你要编辑的项目",
+      "chooseAnItemTitle": "选择一个项目",
+      "commands": {
+        "category": "编辑部",
+        "open": "开放式编辑器"
+      },
+      "deleteNodeQuestion": "删除节点?",
+      "palette": {
+        "black": "黑色",
+        "brightRed": "鲜红色",
+        "darkRed": "深红色",
+        "mediumRed": "中红色"
+      },
+      "visualEditor": "视觉编辑"
+    },
+    "emulator": {
+      "builtIn": "内置式",
+      "commands": {
+        "category": "仿真器",
+        "run": "在仿真器上运行",
+        "selectEmulator": "设置默认仿真器配置..."
+      },
+      "configureInput": "配置输入",
+      "controller": {
+        "aCommand": "A",
+        "bCommand": "B",
+        "category": "仿真器游戏板",
+        "lDownCommand": "左侧D-pad ⇩",
+        "lLeftCommand": "左侧D-pad ⇦",
+        "lRightCommand": "左边的D-pad ⇨",
+        "lTriggerCommand": "左侧触发器",
+        "lUpCommand": "左侧D-pad ⇧",
+        "rDownCommand": "右侧D-pad ⇩",
+        "rLeftCommand": "右侧D-pad ⇦",
+        "rRightCommand": "右边的D-pad ⇨",
+        "rTriggerCommand": "右边的触发器",
+        "rUpCommand": "右侧D-pad ⇧",
+        "selectCommand": "选择",
+        "startCommand": "开始"
+      },
+      "currentSaveState": "当前保存状态",
+      "emulationMode": "仿真模式",
+      "emulationModes": {
+        "accurate": "准确",
+        "fast": "快速"
+      },
+      "emulator": "仿真器",
+      "input": {
+        "audioMuteCommand": "音频静音",
+        "frameAdvanceCommand": "框架推进",
+        "fullscreenCommand": "全屏",
+        "loadStateCommand": "负载状态",
+        "pauseToggleCommand": "切换暂停",
+        "resetCommand": "复位",
+        "rewindCommand": "倒带",
+        "saveStateCommand": "拯救国家",
+        "screenshotCommand": "拍摄屏幕截图",
+        "stateSlotDecreaseCommand": "减少保存状态的槽位",
+        "stateSlotIncreaseCommand": "增加保存状态的槽位",
+        "toggleControlsOverlayCommand": "切换控件叠加",
+        "toggleFastForwardCommand": "拨动快进键",
+        "toggleLowPower": "切换低功率信号",
+        "toggleSlowmotionCommand": "拨动慢动作"
+      },
+      "mute": "静音",
+      "pause": "暂停",
+      "preferences": {
+        "builtInEmulationModeDescription": "内置仿真器的仿真模式。",
+        "builtInScalingModeDescription": "内置仿真器的缩放模式。",
+        "builtInStereoModeDescription": "内置仿真器的立体显示模式。",
+        "customConfigsDescription": "用户定义的仿真器配置,用于运行编译的ROM。",
+        "customDefaultDescription": "仿真器配置,将用于运行编译的ROM。如果留空,则使用内置仿真器。"
+      },
+      "resume": "简历",
+      "runQueued": "运行排队",
+      "scale": "楼梯",
+      "scales": {
+        "auto": "汽车",
+        "stretch": "伸展"
+      },
+      "selectDefaultEmulatorPlaceholder": "应该使用哪种仿真器配置来运行已编译的项目?",
+      "selectDefaultEmulatorTitle": "选择默认的仿真器配置",
+      "showHelp": "展会手册页",
+      "stereoMode": "立体声模式",
+      "stereoModes": {
+        "2dBlackBlue": "2D (蓝/黑)",
+        "2dBlackCyan": "2D (青色/黑色)",
+        "2dBlackElectricCyan": "2D (El.Cyan/Black)",
+        "2dBlackGreen": "2D (绿色/黑色)",
+        "2dBlackMagenta": "2D(品红/黑色)",
+        "2dBlackRed": "2D (红/黑)",
+        "2dBlackWhite": "2D (白色/黑色)",
+        "2dBlackYellow": "2D (黄/黑)",
+        "anaglyph-redElectricCyan": "Anaglyph (Red/El.Cyan)",
+        "anaglyphGreenMagenta": "幻影(红/绿)",
+        "anaglyphRedBlue": "幻影(红/蓝)",
+        "anaglyphRedCyan": "幻影(红色/青色)",
+        "anaglyphYellowBlue": "幻影(黄/蓝)",
+        "cyberscope": "网络视界",
+        "hli": "水平线交错",
+        "sideBySide": "并肩作战",
+        "vli": "垂直线交错式"
+      },
+      "unmute": "撤消静音"
+    },
+    "export": {
+      "commands": {
+        "category": "出口",
+        "export": "出口ROM..."
+      },
+      "doYouReallyWantToOverwrite": "你真的想覆盖{0}吗?",
+      "exportRom": "输出ROM",
+      "overwrite": "覆盖"
+    },
+    "flashCarts": {
+      "abort": "中止",
+      "cancel": "取消",
+      "commands": {
+        "category": "闪存车",
+        "detectConnected": "检测连接的闪光灯手推车",
+        "expandView": "切换到最大限度",
+        "flash": "闪存到闪存车",
+        "showHelp": "展会手册页",
+        "showSettings": "显示Flash购物车首选项",
+        "toggleView": "切换Flash Carts视图"
+      },
+      "connectYourFlashCarts": "通过USB将你的Virtual Boy闪存车连接到你的电脑。",
+      "connectedFlashCarts": "连接的闪光灯手推车",
+      "done": "已完成",
+      "flash": "闪光灯",
+      "flashCarts": "闪存车",
+      "flasherSoftwareDoesNotExist": "在{0}处不存在flasher软件。",
+      "flashingIsQueued": "闪光是排队的,一旦构建完成就会开始。",
+      "flashingQueued": "闪烁的排队",
+      "insufficientSpaceToHoldRom": "没有足够的空间容纳ROM",
+      "noPathToFlasherSoftwareProvided": "没有为购物车{0}提供flasher软件的路径。",
+      "noneFound": "没有发现闪存卡",
+      "preferences": {
+        "flashCartsDescription": "闪光灯车自动检测和闪烁的配置。"
+      },
+      "youCanConnectAnyNumberOfCarts": "你可以同时连接任何数量的闪光灯车,并向其闪光。"
+    },
+    "general": {
+      "commands": {
+        "category": "VUEngine工作室",
+        "reportIssue": "报告问题",
+        "support": "支持VUEngine Studio"
+      },
+      "selectDirectory": "选择目录",
+      "space": "空间",
+      "themes": {
+        "dark": "黑暗",
+        "highContrast": "高对比度",
+        "light": "亮度",
+        "virtualBoy": "虚拟男孩"
+      }
+    },
+    "gettingStarted": {
+      "alwaysShowThisPage": "当没有打开项目时,总是显示这个页面。",
+      "commands": {
+        "showHelp": "展会手册页",
+        "showWidget": "入门"
+      },
+      "links": "链接",
+      "preferences": {
+        "showGettingStartedDescription": "当没有打开项目时,显示 \"入门 \"页面。"
+      },
+      "showDocumentation": "显示文件",
+      "supportUsOnPatreon": "在Patreon上支持我们",
+      "vuengineWebsite": "VUEngine网站"
+    },
+    "handbook": {
+      "handbook": "手册"
+    },
+    "imageConverter": {
+      "changedImagesOnly": "只改变了图像",
+      "clearLogs": "清除日志",
+      "commands": {
+        "category": "图像转换器",
+        "convertAll": "转换所有",
+        "convertChanged": "转换改变",
+        "showHelp": "展会手册页",
+        "toggleView": "切换图像转换器视图"
+      },
+      "convert": "转换",
+      "done": "已完成",
+      "foundXImages": "找到{0}张图片",
+      "imageConverter": "图像转换器",
+      "noneFound": "没有发现。",
+      "startingToConvertAll": "开始转换所有图像...",
+      "startingToConvertChanged": "开始转换改变的图像..."
+    },
+    "plugins": {
+      "add": "添加",
+      "commands": {
+        "category": "插件",
+        "clearAll": "清除搜索结果",
+        "new": "新插件",
+        "searchByAuthor": "按作者搜索",
+        "searchByTag": "按标签搜索",
+        "showHelp": "展会手册页",
+        "showInstalled": "显示已安装的插件",
+        "showRecommendations": "显示推荐的插件",
+        "showSettings": "显示插件首选项",
+        "toggleView": "切换插件视图"
+      },
+      "dependencies": "依赖性",
+      "installed": "已安装",
+      "noDependencies": "无",
+      "plugin": "插件",
+      "plugins": "插件",
+      "preferences": {
+        "includeLibraryInWorkspaceDescription": "自动包括工作区的插件库。",
+        "includeUserLibraryInWorkspaceDescription": "在工作空间中自动包括用户插件。",
+        "libraryPathDescription": "插件库的完整路径.当留空时,使用内置的VUEngine插件库。",
+        "userLibraryPathDescription": "所有用户插件的基础文件夹的完整路径。"
+      },
+      "recommended": "建议",
+      "remove": "移除",
+      "search": "搜索",
+      "searchPlugins": "搜索插件"
+    },
+    "projects": {
+      "areYouSureYouWantToDelete": "你确定要删除{0}吗?",
+      "author": "作者",
+      "commands": {
+        "category": "项目",
+        "closeProject": "关闭项目",
+        "newProject": "新项目",
+        "openProject": "开放项目...",
+        "openProjectFile": "打开项目文件",
+        "openRecentProject": "打开最近的项目...",
+        "saveProjectAs": "将项目保存为...",
+        "toggleView": "切换项目视图"
+      },
+      "create": "创建",
+      "deleteNodeQuestion": "删除节点?",
+      "errorBasePathDoesNotExist": "错误:基本路径不存在",
+      "errorNoProjectName": "错误:没有提供项目名称",
+      "gameCode": "游戏代码",
+      "makerCode": "制造商代码",
+      "myProject": "我的项目",
+      "name": "命名",
+      "path": "路径",
+      "preferences": {
+        "authorDefault": "VUEngine Studio用户",
+        "authorDescription": "新项目使用的默认作者名称。",
+        "basePathDescription": "新项目的基本路径。",
+        "makerCodeDescription": "在新项目的ROM标题中放置默认的制造者代码。"
+      },
+      "project": "项目",
+      "selectParentFolder": "选择新项目的父文件夹",
+      "settingUpNewProject": "设置新项目",
+      "template": "模板",
+      "templates": {
+        "bareboneDescription": "一个(几乎)空的项目,包括一个单一的 \"Hello World \"屏幕,加上最重要的插件,以增加飞溅屏幕,自动暂停等。",
+        "bareboneTitle": "裸机",
+        "imageViewerDescription": "立体图像查看器。",
+        "imageViewerTitle": "图像浏览器",
+        "multiplayerDescription": "一个简单的类似庞氏的游戏,利用引擎的通信类通过连接线进行多人比赛。",
+        "multiplayerTitle": "多人游戏",
+        "platformerDescription": "一个全功能的单层平台游戏。",
+        "platformerTitle": "平台游戏"
+      },
+      "verifying": "核实"
+    },
+    "rumblePack": {
+      "actions": "行动",
+      "break": "休息",
+      "builtInHapticEffects": "内置的触觉效果",
+      "commands": {
+        "category": "隆隆包",
+        "detectConnected": "检测连接的隆隆声包",
+        "expand": "切换到最大限度",
+        "help": "展会手册页",
+        "openWidget": "打开Rumble Pack工具"
+      },
+      "connected": "已连接",
+      "disconnected": "断线",
+      "effect": "效果",
+      "effects": {
+        "1000MsAlert": "1000毫秒警报",
+        "750MsAlert": "750毫秒警报",
+        "buzz": "嗡嗡声",
+        "doubleClick": "双击",
+        "longBuzzForProgrammaticStopping": "程序化停摆的长篇大论",
+        "longDoubleSharpClickMedium": "长的双倍尖锐的点击中",
+        "longDoubleSharpClickStrong": "长长的双倍尖锐的点击声 强烈的",
+        "longDoubleSharpTick": "长的双锋线",
+        "mediumClick": "中型点击",
+        "pulsingMedium": "脉冲介质",
+        "pulsingSharp": "脉动的尖锐",
+        "pulsingStrong": "脉动强劲",
+        "sharpClick": "锐利的点击",
+        "sharpTick": "锋利的蜱虫",
+        "shortDoubleClickMedium": "短双击中",
+        "shortDoubleClickStrong": "短暂的双击强",
+        "shortDoubleSharpTick": "短暂的双倍锋利的刻度线",
+        "smoothHum": "平滑的嗡嗡声{0}(没有踢脚或刹车脉冲)。",
+        "softBump": "柔软颠簸",
+        "softFuzz": "柔软的绒毛",
+        "strongBuzz": "强劲的嗡嗡声",
+        "strongClick": "强力点击",
+        "transitionClick": "过渡点击",
+        "transitionHum": "过渡期悍马",
+        "transitionRampDownLongSharp": "过渡坡道下的长锐",
+        "transitionRampDownLongSmooth": "过渡坡道下的长光滑",
+        "transitionRampDownMediumSharp": "过渡期内,中度锋利的斜线",
+        "transitionRampDownMediumSmooth": "过渡期的斜坡,中度平滑",
+        "transitionRampDownShortSharp": "过渡坡道下行短促",
+        "transitionRampDownShortSmooth": "过渡坡道下的短平快",
+        "transitionRampUpLongSharp": "过渡期内的斜线长的尖锐",
+        "transitionRampUpLongSmooth": "过渡坡道长而平稳",
+        "transitionRampUpMediumSharp": "过渡期内,中速上升",
+        "transitionRampUpMediumSmooth": "过渡期上升 中等平稳",
+        "transitionRampUpShortSharp": "过渡期短促",
+        "transitionRampUpShortSmooth": "过渡期内短平快",
+        "tripleClick": "三次点击"
+      },
+      "frequency": "頻率",
+      "jsonFormat": "JSON格式",
+      "log": "纪录",
+      "menu": "菜单",
+      "negativeSustain": "负面维持",
+      "overdrive": "超速行驶",
+      "positiveSustain": "积极维持",
+      "printCommands": "打印命令",
+      "reRunLastEffect": "重新运行最后的效果",
+      "rumblePack": "隆隆包",
+      "rumblePackConnected": "连接的隆隆包",
+      "rumblePackConnectionStatus": "Rumble Pack连接状态",
+      "rumblePackTool": "隆隆包工具",
+      "runEffect": "运行效果",
+      "stopCurrentEffect": "停止电流效应",
+      "sustainNeg": "持续(消极)。",
+      "sustainPos": "保持(正)。",
+      "vbCommandLineState": "VB命令行状态",
+      "vbSyncLineState": "VB同步线状态"
+    },
+    "titlebar": {
+      "commands": {
+        "category": "窗口",
+        "maximizeWindow": "最大化窗口",
+        "minimizeWindow": "最小化窗口",
+        "unmaximizeWindow": "解读窗口"
+      }
+    },
+    "updater": {
+      "alreadyUsingLatestVersion": "您已经在使用最新版本的VUEngine Studio。",
+      "applicationUpdate": "应用更新",
+      "commands": {
+        "category": "更新器",
+        "checkForUpdates": "检查更新...",
+        "restartToUpdate": "重新启动以更新"
+      },
+      "downloading": "下载",
+      "never": "从不",
+      "no": "没有",
+      "preferences": {
+        "reportOnStartDescription": "在应用程序启动后报告可用的更新。"
+      },
+      "updateFoundWannaUpdate": "发现更新。你想更新吗?",
+      "updateHasBeenDownloaded": "已经下载了一个更新。你想现在重新启动安装吗?",
+      "viewErrorLog": "查看错误日志",
+      "yes": "是"
+    },
+    "zoom": {
+      "commands": {
+        "category": "查看",
+        "resetZoom": "重置缩放",
+        "zoomIn": "放大",
+        "zoomOut": "缩小"
+      },
+      "preferences": {
+        "showZoomLevelInStatusBarDescription": "在状态栏中显示缩放级别(仅当不是100%时)。",
+        "zoomLevelDescription": "调整窗口的缩放级别。"
+      },
+      "resetZoom": "重置变焦"
+    }
+  }
+}
