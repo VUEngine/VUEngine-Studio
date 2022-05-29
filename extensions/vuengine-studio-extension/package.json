@@ -44,6 +44,7 @@
     "iconv-lite": "^0.6.3",
     "inversify": "^5.1.1",
     "lodash": "^4.17.21",
+    "nanoid": "^3.3.4",
     "nunjucks": "^3.2.3",
     "react-dom": "^16.12.0",
     "replace-in-files": "^3.0.0",
@@ -53,7 +54,6 @@
     "showdown": "^1.9.1",
     "three": "^0.140.2",
     "usb": "^2.4.1",
-    "uuid": "^8.3.2",
     "vscode-uri": "^2.1.1"
   },
   "devDependencies": {

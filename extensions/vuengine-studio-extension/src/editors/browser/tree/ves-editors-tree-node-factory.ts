@@ -1,13 +1,15 @@
 import { TreeEditor } from '@eclipse-emfcloud/theia-tree-editor';
 import { ILogger } from '@theia/core';
 import { inject, injectable } from '@theia/core/shared/inversify';
-import { v4 } from 'uuid';
+import { VesCommonService } from '../../../core/browser/ves-common-service';
 import { VesProjectService } from '../../../project/browser/ves-project-service';
 import { VesEditorsTreeEditorWidget } from './ves-editors-tree-editor-widget';
 import { VesEditorsTreeLabelProvider } from './ves-editors-tree-label-provider';
 
 @injectable()
 export class VesEditorsTreeNodeFactory implements TreeEditor.NodeFactory {
+    @inject(VesCommonService)
+    private readonly vesCommonService: VesCommonService;
     @inject(VesProjectService)
     private readonly vesProjectService: VesProjectService;
 
@@ -85,7 +87,7 @@ export class VesEditorsTreeNodeFactory implements TreeEditor.NodeFactory {
 
     protected defaultNode(): Omit<TreeEditor.Node, 'editorId'> {
         return {
-            id: v4(),
+            id: this.vesCommonService.nanoid(),
             expanded: false,
             selected: false,
             parent: undefined,

@@ -12,7 +12,7 @@ import {
 import { inject, injectable } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { v4 as uuid } from 'uuid';
+import { VesCommonService } from '../../../core/browser/ves-common-service';
 import { VesEditorUri } from '../../../editors/browser/ves-editor-uri';
 import { VesProjectService } from '../ves-project-service';
 import { VesProjectChildNode, VesProjectDocumentChild, VesProjectDocumentsTree, VesProjectRootNode } from './ves-project-tree';
@@ -27,6 +27,8 @@ export class VesProjectTreeWidget extends TreeWidget {
   protected readonly labelProvider: LabelProvider;
   @inject(OpenerService)
   protected readonly openerService: OpenerService;
+  @inject(VesCommonService)
+  protected readonly vesCommonService: VesCommonService;
   @inject(VesProjectService)
   protected readonly vesProjectService: VesProjectService;
 
@@ -223,7 +225,7 @@ export class VesProjectTreeWidget extends TreeWidget {
   }
 
   protected async addNode(typeId: string): Promise<void> {
-    const newItemId = uuid();
+    const newItemId = this.vesCommonService.nanoid();
     // TODO: properly create new item with default values
     this.vesProjectService.setProjectDataItem(typeId, newItemId, {
       typeId,
