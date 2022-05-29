@@ -93,7 +93,7 @@ export interface ProjectFileTemplate {
   target: string
   template: URI | string
   encoding?: ProjectFileTemplateEncoding
-  events: ProjectFileTemplateEventType[]
+  events: ProjectFileTemplateEvent[]
 }
 
 export interface WithContributor {
@@ -107,4 +107,15 @@ export enum ProjectFileTemplateMode {
 export enum ProjectFileTemplateEncoding {
   utf8 = 'utf8',
   win1252 = 'win1252',
+}
+
+export interface ProjectFileItemSaveEvent {
+  typeId: string
+  itemId: string
+  item: ProjectFileItem
+}
+
+export interface ProjectFileItemDeleteEvent {
+  typeId: string
+  itemId: string
 }

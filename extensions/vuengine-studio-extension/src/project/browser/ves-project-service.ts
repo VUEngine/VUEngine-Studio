@@ -5,6 +5,7 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
@@ -13,7 +14,19 @@ import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-
 import { USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } from '../../plugins/browser/ves-plugins-types';
 import { VUENGINE_EXT } from '../common/custom-project-file/ves-project-utils';
 import { VesNewProjectTemplate } from './new-project/ves-new-project-form';
-import { ProjectFile, ProjectFileItems, ProjectFileTemplate, ProjectFileType, ProjectFileTypes, WithContributor } from './ves-project-types';
+import {
+  ProjectFileItemSaveEvent,
+  ProjectFile,
+  ProjectFileItem,
+  ProjectFileItems,
+  ProjectFileTemplate,
+  ProjectFileType,
+  ProjectFileTypes,
+  WithContributor,
+  ProjectFileItemDeleteEvent,
+  ProjectFileTemplates,
+  ProjectFileItemsByType
+} from './ves-project-types';
 
 const replaceInFiles = require('replace-in-files');
 
@@ -29,6 +42,8 @@ export class VesProjectService {
   private readonly vesPluginsPathsService: VesPluginsPathsService;
   @inject(WorkspaceService)
   private readonly workspaceService: WorkspaceService;
+
+  protected _isWritingProjectFile = false;
 
   protected readonly _ready = new Deferred<void>();
   get ready(): Promise<void> {
@@ -51,10 +66,17 @@ export class VesProjectService {
   };
   protected readonly onDidChangeProjectDataEmitter = new Emitter<void>();
   readonly onDidChangeProjectData = this.onDidChangeProjectDataEmitter.event;
+  protected readonly onDidSaveItemEmitter = new Emitter<ProjectFileItemSaveEvent>();
+  readonly onDidSaveItem = this.onDidSaveItemEmitter.event;
+  protected readonly onDidDeleteItemEmitter = new Emitter<ProjectFileItemDeleteEvent>();
+  readonly onDidDeleteItem = this.onDidDeleteItemEmitter.event;
   getProjectData(): ProjectFile {
     return this._projectData;
   }
-  getProjectDataItems(typeId: string): ProjectFileItems | undefined {
+  getProjectDataItems(): ProjectFileItemsByType | undefined {
+    return this._projectData.items;
+  }
+  getProjectDataItemsForType(typeId: string): ProjectFileItems | undefined {
     return this._projectData.items && this._projectData.items[typeId];
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -68,12 +90,14 @@ export class VesProjectService {
     return this._projectData.combined?.types
       && this._projectData.combined.types[typeId];
   }
+  getProjectDataTemplates(): ProjectFileTemplates | undefined {
+    return this._projectData.combined?.templates;
+  }
   getProjectDataTemplate(templateId: string): ProjectFileTemplate | undefined {
     return this._projectData.combined?.templates
-      && this._projectData.combined.templates[templateId];
+      && this._projectData.combined?.templates[templateId];
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async setProjectDataItem(typeId: string, itemId: string, data: any): Promise<boolean> {
+  async setProjectDataItem(typeId: string, itemId: string, data: ProjectFileItem): Promise<boolean> {
     if (!this._projectData.items) {
       this._projectData.items = {};
     }
@@ -91,8 +115,12 @@ export class VesProjectService {
     if (!this._projectData.combined.items[typeId]) {
       this._projectData.combined.items[typeId] = {};
     }
-    this._projectData.combined.items[typeId][itemId] = data;
+    this._projectData.combined.items[typeId][itemId] = {
+      _contributor: 'project',
+      ...data
+    };
 
+    this.onDidSaveItemEmitter.fire({ typeId, itemId, item: data });
     this.onDidChangeProjectDataEmitter.fire();
     return this.saveProjectFile();
   }
@@ -122,6 +150,7 @@ export class VesProjectService {
       }
     }
 
+    this.onDidDeleteItemEmitter.fire({ typeId, itemId });
     this.onDidChangeProjectDataEmitter.fire();
     return this.saveProjectFile();
 
@@ -139,22 +168,22 @@ export class VesProjectService {
   @postConstruct()
   protected async init(): Promise<void> {
     await this.readProjectData();
+    this._ready.resolve();
+    this.bindEvents();
+  }
 
-    // TODO: react on workspace folders changing
-
-    /* await this.workspaceService.ready;
+  protected async bindEvents(): Promise<void> {
+    // watch for project file changes
+    await this.workspaceService.ready;
     const projectFileUri = this.workspaceService.workspace?.resource;
     if (projectFileUri) {
-      // watch for project config file changes
       this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
-        if (fileChangesEvent.contains(projectFileUri)) {
+        if (!this._isWritingProjectFile && fileChangesEvent.contains(projectFileUri)) {
           await this.readProjectData();
           this.onDidChangeProjectDataEmitter.fire();
         }
       });
-    } */
-
-    this._ready.resolve();
+    }
   }
 
   protected async readProjectData(): Promise<void> {
@@ -229,7 +258,7 @@ export class VesProjectService {
       },
       ...pluginsProjectDataWithContributors,
       {
-        _contributor: 'workspace',
+        _contributor: 'project',
         ...workspaceProjectFileData
       },
     ];
@@ -304,6 +333,7 @@ export class VesProjectService {
     }
 
     try {
+      this._isWritingProjectFile = true;
       this.fileService.writeFile(
         projectFileUri,
         BinaryBuffer.fromString(JSON.stringify({
@@ -311,8 +341,10 @@ export class VesProjectService {
           combined: undefined,
         }, undefined, 4))
       );
+      this._isWritingProjectFile = false;
       return true;
     } catch (error) {
+      this._isWritingProjectFile = false;
       return false;
     }
   }

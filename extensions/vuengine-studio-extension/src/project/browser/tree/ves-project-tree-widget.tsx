@@ -81,7 +81,7 @@ export class VesProjectTreeWidget extends TreeWidget {
             }
 
             if (registeredType.leaf === true) {
-              const registeredTypeChildren = this.vesProjectService.getProjectDataItems(typeId);
+              const registeredTypeChildren = this.vesProjectService.getProjectDataItemsForType(typeId);
               if (registeredTypeChildren) {
                 const id = Object.keys(registeredTypeChildren)[0];
                 childNode.uri = VesEditorUri.toUri(`${typeId}/${id}`);
@@ -94,7 +94,7 @@ export class VesProjectTreeWidget extends TreeWidget {
               // get items of all types
               childTypes.forEach(childType => {
                 const childTypeId = childType.schema.properties?.typeId.const;
-                Object.keys(this.vesProjectService.getProjectDataItems(childTypeId) || {}).forEach(id => {
+                Object.keys(this.vesProjectService.getProjectDataItemsForType(childTypeId) || {}).forEach(id => {
                   const item = this.vesProjectService.getProjectDataItem(childTypeId, id);
                   if (!childNode.children) {
                     childNode.children = [];
@@ -261,7 +261,7 @@ export class VesProjectTreeWidget extends TreeWidget {
         await open(this.openerService, node.member.uri, { mode: 'reveal' });
       } else if (node.member.typeId) {
         // Create a new item for menu entries which are a leaf, but do not have an item yet
-        const type = this.vesProjectService.getProjectDataItems(node.member.typeId);
+        const type = this.vesProjectService.getProjectDataItemsForType(node.member.typeId);
         if (type?.leaf) {
           await this.addNode(node.member.typeId);
         }

@@ -1,3 +1,4 @@
+import { MessageService, nls } from '@theia/core';
 import { PreferenceService } from '@theia/core/lib/browser';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import URI from '@theia/core/lib/common/uri';
@@ -9,12 +10,21 @@ import * as nunjucks from 'nunjucks';
 import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
-import { ProjectFileTemplate, ProjectFileTemplateEncoding, ProjectFileTemplateMode } from '../../project/browser/ves-project-types';
+import {
+  ProjectFileItemDeleteEvent,
+  ProjectFileItemSaveEvent,
+  ProjectFileTemplate,
+  ProjectFileTemplateEncoding,
+  ProjectFileTemplateEventType,
+  ProjectFileTemplateMode
+} from '../../project/browser/ves-project-types';
 
 @injectable()
 export class VesCodeGenService {
   @inject(FileService)
   protected fileService: FileService;
+  @inject(MessageService)
+  protected readonly messageService: MessageService;
   @inject(PreferenceService)
   protected preferenceService: PreferenceService;
   @inject(VesBuildPathsService)
@@ -28,24 +38,47 @@ export class VesCodeGenService {
 
   @postConstruct()
   protected async init(): Promise<void> {
-    this.preferenceService.ready.then(async () => {
-      this.vesPluginsService.ready.then(async () => {
-        await this.configureTemplateEngine();
+    await this.preferenceService.ready;
+    await this.vesPluginsService.ready;
+    await this.configureTemplateEngine();
+    this.bindEvents();
+  }
 
-        this.vesPluginsService.onDidChangeInstalledPlugins(async () =>
-          this.handlePluginChange());
-      });
-    });
+  protected bindEvents(): void {
+    this.vesPluginsService.onDidChangeInstalledPlugins(async () =>
+      this.handlePluginChange());
+
+    this.vesProjectService.onDidSaveItem(async projectFileItemSaveEvent =>
+      this.handleAddItem(projectFileItemSaveEvent));
+
+    this.vesProjectService.onDidDeleteItem(async projectFileItemDeleteEvent =>
+      this.handleDeleteItem(projectFileItemDeleteEvent));
   }
 
   async generateAll(): Promise<void> {
-    /*
-    await Promise.all(Object.keys(this.templates.templates).map(async templateId => {
-      // TODO: make it possible to render all dynamic templates triggered by fileWithEndingChanged,
-      // like BrightnessRepeatSpec.c
-      await this.renderTemplate(templateId);
-    }));
-    */
+    const types = this.vesProjectService.getProjectDataTypes();
+    const items = this.vesProjectService.getProjectDataItems();
+    if (items && types) {
+      await Promise.all(Object.values(items).map(async itemsForType =>
+        Promise.all(Object.keys(itemsForType).map(async itemId => {
+          const item = {
+            ...itemsForType[itemId],
+            _id: itemId,
+          };
+          // @ts-ignore
+          const type = Object.values(types).find(t => t?.schema.properties?.typeId.const === item.typeId);
+          if (type?.templates) {
+            await Promise.all(type?.templates.map(async templateId => {
+              await this.renderTemplate(templateId, item);
+            }));
+          }
+        }))
+      ));
+    }
+
+    this.messageService.info(
+      nls.localize('vuengine/codegen/generateAllDone', 'Done generating files.')
+    );
   }
 
   async renderTemplateToFile(targetUri: URI, templateString: string, data: object, encoding: ProjectFileTemplateEncoding = ProjectFileTemplateEncoding.utf8): Promise<void> {
@@ -81,9 +114,47 @@ export class VesCodeGenService {
   }
 
   protected async handlePluginChange(): Promise<void> {
-    /* this.templates.events.installedPluginsChanged.map(async templateId => {
-      await this.renderTemplate(templateId);
-    }); */
+    const templates = this.vesProjectService.getProjectDataTemplates();
+    if (templates) {
+      await Promise.all(Object.keys(templates).map(async templateId => {
+        const template = templates[templateId];
+        if (template.events) {
+          await Promise.all(template.events.map(async event => {
+            if (event.type === ProjectFileTemplateEventType.installedPluginsChanged) {
+              await this.renderTemplate(templateId);
+            }
+          }));
+        }
+      }));
+    }
+  }
+
+  protected async handleAddItem(projectFileItemSaveEvent: ProjectFileItemSaveEvent): Promise<void> {
+    const typeData = this.vesProjectService.getProjectDataType(projectFileItemSaveEvent.typeId);
+    if (typeData && typeData.templates) {
+      await Promise.all(typeData.templates.map(async templateId =>
+        this.renderTemplate(templateId, {
+          ...projectFileItemSaveEvent.item,
+          _id: projectFileItemSaveEvent.itemId
+        })));
+    }
+  }
+
+  protected async handleDeleteItem(projectFileItemDeleteEvent: ProjectFileItemDeleteEvent): Promise<void> {
+    const templates = this.vesProjectService.getProjectDataTemplates();
+    if (templates) {
+      await Promise.all(Object.keys(templates).map(async templateId => {
+        const template = templates[templateId];
+        if (template.events) {
+          await Promise.all(template.events.map(async templateEvent => {
+            if (templateEvent.type === ProjectFileTemplateEventType.itemOfTypeGotDeleted
+              && templateEvent.value === projectFileItemDeleteEvent.typeId) {
+              await this.renderTemplate(templateId);
+            }
+          }));
+        }
+      }));
+    }
   }
 
   protected async renderFileFromTemplate(
@@ -102,14 +173,14 @@ export class VesCodeGenService {
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     if (workspaceRootUri) {
-      template.target = template.target
+      const target = template.target
         .replace(/\$\{([\s\S]*?)\}/ig, match => {
           match = match.substring(2, match.length - 1);
           // @ts-ignore
           return this.getByKey(data.item, match);
         });
 
-      const targetPathParts = template.target.split('/');
+      const targetPathParts = target.split('/');
       let targetUri = workspaceRootUri;
       targetPathParts.forEach(targetPathPart => {
         targetUri = targetUri.resolve(targetPathPart);
