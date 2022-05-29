@@ -1,0 +1,481 @@
+{
+  "theia": {
+    "workspace": {
+      "closeWorkspace": "Вы действительно хотите закрыть проект?",
+      "openRecentPlaceholder": "Введите название проекта, который вы хотите открыть",
+      "preserveWindow": "Разрешить открытие проектов в текущем окне."
+    }
+  },
+  "vuengine": {
+    "about": {
+      "and": "и",
+      "thankYouToOurSupporters": "Спасибо нашим сторонникам на Patreon!",
+      "title": "О студии VUEngine",
+      "version": "Версия",
+      "vsCodeApiVersion": "Версия API VSCode"
+    },
+    "build": {
+      "abortBuild": "Прервать сборку",
+      "build": "Построить",
+      "buildMode": "Режим строительства",
+      "buildProject": "Построить проект",
+      "buildSuccessful": "Добиться успеха",
+      "buildSuccessfulWithWarnings": "Построение успешно (с предупреждениями)",
+      "building": "Здание",
+      "commandCompleted": "Команда {0} выполнена.",
+      "commands": {
+        "build": "Построить проект",
+        "category": "Построить",
+        "clean": "Чистая папка сборки",
+        "expandView": "Переключение максимизации",
+        "setMode": "Установите режим строительства...",
+        "showHelp": "Страница справочника выставки",
+        "showSettings": "Показать предпочтения сборки",
+        "toggleDumpElf": "Toggle Dump ELF",
+        "togglePedanticWarnings": "Toggle Педантичные предупреждения",
+        "toggleView": "Переключить вид сборки"
+      },
+      "couldNotFindCommand": "Не удалось найти команду {0}.",
+      "couldNotRunTask": "Не удалось запустить задачу {0}.",
+      "done": "Выполнено",
+      "dumpElf": "Выбросить ELF",
+      "errorCouldNotFindMakefile": "Ошибка: Не удалось найти makefile. Пробовал в следующих местах:",
+      "errorEnginePathMustNotContainSpaces": "Ошибка: Путь к двигателю не должен содержать пробелов. Ваш путь к двигателю:",
+      "errorPluginsPathMustNotContainSpaces": "Ошибка: Путь к плагинам не должен содержать пробелов. Путь к вашим плагинам:",
+      "errorProjectPathMustNotContainSpaces": "Ошибка: Путь к проекту не должен содержать пробелов. Путь к вашему проекту:",
+      "errorUserPluginsPathMustNotContainSpaces": "Ошибка: Путь к плагинам пользователя не должен содержать пробелов. Путь к вашим пользовательским плагинам:",
+      "malformedPreferenceMissingTaskName": "Некорректное предпочтение: отсутствует имя задачи.",
+      "malformedPreferenceMissingTaskType": "Некорректное предпочтение: отсутствует тип для задачи {0}.",
+      "malformedPreferenceNotAnArray": "Некорректное предпочтение: не массив.",
+      "mode": "Режим",
+      "modes": {
+        "betaDescription": "Включает выбранные утверждения для тестирования производительности на аппаратном обеспечении.",
+        "debugDescription": "Включает все утверждения во время выполнения, включает средства отладки.",
+        "releaseDescription": "Не содержит ассертов и флагов отладки, только для доставки.",
+        "toolsDescription": "Включает выбранные ассерты, включает инструменты отладки."
+      },
+      "noTasksFound": "Заданий не найдено.",
+      "pedanticWarnings": "Педантичные предупреждения",
+      "pleaseInstallWsl": "Пожалуйста, рассмотрите возможность установки WSL для значительного улучшения времени сборки.",
+      "postBuildTasks": "Задачи после сборки",
+      "preBuildTasks": "Задачи предварительной сборки",
+      "preferences": {
+        "dumpElfDescription": "Выгрузка ассемблерного кода и участков памяти.",
+        "engineCorePathDescription": "Полный путь к основной библиотеке. Используется встроенное ядро VUEngine Core, если оставить его пустым.",
+        "includeEngineCoreInWorkspaceDescription": "Автоматическое включение библиотеки ядра в рабочие пространства.",
+        "pedanticWarningsDescription": "Включите педантичные предупреждения компилятора.",
+        "postBuildTasksDescription": "Список задач и команд, которые необходимо выполнить после сборки.",
+        "preBuildTasksDescription": "Список задач и команд, которые необходимо выполнить перед началом строительства."
+      },
+      "runningPostBuildTasks": "Выполнение задач после сборки",
+      "runningPreBuildTasks": "Выполнение задач предварительной сборки",
+      "setBuildModePlaceholder": "Выберите, в каком режиме строить",
+      "setBuildModeTitle": "Установите режим сборки",
+      "showOnlyErrors": "Показывать только ошибки",
+      "showOnlyWarnings": "Показывать только предупреждения",
+      "taskCompleted": "Задание {0} выполнено.",
+      "taskTerminatedBySignal": "Задание {0} завершено сигналом {1}.",
+      "taskTerminatedForUnknownReason": "Задание {0} завершено по неизвестной причине.",
+      "taskTerminatedWithExitCode": "Задание {0} завершилось с кодом выхода {1}.",
+      "toggleAutomaticScrolling": "Включить автоматическую прокрутку"
+    },
+    "codegen": {
+      "commands": {
+        "category": "Генератор кодов",
+        "generateAll": "Создать все"
+      },
+      "generateAllDone": "Генерация файлов завершена."
+    },
+    "documentation": {
+      "commands": {
+        "category": "Документация",
+        "openHandbook": "Открытый справочник",
+        "openTechScroll": "Открытая документация по аппаратному обеспечению"
+      },
+      "documentation": "Документация",
+      "hardwareDocumentation": "Документация по аппаратному обеспечению",
+      "vuengineStudioHandbook": "Руководство по VUEngine Studio"
+    },
+    "editors": {
+      "areYouSureYouWantToDeleteItem": "Вы уверены, что хотите удалить {0} {1}?",
+      "chooseAnItemPlaceholder": "Выберите элемент, который вы хотите отредактировать",
+      "chooseAnItemTitle": "Выберите элемент",
+      "commands": {
+        "category": "Редакция",
+        "open": "Открытый редактор"
+      },
+      "deleteNodeQuestion": "Удалить узел?",
+      "palette": {
+        "black": "Черный",
+        "brightRed": "Ярко-красный",
+        "darkRed": "Темно-красный",
+        "mediumRed": "Средний красный"
+      },
+      "visualEditor": "Визуальный редактор"
+    },
+    "emulator": {
+      "builtIn": "Встроенный",
+      "commands": {
+        "category": "Эмулятор",
+        "run": "Запуск на эмуляторе",
+        "selectEmulator": "Установить конфигурацию эмулятора по умолчанию..."
+      },
+      "configureInput": "Настроить вход",
+      "controller": {
+        "aCommand": "A",
+        "bCommand": "B",
+        "category": "Эмулятор Game Pad",
+        "lDownCommand": "Левый D-Pad ⇩",
+        "lLeftCommand": "Левый D-Pad ⇦",
+        "lRightCommand": "Левый D-Pad ⇨",
+        "lTriggerCommand": "Левый триггер",
+        "lUpCommand": "Левый D-Pad ⇧",
+        "rDownCommand": "Правый D-Pad ⇩",
+        "rLeftCommand": "Правый D-Pad ⇦",
+        "rRightCommand": "Правый D-Pad ⇨",
+        "rTriggerCommand": "Правый триггер",
+        "rUpCommand": "Правый D-Pad ⇧",
+        "selectCommand": "Выберите",
+        "startCommand": "Начало"
+      },
+      "currentSaveState": "Текущее состояние сохранения",
+      "emulationMode": "Режим эмуляции",
+      "emulationModes": {
+        "accurate": "Точный",
+        "fast": "Быстрый"
+      },
+      "emulator": "Эмулятор",
+      "input": {
+        "audioMuteCommand": "Отключение звука",
+        "frameAdvanceCommand": "Продвижение рамы",
+        "fullscreenCommand": "Полный экран",
+        "loadStateCommand": "Состояние нагрузки",
+        "pauseToggleCommand": "Переключение паузы",
+        "resetCommand": "Сброс",
+        "rewindCommand": "Перемотка",
+        "saveStateCommand": "Сохранить государство",
+        "screenshotCommand": "Сделать скриншот",
+        "stateSlotDecreaseCommand": "Уменьшение Сохранить состояние слота",
+        "stateSlotIncreaseCommand": "Увеличить слот для сохранения состояния",
+        "toggleControlsOverlayCommand": "Переключение наложения элементов управления",
+        "toggleFastForwardCommand": "Переключение перемотки вперед",
+        "toggleLowPower": "Переключение сигнала низкого энергопотребления",
+        "toggleSlowmotionCommand": "Переключение замедленного движения"
+      },
+      "mute": "Отключить звук",
+      "pause": "Пауза",
+      "preferences": {
+        "builtInEmulationModeDescription": "Режим эмуляции встроенного эмулятора.",
+        "builtInScalingModeDescription": "Режим масштабирования встроенного эмулятора.",
+        "builtInStereoModeDescription": "Режим стереоскопического отображения встроенного эмулятора.",
+        "customConfigsDescription": "Определяемые пользователем конфигурации эмулятора для запуска скомпилированных ПЗУ.",
+        "customDefaultDescription": "Конфигурация эмулятора, который будет использоваться для запуска скомпилированных ПЗУ. Если оставить пустым, используется встроенный эмулятор."
+      },
+      "resume": "Резюме",
+      "runQueued": "Запуск в очереди",
+      "scale": "Лестницы",
+      "scales": {
+        "auto": "Автомобиль",
+        "stretch": "Растяжка"
+      },
+      "selectDefaultEmulatorPlaceholder": "Какую конфигурацию эмулятора следует использовать для запуска скомпилированных проектов?",
+      "selectDefaultEmulatorTitle": "Выберите конфигурацию эмулятора по умолчанию",
+      "showHelp": "Страница справочника выставки",
+      "stereoMode": "Стерео режим",
+      "stereoModes": {
+        "2dBlackBlue": "2D (синий/черный)",
+        "2dBlackCyan": "2D (голубой/черный)",
+        "2dBlackElectricCyan": "2D (эл.голубой/черный)",
+        "2dBlackGreen": "2D (зеленый/черный)",
+        "2dBlackMagenta": "2D (пурпурный/черный)",
+        "2dBlackRed": "2D (красный/черный)",
+        "2dBlackWhite": "2D (белый/черный)",
+        "2dBlackYellow": "2D (желтый/черный)",
+        "anaglyph-redElectricCyan": "Анаглиф (красный/голубой)",
+        "anaglyphGreenMagenta": "Анаглиф (красный/зеленый)",
+        "anaglyphRedBlue": "Анаглиф (красный/синий)",
+        "anaglyphRedCyan": "Анаглиф (красный/голубой)",
+        "anaglyphYellowBlue": "Анаглиф (желтый/синий)",
+        "cyberscope": "CyberScope",
+        "hli": "Горизонтальная линия Чересстрочная",
+        "sideBySide": "Бок о бок",
+        "vli": "Вертикальная линия Чересстрочная"
+      },
+      "unmute": "Отключить"
+    },
+    "export": {
+      "commands": {
+        "category": "Экспорт",
+        "export": "Экспорт ПЗУ..."
+      },
+      "doYouReallyWantToOverwrite": "Вы действительно хотите перезаписать {0}?",
+      "exportRom": "Экспорт ПЗУ",
+      "overwrite": "Перезаписать"
+    },
+    "flashCarts": {
+      "abort": "Прервать",
+      "cancel": "Отмена",
+      "commands": {
+        "category": "Flash Carts",
+        "detectConnected": "Обнаружение подключенных флеш-карт",
+        "expandView": "Переключение максимизации",
+        "flash": "Flash to Flash Cart",
+        "showHelp": "Страница справочника выставки",
+        "showSettings": "Показать настройки Flash Carts",
+        "toggleView": "Переключить просмотр флэш-карт"
+      },
+      "connectYourFlashCarts": "Подключите флеш-карту(ы) Virtual Boy к компьютеру через USB.",
+      "connectedFlashCarts": "Подключенные флеш-карты",
+      "done": "Выполнено",
+      "flash": "Flash",
+      "flashCarts": "Flash Carts",
+      "flasherSoftwareDoesNotExist": "Программное обеспечение прошивальщика не существует по адресу {0}.",
+      "flashingIsQueued": "Прошивка поставлена в очередь и начнется, как только сборка будет готова",
+      "flashingQueued": "Мигает Очередь",
+      "insufficientSpaceToHoldRom": "Недостаточно места для хранения ПЗУ",
+      "noPathToFlasherSoftwareProvided": "Для корзины {0} не указан путь к программе-прошивальщику.",
+      "noneFound": "Флэш-карт не найдено",
+      "preferences": {
+        "flashCartsDescription": "Конфигурации для автоопределения и мигания флэш-карт."
+      },
+      "youCanConnectAnyNumberOfCarts": "Вы можете одновременно подключать и прошивать любое количество флеш-карт."
+    },
+    "general": {
+      "commands": {
+        "category": "Студия VUEngine",
+        "reportIssue": "Выпуск отчета",
+        "support": "Поддержка VUEngine Studio"
+      },
+      "selectDirectory": "Выберите каталог",
+      "space": "Космос",
+      "themes": {
+        "dark": "Темный",
+        "highContrast": "Высокая контрастность",
+        "light": "Свет",
+        "virtualBoy": "Виртуальный мальчик"
+      }
+    },
+    "gettingStarted": {
+      "alwaysShowThisPage": "Всегда показывать эту страницу, если ни один проект не открыт.",
+      "commands": {
+        "showHelp": "Страница справочника выставки",
+        "showWidget": "Начало работы"
+      },
+      "links": "Ссылки",
+      "preferences": {
+        "showGettingStartedDescription": "Показывать страницу \"Начало работы\", если не открыт ни один проект."
+      },
+      "showDocumentation": "Показать документацию",
+      "supportUsOnPatreon": "Поддержите нас на Patreon",
+      "vuengineWebsite": "Веб-сайт VUEngine"
+    },
+    "handbook": {
+      "handbook": "Справочник"
+    },
+    "imageConverter": {
+      "changedImagesOnly": "Только измененные изображения",
+      "clearLogs": "Очистить журналы",
+      "commands": {
+        "category": "Конвертер изображений",
+        "convertAll": "Преобразовать все",
+        "convertChanged": "Преобразование изменилось",
+        "showHelp": "Страница справочника выставки",
+        "toggleView": "Переключить вид конвертера изображений"
+      },
+      "convert": "Конвертировать",
+      "done": "Выполнено",
+      "foundXImages": "Найдено {0} изображений",
+      "imageConverter": "Конвертер изображений",
+      "noneFound": "Не найдено.",
+      "startingToConvertAll": "Начинаем конвертировать все изображения...",
+      "startingToConvertChanged": "Начинаем конвертировать измененные изображения..."
+    },
+    "plugins": {
+      "add": "Добавить",
+      "commands": {
+        "category": "Плагины",
+        "clearAll": "Очистить результаты поиска",
+        "new": "Новый плагин",
+        "searchByAuthor": "Поиск по автору",
+        "searchByTag": "Поиск по тегам",
+        "showHelp": "Страница справочника выставки",
+        "showInstalled": "Показать установленные плагины",
+        "showRecommendations": "Показать рекомендуемые плагины",
+        "showSettings": "Показать настройки плагинов",
+        "toggleView": "Переключить просмотр плагинов"
+      },
+      "dependencies": "Зависимости",
+      "installed": "Установлено",
+      "noDependencies": "Нет",
+      "plugin": "Плагин",
+      "plugins": "Плагины",
+      "preferences": {
+        "includeLibraryInWorkspaceDescription": "Автоматическое включение библиотеки плагинов в рабочие пространства.",
+        "includeUserLibraryInWorkspaceDescription": "Автоматическое включение пользовательских плагинов в рабочие пространства.",
+        "libraryPathDescription": "Полный путь к библиотеке плагинов. Используется встроенная библиотека плагинов VUEngine Plugins, если не указан.",
+        "userLibraryPathDescription": "Полный путь к базовой папке для всех пользовательских плагинов."
+      },
+      "recommended": "Рекомендуется",
+      "remove": "Удалить",
+      "search": "Поиск",
+      "searchPlugins": "Поисковые плагины"
+    },
+    "projects": {
+      "areYouSureYouWantToDelete": "Вы уверены, что хотите удалить {0}?",
+      "author": "Автор",
+      "commands": {
+        "category": "Проекты",
+        "closeProject": "Закрыть проект",
+        "newProject": "Новый проект",
+        "openProject": "Открытый проект...",
+        "openProjectFile": "Открыть файл проекта",
+        "openRecentProject": "Открыть недавний проект...",
+        "saveProjectAs": "Сохранить проект как...",
+        "toggleView": "Переключить вид проекта"
+      },
+      "create": "Создать",
+      "deleteNodeQuestion": "Удалить узел?",
+      "errorBasePathDoesNotExist": "Ошибка: базовый путь не существует",
+      "errorNoProjectName": "Ошибка: не указано имя проекта",
+      "gameCode": "Игровой код",
+      "makerCode": "Код создателя",
+      "myProject": "Мой проект",
+      "name": "Имя",
+      "path": "Путь",
+      "preferences": {
+        "authorDefault": "Пользователь VUEngine Studio",
+        "authorDescription": "Имя автора по умолчанию, используемое для новых проектов.",
+        "basePathDescription": "Базовый путь для новых проектов.",
+        "makerCodeDescription": "Код создателя по умолчанию для размещения в заголовке ROM новых проектов."
+      },
+      "project": "Проект",
+      "selectParentFolder": "Выберите родительскую папку нового проекта",
+      "settingUpNewProject": "Настройка нового проекта",
+      "template": "Шаблон",
+      "templates": {
+        "bareboneDescription": "(Почти) пустой проект, включающий единственный экран \"Hello World\" плюс наиболее важные плагины для добавления заставки, автоматической паузы и многого другого.",
+        "bareboneTitle": "Barebone",
+        "imageViewerDescription": "Программа просмотра стереоизображений.",
+        "imageViewerTitle": "Просмотрщик изображений",
+        "multiplayerDescription": "Простая игра в стиле Pong, использующая класс связи движка для многопользовательских матчей через кабель связи.",
+        "multiplayerTitle": "Многопользовательская игра",
+        "platformerDescription": "Полнофункциональная одноуровневая игра-платформер.",
+        "platformerTitle": "Платформенная игра"
+      },
+      "verifying": "Проверка"
+    },
+    "rumblePack": {
+      "actions": "Действия",
+      "break": "Перерыв",
+      "builtInHapticEffects": "Встроенные тактильные эффекты",
+      "commands": {
+        "category": "Rumble Pack",
+        "detectConnected": "Detect Connected Rumble Pack",
+        "expand": "Переключение максимизации",
+        "help": "Страница справочника выставки",
+        "openWidget": "Откройте инструмент Rumble Pack"
+      },
+      "connected": "Подключено",
+      "disconnected": "Отключено",
+      "effect": "Эффект",
+      "effects": {
+        "1000MsAlert": "1000 мс Оповещение",
+        "750MsAlert": "750 мс Оповещение",
+        "buzz": "Базз",
+        "doubleClick": "Двойной щелчок",
+        "longBuzzForProgrammaticStopping": "Длинный бум для программной остановки",
+        "longDoubleSharpClickMedium": "Длинный Двойной Резкий Щелчок Средний",
+        "longDoubleSharpClickStrong": "Длинный Двойной Резкий Щелчок Сильный",
+        "longDoubleSharpTick": "Длинный двойной острый тик",
+        "mediumClick": "Средний щелчок",
+        "pulsingMedium": "Пульсирующая среда",
+        "pulsingSharp": "Пульсирующий острый",
+        "pulsingStrong": "Пульсирующий сильный",
+        "sharpClick": "Резкий щелчок",
+        "sharpTick": "Острый тик",
+        "shortDoubleClickMedium": "Короткая Двойное нажатие Средняя",
+        "shortDoubleClickStrong": "Короткий двойной щелчок Сильный",
+        "shortDoubleSharpTick": "Короткий двойной острый тик",
+        "smoothHum": "Плавный гул {0} (Нет импульса толчка или торможения)",
+        "softBump": "Мягкий удар",
+        "softFuzz": "Мягкий пух",
+        "strongBuzz": "Сильный кайф",
+        "strongClick": "Сильный щелчок",
+        "transitionClick": "Щелчок при переходе",
+        "transitionHum": "Переходный хам",
+        "transitionRampDownLongSharp": "Переходная рампа вниз длинная острая",
+        "transitionRampDownLongSmooth": "Переходная рампа вниз длинная гладкая",
+        "transitionRampDownMediumSharp": "Переходная рампа вниз Средняя резкость",
+        "transitionRampDownMediumSmooth": "Переход Рампа вниз Средняя плавность",
+        "transitionRampDownShortSharp": "Переход рампа вниз короткая резкая",
+        "transitionRampDownShortSmooth": "Переходная рампа вниз короткая плавная",
+        "transitionRampUpLongSharp": "Переходная рампа длинная острая",
+        "transitionRampUpLongSmooth": "Переходная рампа вверх длинная гладкая",
+        "transitionRampUpMediumSharp": "Переходная рампа Вверх Средне резкий",
+        "transitionRampUpMediumSmooth": "Переход Рампа вверх Средняя плавность",
+        "transitionRampUpShortSharp": "Переходная рампа короткая резкая",
+        "transitionRampUpShortSmooth": "Переход рампа вверх короткая плавная",
+        "tripleClick": "Тройной клик"
+      },
+      "frequency": "Частота",
+      "jsonFormat": "формат JSON",
+      "log": "Журнал",
+      "menu": "Меню",
+      "negativeSustain": "Отрицательная устойчивость",
+      "overdrive": "Overdrive",
+      "positiveSustain": "Положительная устойчивость",
+      "printCommands": "Команды печати",
+      "reRunLastEffect": "Повторное выполнение последнего эффекта",
+      "rumblePack": "Rumble Pack",
+      "rumblePackConnected": "Rumble Pack Connected",
+      "rumblePackConnectionStatus": "Состояние подключения Rumble Pack",
+      "rumblePackTool": "Инструмент для грохота",
+      "runEffect": "Эффект бега",
+      "stopCurrentEffect": "Остановить действие тока",
+      "sustainNeg": "Устойчивость (отриц.)",
+      "sustainPos": "Выдержка (поз.)",
+      "vbCommandLineState": "Состояние командной строки VB",
+      "vbSyncLineState": "Состояние линии синхронизации VB"
+    },
+    "titlebar": {
+      "commands": {
+        "category": "Окно",
+        "maximizeWindow": "Максимизировать окно",
+        "minimizeWindow": "Минимизировать окно",
+        "unmaximizeWindow": "Окно без максимизации"
+      }
+    },
+    "updater": {
+      "alreadyUsingLatestVersion": "Вы уже используете последнюю версию VUEngine Studio.",
+      "applicationUpdate": "Обновление приложения",
+      "commands": {
+        "category": "Updater",
+        "checkForUpdates": "Проверьте обновления...",
+        "restartToUpdate": "Перезагрузка для обновления"
+      },
+      "downloading": "Загрузка",
+      "never": "Никогда",
+      "no": "Нет",
+      "preferences": {
+        "reportOnStartDescription": "Сообщать о доступных обновлениях после запуска приложения."
+      },
+      "updateFoundWannaUpdate": "Обновления найдены. Вы хотите обновить?",
+      "updateHasBeenDownloaded": "Обновление было загружено. Хотите ли вы перезапустить установку сейчас?",
+      "viewErrorLog": "Просмотр журнала ошибок",
+      "yes": "Да"
+    },
+    "zoom": {
+      "commands": {
+        "category": "Посмотреть",
+        "resetZoom": "Сброс масштаба",
+        "zoomIn": "Увеличить",
+        "zoomOut": "Уменьшить масштаб"
+      },
+      "preferences": {
+        "showZoomLevelInStatusBarDescription": "Показывать уровень масштабирования в строке состояния (только если не 100%).",
+        "zoomLevelDescription": "Настройте уровень масштабирования окна."
+      },
+      "resetZoom": "Сброс масштаба"
+    }
+  }
+}

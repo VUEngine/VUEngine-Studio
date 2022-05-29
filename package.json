@@ -38,7 +38,9 @@
     "lint": "lerna run lint",
     "modules:init": "git submodule update --init",
     "modules:update": "git submodule update --recursive --remote",
-    "nls-extract": "theia nls-extract -o extensions/vuengine-studio-extension/i18n/nls.json -r extensions/vuengine-studio-extension -m",
+    "nls": "yarn nls-extract && yarn nls-localize $1",
+    "nls-extract": "theia nls-extract -o extensions/vuengine-studio-extension/i18n/nls.json -r extensions/vuengine-studio-extension -m true",
+    "nls-localize": "theia nls-localize CS DE ES FR HU IT JA PL PT-BR PT-PT RU ZH-CN -f extensions/vuengine-studio-extension/i18n/nls.json --free-api true -k $1",
     "prepare": "lerna run prepare",
     "test": "lerna run test",
     "watch": "lerna run --parallel watch"

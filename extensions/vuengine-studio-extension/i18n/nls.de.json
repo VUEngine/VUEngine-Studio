@@ -22,7 +22,7 @@
             "buildSuccessful": "Build erfolgreich",
             "buildSuccessfulWithWarnings": "Build erfolgreich (mit Warnungen)",
             "building": "Bauen",
-            "commandCompleted": "Befehl \"{0}\" abgeschlossen.",
+            "commandCompleted": "Befehl {0} abgeschlossen.",
             "commands": {
                 "build": "Projekt bauen",
                 "category": "Bauen",
@@ -35,8 +35,8 @@
                 "togglePedanticWarnings": "Pedantische Warnungen ein- und ausschalten",
                 "toggleView": "Build-Ansicht umschalten"
             },
-            "couldNotFindCommand": "Der Befehl \"{0}\" konnte nicht gefunden werden.",
-            "couldNotRunTask": "Aufgabe \"{0}\" konnte nicht ausgeführt werden.",
+            "couldNotFindCommand": "Der Befehl {0} konnte nicht gefunden werden.",
+            "couldNotRunTask": "Aufgabe {0} konnte nicht ausgeführt werden.",
             "done": "Erledigt",
             "dumpElf": "ELF dumpen",
             "errorCouldNotFindMakefile": "Fehler: Konnte kein Makefile finden. Ich habe es an folgenden Stellen versucht:",
@@ -73,17 +73,18 @@
             "setBuildModeTitle": "Build-Modus festlegen",
             "showOnlyErrors": "Nur Fehler anzeigen",
             "showOnlyWarnings": "Nur Warnungen anzeigen",
-            "taskCompleted": "Aufgabe \"{0}\" abgeschlossen.",
-            "taskTerminatedBySignal": "Aufgabe \"{0}\" wurde durch Signal {1} beendet.",
-            "taskTerminatedForUnknownReason": "Aufgabe \"{0}\" aus unbekanntem Grund abgebrochen.",
-            "taskTerminatedWithExitCode": "Aufgabe \"{0}\" wurde mit Exit-Code {1} beendet.",
+            "taskCompleted": "Aufgabe {0} abgeschlossen.",
+            "taskTerminatedBySignal": "Aufgabe {0} wurde durch Signal {1} beendet.",
+            "taskTerminatedForUnknownReason": "Aufgabe {0} aus unbekanntem Grund abgebrochen.",
+            "taskTerminatedWithExitCode": "Aufgabe {0} wurde mit Exit-Code {1} beendet.",
             "toggleAutomaticScrolling": "Automatischen Bildlauf umschalten"
         },
         "codegen": {
             "commands": {
                 "category": "Code-Generator",
                 "generateAll": "Alle generieren"
-            }
+            },
+            "generateAllDone": "Die Generierung aller Dateien ist abgeschlossen."
         },
         "documentation": {
             "commands": {
@@ -96,7 +97,7 @@
             "vuengineStudioHandbook": "VUEngine Studio-Handbuch"
         },
         "editors": {
-            "areYouSureYouWantToDeleteItem": "Sind Sie sicher, dass Sie den Eintrag {0} \"{1}\" löschen wollen?",
+            "areYouSureYouWantToDeleteItem": "Sind Sie sicher, dass Sie den Eintrag {0} {1} löschen wollen?",
             "chooseAnItemPlaceholder": "Wählen Sie das Element, das Sie bearbeiten möchten",
             "chooseAnItemTitle": "Wählen Sie ein Element",
             "commands": {
@@ -207,7 +208,7 @@
                 "category": "Exportieren",
                 "export": "ROM exportieren..."
             },
-            "doYouReallyWantToOverwrite": "Wollen Sie wirklich \"${0}\" überschreiben?",
+            "doYouReallyWantToOverwrite": "Wollen Sie wirklich {0} überschreiben?",
             "exportRom": "ROM exportieren",
             "overwrite": "Überschreiben"
         },
@@ -228,9 +229,11 @@
             "done": "Erledigt",
             "flash": "Flashen",
             "flashCarts": "Flash-Karten",
+            "flasherSoftwareDoesNotExist": "Flasher-Software existiert nicht unter {0}",
             "flashingIsQueued": "Das Flashen steht in der Warteschlange und wird gestartet, sobald der Build fertig ist.",
             "flashingQueued": "Flashen in der Warteschlange",
             "insufficientSpaceToHoldRom": "Unzureichender Speicherplatz für ROM",
+            "noPathToFlasherSoftwareProvided": "Kein Pfad zur Flasher-Software für Wagen {0} angegeben",
             "noneFound": "Keine Flash-Karten gefunden",
             "preferences": {
                 "flashCartsDescription": "Konfigurationen für die automatische Erkennung und das Flashen von Flash-Karten."
@@ -318,7 +321,7 @@
             "searchPlugins": "Plugins durchsuchen"
         },
         "projects": {
-            "areYouSureYouWantToDelete": "Sind Sie sicher, dass Sie \"{0}\" löschen möchten?",
+            "areYouSureYouWantToDelete": "Sind Sie sicher, dass Sie {0} löschen möchten?",
             "author": "Autor",
             "commands": {
                 "category": "Projekte",
@@ -347,6 +350,7 @@
             },
             "project": "Projekt",
             "selectParentFolder": "Wählen Sie den Basis-Ordner für neue Projekte",
+            "settingUpNewProject": "Richte neues Projekt ein",
             "template": "Vorlage",
             "templates": {
                 "bareboneDescription": "Ein (fast) leeres Projekt, das einen einzigen \"Hello World\"-Bildschirm sowie die wichtigsten Plugins zum Hinzufügen von Splash-Screens, automatischen Pausen und mehr enthält.",

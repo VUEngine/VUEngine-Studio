@@ -1,21 +1,21 @@
 import { ApplicationShell, PreferenceService } from '@theia/core/lib/browser';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
-import { CommandService, isWindows, MessageService } from '@theia/core/lib/common';
+import { CommandService, isWindows, MessageService, nls } from '@theia/core/lib/common';
 import { BinaryBufferWriteableStream } from '@theia/core/lib/common/buffer';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { VesCommonService } from '../../core/browser/ves-common-service';
+import IMAGE_FLASHBOY_PLUS from '../../../src/flash-cart/browser/images/flashboy-plus.png';
+import IMAGE_HYPERBOY from '../../../src/flash-cart/browser/images/HyperBoy.png';
+import IMAGE_HYPERFLASH32 from '../../../src/flash-cart/browser/images/hyperflash32-with-label.png';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { VesBuildService } from '../../build/browser/ves-build-service';
+import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 import { VesProjectService } from '../../project/browser/ves-project-service';
-import { VesFlashCartUsbService } from '../common/ves-flash-cart-usb-service-protocol';
-import { VesFlashCartCommands } from './ves-flash-cart-commands';
-import { BUILT_IN_FLASH_CART_CONFIGS, VesFlashCartPreferenceIds } from './ves-flash-cart-preferences';
 import {
   ConnectedFlashCart,
   FLASHBOY_PLUS_IMAGE_PLACEHOLDER,
@@ -30,10 +30,10 @@ import {
   PROG_VB_PLACEHOLDER,
   ROM_PLACEHOLDER
 } from '../common/ves-flash-cart-types';
+import { VesFlashCartUsbService } from '../common/ves-flash-cart-usb-service-protocol';
+import { VesFlashCartCommands } from './ves-flash-cart-commands';
+import { BUILT_IN_FLASH_CART_CONFIGS, VesFlashCartPreferenceIds } from './ves-flash-cart-preferences';
 import { VesFlashCartUsbWatcher } from './ves-flash-cart-usb-watcher';
-import IMAGE_FLASHBOY_PLUS from '../../../src/flash-cart/browser/images/flashboy-plus.png';
-import IMAGE_HYPERBOY from '../../../src/flash-cart/browser/images/HyperBoy.png';
-import IMAGE_HYPERFLASH32 from '../../../src/flash-cart/browser/images/hyperflash32-with-label.png';
 
 @injectable()
 export class VesFlashCartService {
@@ -175,14 +175,14 @@ export class VesFlashCartService {
 
       if (!flasherPath) {
         this.messageService.error(
-          `No path to flasher software provided for cart '${connectedFlashCart.config.name}'`
+          nls.localize('vuengine/flashCarts/noPathToFlasherSoftwareProvided', 'No path to flasher software provided for cart ${0}', connectedFlashCart.config.name)
         );
         continue;
       }
 
       if (!await this.fileService.exists(new URI(flasherPath).withScheme('file'))) {
         this.messageService.error(
-          `Flasher software does not exist at '${flasherPath}'`
+          nls.localize('vuengine/flashCarts/flasherSoftwareDoesNotExist', 'Flasher software does not exist at ${0}', flasherPath)
         );
         continue;
       }
