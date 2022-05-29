@@ -4,6 +4,7 @@ import {
     LabelProviderContribution
 } from '@theia/core/lib/browser';
 import { ColorContribution } from '@theia/core/lib/browser/color-application-contribution';
+import { EncodingRegistry } from '@theia/core/lib/browser/encoding-registry';
 import { DefaultFileIconThemeContribution } from '@theia/core/lib/browser/icon-theme-contribution';
 import {
     BrowserMainMenuFactory,
@@ -28,6 +29,7 @@ import { ToolbarDefaultsFactory } from '@theia/toolbar/lib/browser/toolbar-defau
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { QuickOpenWorkspace } from '@theia/workspace/lib/browser/quick-open-workspace';
 import '../../../src/core/browser/style/index.css';
+import { VesCommonService } from './ves-common-service';
 import { VesApplicationShell } from './ves-core-application-shell';
 import { VesColorContribution } from './ves-core-color-contribution';
 import { VesCoreContribution } from './ves-core-contribution';
@@ -36,14 +38,15 @@ import { VesDebugPrefixConfiguration } from './ves-core-debug-prefix-configurati
 import { VesScmHistoryContribution } from './ves-core-history-contribution';
 import { VesDefaultFileIconThemeContribution } from './ves-core-icon-theme-contribution';
 import { VesCoreLabelProviderContribution } from './ves-core-label-provider';
+import { VesEncodingRegistry } from './ves-encoding-registry';
+import { VesNavigatorWidgetFactory } from './ves-navigator-widget-factory';
 import { VesPluginContribution } from './ves-plugin-contribution';
 import { VesPreferenceConfigurations } from './ves-preference-configurations';
-import { VesPreferenceTreeGenerator } from './ves-preference-tree-generator.';
-import { VesToolbarDefaultsOverride } from './ves-toolbar-defaults-override';
-import { VesCommonService } from './ves-common-service';
-import { VesNavigatorWidgetFactory } from './ves-navigator-widget-factory';
 import { VesPreferenceStringInputRenderer } from './ves-preference-string-input-renderer';
+import { VesPreferenceTreeGenerator } from './ves-preference-tree-generator.';
+import './ves-preferences-monaco-contribution';
 import { VesQuickOpenWorkspace } from './ves-quick-open-workspace';
+import { VesToolbarDefaultsOverride } from './ves-toolbar-defaults-override';
 import { VesWorkspaceService } from './ves-workspace-service';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
@@ -79,6 +82,10 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // file icons & labels
     bind(VesCoreLabelProviderContribution).toSelf().inSingletonScope();
     bind(LabelProviderContribution).toService(VesCoreLabelProviderContribution);
+
+    // encoding registry
+    bind(VesEncodingRegistry).toSelf().inSingletonScope();
+    rebind(EncodingRegistry).toService(VesEncodingRegistry);
 
     // remove debug features
     bind(VesDebugFrontendApplicationContribution).toSelf().inSingletonScope();
