@@ -41,37 +41,39 @@ export class VesEditorsTreeContribution extends BaseTreeEditorContribution {
         super.registerCommands(commandRegistry);
 
         await this.vesProjectService.ready;
-        const registeredTypes = this.vesProjectService.getRegisteredTypes();
-        Object.keys(registeredTypes).forEach(typeId => {
-            const registeredType = registeredTypes[typeId];
-            if (!registeredType.parent) {
-                commandRegistry.registerCommand({
-                    id: `${VesEditorsCommands.OPEN_EDITOR.id}:${typeId}`,
-                    label: `${VesEditorsCommands.OPEN_EDITOR.label}: ${registeredType.schema.title}`,
-                    iconClass: registeredType.icon
-                }, {
-                    execute: async () => {
-                        if (registeredType.leaf) {
-                            const projectDataType = this.vesProjectService.getProjectDataType(typeId);
-                            if (projectDataType) {
-                                const ids = Object.keys(projectDataType);
-                                if (ids.length) {
-                                    const uri = VesEditorUri.toUri(`${typeId}/${ids[0]}`);
-                                    await open(this.openerService, uri, { mode: 'reveal' });
+        const registeredTypes = this.vesProjectService.getProjectDataTypes();
+        if (registeredTypes) {
+            Object.keys(registeredTypes).forEach(typeId => {
+                const registeredType = registeredTypes[typeId];
+                if (!registeredType.parent) {
+                    commandRegistry.registerCommand({
+                        id: `${VesEditorsCommands.OPEN_EDITOR.id}:${typeId}`,
+                        label: `${VesEditorsCommands.OPEN_EDITOR.label}: ${registeredType.schema.title}`,
+                        iconClass: registeredType.icon
+                    }, {
+                        execute: async () => {
+                            if (registeredType.leaf) {
+                                const projectDataType = this.vesProjectService.getProjectDataItems(typeId);
+                                if (projectDataType) {
+                                    const ids = Object.keys(projectDataType);
+                                    if (ids.length) {
+                                        const uri = VesEditorUri.toUri(`${typeId}/${ids[0]}`);
+                                        await open(this.openerService, uri, { mode: 'reveal' });
+                                    }
                                 }
-                            }
-                        } else {
-                            // find which types can be children of current project node
-                            const childTypes = Object.values(registeredTypes).filter(registeredTypeInner =>
-                                registeredTypeInner.parent?.typeId === typeId
-                            );
+                            } else {
+                                // find which types can be children of current project node
+                                const childTypes = Object.values(registeredTypes).filter(registeredTypeInner =>
+                                    registeredTypeInner.parent?.typeId === typeId
+                                );
 
-                            this.itemSelectQuickPick(childTypes.map(type => type.schema?.properties?.typeId.const));
+                                this.itemSelectQuickPick(childTypes.map(type => type.schema?.properties?.typeId.const));
+                            }
                         }
-                    }
-                });
-            }
-        });
+                    });
+                }
+            });
+        }
     }
 
     async itemSelectQuickPick(types: string[]): Promise<void> {
@@ -82,17 +84,18 @@ export class VesEditorsTreeContribution extends BaseTreeEditorContribution {
         const items: QuickPickItem[] = [];
 
         types.forEach(type => {
-            const projectDataType = this.vesProjectService.getProjectDataType(type);
+            const projectDataType = this.vesProjectService.getProjectDataItems(type);
             if (projectDataType) {
                 Object.keys(projectDataType).forEach(key => {
                     const item = projectDataType[key];
-                    const registeredTypes = this.vesProjectService.getRegisteredTypes();
-                    const registeredType = registeredTypes[type];
-                    items.push({
-                        label: item.name,
-                        description: `${type}/${key}`,
-                        iconClasses: registeredType.icon ? [registeredType.icon] : [],
-                    });
+                    const registeredType = this.vesProjectService.getProjectDataType(type);
+                    if (registeredType) {
+                        items.push({
+                            label: item.name as string,
+                            description: `${type}/${key}`,
+                            iconClasses: registeredType.icon ? [registeredType.icon] : [],
+                        });
+                    }
                 });
             }
         });

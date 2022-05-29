@@ -16,12 +16,14 @@ export class VesEditorsTreeModelService implements TreeEditor.ModelService {
 
     getSchemaForNode(node: TreeEditor.Node): MaybePromise<JsonSchema | undefined> {
         const definitions: { [typeId: string]: JsonSchema } = {};
-        const registeredTypes = this.vesProjectService.getRegisteredTypes();
-        Object.keys(registeredTypes).forEach(key => {
-            if (registeredTypes[key] !== undefined) {
-                definitions[key] = registeredTypes[key].schema;
-            }
-        });
+        const registeredTypes = this.vesProjectService.getProjectDataTypes();
+        if (registeredTypes) {
+            Object.keys(registeredTypes).forEach(key => {
+                if (registeredTypes[key] !== undefined) {
+                    definitions[key] = registeredTypes[key].schema;
+                }
+            });
+        }
         return {
             // @ts-ignore
             definitions,
@@ -34,15 +36,16 @@ export class VesEditorsTreeModelService implements TreeEditor.ModelService {
             return undefined;
         }
 
-        const registeredTypes = this.vesProjectService.getRegisteredTypes();
-        return registeredTypes[type]?.schema;
+        const registeredTypes = this.vesProjectService.getProjectDataTypes();
+        return registeredTypes && registeredTypes[type]?.schema;
     }
 
     getUiSchemaForNode(node: TreeEditor.Node): MaybePromise<UISchemaElement | undefined> {
         const type = node.jsonforms.type;
-        const registeredTypes = this.vesProjectService.getRegisteredTypes();
+        const registeredTypes = this.vesProjectService.getProjectDataTypes();
 
-        if (registeredTypes[type].uiSchema !== undefined) {
+        if (registeredTypes && registeredTypes[type]) {
+            // @ts-ignore
             return registeredTypes[type].uiSchema;
         }
 
@@ -70,7 +73,9 @@ export class VesEditorsTreeModelService implements TreeEditor.ModelService {
     }
 
     getNameForType(typeId: string): string {
-        const registeredTypes = this.vesProjectService.getRegisteredTypes();
-        return registeredTypes[typeId]?.schema?.title || typeId;
+        const registeredTypes = this.vesProjectService.getProjectDataTypes();
+        return registeredTypes
+            ? registeredTypes[typeId]?.schema?.title || typeId
+            : typeId;
     }
 }

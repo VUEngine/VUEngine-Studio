@@ -57,44 +57,48 @@ export class VesMasterTreeWidget extends MasterTreeWidget {
     protected vesCreateRemoveHandler(node: TreeEditor.Node): (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void {
         return event => {
             event.stopPropagation();
-            const registeredTypes = this.vesProjectService.getRegisteredTypes();
-            const typeLabel = registeredTypes[node.jsonforms.type].schema.title;
-            const dialog = new ConfirmDialog({
-                title: nls.localize('vuengine/editors/deleteNodeQuestion', 'Delete Node?'),
-                msg: nls.localize('vuengine/editors/areYouSureYouWantToDeleteItem', 'Are you sure you want to delete the {0} "{1}"?', typeLabel, node.name),
-            });
-            dialog.open().then(remove => {
-                if (remove && node.parent && node.parent && TreeEditor.Node.is(node.parent)) {
-                    this.onDeleteEmitter.fire(node);
-                }
-            });
+            const registeredTypes = this.vesProjectService.getProjectDataTypes();
+            if (registeredTypes) {
+                const typeLabel = registeredTypes[node.jsonforms.type].schema.title;
+                const dialog = new ConfirmDialog({
+                    title: nls.localize('vuengine/editors/deleteNodeQuestion', 'Delete Node?'),
+                    msg: nls.localize('vuengine/editors/areYouSureYouWantToDeleteItem', 'Are you sure you want to delete the {0} "{1}"?', typeLabel, node.name),
+                });
+                dialog.open().then(remove => {
+                    if (remove && node.parent && node.parent && TreeEditor.Node.is(node.parent)) {
+                        this.onDeleteEmitter.fire(node);
+                    }
+                });
+            }
         };
     }
 
     protected vesCreateAddHandler(node: TreeEditor.Node): (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void {
         return event => {
-            const registeredTypes = this.vesProjectService.getRegisteredTypes();
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const addHandler = (property: string, type: string): any =>
-                this.onAddEmitter.fire({ node, property, type });
+            const registeredTypes = this.vesProjectService.getProjectDataTypes();
+            if (registeredTypes) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const addHandler = (property: string, type: string): any =>
+                    this.onAddEmitter.fire({ node, property, type });
 
-            const childTypes = Object.values(registeredTypes).filter(registeredType =>
-                registeredType.parent?.typeId === node.jsonforms.type
-            );
-            if (childTypes.length === 1) {
-                addHandler('children', childTypes[0].schema.properties?.typeId.const);
-            } else {
-                const treeAnchor: TreeAnchor = {
-                    x: event.nativeEvent.x,
-                    y: event.nativeEvent.y,
-                    node: node,
-                    onClick: addHandler
-                };
-                const renderOptions: RenderContextMenuOptions = {
-                    menuPath: TreeContextMenu.ADD_MENU,
-                    anchor: treeAnchor
-                };
-                this.contextMenuRenderer.render(renderOptions);
+                const childTypes = Object.values(registeredTypes).filter(registeredType =>
+                    registeredType.parent?.typeId === node.jsonforms.type
+                );
+                if (childTypes.length === 1) {
+                    addHandler('children', childTypes[0].schema.properties?.typeId.const);
+                } else {
+                    const treeAnchor: TreeAnchor = {
+                        x: event.nativeEvent.x,
+                        y: event.nativeEvent.y,
+                        node: node,
+                        onClick: addHandler
+                    };
+                    const renderOptions: RenderContextMenuOptions = {
+                        menuPath: TreeContextMenu.ADD_MENU,
+                        anchor: treeAnchor
+                    };
+                    this.contextMenuRenderer.render(renderOptions);
+                }
             }
         };
     }
