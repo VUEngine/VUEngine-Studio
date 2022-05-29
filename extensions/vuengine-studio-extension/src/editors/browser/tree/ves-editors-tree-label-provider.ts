@@ -19,11 +19,13 @@ export class VesEditorsTreeLabelProvider implements LabelProviderContribution {
 
     public getIcon(element: object): string | undefined {
         let iconClass: string | undefined;
-        const registeredTypes = this.vesProjectService.getRegisteredTypes();
-        if (TreeEditor.CommandIconInfo.is(element)) {
-            iconClass = registeredTypes[element.type]?.icon || 'fa fa-question-circle';
-        } else if (TreeEditor.Node.is(element)) {
-            iconClass = registeredTypes[element.jsonforms.type]?.icon || 'fa fa-question-circle';
+        const registeredTypes = this.vesProjectService.getProjectDataTypes();
+        if (registeredTypes) {
+            if (TreeEditor.CommandIconInfo.is(element)) {
+                iconClass = registeredTypes[element.type]?.icon || 'fa fa-question-circle';
+            } else if (TreeEditor.Node.is(element)) {
+                iconClass = registeredTypes[element.jsonforms.type]?.icon || 'fa fa-question-circle';
+            }
         }
 
         return iconClass ? iconClass : 'fa fa-question-circle';
@@ -41,7 +43,9 @@ export class VesEditorsTreeLabelProvider implements LabelProviderContribution {
     }
 
     private getTypeName(typeId: string): string {
-        const registeredTypes = this.vesProjectService.getRegisteredTypes();
-        return registeredTypes[typeId]?.schema?.title || typeId;
+        const registeredTypes = this.vesProjectService.getProjectDataTypes();
+        return registeredTypes
+            ? registeredTypes[typeId]?.schema?.title || typeId
+            : typeId;
     }
 }

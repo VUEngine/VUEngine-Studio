@@ -40,8 +40,10 @@ export class VesPluginsService {
   @postConstruct()
   protected async init(): Promise<void> {
     this.vesProjectService.onDidChangeProjectData(async () => {
-      await this.determineInstalledPlugins();
-      this.onDidChangeInstalledPluginsEmitter.fire();
+      if (JSON.stringify(this.installedPlugins) !== JSON.stringify(this.vesProjectService.getProjectPlugins())) {
+        await this.determineInstalledPlugins();
+        this.onDidChangeInstalledPluginsEmitter.fire();
+      }
     });
   }
 
@@ -70,11 +72,10 @@ export class VesPluginsService {
     }
   }
 
-  async determineInstalledPlugins(): Promise<string[]> {
+  async determineInstalledPlugins(): Promise<void> {
     await this.vesProjectService.ready;
     this.installedPlugins = this.vesProjectService.getProjectPlugins();
     this._ready.resolve();
-    return this.installedPlugins;
   }
 
   getInstalledPlugins(): Array<string> {

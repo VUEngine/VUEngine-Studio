@@ -67,10 +67,13 @@ export class VesEditorsTreeNodeFactory implements TreeEditor.NodeFactory {
             return false;
         }
 
-        const childTypes = Object.values(this.vesProjectService.getRegisteredTypes()).filter(registeredType =>
-            registeredType.parent?.typeId === node.jsonforms.type &&
-            registeredType.parent?.multiple === true
-        );
+        const registeredTypes = this.vesProjectService.getProjectDataTypes();
+        const childTypes = registeredTypes
+            ? Object.values(registeredTypes).filter(registeredType =>
+                registeredType.parent?.typeId === node.jsonforms.type &&
+                registeredType.parent?.multiple === true
+            )
+            : [];
 
         return childTypes.length > 0;
     }

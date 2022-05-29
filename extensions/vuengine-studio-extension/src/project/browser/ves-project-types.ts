@@ -1,37 +1,48 @@
 import { JsonSchema } from '@jsonforms/core';
+import URI from '@theia/core/lib/common/uri';
 
-export interface ProjectFileWithContributor {
-  contributor: string
-  data: ProjectFile
+export interface WorkspaceFile {
+  extensions?: {
+    recommendations?: {
+      [extensionId: string]: string
+    }
+  }
+  folders?: {
+    name?: string
+    path: string
+  }[]
+  settings?: {
+    [settingId: string]: unknown
+  }
 }
 
-export interface ProjectFileType {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [id: string]: any
+export interface ProjectFile extends WorkspaceFile {
+  combined?: {
+    items?: ProjectFileItemsWithContributor
+    templates?: ProjectFileTemplatesWithContributor
+    types?: ProjectFileTypesWithContributor
+  }
+  items?: ProjectFileItemsByType
+  plugins?: string[]
+  templates?: ProjectFileTemplates
+  types?: ProjectFileTypes
 };
 
 export interface ProjectFileTypes {
   [typeId: string]: ProjectFileType
 };
 
-export interface ProjectFileContribution {
-  types?: ProjectFileTypes
+export interface ProjectFileTypesWithContributor extends ProjectFileTypes {
+  [typeId: string]: ProjectFileType & WithContributor
 };
 
-export interface ProjectFile {
-  folders: {
-    path: string
-  }[],
-  plugins: string[]
-  types?: ProjectFileTypes
-  contributions?: ProjectFileContribution,
-  settings?: {
-    [settingId: string]: unknown
-  };
-};
-
-export interface ProjectFileTypesCombined {
-  typesCombined: ProjectFileTypes
+export interface ProjectFileType {
+  schema: JsonSchema
+  uiSchema?: unknown
+  parent?: RegisteredTypeParent
+  icon?: string
+  leaf?: boolean
+  templates?: string[]
 };
 
 export interface RegisteredTypeParent {
@@ -39,16 +50,61 @@ export interface RegisteredTypeParent {
   multiple: boolean
 };
 
-export interface RegisteredType {
-  _contributor: string
-  schema: JsonSchema
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  uiSchema?: any
-  parent?: RegisteredTypeParent
-  icon?: string
-  leaf?: boolean
+export interface ProjectFileItemsByType {
+  [typeId: string]: ProjectFileItems
 };
 
-export interface RegisteredTypes {
-  [typeId: string]: RegisteredType
+export interface ProjectFileItems {
+  [itemId: string]: ProjectFileItem
 };
+
+export interface ProjectFileItemsWithContributor {
+  [typeId: string]: ProjectFileItemWithContributor
+};
+
+export interface ProjectFileItem {
+  [id: string]: unknown
+};
+
+export interface ProjectFileItemWithContributor extends ProjectFileItem {
+  [id: string]: unknown & WithContributor
+};
+
+export interface ProjectFileTemplates {
+  [key: string]: ProjectFileTemplate
+}
+
+export interface ProjectFileTemplatesWithContributor extends ProjectFileTemplates {
+  [key: string]: ProjectFileTemplate & WithContributor
+}
+
+export interface ProjectFileTemplateEvent {
+  type: ProjectFileTemplateEventType
+  value?: unknown
+}
+
+export enum ProjectFileTemplateEventType {
+  installedPluginsChanged = 'installedPluginsChanged',
+  itemOfTypeGotDeleted = 'itemOfTypeGotDeleted',
+}
+
+export interface ProjectFileTemplate {
+  mode: ProjectFileTemplateMode
+  target: string
+  template: URI | string
+  encoding?: ProjectFileTemplateEncoding
+  events: ProjectFileTemplateEventType[]
+}
+
+export interface WithContributor {
+  _contributor: string
+}
+
+export enum ProjectFileTemplateMode {
+  single = 'single',
+}
+
+export enum ProjectFileTemplateEncoding {
+  utf8 = 'utf8',
+  win1252 = 'win1252',
+}

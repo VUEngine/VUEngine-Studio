@@ -65,56 +65,58 @@ export class VesProjectTreeWidget extends TreeWidget {
     };
 
     await this.vesProjectService.ready;
-    const registeredTypes = this.vesProjectService.getRegisteredTypes();
-    Object.values(registeredTypes).forEach(registeredType => {
-      if (!registeredType.parent) {
-        const typeId = registeredType.schema.properties?.typeId.const;
-        const name = registeredType.schema.title;
-        const iconClass = registeredType.icon;
-        if (typeId && name && iconClass) {
-          const childNode: VesProjectDocumentChild = { typeId, name, iconClass };
-          if (!registeredType.leaf) {
-            childNode.children = [];
-          }
-
-          if (registeredType.leaf === true) {
-            const registeredTypeChildren = this.vesProjectService.getProjectDataType(typeId);
-            if (registeredTypeChildren) {
-              const id = Object.keys(registeredTypeChildren)[0];
-              childNode.uri = VesEditorUri.toUri(`${typeId}/${id}`);
+    const registeredTypes = this.vesProjectService.getProjectDataTypes();
+    if (registeredTypes) {
+      Object.values(registeredTypes).forEach(registeredType => {
+        if (!registeredType.parent) {
+          const typeId = registeredType.schema.properties?.typeId.const;
+          const name = registeredType.schema.title;
+          const iconClass = registeredType.icon;
+          if (typeId && name && iconClass) {
+            const childNode: VesProjectDocumentChild = { typeId, name, iconClass };
+            if (!registeredType.leaf) {
+              childNode.children = [];
             }
-          } else {
-            // find which types can be children of current project node
-            const childTypes = Object.values(registeredTypes).filter(registeredTypeInner =>
-              registeredTypeInner.parent?.typeId === typeId
-            );
-            // get items of all types
-            childTypes.forEach(childType => {
-              const childTypeId = childType.schema.properties?.typeId.const;
-              Object.keys(this.vesProjectService.getProjectDataType(childTypeId) || {}).forEach(id => {
-                const item = this.vesProjectService.getProjectDataItem(childTypeId, id);
-                if (!childNode.children) {
-                  childNode.children = [];
-                }
-                childNode.children.push({
-                  typeId: childTypeId,
-                  uri: VesEditorUri.toUri(`${childTypeId}/${id}`),
-                  name: item?.name
-                    || registeredTypes[childTypeId]?.schema?.title
-                    || childTypeId,
-                  iconClass: childType.icon ?? '',
+
+            if (registeredType.leaf === true) {
+              const registeredTypeChildren = this.vesProjectService.getProjectDataItems(typeId);
+              if (registeredTypeChildren) {
+                const id = Object.keys(registeredTypeChildren)[0];
+                childNode.uri = VesEditorUri.toUri(`${typeId}/${id}`);
+              }
+            } else {
+              // find which types can be children of current project node
+              const childTypes = Object.values(registeredTypes).filter(registeredTypeInner =>
+                registeredTypeInner.parent?.typeId === typeId
+              );
+              // get items of all types
+              childTypes.forEach(childType => {
+                const childTypeId = childType.schema.properties?.typeId.const;
+                Object.keys(this.vesProjectService.getProjectDataItems(childTypeId) || {}).forEach(id => {
+                  const item = this.vesProjectService.getProjectDataItem(childTypeId, id);
+                  if (!childNode.children) {
+                    childNode.children = [];
+                  }
+                  childNode.children.push({
+                    typeId: childTypeId,
+                    uri: VesEditorUri.toUri(`${childTypeId}/${id}`),
+                    name: item?.name
+                      || registeredTypes[childTypeId]?.schema?.title
+                      || childTypeId,
+                    iconClass: childType.icon ?? '',
+                  });
                 });
+
+                // sort children by name
+                childNode.children?.sort((a, b) => a.name > b.name && 1 || -1);
               });
+            }
 
-              // sort children by name
-              childNode.children?.sort((a, b) => a.name > b.name && 1 || -1);
-            });
+            documents.members.push(childNode);
           }
-
-          documents.members.push(childNode);
         }
-      }
-    });
+      });
+    }
 
     // sort entries by name
     documents.members.sort((a, b) => a.name > b.name && 1 || -1);
@@ -189,10 +191,12 @@ export class VesProjectTreeWidget extends TreeWidget {
     return event => {
       event.stopPropagation();
       // find which types can be children of current project node
-      const registeredTypes = this.vesProjectService.getRegisteredTypes();
-      const childTypes = Object.values(registeredTypes).filter(registeredType =>
-        registeredType.parent?.typeId === node.member?.typeId
-      );
+      const registeredTypes = this.vesProjectService.getProjectDataTypes();
+      const childTypes = registeredTypes
+        ? Object.values(registeredTypes).filter(registeredType =>
+          registeredType.parent?.typeId === node.member?.typeId
+        )
+        : [];
       if (childTypes.length > 1) {
         // TODO: add context menu for type selection
         console.error('multiple child types are not supported');
@@ -255,7 +259,7 @@ export class VesProjectTreeWidget extends TreeWidget {
         await open(this.openerService, node.member.uri, { mode: 'reveal' });
       } else if (node.member.typeId) {
         // Create a new item for menu entries which are a leaf, but do not have an item yet
-        const type = this.vesProjectService.getProjectDataType(node.member.typeId);
+        const type = this.vesProjectService.getProjectDataItems(node.member.typeId);
         if (type?.leaf) {
           await this.addNode(node.member.typeId);
         }

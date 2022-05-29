@@ -5,6 +5,7 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { EditorPreferences } from '@theia/editor/lib/browser';
 import { WorkspaceService } from '@theia/workspace/lib/browser/workspace-service';
+import { VesCodeGenService } from '../../../codegen/browser/ves-codegen-service';
 import { VesProjectService } from '../../../project/browser/ves-project-service';
 import { VesDetailFormWidget } from '../ves-editors-detail-form-widget';
 import { VesMasterTreeWidget } from './ves-editors-master-tree-widget';
@@ -19,6 +20,8 @@ export interface VesEditorsTreeEditorOptions {
 
 @injectable()
 export class VesEditorsTreeEditorWidget extends NavigatableTreeEditorWidget {
+    @inject(VesCodeGenService)
+    readonly vesCodeGenService: VesCodeGenService;
     @inject(VesProjectService)
     readonly vesProjectService: VesProjectService;
 
@@ -102,13 +105,15 @@ export class VesEditorsTreeEditorWidget extends NavigatableTreeEditorWidget {
     }
 
     protected configureTitle(title: Title<Widget>): void {
-        const typeData = this.vesProjectService.getRegisteredTypes()[this.instanceData.typeId];
-        title.label = this.instanceData.name
-            ? `${typeData.schema.title}: ${this.instanceData.name}`
-            : typeData.schema.title!;
-        title.caption = '';
-        title.closable = true;
-        title.iconClass = typeData?.icon ?? 'fa fa-file';
+        const typeData = this.vesProjectService.getProjectDataType(this.instanceData.typeId);
+        if (typeData) {
+            title.label = this.instanceData.name
+                ? `${typeData.schema.title}: ${this.instanceData.name}`
+                : typeData.schema.title!;
+            title.caption = '';
+            title.closable = true;
+            title.iconClass = typeData?.icon ?? 'fa fa-file';
+        }
     }
 
     public async save(): Promise<void> {
@@ -121,6 +126,17 @@ export class VesEditorsTreeEditorWidget extends NavigatableTreeEditorWidget {
 
             // potentially update name in title
             this.configureTitle(this.title);
+
+            // render templates
+            const typeData = this.vesProjectService.getProjectDataType(this.instanceData.typeId);
+            if (typeData && typeData.templates) {
+                await Promise.all(typeData.templates.map(async templateId =>
+                    this.vesCodeGenService.renderTemplate(templateId, {
+                        ...this.instanceData,
+                        _id: itemId
+                    })));
+            }
+
         } else {
             // TODO
         }
