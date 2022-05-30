@@ -8,6 +8,7 @@ import { WorkspaceService } from '@theia/workspace/lib/browser';
 import * as iconv from 'iconv-lite';
 import * as nunjucks from 'nunjucks';
 import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
+import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import {
@@ -29,6 +30,8 @@ export class VesCodeGenService {
   protected preferenceService: PreferenceService;
   @inject(VesBuildPathsService)
   protected vesBuildPathsService: VesBuildPathsService;
+  @inject(VesCommonService)
+  protected vesCommonService: VesCommonService;
   @inject(VesPluginsService)
   protected vesPluginsService: VesPluginsService;
   @inject(VesProjectService)
@@ -214,13 +217,11 @@ export class VesCodeGenService {
 
     // add filters
     env.addFilter('basename', (value: string, ending: boolean = true) => {
-      /*
-      let base = basename(value);
+      let base = this.vesCommonService.basename(value);
       if (!ending) {
         base = base.replace(/\.[^/.]+$/, '');
       }
       return base;
-      */
     });
     env.addFilter('values', (value: object) => Object.values(value));
     // @ts-ignore

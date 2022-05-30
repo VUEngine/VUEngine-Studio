@@ -4,13 +4,13 @@ import { Message } from '@theia/core/shared/@phosphor/messaging';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { basename } from 'path';
-import { VesBuildService } from '../../build/browser/ves-build-service';
-import { VesFlashCartCommands } from './ves-flash-cart-commands';
-import { VesFlashCartService } from './ves-flash-cart-service';
-import { ConnectedFlashCart, FlashLogLine, HYPERFLASH32_PREFERENCE_NAME } from '../common/ves-flash-cart-types';
 import IMAGE_HYPERFLASH32_LABEL from '../../../src/flash-cart/browser/images/hyperflash32-label.png';
 import IMAGE_NO_FLASH_CARTS from '../../../src/flash-cart/browser/images/no-flash-carts.png';
+import { VesBuildService } from '../../build/browser/ves-build-service';
+import { VesCommonService } from '../../core/browser/ves-common-service';
+import { ConnectedFlashCart, FlashLogLine, HYPERFLASH32_PREFERENCE_NAME } from '../common/ves-flash-cart-types';
+import { VesFlashCartCommands } from './ves-flash-cart-commands';
+import { VesFlashCartService } from './ves-flash-cart-service';
 
 @injectable()
 export class VesFlashCartWidget extends ReactWidget {
@@ -18,6 +18,8 @@ export class VesFlashCartWidget extends ReactWidget {
   private readonly commandService: CommandService;
   @inject(VesBuildService)
   private readonly vesBuildService: VesBuildService;
+  @inject(VesCommonService)
+  private readonly vesCommonService: VesCommonService;
   @inject(VesFlashCartService)
   private readonly vesFlashCartService: VesFlashCartService;
   @inject(WorkspaceService)
@@ -156,7 +158,7 @@ export class VesFlashCartWidget extends ReactWidget {
                     </div>
                     <div>
                       <i className='fa fa-fw fa-terminal'></i>{' '}
-                      {basename(connectedFlashCart.config.path)}{' '}
+                      {this.vesCommonService.basename(connectedFlashCart.config.path)}{' '}
                       {connectedFlashCart.config.args}
                     </div>
                     {!connectedFlashCart.canHoldRom &&

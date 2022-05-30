@@ -10,22 +10,16 @@ import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VES_PREFERENCE_DIR } from '../../core/browser/ves-preference-configurations';
+import { VesGlobService } from '../../glob/common/ves-glob-service-protocol';
 import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-service';
 import { USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } from '../../plugins/browser/ves-plugins-types';
 import { VUENGINE_EXT } from '../common/custom-project-file/ves-project-utils';
 import { VesNewProjectTemplate } from './new-project/ves-new-project-form';
 import {
-  ProjectFileItemSaveEvent,
   ProjectFile,
-  ProjectFileItem,
-  ProjectFileItems,
-  ProjectFileTemplate,
-  ProjectFileType,
+  ProjectFileItem, ProjectFileItemDeleteEvent, ProjectFileItems, ProjectFileItemSaveEvent, ProjectFileItemsByType, ProjectFileTemplate, ProjectFileTemplates, ProjectFileType,
   ProjectFileTypes,
-  WithContributor,
-  ProjectFileItemDeleteEvent,
-  ProjectFileTemplates,
-  ProjectFileItemsByType
+  WithContributor
 } from './ves-project-types';
 
 const replaceInFiles = require('replace-in-files');
@@ -38,6 +32,8 @@ export class VesProjectService {
   private readonly vesBuildPathsService: VesBuildPathsService;
   @inject(VesCommonService)
   private readonly vesCommonService: VesCommonService;
+  @inject(VesGlobService)
+  private readonly vesGlobService: VesGlobService;
   @inject(VesPluginsPathsService)
   private readonly vesPluginsPathsService: VesPluginsPathsService;
   @inject(WorkspaceService)
@@ -205,13 +201,30 @@ export class VesProjectService {
     };
 
     // workspace
-    const workspaceProjectFileUri = this.workspaceService.workspace?.resource;
-    const workspaceProjectFileData = workspaceProjectFileUri
-      ? templateToUri(
+    let workspaceProjectFileData: ProjectFile = {};
+    let workspaceProjectFileUri = this.workspaceService.workspace?.resource;
+    if (workspaceProjectFileUri) {
+      if (this.workspaceService.workspace?.isDirectory) {
+        const projectFiles = await this.vesGlobService.find(
+          await this.fileService.fsPath(workspaceProjectFileUri),
+          `*.${VUENGINE_EXT}`
+        );
+        if (projectFiles.length) {
+          const filename = this.vesCommonService.basename(projectFiles[0]);
+          if (filename) {
+            workspaceProjectFileUri = workspaceProjectFileUri?.resolve(filename);
+          }
+        }
+      }
+
+      workspaceProjectFileData = templateToUri(
         workspaceProjectFileUri.parent,
         await this.readProjectFileData(workspaceProjectFileUri) || {}
-      )
-      : {};
+      );
+      console.info(`Read project data from file ${workspaceProjectFileUri}.`);
+    } else {
+      console.error('Could not find project file.');
+    }
 
     // engine
     const engineCoreUri = await this.vesBuildPathsService.getEngineCoreUri();
@@ -352,7 +365,7 @@ export class VesProjectService {
   async getProjectName(projectFileUri?: URI): Promise<string> {
     let projectTitle = '';
 
-    // Attempt to retrieve project name from configuration file
+    // Attempt to retrieve project name from project file
     let projectData;
     if (projectFileUri) {
       if (await this.fileService.exists(projectFileUri)) {

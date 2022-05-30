@@ -14,12 +14,12 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import * as React from '@theia/core/shared/react';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { basename } from 'path';
+import { VesCommonService } from '../../../core/browser/ves-common-service';
 import { VesEmulatorCommands } from '../ves-emulator-commands';
 import { VesEmulatorPreferenceIds } from '../ves-emulator-preferences';
 import { VesEmulatorService } from '../ves-emulator-service';
 import {
-  EMULATION_MODES, EmulatorFunctionKeyCode, EmulatorGamePadKeyCode, EMULATION_SCALES, EMULATION_STEREO_MODES
+  EMULATION_MODES, EMULATION_SCALES, EMULATION_STEREO_MODES, EmulatorFunctionKeyCode, EmulatorGamePadKeyCode
 } from '../ves-emulator-types';
 import { VesEmulatorControls } from './ves-emulator-controls-component';
 
@@ -53,6 +53,8 @@ export class VesEmulatorWidget extends ReactWidget {
   protected readonly localStorageService: LocalStorageService;
   @inject(PreferenceService)
   protected readonly preferenceService: PreferenceService;
+  @inject(VesCommonService)
+  protected readonly vesCommonService: VesCommonService;
   @inject(VesEmulatorService)
   protected readonly vesEmulatorService: VesEmulatorService;
   @inject(VesEmulatorWidgetOptions)
@@ -76,7 +78,7 @@ export class VesEmulatorWidget extends ReactWidget {
   @postConstruct()
   protected async init(): Promise<void> {
     const label = this.options
-      ? basename(this.options.uri)
+      ? this.vesCommonService.basename(this.options.uri)
       : VesEmulatorWidget.LABEL;
     const caption = this.options ? this.options.uri : VesEmulatorWidget.LABEL;
 
