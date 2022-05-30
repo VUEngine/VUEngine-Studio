@@ -51,6 +51,10 @@ export class VesCommonService {
       : path;
   }
 
+  basename(path: string): string {
+    return path.replace(/\\/g, '\/').split('/').pop() || '';
+  }
+
   protected async determineIsWslInstalled(): Promise<void> {
     if (!isWindows) {
       this.isWslInstalled = false;
