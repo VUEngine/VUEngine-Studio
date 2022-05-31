@@ -1,4 +1,4 @@
-import { isWindows } from '@theia/core';
+import { isWindows, nls } from '@theia/core';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import { Deferred } from '@theia/core/lib/common/promise-util';
 import URI from '@theia/core/lib/common/uri';
@@ -364,11 +364,16 @@ export class VesProjectService {
 
   async getProjectName(projectFileUri?: URI): Promise<string> {
     let projectTitle = '';
+    let isFolder = false;
 
     // Attempt to retrieve project name from project file
     let projectData;
     if (projectFileUri) {
-      if (await this.fileService.exists(projectFileUri)) {
+      const fileStat = await this.fileService.resolve(projectFileUri);
+      if (fileStat && fileStat.isDirectory) {
+        isFolder = true;
+      }
+      if (fileStat && !isFolder && await this.fileService.exists(projectFileUri)) {
         const configFileContents = await this.fileService.readFile(projectFileUri);
         projectData = JSON.parse(configFileContents.value.toString()) as ProjectFile;
       }
@@ -399,6 +404,12 @@ export class VesProjectService {
     // Use base path instead
     if (!projectTitle) {
       projectTitle = projectFileUri?.path?.base || '';
+    }
+
+    // Append folder suffix
+    if (isFolder) {
+      const folderSuffix = nls.localizeByDefault('Folder');
+      projectTitle = `${projectTitle} (${folderSuffix})`;
     }
 
     return projectTitle || 'VUEngine Studio';
