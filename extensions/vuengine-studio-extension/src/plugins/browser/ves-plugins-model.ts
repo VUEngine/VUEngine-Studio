@@ -94,9 +94,6 @@ export class VesPluginsModel {
         }
     }
 
-    /**
-     * single source of all plugins
-     */
     protected readonly plugins = new Map<string, VesPlugin>();
 
     protected _installed = new Set<string>();
@@ -176,18 +173,15 @@ export class VesPluginsModel {
     };
 
     protected async updateInstalled(): Promise<void> {
-        const prevInstalled = this._installed;
         return this.doChange(async () => {
             const pluginIds = this.pluginsService.getInstalledPlugins();
-            const currInstalled = new Set<string>();
+            const installed = new Set<string>();
             if (pluginIds) {
                 for (const pluginId of pluginIds) {
-                    this._installed.delete(pluginId);
                     const vesPlugin = this.setPlugin(pluginId);
-                    currInstalled.add(vesPlugin.id);
+                    installed.add(vesPlugin.id);
                 }
             }
-            const installed = new Set([...prevInstalled, ...currInstalled]);
             const installedSorted = Array.from(installed).sort((a, b) => this.comparePlugins(a, b));
             this._installed = new Set(installedSorted.values());
         });

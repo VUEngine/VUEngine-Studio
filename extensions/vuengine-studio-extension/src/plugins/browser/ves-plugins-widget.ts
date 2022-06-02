@@ -40,25 +40,44 @@ export class VesPluginsWidget extends SourceTreeWidget {
         this.addClass('ves-plugins');
 
         this.id = generateWidgetId(this.options.id);
-        const title = this.options.title ?? this.computeTitle();
-        this.title.label = title;
-        this.title.caption = title;
 
         this.toDispose.push(this.pluginsSource);
         this.source = this.pluginsSource;
+
+        this.computeTitle();
+
+        this.toDispose.push(this.source.onDidChange(() => {
+            this.computeTitle();
+        }));
     }
 
-    protected computeTitle(): string {
+    protected async computeTitle(): Promise<void> {
+        const countLabel = await this.resolveCountLabel();
+        let label = '';
         switch (this.options.id) {
             case VesPluginsSourceOptions.INSTALLED:
-                return nls.localize('vuengine/plugins/installed', 'Installed');
+                label = nls.localize('vuengine/plugins/installed', 'Installed');
+                break;
             case VesPluginsSourceOptions.RECOMMENDED:
-                return nls.localize('vuengine/plugins/recommended', 'Recommended');
+                label = nls.localize('vuengine/plugins/recommended', 'Recommended');
+                break;
             case VesPluginsSourceOptions.SEARCH_RESULT:
-                return nls.localize('vuengine/plugins/search', 'Search');
-            default:
-                return '';
+                label = nls.localize('vuengine/plugins/search', 'Search');
+                break;
         }
+
+        const title = `${label} ${countLabel}`;
+        this.title.label = title;
+        this.title.caption = title;
+    }
+
+    protected async resolveCountLabel(): Promise<string> {
+        let label = '';
+        if (this.options.id !== VesPluginsSourceOptions.SEARCH_RESULT) {
+            const elements = await this.source?.getElements() || [];
+            label = `(${[...elements].length})`;
+        }
+        return label;
     }
 
     protected handleClickEvent(node: TreeNode | undefined, event: React.MouseEvent<HTMLElement>): void {
