@@ -118,12 +118,6 @@ export class VesPlugin implements VesPluginData, TreeElement {
 
     get icon(): string | undefined {
         return this.data['icon'];
-        /* const plugin = this.plugin;
-        const icon = plugin && plugin.icon;
-        if (icon) {
-            return new Endpoint({ path: icon }).getRestUrl().toString();
-        }
-        return this.data['icon']; */
     }
 
     get name(): string | undefined {
@@ -205,28 +199,16 @@ export class VesPlugin implements VesPluginData, TreeElement {
 }
 
 export abstract class AbstractVesPluginComponent extends React.Component<AbstractVesPluginComponent.Props> {
-
     readonly install = async (event?: React.MouseEvent) => {
         event?.stopPropagation();
+        await this.props.plugin.install();
         this.forceUpdate();
-        try {
-            const pending = this.props.plugin.install();
-            this.forceUpdate();
-            await pending;
-        } finally {
-            this.forceUpdate();
-        }
     };
 
     readonly uninstall = async (event?: React.MouseEvent) => {
         event?.stopPropagation();
-        try {
-            const pending = this.props.plugin.uninstall();
-            this.forceUpdate();
-            await pending;
-        } finally {
-            this.forceUpdate();
-        }
+        await this.props.plugin.uninstall();
+        this.forceUpdate();
     };
 
     protected readonly manage = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
