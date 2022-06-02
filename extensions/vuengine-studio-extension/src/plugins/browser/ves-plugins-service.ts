@@ -1,6 +1,6 @@
 import { Deferred } from '@theia/core/lib/common/promise-util';
 import URI from '@theia/core/lib/common/uri';
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { inject, injectable } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
@@ -37,16 +37,6 @@ export class VesPluginsService {
   protected readonly onDidChangeInstalledPluginsEmitter = new Emitter<void>();
   readonly onDidChangeInstalledPlugins = this.onDidChangeInstalledPluginsEmitter.event;
 
-  @postConstruct()
-  protected async init(): Promise<void> {
-    this.vesProjectService.onDidChangeProjectData(async () => {
-      if (JSON.stringify(this.installedPlugins) !== JSON.stringify(this.vesProjectService.getProjectPlugins())) {
-        await this.determineInstalledPlugins();
-        this.onDidChangeInstalledPluginsEmitter.fire();
-      }
-    });
-  }
-
   getPluginById(id: string): VesPluginData | undefined {
     return this.pluginsData[id] ?? undefined;
   }
@@ -58,8 +48,8 @@ export class VesPluginsService {
   async installPlugin(id: string): Promise<void> {
     if (!this.installedPlugins.includes(id)) {
       this.installedPlugins.push(id);
-      this.onDidChangeInstalledPluginsEmitter.fire();
       await this.writeInstalledPluginsToFile();
+      this.onDidChangeInstalledPluginsEmitter.fire();
     }
   }
 
@@ -67,8 +57,8 @@ export class VesPluginsService {
     const index = this.installedPlugins.indexOf(id);
     if (index > -1) {
       this.installedPlugins.splice(index, 1);
-      this.onDidChangeInstalledPluginsEmitter.fire();
       await this.writeInstalledPluginsToFile();
+      this.onDidChangeInstalledPluginsEmitter.fire();
     }
   }
 

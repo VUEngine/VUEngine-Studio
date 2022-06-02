@@ -5,7 +5,6 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
@@ -17,8 +16,15 @@ import { VUENGINE_EXT } from '../common/custom-project-file/ves-project-utils';
 import { VesNewProjectTemplate } from './new-project/ves-new-project-form';
 import {
   ProjectFile,
-  ProjectFileItem, ProjectFileItemDeleteEvent, ProjectFileItems, ProjectFileItemSaveEvent, ProjectFileItemsByType, ProjectFileTemplate, ProjectFileTemplates, ProjectFileType,
-  ProjectFileTypes,
+  ProjectFileItem,
+  ProjectFileItemDeleteEvent,
+  ProjectFileItems,
+  ProjectFileItemSaveEvent,
+  ProjectFileItemsByType,
+  ProjectFileTemplate,
+  ProjectFileTemplatesWithContributor,
+  ProjectFileType,
+  ProjectFileTypesWithContributor,
   WithContributor
 } from './ves-project-types';
 
@@ -38,8 +44,6 @@ export class VesProjectService {
   private readonly vesPluginsPathsService: VesPluginsPathsService;
   @inject(WorkspaceService)
   private readonly workspaceService: WorkspaceService;
-
-  protected _isWritingProjectFile = false;
 
   protected readonly _ready = new Deferred<void>();
   get ready(): Promise<void> {
@@ -79,21 +83,27 @@ export class VesProjectService {
   getProjectDataItem(typeId: string, itemId: string): any | undefined {
     return this._projectData.items && this._projectData.items[typeId][itemId];
   }
-  getProjectDataTypes(): ProjectFileTypes | undefined {
+  getProjectDataTypes(): ProjectFileTypesWithContributor | undefined {
     return this._projectData.combined?.types;
   }
-  getProjectDataType(typeId: string): ProjectFileType | undefined {
+  getProjectDataType(typeId: string): ProjectFileType & WithContributor | undefined {
     return this._projectData.combined?.types
       && this._projectData.combined.types[typeId];
   }
-  getProjectDataTemplates(): ProjectFileTemplates | undefined {
+  getProjectDataTemplates(): ProjectFileTemplatesWithContributor | undefined {
     return this._projectData.combined?.templates;
   }
-  getProjectDataTemplate(templateId: string): ProjectFileTemplate | undefined {
+  getProjectDataTemplate(templateId: string): ProjectFileTemplate & WithContributor | undefined {
     return this._projectData.combined?.templates
       && this._projectData.combined?.templates[templateId];
   }
   async setProjectDataItem(typeId: string, itemId: string, data: ProjectFileItem): Promise<boolean> {
+    await this.workspaceService.ready;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
+    if (!workspaceRootUri) {
+      return false;
+    }
+
     if (!this._projectData.items) {
       this._projectData.items = {};
     }
@@ -113,6 +123,7 @@ export class VesProjectService {
     }
     this._projectData.combined.items[typeId][itemId] = {
       _contributor: 'project',
+      _contributorUri: workspaceRootUri.parent,
       ...data
     };
 
@@ -121,7 +132,7 @@ export class VesProjectService {
     return this.saveProjectFile();
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async deleteProjectDataItem(typeId: string, itemId: string): Promise<boolean> {
+  async deleteProjectDataItem(typeId: string, itemId: string): Promise<void> {
     if (this._projectData.items
       && this._projectData.items[typeId]
       && this._projectData.items[typeId][itemId]) {
@@ -148,57 +159,27 @@ export class VesProjectService {
 
     this.onDidDeleteItemEmitter.fire({ typeId, itemId });
     this.onDidChangeProjectDataEmitter.fire();
-    return this.saveProjectFile();
-
-    return false;
+    await this.saveProjectFile();
   }
   getProjectPlugins(): string[] {
     return this._projectData.plugins || [];
   }
-  async setProjectPlugins(plugins: string[]): Promise<boolean> {
+  async setProjectPlugins(plugins: string[]): Promise<void> {
     this._projectData.plugins = plugins;
+    await this.saveProjectFile();
+    // update data of plugins
+    await this.readProjectData();
     this.onDidChangeProjectDataEmitter.fire();
-    return this.saveProjectFile();
   }
 
   @postConstruct()
   protected async init(): Promise<void> {
     await this.readProjectData();
     this._ready.resolve();
-    this.bindEvents();
-  }
-
-  protected async bindEvents(): Promise<void> {
-    // watch for project file changes
-    await this.workspaceService.ready;
-    const projectFileUri = this.workspaceService.workspace?.resource;
-    if (projectFileUri) {
-      this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
-        if (!this._isWritingProjectFile && fileChangesEvent.contains(projectFileUri)) {
-          await this.readProjectData();
-          this.onDidChangeProjectDataEmitter.fire();
-        }
-      });
-    }
   }
 
   protected async readProjectData(): Promise<void> {
     await this.workspaceService.ready;
-
-    const templateToUri = (rootUri: URI, projectFile: ProjectFile) => {
-      if (projectFile?.templates) {
-        Object.keys(projectFile.templates).map(key => {
-          const templatePathParts = (projectFile.templates![key].template as string).split('/');
-          let templateUri = rootUri;
-          templatePathParts.forEach(templatePathPart => {
-            templateUri = templateUri.resolve(templatePathPart);
-          });
-          projectFile.templates![key].template = templateUri;
-        });
-      }
-
-      return projectFile;
-    };
 
     // workspace
     let workspaceProjectFileData: ProjectFile = {};
@@ -217,10 +198,7 @@ export class VesProjectService {
         }
       }
 
-      workspaceProjectFileData = templateToUri(
-        workspaceProjectFileUri.parent,
-        await this.readProjectFileData(workspaceProjectFileUri) || {}
-      );
+      workspaceProjectFileData = await this.readProjectFileData(workspaceProjectFileUri) || {};
       console.info(`Read project data from file ${workspaceProjectFileUri}.`);
     } else {
       console.error('Could not find project file.');
@@ -229,10 +207,7 @@ export class VesProjectService {
     // engine
     const engineCoreUri = await this.vesBuildPathsService.getEngineCoreUri();
     const engineCoreProjectFileUri = engineCoreUri.resolve(`core.${VUENGINE_EXT}`);
-    const engineCoreProjectFileData = templateToUri(
-      engineCoreProjectFileUri.parent,
-      await this.readProjectFileData(engineCoreProjectFileUri) || {}
-    );
+    const engineCoreProjectFileData = await this.readProjectFileData(engineCoreProjectFileUri) || {};
 
     // installed plugins
     // TODO: resolve implicitly included plugins.
@@ -257,7 +232,8 @@ export class VesProjectService {
           if (data) {
             pluginsProjectDataWithContributors.push({
               _contributor: `plugin:${installedPlugin}`,
-              ...templateToUri(uri.parent, data)
+              _contributorUri: uri.parent,
+              ...data,
             });
           }
         }
@@ -267,16 +243,23 @@ export class VesProjectService {
     const projectDataWithContributors: (ProjectFile & WithContributor)[] = [
       {
         _contributor: 'engine',
+        _contributorUri: engineCoreProjectFileUri.parent,
         ...engineCoreProjectFileData
       },
       ...pluginsProjectDataWithContributors,
-      {
-        _contributor: 'project',
-        ...workspaceProjectFileData
-      },
     ];
 
-    const combined: { [key: string]: unknown } = {
+    if (workspaceProjectFileUri) {
+      projectDataWithContributors.push({
+        _contributor: 'project',
+        _contributorUri: workspaceProjectFileUri.parent,
+        ...workspaceProjectFileData
+      });
+    }
+
+    const combined: {
+      [key: string]: unknown
+    } = {
       'items': {},
       'templates': {},
       'types': {},
@@ -299,6 +282,7 @@ export class VesProjectService {
                 // @ts-ignore
                 combined[combinedKey][dataKey][itemId] = {
                   _contributor: projectDataWithContributor._contributor,
+                  _contributorUri: projectDataWithContributor._contributorUri,
                   ...combinedItem,
                 };
               });
@@ -306,6 +290,7 @@ export class VesProjectService {
               // @ts-ignore
               combined[combinedKey][dataKey] = {
                 _contributor: projectDataWithContributor._contributor,
+                _contributorUri: projectDataWithContributor._contributorUri,
                 ...data[dataKey],
               };
             }
@@ -346,18 +331,15 @@ export class VesProjectService {
     }
 
     try {
-      this._isWritingProjectFile = true;
-      this.fileService.writeFile(
+      await this.fileService.writeFile(
         projectFileUri,
         BinaryBuffer.fromString(JSON.stringify({
           ...this._projectData,
           combined: undefined,
         }, undefined, 4))
       );
-      this._isWritingProjectFile = false;
       return true;
     } catch (error) {
-      this._isWritingProjectFile = false;
       return false;
     }
   }
@@ -383,10 +365,9 @@ export class VesProjectService {
     }
     if (projectData?.items?.Project) {
       const first = Object.values(projectData.items.Project)[0];
-      // @ts-ignore
-      if (first && first.title) {
+      if (first && first.name) {
         // @ts-ignore
-        projectTitle = first.title;
+        projectTitle = first.name;
       }
     }
 
