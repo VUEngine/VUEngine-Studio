@@ -203,7 +203,7 @@ export class VesProjectTreeWidget extends TreeWidget {
         // TODO: add context menu for type selection
         console.error('multiple child types are not supported');
       } else if (childTypes.length === 1) {
-        this.addNode(childTypes[0].schema.properties?.typeId.const);
+        this.addNode(childTypes[0].schema.properties?.typeId.const, false);
       } else {
         console.error('no child type defined');
       }
@@ -224,12 +224,12 @@ export class VesProjectTreeWidget extends TreeWidget {
     }
   }
 
-  protected async addNode(typeId: string): Promise<void> {
+  protected async addNode(typeId: string, isLeaf: boolean): Promise<void> {
     const newItemId = this.vesCommonService.nanoid();
     // TODO: properly create new item with default values
     this.vesProjectService.setProjectDataItem(typeId, newItemId, {
       typeId,
-      name: 'New'
+      name: !isLeaf ? 'New' : undefined,
     });
     await this.setTreeData();
     const uri = VesEditorUri.toUri(`${typeId}/${newItemId}`);
@@ -261,9 +261,9 @@ export class VesProjectTreeWidget extends TreeWidget {
         await open(this.openerService, node.member.uri, { mode: 'reveal' });
       } else if (node.member.typeId) {
         // Create a new item for menu entries which are a leaf, but do not have an item yet
-        const type = this.vesProjectService.getProjectDataItemsForType(node.member.typeId);
+        const type = this.vesProjectService.getProjectDataType(node.member.typeId);
         if (type?.leaf) {
-          await this.addNode(node.member.typeId);
+          await this.addNode(node.member.typeId, true);
         }
       }
     }
