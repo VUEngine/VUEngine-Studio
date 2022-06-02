@@ -738,7 +738,7 @@ export class VesBuildService {
     if (!command) {
       return this.pushBuildLogLine({
         type: BuildLogLineType.Error,
-        text: nls.localize('vuengine/build/couldNotFindCommand', 'Could not find command "{0}".', commandName),
+        text: nls.localize('vuengine/build/couldNotFindCommand', 'Could not find command {0}.', commandName),
         timestamp: Date.now(),
       });
     }
@@ -747,7 +747,7 @@ export class VesBuildService {
 
     this.pushBuildLogLine({
       type: BuildLogLineType.Normal,
-      text: nls.localize('vuengine/build/commandCompleted', 'Command "{0}" completed.', command?.label),
+      text: nls.localize('vuengine/build/commandCompleted', 'Command {0} completed.', command?.label),
       timestamp: Date.now(),
     });
   }
@@ -761,7 +761,7 @@ export class VesBuildService {
     if (!taskInfo) {
       return this.pushBuildLogLine({
         type: BuildLogLineType.Error,
-        text: nls.localize('vuengine/build/couldNotRunTask', 'Could not run task "{0}".', taskName),
+        text: nls.localize('vuengine/build/couldNotRunTask', 'Could not run task {0}.', taskName),
         timestamp: Date.now(),
       });
     }
@@ -778,20 +778,20 @@ export class VesBuildService {
     if (taskEndedInfo.taskEndedType === TaskEndedTypes.BackgroundTaskEnded && taskEndedInfo.value) {
       return this.pushBuildLogLine({
         type: BuildLogLineType.Normal,
-        text: nls.localize('vuengine/build/taskCompleted', 'Task "{0}" completed.', taskName),
+        text: nls.localize('vuengine/build/taskCompleted', 'Task {0} completed.', taskName),
         timestamp: Date.now(),
       });
     }
     if (taskEndedInfo.taskEndedType === TaskEndedTypes.TaskExited && taskEndedInfo.value === 0) {
       return this.pushBuildLogLine({
         type: BuildLogLineType.Normal,
-        text: nls.localize('vuengine/build/taskCompleted', 'Task "{0}" completed.', taskName),
+        text: nls.localize('vuengine/build/taskCompleted', 'Task {0} completed.', taskName),
         timestamp: Date.now(),
       });
     } else if (taskEndedInfo.taskEndedType === TaskEndedTypes.TaskExited && taskEndedInfo.value !== undefined) {
       return this.pushBuildLogLine({
         type: BuildLogLineType.Error,
-        text: nls.localize('vuengine/build/taskTerminatedWithExitCode', 'Task "{0}" terminated with exit code {1}.', taskName, taskEndedInfo.value),
+        text: nls.localize('vuengine/build/taskTerminatedWithExitCode', 'Task {0} terminated with exit code {1}.', taskName, taskEndedInfo.value),
         timestamp: Date.now(),
       });
     } else {
@@ -799,13 +799,13 @@ export class VesBuildService {
       if (signal !== undefined) {
         return this.pushBuildLogLine({
           type: BuildLogLineType.Error,
-          text: nls.localize('vuengine/build/taskTerminatedBySignal', 'Task "{0}" terminated by signal {1}.', taskName, signal),
+          text: nls.localize('vuengine/build/taskTerminatedBySignal', 'Task {0} terminated by signal {1}.', taskName, signal),
           timestamp: Date.now(),
         });
       } else {
         return this.pushBuildLogLine({
           type: BuildLogLineType.Error,
-          text: nls.localize('vuengine/build/taskTerminatedForUnknownReason', 'Task "{0}" terminated for unknown reason.', taskName),
+          text: nls.localize('vuengine/build/taskTerminatedForUnknownReason', 'Task {0} terminated for unknown reason.', taskName),
           timestamp: Date.now(),
         });
       }

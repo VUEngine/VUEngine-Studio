@@ -97,7 +97,7 @@
       "vuengineStudioHandbook": "VUEngine Studio Handbook"
     },
     "editors": {
-      "areYouSureYouWantToDeleteItem": "Are you sure you want to delete the {0} \"{1}\"?",
+      "areYouSureYouWantToDeleteItem": "Are you sure you want to delete the {0} {1}?",
       "chooseAnItemPlaceholder": "Select which item you want to edit",
       "chooseAnItemTitle": "Choose an item",
       "commands": {
@@ -321,7 +321,7 @@
       "searchPlugins": "Search Plugins"
     },
     "projects": {
-      "areYouSureYouWantToDelete": "Are you sure you want to delete ${0}?",
+      "areYouSureYouWantToDelete": "Are you sure you want to delete {0}?",
       "author": "Author",
       "commands": {
         "category": "Projects",

@@ -89,19 +89,16 @@ export enum ProjectFileTemplateEventType {
 }
 
 export interface ProjectFileTemplate {
-  mode: ProjectFileTemplateMode
   target: string
-  template: URI | string
+  template: string
   encoding?: ProjectFileTemplateEncoding
+  itemSpecific?: string
   events: ProjectFileTemplateEvent[]
 }
 
 export interface WithContributor {
   _contributor: string
-}
-
-export enum ProjectFileTemplateMode {
-  single = 'single',
+  _contributorUri: URI
 }
 
 export enum ProjectFileTemplateEncoding {

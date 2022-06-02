@@ -179,7 +179,7 @@ export class VesProjectTreeWidget extends TreeWidget {
       const name = node.name ? `"${node.name}"` : 'this node';
       const dialog = new ConfirmDialog({
         title: nls.localize('vuengine/projects/deleteNodeQuestion', 'Delete Node?'),
-        msg: nls.localize('vuengine/projects/areYouSureYouWantToDelete', 'Are you sure you want to delete "{0}"?', name),
+        msg: nls.localize('vuengine/projects/areYouSureYouWantToDelete', 'Are you sure you want to delete {0}?', name),
       });
       dialog.open().then(remove => {
         if (remove && node.parent && node.parent && TreeNode.is(node.parent)) {

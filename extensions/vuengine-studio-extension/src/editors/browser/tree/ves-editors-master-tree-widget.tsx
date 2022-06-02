@@ -62,7 +62,7 @@ export class VesMasterTreeWidget extends MasterTreeWidget {
                 const typeLabel = registeredTypes[node.jsonforms.type].schema.title;
                 const dialog = new ConfirmDialog({
                     title: nls.localize('vuengine/editors/deleteNodeQuestion', 'Delete Node?'),
-                    msg: nls.localize('vuengine/editors/areYouSureYouWantToDeleteItem', 'Are you sure you want to delete the {0} "{1}"?', typeLabel, node.name),
+                    msg: nls.localize('vuengine/editors/areYouSureYouWantToDeleteItem', 'Are you sure you want to delete the {0} {1}?', typeLabel, node.name),
                 });
                 dialog.open().then(remove => {
                     if (remove && node.parent && node.parent && TreeEditor.Node.is(node.parent)) {

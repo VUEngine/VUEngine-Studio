@@ -17,7 +17,7 @@ import {
   ProjectFileTemplate,
   ProjectFileTemplateEncoding,
   ProjectFileTemplateEventType,
-  ProjectFileTemplateMode
+  WithContributor
 } from '../../project/browser/ves-project-types';
 
 @injectable()
@@ -59,24 +59,25 @@ export class VesCodeGenService {
   }
 
   async generateAll(): Promise<void> {
-    const types = this.vesProjectService.getProjectDataTypes();
-    const items = this.vesProjectService.getProjectDataItems();
-    if (items && types) {
-      await Promise.all(Object.values(items).map(async itemsForType =>
-        Promise.all(Object.keys(itemsForType).map(async itemId => {
-          const item = {
-            ...itemsForType[itemId],
-            _id: itemId,
-          };
-          // @ts-ignore
-          const type = Object.values(types).find(t => t?.schema.properties?.typeId.const === item.typeId);
-          if (type?.templates) {
-            await Promise.all(type?.templates.map(async templateId => {
+    const templates = this.vesProjectService.getProjectDataTemplates();
+    if (templates) {
+      await Promise.all(Object.keys(templates).map(async templateId => {
+        const template = templates[templateId];
+        if (!template.itemSpecific) {
+          await this.renderTemplate(templateId);
+        } else {
+          const itemsForType = this.vesProjectService.getProjectDataItemsForType(template.itemSpecific);
+          if (itemsForType) {
+            await Promise.all(Object.keys(itemsForType).map(async itemId => {
+              const item = {
+                ...itemsForType[itemId],
+                _id: itemId,
+              };
               await this.renderTemplate(templateId, item);
             }));
           }
-        }))
-      ));
+        }
+      }));
     }
 
     this.messageService.info(
@@ -84,20 +85,39 @@ export class VesCodeGenService {
     );
   }
 
-  async renderTemplateToFile(targetUri: URI, templateString: string, data: object, encoding: ProjectFileTemplateEncoding = ProjectFileTemplateEncoding.utf8): Promise<void> {
-    const renaderedTemplateData = nunjucks.renderString(templateString, data);
-    // await this.fileService.delete();
-    await this.fileService.writeFile(
-      targetUri,
-      BinaryBuffer.wrap(iconv.encode(renaderedTemplateData, encoding))
+  async renderTemplateToFile(
+    templateId: string,
+    targetUri: URI,
+    templateString: string,
+    data: object,
+    encoding: ProjectFileTemplateEncoding = ProjectFileTemplateEncoding.utf8
+  ): Promise<void> {
+    let renaderedTemplateData = '';
+    try {
+      renaderedTemplateData = nunjucks.renderString(templateString, data);
+    } catch (error) {
+      console.error(`Failed to render template ${templateId}. Nunjucks output:`, error);
+      return;
+    }
+    if (renaderedTemplateData) {
+      await this.fileService.writeFile(
+        targetUri,
+        BinaryBuffer.wrap(iconv.encode(renaderedTemplateData, encoding))
+      );
+    }
+
+    // @ts-ignore
+    console.info(data.item ? `Rendered template ${templateId} with item ${data.item._id}.`
+      : `Rendered template ${templateId}.`
     );
   }
 
-  async renderTemplate(templateId: string, itemData?: unknown): Promise<void> {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  async renderTemplate(templateId: string, itemData?: any): Promise<void> {
     await this.vesProjectService.ready;
     const template = this.vesProjectService.getProjectDataTemplate(templateId);
     if (!template) {
-      console.warn(`Template with ID ${templateId} not found.`);
+      console.warn(`Template ${templateId} not found.`);
       return;
     }
 
@@ -108,12 +128,7 @@ export class VesCodeGenService {
       project: this.vesProjectService.getProjectData()
     };
 
-    switch (template.mode) {
-      default:
-      case ProjectFileTemplateMode.single:
-        await this.renderFileFromTemplate(template, data, encoding);
-        break;
-    }
+    await this.renderFileFromTemplate(templateId, template, data, encoding);
   }
 
   protected async handlePluginChange(): Promise<void> {
@@ -161,16 +176,23 @@ export class VesCodeGenService {
   }
 
   protected async renderFileFromTemplate(
-    template: ProjectFileTemplate,
+    templateId: string,
+    template: ProjectFileTemplate & WithContributor,
     data: object,
     encoding: ProjectFileTemplateEncoding
   ): Promise<void> {
-    const templateUri = template.template as URI;
+    let templateUri = template._contributorUri;
+    const templatePathParts = template.template.split('/');
+    templatePathParts.forEach(templatePathPart => {
+      templateUri = templateUri.resolve(templatePathPart);
+    });
+
     let templateString = '';
     try {
       templateString = (await this.fileService.readFile(templateUri)).value.toString();
     } catch (error) {
-      console.error(`Could not read template file at ${templateUri.path.toString()}`);
+      console.error(`Could not read template file at ${templateUri.path}`);
+      return;
     }
 
     await this.workspaceService.ready;
@@ -189,7 +211,7 @@ export class VesCodeGenService {
         targetUri = targetUri.resolve(targetPathPart);
       });
 
-      await this.renderTemplateToFile(targetUri, templateString, data, encoding);
+      await this.renderTemplateToFile(templateId, targetUri, templateString, data, encoding);
     }
   }
 
