@@ -143,5 +143,10 @@
     "vscode.shellscript": "https://open-vsx.org/api/vscode/shellscript/1.52.1/file/vscode.shellscript-1.52.1.vsix",
     "vscode.yaml": "https://open-vsx.org/api/vscode/yaml/1.52.1/file/vscode.yaml-1.52.1.vsix",
     "vscode.xml": "https://open-vsx.org/api/vscode/xml/1.52.1/file/vscode.xml-1.52.1.vsix"
-  }
+  },
+  "theiaPluginsExcludeIds": [
+    "ms-vscode.js-debug-companion",
+    "vscode.extension-editing",
+    "vscode.microsoft-authentication"
+  ]
 }
