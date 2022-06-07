@@ -48,5 +48,8 @@
   "workspaces": [
     "applications/*",
     "extensions/*"
-  ]
+  ],
+  "resolutions": {
+    "**/multer": "1.4.4-lts.1"
+  }
 }
