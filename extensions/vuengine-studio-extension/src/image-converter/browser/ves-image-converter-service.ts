@@ -292,7 +292,7 @@ export class VesImageConverterService {
           const templateFileUri = resourcesUri.resolve('templates').resolve('image.c.nj');
 
           const templateString = (await this.fileService.readFile(templateFileUri)).value.toString();
-          this.vesCodeGenService.renderTemplateToFile(targetFileUri, templateString, {
+          this.vesCodeGenService.renderTemplateToFile('Image.c', targetFileUri, templateString, {
             name,
             tilesData,
             tilesCompression: imageConfigFileToBeConverted.config.tileset.compress,
@@ -318,7 +318,7 @@ export class VesImageConverterService {
           const templateFileUri = resourcesUri.resolve('templates').resolve('image.c.nj');
           const templateString = (await this.fileService.readFile(templateFileUri)).value.toString();
           await Promise.all(imageConfigFileToBeConverted.output.map(async output => {
-            await this.vesCodeGenService.renderTemplateToFile(output.fileUri, templateString, {
+            await this.vesCodeGenService.renderTemplateToFile('Image.c', output.fileUri, templateString, {
               name: output.name,
               tilesData: output.tilesData,
               tilesCompression: imageConfigFileToBeConverted.config.tileset.compress,
