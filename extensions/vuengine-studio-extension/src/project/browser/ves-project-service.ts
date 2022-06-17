@@ -356,8 +356,12 @@ export class VesProjectService {
         isFolder = true;
       }
       if (fileStat && !isFolder && await this.fileService.exists(projectFileUri)) {
-        const configFileContents = await this.fileService.readFile(projectFileUri);
-        projectData = JSON.parse(configFileContents.value.toString()) as ProjectFile;
+        try {
+          const configFileContents = await this.fileService.readFile(projectFileUri);
+          projectData = JSON.parse(configFileContents.value.toString()) as ProjectFile;
+        } catch (error) {
+          console.error('Malformed project file could not be parsed.', projectFileUri?.path.toString());
+        }
       }
     } else {
       await this.ready;
