@@ -22,7 +22,7 @@
       "buildSuccessful": "Construir com sucesso",
       "buildSuccessfulWithWarnings": "Construir com sucesso (com avisos)",
       "building": "Edifício",
-      "commandCompleted": "Comando {0} completado.",
+      "commandCompleted": "Comando {0} concluído.",
       "commands": {
         "build": "Projecto de construção",
         "category": "Construir",
@@ -94,7 +94,7 @@
       },
       "documentation": "Documentação",
       "hardwareDocumentation": "Documentação de Hardware",
-      "vuengineStudioHandbook": "Manual do Estúdio VUEngine"
+      "vuengineStudioHandbook": "Manual do VUEngine Studio"
     },
     "editors": {
       "areYouSureYouWantToDeleteItem": "Tem a certeza que quer apagar o {0} {1}?",
@@ -114,7 +114,7 @@
       "visualEditor": "Editor visual"
     },
     "emulator": {
-      "builtIn": "Integrado em",
+      "builtIn": "Embutido em",
       "commands": {
         "category": "Emulador",
         "run": "Funciona em Emulador",
@@ -208,7 +208,7 @@
         "category": "Exportação",
         "export": "Exportar ROM..."
       },
-      "doYouReallyWantToOverwrite": "Quer mesmo escrever por cima de {0}?",
+      "doYouReallyWantToOverwrite": "Quer mesmo escrever por cima de \"${}\"?",
       "exportRom": "ROM de exportação",
       "overwrite": "Sobreescrever"
     },
@@ -229,20 +229,20 @@
       "done": "Feito",
       "flash": "Flash",
       "flashCarts": "Carrinhos Flash",
-      "flasherSoftwareDoesNotExist": "O software Flasher não existe a {0}.",
+      "flasherSoftwareDoesNotExist": "O software Flasher não existe a ${0}",
       "flashingIsQueued": "O Flashing está enfileirado e começará assim que a construção estiver pronta",
       "flashingQueued": "Fila de espera intermitente",
       "insufficientSpaceToHoldRom": "Espaço insuficiente para manter a ROM",
-      "noPathToFlasherSoftwareProvided": "Nenhum caminho para o software flasher fornecido para o carrinho {0}.",
+      "noPathToFlasherSoftwareProvided": "Nenhum caminho para o software flasher fornecido para o carrinho ${0}",
       "noneFound": "Não foram encontrados carrinhos flash",
       "preferences": {
-        "flashCartsDescription": "Configurações para auto-detecção e flasheo do carrinho."
+        "flashCartsDescription": "Configurações para autodetecção e flasheo do carrinho."
       },
       "youCanConnectAnyNumberOfCarts": "Pode ligar, e piscar, a qualquer número de carrinhos flash ao mesmo tempo."
     },
     "general": {
       "commands": {
-        "category": "Estúdio VUEngine",
+        "category": "VUEngine Studio",
         "reportIssue": "Edição do relatório",
         "support": "Suporte VUEngine Studio"
       },
@@ -341,11 +341,12 @@
       "makerCode": "Código do Criador",
       "myProject": "O meu projecto",
       "name": "Nome",
+      "noTypesRegistered": "Nenhum tipo registado.",
       "path": "Caminho",
       "preferences": {
         "authorDefault": "Utilizador do VUEngine Studio",
         "authorDescription": "Nome de autor por defeito a utilizar em novos projectos.",
-        "basePathDescription": "Caminho de base para novos projectos.",
+        "basePathDescription": "Caminho base para novos projectos.",
         "makerCodeDescription": "Código do Criador por defeito a colocar no cabeçalho de novos projectos da ROM."
       },
       "project": "Projecto",

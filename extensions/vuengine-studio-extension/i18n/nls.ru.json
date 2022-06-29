@@ -51,8 +51,8 @@
       "modes": {
         "betaDescription": "Включает выбранные утверждения для тестирования производительности на аппаратном обеспечении.",
         "debugDescription": "Включает все утверждения во время выполнения, включает средства отладки.",
-        "releaseDescription": "Не содержит ассертов и флагов отладки, только для доставки.",
-        "toolsDescription": "Включает выбранные ассерты, включает инструменты отладки."
+        "releaseDescription": "Не содержит ни ассертов, ни флагов отладки, только для доставки.",
+        "toolsDescription": "Включает выбранные утверждения, включает инструменты отладки."
       },
       "noTasksFound": "Заданий не найдено.",
       "pedanticWarnings": "Педантичные предупреждения",
@@ -76,7 +76,7 @@
       "taskCompleted": "Задание {0} выполнено.",
       "taskTerminatedBySignal": "Задание {0} завершено сигналом {1}.",
       "taskTerminatedForUnknownReason": "Задание {0} завершено по неизвестной причине.",
-      "taskTerminatedWithExitCode": "Задание {0} завершилось с кодом выхода {1}.",
+      "taskTerminatedWithExitCode": "Задача {0} завершилась с кодом выхода {1}.",
       "toggleAutomaticScrolling": "Включить автоматическую прокрутку"
     },
     "codegen": {
@@ -160,7 +160,7 @@
         "toggleControlsOverlayCommand": "Переключение наложения элементов управления",
         "toggleFastForwardCommand": "Переключение перемотки вперед",
         "toggleLowPower": "Переключение сигнала низкого энергопотребления",
-        "toggleSlowmotionCommand": "Переключение замедленного движения"
+        "toggleSlowmotionCommand": "Переключить режим замедленного движения"
       },
       "mute": "Отключить звук",
       "pause": "Пауза",
@@ -208,7 +208,7 @@
         "category": "Экспорт",
         "export": "Экспорт ПЗУ..."
       },
-      "doYouReallyWantToOverwrite": "Вы действительно хотите перезаписать {0}?",
+      "doYouReallyWantToOverwrite": "Вы действительно хотите перезаписать \"${}\"?",
       "exportRom": "Экспорт ПЗУ",
       "overwrite": "Перезаписать"
     },
@@ -229,11 +229,11 @@
       "done": "Выполнено",
       "flash": "Flash",
       "flashCarts": "Flash Carts",
-      "flasherSoftwareDoesNotExist": "Программное обеспечение прошивальщика не существует по адресу {0}.",
+      "flasherSoftwareDoesNotExist": "Программное обеспечение флешера не существует по адресу ${0}",
       "flashingIsQueued": "Прошивка поставлена в очередь и начнется, как только сборка будет готова",
       "flashingQueued": "Мигает Очередь",
       "insufficientSpaceToHoldRom": "Недостаточно места для хранения ПЗУ",
-      "noPathToFlasherSoftwareProvided": "Для корзины {0} не указан путь к программе-прошивальщику.",
+      "noPathToFlasherSoftwareProvided": "Не указан путь к программному обеспечению прошивальщика для корзины ${0}",
       "noneFound": "Флэш-карт не найдено",
       "preferences": {
         "flashCartsDescription": "Конфигурации для автоопределения и мигания флэш-карт."
@@ -242,7 +242,7 @@
     },
     "general": {
       "commands": {
-        "category": "Студия VUEngine",
+        "category": "VUEngine Studio",
         "reportIssue": "Выпуск отчета",
         "support": "Поддержка VUEngine Studio"
       },
@@ -341,6 +341,7 @@
       "makerCode": "Код создателя",
       "myProject": "Мой проект",
       "name": "Имя",
+      "noTypesRegistered": "Типы не зарегистрированы.",
       "path": "Путь",
       "preferences": {
         "authorDefault": "Пользователь VUEngine Studio",

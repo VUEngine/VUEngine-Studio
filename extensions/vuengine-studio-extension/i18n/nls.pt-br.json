@@ -94,7 +94,7 @@
       },
       "documentation": "Documentação",
       "hardwareDocumentation": "Documentação de Hardware",
-      "vuengineStudioHandbook": "Manual do Estúdio VUEngine"
+      "vuengineStudioHandbook": "Manual do VUEngine Studio"
     },
     "editors": {
       "areYouSureYouWantToDeleteItem": "Você tem certeza que quer apagar o {0} {1}?",
@@ -208,7 +208,7 @@
         "category": "Exportação",
         "export": "ROM de exportação..."
       },
-      "doYouReallyWantToOverwrite": "Você realmente quer sobrescrever {0}?",
+      "doYouReallyWantToOverwrite": "Você realmente quer sobrescrever \"${}\"?",
       "exportRom": "ROM de exportação",
       "overwrite": "Sobreescrever"
     },
@@ -229,11 +229,11 @@
       "done": "Feito",
       "flash": "Flash",
       "flashCarts": "Carrinhos Flash",
-      "flasherSoftwareDoesNotExist": "O software Flasher não existe a {0}.",
+      "flasherSoftwareDoesNotExist": "O software Flasher não existe a ${0}.",
       "flashingIsQueued": "O Flashing está enfileirado e começará assim que a construção estiver pronta",
       "flashingQueued": "Fila de espera intermitente",
       "insufficientSpaceToHoldRom": "Espaço insuficiente para manter a ROM",
-      "noPathToFlasherSoftwareProvided": "Nenhum caminho para o software flasher fornecido para o carrinho {0}.",
+      "noPathToFlasherSoftwareProvided": "Nenhum caminho para o software flasher fornecido para o carrinho ${0}",
       "noneFound": "Não foram encontrados carrinhos flash",
       "preferences": {
         "flashCartsDescription": "Configurações para autodetecção e flasheo do carrinho."
@@ -242,7 +242,7 @@
     },
     "general": {
       "commands": {
-        "category": "Estúdio VUEngine",
+        "category": "VUEngine Studio",
         "reportIssue": "Emissão de relatórios",
         "support": "Suporte VUEngine Studio"
       },
@@ -278,7 +278,7 @@
       "commands": {
         "category": "Conversor de imagem",
         "convertAll": "Converta tudo",
-        "convertChanged": "Converter mudado",
+        "convertChanged": "Conversão alterada",
         "showHelp": "Mostrar página do Manual",
         "toggleView": "Alternar a visão do conversor de imagem"
       },
@@ -312,7 +312,7 @@
       "preferences": {
         "includeLibraryInWorkspaceDescription": "Incluir automaticamente a biblioteca de plugins nos espaços de trabalho.",
         "includeUserLibraryInWorkspaceDescription": "Incluir automaticamente plugins de usuário nos espaços de trabalho.",
-        "libraryPathDescription": "Biblioteca completa de plugins. Utiliza a biblioteca de Plugins VUEngine integrada quando deixada em branco.",
+        "libraryPathDescription": "Biblioteca completa de plugins. Utiliza a biblioteca de Plugins VUEngine incorporada quando deixada em branco.",
         "userLibraryPathDescription": "Caminho completo para a pasta base para todos os plugins de usuário."
       },
       "recommended": "Recomendado",
@@ -321,7 +321,7 @@
       "searchPlugins": "Plugins de busca"
     },
     "projects": {
-      "areYouSureYouWantToDelete": "Você tem certeza de que quer excluir {0}?",
+      "areYouSureYouWantToDelete": "Você tem certeza de que quer apagar {0}?",
       "author": "Autor",
       "commands": {
         "category": "Projetos",
@@ -341,6 +341,7 @@
       "makerCode": "Código do fabricante",
       "myProject": "Meu projeto",
       "name": "Nome",
+      "noTypesRegistered": "Nenhum tipo registrado.",
       "path": "Caminho",
       "preferences": {
         "authorDefault": "Usuário do VUEngine Studio",

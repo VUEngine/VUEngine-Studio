@@ -60,7 +60,7 @@
       "postBuildTasks": "Zadania po zakończeniu budowy",
       "preBuildTasks": "Zadania przed budową",
       "preferences": {
-        "dumpElfDescription": "Zrzuć kod asemblera i fragmenty pamięci.",
+        "dumpElfDescription": "Zrzut kodu asemblera i fragmentów pamięci.",
         "engineCorePathDescription": "Pełna ścieżka do biblioteki głównej. Używa wbudowanej biblioteki VUEngine Core, jeśli jest pusta.",
         "includeEngineCoreInWorkspaceDescription": "Automatycznie dołączaj bibliotekę podstawową do obszarów roboczych.",
         "pedanticWarningsDescription": "Włączanie pedantycznych ostrzeżeń kompilatora.",
@@ -75,7 +75,7 @@
       "showOnlyWarnings": "Pokaż tylko ostrzeżenia",
       "taskCompleted": "Zadanie {0} zakończone.",
       "taskTerminatedBySignal": "Zadanie {0} zakończone przez sygnał {1}.",
-      "taskTerminatedForUnknownReason": "Zadanie {0} zostało przerwane z nieznanego powodu.",
+      "taskTerminatedForUnknownReason": "Zadanie {0} zakończone z nieznanego powodu.",
       "taskTerminatedWithExitCode": "Zadanie {0} zakończone z kodem wyjścia {1}.",
       "toggleAutomaticScrolling": "Przełącz automatyczne przewijanie"
     },
@@ -131,14 +131,14 @@
         "lTriggerCommand": "Lewy spust",
         "lUpCommand": "Lewy D-Pad ⇧",
         "rDownCommand": "Prawy D-Pad ⇩",
-        "rLeftCommand": "Prawy przycisk D-Pad ⇦",
+        "rLeftCommand": "Prawy D-Pad ⇦",
         "rRightCommand": "Prawy D-Pad ⇨",
         "rTriggerCommand": "Prawy spust",
         "rUpCommand": "Prawy D-Pad ⇧",
         "selectCommand": "Wybierz stronę",
         "startCommand": "Start"
       },
-      "currentSaveState": "Bieżący stan zapisu",
+      "currentSaveState": "Aktualny stan zapisu",
       "emulationMode": "Tryb emulacji",
       "emulationModes": {
         "accurate": "Dokładna strona",
@@ -208,7 +208,7 @@
         "category": "Eksport",
         "export": "Eksportuj pamięć ROM..."
       },
-      "doYouReallyWantToOverwrite": "Czy naprawdę chcesz nadpisać {0}?",
+      "doYouReallyWantToOverwrite": "Czy naprawdę chcesz nadpisać \"${}\"?",
       "exportRom": "Eksportuj pamięć ROM",
       "overwrite": "Nadpisz"
     },
@@ -222,18 +222,18 @@
         "flash": "Wózek Flash to Flash",
         "showHelp": "Strona podręcznika pokazów",
         "showSettings": "Pokaż preferencje koszyka Flash",
-        "toggleView": "Przełącz widok koszyków Flash"
+        "toggleView": "Przełączanie widoku koszyka Flash"
       },
       "connectYourFlashCarts": "Podłącz kartę lub karty pamięci Virtual Boy do komputera przez złącze USB.",
       "connectedFlashCarts": "Podłączone wózki Flash",
       "done": "Gotowe",
       "flash": "Flash",
       "flashCarts": "Wózki Flash",
-      "flasherSoftwareDoesNotExist": "Oprogramowanie flashera nie istnieje pod adresem {0}.",
+      "flasherSoftwareDoesNotExist": "Oprogramowanie flashera nie istnieje w lokalizacji ${0}.",
       "flashingIsQueued": "Błyskanie jest ustawione w kolejce i rozpocznie się po zakończeniu budowy.",
       "flashingQueued": "Miganie Kolejka",
       "insufficientSpaceToHoldRom": "Niewystarczająca ilość miejsca do przechowywania pamięci ROM",
-      "noPathToFlasherSoftwareProvided": "Nie podano ścieżki do oprogramowania flashera dla koszyka {0}.",
+      "noPathToFlasherSoftwareProvided": "Brak ścieżki do oprogramowania flashera dla koszyka ${0}",
       "noneFound": "Nie znaleziono wózków flash.",
       "preferences": {
         "flashCartsDescription": "Konfiguracje automatycznego wykrywania i migania kaset z lampami błyskowymi."
@@ -242,7 +242,7 @@
     },
     "general": {
       "commands": {
-        "category": "Studio VUEngine",
+        "category": "VUEngine Studio",
         "reportIssue": "Raport Wydanie",
         "support": "Obsługa VUEngine Studio"
       },
@@ -341,6 +341,7 @@
       "makerCode": "Kod twórcy",
       "myProject": "Mój projekt",
       "name": "Nazwa",
+      "noTypesRegistered": "Nie zarejestrowano żadnych typów.",
       "path": "Ścieżka",
       "preferences": {
         "authorDefault": "Użytkownik VUEngine Studio",
@@ -369,7 +370,7 @@
       "break": "Przerwa",
       "builtInHapticEffects": "Wbudowane efekty haptyczne",
       "commands": {
-        "category": "Rumble Pack",
+        "category": "Pakiet Rumble",
         "detectConnected": "Wykryj podłączonego Rumble Pack",
         "expand": "Toggle Maximized",
         "help": "Strona podręcznika pokazów",
@@ -414,7 +415,7 @@
         "transitionRampUpMediumSharp": "Przejście Rampa w górę Średnio ostre",
         "transitionRampUpMediumSmooth": "Przejście Rampa w górę Średnio gładkie",
         "transitionRampUpShortSharp": "Przejście do góry Krótko i ostro",
-        "transitionRampUpShortSmooth": "Przejście Rampa w górę Krótka gładka",
+        "transitionRampUpShortSmooth": "Przejście do góry Krótka gładka",
         "tripleClick": "Potrójne kliknięcie"
       },
       "frequency": "Częstotliwość",

@@ -39,7 +39,7 @@
       "couldNotRunTask": "Impossibile eseguire l'attività {0}.",
       "done": "Fatto",
       "dumpElf": "Scarico ELF",
-      "errorCouldNotFindMakefile": "Errore: Impossibile trovare un makefile. Ho provato i seguenti percorsi:",
+      "errorCouldNotFindMakefile": "Errore: Impossibile trovare un makefile. Ho provato le seguenti posizioni:",
       "errorEnginePathMustNotContainSpaces": "Errore: Il percorso del motore non deve contenere spazi. Il percorso del motore:",
       "errorPluginsPathMustNotContainSpaces": "Errore: Il percorso dei plugin non deve contenere spazi. Il percorso dei plugin:",
       "errorProjectPathMustNotContainSpaces": "Errore: Il percorso del progetto non deve contenere spazi. Il percorso del progetto:",
@@ -74,7 +74,7 @@
       "showOnlyErrors": "Mostra solo gli errori",
       "showOnlyWarnings": "Mostra solo gli avvisi",
       "taskCompleted": "Attività {0} completata.",
-      "taskTerminatedBySignal": "L'attività {0} è stata terminata dal segnale {1}.",
+      "taskTerminatedBySignal": "Il task {0} è stato terminato dal segnale {1}.",
       "taskTerminatedForUnknownReason": "L'attività {0} è terminata per un motivo sconosciuto.",
       "taskTerminatedWithExitCode": "L'attività {0} è terminata con il codice di uscita {1}.",
       "toggleAutomaticScrolling": "Alterna lo scorrimento automatico"
@@ -154,7 +154,7 @@
         "resetCommand": "Reset",
         "rewindCommand": "Riavvolgimento",
         "saveStateCommand": "Salva lo Stato",
-        "screenshotCommand": "Scattare una schermata",
+        "screenshotCommand": "Scatto della schermata",
         "stateSlotDecreaseCommand": "Diminuire lo slot di salvataggio dello Stato",
         "stateSlotIncreaseCommand": "Aumentare lo slot di salvataggio dello Stato",
         "toggleControlsOverlayCommand": "Sovrapposizione dei controlli",
@@ -169,7 +169,7 @@
         "builtInScalingModeDescription": "Modalità di ridimensionamento dell'emulatore integrato.",
         "builtInStereoModeDescription": "Modalità di visualizzazione stereoscopica dell'emulatore integrato.",
         "customConfigsDescription": "Configurazioni dell'emulatore definite dall'utente per l'esecuzione di ROM compilate.",
-        "customDefaultDescription": "Configurazione dell'emulatore da utilizzare per eseguire le ROM compilate. Se lasciato vuoto, utilizza l'emulatore integrato."
+        "customDefaultDescription": "Configurazione dell'emulatore da usare per eseguire le ROM compilate. Se lasciato vuoto, utilizza l'emulatore integrato."
       },
       "resume": "Il curriculum",
       "runQueued": "Esecuzione in coda",
@@ -208,7 +208,7 @@
         "category": "Esportazione",
         "export": "Esportazione ROM..."
       },
-      "doYouReallyWantToOverwrite": "Si vuole davvero sovrascrivere {0}?",
+      "doYouReallyWantToOverwrite": "Si vuole davvero sovrascrivere \"${}\"?",
       "exportRom": "Esportazione ROM",
       "overwrite": "Sovrascrivere"
     },
@@ -218,7 +218,7 @@
       "commands": {
         "category": "Carrelli Flash",
         "detectConnected": "Rilevare i carrelli flash collegati",
-        "expandView": "Toggle Massimizzato",
+        "expandView": "Alterna Massimizzato",
         "flash": "Carrello da Flash a Flash",
         "showHelp": "Pagina del manuale dello spettacolo",
         "showSettings": "Mostra le preferenze di Flash Carts",
@@ -229,11 +229,11 @@
       "done": "Fatto",
       "flash": "Flash",
       "flashCarts": "Carrelli Flash",
-      "flasherSoftwareDoesNotExist": "Il software Flasher non esiste in {0}.",
+      "flasherSoftwareDoesNotExist": "Il software Flasher non esiste in ${0}",
       "flashingIsQueued": "Il flashing è in coda e verrà avviato quando la build sarà pronta.",
       "flashingQueued": "Lampeggiante In coda",
       "insufficientSpaceToHoldRom": "Spazio insufficiente per contenere la ROM",
-      "noPathToFlasherSoftwareProvided": "Non è stato fornito il percorso del software di flasher per il carrello {0}.",
+      "noPathToFlasherSoftwareProvided": "Non è stato fornito il percorso del software di flasher per il carrello ${0}",
       "noneFound": "Nessun carrello flash trovato",
       "preferences": {
         "flashCartsDescription": "Configurazioni per il rilevamento automatico e il lampeggiamento del carrello."
@@ -242,7 +242,7 @@
     },
     "general": {
       "commands": {
-        "category": "Studio VUEngine",
+        "category": "VUEngine Studio",
         "reportIssue": "Rapporto",
         "support": "Support VUEngine Studio"
       },
@@ -337,10 +337,11 @@
       "deleteNodeQuestion": "Cancellare il nodo?",
       "errorBasePathDoesNotExist": "Errore: il percorso di base non esiste",
       "errorNoProjectName": "Errore: non è stato fornito il nome del progetto",
-      "gameCode": "Codice gioco",
+      "gameCode": "Codice del gioco",
       "makerCode": "Codice Creatore",
       "myProject": "Il mio progetto",
       "name": "Nome",
+      "noTypesRegistered": "Nessun tipo registrato.",
       "path": "Percorso",
       "preferences": {
         "authorDefault": "VUEngine Studio User",
@@ -358,7 +359,7 @@
         "imageViewerDescription": "Visualizzatore di immagini stereo.",
         "imageViewerTitle": "Visualizzatore di immagini",
         "multiplayerDescription": "Un semplice gioco simile a Pong che utilizza la classe di comunicazione del motore per le partite multigiocatore su cavo di collegamento.",
-        "multiplayerTitle": "Gioco multiplayer",
+        "multiplayerTitle": "Gioco multigiocatore",
         "platformerDescription": "Un gioco platform completo a livello singolo.",
         "platformerTitle": "Gioco su piattaforma"
       },
