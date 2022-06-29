@@ -9,6 +9,7 @@ import {
   OpenerService, TreeModel, TreeNode, TreeProps,
   TreeWidget
 } from '@theia/core/lib/browser';
+import { AlertMessage } from '@theia/core/lib/browser/widgets/alert-message';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
@@ -123,16 +124,18 @@ export class VesProjectTreeWidget extends TreeWidget {
     // sort entries by name
     documents.members.sort((a, b) => a.name > b.name && 1 || -1);
 
-    const root: VesProjectRootNode = {
-      id: 'ves-project-root',
-      name: 'ves-project-root',
-      visible: false,
-      parent: undefined,
-      children: [],
-      documents
-    };
+    if (documents.members.length) {
+      const root: VesProjectRootNode = {
+        id: 'ves-project-root',
+        name: 'ves-project-root',
+        visible: false,
+        parent: undefined,
+        children: [],
+        documents
+      };
 
-    this.model.root = root;
+      this.model.root = root;
+    }
   }
 
   protected async setTitle(): Promise<void> {
@@ -140,6 +143,13 @@ export class VesProjectTreeWidget extends TreeWidget {
     if (projectName) {
       this.title.label = `${VesProjectTreeWidget.LABEL}: ${projectName}`;
     }
+  }
+  protected override renderTree(model: TreeModel): React.ReactNode {
+    return super.renderTree(model)
+      || <AlertMessage
+        type='WARNING'
+        header={nls.localize('vuengine/projects/noTypesRegistered', 'No types registered.')}
+      />;
   }
 
   protected renderTailDecorations(
