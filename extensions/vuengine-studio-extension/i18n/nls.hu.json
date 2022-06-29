@@ -36,7 +36,7 @@
         "toggleView": "Építési nézet váltása"
       },
       "couldNotFindCommand": "Nem találta a {0} parancsot.",
-      "couldNotRunTask": "Nem sikerült futtatni a {0} feladatot.",
+      "couldNotRunTask": "Nem sikerült futtatni a feladatot {0}.",
       "done": "Kész",
       "dumpElf": "ELF ürítése",
       "errorCouldNotFindMakefile": "Hiba: Nem talált makefile-t. A következő helyeken próbáltam:",
@@ -73,8 +73,8 @@
       "setBuildModeTitle": "Építési mód beállítása",
       "showOnlyErrors": "Csak hibák megjelenítése",
       "showOnlyWarnings": "Csak figyelmeztetések megjelenítése",
-      "taskCompleted": "A {0} feladat befejeződött.",
-      "taskTerminatedBySignal": "A {0} feladatot a {1} jel szakította meg.",
+      "taskCompleted": "Task {0} befejezve.",
+      "taskTerminatedBySignal": "A {0} feladatot az {1} jelzés megszakította.",
       "taskTerminatedForUnknownReason": "A {0} feladat ismeretlen okból megszakadt.",
       "taskTerminatedWithExitCode": "A {0} feladat {1} kilépési kóddal fejeződött be.",
       "toggleAutomaticScrolling": "Automatikus görgetés bekapcsolása"
@@ -208,7 +208,7 @@
         "category": "Exportálás",
         "export": "Export ROM..."
       },
-      "doYouReallyWantToOverwrite": "Tényleg felül akarja írni a {0} szót?",
+      "doYouReallyWantToOverwrite": "Tényleg felül akarja írni a \"${}\" szót?",
       "exportRom": "ROM exportálása",
       "overwrite": "Felülírás"
     },
@@ -229,11 +229,11 @@
       "done": "Kész",
       "flash": "Flash",
       "flashCarts": "Flash kocsik",
-      "flasherSoftwareDoesNotExist": "A flasher szoftver nem létezik a {0} címen.",
+      "flasherSoftwareDoesNotExist": "A Flasher szoftver nem létezik a ${0} címen.",
       "flashingIsQueued": "A villogás várakozik, és elindul, amint a build készen áll.",
-      "flashingQueued": "Villogó sorban állás",
+      "flashingQueued": "Villogó várakozó",
       "insufficientSpaceToHoldRom": "Nem elegendő hely a ROM tárolására",
-      "noPathToFlasherSoftwareProvided": "A {0} kosárhoz nincs megadva a flasher szoftver elérési útvonala.",
+      "noPathToFlasherSoftwareProvided": "A ${0} kosárhoz nincs megadva a flasher szoftver elérési útvonala.",
       "noneFound": "Nem találtunk flash kocsikat",
       "preferences": {
         "flashCartsDescription": "Konfigurációk a villanókocsik automatikus felismeréséhez és villogásához."
@@ -321,7 +321,7 @@
       "searchPlugins": "Pluginok keresése"
     },
     "projects": {
-      "areYouSureYouWantToDelete": "Biztos, hogy törölni akarja a {0}-t?",
+      "areYouSureYouWantToDelete": "Biztos, hogy törölni akarja a {0}?",
       "author": "Szerző",
       "commands": {
         "category": "Projektek",
@@ -341,6 +341,7 @@
       "makerCode": "Gyártó kód",
       "myProject": "Az én projektem",
       "name": "Név",
+      "noTypesRegistered": "Nincs regisztrált típus.",
       "path": "Útvonal",
       "preferences": {
         "authorDefault": "VUEngine Studio felhasználó",
@@ -405,7 +406,7 @@
         "transitionHum": "Átmenet Hum",
         "transitionRampDownLongSharp": "Átmeneti rámpa lefelé hosszú éles",
         "transitionRampDownLongSmooth": "Átmeneti rámpa lefelé hosszú sima",
-        "transitionRampDownMediumSharp": "Átmeneti rámpa lefelé Közepesen éles",
+        "transitionRampDownMediumSharp": "Átmenet Ramp Down közepes éles",
         "transitionRampDownMediumSmooth": "Átmeneti rámpa lefelé Közepes sima",
         "transitionRampDownShortSharp": "Átmeneti rámpa lefelé rövid éles",
         "transitionRampDownShortSmooth": "Átmeneti rámpa lefelé rövid sima",

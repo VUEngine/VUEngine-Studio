@@ -49,7 +49,7 @@
       "malformedPreferenceNotAnArray": "畸形的偏好:不是一个数组。",
       "mode": "模式",
       "modes": {
-        "betaDescription": "包括选定的断言,用于测试硬件上的性能。",
+        "betaDescription": "包括选定的断言,用于测试硬件的性能。",
         "debugDescription": "包括所有运行时断言,包括调试工具。",
         "releaseDescription": "不包括断言或调试标志,只用于运输。",
         "toolsDescription": "包括选定的断言,包括调试工具。"
@@ -193,7 +193,7 @@
         "2dBlackYellow": "2D (黄/黑)",
         "anaglyph-redElectricCyan": "Anaglyph (Red/El.Cyan)",
         "anaglyphGreenMagenta": "幻影(红/绿)",
-        "anaglyphRedBlue": "幻影(红/蓝)",
+        "anaglyphRedBlue": "Anaglyph (Red/Blue)",
         "anaglyphRedCyan": "幻影(红色/青色)",
         "anaglyphYellowBlue": "幻影(黄/蓝)",
         "cyberscope": "网络视界",
@@ -208,7 +208,7 @@
         "category": "出口",
         "export": "出口ROM..."
       },
-      "doYouReallyWantToOverwrite": "你真的想覆盖{0}吗?",
+      "doYouReallyWantToOverwrite": "你真的想覆盖\"${}\"吗?",
       "exportRom": "输出ROM",
       "overwrite": "覆盖"
     },
@@ -229,20 +229,20 @@
       "done": "已完成",
       "flash": "闪光灯",
       "flashCarts": "闪存车",
-      "flasherSoftwareDoesNotExist": "在{0}处不存在flasher软件。",
+      "flasherSoftwareDoesNotExist": "在${0}处不存在Flasher软件。",
       "flashingIsQueued": "闪光是排队的,一旦构建完成就会开始。",
       "flashingQueued": "闪烁的排队",
       "insufficientSpaceToHoldRom": "没有足够的空间容纳ROM",
-      "noPathToFlasherSoftwareProvided": "没有为购物车{0}提供flasher软件的路径。",
-      "noneFound": "没有发现闪存卡",
+      "noPathToFlasherSoftwareProvided": "没有为购物车${0}提供flasher软件的路径。",
+      "noneFound": "没有发现闪光灯车",
       "preferences": {
         "flashCartsDescription": "闪光灯车自动检测和闪烁的配置。"
       },
-      "youCanConnectAnyNumberOfCarts": "你可以同时连接任何数量的闪光灯车,并向其闪光。"
+      "youCanConnectAnyNumberOfCarts": "你可以同时连接任何数量的闪光车,并向其闪光。"
     },
     "general": {
       "commands": {
-        "category": "VUEngine工作室",
+        "category": "VUEngine Studio",
         "reportIssue": "报告问题",
         "support": "支持VUEngine Studio"
       },
@@ -341,6 +341,7 @@
       "makerCode": "制造商代码",
       "myProject": "我的项目",
       "name": "命名",
+      "noTypesRegistered": "没有登记的类型。",
       "path": "路径",
       "preferences": {
         "authorDefault": "VUEngine Studio用户",
@@ -385,7 +386,7 @@
         "doubleClick": "双击",
         "longBuzzForProgrammaticStopping": "程序化停摆的长篇大论",
         "longDoubleSharpClickMedium": "长的双倍尖锐的点击中",
-        "longDoubleSharpClickStrong": "长长的双倍尖锐的点击声 强烈的",
+        "longDoubleSharpClickStrong": "长长的双倍尖锐的点击 强烈的",
         "longDoubleSharpTick": "长的双锋线",
         "mediumClick": "中型点击",
         "pulsingMedium": "脉冲介质",
@@ -413,7 +414,7 @@
         "transitionRampUpLongSmooth": "过渡坡道长而平稳",
         "transitionRampUpMediumSharp": "过渡期内,中速上升",
         "transitionRampUpMediumSmooth": "过渡期上升 中等平稳",
-        "transitionRampUpShortSharp": "过渡期短促",
+        "transitionRampUpShortSharp": "过渡期内的短距离急剧上升",
         "transitionRampUpShortSmooth": "过渡期内短平快",
         "tripleClick": "三次点击"
       },
@@ -459,7 +460,7 @@
       "preferences": {
         "reportOnStartDescription": "在应用程序启动后报告可用的更新。"
       },
-      "updateFoundWannaUpdate": "发现更新。你想更新吗?",
+      "updateFoundWannaUpdate": "发现更新。你要更新吗?",
       "updateHasBeenDownloaded": "已经下载了一个更新。你想现在重新启动安装吗?",
       "viewErrorLog": "查看错误日志",
       "yes": "是"

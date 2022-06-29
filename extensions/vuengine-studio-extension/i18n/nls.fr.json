@@ -1,110 +1,110 @@
 {
   "theia": {
     "workspace": {
-      "closeWorkspace": "Voulez-vous vraiment fermer le projet ?",
-      "openRecentPlaceholder": "Tapez le nom du projet que vous voulez ouvrir",
-      "preserveWindow": "Activer l'ouverture des projets dans la fenêtre actuelle."
+      "closeWorkspace": "Voulez-vous vraiment clôturer le projet ?",
+      "openRecentPlaceholder": "Tapez le nom du projet que vous voulez ouvrir.",
+      "preserveWindow": "Permet d'ouvrir les projets dans la fenêtre actuelle."
     }
   },
   "vuengine": {
     "about": {
       "and": "et",
       "thankYouToOurSupporters": "Merci à nos supporters sur Patreon !",
-      "title": "A propos de VUEngine Studio",
+      "title": "À propos de VUEngine Studio",
       "version": "Version",
-      "vsCodeApiVersion": "Version de l'API VSCode"
+      "vsCodeApiVersion": "VSCode API Version"
     },
     "build": {
       "abortBuild": "Abandonner la construction",
-      "build": "Build",
+      "build": "Construire",
       "buildMode": "Mode de construction",
-      "buildProject": "Build Project",
-      "buildSuccessful": "Build successful",
-      "buildSuccessfulWithWarnings": "Build successful (with warnings)",
-      "building": "Construction",
+      "buildProject": "Projet de construction",
+      "buildSuccessful": "Construire avec succès",
+      "buildSuccessfulWithWarnings": "Construction réussie (avec avertissements)",
+      "building": "Bâtiment",
       "commandCompleted": "Commande {0} terminée.",
       "commands": {
-        "build": "Construire le projet",
-        "category": "Build",
+        "build": "Projet de construction",
+        "category": "Construire",
         "clean": "Nettoyer le dossier de construction",
         "expandView": "Toggle Maximized",
         "setMode": "Définir le mode de construction...",
-        "showHelp": "Afficher la page du manuel",
-        "showSettings": "Afficher les préférences de compilation",
-        "toggleDumpElf": "Basculer le vidage de l'ELF",
-        "togglePedanticWarnings": "Basculer vers les avertissements pédants",
-        "toggleView": "Basculer l'affichage de la compilation"
+        "showHelp": "Page du manuel d'exposition",
+        "showSettings": "Afficher les préférences de construction",
+        "toggleDumpElf": "Toggle Dump ELF",
+        "togglePedanticWarnings": "Avertissements pédants",
+        "toggleView": "Basculer la vue de la construction"
       },
       "couldNotFindCommand": "Impossible de trouver la commande {0}.",
       "couldNotRunTask": "Impossible d'exécuter la tâche {0}.",
       "done": "Terminé",
-      "dumpElf": "Dump ELF",
+      "dumpElf": "Larguer ELF",
       "errorCouldNotFindMakefile": "Erreur : Impossible de trouver un makefile. J'ai essayé les emplacements suivants :",
       "errorEnginePathMustNotContainSpaces": "Erreur : Le chemin du moteur ne doit pas contenir d'espaces. Le chemin de votre moteur :",
-      "errorPluginsPathMustNotContainSpaces": "Erreur : Plugins path must not contain spaces. Le chemin de vos plugins :",
-      "errorProjectPathMustNotContainSpaces": "Erreur : Le chemin du projet ne doit pas contenir d'espaces. Votre chemin de projet :",
-      "errorUserPluginsPathMustNotContainSpaces": "Erreur : User Plugins path ne doit pas contenir d'espaces. Le chemin de vos plugins utilisateur :",
+      "errorPluginsPathMustNotContainSpaces": "Erreur : Le chemin des plugins ne doit pas contenir d'espaces. Le chemin de vos plugins :",
+      "errorProjectPathMustNotContainSpaces": "Erreur : Le chemin du projet ne doit pas contenir d'espaces. Le chemin de votre projet :",
+      "errorUserPluginsPathMustNotContainSpaces": "Erreur : Le chemin des plugins de l'utilisateur ne doit pas contenir d'espaces. Le chemin des plugins de l'utilisateur :",
       "malformedPreferenceMissingTaskName": "Préférence malformée : nom de tâche manquant.",
-      "malformedPreferenceMissingTaskType": "Malformed preference : missing type for task {0}.",
-      "malformedPreferenceNotAnArray": "Malformed preference : not an array.",
+      "malformedPreferenceMissingTaskType": "Préférence malformée : type manquant pour la tâche {0}.",
+      "malformedPreferenceNotAnArray": "Préférence malformée : pas un tableau.",
       "mode": "Mode",
       "modes": {
-        "betaDescription": "Inclut des assertions sélectionnées, pour tester les performances sur le matériel.",
-        "debugDescription": "Inclut toutes les assertions d'exécution, inclut les outils de débogage.",
-        "releaseDescription": "N'inclut pas d'assertions ou de drapeaux de débogage, pour l'expédition uniquement.",
-        "toolsDescription": "Inclut des assertions sélectionnées, inclut des outils de débogage."
+        "betaDescription": "Comprend des assertions sélectionnées, pour tester les performances sur le matériel.",
+        "debugDescription": "Inclut toutes les assertions d'exécution, inclut des outils de débogage.",
+        "releaseDescription": "Ne comprend pas d'alertes ou de drapeaux de débogage, pour l'expédition uniquement.",
+        "toolsDescription": "Comprend des alertes sélectionnées, des outils de débogage."
       },
-      "noTasksFound": "Aucune tâche trouvée.",
+      "noTasksFound": "Aucune tâche n'a été trouvée.",
       "pedanticWarnings": "Avertissements pédants",
-      "pleaseInstallWsl": "Veuillez envisager d'installer WSL pour améliorer massivement les temps de construction.",
+      "pleaseInstallWsl": "Veuillez envisager d'installer WSL pour améliorer considérablement les temps de construction.",
       "postBuildTasks": "Tâches post-construction",
       "preBuildTasks": "Tâches de pré-construction",
       "preferences": {
-        "dumpElfDescription": "Dump du code d'assemblage et des sections de mémoire",
-        "engineCorePathDescription": "Chemin complet vers la bibliothèque de base. Utilise le noyau intégré de VUEngine s'il est laissé vide.",
-        "includeEngineCoreInWorkspaceDescription": "Inclure automatiquement la bibliothèque de base dans les espaces de travail.",
-        "pedanticWarningsDescription": "Activer les avertissements pédants du compilateur.",
+        "dumpElfDescription": "Dump du code d'assemblage et des sections de mémoire.",
+        "engineCorePathDescription": "Chemin complet vers la bibliothèque centrale. Utilise le noyau intégré de VUEngine si laissé vide.",
+        "includeEngineCoreInWorkspaceDescription": "Inclure automatiquement la bibliothèque centrale dans les espaces de travail.",
+        "pedanticWarningsDescription": "Activez les avertissements pédants du compilateur.",
         "postBuildTasksDescription": "Liste des Tâches et Commandes à exécuter après la construction.",
-        "preBuildTasksDescription": "Liste des Tâches et Commandes à exécuter avant la construction."
+        "preBuildTasksDescription": "Liste des tâches et des commandes à exécuter avant la construction."
       },
       "runningPostBuildTasks": "Exécution des tâches post-construction",
-      "runningPreBuildTasks": "Exécuter les tâches de pré-construction",
-      "setBuildModePlaceholder": "Sélectionner le mode de construction",
+      "runningPreBuildTasks": "Exécution des tâches de pré-construction",
+      "setBuildModePlaceholder": "Sélectionnez le mode de construction",
       "setBuildModeTitle": "Définir le mode de construction",
       "showOnlyErrors": "Afficher uniquement les erreurs",
       "showOnlyWarnings": "Afficher uniquement les avertissements",
       "taskCompleted": "Tâche {0} terminée.",
       "taskTerminatedBySignal": "Tâche {0} terminée par le signal {1}.",
-      "taskTerminatedForUnknownReason": "Tâche {0} terminée pour une raison inconnue.",
-      "taskTerminatedWithExitCode": "Tâche {0} terminée avec le code de sortie {1}.",
-      "toggleAutomaticScrolling": "Activer le défilement automatique"
+      "taskTerminatedForUnknownReason": "La tâche {0} s'est terminée pour une raison inconnue.",
+      "taskTerminatedWithExitCode": "La tâche {0} s'est terminée avec le code de sortie {1}.",
+      "toggleAutomaticScrolling": "Basculer le défilement automatique"
     },
     "codegen": {
       "commands": {
         "category": "Générateur de code",
-        "generateAll": "Générer tout"
+        "generateAll": "Générer tous les"
       },
       "generateAllDone": "Fin de la génération des fichiers."
     },
     "documentation": {
       "commands": {
         "category": "Documentation",
-        "openHandbook": "Ouvrir le manuel",
-        "openTechScroll": "Ouvrir la documentation sur le matériel"
+        "openHandbook": "Manuel ouvert",
+        "openTechScroll": "Documentation sur le matériel ouvert"
       },
       "documentation": "Documentation",
-      "hardwareDocumentation": "Documentation du matériel",
+      "hardwareDocumentation": "Documentation sur le matériel",
       "vuengineStudioHandbook": "Manuel de VUEngine Studio"
     },
     "editors": {
-      "areYouSureYouWantToDeleteItem": "Êtes-vous sûr de vouloir supprimer le {0} {1} ?",
+      "areYouSureYouWantToDeleteItem": "Vous êtes sûr de vouloir supprimer les {0} {1} ?",
       "chooseAnItemPlaceholder": "Sélectionnez l'élément que vous voulez modifier",
-      "chooseAnItemTitle": "Choisir un élément",
+      "chooseAnItemTitle": "Choisissez un article",
       "commands": {
-        "category": "Éditeurs",
-        "open": "Ouvrir l'éditeur"
+        "category": "Rédacteurs en chef",
+        "open": "Éditeur ouvert"
       },
-      "deleteNodeQuestion": "Supprimer le noeud ?",
+      "deleteNodeQuestion": "Supprimer un nœud ?",
       "palette": {
         "black": "Noir",
         "brightRed": "Rouge vif",
@@ -114,7 +114,7 @@
       "visualEditor": "Éditeur visuel"
     },
     "emulator": {
-      "builtIn": "Intégré",
+      "builtIn": "Built-In",
       "commands": {
         "category": "Emulateur",
         "run": "Exécuter sur l'émulateur",
@@ -124,7 +124,7 @@
       "controller": {
         "aCommand": "A",
         "bCommand": "B",
-        "category": "Manette de jeu de l'émulateur",
+        "category": "Emulateur Game Pad",
         "lDownCommand": "D-Pad gauche ⇩",
         "lLeftCommand": "D-Pad gauche ⇦",
         "lRightCommand": "D-Pad gauche ⇨",
@@ -134,57 +134,57 @@
         "rLeftCommand": "D-Pad droit ⇦",
         "rRightCommand": "D-Pad droit ⇨",
         "rTriggerCommand": "Gâchette droite",
-        "rUpCommand": "D-Pad droit ⇧",
-        "selectCommand": "Select",
-        "startCommand": "Démarrer"
+        "rUpCommand": "Pavé numérique droit ⇧",
+        "selectCommand": "Sélectionnez",
+        "startCommand": "Début"
       },
-      "currentSaveState": "État de sauvegarde actuel",
+      "currentSaveState": "État actuel de la sauvegarde",
       "emulationMode": "Mode d'émulation",
       "emulationModes": {
         "accurate": "Précis",
-        "fast": "Rapide"
+        "fast": "Presque"
       },
-      "emulator": "Émulateur",
+      "emulator": "Emulateur",
       "input": {
-        "audioMuteCommand": "Coupure audio",
-        "frameAdvanceCommand": "Avance de l'image",
+        "audioMuteCommand": "Sourdine audio",
+        "frameAdvanceCommand": "Avance du cadre",
         "fullscreenCommand": "Plein écran",
-        "loadStateCommand": "Chargement de l'état",
-        "pauseToggleCommand": "Pause",
-        "resetCommand": "Réinitialiser",
-        "rewindCommand": "Rembobiner",
-        "saveStateCommand": "Enregistrer l'état",
+        "loadStateCommand": "État de charge",
+        "pauseToggleCommand": "Toggle Pause",
+        "resetCommand": "Réinitialisation",
+        "rewindCommand": "Rewind",
+        "saveStateCommand": "Sauver l'État",
         "screenshotCommand": "Prendre une capture d'écran",
-        "stateSlotDecreaseCommand": "Diminuer l'intervalle d'enregistrement de l'état",
-        "stateSlotIncreaseCommand": "Augmenter l'intervalle d'enregistrement de l'état",
+        "stateSlotDecreaseCommand": "Diminuer Sauver l'État Slot",
+        "stateSlotIncreaseCommand": "Augmentation de l'emplacement de l'état de sauvegarde",
         "toggleControlsOverlayCommand": "Basculer la superposition des contrôles",
         "toggleFastForwardCommand": "Basculer l'avance rapide",
-        "toggleLowPower": "Basculer vers le signal de faible puissance",
+        "toggleLowPower": "Basculer le signal de faible puissance",
         "toggleSlowmotionCommand": "Basculer le ralenti"
       },
-      "mute": "Muet",
+      "mute": "Mute",
       "pause": "Pause",
       "preferences": {
         "builtInEmulationModeDescription": "Mode d'émulation de l'émulateur intégré.",
         "builtInScalingModeDescription": "Mode de mise à l'échelle de l'émulateur intégré.",
         "builtInStereoModeDescription": "Mode d'affichage stéréoscopique de l'émulateur intégré.",
-        "customConfigsDescription": "Configurations de l'émulateur définies par l'utilisateur pour l'exécution de ROMs compilées.",
-        "customDefaultDescription": "Configuration de l'émulateur qui sera utilisée pour exécuter les ROMs compilées. Utilise l'émulateur intégré si elle est laissée vide."
+        "customConfigsDescription": "Configurations d'émulateur définies par l'utilisateur pour l'exécution de ROMs compilées.",
+        "customDefaultDescription": "Configuration de l'émulateur qui sera utilisé pour exécuter les ROMs compilées. Utilise l'émulateur intégré s'il est laissé vide."
       },
-      "resume": "Reprise",
-      "runQueued": "Exécuter en file d'attente",
-      "scale": "Échelle",
+      "resume": "Curriculum vitae",
+      "runQueued": "Run Queued",
+      "scale": "Escaliers",
       "scales": {
-        "auto": "Auto",
-        "stretch": "Étirer"
+        "auto": "Voiture",
+        "stretch": "Stretch"
       },
       "selectDefaultEmulatorPlaceholder": "Quelle configuration d'émulateur doit être utilisée pour exécuter des projets compilés ?",
       "selectDefaultEmulatorTitle": "Sélectionner la configuration par défaut de l'émulateur",
-      "showHelp": "Afficher la page du manuel",
+      "showHelp": "Page du manuel d'exposition",
       "stereoMode": "Mode stéréo",
       "stereoModes": {
-        "2dBlackBlue": "2D (bleu/noir)",
-        "2dBlackCyan": "2D (Cyan/Noir)",
+        "2dBlackBlue": "2D (Bleu/Noir)",
+        "2dBlackCyan": "2D (cyan/noir)",
         "2dBlackElectricCyan": "2D (El.Cyan/Noir)",
         "2dBlackGreen": "2D (Vert/Noir)",
         "2dBlackMagenta": "2D (Magenta/Noir)",
@@ -192,24 +192,24 @@
         "2dBlackWhite": "2D (Blanc/Noir)",
         "2dBlackYellow": "2D (Jaune/Noir)",
         "anaglyph-redElectricCyan": "Anaglyphe (Rouge/El.Cyan)",
-        "anaglyphGreenMagenta": "Anaglyphe (Rouge/Vert)",
+        "anaglyphGreenMagenta": "Anaglyphe (rouge/vert)",
         "anaglyphRedBlue": "Anaglyphe (rouge/bleu)",
         "anaglyphRedCyan": "Anaglyphe (rouge/cyan)",
         "anaglyphYellowBlue": "Anaglyphe (jaune/bleu)",
         "cyberscope": "CyberScope",
         "hli": "Ligne horizontale entrelacée",
-        "sideBySide": "Côte à côte",
+        "sideBySide": "Side By Side",
         "vli": "Ligne verticale entrelacée"
       },
-      "unmute": "Désactiver le son"
+      "unmute": "Mauvaise humeur"
     },
     "export": {
       "commands": {
         "category": "Exportation",
-        "export": "Exporter ROM..."
+        "export": "Exportation de la ROM..."
       },
-      "doYouReallyWantToOverwrite": "Voulez-vous vraiment écraser {0} ?",
-      "exportRom": "Exporter ROM",
+      "doYouReallyWantToOverwrite": "Voulez-vous vraiment écraser \"${}\" ?",
+      "exportRom": "Exportation de ROM",
       "overwrite": "Écraser"
     },
     "flashCarts": {
@@ -217,49 +217,49 @@
       "cancel": "Annuler",
       "commands": {
         "category": "Chariots Flash",
-        "detectConnected": "Détecter les cartouches flash connectées",
-        "expandView": "Basculer en mode maximisé",
-        "flash": "Flash vers panier flash",
-        "showHelp": "Afficher la page du manuel",
+        "detectConnected": "Détecter les chariots Flash connectés",
+        "expandView": "Toggle Maximized",
+        "flash": "Flash to Flash Cart",
+        "showHelp": "Page du manuel d'exposition",
         "showSettings": "Afficher les préférences des paniers Flash",
-        "toggleView": "Basculer l'affichage des chariots flash"
+        "toggleView": "Basculer l'affichage des chariots Flash"
       },
-      "connectYourFlashCarts": "Connectez votre (vos) chariot(s) flash Virtual Boy à votre ordinateur via USB.",
-      "connectedFlashCarts": "Charriots Flash Connectés",
+      "connectYourFlashCarts": "Connectez votre ou vos cartes flash Virtual Boy à votre ordinateur via USB.",
+      "connectedFlashCarts": "Chariots Flash connectés",
       "done": "Terminé",
       "flash": "Flash",
       "flashCarts": "Chariots Flash",
-      "flasherSoftwareDoesNotExist": "Le logiciel du clignotant n'existe pas dans {0}.",
-      "flashingIsQueued": "Le flashage est en file d'attente et commencera dès que la construction sera prête",
-      "flashingQueued": "Flashing en attente",
+      "flasherSoftwareDoesNotExist": "Le logiciel du clignotant n'existe pas à ${0}",
+      "flashingIsQueued": "Le flashage est en file d'attente et commencera dès que la construction sera prête.",
+      "flashingQueued": "Clignotant En attente",
       "insufficientSpaceToHoldRom": "Espace insuffisant pour contenir la ROM",
-      "noPathToFlasherSoftwareProvided": "Aucun chemin vers le logiciel de flashage n'a été fourni pour le panier {0}.",
-      "noneFound": "Aucune cartouche flash trouvée",
+      "noPathToFlasherSoftwareProvided": "Pas de chemin vers le logiciel de flashage fourni pour le panier ${0}",
+      "noneFound": "Pas de chariots flash trouvés",
       "preferences": {
-        "flashCartsDescription": "Configurations pour l'auto-détection et le flashage des cartes flash."
+        "flashCartsDescription": "Configurations pour l'auto-détection et le flashage des chariots."
       },
-      "youCanConnectAnyNumberOfCarts": "Vous pouvez connecter, et flasher, n'importe quel nombre de cartes flash à la fois."
+      "youCanConnectAnyNumberOfCarts": "Vous pouvez connecter, et flasher sur, un nombre quelconque de chariots de flashes en même temps."
     },
     "general": {
       "commands": {
         "category": "VUEngine Studio",
-        "reportIssue": "Report Issue",
+        "reportIssue": "Numéro du rapport",
         "support": "Support VUEngine Studio"
       },
-      "selectDirectory": "Sélectionner le répertoire",
+      "selectDirectory": "Sélectionnez le répertoire",
       "space": "Espace",
       "themes": {
-        "dark": "Sombre",
+        "dark": "Dark",
         "highContrast": "Contraste élevé",
-        "light": "Clair",
-        "virtualBoy": "Garçon virtuel"
+        "light": "Lumière",
+        "virtualBoy": "Virtual Boy"
       }
     },
     "gettingStarted": {
       "alwaysShowThisPage": "Toujours afficher cette page lorsqu'aucun projet n'est ouvert.",
       "commands": {
-        "showHelp": "Afficher la page du manuel",
-        "showWidget": "Démarrage"
+        "showHelp": "Page du manuel d'exposition",
+        "showWidget": "Pour commencer"
       },
       "links": "Liens",
       "preferences": {
@@ -274,73 +274,74 @@
     },
     "imageConverter": {
       "changedImagesOnly": "Images modifiées uniquement",
-      "clearLogs": "Effacer les logs",
+      "clearLogs": "Effacer les bûches",
       "commands": {
         "category": "Convertisseur d'images",
-        "convertAll": "Convertir tout",
-        "convertChanged": "Convertir les modifications",
-        "showHelp": "Afficher la page du manuel",
+        "convertAll": "Convertir tous",
+        "convertChanged": "Convertir a changé",
+        "showHelp": "Page du manuel d'exposition",
         "toggleView": "Basculer l'affichage du convertisseur d'images"
       },
       "convert": "Convertir",
       "done": "Terminé",
       "foundXImages": "Trouvé {0} images",
       "imageConverter": "Convertisseur d'images",
-      "noneFound": "Aucune trouvée",
-      "startingToConvertAll": "Début de la conversion de toutes les images...",
-      "startingToConvertChanged": "Commence à convertir les images modifiées..."
+      "noneFound": "Aucun trouvé.",
+      "startingToConvertAll": "Je commence à convertir toutes les images...",
+      "startingToConvertChanged": "Début de la conversion des images modifiées..."
     },
     "plugins": {
       "add": "Ajouter",
       "commands": {
         "category": "Plugins",
         "clearAll": "Effacer les résultats de la recherche",
-        "new": "Nouveau plugin",
-        "searchByAuthor": "Chercher par auteur",
-        "searchByTag": "Recherche par balise",
-        "showHelp": "Afficher la page du manuel",
+        "new": "New Plugin",
+        "searchByAuthor": "Recherche par auteur",
+        "searchByTag": "Recherche par étiquette",
+        "showHelp": "Page du manuel d'exposition",
         "showInstalled": "Afficher les plugins installés",
         "showRecommendations": "Afficher les plugins recommandés",
-        "showSettings": "Afficher les préférences relatives aux plugins",
-        "toggleView": "Basculer l'affichage des plugins"
+        "showSettings": "Afficher les préférences des plugins",
+        "toggleView": "Toggle Plugins View"
       },
       "dependencies": "Dépendances",
-      "installed": "Installés",
-      "noDependencies": "Aucune",
+      "installed": "Installé",
+      "noDependencies": "Aucun",
       "plugin": "Plugin",
       "plugins": "Plugins",
       "preferences": {
         "includeLibraryInWorkspaceDescription": "Inclure automatiquement la bibliothèque de plugins dans les espaces de travail.",
-        "includeUserLibraryInWorkspaceDescription": "Inclure automatiquement les plugins de l'utilisateur dans les espaces de travail.",
+        "includeUserLibraryInWorkspaceDescription": "Inclure automatiquement les plugins des utilisateurs dans les espaces de travail.",
         "libraryPathDescription": "Chemin complet vers la bibliothèque de plugins. Utilise la bibliothèque de plugins intégrée de VUEngine si elle est laissée vide.",
-        "userLibraryPathDescription": "Chemin complet vers le dossier de base pour tous les plugins de l'utilisateur."
+        "userLibraryPathDescription": "Chemin complet du dossier de base pour tous les plugins de l'utilisateur."
       },
       "recommended": "Recommandé",
-      "remove": "Supprimer",
-      "search": "Chercher",
+      "remove": "Retirer",
+      "search": "Recherche",
       "searchPlugins": "Plugins de recherche"
     },
     "projects": {
-      "areYouSureYouWantToDelete": "Êtes-vous sûr de vouloir supprimer {0} ?",
+      "areYouSureYouWantToDelete": "Vous êtes sûr de vouloir supprimer {0} ?",
       "author": "Auteur",
       "commands": {
         "category": "Projets",
         "closeProject": "Fermer le projet",
         "newProject": "Nouveau projet",
-        "openProject": "Ouvrir le projet...",
-        "openProjectFile": "Ouvrir un fichier de projet",
+        "openProject": "Projet ouvert...",
+        "openProjectFile": "Ouvrir le fichier de projet",
         "openRecentProject": "Ouvrir un projet récent...",
         "saveProjectAs": "Enregistrer le projet sous...",
         "toggleView": "Basculer la vue du projet"
       },
       "create": "Créer",
-      "deleteNodeQuestion": "Supprimer un noeud",
+      "deleteNodeQuestion": "Supprimer un nœud ?",
       "errorBasePathDoesNotExist": "Erreur : le chemin de base n'existe pas",
-      "errorNoProjectName": "Erreur : aucun nom de projet fourni",
-      "gameCode": "Game Code",
-      "makerCode": "Code du créateur",
+      "errorNoProjectName": "Erreur : aucun nom de projet n'a été fourni",
+      "gameCode": "Code du jeu",
+      "makerCode": "Code Maker",
       "myProject": "Mon projet",
       "name": "Nom",
+      "noTypesRegistered": "Aucun type enregistré.",
       "path": "Chemin",
       "preferences": {
         "authorDefault": "Utilisateur de VUEngine Studio",
@@ -349,14 +350,14 @@
         "makerCodeDescription": "Code Maker par défaut à placer dans l'en-tête ROM des nouveaux projets."
       },
       "project": "Projet",
-      "selectParentFolder": "Sélectionner le dossier parent du nouveau projet",
-      "settingUpNewProject": "Configuration du nouveau projet",
-      "template": "Template",
+      "selectParentFolder": "Sélectionnez le dossier parent du nouveau projet",
+      "settingUpNewProject": "Mise en place d'un nouveau projet",
+      "template": "Modèle",
       "templates": {
-        "bareboneDescription": "Un projet (presque) vide qui comprend un seul écran \"Hello World\" plus les plugins les plus importants pour ajouter des écrans d'accueil, une pause automatique et plus encore.",
+        "bareboneDescription": "Un projet (presque) vide qui comprend un seul écran \"Hello World\" et les plugins les plus importants pour ajouter des écrans d'accueil, une pause automatique et plus encore.",
         "bareboneTitle": "Barebone",
         "imageViewerDescription": "Visionneuse d'images stéréo.",
-        "imageViewerTitle": "Visionneur d'images",
+        "imageViewerTitle": "Visionneuse d'images",
         "multiplayerDescription": "Un simple jeu de type Pong qui utilise la classe de communication du moteur pour des matchs multijoueurs via un câble de liaison.",
         "multiplayerTitle": "Jeu multijoueur",
         "platformerDescription": "Un jeu de plateforme complet à un seul niveau.",
@@ -370,70 +371,70 @@
       "builtInHapticEffects": "Effets haptiques intégrés",
       "commands": {
         "category": "Rumble Pack",
-        "detectConnected": "Détecter le Rumble Pack connecté",
-        "expand": "Basculer en mode Maximisé",
-        "help": "Afficher la page du manuel",
-        "openWidget": "Ouvrir l'outil Rumble Pack"
+        "detectConnected": "Détecter le pack Rumble Connecté",
+        "expand": "Toggle Maximized",
+        "help": "Page du manuel d'exposition",
+        "openWidget": "Open Rumble Pack Tool"
       },
       "connected": "Connecté",
       "disconnected": "Déconnecté",
       "effect": "Effet",
       "effects": {
-        "1000MsAlert": "Alerte de 1000 ms",
+        "1000MsAlert": "1000 ms Alerte",
         "750MsAlert": "750 ms Alerte",
         "buzz": "Buzz",
         "doubleClick": "Double clic",
-        "longBuzzForProgrammaticStopping": "Buzz long pour arrêt programmatique",
-        "longDoubleSharpClickMedium": "Double clic aigu long moyen",
-        "longDoubleSharpClickStrong": "Double clic aigu long et fort",
-        "longDoubleSharpTick": "Long Double Sharp Tick",
+        "longBuzzForProgrammaticStopping": "Long buzz pour l'arrêt programmatique",
+        "longDoubleSharpClickMedium": "Long Double Clic Pointu Moyen",
+        "longDoubleSharpClickStrong": "Long Double Sharp Click Strong",
+        "longDoubleSharpTick": "Long double tic-tac pointu",
         "mediumClick": "Clic moyen",
-        "pulsingMedium": "Moyenne pulsée",
-        "pulsingSharp": "Pulsation forte",
-        "pulsingStrong": "Pulsation forte",
+        "pulsingMedium": "Moyen pulsé",
+        "pulsingSharp": "Pulsing Sharp",
+        "pulsingStrong": "Pulsing Strong",
         "sharpClick": "Clic aigu",
         "sharpTick": "Tic-tac aigu",
         "shortDoubleClickMedium": "Court Double Clic Moyen",
-        "shortDoubleClickStrong": "Court Double Click Fort",
-        "shortDoubleSharpTick": "Double clic court et aigu",
-        "smoothHum": "Bourdonnement doux {0} (pas de coup de pied ou d'impulsion de freinage)",
-        "softBump": "Bump doux",
-        "softFuzz": "Soft Fuzz",
+        "shortDoubleClickStrong": "Court Double Clic Fort",
+        "shortDoubleSharpTick": "Short Double Sharp Tick",
+        "smoothHum": "Smooth Hum {0} (Pas d'impulsion de kick ou de frein)",
+        "softBump": "Bosse douce",
+        "softFuzz": "Fuzz doux",
         "strongBuzz": "Strong Buzz",
-        "strongClick": "Strong Click",
-        "transitionClick": "Transition Click",
+        "strongClick": "Clic fort",
+        "transitionClick": "Clic de transition",
         "transitionHum": "Transition Hum",
-        "transitionRampDownLongSharp": "Transition Ramp Down Long Sharp",
-        "transitionRampDownLongSmooth": "Transition Ramp Down Long Smooth",
-        "transitionRampDownMediumSharp": "Transition Ramp Down Medium Sharp",
-        "transitionRampDownMediumSmooth": "Transition Ramp Down Medium Smooth",
-        "transitionRampDownShortSharp": "Transition Ramp Down Short Sharp",
-        "transitionRampDownShortSmooth": "Transition rampe vers le bas courte et lisse",
-        "transitionRampUpLongSharp": "Rampe de transition vers le haut Long Sharp",
-        "transitionRampUpLongSmooth": "Transition Ramp Up Long Smooth",
-        "transitionRampUpMediumSharp": "Transition Ramp Up Medium Sharp",
-        "transitionRampUpMediumSmooth": "Transition Ramp Up Medium Smooth",
-        "transitionRampUpShortSharp": "Transition Ramp Up Short Sharp",
+        "transitionRampDownLongSharp": "Rampe de transition vers le bas Long Sharp",
+        "transitionRampDownLongSmooth": "Rampe de transition vers le bas Long Smooth",
+        "transitionRampDownMediumSharp": "Rampe de transition vers le bas Moyennement pointu",
+        "transitionRampDownMediumSmooth": "Rampe de transition vers le bas Moyennement lisse",
+        "transitionRampDownShortSharp": "Rampe de transition vers le bas court et pointu",
+        "transitionRampDownShortSmooth": "Transition Ramp Down Short Smooth",
+        "transitionRampUpLongSharp": "Montée en puissance de la transition Long Sharp",
+        "transitionRampUpLongSmooth": "Rampe de transition vers le haut Long Smooth",
+        "transitionRampUpMediumSharp": "Montée de la transition Moyennement pointue",
+        "transitionRampUpMediumSmooth": "Montée de la transition Moyennement lisse",
+        "transitionRampUpShortSharp": "La montée en puissance de la transition est courte et nette",
         "transitionRampUpShortSmooth": "Transition Ramp Up Short Smooth",
         "tripleClick": "Triple clic"
       },
       "frequency": "Fréquence",
       "jsonFormat": "Format JSON",
-      "log": "Journal",
+      "log": "Journal de bord",
       "menu": "Menu",
-      "negativeSustain": "Negative Sustain",
-      "overdrive": "Overdrive",
-      "positiveSustain": "Sustain positif",
+      "negativeSustain": "Sustain négatif",
+      "overdrive": "Surmultipliée",
+      "positiveSustain": "Positive Sustain",
       "printCommands": "Commandes d'impression",
       "reRunLastEffect": "Réexécution du dernier effet",
       "rumblePack": "Rumble Pack",
-      "rumblePackConnected": "Rumble Pack connecté",
+      "rumblePackConnected": "Rumble Pack Connecté",
       "rumblePackConnectionStatus": "État de la connexion du Rumble Pack",
       "rumblePackTool": "Rumble Pack Tool",
-      "runEffect": "Exécuter l'effet",
-      "stopCurrentEffect": "Arrêter l'effet en cours",
+      "runEffect": "Run effect",
+      "stopCurrentEffect": "Arrêter l'effet du courant",
       "sustainNeg": "Sustain (Neg.)",
-      "sustainPos": "Sustain (Pos.)",
+      "sustainPos": "Sustain (pos.)",
       "vbCommandLineState": "État de la ligne de commande VB",
       "vbSyncLineState": "VB Sync Line State"
     },
@@ -441,19 +442,19 @@
       "commands": {
         "category": "Fenêtre",
         "maximizeWindow": "Maximiser la fenêtre",
-        "minimizeWindow": "Minimiser la fenêtre",
+        "minimizeWindow": "Réduire la fenêtre",
         "unmaximizeWindow": "Fenêtre non maximisée"
       }
     },
     "updater": {
       "alreadyUsingLatestVersion": "Vous utilisez déjà la dernière version de VUEngine Studio.",
-      "applicationUpdate": "Mise à jour de l'application",
+      "applicationUpdate": "Mise à jour des applications",
       "commands": {
         "category": "Updater",
         "checkForUpdates": "Vérifier les mises à jour...",
         "restartToUpdate": "Redémarrer pour mettre à jour"
       },
-      "downloading": "Téléchargement",
+      "downloading": "Téléchargement de",
       "never": "Jamais",
       "no": "Non",
       "preferences": {
@@ -466,13 +467,13 @@
     },
     "zoom": {
       "commands": {
-        "category": "Afficher",
-        "resetZoom": "Réinitialiser le zoom",
-        "zoomIn": "Zoom avant",
+        "category": "Voir",
+        "resetZoom": "Réinitialisation du zoom",
+        "zoomIn": "Zoom In",
         "zoomOut": "Zoom arrière"
       },
       "preferences": {
-        "showZoomLevelInStatusBarDescription": "Afficher le niveau de zoom dans la barre d'état (uniquement s'il n'est pas de 100 %).",
+        "showZoomLevelInStatusBarDescription": "Afficher le niveau de zoom dans la barre d'état (seulement si ce n'est pas 100%).",
         "zoomLevelDescription": "Ajustez le niveau de zoom de la fenêtre."
       },
       "resetZoom": "Réinitialiser le zoom"

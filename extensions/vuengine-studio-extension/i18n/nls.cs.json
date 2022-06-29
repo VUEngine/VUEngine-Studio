@@ -33,13 +33,13 @@
         "showSettings": "Zobrazit předvolby sestavení",
         "toggleDumpElf": "Přepínač Dump ELF",
         "togglePedanticWarnings": "Přepínání pedantických varování",
-        "toggleView": "Přepnout zobrazení sestavení"
+        "toggleView": "Přepnutí zobrazení sestavení"
       },
       "couldNotFindCommand": "Nepodařilo se najít příkaz {0}.",
       "couldNotRunTask": "Nepodařilo se spustit úlohu {0}.",
       "done": "Hotovo",
       "dumpElf": "Vyhodit ELF",
-      "errorCouldNotFindMakefile": "Chyba: Chyba: Nepodařilo se najít makefile. Zkoušel jsem následující umístění:",
+      "errorCouldNotFindMakefile": "Chyba: Chyba: Nepodařilo se najít soubor makefile. Zkoušel jsem následující umístění:",
       "errorEnginePathMustNotContainSpaces": "Chyba: Cesta k motoru nesmí obsahovat mezery. Vaše cesta k motoru:",
       "errorPluginsPathMustNotContainSpaces": "Chyba: Cesta k zásuvným modulům nesmí obsahovat mezery. Vaše cesta k zásuvným modulům:",
       "errorProjectPathMustNotContainSpaces": "Chyba: Cesta k projektu nesmí obsahovat mezery. Vaše cesta k projektu:",
@@ -73,7 +73,7 @@
       "setBuildModeTitle": "Nastavení režimu sestavení",
       "showOnlyErrors": "Zobrazit pouze chyby",
       "showOnlyWarnings": "Zobrazit pouze varování",
-      "taskCompleted": "Úloha {0} byla dokončena.",
+      "taskCompleted": "Úloha {0} dokončena.",
       "taskTerminatedBySignal": "Úloha {0} ukončena signálem {1}.",
       "taskTerminatedForUnknownReason": "Úloha {0} byla ukončena z neznámého důvodu.",
       "taskTerminatedWithExitCode": "Úloha {0} byla ukončena s kódem ukončení {1}.",
@@ -97,7 +97,7 @@
       "vuengineStudioHandbook": "Příručka ke studiu VUEngine"
     },
     "editors": {
-      "areYouSureYouWantToDeleteItem": "Jste si jisti, že chcete odstranit {0} {1}?",
+      "areYouSureYouWantToDeleteItem": "Určitě chcete odstranit {0} {1}?",
       "chooseAnItemPlaceholder": "Vyberte položku, kterou chcete upravit",
       "chooseAnItemTitle": "Výběr položky",
       "commands": {
@@ -208,7 +208,7 @@
         "category": "Export",
         "export": "Export ROM..."
       },
-      "doYouReallyWantToOverwrite": "Opravdu chcete přepsat {0}?",
+      "doYouReallyWantToOverwrite": "Opravdu chcete přepsat \"${}\"?",
       "exportRom": "Export ROM",
       "overwrite": "Přepsat"
     },
@@ -229,11 +229,11 @@
       "done": "Hotovo",
       "flash": "Flash",
       "flashCarts": "Bleskové vozíky",
-      "flasherSoftwareDoesNotExist": "Flasher software neexistuje na adrese {0}.",
+      "flasherSoftwareDoesNotExist": "Flasher software neexistuje na adrese ${0}",
       "flashingIsQueued": "Blikání je zařazeno do fronty a spustí se, jakmile bude sestavení připraveno.",
       "flashingQueued": "Bliká ve frontě",
       "insufficientSpaceToHoldRom": "Nedostatečný prostor pro uložení paměti ROM",
-      "noPathToFlasherSoftwareProvided": "Pro košík {0} nebyla poskytnuta cesta k softwaru flasheru.",
+      "noPathToFlasherSoftwareProvided": "Pro košík ${0} nebyla poskytnuta cesta k softwaru flasheru.",
       "noneFound": "Nebyly nalezeny žádné flashové vozíky",
       "preferences": {
         "flashCartsDescription": "Konfigurace pro automatickou detekci a blikání zábleskového vozíku."
@@ -242,7 +242,7 @@
     },
     "general": {
       "commands": {
-        "category": "Studio VUEngine",
+        "category": "VUEngine Studio",
         "reportIssue": "Problém s hlášením",
         "support": "Podpora VUEngine Studio"
       },
@@ -321,7 +321,7 @@
       "searchPlugins": "Vyhledávání zásuvných modulů"
     },
     "projects": {
-      "areYouSureYouWantToDelete": "Určitě chcete odstranit {0}?",
+      "areYouSureYouWantToDelete": "Opravdu chcete odstranit {0}?",
       "author": "Autor",
       "commands": {
         "category": "Projekty",
@@ -341,6 +341,7 @@
       "makerCode": "Kód výrobce",
       "myProject": "Můj projekt",
       "name": "Název",
+      "noTypesRegistered": "Nejsou registrovány žádné typy.",
       "path": "Cesta",
       "preferences": {
         "authorDefault": "Uživatel VUEngine Studio",
@@ -359,7 +360,7 @@
         "imageViewerTitle": "Prohlížeč obrázků",
         "multiplayerDescription": "Jednoduchá hra podobná hře Pong, která využívá komunikační třídu enginu pro zápasy více hráčů přes propojovací kabel.",
         "multiplayerTitle": "Hra pro více hráčů",
-        "platformerDescription": "Plnohodnotná jednoúrovňová plošinovka.",
+        "platformerDescription": "Plnohodnotná plošinovka v jedné úrovni.",
         "platformerTitle": "Hra na platformě"
       },
       "verifying": "Ověřování"
@@ -414,7 +415,7 @@
         "transitionRampUpMediumSharp": "Přechodový náběh Středně ostrý",
         "transitionRampUpMediumSmooth": "Přechodový náběh Středně hladký",
         "transitionRampUpShortSharp": "Přechodová rampa krátká ostrá",
-        "transitionRampUpShortSmooth": "Přechodová rampa Krátká plynulá",
+        "transitionRampUpShortSmooth": "Přechodová rampa Krátká hladká",
         "tripleClick": "Trojité kliknutí"
       },
       "frequency": "Frekvence",
