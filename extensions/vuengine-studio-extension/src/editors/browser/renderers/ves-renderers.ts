@@ -1,3 +1,5 @@
+import vesFontDataControl from './fontData/ves-fontData-control';
+import vesFontDataControlTester from './fontData/ves-fontData-control-tester';
 import vesImagesControl from './images/ves-images-control';
 import vesImagesControlTester from './images/ves-images-control-tester';
 import vesInputControl from './input/ves-input-control';
@@ -12,6 +14,7 @@ import vesRatingControl from './starRating/ves-rating-control';
 import vesRatingControlTester from './starRating/ves-rating-control-tester';
 
 export const VES_RENDERERS = [
+    { tester: vesFontDataControlTester, renderer: vesFontDataControl },
     { tester: vesImagesControlTester, renderer: vesImagesControl },
     { tester: vesIntroControlTester, renderer: vesIntroControl },
     { tester: vesInputControlTester, renderer: vesInputControl },
