@@ -36,21 +36,21 @@ export const VesPalette: React.FC<VesPaletteProps> = ({ value, updateValue, labe
                     <SelectComponent
                         key="paletteIndex0"
                         options={paletteValues}
-                        value={index0}
+                        defaultValue={index0}
                         onChange={option => updateValue(getUpdatedValue(0, option.value!))} />
                 </div>
                 <div className={`value-${index1}`}>
                     <SelectComponent
                         key="paletteIndex1"
                         options={paletteValues}
-                        value={index1}
+                        defaultValue={index1}
                         onChange={option => updateValue(getUpdatedValue(1, option.value!))} />
                 </div>
                 <div className={`value-${index2}`}>
                     <SelectComponent
                         key="paletteIndex2"
                         options={paletteValues}
-                        value={index2}
+                        defaultValue={index2}
                         onChange={option => updateValue(getUpdatedValue(2, option.value!))} />
                 </div>
                 <div className="value-00">

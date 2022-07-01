@@ -1,6 +1,6 @@
 import { MAIN_MENU_BAR, nls } from '@theia/core';
 import { ApplicationShell, PreferenceService } from '@theia/core/lib/browser';
-import { BuiltinThemeProvider, ThemeService } from '@theia/core/lib/browser/theming';
+import { ThemeService } from '@theia/core/lib/browser/theming';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { CommandContribution, CommandRegistry } from '@theia/core/lib/common/command';
 import { MenuContribution, MenuModelRegistry } from '@theia/core/lib/common/menu';
@@ -13,6 +13,8 @@ import { VesCoreMenus } from './ves-core-menus';
 export class VesCoreContribution implements CommandContribution, MenuContribution {
     @inject(ApplicationShell)
     protected readonly shell: ApplicationShell;
+    @inject(MonacoThemeRegistry)
+    protected readonly monacoThemeRegistry: MonacoThemeRegistry;
     @inject(PreferenceService)
     protected readonly preferenceService: PreferenceService;
     @inject(ThemeService)
@@ -49,7 +51,7 @@ export class VesCoreContribution implements CommandContribution, MenuContributio
         // @ref https://github.com/eclipse-theia/theia/blob/master/packages/monaco/src/browser/textmate/monaco-theme-registry.ts
 
         // Override Light Theme
-        MonacoThemeRegistry.SINGLETON.register({
+        this.monacoThemeRegistry.register({
             ...require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/light_theia.json'),
             ...require('../../../themes/vuengine-light-color-theme.json'),
         }, {
@@ -62,16 +64,10 @@ export class VesCoreContribution implements CommandContribution, MenuContributio
             type: 'light',
             label: nls.localize('vuengine/general/themes/light', 'Light'),
             editorTheme: 'light-vuengine-studio',
-            activate(): void {
-                BuiltinThemeProvider.lightCss.use();
-            },
-            deactivate(): void {
-                BuiltinThemeProvider.lightCss.unuse();
-            }
         });
 
         // Override Dark Theme
-        MonacoThemeRegistry.SINGLETON.register({
+        this.monacoThemeRegistry.register({
             ...require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/dark_theia.json'),
             ...require('../../../themes/vuengine-dark-color-theme.json'),
         }, {
@@ -84,16 +80,10 @@ export class VesCoreContribution implements CommandContribution, MenuContributio
             type: 'dark',
             label: nls.localize('vuengine/general/themes/dark', 'Dark'),
             editorTheme: 'dark-vuengine-studio',
-            activate(): void {
-                BuiltinThemeProvider.darkCss.use();
-            },
-            deactivate(): void {
-                BuiltinThemeProvider.darkCss.unuse();
-            }
         });
 
         // Override HC Theme
-        MonacoThemeRegistry.SINGLETON.register({
+        this.monacoThemeRegistry.register({
             ...require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/hc_theia.json'),
             ...require('../../../themes/vuengine-high-contrast-color-theme.json'),
         }, {
@@ -105,18 +95,12 @@ export class VesCoreContribution implements CommandContribution, MenuContributio
             type: 'hc',
             label: nls.localize('vuengine/general/themes/highContrast', 'High Contrast'),
             editorTheme: 'hc-vuengine-studio',
-            activate(): void {
-                BuiltinThemeProvider.darkCss.use();
-            },
-            deactivate(): void {
-                BuiltinThemeProvider.darkCss.unuse();
-            }
         });
 
         // Add Virtual Boy HC theme
         // this is implemented through a filter in style/virtual-boy-theme.css
         // TODO: Exclude certain areas from filter, such as the emulator
-        MonacoThemeRegistry.SINGLETON.register({
+        this.monacoThemeRegistry.register({
             ...require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/hc_theia.json'),
             ...require('../../../themes/vuengine-virtual-boy-color-theme.json'),
         }, {
@@ -128,12 +112,6 @@ export class VesCoreContribution implements CommandContribution, MenuContributio
             type: 'hc',
             label: nls.localize('vuengine/general/themes/virtualBoy', 'Virtual Boy'),
             editorTheme: 'hc-virtual-boy',
-            activate(): void {
-                BuiltinThemeProvider.darkCss.use();
-            },
-            deactivate(): void {
-                BuiltinThemeProvider.darkCss.unuse();
-            }
         });
     }
 

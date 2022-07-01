@@ -17,7 +17,7 @@ export const VesDropdown = (props: EnumCellProps & VanillaRendererProps) => {
                 <div className='theia-input prefix'>{uischema.options?.inputPrefix}</div>}
             <SelectComponent
                 key={id}
-                value={data}
+                defaultValue={data}
                 options={schema.oneOf?.map(option => ({
                     label: option.title || option.const,
                     value: option.const,
