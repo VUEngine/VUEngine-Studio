@@ -1,6 +1,7 @@
-import { injectable } from '@theia/core/shared/inversify';
 import { ColorContribution } from '@theia/core/lib/browser/color-application-contribution';
-import { Color, ColorRegistry } from '@theia/core/lib/browser/color-registry';
+import { ColorRegistry } from '@theia/core/lib/browser/color-registry';
+import { Color } from '@theia/core/lib/common/color';
+import { injectable } from '@theia/core/shared/inversify';
 
 @injectable()
 export class VesColorContribution implements ColorContribution {

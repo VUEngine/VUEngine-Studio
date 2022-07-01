@@ -92,7 +92,7 @@ export class VesRumblePackWidget extends ReactWidget {
                 </select>
                 {/*
                 <SelectComponent
-                  value={this.state.effect}
+                  defaultValue={this.state.effect}
                   options={BUILT_IN_EFFECTS.map((value, index) => ({
                     label: value,
                     value: (index + 1).toString().padStart(3, '0')
