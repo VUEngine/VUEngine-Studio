@@ -38,15 +38,19 @@ export class VesPreferenceTreeGenerator extends PreferenceTreeGenerator {
         [VesGettingStartedPreferenceIds.CATEGORY, 'features'], // custom category
         ['files', 'editor'],
         ['hosted-plugin', 'features'],
+        ['http', 'application'],
         ['keyboard', 'application'],
+        ['notification', 'workbench'],
         ['output', 'features'],
         [VesPluginsPreferenceIds.CATEGORY, VesBuildPreferenceIds.CATEGORY], // custom category
-        ['problems', 'features'],
         ['preview', 'features'],
+        ['problems', 'features'],
         [VesProjectPreferenceIds.CATEGORY, 'features'], // custom category
+        ['scm', 'features'],
         ['search', 'features'],
         ['task', 'features'],
         ['terminal', 'features'],
+        ['toolbar', 'features'],
         [VesUpdaterPreferenceIds.CATEGORY, 'features'], // custom category
         ['webview', 'features'],
         ['workspace', 'application'],

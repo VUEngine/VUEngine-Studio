@@ -1,5 +1,5 @@
-import { nls } from '@theia/core';
-import { TreeNode } from '@theia/core/lib/browser';
+import { Emitter, nls } from '@theia/core';
+import { BadgeWidget, TreeNode } from '@theia/core/lib/browser';
 import { SourceTreeWidget } from '@theia/core/lib/browser/source-tree';
 import { inject, injectable, interfaces, postConstruct } from '@theia/core/shared/inversify';
 import { VesPluginsSource, VesPluginsSourceOptions } from './ves-plugins-source';
@@ -12,7 +12,7 @@ export class VesPluginsWidgetOptions extends VesPluginsSourceOptions {
 export const generateWidgetId = (widgetId: string): string => VesPluginsWidget.ID + ':' + widgetId;
 
 @injectable()
-export class VesPluginsWidget extends SourceTreeWidget {
+export class VesPluginsWidget extends SourceTreeWidget implements BadgeWidget {
     static ID = 'ves-plugins';
 
     static createWidget(parent: interfaces.Container, options: VesPluginsWidgetOptions): VesPluginsWidget {
@@ -46,13 +46,32 @@ export class VesPluginsWidget extends SourceTreeWidget {
 
         this.computeTitle();
 
-        this.toDispose.push(this.source.onDidChange(() => {
-            this.computeTitle();
+        this.toDispose.push(this.source.onDidChange(async () => {
+            this.badge = await this.resolveCount();
         }));
     }
 
+    private _badge: number | undefined = undefined;
+    get badge(): number | undefined {
+        return this._badge;
+    }
+
+    set badge(count: number | undefined) {
+        this._badge = count;
+        this.onDidChangeBadge.fire();
+    }
+
+    public onDidChangeBadge: Emitter<void> = new Emitter<void>();
+
+    protected async resolveCount(): Promise<number | undefined> {
+        if (this.options.id !== VesPluginsSourceOptions.SEARCH_RESULT) {
+            const elements = await this.source?.getElements() || [];
+            return [...elements].length;
+        }
+        return undefined;
+    }
+
     protected async computeTitle(): Promise<void> {
-        const countLabel = await this.resolveCountLabel();
         let label = '';
         switch (this.options.id) {
             case VesPluginsSourceOptions.INSTALLED:
@@ -66,18 +85,8 @@ export class VesPluginsWidget extends SourceTreeWidget {
                 break;
         }
 
-        const title = `${label} ${countLabel}`;
-        this.title.label = title;
-        this.title.caption = title;
-    }
-
-    protected async resolveCountLabel(): Promise<string> {
-        let label = '';
-        if (this.options.id !== VesPluginsSourceOptions.SEARCH_RESULT) {
-            const elements = await this.source?.getElements() || [];
-            label = `(${[...elements].length})`;
-        }
-        return label;
+        this.title.label = label;
+        this.title.caption = label;
     }
 
     protected handleClickEvent(node: TreeNode | undefined, event: React.MouseEvent<HTMLElement>): void {
