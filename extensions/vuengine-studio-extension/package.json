@@ -117,6 +117,9 @@
       "backend": "lib/i18n/node/ves-i18n-backend-module"
     },
     {
+      "frontend": "lib/migrate/browser/ves-migrate-frontend-module"
+    },
+    {
       "frontend": "lib/plugins/browser/ves-plugins-frontend-module"
     },
     {
