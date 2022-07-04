@@ -185,19 +185,23 @@ export class VesProjectService {
     let workspaceProjectFileData: ProjectFile = {};
     let workspaceProjectFileUri = this.workspaceService.workspace?.resource;
     if (workspaceProjectFileUri) {
+      const workspaceProjectFolderUri = workspaceProjectFileUri;
+      workspaceProjectFileUri = undefined;
       if (this.workspaceService.workspace?.isDirectory) {
         const projectFiles = await this.vesGlobService.find(
-          await this.fileService.fsPath(workspaceProjectFileUri),
+          await this.fileService.fsPath(workspaceProjectFolderUri),
           `*.${VUENGINE_EXT}`
         );
         if (projectFiles.length) {
           const filename = this.vesCommonService.basename(projectFiles[0]);
           if (filename) {
-            workspaceProjectFileUri = workspaceProjectFileUri?.resolve(filename);
+            workspaceProjectFileUri = workspaceProjectFolderUri?.resolve(filename);
           }
         }
       }
+    }
 
+    if (workspaceProjectFileUri) {
       workspaceProjectFileData = await this.readProjectFileData(workspaceProjectFileUri) || {};
       console.info(`Read project data from file ${workspaceProjectFileUri}.`);
     } else {
