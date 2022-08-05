@@ -19,7 +19,7 @@ export class VesElectronMainMenuFactory extends ElectronMainMenuFactory {
 
     createElectronMenuBar(): Electron.Menu | null {
         const menuModel = this.menuProvider.getMenu(MAIN_MENU_BAR);
-        const template = this.fillMenuTemplate([], menuModel);
+        const template = this.fillMenuTemplate([], menuModel, [], { rootMenuPath: MAIN_MENU_BAR });
         if (isOSX) {
             template.unshift(this.createOSXMenu());
         }
