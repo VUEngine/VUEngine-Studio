@@ -1,13 +1,7 @@
-export interface Migration {
-  fromVersion: string
-  toVersion: string
-  name: string
-  description: string
-  function: () => void
-};
+import { VesAbstractMigration } from './migrations/ves-abstract-migration';
 
 export interface MigrationRegistry {
-  [key: string]: Migration
+  [key: string]: VesAbstractMigration
 };
 
 export enum Version {

@@ -178,6 +178,7 @@ export class VesGettingStartedWidget extends ReactWidget {
     protected isEnterKey(e: React.KeyboardEvent): boolean {
         return Key.ENTER.keyCode === KeyCode.createKeyCode(e.nativeEvent).key?.keyCode;
     }
+
     protected openUrl = (url: string) => this.windowService.openNewWindow(url, { external: true });
 
     protected renderHeader(): React.ReactNode {

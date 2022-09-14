@@ -1,19 +1,27 @@
 import { MessageService, nls } from '@theia/core';
 import { QuickPickItem, QuickPickOptions, QuickPickService } from '@theia/core/lib/browser';
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { inject, injectable } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { OutputChannelManager } from '@theia/output/lib/browser/output-channel';
+import { OutputContribution } from '@theia/output/lib/browser/output-contribution';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesGlobService } from '../../glob/common/ves-glob-service-protocol';
-import { get as createVuengineProjectFile } from './migrations/create-vuengine-project-file';
-import { MigrationRegistry, Version } from './ves-migrate-types';
+import { VesMigrateFromPreviewTo100 } from './migrations/ves-migrate-preview-to-1-0-0';
+import { MigrationRegistry } from './ves-migrate-types';
 
 @injectable()
 export class VesMigrateService {
+  static CHANNEL_NAME = 'Migrations';
+
   @inject(FileService)
   protected readonly fileService: FileService;
   @inject(MessageService)
   protected readonly messageService: MessageService;
+  @inject(OutputChannelManager)
+  protected readonly outputChannelManager: OutputChannelManager;
+  @inject(OutputContribution)
+  protected readonly outputContribution: OutputContribution;
   @inject(QuickPickService)
   protected readonly quickPickService: QuickPickService;
   @inject(VesCommonService)
@@ -28,105 +36,39 @@ export class VesMigrateService {
     return this._migrations;
   }
 
-  @postConstruct()
-  protected async init(): Promise<void> {
-    this.registerMigrations();
-  }
-
   protected registerMigrations(): void {
+    if (Object.keys(this.migrations).length) {
+      return;
+    }
+
     const migrations = [
-      createVuengineProjectFile(
-        this.fileService,
-        this.messageService,
-        this.vesCommonService,
-        this.vesGlobService,
-        this.workspaceService,
-      ),
+      VesMigrateFromPreviewTo100
     ];
+
+    const channelName = VesMigrateService.CHANNEL_NAME;
+    const channel = this.outputChannelManager.getChannel(channelName);
 
     migrations.map(migration => {
       const id = this.vesCommonService.nanoid();
-      this._migrations[id] = migration;
+      this._migrations[id] = new migration(
+        this.fileService,
+        this.messageService,
+        this.outputChannelManager,
+        this.quickPickService,
+        this.vesCommonService,
+        this.vesGlobService,
+        this.workspaceService,
+        channel
+      );
     });
   }
 
   migrate(): void {
-    this.fromVersionQuickPick();
+    this.registerMigrations();
+    this.migrationQuickPick();
   }
 
-  protected fromVersionQuickPick(): void {
-    const quickPickOptions: QuickPickOptions<QuickPickItem> = {
-      title: nls.localize('vuengine/migrate/migrateProjectFromVersion', 'Migrate Project: From Version'),
-      placeholder: nls.localize('vuengine/migrate/chooseFromVersion', 'Choose VUEngine Studio version to migrate from'),
-      step: 1,
-      totalSteps: 3,
-    };
-
-    const fromVersionsWithMigrations: string[] = [];
-    Object.values(this.migrations).map(migration => {
-      if (!fromVersionsWithMigrations.includes(migration.fromVersion)) {
-        fromVersionsWithMigrations.push(migration.fromVersion);
-      };
-    });
-
-    const items: QuickPickItem[] = [];
-
-    // eslint-disable-next-line guard-for-in
-    for (const version in Version) {
-      if (fromVersionsWithMigrations.includes(version)) {
-        items.push({
-          label: version
-        });
-      }
-    }
-
-    this.quickPickService.show<QuickPickItem>(items, quickPickOptions).then(selection => {
-      if (!selection) {
-        return;
-      }
-
-      this.toVersionQuickPick(selection.label);
-    });
-  }
-
-  protected toVersionQuickPick(fromVersion: string): void {
-    const quickPickOptions: QuickPickOptions<QuickPickItem> = {
-      title: nls.localize('vuengine/migrate/migrateProjectToVersion', 'Migrate Project: To Version'),
-      placeholder: nls.localize('vuengine/migrate/chooseToVersion', 'Choose VUEngine Studio version to migrate to'),
-      step: 2,
-      totalSteps: 3,
-    };
-
-    const toVersionsOfFromVersionWithMigrations: string[] = [];
-    Object.values(this.migrations)
-      .filter(migration => migration.fromVersion === fromVersion)
-      .map(migration => {
-        if (!toVersionsOfFromVersionWithMigrations.includes(migration.toVersion)) {
-          toVersionsOfFromVersionWithMigrations.push(migration.toVersion);
-        };
-      });
-
-    const items: QuickPickItem[] = [];
-
-    // eslint-disable-next-line guard-for-in
-    for (const version in Version) {
-      if (toVersionsOfFromVersionWithMigrations.includes(version)) {
-        items.push({
-          label: version
-        });
-      }
-    }
-
-    this.quickPickService.show<QuickPickItem>(items, quickPickOptions).then(selection => {
-      if (!selection) {
-        return;
-      }
-
-      this.migrationQuickPick(fromVersion, selection.label);
-    });
-  }
-
-  protected migrationQuickPick(fromVersion: string, toVersion: string): void {
+  protected migrationQuickPick(): void {
     const quickPickOptions: QuickPickOptions<QuickPickItem> = {
       title: nls.localize('vuengine/migrate/migrateProjectMigration', 'Migrate Project: Migration'),
       placeholder: nls.localize('vuengine/migrate/chooseMigration', 'Choose migration to apply'),
@@ -141,13 +83,11 @@ export class VesMigrateService {
     // eslint-disable-next-line guard-for-in
     Object.keys(this.migrations).map(id => {
       const migration = this.migrations[id];
-      if (migration.fromVersion === fromVersion && migration.toVersion === toVersion) {
-        items.push({
-          id,
-          label: migration.name,
-          detail: migration.description,
-        });
-      }
+      items.push({
+        id,
+        label: `${migration.fromVersion} → ${migration.toVersion}`,
+        detail: migration.description,
+      });
     });
 
     this.quickPickService.show<QuickPickItem>(items, quickPickOptions).then(selection => {
@@ -155,7 +95,42 @@ export class VesMigrateService {
         return;
       }
 
-      this.migrations[selection.id!].function();
+      this.executeMigration(selection.id!);
+    });
+  }
+
+  protected async executeMigration(id: string): Promise<void> {
+    const channelName = VesMigrateService.CHANNEL_NAME;
+    const channel = this.outputChannelManager.getChannel(channelName);
+    this.outputChannelManager.selectedChannel = channel;
+
+    channel.appendLine('# Migration Report');
+
+    const migration = this.migrations[id];
+    const success = await migration.migrate();
+
+    const viewReportAction = nls.localize('vuengine/migrate/viewReport', 'View Report');
+    let answer = '';
+    if (!success) {
+      answer = await this.messageService.error(
+        nls.localize('vuengine/migrate/migrationHasFailed', 'Migration has failed.'),
+        viewReportAction
+      ) ?? '';
+    } else {
+      answer = await this.messageService.info(
+        nls.localize('vuengine/migrate/migrationFailed', 'Migration successful.'),
+        viewReportAction
+      ) ?? '';
+    }
+
+    if (answer === viewReportAction) {
+      this.showOutputView();
+    }
+  }
+
+  protected showOutputView(): void {
+    this.outputContribution.openView({ reveal: true }).then(view => {
+      view.activate();
     });
   }
 }
