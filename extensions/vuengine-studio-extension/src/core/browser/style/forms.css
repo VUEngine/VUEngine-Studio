@@ -7,3 +7,8 @@
     transition: transform .1s;
     transform: scale(.85);
 } */
+
+.theia-input.large {
+    font-size: 130%;
+    line-height: 160%;
+}

@@ -1,8 +1,8 @@
 import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React from 'react';
-import { FontData, win1252CharNames } from './ves-fontData-control';
+import { DataSection, FontData, win1252CharNames } from './ves-fontEditor-control';
 
-interface VesFontDataProps {
+interface VesFontEditorProps {
     value: FontData;
     label: string;
     updateValue: (newValue: FontData) => void;
@@ -25,88 +25,173 @@ const DEFAULT_DYNAMIC_SIZE = false;
 
 const PALETTE_COLORS = ['#000', '#500', '#a00', '#f00'];
 
-const validateFontData = (fontData: FontData): FontData => {
-    if (!fontData) {
-        fontData = {
-            characters: [],
-            characterCount: DEFAULT_CHAR_COUNT,
-            offset: DEFAULT_OFFSET,
-            size: {
+let clipboard: number[][] | undefined;
+
+export const VesFontEditor: React.FC<VesFontEditorProps> = ({ value, updateValue, label }) => {
+    const validateFontData = (): void => {
+        if (!value) {
+            value = {
+                name: 'New',
+                characters: [],
+                characterCount: DEFAULT_CHAR_COUNT,
+                offset: DEFAULT_OFFSET,
+                size: {
+                    x: DEFAULT_CHAR_SIZE,
+                    y: DEFAULT_CHAR_SIZE
+                },
+                section: DataSection.ROM,
+                variableSize: DEFAULT_DYNAMIC_SIZE
+            };
+        };
+
+        if (!value.characterCount
+            || !Number.isInteger(value.characterCount)
+            || value.characterCount < MIN_CHAR_COUNT
+            || value.characterCount > MAX_CHAR_COUNT) {
+            value.characterCount = DEFAULT_CHAR_COUNT;
+        }
+
+        if (!value.offset
+            || !Number.isInteger(value.offset)
+            || value.offset < MIN_OFFSET
+            || value.offset > MAX_OFFSET) {
+            value.offset = DEFAULT_OFFSET;
+        }
+
+        if (!value.size) {
+            value.size = {
                 x: DEFAULT_CHAR_SIZE,
                 y: DEFAULT_CHAR_SIZE
-            },
-            dynamicSize: DEFAULT_DYNAMIC_SIZE
-        };
+            };
+        } else {
+            if (!value.size.x
+                || !Number.isInteger(value.size.x)
+                || value.size.x < MIN_CHAR_SIZE
+                || value.size.x > MAX_CHAR_SIZE) {
+                value.size.x = DEFAULT_CHAR_SIZE;
+            }
+            if (!value.size.y
+                || !Number.isInteger(value.size.y)
+                || value.size.y < MIN_CHAR_SIZE
+                || value.size.y > MAX_CHAR_SIZE) {
+                value.size.y = DEFAULT_CHAR_SIZE;
+            }
+        }
+
+        if (!value.variableSize) {
+            value.variableSize = DEFAULT_DYNAMIC_SIZE;
+        }
+
+        const characters: number[][][] = [];
+        [...Array(MAX_CHAR_COUNT)].map((i, character) => {
+            const charData: number[][] = [];
+            [...Array(value.size.y * CHAR_PIXEL_SIZE)].map((j, y) => {
+                const charLineData: number[] = [];
+                [...Array(value.size.x * CHAR_PIXEL_SIZE)].map((k, x) => {
+                    charLineData.push(value.characters
+                        && value.characters[character]
+                        && value.characters[character][y]
+                        && value.characters[character][y][x]
+                        ? value.characters[character][y][x]
+                        : 0);
+                });
+                charData.push(charLineData);
+            });
+            characters.push(charData);
+        });
+
+        value.characters = characters;
     };
 
-    if (!fontData.characterCount
-        || !Number.isInteger(fontData.characterCount)
-        || fontData.characterCount < MIN_CHAR_COUNT
-        || fontData.characterCount > MAX_CHAR_COUNT) {
-        fontData.characterCount = DEFAULT_CHAR_COUNT;
-    }
-
-    if (!fontData.offset
-        || !Number.isInteger(fontData.offset)
-        || fontData.offset < MIN_OFFSET
-        || fontData.offset > MAX_OFFSET) {
-        fontData.offset = DEFAULT_OFFSET;
-    }
-
-    if (!fontData.size) {
-        fontData.size = {
-            x: DEFAULT_CHAR_SIZE,
-            y: DEFAULT_CHAR_SIZE
-        };
-    } else {
-        if (!fontData.size.x
-            || !Number.isInteger(fontData.size.x)
-            || fontData.size.x < MIN_CHAR_SIZE
-            || fontData.size.x > MAX_CHAR_SIZE) {
-            fontData.size.x = DEFAULT_CHAR_SIZE;
-        }
-        if (!fontData.size.y
-            || !Number.isInteger(fontData.size.y)
-            || fontData.size.y < MIN_CHAR_SIZE
-            || fontData.size.y > MAX_CHAR_SIZE) {
-            fontData.size.y = DEFAULT_CHAR_SIZE;
-        }
-    }
-
-    if (!fontData.dynamicSize) {
-        fontData.dynamicSize = DEFAULT_DYNAMIC_SIZE;
-    }
-
-    const characters: number[][][] = [];
-    [...Array(MAX_CHAR_COUNT)].map((i, character) => {
-        const charData: number[][] = [];
-        [...Array(fontData.size.y * CHAR_PIXEL_SIZE)].map((j, y) => {
-            const charLineData: number[] = [];
-            [...Array(fontData.size.x * CHAR_PIXEL_SIZE)].map((k, x) => {
-                charLineData.push(fontData.characters
-                    && fontData.characters[character]
-                    && fontData.characters[character][y]
-                    && fontData.characters[character][y][x]
-                    ? fontData.characters[character][y][x]
-                    : 0);
-            });
-            charData.push(charLineData);
+    const setCurrentCharacterData = (character: number[][]): void => {
+        updateValue({
+            ...value,
+            characters: {
+                ...value.characters,
+                [currentCharacter]: character
+            }
         });
-        characters.push(charData);
-    });
+    };
 
-    fontData.characters = characters;
+    const getBlankCharacter = (): number[][] => {
+        const charData: number[][] = [];
+        [...Array(value.size.y * CHAR_PIXEL_SIZE)].map((j, y) => {
+            charData.push(getBlankCharacterLine());
+        });
+        return charData;
+    };
 
-    return fontData;
-};
+    const getBlankCharacterLine = (): number[] => {
+        const charLineData: number[] = [];
+        [...Array(value.size.x * CHAR_PIXEL_SIZE)].map((k, x) => {
+            charLineData.push(0);
+        });
+        return charLineData;
+    };
 
-export const VesFontData: React.FC<VesFontDataProps> = ({ value, updateValue, label }) => {
-    value = validateFontData(value);
-    const [paletteIndex, setPaletteIndex] = React.useState<number>(3);
-    const [currentCharacter, setCurrentCharacter] = React.useState<number>(0);
+    const clear = (): void => {
+        setCurrentCharacterData(getBlankCharacter());
+    };
 
-    const pixelWidth = value.size.x * CHAR_PIXEL_SIZE;
-    const pixelHeight = value.size.y * CHAR_PIXEL_SIZE;
+    const rotate = (): void => {
+        const char = value.characters[currentCharacter];
+
+        const n = char.length;
+        const x = Math.floor(n / 2);
+        const y = n - 1;
+        let k;
+        for (let i = 0; i < x; i++) {
+            for (let j = i; j < y - i; j++) {
+                k = char[i][j];
+                char[i][j] = char[y - j][i];
+                char[y - j][i] = char[y - i][y - j];
+                char[y - i][y - j] = char[j][y - i];
+                char[j][y - i] = k;
+            }
+        }
+
+        setCurrentCharacterData(char);
+    };
+
+    const mirrorHorizontally = (): void => {
+        setCurrentCharacterData(value.characters[currentCharacter].map(line => line.reverse()));
+    };
+
+    const mirrorVertically = (): void => {
+        setCurrentCharacterData(value.characters[currentCharacter].reverse());
+    };
+
+    const moveUp = (): void => {
+        setCurrentCharacterData([
+            ...value.characters[currentCharacter].slice(1),
+            getBlankCharacterLine()
+        ]);
+    };
+
+    const moveDown = (): void => {
+        setCurrentCharacterData([
+            getBlankCharacterLine(),
+            ...value.characters[currentCharacter].slice(0, -1)
+        ]);
+    };
+
+    const moveLeft = (): void => {
+        setCurrentCharacterData(value.characters[currentCharacter].map(line => [...line.slice(1), 0]));
+    };
+
+    const moveRight = (): void => {
+        setCurrentCharacterData(value.characters[currentCharacter].map(line => [0, ...line.slice(0, -1)]));
+    };
+
+    const copy = (): void => {
+        clipboard = [...value.characters[currentCharacter]];
+    };
+
+    const paste = (): void => {
+        if (clipboard) {
+            setCurrentCharacterData(clipboard);
+        }
+    };
 
     const setPixelColor = (x: number, y: number, color: number) =>
         updateValue({
@@ -137,9 +222,30 @@ export const VesFontData: React.FC<VesFontDataProps> = ({ value, updateValue, la
         e.preventDefault();
     };
 
+    validateFontData();
+    const [paletteIndex, setPaletteIndex] = React.useState<number>(3);
+    const [currentCharacter, setCurrentCharacter] = React.useState<number>(0);
+
+    const pixelWidth = value.size.x * CHAR_PIXEL_SIZE;
+    const pixelHeight = value.size.y * CHAR_PIXEL_SIZE;
+
     return (
         <div className={`control font-data-renderer width-${pixelWidth} height-${pixelHeight} palette-index-${paletteIndex}`}>
-            <div className='font-properties'>
+            <div key="font-name" className='font-properties'>
+                <div>
+                    <label>Name</label>
+                    <input
+                        className="theia-input large"
+                        id="#/properties/name-input"
+                        value={value.name}
+                        onChange={e => updateValue({
+                            ...value,
+                            name: e.target.value
+                        })}
+                    />
+                </div>
+            </div>
+            <div key="font-properties" className='font-properties'>
                 <div>
                     <label>Character Size</label>
                     <div className='character-size'>
@@ -181,8 +287,8 @@ export const VesFontData: React.FC<VesFontDataProps> = ({ value, updateValue, la
                 <div>
                     <label>Type</label>
                     <SelectComponent
-                        key="#/properties/dynamicSize-input"
-                        defaultValue={value.dynamicSize ? '1' : '0'}
+                        key="#/properties/variableSize-input"
+                        defaultValue={value.variableSize ? '1' : '0'}
                         options={[{
                             label: 'Fixed Width',
                             value: '0',
@@ -194,7 +300,7 @@ export const VesFontData: React.FC<VesFontDataProps> = ({ value, updateValue, la
                         }]}
                         onChange={option => updateValue({
                             ...value,
-                            dynamicSize: !!option.value
+                            variableSize: !!option.value
                         })}
                     />
                 </div>
@@ -227,6 +333,26 @@ export const VesFontData: React.FC<VesFontDataProps> = ({ value, updateValue, la
                         onChange={e => updateValue({
                             ...value,
                             offset: parseInt(e.target.value)
+                        })}
+                    />
+                </div>
+                <div>
+                    <label>Section</label>
+                    <SelectComponent
+                        key="#/properties/section-input"
+                        defaultValue={value.section}
+                        options={[{
+                            label: 'ROM Space',
+                            value: DataSection.ROM,
+                            description: 'Save tile data in regular ROM space',
+                        }, {
+                            label: 'Expansion Space',
+                            value: DataSection.EXP,
+                            description: 'Save tile data to expansion space',
+                        }]}
+                        onChange={option => updateValue({
+                            ...value,
+                            section: option.value as DataSection
                         })}
                     />
                 </div>
@@ -301,65 +427,75 @@ export const VesFontData: React.FC<VesFontDataProps> = ({ value, updateValue, la
                         <button
                             className='theia-button secondary'
                             title="Clear"
+                            onClick={clear}
                         >
                             <i className="fa fa-trash"></i>
                         </button>
                         <button
                             className='theia-button secondary'
                             title="Rotate"
+                            onClick={rotate}
                         >
                             <i className="fa fa-rotate-right"></i>
                         </button>
                         <button
                             className='theia-button secondary'
                             title="Mirror Horizontally"
+                            onClick={mirrorHorizontally}
                         >
                             <i className="fa fa-arrows-h"></i>
                         </button>
                         <button
                             className='theia-button secondary'
                             title="Mirror Vertically"
+                            onClick={mirrorVertically}
                         >
                             <i className="fa fa-arrows-v"></i>
                         </button>
                         <button
                             className='theia-button secondary'
                             title="Move Up"
+                            onClick={moveUp}
                         >
                             <i className="fa fa-arrow-up"></i>
                         </button>
                         <button
                             className='theia-button secondary'
                             title="Move Down"
+                            onClick={moveDown}
                         >
                             <i className="fa fa-arrow-down"></i>
                         </button>
                         <button
                             className='theia-button secondary'
                             title="Move Left"
+                            onClick={moveLeft}
                         >
                             <i className="fa fa-arrow-left"></i>
                         </button>
                         <button
                             className='theia-button secondary'
                             title="Move Right"
+                            onClick={moveRight}
                         >
                             <i className="fa fa-arrow-right"></i>
                         </button>
                         <button
                             className='theia-button secondary'
                             title="Copy"
+                            onClick={copy}
                         >
                             <i className="fa fa-clone"></i>
                         </button>
                         <button
                             className='theia-button secondary'
                             title="Paste"
+                            onClick={paste}
                         >
                             <i className="fa fa-paste"></i>
                         </button>
                     </div>
-                    <div key='tools' className='tools'>
+                    <div key='import-export' className='tools'>
                         <button
                             className='theia-button secondary full-width'
                             title="Import"
@@ -376,13 +512,8 @@ export const VesFontData: React.FC<VesFontDataProps> = ({ value, updateValue, la
                 </div>
                 <div key='editor-col-2' className='editor-column'>
                     <div key='current-char' className='current-character'>
-                        <div key='current-header-0' className='header'></div>
-                        {[...Array(pixelWidth)].map((x, i) =>
-                            <div key={`current-header-${i}`} className='header'>{i}</div>
-                        )}
                         {[...Array(pixelHeight)].map((h, y) =>
                             [...Array(pixelWidth)].map((w, x) => (<>
-                                {x === 0 && <div key={`current-header-row-${y}`} className='header'>{y}</div>}
                                 <div
                                     key={`current-pixel-${y}-${x}`}
                                     className={`color-${value.characters[currentCharacter][y][x]}`}
@@ -397,10 +528,6 @@ export const VesFontData: React.FC<VesFontDataProps> = ({ value, updateValue, la
                 </div>
                 <div key='editor-col-3' className='table-column'>
                     <div key='characters' className='characters'>
-                        <div key='characters-header-tl' className='header'></div>
-                        {[...Array(16)].map((k, i) =>
-                            <div key={`characters-header-${i}`} className='header'>{i}</div>
-                        )}
                         {[...Array(MAX_CHAR_COUNT)].map((j, character) => {
                             const classNames = ['character'];
                             if (character < value.offset || character >= value.offset + value.characterCount) {
@@ -410,7 +537,6 @@ export const VesFontData: React.FC<VesFontDataProps> = ({ value, updateValue, la
                                 classNames.push('active');
                             }
                             return (<>
-                                {character % 16 === 0 && <div key={`characters-header-row-${character / 16}`} className='header'>{character / 16}</div>}
                                 <div
                                     key={`character-${character}`}
                                     className={classNames.join(' ')}
@@ -430,27 +556,6 @@ export const VesFontData: React.FC<VesFontDataProps> = ({ value, updateValue, la
                                         }}
                                     ></div>
                                 </div>
-                                {
-                                    character === 127 && <>
-                                        <div key='character-separator-1' className='separator' />
-                                        <div key='character-separator-2' className='separator' />
-                                        <div key='character-separator-3' className='separator' />
-                                        <div key='character-separator-4' className='separator' />
-                                        <div key='character-separator-5' className='separator' />
-                                        <div key='character-separator-6' className='separator' />
-                                        <div key='character-separator-7' className='separator' />
-                                        <div key='character-separator-8' className='separator' />
-                                        <div key='character-separator-9' className='separator' />
-                                        <div key='character-separator-10' className='separator' />
-                                        <div key='character-separator-11' className='separator' />
-                                        <div key='character-separator-12' className='separator' />
-                                        <div key='character-separator-13' className='separator' />
-                                        <div key='character-separator-14' className='separator' />
-                                        <div key='character-separator-15' className='separator' />
-                                        <div key='character-separator-16' className='separator' />
-                                        <div key='character-separator-17' className='separator' />
-                                    </>
-                                }
                             </>);
                         }
                         )}

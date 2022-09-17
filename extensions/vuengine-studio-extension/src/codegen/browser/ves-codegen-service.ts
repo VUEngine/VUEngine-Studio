@@ -264,6 +264,11 @@ export class VesCodeGenService {
       length === 8 ? 10 : length === 2 ? 4 : 6,
       length === 8 ? '0x00000000' : length === 2 ? '0x00' : '0x0000'
     ));
+    env.addFilter('intToBin', (value: number, length?: number) => value.toString(2).padStart(
+      length ?? 8,
+      '0'
+    ));
+    env.addFilter('binToHex', (value: string) => parseInt(value, 2).toString(16).toUpperCase());
     env.addFilter('formatValue', (value: string) => {
       // @ts-ignore
       if (!isNaN(value) || value === 'true' || value === 'false') {

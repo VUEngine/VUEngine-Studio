@@ -1,9 +1,8 @@
-
 import { withJsonFormsControlProps } from '@jsonforms/react';
 import React from 'react';
-import { VesFontData } from './ves-fontData';
+import { VesFontEditor } from './ves-fontEditor';
 
-interface VesFontDataControlProps {
+interface VesFontEditorControlProps {
     data: FontData;
     handleChange(path: string, value: FontData): void;
     path: string;
@@ -11,14 +10,21 @@ interface VesFontDataControlProps {
 }
 
 export interface FontData {
+    name: string
     offset: number
     characterCount: number
     size: {
         x: number,
         y: number
     },
-    dynamicSize: boolean,
+    variableSize: boolean,
+    section: DataSection,
     characters: number[][][]
+}
+
+export enum DataSection {
+    ROM = 'rom',
+    EXP = 'exp',
 }
 
 export const win1252CharNames = [
@@ -40,12 +46,12 @@ export const win1252CharNames = [
     'ð', 'ñ', 'ò', 'ó', 'ô', 'õ', 'ö', '÷', 'ø', 'ù', 'ú', 'û', 'ü', 'ý', 'þ', 'ÿ ',
 ];
 
-const VesFontDataControl = ({ data, handleChange, path, label }: VesFontDataControlProps) => (
-    <VesFontData
+const VesFontEditorControl = ({ data, handleChange, path, label }: VesFontEditorControlProps) => (
+    <VesFontEditor
         label={label}
         value={data}
         updateValue={(newValue: FontData) => handleChange(path, newValue)}
     />
 );
 
-export default withJsonFormsControlProps(VesFontDataControl);
+export default withJsonFormsControlProps(VesFontEditorControl);
