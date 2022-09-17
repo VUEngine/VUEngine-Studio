@@ -50,6 +50,8 @@ export class VesProjectService {
     return this._ready.promise;
   }
 
+  protected workspaceProjectFileUri: URI | undefined;
+
   // project data
   protected _projectData: ProjectFile = {
     combined: {
@@ -183,10 +185,10 @@ export class VesProjectService {
 
     // workspace
     let workspaceProjectFileData: ProjectFile = {};
-    let workspaceProjectFileUri = this.workspaceService.workspace?.resource;
-    if (workspaceProjectFileUri) {
-      const workspaceProjectFolderUri = workspaceProjectFileUri;
-      workspaceProjectFileUri = undefined;
+    this.workspaceProjectFileUri = this.workspaceService.workspace?.resource;
+    if (this.workspaceProjectFileUri) {
+      const workspaceProjectFolderUri = this.workspaceProjectFileUri;
+      this.workspaceProjectFileUri = undefined;
       if (this.workspaceService.workspace?.isDirectory) {
         const projectFiles = await this.vesGlobService.find(
           await this.fileService.fsPath(workspaceProjectFolderUri),
@@ -195,15 +197,15 @@ export class VesProjectService {
         if (projectFiles.length) {
           const filename = this.vesCommonService.basename(projectFiles[0]);
           if (filename) {
-            workspaceProjectFileUri = workspaceProjectFolderUri?.resolve(filename);
+            this.workspaceProjectFileUri = workspaceProjectFolderUri?.resolve(filename);
           }
         }
       }
     }
 
-    if (workspaceProjectFileUri) {
-      workspaceProjectFileData = await this.readProjectFileData(workspaceProjectFileUri) || {};
-      console.info(`Read project data from file ${workspaceProjectFileUri}.`);
+    if (this.workspaceProjectFileUri) {
+      workspaceProjectFileData = await this.readProjectFileData(this.workspaceProjectFileUri) || {};
+      console.info(`Read project data from file ${this.workspaceProjectFileUri}.`);
     } else {
       console.error('Could not find project file.');
     }
@@ -253,10 +255,10 @@ export class VesProjectService {
       ...pluginsProjectDataWithContributors,
     ];
 
-    if (workspaceProjectFileUri) {
+    if (this.workspaceProjectFileUri) {
       projectDataWithContributors.push({
         _contributor: 'project',
-        _contributorUri: workspaceProjectFileUri.parent,
+        _contributorUri: this.workspaceProjectFileUri.parent,
         ...workspaceProjectFileData
       });
     }
@@ -329,14 +331,13 @@ export class VesProjectService {
   }
 
   async saveProjectFile(): Promise<boolean> {
-    const projectFileUri = this.workspaceService.workspace?.resource;
-    if (!projectFileUri) {
+    if (!this.workspaceProjectFileUri) {
       return false;
     }
 
     try {
       await this.fileService.writeFile(
-        projectFileUri,
+        this.workspaceProjectFileUri,
         BinaryBuffer.fromString(JSON.stringify({
           ...this._projectData,
           combined: undefined,
