@@ -17,7 +17,11 @@ export interface FontData {
         x: number,
         y: number
     },
-    variableSize: boolean,
+    variableSize: {
+        enabled: boolean,
+        x: number[],
+        y: number
+    },
     section: DataSection,
     characters: number[][][]
 }

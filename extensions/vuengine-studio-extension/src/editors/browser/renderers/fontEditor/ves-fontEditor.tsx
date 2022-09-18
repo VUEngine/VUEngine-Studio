@@ -1,4 +1,5 @@
 import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
+import { isBoolean } from 'lodash';
 import React from 'react';
 import { DataSection, FontData, win1252CharNames } from './ves-fontEditor-control';
 
@@ -21,7 +22,10 @@ const MIN_OFFSET = 0;
 const MAX_OFFSET = MAX_CHAR_COUNT - MIN_CHAR_COUNT;
 const DEFAULT_OFFSET = MIN_OFFSET;
 
-const DEFAULT_DYNAMIC_SIZE = false;
+const DEFAULT_VARIABLE_SIZE_ENABLED = false;
+const MIN_VARIABLE_CHAR_SIZE = 1;
+const MAX_VARIABLE_CHAR_SIZE = MAX_CHAR_SIZE * CHAR_PIXEL_SIZE;
+const DEFAULT_VARIABLE_CHAR_SIZE = DEFAULT_CHAR_SIZE * CHAR_PIXEL_SIZE;
 
 const PALETTE_COLORS = ['#000', '#500', '#a00', '#f00'];
 
@@ -40,7 +44,11 @@ export const VesFontEditor: React.FC<VesFontEditorProps> = ({ value, updateValue
                     y: DEFAULT_CHAR_SIZE
                 },
                 section: DataSection.ROM,
-                variableSize: DEFAULT_DYNAMIC_SIZE
+                variableSize: {
+                    enabled: DEFAULT_VARIABLE_SIZE_ENABLED,
+                    x: [],
+                    y: DEFAULT_VARIABLE_CHAR_SIZE
+                }
             };
         };
 
@@ -79,8 +87,31 @@ export const VesFontEditor: React.FC<VesFontEditorProps> = ({ value, updateValue
         }
 
         if (!value.variableSize) {
-            value.variableSize = DEFAULT_DYNAMIC_SIZE;
+            value.variableSize = {
+                enabled: DEFAULT_VARIABLE_SIZE_ENABLED,
+                x: [],
+                y: DEFAULT_VARIABLE_CHAR_SIZE
+            };
+        } else {
+            if (value.variableSize.enabled === undefined
+                || !isBoolean(value.variableSize.enabled)) {
+                value.variableSize.enabled = DEFAULT_VARIABLE_SIZE_ENABLED;
+            }
+            if (!value.variableSize.y
+                || value.variableSize.y < MIN_VARIABLE_CHAR_SIZE
+                || value.variableSize.y > MAX_VARIABLE_CHAR_SIZE) {
+                value.variableSize.y = DEFAULT_VARIABLE_CHAR_SIZE;
+            }
         }
+
+        const variableCharacterWidths: number[] = [];
+        [...Array(MAX_CHAR_COUNT)].map((i, character) => {
+            variableCharacterWidths.push(value.variableSize
+                && value.variableSize.x[character]
+                ? value.variableSize.x[character]
+                : value.size.x * CHAR_PIXEL_SIZE);
+        });
+        value.variableSize.x = variableCharacterWidths;
 
         const characters: number[][][] = [];
         [...Array(MAX_CHAR_COUNT)].map((i, character) => {
@@ -99,7 +130,6 @@ export const VesFontEditor: React.FC<VesFontEditorProps> = ({ value, updateValue
             });
             characters.push(charData);
         });
-
         value.characters = characters;
     };
 
@@ -201,38 +231,43 @@ export const VesFontEditor: React.FC<VesFontEditorProps> = ({ value, updateValue
                 [currentCharacter]: {
                     ...value.characters[currentCharacter],
                     [y]: {
-                        ...value.characters[color][y],
-                        [x]: paletteIndex
+                        ...value.characters[currentCharacter][y],
+                        [x]: color
                     }
                 }
             }
         });
 
     const onClick = (e: React.MouseEvent<HTMLElement>, x: number, y: number) => {
-        setPixelColor(x, y, currentCharacter);
+        setPixelColor(x, y, paletteIndexL);
+        e.preventDefault();
+    };
+    const onRightClick = (e: React.MouseEvent<HTMLElement>, x: number, y: number) => {
+        setPixelColor(x, y, paletteIndexR);
         e.preventDefault();
     };
 
     const onMouseOver = (e: React.MouseEvent<HTMLElement>, x: number, y: number) => {
         if (e.buttons === 1) {
-            setPixelColor(x, y, currentCharacter);
+            setPixelColor(x, y, paletteIndexL);
         } else if (e.buttons === 2) {
-            setPixelColor(x, y, 0);
+            setPixelColor(x, y, paletteIndexR);
         }
         e.preventDefault();
     };
 
     validateFontData();
-    const [paletteIndex, setPaletteIndex] = React.useState<number>(3);
+    const [paletteIndexL, setPaletteIndexL] = React.useState<number>(3);
+    const [paletteIndexR, setPaletteIndexR] = React.useState<number>(0);
     const [currentCharacter, setCurrentCharacter] = React.useState<number>(0);
 
     const pixelWidth = value.size.x * CHAR_PIXEL_SIZE;
     const pixelHeight = value.size.y * CHAR_PIXEL_SIZE;
 
     return (
-        <div className={`control font-data-renderer width-${pixelWidth} height-${pixelHeight} palette-index-${paletteIndex}`}>
+        <div className={`control font-data-renderer width-${pixelWidth} height-${pixelHeight}`}>
             <div key="font-name" className='font-properties'>
-                <div>
+                <div key="font-name-inner">
                     <label>Name</label>
                     <input
                         className="theia-input large"
@@ -241,118 +276,6 @@ export const VesFontEditor: React.FC<VesFontEditorProps> = ({ value, updateValue
                         onChange={e => updateValue({
                             ...value,
                             name: e.target.value
-                        })}
-                    />
-                </div>
-            </div>
-            <div key="font-properties" className='font-properties'>
-                <div>
-                    <label>Character Size</label>
-                    <div className='character-size'>
-                        <input
-                            type="number"
-                            step={CHAR_PIXEL_SIZE}
-                            min={MIN_CHAR_SIZE * CHAR_PIXEL_SIZE}
-                            max={MAX_CHAR_SIZE * CHAR_PIXEL_SIZE}
-                            className="theia-input"
-                            id="#/properties/size/properties/x-input"
-                            value={pixelWidth}
-                            onChange={e => updateValue({
-                                ...value,
-                                size: {
-                                    x: parseInt(e.target.value) / CHAR_PIXEL_SIZE,
-                                    y: value.size.y
-                                }
-                            })}
-                        />
-                        <div>×</div>
-                        <input
-                            type="number"
-                            step={CHAR_PIXEL_SIZE}
-                            min={MIN_CHAR_SIZE * CHAR_PIXEL_SIZE}
-                            max={MAX_CHAR_SIZE * CHAR_PIXEL_SIZE}
-                            className="theia-input"
-                            id="#/properties/size/properties/y-input"
-                            value={pixelHeight}
-                            onChange={e => updateValue({
-                                ...value,
-                                size: {
-                                    x: value.size.x,
-                                    y: parseInt(e.target.value) / CHAR_PIXEL_SIZE
-                                }
-                            })}
-                        />
-                    </div>
-                </div>
-                <div>
-                    <label>Type</label>
-                    <SelectComponent
-                        key="#/properties/variableSize-input"
-                        defaultValue={value.variableSize ? '1' : '0'}
-                        options={[{
-                            label: 'Fixed Width',
-                            value: '0',
-                            description: 'All characters have the same dimensions',
-                        }, {
-                            label: 'Variable Width',
-                            value: '1',
-                            description: 'Every character can be of different width. Allows for more dense text. Uses Objects.',
-                        }]}
-                        onChange={option => updateValue({
-                            ...value,
-                            variableSize: !!option.value
-                        })}
-                    />
-                </div>
-                <div>
-                    <label>Count</label>
-                    <input
-                        type="number"
-                        step="1"
-                        min={MIN_CHAR_COUNT}
-                        max={MAX_CHAR_COUNT - value.offset}
-                        className="theia-input"
-                        id="#/properties/characterCount-input"
-                        value={value.characterCount}
-                        onChange={e => updateValue({
-                            ...value,
-                            characterCount: parseInt(e.target.value)
-                        })}
-                    />
-                </div>
-                <div>
-                    <label>Offset</label>
-                    <input
-                        type="number"
-                        step="1"
-                        min={MIN_OFFSET}
-                        max={MAX_CHAR_COUNT - value.characterCount}
-                        className="theia-input"
-                        id="#/properties/offset-input"
-                        value={value.offset}
-                        onChange={e => updateValue({
-                            ...value,
-                            offset: parseInt(e.target.value)
-                        })}
-                    />
-                </div>
-                <div>
-                    <label>Section</label>
-                    <SelectComponent
-                        key="#/properties/section-input"
-                        defaultValue={value.section}
-                        options={[{
-                            label: 'ROM Space',
-                            value: DataSection.ROM,
-                            description: 'Save tile data in regular ROM space',
-                        }, {
-                            label: 'Expansion Space',
-                            value: DataSection.EXP,
-                            description: 'Save tile data to expansion space',
-                        }]}
-                        onChange={option => updateValue({
-                            ...value,
-                            section: option.value as DataSection
                         })}
                     />
                 </div>
@@ -366,6 +289,7 @@ export const VesFontEditor: React.FC<VesFontEditorProps> = ({ value, updateValue
                             minLength={1}
                             className="theia-input"
                             value={win1252CharNames[currentCharacter]}
+                            readOnly
                         />
                         {currentCharacter} / 0x{currentCharacter.toString(16).toUpperCase().padStart(2, '0')}
                     </div>
@@ -374,9 +298,14 @@ export const VesFontEditor: React.FC<VesFontEditorProps> = ({ value, updateValue
                             /* TODO: switch index with keyboard, display resp. key on color */
                             <div
                                 key={`palette-${i}`}
-                                className={`color-${i} ${i === paletteIndex && 'active'}`}
-                                onClick={() => setPaletteIndex(i)}
-                            ></div>
+                                className={`color-${i} ${(i === paletteIndexL || i === paletteIndexR) && 'active'}`}
+                                onClick={() => setPaletteIndexL(i)}
+                                onContextMenu={() => setPaletteIndexR(i)}
+                            >
+                                {i === paletteIndexL && 'L'}
+                                {i === paletteIndexL && i === paletteIndexR && '/'}
+                                {i === paletteIndexR && 'R'}
+                            </div>
                         )}
                     </div>
                     <div key='mode' className='tools'>
@@ -511,54 +440,233 @@ export const VesFontEditor: React.FC<VesFontEditorProps> = ({ value, updateValue
                     </div>
                 </div>
                 <div key='editor-col-2' className='editor-column'>
+                    <div key="font-properties" className='font-properties'>
+                        {value.variableSize.enabled && <div>
+                            <label>Character Size</label>
+                            <div key="variable-character-size" className='character-size'>
+                                <input
+                                    type="number"
+                                    min={MIN_VARIABLE_CHAR_SIZE}
+                                    max={value.size.x * CHAR_PIXEL_SIZE}
+                                    className="theia-input"
+                                    value={value.variableSize.x[currentCharacter]}
+                                    onChange={e => updateValue({
+                                        ...value,
+                                        variableSize: {
+                                            ...value.variableSize,
+                                            x: {
+                                                ...value.variableSize.x,
+                                                [currentCharacter]: parseInt(e.target.value)
+                                            }
+                                        }
+                                    })}
+                                />
+                                <div>×</div>
+                                <input
+                                    type="number"
+                                    min={MIN_VARIABLE_CHAR_SIZE}
+                                    max={value.size.y * CHAR_PIXEL_SIZE}
+                                    className="theia-input"
+                                    value={value.variableSize.y}
+                                    onChange={e => updateValue({
+                                        ...value,
+                                        variableSize: {
+                                            ...value.variableSize,
+                                            y: parseInt(e.target.value)
+                                        }
+                                    })}
+                                />
+                            </div>
+                        </div>}
+                        <div>
+                            {!value.variableSize.enabled && <label>Character Size</label>}
+                            {value.variableSize.enabled && <label>Maximum</label>}
+                            <div key="character-size" className='character-size'>
+                                <input
+                                    type="number"
+                                    step={CHAR_PIXEL_SIZE}
+                                    min={MIN_CHAR_SIZE * CHAR_PIXEL_SIZE}
+                                    max={MAX_CHAR_SIZE * CHAR_PIXEL_SIZE}
+                                    className="theia-input"
+                                    id="#/properties/size/properties/x-input"
+                                    value={pixelWidth}
+                                    onChange={e => updateValue({
+                                        ...value,
+                                        size: {
+                                            x: parseInt(e.target.value) / CHAR_PIXEL_SIZE,
+                                            y: value.size.y
+                                        }
+                                    })}
+                                />
+                                <div>×</div>
+                                <input
+                                    type="number"
+                                    step={CHAR_PIXEL_SIZE}
+                                    min={MIN_CHAR_SIZE * CHAR_PIXEL_SIZE}
+                                    max={MAX_CHAR_SIZE * CHAR_PIXEL_SIZE}
+                                    className="theia-input"
+                                    id="#/properties/size/properties/y-input"
+                                    value={pixelHeight}
+                                    onChange={e => updateValue({
+                                        ...value,
+                                        size: {
+                                            x: value.size.x,
+                                            y: parseInt(e.target.value) / CHAR_PIXEL_SIZE
+                                        }
+                                    })}
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <label>Type</label>
+                            <SelectComponent
+                                key="#/properties/variableSize-input"
+                                defaultValue={value.variableSize.enabled ? '1' : '0'}
+                                options={[{
+                                    label: 'Fixed Size',
+                                    value: '0',
+                                    description: 'All characters have the same dimensions',
+                                }, {
+                                    label: 'Variable Size',
+                                    value: '1',
+                                    description: 'Every character can be of different width. Height is global. Allows for more dense or very small text. Uses Objects.',
+                                }]}
+                                onChange={option => updateValue({
+                                    ...value,
+                                    variableSize: {
+                                        ...value.variableSize,
+                                        enabled: !!option.value
+                                    }
+                                })}
+                            />
+                        </div>
+                    </div>
                     <div key='current-char' className='current-character'>
-                        {[...Array(pixelHeight)].map((h, y) =>
-                            [...Array(pixelWidth)].map((w, x) => (<>
-                                <div
-                                    key={`current-pixel-${y}-${x}`}
-                                    className={`color-${value.characters[currentCharacter][y][x]}`}
-                                    onClick={e => onClick(e, x, y)}
-                                    onMouseOver={e => onMouseOver(e, x, y)}
-                                    onMouseLeave={e => onMouseOver(e, x, y)}
-                                ></div>
-                            </>
-                            ))
+                        {[...Array(pixelHeight)].map((h, y) => (
+                            <div
+                                key={`current-line-${y}`}
+                                className={y >= value.variableSize.y ? 'line inactive' : 'line'}
+                            >
+                                {[...Array(pixelWidth)].map((w, x) => {
+                                    const classNames = [`pixel color-${value.characters[currentCharacter][y][x]}`];
+                                    if (x >= value.variableSize.x[currentCharacter]) {
+                                        classNames.push('inactive');
+                                    }
+
+                                    return <div
+                                        key={`current-pixel-${y}-${x}`}
+                                        className={classNames.join(' ')}
+                                        onClick={e => onClick(e, x, y)}
+                                        onContextMenu={e => onRightClick(e, x, y)}
+                                        onMouseOver={e => onMouseOver(e, x, y)}
+                                        onMouseLeave={e => onMouseOver(e, x, y)}
+                                    ></div>;
+                                })}
+                            </div>)
                         )}
                     </div>
                 </div>
-                <div key='editor-col-3' className='table-column'>
+                <div key='editor-col-3' className='alphabet-column'>
+                    <div key="alphabet-properties" className='font-properties'>
+                        <div>
+                            <label>Count</label>
+                            <input
+                                type="number"
+                                step="1"
+                                min={MIN_CHAR_COUNT}
+                                max={MAX_CHAR_COUNT - value.offset}
+                                className="theia-input"
+                                id="#/properties/characterCount-input"
+                                value={value.characterCount}
+                                onChange={e => updateValue({
+                                    ...value,
+                                    characterCount: parseInt(e.target.value)
+                                })}
+                            />
+                        </div>
+                        <div>
+                            <label>Offset</label>
+                            <input
+                                type="number"
+                                step="1"
+                                min={MIN_OFFSET}
+                                max={MAX_CHAR_COUNT - value.characterCount}
+                                className="theia-input"
+                                id="#/properties/offset-input"
+                                value={value.offset}
+                                onChange={e => updateValue({
+                                    ...value,
+                                    offset: parseInt(e.target.value)
+                                })}
+                            />
+                        </div>
+                        <div>
+                            <label>Section</label>
+                            <SelectComponent
+                                key="#/properties/section-input"
+                                defaultValue={value.section}
+                                options={[{
+                                    label: 'ROM Space',
+                                    value: DataSection.ROM,
+                                    description: 'Save tile data in regular ROM space',
+                                }, {
+                                    label: 'Expansion Space',
+                                    value: DataSection.EXP,
+                                    description: 'Save tile data to expansion space',
+                                }]}
+                                onChange={option => updateValue({
+                                    ...value,
+                                    section: option.value as DataSection
+                                })}
+                            />
+                        </div>
+                    </div>
                     <div key='characters' className='characters'>
-                        {[...Array(MAX_CHAR_COUNT)].map((j, character) => {
-                            const classNames = ['character'];
-                            if (character < value.offset || character >= value.offset + value.characterCount) {
-                                classNames.push('inactive');
-                            }
-                            if (character === currentCharacter) {
-                                classNames.push('active');
-                            }
-                            return (<>
-                                <div
-                                    key={`character-${character}`}
-                                    className={classNames.join(' ')}
-                                    title={win1252CharNames[character]}
-                                    onClick={() => !classNames.includes('inactive') && setCurrentCharacter(character)}
-                                >
-                                    <div
-                                        key={`character-pixels-${character}`}
-                                        style={{
-                                            boxShadow: [...Array(pixelHeight)].map((h, y) =>
-                                                [...Array(pixelWidth)].map((w, x) => {
+                        {[...Array(16)].map((i, line) => (
+                            <div key={`characters-line-${line}`} className="line">
+                                {[...Array(MAX_CHAR_COUNT / 16)].map((j, char) => {
+                                    const classNames = ['character'];
+                                    const character = (line * 16) + char;
+                                    if (character < value.offset || character >= value.offset + value.characterCount) {
+                                        classNames.push('inactive');
+                                    }
+                                    if (character === currentCharacter) {
+                                        classNames.push('active');
+                                    }
+
+                                    const boxShadow: string[] = [];
+                                    [...Array(pixelHeight)].map((h, y) => {
+                                        if (!value.variableSize.enabled || y < value.variableSize.y) {
+                                            [...Array(pixelWidth)].map((w, x) => {
+                                                if (!value.variableSize.enabled || x < value.variableSize.x[line * 16 + char]) {
                                                     const pixelSize = (pixelWidth > 16 || pixelHeight > 16) ? 1 : 2;
-                                                    /* TODO: do not render black pixels */
-                                                    return `${(x + 1) * pixelSize}px ${(y + 1) * pixelSize}px 0 0 ${PALETTE_COLORS[value.characters[character][y][x]]}`;
-                                                })
-                                            ).join(',')
-                                        }}
-                                    ></div>
-                                </div>
-                            </>);
-                        }
-                        )}
+                                                    const color = value.characters[character][y][x];
+                                                    boxShadow.push(
+                                                        `${(x + 1) * pixelSize}px ${(y + 1) * pixelSize}px 0 0 ${PALETTE_COLORS[color]}`
+                                                    );
+                                                }
+                                            });
+                                        }
+                                    });
+
+                                    return (<>
+                                        <div
+                                            key={`character-${character}`}
+                                            className={classNames.join(' ')}
+                                            title={win1252CharNames[character]}
+                                            onClick={() => !classNames.includes('inactive') && setCurrentCharacter(character)}
+                                        >
+                                            <div
+                                                key={`character-pixels-${character}`}
+                                                style={{
+                                                    boxShadow: boxShadow.join(',')
+                                                }}
+                                            ></div>
+                                        </div>
+                                    </>);
+                                })}
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
