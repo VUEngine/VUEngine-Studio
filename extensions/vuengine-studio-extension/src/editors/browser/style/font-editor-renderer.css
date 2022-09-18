@@ -1,13 +1,7 @@
-.theia-tree-editor .control.font-data-renderer {
-  display: flex;
-  gap: 20px;
-}
-
 .theia-tree-editor .control.font-data-renderer .editor {
   display: flex;
   flex-direction: row;
   gap: 40px;
-  margin-top: 20px;
 }
 
 .theia-tree-editor .control.font-data-renderer .editor>div {
@@ -21,18 +15,23 @@
   width: 80px;
 }
 
-.theia-tree-editor .control.font-data-renderer .editor .editor-column,
-.theia-tree-editor .control.font-data-renderer .editor .table-column {
-  flex-grow: 1;
+.theia-tree-editor .control.font-data-renderer .editor .editor-column {
+  min-width: 400px;
 }
 
 /* Character Table */
 
+.theia-tree-editor .control.font-data-renderer.width-8.height-24 .editor .alphabet-column .font-properties,
+.theia-tree-editor .control.font-data-renderer.width-8.height-32 .editor .alphabet-column .font-properties,
 .theia-tree-editor .control.font-data-renderer.width-8.height-24 .editor .characters,
 .theia-tree-editor .control.font-data-renderer.width-8.height-32 .editor .characters {
   width: calc(16 * (8px + 2px));
 }
 
+.theia-tree-editor .control.font-data-renderer.width-8.height-8 .editor .alphabet-column .font-properties,
+.theia-tree-editor .control.font-data-renderer.width-8.height-16 .editor .alphabet-column .font-properties,
+.theia-tree-editor .control.font-data-renderer.width-16.height-24 .editor .alphabet-column .font-properties,
+.theia-tree-editor .control.font-data-renderer.width-16.height-32 .editor .alphabet-column .font-properties,
 .theia-tree-editor .control.font-data-renderer.width-8.height-8 .editor .characters,
 .theia-tree-editor .control.font-data-renderer.width-8.height-16 .editor .characters,
 .theia-tree-editor .control.font-data-renderer.width-16.height-24 .editor .characters,
@@ -40,18 +39,21 @@
   width: calc(16 * (16px + 2px));
 }
 
+.theia-tree-editor .control.font-data-renderer.width-24 .editor .alphabet-column .font-properties,
 .theia-tree-editor .control.font-data-renderer.width-24 .editor .characters {
   width: calc(16 * (24px + 2px));
 }
 
+.theia-tree-editor .control.font-data-renderer.width-16.height-8 .editor .alphabet-column .font-properties,
+.theia-tree-editor .control.font-data-renderer.width-16.height-16 .editor .alphabet-column .font-properties,
+.theia-tree-editor .control.font-data-renderer.width-32 .editor .alphabet-column .font-properties,
 .theia-tree-editor .control.font-data-renderer.width-16.height-8 .editor .characters,
 .theia-tree-editor .control.font-data-renderer.width-16.height-16 .editor .characters,
 .theia-tree-editor .control.font-data-renderer.width-32 .editor .characters {
   width: calc(16 * (32px + 2px));
 }
 
-.theia-tree-editor .control.font-data-renderer .editor .characters>div {
-  background-color: #000;
+.theia-tree-editor .control.font-data-renderer .editor .characters .character {
   border: 1px solid var(--theia-editor-background);
   color: var(--theia-input-background);
   cursor: pointer;
@@ -59,75 +61,83 @@
   font-size: 8px;
   float: left;
   height: 16px;
-  overflow: hidden;
   text-align: center;
   width: 16px;
 }
 
-.theia-tree-editor .control.font-data-renderer.width-8.height-8 .editor .characters>div {
+.theia-tree-editor .control.font-data-renderer .editor .characters .line:nth-child(8) .character {
+  margin-bottom: 6px;
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .characters .character:before {
+  position: relative;
+  top: -12px;
+}
+
+.theia-tree-editor .control.font-data-renderer.width-8.height-8 .editor .characters .character {
   height: 16px;
   width: 16px;
 }
 
-.theia-tree-editor .control.font-data-renderer.width-8.height-16 .editor .characters>div,
-.theia-tree-editor .control.font-data-renderer.width-16.height-32 .editor .characters>div {
+.theia-tree-editor .control.font-data-renderer.width-8.height-16 .editor .characters .character,
+.theia-tree-editor .control.font-data-renderer.width-16.height-32 .editor .characters .character {
   height: 32px;
   width: 16px;
 }
 
-.theia-tree-editor .control.font-data-renderer.width-8.height-24 .editor .characters>div {
+.theia-tree-editor .control.font-data-renderer.width-8.height-24 .editor .characters .character {
   height: 24px;
   width: 8px;
 }
 
-.theia-tree-editor .control.font-data-renderer.width-8.height-32 .editor .characters>div {
+.theia-tree-editor .control.font-data-renderer.width-8.height-32 .editor .characters .character {
   height: 32px;
   width: 8px;
 }
 
-.theia-tree-editor .control.font-data-renderer.width-16.height-8 .editor .characters>div,
-.theia-tree-editor .control.font-data-renderer.width-32.height-16 .editor .characters>div {
+.theia-tree-editor .control.font-data-renderer.width-16.height-8 .editor .characters .character,
+.theia-tree-editor .control.font-data-renderer.width-32.height-16 .editor .characters .character {
   height: 16px;
   width: 32px;
 }
 
-.theia-tree-editor .control.font-data-renderer.width-16.height-24 .editor .characters>div {
+.theia-tree-editor .control.font-data-renderer.width-16.height-24 .editor .characters .character {
   height: 24px;
   width: 16px;
 }
 
-.theia-tree-editor .control.font-data-renderer.width-24.height-8 .editor .characters>div {
+.theia-tree-editor .control.font-data-renderer.width-24.height-8 .editor .characters .character {
   height: 8px;
   width: 24px;
 }
 
-.theia-tree-editor .control.font-data-renderer.width-24.height-16 .editor .characters>div {
+.theia-tree-editor .control.font-data-renderer.width-24.height-16 .editor .characters .character {
   height: 16px;
   width: 24px;
 }
 
-.theia-tree-editor .control.font-data-renderer.width-24.height-24 .editor .characters>div {
+.theia-tree-editor .control.font-data-renderer.width-24.height-24 .editor .characters .character {
   height: 24px;
   width: 24px;
 }
 
-.theia-tree-editor .control.font-data-renderer.width-24.height-32 .editor .characters>div {
+.theia-tree-editor .control.font-data-renderer.width-24.height-32 .editor .characters .character {
   height: 32px;
   width: 24px;
 }
 
-.theia-tree-editor .control.font-data-renderer.width-32.height-8 .editor .characters>div {
+.theia-tree-editor .control.font-data-renderer.width-32.height-8 .editor .characters .character {
   height: 8px;
   width: 32px;
 }
 
-.theia-tree-editor .control.font-data-renderer.width-32.height-24 .editor .characters>div {
+.theia-tree-editor .control.font-data-renderer.width-32.height-24 .editor .characters .character {
   height: 24px;
   width: 32px;
 }
 
-.theia-tree-editor .control.font-data-renderer.width-16.height-16 .editor .characters>div,
-.theia-tree-editor .control.font-data-renderer.width-32.height-32 .editor .characters>div {
+.theia-tree-editor .control.font-data-renderer.width-16.height-16 .editor .characters .character,
+.theia-tree-editor .control.font-data-renderer.width-32.height-32 .editor .characters .character {
   height: 32px;
   width: 32px;
 }
@@ -139,13 +149,14 @@
   justify-content: center;
 }
 
+.theia-tree-editor .control.font-data-renderer .editor .characters .character:hover,
 .theia-tree-editor .control.font-data-renderer .editor .characters .character.active {
   border-color: var(--theia-editor-foreground);
 }
 
 .theia-tree-editor .control.font-data-renderer .editor .characters .character.inactive {
   cursor: not-allowed;
-  opacity: .2;
+  opacity: .1;
 }
 
 .theia-tree-editor .control.font-data-renderer .editor .characters .character div {
@@ -158,58 +169,214 @@
 
 .theia-tree-editor .control.font-data-renderer .editor .current-character {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 1px;
 }
 
-.theia-tree-editor .control.font-data-renderer .editor .current-character>div {
-  align-items: center;
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line {
+  display: flex;
+  gap: 1px;
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .pixel {
   aspect-ratio: 1;
+  border: 1px solid transparent;
   cursor: crosshair;
   display: flex;
-  flex-basis: calc((100% - 8 * 1px) / 8);
+  flex-grow: 1;
+  min-width: 16px;
+  position: relative;
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line.inactive .pixel,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .pixel.inactive {
+  cursor: not-allowed;
+  opacity: .1;
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .pixel:hover {
+  border-color: var(--theia-editor-foreground);
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .pixel:after,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .pixel:before {
+  align-items: center;
+  color: var(--theia-input-background);
+  display: flex;
   font-family: monospace;
   font-size: 8px;
+  left: 0;
   justify-content: center;
-  user-select: none;
+  position: absolute;
+  right: 0;
+  top: -14px;
 }
 
-.theia-tree-editor .control.font-data-renderer.width-16 .editor .current-character>div {
-  flex-basis: calc((100% - 16 * 1px) / 16);
+.theia-tree-editor .control.font-data-renderer .editor .current-character .pixel:before {
+  bottom: 0;
+  left: -14px;
+  right: unset;
+  top: 0;
 }
 
-.theia-tree-editor .control.font-data-renderer.width-24 .editor .current-character>div {
-  flex-basis: calc((100% - 24 * 1px) / 24);
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(1) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(1):after {
+  content: '0'
 }
 
-.theia-tree-editor .control.font-data-renderer.width-32 .editor .current-character>div {
-  flex-basis: calc((100% - 32 * 1px) / 32);
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(2) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(2):after {
+  content: '1'
 }
 
-.theia-tree-editor .control.font-data-renderer .editor .current-character .header {
-  background-color: transparent !important;
-  border-color: transparent;
-  color: var(--theia-input-background);
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(3) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(3):after {
+  content: '2'
 }
 
-.theia-tree-editor .control.font-data-renderer .editor .current-character>div:not():hover {
-  opacity: .9;
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(4) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(4):after {
+  content: '3'
 }
 
-.theia-tree-editor .control.font-data-renderer.palette-index-0 .editor .current-character>div:hover {
-  background-color: #000;
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(5) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(5):after {
+  content: '4'
 }
 
-.theia-tree-editor .control.font-data-renderer.palette-index-1 .editor .current-character>div:hover {
-  background-color: #500;
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(6) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(6):after {
+  content: '5'
 }
 
-.theia-tree-editor .control.font-data-renderer.palette-index-2 .editor .current-character>div:hover {
-  background-color: #a00;
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(7) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(7):after {
+  content: '6'
 }
 
-.theia-tree-editor .control.font-data-renderer.palette-index-3 .editor .current-character>div:hover {
-  background-color: #f00;
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(8) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(8):after {
+  content: '7'
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(9) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(9):after {
+  content: '8'
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(10) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(10):after {
+  content: '9'
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(11) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(11):after {
+  content: '10'
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(12) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(12):after {
+  content: '11'
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(13) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(13):after {
+  content: '12'
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(14) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(14):after {
+  content: '13'
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(15) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(15):after {
+  content: '14'
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(16) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(16):after {
+  content: '15'
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(17) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(17):after {
+  content: '16'
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(18) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(18):after {
+  content: '17'
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(19) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(19):after {
+  content: '18'
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(20) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(20):after {
+  content: '19'
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(21) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(21):after {
+  content: '20'
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(22) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(22):after {
+  content: '21'
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(23) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(23):after {
+  content: '22'
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(24) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(24):after {
+  content: '23'
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(25) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(25):after {
+  content: '24'
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(26) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(26):after {
+  content: '25'
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(27) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(27):after {
+  content: '26'
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(28) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(28):after {
+  content: '27'
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(29) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(29):after {
+  content: '28'
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(30) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(30):after {
+  content: '29'
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(31) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(31):after {
+  content: '30'
+}
+
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(32) .pixel:first-child:before,
+.theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(32):after {
+  content: '31'
 }
 
 /* Colors */
@@ -237,6 +404,7 @@
   display: flex;
   flex-direction: row;
   gap: 20px;
+  margin-bottom: 20px;
 }
 
 .theia-tree-editor .control.font-data-renderer .font-properties>div {
@@ -290,7 +458,7 @@
   border: 1px solid transparent;
   cursor: pointer;
   display: flex;
-  font-size: 8px;
+  font-size: var(--theia-ui-font-size1);
   justify-content: center;
   width: calc(50% - 3px);
 }
@@ -303,9 +471,8 @@
 
 .theia-tree-editor .control.font-data-renderer .current-character-info input {
   box-sizing: border-box;
-  font-size: 16px;
-  line-height: 28px;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
+  margin-top: 21px;
   padding-right: 6px;
   text-align: center;
   width: 100%;
