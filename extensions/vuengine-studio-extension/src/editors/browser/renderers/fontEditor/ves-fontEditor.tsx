@@ -223,6 +223,73 @@ export const VesFontEditor: React.FC<VesFontEditorProps> = ({ value, updateValue
         }
     };
 
+    const onChangeName = (e: React.ChangeEvent<HTMLInputElement>) => updateValue({
+        ...value,
+        name: e.target.value
+    });
+
+    const onChangeVariablePixelWidth = (e: React.ChangeEvent<HTMLInputElement>) => updateValue({
+        ...value,
+        variableSize: {
+            ...value.variableSize,
+            x: {
+                ...value.variableSize.x,
+                [currentCharacter]: parseInt(e.target.value)
+            }
+        }
+    });
+
+    const onChangeVariablePixelHeight = (e: React.ChangeEvent<HTMLInputElement>) => updateValue({
+        ...value,
+        variableSize: {
+            ...value.variableSize,
+            y: parseInt(e.target.value)
+        }
+    });
+
+    const onChangePixelWidth = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const currentSize = value.size.x;
+        const currentVariableSize = value.variableSize.x[currentCharacter];
+        const newSize = parseInt(e.target.value);
+        const currentVariableSizeDifference = currentSize * CHAR_PIXEL_SIZE - currentVariableSize;
+        const newVariableSize = newSize - currentVariableSizeDifference;
+
+        updateValue({
+            ...value,
+            size: {
+                x: newSize / CHAR_PIXEL_SIZE,
+                y: value.size.y
+            },
+            variableSize: {
+                ...value.variableSize,
+                x: {
+                    ...value.variableSize.x,
+                    [currentCharacter]: newVariableSize
+                }
+            }
+        });
+    };
+
+    const onChangePixelHeight = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const currentSize = value.size.y;
+        const currentVariableSize = value.variableSize.y;
+        const newSize = parseInt(e.target.value);
+        const currentVariableSizeDifference = currentSize * CHAR_PIXEL_SIZE - currentVariableSize;
+        const newVariableSize = newSize - currentVariableSizeDifference;
+
+        updateValue({
+            ...value,
+            size: {
+                x: value.size.x,
+                y: newSize / CHAR_PIXEL_SIZE
+            },
+            variableSize: {
+                ...value.variableSize,
+                y: newVariableSize
+            }
+        });
+    };
+
     const setPixelColor = (x: number, y: number, color: number) =>
         updateValue({
             ...value,
@@ -273,10 +340,7 @@ export const VesFontEditor: React.FC<VesFontEditorProps> = ({ value, updateValue
                         className="theia-input large"
                         id="#/properties/name-input"
                         value={value.name}
-                        onChange={e => updateValue({
-                            ...value,
-                            name: e.target.value
-                        })}
+                        onChange={onChangeName}
                     />
                 </div>
             </div>
@@ -450,16 +514,7 @@ export const VesFontEditor: React.FC<VesFontEditorProps> = ({ value, updateValue
                                     max={value.size.x * CHAR_PIXEL_SIZE}
                                     className="theia-input"
                                     value={value.variableSize.x[currentCharacter]}
-                                    onChange={e => updateValue({
-                                        ...value,
-                                        variableSize: {
-                                            ...value.variableSize,
-                                            x: {
-                                                ...value.variableSize.x,
-                                                [currentCharacter]: parseInt(e.target.value)
-                                            }
-                                        }
-                                    })}
+                                    onChange={onChangeVariablePixelWidth}
                                 />
                                 <div>×</div>
                                 <input
@@ -468,13 +523,7 @@ export const VesFontEditor: React.FC<VesFontEditorProps> = ({ value, updateValue
                                     max={value.size.y * CHAR_PIXEL_SIZE}
                                     className="theia-input"
                                     value={value.variableSize.y}
-                                    onChange={e => updateValue({
-                                        ...value,
-                                        variableSize: {
-                                            ...value.variableSize,
-                                            y: parseInt(e.target.value)
-                                        }
-                                    })}
+                                    onChange={onChangeVariablePixelHeight}
                                 />
                             </div>
                         </div>}
@@ -490,13 +539,7 @@ export const VesFontEditor: React.FC<VesFontEditorProps> = ({ value, updateValue
                                     className="theia-input"
                                     id="#/properties/size/properties/x-input"
                                     value={pixelWidth}
-                                    onChange={e => updateValue({
-                                        ...value,
-                                        size: {
-                                            x: parseInt(e.target.value) / CHAR_PIXEL_SIZE,
-                                            y: value.size.y
-                                        }
-                                    })}
+                                    onChange={onChangePixelWidth}
                                 />
                                 <div>×</div>
                                 <input
@@ -507,20 +550,13 @@ export const VesFontEditor: React.FC<VesFontEditorProps> = ({ value, updateValue
                                     className="theia-input"
                                     id="#/properties/size/properties/y-input"
                                     value={pixelHeight}
-                                    onChange={e => updateValue({
-                                        ...value,
-                                        size: {
-                                            x: value.size.x,
-                                            y: parseInt(e.target.value) / CHAR_PIXEL_SIZE
-                                        }
-                                    })}
+                                    onChange={onChangePixelHeight}
                                 />
                             </div>
                         </div>
                         <div>
                             <label>Type</label>
                             <SelectComponent
-                                key="#/properties/variableSize-input"
                                 defaultValue={value.variableSize.enabled ? '1' : '0'}
                                 options={[{
                                     label: 'Fixed Size',
@@ -535,7 +571,7 @@ export const VesFontEditor: React.FC<VesFontEditorProps> = ({ value, updateValue
                                     ...value,
                                     variableSize: {
                                         ...value.variableSize,
-                                        enabled: !!option.value
+                                        enabled: option.value === '1' ? true : false
                                     }
                                 })}
                             />
@@ -545,11 +581,11 @@ export const VesFontEditor: React.FC<VesFontEditorProps> = ({ value, updateValue
                         {[...Array(pixelHeight)].map((h, y) => (
                             <div
                                 key={`current-line-${y}`}
-                                className={y >= value.variableSize.y ? 'line inactive' : 'line'}
+                                className={value.variableSize.enabled && y >= value.variableSize.y ? 'line inactive' : 'line'}
                             >
                                 {[...Array(pixelWidth)].map((w, x) => {
                                     const classNames = [`pixel color-${value.characters[currentCharacter][y][x]}`];
-                                    if (x >= value.variableSize.x[currentCharacter]) {
+                                    if (value.variableSize.enabled && x >= value.variableSize.x[currentCharacter]) {
                                         classNames.push('inactive');
                                     }
 

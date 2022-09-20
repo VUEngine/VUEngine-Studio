@@ -271,112 +271,112 @@
 
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(11) .pixel:first-child:before,
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(11):after {
-  content: '10'
+  content: 'A'
 }
 
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(12) .pixel:first-child:before,
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(12):after {
-  content: '11'
+  content: 'B'
 }
 
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(13) .pixel:first-child:before,
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(13):after {
-  content: '12'
+  content: 'C'
 }
 
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(14) .pixel:first-child:before,
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(14):after {
-  content: '13'
+  content: 'D'
 }
 
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(15) .pixel:first-child:before,
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(15):after {
-  content: '14'
+  content: 'E'
 }
 
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(16) .pixel:first-child:before,
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(16):after {
-  content: '15'
+  content: 'F'
 }
 
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(17) .pixel:first-child:before,
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(17):after {
-  content: '16'
+  content: '10'
 }
 
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(18) .pixel:first-child:before,
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(18):after {
-  content: '17'
+  content: '11'
 }
 
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(19) .pixel:first-child:before,
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(19):after {
-  content: '18'
+  content: '12'
 }
 
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(20) .pixel:first-child:before,
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(20):after {
-  content: '19'
+  content: '13'
 }
 
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(21) .pixel:first-child:before,
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(21):after {
-  content: '20'
+  content: '14'
 }
 
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(22) .pixel:first-child:before,
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(22):after {
-  content: '21'
+  content: '15'
 }
 
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(23) .pixel:first-child:before,
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(23):after {
-  content: '22'
+  content: '16'
 }
 
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(24) .pixel:first-child:before,
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(24):after {
-  content: '23'
+  content: '17'
 }
 
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(25) .pixel:first-child:before,
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(25):after {
-  content: '24'
+  content: '18'
 }
 
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(26) .pixel:first-child:before,
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(26):after {
-  content: '25'
+  content: '19'
 }
 
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(27) .pixel:first-child:before,
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(27):after {
-  content: '26'
+  content: '1A'
 }
 
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(28) .pixel:first-child:before,
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(28):after {
-  content: '27'
+  content: '1B'
 }
 
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(29) .pixel:first-child:before,
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(29):after {
-  content: '28'
+  content: '1C'
 }
 
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(30) .pixel:first-child:before,
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(30):after {
-  content: '29'
+  content: '1D'
 }
 
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(31) .pixel:first-child:before,
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(31):after {
-  content: '30'
+  content: '1E'
 }
 
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:nth-child(32) .pixel:first-child:before,
 .theia-tree-editor .control.font-data-renderer .editor .current-character .line:first-child .pixel:nth-child(32):after {
-  content: '31'
+  content: '1F'
 }
 
 /* Colors */
