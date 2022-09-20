@@ -41,6 +41,7 @@ export interface ProjectFileType {
   uiSchema?: unknown
   parent?: RegisteredTypeParent
   icon?: string
+  category?: string
   leaf?: boolean
   templates?: string[]
 };
