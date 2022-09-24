@@ -1,0 +1,26 @@
+.musicEditor .pattern {
+    background-color: #333;
+    box-sizing: border-box;
+    color: transparent;
+    cursor: pointer;
+    margin-right: 1px;
+    overflow: hidden;
+    padding: 3px 5px;
+    position: relative;
+}
+
+.musicEditor .channel.current .pattern,
+.musicEditor .channel:hover .pattern {
+    color: unset;
+}
+
+.musicEditor .pattern:hover,
+.musicEditor .pattern.current {
+    border: 1px solid #d31422;
+}
+
+.musicEditor .pattern div {
+    left: 0;
+    position: absolute;
+    top: 0;
+}

@@ -30,9 +30,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(VesEmulatorService).toSelf().inSingletonScope();
 
     // context key service
-    bind(VesEmulatorContextKeyService)
-        .toSelf()
-        .inSingletonScope();
+    bind(VesEmulatorContextKeyService).toSelf().inSingletonScope();
 
     // emulator view
     bindViewContribution(bind, VesEmulatorViewContribution);

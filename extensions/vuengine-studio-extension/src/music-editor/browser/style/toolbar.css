@@ -1,0 +1,22 @@
+.musicEditor .toolbar {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
+.musicEditor .toolbar button {
+    height: 32px;
+    margin-left: 0px;
+}
+
+.musicEditor .toolbar .playButton {
+    width: 65px;
+}
+
+.musicEditor .toolbar .recordButton {
+    width: 32px;
+    margin-right: 10px;
+    min-width: unset;
+    padding: 0;
+}

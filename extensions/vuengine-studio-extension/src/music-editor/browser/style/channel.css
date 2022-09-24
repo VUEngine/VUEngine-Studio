@@ -1,0 +1,18 @@
+.musicEditor .channel {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    padding: 1px 0;
+}
+
+.musicEditor .channel.muted {
+    opacity: .5;
+}
+
+.musicEditor .collapsedChannel {
+    background-color: #333;
+    cursor: pointer;
+    height: 5px;
+    margin: 1px 0;
+    width: 65px;
+}

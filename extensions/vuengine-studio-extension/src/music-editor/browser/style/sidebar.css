@@ -1,0 +1,23 @@
+.musicEditor .sidebar {
+    padding: 10px;
+    width: 200px;
+}
+
+.musicEditor .sidebar.collapsed {
+    display: none;
+}
+
+.musicEditor .sidebarToggle {
+    background-color: var(--theia-sideBar-background);
+    cursor: e-resize;
+    width: var(--theia-sash-width);
+}
+
+.musicEditor .sidebarToggle:hover {
+    background-color: var(--theia-sash-hoverBorder);
+    transition-delay: var(--theia-sash-hoverDelay);
+}
+
+.musicEditor .sidebarToggle.collapsed {
+    cursor: w-resize;
+}

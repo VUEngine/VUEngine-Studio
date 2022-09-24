@@ -2,7 +2,7 @@ import { nls } from '@theia/core';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
-import { VesCommonService } from '../../../core/browser/ves-common-service';
+import { VesCommonService } from '../../core/browser/ves-common-service';
 
 export const VesScriptEditorWidgetOptions = Symbol('VesScriptEditorWidgetOptions');
 export interface VesScriptEditorWidgetOptions {

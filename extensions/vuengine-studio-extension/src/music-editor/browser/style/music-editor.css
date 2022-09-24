@@ -1,0 +1,19 @@
+.musicEditor {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    overflow: hidden;
+}
+
+.musicEditor .editor {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    gap: 15px;
+    height: 100%;
+    overflow: hidden;
+    padding: 10px;
+    user-select: none;
+}

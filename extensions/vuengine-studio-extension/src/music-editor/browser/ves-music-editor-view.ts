@@ -1,9 +1,8 @@
 import { CommandRegistry, CommandService } from '@theia/core';
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { inject, injectable } from '@theia/core/shared/inversify';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { AbstractViewContribution } from '@theia/core/lib/browser';
-import { VesMusicEditorWidget } from './widget/ves-music-editor-widget';
-import { VesMusicEditorContextKeyService } from './ves-music-editor-context-key-service';
+import { VesMusicEditorWidget } from './ves-music-editor-widget';
 import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
 import { VesMusicEditorCommands } from './ves-music-editor-commands';
 
@@ -11,8 +10,6 @@ import { VesMusicEditorCommands } from './ves-music-editor-commands';
 export class VesMusicEditorViewContribution extends AbstractViewContribution<VesMusicEditorWidget> implements TabBarToolbarContribution {
   @inject(CommandService)
   private readonly commandService: CommandService;
-  @inject(VesMusicEditorContextKeyService)
-  protected readonly contextKeyService: VesMusicEditorContextKeyService;
 
   constructor() {
     super({
@@ -20,18 +17,6 @@ export class VesMusicEditorViewContribution extends AbstractViewContribution<Ves
       widgetName: VesMusicEditorWidget.LABEL,
       defaultWidgetOptions: { area: 'main' },
     });
-  }
-
-  @postConstruct()
-  protected async init(): Promise<void> {
-    this.updateFocusedView();
-    this.shell.onDidChangeActiveWidget(() => this.updateFocusedView());
-  }
-
-  protected updateFocusedView(): void {
-    this.contextKeyService.musicEditorFocus.set(
-      this.shell.activeWidget instanceof VesMusicEditorWidget
-    );
   }
 
   registerCommands(commandRegistry: CommandRegistry): void {

@@ -1,0 +1,70 @@
+.musicEditor .addPattern {
+    align-items: center;
+    border: 1px solid #333;
+    box-sizing: border-box;
+    color: #333;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    width: 20px;
+}
+
+.addPattern .patternSelect {
+    display: none;
+    flex-direction: row;
+    gap: 1px;
+    height: 100%;
+}
+
+.addPattern button {
+    background-color: var(--theia-secondaryButton-background);
+    border: 0;
+    cursor: pointer;
+    font-size: 12px;
+    height: 100%;
+    min-width: 15px;
+    padding: 0;
+    text-align: center;
+    width: 15px;
+    color: var(--theia-secondaryButton-foreground);
+}
+
+.addPattern button.newPattern {
+    min-width: 20px;
+    width: 20px;
+}
+
+.addPattern button:hover {
+    background-color: var(--theia-button-background) !important;
+}
+
+.musicEditor .addPattern:hover {
+    border-width: 0;
+    width: unset;
+}
+
+.musicEditor .addPattern:hover i {
+    display: none;
+}
+
+.musicEditor .addPattern:hover .patternSelect {
+    display: flex;
+}
+
+.addPattern .existingPatterns {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    gap: 1px;
+}
+
+.addPattern .existingPatterns>div {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    gap: 1px;
+}
+
+.addPattern .existingPatterns>div:empty {
+    display: none;
+}
