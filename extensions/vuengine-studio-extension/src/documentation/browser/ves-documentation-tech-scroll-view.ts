@@ -6,7 +6,6 @@ import { VesDocumentationCommands } from './ves-documentation-commands';
 
 @injectable()
 export class VesDocumentationTechScrollViewContribution extends AbstractViewContribution<VesDocumentationTechScrollWidget> {
-
     constructor() {
         super({
             widgetId: VesDocumentationTechScrollWidget.ID,

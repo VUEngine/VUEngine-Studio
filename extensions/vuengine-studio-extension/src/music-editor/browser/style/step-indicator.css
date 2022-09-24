@@ -1,0 +1,13 @@
+.musicEditor .stepIndicator {
+    background-color: red;
+    bottom: 0;
+    left: 82px;
+    position: absolute;
+    top: 0;
+    width: 2px;
+    z-index: 1;
+}
+
+.musicEditor .stepIndicator.stopped {
+    display: none;
+}
