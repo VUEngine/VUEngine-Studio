@@ -13,6 +13,6 @@ export default function PianoRollKey(props: PianoRollKeyProps): JSX.Element {
     }
 
     return <div className={classNames.join(' ')}>
-        {note}
+        <div>{note}</div>
     </div>;
 }

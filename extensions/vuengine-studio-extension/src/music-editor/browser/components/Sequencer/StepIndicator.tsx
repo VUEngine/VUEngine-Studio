@@ -14,7 +14,7 @@ export default function StepIndicator(props: StepIndicatorProps): JSX.Element {
     }
 
     const style = {
-        left: `${82 + currentStep}px`
+        left: `${67 + currentStep}px`
     };
 
     return <div

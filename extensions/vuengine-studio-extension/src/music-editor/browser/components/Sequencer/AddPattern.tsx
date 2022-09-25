@@ -18,16 +18,16 @@ export default function AddPattern(props: AddPatternProps): JSX.Element {
         height: `${height / 2}px`,
     };
 
-    const resolvedPatternIds: number[] = [];
+    const patternsForChannel: number[] = [];
     channelPatterns.forEach(patternId => {
         patterns.forEach(pattern => {
-            if (pattern.channel === channel && !resolvedPatternIds.includes(pattern.id)) {
-                resolvedPatternIds.push(pattern.id);
+            if (pattern.channel === channel && !patternsForChannel.includes(pattern.id)) {
+                patternsForChannel.push(pattern.id);
             }
         });
     });
-    const largestPatternId = resolvedPatternIds.length
-        ? Math.max.apply(undefined, resolvedPatternIds)
+    const largestPatternId = patternsForChannel.length
+        ? Math.max.apply(undefined, patternsForChannel)
         : 0;
 
     return <div
@@ -42,11 +42,11 @@ export default function AddPattern(props: AddPatternProps): JSX.Element {
             >+</button>
             <div className='existingPatterns'>
                 {[0, 1].map(remainder => (
-                    <div>
-                        {resolvedPatternIds.map((patternId, index) => {
+                    <div key={`channel-add-row-${remainder}`}>
+                        {patternsForChannel.map((patternId, index) => {
                             if (index % 2 === remainder) {
                                 return (<button
-                                    key={`add-pattern-${patternId}`}
+                                    key={`channel-${channel}-add-${patternId}`}
                                     onClick={() => stateApi.addChannelPattern(channel, patternId)}
                                 >
                                     {patternId}

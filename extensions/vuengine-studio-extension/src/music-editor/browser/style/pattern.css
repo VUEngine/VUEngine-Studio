@@ -1,8 +1,12 @@
 .musicEditor .pattern {
+    align-items: end;
     background-color: #333;
+    border: 1px solid transparent;
     box-sizing: border-box;
     color: transparent;
     cursor: pointer;
+    display: flex;
+    justify-content: end;
     margin-right: 1px;
     overflow: hidden;
     padding: 3px 5px;
@@ -14,13 +18,35 @@
     color: unset;
 }
 
-.musicEditor .pattern:hover,
-.musicEditor .pattern.current {
-    border: 1px solid #d31422;
+.musicEditor .pattern:hover {
+    border-color: #d31422;
+    border-style: dotted;
 }
 
-.musicEditor .pattern div {
+.musicEditor .pattern.current {
+    border-color: #d31422;
+    border-style: solid;
+}
+
+.musicEditor .pattern .notes {
     left: 0;
     position: absolute;
     top: 0;
+}
+
+.musicEditor .pattern .remove {
+    cursor: pointer;
+    display: none;
+    font-size: 13px;
+    position: absolute;
+    right: 4px;
+    top: 1px;
+}
+
+.musicEditor .pattern .remove:hover {
+    color: #d31422;
+}
+
+.musicEditor .pattern:hover .remove {
+    display: block;
 }

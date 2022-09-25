@@ -7,12 +7,12 @@ interface PianoRollRowProps {
     note: string
     noteId: number
     pattern: PatternConfig
-    rowHighlight: number
+    bar: number
     stateApi: MusicEditorStateApi
 }
 
 export default function PianoRollRow(props: PianoRollRowProps): JSX.Element {
-    const { note, noteId, pattern, rowHighlight, stateApi } = props;
+    const { note, noteId, pattern, bar, stateApi } = props;
 
     const classNames = ['pianoRollRow'];
     if (note.startsWith('C') && note.length === 2) {
@@ -24,12 +24,11 @@ export default function PianoRollRow(props: PianoRollRowProps): JSX.Element {
         {[...Array(pattern.size)].map((x, index) => (
             <PianoRollNote
                 key={`pianoroll-row-${index}-note-${note}`}
-                channel={pattern.channel}
-                pattern={pattern.id}
+                pattern={pattern}
                 index={index}
-                note={noteId}
-                rowHighlight={rowHighlight}
-                set={pattern.notes[index] === noteId}
+                noteId={noteId}
+                bar={bar}
+                set={pattern.notes[index]?.note === noteId}
                 stateApi={stateApi}
             />
         ))}

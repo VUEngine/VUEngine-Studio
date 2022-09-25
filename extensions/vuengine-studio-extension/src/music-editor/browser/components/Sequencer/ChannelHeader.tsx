@@ -23,9 +23,7 @@ export default function ChannelHeader(props: ChannelHeaderProps): JSX.Element {
     const classNames = ['channelHeader'];
 
     return <div className={classNames.join(' ')}>
-        {name
-            ? `${number}: ${name}`
-            : `Channel ${number}`}
+        {number} {name}
         <div className='channelButtons'>
             <div
                 className={`channelButton ${muted ? 'active' : ''}`}

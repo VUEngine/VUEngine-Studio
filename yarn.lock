@@ -12900,6 +12900,11 @@ tone@^13.8.34:
   resolved "https://registry.yarnpkg.com/tone/-/tone-13.8.34.tgz#fcc3286d173c53f0741bbfba8aa8fbf0c4ef66dc"
   integrity sha512-sFIYee0CO5lDcnC/RwIPiPMOIZCMEk35AaxF0Q64q7SE1BL+i+efYR6vrD+peDGrswXJ+D3bTmci2wCy+omx+Q==
 
+toolcool-range-slider@3.0.13:
+  version "3.0.13"
+  resolved "https://registry.yarnpkg.com/toolcool-range-slider/-/toolcool-range-slider-3.0.13.tgz#cea96e55cfff9b39fda930adb03461ca3b9b7449"
+  integrity sha512-FeEnwzyG5L3Bi9KTQK/UX3/gv+TSvL3YbqNcfqJgVdSpY6RBcBQpnI5Uii/FoiGdpc68CxvqGRkjqbp7zAZjRQ==
+
 tough-cookie@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/tough-cookie/-/tough-cookie-4.0.0.tgz#d822234eeca882f991f0f908824ad2622ddbece4"
