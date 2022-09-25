@@ -4,7 +4,15 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import * as React from '@theia/core/shared/react';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import MusicEditor from './components/MusicEditor';
-import { ChannelConfig, CurrentPattern, MAX_SPEED, MAX_VOLUME, MIN_SPEED, MIN_VOLUME, MusicEditorStateApi, PatternConfig } from './ves-music-editor-types';
+import {
+    ChannelConfig,
+    MAX_SPEED,
+    MIN_SPEED,
+    MusicEditorStateApi,
+    NoteConfig,
+    PatternConfig,
+    MUSIC_EDITOR_STATE_TEMPLATE
+} from './ves-music-editor-types';
 
 export const VesMusicEditorWidgetOptions = Symbol('VesMusicEditorWidgetOptions');
 export interface VesMusicEditorWidgetOptions {
@@ -15,7 +23,9 @@ export interface vesMusicEditorWidgetState {
     name: string
     channels: ChannelConfig[],
     patterns: PatternConfig[],
-    currentPattern: CurrentPattern,
+    currentChannel: number,
+    currentPattern: number,
+    currentNote: number,
     playing: boolean
     recording: boolean
     speed: number
@@ -53,31 +63,7 @@ export class VesMusicEditorWidget extends ReactWidget {
         this.update();
     }
     protected initState(): void {
-        this.state = {
-            name: 'New',
-            channels: [...Array(6)].map((c, index) => ({
-                name: '',
-                patterns: index === 0 ? [1] : [],
-                muted: false,
-                solo: false,
-                collapsed: false,
-            })),
-            patterns: [{
-                id: 1,
-                channel: 1,
-                size: 32,
-                notes: []
-            }],
-            currentPattern: {
-                channel: 1,
-                id: 1,
-            },
-            playing: false,
-            recording: false,
-            speed: 160,
-            volume: 10,
-            bar: 4,
-        };
+        this.state = MUSIC_EDITOR_STATE_TEMPLATE;
     }
 
     protected stateApi: MusicEditorStateApi = {
@@ -109,7 +95,7 @@ export class VesMusicEditorWidget extends ReactWidget {
         },
 
         setVolume: (volume: number): void => {
-            if (volume <= MAX_VOLUME && volume >= MIN_VOLUME) {
+            if (volume <= 100 && volume >= 0) {
                 this.state.volume = volume;
                 this.update();
             }
@@ -125,15 +111,28 @@ export class VesMusicEditorWidget extends ReactWidget {
             this.update();
         },
 
-        setCurrentPattern: (currentPattern: CurrentPattern): void => {
-            this.state.currentPattern = currentPattern;
+        setCurrentChannel: (id: number): void => {
+            this.state.currentChannel = id;
+            this.state.currentNote = -1;
             this.update();
         },
 
-        setNote: (channel: number, patternId: number, noteIndex: number, noteId: number): void => {
+        setCurrentPattern: (channel: number, pattern: number): void => {
+            this.state.currentChannel = channel;
+            this.state.currentPattern = pattern;
+            this.state.currentNote = -1;
+            this.update();
+        },
+
+        setCurrentNote: (id: number): void => {
+            this.state.currentNote = id;
+            this.update();
+        },
+
+        setNote: (channel: number, patternId: number, noteIndex: number, note: NoteConfig): void => {
             this.state.patterns.forEach(pattern => {
                 if (pattern.channel === channel && pattern.id === patternId) {
-                    pattern.notes[noteIndex] = noteId;
+                    pattern.notes[noteIndex] = note;
                     return;
                 }
             });
@@ -174,7 +173,6 @@ export class VesMusicEditorWidget extends ReactWidget {
                     return;
                 }
             });
-
             if (!patternExists) {
                 this.state.patterns.push({
                     channel: channelId,
@@ -184,28 +182,41 @@ export class VesMusicEditorWidget extends ReactWidget {
                 });
             }
 
-            this.state.currentPattern = {
-                channel: channelId,
-                id: patternId,
-            };
+            this.state.currentChannel = channelId;
+            this.state.currentPattern = patternId;
+
+            this.update();
+        },
+
+        removeChannelPattern: (channelId: number, index: number): void => {
+            this.state.channels[channelId - 1].patterns.splice(index, 1);
+            this.update();
+        },
+
+        setPatternSize: (channelId: number, patternId: number, size: number): void => {
+            this.state.patterns.forEach(pattern => {
+                if (pattern.channel === channelId && pattern.id === patternId) {
+                    pattern.size = size;
+                    return;
+                }
+            });
             this.update();
         },
     };
 
     protected render(): React.ReactNode {
         return <MusicEditor
+            name={this.state.name}
             channels={this.state.channels}
             patterns={this.state.patterns}
+            currentChannel={this.state.currentChannel}
             currentPattern={this.state.currentPattern}
+            currentNote={this.state.currentNote}
             playing={this.state.playing}
             recording={this.state.recording}
             bar={this.state.bar}
             speed={this.state.speed}
-            maxSpeed={MAX_SPEED}
-            minSpeed={MIN_SPEED}
             volume={this.state.volume}
-            maxVolume={MAX_VOLUME}
-            minVolume={MIN_VOLUME}
             stateApi={this.stateApi}
         />;
     }

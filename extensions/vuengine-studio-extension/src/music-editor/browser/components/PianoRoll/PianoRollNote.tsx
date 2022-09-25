@@ -1,21 +1,27 @@
 import React from 'react';
-import { MusicEditorStateApi } from '../../ves-music-editor-types';
+import { MusicEditorStateApi, Notes, PatternConfig } from '../../ves-music-editor-types';
 
 interface PianoRollNoteProps {
-    channel: number
-    pattern: number
+    pattern: PatternConfig
     index: number
-    note: number
-    rowHighlight: number
+    noteId: number
+    bar: number
     set: boolean
     stateApi: MusicEditorStateApi
 }
 
 export default function PianoRollNote(props: PianoRollNoteProps): JSX.Element {
-    const { channel, pattern, index, note, rowHighlight, set, stateApi } = props;
+    const { pattern, index, noteId, bar, set, stateApi } = props;
+
+    const note = pattern.notes[index] ?? {
+        note: noteId,
+        volumeL: undefined,
+        volumeR: undefined,
+        effects: [],
+    };
 
     const classNames = ['pianoRollNote'];
-    if ((index + 1) % rowHighlight === 0) {
+    if ((index + 1) % bar === 0) {
         classNames.push('nth');
     }
     if (set) {
@@ -24,19 +30,35 @@ export default function PianoRollNote(props: PianoRollNoteProps): JSX.Element {
 
     const onMouseOver = (e: React.MouseEvent<HTMLElement>) => {
         if (e.buttons === 1) {
-            stateApi.setNote(channel, pattern, index, note);
+            stateApi.setNote(pattern.channel, pattern.id, index, {
+                ...note,
+                note: noteId
+            });
         } else if (e.buttons === 2) {
-            stateApi.setNote(channel, pattern, index, 0);
+            stateApi.setNote(pattern.channel, pattern.id, index, {
+                ...note,
+                note: undefined
+            });
         }
         e.preventDefault();
     };
 
     return <div
         className={classNames.join(' ')}
-        onClick={() => stateApi.setNote(channel, pattern, index, note)}
-        onContextMenu={() => stateApi.setNote(channel, pattern, index, 0)}
+        onClick={() => {
+            stateApi.setNote(pattern.channel, pattern.id, index, {
+                ...note,
+                note: noteId
+            });
+            stateApi.setCurrentNote(index);
+        }}
+        onContextMenu={() => stateApi.setNote(pattern.channel, pattern.id, index, {
+            ...note,
+            note: undefined
+        })}
         onMouseOver={e => onMouseOver(e)}
         onMouseLeave={e => onMouseOver(e)}
+        title={Notes[noteId]}
     />;
 }
 

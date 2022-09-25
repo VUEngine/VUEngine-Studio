@@ -8,6 +8,10 @@
     flex-grow: 1;
 }
 
+.musicEditor .pianoRollRow:hover .pianoRollNote {
+    background-color: #555;
+}
+
 .musicEditor .pianoRollRow.cNote .pianoRollNote {
     margin-bottom: 2px;
 }
@@ -24,7 +28,8 @@
     margin-right: 2px;
 }
 
-/* nth-child(1) is pianoRoll_Key_ */
+
+/* nth-child(1) is pianoRollKey */
 .musicEditor .pianoRoll.step-0 .pianoRollNote:nth-child(2),
 .musicEditor .pianoRoll.step-1 .pianoRollNote:nth-child(3),
 .musicEditor .pianoRoll.step-2 .pianoRollNote:nth-child(4),

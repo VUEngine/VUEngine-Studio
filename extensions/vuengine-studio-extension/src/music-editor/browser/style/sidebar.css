@@ -1,6 +1,7 @@
 .musicEditor .sidebar {
-    padding: 10px;
-    width: 200px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    width: 180px;
 }
 
 .musicEditor .sidebar.collapsed {
@@ -20,4 +21,43 @@
 
 .musicEditor .sidebarToggle.collapsed {
     cursor: w-resize;
+    width: 10px;
+}
+
+.musicEditor .sidebar .section {
+    border-top: 3px solid var(--theia-sideBar-background);
+    display: flex;
+    flex-direction: column;
+    padding: 15px 10px;
+    gap: 15px;
+}
+
+.musicEditor .sidebar .section.first {
+    border-top: none;
+}
+
+.musicEditor .sidebarTabs {
+    background: var(--theia-editorGroupHeader-tabsBackground);
+    display: flex;
+    font-size: 14px;
+}
+
+.musicEditor .sidebarTab {
+    align-items: center;
+    color: #666;
+    cursor: pointer;
+    display: flex;
+    flex-grow: 1;
+    font-size: 14px;
+    justify-content: center;
+    height: 24px;
+}
+
+.musicEditor .sidebarTab.active {
+    background: var(--theia-editor-background);
+    color: var(--theia-editor-foreground);
+}
+
+.musicEditor .sidebarTab:hover {
+    color: var(--theia-editor-foreground);
 }

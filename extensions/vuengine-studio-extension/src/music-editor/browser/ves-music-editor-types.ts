@@ -1,13 +1,29 @@
 export interface MusicEditorStateApi {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [fnc: string]: any
+    setName: (name: string) => void,
+    setPlaying: (playing: boolean) => void,
+    setRecording: (recording: boolean) => void,
+    setBar: (bar: number) => void,
+    setSpeed: (speed: number) => void,
+    setVolume: (volume: number) => void,
+    setChannels: (channels: ChannelConfig[]) => void,
+    setPatterns: (patterns: PatternConfig[]) => void,
+    setCurrentChannel: (id: number) => void,
+    setCurrentPattern: (channel: number, pattern: number) => void,
+    setCurrentNote: (id: number) => void,
+    setNote: (channel: number, patternId: number, noteIndex: number, note: NoteConfig) => void,
+    toggleChannelMuted: (channelId: number) => void,
+    toggleChannelSolo: (channelId: number) => void,
+    toggleChannelCollapsed: (channelId: number) => void,
+    addChannelPattern: (channelId: number, patternId: number) => void,
+    removeChannelPattern: (channelId: number, index: number) => void,
+    setPatternSize: (channelId: number, patternId: number, size: number) => void,
 }
 
 export interface PatternConfig {
     id: number,
     channel: number,
     size: number,
-    notes: (number | undefined)[]
+    notes: (NoteConfig | undefined)[]
 }
 
 export interface ChannelConfig {
@@ -18,9 +34,11 @@ export interface ChannelConfig {
     collapsed: boolean
 }
 
-export interface CurrentPattern {
-    channel: number,
-    id: number,
+export interface NoteConfig {
+    note: number | undefined,
+    volumeL: number | undefined,
+    volumeR: number | undefined,
+    effects: string[],
 }
 
 export const Notes = [
@@ -42,8 +60,32 @@ export const HIGHEST_NOTE = 21; // D8;
 export const MAX_SPEED = 300;
 export const MIN_SPEED = 60;
 
-export const MAX_VOLUME = 50;
-export const MIN_VOLUME = -10;
-
 export const PATTERN_HEIGHT_FACTOR = 0.5;
 export const PATTERN_NOTE_WIDTH = 2;
+
+export const VOLUME_STEPS = 16;
+
+export const MUSIC_EDITOR_STATE_TEMPLATE = {
+    name: 'New',
+    channels: [...Array(6)].map((c, index) => ({
+        name: '',
+        patterns: index === 0 ? [1] : [],
+        muted: false,
+        solo: false,
+        collapsed: false,
+    })),
+    patterns: [{
+        id: 1,
+        channel: 1,
+        size: 32,
+        notes: [],
+    }],
+    currentChannel: 1,
+    currentPattern: 1,
+    currentNote: -1,
+    playing: false,
+    recording: false,
+    speed: 120,
+    volume: 100,
+    bar: 4,
+};

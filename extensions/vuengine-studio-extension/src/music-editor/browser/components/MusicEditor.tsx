@@ -1,27 +1,26 @@
 import React, { useState } from 'react';
 import { Instrument, Song, Track } from 'reactronica';
-import { ChannelConfig, CurrentPattern, HIGHEST_NOTE, LOWEST_NOTE, MusicEditorStateApi, PatternConfig } from '../ves-music-editor-types';
+import { ChannelConfig, MusicEditorStateApi, PatternConfig } from '../ves-music-editor-types';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
+import Sidebar from './Sidebar/Sidebar';
 
 interface MusicEditorProps {
+    name: string
     channels: ChannelConfig[]
     patterns: PatternConfig[]
-    currentPattern: CurrentPattern
+    currentChannel: number
+    currentPattern: number
+    currentNote: number
     playing: boolean
     recording: boolean
     bar: number
     speed: number
-    maxSpeed: number
-    minSpeed: number
     volume: number
-    maxVolume: number
-    minVolume: number
     stateApi: MusicEditorStateApi
 }
 
 export default function MusicEditor(props: MusicEditorProps): JSX.Element {
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [currentStep, setCurrentStep] = useState(0);
 
     /* setTimeout(() => {
@@ -29,18 +28,16 @@ export default function MusicEditor(props: MusicEditorProps): JSX.Element {
     }, 100); */
 
     const {
-        bar,
+        name, bar, speed, volume,
         channels, patterns,
-        currentPattern,
+        currentChannel, currentPattern, currentNote,
         playing, recording,
-        speed, maxSpeed, minSpeed,
-        volume, maxVolume, minVolume,
         stateApi
     } = props;
 
     let currentlyEditedPattern: PatternConfig | false = false;
     patterns.forEach(pattern => {
-        if (pattern.channel === currentPattern.channel && pattern.id === currentPattern.id) {
+        if (pattern.channel === currentChannel && pattern.id === currentPattern) {
             currentlyEditedPattern = pattern;
         }
     });
@@ -63,75 +60,73 @@ export default function MusicEditor(props: MusicEditorProps): JSX.Element {
             <div className='toolbar'>
                 <button
                     className='theia-button secondary large playButton'
+                    title={playing ? 'Play' : 'Stop'}
                     onClick={() => stateApi.setPlaying(!playing)}
                 >
                     <i className={`fa fa-${playing ? 'stop' : 'play'}`} />
                 </button>
                 <button
                     className={`theia-button ${recording ? 'primary' : 'secondary'} large recordButton`}
+                    title='Recording Mode'
                     onClick={() => stateApi.setRecording(!recording)}
                 >
                     <i className='fa fa-circle' />
                 </button>
-                BPM:
-                <input
-                    className='theia-input'
-                    type='number'
-                    value={speed}
-                    max={maxSpeed}
-                    min={minSpeed}
-                    step={10}
-                    onChange={e => stateApi.setSpeed(parseInt(e.target.value))}
-                />
-                Volume:
-                <input
-                    className='theia-input'
-                    type='number'
-                    value={volume}
-                    max={maxVolume}
-                    min={minVolume}
-                    step={10}
-                    onChange={e => stateApi.setVolume(parseInt(e.target.value))}
-                />
-                Bar:
-                <input
-                    className='theia-input'
-                    type='number'
-                    value={bar}
-                    max={8}
-                    min={4}
-                    step={1}
-                    onChange={e => stateApi.setBar(parseInt(e.target.value))}
-                />
+                <button
+                    className={'theia-button secondary large'}
+                    title='Save'
+                >
+                    <i className='fa fa-save' />
+                </button>
+                <button
+                    className={'theia-button secondary large'}
+                    title='Configure Input Devices'
+                >
+                    <i className='fa fa-keyboard-o' />
+                </button>
+                <button
+                    className={'theia-button secondary large'}
+                    title='Import'
+                >
+                    <i className='fa fa-download' />
+                </button>
+                <button
+                    className={'theia-button secondary large'}
+                    title='Export'
+                >
+                    <i className='fa fa-upload' />
+                </button>
             </div>
             <div>
                 <Sequencer
                     channels={channels}
                     patterns={patterns}
+                    currentChannel={currentChannel}
                     currentPattern={currentPattern}
                     playing={playing}
                     currentStep={currentStep}
-                    lowestNote={LOWEST_NOTE}
-                    highestNote={HIGHEST_NOTE}
                     stateApi={stateApi}
                 />
             </div>
             {currentlyEditedPattern && <PianoRoll
                 playing={playing}
                 pattern={currentlyEditedPattern}
+                currentNote={currentNote}
                 currentStep={currentStep}
-                lowestNote={LOWEST_NOTE}
-                highestNote={HIGHEST_NOTE}
-                rowHighlight={bar}
+                bar={bar}
                 stateApi={stateApi}
             />}
         </div>
-        <div
-            className={`sidebarToggle${sidebarCollapsed ? ' collapsed' : ''}`}
-            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+        <Sidebar
+            name={name}
+            volume={volume}
+            speed={speed}
+            bar={bar}
+            pattern={currentlyEditedPattern}
+            currentChannel={currentChannel}
+            currentPattern={currentPattern}
+            currentNote={currentNote}
+            stateApi={stateApi}
         />
-        <div className={`sidebar${sidebarCollapsed ? 'collapsed' : ''}`}>
-            Sidebar
-        </div>
     </div>;
 }

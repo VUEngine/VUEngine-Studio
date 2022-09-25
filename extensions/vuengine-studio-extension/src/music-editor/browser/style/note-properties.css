@@ -1,0 +1,6 @@
+.musicEditor .noteProperties {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    padding: 0 10px 0 68px;
+}

@@ -6,31 +6,40 @@
     color: #666;
     cursor: pointer;
     display: flex;
+    font-size: 8px;
     margin-right: 3px;
+    min-height: 10px;
     min-width: 58px;
     padding-left: 5px;
     width: 58px;
 }
 
-.musicEditor .pianoRollKey:hover {
-    background: var(--theia-button-background) !important;
+.musicEditor .pianoRollRow:hover .pianoRollKey,
+.musicEditor .pianoRollKey:hover,
+.musicEditor .pianoRollKey.sharpNote:hover:after,
+.musicEditor .pianoRollRow:hover .pianoRollKey.sharpNote:after {
+    background: var(--theia-button-background);
     color: var(--theia-button-foreground)
 }
 
 .musicEditor .pianoRollKey.sharpNote {
-    background: linear-gradient(90deg, #000 50%, #666 100%);
+    background-color: #fff !important;
     color: #ccc;
     position: relative;
 }
 
 .musicEditor .pianoRollKey.sharpNote:after {
-    background-color: #fff;
-    border-left: 2px solid #666;
+    background: linear-gradient(90deg, #000 50%, #555 100%);
+    border-right: 2px solid #999;
     content: "";
     height: 100%;
     position: absolute;
-    right: 0;
-    width: 10px;
+    left: 0;
+    width: 45px;
+}
+
+.musicEditor .pianoRollKey>div {
+    z-index: 1;
 }
 
 .musicEditor .pianoRollRow.cNote .pianoRollKey {

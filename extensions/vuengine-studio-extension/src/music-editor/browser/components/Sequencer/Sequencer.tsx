@@ -1,15 +1,14 @@
 import React from 'react';
-import { ChannelConfig, CurrentPattern, MusicEditorStateApi, PatternConfig } from '../../ves-music-editor-types';
+import { ChannelConfig, MusicEditorStateApi, PatternConfig } from '../../ves-music-editor-types';
 import Channel from './Channel';
 import StepIndicator from './StepIndicator';
 
 interface SequencerProps {
     channels: ChannelConfig[]
     patterns: PatternConfig[]
-    currentPattern: CurrentPattern
+    currentChannel: number
+    currentPattern: number
     currentStep: number
-    lowestNote: number
-    highestNote: number
     playing: boolean
     stateApi: MusicEditorStateApi
 }
@@ -18,10 +17,9 @@ export default function Sequencer(props: SequencerProps): JSX.Element {
     const {
         channels,
         patterns,
+        currentChannel,
         currentPattern,
         currentStep,
-        lowestNote,
-        highestNote,
         playing,
         stateApi
     } = props;
@@ -44,10 +42,9 @@ export default function Sequencer(props: SequencerProps): JSX.Element {
                 key={`channel-${index + 1}`}
                 channelConfig={channel}
                 patterns={patterns}
+                currentChannel={currentChannel}
                 currentPattern={currentPattern}
                 number={index + 1}
-                lowestNote={lowestNote}
-                highestNote={highestNote}
                 otherSolo={soloChannel > -1 && soloChannel !== index}
                 stateApi={stateApi}
             />

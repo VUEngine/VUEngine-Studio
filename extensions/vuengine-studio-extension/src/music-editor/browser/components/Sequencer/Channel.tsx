@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChannelConfig, CurrentPattern, MusicEditorStateApi, Notes, PatternConfig } from '../../ves-music-editor-types';
+import { ChannelConfig, HIGHEST_NOTE, LOWEST_NOTE, MusicEditorStateApi, Notes, PatternConfig } from '../../ves-music-editor-types';
 import AddPattern from './AddPattern';
 import ChannelHeader from './ChannelHeader';
 import Pattern from './Pattern';
@@ -7,9 +7,8 @@ import Pattern from './Pattern';
 interface ChannelProps {
     channelConfig: ChannelConfig
     patterns: PatternConfig[]
-    currentPattern: CurrentPattern
-    lowestNote: number
-    highestNote: number
+    currentChannel: number
+    currentPattern: number
     number: number
     otherSolo: boolean
     stateApi: MusicEditorStateApi
@@ -18,9 +17,8 @@ interface ChannelProps {
 export default function Channel(props: ChannelProps): JSX.Element {
     const {
         channelConfig,
+        currentChannel,
         currentPattern,
-        lowestNote,
-        highestNote,
         number,
         otherSolo,
         patterns,
@@ -37,7 +35,7 @@ export default function Channel(props: ChannelProps): JSX.Element {
     if (channelConfig.collapsed) {
         classNames.push('collapsed');
     }
-    if (currentPattern.channel === number) {
+    if (currentChannel === number) {
         classNames.push('current');
     }
 
@@ -53,11 +51,11 @@ export default function Channel(props: ChannelProps): JSX.Element {
 
     const patternHeight = Notes
         .filter((note, index) =>
-            index <= lowestNote &&
-            index >= highestNote)
+            index <= LOWEST_NOTE &&
+            index >= HIGHEST_NOTE)
         .length;
 
-    const isCurrent = (id: number): boolean => currentPattern.channel === number && currentPattern.id === id;
+    const isCurrent = (id: number): boolean => currentChannel === number && currentPattern === id;
 
     return channelConfig.collapsed
         ? <div
@@ -76,13 +74,14 @@ export default function Channel(props: ChannelProps): JSX.Element {
             {resolvedPatterns.map((pattern, index) =>
                 <Pattern
                     key={`channel-${number}-pattern-${index}`}
+                    index={index}
                     channel={number}
                     patternId={pattern.id}
                     current={isCurrent(pattern.id)}
                     notes={pattern.notes}
                     height={patternHeight}
                     size={pattern.size}
-                    setCurrentPattern={stateApi.setCurrentPattern}
+                    stateApi={stateApi}
                 />)}
             <AddPattern
                 channel={number}

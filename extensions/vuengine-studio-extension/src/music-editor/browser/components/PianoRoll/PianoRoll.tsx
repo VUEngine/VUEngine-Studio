@@ -1,19 +1,19 @@
 import React from 'react';
-import { MusicEditorStateApi, Notes, PatternConfig } from '../../ves-music-editor-types';
-import PianoRollRow from './PianoRollRow';
+import { MusicEditorStateApi, PatternConfig } from '../../ves-music-editor-types';
+import NoteProperties from './NoteProperties';
+import PianoRollEditor from './PianoRollEditor';
 
 interface PianoRollProps {
     pattern: PatternConfig
+    currentNote: number
     currentStep: number
-    lowestNote: number
-    highestNote: number
     playing: boolean
-    rowHighlight: number
+    bar: number
     stateApi: MusicEditorStateApi
 }
 
 export default function PianoRoll(props: PianoRollProps): JSX.Element {
-    const { currentStep, lowestNote, highestNote, pattern, playing, rowHighlight, stateApi } = props;
+    const { currentNote, currentStep, pattern, playing, bar, stateApi } = props;
 
     const classNames = ['pianoRoll'];
     if (playing) {
@@ -21,15 +21,20 @@ export default function PianoRoll(props: PianoRollProps): JSX.Element {
     }
 
     return <div className={classNames.join(' ')}>
-        {Notes.map((note, index) =>
-            index <= lowestNote &&
-            index >= highestNote && <PianoRollRow
-                key={`pianoroll-row-${index}`}
-                note={note}
-                noteId={index}
-                pattern={pattern}
-                rowHighlight={rowHighlight}
-                stateApi={stateApi}
-            />)}
+        {/* <PianoRollHeader
+            pattern={pattern}
+            stateApi={stateApi}
+        />*/}
+        <PianoRollEditor
+            pattern={pattern}
+            bar={bar}
+            stateApi={stateApi}
+        />
+        <NoteProperties
+            bar={bar}
+            pattern={pattern}
+            currentNote={currentNote}
+            stateApi={stateApi}
+        />
     </div>;
 }
