@@ -27,19 +27,19 @@ export default function ChannelHeader(props: ChannelHeaderProps): JSX.Element {
         <div className='channelButtons'>
             <div
                 className={`channelButton ${muted ? 'active' : ''}`}
-                onClick={() => stateApi.toggleChannelMuted(number - 1)}
+                onClick={() => stateApi.toggleChannelMuted(number)}
             >
                 <i className={`fa fa-volume-${muted ? 'off' : 'up'}`} />
             </div>
             <div
                 className={`channelButton ${solo ? 'active' : ''}`}
-                onClick={() => stateApi.toggleChannelSolo(number - 1)}
+                onClick={() => stateApi.toggleChannelSolo(number)}
             >
                 <i className={`fa fa-star${solo ? '' : '-o'}`} />
             </div>
             <div
                 className={`channelButton ${collapsed ? 'active' : ''}`}
-                onClick={() => stateApi.toggleChannelCollapsed(number - 1)}
+                onClick={() => stateApi.toggleChannelCollapsed(number)}
             >
                 <i className={`fa fa-eye${collapsed ? '-slash' : ''}`} />
             </div>

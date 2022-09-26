@@ -1,7 +1,6 @@
 .musicEditor .pattern {
     align-items: end;
     background-color: #333;
-    border: 1px solid transparent;
     box-sizing: border-box;
     color: transparent;
     cursor: pointer;
@@ -19,13 +18,11 @@
 }
 
 .musicEditor .pattern:hover {
-    border-color: #d31422;
-    border-style: dotted;
+    outline: 1px solid #d31422;
 }
 
 .musicEditor .pattern.current {
-    border-color: #d31422;
-    border-style: solid;
+    background-color: #555;
 }
 
 .musicEditor .pattern .notes {

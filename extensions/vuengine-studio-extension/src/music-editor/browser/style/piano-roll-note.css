@@ -12,6 +12,10 @@
     background-color: #555;
 }
 
+.musicEditor .pianoRollNote.current {
+    background-color: #555;
+}
+
 .musicEditor .pianoRollRow.cNote .pianoRollNote {
     margin-bottom: 2px;
 }
@@ -26,73 +30,4 @@
 
 .musicEditor .pianoRollNote.nth {
     margin-right: 2px;
-}
-
-
-/* nth-child(1) is pianoRollKey */
-.musicEditor .pianoRoll.step-0 .pianoRollNote:nth-child(2),
-.musicEditor .pianoRoll.step-1 .pianoRollNote:nth-child(3),
-.musicEditor .pianoRoll.step-2 .pianoRollNote:nth-child(4),
-.musicEditor .pianoRoll.step-3 .pianoRollNote:nth-child(5),
-.musicEditor .pianoRoll.step-4 .pianoRollNote:nth-child(6),
-.musicEditor .pianoRoll.step-5 .pianoRollNote:nth-child(7),
-.musicEditor .pianoRoll.step-6 .pianoRollNote:nth-child(8),
-.musicEditor .pianoRoll.step-7 .pianoRollNote:nth-child(9),
-.musicEditor .pianoRoll.step-8 .pianoRollNote:nth-child(10),
-.musicEditor .pianoRoll.step-9 .pianoRollNote:nth-child(11),
-.musicEditor .pianoRoll.step-10 .pianoRollNote:nth-child(12),
-.musicEditor .pianoRoll.step-11 .pianoRollNote:nth-child(13),
-.musicEditor .pianoRoll.step-12 .pianoRollNote:nth-child(14),
-.musicEditor .pianoRoll.step-13 .pianoRollNote:nth-child(15),
-.musicEditor .pianoRoll.step-14 .pianoRollNote:nth-child(16),
-.musicEditor .pianoRoll.step-15 .pianoRollNote:nth-child(17),
-.musicEditor .pianoRoll.step-16 .pianoRollNote:nth-child(18),
-.musicEditor .pianoRoll.step-17 .pianoRollNote:nth-child(19),
-.musicEditor .pianoRoll.step-18 .pianoRollNote:nth-child(20),
-.musicEditor .pianoRoll.step-19 .pianoRollNote:nth-child(21),
-.musicEditor .pianoRoll.step-20 .pianoRollNote:nth-child(22),
-.musicEditor .pianoRoll.step-21 .pianoRollNote:nth-child(23),
-.musicEditor .pianoRoll.step-22 .pianoRollNote:nth-child(24),
-.musicEditor .pianoRoll.step-23 .pianoRollNote:nth-child(25),
-.musicEditor .pianoRoll.step-24 .pianoRollNote:nth-child(26),
-.musicEditor .pianoRoll.step-25 .pianoRollNote:nth-child(27),
-.musicEditor .pianoRoll.step-26 .pianoRollNote:nth-child(28),
-.musicEditor .pianoRoll.step-27 .pianoRollNote:nth-child(29),
-.musicEditor .pianoRoll.step-28 .pianoRollNote:nth-child(30),
-.musicEditor .pianoRoll.step-29 .pianoRollNote:nth-child(31),
-.musicEditor .pianoRoll.step-30 .pianoRollNote:nth-child(32),
-.musicEditor .pianoRoll.step-31 .pianoRollNote:nth-child(33),
-.musicEditor .pianoRoll.step-32 .pianoRollNote:nth-child(34),
-.musicEditor .pianoRoll.step-33 .pianoRollNote:nth-child(35),
-.musicEditor .pianoRoll.step-34 .pianoRollNote:nth-child(36),
-.musicEditor .pianoRoll.step-35 .pianoRollNote:nth-child(37),
-.musicEditor .pianoRoll.step-36 .pianoRollNote:nth-child(38),
-.musicEditor .pianoRoll.step-37 .pianoRollNote:nth-child(39),
-.musicEditor .pianoRoll.step-38 .pianoRollNote:nth-child(40),
-.musicEditor .pianoRoll.step-39 .pianoRollNote:nth-child(41),
-.musicEditor .pianoRoll.step-40 .pianoRollNote:nth-child(42),
-.musicEditor .pianoRoll.step-41 .pianoRollNote:nth-child(43),
-.musicEditor .pianoRoll.step-42 .pianoRollNote:nth-child(44),
-.musicEditor .pianoRoll.step-43 .pianoRollNote:nth-child(45),
-.musicEditor .pianoRoll.step-44 .pianoRollNote:nth-child(46),
-.musicEditor .pianoRoll.step-45 .pianoRollNote:nth-child(47),
-.musicEditor .pianoRoll.step-46 .pianoRollNote:nth-child(48),
-.musicEditor .pianoRoll.step-47 .pianoRollNote:nth-child(49),
-.musicEditor .pianoRoll.step-48 .pianoRollNote:nth-child(50),
-.musicEditor .pianoRoll.step-49 .pianoRollNote:nth-child(51),
-.musicEditor .pianoRoll.step-50 .pianoRollNote:nth-child(52),
-.musicEditor .pianoRoll.step-51 .pianoRollNote:nth-child(53),
-.musicEditor .pianoRoll.step-52 .pianoRollNote:nth-child(54),
-.musicEditor .pianoRoll.step-53 .pianoRollNote:nth-child(55),
-.musicEditor .pianoRoll.step-54 .pianoRollNote:nth-child(56),
-.musicEditor .pianoRoll.step-55 .pianoRollNote:nth-child(57),
-.musicEditor .pianoRoll.step-56 .pianoRollNote:nth-child(58),
-.musicEditor .pianoRoll.step-57 .pianoRollNote:nth-child(59),
-.musicEditor .pianoRoll.step-58 .pianoRollNote:nth-child(60),
-.musicEditor .pianoRoll.step-59 .pianoRollNote:nth-child(61),
-.musicEditor .pianoRoll.step-60 .pianoRollNote:nth-child(62),
-.musicEditor .pianoRoll.step-61 .pianoRollNote:nth-child(63),
-.musicEditor .pianoRoll.step-62 .pianoRollNote:nth-child(64),
-.musicEditor .pianoRoll.step-63 .pianoRollNote:nth-child(65) {
-    background-color: #666;
 }

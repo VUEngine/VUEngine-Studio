@@ -23,29 +23,26 @@ export default function Sequencer(props: SequencerProps): JSX.Element {
         playing,
         stateApi
     } = props;
+
     const classNames = ['sequencer'];
 
-    let soloChannel = -1;
-    channels.forEach((channel, index) => {
-        if (channel.solo) {
-            soloChannel = index;
-        }
-    });
+    const soloChannel = channels.filter(c => c.solo).map(c => c.id).pop() ?? -1;
 
     return <div className={classNames.join(' ')}>
-        {playing && <StepIndicator
+        {<StepIndicator
             currentStep={currentStep}
-            playing={playing}
+            pianoRollSize={undefined}
+            hidden={!playing}
         />}
-        {channels.map((channel, index) =>
+        {channels.map(channel =>
             <Channel
-                key={`channel-${index + 1}`}
+                key={`channel-${channel.id}`}
                 channelConfig={channel}
                 patterns={patterns}
                 currentChannel={currentChannel}
                 currentPattern={currentPattern}
-                number={index + 1}
-                otherSolo={soloChannel > -1 && soloChannel !== index}
+                number={channel.id}
+                otherSolo={soloChannel > -1 && soloChannel !== channel.id}
                 stateApi={stateApi}
             />
         )}

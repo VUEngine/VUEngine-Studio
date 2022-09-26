@@ -28,24 +28,6 @@ export default function CurrentChannel(props: CurrentChannelProps): JSX.Element 
         <VContainer>
             <label>Envelope Volume</label>
             <HContainer>
-                <div style={{ minWidth: 10, width: 10 }}>
-                    L
-                </div>
-                <input
-                    type='range'
-                    value={100}
-                    max={100}
-                    min={0}
-                    step={100 / VOLUME_STEPS}
-                />
-                <div style={{ minWidth: 24, textAlign: 'right', width: 24 }}>
-                    100
-                </div>
-            </HContainer>
-            <HContainer>
-                <div style={{ minWidth: 10, width: 10 }}>
-                    R
-                </div>
                 <input
                     type='range'
                     value={100}

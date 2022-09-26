@@ -1,13 +1,18 @@
 .musicEditor .stepIndicator {
-    background-color: red;
+    background-color: #d31422;
     bottom: 0;
-    left: 82px;
+    left: 0;
     position: absolute;
     top: 0;
     width: 2px;
     z-index: 1;
 }
 
-.musicEditor .stepIndicator.stopped {
+.musicEditor .stepIndicator.hidden {
     display: none;
+}
+
+.musicEditor .pianoRoll .stepIndicator {
+    margin-left: -1px;
+    width: 4px;
 }

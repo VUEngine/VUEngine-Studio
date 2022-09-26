@@ -1,7 +1,17 @@
+export interface vesMusicEditorWidgetState {
+    name: string
+    channels: ChannelConfig[],
+    patterns: PatternConfig[],
+    currentChannel: number,
+    currentPattern: number,
+    currentNote: number,
+    speed: number
+    volume: number
+    bar: number
+};
+
 export interface MusicEditorStateApi {
     setName: (name: string) => void,
-    setPlaying: (playing: boolean) => void,
-    setRecording: (recording: boolean) => void,
     setBar: (bar: number) => void,
     setSpeed: (speed: number) => void,
     setVolume: (volume: number) => void,
@@ -27,6 +37,7 @@ export interface PatternConfig {
 }
 
 export interface ChannelConfig {
+    id: number
     name: string,
     patterns: number[],
     muted: boolean,
@@ -39,6 +50,11 @@ export interface NoteConfig {
     volumeL: number | undefined,
     volumeR: number | undefined,
     effects: string[],
+}
+
+export interface PatternSwitchStep {
+    step: number
+    pattern: number
 }
 
 export const Notes = [
@@ -54,8 +70,8 @@ export const Notes = [
     'B0', 'A#0', 'A0', 'G#0', 'G0', 'F#0', 'F0', 'E0', 'D#0', 'D0', 'C#0', 'C0',
 ];
 
-export const LOWEST_NOTE = 92; // D#2;
-export const HIGHEST_NOTE = 21; // D8;
+export const LOWEST_NOTE = 95; // C2;
+export const HIGHEST_NOTE = 12; // B8;
 
 export const MAX_SPEED = 300;
 export const MIN_SPEED = 60;
@@ -68,24 +84,30 @@ export const VOLUME_STEPS = 16;
 export const MUSIC_EDITOR_STATE_TEMPLATE = {
     name: 'New',
     channels: [...Array(6)].map((c, index) => ({
+        id: index,
         name: '',
-        patterns: index === 0 ? [1] : [],
+        patterns: index === 0 ? [1, 1] : [],
         muted: false,
         solo: false,
         collapsed: false,
     })),
     patterns: [{
         id: 1,
-        channel: 1,
-        size: 32,
-        notes: [],
+        channel: 0,
+        size: 16,
+        notes: [{ note: 32, volumeL: undefined, volumeR: undefined, effects: [] }, undefined,
+        { note: 22, volumeL: undefined, volumeR: undefined, effects: [] }, undefined,
+        { note: 12, volumeL: undefined, volumeR: undefined, effects: [] }, undefined,
+        { note: 22, volumeL: undefined, volumeR: undefined, effects: [] }, undefined,
+        { note: 32, volumeL: undefined, volumeR: undefined, effects: [] }, undefined,
+        { note: 42, volumeL: undefined, volumeR: undefined, effects: [] }, undefined,
+        { note: 52, volumeL: undefined, volumeR: undefined, effects: [] }, undefined,
+        { note: 42, volumeL: undefined, volumeR: undefined, effects: [] }, undefined],
     }],
-    currentChannel: 1,
+    currentChannel: 0,
     currentPattern: 1,
     currentNote: -1,
-    playing: false,
-    recording: false,
-    speed: 120,
-    volume: 100,
+    speed: 300,
+    volume: 50,
     bar: 4,
 };

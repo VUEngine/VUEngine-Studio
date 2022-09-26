@@ -60,7 +60,7 @@ export default function Channel(props: ChannelProps): JSX.Element {
     return channelConfig.collapsed
         ? <div
             className='collapsedChannel'
-            onClick={() => stateApi.toggleChannelCollapsed(number - 1)}
+            onClick={() => stateApi.toggleChannelCollapsed(number)}
         />
         : <div className={classNames.join(' ')}>
             <ChannelHeader
