@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Instrument, Song, Track } from 'reactronica';
-import { ChannelConfig, MusicEditorStateApi, PatternConfig } from '../ves-music-editor-types';
+import React from 'react';
+import { Instrument, Song, StepType, Track } from 'reactronica';
+import { ChannelConfig, MusicEditorStateApi, PatternConfig, PatternSwitchStep } from '../ves-music-editor-types';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
 import Sidebar from './Sidebar/Sidebar';
@@ -12,121 +12,135 @@ interface MusicEditorProps {
     currentChannel: number
     currentPattern: number
     currentNote: number
-    playing: boolean
-    recording: boolean
     bar: number
     speed: number
     volume: number
+    currentlyEditedPattern: PatternConfig | false
+    songNotes: (string | undefined)[][]
+    currentChannelPatternMap: PatternSwitchStep[]
     stateApi: MusicEditorStateApi
 }
 
-export default function MusicEditor(props: MusicEditorProps): JSX.Element {
-    const [currentStep, setCurrentStep] = useState(0);
+interface MusicEditorState {
+    playing: boolean
+    recording: boolean
+    currentStep: number
+}
 
-    /* setTimeout(() => {
-        setCurrentStep(currentStep === 64 ? 0 : currentStep + 1);
-    }, 100); */
+export default class MusicEditor extends React.Component<MusicEditorProps, MusicEditorState> {
+    constructor(props: MusicEditorProps) {
+        super(props);
+        this.state = {
+            playing: false,
+            recording: false,
+            currentStep: 0
+        };
+    }
 
-    const {
-        name, bar, speed, volume,
-        channels, patterns,
-        currentChannel, currentPattern, currentNote,
-        playing, recording,
-        stateApi
-    } = props;
+    render(): JSX.Element {
+        /* setTimeout(() => {
+            this.setState({ currentStep: this.state.currentStep + 1 });
+        }, 500);*/
 
-    let currentlyEditedPattern: PatternConfig | false = false;
-    patterns.forEach(pattern => {
-        if (pattern.channel === currentChannel && pattern.id === currentPattern) {
-            currentlyEditedPattern = pattern;
-        }
-    });
+        const {
+            name, bar, speed, volume,
+            channels, patterns,
+            currentChannel, currentPattern, currentNote,
+            stateApi,
+            currentlyEditedPattern, songNotes, currentChannelPatternMap
+        } = this.props;
 
-    return <div className='musicEditor'>
-        <Song isPlaying={playing} bpm={speed} volume={volume}>
-            <Track
-                steps={['A3', 'A4', 'A4', 'A4']}
-                volume={volume}
-                pan={0}
-                onStepPlay={(step, index) => setCurrentStep(index)}
-            >
-                <Instrument
-                    polyphony={1}
-                    type='synth'
-                />
-            </Track>
-        </Song>
-        <div className='editor'>
-            <div className='toolbar'>
-                <button
-                    className='theia-button secondary large playButton'
-                    title={playing ? 'Play' : 'Stop'}
-                    onClick={() => stateApi.setPlaying(!playing)}
-                >
-                    <i className={`fa fa-${playing ? 'stop' : 'play'}`} />
-                </button>
-                <button
-                    className={`theia-button ${recording ? 'primary' : 'secondary'} large recordButton`}
-                    title='Recording Mode'
-                    onClick={() => stateApi.setRecording(!recording)}
-                >
-                    <i className='fa fa-circle' />
-                </button>
-                <button
-                    className={'theia-button secondary large'}
-                    title='Save'
-                >
-                    <i className='fa fa-save' />
-                </button>
-                <button
-                    className={'theia-button secondary large'}
-                    title='Configure Input Devices'
-                >
-                    <i className='fa fa-keyboard-o' />
-                </button>
-                <button
-                    className={'theia-button secondary large'}
-                    title='Import'
-                >
-                    <i className='fa fa-download' />
-                </button>
-                <button
-                    className={'theia-button secondary large'}
-                    title='Export'
-                >
-                    <i className='fa fa-upload' />
-                </button>
-            </div>
-            <div>
-                <Sequencer
-                    channels={channels}
-                    patterns={patterns}
-                    currentChannel={currentChannel}
-                    currentPattern={currentPattern}
-                    playing={playing}
-                    currentStep={currentStep}
+        return <div className='musicEditor'>
+            <Song isPlaying={this.state.playing} bpm={speed} volume={volume}>
+                {songNotes.map((channelNotes, index) => (
+                    <Track
+                        key={`track-${index}`}
+                        steps={channelNotes as StepType[]}
+                        volume={volume}
+                        pan={0}
+                        onStepPlay={(s, i) => this.setState({ currentStep: i })}
+                    >
+                        <Instrument polyphony={1} type='synth' />
+                    </Track>
+                ))}
+            </Song>
+            <div className='editor'>
+                <div className='toolbar'>
+                    <button
+                        className='theia-button secondary large playButton'
+                        title={this.state.playing ? 'Play' : 'Stop'}
+                        onClick={() => {
+                            this.setState({ playing: !this.state.playing });
+                            this.setState({ currentStep: 0 });
+                        }}
+                    >
+                        <i className={`fa fa-${this.state.playing ? 'stop' : 'play'}`} />
+                    </button>
+                    <button
+                        className={`theia-button ${this.state.recording ? 'primary' : 'secondary'} large recordButton`}
+                        title='Recording Mode'
+                        onClick={() => this.setState({ recording: !this.state.recording })}
+                    >
+                        <i className='fa fa-circle' />
+                    </button>
+                    <button
+                        className={'theia-button secondary large'}
+                        title='Save'
+                    >
+                        <i className='fa fa-save' />
+                    </button>
+                    <button
+                        className={'theia-button secondary large'}
+                        title='Configure Input Devices'
+                    >
+                        <i className='fa fa-keyboard-o' />
+                    </button>
+                    <button
+                        className={'theia-button secondary large'}
+                        title='Import'
+                    >
+                        <i className='fa fa-download' />
+                    </button>
+                    <button
+                        className={'theia-button secondary large'}
+                        title='Export'
+                    >
+                        <i className='fa fa-upload' />
+                    </button>
+                    {this.state.currentStep}
+                </div>
+                <div>
+                    <Sequencer
+                        channels={channels}
+                        patterns={patterns}
+                        currentChannel={currentChannel}
+                        currentPattern={currentPattern}
+                        playing={this.state.playing}
+                        currentStep={this.state.currentStep}
+                        stateApi={stateApi}
+                    />
+                </div>
+                {currentlyEditedPattern && <PianoRoll
+                    playing={this.state.playing}
+                    pattern={currentlyEditedPattern}
+                    patternMap={currentChannelPatternMap}
+                    currentNote={currentNote}
+                    currentStep={this.state.currentStep}
+                    bar={bar}
                     stateApi={stateApi}
-                />
+                />}
             </div>
-            {currentlyEditedPattern && <PianoRoll
-                playing={playing}
-                pattern={currentlyEditedPattern}
-                currentNote={currentNote}
-                currentStep={currentStep}
+            <Sidebar
+                name={name}
+                volume={volume}
+                speed={speed}
                 bar={bar}
+                pattern={currentlyEditedPattern}
+                currentChannel={currentChannel}
+                currentPattern={currentPattern}
+                currentNote={currentNote}
                 stateApi={stateApi}
-            />}
-        </div>
-        <Sidebar
-            name={name}
-            volume={volume}
-            speed={speed}
-            bar={bar}
-            pattern={currentlyEditedPattern}
-            currentChannel={currentChannel}
-            currentPattern={currentPattern}
-            currentNote={currentNote}
-            stateApi={stateApi}
-        />
-    </div>;
+            />
+        </div >;
+    }
 }

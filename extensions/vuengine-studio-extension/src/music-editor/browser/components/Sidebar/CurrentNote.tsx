@@ -21,8 +21,20 @@ export default function CurrentNote(props: CurrentNoteProps): JSX.Element {
         effects: []
     };
     const noteId = note.note;
-    const volumeL = note.volumeL ?? 100;
-    const volumeR = note.volumeR ?? 100;
+    let volumeL = 100;
+    let volumeR = 100;
+    pattern.notes
+        .filter((n, i) => i < currentNote)
+        .forEach((n, i) => {
+            if (n?.volumeL !== undefined) {
+                volumeL = n.volumeL;
+            }
+            if (n?.volumeR !== undefined) {
+                volumeR = n.volumeR;
+            }
+        });
+    volumeL = note.volumeL ?? volumeL;
+    volumeR = note.volumeR ?? volumeR;
 
     return <div className='section currentNote'>
         <VContainer>

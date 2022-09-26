@@ -7,11 +7,12 @@ interface PianoRollNoteProps {
     noteId: number
     bar: number
     set: boolean
+    current: boolean
     stateApi: MusicEditorStateApi
 }
 
 export default function PianoRollNote(props: PianoRollNoteProps): JSX.Element {
-    const { pattern, index, noteId, bar, set, stateApi } = props;
+    const { pattern, index, noteId, bar, current, set, stateApi } = props;
 
     const note = pattern.notes[index] ?? {
         note: noteId,
@@ -26,6 +27,9 @@ export default function PianoRollNote(props: PianoRollNoteProps): JSX.Element {
     }
     if (set) {
         classNames.push('set');
+    }
+    if (current) {
+        classNames.push('current');
     }
 
     const onMouseOver = (e: React.MouseEvent<HTMLElement>) => {

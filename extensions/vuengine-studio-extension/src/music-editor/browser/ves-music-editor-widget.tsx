@@ -11,27 +11,16 @@ import {
     MusicEditorStateApi,
     NoteConfig,
     PatternConfig,
-    MUSIC_EDITOR_STATE_TEMPLATE
+    MUSIC_EDITOR_STATE_TEMPLATE,
+    PatternSwitchStep,
+    Notes,
+    vesMusicEditorWidgetState
 } from './ves-music-editor-types';
 
 export const VesMusicEditorWidgetOptions = Symbol('VesMusicEditorWidgetOptions');
 export interface VesMusicEditorWidgetOptions {
     uri: string;
 }
-
-export interface vesMusicEditorWidgetState {
-    name: string
-    channels: ChannelConfig[],
-    patterns: PatternConfig[],
-    currentChannel: number,
-    currentPattern: number,
-    currentNote: number,
-    playing: boolean
-    recording: boolean
-    speed: number
-    volume: number
-    bar: number
-};
 
 @injectable()
 export class VesMusicEditorWidget extends ReactWidget {
@@ -69,16 +58,6 @@ export class VesMusicEditorWidget extends ReactWidget {
     protected stateApi: MusicEditorStateApi = {
         setName: (name: string): void => {
             this.state.name = name;
-            this.update();
-        },
-
-        setPlaying: (playing: boolean): void => {
-            this.state.playing = playing;
-            this.update();
-        },
-
-        setRecording: (recording: boolean): void => {
-            this.state.recording = recording;
             this.update();
         },
 
@@ -164,7 +143,7 @@ export class VesMusicEditorWidget extends ReactWidget {
         },
 
         addChannelPattern: (channelId: number, patternId: number): void => {
-            this.state.channels[channelId - 1].patterns.push(patternId);
+            this.state.channels[channelId].patterns.push(patternId);
 
             let patternExists = false;
             this.state.patterns.forEach(pattern => {
@@ -189,7 +168,7 @@ export class VesMusicEditorWidget extends ReactWidget {
         },
 
         removeChannelPattern: (channelId: number, index: number): void => {
-            this.state.channels[channelId - 1].patterns.splice(index, 1);
+            this.state.channels[channelId].patterns.splice(index, 1);
             this.update();
         },
 
@@ -205,6 +184,47 @@ export class VesMusicEditorWidget extends ReactWidget {
     };
 
     protected render(): React.ReactNode {
+        let currentlyEditedPattern: PatternConfig | false = false;
+        this.state.patterns.forEach(pattern => {
+            if (pattern.channel === this.state.currentChannel && pattern.id === this.state.currentPattern) {
+                currentlyEditedPattern = pattern;
+            }
+        });
+
+        const soloChannel = this.state.channels.filter(c => c.solo).map(c => c.id).pop() ?? -1;
+
+        const songNotes: (string | undefined)[][] = [];
+        const currentChannelPatternMap: PatternSwitchStep[] = [];
+        this.state.channels.forEach((channel, index) => {
+            const channelNotes: (string | undefined)[] = [];
+            let step = 0;
+            channel.patterns.forEach(patternId => {
+                this.state.patterns.forEach(pattern => {
+                    if (pattern.channel === channel.id && pattern.id === patternId) {
+                        if (channel.id === this.state.currentChannel) {
+                            currentChannelPatternMap.push({
+                                step: step,
+                                pattern: patternId
+                            });
+                        }
+                        [...Array(pattern.size)].forEach((s, i) => {
+                            channelNotes[step + i] = (pattern.notes[i] !== undefined
+                                && pattern.notes[i]!.note !== undefined
+                                && !channel.muted
+                                && !(soloChannel > -1 && soloChannel !== channel.id))
+                                ? Notes[pattern.notes[i]!.note!]
+                                : undefined;
+                        });
+                        step += pattern.size;
+                        return;
+                    }
+                });
+            });
+            if (channelNotes.length) {
+                songNotes.push(channelNotes);
+            }
+        });
+
         return <MusicEditor
             name={this.state.name}
             channels={this.state.channels}
@@ -212,12 +232,13 @@ export class VesMusicEditorWidget extends ReactWidget {
             currentChannel={this.state.currentChannel}
             currentPattern={this.state.currentPattern}
             currentNote={this.state.currentNote}
-            playing={this.state.playing}
-            recording={this.state.recording}
             bar={this.state.bar}
             speed={this.state.speed}
             volume={this.state.volume}
             stateApi={this.stateApi}
+            currentlyEditedPattern={currentlyEditedPattern}
+            songNotes={songNotes}
+            currentChannelPatternMap={currentChannelPatternMap}
         />;
     }
 }

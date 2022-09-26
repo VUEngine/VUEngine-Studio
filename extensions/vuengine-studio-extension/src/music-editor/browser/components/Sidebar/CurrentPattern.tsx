@@ -42,8 +42,9 @@ export default function CurrentPattern(props: CurrentPatternProps): JSX.Element 
             </select>
         </VContainer>
 
+        {/*
         <VContainer>
-            <label>Envelope Volume</label>
+            <label>Pattern Master Volume</label>
             <HContainer>
                 <div style={{ minWidth: 10, width: 10 }}>
                     L
@@ -75,5 +76,6 @@ export default function CurrentPattern(props: CurrentPatternProps): JSX.Element 
                 </div>
             </HContainer>
         </VContainer>
+        */}
     </div>;
 }

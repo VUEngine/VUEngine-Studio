@@ -12,9 +12,9 @@
     flex-grow: 1;
 }
 
-.musicEditor .notePropertiesNote:hover,
-.musicEditor .notePropertiesNote.current {
-    outline: 1px solid #d31422;
+.musicEditor .notePropertiesNote:hover .effects,
+.musicEditor .notePropertiesNote.current .effects {
+    background-color: #555;
 }
 
 .musicEditor .notePropertiesNote.nth {
@@ -40,74 +40,6 @@
 }
 
 .musicEditor .notePropertiesNote .volume div {
-    background-color: #666;
+    background-color: #555;
     flex-grow: 1;
-}
-
-/* nth-child(1) is notePropertiesHeader */
-.musicEditor .pianoRoll.step-0 .notePropertiesNote:nth-child(2),
-.musicEditor .pianoRoll.step-1 .notePropertiesNote:nth-child(3),
-.musicEditor .pianoRoll.step-2 .notePropertiesNote:nth-child(4),
-.musicEditor .pianoRoll.step-3 .notePropertiesNote:nth-child(5),
-.musicEditor .pianoRoll.step-4 .notePropertiesNote:nth-child(6),
-.musicEditor .pianoRoll.step-5 .notePropertiesNote:nth-child(7),
-.musicEditor .pianoRoll.step-6 .notePropertiesNote:nth-child(8),
-.musicEditor .pianoRoll.step-7 .notePropertiesNote:nth-child(9),
-.musicEditor .pianoRoll.step-8 .notePropertiesNote:nth-child(10),
-.musicEditor .pianoRoll.step-9 .notePropertiesNote:nth-child(11),
-.musicEditor .pianoRoll.step-10 .notePropertiesNote:nth-child(12),
-.musicEditor .pianoRoll.step-11 .notePropertiesNote:nth-child(13),
-.musicEditor .pianoRoll.step-12 .notePropertiesNote:nth-child(14),
-.musicEditor .pianoRoll.step-13 .notePropertiesNote:nth-child(15),
-.musicEditor .pianoRoll.step-14 .notePropertiesNote:nth-child(16),
-.musicEditor .pianoRoll.step-15 .notePropertiesNote:nth-child(17),
-.musicEditor .pianoRoll.step-16 .notePropertiesNote:nth-child(18),
-.musicEditor .pianoRoll.step-17 .notePropertiesNote:nth-child(19),
-.musicEditor .pianoRoll.step-18 .notePropertiesNote:nth-child(20),
-.musicEditor .pianoRoll.step-19 .notePropertiesNote:nth-child(21),
-.musicEditor .pianoRoll.step-20 .notePropertiesNote:nth-child(22),
-.musicEditor .pianoRoll.step-21 .notePropertiesNote:nth-child(23),
-.musicEditor .pianoRoll.step-22 .notePropertiesNote:nth-child(24),
-.musicEditor .pianoRoll.step-23 .notePropertiesNote:nth-child(25),
-.musicEditor .pianoRoll.step-24 .notePropertiesNote:nth-child(26),
-.musicEditor .pianoRoll.step-25 .notePropertiesNote:nth-child(27),
-.musicEditor .pianoRoll.step-26 .notePropertiesNote:nth-child(28),
-.musicEditor .pianoRoll.step-27 .notePropertiesNote:nth-child(29),
-.musicEditor .pianoRoll.step-28 .notePropertiesNote:nth-child(30),
-.musicEditor .pianoRoll.step-29 .notePropertiesNote:nth-child(31),
-.musicEditor .pianoRoll.step-30 .notePropertiesNote:nth-child(32),
-.musicEditor .pianoRoll.step-31 .notePropertiesNote:nth-child(33),
-.musicEditor .pianoRoll.step-32 .notePropertiesNote:nth-child(34),
-.musicEditor .pianoRoll.step-33 .notePropertiesNote:nth-child(35),
-.musicEditor .pianoRoll.step-34 .notePropertiesNote:nth-child(36),
-.musicEditor .pianoRoll.step-35 .notePropertiesNote:nth-child(37),
-.musicEditor .pianoRoll.step-36 .notePropertiesNote:nth-child(38),
-.musicEditor .pianoRoll.step-37 .notePropertiesNote:nth-child(39),
-.musicEditor .pianoRoll.step-38 .notePropertiesNote:nth-child(40),
-.musicEditor .pianoRoll.step-39 .notePropertiesNote:nth-child(41),
-.musicEditor .pianoRoll.step-40 .notePropertiesNote:nth-child(42),
-.musicEditor .pianoRoll.step-41 .notePropertiesNote:nth-child(43),
-.musicEditor .pianoRoll.step-42 .notePropertiesNote:nth-child(44),
-.musicEditor .pianoRoll.step-43 .notePropertiesNote:nth-child(45),
-.musicEditor .pianoRoll.step-44 .notePropertiesNote:nth-child(46),
-.musicEditor .pianoRoll.step-45 .notePropertiesNote:nth-child(47),
-.musicEditor .pianoRoll.step-46 .notePropertiesNote:nth-child(48),
-.musicEditor .pianoRoll.step-47 .notePropertiesNote:nth-child(49),
-.musicEditor .pianoRoll.step-48 .notePropertiesNote:nth-child(50),
-.musicEditor .pianoRoll.step-49 .notePropertiesNote:nth-child(51),
-.musicEditor .pianoRoll.step-50 .notePropertiesNote:nth-child(52),
-.musicEditor .pianoRoll.step-51 .notePropertiesNote:nth-child(53),
-.musicEditor .pianoRoll.step-52 .notePropertiesNote:nth-child(54),
-.musicEditor .pianoRoll.step-53 .notePropertiesNote:nth-child(55),
-.musicEditor .pianoRoll.step-54 .notePropertiesNote:nth-child(56),
-.musicEditor .pianoRoll.step-55 .notePropertiesNote:nth-child(57),
-.musicEditor .pianoRoll.step-56 .notePropertiesNote:nth-child(58),
-.musicEditor .pianoRoll.step-57 .notePropertiesNote:nth-child(59),
-.musicEditor .pianoRoll.step-58 .notePropertiesNote:nth-child(60),
-.musicEditor .pianoRoll.step-59 .notePropertiesNote:nth-child(61),
-.musicEditor .pianoRoll.step-60 .notePropertiesNote:nth-child(62),
-.musicEditor .pianoRoll.step-61 .notePropertiesNote:nth-child(63),
-.musicEditor .pianoRoll.step-62 .notePropertiesNote:nth-child(64),
-.musicEditor .pianoRoll.step-63 .notePropertiesNote:nth-child(65) {
-    background-color: #666;
 }

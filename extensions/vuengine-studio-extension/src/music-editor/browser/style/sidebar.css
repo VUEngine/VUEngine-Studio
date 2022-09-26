@@ -1,7 +1,7 @@
 .musicEditor .sidebar {
     overflow-x: hidden;
     overflow-y: auto;
-    width: 180px;
+    width: 220px;
 }
 
 .musicEditor .sidebar.collapsed {

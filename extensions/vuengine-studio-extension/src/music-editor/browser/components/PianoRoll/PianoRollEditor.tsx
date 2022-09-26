@@ -3,13 +3,14 @@ import { HIGHEST_NOTE, LOWEST_NOTE, MusicEditorStateApi, Notes, PatternConfig } 
 import PianoRollRow from './PianoRollRow';
 
 interface PianoRollEditorProps {
-    pattern: PatternConfig
     bar: number
+    currentNote: number
+    pattern: PatternConfig
     stateApi: MusicEditorStateApi
 }
 
 export default function PianoRollEditor(props: PianoRollEditorProps): JSX.Element {
-    const { pattern, bar, stateApi } = props;
+    const { bar, currentNote, pattern, stateApi } = props;
 
     const classNames = ['pianoRollEditor'];
 
@@ -22,6 +23,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): JSX.Elemen
                 noteId={index}
                 pattern={pattern}
                 bar={bar}
+                currentNote={currentNote}
                 stateApi={stateApi}
             />)}
     </div>;
