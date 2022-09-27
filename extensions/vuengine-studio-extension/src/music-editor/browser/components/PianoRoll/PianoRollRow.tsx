@@ -10,10 +10,11 @@ interface PianoRollRowProps {
     bar: number
     currentNote: number
     stateApi: MusicEditorStateApi
+    playNote: (note: number) => void
 }
 
 export default function PianoRollRow(props: PianoRollRowProps): JSX.Element {
-    const { note, noteId, pattern, bar, currentNote, stateApi } = props;
+    const { note, noteId, pattern, bar, currentNote, stateApi, playNote } = props;
 
     const classNames = ['pianoRollRow'];
     if (note.startsWith('C') && note.length === 2) {
@@ -21,17 +22,21 @@ export default function PianoRollRow(props: PianoRollRowProps): JSX.Element {
     }
 
     return <div className={classNames.join(' ')}>
-        <PianoRollKey note={note} />
+        <PianoRollKey
+            noteId={noteId}
+            note={note}
+            playNote={playNote}
+        />
         {[...Array(pattern.size)].map((x, index) => (
             <PianoRollNote
                 key={`pianoroll-row-${index}-note-${note}`}
-                pattern={pattern}
                 index={index}
                 noteId={noteId}
                 bar={bar}
                 current={currentNote === index}
-                set={pattern.notes[index]?.note === noteId}
+                set={pattern.notes[index] === noteId}
                 stateApi={stateApi}
+                playNote={playNote}
             />
         ))}
     </div>;

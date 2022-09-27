@@ -7,10 +7,11 @@ interface PianoRollEditorProps {
     currentNote: number
     pattern: PatternConfig
     stateApi: MusicEditorStateApi
+    playNote: (note: number) => void
 }
 
 export default function PianoRollEditor(props: PianoRollEditorProps): JSX.Element {
-    const { bar, currentNote, pattern, stateApi } = props;
+    const { bar, currentNote, pattern, stateApi, playNote } = props;
 
     const classNames = ['pianoRollEditor'];
 
@@ -25,6 +26,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): JSX.Elemen
                 bar={bar}
                 currentNote={currentNote}
                 stateApi={stateApi}
+                playNote={playNote}
             />)}
     </div>;
 }

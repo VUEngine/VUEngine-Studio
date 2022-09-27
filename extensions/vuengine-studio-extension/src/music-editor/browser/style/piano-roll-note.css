@@ -9,11 +9,11 @@
 }
 
 .musicEditor .pianoRollRow:hover .pianoRollNote {
-    background-color: #555;
+    background-color: #444;
 }
 
 .musicEditor .pianoRollNote.current {
-    background-color: #555;
+    background-color: #444;
 }
 
 .musicEditor .pianoRollRow.cNote .pianoRollNote {

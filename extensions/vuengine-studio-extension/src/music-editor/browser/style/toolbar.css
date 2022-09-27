@@ -2,7 +2,7 @@
     align-items: center;
     display: flex;
     flex-direction: row;
-    gap: 5px;
+    gap: 2px;
     margin-bottom: 10px;
 }
 
@@ -15,7 +15,18 @@
 }
 
 .musicEditor .toolbar .playButton {
-    width: 65px;
+    width: 75px;
+}
+
+.musicEditor .toolbar .currentStep {
+    align-items: center;
+    border: 1px solid var(--theia-secondaryButton-background);
+    box-sizing: border-box;
+    display: flex;
+    height: 32px;
+    justify-content: center;
+    margin-right: 10px;
+    width: 63px;
 }
 
 .musicEditor .toolbar .recordButton {

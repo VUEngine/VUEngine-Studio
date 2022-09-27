@@ -1,9 +1,9 @@
 import React from 'react';
-import { MusicEditorStateApi } from '../../ves-music-editor-types';
+import { ChannelConfig, MusicEditorStateApi } from '../../ves-music-editor-types';
 
 interface ChannelHeaderProps {
+    channel: ChannelConfig
     number: number
-    name: string
     muted: boolean
     solo: boolean
     collapsed: boolean
@@ -12,18 +12,27 @@ interface ChannelHeaderProps {
 
 export default function ChannelHeader(props: ChannelHeaderProps): JSX.Element {
     const {
-        collapsed,
-        name,
-        muted,
+        channel,
         number,
+        muted,
         solo,
+        // collapsed,
         stateApi,
     } = props;
 
     const classNames = ['channelHeader'];
 
     return <div className={classNames.join(' ')}>
-        {number} {name}
+        <div
+            className='channelInfo'
+            onClick={() => stateApi.setCurrentChannel(number)}
+        >
+            <div className='channelName'>Channel {number + 1}</div>
+            <div className='channelInstrument'>Synth</div>
+            {channel.volume < 100 && <div className='channelVolume'>
+                <div style={{ width: `${channel.volume}%` }}></div>
+            </div>}
+        </div>
         <div className='channelButtons'>
             <div
                 className={`channelButton ${muted ? 'active' : ''}`}
@@ -37,12 +46,12 @@ export default function ChannelHeader(props: ChannelHeaderProps): JSX.Element {
             >
                 <i className={`fa fa-star${solo ? '' : '-o'}`} />
             </div>
-            <div
+            {/* <div
                 className={`channelButton ${collapsed ? 'active' : ''}`}
                 onClick={() => stateApi.toggleChannelCollapsed(number)}
             >
                 <i className={`fa fa-eye${collapsed ? '-slash' : ''}`} />
-            </div>
+            </div> */}
         </div>
     </div>;
 }

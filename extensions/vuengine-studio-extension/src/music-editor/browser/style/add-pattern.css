@@ -6,6 +6,7 @@
     cursor: pointer;
     display: flex;
     justify-content: center;
+    margin-right: 2px;
     min-width: 20px;
     width: 20px;
 }

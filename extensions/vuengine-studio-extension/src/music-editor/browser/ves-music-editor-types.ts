@@ -1,7 +1,6 @@
 export interface vesMusicEditorWidgetState {
     name: string
     channels: ChannelConfig[],
-    patterns: PatternConfig[],
     currentChannel: number,
     currentPattern: number,
     currentNote: number,
@@ -16,45 +15,39 @@ export interface MusicEditorStateApi {
     setSpeed: (speed: number) => void,
     setVolume: (volume: number) => void,
     setChannels: (channels: ChannelConfig[]) => void,
-    setPatterns: (patterns: PatternConfig[]) => void,
+    setChannelVolume: (volume: number) => void,
+    setPatterns: (channelId: number, patterns: PatternConfig[]) => void,
     setCurrentChannel: (id: number) => void,
     setCurrentPattern: (channel: number, pattern: number) => void,
     setCurrentNote: (id: number) => void,
-    setNote: (channel: number, patternId: number, noteIndex: number, note: NoteConfig) => void,
+    setNote: (noteIndex: number, note: number | undefined) => void,
+    setVolumeL: (noteIndex: number, volume: number | undefined) => void,
+    setVolumeR: (noteIndex: number, volume: number | undefined) => void,
     toggleChannelMuted: (channelId: number) => void,
     toggleChannelSolo: (channelId: number) => void,
     toggleChannelCollapsed: (channelId: number) => void,
-    addChannelPattern: (channelId: number, patternId: number) => void,
-    removeChannelPattern: (channelId: number, index: number) => void,
-    setPatternSize: (channelId: number, patternId: number, size: number) => void,
+    addToSequence: (channelId: number, patternId: number) => void,
+    removeFromSequence: (channelId: number, index: number) => void,
+    setPatternSize: (size: number) => void,
 }
 
 export interface PatternConfig {
-    id: number,
-    channel: number,
     size: number,
-    notes: (NoteConfig | undefined)[]
+    notes: (number | undefined)[]
+    volumeL: (number | undefined)[]
+    volumeR: (number | undefined)[]
+    effects: (string[] | undefined)[]
 }
 
 export interface ChannelConfig {
     id: number
     name: string,
-    patterns: number[],
+    sequence: number[],
+    patterns: PatternConfig[],
+    volume: number,
     muted: boolean,
     solo: boolean,
     collapsed: boolean
-}
-
-export interface NoteConfig {
-    note: number | undefined,
-    volumeL: number | undefined,
-    volumeR: number | undefined,
-    effects: string[],
-}
-
-export interface PatternSwitchStep {
-    step: number
-    pattern: number
 }
 
 export const Notes = [
@@ -86,26 +79,21 @@ export const MUSIC_EDITOR_STATE_TEMPLATE = {
     channels: [...Array(6)].map((c, index) => ({
         id: index,
         name: '',
-        patterns: index === 0 ? [1, 1] : [],
+        sequence: index === 0 ? [0, 0] : [],
+        patterns: index === 0 ? [{
+            size: 16,
+            notes: [32, undefined, 22, undefined, 12, undefined, 22, undefined, 32, undefined, 42, undefined, 52, undefined, 42, undefined],
+            volumeL: [],
+            volumeR: [],
+            effects: []
+        }] : [],
+        volume: 100,
         muted: false,
         solo: false,
         collapsed: false,
     })),
-    patterns: [{
-        id: 1,
-        channel: 0,
-        size: 16,
-        notes: [{ note: 32, volumeL: undefined, volumeR: undefined, effects: [] }, undefined,
-        { note: 22, volumeL: undefined, volumeR: undefined, effects: [] }, undefined,
-        { note: 12, volumeL: undefined, volumeR: undefined, effects: [] }, undefined,
-        { note: 22, volumeL: undefined, volumeR: undefined, effects: [] }, undefined,
-        { note: 32, volumeL: undefined, volumeR: undefined, effects: [] }, undefined,
-        { note: 42, volumeL: undefined, volumeR: undefined, effects: [] }, undefined,
-        { note: 52, volumeL: undefined, volumeR: undefined, effects: [] }, undefined,
-        { note: 42, volumeL: undefined, volumeR: undefined, effects: [] }, undefined],
-    }],
     currentChannel: 0,
-    currentPattern: 1,
+    currentPattern: 0,
     currentNote: -1,
     speed: 300,
     volume: 50,

@@ -1,40 +1,36 @@
 import React from 'react';
 import HContainer from '../../../../core/browser/components/HContainer';
 import VContainer from '../../../../core/browser/components/VContainer';
-import { HIGHEST_NOTE, LOWEST_NOTE, MusicEditorStateApi, NoteConfig, Notes, PatternConfig, VOLUME_STEPS } from '../../ves-music-editor-types';
+import { HIGHEST_NOTE, LOWEST_NOTE, MusicEditorStateApi, Notes, PatternConfig, VOLUME_STEPS } from '../../ves-music-editor-types';
 
 interface CurrentNoteProps {
     pattern: PatternConfig
-    currentChannel: number
-    currentPattern: number
     currentNote: number
     stateApi: MusicEditorStateApi
 }
 
 export default function CurrentNote(props: CurrentNoteProps): JSX.Element {
-    const { currentChannel, currentPattern, currentNote, pattern, stateApi } = props;
+    const { currentNote, pattern, stateApi } = props;
 
-    const note = pattern.notes[currentNote] ?? {
-        note: undefined,
-        volumeL: undefined,
-        volumeR: undefined,
-        effects: []
-    };
-    const noteId = note.note;
+    const note = pattern.notes[currentNote];
     let volumeL = 100;
     let volumeR = 100;
-    pattern.notes
+    pattern.volumeL
         .filter((n, i) => i < currentNote)
         .forEach((n, i) => {
-            if (n?.volumeL !== undefined) {
-                volumeL = n.volumeL;
-            }
-            if (n?.volumeR !== undefined) {
-                volumeR = n.volumeR;
+            if (n !== undefined) {
+                volumeL = n;
             }
         });
-    volumeL = note.volumeL ?? volumeL;
-    volumeR = note.volumeR ?? volumeR;
+    pattern.volumeR
+        .filter((n, i) => i < currentNote)
+        .forEach((n, i) => {
+            if (n !== undefined) {
+                volumeR = n;
+            }
+        });
+    volumeL = pattern.volumeL[currentNote] ?? volumeL;
+    volumeR = pattern.volumeR[currentNote] ?? volumeR;
 
     return <div className='section currentNote'>
         <VContainer>
@@ -42,11 +38,8 @@ export default function CurrentNote(props: CurrentNoteProps): JSX.Element {
             <select
                 className='theia-select'
                 style={{ flexGrow: 1 }}
-                onChange={e => stateApi.setNote(currentChannel, currentPattern, currentNote, {
-                    ...note,
-                    note: parseInt(e.target.value)
-                })}
-                value={noteId ?? -1}
+                onChange={e => stateApi.setNote(currentNote, parseInt(e.target.value))}
+                value={note ?? -1}
             >
                 <option value={undefined}>none</option>
                 {Notes.map((n, i) =>
@@ -69,10 +62,7 @@ export default function CurrentNote(props: CurrentNoteProps): JSX.Element {
                     max={100}
                     min={0}
                     step={100 / VOLUME_STEPS}
-                    onChange={e => stateApi.setNote(currentChannel, currentPattern, currentNote, {
-                        ...note,
-                        volumeL: parseInt(e.target.value)
-                    } as NoteConfig)}
+                    onChange={e => stateApi.setVolumeL(currentNote, parseInt(e.target.value))}
                 />
                 <div style={{ minWidth: 24, textAlign: 'right', width: 24 }}>
                     {volumeL}
@@ -89,10 +79,7 @@ export default function CurrentNote(props: CurrentNoteProps): JSX.Element {
                     max={100}
                     min={0}
                     step={100 / VOLUME_STEPS}
-                    onChange={e => stateApi.setNote(currentChannel, currentPattern, currentNote, {
-                        ...note,
-                        volumeR: parseInt(e.target.value)
-                    } as NoteConfig)}
+                    onChange={e => stateApi.setVolumeR(currentNote, parseInt(e.target.value))}
                 />
                 <div style={{ minWidth: 24, textAlign: 'right', width: 24 }}>
                     {volumeR}
