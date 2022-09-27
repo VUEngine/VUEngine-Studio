@@ -1,11 +1,10 @@
 import React from 'react';
-import { ChannelConfig, MusicEditorStateApi, PatternConfig } from '../../ves-music-editor-types';
+import { ChannelConfig, MusicEditorStateApi } from '../../ves-music-editor-types';
 import Channel from './Channel';
 import StepIndicator from './StepIndicator';
 
 interface SequencerProps {
     channels: ChannelConfig[]
-    patterns: PatternConfig[]
     currentChannel: number
     currentPattern: number
     currentStep: number
@@ -16,7 +15,6 @@ interface SequencerProps {
 export default function Sequencer(props: SequencerProps): JSX.Element {
     const {
         channels,
-        patterns,
         currentChannel,
         currentPattern,
         currentStep,
@@ -38,7 +36,6 @@ export default function Sequencer(props: SequencerProps): JSX.Element {
             <Channel
                 key={`channel-${channel.id}`}
                 channelConfig={channel}
-                patterns={patterns}
                 currentChannel={currentChannel}
                 currentPattern={currentPattern}
                 number={channel.id}

@@ -18,9 +18,13 @@ export default function NoteProperties(props: NotePropertiesProps): JSX.Element 
     let volumeR = 100;
 
     return <div className={classNames.join(' ')}>
+        <div className='notePropertiesHeader'>
+            <div>Effects</div>
+            <div>Volume</div>
+        </div>
         {[...Array(pattern.size)].map((x, index) => {
-            volumeL = pattern.notes[index]?.volumeL ?? volumeL;
-            volumeR = pattern.notes[index]?.volumeR ?? volumeR;
+            volumeL = pattern.volumeL[index] ?? volumeL;
+            volumeR = pattern.volumeR[index] ?? volumeR;
             return (
                 <NotePropertiesNote
                     key={`pianoroll-note-properties-volume-note-${index}`}

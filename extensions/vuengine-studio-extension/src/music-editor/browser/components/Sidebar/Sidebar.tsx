@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MusicEditorStateApi, PatternConfig } from '../../ves-music-editor-types';
+import { ChannelConfig, MusicEditorStateApi, PatternConfig } from '../../ves-music-editor-types';
 import CurrentChannel from './CurrentChannel';
 import CurrentNote from './CurrentNote';
 import CurrentPattern from './CurrentPattern';
@@ -10,6 +10,7 @@ interface SidebarProps {
     volume: number
     speed: number
     bar: number
+    channel: ChannelConfig
     pattern: PatternConfig | boolean
     currentChannel: number
     currentPattern: number
@@ -19,7 +20,7 @@ interface SidebarProps {
 
 export default function Sidebar(props: SidebarProps): JSX.Element {
     const [collapsed, setCollapsed] = useState(false);
-    const { name, volume, speed, bar, pattern, currentChannel, currentPattern, currentNote, stateApi } = props;
+    const { name, volume, speed, bar, channel, pattern, currentChannel, currentPattern, currentNote, stateApi } = props;
 
     return <>
         <div
@@ -50,7 +51,7 @@ export default function Sidebar(props: SidebarProps): JSX.Element {
             />
 
             {currentChannel > -1 && <CurrentChannel
-                currentChannel={currentChannel}
+                channel={channel}
                 stateApi={stateApi}
             />}
 
@@ -62,8 +63,6 @@ export default function Sidebar(props: SidebarProps): JSX.Element {
 
             {currentNote > -1 && <CurrentNote
                 pattern={pattern as PatternConfig}
-                currentChannel={currentChannel}
-                currentPattern={currentPattern}
                 currentNote={currentNote}
                 stateApi={stateApi}
             />}

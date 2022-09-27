@@ -9,10 +9,8 @@ import {
     MAX_SPEED,
     MIN_SPEED,
     MusicEditorStateApi,
-    NoteConfig,
     PatternConfig,
     MUSIC_EDITOR_STATE_TEMPLATE,
-    PatternSwitchStep,
     Notes,
     vesMusicEditorWidgetState
 } from './ves-music-editor-types';
@@ -85,13 +83,19 @@ export class VesMusicEditorWidget extends ReactWidget {
             this.update();
         },
 
-        setPatterns: (patterns: PatternConfig[]): void => {
-            this.state.patterns = patterns;
+        setChannelVolume: (volume: number): void => {
+            this.state.channels[this.state.currentChannel].volume = volume;
+            this.update();
+        },
+
+        setPatterns: (channelId: number, patterns: PatternConfig[]): void => {
+            this.state.channels[channelId].patterns = patterns;
             this.update();
         },
 
         setCurrentChannel: (id: number): void => {
             this.state.currentChannel = id;
+            this.state.currentPattern = this.state.channels[id].sequence[0] ?? -1;
             this.state.currentNote = -1;
             this.update();
         },
@@ -108,13 +112,18 @@ export class VesMusicEditorWidget extends ReactWidget {
             this.update();
         },
 
-        setNote: (channel: number, patternId: number, noteIndex: number, note: NoteConfig): void => {
-            this.state.patterns.forEach(pattern => {
-                if (pattern.channel === channel && pattern.id === patternId) {
-                    pattern.notes[noteIndex] = note;
-                    return;
-                }
-            });
+        setNote: (noteIndex: number, note: number | undefined): void => {
+            this.state.channels[this.state.currentChannel].patterns[this.state.currentPattern].notes[noteIndex] = note;
+            this.update();
+        },
+
+        setVolumeL: (noteIndex: number, volume: number | undefined): void => {
+            this.state.channels[this.state.currentChannel].patterns[this.state.currentPattern].volumeL[noteIndex] = volume;
+            this.update();
+        },
+
+        setVolumeR: (noteIndex: number, volume: number | undefined): void => {
+            this.state.channels[this.state.currentChannel].patterns[this.state.currentPattern].volumeR[noteIndex] = volume;
             this.update();
         },
 
@@ -142,22 +151,17 @@ export class VesMusicEditorWidget extends ReactWidget {
             this.update();
         },
 
-        addChannelPattern: (channelId: number, patternId: number): void => {
-            this.state.channels[channelId].patterns.push(patternId);
+        addToSequence: (channelId: number, patternId: number): void => {
+            this.state.channels[channelId].sequence.push(patternId);
 
-            let patternExists = false;
-            this.state.patterns.forEach(pattern => {
-                if (pattern.channel === channelId && pattern.id === patternId) {
-                    patternExists = true;
-                    return;
-                }
-            });
-            if (!patternExists) {
-                this.state.patterns.push({
-                    channel: channelId,
-                    id: patternId,
+            const largestPatternId = this.state.channels[channelId].patterns.length - 1;
+            if (patternId > largestPatternId) {
+                this.state.channels[channelId].patterns.push({
                     size: 32,
                     notes: [],
+                    volumeL: [],
+                    volumeR: [],
+                    effects: [],
                 });
             }
 
@@ -167,58 +171,34 @@ export class VesMusicEditorWidget extends ReactWidget {
             this.update();
         },
 
-        removeChannelPattern: (channelId: number, index: number): void => {
-            this.state.channels[channelId].patterns.splice(index, 1);
+        removeFromSequence: (channelId: number, index: number): void => {
+            this.state.channels[channelId].sequence.splice(index, 1);
             this.update();
         },
 
-        setPatternSize: (channelId: number, patternId: number, size: number): void => {
-            this.state.patterns.forEach(pattern => {
-                if (pattern.channel === channelId && pattern.id === patternId) {
-                    pattern.size = size;
-                    return;
-                }
-            });
+        setPatternSize: (size: number): void => {
+            this.state.channels[this.state.currentChannel].patterns[this.state.currentPattern].size = size;
             this.update();
         },
     };
 
     protected render(): React.ReactNode {
-        let currentlyEditedPattern: PatternConfig | false = false;
-        this.state.patterns.forEach(pattern => {
-            if (pattern.channel === this.state.currentChannel && pattern.id === this.state.currentPattern) {
-                currentlyEditedPattern = pattern;
-            }
-        });
-
         const soloChannel = this.state.channels.filter(c => c.solo).map(c => c.id).pop() ?? -1;
 
         const songNotes: (string | undefined)[][] = [];
-        const currentChannelPatternMap: PatternSwitchStep[] = [];
-        this.state.channels.forEach((channel, index) => {
+        this.state.channels.forEach(channel => {
             const channelNotes: (string | undefined)[] = [];
             let step = 0;
-            channel.patterns.forEach(patternId => {
-                this.state.patterns.forEach(pattern => {
-                    if (pattern.channel === channel.id && pattern.id === patternId) {
-                        if (channel.id === this.state.currentChannel) {
-                            currentChannelPatternMap.push({
-                                step: step,
-                                pattern: patternId
-                            });
-                        }
-                        [...Array(pattern.size)].forEach((s, i) => {
-                            channelNotes[step + i] = (pattern.notes[i] !== undefined
-                                && pattern.notes[i]!.note !== undefined
-                                && !channel.muted
-                                && !(soloChannel > -1 && soloChannel !== channel.id))
-                                ? Notes[pattern.notes[i]!.note!]
-                                : undefined;
-                        });
-                        step += pattern.size;
-                        return;
-                    }
+            channel.sequence.forEach(patternId => {
+                const pattern = this.state.channels[channel.id].patterns[patternId];
+                [...Array(pattern.size)].forEach((s, i) => {
+                    channelNotes[step + i] = (pattern.notes[i] !== undefined
+                        && !channel.muted
+                        && !(soloChannel > -1 && soloChannel !== channel.id))
+                        ? Notes[pattern.notes[i]!]
+                        : undefined;
                 });
+                step += pattern.size;
             });
             if (channelNotes.length) {
                 songNotes.push(channelNotes);
@@ -228,7 +208,6 @@ export class VesMusicEditorWidget extends ReactWidget {
         return <MusicEditor
             name={this.state.name}
             channels={this.state.channels}
-            patterns={this.state.patterns}
             currentChannel={this.state.currentChannel}
             currentPattern={this.state.currentPattern}
             currentNote={this.state.currentNote}
@@ -236,9 +215,7 @@ export class VesMusicEditorWidget extends ReactWidget {
             speed={this.state.speed}
             volume={this.state.volume}
             stateApi={this.stateApi}
-            currentlyEditedPattern={currentlyEditedPattern}
             songNotes={songNotes}
-            currentChannelPatternMap={currentChannelPatternMap}
         />;
     }
 }

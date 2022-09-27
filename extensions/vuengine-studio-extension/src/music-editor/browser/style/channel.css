@@ -6,7 +6,7 @@
 }
 
 .musicEditor .channel.muted {
-    opacity: .5;
+    opacity: .4;
 }
 
 .musicEditor .collapsedChannel {
@@ -15,4 +15,14 @@
     height: 5px;
     margin: 1px 0;
     width: 65px;
+}
+
+.musicEditor .patternFill {
+    cursor: pointer;
+    flex-grow: 1;
+}
+
+.musicEditor .channel:hover .patternFill,
+.musicEditor .channel.current .patternFill {
+    background-color: rgba(255, 255, 255, .02);
 }

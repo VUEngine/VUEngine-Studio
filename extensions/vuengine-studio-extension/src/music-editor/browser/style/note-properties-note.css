@@ -4,17 +4,32 @@
     display: flex;
     flex-direction: column;
     gap: 1px;
-    height: 24px;
+    height: 28px;
     margin-bottom: 1px;
     margin-right: 1px;
     min-height: 24px;
-    min-width: 8px;
     flex-grow: 1;
+}
+
+.musicEditor .pianoRoll.size-16 .notePropertiesNote {
+    width: calc((100% - 77px) / 16);
+}
+
+.musicEditor .pianoRoll.size-32 .notePropertiesNote {
+    width: calc((100% - 77px) / 32);
+}
+
+.musicEditor .pianoRoll.size-64 .notePropertiesNote {
+    width: calc((100% - 77px) / 64);
+}
+
+.musicEditor .notePropertiesNote:hover {
+    outline: 1px solid #d31422;
 }
 
 .musicEditor .notePropertiesNote:hover .effects,
 .musicEditor .notePropertiesNote.current .effects {
-    background-color: #555;
+    background-color: #333;
 }
 
 .musicEditor .notePropertiesNote.nth {
@@ -24,9 +39,10 @@
 .musicEditor .notePropertiesNote .effects {
     align-items: center;
     display: flex;
+    font-size: 8px;
     flex-grow: 1;
-    height: 50%;
     justify-content: center;
+    overflow: hidden;
     width: 100%;
 }
 
@@ -34,12 +50,11 @@
     align-items: end;
     background-color: #333;
     display: flex;
-    flex-grow: 1;
-    height: 50%;
+    height: 16px;
     width: 100%;
 }
 
 .musicEditor .notePropertiesNote .volume div {
-    background-color: #555;
+    background-color: #666;
     flex-grow: 1;
 }

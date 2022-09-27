@@ -1,15 +1,15 @@
 import { nls } from '@theia/core';
 import React from 'react';
-import { HIGHEST_NOTE, LOWEST_NOTE, MusicEditorStateApi, NoteConfig, PATTERN_HEIGHT_FACTOR, PATTERN_NOTE_WIDTH } from '../../ves-music-editor-types';
+import { HIGHEST_NOTE, LOWEST_NOTE, MusicEditorStateApi, PatternConfig, PATTERN_HEIGHT_FACTOR, PATTERN_NOTE_WIDTH } from '../../ves-music-editor-types';
 
 interface PatternProps {
     index: number
+    pattern: PatternConfig
+    currentChannel: number
+    currentPattern: number
     channel: number
-    current: boolean
     height: number
-    notes: (NoteConfig | undefined)[]
     patternId: number
-    size: number
     stateApi: MusicEditorStateApi
 }
 
@@ -17,27 +17,26 @@ export default function Pattern(props: PatternProps): JSX.Element {
     const {
         index,
         channel,
-        current,
         height,
-        notes,
+        pattern,
         patternId,
-        size,
+        currentChannel,
+        currentPattern,
         stateApi
     } = props;
 
     const classNames = ['pattern'];
-    if (current) {
+    if (currentChannel === channel && currentPattern === patternId) {
         classNames.push('current');
     }
 
     const boxShadow: string[] = [];
-    notes.forEach((noteConfig, i) => {
-        if (noteConfig !== undefined
-            && noteConfig.note !== undefined
-            && noteConfig.note >= HIGHEST_NOTE
-            && noteConfig.note <= LOWEST_NOTE) {
+    pattern.notes.forEach((note, i) => {
+        if (note !== undefined
+            && note >= HIGHEST_NOTE
+            && note <= LOWEST_NOTE) {
             boxShadow.push(
-                `${(i + 1) * PATTERN_NOTE_WIDTH}px ${(noteConfig.note - HIGHEST_NOTE) * PATTERN_HEIGHT_FACTOR}px 0 0 #f00`
+                `${(i + 1) * PATTERN_NOTE_WIDTH}px ${(note - HIGHEST_NOTE) * PATTERN_HEIGHT_FACTOR}px 0 0 #f00`
             );
         }
     });
@@ -46,8 +45,8 @@ export default function Pattern(props: PatternProps): JSX.Element {
         className={classNames.join(' ')}
         style={{
             height: `${height * PATTERN_HEIGHT_FACTOR}px`,
-            minWidth: `${(size * PATTERN_NOTE_WIDTH) - 1}px`,
-            width: `${(size * PATTERN_NOTE_WIDTH) - 1}px`
+            minWidth: `${(pattern.size * PATTERN_NOTE_WIDTH) - 1}px`,
+            width: `${(pattern.size * PATTERN_NOTE_WIDTH) - 1}px`
         }}
         onClick={() => stateApi.setCurrentPattern(channel, patternId)}
     >
@@ -60,12 +59,12 @@ export default function Pattern(props: PatternProps): JSX.Element {
                 width: `${PATTERN_NOTE_WIDTH}px`,
             }}
         />
-        {patternId}
+        {patternId + 1}
         <div
             className='remove'
             title={nls.localize('vuengine/musicEditor/removePattern', 'Remove Pattern')}
             onClick={e => {
-                stateApi.removeChannelPattern(channel, index);
+                stateApi.removeFromSequence(channel, index);
                 e.stopPropagation();
             }}
         >

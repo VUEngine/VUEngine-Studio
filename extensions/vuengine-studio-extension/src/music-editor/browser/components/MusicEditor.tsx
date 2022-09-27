@@ -1,23 +1,21 @@
 import React from 'react';
 import { Instrument, Song, StepType, Track } from 'reactronica';
-import { ChannelConfig, MusicEditorStateApi, PatternConfig, PatternSwitchStep } from '../ves-music-editor-types';
+import { ChannelConfig, MusicEditorStateApi, Notes } from '../ves-music-editor-types';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
 import Sidebar from './Sidebar/Sidebar';
+import * as Tone from 'tone';
 
 interface MusicEditorProps {
     name: string
     channels: ChannelConfig[]
-    patterns: PatternConfig[]
     currentChannel: number
     currentPattern: number
     currentNote: number
     bar: number
     speed: number
     volume: number
-    currentlyEditedPattern: PatternConfig | false
     songNotes: (string | undefined)[][]
-    currentChannelPatternMap: PatternSwitchStep[]
     stateApi: MusicEditorStateApi
 }
 
@@ -37,6 +35,13 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
         };
     }
 
+    playNote(note: number): void {
+        if (!this.state.playing) {
+            const synth = new Tone.Synth().toDestination();
+            synth.triggerAttackRelease(Notes[note], '16n');
+        }
+    }
+
     render(): JSX.Element {
         /* setTimeout(() => {
             this.setState({ currentStep: this.state.currentStep + 1 });
@@ -44,10 +49,10 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
 
         const {
             name, bar, speed, volume,
-            channels, patterns,
+            channels,
+            songNotes,
             currentChannel, currentPattern, currentNote,
             stateApi,
-            currentlyEditedPattern, songNotes, currentChannelPatternMap
         } = this.props;
 
         return <div className='musicEditor'>
@@ -76,6 +81,9 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                     >
                         <i className={`fa fa-${this.state.playing ? 'stop' : 'play'}`} />
                     </button>
+                    <div className='currentStep'>
+                        {this.state.currentStep}
+                    </div>
                     <button
                         className={`theia-button ${this.state.recording ? 'primary' : 'secondary'} large recordButton`}
                         title='Recording Mode'
@@ -107,12 +115,10 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                     >
                         <i className='fa fa-upload' />
                     </button>
-                    {this.state.currentStep}
                 </div>
                 <div>
                     <Sequencer
                         channels={channels}
-                        patterns={patterns}
                         currentChannel={currentChannel}
                         currentPattern={currentPattern}
                         playing={this.state.playing}
@@ -120,14 +126,16 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                         stateApi={stateApi}
                     />
                 </div>
-                {currentlyEditedPattern && <PianoRoll
+                {currentPattern > -1 && <PianoRoll
                     playing={this.state.playing}
-                    pattern={currentlyEditedPattern}
-                    patternMap={currentChannelPatternMap}
+                    channel={channels[currentChannel]}
+                    currentChannel={currentChannel}
+                    currentPattern={currentPattern}
                     currentNote={currentNote}
                     currentStep={this.state.currentStep}
                     bar={bar}
                     stateApi={stateApi}
+                    playNote={this.playNote.bind(this)}
                 />}
             </div>
             <Sidebar
@@ -135,7 +143,8 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                 volume={volume}
                 speed={speed}
                 bar={bar}
-                pattern={currentlyEditedPattern}
+                channel={channels[currentChannel]}
+                pattern={channels[currentChannel].patterns[currentPattern]}
                 currentChannel={currentChannel}
                 currentPattern={currentPattern}
                 currentNote={currentNote}
