@@ -54,7 +54,6 @@ export default function Channel(props: ChannelProps): JSX.Element {
                 number={number}
                 muted={channelConfig.muted}
                 solo={channelConfig.solo}
-                collapsed={channelConfig.collapsed}
                 stateApi={stateApi}
             />
             {channelConfig.sequence.map((patternId, index) =>

@@ -6,7 +6,6 @@ interface ChannelHeaderProps {
     number: number
     muted: boolean
     solo: boolean
-    collapsed: boolean
     stateApi: MusicEditorStateApi
 }
 
@@ -16,7 +15,6 @@ export default function ChannelHeader(props: ChannelHeaderProps): JSX.Element {
         number,
         muted,
         solo,
-        // collapsed,
         stateApi,
     } = props;
 
@@ -46,12 +44,6 @@ export default function ChannelHeader(props: ChannelHeaderProps): JSX.Element {
             >
                 <i className={`fa fa-star${solo ? '' : '-o'}`} />
             </div>
-            {/* <div
-                className={`channelButton ${collapsed ? 'active' : ''}`}
-                onClick={() => stateApi.toggleChannelCollapsed(number)}
-            >
-                <i className={`fa fa-eye${collapsed ? '-slash' : ''}`} />
-            </div> */}
         </div>
     </div>;
 }

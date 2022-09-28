@@ -57,6 +57,7 @@ export default function Sidebar(props: SidebarProps): JSX.Element {
 
             {currentPattern > -1 && <CurrentPattern
                 pattern={pattern as PatternConfig}
+                channel={channel}
                 currentPattern={currentPattern}
                 stateApi={stateApi}
             />}

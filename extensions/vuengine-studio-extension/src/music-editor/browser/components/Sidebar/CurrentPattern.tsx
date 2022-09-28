@@ -1,35 +1,42 @@
+import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React from 'react';
 import VContainer from '../../../../core/browser/components/VContainer';
-import { MusicEditorStateApi, PatternConfig } from '../../ves-music-editor-types';
+import { ChannelConfig, MusicEditorStateApi, PatternConfig } from '../../ves-music-editor-types';
 
 interface CurrentPatternProps {
     pattern: PatternConfig
+    channel: ChannelConfig
     currentPattern: number
     stateApi: MusicEditorStateApi
 }
 
 export default function CurrentPattern(props: CurrentPatternProps): JSX.Element {
-    const { currentPattern, pattern, stateApi } = props;
+    const { channel, currentPattern, pattern, stateApi } = props;
 
     return <div className='section currentPattern'>
         <VContainer>
-            <label>Pattern: {currentPattern + 1}</label>
+            <label>Pattern</label>
+            <SelectComponent
+                options={channel.patterns.map((n, i) => ({
+                    value: i.toString(),
+                    label: (i + 1).toString()
+                }))}
+                defaultValue={currentPattern.toString()}
+                onChange={option => stateApi.setCurrentPattern(channel.id, parseInt(option.value!))}
+            />
         </VContainer>
 
         <VContainer>
             Size
-            <select
-                className='theia-select'
-                onChange={e => {
-                    stateApi.setPatternSize(parseInt(e.target.value));
-                    e.stopPropagation();
-                }}
-                value={pattern.size}
-            >
-                <option value={16}>16</option>
-                <option value={32}>32</option>
-                <option value={64}>64</option>
-            </select>
+            <SelectComponent
+                options={[
+                    { value: '16', label: '16' },
+                    { value: '32', label: '32' },
+                    { value: '64', label: '64' },
+                ]}
+                defaultValue={pattern.size.toString()}
+                onChange={option => stateApi.setPatternSize(parseInt(option.value!))}
+            />
         </VContainer>
 
         {/*

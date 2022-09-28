@@ -1,3 +1,44 @@
 .theia-select {
     padding: 3px 0 4px;
 }
+
+.theia-input.large {
+    font-size: 130%;
+    line-height: 160%;
+}
+
+input[type="range"] {
+    appearance: none;
+    background: var(--theia-input-background);
+    border: var(--theia-border-width) solid var(--theia-input-border);
+    border-radius: 10px;
+    cursor: ew-resize;
+    margin: 0;
+    width: 100%;
+}
+
+input[type="range"]:focus {
+    outline-width: 0;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: var(--theia-foreground);
+    cursor: ew-resize;
+}
+
+input[type="range"]:hover,
+input[type="range"]:active,
+input[type="range"]:focus {
+    background: var(--theia-button-background);
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+    -webkit-appearance: none;
+    box-shadow: none;
+    border: none;
+    background: transparent;
+}

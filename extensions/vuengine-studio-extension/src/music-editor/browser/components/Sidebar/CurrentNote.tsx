@@ -37,7 +37,6 @@ export default function CurrentNote(props: CurrentNoteProps): JSX.Element {
             Note
             <select
                 className='theia-select'
-                style={{ flexGrow: 1 }}
                 onChange={e => stateApi.setNote(currentNote, parseInt(e.target.value))}
                 value={note ?? -1}
             >
@@ -48,6 +47,19 @@ export default function CurrentNote(props: CurrentNoteProps): JSX.Element {
                         <option key={`note-select-${i}`} value={i}>{n}</option>
                     ))}
             </select>
+            {/* <SelectComponent
+                options={[{
+                    value: '-1',
+                    label: 'none'
+                }].concat(Notes
+                    .filter((n, i) => (i <= LOWEST_NOTE && i >= HIGHEST_NOTE))
+                    .map((n, i) => ({
+                        value: (i + HIGHEST_NOTE).toString(),
+                        label: n.toString()
+                    })))}
+                defaultValue={note?.toString() ?? '-1'}
+                onChange={option => stateApi.setNote(currentNote, parseInt(option.value!))}
+            /> */}
         </VContainer>
 
         <VContainer>
