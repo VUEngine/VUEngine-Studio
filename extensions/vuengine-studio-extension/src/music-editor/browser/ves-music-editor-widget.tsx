@@ -205,6 +205,7 @@ export class VesMusicEditorWidget extends ReactWidget {
     protected render(): React.ReactNode {
         const soloChannel = this.state.channels.filter(c => c.solo).map(c => c.id).pop() ?? -1;
 
+        let songLength = 0;
         const songNotes: (string | undefined)[][] = [];
         this.state.channels.forEach(channel => {
             const channelNotes: (string | undefined)[] = [];
@@ -221,6 +222,9 @@ export class VesMusicEditorWidget extends ReactWidget {
                 step += pattern.size;
             });
             if (channelNotes.length) {
+                if (channelNotes.length > songLength) {
+                    songLength = channelNotes.length;
+                }
                 songNotes.push(channelNotes);
             }
         });
@@ -238,6 +242,7 @@ export class VesMusicEditorWidget extends ReactWidget {
             sidebarTab={this.state.sidebarTab}
             defaultPatternSize={this.state.defaultPatternSize}
             songNotes={songNotes}
+            songLength={songLength}
         />;
     }
 }
