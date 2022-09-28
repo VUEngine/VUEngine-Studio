@@ -1,4 +1,3 @@
-import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React from 'react';
 import HContainer from '../../../../core/browser/components/HContainer';
 import VContainer from '../../../../core/browser/components/VContainer';
@@ -15,27 +14,27 @@ export default function CurrentChannel(props: CurrentChannelProps): JSX.Element 
     return <div className='section currentChannel'>
         <VContainer>
             <label>Channel</label>
-            <SelectComponent
-                options={[...Array(6)].map((n, i) => ({
-                    value: i.toString(),
-                    label: (i + 1).toString()
-                }))}
-                defaultValue={CurrentChannel.toString()}
-                onChange={option => stateApi.setCurrentChannel(parseInt(option.value!))}
-            />
+            <select
+                className='theia-select'
+                value={channel.id}
+                onChange={e => stateApi.setCurrentChannel(parseInt(e.target.value))}
+            >
+                {[...Array(6)].map((n, i) => (
+                    <option key={`select-channel-${i}`} value={i}>{i + 1}</option>
+                ))}
+            </select>
         </VContainer>
 
         <VContainer>
             Instrument
-            <SelectComponent
-                options={[
-                    { value: '0', label: 'Piano' },
-                    { value: '1', label: 'Guitar' },
-                    { value: '2', label: 'Bass' },
-                    { value: '3', label: 'Oboe' },
-                ]}
-                defaultValue={'0'}
-            />
+            <select
+                className='theia-select'
+                value={0}
+            >
+                <option value={0}>Piano</option>
+                <option value={1}>Guitar</option>
+                <option value={2}>Bass</option>
+            </select>
         </VContainer>
 
         <VContainer>
@@ -56,30 +55,30 @@ export default function CurrentChannel(props: CurrentChannelProps): JSX.Element 
         </VContainer>
 
         <VContainer>
-            <div>
+            <label>
                 <input
                     type='checkbox'
                     checked={channel.collapsed}
-                    onClick={() => stateApi.toggleChannelCollapsed(channel.id)}
+                    onChange={() => stateApi.toggleChannelCollapsed(channel.id)}
                 />
-                <label>Collapsed</label>
-            </div>
-            <div>
+                Collapsed
+            </label>
+            <label>
                 <input
                     type='checkbox'
                     checked={channel.muted}
-                    onClick={() => stateApi.toggleChannelMuted(channel.id)}
+                    onChange={() => stateApi.toggleChannelMuted(channel.id)}
                 />
-                <label>Muted</label>
-            </div>
-            <div>
+                Muted
+            </label>
+            <label>
                 <input
                     type='checkbox'
                     checked={channel.solo}
-                    onClick={() => stateApi.toggleChannelSolo(channel.id)}
+                    onChange={() => stateApi.toggleChannelSolo(channel.id)}
                 />
-                <label>Solo</label>
-            </div>
+                Solo
+            </label>
         </VContainer>
     </div>;
 }

@@ -1,4 +1,3 @@
-import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React from 'react';
 import HContainer from '../../../../core/browser/components/HContainer';
 import VContainer from '../../../../core/browser/components/VContainer';
@@ -9,13 +8,14 @@ interface SongProps {
     volume: number
     speed: number
     bar: number
+    defaultPatternSize: number
     stateApi: MusicEditorStateApi
 }
 
 export default function Song(props: SongProps): JSX.Element {
-    const { name, volume, speed, bar, stateApi } = props;
+    const { name, volume, speed, bar, defaultPatternSize, stateApi } = props;
 
-    return <div className='section first song'>
+    return <div className='section song'>
         <VContainer>
             <label>Song Name</label>
             <input
@@ -78,14 +78,15 @@ export default function Song(props: SongProps): JSX.Element {
 
         <VContainer>
             Default Pattern Size
-            <SelectComponent
-                options={[
-                    { value: '16', label: '16' },
-                    { value: '32', label: '32' },
-                    { value: '64', label: '64' },
-                ]}
-                defaultValue={'32'}
-            />
+            <select
+                className='theia-select'
+                value={defaultPatternSize}
+                onChange={e => stateApi.setDefaultPatternSize(parseInt(e.target.value))}
+            >
+                <option value={16}>16</option>
+                <option value={32}>32</option>
+                <option value={64}>64</option>
+            </select>
         </VContainer>
     </div>;
 }

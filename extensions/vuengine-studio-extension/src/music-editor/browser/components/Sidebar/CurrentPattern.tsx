@@ -1,4 +1,3 @@
-import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React from 'react';
 import VContainer from '../../../../core/browser/components/VContainer';
 import { ChannelConfig, MusicEditorStateApi, PatternConfig } from '../../ves-music-editor-types';
@@ -16,27 +15,28 @@ export default function CurrentPattern(props: CurrentPatternProps): JSX.Element 
     return <div className='section currentPattern'>
         <VContainer>
             <label>Pattern</label>
-            <SelectComponent
-                options={channel.patterns.map((n, i) => ({
-                    value: i.toString(),
-                    label: (i + 1).toString()
-                }))}
-                defaultValue={currentPattern.toString()}
-                onChange={option => stateApi.setCurrentPattern(channel.id, parseInt(option.value!))}
-            />
+            <select
+                className='theia-select'
+                value={currentPattern}
+                onChange={e => stateApi.setCurrentPattern(channel.id, parseInt(e.target.value))}
+            >
+                {channel.patterns.map((n, i) => (
+                    <option key={`select-pattern-${i}`} value={i}>{i + 1}</option>
+                ))}
+            </select>
         </VContainer>
 
         <VContainer>
             Size
-            <SelectComponent
-                options={[
-                    { value: '16', label: '16' },
-                    { value: '32', label: '32' },
-                    { value: '64', label: '64' },
-                ]}
-                defaultValue={pattern.size.toString()}
-                onChange={option => stateApi.setPatternSize(parseInt(option.value!))}
-            />
+            <select
+                className='theia-select'
+                value={pattern.size}
+                onChange={e => stateApi.setPatternSize(parseInt(e.target.value))}
+            >
+                <option value={16}>16</option>
+                <option value={32}>32</option>
+                <option value={64}>64</option>
+            </select>
         </VContainer>
 
         {/*
