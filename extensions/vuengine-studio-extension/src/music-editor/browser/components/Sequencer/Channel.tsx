@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ChannelConfig, HIGHEST_NOTE, LOWEST_NOTE, MusicEditorStateApi, Notes } from '../../ves-music-editor-types';
 import AddPattern from './AddPattern';
 import ChannelHeader from './ChannelHeader';
@@ -14,6 +14,8 @@ interface ChannelProps {
 }
 
 export default function Channel(props: ChannelProps): JSX.Element {
+    const [dragged, setDragged] = useState<boolean>(false);
+
     const {
         channelConfig,
         currentChannel,
@@ -67,6 +69,8 @@ export default function Channel(props: ChannelProps): JSX.Element {
                     currentPattern={currentPattern}
                     height={patternHeight}
                     stateApi={stateApi}
+                    dragged={dragged}
+                    setDragged={setDragged}
                 />)}
             <AddPattern
                 channel={channelConfig}

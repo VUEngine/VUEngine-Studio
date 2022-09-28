@@ -179,6 +179,13 @@ export class VesMusicEditorWidget extends ReactWidget {
             this.update();
         },
 
+        moveSequencePattern: (channelId: number, from: number, to: number): void => {
+            const sequence = this.state.channels[channelId].sequence;
+            const removedPattern = sequence.splice(from, 1).pop();
+            sequence.splice(to > from ? to - 1 : to, 0, removedPattern!);
+            this.update();
+        },
+
         setPatternSize: (size: number): void => {
             this.state.channels[this.state.currentChannel].patterns[this.state.currentPattern].size = size;
             this.update();

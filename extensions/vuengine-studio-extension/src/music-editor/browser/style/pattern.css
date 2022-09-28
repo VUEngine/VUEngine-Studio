@@ -3,7 +3,7 @@
     background-color: #333;
     box-sizing: border-box;
     color: transparent;
-    cursor: pointer;
+    cursor: grab;
     display: flex;
     justify-content: end;
     margin-right: 1px;
@@ -46,4 +46,19 @@
 
 .musicEditor .pattern:hover .remove {
     display: block;
+}
+
+.musicEditor .pattern.beingDragged {
+    border: 1px solid #d31422;
+    cursor: grabbing;
+    outline: 0;
+    opacity: .1;
+}
+
+.musicEditor .pattern.dragOver {
+    border-left: 4px solid #d31422;
+}
+
+.musicEditor .pattern.dragOver .notes {
+    left: -4px;
 }

@@ -11,6 +11,8 @@ interface PatternProps {
     height: number
     patternId: number
     stateApi: MusicEditorStateApi
+    dragged: boolean
+    setDragged: (dragged: boolean) => void
 }
 
 export default function Pattern(props: PatternProps): JSX.Element {
@@ -22,7 +24,9 @@ export default function Pattern(props: PatternProps): JSX.Element {
         patternId,
         currentChannel,
         currentPattern,
-        stateApi
+        stateApi,
+        dragged,
+        setDragged
     } = props;
 
     const classNames = ['pattern'];
@@ -41,6 +45,42 @@ export default function Pattern(props: PatternProps): JSX.Element {
         }
     });
 
+    const onDragStart = (e: React.DragEvent<HTMLDivElement>): void => {
+        setDragged(true);
+        e.currentTarget.classList.add('beingDragged');
+        e.dataTransfer.setData('channel', e.currentTarget.getAttribute('data-channel') ?? '');
+        e.dataTransfer.setData('position', e.currentTarget.getAttribute('data-position') ?? '');
+    };
+
+    const onDragEnd = (e: React.DragEvent<HTMLDivElement>): void => {
+        setDragged(false);
+        e.currentTarget.classList.remove('beingDragged');
+
+        const dragOverElements = document.getElementsByClassName('dragOver');
+        for (let i = 0; i < dragOverElements.length; i++) {
+            dragOverElements[i].classList.remove('dragOver');
+        }
+    };
+
+    const onDrop = (e: React.DragEvent<HTMLDivElement>): void => {
+        const from = parseInt(e.dataTransfer.getData('position'));
+        const to = parseInt(e.currentTarget.getAttribute('data-position') ?? '');
+        const fromChannelId = parseInt(e.dataTransfer.getData('channel'));
+        if (channel === fromChannelId) {
+            stateApi.moveSequencePattern(channel, from, to);
+        }
+    };
+
+    const onDragEnter = (e: React.DragEvent<HTMLDivElement>): void => {
+        if (dragged) {
+            e.currentTarget.classList.add('dragOver');
+        }
+    };
+
+    const onDragLeave = (e: React.DragEvent<HTMLDivElement>): void => {
+        e.currentTarget.classList.remove('dragOver');
+    };
+
     return <div
         className={classNames.join(' ')}
         style={{
@@ -48,7 +88,15 @@ export default function Pattern(props: PatternProps): JSX.Element {
             minWidth: `${(pattern.size * PATTERN_NOTE_WIDTH) - 1}px`,
             width: `${(pattern.size * PATTERN_NOTE_WIDTH) - 1}px`
         }}
+        data-channel={channel}
+        data-position={index}
         onClick={() => stateApi.setCurrentPattern(channel, patternId)}
+        draggable={true}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
+        onDragEnter={onDragEnter}
+        onDragLeave={onDragLeave}
+        onDrop={onDrop}
     >
         <div
             className='notes'
