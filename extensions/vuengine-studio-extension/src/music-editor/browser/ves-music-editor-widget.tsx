@@ -97,6 +97,7 @@ export class VesMusicEditorWidget extends ReactWidget {
             this.state.currentChannel = id;
             this.state.currentPattern = this.state.channels[id].sequence[0] ?? -1;
             this.state.currentNote = -1;
+            this.state.sidebarTab = 0;
             this.update();
         },
 
@@ -104,11 +105,13 @@ export class VesMusicEditorWidget extends ReactWidget {
             this.state.currentChannel = channel;
             this.state.currentPattern = pattern;
             this.state.currentNote = -1;
+            this.state.sidebarTab = 0;
             this.update();
         },
 
         setCurrentNote: (id: number): void => {
             this.state.currentNote = id;
+            this.state.sidebarTab = 1;
             this.update();
         },
 
@@ -157,7 +160,7 @@ export class VesMusicEditorWidget extends ReactWidget {
             const largestPatternId = this.state.channels[channelId].patterns.length - 1;
             if (patternId > largestPatternId) {
                 this.state.channels[channelId].patterns.push({
-                    size: 32,
+                    size: this.state.defaultPatternSize,
                     notes: [],
                     volumeL: [],
                     volumeR: [],
@@ -178,6 +181,16 @@ export class VesMusicEditorWidget extends ReactWidget {
 
         setPatternSize: (size: number): void => {
             this.state.channels[this.state.currentChannel].patterns[this.state.currentPattern].size = size;
+            this.update();
+        },
+
+        setDefaultPatternSize: (size: number): void => {
+            this.state.defaultPatternSize = size;
+            this.update();
+        },
+
+        setSidebarTab: (tab: number): void => {
+            this.state.sidebarTab = tab;
             this.update();
         },
     };
@@ -215,6 +228,8 @@ export class VesMusicEditorWidget extends ReactWidget {
             speed={this.state.speed}
             volume={this.state.volume}
             stateApi={this.stateApi}
+            sidebarTab={this.state.sidebarTab}
+            defaultPatternSize={this.state.defaultPatternSize}
             songNotes={songNotes}
         />;
     }

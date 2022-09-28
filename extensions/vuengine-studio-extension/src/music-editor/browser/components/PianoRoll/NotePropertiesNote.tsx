@@ -32,6 +32,7 @@ export default function NotePropertiesNote(props: NotePropertiesNoteProps): JSX.
         className={classNames.join(' ')}
         title={`${effects.length} ${labelEffects}, ${leftLabel}: ${volumeL}%/${rightLabel}: ${volumeR}%`}
         onClick={() => stateApi.setCurrentNote(index)}
+        onContextMenu={() => stateApi.setNote(index, undefined)}
     >
         <div className='effects'>
         </div>

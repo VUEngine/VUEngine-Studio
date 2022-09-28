@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { ChannelConfig, MusicEditorStateApi, PatternConfig } from '../../ves-music-editor-types';
-import CurrentChannel from './CurrentChannel';
-import CurrentNote from './CurrentNote';
-import CurrentPattern from './CurrentPattern';
-import Song from './Song';
+import TabInstruments from './TabInstruments';
+import TabNote from './TabNote';
+import TabSong from './TabSong';
+import TabWaveforms from './TabWaveforms';
 
 interface SidebarProps {
     name: string
@@ -15,12 +15,14 @@ interface SidebarProps {
     currentChannel: number
     currentPattern: number
     currentNote: number
+    tab: number
+    defaultPatternSize: number
     stateApi: MusicEditorStateApi
 }
 
 export default function Sidebar(props: SidebarProps): JSX.Element {
     const [collapsed, setCollapsed] = useState(false);
-    const { name, volume, speed, bar, channel, pattern, currentChannel, currentPattern, currentNote, stateApi } = props;
+    const { name, volume, speed, bar, channel, pattern, currentChannel, currentPattern, currentNote, tab, defaultPatternSize, stateApi } = props;
 
     return <>
         <div
@@ -29,44 +31,60 @@ export default function Sidebar(props: SidebarProps): JSX.Element {
         />
         <div className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
             <div className='sidebarTabs'>
-                <div className='sidebarTab active'>
+                <div
+                    className={`sidebarTab ${tab === 0 && 'active'}`}
+                    onClick={() => stateApi.setSidebarTab(0)}
+                >
                     <i className='fa fa-cog' />
                 </div>
-                <div className='sidebarTab'>
+                <div
+                    className={`sidebarTab ${tab === 1 && 'active'}`}
+                    onClick={() => stateApi.setSidebarTab(1)}
+                >
                     <i className='fa fa-music' />
                 </div>
-                <div className='sidebarTab'>
+                <div
+                    className={`sidebarTab ${tab === 2 && 'active'}`}
+                    onClick={() => stateApi.setSidebarTab(2)}
+                >
                     <i className='fa fa-bullhorn' />
                 </div>
-                <div className='sidebarTab'>
+                <div
+                    className={`sidebarTab ${tab === 3 && 'active'}`}
+                    onClick={() => stateApi.setSidebarTab(3)}
+                >
                     <i className='fa fa-signal' />
                 </div>
             </div>
-            <Song
-                name={name}
-                volume={volume}
-                speed={speed}
-                bar={bar}
-                stateApi={stateApi}
-            />
-
-            {currentChannel > -1 && <CurrentChannel
-                channel={channel}
-                stateApi={stateApi}
-            />}
-
-            {currentPattern > -1 && <CurrentPattern
-                pattern={pattern as PatternConfig}
-                channel={channel}
-                currentPattern={currentPattern}
-                stateApi={stateApi}
-            />}
-
-            {currentNote > -1 && <CurrentNote
-                pattern={pattern as PatternConfig}
-                currentNote={currentNote}
-                stateApi={stateApi}
-            />}
+            <div className='sidebarTabContent'>
+                {tab === 0 && <TabSong
+                    name={name}
+                    volume={volume}
+                    speed={speed}
+                    bar={bar}
+                    channel={channel}
+                    pattern={pattern}
+                    currentChannel={currentChannel}
+                    currentPattern={currentPattern}
+                    defaultPatternSize={defaultPatternSize}
+                    stateApi={stateApi}
+                />}
+                {tab === 1 && <TabNote
+                    pattern={pattern}
+                    currentNote={currentNote}
+                    stateApi={stateApi}
+                />}
+                {tab === 2 && <TabInstruments
+                    pattern={pattern}
+                    currentNote={currentNote}
+                    stateApi={stateApi}
+                />}
+                {tab === 3 && <TabWaveforms
+                    pattern={pattern}
+                    currentNote={currentNote}
+                    stateApi={stateApi}
+                />}
+            </div>
         </div>
     </>;
 }

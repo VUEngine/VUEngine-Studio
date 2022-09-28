@@ -16,6 +16,8 @@ interface MusicEditorProps {
     speed: number
     volume: number
     songNotes: (string | undefined)[][]
+    sidebarTab: number
+    defaultPatternSize: number
     stateApi: MusicEditorStateApi
 }
 
@@ -49,9 +51,9 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
 
         const {
             name, bar, speed, volume,
-            channels,
-            songNotes,
-            currentChannel, currentPattern, currentNote,
+            channels, songNotes,
+            defaultPatternSize,
+            sidebarTab, currentChannel, currentPattern, currentNote,
             stateApi,
         } = this.props;
 
@@ -143,11 +145,13 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                 volume={volume}
                 speed={speed}
                 bar={bar}
+                defaultPatternSize={defaultPatternSize}
                 channel={channels[currentChannel]}
                 pattern={channels[currentChannel].patterns[currentPattern]}
                 currentChannel={currentChannel}
                 currentPattern={currentPattern}
                 currentNote={currentNote}
+                tab={sidebarTab}
                 stateApi={stateApi}
             />
         </div >;

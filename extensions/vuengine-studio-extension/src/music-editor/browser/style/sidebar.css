@@ -1,7 +1,13 @@
 .musicEditor .sidebar {
-    overflow-x: hidden;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
     width: 220px;
+}
+
+.musicEditor .sidebarTabContent {
+    flex-grow: 1;
+    overflow-y: auto;
 }
 
 .musicEditor .sidebar.collapsed {
@@ -25,15 +31,15 @@
 }
 
 .musicEditor .sidebar .section {
-    border-top: 3px solid var(--theia-sideBar-background);
+    border-bottom: 2px solid var(--theia-sideBar-background);
     display: flex;
     flex-direction: column;
     padding: 15px 10px;
     gap: 15px;
 }
 
-.musicEditor .sidebar .section.first {
-    border-top: none;
+.musicEditor .sidebar .section:last-child {
+    border-bottom: none;
 }
 
 .musicEditor .sidebarTabs {

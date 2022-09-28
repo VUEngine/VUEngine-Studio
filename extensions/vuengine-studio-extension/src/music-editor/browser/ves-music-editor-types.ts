@@ -7,6 +7,8 @@ export interface vesMusicEditorWidgetState {
     speed: number
     volume: number
     bar: number
+    defaultPatternSize: number
+    sidebarTab: number
 };
 
 export interface MusicEditorStateApi {
@@ -29,6 +31,8 @@ export interface MusicEditorStateApi {
     addToSequence: (channelId: number, patternId: number) => void,
     removeFromSequence: (channelId: number, index: number) => void,
     setPatternSize: (size: number) => void,
+    setDefaultPatternSize: (size: number) => void,
+    setSidebarTab: (tab: number) => void,
 }
 
 export interface PatternConfig {
@@ -98,4 +102,6 @@ export const MUSIC_EDITOR_STATE_TEMPLATE = {
     speed: 300,
     volume: 50,
     bar: 4,
+    defaultPatternSize: 32,
+    sidebarTab: 0
 };

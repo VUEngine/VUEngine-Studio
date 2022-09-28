@@ -1,3 +1,4 @@
+import { nls } from '@theia/core';
 import React from 'react';
 import HContainer from '../../../../core/browser/components/HContainer';
 import VContainer from '../../../../core/browser/components/VContainer';
@@ -11,6 +12,15 @@ interface CurrentNoteProps {
 
 export default function CurrentNote(props: CurrentNoteProps): JSX.Element {
     const { currentNote, pattern, stateApi } = props;
+
+    if (currentNote === -1) {
+        return <div className='section currentNote'>
+            {nls.localize(
+                'vuengine/musicEditor/selectANote',
+                'Select a note to edit its properties'
+            )}
+        </div>;
+    }
 
     const note = pattern.notes[currentNote];
     let volumeL = 100;
