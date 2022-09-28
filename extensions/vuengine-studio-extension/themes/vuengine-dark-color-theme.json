@@ -23,6 +23,7 @@
 		"progressBar.background": "#4aa94e",
 		"quickInput.list.focusBackground": "#d3142240",
 		"quickInputList.focusBackground": "#d3142240",
+		"settings.modifiedItemIndicator": "#d31422",
 		"selection.background": "#d3142240",
 		"statusBar.background": "#111111",
 		"statusBar.border": "#1e1e1e",

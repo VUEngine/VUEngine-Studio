@@ -28,6 +28,7 @@
 		"quickInput.list.focusBackground": "#d3142240",
 		"quickInputList.focusBackground": "#d3142240",
 		"selection.background": "#d3142240",
+		"settings.modifiedItemIndicator": "#d31422",
 		"statusBar.background": "#616161",
 		"statusBar.border": "#616161",
 		"statusBar.noFolderBackground": "#616161",

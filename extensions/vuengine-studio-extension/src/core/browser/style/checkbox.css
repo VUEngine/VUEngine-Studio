@@ -1,24 +1,48 @@
+.theia-settings-container .pref-content-container.boolean {
+    grid-template-columns: calc(2 * var(--theia-ui-font-size2) + var(--theia-ui-padding)) 1fr;
+}
+
 [type="checkbox"] {
+    -webkit-appearance: none;
     background-color: transparent;
-    margin: 0;
+    height: var(--theia-ui-font-size2);
+    line-height: var(--theia-ui-font-size2);
+    margin: 0 var(--theia-ui-padding) 0 0;
     outline: none;
     padding: 0;
-    -webkit-appearance: none;
+    position: relative;
+    width: calc(2 * var(--theia-ui-font-size2));
 }
 
 [type="checkbox"]::before {
-    font-size: 120%;
-    margin-right: var(--theia-ui-padding);
-    content: "\f096";
+    background-color: var(--theia-input-background);
+    border-radius: 10px;
+    content: '';
+    cursor: pointer;
     display: inline-block;
-    font-family: "FontAwesome";
-    text-align: left;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
+    height: var(--theia-ui-font-size2);
+    position: relative;
     vertical-align: bottom;
-    width: 1em;
+    width: calc(2 * var(--theia-ui-font-size2));
 }
 
 [type="checkbox"]:checked::before {
-    content: "\f046";
+    background-color: #d31422;
+}
+
+[type="checkbox"]::after {
+    aspect-ratio: 1;
+    background: var(--theia-editor-foreground);
+    border-radius: 50%;
+    content: '';
+    cursor: pointer;
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+}
+
+[type="checkbox"]:checked::after {
+    left: unset;
+    right: 0;
 }
