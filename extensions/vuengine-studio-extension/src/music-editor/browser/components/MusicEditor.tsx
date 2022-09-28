@@ -1,10 +1,10 @@
 import React from 'react';
-import { Instrument, Song, StepType, Track } from 'reactronica';
 import { ChannelConfig, MusicEditorStateApi, Notes } from '../ves-music-editor-types';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
 import Sidebar from './Sidebar/Sidebar';
 import * as Tone from 'tone';
+import MusicPlayer from './MusicPlayer';
 
 interface MusicEditorProps {
     name: string
@@ -16,6 +16,7 @@ interface MusicEditorProps {
     speed: number
     volume: number
     songNotes: (string | undefined)[][]
+    songLength: number
     sidebarTab: number
     defaultPatternSize: number
     stateApi: MusicEditorStateApi
@@ -45,32 +46,26 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
     }
 
     render(): JSX.Element {
-        /* setTimeout(() => {
-            this.setState({ currentStep: this.state.currentStep + 1 });
-        }, 500);*/
-
         const {
             name, bar, speed, volume,
-            channels, songNotes,
+            channels, songNotes, songLength,
             defaultPatternSize,
             sidebarTab, currentChannel, currentPattern, currentNote,
             stateApi,
         } = this.props;
 
         return <div className='musicEditor'>
-            <Song isPlaying={this.state.playing} bpm={speed} volume={volume}>
-                {songNotes.map((channelNotes, index) => (
-                    <Track
-                        key={`track-${index}`}
-                        steps={channelNotes as StepType[]}
-                        volume={volume}
-                        pan={0}
-                        onStepPlay={(s, i) => this.setState({ currentStep: i })}
-                    >
-                        <Instrument polyphony={1} type='synth' />
-                    </Track>
-                ))}
-            </Song>
+            <MusicPlayer
+                currentStep={this.state.currentStep}
+                playing={this.state.playing}
+                speed={60000 / speed}
+                notes={songNotes}
+                increaseCurrentStep={() => this.setState({
+                    currentStep: this.state.currentStep + 1 >= songLength
+                        ? 0
+                        : this.state.currentStep + 1
+                })}
+            />
             <div className='editor'>
                 <div className='toolbar'>
                     <button

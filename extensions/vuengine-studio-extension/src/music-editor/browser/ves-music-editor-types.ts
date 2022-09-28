@@ -71,8 +71,8 @@ export const Notes = [
 export const LOWEST_NOTE = 95; // C2;
 export const HIGHEST_NOTE = 12; // B8;
 
-export const MAX_SPEED = 300;
-export const MIN_SPEED = 60;
+export const MAX_SPEED = 4800;
+export const MIN_SPEED = 30;
 
 export const PATTERN_HEIGHT_FACTOR = 0.5;
 export const PATTERN_NOTE_WIDTH = 2;
