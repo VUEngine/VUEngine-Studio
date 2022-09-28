@@ -30,6 +30,7 @@ export interface MusicEditorStateApi {
     toggleChannelCollapsed: (channelId: number) => void,
     addToSequence: (channelId: number, patternId: number) => void,
     removeFromSequence: (channelId: number, index: number) => void,
+    moveSequencePattern: (channelId: number, from: number, to: number) => void,
     setPatternSize: (size: number) => void,
     setDefaultPatternSize: (size: number) => void,
     setSidebarTab: (tab: number) => void,
