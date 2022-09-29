@@ -2,7 +2,7 @@ import { nls } from '@theia/core';
 import React from 'react';
 import HContainer from '../../../../core/browser/components/HContainer';
 import VContainer from '../../../../core/browser/components/VContainer';
-import { HIGHEST_NOTE, LOWEST_NOTE, MusicEditorStateApi, Notes, PatternConfig, VOLUME_STEPS } from '../../ves-music-editor-types';
+import { HIGHEST_NOTE, LOWEST_NOTE, MusicEditorStateApi, Notes, PatternConfig, VOLUME_STEPS } from '../types';
 
 interface CurrentNoteProps {
     pattern: PatternConfig

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChannelConfig, MusicEditorStateApi } from '../../ves-music-editor-types';
+import { ChannelConfig, MusicEditorStateApi } from '../types';
 import StepIndicator from '../Sequencer/StepIndicator';
 import NoteProperties from './NoteProperties';
 import PianoRollEditor from './PianoRollEditor';
@@ -14,10 +14,11 @@ interface PianoRollProps {
     bar: number
     stateApi: MusicEditorStateApi
     playNote: (note: number) => void
+    setCurrentNote: (id: number) => void
 }
 
 export default function PianoRoll(props: PianoRollProps): JSX.Element {
-    const { currentNote, currentStep, currentChannel, currentPattern, channel, playing, bar, stateApi, playNote } = props;
+    const { currentNote, currentStep, currentChannel, currentPattern, channel, playing, bar, stateApi, playNote, setCurrentNote } = props;
     const pattern = channel.patterns[currentPattern];
 
     const classNames = ['pianoRoll'];
@@ -53,12 +54,14 @@ export default function PianoRoll(props: PianoRollProps): JSX.Element {
             pattern={pattern}
             stateApi={stateApi}
             playNote={playNote}
+            setCurrentNote={setCurrentNote}
         />
         <NoteProperties
             bar={bar}
             pattern={pattern}
             currentNote={currentNote}
             stateApi={stateApi}
+            setCurrentNote={setCurrentNote}
         />
     </div>;
 }

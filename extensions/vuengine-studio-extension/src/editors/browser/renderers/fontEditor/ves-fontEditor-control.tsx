@@ -1,7 +1,7 @@
 import { withJsonFormsControlProps } from '@jsonforms/react';
 import React from 'react';
-import FontEditor from './components/FontEditor';
-import { FontData } from './types';
+import FontEditor from '../../components/FontEditor/FontEditor';
+import { FontData } from '../../components/FontEditor/types';
 
 interface VesFontEditorControlProps {
     data: FontData;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { MusicEditorStateApi, PatternConfig } from '../../ves-music-editor-types';
+import { MusicEditorStateApi, PatternConfig } from '../types';
 import PianoRollKey from './PianoRollKey';
 import PianoRollNote from './PianoRollNote';
 
@@ -11,10 +11,11 @@ interface PianoRollRowProps {
     currentNote: number
     stateApi: MusicEditorStateApi
     playNote: (note: number) => void
+    setCurrentNote: (id: number) => void
 }
 
 export default function PianoRollRow(props: PianoRollRowProps): JSX.Element {
-    const { note, noteId, pattern, bar, currentNote, stateApi, playNote } = props;
+    const { note, noteId, pattern, bar, currentNote, stateApi, playNote, setCurrentNote } = props;
 
     const classNames = ['pianoRollRow'];
     if (note.startsWith('C') && note.length === 2) {
@@ -37,6 +38,7 @@ export default function PianoRollRow(props: PianoRollRowProps): JSX.Element {
                 set={pattern.notes[index] === noteId}
                 stateApi={stateApi}
                 playNote={playNote}
+                setCurrentNote={setCurrentNote}
             />
         ))}
     </div>;

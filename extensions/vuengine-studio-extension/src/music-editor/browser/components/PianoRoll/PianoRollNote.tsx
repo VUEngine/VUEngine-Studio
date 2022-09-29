@@ -1,5 +1,5 @@
 import React from 'react';
-import { MusicEditorStateApi, Notes } from '../../ves-music-editor-types';
+import { MusicEditorStateApi, Notes } from '../types';
 
 interface PianoRollNoteProps {
     index: number
@@ -9,10 +9,11 @@ interface PianoRollNoteProps {
     current: boolean
     stateApi: MusicEditorStateApi
     playNote: (note: number) => void
+    setCurrentNote: (id: number) => void
 }
 
 export default function PianoRollNote(props: PianoRollNoteProps): JSX.Element {
-    const { index, noteId, bar, current, set, stateApi, playNote } = props;
+    const { index, noteId, bar, current, set, stateApi, playNote, setCurrentNote } = props;
 
     const classNames = ['pianoRollNote'];
     if ((index + 1) % bar === 0) {
@@ -39,7 +40,7 @@ export default function PianoRollNote(props: PianoRollNoteProps): JSX.Element {
         className={classNames.join(' ')}
         onClick={() => {
             stateApi.setNote(index, noteId);
-            stateApi.setCurrentNote(index);
+            setCurrentNote(index);
             playNote(noteId);
         }}
         onContextMenu={() => stateApi.setNote(index, undefined)}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChannelConfig, MusicEditorStateApi, PatternConfig } from '../../ves-music-editor-types';
+import { ChannelConfig, MusicEditorStateApi, PatternConfig } from '../types';
 import TabInput from './TabInput';
 import TabInstruments from './TabInstruments';
 import TabNote from './TabNote';
@@ -19,11 +19,43 @@ interface SidebarProps {
     tab: number
     defaultPatternSize: number
     stateApi: MusicEditorStateApi
+    setName: (name: string) => void
+    setBar: (bar: number) => void
+    setSpeed: (speed: number) => void
+    setVolume: (volume: number) => void
+    setDefaultPatternSize: (size: number) => void
+    setCurrentChannel: (channel: number) => void
+    setCurrentPattern: (channel: number, pattern: number) => void
+    toggleChannelMuted: (channelId: number) => void
+    toggleChannelSolo: (channelId: number) => void
+    toggleChannelCollapsed: (channelId: number) => void
 }
 
 export default function Sidebar(props: SidebarProps): JSX.Element {
     const [collapsed, setCollapsed] = useState(false);
-    const { name, volume, speed, bar, channel, pattern, currentChannel, currentPattern, currentNote, tab, defaultPatternSize, stateApi } = props;
+    const { name,
+        volume,
+        speed,
+        bar,
+        channel,
+        pattern,
+        currentChannel,
+        currentPattern,
+        currentNote,
+        tab,
+        defaultPatternSize,
+        stateApi,
+        setName,
+        setBar,
+        setSpeed,
+        setVolume,
+        setDefaultPatternSize,
+        setCurrentChannel,
+        setCurrentPattern,
+        toggleChannelMuted,
+        toggleChannelSolo,
+        toggleChannelCollapsed,
+    } = props;
 
     return <>
         <div
@@ -74,6 +106,16 @@ export default function Sidebar(props: SidebarProps): JSX.Element {
                     currentChannel={currentChannel}
                     currentPattern={currentPattern}
                     defaultPatternSize={defaultPatternSize}
+                    setName={setName}
+                    setBar={setBar}
+                    setSpeed={setSpeed}
+                    setVolume={setVolume}
+                    setDefaultPatternSize={setDefaultPatternSize}
+                    setCurrentChannel={setCurrentChannel}
+                    setCurrentPattern={setCurrentPattern}
+                    toggleChannelMuted={toggleChannelMuted}
+                    toggleChannelSolo={toggleChannelSolo}
+                    toggleChannelCollapsed={toggleChannelCollapsed}
                     stateApi={stateApi}
                 />}
                 {tab === 1 && <TabNote

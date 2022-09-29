@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChannelConfig, HIGHEST_NOTE, LOWEST_NOTE, MusicEditorStateApi, Notes } from '../../ves-music-editor-types';
+import { ChannelConfig, HIGHEST_NOTE, LOWEST_NOTE, MusicEditorStateApi, Notes } from '../types';
 import AddPattern from './AddPattern';
 import ChannelHeader from './ChannelHeader';
 import Pattern from './Pattern';
@@ -11,6 +11,11 @@ interface ChannelProps {
     number: number
     otherSolo: boolean
     stateApi: MusicEditorStateApi
+    setCurrentChannel: (id: number) => void
+    setCurrentPattern: (channelId: number, patternId: number) => void
+    toggleChannelMuted: (channelId: number) => void
+    toggleChannelSolo: (channelId: number) => void
+    toggleChannelCollapsed: (channelId: number) => void
 }
 
 export default function Channel(props: ChannelProps): JSX.Element {
@@ -22,7 +27,12 @@ export default function Channel(props: ChannelProps): JSX.Element {
         currentPattern,
         number,
         otherSolo,
-        stateApi
+        stateApi,
+        setCurrentChannel,
+        setCurrentPattern,
+        toggleChannelMuted,
+        toggleChannelSolo,
+        toggleChannelCollapsed,
     } = props;
 
     const classNames = ['channel'];
@@ -48,7 +58,7 @@ export default function Channel(props: ChannelProps): JSX.Element {
     return channelConfig.collapsed
         ? <div
             className='collapsedChannel'
-            onClick={() => stateApi.toggleChannelCollapsed(number)}
+            onClick={() => toggleChannelCollapsed(number)}
         />
         : <div className={classNames.join(' ')}>
             <ChannelHeader
@@ -56,7 +66,9 @@ export default function Channel(props: ChannelProps): JSX.Element {
                 number={number}
                 muted={channelConfig.muted}
                 solo={channelConfig.solo}
-                stateApi={stateApi}
+                setCurrentChannel={setCurrentChannel}
+                toggleChannelMuted={toggleChannelMuted}
+                toggleChannelSolo={toggleChannelSolo}
             />
             {channelConfig.sequence.map((patternId, index) =>
                 <Pattern
@@ -71,6 +83,7 @@ export default function Channel(props: ChannelProps): JSX.Element {
                     stateApi={stateApi}
                     dragged={dragged}
                     setDragged={setDragged}
+                    setCurrentPattern={setCurrentPattern}
                 />)}
             <AddPattern
                 channel={channelConfig}
@@ -79,7 +92,7 @@ export default function Channel(props: ChannelProps): JSX.Element {
             />
             <div
                 className='patternFill'
-                onClick={() => stateApi.setCurrentChannel(number)}
+                onClick={() => setCurrentChannel(number)}
             ></div>
         </div>;
 }

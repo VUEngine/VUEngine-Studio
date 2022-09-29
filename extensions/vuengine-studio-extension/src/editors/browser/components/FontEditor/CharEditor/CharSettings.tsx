@@ -1,6 +1,6 @@
 import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React from 'react';
-import { CHAR_PIXEL_SIZE, MAX_CHAR_SIZE, MIN_CHAR_SIZE, MIN_VARIABLE_CHAR_SIZE, Size, VariableSize } from '../../types';
+import { CHAR_PIXEL_SIZE, MAX_CHAR_SIZE, MIN_CHAR_SIZE, MIN_VARIABLE_CHAR_SIZE, Size, VariableSize } from '../types';
 
 interface CharSettingsProps {
     currentCharacter: number

@@ -1,15 +1,26 @@
 import React from 'react';
 import HContainer from '../../../../core/browser/components/HContainer';
 import VContainer from '../../../../core/browser/components/VContainer';
-import { ChannelConfig, MusicEditorStateApi, VOLUME_STEPS } from '../../ves-music-editor-types';
+import { ChannelConfig, MusicEditorStateApi, VOLUME_STEPS } from '../types';
 
 interface CurrentChannelProps {
     channel: ChannelConfig
     stateApi: MusicEditorStateApi
+    setCurrentChannel: (channel: number) => void
+    toggleChannelMuted: (channelId: number) => void
+    toggleChannelSolo: (channelId: number) => void
+    toggleChannelCollapsed: (channelId: number) => void
 }
 
 export default function CurrentChannel(props: CurrentChannelProps): JSX.Element {
-    const { channel, stateApi } = props;
+    const {
+        channel,
+        setCurrentChannel,
+        stateApi,
+        toggleChannelMuted,
+        toggleChannelSolo,
+        toggleChannelCollapsed,
+    } = props;
 
     return <div className='section currentChannel'>
         <VContainer>
@@ -17,7 +28,7 @@ export default function CurrentChannel(props: CurrentChannelProps): JSX.Element 
             <select
                 className='theia-select'
                 value={channel.id}
-                onChange={e => stateApi.setCurrentChannel(parseInt(e.target.value))}
+                onChange={e => setCurrentChannel(parseInt(e.target.value))}
             >
                 {[...Array(6)].map((n, i) => (
                     <option key={`select-channel-${i}`} value={i}>{i + 1}</option>
@@ -59,7 +70,7 @@ export default function CurrentChannel(props: CurrentChannelProps): JSX.Element 
                 <input
                     type='checkbox'
                     checked={channel.collapsed}
-                    onChange={() => stateApi.toggleChannelCollapsed(channel.id)}
+                    onChange={() => toggleChannelCollapsed(channel.id)}
                 />
                 Collapsed
             </label>
@@ -67,7 +78,7 @@ export default function CurrentChannel(props: CurrentChannelProps): JSX.Element 
                 <input
                     type='checkbox'
                     checked={channel.muted}
-                    onChange={() => stateApi.toggleChannelMuted(channel.id)}
+                    onChange={() => toggleChannelMuted(channel.id)}
                 />
                 Muted
             </label>
@@ -75,7 +86,7 @@ export default function CurrentChannel(props: CurrentChannelProps): JSX.Element 
                 <input
                     type='checkbox'
                     checked={channel.solo}
-                    onChange={() => stateApi.toggleChannelSolo(channel.id)}
+                    onChange={() => toggleChannelSolo(channel.id)}
                 />
                 Solo
             </label>

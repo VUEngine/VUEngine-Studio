@@ -1,6 +1,6 @@
 import { nls } from '@theia/core';
 import React from 'react';
-import { MusicEditorStateApi, PatternConfig } from '../../ves-music-editor-types';
+import { MusicEditorStateApi, PatternConfig } from '../types';
 
 interface PianoRollHeaderProps {
     pattern: PatternConfig

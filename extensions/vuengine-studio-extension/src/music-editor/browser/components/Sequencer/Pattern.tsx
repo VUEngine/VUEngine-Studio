@@ -1,6 +1,6 @@
 import { nls } from '@theia/core';
 import React from 'react';
-import { HIGHEST_NOTE, LOWEST_NOTE, MusicEditorStateApi, PatternConfig, PATTERN_NOTE_HEIGHT, PATTERN_NOTE_WIDTH } from '../../ves-music-editor-types';
+import { HIGHEST_NOTE, LOWEST_NOTE, MusicEditorStateApi, PatternConfig, PATTERN_NOTE_HEIGHT, PATTERN_NOTE_WIDTH } from '../types';
 
 interface PatternProps {
     index: number
@@ -13,6 +13,7 @@ interface PatternProps {
     stateApi: MusicEditorStateApi
     dragged: boolean
     setDragged: (dragged: boolean) => void
+    setCurrentPattern: (channelId: number, patternId: number) => void
 }
 
 export default function Pattern(props: PatternProps): JSX.Element {
@@ -26,7 +27,8 @@ export default function Pattern(props: PatternProps): JSX.Element {
         currentPattern,
         stateApi,
         dragged,
-        setDragged
+        setDragged,
+        setCurrentPattern,
     } = props;
 
     const classNames = ['pattern'];
@@ -90,7 +92,7 @@ export default function Pattern(props: PatternProps): JSX.Element {
         }}
         data-channel={channel}
         data-position={index}
-        onClick={() => stateApi.setCurrentPattern(channel, patternId)}
+        onClick={() => setCurrentPattern(channel, patternId)}
         draggable={true}
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
