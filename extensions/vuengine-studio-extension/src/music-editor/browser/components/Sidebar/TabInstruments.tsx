@@ -1,5 +1,5 @@
 import React from 'react';
-import { MusicEditorStateApi, PatternConfig } from '../../ves-music-editor-types';
+import { MusicEditorStateApi, PatternConfig } from '../types';
 
 interface TabInstrumentsProps {
     pattern: PatternConfig | boolean

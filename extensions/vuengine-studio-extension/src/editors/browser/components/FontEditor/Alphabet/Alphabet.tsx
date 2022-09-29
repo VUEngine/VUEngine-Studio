@@ -1,5 +1,5 @@
 import React from 'react';
-import { MAX_CHAR_COUNT, VariableSize } from '../../types';
+import { MAX_CHAR_COUNT, VariableSize } from '../types';
 import AlphabetChar from './AlphabetChar';
 
 interface AlphabetProps {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { win1252CharNames } from '../../types';
+import { win1252CharNames } from '../types';
 
 interface CurrentCharInfoProps {
     currentCharacter: number

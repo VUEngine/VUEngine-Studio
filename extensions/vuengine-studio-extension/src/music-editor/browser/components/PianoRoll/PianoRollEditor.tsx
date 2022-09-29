@@ -1,5 +1,5 @@
 import React from 'react';
-import { HIGHEST_NOTE, LOWEST_NOTE, MusicEditorStateApi, Notes, PatternConfig } from '../../ves-music-editor-types';
+import { HIGHEST_NOTE, LOWEST_NOTE, MusicEditorStateApi, Notes, PatternConfig } from '../types';
 import PianoRollRow from './PianoRollRow';
 
 interface PianoRollEditorProps {
@@ -8,10 +8,11 @@ interface PianoRollEditorProps {
     pattern: PatternConfig
     stateApi: MusicEditorStateApi
     playNote: (note: number) => void
+    setCurrentNote: (id: number) => void
 }
 
 export default function PianoRollEditor(props: PianoRollEditorProps): JSX.Element {
-    const { bar, currentNote, pattern, stateApi, playNote } = props;
+    const { bar, currentNote, pattern, stateApi, playNote, setCurrentNote } = props;
 
     const classNames = ['pianoRollEditor'];
 
@@ -27,6 +28,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): JSX.Elemen
                 currentNote={currentNote}
                 stateApi={stateApi}
                 playNote={playNote}
+                setCurrentNote={setCurrentNote}
             />)}
     </div>;
 }

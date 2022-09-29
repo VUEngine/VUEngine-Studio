@@ -1,40 +1,25 @@
-export interface vesMusicEditorWidgetState {
-    name: string
-    channels: ChannelConfig[],
-    instruments: InstrumentConfig[],
-    currentChannel: number,
-    currentPattern: number,
-    currentNote: number,
-    speed: number
-    volume: number
-    bar: number
-    defaultPatternSize: number
-    sidebarTab: number
-};
-
 export interface MusicEditorStateApi {
-    setName: (name: string) => void,
-    setBar: (bar: number) => void,
-    setSpeed: (speed: number) => void,
-    setVolume: (volume: number) => void,
     setChannels: (channels: ChannelConfig[]) => void,
     setChannelVolume: (volume: number) => void,
     setPatterns: (channelId: number, patterns: PatternConfig[]) => void,
-    setCurrentChannel: (id: number) => void,
-    setCurrentPattern: (channel: number, pattern: number) => void,
-    setCurrentNote: (id: number) => void,
     setNote: (noteIndex: number, note: number | undefined) => void,
     setVolumeL: (noteIndex: number, volume: number | undefined) => void,
     setVolumeR: (noteIndex: number, volume: number | undefined) => void,
-    toggleChannelMuted: (channelId: number) => void,
-    toggleChannelSolo: (channelId: number) => void,
-    toggleChannelCollapsed: (channelId: number) => void,
     addToSequence: (channelId: number, patternId: number) => void,
     removeFromSequence: (channelId: number, index: number) => void,
     moveSequencePattern: (channelId: number, from: number, to: number) => void,
     setPatternSize: (size: number) => void,
-    setDefaultPatternSize: (size: number) => void,
     setSidebarTab: (tab: number) => void,
+}
+
+export interface SongData {
+    name: string
+    channels: ChannelConfig[],
+    instruments: InstrumentConfig[],
+    speed: number
+    volume: number
+    bar: number
+    defaultPatternSize: number,
 }
 
 export interface PatternConfig {
@@ -86,7 +71,7 @@ export const PATTERN_NOTE_WIDTH = 2;
 export const VOLUME_STEPS = 16;
 export const PATTERN_SIZES = [8, 16, 32, 64];
 
-export const MUSIC_EDITOR_STATE_TEMPLATE = {
+export const MUSIC_EDITOR_SONG_TEMPLATE: SongData = {
     name: 'New',
     channels: [...Array(6)].map((c, index) => ({
         id: index,
@@ -108,12 +93,8 @@ export const MUSIC_EDITOR_STATE_TEMPLATE = {
     instruments: [{
         name: 'Synth'
     }],
-    currentChannel: 0,
-    currentPattern: 0,
-    currentNote: -1,
     speed: 300,
     volume: 50,
     bar: 4,
     defaultPatternSize: 32,
-    sidebarTab: 0
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { PALETTE_COLORS, VariableSize, win1252CharNames } from '../../types';
+import { PALETTE_COLORS, VariableSize, win1252CharNames } from '../types';
 
 interface AlphabetCharProps {
     line: number

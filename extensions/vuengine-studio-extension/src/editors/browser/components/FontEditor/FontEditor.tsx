@@ -18,7 +18,7 @@ import {
     MIN_VARIABLE_CHAR_SIZE,
     Size,
     VariableSize
-} from '../types';
+} from './types';
 import Actions from './Tools/Actions';
 import Alphabet from './Alphabet/Alphabet';
 import AlphabetSettings from './Alphabet/AlphabetSettings';

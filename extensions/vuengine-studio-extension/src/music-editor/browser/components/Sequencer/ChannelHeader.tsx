@@ -1,12 +1,14 @@
 import React from 'react';
-import { ChannelConfig, MusicEditorStateApi } from '../../ves-music-editor-types';
+import { ChannelConfig } from '../types';
 
 interface ChannelHeaderProps {
     channel: ChannelConfig
     number: number
     muted: boolean
     solo: boolean
-    stateApi: MusicEditorStateApi
+    setCurrentChannel: (id: number) => void
+    toggleChannelMuted: (channelId: number) => void
+    toggleChannelSolo: (channelId: number) => void
 }
 
 export default function ChannelHeader(props: ChannelHeaderProps): JSX.Element {
@@ -15,7 +17,9 @@ export default function ChannelHeader(props: ChannelHeaderProps): JSX.Element {
         number,
         muted,
         solo,
-        stateApi,
+        setCurrentChannel,
+        toggleChannelMuted,
+        toggleChannelSolo,
     } = props;
 
     const classNames = ['channelHeader'];
@@ -23,7 +27,7 @@ export default function ChannelHeader(props: ChannelHeaderProps): JSX.Element {
     return <div className={classNames.join(' ')}>
         <div
             className='channelInfo'
-            onClick={() => stateApi.setCurrentChannel(number)}
+            onClick={() => setCurrentChannel(number)}
         >
             <div className='channelName'>Channel {number + 1}</div>
             <div className='channelInstrument'>Synth</div>
@@ -34,13 +38,13 @@ export default function ChannelHeader(props: ChannelHeaderProps): JSX.Element {
         <div className='channelButtons'>
             <div
                 className={`channelButton ${muted ? 'active' : ''}`}
-                onClick={() => stateApi.toggleChannelMuted(number)}
+                onClick={() => toggleChannelMuted(number)}
             >
                 <i className={`fa fa-volume-${muted ? 'off' : 'up'}`} />
             </div>
             <div
                 className={`channelButton ${solo ? 'active' : ''}`}
-                onClick={() => stateApi.toggleChannelSolo(number)}
+                onClick={() => toggleChannelSolo(number)}
             >
                 <i className={`fa fa-star${solo ? '' : '-o'}`} />
             </div>

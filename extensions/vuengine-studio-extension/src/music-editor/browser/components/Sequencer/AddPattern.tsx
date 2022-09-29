@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChannelConfig, MusicEditorStateApi } from '../../ves-music-editor-types';
+import { ChannelConfig, MusicEditorStateApi } from '../types';
 
 interface AddPatternProps {
     channel: ChannelConfig
