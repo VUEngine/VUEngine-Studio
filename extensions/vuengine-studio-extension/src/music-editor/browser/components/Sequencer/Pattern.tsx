@@ -1,6 +1,6 @@
 import { nls } from '@theia/core';
 import React from 'react';
-import { HIGHEST_NOTE, LOWEST_NOTE, MusicEditorStateApi, PatternConfig, PATTERN_HEIGHT_FACTOR, PATTERN_NOTE_WIDTH } from '../../ves-music-editor-types';
+import { HIGHEST_NOTE, LOWEST_NOTE, MusicEditorStateApi, PatternConfig, PATTERN_NOTE_HEIGHT, PATTERN_NOTE_WIDTH } from '../../ves-music-editor-types';
 
 interface PatternProps {
     index: number
@@ -40,7 +40,7 @@ export default function Pattern(props: PatternProps): JSX.Element {
             && note >= HIGHEST_NOTE
             && note <= LOWEST_NOTE) {
             boxShadow.push(
-                `${(i + 1) * PATTERN_NOTE_WIDTH}px ${(note - HIGHEST_NOTE) * PATTERN_HEIGHT_FACTOR}px 0 0 #f00`
+                `${(i + 1) * PATTERN_NOTE_WIDTH}px ${(note - HIGHEST_NOTE) * PATTERN_NOTE_HEIGHT}px 0 0 #f00`
             );
         }
     });
@@ -84,7 +84,7 @@ export default function Pattern(props: PatternProps): JSX.Element {
     return <div
         className={classNames.join(' ')}
         style={{
-            height: `${height * PATTERN_HEIGHT_FACTOR}px`,
+            height: `${height * PATTERN_NOTE_HEIGHT}px`,
             minWidth: `${(pattern.size * PATTERN_NOTE_WIDTH) - 1}px`,
             width: `${(pattern.size * PATTERN_NOTE_WIDTH) - 1}px`
         }}

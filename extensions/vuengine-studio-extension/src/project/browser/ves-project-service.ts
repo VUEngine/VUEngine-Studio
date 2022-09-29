@@ -187,9 +187,9 @@ export class VesProjectService {
     let workspaceProjectFileData: ProjectFile = {};
     this.workspaceProjectFileUri = this.workspaceService.workspace?.resource;
     if (this.workspaceProjectFileUri) {
-      const workspaceProjectFolderUri = this.workspaceProjectFileUri;
-      this.workspaceProjectFileUri = undefined;
       if (this.workspaceService.workspace?.isDirectory) {
+        const workspaceProjectFolderUri = this.workspaceProjectFileUri;
+        this.workspaceProjectFileUri = undefined;
         const projectFiles = await this.vesGlobService.find(
           await this.fileService.fsPath(workspaceProjectFolderUri),
           `*.${VUENGINE_EXT}`

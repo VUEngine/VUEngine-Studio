@@ -84,7 +84,7 @@ export default function Song(props: SongProps): JSX.Element {
                 onChange={e => stateApi.setDefaultPatternSize(parseInt(e.target.value))}
             >
                 {PATTERN_SIZES.map(size =>
-                    <option value={size}>{size}</option>
+                    <option key={`default-pattern-size-option-${size}`} value={size}>{size}</option>
                 )}
             </select>
         </VContainer>
