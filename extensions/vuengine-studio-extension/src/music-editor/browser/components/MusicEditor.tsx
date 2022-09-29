@@ -96,12 +96,6 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                     </button>
                     <button
                         className={'theia-button secondary large'}
-                        title='Configure Input Devices'
-                    >
-                        <i className='fa fa-keyboard-o' />
-                    </button>
-                    <button
-                        className={'theia-button secondary large'}
                         title='Import'
                     >
                         <i className='fa fa-download' />

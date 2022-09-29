@@ -11,6 +11,10 @@
     flex-grow: 1;
 }
 
+.musicEditor .pianoRoll.size-8 .notePropertiesNote {
+    width: calc((100% - 77px) / 8);
+}
+
 .musicEditor .pianoRoll.size-16 .notePropertiesNote {
     width: calc((100% - 77px) / 16);
 }
@@ -33,7 +37,7 @@
 }
 
 .musicEditor .notePropertiesNote.nth {
-    margin-right: 2px;
+    margin-right: 3px;
 }
 
 .musicEditor .notePropertiesNote .effects {

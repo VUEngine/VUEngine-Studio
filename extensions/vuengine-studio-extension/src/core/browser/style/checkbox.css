@@ -26,6 +26,11 @@
     width: calc(2 * var(--theia-ui-font-size2));
 }
 
+[type="checkbox"]:active::before,
+[type="checkbox"]:focus::before {
+    outline: 1px solid var(--theia-button-background)
+}
+
 [type="checkbox"]:checked::before {
     background-color: #d31422;
 }

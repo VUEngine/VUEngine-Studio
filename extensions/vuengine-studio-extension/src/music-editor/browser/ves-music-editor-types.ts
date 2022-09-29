@@ -1,6 +1,7 @@
 export interface vesMusicEditorWidgetState {
     name: string
     channels: ChannelConfig[],
+    instruments: number[],
     currentChannel: number,
     currentPattern: number,
     currentNote: number,
@@ -47,12 +48,17 @@ export interface PatternConfig {
 export interface ChannelConfig {
     id: number
     name: string,
+    instrument: number,
     sequence: number[],
     patterns: PatternConfig[],
     volume: number,
     muted: boolean,
     solo: boolean,
     collapsed: boolean
+}
+
+export interface InstrumentConfig {
+    name: string,
 }
 
 export const Notes = [
@@ -78,12 +84,14 @@ export const PATTERN_HEIGHT_FACTOR = 0.5;
 export const PATTERN_NOTE_WIDTH = 2;
 
 export const VOLUME_STEPS = 16;
+export const PATTERN_SIZES = [8, 16, 32, 64];
 
 export const MUSIC_EDITOR_STATE_TEMPLATE = {
     name: 'New',
     channels: [...Array(6)].map((c, index) => ({
         id: index,
         name: '',
+        instrument: 0,
         sequence: index === 0 ? [0, 0] : [],
         patterns: index === 0 ? [{
             size: 16,
@@ -97,6 +105,9 @@ export const MUSIC_EDITOR_STATE_TEMPLATE = {
         solo: false,
         collapsed: false,
     })),
+    instruments: [{
+        name: 'Synth'
+    }],
     currentChannel: 0,
     currentPattern: 0,
     currentNote: -1,

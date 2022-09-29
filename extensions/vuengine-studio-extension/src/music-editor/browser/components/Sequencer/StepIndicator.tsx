@@ -16,7 +16,7 @@ export default function StepIndicator(props: StepIndicatorProps): JSX.Element {
 
     let offset = '';
     if (pianoRollSize) {
-        offset = `calc(75px + (${currentStep} / ${pianoRollSize} * calc(100% - 77px - 10px)))`;
+        offset = `calc(75px + (${currentStep} / ${pianoRollSize} * calc(100% - 78px - 10px)))`;
     } else {
         offset = `${75 + currentStep * 2}px`;
     }
