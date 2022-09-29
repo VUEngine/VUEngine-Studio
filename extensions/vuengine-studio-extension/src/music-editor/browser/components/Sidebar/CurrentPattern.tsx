@@ -34,7 +34,7 @@ export default function CurrentPattern(props: CurrentPatternProps): JSX.Element 
                 onChange={e => stateApi.setPatternSize(parseInt(e.target.value))}
             >
                 {PATTERN_SIZES.map(size =>
-                    <option value={size}>{size}</option>
+                    <option key={`current-pattern-size-option-${size}`} value={size}>{size}</option>
                 )}
             </select>
         </VContainer>
