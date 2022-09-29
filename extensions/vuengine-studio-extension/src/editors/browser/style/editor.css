@@ -87,5 +87,6 @@
 
 .theia-tree-editor.form-only>.p-SplitPanel>.theia-tree-editor-form {
   left: 0 !important;
+  padding: 0;
   width: 100% !important;
 }

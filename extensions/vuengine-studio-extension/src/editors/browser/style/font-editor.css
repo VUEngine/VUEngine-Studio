@@ -1,0 +1,479 @@
+.font-editor .editor {
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
+}
+
+.font-editor .editor>div {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.font-editor .editor .tools-column {
+  text-align: center;
+  width: 80px;
+}
+
+.font-editor .editor .editor-column {
+  min-width: 400px;
+}
+
+/* Character Table */
+
+.font-editor.width-8.height-24 .editor .alphabet-column .font-properties,
+.font-editor.width-8.height-32 .editor .alphabet-column .font-properties,
+.font-editor.width-8.height-24 .editor .characters,
+.font-editor.width-8.height-32 .editor .characters {
+  width: calc(16 * (8px + 2px));
+}
+
+.font-editor.width-8.height-8 .editor .alphabet-column .font-properties,
+.font-editor.width-8.height-16 .editor .alphabet-column .font-properties,
+.font-editor.width-16.height-24 .editor .alphabet-column .font-properties,
+.font-editor.width-16.height-32 .editor .alphabet-column .font-properties,
+.font-editor.width-8.height-8 .editor .characters,
+.font-editor.width-8.height-16 .editor .characters,
+.font-editor.width-16.height-24 .editor .characters,
+.font-editor.width-16.height-32 .editor .characters {
+  width: calc(16 * (16px + 2px));
+}
+
+.font-editor.width-24 .editor .alphabet-column .font-properties,
+.font-editor.width-24 .editor .characters {
+  width: calc(16 * (24px + 2px));
+}
+
+.font-editor.width-16.height-8 .editor .alphabet-column .font-properties,
+.font-editor.width-16.height-16 .editor .alphabet-column .font-properties,
+.font-editor.width-32 .editor .alphabet-column .font-properties,
+.font-editor.width-16.height-8 .editor .characters,
+.font-editor.width-16.height-16 .editor .characters,
+.font-editor.width-32 .editor .characters {
+  width: calc(16 * (32px + 2px));
+}
+
+.font-editor .editor .characters .character {
+  border: 1px solid var(--theia-editor-background);
+  color: var(--theia-input-background);
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 8px;
+  float: left;
+  height: 16px;
+  text-align: center;
+  width: 16px;
+}
+
+.font-editor .editor .characters .line:nth-child(8) .character {
+  margin-bottom: 6px;
+}
+
+.font-editor .editor .characters .character:before {
+  position: relative;
+  top: -12px;
+}
+
+.font-editor.width-8.height-8 .editor .characters .character {
+  height: 16px;
+  width: 16px;
+}
+
+.font-editor.width-8.height-16 .editor .characters .character,
+.font-editor.width-16.height-32 .editor .characters .character {
+  height: 32px;
+  width: 16px;
+}
+
+.font-editor.width-8.height-24 .editor .characters .character {
+  height: 24px;
+  width: 8px;
+}
+
+.font-editor.width-8.height-32 .editor .characters .character {
+  height: 32px;
+  width: 8px;
+}
+
+.font-editor.width-16.height-8 .editor .characters .character,
+.font-editor.width-32.height-16 .editor .characters .character {
+  height: 16px;
+  width: 32px;
+}
+
+.font-editor.width-16.height-24 .editor .characters .character {
+  height: 24px;
+  width: 16px;
+}
+
+.font-editor.width-24.height-8 .editor .characters .character {
+  height: 8px;
+  width: 24px;
+}
+
+.font-editor.width-24.height-16 .editor .characters .character {
+  height: 16px;
+  width: 24px;
+}
+
+.font-editor.width-24.height-24 .editor .characters .character {
+  height: 24px;
+  width: 24px;
+}
+
+.font-editor.width-24.height-32 .editor .characters .character {
+  height: 32px;
+  width: 24px;
+}
+
+.font-editor.width-32.height-8 .editor .characters .character {
+  height: 8px;
+  width: 32px;
+}
+
+.font-editor.width-32.height-24 .editor .characters .character {
+  height: 24px;
+  width: 32px;
+}
+
+.font-editor.width-16.height-16 .editor .characters .character,
+.font-editor.width-32.height-32 .editor .characters .character {
+  height: 32px;
+  width: 32px;
+}
+
+.font-editor .editor .characters .header {
+  align-items: center;
+  background-color: transparent;
+  display: flex;
+  justify-content: center;
+}
+
+.font-editor .editor .characters .character:hover,
+.font-editor .editor .characters .character.active {
+  border-color: var(--theia-editor-foreground);
+}
+
+.font-editor .editor .characters .character.inactive {
+  cursor: not-allowed;
+  opacity: .1;
+}
+
+.font-editor .editor .characters .character div {
+  margin: -2px 0 0 -2px;
+  height: 2px;
+  width: 2px;
+}
+
+/* Current Character */
+
+.font-editor .editor .current-character {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.font-editor .editor .current-character .line {
+  display: flex;
+  gap: 1px;
+}
+
+.font-editor .editor .current-character .pixel {
+  aspect-ratio: 1;
+  border: 1px solid transparent;
+  cursor: crosshair;
+  display: flex;
+  flex-grow: 1;
+  min-width: 16px;
+  position: relative;
+}
+
+.font-editor .editor .current-character .line.inactive .pixel,
+.font-editor .editor .current-character .pixel.inactive {
+  cursor: not-allowed;
+  opacity: .1;
+}
+
+.font-editor .editor .current-character .pixel:hover {
+  border-color: var(--theia-editor-foreground);
+}
+
+.font-editor .editor .current-character .pixel:after,
+.font-editor .editor .current-character .pixel:before {
+  align-items: center;
+  color: var(--theia-input-background);
+  display: flex;
+  font-family: monospace;
+  font-size: 8px;
+  left: 0;
+  justify-content: center;
+  position: absolute;
+  right: 0;
+  top: -14px;
+}
+
+.font-editor .editor .current-character .pixel:before {
+  bottom: 0;
+  left: -14px;
+  right: unset;
+  top: 0;
+}
+
+.font-editor .editor .current-character .line:nth-child(1) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(1):after {
+  content: '0'
+}
+
+.font-editor .editor .current-character .line:nth-child(2) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(2):after {
+  content: '1'
+}
+
+.font-editor .editor .current-character .line:nth-child(3) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(3):after {
+  content: '2'
+}
+
+.font-editor .editor .current-character .line:nth-child(4) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(4):after {
+  content: '3'
+}
+
+.font-editor .editor .current-character .line:nth-child(5) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(5):after {
+  content: '4'
+}
+
+.font-editor .editor .current-character .line:nth-child(6) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(6):after {
+  content: '5'
+}
+
+.font-editor .editor .current-character .line:nth-child(7) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(7):after {
+  content: '6'
+}
+
+.font-editor .editor .current-character .line:nth-child(8) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(8):after {
+  content: '7'
+}
+
+.font-editor .editor .current-character .line:nth-child(9) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(9):after {
+  content: '8'
+}
+
+.font-editor .editor .current-character .line:nth-child(10) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(10):after {
+  content: '9'
+}
+
+.font-editor .editor .current-character .line:nth-child(11) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(11):after {
+  content: 'A'
+}
+
+.font-editor .editor .current-character .line:nth-child(12) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(12):after {
+  content: 'B'
+}
+
+.font-editor .editor .current-character .line:nth-child(13) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(13):after {
+  content: 'C'
+}
+
+.font-editor .editor .current-character .line:nth-child(14) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(14):after {
+  content: 'D'
+}
+
+.font-editor .editor .current-character .line:nth-child(15) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(15):after {
+  content: 'E'
+}
+
+.font-editor .editor .current-character .line:nth-child(16) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(16):after {
+  content: 'F'
+}
+
+.font-editor .editor .current-character .line:nth-child(17) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(17):after {
+  content: '10'
+}
+
+.font-editor .editor .current-character .line:nth-child(18) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(18):after {
+  content: '11'
+}
+
+.font-editor .editor .current-character .line:nth-child(19) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(19):after {
+  content: '12'
+}
+
+.font-editor .editor .current-character .line:nth-child(20) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(20):after {
+  content: '13'
+}
+
+.font-editor .editor .current-character .line:nth-child(21) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(21):after {
+  content: '14'
+}
+
+.font-editor .editor .current-character .line:nth-child(22) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(22):after {
+  content: '15'
+}
+
+.font-editor .editor .current-character .line:nth-child(23) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(23):after {
+  content: '16'
+}
+
+.font-editor .editor .current-character .line:nth-child(24) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(24):after {
+  content: '17'
+}
+
+.font-editor .editor .current-character .line:nth-child(25) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(25):after {
+  content: '18'
+}
+
+.font-editor .editor .current-character .line:nth-child(26) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(26):after {
+  content: '19'
+}
+
+.font-editor .editor .current-character .line:nth-child(27) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(27):after {
+  content: '1A'
+}
+
+.font-editor .editor .current-character .line:nth-child(28) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(28):after {
+  content: '1B'
+}
+
+.font-editor .editor .current-character .line:nth-child(29) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(29):after {
+  content: '1C'
+}
+
+.font-editor .editor .current-character .line:nth-child(30) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(30):after {
+  content: '1D'
+}
+
+.font-editor .editor .current-character .line:nth-child(31) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(31):after {
+  content: '1E'
+}
+
+.font-editor .editor .current-character .line:nth-child(32) .pixel:first-child:before,
+.font-editor .editor .current-character .line:first-child .pixel:nth-child(32):after {
+  content: '1F'
+}
+
+/* Colors */
+
+.font-editor .color-0 {
+  background-color: #000;
+}
+
+.font-editor .color-1 {
+  background-color: #500;
+}
+
+.font-editor .color-2 {
+  background-color: #a00;
+}
+
+.font-editor .color-3 {
+  background-color: #f00;
+}
+
+/* Font Properties */
+
+.font-editor .font-properties {
+  align-items: baseline;
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.font-editor .font-properties>div {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: 6px;
+}
+
+.font-editor .font-properties .character-size {
+  align-items: baseline;
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+}
+
+.font-editor .font-properties .character-size input {
+  flex-grow: 1;
+}
+
+/* Tools */
+
+.font-editor .tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.font-editor .tools button {
+  height: 24px;
+  margin: 0;
+  min-width: unset;
+  width: calc(50% - 1px);
+}
+
+.font-editor .tools button.full-width {
+  width: 100%;
+}
+
+/* Palette */
+
+.font-editor .palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.font-editor .palette div {
+  align-items: center;
+  aspect-ratio: 1;
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: flex;
+  font-size: var(--theia-ui-font-size1);
+  justify-content: center;
+  width: calc(50% - 3px);
+}
+
+.font-editor .palette div.active {
+  border-color: var(--theia-editor-foreground);
+}
+
+/* Current Character Meta */
+
+.font-editor .current-character-info input {
+  box-sizing: border-box;
+  margin-bottom: 5px;
+  margin-top: 21px;
+  padding-right: 6px;
+  text-align: center;
+  width: 100%;
+}
