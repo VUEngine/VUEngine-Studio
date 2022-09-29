@@ -8,7 +8,7 @@
     justify-content: end;
     margin-right: 1px;
     overflow: hidden;
-    padding: 3px 5px;
+    padding: 3px;
     position: relative;
 }
 
@@ -36,8 +36,10 @@
     display: none;
     font-size: 13px;
     position: absolute;
-    right: 4px;
-    top: 1px;
+    right: 0;
+    text-align: center;
+    top: 0;
+    width: 12px;
 }
 
 .musicEditor .pattern .remove:hover {
@@ -56,9 +58,11 @@
 }
 
 .musicEditor .pattern.dragOver {
+    border: 1px dashed #d31422;
     border-left: 4px solid #d31422;
 }
 
 .musicEditor .pattern.dragOver .notes {
     left: -4px;
+    top: -1px;
 }

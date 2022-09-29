@@ -8,7 +8,7 @@
     cursor: pointer;
     display: flex;
     font-size: 8px;
-    margin-right: 2px;
+    margin-right: 3px;
     min-height: 10px;
     min-width: 75px;
     padding-left: 3px;
@@ -24,7 +24,11 @@
 }
 
 .musicEditor .pianoRollRow.cNote .pianoRollKey {
-    border-width: 2;
+    border-bottom-width: 3px;
+}
+
+.musicEditor .pianoRollRow.cNote:last-child .pianoRollKey {
+    border-bottom-width: 0;
 }
 
 .musicEditor .pianoRollKey.sharpNote {

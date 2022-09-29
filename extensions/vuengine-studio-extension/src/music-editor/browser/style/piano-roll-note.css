@@ -17,7 +17,11 @@
 }
 
 .musicEditor .pianoRollRow.cNote .pianoRollNote {
-    margin-bottom: 2px;
+    margin-bottom: 3px;
+}
+
+.musicEditor .pianoRollRow.cNote:last-child .pianoRollNote {
+    margin-bottom: 0;
 }
 
 .musicEditor .pianoRollNote:hover {
@@ -29,5 +33,5 @@
 }
 
 .musicEditor .pianoRollNote.nth {
-    margin-right: 2px;
+    margin-right: 3px;
 }

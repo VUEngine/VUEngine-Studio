@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ChannelConfig, MusicEditorStateApi, PatternConfig } from '../../ves-music-editor-types';
+import TabInput from './TabInput';
 import TabInstruments from './TabInstruments';
 import TabNote from './TabNote';
 import TabSong from './TabSong';
@@ -55,6 +56,12 @@ export default function Sidebar(props: SidebarProps): JSX.Element {
                 >
                     <i className='fa fa-signal' />
                 </div>
+                <div
+                    className={`sidebarTab ${tab === 4 && 'active'}`}
+                    onClick={() => stateApi.setSidebarTab(4)}
+                >
+                    <i className='fa fa-keyboard-o' />
+                </div>
             </div>
             <div className='sidebarTabContent'>
                 {tab === 0 && <TabSong
@@ -80,6 +87,11 @@ export default function Sidebar(props: SidebarProps): JSX.Element {
                     stateApi={stateApi}
                 />}
                 {tab === 3 && <TabWaveforms
+                    pattern={pattern}
+                    currentNote={currentNote}
+                    stateApi={stateApi}
+                />}
+                {tab === 4 && <TabInput
                     pattern={pattern}
                     currentNote={currentNote}
                     stateApi={stateApi}

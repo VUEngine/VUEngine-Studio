@@ -1,6 +1,6 @@
 import React from 'react';
 import VContainer from '../../../../core/browser/components/VContainer';
-import { ChannelConfig, MusicEditorStateApi, PatternConfig } from '../../ves-music-editor-types';
+import { ChannelConfig, MusicEditorStateApi, PatternConfig, PATTERN_SIZES } from '../../ves-music-editor-types';
 
 interface CurrentPatternProps {
     pattern: PatternConfig
@@ -33,9 +33,9 @@ export default function CurrentPattern(props: CurrentPatternProps): JSX.Element 
                 value={pattern.size}
                 onChange={e => stateApi.setPatternSize(parseInt(e.target.value))}
             >
-                <option value={16}>16</option>
-                <option value={32}>32</option>
-                <option value={64}>64</option>
+                {PATTERN_SIZES.map(size =>
+                    <option value={size}>{size}</option>
+                )}
             </select>
         </VContainer>
 

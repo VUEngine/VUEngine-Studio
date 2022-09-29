@@ -9,7 +9,8 @@
     color: #555;
     display: flex;
     flex-direction: column;
-    margin-right: 2px;
+    height: 28px;
+    margin-right: 3px;
     min-width: 75px;
     width: 75px;
 }
@@ -17,4 +18,5 @@
 .musicEditor .notePropertiesHeader div {
     align-items: center;
     display: flex;
+    flex-grow: 1;
 }

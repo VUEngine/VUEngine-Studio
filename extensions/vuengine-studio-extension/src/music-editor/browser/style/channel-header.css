@@ -4,7 +4,7 @@
     display: flex;
     flex-direction: row;
     font-size: 10px;
-    margin-right: 2px;
+    margin-right: 3px;
     min-width: 75px;
     width: 75px;
 }

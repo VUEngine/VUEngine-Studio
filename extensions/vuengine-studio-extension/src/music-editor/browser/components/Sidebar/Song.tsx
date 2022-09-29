@@ -1,7 +1,7 @@
 import React from 'react';
 import HContainer from '../../../../core/browser/components/HContainer';
 import VContainer from '../../../../core/browser/components/VContainer';
-import { MAX_SPEED, MIN_SPEED, MusicEditorStateApi, VOLUME_STEPS } from '../../ves-music-editor-types';
+import { MAX_SPEED, MIN_SPEED, MusicEditorStateApi, PATTERN_SIZES, VOLUME_STEPS } from '../../ves-music-editor-types';
 
 interface SongProps {
     name: string
@@ -83,9 +83,9 @@ export default function Song(props: SongProps): JSX.Element {
                 value={defaultPatternSize}
                 onChange={e => stateApi.setDefaultPatternSize(parseInt(e.target.value))}
             >
-                <option value={16}>16</option>
-                <option value={32}>32</option>
-                <option value={64}>64</option>
+                {PATTERN_SIZES.map(size =>
+                    <option value={size}>{size}</option>
+                )}
             </select>
         </VContainer>
     </div>;
