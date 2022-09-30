@@ -15,7 +15,7 @@ const FILE_TYPES: FileType[] = [/* {
     name: 'Project Config',
 },*/{
         ext: '.vuengine',
-        icon: 'ves-file-icon codicon codicon-primitive-square codicon-rotate-45 medium-purple',
+        icon: 'ves-file-icon codicon codicon-library medium-purple',
     }, {
         ext: '.vb',
         icon: 'ves-file-icon codicon codicon-play',

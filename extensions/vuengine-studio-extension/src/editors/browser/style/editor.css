@@ -7,11 +7,13 @@
 
 .control>.input-description,
 .control>.validation {
+  margin-top: 0;
   min-height: unset;
 }
 
 .theia-tree-editor .control {
-  margin: 0 0 1em;
+  gap: 3px;
+  margin: 0;
 }
 
 .group-layout {
@@ -23,16 +25,11 @@
 .group-layout>legend {
   padding: 0;
   font-weight: normal;
-  margin-top: 0.5em;
+  margin-bottom: 3px;
 }
 
 .control>* {
   margin: 0;
-}
-
-.control>.input-description,
-.control>.validation {
-  margin-bottom: 4px !important;
 }
 
 .horizontal-layout {
@@ -46,6 +43,15 @@
 .theia-tree-editor .control>.input-description {
   /* font-size: 80%; */
   opacity: .5;
+}
+
+.theia-tree-editor .control>.input-description:empty {
+  display: none;
+}
+
+.horizontal-layout,
+.vertical-layout {
+  gap: 15px;
 }
 
 /* Custom */
@@ -73,11 +79,6 @@
 
 .theia-tree-editor-form>.jsonforms-container {
   flex-grow: 1;
-}
-
-.control>.input-description,
-.control>.validation {
-  margin-bottom: 0.25em;
 }
 
 .theia-tree-editor.form-only>.p-SplitPanel>.theia-Tree,

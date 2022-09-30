@@ -43,8 +43,7 @@ export class VesFlashCartStatusBarContribution implements FrontendApplicationCon
                 alignment: StatusBarAlignment.LEFT,
                 command: VesFlashCartCommands.WIDGET_TOGGLE.id,
                 priority: 1,
-                // TODO: change to codicon-layout-statusbar once codicon version in Theia got updated
-                text: `$(codicon-browser codicon-flip-y) ${label}`,
+                text: `$(codicon-layout-statusbar) ${label}`,
                 tooltip: nls.localize('vuengine/flashCarts/connectedFlashCarts', 'Connected Flash Carts')
             });
         } else {
