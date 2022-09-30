@@ -1,5 +1,5 @@
 import React from 'react';
-import { VariableSize } from '../types';
+import { VariableSize } from '../FontEditorTypes';
 import CharEditorPixel from './CharEditorPixel';
 
 interface CharEditorProps {

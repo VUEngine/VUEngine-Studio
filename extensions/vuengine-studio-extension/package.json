@@ -121,9 +121,6 @@
       "frontend": "lib/migrate/browser/ves-migrate-frontend-module"
     },
     {
-      "frontend": "lib/music-editor/browser/ves-music-editor-frontend-module"
-    },
-    {
       "frontend": "lib/plugins/browser/ves-plugins-frontend-module"
     },
     {
