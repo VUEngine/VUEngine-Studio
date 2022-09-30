@@ -1,6 +1,6 @@
 import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React from 'react';
-import { DataSection, MAX_CHAR_COUNT, MIN_CHAR_COUNT, MIN_OFFSET } from '../types';
+import { DataSection, MAX_CHAR_COUNT, MIN_CHAR_COUNT, MIN_OFFSET } from '../FontEditorTypes';
 
 interface AlphabetSettingsProps {
     charCount: number

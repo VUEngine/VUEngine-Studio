@@ -254,6 +254,7 @@ export class VesProjectTreeWidget extends TreeWidget {
   protected async addNode(typeId: string, isLeaf: boolean): Promise<void> {
     const newItemId = this.vesCommonService.nanoid();
     // TODO: properly create new item with default values
+    // (or always deepmerge with defauls in editor when opening?)
     this.vesProjectService.setProjectDataItem(typeId, newItemId, {
       typeId,
       name: !isLeaf ? 'New' : undefined,
@@ -297,11 +298,13 @@ export class VesProjectTreeWidget extends TreeWidget {
   }
 
   protected renderIcon(node: VesProjectChildNode, props: NodeProps): React.ReactNode {
-    const iconClass = node.member?.iconClass
+    /* const iconClass = node.member?.iconClass
       ? node.member?.iconClass
       : node.member.children && node.member.children.length > 0
         ? 'codicon codicon-folder'
-        : 'codicon codicon-file';
+        : 'codicon codicon-file'; */
+    const iconClass = (!node.member?.children && node.member?.iconClass)
+      ? node.member?.iconClass : '';
     return <i className={iconClass} style={{ marginRight: 5 }} />;
   }
 
