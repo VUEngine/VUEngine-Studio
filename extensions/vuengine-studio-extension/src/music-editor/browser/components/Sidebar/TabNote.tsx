@@ -1,21 +1,25 @@
 import React from 'react';
-import { MusicEditorStateApi, PatternConfig } from '../types';
+import { PatternConfig } from '../types';
 import CurrentNote from './CurrentNote';
 
 interface TabNoteProps {
     pattern: PatternConfig | boolean
     currentNote: number
-    stateApi: MusicEditorStateApi
+    setNote: (noteIndex: number, note: number | undefined) => void
+    setVolumeL: (noteIndex: number, volume: number | undefined) => void
+    setVolumeR: (noteIndex: number, volume: number | undefined) => void
 }
 
 export default function TabNote(props: TabNoteProps): JSX.Element {
-    const { pattern, currentNote, stateApi } = props;
+    const { pattern, currentNote, setNote, setVolumeL, setVolumeR } = props;
 
     return <>
         <CurrentNote
             pattern={pattern as PatternConfig}
             currentNote={currentNote}
-            stateApi={stateApi}
+            setNote={setNote}
+            setVolumeL={setVolumeL}
+            setVolumeR={setVolumeR}
         />
     </>;
 }

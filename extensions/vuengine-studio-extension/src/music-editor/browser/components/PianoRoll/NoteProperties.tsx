@@ -1,17 +1,17 @@
 import React from 'react';
-import { MusicEditorStateApi, PatternConfig } from '../types';
+import { PatternConfig } from '../types';
 import NotePropertiesNote from './NotePropertiesNote';
 
 interface NotePropertiesProps {
     bar: number
     pattern: PatternConfig
     currentNote: number
-    stateApi: MusicEditorStateApi
     setCurrentNote: (id: number) => void
+    setNote: (noteIndex: number, note: number | undefined) => void
 }
 
 export default function NoteProperties(props: NotePropertiesProps): JSX.Element {
-    const { bar, pattern, currentNote, stateApi, setCurrentNote } = props;
+    const { bar, pattern, currentNote, setCurrentNote, setNote } = props;
 
     const classNames = ['noteProperties'];
 
@@ -36,8 +36,8 @@ export default function NoteProperties(props: NotePropertiesProps): JSX.Element 
                     effects={[]}
                     volumeL={volumeL}
                     volumeR={volumeR}
-                    stateApi={stateApi}
                     setCurrentNote={setCurrentNote}
+                    setNote={setNote}
                 />
             );
         })}

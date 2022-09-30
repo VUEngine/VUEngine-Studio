@@ -1,14 +1,13 @@
 import React from 'react';
-import { MusicEditorStateApi, PatternConfig } from '../types';
+import { PatternConfig } from '../types';
 
 interface TabWaveformsProps {
     pattern: PatternConfig | boolean
     currentNote: number
-    stateApi: MusicEditorStateApi
 }
 
 export default function TabWaveforms(props: TabWaveformsProps): JSX.Element {
-    // const { pattern, currentNote, stateApi } = props;
+    // const { pattern, currentNote } = props;
 
     return <>
         <div className='section'>

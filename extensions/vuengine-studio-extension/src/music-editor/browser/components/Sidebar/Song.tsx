@@ -1,7 +1,7 @@
 import React from 'react';
 import HContainer from '../../../../core/browser/components/HContainer';
 import VContainer from '../../../../core/browser/components/VContainer';
-import { MAX_SPEED, MIN_SPEED, PATTERN_SIZES, VOLUME_STEPS } from '../types';
+import { MAX_SPEED, MIN_SPEED, PATTERN_SIZES, SongData, VOLUME_STEPS } from '../types';
 
 interface SongProps {
     name: string
@@ -9,15 +9,37 @@ interface SongProps {
     speed: number
     bar: number
     defaultPatternSize: number
-    setName: (name: string) => void
-    setBar: (bar: number) => void
-    setSpeed: (speed: number) => void
-    setVolume: (volume: number) => void
-    setDefaultPatternSize: (size: number) => void
+    setSongData: (songData: Partial<SongData>) => void
 }
 
 export default function Song(props: SongProps): JSX.Element {
-    const { name, volume, speed, bar, defaultPatternSize, setName, setBar, setSpeed, setVolume, setDefaultPatternSize } = props;
+    const { name, volume, speed, bar, defaultPatternSize, setSongData } = props;
+
+    const setName = (n: string): void => {
+        setSongData({ name: n });
+    };
+
+    const setBar = (b: number): void => {
+        setSongData({ bar: b });
+    };
+
+    const setSpeed = (s: number): void => {
+        if (s <= MAX_SPEED && s >= MIN_SPEED) {
+            setSongData({ speed: s });
+        }
+    };
+
+    const setVolume = (v: number): void => {
+        if (v <= 100 && v >= 0) {
+            setSongData({ volume: v });
+        }
+    };
+
+    const setDefaultPatternSize = (size: number): void => {
+        setSongData({
+            defaultPatternSize: size,
+        });
+    };
 
     return <div className='section song'>
         <VContainer>

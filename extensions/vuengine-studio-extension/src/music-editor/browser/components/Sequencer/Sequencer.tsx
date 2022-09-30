@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChannelConfig, MusicEditorStateApi } from '../types';
+import { ChannelConfig } from '../types';
 import Channel from './Channel';
 import StepIndicator from './StepIndicator';
 
@@ -9,12 +9,14 @@ interface SequencerProps {
     currentPattern: number
     currentStep: number
     playing: boolean
-    stateApi: MusicEditorStateApi
     setCurrentChannel: (id: number) => void
     setCurrentPattern: (channelId: number, patternId: number) => void
     toggleChannelMuted: (channelId: number) => void
     toggleChannelSolo: (channelId: number) => void
     toggleChannelCollapsed: (channelId: number) => void
+    removeFromSequence: (channelId: number, index: number) => void
+    moveSequencePattern: (channelId: number, from: number, to: number) => void
+    addToSequence: (channelId: number, patternId: number) => void
 }
 
 export default function Sequencer(props: SequencerProps): JSX.Element {
@@ -24,12 +26,14 @@ export default function Sequencer(props: SequencerProps): JSX.Element {
         currentPattern,
         currentStep,
         playing,
-        stateApi,
         setCurrentChannel,
         setCurrentPattern,
         toggleChannelMuted,
         toggleChannelSolo,
         toggleChannelCollapsed,
+        removeFromSequence,
+        moveSequencePattern,
+        addToSequence,
     } = props;
 
     const classNames = ['sequencer'];
@@ -50,12 +54,14 @@ export default function Sequencer(props: SequencerProps): JSX.Element {
                 currentPattern={currentPattern}
                 number={channel.id}
                 otherSolo={soloChannel > -1 && soloChannel !== channel.id}
-                stateApi={stateApi}
                 setCurrentChannel={setCurrentChannel}
                 setCurrentPattern={setCurrentPattern}
                 toggleChannelMuted={toggleChannelMuted}
                 toggleChannelSolo={toggleChannelSolo}
                 toggleChannelCollapsed={toggleChannelCollapsed}
+                removeFromSequence={removeFromSequence}
+                moveSequencePattern={moveSequencePattern}
+                addToSequence={addToSequence}
             />
         )}
     </div>;

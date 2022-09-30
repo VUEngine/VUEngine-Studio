@@ -2,16 +2,18 @@ import { nls } from '@theia/core';
 import React from 'react';
 import HContainer from '../../../../core/browser/components/HContainer';
 import VContainer from '../../../../core/browser/components/VContainer';
-import { HIGHEST_NOTE, LOWEST_NOTE, MusicEditorStateApi, Notes, PatternConfig, VOLUME_STEPS } from '../types';
+import { HIGHEST_NOTE, LOWEST_NOTE, Notes, PatternConfig, VOLUME_STEPS } from '../types';
 
 interface CurrentNoteProps {
     pattern: PatternConfig
     currentNote: number
-    stateApi: MusicEditorStateApi
+    setNote: (noteIndex: number, note: number | undefined) => void
+    setVolumeL: (noteIndex: number, volume: number | undefined) => void
+    setVolumeR: (noteIndex: number, volume: number | undefined) => void
 }
 
 export default function CurrentNote(props: CurrentNoteProps): JSX.Element {
-    const { currentNote, pattern, stateApi } = props;
+    const { currentNote, pattern, setNote, setVolumeL, setVolumeR } = props;
 
     if (currentNote === -1) {
         return <div className='section currentNote'>
@@ -47,7 +49,7 @@ export default function CurrentNote(props: CurrentNoteProps): JSX.Element {
             Note
             <select
                 className='theia-select'
-                onChange={e => stateApi.setNote(currentNote, parseInt(e.target.value))}
+                onChange={e => setNote(currentNote, parseInt(e.target.value))}
                 value={note ?? -1}
             >
                 <option value={undefined}>none</option>
@@ -68,7 +70,7 @@ export default function CurrentNote(props: CurrentNoteProps): JSX.Element {
                         label: n.toString()
                     })))}
                 defaultValue={note?.toString() ?? '-1'}
-                onChange={option => stateApi.setNote(currentNote, parseInt(option.value!))}
+                onChange={option => setNote(currentNote, parseInt(option.value!))}
             /> */}
         </VContainer>
 
@@ -84,7 +86,7 @@ export default function CurrentNote(props: CurrentNoteProps): JSX.Element {
                     max={100}
                     min={0}
                     step={100 / VOLUME_STEPS}
-                    onChange={e => stateApi.setVolumeL(currentNote, parseInt(e.target.value))}
+                    onChange={e => setVolumeL(currentNote, parseInt(e.target.value))}
                 />
                 <div style={{ minWidth: 24, textAlign: 'right', width: 24 }}>
                     {volumeL}
@@ -101,7 +103,7 @@ export default function CurrentNote(props: CurrentNoteProps): JSX.Element {
                     max={100}
                     min={0}
                     step={100 / VOLUME_STEPS}
-                    onChange={e => stateApi.setVolumeR(currentNote, parseInt(e.target.value))}
+                    onChange={e => setVolumeR(currentNote, parseInt(e.target.value))}
                 />
                 <div style={{ minWidth: 24, textAlign: 'right', width: 24 }}>
                     {volumeR}

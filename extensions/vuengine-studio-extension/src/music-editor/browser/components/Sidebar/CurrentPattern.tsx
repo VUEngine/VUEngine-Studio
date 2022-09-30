@@ -1,17 +1,17 @@
 import React from 'react';
 import VContainer from '../../../../core/browser/components/VContainer';
-import { ChannelConfig, MusicEditorStateApi, PatternConfig, PATTERN_SIZES } from '../types';
+import { ChannelConfig, PatternConfig, PATTERN_SIZES } from '../types';
 
 interface CurrentPatternProps {
     pattern: PatternConfig
     channel: ChannelConfig
     currentPattern: number
-    stateApi: MusicEditorStateApi
     setCurrentPattern: (channel: number, pattern: number) => void
+    setPatternSize: (size: number) => void
 }
 
 export default function CurrentPattern(props: CurrentPatternProps): JSX.Element {
-    const { channel, currentPattern, setCurrentPattern, pattern, stateApi } = props;
+    const { channel, currentPattern, setCurrentPattern, pattern, setPatternSize } = props;
 
     return <div className='section currentPattern'>
         <VContainer>
@@ -32,7 +32,7 @@ export default function CurrentPattern(props: CurrentPatternProps): JSX.Element 
             <select
                 className='theia-select'
                 value={pattern.size}
-                onChange={e => stateApi.setPatternSize(parseInt(e.target.value))}
+                onChange={e => setPatternSize(parseInt(e.target.value))}
             >
                 {PATTERN_SIZES.map(size =>
                     <option key={`current-pattern-size-option-${size}`} value={size}>{size}</option>

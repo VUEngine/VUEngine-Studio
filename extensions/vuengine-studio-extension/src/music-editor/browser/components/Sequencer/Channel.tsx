@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChannelConfig, HIGHEST_NOTE, LOWEST_NOTE, MusicEditorStateApi, Notes } from '../types';
+import { ChannelConfig, HIGHEST_NOTE, LOWEST_NOTE, Notes } from '../types';
 import AddPattern from './AddPattern';
 import ChannelHeader from './ChannelHeader';
 import Pattern from './Pattern';
@@ -10,12 +10,14 @@ interface ChannelProps {
     currentPattern: number
     number: number
     otherSolo: boolean
-    stateApi: MusicEditorStateApi
     setCurrentChannel: (id: number) => void
     setCurrentPattern: (channelId: number, patternId: number) => void
     toggleChannelMuted: (channelId: number) => void
     toggleChannelSolo: (channelId: number) => void
     toggleChannelCollapsed: (channelId: number) => void
+    removeFromSequence: (channelId: number, index: number) => void
+    moveSequencePattern: (channelId: number, from: number, to: number) => void
+    addToSequence: (channelId: number, patternId: number) => void
 }
 
 export default function Channel(props: ChannelProps): JSX.Element {
@@ -27,12 +29,14 @@ export default function Channel(props: ChannelProps): JSX.Element {
         currentPattern,
         number,
         otherSolo,
-        stateApi,
         setCurrentChannel,
         setCurrentPattern,
         toggleChannelMuted,
         toggleChannelSolo,
         toggleChannelCollapsed,
+        removeFromSequence,
+        moveSequencePattern,
+        addToSequence,
     } = props;
 
     const classNames = ['channel'];
@@ -80,15 +84,16 @@ export default function Channel(props: ChannelProps): JSX.Element {
                     currentChannel={currentChannel}
                     currentPattern={currentPattern}
                     height={patternHeight}
-                    stateApi={stateApi}
                     dragged={dragged}
                     setDragged={setDragged}
                     setCurrentPattern={setCurrentPattern}
+                    removeFromSequence={removeFromSequence}
+                    moveSequencePattern={moveSequencePattern}
                 />)}
             <AddPattern
                 channel={channelConfig}
                 height={patternHeight}
-                stateApi={stateApi}
+                addToSequence={addToSequence}
             />
             <div
                 className='patternFill'
