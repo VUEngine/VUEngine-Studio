@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChannelConfig, MusicEditorStateApi, PatternConfig } from '../types';
+import { ChannelConfig, PatternConfig, SongData } from '../types';
 import CurrentChannel from './CurrentChannel';
 import CurrentPattern from './CurrentPattern';
 import Song from './Song';
@@ -14,17 +14,14 @@ interface TabSongProps {
     currentChannel: number
     currentPattern: number
     defaultPatternSize: number
-    stateApi: MusicEditorStateApi
-    setName: (name: string) => void
-    setBar: (bar: number) => void
-    setSpeed: (speed: number) => void
-    setVolume: (volume: number) => void
-    setDefaultPatternSize: (size: number) => void
     setCurrentChannel: (channel: number) => void
     setCurrentPattern: (channel: number, pattern: number) => void
     toggleChannelMuted: (channelId: number) => void
     toggleChannelSolo: (channelId: number) => void
     toggleChannelCollapsed: (channelId: number) => void
+    setChannelVolume: (volume: number) => void
+    setPatternSize: (size: number) => void
+    setSongData: (songData: Partial<SongData>) => void
 }
 
 export default function TabSong(props: TabSongProps): JSX.Element {
@@ -37,17 +34,14 @@ export default function TabSong(props: TabSongProps): JSX.Element {
         currentChannel,
         currentPattern,
         defaultPatternSize,
-        stateApi,
-        setName,
-        setBar,
-        setSpeed,
-        setVolume,
-        setDefaultPatternSize,
         setCurrentChannel,
         setCurrentPattern,
         toggleChannelMuted,
         toggleChannelSolo,
         toggleChannelCollapsed,
+        setChannelVolume,
+        setPatternSize,
+        setSongData,
     } = props;
 
     return <>
@@ -57,20 +51,16 @@ export default function TabSong(props: TabSongProps): JSX.Element {
             speed={speed}
             bar={bar}
             defaultPatternSize={defaultPatternSize}
-            setName={setName}
-            setBar={setBar}
-            setSpeed={setSpeed}
-            setVolume={setVolume}
-            setDefaultPatternSize={setDefaultPatternSize}
+            setSongData={setSongData}
         />
 
         {currentChannel > -1 && <CurrentChannel
             channel={channel}
             setCurrentChannel={setCurrentChannel}
-            stateApi={stateApi}
             toggleChannelMuted={toggleChannelMuted}
             toggleChannelSolo={toggleChannelSolo}
             toggleChannelCollapsed={toggleChannelCollapsed}
+            setChannelVolume={setChannelVolume}
         />}
 
         {currentPattern > -1 && <CurrentPattern
@@ -78,7 +68,7 @@ export default function TabSong(props: TabSongProps): JSX.Element {
             channel={channel}
             currentPattern={currentPattern}
             setCurrentPattern={setCurrentPattern}
-            stateApi={stateApi}
+            setPatternSize={setPatternSize}
         />}
     </>;
 }

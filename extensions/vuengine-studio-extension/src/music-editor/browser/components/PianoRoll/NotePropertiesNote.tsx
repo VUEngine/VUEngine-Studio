@@ -1,6 +1,6 @@
 import { nls } from '@theia/core';
 import React from 'react';
-import { MusicEditorStateApi, PatternConfig } from '../types';
+import { PatternConfig } from '../types';
 
 interface NotePropertiesNoteProps {
     index: number
@@ -10,12 +10,12 @@ interface NotePropertiesNoteProps {
     pattern: PatternConfig
     volumeL: number
     volumeR: number
-    stateApi: MusicEditorStateApi
     setCurrentNote: (id: number) => void
+    setNote: (noteIndex: number, note: number | undefined) => void
 }
 
 export default function NotePropertiesNote(props: NotePropertiesNoteProps): JSX.Element {
-    const { index, current, bar, volumeL, volumeR, effects, /* pattern, */ stateApi, setCurrentNote } = props;
+    const { index, current, bar, volumeL, volumeR, effects, /* pattern, */ setCurrentNote, setNote } = props;
 
     const classNames = ['notePropertiesNote'];
     if ((index + 1) % bar === 0) {
@@ -33,7 +33,7 @@ export default function NotePropertiesNote(props: NotePropertiesNoteProps): JSX.
         className={classNames.join(' ')}
         title={`${effects.length} ${labelEffects}, ${leftLabel}: ${volumeL}%/${rightLabel}: ${volumeR}%`}
         onClick={() => setCurrentNote(index)}
-        onContextMenu={() => stateApi.setNote(index, undefined)}
+        onContextMenu={() => setNote(index, undefined)}
     >
         <div className='effects'>
         </div>

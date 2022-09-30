@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-    ChannelConfig,
-    MAX_SPEED,
-    MIN_SPEED,
-    MusicEditorStateApi,
-    Notes,
-    PatternConfig,
-    SongData,
-} from './types';
+import { Notes, SongData } from './types';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
 import Sidebar from './Sidebar/Sidebar';
@@ -50,48 +42,8 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
         }
     }
 
-    setName(name: string): void {
-        this.props.setSongData({
-            ...this.props.songData,
-            name: name,
-        });
-    };
-
-    setBar(bar: number): void {
-        this.props.setSongData({
-            ...this.props.songData,
-            bar: bar,
-        });
-    };
-
-    setSpeed(speed: number): void {
-        if (speed <= MAX_SPEED && speed >= MIN_SPEED) {
-            this.props.setSongData({
-                ...this.props.songData,
-                speed: speed,
-            });
-        }
-    };
-
-    setVolume(volume: number): void {
-        if (volume <= 100 && volume >= 0) {
-            this.props.setSongData({
-                ...this.props.songData,
-                volume: volume,
-            });
-        }
-    };
-
-    setDefaultPatternSize(size: number): void {
-        this.props.setSongData({
-            ...this.props.songData,
-            defaultPatternSize: size,
-        });
-    };
-
     setCurrentChannel(id: number): void {
         this.setState({
-            currentStep: 0,
             currentChannel: id,
             currentPattern: this.props.songData.channels[id].sequence[0] ?? -1,
             currentNote: -1,
@@ -139,88 +91,75 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
         this.props.setSongData(this.props.songData);
     };
 
+    setChannelVolume(volume: number): void {
+        this.props.songData.channels[this.state.currentChannel].volume = volume;
+        this.props.setSongData(this.props.songData);
+    };
+
+    setNote(noteIndex: number, note: number | undefined): void {
+        this.props.songData.channels[this.state.currentChannel].patterns[this.state.currentPattern].notes[noteIndex] = note;
+        this.props.setSongData(this.props.songData);
+    };
+
+    setVolumeL(noteIndex: number, volume: number | undefined): void {
+        this.props.songData.channels[this.state.currentChannel].patterns[this.state.currentPattern].volumeL[noteIndex] = volume;
+        this.props.setSongData(this.props.songData);
+    };
+
+    setVolumeR(noteIndex: number, volume: number | undefined): void {
+        this.props.songData.channels[this.state.currentChannel].patterns[this.state.currentPattern].volumeR[noteIndex] = volume;
+        this.props.setSongData(this.props.songData);
+    };
+
+    addToSequence(channelId: number, patternId: number): void {
+        this.props.songData.channels[channelId].sequence.push(patternId);
+
+        const largestPatternId = this.props.songData.channels[channelId].patterns.length - 1;
+        if (patternId > largestPatternId) {
+            this.props.songData.channels[channelId].patterns.push({
+                size: this.props.songData.defaultPatternSize,
+                notes: [],
+                volumeL: [],
+                volumeR: [],
+                effects: [],
+            });
+        }
+
+        this.props.setSongData(this.props.songData);
+        this.setState({
+            currentChannel: channelId,
+            currentPattern: patternId,
+        });
+    };
+
+    removeFromSequence(channelId: number, index: number): void {
+        this.props.songData.channels[channelId].sequence.splice(index, 1);
+        this.props.setSongData(this.props.songData);
+    };
+
+    moveSequencePattern(channelId: number, from: number, to: number): void {
+        const sequence = this.props.songData.channels[channelId].sequence;
+        const removedPattern = sequence.splice(from, 1).pop();
+        sequence.splice(to > from ? to - 1 : to, 0, removedPattern!);
+        this.props.setSongData(this.props.songData);
+    };
+
+    setPatternSize(size: number): void {
+        this.props.songData.channels[this.state.currentChannel].patterns[this.state.currentPattern].size = size;
+        this.props.setSongData(this.props.songData);
+    };
+
+    setSidebarTab(tab: number): void {
+        this.setState({
+            sidebarTab: tab,
+        });
+    };
+
+    setSongData(songData: Partial<SongData>): void {
+        this.props.setSongData({ ...this.props.songData, ...songData });
+    };
+
     render(): JSX.Element {
-        const {
-        } = this.props;
-
-        const stateApi: MusicEditorStateApi = {
-            setChannels: (channels: ChannelConfig[]): void => {
-                this.props.setSongData({
-                    ...this.props.songData,
-                    channels: channels,
-                });
-            },
-
-            setChannelVolume: (volume: number): void => {
-                this.props.songData.channels[this.state.currentChannel].volume = volume;
-                this.props.setSongData(this.props.songData);
-            },
-
-            setPatterns: (channelId: number, patterns: PatternConfig[]): void => {
-                this.props.songData.channels[channelId].patterns = patterns;
-                this.props.setSongData(this.props.songData);
-            },
-
-            setNote: (noteIndex: number, note: number | undefined): void => {
-                this.props.songData.channels[this.state.currentChannel].patterns[this.state.currentPattern].notes[noteIndex] = note;
-                this.props.setSongData(this.props.songData);
-            },
-
-            setVolumeL: (noteIndex: number, volume: number | undefined): void => {
-                this.props.songData.channels[this.state.currentChannel].patterns[this.state.currentPattern].volumeL[noteIndex] = volume;
-                this.props.setSongData(this.props.songData);
-            },
-
-            setVolumeR: (noteIndex: number, volume: number | undefined): void => {
-                this.props.songData.channels[this.state.currentChannel].patterns[this.state.currentPattern].volumeR[noteIndex] = volume;
-                this.props.setSongData(this.props.songData);
-            },
-
-            addToSequence: (channelId: number, patternId: number): void => {
-                this.props.songData.channels[channelId].sequence.push(patternId);
-
-                const largestPatternId = this.props.songData.channels[channelId].patterns.length - 1;
-                if (patternId > largestPatternId) {
-                    this.props.songData.channels[channelId].patterns.push({
-                        size: this.props.songData.defaultPatternSize,
-                        notes: [],
-                        volumeL: [],
-                        volumeR: [],
-                        effects: [],
-                    });
-                }
-
-                this.props.setSongData(this.props.songData);
-                this.setState({
-                    currentChannel: channelId,
-                    currentPattern: patternId,
-                });
-            },
-
-            removeFromSequence: (channelId: number, index: number): void => {
-                this.props.songData.channels[channelId].sequence.splice(index, 1);
-                this.props.setSongData(this.props.songData);
-            },
-
-            moveSequencePattern: (channelId: number, from: number, to: number): void => {
-                const sequence = this.props.songData.channels[channelId].sequence;
-                const removedPattern = sequence.splice(from, 1).pop();
-                sequence.splice(to > from ? to - 1 : to, 0, removedPattern!);
-                this.props.setSongData(this.props.songData);
-            },
-
-            setPatternSize: (size: number): void => {
-                this.props.songData.channels[this.state.currentChannel].patterns[this.state.currentPattern].size = size;
-                this.props.setSongData(this.props.songData);
-            },
-
-            setSidebarTab: (tab: number): void => {
-                this.setState({
-                    sidebarTab: tab,
-                });
-            },
-        };
-
         const soloChannel = this.props.songData.channels.filter(c => c.solo).map(c => c.id).pop() ?? -1;
 
         let songLength = 0;
@@ -309,12 +248,14 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                         currentPattern={this.state.currentPattern}
                         playing={this.state.playing}
                         currentStep={this.state.currentStep}
-                        stateApi={stateApi}
                         setCurrentChannel={this.setCurrentChannel.bind(this)}
                         setCurrentPattern={this.setCurrentPattern.bind(this)}
                         toggleChannelMuted={this.toggleChannelMuted.bind(this)}
                         toggleChannelSolo={this.toggleChannelSolo.bind(this)}
                         toggleChannelCollapsed={this.toggleChannelCollapsed.bind(this)}
+                        removeFromSequence={this.removeFromSequence.bind(this)}
+                        moveSequencePattern={this.moveSequencePattern.bind(this)}
+                        addToSequence={this.addToSequence.bind(this)}
                     />
                 </div>
                 {this.state.currentPattern > -1 && <PianoRoll
@@ -325,9 +266,9 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                     currentNote={this.state.currentNote}
                     currentStep={this.state.currentStep}
                     bar={this.props.songData.bar}
-                    stateApi={stateApi}
                     playNote={this.playNote.bind(this)}
                     setCurrentNote={this.setCurrentNote.bind(this)}
+                    setNote={this.setNote.bind(this)}
                 />}
             </div>
             <Sidebar
@@ -342,17 +283,18 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                 currentPattern={this.state.currentPattern}
                 currentNote={this.state.currentNote}
                 tab={this.state.sidebarTab}
-                setName={this.setName.bind(this)}
-                setBar={this.setBar.bind(this)}
-                setSpeed={this.setSpeed.bind(this)}
-                setVolume={this.setVolume.bind(this)}
-                setDefaultPatternSize={this.setDefaultPatternSize.bind(this)}
                 setCurrentChannel={this.setCurrentChannel.bind(this)}
                 setCurrentPattern={this.setCurrentPattern.bind(this)}
                 toggleChannelMuted={this.toggleChannelMuted.bind(this)}
                 toggleChannelSolo={this.toggleChannelSolo.bind(this)}
                 toggleChannelCollapsed={this.toggleChannelCollapsed.bind(this)}
-                stateApi={stateApi}
+                setSidebarTab={this.setSidebarTab.bind(this)}
+                setChannelVolume={this.setChannelVolume.bind(this)}
+                setPatternSize={this.setPatternSize.bind(this)}
+                setNote={this.setNote.bind(this)}
+                setVolumeL={this.setVolumeL.bind(this)}
+                setVolumeR={this.setVolumeR.bind(this)}
+                setSongData={this.setSongData.bind(this)}
             />
         </div >;
     }

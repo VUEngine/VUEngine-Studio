@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChannelConfig, MusicEditorStateApi } from '../types';
+import { ChannelConfig } from '../types';
 import StepIndicator from '../Sequencer/StepIndicator';
 import NoteProperties from './NoteProperties';
 import PianoRollEditor from './PianoRollEditor';
@@ -12,13 +12,13 @@ interface PianoRollProps {
     currentStep: number
     playing: boolean
     bar: number
-    stateApi: MusicEditorStateApi
     playNote: (note: number) => void
     setCurrentNote: (id: number) => void
+    setNote: (noteIndex: number, note: number | undefined) => void
 }
 
 export default function PianoRoll(props: PianoRollProps): JSX.Element {
-    const { currentNote, currentStep, currentChannel, currentPattern, channel, playing, bar, stateApi, playNote, setCurrentNote } = props;
+    const { currentNote, currentStep, currentChannel, currentPattern, channel, playing, bar, playNote, setCurrentNote, setNote } = props;
     const pattern = channel.patterns[currentPattern];
 
     const classNames = ['pianoRoll'];
@@ -46,22 +46,21 @@ export default function PianoRoll(props: PianoRollProps): JSX.Element {
         />}
         {/* <PianoRollHeader
             pattern={pattern}
-            stateApi={stateApi}
         />*/}
         <PianoRollEditor
             bar={bar}
             currentNote={currentNote}
             pattern={pattern}
-            stateApi={stateApi}
             playNote={playNote}
             setCurrentNote={setCurrentNote}
+            setNote={setNote}
         />
         <NoteProperties
             bar={bar}
             pattern={pattern}
             currentNote={currentNote}
-            stateApi={stateApi}
             setCurrentNote={setCurrentNote}
+            setNote={setNote}
         />
     </div>;
 }

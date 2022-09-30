@@ -1,17 +1,3 @@
-export interface MusicEditorStateApi {
-    setChannels: (channels: ChannelConfig[]) => void,
-    setChannelVolume: (volume: number) => void,
-    setPatterns: (channelId: number, patterns: PatternConfig[]) => void,
-    setNote: (noteIndex: number, note: number | undefined) => void,
-    setVolumeL: (noteIndex: number, volume: number | undefined) => void,
-    setVolumeR: (noteIndex: number, volume: number | undefined) => void,
-    addToSequence: (channelId: number, patternId: number) => void,
-    removeFromSequence: (channelId: number, index: number) => void,
-    moveSequencePattern: (channelId: number, from: number, to: number) => void,
-    setPatternSize: (size: number) => void,
-    setSidebarTab: (tab: number) => void,
-}
-
 export interface SongData {
     name: string
     channels: ChannelConfig[],
@@ -62,7 +48,7 @@ export const Notes = [
 export const LOWEST_NOTE = 95; // C2;
 export const HIGHEST_NOTE = 12; // B8;
 
-export const MAX_SPEED = 4800;
+export const MAX_SPEED = 1200;
 export const MIN_SPEED = 30;
 
 export const PATTERN_NOTE_HEIGHT = 0.5;

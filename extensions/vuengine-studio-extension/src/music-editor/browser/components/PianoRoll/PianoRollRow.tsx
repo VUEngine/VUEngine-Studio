@@ -1,5 +1,5 @@
 import React from 'react';
-import { MusicEditorStateApi, PatternConfig } from '../types';
+import { PatternConfig } from '../types';
 import PianoRollKey from './PianoRollKey';
 import PianoRollNote from './PianoRollNote';
 
@@ -9,13 +9,13 @@ interface PianoRollRowProps {
     pattern: PatternConfig
     bar: number
     currentNote: number
-    stateApi: MusicEditorStateApi
     playNote: (note: number) => void
     setCurrentNote: (id: number) => void
+    setNote: (noteIndex: number, note: number | undefined) => void
 }
 
 export default function PianoRollRow(props: PianoRollRowProps): JSX.Element {
-    const { note, noteId, pattern, bar, currentNote, stateApi, playNote, setCurrentNote } = props;
+    const { note, noteId, pattern, bar, currentNote, playNote, setCurrentNote, setNote } = props;
 
     const classNames = ['pianoRollRow'];
     if (note.startsWith('C') && note.length === 2) {
@@ -36,9 +36,9 @@ export default function PianoRollRow(props: PianoRollRowProps): JSX.Element {
                 bar={bar}
                 current={currentNote === index}
                 set={pattern.notes[index] === noteId}
-                stateApi={stateApi}
                 playNote={playNote}
                 setCurrentNote={setCurrentNote}
+                setNote={setNote}
             />
         ))}
     </div>;

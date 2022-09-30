@@ -1,15 +1,10 @@
 import { nls } from '@theia/core';
 import React from 'react';
-import { MusicEditorStateApi, PatternConfig } from '../types';
 
 interface PianoRollHeaderProps {
-    pattern: PatternConfig
-    stateApi: MusicEditorStateApi
 }
 
 export default function PianoRollHeader(props: PianoRollHeaderProps): JSX.Element {
-    // const { pattern, stateApi } = props;
-
     const classNames = ['pianoRollHeader'];
 
     return <div className={classNames.join(' ')}>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { MusicEditorStateApi, Notes } from '../types';
+import { Notes } from '../types';
 
 interface PianoRollNoteProps {
     index: number
@@ -7,13 +7,13 @@ interface PianoRollNoteProps {
     bar: number
     set: boolean
     current: boolean
-    stateApi: MusicEditorStateApi
     playNote: (note: number) => void
     setCurrentNote: (id: number) => void
+    setNote: (noteIndex: number, note: number | undefined) => void
 }
 
 export default function PianoRollNote(props: PianoRollNoteProps): JSX.Element {
-    const { index, noteId, bar, current, set, stateApi, playNote, setCurrentNote } = props;
+    const { index, noteId, bar, current, set, playNote, setCurrentNote, setNote } = props;
 
     const classNames = ['pianoRollNote'];
     if ((index + 1) % bar === 0) {
@@ -28,10 +28,10 @@ export default function PianoRollNote(props: PianoRollNoteProps): JSX.Element {
 
     const onMouseOver = (e: React.MouseEvent<HTMLElement>) => {
         if (e.buttons === 1) {
-            stateApi.setNote(index, noteId);
+            setNote(index, noteId);
             playNote(noteId);
         } else if (e.buttons === 2) {
-            stateApi.setNote(index, undefined);
+            setNote(index, undefined);
         }
         e.preventDefault();
     };
@@ -39,11 +39,11 @@ export default function PianoRollNote(props: PianoRollNoteProps): JSX.Element {
     return <div
         className={classNames.join(' ')}
         onClick={() => {
-            stateApi.setNote(index, noteId);
+            setNote(index, noteId);
             setCurrentNote(index);
             playNote(noteId);
         }}
-        onContextMenu={() => stateApi.setNote(index, undefined)}
+        onContextMenu={() => setNote(index, undefined)}
         onMouseOver={e => onMouseOver(e)}
         onMouseLeave={e => onMouseOver(e)}
         title={Notes[noteId]}

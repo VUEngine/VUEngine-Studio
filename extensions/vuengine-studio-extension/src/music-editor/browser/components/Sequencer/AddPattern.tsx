@@ -1,14 +1,14 @@
 import React from 'react';
-import { ChannelConfig, MusicEditorStateApi } from '../types';
+import { ChannelConfig } from '../types';
 
 interface AddPatternProps {
     channel: ChannelConfig
     height: number
-    stateApi: MusicEditorStateApi
+    addToSequence: (channelId: number, patternId: number) => void
 }
 
 export default function AddPattern(props: AddPatternProps): JSX.Element {
-    const { channel, height, stateApi } = props;
+    const { channel, height, addToSequence } = props;
 
     const classNames = ['addPattern'];
 
@@ -24,7 +24,7 @@ export default function AddPattern(props: AddPatternProps): JSX.Element {
         <div className='patternSelect'>
             <button
                 className='newPattern'
-                onClick={() => stateApi.addToSequence(channel.id, channel.patterns.length)}
+                onClick={() => addToSequence(channel.id, channel.patterns.length)}
             >+</button>
             <div className='existingPatterns'>
                 {[0, 1].map(remainder => (
@@ -33,7 +33,7 @@ export default function AddPattern(props: AddPatternProps): JSX.Element {
                             if (patternId % 2 === remainder) {
                                 return (<button
                                     key={`channel-${channel.id}-add-${patternId}`}
-                                    onClick={() => stateApi.addToSequence(channel.id, patternId)}
+                                    onClick={() => addToSequence(channel.id, patternId)}
                                 >
                                     {patternId + 1}
                                 </button>);

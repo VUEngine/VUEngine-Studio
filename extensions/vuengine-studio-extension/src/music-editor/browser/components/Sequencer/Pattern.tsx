@@ -1,6 +1,6 @@
 import { nls } from '@theia/core';
 import React from 'react';
-import { HIGHEST_NOTE, LOWEST_NOTE, MusicEditorStateApi, PatternConfig, PATTERN_NOTE_HEIGHT, PATTERN_NOTE_WIDTH } from '../types';
+import { HIGHEST_NOTE, LOWEST_NOTE, PatternConfig, PATTERN_NOTE_HEIGHT, PATTERN_NOTE_WIDTH } from '../types';
 
 interface PatternProps {
     index: number
@@ -10,10 +10,11 @@ interface PatternProps {
     channel: number
     height: number
     patternId: number
-    stateApi: MusicEditorStateApi
     dragged: boolean
     setDragged: (dragged: boolean) => void
     setCurrentPattern: (channelId: number, patternId: number) => void
+    removeFromSequence: (channelId: number, index: number) => void
+    moveSequencePattern: (channelId: number, from: number, to: number) => void
 }
 
 export default function Pattern(props: PatternProps): JSX.Element {
@@ -25,10 +26,11 @@ export default function Pattern(props: PatternProps): JSX.Element {
         patternId,
         currentChannel,
         currentPattern,
-        stateApi,
         dragged,
         setDragged,
         setCurrentPattern,
+        removeFromSequence,
+        moveSequencePattern,
     } = props;
 
     const classNames = ['pattern'];
@@ -69,7 +71,7 @@ export default function Pattern(props: PatternProps): JSX.Element {
         const to = parseInt(e.currentTarget.getAttribute('data-position') ?? '');
         const fromChannelId = parseInt(e.dataTransfer.getData('channel'));
         if (channel === fromChannelId) {
-            stateApi.moveSequencePattern(channel, from, to);
+            moveSequencePattern(channel, from, to);
         }
     };
 
@@ -114,7 +116,7 @@ export default function Pattern(props: PatternProps): JSX.Element {
             className='remove'
             title={nls.localize('vuengine/musicEditor/removePattern', 'Remove Pattern')}
             onClick={e => {
-                stateApi.removeFromSequence(channel, index);
+                removeFromSequence(channel, index);
                 e.stopPropagation();
             }}
         >
