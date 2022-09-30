@@ -35,8 +35,7 @@ export class VesFlashCartWidget extends ReactWidget {
   @postConstruct()
   protected async init(): Promise<void> {
     this.id = VesFlashCartWidget.ID;
-    // TODO: change to codicon-layout-statusbar once codicon version in Theia got updated
-    this.title.iconClass = 'codicon codicon-browser codicon-flip-y';
+    this.title.iconClass = 'codicon codicon-layout-statusbar';
     this.title.closable = true;
     this.setTitle();
     this.node.tabIndex = 0; // required for this.node.focus() to work in this.onActivateRequest()

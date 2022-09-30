@@ -1,0 +1,24 @@
+.jsonforms-container .categorization {
+    display: flex;
+    gap: 20px;
+}
+
+.jsonforms-container .category-subcategories {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.jsonforms-container .category-subcategories li {
+    cursor: pointer;
+    margin-bottom: 1px;
+    padding: 5px 20px;
+}
+
+.jsonforms-container .category-subcategories li:hover {
+    background-color: var(--theia-list-hoverBackground);
+}
+
+.jsonforms-container .category-subcategories li.selected {
+    background-color: var(--theia-list-activeSelectionBackground);
+}

@@ -1,7 +1,8 @@
-import { ContainerModule } from '@theia/core/shared/inversify';
 import { CommandContribution, MenuContribution } from '@theia/core';
 import { bindViewContribution, FrontendApplicationContribution, KeybindingContribution, OpenHandler, PreferenceContribution, WidgetFactory } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
+import { ContainerModule } from '@theia/core/shared/inversify';
+import '../../../src/emulator/browser/style/index.css';
 import { VesEmulatorContextKeyService } from './ves-emulator-context-key-service';
 import { VesEmulatorContribution } from './ves-emulator-contribution';
 import { VesEmulatorOpenHandler } from './ves-emulator-open-handler';
@@ -9,8 +10,6 @@ import { VesEmulatorPreferenceSchema } from './ves-emulator-preferences';
 import { VesEmulatorService } from './ves-emulator-service';
 import { VesEmulatorViewContribution } from './ves-emulator-view';
 import { VesEmulatorWidget, VesEmulatorWidgetOptions } from './widget/ves-emulator-widget';
-import '../../../src/emulator/browser/style/index.css';
-import { VesEmulatorStatusBarContribution } from './ves-emulator-statusbar-contribution';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // preferences
@@ -23,8 +22,8 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(MenuContribution).toService(VesEmulatorContribution);
 
     // status bar entry
-    bind(VesEmulatorStatusBarContribution).toSelf().inSingletonScope();
-    bind(FrontendApplicationContribution).toService(VesEmulatorStatusBarContribution);
+    // bind(VesEmulatorStatusBarContribution).toSelf().inSingletonScope();
+    // bind(FrontendApplicationContribution).toService(VesEmulatorStatusBarContribution);
 
     // emulator service
     bind(VesEmulatorService).toSelf().inSingletonScope();
