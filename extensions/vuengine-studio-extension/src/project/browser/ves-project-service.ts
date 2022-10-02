@@ -1,4 +1,5 @@
 import { isWindows, nls } from '@theia/core';
+import { WindowTitleService } from '@theia/core/lib/browser/window/window-title-service';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import { Deferred } from '@theia/core/lib/common/promise-util';
 import URI from '@theia/core/lib/common/uri';
@@ -42,6 +43,8 @@ export class VesProjectService {
   private readonly vesGlobService: VesGlobService;
   @inject(VesPluginsPathsService)
   private readonly vesPluginsPathsService: VesPluginsPathsService;
+  @inject(WindowTitleService)
+  private readonly windowTitleService: WindowTitleService;
   @inject(WorkspaceService)
   private readonly workspaceService: WorkspaceService;
 
@@ -178,6 +181,11 @@ export class VesProjectService {
   protected async init(): Promise<void> {
     await this.readProjectData();
     this._ready.resolve();
+
+    this.updateWindowTitle();
+    this.onDidChangeProjectData(() => {
+      this.updateWindowTitle();
+    });
   }
 
   protected async readProjectData(): Promise<void> {
@@ -499,5 +507,11 @@ export class VesProjectService {
         to,
       });
     }
+  }
+
+  protected async updateWindowTitle(): Promise<void> {
+    this.windowTitleService.update({
+      projectName: await this.getProjectName()
+    });
   }
 }
