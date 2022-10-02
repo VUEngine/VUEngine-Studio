@@ -1,4 +1,4 @@
-import { MAIN_MENU_BAR, nls } from '@theia/core';
+import { nls } from '@theia/core';
 import { ApplicationShell, PreferenceService } from '@theia/core/lib/browser';
 import { ThemeService } from '@theia/core/lib/browser/theming';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';

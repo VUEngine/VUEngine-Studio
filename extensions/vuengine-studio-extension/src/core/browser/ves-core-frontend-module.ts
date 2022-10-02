@@ -1,7 +1,8 @@
 import { CallHierarchyContribution } from '@theia/callhierarchy/lib/browser/callhierarchy-contribution';
 import {
-    ApplicationShell, FrontendApplicationContribution,
-    LabelProviderContribution
+    ApplicationShell, CorePreferenceContribution, FrontendApplicationContribution,
+    LabelProviderContribution,
+    PreferenceContribution
 } from '@theia/core/lib/browser';
 import { ColorContribution } from '@theia/core/lib/browser/color-application-contribution';
 import { EncodingRegistry } from '@theia/core/lib/browser/encoding-registry';
@@ -11,6 +12,7 @@ import {
     BrowserMenuBarContribution
 } from '@theia/core/lib/browser/menu/browser-menu-plugin';
 import { PreferenceConfigurations } from '@theia/core/lib/browser/preferences/preference-configurations';
+import { WindowTitleService } from '@theia/core/lib/browser/window/window-title-service';
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { MenuContribution } from '@theia/core/lib/common/menu';
 import { ContainerModule } from '@theia/core/shared/inversify';
@@ -38,15 +40,17 @@ import { VesDebugPrefixConfiguration } from './ves-core-debug-prefix-configurati
 import { VesScmHistoryContribution } from './ves-core-history-contribution';
 import { VesDefaultFileIconThemeContribution } from './ves-core-icon-theme-contribution';
 import { VesCoreLabelProviderContribution } from './ves-core-label-provider';
+import { VesCorePreferenceSchema } from './ves-core-preferences';
 import { VesEncodingRegistry } from './ves-encoding-registry';
 import { VesNavigatorWidgetFactory } from './ves-navigator-widget-factory';
 import { VesPluginContribution } from './ves-plugin-contribution';
 import { VesPreferenceConfigurations } from './ves-preference-configurations';
 import { VesPreferenceStringInputRenderer } from './ves-preference-string-input-renderer';
-import { VesPreferenceTreeGenerator } from './ves-preference-tree-generator.';
+import { VesPreferenceTreeGenerator } from './ves-preference-tree-generator';
 import './ves-preferences-monaco-contribution';
 import { VesQuickOpenWorkspace } from './ves-quick-open-workspace';
 import { VesToolbarDefaultsOverride } from './ves-toolbar-defaults-override';
+import { VesWindowTitleService } from './ves-window-title-service';
 import { VesWorkspaceService } from './ves-workspace-service';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
@@ -62,6 +66,9 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(BrowserMainMenuFactory).toSelf().inSingletonScope();
     bind(BrowserMenuBarContribution).toSelf().inSingletonScope();
     bind(FrontendApplicationContribution).toService(BrowserMenuBarContribution);
+
+    // preferences
+    rebind(CorePreferenceContribution).toConstantValue({ schema: VesCorePreferenceSchema });
 
     // commands and menus
     bind(VesCoreContribution).toSelf().inSingletonScope();
@@ -147,6 +154,10 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // workspace service
     bind(VesWorkspaceService).toSelf().inSingletonScope();
     rebind(WorkspaceService).toService(VesWorkspaceService);
+
+    // window title service
+    bind(VesWindowTitleService).toSelf().inSingletonScope();
+    rebind(WindowTitleService).toService(VesWindowTitleService);
 
     // toolbar default config
     rebind(ToolbarDefaultsFactory).toConstantValue(VesToolbarDefaultsOverride);
