@@ -6,7 +6,7 @@ interface VContainerProps {
 export default function VContainer(props: PropsWithChildren<VContainerProps>): JSX.Element {
     const { children } = props;
 
-    // TODO: move to class
+    // TODO: move to css class
     return (<div style={{
         alignItems: 'center',
         display: 'flex',

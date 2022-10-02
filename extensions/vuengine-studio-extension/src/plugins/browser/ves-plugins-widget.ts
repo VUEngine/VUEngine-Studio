@@ -1,6 +1,7 @@
-import { Emitter, nls } from '@theia/core';
+import { nls } from '@theia/core';
 import { BadgeWidget, TreeNode } from '@theia/core/lib/browser';
 import { SourceTreeWidget } from '@theia/core/lib/browser/source-tree';
+import { Emitter, Event } from '@theia/core/lib/common';
 import { inject, injectable, interfaces, postConstruct } from '@theia/core/shared/inversify';
 import { VesPluginsSource, VesPluginsSourceOptions } from './ves-plugins-source';
 
@@ -51,17 +52,19 @@ export class VesPluginsWidget extends SourceTreeWidget implements BadgeWidget {
         }));
     }
 
-    private _badge: number | undefined = undefined;
+    protected _badge?: number;
     get badge(): number | undefined {
         return this._badge;
+    }
+    protected onDidChangeBadgeEmitter = new Emitter<void>();
+    get onDidChangeBadge(): Event<void> {
+        return this.onDidChangeBadgeEmitter.event;
     }
 
     set badge(count: number | undefined) {
         this._badge = count;
-        this.onDidChangeBadge.fire();
+        this.onDidChangeBadgeEmitter.fire();
     }
-
-    public onDidChangeBadge: Emitter<void> = new Emitter<void>();
 
     protected async resolveCount(): Promise<number | undefined> {
         if (this.options.id !== VesPluginsSourceOptions.SEARCH_RESULT) {
