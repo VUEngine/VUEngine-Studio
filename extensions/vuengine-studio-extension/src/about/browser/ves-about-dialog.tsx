@@ -123,7 +123,6 @@ export class VesAboutDialog extends AboutDialog {
             Domenic Umberto Raso,
             Eric Freeman,
             IanelGreenleaf,
-            Jesse Levine,
             Jose Zagal,
             Marten Reiß,
             Michael Ortega,
@@ -135,6 +134,7 @@ export class VesAboutDialog extends AboutDialog {
             RetroOnyx,
             Sean Machan,
             Steven Hagelgans,
+            Studio Kerga,
             Tony,
             Troy Bonneau,
             tydyedsyko

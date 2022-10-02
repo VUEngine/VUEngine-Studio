@@ -5,8 +5,8 @@ import { PreferenceSchema } from '@theia/core/lib/common/preferences/preference-
 export namespace VesZoomPreferenceIds {
     export const CATEGORY = 'window';
 
-    export const ZOOM_LEVEL = [CATEGORY, 'zoomLevel'].join('.');
-    export const SHOW_STATUS_BAR_ENTRY = [CATEGORY, 'showZoomInStatusBar'].join('.');
+    export const ZOOM_LEVEL = [CATEGORY, 'zoom', 'level'].join('.');
+    export const SHOW_STATUS_BAR_ENTRY = [CATEGORY, 'zoom', 'showInStatusBar'].join('.');
 }
 
 export const VesZoomPreferenceSchema: PreferenceSchema = {

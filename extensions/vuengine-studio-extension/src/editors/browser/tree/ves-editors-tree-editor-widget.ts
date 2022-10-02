@@ -173,7 +173,7 @@ export class VesEditorsTreeEditorWidget extends NavigatableTreeEditorWidget {
         const newData: { [k: string]: any } = {};
         newData[this.getTypeProperty()] = type;
 
-        // TODO handle children not being stored in an array
+        // TODO: handle children not being stored in an array
 
         if (!node.jsonforms.data[property]) {
             node.jsonforms.data[property] = [];

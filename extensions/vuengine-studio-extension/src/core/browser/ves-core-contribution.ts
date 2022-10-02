@@ -27,23 +27,7 @@ export class VesCoreContribution implements CommandContribution, MenuContributio
 
     @postConstruct()
     init(): void {
-        this.initMenubar();
         this.initThemes();
-    }
-
-    initMenubar(): void {
-        // work around Theia bug with main menu not being initialized when the default
-        // value is "compact"
-        const menuBarVisibility = this.preferenceService.get('window.menuBarVisibility');
-        if (menuBarVisibility === 'compact') {
-            this.shell.leftPanelHandler.addTopMenu({
-                id: 'main-menu',
-                iconClass: 'codicon codicon-menu',
-                title: nls.localizeByDefault('Application Menu'),
-                menuPath: MAIN_MENU_BAR,
-                order: 0,
-            });
-        }
     }
 
     initThemes(): void {

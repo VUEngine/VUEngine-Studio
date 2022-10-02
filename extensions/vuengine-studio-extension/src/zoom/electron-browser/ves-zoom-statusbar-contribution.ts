@@ -32,16 +32,14 @@ export class VesZoomStatusBarContribution implements FrontendApplicationContribu
             this.statusBar.removeElement('ves-zoom-factor');
         } else {
             const icon = (zoomLevelInt < 100)
-                ? 'search-minus'
-                : (zoomLevelInt > 100)
-                    ? 'search-plus'
-                    : 'search';
+                ? 'zoom-out'
+                : 'zoom-in';
 
             this.statusBar.setElement('ves-zoom-factor', {
                 alignment: StatusBarAlignment.LEFT,
                 command: VesZoomCommands.RESET_ZOOM.id,
                 priority: -100,
-                text: `$(${icon}) ${zoomLevel}`,
+                text: `$(codicon-${icon}) ${zoomLevel}`,
                 tooltip: nls.localize('vuengine/zoom/resetZoom', 'Reset zoom'),
             });
         }

@@ -5,7 +5,6 @@ import { ApplicationShellWithToolbarOverride } from '@theia/toolbar/lib/browser/
 
 @injectable()
 export class VesApplicationShell extends ApplicationShellWithToolbarOverride {
-
     canToggleMaximized(widget: Widget | undefined = this.currentWidget): boolean {
         const area = widget && this.getAreaFor(widget);
 
