@@ -41,6 +41,8 @@ export default function FontEditor(props: FontEditorProps): JSX.Element {
     const [paletteIndexL, setPaletteIndexL] = React.useState<number>(3);
     const [paletteIndexR, setPaletteIndexR] = React.useState<number>(0);
     const [currentCharacter, setCurrentCharacter] = React.useState<number>(0);
+    const [charGrid, setCharGrid] = React.useState<number>(1);
+    const [alphabetGrid, setAlphabetGrid] = React.useState<number>(1);
 
     const pixelWidth = fontData.size.x * CHAR_PIXEL_SIZE;
     const pixelHeight = fontData.size.y * CHAR_PIXEL_SIZE;
@@ -221,7 +223,9 @@ export default function FontEditor(props: FontEditorProps): JSX.Element {
                     paletteIndexR={paletteIndexR}
                     setPaletteIndexR={setPaletteIndexR}
                 />
+                {/*
                 <Tools />
+                 */}
                 <Actions
                     clipboard={clipboard}
                     setClipboard={setClipboard}
@@ -230,7 +234,9 @@ export default function FontEditor(props: FontEditorProps): JSX.Element {
                     currentCharData={fontData.characters[currentCharacter]}
                     setCurrentCharData={setCurrentCharacterData}
                 />
+                {/*
                 <ImportExport />
+                 */}
             </div>
             <div className='editor-column'>
                 <CharSettings
@@ -239,6 +245,8 @@ export default function FontEditor(props: FontEditorProps): JSX.Element {
                     charWidth={pixelWidth}
                     variableSize={fontData.variableSize}
                     setCharSize={setCharSize}
+                    charGrid={charGrid}
+                    setCharGrid={setCharGrid}
                 />
                 <CharEditor
                     char={fontData.characters[currentCharacter]}
@@ -249,6 +257,7 @@ export default function FontEditor(props: FontEditorProps): JSX.Element {
                     setPixelColor={setPixelColor}
                     paletteIndexL={paletteIndexL}
                     paletteIndexR={paletteIndexR}
+                    charGrid={charGrid}
                 />
             </div>
             <div className='alphabet-column'>
@@ -259,6 +268,8 @@ export default function FontEditor(props: FontEditorProps): JSX.Element {
                     setOffset={setOffset}
                     section={fontData.section}
                     setSection={setSection}
+                    alphabetGrid={alphabetGrid}
+                    setAlphabetGrid={setAlphabetGrid}
                 />
                 <Alphabet
                     charsData={fontData.characters}
@@ -269,6 +280,7 @@ export default function FontEditor(props: FontEditorProps): JSX.Element {
                     currentCharacter={currentCharacter}
                     setCurrentCharacter={setCurrentCharacter}
                     variableSize={fontData.variableSize}
+                    alphabetGrid={alphabetGrid}
                 />
             </div>
         </div>

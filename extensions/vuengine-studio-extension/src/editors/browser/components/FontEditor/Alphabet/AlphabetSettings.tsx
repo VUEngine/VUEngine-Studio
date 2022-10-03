@@ -1,4 +1,3 @@
-import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React from 'react';
 import { DataSection, MAX_CHAR_COUNT, MIN_CHAR_COUNT, MIN_OFFSET } from '../FontEditorTypes';
 
@@ -9,13 +8,17 @@ interface AlphabetSettingsProps {
     setOffset: (offset: number) => void
     section: DataSection
     setSection: (section: DataSection) => void
+    alphabetGrid: number
+    setAlphabetGrid: (grid: number) => void
 }
 
 export default function AlphabetSettings(props: AlphabetSettingsProps): JSX.Element {
+
     const {
         charCount, setCharCount,
         offset, setOffset,
-        section, setSection,
+        // section, setSection,
+        alphabetGrid, setAlphabetGrid,
     } = props;
 
     return <div className='font-properties'>
@@ -43,6 +46,7 @@ export default function AlphabetSettings(props: AlphabetSettingsProps): JSX.Elem
                 onChange={e => setOffset(parseInt(e.target.value))}
             />
         </div>
+        {/*
         <div>
             <label>Section</label>
             <SelectComponent
@@ -57,6 +61,19 @@ export default function AlphabetSettings(props: AlphabetSettingsProps): JSX.Elem
                     description: 'Save tile data to expansion space',
                 }]}
                 onChange={option => setSection(option.value as DataSection)}
+            />
+        </div>
+        */}
+        <div>
+            <label>Grid</label>
+            <input
+                className="theia-input"
+                type="number"
+                step="1"
+                min="0"
+                max="3"
+                value={alphabetGrid}
+                onChange={e => setAlphabetGrid(parseInt(e.target.value))}
             />
         </div>
     </div>;

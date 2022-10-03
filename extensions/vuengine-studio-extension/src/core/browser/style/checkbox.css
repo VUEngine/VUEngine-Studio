@@ -5,6 +5,7 @@
 [type="checkbox"] {
     -webkit-appearance: none;
     background-color: transparent;
+    flex: unset !important;
     height: var(--theia-ui-font-size2);
     line-height: var(--theia-ui-font-size2);
     margin: 0 var(--theia-ui-padding) 0 0;

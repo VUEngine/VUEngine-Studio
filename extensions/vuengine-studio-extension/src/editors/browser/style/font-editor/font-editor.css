@@ -21,40 +21,157 @@
 
 /* Character Table */
 
-.font-editor.width-8.height-24 .editor .alphabet-column .font-properties,
-.font-editor.width-8.height-32 .editor .alphabet-column .font-properties,
-.font-editor.width-8.height-24 .editor .characters,
-.font-editor.width-8.height-32 .editor .characters {
+.font-editor .editor .characters {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.font-editor .editor .characters.grid-0 {
+  gap: 0;
+}
+
+.font-editor .editor .characters.grid-1 {
+  gap: 1px;
+}
+
+.font-editor .editor .characters.grid-2 {
+  gap: 2px;
+}
+
+.font-editor .editor .characters.grid-3 {
+  gap: 3px;
+}
+
+.font-editor.width-8.height-24 .editor.gap-0 .alphabet-column .font-properties,
+.font-editor.width-8.height-32 .editor.gap-0 .alphabet-column .font-properties,
+.font-editor.width-8.height-24 .editor.gap-0 .characters,
+.font-editor.width-8.height-32 .editor.gap-0 .characters {
+  width: calc(16 * 8px);
+}
+
+.font-editor.width-8.height-8 .editor.gap-0 .alphabet-column .font-properties,
+.font-editor.width-8.height-16 .editor.gap-0 .alphabet-column .font-properties,
+.font-editor.width-16.height-24 .editor.gap-0 .alphabet-column .font-properties,
+.font-editor.width-16.height-32 .editor.gap-0 .alphabet-column .font-properties,
+.font-editor.width-8.height-8 .editor.gap-0 .characters,
+.font-editor.width-8.height-16 .editor.gap-0 .characters,
+.font-editor.width-16.height-24 .editor.gap-0 .characters,
+.font-editor.width-16.height-32 .editor.gap-0 .characters {
+  width: calc(16 * 16px);
+}
+
+.font-editor.width-24 .editor.gap-0 .alphabet-column .font-properties,
+.font-editor.width-24 .editor.gap-0 .characters {
+  width: calc(16 * 24px);
+}
+
+.font-editor.width-16.height-8 .editor.gap-0 .alphabet-column .font-properties,
+.font-editor.width-16.height-16 .editor.gap-0 .alphabet-column .font-properties,
+.font-editor.width-32 .editor.gap-0 .alphabet-column .font-properties,
+.font-editor.width-16.height-8 .editor.gap-0 .characters,
+.font-editor.width-16.height-16 .editor.gap-0 .characters,
+.font-editor.width-32 .editor.gap-0 .characters {
+  width: calc(16 * 32px);
+}
+
+.font-editor.width-8.height-24 .editor.gap-1 .alphabet-column .font-properties,
+.font-editor.width-8.height-32 .editor.gap-1 .alphabet-column .font-properties,
+.font-editor.width-8.height-24 .editor.gap-1 .characters,
+.font-editor.width-8.height-32 .editor.gap-1 .characters {
+  width: calc(16 * (8px + 1px));
+}
+
+.font-editor.width-8.height-8 .editor.gap-1 .alphabet-column .font-properties,
+.font-editor.width-8.height-16 .editor.gap-1 .alphabet-column .font-properties,
+.font-editor.width-16.height-24 .editor.gap-1 .alphabet-column .font-properties,
+.font-editor.width-16.height-32 .editor.gap-1 .alphabet-column .font-properties,
+.font-editor.width-8.height-8 .editor.gap-1 .characters,
+.font-editor.width-8.height-16 .editor.gap-1 .characters,
+.font-editor.width-16.height-24 .editor.gap-1 .characters,
+.font-editor.width-16.height-32 .editor.gap-1 .characters {
+  width: calc(16 * (16px + 1px));
+}
+
+.font-editor.width-24 .editor.gap-1 .alphabet-column .font-properties,
+.font-editor.width-24 .editor.gap-1 .characters {
+  width: calc(16 * (24px + 1px));
+}
+
+.font-editor.width-16.height-8 .editor.gap-1 .alphabet-column .font-properties,
+.font-editor.width-16.height-16 .editor.gap-1 .alphabet-column .font-properties,
+.font-editor.width-32 .editor.gap-1 .alphabet-column .font-properties,
+.font-editor.width-16.height-8 .editor.gap-1 .characters,
+.font-editor.width-16.height-16 .editor.gap-1 .characters,
+.font-editor.width-32 .editor.gap-1 .characters {
+  width: calc(16 * (32px + 1px));
+}
+
+.font-editor.width-8.height-24 .editor.gap-2 .alphabet-column .font-properties,
+.font-editor.width-8.height-32 .editor.gap-2 .alphabet-column .font-properties,
+.font-editor.width-8.height-24 .editor.gap-2 .characters,
+.font-editor.width-8.height-32 .editor.gap-2 .characters {
   width: calc(16 * (8px + 2px));
 }
 
-.font-editor.width-8.height-8 .editor .alphabet-column .font-properties,
-.font-editor.width-8.height-16 .editor .alphabet-column .font-properties,
-.font-editor.width-16.height-24 .editor .alphabet-column .font-properties,
-.font-editor.width-16.height-32 .editor .alphabet-column .font-properties,
-.font-editor.width-8.height-8 .editor .characters,
-.font-editor.width-8.height-16 .editor .characters,
-.font-editor.width-16.height-24 .editor .characters,
-.font-editor.width-16.height-32 .editor .characters {
+.font-editor.width-8.height-8 .editor.gap-2 .alphabet-column .font-properties,
+.font-editor.width-8.height-16 .editor.gap-2 .alphabet-column .font-properties,
+.font-editor.width-16.height-24 .editor.gap-2 .alphabet-column .font-properties,
+.font-editor.width-16.height-32 .editor.gap-2 .alphabet-column .font-properties,
+.font-editor.width-8.height-8 .editor.gap-2 .characters,
+.font-editor.width-8.height-16 .editor.gap-2 .characters,
+.font-editor.width-16.height-24 .editor.gap-2 .characters,
+.font-editor.width-16.height-32 .editor.gap-2 .characters {
   width: calc(16 * (16px + 2px));
 }
 
-.font-editor.width-24 .editor .alphabet-column .font-properties,
-.font-editor.width-24 .editor .characters {
+.font-editor.width-24 .editor.gap-2 .alphabet-column .font-properties,
+.font-editor.width-24 .editor.gap-2 .characters {
   width: calc(16 * (24px + 2px));
 }
 
-.font-editor.width-16.height-8 .editor .alphabet-column .font-properties,
-.font-editor.width-16.height-16 .editor .alphabet-column .font-properties,
-.font-editor.width-32 .editor .alphabet-column .font-properties,
-.font-editor.width-16.height-8 .editor .characters,
-.font-editor.width-16.height-16 .editor .characters,
-.font-editor.width-32 .editor .characters {
+.font-editor.width-16.height-8 .editor.gap-2 .alphabet-column .font-properties,
+.font-editor.width-16.height-16 .editor.gap-2 .alphabet-column .font-properties,
+.font-editor.width-32 .editor.gap-2 .alphabet-column .font-properties,
+.font-editor.width-16.height-8 .editor.gap-2 .characters,
+.font-editor.width-16.height-16 .editor.gap-2 .characters,
+.font-editor.width-32 .editor.gap-2 .characters {
   width: calc(16 * (32px + 2px));
 }
 
+.font-editor.width-8.height-24 .editor.gap-3 .alphabet-column .font-properties,
+.font-editor.width-8.height-32 .editor.gap-3 .alphabet-column .font-properties,
+.font-editor.width-8.height-24 .editor.gap-3 .characters,
+.font-editor.width-8.height-32 .editor.gap-3 .characters {
+  width: calc(16 * (8px + 3px));
+}
+
+.font-editor.width-8.height-8 .editor.gap-3 .alphabet-column .font-properties,
+.font-editor.width-8.height-16 .editor.gap-3 .alphabet-column .font-properties,
+.font-editor.width-16.height-24 .editor.gap-3 .alphabet-column .font-properties,
+.font-editor.width-16.height-32 .editor.gap-3 .alphabet-column .font-properties,
+.font-editor.width-8.height-8 .editor.gap-3 .characters,
+.font-editor.width-8.height-16 .editor.gap-3 .characters,
+.font-editor.width-16.height-24 .editor.gap-3 .characters,
+.font-editor.width-16.height-32 .editor.gap-3 .characters {
+  width: calc(16 * (16px + 3px));
+}
+
+.font-editor.width-24 .editor.gap-3 .alphabet-column .font-properties,
+.font-editor.width-24 .editor.gap-3 .characters {
+  width: calc(16 * (24px + 3px));
+}
+
+.font-editor.width-16.height-8 .editor.gap-3 .alphabet-column .font-properties,
+.font-editor.width-16.height-16 .editor.gap-3 .alphabet-column .font-properties,
+.font-editor.width-32 .editor.gap-3 .alphabet-column .font-properties,
+.font-editor.width-16.height-8 .editor.gap-3 .characters,
+.font-editor.width-16.height-16 .editor.gap-3 .characters,
+.font-editor.width-32 .editor.gap-3 .characters {
+  width: calc(16 * (32px + 3px));
+}
+
 .font-editor .editor .characters .character {
-  border: 1px solid var(--theia-editor-background);
   color: var(--theia-input-background);
   cursor: pointer;
   font-family: monospace;
@@ -63,6 +180,27 @@
   height: 16px;
   text-align: center;
   width: 16px;
+}
+
+.font-editor .editor .characters .line {
+  display: flex;
+  gap: 1px;
+}
+
+.font-editor .editor .characters.grid-0 .line {
+  gap: 0;
+}
+
+.font-editor .editor .characters.grid-1 .line {
+  gap: 1px;
+}
+
+.font-editor .editor .characters.grid-2 .line {
+  gap: 2px;
+}
+
+.font-editor .editor .characters.grid-3 .line {
+  gap: 3px;
 }
 
 .font-editor .editor .characters .line:nth-child(8) .character {
@@ -151,7 +289,8 @@
 
 .font-editor .editor .characters .character:hover,
 .font-editor .editor .characters .character.active {
-  border-color: var(--theia-editor-foreground);
+  outline: 1px solid var(--theia-editor-foreground);
+  z-index: 1;
 }
 
 .font-editor .editor .characters .character.inactive {
@@ -173,14 +312,45 @@
   gap: 1px;
 }
 
+.font-editor .editor .current-character.grid-0 {
+  gap: 0;
+}
+
+.font-editor .editor .current-character.grid-1 {
+  gap: 1px;
+}
+
+.font-editor .editor .current-character.grid-2 {
+  gap: 2px;
+}
+
+.font-editor .editor .current-character.grid-3 {
+  gap: 3px;
+}
+
 .font-editor .editor .current-character .line {
   display: flex;
   gap: 1px;
 }
 
+.font-editor .editor .current-character.grid-0 .line {
+  gap: 0;
+}
+
+.font-editor .editor .current-character.grid-1 .line {
+  gap: 1px;
+}
+
+.font-editor .editor .current-character.grid-2 .line {
+  gap: 2px;
+}
+
+.font-editor .editor .current-character.grid-3 .line {
+  gap: 3px;
+}
+
 .font-editor .editor .current-character .pixel {
   aspect-ratio: 1;
-  border: 1px solid transparent;
   cursor: crosshair;
   display: flex;
   flex-grow: 1;
@@ -195,7 +365,8 @@
 }
 
 .font-editor .editor .current-character .pixel:hover {
-  border-color: var(--theia-editor-foreground);
+  outline: 1px solid var(--theia-editor-foreground);
+  z-index: 1;
 }
 
 .font-editor .editor .current-character .pixel:after,

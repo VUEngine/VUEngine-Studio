@@ -54,6 +54,16 @@
   gap: 15px;
 }
 
+.array-table-layout table,
+.array-table-layout th,
+.array-table-layout td {
+  border: none;
+}
+
+.array-table-layout td {
+  justify-content: center;
+}
+
 /* Custom */
 
 .theia-tree-editor {

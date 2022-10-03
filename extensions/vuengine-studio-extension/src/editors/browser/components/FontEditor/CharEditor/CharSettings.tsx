@@ -8,12 +8,15 @@ interface CharSettingsProps {
     charWidth: number,
     variableSize: VariableSize,
     setCharSize: (size?: Size, variableSize?: VariableSize) => void
+    charGrid: number
+    setCharGrid: (grid: number) => void
 }
 
 export default function CharSettings(props: CharSettingsProps): JSX.Element {
     const {
         currentCharacter,
         charHeight, charWidth, variableSize, setCharSize,
+        charGrid, setCharGrid
     } = props;
 
     const onChangeVariablePixelWidth = (e: React.ChangeEvent<HTMLInputElement>) => setCharSize(
@@ -124,6 +127,7 @@ export default function CharSettings(props: CharSettingsProps): JSX.Element {
                 />
             </div>
         </div>
+        {/*
         <div>
             <label>Type</label>
             <SelectComponent
@@ -144,6 +148,19 @@ export default function CharSettings(props: CharSettingsProps): JSX.Element {
                         enabled: option.value === '1' ? true : false
                     }
                 )}
+            />
+        </div>
+        */}
+        <div>
+            <label>Grid</label>
+            <input
+                className="theia-input"
+                type="number"
+                step="1"
+                min="0"
+                max="3"
+                value={charGrid}
+                onChange={e => setCharGrid(parseInt(e.target.value))}
             />
         </div>
     </div>;
