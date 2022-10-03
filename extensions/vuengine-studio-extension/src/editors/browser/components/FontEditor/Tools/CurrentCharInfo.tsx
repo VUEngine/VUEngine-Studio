@@ -13,7 +13,7 @@ export default function CurrentCharInfo(props: CurrentCharInfoProps): JSX.Elemen
             type="string"
             maxLength={1}
             minLength={1}
-            className="theia-input"
+            className="theia-input large"
             value={win1252CharNames[currentCharacter]}
             readOnly
         />

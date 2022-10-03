@@ -1,19 +1,22 @@
+import { nls } from '@theia/core';
 import React from 'react';
+import { FontEditorState } from '../FontEditorTypes';
 
 interface ActionsProps {
     clipboard: number[][] | undefined,
-    setClipboard: (data: number[][]) => void,
     charHeight: number,
     charWidth: number,
     currentCharData: number[][]
     setCurrentCharData: (data: number[][]) => void
+    setState: (state: Partial<FontEditorState>) => void
 }
 
 export default function Actions(props: ActionsProps): JSX.Element {
     const {
-        clipboard, setClipboard,
+        clipboard,
         charHeight, charWidth,
-        currentCharData, setCurrentCharData
+        currentCharData, setCurrentCharData,
+        setState
     } = props;
 
     const getBlankCharacterLine = (): number[] => {
@@ -86,8 +89,18 @@ export default function Actions(props: ActionsProps): JSX.Element {
         setCurrentCharData(currentCharData.map(line => [0, ...line.slice(0, -1)]));
     };
 
+    const toneUp = (): void => {
+        setCurrentCharData(currentCharData.map(line =>
+            line.map(pixel => pixel < 3 ? pixel + 1 : pixel)));
+    };
+
+    const toneDown = (): void => {
+        setCurrentCharData(currentCharData.map(line =>
+            line.map(pixel => pixel > 0 ? pixel - 1 : pixel)));
+    };
+
     const copy = (): void => {
-        setClipboard([...currentCharData]);
+        setState({ clipboard: [...currentCharData] });
     };
 
     const paste = (): void => {
@@ -99,70 +112,86 @@ export default function Actions(props: ActionsProps): JSX.Element {
     return <div className="tools">
         <button
             className="theia-button secondary"
-            title="Clear"
+            title={nls.localize('vuengine/fontEditor/actions/clear', 'Clear')}
             onClick={clear}
         >
             <i className="fa fa-trash"></i>
         </button>
         <button
             className="theia-button secondary"
-            title="Rotate"
+            title={nls.localize('vuengine/fontEditor/actions/rotate', 'Rotate')}
             onClick={rotate}
         >
             <i className="fa fa-rotate-right"></i>
         </button>
         <button
             className="theia-button secondary"
-            title="Mirror Horizontally"
+            title={nls.localize('vuengine/fontEditor/actions/mirrorHorizontally', 'Mirror Horizontally')}
             onClick={mirrorHorizontally}
         >
             <i className="fa fa-arrows-h"></i>
         </button>
         <button
             className="theia-button secondary"
-            title="Mirror Vertically"
+            title={nls.localize('vuengine/fontEditor/actions/mirrorVertically', 'Mirror Vertically')}
             onClick={mirrorVertically}
         >
             <i className="fa fa-arrows-v"></i>
         </button>
         <button
             className="theia-button secondary"
-            title="Move Up"
+            title={nls.localize('vuengine/fontEditor/actions/moveUp', 'Move Up')}
             onClick={moveUp}
         >
             <i className="fa fa-arrow-up"></i>
         </button>
         <button
             className="theia-button secondary"
-            title="Move Down"
+            title={nls.localize('vuengine/fontEditor/actions/moveDown', 'Move Down')}
             onClick={moveDown}
         >
             <i className="fa fa-arrow-down"></i>
         </button>
         <button
             className="theia-button secondary"
-            title="Move Left"
+            title={nls.localize('vuengine/fontEditor/actions/moveLeft', 'Move Left')}
             onClick={moveLeft}
         >
             <i className="fa fa-arrow-left"></i>
         </button>
         <button
             className="theia-button secondary"
-            title="Move Right"
+            title={nls.localize('vuengine/fontEditor/actions/moveRight', 'Move Right')}
             onClick={moveRight}
         >
             <i className="fa fa-arrow-right"></i>
         </button>
         <button
             className="theia-button secondary"
-            title="Copy"
+            title={nls.localize('vuengine/fontEditor/actions/toneDown', 'Tone Down')}
+            onClick={toneDown}
+        >
+            <i className="fa fa-sun-o"></i>
+            <i className="fa fa-long-arrow-down"></i>
+        </button>
+        <button
+            className="theia-button secondary"
+            title={nls.localize('vuengine/fontEditor/actions/toneUp', 'Tone Up')}
+            onClick={toneUp}
+        >
+            <i className="fa fa-sun-o"></i>
+            <i className="fa fa-long-arrow-up"></i>
+        </button>
+        <button
+            className="theia-button secondary"
+            title={nls.localize('vuengine/fontEditor/actions/copy', 'Copy')}
             onClick={copy}
         >
             <i className="fa fa-clone"></i>
         </button>
         <button
             className="theia-button secondary"
-            title="Paste"
+            title={nls.localize('vuengine/fontEditor/actions/paste', 'Paste')}
             onClick={paste}
         >
             <i className="fa fa-paste"></i>

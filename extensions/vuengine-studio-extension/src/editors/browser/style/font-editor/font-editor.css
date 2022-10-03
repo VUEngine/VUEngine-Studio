@@ -1,6 +1,17 @@
+.font-editor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.font-editor:focus {
+  outline: none;
+}
+
 .font-editor .editor {
   display: flex;
   flex-direction: row;
+  flex-grow: 1;
   gap: 40px;
 }
 
@@ -75,38 +86,6 @@
   width: calc(16 * 32px);
 }
 
-.font-editor.width-8.height-24 .editor.gap-1 .alphabet-column .font-properties,
-.font-editor.width-8.height-32 .editor.gap-1 .alphabet-column .font-properties,
-.font-editor.width-8.height-24 .editor.gap-1 .characters,
-.font-editor.width-8.height-32 .editor.gap-1 .characters {
-  width: calc(16 * (8px + 1px));
-}
-
-.font-editor.width-8.height-8 .editor.gap-1 .alphabet-column .font-properties,
-.font-editor.width-8.height-16 .editor.gap-1 .alphabet-column .font-properties,
-.font-editor.width-16.height-24 .editor.gap-1 .alphabet-column .font-properties,
-.font-editor.width-16.height-32 .editor.gap-1 .alphabet-column .font-properties,
-.font-editor.width-8.height-8 .editor.gap-1 .characters,
-.font-editor.width-8.height-16 .editor.gap-1 .characters,
-.font-editor.width-16.height-24 .editor.gap-1 .characters,
-.font-editor.width-16.height-32 .editor.gap-1 .characters {
-  width: calc(16 * (16px + 1px));
-}
-
-.font-editor.width-24 .editor.gap-1 .alphabet-column .font-properties,
-.font-editor.width-24 .editor.gap-1 .characters {
-  width: calc(16 * (24px + 1px));
-}
-
-.font-editor.width-16.height-8 .editor.gap-1 .alphabet-column .font-properties,
-.font-editor.width-16.height-16 .editor.gap-1 .alphabet-column .font-properties,
-.font-editor.width-32 .editor.gap-1 .alphabet-column .font-properties,
-.font-editor.width-16.height-8 .editor.gap-1 .characters,
-.font-editor.width-16.height-16 .editor.gap-1 .characters,
-.font-editor.width-32 .editor.gap-1 .characters {
-  width: calc(16 * (32px + 1px));
-}
-
 .font-editor.width-8.height-24 .editor.gap-2 .alphabet-column .font-properties,
 .font-editor.width-8.height-32 .editor.gap-2 .alphabet-column .font-properties,
 .font-editor.width-8.height-24 .editor.gap-2 .characters,
@@ -174,11 +153,8 @@
 .font-editor .editor .characters .character {
   color: var(--theia-input-background);
   cursor: pointer;
-  font-family: monospace;
-  font-size: 8px;
-  float: left;
   height: 16px;
-  text-align: center;
+  position: relative;
   width: 16px;
 }
 
@@ -287,7 +263,7 @@
   justify-content: center;
 }
 
-.font-editor .editor .characters .character:hover,
+.font-editor .editor .characters .character:not(.inactive):hover,
 .font-editor .editor .characters .character.active {
   outline: 1px solid var(--theia-editor-foreground);
   z-index: 1;
@@ -362,192 +338,6 @@
 .font-editor .editor .current-character .pixel.inactive {
   cursor: not-allowed;
   opacity: .1;
-}
-
-.font-editor .editor .current-character .pixel:hover {
-  outline: 1px solid var(--theia-editor-foreground);
-  z-index: 1;
-}
-
-.font-editor .editor .current-character .pixel:after,
-.font-editor .editor .current-character .pixel:before {
-  align-items: center;
-  color: var(--theia-input-background);
-  display: flex;
-  font-family: monospace;
-  font-size: 8px;
-  left: 0;
-  justify-content: center;
-  position: absolute;
-  right: 0;
-  top: -14px;
-}
-
-.font-editor .editor .current-character .pixel:before {
-  bottom: 0;
-  left: -14px;
-  right: unset;
-  top: 0;
-}
-
-.font-editor .editor .current-character .line:nth-child(1) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(1):after {
-  content: '0'
-}
-
-.font-editor .editor .current-character .line:nth-child(2) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(2):after {
-  content: '1'
-}
-
-.font-editor .editor .current-character .line:nth-child(3) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(3):after {
-  content: '2'
-}
-
-.font-editor .editor .current-character .line:nth-child(4) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(4):after {
-  content: '3'
-}
-
-.font-editor .editor .current-character .line:nth-child(5) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(5):after {
-  content: '4'
-}
-
-.font-editor .editor .current-character .line:nth-child(6) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(6):after {
-  content: '5'
-}
-
-.font-editor .editor .current-character .line:nth-child(7) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(7):after {
-  content: '6'
-}
-
-.font-editor .editor .current-character .line:nth-child(8) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(8):after {
-  content: '7'
-}
-
-.font-editor .editor .current-character .line:nth-child(9) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(9):after {
-  content: '8'
-}
-
-.font-editor .editor .current-character .line:nth-child(10) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(10):after {
-  content: '9'
-}
-
-.font-editor .editor .current-character .line:nth-child(11) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(11):after {
-  content: 'A'
-}
-
-.font-editor .editor .current-character .line:nth-child(12) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(12):after {
-  content: 'B'
-}
-
-.font-editor .editor .current-character .line:nth-child(13) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(13):after {
-  content: 'C'
-}
-
-.font-editor .editor .current-character .line:nth-child(14) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(14):after {
-  content: 'D'
-}
-
-.font-editor .editor .current-character .line:nth-child(15) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(15):after {
-  content: 'E'
-}
-
-.font-editor .editor .current-character .line:nth-child(16) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(16):after {
-  content: 'F'
-}
-
-.font-editor .editor .current-character .line:nth-child(17) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(17):after {
-  content: '10'
-}
-
-.font-editor .editor .current-character .line:nth-child(18) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(18):after {
-  content: '11'
-}
-
-.font-editor .editor .current-character .line:nth-child(19) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(19):after {
-  content: '12'
-}
-
-.font-editor .editor .current-character .line:nth-child(20) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(20):after {
-  content: '13'
-}
-
-.font-editor .editor .current-character .line:nth-child(21) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(21):after {
-  content: '14'
-}
-
-.font-editor .editor .current-character .line:nth-child(22) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(22):after {
-  content: '15'
-}
-
-.font-editor .editor .current-character .line:nth-child(23) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(23):after {
-  content: '16'
-}
-
-.font-editor .editor .current-character .line:nth-child(24) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(24):after {
-  content: '17'
-}
-
-.font-editor .editor .current-character .line:nth-child(25) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(25):after {
-  content: '18'
-}
-
-.font-editor .editor .current-character .line:nth-child(26) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(26):after {
-  content: '19'
-}
-
-.font-editor .editor .current-character .line:nth-child(27) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(27):after {
-  content: '1A'
-}
-
-.font-editor .editor .current-character .line:nth-child(28) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(28):after {
-  content: '1B'
-}
-
-.font-editor .editor .current-character .line:nth-child(29) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(29):after {
-  content: '1C'
-}
-
-.font-editor .editor .current-character .line:nth-child(30) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(30):after {
-  content: '1D'
-}
-
-.font-editor .editor .current-character .line:nth-child(31) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(31):after {
-  content: '1E'
-}
-
-.font-editor .editor .current-character .line:nth-child(32) .pixel:first-child:before,
-.font-editor .editor .current-character .line:first-child .pixel:nth-child(32):after {
-  content: '1F'
 }
 
 /* Colors */
@@ -643,8 +433,196 @@
 .font-editor .current-character-info input {
   box-sizing: border-box;
   margin-bottom: 5px;
-  margin-top: 21px;
+  margin-top: 16px;
   padding-right: 6px;
   text-align: center;
   width: 100%;
+}
+
+/* Markers */
+
+.font-editor .editor .current-character .pixel:hover {
+  outline: 1px solid var(--theia-editor-foreground);
+  z-index: 1;
+}
+
+.font-editor .editor .markers .line>div:after,
+.font-editor .editor .markers .line>div:before {
+  align-items: center;
+  color: var(--theia-input-background);
+  display: flex;
+  font-family: monospace;
+  font-size: 8px;
+  left: 0;
+  justify-content: center;
+  position: absolute;
+  right: 0;
+  top: -14px;
+}
+
+.font-editor .editor .markers .line>div:before {
+  bottom: 0;
+  left: -14px;
+  right: unset;
+  top: 0;
+}
+
+.font-editor .editor .markers .line:nth-child(1)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(1):after {
+  content: '0'
+}
+
+.font-editor .editor .markers .line:nth-child(2)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(2):after {
+  content: '1'
+}
+
+.font-editor .editor .markers .line:nth-child(3)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(3):after {
+  content: '2'
+}
+
+.font-editor .editor .markers .line:nth-child(4)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(4):after {
+  content: '3'
+}
+
+.font-editor .editor .markers .line:nth-child(5)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(5):after {
+  content: '4'
+}
+
+.font-editor .editor .markers .line:nth-child(6)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(6):after {
+  content: '5'
+}
+
+.font-editor .editor .markers .line:nth-child(7)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(7):after {
+  content: '6'
+}
+
+.font-editor .editor .markers .line:nth-child(8)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(8):after {
+  content: '7'
+}
+
+.font-editor .editor .markers .line:nth-child(9)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(9):after {
+  content: '8'
+}
+
+.font-editor .editor .markers .line:nth-child(10)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(10):after {
+  content: '9'
+}
+
+.font-editor .editor .markers .line:nth-child(11)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(11):after {
+  content: 'A'
+}
+
+.font-editor .editor .markers .line:nth-child(12)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(12):after {
+  content: 'B'
+}
+
+.font-editor .editor .markers .line:nth-child(13)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(13):after {
+  content: 'C'
+}
+
+.font-editor .editor .markers .line:nth-child(14)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(14):after {
+  content: 'D'
+}
+
+.font-editor .editor .markers .line:nth-child(15)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(15):after {
+  content: 'E'
+}
+
+.font-editor .editor .markers .line:nth-child(16)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(16):after {
+  content: 'F'
+}
+
+.font-editor .editor .markers .line:nth-child(17)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(17):after {
+  content: '10'
+}
+
+.font-editor .editor .markers .line:nth-child(18)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(18):after {
+  content: '11'
+}
+
+.font-editor .editor .markers .line:nth-child(19)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(19):after {
+  content: '12'
+}
+
+.font-editor .editor .markers .line:nth-child(20)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(20):after {
+  content: '13'
+}
+
+.font-editor .editor .markers .line:nth-child(21)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(21):after {
+  content: '14'
+}
+
+.font-editor .editor .markers .line:nth-child(22)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(22):after {
+  content: '15'
+}
+
+.font-editor .editor .markers .line:nth-child(23)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(23):after {
+  content: '16'
+}
+
+.font-editor .editor .markers .line:nth-child(24)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(24):after {
+  content: '17'
+}
+
+.font-editor .editor .markers .line:nth-child(25)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(25):after {
+  content: '18'
+}
+
+.font-editor .editor .markers .line:nth-child(26)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(26):after {
+  content: '19'
+}
+
+.font-editor .editor .markers .line:nth-child(27)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(27):after {
+  content: '1A'
+}
+
+.font-editor .editor .markers .line:nth-child(28)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(28):after {
+  content: '1B'
+}
+
+.font-editor .editor .markers .line:nth-child(29)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(29):after {
+  content: '1C'
+}
+
+.font-editor .editor .markers .line:nth-child(30)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(30):after {
+  content: '1D'
+}
+
+.font-editor .editor .markers .line:nth-child(31)>div:first-child:before,
+.font-editor .editor .markers .line:first-child>div:nth-child(31):after {
+  content: '1E'
+}
+
+.font-editor .editor .markers .line:nth-child(32) .pixel:first-child:before,
+.font-editor .editor .markers .line:first-child .pixel:nth-child(32):after {
+  content: '1F'
 }

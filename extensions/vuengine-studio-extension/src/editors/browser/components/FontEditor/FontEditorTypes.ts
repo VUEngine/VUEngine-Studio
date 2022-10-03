@@ -1,3 +1,14 @@
+export interface FontEditorState {
+    active: boolean
+    clipboard: number[][] | undefined
+    tool: FontEditorTools
+    paletteIndexL: number
+    paletteIndexR: number
+    currentCharacter: number
+    charGrid: number
+    alphabetGrid: number
+}
+
 export interface FontData {
     name: string
     offset: number
@@ -22,6 +33,12 @@ export interface VariableSize {
 export enum DataSection {
     ROM = 'rom',
     EXP = 'exp',
+}
+
+export enum FontEditorTools {
+    PENCIL,
+    FILL,
+    FILL_ALL,
 }
 
 export const win1252CharNames = [

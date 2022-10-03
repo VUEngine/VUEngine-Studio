@@ -1,5 +1,5 @@
 import React from 'react';
-import { PALETTE_COLORS, VariableSize, win1252CharNames } from '../FontEditorTypes';
+import { FontEditorState, PALETTE_COLORS, VariableSize, win1252CharNames } from '../FontEditorTypes';
 
 interface AlphabetCharProps {
     line: number
@@ -11,7 +11,7 @@ interface AlphabetCharProps {
     charWidth: number
     currentCharacter: number
     variableSize: VariableSize
-    setCurrentCharacter: (id: number) => void
+    setState: (state: Partial<FontEditorState>) => void
 }
 
 export default function AlphabetChar(props: AlphabetCharProps): JSX.Element {
@@ -20,8 +20,9 @@ export default function AlphabetChar(props: AlphabetCharProps): JSX.Element {
         charHeight, charWidth,
         line, index,
         offset, charCount,
-        currentCharacter, setCurrentCharacter,
-        variableSize
+        currentCharacter,
+        variableSize,
+        setState
     } = props;
 
     const classNames = ['character'];
@@ -51,7 +52,7 @@ export default function AlphabetChar(props: AlphabetCharProps): JSX.Element {
     return <div
         className={classNames.join(' ')}
         title={win1252CharNames[character]}
-        onClick={() => !classNames.includes('inactive') && setCurrentCharacter(character)}
+        onClick={() => !classNames.includes('inactive') && setState({ currentCharacter: character })}
     >
         <div
             key={`character-pixels-${character}`}

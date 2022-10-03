@@ -10,7 +10,7 @@ interface CharEditorProps {
     variableSize: VariableSize,
     paletteIndexL: number,
     paletteIndexR: number,
-    setPixelColor: (x: number, y: number, color: number) => void,
+    clickPixel: (x: number, y: number, color: number) => void,
     charGrid: number
 }
 
@@ -20,12 +20,12 @@ export default function CharEditor(props: CharEditorProps): JSX.Element {
         charId,
         charHeight, charWidth,
         variableSize,
-        setPixelColor,
+        clickPixel,
         paletteIndexL, paletteIndexR,
         charGrid
     } = props;
 
-    return <div className={`current-character grid-${charGrid}`}>
+    return <div className={`current-character markers grid-${charGrid}`}>
         {
             [...Array(charHeight)].map((h, y) => (
                 <div
@@ -37,7 +37,7 @@ export default function CharEditor(props: CharEditorProps): JSX.Element {
                         x={x}
                         y={y}
                         pixelColor={char[y][x]}
-                        setPixelColor={setPixelColor}
+                        clickPixel={clickPixel}
                         paletteIndexL={paletteIndexL}
                         paletteIndexR={paletteIndexR}
                         active={!variableSize.enabled || x < variableSize.x[charId]}

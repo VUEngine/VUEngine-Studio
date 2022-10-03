@@ -1,7 +1,6 @@
 import { DetailFormWidget, jsonFormsConfig, JsonFormsDetailConfig } from '@eclipse-emfcloud/theia-tree-editor';
 import { injectable } from '@theia/core/shared/inversify';
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { VES_RENDERERS } from './renderers/ves-renderers';
 
 @injectable()
@@ -17,9 +16,6 @@ export class VesDetailFormWidget extends DetailFormWidget {
     }
 
     protected renderEmptyForms(): void {
-        ReactDOM.render(
-            <></>,
-            this.node
-        );
+        createRoot(this.node);
     }
 }

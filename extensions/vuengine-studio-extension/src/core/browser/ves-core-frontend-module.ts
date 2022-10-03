@@ -1,8 +1,7 @@
 import { CallHierarchyContribution } from '@theia/callhierarchy/lib/browser/callhierarchy-contribution';
 import {
     ApplicationShell, CorePreferenceContribution, FrontendApplicationContribution,
-    LabelProviderContribution,
-    PreferenceContribution
+    LabelProviderContribution
 } from '@theia/core/lib/browser';
 import { ColorContribution } from '@theia/core/lib/browser/color-application-contribution';
 import { EncodingRegistry } from '@theia/core/lib/browser/encoding-registry';

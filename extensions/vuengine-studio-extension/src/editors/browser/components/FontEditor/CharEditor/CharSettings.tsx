@@ -1,6 +1,6 @@
-import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
+import { nls } from '@theia/core';
 import React from 'react';
-import { CHAR_PIXEL_SIZE, MAX_CHAR_SIZE, MIN_CHAR_SIZE, MIN_VARIABLE_CHAR_SIZE, Size, VariableSize } from '../FontEditorTypes';
+import { CHAR_PIXEL_SIZE, FontEditorState, MAX_CHAR_SIZE, MIN_CHAR_SIZE, MIN_VARIABLE_CHAR_SIZE, Size, VariableSize } from '../FontEditorTypes';
 
 interface CharSettingsProps {
     currentCharacter: number
@@ -9,14 +9,15 @@ interface CharSettingsProps {
     variableSize: VariableSize,
     setCharSize: (size?: Size, variableSize?: VariableSize) => void
     charGrid: number
-    setCharGrid: (grid: number) => void
+    setState: (state: Partial<FontEditorState>) => void
 }
 
 export default function CharSettings(props: CharSettingsProps): JSX.Element {
     const {
         currentCharacter,
         charHeight, charWidth, variableSize, setCharSize,
-        charGrid, setCharGrid
+        charGrid,
+        setState,
     } = props;
 
     const onChangeVariablePixelWidth = (e: React.ChangeEvent<HTMLInputElement>) => setCharSize(
@@ -79,7 +80,9 @@ export default function CharSettings(props: CharSettingsProps): JSX.Element {
 
     return <div className='font-properties'>
         {variableSize.enabled && <div>
-            <label>Character Size</label>
+            <label>
+                {nls.localize('vuengine/fontEditor/characterSize', 'Character Size')}
+            </label>
             <div className='character-size'>
                 <input
                     type="number"
@@ -101,8 +104,12 @@ export default function CharSettings(props: CharSettingsProps): JSX.Element {
             </div>
         </div>}
         <div>
-            {!variableSize.enabled && <label>Character Size</label>}
-            {variableSize.enabled && <label>Maximum</label>}
+            {!variableSize.enabled && <label>
+                {nls.localize('vuengine/fontEditor/characterSize', 'Character Size')}
+            </label>}
+            {variableSize.enabled && <label>
+                {nls.localize('vuengine/fontEditor/maximum', 'Maximum')}
+            </label>}
             <div className='character-size'>
                 <input
                     type="number"
@@ -129,17 +136,22 @@ export default function CharSettings(props: CharSettingsProps): JSX.Element {
         </div>
         {/*
         <div>
-            <label>Type</label>
+            <label>
+                {nls.localize('vuengine/fontEditor/type', 'Type')}
+            </label>
             <SelectComponent
                 defaultValue={variableSize.enabled ? '1' : '0'}
                 options={[{
-                    label: 'Fixed Size',
+                    label: nls.localize('vuengine/fontEditor/fixedSize', 'Fixed Size'),
                     value: '0',
-                    description: 'All characters have the same dimensions',
+                    description: nls.localize('vuengine/fontEditor/fixedSizeDescription', 'All characters have the same dimensions'),
                 }, {
-                    label: 'Variable Size',
+                    label: nls.localize('vuengine/fontEditor/variableSize', 'Variable Size'),
                     value: '1',
-                    description: 'Every character can be of different width. Height is global. Allows for more dense or very small text. Uses Objects.',
+                    description: nls.localize(
+                        'vuengine/fontEditor/variableSizeDescription',
+                        'Every character can be of different width. Height is global. Allows for more dense or very small text. Uses Objects.'
+                    ),
                 }]}
                 onChange={option => setCharSize(
                     undefined,
@@ -152,7 +164,9 @@ export default function CharSettings(props: CharSettingsProps): JSX.Element {
         </div>
         */}
         <div>
-            <label>Grid</label>
+            <label>
+                {nls.localize('vuengine/fontEditor/grid', 'Grid')}
+            </label>
             <input
                 className="theia-input"
                 type="number"
@@ -160,7 +174,7 @@ export default function CharSettings(props: CharSettingsProps): JSX.Element {
                 min="0"
                 max="3"
                 value={charGrid}
-                onChange={e => setCharGrid(parseInt(e.target.value))}
+                onChange={e => setState({ charGrid: parseInt(e.target.value) })}
             />
         </div>
     </div>;

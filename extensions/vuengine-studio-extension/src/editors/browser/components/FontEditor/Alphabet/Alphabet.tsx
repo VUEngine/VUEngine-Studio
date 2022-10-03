@@ -1,5 +1,5 @@
 import React from 'react';
-import { MAX_CHAR_COUNT, VariableSize } from '../FontEditorTypes';
+import { FontEditorState, MAX_CHAR_COUNT, VariableSize } from '../FontEditorTypes';
 import AlphabetChar from './AlphabetChar';
 
 interface AlphabetProps {
@@ -10,8 +10,8 @@ interface AlphabetProps {
     charWidth: number
     currentCharacter: number
     variableSize: VariableSize
-    setCurrentCharacter: (id: number) => void
     alphabetGrid: number
+    setState: (state: Partial<FontEditorState>) => void
 }
 
 export default function Alphabet(props: AlphabetProps): JSX.Element {
@@ -19,12 +19,14 @@ export default function Alphabet(props: AlphabetProps): JSX.Element {
         charsData,
         charHeight, charWidth,
         offset, charCount,
-        currentCharacter, setCurrentCharacter,
+        currentCharacter,
         variableSize,
         alphabetGrid,
+        setState,
     } = props;
 
-    return <div className={`characters grid-${alphabetGrid}`} >
+    return <div className={`characters markers grid-${alphabetGrid}`}
+        onKeyDown={() => console.log('BUMS')} >
         {
             [...Array(16)].map((i, line) => (
                 <div key={`characters-line-${line}`} className="line">
@@ -40,8 +42,8 @@ export default function Alphabet(props: AlphabetProps): JSX.Element {
                             charHeight={charHeight}
                             charWidth={charWidth}
                             currentCharacter={currentCharacter}
-                            setCurrentCharacter={setCurrentCharacter}
                             variableSize={variableSize}
+                            setState={setState}
                         />;
                     })}
                 </div>

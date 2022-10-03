@@ -1,5 +1,6 @@
+import { nls } from '@theia/core';
 import React from 'react';
-import { DataSection, MAX_CHAR_COUNT, MIN_CHAR_COUNT, MIN_OFFSET } from '../FontEditorTypes';
+import { DataSection, FontEditorState, MAX_CHAR_COUNT, MIN_CHAR_COUNT, MIN_OFFSET } from '../FontEditorTypes';
 
 interface AlphabetSettingsProps {
     charCount: number
@@ -9,7 +10,7 @@ interface AlphabetSettingsProps {
     section: DataSection
     setSection: (section: DataSection) => void
     alphabetGrid: number
-    setAlphabetGrid: (grid: number) => void
+    setState: (state: Partial<FontEditorState>) => void
 }
 
 export default function AlphabetSettings(props: AlphabetSettingsProps): JSX.Element {
@@ -18,12 +19,15 @@ export default function AlphabetSettings(props: AlphabetSettingsProps): JSX.Elem
         charCount, setCharCount,
         offset, setOffset,
         // section, setSection,
-        alphabetGrid, setAlphabetGrid,
+        alphabetGrid,
+        setState,
     } = props;
 
     return <div className='font-properties'>
         <div>
-            <label>Count</label>
+            <label>
+                {nls.localize('vuengine/fontEditor/count', 'Count')}
+            </label>
             <input
                 className="theia-input"
                 type="number"
@@ -35,7 +39,9 @@ export default function AlphabetSettings(props: AlphabetSettingsProps): JSX.Elem
             />
         </div>
         <div>
-            <label>Offset</label>
+            <label>
+                {nls.localize('vuengine/fontEditor/offset', 'Offset')}
+            </label>
             <input
                 className="theia-input"
                 type="number"
@@ -48,24 +54,28 @@ export default function AlphabetSettings(props: AlphabetSettingsProps): JSX.Elem
         </div>
         {/*
         <div>
-            <label>Section</label>
+            <label>
+                {nls.localize('vuengine/fontEditor/section', 'Section')}
+            </label>
             <SelectComponent
                 defaultValue={section}
                 options={[{
-                    label: 'ROM Space',
+                    label: nls.localize('vuengine/fontEditor/romSpace', 'ROM Space'),
                     value: DataSection.ROM,
-                    description: 'Save tile data in regular ROM space',
+                    label: nls.localize('vuengine/fontEditor/romSpaceDescription', 'Save tile data to ROM space'),
                 }, {
-                    label: 'Expansion Space',
+                    label: nls.localize('vuengine/fontEditor/expansionSpace', 'Expansion Space'),
                     value: DataSection.EXP,
-                    description: 'Save tile data to expansion space',
+                    label: nls.localize('vuengine/fontEditor/expansionSpaceDescription', 'Save tile data to expansion space'),
                 }]}
                 onChange={option => setSection(option.value as DataSection)}
             />
         </div>
         */}
         <div>
-            <label>Grid</label>
+            <label>
+                {nls.localize('vuengine/fontEditor/grid', 'Grid')}
+            </label>
             <input
                 className="theia-input"
                 type="number"
@@ -73,7 +83,7 @@ export default function AlphabetSettings(props: AlphabetSettingsProps): JSX.Elem
                 min="0"
                 max="3"
                 value={alphabetGrid}
-                onChange={e => setAlphabetGrid(parseInt(e.target.value))}
+                onChange={e => setState({ alphabetGrid: parseInt(e.target.value) })}
             />
         </div>
     </div>;
