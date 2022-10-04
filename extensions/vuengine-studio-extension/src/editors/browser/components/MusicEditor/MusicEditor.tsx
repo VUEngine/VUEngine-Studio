@@ -1,10 +1,10 @@
 import React from 'react';
+import * as Tone from 'tone';
 import { ChannelConfig, Notes, PatternConfig, SongData } from './MusicEditorTypes';
+import MusicPlayer from './MusicPlayer';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
 import Sidebar from './Sidebar/Sidebar';
-import * as Tone from 'tone';
-import MusicPlayer from './MusicPlayer';
 
 interface MusicEditorProps {
     songData: SongData
