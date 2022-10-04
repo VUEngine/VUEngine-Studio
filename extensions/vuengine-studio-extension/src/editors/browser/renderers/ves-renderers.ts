@@ -1,5 +1,5 @@
-import vesFontEditorControl from './fontEditor/ves-fontEditor-control';
-import vesFontEditorControlTester from './fontEditor/ves-fontEditor-control-tester';
+import vesFontEditorControl from './font-editor/ves-font-editor-control';
+import vesFontEditorControlTester from './font-editor/ves-font-editor-control-tester';
 import vesImagesControl from './images/ves-images-control';
 import vesImagesControlTester from './images/ves-images-control-tester';
 import vesInputControl from './input/ves-input-control';
