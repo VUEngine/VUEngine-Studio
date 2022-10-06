@@ -458,10 +458,11 @@ export class VesFlashCartService {
           ...connectedFlashCart.status,
           step: 'Erasing',
         };
-      } else if (data.startsWith('Flash Cleared')) {
+      } else if (data.startsWith('Setting file size')) {
         connectedFlashCart.status = {
           ...connectedFlashCart.status,
           step: 'Flashing',
+          progress: 0,
         };
       } else if (data.startsWith('#')) {
         connectedFlashCart.status = {
