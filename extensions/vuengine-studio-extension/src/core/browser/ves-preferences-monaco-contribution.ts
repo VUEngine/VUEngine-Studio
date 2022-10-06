@@ -6,9 +6,6 @@ monaco.languages.register({
     'aliases': [
         'JSON with Comments'
     ],
-    'filenames': [
-        'settings.json'
-    ],
     'extensions': [
         `.${VUENGINE_EXT}`
     ]
