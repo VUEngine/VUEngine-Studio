@@ -8,9 +8,9 @@ import * as React from '@theia/core/shared/react';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceCommands, WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesBuildCommands } from '../../../build/browser/ves-build-commands';
-import { VesBuildPreferenceIds } from '../../../build/browser/ves-build-preferences';
+// import { VesBuildPreferenceIds } from '../../../build/browser/ves-build-preferences';
 import { VesBuildService } from '../../../build/browser/ves-build-service';
-import { BuildMode, BuildResult } from '../../../build/browser/ves-build-types';
+// import { BuildMode, BuildResult } from '../../../build/browser/ves-build-types';
 import { VesEmulatorCommands } from '../../../emulator/browser/ves-emulator-commands';
 import { VesEmulatorService } from '../../../emulator/browser/ves-emulator-service';
 import { VesFlashCartCommands } from '../../../flash-cart/browser/ves-flash-cart-commands';
@@ -100,8 +100,9 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
     }
 
     protected render(): React.ReactNode {
-        const buildMode = this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode;
+        // const buildMode = this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode;
         return !this.workspaceService.opened ? <>
+            {/*
             <button
                 className='theia-button secondary new-project'
                 title={nls.localize('vuengine/projects/commands/newProject', 'New Project') +
@@ -120,8 +121,10 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
             >
                 <i className='fa fa-file-code-o'></i>
             </button>
+            */}
         </>
             : <>
+                {/*
                 <button
                     className={'theia-button secondary build' + (this.vesBuildService.isQueued
                         ? ' queued'
@@ -134,9 +137,9 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                                     : '')}
                     style={this.vesBuildService.buildStatus.active ? {
                         backgroundImage: `linear-gradient(
-                            90deg, 
-                            ${this.getProgressBarColor()} 0%, 
-                            ${this.getProgressBarColor()} ${this.vesBuildService.buildStatus.progress}%, 
+                            90deg,
+                            ${this.getProgressBarColor()} 0%,
+                            ${this.getProgressBarColor()} ${this.vesBuildService.buildStatus.progress}%,
                             var(--theia-titleBar-hoverButtonBackground) ${this.vesBuildService.buildStatus.progress}%)`
                     } : {}}
                     title={this.vesBuildService.buildStatus.active
@@ -195,6 +198,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
                         ? <i className='fa fa-cog fa-spin'></i>
                         : <i className='fa fa-trash'></i>}
                 </button>
+                */}
                 {this.isMaximized &&
                     <button
                         className="theia-button secondary collapse active"

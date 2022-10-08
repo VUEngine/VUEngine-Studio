@@ -2,7 +2,7 @@ import { CommandRegistry, CommandService } from '@theia/core';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { AbstractViewContribution } from '@theia/core/lib/browser';
-import { VesEmulatorWidget } from './widget/ves-emulator-widget';
+import { VesEmulatorWidget } from './ves-emulator-widget';
 import { VesEmulatorContextKeyService } from './ves-emulator-context-key-service';
 import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
 import { VesEmulatorCommands } from './ves-emulator-commands';

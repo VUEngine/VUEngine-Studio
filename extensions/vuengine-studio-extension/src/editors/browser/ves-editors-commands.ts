@@ -4,7 +4,7 @@ export namespace VesEditorsCommands {
     export const WIDGET_OPEN: Command = Command.toLocalizedCommand(
         {
             id: 'ves:editors:open',
-            label: 'Open',
+            label: 'Open Editor',
             category: 'Editor',
         },
         'vuengine/editors/commands/open',

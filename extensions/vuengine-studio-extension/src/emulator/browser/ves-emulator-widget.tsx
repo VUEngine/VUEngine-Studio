@@ -14,14 +14,14 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import * as React from '@theia/core/shared/react';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { VesCommonService } from '../../../core/browser/ves-common-service';
-import { VesEmulatorCommands } from '../ves-emulator-commands';
-import { VesEmulatorPreferenceIds } from '../ves-emulator-preferences';
-import { VesEmulatorService } from '../ves-emulator-service';
+import { VesCommonService } from '../../core/browser/ves-common-service';
+import { VesEmulatorCommands } from './ves-emulator-commands';
+import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
+import { VesEmulatorService } from './ves-emulator-service';
 import {
   EMULATION_MODES, EMULATION_SCALES, EMULATION_STEREO_MODES, EmulatorFunctionKeyCode, EmulatorGamePadKeyCode
-} from '../ves-emulator-types';
-import { VesEmulatorControls } from './ves-emulator-controls-component';
+} from './ves-emulator-types';
+import { VesEmulatorControls } from './widget/ves-emulator-controls-component';
 
 export const VesEmulatorWidgetOptions = Symbol('VesEmulatorWidgetOptions');
 export interface VesEmulatorWidgetOptions {

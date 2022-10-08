@@ -401,10 +401,6 @@
   width: calc(50% - 1px);
 }
 
-.font-editor .tools button.full-width {
-  width: 100%;
-}
-
 /* Palette */
 
 .font-editor .palette {

@@ -1,0 +1,7 @@
+#vesEmulatorSidebarWidget {
+  padding: calc(var(--theia-ui-padding) * 2);
+}
+
+#vesEmulatorSidebarWidget .theia-button {
+  margin-left: 0;
+}

@@ -5,8 +5,8 @@ import {
 } from '@theia/core/lib/browser';
 import { ContainerModule } from '@theia/core/shared/inversify';
 import '../../../src/titlebar/browser/style/index.css';
-// import { VesTitlebarActionButtonsContribution } from './action-buttons/ves-titlebar-action-buttons-view';
-// import { VesTitlebarActionButtonsWidget } from './action-buttons/ves-titlebar-action-buttons-widget';
+import { VesTitlebarActionButtonsContribution } from './action-buttons/ves-titlebar-action-buttons-view';
+import { VesTitlebarActionButtonsWidget } from './action-buttons/ves-titlebar-action-buttons-widget';
 import { VesTitlebarApplicationTitleContribution } from './application-title/ves-titlebar-application-title-view';
 import { VesTitlebarApplicationTitleWidget } from './application-title/ves-titlebar-application-title-widget';
 import { VesTitlebarWindowControlsContribution } from './window-controls/ves-titlebar-window-controls-view';
@@ -46,7 +46,6 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     }
 
     // title bar action buttons
-    /*
     bindViewContribution(bind, VesTitlebarActionButtonsContribution);
     bind(FrontendApplicationContribution).toService(VesTitlebarActionButtonsContribution);
     bind(VesTitlebarActionButtonsWidget).toSelf();
@@ -59,5 +58,4 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
                 ),
         }))
         .inSingletonScope();
-    */
 });

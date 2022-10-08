@@ -2,7 +2,7 @@ import { injectable, inject } from '@theia/core/shared/inversify';
 import { WidgetOpenerOptions, WidgetOpenHandler } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';
 import { EditorManager } from '@theia/editor/lib/browser';
-import { VesEmulatorWidget, VesEmulatorWidgetOptions } from './widget/ves-emulator-widget';
+import { VesEmulatorWidget, VesEmulatorWidgetOptions } from './ves-emulator-widget';
 import { nls } from '@theia/core';
 
 // Start vb files in the configured default emulator

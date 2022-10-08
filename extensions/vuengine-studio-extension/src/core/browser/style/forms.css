@@ -7,3 +7,7 @@
     transition: transform .1s;
     transform: scale(.85);
 } */
+
+.theia-button.full-width {
+    width: 100%;
+}
