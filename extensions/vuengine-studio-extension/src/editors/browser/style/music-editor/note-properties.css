@@ -6,12 +6,12 @@
 }
 
 .musicEditor .notePropertiesHeader {
-    color: #555;
     display: flex;
     flex-direction: column;
     height: 28px;
     margin-right: 3px;
     min-width: 75px;
+    opacity: .5;
     width: 75px;
 }
 

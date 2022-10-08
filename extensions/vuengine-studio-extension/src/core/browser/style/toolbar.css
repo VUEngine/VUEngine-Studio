@@ -1,5 +1,26 @@
 #main-toolbar {
-  --theia-toolbar-height: 32px;
+  --theia-toolbar-height: var(--theia-statusBar-height);
   --theia-toolbar-item-padding: 4px;
-  --theia-toolbar-icon-size: 18px;
+  --theia-toolbar-icon-size: 16px;
+  padding: 0 var(--theia-ui-padding);
+}
+
+#main-toolbar .toolbar-item {
+  border-radius: 0;
+  height: var(--theia-toolbar-height);
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+#main-toolbar .toolbar-item .codicon,
+#main-toolbar .toolbar-item .fa {
+  height: var(--theia-toolbar-height);
+  line-height: var(--theia-toolbar-height);
+  min-width: var(--theia-toolbar-height);
+}
+
+#main-toolbar .separator {
+  background-color: var(--theia-mainToolbar-foreground);
+  opacity: 0.1;
 }

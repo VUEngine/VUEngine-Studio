@@ -50,20 +50,22 @@
 
 .musicEditor .sidebarTab {
     align-items: center;
-    color: #666;
     cursor: pointer;
     display: flex;
     flex-grow: 1;
     font-size: 14px;
     justify-content: center;
     height: 24px;
+    opacity: .4;
 }
 
 .musicEditor .sidebarTab.active {
     background: var(--theia-editor-background);
     color: var(--theia-editor-foreground);
+    opacity: 1;
 }
 
 .musicEditor .sidebarTab:hover {
     color: var(--theia-editor-foreground);
+    opacity: 1;
 }

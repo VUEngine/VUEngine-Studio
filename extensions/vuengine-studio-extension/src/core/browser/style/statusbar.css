@@ -1,7 +1,7 @@
 :root {
-    --theia-statusBar-height: 28px;
+  --theia-statusBar-height: 28px;
 }
-  
+
 #theia-statusBar .area.left {
   padding-left: var(--theia-ui-padding);
 }
@@ -17,9 +17,9 @@
 }
 
 #theia-statusBar .element.active {
-    font-style: italic;
+  font-style: italic;
 }
 
 #theia-statusBar .element.disabled {
-    opacity: 0.5;
+  opacity: 0.5;
 }

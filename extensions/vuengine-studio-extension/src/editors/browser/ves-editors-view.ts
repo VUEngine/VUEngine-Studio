@@ -2,7 +2,7 @@ import { CommandRegistry, nls, QuickPickItem, QuickPickOptions, QuickPickService
 import { AbstractViewContribution, CommonCommands, open, OpenerService } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { ProjectFileType, ProjectFileTypesWithContributor } from 'src/project/browser/ves-project-types';
+import { ProjectFileType } from 'src/project/browser/ves-project-types';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesEditorUri } from './ves-editor-uri';
 import { VesEditorsCommands } from './ves-editors-commands';
@@ -55,15 +55,13 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         if (registeredTypes) {
             Object.keys(registeredTypes).forEach(typeId => {
                 const registeredType = registeredTypes[typeId];
-                if (!registeredType.parent) {
-                    commandRegistry.registerCommand({
-                        id: `${VesEditorsCommands.WIDGET_OPEN.id}:${typeId}`,
-                        label: `${VesEditorsCommands.WIDGET_OPEN.label}: ${registeredType.schema.title}`,
-                        iconClass: registeredType.icon
-                    }, {
-                        execute: () => this.selectItem(registeredTypes, registeredType, typeId)
-                    });
-                }
+                commandRegistry.registerCommand({
+                    id: `${VesEditorsCommands.WIDGET_OPEN.id}:${typeId}`,
+                    label: `${VesEditorsCommands.WIDGET_OPEN.label}: ${registeredType.schema.title}`,
+                    iconClass: registeredType.icon
+                }, {
+                    execute: () => this.selectItem(registeredType, typeId)
+                });
             });
         }
     }
@@ -77,8 +75,8 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         });
     }
 
-    protected async selectItem(registeredTypes: ProjectFileTypesWithContributor, registeredType: ProjectFileType, typeId: string): Promise<void> {
-        if (registeredType.leaf) {
+    protected async selectItem(registeredType: ProjectFileType, typeId: string): Promise<void> {
+        if (!registeredType.multiple) {
             const projectDataType = this.vesProjectService.getProjectDataItemsForType(typeId);
             if (projectDataType) {
                 const ids = Object.keys(projectDataType);
@@ -88,38 +86,31 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                 }
             }
         } else {
-            // find which types can be children of current project node
-            const childTypes = Object.values(registeredTypes).filter(registeredTypeInner =>
-                registeredTypeInner.parent?.typeId === typeId
-            );
-
-            this.itemSelectQuickPick(childTypes.map(type => type.schema?.properties?.typeId.const));
+            this.itemSelectQuickPick(typeId);
         }
     }
 
-    protected async itemSelectQuickPick(types: string[]): Promise<void> {
+    protected async itemSelectQuickPick(typeId: string): Promise<void> {
         const quickPickOptions: QuickPickOptions<QuickPickItem> = {
             title: nls.localize('vuengine/editors/chooseAnItemTitle', 'Choose an item'),
             placeholder: nls.localize('vuengine/editors/chooseAnItemPlaceholder', 'Select which item you want to edit'),
         };
         const items: QuickPickItem[] = [];
 
-        types.forEach(type => {
-            const projectDataType = this.vesProjectService.getProjectDataItemsForType(type);
-            if (projectDataType) {
-                Object.keys(projectDataType).forEach(key => {
-                    const item = projectDataType[key];
-                    const registeredType = this.vesProjectService.getProjectDataType(type);
-                    if (registeredType) {
-                        items.push({
-                            label: item.name as string,
-                            description: `${type}/${key}`,
-                            iconClasses: registeredType.icon ? [registeredType.icon] : [],
-                        });
-                    }
-                });
-            }
-        });
+        const projectDataType = this.vesProjectService.getProjectDataItemsForType(typeId);
+        if (projectDataType) {
+            Object.keys(projectDataType).forEach(key => {
+                const item = projectDataType[key];
+                const registeredType = this.vesProjectService.getProjectDataType(typeId);
+                if (registeredType) {
+                    items.push({
+                        label: item.name as string,
+                        description: `${typeId}/${key}`,
+                        iconClasses: registeredType.icon ? [registeredType.icon] : [],
+                    });
+                }
+            });
+        }
 
         if (!items.length) {
             // TODO: error message

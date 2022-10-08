@@ -5,6 +5,7 @@
 [type="checkbox"] {
     -webkit-appearance: none;
     background-color: transparent;
+    border: none !important;
     flex: unset !important;
     height: var(--theia-ui-font-size2);
     line-height: var(--theia-ui-font-size2);
@@ -12,11 +13,12 @@
     outline: none;
     padding: 0;
     position: relative;
-    width: calc(2 * var(--theia-ui-font-size2)) !important;
+    width: calc(2 * (var(--theia-ui-font-size2) + var(--theia-border-width))) !important;
 }
 
 [type="checkbox"]::before {
     background-color: var(--theia-input-background);
+    border: var(--theia-border-width) solid var(--theia-dropdown-border);
     border-radius: 10px;
     content: '';
     cursor: pointer;
@@ -44,6 +46,7 @@
     cursor: pointer;
     height: 100%;
     left: 0;
+    padding: var(--theia-border-width);
     position: absolute;
     top: 0;
 }

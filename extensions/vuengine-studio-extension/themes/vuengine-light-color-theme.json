@@ -9,6 +9,8 @@
 		"activityBarBadge.background": "#d31422",
 		"button.background": "#d31422",
 		"button.foreground": "#ffffff",
+		"secondaryButton.background": "#ececec",
+		"secondaryButton.hoverBackground": "#cccccc",
 		"editor.selectionBackground": "#d3142240",
 		"editorOverviewRuler.rangeHighlightForeground": "#d3142299",
 		"extensionBadge.remoteBackground": "#d31422",

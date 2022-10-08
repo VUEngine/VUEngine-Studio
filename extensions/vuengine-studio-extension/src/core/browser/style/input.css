@@ -2,6 +2,10 @@
     padding: 3px 0 4px;
 }
 
+.theia-input {
+    border: var(--theia-border-width) solid var(--theia-dropdown-border);
+}
+
 .theia-input.large {
     font-size: 130%;
     line-height: 160%;
@@ -10,7 +14,7 @@
 input[type="range"] {
     appearance: none;
     background: var(--theia-input-background);
-    border: var(--theia-border-width) solid var(--theia-input-border);
+    border: var(--theia-border-width) solid var(--theia-dropdown-border);
     border-radius: 100px;
     cursor: ew-resize;
     height: var(--theia-ui-font-size2);

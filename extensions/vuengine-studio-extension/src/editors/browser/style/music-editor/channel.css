@@ -10,19 +10,21 @@
 }
 
 .musicEditor .collapsedChannel {
-    background-color: #333;
+    background-color: var(--theia-secondaryButton-background);
     cursor: pointer;
     height: 5px;
     margin: 1px 0;
-    width: 65px;
+    width: 75px;
 }
 
 .musicEditor .patternFill {
+    background-color: var(--theia-secondaryButton-background);
     cursor: pointer;
     flex-grow: 1;
+    opacity: 0;
 }
 
 .musicEditor .channel:hover .patternFill,
 .musicEditor .channel.current .patternFill {
-    background-color: rgba(255, 255, 255, .02);
+    opacity: .4;
 }

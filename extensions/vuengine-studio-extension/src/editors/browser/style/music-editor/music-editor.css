@@ -14,5 +14,6 @@
     gap: 5px;
     height: 100%;
     overflow: hidden;
+    padding: 2px;
     user-select: none;
 }

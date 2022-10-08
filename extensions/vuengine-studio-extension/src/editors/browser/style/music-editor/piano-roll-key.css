@@ -15,6 +15,14 @@
     width: 75px;
 }
 
+.musicEditor .pianoRollRow:first-child .pianoRollKey {
+    border-top: 1px solid #ccc;
+}
+
+.musicEditor .pianoRollRow:last-child .pianoRollKey {
+    border-bottom: 1px solid #ccc;
+}
+
 .musicEditor .pianoRollRow:hover .pianoRollKey,
 .musicEditor .pianoRollKey:hover,
 .musicEditor .pianoRollKey.sharpNote:hover:after,
@@ -28,7 +36,7 @@
 }
 
 .musicEditor .pianoRollRow.cNote:last-child .pianoRollKey {
-    border-bottom-width: 0;
+    border-bottom-width: 1px;
 }
 
 .musicEditor .pianoRollKey.sharpNote {

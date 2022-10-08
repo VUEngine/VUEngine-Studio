@@ -1,6 +1,6 @@
 .musicEditor .pattern {
     align-items: end;
-    background-color: #333;
+    background-color: var(--theia-secondaryButton-background);
     box-sizing: border-box;
     color: transparent;
     cursor: grab;
@@ -17,12 +17,9 @@
     color: unset;
 }
 
-.musicEditor .pattern:hover {
-    outline: 1px solid #d31422;
-}
-
+.musicEditor .pattern:hover,
 .musicEditor .pattern.current {
-    background-color: #555;
+    outline: 1px solid var(--theia-focusBorder);
 }
 
 .musicEditor .pattern .notes {
@@ -43,7 +40,7 @@
 }
 
 .musicEditor .pattern .remove:hover {
-    color: #d31422;
+    color: var(--theia-focusBorder);
 }
 
 .musicEditor .pattern:hover .remove {
@@ -51,15 +48,15 @@
 }
 
 .musicEditor .pattern.beingDragged {
-    border: 1px solid #d31422;
+    border: 1px solid var(--theia-focusBorder);
     cursor: grabbing;
     outline: 0;
     opacity: .1;
 }
 
 .musicEditor .pattern.dragOver {
-    border: 1px dashed #d31422;
-    border-left: 4px solid #d31422;
+    border: 1px dashed var(--theia-focusBorder);
+    border-left: 4px solid var(--theia-focusBorder);
 }
 
 .musicEditor .pattern.dragOver .notes {

@@ -265,7 +265,7 @@
 
 .font-editor .editor .characters .character:not(.inactive):hover,
 .font-editor .editor .characters .character.active {
-  outline: 1px solid var(--theia-editor-foreground);
+  outline: 1px solid var(--theia-focusBorder);
   z-index: 1;
 }
 
@@ -416,16 +416,16 @@
 .font-editor .palette div {
   align-items: center;
   aspect-ratio: 1;
-  border: 1px solid transparent;
+  color: #fff;
   cursor: pointer;
   display: flex;
   font-size: var(--theia-ui-font-size1);
   justify-content: center;
-  width: calc(50% - 3px);
+  width: calc(50% - 1px);
 }
 
-.font-editor .palette div.active {
-  border-color: var(--theia-editor-foreground);
+.font-editor .palette div:hover {
+  outline: 1px solid var(--theia-focusBorder);
 }
 
 /* Current Character Meta */
@@ -442,7 +442,7 @@
 /* Markers */
 
 .font-editor .editor .current-character .pixel:hover {
-  outline: 1px solid var(--theia-editor-foreground);
+  outline: 1px solid var(--theia-focusBorder);
   z-index: 1;
 }
 

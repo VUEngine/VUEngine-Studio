@@ -1,3 +1,7 @@
 .quick-input-widget {
     border-radius: 0 0 5px 5px;
 }
+
+#quick-input-container {
+    top: var(--theia-private-menubar-height) !important;
+}

@@ -10,8 +10,27 @@
 #ves-titlebar-application-title .applicationTitle {
   -webkit-app-region: no-drag;
   cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 5px;
+  box-sizing: border-box;
   display: inline-block;
-  padding: 0 10px;
+  height: 27px;
+  line-height: 27px;
+  max-width: 30%;
+  padding: 0 20px 0 10px;
+  position: relative;
+  width: 30%;
+}
+
+#ves-titlebar-application-title .applicationTitle:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+#ves-titlebar-application-title .applicationTitle:after {
+  content: "\eab4";
+  font-family: "codicon";
+  position: absolute;
+  right: 5px;
 }
 
 @media (max-width: 1000px) {

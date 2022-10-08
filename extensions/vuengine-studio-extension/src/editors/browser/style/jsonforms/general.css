@@ -1,6 +1,8 @@
 .jsonforms-container {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  height: 100%;
   outline: none;
-  padding: 10px;
+  padding: calc(var(--theia-ui-padding) * 2);
 }

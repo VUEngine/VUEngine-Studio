@@ -6,24 +6,25 @@
 .p-TabBar.theia-app-sides .p-TabBar-tab[class*=ves-decorator]:after {
     background-color: var(--theia-activityBarBadge-background);
     border-radius: 20px;
+    bottom: var(--theia-ui-padding);
     color: var(--theia-activityBarBadge-foreground);
     font-family: FontAwesome;
-    font-size: calc(var(--theia-ui-font-size0) * 0.85);
-    line-height: var(--theia-notification-count-height);
-    margin: -1px;
+    font-size: var(--theia-ui-font-size0);
+    line-height: var(--theia-notification-count-width);
     padding: 2px;
     position: absolute;
-    right: calc(var(--theia-ui-padding) * 1.33);
+    right: var(--theia-ui-padding);
     text-align: center;
-    top: calc(var(--theia-ui-padding) * 4);
     width: var(--theia-notification-count-width);
 }
 
 .p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-queued:after {
+    animation: pulseQueued 2s infinite linear;
     content: "\f252";
 }
 
 .p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress:after {
+    /* animation: fa-spin 2s infinite linear; */
     content: "\f013";
 }
 

@@ -1,5 +1,5 @@
 .musicEditor .stepIndicator {
-    background-color: #d31422;
+    background-color: var(--theia-focusBorder);
     bottom: 0;
     left: 0;
     position: absolute;

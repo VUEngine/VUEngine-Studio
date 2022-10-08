@@ -1,5 +1,5 @@
 .musicEditor .pianoRollNote {
-    background-color: #333;
+    background-color: var(--theia-secondaryButton-background);
     cursor: crosshair;
     margin-bottom: 1px;
     margin-right: 1px;
@@ -9,11 +9,11 @@
 }
 
 .musicEditor .pianoRollRow:hover .pianoRollNote {
-    background-color: #444;
+    background-color: var(--theia-secondaryButton-hoverBackground);
 }
 
 .musicEditor .pianoRollNote.current {
-    background-color: #444;
+    background-color: var(--theia-secondaryButton-hoverBackground);
 }
 
 .musicEditor .pianoRollRow.cNote .pianoRollNote {
@@ -25,11 +25,11 @@
 }
 
 .musicEditor .pianoRollNote:hover {
-    outline: 1px solid #d31422;
+    outline: 1px solid var(--theia-focusBorder);
 }
 
 .musicEditor .pianoRollNote.set {
-    background-color: #d31422 !important;
+    background-color: var(--theia-focusBorder) !important;
 }
 
 .musicEditor .pianoRollNote.nth {

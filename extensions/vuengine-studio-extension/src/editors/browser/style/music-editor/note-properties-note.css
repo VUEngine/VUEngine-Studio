@@ -28,12 +28,12 @@
 }
 
 .musicEditor .notePropertiesNote:hover {
-    outline: 1px solid #d31422;
+    outline: 1px solid var(--theia-focusBorder);
 }
 
 .musicEditor .notePropertiesNote:hover .effects,
 .musicEditor .notePropertiesNote.current .effects {
-    background-color: #333;
+    background-color: var(--theia-secondaryButton-hoverBackground);
 }
 
 .musicEditor .notePropertiesNote.nth {
@@ -52,13 +52,14 @@
 
 .musicEditor .notePropertiesNote .volume {
     align-items: end;
-    background-color: #333;
+    background-color: var(--theia-secondaryButton-background);
     display: flex;
     height: 16px;
     width: 100%;
 }
 
 .musicEditor .notePropertiesNote .volume div {
-    background-color: #666;
+    background-color: var(--theia-editor-foreground);
     flex-grow: 1;
+    opacity: .4;
 }
