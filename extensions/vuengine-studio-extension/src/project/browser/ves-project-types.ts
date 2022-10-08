@@ -39,16 +39,10 @@ export interface ProjectFileTypesWithContributor extends ProjectFileTypes {
 export interface ProjectFileType {
   schema: JsonSchema
   uiSchema?: UISchemaElement
-  parent?: RegisteredTypeParent
   icon?: string
   category?: string
-  leaf?: boolean
-  templates?: string[]
-};
-
-export interface RegisteredTypeParent {
-  typeId: string
   multiple: boolean
+  templates?: string[]
 };
 
 export interface ProjectFileItemsByType {

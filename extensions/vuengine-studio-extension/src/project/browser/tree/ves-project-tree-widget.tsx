@@ -78,7 +78,6 @@ export class VesProjectTreeWidget extends TreeWidget {
         'Other'
       ].forEach(category => {
         const categoryNode: VesProjectDocumentChild = {
-          typeId: category,
           name: category,
           iconClass: '',
           children: []
@@ -86,48 +85,41 @@ export class VesProjectTreeWidget extends TreeWidget {
 
         Object.keys(registeredTypes).forEach(typeId => {
           const registeredType = registeredTypes[typeId];
-          if (!registeredType.parent && registeredType.category === category) {
+          if (registeredType.category === category) {
             const name = registeredType.schema.title;
             const iconClass = registeredType.icon;
+            const multiple = registeredType.multiple;
             if (typeId && name && iconClass) {
-              const childNode: VesProjectDocumentChild = { typeId, name, iconClass };
-              if (!registeredType.leaf) {
-                childNode.children = [];
-              }
+              const childNode: VesProjectDocumentChild = {
+                typeId,
+                name,
+                iconClass,
+                multiple,
+                children: multiple ? [] : undefined
+              };
 
-              if (registeredType.leaf === true) {
-                const registeredTypeChildren = this.vesProjectService.getProjectDataItemsForType(typeId);
-                if (registeredTypeChildren) {
-                  const id = Object.keys(registeredTypeChildren)[0];
-                  childNode.uri = VesEditorUri.toUri(`${typeId}/${id}`);
-                }
-              } else {
-                // find which types can be children of current project node
-                const childTypes = Object.keys(registeredTypes).filter(typeIdInner => {
-                  const typeInner = registeredTypes[typeIdInner];
-                  return typeInner.parent?.typeId === typeId;
-                });
-                // get items of all types
-                childTypes.forEach(childTypeId => {
-                  const childType = registeredTypes[childTypeId];
-                  Object.keys(this.vesProjectService.getProjectDataItemsForType(childTypeId) || {}).forEach(id => {
-                    const item = this.vesProjectService.getProjectDataItem(childTypeId, id);
-                    if (!childNode.children) {
-                      childNode.children = [];
-                    }
-                    childNode.children.push({
-                      typeId: childTypeId,
-                      uri: VesEditorUri.toUri(`${childTypeId}/${id}`),
+              const registeredTypeChildren = this.vesProjectService.getProjectDataItemsForType(typeId);
+              if (registeredTypeChildren) {
+                if (registeredType.multiple) {
+                  Object.keys(registeredTypeChildren).forEach(id => {
+                    const item = this.vesProjectService.getProjectDataItem(typeId, id);
+                    childNode.children!.push({
+                      typeId: typeId,
+                      uri: VesEditorUri.toUri(`${typeId}/${id}`),
                       name: item?.name as string
-                        || registeredTypes[childTypeId]?.schema?.title
-                        || childTypeId,
-                      iconClass: childType.icon ?? '',
+                        || registeredTypes[typeId]?.schema?.title
+                        || typeId,
+                      multiple,
+                      iconClass: registeredType.icon ?? '',
                     });
                   });
 
                   // sort children by name
                   childNode.children?.sort((a, b) => a.name > b.name && 1 || -1);
-                });
+                } else {
+                  const id = Object.keys(registeredTypeChildren)[0];
+                  childNode.uri = VesEditorUri.toUri(`${typeId}/${id}`);
+                }
               }
 
               categoryNode.children!.push(childNode);
@@ -174,9 +166,9 @@ export class VesProjectTreeWidget extends TreeWidget {
     node: TreeNode,
     props: NodeProps
   ): React.ReactNode {
-    const addPlus = this.isExpandable(node);
+    const addPlus = this.isAddable(node);
     const addRemoveButton = node.parent && !VesProjectRootNode.is(node.parent)
-      ? this.isExpandable(node.parent)
+      ? this.isAddable(node.parent)
       : false;
 
     return (
@@ -219,21 +211,9 @@ export class VesProjectTreeWidget extends TreeWidget {
 
   protected createAddHandler(node: VesProjectChildNode): (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void {
     return event => {
-      event.stopPropagation();
-      // find which types can be children of current project node
-      const registeredTypes = this.vesProjectService.getProjectDataTypes();
-      const childTypes = registeredTypes
-        ? Object.values(registeredTypes).filter(registeredType =>
-          registeredType.parent?.typeId === node.member?.typeId
-        )
-        : [];
-      if (childTypes.length > 1) {
-        // TODO: add context menu for type selection
-        console.error('multiple child types are not supported');
-      } else if (childTypes.length === 1) {
-        this.addNode(childTypes[0].schema.properties?.typeId.const, false);
-      } else {
-        console.error('no child type defined');
+      if (node.member?.typeId) {
+        event.stopPropagation();
+        this.addNode(node.member?.typeId, false);
       }
     };
   }
@@ -291,7 +271,7 @@ export class VesProjectTreeWidget extends TreeWidget {
       } else if (node.member.typeId) {
         // Create a new item for menu entries which are a leaf, but do not have an item yet
         const type = this.vesProjectService.getProjectDataType(node.member.typeId);
-        if (type?.leaf) {
+        if (!type?.multiple) {
           await this.addNode(node.member.typeId, true);
         }
       }
@@ -304,7 +284,7 @@ export class VesProjectTreeWidget extends TreeWidget {
       : node.member.children && node.member.children.length > 0
         ? 'codicon codicon-folder'
         : 'codicon codicon-file'; */
-    const iconClass = (!node.member?.children && node.member?.iconClass)
+    const iconClass = (!node.member?.children && node.member?.multiple && node.member?.iconClass)
       ? node.member?.iconClass : '';
     return <i className={iconClass} style={{ marginRight: 5 }} />;
   }
@@ -319,5 +299,9 @@ export class VesProjectTreeWidget extends TreeWidget {
     }
 
     return false;
+  }
+
+  protected isAddable(node: TreeNode): node is ExpandableTreeNode {
+    return (VesProjectChildNode.is(node) && node.member.multiple && node.member.children !== undefined) ?? false;
   }
 }

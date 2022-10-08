@@ -63,10 +63,11 @@ export interface VesProjectDocumentsTree {
 }
 
 export interface VesProjectDocumentChild {
-  typeId: string;
+  typeId?: string;
   name: string;
   uri?: URI;
   url?: string; // TODO: remove
   iconClass: string;
+  multiple?: boolean;
   children?: VesProjectDocumentChild[];
 }
