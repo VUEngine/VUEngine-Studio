@@ -39,7 +39,6 @@
           },
           "security.workspace.trust.enabled": false,
           "toolbar.showToolbar": false,
-          "window.menuBarVisibility": "compact",
           "window.title": "${projectName}",
           "workspace.preserveWindow": true
         }

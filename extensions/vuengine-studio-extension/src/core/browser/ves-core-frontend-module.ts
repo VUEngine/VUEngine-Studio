@@ -161,7 +161,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // toolbar default config
     rebind(ToolbarDefaultsFactory).toConstantValue(VesToolbarDefaultsOverride);
 
-    // add button to select path to respective settings
+    // add select path button to respective settings
     bind(VesPreferenceStringInputRenderer).toSelf();
     rebind(PreferenceStringInputRenderer).to(VesPreferenceStringInputRenderer);
 

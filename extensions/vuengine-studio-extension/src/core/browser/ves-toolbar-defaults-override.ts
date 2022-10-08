@@ -23,7 +23,7 @@ export const VesToolbarDefaultsOverride: () => DeflatedToolbarTree = () => ({
                 {
                     'id': 'ves:build:build',
                     'command': 'ves:build:build',
-                    'icon': 'codicon codicon-wrench'
+                    'icon': 'codicon codicon-tools'
                 },
                 {
                     'id': 'ves:emulator:run',
@@ -33,7 +33,7 @@ export const VesToolbarDefaultsOverride: () => DeflatedToolbarTree = () => ({
                 {
                     'id': 'ves:flashCarts:flash',
                     'command': 'ves:flashCarts:flash',
-                    'icon': 'fa fa-microchip'
+                    'icon': 'codicon codicon-layout-statusbar'
                 }
             ]
         ]

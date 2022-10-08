@@ -80,6 +80,9 @@
       "frontend": "lib/codegen/browser/ves-codegen-frontend-module"
     },
     {
+      "frontendElectron": "lib/core/electron-browser/ves-core-electron-frontend-module"
+    },
+    {
       "frontend": "lib/core/browser/ves-core-frontend-module",
       "backend": "lib/core/node/ves-core-backend-module"
     },

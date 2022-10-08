@@ -1,29 +1,36 @@
 #ves-titlebar-application-title {
   flex-grow: 1;
-  height: var(--theia-private-menubar-height);
-  line-height: var(--theia-private-menubar-height);
   order: 2;
-  text-align: center;
-  white-space: nowrap;
+}
+
+#ves-titlebar-application-title>div {
+  height: var(--theia-private-menubar-height);
 }
 
 #ves-titlebar-application-title .applicationTitle {
   -webkit-app-region: no-drag;
+  background-color: var(--theia-titleBar-activeBackground);
   cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, .3);
   border-radius: 5px;
   box-sizing: border-box;
   display: inline-block;
-  height: 27px;
-  line-height: 27px;
-  max-width: 30%;
+  height: calc(var(--theia-private-menubar-height) - 10px);
+  left: 35%;
+  line-height: calc(var(--theia-private-menubar-height) - 10px);
+  overflow: hidden;
   padding: 0 20px 0 10px;
-  position: relative;
+  position: fixed;
+  text-align: center;
+  text-overflow: ellipsis;
+  top: 5px;
+  white-space: nowrap;
   width: 30%;
+  z-index: 10;
 }
 
 #ves-titlebar-application-title .applicationTitle:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, .8);
 }
 
 #ves-titlebar-application-title .applicationTitle:after {
@@ -33,8 +40,15 @@
   right: 5px;
 }
 
+@media (max-width: 1200px) {
+  .theia-ApplicationShell:not(.os-osx) #ves-titlebar-application-title .applicationTitle {
+    left: 40%;
+    width: 20%;
+  }
+}
+
 @media (max-width: 1000px) {
-  .theia-ApplicationShell:not(.os-osx) #ves-titlebar-application-title {
-    visibility: hidden;
+  .theia-ApplicationShell:not(.os-osx) #ves-titlebar-application-title .applicationTitle {
+    display: none;
   }
 }
