@@ -84,9 +84,9 @@ export class VesProjectTreeWidget extends TreeWidget {
           children: []
         };
 
-        Object.values(registeredTypes).forEach(registeredType => {
+        Object.keys(registeredTypes).forEach(typeId => {
+          const registeredType = registeredTypes[typeId];
           if (!registeredType.parent && registeredType.category === category) {
-            const typeId = registeredType.schema.properties?.typeId.const;
             const name = registeredType.schema.title;
             const iconClass = registeredType.icon;
             if (typeId && name && iconClass) {
@@ -103,12 +103,13 @@ export class VesProjectTreeWidget extends TreeWidget {
                 }
               } else {
                 // find which types can be children of current project node
-                const childTypes = Object.values(registeredTypes).filter(registeredTypeInner =>
-                  registeredTypeInner.parent?.typeId === typeId
-                );
+                const childTypes = Object.keys(registeredTypes).filter(typeIdInner => {
+                  const typeInner = registeredTypes[typeIdInner];
+                  return typeInner.parent?.typeId === typeId;
+                });
                 // get items of all types
-                childTypes.forEach(childType => {
-                  const childTypeId = childType.schema.properties?.typeId.const;
+                childTypes.forEach(childTypeId => {
+                  const childType = registeredTypes[childTypeId];
                   Object.keys(this.vesProjectService.getProjectDataItemsForType(childTypeId) || {}).forEach(id => {
                     const item = this.vesProjectService.getProjectDataItem(childTypeId, id);
                     if (!childNode.children) {
@@ -117,7 +118,7 @@ export class VesProjectTreeWidget extends TreeWidget {
                     childNode.children.push({
                       typeId: childTypeId,
                       uri: VesEditorUri.toUri(`${childTypeId}/${id}`),
-                      name: item?.name
+                      name: item?.name as string
                         || registeredTypes[childTypeId]?.schema?.title
                         || childTypeId,
                       iconClass: childType.icon ?? '',

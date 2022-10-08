@@ -950,15 +950,6 @@
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz#1d572bfbbe14b7704e0ba0f39b74815b84870d70"
   integrity sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw==
 
-"@eclipse-emfcloud/theia-tree-editor@next":
-  version "0.7.0-next.4b9e870"
-  resolved "https://registry.yarnpkg.com/@eclipse-emfcloud/theia-tree-editor/-/theia-tree-editor-0.7.0-next.4b9e870.tgz#548b9b2641049cb124fcf1fc5c3ec4ffac6fdad3"
-  integrity sha512-dIbPA3ErIdLT+RqgxW19VszL/bccuTJHWaXeSRFzvQBqxcVCXWAYLKOPfc0QBwvFuDWFHYjozTW2aGj8NcJFVw==
-  dependencies:
-    "@jsonforms/core" "3.0.0-alpha.2"
-    "@jsonforms/react" "3.0.0-alpha.2"
-    "@jsonforms/vanilla-renderers" "3.0.0-alpha.2"
-
 "@electron/get@^1.12.2", "@electron/get@^1.13.0":
   version "1.14.1"
   resolved "https://registry.yarnpkg.com/@electron/get/-/get-1.14.1.tgz#16ba75f02dffb74c23965e72d617adc721d27f40"
