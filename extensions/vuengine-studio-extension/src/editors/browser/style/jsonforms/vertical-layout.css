@@ -1,0 +1,5 @@
+.jsonforms-container .vertical-layout {
+    display: flex;
+    flex-direction: column;
+    gap: calc(2 * var(--theia-ui-padding));
+}

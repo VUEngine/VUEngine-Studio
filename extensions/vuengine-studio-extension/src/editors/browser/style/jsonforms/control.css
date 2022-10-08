@@ -1,0 +1,37 @@
+.jsonforms-container .control {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 0;
+}
+
+.jsonforms-container .control>label {
+  font-size: unset;
+  font-weight: normal;
+  order: 1;
+}
+
+.jsonforms-container .control>.input-description,
+.jsonforms-container .control>.validation {
+  margin-top: 0;
+  min-height: unset;
+}
+
+.jsonforms-container .control> {
+  margin: 0;
+}
+
+.jsonforms-container .control>.input,
+.jsonforms-container .control>.input-with-decoration {
+  order: 3;
+}
+
+.jsonforms-container .control>.input-description {
+  /* font-size: 80%; */
+  opacity: .5;
+  order: 2;
+}
+
+.jsonforms-container .control>.input-description:empty {
+  display: none;
+}

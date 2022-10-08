@@ -1,52 +1,31 @@
-import { createBasicTreeContainer } from '@eclipse-emfcloud/theia-tree-editor';
-import '@eclipse-emfcloud/theia-tree-editor/style/forms.css';
-import '@eclipse-emfcloud/theia-tree-editor/style/index.css';
-import { CommandContribution, MenuContribution } from '@theia/core';
-import { createTreeContainer, LabelProviderContribution, NavigatableWidgetOptions, OpenHandler, TreeProps, TreeWidget, WidgetFactory } from '@theia/core/lib/browser';
+import { bindViewContribution, FrontendApplicationContribution, OpenHandler, WidgetFactory } from '@theia/core/lib/browser';
+import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { ContainerModule } from '@theia/core/shared/inversify';
-import { VesMasterTreeWidget, VES_TREE_PROPS } from './tree/ves-editors-master-tree-widget';
-import { VesEditorsTreeEditorOptions, VesEditorsTreeEditorWidget } from './tree/ves-editors-tree-editor-widget';
-import { VesEditorsTreeLabelProvider } from './tree/ves-editors-tree-label-provider';
-import { VesEditorsTreeModelService } from './tree/ves-editors-tree-model-service';
-import { VesEditorsTreeNodeFactory } from './tree/ves-editors-tree-node-factory';
-import { VesDetailFormWidget } from './ves-editors-detail-form-widget';
-import { VesEditorsOpenHandler } from './ves-editors-open-handler';
-import { VesEditorsTreeContribution } from './ves-editors-tree-contribution';
 import '../../../src/editors/browser/style/index.css';
+import { VesEditorsContextKeyService } from './ves-editors-context-key-service';
+import { VesEditorsOpenHandler } from './ves-editors-open-handler';
+import { VesEditorsViewContribution } from './ves-editors-view';
+import { VesEditorsWidget, VesEditorsWidgetOptions } from './ves-editors-widget';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
-    bind(OpenHandler).to(VesEditorsTreeContribution);
-    bind(MenuContribution).to(VesEditorsTreeContribution);
-    bind(CommandContribution).to(VesEditorsTreeContribution);
-    bind(LabelProviderContribution).to(VesEditorsTreeLabelProvider);
+    // context key service
+    bind(VesEditorsContextKeyService)
+        .toSelf()
+        .inSingletonScope();
 
-    bind(VesEditorsTreeModelService).toSelf().inSingletonScope();
-    bind(VesEditorsTreeLabelProvider).toSelf().inSingletonScope();
-
-    bind(VesDetailFormWidget).toSelf();
-
-    bind<WidgetFactory>(WidgetFactory).toDynamicValue(context => ({
-        id: VesEditorsTreeEditorWidget.WIDGET_ID,
-        createWidget: (options: NavigatableWidgetOptions) => {
-            const treeContainer = createBasicTreeContainer(
-                context.container,
-                VesEditorsTreeEditorWidget,
-                VesEditorsTreeModelService,
-                VesEditorsTreeNodeFactory
-            );
-            treeContainer.bind(VesEditorsTreeEditorOptions).toConstantValue(options);
-
-            return treeContainer.get(VesEditorsTreeEditorWidget);
-        }
+    // editor view
+    bindViewContribution(bind, VesEditorsViewContribution);
+    bind(FrontendApplicationContribution).toService(VesEditorsViewContribution);
+    bind(TabBarToolbarContribution).toService(VesEditorsViewContribution);
+    bind(OpenHandler).to(VesEditorsOpenHandler).inSingletonScope();
+    bind(VesEditorsWidget).toSelf();
+    bind(WidgetFactory).toDynamicValue(({ container }) => ({
+        id: VesEditorsWidget.ID,
+        createWidget: (options: VesEditorsWidgetOptions) => {
+            const child = container.createChild();
+            child.bind(VesEditorsWidgetOptions).toConstantValue(options);
+            child.bind(VesEditorsWidget).toSelf();
+            return child.get(VesEditorsWidget);
+        },
     }));
-    bind(VesEditorsOpenHandler).toSelf().inSingletonScope();
-    bind(OpenHandler).toService(VesEditorsOpenHandler);
-
-    bind(VesMasterTreeWidget).toDynamicValue(context => {
-        const treeContainer = createTreeContainer(context.container);
-        treeContainer.unbind(TreeWidget);
-        treeContainer.bind(VesMasterTreeWidget).toSelf();
-        treeContainer.rebind(TreeProps).toConstantValue(VES_TREE_PROPS);
-        return treeContainer.get(VesMasterTreeWidget);
-    });
 });

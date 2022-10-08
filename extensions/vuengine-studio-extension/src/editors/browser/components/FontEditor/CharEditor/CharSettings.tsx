@@ -1,4 +1,5 @@
 import { nls } from '@theia/core';
+import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React from 'react';
 import { CHAR_PIXEL_SIZE, FontEditorState, MAX_CHAR_SIZE, MIN_CHAR_SIZE, MIN_VARIABLE_CHAR_SIZE, Size, VariableSize } from '../FontEditorTypes';
 
@@ -134,7 +135,6 @@ export default function CharSettings(props: CharSettingsProps): JSX.Element {
                 />
             </div>
         </div>
-        {/*
         <div>
             <label>
                 {nls.localize('vuengine/fontEditor/type', 'Type')}
@@ -162,7 +162,6 @@ export default function CharSettings(props: CharSettingsProps): JSX.Element {
                 )}
             />
         </div>
-        */}
         <div>
             <label>
                 {nls.localize('vuengine/fontEditor/grid', 'Grid')}

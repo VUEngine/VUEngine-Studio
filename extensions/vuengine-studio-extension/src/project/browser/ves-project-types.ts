@@ -1,4 +1,4 @@
-import { JsonSchema } from '@jsonforms/core';
+import { JsonSchema, UISchemaElement } from '@jsonforms/core';
 import URI from '@theia/core/lib/common/uri';
 
 export interface WorkspaceFile {
@@ -38,7 +38,7 @@ export interface ProjectFileTypesWithContributor extends ProjectFileTypes {
 
 export interface ProjectFileType {
   schema: JsonSchema
-  uiSchema?: unknown
+  uiSchema?: UISchemaElement
   parent?: RegisteredTypeParent
   icon?: string
   category?: string

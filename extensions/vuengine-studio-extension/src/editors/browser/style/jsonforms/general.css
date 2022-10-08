@@ -1,0 +1,6 @@
+.jsonforms-container {
+  display: flex;
+  flex-direction: column;
+  outline: none;
+  padding: 10px;
+}

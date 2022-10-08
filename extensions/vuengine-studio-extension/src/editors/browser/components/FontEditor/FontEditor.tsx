@@ -1,4 +1,7 @@
 import { nls } from '@theia/core';
+import { injectable } from '@theia/core/shared/inversify';
+import { FileDialogService } from '@theia/filesystem/lib/browser';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import React from 'react';
 import Alphabet from './Alphabet/Alphabet';
 import AlphabetSettings from './Alphabet/AlphabetSettings';
@@ -28,14 +31,20 @@ import {
 } from './FontEditorTypes';
 import Actions from './Tools/Actions';
 import CurrentCharInfo from './Tools/CurrentCharInfo';
+import ImportExport from './Tools/ImportExport';
 import Palette from './Tools/Palette';
 import Tools from './Tools/Tools';
 
 interface FontEditorProps {
     fontData: FontData
     updateFontData: (fontData: FontData) => void
+    services: {
+        fileService: FileService,
+        fileDialogService: FileDialogService,
+    }
 }
 
+@injectable()
 export default class FontEditor extends React.Component<FontEditorProps, FontEditorState> {
     constructor(props: FontEditorProps) {
         super(props);
@@ -366,9 +375,10 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
                         setCurrentCharData={this.setCurrentCharacterData.bind(this)}
                         setState={this.setState.bind(this)}
                     />
-                    {/*
-                <ImportExport />
-                 */}
+                    <ImportExport
+                        fileDialogService={this.props.services.fileDialogService}
+                        fileService={this.props.services.fileService}
+                    />
                 </div>
                 <div className='editor-column'>
                     <CharSettings

@@ -84,8 +84,7 @@ export class VesProjectService {
   getProjectDataItemsForType(typeId: string): ProjectFileItems | undefined {
     return this._projectData.items && this._projectData.items[typeId];
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  getProjectDataItem(typeId: string, itemId: string): any | undefined {
+  getProjectDataItem(typeId: string, itemId: string): ProjectFileItem | undefined {
     return this._projectData.items && this._projectData.items[typeId][itemId];
   }
   getProjectDataTypes(): ProjectFileTypesWithContributor | undefined {

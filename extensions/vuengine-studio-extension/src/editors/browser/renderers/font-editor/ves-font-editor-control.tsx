@@ -7,14 +7,15 @@ interface VesFontEditorControlProps {
     data: FontData;
     handleChange(path: string, value: FontData): void;
     path: string;
-    label: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    config?: any;
 }
 
-const VesFontEditorControl = ({ data, handleChange, path, label }: VesFontEditorControlProps) => (
+const VesFontEditorControl = ({ data, handleChange, path, config }: VesFontEditorControlProps) =>
     <FontEditor
         fontData={data}
         updateFontData={(newValue: FontData) => handleChange(path, newValue)}
-    />
-);
+        services={config.services}
+    />;
 
 export default withJsonFormsControlProps(VesFontEditorControl);

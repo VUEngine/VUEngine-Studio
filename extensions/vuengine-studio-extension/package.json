@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "VUEngine Studio specific functionality",
   "dependencies": {
-    "@eclipse-emfcloud/theia-tree-editor": "next",
+    "@camoto/pngjs": "^6.1.0",
     "@jsonforms/core": "3.0.0-alpha.2",
     "@jsonforms/react": "3.0.0-alpha.2",
     "@jsonforms/vanilla-renderers": "3.0.0-alpha.2",

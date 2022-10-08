@@ -1,13 +1,13 @@
-.theia-tree-editor .control.intro-renderer {
+.jsonforms-container .control.intro-renderer {
   flex-direction: row;
   gap: 8px;
   margin-bottom: 20px;
 }
 
-.theia-tree-editor .control.intro-renderer .fa {
+.jsonforms-container .control.intro-renderer .fa {
   order: -1;
 }
 
-.theia-tree-editor .control.intro-renderer .fa::before {
+.jsonforms-container .control.intro-renderer .fa::before {
   vertical-align: middle;
 }

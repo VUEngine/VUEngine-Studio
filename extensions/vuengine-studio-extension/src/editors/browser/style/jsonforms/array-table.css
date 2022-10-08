@@ -1,0 +1,19 @@
+.jsonforms-container .array-table-layout header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.jsonforms-container .array-table-layout table,
+.jsonforms-container .array-table-layout th,
+.jsonforms-container .array-table-layout td {
+    border: none;
+}
+
+.jsonforms-container .array-table-layout td {
+    justify-content: center;
+}
+
+.jsonforms-container .array-table-layout input {
+    box-sizing: border-box;
+    width: 100%;
+}

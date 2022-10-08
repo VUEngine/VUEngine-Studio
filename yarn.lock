@@ -932,6 +932,11 @@
     "@babel/helper-validator-identifier" "^7.19.1"
     to-fast-properties "^2.0.0"
 
+"@camoto/pngjs@^6.1.0":
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/@camoto/pngjs/-/pngjs-6.1.0.tgz#4f4fdc83bdf94854f1a30877fde1cad6d4ac44b5"
+  integrity sha512-0mwwlqkoQbyMVGCalNplOtjjAg1b/fHNtyvE4prJn7lvKftcDEs0+wd6dpSmD+C8gBJZMJdon4JCzy39ypkiMw==
+
 "@develar/schema-utils@~2.6.5":
   version "2.6.5"
   resolved "https://registry.yarnpkg.com/@develar/schema-utils/-/schema-utils-2.6.5.tgz#3ece22c5838402419a6e0425f85742b961d9b6c6"

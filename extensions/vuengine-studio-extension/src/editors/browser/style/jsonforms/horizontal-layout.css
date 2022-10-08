@@ -1,0 +1,4 @@
+.jsonforms-container .horizontal-layout {
+    display: flex;
+    gap: calc(2 * var(--theia-ui-padding));
+}
