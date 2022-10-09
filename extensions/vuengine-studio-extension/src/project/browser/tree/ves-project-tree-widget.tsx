@@ -236,12 +236,7 @@ export class VesProjectTreeWidget extends TreeWidget {
 
   protected async addNode(typeId: string, isLeaf: boolean): Promise<void> {
     const newItemId = this.vesCommonService.nanoid();
-    // TODO: properly create new item with default values
-    // (or always deepmerge with defauls in editor when opening?)
-    this.vesProjectService.setProjectDataItem(typeId, newItemId, {
-      typeId,
-      name: !isLeaf ? 'New' : undefined,
-    });
+    this.vesProjectService.setProjectDataItem(typeId, newItemId, {});
     await this.setTreeData();
     const uri = VesEditorUri.toUri(`${typeId}/${newItemId}`);
     await open(this.openerService, uri, { mode: 'reveal' });

@@ -2,7 +2,7 @@ import { JsonFormsCore, JsonSchema, UISchemaElement } from '@jsonforms/core';
 import { JsonForms } from '@jsonforms/react';
 import { JsonFormsStyleContext, StyleContext, vanillaCells, vanillaRenderers, vanillaStyles } from '@jsonforms/vanilla-renderers';
 import { Message } from '@phosphor/messaging';
-import { Emitter, Event } from '@theia/core';
+import { Emitter, Event, nls } from '@theia/core';
 import { Saveable, SaveableSource } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -10,8 +10,10 @@ import * as React from '@theia/core/shared/react';
 import { EditorPreferences } from '@theia/editor/lib/browser';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { deepmergeCustom } from 'deepmerge-ts';
+import jsf, { Schema } from 'json-schema-faker';
 import { VesProjectService } from '../../project/browser/ves-project-service';
-import { ProjectFileItem } from '../../project/browser/ves-project-types';
+import { ProjectFileItem, ProjectFileType } from '../../project/browser/ves-project-types';
 import { VES_RENDERERS } from './renderers/ves-renderers';
 
 export const VesEditorsWidgetOptions = Symbol('VesEditorsWidgetOptions');
@@ -75,18 +77,23 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
             this.changeEmitter.fire(state.data);
 
         await this.vesProjectService.ready;
-        this.data = (this.options.itemId)
-            ? this.vesProjectService.getProjectDataItem(this.options.typeId, this.options.itemId)
-            : undefined;
-        this.setSavedData();
         const type = this.vesProjectService.getProjectDataType(this.options.typeId);
-        this.schema = type?.schema;
-        this.uiSchema = type?.uiSchema;
-        if (type?.icon) {
-            this.title.iconClass = type.icon;
+        if (type) {
+            this.schema = type?.schema;
+            this.uiSchema = type?.uiSchema;
+            if (type?.icon) {
+                this.title.iconClass = type.icon;
+            }
+            this.data = (this.options.itemId)
+                ? this.vesProjectService.getProjectDataItem(this.options.typeId, this.options.itemId)
+                : {};
+            this.setSavedData();
+            this.mergeOntoDefaults(type);
+            this.setTitle();
+            this.update();
+        } else {
+            // TODO
         }
-        this.setTitle();
-        this.update();
 
         this.autoSave = this.editorPreferences['files.autoSave'];
         this.autoSaveDelay = this.editorPreferences['files.autoSaveDelay'];
@@ -104,8 +111,8 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
             }
         });
 
-        this.onChange(data => {
-            this.handleChanged(data);
+        this.onChange(d => {
+            this.handleChanged(d);
         });
     }
 
@@ -161,6 +168,55 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
 
     protected setSavedData(): void {
         this.savedData = JSON.stringify(this.data);
+    }
+
+    protected mergeOntoDefaults(type: ProjectFileType): void {
+        // eslint-disable-next-line deprecation/deprecation
+        jsf.option({
+            alwaysFakeOptionals: true,
+            useDefaultValue: true
+        });
+        const template = {
+            // eslint-disable-next-line deprecation/deprecation
+            ...(jsf.generate(type?.schema as Schema) ?? {}) as ProjectFileItem,
+            name: nls.localize('vuengine/editors/new', 'New')
+        };
+        const customDeepmerge = deepmergeCustom({ mergeArrays: false });
+        this.data = customDeepmerge(template, this.data);
+        this.data = this.sortObject(this.data ?? {});
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    protected sortObject(object: { [key: string]: any }): ProjectFileItem {
+        if (!object) {
+            return object;
+        }
+
+        const isArray = object instanceof Array;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let sortedObj: { [key: string]: any } = {};
+        if (isArray) {
+            sortedObj = object.map(item => this.sortObject(item));
+        } else {
+            const keys = Object.keys(object);
+            keys.sort((key1, key2) => {
+                key1 = key1.toLowerCase();
+                key2 = key2.toLowerCase();
+                if (key1 < key2) { return -1; };
+                if (key1 > key2) { return 1; };
+                return 0;
+            });
+
+            keys.forEach(key => {
+                if (typeof object[key] == 'object') {
+                    sortedObj[key] = this.sortObject(object[key]);
+                } else {
+                    sortedObj[key] = object[key];
+                }
+            });
+        }
+
+        return sortedObj;
     }
 
     protected dataHasBeenChanged(): boolean {

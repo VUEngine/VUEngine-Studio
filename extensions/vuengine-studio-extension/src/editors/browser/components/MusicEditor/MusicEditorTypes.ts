@@ -55,30 +55,3 @@ export const PATTERN_NOTE_WIDTH = 2;
 
 export const VOLUME_STEPS = 16;
 export const PATTERN_SIZES = [8, 16, 32, 64];
-
-export const MUSIC_EDITOR_SONG_TEMPLATE: SongData = {
-    name: 'New',
-    channels: [...Array(6)].map((c, index) => ({
-        id: index,
-        instrument: 0,
-        sequence: index === 0 ? [0] : [],
-        patterns: index === 0 ? [{
-            size: 32,
-            notes: [],
-            volumeL: [],
-            volumeR: [],
-            effects: []
-        }] : [],
-        volume: 100,
-        muted: false,
-        solo: false,
-        collapsed: false,
-    })),
-    instruments: [{
-        name: 'Synth'
-    }],
-    speed: 300,
-    volume: 100,
-    bar: 4,
-    defaultPatternSize: 32,
-};

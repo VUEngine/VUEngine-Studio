@@ -21,8 +21,8 @@
   margin: 0;
 }
 
-.jsonforms-container .control>.input,
-.jsonforms-container .control>.input-with-decoration {
+.jsonforms-container .control>input,
+.jsonforms-container .control>select {
   order: 3;
 }
 
