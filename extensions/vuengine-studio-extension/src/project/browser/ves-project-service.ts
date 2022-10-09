@@ -191,7 +191,12 @@ export class VesProjectService {
     await this.workspaceService.ready;
 
     // workspace
-    let workspaceProjectFileData: ProjectFile = {};
+    let workspaceProjectFileData: ProjectFile = {
+      'folders':
+        [{
+          'path': '.'
+        }]
+    };
     this.workspaceProjectFileUri = this.workspaceService.workspace?.resource;
     if (this.workspaceProjectFileUri) {
       if (this.workspaceService.workspace?.isDirectory) {
@@ -214,7 +219,17 @@ export class VesProjectService {
       workspaceProjectFileData = await this.readProjectFileData(this.workspaceProjectFileUri) || {};
       console.info(`Read project data from file ${this.workspaceProjectFileUri}.`);
     } else {
-      console.error('Could not find project file.');
+      if (this.workspaceService.workspace?.resource) {
+        const newProjectFileUri = this.workspaceService.workspace?.resource.resolve(`project.${VUENGINE_EXT}`);
+        this.fileService.createFile(
+          newProjectFileUri,
+          BinaryBuffer.fromString(JSON.stringify(workspaceProjectFileData, undefined, 4))
+        );
+        this.workspaceProjectFileUri = newProjectFileUri;
+        console.info(`Could not find project file. Created new one at ${this.workspaceProjectFileUri}`);
+      } else {
+        console.error('Could not find of create project file.');
+      }
     }
 
     // engine
