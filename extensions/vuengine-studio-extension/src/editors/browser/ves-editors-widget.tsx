@@ -12,6 +12,7 @@ import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { deepmergeCustom } from 'deepmerge-ts';
 import jsf, { Schema } from 'json-schema-faker';
+import sortJson from 'sort-json';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { ProjectFileItem, ProjectFileType } from '../../project/browser/ves-project-types';
 import { VES_RENDERERS } from './renderers/ves-renderers';
@@ -183,40 +184,12 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         };
         const customDeepmerge = deepmergeCustom({ mergeArrays: false });
         this.data = customDeepmerge(template, this.data);
-        this.data = this.sortObject(this.data ?? {});
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    protected sortObject(object: { [key: string]: any }): ProjectFileItem {
-        if (!object) {
-            return object;
-        }
-
-        const isArray = object instanceof Array;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let sortedObj: { [key: string]: any } = {};
-        if (isArray) {
-            sortedObj = object.map(item => this.sortObject(item));
-        } else {
-            const keys = Object.keys(object);
-            keys.sort((key1, key2) => {
-                key1 = key1.toLowerCase();
-                key2 = key2.toLowerCase();
-                if (key1 < key2) { return -1; };
-                if (key1 > key2) { return 1; };
-                return 0;
-            });
-
-            keys.forEach(key => {
-                if (typeof object[key] == 'object') {
-                    sortedObj[key] = this.sortObject(object[key]);
-                } else {
-                    sortedObj[key] = object[key];
-                }
-            });
-        }
-
-        return sortedObj;
+        this.data = sortJson(this.data ?? {}, {
+            depth: 8,
+            ignoreCase: true,
+            reverse: false,
+        });
+        console.log('this.data', this.data);
     }
 
     protected dataHasBeenChanged(): boolean {

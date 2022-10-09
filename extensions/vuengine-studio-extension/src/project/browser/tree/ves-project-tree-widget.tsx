@@ -46,7 +46,7 @@ export class VesProjectTreeWidget extends TreeWidget {
     this.id = VesProjectTreeWidget.ID;
     this.title.label = VesProjectTreeWidget.LABEL;
     this.title.caption = VesProjectTreeWidget.LABEL;
-    this.title.iconClass = 'codicon codicon-home';
+    this.title.iconClass = 'codicon codicon-library';
     this.title.closable = true;
   }
 

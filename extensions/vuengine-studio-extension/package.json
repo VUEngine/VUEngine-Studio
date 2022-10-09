@@ -45,6 +45,7 @@
     "iconv-lite": "^0.6.3",
     "inversify": "^5.1.1",
     "json-schema-faker": "^0.5.0-rcv.44",
+    "sort-json": "^2.0.1",
     "lodash": "^4.17.21",
     "nanoid": "^3.3.4",
     "nunjucks": "^3.2.3",
@@ -66,6 +67,7 @@
     "@types/three": "^0.140.0",
     "@types/usb": "^2.0.5",
     "@types/uuid": "^8.3.2",
+    "@types/sort-json": "^2.0.1",
     "rimraf": "^2.7.1",
     "tslint": "^5.12.0",
     "typescript": "^4.5.5"
