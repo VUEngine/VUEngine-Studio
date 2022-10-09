@@ -19,91 +19,136 @@ export default function Actions(props: ActionsProps): JSX.Element {
         setState
     } = props;
 
-    const getBlankCharacterLine = (): number[] => {
-        const charLineData: number[] = [];
-        [...Array(charWidth)].map((k, x) => {
-            charLineData.push(0);
-        });
-        return charLineData;
-    };
-
-    const getBlankCharacter = (): number[][] => {
-        const charData: number[][] = [];
-        [...Array(charHeight)].map((j, y) => {
-            charData.push(getBlankCharacterLine());
-        });
-        return charData;
-    };
-
     const clear = (): void => {
-        setCurrentCharData(getBlankCharacter());
+        setCurrentCharData([]);
     };
 
     const rotate = (): void => {
-        const char = currentCharData;
+        const updatedCharacter = currentCharData ?? [];
 
-        const n = char.length;
+        const n = charHeight;
         const x = Math.floor(n / 2);
         const y = n - 1;
         let k;
         for (let i = 0; i < x; i++) {
+            if (!updatedCharacter[i]) { updatedCharacter[i] = []; }
+            if (!updatedCharacter[y - i]) { updatedCharacter[y - i] = []; }
             for (let j = i; j < y - i; j++) {
-                k = char[i][j];
-                char[i][j] = char[y - j][i];
-                char[y - j][i] = char[y - i][y - j];
-                char[y - i][y - j] = char[j][y - i];
-                char[j][y - i] = k;
+                if (!updatedCharacter[j]) { updatedCharacter[j] = []; }
+                if (!updatedCharacter[y - j]) { updatedCharacter[y - j] = []; }
+                k = updatedCharacter[i][j] ?? 0;
+                updatedCharacter[i][j] = updatedCharacter[y - j][i] ?? 0;
+                updatedCharacter[y - j][i] = updatedCharacter[y - i][y - j] ?? 0;
+                updatedCharacter[y - i][y - j] = updatedCharacter[j][y - i] ?? 0;
+                updatedCharacter[j][y - i] = k;
             }
         }
 
-        setCurrentCharData(char);
+        setCurrentCharData(updatedCharacter);
     };
 
     const mirrorHorizontally = (): void => {
-        setCurrentCharData(currentCharData.map(line => line.reverse()));
+        const updatedCharacter = currentCharData ?? [];
+
+        [...Array(charHeight)].map((j, y) => {
+            if (!updatedCharacter[y]) { updatedCharacter[y] = []; }
+            [...Array(charWidth)].map((k, x) => {
+                if (!updatedCharacter[y][x]) { updatedCharacter[y][x] = 0; }
+            });
+            updatedCharacter[y] = updatedCharacter[y].reverse();
+        });
+
+        setCurrentCharData(updatedCharacter);
     };
 
     const mirrorVertically = (): void => {
-        setCurrentCharData(currentCharData.reverse());
+        const updatedCharacter = currentCharData ?? [];
+
+        [...Array(charHeight)].map((j, y) => {
+            if (!updatedCharacter[y]) { updatedCharacter[y] = []; }
+        });
+
+        setCurrentCharData(updatedCharacter.reverse());
     };
 
     const moveUp = (): void => {
+        if (!currentCharData || currentCharData.length < 1) { return; }
+
         setCurrentCharData([
             ...currentCharData.slice(1),
-            getBlankCharacterLine()
+            []
         ]);
     };
 
     const moveDown = (): void => {
+        if (!currentCharData || currentCharData.length < 1) { return; }
+
+        [...Array(charHeight)].map((j, y) => {
+            if (!currentCharData[y]) { currentCharData[y] = []; }
+        });
+
         setCurrentCharData([
-            getBlankCharacterLine(),
+            [],
             ...currentCharData.slice(0, -1)
         ]);
     };
 
     const moveLeft = (): void => {
+        if (!currentCharData || currentCharData.length < 1) { return; }
+
         setCurrentCharData(currentCharData.map(line => [...line.slice(1), 0]));
     };
 
     const moveRight = (): void => {
+        if (!currentCharData || currentCharData.length < 1) { return; }
+
+        currentCharData.map((j, y) => {
+            const line = currentCharData[y];
+            [...Array(charWidth)].map((k, x) => {
+                if (!line[x]) { line[x] = 0; }
+            });
+        });
+
         setCurrentCharData(currentCharData.map(line => [0, ...line.slice(0, -1)]));
     };
 
     const toneUp = (): void => {
-        setCurrentCharData(currentCharData.map(line =>
-            line.map(pixel => pixel < 3 ? pixel + 1 : pixel)));
+        const updatedCharacter = currentCharData ?? [];
+
+        [...Array(charHeight)].map((j, y) => {
+            if (!updatedCharacter[y]) { updatedCharacter[y] = []; }
+            [...Array(charWidth)].map((k, x) => {
+                if (!updatedCharacter[y][x]) { updatedCharacter[y][x] = 0; }
+                if (updatedCharacter[y][x] < 3) { updatedCharacter[y][x]++; }
+            });
+        });
+
+        setCurrentCharData(updatedCharacter);
     };
 
     const toneDown = (): void => {
-        setCurrentCharData(currentCharData.map(line =>
-            line.map(pixel => pixel > 0 ? pixel - 1 : pixel)));
+        const updatedCharacter = currentCharData ?? [];
+
+        [...Array(charHeight)].map((j, y) => {
+            if (!updatedCharacter[y]) { updatedCharacter[y] = []; }
+            [...Array(charWidth)].map((k, x) => {
+                if (!updatedCharacter[y][x]) { updatedCharacter[y][x] = 0; }
+                if (updatedCharacter[y][x] > 0) { updatedCharacter[y][x]--; }
+            });
+        });
+
+        setCurrentCharData(updatedCharacter);
     };
 
     const copy = (): void => {
+        if (!currentCharData || currentCharData.length < 1) { return; }
+
         setState({ clipboard: [...currentCharData] });
     };
 
     const paste = (): void => {
+        if (!currentCharData || currentCharData.length < 1) { return; }
+
         if (clipboard) {
             setCurrentCharData(clipboard);
         }

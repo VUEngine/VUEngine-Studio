@@ -197,7 +197,7 @@ export class VesProjectService {
     this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
       if (this.workspaceProjectFileUri && fileChangesEvent.contains(this.workspaceProjectFileUri, FileChangeType.UPDATED)) {
         if (!this.fileChangeEventLock) {
-          console.log('Manual change of project file.');
+          console.info('Manual change of project file.');
           this.readProjectData();
         } else {
           this.fileChangeEventLock = false;

@@ -447,7 +447,6 @@
   align-items: center;
   color: var(--theia-input-background);
   display: flex;
-  font-family: monospace;
   font-size: 8px;
   left: 0;
   justify-content: center;

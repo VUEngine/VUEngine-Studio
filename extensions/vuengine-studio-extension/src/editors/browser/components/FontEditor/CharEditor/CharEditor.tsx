@@ -36,11 +36,11 @@ export default function CharEditor(props: CharEditorProps): JSX.Element {
                         key={`current-pixel-${y}-${x}`}
                         x={x}
                         y={y}
-                        pixelColor={char[y][x]}
+                        pixelColor={char && char[y] && char[y][x] ? char[y][x] : 0}
                         clickPixel={clickPixel}
                         paletteIndexL={paletteIndexL}
                         paletteIndexR={paletteIndexR}
-                        active={!variableSize.enabled || x < variableSize.x[charId]}
+                        active={!variableSize.enabled || x < (variableSize.x[charId] ?? charWidth)}
                     />)}
                 </div>)
             )

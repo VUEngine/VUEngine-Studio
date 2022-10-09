@@ -25,8 +25,7 @@ export default function Alphabet(props: AlphabetProps): JSX.Element {
         setState,
     } = props;
 
-    return <div className={`characters markers grid-${alphabetGrid}`}
-        onKeyDown={() => console.log('BUMS')} >
+    return <div className={`characters markers grid-${alphabetGrid}`}>
         {
             [...Array(16)].map((i, line) => (
                 <div key={`characters-line-${line}`} className="line">

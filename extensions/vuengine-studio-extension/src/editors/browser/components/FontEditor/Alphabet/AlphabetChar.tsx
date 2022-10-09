@@ -1,3 +1,4 @@
+import { size } from 'lodash';
 import React from 'react';
 import { FontEditorState, PALETTE_COLORS, VariableSize, win1252CharNames } from '../FontEditorTypes';
 
@@ -38,9 +39,9 @@ export default function AlphabetChar(props: AlphabetCharProps): JSX.Element {
     [...Array(charHeight)].map((h, y) => {
         if (!variableSize.enabled || y < variableSize.y) {
             [...Array(charWidth)].map((w, x) => {
-                if (!variableSize.enabled || x < variableSize.x[line * 16 + index]) {
+                if (!variableSize.enabled || x < (variableSize.x[line * 16 + index] ?? charWidth)) {
                     const pixelSize = (charWidth > 16 || charHeight > 16) ? 1 : 2;
-                    const color = charData[y][x];
+                    const color = charData && charData[y] && charData[y][x] ? charData[y][x] : 0;
                     boxShadow.push(
                         `${(x + 1) * pixelSize}px ${(y + 1) * pixelSize}px 0 0 ${PALETTE_COLORS[color]}`
                     );

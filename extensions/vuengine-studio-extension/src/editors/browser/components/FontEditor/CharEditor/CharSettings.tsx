@@ -21,44 +21,36 @@ export default function CharSettings(props: CharSettingsProps): JSX.Element {
         setState,
     } = props;
 
-    const onChangeVariablePixelWidth = (e: React.ChangeEvent<HTMLInputElement>) => setCharSize(
-        undefined,
-        {
+    const onChangeVariablePixelWidth = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const updatedVariableSizeX = [...variableSize.x];
+        updatedVariableSizeX[currentCharacter] = parseInt(e.target.value);
+        setCharSize(undefined, {
             ...variableSize,
-            x: {
-                ...variableSize.x,
-                [currentCharacter]: parseInt(e.target.value)
-            }
-        }
-    );
+            x: updatedVariableSizeX
+        });
+    };
 
-    const onChangeVariablePixelHeight = (e: React.ChangeEvent<HTMLInputElement>) => setCharSize(
-        undefined,
-        {
-            ...variableSize,
-            y: parseInt(e.target.value)
-        }
-    );
+    const onChangeVariablePixelHeight = (e: React.ChangeEvent<HTMLInputElement>) => setCharSize(undefined, {
+        ...variableSize,
+        y: parseInt(e.target.value)
+    });
 
     const onChangePixelWidth = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const currentVariableSize = variableSize.x[currentCharacter];
+        const currentVariableSize = variableSize.x[currentCharacter] ?? charWidth;
         const newSize = parseInt(e.target.value);
         const currentVariableSizeDifference = charWidth - currentVariableSize;
         const newVariableSize = newSize - currentVariableSizeDifference;
 
-        setCharSize(
-            {
-                x: newSize / CHAR_PIXEL_SIZE,
-                y: charHeight / CHAR_PIXEL_SIZE
-            },
-            {
-                ...variableSize,
-                x: {
-                    ...variableSize.x,
-                    [currentCharacter]: newVariableSize
-                }
-            }
-        );
+        const updatedVariableSizeX = [...variableSize.x];
+        updatedVariableSizeX[currentCharacter] = newVariableSize;
+
+        setCharSize({
+            x: newSize / CHAR_PIXEL_SIZE,
+            y: charHeight / CHAR_PIXEL_SIZE
+        }, {
+            ...variableSize,
+            x: updatedVariableSizeX
+        });
     };
 
     const onChangePixelHeight = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,16 +59,13 @@ export default function CharSettings(props: CharSettingsProps): JSX.Element {
         const currentVariableSizeDifference = charHeight - currentVariableSize;
         const newVariableSize = newSize - currentVariableSizeDifference;
 
-        setCharSize(
-            {
-                x: charWidth / CHAR_PIXEL_SIZE,
-                y: newSize / CHAR_PIXEL_SIZE
-            },
-            {
-                ...variableSize,
-                y: newVariableSize
-            }
-        );
+        setCharSize({
+            x: charWidth / CHAR_PIXEL_SIZE,
+            y: newSize / CHAR_PIXEL_SIZE
+        }, {
+            ...variableSize,
+            y: newVariableSize
+        });
     };
 
     return <div className='font-properties'>
@@ -90,7 +79,7 @@ export default function CharSettings(props: CharSettingsProps): JSX.Element {
                     min={MIN_VARIABLE_CHAR_SIZE}
                     max={charWidth}
                     className="theia-input"
-                    value={variableSize.x[currentCharacter]}
+                    value={variableSize.x[currentCharacter] ?? charWidth}
                     onChange={onChangeVariablePixelWidth}
                 />
                 <div>×</div>
