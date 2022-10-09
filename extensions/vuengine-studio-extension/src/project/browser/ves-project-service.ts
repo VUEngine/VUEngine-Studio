@@ -6,6 +6,7 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { FileChangesEvent, FileChangeType } from '@theia/filesystem/lib/common/files';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
@@ -53,6 +54,7 @@ export class VesProjectService {
     return this._ready.promise;
   }
 
+  protected fileChangeEventLock: boolean = false;
   protected workspaceProjectFileUri: URI | undefined;
 
   // project data
@@ -185,6 +187,18 @@ export class VesProjectService {
     this.onDidChangeProjectData(() => {
       this.updateWindowTitle();
     });
+
+    // watch for project file changes
+    this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
+      if (this.workspaceProjectFileUri && fileChangesEvent.contains(this.workspaceProjectFileUri, FileChangeType.UPDATED)) {
+        if (!this.fileChangeEventLock) {
+          console.log('Manual change of project file.');
+          this.readProjectData();
+        } else {
+          this.fileChangeEventLock = false;
+        }
+      }
+    });
   }
 
   protected async readProjectData(): Promise<void> {
@@ -220,12 +234,9 @@ export class VesProjectService {
       console.info(`Read project data from file ${this.workspaceProjectFileUri}.`);
     } else {
       if (this.workspaceService.workspace?.resource) {
-        const newProjectFileUri = this.workspaceService.workspace?.resource.resolve(`project.${VUENGINE_EXT}`);
-        this.fileService.createFile(
-          newProjectFileUri,
-          BinaryBuffer.fromString(JSON.stringify(workspaceProjectFileData, undefined, 4))
-        );
-        this.workspaceProjectFileUri = newProjectFileUri;
+        this.workspaceProjectFileUri = this.workspaceService.workspace?.resource.resolve(`project.${VUENGINE_EXT}`);
+        this._projectData = workspaceProjectFileData;
+        this.saveProjectFile();
         console.info(`Could not find project file. Created new one at ${this.workspaceProjectFileUri}`);
       } else {
         console.error('Could not find of create project file.');
@@ -331,6 +342,8 @@ export class VesProjectService {
       ...workspaceProjectFileData,
       combined,
     };
+
+    this.onDidChangeProjectDataEmitter.fire();
   }
 
   protected async readProjectFileData(projectFileUri?: URI): Promise<ProjectFile | undefined> {
@@ -356,6 +369,8 @@ export class VesProjectService {
     if (!this.workspaceProjectFileUri) {
       return false;
     }
+
+    this.fileChangeEventLock = true;
 
     try {
       await this.fileService.writeFile(
