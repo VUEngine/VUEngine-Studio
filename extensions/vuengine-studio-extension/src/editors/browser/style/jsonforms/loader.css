@@ -1,0 +1,48 @@
+.jsonforms-container .loader {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+}
+
+.jsonforms-container .loader>div {
+  background-color: var(--theia-sideBar-background);
+  border-radius: 10px;
+  height: 128px;
+  overflow: hidden;
+  position: relative;
+  transform: rotate(45deg);
+  width: 128px;
+}
+
+.jsonforms-container .loader>div:after {
+  background-color: var(--theia-editor-background);
+  border-radius: 6px;
+  content: '';
+  inset: 7px 8px 8px;
+  margin: auto;
+  position: absolute;
+}
+
+.jsonforms-container .loader>div:before {
+  animation: RhombusLoader 2s linear infinite;
+  background: var(--theia-editor-foreground);
+  content: '';
+  inset: -25px;
+  margin: auto;
+  opacity: .3;
+  position: absolute;
+}
+
+@keyframes RhombusLoader {
+
+  0%,
+  10% {
+    transform: translate(-128px, -128px) rotate(-45deg)
+  }
+
+  99%,
+  100% {
+    transform: translate(0px, 0px) rotate(-45deg)
+  }
+}

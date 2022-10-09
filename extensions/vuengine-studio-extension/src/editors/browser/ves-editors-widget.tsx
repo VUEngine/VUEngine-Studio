@@ -46,6 +46,8 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     public autoSave: 'off' | 'afterDelay' | 'onFocusChange' | 'onWindowChange' = 'off';
     protected autoSaveDelay: number;
 
+    protected loading: boolean = true;
+
     protected readonly onDirtyChangedEmitter = new Emitter<void>();
     get onDirtyChanged(): Event<void> {
         return this.onDirtyChangedEmitter.event;
@@ -73,29 +75,6 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
 
         this.update();
 
-        this.toDispose.push(this.changeEmitter);
-        this.jsonformsOnChange = (state: Pick<JsonFormsCore, 'data' | 'errors'>) =>
-            this.changeEmitter.fire(state.data);
-
-        await this.vesProjectService.ready;
-        const type = this.vesProjectService.getProjectDataType(this.options.typeId);
-        if (type) {
-            this.schema = type?.schema;
-            this.uiSchema = type?.uiSchema;
-            if (type?.icon) {
-                this.title.iconClass = type.icon;
-            }
-            this.data = (this.options.itemId)
-                ? this.vesProjectService.getProjectDataItem(this.options.typeId, this.options.itemId)
-                : {};
-            if (this.data) {
-                this.setSavedData();
-                this.mergeOntoDefaults(type);
-                this.setTitle();
-                this.update();
-            }
-        }
-
         this.autoSave = this.editorPreferences['files.autoSave'];
         this.autoSaveDelay = this.editorPreferences['files.autoSaveDelay'];
         this.editorPreferences.onPreferenceChanged(ev => {
@@ -115,6 +94,31 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         this.onChange(d => {
             this.handleChanged(d);
         });
+
+        this.toDispose.push(this.changeEmitter);
+        this.jsonformsOnChange = (state: Pick<JsonFormsCore, 'data' | 'errors'>) =>
+            this.changeEmitter.fire(state.data);
+
+        await this.vesProjectService.ready;
+        const type = this.vesProjectService.getProjectDataType(this.options.typeId);
+        if (type) {
+            this.schema = type?.schema;
+            this.uiSchema = type?.uiSchema;
+            if (type?.icon) {
+                this.title.iconClass = type.icon;
+            }
+            this.data = (this.options.itemId)
+                ? this.vesProjectService.getProjectDataItem(this.options.typeId, this.options.itemId)
+                : {};
+            if (this.data) {
+                this.setSavedData();
+                this.mergeOntoDefaults(type);
+                this.setTitle();
+            }
+        }
+
+        this.loading = false;
+        this.update();
     }
 
     protected setTitle(): void {
@@ -226,34 +230,36 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
 
     protected render(): React.ReactNode {
         return <div className="jsonforms-container" tabIndex={0}>
-            {this.data
-                ? <JsonFormsStyleContext.Provider value={this.getStyles()}>
-                    <JsonForms
-                        data={this.data}
-                        schema={this.schema}
-                        uischema={this.uiSchema}
-                        onChange={this.jsonformsOnChange}
-                        cells={vanillaCells}
-                        renderers={[
-                            ...vanillaRenderers,
-                            ...VES_RENDERERS
-                        ]}
-                        config={{
-                            restrict: false,
-                            trim: false,
-                            showUnfocusedDescription: true,
-                            hideRequiredAsterisk: false,
-                            // TODO: refactor once there's a non-hacky way to inject services
-                            services: {
-                                fileService: this.fileService,
-                                fileDialogService: this.fileDialogService
-                            }
-                        }}
-                    />
-                </JsonFormsStyleContext.Provider>
-                : <div className='error'>
-                    {nls.localize('vuengine/editors/errorCouldNotLoadItem', 'Error: could not load item.')}
-                </div>}
+            {this.loading
+                ? <div className="loader"><div></div></div>
+                : this.data
+                    ? <JsonFormsStyleContext.Provider value={this.getStyles()}>
+                        <JsonForms
+                            data={this.data}
+                            schema={this.schema}
+                            uischema={this.uiSchema}
+                            onChange={this.jsonformsOnChange}
+                            cells={vanillaCells}
+                            renderers={[
+                                ...vanillaRenderers,
+                                ...VES_RENDERERS
+                            ]}
+                            config={{
+                                restrict: false,
+                                trim: false,
+                                showUnfocusedDescription: true,
+                                hideRequiredAsterisk: false,
+                                // TODO: refactor once there's a non-hacky way to inject services
+                                services: {
+                                    fileService: this.fileService,
+                                    fileDialogService: this.fileDialogService
+                                }
+                            }}
+                        />
+                    </JsonFormsStyleContext.Provider>
+                    : <div className='error'>
+                        {nls.localize('vuengine/editors/errorCouldNotLoadItem', 'Error: could not load item.')}
+                    </div>}
         </div>;
     }
 
