@@ -453,12 +453,12 @@ export class VesFlashCartService {
 
   protected async parseStreamDataHyperBoyCli(connectedFlashCart: ConnectedFlashCart, data: any): Promise<void> { /* eslint-disable-line */
     if (connectedFlashCart.config.path === HBCLI_PLACEHOLDER) {
-      if (data.startsWith('Clearing')) {
+      if (data.startsWith('> Clearing')) {
         connectedFlashCart.status = {
           ...connectedFlashCart.status,
           step: 'Erasing',
         };
-      } else if (data.startsWith('Setting file size')) {
+      } else if (data.startsWith('> Setting file size')) {
         connectedFlashCart.status = {
           ...connectedFlashCart.status,
           step: 'Flashing',

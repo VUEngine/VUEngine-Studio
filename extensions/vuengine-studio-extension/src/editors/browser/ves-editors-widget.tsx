@@ -179,6 +179,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         // eslint-disable-next-line deprecation/deprecation
         jsf.option({
             alwaysFakeOptionals: true,
+            fillProperties: false,
             useDefaultValue: true
         });
         const template = {
