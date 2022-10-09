@@ -184,7 +184,9 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         const template = {
             // eslint-disable-next-line deprecation/deprecation
             ...(jsf.generate(type?.schema as Schema) ?? {}) as ProjectFileItem,
-            name: nls.localize('vuengine/editors/new', 'New')
+            name: type?.schema.properties?.name
+                ? nls.localize('vuengine/editors/new', 'New')
+                : undefined
         };
         const customDeepmerge = deepmergeCustom({ mergeArrays: false });
         this.data = customDeepmerge(template, this.data);
