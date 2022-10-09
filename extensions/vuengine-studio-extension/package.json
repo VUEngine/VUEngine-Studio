@@ -49,6 +49,7 @@
     "lodash": "^4.17.21",
     "nanoid": "^3.3.4",
     "nunjucks": "^3.2.3",
+    "physical-cpu-count": "^2.0.0",
     "react-dom": "^18.2.0",
     "replace-in-files": "^3.0.0",
     "sanitize-filename": "^1.6.3",

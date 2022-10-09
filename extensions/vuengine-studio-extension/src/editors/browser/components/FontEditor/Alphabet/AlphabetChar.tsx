@@ -1,4 +1,3 @@
-import { size } from 'lodash';
 import React from 'react';
 import { FontEditorState, PALETTE_COLORS, VariableSize, win1252CharNames } from '../FontEditorTypes';
 

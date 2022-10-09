@@ -163,8 +163,9 @@ export class VesFlashCartWidget extends ReactWidget {
                     {!connectedFlashCart.canHoldRom &&
                       <div className="infoPanel warning">
                         <i className='fa fa-fw fa-exclamation-triangle'></i>{' '}
-                        {nls.localize('vuengine/flashCarts/insufficientSpaceToHoldRom', 'Insufficient space to hold ROM')}
-                        ({this.vesBuildService.bytesToMbit(this.vesBuildService.romSize)} MBit)
+                        {nls.localize('vuengine/flashCarts/insufficientSpaceToHoldRom', 'Insufficient space to hold ROM')} ({
+                          this.vesBuildService.bytesToMbit(this.vesBuildService.romSize)
+                        } MBit)
                       </div>
                     }
                     {connectedFlashCart.status.progress === 100 ? (

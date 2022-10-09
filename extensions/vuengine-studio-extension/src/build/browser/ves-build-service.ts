@@ -10,7 +10,6 @@ import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { ProcessOptions } from '@theia/process/lib/node';
 import { TaskEndedInfo, TaskEndedTypes, TaskService } from '@theia/task/lib/browser/task-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { cpus } from 'os';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
@@ -660,12 +659,7 @@ export class VesBuildService {
   }
 
   protected getThreads(): number {
-    let threads = cpus().length;
-    if (threads > 2) {
-      threads--;
-    }
-
-    return threads;
+    return require('physical-cpu-count');
   }
 
   protected computeProgress(matches: string[]): number {
