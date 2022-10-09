@@ -71,7 +71,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         this.title.iconClass = 'fa fa-cog';
         this.title.closable = true;
 
-        this.renderEmptyForm();
+        this.update();
 
         this.toDispose.push(this.changeEmitter);
         this.jsonformsOnChange = (state: Pick<JsonFormsCore, 'data' | 'errors'>) =>
@@ -88,12 +88,12 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
             this.data = (this.options.itemId)
                 ? this.vesProjectService.getProjectDataItem(this.options.typeId, this.options.itemId)
                 : {};
-            this.setSavedData();
-            this.mergeOntoDefaults(type);
-            this.setTitle();
-            this.update();
-        } else {
-            // TODO
+            if (this.data) {
+                this.setSavedData();
+                this.mergeOntoDefaults(type);
+                this.setTitle();
+                this.update();
+            }
         }
 
         this.autoSave = this.editorPreferences['files.autoSave'];
@@ -189,7 +189,6 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
             ignoreCase: true,
             reverse: false,
         });
-        console.log('this.data', this.data);
     }
 
     protected dataHasBeenChanged(): boolean {
@@ -227,36 +226,34 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
 
     protected render(): React.ReactNode {
         return <div className="jsonforms-container" tabIndex={0}>
-            <JsonFormsStyleContext.Provider value={this.getStyles()}>
-                <JsonForms
-                    data={this.data}
-                    schema={this.schema}
-                    uischema={this.uiSchema}
-                    onChange={this.jsonformsOnChange}
-                    cells={vanillaCells}
-                    renderers={[
-                        ...vanillaRenderers,
-                        ...VES_RENDERERS
-                    ]}
-                    config={{
-                        restrict: false,
-                        trim: false,
-                        showUnfocusedDescription: true,
-                        hideRequiredAsterisk: false,
-                        // TODO: refactor once there's a non-hacky way to inject services
-                        services: {
-                            fileService: this.fileService,
-                            fileDialogService: this.fileDialogService
-                        }
-                    }}
-                />
-            </JsonFormsStyleContext.Provider>
-        </div>;
-    }
-
-    protected renderEmptyForm(): React.ReactNode {
-        return <div className="jsonforms-container">
-            ¯\_(ツ)_/¯
+            {this.data
+                ? <JsonFormsStyleContext.Provider value={this.getStyles()}>
+                    <JsonForms
+                        data={this.data}
+                        schema={this.schema}
+                        uischema={this.uiSchema}
+                        onChange={this.jsonformsOnChange}
+                        cells={vanillaCells}
+                        renderers={[
+                            ...vanillaRenderers,
+                            ...VES_RENDERERS
+                        ]}
+                        config={{
+                            restrict: false,
+                            trim: false,
+                            showUnfocusedDescription: true,
+                            hideRequiredAsterisk: false,
+                            // TODO: refactor once there's a non-hacky way to inject services
+                            services: {
+                                fileService: this.fileService,
+                                fileDialogService: this.fileDialogService
+                            }
+                        }}
+                    />
+                </JsonFormsStyleContext.Provider>
+                : <div className='error'>
+                    {nls.localize('vuengine/editors/errorCouldNotLoadItem', 'Error: could not load item.')}
+                </div>}
         </div>;
     }
 
