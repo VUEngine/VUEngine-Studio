@@ -21,6 +21,10 @@ export default class MusicPlayer extends React.Component<MusicPlayerProps> {
         )];
     };
 
+    componentWillUnmount(): void {
+        clearTimeout(this.timer);
+    }
+
     playNote(): void {
         const { currentStep, increaseCurrentStep, notes, playing, speed } = this.props;
 

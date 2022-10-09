@@ -3,6 +3,7 @@
   --theia-toolbar-item-padding: 4px;
   --theia-toolbar-icon-size: 16px;
   padding: 0 var(--theia-ui-padding);
+  z-index: 1;
 }
 
 #main-toolbar .toolbar-item {
