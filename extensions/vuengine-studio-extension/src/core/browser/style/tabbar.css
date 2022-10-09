@@ -6,15 +6,15 @@
 .p-TabBar.theia-app-sides .p-TabBar-tab[class*=ves-decorator]:after {
     background-color: var(--theia-activityBarBadge-background);
     border-radius: 20px;
-    bottom: var(--theia-ui-padding);
     color: var(--theia-activityBarBadge-foreground);
     font-family: FontAwesome;
     font-size: var(--theia-ui-font-size0);
-    line-height: var(--theia-notification-count-width);
+    line-height: var(--theia-notification-count-height);
     padding: 2px;
     position: absolute;
     right: var(--theia-ui-padding);
     text-align: center;
+    top: calc(var(--theia-ui-padding) * 4);
     width: var(--theia-notification-count-width);
 }
 
