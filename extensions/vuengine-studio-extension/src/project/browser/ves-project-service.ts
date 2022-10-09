@@ -103,7 +103,7 @@ export class VesProjectService {
     return this._projectData.combined?.templates
       && this._projectData.combined?.templates[templateId];
   }
-  async setProjectDataItem(typeId: string, itemId: string, data: ProjectFileItem): Promise<boolean> {
+  async setProjectDataItem(typeId: string, itemId: string, data: ProjectFileItem, save: boolean = true): Promise<boolean> {
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     if (!workspaceRootUri) {
@@ -133,9 +133,14 @@ export class VesProjectService {
       ...data
     };
 
-    this.onDidSaveItemEmitter.fire({ typeId, itemId, item: data });
     this.onDidChangeProjectDataEmitter.fire();
-    return this.saveProjectFile();
+
+    if (save) {
+      this.onDidSaveItemEmitter.fire({ typeId, itemId, item: data });
+      return this.saveProjectFile();
+    }
+
+    return true;
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async deleteProjectDataItem(typeId: string, itemId: string): Promise<void> {
