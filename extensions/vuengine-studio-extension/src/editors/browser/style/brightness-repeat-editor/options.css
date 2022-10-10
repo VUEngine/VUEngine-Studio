@@ -1,0 +1,11 @@
+.brightnessRepeatEditor .options {
+  display: flex;
+  gap: 20px;
+}
+
+.brightnessRepeatEditor .options>div:first-child {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  gap: 20px;
+}

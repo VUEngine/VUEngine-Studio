@@ -1,3 +1,7 @@
+import vesBrightnessRepeatEditorControl from './brightness-repeat-editor/ves-brightness-repeat-editor-control';
+import vesBrightnessRepeatEditorControlTester from './brightness-repeat-editor/ves-brightness-repeat-editor-control-tester';
+import vesColumnTableEditorControl from './column-table-editor/ves-column-table-editor-control';
+import vesColumnTableEditorControlTester from './column-table-editor/ves-column-table-editor-control-tester';
 import vesFontEditorControl from './font-editor/ves-font-editor-control';
 import vesFontEditorControlTester from './font-editor/ves-font-editor-control-tester';
 import vesImagesControl from './images/ves-images-control';
@@ -12,6 +16,8 @@ import vesRatingControl from './starRating/ves-rating-control';
 import vesRatingControlTester from './starRating/ves-rating-control-tester';
 
 export const VES_RENDERERS = [
+    { tester: vesBrightnessRepeatEditorControlTester, renderer: vesBrightnessRepeatEditorControl },
+    { tester: vesColumnTableEditorControlTester, renderer: vesColumnTableEditorControl },
     { tester: vesFontEditorControlTester, renderer: vesFontEditorControl },
     { tester: vesMusicEditorControlTester, renderer: vesMusicEditorControl },
     { tester: vesImagesControlTester, renderer: vesImagesControl },

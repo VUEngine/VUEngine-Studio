@@ -1,17 +1,18 @@
 import React, { PropsWithChildren } from 'react';
 
-interface VContainerProps {
+interface HContainerProps {
+    gap?: number;
 }
 
-export default function VContainer(props: PropsWithChildren<VContainerProps>): JSX.Element {
-    const { children } = props;
+export default function HContainer(props: PropsWithChildren<HContainerProps>): JSX.Element {
+    const { children, gap } = props;
 
     // TODO: move to css class
     return (<div style={{
         alignItems: 'center',
         display: 'flex',
         flexDirection: 'row',
-        gap: '5px',
+        gap: gap ? `${gap}px` : '5px',
     }}>
         {children}
     </div >);
