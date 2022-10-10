@@ -7,7 +7,6 @@ interface VesFontEditorControlProps {
     data: FontData;
     handleChange(path: string, value: FontData): void;
     path: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     config?: any;
 }
 

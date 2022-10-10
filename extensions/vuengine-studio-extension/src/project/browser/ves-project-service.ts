@@ -142,7 +142,6 @@ export class VesProjectService {
 
     return true;
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async deleteProjectDataItem(typeId: string, itemId: string): Promise<void> {
     if (this._projectData.items
       && this._projectData.items[typeId]

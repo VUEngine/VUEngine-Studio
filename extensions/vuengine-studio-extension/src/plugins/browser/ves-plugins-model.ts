@@ -254,7 +254,6 @@ export class VesPluginsModel {
         }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     protected onDidFailRefresh(id: string, error: any): VesPlugin | undefined {
         const cached = this.getPlugin(id);
         if (cached && cached.installed) {

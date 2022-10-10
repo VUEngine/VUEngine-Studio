@@ -112,7 +112,6 @@ export class VesCodeGenService {
     );
   }
 
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   async renderTemplate(templateId: string, itemData?: any): Promise<void> {
     await this.vesProjectService.ready;
     const template = this.vesProjectService.getProjectDataTemplate(templateId);
@@ -215,7 +214,6 @@ export class VesCodeGenService {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected getByKey(o: any, s: string): any {
     // convert indexes to properties
     s = s.replace(/\[(\w+)\]/g, '.$1');

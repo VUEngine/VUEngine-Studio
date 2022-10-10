@@ -112,7 +112,6 @@ export class VesPluginsViewContainer extends ViewContainer {
         }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     protected doStoreState(): any {
         const modes: VesPluginsViewContainer.State['modes'] = {};
         for (const mode of this.lastModeState.keys()) {
@@ -124,7 +123,6 @@ export class VesPluginsViewContainer extends ViewContainer {
         };
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     protected doRestoreState(state: any): void {
         for (const key in state.modes) {
             if (state.modes.hasOwnProperty(key)) {

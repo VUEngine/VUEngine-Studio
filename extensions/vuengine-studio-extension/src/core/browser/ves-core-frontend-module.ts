@@ -101,7 +101,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
         registerMenus: () => { },
         registerKeybindings: () => { },
         registerToolbarItems: () => { }
-    } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+    } as any);
     rebind(DebugPrefixConfiguration).to(VesDebugPrefixConfiguration).inSingletonScope();
     // TODO: remove Preferences->Extensions->Debug (-> bindDebugPreferences)
 
@@ -111,13 +111,13 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
         registerMenus: () => { },
         registerKeybindings: () => { },
         registerToolbarItems: () => { }
-    } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+    } as any);
     rebind(PluginApiFrontendContribution).toConstantValue({
         registerCommands: () => { },
         registerMenus: () => { },
         registerKeybindings: () => { },
         registerToolbarItems: () => { }
-    } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+    } as any);
 
     // remove outline view
     rebind(OutlineViewContribution).toConstantValue({
@@ -125,7 +125,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
         registerMenus: () => { },
         registerKeybindings: () => { },
         registerToolbarItems: () => { }
-    } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+    } as any);
 
     // common service
     bind(VesCommonService).toSelf().inSingletonScope();
@@ -136,7 +136,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
         registerMenus: () => { },
         registerKeybindings: () => { },
         registerToolbarItems: () => { }
-    } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+    } as any);
 
     // git history
     bind(VesScmHistoryContribution).toSelf().inSingletonScope();
