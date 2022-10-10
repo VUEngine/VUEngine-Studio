@@ -1,0 +1,32 @@
+.rumbleEffectEditor {
+  display: flex;
+  gap: 20px;
+  outline: none;
+}
+
+.rumbleEffectEditor>div {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: 10px;
+}
+
+.rumbleEffectEditor .settings {
+  display: flex;
+  gap: 4px;
+}
+
+.rumbleEffectEditor .setting {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: 4px;
+}
+
+.rumbleEffectEditor .connected {
+  color: var(--theia-editorSuccess-foreground);
+}
+
+.rumbleEffectEditor .disconnected {
+  color: var(--theia-editorError-foreground);
+}

@@ -1,3 +1,4 @@
+import $RefParser, { JSONSchema } from '@apidevtools/json-schema-ref-parser';
 import { JsonFormsCore, JsonSchema, UISchemaElement } from '@jsonforms/core';
 import { JsonForms } from '@jsonforms/react';
 import { JsonFormsStyleContext, StyleContext, vanillaCells, vanillaRenderers, vanillaStyles } from '@jsonforms/vanilla-renderers';
@@ -13,8 +14,8 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import sortJson from 'sort-json';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { ProjectFileItem, ProjectFileType } from '../../project/browser/ves-project-types';
+import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
 import { VES_RENDERERS } from './renderers/ves-renderers';
-import $RefParser, { JSONSchema } from '@apidevtools/json-schema-ref-parser';
 
 export const VesEditorsWidgetOptions = Symbol('VesEditorsWidgetOptions');
 export interface VesEditorsWidgetOptions {
@@ -34,6 +35,8 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     protected readonly options: VesEditorsWidgetOptions;
     @inject(VesProjectService)
     protected readonly vesProjectService: VesProjectService;
+    @inject(VesRumblePackService)
+    private readonly vesRumblePackService: VesRumblePackService;
 
     protected data: ProjectFileItem | undefined;
     protected savedData: string;
@@ -180,7 +183,6 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
             ...schema,
             type: 'object'
         }, this.data);
-        console.log('this.data', this.data);
 
         this.data = sortJson(this.data ?? {}, {
             depth: 8,
@@ -285,7 +287,8 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
                                 // TODO: refactor once there's a non-hacky way to inject services
                                 services: {
                                     fileService: this.fileService,
-                                    fileDialogService: this.fileDialogService
+                                    fileDialogService: this.fileDialogService,
+                                    vesRumblePackService: this.vesRumblePackService,
                                 }
                             }}
                         />

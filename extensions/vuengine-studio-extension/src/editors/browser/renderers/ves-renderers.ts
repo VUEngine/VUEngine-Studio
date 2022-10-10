@@ -12,6 +12,8 @@ import vesMusicEditorControl from './music-editor/ves-music-editor-control';
 import vesMusicEditorControlTester from './music-editor/ves-music-editor-control-tester';
 import vesPaletteControl from './palette/ves-palette-control';
 import vesPaletteControlTester from './palette/ves-palette-control-tester';
+import vesRumbleEffectEditorControl from './rumble-effect-editor/ves-rumble-effect-editor-control';
+import vesRumbleEffectEditorControlTester from './rumble-effect-editor/ves-rumble-effect-editor-control-tester';
 import vesRatingControl from './starRating/ves-rating-control';
 import vesRatingControlTester from './starRating/ves-rating-control-tester';
 
@@ -24,4 +26,5 @@ export const VES_RENDERERS = [
     { tester: vesMeshesControlTester, renderer: vesMeshesControl },
     { tester: vesPaletteControlTester, renderer: vesPaletteControl },
     { tester: vesRatingControlTester, renderer: vesRatingControl },
+    { tester: vesRumbleEffectEditorControlTester, renderer: vesRumbleEffectEditorControl },
 ];
