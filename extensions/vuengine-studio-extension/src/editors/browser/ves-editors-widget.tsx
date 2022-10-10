@@ -14,6 +14,7 @@ import sortJson from 'sort-json';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { ProjectFileItem, ProjectFileType } from '../../project/browser/ves-project-types';
 import { VES_RENDERERS } from './renderers/ves-renderers';
+import $RefParser, { JSONSchema } from '@apidevtools/json-schema-ref-parser';
 
 export const VesEditorsWidgetOptions = Symbol('VesEditorsWidgetOptions');
 export interface VesEditorsWidgetOptions {
@@ -173,10 +174,10 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         this.savedData = JSON.stringify(this.data);
     }
 
-    protected mergeOntoDefaults(type: ProjectFileType): void {
-        // TODO: apply ref resolver before passing schema to generator
+    protected async mergeOntoDefaults(type: ProjectFileType): Promise<void> {
+        const schema = await $RefParser.dereference(type.schema as JSONSchema);
         this.data = this.generateDataFromSchema({
-            ...type.schema,
+            ...schema,
             type: 'object'
         }, this.data);
         console.log('this.data', this.data);

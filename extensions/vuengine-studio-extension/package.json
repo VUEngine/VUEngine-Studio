@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "description": "VUEngine Studio specific functionality",
   "dependencies": {
+    "@apidevtools/json-schema-ref-parser": "^9.0.9",
     "@camoto/pngjs": "^6.1.0",
     "@jsonforms/core": "^3.0.0",
     "@jsonforms/react": "^3.0.0",
