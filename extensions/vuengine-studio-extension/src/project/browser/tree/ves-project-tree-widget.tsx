@@ -236,7 +236,9 @@ export class VesProjectTreeWidget extends TreeWidget {
 
   protected async addNode(typeId: string, isLeaf: boolean): Promise<void> {
     const newItemId = this.vesCommonService.nanoid();
-    this.vesProjectService.setProjectDataItem(typeId, newItemId, {}, false);
+    this.vesProjectService.setProjectDataItem(typeId, newItemId, {
+      name: nls.localize('vuengine/editors/new', 'New'),
+    }, false);
     await this.setTreeData();
     const uri = VesEditorUri.toUri(`${typeId}/${newItemId}`);
     await open(this.openerService, uri, { mode: 'reveal' });

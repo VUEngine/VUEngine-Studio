@@ -44,7 +44,6 @@
     "glob": "^7.1.7",
     "iconv-lite": "^0.6.3",
     "inversify": "^5.1.1",
-    "json-schema-faker": "^0.5.0-rcv.44",
     "sort-json": "^2.0.1",
     "lodash": "^4.17.21",
     "nanoid": "^3.3.4",

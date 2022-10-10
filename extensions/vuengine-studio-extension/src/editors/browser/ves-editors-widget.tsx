@@ -10,8 +10,6 @@ import * as React from '@theia/core/shared/react';
 import { EditorPreferences } from '@theia/editor/lib/browser';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { deepmergeCustom } from 'deepmerge-ts';
-import jsf, { Schema } from 'json-schema-faker';
 import sortJson from 'sort-json';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { ProjectFileItem, ProjectFileType } from '../../project/browser/ves-project-types';
@@ -176,26 +174,57 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     }
 
     protected mergeOntoDefaults(type: ProjectFileType): void {
-        // eslint-disable-next-line deprecation/deprecation
-        jsf.option({
-            alwaysFakeOptionals: true,
-            fillProperties: false,
-            useDefaultValue: true
-        });
-        const template = {
-            // eslint-disable-next-line deprecation/deprecation
-            ...(jsf.generate(type?.schema as Schema) ?? {}) as ProjectFileItem,
-            name: type?.schema.properties?.name
-                ? nls.localize('vuengine/editors/new', 'New')
-                : undefined
-        };
-        const customDeepmerge = deepmergeCustom({ mergeArrays: false });
-        this.data = customDeepmerge(template, this.data);
+        // TODO: apply ref resolver before passing schema to generator
+        this.data = this.generateDataFromSchema({
+            ...type.schema,
+            type: 'object'
+        }, this.data);
+        console.log('this.data', this.data);
+
         this.data = sortJson(this.data ?? {}, {
             depth: 8,
             ignoreCase: true,
             reverse: false,
         });
+    }
+
+    /**
+     * Generates JSON from schema, using either values present in data or schema default.
+     * Will only contain properties that are present in the schema.
+     * TODO: validate arrays in data against schema
+     */
+    protected generateDataFromSchema(schema: any, data: any): any {
+        if (!schema) {
+            return;
+        }
+
+        const getValue = (def: any) => (data !== undefined)
+            ? data
+            : (schema.default !== undefined)
+                ? schema.default
+                : def;
+
+        switch (schema.type) {
+            case 'array':
+                return getValue([]);
+            case 'boolean':
+                return getValue(false);
+            case 'integer':
+                return getValue(0);
+            case 'object':
+                const parsedData: any = {};
+                if (schema.properties) {
+                    Object.keys(schema.properties).forEach(item => {
+                        parsedData[item] = this.generateDataFromSchema(
+                            schema.properties![item],
+                            data ? data[item] : undefined
+                        );
+                    });
+                }
+                return parsedData;
+            case 'string':
+                return getValue('');
+        }
     }
 
     protected dataHasBeenChanged(): boolean {

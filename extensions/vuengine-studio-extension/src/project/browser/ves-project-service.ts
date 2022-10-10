@@ -65,7 +65,7 @@ export class VesProjectService {
       types: {},
     },
     folders: [{
-      'path': '.'
+      'path': ''
     }],
     items: {},
     plugins: [],
@@ -87,7 +87,7 @@ export class VesProjectService {
     return this._projectData.items && this._projectData.items[typeId];
   }
   getProjectDataItem(typeId: string, itemId: string): ProjectFileItem | undefined {
-    return this._projectData.items && this._projectData.items[typeId][itemId];
+    return this._projectData.items && this._projectData.items[typeId] && this._projectData.items[typeId][itemId];
   }
   getProjectDataTypes(): ProjectFileTypesWithContributor | undefined {
     return this._projectData.combined?.types;
@@ -212,7 +212,7 @@ export class VesProjectService {
     let workspaceProjectFileData: ProjectFile = {
       'folders':
         [{
-          'path': '.'
+          'path': ''
         }]
     };
     this.workspaceProjectFileUri = this.workspaceService.workspace?.resource;
@@ -362,7 +362,7 @@ export class VesProjectService {
 
     return {
       folders: [{
-        'path': '.'
+        'path': ''
       }],
       plugins: [],
       items: {}
