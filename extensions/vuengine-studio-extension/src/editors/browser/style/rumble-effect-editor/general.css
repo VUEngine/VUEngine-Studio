@@ -1,6 +1,7 @@
 .rumbleEffectEditor {
   display: flex;
   gap: 20px;
+  height: 100%;
   outline: none;
 }
 
@@ -19,7 +20,6 @@
 .rumbleEffectEditor .setting {
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
   gap: 4px;
 }
 

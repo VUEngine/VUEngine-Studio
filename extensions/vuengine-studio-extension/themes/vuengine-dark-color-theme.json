@@ -18,6 +18,7 @@
 		"menu.selectionBackground": "#d3142240",
 		"menu.separatorBackground": "#555555",
 		"minimap.selectionHighlight": "#d3142240",
+		"notificationsInfoIcon.foreground": "#d31422",
 		"peekView.border": "#d31422",
 		"pickerGroup.foreground": "#d31422",
 		"progressBar.background": "#4aa94e",

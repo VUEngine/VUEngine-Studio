@@ -1,10 +1,8 @@
-export const RUMBLE_PACK_IDS: RumblePackId[] = [
-  {
-    vendoriId: '9999',
-    productId: '9999',
-    manufacturer: 'Unknown',
-  }
-];
+export const RUMBLE_PACK_IDS: RumblePackId[] = [{
+  vendoriId: '9999',
+  productId: '9999',
+  manufacturer: 'Unknown',
+}];
 
 export interface RumblePackId {
   vendoriId: string
