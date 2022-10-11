@@ -3,7 +3,12 @@ export const RUMBLE_PACK_IDS: RumblePackId[] = [
     vendoriId: '9999',
     productId: '9999',
     manufacturer: 'Unknown',
-  }
+  },
+  {
+    vendoriId: '2341',
+    productId: '8036',
+    manufacturer: 'Arduino LLC',
+  },
 ];
 
 export interface RumblePackId {
