@@ -1,7 +1,9 @@
 .rumbleEffectEditor .log {
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
   gap: 4px;
+  overflow: hidden;
 }
 
 .rumbleEffectEditor .rumblePakLog {
