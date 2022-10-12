@@ -5,7 +5,7 @@ import { BrightnessRepeatData } from './BrightnessRepeatTypes';
 import Editor from './Editor';
 import Preview from './Preview';
 
-interface BrightnessRepeatProps {
+interface BrightnessRepeatEditorProps {
     data: BrightnessRepeatData
     updateData: (data: BrightnessRepeatData) => void
 }
@@ -13,8 +13,8 @@ interface BrightnessRepeatProps {
 interface BrightnessRepeatState {
 }
 
-export default class BrightnessRepeatEditor extends React.Component<BrightnessRepeatProps, BrightnessRepeatState> {
-    constructor(props: BrightnessRepeatProps) {
+export default class BrightnessRepeatEditor extends React.Component<BrightnessRepeatEditorProps, BrightnessRepeatState> {
+    constructor(props: BrightnessRepeatEditorProps) {
         super(props);
         this.state = {
         };
@@ -85,7 +85,7 @@ export default class BrightnessRepeatEditor extends React.Component<BrightnessRe
                             checked={data.mirror}
                             onChange={this.onChangeMirror.bind(this)}
                         />
-                        Mirror
+                        {nls.localize('vuengine/brightnessRepeatEditor/mirror', 'Mirror')}
                     </label>
                 </div>
                 <VContainer>

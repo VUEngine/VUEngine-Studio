@@ -9,6 +9,9 @@ interface EditorColumnProps {
 export default function EditorColumn(props: EditorColumnProps): JSX.Element {
     const { index, brightness, setValue } = props;
 
+    const handleSelectInput = (event: React.MouseEvent) => // @ts-ignore
+        event.target.select();
+
     const onMouse = (e: React.MouseEvent<HTMLElement>) => {
         if (e.buttons === 1) {
             // @ts-ignore
@@ -40,6 +43,7 @@ export default function EditorColumn(props: EditorColumnProps): JSX.Element {
             min={0}
             max={15}
             value={brightness}
+            onClick={handleSelectInput}
             onChange={e => setValue(index, parseInt(e.target.value))}
         />
     </div>;

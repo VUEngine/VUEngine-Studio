@@ -1,0 +1,11 @@
+.columnTableEditor .options {
+  display: flex;
+  gap: 20px;
+}
+
+.columnTableEditor .options>div:first-child {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  gap: 10px;
+}
