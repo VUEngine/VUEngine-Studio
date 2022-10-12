@@ -126,6 +126,9 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
     protected sendCommandStopCurrentEffect = () =>
         this.props.services.vesRumblePackService.sendCommandStopCurrentEffect();
 
+    protected clearLog = () =>
+        this.props.services.vesRumblePackService.rumblePackLog = [];
+
     render(): JSX.Element {
         const { data, services } = this.props;
         const { command } = this.state;
@@ -156,7 +159,7 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                             value={data.effect}
                         >
                             {BUILT_IN_EFFECTS.map((value, index) => (
-                                <option value={index}>{value}</option>
+                                <option key={`effect-option-${index}`} value={index}>{value}</option>
                             ))}
                         </select>
                         {/*
@@ -368,6 +371,16 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                             <div ref={this.rumblePakLogLineLastElementRef} key={'rumblePakLogLineLast'}></div>
                         </div>
                     </div>
+                </div>
+                <div className='log-actions'>
+                    <button
+                        className='theia-button secondary'
+                        title={nls.localize('vuengine/rumblePack/clearLog', 'Clear Log')}
+                        onClick={this.clearLog}
+                        disabled={!services.vesRumblePackService.rumblePackLog.length}
+                    >
+                        {nls.localize('vuengine/rumblePack/clearLog', 'Clear Log')}
+                    </button>
                 </div>
             </div>
         </div >;

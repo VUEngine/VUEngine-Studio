@@ -84,7 +84,13 @@ export class VesRumblePackService {
     this.vesRumblePackUsbWatcher.onDidAttachDevice(async () => this.detectRumblePackIsConnected());
     this.vesRumblePackUsbWatcher.onDidDetachDevice(async () => this.detectRumblePackIsConnected());
     this.vesRumblePackUsbWatcher.onDidReceiveData(data => {
-      this.rumblePackLog.push({ timestamp: Date.now(), text: data });
+      const dataParts = data.split('\n');
+      if (this._rumblePackLog.length) {
+        this._rumblePackLog[this._rumblePackLog.length - 1].text += dataParts.shift();
+      }
+      dataParts.map(dataPart =>
+        this.rumblePackLog.push({ timestamp: Date.now(), text: dataPart })
+      );
       // trigger event
       this.rumblePackLog = this.rumblePackLog;
     });

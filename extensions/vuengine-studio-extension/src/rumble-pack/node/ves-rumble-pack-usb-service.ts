@@ -40,7 +40,7 @@ export class VesRumblePackUsbServiceImpl implements VesRumblePackUsbService {
                         stopBits: 1,
                         parity: 'none',
                     });
-                    this.port.on('data', data => this.client?.onDidReceiveData(`← ${data.toString()}`));
+                    this.port.on('data', data => this.client?.onDidReceiveData(data.toString()));
                 }
             })
         );
@@ -54,7 +54,7 @@ export class VesRumblePackUsbServiceImpl implements VesRumblePackUsbService {
 
     sendCommand(command: string): boolean {
         const preparedCommand = `<${command}>`;
-        this.client?.onDidReceiveData(`→ Command sent:  ${preparedCommand}`);
+        this.client?.onDidReceiveData(`→ Command sent:  ${preparedCommand}\n`);
         return this.port?.write(preparedCommand) || false;
     }
 
