@@ -1,5 +1,4 @@
 import { nls } from '@theia/core';
-import { HapticFrequency } from '../../../../rumble-pack/common/ves-rumble-pack-types';
 
 export interface RumbleEffectData {
     name: string
@@ -11,13 +10,6 @@ export interface RumbleEffectData {
     break: number
     stopBeforeStarting: boolean
 }
-
-export const FREQUENCY_MAPPING: { [id: number]: HapticFrequency } = {
-    160: HapticFrequency.Hz160,
-    240: HapticFrequency.Hz240,
-    320: HapticFrequency.Hz320,
-    400: HapticFrequency.Hz400,
-};
 
 export const BUILT_IN_EFFECTS = [
     `1) ${nls.localize('vuengine/rumblePack/effects/strongClick', 'Strong Click')} - 100 %`,

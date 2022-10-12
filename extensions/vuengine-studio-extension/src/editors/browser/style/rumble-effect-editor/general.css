@@ -17,6 +17,10 @@
   gap: 4px;
 }
 
+.rumbleEffectEditor .settings .setting {
+  flex-grow: 1;
+}
+
 .rumbleEffectEditor .setting {
   display: flex;
   flex-direction: column;

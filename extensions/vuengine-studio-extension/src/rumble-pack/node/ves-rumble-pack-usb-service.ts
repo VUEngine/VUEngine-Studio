@@ -1,7 +1,7 @@
 import { injectable, postConstruct } from '@theia/core/shared/inversify';
 import { SerialPort } from 'serialport';
 import { usb } from 'usb';
-import { HapticFrequency, RUMBLE_PACK_IDS } from '../common/ves-rumble-pack-types';
+import { RUMBLE_PACK_IDS } from '../common/ves-rumble-pack-types';
 import { VesRumblePackUsbService, VesRumblePackUsbServiceClient } from '../common/ves-rumble-pack-usb-service-protocol';
 
 @injectable()
@@ -40,7 +40,7 @@ export class VesRumblePackUsbServiceImpl implements VesRumblePackUsbService {
                         stopBits: 1,
                         parity: 'none',
                     });
-                    this.port.on('data', data => this.client?.onDidReceiveData(data.toString()));
+                    this.port.on('data', data => this.client?.onDidReceiveData(`← ${data.toString()}`));
                 }
             })
         );
@@ -53,19 +53,17 @@ export class VesRumblePackUsbServiceImpl implements VesRumblePackUsbService {
     }
 
     sendCommand(command: string): boolean {
-        return this.port?.write(`<${command}>`) || false;
+        const preparedCommand = `<${command}>`;
+        this.client?.onDidReceiveData(`→ ${preparedCommand}`);
+        return this.port?.write(preparedCommand) || false;
     }
 
     sendCommandPrintMenu(): boolean {
         return this.sendCommand('PM');
     }
 
-    sendCommandPrintVbCommandLineState(): boolean {
-        return this.sendCommand('VBC');
-    }
-
-    sendCommandPrintVbSyncLineState(): boolean {
-        return this.sendCommand('VBS');
+    sendCommandPrintVersion(): boolean {
+        return this.sendCommand('VER');
     }
 
     sendCommandPlayLastEffect(): boolean {
@@ -76,12 +74,8 @@ export class VesRumblePackUsbServiceImpl implements VesRumblePackUsbService {
         return this.sendCommand('STP');
     }
 
-    sendCommandPlayEffect(effect: string): boolean {
-        return this.sendCommand(`HAP ${effect}`);
-    }
-
-    sendCommandSetFrequency(frequency: HapticFrequency): boolean {
-        return this.sendCommand(`FRQ ${frequency}`);
+    sendCommandPlayEffect(effect: number, frequency: number): boolean {
+        return this.sendCommand(`HAP 0 ${(++effect).toString().padStart(3, '0')} ${frequency}`);
     }
 
     sendCommandSetOverdrive(overdrive: number): boolean {

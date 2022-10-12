@@ -1,8 +1,8 @@
 import { nls } from '@theia/core';
 import React from 'react';
 import { VesRumblePackService } from '../../../../rumble-pack/browser/ves-rumble-pack-service';
-import { HapticFrequency, RumblePakLogLine } from '../../../../rumble-pack/common/ves-rumble-pack-types';
-import { BUILT_IN_EFFECTS, FREQUENCY_MAPPING, RumbleEffectData } from './RumbleEffectTypes';
+import { RumblePakLogLine } from '../../../../rumble-pack/common/ves-rumble-pack-types';
+import { BUILT_IN_EFFECTS, RumbleEffectData } from './RumbleEffectTypes';
 
 interface RumbleEffectProps {
     data: RumbleEffectData
@@ -13,12 +13,14 @@ interface RumbleEffectProps {
 }
 
 interface RumbleEffectState {
+    command: string
 }
 
 export default class RumbleEffectEditor extends React.Component<RumbleEffectProps, RumbleEffectState> {
     constructor(props: RumbleEffectProps) {
         super(props);
         this.state = {
+            command: ''
         };
 
         props.services.vesRumblePackService.onDidChangeRumblePackIsConnected(() => this.forceUpdate());
@@ -46,7 +48,6 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
             ...this.props.data,
             frequency: frequency,
         });
-        this.sendCommandSetFrequency(FREQUENCY_MAPPING[frequency]);
     };
 
     protected setStateSustainPositive = (sustain: number) => {
@@ -55,7 +56,6 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                 ...this.props.data,
                 sustainPositive: sustain,
             });
-            this.sendCommandSetPositiveSustain(sustain);
         }
     };
 
@@ -65,7 +65,6 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                 ...this.props.data,
                 sustainNegative: sustain,
             });
-            this.sendCommandSetNegativeSustain(sustain);
         }
     };
 
@@ -75,7 +74,6 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                 ...this.props.data,
                 overdrive: overdrive,
             });
-            this.sendCommandSetOverdrive(overdrive);
         }
     };
 
@@ -85,7 +83,6 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                 ...this.props.data,
                 break: breakValue,
             });
-            this.sendCommandSetBreak(breakValue);
         }
     };
 
@@ -96,14 +93,25 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
         });
     };
 
+    protected playEffect = () => {
+        const data = this.props.data;
+        const service = this.props.services.vesRumblePackService;
+
+        this.props.services.vesRumblePackService.sendCommandSetOverdrive(data.overdrive);
+        this.props.services.vesRumblePackService.sendCommandSetPositiveSustain(data.sustainPositive);
+        this.props.services.vesRumblePackService.sendCommandSetNegativeSustain(data.sustainNegative);
+        this.props.services.vesRumblePackService.sendCommandSetBreak(data.break);
+        service.sendCommandPlayEffect(data.effect, data.frequency);
+    };
+
+    protected sendCommand = () =>
+        this.props.services.vesRumblePackService.sendCommand(this.state.command);
+
     protected sendCommandPrintMenu = () =>
         this.props.services.vesRumblePackService.sendCommandPrintMenu();
 
-    protected sendCommandPrintVbCommandLineState = () =>
-        this.props.services.vesRumblePackService.sendCommandPrintVbCommandLineState();
-
-    protected sendCommandPrintVbSyncLineState = () =>
-        this.props.services.vesRumblePackService.sendCommandPrintVbSyncLineState();
+    protected sendCommandPrintVersion = () =>
+        this.props.services.vesRumblePackService.sendCommandPrintVersion();
 
     protected sendCommandPlayLastEffect = () =>
         this.props.services.vesRumblePackService.sendCommandPlayLastEffect();
@@ -111,26 +119,9 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
     protected sendCommandStopCurrentEffect = () =>
         this.props.services.vesRumblePackService.sendCommandStopCurrentEffect();
 
-    protected sendCommandPlayEffect = () =>
-        this.props.services.vesRumblePackService.sendCommandPlayEffect((this.props.data.effect + 1).toString().padStart(3, '0'));
-
-    protected sendCommandSetFrequency = (frequency: HapticFrequency) =>
-        this.props.services.vesRumblePackService.sendCommandSetFrequency(frequency);
-
-    protected sendCommandSetOverdrive = (overdrive: number) =>
-        this.props.services.vesRumblePackService.sendCommandSetOverdrive(overdrive);
-
-    protected sendCommandSetPositiveSustain = (sustain: number) =>
-        this.props.services.vesRumblePackService.sendCommandSetPositiveSustain(sustain);
-
-    protected sendCommandSetNegativeSustain = (sustain: number) =>
-        this.props.services.vesRumblePackService.sendCommandSetNegativeSustain(sustain);
-
-    protected sendCommandSetBreak = (breakValue: number) =>
-        this.props.services.vesRumblePackService.sendCommandSetBreak(breakValue);
-
     render(): JSX.Element {
         const { data, services } = this.props;
+        const { command } = this.state;
 
         this.rumblePakLogLineLastElementRef.current?.scrollIntoView();
 
@@ -146,21 +137,22 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                         onChange={this.onChangeName.bind(this)}
                     />
                 </div>
-                <div className='setting'>
-                    <label>
-                        {nls.localize('vuengine/rumblePack/effect', 'Effect')}
-                    </label>
-                    <select
-                        className='theia-select'
-                        title={nls.localize('vuengine/rumblePack/builtInHapticEffects', 'Built-In Haptic Effects')}
-                        onChange={e => this.setStateEffect(e.target.value as unknown as number)}
-                        value={data.effect}
-                    >
-                        {BUILT_IN_EFFECTS.map((value, index) => (
-                            <option value={index}>{value}</option>
-                        ))}
-                    </select>
-                    {/*
+                <div className='settings'>
+                    <div className='setting'>
+                        <label>
+                            {nls.localize('vuengine/rumblePack/effect', 'Effect')}
+                        </label>
+                        <select
+                            className='theia-select'
+                            title={nls.localize('vuengine/rumblePack/builtInHapticEffects', 'Built-In Haptic Effects')}
+                            onChange={e => this.setStateEffect(parseInt(e.target.value))}
+                            value={data.effect}
+                        >
+                            {BUILT_IN_EFFECTS.map((value, index) => (
+                                <option value={index}>{value}</option>
+                            ))}
+                        </select>
+                        {/*
                         <SelectComponent
                         defaultValue={data.effect}
                         options={BUILT_IN_EFFECTS.map((value, index) => ({
@@ -170,8 +162,7 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                         onChange={option => this.setStateEffect(option.value || '001')}
                         />
                         */}
-                </div>
-                <div className='settings'>
+                    </div>
                     <div className='setting'>
                         <label>
                             {nls.localize('vuengine/rumblePack/frequency', 'Frequency')}
@@ -179,15 +170,17 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                         <select
                             className='theia-select'
                             title={nls.localize('vuengine/rumblePack/frequency', 'Frequency')}
-                            onChange={e => this.setStateFrequency(e.target.value as unknown as number)}
+                            onChange={e => this.setStateFrequency(parseInt(e.target.value))}
                             value={data.frequency}
                         >
-                            <option value={160}>160 Hz</option>
-                            <option value={240}>240 Hz</option>
-                            <option value={320}>320 Hz</option>
-                            <option value={400}>400 Hz</option>
+                            <option value={0}>160 Hz</option>
+                            <option value={1}>240 Hz</option>
+                            <option value={2}>320 Hz</option>
+                            <option value={3}>400 Hz</option>
                         </select>
                     </div>
+                </div>
+                <div className='settings'>
                     <div className='setting'>
                         <label>
                             {nls.localize('vuengine/rumblePack/sustainPos', 'Sustain (Pos.)')}
@@ -273,7 +266,7 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                             <button
                                 className='theia-button'
                                 title={nls.localize('vuengine/rumblePack/runEffect', 'Run effect')}
-                                onClick={this.sendCommandPlayEffect}
+                                onClick={this.playEffect}
                                 disabled={!services.vesRumblePackService.rumblePackIsConnected}
                             >
                                 <i className='fa fa-play'></i>
@@ -310,17 +303,31 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                             </button>
                             <button
                                 className='theia-button secondary'
-                                onClick={this.sendCommandPrintVbCommandLineState}
+                                onClick={this.sendCommandPrintVersion}
                                 disabled={!services.vesRumblePackService.rumblePackIsConnected}
                             >
-                                {nls.localize('vuengine/rumblePack/vbCommandLineState', 'VB Command Line State')}
+                                {nls.localize('vuengine/rumblePack/version', 'Version')}
                             </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label>
+                            {nls.localize('vuengine/rumblePack/command', 'Command')}
+                        </label>
+                        <div className='buttons'>
+                            <input
+                                className="theia-input"
+                                onChange={e => this.setState({ command: e.target.value })}
+                                value={command}
+                                min="0"
+                                max="255"
+                            />
                             <button
                                 className='theia-button secondary'
-                                onClick={this.sendCommandPrintVbSyncLineState}
+                                onClick={this.sendCommand}
                                 disabled={!services.vesRumblePackService.rumblePackIsConnected}
                             >
-                                {nls.localize('vuengine/rumblePack/vbSyncLineState', 'VB Sync Line State')}
+                                {nls.localize('vuengine/rumblePack/send', 'Send')}
                             </button>
                         </div>
                     </div>
