@@ -101,7 +101,8 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
         this.props.services.vesRumblePackService.sendCommandSetPositiveSustain(data.sustainPositive);
         this.props.services.vesRumblePackService.sendCommandSetNegativeSustain(data.sustainNegative);
         this.props.services.vesRumblePackService.sendCommandSetBreak(data.break);
-        service.sendCommandPlayEffect(data.effect, data.frequency);
+        this.props.services.vesRumblePackService.sendCommandSetFrequency(data.frequency);
+        service.sendCommandPlayEffect(data.effect);
     };
 
     protected sendCommand = () =>
@@ -112,6 +113,12 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
 
     protected sendCommandPrintVersion = () =>
         this.props.services.vesRumblePackService.sendCommandPrintVersion();
+
+    protected sendCommandPrintVbCommandLineState = () =>
+        this.props.services.vesRumblePackService.sendCommandPrintVbCommandLineState();
+
+    protected sendCommandPrintVbSyncLineState = () =>
+        this.props.services.vesRumblePackService.sendCommandPrintVbSyncLineState();
 
     protected sendCommandPlayLastEffect = () =>
         this.props.services.vesRumblePackService.sendCommandPlayLastEffect();
@@ -307,6 +314,20 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                                 disabled={!services.vesRumblePackService.rumblePackIsConnected}
                             >
                                 {nls.localize('vuengine/rumblePack/version', 'Version')}
+                            </button>
+                            <button
+                                className='theia-button secondary'
+                                onClick={this.sendCommandPrintVbCommandLineState}
+                                disabled={!services.vesRumblePackService.rumblePackIsConnected}
+                            >
+                                {nls.localize('vuengine/rumblePack/vbCommandLineState', 'VB Command Line State')}
+                            </button>
+                            <button
+                                className='theia-button secondary'
+                                onClick={this.sendCommandPrintVbSyncLineState}
+                                disabled={!services.vesRumblePackService.rumblePackIsConnected}
+                            >
+                                {nls.localize('vuengine/rumblePack/vbSyncLineState', 'VB Sync Line State')}
                             </button>
                         </div>
                     </div>

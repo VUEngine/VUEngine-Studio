@@ -106,6 +106,14 @@ export class VesRumblePackService {
     return this.vesRumblePackUsbService.sendCommandPrintVersion();
   };
 
+  sendCommandPrintVbCommandLineState(): boolean {
+    return this.vesRumblePackUsbService.sendCommandPrintVbCommandLineState();
+  }
+
+  sendCommandPrintVbSyncLineState(): boolean {
+    return this.vesRumblePackUsbService.sendCommandPrintVbSyncLineState();
+  }
+
   sendCommandPlayLastEffect(): boolean {
     return this.vesRumblePackUsbService.sendCommandPlayLastEffect();
   }
@@ -114,8 +122,12 @@ export class VesRumblePackService {
     return this.vesRumblePackUsbService.sendCommandStopCurrentEffect();
   }
 
-  sendCommandPlayEffect(effect: number, frequency: number): boolean {
-    return this.vesRumblePackUsbService.sendCommandPlayEffect(effect, frequency);
+  sendCommandPlayEffect(effect: number): boolean {
+    return this.vesRumblePackUsbService.sendCommandPlayEffect(effect);
+  };
+
+  sendCommandSetFrequency(frequency: number): boolean {
+    return this.vesRumblePackUsbService.sendCommandSetFrequency(frequency);
   };
 
   sendCommandSetOverdrive(overdrive: number): boolean {

@@ -54,7 +54,7 @@ export class VesRumblePackUsbServiceImpl implements VesRumblePackUsbService {
 
     sendCommand(command: string): boolean {
         const preparedCommand = `<${command}>`;
-        this.client?.onDidReceiveData(`→ ${preparedCommand}`);
+        this.client?.onDidReceiveData(`→ Command sent:  ${preparedCommand}`);
         return this.port?.write(preparedCommand) || false;
     }
 
@@ -66,6 +66,14 @@ export class VesRumblePackUsbServiceImpl implements VesRumblePackUsbService {
         return this.sendCommand('VER');
     }
 
+    sendCommandPrintVbCommandLineState(): boolean {
+        return this.sendCommand('VBC');
+    }
+
+    sendCommandPrintVbSyncLineState(): boolean {
+        return this.sendCommand('VBS');
+    }
+
     sendCommandPlayLastEffect(): boolean {
         return this.sendCommand('GO');
     }
@@ -74,8 +82,12 @@ export class VesRumblePackUsbServiceImpl implements VesRumblePackUsbService {
         return this.sendCommand('STP');
     }
 
-    sendCommandPlayEffect(effect: number, frequency: number): boolean {
-        return this.sendCommand(`HAP 0 ${(++effect).toString().padStart(3, '0')} ${frequency}`);
+    sendCommandPlayEffect(effect: number): boolean {
+        return this.sendCommand(`HAP ${(++effect).toString().padStart(3, '0')}`);
+    }
+
+    sendCommandSetFrequency(frequency: number): boolean {
+        return this.sendCommand(`FRQ ${frequency.toString().padStart(3, '0')}`);
     }
 
     sendCommandSetOverdrive(overdrive: number): boolean {

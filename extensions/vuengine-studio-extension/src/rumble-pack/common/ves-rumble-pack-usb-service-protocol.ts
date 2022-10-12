@@ -14,9 +14,12 @@ export interface VesRumblePackUsbService extends JsonRpcServer<VesRumblePackUsbS
     sendCommand(command: string): boolean;
     sendCommandPrintMenu(): boolean;
     sendCommandPrintVersion(): boolean;
+    sendCommandPrintVbCommandLineState(): boolean;
+    sendCommandPrintVbSyncLineState(): boolean;
     sendCommandPlayLastEffect(): boolean;
     sendCommandStopCurrentEffect(): boolean;
-    sendCommandPlayEffect(effect: number, frequency: number): boolean;
+    sendCommandPlayEffect(effect: number): boolean;
+    sendCommandSetFrequency(frequency: number): boolean;
     sendCommandSetOverdrive(overdrive: number): boolean;
     sendCommandSetPositiveSustain(sustain: number): boolean;
     sendCommandSetNegativeSustain(sustain: number): boolean;
