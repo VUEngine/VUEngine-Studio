@@ -11,9 +11,10 @@ import * as React from '@theia/core/shared/react';
 import { EditorPreferences } from '@theia/editor/lib/browser';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { deepmerge } from 'deepmerge-ts';
 import sortJson from 'sort-json';
 import { VesProjectService } from '../../project/browser/ves-project-service';
-import { ProjectFileItem, ProjectFileType } from '../../project/browser/ves-project-types';
+import { ProjectFile, ProjectFileItem, ProjectFileType } from '../../project/browser/ves-project-types';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
 import { VES_RENDERERS } from './renderers/ves-renderers';
 
@@ -38,6 +39,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     @inject(VesRumblePackService)
     private readonly vesRumblePackService: VesRumblePackService;
 
+    protected projectData: ProjectFile | undefined;
     protected data: ProjectFileItem | undefined;
     protected savedData: string;
     protected schema: JsonSchema | undefined;
@@ -117,6 +119,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
                 this.mergeOntoDefaults(type);
                 this.setTitle();
             }
+            this.projectData = this.vesProjectService.getProjectData();
         }
 
         this.loading = false;
@@ -194,7 +197,6 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     /**
      * Generates JSON from schema, using either values present in data or schema default.
      * Will only contain properties that are present in the schema.
-     * TODO: validate arrays in data against schema
      */
     protected generateDataFromSchema(schema: any, data: any): any {
         if (!schema) {
@@ -209,13 +211,14 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
 
         switch (schema.type) {
             case 'array':
+                // TODO: validate against schema
                 return getValue([]);
             case 'boolean':
                 return getValue(false);
             case 'integer':
                 return getValue(0);
             case 'object':
-                const parsedData: any = {};
+                let parsedData: any = {};
                 if (schema.properties) {
                     Object.keys(schema.properties).forEach(item => {
                         parsedData[item] = this.generateDataFromSchema(
@@ -223,6 +226,9 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
                             data ? data[item] : undefined
                         );
                     });
+                }
+                if (schema.additionalProperties) {
+                    parsedData = deepmerge(parsedData, data);
                 }
                 return parsedData;
             case 'string':
@@ -284,12 +290,13 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
                                 trim: false,
                                 showUnfocusedDescription: true,
                                 hideRequiredAsterisk: false,
-                                // TODO: refactor once there's a non-hacky way to inject services
+                                // TODO: refactor once there's a non-hacky way to inject services and projectData
                                 services: {
                                     fileService: this.fileService,
                                     fileDialogService: this.fileDialogService,
                                     vesRumblePackService: this.vesRumblePackService,
-                                }
+                                },
+                                projectData: this.projectData
                             }}
                         />
                     </JsonFormsStyleContext.Provider>

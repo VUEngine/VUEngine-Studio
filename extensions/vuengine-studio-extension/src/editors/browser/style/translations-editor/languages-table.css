@@ -1,0 +1,83 @@
+.translationsEditor .languagesTable {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  overflow: auto;
+  padding: 2px 0;
+  width: 100%;
+}
+
+.translationsEditor .languagesTable>div {
+  display: flex;
+  gap: 5px;
+}
+
+.translationsEditor .languagesTable>div.beingDragged {
+  cursor: grabbing;
+  opacity: .1;
+}
+
+.translationsEditor .languagesTable>div.dragOver {
+  border-top: 4px solid var(--theia-focusBorder);
+  margin-top: -4px;
+}
+
+.translationsEditor .languagesTable .languageSelect,
+.translationsEditor .languagesTable .languageSelect>select {
+  min-width: 210px;
+  width: 210px;
+}
+
+.translationsEditor .languagesTable .languageCode {
+  width: 32px;
+}
+
+.translationsEditor .languagesTable .languageName,
+.translationsEditor .languagesTable .languageFlag {
+  width: 30%;
+}
+
+.translationsEditor .languagesTable .languageName>input,
+.translationsEditor .languagesTable .languageFlag>input,
+.translationsEditor .languagesTable .languageCode>input {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.translationsEditor .languagesTable .languageActions {
+  align-items: center;
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  min-width: 64px;
+  visibility: hidden;
+  width: 64px;
+}
+
+.translationsEditor .languagesTable>div:hover .languageActions {
+  visibility: visible;
+}
+
+.translationsEditor .languagesTable .languageActions button {
+  height: var(--theia-content-line-height);
+  margin: 0;
+  min-width: 16px;
+}
+
+.translationsEditor .languagesTable .languageAdd {
+  align-items: center;
+  border: var(--theia-border-width) dashed var(--theia-dropdown-border);
+  color: var(--theia-dropdown-border);
+  cursor: pointer;
+  display: flex;
+  height: var(--theia-content-line-height);
+  justify-content: center;
+  width: 207px;
+}
+
+.translationsEditor .languagesTable .languageAdd:hover {
+  background-color: var(--theia-button-hoverBackground);
+  border-color: var(--theia-button-hoverBackground);
+  border-style: solid;
+  color: var(--theia-button-hoverForeground);
+}

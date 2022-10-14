@@ -534,7 +534,7 @@ export class VesEmulatorWidget extends ReactWidget {
               value={this.preferenceService.get(
                 VesEmulatorPreferenceIds.EMULATOR_SCALE
               )}
-              onChange={e => this.setScale(e)}
+              onChange={this.setScale}
               disabled={!this.state.loaded || this.state.showControls}
             >
               {Object.keys(EMULATION_SCALES).map((value, index) => (
@@ -549,7 +549,7 @@ export class VesEmulatorWidget extends ReactWidget {
               value={this.preferenceService.get(
                 VesEmulatorPreferenceIds.EMULATOR_STEREO_MODE
               )}
-              onChange={e => this.setStereoMode(e)}
+              onChange={this.setStereoMode}
               disabled={!this.state.loaded || this.state.showControls}
             >
               {Object.keys(EMULATION_STEREO_MODES).map((value, index) => (
@@ -564,7 +564,7 @@ export class VesEmulatorWidget extends ReactWidget {
               value={this.preferenceService.get(
                 VesEmulatorPreferenceIds.EMULATOR_EMULATION_MODE
               )}
-              onChange={e => this.setEmulationMode(e)}
+              onChange={this.setEmulationMode}
               disabled={!this.state.loaded || this.state.showControls}
             >
               {Object.keys(EMULATION_MODES).map((value, index) => (

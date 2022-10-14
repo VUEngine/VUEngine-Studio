@@ -1,5 +1,5 @@
 import { nls } from '@theia/core';
-import React from 'react';
+import React, { useState } from 'react';
 import { HIGHEST_NOTE, LOWEST_NOTE, PatternConfig, PATTERN_NOTE_HEIGHT, PATTERN_NOTE_WIDTH } from '../MusicEditorTypes';
 
 interface PatternProps {
@@ -10,14 +10,13 @@ interface PatternProps {
     channel: number
     height: number
     patternId: number
-    dragged: boolean
-    setDragged: (dragged: boolean) => void
     setCurrentPattern: (channelId: number, patternId: number) => void
     removeFromSequence: (channelId: number, index: number) => void
     moveSequencePattern: (channelId: number, from: number, to: number) => void
 }
 
 export default function Pattern(props: PatternProps): JSX.Element {
+    const [dragged, setDragged] = useState<boolean>(false);
     const {
         index,
         channel,
@@ -26,8 +25,6 @@ export default function Pattern(props: PatternProps): JSX.Element {
         patternId,
         currentChannel,
         currentPattern,
-        dragged,
-        setDragged,
         setCurrentPattern,
         removeFromSequence,
         moveSequencePattern,

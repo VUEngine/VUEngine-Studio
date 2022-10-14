@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ChannelConfig, HIGHEST_NOTE, LOWEST_NOTE, Notes } from '../MusicEditorTypes';
 import AddPattern from './AddPattern';
 import ChannelHeader from './ChannelHeader';
@@ -21,8 +21,6 @@ interface ChannelProps {
 }
 
 export default function Channel(props: ChannelProps): JSX.Element {
-    const [dragged, setDragged] = useState<boolean>(false);
-
     const {
         channelConfig,
         currentChannel,
@@ -84,8 +82,6 @@ export default function Channel(props: ChannelProps): JSX.Element {
                     currentChannel={currentChannel}
                     currentPattern={currentPattern}
                     height={patternHeight}
-                    dragged={dragged}
-                    setDragged={setDragged}
                     setCurrentPattern={setCurrentPattern}
                     removeFromSequence={removeFromSequence}
                     moveSequencePattern={moveSequencePattern}

@@ -4,6 +4,9 @@
   flex-direction: column;
   height: 100%;
   outline: none;
+}
+
+.jsonforms-container>div {
   padding: calc(var(--theia-ui-padding) * 2);
 }
 
