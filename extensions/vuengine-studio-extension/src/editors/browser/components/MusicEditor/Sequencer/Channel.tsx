@@ -10,6 +10,7 @@ interface ChannelProps {
     currentPattern: number
     number: number
     otherSolo: boolean
+    instrumentName: string
     setCurrentChannel: (id: number) => void
     setCurrentPattern: (channelId: number, patternId: number) => void
     toggleChannelMuted: (channelId: number) => void
@@ -27,6 +28,7 @@ export default function Channel(props: ChannelProps): JSX.Element {
         currentPattern,
         number,
         otherSolo,
+        instrumentName,
         setCurrentChannel,
         setCurrentPattern,
         toggleChannelMuted,
@@ -68,6 +70,7 @@ export default function Channel(props: ChannelProps): JSX.Element {
                 number={number}
                 muted={channelConfig.muted}
                 solo={channelConfig.solo}
+                instrumentName={instrumentName}
                 setCurrentChannel={setCurrentChannel}
                 toggleChannelMuted={toggleChannelMuted}
                 toggleChannelSolo={toggleChannelSolo}

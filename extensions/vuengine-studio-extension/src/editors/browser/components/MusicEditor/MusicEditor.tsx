@@ -126,6 +126,12 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
         });
     };
 
+    setChannelInstrument(instrument: number): void {
+        this.setChannel(this.state.currentChannel, {
+            instrument: instrument,
+        });
+    };
+
     setNote(index: number, note: number | undefined): void {
         const updatedNotes = [...this.props.songData.channels[this.state.currentChannel].patterns[this.state.currentPattern].notes];
         updatedNotes[index] = note;
@@ -300,6 +306,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                         currentPattern={this.state.currentPattern}
                         playing={this.state.playing}
                         currentStep={this.state.currentStep}
+                        instruments={this.props.songData.instruments}
                         setCurrentChannel={this.setCurrentChannel.bind(this)}
                         setCurrentPattern={this.setCurrentPattern.bind(this)}
                         toggleChannelMuted={this.toggleChannelMuted.bind(this)}
@@ -335,6 +342,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                 currentPattern={this.state.currentPattern}
                 currentNote={this.state.currentNote}
                 tab={this.state.sidebarTab}
+                instruments={this.props.songData.instruments}
                 setCurrentChannel={this.setCurrentChannel.bind(this)}
                 setCurrentPattern={this.setCurrentPattern.bind(this)}
                 toggleChannelMuted={this.toggleChannelMuted.bind(this)}
@@ -342,6 +350,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                 toggleChannelCollapsed={this.toggleChannelCollapsed.bind(this)}
                 setSidebarTab={this.setSidebarTab.bind(this)}
                 setChannelVolume={this.setChannelVolume.bind(this)}
+                setChannelInstrument={this.setChannelInstrument.bind(this)}
                 setPatternSize={this.setPatternSize.bind(this)}
                 setNote={this.setNote.bind(this)}
                 setVolumeL={this.setVolumeL.bind(this)}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChannelConfig, PatternConfig, SongData } from '../MusicEditorTypes';
+import { ChannelConfig, InstrumentConfig, PatternConfig, SongData } from '../MusicEditorTypes';
 import CurrentChannel from './CurrentChannel';
 import CurrentPattern from './CurrentPattern';
 import Song from './Song';
@@ -11,6 +11,7 @@ interface TabSongProps {
     bar: number
     channel: ChannelConfig
     pattern: PatternConfig | boolean
+    instruments: InstrumentConfig[]
     currentChannel: number
     currentPattern: number
     defaultPatternSize: number
@@ -20,8 +21,10 @@ interface TabSongProps {
     toggleChannelSolo: (channelId: number) => void
     toggleChannelCollapsed: (channelId: number) => void
     setChannelVolume: (volume: number) => void
+    setChannelInstrument: (instrument: number) => void
     setPatternSize: (size: number) => void
     setSongData: (songData: Partial<SongData>) => void
+    editInstrument: (instrument: number) => void
 }
 
 export default function TabSong(props: TabSongProps): JSX.Element {
@@ -31,6 +34,7 @@ export default function TabSong(props: TabSongProps): JSX.Element {
         bar,
         channel,
         pattern,
+        instruments,
         currentChannel,
         currentPattern,
         defaultPatternSize,
@@ -40,8 +44,10 @@ export default function TabSong(props: TabSongProps): JSX.Element {
         toggleChannelSolo,
         toggleChannelCollapsed,
         setChannelVolume,
+        setChannelInstrument,
         setPatternSize,
         setSongData,
+        editInstrument,
     } = props;
 
     return <>
@@ -56,11 +62,14 @@ export default function TabSong(props: TabSongProps): JSX.Element {
 
         {currentChannel > -1 && <CurrentChannel
             channel={channel}
+            instruments={instruments}
             setCurrentChannel={setCurrentChannel}
             toggleChannelMuted={toggleChannelMuted}
             toggleChannelSolo={toggleChannelSolo}
             toggleChannelCollapsed={toggleChannelCollapsed}
             setChannelVolume={setChannelVolume}
+            setChannelInstrument={setChannelInstrument}
+            editInstrument={editInstrument}
         />}
 
         {currentPattern > -1 && <CurrentPattern

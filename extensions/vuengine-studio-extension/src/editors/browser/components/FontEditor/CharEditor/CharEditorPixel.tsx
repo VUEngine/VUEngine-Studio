@@ -20,7 +20,7 @@ export default function CharEditorPixel(props: CharEditorPixelProps): JSX.Elemen
         e.preventDefault();
     };
 
-    const onMouseOver = (e: React.MouseEvent<HTMLElement>) => {
+    const onMouse = (e: React.MouseEvent<HTMLElement>) => {
         if (e.buttons === 1) {
             clickPixel(x, y, paletteIndexL);
         } else if (e.buttons === 2) {
@@ -45,7 +45,7 @@ export default function CharEditorPixel(props: CharEditorPixelProps): JSX.Elemen
         className={classNames.join(' ')}
         onClick={onClick}
         onContextMenu={onRightClick}
-        onMouseOver={onMouseOver}
-        onMouseLeave={onMouseOver}
+        onMouseDown={e => onMouse(e)}
+        onMouseOver={e => onMouse(e)}
     ></div>;
 }

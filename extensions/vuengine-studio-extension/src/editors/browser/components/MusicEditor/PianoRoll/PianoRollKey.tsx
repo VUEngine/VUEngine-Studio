@@ -19,7 +19,7 @@ export default function PianoRollKey(props: PianoRollKeyProps): JSX.Element {
         e.preventDefault();
     };
 
-    const onMouseOver = (e: React.MouseEvent<HTMLElement>) => {
+    const onMouse = (e: React.MouseEvent<HTMLElement>) => {
         if (e.buttons === 1) {
             playNote(noteId);
         }
@@ -29,8 +29,8 @@ export default function PianoRollKey(props: PianoRollKeyProps): JSX.Element {
     return <div
         className={classNames.join(' ')}
         onClick={onClick}
-        onMouseOver={onMouseOver}
-        onMouseLeave={onMouseOver}
+        onMouseDown={onMouse}
+        onMouseOver={onMouse}
     >
         <div>{note}</div>
     </div>;

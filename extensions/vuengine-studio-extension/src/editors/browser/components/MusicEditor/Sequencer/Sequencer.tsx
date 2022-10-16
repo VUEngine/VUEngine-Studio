@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChannelConfig } from '../MusicEditorTypes';
+import { ChannelConfig, InstrumentConfig } from '../MusicEditorTypes';
 import Channel from './Channel';
 import StepIndicator from './StepIndicator';
 
@@ -9,6 +9,7 @@ interface SequencerProps {
     currentPattern: number
     currentStep: number
     playing: boolean
+    instruments: InstrumentConfig[]
     setCurrentChannel: (id: number) => void
     setCurrentPattern: (channelId: number, patternId: number) => void
     toggleChannelMuted: (channelId: number) => void
@@ -26,6 +27,7 @@ export default function Sequencer(props: SequencerProps): JSX.Element {
         currentPattern,
         currentStep,
         playing,
+        instruments,
         setCurrentChannel,
         setCurrentPattern,
         toggleChannelMuted,
@@ -54,6 +56,7 @@ export default function Sequencer(props: SequencerProps): JSX.Element {
                 currentPattern={currentPattern}
                 number={channel.id}
                 otherSolo={soloChannel > -1 && soloChannel !== channel.id}
+                instrumentName={instruments[channel.instrument].name}
                 setCurrentChannel={setCurrentChannel}
                 setCurrentPattern={setCurrentPattern}
                 toggleChannelMuted={toggleChannelMuted}

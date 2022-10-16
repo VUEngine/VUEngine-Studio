@@ -26,7 +26,7 @@ export default function PianoRollNote(props: PianoRollNoteProps): JSX.Element {
         classNames.push('current');
     }
 
-    const onMouseOver = (e: React.MouseEvent<HTMLElement>) => {
+    const onMouse = (e: React.MouseEvent<HTMLElement>) => {
         if (e.buttons === 1) {
             setNote(index, noteId);
             playNote(noteId);
@@ -44,8 +44,8 @@ export default function PianoRollNote(props: PianoRollNoteProps): JSX.Element {
             playNote(noteId);
         }}
         onContextMenu={() => setNote(index, undefined)}
-        onMouseOver={e => onMouseOver(e)}
-        onMouseLeave={e => onMouseOver(e)}
+        onMouseDown={e => onMouse(e)}
+        onMouseOver={e => onMouse(e)}
         title={Notes[noteId]}
     />;
 }

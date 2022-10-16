@@ -6,6 +6,7 @@ interface ChannelHeaderProps {
     number: number
     muted: boolean
     solo: boolean
+    instrumentName: string
     setCurrentChannel: (id: number) => void
     toggleChannelMuted: (channelId: number) => void
     toggleChannelSolo: (channelId: number) => void
@@ -17,6 +18,7 @@ export default function ChannelHeader(props: ChannelHeaderProps): JSX.Element {
         number,
         muted,
         solo,
+        instrumentName,
         setCurrentChannel,
         toggleChannelMuted,
         toggleChannelSolo,
@@ -30,7 +32,9 @@ export default function ChannelHeader(props: ChannelHeaderProps): JSX.Element {
             onClick={() => setCurrentChannel(number)}
         >
             <div className='channelName'>Channel {number + 1}</div>
-            <div className='channelInstrument'>Synth</div>
+            <div className='channelInstrument'>
+                {instrumentName}
+            </div>
             {channel.volume < 100 && <div className='channelVolume'>
                 <div style={{ width: `${channel.volume}%` }}></div>
             </div>}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChannelConfig, PatternConfig, SongData } from '../MusicEditorTypes';
+import { ChannelConfig, InstrumentConfig, PatternConfig, SongData } from '../MusicEditorTypes';
 import TabInput from './TabInput';
 import TabInstruments from './TabInstruments';
 import TabNote from './TabNote';
@@ -18,6 +18,7 @@ interface SidebarProps {
     currentNote: number
     tab: number
     defaultPatternSize: number
+    instruments: InstrumentConfig[],
     setCurrentChannel: (channel: number) => void
     setCurrentPattern: (channel: number, pattern: number) => void
     toggleChannelMuted: (channelId: number) => void
@@ -25,6 +26,7 @@ interface SidebarProps {
     toggleChannelCollapsed: (channelId: number) => void
     setSidebarTab: (tab: number) => void
     setChannelVolume: (volume: number) => void
+    setChannelInstrument: (instrument: number) => void
     setPatternSize: (size: number) => void
     setNote: (noteIndex: number, note: number | undefined) => void
     setVolumeL: (noteIndex: number, volume: number | undefined) => void
@@ -34,6 +36,7 @@ interface SidebarProps {
 
 export default function Sidebar(props: SidebarProps): JSX.Element {
     const [collapsed, setCollapsed] = useState(false);
+    const [currentInstrument, setCurrentInstrument] = useState(0);
     const { name,
         volume,
         speed,
@@ -45,6 +48,7 @@ export default function Sidebar(props: SidebarProps): JSX.Element {
         currentNote,
         tab,
         defaultPatternSize,
+        instruments,
         setCurrentChannel,
         setCurrentPattern,
         toggleChannelMuted,
@@ -52,12 +56,22 @@ export default function Sidebar(props: SidebarProps): JSX.Element {
         toggleChannelCollapsed,
         setSidebarTab,
         setChannelVolume,
+        setChannelInstrument,
         setPatternSize,
         setNote,
         setVolumeL,
         setVolumeR,
         setSongData,
     } = props;
+
+    const setInstruments = (i: InstrumentConfig[]) => {
+        setSongData({ instruments: i });
+    };
+
+    const editInstrument = (instrument: number) => {
+        setCurrentInstrument(instrument);
+        setSidebarTab(2);
+    };
 
     return <>
         <div
@@ -105,6 +119,7 @@ export default function Sidebar(props: SidebarProps): JSX.Element {
                     bar={bar}
                     channel={channel}
                     pattern={pattern}
+                    instruments={instruments}
                     currentChannel={currentChannel}
                     currentPattern={currentPattern}
                     defaultPatternSize={defaultPatternSize}
@@ -114,8 +129,10 @@ export default function Sidebar(props: SidebarProps): JSX.Element {
                     toggleChannelSolo={toggleChannelSolo}
                     toggleChannelCollapsed={toggleChannelCollapsed}
                     setChannelVolume={setChannelVolume}
+                    setChannelInstrument={setChannelInstrument}
                     setPatternSize={setPatternSize}
                     setSongData={setSongData}
+                    editInstrument={editInstrument}
                 />}
                 {tab === 1 && <TabNote
                     pattern={pattern}
@@ -125,8 +142,10 @@ export default function Sidebar(props: SidebarProps): JSX.Element {
                     setVolumeR={setVolumeR}
                 />}
                 {tab === 2 && <TabInstruments
-                    pattern={pattern}
-                    currentNote={currentNote}
+                    instruments={instruments}
+                    setInstruments={setInstruments}
+                    currentInstrument={currentInstrument}
+                    setCurrentInstrument={setCurrentInstrument}
                 />}
                 {tab === 3 && <TabWaveforms
                     pattern={pattern}
