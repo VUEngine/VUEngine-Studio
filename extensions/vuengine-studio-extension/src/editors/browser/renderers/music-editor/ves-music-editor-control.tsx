@@ -7,12 +7,13 @@ interface VesMusicEditorControlProps {
     data: SongData;
     handleChange(path: string, value: SongData): void;
     path: string;
-    label: string;
+    config?: any;
 }
 
-const VesMusicEditorControl = ({ data, handleChange, path, label }: VesMusicEditorControlProps) => <MusicEditor
+const VesMusicEditorControl = ({ data, handleChange, path, config }: VesMusicEditorControlProps) => <MusicEditor
     songData={data}
     updateSongData={(newValue: SongData) => handleChange(path, newValue)}
+    services={config.services}
 />;
 
 export default withJsonFormsControlProps(VesMusicEditorControl);

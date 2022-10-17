@@ -4,7 +4,7 @@ import HContainer from '../../../../../core/browser/components/HContainer';
 import VContainer from '../../../../../core/browser/components/VContainer';
 import { HIGHEST_NOTE, LOWEST_NOTE, Notes, PatternConfig, VOLUME_STEPS } from '../MusicEditorTypes';
 
-interface CurrentNoteProps {
+interface NoteProps {
     pattern: PatternConfig
     currentNote: number
     setNote: (noteIndex: number, note: number | undefined) => void
@@ -12,16 +12,16 @@ interface CurrentNoteProps {
     setVolumeR: (noteIndex: number, volume: number | undefined) => void
 }
 
-export default function CurrentNote(props: CurrentNoteProps): JSX.Element {
+export default function Note(props: NoteProps): JSX.Element {
     const { currentNote, pattern, setNote, setVolumeL, setVolumeR } = props;
 
     if (currentNote === -1) {
-        return <div className='section currentNote'>
+        return <VContainer gap={10}>
             {nls.localize(
                 'vuengine/musicEditor/selectANote',
                 'Select a note to edit its properties'
             )}
-        </div>;
+        </VContainer>;
     }
 
     const note = pattern.notes[currentNote];
@@ -44,7 +44,7 @@ export default function CurrentNote(props: CurrentNoteProps): JSX.Element {
     volumeL = pattern.volumeL[currentNote] ?? volumeL;
     volumeR = pattern.volumeR[currentNote] ?? volumeR;
 
-    return <div className='section currentNote'>
+    return <VContainer gap={10}>
         <VContainer>
             Note
             <select
@@ -115,5 +115,5 @@ export default function CurrentNote(props: CurrentNoteProps): JSX.Element {
             <label>Effects</label>
             <i>Not yet implemented</i>
         </VContainer>
-    </div>;
+    </VContainer>;
 }

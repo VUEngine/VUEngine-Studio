@@ -3,8 +3,8 @@ import { JsonFormsCore, JsonSchema, UISchemaElement } from '@jsonforms/core';
 import { JsonForms } from '@jsonforms/react';
 import { JsonFormsStyleContext, StyleContext, vanillaCells, vanillaRenderers, vanillaStyles } from '@jsonforms/vanilla-renderers';
 import { Message } from '@phosphor/messaging';
-import { Emitter, Event, nls } from '@theia/core';
-import { Saveable, SaveableSource } from '@theia/core/lib/browser';
+import { CommandService, Emitter, Event, nls } from '@theia/core';
+import { LocalStorageService, Saveable, SaveableSource } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
@@ -26,12 +26,16 @@ export interface VesEditorsWidgetOptions {
 
 @injectable()
 export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableSource {
+    @inject(CommandService)
+    protected readonly commandService: CommandService;
     @inject(EditorPreferences)
     protected readonly editorPreferences: EditorPreferences;
     @inject(FileDialogService)
     protected readonly fileDialogService: FileDialogService;
     @inject(FileService)
     protected readonly fileService: FileService;
+    @inject(LocalStorageService)
+    protected readonly localStorageService: LocalStorageService;
     @inject(VesEditorsWidgetOptions)
     protected readonly options: VesEditorsWidgetOptions;
     @inject(VesProjectService)
@@ -292,8 +296,10 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
                                 hideRequiredAsterisk: false,
                                 // TODO: refactor once there's a non-hacky way to inject services and projectData
                                 services: {
+                                    commandService: this.commandService,
                                     fileService: this.fileService,
                                     fileDialogService: this.fileDialogService,
+                                    localStorageService: this.localStorageService,
                                     vesRumblePackService: this.vesRumblePackService,
                                 },
                                 projectData: this.projectData

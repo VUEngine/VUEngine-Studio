@@ -1,24 +1,27 @@
+import DockLayout, { LayoutBase, LayoutData } from 'rc-dock';
 import React from 'react';
 import * as Tone from 'tone';
-import { ChannelConfig, Notes, PatternConfig, SongData } from './MusicEditorTypes';
+import { ChannelConfig, InstrumentConfig, MusicEditorContext, MusicEditorState, Notes, PatternConfig, SongData } from './MusicEditorTypes';
 import MusicPlayer from './MusicPlayer';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
-import Sidebar from './Sidebar/Sidebar';
+import '../../../../../../../node_modules/rc-dock/dist/rc-dock.css';
+import Instruments from './Sidebar/Instruments';
+import Waveforms from './Sidebar/Waveforms';
+import { CommonCommands, ConfirmDialog, LocalStorageService } from '@theia/core/lib/browser';
+import { CommandService, nls } from '@theia/core';
+import Note from './Sidebar/Note';
+import Song from './Sidebar/Song';
+import Channel from './Sidebar/Channel';
+import Input from './Sidebar/Input';
 
 interface MusicEditorProps {
     songData: SongData
     updateSongData: (songData: SongData) => void
-}
-
-interface MusicEditorState {
-    playing: boolean
-    recording: boolean
-    currentStep: number
-    currentChannel: number
-    currentPattern: number
-    currentNote: number
-    sidebarTab: number,
+    services: {
+        commandService: CommandService
+        localStorageService: LocalStorageService
+    }
 }
 
 export default class MusicEditor extends React.Component<MusicEditorProps, MusicEditorState> {
@@ -31,9 +34,16 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
             currentChannel: 0,
             currentPattern: 0,
             currentNote: -1,
-            sidebarTab: 0,
+            currentInstrument: 0,
         };
     }
+
+    protected defaultLayout: LayoutBase;
+    protected dockLayoutRef: DockLayout;
+
+    getRef = (r: DockLayout) => {
+        this.dockLayoutRef = r;
+    };
 
     setChannel(channelId: number, channel: Partial<ChannelConfig>): void {
         this.setSongData({
@@ -73,7 +83,6 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
             currentChannel: id,
             currentPattern: this.props.songData.channels[id].sequence[0] ?? -1,
             currentNote: -1,
-            sidebarTab: 0,
         });
     };
 
@@ -82,14 +91,18 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
             currentChannel: channel,
             currentPattern: pattern,
             currentNote: -1,
-            sidebarTab: 0,
         });
     };
 
     setCurrentNote(id: number): void {
         this.setState({
             currentNote: id,
-            sidebarTab: 1,
+        });
+    };
+
+    setCurrentInstrument(id: number): void {
+        this.setState({
+            currentInstrument: id,
         });
     };
 
@@ -207,15 +220,33 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
         });
     };
 
-    setSidebarTab(tab: number): void {
-        this.setState({
-            sidebarTab: tab,
-        });
-    };
-
     setSongData(songData: Partial<SongData>): void {
         this.props.updateSongData({ ...this.props.songData, ...songData });
     };
+
+    setInstruments(i: InstrumentConfig[]): void {
+        this.setSongData({ instruments: i });
+    };
+
+    async resetLayout(): Promise<void> {
+        const dialog = new ConfirmDialog({
+            title: nls.localize('vuengine/musicEditor/resetLayout', 'Reset Layout?'),
+            msg: nls.localize('vuengine/musicEditor/areYouSureYouWantToResetLayout', 'Are you sure you want to reset the layout to default?'),
+        });
+        const confirmed = await dialog.open();
+        if (confirmed) {
+            this.dockLayoutRef.loadLayout(this.defaultLayout);
+            await this.props.services.localStorageService.setData('ves-editors-musicEditor-layout', undefined);
+        }
+    };
+
+    async componentDidMount(): Promise<void> {
+        this.defaultLayout = this.dockLayoutRef.getLayout();
+        const savedLayout = await this.props.services.localStorageService.getData('ves-editors-musicEditor-layout');
+        if (savedLayout) {
+            this.dockLayoutRef.loadLayout(savedLayout as LayoutBase);
+        }
+    }
 
     render(): JSX.Element {
         const soloChannel = this.props.songData.channels.filter(c => c.solo).map(c => c.id).pop() ?? -1;
@@ -244,6 +275,191 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
             }
         });
 
+        const defaultLayout: LayoutData = {
+            dockbox: {
+                mode: 'horizontal',
+                children: [
+                    {
+                        size: 99999,
+                        mode: 'vertical',
+                        children: [
+                            {
+                                tabs: [{
+                                    id: 'tab-sequencer',
+                                    title: 'Sequencer',
+                                    minHeight: 320,
+                                    minWidth: 250,
+                                    content:
+                                        <MusicEditorContext.Consumer>
+                                            {context =>
+                                                <Sequencer
+                                                    channels={this.props.songData.channels}
+                                                    currentChannel={this.state.currentChannel}
+                                                    currentPattern={this.state.currentPattern}
+                                                    playing={this.state.playing}
+                                                    currentStep={this.state.currentStep}
+                                                    instruments={this.props.songData.instruments}
+                                                    setCurrentChannel={this.setCurrentChannel.bind(this)}
+                                                    setCurrentPattern={this.setCurrentPattern.bind(this)}
+                                                    toggleChannelMuted={this.toggleChannelMuted.bind(this)}
+                                                    toggleChannelSolo={this.toggleChannelSolo.bind(this)}
+                                                    toggleChannelCollapsed={this.toggleChannelCollapsed.bind(this)}
+                                                    removeFromSequence={this.removeFromSequence.bind(this)}
+                                                    moveSequencePattern={this.moveSequencePattern.bind(this)}
+                                                    addToSequence={this.addToSequence.bind(this)}
+                                                />
+                                            }
+                                        </MusicEditorContext.Consumer>
+                                },
+                                {
+                                    id: 'tab-instruments',
+                                    title: 'Instruments',
+                                    minHeight: 250,
+                                    minWidth: 250,
+                                    content:
+                                        <MusicEditorContext.Consumer>
+                                            {context =>
+                                                <Instruments
+                                                    instruments={this.props.songData.instruments}
+                                                    setInstruments={this.setInstruments.bind(this)}
+                                                    currentInstrument={this.state.currentInstrument}
+                                                    setCurrentInstrument={this.setCurrentInstrument.bind(this)}
+                                                />
+                                            }
+                                        </MusicEditorContext.Consumer>
+                                },
+                                {
+                                    id: 'tab-waveforms',
+                                    title: 'Waveforms',
+                                    minHeight: 250,
+                                    minWidth: 250,
+                                    content:
+                                        <MusicEditorContext.Consumer>
+                                            {context =>
+                                                <Waveforms
+                                                />
+                                            }
+                                        </MusicEditorContext.Consumer>
+                                }]
+                            },
+                            {
+                                size: 99999,
+                                tabs: [{
+                                    id: 'tab-pianoroll',
+                                    title: 'Piano Roll',
+                                    minHeight: 250,
+                                    minWidth: 250,
+                                    content:
+                                        <MusicEditorContext.Consumer>
+                                            {context =>
+                                                <PianoRoll
+                                                    playing={this.state.playing}
+                                                    channel={this.props.songData.channels[this.state.currentChannel]}
+                                                    currentChannel={this.state.currentChannel}
+                                                    currentPattern={this.state.currentPattern}
+                                                    currentNote={this.state.currentNote}
+                                                    currentStep={this.state.currentStep}
+                                                    bar={this.props.songData.bar}
+                                                    playNote={this.playNote.bind(this)}
+                                                    setCurrentNote={this.setCurrentNote.bind(this)}
+                                                    setNote={this.setNote.bind(this)}
+                                                />
+                                            }
+                                        </MusicEditorContext.Consumer>
+                                }]
+                            }
+                        ]
+                    },
+                    {
+                        tabs: [
+                            {
+                                id: 'tab-song',
+                                title: 'Song',
+                                minHeight: 250,
+                                minWidth: 250,
+                                content:
+                                    <MusicEditorContext.Consumer>
+                                        {context =>
+                                            <Song
+                                                name={this.props.songData.name}
+                                                volume={this.props.songData.volume}
+                                                speed={this.props.songData.speed}
+                                                bar={this.props.songData.bar}
+                                                defaultPatternSize={this.props.songData.defaultPatternSize}
+                                                setSongData={this.setSongData.bind(this)}
+                                            />
+                                        }
+                                    </MusicEditorContext.Consumer>
+                            },
+                            {
+                                id: 'tab-channel',
+                                title: 'Channel',
+                                minHeight: 250,
+                                minWidth: 250,
+                                content:
+                                    <MusicEditorContext.Consumer>
+                                        {context =>
+                                            <Channel
+                                                name={this.props.songData.name}
+                                                volume={this.props.songData.volume}
+                                                speed={this.props.songData.speed}
+                                                bar={this.props.songData.bar}
+                                                defaultPatternSize={this.props.songData.defaultPatternSize}
+                                                channel={this.props.songData.channels[this.state.currentChannel]}
+                                                pattern={this.props.songData.channels[this.state.currentChannel].patterns[this.state.currentPattern]}
+                                                currentChannel={this.state.currentChannel}
+                                                currentPattern={this.state.currentPattern}
+                                                instruments={this.props.songData.instruments}
+                                                setCurrentChannel={this.setCurrentChannel.bind(this)}
+                                                setCurrentPattern={this.setCurrentPattern.bind(this)}
+                                                toggleChannelMuted={this.toggleChannelMuted.bind(this)}
+                                                toggleChannelSolo={this.toggleChannelSolo.bind(this)}
+                                                toggleChannelCollapsed={this.toggleChannelCollapsed.bind(this)}
+                                                setChannelVolume={this.setChannelVolume.bind(this)}
+                                                setChannelInstrument={this.setChannelInstrument.bind(this)}
+                                                setPatternSize={this.setPatternSize.bind(this)}
+                                                setSongData={this.setSongData.bind(this)}
+                                            />
+                                        }
+                                    </MusicEditorContext.Consumer>
+                            },
+                            {
+                                id: 'tab-note',
+                                title: 'Note',
+                                minHeight: 250,
+                                minWidth: 250,
+                                content:
+                                    <MusicEditorContext.Consumer>
+                                        {context =>
+                                            <Note
+                                                pattern={this.props.songData.channels[this.state.currentChannel].patterns[this.state.currentPattern]}
+                                                currentNote={this.state.currentNote}
+                                                setNote={this.setNote.bind(this)}
+                                                setVolumeL={this.setVolumeL.bind(this)}
+                                                setVolumeR={this.setVolumeR.bind(this)}
+                                            />
+                                        }
+                                    </MusicEditorContext.Consumer>
+                            },
+                            {
+                                id: 'tab-input',
+                                title: 'Input',
+                                minHeight: 250,
+                                minWidth: 250,
+                                content:
+                                    <MusicEditorContext.Consumer>
+                                        {context =>
+                                            <Input
+                                            />
+                                        }
+                                    </MusicEditorContext.Consumer>
+                            }
+                        ]
+                    }
+                ]
+            }
+        };
+
         return <div className='musicEditor'>
             <MusicPlayer
                 currentStep={this.state.currentStep}
@@ -256,107 +472,75 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                         : this.state.currentStep + 1
                 })}
             />
-            <div className='editor'>
-                <div className='toolbar'>
-                    <button
-                        className='theia-button secondary large playButton'
-                        title={this.state.playing ? 'Play' : 'Stop'}
-                        onClick={() => {
-                            this.setState({
-                                currentStep: 0,
-                                playing: !this.state.playing,
-                            });
-                        }}
-                    >
-                        <i className={`fa fa-${this.state.playing ? 'stop' : 'play'}`} />
-                    </button>
-                    <div className='currentStep'>
-                        {this.state.currentStep}
-                    </div>
-                    <button
-                        className={`theia-button ${this.state.recording ? 'primary' : 'secondary'} large recordButton`}
-                        title='Recording Mode'
-                        onClick={() => this.setState({ recording: !this.state.recording })}
-                    >
-                        <i className='fa fa-circle' />
-                    </button>
-                    <button
-                        className={'theia-button secondary large'}
-                        title='Save'
-                    >
-                        <i className='fa fa-save' />
-                    </button>
-                    <button
-                        className={'theia-button secondary large'}
-                        title='Import'
-                    >
-                        <i className='fa fa-download' />
-                    </button>
-                    <button
-                        className={'theia-button secondary large'}
-                        title='Export'
-                    >
-                        <i className='fa fa-upload' />
-                    </button>
+            <div className='toolbar'>
+                <button
+                    className='theia-button secondary large playButton'
+                    title={this.state.playing ? 'Play' : 'Stop'}
+                    onClick={() => {
+                        this.setState({
+                            currentStep: 0,
+                            playing: !this.state.playing,
+                        });
+                    }}
+                >
+                    <i className={`fa fa-${this.state.playing ? 'stop' : 'play'}`} />
+                </button>
+                <div className='currentStep'>
+                    {this.state.currentStep}
                 </div>
-                <div>
-                    <Sequencer
-                        channels={this.props.songData.channels}
-                        currentChannel={this.state.currentChannel}
-                        currentPattern={this.state.currentPattern}
-                        playing={this.state.playing}
-                        currentStep={this.state.currentStep}
-                        instruments={this.props.songData.instruments}
-                        setCurrentChannel={this.setCurrentChannel.bind(this)}
-                        setCurrentPattern={this.setCurrentPattern.bind(this)}
-                        toggleChannelMuted={this.toggleChannelMuted.bind(this)}
-                        toggleChannelSolo={this.toggleChannelSolo.bind(this)}
-                        toggleChannelCollapsed={this.toggleChannelCollapsed.bind(this)}
-                        removeFromSequence={this.removeFromSequence.bind(this)}
-                        moveSequencePattern={this.moveSequencePattern.bind(this)}
-                        addToSequence={this.addToSequence.bind(this)}
-                    />
-                </div>
-                {this.state.currentPattern > -1 && <PianoRoll
-                    playing={this.state.playing}
-                    channel={this.props.songData.channels[this.state.currentChannel]}
-                    currentChannel={this.state.currentChannel}
-                    currentPattern={this.state.currentPattern}
-                    currentNote={this.state.currentNote}
-                    currentStep={this.state.currentStep}
-                    bar={this.props.songData.bar}
-                    playNote={this.playNote.bind(this)}
-                    setCurrentNote={this.setCurrentNote.bind(this)}
-                    setNote={this.setNote.bind(this)}
-                />}
-            </div>
-            <Sidebar
-                name={this.props.songData.name}
-                volume={this.props.songData.volume}
-                speed={this.props.songData.speed}
-                bar={this.props.songData.bar}
-                defaultPatternSize={this.props.songData.defaultPatternSize}
-                channel={this.props.songData.channels[this.state.currentChannel]}
-                pattern={this.props.songData.channels[this.state.currentChannel].patterns[this.state.currentPattern]}
-                currentChannel={this.state.currentChannel}
-                currentPattern={this.state.currentPattern}
-                currentNote={this.state.currentNote}
-                tab={this.state.sidebarTab}
-                instruments={this.props.songData.instruments}
-                setCurrentChannel={this.setCurrentChannel.bind(this)}
-                setCurrentPattern={this.setCurrentPattern.bind(this)}
-                toggleChannelMuted={this.toggleChannelMuted.bind(this)}
-                toggleChannelSolo={this.toggleChannelSolo.bind(this)}
-                toggleChannelCollapsed={this.toggleChannelCollapsed.bind(this)}
-                setSidebarTab={this.setSidebarTab.bind(this)}
-                setChannelVolume={this.setChannelVolume.bind(this)}
-                setChannelInstrument={this.setChannelInstrument.bind(this)}
-                setPatternSize={this.setPatternSize.bind(this)}
-                setNote={this.setNote.bind(this)}
-                setVolumeL={this.setVolumeL.bind(this)}
-                setVolumeR={this.setVolumeR.bind(this)}
-                setSongData={this.setSongData.bind(this)}
-            />
+                <button
+                    className={`theia-button ${this.state.recording ? 'primary' : 'secondary'} large recordButton`}
+                    title='Recording Mode'
+                    disabled={true}
+                    onClick={() => this.setState({ recording: !this.state.recording })}
+                >
+                    <i className='fa fa-circle' />
+                </button>
+                <button
+                    className={'theia-button secondary large'}
+                    title='Save'
+                    onClick={() => this.props.services.commandService.executeCommand(CommonCommands.SAVE.id)}
+                >
+                    <i className='fa fa-save' />
+                </button>
+                <button
+                    className={'theia-button secondary large'}
+                    title='Import'
+                    disabled={true}
+                >
+                    <i className='fa fa-download' />
+                </button>
+                <button
+                    className={'theia-button secondary large'}
+                    title='Export'
+                    disabled={true}
+                >
+                    <i className='fa fa-upload' />
+                </button>
+                <button
+                    className={'theia-button secondary large'}
+                    title='Reset Layout'
+                    onClick={this.resetLayout.bind(this)}
+                >
+                    <i className='fa fa-undo' />
+                </button>
+            </div >
+            <MusicEditorContext.Provider value={{
+                state: this.state,
+                // @ts-ignore
+                setState: this.setState,
+                songData: this.props.songData,
+                setSongData: this.setSongData,
+            }}>
+                <DockLayout
+                    defaultLayout={defaultLayout}
+                    dropMode='edge'
+                    ref={this.getRef}
+                    onLayoutChange={layout =>
+                        this.props.services.localStorageService.setData('ves-editors-musicEditor-layout', layout)
+                    }
+                />
+            </MusicEditorContext.Provider>
         </div >;
     }
 }

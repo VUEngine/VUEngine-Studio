@@ -1,5 +1,5 @@
-import React from 'react';
-import { ChannelConfig, InstrumentConfig } from '../MusicEditorTypes';
+import React, { useContext } from 'react';
+import { ChannelConfig, InstrumentConfig, MusicEditorContext, MusicEditorContextType } from '../MusicEditorTypes';
 import Channel from './Channel';
 import StepIndicator from './StepIndicator';
 
@@ -21,8 +21,8 @@ interface SequencerProps {
 }
 
 export default function Sequencer(props: SequencerProps): JSX.Element {
+    const { state, setState, songData, setSongData } = useContext(MusicEditorContext) as MusicEditorContextType;
     const {
-        channels,
         currentChannel,
         currentPattern,
         currentStep,
@@ -38,34 +38,34 @@ export default function Sequencer(props: SequencerProps): JSX.Element {
         addToSequence,
     } = props;
 
-    const classNames = ['sequencer'];
+    const soloChannel = songData.channels.filter(c => c.solo).map(c => c.id).pop() ?? -1;
 
-    const soloChannel = channels.filter(c => c.solo).map(c => c.id).pop() ?? -1;
-
-    return <div className={classNames.join(' ')}>
-        {<StepIndicator
-            currentStep={currentStep}
+    return <div className='sequencer'>
+        {< StepIndicator
+            currentStep={state.currentStep}
             pianoRollSize={undefined}
-            hidden={!playing}
+            hidden={!state.playing}
         />}
-        {channels.map(channel =>
-            <Channel
-                key={`channel-${channel.id}`}
-                channelConfig={channel}
-                currentChannel={currentChannel}
-                currentPattern={currentPattern}
-                number={channel.id}
-                otherSolo={soloChannel > -1 && soloChannel !== channel.id}
-                instrumentName={instruments[channel.instrument].name}
-                setCurrentChannel={setCurrentChannel}
-                setCurrentPattern={setCurrentPattern}
-                toggleChannelMuted={toggleChannelMuted}
-                toggleChannelSolo={toggleChannelSolo}
-                toggleChannelCollapsed={toggleChannelCollapsed}
-                removeFromSequence={removeFromSequence}
-                moveSequencePattern={moveSequencePattern}
-                addToSequence={addToSequence}
-            />
-        )}
-    </div>;
+        {
+            songData.channels.map(channel =>
+                <Channel
+                    key={`channel-${channel.id}`}
+                    channelConfig={channel}
+                    currentChannel={currentChannel}
+                    currentPattern={currentPattern}
+                    number={channel.id}
+                    otherSolo={soloChannel > -1 && soloChannel !== channel.id}
+                    instrumentName={instruments[channel.instrument].name}
+                    setCurrentChannel={setCurrentChannel}
+                    setCurrentPattern={setCurrentPattern}
+                    toggleChannelMuted={toggleChannelMuted}
+                    toggleChannelSolo={toggleChannelSolo}
+                    toggleChannelCollapsed={toggleChannelCollapsed}
+                    removeFromSequence={removeFromSequence}
+                    moveSequencePattern={moveSequencePattern}
+                    addToSequence={addToSequence}
+                />
+            )
+        }
+    </div >;
 }

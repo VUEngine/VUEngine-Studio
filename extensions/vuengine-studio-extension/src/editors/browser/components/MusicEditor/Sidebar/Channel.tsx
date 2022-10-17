@@ -2,9 +2,8 @@ import React from 'react';
 import { ChannelConfig, InstrumentConfig, PatternConfig, SongData } from '../MusicEditorTypes';
 import CurrentChannel from './CurrentChannel';
 import CurrentPattern from './CurrentPattern';
-import Song from './Song';
 
-interface TabSongProps {
+interface ChannelProps {
     name: string
     volume: number
     speed: number
@@ -24,20 +23,15 @@ interface TabSongProps {
     setChannelInstrument: (instrument: number) => void
     setPatternSize: (size: number) => void
     setSongData: (songData: Partial<SongData>) => void
-    editInstrument: (instrument: number) => void
 }
 
-export default function TabSong(props: TabSongProps): JSX.Element {
-    const { name,
-        volume,
-        speed,
-        bar,
+export default function Channel(props: ChannelProps): JSX.Element {
+    const {
         channel,
         pattern,
         instruments,
         currentChannel,
         currentPattern,
-        defaultPatternSize,
         setCurrentChannel,
         setCurrentPattern,
         toggleChannelMuted,
@@ -46,38 +40,33 @@ export default function TabSong(props: TabSongProps): JSX.Element {
         setChannelVolume,
         setChannelInstrument,
         setPatternSize,
-        setSongData,
-        editInstrument,
     } = props;
 
     return <>
-        <Song
-            name={name}
-            volume={volume}
-            speed={speed}
-            bar={bar}
-            defaultPatternSize={defaultPatternSize}
-            setSongData={setSongData}
-        />
+        {currentChannel > -1
+            ? <CurrentChannel
+                channel={channel}
+                instruments={instruments}
+                setCurrentChannel={setCurrentChannel}
+                toggleChannelMuted={toggleChannelMuted}
+                toggleChannelSolo={toggleChannelSolo}
+                toggleChannelCollapsed={toggleChannelCollapsed}
+                setChannelVolume={setChannelVolume}
+                setChannelInstrument={setChannelInstrument}
+            />
+            : <div>
+                Select a channel to edit its properties
+            </div>}
 
-        {currentChannel > -1 && <CurrentChannel
-            channel={channel}
-            instruments={instruments}
-            setCurrentChannel={setCurrentChannel}
-            toggleChannelMuted={toggleChannelMuted}
-            toggleChannelSolo={toggleChannelSolo}
-            toggleChannelCollapsed={toggleChannelCollapsed}
-            setChannelVolume={setChannelVolume}
-            setChannelInstrument={setChannelInstrument}
-            editInstrument={editInstrument}
-        />}
-
-        {currentPattern > -1 && <CurrentPattern
-            pattern={pattern as PatternConfig}
-            channel={channel}
-            currentPattern={currentPattern}
-            setCurrentPattern={setCurrentPattern}
-            setPatternSize={setPatternSize}
-        />}
+        {currentPattern > -1 && <>
+            <div className="divider"></div>
+            <CurrentPattern
+                pattern={pattern as PatternConfig}
+                channel={channel}
+                currentPattern={currentPattern}
+                setCurrentPattern={setCurrentPattern}
+                setPatternSize={setPatternSize}
+            />
+        </>}
     </>;
 }

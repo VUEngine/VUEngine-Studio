@@ -13,7 +13,7 @@ interface CurrentPatternProps {
 export default function CurrentPattern(props: CurrentPatternProps): JSX.Element {
     const { channel, currentPattern, setCurrentPattern, pattern, setPatternSize } = props;
 
-    return <div className='section currentPattern'>
+    return <VContainer gap={10}>
         <VContainer>
             <label>Pattern</label>
             <select
@@ -86,5 +86,5 @@ export default function CurrentPattern(props: CurrentPatternProps): JSX.Element 
             </HContainer>
         </VContainer>
         */}
-    </div>;
+    </VContainer>;
 }

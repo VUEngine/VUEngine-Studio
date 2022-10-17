@@ -21,6 +21,12 @@ export default function PianoRoll(props: PianoRollProps): JSX.Element {
     const { currentNote, currentStep, currentChannel, currentPattern, channel, playing, bar, playNote, setCurrentNote, setNote } = props;
     const pattern = channel.patterns[currentPattern];
 
+    if (currentPattern === -1) {
+        return <div>
+            Select a pattern to edit
+        </div>;
+    }
+
     const classNames = ['pianoRoll'];
     classNames.push(`size-${pattern.size}`);
 
@@ -45,8 +51,8 @@ export default function PianoRoll(props: PianoRollProps): JSX.Element {
             hidden={!playing || currentPatternStep === -1}
         />}
         {/* <PianoRollHeader
-            pattern={pattern}
-        />*/}
+                pattern={pattern}
+            />*/}
         <PianoRollEditor
             bar={bar}
             currentNote={currentNote}

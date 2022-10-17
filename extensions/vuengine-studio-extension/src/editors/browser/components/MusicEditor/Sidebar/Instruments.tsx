@@ -4,14 +4,14 @@ import React from 'react';
 import VContainer from '../../../../../core/browser/components/VContainer';
 import { InstrumentConfig } from '../MusicEditorTypes';
 
-interface TabInstrumentsProps {
+interface InstrumentsProps {
     instruments: InstrumentConfig[]
     setInstruments: (instruments: InstrumentConfig[]) => void
     currentInstrument: number
     setCurrentInstrument: (instrument: number) => void
 }
 
-export default function TabInstruments(props: TabInstrumentsProps): JSX.Element {
+export default function Instruments(props: InstrumentsProps): JSX.Element {
     const { instruments, setInstruments, currentInstrument, setCurrentInstrument } = props;
 
     const instrument = instruments[currentInstrument];
@@ -50,45 +50,41 @@ export default function TabInstruments(props: TabInstrumentsProps): JSX.Element 
         }
     };
 
-    return <>
-        <div className='section'>
-            <VContainer>
-                Instruments
-                <div className='inputWithAction'>
-                    <select
-                        className='theia-select'
-                        onChange={e => setCurrentInstrument(parseInt(e.target.value))}
-                        value={currentInstrument}
-                    >
-                        {instruments.map((n, i) =>
-                            <option key={`instrument-select-${i}`} value={i}>{n.name}</option>
-                        )}
-                    </select>
-                    <button
-                        className='theia-button secondary'
-                        onClick={removeCurrentInstrument}
-                        disabled={instruments.length <= 1}
-                    >
-                        <i className='fa fa-minus' />
-                    </button>
-                    <button
-                        className='theia-button secondary'
-                        onClick={addInstrument}
-                    >
-                        <i className='fa fa-plus' />
-                    </button>
-                </div>
-            </VContainer>
-        </div>
-        <div className='section'>
-            <VContainer>
-                <label>Name</label>
-                <input
-                    className='theia-input'
-                    value={instrument.name}
-                    onChange={e => setName(e.target.value)}
-                />
-            </VContainer>
-        </div>
-    </>;
+    return <VContainer gap={10}>
+        <VContainer>
+            Instruments
+            <div className='inputWithAction'>
+                <select
+                    className='theia-select'
+                    onChange={e => setCurrentInstrument(parseInt(e.target.value))}
+                    value={currentInstrument}
+                >
+                    {instruments.map((n, i) =>
+                        <option key={`instrument-select-${i}`} value={i}>{n.name}</option>
+                    )}
+                </select>
+                <button
+                    className='theia-button secondary'
+                    onClick={removeCurrentInstrument}
+                    disabled={instruments.length <= 1}
+                >
+                    <i className='fa fa-minus' />
+                </button>
+                <button
+                    className='theia-button secondary'
+                    onClick={addInstrument}
+                >
+                    <i className='fa fa-plus' />
+                </button>
+            </div>
+        </VContainer>
+        <VContainer>
+            <label>Name</label>
+            <input
+                className='theia-input'
+                value={instrument.name}
+                onChange={e => setName(e.target.value)}
+            />
+        </VContainer>
+    </VContainer>;
 }

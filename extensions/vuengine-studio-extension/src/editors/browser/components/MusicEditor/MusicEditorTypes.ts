@@ -1,3 +1,25 @@
+import React from 'react';
+
+// @ts-ignore
+export const MusicEditorContext = React.createContext<MusicEditorContextType>({});
+
+export interface MusicEditorContextType {
+    state: MusicEditorState
+    setState: (state: Partial<MusicEditorState>) => void
+    songData: SongData
+    setSongData: (songData: Partial<SongData>) => void
+}
+
+export interface MusicEditorState {
+    playing: boolean
+    recording: boolean
+    currentStep: number
+    currentChannel: number
+    currentPattern: number
+    currentNote: number
+    currentInstrument: number
+}
+
 export interface SongData {
     name: string
     channels: ChannelConfig[],

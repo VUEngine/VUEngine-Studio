@@ -1,12 +1,12 @@
 .musicEditor {
     box-sizing: border-box;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     height: 100%;
     overflow: hidden;
 }
 
-.musicEditor .editor {
+.musicEditor .dock-layout {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -16,4 +16,24 @@
     overflow: hidden;
     padding: 2px;
     user-select: none;
+}
+
+.musicEditor .inputWithAction {
+    display: flex;
+    gap: 5px;
+}
+
+.musicEditor .inputWithAction :first-child {
+    flex-grow: 1;
+}
+
+.musicEditor .inputWithAction .theia-button {
+    margin: 0;
+    min-width: 32px;
+    width: 32px;
+}
+
+.musicEditor .divider {
+    border-top: var(--theia-sash-width) dashed var(--theia-sideBar-background);
+    margin: 20px 0;
 }

@@ -41,7 +41,7 @@ export default function Song(props: SongProps): JSX.Element {
         });
     };
 
-    return <div className='section song'>
+    return <VContainer gap={10}>
         <VContainer>
             <label>Song Name</label>
             <input
@@ -114,5 +114,5 @@ export default function Song(props: SongProps): JSX.Element {
                 )}
             </select>
         </VContainer>
-    </div>;
+    </VContainer>;
 }

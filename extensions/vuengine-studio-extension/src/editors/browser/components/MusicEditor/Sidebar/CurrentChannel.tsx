@@ -12,7 +12,6 @@ interface CurrentChannelProps {
     toggleChannelCollapsed: (channelId: number) => void
     setChannelVolume: (volume: number) => void
     setChannelInstrument: (instrument: number) => void
-    editInstrument: (instrument: number) => void
 }
 
 export default function CurrentChannel(props: CurrentChannelProps): JSX.Element {
@@ -25,10 +24,9 @@ export default function CurrentChannel(props: CurrentChannelProps): JSX.Element 
         toggleChannelCollapsed,
         setChannelVolume,
         setChannelInstrument,
-        editInstrument,
     } = props;
 
-    return <div className='section currentChannel'>
+    return <VContainer gap={10}>
         <VContainer>
             <label>Channel</label>
             <select
@@ -44,24 +42,15 @@ export default function CurrentChannel(props: CurrentChannelProps): JSX.Element 
 
         <VContainer>
             Instrument
-            <div className='inputWithAction'>
-
-                <select
-                    className='theia-select'
-                    onChange={e => setChannelInstrument(parseInt(e.target.value))}
-                    value={channel.instrument}
-                >
-                    {instruments.map((n, i) =>
-                        <option key={`instrument-select-${i}`} value={i}>{n.name}</option>
-                    )}
-                </select>
-                <button
-                    className='theia-button secondary'
-                    onClick={() => editInstrument(channel.instrument)}
-                >
-                    <i className='fa fa-cog' />
-                </button>
-            </div>
+            <select
+                className='theia-select'
+                onChange={e => setChannelInstrument(parseInt(e.target.value))}
+                value={channel.instrument}
+            >
+                {instruments.map((n, i) =>
+                    <option key={`instrument-select-${i}`} value={i}>{n.name}</option>
+                )}
+            </select>
         </VContainer>
 
         <VContainer>
@@ -107,5 +96,5 @@ export default function CurrentChannel(props: CurrentChannelProps): JSX.Element 
                 Solo
             </label>
         </VContainer>
-    </div>;
+    </VContainer>;
 }
