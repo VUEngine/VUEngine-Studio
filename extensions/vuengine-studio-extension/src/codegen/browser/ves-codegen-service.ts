@@ -243,11 +243,16 @@ export class VesCodeGenService {
       }
       return base;
     });
+
     env.addFilter('values', (value: object) => Object.values(value));
+
     // @ts-ignore
     env.addFilter('typeId', (arr: unknown[], typeId: string) => arr.filter(item => item.typeId === typeId));
+
     env.addFilter('sanitizeSpecName', (value: string) => value.replace(/[^A-Za-z0-9]/g, ''));
+
     env.addFilter('toUpperSnakeCase', (value: string) => this.toUpperSnakeCase(value));
+
     env.addFilter('unique', (values: Array<string>, attribute?: string) => {
       if (attribute) {
         // array of objects with unique given attribute
@@ -258,22 +263,32 @@ export class VesCodeGenService {
         return values.filter((value, index, self) => self.indexOf(value) === index);
       }
     });
+
     env.addFilter('hexToInt', (value: string) => parseInt(value, 16));
+
     env.addFilter('intToHex', (value: number, length?: number) => value.toString(16).toUpperCase().padStart(
       length === 8 ? 10 : length === 2 ? 4 : 6,
       length === 8 ? '0x00000000' : length === 2 ? '0x00' : '0x0000'
     ));
+
     env.addFilter('intToBin', (value: number, length?: number) => value.toString(2).padStart(
       length ?? 8,
       '0'
     ));
+
     env.addFilter('binToHex', (value: string) => parseInt(value, 2).toString(16).toUpperCase());
+
     env.addFilter('formatValue', (value: string) => {
       // @ts-ignore
       if (!isNaN(value) || value === 'true' || value === 'false') {
         return value;
       }
       return `"${value}"`;
+    });
+
+    env.addFilter('setAttribute', (obj, key, value) => {
+      obj[key] = value;
+      return obj;
     });
 
     // add functions
