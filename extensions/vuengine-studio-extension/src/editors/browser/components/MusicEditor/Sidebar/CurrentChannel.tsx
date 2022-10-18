@@ -1,30 +1,21 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import HContainer from '../../../../../core/browser/components/HContainer';
 import VContainer from '../../../../../core/browser/components/VContainer';
-import { ChannelConfig, InstrumentConfig, VOLUME_STEPS } from '../MusicEditorTypes';
+import { MusicEditorContext, MusicEditorContextType, VOLUME_STEPS } from '../MusicEditorTypes';
 
-interface CurrentChannelProps {
-    channel: ChannelConfig
-    instruments: InstrumentConfig[]
-    setCurrentChannel: (channel: number) => void
-    toggleChannelMuted: (channelId: number) => void
-    toggleChannelSolo: (channelId: number) => void
-    toggleChannelCollapsed: (channelId: number) => void
-    setChannelVolume: (volume: number) => void
-    setChannelInstrument: (instrument: number) => void
-}
-
-export default function CurrentChannel(props: CurrentChannelProps): JSX.Element {
+export default function CurrentChannel(): JSX.Element {
     const {
-        channel,
-        instruments,
+        state,
+        songData,
         setCurrentChannel,
+        setChannelInstrument,
+        setChannelVolume,
+        toggleChannelCollapsed,
         toggleChannelMuted,
         toggleChannelSolo,
-        toggleChannelCollapsed,
-        setChannelVolume,
-        setChannelInstrument,
-    } = props;
+    } = useContext(MusicEditorContext) as MusicEditorContextType;
+
+    const channel = songData.channels[state.currentChannel];
 
     return <VContainer gap={10}>
         <VContainer>
@@ -47,7 +38,7 @@ export default function CurrentChannel(props: CurrentChannelProps): JSX.Element 
                 onChange={e => setChannelInstrument(parseInt(e.target.value))}
                 value={channel.instrument}
             >
-                {instruments.map((n, i) =>
+                {songData.instruments.map((n, i) =>
                     <option key={`instrument-select-${i}`} value={i}>{n.name}</option>
                 )}
             </select>

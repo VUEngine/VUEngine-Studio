@@ -1,21 +1,19 @@
-import React from 'react';
-import { PatternConfig } from '../MusicEditorTypes';
+import React, { useContext } from 'react';
+import { MusicEditorContext, MusicEditorContextType } from '../MusicEditorTypes';
 import PianoRollKey from './PianoRollKey';
 import PianoRollNote from './PianoRollNote';
 
 interface PianoRollRowProps {
     note: string
     noteId: number
-    pattern: PatternConfig
-    bar: number
-    currentNote: number
-    playNote: (note: number) => void
-    setCurrentNote: (id: number) => void
-    setNote: (noteIndex: number, note: number | undefined) => void
 }
 
 export default function PianoRollRow(props: PianoRollRowProps): JSX.Element {
-    const { note, noteId, pattern, bar, currentNote, playNote, setCurrentNote, setNote } = props;
+    const { state, songData, playNote } = useContext(MusicEditorContext) as MusicEditorContextType;
+    const { note, noteId } = props;
+
+    const channel = songData.channels[state.currentChannel];
+    const pattern = channel.patterns[state.currentPattern];
 
     const classNames = ['pianoRollRow'];
     if (note.startsWith('C') && note.length === 2) {
@@ -33,12 +31,8 @@ export default function PianoRollRow(props: PianoRollRowProps): JSX.Element {
                 key={`pianoroll-row-${index}-note-${note}`}
                 index={index}
                 noteId={noteId}
-                bar={bar}
-                current={currentNote === index}
+                current={state.currentNote === index}
                 set={pattern.notes[index] === noteId}
-                playNote={playNote}
-                setCurrentNote={setCurrentNote}
-                setNote={setNote}
             />
         ))}
     </div>;

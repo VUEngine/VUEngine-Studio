@@ -1,17 +1,12 @@
-import React from 'react';
-import { PatternConfig } from '../MusicEditorTypes';
+import React, { useContext } from 'react';
+import { MusicEditorContext, MusicEditorContextType } from '../MusicEditorTypes';
 import NotePropertiesNote from './NotePropertiesNote';
 
-interface NotePropertiesProps {
-    bar: number
-    pattern: PatternConfig
-    currentNote: number
-    setCurrentNote: (id: number) => void
-    setNote: (noteIndex: number, note: number | undefined) => void
-}
+export default function NoteProperties(): JSX.Element {
+    const { state, songData } = useContext(MusicEditorContext) as MusicEditorContextType;
 
-export default function NoteProperties(props: NotePropertiesProps): JSX.Element {
-    const { bar, pattern, currentNote, setCurrentNote, setNote } = props;
+    const channel = songData.channels[state.currentChannel];
+    const pattern = channel.patterns[state.currentPattern];
 
     const classNames = ['noteProperties'];
 
@@ -29,15 +24,11 @@ export default function NoteProperties(props: NotePropertiesProps): JSX.Element 
             return (
                 <NotePropertiesNote
                     key={`pianoroll-note-properties-volume-note-${index}`}
-                    pattern={pattern}
                     index={index}
-                    current={index === currentNote}
-                    bar={bar}
+                    current={index === state.currentNote}
                     effects={[]}
                     volumeL={volumeL}
                     volumeR={volumeR}
-                    setCurrentNote={setCurrentNote}
-                    setNote={setNote}
                 />
             );
         })}

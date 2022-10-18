@@ -1,27 +1,16 @@
-import React from 'react';
-import { ChannelConfig } from '../MusicEditorTypes';
+import React, { useContext } from 'react';
+import { MusicEditorContext, MusicEditorContextType } from '../MusicEditorTypes';
 import StepIndicator from '../Sequencer/StepIndicator';
 import NoteProperties from './NoteProperties';
 import PianoRollEditor from './PianoRollEditor';
 
-interface PianoRollProps {
-    channel: ChannelConfig
-    currentChannel: number
-    currentPattern: number
-    currentNote: number
-    currentStep: number
-    playing: boolean
-    bar: number
-    playNote: (note: number) => void
-    setCurrentNote: (id: number) => void
-    setNote: (noteIndex: number, note: number | undefined) => void
-}
+export default function PianoRoll(): JSX.Element {
+    const { state, songData } = useContext(MusicEditorContext) as MusicEditorContextType;
 
-export default function PianoRoll(props: PianoRollProps): JSX.Element {
-    const { currentNote, currentStep, currentChannel, currentPattern, channel, playing, bar, playNote, setCurrentNote, setNote } = props;
-    const pattern = channel.patterns[currentPattern];
+    const channel = songData.channels[state.currentChannel];
+    const pattern = channel.patterns[state.currentPattern];
 
-    if (currentPattern === -1) {
+    if (state.currentPattern === -1) {
         return <div>
             Select a pattern to edit
         </div>;
@@ -31,13 +20,13 @@ export default function PianoRoll(props: PianoRollProps): JSX.Element {
     classNames.push(`size-${pattern.size}`);
 
     let currentPatternStep = -1;
-    if (channel.id === currentChannel) {
+    if (channel.id === state.currentChannel) {
         let patternStartStep = 0;
         channel.sequence.forEach((patternId, index) => {
             const patternSize = channel.patterns[patternId].size;
             const patternEndStep = patternStartStep + patternSize;
-            if (patternId === currentPattern && currentStep >= patternStartStep && currentStep < patternEndStep) {
-                currentPatternStep = currentStep - patternStartStep;
+            if (patternId === state.currentPattern && state.currentStep >= patternStartStep && state.currentStep < patternEndStep) {
+                currentPatternStep = state.currentStep - patternStartStep;
                 return;
             }
             patternStartStep += patternSize;
@@ -48,25 +37,10 @@ export default function PianoRoll(props: PianoRollProps): JSX.Element {
         {<StepIndicator
             currentStep={currentPatternStep}
             pianoRollSize={pattern.size}
-            hidden={!playing || currentPatternStep === -1}
+            hidden={!state.playing || currentPatternStep === -1}
         />}
-        {/* <PianoRollHeader
-                pattern={pattern}
-            />*/}
-        <PianoRollEditor
-            bar={bar}
-            currentNote={currentNote}
-            pattern={pattern}
-            playNote={playNote}
-            setCurrentNote={setCurrentNote}
-            setNote={setNote}
-        />
-        <NoteProperties
-            bar={bar}
-            pattern={pattern}
-            currentNote={currentNote}
-            setCurrentNote={setCurrentNote}
-            setNote={setNote}
-        />
+        {/* <PianoRollHeader/> */}
+        <PianoRollEditor />
+        <NoteProperties />
     </div>;
 }

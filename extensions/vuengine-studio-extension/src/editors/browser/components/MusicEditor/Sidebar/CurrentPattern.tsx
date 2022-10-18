@@ -1,24 +1,19 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import VContainer from '../../../../../core/browser/components/VContainer';
-import { ChannelConfig, PatternConfig, PATTERN_SIZES } from '../MusicEditorTypes';
+import { MusicEditorContext, MusicEditorContextType, PATTERN_SIZES } from '../MusicEditorTypes';
 
-interface CurrentPatternProps {
-    pattern: PatternConfig
-    channel: ChannelConfig
-    currentPattern: number
-    setCurrentPattern: (channel: number, pattern: number) => void
-    setPatternSize: (size: number) => void
-}
+export default function CurrentPattern(): JSX.Element {
+    const { state, songData, setCurrentPattern, setPatternSize } = useContext(MusicEditorContext) as MusicEditorContextType;
 
-export default function CurrentPattern(props: CurrentPatternProps): JSX.Element {
-    const { channel, currentPattern, setCurrentPattern, pattern, setPatternSize } = props;
+    const channel = songData.channels[state.currentChannel];
+    const pattern = channel.patterns[state.currentPattern];
 
     return <VContainer gap={10}>
         <VContainer>
             <label>Pattern</label>
             <select
                 className='theia-select'
-                value={currentPattern}
+                value={state.currentPattern}
                 onChange={e => setCurrentPattern(channel.id, parseInt(e.target.value))}
             >
                 {channel.patterns.map((n, i) => (

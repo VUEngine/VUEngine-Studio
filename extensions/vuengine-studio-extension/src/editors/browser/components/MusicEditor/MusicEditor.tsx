@@ -1,7 +1,7 @@
 import DockLayout, { LayoutBase, LayoutData } from 'rc-dock';
 import React from 'react';
 import * as Tone from 'tone';
-import { ChannelConfig, InstrumentConfig, MusicEditorContext, MusicEditorState, Notes, PatternConfig, SongData } from './MusicEditorTypes';
+import { ChannelConfig, InstrumentConfig, MusicEditorContext, MusicEditorState, Notes, PatternConfig, SongData, SongNote } from './MusicEditorTypes';
 import MusicPlayer from './MusicPlayer';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
@@ -35,6 +35,8 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
             currentPattern: 0,
             currentNote: -1,
             currentInstrument: 0,
+            song: [],
+            songLength: 0,
         };
     }
 
@@ -222,6 +224,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
 
     setSongData(songData: Partial<SongData>): void {
         this.props.updateSongData({ ...this.props.songData, ...songData });
+        this.computeSong();
     };
 
     setInstruments(i: InstrumentConfig[]): void {
@@ -240,29 +243,26 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
         }
     };
 
-    async componentDidMount(): Promise<void> {
-        this.defaultLayout = this.dockLayoutRef.getLayout();
-        const savedLayout = await this.props.services.localStorageService.getData('ves-editors-musicEditor-layout');
-        if (savedLayout) {
-            this.dockLayoutRef.loadLayout(savedLayout as LayoutBase);
-        }
-    }
-
-    render(): JSX.Element {
+    protected computeSong(): void {
         const soloChannel = this.props.songData.channels.filter(c => c.solo).map(c => c.id).pop() ?? -1;
 
         let songLength = 0;
-        const songNotes: (string | undefined)[][] = [];
+        const song: (SongNote | undefined)[][] = [];
+
         this.props.songData.channels.forEach(channel => {
-            const channelNotes: (string | undefined)[] = [];
+            const channelNotes: (SongNote | undefined)[] = [];
             let step = 0;
             channel.sequence.forEach(patternId => {
                 const pattern = this.props.songData.channels[channel.id].patterns[patternId];
                 [...Array(pattern.size)].forEach((s, i) => {
-                    channelNotes[step + i] = (pattern.notes[i] !== undefined
-                        && !channel.muted
-                        && !(soloChannel > -1 && soloChannel !== channel.id))
-                        ? Notes[pattern.notes[i]!]
+                    channelNotes[step + i] = (!channel.muted && !(soloChannel > -1 && soloChannel !== channel.id))
+                        ? {
+                            note: pattern.notes[i] !== undefined ? Notes[pattern.notes[i]!] : undefined,
+                            volumeL: (typeof pattern.volumeL[i] === 'number')
+                                ? 20 * Math.log10((pattern.volumeL[i]! / 100) ** 2) // convert to decibels
+                                : undefined,
+                            volumeR: (typeof pattern.volumeR[i] === 'number') ? pattern.volumeL[i] : undefined,
+                        }
                         : undefined;
                 });
                 step += pattern.size;
@@ -271,10 +271,24 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                 if (channelNotes.length > songLength) {
                     songLength = channelNotes.length;
                 }
-                songNotes.push(channelNotes);
+                song.push(channelNotes);
             }
         });
 
+        this.setState({ song, songLength });
+    }
+
+    async componentDidMount(): Promise<void> {
+        this.defaultLayout = this.dockLayoutRef.getLayout();
+        const savedLayout = await this.props.services.localStorageService.getData('ves-editors-musicEditor-layout');
+        if (savedLayout) {
+            this.dockLayoutRef.loadLayout(savedLayout as LayoutBase);
+        }
+
+        this.computeSong();
+    }
+
+    render(): JSX.Element {
         const defaultLayout: LayoutData = {
             dockbox: {
                 mode: 'horizontal',
@@ -292,22 +306,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                                     content:
                                         <MusicEditorContext.Consumer>
                                             {context =>
-                                                <Sequencer
-                                                    channels={this.props.songData.channels}
-                                                    currentChannel={this.state.currentChannel}
-                                                    currentPattern={this.state.currentPattern}
-                                                    playing={this.state.playing}
-                                                    currentStep={this.state.currentStep}
-                                                    instruments={this.props.songData.instruments}
-                                                    setCurrentChannel={this.setCurrentChannel.bind(this)}
-                                                    setCurrentPattern={this.setCurrentPattern.bind(this)}
-                                                    toggleChannelMuted={this.toggleChannelMuted.bind(this)}
-                                                    toggleChannelSolo={this.toggleChannelSolo.bind(this)}
-                                                    toggleChannelCollapsed={this.toggleChannelCollapsed.bind(this)}
-                                                    removeFromSequence={this.removeFromSequence.bind(this)}
-                                                    moveSequencePattern={this.moveSequencePattern.bind(this)}
-                                                    addToSequence={this.addToSequence.bind(this)}
-                                                />
+                                                <Sequencer />
                                             }
                                         </MusicEditorContext.Consumer>
                                 },
@@ -319,12 +318,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                                     content:
                                         <MusicEditorContext.Consumer>
                                             {context =>
-                                                <Instruments
-                                                    instruments={this.props.songData.instruments}
-                                                    setInstruments={this.setInstruments.bind(this)}
-                                                    currentInstrument={this.state.currentInstrument}
-                                                    setCurrentInstrument={this.setCurrentInstrument.bind(this)}
-                                                />
+                                                <Instruments />
                                             }
                                         </MusicEditorContext.Consumer>
                                 },
@@ -336,8 +330,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                                     content:
                                         <MusicEditorContext.Consumer>
                                             {context =>
-                                                <Waveforms
-                                                />
+                                                <Waveforms />
                                             }
                                         </MusicEditorContext.Consumer>
                                 }]
@@ -352,18 +345,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                                     content:
                                         <MusicEditorContext.Consumer>
                                             {context =>
-                                                <PianoRoll
-                                                    playing={this.state.playing}
-                                                    channel={this.props.songData.channels[this.state.currentChannel]}
-                                                    currentChannel={this.state.currentChannel}
-                                                    currentPattern={this.state.currentPattern}
-                                                    currentNote={this.state.currentNote}
-                                                    currentStep={this.state.currentStep}
-                                                    bar={this.props.songData.bar}
-                                                    playNote={this.playNote.bind(this)}
-                                                    setCurrentNote={this.setCurrentNote.bind(this)}
-                                                    setNote={this.setNote.bind(this)}
-                                                />
+                                                <PianoRoll />
                                             }
                                         </MusicEditorContext.Consumer>
                                 }]
@@ -380,14 +362,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                                 content:
                                     <MusicEditorContext.Consumer>
                                         {context =>
-                                            <Song
-                                                name={this.props.songData.name}
-                                                volume={this.props.songData.volume}
-                                                speed={this.props.songData.speed}
-                                                bar={this.props.songData.bar}
-                                                defaultPatternSize={this.props.songData.defaultPatternSize}
-                                                setSongData={this.setSongData.bind(this)}
-                                            />
+                                            <Song />
                                         }
                                     </MusicEditorContext.Consumer>
                             },
@@ -399,27 +374,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                                 content:
                                     <MusicEditorContext.Consumer>
                                         {context =>
-                                            <Channel
-                                                name={this.props.songData.name}
-                                                volume={this.props.songData.volume}
-                                                speed={this.props.songData.speed}
-                                                bar={this.props.songData.bar}
-                                                defaultPatternSize={this.props.songData.defaultPatternSize}
-                                                channel={this.props.songData.channels[this.state.currentChannel]}
-                                                pattern={this.props.songData.channels[this.state.currentChannel].patterns[this.state.currentPattern]}
-                                                currentChannel={this.state.currentChannel}
-                                                currentPattern={this.state.currentPattern}
-                                                instruments={this.props.songData.instruments}
-                                                setCurrentChannel={this.setCurrentChannel.bind(this)}
-                                                setCurrentPattern={this.setCurrentPattern.bind(this)}
-                                                toggleChannelMuted={this.toggleChannelMuted.bind(this)}
-                                                toggleChannelSolo={this.toggleChannelSolo.bind(this)}
-                                                toggleChannelCollapsed={this.toggleChannelCollapsed.bind(this)}
-                                                setChannelVolume={this.setChannelVolume.bind(this)}
-                                                setChannelInstrument={this.setChannelInstrument.bind(this)}
-                                                setPatternSize={this.setPatternSize.bind(this)}
-                                                setSongData={this.setSongData.bind(this)}
-                                            />
+                                            <Channel />
                                         }
                                     </MusicEditorContext.Consumer>
                             },
@@ -431,13 +386,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                                 content:
                                     <MusicEditorContext.Consumer>
                                         {context =>
-                                            <Note
-                                                pattern={this.props.songData.channels[this.state.currentChannel].patterns[this.state.currentPattern]}
-                                                currentNote={this.state.currentNote}
-                                                setNote={this.setNote.bind(this)}
-                                                setVolumeL={this.setVolumeL.bind(this)}
-                                                setVolumeR={this.setVolumeR.bind(this)}
-                                            />
+                                            <Note />
                                         }
                                     </MusicEditorContext.Consumer>
                             },
@@ -449,8 +398,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                                 content:
                                     <MusicEditorContext.Consumer>
                                         {context =>
-                                            <Input
-                                            />
+                                            <Input />
                                         }
                                     </MusicEditorContext.Consumer>
                             }
@@ -465,9 +413,9 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                 currentStep={this.state.currentStep}
                 playing={this.state.playing}
                 speed={60000 / this.props.songData.speed}
-                notes={songNotes}
+                song={this.state.song}
                 increaseCurrentStep={() => this.setState({
-                    currentStep: this.state.currentStep + 1 >= songLength
+                    currentStep: this.state.currentStep + 1 >= this.state.songLength
                         ? 0
                         : this.state.currentStep + 1
                 })}
@@ -527,10 +475,29 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
             </div >
             <MusicEditorContext.Provider value={{
                 state: this.state,
-                // @ts-ignore
-                setState: this.setState,
                 songData: this.props.songData,
-                setSongData: this.setSongData,
+                setState: this.setState.bind(this),
+                setSongData: this.setSongData.bind(this),
+                setChannel: this.setChannel.bind(this),
+                setPattern: this.setPattern.bind(this),
+                playNote: this.playNote.bind(this),
+                setCurrentChannel: this.setCurrentChannel.bind(this),
+                setCurrentPattern: this.setCurrentPattern.bind(this),
+                setCurrentNote: this.setCurrentNote.bind(this),
+                setCurrentInstrument: this.setCurrentInstrument.bind(this),
+                toggleChannelMuted: this.toggleChannelMuted.bind(this),
+                toggleChannelSolo: this.toggleChannelSolo.bind(this),
+                toggleChannelCollapsed: this.toggleChannelCollapsed.bind(this),
+                setChannelVolume: this.setChannelVolume.bind(this),
+                setChannelInstrument: this.setChannelInstrument.bind(this),
+                setNote: this.setNote.bind(this),
+                setVolumeL: this.setVolumeL.bind(this),
+                setVolumeR: this.setVolumeR.bind(this),
+                addToSequence: this.addToSequence.bind(this),
+                removeFromSequence: this.removeFromSequence.bind(this),
+                moveSequencePattern: this.moveSequencePattern.bind(this),
+                setPatternSize: this.setPatternSize.bind(this),
+                setInstruments: this.setInstruments.bind(this),
             }}>
                 <DockLayout
                     defaultLayout={defaultLayout}

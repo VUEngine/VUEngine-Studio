@@ -1,12 +1,13 @@
 import React from 'react';
 import * as Tone from 'tone';
 import { Synth } from 'tone';
+import { SongNote } from './MusicEditorTypes';
 
 interface MusicPlayerProps {
     currentStep: number
     playing: boolean
     speed: number
-    notes: (string | undefined)[][]
+    song: (SongNote | undefined)[][]
     increaseCurrentStep: () => void
 }
 
@@ -26,18 +27,25 @@ export default class MusicPlayer extends React.Component<MusicPlayerProps> {
     }
 
     playNote(): void {
-        const { currentStep, increaseCurrentStep, notes, playing, speed } = this.props;
+        const { currentStep, increaseCurrentStep, song, playing, speed } = this.props;
 
         if (playing) {
-            notes.forEach((channel, index) => {
+            song.forEach((channel, index) => {
                 const note = channel[currentStep];
-                if (note !== undefined) {
-                    this.synths[index].triggerAttackRelease(note, 0.5);
+                if (typeof note?.volumeL === 'number') {
+                    this.synths[index].volume.value = note!.volumeL!;
+                }
+                if (typeof note?.note === 'string') {
+                    this.synths[index].triggerAttack(note.note, 1);
                 }
             });
             increaseCurrentStep();
 
             this.timer = setTimeout(() => this.playNote(), speed);
+        } else {
+            this.synths.map(synth => {
+                synth.triggerRelease();
+            });
         }
     }
 

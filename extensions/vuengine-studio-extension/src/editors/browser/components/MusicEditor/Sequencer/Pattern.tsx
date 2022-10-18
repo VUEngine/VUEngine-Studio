@@ -1,21 +1,17 @@
 import { nls } from '@theia/core';
-import React, { useState } from 'react';
-import { HIGHEST_NOTE, LOWEST_NOTE, PatternConfig, PATTERN_NOTE_HEIGHT, PATTERN_NOTE_WIDTH } from '../MusicEditorTypes';
+import React, { useContext, useState } from 'react';
+import { HIGHEST_NOTE, LOWEST_NOTE, MusicEditorContext, MusicEditorContextType, PatternConfig, PATTERN_NOTE_HEIGHT, PATTERN_NOTE_WIDTH } from '../MusicEditorTypes';
 
 interface PatternProps {
     index: number
     pattern: PatternConfig
-    currentChannel: number
-    currentPattern: number
     channel: number
     height: number
     patternId: number
-    setCurrentPattern: (channelId: number, patternId: number) => void
-    removeFromSequence: (channelId: number, index: number) => void
-    moveSequencePattern: (channelId: number, from: number, to: number) => void
 }
 
 export default function Pattern(props: PatternProps): JSX.Element {
+    const { state, moveSequencePattern, setCurrentPattern, removeFromSequence } = useContext(MusicEditorContext) as MusicEditorContextType;
     const [dragged, setDragged] = useState<boolean>(false);
     const {
         index,
@@ -23,15 +19,10 @@ export default function Pattern(props: PatternProps): JSX.Element {
         height,
         pattern,
         patternId,
-        currentChannel,
-        currentPattern,
-        setCurrentPattern,
-        removeFromSequence,
-        moveSequencePattern,
     } = props;
 
     const classNames = ['pattern'];
-    if (currentChannel === channel && currentPattern === patternId) {
+    if (state.currentChannel === channel && state.currentPattern === patternId) {
         classNames.push('current');
     }
 

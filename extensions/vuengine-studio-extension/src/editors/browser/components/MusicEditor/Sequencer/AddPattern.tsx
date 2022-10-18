@@ -1,14 +1,14 @@
-import React from 'react';
-import { ChannelConfig } from '../MusicEditorTypes';
+import React, { useContext } from 'react';
+import { ChannelConfig, MusicEditorContext, MusicEditorContextType } from '../MusicEditorTypes';
 
 interface AddPatternProps {
     channel: ChannelConfig
     height: number
-    addToSequence: (channelId: number, patternId: number) => void
 }
 
 export default function AddPattern(props: AddPatternProps): JSX.Element {
-    const { channel, height, addToSequence } = props;
+    const { addToSequence } = useContext(MusicEditorContext) as MusicEditorContextType;
+    const { channel, height } = props;
 
     const classNames = ['addPattern'];
 

@@ -8,6 +8,27 @@ export interface MusicEditorContextType {
     setState: (state: Partial<MusicEditorState>) => void
     songData: SongData
     setSongData: (songData: Partial<SongData>) => void
+    setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
+    setPattern: (channelId: number, patternId: number, pattern: Partial<PatternConfig>) => void
+    playNote: (note: number) => void
+    setCurrentChannel: (id: number) => void
+    setCurrentPattern: (channel: number, pattern: number) => void
+    setCurrentNote: (id: number) => void
+    setCurrentInstrument: (id: number) => void
+    toggleChannelMuted: (channelId: number) => void
+    toggleChannelSolo: (channelId: number) => void
+    toggleChannelCollapsed: (channelId: number) => void
+    setChannelVolume: (volume: number) => void
+    setChannelInstrument: (instrument: number) => void
+    setNote: (index: number, note: number | undefined) => void
+    setVolumeL: (index: number, volume: number | undefined) => void
+    setVolumeR: (index: number, volume: number | undefined) => void
+    addToSequence: (channelId: number, patternId: number) => void
+    removeFromSequence: (channelId: number, index: number) => void
+    moveSequencePattern: (channelId: number, from: number, to: number) => void
+    setPatternSize: (size: number) => void
+    setInstruments: (i: InstrumentConfig[]) => void
+
 }
 
 export interface MusicEditorState {
@@ -18,6 +39,8 @@ export interface MusicEditorState {
     currentPattern: number
     currentNote: number
     currentInstrument: number
+    song: (SongNote | undefined)[][]
+    songLength: number
 }
 
 export interface SongData {
@@ -51,6 +74,12 @@ export interface ChannelConfig {
 
 export interface InstrumentConfig {
     name: string,
+}
+
+export interface SongNote {
+    note: string | undefined
+    volumeL: number | undefined
+    volumeR: number | undefined
 }
 
 export const Notes = [

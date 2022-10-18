@@ -1,24 +1,21 @@
 import { nls } from '@theia/core';
-import React from 'react';
-import { PatternConfig } from '../MusicEditorTypes';
+import React, { useContext } from 'react';
+import { MusicEditorContext, MusicEditorContextType } from '../MusicEditorTypes';
 
 interface NotePropertiesNoteProps {
     index: number
     current: boolean
-    bar: number
     effects: string[]
-    pattern: PatternConfig
     volumeL: number
     volumeR: number
-    setCurrentNote: (id: number) => void
-    setNote: (noteIndex: number, note: number | undefined) => void
 }
 
 export default function NotePropertiesNote(props: NotePropertiesNoteProps): JSX.Element {
-    const { index, current, bar, volumeL, volumeR, effects, /* pattern, */ setCurrentNote, setNote } = props;
+    const { songData, setCurrentNote, setNote } = useContext(MusicEditorContext) as MusicEditorContextType;
+    const { index, current, volumeL, volumeR, effects } = props;
 
     const classNames = ['notePropertiesNote'];
-    if ((index + 1) % bar === 0) {
+    if ((index + 1) % songData.bar === 0) {
         classNames.push('nth');
     }
     if (current) {

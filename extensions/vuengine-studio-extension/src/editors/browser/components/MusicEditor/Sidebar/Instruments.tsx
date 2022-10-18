@@ -1,32 +1,25 @@
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
-import React from 'react';
+import React, { useContext } from 'react';
 import VContainer from '../../../../../core/browser/components/VContainer';
-import { InstrumentConfig } from '../MusicEditorTypes';
+import { MusicEditorContext, MusicEditorContextType } from '../MusicEditorTypes';
 
-interface InstrumentsProps {
-    instruments: InstrumentConfig[]
-    setInstruments: (instruments: InstrumentConfig[]) => void
-    currentInstrument: number
-    setCurrentInstrument: (instrument: number) => void
-}
+export default function Instruments(): JSX.Element {
+    const { state, songData, setInstruments, setCurrentInstrument } = useContext(MusicEditorContext) as MusicEditorContextType;
 
-export default function Instruments(props: InstrumentsProps): JSX.Element {
-    const { instruments, setInstruments, currentInstrument, setCurrentInstrument } = props;
-
-    const instrument = instruments[currentInstrument];
+    const instrument = songData.instruments[state.currentInstrument];
 
     const setName = (name: string) => {
-        const updatedInstruments = [...instruments];
-        updatedInstruments[currentInstrument].name = name;
+        const updatedInstruments = [...songData.instruments];
+        updatedInstruments[state.currentInstrument].name = name;
 
         setInstruments(updatedInstruments);
     };
 
     const addInstrument = () => {
-        setCurrentInstrument(instruments.length);
+        setCurrentInstrument(songData.instruments.length);
         setInstruments([
-            ...instruments,
+            ...songData.instruments,
             {
                 name: 'New'
             }
@@ -40,10 +33,10 @@ export default function Instruments(props: InstrumentsProps): JSX.Element {
         });
         const remove = await dialog.open();
         if (remove) {
-            const updatedInstruments = [...instruments];
-            updatedInstruments.splice(currentInstrument, 1);
+            const updatedInstruments = [...songData.instruments];
+            updatedInstruments.splice(state.currentInstrument, 1);
 
-            setCurrentInstrument(currentInstrument > 0 ? currentInstrument - 1 : 0);
+            setCurrentInstrument(state.currentInstrument > 0 ? state.currentInstrument - 1 : 0);
             // TODO: update references in channels
 
             setInstruments(updatedInstruments);
@@ -57,16 +50,16 @@ export default function Instruments(props: InstrumentsProps): JSX.Element {
                 <select
                     className='theia-select'
                     onChange={e => setCurrentInstrument(parseInt(e.target.value))}
-                    value={currentInstrument}
+                    value={state.currentInstrument}
                 >
-                    {instruments.map((n, i) =>
+                    {songData.instruments.map((n, i) =>
                         <option key={`instrument-select-${i}`} value={i}>{n.name}</option>
                     )}
                 </select>
                 <button
                     className='theia-button secondary'
                     onClick={removeCurrentInstrument}
-                    disabled={instruments.length <= 1}
+                    disabled={songData.instruments.length <= 1}
                 >
                     <i className='fa fa-minus' />
                 </button>

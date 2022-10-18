@@ -1,22 +1,19 @@
-import React from 'react';
-import { Notes } from '../MusicEditorTypes';
+import React, { useContext } from 'react';
+import { MusicEditorContext, MusicEditorContextType, Notes } from '../MusicEditorTypes';
 
 interface PianoRollNoteProps {
     index: number
     noteId: number
-    bar: number
     set: boolean
     current: boolean
-    playNote: (note: number) => void
-    setCurrentNote: (id: number) => void
-    setNote: (noteIndex: number, note: number | undefined) => void
 }
 
 export default function PianoRollNote(props: PianoRollNoteProps): JSX.Element {
-    const { index, noteId, bar, current, set, playNote, setCurrentNote, setNote } = props;
+    const { songData, playNote, setCurrentNote, setNote } = useContext(MusicEditorContext) as MusicEditorContextType;
+    const { index, noteId, current, set } = props;
 
     const classNames = ['pianoRollNote'];
-    if ((index + 1) % bar === 0) {
+    if ((index + 1) % songData.bar === 0) {
         classNames.push('nth');
     }
     if (set) {

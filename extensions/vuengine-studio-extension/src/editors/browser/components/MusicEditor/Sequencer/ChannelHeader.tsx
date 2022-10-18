@@ -1,5 +1,5 @@
-import React from 'react';
-import { ChannelConfig } from '../MusicEditorTypes';
+import React, { useContext } from 'react';
+import { ChannelConfig, MusicEditorContext, MusicEditorContextType } from '../MusicEditorTypes';
 
 interface ChannelHeaderProps {
     channel: ChannelConfig
@@ -7,21 +7,16 @@ interface ChannelHeaderProps {
     muted: boolean
     solo: boolean
     instrumentName: string
-    setCurrentChannel: (id: number) => void
-    toggleChannelMuted: (channelId: number) => void
-    toggleChannelSolo: (channelId: number) => void
 }
 
 export default function ChannelHeader(props: ChannelHeaderProps): JSX.Element {
+    const { setCurrentChannel, toggleChannelMuted, toggleChannelSolo } = useContext(MusicEditorContext) as MusicEditorContextType;
     const {
         channel,
         number,
         muted,
         solo,
         instrumentName,
-        setCurrentChannel,
-        toggleChannelMuted,
-        toggleChannelSolo,
     } = props;
 
     const classNames = ['channelHeader'];
