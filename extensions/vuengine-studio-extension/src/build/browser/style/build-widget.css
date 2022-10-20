@@ -16,6 +16,10 @@
   margin-bottom: var(--theia-ui-padding);
 }
 
+#vesBuildWidget .buildButtons .theia-button {
+  width: 20%;
+}
+
 #vesBuildWidget .theia-button {
   flex-grow: 1;
   margin: 0 var(--theia-ui-padding) 0 0;
@@ -61,16 +65,18 @@
   flex-grow: 1;
 }
 
-#vesBuildWidget .buildStatus > div:last-child {
+#vesBuildWidget .buildStatus>div:last-child {
   font-size: 80%;
 }
 
 #vesBuildWidget .buildStatus .success {
   color: var(--theia-editorSuccess-foreground);
 }
+
 #vesBuildWidget .buildStatus .warning {
   color: var(--theia-editorWarning-foreground);
 }
+
 #vesBuildWidget .buildStatus .error {
   color: var(--theia-editorError-foreground);
 }
@@ -78,6 +84,7 @@
 #vesBuildWidget .buildStatusMeta {
   margin-top: var(--theia-ui-padding);
 }
+
 #vesBuildWidget .buildStatusMeta span {
   margin-right: var(--theia-ui-padding);
 }
@@ -106,6 +113,7 @@
 #vesBuildWidget .buildLogWrapper.filterWarning .buildLogLine:not(.warning) {
   display: none;
 }
+
 #vesBuildWidget .buildLogWrapper.filterError .buildLogLine:not(.error) {
   display: none;
 }
@@ -120,7 +128,7 @@
   overflow: auto;
 }
 
-#vesBuildWidget .buildLog > div {
+#vesBuildWidget .buildLog>div {
   display: table;
   padding: var(--theia-ui-padding) 0;
   width: 100%;

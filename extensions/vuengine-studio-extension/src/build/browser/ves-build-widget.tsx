@@ -8,8 +8,11 @@ import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
 import { VesEmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
+import { VesEmulatorService } from '../../emulator/browser/ves-emulator-service';
 import { VesExportCommands } from '../../export/browser/ves-export-commands';
+import { VesExportService } from '../../export/browser/ves-export-service';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
+import { VesFlashCartService } from '../../flash-cart/browser/ves-flash-cart-service';
 import { VesPluginsPreferenceIds } from '../../plugins/browser/ves-plugins-preferences';
 import { VesBuildCommands } from './ves-build-commands';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
@@ -37,6 +40,12 @@ export class VesBuildWidget extends ReactWidget {
   private readonly vesBuildService: VesBuildService;
   @inject(VesCommonService)
   private readonly vesCommonService: VesCommonService;
+  @inject(VesEmulatorService)
+  private readonly vesEmulatorService: VesEmulatorService;
+  @inject(VesExportService)
+  private readonly vesExportService: VesExportService;
+  @inject(VesFlashCartService)
+  private readonly vesFlashCartService: VesFlashCartService;
   @inject(WorkspaceService)
   private readonly workspaceService: WorkspaceService;
 
@@ -135,11 +144,12 @@ export class VesBuildWidget extends ReactWidget {
     if (this.vesBuildService.buildStatus.active) {
       this.title.className = this.isVisible
         ? 'ves-decorator-progress'
-        : `ves-decorator-progress ves-decorator-progress-${this.vesBuildService.buildStatus.progress}`;
+        : this.vesBuildService.getNumberOfWarnings()
+          ? `ves-decorator-progress ves-decorator-progress-${this.vesBuildService.buildStatus.progress} ves-decorator-progress-with-warnings`
+          : `ves-decorator-progress ves-decorator-progress-${this.vesBuildService.buildStatus.progress}`;
     }
   }
 
-  // TODO: allow queueing run, flash and export
   protected render(): React.ReactNode {
     const buildMode = this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode;
     return (
@@ -148,7 +158,7 @@ export class VesBuildWidget extends ReactWidget {
           {this.vesBuildService.buildStatus.active &&
             this.vesBuildService.buildStatus.progress > -1 && (
               <div className='buildPanel'>
-                <div className={`vesProgressBar ${this.vesBuildService.getNumberOfWarnings() > 0 && 'withWarnings'}`}>
+                <div className={`vesProgressBar ${this.vesBuildService.getNumberOfWarnings() && 'withWarnings'}`}>
                   <div style={{ width: this.vesBuildService.buildStatus.progress + '%' }}></div>
                   <span>
                     {this.vesBuildService.buildStatus.progress === 100 ? (
@@ -177,44 +187,47 @@ export class VesBuildWidget extends ReactWidget {
           )}
           <div className='buildButtons'>
             <button
-              className='theia-button secondary'
+              className='theia-button secondary codicon codicon-circle-slash'
               disabled={!this.vesBuildService.buildStatus.active}
               onClick={this.abort}
               title={nls.localize('vuengine/build/abortBuild', 'Abort build')}
-            >
-              <i className='fa fa-ban'></i>
-            </button>
+            />
             <button
-              className='theia-button secondary'
-              disabled={this.vesBuildService.buildStatus.active || !this.state.outputRomExists}
+              className={`theia-button secondary ${this.vesEmulatorService.isQueued ? 'queued' : 'codicon codicon-run'}`}
               onClick={this.run}
-              title={`${nls.localize('vuengine/emulator/commands/run', 'Run on Emulator')}${this.getKeybindingLabel(VesEmulatorCommands.RUN.id, true)}`}
+              title={this.vesEmulatorService.isQueued
+                ? `${nls.localize('vuengine/emulator/runQueued', 'Run Queued')}...`
+                : `${nls.localize('vuengine/emulator/commands/run', 'Run on Emulator')}${this.getKeybindingLabel(VesEmulatorCommands.RUN.id, true)}`}
             >
-              <i className='fa fa-play'></i>
+              {this.vesEmulatorService.isQueued && <i className='fa fa-hourglass-half'></i>}
             </button>
             <button
-              className='theia-button secondary'
-              disabled={this.vesBuildService.buildStatus.active || !this.state.outputRomExists}
+              className={`theia-button secondary ${this.vesFlashCartService.isQueued ? 'queued' : 'codicon codicon-layout-statusbar'}`}
               onClick={this.flash}
-              title={`${nls.localize('vuengine/flashCarts/commands/flash', 'Flash to Flash Cart')}${this.getKeybindingLabel(VesFlashCartCommands.FLASH.id, true)}`}
+              title={this.vesFlashCartService.isQueued
+                ? `${nls.localize('vuengine/flashCarts/flashingQueued', 'Flashing Queued')}...`
+                : `${nls.localize('vuengine/flashCarts/commands/flash', 'Flash to Flash Cart')}${this.getKeybindingLabel(VesFlashCartCommands.FLASH.id, true)}`}
             >
-              <i className='fa fa-microchip'></i>
+              {this.vesFlashCartService.isQueued && <i className='fa fa-hourglass-half'></i>}
             </button>
             <button
-              className='theia-button secondary'
-              disabled={this.vesBuildService.buildStatus.active || !this.state.outputRomExists}
+              className={`theia-button secondary ${this.vesExportService.isQueued ? 'queued' : 'codicon codicon-desktop-download'}`}
               onClick={this.export}
-              title={`${nls.localize('vuengine/export/commands/export', 'Export ROM...')}${this.getKeybindingLabel(VesExportCommands.EXPORT.id, true)}`}
+              title={this.vesExportService.isQueued
+                ? `${nls.localize('vuengine/export/exportQueued', 'Export Queued')}...`
+                : `${nls.localize('vuengine/export/commands/export', 'Export ROM...')}${this.getKeybindingLabel(VesExportCommands.EXPORT.id, true)}`}
             >
-              <i className='fa fa-share-square-o'></i>
+              {this.vesExportService.isQueued && <i className='fa fa-hourglass-half'></i>}
             </button>
             <button
-              className='theia-button secondary'
-              disabled={this.vesBuildService.buildStatus.active || !this.vesBuildService.buildFolderExists[buildMode]}
+              className={`theia-button secondary ${!this.vesBuildService.isCleaning && 'codicon codicon-trash'}`}
+              disabled={!this.vesBuildService.buildFolderExists[buildMode]}
               onClick={this.clean}
-              title={`${nls.localize('vuengine/build/commands/clean', 'Clean Build Folder')}${this.getKeybindingLabel(VesBuildCommands.CLEAN.id, true)}`}
+              title={this.vesBuildService.isCleaning
+                ? `${nls.localize('vuengine/build/cleaning', 'Cleaning')}...`
+                : `${nls.localize('vuengine/build/commands/clean', 'Clean Build Folder')}${this.getKeybindingLabel(VesBuildCommands.CLEAN.id, true)}`}
             >
-              <i className='fa fa-trash'></i>
+              {this.vesBuildService.isCleaning && <i className='fa fa-cog fa-spin'></i>}
             </button>
           </div>
           {isWindows && !this.vesCommonService.isWslInstalled && (
@@ -452,10 +465,22 @@ export class VesBuildWidget extends ReactWidget {
   };
 
   protected abort = async () => this.vesBuildService.abortBuild();
-  protected run = () => this.commandService.executeCommand(VesEmulatorCommands.RUN.id);
-  protected flash = () => this.commandService.executeCommand(VesFlashCartCommands.FLASH.id);
-  protected export = () => this.commandService.executeCommand(VesExportCommands.EXPORT.id);
-  protected clean = () => this.commandService.executeCommand(VesBuildCommands.CLEAN.id);
+  protected run = () => {
+    this.commandService.executeCommand(VesEmulatorCommands.RUN.id);
+    this.update();
+  };
+  protected flash = () => {
+    this.commandService.executeCommand(VesFlashCartCommands.FLASH.id);
+    this.update();
+  };
+  protected export = () => {
+    this.commandService.executeCommand(VesExportCommands.EXPORT.id);
+    this.update();
+  };
+  protected clean = () => {
+    this.commandService.executeCommand(VesBuildCommands.CLEAN.id);
+    this.update();
+  };
 
   protected openWslDocs = () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'setup/enhancing-build-times-on-windows', false);
 }
