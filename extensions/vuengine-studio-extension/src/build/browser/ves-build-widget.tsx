@@ -283,91 +283,87 @@ export class VesBuildWidget extends ReactWidget {
               : 'buildLogWrapper'
           }
         >
-          {this.vesBuildService.buildStatus.log.length > 0 && (
-            <div className='buildLog'>
-              <div>
-                {this.vesBuildService.buildStatus.log.map(
-                  // TODO: context menu with option to copy (full) error message
-                  (line: BuildLogLine, index: number) => (
-                    line.text !== ''
-                      ? <div
-                        className={`buildLogLine ${line.type}${line.file ? ' hasFileLink' : ''}`}
-                        key={`buildLogLine${index}`}
-                        onClick={e => this.openFile(e, line.file)}
-                        title={`${new Date(line.timestamp).toTimeString().substring(0, 8)} ${line.text}`}
-                      >
-                        <span className='icon'>
-                          {line.type === BuildLogLineType.Error
-                            ? <i className='codicon codicon-error' />
-                            : line.type === BuildLogLineType.Warning
-                              ? <i className='codicon codicon-warning' />
-                              : line.type === BuildLogLineType.Headline
-                                ? <i className='codicon codicon-info' />
-                                : line.type === BuildLogLineType.Done
-                                  ? <i className='codicon codicon-pass-filled' />
-                                  : <></>}
-                        </span>
-                        <span className='text'>
-                          {line.optimizedText ? line.optimizedText : line.text}
-                        </span>
-                      </div>
-                      : <div className='buildLogLine' key={`buildLogLine${index}`}></div>
-                  )
-                )}
-                <div ref={this.buildLogLastElementRef} key={'buildLogLineLast'}></div>
-              </div>
+          <div className='buildLog'>
+            <div>
+              {this.vesBuildService.buildStatus.log.map(
+                // TODO: context menu with option to copy (full) error message
+                (line: BuildLogLine, index: number) => (
+                  line.text !== ''
+                    ? <div
+                      className={`buildLogLine ${line.type}${line.file ? ' hasFileLink' : ''}`}
+                      key={`buildLogLine${index}`}
+                      onClick={e => this.openFile(e, line.file)}
+                      title={`${new Date(line.timestamp).toTimeString().substring(0, 8)} ${line.text}`}
+                    >
+                      <span className='icon'>
+                        {line.type === BuildLogLineType.Error
+                          ? <i className='codicon codicon-error' />
+                          : line.type === BuildLogLineType.Warning
+                            ? <i className='codicon codicon-warning' />
+                            : line.type === BuildLogLineType.Headline
+                              ? <i className='codicon codicon-info' />
+                              : line.type === BuildLogLineType.Done
+                                ? <i className='codicon codicon-pass-filled' />
+                                : <></>}
+                      </span>
+                      <span className='text'>
+                        {line.optimizedText ? line.optimizedText : line.text}
+                      </span>
+                    </div>
+                    : <div className='buildLogLine' key={`buildLogLine${index}`}></div>
+                )
+              )}
+              <div ref={this.buildLogLastElementRef} key={'buildLogLineLast'}></div>
             </div>
-          )}
-        </div>
-        {this.vesBuildService.buildStatus.log.length > 0 && (
-          <div className='buildLogButtons'>
-            <button
-              className="theia-button secondary"
-              title={nls.localize('vuengine/build/toggleAutomaticScrolling', 'Toggle automatic scrolling')}
-              onClick={() => this.toggleAutoScroll()}
-            >
-              <i className={this.state.autoScroll
-                ? 'fa fa-fw fa-long-arrow-down'
-                : 'fa fa-fw fa-minus'
-              }></i>
-            </button>
-            {/* TODO: allow to filter for both warnings AND problems */}
-            <button
-              className={
-                this.state.logFilter === BuildLogLineType.Warning
-                  ? 'theia-button'
-                  : 'theia-button secondary'
-              }
-              title={nls.localize('vuengine/build/showOnlyWarnings', 'Show only warnings')}
-              onClick={() => this.toggleFilter(BuildLogLineType.Warning)}
-            >
-              <i className='fa fa-exclamation-triangle'></i>{' '}
-              {this.vesBuildService.getNumberOfWarnings()}
-            </button>
-            <button
-              className={
-                this.state.logFilter === BuildLogLineType.Error
-                  ? 'theia-button'
-                  : 'theia-button secondary'
-              }
-              title={nls.localize('vuengine/build/showOnlyErrors', 'Show only errors')}
-              onClick={() => this.toggleFilter(BuildLogLineType.Error)}
-            >
-              <i className='fa fa-times-circle-o'></i>{' '}
-              {this.vesBuildService.getNumberOfErrors()}
-            </button>
-            <button
-              className='theia-button secondary'
-              title={nls.localize('vuengine/build/clearLogs', 'clearLogs')}
-              onClick={() => {
-                this.vesBuildService.clearLogs();
-                this.update();
-              }}
-            >
-              <i className='fa fa-trash-o'></i>
-            </button>
           </div>
-        )}
+        </div>
+        <div className='buildLogButtons'>
+          <button
+            className="theia-button secondary"
+            title={nls.localize('vuengine/build/toggleAutomaticScrolling', 'Toggle automatic scrolling')}
+            onClick={() => this.toggleAutoScroll()}
+          >
+            <i className={this.state.autoScroll
+              ? 'fa fa-fw fa-long-arrow-down'
+              : 'fa fa-fw fa-minus'
+            }></i>
+          </button>
+          {/* TODO: allow to filter for both warnings AND problems */}
+          <button
+            className={
+              this.state.logFilter === BuildLogLineType.Warning
+                ? 'theia-button'
+                : 'theia-button secondary'
+            }
+            title={nls.localize('vuengine/build/showOnlyWarnings', 'Show only warnings')}
+            onClick={() => this.toggleFilter(BuildLogLineType.Warning)}
+          >
+            <i className='fa fa-exclamation-triangle'></i>{' '}
+            {this.vesBuildService.getNumberOfWarnings()}
+          </button>
+          <button
+            className={
+              this.state.logFilter === BuildLogLineType.Error
+                ? 'theia-button'
+                : 'theia-button secondary'
+            }
+            title={nls.localize('vuengine/build/showOnlyErrors', 'Show only errors')}
+            onClick={() => this.toggleFilter(BuildLogLineType.Error)}
+          >
+            <i className='fa fa-times-circle-o'></i>{' '}
+            {this.vesBuildService.getNumberOfErrors()}
+          </button>
+          <button
+            className='theia-button secondary'
+            title={nls.localize('vuengine/build/clearLogs', 'clearLogs')}
+            onClick={() => {
+              this.vesBuildService.clearLogs();
+              this.update();
+            }}
+          >
+            <i className='fa fa-trash-o'></i>
+          </button>
+        </div>
         {/* <div className='buildSelector'>
           <select className='theia-select' title='Build'>
             <option value='latest'>

@@ -16,7 +16,8 @@
   margin-bottom: var(--theia-ui-padding);
 }
 
-#vesBuildWidget .buildButtons .theia-button {
+#vesBuildWidget .buildButtons+.buildButtons .theia-button {
+  font-size: 90%;
   width: 20%;
 }
 
