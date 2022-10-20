@@ -6,6 +6,11 @@ import { BuildMode, DEFAULT_BUILD_MODE, PrePostBuildTaskType } from './ves-build
 export namespace VesBuildPreferenceIds {
     export const CATEGORY = 'build';
 
+    export const AUTO_CLOSE_WIDGET_ON_BUILD_START = [CATEGORY, 'autoCloseWidgetOnBuildStart'].join('.');
+    export const AUTO_CLOSE_WIDGET_ON_SUCCESS = [CATEGORY, 'autoCloseWidgetOnSuccess'].join('.');
+    export const AUTO_FILTER_LOGS_ON_ERROR = [CATEGORY, 'autoFilterLogsOnError'].join('.');
+    export const AUTO_FILTER_LOGS_ON_WARNING = [CATEGORY, 'autoFilterLogsOnWarning'].join('.');
+    export const AUTO_OPEN_WIDGET_ON_ERROR = [CATEGORY, 'autoOpenWidgetOnError'].join('.');
     export const BUILD_MODE = [CATEGORY, 'mode'].join('.');
     export const DUMP_ELF = [CATEGORY, 'dumpElf'].join('.');
     export const PEDANTIC_WARNINGS = [CATEGORY, 'pedanticWarnings'].join('.');
@@ -64,7 +69,7 @@ export const VesBuildPreferenceSchema: PreferenceSchema = {
         },
         [VesBuildPreferenceIds.PRE_BUILD_TASKS]: {
             type: 'array',
-            label: 'Pre-Build Tasks',
+            label: nls.localize('vuengine/build/preferences/preBuildTasks', 'Pre-Build Tasks'),
             description: nls.localize('vuengine/build/preferences/preBuildTasksDescription', 'List of Tasks and Commands to execute before building.'),
             items: {
                 type: 'object',
@@ -92,7 +97,7 @@ export const VesBuildPreferenceSchema: PreferenceSchema = {
         },
         [VesBuildPreferenceIds.POST_BUILD_TASKS]: {
             type: 'array',
-            label: 'Post-Build Tasks',
+            label: nls.localize('vuengine/build/preferences/postBuildTasks', 'Post-Build Tasks'),
             description: nls.localize('vuengine/build/preferences/postBuildTasksDescription', 'List of Tasks and Commands to execute after building.'),
             items: {
                 type: 'object',
@@ -115,6 +120,44 @@ export const VesBuildPreferenceSchema: PreferenceSchema = {
                 },
             },
             default: [],
+            scope: PreferenceScope.Folder,
+            overridable: true,
+        },
+        [VesBuildPreferenceIds.AUTO_CLOSE_WIDGET_ON_BUILD_START]: {
+            type: 'boolean',
+            description: nls.localize('vuengine/build/preferences/autoCloseWidgetWhenBuildStarts', 'Automatically close widget when the build starts.'),
+            default: false,
+            scope: PreferenceScope.Folder,
+            overridable: true,
+        },
+        [VesBuildPreferenceIds.AUTO_CLOSE_WIDGET_ON_SUCCESS]: {
+            type: 'boolean',
+            description: nls.localize('vuengine/build/preferences/autoCloseWidgetOnSuccess', 'Automatically close widget when the build succeded.'),
+            default: true,
+            scope: PreferenceScope.Folder,
+            overridable: true,
+        },
+        [VesBuildPreferenceIds.AUTO_FILTER_LOGS_ON_ERROR]: {
+            type: 'boolean',
+            description: nls.localize('vuengine/build/preferences/autoFilterLogsByError', 'Automatically filter build logs to show only errors when the build failed.'),
+            default: false,
+            scope: PreferenceScope.Folder,
+            overridable: true,
+        },
+        [VesBuildPreferenceIds.AUTO_FILTER_LOGS_ON_WARNING]: {
+            type: 'boolean',
+            description: nls.localize(
+                'vuengine/build/preferences/autoFilterLogsByWarning',
+                'Automatically filter build logs to show only warning when the build succeeded with warnings.'
+            ),
+            default: false,
+            scope: PreferenceScope.Folder,
+            overridable: true,
+        },
+        [VesBuildPreferenceIds.AUTO_OPEN_WIDGET_ON_ERROR]: {
+            type: 'boolean',
+            description: nls.localize('vuengine/build/preferences/autoOpenWidgetOnError', 'Automatically open widget when the build failed.'),
+            default: true,
             scope: PreferenceScope.Folder,
             overridable: true,
         },

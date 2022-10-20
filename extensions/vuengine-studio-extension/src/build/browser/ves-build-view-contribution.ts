@@ -32,13 +32,24 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
         }
     }
 
+    protected async hideView(): Promise<void> {
+        const area = this.shell.getAreaFor(await this.widget);
+        if (area && this.shell.isExpanded(area)) {
+            this.toggleView();
+        }
+    }
+
     async registerCommands(commandRegistry: CommandRegistry): Promise<void> {
         super.registerCommands(commandRegistry);
 
         await this.workspaceService.ready;
         if (this.workspaceService.opened) {
             commandRegistry.registerCommand(VesBuildCommands.WIDGET_TOGGLE, {
-                execute: () => this.toggleView()
+                execute: force => force === true
+                    ? this.openView({ activate: true, reveal: true })
+                    : force === false
+                        ? this.hideView()
+                        : this.toggleView()
             });
 
             commandRegistry.registerCommand(VesBuildCommands.WIDGET_EXPAND, {

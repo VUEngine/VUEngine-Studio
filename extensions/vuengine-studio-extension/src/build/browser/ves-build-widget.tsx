@@ -97,12 +97,18 @@ export class VesBuildWidget extends ReactWidget {
         ? 'ves-decorator-warning'
         : 'ves-decorator-success';
       this.state.outputRomExists = await this.vesBuildService.outputRomExists();
+      if (!this.vesBuildService.getNumberOfWarnings() && this.preferenceService.get(VesBuildPreferenceIds.AUTO_FILTER_LOGS_ON_WARNING)) {
+        this.state.logFilter = BuildLogLineType.Warning;
+      }
       this.update();
     });
     this.vesBuildService.onDidFailBuild(async () => {
       this.stopTimerInterval();
       this.title.className = 'ves-decorator-error';
       this.state.outputRomExists = await this.vesBuildService.outputRomExists();
+      if (this.preferenceService.get(VesBuildPreferenceIds.AUTO_FILTER_LOGS_ON_ERROR)) {
+        this.state.logFilter = BuildLogLineType.Error;
+      }
       this.update();
     });
     this.preferenceService.onPreferenceChanged(({ preferenceName }) => {
@@ -336,6 +342,16 @@ export class VesBuildWidget extends ReactWidget {
             >
               <i className='fa fa-times-circle-o'></i>{' '}
               {this.vesBuildService.getNumberOfErrors()}
+            </button>
+            <button
+              className='theia-button secondary'
+              title={nls.localize('vuengine/build/clearLogs', 'clearLogs')}
+              onClick={() => {
+                this.vesBuildService.clearLogs();
+                this.update();
+              }}
+            >
+              <i className='fa fa-trash-o'></i>
             </button>
           </div>
         )}

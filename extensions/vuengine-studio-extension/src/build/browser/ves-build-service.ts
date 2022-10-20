@@ -181,6 +181,10 @@ export class VesBuildService {
     this.onDidChangeBuildStatusEmitter.fire(this._buildStatus);
   }
 
+  clearLogs(): void {
+    this._buildStatus.log = [];
+  }
+
   @postConstruct()
   protected async init(): Promise<void> {
     await this.resetBuildStatus();
@@ -312,14 +316,28 @@ export class VesBuildService {
     this.vesProcessWatcher.onDidReceiveOutputStreamData(onData);
     this.vesProcessWatcher.onDidReceiveErrorStreamData(onData);
 
+    this.onDidStartBuild(async () => {
+      if (this.preferenceService.get(VesBuildPreferenceIds.AUTO_CLOSE_WIDGET_ON_BUILD_START)) {
+        this.commandService.executeCommand(VesBuildCommands.WIDGET_TOGGLE.id, false);
+      }
+    });
+
     this.onDidSucceedBuild(async () => {
       /* await */ this.determineRomSize();
       await this.runPostBuildTasks();
+
+      const numberOfWarnings = this.getNumberOfWarnings();
+      if (!numberOfWarnings && this.preferenceService.get(VesBuildPreferenceIds.AUTO_CLOSE_WIDGET_ON_SUCCESS)) {
+        this.commandService.executeCommand(VesBuildCommands.WIDGET_TOGGLE.id, false);
+      }
     });
 
     this.onDidFailBuild(async () => {
+      console.log('onDidFailBuild');
       this.romSize = 0;
-      this.commandService.executeCommand(VesBuildCommands.WIDGET_TOGGLE.id, true);
+      if (this.preferenceService.get(VesBuildPreferenceIds.AUTO_OPEN_WIDGET_ON_ERROR)) {
+        this.commandService.executeCommand(VesBuildCommands.WIDGET_TOGGLE.id, true);
+      }
     });
   }
 
