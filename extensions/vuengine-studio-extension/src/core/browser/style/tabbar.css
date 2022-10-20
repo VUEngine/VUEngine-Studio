@@ -5,26 +5,27 @@
 /* Custom tabbar decorators */
 .p-TabBar.theia-app-sides .p-TabBar-tab[class*=ves-decorator]:after {
     background-color: var(--theia-activityBarBadge-background);
+    border: 3px solid var(--theia-activityBarBadge-background);
     border-radius: 20px;
     color: var(--theia-activityBarBadge-foreground);
     font-family: FontAwesome;
-    font-size: var(--theia-ui-font-size0);
-    line-height: var(--theia-notification-count-height);
-    padding: 2px;
+    font-size: 14px;
+    height: 14px;
+    line-height: 14px;
     position: absolute;
-    right: var(--theia-ui-padding);
+    right: calc(var(--theia-ui-padding) + 1px);
     text-align: center;
-    top: calc(var(--theia-ui-padding) * 4);
-    width: var(--theia-notification-count-width);
+    top: calc(var(--theia-ui-padding) * 4 - 1px);
+    width: 14px;
 }
 
 .p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-queued:after {
-    animation: pulseQueued 2s infinite linear;
+    animation: hourglass 6s infinite linear;
     content: "\f252";
 }
 
 .p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress:after {
-    /* animation: fa-spin 2s infinite linear; */
+    animation: fa-spin 2s infinite linear;
     content: "\f013";
 }
 
@@ -34,16 +35,19 @@
 
 .p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-success:after {
     background-color: var(--theia-editorSuccess-foreground);
+    border-color: var(--theia-editorSuccess-foreground);
     content: "\f00c";
 }
 
 .p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-warning:after {
     background-color: var(--theia-editorWarning-foreground);
+    border-color: var(--theia-editorWarning-foreground);
     content: "\f071";
 }
 
 .p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-error:after {
     background-color: var(--theia-editorError-foreground);
+    border-color: var(--theia-editorError-foreground);
     content: "\f00d";
 }
 
@@ -449,4 +453,47 @@
 
 .p-TabBar.theia-app-sides .p-TabBar-tab.ves-decorator-progress-100 {
     background-image: linear-gradient(90deg, var(--theia-progressBar-background) 0%, var(--theia-progressBar-background) 100%, transparent 100%);
+}
+
+@keyframes hourglass {
+    0% {
+        content: "\f251";
+        transform: rotate(0deg);
+    }
+
+    5% {
+        content: "\f252";
+    }
+
+    10% {
+        content: "\f253";
+    }
+
+    40% {
+        content: "\f253";
+        transform: rotate(0deg);
+    }
+
+    50% {
+        content: "\f253";
+        transform: rotate(180deg);
+    }
+
+    55% {
+        content: "\f252";
+    }
+
+    60% {
+        content: "\f251";
+    }
+
+    90% {
+        content: "\f251";
+        transform: rotate(180deg);
+    }
+
+    100% {
+        content: "\f251";
+        transform: rotate(360deg);
+    }
 }

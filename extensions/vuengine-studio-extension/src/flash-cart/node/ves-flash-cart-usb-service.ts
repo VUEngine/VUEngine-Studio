@@ -25,7 +25,6 @@ export class VesFlashCartUsbServiceImpl implements VesFlashCartUsbService {
     async detectFlashCarts(...flashCartConfigs: FlashCartConfig[]): Promise<ConnectedFlashCart[]> {
         const connectedFlashCarts = [];
         const devices: usb.Device[] = getDeviceList();
-        // @ts-ignore
         const ports = await SerialPort.list();
         let manufacturer: string | undefined;
         let product: string | undefined;
@@ -48,14 +47,12 @@ export class VesFlashCartUsbServiceImpl implements VesFlashCartUsbService {
                     manufacturer = await new Promise((resolve, reject) => {
                         device.getStringDescriptor(
                             device.deviceDescriptor.iManufacturer,
-                            // @ts-ignore
                             (error, data) => resolve(data)
                         );
                     });
                     product = await new Promise((resolve, reject) => {
                         device.getStringDescriptor(
                             device.deviceDescriptor.iProduct,
-                            // @ts-ignore
                             (error, data) => resolve(data)
                         );
                     });
