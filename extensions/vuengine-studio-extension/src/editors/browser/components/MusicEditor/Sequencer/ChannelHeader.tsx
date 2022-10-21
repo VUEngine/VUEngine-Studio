@@ -10,14 +10,8 @@ interface ChannelHeaderProps {
 }
 
 export default function ChannelHeader(props: ChannelHeaderProps): JSX.Element {
-    const { setCurrentChannel, toggleChannelMuted, toggleChannelSolo } = useContext(MusicEditorContext) as MusicEditorContextType;
-    const {
-        channel,
-        number,
-        muted,
-        solo,
-        instrumentName,
-    } = props;
+    const { getChannelName, setCurrentChannel, toggleChannelMuted, toggleChannelSolo } = useContext(MusicEditorContext) as MusicEditorContextType;
+    const { channel, number, muted, solo, instrumentName } = props;
 
     const classNames = ['channelHeader'];
 
@@ -26,7 +20,9 @@ export default function ChannelHeader(props: ChannelHeaderProps): JSX.Element {
             className='channelInfo'
             onClick={() => setCurrentChannel(number)}
         >
-            <div className='channelName'>Channel {number + 1}</div>
+            <div className='channelName'>
+                {getChannelName(number)}
+            </div>
             <div className='channelInstrument'>
                 {instrumentName}
             </div>

@@ -28,7 +28,7 @@ export interface MusicEditorContextType {
     moveSequencePattern: (channelId: number, from: number, to: number) => void
     setPatternSize: (size: number) => void
     setInstruments: (i: InstrumentConfig[]) => void
-
+    getChannelName: (i: number) => string
 }
 
 export interface MusicEditorState {

@@ -58,7 +58,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                 ...this.props.songData.channels.slice(channelId + 1)
             ]
         });
-    };
+    }
 
     setPattern(channelId: number, patternId: number, pattern: Partial<PatternConfig>): void {
         this.setChannel(channelId, {
@@ -71,7 +71,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                 ...this.props.songData.channels[channelId].patterns.slice(patternId + 1)
             ]
         });
-    };
+    }
 
     playNote(note: number): void {
         if (!this.state.playing) {
@@ -86,7 +86,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
             currentPattern: this.props.songData.channels[id].sequence[0] ?? -1,
             currentNote: -1,
         });
-    };
+    }
 
     setCurrentPattern(channel: number, pattern: number): void {
         this.setState({
@@ -94,26 +94,26 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
             currentPattern: pattern,
             currentNote: -1,
         });
-    };
+    }
 
     setCurrentNote(id: number): void {
         this.setState({
             currentNote: id,
         });
-    };
+    }
 
     setCurrentInstrument(id: number): void {
         this.setState({
             currentInstrument: id,
         });
-    };
+    }
 
     toggleChannelMuted(channelId: number): void {
         this.setChannel(this.state.currentChannel, {
             muted: !this.props.songData.channels[channelId].muted,
             solo: false
         });
-    };
+    }
 
     toggleChannelSolo(channelId: number): void {
         this.setSongData({
@@ -126,26 +126,26 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                 collapsed: false,
             }))
         });
-    };
+    }
 
     toggleChannelCollapsed(channelId: number): void {
         this.setChannel(channelId, {
             collapsed: !this.props.songData.channels[channelId].collapsed,
             solo: this.props.songData.channels[channelId].solo = false,
         });
-    };
+    }
 
     setChannelVolume(volume: number): void {
         this.setChannel(this.state.currentChannel, {
             volume: volume,
         });
-    };
+    }
 
     setChannelInstrument(instrument: number): void {
         this.setChannel(this.state.currentChannel, {
             instrument: instrument,
         });
-    };
+    }
 
     setNote(index: number, note: number | undefined): void {
         const updatedNotes = [...this.props.songData.channels[this.state.currentChannel].patterns[this.state.currentPattern].notes];
@@ -153,7 +153,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
         this.setPattern(this.state.currentChannel, this.state.currentPattern, {
             notes: updatedNotes
         });
-    };
+    }
 
     setVolumeL(index: number, volume: number | undefined): void {
         const updatedVolume = [...this.props.songData.channels[this.state.currentChannel].patterns[this.state.currentPattern].volumeL];
@@ -161,7 +161,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
         this.setPattern(this.state.currentChannel, this.state.currentPattern, {
             volumeL: updatedVolume
         });
-    };
+    }
 
     setVolumeR(index: number, volume: number | undefined): void {
         const updatedVolume = [...this.props.songData.channels[this.state.currentChannel].patterns[this.state.currentPattern].volumeR];
@@ -169,7 +169,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
         this.setPattern(this.state.currentChannel, this.state.currentPattern, {
             volumeR: updatedVolume
         });
-    };
+    }
 
     addToSequence(channelId: number, patternId: number): void {
         const updatedChannel = {
@@ -196,7 +196,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
             currentChannel: channelId,
             currentPattern: patternId,
         });
-    };
+    }
 
     removeFromSequence(channelId: number, index: number): void {
         this.setChannel(channelId, {
@@ -205,7 +205,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                 ...this.props.songData.channels[channelId].sequence.slice(index + 1)
             ],
         });
-    };
+    }
 
     moveSequencePattern(channelId: number, from: number, to: number): void {
         const sequence = [...this.props.songData.channels[channelId].sequence];
@@ -214,22 +214,37 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
         this.setChannel(channelId, {
             sequence: sequence
         });
-    };
+    }
 
     setPatternSize(size: number): void {
         this.setPattern(this.state.currentChannel, this.state.currentPattern, {
             size: size,
         });
-    };
+    }
 
     setSongData(songData: Partial<SongData>): void {
         this.props.updateSongData({ ...this.props.songData, ...songData });
         this.computeSong();
-    };
+    }
 
     setInstruments(i: InstrumentConfig[]): void {
         this.setSongData({ instruments: i });
-    };
+    }
+
+    getChannelName(i: number): string {
+        switch (i) {
+            default:
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+                return `Wave ${i + 1}`;
+            case 4:
+                return 'Sweep';
+            case 5:
+                return 'Noise';
+        }
+    }
 
     async resetLayout(): Promise<void> {
         const dialog = new ConfirmDialog({
@@ -498,6 +513,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                 moveSequencePattern: this.moveSequencePattern.bind(this),
                 setPatternSize: this.setPatternSize.bind(this),
                 setInstruments: this.setInstruments.bind(this),
+                getChannelName: this.getChannelName.bind(this),
             }}>
                 <DockLayout
                     defaultLayout={defaultLayout}

@@ -13,6 +13,7 @@ export default function CurrentChannel(): JSX.Element {
         toggleChannelCollapsed,
         toggleChannelMuted,
         toggleChannelSolo,
+        getChannelName,
     } = useContext(MusicEditorContext) as MusicEditorContextType;
 
     const channel = songData.channels[state.currentChannel];
@@ -26,7 +27,7 @@ export default function CurrentChannel(): JSX.Element {
                 onChange={e => setCurrentChannel(parseInt(e.target.value))}
             >
                 {[...Array(6)].map((n, i) => (
-                    <option key={`select-channel-${i}`} value={i}>{i + 1}</option>
+                    <option key={`select-channel-${i}`} value={i}>{getChannelName(i)}</option>
                 ))}
             </select>
         </VContainer>
