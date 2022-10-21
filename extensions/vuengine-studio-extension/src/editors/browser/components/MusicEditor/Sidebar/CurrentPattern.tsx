@@ -3,10 +3,14 @@ import VContainer from '../../../../../core/browser/components/VContainer';
 import { MusicEditorContext, MusicEditorContextType, PATTERN_SIZES } from '../MusicEditorTypes';
 
 export default function CurrentPattern(): JSX.Element {
-    const { state, songData, setCurrentPattern, setPatternSize } = useContext(MusicEditorContext) as MusicEditorContextType;
+    const { state, songData, setCurrentPattern, setPatternName, setPatternSize } = useContext(MusicEditorContext) as MusicEditorContextType;
 
     const channel = songData.channels[state.currentChannel];
     const pattern = channel.patterns[state.currentPattern];
+
+    const getName = (i: number): string => channel.patterns[i].name
+        ? `${i + 1}: ${channel.patterns[i].name}`
+        : (i + 1).toString();
 
     return <VContainer gap={10}>
         <VContainer>
@@ -17,11 +21,19 @@ export default function CurrentPattern(): JSX.Element {
                 onChange={e => setCurrentPattern(channel.id, parseInt(e.target.value))}
             >
                 {channel.patterns.map((n, i) => (
-                    <option key={`select-pattern-${i}`} value={i}>{i + 1}</option>
+                    <option key={`select-pattern-${i}`} value={i}>{getName(i)}</option>
                 ))}
             </select>
         </VContainer>
 
+        <VContainer>
+            <label>Name</label>
+            <input
+                className='theia-input'
+                value={pattern.name}
+                onChange={e => setPatternName(e.target.value)}
+            />
+        </VContainer>
         <VContainer>
             Size
             <select

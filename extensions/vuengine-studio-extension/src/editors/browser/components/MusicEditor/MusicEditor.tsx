@@ -183,6 +183,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
         const largestPatternId = this.props.songData.channels[channelId].patterns.length - 1;
         if (patternId > largestPatternId) {
             updatedChannel.patterns.push({
+                name: '',
                 size: this.props.songData.defaultPatternSize,
                 notes: [],
                 volumeL: [],
@@ -213,6 +214,12 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
         sequence.splice(to > from ? to - 1 : to, 0, removedPattern!);
         this.setChannel(channelId, {
             sequence: sequence
+        });
+    }
+
+    setPatternName(name: string): void {
+        this.setPattern(this.state.currentChannel, this.state.currentPattern, {
+            name: name,
         });
     }
 
@@ -511,6 +518,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                 addToSequence: this.addToSequence.bind(this),
                 removeFromSequence: this.removeFromSequence.bind(this),
                 moveSequencePattern: this.moveSequencePattern.bind(this),
+                setPatternName: this.setPatternName.bind(this),
                 setPatternSize: this.setPatternSize.bind(this),
                 setInstruments: this.setInstruments.bind(this),
                 getChannelName: this.getChannelName.bind(this),

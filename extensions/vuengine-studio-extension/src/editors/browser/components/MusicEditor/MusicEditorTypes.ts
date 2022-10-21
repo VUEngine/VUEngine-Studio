@@ -26,6 +26,7 @@ export interface MusicEditorContextType {
     addToSequence: (channelId: number, patternId: number) => void
     removeFromSequence: (channelId: number, index: number) => void
     moveSequencePattern: (channelId: number, from: number, to: number) => void
+    setPatternName: (name: string) => void
     setPatternSize: (size: number) => void
     setInstruments: (i: InstrumentConfig[]) => void
     getChannelName: (i: number) => string
@@ -54,6 +55,7 @@ export interface SongData {
 }
 
 export interface PatternConfig {
+    name: string,
     size: number,
     notes: (number | undefined)[]
     volumeL: (number | undefined)[]
