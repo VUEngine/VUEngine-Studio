@@ -11,6 +11,7 @@ export namespace VesEmulatorPreferenceIds {
     export const EMULATOR_STEREO_MODE = [CATEGORY, 'builtIn', 'stereoMode'].join('.');
     export const EMULATOR_EMULATION_MODE = [CATEGORY, 'builtIn', 'emulationMode'].join('.');
     export const EMULATOR_SCALE = [CATEGORY, 'builtIn', 'scale'].join('.');
+    export const EMULATOR_AUTO_QUEUE = [CATEGORY, 'autoQueue'].join('.');
 }
 
 export const VesEmulatorPreferenceSchema: PreferenceSchema = {
@@ -59,7 +60,7 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
             label: 'Stereo Mode',
             description: nls.localize('vuengine/emulator/preferences/builtInStereoModeDescription', 'Stereoscopy display mode of built-in emulator.'),
             enum: Object.keys(EMULATION_STEREO_MODES),
-            /* enumDescriptions: Object.values(EMULATION_STEREO_MODES), */
+            enumItemLabels: Object.values(EMULATION_STEREO_MODES),
             default: Object.keys(EMULATION_STEREO_MODES)[0],
             scope: PreferenceScope.Folder,
             overridable: true,
@@ -69,7 +70,7 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
             label: 'Emulation Mode',
             description: nls.localize('vuengine/emulator/preferences/builtInEmulationModeDescription', 'Emulation mode of built-in emulator.'),
             enum: Object.keys(EMULATION_MODES),
-            /* enumDescriptions: Object.values(EmulationMode), */
+            enumItemLabels: Object.values(EMULATION_MODES),
             default: Object.keys(EMULATION_MODES)[0],
             scope: PreferenceScope.Folder,
             overridable: true,
@@ -79,8 +80,16 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
             label: 'Scale',
             description: nls.localize('vuengine/emulator/preferences/builtInScalingModeDescription', 'Scaling mode of built-in emulator.'),
             enum: Object.keys(EMULATION_SCALES),
-            /* enumDescriptions: Object.values(EMULATION_SCALES), */
+            enumItemLabels: Object.values(EMULATION_SCALES),
             default: Object.keys(EMULATION_SCALES)[0],
+            scope: PreferenceScope.Folder,
+            overridable: true,
+        },
+        [VesEmulatorPreferenceIds.EMULATOR_AUTO_QUEUE]: {
+            type: 'boolean',
+            label: 'Auto Queue',
+            description: nls.localize('vuengine/emulator/preferences/automaticallyQueueWhenBuildStarted', 'Automatically queue when a build is started.'),
+            default: false,
             scope: PreferenceScope.Folder,
             overridable: true,
         },

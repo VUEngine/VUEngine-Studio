@@ -4,13 +4,16 @@ import { FrontendApplicationState, FrontendApplicationStateService } from '@thei
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
-import { FileChangeType } from '@theia/filesystem/lib/common/files';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { FileChangesEvent } from '@theia/filesystem/lib/common/files';
+import { FileChangesEvent, FileChangeType } from '@theia/filesystem/lib/common/files';
 import { ProcessOptions } from '@theia/process/lib/node';
 import { TaskEndedInfo, TaskEndedTypes, TaskService } from '@theia/task/lib/browser/task-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesCommonService } from '../../core/browser/ves-common-service';
+import { VesEmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
+import { VesEmulatorPreferenceIds } from '../../emulator/browser/ves-emulator-preferences';
+import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
+import { VesFlashCartPreferenceIds } from '../../flash-cart/browser/ves-flash-cart-preferences';
 import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
@@ -208,6 +211,12 @@ export class VesBuildService {
       }
     } else {
       this.build();
+      if (this.preferenceService.get(VesEmulatorPreferenceIds.EMULATOR_AUTO_QUEUE)) {
+        this.commandService.executeCommand(VesEmulatorCommands.RUN.id);
+      }
+      if (this.preferenceService.get(VesFlashCartPreferenceIds.FLASH_CARTS_AUTO_QUEUE)) {
+        this.commandService.executeCommand(VesFlashCartCommands.FLASH.id);
+      }
     }
   }
 

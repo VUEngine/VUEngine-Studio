@@ -20,6 +20,7 @@ export namespace VesFlashCartPreferenceIds {
     export const CATEGORY = 'flashCarts';
 
     export const FLASH_CARTS = [CATEGORY, 'configs'].join('.');
+    export const FLASH_CARTS_AUTO_QUEUE = [CATEGORY, 'autoQueue'].join('.');
 }
 
 export const BUILT_IN_FLASH_CART_CONFIGS: Array<FlashCartConfig> = [
@@ -130,6 +131,14 @@ export const VesFlashCartPreferenceSchema: PreferenceSchema = {
                 },
             },
             default: [],
+            scope: PreferenceScope.Folder,
+            overridable: true,
+        },
+        [VesFlashCartPreferenceIds.FLASH_CARTS_AUTO_QUEUE]: {
+            type: 'boolean',
+            label: 'Auto Queue',
+            description: nls.localize('vuengine/flashCarts/preferences/automaticallyQueueWhenBuildStarted', 'Automatically queue when a build is started.'),
+            default: false,
             scope: PreferenceScope.Folder,
             overridable: true,
         },

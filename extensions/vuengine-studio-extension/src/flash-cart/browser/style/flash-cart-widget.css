@@ -15,14 +15,13 @@
 
 #vesFlashCartWidget .flashingActions {
   border-bottom: 1px solid var(--theia-activityBar-background);
+  display: flex;
+  flex-direction: column;
+  gap: var(--theia-ui-padding);
   padding: calc(var(--theia-ui-padding) * 2);
 }
 
-#vesFlashCartWidget .flashingActions .flashingPanel {
-  padding-bottom: var(--theia-ui-padding);
-}
-
-#vesFlashCartWidget > div:last-child {
+#vesFlashCartWidget>div:last-child {
   flex-grow: 1;
   overflow: auto;
 }
@@ -48,21 +47,22 @@
   margin-top: 0;
 }
 
-#vesFlashCartWidget .flashCartInfo > div:first-child {
+#vesFlashCartWidget .flashCartInfo>div:first-child {
   width: 70%;
 }
-#vesFlashCartWidget .flashCartInfo > div:nth-child(2) {
+
+#vesFlashCartWidget .flashCartInfo>div:nth-child(2) {
   padding: 0 calc(var(--theia-ui-padding) * 2);
   width: 30%;
 }
 
-#vesFlashCartWidget .flashCartInfo > div:first-child > div {
+#vesFlashCartWidget .flashCartInfo>div:first-child>div {
   margin: var(--theia-ui-padding) 0;
   padding-left: 24px;
   position: relative;
 }
 
-#vesFlashCartWidget .flashCartInfo > div:first-child > div > i {
+#vesFlashCartWidget .flashCartInfo>div:first-child>div>i {
   left: 0;
   position: absolute;
   top: 1px;
@@ -76,15 +76,16 @@
 #vesFlashCartWidget .infoPanel {
   padding-top: calc(var(--theia-ui-padding) * 2);
 }
-#vesFlashCartWidget .flashCartInfo > div:first-child > div.infoPanel > i {
+
+#vesFlashCartWidget .flashCartInfo>div:first-child>div.infoPanel>i {
   top: calc(1px + (var(--theia-ui-padding) * 2));
 }
 
-#vesFlashCartWidget .infoPanel.success { 
+#vesFlashCartWidget .infoPanel.success {
   color: var(--theia-editorSuccess-foreground);
 }
 
-#vesFlashCartWidget .infoPanel.warning { 
+#vesFlashCartWidget .infoPanel.warning {
   color: var(--theia-editorWarning-foreground);
 }
 
@@ -103,7 +104,7 @@
   overflow: auto;
 }
 
-#vesFlashCartWidget .flashLog > div {
+#vesFlashCartWidget .flashLog>div {
   display: table;
   padding: var(--theia-ui-padding) 0;
   width: 100%;

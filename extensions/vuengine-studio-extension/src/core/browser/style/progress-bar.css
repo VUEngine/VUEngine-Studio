@@ -1,27 +1,27 @@
 .vesProgressBar {
-    background: rgba(0, 0, 0, 0.2);
-    color: var(--theia-progressBar-foreground);
-    line-height: 32px;
-    position: relative;
-    text-align: center;
-  }
-  
-  .vesProgressBar div {
-    background-color: var(--theia-progressBar-background);
-    height: 100%;
-    position: absolute;
-    text-align: center;
-    transition: width 0.5s ease;
-    width: 0px;
-  }
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--theia-progressBar-foreground);
+  line-height: 32px;
+  position: relative;
+  text-align: center;
+}
 
-  .vesProgressBar.withWarnings div {
-    background-color: var(--theia-editorWarning-foreground);
-  }
-  
-  .vesProgressBar span {
-    font-weight: bold;
-    padding: 0 var(--theia-ui-padding);
-    position: relative;
-    z-index: 1;
-  }
+.vesProgressBar div {
+  background-color: var(--theia-progressBar-background);
+  height: 100%;
+  position: absolute;
+  text-align: center;
+  transition: width 0.5s ease;
+  width: 0px;
+}
+
+.vesProgressBar.withWarnings div {
+  background-color: var(--theia-editorWarning-foreground);
+}
+
+.vesProgressBar span {
+  font-weight: bold;
+  padding: 0 var(--theia-ui-padding);
+  position: relative;
+  z-index: 1;
+}

@@ -1,7 +1,11 @@
-#vesEmulatorSidebarWidget {
-  padding: calc(var(--theia-ui-padding) * 2);
-}
-
 #vesEmulatorSidebarWidget .theia-button {
   margin-left: 0;
+}
+
+#vesEmulatorSidebarWidget .runActions {
+  border-bottom: 1px solid var(--theia-activityBar-background);
+  display: flex;
+  flex-direction: column;
+  gap: var(--theia-ui-padding);
+  padding: calc(var(--theia-ui-padding) * 2);
 }
