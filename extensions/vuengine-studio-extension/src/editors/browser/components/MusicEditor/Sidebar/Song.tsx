@@ -7,7 +7,7 @@ export default function Song(): JSX.Element {
     const { songData, setSongData } = useContext(MusicEditorContext) as MusicEditorContextType;
 
     const setName = (n: string): void => {
-        setSongData({ name: n });
+        setSongData({ name: n.trim() });
     };
 
     const setBar = (b: number): void => {

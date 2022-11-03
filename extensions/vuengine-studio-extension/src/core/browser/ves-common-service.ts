@@ -55,6 +55,10 @@ export class VesCommonService {
     return path.replace(/\\/g, '\/').split('/').pop() || '';
   }
 
+  cleanSpecName(name: string): string {
+    return name.replace(/[^A-Za-z0-9_]/g, '');
+  }
+
   protected async determineIsWslInstalled(): Promise<void> {
     if (!isWindows) {
       this.isWslInstalled = false;

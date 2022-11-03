@@ -3,6 +3,7 @@ import { injectable } from '@theia/core/shared/inversify';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import React from 'react';
+import { ImageConverterCompressor } from 'src/image-converter/browser/ves-image-converter-types';
 import Alphabet from './Alphabet/Alphabet';
 import AlphabetSettings from './Alphabet/AlphabetSettings';
 import CharEditor from './CharEditor/CharEditor';
@@ -113,7 +114,7 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
     protected onChangeName(e: React.ChangeEvent<HTMLInputElement>): void {
         this.props.updateFontData({
             ...this.props.fontData,
-            name: e.target.value
+            name: e.target.value.trim()
         });
     }
 
@@ -135,6 +136,12 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
         this.props.updateFontData({
             ...this.props.fontData,
             section: section
+        });
+    }
+    protected setCompression(compression: ImageConverterCompressor): void {
+        this.props.updateFontData({
+            ...this.props.fontData,
+            compression: compression
         });
     }
 
@@ -257,6 +264,21 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
                         value={fontData.name}
                         onChange={this.onChangeName.bind(this)}
                     />
+                </div>
+            </div>
+            <div className='font-properties'>
+                <div>
+                    <label>
+                        {nls.localize('vuengine/fontEditor/compression', 'Compression')}
+                    </label>
+                    <select
+                        className='theia-select'
+                        onChange={e => this.setCompression(e.target.value as ImageConverterCompressor)}
+                        value={fontData.compression}
+                    >
+                        <option value='none'>{nls.localize('vuengine/fontEditor/none', 'None')}</option>
+                        <option value='rle'>RLE</option>
+                    </select>
                 </div>
             </div>
             <div className='editor'>

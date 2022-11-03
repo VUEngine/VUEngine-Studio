@@ -22,7 +22,7 @@ export default class ColumnTableEditor extends React.Component<ColumnTableEditor
     protected onChangeName(e: React.ChangeEvent<HTMLInputElement>): void {
         this.props.updateData({
             ...this.props.data,
-            name: e.target.value
+            name: e.target.value.trim()
         });
     }
 

@@ -1,3 +1,5 @@
+import { ImageConverterCompressor } from '../../../../image-converter/browser/ves-image-converter-types';
+
 export interface FontEditorState {
     active: boolean
     clipboard: number[][] | undefined
@@ -16,6 +18,7 @@ export interface FontData {
     size: Size,
     variableSize: VariableSize,
     section: DataSection,
+    compression: ImageConverterCompressor,
     characters: number[][][]
 }
 

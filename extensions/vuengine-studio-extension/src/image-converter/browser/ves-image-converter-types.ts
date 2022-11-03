@@ -2,7 +2,7 @@ import URI from '@theia/core/lib/common/uri';
 import { MemorySection } from '../../build/browser/ves-build-types';
 
 export interface ImageConverterConfig {
-  images: Array<string>
+  images: string[]
   name: string
   section: MemorySection
   tileset: {
@@ -18,21 +18,23 @@ export interface ImageConverterConfig {
     }
     compress: false | ImageConverterCompressor
   }
-  animation: {
-    isAnimation: boolean
-    individualFiles: boolean
-    frameWidth: number
-    frameHeight: number
-  }
+  animation: AnimationConfig
+}
+
+export interface AnimationConfig {
+  isAnimation: boolean
+  individualFiles: boolean
+  frameWidth: number
+  frameHeight: number
 }
 
 export interface ImageConfigFileToBeConverted {
   imageConfigFileUri: URI
-  images: Array<URI>
+  images: URI[]
   name: string
   config: ImageConverterConfig
-  gritArguments: Array<string>
-  output: Array<ConvertedFileData>
+  gritArguments: string[]
+  output: ConvertedFileData[]
 }
 
 export interface ImageConverterLogLine {
@@ -45,27 +47,23 @@ export interface ImageConverterLogLine {
 export interface ConvertedFileData {
   name: string
   fileUri: URI
-  tilesData: Array<string>
-  mapData: Array<string>
-  frameTileOffsets: Array<number>
+  tilesData: string[]
+  mapData: string[]
+  frameTileOffsets: number[]
   meta: ConvertedFileDataMeta
 }
 
 export interface ConvertedFileDataMeta {
   tilesCount: number
   tilesCompressionRatio?: string
-  mapCompressionRatio?: number
+  mapCompressionRatio?: string
   imageHeight: number
   imageWidth: number
   mapHeight: number
   mapWidth: number
   mapReduceFlipped: boolean
   mapReduceUnique: boolean
-  animation: {
-    isAnimation: boolean
-    individualFiles: boolean
-    frameWidth: number
-    frameHeight: number
+  animation: AnimationConfig & {
     largestFrame: number
   }
 }
@@ -78,6 +76,14 @@ export enum ImageConverterLogLineType {
   Done = 'done',
 }
 
+export const COMPRESSION_FLAG_LENGTH = 1;
+
 export enum ImageConverterCompressor {
   RLE = 'rle',
+}
+
+export interface TilesCompressionResult {
+  tilesData: string[]
+  frameTileOffsets: number[]
+  compressionRatio?: string
 }

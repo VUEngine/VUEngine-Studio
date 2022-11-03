@@ -6,13 +6,15 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileStatWithMetadata } from '@theia/filesystem/lib/common/files';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { deepmerge } from 'deepmerge-ts';
-import { VesCommonService } from '../../core/browser/ves-common-service';
-import { VesGlobService } from '../../glob/common/ves-glob-service-protocol';
 import { MemorySection } from '../../build/browser/ves-build-types';
 import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
+import { VesCommonService } from '../../core/browser/ves-common-service';
+import { VesGlobService } from '../../glob/common/ves-glob-service-protocol';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
+import { compressTiles } from './ves-image-converter-compressor';
 import {
+  COMPRESSION_FLAG_LENGTH,
   ImageConfigFileToBeConverted,
   ImageConverterCompressor,
   ImageConverterConfig,
@@ -44,8 +46,6 @@ const DEFAULT_IMAGE_CONVERTER_CONFIG: ImageConverterConfig = {
     frameHeight: 0
   }
 };
-
-const COMPRESSION_FLAG_LENGTH = 1;
 
 @injectable()
 export class VesImageConverterService {
@@ -418,110 +418,23 @@ export class VesImageConverterService {
   }
 
   protected async handleCompression(imageConfigFileToBeConverted: ImageConfigFileToBeConverted): Promise<ImageConfigFileToBeConverted> {
-    if (imageConfigFileToBeConverted.config.tileset.compress === ImageConverterCompressor.RLE) {
-      imageConfigFileToBeConverted = this.compressTilesRle(imageConfigFileToBeConverted);
+    if (imageConfigFileToBeConverted.config.tileset.compress !== false) {
+      imageConfigFileToBeConverted.output.map(output => {
+        const compressionResult = compressTiles(
+          output.tilesData,
+          imageConfigFileToBeConverted.config.tileset.compress as ImageConverterCompressor,
+          imageConfigFileToBeConverted.config.animation
+        );
+        output.tilesData = compressionResult.tilesData;
+        output.frameTileOffsets = compressionResult.frameTileOffsets;
+        output.meta.tilesCompressionRatio = compressionResult.compressionRatio;
+      });
     }
 
-    if (imageConfigFileToBeConverted.config.map.compress === ImageConverterCompressor.RLE) {
-      imageConfigFileToBeConverted = this.compressMapRle(imageConfigFileToBeConverted);
+    if (imageConfigFileToBeConverted.config.map.compress !== false) {
+      // TODO
     }
 
-    return imageConfigFileToBeConverted;
-  }
-
-  // Normal RLE applied to pixel pairs (4 bits or 1 hexadecimal digit)
-  protected compressTilesRle(imageConfigFileToBeConverted: ImageConfigFileToBeConverted): ImageConfigFileToBeConverted {
-    let uncompressedLength = 0;
-    let compressedData: Array<string> = [];
-    let currentBlock = '';
-    let counter = 0;
-    let currentDigit = '';
-
-    const isSpritesheet = imageConfigFileToBeConverted.config.animation.isAnimation && !imageConfigFileToBeConverted.config.animation.individualFiles;
-    const spritesheetFrameSize = (4 * imageConfigFileToBeConverted.config.animation.frameWidth * imageConfigFileToBeConverted.config.animation.frameHeight) || 4;
-
-    imageConfigFileToBeConverted.output.map(output => {
-      uncompressedLength = output.tilesData.length;
-      if (!uncompressedLength) {
-        return output;
-      }
-      compressedData = [];
-      currentBlock = '';
-      counter = 0;
-      currentDigit = output.tilesData[0][0] ?? '';
-
-      if (isSpritesheet) {
-        output.frameTileOffsets = [COMPRESSION_FLAG_LENGTH];
-      }
-
-      for (const [index, tileData] of output.tilesData.entries()) {
-        for (const digit of tileData) {
-          if (digit === currentDigit) {
-            if (counter === 16) {
-              currentBlock += (counter - 1).toString(16).toUpperCase() + currentDigit;
-              if (currentBlock.length === 8) {
-                compressedData.push(currentBlock);
-                currentBlock = '';
-              }
-              counter = 1;
-            } else {
-              counter++;
-            }
-          } else {
-            currentBlock += (counter - 1).toString(16).toUpperCase() + currentDigit;
-            if (currentBlock.length === 8) {
-              compressedData.push(currentBlock);
-              currentBlock = '';
-            }
-            currentDigit = digit;
-            counter = 1;
-          }
-        }
-
-        if (isSpritesheet && ((index + 1) % spritesheetFrameSize === 0)) {
-          // right-pad individual frames
-          if (currentBlock.length > 0) {
-            compressedData.push(currentBlock.padEnd(8, '0'));
-          }
-
-          output.frameTileOffsets.push(compressedData.length);
-        }
-      };
-
-      currentBlock += (counter - 1).toString(16).toUpperCase() + currentDigit;
-      // right-pad last block
-      compressedData.push(currentBlock.padEnd(8, '0'));
-
-      output.tilesData = compressedData;
-      output.meta.tilesCompressionRatio = (- ((uncompressedLength - compressedData.length) / uncompressedLength * 100)).toFixed(2);
-
-      if (isSpritesheet) {
-        output.frameTileOffsets.pop();
-      }
-    });
-
-    return imageConfigFileToBeConverted;
-  }
-
-  /* protected prependTilesCompressionFlag(imageConfigFileToBeConverted: ImageConfigFileToBeConverted): ImageConfigFileToBeConverted {
-    let compressionFlag = '00000000';
-    switch (imageConfigFileToBeConverted.config.tileset.compress) {
-      case ImageConverterCompressor.RLE:
-        compressionFlag = '00000001';
-        break;
-    }
-
-    imageConfigFileToBeConverted.output.map(output => {
-      if (output.tilesData.length) {
-        output.tilesData.unshift(compressionFlag);
-      }
-    });
-
-    return imageConfigFileToBeConverted;
-  } */
-
-  protected compressMapRle(imageConfigFileToBeConverted: ImageConfigFileToBeConverted): ImageConfigFileToBeConverted {
-    // TODO
     return imageConfigFileToBeConverted;
   }
 

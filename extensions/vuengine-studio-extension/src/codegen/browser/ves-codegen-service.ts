@@ -9,6 +9,8 @@ import * as iconv from 'iconv-lite';
 import * as nunjucks from 'nunjucks';
 import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
+import { compressTiles } from '../../image-converter/browser/ves-image-converter-compressor';
+import { AnimationConfig, ImageConverterCompressor, TilesCompressionResult } from '../../image-converter/browser/ves-image-converter-types';
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import {
@@ -249,7 +251,7 @@ export class VesCodeGenService {
     // @ts-ignore
     env.addFilter('typeId', (arr: unknown[], typeId: string) => arr.filter(item => item.typeId === typeId));
 
-    env.addFilter('sanitizeSpecName', (value: string) => value.replace(/[^A-Za-z0-9_]/g, ''));
+    env.addFilter('sanitizeSpecName', (value: string) => this.vesCommonService.cleanSpecName(value));
 
     env.addFilter('toUpperSnakeCase', (value: string) => this.toUpperSnakeCase(value));
 
@@ -266,15 +268,24 @@ export class VesCodeGenService {
 
     env.addFilter('hexToInt', (value: string) => parseInt(value, 16));
 
-    env.addFilter('intToHex', (value: number, length?: number) => value.toString(16).toUpperCase().padStart(
-      length === 8 ? 10 : length === 2 ? 4 : 6,
-      length === 8 ? '0x00000000' : length === 2 ? '0x00' : '0x0000'
-    ));
+    env.addFilter('intToHex', (value: number, length?: number) => {
+      // catch null
+      if (!value) {
+        value = 0;
+      }
+      return value.toString(16).toUpperCase().padStart(
+        length === 8 ? 10 : length === 2 ? 4 : 6,
+        length === 8 ? '0x00000000' : length === 2 ? '0x00' : '0x0000'
+      );
+    });
 
-    env.addFilter('intToBin', (value: number, length?: number) => value.toString(2).padStart(
-      length ?? 8,
-      '0'
-    ));
+    env.addFilter('intToBin', (value: number, length?: number) => {
+      // catch null
+      if (!value) {
+        value = 0;
+      }
+      return value.toString(2).padStart(length ?? 8, '0');
+    });
 
     env.addFilter('binToHex', (value: string) => parseInt(value, 2).toString(16).toUpperCase());
 
@@ -296,6 +307,10 @@ export class VesCodeGenService {
       const exists = await this.fileService.exists(new URI(value).withScheme('file'));
       return exists;
     }); */
+
+    env.addGlobal('compressTiles', (tilesData: string[], compressor: ImageConverterCompressor, animationConfig: AnimationConfig): TilesCompressionResult =>
+      compressTiles(tilesData, compressor, animationConfig)
+    );
   }
 
   protected toUpperSnakeCase(key: string): string {

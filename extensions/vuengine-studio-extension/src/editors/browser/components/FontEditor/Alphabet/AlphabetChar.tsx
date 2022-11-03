@@ -41,8 +41,10 @@ export default function AlphabetChar(props: AlphabetCharProps): JSX.Element {
                 if (!variableSize.enabled || x < (variableSize.x[line * 16 + index] ?? charWidth)) {
                     const pixelSize = (charWidth > 16 || charHeight > 16) ? 1 : 2;
                     const color = charData && charData[y] && charData[y][x] ? charData[y][x] : 0;
+                    const xPos = (x + 1) * pixelSize;
+                    const yPos = (y + 1) * pixelSize;
                     boxShadow.push(
-                        `${(x + 1) * pixelSize}px ${(y + 1) * pixelSize}px 0 0 ${PALETTE_COLORS[color]}`
+                        `${xPos}px ${yPos}px 0 0 ${PALETTE_COLORS[color]}`
                     );
                 }
             });
