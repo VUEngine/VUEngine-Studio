@@ -16,7 +16,7 @@
   margin-bottom: var(--theia-ui-padding);
 }
 
-#vesBuildWidget .buildButtons+.buildButtons .theia-button {
+#vesBuildWidget .buildButtons .theia-button {
   font-size: 90%;
   width: 20%;
 }
@@ -32,6 +32,7 @@
 }
 
 #vesBuildWidget .theia-button.build {
+  font-size: 100%;
   width: 100%;
 }
 
@@ -101,8 +102,8 @@
 }
 
 #vesBuildWidget .buildLogButtons .theia-button {
-  flex-grow: 1;
-  font-size: 75%;
+  font-size: 90%;
+  width: 25%;
 }
 
 #vesBuildWidget .buildLogWrapper {
