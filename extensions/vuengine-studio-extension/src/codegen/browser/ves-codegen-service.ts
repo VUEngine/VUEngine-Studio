@@ -249,7 +249,7 @@ export class VesCodeGenService {
     // @ts-ignore
     env.addFilter('typeId', (arr: unknown[], typeId: string) => arr.filter(item => item.typeId === typeId));
 
-    env.addFilter('sanitizeSpecName', (value: string) => value.replace(/[^A-Za-z0-9]/g, ''));
+    env.addFilter('sanitizeSpecName', (value: string) => value.replace(/[^A-Za-z0-9_]/g, ''));
 
     env.addFilter('toUpperSnakeCase', (value: string) => this.toUpperSnakeCase(value));
 

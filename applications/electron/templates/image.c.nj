@@ -1,3 +1,5 @@
+{%- set sanitizedSpecName = name | sanitizeSpecName -%}
+
 {#- prepend tile data with a custom compression algorithm flag -#}
 {%- if tilesData.length -%}
     {%- if tilesCompression is defined and tilesCompression != false -%}
@@ -7,14 +9,14 @@
     {%- endif -%}
 {%- endif -%}
 
-{%- set reducedTiles = 'unreduced' -%}
+{%- set reducedTilesLabel = 'unreduced' -%}
 {%- if meta.mapReduceFlipped is defined and meta.mapReduceUnique is defined -%}
     {%- if meta.mapReduceFlipped and meta.mapReduceUnique -%}
-        {%- set reducedTiles = 'reduced by non-unique and flipped tiles' -%}
+        {%- set reducedTilesLabel = 'reduced by non-unique and flipped tiles' -%}
     {%- elseif meta.mapReduceFlipped -%}
-        {%- set reducedTiles = 'reduced by flipped tiles' -%}
+        {%- set reducedTilesLabel = 'reduced by flipped tiles' -%}
     {%- elseif meta.mapReduceUnique -%}
-        {%- set reducedTiles = 'reduced by non-unique tiles' -%}
+        {%- set reducedTilesLabel = 'reduced by non-unique tiles' -%}
     {%- endif -%}
 {%- endif -%}
 
@@ -34,10 +36,10 @@
 
 //---------------------------------------------------------------------------------------------------------
 //
-//  {{ name }}
+//  {{ sanitizedSpecName }}
 //  • {{ meta.imageWidth }}×{{ meta.imageHeight }} pixels
 {%- if tilesData.length %}
-//  • {{ meta.tilesCount }} tiles, {{ reducedTiles }}, {{ tilesCompressionLabel }}
+//  • {{ meta.tilesCount }} tiles, {{ reducedTilesLabel }}, {{ tilesCompressionLabel }}
 {%- endif %}
 {%- if mapData.length %}
 //  • {{ meta.mapWidth }}×{{ meta.mapHeight }} map, not compressed
@@ -55,7 +57,7 @@
 //
 //---------------------------------------------------------------------------------------------------------
 {% if tilesData.length %}
-const uint32 {{ name }}Tiles[{{ tilesData.length }}] __attribute__((aligned(4))){% if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
+const uint32 {{ sanitizedSpecName }}Tiles[{{ tilesData.length }}] __attribute__((aligned(4))){% if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
     {% for tileData in tilesData -%}
     0x{{ tileData }},
@@ -63,7 +65,7 @@ const uint32 {{ name }}Tiles[{{ tilesData.length }}] __attribute__((aligned(4)))
     {%- endfor %}
 };
 {% endif %}{% if mapData.length %}
-const uint16 {{ name }}Map[{{ mapData.length }}] __attribute__((aligned(4))){% if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
+const uint16 {{ sanitizedSpecName }}Map[{{ mapData.length }}] __attribute__((aligned(4))){% if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
     {% for mapTile in mapData -%}
     0x{{ mapTile }},
@@ -71,7 +73,7 @@ const uint16 {{ name }}Map[{{ mapData.length }}] __attribute__((aligned(4))){% i
     {%- endfor %}
 };
 {% endif %}{% if frameTileOffsets.length %}
-const uint32 {{ name }}TilesFrameOffsets[{{ frameTileOffsets.length }}] __attribute__((aligned(4))){% if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
+const uint32 {{ sanitizedSpecName }}TilesFrameOffsets[{{ frameTileOffsets.length }}] __attribute__((aligned(4))){% if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
     {% for frameTileOffset in frameTileOffsets -%}
     {{ frameTileOffset | intToHex(8) }},

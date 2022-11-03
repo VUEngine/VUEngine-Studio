@@ -438,9 +438,7 @@ export class VesImageConverterService {
     let currentDigit = '';
 
     const isSpritesheet = imageConfigFileToBeConverted.config.animation.isAnimation && !imageConfigFileToBeConverted.config.animation.individualFiles;
-    const frameSize = isSpritesheet
-      ? (32 * imageConfigFileToBeConverted.config.animation.frameWidth * imageConfigFileToBeConverted.config.animation.frameHeight) || 32
-      : 32;
+    const spritesheetFrameSize = (4 * imageConfigFileToBeConverted.config.animation.frameWidth * imageConfigFileToBeConverted.config.animation.frameHeight) || 4;
 
     imageConfigFileToBeConverted.output.map(output => {
       uncompressedLength = output.tilesData.length;
@@ -480,7 +478,7 @@ export class VesImageConverterService {
           }
         }
 
-        if (isSpritesheet && (index + 1) % frameSize === 0) {
+        if (isSpritesheet && ((index + 1) % spritesheetFrameSize === 0)) {
           // right-pad individual frames
           if (currentBlock.length > 0) {
             compressedData.push(currentBlock.padEnd(8, '0'));
@@ -504,6 +502,23 @@ export class VesImageConverterService {
 
     return imageConfigFileToBeConverted;
   }
+
+  /* protected prependTilesCompressionFlag(imageConfigFileToBeConverted: ImageConfigFileToBeConverted): ImageConfigFileToBeConverted {
+    let compressionFlag = '00000000';
+    switch (imageConfigFileToBeConverted.config.tileset.compress) {
+      case ImageConverterCompressor.RLE:
+        compressionFlag = '00000001';
+        break;
+    }
+
+    imageConfigFileToBeConverted.output.map(output => {
+      if (output.tilesData.length) {
+        output.tilesData.unshift(compressionFlag);
+      }
+    });
+
+    return imageConfigFileToBeConverted;
+  } */
 
   protected compressMapRle(imageConfigFileToBeConverted: ImageConfigFileToBeConverted): ImageConfigFileToBeConverted {
     // TODO
