@@ -21,15 +21,24 @@
   margin: 0;
 }
 
-.jsonforms-container .control>input,
-.jsonforms-container .control>select {
-  order: 3;
-}
-
 .jsonforms-container .control>.input-description {
   /* font-size: 80%; */
   opacity: .5;
   order: 2;
+}
+
+.jsonforms-container .control>input,
+.jsonforms-container .control>select,
+.jsonforms-container .control>.input {
+  order: 3;
+}
+
+.jsonforms-container .control>.validation {
+  order: 2;
+}
+
+.jsonforms-container .control>.validation_error {
+  color: var(--theia-errorForeground);
 }
 
 .jsonforms-container .control>.input-description:empty {

@@ -122,9 +122,14 @@ export class VesEmulatorWidget extends ReactWidget {
     return this.state.loaded;
   }
 
-  async reload(): Promise<void> {
-    if (this.iframeRef.current) {
+  async reload(deleteSram = false): Promise<void> {
+    if (deleteSram) {
+      this.sendCommand('deleteSram');
+    } else {
       this.sendCommand('saveSram');
+    }
+
+    if (this.iframeRef.current) {
       const currentIframeRef = this.iframeRef.current;
       setTimeout(async () => {
         this.sendCoreOptions();
@@ -591,17 +596,14 @@ export class VesEmulatorWidget extends ReactWidget {
             >
               <i className='fa fa-camera'></i>
             </button>
-            { /* }
-            // TODO: Investigate why the clean command does not work
             <button
               className='theia-button secondary'
-              title='Clear Emulator Cache'
-              onClick={this.cleanStorage}
+              title='Delete SRAM and restart'
+              onClick={this.deleteSramAndRestart}
               disabled={!this.state.loaded || this.state.showControls}
             >
               <i className='fa fa-trash-o'></i>
             </button>
-            { */ }
             <button
               className={
                 this.state.showControls
@@ -980,6 +982,11 @@ export class VesEmulatorWidget extends ReactWidget {
     return keybindingAccelerator;
   }
 
+  protected deleteSramAndRestart = async () => {
+    this.reload(true);
+  };
+
+  // TODO: Investigate why the clean command does not work
   protected cleanStorage = async () => {
     const romPath = await this.getRomPath();
     const dbName = `RetroArch ${romPath}`;
