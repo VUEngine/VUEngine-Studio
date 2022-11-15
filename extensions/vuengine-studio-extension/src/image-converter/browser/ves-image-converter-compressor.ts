@@ -68,20 +68,26 @@ function compressTilesRle(tilesData: string[], animationConfig: AnimationConfig)
         compressedData.push(currentBlock.padEnd(8, '0'));
       }
 
+      // reset variables
+      currentBlock = '';
+      counter = 0;
+      currentDigit = tilesData[index + 1] ? tilesData[index + 1][0] : '';
+
+      // save tile offset
       result.frameTileOffsets.push(compressedData.length + COMPRESSION_FLAG_LENGTH);
     }
   };
 
-  currentBlock += (counter - 1).toString(16).toUpperCase() + currentDigit;
-  // right-pad last block
-  compressedData.push(currentBlock.padEnd(8, '0'));
+  if (isSpritesheet) {
+    result.frameTileOffsets.pop();
+  } else {
+    currentBlock += (counter - 1).toString(16).toUpperCase() + currentDigit;
+    // right-pad last block
+    compressedData.push(currentBlock.padEnd(8, '0'));
+  }
 
   result.tilesData = compressedData;
   result.compressionRatio = (- ((uncompressedLength - compressedData.length) / uncompressedLength * 100)).toFixed(2);
-
-  if (isSpritesheet) {
-    result.frameTileOffsets.pop();
-  }
 
   return result;
 }
