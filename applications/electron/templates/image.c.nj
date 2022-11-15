@@ -1,14 +1,5 @@
 {%- set sanitizedSpecName = name | sanitizeSpecName -%}
 
-{#- prepend tile data with a custom compression algorithm flag -#}
-{%- if tilesData.length -%}
-    {%- if tilesCompression is defined and tilesCompression != false -%}
-        {%- set tilesData = (tilesData.unshift('00000001'),tilesData) -%}
-    {%- else -%}
-        {%- set tilesData = (tilesData.unshift('00000000'),tilesData) -%}
-    {%- endif -%}
-{%- endif -%}
-
 {%- set reducedTilesLabel = 'unreduced' -%}
 {%- if meta.mapReduceFlipped is defined and meta.mapReduceUnique is defined -%}
     {%- if meta.mapReduceFlipped and meta.mapReduceUnique -%}
@@ -48,17 +39,23 @@
 //  • {{ frameTileOffsets.length }} animation frames{% if meta.animation.frameWidth > 0 and meta.animation.frameHeight > 0 %}, {{ meta.animation.frameWidth }}×{{ meta.animation.frameHeight }}{% endif %}, {% if meta.animation.individualFiles %}individual files{% else %}spritesheet{% endif %}{% if meta.animation.largestFrame > 0 %}, largest frame: {{meta.animation.largestFrame}} tiles{% endif %}
 {%- endif %}
 {%- if tilesData.length and mapData.length %}
-//  Size: {{ tilesData.length * 4 }} + {{ mapData.length * 2 }} = {{ (tilesData.length * 4) + (mapData.length * 2) }}
+//  Size: {{ (tilesData.length + 1) * 4 }} + {{ mapData.length * 2 }} = {{ ((tilesData.length + 1) * 4) + (mapData.length * 2) }}
 {%- elseif tilesData.length %}
-//  Size: {{ tilesData.length * 4 }}
+//  Size: {{ (tilesData.length + 1) * 4 }}
 {%- elseif mapData.length %}
 //  Size: {{ mapData.length * 2 }}
 {%- endif %}
 //
 //---------------------------------------------------------------------------------------------------------
 {% if tilesData.length %}
-const uint32 {{ sanitizedSpecName }}Tiles[{{ tilesData.length }}] __attribute__((aligned(4))){% if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
+const uint32 {{ sanitizedSpecName }}Tiles[{{ (tilesData.length + 1) }}] __attribute__((aligned(4))){% if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
+    {# prepend tile data with a custom compression algorithm flag -#}
+    {%- if tilesCompression is defined and tilesCompression != false -%}
+        0x00000001,
+    {%- else -%}
+        0x00000000,
+    {%- endif %}
     {% for tileData in tilesData -%}
     0x{{ tileData }},
     {%- if loop.index % 8 == 0 and not loop.last %}{{ "\n    " }}{% endif -%}

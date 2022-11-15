@@ -68,7 +68,7 @@ function compressTilesRle(tilesData: string[], animationConfig: AnimationConfig)
         compressedData.push(currentBlock.padEnd(8, '0'));
       }
 
-      result.frameTileOffsets.push(compressedData.length);
+      result.frameTileOffsets.push(compressedData.length + COMPRESSION_FLAG_LENGTH);
     }
   };
 
