@@ -1,3 +1,8 @@
+#vesEmulatorSidebarWidget {
+  display: flex;
+  flex-direction: column;
+}
+
 #vesEmulatorSidebarWidget .theia-button {
   margin-left: 0;
 }
@@ -8,4 +13,52 @@
   flex-direction: column;
   gap: var(--theia-ui-padding);
   padding: calc(var(--theia-ui-padding) * 2);
+}
+
+#vesEmulatorSidebarWidget .emulatorConfigs {
+  flex-grow: 1;
+  overflow: auto;
+}
+
+#vesEmulatorSidebarWidget .emulatorConfigs .emulatorConfigsActions {
+  padding: calc(var(--theia-ui-padding) * 2);
+}
+
+#vesEmulatorSidebarWidget .emulatorConfig {
+  border-bottom: 1px solid var(--theia-activityBar-background);
+  display: flex;
+  flex-direction: column;
+  gap: var(--theia-ui-padding);
+  padding: calc(var(--theia-ui-padding) * 2);
+}
+
+#vesEmulatorSidebarWidget .emulatorConfig>div {
+  display: flex;
+  gap: var(--theia-ui-padding);
+  justify-content: space-between;
+}
+
+#vesEmulatorSidebarWidget .emulatorConfig>div>div {
+  align-items: end;
+  display: flex;
+}
+
+#vesEmulatorSidebarWidget .emulatorConfig label {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: 4px;
+}
+
+#vesEmulatorSidebarWidget .emulatorConfig button {
+  height: calc(2 * var(--theia-border-width) + var(--theia-content-line-height) + 2px);
+  min-width: 32px;
+  width: 32px;
+}
+
+#vesEmulatorSidebarWidget .emulatorConfig textarea {
+  line-height: 120%;
+  min-height: calc(2 * var(--theia-border-width) + var(--theia-content-line-height) + 2px);
+  padding: 3px 5px;
+  resize: vertical;
 }

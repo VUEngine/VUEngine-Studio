@@ -144,6 +144,7 @@ export class VesFlashCartService {
 
   async doFlash(): Promise<void> {
     const outputRomExists = await this.vesBuildService.outputRomExists();
+    console.log('outputRomExists', outputRomExists);
     if (this.isQueued) {
       this.isQueued = false;
     } else if (this.vesBuildService.buildStatus.active) {
@@ -162,6 +163,7 @@ export class VesFlashCartService {
   }
 
   async flash(): Promise<void> {
+    console.log('flash()');
     if (!this.atLeastOneCanHoldRom || this.connectedFlashCarts.length === 0) {
       return;
     }
@@ -206,12 +208,16 @@ export class VesFlashCartService {
           .split(' ')
         : [];
 
+      console.log('await this.fixPermissions()');
+
       await this.fixPermissions();
 
+      console.log('LAUNCH PROC');
       const { processManagerId } = await this.vesProcessService.launchProcess(VesProcessType.Terminal, {
         command: flasherPath,
         args: flasherArgs,
       });
+      console.log('processManagerId', processManagerId);
 
       connectedFlashCart.status = {
         ...connectedFlashCart.status,
@@ -220,10 +226,10 @@ export class VesFlashCartService {
         progress: 0,
         log: [],
       };
-
-      // trigger change event
-      this.connectedFlashCarts = this.connectedFlashCarts;
     }
+
+    // trigger change event
+    this.connectedFlashCarts = this.connectedFlashCarts;
 
     this.isFlashing = true;
     this.onDidStartFlashingEmitter.fire();
@@ -364,9 +370,12 @@ export class VesFlashCartService {
     });
   }
 
-  protected processStreamData(pId: number, data: any): void { /* eslint-disable-line */
+  protected processStreamData(pId: number, data: any): void {
+    console.log('processStreamData', pId, data);
     for (const connectedFlashCart of this.connectedFlashCarts) {
+      console.log('ID check', connectedFlashCart.status.processId, pId);
       if (connectedFlashCart.status.processId === pId) {
+        console.log('ID match', connectedFlashCart.config.name);
         connectedFlashCart.status.log.push({
           timestamp: Date.now(),
           text: data
@@ -376,10 +385,10 @@ export class VesFlashCartService {
         this.parseStreamDataHyperFlasherCli32(connectedFlashCart, data);
         this.parseStreamDataHyperBoyCli(connectedFlashCart, data);
       }
-    }
 
-    // trigger change event
-    this.connectedFlashCarts = this.connectedFlashCarts;
+      // trigger change event
+      this.connectedFlashCarts = this.connectedFlashCarts;
+    }
   }
 
   protected async replaceFlasherPath(flasherPath: string): Promise<string> {
@@ -424,7 +433,7 @@ export class VesFlashCartService {
     return workspaceRootUri.resolve('build').resolve(`outputPadded${size}.vb`);
   }
 
-  protected async parseStreamDataHyperFlasherCli32(connectedFlashCart: ConnectedFlashCart, data: any): Promise<void> { /* eslint-disable-line */
+  protected async parseStreamDataHyperFlasherCli32(connectedFlashCart: ConnectedFlashCart, data: any): Promise<void> {
     if (connectedFlashCart.config.path === HFCLI_PLACEHOLDER) {
       /* - Number of # is only fixed (to 20) on HF32 firmware version 1.9 and above.
         On lower firmwares, the number of # depends on file size.
@@ -451,7 +460,7 @@ export class VesFlashCartService {
     }
   }
 
-  protected async parseStreamDataHyperBoyCli(connectedFlashCart: ConnectedFlashCart, data: any): Promise<void> { /* eslint-disable-line */
+  protected async parseStreamDataHyperBoyCli(connectedFlashCart: ConnectedFlashCart, data: any): Promise<void> {
     if (connectedFlashCart.config.path === HBCLI_PLACEHOLDER) {
       if (data.startsWith('> Clearing')) {
         connectedFlashCart.status = {
@@ -474,7 +483,7 @@ export class VesFlashCartService {
     }
   }
 
-  protected async parseStreamDataProgVb(connectedFlashCart: ConnectedFlashCart, data: any): Promise<void> { /* eslint-disable-line */
+  protected async parseStreamDataProgVb(connectedFlashCart: ConnectedFlashCart, data: any): Promise<void> {
     if (connectedFlashCart.config.path === PROG_VB_PLACEHOLDER) {
       if (data.startsWith('Erasing device')) {
         connectedFlashCart.status = {
@@ -493,6 +502,7 @@ export class VesFlashCartService {
   }
 
   async detectConnectedFlashCarts(): Promise<void> {
+    console.log('detectConnectedFlashCarts');
     const flashCartConfigs: FlashCartConfig[] = this.getFlashCartConfigs();
     this.connectedFlashCarts = await this.vesFlashCartUsbService.detectFlashCarts(
       ...flashCartConfigs

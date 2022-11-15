@@ -54,11 +54,11 @@ export class VesProcessServiceImpl implements VesProcessService {
       this.client?.onDidExitProcess(processManagerId, event);
     });
 
-    newProcess.outputStream.on('data', (chunk: any) => { /* eslint-disable-line */
+    newProcess.outputStream.on('data', (chunk: any) => {
       this.client?.onDidReceiveOutputStreamData(processManagerId, chunk.toString());
     });
 
-    newProcess.errorStream.on('data', (chunk: any) => { /* eslint-disable-line */
+    newProcess.errorStream.on('data', (chunk: any) => {
       this.client?.onDidReceiveErrorStreamData(processManagerId, chunk.toString());
     });
 
