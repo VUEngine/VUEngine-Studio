@@ -289,6 +289,9 @@ export class VesCodeGenService {
 
     env.addFilter('binToHex', (value: string) => parseInt(value, 2).toString(16).toUpperCase());
 
+    env.addFilter('padStart', (value: string, length: number, char: string) => value.padStart(length, char));
+    env.addFilter('padEnd', (value: string, length: number, char: string) => value.padEnd(length, char));
+
     env.addFilter('formatValue', (value: string) => {
       // @ts-ignore
       if (!isNaN(value) || value === 'true' || value === 'false') {
