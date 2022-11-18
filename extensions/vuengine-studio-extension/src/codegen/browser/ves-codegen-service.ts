@@ -7,11 +7,13 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import * as iconv from 'iconv-lite';
 import * as nunjucks from 'nunjucks';
+import { VesAudioConverterService } from '../../audio-converter/browser/ves-audio-converter-service';
 import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { compressTiles } from '../../image-converter/browser/ves-image-converter-compressor';
 import { AnimationConfig, ImageConverterCompressor, TilesCompressionResult } from '../../image-converter/browser/ves-image-converter-types';
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
+import { VesProcessService } from '../../process/common/ves-process-service-protocol';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import {
   ProjectFileItemDeleteEvent,
@@ -30,12 +32,16 @@ export class VesCodeGenService {
   protected readonly messageService: MessageService;
   @inject(PreferenceService)
   protected preferenceService: PreferenceService;
+  @inject(VesAudioConverterService)
+  protected vesAudioConverterService: VesAudioConverterService;
   @inject(VesBuildPathsService)
   protected vesBuildPathsService: VesBuildPathsService;
   @inject(VesCommonService)
   protected vesCommonService: VesCommonService;
   @inject(VesPluginsService)
   protected vesPluginsService: VesPluginsService;
+  @inject(VesProcessService)
+  protected vesProcessService: VesProcessService;
   @inject(VesProjectService)
   protected vesProjectService: VesProjectService;
   @inject(WorkspaceService)
@@ -94,24 +100,21 @@ export class VesCodeGenService {
     data: object,
     encoding: ProjectFileTemplateEncoding = ProjectFileTemplateEncoding.utf8
   ): Promise<void> {
-    let renaderedTemplateData = '';
-    try {
-      renaderedTemplateData = nunjucks.renderString(templateString, data);
-    } catch (error) {
-      console.error(`Failed to render template ${templateId}. Nunjucks output:`, error);
-      return;
-    }
-    if (renaderedTemplateData) {
-      await this.fileService.writeFile(
-        targetUri,
-        BinaryBuffer.wrap(iconv.encode(renaderedTemplateData, encoding))
-      );
-    }
+    nunjucks.renderString(templateString, data, (err, res) => {
+      if (err) {
+        console.error(`Failed to render template ${templateId}. Nunjucks output:`, err);
+      } else if (res) {
+        this.fileService.writeFile(
+          targetUri,
+          BinaryBuffer.wrap(iconv.encode(res, encoding))
+        );
 
-    // @ts-ignore
-    console.info(data.item ? `Rendered template ${templateId} with item ${data.item._id}.`
-      : `Rendered template ${templateId}.`
-    );
+        // @ts-ignore
+        console.info(data.item ? `Rendered template ${templateId} with item ${data.item._id}.`
+          : `Rendered template ${templateId}.`
+        );
+      }
+    });
   }
 
   async renderTemplate(templateId: string, itemData?: any): Promise<void> {
@@ -305,12 +308,17 @@ export class VesCodeGenService {
       return obj;
     });
 
-    // add functions
-    /* env.addGlobal('fileExists', async (value: string) => {
-      const exists = await this.fileService.exists(new URI(value).withScheme('file'));
-      return exists;
-    }); */
+    // nunjucks supports only async filters (in the ugly as hell way as below), but not functions
+    env.addFilter('convertPcm', async (...args): Promise<void> => {
+      const callback = args.pop();
+      const value: string = args[0];
+      const range: number = args[1];
+      const result = await this.vesAudioConverterService.convertPcm(value, range);
+      // eslint-disable-next-line no-null/no-null
+      callback(null, result);
+    }, true);
 
+    // add functions
     env.addGlobal('compressTiles', (tilesData: string[], compressor: ImageConverterCompressor, animationConfig: AnimationConfig): TilesCompressionResult =>
       compressTiles(tilesData, compressor, animationConfig)
     );

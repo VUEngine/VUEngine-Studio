@@ -80,6 +80,9 @@
       "frontend": "lib/about/browser/ves-about-frontend-module"
     },
     {
+      "frontend": "lib/audio-converter/browser/ves-audio-converter-frontend-module"
+    },
+    {
       "frontend": "lib/build/browser/ves-build-frontend-module"
     },
     {
