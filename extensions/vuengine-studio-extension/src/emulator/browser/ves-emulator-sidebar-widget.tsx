@@ -286,7 +286,30 @@ export class VesEmulatorSidebarWidget extends ReactWidget {
 
     return <>
       <div className='runActions'>
-        <button className='theia-button large full-width' onClick={this.run}>Run</button>
+
+        {this.vesEmulatorService.isQueued ? (
+          <>
+            <div className='queuedInfo'>
+              <i className='fa fa-fw fa-hourglass-half'></i>{' '}
+              <em>
+                {nls.localize('vuengine/emulator/emulationIsQueued', 'Emulation is queued and will start once the build is ready')}
+              </em>
+            </div>
+            <button
+              className='theia-button large secondary'
+              onClick={this.run}
+            >
+              {nls.localize('vuengine/emulator/cancel', 'Cancel')}
+            </button>
+          </>
+        ) : (
+          <button
+            className='theia-button large full-width'
+            onClick={this.run}
+          >
+            {nls.localize('vuengine/emulator/run', 'Run')}
+          </button>
+        )}
 
         <AutoQueuePreference
           preferenceService={this.preferenceService}

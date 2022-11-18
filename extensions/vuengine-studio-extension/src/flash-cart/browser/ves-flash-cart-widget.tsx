@@ -128,7 +128,7 @@ export class VesFlashCartWidget extends ReactWidget {
               </em>
             </div>
             <button
-              className='theia-button secondary'
+              className='theia-button large secondary'
               onClick={this.flash}
             >
               {nls.localize('vuengine/flashCarts/cancel', 'Cancel')}
