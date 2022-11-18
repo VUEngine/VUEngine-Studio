@@ -15,6 +15,26 @@
   padding: calc(var(--theia-ui-padding) * 2);
 }
 
+#vesEmulatorSidebarWidget .emulatorConfigsWrapper {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+#vesEmulatorSidebarWidget .emulatorConfigsOverview {
+  border-bottom: 1px solid var(--theia-activityBar-background);
+  cursor: pointer;
+  padding: calc(var(--theia-ui-padding) * 2);
+  position: relative;
+}
+
+#vesEmulatorSidebarWidget .emulatorConfigsOverview .fa {
+  position: absolute;
+  right: calc(var(--theia-ui-padding) * 2);
+  top: calc(50% - 5px);
+}
+
 #vesEmulatorSidebarWidget .emulatorConfigs {
   flex-grow: 1;
   overflow: auto;

@@ -49,6 +49,7 @@ interface EmulatorConfigsProps {
 }
 
 function EmulatorConfigs(props: EmulatorConfigsProps): JSX.Element {
+  const [configsExpanded, setConfigsExpanded] = React.useState<boolean>(false);
   const [defaultEmulator, setDefaultEmulator] = React.useState<string>(props.preferenceService.get(VesEmulatorPreferenceIds.DEFAULT_EMULATOR, ''));
   const [emulatorConfigs, setEmulatorConfigs] = React.useState<EmulatorConfig[]>(props.preferenceService.get(VesEmulatorPreferenceIds.EMULATORS, []));
 
@@ -143,98 +144,111 @@ function EmulatorConfigs(props: EmulatorConfigsProps): JSX.Element {
     }
   };
 
-  return <div className='emulatorConfigs'>
-    <div className='emulatorConfig'>
-      <label>
-        {nls.localize('vuengine/emulator/name', 'Name')}
-        <input type="text" className="theia-input" readOnly value={nls.localize('vuengine/emulator/builtIn', 'Built-In')} />
-      </label>
-      <label>
-        {nls.localize('vuengine/emulator/default', 'Default')}
-        <input
-          type="checkbox"
-          className="theia-input"
-          onChange={() => updateDefaultEmulator('')}
-          checked={!defaultEmulator}
-        />
-      </label>
-    </div>
-    {emulatorConfigs && emulatorConfigs.map((config, index) => <div className='emulatorConfig' key={`emulatorConfig-${index}`}>
+  return <div className='emulatorConfigsWrapper'>
+    <div className='emulatorConfigsOverview' onClick={() => setConfigsExpanded(!configsExpanded)}>
+      <i className={`fa fa-chevron-${configsExpanded ? 'down' : 'left'}`} />
       <div>
+        {nls.localize('vuengine/emulator/defaultEmulator', 'Default Emulator')}: {!defaultEmulator
+          ? nls.localize('vuengine/emulator/builtIn', 'Built-In')
+          : defaultEmulator}
+      </div>
+      <div>
+        {nls.localize('vuengine/emulator/customConfigurations', 'Custom Configurations')}: {emulatorConfigs.length}
+      </div>
+    </div>
+    {configsExpanded && <div className='emulatorConfigs'>
+      <div className='emulatorConfig'>
         <label>
           {nls.localize('vuengine/emulator/name', 'Name')}
-          <input
-            type="text"
-            className="theia-input"
-            value={config.name}
-            onBlur={e => setEmulatorName(index, e.target.value)}
-            onChange={e => setEmulatorName(index, e.target.value, false)}
-          />
+          <input type="text" className="theia-input" readOnly value={nls.localize('vuengine/emulator/builtIn', 'Built-In')} />
         </label>
-        <div>
-          <button
-            className='theia-button secondary'
-            onClick={() => removeEmulatorConfig(index)}
-            title={nls.localize('vuengine/emulator/removeEmulatorConfig', 'Remove Emulator Config')}
-          >
-            <i className='fa fa-trash' />
-          </button>
-        </div>
-      </div>
-      <div>
-        <label>
-          {nls.localize('vuengine/emulator/path', 'Path')}
-          <input
-            type="text"
-            className="theia-input"
-            value={config.path}
-            onBlur={e => setEmulatorPath(index, e.target.value)}
-            onChange={e => setEmulatorPath(index, e.target.value, false)}
-          />
-        </label>
-        <div>
-          <button
-            className="theia-button secondary"
-            onClick={() => selectEmulatorPath(index)}
-          >
-            <i className="fa fa-ellipsis-h" />
-          </button>
-        </div>
-      </div>
-      <div>
-        <label>
-          {nls.localize('vuengine/emulator/arguments', 'Arguments')}
-          <ReactTextareaAutosize
-            className="theia-input"
-            value={config.args}
-            maxRows={4}
-            onBlur={e => setEmulatorArgs(index, e.target.value)}
-            onChange={e => setEmulatorArgs(index, e.target.value, false)}
-          />
-        </label>
-      </div>
-      <div>
         <label>
           {nls.localize('vuengine/emulator/default', 'Default')}
           <input
             type="checkbox"
             className="theia-input"
-            onChange={() => updateDefaultEmulator(config.name)}
-            checked={defaultEmulator === config.name}
+            onChange={() => updateDefaultEmulator('')}
+            checked={!defaultEmulator}
           />
         </label>
       </div>
-    </div>)
-    }
-    <div className='emulatorConfigsActions'>
-      <button
-        className='theia-button secondary full-width'
-        onClick={addEmulatorConfig}
-      >
-        <i className='fa fa-plus' />
-      </button>
-    </div>
-  </div >;
+      {emulatorConfigs && emulatorConfigs.map((config, index) => <div className='emulatorConfig' key={`emulatorConfig-${index}`}>
+        <div>
+          <label>
+            {nls.localize('vuengine/emulator/name', 'Name')}
+            <input
+              type="text"
+              className="theia-input"
+              value={config.name}
+              onBlur={e => setEmulatorName(index, e.target.value)}
+              onChange={e => setEmulatorName(index, e.target.value, false)}
+            />
+          </label>
+          <div>
+            <button
+              className='theia-button secondary'
+              onClick={() => removeEmulatorConfig(index)}
+              title={nls.localize('vuengine/emulator/removeEmulatorConfig', 'Remove Emulator Config')}
+            >
+              <i className='fa fa-trash' />
+            </button>
+          </div>
+        </div>
+        <div>
+          <label>
+            {nls.localize('vuengine/emulator/path', 'Path')}
+            <input
+              type="text"
+              className="theia-input"
+              value={config.path}
+              onBlur={e => setEmulatorPath(index, e.target.value)}
+              onChange={e => setEmulatorPath(index, e.target.value, false)}
+            />
+          </label>
+          <div>
+            <button
+              className="theia-button secondary"
+              onClick={() => selectEmulatorPath(index)}
+            >
+              <i className="fa fa-ellipsis-h" />
+            </button>
+          </div>
+        </div>
+        <div>
+          <label>
+            {nls.localize('vuengine/emulator/arguments', 'Arguments')}
+            <ReactTextareaAutosize
+              className="theia-input"
+              value={config.args}
+              maxRows={4}
+              onBlur={e => setEmulatorArgs(index, e.target.value)}
+              onChange={e => setEmulatorArgs(index, e.target.value, false)}
+            />
+          </label>
+        </div>
+        <div>
+          <label>
+            {nls.localize('vuengine/emulator/default', 'Default')}
+            <input
+              type="checkbox"
+              className="theia-input"
+              onChange={() => updateDefaultEmulator(config.name)}
+              checked={defaultEmulator === config.name}
+            />
+          </label>
+        </div>
+      </div>)
+      }
+      <div className='emulatorConfigsActions'>
+        <button
+          className='theia-button secondary full-width'
+          onClick={addEmulatorConfig}
+        >
+          <i className='fa fa-plus' />
+        </button>
+      </div>
+    </div>}
+  </div>;
 }
 
 @injectable()
