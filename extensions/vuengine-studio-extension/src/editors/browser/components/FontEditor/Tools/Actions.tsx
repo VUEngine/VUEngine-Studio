@@ -1,4 +1,5 @@
 import { nls } from '@theia/core';
+import cloneDeep from 'lodash/cloneDeep';
 import React from 'react';
 import { FontEditorState } from '../FontEditorTypes';
 
@@ -143,14 +144,14 @@ export default function Actions(props: ActionsProps): JSX.Element {
     const copy = (): void => {
         if (!currentCharData || currentCharData.length < 1) { return; }
 
-        setState({ clipboard: [...currentCharData] });
+        setState({ clipboard: currentCharData });
     };
 
     const paste = (): void => {
         if (!currentCharData || currentCharData.length < 1) { return; }
 
         if (clipboard) {
-            setCurrentCharData(clipboard);
+            setCurrentCharData(cloneDeep(clipboard));
         }
     };
 
