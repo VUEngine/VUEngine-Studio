@@ -161,13 +161,7 @@ export class VesBuildWidget extends ReactWidget {
                 <div className={`vesProgressBar ${this.vesBuildService.getNumberOfWarnings() && 'withWarnings'}`}>
                   <div style={{ width: this.vesBuildService.buildStatus.progress + '%' }}></div>
                   <span>
-                    {this.vesBuildService.buildStatus.progress === 100 ? (
-                      <>
-                        <i className='fa fa-check'></i> {nls.localize('vuengine/build/done', 'Done')}
-                      </>
-                    ) : (
-                      <>{this.vesBuildService.buildStatus.progress}%</>
-                    )}
+                    {this.vesBuildService.buildStatus.progress}%
                   </span>
                 </div>
               </div>

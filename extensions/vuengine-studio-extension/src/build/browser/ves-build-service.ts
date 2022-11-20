@@ -342,7 +342,6 @@ export class VesBuildService {
     });
 
     this.onDidFailBuild(async () => {
-      console.log('onDidFailBuild');
       this.romSize = 0;
       if (this.preferenceService.get(VesBuildPreferenceIds.AUTO_OPEN_WIDGET_ON_ERROR)) {
         this.commandService.executeCommand(VesBuildCommands.WIDGET_TOGGLE.id, true);
@@ -924,7 +923,7 @@ export class VesBuildService {
 
     this.buildStatus = {
       ...this.buildStatus,
-      step: nls.localize('vuengine/build/done', 'Done'),
+      step: BuildResult.done,
     };
   }
 
