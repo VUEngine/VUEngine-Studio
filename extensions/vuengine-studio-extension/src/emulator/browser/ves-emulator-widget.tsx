@@ -21,7 +21,7 @@ import { VesEmulatorCommands } from './ves-emulator-commands';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
 import { VesEmulatorService } from './ves-emulator-service';
 import {
-  EMULATION_MODES, EMULATION_SCALES, EMULATION_STEREO_MODES, EmulatorFunctionKeyCode, EmulatorGamePadKeyCode, RomHeader
+  EMULATION_MODES, EMULATION_SCALES, EMULATION_STEREO_MODES, EmulatorFunctionKeyCode, EmulatorGamePadKeyCode, RomHeader, ROM_HEADER_MAKERS
 } from './ves-emulator-types';
 import { VesEmulatorControls } from './widget/ves-emulator-controls-component';
 
@@ -645,21 +645,30 @@ export class VesEmulatorWidget extends ReactWidget {
             </button>
           </div>
         </div>
-        {this.state.loaded && <div className='emulator-header'>
-          <div>
-            Name: <span>{this.state.romHeader.name}</span>
-          </div>
-          <div>
-            Code: <span>{this.state.romHeader.code}</span>
-          </div>
-          <div>
-            Maker: <span>{this.state.romHeader.maker}</span>
-          </div>
-          <div>
-            Version: 1.<span>{this.state.romHeader.version}</span>
-          </div>
-        </div>}
         <div className='emulator-wrapper' ref={this.wrapperRef}>
+          {this.state.loaded && <div className='emulator-header'>
+            <div>
+              <div>Name:</div>
+              <div><span>{this.state.romHeader.name}</span></div>
+            </div>
+            <div>
+              <div>Code:</div>
+              <div><span>{this.state.romHeader.code}</span></div>
+            </div>
+            <div>
+              <div>Maker:</div>
+              <div><span>
+                {this.state.romHeader.maker}
+                {ROM_HEADER_MAKERS[this.state.romHeader.maker] && <> ({ROM_HEADER_MAKERS[this.state.romHeader.maker]})</>}
+              </span></div>
+            </div>
+            <div>
+              <div>Version:</div>
+              <div>
+                1.<span>{this.state.romHeader.version}</span>
+              </div>
+            </div>
+          </div>}
           <iframe
             className='emulator-iframe'
             ref={this.iframeRef}

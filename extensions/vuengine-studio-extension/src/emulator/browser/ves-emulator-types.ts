@@ -7,6 +7,45 @@ export interface RomHeader {
   version: number
 };
 
+export const ROM_HEADER_MAKERS: { [key: string]: string } = {
+  '01': 'Nintendo',
+  '0B': 'Coconuts',
+  '18': 'Hudson Soft',
+  '28': 'Kemco',
+  '67': 'Ocean',
+  '7F': 'Kemco America',
+  '8B': 'Bullet-Proof Software',
+  '8F': "I'Max",
+  '99': 'Pack-in-Video',
+  'AH': 'J-Wing',
+  'B2': 'Bandai',
+  'C0': 'Taito',
+  'E4': 'T&E Soft',
+  'E7': 'Athena',
+  'EB': 'Atlus',
+
+  'AB': 'Amos Bieler',
+  'AE': 'Aegis Games',
+  'CR': 'Christian Radke',
+  'DA': 'Dan Bergman',
+  'DB': 'David Tucker',
+  'DD': '16-Bit',
+  'DP': 'Pat Daderko',
+  'DW': 'David Williamson',
+  'GP': 'Guy Perfect',
+  'JE': 'Jorge Andres Eremiev',
+  'MH': 'Matej Horvat',
+  'MK': 'Martin Kujaczynski',
+  'NY': 'Nyrator',
+  'PA': 'prior art',
+  'PR': 'PizzaRollsRoyce',
+  'SP': 'Sploopby!',
+  'TB': 'Trailboss',
+  'TS': 'Thunderstruck',
+  'TV': 'Team VUEngine',
+  'VE': 'Virtual-E',
+};
+
 export interface EmulatorConfig {
   name: string
   path: string

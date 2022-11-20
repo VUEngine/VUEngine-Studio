@@ -14,6 +14,7 @@ export class VesEmulatorOpenHandler extends WidgetOpenHandler<VesEmulatorWidget>
     readonly label = nls.localize('vuengine/emulator/emulator', 'Emulator');
     readonly supported = [
         '.vb',
+        '.VB',
     ];
 
     @inject(EditorManager)

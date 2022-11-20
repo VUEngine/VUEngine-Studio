@@ -19,6 +19,9 @@ const FILE_TYPES: FileType[] = [/* {
     }, {
         ext: '.vb',
         icon: 'ves-file-icon codicon codicon-play',
+    }, {
+        ext: '.VB',
+        icon: 'ves-file-icon codicon codicon-play',
     }];
 
 @injectable()

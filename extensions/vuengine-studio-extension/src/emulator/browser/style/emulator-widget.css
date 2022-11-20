@@ -35,6 +35,12 @@
   padding-bottom: calc(var(--theia-ui-padding) * 2);
 }
 
+.emulator-header>div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
 .emulator-header span {
   background: #000;
   border-radius: 3px;
@@ -45,6 +51,7 @@
 .emulator-wrapper {
   align-items: center;
   display: flex;
+  flex-direction: column;
   flex-grow: 1;
   justify-content: center;
   min-height: 224px;
