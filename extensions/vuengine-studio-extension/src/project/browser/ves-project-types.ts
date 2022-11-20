@@ -97,6 +97,7 @@ export interface WithContributor {
 }
 
 export enum ProjectFileTemplateEncoding {
+  ShiftJIS = 'shift_jis',
   utf8 = 'utf8',
   win1252 = 'win1252',
 }

@@ -1,5 +1,12 @@
 import { nls } from '@theia/core';
 
+export interface RomHeader {
+  name: string
+  maker: string
+  code: string
+  version: number
+};
+
 export interface EmulatorConfig {
   name: string
   path: string

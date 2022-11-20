@@ -1,4 +1,5 @@
 import { CommandService, isWindows, nls } from '@theia/core';
+import * as iconv from 'iconv-lite';
 import {
   Endpoint,
   KeybindingRegistry,
@@ -10,6 +11,7 @@ import {
 } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
+import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
@@ -19,7 +21,7 @@ import { VesEmulatorCommands } from './ves-emulator-commands';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
 import { VesEmulatorService } from './ves-emulator-service';
 import {
-  EMULATION_MODES, EMULATION_SCALES, EMULATION_STEREO_MODES, EmulatorFunctionKeyCode, EmulatorGamePadKeyCode
+  EMULATION_MODES, EMULATION_SCALES, EMULATION_STEREO_MODES, EmulatorFunctionKeyCode, EmulatorGamePadKeyCode, RomHeader
 } from './ves-emulator-types';
 import { VesEmulatorControls } from './widget/ves-emulator-controls-component';
 
@@ -38,6 +40,7 @@ export interface vesEmulatorWidgetState {
   fastForward: boolean
   frameAdvance: boolean
   showControls: boolean
+  romHeader: RomHeader
   input: any /* eslint-disable-line */
 };
 
@@ -151,6 +154,12 @@ export class VesEmulatorWidget extends ReactWidget {
       fastForward: false,
       frameAdvance: false,
       showControls: false,
+      romHeader: {
+        name: '',
+        maker: '',
+        code: '',
+        version: 0
+      },
       input: {},
     };
     this.keybindingToState();
@@ -379,6 +388,24 @@ export class VesEmulatorWidget extends ReactWidget {
       rom: await datauri(romPath)
     };
 
+    const romUri = new URI(romPath);
+    const romContent = await this.fileService.readFile(romUri);
+    const romContentBuffer = romContent.value.buffer;
+    const romContentHeaderBuffer = romContentBuffer.slice(-544).slice(0, 32);
+    const romHeaderName = iconv.decode(
+      Buffer.from(romContentHeaderBuffer.slice(0, 20)),
+      'Shift_JIS'
+    );
+    const romHeaderMaker = romContentHeaderBuffer.slice(25, 27).toString();
+    const romHeaderCode = romContentHeaderBuffer.slice(27, 31).toString();
+    const romHeaderVersion = romContentHeaderBuffer.slice(31, 32)[0];
+    this.state.romHeader = {
+      name: romHeaderName.padEnd(20, ' '),
+      maker: romHeaderMaker,
+      code: romHeaderCode,
+      version: romHeaderVersion,
+    };
+
     this.sendRetroArchConfig();
     this.sendCoreOptions();
     this.sendCommand('start', content);
@@ -401,7 +428,7 @@ export class VesEmulatorWidget extends ReactWidget {
     const canvasDimensions = this.getCanvasDimensions();
     return (
       <>
-        <div id='vesEmulatorUi'>
+        <div className='emulator-controls'>
           <div>
             <button
               className={this.state.paused
@@ -618,9 +645,23 @@ export class VesEmulatorWidget extends ReactWidget {
             </button>
           </div>
         </div>
-        <div id='vesEmulatorWrapper' ref={this.wrapperRef}>
+        {this.state.loaded && <div className='emulator-header'>
+          <div>
+            Name: <span>{this.state.romHeader.name}</span>
+          </div>
+          <div>
+            Code: <span>{this.state.romHeader.code}</span>
+          </div>
+          <div>
+            Maker: <span>{this.state.romHeader.maker}</span>
+          </div>
+          <div>
+            Version: 1.<span>{this.state.romHeader.version}</span>
+          </div>
+        </div>}
+        <div className='emulator-wrapper' ref={this.wrapperRef}>
           <iframe
-            id='vesEmulatorFrame'
+            className='emulator-iframe'
             ref={this.iframeRef}
             src={this.resource}
             width={canvasDimensions.width}

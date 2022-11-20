@@ -3,30 +3,46 @@
   flex-direction: column;
 }
 
-#vesEmulatorUi {
+.emulator-controls {
   min-width: 384px;
   padding: calc(var(--theia-ui-padding) * 2) 0;
   text-align: center;
 }
 
-#vesEmulatorUi>div {
+.emulator-controls>div {
   display: inline-block;
   margin: var(--theia-ui-padding);
 }
 
-#vesEmulatorUi button.theia-button {
+.emulator-controls button.theia-button {
   height: 26px;
   margin: 0 2px;
   min-width: 32px;
   vertical-align: middle;
 }
 
-#vesEmulatorUi select.theia-select {
+.emulator-controls select.theia-select {
   margin: 0 2px;
   vertical-align: middle;
 }
 
-#vesEmulatorWrapper {
+.emulator-header {
+  display: flex;
+  gap: var(--theia-ui-padding);
+  justify-content: center;
+  min-width: 384px;
+  opacity: .5;
+  padding-bottom: calc(var(--theia-ui-padding) * 2);
+}
+
+.emulator-header span {
+  background: #000;
+  border-radius: 3px;
+  color: #fff;
+  padding: 2px 4px;
+}
+
+.emulator-wrapper {
   align-items: center;
   display: flex;
   flex-grow: 1;
@@ -36,7 +52,7 @@
   overflow: hidden;
 }
 
-iframe#vesEmulatorFrame {
+iframe.emulator-iframe {
   background: #111;
   border: none;
   overflow: hidden;
