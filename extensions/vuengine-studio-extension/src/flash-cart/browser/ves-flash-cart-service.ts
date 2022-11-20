@@ -165,9 +165,9 @@ export class VesFlashCartService {
       return;
     }
 
-    for (const connectedFlashCart of this.connectedFlashCarts) {
+    this.connectedFlashCarts = await Promise.all(this.connectedFlashCarts.map(async connectedFlashCart => {
       if (!connectedFlashCart.canHoldRom) {
-        continue;
+        return connectedFlashCart;
       }
 
       const flasherPath = await this.replaceFlasherPath(connectedFlashCart.config.path);
@@ -176,14 +176,14 @@ export class VesFlashCartService {
         this.messageService.error(
           nls.localize('vuengine/flashCarts/noPathToFlasherSoftwareProvided', 'No path to flasher software provided for cart ${0}', connectedFlashCart.config.name)
         );
-        continue;
+        return connectedFlashCart;
       }
 
       if (!await this.fileService.exists(new URI(flasherPath).withScheme('file'))) {
         this.messageService.error(
           nls.localize('vuengine/flashCarts/flasherSoftwareDoesNotExist', 'Flasher software does not exist at ${0}', flasherPath)
         );
-        continue;
+        return connectedFlashCart;
       }
 
       await this.workspaceService.ready;
@@ -212,17 +212,17 @@ export class VesFlashCartService {
         args: flasherArgs,
       });
 
-      connectedFlashCart.status = {
-        ...connectedFlashCart.status,
-        step: 'Preparing',
-        processId: processManagerId,
-        progress: 0,
-        log: [],
+      return {
+        ...connectedFlashCart,
+        status: {
+          ...connectedFlashCart.status,
+          step: 'Preparing',
+          processId: processManagerId,
+          progress: 0,
+          log: [],
+        }
       };
-    }
-
-    // trigger change event
-    this.connectedFlashCarts = this.connectedFlashCarts;
+    }));
 
     this.isFlashing = true;
     this.onDidStartFlashingEmitter.fire();
@@ -261,13 +261,13 @@ export class VesFlashCartService {
       }
     }
 
-    for (const connectedFlashCart of this.connectedFlashCarts) {
+    this.connectedFlashCarts.forEach(async connectedFlashCart => {
       const flasherPath = await this.replaceFlasherPath(connectedFlashCart.config.path);
       await this.vesProcessService.launchProcess(VesProcessType.Raw, {
         command,
         args: args.concat(flasherPath),
       });
-    }
+    });
   }
 
   protected bindEvents(): void {
@@ -294,26 +294,8 @@ export class VesFlashCartService {
     this.vesFlashCartUsbWatcher.onDidAttachDevice(async () => this.detectConnectedFlashCarts());
     this.vesFlashCartUsbWatcher.onDidDetachDevice(async () => this.detectConnectedFlashCarts());
 
-    // compute overall flashing progress
-    this.onDidChangeConnectedFlashCarts(() => {
-      let activeCarts = 0;
-      let activeCartsProgress = 0;
-      for (const connectedFlashCart of this.connectedFlashCarts) {
-        if (connectedFlashCart.status.progress > -1) {
-          activeCarts++;
-          activeCartsProgress += connectedFlashCart.status.progress;
-        }
-      }
-      if (activeCarts > 0) {
-        const overallProgress = Math.floor(activeCartsProgress / activeCarts);
-        if (this.flashingProgress !== overallProgress) {
-          this.flashingProgress = overallProgress;
-        }
-      }
-    });
-
     this.vesBuildService.onDidSucceedBuild(async () => {
-      if (await this.vesBuildService.outputRomExists() && this.isQueued) {
+      if (this.isQueued) {
         this.isQueued = false;
         this.doFlash();
       }
@@ -327,10 +309,11 @@ export class VesFlashCartService {
     });
 
     this.vesProcessWatcher.onDidExitProcess(({ pId, event }) => {
-      const successful = (event.code === 0);
-      this.flashingProgress = -1;
-      for (const connectedFlashCart of this.connectedFlashCarts) {
+      this.connectedFlashCarts.forEach(connectedFlashCart => {
         if (connectedFlashCart.status.processId === pId) {
+          this.flashingProgress = -1;
+
+          const successful = (event.code === 0);
           connectedFlashCart.status.progress = successful ? 100 : -1;
 
           // trigger change event
@@ -348,33 +331,59 @@ export class VesFlashCartService {
             this.onDidSucceedFlashingEmitter.fire();
           }
         }
-      }
+      });
     });
 
     this.vesProcessWatcher.onDidReceiveOutputStreamData(({ pId, data }) => {
-      this.processStreamData(pId, data.trim());
+      this.processStreamData(pId, data);
     });
 
     this.vesProcessWatcher.onDidReceiveErrorStreamData(({ pId, data }) => {
-      this.processStreamData(pId, data.trim());
+      this.processStreamData(pId, data);
     });
   }
 
   protected processStreamData(pId: number, data: any): void {
-    for (const connectedFlashCart of this.connectedFlashCarts) {
+    let flashCartStream = false;
+
+    this.connectedFlashCarts.forEach(connectedFlashCart => {
       if (connectedFlashCart.status.processId === pId) {
+        flashCartStream = true;
+        const trimmedData = data.trim();
+
         connectedFlashCart.status.log.push({
           timestamp: Date.now(),
-          text: data
+          text: trimmedData
         });
 
-        this.parseStreamDataProgVb(connectedFlashCart, data);
-        this.parseStreamDataHyperFlasherCli32(connectedFlashCart, data);
-        this.parseStreamDataHyperBoyCli(connectedFlashCart, data);
+        this.parseStreamDataProgVb(connectedFlashCart, trimmedData);
+        this.parseStreamDataHyperFlasherCli32(connectedFlashCart, trimmedData);
+        this.parseStreamDataHyperBoyCli(connectedFlashCart, trimmedData);
       }
+    });
+
+    if (flashCartStream) {
+      this.computeFlashingProgress();
 
       // trigger change event
       this.connectedFlashCarts = this.connectedFlashCarts;
+    }
+  }
+
+  protected computeFlashingProgress(): void {
+    let activeCarts = 0;
+    let activeCartsProgress = 0;
+    for (const connectedFlashCart of this.connectedFlashCarts) {
+      if (connectedFlashCart.status.progress > -1) {
+        activeCarts++;
+        activeCartsProgress += connectedFlashCart.status.progress;
+      }
+    }
+    if (activeCarts > 0) {
+      const overallProgress = Math.floor(activeCartsProgress / activeCarts);
+      if (this.flashingProgress !== overallProgress) {
+        this.flashingProgress = overallProgress;
+      }
     }
   }
 

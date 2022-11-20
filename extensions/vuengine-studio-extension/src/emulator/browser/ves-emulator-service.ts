@@ -134,7 +134,7 @@ export class VesEmulatorService {
 
   protected bindEvents(): void {
     this.vesBuildService.onDidSucceedBuild(async () => {
-      if (await this.vesBuildService.outputRomExists() && this.isQueued) {
+      if (this.isQueued) {
         this.isQueued = false;
         this.run();
       }
