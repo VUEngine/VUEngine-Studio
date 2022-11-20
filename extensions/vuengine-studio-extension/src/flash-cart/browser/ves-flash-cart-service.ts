@@ -95,8 +95,7 @@ export class VesFlashCartService {
   protected readonly onDidChangeConnectedFlashCartsEmitter = new Emitter<
     ConnectedFlashCart[]
   >();
-  readonly onDidChangeConnectedFlashCarts = this
-    .onDidChangeConnectedFlashCartsEmitter.event;
+  readonly onDidChangeConnectedFlashCarts = this.onDidChangeConnectedFlashCartsEmitter.event;
   set connectedFlashCarts(connectedFlashCart: ConnectedFlashCart[]) {
     this._connectedFlashCarts = connectedFlashCart;
     this.onDidChangeConnectedFlashCartsEmitter.fire(this._connectedFlashCarts);
@@ -144,7 +143,6 @@ export class VesFlashCartService {
 
   async doFlash(): Promise<void> {
     const outputRomExists = await this.vesBuildService.outputRomExists();
-    // console.log('outputRomExists', outputRomExists);
     if (this.isQueued) {
       this.isQueued = false;
     } else if (this.vesBuildService.buildStatus.active) {
@@ -163,7 +161,6 @@ export class VesFlashCartService {
   }
 
   async flash(): Promise<void> {
-    // console.log('flash()');
     if (!this.atLeastOneCanHoldRom || this.connectedFlashCarts.length === 0) {
       return;
     }
@@ -208,16 +205,12 @@ export class VesFlashCartService {
           .split(' ')
         : [];
 
-      // console.log('await this.fixPermissions()');
-
       await this.fixPermissions();
 
-      // console.log('LAUNCH PROC');
       const { processManagerId } = await this.vesProcessService.launchProcess(VesProcessType.Terminal, {
         command: flasherPath,
         args: flasherArgs,
       });
-      // console.log('processManagerId', processManagerId);
 
       connectedFlashCart.status = {
         ...connectedFlashCart.status,
@@ -336,7 +329,6 @@ export class VesFlashCartService {
     this.vesProcessWatcher.onDidExitProcess(({ pId, event }) => {
       const successful = (event.code === 0);
       this.flashingProgress = -1;
-      // console.log('exit', pId);
       for (const connectedFlashCart of this.connectedFlashCarts) {
         if (connectedFlashCart.status.processId === pId) {
           connectedFlashCart.status.progress = successful ? 100 : -1;
@@ -360,22 +352,17 @@ export class VesFlashCartService {
     });
 
     this.vesProcessWatcher.onDidReceiveOutputStreamData(({ pId, data }) => {
-      // console.log('data', pId, data);
       this.processStreamData(pId, data.trim());
     });
 
     this.vesProcessWatcher.onDidReceiveErrorStreamData(({ pId, data }) => {
-      // console.log('error data', pId, data);
       this.processStreamData(pId, data.trim());
     });
   }
 
   protected processStreamData(pId: number, data: any): void {
-    // console.log('processStreamData', pId, data);
     for (const connectedFlashCart of this.connectedFlashCarts) {
-      // console.log('ID check', connectedFlashCart.status.processId, pId);
       if (connectedFlashCart.status.processId === pId) {
-        // console.log('ID match', connectedFlashCart.config.name);
         connectedFlashCart.status.log.push({
           timestamp: Date.now(),
           text: data
@@ -502,11 +489,19 @@ export class VesFlashCartService {
   }
 
   async detectConnectedFlashCarts(): Promise<void> {
-    // console.log('detectConnectedFlashCarts');
     const flashCartConfigs: FlashCartConfig[] = this.getFlashCartConfigs();
-    this.connectedFlashCarts = await this.vesFlashCartUsbService.detectFlashCarts(
+    const connectedFlashCarts = await this.vesFlashCartUsbService.detectFlashCarts(
       ...flashCartConfigs
     );
+
+    this.connectedFlashCarts = connectedFlashCarts.map(connectedFlashCart => {
+      const known = this.connectedFlashCarts.find(cfc =>
+        cfc.port === connectedFlashCart.port &&
+        JSON.stringify(cfc.config) === JSON.stringify(connectedFlashCart.config)
+      );
+      return known ? known : connectedFlashCart;
+    });
+
     this.determineAllCanHoldRom();
   };
 
