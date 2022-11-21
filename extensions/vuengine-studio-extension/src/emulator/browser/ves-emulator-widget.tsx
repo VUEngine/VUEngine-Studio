@@ -868,7 +868,8 @@ export class VesEmulatorWidget extends ReactWidget {
         audio_mute_enable = ${this.state.muted}
         state_slot = ${this.state.saveSlot}
 
-        input_player1_select = ${this.toButton(EmulatorGamePadKeyCode.Select)}
+      ${/* keyboard input */''}
+      input_player1_select = ${this.toButton(EmulatorGamePadKeyCode.Select)}
         input_player1_start = ${this.toButton(EmulatorGamePadKeyCode.Start)}
         input_player1_l = ${this.toButton(EmulatorGamePadKeyCode.LT)}
         input_player1_r = ${this.toButton(EmulatorGamePadKeyCode.RT)}
@@ -891,6 +892,22 @@ export class VesEmulatorWidget extends ReactWidget {
         input_player1_r_y_minus = ${this.toButton(EmulatorGamePadKeyCode.RDown)}
         input_player1_r_y_plus = ${this.toButton(EmulatorGamePadKeyCode.RUp)}
         input_player1_turbo = nul
+
+        ${/* vb usb adapter input */''}
+        input_player1_up_btn = "0"
+        input_player1_down_btn = "1"
+        input_player1_left_btn = "2"
+        input_player1_right_btn = "3"
+        input_player1_a_btn = "4"
+        input_player1_b_btn = "5"
+        input_player1_select_btn = "7"
+        input_player1_start_btn = "6"
+        input_player1_l_btn = "9"
+        input_player1_r_btn = "8"
+        input_player1_l2_btn = "10"
+        input_player1_r3_btn = "11"
+        input_player1_l3_btn = "12"
+        input_player1_r2_btn = "13"
 
         input_save_state = ${this.toButton(EmulatorFunctionKeyCode.SaveState)}
         input_load_state = ${this.toButton(EmulatorFunctionKeyCode.LoadState)}
