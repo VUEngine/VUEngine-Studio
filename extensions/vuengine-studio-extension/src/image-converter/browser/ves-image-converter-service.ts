@@ -425,9 +425,13 @@ export class VesImageConverterService {
           imageConfigFileToBeConverted.config.tileset.compress as ImageConverterCompressor,
           imageConfigFileToBeConverted.config.animation
         );
-        output.tilesData = compressionResult.tilesData;
-        output.frameTileOffsets = compressionResult.frameTileOffsets;
+
         output.meta.tilesCompressionRatio = compressionResult.compressionRatio;
+        // discard compression results if they're larger than the original size
+        if (compressionResult.compressionRatio < 0) {
+          output.tilesData = compressionResult.tilesData;
+          output.frameTileOffsets = compressionResult.frameTileOffsets;
+        }
       });
     }
 

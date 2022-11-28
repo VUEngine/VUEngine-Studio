@@ -8,7 +8,7 @@ export function compressTiles(tilesData: string[], compressor: ImageConverterCom
       return {
         tilesData: tilesData,
         frameTileOffsets: [],
-        compressionRatio: (0).toFixed(2),
+        compressionRatio: 0,
       };
   }
 }
@@ -18,7 +18,7 @@ function compressTilesRle(tilesData: string[], animationConfig: AnimationConfig)
   const result: TilesCompressionResult = {
     tilesData: tilesData,
     frameTileOffsets: [],
-    compressionRatio: (0).toFixed(2),
+    compressionRatio: 0,
   };
 
   if (!tilesData.length) {
@@ -84,7 +84,7 @@ function compressTilesRle(tilesData: string[], animationConfig: AnimationConfig)
   }
 
   result.tilesData = compressedData;
-  result.compressionRatio = (- ((uncompressedLength - compressedData.length) / uncompressedLength * 100)).toFixed(2);
+  result.compressionRatio = - ((uncompressedLength - compressedData.length) / uncompressedLength * 100);
 
   return result;
 }

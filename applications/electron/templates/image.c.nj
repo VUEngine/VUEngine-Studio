@@ -13,15 +13,12 @@
 
 {%- set tilesCompressionLabel = 'not compressed' -%}
 {%- if tilesCompression is defined and tilesCompression != false -%}
-    {%- set tilesCompressionLabel = tilesCompression | upper ~ ' compressed' -%}
-    {%- if meta.tilesCompressionRatio is defined -%}
-        {%- set tilesCompressionRatio = meta.tilesCompressionRatio -%}
-        {%- if meta.tilesCompressionRatio > 0 -%}
-            {%- set tilesCompressionRatio = '+' ~ meta.tilesCompressionRatio -%}
-        {%- elseif meta.tilesCompressionRatio == 0 -%}
-            {%- set tilesCompressionRatio = '±0' -%}
-        {%- endif -%}
-        {%- set tilesCompressionLabel = tilesCompressionLabel ~ ' (' ~ tilesCompressionRatio ~ '%)' -%}
+    {%- if meta.tilesCompressionRatio < 0 -%}
+        {%- set tilesCompressionLabel = tilesCompression | upper ~ ' compressed (' ~ meta.tilesCompressionRatio ~ '%)' -%}
+    {%- elseif meta.tilesCompressionRatio == 0 -%}
+        {%- set tilesCompressionLabel = tilesCompression | upper ~ ' compression skipped for not reducing size (±' ~ meta.tilesCompressionRatio ~ '%)' -%}
+    {%- else -%}
+        {%- set tilesCompressionLabel = tilesCompression | upper ~ ' compression skipped for inflating size (+' ~ meta.tilesCompressionRatio ~ '%)' -%}
     {%- endif -%}
 {%- endif -%}
 
@@ -51,7 +48,7 @@
 const uint32 {{ sanitizedSpecName }}Tiles[{{ (tilesData.length + 1) }}] __attribute__((aligned(4))){% if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
     {# prepend tile data with a custom compression algorithm flag -#}
-    {%- if tilesCompression is defined and tilesCompression != false -%}
+    {%- if tilesCompression is defined and tilesCompression != false and meta.tilesCompressionRatio < 0 -%}
         0x00000001,
     {%- else -%}
         0x00000000,

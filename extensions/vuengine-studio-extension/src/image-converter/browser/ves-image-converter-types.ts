@@ -55,7 +55,7 @@ export interface ConvertedFileData {
 
 export interface ConvertedFileDataMeta {
   tilesCount: number
-  tilesCompressionRatio?: string
+  tilesCompressionRatio?: number
   mapCompressionRatio?: string
   imageHeight: number
   imageWidth: number
@@ -85,5 +85,5 @@ export enum ImageConverterCompressor {
 export interface TilesCompressionResult {
   tilesData: string[]
   frameTileOffsets: number[]
-  compressionRatio?: string
+  compressionRatio: number
 }
