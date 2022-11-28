@@ -29,40 +29,36 @@ function compressTilesRle(tilesData: string[], animationConfig: AnimationConfig)
   const compressedData: string[] = [];
   let currentBlock = '';
   let counter = 0;
-  let currentDigit = tilesData[0][0] ?? '';
+  let previousDigit = tilesData[0][0] ?? '';
 
   const isSpritesheet = animationConfig.isAnimation && !animationConfig.individualFiles;
   const spritesheetFrameSize = (4 * animationConfig.frameWidth * animationConfig.frameHeight) || 4;
 
-  if (isSpritesheet) {
-    result.frameTileOffsets = [COMPRESSION_FLAG_LENGTH];
-  }
+  const addPreviousDigitToCurrentBlock = () => {
+    currentBlock += (counter - 1).toString(16).toUpperCase() + previousDigit;
+    counter = 1;
+  };
 
   for (const [index, tileData] of tilesData.entries()) {
     for (const digit of tileData) {
-      if (digit === currentDigit) {
-        if (counter === 16) {
-          currentBlock += (counter - 1).toString(16).toUpperCase() + currentDigit;
-          if (currentBlock.length === 8) {
-            compressedData.push(currentBlock);
-            currentBlock = '';
-          }
-          counter = 1;
-        } else {
-          counter++;
-        }
+      if (digit === previousDigit && counter < 16) {
+        counter++;
       } else {
-        currentBlock += (counter - 1).toString(16).toUpperCase() + currentDigit;
+        addPreviousDigitToCurrentBlock();
         if (currentBlock.length === 8) {
           compressedData.push(currentBlock);
           currentBlock = '';
         }
-        currentDigit = digit;
-        counter = 1;
+        previousDigit = digit;
       }
     }
 
     if (isSpritesheet && ((index + 1) % spritesheetFrameSize === 0)) {
+      // conclude and save last character's count if it wasn't in the last loop of tileData
+      if (counter > 1) {
+        addPreviousDigitToCurrentBlock();
+      }
+
       // right-pad individual frames
       if (currentBlock.length > 0) {
         compressedData.push(currentBlock.padEnd(8, '0'));
@@ -71,7 +67,7 @@ function compressTilesRle(tilesData: string[], animationConfig: AnimationConfig)
       // reset variables
       currentBlock = '';
       counter = 0;
-      currentDigit = tilesData[index + 1] ? tilesData[index + 1][0] : '';
+      previousDigit = tilesData[index + 1] ? tilesData[index + 1][0] : '';
 
       // save tile offset
       result.frameTileOffsets.push(compressedData.length + COMPRESSION_FLAG_LENGTH);
@@ -79,9 +75,10 @@ function compressTilesRle(tilesData: string[], animationConfig: AnimationConfig)
   };
 
   if (isSpritesheet) {
+    result.frameTileOffsets.unshift(COMPRESSION_FLAG_LENGTH);
     result.frameTileOffsets.pop();
   } else {
-    currentBlock += (counter - 1).toString(16).toUpperCase() + currentDigit;
+    addPreviousDigitToCurrentBlock();
     // right-pad last block
     compressedData.push(currentBlock.padEnd(8, '0'));
   }
