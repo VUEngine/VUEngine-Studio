@@ -41,9 +41,12 @@ export class VesAudioConverterService {
       fileBinaryBuffer = fileBinaryBuffer.slice(36, fileBinaryBuffer.byteLength);
 
       [...Array(fileBinaryBuffer.byteLength)].map((v, i) => {
-        const value = fileBinaryBuffer.readUInt8(i);
-        // apply scaling and clamp at amplitude max
-        result.push(Math.min(amplitude, Math.round(value * scale)));
+        let value = fileBinaryBuffer.readUInt8(i);
+        // apply scaling
+        value = Math.floor(value * scale);
+        // clamp at amplitude max
+        value = Math.min(amplitude, value);
+        result.push(value);
       });
     }
 
