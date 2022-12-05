@@ -1,4 +1,3 @@
-import { isWindows } from '@theia/core';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import {
   IProcessExitEvent,
@@ -66,7 +65,7 @@ export class VesProcessServiceImpl implements VesProcessService {
 
     return {
       processManagerId: processManagerId,
-      processId: process?.pid || -1,
+      processId: process?.id || -1,
     };
   }
 
@@ -76,7 +75,7 @@ export class VesProcessServiceImpl implements VesProcessService {
       return false;
     }
 
-    process.kill(isWindows ? 'SIGINT' : 'SIGTERM');
+    process.kill();
     return true;
   }
 }

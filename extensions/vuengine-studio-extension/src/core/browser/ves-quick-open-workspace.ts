@@ -3,11 +3,14 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { FileStat } from '@theia/filesystem/lib/common/files';
 import { QuickOpenWorkspace } from '@theia/workspace/lib/browser/quick-open-workspace';
+import { CommonWorkspaceUtils } from '@theia/workspace/lib/common';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesCommonService } from './ves-common-service';
 
 @injectable()
 export class VesQuickOpenWorkspace extends QuickOpenWorkspace {
+    @inject(CommonWorkspaceUtils)
+    protected workspaceUtils: CommonWorkspaceUtils;
     @inject(VesCommonService)
     protected readonly vesCommonService: VesCommonService;
     @inject(VesProjectService)
@@ -17,7 +20,7 @@ export class VesQuickOpenWorkspace extends QuickOpenWorkspace {
     // ensure to keep this up to date with Theia
     async open(workspaces: string[]): Promise<void> {
         this.items = [];
-        const [homeDirUri, tempWorkspaceFile] = await Promise.all([
+        const [homeDirUri] = await Promise.all([
             this.envServer.getHomeDirUri(),
             this.workspaceService.getUntitledWorkspace()
         ]);
@@ -30,12 +33,8 @@ export class VesQuickOpenWorkspace extends QuickOpenWorkspace {
             try {
                 stat = await this.fileService.resolve(uri);
             } catch { }
-            if (!stat ||
-                !this.preferences['workspace.supportMultiRootWorkspace'] && !stat.isDirectory) {
-                continue; // skip the workspace files if multi root is not supported
-            }
-            if (uri.toString() === tempWorkspaceFile.toString()) {
-                continue; // skip the temporary workspace files
+            if (this.workspaceUtils.isUntitledWorkspace(uri) || !stat) {
+                continue; // skip the temporary workspace files or an undefined stat.
             }
             const icon = this.labelProvider.getIcon(stat);
             const iconClasses = icon === '' ? undefined : [icon + ' file-icon'];

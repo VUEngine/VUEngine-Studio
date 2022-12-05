@@ -54,13 +54,11 @@ export class VesWorkspaceFrontendContribution extends WorkspaceFrontendContribut
 
     protected async openWorkspaceOpenFileDialogProps(): Promise<OpenFileDialogProps> {
         await this.preferences.ready;
-        const supportMultiRootWorkspace = this.preferences['workspace.supportMultiRootWorkspace'];
         const type = OS.type();
         const electron = environment.electron.is();
         return VesWorkspaceFrontendContribution.createOpenWorkspaceOpenFileDialogProps({
             type,
             electron,
-            supportMultiRootWorkspace
         });
     }
 }
@@ -70,27 +68,17 @@ export namespace VesWorkspaceFrontendContribution {
         'VUEngine Studio Project': [VUENGINE_EXT]
     };
 
-    export function createOpenWorkspaceOpenFileDialogProps(options: Readonly<{ type: OS.Type, electron: boolean, supportMultiRootWorkspace: boolean }>): OpenFileDialogProps {
-        const { electron, type, supportMultiRootWorkspace } = options;
+    export function createOpenWorkspaceOpenFileDialogProps(options: Readonly<{ type: OS.Type, electron: boolean }>): OpenFileDialogProps {
+        const { electron, type } = options;
         const title = WorkspaceCommands.OPEN_WORKSPACE.dialogLabel;
         // If browser
         if (!electron) {
-            // and multi-root workspace is supported, it is always folder + workspace files.
-            if (supportMultiRootWorkspace) {
-                return {
-                    title,
-                    canSelectFiles: true,
-                    canSelectFolders: true,
-                    filters: VES_DEFAULT_FILE_FILTER
-                };
-            } else {
-                // otherwise, it is always folders. No files at all.
-                return {
-                    title,
-                    canSelectFiles: false,
-                    canSelectFolders: true
-                };
-            }
+            return {
+                title,
+                canSelectFiles: true,
+                canSelectFolders: true,
+                filters: VES_DEFAULT_FILE_FILTER
+            };
         }
 
         // If electron
@@ -104,17 +92,6 @@ export namespace VesWorkspaceFrontendContribution {
             };
         }
 
-        // In electron, only workspace files can be selected when the multi-root workspace feature is enabled.
-        if (supportMultiRootWorkspace) {
-            return {
-                title,
-                canSelectFiles: true,
-                canSelectFolders: false,
-                filters: VES_DEFAULT_FILE_FILTER
-            };
-        }
-
-        // Otherwise, it is always a folder.
         return {
             title,
             canSelectFiles: false,
