@@ -38,6 +38,12 @@ fileAssociations:
     role: Editor
     rank: Owner
     isPackage: false
+  - ext: vb
+    name: Virtual Boy ROM
+    description: ROM image of Virtual Boy program
+    role: Viewer
+    rank: Default
+    isPackage: false
 
 win:
   icon: resources/icons/WindowsLauncherIcon/VUEngineStudio.ico

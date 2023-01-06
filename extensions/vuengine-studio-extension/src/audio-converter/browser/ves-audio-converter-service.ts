@@ -30,7 +30,6 @@ export class VesAudioConverterService {
       return result;
     }
     const fileUri = workspaceRootUri.resolve(filePath);
-    console.log('fileUri', fileUri);
     const exists = await this.fileService.exists(fileUri);
 
     if (exists) {

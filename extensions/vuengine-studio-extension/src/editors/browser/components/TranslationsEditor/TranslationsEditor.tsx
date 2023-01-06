@@ -19,8 +19,7 @@ interface TranslationsEditorState {
 export default class TranslationsEditor extends React.Component<TranslationsEditorProps, TranslationsEditorState> {
     constructor(props: TranslationsEditorProps) {
         super(props);
-        this.state = {
-        };
+        this.state = {};
     }
 
     protected onChangeFlag(index: number, flag: string): void {
