@@ -6,7 +6,6 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileStatWithMetadata } from '@theia/filesystem/lib/common/files';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { deepmerge } from 'deepmerge-ts';
-import { MemorySection } from '../../build/browser/ves-build-types';
 import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesGlobService } from '../../glob/common/ves-glob-service-protocol';
@@ -15,37 +14,13 @@ import { VesProcessService, VesProcessType } from '../../process/common/ves-proc
 import { compressTiles } from './ves-image-converter-compressor';
 import {
   COMPRESSION_FLAG_LENGTH,
+  DEFAULT_IMAGE_CONVERTER_CONFIG,
   ImageConfigFileToBeConverted,
   ImageConverterCompressor,
   ImageConverterConfig,
   ImageConverterLogLine,
   ImageConverterLogLineType
 } from './ves-image-converter-types';
-
-const DEFAULT_IMAGE_CONVERTER_CONFIG: ImageConverterConfig = {
-  images: [],
-  name: '',
-  section: MemorySection.ROM,
-  tileset: {
-    shared: false,
-    reduce: true,
-    compress: false
-  },
-  map: {
-    generate: true,
-    reduce: {
-      flipped: true,
-      unique: true
-    },
-    compress: false
-  },
-  animation: {
-    isAnimation: false,
-    individualFiles: false,
-    frameWidth: 0,
-    frameHeight: 0
-  }
-};
 
 @injectable()
 export class VesImageConverterService {
@@ -198,7 +173,7 @@ export class VesImageConverterService {
     });
 
     const gritUri = await this.getGritUri();
-    await this.fixPermissions(gritUri);
+    await this.fixFilePermissions(gritUri);
 
     await Promise.all(imageConfigFilesToBeConverted.map(async imageConfigFileToBeConverted => {
       await this.doConvertFile(imageConfigFileToBeConverted, gritUri);
@@ -257,6 +232,8 @@ export class VesImageConverterService {
 
         if (imageConfigFileToBeConverted.config.animation.isAnimation
           && imageConfigFileToBeConverted.config.animation.individualFiles) {
+          // TODO: discard compression results if they're larger than the original size
+
           // delete source files and report done
           await Promise.all(imageConfigFileToBeConverted.output.map(async output => {
             await this.fileService.delete(output.fileUri);
@@ -277,6 +254,10 @@ export class VesImageConverterService {
               largestFrame = output.meta.tilesCount;
             }
           });
+
+          const compressedLength = tilesData.length;
+          const uncompressedLength = totalTilesCount * 4;
+          const tilesCompressionRatio = - ((uncompressedLength - compressedLength) / uncompressedLength * 100);
 
           // remove last element from frameTileOffsets
           frameTileOffsets.pop();
@@ -303,7 +284,7 @@ export class VesImageConverterService {
             meta: {
               ...imageConfigFileToBeConverted.output[0].meta,
               tilesCount: totalTilesCount,
-              tilesCompressionRatio: (- (((totalTilesCount * 4) - tilesData.length) / (totalTilesCount * 4) * 100)).toFixed(2),
+              tilesCompressionRatio: tilesCompressionRatio,
               animation: {
                 ...imageConfigFileToBeConverted.output[0].meta.animation,
                 largestFrame
@@ -428,7 +409,9 @@ export class VesImageConverterService {
 
         output.meta.tilesCompressionRatio = compressionResult.compressionRatio;
         // discard compression results if they're larger than the original size
-        if (compressionResult.compressionRatio < 0) {
+        if (compressionResult.compressionRatio < 0 ||
+          (imageConfigFileToBeConverted.config.animation.isAnimation &&
+            imageConfigFileToBeConverted.config.animation.individualFiles)) {
           output.tilesData = compressionResult.tilesData;
           output.frameTileOffsets = compressionResult.frameTileOffsets;
         }
@@ -692,7 +675,7 @@ export class VesImageConverterService {
    * Must be executed before every run to ensure permissions are right,
    * even right after reconfiguring paths.
    */
-  async fixPermissions(gritUri: URI): Promise<void> {
+  async fixFilePermissions(gritUri: URI): Promise<void> {
     let command = 'chmod';
     let args = ['-R', 'a+x'];
 

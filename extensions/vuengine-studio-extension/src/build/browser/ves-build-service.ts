@@ -378,7 +378,7 @@ export class VesBuildService {
 
       const buildParams = await this.getBuildProcessParams();
       await this.deleteRom();
-      await this.fixPermissions();
+      await this.fixFilePermissions();
       ({ processManagerId, processId } = await this.vesProcessService.launchProcess(VesProcessType.Raw, buildParams));
 
     } catch (e) {
@@ -701,7 +701,7 @@ export class VesBuildService {
    * Must be executed before every build to ensure permissions are right,
    * even right after reconfiguring engine paths.
    */
-  protected async fixPermissions(): Promise<void> {
+  protected async fixFilePermissions(): Promise<void> {
     let command = 'chmod';
     let args = ['-R', 'a+x'];
 

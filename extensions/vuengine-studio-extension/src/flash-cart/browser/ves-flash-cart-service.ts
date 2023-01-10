@@ -205,7 +205,7 @@ export class VesFlashCartService {
           .split(' ')
         : [];
 
-      await this.fixPermissions();
+      await this.fixFilePermissions();
 
       const { processManagerId } = await this.vesProcessService.launchProcess(VesProcessType.Terminal, {
         command: flasherPath,
@@ -248,7 +248,7 @@ export class VesFlashCartService {
    * Must be executed before every run to ensure permissions are right,
    * even right after reconfiguring paths.
    */
-  protected async fixPermissions(): Promise<void> {
+  protected async fixFilePermissions(): Promise<void> {
     let command = 'chmod';
     let args = ['-R', 'a+x'];
 

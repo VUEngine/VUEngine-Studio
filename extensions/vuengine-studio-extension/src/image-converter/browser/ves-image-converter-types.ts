@@ -76,8 +76,6 @@ export enum ImageConverterLogLineType {
   Done = 'done',
 }
 
-export const COMPRESSION_FLAG_LENGTH = 1;
-
 export enum ImageConverterCompressor {
   RLE = 'rle',
 }
@@ -87,3 +85,30 @@ export interface TilesCompressionResult {
   frameTileOffsets: number[]
   compressionRatio: number
 }
+
+export const COMPRESSION_FLAG_LENGTH = 1;
+
+export const DEFAULT_IMAGE_CONVERTER_CONFIG: ImageConverterConfig = {
+  images: [],
+  name: '',
+  section: MemorySection.ROM,
+  tileset: {
+    shared: false,
+    reduce: true,
+    compress: false
+  },
+  map: {
+    generate: true,
+    reduce: {
+      flipped: true,
+      unique: true
+    },
+    compress: false
+  },
+  animation: {
+    isAnimation: false,
+    individualFiles: false,
+    frameWidth: 0,
+    frameHeight: 0
+  }
+};

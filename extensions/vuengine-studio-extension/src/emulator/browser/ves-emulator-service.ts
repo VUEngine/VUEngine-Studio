@@ -167,7 +167,7 @@ export class VesEmulatorService {
         return;
       }
 
-      await this.fixPermissions(emulatorUri);
+      await this.fixFilePermissions(emulatorUri);
 
       await this.vesProcessService.launchProcess(VesProcessType.Raw, {
         command: await this.fileService.fsPath(emulatorUri),
@@ -214,7 +214,7 @@ export class VesEmulatorService {
    * Must be executed before every run to ensure permissions are right,
    * even right after reconfiguring paths.
    */
-  async fixPermissions(emulatorUri: URI): Promise<void> {
+  async fixFilePermissions(emulatorUri: URI): Promise<void> {
     let command = 'chmod';
     let args = ['-R', 'a+x'];
 
