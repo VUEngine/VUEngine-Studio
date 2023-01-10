@@ -14,11 +14,11 @@
 {%- set tilesCompressionLabel = 'not compressed' -%}
 {%- if tilesCompression is defined and tilesCompression != false -%}
     {%- if meta.tilesCompressionRatio < 0 -%}
-        {%- set tilesCompressionLabel = tilesCompression | upper ~ ' compressed (' ~ meta.tilesCompressionRatio ~ '%)' -%}
+        {%- set tilesCompressionLabel = tilesCompression | upper ~ ' compressed (' ~ meta.tilesCompressionRatio | round(2) ~ '%)' -%}
     {%- elseif meta.tilesCompressionRatio == 0 -%}
-        {%- set tilesCompressionLabel = tilesCompression | upper ~ ' compression skipped for not reducing size (±' ~ meta.tilesCompressionRatio ~ '%)' -%}
+        {%- set tilesCompressionLabel = tilesCompression | upper ~ ' compression skipped for not reducing size (±' ~ meta.tilesCompressionRatio | round(2) ~ '%)' -%}
     {%- else -%}
-        {%- set tilesCompressionLabel = tilesCompression | upper ~ ' compression skipped for inflating size (+' ~ meta.tilesCompressionRatio ~ '%)' -%}
+        {%- set tilesCompressionLabel = tilesCompression | upper ~ ' compression skipped for inflating size (+' ~ meta.tilesCompressionRatio | round(2) ~ '%)' -%}
     {%- endif -%}
 {%- endif -%}
 
