@@ -66,19 +66,34 @@ export class VesCoreContribution implements CommandContribution, MenuContributio
             editorTheme: 'dark-vuengine-studio',
         });
 
-        // Override HC Theme
+        // Override HC Black Theme
         this.monacoThemeRegistry.register({
             ...require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/hc_theia.json'),
-            ...require('../../../themes/vuengine-high-contrast-color-theme.json'),
+            ...require('../../../themes/vuengine-high-contrast-dark-color-theme.json'),
         }, {
             './hc_black.json': require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/hc_black.json')
-        }, 'hc-vuengine-studio', 'hc-black').name!;
+        }, 'hc-vuengine-studio-dark', 'hc-black').name!;
 
         this.themeService.register({
             id: 'hc-theia',
             type: 'hc',
-            label: nls.localize('vuengine/general/themes/highContrast', 'High Contrast'),
-            editorTheme: 'hc-vuengine-studio',
+            label: nls.localize('vuengine/general/themes/highContrastDark', 'High Contrast Dark'),
+            editorTheme: 'hc-vuengine-studio-dark',
+        });
+
+        // Override HC Light Theme
+        this.monacoThemeRegistry.register({
+            ...require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/hc_theia_light.json'),
+            ...require('../../../themes/vuengine-high-contrast-light-color-theme.json'),
+        }, {
+            './hc_light.json': require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/hc_light.json')
+        }, 'hc-vuengine-studio-light', 'hc-light').name!;
+
+        this.themeService.register({
+            id: 'hc-theia-light',
+            type: 'hc',
+            label: nls.localize('vuengine/general/themes/highContrastLightLight', 'High Contrast Light'),
+            editorTheme: 'hc-vuengine-studio-light',
         });
 
         // Add Virtual Boy HC theme
