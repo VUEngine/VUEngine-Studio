@@ -29,6 +29,7 @@
         "preferences": {
           "files.autoSave": "onFocusChange",
           "workbench.tree.renderIndentGuides": "none",
+          "editor.detectIndentation": false,
           "editor.insertSpaces": false,
           "files.watcherExclude": {
             "**/.git/objects/**": true,
