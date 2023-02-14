@@ -124,4 +124,5 @@ export enum EmulatorFunctionKeyCode {
   Reset = 'F10',
   AudioMute = 'KeyQ',
   Screenshot = 'F9',
+  DumpSram = 'KeyY',
 }

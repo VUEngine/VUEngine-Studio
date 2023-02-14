@@ -346,6 +346,9 @@ export class VesEmulatorWidget extends ReactWidget {
           this.update();
         }, 200);
         break;
+      case 'sram':
+        await this.processSram(e.data.data);
+        break;
       case 'screenshot':
         await this.processScreenshot(e.data.data, e.data.filename);
         break;
@@ -560,6 +563,24 @@ export class VesEmulatorWidget extends ReactWidget {
             </button>
           </div>
           <div>
+            <button
+              className='theia-button secondary'
+              title={`${VesEmulatorCommands.INPUT_DUMP_SRAM.label}${this.getKeybindingLabel(VesEmulatorCommands.INPUT_DUMP_SRAM.id, true)}`}
+              onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.DumpSram, e)}
+              disabled={!this.state.loaded || this.state.showControls}
+            >
+              <i className='fa fa-microchip'></i>
+            </button>
+            <button
+              className='theia-button secondary'
+              title='Delete SRAM and restart'
+              onClick={this.deleteSramAndRestart}
+              disabled={!this.state.loaded || this.state.showControls}
+            >
+              <i className='fa fa-trash-o'></i>
+            </button>
+          </div>
+          <div>
             <select
               className='theia-select'
               title={nls.localize('vuengine/emulator/scale', 'Scale')}
@@ -622,14 +643,6 @@ export class VesEmulatorWidget extends ReactWidget {
               disabled={!this.state.loaded || this.state.showControls}
             >
               <i className='fa fa-camera'></i>
-            </button>
-            <button
-              className='theia-button secondary'
-              title='Delete SRAM and restart'
-              onClick={this.deleteSramAndRestart}
-              disabled={!this.state.loaded || this.state.showControls}
-            >
-              <i className='fa fa-trash-o'></i>
             </button>
             <button
               className={
@@ -754,6 +767,9 @@ export class VesEmulatorWidget extends ReactWidget {
         case EmulatorFunctionKeyCode.Screenshot:
           this.sendCommand('sendScreenshot');
           break;
+        case EmulatorFunctionKeyCode.DumpSram:
+          this.sendCommand('sendSram');
+          break;
       }
     }
   }
@@ -774,6 +790,25 @@ export class VesEmulatorWidget extends ReactWidget {
         .resolve('screenshots')
         .resolve(filename);
       this.fileService.writeFile(fileUri, BinaryBuffer.wrap(ia));
+    }
+  }
+
+  protected async processSram(data: string): Promise<void> {
+    // eslint-disable-next-line deprecation/deprecation
+    const byteString = atob(data);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+
+    const romPath = await this.getRomPath();
+    const sramPath = romPath.replace(new RegExp('.vb$'), '.srm');
+
+    await this.workspaceService.ready;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
+    if (workspaceRootUri) {
+      this.fileService.writeFile(new URI(sramPath), BinaryBuffer.wrap(ia));
     }
   }
 

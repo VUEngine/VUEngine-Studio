@@ -311,6 +311,16 @@ export namespace VesEmulatorCommands {
     'vuengine/emulator/commands/category'
   );
 
+  export const INPUT_DUMP_SRAM: Command = Command.toLocalizedCommand(
+    {
+      id: 'ves:emulator:input:dumpSram',
+      label: 'Dump SRAM',
+      category: 'Emulator',
+    },
+    'vuengine/emulator/input/dumpSramCommand',
+    'vuengine/emulator/commands/category'
+  );
+
   export const WIDGET_HELP: Command = Command.toLocalizedCommand(
     {
       id: 'ves:emulator:showHelp',
