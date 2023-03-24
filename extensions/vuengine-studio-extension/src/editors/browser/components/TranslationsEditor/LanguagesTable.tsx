@@ -126,12 +126,16 @@ export default function LanguagesTable(props: LanguagesTableProps): JSX.Element 
                     />
                 </div>
                 <div className='languageActions'>
-                    <button className='theia-button secondary'>
+                    <button
+                        className='theia-button secondary'
+                        title={nls.localize('vuengine/translationsEditor/reorderLanguage', 'Drag to reorder')}
+                    >
                         <i className='codicon codicon-grabber' />
                     </button>
                     <button
                         className='theia-button secondary'
                         onClick={e => removeLanguage(lang.code)}
+                        title={nls.localize('vuengine/translationsEditor/deleteLanguage', 'Delete Language')}
                     >
                         <i className='fa fa-trash' />
                     </button>

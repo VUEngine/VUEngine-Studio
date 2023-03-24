@@ -1,3 +1,4 @@
+import { nls } from '@theia/core';
 import React from 'react';
 import ReactTextareaAutosize from 'react-textarea-autosize';
 import { Language, Translations } from './TranslationsEditorTypes';
@@ -65,6 +66,7 @@ export default function TranslationsTable(props: TranslationsTableProps): JSX.El
                     {removeable && <button
                         className='theia-button secondary'
                         onClick={e => removeTranslation(s)}
+                        title={nls.localize('vuengine/translationsEditor/deleteTranslation', 'Delete Translation')}
                     >
                         <i className='fa fa-trash' />
                     </button>}

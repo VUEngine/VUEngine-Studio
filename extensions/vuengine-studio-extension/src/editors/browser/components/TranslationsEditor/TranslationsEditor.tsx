@@ -1,7 +1,7 @@
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React from 'react';
-import sortJson from 'sort-json';
+// import sortJson from 'sort-json';
 import { ProjectFile, WithContributor } from '../../../../project/browser/ves-project-types';
 import LanguagesTable from './LanguagesTable';
 import { LANGUAGES, Translations, TranslationsData } from './TranslationsEditorTypes';
@@ -103,16 +103,20 @@ export default class TranslationsEditor extends React.Component<TranslationsEdit
     }
 
     protected onChangeTranslationId(oldId: string, newId: string): void {
-        let updatedTranslations = { ...this.props.data.translations };
+        const updatedTranslations = { ...this.props.data.translations };
         const cleanedNewId = newId.replace(/[^A-Za-z0-9]/g, '');
         if (!Object.keys(updatedTranslations).includes(cleanedNewId)) {
             updatedTranslations[cleanedNewId] = updatedTranslations[oldId];
             delete updatedTranslations[oldId];
         }
+        // TODO: do not sort translations on the fly because that messes with a user's typing
+        // Instead, offer a button to trigger sorting
+        /*
         updatedTranslations = sortJson(updatedTranslations, {
             depth: 1,
             ignoreCase: true,
         });
+        */
 
         this.props.updateData({
             ...this.props.data,
