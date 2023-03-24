@@ -1,0 +1,5 @@
+#ves3dConverterWidget {
+    display: flex;
+    flex-direction: column;
+    padding: calc(var(--theia-ui-padding) * 2);
+}
