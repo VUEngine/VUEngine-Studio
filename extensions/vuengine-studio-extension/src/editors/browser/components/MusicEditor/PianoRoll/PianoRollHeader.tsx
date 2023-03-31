@@ -12,5 +12,5 @@ export default function PianoRollHeader(): JSX.Element {
         <div className='pianoRollHeaderAttributes'>
 
         </div>
-    </div >;
+    </div>;
 }

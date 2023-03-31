@@ -494,7 +494,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                 >
                     <i className='fa fa-undo' />
                 </button>
-            </div >
+            </div>
             <MusicEditorContext.Provider value={{
                 state: this.state,
                 songData: this.props.songData,
@@ -532,6 +532,6 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                     }
                 />
             </MusicEditorContext.Provider>
-        </div >;
+        </div>;
     }
 }

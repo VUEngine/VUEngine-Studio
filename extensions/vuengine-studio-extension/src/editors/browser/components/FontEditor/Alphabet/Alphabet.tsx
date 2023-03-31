@@ -48,5 +48,5 @@ export default function Alphabet(props: AlphabetProps): JSX.Element {
                 </div>
             ))
         }
-    </div >;
+    </div>;
 }

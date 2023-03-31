@@ -14,6 +14,6 @@ export default function VContainer(props: PropsWithChildren<VContainerProps>): J
         gap: gap ? `${gap}px` : '5px',
     }}>
         {children}
-    </div >);
+    </div>);
 }
 

@@ -94,6 +94,6 @@ export default class ColumnTableEditor extends React.Component<ColumnTableEditor
                 values={data.values}
                 setValue={this.setValue.bind(this)}
             />
-        </div >;
+        </div>;
     }
 }

@@ -254,7 +254,7 @@ export class VesGettingStartedWidget extends ReactWidget {
             </h3>
             {this.vesRecentWorkspaces.length > 0 ? content : <p className='gs-no-recent'>{nls.localizeByDefault('No Recent Workspaces')}</p>}
             {more}
-        </div >;
+        </div>;
     }
 
     protected renderHelp(): React.ReactNode {

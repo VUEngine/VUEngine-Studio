@@ -102,6 +102,6 @@ export default class BrightnessRepeatEditor extends React.Component<BrightnessRe
                 values={data.values}
                 setValue={this.setValue.bind(this)}
             />
-        </div >;
+        </div>;
     }
 }

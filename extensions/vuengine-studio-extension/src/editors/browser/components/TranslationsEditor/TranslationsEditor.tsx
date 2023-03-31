@@ -230,6 +230,6 @@ export default class TranslationsEditor extends React.Component<TranslationsEdit
                     />
                 </div>
             )}
-        </div >;
+        </div>;
     }
 }

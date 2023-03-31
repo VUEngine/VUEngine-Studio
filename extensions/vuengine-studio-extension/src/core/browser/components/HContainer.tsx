@@ -15,6 +15,6 @@ export default function HContainer(props: PropsWithChildren<HContainerProps>): J
         gap: gap ? `${gap}px` : '5px',
     }}>
         {children}
-    </div >);
+    </div>);
 }
 

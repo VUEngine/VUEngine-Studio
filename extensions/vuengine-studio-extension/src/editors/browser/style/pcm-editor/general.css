@@ -1,0 +1,23 @@
+.pcmEditor {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: 20px;
+  height: 100%;
+  outline: none;
+}
+
+.pcmEditor .settings {
+  display: flex;
+  gap: 4px;
+}
+
+.pcmEditor .settings .setting {
+  flex-grow: 1;
+}
+
+.pcmEditor .setting {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}

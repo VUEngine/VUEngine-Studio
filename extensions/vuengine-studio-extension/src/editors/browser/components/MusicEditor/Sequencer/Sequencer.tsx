@@ -25,5 +25,5 @@ export default function Sequencer(): JSX.Element {
                 />
             )
         }
-    </div >;
+    </div>;
 }

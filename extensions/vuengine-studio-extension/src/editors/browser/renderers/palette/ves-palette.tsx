@@ -59,6 +59,6 @@ export const VesPalette: React.FC<VesPaletteProps> = ({ value, updateValue, labe
                     </div>
                 </div>
             </div>
-        </div >
+        </div>
     );
 };

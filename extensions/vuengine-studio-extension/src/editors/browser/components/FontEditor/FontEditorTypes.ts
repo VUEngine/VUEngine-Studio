@@ -15,10 +15,10 @@ export interface FontData {
     name: string
     offset: number
     characterCount: number
-    size: Size,
-    variableSize: VariableSize,
-    section: DataSection,
-    compression: ImageConverterCompressor,
+    size: Size
+    variableSize: VariableSize
+    section: DataSection
+    compression: ImageConverterCompressor
     characters: number[][][]
 }
 
@@ -28,8 +28,8 @@ export interface Size {
 }
 
 export interface VariableSize {
-    enabled: boolean,
-    x: number[],
+    enabled: boolean
+    x: number[]
     y: number
 }
 

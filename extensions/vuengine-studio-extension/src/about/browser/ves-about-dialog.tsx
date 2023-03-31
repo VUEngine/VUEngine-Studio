@@ -46,7 +46,7 @@ export class VesAboutDialog extends AboutDialog {
             {this.renderVersions()}
             <hr className="ves-about-hr" />
             {this.renderPatreon()}
-        </div >;
+        </div>;
     }
 
     protected renderHeader(): React.ReactNode {

@@ -45,7 +45,7 @@ export class VesTitlebarApplicationTitleWidget extends ReactWidget {
     return <div onDoubleClick={this.maximizeWindow}>
       <div className="applicationTitle" onClick={this.openRecentWorkspace}>
         {this.applicationTitle}
-      </div >
+      </div>
     </div>;
   }
 

@@ -354,6 +354,6 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
                     />
                 </div>
             </div>
-        </div >;
+        </div>;
     }
 }
