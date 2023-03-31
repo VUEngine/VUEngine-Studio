@@ -60,6 +60,10 @@ export class VesPluginsWidget extends SourceTreeWidget implements BadgeWidget {
     get onDidChangeBadge(): Event<void> {
         return this.onDidChangeBadgeEmitter.event;
     }
+    protected onDidChangeBadgeTooltipEmitter = new Emitter<void>();
+    get onDidChangeBadgeTooltip(): Event<void> {
+        return this.onDidChangeBadgeTooltipEmitter.event;
+    }
 
     set badge(count: number | undefined) {
         this._badge = count;
