@@ -38,6 +38,7 @@
             "**/build/*.a": true,
             "**/node_modules/**": true
           },
+	        "git.autofetch": true,
           "security.workspace.trust.enabled": false,
           "toolbar.showToolbar": true,
           "window.title": "${projectName}",
@@ -53,7 +54,7 @@
     },
     "generator": {
       "config": {
-        "preloadTemplate": "resources/splash/index.html"
+        "preloadTemplate": "./resources/splash/index.html"
       }
     }
   },
@@ -68,7 +69,6 @@
     "@theia/external-terminal": "1.36.0",
     "@theia/file-search": "1.36.0",
     "@theia/filesystem": "1.36.0",
-    "@theia/git": "1.36.0",
     "@theia/keymaps": "1.36.0",
     "@theia/markers": "1.36.0",
     "@theia/messages": "1.36.0",
@@ -132,7 +132,11 @@
   },
   "theiaPluginsDir": "plugins",
   "theiaPlugins": {
+    "vscode.configuration-editing": "https://open-vsx.org/api/vscode/configuration-editing/1.52.1/file/vscode.configuration-editing-1.52.1.vsix",
     "vscode.cpp": "https://open-vsx.org/api/vscode/cpp/1.52.1/file/vscode.cpp-1.52.1.vsix",
+    "vscode.git": "https://open-vsx.org/api/vscode/git/1.52.1/file/vscode.git-1.52.1.vsix",
+    "vscode.git-base": "https://open-vsx.org/api/vscode/git-base/1.70.2/file/vscode.git-base-1.70.2.vsix",
+    "vscode.git-ui": "https://open-vsx.org/api/vscode/git-ui/1.52.1/file/vscode.git-ui-1.52.1.vsix",
     "vscode.image-preview": "https://open-vsx.org/api/vscode/image-preview/1.52.1/file/vscode.image-preview-1.52.1.vsix",
     "vscode.ini": "https://open-vsx.org/api/vscode/ini/1.52.1/file/vscode.ini-1.52.1.vsix",
     "vscode.javascript": "https://open-vsx.org/api/vscode/javascript/1.52.1/file/vscode.javascript-1.52.1.vsix",
@@ -141,14 +145,14 @@
     "vscode.log": "https://open-vsx.org/api/vscode/log/1.52.1/file/vscode.log-1.52.1.vsix",
     "vscode.make": "https://open-vsx.org/api/vscode/make/1.52.1/file/vscode.make-1.52.1.vsix",
     "vscode.markdown": "https://open-vsx.org/api/vscode/markdown/1.52.1/file/vscode.markdown-1.52.1.vsix",
+    "vscode.markdown-language-features": "https://open-vsx.org/api/vscode/markdown-language-features/1.52.1/file/vscode.markdown-language-features-1.52.1.vsix",
+    "vscode.merge-conflict": "https://open-vsx.org/api/vscode/merge-conflict/1.52.1/file/vscode.merge-conflict-1.52.1.vsix",
     "vscode.powershell": "https://open-vsx.org/api/vscode/powershell/1.52.1/file/vscode.powershell-1.52.1.vsix",
+    "vscode.search-result": "https://open-vsx.org/api/vscode/search-result/1.52.1/file/vscode.search-result-1.52.1.vsix",
     "vscode.shellscript": "https://open-vsx.org/api/vscode/shellscript/1.52.1/file/vscode.shellscript-1.52.1.vsix",
-    "vscode.yaml": "https://open-vsx.org/api/vscode/yaml/1.52.1/file/vscode.yaml-1.52.1.vsix",
-    "vscode.xml": "https://open-vsx.org/api/vscode/xml/1.52.1/file/vscode.xml-1.52.1.vsix"
+    "vscode.xml": "https://open-vsx.org/api/vscode/xml/1.52.1/file/vscode.xml-1.52.1.vsix",
+    "vscode.yaml": "https://open-vsx.org/api/vscode/yaml/1.52.1/file/vscode.yaml-1.52.1.vsix"
   },
   "theiaPluginsExcludeIds": [
-    "ms-vscode.js-debug-companion",
-    "vscode.extension-editing",
-    "vscode.microsoft-authentication"
   ]
 }
