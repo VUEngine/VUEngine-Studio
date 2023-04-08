@@ -130,7 +130,8 @@ function EmulatorConfigs(props: EmulatorConfigsProps): JSX.Element {
     const openFileDialogProps: OpenFileDialogProps = {
       title: nls.localize('vuengine/emulator/selectEmulatorExecutable', 'Select emulator executable'),
       canSelectFolders: false,
-      canSelectFiles: true
+      canSelectFiles: true,
+      filters: { 'Executables': ['.'] }
     };
     const currentPath = await props.fileService.exists(new URI(emulatorConfigs[index].path).withScheme('file'))
       ? await props.fileService.resolve(new URI(emulatorConfigs[index].path).withScheme('file'))
