@@ -18,12 +18,13 @@
 
 [type="checkbox"]::before {
     background-color: var(--theia-input-background);
-    border: var(--theia-border-width) solid var(--theia-dropdown-border);
+    border: var(--theia-border-width) solid transparent;
     border-radius: 10px;
     content: '';
     cursor: pointer;
     display: inline-block;
     height: var(--theia-ui-font-size2);
+    outline: none !important;
     position: relative;
     vertical-align: bottom;
     width: calc(2 * var(--theia-ui-font-size2));

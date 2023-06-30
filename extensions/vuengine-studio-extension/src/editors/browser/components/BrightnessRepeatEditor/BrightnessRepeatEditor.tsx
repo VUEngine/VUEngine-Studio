@@ -81,7 +81,7 @@ export default class BrightnessRepeatEditor extends React.Component<BrightnessRe
                     </VContainer>
                     <label>
                         <input
-                            type='checkbox'
+                            type="checkbox"
                             checked={data.mirror}
                             onChange={this.onChangeMirror.bind(this)}
                         />

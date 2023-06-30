@@ -156,7 +156,7 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
                 <label className='setting'>
                     {nls.localize('vuengine/pcmEditor/loop', 'Loop')}
                     <input
-                        type='checkbox'
+                        type="checkbox"
                         checked={data.loop}
                         onChange={this.toggleLoop}
                     />

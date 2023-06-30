@@ -5,7 +5,6 @@ import { ChannelConfig, InstrumentConfig, MusicEditorContext, MusicEditorState, 
 import MusicPlayer from './MusicPlayer';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
-import '../../../../../../../node_modules/rc-dock/dist/rc-dock.css';
 import Instruments from './Sidebar/Instruments';
 import Waveforms from './Sidebar/Waveforms';
 import { CommonCommands, ConfirmDialog, LocalStorageService } from '@theia/core/lib/browser';

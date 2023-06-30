@@ -65,7 +65,7 @@ export default function CurrentChannel(): JSX.Element {
         <VContainer>
             <label>
                 <input
-                    type='checkbox'
+                    type="checkbox"
                     checked={channel.collapsed}
                     onChange={() => toggleChannelCollapsed(channel.id)}
                 />
@@ -73,7 +73,7 @@ export default function CurrentChannel(): JSX.Element {
             </label>
             <label>
                 <input
-                    type='checkbox'
+                    type="checkbox"
                     checked={channel.muted}
                     onChange={() => toggleChannelMuted(channel.id)}
                 />
@@ -81,7 +81,7 @@ export default function CurrentChannel(): JSX.Element {
             </label>
             <label>
                 <input
-                    type='checkbox'
+                    type="checkbox"
                     checked={channel.solo}
                     onChange={() => toggleChannelSolo(channel.id)}
                 />

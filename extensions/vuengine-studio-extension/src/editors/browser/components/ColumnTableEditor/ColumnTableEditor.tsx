@@ -80,7 +80,7 @@ export default class ColumnTableEditor extends React.Component<ColumnTableEditor
                     </VContainer>
                     <label>
                         <input
-                            type='checkbox'
+                            type="checkbox"
                             checked={data.mirror}
                             onChange={this.onChangeMirror.bind(this)}
                         />

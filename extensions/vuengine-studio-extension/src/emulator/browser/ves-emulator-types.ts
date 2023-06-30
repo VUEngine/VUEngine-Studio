@@ -8,6 +8,7 @@ export interface RomHeader {
 };
 
 export const ROM_HEADER_MAKERS: { [key: string]: string } = {
+  // Official Maker Codes
   '01': 'Nintendo',
   '0B': 'Coconuts',
   '18': 'Hudson Soft',
@@ -24,6 +25,10 @@ export const ROM_HEADER_MAKERS: { [key: string]: string } = {
   'E7': 'Athena',
   'EB': 'Atlus',
 
+  // Imaginary Official Maker Codes
+  '0A': 'Konami',
+
+  // Homebrew Authors
   'AB': 'Amos Bieler',
   'AE': 'Aegis Games',
   'CR': 'Christian Radke',
@@ -44,6 +49,7 @@ export const ROM_HEADER_MAKERS: { [key: string]: string } = {
   'TS': 'Thunderstruck',
   'TV': 'Team VUEngine',
   'VE': 'Virtual-E',
+  'VU': 'Team VUEngine',
 };
 
 export interface EmulatorConfig {

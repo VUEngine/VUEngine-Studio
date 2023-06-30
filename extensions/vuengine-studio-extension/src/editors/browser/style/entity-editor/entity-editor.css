@@ -1,0 +1,56 @@
+.entityEditor {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+.entityEditor .dock-layout {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    gap: 5px;
+    height: 100%;
+    overflow: hidden;
+    padding: 2px;
+    user-select: none;
+}
+
+.entityEditor .divider {
+    border-top: var(--theia-sash-width) dashed var(--theia-sideBar-background);
+    margin: 20px 0;
+}
+
+.entityEditor .item {
+    align-items: center;
+    border: var(--theia-border-width) solid var(--theia-dropdown-border);
+    padding: calc(2 * var(--theia-ui-padding));
+}
+
+.entityEditor .item:hover {
+    border-color: var(--theia-button-hoverBackground);
+}
+
+.entityEditor .add-button {
+    align-items: center;
+    border: var(--theia-border-width) dashed var(--theia-dropdown-border);
+    color: var(--theia-dropdown-border);
+    cursor: pointer;
+    display: flex;
+    height: var(--theia-content-line-height);
+    justify-content: center;
+}
+
+.entityEditor .add-button:hover {
+    background-color: var(--theia-button-hoverBackground);
+    border-color: var(--theia-button-hoverBackground);
+    border-style: solid;
+    color: var(--theia-button-hoverForeground);
+}
+
+.entityEditor .remove-button {
+    margin-left: 0;
+    width: fit-content;
+}
