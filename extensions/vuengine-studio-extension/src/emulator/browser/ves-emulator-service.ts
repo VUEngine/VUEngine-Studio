@@ -61,7 +61,7 @@ export class VesEmulatorService {
   readonly onDidChangeEmulatorConfigs = this.onDidChangeEmulatorConfigsEmitter.event;
 
   @postConstruct()
-  protected async init(): Promise<void> {
+  protected init(): void {
     // watch for preference changes
     this.preferenceService.onPreferenceChanged(
       ({ preferenceName, newValue }) => {

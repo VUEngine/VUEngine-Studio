@@ -273,7 +273,7 @@ export class VesEmulatorSidebarWidget extends ReactWidget {
   };
 
   @postConstruct()
-  protected async init(): Promise<void> {
+  protected init(): void {
     this.id = VesEmulatorSidebarWidget.ID;
     this.title.iconClass = 'codicon codicon-run';
     this.title.closable = true;

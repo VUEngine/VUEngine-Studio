@@ -46,7 +46,7 @@ export class VesPluginsModel {
     protected readonly initialized = new Deferred<void>();
 
     @postConstruct()
-    protected async init(): Promise<void> {
+    protected init(): void {
         this.frontendApplicationStateService.onStateChanged(async (state: FrontendApplicationState) => {
             if (state === 'attached_shell') {
                 await this.pluginsService.setPluginsData();

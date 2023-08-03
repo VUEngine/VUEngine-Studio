@@ -1,6 +1,8 @@
 import { JsonSchema, UISchemaElement } from '@jsonforms/core';
 import URI from '@theia/core/lib/common/uri';
 
+export const VUENGINE_EXT = 'vuengine';
+
 export interface WorkspaceFile {
   extensions?: {
     recommendations?: {

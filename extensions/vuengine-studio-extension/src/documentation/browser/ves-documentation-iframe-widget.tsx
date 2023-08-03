@@ -14,7 +14,7 @@ export class VesDocumentationIFrameWidget extends ReactWidget {
     static readonly LABEL = nls.localize('vuengine/documentation/hardwareDocumentation', 'Hardware Documentation');
 
     @postConstruct()
-    protected async init(): Promise<void> {
+    protected init(): void {
         this.id = VesDocumentationIFrameWidget.ID;
         this.title.label = VesDocumentationIFrameWidget.LABEL;
         this.title.caption = VesDocumentationIFrameWidget.LABEL;

@@ -19,7 +19,7 @@ export class VesProcessWatcher {
     @inject(VesProcessService) protected readonly server: VesProcessService;
 
     @postConstruct()
-    protected async init(): Promise<void> {
+    protected init(): void {
         // TODO: do we have to manually dispose event handlers when the respective processes are killed?
         this.server.setClient({
             onDidReceiveErrorStreamData: (pId: number, data: string) => this.onDidReceiveErrorStreamDataEmitter.fire({ pId, data }),

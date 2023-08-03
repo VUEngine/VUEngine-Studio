@@ -67,7 +67,7 @@ export class VesRumblePackService {
   }
 
   @postConstruct()
-  protected async init(): Promise<void> {
+  protected init(): void {
     this.bindEvents();
   }
 

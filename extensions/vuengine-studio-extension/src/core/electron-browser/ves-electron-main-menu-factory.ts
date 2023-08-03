@@ -1,6 +1,6 @@
 import { isOSX, MAIN_MENU_BAR } from '@theia/core';
-import { getCurrentWindow, Menu } from '@theia/core/electron-shared/@electron/remote';
 import { ElectronMainMenuFactory } from '@theia/core/lib/electron-browser/menu/electron-main-menu-factory';
+import { MenuDto } from '@theia/core/lib/electron-common/electron-api';
 import { injectable } from '@theia/core/shared/inversify';
 
 // This fixes a bug in Theia where the main menu would not render on Mac
@@ -8,27 +8,16 @@ import { injectable } from '@theia/core/shared/inversify';
 
 @injectable()
 export class VesElectronMainMenuFactory extends ElectronMainMenuFactory {
-    async setMenuBar(): Promise<void> {
-        const createdMenuBar = this.createElectronMenuBar();
-        if (isOSX) {
-            Menu.setApplicationMenu(createdMenuBar);
-        } else {
-            getCurrentWindow().setMenu(createdMenuBar);
-        }
-    }
-
-    createElectronMenuBar(): Electron.Menu | null {
+    createElectronMenuBar(): MenuDto[] | undefined {
         const menuModel = this.menuProvider.getMenu(MAIN_MENU_BAR);
-        const template = this.fillMenuTemplate([], menuModel, [], { rootMenuPath: MAIN_MENU_BAR });
+        this._menu = this.fillMenuTemplate([], menuModel, [], { /* honorDisabled: false, */ rootMenuPath: MAIN_MENU_BAR });
         if (isOSX) {
-            template.unshift(this.createOSXMenu());
+            this._menu.unshift(this.createOSXMenu());
         }
-        const menu = Menu.buildFromTemplate(template);
-        this._menu = menu;
         return this._menu;
     }
 
-    protected createOSXMenu(): Electron.MenuItemConstructorOptions {
+    protected createOSXMenu(): MenuDto {
         return {
             label: 'VUEngine Studio',
             submenu: [

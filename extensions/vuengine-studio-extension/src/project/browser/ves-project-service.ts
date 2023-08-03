@@ -14,7 +14,6 @@ import { VES_PREFERENCE_DIR } from '../../core/browser/ves-preference-configurat
 import { VesGlobService } from '../../glob/common/ves-glob-service-protocol';
 import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-service';
 import { USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } from '../../plugins/browser/ves-plugins-types';
-import { VUENGINE_EXT } from '../common/custom-project-file/ves-project-utils';
 import { VesNewProjectTemplate } from './new-project/ves-new-project-form';
 import {
   ProjectFile,
@@ -27,6 +26,7 @@ import {
   ProjectFileTemplatesWithContributor,
   ProjectFileType,
   ProjectFileTypesWithContributor,
+  VUENGINE_EXT,
   WithContributor
 } from './ves-project-types';
 
@@ -183,11 +183,9 @@ export class VesProjectService {
   }
 
   @postConstruct()
-  protected async init(): Promise<void> {
-    await this.readProjectData();
-    this._ready.resolve();
+  protected init(): void {
+    this.doInit();
 
-    this.updateWindowTitle();
     this.onDidChangeProjectData(() => {
       this.updateWindowTitle();
     });
@@ -203,6 +201,12 @@ export class VesProjectService {
         }
       }
     });
+  }
+
+  protected async doInit(): Promise<void> {
+    await this.readProjectData();
+    this._ready.resolve();
+    this.updateWindowTitle();
   }
 
   protected async readProjectData(): Promise<void> {

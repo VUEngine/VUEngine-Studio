@@ -4,8 +4,8 @@
 **/dist
 **/lib
 **/src-gen
-**/webpack.config.js
 **/gen-webpack.config.js
+**/gen-webpack.node.config.js
 applications/*/plugins
 **/tsconfig.tsbuildinfo
 *.log

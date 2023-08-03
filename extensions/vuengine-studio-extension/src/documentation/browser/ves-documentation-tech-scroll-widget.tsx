@@ -30,7 +30,11 @@ export class VesDocumentationTechScrollWidget extends BaseWidget {
     }
 
     @postConstruct()
-    async init(): Promise<void> {
+    init(): void {
+        this.doInit();
+    }
+
+    protected async doInit(): Promise<void> {
         const resourcesURi = await this.vesCommonService.getResourcesUri();
         const stsUri = resourcesURi
             .resolve('documentation')

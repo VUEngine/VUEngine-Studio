@@ -13,7 +13,7 @@ export class VesFlashCartUsbWatcher {
     public readonly onDidDetachDevice: Event<void> = this.onDidDetachDeviceEmitter.event;
 
     @postConstruct()
-    protected async init(): Promise<void> {
+    protected init(): void {
         this.server.setClient({
             onDidAttachDevice: () => this.onDidAttachDeviceEmitter.fire(),
             onDidDetachDevice: () => this.onDidDetachDeviceEmitter.fire(),

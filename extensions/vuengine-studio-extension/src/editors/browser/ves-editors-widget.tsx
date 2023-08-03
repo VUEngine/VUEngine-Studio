@@ -80,7 +80,9 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     static readonly LABEL = 'Editor';
 
     @postConstruct()
-    protected async init(): Promise<void> {
+    protected init(): void {
+        this.doInit();
+
         this.id = `vesEditorsWidget:${this.options.typeId}:${this.options.itemId}`;
         this.title.label = this.options.typeId;
         this.title.caption = this.options.typeId;
@@ -112,7 +114,9 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         this.toDispose.push(this.changeEmitter);
         this.jsonformsOnChange = (state: Pick<JsonFormsCore, 'data' | 'errors'>) =>
             this.changeEmitter.fire(state.data);
+    }
 
+    protected async doInit(): Promise<void> {
         await this.vesProjectService.ready;
         const type = this.vesProjectService.getProjectDataType(this.options.typeId);
         if (type) {

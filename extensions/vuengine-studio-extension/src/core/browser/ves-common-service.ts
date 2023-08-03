@@ -18,7 +18,11 @@ export class VesCommonService {
   protected readonly vesProcessWatcher: VesProcessWatcher;
 
   @postConstruct()
-  protected async init(): Promise<void> {
+  protected init(): void {
+    this.doInit();
+  }
+
+  protected async doInit(): Promise<void> {
     await this.determineIsWslInstalled();
   }
 

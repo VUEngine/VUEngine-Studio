@@ -1,5 +1,4 @@
 import { CommandService } from '@theia/core';
-import { getCurrentWindow, systemPreferences } from '@theia/core/electron-shared/@electron/remote';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { WindowTitleService } from '@theia/core/lib/browser/window/window-title-service';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -20,20 +19,24 @@ export class VesTitlebarApplicationTitleWidget extends ReactWidget {
   protected applicationTitle = '';
 
   @postConstruct()
-  protected async init(): Promise<void> {
+  protected init(): void {
+    this.doInit();
+
     this.id = VesTitlebarApplicationTitleWidget.ID;
     this.title.label = VesTitlebarApplicationTitleWidget.LABEL;
     this.title.caption = VesTitlebarApplicationTitleWidget.LABEL;
     this.title.closable = false;
 
+    this.windowTitleService.onDidChangeTitle(() => {
+      this.setTitle();
+    });
+  }
+
+  protected async doInit(): Promise<void> {
     await this.workspaceService.ready;
     this.setTitle();
 
     this.update();
-
-    this.windowTitleService.onDidChangeTitle(() => {
-      this.setTitle();
-    });
   }
 
   protected setTitle(): void {
@@ -50,14 +53,15 @@ export class VesTitlebarApplicationTitleWidget extends ReactWidget {
   }
 
   protected maximizeWindow(): void {
-    const win = getCurrentWindow();
+    const win = window.electronTheiaCore;
     if (!win) { return; }
     if (process.platform === 'darwin') {
-      const action = systemPreferences.getUserDefault('AppleActionOnDoubleClick', 'string');
+      const action = window.electronVesCore.getUserDefault('AppleActionOnDoubleClick', 'string');
       if (action === 'None') { return; }
       if (action === 'Minimize') { return win.minimize(); }
+      win.minimize();
     }
-    if (win.isMaximized()) { return win.unmaximize(); };
+    if (win.isMaximized()) { return win.unMaximize(); };
     return win.maximize();
   }
 

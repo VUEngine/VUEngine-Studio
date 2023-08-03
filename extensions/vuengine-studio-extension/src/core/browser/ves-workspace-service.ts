@@ -17,7 +17,7 @@ export class VesWorkspaceService extends WorkspaceService {
     protected readonly vesPluginsPathsService: VesPluginsPathsService;
 
     @postConstruct()
-    protected async init(): Promise<void> {
+    protected init(): void {
         super.init();
 
         this.preferenceService.onPreferenceChanged(async ({ preferenceName }) => {
