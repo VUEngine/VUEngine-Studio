@@ -18,6 +18,7 @@ import { ContainerModule } from '@theia/core/shared/inversify';
 import { DebugConsoleContribution } from '@theia/debug/lib/browser/console/debug-console-contribution';
 import { DebugFrontendApplicationContribution } from '@theia/debug/lib/browser/debug-frontend-application-contribution';
 import { DebugPrefixConfiguration } from '@theia/debug/lib/browser/debug-prefix-configuration';
+import { FileSystemFrontendContribution } from '@theia/filesystem/lib/browser/filesystem-frontend-contribution';
 import { NavigatorWidgetFactory } from '@theia/navigator/lib/browser/navigator-widget-factory';
 import { OutlineViewContribution } from '@theia/outline-view/lib/browser/outline-view-contribution';
 import { PluginApiFrontendContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-contribution';
@@ -41,6 +42,7 @@ import { VesDefaultFileIconThemeContribution } from './ves-core-icon-theme-contr
 import { VesCoreLabelProviderContribution } from './ves-core-label-provider';
 import { VesCorePreferenceSchema } from './ves-core-preferences';
 import { VesEncodingRegistry } from './ves-encoding-registry';
+import { VesFileSystemFrontendContribution } from './ves-filesystem-frontend-contribution';
 import { VesNavigatorWidgetFactory } from './ves-navigator-widget-factory';
 import { VesPluginContribution } from './ves-plugin-contribution';
 import { VesPreferenceConfigurations } from './ves-preference-configurations';
@@ -141,6 +143,10 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // git history
     bind(VesScmHistoryContribution).toSelf().inSingletonScope();
     rebind(ScmHistoryContribution).toService(VesScmHistoryContribution);
+
+    // custom file extensions
+    bind(VesFileSystemFrontendContribution).toSelf().inSingletonScope();
+    rebind(FileSystemFrontendContribution).toService(VesFileSystemFrontendContribution);
 
     // remove "test" view
     bind(VesPluginContribution).toSelf().inSingletonScope();
