@@ -3,14 +3,14 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { FileStat } from '@theia/filesystem/lib/common/files';
 import { QuickOpenWorkspace } from '@theia/workspace/lib/browser/quick-open-workspace';
-import { CommonWorkspaceUtils } from '@theia/workspace/lib/common';
+import { UntitledWorkspaceService } from '@theia/workspace/lib/common';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesCommonService } from './ves-common-service';
 
 @injectable()
 export class VesQuickOpenWorkspace extends QuickOpenWorkspace {
-    @inject(CommonWorkspaceUtils)
-    protected workspaceUtils: CommonWorkspaceUtils;
+    @inject(UntitledWorkspaceService)
+    protected readonly untitledWorkspaceService: UntitledWorkspaceService;
     @inject(VesCommonService)
     protected readonly vesCommonService: VesCommonService;
     @inject(VesProjectService)
@@ -33,7 +33,7 @@ export class VesQuickOpenWorkspace extends QuickOpenWorkspace {
             try {
                 stat = await this.fileService.resolve(uri);
             } catch { }
-            if (this.workspaceUtils.isUntitledWorkspace(uri) || !stat) {
+            if (this.untitledWorkspaceService.isUntitledWorkspace(uri) || !stat) {
                 continue; // skip the temporary workspace files or an undefined stat.
             }
             const icon = this.labelProvider.getIcon(stat);

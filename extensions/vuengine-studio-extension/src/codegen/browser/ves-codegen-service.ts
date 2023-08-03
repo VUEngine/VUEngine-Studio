@@ -48,11 +48,15 @@ export class VesCodeGenService {
   protected workspaceService: WorkspaceService;
 
   @postConstruct()
-  protected async init(): Promise<void> {
+  protected init(): void {
+    this.doInit();
+    this.bindEvents();
+  }
+
+  protected async doInit(): Promise<void> {
     await this.preferenceService.ready;
     await this.vesPluginsService.ready;
     await this.configureTemplateEngine();
-    this.bindEvents();
   }
 
   protected bindEvents(): void {

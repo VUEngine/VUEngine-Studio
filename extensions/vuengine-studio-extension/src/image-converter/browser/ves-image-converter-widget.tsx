@@ -49,7 +49,7 @@ export class VesImageConverterWidget extends ReactWidget {
   }
 
   @postConstruct()
-  protected async init(): Promise<void> {
+  protected init(): void {
     this.id = VesImageConverterWidget.ID;
     this.title.iconClass = 'codicon codicon-circuit-board';
     this.title.closable = true;

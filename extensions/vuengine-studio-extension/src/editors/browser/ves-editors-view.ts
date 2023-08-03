@@ -29,7 +29,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
     }
 
     @postConstruct()
-    protected async init(): Promise<void> {
+    protected init(): void {
         this.updateFocusedView();
         this.shell.onDidChangeActiveWidget(() => this.updateFocusedView());
     }

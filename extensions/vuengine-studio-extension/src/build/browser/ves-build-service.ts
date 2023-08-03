@@ -177,9 +177,13 @@ export class VesBuildService {
   }
 
   @postConstruct()
-  protected async init(): Promise<void> {
-    await this.resetBuildStatus();
+  protected init(): void {
     this.bindEvents();
+    this.doInit();
+  }
+
+  protected async doInit(): Promise<void> {
+    await this.resetBuildStatus();
   }
 
   async doBuild(force: boolean = false): Promise<void> {

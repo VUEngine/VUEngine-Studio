@@ -1,4 +1,3 @@
-import { getCurrentWindow } from '@theia/core/electron-shared/@electron/remote';
 import { KeybindingContribution, KeybindingRegistry, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
 import { CommandContribution, CommandRegistry } from '@theia/core/lib/common/command';
 import { ElectronCommands } from '@theia/core/lib/electron-browser/menu/electron-menu-contribution';
@@ -95,8 +94,7 @@ export class VesZoomContribution implements CommandContribution, KeybindingContr
 
     protected applyConfiguredZoomFactor(): void {
         const zoomFactor = this.toZoomFactor(this.preferenceService.get(VesZoomPreferenceIds.ZOOM_LEVEL) as string);
-        const currentWindow = getCurrentWindow();
-        currentWindow.webContents.setZoomFactor(zoomFactor);
+        window.electronVesCore.setZoomFactor(zoomFactor);
     }
 
     protected toZoomFactor(value: string): number {

@@ -95,7 +95,9 @@ export class VesEmulatorWidget extends ReactWidget {
   protected state: vesEmulatorWidgetState;
 
   @postConstruct()
-  protected async init(): Promise<void> {
+  protected init(): void {
+    this.doInit();
+
     const label = this.options
       ? this.vesCommonService.basename(this.options.uri)
       : VesEmulatorWidget.LABEL;
@@ -107,9 +109,6 @@ export class VesEmulatorWidget extends ReactWidget {
     this.title.iconClass = 'codicon codicon-play';
     this.title.closable = true;
 
-    this.resource = await this.getResource();
-
-    await this.initState();
     // TODO: find out why the emulator is only x1 size initially, without setTimeout
     setTimeout(() => {
       this.update();
@@ -136,6 +135,11 @@ export class VesEmulatorWidget extends ReactWidget {
         this.reload();
       }
     });
+  }
+
+  protected async doInit(): Promise<void> {
+    this.resource = await this.getResource();
+    await this.initState();
   }
 
   protected onCloseRequest(msg: Message): void {

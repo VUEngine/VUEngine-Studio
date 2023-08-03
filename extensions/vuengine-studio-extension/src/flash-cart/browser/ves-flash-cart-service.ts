@@ -138,7 +138,7 @@ export class VesFlashCartService {
   readonly onDidSucceedFlashing = this.onDidSucceedFlashingEmitter.event;
 
   @postConstruct()
-  protected async init(): Promise<void> {
+  protected init(): void {
     this.bindEvents();
   }
 

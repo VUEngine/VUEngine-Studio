@@ -23,7 +23,7 @@ export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmu
   }
 
   @postConstruct()
-  protected async init(): Promise<void> {
+  protected init(): void {
     this.updateFocusedView();
     this.shell.onDidChangeActiveWidget(() => this.updateFocusedView());
   }

@@ -67,7 +67,7 @@ export class VesFlashCartWidget extends ReactWidget {
   };
 
   @postConstruct()
-  protected async init(): Promise<void> {
+  protected init(): void {
     this.id = VesFlashCartWidget.ID;
     this.title.iconClass = 'codicon codicon-layout-statusbar';
     this.title.closable = true;

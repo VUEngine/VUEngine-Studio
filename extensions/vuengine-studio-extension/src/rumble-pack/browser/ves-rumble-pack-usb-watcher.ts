@@ -15,7 +15,7 @@ export class VesRumblePackUsbWatcher {
     public readonly onDidReceiveData: Event<string> = this.onDidReceiveDataEmitter.event;
 
     @postConstruct()
-    protected async init(): Promise<void> {
+    protected init(): void {
         this.server.setClient({
             onDidAttachDevice: () => this.onDidAttachDeviceEmitter.fire(),
             onDidDetachDevice: () => this.onDidDetachDeviceEmitter.fire(),

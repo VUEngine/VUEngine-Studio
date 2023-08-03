@@ -20,7 +20,7 @@ export class VesPluginsSource extends TreeSource {
     protected readonly model: VesPluginsModel;
 
     @postConstruct()
-    protected async init(): Promise<void> {
+    protected init(): void {
         this.fireDidChange();
         this.toDispose.push(this.model.onDidChangeData(() => this.fireDidChange()));
     }

@@ -69,7 +69,8 @@ export class VesBuildWidget extends ReactWidget {
   }
 
   @postConstruct()
-  protected async init(): Promise<void> {
+  protected init(): void {
+    this.doInit();
     this.id = VesBuildWidget.ID;
     this.title.iconClass = 'codicon codicon-tools';
     this.title.closable = true;
@@ -77,10 +78,13 @@ export class VesBuildWidget extends ReactWidget {
     this.title.caption = VesBuildWidget.LABEL;
     this.node.tabIndex = 0; // required for this.node.focus() to work in this.onActivateRequest()
     this.title.className = '';
-    this.state.outputRomExists = await this.vesBuildService.outputRomExists();
 
     this.update();
     this.bindEvents();
+  }
+
+  protected async doInit(): Promise<void> {
+    this.state.outputRomExists = await this.vesBuildService.outputRomExists();
   }
 
   protected bindEvents(): void {

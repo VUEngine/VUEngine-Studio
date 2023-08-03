@@ -14,7 +14,7 @@ export class VesTitlebarActionButtonsContribution extends AbstractViewContributi
     }
 
     @postConstruct()
-    protected async init(): Promise<void> {
-        await this.openView({ activate: true, reveal: true });
+    protected init(): void {
+        this.openView({ activate: true, reveal: true });
     }
 }

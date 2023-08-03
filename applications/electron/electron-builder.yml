@@ -2,24 +2,25 @@ appId: dev.vuengine.studio
 productName: VUEngine
 copyright: Copyright © 2006-2023 VUEngine
 electronDist: ../../node_modules/electron/dist
-electronVersion: 15.5.7
+electronVersion: 23.3.11
 # Although it is generally not recommended to disable asar, it is required for Theia.
 # Enabling this leads to: process ERROR Error: spawn ENOTDIR
 # because binaries can not be executed from the asar archive.
 # See asar file API limitations: https://www.electronjs.org/docs/tutorial/application-packaging#limitations-of-the-node-api
 asar: false
+nodeGypRebuild: false
+npmRebuild: false
 
 directories:
   buildResources: resources
 
 # node_modules and package.json are copied automatically
-# Copying node_modules must be automatic for correct resolvement of binaries.
-# Furthermore, This reduces bundle sizes significantly because it avoids duplicates of the electron runtime.
+# Exclude node_modules manually because electron is copied by electron-builder and we are using a bundled backend
 files:
   - src-gen
   - lib
   - scripts
-  - "!**node_modules/electron/**"
+  - "!**node_modules/**"
   - from: plugins
     to: plugins
   - from: binaries/vuengine-studio-tools/web

@@ -10,11 +10,11 @@ import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesCommonService } from '../../../core/browser/ves-common-service';
-import { VUENGINE_EXT } from '../../common/custom-project-file/ves-project-utils';
 import { VesProjectCommands } from '../ves-project-commands';
 import { VesProjectPathsService } from '../ves-project-paths-service';
 import { VesProjectService } from '../ves-project-service';
 import { VesNewProjectFormComponent, VES_NEW_PROJECT_TEMPLATES } from './ves-new-project-form';
+import { VUENGINE_EXT } from '../ves-project-types';
 
 @injectable()
 export class VesNewProjectDialogProps extends DialogProps {
@@ -61,7 +61,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
     }
 
     @postConstruct()
-    protected async init(): Promise<void> {
+    protected init(): void {
         this.update();
     }
 

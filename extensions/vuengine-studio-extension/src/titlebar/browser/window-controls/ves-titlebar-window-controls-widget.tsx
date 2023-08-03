@@ -1,5 +1,4 @@
 import { CommandService } from '@theia/core';
-import { getCurrentWindow } from '@theia/core/electron-shared/@electron/remote';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { ElectronCommands } from '@theia/core/lib/electron-browser/menu/electron-menu-contribution';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -15,13 +14,13 @@ export class VesTitlebarWindowControlsWidget extends ReactWidget {
   protected readonly commandService!: CommandService;
 
   @postConstruct()
-  protected async init(): Promise<void> {
+  protected init(): void {
     this.id = VesTitlebarWindowControlsWidget.ID;
     this.title.label = VesTitlebarWindowControlsWidget.LABEL;
     this.title.caption = VesTitlebarWindowControlsWidget.LABEL;
     this.title.closable = false;
-    getCurrentWindow().on('maximize', () => this.update());
-    getCurrentWindow().on('unmaximize', () => this.update());
+    window.electronTheiaCore.onWindowEvent('maximize', () => this.update());
+    window.electronTheiaCore.onWindowEvent('unmaximize', () => this.update());
     this.update();
   }
 
@@ -84,7 +83,7 @@ export class VesTitlebarWindowControlsWidget extends ReactWidget {
   }
 
   protected isMaximized(): boolean {
-    return getCurrentWindow().isMaximized();
+    return window.electronTheiaCore.isMaximized();
   }
 
   protected maximizeWindow = async () => this.commandService.executeCommand(VesTitlebarWindowControlCommands.MAXIMIZE.id);

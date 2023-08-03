@@ -51,13 +51,16 @@ export class VesGettingStartedWidget extends ReactWidget {
     protected vesRecentWorkspaces: Array<{ name: string, uri: URI, path: string }> = [];
 
     @postConstruct()
-    protected async init(): Promise<void> {
+    protected init(): void {
+        this.doInit();
         this.id = VesGettingStartedWidget.ID;
         this.title.label = VesGettingStartedWidget.LABEL;
         this.title.caption = VesGettingStartedWidget.LABEL;
         this.title.iconClass = 'codicon codicon-info';
         this.title.closable = true;
+    }
 
+    protected async doInit(): Promise<void> {
         this.applicationInfo = await this.appServer.getApplicationInfo();
         this.recentWorkspaces = await this.workspaceService.recentWorkspaces();
         this.home = new URI(await this.environments.getHomeDirUri()).path.toString();

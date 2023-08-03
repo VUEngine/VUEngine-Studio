@@ -58,7 +58,7 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
     }
 
     @postConstruct()
-    protected async init(): Promise<void> {
+    protected init(): void {
         this.id = VesTitlebarActionButtonsWidget.ID;
         this.title.label = VesTitlebarActionButtonsWidget.LABEL;
         this.title.caption = VesTitlebarActionButtonsWidget.LABEL;

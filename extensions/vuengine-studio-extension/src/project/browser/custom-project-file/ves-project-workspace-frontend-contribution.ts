@@ -1,13 +1,8 @@
-import { environment, OS } from '@theia/core';
 import { UTF8 } from '@theia/core/lib/common/encodings';
-import { nls } from '@theia/core/lib/common/nls';
-import URI from '@theia/core/lib/common/uri';
 import { injectable } from '@theia/core/shared/inversify';
-import { FileDialogTreeFilters, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
-import { WorkspaceCommands, WorkspaceFrontendContribution } from '@theia/workspace/lib/browser';
+import { WorkspaceFrontendContribution } from '@theia/workspace/lib/browser';
 import { VesEncodingOverride } from 'src/core/browser/ves-encoding-registry';
-import { VUENGINE_EXT } from '../../common/custom-project-file/ves-project-utils';
-import { ProjectFileTemplateEncoding } from '../ves-project-types';
+import { ProjectFileTemplateEncoding, VUENGINE_EXT } from '../ves-project-types';
 
 @injectable()
 export class VesWorkspaceFrontendContribution extends WorkspaceFrontendContribution {
@@ -20,6 +15,7 @@ export class VesWorkspaceFrontendContribution extends WorkspaceFrontendContribut
         this.updateEncodingOverrides();
     }
 
+    /*
     protected async saveWorkspaceAs(): Promise<boolean> {
         let exist: boolean = false;
         let overwrite: boolean = false;
@@ -51,7 +47,9 @@ export class VesWorkspaceFrontendContribution extends WorkspaceFrontendContribut
         }
         return false;
     }
+    */
 
+    /*
     protected async openWorkspaceOpenFileDialogProps(): Promise<OpenFileDialogProps> {
         await this.preferences.ready;
         const type = OS.type();
@@ -61,8 +59,10 @@ export class VesWorkspaceFrontendContribution extends WorkspaceFrontendContribut
             electron,
         });
     }
+    */
 }
 
+/*
 export namespace VesWorkspaceFrontendContribution {
     export const VES_DEFAULT_FILE_FILTER: FileDialogTreeFilters = {
         'VUEngine Studio Project': [VUENGINE_EXT]
@@ -99,3 +99,4 @@ export namespace VesWorkspaceFrontendContribution {
         };
     }
 }
+*/
