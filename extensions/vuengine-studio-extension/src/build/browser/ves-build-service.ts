@@ -127,8 +127,8 @@ export class VesBuildService {
   // build status
   protected _buildStatus: BuildStatus = {
     active: false,
-    componentsTotal: -1,
-    componentsDone: -1,
+    stepsTotal: -1,
+    stepsDone: -1,
     processManagerId: -1,
     processId: -1,
     progress: -1,
@@ -360,8 +360,8 @@ export class VesBuildService {
 
     this.buildStatus = {
       active: false,
-      componentsTotal: 2 * (this.vesPluginsService.getActualUsedPluginNames().length + 2),
-      componentsDone: 0,
+      stepsTotal: 2 * (this.vesPluginsService.getActualUsedPluginNames().length + 2),
+      stepsDone: 0,
       processManagerId,
       processId,
       progress: 0,
@@ -548,7 +548,7 @@ export class VesBuildService {
   }
 
   protected parseBuildOutput(data: string): BuildLogLine {
-    const text = data.trim();
+    let text = data.trim();
     const textLowerCase = text.toLowerCase();
     let optimizedText;
     let type = BuildLogLineType.Normal;
@@ -564,8 +564,13 @@ export class VesBuildService {
     } else if (textLowerCase.includes('preprocessing') || textLowerCase.includes('building')) {
       type = BuildLogLineType.Headline;
       this.buildStatus.step = textLowerCase;
-      this.buildStatus.componentsDone++;
+      this.buildStatus.stepsDone++;
       this.buildStatus.progress = this.computeProgress();
+      const stepsDoneLabel = this.buildStatus.stepsDone.toString().padStart(
+        this.buildStatus.stepsTotal.toString().length,
+        '0'
+      );
+      text = `(${stepsDoneLabel}/${this.buildStatus.stepsTotal}) ${text}`;
     } else if (textLowerCase.startsWith('build finished')) {
       type = BuildLogLineType.Headline;
       this.buildStatus.progress = 100;
@@ -678,7 +683,7 @@ export class VesBuildService {
 
   protected computeProgress(): number {
     // each headline indicates that a new chunk of work is being _started_, not finishing, hence -1
-    return Math.floor((this.buildStatus.componentsDone - 1) * 100 / this.buildStatus.componentsTotal);
+    return Math.floor((this.buildStatus.stepsDone - 1) * 100 / this.buildStatus.stepsTotal);
   }
 
   /**
