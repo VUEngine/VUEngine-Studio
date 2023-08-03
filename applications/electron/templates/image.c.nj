@@ -25,15 +25,15 @@
 //---------------------------------------------------------------------------------------------------------
 //
 //  {{ sanitizedSpecName }}
-//  • {{ meta.imageWidth }}×{{ meta.imageHeight }} pixels
+//  • {{ meta.imageWidth }}x{{ meta.imageHeight }} pixels
 {%- if tilesData.length %}
 //  • {{ meta.tilesCount }} tiles, {{ reducedTilesLabel }}, {{ tilesCompressionLabel }}
 {%- endif %}
 {%- if mapData.length %}
-//  • {{ meta.mapWidth }}×{{ meta.mapHeight }} map, not compressed
+//  • {{ meta.mapWidth }}x{{ meta.mapHeight }} map, not compressed
 {%- endif %}
 {%- if frameTileOffsets.length > 0 %}
-//  • {{ frameTileOffsets.length }} animation frames{% if meta.animation.frameWidth > 0 and meta.animation.frameHeight > 0 %}, {{ meta.animation.frameWidth }}×{{ meta.animation.frameHeight }}{% endif %}, {% if meta.animation.individualFiles %}individual files{% else %}spritesheet{% endif %}{% if meta.animation.largestFrame > 0 %}, largest frame: {{meta.animation.largestFrame}} tiles{% endif %}
+//  • {{ frameTileOffsets.length }} animation frames{% if meta.animation.frameWidth > 0 and meta.animation.frameHeight > 0 %}, {{ meta.animation.frameWidth }}x{{ meta.animation.frameHeight }}{% endif %}, {% if meta.animation.individualFiles %}individual files{% else %}spritesheet{% endif %}{% if meta.animation.largestFrame > 0 %}, largest frame: {{meta.animation.largestFrame}} tiles{% endif %}
 {%- endif %}
 {%- if tilesData.length and mapData.length %}
 //  Size: {{ (tilesData.length + 1) * 4 }} + {{ mapData.length * 2 }} = {{ ((tilesData.length + 1) * 4) + (mapData.length * 2) }}
