@@ -5,7 +5,7 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { FileChangesEvent, FileChangeType } from '@theia/filesystem/lib/common/files';
+import { FileChangeType, FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { ProcessOptions } from '@theia/process/lib/node';
 import { TaskEndedInfo, TaskEndedTypes, TaskService } from '@theia/task/lib/browser/task-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
@@ -15,6 +15,7 @@ import { VesEmulatorPreferenceIds } from '../../emulator/browser/ves-emulator-pr
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
 import { VesFlashCartPreferenceIds } from '../../flash-cart/browser/ves-flash-cart-preferences';
 import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-service';
+import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 import { VesBuildCommands } from './ves-build-commands';
@@ -62,6 +63,8 @@ export class VesBuildService {
   protected readonly vesCommonService: VesCommonService;
   @inject(VesPluginsPathsService)
   protected readonly vesPluginsPathsService: VesPluginsPathsService;
+  @inject(VesPluginsService)
+  protected readonly vesPluginsService: VesPluginsService;
   @inject(VesProcessService)
   protected readonly vesProcessService: VesProcessService;
   @inject(VesProcessWatcher)
@@ -124,6 +127,8 @@ export class VesBuildService {
   // build status
   protected _buildStatus: BuildStatus = {
     active: false,
+    componentsTotal: -1,
+    componentsDone: -1,
     processManagerId: -1,
     processId: -1,
     progress: -1,
@@ -355,6 +360,8 @@ export class VesBuildService {
 
     this.buildStatus = {
       active: false,
+      componentsTotal: 2 * (this.vesPluginsService.getActualUsedPluginNames().length + 2),
+      componentsDone: 0,
       processManagerId,
       processId,
       progress: 0,
@@ -546,7 +553,6 @@ export class VesBuildService {
     let optimizedText;
     let type = BuildLogLineType.Normal;
     let file: BuildLogLineFileLink | undefined;
-    let headlineMatches;
     let problem;
 
     if (textLowerCase.startsWith('starting build')) {
@@ -555,10 +561,11 @@ export class VesBuildService {
       type = BuildLogLineType.Headline;
     } else if (textLowerCase.startsWith('build finished')) {
       type = BuildLogLineType.Done;
-    } else if ((headlineMatches = this.matchHeadlines(text)).length) {
+    } else if (textLowerCase.includes('preprocessing') || textLowerCase.includes('building')) {
       type = BuildLogLineType.Headline;
-      this.buildStatus.step = headlineMatches[3] as unknown as string;
-      this.buildStatus.progress = this.computeProgress(headlineMatches);
+      this.buildStatus.step = textLowerCase;
+      this.buildStatus.componentsDone++;
+      this.buildStatus.progress = this.computeProgress();
     } else if (textLowerCase.startsWith('build finished')) {
       type = BuildLogLineType.Headline;
       this.buildStatus.progress = 100;
@@ -601,25 +608,6 @@ export class VesBuildService {
       timestamp: Date.now(),
       optimizedText: optimizedText && this.replaceFunctionNames(optimizedText),
     };
-  }
-
-  protected matchHeadlines(message: string): string[] {
-    const regEx = /\((\d+)\/(\d+)\) (preprocessing (.+)|building (.+))/gi;
-    const headlineMatches: string[] = [];
-
-    let m;
-    while (m = regEx.exec(message)) {
-      // Avoid infinite loops with zero-width matches
-      if (m.index === regEx.lastIndex) {
-        regEx.lastIndex++;
-      }
-
-      m.forEach((match, groupIndex) => {
-        headlineMatches[groupIndex] = match;
-      });
-    }
-
-    return headlineMatches;
   }
 
   protected matchGccProblem(message: string): GccMatchedProblem | undefined {
@@ -688,12 +676,9 @@ export class VesBuildService {
     return require('physical-cpu-count');
   }
 
-  protected computeProgress(matches: string[]): number {
-    const stepsDone = parseInt(matches[1]) ?? 0;
-    const stepsTotal = parseInt(matches[2]) ?? 1;
-
+  protected computeProgress(): number {
     // each headline indicates that a new chunk of work is being _started_, not finishing, hence -1
-    return Math.floor((stepsDone - 1) * 100 / stepsTotal);
+    return Math.floor((this.buildStatus.componentsDone - 1) * 100 / this.buildStatus.componentsTotal);
   }
 
   /**

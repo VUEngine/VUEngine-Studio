@@ -45,6 +45,24 @@ export class VesPluginsService {
     return this.installedPlugins.includes(id);
   }
 
+  // get actually used plugins by resolving dependencies of installed plugins
+  getActualUsedPluginNames(): string[] {
+    const actualUsedPlugins: string[] = [];
+
+    const loopPlugins = (plugins: string[]) => plugins.forEach(plugin => {
+      if (this.pluginsData[plugin] && !actualUsedPlugins.includes(plugin)) {
+        actualUsedPlugins.push(plugin);
+        if (this.pluginsData[plugin].dependencies?.length) {
+          loopPlugins(this.pluginsData[plugin].dependencies!);
+        }
+      }
+    });
+
+    loopPlugins(this.installedPlugins);
+
+    return actualUsedPlugins.sort();
+  }
+
   async installPlugin(id: string): Promise<void> {
     if (!this.installedPlugins.includes(id)) {
       this.installedPlugins.push(id);
