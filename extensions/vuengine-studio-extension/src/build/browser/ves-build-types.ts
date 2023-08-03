@@ -17,6 +17,8 @@ export const DEFAULT_BUILD_MODE = BuildMode.Beta;
 
 export interface BuildStatus {
   active: boolean;
+  componentsTotal: number;
+  componentsDone: number;
   processManagerId: number;
   processId: number;
   progress: number;
