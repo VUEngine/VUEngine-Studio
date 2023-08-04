@@ -67,7 +67,6 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
         this.vesBuildService.onDidChangeIsCleaning(() => this.update());
         this.vesBuildService.onDidChangeIsQueued(() => this.update());
         this.vesBuildService.onDidChangeBuildStatus(() => this.update());
-        this.vesBuildService.onDidChangeBuildFolder(() => this.update());
         this.vesFlashCartService.onDidChangeIsQueued(() => this.update());
         this.vesFlashCartService.onDidChangeIsFlashing(() => this.update());
         this.vesFlashCartService.onDidChangeConnectedFlashCarts(() => this.update());

@@ -148,11 +148,6 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         });
 
         // @ts-ignore
-        app.on(VesTouchBarCommands.changeBuildFolder, flags => {
-            const buildMode = buildModeButton.label;
-            buildMenuCleanButton.enabled = flags[buildMode];
-        });
-        // @ts-ignore
         app.on(VesTouchBarCommands.changeBuildIsQueued, (isQueued: boolean) => {
             buildMenuBuildButton.label = '';
             buildMenuBuildButton.icon = isQueued ? queuedIcon : buildIcon;
