@@ -486,12 +486,9 @@ export class VesBuildService {
     }
   }
 
-  protected async getBuildPathUri(buildMode?: BuildMode): Promise<URI | undefined> {
+  protected async getBuildPathUri(buildMode?: BuildMode): Promise<URI> {
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-    if (!workspaceRootUri) {
-      return;
-    }
 
     const buildPathUri = workspaceRootUri.resolve('build');
 
@@ -991,13 +988,28 @@ export class VesBuildService {
 
   protected async clean(full: boolean, buildMode: BuildMode): Promise<void> {
     this.isCleaning = true;
+    const buildPathUri = await this.getBuildPathUri();
 
-    const buildPathUri = full
-      ? await this.getBuildPathUri()
-      : await this.getBuildPathUri(buildMode);
+    if (full) {
+      if (await this.fileService.exists(buildPathUri)) {
+        await this.fileService.delete(buildPathUri, { recursive: true });
+      }
+    } else {
+      const buildPathModeUri = await this.getBuildPathUri(buildMode);
+      if (await this.fileService.exists(buildPathModeUri)) {
+        await this.fileService.delete(buildPathModeUri, { recursive: true });
+      }
 
-    if (buildPathUri && await this.fileService.exists(buildPathUri)) {
-      await this.fileService.delete(buildPathUri, { recursive: true });
+      if (buildPathUri) {
+        const files = await this.fileService.resolve(buildPathUri);
+        if (files.children) {
+          for (const child of files.children) {
+            if (child.name.endsWith('.a')) {
+              this.fileService.delete(child.resource);
+            }
+          }
+        }
+      }
     }
 
     this.isCleaning = false;
