@@ -298,8 +298,15 @@ export class VesImageConverterService {
           });
 
           // remove object file
-          const relativeFilePath = workspaceRootUri.relative(imageConfigFileToBeConverted.imageConfigFileUri.parent);
-          const objectFileUri = workspaceRootUri.resolve('build').resolve(relativeFilePath?.dir!).resolve(`${name}.o`);
+          const relativeFilePath = workspaceRootUri.relative(imageConfigFileToBeConverted.imageConfigFileUri);
+          const objectFileUri = workspaceRootUri
+            .resolve('build')
+            .resolve('working')
+            .resolve('assets')
+            .resolve(workspaceRootUri.path.name)
+            .resolve(relativeFilePath?.dir!)
+            .resolve(this.getConvertedDirName())
+            .resolve(`${name}.o`);
           if (await this.fileService.exists(objectFileUri)) {
             await this.fileService.delete(objectFileUri);
           }
@@ -326,8 +333,14 @@ export class VesImageConverterService {
             });
 
             // remove object file
-            const relativeFilePath = workspaceRootUri.relative(output.fileUri.parent);
-            const objectFileUri = workspaceRootUri.resolve('build').resolve(relativeFilePath?.dir!).resolve(`${output.fileUri.path.name}.o`);
+            const relativeFilePath = workspaceRootUri.relative(output.fileUri);
+            const objectFileUri = workspaceRootUri
+              .resolve('build')
+              .resolve('working')
+              .resolve('assets')
+              .resolve(workspaceRootUri.path.name)
+              .resolve(relativeFilePath?.dir!)
+              .resolve(`${output.fileUri.path.name}.o`);
             if (await this.fileService.exists(objectFileUri)) {
               await this.fileService.delete(objectFileUri);
             }
