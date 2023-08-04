@@ -1,7 +1,6 @@
 export enum VesTouchBarCommands {
     init = 'ves-init',
     changeBuildIsQueued = 'ves-change-build-is-queued',
-    changeBuildFolder = 'ves-change-build-folder',
     changeBuildMode = 'ves-change-build-mode',
     changeBuildStatus = 'ves-change-build-status',
     changeConnectedFlashCart = 'ves-change-connected-flash-cart',

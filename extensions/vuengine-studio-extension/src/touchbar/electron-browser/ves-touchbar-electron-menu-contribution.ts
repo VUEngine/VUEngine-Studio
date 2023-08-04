@@ -78,14 +78,12 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
         // init touchbar values
         electronApp.emit(VesTouchBarCommands.changeBuildMode, this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE));
         electronApp.emit(VesTouchBarCommands.changeConnectedFlashCart, this.vesFlashCartService.connectedFlashCarts);
-        electronApp.emit(VesTouchBarCommands.changeBuildFolder, this.vesBuildService.buildFolderExists);
         electronApp.emit(VesTouchBarCommands.changeEmulator, this.vesEmulatorService.getDefaultEmulatorConfig().name);
         electronApp.emit(VesTouchBarCommands.changeEmulatorConfigs, this.vesEmulatorService.getEmulatorConfigs());
 
         this.vesBuildService.onDidChangeIsQueued(buildStatus => electronApp.emit(VesTouchBarCommands.changeBuildIsQueued, buildStatus));
         this.vesBuildService.onDidChangeBuildStatus(buildStatus => electronApp.emit(VesTouchBarCommands.changeBuildStatus, buildStatus));
         this.vesBuildService.onDidChangeBuildMode(buildMode => electronApp.emit(VesTouchBarCommands.changeBuildMode, buildMode));
-        this.vesBuildService.onDidChangeBuildFolder(flags => electronApp.emit(VesTouchBarCommands.changeBuildFolder, flags));
         this.vesEmulatorService.onDidChangeIsQueued(flag => electronApp.emit(VesTouchBarCommands.changeIsRunQueued, flag));
         this.vesEmulatorService.onDidChangeEmulator(name => electronApp.emit(VesTouchBarCommands.changeEmulator, name));
         this.vesEmulatorService.onDidChangeEmulatorConfigs(emulatorConfigs => electronApp.emit(VesTouchBarCommands.changeEmulatorConfigs, emulatorConfigs));

@@ -1,11 +1,10 @@
 import { CommandRegistry, CommandService, isWindows, nls } from '@theia/core';
-import { ApplicationShell, LabelProvider, PreferenceScope, PreferenceService, QuickPickItem, QuickPickOptions, QuickPickService } from '@theia/core/lib/browser';
+import { ApplicationShell, ConfirmDialog, LabelProvider, PreferenceScope, PreferenceService, QuickPickItem, QuickPickOptions, QuickPickService } from '@theia/core/lib/browser';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { FileChangeType, FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { ProcessOptions } from '@theia/process/lib/node';
 import { TaskEndedInfo, TaskEndedTypes, TaskService } from '@theia/task/lib/browser/task-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
@@ -32,10 +31,6 @@ import {
   PrePostBuildTask,
   PrePostBuildTaskType
 } from './ves-build-types';
-
-interface BuildFolderFlags {
-  [key: string]: boolean;
-};
 
 @injectable()
 export class VesBuildService {
@@ -87,18 +82,6 @@ export class VesBuildService {
   // build mode
   protected readonly onDidChangeBuildModeEmitter = new Emitter<BuildMode>();
   readonly onDidChangeBuildMode = this.onDidChangeBuildModeEmitter.event;
-
-  // build folder
-  protected readonly onDidChangeBuildFolderEmitter = new Emitter<BuildFolderFlags>();
-  readonly onDidChangeBuildFolder = this.onDidChangeBuildFolderEmitter.event;
-  protected _buildFolderExists: BuildFolderFlags = {};
-  setBuildFolderExists(buildMode: string, flag: boolean): void {
-    this._buildFolderExists[buildMode] = flag;
-    this.onDidChangeBuildFolderEmitter.fire(this._buildFolderExists);
-  }
-  get buildFolderExists(): BuildFolderFlags {
-    return this._buildFolderExists;
-  }
 
   // is cleaning
   protected _isCleaning: boolean = false;
@@ -257,39 +240,10 @@ export class VesBuildService {
     this.frontendApplicationStateService.onStateChanged(
       async (state: FrontendApplicationState) => {
         if (state === 'attached_shell') {
-          for (const buildMode in BuildMode) {
-            if (BuildMode.hasOwnProperty(buildMode)) {
-              const buildPathUri = await this.getBuildPathUri(buildMode as BuildMode);
-              if (buildPathUri) {
-                this.fileService
-                  .exists(buildPathUri)
-                  .then((exists: boolean) => {
-                    this.setBuildFolderExists(buildMode, exists);
-                  });
-              }
-            }
-          }
-
           await this.determineRomSize();
         }
       }
     );
-
-    // watch for file changes
-    this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
-      for (const buildMode in BuildMode) {
-        if (BuildMode.hasOwnProperty(buildMode)) {
-          const buildPathUri = await this.getBuildPathUri(buildMode as BuildMode);
-          if (buildPathUri) {
-            if (fileChangesEvent.contains(buildPathUri, FileChangeType.ADDED)) {
-              this.setBuildFolderExists(buildMode, true);
-            } else if (fileChangesEvent.contains(buildPathUri, FileChangeType.DELETED)) {
-              this.setBuildFolderExists(buildMode, false);
-            }
-          }
-        }
-      }
-    });
 
     // watch for preference changes
     this.preferenceService.onPreferenceChanged(
@@ -297,7 +251,6 @@ export class VesBuildService {
         switch (preferenceName) {
           case VesBuildPreferenceIds.BUILD_MODE:
             this.onDidChangeBuildModeEmitter.fire(newValue);
-            this.onDidChangeBuildFolderEmitter.fire(this._buildFolderExists);
             break;
         }
       }
@@ -543,7 +496,10 @@ export class VesBuildService {
     const buildPathUri = workspaceRootUri.resolve('build');
 
     return buildMode
-      ? buildPathUri.resolve(buildMode.toLowerCase())
+      ? buildPathUri
+        .resolve('working')
+        .resolve('objects')
+        .resolve(buildMode.toLowerCase())
       : buildPathUri;
   }
 
@@ -738,8 +694,50 @@ export class VesBuildService {
 
     const buildMode = this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode;
 
-    if (this.buildFolderExists[buildMode]) {
-      this.clean(buildMode);
+    const container = document.createElement('div');
+    container.style.width = '376px';
+
+    const areYouSureElement = document.createElement('p');
+    areYouSureElement.style.marginBottom = '30px';
+    container.appendChild(areYouSureElement);
+    areYouSureElement.textContent = nls.localize(
+      'vuengine/build/clean/areYouSure',
+      'Are you sure you want to delete all cached object files for the {0} build mode?',
+      buildMode
+    );
+
+    const fullCleanContainer = document.createElement('p');
+    container.appendChild(fullCleanContainer);
+
+    const assetsCheckbox = document.createElement('input');
+    assetsCheckbox.type = 'checkbox';
+    assetsCheckbox.name = 'name';
+    assetsCheckbox.value = 'value';
+    assetsCheckbox.id = 'id';
+    fullCleanContainer.appendChild(assetsCheckbox);
+
+    const assetsCheckboxLabelElement = document.createElement('span');
+    fullCleanContainer.appendChild(assetsCheckboxLabelElement);
+    assetsCheckboxLabelElement.textContent = nls.localize(
+      'vuengine/build/clean/fullClean',
+      'Full clean'
+    );
+
+    const assetsCheckboxExplanationElement = document.createElement('p');
+    container.appendChild(assetsCheckboxExplanationElement);
+    assetsCheckboxExplanationElement.textContent = nls.localize(
+      'vuengine/build/clean/fullCleanExplanation',
+      // eslint-disable-next-line max-len
+      'Checking this will delete the entire build folder, including object files for all build modes and assets. Beware! This is usually not necessary and will result in the next build taking longer due to all assets having to be recompiled.'
+    );
+
+    const dialog = new ConfirmDialog({
+        title: nls.localize('vuengine/build/commands/clean', 'Clean Build Folder'),
+        msg: container,
+    });
+    const confirmed = await dialog.open();
+    if (confirmed) {
+      this.clean(assetsCheckbox.checked, buildMode);
     }
   }
 
@@ -917,40 +915,6 @@ export class VesBuildService {
     };
   }
 
-  async clean(buildMode: BuildMode): Promise<void> {
-    if (!this.buildFolderExists[buildMode]) {
-      return;
-    }
-
-    this.isCleaning = true;
-
-    const buildModePathUri = await this.getBuildPathUri(buildMode);
-    const buildPathUri = await this.getBuildPathUri();
-
-    if (buildModePathUri) {
-      await this.fileService.delete(buildModePathUri, { recursive: true });
-    }
-
-    if (buildPathUri) {
-      const files = await this.fileService.resolve(buildPathUri);
-      if (files.children) {
-        for (const child of files.children) {
-          if (child.name.endsWith('.a')) {
-            this.fileService.delete(child.resource);
-          }
-        }
-      }
-    }
-
-    this.isCleaning = false;
-    this.setBuildFolderExists(buildMode, false);
-
-    if (this.isQueued) {
-      this.isQueued = false;
-      this.commandService.executeCommand(VesBuildCommands.BUILD.id, true);
-    }
-  }
-
   async buildModeQuickPick(buildMode?: BuildMode): Promise<void> {
     const currentBuildMode = this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode;
 
@@ -1029,5 +993,24 @@ export class VesBuildService {
       .resolve('build')
       .resolve(buildMode.toLowerCase())
       .resolve(`output-${buildMode.toLowerCase()}.vb`);
+  }
+
+  protected async clean(full: boolean, buildMode: BuildMode): Promise<void> {
+    this.isCleaning = true;
+
+    const buildPathUri = full
+      ? await this.getBuildPathUri()
+      : await this.getBuildPathUri(buildMode);
+
+    if (buildPathUri && await this.fileService.exists(buildPathUri)) {
+      await this.fileService.delete(buildPathUri, { recursive: true });
+    }
+
+    this.isCleaning = false;
+
+    if (this.isQueued) {
+      this.isQueued = false;
+      this.commandService.executeCommand(VesBuildCommands.BUILD.id, true);
+    }
   }
 }

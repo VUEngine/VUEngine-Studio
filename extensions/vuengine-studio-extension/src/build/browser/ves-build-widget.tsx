@@ -17,7 +17,7 @@ import { VesPluginsPreferenceIds } from '../../plugins/browser/ves-plugins-prefe
 import { VesBuildCommands } from './ves-build-commands';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
 import { VesBuildService } from './ves-build-service';
-import { BuildLogLine, BuildLogLineFileLink, BuildLogLineType, BuildMode, BuildResult } from './ves-build-types';
+import { BuildLogLine, BuildLogLineFileLink, BuildLogLineType, BuildResult } from './ves-build-types';
 
 interface VesBuildWidgetState {
   logFilter: BuildLogLineType
@@ -151,7 +151,6 @@ export class VesBuildWidget extends ReactWidget {
   }
 
   protected render(): React.ReactNode {
-    const buildMode = this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode;
     return (
       <>
         <div className='buildActions'>
@@ -215,7 +214,6 @@ export class VesBuildWidget extends ReactWidget {
             </button>
             <button
               className={`theia-button secondary ${!this.vesBuildService.isCleaning && 'codicon codicon-trash'}`}
-              disabled={!this.vesBuildService.buildFolderExists[buildMode]}
               onClick={this.clean}
               title={this.vesBuildService.isCleaning
                 ? `${nls.localize('vuengine/build/cleaning', 'Cleaning')}...`
