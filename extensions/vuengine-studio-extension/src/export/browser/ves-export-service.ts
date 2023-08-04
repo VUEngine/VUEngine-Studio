@@ -79,12 +79,7 @@ export class VesExportService {
   }
 
   protected async exportRom(): Promise<void> {
-    await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-    if (!workspaceRootUri) {
-      return;
-    }
-    const romUri = workspaceRootUri.resolve('build').resolve('output.vb');
+    const romUri = await this.vesBuildService.getDefaultRomUri();
     let exists: boolean = false;
     let overwrite: boolean = false;
     let selected: URI | undefined;

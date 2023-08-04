@@ -1,5 +1,4 @@
 import { CommandService, isWindows, nls } from '@theia/core';
-import * as iconv from 'iconv-lite';
 import {
   Endpoint,
   KeybindingRegistry,
@@ -16,12 +15,16 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import * as React from '@theia/core/shared/react';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import * as iconv from 'iconv-lite';
+import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesEmulatorCommands } from './ves-emulator-commands';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
 import { VesEmulatorService } from './ves-emulator-service';
 import {
-  EMULATION_MODES, EMULATION_SCALES, EMULATION_STEREO_MODES, EmulatorFunctionKeyCode, EmulatorGamePadKeyCode, RomHeader, ROM_HEADER_MAKERS
+  EMULATION_MODES, EMULATION_SCALES, EMULATION_STEREO_MODES, EmulatorFunctionKeyCode, EmulatorGamePadKeyCode,
+  ROM_HEADER_MAKERS,
+  RomHeader
 } from './ves-emulator-types';
 import { VesEmulatorControls } from './widget/ves-emulator-controls-component';
 
@@ -56,6 +59,8 @@ export class VesEmulatorWidget extends ReactWidget {
   protected readonly localStorageService: LocalStorageService;
   @inject(PreferenceService)
   protected readonly preferenceService: PreferenceService;
+  @inject(VesBuildService)
+  protected readonly vesBuildService: VesBuildService;
   @inject(VesCommonService)
   protected readonly vesCommonService: VesCommonService;
   @inject(VesEmulatorService)
@@ -368,9 +373,7 @@ export class VesEmulatorWidget extends ReactWidget {
   }
 
   protected getRomPath = async () => {
-    await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-    const defaultRomUri = workspaceRootUri && workspaceRootUri.resolve('build').resolve('output.vb');
+    const defaultRomUri = await this.vesBuildService.getDefaultRomUri();
     let romPath = this.options ? this.options.uri : defaultRomUri;
     if (typeof romPath !== 'string') {
       romPath = await this.fileService.fsPath(romPath);

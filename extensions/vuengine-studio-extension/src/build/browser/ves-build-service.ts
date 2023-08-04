@@ -970,28 +970,22 @@ export class VesBuildService {
     }
   }
 
-  async getDefaultRomUri(): Promise<URI | undefined> {
+  async getDefaultRomUri(): Promise<URI> {
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-    if (!workspaceRootUri) {
-      return;
-    }
 
     return workspaceRootUri
       .resolve('build')
       .resolve('output.vb');
   }
 
-  async getBuildModeRomUri(buildMode: BuildMode): Promise<URI | undefined> {
+  async getBuildModeRomUri(buildMode: BuildMode): Promise<URI> {
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-    if (!workspaceRootUri) {
-      return;
-    }
 
     return workspaceRootUri
       .resolve('build')
-      .resolve(buildMode.toLowerCase())
+      .resolve('working')
       .resolve(`output-${buildMode.toLowerCase()}.vb`);
   }
 

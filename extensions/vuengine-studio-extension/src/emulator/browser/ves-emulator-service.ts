@@ -5,7 +5,6 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { VesBuildService } from '../../build/browser/ves-build-service';
@@ -40,8 +39,6 @@ export class VesEmulatorService {
   private readonly vesProcessService: VesProcessService;
   @inject(VesProjectService)
   protected readonly vesProjectsService: VesProjectService;
-  @inject(WorkspaceService)
-  private readonly workspaceService: WorkspaceService;
 
   // is queued
   protected _isQueued: boolean = false;
@@ -146,12 +143,7 @@ export class VesEmulatorService {
 
   async runInEmulator(): Promise<void> {
     const defaultEmulatorConfig = this.getDefaultEmulatorConfig();
-    await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-    if (!workspaceRootUri) {
-      return;
-    }
-    const romUri = workspaceRootUri.resolve('build').resolve('output.vb');
+    const romUri = await this.vesBuildService.getDefaultRomUri();
     if (defaultEmulatorConfig === DEFAULT_EMULATOR) {
       const opener = await this.openerService.getOpener(romUri);
       await opener.open(romUri);
