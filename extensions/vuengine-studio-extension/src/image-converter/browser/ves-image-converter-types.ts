@@ -88,8 +88,6 @@ export interface TilesCompressionResult {
 
 export const COMPRESSION_FLAG_LENGTH = 1;
 
-export const CONVERTED_FILE_ENDING = 'c_asset';
-
 export const DEFAULT_IMAGE_CONVERTER_CONFIG: ImageConverterConfig = {
   images: [],
   name: '',

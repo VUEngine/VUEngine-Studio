@@ -14,7 +14,6 @@ import { VesProcessService, VesProcessType } from '../../process/common/ves-proc
 import { compressTiles } from './ves-image-converter-compressor';
 import {
   COMPRESSION_FLAG_LENGTH,
-  CONVERTED_FILE_ENDING,
   DEFAULT_IMAGE_CONVERTER_CONFIG,
   ImageConfigFileToBeConverted,
   ImageConverterCompressor,
@@ -273,7 +272,7 @@ export class VesImageConverterService {
             : imageConfigFileToBeConverted.imageConfigFileUri.path.name;
           const targetFileUri = imageConfigFileToBeConverted.imageConfigFileUri.parent
             .resolve(this.getConvertedDirName())
-            .resolve(`${name}.${CONVERTED_FILE_ENDING}`);
+            .resolve(`${name}.c`);
           const resourcesUri = await this.vesCommonService.getResourcesUri();
           const templateFileUri = resourcesUri.resolve('templates').resolve('image.c.nj');
 
@@ -297,20 +296,6 @@ export class VesImageConverterService {
             },
           });
 
-          // remove object file
-          const relativeFilePath = workspaceRootUri.relative(imageConfigFileToBeConverted.imageConfigFileUri);
-          const objectFileUri = workspaceRootUri
-            .resolve('build')
-            .resolve('working')
-            .resolve('assets')
-            .resolve(workspaceRootUri.path.name)
-            .resolve(relativeFilePath?.dir!)
-            .resolve(this.getConvertedDirName())
-            .resolve(`${name}.o`);
-          if (await this.fileService.exists(objectFileUri)) {
-            await this.fileService.delete(objectFileUri);
-          }
-
           this.reportConverted(targetFileUri);
         } else {
           // render asset files, delete original grit converted c files
@@ -319,9 +304,7 @@ export class VesImageConverterService {
           const templateString = (await this.fileService.readFile(templateFileUri)).value.toString();
 
           await Promise.all(imageConfigFileToBeConverted.output.map(async output => {
-            await this.fileService.delete(output.fileUri);
-            const assetFileUri = output.fileUri.parent.resolve(`${output.fileUri.path.name}.${CONVERTED_FILE_ENDING}`);
-            await this.vesCodeGenService.renderTemplateToFile('Image.c', assetFileUri, templateString, {
+            await this.vesCodeGenService.renderTemplateToFile('Image.c', output.fileUri, templateString, {
               name: output.name,
               tilesData: output.tilesData,
               tilesCompression: imageConfigFileToBeConverted.config.tileset.compress,
@@ -331,19 +314,6 @@ export class VesImageConverterService {
               section: imageConfigFileToBeConverted.config.section,
               meta: output.meta,
             });
-
-            // remove object file
-            const relativeFilePath = workspaceRootUri.relative(output.fileUri);
-            const objectFileUri = workspaceRootUri
-              .resolve('build')
-              .resolve('working')
-              .resolve('assets')
-              .resolve(workspaceRootUri.path.name)
-              .resolve(relativeFilePath?.dir!)
-              .resolve(`${output.fileUri.path.name}.o`);
-            if (await this.fileService.exists(objectFileUri)) {
-              await this.fileService.delete(objectFileUri);
-            }
 
             this.reportConverted(output.fileUri);
           }));
@@ -409,7 +379,7 @@ export class VesImageConverterService {
     const generatedFiles: Array<URI> = [];
 
     imageConfigFileToBeConverted.images.map(imageUri => {
-      generatedFiles.push(this.getGritGeneratedFileUri(imageConfigFileToBeConverted.imageConfigFileUri, imageUri));
+      generatedFiles.push(this.getGeneratedFileUri(imageConfigFileToBeConverted.imageConfigFileUri, imageUri));
     });
 
     // there might be a separate file containing only tiles
@@ -428,16 +398,10 @@ export class VesImageConverterService {
     return generatedFiles;
   }
 
-  protected getGritGeneratedFileUri(imageConfigFileUri: URI, imageUri: URI): URI {
+  protected getGeneratedFileUri(imageConfigFileUri: URI, imageUri: URI): URI {
     return imageConfigFileUri.parent
       .resolve(this.getConvertedDirName())
       .resolve(`${imageUri.path.name}.c`);
-  }
-
-  protected getGeneratedAssetFileUri(imageConfigFileUri: URI, imageUri: URI): URI {
-    return imageConfigFileUri.parent
-      .resolve(this.getConvertedDirName())
-      .resolve(`${imageUri.path.name}.${CONVERTED_FILE_ENDING}`);
   }
 
   protected async handleCompression(imageConfigFileToBeConverted: ImageConfigFileToBeConverted): Promise<ImageConfigFileToBeConverted> {
@@ -597,7 +561,7 @@ export class VesImageConverterService {
       const changedImages: Array<URI> = [];
       await Promise.all(foundImages.map(async foundImage => {
         const foundImageStat = await this.fileService.resolve(foundImage, { resolveMetadata: true });
-        const convertedFileUri = this.getGeneratedAssetFileUri(imageConfigFileUri, foundImage);
+        const convertedFileUri = this.getGeneratedFileUri(imageConfigFileUri, foundImage);
         const convertedFileStat = await this.fileService.exists(convertedFileUri)
           ? await this.fileService.resolve(convertedFileUri, { resolveMetadata: true })
           : undefined;
@@ -627,7 +591,7 @@ export class VesImageConverterService {
     imageConfigFileUri: URI,
     imageConfigFileStat: FileStatWithMetadata,
     name: string): Promise<boolean> {
-    const convertedFileUri = imageConfigFileUri.parent.resolve(this.getConvertedDirName()).resolve(`${name}.${CONVERTED_FILE_ENDING}`);
+    const convertedFileUri = imageConfigFileUri.parent.resolve(this.getConvertedDirName()).resolve(`${name}.c`);
     if (!await this.fileService.exists(convertedFileUri)) {
       return true;
     }
