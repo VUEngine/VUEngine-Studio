@@ -124,8 +124,7 @@ export class VesBuildWidget extends ReactWidget {
       switch (preferenceName) {
         case VesBuildPreferenceIds.BUILD_MODE:
         case VesBuildPreferenceIds.DUMP_ELF:
-        case VesBuildPreferenceIds.ENGINE_CORE_PATH:
-        case VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH:
+        case VesBuildPreferenceIds.ENGINE_LIBRARIES_PATH:
         case VesPluginsPreferenceIds.USER_PLUGINS_PATH:
         case VesBuildPreferenceIds.PEDANTIC_WARNINGS:
           this.update();

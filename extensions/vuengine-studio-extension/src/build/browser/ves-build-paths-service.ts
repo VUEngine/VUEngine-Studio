@@ -18,10 +18,8 @@ export class VesBuildPathsService {
     const resourcesUri = await this.vesCommonService.getResourcesUri();
     const defaultUri = resourcesUri
       .resolve('vuengine')
-      .resolve('vuengine-core');
-    const customUri = new URI(this.preferenceService.get(
-      VesBuildPreferenceIds.ENGINE_CORE_PATH
-    ) as string).withScheme('file');
+      .resolve('core');
+    const customUri = new URI(this.preferenceService.get(VesBuildPreferenceIds.ENGINE_LIBRARIES_PATH) as string).withScheme('file').resolve('core');
 
     return (!customUri.isEqual(new URI('').withScheme('file')) && await this.fileService.exists(customUri))
       ? customUri
