@@ -211,9 +211,6 @@ export class VesImageConverterService {
     // TODO: dispose listener once done
     const exitListener = this.vesProcessWatcher.onDidExitProcess(async ({ pId }) => {
       if (pId === processInfo.processManagerId) {
-        await this.workspaceService.ready;
-        const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-
         imageConfigFileToBeConverted = await this.appendConvertedFilesData(imageConfigFileToBeConverted);
         imageConfigFileToBeConverted = this.removeUnusedEmptyTileAddedByGrit(imageConfigFileToBeConverted);
 

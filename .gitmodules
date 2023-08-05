@@ -4,12 +4,6 @@
 [submodule "applications/electron/binaries/vuengine-studio-tools"]
 	path = applications/electron/binaries/vuengine-studio-tools
 	url = git@github.com:VUEngine/VUEngine-Studio-Tools.git
-[submodule "applications/electron/vuengine/vuengine-core"]
-	path = applications/electron/vuengine/vuengine-core
-	url = git@github.com:VUEngine/VUEngine-Core.git
-[submodule "applications/electron/vuengine/vuengine-plugins"]
-	path = applications/electron/vuengine/vuengine-plugins
-	url = git@github.com:VUEngine/VUEngine-Plugins.git
 [submodule "applications/electron/vuengine/vuengine-barebone"]
 	path = applications/electron/vuengine/vuengine-barebone
 	url = git@github.com:VUEngine/VUEngine-Barebone.git
@@ -22,3 +16,6 @@
 [submodule "applications/electron/vuengine/spong"]
 	path = applications/electron/vuengine/spong
 	url = git@github.com:VUEngine/SPONG.git
+[submodule "applications/electron/vuengine/plugins/vuengine"]
+	path = applications/electron/vuengine/plugins/vuengine
+	url = git@github.com:VUEngine/VUEngine-Plugins.git

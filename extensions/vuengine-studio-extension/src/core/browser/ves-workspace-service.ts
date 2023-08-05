@@ -23,10 +23,8 @@ export class VesWorkspaceService extends WorkspaceService {
         this.preferenceService.onPreferenceChanged(async ({ preferenceName }) => {
             if (this.opened) {
                 switch (preferenceName) {
-                    case VesBuildPreferenceIds.ENGINE_CORE_PATH:
-                    case VesBuildPreferenceIds.ENGINE_CORE_INCLUDE_IN_WORKSPACE:
-                    case VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH:
-                    case VesPluginsPreferenceIds.ENGINE_PLUGINS_INCLUDE_IN_WORKSPACE:
+                    case VesBuildPreferenceIds.ENGINE_LIBRARIES_PATH:
+                    case VesBuildPreferenceIds.ENGINE_LIBRARIES_INCLUDE_IN_WORKSPACE:
                     case VesPluginsPreferenceIds.USER_PLUGINS_PATH:
                     case VesPluginsPreferenceIds.USER_PLUGINS_INCLUDE_IN_WORKSPACE:
                         if (!this._workspace?.isDirectory) {
@@ -53,19 +51,15 @@ export class VesWorkspaceService extends WorkspaceService {
         const roots: Array<FileStat> = [];
 
         if (this.opened && !this._workspace?.isDirectory) {
-            const engineCoreInclude = this.preferenceService.get<boolean>(VesBuildPreferenceIds.ENGINE_CORE_INCLUDE_IN_WORKSPACE);
-            if (engineCoreInclude) {
+            const engineLibsInclude = this.preferenceService.get<boolean>(VesBuildPreferenceIds.ENGINE_LIBRARIES_INCLUDE_IN_WORKSPACE);
+            if (engineLibsInclude) {
                 const engineCoreUri = await this.vesBuildPathsService.getEngineCoreUri();
-                const coreFileStat = await this.toFileStat(engineCoreUri);
-                if (coreFileStat && await this.fileService.exists(coreFileStat.resource)) {
-                    roots.push(coreFileStat);
+                const libsFileStat = await this.toFileStat(engineCoreUri);
+                if (libsFileStat && await this.fileService.exists(libsFileStat.resource)) {
+                    roots.push(libsFileStat);
                 }
-            }
-
-            const enginePluginsInclude = this.preferenceService.get<boolean>(VesPluginsPreferenceIds.ENGINE_PLUGINS_INCLUDE_IN_WORKSPACE);
-            if (enginePluginsInclude) {
                 const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
-                const pluginsFileStat = await this.toFileStat(enginePluginsUri);
+                const pluginsFileStat = await this.toFileStat(enginePluginsUri.parent);
                 if (pluginsFileStat && await this.fileService.exists(pluginsFileStat.resource)) {
                     roots.push(pluginsFileStat);
                 }
