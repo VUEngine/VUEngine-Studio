@@ -22,9 +22,10 @@ export class VesPluginsPathsService {
     const resourcesUri = await this.vesCommonService.getResourcesUri();
     const defaultUri = resourcesUri
       .resolve('vuengine')
-      .resolve('plugins')
-      .resolve('vuengine');
-    const customUri = new URI(this.preferenceService.get(VesBuildPreferenceIds.ENGINE_LIBRARIES_PATH) as string).withScheme('file').resolve('plugins').resolve('vuengine');
+      .resolve('plugins');
+    const customUri = new URI(this.preferenceService.get(VesBuildPreferenceIds.ENGINE_LIBRARIES_PATH) as string)
+      .withScheme('file')
+      .resolve('plugins');
 
     return (!customUri.isEqual(new URI('').withScheme('file')) && await this.fileService.exists(customUri))
       ? customUri

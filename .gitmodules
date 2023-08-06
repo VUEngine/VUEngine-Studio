@@ -16,6 +16,6 @@
 [submodule "applications/electron/vuengine/spong"]
 	path = applications/electron/vuengine/spong
 	url = git@github.com:VUEngine/SPONG.git
-[submodule "applications/electron/vuengine/plugins/vuengine"]
-	path = applications/electron/vuengine/plugins/vuengine
+[submodule "applications/electron/vuengine/plugins"]
+	path = applications/electron/vuengine/plugins
 	url = git@github.com:VUEngine/VUEngine-Plugins.git

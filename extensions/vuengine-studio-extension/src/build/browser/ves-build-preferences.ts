@@ -52,7 +52,7 @@ export const VesBuildPreferenceSchema: PreferenceSchema = {
         [VesBuildPreferenceIds.ENGINE_LIBRARIES_PATH]: {
             type: 'string',
             // eslint-disable-next-line max-len
-            description: nls.localize('vuengine/build/preferences/engineCorePathDescription', 'Full path to custom libraries. Has to be a folder named "vuengine" with VUEngine-Core in a sub-folder called "core" and VUEngine-Plugins in a sub-folder called "plugins/vuengine". Uses built-in libraries when left blank.'),
+            description: nls.localize('vuengine/build/preferences/engineCorePathDescription', 'Full path to custom libraries. Has to be a folder named "vuengine" with VUEngine-Core in a sub-folder called "core" and VUEngine-Plugins in a sub-folder called "plugins". Uses built-in libraries when left blank.'),
             default: '',
             additionalProperties: {
                 // @ts-ignore

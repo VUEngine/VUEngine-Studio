@@ -59,7 +59,7 @@ export class VesWorkspaceService extends WorkspaceService {
                     roots.push(libsFileStat);
                 }
                 const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
-                const pluginsFileStat = await this.toFileStat(enginePluginsUri.parent);
+                const pluginsFileStat = await this.toFileStat(enginePluginsUri);
                 if (pluginsFileStat && await this.fileService.exists(pluginsFileStat.resource)) {
                     roots.push(pluginsFileStat);
                 }
