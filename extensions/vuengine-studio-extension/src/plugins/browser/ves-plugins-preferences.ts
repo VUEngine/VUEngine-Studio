@@ -14,7 +14,7 @@ export const VesPluginsPreferenceSchema: PreferenceSchema = {
     'properties': {
         [VesPluginsPreferenceIds.USER_PLUGINS_PATH]: {
             type: 'string',
-            description: nls.localize('vuengine/plugins/preferences/userLibraryPathDescription', 'Full path to base folder for all user plugins.'),
+            description: nls.localize('vuengine/plugins/preferences/userLibraryPathDescription', 'Full path to base folder that contains user plugins. Must not be within the VUEngine Plugins directory. Defaults to [HOME]/vuengine/plugins if left blank.'),
             additionalProperties: {
                 // @ts-ignore
                 isDirectory: true,
