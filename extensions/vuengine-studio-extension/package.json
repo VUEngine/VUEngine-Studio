@@ -28,7 +28,6 @@
     "@theia/preferences": "1.36.0",
     "@theia/preview": "1.36.0",
     "@theia/process": "1.36.0",
-    "@theia/scm-extra": "1.36.0",
     "@theia/search-in-workspace": "1.36.0",
     "@theia/task": "1.36.0",
     "@theia/toolbar": "1.36.0",

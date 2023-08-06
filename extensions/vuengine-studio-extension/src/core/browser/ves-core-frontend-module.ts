@@ -26,7 +26,6 @@ import { PluginFrontendViewContribution } from '@theia/plugin-ext/lib/main/brows
 import { PluginViewRegistry } from '@theia/plugin-ext/lib/main/browser/view/plugin-view-registry';
 import { PreferenceTreeGenerator } from '@theia/preferences/lib/browser/util/preference-tree-generator';
 import { PreferenceStringInputRenderer } from '@theia/preferences/lib/browser/views/components/preference-string-input';
-import { ScmHistoryContribution } from '@theia/scm-extra/lib/browser/history/scm-history-contribution';
 import { ToolbarDefaultsFactory } from '@theia/toolbar/lib/browser/toolbar-defaults';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { QuickOpenWorkspace } from '@theia/workspace/lib/browser/quick-open-workspace';
@@ -37,7 +36,6 @@ import { VesColorContribution } from './ves-core-color-contribution';
 import { VesCoreContribution } from './ves-core-contribution';
 import { VesDebugFrontendApplicationContribution } from './ves-core-debug-contribution';
 import { VesDebugPrefixConfiguration } from './ves-core-debug-prefix-configuration';
-import { VesScmHistoryContribution } from './ves-core-history-contribution';
 import { VesDefaultFileIconThemeContribution } from './ves-core-icon-theme-contribution';
 import { VesCoreLabelProviderContribution } from './ves-core-label-provider';
 import { VesCorePreferenceSchema } from './ves-core-preferences';
@@ -139,10 +137,6 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
         registerKeybindings: () => { },
         registerToolbarItems: () => { }
     } as any);
-
-    // git history
-    bind(VesScmHistoryContribution).toSelf().inSingletonScope();
-    rebind(ScmHistoryContribution).toService(VesScmHistoryContribution);
 
     // custom file extensions
     bind(VesFileSystemFrontendContribution).toSelf().inSingletonScope();

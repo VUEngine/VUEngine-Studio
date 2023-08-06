@@ -38,7 +38,7 @@
             "**/build/*.a": true,
             "**/node_modules/**": true
           },
-	        "git.autofetch": true,
+          "git.autofetch": true,
           "security.workspace.trust.enabled": false,
           "toolbar.showToolbar": true,
           "window.title": "${projectName}",
@@ -83,7 +83,6 @@
     "@theia/preview": "1.36.0",
     "@theia/process": "1.36.0",
     "@theia/property-view": "1.36.0",
-    "@theia/scm-extra": "1.36.0",
     "@theia/scm": "1.36.0",
     "@theia/search-in-workspace": "1.36.0",
     "@theia/task": "1.36.0",
@@ -153,6 +152,5 @@
     "vscode.xml": "https://open-vsx.org/api/vscode/xml/1.52.1/file/vscode.xml-1.52.1.vsix",
     "vscode.yaml": "https://open-vsx.org/api/vscode/yaml/1.52.1/file/vscode.yaml-1.52.1.vsix"
   },
-  "theiaPluginsExcludeIds": [
-  ]
+  "theiaPluginsExcludeIds": []
 }
