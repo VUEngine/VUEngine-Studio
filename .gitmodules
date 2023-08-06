@@ -19,3 +19,6 @@
 [submodule "applications/electron/vuengine/plugins"]
 	path = applications/electron/vuengine/plugins
 	url = git@github.com:VUEngine/VUEngine-Plugins.git
+[submodule "applications/electron/vuengine/core"]
+	path = applications/electron/vuengine/core
+	url = git@github.com:VUEngine/VUEngine-Core.git
