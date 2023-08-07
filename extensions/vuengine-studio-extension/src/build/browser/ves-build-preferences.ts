@@ -14,8 +14,8 @@ export namespace VesBuildPreferenceIds {
     export const BUILD_MODE = [CATEGORY, 'mode'].join('.');
     export const DUMP_ELF = [CATEGORY, 'dumpElf'].join('.');
     export const PEDANTIC_WARNINGS = [CATEGORY, 'pedanticWarnings'].join('.');
-    export const ENGINE_LIBRARIES_PATH = [CATEGORY, 'engine', 'libraries', 'path'].join('.');
-    export const ENGINE_LIBRARIES_INCLUDE_IN_WORKSPACE = [CATEGORY, 'engine', 'libraries', 'includeInWorkspace'].join('.');
+    export const ENGINE_CORE_PATH = [CATEGORY, 'engine', 'core', 'path'].join('.');
+    export const ENGINE_CORE_INCLUDE_IN_WORKSPACE = [CATEGORY, 'engine', 'core', 'includeInWorkspace'].join('.');
     export const PRE_BUILD_TASKS = [CATEGORY, 'tasks', 'pre'].join('.');
     export const POST_BUILD_TASKS = [CATEGORY, 'tasks', 'post'].join('.');
 }
@@ -49,10 +49,10 @@ export const VesBuildPreferenceSchema: PreferenceSchema = {
             scope: PreferenceScope.Folder,
             overridable: true,
         },
-        [VesBuildPreferenceIds.ENGINE_LIBRARIES_PATH]: {
+        [VesBuildPreferenceIds.ENGINE_CORE_PATH]: {
             type: 'string',
             // eslint-disable-next-line max-len
-            description: nls.localize('vuengine/build/preferences/engineCorePathDescription', 'Full path to custom libraries. Has to be a folder named "vuengine" with VUEngine-Core in a sub-folder called "core" and VUEngine-Plugins in a sub-folder called "plugins". Uses built-in libraries when left blank.'),
+            description: nls.localize('vuengine/build/preferences/engineCorePathDescription', 'Full path to core library. Has to be a folder named "core" inside a parent folder named "vuengine". Uses built-in VUEngine Core when left blank.'),
             default: '',
             additionalProperties: {
                 // @ts-ignore
@@ -61,7 +61,7 @@ export const VesBuildPreferenceSchema: PreferenceSchema = {
             scope: PreferenceScope.Folder,
             overridable: true,
         },
-        [VesBuildPreferenceIds.ENGINE_LIBRARIES_INCLUDE_IN_WORKSPACE]: {
+        [VesBuildPreferenceIds.ENGINE_CORE_INCLUDE_IN_WORKSPACE]: {
             type: 'boolean',
             description: nls.localize('vuengine/build/preferences/includeEngineCoreInWorkspaceDescription', 'Automatically include VUEngine libraries in workspaces.'),
             default: false,

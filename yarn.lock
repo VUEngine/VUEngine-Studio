@@ -2989,17 +2989,6 @@
     http-proxy-agent "^5.0.0"
     https-proxy-agent "^5.0.0"
 
-"@theia/scm-extra@1.36.0":
-  version "1.36.0"
-  resolved "https://registry.yarnpkg.com/@theia/scm-extra/-/scm-extra-1.36.0.tgz#1d9a4bea834d520d5537ce4c7d551651b6bb104b"
-  integrity sha512-YSOTU+b5xo2CXcjMfeVyMwNgWXJqfNYFGdf7TTVuf2h9bVw5t5fIroXmMhp8mCA56mfQPEXrXb3xDAdhgumd0w==
-  dependencies:
-    "@theia/core" "1.36.0"
-    "@theia/editor" "1.36.0"
-    "@theia/filesystem" "1.36.0"
-    "@theia/navigator" "1.36.0"
-    "@theia/scm" "1.36.0"
-
 "@theia/scm@1.36.0":
   version "1.36.0"
   resolved "https://registry.yarnpkg.com/@theia/scm/-/scm-1.36.0.tgz#60e74a3ca820ef8e1d34abd0041be6934ca8c786"

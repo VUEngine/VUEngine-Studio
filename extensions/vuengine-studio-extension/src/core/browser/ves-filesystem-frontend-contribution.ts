@@ -9,7 +9,13 @@ export class VesFileSystemFrontendContribution extends FileSystemFrontendContrib
         const fileAssociations: {[filePattern: string]: string} = {
             ...{
                 [projectFilePattern]: 'jsonc',
-                'config.make': 'Makefile',
+                '*.make': 'Makefile',
+                '*.ld': 'c',
+                'makefile-common': 'Makefile',
+                'makefile-compile': 'Makefile',
+                'makefile-compiler': 'Makefile',
+                'makefile-game': 'Makefile',
+                'makefile-preprocess': 'Makefile',
             },
             ...this.preferences['files.associations'],
         };
