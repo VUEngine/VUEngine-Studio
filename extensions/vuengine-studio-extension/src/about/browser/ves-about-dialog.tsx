@@ -72,7 +72,7 @@ export class VesAboutDialog extends AboutDialog {
     protected renderCopyright(): React.ReactNode {
         return <>
             <div className="ves-about-paragraph">
-                © 2022 <a href={'mailto:c.radke@posteo.de'}>
+                © 2023 <a href={'mailto:c.radke@posteo.de'}>
                     Christian Radke
                 </a> {nls.localize('vuengine/about/and', 'and')} <a href={'mailto:jorgech3@gmail.com'}>
                     Jorge Andres Eremiev
@@ -103,7 +103,7 @@ export class VesAboutDialog extends AboutDialog {
     protected renderPatreon(): React.ReactNode {
         return <>
             <div className="ves-about-paragraph">
-                {nls.localize('vuengine/about/thankYouToOurSupporters', 'Thank you to our supporters on Patreon!')}
+                {nls.localize('vuengine/about/thankYouToOurSupporters', 'Thank you to our supporters on Patreon!')}<br/>
                 <a href="#" onClick={() => this.openUrl('https://www.patreon.com/VUEngine')}>{'https://www.patreon.com/VUEngine'}</a>
             </div>
             {this.renderPatrons()}
@@ -112,18 +112,21 @@ export class VesAboutDialog extends AboutDialog {
 
     protected renderPatrons(): React.ReactNode {
         return <div className="ves-about-paragraph">
-            {/* 25 patrons with highest lifetime support */}
+            {/* 30 patrons with highest lifetime support */}
             Adam Wannamaker,
             Alec Kafka,
             Benjamin Stevens,
             Bnjmn Mrph,
             Cameron Hollaway,
+            chairodactyl,
             Christopher Garland,
             David Baisley,
             Domenic Umberto Raso,
             Eric Freeman,
+            Gregory VanNostrand,
             IanelGreenleaf,
             Jose Zagal,
+            Luke Gerhardt,
             Marten Reiß,
             Michael Ortega,
             NeGiZON,
@@ -132,7 +135,9 @@ export class VesAboutDialog extends AboutDialog {
             Patrick-VB,
             Randy Jeffery,
             RetroOnyx,
+            Richard Corlett,
             Sean Machan,
+            Simon Gellis,
             Steven Hagelgans,
             Studio Kerga,
             Tony,
