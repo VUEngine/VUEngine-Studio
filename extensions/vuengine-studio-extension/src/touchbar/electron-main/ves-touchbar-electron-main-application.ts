@@ -30,8 +30,8 @@ export class VesElectronMainApplication extends ElectronMainApplication {
     async createWindow(asyncOptions: MaybePromise<TheiaBrowserWindowOptions> = this.getDefaultOptions()): Promise<BrowserWindow> {
         const electronWindow = await super.createWindow(asyncOptions);
 
-        electronWindow.on('focus', async () => this.removeGreyOutWindow(electronWindow));
-        electronWindow.on('blur', async () => this.greyOutWindow(electronWindow));
+        // electronWindow.on('focus', async () => this.removeGreyOutWindow(electronWindow));
+        // electronWindow.on('blur', async () => this.greyOutWindow(electronWindow));
 
         // @ts-ignore
         app.on(VesTouchBarCommands.init, workspaceOpened => this.registerVesTouchBar(electronWindow, workspaceOpened));
