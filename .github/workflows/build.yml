@@ -45,7 +45,7 @@ jobs:
       - name: Upload artifacts (Mac)
         uses: actions/upload-artifact@v3
         with:
-          name: dist
+          name: Mac
           path: |
             applications/electron/dist/*.pkg
             applications/electron/dist/*.zip
@@ -54,7 +54,7 @@ jobs:
       - name: Upload artifacts (Windows)
         uses: actions/upload-artifact@v3
         with:
-          name: dist
+          name: Windows
           path: |
             applications/electron/dist/*.exe
             applications/electron/dist/latest.yml
@@ -62,7 +62,7 @@ jobs:
       - name: Upload artifacts (Linux)
         uses: actions/upload-artifact@v3
         with:
-          name: dist
+          name: Linux
           path: |
             applications/electron/dist/*.deb
             applications/electron/dist/*.AppImage
