@@ -1,5 +1,5 @@
 appId: dev.vuengine.studio
-productName: VUEngine Studio
+productName: VUEngine
 copyright: Copyright © 2006-2023 VUEngine
 electronDist: ../../node_modules/electron/dist
 electronVersion: 15.5.7
@@ -47,7 +47,7 @@ fileAssociations:
 
 win:
   icon: resources/icons/WindowsLauncherIcon/VUEngineStudio.ico
-  artifactName: ${productName} ${version} Windows.${ext}
+  artifactName: VUEngine-Studio-${version}-Windows.${ext}
   target:
     - nsis
     - zip
@@ -59,7 +59,7 @@ win:
 
 mac:
   #executableName: VUEngine
-  artifactName: ${productName} ${version} Mac.${ext}
+  artifactName: VUEngine-Studio-${version}-Mac.${ext}
   icon: resources/icons/MacLauncherIcon/512-512.icns
   category: public.app-category.developer-tools
   darkModeSupport: true
@@ -72,7 +72,7 @@ mac:
 
 linux:
   icon: resources/icons/LinuxLauncherIcon/512-512.png
-  artifactName: ${productName} ${version} Linux.${ext}
+  artifactName: VUEngine-Studio-${version}-Linux.${ext}
   category: Development
   vendor: VUEngine
   maintainer: VUEngine
@@ -97,10 +97,10 @@ nsis:
   uninstallerIcon: resources/icons/WindowsLauncherIcon/VUEngineStudio.ico
   installerSidebar: resources/icons/InstallerSidebarImage/164-314Windows.bmp
   uninstallerSidebar: resources/icons/InstallerSidebarImage/164-314Windows.bmp
-  artifactName: ${productName} ${version} Setup Windows.${ext}
-  uninstallDisplayName: ${productName}
+  artifactName: VUEngine-Studio-${version}-Setup-Windows.${ext}
+  uninstallDisplayName: VUEngine Studio
 pkg:
-  artifactName: ${productName} ${version} Setup Mac.${ext}
+  artifactName: VUEngine-Studio-${version}-Setup-Mac.${ext}
   installLocation: /Applications
   allowAnywhere: false
   allowCurrentUserHome: false
@@ -113,8 +113,8 @@ pkg:
     alignment: bottomleft
     scaling: proportional
 deb:
-  artifactName: ${productName} ${version} Setup Linux.${ext}
+  artifactName: VUEngine-Studio-${version}-Setup-Linux.${ext}
 appImage:
-  artifactName: ${productName} ${version} Linux.${ext}
+  artifactName: VUEngine-Studio-${version}-Linux.${ext}
 
 afterPack: ./scripts/after-pack.js
