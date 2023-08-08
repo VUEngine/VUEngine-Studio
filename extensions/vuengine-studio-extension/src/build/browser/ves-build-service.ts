@@ -1,4 +1,4 @@
-import { CommandRegistry, CommandService, isWindows, nls } from '@theia/core';
+import { CommandRegistry, CommandService, isOSX, isWindows, nls } from '@theia/core';
 import { ApplicationShell, ConfirmDialog, LabelProvider, PreferenceScope, PreferenceService, QuickPickItem, QuickPickOptions, QuickPickService } from '@theia/core/lib/browser';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import URI from '@theia/core/lib/common/uri';
@@ -703,21 +703,19 @@ export class VesBuildService {
       buildMode
     );
 
-    const fullCleanContainer = document.createElement('p');
-    container.appendChild(fullCleanContainer);
+    const fullCleanLabel = document.createElement('label');
+    container.appendChild(fullCleanLabel);
 
     const assetsCheckbox = document.createElement('input');
     assetsCheckbox.type = 'checkbox';
-    assetsCheckbox.name = 'name';
-    assetsCheckbox.value = 'value';
-    assetsCheckbox.id = 'id';
-    fullCleanContainer.appendChild(assetsCheckbox);
+    fullCleanLabel.appendChild(assetsCheckbox);
 
     const assetsCheckboxLabelElement = document.createElement('span');
-    fullCleanContainer.appendChild(assetsCheckboxLabelElement);
+    fullCleanLabel.appendChild(assetsCheckboxLabelElement);
     assetsCheckboxLabelElement.textContent = nls.localize(
       'vuengine/build/clean/fullClean',
-      'Full clean'
+      'Full clean ({0} to toggle)',
+      isOSX ? '⌘' : nls.localize('vuengine/ctrl', 'Ctrl')
     );
 
     const assetsCheckboxExplanationElement = document.createElement('p');
@@ -728,6 +726,13 @@ export class VesBuildService {
       'Checking this will delete the entire build folder, including object files for all build modes and assets. Beware! This is usually not necessary and will result in the next build taking longer due to all assets having to be recompiled.'
     );
 
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Meta') {
+        assetsCheckbox.checked = !assetsCheckbox.checked;
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+
     const dialog = new ConfirmDialog({
         title: nls.localize('vuengine/build/commands/clean', 'Clean Build Folder'),
         msg: container,
@@ -736,6 +741,7 @@ export class VesBuildService {
     if (confirmed) {
       this.clean(assetsCheckbox.checked, buildMode);
     }
+    document.removeEventListener('keydown', onKeyDown);
   }
 
   protected async runCommand(commandName: string): Promise<void> {
@@ -1000,7 +1006,7 @@ export class VesBuildService {
         await this.fileService.delete(buildPathModeUri, { recursive: true });
       }
 
-      if (buildPathUri) {
+      if (await this.fileService.exists(buildPathUri)) {
         const files = await this.fileService.resolve(buildPathUri);
         if (files.children) {
           for (const child of files.children) {
