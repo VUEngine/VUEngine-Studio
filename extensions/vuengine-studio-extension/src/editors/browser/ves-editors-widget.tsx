@@ -11,13 +11,14 @@ import * as React from '@theia/core/shared/react';
 import { EditorPreferences } from '@theia/editor/lib/browser';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { deepmerge } from 'deepmerge-ts';
 import sortJson from 'sort-json';
+import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { ProjectFile, ProjectFileItem, ProjectFileType } from '../../project/browser/ves-project-types';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
 import { VES_RENDERERS } from './renderers/ves-renderers';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
 
 export const VesEditorsWidgetOptions = Symbol('VesEditorsWidgetOptions');
 export interface VesEditorsWidgetOptions {
@@ -37,6 +38,8 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     protected readonly fileService: FileService;
     @inject(LocalStorageService)
     protected readonly localStorageService: LocalStorageService;
+    @inject(VesCommonService)
+    protected readonly vesCommonService: VesCommonService;
     @inject(VesEditorsWidgetOptions)
     protected readonly options: VesEditorsWidgetOptions;
     @inject(VesProjectService)
@@ -303,6 +306,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
                                     fileService: this.fileService,
                                     fileDialogService: this.fileDialogService,
                                     localStorageService: this.localStorageService,
+                                    vesCommonService: this.vesCommonService,
                                     vesRumblePackService: this.vesRumblePackService,
                                     workspaceService: this.workspaceService,
                                 },

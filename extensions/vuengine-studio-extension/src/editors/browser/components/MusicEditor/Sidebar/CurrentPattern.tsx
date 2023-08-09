@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import VContainer from '../../../../../core/browser/components/VContainer';
+import VContainer from '../../Common/VContainer';
 import { MusicEditorContext, MusicEditorContextType, PATTERN_SIZES } from '../MusicEditorTypes';
 
 export default function CurrentPattern(): JSX.Element {

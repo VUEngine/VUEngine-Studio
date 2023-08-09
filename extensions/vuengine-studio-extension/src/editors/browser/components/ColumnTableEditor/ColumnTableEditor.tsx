@@ -1,6 +1,6 @@
 import { nls } from '@theia/core';
 import React from 'react';
-import VContainer from '../../../../core/browser/components/VContainer';
+import VContainer from '../Common/VContainer';
 import { ColumnTableData, ColumnTableEntry } from './ColumnTableTypes';
 import Editor from './Editor';
 

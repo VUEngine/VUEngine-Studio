@@ -131,4 +131,20 @@ export interface EntityData {
 }
 
 export interface EntityEditorState {
+    preview: {
+        anaglyph: boolean
+        animations: boolean
+        collisions: boolean
+        meshes: boolean
+        palettes: string[]
+        sprites: boolean
+        zoom: number
+    }
+}
+
+export interface Displacement {
+    x: number
+    y: number
+    z: number
+    parallax: number
 }

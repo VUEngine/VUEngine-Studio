@@ -1,6 +1,6 @@
 import { nls } from '@theia/core';
 import React from 'react';
-import VContainer from '../../../../core/browser/components/VContainer';
+import VContainer from '../Common/VContainer';
 import { BrightnessRepeatData } from './BrightnessRepeatTypes';
 import Editor from './Editor';
 import Preview from './Preview';

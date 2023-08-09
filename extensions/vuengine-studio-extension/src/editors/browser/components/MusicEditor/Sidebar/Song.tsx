@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
-import HContainer from '../../../../../core/browser/components/HContainer';
-import VContainer from '../../../../../core/browser/components/VContainer';
+import HContainer from '../../Common/HContainer';
+import VContainer from '../../Common/VContainer';
 import { MAX_SPEED, MIN_SPEED, MusicEditorContext, MusicEditorContextType, PATTERN_SIZES, VOLUME_STEPS } from '../MusicEditorTypes';
 
 export default function Song(): JSX.Element {

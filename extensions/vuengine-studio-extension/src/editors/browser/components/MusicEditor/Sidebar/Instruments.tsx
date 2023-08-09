@@ -1,7 +1,7 @@
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext } from 'react';
-import VContainer from '../../../../../core/browser/components/VContainer';
+import VContainer from '../../Common/VContainer';
 import { MusicEditorContext, MusicEditorContextType } from '../MusicEditorTypes';
 
 export default function Instruments(): JSX.Element {

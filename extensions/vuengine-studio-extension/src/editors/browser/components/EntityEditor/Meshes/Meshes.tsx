@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import VContainer from '../../../../../core/browser/components/VContainer';
+import VContainer from '../../Common/VContainer';
 import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 import { nls } from '@theia/core';
 import Mesh from './Mesh';

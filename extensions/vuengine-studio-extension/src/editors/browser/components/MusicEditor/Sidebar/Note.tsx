@@ -1,7 +1,7 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
-import HContainer from '../../../../../core/browser/components/HContainer';
-import VContainer from '../../../../../core/browser/components/VContainer';
+import HContainer from '../../Common/HContainer';
+import VContainer from '../../Common/VContainer';
 import { HIGHEST_NOTE, LOWEST_NOTE, MusicEditorContext, MusicEditorContextType, Notes, VOLUME_STEPS } from '../MusicEditorTypes';
 
 export default function Note(): JSX.Element {

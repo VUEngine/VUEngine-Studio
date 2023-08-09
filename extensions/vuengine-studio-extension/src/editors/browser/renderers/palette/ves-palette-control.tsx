@@ -1,7 +1,8 @@
 
 import { withJsonFormsControlProps } from '@jsonforms/react';
 import React from 'react';
-import { VesPalette } from './ves-palette';
+import Palette from '../../components/Common/Palette';
+import VContainer from '../../components/Common/VContainer';
 
 interface VesPaletteControlProps {
     data: string;
@@ -11,11 +12,13 @@ interface VesPaletteControlProps {
 }
 
 const VesPaletteControl = ({ data, handleChange, path, label }: VesPaletteControlProps) => (
-    <VesPalette
-        label={label}
-        value={data}
-        updateValue={(newValue: string) => handleChange(path, newValue)}
-    />
+    <VContainer>
+        <label>{label}</label>
+        <Palette
+            value={data}
+            updateValue={(newValue: string) => handleChange(path, newValue)}
+        />
+    </VContainer>
 );
 
 export default withJsonFormsControlProps(VesPaletteControl);

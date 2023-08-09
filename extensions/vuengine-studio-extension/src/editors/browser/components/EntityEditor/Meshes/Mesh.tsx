@@ -1,9 +1,9 @@
-import React, { useContext } from 'react';
-import HContainer from '../../../../../core/browser/components/HContainer';
-import VContainer from '../../../../../core/browser/components/VContainer';
-import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
+import React, { useContext } from 'react';
+import HContainer from '../../Common/HContainer';
+import VContainer from '../../Common/VContainer';
+import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 import Segment from './Segment';
 
 interface MeshProps {

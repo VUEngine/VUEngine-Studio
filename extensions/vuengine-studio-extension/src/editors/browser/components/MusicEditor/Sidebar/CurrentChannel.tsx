@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
-import HContainer from '../../../../../core/browser/components/HContainer';
-import VContainer from '../../../../../core/browser/components/VContainer';
+import HContainer from '../../Common/HContainer';
+import VContainer from '../../Common/VContainer';
 import { MusicEditorContext, MusicEditorContextType, VOLUME_STEPS } from '../MusicEditorTypes';
 
 export default function CurrentChannel(): JSX.Element {

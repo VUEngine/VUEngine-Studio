@@ -1,0 +1,38 @@
+.entityEditor .preview-container {
+    align-items: center;
+    background-color: var(--theia-sideBar-background);
+    border-radius: 10px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    height: 300px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.entityEditor .sprite-error {
+    align-items: center;
+    border: 1px dashed red;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.entityEditor .sprite-error::after {
+    border-top: 1px dashed red;
+    content: '';
+    display: block;
+    position: absolute;
+    transform: rotate(45deg);
+    width: 150%;
+}
+
+.entityEditor .sprite-error::before {
+    border-top: 1px dashed red;
+    content: '';
+    display: block;
+    position: absolute;
+    transform: rotate(-45deg);
+    width: 150%;
+}

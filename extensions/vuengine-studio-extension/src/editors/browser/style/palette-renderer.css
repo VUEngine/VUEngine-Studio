@@ -1,34 +1,29 @@
-.jsonforms-container .control.palette-renderer .theia-select-component {
+.palette-renderer .theia-select-component {
   display: inline-flex;
-  min-width: 48px;
-  width: 48px;
-}
-
-.jsonforms-container .control.palette-renderer .input {
-  display: flex;
-  flex-direction: row;
+  min-width: 40px;
+  width: 40px;
 }
 
 /* .theia-select-component-dropdown .theia-select-component-option:nth-child(1), */
-.jsonforms-container .control.palette-renderer .value-11 .theia-select-component {
+.palette-renderer .value-11 .theia-select-component {
   background-color: #ff0000;
   color: #fff;
 }
 
 /* .theia-select-component-dropdown .theia-select-component-option:nth-child(2), */
-.jsonforms-container .control.palette-renderer .value-10 .theia-select-component {
+.palette-renderer .value-10 .theia-select-component {
   background-color: #aa0000;
   color: #fff;
 }
 
 /* .theia-select-component-dropdown .theia-select-component-option:nth-child(3), */
-.jsonforms-container .control.palette-renderer .value-01 .theia-select-component {
+.palette-renderer .value-01 .theia-select-component {
   background-color: #550000;
   color: #fff;
 }
 
 /* .theia-select-component-dropdown .theia-select-component-option:nth-child(4), */
-.jsonforms-container .control.palette-renderer .value-00 .theia-select-component {
+.palette-renderer .value-00 .theia-select-component {
   background-color: #000000;
   color: #fff;
 }

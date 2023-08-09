@@ -1,5 +1,6 @@
 import React from 'react';
-import { FontEditorState, PALETTE_COLORS, VariableSize, win1252CharNames } from '../FontEditorTypes';
+import { PALETTE_COLORS } from '../../../../../core/browser/ves-common-types';
+import { FontEditorState, VariableSize, win1252CharNames } from '../FontEditorTypes';
 
 interface AlphabetCharProps {
     line: number
@@ -34,6 +35,7 @@ export default function AlphabetChar(props: AlphabetCharProps): JSX.Element {
         classNames.push('active');
     }
 
+    // TODO: try using CssImage for this
     const boxShadow: string[] = [];
     [...Array(charHeight)].map((h, y) => {
         if (!variableSize.enabled || y < variableSize.y) {

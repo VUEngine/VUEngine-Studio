@@ -19,10 +19,8 @@ export default function ImportExport(props: ImportExportProps): JSX.Element {
         const uri = await props.fileDialogService.showOpenDialog(openFileDialogProps);
         if (uri) {
             const fileContent = await props.fileService.readFile(uri);
-            const PNG = require('@camoto/pngjs').PNG;
-            new PNG({ filterType: 4 }).parse(fileContent.value.toString(), function (error: unknown, data: unknown): void {
-                console.log(error, data);
-            });
+            // ...
+            console.log(fileContent);
         }
     };
 
