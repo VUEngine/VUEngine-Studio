@@ -48,7 +48,6 @@ jobs:
           name: Mac
           path: |
             applications/electron/dist/*.pkg
-            applications/electron/dist/*.zip
             applications/electron/dist/latest-mac.yml
 
       - name: Upload artifacts (Windows)

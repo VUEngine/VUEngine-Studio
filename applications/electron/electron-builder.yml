@@ -50,7 +50,6 @@ win:
   artifactName: VUEngine-Studio-${version}-Windows.${ext}
   target:
     - nsis
-    - zip
   extraResources:
     - from: binaries/vuengine-studio-tools/win
       to: app/binaries/vuengine-studio-tools/win
@@ -65,7 +64,6 @@ mac:
   darkModeSupport: true
   target:
     - pkg
-    - zip
   extraResources:
     - from: binaries/vuengine-studio-tools/osx
       to: app/binaries/vuengine-studio-tools/osx
