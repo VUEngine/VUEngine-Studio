@@ -266,7 +266,7 @@ export class VesImageConverterService {
           // render animation file
           const name = imageConfigFileToBeConverted.config.name
             ? imageConfigFileToBeConverted.config.name
-            : imageConfigFileToBeConverted.imageConfigFileUri.path.name;
+            : imageConfigFileToBeConverted.imageConfigFileUri.path.name.replace('.image', '');
           const targetFileUri = imageConfigFileToBeConverted.imageConfigFileUri.parent
             .resolve(this.getConvertedDirName())
             .resolve(`${name}.c`);
