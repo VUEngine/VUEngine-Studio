@@ -72,10 +72,12 @@
     "vscode.make": "https://open-vsx.org/api/vscode/make/1.77.0/file/vscode.make-1.77.0.vsix",
     "vscode.markdown": "https://open-vsx.org/api/vscode/markdown/1.77.0/file/vscode.markdown-1.77.0.vsix",
     "vscode.markdown-language-features": "https://open-vsx.org/api/vscode/markdown-language-features/1.77.0/file/vscode.markdown-language-features-1.77.0.vsix",
+    "vscode.media-preview": "https://open-vsx.org/api/vscode/media-preview/1.77.0/file/vscode.media-preview-1.77.0.vsix",
     "vscode.merge-conflict": "https://open-vsx.org/api/vscode/merge-conflict/1.77.0/file/vscode.merge-conflict-1.77.0.vsix",
     "vscode.powershell": "https://open-vsx.org/api/vscode/powershell/1.77.0/file/vscode.powershell-1.77.0.vsix",
     "vscode.search-result": "https://open-vsx.org/api/vscode/search-result/1.77.0/file/vscode.search-result-1.77.0.vsix",
     "vscode.shellscript": "https://open-vsx.org/api/vscode/shellscript/1.77.0/file/vscode.shellscript-1.77.0.vsix",
+    "vscode.simple-browser": "https://open-vsx.org/api/vscode/simple-browser/1.77.0/file/vscode.simple-browser-1.77.0.vsix",
     "vscode.xml": "https://open-vsx.org/api/vscode/xml/1.77.0/file/vscode.xml-1.77.0.vsix",
     "vscode.yaml": "https://open-vsx.org/api/vscode/yaml/1.77.0/file/vscode.yaml-1.77.0.vsix"
   },
