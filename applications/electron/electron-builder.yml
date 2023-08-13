@@ -21,8 +21,6 @@ files:
   - lib
   - scripts
   - "!**node_modules/**"
-  - from: plugins
-    to: plugins
   - from: binaries/vuengine-studio-tools/web
     to: binaries/vuengine-studio-tools/web
   - from: documentation
@@ -31,6 +29,9 @@ files:
     to: templates
   - from: vuengine
     to: vuengine
+extraResources:
+  - from: ../../plugins
+    to: app/plugins
 
 fileAssociations:
   - ext: vuengine

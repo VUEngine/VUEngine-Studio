@@ -6,6 +6,6 @@
 **/src-gen
 **/gen-webpack.config.js
 **/gen-webpack.node.config.js
-applications/*/plugins
+/plugins
 **/tsconfig.tsbuildinfo
 *.log
