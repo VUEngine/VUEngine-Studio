@@ -59,9 +59,13 @@ They can be updated at a later point with
 
 ### Build
 
-To build the applicationm, simply call the yarn build command.
+To build the application in production mode:
 
-    yarn
+    yarn && yarn build && yarn download:plugins
+
+For a fast, less resource intensive build use the following. This will not minify the frontend app.
+
+    yarn && yarn build:dev && yarn download:plugins
 
 ### Development
 
