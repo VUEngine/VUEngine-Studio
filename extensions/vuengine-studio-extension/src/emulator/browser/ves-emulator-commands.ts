@@ -331,4 +331,14 @@ export namespace VesEmulatorCommands {
     'vuengine/emulator/showHelp',
     'vuengine/emulator/commands/category'
   );
+
+  export const WIDGET_SETTINGS: Command = Command.toLocalizedCommand(
+    {
+      id: 'ves:emulator:showSettings',
+      label: 'Show Emulator Preferences',
+      iconClass: 'codicon codicon-settings',
+    },
+    'vuengine/emulator/commands/showSettings',
+    'vuengine/emulator/commands/category'
+  );
 };

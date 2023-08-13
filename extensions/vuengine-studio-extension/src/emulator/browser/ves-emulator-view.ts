@@ -1,11 +1,11 @@
 import { CommandRegistry, CommandService } from '@theia/core';
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { AbstractViewContribution, CommonCommands } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
-import { AbstractViewContribution } from '@theia/core/lib/browser';
-import { VesEmulatorWidget } from './ves-emulator-widget';
-import { VesEmulatorContextKeyService } from './ves-emulator-context-key-service';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
 import { VesEmulatorCommands } from './ves-emulator-commands';
+import { VesEmulatorContextKeyService } from './ves-emulator-context-key-service';
+import { VesEmulatorWidget } from './ves-emulator-widget';
 
 @injectable()
 export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmulatorWidget> implements TabBarToolbarContribution {
@@ -44,6 +44,13 @@ export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmu
         widget.id === VesEmulatorWidget.ID,
       execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'user-guide/emulator', false),
     });
+
+    commandRegistry.registerCommand(VesEmulatorCommands.WIDGET_SETTINGS, {
+      isEnabled: () => true,
+      isVisible: widget => widget !== undefined &&
+          widget.id === VesEmulatorWidget.ID,
+      execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'emulator'),
+  });
   }
 
   registerToolbarItems(toolbar: TabBarToolbarRegistry): void {
@@ -51,6 +58,12 @@ export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmu
       id: VesEmulatorCommands.WIDGET_HELP.id,
       command: VesEmulatorCommands.WIDGET_HELP.id,
       tooltip: VesEmulatorCommands.WIDGET_HELP.label,
+      priority: 1,
+    });
+    toolbar.registerItem({
+      id: VesEmulatorCommands.WIDGET_SETTINGS.id,
+      command: VesEmulatorCommands.WIDGET_SETTINGS.id,
+      tooltip: VesEmulatorCommands.WIDGET_SETTINGS.label,
       priority: 0,
     });
   }
