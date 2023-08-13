@@ -1,0 +1,13 @@
+{
+  "extends": "../../configs/base.tsconfig",
+  "include": [],
+  "compilerOptions": {
+    "composite": true,
+    "esModuleInterop": true
+  },
+  "references": [
+    {
+      "path": "../../extensions/vuengine-studio-extension"
+    }
+  ]
+}

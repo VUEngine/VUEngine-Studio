@@ -21,13 +21,16 @@
     "@typescript-eslint/eslint-plugin-tslint": "^4.25.0",
     "@typescript-eslint/parser": "^4.25.0",
     "eslint": "^7.27.0",
-    "eslint-plugin-deprecation": "^1.2.1",
+    "eslint-plugin-deprecation": "1.2.1",
     "eslint-plugin-import": "^2.23.3",
     "eslint-plugin-no-null": "^1.0.2",
     "eslint-plugin-no-unsanitized": "^3.1.5",
     "eslint-plugin-react": "^7.23.2",
     "lerna": "^6.0.1",
-    "rimraf": "^2.7.1"
+    "rimraf": "^2.7.1",
+    "ts-node": "^10.0.0",
+    "type-fest": "^0.20.2",
+    "yargs": "17.2.1"
   },
   "scripts": {
     "clean": "lerna run clean && rimraf node_modules",
@@ -53,17 +56,6 @@
     "nls-extract": "theia nls-extract -o extensions/vuengine-studio-extension/i18n/nls.json -r extensions/vuengine-studio-extension -m true",
     "nls-localize": "theia nls-localize CS DE ES FR HU IT JA PL PT-BR PT-PT RU ZH-CN -f extensions/vuengine-studio-extension/i18n/nls.json --free-api true -k $1"
   },
-  "workspaces": [
-    "applications/*",
-    "extensions/*"
-  ],
-  "resolutions": {
-    "@types/puppeteer": "^5.4.0",
-    "@yarnpkg/parsers": "3.0.0-rc.44",
-    "**/msgpackr": "1.8.3",
-    "**/multer": "1.4.4-lts.1",
-    "**/node-abi": "^3.45.0"
-  },
   "theiaPluginsDir": "plugins",
   "theiaPlugins": {
     "vscode.configuration-editing": "https://open-vsx.org/api/vscode/configuration-editing/1.77.0/file/vscode.configuration-editing-1.77.0.vsix",
@@ -87,5 +79,15 @@
     "vscode.xml": "https://open-vsx.org/api/vscode/xml/1.77.0/file/vscode.xml-1.77.0.vsix",
     "vscode.yaml": "https://open-vsx.org/api/vscode/yaml/1.77.0/file/vscode.yaml-1.77.0.vsix"
   },
-  "theiaPluginsExcludeIds": []
+  "theiaPluginsExcludeIds": [],
+  "workspaces": [
+    "applications/*",
+    "extensions/*"
+  ],
+  "resolutions": {
+    "@types/puppeteer": "^5.4.0",
+    "@yarnpkg/parsers": "3.0.0-rc.44",
+    "**/msgpackr": "1.8.3",
+    "**/multer": "1.4.4-lts.1"
+  }
 }
