@@ -43,7 +43,8 @@ jobs:
           NODE_OPTIONS: --max_old_space_size=4096
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # https://github.com/microsoft/vscode-ripgrep/issues/9
 
-      - name: Upload artifacts (Mac)
+      - name: Upload artifacts
+        if: runner.os == 'macOS'
         uses: actions/upload-artifact@v3
         with:
           name: Mac
@@ -51,7 +52,8 @@ jobs:
             applications/electron/dist/*.pkg
             applications/electron/dist/latest-mac.yml
 
-      - name: Upload artifacts (Windows)
+      - name: Upload artifacts
+        if: runner.os == 'Windows'
         uses: actions/upload-artifact@v3
         with:
           name: Windows
@@ -59,7 +61,8 @@ jobs:
             applications/electron/dist/*.exe
             applications/electron/dist/latest.yml
 
-      - name: Upload artifacts (Linux)
+      - name: Upload artifacts
+        if: runner.os == 'Linux'
         uses: actions/upload-artifact@v3
         with:
           name: Linux
