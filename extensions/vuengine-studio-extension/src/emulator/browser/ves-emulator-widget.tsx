@@ -875,7 +875,6 @@ export class VesEmulatorWidget extends ReactWidget {
                 </option>
               ))}
             </select>
-            {/* }
             <select
               className="theia-select"
               title={nls.localize(
@@ -894,7 +893,6 @@ export class VesEmulatorWidget extends ReactWidget {
                 </option>
               ))}
             </select>
-            { */}
           </div>
           <div>
             <button
