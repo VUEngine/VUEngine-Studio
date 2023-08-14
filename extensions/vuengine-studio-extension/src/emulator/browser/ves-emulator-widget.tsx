@@ -26,6 +26,7 @@ import { VesEmulatorCommands } from './ves-emulator-commands';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
 import { VesEmulatorService } from './ves-emulator-service';
 import {
+  EMULATION_MODES,
   EMULATION_SCALES,
   EMULATION_STEREO_MODES,
   EmulatorFunctionKeyCode,
