@@ -276,7 +276,12 @@ export class VesBuildService {
     // @ts-ignore
     const onData = ({ pId, data }) => {
       if (this.buildStatus.processManagerId === pId) {
-        this.pushBuildLogLine(this.parseBuildOutput(data));
+        data
+          .trim() // remove trailing newline
+          .split(/\n/) // split by newline
+          .forEach((d: string) =>
+            this.pushBuildLogLine(this.parseBuildOutput(d))
+          );
       }
     };
 
@@ -734,8 +739,8 @@ export class VesBuildService {
     document.addEventListener('keydown', onKeyDown);
 
     const dialog = new ConfirmDialog({
-        title: nls.localize('vuengine/build/commands/clean', 'Clean Build Folder'),
-        msg: container,
+      title: nls.localize('vuengine/build/commands/clean', 'Clean Build Folder'),
+      msg: container,
     });
     const confirmed = await dialog.open();
     if (confirmed) {
