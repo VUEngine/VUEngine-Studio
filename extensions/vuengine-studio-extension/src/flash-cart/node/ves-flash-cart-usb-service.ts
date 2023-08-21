@@ -38,49 +38,52 @@ export class VesFlashCartUsbServiceImpl implements VesFlashCartUsbService {
             deviceIsFlashCart = false;
             for (const flashCartConfig of flashCartConfigs) {
                 const deviceDesc = device.deviceDescriptor;
-                if (
-                    !deviceIsFlashCart &&
-                    deviceDesc.idVendor === flashCartConfig.vid &&
-                    deviceDesc.idProduct === flashCartConfig.pid
-                ) {
-                    device.open();
-                    manufacturer = await new Promise((resolve, reject) => {
-                        device.getStringDescriptor(
-                            device.deviceDescriptor.iManufacturer,
-                            (error, data) => resolve(data)
-                        );
-                    });
-                    product = await new Promise((resolve, reject) => {
-                        device.getStringDescriptor(
-                            device.deviceDescriptor.iProduct,
-                            (error, data) => resolve(data)
-                        );
-                    });
-                    device.close();
-
+                for (const deviceCodes of flashCartConfig.deviceCodes) {
                     if (
-                        (flashCartConfig.manufacturer === '' ||
-                            manufacturer?.includes(flashCartConfig.manufacturer)) &&
-                        (flashCartConfig.product === '' ||
-                            product?.includes(flashCartConfig.product))
+                        !deviceIsFlashCart &&
+                        deviceDesc.idVendor === deviceCodes.vid &&
+                        deviceDesc.idProduct === deviceCodes.pid
                     ) {
-                        const portName = ports.find(port =>
-                            parseInt(port.productId || '0', 16) === flashCartConfig.pid &&
-                            parseInt(port.vendorId || '0', 16) === flashCartConfig.vid &&
-                            port.manufacturer === flashCartConfig.manufacturer);
-
-                        deviceIsFlashCart = true;
-                        connectedFlashCarts.push({
-                            config: flashCartConfig,
-                            port: portName?.path || '',
-                            status: {
-                                processId: -1,
-                                step: '',
-                                progress: -1,
-                                log: [],
-                            },
-                            canHoldRom: true,
+                        device.open();
+                        manufacturer = await new Promise((resolve, reject) => {
+                            device.getStringDescriptor(
+                                device.deviceDescriptor.iManufacturer,
+                                (error, data) => resolve(data)
+                            );
                         });
+                        product = await new Promise((resolve, reject) => {
+                            device.getStringDescriptor(
+                                device.deviceDescriptor.iProduct,
+                                (error, data) => resolve(data)
+                            );
+                        });
+                        device.close();
+
+                        if (
+                            (deviceCodes.manufacturer === '' ||
+                                manufacturer?.includes(deviceCodes.manufacturer)) &&
+                            (deviceCodes.product === '' ||
+                                product?.includes(deviceCodes.product))
+                        ) {
+                            const portName = ports.find(port =>
+                                parseInt(port.productId || '0', 16) === deviceCodes.pid &&
+                                parseInt(port.vendorId || '0', 16) === deviceCodes.vid &&
+                                port.manufacturer === deviceCodes.manufacturer);
+
+                            deviceIsFlashCart = true;
+                            connectedFlashCarts.push({
+                                config: flashCartConfig,
+                                deviceCodes,
+                                port: portName?.path || '',
+                                status: {
+                                    processId: -1,
+                                    step: '',
+                                    progress: -1,
+                                    log: [],
+                                },
+                                canHoldRom: true,
+                            });
+                        }
                     }
                 }
             }

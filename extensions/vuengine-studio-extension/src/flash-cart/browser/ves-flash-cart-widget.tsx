@@ -183,10 +183,10 @@ export class VesFlashCartWidget extends ReactWidget {
                   </div>
                   <div>
                     <i className='fa fa-fw fa-usb'></i>{' '}
-                    {connectedFlashCart.config.vid}:
-                    {connectedFlashCart.config.pid}<br />
-                    {connectedFlashCart.config.manufacturer}<br />
-                    {connectedFlashCart.config.product}<br />
+                    {connectedFlashCart.deviceCodes.vid}:
+                    {connectedFlashCart.deviceCodes.pid}<br />
+                    {connectedFlashCart.deviceCodes.manufacturer}<br />
+                    {connectedFlashCart.deviceCodes.product}<br />
                     {connectedFlashCart.port}
                   </div>
                   <div>

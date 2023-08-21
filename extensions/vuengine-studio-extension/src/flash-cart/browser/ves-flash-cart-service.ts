@@ -17,6 +17,7 @@ import { VesProcessWatcher } from '../../process/browser/ves-process-service-wat
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import {
+  BUILT_IN_FLASH_CART_CONFIGS,
   ConnectedFlashCart,
   FLASHBOY_PLUS_IMAGE_PLACEHOLDER,
   FlashCartConfig,
@@ -32,7 +33,7 @@ import {
 } from '../common/ves-flash-cart-types';
 import { VesFlashCartUsbService } from '../common/ves-flash-cart-usb-service-protocol';
 import { VesFlashCartCommands } from './ves-flash-cart-commands';
-import { BUILT_IN_FLASH_CART_CONFIGS, VesFlashCartPreferenceIds } from './ves-flash-cart-preferences';
+import { VesFlashCartPreferenceIds } from './ves-flash-cart-preferences';
 import { VesFlashCartUsbWatcher } from './ves-flash-cart-usb-watcher';
 
 @injectable()
