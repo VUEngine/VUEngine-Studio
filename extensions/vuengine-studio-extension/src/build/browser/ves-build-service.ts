@@ -939,7 +939,7 @@ export class VesBuildService {
       },
       {
         label: BuildMode.Beta,
-        detail: `   ${nls.localize('vuengine/build/modes/betaDescription', 'Includes selected asserts, for testing the performance on hardware.')}`,
+        detail: `   ${nls.localize('vuengine/build/modes/betaDescription', 'Includes selected asserts, for testing on emulators.')}`,
         iconClasses: (BuildMode.Beta === currentBuildMode) ? ['fa', 'fa-check-square-o'] : ['fa', 'fa-square-o'],
       },
       {
