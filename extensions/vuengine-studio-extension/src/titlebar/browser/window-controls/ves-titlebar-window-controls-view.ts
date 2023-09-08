@@ -16,8 +16,8 @@ export class VesTitlebarWindowControlsContribution extends AbstractViewContribut
     }
 
     @postConstruct()
-    protected async init(): Promise<void> {
-        await this.openView({ activate: true, reveal: true });
+    protected init(): void {
+        this.openView({ activate: true, reveal: true });
     }
 
     registerCommands(commandRegistry: CommandRegistry): void {

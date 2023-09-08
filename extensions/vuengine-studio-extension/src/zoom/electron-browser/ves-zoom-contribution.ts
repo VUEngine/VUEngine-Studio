@@ -12,7 +12,7 @@ export class VesZoomContribution implements CommandContribution, KeybindingContr
     @inject(VesZoomStatusBarContribution) protected readonly vesZoomStatusBarContribution: VesZoomStatusBarContribution;
 
     @postConstruct()
-    protected async init(): Promise<void> {
+    protected init(): void {
         this.preferenceService.ready.then(() => {
             this.applyConfiguredZoomFactor();
             this.preferenceService.onPreferenceChanged(({ preferenceName, newValue }) => {
