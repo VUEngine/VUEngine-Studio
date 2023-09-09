@@ -1,7 +1,7 @@
 import { UTF8 } from '@theia/core/lib/common/encodings';
 import { injectable } from '@theia/core/shared/inversify';
 import { WorkspaceFrontendContribution } from '@theia/workspace/lib/browser';
-import { VesEncodingOverride } from 'src/core/browser/ves-encoding-registry';
+import { VesEncodingOverride } from '../../../core/browser/ves-encoding-registry';
 import { ProjectFileTemplateEncoding, VUENGINE_EXT } from '../ves-project-types';
 
 @injectable()

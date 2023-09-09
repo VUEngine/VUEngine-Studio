@@ -1,4 +1,4 @@
-import { CommandService } from '@theia/core';
+import { CommandService, isOSX } from '@theia/core';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { WindowTitleService } from '@theia/core/lib/browser/window/window-title-service';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -55,7 +55,7 @@ export class VesTitlebarApplicationTitleWidget extends ReactWidget {
   protected maximizeWindow(): void {
     const win = window.electronTheiaCore;
     if (!win) { return; }
-    if (process.platform === 'darwin') {
+    if (isOSX) {
       const action = window.electronVesCore.getUserDefault('AppleActionOnDoubleClick', 'string');
       if (action === 'None') { return; }
       if (action === 'Minimize') { return win.minimize(); }

@@ -3,7 +3,7 @@ import { injectable } from '@theia/core/shared/inversify';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import React from 'react';
-import { ImageConverterCompressor } from 'src/image-converter/browser/ves-image-converter-types';
+import { ImageConverterCompressor } from '../../../../image-converter/browser/ves-image-converter-types';
 import Alphabet from './Alphabet/Alphabet';
 import AlphabetSettings from './Alphabet/AlphabetSettings';
 import CharEditor from './CharEditor/CharEditor';
