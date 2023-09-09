@@ -6,7 +6,6 @@ import { VesProcessService, VesProcessServiceClient, VES_PROCESS_SERVICE_PATH } 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(VesProcessServiceImpl).toSelf().inSingletonScope();
     bind(VesProcessService).toService(VesProcessServiceImpl);
-
     bind(ConnectionHandler).toDynamicValue(ctx =>
         new RpcConnectionHandler<VesProcessServiceClient>(VES_PROCESS_SERVICE_PATH, client => {
             const server = ctx.container.get<VesProcessService>(VesProcessService);

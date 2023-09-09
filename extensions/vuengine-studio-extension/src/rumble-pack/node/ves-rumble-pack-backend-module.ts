@@ -6,7 +6,6 @@ import { VesRumblePackUsbService, VesRumblePackUsbServiceClient, VES_RUMBLE_PACK
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(VesRumblePackUsbServiceImpl).toSelf().inSingletonScope();
     bind(VesRumblePackUsbService).toService(VesRumblePackUsbServiceImpl);
-
     bind(ConnectionHandler).toDynamicValue(ctx =>
         new RpcConnectionHandler<VesRumblePackUsbServiceClient>(VES_RUMBLE_PACK_USB_SERVICE_PATH, client => {
             const server = ctx.container.get<VesRumblePackUsbService>(VesRumblePackUsbService);

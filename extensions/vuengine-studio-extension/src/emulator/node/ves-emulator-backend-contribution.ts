@@ -2,8 +2,8 @@ import { isWindows } from '@theia/core';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import URI from '@theia/core/lib/common/uri';
 import { BackendApplicationContribution, FileUri } from '@theia/core/lib/node';
-import * as express from 'express';
 import { inject, injectable } from '@theia/core/shared/inversify';
+import * as express from 'express';
 
 @injectable()
 export class EmulatorBackendContribution implements BackendApplicationContribution {
