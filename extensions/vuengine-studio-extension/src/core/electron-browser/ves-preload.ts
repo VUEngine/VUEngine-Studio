@@ -1,6 +1,5 @@
 import { VES_CHANNEL_GET_USER_DEFAULT, VES_CHANNEL_SET_ZOOM_FACTOR, VesCoreAPI } from '../electron-common/ves-electron-api';
 
-// eslint-disable-next-line import/no-extraneous-dependencies
 const { ipcRenderer, contextBridge } = require('electron');
 
 const api: VesCoreAPI = {

@@ -4,7 +4,8 @@ import { VesGlobService, VES_GLOB_SERVICE_PATH } from '../common/ves-glob-servic
 import { VesGlobServiceImpl } from './ves-glob-service';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
-    bind(VesGlobService).to(VesGlobServiceImpl).inSingletonScope();
+    bind(VesGlobServiceImpl).toSelf().inSingletonScope();
+    bind(VesGlobService).toService(VesGlobServiceImpl);
     bind(ConnectionHandler).toDynamicValue(ctx =>
         new RpcConnectionHandler(VES_GLOB_SERVICE_PATH, () =>
             ctx.container.get<VesGlobService>(VesGlobService)

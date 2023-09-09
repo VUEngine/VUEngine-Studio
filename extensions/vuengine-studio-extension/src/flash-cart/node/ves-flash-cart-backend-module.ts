@@ -6,7 +6,6 @@ import { VesFlashCartUsbService, VesFlashCartUsbServiceClient, VES_FLASH_CART_US
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(VesFlashCartUsbServiceImpl).toSelf().inSingletonScope();
     bind(VesFlashCartUsbService).toService(VesFlashCartUsbServiceImpl);
-
     bind(ConnectionHandler).toDynamicValue(ctx =>
         new RpcConnectionHandler<VesFlashCartUsbServiceClient>(VES_FLASH_CART_USB_SERVICE_PATH, client => {
             const server = ctx.container.get<VesFlashCartUsbService>(VesFlashCartUsbService);

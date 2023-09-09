@@ -30,7 +30,8 @@ import {
   WithContributor
 } from './ves-project-types';
 
-const replaceInFiles = require('replace-in-files');
+// TODO: this uses node functions, move to backend
+// const replaceInFiles = require('replace-in-file');
 
 @injectable()
 export class VesProjectService {
@@ -533,17 +534,17 @@ export class VesProjectService {
       basepath = basepath.replace(/\\/g, '/');
     }
 
-    if (to && from) {
-      return replaceInFiles({
-        files: [
-          `${basepath}/**/*.*`,
-          `${basepath}/*.*`,
-          `${basepath}/*`,
-        ],
-        from,
-        to,
-      });
-    }
+    //    if (to && from) {
+    //      return replaceInFiles({
+    //        files: [
+    //          `${basepath}/**/*.*`,
+    //          `${basepath}/*.*`,
+    //          `${basepath}/*`,
+    //        ],
+    //        from,
+    //        to,
+    //      });
+    //    }
   }
 
   protected async updateWindowTitle(): Promise<void> {

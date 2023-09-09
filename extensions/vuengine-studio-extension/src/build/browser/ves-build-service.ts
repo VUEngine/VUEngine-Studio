@@ -1,6 +1,7 @@
 import { CommandRegistry, CommandService, isOSX, isWindows, nls } from '@theia/core';
 import { ApplicationShell, ConfirmDialog, LabelProvider, PreferenceScope, PreferenceService, QuickPickItem, QuickPickOptions, QuickPickService } from '@theia/core/lib/browser';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
+import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
@@ -40,6 +41,8 @@ export class VesBuildService {
   protected readonly commandRegistry: CommandRegistry;
   @inject(CommandService)
   protected readonly commandService: CommandService;
+  @inject(EnvVariablesServer)
+  protected envVariablesServer: EnvVariablesServer;
   @inject(FileService)
   protected fileService: FileService;
   @inject(FrontendApplicationStateService)
@@ -459,7 +462,10 @@ export class VesBuildService {
           LC_ALL: 'C',
           PREPROCESSING_WAIT_FOR_LOCK_DELAY_FACTOR: '0.000',
           MAKE_JOBS: this.getThreads(),
-          PATH: [await this.fileService.fsPath(compilerUri.resolve('bin')), process.env.PATH].join(':'),
+          PATH: [
+            await this.fileService.fsPath(compilerUri.resolve('bin')),
+            await this.envVariablesServer.getValue('PATH'),
+          ].join(':'),
           PLUGINS_FOLDER: await this.convertoToEnvPath(enginePluginsUri),
           USER_PLUGINS_FOLDER: await this.convertoToEnvPath(userPluginsUri),
           PRINT_PEDANTIC_WARNINGS: pedanticWarnings ? 1 : 0,

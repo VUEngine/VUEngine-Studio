@@ -1,4 +1,3 @@
-import $RefParser, { JSONSchema } from '@apidevtools/json-schema-ref-parser';
 import { JsonFormsCore, JsonSchema, UISchemaElement } from '@jsonforms/core';
 import { JsonForms } from '@jsonforms/react';
 import { JsonFormsStyleContext, StyleContext, vanillaCells, vanillaRenderers, vanillaStyles } from '@jsonforms/vanilla-renderers';
@@ -13,7 +12,6 @@ import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { deepmerge } from 'deepmerge-ts';
-import sortJson from 'sort-json';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { ProjectFile, ProjectFileItem, ProjectFileType } from '../../project/browser/ves-project-types';
@@ -195,6 +193,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     }
 
     protected async mergeOntoDefaults(type: ProjectFileType): Promise<void> {
+/*
         const schema = await $RefParser.dereference(type.schema as JSONSchema);
         this.data = this.generateDataFromSchema({
             ...schema,
@@ -206,6 +205,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
             ignoreCase: true,
             reverse: false,
         });
+*/
     }
 
     /**
