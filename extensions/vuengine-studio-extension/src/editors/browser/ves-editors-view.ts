@@ -2,7 +2,7 @@ import { CommandRegistry, nls, QuickPickItem, QuickPickOptions, QuickPickService
 import { AbstractViewContribution, CommonCommands, open, OpenerService } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { ProjectFileType } from 'src/project/browser/ves-project-types';
+import { ProjectFileType } from '../../project/browser/ves-project-types';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesEditorUri } from './ves-editor-uri';
 import { VesEditorsCommands } from './ves-editors-commands';

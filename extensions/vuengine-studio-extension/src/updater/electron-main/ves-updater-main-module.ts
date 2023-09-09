@@ -1,4 +1,4 @@
-import { JsonRpcConnectionHandler } from '@theia/core/lib/common/messaging/proxy-factory';
+import { RpcConnectionHandler } from '@theia/core/lib/common/messaging/proxy-factory';
 import { ElectronConnectionHandler } from '@theia/core/lib/electron-common/messaging/electron-connection-handler';
 import { ElectronMainApplicationContribution } from '@theia/core/lib/electron-main/electron-main-application';
 import { ContainerModule } from '@theia/core/shared/inversify';
@@ -10,7 +10,7 @@ export default new ContainerModule(bind => {
     bind(VesUpdater).toService(VesUpdaterImpl);
     bind(ElectronMainApplicationContribution).toService(VesUpdater);
     bind(ElectronConnectionHandler).toDynamicValue(context =>
-        new JsonRpcConnectionHandler<VesUpdaterClient>(VesUpdaterPath, client => {
+        new RpcConnectionHandler<VesUpdaterClient>(VesUpdaterPath, client => {
             const server = context.container.get<VesUpdater>(VesUpdater);
             server.setClient(client);
             client.onDidCloseConnection(() => server.disconnectClient(client));
