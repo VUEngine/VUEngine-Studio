@@ -22,6 +22,14 @@
   z-index: 1;
 }
 
+#theia-top-panel .p-MenuBar-item {
+  line-height: var(--theia-private-menubar-height);
+}
+
+#theia-top-panel .p-MenuBar-item.p-mod-active {
+  background: rgba(255, 255, 255, .3);
+}
+
 #theia-top-panel .ps__rail-x,
 #theia-top-panel .ps__rail-y {
   display: none;
