@@ -3,9 +3,6 @@ import { ElectronMainMenuFactory } from '@theia/core/lib/electron-browser/menu/e
 import { MenuDto } from '@theia/core/lib/electron-common/electron-api';
 import { injectable } from '@theia/core/shared/inversify';
 
-// This fixes a bug in Theia where the main menu would not render on Mac
-// TODO: remove once fixed in Theia
-
 @injectable()
 export class VesElectronMainMenuFactory extends ElectronMainMenuFactory {
     createElectronMenuBar(): MenuDto[] | undefined {
