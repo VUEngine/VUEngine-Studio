@@ -11,6 +11,10 @@ import { VesProjectContribution } from './ves-project-contribution';
 import { VesProjectPathsService } from './ves-project-paths-service';
 import { VesProjectPreferenceSchema } from './ves-project-preferences';
 import { VesProjectService } from './ves-project-service';
+import { VesWorkspaceFrontendContribution } from './ves-project-workspace-frontend-contribution';
+import { WorkspaceFrontendContribution } from '@theia/workspace/lib/browser';
+import { VesWorkspaceFileService } from '../common/ves-workspace-file-service';
+import { WorkspaceFileService } from '@theia/workspace/lib/common';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // commands
@@ -35,4 +39,11 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
         id: VesProjectTreeWidget.ID,
         createWidget: () => createVesProjectTreeWidget(ctx.container)
     })).inSingletonScope();
+
+    bind(VesWorkspaceFrontendContribution).toSelf().inSingletonScope();
+    rebind(WorkspaceFrontendContribution).to(VesWorkspaceFrontendContribution);
+
+    // custom project file name
+    bind(VesWorkspaceFileService).toSelf().inSingletonScope();
+    rebind(WorkspaceFileService).to(VesWorkspaceFileService);
 });
