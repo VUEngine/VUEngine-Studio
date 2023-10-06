@@ -248,7 +248,7 @@ export class VesProjectService {
         this.saveProjectFile();
         console.info(`Could not find project file. Created new one at ${this.workspaceProjectFileUri}`);
       } else {
-        console.error('Could not find of create project file.');
+        console.info('Could not find or create project file.');
       }
     }
 
