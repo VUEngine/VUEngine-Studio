@@ -1,6 +1,5 @@
 import { ColorContribution } from '@theia/core/lib/browser/color-application-contribution';
 import { ColorRegistry } from '@theia/core/lib/browser/color-registry';
-import { Color } from '@theia/core/lib/common/color';
 import { injectable } from '@theia/core/shared/inversify';
 
 @injectable()
@@ -14,25 +13,7 @@ export class VesColorContribution implements ColorContribution {
           light: '#4aa94e',
           hc: '#fff'
         },
-        description: 'Background of title bar buttons'
-      },
-      {
-        id: 'titleBar.buttonBackground',
-        defaults: {
-          dark: Color.darken('titleBar.activeBackground', 0.3),
-          light: Color.darken('titleBar.activeBackground', 0.3),
-          hc: '#000'
-        },
-        description: 'Background of title bar buttons'
-      },
-      {
-        id: 'titleBar.hoverButtonBackground',
-        defaults: {
-          dark: Color.darken('titleBar.activeBackground', 0.6),
-          light: Color.darken('titleBar.activeBackground', 0.6),
-          hc: '#000',
-        },
-        description: 'Background of title bar buttons when hovered over'
+        description: 'Success text color'
       }
     );
   }
