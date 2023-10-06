@@ -15,10 +15,6 @@ configs[0].module.rules.push({
     loader: require.resolve('@theia/application-manager/lib/expose-loader')
 }); */
 
-if (process.platform !== 'win32') {
-    nodeConfig.ignoredResources.add('@vscode/windows-ca-certs/build/Release/crypt32.node');
-}
-
 module.exports = [
     ...configs,
     nodeConfig.config
