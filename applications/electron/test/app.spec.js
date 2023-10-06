@@ -95,6 +95,8 @@ describe("Theia App", function () {
   });
 
   it("Correct window title", async function () {
+    // Wait a bit to make sure workspace is set and title got updated
+    await new Promise(r => setTimeout(r, 2000));
     const windowTitle = await this.browser.getTitle();
     expect(windowTitle).to.include("workspace — Theia");
   });

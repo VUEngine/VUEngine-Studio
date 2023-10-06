@@ -28,7 +28,7 @@ Documentation on how to use VUEngine Studio can be found at https://www.vuengine
 
 ### Prerequisites
 
-Download node.js 16 and install. You can download it from https://nodejs.org/en/download/releases/ or alternatively use nvm (Node Version Manager). On Windows, you'll need to grab nvm-windows from https://github.com/coreybutler/nvm-windows instead.
+Download node.js and install. Preferrably use nvm (Node Version Manager). On Windows, you'll need to grab nvm-windows from https://github.com/coreybutler/nvm-windows instead.
 
 Make sure you're using node 18.
 
