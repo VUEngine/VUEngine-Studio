@@ -154,7 +154,9 @@ export class VesBuildService {
     }
 
     this.buildStatus = newBuildStatus;
+  }
 
+  async afterBuild(step?: string): Promise<void> {
     if (step !== BuildResult.done) {
       this.onDidFailBuildEmitter.fire();
     } else {
@@ -267,16 +269,18 @@ export class VesBuildService {
     this.vesProcessWatcher.onDidReceiveError(async ({ pId }) => {
       if (this.buildStatus.processManagerId === pId) {
         await this.resetBuildStatus(BuildResult.failed);
+        await this.afterBuild(BuildResult.failed);
       }
     });
 
     // @ts-ignore
     this.vesProcessWatcher.onDidExitProcess(async ({ pId, event }) => {
       if (this.buildStatus.processManagerId === pId) {
-        await this.resetBuildStatus(event.code === 0
+        const step = event.code === 0
           ? BuildResult.done
-          : BuildResult.failed
-        );
+          : BuildResult.failed;
+        await this.resetBuildStatus(step);
+        await this.afterBuild(step);
       }
     });
 
@@ -369,6 +373,7 @@ export class VesBuildService {
       });
 
       await this.resetBuildStatus(BuildResult.failed);
+      await this.afterBuild(BuildResult.failed);
 
       this.onDidFailBuildEmitter.fire();
     }
@@ -993,8 +998,10 @@ export class VesBuildService {
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
 
     return workspaceRootUri
-      .resolve('build')
-      .resolve('output.vb');
+      ? workspaceRootUri
+        .resolve('build')
+        .resolve('output.vb')
+      : new URI;
   }
 
   async getBuildModeRomUri(buildMode: BuildMode): Promise<URI> {
