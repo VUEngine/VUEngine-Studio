@@ -1,4 +1,12 @@
-import { VES_CHANNEL_GET_USER_DEFAULT, VES_CHANNEL_SET_ZOOM_FACTOR, VesCoreAPI } from '../electron-common/ves-electron-api';
+import { JsonSchema } from '@jsonforms/core';
+import { VisitOptions } from 'sort-json';
+import {
+    VES_CHANNEL_DEREFERENCE_JSON_SCHEMA,
+    VES_CHANNEL_GET_USER_DEFAULT,
+    VES_CHANNEL_SET_ZOOM_FACTOR,
+    VES_CHANNEL_SORT_JSON,
+    VesCoreAPI
+} from '../electron-common/ves-electron-api';
 
 const { ipcRenderer, contextBridge } = require('electron');
 
@@ -9,6 +17,12 @@ const api: VesCoreAPI = {
     getUserDefault: function (preference: string, type: string): string {
         return ipcRenderer.sendSync(VES_CHANNEL_GET_USER_DEFAULT, preference, type);
     },
+    dereferenceJsonSchema: function (schema: JsonSchema): Promise<JsonSchema> {
+        return ipcRenderer.sendSync(VES_CHANNEL_DEREFERENCE_JSON_SCHEMA, schema);
+    },
+    sortJson<T>(old: T, options?: VisitOptions): T {
+        return ipcRenderer.sendSync(VES_CHANNEL_SORT_JSON, old, options);
+    }
 };
 
 export function preload(): void {
