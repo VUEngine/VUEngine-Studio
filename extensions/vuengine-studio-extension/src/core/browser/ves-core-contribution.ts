@@ -24,6 +24,7 @@ export class VesCoreContribution implements CommandContribution, MenuContributio
 
     static REPORT_ISSUE_URL = 'https://github.com/VUEngine/VUEngine-Studio/issues/new';
     static SUPPORT_URL = 'https://www.patreon.com/VUEngine';
+    static DOCUMENTATION_URL = 'https://www.vuengine.dev/documentation/';
 
     @postConstruct()
     init(): void {
@@ -120,6 +121,9 @@ export class VesCoreContribution implements CommandContribution, MenuContributio
         });
         commandRegistry.registerCommand(VesCoreCommands.SUPPORT, {
             execute: () => this.windowService.openNewWindow(VesCoreContribution.SUPPORT_URL, { external: true })
+        });
+        commandRegistry.registerCommand(VesCoreCommands.OPEN_DOCUMENTATION, {
+            execute: path => this.windowService.openNewWindow(`${VesCoreContribution.DOCUMENTATION_URL}/${path}`, { external: true })
         });
     }
 

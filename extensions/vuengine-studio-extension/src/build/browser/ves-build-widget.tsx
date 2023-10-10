@@ -6,7 +6,7 @@ import * as React from '@theia/core/shared/react';
 import { EditorManager } from '@theia/editor/lib/browser';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesCommonService } from '../../core/browser/ves-common-service';
-import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
+import { VesCoreCommands } from '../../core/browser/ves-core-commands';
 import { VesEmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
 import { VesEmulatorService } from '../../emulator/browser/ves-emulator-service';
 import { VesExportCommands } from '../../export/browser/ves-export-commands';
@@ -474,5 +474,5 @@ export class VesBuildWidget extends ReactWidget {
     this.update();
   };
 
-  protected openWslDocs = () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'setup/enhancing-build-times-on-windows', false);
+  protected openWslDocs = () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'setup/enhancing-build-times-on-windows', false);
 }

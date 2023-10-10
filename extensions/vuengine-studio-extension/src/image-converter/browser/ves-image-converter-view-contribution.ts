@@ -3,7 +3,7 @@ import { AbstractViewContribution, ApplicationShell, CommonMenus, FrontendApplic
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
+import { VesCoreCommands } from '../../core/browser/ves-core-commands';
 import { VesImageConverterCommands } from './ves-image-converter-commands';
 import { VesImageConverterWidget } from './ves-image-converter-widget';
 
@@ -47,7 +47,7 @@ export class VesImageConverterViewContribution extends AbstractViewContribution<
                 isEnabled: () => true,
                 isVisible: widget => widget !== undefined &&
                     widget.id === VesImageConverterWidget.ID,
-                execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'user-guide/assets', false),
+                execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'user-guide/assets', false),
             });
         }
     }

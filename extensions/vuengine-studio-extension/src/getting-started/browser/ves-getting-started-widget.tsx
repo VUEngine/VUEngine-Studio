@@ -1,10 +1,11 @@
-import * as React from 'react';
+import { nls } from '@theia/core';
 import { Message, PreferenceService, codicon } from '@theia/core/lib/browser';
+import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { GettingStartedWidget } from '@theia/getting-started/lib/browser/getting-started-widget';
 import { VSXEnvironment } from '@theia/vsx-registry/lib/common/vsx-environment';
-import { WindowService } from '@theia/core/lib/browser/window/window-service';
-import { nls } from '@theia/core';
+import * as React from 'react';
+import { VesCoreContribution } from '../../core/browser/ves-core-contribution';
 import { VesProjectCommands } from '../../project/browser/ves-project-commands';
 
 @injectable()
@@ -132,7 +133,6 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
     }
 
     protected renderHelp(): React.ReactNode {
-        const documentationUrl = 'https://www.vuengine.dev/documentation/';
         return <div className='gs-section'>
             <h3 className='gs-section-header'>
                 <i className={codicon('question')}></i>
@@ -142,8 +142,8 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
                 <a
                     role={'button'}
                     tabIndex={0}
-                    onClick={() => this.doOpenExternalLink(documentationUrl)}
-                    onKeyDown={(e: React.KeyboardEvent) => this.doOpenExternalLinkEnter(e, documentationUrl)}>
+                    onClick={() => this.doOpenExternalLink(VesCoreContribution.DOCUMENTATION_URL)}
+                    onKeyDown={(e: React.KeyboardEvent) => this.doOpenExternalLinkEnter(e, VesCoreContribution.DOCUMENTATION_URL)}>
                     {nls.localizeByDefault('Documentation')}
                 </a>
             </div>

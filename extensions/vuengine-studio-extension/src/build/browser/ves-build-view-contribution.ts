@@ -1,11 +1,11 @@
-import { inject, injectable } from '@theia/core/shared/inversify';
 import { CommandRegistry, CommandService, MenuModelRegistry } from '@theia/core';
-import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { AbstractViewContribution, CommonCommands, CommonMenus, FrontendApplication, KeybindingRegistry } from '@theia/core/lib/browser';
-import { VesBuildWidget } from './ves-build-widget';
-import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
+import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
+import { inject, injectable } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { VesCoreCommands } from '../../core/browser/ves-core-commands';
 import { VesBuildCommands } from './ves-build-commands';
+import { VesBuildWidget } from './ves-build-widget';
 
 @injectable()
 export class VesBuildViewContribution extends AbstractViewContribution<VesBuildWidget> implements TabBarToolbarContribution {
@@ -65,7 +65,7 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
                 isEnabled: () => true,
                 isVisible: widget => widget !== undefined &&
                     widget.id === VesBuildWidget.ID,
-                execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'user-guide/building', false),
+                execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'user-guide/building', false),
             });
             commandRegistry.registerCommand(VesBuildCommands.WIDGET_SETTINGS, {
                 isEnabled: () => true,

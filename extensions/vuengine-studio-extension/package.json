@@ -103,9 +103,6 @@
       "backend": "lib/core/node/ves-core-backend-module"
     },
     {
-      "frontend": "lib/documentation/browser/ves-documentation-frontend-module"
-    },
-    {
       "frontend": "lib/emulator/browser/ves-emulator-frontend-module",
       "backend": "lib/emulator/node/ves-emulator-backend-module"
     },

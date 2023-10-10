@@ -3,8 +3,8 @@ import { AbstractViewContribution, CommonCommands, CommonMenus, FrontendApplicat
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
 import { VesEmulatorSidebarWidget } from './ves-emulator-sidebar-widget';
+import { VesCoreCommands } from '../../core/browser/ves-core-commands';
 
 export namespace VesEmulatorSidebarCommands {
     export const WIDGET_TOGGLE: Command = Command.toLocalizedCommand(
@@ -96,7 +96,7 @@ export class VesEmulatorSidebarViewContribution extends AbstractViewContribution
                 isVisible: widget => widget !== undefined &&
                     widget.id !== undefined &&
                     widget.id === VesEmulatorSidebarWidget.ID,
-                execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'user-guide/emulators', false),
+                execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'user-guide/emulator', false),
             });
 
             commandRegistry.registerCommand(VesEmulatorSidebarCommands.WIDGET_SETTINGS, {
