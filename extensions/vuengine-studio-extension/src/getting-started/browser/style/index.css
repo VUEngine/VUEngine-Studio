@@ -1,1 +1,4 @@
-@import "getting-started.css";
+.gs-section .theia-button {
+    margin-left: 0;
+    margin-right: calc(var(--theia-ui-padding) * 2);
+}
