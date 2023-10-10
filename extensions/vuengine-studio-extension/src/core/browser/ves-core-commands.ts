@@ -19,4 +19,13 @@ export namespace VesCoreCommands {
         'vuengine/general/commands/support',
         'vuengine/general/commands/category'
     );
+    export const OPEN_DOCUMENTATION: Command = Command.toLocalizedCommand(
+        {
+            id: 'ves:general:openDocumentation',
+            label: 'Open Documentation',
+            category: 'VUEngine Studio',
+        },
+        'vuengine/documentation/commands/openDocumentation',
+        'vuengine/documentation/commands/category'
+    );
 }

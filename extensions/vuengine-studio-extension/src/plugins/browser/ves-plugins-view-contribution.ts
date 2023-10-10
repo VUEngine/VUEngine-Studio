@@ -6,7 +6,7 @@ import { AbstractViewContribution } from '@theia/core/lib/browser/shell/view-con
 import { CommandRegistry, CommandService } from '@theia/core/lib/common/command';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
+import { VesCoreCommands } from '../../core/browser/ves-core-commands';
 import { VesPluginsCommands } from './ves-plugins-commands';
 import { VesPluginsModel } from './ves-plugins-model';
 import { AUTHOR_SEARCH_QUERY, INSTALLED_QUERY, RECOMMENDED_QUERY, TAG_SEARCH_QUERY } from './ves-plugins-search-model';
@@ -71,7 +71,7 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
                         `${VesPluginsWidget.ID}:${VesPluginsSourceOptions.SEARCH_RESULT}`,
                         VesPluginsViewContainer.ID
                     ].includes(widget.id),
-                execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'user-guide/vuengine-plugins', false),
+                execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'user-guide/vuengine-plugins', false),
             });
 
             commandRegistry.registerCommand(VesPluginsCommands.SHOW_INSTALLED, {

@@ -2,7 +2,7 @@ import { CommandRegistry, CommandService } from '@theia/core';
 import { AbstractViewContribution, CommonCommands } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
+import { VesCoreCommands } from '../../core/browser/ves-core-commands';
 import { VesEmulatorCommands } from './ves-emulator-commands';
 import { VesEmulatorContextKeyService } from './ves-emulator-context-key-service';
 import { VesEmulatorWidget } from './ves-emulator-widget';
@@ -42,15 +42,15 @@ export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmu
       isVisible: widget => widget !== undefined &&
         widget.id !== undefined &&
         widget.id === VesEmulatorWidget.ID,
-      execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'user-guide/emulator', false),
+      execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'user-guide/emulator', false),
     });
 
     commandRegistry.registerCommand(VesEmulatorCommands.WIDGET_SETTINGS, {
       isEnabled: () => true,
       isVisible: widget => widget !== undefined &&
-          widget.id === VesEmulatorWidget.ID,
+        widget.id === VesEmulatorWidget.ID,
       execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'emulator'),
-  });
+    });
   }
 
   registerToolbarItems(toolbar: TabBarToolbarRegistry): void {

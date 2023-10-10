@@ -3,7 +3,7 @@ import { AbstractViewContribution, CommonCommands, CommonMenus, FrontendApplicat
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { VesDocumentationCommands } from '../../documentation/browser/ves-documentation-commands';
+import { VesCoreCommands } from '../../core/browser/ves-core-commands';
 import { VesFlashCartCommands } from './ves-flash-cart-commands';
 import { VesFlashCartService } from './ves-flash-cart-service';
 import { VesFlashCartWidget } from './ves-flash-cart-widget';
@@ -59,7 +59,7 @@ export class VesFlashCartViewContribution extends AbstractViewContribution<VesFl
                 isVisible: widget => widget !== undefined &&
                     widget.id !== undefined &&
                     widget.id === VesFlashCartWidget.ID,
-                execute: () => this.commandService.executeCommand(VesDocumentationCommands.OPEN_HANDBOOK.id, 'user-guide/flash-carts', false),
+                execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'user-guide/flash-carts', false),
             });
 
             commandRegistry.registerCommand(VesFlashCartCommands.WIDGET_SETTINGS, {

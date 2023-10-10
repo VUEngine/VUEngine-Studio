@@ -1,6 +1,3 @@
-[submodule "applications/electron/documentation/vuengine-studio-documentation"]
-	path = applications/electron/documentation/vuengine-studio-documentation
-	url = git@github.com:VUEngine/VUEngine-Studio-Documentation.git
 [submodule "applications/electron/binaries/vuengine-studio-tools"]
 	path = applications/electron/binaries/vuengine-studio-tools
 	url = git@github.com:VUEngine/VUEngine-Studio-Tools.git
