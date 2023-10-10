@@ -18,6 +18,7 @@
     "@theia/editor": "1.42.1",
     "@theia/electron": "1.42.1",
     "@theia/filesystem": "1.42.1",
+    "@theia/getting-started": "1.42.1",
     "@theia/keymaps": "1.42.1",
     "@theia/monaco": "1.42.1",
     "@theia/monaco-editor-core": "1.65.2",
