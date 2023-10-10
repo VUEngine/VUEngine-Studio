@@ -8,7 +8,6 @@ import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { deepmerge } from 'deepmerge-ts';
 import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
-import { VesGlobService } from '../../glob/common/ves-glob-service-protocol';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 import { compressTiles } from './ves-image-converter-compressor';
@@ -32,8 +31,6 @@ export class VesImageConverterService {
   protected vesCodeGenService: VesCodeGenService;
   @inject(VesCommonService)
   protected vesCommonService: VesCommonService;
-  @inject(VesGlobService)
-  protected vesGlobService: VesGlobService;
   @inject(VesProcessService)
   protected vesProcessService: VesProcessService;
   @inject(VesProcessWatcher)
@@ -468,12 +465,12 @@ export class VesImageConverterService {
     return imageConfigFileToBeConverted;
   }
 
-  protected async getImageConfigFilesToBeConverted(changedOnly: boolean): Promise<Array<ImageConfigFileToBeConverted>> {
+  protected async getImageConfigFilesToBeConverted(changedOnly: boolean): Promise<ImageConfigFileToBeConverted[]> {
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
 
-    const imageConfigFilesToBeConverted: Array<ImageConfigFileToBeConverted> = [];
-    const imageConfigFiles = await this.vesGlobService.find(await this.fileService.fsPath(workspaceRootUri), '**/*.image.json');
+    const imageConfigFilesToBeConverted: ImageConfigFileToBeConverted[] = [];
+    const imageConfigFiles = window.electronVesCore.findFiles(await this.fileService.fsPath(workspaceRootUri), '**/*.image.json');
     for (const imageConfigFile of imageConfigFiles) {
       const imageConfigFileUri = new URI(imageConfigFile).withScheme('file');
       const config = await this.getConverterConfig(imageConfigFileUri);

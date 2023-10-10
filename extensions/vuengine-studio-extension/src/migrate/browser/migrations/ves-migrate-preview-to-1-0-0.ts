@@ -18,7 +18,7 @@ export class VesMigrateFromPreviewTo100 extends VesAbstractMigration {
         }
 
         // find and parse workspace file
-        const workspaceFiles = await this.vesGlobService.find(
+        const workspaceFiles = window.electronVesCore.findFiles(
             await this.fileService.fsPath(workspaceRootUri),
             '*.theia-workspace'
         );

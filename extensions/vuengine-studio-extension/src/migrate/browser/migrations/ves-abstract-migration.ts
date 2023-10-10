@@ -4,7 +4,6 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { OutputChannel, OutputChannelManager } from '@theia/output/lib/browser/output-channel';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesCommonService } from '../../../core/browser/ves-common-service';
-import { VesGlobService } from '../../../glob/common/ves-glob-service-protocol';
 import { Version } from '../ves-migrate-types';
 
 export abstract class VesAbstractMigration {
@@ -13,7 +12,6 @@ export abstract class VesAbstractMigration {
     protected readonly outputChannelManager: OutputChannelManager;
     protected readonly quickPickService: QuickPickService;
     protected readonly vesCommonService: VesCommonService;
-    protected readonly vesGlobService: VesGlobService;
     protected readonly workspaceService: WorkspaceService;
 
     protected channel: OutputChannel;
@@ -28,7 +26,6 @@ export abstract class VesAbstractMigration {
         outputChannelManager: OutputChannelManager,
         quickPickService: QuickPickService,
         vesCommonService: VesCommonService,
-        vesGlobService: VesGlobService,
         workspaceService: WorkspaceService,
         channel: OutputChannel
     ) {
@@ -37,7 +34,6 @@ export abstract class VesAbstractMigration {
         this.outputChannelManager = outputChannelManager;
         this.quickPickService = quickPickService;
         this.vesCommonService = vesCommonService;
-        this.vesGlobService = vesGlobService;
         this.workspaceService = workspaceService;
 
         this.channel = channel;
