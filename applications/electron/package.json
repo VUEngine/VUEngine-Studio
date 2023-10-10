@@ -45,7 +45,7 @@
           "workspace.preserveWindow": true
         },
         "electron": {
-          "showWindowEarly": false
+          "showWindowEarly": true
         }
       }
     },

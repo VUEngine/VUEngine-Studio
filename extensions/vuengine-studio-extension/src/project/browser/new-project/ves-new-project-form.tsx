@@ -173,7 +173,6 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
 
     render(): JSX.Element {
         return <>
-            <div style={{ width: 600 }} />
             <div style={{ display: 'flex' }}>
                 <div style={{ flexGrow: 1, paddingRight: 8 }}>
                     <div className="ves-new-project-input-label">
