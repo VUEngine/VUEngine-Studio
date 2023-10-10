@@ -1,7 +1,6 @@
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React from 'react';
-// import sortJson from 'sort-json';
 import { ProjectFile, WithContributor } from '../../../../project/browser/ves-project-types';
 import LanguagesTable from './LanguagesTable';
 import { LANGUAGES, Translations, TranslationsData } from './TranslationsEditorTypes';
@@ -112,7 +111,7 @@ export default class TranslationsEditor extends React.Component<TranslationsEdit
         // TODO: do not sort translations on the fly because that messes with a user's typing
         // Instead, offer a button to trigger sorting
         /*
-        updatedTranslations = sortJson(updatedTranslations, {
+        updatedTranslations = window.electronVesCore.sortJson(updatedTranslations, {
             depth: 1,
             ignoreCase: true,
         });
@@ -172,7 +171,7 @@ export default class TranslationsEditor extends React.Component<TranslationsEdit
         });
     };
 
-    render(): JSX.Element {
+    render(): React.JSX.Element {
         const { languages, translations } = this.props.data;
         const combinedTranslations = this.props.projectData.combined?.items?.Translations || {} as Translations & WithContributor;
 

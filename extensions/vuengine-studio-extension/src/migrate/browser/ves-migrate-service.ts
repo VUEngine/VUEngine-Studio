@@ -6,7 +6,6 @@ import { OutputChannelManager } from '@theia/output/lib/browser/output-channel';
 import { OutputContribution } from '@theia/output/lib/browser/output-contribution';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesCommonService } from '../../core/browser/ves-common-service';
-import { VesGlobService } from '../../glob/common/ves-glob-service-protocol';
 import { VesMigrateFromPreviewTo100 } from './migrations/ves-migrate-preview-to-1-0-0';
 import { MigrationRegistry } from './ves-migrate-types';
 
@@ -26,8 +25,6 @@ export class VesMigrateService {
   protected readonly quickPickService: QuickPickService;
   @inject(VesCommonService)
   protected readonly vesCommonService: VesCommonService;
-  @inject(VesGlobService)
-  protected readonly vesGlobService: VesGlobService;
   @inject(WorkspaceService)
   protected readonly workspaceService: WorkspaceService;
 
@@ -56,7 +53,6 @@ export class VesMigrateService {
         this.outputChannelManager,
         this.quickPickService,
         this.vesCommonService,
-        this.vesGlobService,
         this.workspaceService,
         channel
       );

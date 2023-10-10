@@ -119,10 +119,6 @@
       "frontend": "lib/getting-started/browser/ves-getting-started-frontend-module"
     },
     {
-      "frontend": "lib/glob/browser/ves-glob-frontend-module",
-      "backend": "lib/glob/node/ves-glob-backend-module"
-    },
-    {
       "frontend": "lib/image-converter/browser/ves-image-converter-frontend-module"
     },
     {

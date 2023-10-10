@@ -6,12 +6,11 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { FileChangesEvent, FileChangeType } from '@theia/filesystem/lib/common/files';
+import { FileChangeType, FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VES_PREFERENCE_DIR } from '../../core/browser/ves-preference-configurations';
-import { VesGlobService } from '../../glob/common/ves-glob-service-protocol';
 import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-service';
 import { USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } from '../../plugins/browser/ves-plugins-types';
 import { VesNewProjectTemplate } from './new-project/ves-new-project-form';
@@ -19,8 +18,8 @@ import {
   ProjectFile,
   ProjectFileItem,
   ProjectFileItemDeleteEvent,
-  ProjectFileItems,
   ProjectFileItemSaveEvent,
+  ProjectFileItems,
   ProjectFileItemsByType,
   ProjectFileTemplate,
   ProjectFileTemplatesWithContributor,
@@ -30,9 +29,6 @@ import {
   WithContributor
 } from './ves-project-types';
 
-// TODO: this uses node functions, move to backend
-// const replaceInFiles = require('replace-in-file');
-
 @injectable()
 export class VesProjectService {
   @inject(FileService)
@@ -41,8 +37,6 @@ export class VesProjectService {
   private readonly vesBuildPathsService: VesBuildPathsService;
   @inject(VesCommonService)
   private readonly vesCommonService: VesCommonService;
-  @inject(VesGlobService)
-  private readonly vesGlobService: VesGlobService;
   @inject(VesPluginsPathsService)
   private readonly vesPluginsPathsService: VesPluginsPathsService;
   @inject(WindowTitleService)
@@ -225,7 +219,7 @@ export class VesProjectService {
       if (this.workspaceService.workspace?.isDirectory) {
         const workspaceProjectFolderUri = this.workspaceProjectFileUri;
         this.workspaceProjectFileUri = undefined;
-        const projectFiles = await this.vesGlobService.find(
+        const projectFiles = window.electronVesCore.findFiles(
           await this.fileService.fsPath(workspaceProjectFolderUri),
           `*.${VUENGINE_EXT}`
         );
@@ -534,17 +528,18 @@ export class VesProjectService {
       basepath = basepath.replace(/\\/g, '/');
     }
 
-    //    if (to && from) {
-    //      return replaceInFiles({
-    //        files: [
-    //          `${basepath}/**/*.*`,
-    //          `${basepath}/*.*`,
-    //          `${basepath}/*`,
-    //        ],
-    //        from,
-    //        to,
-    //      });
-    //    }
+    if (to && from) {
+      return window.electronVesCore.replaceInFiles(
+        [
+          `${basepath}/**/*.*`,
+          `${basepath}/*.*`,
+          `${basepath}/*`,
+        ],
+        from,
+        to,
+      );
+
+    }
   }
 
   protected async updateWindowTitle(): Promise<void> {

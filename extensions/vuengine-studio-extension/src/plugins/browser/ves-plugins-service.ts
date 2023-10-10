@@ -1,23 +1,20 @@
+import { nls } from '@theia/core';
 import { Deferred } from '@theia/core/lib/common/promise-util';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { VesGlobService } from '../../glob/common/ves-glob-service-protocol';
+import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesPluginData, VesPluginsData } from './ves-plugin';
 import { VesPluginsPathsService } from './ves-plugins-paths-service';
 import { VUENGINE_PLUGINS_PREFIX } from './ves-plugins-types';
-import { VesProjectService } from '../../project/browser/ves-project-service';
-import { nls } from '@theia/core';
 
 @injectable()
 export class VesPluginsService {
 
   @inject(FileService)
   protected fileService: FileService;
-  @inject(VesGlobService)
-  protected vesGlobService: VesGlobService;
   @inject(VesPluginsPathsService)
   protected vesPluginsPathsService: VesPluginsPathsService;
   @inject(VesProjectService)
@@ -111,7 +108,7 @@ export class VesPluginsService {
       const rootPath = (await this.fileService.fsPath(rootUri)).replace(/\\/g, '/');
       const pluginsMap: any = {};
 
-      const pluginFiles = await this.vesGlobService.find(rootPath, '**/plugin.vuengine');
+      const pluginFiles = window.electronVesCore.findFiles(rootPath, '**/plugin.vuengine');
       for (const pluginFile of pluginFiles) {
         const pluginFileUri = new URI(pluginFile).withScheme('file');
         const pluginFolderUri = pluginFileUri.parent;
