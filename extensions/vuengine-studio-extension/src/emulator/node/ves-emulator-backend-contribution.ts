@@ -1,35 +1,19 @@
-import { isWindows } from '@theia/core';
+import * as path from 'path';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
-import URI from '@theia/core/lib/common/uri';
-import { BackendApplicationContribution, FileUri } from '@theia/core/lib/node';
+import { BackendApplicationContribution } from '@theia/core/lib/node';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import * as express from 'express';
+import { ApplicationPackage } from '@theia/core/shared/@theia/application-package';
 
 @injectable()
 export class EmulatorBackendContribution implements BackendApplicationContribution {
 
+  @inject(ApplicationPackage)
+  protected readonly applicationPackage: ApplicationPackage;
   @inject(EnvVariablesServer)
   protected readonly envVariablesServer: EnvVariablesServer;
 
   async configure(app: express.Application): Promise<void> {
-    const applicationUri = await this.getResourcesUri();
-    const emulatorUri = applicationUri
-      .resolve('binaries')
-      .resolve('vuengine-studio-tools')
-      .resolve('web')
-      .resolve('retroarch');
-
-    app.use('/emulator', express.static(FileUri.fsPath(emulatorUri), { dotfiles: 'allow' }));
-  }
-
-  protected async getResourcesUri(): Promise<URI> {
-    const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
-    const applicationPath = envVar && envVar.value
-      ? isWindows
-        ? `/${envVar.value}`
-        : envVar.value
-      : '';
-
-    return new URI(applicationPath).withScheme('file');
+    app.use('/emulator', express.static(path.join(this.applicationPackage.projectPath, 'binaries', 'vuengine-studio-tools', 'web', 'retroarch'), { dotfiles: 'allow' }));
   }
 }
