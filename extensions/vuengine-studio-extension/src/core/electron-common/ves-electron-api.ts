@@ -8,6 +8,7 @@ export interface VesCoreAPI {
     sortJson<T>(old: T, options?: VisitOptions): T;
     replaceInFiles(files: string[], from: string, to: string): any;
     findFiles(base: string, pattern: string): string[];
+    getPhysicalCpuCount(): number;
 }
 
 declare global {
@@ -22,3 +23,4 @@ export const VES_CHANNEL_DEREFERENCE_JSON_SCHEMA = 'dereferenceJsonSchema';
 export const VES_CHANNEL_SORT_JSON = 'sortJson';
 export const VES_CHANNEL_REPLACE_IN_FILES = 'replaceInFiles';
 export const VES_CHANNEL_FIND_FILES = 'findFiles';
+export const VES_CHANNEL_GET_PHYSICAL_CPU_COUNT = 'getPhysicalCpuCount';

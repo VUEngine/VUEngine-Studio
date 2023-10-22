@@ -3,6 +3,7 @@ import { VisitOptions } from 'sort-json';
 import {
     VES_CHANNEL_DEREFERENCE_JSON_SCHEMA,
     VES_CHANNEL_FIND_FILES,
+    VES_CHANNEL_GET_PHYSICAL_CPU_COUNT,
     VES_CHANNEL_GET_USER_DEFAULT,
     VES_CHANNEL_REPLACE_IN_FILES,
     VES_CHANNEL_SET_ZOOM_FACTOR,
@@ -30,6 +31,9 @@ const api: VesCoreAPI = {
     },
     findFiles: function (base: string, pattern: string): string[] {
         return ipcRenderer.sendSync(VES_CHANNEL_FIND_FILES, base, pattern);
+    },
+    getPhysicalCpuCount: function (): number {
+        return ipcRenderer.sendSync(VES_CHANNEL_GET_PHYSICAL_CPU_COUNT);
     },
 };
 
