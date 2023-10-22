@@ -1,8 +1,8 @@
-import { JsonRpcServer } from '@theia/core/lib/common/messaging/proxy-factory';
+import { RpcServer } from '@theia/core/lib/common/messaging/proxy-factory';
 
 export const VesUpdaterPath = '/services/ves/updater';
 export const VesUpdater = Symbol('VesUpdater');
-export interface VesUpdater extends JsonRpcServer<VesUpdaterClient> {
+export interface VesUpdater extends RpcServer<VesUpdaterClient> {
     checkForUpdates(): void;
     downloadUpdate(): void;
     onRestartToUpdateRequested(): void;

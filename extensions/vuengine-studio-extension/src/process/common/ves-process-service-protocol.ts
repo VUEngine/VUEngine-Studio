@@ -1,4 +1,4 @@
-import { JsonRpcServer } from '@theia/core';
+import { RpcServer } from '@theia/core';
 import {
   IProcessExitEvent,
   ProcessErrorEvent,
@@ -22,7 +22,7 @@ export interface VesProcessServiceClient {
 }
 
 export interface VesProcessService
-  extends JsonRpcServer<VesProcessServiceClient> {
+  extends RpcServer<VesProcessServiceClient> {
   launchProcess(type: VesProcessType, options: ProcessOptions): Promise<{
     processManagerId: number;
     processId: number;
