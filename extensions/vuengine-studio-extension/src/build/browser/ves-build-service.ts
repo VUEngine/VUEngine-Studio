@@ -451,6 +451,12 @@ export class VesBuildService {
       }
     }
 
+    const paths = [await this.fileService.fsPath(compilerUri.resolve('bin'))];
+    const pathEnvVar = await this.envVariablesServer.getValue('PATH');
+    if (pathEnvVar !== undefined) {
+      paths.push(pathEnvVar.value!);
+    }
+
     return {
       command: 'make',
       args: [
@@ -467,10 +473,7 @@ export class VesBuildService {
           LC_ALL: 'C',
           PREPROCESSING_WAIT_FOR_LOCK_DELAY_FACTOR: '0.000',
           MAKE_JOBS: this.getThreads(),
-          PATH: [
-            await this.fileService.fsPath(compilerUri.resolve('bin')),
-            await this.envVariablesServer.getValue('PATH'),
-          ].join(':'),
+          PATH: paths.join(':'),
           PLUGINS_FOLDER: await this.convertoToEnvPath(enginePluginsUri),
           USER_PLUGINS_FOLDER: await this.convertoToEnvPath(userPluginsUri),
           PRINT_PEDANTIC_WARNINGS: pedanticWarnings ? 1 : 0,
