@@ -9,6 +9,7 @@ interface FileType {
     name?: string;
 };
 
+// TODO: move to file icon theme
 const FILE_TYPES: FileType[] = [/* {
     base: 'file.ending',
     icon: 'ves-file-icon codicon codicon-settings-gear medium-blue',
