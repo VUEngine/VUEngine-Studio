@@ -7,7 +7,7 @@ interface ToolsProps {
     setState: (state: Partial<FontEditorState>) => void
 }
 
-export default function Tools(props: ToolsProps): JSX.Element {
+export default function Tools(props: ToolsProps): React.JSX.Element {
     const { tool, setState } = props;
 
     return <div className='tools'>

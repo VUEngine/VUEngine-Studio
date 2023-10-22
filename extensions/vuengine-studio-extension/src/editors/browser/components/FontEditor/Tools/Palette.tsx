@@ -7,7 +7,7 @@ interface PaletteProps {
     setState: (state: Partial<FontEditorState>) => void
 }
 
-export default function Palette(props: PaletteProps): JSX.Element {
+export default function Palette(props: PaletteProps): React.JSX.Element {
     const { paletteIndexL, paletteIndexR, setState } = props;
 
     return <div className="palette">

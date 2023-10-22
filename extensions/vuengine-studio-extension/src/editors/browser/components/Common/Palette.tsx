@@ -15,7 +15,7 @@ const paletteValues: SelectOption[] = [
     { value: '00', label: '00', description: nls.localize('vuengine/editors/palette/black', 'Black') },
 ];
 
-export default function Palette(props: PaletteProps): JSX.Element {
+export default function Palette(props: PaletteProps): React.JSX.Element {
     const { value, updateValue } = props;
 
     const index0 = value.substring(0, 2);

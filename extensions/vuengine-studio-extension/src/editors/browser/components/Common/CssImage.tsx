@@ -9,7 +9,7 @@ interface CssImageProps {
     width: number
 }
 
-export default function CssImage(props: CssImageProps): JSX.Element {
+export default function CssImage(props: CssImageProps): React.JSX.Element {
     const { height, palette, pixelData, pixelSize, width } = props;
 
     const boxShadow: string[] = [];

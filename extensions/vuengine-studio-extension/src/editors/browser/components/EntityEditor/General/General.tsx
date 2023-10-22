@@ -3,7 +3,7 @@ import HContainer from '../../Common/HContainer';
 import VContainer from '../../Common/VContainer';
 import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 
-export default function General(): JSX.Element {
+export default function General(): React.JSX.Element {
     const { entityData, setEntityData } = useContext(EntityEditorContext) as EntityEditorContextType;
 
     const setName = (n: string): void => {
@@ -15,21 +15,27 @@ export default function General(): JSX.Element {
     };
 
     const setPixelSizeX = (x: number): void => {
-        setEntityData({ pixelSize: {
-            ...entityData.pixelSize, x
-        } });
+        setEntityData({
+            pixelSize: {
+                ...entityData.pixelSize, x
+            }
+        });
     };
 
     const setPixelSizeY = (y: number): void => {
-        setEntityData({ pixelSize: {
-            ...entityData.pixelSize, y
-        } });
+        setEntityData({
+            pixelSize: {
+                ...entityData.pixelSize, y
+            }
+        });
     };
 
     const setPixelSizeZ = (z: number): void => {
-        setEntityData({ pixelSize: {
-            ...entityData.pixelSize, z
-        } });
+        setEntityData({
+            pixelSize: {
+                ...entityData.pixelSize, z
+            }
+        });
     };
 
     return <VContainer gap={10}>

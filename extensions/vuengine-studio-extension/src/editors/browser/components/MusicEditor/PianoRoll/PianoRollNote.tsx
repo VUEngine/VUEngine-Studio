@@ -8,7 +8,7 @@ interface PianoRollNoteProps {
     current: boolean
 }
 
-export default function PianoRollNote(props: PianoRollNoteProps): JSX.Element {
+export default function PianoRollNote(props: PianoRollNoteProps): React.JSX.Element {
     const { songData, playNote, setCurrentNote, setNote } = useContext(MusicEditorContext) as MusicEditorContextType;
     const { index, noteId, current, set } = props;
 

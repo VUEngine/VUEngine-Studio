@@ -6,7 +6,7 @@ interface PianoRollKeyProps {
     playNote: (note: number) => void
 }
 
-export default function PianoRollKey(props: PianoRollKeyProps): JSX.Element {
+export default function PianoRollKey(props: PianoRollKeyProps): React.JSX.Element {
     const { noteId, note, playNote } = props;
 
     const classNames = ['pianoRollKey'];

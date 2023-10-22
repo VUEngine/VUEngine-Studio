@@ -13,7 +13,7 @@ interface AlphabetSettingsProps {
     setState: (state: Partial<FontEditorState>) => void
 }
 
-export default function AlphabetSettings(props: AlphabetSettingsProps): JSX.Element {
+export default function AlphabetSettings(props: AlphabetSettingsProps): React.JSX.Element {
 
     const {
         charCount, setCharCount,

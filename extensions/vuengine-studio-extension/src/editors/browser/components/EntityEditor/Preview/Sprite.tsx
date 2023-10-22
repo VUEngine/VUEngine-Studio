@@ -17,7 +17,7 @@ interface SpriteProps {
   zoom: number;
 }
 
-export default function Sprite(props: SpriteProps): JSX.Element {
+export default function Sprite(props: SpriteProps): React.JSX.Element {
   const { fileService, vesCommonService, workspaceService } = props;
   const { displacement, height, imagePath, width, zoom } = props;
   const [imageData, setImageData] = useState<ImageData>();

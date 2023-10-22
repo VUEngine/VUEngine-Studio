@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import VContainer from '../../Common/VContainer';
 import { MusicEditorContext, MusicEditorContextType, PATTERN_SIZES } from '../MusicEditorTypes';
 
-export default function CurrentPattern(): JSX.Element {
+export default function CurrentPattern(): React.JSX.Element {
     const { state, songData, setCurrentPattern, setPatternName, setPatternSize } = useContext(MusicEditorContext) as MusicEditorContextType;
 
     const channel = songData.channels[state.currentChannel];

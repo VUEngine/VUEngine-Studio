@@ -7,7 +7,7 @@ interface EditorColumnProps {
     setValue: (index: number, value: ColumnTableEntry) => void
 }
 
-export default function EditorColumn(props: EditorColumnProps): JSX.Element {
+export default function EditorColumn(props: EditorColumnProps): React.JSX.Element {
     const { index, value, setValue } = props;
 
     const handleSelectInput = (event: React.MouseEvent) => // @ts-ignore

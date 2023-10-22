@@ -6,7 +6,7 @@ interface AddPatternProps {
     height: number
 }
 
-export default function AddPattern(props: AddPatternProps): JSX.Element {
+export default function AddPattern(props: AddPatternProps): React.JSX.Element {
     const { addToSequence } = useContext(MusicEditorContext) as MusicEditorContextType;
     const { channel, height } = props;
 

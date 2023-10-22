@@ -12,7 +12,7 @@ interface LanguagesTableProps {
     moveLanguage: (from: number, to: number) => void
 }
 
-export default function LanguagesTable(props: LanguagesTableProps): JSX.Element {
+export default function LanguagesTable(props: LanguagesTableProps): React.JSX.Element {
     const [dragged, setDragged] = useState<boolean>(false);
     const {
         languages,

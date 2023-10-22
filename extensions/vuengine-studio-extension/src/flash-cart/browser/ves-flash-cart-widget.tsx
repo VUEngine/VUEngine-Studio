@@ -18,7 +18,7 @@ interface PreferencesProps {
   preferenceService: PreferenceService;
 }
 
-function AutoQueuePreference(props: PreferencesProps): JSX.Element {
+function AutoQueuePreference(props: PreferencesProps): React.JSX.Element {
   const [autoQueue, setAutoQueue] = React.useState<boolean>(props.preferenceService.get(VesFlashCartPreferenceIds.FLASH_CARTS_AUTO_QUEUE, false));
 
   React.useEffect(() => {

@@ -6,7 +6,7 @@ interface StepIndicatorProps {
     hidden: boolean
 }
 
-export default function StepIndicator(props: StepIndicatorProps): JSX.Element {
+export default function StepIndicator(props: StepIndicatorProps): React.JSX.Element {
     const { currentStep, pianoRollSize, hidden } = props;
 
     const classNames = ['stepIndicator'];

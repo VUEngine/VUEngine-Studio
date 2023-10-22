@@ -4,7 +4,7 @@ import StepIndicator from '../Sequencer/StepIndicator';
 import NoteProperties from './NoteProperties';
 import PianoRollEditor from './PianoRollEditor';
 
-export default function PianoRoll(): JSX.Element {
+export default function PianoRoll(): React.JSX.Element {
     const { state, songData } = useContext(MusicEditorContext) as MusicEditorContextType;
 
     const channel = songData.channels[state.currentChannel];

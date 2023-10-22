@@ -9,7 +9,7 @@ interface EditorProps {
     setValue: (index: number, value: ColumnTableEntry) => void
 }
 
-export default function Editor(props: EditorProps): JSX.Element {
+export default function Editor(props: EditorProps): React.JSX.Element {
     const { mirror, values, setValue } = props;
 
     return <div className='editor'>

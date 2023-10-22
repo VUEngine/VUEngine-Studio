@@ -17,7 +17,7 @@ interface AutoQueuePreferenceProps {
   preferenceService: PreferenceService;
 }
 
-function AutoQueuePreference(props: AutoQueuePreferenceProps): JSX.Element {
+function AutoQueuePreference(props: AutoQueuePreferenceProps): React.JSX.Element {
   const [autoQueue, setAutoQueue] = React.useState<boolean>(props.preferenceService.get(VesEmulatorPreferenceIds.EMULATOR_AUTO_QUEUE, false));
 
   React.useEffect(() => {
@@ -48,7 +48,7 @@ interface EmulatorConfigsProps {
   preferenceService: PreferenceService;
 }
 
-function EmulatorConfigs(props: EmulatorConfigsProps): JSX.Element {
+function EmulatorConfigs(props: EmulatorConfigsProps): React.JSX.Element {
   const [configsExpanded, setConfigsExpanded] = React.useState<boolean>(false);
   const [defaultEmulator, setDefaultEmulator] = React.useState<string>(props.preferenceService.get(VesEmulatorPreferenceIds.DEFAULT_EMULATOR, ''));
   const [emulatorConfigs, setEmulatorConfigs] = React.useState<EmulatorConfig[]>(props.preferenceService.get(VesEmulatorPreferenceIds.EMULATORS, []));

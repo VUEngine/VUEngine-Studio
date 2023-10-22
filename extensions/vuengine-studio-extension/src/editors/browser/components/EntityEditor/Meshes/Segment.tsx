@@ -6,7 +6,7 @@ interface SegmentProps {
     segmentIndex: number,
 }
 
-export default function Segment(props: SegmentProps): JSX.Element {
+export default function Segment(props: SegmentProps): React.JSX.Element {
     const { entityData } = useContext(EntityEditorContext) as EntityEditorContextType;
     const { meshIndex, segmentIndex } = props;
     const segment = entityData.meshes.meshes[meshIndex].segments[segmentIndex];

@@ -3,7 +3,7 @@ import HContainer from '../../Common/HContainer';
 import VContainer from '../../Common/VContainer';
 import { MusicEditorContext, MusicEditorContextType, VOLUME_STEPS } from '../MusicEditorTypes';
 
-export default function CurrentChannel(): JSX.Element {
+export default function CurrentChannel(): React.JSX.Element {
     const {
         state,
         songData,

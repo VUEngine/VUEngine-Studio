@@ -13,7 +13,7 @@ interface CharSettingsProps {
     setState: (state: Partial<FontEditorState>) => void
 }
 
-export default function CharSettings(props: CharSettingsProps): JSX.Element {
+export default function CharSettings(props: CharSettingsProps): React.JSX.Element {
     const {
         currentCharacter,
         charHeight, charWidth, variableSize, setCharSize,

@@ -10,7 +10,7 @@ interface PatternProps {
     patternId: number
 }
 
-export default function Pattern(props: PatternProps): JSX.Element {
+export default function Pattern(props: PatternProps): React.JSX.Element {
     const { state, moveSequencePattern, setCurrentPattern, removeFromSequence } = useContext(MusicEditorContext) as MusicEditorContextType;
     const [dragged, setDragged] = useState<boolean>(false);
     const {

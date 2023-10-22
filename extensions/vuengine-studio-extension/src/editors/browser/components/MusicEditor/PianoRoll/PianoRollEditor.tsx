@@ -2,7 +2,7 @@ import React from 'react';
 import { HIGHEST_NOTE, LOWEST_NOTE, Notes } from '../MusicEditorTypes';
 import PianoRollRow from './PianoRollRow';
 
-export default function PianoRollEditor(): JSX.Element {
+export default function PianoRollEditor(): React.JSX.Element {
     const classNames = ['pianoRollEditor'];
 
     return <div className={classNames.join(' ')}>

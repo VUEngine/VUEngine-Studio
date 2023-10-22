@@ -5,7 +5,7 @@ interface VContainerProps {
     gap?: number
 }
 
-export default function VContainer(props: PropsWithChildren<VContainerProps>): JSX.Element {
+export default function VContainer(props: PropsWithChildren<VContainerProps>): React.JSX.Element {
     const { children, className, gap } = props;
 
     // TODO: move to css class

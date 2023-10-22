@@ -11,7 +11,7 @@ interface ChannelProps {
     instrumentName: string
 }
 
-export default function Channel(props: ChannelProps): JSX.Element {
+export default function Channel(props: ChannelProps): React.JSX.Element {
     const { state, setCurrentChannel, toggleChannelCollapsed } = useContext(MusicEditorContext) as MusicEditorContextType;
     const { channelConfig, number, otherSolo, instrumentName } = props;
 
