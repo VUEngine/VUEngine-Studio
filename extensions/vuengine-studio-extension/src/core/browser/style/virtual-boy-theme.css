@@ -1,3 +1,4 @@
+/* TODO: Exclude certain areas from filter, such as the emulator */
 body.hc-virtual-boy > * {
     filter: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxmaWx0ZXIgaWQ9InYiPjxmZUNvbG9yTWF0cml4IGluPSJTb3VyY2VHcmFwaGljIiB0eXBlPSJtYXRyaXgiIHZhbHVlcz0iMSAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMCAwIDAgMSAwIiAvPjwvZmlsdGVyPjwvc3ZnPg==#v");
 }
