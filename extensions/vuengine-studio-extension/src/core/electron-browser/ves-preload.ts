@@ -25,10 +25,10 @@ const api: VesCoreAPI = {
     sortJson<T>(old: T, options?: VisitOptions): T {
         return ipcRenderer.sendSync(VES_CHANNEL_SORT_JSON, old, options);
     },
-    replaceInFiles(files: string[], from: string, to: string): any {
+    replaceInFiles: function (files: string[], from: string, to: string): any {
         return ipcRenderer.sendSync(VES_CHANNEL_REPLACE_IN_FILES, files, from, to);
     },
-    findFiles(base: string, pattern: string): string[] {
+    findFiles: function (base: string, pattern: string): string[] {
         return ipcRenderer.sendSync(VES_CHANNEL_FIND_FILES, base, pattern);
     },
 };
