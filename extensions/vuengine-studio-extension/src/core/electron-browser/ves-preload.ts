@@ -21,7 +21,7 @@ const api: VesCoreAPI = {
         return ipcRenderer.sendSync(VES_CHANNEL_GET_USER_DEFAULT, preference, type);
     },
     dereferenceJsonSchema: function (schema: JsonSchema): Promise<JsonSchema> {
-        return ipcRenderer.sendSync(VES_CHANNEL_DEREFERENCE_JSON_SCHEMA, schema);
+        return ipcRenderer.invoke(VES_CHANNEL_DEREFERENCE_JSON_SCHEMA, schema);
     },
     sortJson<T>(old: T, options?: VisitOptions): T {
         return ipcRenderer.sendSync(VES_CHANNEL_SORT_JSON, old, options);
