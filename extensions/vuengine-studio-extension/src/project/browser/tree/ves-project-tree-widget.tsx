@@ -50,7 +50,7 @@ export class VesProjectTreeWidget extends TreeWidget {
     this.title.closable = true;
   }
 
-  async init(): Promise<void> {
+  init(): void {
     super.init();
 
     this.vesProjectService.onDidChangeProjectData(async () => {
