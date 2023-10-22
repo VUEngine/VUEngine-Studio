@@ -26,9 +26,9 @@ export class VesMainApi implements ElectronMainApplicationContribution {
         ipcMain.on(VES_CHANNEL_GET_USER_DEFAULT, (event, preference, type) => {
             event.returnValue = systemPreferences.getUserDefault(preference, type);
         });
-        ipcMain.on(VES_CHANNEL_DEREFERENCE_JSON_SCHEMA, (event, schema) => {
-            event.returnValue = $RefParser.dereference(schema as JSONSchema);
-        });
+        ipcMain.handle(VES_CHANNEL_DEREFERENCE_JSON_SCHEMA, (event, schema) =>
+            $RefParser.dereference(schema as JSONSchema)
+        );
         ipcMain.on(VES_CHANNEL_SORT_JSON, (event, old, options) => {
             event.returnValue = sortJson(old, options);
         });
