@@ -47,7 +47,6 @@
     "test": "lerna run test",
     "electron": "yarn --cwd applications/electron",
     "browser": "yarn --cwd applications/browser",
-    "update:next": "ts-node scripts/update-theia-to-next.ts && lerna run update:next",
     "lint": "eslint --ext js,jsx,ts,tsx scripts && lerna run lint",
     "lint:fix": "eslint --ext js,jsx,ts,tsx scripts --fix && lerna run lint:fix",
     "modules:init": "git submodule update --init",

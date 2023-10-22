@@ -420,24 +420,24 @@ export class VesEmulatorWidget extends ReactWidget {
         if (
           (!this.state.paused && !this.state.showControls) ||
           this.state.input[key].command ===
-            EmulatorFunctionKeyCode.ToggleControlsOverlay ||
+          EmulatorFunctionKeyCode.ToggleControlsOverlay ||
           (!this.state.showControls &&
             this.state.input[key].command ===
-              EmulatorFunctionKeyCode.PauseToggle) ||
+            EmulatorFunctionKeyCode.PauseToggle) ||
           (!this.state.showControls &&
             this.state.input[key].command ===
-              EmulatorFunctionKeyCode.Fullscreen) ||
+            EmulatorFunctionKeyCode.Fullscreen) ||
           (!this.state.showControls &&
             this.state.input[key].command ===
-              EmulatorFunctionKeyCode.AudioMute) ||
+            EmulatorFunctionKeyCode.AudioMute) ||
           (!this.state.showControls &&
             this.state.input[key].command === EmulatorFunctionKeyCode.Reset) ||
           (!this.state.showControls &&
             this.state.input[key].command ===
-              EmulatorFunctionKeyCode.Screenshot) ||
+            EmulatorFunctionKeyCode.Screenshot) ||
           (this.state.frameAdvance &&
             this.state.input[key].command ===
-              EmulatorFunctionKeyCode.FrameAdvance)
+            EmulatorFunctionKeyCode.FrameAdvance)
         ) {
           if (this.matchKey(this.state.input[key].keys, e.code)) {
             this.sendCommand(e.type, this.state.input[key].command);
@@ -494,13 +494,6 @@ export class VesEmulatorWidget extends ReactWidget {
 
   protected startEmulator = async () => {
     const romPath = await this.getRomPath();
-
-    const datauri = require('datauri');
-    const content = {
-      namespace: romPath,
-      rom: await datauri(romPath),
-    };
-
     const romUri = new URI(romPath);
     const romContent = await this.fileService.readFile(romUri);
     const romContentBuffer = romContent.value.buffer;
@@ -519,9 +512,13 @@ export class VesEmulatorWidget extends ReactWidget {
       version: romHeaderVersion,
     };
 
+    const romBase64 = Buffer.from(romContentBuffer).toString('base64');
     this.sendRetroArchConfig();
     this.sendCoreOptions();
-    this.sendCommand('start', content);
+    this.sendCommand('start', {
+      namespace: romPath,
+      rom: `data:application/octet-stream;base64,${romBase64}`,
+    });
   };
 
   protected onResize(): void {
@@ -554,14 +551,13 @@ export class VesEmulatorWidget extends ReactWidget {
               className={
                 this.state.paused ? 'theia-button' : 'theia-button secondary'
               }
-              title={`${
-                this.state.paused
-                  ? nls.localize('vuengine/emulator/resume', 'Resume')
-                  : nls.localize('vuengine/emulator/pause', 'Pause')
-              }${this.getKeybindingLabel(
-                VesEmulatorCommands.INPUT_PAUSE_TOGGLE.id,
-                true
-              )}`}
+              title={`${this.state.paused
+                ? nls.localize('vuengine/emulator/resume', 'Resume')
+                : nls.localize('vuengine/emulator/pause', 'Pause')
+                }${this.getKeybindingLabel(
+                  VesEmulatorCommands.INPUT_PAUSE_TOGGLE.id,
+                  true
+                )}`}
               onClick={e =>
                 this.sendKeypress(EmulatorFunctionKeyCode.PauseToggle, e)
               }
@@ -571,12 +567,11 @@ export class VesEmulatorWidget extends ReactWidget {
             </button>
             <button
               className="theia-button secondary"
-              title={`${
-                VesEmulatorCommands.INPUT_RESET.label
-              }${this.getKeybindingLabel(
-                VesEmulatorCommands.INPUT_RESET.id,
-                true
-              )}`}
+              title={`${VesEmulatorCommands.INPUT_RESET.label
+                }${this.getKeybindingLabel(
+                  VesEmulatorCommands.INPUT_RESET.id,
+                  true
+                )}`}
               onClick={e => this.sendKeypress(EmulatorFunctionKeyCode.Reset, e)}
               disabled={!this.state.loaded || this.state.showControls}
             >
@@ -584,14 +579,13 @@ export class VesEmulatorWidget extends ReactWidget {
             </button>
             <button
               className="theia-button secondary"
-              title={`${
-                this.state.muted
-                  ? nls.localize('vuengine/emulator/unmute', 'Unmute')
-                  : nls.localize('vuengine/emulator/mute', 'Mute')
-              }${this.getKeybindingLabel(
-                VesEmulatorCommands.INPUT_AUDIO_MUTE.id,
-                true
-              )}`}
+              title={`${this.state.muted
+                ? nls.localize('vuengine/emulator/unmute', 'Unmute')
+                : nls.localize('vuengine/emulator/mute', 'Mute')
+                }${this.getKeybindingLabel(
+                  VesEmulatorCommands.INPUT_AUDIO_MUTE.id,
+                  true
+                )}`}
               onClick={e =>
                 this.sendKeypress(EmulatorFunctionKeyCode.AudioMute, e)
               }
@@ -607,12 +601,11 @@ export class VesEmulatorWidget extends ReactWidget {
               className={
                 this.state.lowPower ? 'theia-button' : 'theia-button secondary'
               }
-              title={`${
-                VesEmulatorCommands.INPUT_TOGGLE_LOW_POWER.label
-              }${this.getKeybindingLabel(
-                VesEmulatorCommands.INPUT_TOGGLE_LOW_POWER.id,
-                true
-              )}`}
+              title={`${VesEmulatorCommands.INPUT_TOGGLE_LOW_POWER.label
+                }${this.getKeybindingLabel(
+                  VesEmulatorCommands.INPUT_TOGGLE_LOW_POWER.id,
+                  true
+                )}`}
               onClick={e =>
                 this.sendKeypress(EmulatorFunctionKeyCode.ToggleLowPower, e)
               }
@@ -635,38 +628,36 @@ export class VesEmulatorWidget extends ReactWidget {
             {(this.preferenceService.get(
               VesEmulatorPreferenceIds.EMULATOR_REWIND_ENABLE
             ) as boolean) && (
-              <button
-                className="theia-button secondary"
-                title={`${
-                  VesEmulatorCommands.INPUT_REWIND.label
-                }${this.getKeybindingLabel(
-                  VesEmulatorCommands.INPUT_REWIND.id,
-                  true
-                )}`}
-                onClick={e =>
-                  this.sendKeypress(EmulatorFunctionKeyCode.Rewind, e)
-                }
-                disabled={
-                  !this.state.loaded ||
-                  this.state.showControls ||
-                  this.state.paused
-                }
-              >
-                <i className="fa fa-backward"></i>
-              </button>
-            )}
+                <button
+                  className="theia-button secondary"
+                  title={`${VesEmulatorCommands.INPUT_REWIND.label
+                    }${this.getKeybindingLabel(
+                      VesEmulatorCommands.INPUT_REWIND.id,
+                      true
+                    )}`}
+                  onClick={e =>
+                    this.sendKeypress(EmulatorFunctionKeyCode.Rewind, e)
+                  }
+                  disabled={
+                    !this.state.loaded ||
+                    this.state.showControls ||
+                    this.state.paused
+                  }
+                >
+                  <i className="fa fa-backward"></i>
+                </button>
+              )}
             <button
               className={
                 this.state.slowmotion
                   ? 'theia-button'
                   : 'theia-button secondary'
               }
-              title={`${
-                VesEmulatorCommands.INPUT_TOGGLE_SLOWMOTION.label
-              }${this.getKeybindingLabel(
-                VesEmulatorCommands.INPUT_TOGGLE_SLOWMOTION.id,
-                true
-              )}`}
+              title={`${VesEmulatorCommands.INPUT_TOGGLE_SLOWMOTION.label
+                }${this.getKeybindingLabel(
+                  VesEmulatorCommands.INPUT_TOGGLE_SLOWMOTION.id,
+                  true
+                )}`}
               onClick={e =>
                 this.sendKeypress(EmulatorFunctionKeyCode.ToggleSlowmotion, e)
               }
@@ -684,12 +675,11 @@ export class VesEmulatorWidget extends ReactWidget {
                   ? 'theia-button'
                   : 'theia-button secondary'
               }
-              title={`${
-                VesEmulatorCommands.INPUT_FRAME_ADVANCE.label
-              }${this.getKeybindingLabel(
-                VesEmulatorCommands.INPUT_FRAME_ADVANCE.id,
-                true
-              )}`}
+              title={`${VesEmulatorCommands.INPUT_FRAME_ADVANCE.label
+                }${this.getKeybindingLabel(
+                  VesEmulatorCommands.INPUT_FRAME_ADVANCE.id,
+                  true
+                )}`}
               onClick={e =>
                 this.sendKeypress(EmulatorFunctionKeyCode.FrameAdvance, e)
               }
@@ -708,12 +698,11 @@ export class VesEmulatorWidget extends ReactWidget {
                   ? 'theia-button'
                   : 'theia-button secondary'
               }
-              title={`${
-                VesEmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.label
-              }${this.getKeybindingLabel(
-                VesEmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.id,
-                true
-              )}`}
+              title={`${VesEmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.label
+                }${this.getKeybindingLabel(
+                  VesEmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.id,
+                  true
+                )}`}
               onClick={e =>
                 this.sendKeypress(EmulatorFunctionKeyCode.ToggleFastForward, e)
               }
@@ -729,12 +718,11 @@ export class VesEmulatorWidget extends ReactWidget {
           <div>
             <button
               className="theia-button secondary"
-              title={`${
-                VesEmulatorCommands.INPUT_SAVE_STATE.label
-              }${this.getKeybindingLabel(
-                VesEmulatorCommands.INPUT_SAVE_STATE.id,
-                true
-              )}`}
+              title={`${VesEmulatorCommands.INPUT_SAVE_STATE.label
+                }${this.getKeybindingLabel(
+                  VesEmulatorCommands.INPUT_SAVE_STATE.id,
+                  true
+                )}`}
               onClick={e =>
                 this.sendKeypress(EmulatorFunctionKeyCode.SaveState, e)
               }
@@ -749,12 +737,11 @@ export class VesEmulatorWidget extends ReactWidget {
             </button>
             <button
               className="theia-button secondary"
-              title={`${
-                VesEmulatorCommands.INPUT_LOAD_STATE.label
-              }${this.getKeybindingLabel(
-                VesEmulatorCommands.INPUT_LOAD_STATE.id,
-                true
-              )}`}
+              title={`${VesEmulatorCommands.INPUT_LOAD_STATE.label
+                }${this.getKeybindingLabel(
+                  VesEmulatorCommands.INPUT_LOAD_STATE.id,
+                  true
+                )}`}
               onClick={e =>
                 this.sendKeypress(EmulatorFunctionKeyCode.LoadState, e)
               }
@@ -783,12 +770,11 @@ export class VesEmulatorWidget extends ReactWidget {
             </button>
             <button
               className="theia-button secondary"
-              title={`${
-                VesEmulatorCommands.INPUT_STATE_SLOT_DECREASE.label
-              }${this.getKeybindingLabel(
-                VesEmulatorCommands.INPUT_STATE_SLOT_DECREASE.id,
-                true
-              )}`}
+              title={`${VesEmulatorCommands.INPUT_STATE_SLOT_DECREASE.label
+                }${this.getKeybindingLabel(
+                  VesEmulatorCommands.INPUT_STATE_SLOT_DECREASE.id,
+                  true
+                )}`}
               onClick={e =>
                 this.sendKeypress(EmulatorFunctionKeyCode.StateSlotDecrease, e)
               }
@@ -803,12 +789,11 @@ export class VesEmulatorWidget extends ReactWidget {
             </button>
             <button
               className="theia-button secondary"
-              title={`${
-                VesEmulatorCommands.INPUT_STATE_SLOT_INCREASE.label
-              }${this.getKeybindingLabel(
-                VesEmulatorCommands.INPUT_STATE_SLOT_INCREASE.id,
-                true
-              )}`}
+              title={`${VesEmulatorCommands.INPUT_STATE_SLOT_INCREASE.label
+                }${this.getKeybindingLabel(
+                  VesEmulatorCommands.INPUT_STATE_SLOT_INCREASE.id,
+                  true
+                )}`}
               onClick={e =>
                 this.sendKeypress(EmulatorFunctionKeyCode.StateSlotIncrease, e)
               }
@@ -824,12 +809,11 @@ export class VesEmulatorWidget extends ReactWidget {
           <div>
             <button
               className="theia-button secondary"
-              title={`${
-                VesEmulatorCommands.INPUT_DUMP_SRAM.label
-              }${this.getKeybindingLabel(
-                VesEmulatorCommands.INPUT_DUMP_SRAM.id,
-                true
-              )}`}
+              title={`${VesEmulatorCommands.INPUT_DUMP_SRAM.label
+                }${this.getKeybindingLabel(
+                  VesEmulatorCommands.INPUT_DUMP_SRAM.id,
+                  true
+                )}`}
               onClick={e =>
                 this.sendKeypress(EmulatorFunctionKeyCode.DumpSram, e)
               }
@@ -902,12 +886,11 @@ export class VesEmulatorWidget extends ReactWidget {
           <div>
             <button
               className="theia-button secondary"
-              title={`${
-                VesEmulatorCommands.INPUT_FULLSCREEN.label
-              }${this.getKeybindingLabel(
-                VesEmulatorCommands.INPUT_FULLSCREEN.id,
-                true
-              )}`}
+              title={`${VesEmulatorCommands.INPUT_FULLSCREEN.label
+                }${this.getKeybindingLabel(
+                  VesEmulatorCommands.INPUT_FULLSCREEN.id,
+                  true
+                )}`}
               onClick={e =>
                 this.sendKeypress(EmulatorFunctionKeyCode.Fullscreen, e)
               }
@@ -917,12 +900,11 @@ export class VesEmulatorWidget extends ReactWidget {
             </button>
             <button
               className="theia-button secondary"
-              title={`${
-                VesEmulatorCommands.INPUT_SCREENSHOT.label
-              }${this.getKeybindingLabel(
-                VesEmulatorCommands.INPUT_SCREENSHOT.id,
-                true
-              )}`}
+              title={`${VesEmulatorCommands.INPUT_SCREENSHOT.label
+                }${this.getKeybindingLabel(
+                  VesEmulatorCommands.INPUT_SCREENSHOT.id,
+                  true
+                )}`}
               onClick={e =>
                 this.sendKeypress(EmulatorFunctionKeyCode.Screenshot, e)
               }
@@ -1221,16 +1203,14 @@ export class VesEmulatorWidget extends ReactWidget {
         cheevos_enable = false
         cheevos_hardcore_mode_enable = false
         quit_press_twice = false
-        rewind_enable = ${
-          this.preferenceService.get(
-            VesEmulatorPreferenceIds.EMULATOR_REWIND_ENABLE
-          ) as boolean
-        }
-        rewind_granularity = ${
-          this.preferenceService.get(
-            VesEmulatorPreferenceIds.EMULATOR_REWIND_GRANULARITY
-          ) as number
-        }
+        rewind_enable = ${this.preferenceService.get(
+        VesEmulatorPreferenceIds.EMULATOR_REWIND_ENABLE
+      ) as boolean
+      }
+        rewind_granularity = ${this.preferenceService.get(
+        VesEmulatorPreferenceIds.EMULATOR_REWIND_GRANULARITY
+      ) as number
+      }
         rewind_buffer_size = 50
         pause_nonactive = true
         
@@ -1281,40 +1261,38 @@ export class VesEmulatorWidget extends ReactWidget {
         input_save_state = ${this.toButton(EmulatorFunctionKeyCode.SaveState)}
         input_load_state = ${this.toButton(EmulatorFunctionKeyCode.LoadState)}
         input_state_slot_decrease = ${this.toButton(
-          EmulatorFunctionKeyCode.StateSlotDecrease
-        )}
+        EmulatorFunctionKeyCode.StateSlotDecrease
+      )}
         input_state_slot_increase = ${this.toButton(
-          EmulatorFunctionKeyCode.StateSlotIncrease
-        )}
+        EmulatorFunctionKeyCode.StateSlotIncrease
+      )}
         input_toggle_fast_forward = ${this.toButton(
-          EmulatorFunctionKeyCode.ToggleFastForward
-        )}
+        EmulatorFunctionKeyCode.ToggleFastForward
+      )}
         input_toggle_slowmotion = ${this.toButton(
-          EmulatorFunctionKeyCode.ToggleSlowmotion
-        )}
+        EmulatorFunctionKeyCode.ToggleSlowmotion
+      )}
         input_pause_toggle = ${this.toButton(
-          EmulatorFunctionKeyCode.PauseToggle
-        )}
+        EmulatorFunctionKeyCode.PauseToggle
+      )}
         input_rewind = ${this.toButton(EmulatorFunctionKeyCode.Rewind)}
         input_frame_advance = ${this.toButton(
-          EmulatorFunctionKeyCode.FrameAdvance
-        )}
+        EmulatorFunctionKeyCode.FrameAdvance
+      )}
         input_audio_mute = ${this.toButton(EmulatorFunctionKeyCode.AudioMute)}
         input_screenshot = ${this.toButton(EmulatorFunctionKeyCode.Screenshot)}
 
         auto_screenshot_filename = "true"
         screenshot_directory = "/home/web_user/retroarch/userdata"
 
-        slowmotion_ratio = ${
-          this.preferenceService.get(
-            VesEmulatorPreferenceIds.EMULATOR_SLOW_MOTION_RATIO
-          ) as number
-        }
-        fastforward_ratio = ${
-          this.preferenceService.get(
-            VesEmulatorPreferenceIds.EMULATOR_FAST_FORWARD_RATIO
-          ) as number
-        }
+        slowmotion_ratio = ${this.preferenceService.get(
+        VesEmulatorPreferenceIds.EMULATOR_SLOW_MOTION_RATIO
+      ) as number
+      }
+        fastforward_ratio = ${this.preferenceService.get(
+        VesEmulatorPreferenceIds.EMULATOR_FAST_FORWARD_RATIO
+      ) as number
+      }
 
         input_reset = nul
         input_toggle_fullscreen = nul
