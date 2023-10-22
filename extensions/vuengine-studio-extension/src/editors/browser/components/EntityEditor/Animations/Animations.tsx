@@ -4,7 +4,7 @@ import VContainer from '../../Common/VContainer';
 interface AnimationsProps {
 }
 
-export default function Animations(props: AnimationsProps): JSX.Element {
+export default function Animations(props: AnimationsProps): React.JSX.Element {
     // const { pattern, currentNote } = props;
 
     return <VContainer gap={10}>

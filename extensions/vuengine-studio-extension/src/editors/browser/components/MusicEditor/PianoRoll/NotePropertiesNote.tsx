@@ -10,7 +10,7 @@ interface NotePropertiesNoteProps {
     volumeR: number
 }
 
-export default function NotePropertiesNote(props: NotePropertiesNoteProps): JSX.Element {
+export default function NotePropertiesNote(props: NotePropertiesNoteProps): React.JSX.Element {
     const { songData, setCurrentNote, setNote } = useContext(MusicEditorContext) as MusicEditorContextType;
     const { index, current, volumeL, volumeR, effects } = props;
 

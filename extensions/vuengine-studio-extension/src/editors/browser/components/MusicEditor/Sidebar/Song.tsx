@@ -3,7 +3,7 @@ import HContainer from '../../Common/HContainer';
 import VContainer from '../../Common/VContainer';
 import { MAX_SPEED, MIN_SPEED, MusicEditorContext, MusicEditorContextType, PATTERN_SIZES, VOLUME_STEPS } from '../MusicEditorTypes';
 
-export default function Song(): JSX.Element {
+export default function Song(): React.JSX.Element {
     const { songData, setSongData } = useContext(MusicEditorContext) as MusicEditorContextType;
 
     const setName = (n: string): void => {

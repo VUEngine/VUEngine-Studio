@@ -8,7 +8,7 @@ interface ImportExportProps {
     fileService: FileService
 }
 
-export default function ImportExport(props: ImportExportProps): JSX.Element {
+export default function ImportExport(props: ImportExportProps): React.JSX.Element {
     const selectDirectory = async (): Promise<void> => {
         const openFileDialogProps: OpenFileDialogProps = {
             title: nls.localize('vuengine/general/selectDirectory', 'Select directory'),

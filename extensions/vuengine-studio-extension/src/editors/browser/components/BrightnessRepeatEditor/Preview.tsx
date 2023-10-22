@@ -5,7 +5,7 @@ interface PreviewProps {
     values: number[]
 }
 
-export default function Preview(props: PreviewProps): JSX.Element {
+export default function Preview(props: PreviewProps): React.JSX.Element {
     const { mirror, values } = props;
 
     return <div className='preview'>

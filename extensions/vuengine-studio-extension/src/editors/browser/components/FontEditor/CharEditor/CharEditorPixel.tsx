@@ -10,7 +10,7 @@ interface CharEditorPixelProps {
     active: boolean
 }
 
-export default function CharEditorPixel(props: CharEditorPixelProps): JSX.Element {
+export default function CharEditorPixel(props: CharEditorPixelProps): React.JSX.Element {
     const onClick = (e: React.MouseEvent<HTMLElement>) => {
         clickPixel(x, y, paletteIndexL);
         e.preventDefault();

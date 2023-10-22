@@ -8,7 +8,7 @@ interface PianoRollRowProps {
     noteId: number
 }
 
-export default function PianoRollRow(props: PianoRollRowProps): JSX.Element {
+export default function PianoRollRow(props: PianoRollRowProps): React.JSX.Element {
     const { state, songData, playNote } = useContext(MusicEditorContext) as MusicEditorContextType;
     const { note, noteId } = props;
 

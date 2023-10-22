@@ -4,11 +4,11 @@ import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTyp
 import { nls } from '@theia/core';
 import Mesh from './Mesh';
 
-export default function Meshes(): JSX.Element {
+export default function Meshes(): React.JSX.Element {
     const { entityData, setEntityData } = useContext(EntityEditorContext) as EntityEditorContextType;
 
     const addMesh = (): void => {
-        const updatedMeshes = {...entityData.meshes};
+        const updatedMeshes = { ...entityData.meshes };
         updatedMeshes.meshes = [
             ...updatedMeshes.meshes,
             {

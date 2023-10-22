@@ -4,7 +4,7 @@ import React, { useContext } from 'react';
 import VContainer from '../../Common/VContainer';
 import { MusicEditorContext, MusicEditorContextType } from '../MusicEditorTypes';
 
-export default function Instruments(): JSX.Element {
+export default function Instruments(): React.JSX.Element {
     const { state, songData, setInstruments, setCurrentInstrument } = useContext(MusicEditorContext) as MusicEditorContextType;
 
     const instrument = songData.instruments[state.currentInstrument];

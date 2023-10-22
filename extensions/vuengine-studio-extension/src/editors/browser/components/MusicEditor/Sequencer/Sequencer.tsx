@@ -3,7 +3,7 @@ import { MusicEditorContext, MusicEditorContextType } from '../MusicEditorTypes'
 import Channel from './Channel';
 import StepIndicator from './StepIndicator';
 
-export default function Sequencer(): JSX.Element {
+export default function Sequencer(): React.JSX.Element {
     const { state, songData } = useContext(MusicEditorContext) as MusicEditorContextType;
 
     const soloChannel = songData.channels.filter(c => c.solo).map(c => c.id).pop() ?? -1;

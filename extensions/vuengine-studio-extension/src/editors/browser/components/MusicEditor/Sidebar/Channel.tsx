@@ -3,7 +3,7 @@ import { MusicEditorContext, MusicEditorContextType } from '../MusicEditorTypes'
 import CurrentChannel from './CurrentChannel';
 import CurrentPattern from './CurrentPattern';
 
-export default function Channel(): JSX.Element {
+export default function Channel(): React.JSX.Element {
     const { state } = useContext(MusicEditorContext) as MusicEditorContextType;
 
     return <>

@@ -14,7 +14,7 @@ interface CharEditorProps {
     charGrid: number
 }
 
-export default function CharEditor(props: CharEditorProps): JSX.Element {
+export default function CharEditor(props: CharEditorProps): React.JSX.Element {
     const {
         char,
         charId,

@@ -5,7 +5,7 @@ interface CurrentCharInfoProps {
     currentCharacter: number
 }
 
-export default function CurrentCharInfo(props: CurrentCharInfoProps): JSX.Element {
+export default function CurrentCharInfo(props: CurrentCharInfoProps): React.JSX.Element {
     const { currentCharacter } = props;
 
     return <div className='current-character-info'>

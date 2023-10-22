@@ -16,7 +16,7 @@ interface TranslationsTableProps {
     onChangeTranslation: (id: string, languageCode: string, translation: string) => void
 }
 
-export default function TranslationsTable(props: TranslationsTableProps): JSX.Element {
+export default function TranslationsTable(props: TranslationsTableProps): React.JSX.Element {
     const {
         editTranslations = true,
         editIds = true,

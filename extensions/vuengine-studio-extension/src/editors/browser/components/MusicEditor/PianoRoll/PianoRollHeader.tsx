@@ -1,7 +1,7 @@
 import { nls } from '@theia/core';
 import React from 'react';
 
-export default function PianoRollHeader(): JSX.Element {
+export default function PianoRollHeader(): React.JSX.Element {
     return <div className='pianoRollHeader'>
         <div
             className='pianoRollHeaderTitle'

@@ -10,13 +10,13 @@ interface MeshProps {
     index: number,
 }
 
-export default function Mesh(props: MeshProps): JSX.Element {
+export default function Mesh(props: MeshProps): React.JSX.Element {
     const { entityData, setEntityData } = useContext(EntityEditorContext) as EntityEditorContextType;
     const { index } = props;
     const mesh = entityData.meshes.meshes[index];
 
     const setAllocator = (allocator: string): void => {
-        const updatedMeshes = {...entityData.meshes};
+        const updatedMeshes = { ...entityData.meshes };
         updatedMeshes.meshes[index] = {
             ...updatedMeshes.meshes[index],
             wireframe: {
@@ -29,7 +29,7 @@ export default function Mesh(props: MeshProps): JSX.Element {
     };
 
     const setDisplacementX = (x: number): void => {
-        const updatedMeshes = {...entityData.meshes};
+        const updatedMeshes = { ...entityData.meshes };
         updatedMeshes.meshes[index] = {
             ...updatedMeshes.meshes[index],
             wireframe: {
@@ -45,7 +45,7 @@ export default function Mesh(props: MeshProps): JSX.Element {
     };
 
     const setDisplacementY = (y: number): void => {
-        const updatedMeshes = {...entityData.meshes};
+        const updatedMeshes = { ...entityData.meshes };
         updatedMeshes.meshes[index] = {
             ...updatedMeshes.meshes[index],
             wireframe: {
@@ -61,7 +61,7 @@ export default function Mesh(props: MeshProps): JSX.Element {
     };
 
     const setDisplacementZ = (z: number): void => {
-        const updatedMeshes = {...entityData.meshes};
+        const updatedMeshes = { ...entityData.meshes };
         updatedMeshes.meshes[index] = {
             ...updatedMeshes.meshes[index],
             wireframe: {
@@ -77,7 +77,7 @@ export default function Mesh(props: MeshProps): JSX.Element {
     };
 
     const toggleInterlaced = (): void => {
-        const updatedMeshes = {...entityData.meshes};
+        const updatedMeshes = { ...entityData.meshes };
         updatedMeshes.meshes[index] = {
             ...updatedMeshes.meshes[index],
             wireframe: {
@@ -90,7 +90,7 @@ export default function Mesh(props: MeshProps): JSX.Element {
     };
 
     const addSegment = (): void => {
-        const updatedMeshes = {...entityData.meshes};
+        const updatedMeshes = { ...entityData.meshes };
         updatedMeshes.meshes[index].segments = [
             ...updatedMeshes.meshes[index].segments,
             {
@@ -119,7 +119,7 @@ export default function Mesh(props: MeshProps): JSX.Element {
         });
         const confirmed = await dialog.open();
         if (confirmed) {
-            const updatedMeshes = {...entityData.meshes};
+            const updatedMeshes = { ...entityData.meshes };
             updatedMeshes.meshes = [
                 ...entityData.meshes.meshes.slice(0, index),
                 ...entityData.meshes.meshes.slice(index + 1)
@@ -195,8 +195,8 @@ export default function Mesh(props: MeshProps): JSX.Element {
                 </div>
             </VContainer>
             <button
-              className="theia-button secondary remove-button"
-              onClick={removeMesh}
+                className="theia-button secondary remove-button"
+                onClick={removeMesh}
             >
                 {nls.localize('vuengine/entityEditor/remove', 'Remove')}
             </button>

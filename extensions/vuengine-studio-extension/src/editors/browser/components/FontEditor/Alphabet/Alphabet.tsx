@@ -14,7 +14,7 @@ interface AlphabetProps {
     setState: (state: Partial<FontEditorState>) => void
 }
 
-export default function Alphabet(props: AlphabetProps): JSX.Element {
+export default function Alphabet(props: AlphabetProps): React.JSX.Element {
     const {
         charsData,
         charHeight, charWidth,

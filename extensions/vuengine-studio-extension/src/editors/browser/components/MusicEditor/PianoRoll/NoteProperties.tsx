@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { MusicEditorContext, MusicEditorContextType } from '../MusicEditorTypes';
 import NotePropertiesNote from './NotePropertiesNote';
 
-export default function NoteProperties(): JSX.Element {
+export default function NoteProperties(): React.JSX.Element {
     const { state, songData } = useContext(MusicEditorContext) as MusicEditorContextType;
 
     const channel = songData.channels[state.currentChannel];

@@ -17,7 +17,7 @@ interface PreviewProps {
   workspaceService: WorkspaceService;
 }
 
-export default function Preview(props: PreviewProps): JSX.Element {
+export default function Preview(props: PreviewProps): React.JSX.Element {
   const { fileService, vesCommonService, workspaceService } = props;
   const { state, setState } = useContext(
     EntityEditorContext

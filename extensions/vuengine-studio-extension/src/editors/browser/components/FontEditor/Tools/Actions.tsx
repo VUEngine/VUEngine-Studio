@@ -12,7 +12,7 @@ interface ActionsProps {
     setState: (state: Partial<FontEditorState>) => void
 }
 
-export default function Actions(props: ActionsProps): JSX.Element {
+export default function Actions(props: ActionsProps): React.JSX.Element {
     const {
         clipboard,
         charHeight, charWidth,

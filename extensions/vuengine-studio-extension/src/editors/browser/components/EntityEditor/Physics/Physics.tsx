@@ -4,65 +4,81 @@ import VContainer from '../../Common/VContainer';
 import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 import { nls } from '@theia/core';
 
-export default function Physics(): JSX.Element {
+export default function Physics(): React.JSX.Element {
     const { entityData, setEntityData } = useContext(EntityEditorContext) as EntityEditorContextType;
 
     const toggleEnabled = (): void => {
-        setEntityData({ physics: {
-            ...entityData.physics,
-            enabled: !entityData.physics.enabled
-        } });
+        setEntityData({
+            physics: {
+                ...entityData.physics,
+                enabled: !entityData.physics.enabled
+            }
+        });
     };
 
     const setMass = (mass: number): void => {
-        setEntityData({ physics: {
-            ...entityData.physics, mass
-        } });
+        setEntityData({
+            physics: {
+                ...entityData.physics, mass
+            }
+        });
     };
 
     const setFriction = (friction: number): void => {
-        setEntityData({ physics: {
-            ...entityData.physics, friction
-        } });
+        setEntityData({
+            physics: {
+                ...entityData.physics, friction
+            }
+        });
     };
 
     const setBounciness = (bounciness: number): void => {
-        setEntityData({ physics: {
-            ...entityData.physics, bounciness
-        } });
+        setEntityData({
+            physics: {
+                ...entityData.physics, bounciness
+            }
+        });
     };
 
     const setMaximumSpeed = (maximumSpeed: number): void => {
-        setEntityData({ physics: {
-            ...entityData.physics, maximumSpeed
-        } });
+        setEntityData({
+            physics: {
+                ...entityData.physics, maximumSpeed
+            }
+        });
     };
 
     const setMaximumVelocityX = (x: number): void => {
-        setEntityData({ physics: {
-            ...entityData.physics,
-            maximumVelocity: {
-                ...entityData.physics.maximumVelocity, x
+        setEntityData({
+            physics: {
+                ...entityData.physics,
+                maximumVelocity: {
+                    ...entityData.physics.maximumVelocity, x
+                }
             }
-        }});
+        });
     };
 
     const setMaximumVelocityY = (y: number): void => {
-        setEntityData({ physics: {
-            ...entityData.physics,
-            maximumVelocity: {
-                ...entityData.physics.maximumVelocity, y
+        setEntityData({
+            physics: {
+                ...entityData.physics,
+                maximumVelocity: {
+                    ...entityData.physics.maximumVelocity, y
+                }
             }
-        }});
+        });
     };
 
     const setMaximumVelocityZ = (z: number): void => {
-        setEntityData({ physics: {
-            ...entityData.physics,
-            maximumVelocity: {
-                ...entityData.physics.maximumVelocity, z
+        setEntityData({
+            physics: {
+                ...entityData.physics,
+                maximumVelocity: {
+                    ...entityData.physics.maximumVelocity, z
+                }
             }
-        }});
+        });
     };
 
     return <VContainer gap={10}>

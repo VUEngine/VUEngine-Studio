@@ -9,7 +9,7 @@ interface ChannelHeaderProps {
     instrumentName: string
 }
 
-export default function ChannelHeader(props: ChannelHeaderProps): JSX.Element {
+export default function ChannelHeader(props: ChannelHeaderProps): React.JSX.Element {
     const { getChannelName, setCurrentChannel, toggleChannelMuted, toggleChannelSolo } = useContext(MusicEditorContext) as MusicEditorContextType;
     const { channel, number, muted, solo, instrumentName } = props;
 

@@ -4,7 +4,7 @@ import HContainer from '../../Common/HContainer';
 import VContainer from '../../Common/VContainer';
 import { HIGHEST_NOTE, LOWEST_NOTE, MusicEditorContext, MusicEditorContextType, Notes, VOLUME_STEPS } from '../MusicEditorTypes';
 
-export default function Note(): JSX.Element {
+export default function Note(): React.JSX.Element {
     const { state, songData, setNote, setVolumeL, setVolumeR } = useContext(MusicEditorContext) as MusicEditorContextType;
 
     const pattern = songData.channels[state.currentChannel].patterns[state.currentPattern];
