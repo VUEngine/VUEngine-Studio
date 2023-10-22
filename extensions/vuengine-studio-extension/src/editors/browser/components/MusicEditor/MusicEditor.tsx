@@ -1,6 +1,5 @@
 import DockLayout, { LayoutBase, LayoutData } from 'rc-dock';
 import React from 'react';
-import * as Tone from 'tone';
 import { ChannelConfig, InstrumentConfig, MusicEditorContext, MusicEditorState, Notes, PatternConfig, SongData, SongNote } from './MusicEditorTypes';
 import MusicPlayer from './MusicPlayer';
 import PianoRoll from './PianoRoll/PianoRoll';
@@ -74,8 +73,10 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
 
     playNote(note: number): void {
         if (!this.state.playing) {
+            /*
             const synth = new Tone.Synth().toDestination();
             synth.triggerAttackRelease(Notes[note], '16n');
+            */
         }
     }
 
