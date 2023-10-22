@@ -24,7 +24,7 @@
     "frontend": {
       "config": {
         "applicationName": "VUEngine Studio",
-        "defaultTheme": "dark",
+        "defaultTheme": "Dark",
         "defaultIconTheme": "vuengine-studio-file-icons",
         "preferences": {
           "files.autoSave": "onFocusChange",

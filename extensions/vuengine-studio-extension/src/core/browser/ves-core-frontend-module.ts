@@ -11,6 +11,7 @@ import {
     BrowserMenuBarContribution
 } from '@theia/core/lib/browser/menu/browser-menu-plugin';
 import { PreferenceConfigurations } from '@theia/core/lib/browser/preferences/preference-configurations';
+import { ThemeService } from '@theia/core/lib/browser/theming';
 import { WindowTitleService } from '@theia/core/lib/browser/window/window-title-service';
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { MenuContribution } from '@theia/core/lib/common/menu';
@@ -19,6 +20,7 @@ import { DebugConsoleContribution } from '@theia/debug/lib/browser/console/debug
 import { DebugFrontendApplicationContribution } from '@theia/debug/lib/browser/debug-frontend-application-contribution';
 import { DebugPrefixConfiguration } from '@theia/debug/lib/browser/debug-prefix-configuration';
 import { FileSystemFrontendContribution } from '@theia/filesystem/lib/browser/filesystem-frontend-contribution';
+import { MonacoThemeRegistry } from '@theia/monaco/lib/browser/textmate/monaco-theme-registry';
 import { NavigatorWidgetFactory } from '@theia/navigator/lib/browser/navigator-widget-factory';
 import { OutlineViewContribution } from '@theia/outline-view/lib/browser/outline-view-contribution';
 import { PluginApiFrontendContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-contribution';
@@ -48,15 +50,16 @@ import { VesPreferenceStringInputRenderer } from './ves-preference-string-input-
 import { VesPreferenceTreeGenerator } from './ves-preference-tree-generator';
 import './ves-preferences-monaco-contribution';
 import { VesQuickOpenWorkspace } from './ves-quick-open-workspace';
+import { VesThemeRegistry } from './ves-theme-registry';
+import { VesThemeService } from './ves-theme-service';
 import { VesToolbarDefaultsOverride } from './ves-toolbar-defaults-override';
 import { VesWindowTitleService } from './ves-window-title-service';
 import { VesWorkspaceService } from './ves-workspace-service';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // rename default icon theme
-    bind(VesDefaultFileIconThemeContribution).toSelf().inSingletonScope();
     // @ts-ignore
-    rebind(DefaultFileIconThemeContribution).to(VesDefaultFileIconThemeContribution);
+    rebind(DefaultFileIconThemeContribution).to(VesDefaultFileIconThemeContribution).inSingletonScope();
 
     // custom theme colors
     bind(ColorContribution).to(VesColorContribution).inSingletonScope();
@@ -75,27 +78,23 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(MenuContribution).toService(VesCoreContribution);
 
     // default configurations
-    bind(VesPreferenceConfigurations).toSelf().inSingletonScope();
-    rebind(PreferenceConfigurations).toService(VesPreferenceConfigurations);
+    rebind(PreferenceConfigurations).to(VesPreferenceConfigurations).inSingletonScope();
 
     // add custom preference tree categories
-    bind(VesPreferenceTreeGenerator).toSelf().inSingletonScope();
-    rebind(PreferenceTreeGenerator).to(VesPreferenceTreeGenerator);
+    rebind(PreferenceTreeGenerator).to(VesPreferenceTreeGenerator).inSingletonScope();
 
     // application shell overrides
     rebind(ApplicationShell).to(VesApplicationShell).inSingletonScope();
 
     // file icons & labels
-    bind(VesCoreLabelProviderContribution).toSelf().inSingletonScope();
-    bind(LabelProviderContribution).toService(VesCoreLabelProviderContribution);
+    bind(LabelProviderContribution).to(VesCoreLabelProviderContribution).inSingletonScope();
 
     // encoding registry
     bind(VesEncodingRegistry).toSelf().inSingletonScope();
     rebind(EncodingRegistry).toService(VesEncodingRegistry);
 
     // remove debug features
-    bind(VesDebugFrontendApplicationContribution).toSelf().inSingletonScope();
-    rebind(DebugFrontendApplicationContribution).toService(VesDebugFrontendApplicationContribution);
+    rebind(DebugFrontendApplicationContribution).to(VesDebugFrontendApplicationContribution).inSingletonScope();
     rebind(DebugConsoleContribution).toConstantValue({
         registerCommands: () => { },
         registerMenus: () => { },
@@ -139,24 +138,23 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     } as any);
 
     // custom file extensions
-    bind(VesFileSystemFrontendContribution).toSelf().inSingletonScope();
-    rebind(FileSystemFrontendContribution).toService(VesFileSystemFrontendContribution);
+    rebind(FileSystemFrontendContribution).to(VesFileSystemFrontendContribution).inSingletonScope();
 
     // remove "test" view
-    bind(VesPluginContribution).toSelf().inSingletonScope();
-    rebind(PluginViewRegistry).toService(VesPluginContribution);
+    rebind(PluginViewRegistry).to(VesPluginContribution).inSingletonScope();
 
     // quick open workspace
-    bind(VesQuickOpenWorkspace).toSelf().inSingletonScope();
-    rebind(QuickOpenWorkspace).toService(VesQuickOpenWorkspace);
+    rebind(QuickOpenWorkspace).to(VesQuickOpenWorkspace).inSingletonScope();
 
     // workspace service
-    bind(VesWorkspaceService).toSelf().inSingletonScope();
-    rebind(WorkspaceService).toService(VesWorkspaceService);
+    rebind(WorkspaceService).to(VesWorkspaceService).inSingletonScope();
+
+    // themes
+    rebind(ThemeService).to(VesThemeService).inSingletonScope();
+    rebind(MonacoThemeRegistry).to(VesThemeRegistry).inSingletonScope();
 
     // window title service
-    bind(VesWindowTitleService).toSelf().inSingletonScope();
-    rebind(WindowTitleService).toService(VesWindowTitleService);
+    rebind(WindowTitleService).to(VesWindowTitleService).inSingletonScope();
 
     // toolbar default config
     rebind(ToolbarDefaultsFactory).toConstantValue(VesToolbarDefaultsOverride);

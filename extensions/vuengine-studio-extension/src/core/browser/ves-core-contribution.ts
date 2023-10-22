@@ -1,11 +1,8 @@
-import { nls } from '@theia/core';
 import { ApplicationShell, PreferenceService } from '@theia/core/lib/browser';
-import { ThemeService } from '@theia/core/lib/browser/theming';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { CommandContribution, CommandRegistry } from '@theia/core/lib/common/command';
 import { MenuContribution, MenuModelRegistry } from '@theia/core/lib/common/menu';
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { MonacoThemeRegistry } from '@theia/monaco/lib/browser/textmate/monaco-theme-registry';
+import { inject, injectable } from '@theia/core/shared/inversify';
 import { VesCoreCommands } from './ves-core-commands';
 import { VesCoreMenus } from './ves-core-menus';
 
@@ -13,107 +10,14 @@ import { VesCoreMenus } from './ves-core-menus';
 export class VesCoreContribution implements CommandContribution, MenuContribution {
     @inject(ApplicationShell)
     protected readonly shell: ApplicationShell;
-    @inject(MonacoThemeRegistry)
-    protected readonly monacoThemeRegistry: MonacoThemeRegistry;
     @inject(PreferenceService)
     protected readonly preferenceService: PreferenceService;
-    @inject(ThemeService)
-    protected readonly themeService: ThemeService;
     @inject(WindowService)
     protected readonly windowService: WindowService;
 
     static REPORT_ISSUE_URL = 'https://github.com/VUEngine/VUEngine-Studio/issues/new';
     static SUPPORT_URL = 'https://www.patreon.com/VUEngine';
     static DOCUMENTATION_URL = 'https://www.vuengine.dev/documentation/';
-
-    @postConstruct()
-    init(): void {
-        this.initThemes();
-    }
-
-    initThemes(): void {
-        // @ref https://github.com/eclipse-theia/theia/blob/master/packages/core/src/browser/theming.ts
-        // @ref https://github.com/eclipse-theia/theia/blob/master/packages/monaco/src/browser/textmate/monaco-theme-registry.ts
-
-        // Override Light Theme
-        this.monacoThemeRegistry.register({
-            ...require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/light_theia.json'),
-            ...require('../../../themes/vuengine-light-color-theme.json'),
-        }, {
-            './light_vs.json': require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/light_vs.json'),
-            './light_plus.json': require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/light_plus.json')
-        }, 'light-vuengine-studio', 'vs');
-
-        this.themeService.register({
-            id: 'light',
-            type: 'light',
-            label: nls.localize('vuengine/general/themes/light', 'Light'),
-            editorTheme: 'light-vuengine-studio',
-        });
-
-        // Override Dark Theme
-        this.monacoThemeRegistry.register({
-            ...require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/dark_theia.json'),
-            ...require('../../../themes/vuengine-dark-color-theme.json'),
-        }, {
-            './dark_vs.json': require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/dark_vs.json'),
-            './dark_plus.json': require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/dark_plus.json')
-        }, 'dark-vuengine-studio', 'vs-dark');
-
-        this.themeService.register({
-            id: 'dark',
-            type: 'dark',
-            label: nls.localize('vuengine/general/themes/dark', 'Dark'),
-            editorTheme: 'dark-vuengine-studio',
-        });
-
-        // Override HC Black Theme
-        this.monacoThemeRegistry.register({
-            ...require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/hc_theia.json'),
-            ...require('../../../themes/vuengine-high-contrast-dark-color-theme.json'),
-        }, {
-            './hc_black.json': require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/hc_black.json')
-        }, 'hc-vuengine-studio-dark', 'hc-black').name!;
-
-        this.themeService.register({
-            id: 'hc-theia',
-            type: 'hc',
-            label: nls.localize('vuengine/general/themes/highContrastDark', 'High Contrast Dark'),
-            editorTheme: 'hc-vuengine-studio-dark',
-        });
-
-        // Override HC Light Theme
-        this.monacoThemeRegistry.register({
-            ...require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/hc_theia_light.json'),
-            ...require('../../../themes/vuengine-high-contrast-light-color-theme.json'),
-        }, {
-            './hc_light.json': require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/hc_light.json')
-        }, 'hc-vuengine-studio-light', 'hc-light').name!;
-
-        this.themeService.register({
-            id: 'hc-theia-light',
-            type: 'hc',
-            label: nls.localize('vuengine/general/themes/highContrastLightLight', 'High Contrast Light'),
-            editorTheme: 'hc-vuengine-studio-light',
-        });
-
-        // Add Virtual Boy HC theme
-        // this is implemented through a filter in style/virtual-boy-theme.css
-        // TODO: Exclude certain areas from filter, such as the emulator
-        this.monacoThemeRegistry.register({
-            ...require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/hc_theia.json'),
-            ...require('../../../themes/vuengine-virtual-boy-color-theme.json'),
-        }, {
-            './hc_black.json': require('../../../../../node_modules/@theia/monaco/data/monaco-themes/vscode/hc_black.json')
-        }, 'hc-virtual-boy', 'hc-black').name!;
-
-        this.themeService.register({
-            id: 'virtual-boy',
-            type: 'hc',
-            label: nls.localize('vuengine/general/themes/virtualBoy', 'Virtual Boy'),
-            editorTheme: 'hc-virtual-boy',
-        });
-    }
 
     registerCommands(commandRegistry: CommandRegistry): void {
         commandRegistry.registerCommand(VesCoreCommands.REPORT_ISSUE, {
