@@ -310,7 +310,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
         this.computeSong();
     }
 
-    render(): JSX.Element {
+    render(): React.JSX.Element {
         const defaultLayout: LayoutData = {
             dockbox: {
                 mode: 'horizontal',

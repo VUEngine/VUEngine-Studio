@@ -56,7 +56,7 @@ export default class MusicPlayer extends React.Component<MusicPlayerProps> {
         }
     }
 
-    render(): JSX.Element {
+    render(): React.JSX.Element {
         return <></>;
     }
 }

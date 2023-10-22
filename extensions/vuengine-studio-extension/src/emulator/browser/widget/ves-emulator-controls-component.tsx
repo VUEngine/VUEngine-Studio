@@ -55,7 +55,7 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
         this.keybindingRegistry = props.keybindingRegistry;
     }
 
-    render(): JSX.Element {
+    render(): React.JSX.Element {
         return <>
             <div>
                 <div className='controlsController'>

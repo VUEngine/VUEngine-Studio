@@ -240,7 +240,7 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
         return char;
     }
 
-    render(): JSX.Element {
+    render(): React.JSX.Element {
         const { fontData } = this.props;
 
         const pixelWidth = fontData.size.x * CHAR_PIXEL_SIZE;

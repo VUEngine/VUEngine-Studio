@@ -129,7 +129,7 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
     protected clearLog = () =>
         this.props.services.vesRumblePackService.rumblePackLog = [];
 
-    render(): JSX.Element {
+    render(): React.JSX.Element {
         const { data, services } = this.props;
         const { command } = this.state;
 

@@ -91,7 +91,7 @@ export default class EntityEditor extends React.Component<
     }
   }
 
-  render(): JSX.Element {
+  render(): React.JSX.Element {
     const defaultLayout: LayoutData = {
       dockbox: {
         mode: 'horizontal',
