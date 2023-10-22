@@ -50,7 +50,7 @@ export default class BrightnessRepeatEditor extends React.Component<BrightnessRe
         });
     }
 
-    render(): JSX.Element {
+    render(): React.JSX.Element {
         const { data } = this.props;
 
         return <div

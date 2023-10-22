@@ -171,7 +171,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
         });
     }
 
-    render(): JSX.Element {
+    render(): React.JSX.Element {
         return <>
             <div style={{ display: 'flex' }}>
                 <div style={{ flexGrow: 1, paddingRight: 8 }}>

@@ -69,24 +69,24 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
         });
     };
 
-    render(): JSX.Element {
+    render(): React.JSX.Element {
         const { data } = this.props;
 
         const selectSourceFile = async (): Promise<void> => {
-          const openFileDialogProps: OpenFileDialogProps = {
-            title: nls.localize('vuengine/pcmEditor/selectSourceFile', 'Select source file'),
-            canSelectFolders: false,
-            canSelectFiles: true,
-            filters: { 'WAV': ['.wav'] }
-          };
-          const uri = await this.props.services.fileDialogService.showOpenDialog(openFileDialogProps);
-          if (uri) {
-            const workspaceRootUri = this.props.services.workspaceService.tryGetRoots()[0]?.resource;
-            const source = await this.props.services.fileService.resolve(uri);
-            if (source.isFile) {
-              this.setSourceFile(workspaceRootUri.relative(uri)!.fsPath());
+            const openFileDialogProps: OpenFileDialogProps = {
+                title: nls.localize('vuengine/pcmEditor/selectSourceFile', 'Select source file'),
+                canSelectFolders: false,
+                canSelectFiles: true,
+                filters: { 'WAV': ['.wav'] }
+            };
+            const uri = await this.props.services.fileDialogService.showOpenDialog(openFileDialogProps);
+            if (uri) {
+                const workspaceRootUri = this.props.services.workspaceService.tryGetRoots()[0]?.resource;
+                const source = await this.props.services.fileService.resolve(uri);
+                if (source.isFile) {
+                    this.setSourceFile(workspaceRootUri.relative(uri)!.fsPath());
+                }
             }
-          }
         };
 
         return <div className='pcmEditor'>
