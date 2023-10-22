@@ -58,7 +58,7 @@ function EmulatorConfigs(props: EmulatorConfigsProps): JSX.Element {
       if (change.preferenceName === VesEmulatorPreferenceIds.DEFAULT_EMULATOR) {
         setDefaultEmulator(change.newValue);
       } else if (change.preferenceName === VesEmulatorPreferenceIds.EMULATORS) {
-        setEmulatorConfigs(change.newValue);
+        setEmulatorConfigs(change.newValue || []);
       }
     });
     return () => preflistener.dispose();
