@@ -1,7 +1,7 @@
 import { injectable, postConstruct } from '@theia/core/shared/inversify';
 import { SerialPort } from 'serialport';
-import { usb } from 'usb';
-import { RUMBLE_PACK_IDS } from '../common/ves-rumble-pack-types';
+// import { usb } from 'usb';
+// import { RUMBLE_PACK_IDS } from '../common/ves-rumble-pack-types';
 import { VesRumblePackUsbService, VesRumblePackUsbServiceClient } from '../common/ves-rumble-pack-usb-service-protocol';
 
 @injectable()
@@ -19,11 +19,12 @@ export class VesRumblePackUsbServiceImpl implements VesRumblePackUsbService {
 
     @postConstruct()
     protected init(): void {
-        usb.on('attach', async () => this.client?.onDidAttachDevice());
-        usb.on('detach', async () => this.client?.onDidDetachDevice());
+        // usb.on('attach', async () => this.client?.onDidAttachDevice());
+        // usb.on('detach', async () => this.client?.onDidDetachDevice());
     }
 
     async detectRumblePack(): Promise<boolean> {
+        /*
         let connectedRumblePack = false;
 
         const ports = await SerialPort.list();
@@ -50,6 +51,9 @@ export class VesRumblePackUsbServiceImpl implements VesRumblePackUsbService {
         }
 
         return connectedRumblePack;
+        */
+
+        return false;
     }
 
     sendCommand(command: string): boolean {

@@ -3467,13 +3467,6 @@
   resolved "https://registry.yarnpkg.com/@types/trusted-types/-/trusted-types-2.0.3.tgz#a136f83b0758698df454e328759dbd3d44555311"
   integrity sha512-NfQ4gyz38SL8sDNrSixxU2Os1a5xcdFxipAFxYEuLUlvU2uDwS4NUpsImcf1//SlWItCVMMLiylsxbmNMToV/g==
 
-"@types/usb@^2.0.5":
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/@types/usb/-/usb-2.0.5.tgz#fc4bc0c325f5fcdf3855fc96f43581790cde2f2e"
-  integrity sha512-aol2g3fGCZv+vpC+xIgVws+cdTQBKSh7q4f77XmPjUAKRUaxsAn+nfGTx2p/w/VqpF3emoJtqVeRHnYnSd4NSA==
-  dependencies:
-    usb "*"
-
 "@types/uuid@^7.0.3":
   version "7.0.5"
   resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-7.0.5.tgz#b1d2f772142a301538fae9bdf9cf15b9f2573a29"
@@ -10229,11 +10222,6 @@ node-addon-api@^5.0.0:
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-5.1.0.tgz#49da1ca055e109a23d537e9de43c09cca21eb762"
   integrity sha512-eh0GgfEkpnoWDq+VY8OyvYhFEzBk6jIYbRKdIlyTiAXIVJ8PyBaKb0rp7oDtoddbdoHWhq8wwr+XZ81F1rpNdA==
 
-node-addon-api@^6.0.0:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-6.1.0.tgz#ac8470034e58e67d0c6f1204a18ae6995d9c0d76"
-  integrity sha512-+eawOlIgy680F0kBzPUNFhMZGtJ1YmqM6l4+Crf4IkImjYrO/mqPwRMh352g23uIaQKFItcQ64I7KMaJxHgAVA==
-
 node-api-version@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/node-api-version/-/node-api-version-0.1.4.tgz#1ed46a485e462d55d66b5aa1fe2821720dedf080"
@@ -13934,19 +13922,10 @@ url-parse@^1.5.3:
     querystringify "^2.1.1"
     requires-port "^1.0.0"
 
-usb@*:
-  version "2.9.0"
-  resolved "https://registry.yarnpkg.com/usb/-/usb-2.9.0.tgz#8ae3b175f93bee559400bff33491eee63406b6a2"
-  integrity sha512-G0I/fPgfHUzWH8xo2KkDxTTFruUWfppgSFJ+bQxz/kVY2x15EQ/XDB7dqD1G432G4gBG4jYQuF3U7j/orSs5nw==
-  dependencies:
-    "@types/w3c-web-usb" "^1.0.6"
-    node-addon-api "^6.0.0"
-    node-gyp-build "^4.5.0"
-
-usb@^2.10.0:
-  version "2.10.0"
-  resolved "https://registry.yarnpkg.com/usb/-/usb-2.10.0.tgz#c582b62d709c85d63c76a9864fc670d6ad65928b"
-  integrity sha512-FbzLhziRs4rHnTDZX+eKl9yBVjiuMNX+opl0r8TFPj265PuNtqak3qw5c8DLpBwq3z1JZgAOgm5Nn7cV30nCxg==
+usb@^2.11.0:
+  version "2.11.0"
+  resolved "https://registry.yarnpkg.com/usb/-/usb-2.11.0.tgz#bbb2257c65534635a450aed3754df7c8844d518e"
+  integrity sha512-u5+NZ6DtoW8TIBtuSArQGAZZ/K15i3lYvZBAYmcgI+RcDS9G50/KPrUd3CrU8M92ahyCvg5e0gc8BDvr5Hwejg==
   dependencies:
     "@types/w3c-web-usb" "^1.0.6"
     node-addon-api "^7.0.0"
