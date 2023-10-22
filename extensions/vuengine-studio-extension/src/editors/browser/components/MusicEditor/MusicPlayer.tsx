@@ -1,6 +1,4 @@
 import React from 'react';
-import * as Tone from 'tone';
-import { Synth } from 'tone';
 import { SongNote } from './MusicEditorTypes';
 
 interface MusicPlayerProps {
@@ -12,13 +10,14 @@ interface MusicPlayerProps {
 }
 
 export default class MusicPlayer extends React.Component<MusicPlayerProps> {
-    protected synths: Synth[];
+    protected synths: any[];
     protected timer: NodeJS.Timer;
 
     constructor(props: MusicPlayerProps) {
         super(props);
         this.synths = [...[...Array(6)].map((n, i) =>
-            (new Tone.Synth().toDestination())
+            // (new Tone.Synth().toDestination())
+            undefined
         )];
     };
 
@@ -33,10 +32,10 @@ export default class MusicPlayer extends React.Component<MusicPlayerProps> {
             song.forEach((channel, index) => {
                 const note = channel[currentStep];
                 if (typeof note?.volumeL === 'number') {
-                    this.synths[index].volume.value = note!.volumeL!;
+                    // this.synths[index].volume.value = note!.volumeL!;
                 }
                 if (typeof note?.note === 'string') {
-                    this.synths[index].triggerAttack(note.note, 1);
+                    // this.synths[index].triggerAttack(note.note, 1);
                 }
             });
             increaseCurrentStep();
@@ -44,7 +43,7 @@ export default class MusicPlayer extends React.Component<MusicPlayerProps> {
             this.timer = setTimeout(() => this.playNote(), speed);
         } else {
             this.synths.map(synth => {
-                synth.triggerRelease();
+                // synth.triggerRelease();
             });
         }
     }
