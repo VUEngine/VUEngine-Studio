@@ -651,7 +651,7 @@ export class VesBuildService {
   }
 
   protected getThreads(): number {
-    return require('physical-cpu-count');
+    return window.electronVesCore.getPhysicalCpuCount();
   }
 
   protected computeProgress(): number {
