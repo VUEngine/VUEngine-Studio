@@ -11,7 +11,7 @@ interface MusicPlayerProps {
 
 export default class MusicPlayer extends React.Component<MusicPlayerProps> {
     protected synths: any[];
-    protected timer: NodeJS.Timer;
+    protected timeout: NodeJS.Timeout;
 
     constructor(props: MusicPlayerProps) {
         super(props);
@@ -22,7 +22,7 @@ export default class MusicPlayer extends React.Component<MusicPlayerProps> {
     };
 
     componentWillUnmount(): void {
-        clearTimeout(this.timer);
+        clearTimeout(this.timeout);
     }
 
     playNote(): void {
@@ -40,7 +40,7 @@ export default class MusicPlayer extends React.Component<MusicPlayerProps> {
             });
             increaseCurrentStep();
 
-            this.timer = setTimeout(() => this.playNote(), speed);
+            this.timeout = setTimeout(() => this.playNote(), speed);
         } else {
             this.synths.map(synth => {
                 // synth.triggerRelease();
@@ -51,8 +51,8 @@ export default class MusicPlayer extends React.Component<MusicPlayerProps> {
     componentDidUpdate(prevProps: MusicPlayerProps): void {
         const { playing, speed } = this.props;
         if (playing && playing !== prevProps.playing) {
-            clearTimeout(this.timer);
-            this.timer = setTimeout(() => this.playNote(), speed);
+            clearTimeout(this.timeout);
+            this.timeout = setTimeout(() => this.playNote(), speed);
         }
     }
 

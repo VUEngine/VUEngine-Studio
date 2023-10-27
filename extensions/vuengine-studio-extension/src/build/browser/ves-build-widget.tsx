@@ -21,7 +21,7 @@ import { BuildLogLine, BuildLogLineFileLink, BuildLogLineType, BuildResult } fro
 
 interface VesBuildWidgetState {
   logFilter: BuildLogLineType
-  timerInterval: NodeJS.Timer | undefined
+  timerInterval: NodeJS.Timeout | undefined
   outputRomExists: boolean
   autoScroll: boolean
 }
