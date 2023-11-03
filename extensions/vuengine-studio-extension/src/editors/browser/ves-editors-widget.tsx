@@ -87,8 +87,6 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         this.title.iconClass = 'fa fa-cog';
         this.title.closable = true;
 
-        this.update();
-
         this.autoSave = this.editorPreferences['files.autoSave'];
         this.autoSaveDelay = this.editorPreferences['files.autoSaveDelay'];
         this.editorPreferences.onPreferenceChanged(ev => {
@@ -117,22 +115,24 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     protected async doInit(): Promise<void> {
         await this.vesProjectService.ready;
         const type = this.vesProjectService.getProjectDataType(this.options.typeId);
-        if (type) {
-            this.schema = type?.schema;
-            this.uiSchema = type?.uiSchema;
-            if (type?.icon) {
-                this.title.iconClass = type.icon;
-            }
-            this.data = (this.options.itemId)
-                ? this.vesProjectService.getProjectDataItem(this.options.typeId, this.options.itemId)
-                : {};
-            if (this.data) {
-                this.setSavedData();
-                this.mergeOntoDefaults(type);
-                this.setTitle();
-            }
-            this.projectData = this.vesProjectService.getProjectData();
+        if (!type) {
+            return;
         }
+
+        this.schema = type?.schema;
+        this.uiSchema = type?.uiSchema;
+        if (type?.icon) {
+            this.title.iconClass = type.icon;
+        }
+        this.data = (this.options.itemId)
+            ? this.vesProjectService.getProjectDataItem(this.options.typeId, this.options.itemId)
+            : {};
+        if (this.data) {
+            this.setSavedData();
+            await this.mergeOntoDefaults(type);
+            this.setTitle();
+        }
+        this.projectData = this.vesProjectService.getProjectData();
 
         this.loading = false;
         this.update();
@@ -228,6 +228,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
             case 'boolean':
                 return getValue(false);
             case 'integer':
+            case 'number':
                 return getValue(0);
             case 'object':
                 let parsedData: any = {};

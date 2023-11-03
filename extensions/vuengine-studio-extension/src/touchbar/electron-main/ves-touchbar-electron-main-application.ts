@@ -1,10 +1,11 @@
 import { isOSX, MaybePromise, nls } from '@theia/core';
-import { app, BrowserWindow, nativeImage, TouchBar } from '@theia/core/electron-shared/electron';
+import { BrowserWindow, nativeImage, TouchBar } from '@theia/core/electron-shared/electron';
 import { ElectronMainApplication } from '@theia/core/lib/electron-main/electron-main-application';
 import { TheiaBrowserWindowOptions } from '@theia/core/lib/electron-main/theia-electron-window';
 import { injectable } from '@theia/core/shared/inversify';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
-import { BuildMode } from '../../build/browser/ves-build-types';
+import { BuildMode, BuildStatus } from '../../build/browser/ves-build-types';
+import { VesRendererAPI } from '../../core/electron-main/ves-electron-main-api';
 import { VesEmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
 import { VesProjectCommands } from '../../project/browser/ves-project-commands';
@@ -33,8 +34,8 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         // electronWindow.on('focus', async () => this.removeGreyOutWindow(electronWindow));
         // electronWindow.on('blur', async () => this.greyOutWindow(electronWindow));
 
-        // @ts-ignore
-        app.on(VesTouchBarCommands.init, workspaceOpened => this.registerVesTouchBar(electronWindow, workspaceOpened));
+        VesRendererAPI.onTouchBarCommand(VesTouchBarCommands.init, workspaceOpened => this.registerVesTouchBar(electronWindow, workspaceOpened));
+        this.registerVesTouchBar(electronWindow, true);
 
         return electronWindow;
     }
@@ -68,26 +69,26 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         const vesButton = new TouchBarButton({
             backgroundColor: '#a22929',
             icon: vesIcon,
-            // click: () => app.emit(VesTouchBarCommands.executeCommand, 'core.about'),
-            click: () => app.emit(VesTouchBarCommands.executeCommand, 'workbench.action.showCommands'),
+            // click: () => VesRendererAPI.sendTouchBarEvent(electronWindow.webContents, VesTouchBarCommands.executeCommand, 'core.about'),
+            click: () => VesRendererAPI.sendTouchBarEvent(electronWindow.webContents, VesTouchBarCommands.executeCommand, 'workbench.action.showCommands'),
         });
 
         const vesTouchBar = new TouchBar({
             items: workspaceOpened
                 ? [
                     vesButton,
-                    ...this.getProjectToolbarButtons(),
+                    ...this.getProjectToolbarButtons(electronWindow),
                 ]
                 : [
                     vesButton,
-                    ...this.getNoProjectToolbarButtons(),
+                    ...this.getNoProjectToolbarButtons(electronWindow),
                 ]
         });
 
         electronWindow.setTouchBar(vesTouchBar);
     }
 
-    protected getProjectToolbarButtons(): Array<Electron.TouchBarButton | Electron.TouchBarPopover | Electron.TouchBarSpacer> {
+    protected getProjectToolbarButtons(electronWindow: BrowserWindow): Array<Electron.TouchBarButton | Electron.TouchBarPopover | Electron.TouchBarSpacer> {
         const { TouchBarButton, TouchBarLabel, TouchBarPopover, TouchBarSegmentedControl, TouchBarSpacer } = TouchBar;
 
         const blankIcon = nativeImage.createFromDataURL(VesTouchBarIcons.BLANK).resize({ height: 18 });
@@ -99,19 +100,19 @@ export class VesElectronMainApplication extends ElectronMainApplication {
 
         const buildMenuBuildButton = new TouchBarButton({
             icon: buildIcon,
-            click: () => app.emit(VesTouchBarCommands.executeCommand, VesBuildCommands.BUILD.id),
+            click: () => VesRendererAPI.sendTouchBarEvent(electronWindow.webContents, VesTouchBarCommands.executeCommand, VesBuildCommands.BUILD.id),
         });
         const buildMenuRunButton = new TouchBarButton({
             icon: runIcon,
-            click: () => app.emit(VesTouchBarCommands.executeCommand, VesEmulatorCommands.RUN.id),
+            click: () => VesRendererAPI.sendTouchBarEvent(electronWindow.webContents, VesTouchBarCommands.executeCommand, VesEmulatorCommands.RUN.id),
         });
         const buildMenuFlashButton = new TouchBarButton({
             icon: flashIcon,
-            click: () => app.emit(VesTouchBarCommands.executeCommand, VesFlashCartCommands.FLASH.id),
+            click: () => VesRendererAPI.sendTouchBarEvent(electronWindow.webContents, VesTouchBarCommands.executeCommand, VesFlashCartCommands.FLASH.id),
         });
         const buildMenuCleanButton = new TouchBarButton({
             icon: cleanIcon,
-            click: () => app.emit(VesTouchBarCommands.executeCommand, VesBuildCommands.CLEAN.id),
+            click: () => VesRendererAPI.sendTouchBarEvent(electronWindow.webContents, VesTouchBarCommands.executeCommand, VesBuildCommands.CLEAN.id),
         });
 
         const buildModes = [{
@@ -129,7 +130,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             mode: 'single',
             segments: buildModes,
             selectedIndex: 1,
-            change: (selectedIndex: number) => app.emit(VesTouchBarCommands.setBuildMode, buildModes[selectedIndex].label),
+            change: (selectedIndex: number) => VesRendererAPI.sendTouchBarEvent(electronWindow.webContents, VesTouchBarCommands.setBuildMode, buildModes[selectedIndex].label),
         });
 
         const buildMenuSpacer = new TouchBarSpacer({
@@ -147,13 +148,11 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             }),
         });
 
-        // @ts-ignore
-        app.on(VesTouchBarCommands.changeBuildIsQueued, (isQueued: boolean) => {
+        VesRendererAPI.onTouchBarCommand(VesTouchBarCommands.changeBuildIsQueued, (isQueued: boolean) => {
             buildMenuBuildButton.label = '';
             buildMenuBuildButton.icon = isQueued ? queuedIcon : buildIcon;
         });
-        // @ts-ignore
-        app.on(VesTouchBarCommands.changeBuildStatus, (buildStatus: BuildStatus) => {
+        VesRendererAPI.onTouchBarCommand(VesTouchBarCommands.changeBuildStatus, (buildStatus: BuildStatus) => {
             if (buildStatus.active) {
                 buildMenuBuildButton.label = `${buildStatus.progress}%`;
                 buildMenuBuildButton.icon = blankIcon;
@@ -162,18 +161,15 @@ export class VesElectronMainApplication extends ElectronMainApplication {
                 buildMenuBuildButton.icon = buildIcon;
             }
         });
-        // @ts-ignore
-        app.on(VesTouchBarCommands.changeIsRunQueued, (isQueued: boolean) => {
+        VesRendererAPI.onTouchBarCommand(VesTouchBarCommands.changeIsRunQueued, (isQueued: boolean) => {
             buildMenuRunButton.label = '';
             buildMenuRunButton.icon = isQueued ? queuedIcon : runIcon;
         });
-        // @ts-ignore
-        app.on(VesTouchBarCommands.changeIsFlashQueued, (isQueued: boolean) => {
+        VesRendererAPI.onTouchBarCommand(VesTouchBarCommands.changeIsFlashQueued, (isQueued: boolean) => {
             buildMenuFlashButton.label = '';
             buildMenuFlashButton.icon = isQueued ? queuedIcon : flashIcon;
         });
-        // @ts-ignore
-        app.on(VesTouchBarCommands.changeIsFlashing, (isFlashing: boolean) => {
+        VesRendererAPI.onTouchBarCommand(VesTouchBarCommands.changeIsFlashing, (isFlashing: boolean) => {
             if (isFlashing) {
                 buildMenuFlashButton.label = '0%';
                 buildMenuFlashButton.icon = blankIcon;
@@ -182,16 +178,13 @@ export class VesElectronMainApplication extends ElectronMainApplication {
                 buildMenuFlashButton.icon = flashIcon;
             }
         });
-        // @ts-ignore
-        app.on(VesTouchBarCommands.onDidChangeFlashingProgress, (progress: number) => {
+        VesRendererAPI.onTouchBarCommand(VesTouchBarCommands.onDidChangeFlashingProgress, (progress: number) => {
             buildMenuFlashButton.label = progress > -1 ? `${progress}%` : '';
         });
-        // @ts-ignore
-        app.on(VesTouchBarCommands.changeConnectedFlashCart, flashCartConfig => {
+        VesRendererAPI.onTouchBarCommand(VesTouchBarCommands.changeConnectedFlashCart, flashCartConfig => {
             buildMenuFlashButton.enabled = !!flashCartConfig;
         });
-        // @ts-ignore
-        app.on(VesTouchBarCommands.changeBuildMode, (buildMode: BuildMode) => {
+        VesRendererAPI.onTouchBarCommand(VesTouchBarCommands.changeBuildMode, (buildMode: BuildMode) => {
             buildModeButton.label = buildMode;
         });
 
@@ -205,7 +198,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         ];
     }
 
-    protected getNoProjectToolbarButtons(): Array<Electron.TouchBarButton> {
+    protected getNoProjectToolbarButtons(electronWindow: BrowserWindow): Array<Electron.TouchBarButton> {
         const { TouchBarButton } = TouchBar;
 
         const newProjectIcon = nativeImage.createFromDataURL(VesTouchBarIcons.PLUS).resize({ height: 18 });
@@ -214,17 +207,17 @@ export class VesElectronMainApplication extends ElectronMainApplication {
 
         const newProjectButton = new TouchBarButton({
             icon: newProjectIcon,
-            click: () => app.emit(VesTouchBarCommands.executeCommand, VesProjectCommands.NEW.id),
+            click: () => VesRendererAPI.sendTouchBarEvent(electronWindow.webContents, VesTouchBarCommands.executeCommand, VesProjectCommands.NEW.id),
         });
         const openButton = new TouchBarButton({
             icon: openIcon,
-            click: () => app.emit(VesTouchBarCommands.executeCommand, isOSX
+            click: () => VesRendererAPI.sendTouchBarEvent(electronWindow.webContents, VesTouchBarCommands.executeCommand, isOSX
                 ? 'workspace:open'
                 : 'workspace:openFolder'),
         });
         const openWorkspaceButton = new TouchBarButton({
             icon: openWorkspaceIcon,
-            click: () => app.emit(VesTouchBarCommands.executeCommand, 'workspace:openWorkspace'),
+            click: () => VesRendererAPI.sendTouchBarEvent(electronWindow.webContents, VesTouchBarCommands.executeCommand, 'workspace:openWorkspace'),
         });
 
         return [

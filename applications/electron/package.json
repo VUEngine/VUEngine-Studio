@@ -110,7 +110,7 @@
     "@wdio/mocha-framework": "^6.8.0",
     "@wdio/spec-reporter": "^6.8.1",
     "app-builder-lib": "22.10.5",
-    "chai": "^4.2.0",
+    "chai": "^4.3.10",
     "electron": "^23.2.4",
     "electron-builder": "23.6.0",
     "electron-chromedriver": "9.0.0",

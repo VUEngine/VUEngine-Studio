@@ -1,18 +1,24 @@
 import { default as $RefParser, default as JSONSchema } from '@apidevtools/json-schema-ref-parser';
-import { MaybePromise } from '@theia/core';
+import { Disposable, MaybePromise } from '@theia/core';
 import { ElectronMainApplication, ElectronMainApplicationContribution } from '@theia/core/lib/electron-main/electron-main-application';
 import {
     ipcMain, systemPreferences
 } from '@theia/electron/shared/electron';
+import { FileContent } from '@theia/filesystem/lib/common/files';
+import { WebContents } from 'electron';
 import { glob } from 'glob';
 import { injectable } from 'inversify';
 import sortJson from 'sort-json';
+import { ImageData } from '../browser/ves-common-types';
 import {
     VES_CHANNEL_DEREFERENCE_JSON_SCHEMA,
     VES_CHANNEL_FIND_FILES,
     VES_CHANNEL_GET_PHYSICAL_CPU_COUNT,
     VES_CHANNEL_GET_USER_DEFAULT,
+    VES_CHANNEL_ON_TOUCHBAR_EVENT,
+    VES_CHANNEL_PARSE_PNG,
     VES_CHANNEL_REPLACE_IN_FILES,
+    VES_CHANNEL_SEND_TOUCHBAR_COMMAND,
     VES_CHANNEL_SET_ZOOM_FACTOR,
     VES_CHANNEL_SORT_JSON
 } from '../electron-common/ves-electron-api';
@@ -48,5 +54,55 @@ export class VesMainApi implements ElectronMainApplicationContribution {
         ipcMain.on(VES_CHANNEL_GET_PHYSICAL_CPU_COUNT, event => {
             event.returnValue = require('physical-cpu-count');
         });
+        ipcMain.handle(VES_CHANNEL_PARSE_PNG, async (event, fileContent: FileContent) => {
+            const PNG = require('@camoto/pngjs').PNG;
+            let imageData: ImageData | false = false;
+
+            await new Promise<void>((resolve, reject) => {
+                new PNG().parse(fileContent.value.buffer, (error: unknown, data: unknown): void => {
+                    console.error(error, data);
+                    resolve();
+                }).on('parsed', function (): void {
+                    // @ts-ignore: suppress implicit any errors
+                    const png = this;
+
+                    const height = png.height;
+                    const width = png.width;
+                    const colorType = png._parser._parser._colorType;
+                    const pixelDataBuffer = [...png._parser._inflate._outBuffer];
+
+                    const pixelData: number[][] = [];
+                    [...Array(height)].map((h, y) => {
+                        const line: number[] = [];
+                        [...Array(width)].map((w, x) => {
+                            // both +1 due to lines being prepended with an extra 0
+                            line.push(pixelDataBuffer[y * (width + 1) + x + 1]);
+                        });
+                        pixelData.push(line);
+                    });
+
+                    imageData = { height, width, colorType, pixelData };
+
+                    resolve();
+                });
+            });
+
+            return imageData;
+        });
+    }
+}
+
+export namespace VesRendererAPI {
+    export function sendTouchBarEvent(wc: WebContents, event: string, data?: any): void {
+        wc.send(VES_CHANNEL_ON_TOUCHBAR_EVENT, event, data);
+    }
+    export function onTouchBarCommand(command: string, handler: (data?: any) => void): Disposable {
+        const h = (_event: unknown, evt: string, data?: any) => {
+            if (command === evt) {
+                handler(data);
+            }
+        };
+        ipcMain.on(VES_CHANNEL_SEND_TOUCHBAR_COMMAND, h);
+        return Disposable.create(() => ipcMain.off(VES_CHANNEL_SEND_TOUCHBAR_COMMAND, h));
     }
 }

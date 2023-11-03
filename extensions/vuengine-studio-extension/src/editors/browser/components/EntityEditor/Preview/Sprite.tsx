@@ -1,7 +1,6 @@
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import React, { useEffect, useState } from 'react';
-import { VesCommonService } from '../../../../../core/browser/ves-common-service';
 import { ImageData } from '../../../../../core/browser/ves-common-types';
 import CssImage from '../../Common/CssImage';
 import { Displacement } from '../EntityEditorTypes';
@@ -10,7 +9,6 @@ interface SpriteProps {
   displacement: Displacement;
   height: number;
   imagePath: string;
-  vesCommonService: VesCommonService;
   fileService: FileService;
   workspaceService: WorkspaceService;
   width: number;
@@ -18,7 +16,7 @@ interface SpriteProps {
 }
 
 export default function Sprite(props: SpriteProps): React.JSX.Element {
-  const { fileService, vesCommonService, workspaceService } = props;
+  const { fileService, workspaceService } = props;
   const { displacement, height, imagePath, width, zoom } = props;
   const [imageData, setImageData] = useState<ImageData>();
   const [error, setError] = useState<string>();
@@ -30,7 +28,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
       const imageUri = workspaceRootUri.resolve(imagePath);
       if (await fileService.exists(imageUri)) {
         const imageFileContent = await fileService.readFile(imageUri);
-        const img = await vesCommonService.parsePng(imageFileContent);
+        const img = await window.electronVesCore.parsePng(imageFileContent);
         if (img) {
           if (img.colorType !== 3) {
             setError('wrong color type');

@@ -1,7 +1,6 @@
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import React, { useContext } from 'react';
-import { VesCommonService } from '../../../../../core/browser/ves-common-service';
 import HContainer from '../../Common/HContainer';
 import VContainer from '../../Common/VContainer';
 import {
@@ -12,13 +11,12 @@ import Sprite from './Sprite';
 import Palette from '../../Common/Palette';
 
 interface PreviewProps {
-  vesCommonService: VesCommonService;
   fileService: FileService;
   workspaceService: WorkspaceService;
 }
 
 export default function Preview(props: PreviewProps): React.JSX.Element {
-  const { fileService, vesCommonService, workspaceService } = props;
+  const { fileService, workspaceService } = props;
   const { state, setState } = useContext(
     EntityEditorContext
   ) as EntityEditorContextType;
@@ -47,7 +45,6 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
           width={16}
           zoom={state.preview.zoom}
           fileService={fileService}
-          vesCommonService={vesCommonService}
           workspaceService={workspaceService}
         />
       </div>
