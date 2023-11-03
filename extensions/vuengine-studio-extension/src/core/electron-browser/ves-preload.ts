@@ -1,10 +1,14 @@
 import { JsonSchema } from '@jsonforms/core';
+// import { Disposable } from '@theia/core';
+import { FileContent } from '@theia/filesystem/lib/common/files';
 import { VisitOptions } from 'sort-json';
+import { ImageData } from '../browser/ves-common-types';
 import {
     VES_CHANNEL_DEREFERENCE_JSON_SCHEMA,
     VES_CHANNEL_FIND_FILES,
     VES_CHANNEL_GET_PHYSICAL_CPU_COUNT,
     VES_CHANNEL_GET_USER_DEFAULT,
+    VES_CHANNEL_PARSE_PNG,
     VES_CHANNEL_REPLACE_IN_FILES,
     VES_CHANNEL_SET_ZOOM_FACTOR,
     VES_CHANNEL_SORT_JSON,
@@ -35,6 +39,24 @@ const api: VesCoreAPI = {
     getPhysicalCpuCount: function (): number {
         return ipcRenderer.sendSync(VES_CHANNEL_GET_PHYSICAL_CPU_COUNT);
     },
+    parsePng: async function (fileContent: FileContent): Promise<ImageData | false> {
+        return ipcRenderer.invoke(VES_CHANNEL_PARSE_PNG, fileContent);
+    },
+    /*
+    sendTouchBarCommand: function (command: string, data?: any): void {
+        return ipcRenderer.sendSync(VES_CHANNEL_SEND_TOUCHBAR_COMMAND, command, data);
+    },
+    onTouchBarEvent: function (command: string, handler: (data?: any) => void): Disposable {
+        const h = (_event: unknown, evt: string, data?: any) => {
+            console.log('evt', evt);
+            if (command === evt) {
+                handler(data);
+            }
+        };
+        ipcRenderer.on(VES_CHANNEL_ON_TOUCHBAR_EVENT, h);
+        return Disposable.create(() => ipcRenderer.off(VES_CHANNEL_ON_TOUCHBAR_EVENT, h));
+    },
+    */
 };
 
 export function preload(): void {

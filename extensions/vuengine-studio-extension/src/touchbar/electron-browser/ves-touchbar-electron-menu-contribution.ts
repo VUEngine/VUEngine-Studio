@@ -56,38 +56,46 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
     }
 
     protected async vesBindTouchBar(): Promise<void> {
-        /*
         await this.workspaceService.ready;
+        /*
         // TODO: add more touchbar modes for emulator etc
-        electronApp.emit(VesTouchBarCommands.init, this.workspaceService.opened);
+        window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.init, this.workspaceService.opened);
 
-        // @ts-ignore
-        electronApp.on(VesTouchBarCommands.executeCommand, (command: string) => this.commandService.executeCommand(command));
-        // @ts-ignore
-        electronApp.on(VesTouchBarCommands.setBuildMode, (buildMode: BuildMode) => this.preferenceService.set(
+        window.electronVesCore.onTouchBarEvent(VesTouchBarCommands.executeCommand, (command: string) => this.commandService.executeCommand(command));
+        window.electronVesCore.onTouchBarEvent(VesTouchBarCommands.setBuildMode, (buildMode: BuildMode) => this.preferenceService.set(
             VesBuildPreferenceIds.BUILD_MODE, buildMode, PreferenceScope.User
         ));
-        // @ts-ignore
-        electronApp.on(VesTouchBarCommands.setEmulator, (emulatorName: string) => this.preferenceService.set(
+        window.electronVesCore.onTouchBarEvent(VesTouchBarCommands.setEmulator, (emulatorName: string) => this.preferenceService.set(
             VesEmulatorPreferenceIds.DEFAULT_EMULATOR, emulatorName, PreferenceScope.User
         ));
 
         // init touchbar values
-        electronApp.emit(VesTouchBarCommands.changeBuildMode, this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE));
-        electronApp.emit(VesTouchBarCommands.changeConnectedFlashCart, this.vesFlashCartService.connectedFlashCarts);
-        electronApp.emit(VesTouchBarCommands.changeEmulator, this.vesEmulatorService.getDefaultEmulatorConfig().name);
-        electronApp.emit(VesTouchBarCommands.changeEmulatorConfigs, this.vesEmulatorService.getEmulatorConfigs());
 
-        this.vesBuildService.onDidChangeIsQueued(buildStatus => electronApp.emit(VesTouchBarCommands.changeBuildIsQueued, buildStatus));
-        this.vesBuildService.onDidChangeBuildStatus(buildStatus => electronApp.emit(VesTouchBarCommands.changeBuildStatus, buildStatus));
-        this.vesBuildService.onDidChangeBuildMode(buildMode => electronApp.emit(VesTouchBarCommands.changeBuildMode, buildMode));
-        this.vesEmulatorService.onDidChangeIsQueued(flag => electronApp.emit(VesTouchBarCommands.changeIsRunQueued, flag));
-        this.vesEmulatorService.onDidChangeEmulator(name => electronApp.emit(VesTouchBarCommands.changeEmulator, name));
-        this.vesEmulatorService.onDidChangeEmulatorConfigs(emulatorConfigs => electronApp.emit(VesTouchBarCommands.changeEmulatorConfigs, emulatorConfigs));
-        this.vesFlashCartService.onDidChangeIsQueued(flag => electronApp.emit(VesTouchBarCommands.changeIsFlashQueued, flag));
-        this.vesFlashCartService.onDidChangeIsFlashing(flag => electronApp.emit(VesTouchBarCommands.changeIsFlashing, flag));
-        this.vesFlashCartService.onDidChangeFlashingProgress(progress => electronApp.emit(VesTouchBarCommands.onDidChangeFlashingProgress, progress));
-        this.vesFlashCartService.onDidChangeConnectedFlashCarts(config => electronApp.emit(VesTouchBarCommands.changeConnectedFlashCart, config));
+        window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.changeBuildMode, this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE));
+        window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.changeConnectedFlashCart, this.vesFlashCartService.connectedFlashCarts);
+        window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.changeEmulator, this.vesEmulatorService.getDefaultEmulatorConfig().name);
+        window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.changeEmulatorConfigs, this.vesEmulatorService.getEmulatorConfigs());
+
+        this.vesBuildService.onDidChangeIsQueued(buildStatus =>
+            window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.changeBuildIsQueued, buildStatus));
+        this.vesBuildService.onDidChangeBuildStatus(buildStatus =>
+            window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.changeBuildStatus, buildStatus));
+        this.vesBuildService.onDidChangeBuildMode(buildMode =>
+            window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.changeBuildMode, buildMode));
+        this.vesEmulatorService.onDidChangeIsQueued(flag =>
+            window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.changeIsRunQueued, flag));
+        this.vesEmulatorService.onDidChangeEmulator(name =>
+            window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.changeEmulator, name));
+        this.vesEmulatorService.onDidChangeEmulatorConfigs(emulatorConfigs =>
+            window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.changeEmulatorConfigs, emulatorConfigs));
+        this.vesFlashCartService.onDidChangeIsQueued(flag =>
+            window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.changeIsFlashQueued, flag));
+        this.vesFlashCartService.onDidChangeIsFlashing(flag =>
+            window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.changeIsFlashing, flag));
+        this.vesFlashCartService.onDidChangeFlashingProgress(progress =>
+            window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.onDidChangeFlashingProgress, progress));
+        this.vesFlashCartService.onDidChangeConnectedFlashCarts(config =>
+            window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.changeConnectedFlashCart, config));
         */
     }
 }

@@ -4,7 +4,6 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import DockLayout, { LayoutBase, LayoutData } from 'rc-dock';
 import React from 'react';
-import { VesCommonService } from '../../../../core/browser/ves-common-service';
 import Animations from './Animations/Animations';
 import Behaviors from './Behaviors/Behaviors';
 import Children from './Children/Children';
@@ -27,7 +26,6 @@ interface EntityEditorProps {
   updateEntityData: (entityData: EntityData) => void;
   services: {
     fileService: FileService;
-    vesCommonService: VesCommonService;
     localStorageService: LocalStorageService;
     workspaceService: WorkspaceService;
   };
@@ -244,7 +242,6 @@ export default class EntityEditor extends React.Component<
                     {context => (
                       <Preview
                         fileService={this.props.services.fileService}
-                        vesCommonService={this.props.services.vesCommonService}
                         workspaceService={this.props.services.workspaceService}
                       />
                     )}
