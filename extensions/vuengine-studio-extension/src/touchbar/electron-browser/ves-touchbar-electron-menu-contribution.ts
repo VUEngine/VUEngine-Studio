@@ -1,13 +1,16 @@
 import { CommandService, isOSX } from '@theia/core';
-import { FrontendApplication, PreferenceService } from '@theia/core/lib/browser';
+import { FrontendApplication, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
 import { ElectronMenuContribution } from '@theia/core/lib/electron-browser/menu/electron-menu-contribution';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesBuildPreferenceIds } from '../../build/browser/ves-build-preferences';
 import { VesBuildService } from '../../build/browser/ves-build-service';
+import { BuildMode } from '../../build/browser/ves-build-types';
 import { VesCommonService } from '../../core/browser/ves-common-service';
+import { VesEmulatorPreferenceIds } from '../../emulator/browser/ves-emulator-preferences';
 import { VesEmulatorService } from '../../emulator/browser/ves-emulator-service';
 import { VesFlashCartService } from '../../flash-cart/browser/ves-flash-cart-service';
+import { VesTouchBarCommands } from '../common/ves-touchbar-types';
 
 @injectable()
 export class VesElectronMenuContribution extends ElectronMenuContribution {
@@ -57,7 +60,6 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
 
     protected async vesBindTouchBar(): Promise<void> {
         await this.workspaceService.ready;
-        /*
         // TODO: add more touchbar modes for emulator etc
         window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.init, this.workspaceService.opened);
 
@@ -96,6 +98,5 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
             window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.onDidChangeFlashingProgress, progress));
         this.vesFlashCartService.onDidChangeConnectedFlashCarts(config =>
             window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.changeConnectedFlashCart, config));
-        */
     }
 }

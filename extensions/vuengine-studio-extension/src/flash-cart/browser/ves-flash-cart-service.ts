@@ -30,11 +30,9 @@ import {
   PORT_PLACEHOLDER,
   PROG_VB_PLACEHOLDER,
   ROM_PLACEHOLDER
-} from '../common/ves-flash-cart-types';
-import { VesFlashCartUsbService } from '../common/ves-flash-cart-usb-service-protocol';
+} from './ves-flash-cart-types';
 import { VesFlashCartCommands } from './ves-flash-cart-commands';
-import { VesFlashCartPreferenceIds } from './ves-flash-cart-preferences';
-import { VesFlashCartUsbWatcher } from './ves-flash-cart-usb-watcher';
+import { BUILT_IN_FLASH_CART_CONFIGS, VesFlashCartPreferenceIds } from './ves-flash-cart-preferences';
 
 @injectable()
 export class VesFlashCartService {
@@ -54,10 +52,6 @@ export class VesFlashCartService {
   protected readonly vesBuildService: VesBuildService;
   @inject(VesCommonService)
   protected readonly vesCommonService: VesCommonService;
-  @inject(VesFlashCartUsbService)
-  protected readonly vesFlashCartUsbService: VesFlashCartUsbService;
-  @inject(VesFlashCartUsbWatcher)
-  protected readonly vesFlashCartUsbWatcher: VesFlashCartUsbWatcher;
   @inject(VesProcessService)
   protected readonly vesProcessService: VesProcessService;
   @inject(VesProcessWatcher)
@@ -290,8 +284,7 @@ export class VesFlashCartService {
     );
 
     // watch for flash cart attach/detach
-    this.vesFlashCartUsbWatcher.onDidAttachDevice(async () => this.detectConnectedFlashCarts());
-    this.vesFlashCartUsbWatcher.onDidDetachDevice(async () => this.detectConnectedFlashCarts());
+    window.electronVesCore.onUsbDeviceChange(() => this.detectConnectedFlashCarts());
 
     this.vesBuildService.onDidSucceedBuild(async () => {
       if (this.isQueued) {
@@ -304,7 +297,7 @@ export class VesFlashCartService {
     });
 
     this.vesBuildService.onDidChangeRomSize(() => {
-      this.determineAllCanHoldRom();
+      this.determineAtLeastOneCanHoldRom();
     });
 
     this.vesProcessWatcher.onDidExitProcess(({ pId, event }) => {
@@ -496,10 +489,32 @@ export class VesFlashCartService {
 
   async detectConnectedFlashCarts(): Promise<void> {
     const flashCartConfigs: FlashCartConfig[] = this.getFlashCartConfigs();
-    const connectedFlashCarts = await this.vesFlashCartUsbService.detectFlashCarts(
-      ...flashCartConfigs
-    );
+    navigator.usb.requestDevice({ filters: [] }).catch();
+    const devices: USBDevice[] = await navigator.usb.getDevices();
+    const connectedFlashCarts: ConnectedFlashCart[] = [];
+    for (const device of devices) {
+      for (const flashCartConfig of flashCartConfigs) {
+        if (device.vendorId === flashCartConfig.vid &&
+          device.productId === flashCartConfig.pid &&
+          device.productName === flashCartConfig.product &&
+          device.manufacturerName === flashCartConfig.manufacturer) {
+          connectedFlashCarts.push({
+            config: flashCartConfig,
+            port: device.serialNumber || '',
+            status: {
+              processId: -1,
+              step: '',
+              progress: -1,
+              log: [],
+            },
+            canHoldRom: await this.determineCanHoldRom(flashCartConfig.size),
+          });
+          break;
+        }
+      }
+    }
 
+    // merge onto already known carts to prevent losing status when another USB device is dis/connected
     this.connectedFlashCarts = connectedFlashCarts.map(connectedFlashCart => {
       const known = this.connectedFlashCarts.find(cfc =>
         cfc.port === connectedFlashCart.port &&
@@ -508,7 +523,7 @@ export class VesFlashCartService {
       return known ? known : connectedFlashCart;
     });
 
-    this.determineAllCanHoldRom();
+    this.determineAtLeastOneCanHoldRom();
   };
 
   getFlashCartConfigs(): FlashCartConfig[] {
@@ -554,16 +569,12 @@ export class VesFlashCartService {
       .resolve(isWindows ? 'hfcli.exe' : 'hfcli');
   }
 
-  protected determineCanHoldRom(flashSize: number): boolean {
+  protected async determineCanHoldRom(flashSize: number): Promise<boolean> {
+    await this.vesBuildService.ready;
     return flashSize >= this.vesBuildService.bytesToMbit(this.vesBuildService.romSize);
   }
 
-  protected determineAllCanHoldRom(): void {
-    this.connectedFlashCarts = this.connectedFlashCarts.map((connectedFlashCart: ConnectedFlashCart) => ({
-      ...connectedFlashCart,
-      canHoldRom: this.determineCanHoldRom(connectedFlashCart.config.size),
-    }));
-
+  protected determineAtLeastOneCanHoldRom(): void {
     let atLeastOneCanHoldRom = false;
     this.connectedFlashCarts.forEach((connectedFlashCart: ConnectedFlashCart) => {
       if (connectedFlashCart.canHoldRom) {

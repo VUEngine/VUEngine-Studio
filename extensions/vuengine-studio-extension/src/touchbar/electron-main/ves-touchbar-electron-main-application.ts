@@ -34,7 +34,9 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         // electronWindow.on('focus', async () => this.removeGreyOutWindow(electronWindow));
         // electronWindow.on('blur', async () => this.greyOutWindow(electronWindow));
 
-        VesRendererAPI.onTouchBarCommand(VesTouchBarCommands.init, workspaceOpened => this.registerVesTouchBar(electronWindow, workspaceOpened));
+        this.setUpWebUSB(electronWindow);
+
+        VesRendererAPI.onTouchBarCommand(electronWindow.webContents, VesTouchBarCommands.init, workspaceOpened => this.registerVesTouchBar(electronWindow, workspaceOpened));
         this.registerVesTouchBar(electronWindow, true);
 
         return electronWindow;
@@ -48,6 +50,22 @@ export class VesElectronMainApplication extends ElectronMainApplication {
     protected async removeGreyOutWindow(electronWindow: BrowserWindow): Promise<void> {
         await electronWindow.webContents.removeInsertedCSS(this.grayscaleCss);
         this.grayscaleCss = await electronWindow.webContents.insertCSS('html { filter: unset; transition: unset; }');
+    }
+
+    protected async setUpWebUSB(electronWindow: BrowserWindow): Promise<void> {
+        electronWindow.webContents.session.on('usb-device-added', (evt, device) => {
+            VesRendererAPI.sendUsbDeviceChange(electronWindow.webContents);
+        });
+
+        electronWindow.webContents.session.on('usb-device-removed', (evt, device) => {
+            VesRendererAPI.sendUsbDeviceChange(electronWindow.webContents);
+        });
+
+        electronWindow.webContents.session.setPermissionCheckHandler((webContents, permission, requestingOrigin, details) =>
+            (permission === 'usb' && details.securityOrigin === 'file:///'));
+
+        electronWindow.webContents.session.setDevicePermissionHandler(details =>
+            (details.deviceType === 'usb' && details.origin === 'file://'));
     }
 
     protected getDefaultOptions(): TheiaBrowserWindowOptions {
@@ -148,11 +166,11 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             }),
         });
 
-        VesRendererAPI.onTouchBarCommand(VesTouchBarCommands.changeBuildIsQueued, (isQueued: boolean) => {
+        VesRendererAPI.onTouchBarCommand(electronWindow.webContents, VesTouchBarCommands.changeBuildIsQueued, (isQueued: boolean) => {
             buildMenuBuildButton.label = '';
             buildMenuBuildButton.icon = isQueued ? queuedIcon : buildIcon;
         });
-        VesRendererAPI.onTouchBarCommand(VesTouchBarCommands.changeBuildStatus, (buildStatus: BuildStatus) => {
+        VesRendererAPI.onTouchBarCommand(electronWindow.webContents, VesTouchBarCommands.changeBuildStatus, (buildStatus: BuildStatus) => {
             if (buildStatus.active) {
                 buildMenuBuildButton.label = `${buildStatus.progress}%`;
                 buildMenuBuildButton.icon = blankIcon;
@@ -161,15 +179,15 @@ export class VesElectronMainApplication extends ElectronMainApplication {
                 buildMenuBuildButton.icon = buildIcon;
             }
         });
-        VesRendererAPI.onTouchBarCommand(VesTouchBarCommands.changeIsRunQueued, (isQueued: boolean) => {
+        VesRendererAPI.onTouchBarCommand(electronWindow.webContents, VesTouchBarCommands.changeIsRunQueued, (isQueued: boolean) => {
             buildMenuRunButton.label = '';
             buildMenuRunButton.icon = isQueued ? queuedIcon : runIcon;
         });
-        VesRendererAPI.onTouchBarCommand(VesTouchBarCommands.changeIsFlashQueued, (isQueued: boolean) => {
+        VesRendererAPI.onTouchBarCommand(electronWindow.webContents, VesTouchBarCommands.changeIsFlashQueued, (isQueued: boolean) => {
             buildMenuFlashButton.label = '';
             buildMenuFlashButton.icon = isQueued ? queuedIcon : flashIcon;
         });
-        VesRendererAPI.onTouchBarCommand(VesTouchBarCommands.changeIsFlashing, (isFlashing: boolean) => {
+        VesRendererAPI.onTouchBarCommand(electronWindow.webContents, VesTouchBarCommands.changeIsFlashing, (isFlashing: boolean) => {
             if (isFlashing) {
                 buildMenuFlashButton.label = '0%';
                 buildMenuFlashButton.icon = blankIcon;
@@ -178,13 +196,13 @@ export class VesElectronMainApplication extends ElectronMainApplication {
                 buildMenuFlashButton.icon = flashIcon;
             }
         });
-        VesRendererAPI.onTouchBarCommand(VesTouchBarCommands.onDidChangeFlashingProgress, (progress: number) => {
+        VesRendererAPI.onTouchBarCommand(electronWindow.webContents, VesTouchBarCommands.onDidChangeFlashingProgress, (progress: number) => {
             buildMenuFlashButton.label = progress > -1 ? `${progress}%` : '';
         });
-        VesRendererAPI.onTouchBarCommand(VesTouchBarCommands.changeConnectedFlashCart, flashCartConfig => {
+        VesRendererAPI.onTouchBarCommand(electronWindow.webContents, VesTouchBarCommands.changeConnectedFlashCart, flashCartConfig => {
             buildMenuFlashButton.enabled = !!flashCartConfig;
         });
-        VesRendererAPI.onTouchBarCommand(VesTouchBarCommands.changeBuildMode, (buildMode: BuildMode) => {
+        VesRendererAPI.onTouchBarCommand(electronWindow.webContents, VesTouchBarCommands.changeBuildMode, (buildMode: BuildMode) => {
             buildModeButton.label = buildMode;
         });
 

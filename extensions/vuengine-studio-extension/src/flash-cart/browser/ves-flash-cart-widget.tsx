@@ -9,7 +9,7 @@ import IMAGE_HYPERFLASH32_LABEL from '../../../src/flash-cart/browser/images/hyp
 import IMAGE_NO_FLASH_CARTS from '../../../src/flash-cart/browser/images/no-flash-carts.png';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
-import { ConnectedFlashCart, FlashLogLine, HYPERFLASH32_PREFERENCE_NAME } from '../common/ves-flash-cart-types';
+import { ConnectedFlashCart, FlashLogLine, HYPERFLASH32_PREFERENCE_NAME } from './ves-flash-cart-types';
 import { VesFlashCartCommands } from './ves-flash-cart-commands';
 import { VesFlashCartPreferenceIds } from './ves-flash-cart-preferences';
 import { VesFlashCartService } from './ves-flash-cart-service';

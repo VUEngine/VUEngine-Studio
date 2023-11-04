@@ -1,7 +1,9 @@
 import { default as $RefParser, default as JSONSchema } from '@apidevtools/json-schema-ref-parser';
 import { Disposable, MaybePromise } from '@theia/core';
 import { ElectronMainApplication, ElectronMainApplicationContribution } from '@theia/core/lib/electron-main/electron-main-application';
+import { createDisposableListener } from '@theia/core/lib/electron-main/event-utils';
 import {
+    IpcMainEvent,
     ipcMain, systemPreferences
 } from '@theia/electron/shared/electron';
 import { FileContent } from '@theia/filesystem/lib/common/files';
@@ -16,6 +18,7 @@ import {
     VES_CHANNEL_GET_PHYSICAL_CPU_COUNT,
     VES_CHANNEL_GET_USER_DEFAULT,
     VES_CHANNEL_ON_TOUCHBAR_EVENT,
+    VES_CHANNEL_ON_USB_DEVICE_CHANGE,
     VES_CHANNEL_PARSE_PNG,
     VES_CHANNEL_REPLACE_IN_FILES,
     VES_CHANNEL_SEND_TOUCHBAR_COMMAND,
@@ -96,13 +99,14 @@ export namespace VesRendererAPI {
     export function sendTouchBarEvent(wc: WebContents, event: string, data?: any): void {
         wc.send(VES_CHANNEL_ON_TOUCHBAR_EVENT, event, data);
     }
-    export function onTouchBarCommand(command: string, handler: (data?: any) => void): Disposable {
-        const h = (_event: unknown, evt: string, data?: any) => {
-            if (command === evt) {
+    export function sendUsbDeviceChange(wc: WebContents): void {
+        wc.send(VES_CHANNEL_ON_USB_DEVICE_CHANGE);
+    }
+    export function onTouchBarCommand(wc: WebContents, command: string, handler: (data?: any) => void): Disposable {
+        return createDisposableListener<IpcMainEvent>(ipcMain, VES_CHANNEL_SEND_TOUCHBAR_COMMAND, (event, data: any) => {
+            if (wc.id === event.sender.id) {
                 handler(data);
             }
-        };
-        ipcMain.on(VES_CHANNEL_SEND_TOUCHBAR_COMMAND, h);
-        return Disposable.create(() => ipcMain.off(VES_CHANNEL_SEND_TOUCHBAR_COMMAND, h));
+        });
     }
 }
