@@ -75,7 +75,7 @@ export const BUILT_IN_FLASH_CART_CONFIGS: Array<FlashCartConfig> = [
       vid: 1027,
       pid: 24577,
       manufacturer: 'FTDI',
-      product: 'FT232R',
+      product: 'FT232R USB UART',
     }, {
       // Cypress chips
       vid: 1204,

@@ -1,5 +1,5 @@
 import { injectable, postConstruct } from '@theia/core/shared/inversify';
-import { SerialPort } from 'serialport';
+// import { SerialPort } from 'serialport';
 // import { usb } from 'usb';
 // import { RUMBLE_PACK_IDS } from '../common/ves-rumble-pack-types';
 import { VesRumblePackUsbService, VesRumblePackUsbServiceClient } from '../common/ves-rumble-pack-usb-service-protocol';
@@ -7,7 +7,7 @@ import { VesRumblePackUsbService, VesRumblePackUsbServiceClient } from '../commo
 @injectable()
 export class VesRumblePackUsbServiceImpl implements VesRumblePackUsbService {
     protected client: VesRumblePackUsbServiceClient | undefined;
-    protected port: SerialPort | undefined;
+    protected port: undefined; // SerialPort | undefined;
 
     dispose(): void {
         throw new Error('Method not implemented.');
@@ -59,7 +59,7 @@ export class VesRumblePackUsbServiceImpl implements VesRumblePackUsbService {
     sendCommand(command: string): boolean {
         const preparedCommand = `<${command}>`;
         this.client?.onDidReceiveData(`→ Command sent:  ${preparedCommand}\n`);
-        return this.port?.write(preparedCommand) || false;
+        return false; // this.port?.write(preparedCommand) || false;
     }
 
     sendCommandPrintMenu(): boolean {

@@ -32,7 +32,7 @@ import {
   ROM_PLACEHOLDER
 } from './ves-flash-cart-types';
 import { VesFlashCartCommands } from './ves-flash-cart-commands';
-import { BUILT_IN_FLASH_CART_CONFIGS, VesFlashCartPreferenceIds } from './ves-flash-cart-preferences';
+import { VesFlashCartPreferenceIds } from './ves-flash-cart-preferences';
 
 @injectable()
 export class VesFlashCartService {
@@ -487,19 +487,16 @@ export class VesFlashCartService {
     }
   }
 
-  async detectConnectedFlashCarts(): Promise<void> {
-    const flashCartConfigs: FlashCartConfig[] = this.getFlashCartConfigs();
-    navigator.usb.requestDevice({ filters: [] }).catch();
-    const devices: USBDevice[] = await navigator.usb.getDevices();
-    const connectedFlashCarts: ConnectedFlashCart[] = [];
-    for (const device of devices) {
-      for (const flashCartConfig of flashCartConfigs) {
-        if (device.vendorId === flashCartConfig.vid &&
-          device.productId === flashCartConfig.pid &&
-          device.productName === flashCartConfig.product &&
-          device.manufacturerName === flashCartConfig.manufacturer) {
-          connectedFlashCarts.push({
+  protected async matchFlashCart(device: USBDevice, flashCartConfigs: FlashCartConfig[]): Promise<ConnectedFlashCart | undefined> {
+    for (const flashCartConfig of flashCartConfigs) {
+      for (const deviceCodes of flashCartConfig.deviceCodes) {
+        if (device.vendorId === deviceCodes.vid &&
+          device.productId === deviceCodes.pid &&
+          device.productName === deviceCodes.product &&
+          device.manufacturerName === deviceCodes.manufacturer) {
+          return {
             config: flashCartConfig,
+            deviceCodes,
             port: device.serialNumber || '',
             status: {
               processId: -1,
@@ -508,21 +505,29 @@ export class VesFlashCartService {
               log: [],
             },
             canHoldRom: await this.determineCanHoldRom(flashCartConfig.size),
-          });
-          break;
+          };
         }
       }
     }
+  }
 
-    // merge onto already known carts to prevent losing status when another USB device is dis/connected
-    this.connectedFlashCarts = connectedFlashCarts.map(connectedFlashCart => {
-      const known = this.connectedFlashCarts.find(cfc =>
-        cfc.port === connectedFlashCart.port &&
-        JSON.stringify(cfc.config) === JSON.stringify(connectedFlashCart.config)
-      );
-      return known ? known : connectedFlashCart;
-    });
-
+  async detectConnectedFlashCarts(): Promise<void> {
+    const flashCartConfigs: FlashCartConfig[] = this.getFlashCartConfigs();
+    navigator.usb.requestDevice({ filters: [] }).catch();
+    const devices: USBDevice[] = await navigator.usb.getDevices();
+    const connectedFlashCarts: ConnectedFlashCart[] = [];
+    for (const device of devices) {
+      const matchedFlashCart = await this.matchFlashCart(device, flashCartConfigs);
+      if (matchedFlashCart) {
+        // look for matches in already known carts to prevent losing status when another USB device is dis/connected
+        const known = this.connectedFlashCarts.find(cfc =>
+          cfc.port === matchedFlashCart.port &&
+          JSON.stringify(cfc.config) === JSON.stringify(matchedFlashCart.config)
+        );
+        connectedFlashCarts.push(known ? known : matchedFlashCart);
+      }
+    }
+    this.connectedFlashCarts = connectedFlashCarts;
     this.determineAtLeastOneCanHoldRom();
   };
 
