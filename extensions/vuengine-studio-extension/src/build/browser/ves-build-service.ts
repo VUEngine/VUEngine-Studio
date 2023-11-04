@@ -2,6 +2,7 @@ import { CommandRegistry, CommandService, isOSX, isWindows, nls } from '@theia/c
 import { ApplicationShell, ConfirmDialog, LabelProvider, PreferenceScope, PreferenceService, QuickPickItem, QuickPickOptions, QuickPickService } from '@theia/core/lib/browser';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
+import { Deferred } from '@theia/core/lib/common/promise-util';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
@@ -69,6 +70,11 @@ export class VesBuildService {
   protected readonly vesProcessWatcher: VesProcessWatcher;
   @inject(WorkspaceService)
   protected readonly workspaceService: WorkspaceService;
+
+  protected _ready = new Deferred<void>();
+  get ready(): Promise<void> {
+    return this._ready.promise;
+  }
 
   // is queued
   protected _isQueued: boolean = false;
@@ -242,6 +248,8 @@ export class VesBuildService {
     } else {
       this.romSize = 0;
     }
+
+    this._ready.resolve();
   }
 
   protected bindEvents(): void {

@@ -5,12 +5,9 @@ import {
     FrontendApplicationContribution,
     KeybindingContribution,
     PreferenceContribution,
-    WebSocketConnectionProvider,
     WidgetFactory
 } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
-import { VesFlashCartUsbService, VES_FLASH_CART_USB_SERVICE_PATH } from '../common/ves-flash-cart-usb-service-protocol';
-import { VesFlashCartUsbWatcher } from './ves-flash-cart-usb-watcher';
 import { VesFlashCartContribution } from './ves-flash-cart-contribution';
 import { VesFlashCartService } from './ves-flash-cart-service';
 import { VesFlashCartViewContribution } from './ves-flash-cart-view-contribution';
@@ -37,15 +34,6 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     // flash cart service
     bind(VesFlashCartService).toSelf().inSingletonScope();
-
-    // flash cart usb service
-    bind(VesFlashCartUsbService).toDynamicValue(ctx => {
-        const provider = ctx.container.get(WebSocketConnectionProvider);
-        return provider.createProxy<VesFlashCartUsbService>(VES_FLASH_CART_USB_SERVICE_PATH);
-    }).inSingletonScope();
-
-    // flash cart usb watcher
-    bind(VesFlashCartUsbWatcher).toSelf().inSingletonScope();
 
     // flash cart view
     bindViewContribution(bind, VesFlashCartViewContribution);
