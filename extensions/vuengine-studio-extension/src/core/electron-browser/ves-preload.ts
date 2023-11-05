@@ -56,8 +56,8 @@ const api: VesCoreAPI = {
         ipcRenderer.send(VES_CHANNEL_SEND_TOUCHBAR_COMMAND, command, data);
     },
     onTouchBarEvent: function (command: string, handler: (data?: any) => void): Disposable {
-        const h = (_event: unknown, evt: string, data?: any) => {
-            if (command === evt) {
+        const h = (_event: unknown, cmd: string, data?: any) => {
+            if (command === cmd) {
                 handler(data);
             }
         };

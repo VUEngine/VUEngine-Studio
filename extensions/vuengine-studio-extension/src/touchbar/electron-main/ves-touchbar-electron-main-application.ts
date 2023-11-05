@@ -35,9 +35,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         // electronWindow.on('blur', async () => this.greyOutWindow(electronWindow));
 
         this.setUpWebUSB(electronWindow);
-
         VesRendererAPI.onTouchBarCommand(electronWindow.webContents, VesTouchBarCommands.init, workspaceOpened => this.registerVesTouchBar(electronWindow, workspaceOpened));
-        this.registerVesTouchBar(electronWindow, true);
 
         return electronWindow;
     }

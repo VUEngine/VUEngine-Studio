@@ -96,16 +96,18 @@ export class VesMainApi implements ElectronMainApplicationContribution {
 }
 
 export namespace VesRendererAPI {
-    export function sendTouchBarEvent(wc: WebContents, event: string, data?: any): void {
-        wc.send(VES_CHANNEL_ON_TOUCHBAR_EVENT, event, data);
-    }
     export function sendUsbDeviceChange(wc: WebContents): void {
         wc.send(VES_CHANNEL_ON_USB_DEVICE_CHANGE);
     }
+    export function sendTouchBarEvent(wc: WebContents, event: string, data?: any): void {
+        wc.send(VES_CHANNEL_ON_TOUCHBAR_EVENT, event, data);
+    }
     export function onTouchBarCommand(wc: WebContents, command: string, handler: (data?: any) => void): Disposable {
-        return createDisposableListener<IpcMainEvent>(ipcMain, VES_CHANNEL_SEND_TOUCHBAR_COMMAND, (event, data: any) => {
+        return createDisposableListener<IpcMainEvent>(ipcMain, VES_CHANNEL_SEND_TOUCHBAR_COMMAND, (event, cmd: string, data?: any) => {
             if (wc.id === event.sender.id) {
-                handler(data);
+                if (command === cmd) {
+                    handler(data);
+                }
             }
         });
     }
