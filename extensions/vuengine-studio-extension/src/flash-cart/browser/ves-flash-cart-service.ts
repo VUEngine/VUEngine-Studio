@@ -169,14 +169,14 @@ export class VesFlashCartService {
 
       if (!flasherPath) {
         this.messageService.error(
-          nls.localize('vuengine/flashCarts/noPathToFlasherSoftwareProvided', 'No path to flasher software provided for cart ${0}', connectedFlashCart.config.name)
+          nls.localize('vuengine/flashCarts/noPathToFlasherSoftwareProvided', 'No path to flasher software provided for cart {0}', connectedFlashCart.config.name)
         );
         return connectedFlashCart;
       }
 
       if (!await this.fileService.exists(new URI(flasherPath).withScheme('file'))) {
         this.messageService.error(
-          nls.localize('vuengine/flashCarts/flasherSoftwareDoesNotExist', 'Flasher software does not exist at ${0}', flasherPath)
+          nls.localize('vuengine/flashCarts/flasherSoftwareDoesNotExist', 'Flasher software does not exist at {0}', flasherPath)
         );
         return connectedFlashCart;
       }

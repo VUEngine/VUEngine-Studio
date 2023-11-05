@@ -1325,7 +1325,7 @@
         "category": "Export",
         "export": "Export ROM..."
       },
-      "doYouReallyWantToOverwrite": "Do you really want to overwrite \"${}\"?",
+      "doYouReallyWantToOverwrite": "Do you really want to overwrite \"{0}\"?",
       "exportQueued": "Export Queued",
       "exportRom": "Export ROM",
       "overwrite": "Overwrite"
@@ -1347,11 +1347,11 @@
       "done": "Done",
       "flash": "Flash",
       "flashCarts": "Flash Carts",
-      "flasherSoftwareDoesNotExist": "Flasher software does not exist at ${0}",
+      "flasherSoftwareDoesNotExist": "Flasher software does not exist at {0}",
       "flashingIsQueued": "Flashing is queued and will start once the build is ready",
       "flashingQueued": "Flashing Queued",
       "insufficientSpaceToHoldRom": "Insufficient space to hold ROM",
-      "noPathToFlasherSoftwareProvided": "No path to flasher software provided for cart ${0}",
+      "noPathToFlasherSoftwareProvided": "No path to flasher software provided for cart {0}",
       "noneFound": "No flash carts found",
       "preferences": {
         "automaticallyQueue": "Automatically queue",
