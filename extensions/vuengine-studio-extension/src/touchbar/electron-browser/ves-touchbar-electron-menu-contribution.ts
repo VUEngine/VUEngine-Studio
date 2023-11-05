@@ -72,7 +72,6 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
         ));
 
         // init touchbar values
-
         window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.changeBuildMode, this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE));
         window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.changeConnectedFlashCart, this.vesFlashCartService.connectedFlashCarts);
         window.electronVesCore.sendTouchBarCommand(VesTouchBarCommands.changeEmulator, this.vesEmulatorService.getDefaultEmulatorConfig().name);

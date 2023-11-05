@@ -267,6 +267,7 @@ export class VesFlashCartService {
     this.frontendApplicationStateService.onStateChanged(
       async (state: FrontendApplicationState) => {
         if (state === 'attached_shell') {
+          navigator.usb.requestDevice({ filters: [] }).catch();
           this.detectConnectedFlashCarts();
         }
       }
