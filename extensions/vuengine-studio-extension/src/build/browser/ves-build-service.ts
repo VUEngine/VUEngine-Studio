@@ -1,5 +1,15 @@
 import { CommandRegistry, CommandService, isOSX, isWindows, nls } from '@theia/core';
-import { ApplicationShell, ConfirmDialog, LabelProvider, PreferenceScope, PreferenceService, QuickPickItem, QuickPickOptions, QuickPickService } from '@theia/core/lib/browser';
+import {
+  ApplicationShell,
+  ConfirmDialog,
+  LabelProvider,
+  LocalStorageService,
+  PreferenceScope,
+  PreferenceService,
+  QuickPickItem,
+  QuickPickOptions,
+  QuickPickService
+} from '@theia/core/lib/browser';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import { Deferred } from '@theia/core/lib/common/promise-util';
@@ -50,6 +60,8 @@ export class VesBuildService {
   protected readonly frontendApplicationStateService: FrontendApplicationStateService;
   @inject(LabelProvider)
   protected readonly labelProvider: LabelProvider;
+  @inject(LocalStorageService)
+  protected readonly localStorageService: LocalStorageService;
   @inject(PreferenceService)
   protected readonly preferenceService: PreferenceService;
   @inject(QuickPickService)
@@ -74,6 +86,22 @@ export class VesBuildService {
   protected _ready = new Deferred<void>();
   get ready(): Promise<void> {
     return this._ready.promise;
+  }
+
+  // last build mode
+  protected _lastBuildMode: string | undefined;
+  protected readonly onDidChangeLastBuildModeEmitter = new Emitter<string | undefined>();
+  readonly onDidChangeLastBuildMode = this.onDidChangeLastBuildModeEmitter.event;
+  set lastBuildMode(mode: string | undefined) {
+    this._lastBuildMode = mode;
+    this.onDidChangeLastBuildModeEmitter.fire(this._lastBuildMode);
+    this.localStorageService.setData(
+      'ves-last-build-mode',
+      mode
+    );
+  }
+  get lastBuildMode(): string | undefined {
+    return this._lastBuildMode;
   }
 
   // is queued
@@ -194,6 +222,7 @@ export class VesBuildService {
   }
 
   protected async doInit(): Promise<void> {
+    this.lastBuildMode = await this.localStorageService.getData('ves-last-build-mode');
     await this.resetBuildStatus();
   }
 
@@ -240,6 +269,7 @@ export class VesBuildService {
     return romUri !== undefined && this.fileService.exists(romUri);
   }
 
+  // TODO: save this in local storage after build instead of determining on each program start
   protected async determineRomSize(): Promise<void> {
     const romUri = await this.getDefaultRomUri();
     if (romUri && await this.fileService.exists(romUri)) {
@@ -334,6 +364,7 @@ export class VesBuildService {
   protected async build(): Promise<void> {
     let processManagerId = 0;
     let processId = 0;
+    const buildMode = this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode;
 
     this.buildStatus = {
       active: false,
@@ -343,11 +374,13 @@ export class VesBuildService {
       processId,
       progress: 0,
       log: [],
-      buildMode: this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode,
+      buildMode,
       step: '',
       startDate: new Date(),
       endDate: undefined,
     };
+
+    this.lastBuildMode = buildMode;
 
     await this.runPreBuildTasks();
 

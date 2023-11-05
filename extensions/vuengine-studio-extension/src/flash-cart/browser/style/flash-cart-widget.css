@@ -8,7 +8,8 @@
   min-width: 250px;
 }
 
-#vesFlashCartWidget .noFlashCart {
+#vesFlashCartWidget > .infoPanel {
+  border-bottom: 1px solid var(--theia-activityBar-background);
   padding: calc(var(--theia-ui-padding) * 2);
 }
 
@@ -30,11 +31,9 @@
   padding: calc(var(--theia-ui-padding) * 2);
 }
 
-#vesFlashCartWidget .theia-button {
-  margin: 0;
-}
-
+#vesFlashCartWidget .theia-button.abort,
 #vesFlashCartWidget .theia-button.flash {
+  margin: 0;
   width: 100%;
 }
 

@@ -117,7 +117,7 @@ export class VesExportService {
     }
     const confirmed = await new ConfirmDialog({
       title: nls.localize('vuengine/export/overwrite', 'Overwrite'),
-      msg: nls.localize('vuengine/export/doYouReallyWantToOverwrite', 'Do you really want to overwrite "${}"?', uri.toString()),
+      msg: nls.localize('vuengine/export/doYouReallyWantToOverwrite', 'Do you really want to overwrite "{0}"?', uri.toString()),
     }).open();
     return !!confirmed;
   }
