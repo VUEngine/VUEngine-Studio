@@ -1,14 +1,13 @@
-import { ApplicationShell, PreferenceService } from '@theia/core/lib/browser';
-import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
-import { CommandService, isWindows, MessageService, nls } from '@theia/core/lib/common';
+import { PreferenceService } from '@theia/core/lib/browser';
+import { CommandService, MessageService, isWindows, nls } from '@theia/core/lib/common';
 import { BinaryBufferWriteableStream } from '@theia/core/lib/common/buffer';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import IMAGE_FLASHBOY_PLUS from '../../../src/flash-cart/browser/images/flashboy-plus.png';
 import IMAGE_HYPERBOY from '../../../src/flash-cart/browser/images/HyperBoy.png';
+import IMAGE_FLASHBOY_PLUS from '../../../src/flash-cart/browser/images/flashboy-plus.png';
 import IMAGE_HYPERFLASH32 from '../../../src/flash-cart/browser/images/hyperflash32-with-label.png';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { VesBuildService } from '../../build/browser/ves-build-service';
@@ -16,6 +15,8 @@ import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 import { VesProjectService } from '../../project/browser/ves-project-service';
+import { VesFlashCartCommands } from './ves-flash-cart-commands';
+import { VesFlashCartPreferenceIds } from './ves-flash-cart-preferences';
 import {
   BUILT_IN_FLASH_CART_CONFIGS,
   ConnectedFlashCart,
@@ -31,19 +32,13 @@ import {
   PROG_VB_PLACEHOLDER,
   ROM_PLACEHOLDER
 } from './ves-flash-cart-types';
-import { VesFlashCartCommands } from './ves-flash-cart-commands';
-import { VesFlashCartPreferenceIds } from './ves-flash-cart-preferences';
 
 @injectable()
 export class VesFlashCartService {
-  @inject(ApplicationShell)
-  protected readonly shell: ApplicationShell;
   @inject(CommandService)
   protected commandService: CommandService;
   @inject(FileService)
   protected fileService: FileService;
-  @inject(FrontendApplicationStateService)
-  protected readonly frontendApplicationStateService: FrontendApplicationStateService;
   @inject(MessageService)
   protected readonly messageService: MessageService;
   @inject(PreferenceService)
@@ -264,15 +259,6 @@ export class VesFlashCartService {
   }
 
   protected bindEvents(): void {
-    this.frontendApplicationStateService.onStateChanged(
-      async (state: FrontendApplicationState) => {
-        if (state === 'attached_shell') {
-          navigator.usb.requestDevice({ filters: [] }).catch();
-          this.detectConnectedFlashCarts();
-        }
-      }
-    );
-
     // watch for preference changes
     this.preferenceService.onPreferenceChanged(
       ({ preferenceName }) => {
@@ -513,23 +499,26 @@ export class VesFlashCartService {
   }
 
   async detectConnectedFlashCarts(): Promise<void> {
-    const flashCartConfigs: FlashCartConfig[] = this.getFlashCartConfigs();
-    navigator.usb.requestDevice({ filters: [] }).catch();
+    navigator.usb.requestDevice({ filters: [] }).catch(() => { });
     const devices: USBDevice[] = await navigator.usb.getDevices();
-    const connectedFlashCarts: ConnectedFlashCart[] = [];
-    for (const device of devices) {
-      const matchedFlashCart = await this.matchFlashCart(device, flashCartConfigs);
-      if (matchedFlashCart) {
-        // look for matches in already known carts to prevent losing status when another USB device is dis/connected
-        const known = this.connectedFlashCarts.find(cfc =>
-          cfc.port === matchedFlashCart.port &&
-          JSON.stringify(cfc.config) === JSON.stringify(matchedFlashCart.config)
-        );
-        connectedFlashCarts.push(known ? known : matchedFlashCart);
+    console.log('USB devices found', devices);
+    if (devices.length > 0) {
+      const flashCartConfigs: FlashCartConfig[] = this.getFlashCartConfigs();
+      const connectedFlashCarts: ConnectedFlashCart[] = [];
+      for (const device of devices) {
+        const matchedFlashCart = await this.matchFlashCart(device, flashCartConfigs);
+        if (matchedFlashCart) {
+          // look for matches in already known carts to prevent losing status when another USB device is dis/connected
+          const known = this.connectedFlashCarts.find(cfc =>
+            cfc.port === matchedFlashCart.port &&
+            JSON.stringify(cfc.config) === JSON.stringify(matchedFlashCart.config)
+          );
+          connectedFlashCarts.push(known ? known : matchedFlashCart);
+        }
       }
+      this.connectedFlashCarts = connectedFlashCarts;
+      this.determineAtLeastOneCanHoldRom();
     }
-    this.connectedFlashCarts = connectedFlashCarts;
-    this.determineAtLeastOneCanHoldRom();
   };
 
   getFlashCartConfigs(): FlashCartConfig[] {

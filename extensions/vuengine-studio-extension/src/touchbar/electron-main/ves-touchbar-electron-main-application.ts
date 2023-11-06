@@ -54,7 +54,6 @@ export class VesElectronMainApplication extends ElectronMainApplication {
         electronWindow.webContents.session.on('usb-device-added', (evt, device) => {
             VesRendererAPI.sendUsbDeviceChange(electronWindow.webContents);
         });
-
         electronWindow.webContents.session.on('usb-device-removed', (evt, device) => {
             VesRendererAPI.sendUsbDeviceChange(electronWindow.webContents);
         });
