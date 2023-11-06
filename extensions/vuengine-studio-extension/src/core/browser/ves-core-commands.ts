@@ -13,7 +13,7 @@ export namespace VesCoreCommands {
     export const SUPPORT: Command = Command.toLocalizedCommand(
         {
             id: 'ves:general:support',
-            label: 'Support VUEngine Studio',
+            label: 'Support Us',
             category: 'VUEngine Studio',
         },
         'vuengine/general/commands/support',
