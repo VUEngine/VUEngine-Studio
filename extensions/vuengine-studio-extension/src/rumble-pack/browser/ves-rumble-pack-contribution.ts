@@ -13,7 +13,7 @@ export class VesRumblePackContribution implements CommandContribution {
 
   registerCommands(commandRegistry: CommandRegistry): void {
     commandRegistry.registerCommand(VesRumblePackCommands.DETECT, {
-      execute: () => this.vesRumblePackService.detectRumblePackIsConnected(),
+      execute: () => this.vesRumblePackService.detectConnectedRumblePack(),
     });
   }
 }

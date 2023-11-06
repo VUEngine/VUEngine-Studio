@@ -3393,6 +3393,11 @@
   resolved "https://registry.yarnpkg.com/@types/verror/-/verror-1.10.8.tgz#5324a03e0885ffe6fef0192900aec317abbb2997"
   integrity sha512-YhUhnxRYs/NiVUbIs3F/EzviDP/NZCEAE2Mx5DUqLdldUmphOhFCVh7Kc+7zlYEExM0P8dzfbJi0yRlNb2Bw5g==
 
+"@types/w3c-web-serial@^1.0.5":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@types/w3c-web-serial/-/w3c-web-serial-1.0.5.tgz#09ed1265b642703c7f5556f36717bf4b1eddb10c"
+  integrity sha512-gpWNghA1RjPc92puT2HRRRFjv0MDVcpS9yTjJPLwCRU+w1YQTmJommTEL1w7l6Llq5/2cbzH1B4jHx/EP0PcjQ==
+
 "@types/w3c-web-usb@^1.0.9":
   version "1.0.9"
   resolved "https://registry.yarnpkg.com/@types/w3c-web-usb/-/w3c-web-usb-1.0.9.tgz#7e50f33dc3f75bf6a06bef9c924ae51213548346"

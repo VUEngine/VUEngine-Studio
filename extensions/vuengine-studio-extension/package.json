@@ -72,6 +72,7 @@
     "@types/three": "^0.140.0",
     "@types/uuid": "^8.3.2",
     "@types/w3c-web-usb": "^1.0.9",
+    "@types/w3c-web-serial": "^1.0.5",
     "rimraf": "^2.7.1",
     "tslint": "^5.12.0",
     "typescript": "^4.5.5"
@@ -137,8 +138,7 @@
       "frontend": "lib/project/browser/ves-project-frontend-module"
     },
     {
-      "frontend": "lib/rumble-pack/browser/ves-rumble-pack-frontend-module",
-      "backend": "lib/rumble-pack/node/ves-rumble-pack-backend-module"
+      "frontend": "lib/rumble-pack/browser/ves-rumble-pack-frontend-module"
     },
     {
       "frontend": "lib/titlebar/browser/ves-titlebar-frontend-module"

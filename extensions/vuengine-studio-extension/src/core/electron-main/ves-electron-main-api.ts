@@ -17,6 +17,7 @@ import {
     VES_CHANNEL_FIND_FILES,
     VES_CHANNEL_GET_PHYSICAL_CPU_COUNT,
     VES_CHANNEL_GET_USER_DEFAULT,
+    VES_CHANNEL_ON_SERIAL_DEVICE_CHANGE,
     VES_CHANNEL_ON_TOUCHBAR_EVENT,
     VES_CHANNEL_ON_USB_DEVICE_CHANGE,
     VES_CHANNEL_PARSE_PNG,
@@ -98,6 +99,9 @@ export class VesMainApi implements ElectronMainApplicationContribution {
 export namespace VesRendererAPI {
     export function sendUsbDeviceChange(wc: WebContents): void {
         wc.send(VES_CHANNEL_ON_USB_DEVICE_CHANGE);
+    }
+    export function sendSerialDeviceChange(wc: WebContents): void {
+        wc.send(VES_CHANNEL_ON_SERIAL_DEVICE_CHANGE);
     }
     export function sendTouchBarEvent(wc: WebContents, event: string, data?: any): void {
         wc.send(VES_CHANNEL_ON_TOUCHBAR_EVENT, event, data);

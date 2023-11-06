@@ -1,16 +1,10 @@
 .rumbleEffectEditor {
   display: flex;
+  flex-direction: column;
   gap: 20px;
   height: 100%;
   outline: none;
-}
-
-.rumbleEffectEditor>div {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  gap: 10px;
-  width: 50%;
+  overflow: hidden;
 }
 
 .rumbleEffectEditor .settings {
@@ -26,6 +20,10 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.rumbleEffectEditor .connectionStatus {
+  padding-top: 20px;
 }
 
 .rumbleEffectEditor .connected {

@@ -17,13 +17,13 @@ export class VesRumblePackStatusBarContribution implements FrontendApplicationCo
     updateStatusBar(): void {
         this.setConnectedRumblePackStatusBar();
 
-        this.vesRumblePackService.onDidChangeRumblePackIsConnected(() => {
+        this.vesRumblePackService.onDidChangeConnectedRumblePack(() => {
             this.setConnectedRumblePackStatusBar();
         });
     }
 
     setConnectedRumblePackStatusBar(): void {
-        if (this.vesRumblePackService.rumblePackIsConnected) {
+        if (this.vesRumblePackService.connectedRumblePack !== undefined) {
             this.statusBar.setElement('ves-rumble-pack', {
                 alignment: StatusBarAlignment.LEFT,
                 priority: 2,
