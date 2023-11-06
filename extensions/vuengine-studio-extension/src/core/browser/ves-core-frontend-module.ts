@@ -25,9 +25,9 @@ import { NavigatorWidgetFactory } from '@theia/navigator/lib/browser/navigator-w
 import { OutlineViewContribution } from '@theia/outline-view/lib/browser/outline-view-contribution';
 import { PluginApiFrontendContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-contribution';
 import { PluginFrontendViewContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-view-contribution';
-import { PluginViewRegistry } from '@theia/plugin-ext/lib/main/browser/view/plugin-view-registry';
 import { PreferenceTreeGenerator } from '@theia/preferences/lib/browser/util/preference-tree-generator';
 import { PreferenceStringInputRenderer } from '@theia/preferences/lib/browser/views/components/preference-string-input';
+import { TestViewContribution } from '@theia/test/lib/browser/view/test-view-contribution';
 import { ToolbarDefaultsFactory } from '@theia/toolbar/lib/browser/toolbar-defaults';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { QuickOpenWorkspace } from '@theia/workspace/lib/browser/quick-open-workspace';
@@ -44,7 +44,6 @@ import { VesCorePreferenceSchema } from './ves-core-preferences';
 import { VesEncodingRegistry } from './ves-encoding-registry';
 import { VesFileSystemFrontendContribution } from './ves-filesystem-frontend-contribution';
 import { VesNavigatorWidgetFactory } from './ves-navigator-widget-factory';
-import { VesPluginContribution } from './ves-plugin-contribution';
 import { VesPreferenceConfigurations } from './ves-preference-configurations';
 import { VesPreferenceStringInputRenderer } from './ves-preference-string-input-renderer';
 import { VesPreferenceTreeGenerator } from './ves-preference-tree-generator';
@@ -140,8 +139,13 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // custom file extensions
     rebind(FileSystemFrontendContribution).to(VesFileSystemFrontendContribution).inSingletonScope();
 
-    // remove "test" view
-    rebind(PluginViewRegistry).to(VesPluginContribution).inSingletonScope();
+    // remove test view
+    rebind(TestViewContribution).toConstantValue({
+        registerCommands: () => { },
+        registerMenus: () => { },
+        registerKeybindings: () => { },
+        registerToolbarItems: () => { }
+    } as any);
 
     // quick open workspace
     rebind(QuickOpenWorkspace).to(VesQuickOpenWorkspace).inSingletonScope();
