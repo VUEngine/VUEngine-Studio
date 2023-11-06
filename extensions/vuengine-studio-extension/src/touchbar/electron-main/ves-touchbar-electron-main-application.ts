@@ -51,6 +51,15 @@ export class VesElectronMainApplication extends ElectronMainApplication {
     }
 
     protected async setUpWebUSB(electronWindow: BrowserWindow): Promise<void> {
+        electronWindow.webContents.session.on('select-serial-port', (event, portList, webContents, callback) => {
+            event.preventDefault();
+            if (portList && portList.length > 0) {
+                callback(portList[0].portId);
+            } else {
+                callback(''); // Could not find any matching devices
+            }
+        });
+
         electronWindow.webContents.session.on('usb-device-added', (evt, device) => {
             VesRendererAPI.sendUsbDeviceChange(electronWindow.webContents);
         });
@@ -58,11 +67,18 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             VesRendererAPI.sendUsbDeviceChange(electronWindow.webContents);
         });
 
+        electronWindow.webContents.session.on('serial-port-added', (evt, device) => {
+            VesRendererAPI.sendSerialDeviceChange(electronWindow.webContents);
+        });
+        electronWindow.webContents.session.on('serial-port-removed', (evt, device) => {
+            VesRendererAPI.sendSerialDeviceChange(electronWindow.webContents);
+        });
+
         electronWindow.webContents.session.setPermissionCheckHandler((webContents, permission, requestingOrigin, details) =>
-            (permission === 'usb' && details.securityOrigin === 'file:///'));
+            (['serial', 'usb'].includes(permission) && details.securityOrigin === 'file:///'));
 
         electronWindow.webContents.session.setDevicePermissionHandler(details =>
-            (details.deviceType === 'usb' && details.origin === 'file://'));
+            (['serial', 'usb'].includes(details.deviceType) && details.origin === 'file://'));
     }
 
     protected getDefaultOptions(): TheiaBrowserWindowOptions {

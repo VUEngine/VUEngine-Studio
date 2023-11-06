@@ -1,28 +1,21 @@
-import { ApplicationShell, PreferenceService } from '@theia/core/lib/browser';
-import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
+import { PreferenceService } from '@theia/core/lib/browser';
 import { CommandService, MessageService } from '@theia/core/lib/common';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesBuildService } from '../../build/browser/ves-build-service';
+import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService } from '../../process/common/ves-process-service-protocol';
 import { VesProjectService } from '../../project/browser/ves-project-service';
-import { RumblePakLogLine } from '../common/ves-rumble-pack-types';
-import { VesRumblePackUsbService } from '../common/ves-rumble-pack-usb-service-protocol';
-import { VesRumblePackUsbWatcher } from './ves-rumble-pack-usb-watcher';
+import { RUMBLE_PACK_IDS, RumblePakLogLine } from './ves-rumble-pack-types';
 
 @injectable()
 export class VesRumblePackService {
-  @inject(ApplicationShell)
-  protected readonly shell: ApplicationShell;
   @inject(CommandService)
   protected commandService: CommandService;
   @inject(FileService)
   protected fileService: FileService;
-  @inject(FrontendApplicationStateService)
-  protected readonly frontendApplicationStateService: FrontendApplicationStateService;
   @inject(MessageService)
   protected readonly messageService: MessageService;
   @inject(PreferenceService)
@@ -31,10 +24,6 @@ export class VesRumblePackService {
   protected readonly vesBuildService: VesBuildService;
   @inject(VesCommonService)
   protected readonly vesCommonService: VesCommonService;
-  @inject(VesRumblePackUsbService)
-  protected readonly vesRumblePackUsbService: VesRumblePackUsbService;
-  @inject(VesRumblePackUsbWatcher)
-  protected readonly vesRumblePackUsbWatcher: VesRumblePackUsbWatcher;
   @inject(VesProcessService)
   protected readonly vesProcessService: VesProcessService;
   @inject(VesProcessWatcher)
@@ -43,15 +32,15 @@ export class VesRumblePackService {
   protected readonly vesProjectsService: VesProjectService;
 
   // connected rumble pack
-  protected _rumblePackIsConnected: boolean = false;
-  protected readonly onDidChangeRumblePackIsConnectedEmitter = new Emitter<boolean>();
-  readonly onDidChangeRumblePackIsConnected = this.onDidChangeRumblePackIsConnectedEmitter.event;
-  set rumblePackIsConnected(rumblePackIsConnected: boolean) {
-    this._rumblePackIsConnected = rumblePackIsConnected;
-    this.onDidChangeRumblePackIsConnectedEmitter.fire(this._rumblePackIsConnected);
+  protected _connectedRumblePack: SerialPort | undefined;
+  protected readonly onDidChangeConnectedRumblePackEmitter = new Emitter<SerialPort | undefined>();
+  readonly onDidChangeConnectedRumblePack = this.onDidChangeConnectedRumblePackEmitter.event;
+  set connectedRumblePack(connectedRumblePack: SerialPort | undefined) {
+    this._connectedRumblePack = connectedRumblePack;
+    this.onDidChangeConnectedRumblePackEmitter.fire(this._connectedRumblePack);
   }
-  get rumblePackIsConnected(): boolean {
-    return this._rumblePackIsConnected;
+  get connectedRumblePack(): SerialPort | undefined {
+    return this._connectedRumblePack;
   }
 
   // rumble pack log
@@ -66,89 +55,121 @@ export class VesRumblePackService {
     return this._rumblePackLog;
   }
 
+  protected writer: WritableStreamDefaultWriter<Uint8Array> | undefined;
+
   @postConstruct()
   protected init(): void {
     this.bindEvents();
   }
 
   protected bindEvents(): void {
-    this.frontendApplicationStateService.onStateChanged(
-      async (state: FrontendApplicationState) => {
-        if (state === 'attached_shell') {
-          this.detectRumblePackIsConnected();
+    window.electronVesCore.onSerialDeviceChange(async () => this.detectConnectedRumblePack());
+  }
+
+  async detectConnectedRumblePack(): Promise<void> {
+    try {
+      await navigator.serial.requestPort({ filters: RUMBLE_PACK_IDS });
+    } catch (error) {
+    }
+    const ports: SerialPort[] = await navigator.serial.getPorts();
+    if (ports.length) {
+      const rumblePack = ports[0];
+      await rumblePack.open({
+        baudRate: 115200,
+        dataBits: 8,
+        flowControl: 'none',
+        parity: 'none',
+        stopBits: 1,
+      });
+      this.connectedRumblePack = rumblePack;
+      this.writer = this.connectedRumblePack.writable!.getWriter();
+      this.startReader();
+    } else {
+      this.connectedRumblePack = undefined;
+      this.writer = undefined;
+    }
+  };
+
+  async startReader(): Promise<void> {
+    if (this.connectedRumblePack !== undefined) {
+      const decoder = new TextDecoder();
+      const reader = this.connectedRumblePack.readable!.getReader();
+      try {
+        while (true) {
+          const { value } = await reader.read();
+          const returnValueParts = decoder.decode(value).split('\n');
+          if (this._rumblePackLog.length) {
+            this._rumblePackLog[this._rumblePackLog.length - 1].text += returnValueParts.shift();
+          }
+          returnValueParts.map(returnValuePart =>
+            this.rumblePackLog.push({ timestamp: Date.now(), text: returnValuePart })
+          );
+          // trigger event
+          this.rumblePackLog = this.rumblePackLog;
         }
+      } catch (error) {
+      } finally {
+        reader.releaseLock();
       }
-    );
-
-    // watch for rumble pack events
-    this.vesRumblePackUsbWatcher.onDidAttachDevice(async () => this.detectRumblePackIsConnected());
-    this.vesRumblePackUsbWatcher.onDidDetachDevice(async () => this.detectRumblePackIsConnected());
-    this.vesRumblePackUsbWatcher.onDidReceiveData(data => {
-      const dataParts = data.split('\n');
-      if (this._rumblePackLog.length) {
-        this._rumblePackLog[this._rumblePackLog.length - 1].text += dataParts.shift();
-      }
-      dataParts.map(dataPart =>
-        this.rumblePackLog.push({ timestamp: Date.now(), text: dataPart })
-      );
-      // trigger event
-      this.rumblePackLog = this.rumblePackLog;
-    });
+    }
   }
 
-  async detectRumblePackIsConnected(): Promise<void> {
-    this.rumblePackIsConnected = await this.vesRumblePackUsbService.detectRumblePack();
-  };
-
-  sendCommand(command: string): boolean {
-    return this.vesRumblePackUsbService.sendCommand(command);
-  };
-
-  sendCommandPrintMenu(): boolean {
-    return this.vesRumblePackUsbService.sendCommandPrintMenu();
-  };
-
-  sendCommandPrintVersion(): boolean {
-    return this.vesRumblePackUsbService.sendCommandPrintVersion();
-  };
-
-  sendCommandPrintVbCommandLineState(): boolean {
-    return this.vesRumblePackUsbService.sendCommandPrintVbCommandLineState();
+  async sendCommand(command: string): Promise<void> {
+    const preparedCommand = `<${command}>`;
+    if (this.connectedRumblePack !== undefined) {
+      await this.writer!.write(new TextEncoder().encode(preparedCommand));
+    }
   }
 
-  sendCommandPrintVbSyncLineState(): boolean {
-    return this.vesRumblePackUsbService.sendCommandPrintVbSyncLineState();
+  async sendCommandPrintMenu(): Promise<void> {
+    return this.sendCommand('PM');
   }
 
-  sendCommandPlayLastEffect(): boolean {
-    return this.vesRumblePackUsbService.sendCommandPlayLastEffect();
+  async sendCommandPrintVersion(): Promise<void> {
+    return this.sendCommand('VER');
   }
 
-  sendCommandStopCurrentEffect(): boolean {
-    return this.vesRumblePackUsbService.sendCommandStopCurrentEffect();
+  async sendCommandPrintVbCommandLineState(): Promise<void> {
+    return this.sendCommand('VBC');
   }
 
-  sendCommandPlayEffect(effect: number): boolean {
-    return this.vesRumblePackUsbService.sendCommandPlayEffect(effect);
-  };
-
-  sendCommandSetFrequency(frequency: number): boolean {
-    return this.vesRumblePackUsbService.sendCommandSetFrequency(frequency);
-  };
-
-  sendCommandSetOverdrive(overdrive: number): boolean {
-    return this.vesRumblePackUsbService.sendCommandSetOverdrive(overdrive);
+  async sendCommandPrintVbSyncLineState(): Promise<void> {
+    return this.sendCommand('VBS');
   }
 
-  sendCommandSetPositiveSustain(sustain: number): boolean {
-    return this.vesRumblePackUsbService.sendCommandSetPositiveSustain(sustain);
+  async sendCommandPlayLastEffect(): Promise<void> {
+    return this.sendCommand('GO');
   }
 
-  sendCommandSetNegativeSustain(sustain: number): boolean {
-    return this.vesRumblePackUsbService.sendCommandSetNegativeSustain(sustain);
+  async sendCommandStopCurrentEffect(): Promise<void> {
+    return this.sendCommand('STP');
   }
 
-  sendCommandSetBreak(breakValue: number): boolean {
-    return this.vesRumblePackUsbService.sendCommandSetBreak(breakValue);
+  async sendCommandPlayEffect(effect: number): Promise<void> {
+    return this.sendCommand(`HAP ${(++effect).toString().padStart(3, '0')}`);
+  }
+
+  async sendCommandSetFrequency(frequency: number): Promise<void> {
+    return this.sendCommand(`FRQ ${frequency.toString().padStart(3, '0')}`);
+  }
+
+  async sendCommandSetOverdrive(overdrive: number): Promise<void> {
+    return this.sendCommand(`ODT ${overdrive.toString().padStart(3, '0')}`);
+  }
+
+  async sendCommandSetPositiveSustain(sustain: number): Promise<void> {
+    return this.sendCommand(`SPT ${sustain.toString().padStart(3, '0')}`);
+  }
+
+  async sendCommandSetNegativeSustain(sustain: number): Promise<void> {
+    return this.sendCommand(`SNT ${sustain.toString().padStart(3, '0')}`);
+  }
+
+  async sendCommandSetBreak(breakValue: number): Promise<void> {
+    return this.sendCommand(`BRT ${breakValue.toString().padStart(3, '0')}`);
+  }
+
+  async sendCommandEmulateVbByte(byte: string): Promise<void> {
+    return this.sendCommand(`VB ${byte}`);
   }
 }

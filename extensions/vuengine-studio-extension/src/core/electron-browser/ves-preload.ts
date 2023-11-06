@@ -8,6 +8,7 @@ import {
     VES_CHANNEL_FIND_FILES,
     VES_CHANNEL_GET_PHYSICAL_CPU_COUNT,
     VES_CHANNEL_GET_USER_DEFAULT,
+    VES_CHANNEL_ON_SERIAL_DEVICE_CHANGE,
     VES_CHANNEL_ON_TOUCHBAR_EVENT,
     VES_CHANNEL_ON_USB_DEVICE_CHANGE,
     VES_CHANNEL_PARSE_PNG,
@@ -51,6 +52,13 @@ const api: VesCoreAPI = {
         };
         ipcRenderer.on(VES_CHANNEL_ON_USB_DEVICE_CHANGE, h);
         return Disposable.create(() => ipcRenderer.off(VES_CHANNEL_ON_USB_DEVICE_CHANGE, h));
+    },
+    onSerialDeviceChange: function (handler: () => void): Disposable {
+        const h = (_event: unknown) => {
+            handler();
+        };
+        ipcRenderer.on(VES_CHANNEL_ON_SERIAL_DEVICE_CHANGE, h);
+        return Disposable.create(() => ipcRenderer.off(VES_CHANNEL_ON_SERIAL_DEVICE_CHANGE, h));
     },
     sendTouchBarCommand: function (command: string, data?: any): void {
         ipcRenderer.send(VES_CHANNEL_SEND_TOUCHBAR_COMMAND, command, data);

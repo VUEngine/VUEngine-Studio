@@ -17,4 +17,5 @@
 
 .rumbleEffectEditor button {
   margin: 0;
+  max-width: 250px;
 }

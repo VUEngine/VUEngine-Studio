@@ -14,6 +14,7 @@ export interface VesCoreAPI {
     getPhysicalCpuCount(): number;
     parsePng(fileContent: FileContent): Promise<ImageData | false>;
     onUsbDeviceChange(handler: () => void): Disposable;
+    onSerialDeviceChange(handler: () => void): Disposable;
     sendTouchBarCommand(command: string, data?: any): void;
     onTouchBarEvent(command: string, handler: (data?: any) => void): Disposable;
 }
@@ -33,5 +34,6 @@ export const VES_CHANNEL_FIND_FILES = 'vesFindFiles';
 export const VES_CHANNEL_GET_PHYSICAL_CPU_COUNT = 'vesGetPhysicalCpuCount';
 export const VES_CHANNEL_PARSE_PNG = 'vesParsePng';
 export const VES_CHANNEL_ON_USB_DEVICE_CHANGE = 'vesOnUsbDeviceChange';
+export const VES_CHANNEL_ON_SERIAL_DEVICE_CHANGE = 'vesOnSerialDeviceChange';
 export const VES_CHANNEL_SEND_TOUCHBAR_COMMAND = 'vesSendTouchBarCommand';
 export const VES_CHANNEL_ON_TOUCHBAR_EVENT = 'vesOnTouchBarEvent';
