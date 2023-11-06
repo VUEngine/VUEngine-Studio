@@ -94,20 +94,4 @@ export const VesFlashCartPreferenceSchema: PreferenceSchema = {
       overridable: true,
     },
   },
-  default: [],
-  scope: PreferenceScope.Folder,
-  overridable: true,
-},
-  [VesFlashCartPreferenceIds.FLASH_CARTS_AUTO_QUEUE]: {
-    type: 'boolean',
-    label: 'Auto Queue',
-    description: nls.localize(
-        'vuengine/flashCarts/preferences/automaticallyQueueWhenBuildStarted',
-        'Automatically queue when a build is started.'
-    ),
-    default: false,
-    scope: PreferenceScope.Folder,
-    overridable: true,
-  },
-  },
 };
