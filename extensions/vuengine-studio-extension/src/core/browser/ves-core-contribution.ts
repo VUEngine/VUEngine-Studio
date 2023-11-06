@@ -27,7 +27,7 @@ export class VesCoreContribution implements CommandContribution, MenuContributio
             execute: () => this.windowService.openNewWindow(VesCoreContribution.SUPPORT_URL, { external: true })
         });
         commandRegistry.registerCommand(VesCoreCommands.OPEN_DOCUMENTATION, {
-            execute: path => this.windowService.openNewWindow(`${VesCoreContribution.DOCUMENTATION_URL}/${path}`, { external: true })
+            execute: path => this.windowService.openNewWindow(`${VesCoreContribution.DOCUMENTATION_URL}${path ? path : ''}`, { external: true })
         });
     }
 
