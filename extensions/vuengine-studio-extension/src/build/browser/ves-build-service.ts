@@ -95,10 +95,7 @@ export class VesBuildService {
   set lastBuildMode(mode: string | undefined) {
     this._lastBuildMode = mode;
     this.onDidChangeLastBuildModeEmitter.fire(this._lastBuildMode);
-    this.localStorageService.setData(
-      'ves-last-build-mode',
-      mode
-    );
+    this.localStorageService.setData(this.getLastBuildModeStorageKey(), mode);
   }
   get lastBuildMode(): string | undefined {
     return this._lastBuildMode;
@@ -222,7 +219,8 @@ export class VesBuildService {
   }
 
   protected async doInit(): Promise<void> {
-    this.lastBuildMode = await this.localStorageService.getData('ves-last-build-mode');
+    await this.workspaceService.ready;
+    this.lastBuildMode = await this.localStorageService.getData(this.getLastBuildModeStorageKey());
     await this.resetBuildStatus();
   }
 
@@ -1090,5 +1088,10 @@ export class VesBuildService {
       this.isQueued = false;
       this.commandService.executeCommand(VesBuildCommands.BUILD.id, true);
     }
+  }
+
+  protected getLastBuildModeStorageKey(): string {
+    const workspacePath = this.workspaceService.tryGetRoots()[0].resource.path;
+    return `ves-last-build-mode/${workspacePath}`;
   }
 }

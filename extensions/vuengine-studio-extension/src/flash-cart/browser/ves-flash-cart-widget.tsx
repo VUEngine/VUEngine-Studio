@@ -126,6 +126,7 @@ export class VesFlashCartWidget extends ReactWidget {
   }
 
   protected render(): React.ReactNode {
+    const lastBuildMode = this.vesBuildService.lastBuildMode;
     return this.vesFlashCartService.connectedFlashCarts.length
       ? <>
         <div className='flashingActions'>
@@ -177,13 +178,13 @@ export class VesFlashCartWidget extends ReactWidget {
             preferenceService={this.preferenceService}
           />
         </div>
-        {this.vesBuildService.lastBuildMode && this.vesBuildService.lastBuildMode !== 'Release' &&
+        {lastBuildMode && lastBuildMode !== 'Release' &&
           <div className="infoPanel warning">
             <i className='fa fa-fw fa-exclamation-triangle'></i>{' '}
             {nls.localize(
               'vuengine/flashCarts/buildModeWarning',
               'The last build was done in {0} mode. Be warned that any mode other than Release will result in decreased performance on real hardware.',
-              'Beta'
+              lastBuildMode
             )}
           </div>
         }
