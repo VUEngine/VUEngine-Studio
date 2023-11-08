@@ -32,6 +32,7 @@
 }
 
 #vesFlashCartWidget .theia-button.abort,
+#vesFlashCartWidget .theia-button.cancel,
 #vesFlashCartWidget .theia-button.flash {
   margin: 0;
   width: 100%;
