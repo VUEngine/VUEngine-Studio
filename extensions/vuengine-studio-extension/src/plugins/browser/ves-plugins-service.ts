@@ -1,10 +1,11 @@
-import { nls } from '@theia/core';
+import { isWindows, nls } from '@theia/core';
 import { Deferred } from '@theia/core/lib/common/promise-util';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesPluginData, VesPluginsData } from './ves-plugin';
 import { VesPluginsPathsService } from './ves-plugins-paths-service';
@@ -15,6 +16,8 @@ export class VesPluginsService {
 
   @inject(FileService)
   protected fileService: FileService;
+  @inject(VesCommonService)
+  protected vesCommonService: VesCommonService;
   @inject(VesPluginsPathsService)
   protected vesPluginsPathsService: VesPluginsPathsService;
   @inject(VesProjectService)
@@ -110,7 +113,7 @@ export class VesPluginsService {
 
       const pluginFiles = window.electronVesCore.findFiles(rootPath, '**/plugin.vuengine');
       for (const pluginFile of pluginFiles) {
-        const pluginFileUri = new URI(pluginFile).withScheme('file');
+        const pluginFileUri = new URI(isWindows ? `/${pluginFile}` : pluginFile).withScheme('file');
         const pluginFolderUri = pluginFileUri.parent;
 
         const pluginPathRelative = rootUri.relative(pluginFolderUri)!.toString();
