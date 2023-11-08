@@ -1,4 +1,4 @@
-import { CommandService, isWindows, nls } from '@theia/core';
+import { CommandService, nls } from '@theia/core';
 import {
   Endpoint,
   KeybindingRegistry,
@@ -484,9 +484,6 @@ export class VesEmulatorWidget extends ReactWidget {
     let romPath = this.options ? this.options.uri : defaultRomUri;
     if (typeof romPath !== 'string') {
       romPath = await this.fileService.fsPath(romPath);
-    }
-    if (isWindows && romPath.charAt(0) === '/') {
-      romPath = romPath.substring(1);
     }
 
     return romPath;
