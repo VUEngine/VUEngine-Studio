@@ -3,7 +3,7 @@
 }
 
 #theia-top-panel {
-  z-index: 9999999;
+  border-bottom: unset;
 }
 
 #theia-top-panel,
@@ -23,7 +23,7 @@
 }
 
 #theia-top-panel .p-MenuBar-item {
-  line-height: var(--theia-private-menubar-height);
+  line-height: calc(var(--theia-private-menubar-height) - 10px);
 }
 
 #theia-top-panel .p-MenuBar-item.p-mod-active {

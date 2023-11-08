@@ -3,7 +3,7 @@
 }
 
 #theia-top-panel .theia-icon {
-  height: calc(var(--theia-private-menubar-height) - 1px);
+  height: var(--theia-private-menubar-height);
   margin: 0;
   min-width: 48px !important;
 }

@@ -10,18 +10,13 @@
   display: inline-block;
   fill: var(--theia-titleBar-activeForeground);
   font-size: 18px;
-  height: calc(var(--theia-private-menubar-height) - 1px);
-  line-height: calc(var(--theia-private-menubar-height) - 1px);
+  height: var(--theia-private-menubar-height);
+  line-height: var(--theia-private-menubar-height);
   text-align: center;
   width: 46px;
 }
 
 #ves-titlebar-window-controls .titlebar-window-controls-button:hover,
 #ves-titlebar-window-controls .titlebar-window-controls-button:active {
-  background: var(--theia-menubar-selectionBackground);
-}
-
-#ves-titlebar-window-controls .titlebar-window-controls-button.close:hover,
-#ves-titlebar-window-controls .titlebar-window-controls-button.close:active {
-  background: var(--theia-editorError-foreground);
+  background: rgba(255, 255, 255, .3);
 }

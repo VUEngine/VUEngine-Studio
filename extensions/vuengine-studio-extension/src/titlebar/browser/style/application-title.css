@@ -9,9 +9,7 @@
 
 #ves-titlebar-application-title .applicationTitle {
   -webkit-app-region: no-drag;
-  background-color: var(--theia-titleBar-activeBackground);
   cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, .3);
   border-radius: 5px;
   box-sizing: border-box;
   display: inline-block;
@@ -30,14 +28,7 @@
 }
 
 #ves-titlebar-application-title .applicationTitle:hover {
-  border-color: rgba(255, 255, 255, .8);
-}
-
-#ves-titlebar-application-title .applicationTitle:after {
-  content: "\eab4";
-  font-family: "codicon";
-  position: absolute;
-  right: 5px;
+  background-color: rgba(255, 255, 255, .3);
 }
 
 @media (max-width: 1200px) {
