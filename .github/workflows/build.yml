@@ -27,7 +27,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
-          registry-url: "http://registry.npmjs.org"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Use Python 3.x
         uses: actions/setup-python@v4
