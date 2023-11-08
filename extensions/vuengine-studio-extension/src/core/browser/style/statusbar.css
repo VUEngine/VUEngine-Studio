@@ -2,17 +2,9 @@
   --theia-statusBar-height: 28px;
 }
 
-#theia-statusBar .area.left {
-  padding-left: var(--theia-ui-padding);
-}
-
-#theia-statusBar .area.right {
-  padding-right: var(--theia-ui-padding);
-}
-
 #theia-statusBar .area.left .element,
 #theia-statusBar .area.right .element {
-  margin-left: unset;
+  margin: 0;
   padding: 0 var(--theia-ui-padding);
 }
 
@@ -22,4 +14,12 @@
 
 #theia-statusBar .element.disabled {
   opacity: 0.5;
+}
+
+#theia-statusBar .area.left .element:first-child:not(.has-background) {
+  margin-left: var(--theia-ui-padding);
+}
+
+#theia-statusBar .area.right {
+  padding-right: var(--theia-ui-padding);
 }
