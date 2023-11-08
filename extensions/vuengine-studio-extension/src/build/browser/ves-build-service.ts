@@ -1091,7 +1091,8 @@ export class VesBuildService {
   }
 
   protected getLastBuildModeStorageKey(): string {
-    const workspacePath = this.workspaceService.tryGetRoots()[0].resource.path;
-    return `ves-last-build-mode/${workspacePath}`;
+    const workspaceRoot = this.workspaceService.tryGetRoots()[0];
+    const workspacePath = workspaceRoot ? `/${workspaceRoot.resource.path}` : '';
+    return `ves-last-build-mode${workspacePath}`;
   }
 }
