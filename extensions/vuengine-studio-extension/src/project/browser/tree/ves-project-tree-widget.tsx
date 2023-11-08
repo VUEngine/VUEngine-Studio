@@ -196,8 +196,9 @@ export class VesProjectTreeWidget extends TreeWidget {
   protected createRemoveHandler(node: VesProjectChildNode): (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void {
     return event => {
       event.stopPropagation();
-      const name = node.name
-        ? `"${node.name}"`
+      const providedName = this.labelProvider.getName(node);
+      const name = providedName
+        ? `"${providedName}"`
         : nls.localize('vuengine/projects/thisNode', 'this node');
       const dialog = new ConfirmDialog({
         title: nls.localize('vuengine/projects/deleteNodeQuestion', 'Delete Node?'),
