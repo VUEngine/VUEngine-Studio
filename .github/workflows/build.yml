@@ -38,6 +38,8 @@ jobs:
         shell: bash
         run: |
           yarn --skip-integrity-check --network-timeout 100000
+          yarn build
+          yarn download:plugins
           yarn electron package
         env:
           NODE_OPTIONS: --max_old_space_size=4096
