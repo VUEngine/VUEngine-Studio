@@ -41,7 +41,7 @@ Install yarn.
 
 On Linux systems, you'll need the following packages:
 
-    sudo apt-get install -y g++ gcc make python2.7 pkg-config libx11-dev libxkbfile-dev libsecret-1-dev
+    sudo apt-get install -y g++ gcc make python3 pkg-config libx11-dev libxkbfile-dev libsecret-1-dev
 
 On Windows, install Visual Studio Build Tools.
 
