@@ -49,7 +49,7 @@ fileAssociations:
 
 win:
   icon: resources/icons/WindowsLauncherIcon/VUEngineStudio.ico
-  artifactName: VUEngine-Studio-${version}-Windows.${ext}
+  artifactName: VUEngine-Studio-${versionDashes}-Windows.${ext}
   target:
     - nsis
   extraResources:
@@ -60,7 +60,7 @@ win:
 
 mac:
   #executableName: VUEngine
-  artifactName: VUEngine-Studio-${version}-Mac.${ext}
+  artifactName: VUEngine-Studio-${versionDashes}-Mac.${ext}
   icon: resources/icons/MacLauncherIcon/512-512.icns
   category: public.app-category.developer-tools
   darkModeSupport: true
@@ -72,7 +72,7 @@ mac:
 
 linux:
   icon: resources/icons/LinuxLauncherIcon/512-512.png
-  artifactName: VUEngine-Studio-${version}-Linux.${ext}
+  artifactName: VUEngine-Studio-${versionDashes}-Linux.${ext}
   category: Development
   vendor: VUEngine
   maintainer: VUEngine
@@ -96,10 +96,10 @@ nsis:
   uninstallerIcon: resources/icons/WindowsLauncherIcon/VUEngineStudio.ico
   installerSidebar: resources/icons/InstallerSidebarImage/164-314Windows.bmp
   uninstallerSidebar: resources/icons/InstallerSidebarImage/164-314Windows.bmp
-  artifactName: VUEngine-Studio-${version}-Setup-Windows.${ext}
+  artifactName: VUEngine-Studio-${versionDashes}-Setup-Windows.${ext}
   uninstallDisplayName: VUEngine Studio
 pkg:
-  artifactName: VUEngine-Studio-${version}-Setup-Mac.${ext}
+  artifactName: VUEngine-Studio-${versionDashes}-Setup-Mac.${ext}
   installLocation: /Applications
   allowAnywhere: false
   allowCurrentUserHome: false
@@ -112,6 +112,7 @@ pkg:
     alignment: bottomleft
     scaling: proportional
 deb:
-  artifactName: VUEngine-Studio-${version}-Setup-Linux.${ext}
+  artifactName: VUEngine-Studio-${versionDashes}-Setup-Linux.${ext}
 
+beforePack: ./scripts/before-pack.js
 afterPack: ./scripts/after-pack.js
