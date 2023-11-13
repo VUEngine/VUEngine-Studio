@@ -434,15 +434,22 @@ export class VesBuildService {
     const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
     const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
     const compilerUri = await this.vesBuildPathsService.getCompilerUri(this.vesCommonService.isWslInstalled);
+    const makeUri = await this.vesBuildPathsService.getMakeUri(this.vesCommonService.isWslInstalled);
     const makefileUri = await this.getMakefileUri(workspaceRootUri, engineCoreUri);
 
     // TODO: remove check when https://github.com/VUEngine/VUEngine-Studio/issues/15 is resolved
     await this.checkPathsForSpaces(workspaceRootUri, engineCoreUri, enginePluginsUri, userPluginsUri);
 
+    const pathUris: URI[] = [
+      compilerUri.resolve('bin'),
+      compilerUri.resolve('libexec').resolve('bin'),
+      makeUri,
+    ];
+
     if (isWindows) {
       const args = [
         'cd', await this.convertoToEnvPath(workspaceRootUri), '&&',
-        'export', `PATH=${await this.convertoToEnvPath(compilerUri.resolve('bin'))}:$PATH`,
+        'export', `PATH=${await Promise.all(pathUris.map(async p => this.convertoToEnvPath(p)).join(':'))}:$PATH`,
         'LC_ALL=C',
         `MAKE_JOBS=${this.getThreads()}`,
         'PREPROCESSING_WAIT_FOR_LOCK_DELAY_FACTOR=0.0',
@@ -456,28 +463,15 @@ export class VesBuildService {
         '-f', await this.convertoToEnvPath(makefileUri),
       ];
 
-      if (this.vesCommonService.isWslInstalled) {
-
-        /* const winDir = await this.envVariablesServer.getValue('winDir');
-        if (!winDir || !winDir.value) {
-          return;
-        }
-
-        const winDirUri = new URI(winDir.value).withScheme('file');
-        const wslExeUri = winDirUri
-          .resolve('System32')
-          .resolve('wsl.exe');
-        */
-
-        return {
+      return this.vesCommonService.isWslInstalled
+        ? {
           command: 'wsl.exe',
           args: args,
           options: {
             cwd: await this.fileService.fsPath(workspaceRootUri)
           },
-        };
-      } else {
-        return {
+        }
+        : {
           command: await this.fileService.fsPath(await this.vesBuildPathsService.getMsysBashUri()),
           args: [
             '--login',
@@ -487,10 +481,9 @@ export class VesBuildService {
             cwd: await this.fileService.fsPath(workspaceRootUri),
           },
         };
-      }
     }
 
-    const paths = [await this.fileService.fsPath(compilerUri.resolve('bin'))];
+    const paths = await Promise.all(pathUris.map(async p => this.fileService.fsPath(p)));
     const pathEnvVar = await this.envVariablesServer.getValue('PATH');
     if (pathEnvVar !== undefined) {
       paths.push(pathEnvVar.value!);
@@ -721,25 +714,25 @@ export class VesBuildService {
 
     const engineCorePath = await this.vesBuildPathsService.getEngineCoreUri();
     const compilerUri = await this.vesBuildPathsService.getCompilerUri(this.vesCommonService.isWslInstalled);
+    const makeUri = await this.vesBuildPathsService.getMakeUri(this.vesCommonService.isWslInstalled);
 
-    await Promise.all([
-      this.vesProcessService.launchProcess(VesProcessType.Raw, {
-        command,
-        args: args.concat(await this.fileService.fsPath(compilerUri.resolve('bin'))),
-      }),
-      this.vesProcessService.launchProcess(VesProcessType.Raw, {
-        command,
-        args: args.concat(await this.fileService.fsPath(compilerUri.resolve('libexec'))),
-      }),
-      this.vesProcessService.launchProcess(VesProcessType.Raw, {
-        command,
-        args: args.concat(await this.fileService.fsPath(compilerUri.resolve('v810').resolve('bin'))),
-      }),
-      this.vesProcessService.launchProcess(VesProcessType.Raw, {
-        command,
-        args: args.concat(await this.fileService.fsPath(engineCorePath.resolve('lib').resolve('compiler').resolve('preprocessor'))),
-      }),
+    const paths = await Promise.all([
+      this.fileService.fsPath(compilerUri.resolve('bin')),
+      this.fileService.fsPath(compilerUri.resolve('libexec')),
+      this.fileService.fsPath(compilerUri.resolve('v810').resolve('bin')),
+      this.fileService.fsPath(engineCorePath.resolve('lib').resolve('compiler').resolve('preprocessor')),
     ]);
+
+    if (!isWindows) {
+      paths.push(await this.fileService.fsPath(makeUri));
+    }
+
+    console.log('paths', paths);
+
+    paths.map(p => this.vesProcessService.launchProcess(VesProcessType.Raw, {
+      command,
+      args: args.concat(p),
+    }));
   }
 
   bytesToMbit(bytes: number): number {

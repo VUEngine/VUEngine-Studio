@@ -28,6 +28,15 @@ export class VesBuildPathsService {
       : defaultUri;
   }
 
+  async getMakeUri(isWslInstalled: boolean = false): Promise<URI> {
+    const resourcesUri = await this.vesCommonService.getResourcesUri();
+    return resourcesUri
+      .resolve('binaries')
+      .resolve('vuengine-studio-tools')
+      .resolve(isWslInstalled ? 'linux' : this.vesCommonService.getOs())
+      .resolve('make');
+  }
+
   async getCompilerUri(isWslInstalled: boolean = false): Promise<URI> {
     const resourcesUri = await this.vesCommonService.getResourcesUri();
     return resourcesUri
