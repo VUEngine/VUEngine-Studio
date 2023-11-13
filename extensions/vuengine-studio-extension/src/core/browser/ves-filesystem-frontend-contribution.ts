@@ -6,16 +6,16 @@ import { VES_PREFERENCE_DIR } from './ves-preference-configurations';
 export class VesFileSystemFrontendContribution extends FileSystemFrontendContribution {
     protected updateAssociations(): void {
         const projectFilePattern = `*${VES_PREFERENCE_DIR}`;
-        const fileAssociations: {[filePattern: string]: string} = {
+        const fileAssociations: { [filePattern: string]: string } = {
             ...{
                 [projectFilePattern]: 'jsonc',
-                '*.make': 'Makefile',
+                '*.make': 'makefile',
                 '*.ld': 'c',
-                'makefile-common': 'Makefile',
-                'makefile-compile': 'Makefile',
-                'makefile-compiler': 'Makefile',
-                'makefile-game': 'Makefile',
-                'makefile-preprocess': 'Makefile',
+                'makefile-common': 'makefile',
+                'makefile-compile': 'makefile',
+                'makefile-compiler': 'makefile',
+                'makefile-game': 'makefile',
+                'makefile-preprocess': 'makefile',
             },
             ...this.preferences['files.associations'],
         };
