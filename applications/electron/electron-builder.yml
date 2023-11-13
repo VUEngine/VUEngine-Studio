@@ -71,7 +71,7 @@ mac:
       to: app/binaries/vuengine-studio-tools/osx
 
 linux:
-  icon: resources/icons/LinuxLauncherIcon/512-512.png
+  icon: resources/icons/MacLauncherIcon/512-512.icns
   artifactName: VUEngine-Studio-${versionDashes}-Linux.${ext}
   category: Development
   vendor: VUEngine
