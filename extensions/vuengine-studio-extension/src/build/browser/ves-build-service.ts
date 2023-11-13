@@ -717,17 +717,12 @@ export class VesBuildService {
     const makeUri = await this.vesBuildPathsService.getMakeUri(this.vesCommonService.isWslInstalled);
 
     const paths = await Promise.all([
+      this.fileService.fsPath(makeUri),
       this.fileService.fsPath(compilerUri.resolve('bin')),
       this.fileService.fsPath(compilerUri.resolve('libexec')),
       this.fileService.fsPath(compilerUri.resolve('v810').resolve('bin')),
       this.fileService.fsPath(engineCorePath.resolve('lib').resolve('compiler').resolve('preprocessor')),
     ]);
-
-    if (!isWindows) {
-      paths.push(await this.fileService.fsPath(makeUri));
-    }
-
-    console.log('paths', paths);
 
     paths.map(p => this.vesProcessService.launchProcess(VesProcessType.Raw, {
       command,
