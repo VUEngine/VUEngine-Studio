@@ -11,6 +11,7 @@ import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-co
 import { VesProjectCommands } from '../../project/browser/ves-project-commands';
 import { VesTouchBarCommands } from '../common/ves-touchbar-types';
 import { VesTouchBarIcons } from './images/touch-bar-icons';
+import { FrontendApplicationConfig } from '@theia/core/shared/@theia/application-package';
 // import IMAGE_BLANK from '../../../src/touchbar/electron-main/images/blank.png';
 // import IMAGE_VES from '../../../src/touchbar/electron-main/images/ves.png';
 // import IMAGE_CLEAN from '../../../src/touchbar/electron-main/images/clean.png';
@@ -90,6 +91,10 @@ export class VesElectronMainApplication extends ElectronMainApplication {
             minWidth: 850,
             titleBarStyle: 'hiddenInset'
         };
+    }
+
+    protected getTitleBarStyle(config: FrontendApplicationConfig): 'native' | 'custom' {
+        return 'custom';
     }
 
     protected registerVesTouchBar(electronWindow: BrowserWindow, workspaceOpened: boolean): void {
