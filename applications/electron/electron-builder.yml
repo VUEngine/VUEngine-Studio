@@ -78,7 +78,6 @@ linux:
   maintainer: VUEngine
   target:
     - deb
-    - AppImage
   extraResources:
     - from: binaries/vuengine-studio-tools/linux
       to: app/binaries/vuengine-studio-tools/linux
@@ -114,7 +113,5 @@ pkg:
     scaling: proportional
 deb:
   artifactName: VUEngine-Studio-${version}-Setup-Linux.${ext}
-appImage:
-  artifactName: VUEngine-Studio-${version}-Linux.${ext}
 
 afterPack: ./scripts/after-pack.js

@@ -70,7 +70,6 @@ jobs:
           name: Linux
           path: |
             applications/electron/dist/*.deb
-            applications/electron/dist/*.AppImage
             applications/electron/dist/latest-linux.yml
 
       - name: Lint
