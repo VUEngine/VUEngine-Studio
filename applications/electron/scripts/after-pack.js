@@ -14,13 +14,13 @@ const DELETE_PATHS = [
 ];
 
 const EXECUTABLE_PATHS = [
-    'binaries/vuengine-studio-tools/osx/gcc/bin',
-    'binaries/vuengine-studio-tools/osx/gcc/libexec/gcc/v810/4.7.4',
-    'binaries/vuengine-studio-tools/osx/gcc/v810/bin',
-    'binaries/vuengine-studio-tools/osx/grit/grit',
-    'binaries/vuengine-studio-tools/osx/hb-cli/hbcli',
-    'binaries/vuengine-studio-tools/osx/hf-cli/hfcli',
-    'binaries/vuengine-studio-tools/osx/make/make',
+    'binaries/vuengine-studio-tools/${os}/gcc/bin',
+    'binaries/vuengine-studio-tools/${os}/gcc/libexec/gcc/v810/4.7.4',
+    'binaries/vuengine-studio-tools/${os}/gcc/v810/bin',
+    'binaries/vuengine-studio-tools/${os}/grit/grit',
+    'binaries/vuengine-studio-tools/${os}/hb-cli/hbcli',
+    'binaries/vuengine-studio-tools/${os}/hf-cli/hfcli',
+    'binaries/vuengine-studio-tools/${os}/make/make',
     'vuengine/core/lib/compiler/preprocessor',
 ];
 
@@ -48,29 +48,28 @@ const signFile = file => {
 };
 
 exports.default = async function (context) {
-    // Do not continue for Windows
-    if (context.packager.platform.name !== 'mac' && context.packager.platform.name !== 'linux') {
-        return;
-    }
+    const appPath = path.resolve(context.appOutDir, context.packager.platform.name === 'mac'
+        ? `${context.packager.appInfo.productFilename}.app/Contents/Resources/app/`
+        : 'resources/app/');
 
-    const appPath = path.resolve(context.appOutDir, `${context.packager.appInfo.productFilename}.app`);
-
-    const appDir = context.packager.platform.name === 'mac'
-        ? 'Contents/Resources/app/'
-        : 'resources/app/';
+    const os = context.packager.platform.name
+        .replace('mac', 'osx')
+        .replace('windows', 'linux'); // on Windows, we just need to chmod Linux gcc for use in WSL
+    const replaceOs = p => p.replace('${os}', os);
+    console.log('---------------------------------------------------------', os);
 
     // Remove anything we don't want in the final package
     for (const deletePath of DELETE_PATHS) {
-        const resolvedPath = path.resolve(appPath, appDir + deletePath);
+        const resolvedPath = path.resolve(appPath, replaceOs(deletePath));
         console.log(`Deleting ${resolvedPath}...`);
         await asyncRimraf(resolvedPath);
     }
 
     // Set executable flags
     for (const execPath of EXECUTABLE_PATHS) {
-        const resolvedPath = path.resolve(appPath, appDir + execPath);
-        console.log(`chmod ${resolvedPath}...`);
+        const resolvedPath = path.resolve(appPath, replaceOs(execPath));
         if (fs.existsSync(resolvedPath)) {
+            console.log(`chmod ${resolvedPath}...`);
             if (fs.lstatSync(resolvedPath).isDirectory()) {
                 const files = fs.readdirSync(resolvedPath);
                 files.forEach(file => {
