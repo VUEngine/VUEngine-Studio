@@ -56,7 +56,6 @@ exports.default = async function (context) {
         .replace('mac', 'osx')
         .replace('windows', 'linux'); // on Windows, we just need to chmod Linux gcc for use in WSL
     const replaceOs = p => p.replace('${os}', os);
-    console.log('---------------------------------------------------------', os);
 
     // Remove anything we don't want in the final package
     for (const deletePath of DELETE_PATHS) {
