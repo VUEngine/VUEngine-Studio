@@ -7,7 +7,6 @@ import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { VesBuildService } from '../../build/browser/ves-build-service';
-import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
@@ -33,8 +32,6 @@ export class VesEmulatorService {
   private readonly quickPickService: QuickPickService;
   @inject(VesBuildService)
   private readonly vesBuildService: VesBuildService;
-  @inject(VesCommonService)
-  private readonly vesCommonService: VesCommonService;
   @inject(VesProcessService)
   private readonly vesProcessService: VesProcessService;
   @inject(VesProjectService)
