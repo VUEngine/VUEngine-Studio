@@ -6,7 +6,7 @@ import { inject, injectable } from '@theia/core/shared/inversify';
 export class VesCoreCompactMainMenuContribution implements FrontendApplicationContribution {
     @inject(ApplicationShell)
     protected readonly shell: ApplicationShell;
-    @inject(PreferenceService) 
+    @inject(PreferenceService)
     protected readonly preferenceService: PreferenceService;
 
     onStart(app: FrontendApplication): void {
