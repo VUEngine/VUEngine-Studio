@@ -193,8 +193,6 @@ export class VesFlashCartService {
           .split(' ')
         : [];
 
-      await this.fixFilePermissions();
-
       const { processManagerId } = await this.vesProcessService.launchProcess(VesProcessType.Terminal, {
         command: flasherPath,
         args: flasherArgs,
@@ -229,33 +227,6 @@ export class VesFlashCartService {
     this.isFlashing = false;
     this.onDidFailFlashingEmitter.fire();
     this.flashingProgress = -1;
-  }
-
-  /**
-   * Give executables respective permission on UNIX systems.
-   * Must be executed before every run to ensure permissions are right,
-   * even right after reconfiguring paths.
-   */
-  protected async fixFilePermissions(): Promise<void> {
-    let command = 'chmod';
-    let args = ['-R', 'a+x'];
-
-    if (isWindows) {
-      if (this.vesCommonService.isWslInstalled) {
-        command = 'wsl.exe';
-        args = ['chmod'].concat(args);
-      } else {
-        return;
-      }
-    }
-
-    this.connectedFlashCarts.forEach(async connectedFlashCart => {
-      const flasherPath = await this.replaceFlasherPath(connectedFlashCart.config.path);
-      await this.vesProcessService.launchProcess(VesProcessType.Raw, {
-        command,
-        args: args.concat(flasherPath),
-      });
-    });
   }
 
   protected bindEvents(): void {

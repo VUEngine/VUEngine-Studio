@@ -170,7 +170,6 @@ export class VesImageConverterService {
     });
 
     const gritUri = await this.getGritUri();
-    await this.fixFilePermissions(gritUri);
 
     await Promise.all(imageConfigFilesToBeConverted.map(async imageConfigFileToBeConverted => {
       await this.doConvertFile(imageConfigFileToBeConverted, gritUri);
@@ -668,30 +667,6 @@ export class VesImageConverterService {
     }
 
     return gritArguments;
-  }
-
-  /**
-   * Give executables respective permission on UNIX systems.
-   * Must be executed before every run to ensure permissions are right,
-   * even right after reconfiguring paths.
-   */
-  async fixFilePermissions(gritUri: URI): Promise<void> {
-    let command = 'chmod';
-    let args = ['-R', 'a+x'];
-
-    if (isWindows) {
-      if (this.vesCommonService.isWslInstalled) {
-        command = 'wsl.exe';
-        args = ['chmod'].concat(args);
-      } else {
-        return;
-      }
-    }
-
-    await this.vesProcessService.launchProcess(VesProcessType.Raw, {
-      command,
-      args: args.concat(await this.fileService.fsPath(gritUri)),
-    });
   }
 
   protected async getGritUri(): Promise<URI> {
