@@ -155,6 +155,9 @@ export class VesBuildWidget extends ReactWidget {
   }
 
   protected render(): React.ReactNode {
+    const useWsl = this.preferenceService.get(VesBuildPreferenceIds.USE_WSL) as boolean;
+    const isWslInstalled = useWsl && this.vesCommonService.isWslInstalled;
+
     return (
       <>
         <div className='buildActions'>
@@ -226,7 +229,7 @@ export class VesBuildWidget extends ReactWidget {
               {this.vesBuildService.isCleaning && <i className='fa fa-cog fa-spin'></i>}
             </button>
           </div>
-          {isWindows && !this.vesCommonService.isWslInstalled && (
+          {isWindows && !isWslInstalled && (
             <div>
               <i className='fa fa-exclamation-triangle'></i> {nls.localize('vuengine/build/pleaseInstallWsl',
                 'Please consider installing WSL to massively improve build times.')} (
@@ -262,7 +265,7 @@ export class VesBuildWidget extends ReactWidget {
                 <span><i className='fa fa-wrench'></i> {this.vesBuildService.buildStatus.buildMode}</span>
                 {this.vesBuildService.buildStatus.active && this.vesBuildService.buildStatus.processId > 0 &&
                   <span><i className='fa fa-terminal'></i> PID {this.vesBuildService.buildStatus.processId}</span>}
-                {this.vesCommonService.isWslInstalled &&
+                {isWslInstalled &&
                   <span><i className='fa fa-linux'></i> WSL</span>}
                 {!this.vesBuildService.buildStatus.active && this.vesBuildService.romSize > 0 &&
                   <span><i className='fa fa-microchip'></i> {this.vesBuildService.bytesToMbit(this.vesBuildService.romSize)} MBit</span>}
