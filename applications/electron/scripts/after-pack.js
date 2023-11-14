@@ -9,19 +9,19 @@ const rimraf = require('rimraf');
 const asyncRimraf = util.promisify(rimraf);
 
 const DELETE_PATHS = [
-    'Contents/Resources/app/node_modules/unzip-stream/aa.zip',
-    'Contents/Resources/app/node_modules/unzip-stream/testData*'
+    'node_modules/unzip-stream/aa.zip',
+    'node_modules/unzip-stream/testData*'
 ];
 
 const EXECUTABLE_PATHS = [
-    'Contents/Resources/app/binaries/vuengine-studio-tools/osx/gcc/bin',
-    'Contents/Resources/app/binaries/vuengine-studio-tools/osx/gcc/libexec',
-    'Contents/Resources/app/binaries/vuengine-studio-tools/osx/gcc/v810/bin',
-    'Contents/Resources/app/binaries/vuengine-studio-tools/osx/grit/grit',
-    'Contents/Resources/app/binaries/vuengine-studio-tools/osx/hb-cli/hbcli',
-    'Contents/Resources/app/binaries/vuengine-studio-tools/osx/hf-cli/hfcli',
-    'Contents/Resources/app/binaries/vuengine-studio-tools/osx/make/make',
-    'Contents/Resources/app/vuengine/core/lib/compiler/preprocessor',
+    'binaries/vuengine-studio-tools/osx/gcc/bin',
+    'binaries/vuengine-studio-tools/osx/gcc/libexec/gcc/v810/4.7.4',
+    'binaries/vuengine-studio-tools/osx/gcc/v810/bin',
+    'binaries/vuengine-studio-tools/osx/grit/grit',
+    'binaries/vuengine-studio-tools/osx/hb-cli/hbcli',
+    'binaries/vuengine-studio-tools/osx/hf-cli/hfcli',
+    'binaries/vuengine-studio-tools/osx/make/make',
+    'vuengine/core/lib/compiler/preprocessor',
 ];
 
 const signCommand = path.join(__dirname, 'sign.sh');
@@ -48,21 +48,37 @@ const signFile = file => {
 };
 
 exports.default = async function (context) {
+    // Do not continue for Windows
+    if (context.packager.platform.name !== 'mac' && context.packager.platform.name !== 'linux') {
+        return;
+    }
+
     const appPath = path.resolve(context.appOutDir, `${context.packager.appInfo.productFilename}.app`);
+
+    const appDir = context.packager.platform.name === 'mac'
+        ? 'Contents/Resources/app/'
+        : 'resources/app/';
 
     // Remove anything we don't want in the final package
     for (const deletePath of DELETE_PATHS) {
-        const resolvedPath = path.resolve(appPath, deletePath);
+        const resolvedPath = path.resolve(appPath, appDir + deletePath);
         console.log(`Deleting ${resolvedPath}...`);
         await asyncRimraf(resolvedPath);
     }
 
     // Set executable flags
     for (const execPath of EXECUTABLE_PATHS) {
-        const resolvedPath = path.resolve(appPath, execPath);
+        const resolvedPath = path.resolve(appPath, appDir + execPath);
         console.log(`chmod ${resolvedPath}...`);
         if (fs.existsSync(resolvedPath)) {
-            fs.chmodSync(resolvedPath, '755');
+            if (fs.lstatSync(resolvedPath).isDirectory()) {
+                const files = fs.readdirSync(resolvedPath);
+                files.forEach(file => {
+                    fs.chmodSync(path.resolve(resolvedPath, file), '755');
+                });
+            } else {
+                fs.chmodSync(resolvedPath, '755');
+            }
         }
     }
 
@@ -70,6 +86,7 @@ exports.default = async function (context) {
     if (context.packager.platform.name !== 'mac') {
         return;
     }
+
     /*
     // Use app-builder-lib to find all binaries to sign, at this level it will include the final .app
     let childPaths = await sign_util.walkAsync(context.appOutDir);
