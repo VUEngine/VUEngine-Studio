@@ -49,7 +49,7 @@ fileAssociations:
 
 win:
   icon: resources/icons/WindowsLauncherIcon/VUEngineStudio.ico
-  artifactName: VUEngine-Studio-${versionDashes}-Windows.${ext}
+  artifactName: VUEngine-Studio-${versionDashes}.${ext}
   target:
     - nsis
   extraResources:
@@ -59,8 +59,7 @@ win:
       to: app/binaries/vuengine-studio-tools/linux/gcc
 
 mac:
-  #executableName: VUEngine
-  artifactName: VUEngine-Studio-${versionDashes}-Mac.${ext}
+  artifactName: VUEngine-Studio-${versionDashes}.${ext}
   icon: resources/icons/MacLauncherIcon/512-512.icns
   category: public.app-category.developer-tools
   darkModeSupport: true
@@ -72,12 +71,13 @@ mac:
 
 linux:
   icon: resources/icons/MacLauncherIcon/512-512.icns
-  artifactName: VUEngine-Studio-${versionDashes}-Linux.${ext}
+  artifactName: VUEngine-Studio-${versionDashes}.${ext}
   category: Development
   vendor: VUEngine
   maintainer: VUEngine
   target:
     - deb
+    - AppImage
   extraResources:
     - from: binaries/vuengine-studio-tools/linux
       to: app/binaries/vuengine-studio-tools/linux
@@ -96,10 +96,10 @@ nsis:
   uninstallerIcon: resources/icons/WindowsLauncherIcon/VUEngineStudio.ico
   installerSidebar: resources/icons/InstallerSidebarImage/164-314Windows.bmp
   uninstallerSidebar: resources/icons/InstallerSidebarImage/164-314Windows.bmp
-  artifactName: VUEngine-Studio-${versionDashes}-Setup-Windows.${ext}
+  artifactName: VUEngine-Studio-${versionDashes}-Setup.${ext}
   uninstallDisplayName: VUEngine Studio
 pkg:
-  artifactName: VUEngine-Studio-${versionDashes}-Setup-Mac.${ext}
+  artifactName: VUEngine-Studio-${versionDashes}-Setup.${ext}
   installLocation: /Applications
   allowAnywhere: false
   allowCurrentUserHome: false
@@ -112,7 +112,9 @@ pkg:
     alignment: bottomleft
     scaling: proportional
 deb:
-  artifactName: VUEngine-Studio-${versionDashes}-Setup-Linux.${ext}
+  artifactName: VUEngine-Studio-${versionDashes}-Setup.${ext}
+appImage:
+  artifactName: VUEngine-Studio-${versionDashes}.${ext}
 
 beforePack: ./scripts/before-pack.js
 afterPack: ./scripts/after-pack.js
