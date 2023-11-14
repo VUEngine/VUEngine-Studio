@@ -54,6 +54,7 @@ import { VesThemeService } from './ves-theme-service';
 import { VesToolbarDefaultsOverride } from './ves-toolbar-defaults-override';
 import { VesWindowTitleService } from './ves-window-title-service';
 import { VesWorkspaceService } from './ves-workspace-service';
+import { VesCoreCompactMainMenuContribution } from './ves-core-compact-main-menu-contribution';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // rename default icon theme
@@ -67,6 +68,10 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(BrowserMainMenuFactory).toSelf().inSingletonScope();
     bind(BrowserMenuBarContribution).toSelf().inSingletonScope();
     bind(FrontendApplicationContribution).toService(BrowserMenuBarContribution);
+
+    // properly initiate compact main menu
+    bind(VesCoreCompactMainMenuContribution).toSelf().inSingletonScope();
+    bind(FrontendApplicationContribution).toService(VesCoreCompactMainMenuContribution);
 
     // preferences
     rebind(CorePreferenceContribution).toConstantValue({ schema: VesCorePreferenceSchema });

@@ -13,7 +13,7 @@ export const VesCorePreferenceSchema: PreferenceSchema = {
         },
         ['window.menuBarVisibility']: {
             ...corePreferenceSchema.properties['window.menuBarVisibility'],
-            default: isOSX ? 'hidden' : corePreferenceSchema.properties['window.menuBarVisibility'].default,
+            default: isOSX ? 'hidden' : 'compact',
             included: true
         }
     }
