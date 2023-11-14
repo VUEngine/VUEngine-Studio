@@ -446,9 +446,10 @@ export class VesBuildService {
     ];
 
     if (isWindows) {
+      const winPaths = await Promise.all(pathUris.map(async p => this.convertoToEnvPath(p)));
       const args = [
         'cd', await this.convertoToEnvPath(workspaceRootUri), '&&',
-        'export', `PATH=${await Promise.all(pathUris.map(async p => this.convertoToEnvPath(p)).join(':'))}:$PATH`,
+        'export', `PATH=${winPaths.join(':')}:$PATH`,
         'LC_ALL=C',
         `MAKE_JOBS=${this.getThreads()}`,
         'PREPROCESSING_WAIT_FOR_LOCK_DELAY_FACTOR=0.0',
