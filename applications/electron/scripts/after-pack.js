@@ -13,6 +13,17 @@ const DELETE_PATHS = [
     'Contents/Resources/app/node_modules/unzip-stream/testData*'
 ];
 
+const EXECUTABLE_PATHS = [
+    'Contents/Resources/app/binaries/vuengine-studio-tools/osx/gcc/bin',
+    'Contents/Resources/app/binaries/vuengine-studio-tools/osx/gcc/libexec',
+    'Contents/Resources/app/binaries/vuengine-studio-tools/osx/gcc/v810/bin',
+    'Contents/Resources/app/binaries/vuengine-studio-tools/osx/grit/grit',
+    'Contents/Resources/app/binaries/vuengine-studio-tools/osx/hb-cli/hbcli',
+    'Contents/Resources/app/binaries/vuengine-studio-tools/osx/hf-cli/hfcli',
+    'Contents/Resources/app/binaries/vuengine-studio-tools/osx/make/make',
+    'Contents/Resources/app/vuengine/core/lib/compiler/preprocessor',
+];
+
 const signCommand = path.join(__dirname, 'sign.sh');
 // const notarizeCommand = path.join(__dirname, 'notarize.sh');
 const entitlements = path.resolve(__dirname, '..', 'entitlements.plist');
@@ -44,6 +55,15 @@ exports.default = async function (context) {
         const resolvedPath = path.resolve(appPath, deletePath);
         console.log(`Deleting ${resolvedPath}...`);
         await asyncRimraf(resolvedPath);
+    }
+
+    // Set executable flags
+    for (const execPath of EXECUTABLE_PATHS) {
+        const resolvedPath = path.resolve(appPath, execPath);
+        console.log(`chmod ${resolvedPath}...`);
+        if (fs.existsSync(resolvedPath)) {
+            fs.chmodSync(resolvedPath, '755');
+        }
     }
 
     // Only continue for macOS
