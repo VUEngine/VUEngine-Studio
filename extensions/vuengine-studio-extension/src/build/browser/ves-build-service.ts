@@ -393,7 +393,6 @@ export class VesBuildService {
 
       const buildParams = await this.getBuildProcessParams();
       await this.deleteRom();
-      await this.fixFilePermissions();
       ({ processManagerId, processId } = await this.vesProcessService.launchProcess(VesProcessType.Raw, buildParams));
 
     } catch (e) {
@@ -692,42 +691,6 @@ export class VesBuildService {
   protected computeProgress(): number {
     // each headline indicates that a new chunk of work is being _started_, not finishing, hence -1
     return Math.floor((this.buildStatus.stepsDone - 1) * 100 / this.buildStatus.stepsTotal);
-  }
-
-  /**
-   * Give executables respective permission on UNIX systems.
-   * Must be executed before every build to ensure permissions are right,
-   * even right after reconfiguring engine paths.
-   */
-  protected async fixFilePermissions(): Promise<void> {
-    let command = 'chmod';
-    let args = ['-R', 'a+x'];
-
-    if (isWindows) {
-      if (this.vesCommonService.isWslInstalled) {
-        command = 'wsl.exe';
-        args = ['chmod'].concat(args);
-      } else {
-        return;
-      }
-    }
-
-    const engineCorePath = await this.vesBuildPathsService.getEngineCoreUri();
-    const compilerUri = await this.vesBuildPathsService.getCompilerUri(this.vesCommonService.isWslInstalled);
-    const makeUri = await this.vesBuildPathsService.getMakeUri(this.vesCommonService.isWslInstalled);
-
-    const paths = await Promise.all([
-      this.fileService.fsPath(makeUri),
-      this.fileService.fsPath(compilerUri.resolve('bin')),
-      this.fileService.fsPath(compilerUri.resolve('libexec')),
-      this.fileService.fsPath(compilerUri.resolve('v810').resolve('bin')),
-      this.fileService.fsPath(engineCorePath.resolve('lib').resolve('compiler').resolve('preprocessor')),
-    ]);
-
-    paths.map(p => this.vesProcessService.launchProcess(VesProcessType.Raw, {
-      command,
-      args: args.concat(p),
-    }));
   }
 
   bytesToMbit(bytes: number): number {

@@ -9,8 +9,19 @@ const rimraf = require('rimraf');
 const asyncRimraf = util.promisify(rimraf);
 
 const DELETE_PATHS = [
-    'Contents/Resources/app/node_modules/unzip-stream/aa.zip',
-    'Contents/Resources/app/node_modules/unzip-stream/testData*'
+    'node_modules/unzip-stream/aa.zip',
+    'node_modules/unzip-stream/testData*'
+];
+
+const EXECUTABLE_PATHS = [
+    'binaries/vuengine-studio-tools/${os}/gcc/bin',
+    'binaries/vuengine-studio-tools/${os}/gcc/libexec/gcc/v810/4.7.4',
+    'binaries/vuengine-studio-tools/${os}/gcc/v810/bin',
+    'binaries/vuengine-studio-tools/${os}/grit/grit',
+    'binaries/vuengine-studio-tools/${os}/hb-cli/hbcli',
+    'binaries/vuengine-studio-tools/${os}/hf-cli/hfcli',
+    'binaries/vuengine-studio-tools/${os}/make/make',
+    'vuengine/core/lib/compiler/preprocessor',
 ];
 
 const signCommand = path.join(__dirname, 'sign.sh');
@@ -37,19 +48,43 @@ const signFile = file => {
 };
 
 exports.default = async function (context) {
-    const appPath = path.resolve(context.appOutDir, `${context.packager.appInfo.productFilename}.app`);
+    const appPath = path.resolve(context.appOutDir, context.packager.platform.name === 'mac'
+        ? `${context.packager.appInfo.productFilename}.app/Contents/Resources/app/`
+        : 'resources/app/');
+
+    const os = context.packager.platform.name
+        .replace('mac', 'osx')
+        .replace('windows', 'linux'); // on Windows, we just need to chmod Linux gcc for use in WSL
+    const replaceOs = p => p.replace('${os}', os);
 
     // Remove anything we don't want in the final package
     for (const deletePath of DELETE_PATHS) {
-        const resolvedPath = path.resolve(appPath, deletePath);
+        const resolvedPath = path.resolve(appPath, replaceOs(deletePath));
         console.log(`Deleting ${resolvedPath}...`);
         await asyncRimraf(resolvedPath);
+    }
+
+    // Set executable flags
+    for (const execPath of EXECUTABLE_PATHS) {
+        const resolvedPath = path.resolve(appPath, replaceOs(execPath));
+        if (fs.existsSync(resolvedPath)) {
+            console.log(`chmod ${resolvedPath}...`);
+            if (fs.lstatSync(resolvedPath).isDirectory()) {
+                const files = fs.readdirSync(resolvedPath);
+                files.forEach(file => {
+                    fs.chmodSync(path.resolve(resolvedPath, file), '755');
+                });
+            } else {
+                fs.chmodSync(resolvedPath, '755');
+            }
+        }
     }
 
     // Only continue for macOS
     if (context.packager.platform.name !== 'mac') {
         return;
     }
+
     /*
     // Use app-builder-lib to find all binaries to sign, at this level it will include the final .app
     let childPaths = await sign_util.walkAsync(context.appOutDir);

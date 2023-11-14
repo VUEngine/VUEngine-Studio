@@ -1,11 +1,10 @@
 import { ApplicationShell, OpenerService, PreferenceScope, PreferenceService, QuickPickItem, QuickPickOptions } from '@theia/core/lib/browser';
-import { CommandService, isWindows, MessageService, nls } from '@theia/core/lib/common';
+import { CommandService, MessageService, nls } from '@theia/core/lib/common';
 import { QuickPickService } from '@theia/core/lib/common/quick-pick-service';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
@@ -33,8 +32,6 @@ export class VesEmulatorService {
   private readonly quickPickService: QuickPickService;
   @inject(VesBuildService)
   private readonly vesBuildService: VesBuildService;
-  @inject(VesCommonService)
-  private readonly vesCommonService: VesCommonService;
   @inject(VesProcessService)
   private readonly vesProcessService: VesProcessService;
   @inject(VesProjectService)
@@ -159,8 +156,6 @@ export class VesEmulatorService {
         return;
       }
 
-      await this.fixFilePermissions(emulatorUri);
-
       await this.vesProcessService.launchProcess(VesProcessType.Raw, {
         command: await this.fileService.fsPath(emulatorUri),
         args: emulatorArgs,
@@ -199,29 +194,5 @@ export class VesEmulatorService {
     ];
 
     return emulatorConfigs;
-  }
-
-  /**
-   * Give executables respective permission on UNIX systems.
-   * Must be executed before every run to ensure permissions are right,
-   * even right after reconfiguring paths.
-   */
-  async fixFilePermissions(emulatorUri: URI): Promise<void> {
-    let command = 'chmod';
-    let args = ['-R', 'a+x'];
-
-    if (isWindows) {
-      if (this.vesCommonService.isWslInstalled) {
-        command = 'wsl.exe';
-        args = ['chmod'].concat(args);
-      } else {
-        return;
-      }
-    }
-
-    await this.vesProcessService.launchProcess(VesProcessType.Raw, {
-      command,
-      args: args.concat(await this.fileService.fsPath(emulatorUri)),
-    });
   }
 }
