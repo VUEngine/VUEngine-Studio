@@ -16,8 +16,6 @@ import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { VesProcessService } from '../../process/common/ves-process-service-protocol';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import {
-  ProjectFileItemDeleteEvent,
-  ProjectFileItemSaveEvent,
   ProjectFileTemplate,
   ProjectFileTemplateEncoding,
   ProjectFileTemplateEventType,
@@ -62,12 +60,6 @@ export class VesCodeGenService {
   protected bindEvents(): void {
     this.vesPluginsService.onDidChangeInstalledPlugins(async () =>
       this.handlePluginChange());
-
-    this.vesProjectService.onDidSaveItem(async projectFileItemSaveEvent =>
-      this.handleAddItem(projectFileItemSaveEvent));
-
-    this.vesProjectService.onDidDeleteItem(async projectFileItemDeleteEvent =>
-      this.handleDeleteItem(projectFileItemDeleteEvent));
   }
 
   async generateAll(): Promise<void> {
@@ -78,6 +70,8 @@ export class VesCodeGenService {
         if (!template.itemSpecific) {
           await this.renderTemplate(templateId);
         } else {
+          // TODO
+          /*
           const itemsForType = this.vesProjectService.getProjectDataItemsForType(template.itemSpecific);
           if (itemsForType) {
             await Promise.all(Object.keys(itemsForType).map(async itemId => {
@@ -88,6 +82,7 @@ export class VesCodeGenService {
               await this.renderTemplate(templateId, item);
             }));
           }
+          */
         }
       }));
     }
@@ -121,7 +116,7 @@ export class VesCodeGenService {
     });
   }
 
-  async renderTemplate(templateId: string, itemData?: any): Promise<void> {
+  async renderTemplate(templateId: string, itemUri?: URI, itemData?: any): Promise<void> {
     await this.vesProjectService.ready;
     const template = this.vesProjectService.getProjectDataTemplate(templateId);
     if (!template) {
@@ -131,12 +126,13 @@ export class VesCodeGenService {
 
     const encoding = template.encoding ? template.encoding : ProjectFileTemplateEncoding.utf8;
 
+    const uri = itemUri || new URI();
     const data = {
       item: itemData,
       project: this.vesProjectService.getProjectData()
     };
 
-    await this.renderFileFromTemplate(templateId, template, data, encoding);
+    await this.renderFileFromTemplate(templateId, template, uri, data, encoding);
   }
 
   protected async handlePluginChange(): Promise<void> {
@@ -155,18 +151,18 @@ export class VesCodeGenService {
     }
   }
 
-  protected async handleAddItem(projectFileItemSaveEvent: ProjectFileItemSaveEvent): Promise<void> {
-    const typeData = this.vesProjectService.getProjectDataType(projectFileItemSaveEvent.typeId);
+  async renderTemplatesForItem(typeId: string, itemData: any, itemUri: URI): Promise<void> {
+    const typeData = this.vesProjectService.getProjectDataType(typeId);
     if (typeData && typeData.templates) {
       await Promise.all(typeData.templates.map(async templateId =>
-        this.renderTemplate(templateId, {
-          ...projectFileItemSaveEvent.item,
-          _id: projectFileItemSaveEvent.itemId
+        this.renderTemplate(templateId, itemUri, {
+          ...itemData,
+          _filename: itemUri.path.name,
         })));
     }
   }
 
-  protected async handleDeleteItem(projectFileItemDeleteEvent: ProjectFileItemDeleteEvent): Promise<void> {
+  protected async handleDeleteItem(typeId: string): Promise<void> {
     const templates = this.vesProjectService.getProjectDataTemplates();
     if (templates) {
       await Promise.all(Object.keys(templates).map(async templateId => {
@@ -174,7 +170,7 @@ export class VesCodeGenService {
         if (template.events) {
           await Promise.all(template.events.map(async templateEvent => {
             if (templateEvent.type === ProjectFileTemplateEventType.itemOfTypeGotDeleted
-              && templateEvent.value === projectFileItemDeleteEvent.typeId) {
+              && templateEvent.value === typeId) {
               await this.renderTemplate(templateId);
             }
           }));
@@ -186,6 +182,7 @@ export class VesCodeGenService {
   protected async renderFileFromTemplate(
     templateId: string,
     template: ProjectFileTemplate & WithContributor,
+    itemUri: URI,
     data: object,
     encoding: ProjectFileTemplateEncoding
   ): Promise<void> {
@@ -214,7 +211,9 @@ export class VesCodeGenService {
         });
 
       const targetPathParts = target.split('/');
-      let targetUri = workspaceRootUri;
+      let targetUri = template.targetRoot === 'project'
+        ? workspaceRootUri
+        : itemUri.parent;
       targetPathParts.forEach(targetPathPart => {
         targetUri = targetUri.resolve(targetPathPart);
       });

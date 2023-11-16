@@ -1,24 +1,28 @@
-import { CommandRegistry, nls, QuickPickItem, QuickPickOptions, QuickPickService } from '@theia/core';
-import { AbstractViewContribution, CommonCommands, open, OpenerService } from '@theia/core/lib/browser';
+import { Command, CommandContribution, CommandRegistry, MenuContribution, MenuModelRegistry, UntitledResourceResolver } from '@theia/core';
+import { AbstractViewContribution, CommonCommands, CommonMenus, OpenerService, Widget, open } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
+import { UserWorkingDirectoryProvider } from '@theia/core/lib/browser/user-working-directory-provider';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { ProjectFileType } from '../../project/browser/ves-project-types';
+import { EditorManager } from '@theia/editor/lib/browser';
 import { VesProjectService } from '../../project/browser/ves-project-service';
-import { VesEditorUri } from './ves-editor-uri';
 import { VesEditorsCommands } from './ves-editors-commands';
 import { VesEditorsContextKeyService } from './ves-editors-context-key-service';
 import { VesEditorsWidget } from './ves-editors-widget';
 
 @injectable()
-export class VesEditorsViewContribution extends AbstractViewContribution<VesEditorsWidget> implements TabBarToolbarContribution {
+export class VesEditorsViewContribution extends AbstractViewContribution<VesEditorsWidget> implements CommandContribution, MenuContribution, TabBarToolbarContribution {
+    @inject(EditorManager)
+    protected readonly editorManager: EditorManager;
     @inject(OpenerService)
     protected openerService: OpenerService;
-    @inject(QuickPickService)
-    private readonly quickPickService: QuickPickService;
     @inject(VesEditorsContextKeyService)
     protected readonly contextKeyService: VesEditorsContextKeyService;
+    @inject(UntitledResourceResolver)
+    protected readonly untitledResourceResolver: UntitledResourceResolver;
     @inject(VesProjectService)
-    private readonly vesProjectService: VesProjectService;
+    protected readonly vesProjectService: VesProjectService;
+    @inject(UserWorkingDirectoryProvider)
+    protected readonly workingDirProvider: UserWorkingDirectoryProvider;
 
     constructor() {
         super({
@@ -35,12 +39,18 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
     }
 
     protected updateFocusedView(): void {
-        this.contextKeyService.graphicalEditorsFocus.set(
+        this.contextKeyService.graphicalEditorFocus.set(
             this.shell.activeWidget instanceof VesEditorsWidget
         );
     }
 
     async registerCommands(commandRegistry: CommandRegistry): Promise<void> {
+        commandRegistry.registerCommand(VesEditorsCommands.OPEN_SOURCE, {
+            isEnabled: () => true,
+            isVisible: widget => widget instanceof VesEditorsWidget,
+            execute: widget => this.openSource(widget),
+        });
+
         commandRegistry.registerHandler(CommonCommands.UNDO.id, {
             isEnabled: () => this.shell.activeWidget instanceof VesEditorsWidget,
             execute: () => (this.shell.activeWidget as VesEditorsWidget).undo()
@@ -51,79 +61,67 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         });
 
         await this.vesProjectService.ready;
-        const registeredTypes = this.vesProjectService.getProjectDataTypes();
-        if (registeredTypes) {
-            Object.keys(registeredTypes).forEach(typeId => {
-                const registeredType = registeredTypes[typeId];
-                commandRegistry.registerCommand({
-                    id: `${VesEditorsCommands.WIDGET_OPEN.id}:${typeId}`,
-                    label: `${VesEditorsCommands.WIDGET_OPEN.label}: ${registeredType.schema.title}`,
-                    iconClass: registeredType.icon
-                }, {
-                    execute: () => this.selectItem(registeredType, typeId)
-                });
+        const types = this.vesProjectService.getProjectDataTypes();
+        for (const typeId of Object.keys(types || {})) {
+            const type = types![typeId];
+            if (!type.file.startsWith('.')) {
+                continue;
+            }
+            const id = `ves:editors:new-untitled:${typeId}`;
+            const typeLabel = type.schema.title || typeId;
+            commandRegistry.registerCommand(Command.toLocalizedCommand(
+                {
+                    id,
+                    label: `New ${typeLabel} File`,
+                    category: 'Editor',
+                    iconClass: type.icon,
+                },
+                `vuengine/editors/newUntitled/${typeId}`,
+                'vuengine/editors/commands/category'
+            ), {
+                isEnabled: () => true,
+                execute: async () => {
+                    const untitledUri = this.untitledResourceResolver.createUntitledURI(type.file, await this.workingDirProvider.getUserWorkingDir());
+                    await this.untitledResourceResolver.resolve(untitledUri);
+                    return open(this.openerService, untitledUri);
+                },
             });
         }
     }
 
     registerToolbarItems(toolbar: TabBarToolbarRegistry): void {
         toolbar.registerItem({
-            id: VesEditorsCommands.WIDGET_HELP.id,
-            command: VesEditorsCommands.WIDGET_HELP.id,
-            tooltip: VesEditorsCommands.WIDGET_HELP.label,
+            id: VesEditorsCommands.OPEN_SOURCE.id,
+            command: VesEditorsCommands.OPEN_SOURCE.id,
+            tooltip: VesEditorsCommands.OPEN_SOURCE.label,
             priority: 0,
         });
     }
 
-    protected async selectItem(registeredType: ProjectFileType, typeId: string): Promise<void> {
-        if (!registeredType.multiple) {
-            const projectDataType = this.vesProjectService.getProjectDataItemsForType(typeId);
-            if (projectDataType) {
-                const ids = Object.keys(projectDataType);
-                if (ids.length) {
-                    const uri = VesEditorUri.toUri(`${typeId}/${ids[0]}`);
-                    await open(this.openerService, uri, { mode: 'reveal' });
-                }
+    async registerMenus(menus: MenuModelRegistry): Promise<void> {
+        await this.vesProjectService.ready;
+        const types = this.vesProjectService.getProjectDataTypes();
+        for (const typeId of Object.keys(types || {})) {
+            const type = types![typeId];
+            if (!type.file.startsWith('.')) {
+                continue;
             }
-        } else {
-            this.itemSelectQuickPick(typeId);
+            const id = `ves:editors:new-untitled:${typeId}`;
+            menus.registerMenuNode(CommonMenus.FILE_NEW_CONTRIBUTIONS, {
+                id,
+                sortString: typeId,
+                command: id,
+            });
         }
     }
 
-    protected async itemSelectQuickPick(typeId: string): Promise<void> {
-        const quickPickOptions: QuickPickOptions<QuickPickItem> = {
-            title: nls.localize('vuengine/editors/chooseAnItemTitle', 'Choose an item'),
-            placeholder: nls.localize('vuengine/editors/chooseAnItemPlaceholder', 'Select which item you want to edit'),
-        };
-        const items: QuickPickItem[] = [];
-
-        const projectDataType = this.vesProjectService.getProjectDataItemsForType(typeId);
-        if (projectDataType) {
-            Object.keys(projectDataType).forEach(key => {
-                const item = projectDataType[key];
-                const registeredType = this.vesProjectService.getProjectDataType(typeId);
-                if (registeredType) {
-                    items.push({
-                        label: item.name as string,
-                        description: `${typeId}/${key}`,
-                        iconClasses: registeredType.icon ? [registeredType.icon] : [],
-                    });
-                }
-            });
-        }
-
-        if (!items.length) {
-            // TODO: error message
+    protected openSource(widget: Widget): void {
+        const ref = widget instanceof VesEditorsWidget && widget || undefined;
+        if (!ref || !ref.uri) {
             return;
         }
-
-        this.quickPickService.show<QuickPickItem>(items, quickPickOptions).then(async selection => {
-            if (!selection) {
-                return;
-            }
-
-            const uri = VesEditorUri.toUri(selection.description!);
-            await open(this.openerService, uri, { mode: 'reveal' });
+        this.editorManager.open(ref.uri, {
+            widgetOptions: { ref, mode: 'tab-after' }
         });
     }
 }

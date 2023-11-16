@@ -1,5 +1,5 @@
 import { Path, URI, nls } from '@theia/core';
-import { Message, PreferenceService, codicon } from '@theia/core/lib/browser';
+import { PreferenceService, codicon } from '@theia/core/lib/browser';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { GettingStartedWidget } from '@theia/getting-started/lib/browser/getting-started-widget';
@@ -38,14 +38,6 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
         await this.preferenceService.ready;
         await this.vesGetRecentWorkspaces();
         this.update();
-    }
-
-    protected onActivateRequest(msg: Message): void {
-        super.onActivateRequest(msg);
-        const htmlElement = document.getElementById('alwaysShowWelcomePage');
-        if (htmlElement) {
-            htmlElement.focus();
-        }
     }
 
     protected createNewProject = async () => this.commandRegistry.executeCommand(VesProjectCommands.NEW.id);
