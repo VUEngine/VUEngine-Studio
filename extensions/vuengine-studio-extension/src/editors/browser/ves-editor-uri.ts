@@ -5,6 +5,7 @@ export namespace VesEditorUri {
         return new URI(`ves-editor:${id}`);
     }
     export function toId(uri: URI): string | undefined {
+        console.log(uri);
         if (uri.scheme === 'ves-editor') {
             return uri.path.toString();
         }

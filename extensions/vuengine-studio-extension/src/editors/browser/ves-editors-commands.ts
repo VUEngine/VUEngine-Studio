@@ -1,24 +1,14 @@
 import { Command } from '@theia/core';
 
 export namespace VesEditorsCommands {
-    export const WIDGET_OPEN: Command = Command.toLocalizedCommand(
+    export const OPEN_SOURCE: Command = Command.toLocalizedCommand(
         {
-            id: 'ves:editors:open',
-            label: 'Open Editor',
+            id: 'ves:editors:showSource',
+            label: 'Show Source',
             category: 'Editor',
+            iconClass: 'codicon codicon-json',
         },
-        'vuengine/editors/commands/open',
-        'vuengine/editors/commands/category'
-    );
-
-    export const WIDGET_HELP: Command = Command.toLocalizedCommand(
-        {
-            id: 'ves:editors:showHelp',
-            label: 'Show Handbook Page',
-            category: 'Editor',
-            iconClass: 'codicon codicon-book',
-        },
-        'vuengine/editors/showHelp',
+        'vuengine/editors/showSource',
         'vuengine/editors/commands/category'
     );
 };

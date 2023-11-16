@@ -3,6 +3,8 @@ import URI from '@theia/core/lib/common/uri';
 
 export const VUENGINE_EXT = 'vuengine';
 
+export const CONFIG_ITEM_KEY = '_config';
+
 export interface WorkspaceFile {
   extensions?: {
     recommendations?: {
@@ -20,12 +22,11 @@ export interface WorkspaceFile {
 
 export interface ProjectFile extends WorkspaceFile {
   combined?: {
-    items?: ProjectFileItemsWithContributor
     templates?: ProjectFileTemplatesWithContributor
     types?: ProjectFileTypesWithContributor
   }
-  items?: ProjectFileItemsByType
   plugins?: string[]
+  project?: ProjectFileMetaData
   templates?: ProjectFileTemplates
   types?: ProjectFileTypes
 };
@@ -39,36 +40,21 @@ export interface ProjectFileTypesWithContributor extends ProjectFileTypes {
 };
 
 export interface ProjectFileType {
+  file: string
+  icon?: string
   schema: JsonSchema
   uiSchema?: UISchemaElement
-  icon?: string
-  category?: string
-  multiple: boolean
   templates?: string[]
-};
-
-export interface ProjectFileItemsByType {
-  [typeId: string]: ProjectFileItems
-};
-
-export interface ProjectFileItems {
-  [itemId: string]: ProjectFileItem
-};
-
-export interface ProjectFileItemsWithContributor {
-  [typeId: string]: ProjectFileItemWithContributor
-};
-
-export interface ProjectFileItem {
-  [id: string]: unknown
-};
-
-export interface ProjectFileItemWithContributor extends ProjectFileItem {
-  [id: string]: unknown & WithContributor
 };
 
 export interface ProjectFileTemplates {
   [key: string]: ProjectFileTemplate
+}
+
+export interface ProjectFileMetaData {
+  name: string
+  author: string
+  description: string
 }
 
 export interface ProjectFileTemplatesWithContributor extends ProjectFileTemplates {
@@ -87,6 +73,7 @@ export enum ProjectFileTemplateEventType {
 
 export interface ProjectFileTemplate {
   target: string
+  targetRoot: string
   template: string
   encoding?: ProjectFileTemplateEncoding
   itemSpecific?: string
@@ -102,15 +89,4 @@ export enum ProjectFileTemplateEncoding {
   ShiftJIS = 'shift_jis',
   utf8 = 'utf8',
   win1252 = 'win1252',
-}
-
-export interface ProjectFileItemSaveEvent {
-  typeId: string
-  itemId: string
-  item: ProjectFileItem
-}
-
-export interface ProjectFileItemDeleteEvent {
-  typeId: string
-  itemId: string
 }

@@ -10,20 +10,16 @@ interface FileType {
 };
 
 // TODO: move to file icon theme
-const FILE_TYPES: FileType[] = [/* {
-    base: 'file.ending',
-    icon: 'ves-file-icon codicon codicon-settings-gear medium-blue',
-    name: 'Project Config',
-},*/{
-        ext: '.vuengine',
-        icon: 'ves-file-icon codicon codicon-library medium-purple',
-    }, {
-        ext: '.vb',
-        icon: 'ves-file-icon codicon codicon-play',
-    }, {
-        ext: '.VB',
-        icon: 'ves-file-icon codicon codicon-play',
-    }];
+const FILE_TYPES: FileType[] = [{
+    ext: '.vuengine',
+    icon: 'ves-codicon-file-icon codicon codicon-library medium-purple',
+}, {
+    ext: '.vb',
+    icon: 'ves-codicon-file-icon codicon codicon-play',
+}, {
+    ext: '.VB',
+    icon: 'ves-codicon-file-icon codicon codicon-play',
+}];
 
 @injectable()
 export class VesCoreLabelProviderContribution implements LabelProviderContribution {

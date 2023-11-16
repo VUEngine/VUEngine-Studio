@@ -398,6 +398,7 @@
   height: 24px;
   margin: 0;
   min-width: unset;
+  white-space: nowrap;
   width: calc(50% - 1px);
 }
 

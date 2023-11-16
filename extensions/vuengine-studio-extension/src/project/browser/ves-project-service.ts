@@ -4,7 +4,6 @@ import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import { Deferred } from '@theia/core/lib/common/promise-util';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileChangeType, FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
@@ -16,11 +15,6 @@ import { USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } from '../../plugins/brow
 import { VesNewProjectTemplate } from './new-project/ves-new-project-form';
 import {
   ProjectFile,
-  ProjectFileItem,
-  ProjectFileItemDeleteEvent,
-  ProjectFileItemSaveEvent,
-  ProjectFileItems,
-  ProjectFileItemsByType,
   ProjectFileTemplate,
   ProjectFileTemplatesWithContributor,
   ProjectFileType,
@@ -55,34 +49,23 @@ export class VesProjectService {
   // project data
   protected _projectData: ProjectFile = {
     combined: {
-      items: {},
       templates: {},
       types: {},
     },
     folders: [{
       'path': ''
     }],
-    items: {},
+    project: {
+      name: '',
+      author: '',
+      description: '',
+    },
     plugins: [],
     types: {},
   };
-  protected readonly onDidChangeProjectDataEmitter = new Emitter<void>();
-  readonly onDidChangeProjectData = this.onDidChangeProjectDataEmitter.event;
-  protected readonly onDidSaveItemEmitter = new Emitter<ProjectFileItemSaveEvent>();
-  readonly onDidSaveItem = this.onDidSaveItemEmitter.event;
-  protected readonly onDidDeleteItemEmitter = new Emitter<ProjectFileItemDeleteEvent>();
-  readonly onDidDeleteItem = this.onDidDeleteItemEmitter.event;
+
   getProjectData(): ProjectFile {
     return this._projectData;
-  }
-  getProjectDataItems(): ProjectFileItemsByType | undefined {
-    return this._projectData.items;
-  }
-  getProjectDataItemsForType(typeId: string): ProjectFileItems | undefined {
-    return this._projectData.items && this._projectData.items[typeId];
-  }
-  getProjectDataItem(typeId: string, itemId: string): ProjectFileItem | undefined {
-    return this._projectData.items && this._projectData.items[typeId] && this._projectData.items[typeId][itemId];
   }
   getProjectDataTypes(): ProjectFileTypesWithContributor | undefined {
     return this._projectData.combined?.types;
@@ -98,74 +81,6 @@ export class VesProjectService {
     return this._projectData.combined?.templates
       && this._projectData.combined?.templates[templateId];
   }
-  async setProjectDataItem(typeId: string, itemId: string, data: ProjectFileItem, save: boolean = true): Promise<boolean> {
-    await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-    if (!workspaceRootUri) {
-      return false;
-    }
-
-    if (!this._projectData.items) {
-      this._projectData.items = {};
-    }
-    if (!this._projectData.items[typeId]) {
-      this._projectData.items[typeId] = {};
-    }
-    this._projectData.items[typeId][itemId] = data;
-
-    if (!this._projectData.combined) {
-      this._projectData.combined = {};
-    }
-    if (!this._projectData.combined.items) {
-      this._projectData.combined.items = {};
-    }
-    if (!this._projectData.combined.items[typeId]) {
-      this._projectData.combined.items[typeId] = {};
-    }
-    this._projectData.combined.items[typeId][itemId] = {
-      _contributor: 'project',
-      _contributorUri: workspaceRootUri.parent,
-      ...data
-    };
-
-    this.onDidChangeProjectDataEmitter.fire();
-
-    if (save) {
-      this.onDidSaveItemEmitter.fire({ typeId, itemId, item: data });
-      return this.saveProjectFile();
-    }
-
-    return true;
-  }
-  async deleteProjectDataItem(typeId: string, itemId: string): Promise<void> {
-    if (this._projectData.items
-      && this._projectData.items[typeId]
-      && this._projectData.items[typeId][itemId]) {
-      delete (this._projectData.items[typeId][itemId]);
-      if (!Object.keys(this._projectData.items[typeId]).length) {
-        delete this._projectData.items[typeId];
-      }
-      if (!Object.keys(this._projectData.items).length) {
-        delete this._projectData.items;
-      }
-    }
-
-    if (this._projectData.combined?.items
-      && this._projectData.combined.items[typeId]
-      && this._projectData.combined.items[typeId][itemId]) {
-      delete (this._projectData.combined.items[typeId][itemId]);
-      if (!Object.keys(this._projectData.combined.items[typeId]).length) {
-        delete this._projectData.combined.items[typeId];
-      }
-      if (!Object.keys(this._projectData.combined.items).length) {
-        delete this._projectData.combined.items;
-      }
-    }
-
-    this.onDidDeleteItemEmitter.fire({ typeId, itemId });
-    this.onDidChangeProjectDataEmitter.fire();
-    await this.saveProjectFile();
-  }
   getProjectPlugins(): string[] {
     return this._projectData.plugins || [];
   }
@@ -174,27 +89,27 @@ export class VesProjectService {
     await this.saveProjectFile();
     // update data of plugins
     await this.readProjectData();
-    this.onDidChangeProjectDataEmitter.fire();
+    this.updateWindowTitle();
   }
 
   @postConstruct()
   protected init(): void {
     this.doInit();
 
-    this.onDidChangeProjectData(() => {
-      this.updateWindowTitle();
-    });
-
-    // watch for project file changes
     this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
-      if (this.workspaceProjectFileUri && fileChangesEvent.contains(this.workspaceProjectFileUri, FileChangeType.UPDATED)) {
-        if (!this.fileChangeEventLock) {
-          console.info('Manual change of project file.');
-          this.readProjectData();
-        } else {
-          this.fileChangeEventLock = false;
+      fileChangesEvent.changes.map(change => {
+        // TODO: registered types
+
+        // project file
+        if (this.workspaceProjectFileUri && change.type === FileChangeType.UPDATED && change.resource.isEqual(this.workspaceProjectFileUri)) {
+          if (!this.fileChangeEventLock) {
+            console.info('Manual change of project file.');
+            this.readProjectData();
+          } else {
+            this.fileChangeEventLock = false;
+          }
         }
-      }
+      });
     });
   }
 
@@ -346,14 +261,15 @@ export class VesProjectService {
       combined,
     };
 
-    this.onDidChangeProjectDataEmitter.fire();
+    this.updateWindowTitle();
   }
 
   protected async readProjectFileData(projectFileUri?: URI): Promise<ProjectFile | undefined> {
     if (projectFileUri && await this.fileService.exists(projectFileUri)) {
-      const configFileContents = await this.fileService.readFile(projectFileUri);
+      const projectFileContents = await this.fileService.readFile(projectFileUri);
       try {
-        return JSON.parse(configFileContents.value.toString());
+        const projectFile: ProjectFile = JSON.parse(projectFileContents.value.toString());
+        return this.addIdToTypes(projectFile);
       } catch (error) {
         console.error('Malformed project file could not be parsed.', projectFileUri?.path.toString());
       }
@@ -364,8 +280,20 @@ export class VesProjectService {
         'path': ''
       }],
       plugins: [],
-      items: {}
     };
+  }
+
+  protected addIdToTypes(projectFile: ProjectFile): ProjectFile {
+    for (const type of Object.values(projectFile.types || {})) {
+      if (type.file?.startsWith('.') && type.schema.properties) {
+        type.schema.properties['_id'] = {
+          type: 'string',
+          default: ''
+        };
+      }
+    }
+
+    return projectFile;
   }
 
   async saveProjectFile(): Promise<boolean> {
@@ -412,11 +340,12 @@ export class VesProjectService {
       await this.ready;
       projectData = this._projectData;
     }
-    if (projectData?.items?.Project) {
-      const first = Object.values(projectData.items.Project)[0];
-      if (first && first.name) {
+
+    if (projectData?.project) {
+      const pd = projectData?.project;
+      if (pd && pd.name) {
         // @ts-ignore
-        projectTitle = first.name;
+        projectTitle = pd.name;
       }
     }
 

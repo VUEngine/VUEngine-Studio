@@ -6,14 +6,14 @@ export class VesEditorsContextKeyService {
     @inject(ContextKeyService)
     protected readonly contextKeyService: ContextKeyService;
 
-    protected _graphicalEditorsFocus: ContextKey<boolean>;
-    get graphicalEditorsFocus(): ContextKey<boolean> {
-        return this._graphicalEditorsFocus;
+    protected _graphicalEditorFocus: ContextKey<boolean>;
+    get graphicalEditorFocus(): ContextKey<boolean> {
+        return this._graphicalEditorFocus;
     }
 
     @postConstruct()
     protected init(): void {
-        this._graphicalEditorsFocus = this.contextKeyService.createKey<boolean>(
+        this._graphicalEditorFocus = this.contextKeyService.createKey<boolean>(
             'graphicalEditorFocus',
             false
         );
