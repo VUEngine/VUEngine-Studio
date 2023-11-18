@@ -5,8 +5,6 @@ import { inject, injectable } from 'inversify';
 import * as React from 'react';
 import { ProjectFileTypesWithContributor } from '../../project/browser/ves-project-types';
 
-export const DEFAULT_EXT = '.txt';
-
 @injectable()
 export class VesNewFileDialogProps extends DialogProps {
     parentLabel: string;
@@ -23,7 +21,7 @@ export class VesNewFileDialog extends ReactDialog<string> {
         this.appendAcceptButton(Dialog.OK);
     }
 
-    protected ext = DEFAULT_EXT;
+    protected ext = '.c / .h';
     protected name = nls.localize('vuengine/editors/newFileDialog/untitled', 'Untitled');
 
     get value(): string {
@@ -86,23 +84,48 @@ export class VesNewFileDialog extends ReactDialog<string> {
                             this.update();
                         }}
                     >
-                        <option
-                            value={DEFAULT_EXT}
-                            selected={this.ext === DEFAULT_EXT}
-                        >
-                            {nls.localize('vuengine/editors/newFileDialog/types/Text', 'Text')}
-                        </option>
-                        {Object.keys(this.props.types).map(typeId => (
+                        <optgroup>
                             <option
-                                value={this.props.types[typeId].file}
-                                selected={this.ext === this.props.types[typeId].file}
+                                value=".c / .h"
+                                selected={this.ext === '.c / .h'}
                             >
-                                {nls.localize(`vuengine/editors/newFileDialog/types/${typeId}`, this.props.types[typeId].schema.title || typeId)}
+                                {nls.localize('vuengine/editors/newFileDialog/types/CSourceAndHeader', 'C Source & Header')}
                             </option>
-                        ))}
+                            <option
+                                value=".c"
+                                selected={this.ext === '.c'}
+                            >
+                                {nls.localize('vuengine/editors/newFileDialog/types/CSource', 'C Source Code')}
+                            </option>
+                            <option
+                                value=".h"
+                                selected={this.ext === '.h'}
+                            >
+                                {nls.localize('vuengine/editors/newFileDialog/types/CHeader', 'C Header')}
+                            </option>
+                            <option
+                                value=".txt"
+                                selected={this.ext === '.txt'}
+                            >
+                                {nls.localize('vuengine/editors/newFileDialog/types/Text', 'Text')}
+                            </option>
+                        </optgroup>
+                        {[true, false].map(b =>
+                            <optgroup>
+                                {Object.keys(this.props.types).map(typeId => (
+                                    (this.props.types[typeId].file.startsWith('.') === b) &&
+                                    <option
+                                        value={this.props.types[typeId].file}
+                                        selected={this.ext === this.props.types[typeId].file}
+                                    >
+                                        {nls.localize(`vuengine/editors/newFileDialog/types/${typeId}`, this.props.types[typeId].schema.title || typeId)}
+                                    </option>
+                                ))}
+                            </optgroup>
+                        )}
                     </select>
                 </div>
-            </div>
+            </div >
             <div className="error"></div>
         </>;
     }

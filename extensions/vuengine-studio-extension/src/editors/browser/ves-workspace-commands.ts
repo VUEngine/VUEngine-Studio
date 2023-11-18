@@ -28,12 +28,21 @@ export class VesWorkspaceCommandContribution extends WorkspaceCommandContributio
                         parentLabel: this.labelProvider.getLongName(parentUri),
                         types,
                     });
-                    dialog.open().then(async name => {
-                        if (name) {
-                            const fileUri = parentUri.resolve(name);
-                            await this.fileService.create(fileUri);
-                            this.fireCreateNewFile({ parent: parentUri, uri: fileUri });
-                            open(this.openerService, fileUri);
+                    dialog.open().then(async value => {
+                        if (value) {
+                            const createFile = async (n: string) => {
+                                const fileUri = parentUri.resolve(n);
+                                await this.fileService.create(fileUri);
+                                this.fireCreateNewFile({ parent: parentUri, uri: fileUri });
+                                open(this.openerService, fileUri);
+                            };
+                            const name = value.substring(0, value.indexOf('.'));
+                            const extensions = value.substring(value.indexOf('.'));
+                            if (extensions) {
+                                extensions.split(' / ').forEach(async ext => createFile(name + ext));
+                            } else {
+                                createFile(name);
+                            }
                         }
                     });
                 }
