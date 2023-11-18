@@ -8,8 +8,14 @@ import { VesEditorsViewContribution } from './ves-editors-view';
 import { VesEditorsWidget, VesEditorsWidgetOptions } from './ves-editors-widget';
 import { VesEditorsLabelProviderContribution } from './ves-editors-label-provider';
 import { CommandContribution, MenuContribution } from '@theia/core';
+import { VesWorkspaceCommandContribution } from './ves-workspace-commands';
+import { WorkspaceCommandContribution } from '@theia/workspace/lib/browser';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
+    // override new file dialog
+    bind(VesWorkspaceCommandContribution).toSelf().inSingletonScope();
+    rebind(WorkspaceCommandContribution).toService(VesWorkspaceCommandContribution);
+
     // context key service
     bind(VesEditorsContextKeyService)
         .toSelf()
