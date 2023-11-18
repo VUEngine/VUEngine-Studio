@@ -11,6 +11,10 @@
     line-height: 160%;
 }
 
+.theia-input:disabled {
+    background-color: transparent;
+}
+
 input[type="range"] {
     appearance: none;
     background: var(--theia-input-background);
