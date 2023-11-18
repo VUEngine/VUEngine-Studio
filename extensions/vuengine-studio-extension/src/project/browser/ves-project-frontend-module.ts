@@ -12,11 +12,13 @@ import { VesProjectPathsService } from './ves-project-paths-service';
 import { VesProjectPreferenceSchema } from './ves-project-preferences';
 import { VesProjectService } from './ves-project-service';
 import { VesWorkspaceFrontendContribution } from './ves-project-workspace-frontend-contribution';
+import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // commands
     bind(VesProjectContribution).toSelf().inSingletonScope();
     bind(CommandContribution).toService(VesProjectContribution);
+    bind(TabBarToolbarContribution).toService(VesProjectContribution);
 
     // preferences
     bind(PreferenceContribution).toConstantValue({ schema: VesProjectPreferenceSchema });

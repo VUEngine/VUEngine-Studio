@@ -55,11 +55,7 @@ export class VesProjectService {
     folders: [{
       'path': ''
     }],
-    project: {
-      name: '',
-      author: '',
-      description: '',
-    },
+    name: '',
     plugins: [],
     types: {},
   };
@@ -341,12 +337,8 @@ export class VesProjectService {
       projectData = this._projectData;
     }
 
-    if (projectData?.project) {
-      const pd = projectData?.project;
-      if (pd && pd.name) {
-        // @ts-ignore
-        projectTitle = pd.name;
-      }
+    if (projectData?.name) {
+      projectTitle = projectData.name;
     }
 
     // Get from workspace service instead
@@ -372,6 +364,12 @@ export class VesProjectService {
     }
 
     return projectTitle || 'VUEngine Studio';
+  }
+
+  async setProjectName(name: string): Promise<void> {
+    this._projectData.name = name;
+    await this.saveProjectFile();
+    this.updateWindowTitle();
   }
 
   async createProjectFromTemplate(

@@ -25,8 +25,8 @@ export interface ProjectFile extends WorkspaceFile {
     templates?: ProjectFileTemplatesWithContributor
     types?: ProjectFileTypesWithContributor
   }
+  name?: string
   plugins?: string[]
-  project?: ProjectFileMetaData
   templates?: ProjectFileTemplates
   types?: ProjectFileTypes
 };
@@ -49,12 +49,6 @@ export interface ProjectFileType {
 
 export interface ProjectFileTemplates {
   [key: string]: ProjectFileTemplate
-}
-
-export interface ProjectFileMetaData {
-  name: string
-  author: string
-  description: string
 }
 
 export interface ProjectFileTemplatesWithContributor extends ProjectFileTemplates {
