@@ -125,9 +125,6 @@
       "backend": "lib/i18n/node/ves-i18n-backend-module"
     },
     {
-      "frontend": "lib/migrate/browser/ves-migrate-frontend-module"
-    },
-    {
       "frontend": "lib/plugins/browser/ves-plugins-frontend-module"
     },
     {
@@ -146,10 +143,6 @@
     {
       "frontendElectron": "lib/touchbar/electron-browser/ves-touchbar-electron-frontend-module",
       "electronMain": "lib/touchbar/electron-main/ves-touchbar-electron-main-application-module"
-    },
-    {
-      "electronMain": "lib/updater/electron-main/ves-updater-main-module",
-      "frontendElectron": "lib/updater/electron-browser/ves-updater-frontend-module"
     },
     {
       "frontendElectron": "lib/zoom/electron-browser/ves-zoom-frontend-module"
