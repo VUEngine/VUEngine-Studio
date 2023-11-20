@@ -15,11 +15,10 @@ export class VesEditorsOpenHandler extends WidgetOpenHandler<VesEditorsWidget> {
     readonly label = 'Graphical Editor';
 
     async canHandle(uri: URI): Promise<number> {
-        await this.vesProjectService.ready;
+        await this.vesProjectService.projectDataReady;
         const types = this.vesProjectService.getProjectDataTypes();
         for (const typeId of Object.keys(types || {})) {
-            if (uri.path.ext === types![typeId].file ||
-                uri.path.base === types![typeId].file) {
+            if ([uri.path.ext, uri.path.base].includes(types![typeId].file)) {
                 this.typeId = typeId;
                 return 1000;
             }

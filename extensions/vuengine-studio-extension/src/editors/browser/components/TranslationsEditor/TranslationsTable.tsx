@@ -31,7 +31,7 @@ export default function TranslationsTable(props: TranslationsTableProps): React.
     } = props;
 
     return <div className='translationsTable'>
-        {Object.keys(translations).map((s, i) =>
+        {translations && Object.keys(translations).map((s, i) =>
             <div key={`string-key-${i}`}>
                 <div className='translationId'>
                     <input

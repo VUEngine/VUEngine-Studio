@@ -14,7 +14,11 @@ import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-
 import { USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } from '../../plugins/browser/ves-plugins-types';
 import { VesNewProjectTemplate } from './new-project/ves-new-project-form';
 import {
+  defaultProjectData,
   ProjectFile,
+  ProjectFileItem,
+  ProjectFileItemWithContributor,
+  ProjectFileItemsWithContributor,
   ProjectFileTemplate,
   ProjectFileTemplatesWithContributor,
   ProjectFileType,
@@ -38,27 +42,20 @@ export class VesProjectService {
   @inject(WorkspaceService)
   private readonly workspaceService: WorkspaceService;
 
-  protected readonly _ready = new Deferred<void>();
-  get ready(): Promise<void> {
-    return this._ready.promise;
+  protected readonly _projectDataReady = new Deferred<void>();
+  get projectDataReady(): Promise<void> {
+    return this._projectDataReady.promise;
+  }
+  protected readonly _projectItemsReady = new Deferred<void>();
+  get projectItemsReady(): Promise<void> {
+    return this._projectItemsReady.promise;
   }
 
   protected fileChangeEventLock: boolean = false;
   protected workspaceProjectFileUri: URI | undefined;
 
   // project data
-  protected _projectData: ProjectFile = {
-    combined: {
-      templates: {},
-      types: {},
-    },
-    folders: [{
-      'path': ''
-    }],
-    name: '',
-    plugins: [],
-    types: {},
-  };
+  protected _projectData: ProjectFile;
 
   getProjectData(): ProjectFile {
     return this._projectData;
@@ -77,6 +74,49 @@ export class VesProjectService {
     return this._projectData.combined?.templates
       && this._projectData.combined?.templates[templateId];
   }
+  getProjectDataItems(): ProjectFileItemsWithContributor | undefined {
+    return this._projectData.combined?.items;
+  }
+  getProjectDataItemsForType(typeId: string): ProjectFileItemWithContributor | undefined {
+    return this._projectData.combined?.items && this._projectData.combined?.items[typeId];
+  }
+  async setProjectDataItem(typeId: string, itemId: string, data: ProjectFileItem): Promise<boolean> {
+    await this.workspaceService.ready;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
+    if (!workspaceRootUri) {
+      return false;
+    }
+
+    if (!this._projectData.combined) {
+      this._projectData.combined = {};
+    }
+    if (!this._projectData.combined.items) {
+      this._projectData.combined.items = {};
+    }
+    if (!this._projectData.combined.items[typeId]) {
+      this._projectData.combined.items[typeId] = {};
+    }
+    this._projectData.combined.items[typeId][itemId] = {
+      _contributor: 'project',
+      _contributorUri: workspaceRootUri.parent,
+      ...data
+    };
+
+    return true;
+  }
+  async deleteProjectDataItem(typeId: string, itemId: string): Promise<void> {
+    if (this._projectData.combined?.items
+      && this._projectData.combined.items[typeId]
+      && this._projectData.combined.items[typeId][itemId]) {
+      delete (this._projectData.combined.items[typeId][itemId]);
+      if (!Object.keys(this._projectData.combined.items[typeId]).length) {
+        delete this._projectData.combined.items[typeId];
+      }
+      if (!Object.keys(this._projectData.combined.items).length) {
+        delete this._projectData.combined.items;
+      }
+    }
+  }
   getProjectPlugins(): string[] {
     return this._projectData.plugins || [];
   }
@@ -91,7 +131,15 @@ export class VesProjectService {
   @postConstruct()
   protected init(): void {
     this.doInit();
+    this.bindEvents();
+  }
 
+  protected async doInit(): Promise<void> {
+    await this.readProjectData();
+    this.updateWindowTitle();
+  }
+
+  protected bindEvents(): void {
     this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
       fileChangesEvent.changes.map(change => {
         // TODO: registered types
@@ -107,12 +155,6 @@ export class VesProjectService {
         }
       });
     });
-  }
-
-  protected async doInit(): Promise<void> {
-    await this.readProjectData();
-    this._ready.resolve();
-    this.updateWindowTitle();
   }
 
   protected async readProjectData(): Promise<void> {
@@ -132,8 +174,15 @@ export class VesProjectService {
         this.workspaceProjectFileUri = undefined;
         const projectFiles = window.electronVesCore.findFiles(
           await this.fileService.fsPath(workspaceProjectFolderUri),
-          `*.${VUENGINE_EXT}`
+          `*.${VUENGINE_EXT}`,
+          {
+            dot: false,
+            ignore: ['build/**'],
+            maxDepth: 0,
+            nodir: true,
+          }
         );
+        console.log('projectFiles', projectFiles);
         if (projectFiles.length) {
           const filename = this.vesCommonService.basename(projectFiles[0]);
           if (filename) {
@@ -193,7 +242,13 @@ export class VesProjectService {
       }));
     }
 
+    const resourcesUri = await this.vesCommonService.getResourcesUri();
     const projectDataWithContributors: (ProjectFile & WithContributor)[] = [
+      {
+        _contributor: 'studio',
+        _contributorUri: resourcesUri,
+        ...defaultProjectData
+      },
       {
         _contributor: 'engine',
         _contributorUri: engineCoreProjectFileUri.parent,
@@ -211,42 +266,25 @@ export class VesProjectService {
     }
 
     const combined: {
-      [key: string]: unknown
+      [key: string]: ProjectFileItemsWithContributor | ProjectFileTemplatesWithContributor | ProjectFileTypesWithContributor
     } = {
-      'items': {},
-      'templates': {},
-      'types': {},
+      items: {},
+      templates: {},
+      types: {},
     };
-    projectDataWithContributors.forEach(projectDataWithContributor => {
-      // add to combined
-      Object.keys(combined).forEach(combinedKey => {
+
+    // add types and templates to combined
+    projectDataWithContributors.forEach(async projectDataWithContributor => {
+      ['templates', 'types'].forEach(combinedKey => {
         // @ts-ignore
         const data = projectDataWithContributor[combinedKey];
         if (data) {
           Object.keys(data).forEach(dataKey => {
-            if (combinedKey === 'items') {
-              Object.keys(data[dataKey]).forEach(itemId => {
-                const combinedItem = data[dataKey][itemId];
-                // @ts-ignore
-                if (!combined[combinedKey][dataKey]) {
-                  // @ts-ignore
-                  combined[combinedKey][dataKey] = {};
-                }
-                // @ts-ignore
-                combined[combinedKey][dataKey][itemId] = {
-                  _contributor: projectDataWithContributor._contributor,
-                  _contributorUri: projectDataWithContributor._contributorUri,
-                  ...combinedItem,
-                };
-              });
-            } else {
-              // @ts-ignore
-              combined[combinedKey][dataKey] = {
-                _contributor: projectDataWithContributor._contributor,
-                _contributorUri: projectDataWithContributor._contributorUri,
-                ...data[dataKey],
-              };
-            }
+            combined[combinedKey][dataKey] = {
+              _contributor: projectDataWithContributor._contributor,
+              _contributorUri: projectDataWithContributor._contributorUri,
+              ...data[dataKey],
+            };
           });
         }
       });
@@ -256,6 +294,70 @@ export class VesProjectService {
       ...workspaceProjectFileData,
       combined,
     };
+
+    if (this._projectDataReady.state === 'unresolved') {
+      this._projectDataReady.resolve();
+    }
+
+    // add items to combined
+    const filePatterns = Object.values(combined.types).map((t: ProjectFileType) => t.file.startsWith('.') ? `**/*${t.file}` : `**/${t.file}`);
+    projectDataWithContributors.forEach(async projectDataWithContributor => {
+      // find item files
+      const itemFiles = window.electronVesCore.findFiles(
+        await this.fileService.fsPath(projectDataWithContributor._contributorUri),
+        filePatterns,
+        {
+          ignore: ['build/**'],
+          maxDepth: 32,
+          nodir: true,
+        }
+      );
+      // find type
+      itemFiles.forEach(filename => {
+        const uri = projectDataWithContributor._contributorUri.resolve(filename);
+        Object.keys(combined.types).forEach(async typeId => {
+          const type = combined.types[typeId] as (ProjectFileType & WithContributor);
+          if ([uri.path.ext, uri.path.base].includes(type.file)) {
+            if (!combined['items'][typeId]) {
+              combined['items'][typeId] = {};
+            }
+
+            const fileContent = await this.fileService.readFile(uri);
+            try {
+              const fileContentJson = JSON.parse(fileContent.value.toString());
+              const itemWithContributor = {
+                _contributor: projectDataWithContributor._contributor,
+                _contributorUri: projectDataWithContributor._contributorUri,
+                ...fileContentJson
+              };
+              if (type.file.startsWith('.')) {
+                if (fileContentJson._id) {
+                  // @ts-ignore
+                  combined['items'][typeId][fileContentJson._id] = itemWithContributor;
+                } else {
+                  console.error('Missing _id in item file.', uri?.path.toString());
+                }
+              } else {
+                // @ts-ignore
+                combined['items'][typeId][projectDataWithContributor._contributor] = itemWithContributor;
+              }
+            } catch (error) {
+              console.error('Malformed item file could not be parsed.', uri?.path.toString());
+              return;
+            }
+          }
+        });
+      });
+    });
+
+    this._projectData = {
+      ...this._projectData,
+      combined,
+    };
+
+    if (this._projectItemsReady.state === 'unresolved') {
+      this._projectItemsReady.resolve();
+    }
 
     this.updateWindowTitle();
   }
@@ -333,7 +435,7 @@ export class VesProjectService {
         }
       }
     } else {
-      await this.ready;
+      await this.projectDataReady;
       projectData = this._projectData;
     }
 

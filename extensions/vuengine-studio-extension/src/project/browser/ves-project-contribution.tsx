@@ -29,7 +29,7 @@ export class VesProjectContribution implements CommandContribution, TabBarToolba
             isEnabled: () => this.workspaceService.opened,
             isVisible: widget => widget.id === EXPLORER_VIEW_CONTAINER_ID,
             execute: async () => {
-                await this.vesProjectService.ready;
+                await this.vesProjectService.projectDataReady;
                 const initialValue = await this.vesProjectService.getProjectName();
                 const dialog = new SingleTextInputDialog({
                     title: nls.localize('vuengine/projects/commands/editName', 'Edit Project Name'),

@@ -53,7 +53,7 @@ export class VesNewFileDialog extends ReactDialog<string> {
                         <input
                             type="text"
                             className="theia-input"
-                            style={{ display: this.ext.startsWith('.') ? 'block' : 'none', flexGrow: 3, width: 0 }}
+                            style={{ display: this.ext.startsWith('.') ? 'block' : 'none', flexGrow: 2, width: 0 }}
                             spellCheck="false"
                             placeholder={nls.localize('vuengine/editors/newFileDialog/fileName', 'File Name')}
                             value={this.name}
@@ -79,48 +79,37 @@ export class VesNewFileDialog extends ReactDialog<string> {
                     <select
                         className="theia-select"
                         style={{ flexGrow: 1 }}
+                        value={this.ext}
                         onChange={e => {
                             this.ext = e.currentTarget.value;
                             this.update();
                         }}
                     >
                         <optgroup>
-                            <option
-                                value=".c / .h"
-                                selected={this.ext === '.c / .h'}
-                            >
+                            <option value=".c / .h">
                                 {nls.localize('vuengine/editors/newFileDialog/types/CSourceAndHeader', 'C Source & Header')}
                             </option>
-                            <option
-                                value=".c"
-                                selected={this.ext === '.c'}
-                            >
+                            <option value=".c">
                                 {nls.localize('vuengine/editors/newFileDialog/types/CSource', 'C Source Code')}
                             </option>
-                            <option
-                                value=".h"
-                                selected={this.ext === '.h'}
-                            >
+                            <option value=".h">
                                 {nls.localize('vuengine/editors/newFileDialog/types/CHeader', 'C Header')}
                             </option>
-                            <option
-                                value=".txt"
-                                selected={this.ext === '.txt'}
-                            >
+                            <option value=".txt">
                                 {nls.localize('vuengine/editors/newFileDialog/types/Text', 'Text')}
                             </option>
                         </optgroup>
                         {[true, false].map(b =>
-                            <optgroup>
-                                {Object.keys(this.props.types).map(typeId => (
-                                    (this.props.types[typeId].file.startsWith('.') === b) &&
-                                    <option
-                                        value={this.props.types[typeId].file}
-                                        selected={this.ext === this.props.types[typeId].file}
-                                    >
-                                        {nls.localize(`vuengine/editors/newFileDialog/types/${typeId}`, this.props.types[typeId].schema.title || typeId)}
-                                    </option>
-                                ))}
+                            <optgroup key={b ? 'true' : ' false'}>
+                                {Object.keys(this.props.types).map(typeId => {
+                                    const ext = this.props.types[typeId].file;
+                                    return (
+                                        (this.props.types[typeId].file.startsWith('.') === b) &&
+                                        <option value={ext} key={ext}>
+                                            {nls.localize(`vuengine/editors/newFileDialog/types/${typeId}`, this.props.types[typeId].schema.title || typeId)}
+                                        </option>
+                                    );
+                                })}
                             </optgroup>
                         )}
                     </select>

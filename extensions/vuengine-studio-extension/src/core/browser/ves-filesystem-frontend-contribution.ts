@@ -16,7 +16,7 @@ export class VesFileSystemFrontendContribution extends FileSystemFrontendContrib
             'makefile*': 'makefile',
         };
 
-        await this.vesProjectService.ready;
+        await this.vesProjectService.projectDataReady;
         const types = this.vesProjectService.getProjectDataTypes();
         for (const type of Object.values(types || {})) {
             if (type.file?.startsWith('.')) {

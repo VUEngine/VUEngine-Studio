@@ -46,7 +46,6 @@ export default function LanguagesTable(props: LanguagesTableProps): React.JSX.El
         const from = parseInt(e.dataTransfer.getData('position'));
         const to = parseInt(e.currentTarget.getAttribute('data-position') ?? '');
         moveLanguage(from, to);
-        console.log('MOVE FROM ' + from + ' to ' + to);
     };
 
     const onDragEnter = (e: React.DragEvent<HTMLDivElement>): void => {

@@ -18,7 +18,7 @@ export class VesEditorsLabelProviderContribution implements LabelProviderContrib
     }
 
     protected async doInit(): Promise<void> {
-        await this.vesProjectService.ready;
+        await this.vesProjectService.projectDataReady;
         const types = this.vesProjectService.getProjectDataTypes();
         for (const typeId of Object.keys(types || {})) {
             if (types![typeId].icon !== undefined) {
@@ -34,7 +34,7 @@ export class VesEditorsLabelProviderContribution implements LabelProviderContrib
         }
         if (toCheck instanceof URI) {
             for (const f of Object.keys(this.fileIcons)) {
-                if (toCheck.path.ext === f || toCheck.path.base === f) {
+                if ([toCheck.path.ext, toCheck.path.base].includes(f)) {
                     this.fileIcon = this.fileIcons[f];
                     return 1000;
                 }

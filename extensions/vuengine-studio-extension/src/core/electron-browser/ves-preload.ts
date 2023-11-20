@@ -1,6 +1,7 @@
 import { JsonSchema } from '@jsonforms/core';
 import { Disposable } from '@theia/core/lib/common/disposable';
 import { FileContent } from '@theia/filesystem/lib/common/files';
+import { GlobOptionsWithFileTypesUnset } from 'glob';
 import { VisitOptions } from 'sort-json';
 import { ImageData } from '../browser/ves-common-types';
 import {
@@ -37,8 +38,8 @@ const api: VesCoreAPI = {
     replaceInFiles: function (files: string[], from: string, to: string): any {
         return ipcRenderer.sendSync(VES_CHANNEL_REPLACE_IN_FILES, files, from, to);
     },
-    findFiles: function (base: string, pattern: string): string[] {
-        return ipcRenderer.sendSync(VES_CHANNEL_FIND_FILES, base, pattern);
+    findFiles: function (base: string, pattern: string | string[], options?: GlobOptionsWithFileTypesUnset): string[] {
+        return ipcRenderer.sendSync(VES_CHANNEL_FIND_FILES, base, pattern, options);
     },
     getPhysicalCpuCount: function (): number {
         return ipcRenderer.sendSync(VES_CHANNEL_GET_PHYSICAL_CPU_COUNT);
