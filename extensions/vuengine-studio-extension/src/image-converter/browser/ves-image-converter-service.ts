@@ -469,7 +469,11 @@ export class VesImageConverterService {
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
 
     const imageConfigFilesToBeConverted: ImageConfigFileToBeConverted[] = [];
-    const imageConfigFiles = window.electronVesCore.findFiles(await this.fileService.fsPath(workspaceRootUri), '**/*.image.json');
+    const imageConfigFiles = window.electronVesCore.findFiles(await this.fileService.fsPath(workspaceRootUri), '**/*.image.json', {
+      dot: false,
+      ignore: ['build/**'],
+      nodir: true
+    });
     for (const imageConfigFile of imageConfigFiles) {
       const imageConfigFileUri = new URI(imageConfigFile).withScheme('file');
       const config = await this.getConverterConfig(imageConfigFileUri);

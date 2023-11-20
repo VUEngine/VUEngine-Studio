@@ -81,7 +81,7 @@ export class VesPluginsService {
   }
 
   async determineInstalledPlugins(): Promise<void> {
-    await this.vesProjectService.ready;
+    await this.vesProjectService.projectDataReady;
     this.installedPlugins = this.vesProjectService.getProjectPlugins();
     this._ready.resolve();
   }
@@ -111,24 +111,26 @@ export class VesPluginsService {
       const rootPath = (await this.fileService.fsPath(rootUri)).replace(/\\/g, '/');
       const pluginsMap: any = {};
 
-      const pluginFiles = window.electronVesCore.findFiles(rootPath, '**/plugin.vuengine');
+      const pluginFiles = window.electronVesCore.findFiles(rootPath, '**/plugin.vuengine', {
+        dot: false,
+        nodir: true
+      });
       for (const pluginFile of pluginFiles) {
-        const pluginFileUri = new URI(isWindows ? `/${pluginFile}` : pluginFile).withScheme('file');
-        const pluginFolderUri = pluginFileUri.parent;
+        const pluginFileUri = rootUri.resolve(pluginFile);
+        const pluginRelativeUri = new URI(isWindows ? `/${pluginFile}` : pluginFile).withScheme('file').parent;
 
-        const pluginPathRelative = rootUri.relative(pluginFolderUri)!.toString();
         const fileContent = await this.fileService.readFile(pluginFileUri);
         try {
           let fileContentJson = JSON.parse(fileContent.value.toString()).plugin;
 
-          const pluginId = `${prefix}//${pluginPathRelative.replace(/\\/g, '/')}`;
+          const pluginId = `${prefix}/${pluginRelativeUri.path.toString().replace(/\\/g, '/')}`;
 
           fileContentJson.name = pluginId;
-          const iconUri = pluginFolderUri.resolve('icon.png');
+          const iconUri = pluginFileUri.parent.resolve('icon.png');
           fileContentJson.icon = await this.fileService.exists(iconUri)
             ? iconUri.path.toString()
             : '';
-          fileContentJson.readme = pluginFolderUri.resolve('readme.md').path.toString();
+          fileContentJson.readme = pluginFileUri.parent.resolve('readme.md').path.toString();
 
           fileContentJson.displayName = this.translateField(fileContentJson.displayName, nls.locale || 'en');
           fileContentJson.author = this.translateField(fileContentJson.author, nls.locale || 'en');
@@ -148,7 +150,7 @@ export class VesPluginsService {
 
           pluginsMap[pluginId] = fileContentJson;
         } catch (e) {
-          console.error(pluginPathRelative, e);
+          console.error(pluginFileUri.path.toString(), e);
         }
       }
 

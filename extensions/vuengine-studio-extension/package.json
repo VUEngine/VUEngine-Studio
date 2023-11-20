@@ -45,7 +45,7 @@
     "express": "^4.17.1",
     "filenamify": "^4.3.0",
     "fs-extra": "^10.0.0",
-    "glob": "^7.1.7",
+    "glob": "^10.3.10",
     "iconv-lite": "^0.6.3",
     "inversify": "^6.0.1",
     "lodash": "^4.17.21",

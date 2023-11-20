@@ -143,7 +143,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     }
 
     protected async doInit(): Promise<void> {
-        await this.vesProjectService.ready;
+        await this.vesProjectService.projectDataReady;
 
         const type = this.vesProjectService.getProjectDataType(this.options.typeId);
         if (!type) {
@@ -196,11 +196,9 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     }
 
     protected setTitle(): void {
-        if (!this.uri && this.data?.name) {
-            const name = this.data.name as string;
-            this.title.label = `${this.options.typeId}: ${name}`;
-            this.title.caption = `${this.options.typeId}: ${name}`;
-        }
+        const name = this.uri.path.base;
+        this.title.label = name;
+        this.title.caption = name;
     }
 
     protected onActivateRequest(msg: Message): void {

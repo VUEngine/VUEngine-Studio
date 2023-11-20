@@ -13,7 +13,7 @@ export class VesWorkspaceCommandContribution extends WorkspaceCommandContributio
     async registerCommands(commandRegistry: CommandRegistry): Promise<void> {
         super.registerCommands(commandRegistry);
 
-        await this.vesProjectService.ready;
+        await this.vesProjectService.projectDataReady;
         const types = this.vesProjectService.getProjectDataTypes() || {};
 
         commandRegistry.unregisterCommand(WorkspaceCommands.NEW_FILE);

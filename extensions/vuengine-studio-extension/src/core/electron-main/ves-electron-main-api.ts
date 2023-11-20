@@ -46,9 +46,12 @@ export class VesMainApi implements ElectronMainApplicationContribution {
             const replaceInFiles = require('replace-in-file');
             event.returnValue = replaceInFiles({ files, from, to });
         });
-        ipcMain.on(VES_CHANNEL_FIND_FILES, (event, base, pattern) => {
+        ipcMain.on(VES_CHANNEL_FIND_FILES, (event, base, pattern, options) => {
             const results: string[] = [];
-            const foundFiles = glob.sync(`${base}/${pattern}`);
+            const foundFiles = glob.sync(pattern, {
+                cwd: base,
+                ...(options || {})
+            });
             for (const foundFile of foundFiles) {
                 results.push(foundFile);
             };

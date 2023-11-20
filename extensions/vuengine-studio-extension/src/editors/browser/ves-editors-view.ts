@@ -60,7 +60,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             execute: () => (this.shell.activeWidget as VesEditorsWidget).redo()
         });
 
-        await this.vesProjectService.ready;
+        await this.vesProjectService.projectDataReady;
         const types = this.vesProjectService.getProjectDataTypes();
         for (const typeId of Object.keys(types || {})) {
             const type = types![typeId];
@@ -99,7 +99,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
     }
 
     async registerMenus(menus: MenuModelRegistry): Promise<void> {
-        await this.vesProjectService.ready;
+        await this.vesProjectService.projectDataReady;
         const types = this.vesProjectService.getProjectDataTypes();
         for (const typeId of Object.keys(types || {})) {
             const type = types![typeId];

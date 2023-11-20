@@ -8,7 +8,6 @@ import { WorkspaceService } from '@theia/workspace/lib/browser';
 import * as iconv from 'iconv-lite';
 import * as nunjucks from 'nunjucks';
 import { VesAudioConverterService } from '../../audio-converter/browser/ves-audio-converter-service';
-import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { compressTiles } from '../../image-converter/browser/ves-image-converter-compressor';
 import { AnimationConfig, ImageConverterCompressor, TilesCompressionResult } from '../../image-converter/browser/ves-image-converter-types';
@@ -32,8 +31,6 @@ export class VesCodeGenService {
   protected preferenceService: PreferenceService;
   @inject(VesAudioConverterService)
   protected vesAudioConverterService: VesAudioConverterService;
-  @inject(VesBuildPathsService)
-  protected vesBuildPathsService: VesBuildPathsService;
   @inject(VesCommonService)
   protected vesCommonService: VesCommonService;
   @inject(VesPluginsService)
@@ -109,7 +106,7 @@ export class VesCodeGenService {
         );
 
         // @ts-ignore
-        console.info(data.item ? `Rendered template ${templateId} with item ${data.item._id}.`
+        console.info(data.item?._id ? `Rendered template ${templateId} with item ${data.item._id}.`
           : `Rendered template ${templateId}.`
         );
       }
@@ -117,7 +114,7 @@ export class VesCodeGenService {
   }
 
   async renderTemplate(templateId: string, itemUri?: URI, itemData?: any): Promise<void> {
-    await this.vesProjectService.ready;
+    await this.vesProjectService.projectDataReady;
     const template = this.vesProjectService.getProjectDataTemplate(templateId);
     if (!template) {
       console.warn(`Template ${templateId} not found.`);
@@ -240,8 +237,9 @@ export class VesCodeGenService {
   }
 
   protected async configureTemplateEngine(): Promise<void> {
-    const engineCoreUri = await this.vesBuildPathsService.getEngineCoreUri();
-    const env = nunjucks.configure(await this.fileService.fsPath(engineCoreUri));
+    // configure base path for includes of template partials
+    const resourcesUri = await this.vesCommonService.getResourcesUri();
+    const env = nunjucks.configure(await this.fileService.fsPath(resourcesUri));
 
     // add filters
     env.addFilter('basename', (value: string, ending: boolean = true) => {

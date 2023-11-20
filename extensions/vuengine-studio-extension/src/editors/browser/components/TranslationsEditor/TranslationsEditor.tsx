@@ -3,7 +3,7 @@ import { ConfirmDialog } from '@theia/core/lib/browser';
 import React from 'react';
 import { ProjectFile, WithContributor } from '../../../../project/browser/ves-project-types';
 import LanguagesTable from './LanguagesTable';
-import { LANGUAGES, TranslationsData } from './TranslationsEditorTypes';
+import { LANGUAGES, Translations, TranslationsData } from './TranslationsEditorTypes';
 import TranslationsTable from './TranslationsTable';
 
 interface TranslationsEditorProps {
@@ -173,9 +173,7 @@ export default class TranslationsEditor extends React.Component<TranslationsEdit
 
     render(): React.JSX.Element {
         const { languages, translations } = this.props.data;
-        // TODO
-        // const combinedTranslations = this.props.projectData.combined?.items?.Translations || {} as Translations & WithContributor;
-        const combinedTranslations = {} as TranslationsData & WithContributor;
+        const combinedTranslations = this.props.projectData.combined?.items?.Translations || {} as Translations & WithContributor;
 
         return <div
             tabIndex={0}

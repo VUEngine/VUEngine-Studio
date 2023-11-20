@@ -1,0 +1,21 @@
+{%- set item = project.combined.items.RomHeader | values | first -%}
+{%- import 'templates/partials/macros.nj' as macros -%}
+{% include('templates/partials/fileHeader.h.nj') %}
+
+#ifndef ROM_HEADER_H_
+#define ROM_HEADER_H_
+
+
+{{ macros.sectionHeader('ROM Header Info') }}
+
+// game title (20 chars) 	 ####################
+#define __GAME_TITLE		"{{ (item.gameTitle ~ '                    ') | truncate(20, true, '') }}"
+// maker code (2 chars)		 ##
+#define __MAKER_CODE		"{{ (item.makerCode ~ '  ') | truncate(2, true, '') }}"
+// game code (4 chars)		 ####
+#define __GAME_CODE			"{{ (item.gameCodeSystem ~ ' ') | truncate(1, true, '') }}{{ (item.gameCodeId ~ '  ') | truncate(2, true, '') }}{{ (item.gameCodeLanguage ~ ' ') | truncate(1, true, '') }}"
+// revision (1.x)			 #
+#define __ROM_VERSION		 {{ (item.revision ~ '') | truncate(1, true, '') }}
+
+
+#endif
