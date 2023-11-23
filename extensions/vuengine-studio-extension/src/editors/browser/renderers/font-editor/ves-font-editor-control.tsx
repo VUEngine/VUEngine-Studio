@@ -10,7 +10,7 @@ interface VesFontEditorControlProps {
     config?: any;
 }
 
-const removeTrailingNullsFromArray = (arr: any[]): any[] => {
+const removeTrailingNullsFromArray = (arr: any[]): any[] | null => {
     // eslint-disable-next-line no-null/no-null
     if (arr === null) {
         return arr;
@@ -27,7 +27,8 @@ const removeTrailingNullsFromArray = (arr: any[]): any[] => {
     }
     arr.splice(arr.length - toDelete, toDelete);
 
-    return arr;
+    // eslint-disable-next-line no-null/no-null
+    return arr.length ? arr : null;
 };
 
 const optimizeFontData = (fontData: FontData): FontData => {
