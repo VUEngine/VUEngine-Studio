@@ -161,13 +161,14 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
                 this.setPixelColor(x, y, color);
                 break;
             case FontEditorTools.FILL:
-                const currentColor = this.props.fontData.characters[this.state.currentCharacter]
-                    && this.props.fontData.characters[this.state.currentCharacter][y]
-                    ? this.props.fontData.characters[this.state.currentCharacter][y][x] ?? 0
+                const characters = this.props.fontData.characters || [];
+                const currentColor = characters[this.state.currentCharacter]
+                    && characters[this.state.currentCharacter][y]
+                    ? characters[this.state.currentCharacter][y][x] ?? 0
                     : 0;
                 if (currentColor !== color) {
                     this.setCurrentCharacterData(this.fill(
-                        this.props.fontData.characters[this.state.currentCharacter] ?? [],
+                        characters[this.state.currentCharacter] ?? [],
                         x,
                         y,
                         currentColor,
@@ -205,13 +206,14 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
     }
 
     protected fillAll(x: number, y: number, color: number): void {
-        const oldColor = this.props.fontData.characters[this.state.currentCharacter]
-            && this.props.fontData.characters[this.state.currentCharacter][y]
-            && this.props.fontData.characters[this.state.currentCharacter][y][x]
-            ? this.props.fontData.characters[this.state.currentCharacter][y][x]
+        const characters = this.props.fontData.characters;
+        const oldColor = characters[this.state.currentCharacter]
+            && characters[this.state.currentCharacter][y]
+            && characters[this.state.currentCharacter][y][x]
+            ? characters[this.state.currentCharacter][y][x]
             : 0;
         if (oldColor !== color) {
-            const updatedCharacter = this.props.fontData.characters[this.state.currentCharacter] ?? [];
+            const updatedCharacter = characters[this.state.currentCharacter] ?? [];
             [...Array(this.props.fontData.size.y * CHAR_PIXEL_SIZE)].map((j, sy) => {
                 if (!updatedCharacter[sy]) {
                     updatedCharacter[sy] = [];
@@ -254,6 +256,8 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
 
         const pixelWidth = fontData.size.x * CHAR_PIXEL_SIZE;
         const pixelHeight = fontData.size.y * CHAR_PIXEL_SIZE;
+
+        const characters = this.props.fontData.characters || [];
 
         return <div
             tabIndex={0}
@@ -308,7 +312,7 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
                         clipboard={this.state.clipboard}
                         charHeight={pixelHeight}
                         charWidth={pixelWidth}
-                        currentCharData={fontData.characters[this.state.currentCharacter]}
+                        currentCharData={characters[this.state.currentCharacter]}
                         setCurrentCharData={this.setCurrentCharacterData.bind(this)}
                         setState={this.setState.bind(this)}
                     />
@@ -334,7 +338,7 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
                         setState={this.setState.bind(this)}
                     />
                     <CharEditor
-                        char={fontData.characters[this.state.currentCharacter]}
+                        char={characters[this.state.currentCharacter]}
                         charId={this.state.currentCharacter}
                         charHeight={pixelHeight}
                         charWidth={pixelWidth}
@@ -357,7 +361,7 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
                         setState={this.setState.bind(this)}
                     />
                     <Alphabet
-                        charsData={fontData.characters}
+                        charsData={fontData.characters || []}
                         offset={fontData.offset}
                         charCount={fontData.characterCount}
                         charHeight={pixelHeight}
