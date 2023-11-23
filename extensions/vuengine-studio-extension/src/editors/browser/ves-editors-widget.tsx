@@ -2,7 +2,7 @@ import { JsonFormsCore, JsonSchema, UISchemaElement } from '@jsonforms/core';
 import { JsonForms } from '@jsonforms/react';
 import { JsonFormsStyleContext, StyleContext, vanillaCells, vanillaRenderers, vanillaStyles } from '@jsonforms/vanilla-renderers';
 import { Message } from '@phosphor/messaging';
-import { CommandService, Emitter, Event, Reference, UNTITLED_SCHEME, URI, nls } from '@theia/core';
+import { CommandService, Emitter, Event, MessageService, Reference, UNTITLED_SCHEME, URI, nls } from '@theia/core';
 import { CommonCommands, LabelProvider, LocalStorageService, Saveable, SaveableSource } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -46,6 +46,8 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     protected readonly fileService: FileService;
     @inject(LabelProvider)
     protected readonly labelProvider: LabelProvider;
+    @inject(MessageService)
+    protected readonly messageService: MessageService;
     @inject(LocalStorageService)
     protected readonly localStorageService: LocalStorageService;
     @inject(MonacoTextModelService)
@@ -312,7 +314,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         }, this.data);
 
         if (this.data?.name === '') {
-            this.data.name = nls.localize('vuengine/editors/new', 'New');
+            this.data.name = this.uri.path.name;
         }
 
         if (this.data?._id === '') {
@@ -424,12 +426,14 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
                                 trim: false,
                                 showUnfocusedDescription: true,
                                 hideRequiredAsterisk: false,
-                                // TODO: refactor once there's a non-hacky way to inject services and projectData
+                                // TODO: refactor once there's a non-hacky way to inject custom data
+                                fileUri: this.uri,
                                 services: {
                                     commandService: this.commandService,
                                     fileService: this.fileService,
                                     fileDialogService: this.fileDialogService,
                                     localStorageService: this.localStorageService,
+                                    messageService: this.messageService,
                                     vesCommonService: this.vesCommonService,
                                     vesRumblePackService: this.vesRumblePackService,
                                     workspaceService: this.workspaceService,

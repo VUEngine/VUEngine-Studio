@@ -1,4 +1,4 @@
-import { nls } from '@theia/core';
+import { MessageService, URI, nls } from '@theia/core';
 import { injectable } from '@theia/core/shared/inversify';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
@@ -24,9 +24,11 @@ import Tools from './Tools/Tools';
 interface FontEditorProps {
     fontData: FontData
     updateFontData: (fontData: FontData) => void
+    fileUri: URI
     services: {
         fileService: FileService,
         fileDialogService: FileDialogService,
+        messageService: MessageService,
     }
 }
 
@@ -179,6 +181,13 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
         }
     }
 
+    protected setCharacters(characters: number[][][]): void {
+        this.props.updateFontData({
+            ...this.props.fontData,
+            characters: characters
+        });
+    }
+
     protected setPixelColor(x: number, y: number, color: number): void {
         const updatedCharacters = [...this.props.fontData.characters];
         if (!updatedCharacters[this.state.currentCharacter]) {
@@ -241,7 +250,7 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
     }
 
     render(): React.JSX.Element {
-        const { fontData } = this.props;
+        const { fileUri, fontData, services } = this.props;
 
         const pixelWidth = fontData.size.x * CHAR_PIXEL_SIZE;
         const pixelHeight = fontData.size.y * CHAR_PIXEL_SIZE;
@@ -304,8 +313,14 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
                         setState={this.setState.bind(this)}
                     />
                     <ImportExport
-                        fileDialogService={this.props.services.fileDialogService}
-                        fileService={this.props.services.fileService}
+                        fileDialogService={services.fileDialogService}
+                        fileService={services.fileService}
+                        messageService={services.messageService}
+                        baseUri={fileUri}
+                        setCharacters={this.setCharacters.bind(this)}
+                        size={fontData.size}
+                        offset={fontData.offset}
+                        characterCount={fontData.characterCount}
                     />
                 </div>
                 <div className='editor-column'>
