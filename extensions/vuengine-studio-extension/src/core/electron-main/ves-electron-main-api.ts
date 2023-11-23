@@ -66,9 +66,13 @@ export class VesMainApi implements ElectronMainApplicationContribution {
             let imageData: ImageData | false = false;
 
             await new Promise<void>((resolve, reject) => {
-                new PNG().parse(fileContent.value.buffer, (error: unknown, data: unknown): void => {
-                    console.error(error, data);
-                    resolve();
+                new PNG({
+                    keepIndexed: true,
+                }).parse(fileContent.value.buffer, (error: unknown, data: unknown): void => {
+                    if (error) {
+                        console.error('Error while parsing PNG', error, data);
+                        resolve();
+                    }
                 }).on('parsed', function (): void {
                     // @ts-ignore: suppress implicit any errors
                     const png = this;
@@ -76,14 +80,12 @@ export class VesMainApi implements ElectronMainApplicationContribution {
                     const height = png.height;
                     const width = png.width;
                     const colorType = png._parser._parser._colorType;
-                    const pixelDataBuffer = [...png._parser._inflate._outBuffer];
 
                     const pixelData: number[][] = [];
                     [...Array(height)].map((h, y) => {
                         const line: number[] = [];
                         [...Array(width)].map((w, x) => {
-                            // both +1 due to lines being prepended with an extra 0
-                            line.push(pixelDataBuffer[y * (width + 1) + x + 1]);
+                            line.push(png.data[y * width + x]);
                         });
                         pixelData.push(line);
                     });
