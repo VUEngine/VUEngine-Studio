@@ -10,11 +10,12 @@ import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VES_PREFERENCE_DIR } from '../../core/browser/ves-preference-configurations';
+import { VesPluginsData } from '../../plugins/browser/ves-plugin';
 import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-service';
+import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } from '../../plugins/browser/ves-plugins-types';
 import { VesNewProjectTemplate } from './new-project/ves-new-project-form';
 import {
-  defaultProjectData,
   ProjectFile,
   ProjectFileItem,
   ProjectFileItemWithContributor,
@@ -24,7 +25,8 @@ import {
   ProjectFileType,
   ProjectFileTypesWithContributor,
   VUENGINE_EXT,
-  WithContributor
+  WithContributor,
+  defaultProjectData
 } from './ves-project-types';
 
 @injectable()
@@ -35,6 +37,8 @@ export class VesProjectService {
   private readonly vesBuildPathsService: VesBuildPathsService;
   @inject(VesCommonService)
   private readonly vesCommonService: VesCommonService;
+  @inject(VesPluginsService)
+  private readonly vesPluginsService: VesPluginsService;
   @inject(VesPluginsPathsService)
   private readonly vesPluginsPathsService: VesPluginsPathsService;
   @inject(WindowTitleService)
@@ -140,6 +144,10 @@ export class VesProjectService {
   }
 
   protected bindEvents(): void {
+    this.vesPluginsService.onDidChangeInstalledPlugins((installedPlugins: string[]) => {
+      this.setProjectPlugins(installedPlugins);
+    });
+
     this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
       fileChangesEvent.changes.map(change => {
         // TODO: registered types
@@ -159,6 +167,7 @@ export class VesProjectService {
 
   protected async readProjectData(): Promise<void> {
     await this.workspaceService.ready;
+    const startTime = performance.now();
 
     // workspace
     let workspaceProjectFileData: ProjectFile = {
@@ -182,7 +191,6 @@ export class VesProjectService {
             nodir: true,
           }
         );
-        console.log('projectFiles', projectFiles);
         if (projectFiles.length) {
           const filename = this.vesCommonService.basename(projectFiles[0]);
           if (filename) {
@@ -199,7 +207,7 @@ export class VesProjectService {
       if (this.workspaceService.workspace?.resource) {
         this.workspaceProjectFileUri = this.workspaceService.workspace?.resource.resolve(`project.${VUENGINE_EXT}`);
         this._projectData = workspaceProjectFileData;
-        this.saveProjectFile();
+        await this.saveProjectFile();
         console.info(`Could not find project file. Created new one at ${this.workspaceProjectFileUri}`);
       } else {
         console.info('Could not find or create project file.');
@@ -211,36 +219,31 @@ export class VesProjectService {
     const engineCoreProjectFileUri = engineCoreUri.resolve(`core.${VUENGINE_EXT}`);
     const engineCoreProjectFileData = await this.readProjectFileData(engineCoreProjectFileUri) || {};
 
+    // plugins
+    this.vesPluginsService.setInstalledPlugins(workspaceProjectFileData?.plugins || []);
+    const pluginsData = await this.getAllPluginsData();
+    this.vesPluginsService.setPluginsData(pluginsData);
+
     // installed plugins
-    // TODO: resolve implicitly included plugins.
-    // e.g. plugin B is a dependency of plugin A, but not listed in workspaceProjectFileData.plugins
     const pluginsProjectDataWithContributors: (ProjectFile & WithContributor)[] = [];
-    if (workspaceProjectFileData?.plugins) {
-      const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
-      const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
-      await Promise.all(workspaceProjectFileData.plugins.map(async installedPlugin => {
-        let uri: URI | undefined;
-        if (installedPlugin.startsWith(VUENGINE_PLUGINS_PREFIX)) {
-          uri = enginePluginsUri
-            .resolve(installedPlugin.replace(VUENGINE_PLUGINS_PREFIX, ''))
-            .resolve(`plugin.${VUENGINE_EXT}`);
-        } else if (installedPlugin.startsWith(USER_PLUGINS_PREFIX)) {
-          uri = userPluginsUri
-            .resolve(installedPlugin.replace(USER_PLUGINS_PREFIX, ''))
-            .resolve(`plugin.${VUENGINE_EXT}`);
-        }
-        if (uri) {
-          const data = await this.readProjectFileData(uri) as ProjectFile;
-          if (data) {
-            pluginsProjectDataWithContributors.push({
-              _contributor: `plugin:${installedPlugin}`,
-              _contributorUri: uri.parent,
-              ...data,
-            });
-          }
-        }
-      }));
-    }
+    const actuallyUsedPlugins = this.vesPluginsService.getActualUsedPluginNames();
+    const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
+    const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
+    await Promise.all(actuallyUsedPlugins.map(async installedPluginId => {
+      let uri: URI | undefined;
+      if (installedPluginId.startsWith(VUENGINE_PLUGINS_PREFIX)) {
+        uri = enginePluginsUri.resolve(installedPluginId.replace(VUENGINE_PLUGINS_PREFIX, ''));
+      } else if (installedPluginId.startsWith(USER_PLUGINS_PREFIX)) {
+        uri = userPluginsUri.resolve(installedPluginId.replace(USER_PLUGINS_PREFIX, ''));
+      }
+      if (uri && pluginsData[installedPluginId]) {
+        pluginsProjectDataWithContributors.push({
+          _contributor: `plugin:${installedPluginId}`,
+          _contributorUri: uri,
+          ...pluginsData[installedPluginId],
+        });
+      }
+    }));
 
     const resourcesUri = await this.vesCommonService.getResourcesUri();
     const projectDataWithContributors: (ProjectFile & WithContributor)[] = [
@@ -360,6 +363,81 @@ export class VesProjectService {
     }
 
     this.updateWindowTitle();
+
+    const duration = performance.now() - startTime;
+    console.log(`Getting VUEngine project data took: ${Math.round(duration)} ms.`);
+  }
+
+  // note: tests with caching plugin data in a single file did not increase performance much
+  async getAllPluginsData(): Promise<VesPluginsData> {
+    const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
+    const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
+
+    const findPlugins = async (rootUri: URI, prefix: string) => {
+      const rootPath = (await this.fileService.fsPath(rootUri)).replace(/\\/g, '/');
+      const pluginsMap: any = {};
+
+      const pluginFiles = window.electronVesCore.findFiles(rootPath, '**/plugin.vuengine', {
+        dot: false,
+        nodir: true
+      });
+      for (const pluginFile of pluginFiles) {
+        const pluginFileUri = rootUri.resolve(pluginFile);
+        const pluginRelativeUri = new URI(isWindows ? `/${pluginFile}` : pluginFile).withScheme('file').parent;
+
+        const fileContent = await this.fileService.readFile(pluginFileUri);
+        try {
+          const fileContentJson = JSON.parse(fileContent.value.toString()).plugin;
+
+          const pluginId = `${prefix}/${pluginRelativeUri.path.toString().replace(/\\/g, '/')}`;
+
+          fileContentJson.name = pluginId;
+          const iconUri = pluginFileUri.parent.resolve('icon.png');
+          fileContentJson.icon = await this.fileService.exists(iconUri)
+            ? iconUri.path.toString()
+            : '';
+          fileContentJson.readme = pluginFileUri.parent.resolve('readme.md').path.toString();
+
+          fileContentJson.displayName = this.translatePluginField(fileContentJson.displayName, nls.locale || 'en');
+          fileContentJson.author = this.translatePluginField(fileContentJson.author, nls.locale || 'en');
+          fileContentJson.description = this.translatePluginField(fileContentJson.description, nls.locale || 'en');
+          fileContentJson.license = this.translatePluginField(fileContentJson.license, nls.locale || 'en');
+
+          if (Array.isArray(fileContentJson.tags)) {
+            const tagsObject = {};
+            fileContentJson.tags.forEach((tag: any) => {
+              // @ts-ignore
+              tagsObject[this.translatePluginField(tag, 'en')] = this.translatePluginField(tag, nls.locale);
+            });
+            fileContentJson.tags = tagsObject;
+          } else {
+            fileContentJson.tags = {};
+          }
+
+          pluginsMap[pluginId] = fileContentJson;
+        } catch (e) {
+          console.error(pluginFileUri.path.toString(), e);
+        }
+      }
+
+      return pluginsMap;
+    };
+
+    const pluginsData = {
+      ...await findPlugins(enginePluginsUri, 'vuengine'),
+      ...await findPlugins(userPluginsUri, 'user'),
+    };
+
+    return pluginsData;
+  }
+
+  protected translatePluginField(field: Object | string, locale: string): string {
+    if (field instanceof Object) {
+      // @ts-ignore
+      return field[locale] || field.en || '';
+    }
+
+    return field;
   }
 
   protected async readProjectFileData(projectFileUri?: URI): Promise<ProjectFile | undefined> {

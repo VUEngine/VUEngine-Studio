@@ -2,6 +2,7 @@ import { isOSX, MaybePromise, nls } from '@theia/core';
 import { BrowserWindow, nativeImage, TouchBar } from '@theia/core/electron-shared/electron';
 import { ElectronMainApplication } from '@theia/core/lib/electron-main/electron-main-application';
 import { TheiaBrowserWindowOptions } from '@theia/core/lib/electron-main/theia-electron-window';
+import { FrontendApplicationConfig } from '@theia/core/shared/@theia/application-package';
 import { injectable } from '@theia/core/shared/inversify';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { BuildMode, BuildStatus } from '../../build/browser/ves-build-types';
@@ -11,7 +12,6 @@ import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-co
 import { VesProjectCommands } from '../../project/browser/ves-project-commands';
 import { VesTouchBarCommands } from '../common/ves-touchbar-types';
 import { VesTouchBarIcons } from './images/touch-bar-icons';
-import { FrontendApplicationConfig } from '@theia/core/shared/@theia/application-package';
 // import IMAGE_BLANK from '../../../src/touchbar/electron-main/images/blank.png';
 // import IMAGE_VES from '../../../src/touchbar/electron-main/images/ves.png';
 // import IMAGE_CLEAN from '../../../src/touchbar/electron-main/images/clean.png';

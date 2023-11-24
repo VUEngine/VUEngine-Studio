@@ -1,12 +1,9 @@
-import { isWindows, nls } from '@theia/core';
 import { Deferred } from '@theia/core/lib/common/promise-util';
-import URI from '@theia/core/lib/common/uri';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesCommonService } from '../../core/browser/ves-common-service';
-import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesPluginData, VesPluginsData } from './ves-plugin';
 import { VesPluginsPathsService } from './ves-plugins-paths-service';
 import { VUENGINE_PLUGINS_PREFIX } from './ves-plugins-types';
@@ -20,8 +17,6 @@ export class VesPluginsService {
   protected vesCommonService: VesCommonService;
   @inject(VesPluginsPathsService)
   protected vesPluginsPathsService: VesPluginsPathsService;
-  @inject(VesProjectService)
-  protected vesProjectService: VesProjectService;
   @inject(WorkspaceService)
   protected workspaceService: WorkspaceService;
 
@@ -34,7 +29,10 @@ export class VesPluginsService {
 
   protected installedPlugins: Array<string> = [];
 
-  protected readonly onDidChangeInstalledPluginsEmitter = new Emitter<void>();
+  protected readonly onDidChangePluginsDataEmitter = new Emitter<void>();
+  readonly onDidChangePluginsData = this.onDidChangePluginsDataEmitter.event;
+
+  protected readonly onDidChangeInstalledPluginsEmitter = new Emitter<string[]>();
   readonly onDidChangeInstalledPlugins = this.onDidChangeInstalledPluginsEmitter.event;
 
   getPluginById(id: string): VesPluginData | undefined {
@@ -66,8 +64,7 @@ export class VesPluginsService {
   async installPlugin(id: string): Promise<void> {
     if (!this.installedPlugins.includes(id)) {
       this.installedPlugins.push(id);
-      await this.writeInstalledPluginsToFile();
-      this.onDidChangeInstalledPluginsEmitter.fire();
+      this.onDidChangeInstalledPluginsEmitter.fire(this.installedPlugins.sort());
     }
   }
 
@@ -75,14 +72,12 @@ export class VesPluginsService {
     const index = this.installedPlugins.indexOf(id);
     if (index > -1) {
       this.installedPlugins.splice(index, 1);
-      await this.writeInstalledPluginsToFile();
-      this.onDidChangeInstalledPluginsEmitter.fire();
+      this.onDidChangeInstalledPluginsEmitter.fire(this.installedPlugins.sort());
     }
   }
 
-  async determineInstalledPlugins(): Promise<void> {
-    await this.vesProjectService.projectDataReady;
-    this.installedPlugins = this.vesProjectService.getProjectPlugins();
+  setInstalledPlugins(installedPlugins: string[]): void {
+    this.installedPlugins = installedPlugins;
     this._ready.resolve();
   }
 
@@ -101,71 +96,9 @@ export class VesPluginsService {
     ];
   }
 
-  // note: tests with caching plugin data in a single file did not increase performance much
-  async setPluginsData(): Promise<void> {
-    const startTime = performance.now();
-    const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
-    const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
-
-    const findPlugins = async (rootUri: URI, prefix: string) => {
-      const rootPath = (await this.fileService.fsPath(rootUri)).replace(/\\/g, '/');
-      const pluginsMap: any = {};
-
-      const pluginFiles = window.electronVesCore.findFiles(rootPath, '**/plugin.vuengine', {
-        dot: false,
-        nodir: true
-      });
-      for (const pluginFile of pluginFiles) {
-        const pluginFileUri = rootUri.resolve(pluginFile);
-        const pluginRelativeUri = new URI(isWindows ? `/${pluginFile}` : pluginFile).withScheme('file').parent;
-
-        const fileContent = await this.fileService.readFile(pluginFileUri);
-        try {
-          let fileContentJson = JSON.parse(fileContent.value.toString()).plugin;
-
-          const pluginId = `${prefix}/${pluginRelativeUri.path.toString().replace(/\\/g, '/')}`;
-
-          fileContentJson.name = pluginId;
-          const iconUri = pluginFileUri.parent.resolve('icon.png');
-          fileContentJson.icon = await this.fileService.exists(iconUri)
-            ? iconUri.path.toString()
-            : '';
-          fileContentJson.readme = pluginFileUri.parent.resolve('readme.md').path.toString();
-
-          fileContentJson.displayName = this.translateField(fileContentJson.displayName, nls.locale || 'en');
-          fileContentJson.author = this.translateField(fileContentJson.author, nls.locale || 'en');
-          fileContentJson.description = this.translateField(fileContentJson.description, nls.locale || 'en');
-          fileContentJson.license = this.translateField(fileContentJson.license, nls.locale || 'en');
-
-          if (Array.isArray(fileContentJson.tags)) {
-            const tagsObject = {};
-            fileContentJson.tags.forEach((tag: any) => {
-              // @ts-ignore
-              tagsObject[this.translateField(tag, 'en')] = this.translateField(tag, nls.locale);
-            });
-            fileContentJson.tags = tagsObject;
-          } else {
-            fileContentJson.tags = {};
-          }
-
-          pluginsMap[pluginId] = fileContentJson;
-        } catch (e) {
-          console.error(pluginFileUri.path.toString(), e);
-        }
-      }
-
-      return pluginsMap;
-    };
-
-    const pluginsMap = {
-      ...await findPlugins(enginePluginsUri, 'vuengine'),
-      ...await findPlugins(userPluginsUri, 'user'),
-    };
-
-    const duration = performance.now() - startTime;
-    console.log(`Getting VUEngine plugins data took: ${Math.round(duration)} ms.`);
-
-    this.pluginsData = pluginsMap;
+  setPluginsData(pluginsData: VesPluginsData): void {
+    this.pluginsData = pluginsData;
+    this.onDidChangePluginsDataEmitter.fire();
   }
 
   protected translateField(field: Object | string, locale: string): string {
@@ -214,9 +147,5 @@ export class VesPluginsService {
     }
 
     return searchResult;
-  }
-
-  protected async writeInstalledPluginsToFile(): Promise<void> {
-    await this.vesProjectService.setProjectPlugins(this.installedPlugins.sort());
   }
 }
