@@ -104,7 +104,7 @@ export class VesNewFileDialog extends ReactDialog<string> {
                                 {Object.keys(this.props.types).map(typeId => {
                                     const ext = this.props.types[typeId].file;
                                     return (
-                                        (this.props.types[typeId].file.startsWith('.') === b) &&
+                                        (this.props.types[typeId].file?.startsWith('.') === b) &&
                                         <option value={ext} key={ext}>
                                             {nls.localize(`vuengine/editors/newFileDialog/types/${typeId}`, this.props.types[typeId].schema.title || typeId)}
                                         </option>
