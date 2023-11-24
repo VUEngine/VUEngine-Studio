@@ -64,7 +64,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         const types = this.vesProjectService.getProjectDataTypes();
         for (const typeId of Object.keys(types || {})) {
             const type = types![typeId];
-            if (!type.file.startsWith('.')) {
+            if (!type.file?.startsWith('.')) {
                 continue;
             }
             const id = `ves:editors:new-untitled:${typeId}`;
@@ -103,7 +103,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         const types = this.vesProjectService.getProjectDataTypes();
         for (const typeId of Object.keys(types || {})) {
             const type = types![typeId];
-            if (!type.file.startsWith('.')) {
+            if (!type.file?.startsWith('.')) {
                 continue;
             }
             const id = `ves:editors:new-untitled:${typeId}`;

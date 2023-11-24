@@ -151,6 +151,10 @@ export class VesProjectService {
     this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
       fileChangesEvent.changes.map(change => {
         // TODO: registered types
+        // move corresponding generated code for moved files of registered types
+        // update project data entries for changed files of registered types to project data
+        // add new files of registered types to project data
+        // remove deleted files of registered types from project data and delete corresponding generated code
 
         // project file
         if (this.workspaceProjectFileUri && change.type === FileChangeType.UPDATED && change.resource.isEqual(this.workspaceProjectFileUri)) {
@@ -303,7 +307,7 @@ export class VesProjectService {
     }
 
     // add items to combined
-    const filePatterns = Object.values(combined.types).map((t: ProjectFileType) => t.file.startsWith('.') ? `**/*${t.file}` : `**/${t.file}`);
+    const filePatterns = Object.values(combined.types).map((t: ProjectFileType) => t.file?.startsWith('.') ? `**/*${t.file}` : `**/${t.file}`);
     projectDataWithContributors.forEach(async projectDataWithContributor => {
       // find item files
       const itemFiles = window.electronVesCore.findFiles(
@@ -333,7 +337,7 @@ export class VesProjectService {
                 _contributorUri: projectDataWithContributor._contributorUri,
                 ...fileContentJson
               };
-              if (type.file.startsWith('.')) {
+              if (type.file?.startsWith('.')) {
                 if (fileContentJson._id) {
                   // @ts-ignore
                   combined['items'][typeId][fileContentJson._id] = itemWithContributor;
