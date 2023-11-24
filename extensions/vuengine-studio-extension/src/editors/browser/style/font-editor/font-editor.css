@@ -151,6 +151,7 @@
 }
 
 .font-editor .editor .characters .character {
+  background-color: #000;
   color: var(--theia-input-background);
   cursor: pointer;
   height: 16px;

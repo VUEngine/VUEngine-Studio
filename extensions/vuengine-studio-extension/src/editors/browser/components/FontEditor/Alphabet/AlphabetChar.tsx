@@ -41,13 +41,15 @@ export default function AlphabetChar(props: AlphabetCharProps): React.JSX.Elemen
         if (!variableSize.enabled || y < variableSize.y) {
             [...Array(charWidth)].map((w, x) => {
                 if (!variableSize.enabled || x < (variableSize.x[line * 16 + index] ?? charWidth)) {
-                    const pixelSize = (charWidth > 16 || charHeight > 16) ? 1 : 2;
                     const color = charData && charData[y] && charData[y][x] ? charData[y][x] : 0;
-                    const xPos = (x + 1) * pixelSize;
-                    const yPos = (y + 1) * pixelSize;
-                    boxShadow.push(
-                        `${xPos}px ${yPos}px 0 0 ${PALETTE_COLORS[color]}`
-                    );
+                    if (color > 0) {
+                        const pixelSize = (charWidth > 16 || charHeight > 16) ? 1 : 2;
+                        const xPos = (x + 1) * pixelSize;
+                        const yPos = (y + 1) * pixelSize;
+                        boxShadow.push(
+                            `${xPos}px ${yPos}px 0 0 ${PALETTE_COLORS[color]}`
+                        );
+                    }
                 }
             });
         }
