@@ -7,7 +7,6 @@ import { Deferred } from '@theia/core/lib/common/promise-util';
 import { PreferenceService } from '@theia/core/lib/browser';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { AUTHOR_SEARCH_QUERY, TAG_SEARCH_QUERY, VesPluginsSearchModel } from './ves-plugins-search-model';
-import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { VesPlugin, VesPluginFactory } from './ves-plugin';
 import { VesPluginsService } from './ves-plugins-service';
@@ -21,9 +20,6 @@ export class VesPluginsModel {
 
     @inject(FileService)
     protected readonly fileService: FileService;
-
-    @inject(FrontendApplicationStateService)
-    protected readonly frontendApplicationStateService: FrontendApplicationStateService;
 
     @inject(VesPluginFactory)
     protected readonly pluginFactory: VesPluginFactory;
@@ -47,20 +43,17 @@ export class VesPluginsModel {
 
     @postConstruct()
     protected init(): void {
-        this.frontendApplicationStateService.onStateChanged(async (state: FrontendApplicationState) => {
-            if (state === 'attached_shell') {
-                await this.pluginsService.setPluginsData();
-                await this.pluginsService.determineInstalledPlugins();
-                await Promise.all([
-                    this.initSearchResult(),
-                    this.initInstalled(),
-                    this.initRecommended(),
-                ]);
-                this.initialized.resolve();
+        this.bindEvents();
+    }
 
-                this.pluginsService.onDidChangeInstalledPlugins(() => this.updateInstalled());
-            };
+    protected bindEvents(): void {
+        this.pluginsService.onDidChangePluginsData(async () => {
+            await this.initSearchResult();
+            await this.initInstalled();
+            await this.initRecommended();
+            this.initialized.resolve();
         });
+        this.pluginsService.onDidChangeInstalledPlugins(() => this.updateInstalled());
     }
 
     protected async initInstalled(): Promise<void> {
