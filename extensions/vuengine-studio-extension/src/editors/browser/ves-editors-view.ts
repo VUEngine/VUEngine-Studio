@@ -15,10 +15,10 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
     protected readonly editorManager: EditorManager;
     @inject(OpenerService)
     protected openerService: OpenerService;
-    @inject(VesEditorsContextKeyService)
-    protected readonly contextKeyService: VesEditorsContextKeyService;
     @inject(UntitledResourceResolver)
     protected readonly untitledResourceResolver: UntitledResourceResolver;
+    @inject(VesEditorsContextKeyService)
+    protected readonly contextKeyService: VesEditorsContextKeyService;
     @inject(VesProjectService)
     protected readonly vesProjectService: VesProjectService;
     @inject(UserWorkingDirectoryProvider)
@@ -45,6 +45,11 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
     }
 
     async registerCommands(commandRegistry: CommandRegistry): Promise<void> {
+        commandRegistry.registerCommand(VesEditorsCommands.GENERATE, {
+            isEnabled: () => true,
+            isVisible: widget => widget instanceof VesEditorsWidget,
+            execute: widget => this.generateFiles(widget),
+        });
         commandRegistry.registerCommand(VesEditorsCommands.OPEN_SOURCE, {
             isEnabled: () => true,
             isVisible: widget => widget instanceof VesEditorsWidget,
@@ -91,10 +96,16 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
 
     registerToolbarItems(toolbar: TabBarToolbarRegistry): void {
         toolbar.registerItem({
+            id: VesEditorsCommands.GENERATE.id,
+            command: VesEditorsCommands.GENERATE.id,
+            tooltip: VesEditorsCommands.GENERATE.label,
+            priority: 0,
+        });
+        toolbar.registerItem({
             id: VesEditorsCommands.OPEN_SOURCE.id,
             command: VesEditorsCommands.OPEN_SOURCE.id,
             tooltip: VesEditorsCommands.OPEN_SOURCE.label,
-            priority: 0,
+            priority: 1,
         });
     }
 
@@ -123,5 +134,13 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         this.editorManager.open(ref.uri, {
             widgetOptions: { ref, mode: 'tab-after' }
         });
+    }
+
+    protected generateFiles(widget: Widget): void {
+        const ref = widget instanceof VesEditorsWidget && widget || undefined;
+        if (!ref || !ref.uri) {
+            return;
+        }
+        (ref as VesEditorsWidget).generateFiles();
     }
 }

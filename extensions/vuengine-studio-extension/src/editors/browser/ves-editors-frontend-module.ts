@@ -1,25 +1,34 @@
+import { CommandContribution, MenuContribution } from '@theia/core';
 import { FrontendApplicationContribution, LabelProviderContribution, OpenHandler, WidgetFactory } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { ContainerModule } from '@theia/core/shared/inversify';
+import { WorkspaceCommandContribution } from '@theia/workspace/lib/browser';
 import '../../../src/editors/browser/style/index.css';
 import { VesEditorsContextKeyService } from './ves-editors-context-key-service';
+import { VesEditorsLabelProviderContribution } from './ves-editors-label-provider';
 import { VesEditorsOpenHandler } from './ves-editors-open-handler';
+import { VesEditorsStatusBarContribution } from './ves-editors-statusbar-contribution';
 import { VesEditorsViewContribution } from './ves-editors-view';
 import { VesEditorsWidget, VesEditorsWidgetOptions } from './ves-editors-widget';
-import { VesEditorsLabelProviderContribution } from './ves-editors-label-provider';
-import { CommandContribution, MenuContribution } from '@theia/core';
 import { VesWorkspaceCommandContribution } from './ves-workspace-commands';
-import { WorkspaceCommandContribution } from '@theia/workspace/lib/browser';
+import { VesEditorsService } from './ves-editors-service';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // override new file dialog
     bind(VesWorkspaceCommandContribution).toSelf().inSingletonScope();
     rebind(WorkspaceCommandContribution).toService(VesWorkspaceCommandContribution);
 
+    // status bar entry
+    bind(VesEditorsStatusBarContribution).toSelf().inSingletonScope();
+    bind(FrontendApplicationContribution).toService(VesEditorsStatusBarContribution);
+
     // context key service
     bind(VesEditorsContextKeyService)
         .toSelf()
         .inSingletonScope();
+
+    // editors services
+    bind(VesEditorsService).toSelf().inSingletonScope();
 
     // editor view
     bind(VesEditorsViewContribution).toSelf().inSingletonScope();

@@ -6,6 +6,16 @@
   outline: none;
 }
 
+.jsonforms-container .generatingOverlay {
+  background-color: var(--theia-editor-background);
+  height: 100%;
+  opacity: .5;
+  padding: 0;
+  position: absolute;
+  width: 100%;
+  z-index: 999999;
+}
+
 .jsonforms-container>div {
   padding: calc(var(--theia-ui-padding) * 2);
 }
