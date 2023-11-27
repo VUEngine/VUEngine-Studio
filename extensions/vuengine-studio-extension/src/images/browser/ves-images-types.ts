@@ -1,14 +1,14 @@
 import URI from '@theia/core/lib/common/uri';
 import { MemorySection } from '../../build/browser/ves-build-types';
 
-export interface ImageConverterConfig {
+export interface ImagesConfig {
   images: string[]
   name: string
   section: MemorySection
   tileset: {
     shared: boolean
     reduce: boolean
-    compress: false | ImageConverterCompressor
+    compress: false | ImageCompressionType
   }
   map: {
     generate: boolean
@@ -16,7 +16,7 @@ export interface ImageConverterConfig {
       flipped: boolean
       unique: boolean
     }
-    compress: false | ImageConverterCompressor
+    compress: false | ImageCompressionType
   }
   animation: AnimationConfig
 }
@@ -32,15 +32,15 @@ export interface ImageConfigFileToBeConverted {
   imageConfigFileUri: URI
   images: URI[]
   name: string
-  config: ImageConverterConfig
+  config: ImagesConfig
   gritArguments: string[]
   output: ConvertedFileData[]
 }
 
-export interface ImageConverterLogLine {
+export interface ImagesLogLine {
   timestamp: number
   text: string
-  type: ImageConverterLogLineType
+  type: ImagesLogLineType
   uri?: URI
 }
 
@@ -68,7 +68,7 @@ export interface ConvertedFileDataMeta {
   }
 }
 
-export enum ImageConverterLogLineType {
+export enum ImagesLogLineType {
   Normal = 'normal',
   Headline = 'headline',
   Warning = 'warning',
@@ -76,7 +76,7 @@ export enum ImageConverterLogLineType {
   Done = 'done',
 }
 
-export enum ImageConverterCompressor {
+export enum ImageCompressionType {
   RLE = 'rle',
 }
 
@@ -88,7 +88,7 @@ export interface TilesCompressionResult {
 
 export const COMPRESSION_FLAG_LENGTH = 1;
 
-export const DEFAULT_IMAGE_CONVERTER_CONFIG: ImageConverterConfig = {
+export const DEFAULT_IMAGE_CONVERTER_CONFIG: ImagesConfig = {
   images: [],
   name: '',
   section: MemorySection.ROM,

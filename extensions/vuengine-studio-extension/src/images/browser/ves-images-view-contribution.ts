@@ -4,11 +4,11 @@ import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/li
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
-import { VesImageConverterCommands } from './ves-image-converter-commands';
-import { VesImageConverterWidget } from './ves-image-converter-widget';
+import { VesImagesCommands } from './ves-images-commands';
+import { VesImagesWidget } from './ves-images-widget';
 
 @injectable()
-export class VesImageConverterViewContribution extends AbstractViewContribution<VesImageConverterWidget> implements TabBarToolbarContribution {
+export class VesImagesViewContribution extends AbstractViewContribution<VesImagesWidget> implements TabBarToolbarContribution {
     @inject(ApplicationShell)
     protected readonly applicationShell: ApplicationShell;
     @inject(CommandService)
@@ -18,8 +18,8 @@ export class VesImageConverterViewContribution extends AbstractViewContribution<
 
     constructor() {
         super({
-            widgetId: VesImageConverterWidget.ID,
-            widgetName: VesImageConverterWidget.LABEL,
+            widgetId: VesImagesWidget.ID,
+            widgetName: VesImagesWidget.LABEL,
             defaultWidgetOptions: {
                 area: 'right',
                 rank: 900,
@@ -39,14 +39,14 @@ export class VesImageConverterViewContribution extends AbstractViewContribution<
 
         await this.workspaceService.ready;
         if (this.workspaceService.opened) {
-            commandRegistry.registerCommand(VesImageConverterCommands.WIDGET_TOGGLE, {
+            commandRegistry.registerCommand(VesImagesCommands.WIDGET_TOGGLE, {
                 execute: () => this.toggleView()
             });
 
-            commandRegistry.registerCommand(VesImageConverterCommands.WIDGET_HELP, {
+            commandRegistry.registerCommand(VesImagesCommands.WIDGET_HELP, {
                 isEnabled: () => true,
                 isVisible: widget => widget !== undefined &&
-                    widget.id === VesImageConverterWidget.ID,
+                    widget.id === VesImagesWidget.ID,
                 execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'user-guide/assets', false),
             });
         }
@@ -56,9 +56,9 @@ export class VesImageConverterViewContribution extends AbstractViewContribution<
         await this.workspaceService.ready;
         if (this.workspaceService.opened) {
             toolbar.registerItem({
-                id: VesImageConverterCommands.WIDGET_HELP.id,
-                command: VesImageConverterCommands.WIDGET_HELP.id,
-                tooltip: VesImageConverterCommands.WIDGET_HELP.label,
+                id: VesImagesCommands.WIDGET_HELP.id,
+                command: VesImagesCommands.WIDGET_HELP.id,
+                tooltip: VesImagesCommands.WIDGET_HELP.label,
                 priority: 3,
             });
         }
@@ -70,7 +70,7 @@ export class VesImageConverterViewContribution extends AbstractViewContribution<
         await this.workspaceService.ready;
         if (this.workspaceService.opened) {
             menus.registerMenuAction(CommonMenus.VIEW_VIEWS, {
-                commandId: VesImageConverterCommands.WIDGET_TOGGLE.id,
+                commandId: VesImagesCommands.WIDGET_TOGGLE.id,
                 label: this.viewLabel
             });
         }
@@ -82,7 +82,7 @@ export class VesImageConverterViewContribution extends AbstractViewContribution<
         await this.workspaceService.ready;
         if (this.workspaceService.opened) {
             keybindings.registerKeybinding({
-                command: VesImageConverterCommands.WIDGET_TOGGLE.id,
+                command: VesImagesCommands.WIDGET_TOGGLE.id,
                 keybinding: 'ctrlcmd+shift+i'
             });
         }

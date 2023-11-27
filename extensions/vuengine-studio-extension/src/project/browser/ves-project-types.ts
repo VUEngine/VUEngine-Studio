@@ -108,13 +108,11 @@ export enum ProjectFileTemplateEncoding {
 
 export const defaultProjectData: ProjectFile = {
   templates: {
-    /*
-    'imageSpec.c': {
+    'image.c': {
       target: 'Converted/${_filename}.c',
       targetRoot: 'file',
       template: 'templates/image.c.nj'
     },
-    */
     'romHeader.h': {
       target: 'source/romHeader.h',
       targetRoot: 'project',
@@ -123,7 +121,6 @@ export const defaultProjectData: ProjectFile = {
     }
   },
   types: {
-    /*
     Image: {
       file: '.imageConv',
       schema: {
@@ -399,9 +396,8 @@ export const defaultProjectData: ProjectFile = {
         ]
       },
       icon: 'fa fa-image',
-      templates: ['imageSpec.c']
+      templates: ['image.c']
     },
-    */
     RomHeader: {
       file: 'RomHeader',
       schema: {

@@ -1,6 +1,6 @@
 import { Command } from '@theia/core';
 
-export namespace VesImageConverterCommands {
+export namespace VesImagesCommands {
   export const CONVERT_ALL: Command = Command.toLocalizedCommand(
     {
       id: 'ves:imageConverter:convertAll',

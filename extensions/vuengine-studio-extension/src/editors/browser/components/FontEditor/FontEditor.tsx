@@ -3,7 +3,7 @@ import { injectable } from '@theia/core/shared/inversify';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import React from 'react';
-import { ImageConverterCompressor } from '../../../../image-converter/browser/ves-image-converter-types';
+import { ImageCompressionType } from '../../../../images/browser/ves-images-types';
 import Alphabet from './Alphabet/Alphabet';
 import AlphabetSettings from './Alphabet/AlphabetSettings';
 import CharEditor from './CharEditor/CharEditor';
@@ -140,7 +140,7 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
             section: section
         });
     }
-    protected setCompression(compression: ImageConverterCompressor): void {
+    protected setCompression(compression: ImageCompressionType): void {
         this.props.updateFontData({
             ...this.props.fontData,
             compression: compression
@@ -286,7 +286,7 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
                     </label>
                     <select
                         className='theia-select'
-                        onChange={e => this.setCompression(e.target.value as ImageConverterCompressor)}
+                        onChange={e => this.setCompression(e.target.value as ImageCompressionType)}
                         value={fontData.compression}
                     >
                         <option value='none'>{nls.localize('vuengine/fontEditor/none', 'None')}</option>
