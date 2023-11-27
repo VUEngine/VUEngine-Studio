@@ -7,17 +7,17 @@ import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/br
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { EditorManager } from '@theia/editor/lib/browser';
-import { VesImageConverterCommands } from './ves-image-converter-commands';
-import { VesImageConverterService } from './ves-image-converter-service';
-import { ImageConverterLogLine, ImageConverterLogLineType } from './ves-image-converter-types';
+import { VesImagesCommands } from './ves-images-commands';
+import { VesImagesService } from './ves-images-service';
+import { ImagesLogLine, ImagesLogLineType } from './ves-images-types';
 import URI from '@theia/core/lib/common/uri';
 
-interface VesImageConverterWidgetState {
+interface VesImagesWidgetState {
   changedOnly: boolean,
 }
 
 @injectable()
-export class VesImageConverterWidget extends ReactWidget {
+export class VesImagesWidget extends ReactWidget {
   @inject(CommandService)
   private readonly commandService: CommandService;
   @inject(FileService)
@@ -28,15 +28,15 @@ export class VesImageConverterWidget extends ReactWidget {
   private readonly editorManager: EditorManager;
   @inject(PreferenceService)
   private readonly preferenceService: PreferenceService;
-  @inject(VesImageConverterService)
-  private readonly vesImageConverterService: VesImageConverterService;
+  @inject(VesImagesService)
+  private readonly VesImagesService: VesImagesService;
   @inject(WorkspaceService)
   private readonly workspaceService: WorkspaceService;
 
-  static readonly ID = 'vesImageConverterWidget';
+  static readonly ID = 'VesImagesWidget';
   static readonly LABEL = nls.localize('vuengine/imageConverter/imageConverter', 'Image Converter');
 
-  protected state: VesImageConverterWidgetState = {
+  protected state: VesImagesWidgetState = {
     changedOnly: true,
   };
 
@@ -50,11 +50,11 @@ export class VesImageConverterWidget extends ReactWidget {
 
   @postConstruct()
   protected init(): void {
-    this.id = VesImageConverterWidget.ID;
+    this.id = VesImagesWidget.ID;
     this.title.iconClass = 'codicon codicon-circuit-board';
     this.title.closable = true;
-    this.title.label = VesImageConverterWidget.LABEL;
-    this.title.caption = VesImageConverterWidget.LABEL;
+    this.title.label = VesImagesWidget.LABEL;
+    this.title.caption = VesImagesWidget.LABEL;
     this.node.tabIndex = 0; // required for this.node.focus() to work in this.onActivateRequest()
     this.update();
     this.title.className = '';
@@ -63,15 +63,15 @@ export class VesImageConverterWidget extends ReactWidget {
   }
 
   protected bindEvents(): void {
-    this.vesImageConverterService.onDidChangeIsConverting(isConverting => {
+    this.VesImagesService.onDidChangeIsConverting(isConverting => {
       this.title.className = isConverting
         ? 'ves-decorator-progress'
-        : this.vesImageConverterService.progress > 0
+        : this.VesImagesService.progress > 0
           ? 'ves-decorator-success'
           : '';
     });
-    this.vesImageConverterService.onDidChangeLog(() => this.update());
-    this.vesImageConverterService.onDidChangeProgress(() => this.update());
+    this.VesImagesService.onDidChangeLog(() => this.update());
+    this.VesImagesService.onDidChangeProgress(() => this.update());
   }
 
   protected onActivateRequest(msg: Message): void {
@@ -84,15 +84,15 @@ export class VesImageConverterWidget extends ReactWidget {
     return (
       <>
         <div className="convertActions">
-          {this.vesImageConverterService.isConverting && (
+          {this.VesImagesService.isConverting && (
             <div className="convertPanel">
               <div className="vesProgressBar">
-                <div style={{ width: this.vesImageConverterService.progress + '%' }}></div>
-                <span>{this.vesImageConverterService.progress}%</span>
+                <div style={{ width: this.VesImagesService.progress + '%' }}></div>
+                <span>{this.VesImagesService.progress}%</span>
               </div>
             </div>
           )}
-          {!this.vesImageConverterService.isConverting && (
+          {!this.VesImagesService.isConverting && (
             <div className="convertButtons">
               <button
                 className="theia-button large convert"
@@ -114,7 +114,7 @@ export class VesImageConverterWidget extends ReactWidget {
               </div>
             </div>
           )}
-          {/* this.vesImageConverterService.isConverting && (
+          {/* this.VesImagesService.isConverting && (
             <div className="convertButtons">
               <button
                 className="theia-button secondary"
@@ -125,13 +125,13 @@ export class VesImageConverterWidget extends ReactWidget {
             </div>
           ) */}
         </div>
-        {this.vesImageConverterService.log.length > 0 && (
+        {this.VesImagesService.log.length > 0 && (
           <>
             <div className="convertLogWrapper">
               <div className="convertLog">
                 <div>
-                  {this.vesImageConverterService.log.map(
-                    (line: ImageConverterLogLine, index: number) => (
+                  {this.VesImagesService.log.map(
+                    (line: ImagesLogLine, index: number) => (
                       line.text !== ''
                         ? <div className={`convertLogLine ${line.type}${line.uri ? ' hasFileLink' : ''}`}
                           key={`convertLogLine${index}`}
@@ -139,13 +139,13 @@ export class VesImageConverterWidget extends ReactWidget {
                           title={`${new Date(line.timestamp).toTimeString().substring(0, 8)} ${line.text}`}
                         >
                           <span className='icon'>
-                            {line.type === ImageConverterLogLineType.Error
+                            {line.type === ImagesLogLineType.Error
                               ? <i className='codicon codicon-error' />
-                              : line.type === ImageConverterLogLineType.Warning
+                              : line.type === ImagesLogLineType.Warning
                                 ? <i className='codicon codicon-warning' />
-                                : line.type === ImageConverterLogLineType.Headline
+                                : line.type === ImagesLogLineType.Headline
                                   ? <i className='codicon codicon-info' />
-                                  : line.type === ImageConverterLogLineType.Done
+                                  : line.type === ImagesLogLineType.Done
                                     ? <i className='codicon codicon-pass-filled' />
                                     : <></>}
                           </span>
@@ -167,7 +167,7 @@ export class VesImageConverterWidget extends ReactWidget {
               <button
                 className="theia-button secondary"
                 onClick={this.clearLog}
-                disabled={this.vesImageConverterService.isConverting}
+                disabled={this.VesImagesService.isConverting}
               >
                 {nls.localize('vuengine/imageConverter/clearLogs', 'Clear Logs')}
               </button>
@@ -202,17 +202,17 @@ export class VesImageConverterWidget extends ReactWidget {
     }
   }
 
-  protected clearLog = () => this.vesImageConverterService.clearLog();
+  protected clearLog = () => this.VesImagesService.clearLog();
   protected toggleChangedOnly = () => {
     this.state.changedOnly = !this.state.changedOnly;
     this.update();
   };
   protected convert = async () => {
     if (this.state.changedOnly) {
-      this.commandService.executeCommand(VesImageConverterCommands.CONVERT_CHANGED.id);
+      this.commandService.executeCommand(VesImagesCommands.CONVERT_CHANGED.id);
     } else {
-      this.commandService.executeCommand(VesImageConverterCommands.CONVERT_ALL.id);
+      this.commandService.executeCommand(VesImagesCommands.CONVERT_ALL.id);
     }
   };
-  // protected abort = () => this.vesImageConverterService.abortConverting();
+  // protected abort = () => this.VesImagesService.abortConverting();
 }

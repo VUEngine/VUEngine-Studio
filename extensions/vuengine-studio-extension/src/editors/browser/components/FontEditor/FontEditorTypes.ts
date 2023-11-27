@@ -1,4 +1,4 @@
-import { ImageConverterCompressor } from '../../../../image-converter/browser/ves-image-converter-types';
+import { ImageCompressionType } from '../../../../images/browser/ves-images-types';
 
 export interface FontEditorState {
     active: boolean
@@ -18,7 +18,7 @@ export interface FontData {
     size: Size
     variableSize: VariableSize
     section: DataSection
-    compression: ImageConverterCompressor
+    compression: ImageCompressionType
     characters: number[][][]
 }
 

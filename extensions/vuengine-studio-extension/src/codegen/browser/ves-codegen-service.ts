@@ -9,8 +9,8 @@ import * as iconv from 'iconv-lite';
 import * as nunjucks from 'nunjucks';
 import { VesAudioConverterService } from '../../audio-converter/browser/ves-audio-converter-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
-import { compressTiles } from '../../image-converter/browser/ves-image-converter-compressor';
-import { AnimationConfig, ImageConverterCompressor, TilesCompressionResult } from '../../image-converter/browser/ves-image-converter-types';
+import { compressTiles } from '../../images/browser/ves-images-compressor';
+import { AnimationConfig, ImageCompressionType, TilesCompressionResult } from '../../images/browser/ves-images-types';
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { VesProcessService } from '../../process/common/ves-process-service-protocol';
 import { VesProjectService } from '../../project/browser/ves-project-service';
@@ -320,7 +320,7 @@ export class VesCodeGenService {
     }, true);
 
     // add functions
-    env.addGlobal('compressTiles', (tilesData: string[], compressor: ImageConverterCompressor, animationConfig: AnimationConfig): TilesCompressionResult =>
+    env.addGlobal('compressTiles', (tilesData: string[], compressor: ImageCompressionType, animationConfig: AnimationConfig): TilesCompressionResult =>
       compressTiles(tilesData, compressor, animationConfig)
     );
   }

@@ -118,7 +118,7 @@
       "frontend": "lib/getting-started/browser/ves-getting-started-frontend-module"
     },
     {
-      "frontend": "lib/image-converter/browser/ves-image-converter-frontend-module"
+      "frontend": "lib/images/browser/ves-images-frontend-module"
     },
     {
       "frontend": "lib/i18n/browser/ves-i18n-frontend-module",

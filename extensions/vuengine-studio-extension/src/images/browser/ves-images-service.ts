@@ -10,19 +10,19 @@ import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
-import { compressTiles } from './ves-image-converter-compressor';
+import { compressTiles } from './ves-images-compressor';
 import {
   COMPRESSION_FLAG_LENGTH,
   DEFAULT_IMAGE_CONVERTER_CONFIG,
   ImageConfigFileToBeConverted,
-  ImageConverterCompressor,
-  ImageConverterConfig,
-  ImageConverterLogLine,
-  ImageConverterLogLineType
-} from './ves-image-converter-types';
+  ImageCompressionType,
+  ImagesConfig,
+  ImagesLogLine,
+  ImagesLogLineType
+} from './ves-images-types';
 
 @injectable()
-export class VesImageConverterService {
+export class VesImagesService {
   @inject(FileService)
   protected fileService: FileService;
   @inject(LabelProvider)
@@ -91,17 +91,17 @@ export class VesImageConverterService {
   }
 
   // log
-  protected _log: Array<ImageConverterLogLine> = [];
-  protected readonly onDidChangeLogEmitter = new Emitter<Array<ImageConverterLogLine>>();
+  protected _log: Array<ImagesLogLine> = [];
+  protected readonly onDidChangeLogEmitter = new Emitter<Array<ImagesLogLine>>();
   readonly onDidChangeLog = this.onDidChangeLogEmitter.event;
-  set log(log: Array<ImageConverterLogLine>) {
+  set log(log: Array<ImagesLogLine>) {
     this._log = log;
     this.onDidChangeLogEmitter.fire(this._log);
   }
-  get log(): Array<ImageConverterLogLine> {
+  get log(): Array<ImagesLogLine> {
     return this._log;
   }
-  protected pushLog(line: ImageConverterLogLine): void {
+  protected pushLog(line: ImagesLogLine): void {
     this.log.push(line);
     this.onDidChangeLogEmitter.fire(this._log);
   }
@@ -138,7 +138,7 @@ export class VesImageConverterService {
       text: changedOnly
         ? nls.localize('vuengine/imageConverter/startingToConvertChanged', 'Starting to convert changed images...')
         : nls.localize('vuengine/imageConverter/startingToConvertAll', 'Starting to convert all images...'),
-      type: ImageConverterLogLineType.Headline,
+      type: ImagesLogLineType.Headline,
     });
 
     const imageConfigFilesToBeConverted = await this.getImageConfigFilesToBeConverted(changedOnly);
@@ -147,12 +147,12 @@ export class VesImageConverterService {
       this.pushLog({
         timestamp: Date.now(),
         text: nls.localize('vuengine/imageConverter/noneFound', 'None found.'),
-        type: ImageConverterLogLineType.Normal,
+        type: ImagesLogLineType.Normal,
       });
       this.pushLog({
         timestamp: Date.now(),
         text: '',
-        type: ImageConverterLogLineType.Normal,
+        type: ImagesLogLineType.Normal,
       });
 
       return;
@@ -166,7 +166,7 @@ export class VesImageConverterService {
     this.pushLog({
       timestamp: Date.now(),
       text: nls.localize('vuengine/imageConverter/foundXImages', 'Found {0} images', this.totalToConvert),
-      type: ImageConverterLogLineType.Normal,
+      type: ImagesLogLineType.Normal,
     });
 
     const gritUri = await this.getGritUri();
@@ -229,7 +229,6 @@ export class VesImageConverterService {
 
         if (imageConfigFileToBeConverted.config.animation.isAnimation
           && imageConfigFileToBeConverted.config.animation.individualFiles) {
-          // TODO: discard compression results if they're larger than the original size
 
           // delete source files and report done
           await Promise.all(imageConfigFileToBeConverted.output.map(async output => {
@@ -359,7 +358,7 @@ export class VesImageConverterService {
     this.pushLog({
       timestamp: Date.now(),
       text: `Created ${convertedImageUri.path.base}`,
-      type: ImageConverterLogLineType.Normal,
+      type: ImagesLogLineType.Normal,
       uri: convertedImageUri,
     });
 
@@ -402,7 +401,7 @@ export class VesImageConverterService {
       imageConfigFileToBeConverted.output.map(output => {
         const compressionResult = compressTiles(
           output.tilesData,
-          imageConfigFileToBeConverted.config.tileset.compress as ImageConverterCompressor,
+          imageConfigFileToBeConverted.config.tileset.compress as ImageCompressionType,
           imageConfigFileToBeConverted.config.animation
         );
 
@@ -475,10 +474,10 @@ export class VesImageConverterService {
       nodir: true
     });
     for (const imageConfigFile of imageConfigFiles) {
-      const imageConfigFileUri = new URI(imageConfigFile).withScheme('file');
+      const imageConfigFileUri = workspaceRootUri.resolve(imageConfigFile);
       const config = await this.getConverterConfig(imageConfigFileUri);
 
-      if (!this.validateImageConverterConfig(config, imageConfigFileUri)) {
+      if (!this.validateImagesConfig(config, imageConfigFileUri)) {
         continue;
       }
 
@@ -514,7 +513,7 @@ export class VesImageConverterService {
     return totalImagesToBeConverted;
   }
 
-  protected async getRelevantImageFiles(changedOnly: boolean, imageConfigFileUri: URI, config: ImageConverterConfig, name: string): Promise<Array<URI>> {
+  protected async getRelevantImageFiles(changedOnly: boolean, imageConfigFileUri: URI, config: ImagesConfig, name: string): Promise<Array<URI>> {
     let foundImages: Array<URI> = [];
     await Promise.all(config.images.map(async image => {
       if (image === '.') {
@@ -545,7 +544,7 @@ export class VesImageConverterService {
 
   protected async getOnlyChangedImages(
     foundImages: Array<URI>,
-    config: ImageConverterConfig,
+    config: ImagesConfig,
     imageConfigFileUri: URI,
     name: string,
   ): Promise<Array<URI>> {
@@ -609,7 +608,7 @@ export class VesImageConverterService {
     return atLeastOneFileNewer;
   }
 
-  protected async getConverterConfig(file: URI): Promise<ImageConverterConfig> {
+  protected async getConverterConfig(file: URI): Promise<ImagesConfig> {
     const fileContents = await this.fileService.readFile(file);
     const config = JSON.parse(fileContents.value.toString());
     const merged = deepmerge(DEFAULT_IMAGE_CONVERTER_CONFIG, config);
@@ -622,13 +621,13 @@ export class VesImageConverterService {
   }
 
   // check converter config for validity
-  protected validateImageConverterConfig(config: ImageConverterConfig, imageConfigFileUri: URI): boolean {
+  protected validateImagesConfig(config: ImagesConfig, imageConfigFileUri: URI): boolean {
     if (config.animation.isAnimation && !config.animation.individualFiles
       && config.animation.frameHeight * config.animation.frameWidth === 0) {
       this.pushLog({
         timestamp: Date.now(),
         text: `${this.labelProvider.getName(imageConfigFileUri)}: No frame dimensions specified for spritesheet animation.`,
-        type: ImageConverterLogLineType.Error,
+        type: ImagesLogLineType.Error,
         uri: imageConfigFileUri
       });
       return false;
@@ -637,7 +636,7 @@ export class VesImageConverterService {
     return true;
   }
 
-  protected getGritArguments(name: string, config: ImageConverterConfig): Array<string> {
+  protected getGritArguments(name: string, config: ImagesConfig): Array<string> {
     const gritArguments = ['-fh!', '-ftc', '-gB2', '-p!'];
 
     if (config.tileset.reduce) {
@@ -691,12 +690,12 @@ export class VesImageConverterService {
         this.pushLog({
           timestamp: Date.now(),
           text: nls.localize('vuengine/imageConverter/done', 'Done'),
-          type: ImageConverterLogLineType.Done,
+          type: ImagesLogLineType.Done,
         });
         this.pushLog({
           timestamp: Date.now(),
           text: '',
-          type: ImageConverterLogLineType.Normal,
+          type: ImagesLogLineType.Normal,
         });
       }
     });

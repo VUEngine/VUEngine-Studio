@@ -1,8 +1,8 @@
-import { AnimationConfig, COMPRESSION_FLAG_LENGTH, ImageConverterCompressor, TilesCompressionResult } from './ves-image-converter-types';
+import { AnimationConfig, COMPRESSION_FLAG_LENGTH, ImageCompressionType, TilesCompressionResult } from './ves-images-types';
 
-export function compressTiles(tilesData: string[], compressor: ImageConverterCompressor, animationConfig: AnimationConfig): TilesCompressionResult {
+export function compressTiles(tilesData: string[], compressor: ImageCompressionType, animationConfig: AnimationConfig): TilesCompressionResult {
   switch (compressor) {
-    case ImageConverterCompressor.RLE:
+    case ImageCompressionType.RLE:
       return compressTilesRle(tilesData, animationConfig);
     default:
       return {
