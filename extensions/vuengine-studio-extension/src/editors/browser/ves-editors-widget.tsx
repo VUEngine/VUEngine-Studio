@@ -21,6 +21,7 @@ import { VesProjectService } from '../../project/browser/ves-project-service';
 import { ProjectFile, ProjectFileType } from '../../project/browser/ves-project-types';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
 import { VES_RENDERERS } from './renderers/ves-renderers';
+import { IsGeneratingFilesStatus, VesEditorsService } from './ves-editors-service';
 
 export const VesEditorsWidgetOptions = Symbol('VesEditorsWidgetOptions');
 export interface VesEditorsWidgetOptions {
@@ -58,6 +59,8 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     protected readonly options: VesEditorsWidgetOptions;
     @inject(VesCodeGenService)
     protected readonly vesCodeGenService: VesCodeGenService;
+    @inject(VesEditorsService)
+    protected readonly vesEditorsService: VesEditorsService;
     @inject(VesProjectService)
     protected readonly vesProjectService: VesProjectService;
     @inject(VesRumblePackService)
@@ -84,6 +87,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     protected reference: Reference<MonacoEditorModel>;
     protected justSaved: boolean = false;
     protected loading: boolean = true;
+    protected generating: boolean = false;
 
     protected readonly onDirtyChangedEmitter = new Emitter<void>();
     get onDirtyChanged(): Event<void> {
@@ -286,6 +290,20 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         return false;
     }
 
+    async generateFiles(): Promise<void> {
+        this.generating = true;
+        this.update();
+        this.vesEditorsService.isGeneratingFiles = IsGeneratingFilesStatus.active;
+        // delay template rendering to allow frontend to update status bar
+        window.setTimeout(async () => {
+            const numberOfGeneratedFiles = await this.vesCodeGenService.renderTemplatesForItem(this.options.typeId, this.data, this.uri);
+            this.vesEditorsService.setNumberOfGeneratedFiles(numberOfGeneratedFiles);
+            this.vesEditorsService.isGeneratingFiles = IsGeneratingFilesStatus.done;
+            this.generating = false;
+            this.update();
+        }, 100);
+    }
+
     async save(): Promise<void> {
         if (this.uri.scheme === UNTITLED_SCHEME) {
             this.commandService.executeCommand(CommonCommands.SAVE_AS.id);
@@ -295,7 +313,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
                 this.justSaved = true;
                 this.setDirty(false);
                 this.setSavedData();
-                this.vesCodeGenService.renderTemplatesForItem(this.options.typeId, this.data, this.uri);
+                this.generateFiles();
             } catch (error) {
                 console.error('Could not save');
             }
@@ -410,38 +428,41 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
             {this.loading
                 ? <div className="loader"><div></div></div>
                 : this.data
-                    ? <JsonFormsStyleContext.Provider value={this.getStyles()}>
-                        <JsonForms
-                            data={this.data}
-                            schema={this.schema}
-                            uischema={this.uiSchema}
-                            onChange={this.jsonformsOnChange}
-                            cells={vanillaCells}
-                            renderers={[
-                                ...vanillaRenderers,
-                                ...VES_RENDERERS
-                            ]}
-                            config={{
-                                restrict: false,
-                                trim: false,
-                                showUnfocusedDescription: true,
-                                hideRequiredAsterisk: false,
-                                // TODO: refactor once there's a non-hacky way to inject custom data
-                                fileUri: this.uri,
-                                services: {
-                                    commandService: this.commandService,
-                                    fileService: this.fileService,
-                                    fileDialogService: this.fileDialogService,
-                                    localStorageService: this.localStorageService,
-                                    messageService: this.messageService,
-                                    vesCommonService: this.vesCommonService,
-                                    vesRumblePackService: this.vesRumblePackService,
-                                    workspaceService: this.workspaceService,
-                                },
-                                projectData: this.projectData
-                            }}
-                        />
-                    </JsonFormsStyleContext.Provider>
+                    ? <>
+                        {this.generating && <div className='generatingOverlay'></div>}
+                        <JsonFormsStyleContext.Provider value={this.getStyles()}>
+                            <JsonForms
+                                data={this.data}
+                                schema={this.schema}
+                                uischema={this.uiSchema}
+                                onChange={this.jsonformsOnChange}
+                                cells={vanillaCells}
+                                renderers={[
+                                    ...vanillaRenderers,
+                                    ...VES_RENDERERS
+                                ]}
+                                config={{
+                                    restrict: false,
+                                    trim: false,
+                                    showUnfocusedDescription: true,
+                                    hideRequiredAsterisk: false,
+                                    // TODO: refactor once there's a non-hacky way to inject custom data
+                                    fileUri: this.uri,
+                                    services: {
+                                        commandService: this.commandService,
+                                        fileService: this.fileService,
+                                        fileDialogService: this.fileDialogService,
+                                        localStorageService: this.localStorageService,
+                                        messageService: this.messageService,
+                                        vesCommonService: this.vesCommonService,
+                                        vesRumblePackService: this.vesRumblePackService,
+                                        workspaceService: this.workspaceService,
+                                    },
+                                    projectData: this.projectData
+                                }}
+                            />
+                        </JsonFormsStyleContext.Provider>
+                    </>
                     : <div className='error'>
                         {nls.localize('vuengine/editors/errorCouldNotLoadItem', 'Error: could not load item.')}
                     </div>}

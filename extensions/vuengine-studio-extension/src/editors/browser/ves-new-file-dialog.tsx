@@ -99,19 +99,22 @@ export class VesNewFileDialog extends ReactDialog<string> {
                                 {nls.localize('vuengine/editors/newFileDialog/types/Text', 'Text')}
                             </option>
                         </optgroup>
-                        {[true, false].map(b =>
-                            <optgroup key={b ? 'true' : ' false'}>
-                                {Object.keys(this.props.types).map(typeId => {
-                                    const ext = this.props.types[typeId].file;
-                                    return (
-                                        (this.props.types[typeId].file?.startsWith('.') === b) &&
-                                        <option value={ext} key={ext}>
-                                            {nls.localize(`vuengine/editors/newFileDialog/types/${typeId}`, this.props.types[typeId].schema.title || typeId)}
-                                        </option>
-                                    );
-                                })}
-                            </optgroup>
-                        )}
+                        {[true, false].map(b => {
+                            const typeKeys = Object.keys(this.props.types);
+                            const options = typeKeys.filter(typeId => this.props.types[typeId].file?.startsWith('.') === b);
+                            if (options.length) {
+                                return <optgroup key={b ? 'true' : ' false'}>
+                                    {options.map(typeId => {
+                                        const ext = this.props.types[typeId].file;
+                                        return (
+                                            <option value={ext} key={ext}>
+                                                {nls.localize(`vuengine/editors/newFileDialog/types/${typeId}`, this.props.types[typeId].schema.title || typeId)}
+                                            </option>
+                                        );
+                                    })}
+                                </optgroup>;
+                            }
+                        })}
                     </select>
                 </div>
             </div >

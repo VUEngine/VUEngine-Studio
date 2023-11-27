@@ -96,20 +96,25 @@ export class VesCodeGenService {
     data: object,
     encoding: ProjectFileTemplateEncoding = ProjectFileTemplateEncoding.utf8
   ): Promise<void> {
-    nunjucks.renderString(templateString, data, (err, res) => {
-      if (err) {
-        console.error(`Failed to render template ${templateId}. Nunjucks output:`, err);
-      } else if (res) {
-        this.fileService.writeFile(
-          targetUri,
-          BinaryBuffer.wrap(iconv.encode(res, encoding))
-        );
+    return new Promise((resolve, reject) => {
+      nunjucks.renderString(templateString, data, (err, res) => {
+        if (err) {
+          console.error(`Failed to render template ${templateId}. Nunjucks output:`, err);
+          reject();
+        } else if (res) {
+          this.fileService.writeFile(
+            targetUri,
+            BinaryBuffer.wrap(iconv.encode(res, encoding))
+          ).then(() => {
+            // @ts-ignore
+            console.info(data.item?._id ? `Rendered template ${templateId} with item ${data.item._id}.`
+              : `Rendered template ${templateId}.`
+            );
 
-        // @ts-ignore
-        console.info(data.item?._id ? `Rendered template ${templateId} with item ${data.item._id}.`
-          : `Rendered template ${templateId}.`
-        );
-      }
+            resolve();
+          });
+        }
+      });
     });
   }
 
@@ -129,7 +134,7 @@ export class VesCodeGenService {
       project: this.vesProjectService.getProjectData()
     };
 
-    await this.renderFileFromTemplate(templateId, template, uri, data, encoding);
+    return this.renderFileFromTemplate(templateId, template, uri, data, encoding);
   }
 
   protected async handlePluginChange(): Promise<void> {
@@ -140,7 +145,7 @@ export class VesCodeGenService {
         if (template.events) {
           await Promise.all(template.events.map(async event => {
             if (event.type === ProjectFileTemplateEventType.installedPluginsChanged) {
-              await this.renderTemplate(templateId);
+              return this.renderTemplate(templateId);
             }
           }));
         }
@@ -148,15 +153,20 @@ export class VesCodeGenService {
     }
   }
 
-  async renderTemplatesForItem(typeId: string, itemData: any, itemUri: URI): Promise<void> {
+  async renderTemplatesForItem(typeId: string, itemData: any, itemUri: URI): Promise<number> {
+    let numberOfGeneratedFiles = 0;
     const typeData = this.vesProjectService.getProjectDataType(typeId);
-    if (typeData && typeData.templates) {
-      await Promise.all(typeData.templates.map(async templateId =>
-        this.renderTemplate(templateId, itemUri, {
+    if (typeData && Array.isArray(typeData.templates)) {
+      await Promise.all(typeData.templates.map(async templateId => {
+        numberOfGeneratedFiles++;
+        return this.renderTemplate(templateId, itemUri, {
           ...itemData,
           _filename: itemUri.path.name,
-        })));
-    }
+        });
+      }));
+    };
+
+    return numberOfGeneratedFiles;
   }
 
   protected async handleDeleteItem(typeId: string): Promise<void> {
@@ -215,7 +225,7 @@ export class VesCodeGenService {
         targetUri = targetUri.resolve(targetPathPart);
       });
 
-      await this.renderTemplateToFile(templateId, targetUri, templateString, data, encoding);
+      return this.renderTemplateToFile(templateId, targetUri, templateString, data, encoding);
     }
   }
 
