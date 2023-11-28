@@ -9,6 +9,8 @@ import { ProjectFileTypesWithContributor } from '../../project/browser/ves-proje
 export class VesNewFileDialogProps extends DialogProps {
     parentLabel: string;
     types: ProjectFileTypesWithContributor;
+    defaultName: string;
+    defaultExt: string;
 }
 
 @injectable()
@@ -18,11 +20,13 @@ export class VesNewFileDialog extends ReactDialog<string> {
     ) {
         super(props);
 
+        this.name = props.defaultName;
+        this.ext = props.defaultExt;
         this.appendAcceptButton(Dialog.OK);
     }
 
-    protected ext = '.c / .h';
-    protected name = nls.localize('vuengine/editors/newFileDialog/untitled', 'Untitled');
+    protected ext: string;
+    protected name: string;
 
     get value(): string {
         return this.ext.startsWith('.')
