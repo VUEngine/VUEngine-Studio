@@ -335,7 +335,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
             this.data.name = this.uri.path.name;
         }
 
-        if (this.data?._id === '') {
+        if (!this.data?._id) {
             this.data!._id = this.vesCommonService.nanoid();
         }
 

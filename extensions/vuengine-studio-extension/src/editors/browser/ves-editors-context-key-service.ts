@@ -11,11 +11,20 @@ export class VesEditorsContextKeyService {
         return this._graphicalEditorFocus;
     }
 
+    protected _explorerResourceExt: ContextKey<string>;
+    get explorerResourceExt(): ContextKey<string> {
+        return this._explorerResourceExt;
+    }
+
     @postConstruct()
     protected init(): void {
         this._graphicalEditorFocus = this.contextKeyService.createKey<boolean>(
             'graphicalEditorFocus',
             false
+        );
+        this._explorerResourceExt = this.contextKeyService.createKey<string>(
+            'explorerResourceExt',
+            ''
         );
     }
 }
