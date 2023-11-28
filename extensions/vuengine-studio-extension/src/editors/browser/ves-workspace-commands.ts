@@ -22,11 +22,25 @@ export class VesWorkspaceCommandContribution extends WorkspaceCommandContributio
                 const parent = await this.getDirectory(uri);
                 if (parent) {
                     const parentUri = parent.resource;
+                    let defaultExt = '.c / .h';
+                    let defaultName = nls.localize('vuengine/editors/newFileDialog/untitled', 'Untitled');
+                    if (!parentUri.isEqual(uri)) {
+                        Object.keys(types).map(typeId => {
+                            types[typeId].forFiles?.map(f => {
+                                if ([uri.path.ext, uri.path.base].includes(f)) {
+                                    defaultName = uri.path.name;
+                                    defaultExt = types[typeId].file;
+                                }
+                            });
+                        });
+                    }
                     const dialog = new VesNewFileDialog({
                         title: nls.localizeByDefault('New File...'),
                         maxWidth: 500,
-                        parentLabel: this.labelProvider.getLongName(parentUri),
+                        parentLabel: this.labelProvider.getLongName(parentUri) + '/',
                         types,
+                        defaultName,
+                        defaultExt,
                     });
                     dialog.open().then(async value => {
                         if (value) {

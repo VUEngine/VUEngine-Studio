@@ -66,6 +66,7 @@ export interface ProjectFileType {
   schema: any
   uiSchema?: any
   templates?: string[]
+  forFiles?: string[]
 };
 
 export interface ProjectFileTemplates {
@@ -126,14 +127,9 @@ export const defaultProjectData: ProjectFile = {
       schema: {
         title: 'Image',
         properties: {
-          images: {
-            type: 'array',
-            items: {
-              type: 'string',
-              default: ''
-            },
-            minItems: 1,
-            default: ['.']
+          sourceFile: {
+            type: 'string',
+            default: ''
           },
           name: {
             type: 'string',
@@ -232,41 +228,17 @@ export const defaultProjectData: ProjectFile = {
                 default: 0
               }
             }
-          },
-          _converted: {
-            type: 'array',
-            items: {
-              image: {
-                type: 'string',
-                default: ''
-              },
-              timestamp: {
-                type: 'integer'
-              },
-              name: {
-                type: 'string',
-                default: ''
-              },
-              tiles: {
-                type: 'integer'
-              }
-            }
           }
         },
-        required: ['images', 'section']
+        required: ['sourceFile', 'section']
       },
       uiSchema: {
         type: 'VerticalLayout',
         elements: [
           {
             type: 'Control',
-            label: 'Images',
-            scope: '#/properties/_converted'
-          },
-          {
-            type: 'Control',
-            label: 'Images',
-            scope: '#/properties/images'
+            label: 'Image',
+            scope: '#/properties/sourceFile'
           },
           {
             type: 'Control',
@@ -396,7 +368,8 @@ export const defaultProjectData: ProjectFile = {
         ]
       },
       icon: 'fa fa-image',
-      templates: ['image.c']
+      templates: ['image.c'],
+      forFiles: ['.png']
     },
     RomHeader: {
       file: 'RomHeader',
