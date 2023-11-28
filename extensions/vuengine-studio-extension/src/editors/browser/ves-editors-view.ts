@@ -1,4 +1,4 @@
-import { Command, CommandContribution, CommandRegistry, MenuContribution, MenuModelRegistry, UntitledResourceResolver } from '@theia/core';
+import { Command, CommandContribution, CommandRegistry, CommandService, MenuContribution, MenuModelRegistry, UntitledResourceResolver } from '@theia/core';
 import { AbstractViewContribution, CommonCommands, CommonMenus, OpenerService, Widget, open } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { UserWorkingDirectoryProvider } from '@theia/core/lib/browser/user-working-directory-provider';
@@ -8,11 +8,19 @@ import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesEditorsCommands } from './ves-editors-commands';
 import { VesEditorsContextKeyService } from './ves-editors-context-key-service';
 import { VesEditorsWidget } from './ves-editors-widget';
+import { NavigatorContextMenu } from '@theia/navigator/lib/browser/navigator-contribution';
+import { WorkspaceCommands } from '@theia/workspace/lib/browser';
+import { FILE_NAVIGATOR_ID, FileNavigatorWidget } from '@theia/navigator/lib/browser/navigator-widget';
+import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 
 @injectable()
 export class VesEditorsViewContribution extends AbstractViewContribution<VesEditorsWidget> implements CommandContribution, MenuContribution, TabBarToolbarContribution {
+    @inject(CommandService)
+    protected readonly commandService: CommandService;
     @inject(EditorManager)
     protected readonly editorManager: EditorManager;
+    @inject(FrontendApplicationStateService)
+    protected readonly frontendApplicationStateService: FrontendApplicationStateService;
     @inject(OpenerService)
     protected openerService: OpenerService;
     @inject(UntitledResourceResolver)
@@ -35,7 +43,25 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
     @postConstruct()
     protected init(): void {
         this.updateFocusedView();
+        this.bindEvents();
+    }
+
+    protected bindEvents(): void {
         this.shell.onDidChangeActiveWidget(() => this.updateFocusedView());
+        this.frontendApplicationStateService.onStateChanged(
+            async (state: FrontendApplicationState) => {
+                if (state === 'ready') {
+                    const widget = this.shell.getWidgetById(FILE_NAVIGATOR_ID) as FileNavigatorWidget | undefined;
+                    if (!widget) {
+                        return;
+                    }
+                    widget.model.onSelectionChanged(() => {
+                        // @ts-ignore
+                        this.contextKeyService.explorerResourceExt.set(widget.model.selectedNodes[0].fileStat.resource.path.ext);
+                    });
+                }
+            }
+        );
     }
 
     protected updateFocusedView(): void {
@@ -69,28 +95,40 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         const types = this.vesProjectService.getProjectDataTypes();
         for (const typeId of Object.keys(types || {})) {
             const type = types![typeId];
-            if (!type.file?.startsWith('.')) {
-                continue;
+            if (type.file?.startsWith('.')) {
+                commandRegistry.registerCommand(Command.toLocalizedCommand(
+                    {
+                        id: `ves:editors:new-untitled:${typeId}`,
+                        label: `New Untitled ${type.schema.title || typeId} File`,
+                        category: 'Editor',
+                        iconClass: type.icon,
+                    },
+                    `vuengine/editors/newUntitled/${typeId}`,
+                    'vuengine/editors/commands/category'
+                ), {
+                    isEnabled: () => true,
+                    execute: async () => {
+                        const untitledUri = this.untitledResourceResolver.createUntitledURI(type.file, await this.workingDirProvider.getUserWorkingDir());
+                        await this.untitledResourceResolver.resolve(untitledUri);
+                        return open(this.openerService, untitledUri);
+                    },
+                });
             }
-            const id = `ves:editors:new-untitled:${typeId}`;
-            const typeLabel = type.schema.title || typeId;
-            commandRegistry.registerCommand(Command.toLocalizedCommand(
-                {
-                    id,
-                    label: `New ${typeLabel} File`,
-                    category: 'Editor',
-                    iconClass: type.icon,
-                },
-                `vuengine/editors/newUntitled/${typeId}`,
-                'vuengine/editors/commands/category'
-            ), {
-                isEnabled: () => true,
-                execute: async () => {
-                    const untitledUri = this.untitledResourceResolver.createUntitledURI(type.file, await this.workingDirProvider.getUserWorkingDir());
-                    await this.untitledResourceResolver.resolve(untitledUri);
-                    return open(this.openerService, untitledUri);
-                },
-            });
+
+            if (type.forFiles?.length) {
+                commandRegistry.registerCommand(Command.toLocalizedCommand(
+                    {
+                        id: `ves:editors:new-file:${typeId}`,
+                        label: `New ${type.schema.title || typeId} File...`,
+                        category: 'Editor',
+                    },
+                    `vuengine/editors/newFile/${typeId}`,
+                    'vuengine/editors/commands/category'
+                ), {
+                    isEnabled: () => true,
+                    execute: async () => this.commandService.executeCommand(WorkspaceCommands.NEW_FILE.id),
+                });
+            }
         }
     }
 
@@ -114,15 +152,22 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         const types = this.vesProjectService.getProjectDataTypes();
         for (const typeId of Object.keys(types || {})) {
             const type = types![typeId];
-            if (!type.file?.startsWith('.')) {
-                continue;
+            if (type.file?.startsWith('.')) {
+                const id = `ves:editors:new-untitled:${typeId}`;
+                menus.registerMenuNode(CommonMenus.FILE_NEW_CONTRIBUTIONS, {
+                    id,
+                    sortString: typeId,
+                    command: id,
+                });
             }
-            const id = `ves:editors:new-untitled:${typeId}`;
-            menus.registerMenuNode(CommonMenus.FILE_NEW_CONTRIBUTIONS, {
-                id,
-                sortString: typeId,
-                command: id,
-            });
+
+            if (type.forFiles?.length) {
+                menus.registerMenuAction(NavigatorContextMenu.NAVIGATION, {
+                    commandId: `ves:editors:new-file:${typeId}`,
+                    order: '-500',
+                    when: type.forFiles.map(f => `explorerResourceExt == ${f}`).join(' || '),
+                });
+            }
         }
     }
 

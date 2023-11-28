@@ -125,7 +125,7 @@ export const defaultProjectData: ProjectFile = {
     Image: {
       file: '.imageConv',
       schema: {
-        title: 'Image',
+        title: 'Image Conversion',
         properties: {
           sourceFile: {
             type: 'string',
