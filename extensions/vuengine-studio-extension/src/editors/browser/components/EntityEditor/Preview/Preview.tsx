@@ -34,15 +34,16 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
     <VContainer gap={10}>
       <div className="preview-container">
         <Sprite
+          animate={state.preview.animations}
           displacement={{
             x: 0,
             y: 0,
             z: 10,
             parallax: 0,
           }}
-          height={16}
+          frames={3}
           imagePath="assets/images/Drone/Drone/Drone.png"
-          width={16}
+          palette='11100100'
           zoom={state.preview.zoom}
           fileService={fileService}
           workspaceService={workspaceService}
@@ -124,7 +125,9 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
         <label>BGMap Palettes</label>
         {[...Array(4)].map((h, index) => (
           <HContainer>
-            {index}
+            <div style={{ width: 16 }}>
+              {index}
+            </div>
             <Palette
               value={state.preview.palettes[index]}
               updateValue={newValue => {

@@ -1,10 +1,11 @@
 import { MessageService, URI, nls } from '@theia/core';
 import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React from 'react';
-import { DataSection, MAX_RANGE, MIN_RANGE, PCMData } from './PCMTypes';
+import { MAX_RANGE, MIN_RANGE, PCMData } from './PCMTypes';
 import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { DataSection } from '../Common/CommonTypes';
 
 interface PCMProps {
     data: PCMData

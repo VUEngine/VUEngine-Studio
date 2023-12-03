@@ -1,0 +1,48 @@
+.imageConvEditor {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: 20px;
+  height: 100%;
+  outline: none;
+}
+
+.imageConvEditor .settings {
+  display: flex;
+  gap: var(--theia-ui-padding);
+}
+
+.imageConvEditor .settings .setting {
+  flex-grow: 1;
+}
+
+.imageConvEditor .setting {
+  display: flex;
+  flex-direction: column;
+  gap: var(--theia-ui-padding);
+}
+
+.imageConvEditor .sourceFile {
+  display: flex;
+  gap: var(--theia-ui-padding);
+  justify-content: space-between;
+}
+
+.imageConvEditor .sourceFile label {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: var(--theia-ui-padding);
+}
+
+.imageConvEditor .sourceFile > div {
+  align-items: end;
+  display: flex;
+}
+
+.imageConvEditor .sourceFile button {
+  height: calc(2 * var(--theia-border-width) + var(--theia-content-line-height) + 2px);
+  margin-left: 0;
+  min-width: 64px;
+  width: 64px;
+}

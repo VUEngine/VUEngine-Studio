@@ -1,4 +1,5 @@
 import { ImageCompressionType } from '../../../../images/browser/ves-images-types';
+import { DataSection } from '../Common/CommonTypes';
 
 export interface FontEditorState {
     active: boolean
@@ -31,11 +32,6 @@ export interface VariableSize {
     enabled: boolean
     x: number[]
     y: number
-}
-
-export enum DataSection {
-    ROM = 'rom',
-    EXP = 'exp',
 }
 
 export enum FontEditorTools {

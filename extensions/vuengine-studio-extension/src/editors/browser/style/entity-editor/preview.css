@@ -1,4 +1,4 @@
-.entityEditor .preview-container {
+.jsonforms-container .preview-container {
     align-items: center;
     background-color: var(--theia-sideBar-background);
     border-radius: 10px;
@@ -10,7 +10,7 @@
     width: 100%;
 }
 
-.entityEditor .sprite-error {
+.jsonforms-container .preview-container .sprite-error {
     align-items: center;
     border: 1px dashed red;
     display: flex;
@@ -19,7 +19,7 @@
     position: relative;
 }
 
-.entityEditor .sprite-error::after {
+.jsonforms-container .preview-container .sprite-error::after {
     border-top: 1px dashed red;
     content: '';
     display: block;
@@ -28,11 +28,17 @@
     width: 150%;
 }
 
-.entityEditor .sprite-error::before {
+.jsonforms-container .preview-container .sprite-error::before {
     border-top: 1px dashed red;
     content: '';
     display: block;
     position: absolute;
     transform: rotate(-45deg);
     width: 150%;
+}
+
+.jsonforms-container .preview-container .current-frame {
+    position: absolute;
+    right: 10px;
+    top: 10px;
 }

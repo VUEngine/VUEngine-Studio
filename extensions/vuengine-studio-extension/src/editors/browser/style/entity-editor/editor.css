@@ -1,4 +1,4 @@
-.entityEditor {
+.jsonforms-container > div {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -6,7 +6,7 @@
     overflow: hidden;
 }
 
-.entityEditor .dock-layout {
+.jsonforms-container .dock-layout {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -16,11 +16,6 @@
     overflow: hidden;
     padding: 2px;
     user-select: none;
-}
-
-.entityEditor .divider {
-    border-top: var(--theia-sash-width) dashed var(--theia-sideBar-background);
-    margin: 20px 0;
 }
 
 .entityEditor .item {

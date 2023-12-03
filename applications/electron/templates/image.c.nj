@@ -20,11 +20,11 @@
 {%- set tilesCompressionLabel = 'not compressed' -%}
 {%- if imageData.tiles.compressionRatio is defined -%}
     {%- if imageData.tiles.compressionRatio < 0 -%}
-        {%- set tilesCompressionLabel = item.tileset.compress | upper ~ ' compressed (' ~ imageData.tiles.compressionRatio | round(2) ~ '%)' -%}
+        {%- set tilesCompressionLabel = item.tileset.compression | upper ~ ' compressed (' ~ imageData.tiles.compressionRatio | round(2) ~ '%)' -%}
     {%- elseif imageData.tiles.compressionRatio == 0 -%}
-        {%- set tilesCompressionLabel = item.tileset.compress | upper ~ ' compression skipped for not reducing size (±' ~ imageData.tiles.compressionRatio | round(2) ~ '%)' -%}
+        {%- set tilesCompressionLabel = item.tileset.compression | upper ~ ' compression skipped for not reducing size (±' ~ imageData.tiles.compressionRatio | round(2) ~ '%)' -%}
     {%- else -%}
-        {%- set tilesCompressionLabel = item.tileset.compress | upper ~ ' compression skipped for inflating size (+' ~ imageData.tiles.compressionRatio | round(2) ~ '%)' -%}
+        {%- set tilesCompressionLabel = item.tileset.compression | upper ~ ' compression skipped for inflating size (+' ~ imageData.tiles.compressionRatio | round(2) ~ '%)' -%}
     {%- endif -%}
 {%- endif -%}
 
@@ -45,14 +45,9 @@
     //  * {{ map.width }}x{{ map.height }} map, not compressed
 {% endfor -%}
 
-{%- if item.animation.isAnimation and imageData.tiles.count > 0 %}
-    {%- if item.animation.individualFiles and imageData.maps.length -%}
-        {%- set frameSize = imageData.maps[0].data.length -%}
-    {%- else -%}
-        {%- set frameSize = item.animation.frameHeight * item.animation.frameWidth -%}
-    {%- endif -%}
-    //  * {{ imageData.tiles.count / frameSize }} animation frames{% if item.animation.frameWidth > 0 and item.animation.frameHeight > 0 %}, {{ item.animation.frameWidth }}x{{ item.animation.frameHeight }}{% endif %}, {% if item.animation.individualFiles %}individual files{% else %}spritesheet{% endif %}{% if itemData.animation.largestFrame > 0 %}, largest frame: {{itemData.animation.largestFrame}} tiles{% endif %}
-{% endif %}
+{%- if item.animation.isAnimation and imageData.tiles.count > 0 -%}
+    //  * {{ item.animation.frames }} animation frames, {% if item.animation.individualFiles %}individual files{% else %}spritesheet{% endif %}{% if itemData.animation.largestFrame > 0 %}, largest frame: {{itemData.animation.largestFrame}} tiles{% endif %}
+{% endif -%}
 
 {%- if imageData.tiles.data.length and imageData.maps.length -%}
     //  Size: {{ (imageData.tiles.data.length + 1) * 4 }}
@@ -71,7 +66,7 @@
 const uint32 {{ sanitizedSpecName }}Tiles[{{ (imageData.tiles.data.length + 1) }}] __attribute__((aligned(4))){% if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
     {# prepend tile data with a custom compression algorithm flag -#}
-    {%- if item.tileset.compress is defined and item.tileset.compress != 'off' and imageData.tiles.compressionRatio < 0 -%}
+    {%- if item.tileset.compression is defined and item.tileset.compression != 'none' and imageData.tiles.compressionRatio < 0 -%}
         0x00000001,
     {%- else -%}
         0x00000000,

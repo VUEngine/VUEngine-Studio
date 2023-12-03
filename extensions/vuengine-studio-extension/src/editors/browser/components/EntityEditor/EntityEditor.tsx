@@ -234,7 +234,10 @@ export default class EntityEditor extends React.Component<
             tabs: [
               {
                 id: 'tab-preview',
-                title: nls.localize('vuengine/entityEditor/preview', 'Preview'),
+                title: nls.localize(
+                  'vuengine/entityEditor/preview',
+                  'Preview'
+                ),
                 minHeight: 250,
                 minWidth: 250,
                 content: (

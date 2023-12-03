@@ -157,15 +157,11 @@ export const defaultProjectData: ProjectFile = {
                 type: 'boolean',
                 default: false
               },
-              reduce: {
-                type: 'boolean',
-                default: false
-              },
-              compress: {
+              compression: {
                 type: 'string',
                 oneOf: [
                   {
-                    const: 'off',
+                    const: 'none',
                     title: 'No compression'
                   },
                   {
@@ -173,7 +169,7 @@ export const defaultProjectData: ProjectFile = {
                     title: 'Run Length Encoding (RLE)'
                   }
                 ],
-                default: 'off'
+                default: 'none'
               }
             }
           },
@@ -197,15 +193,15 @@ export const defaultProjectData: ProjectFile = {
                   }
                 }
               },
-              compress: {
+              compression: {
                 type: 'string',
                 oneOf: [
                   {
-                    const: 'off',
+                    const: 'none',
                     title: 'No compression'
                   }
                 ],
-                default: 'off'
+                default: 'none'
               }
             }
           },
@@ -220,14 +216,10 @@ export const defaultProjectData: ProjectFile = {
                 type: 'boolean',
                 default: false
               },
-              frameWidth: {
+              frames: {
                 type: 'integer',
                 default: 0
               },
-              frameHeight: {
-                type: 'integer',
-                default: 0
-              }
             }
           }
         },

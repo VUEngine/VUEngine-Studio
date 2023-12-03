@@ -26,7 +26,7 @@ export default function Palette(props: PaletteProps): React.JSX.Element {
         value.substring(0, index * 2) + newValue + value.substring(index * 2 + 2);
 
     return <>
-        <HContainer className='palette-renderer' gap={0}>
+        <HContainer className='palette-renderer' gap={2}>
             <div className={`value-${index0}`}>
                 <SelectComponent
                     key="paletteIndex0"
