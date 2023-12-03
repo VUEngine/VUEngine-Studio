@@ -14,6 +14,7 @@ const VesPCMEditorControl = ({ data, handleChange, path, config }: VesPCMEditorC
     <PCMEditor
         data={data}
         updateData={(newValue: PCMData) => handleChange(path, newValue)}
+        fileUri={config.fileUri}
         services={config.services}
     />;
 

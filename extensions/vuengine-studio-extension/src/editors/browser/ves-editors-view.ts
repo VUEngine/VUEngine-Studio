@@ -52,10 +52,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             async (state: FrontendApplicationState) => {
                 if (state === 'ready') {
                     const widget = this.shell.getWidgetById(FILE_NAVIGATOR_ID) as FileNavigatorWidget | undefined;
-                    if (!widget) {
-                        return;
-                    }
-                    widget.model.onSelectionChanged(() => {
+                    widget?.model.onSelectionChanged(() => {
                         // @ts-ignore
                         this.contextKeyService.explorerResourceExt.set(widget.model.selectedNodes[0].fileStat.resource.path.ext);
                     });

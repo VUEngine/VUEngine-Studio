@@ -1,14 +1,14 @@
 import URI from '@theia/core/lib/common/uri';
 import { MemorySection } from '../../build/browser/ves-build-types';
 
-export interface ImagesConfig {
-  images: string[]
+export interface ImageConfig {
+  sourceFile: string
   name: string
   section: MemorySection
   tileset: {
     shared: boolean
     reduce: boolean
-    compress: false | ImageCompressionType
+    compress: ImageCompressionType
   }
   map: {
     generate: boolean
@@ -16,7 +16,7 @@ export interface ImagesConfig {
       flipped: boolean
       unique: boolean
     }
-    compress: false | ImageCompressionType
+    compress: ImageCompressionType
   }
   animation: AnimationConfig
 }
@@ -29,12 +29,8 @@ export interface AnimationConfig {
 }
 
 export interface ImageConfigFileToBeConverted {
-  imageConfigFileUri: URI
-  images: URI[]
-  name: string
-  config: ImagesConfig
-  gritArguments: string[]
-  output: ConvertedFileData[]
+  configFileUri: URI
+  config: ImageConfig
 }
 
 export interface ImagesLogLine {
@@ -44,28 +40,51 @@ export interface ImagesLogLine {
   uri?: URI
 }
 
-export interface ConvertedFileData {
+export interface ConversionResultTilesData {
+  compressionRatio?: number
+  count: number
+  data: string[]
+  frameOffsets?: number[]
+  height: number
   name: string
-  fileUri: URI
-  tilesData: string[]
-  mapData: string[]
-  frameTileOffsets: number[]
-  meta: ConvertedFileDataMeta
+  width: number
 }
 
-export interface ConvertedFileDataMeta {
-  tilesCount: number
-  tilesCompressionRatio?: number
-  mapCompressionRatio?: string
-  imageHeight: number
-  imageWidth: number
-  mapHeight: number
-  mapWidth: number
-  mapReduceFlipped: boolean
-  mapReduceUnique: boolean
-  animation: AnimationConfig & {
-    largestFrame: number
-  }
+export interface ConversionResultMapData {
+  compressionRatio?: number
+  data: string[]
+  height: number
+  name: string
+  width: number
+}
+
+export interface ConversionResultAnimationData {
+  largestFrame?: number
+}
+
+export interface ConversionResult {
+  animation: ConversionResultAnimationData
+  maps: ConversionResultMapData[]
+  tiles: ConversionResultTilesData
+}
+
+export interface ConvertedFileTilesData {
+  count: number
+  data: string[]
+  height: number
+  width: number
+}
+
+export interface ConvertedFileMapData {
+  data: string[]
+  height: number
+  width: number
+}
+
+export interface ConvertedFileData {
+  map: ConvertedFileMapData
+  name: string
+  tiles: ConvertedFileTilesData
 }
 
 export enum ImagesLogLineType {
@@ -77,6 +96,7 @@ export enum ImagesLogLineType {
 }
 
 export enum ImageCompressionType {
+  NONE = 'off',
   RLE = 'rle',
 }
 
@@ -88,14 +108,14 @@ export interface TilesCompressionResult {
 
 export const COMPRESSION_FLAG_LENGTH = 1;
 
-export const DEFAULT_IMAGE_CONVERTER_CONFIG: ImagesConfig = {
-  images: [],
+export const DEFAULT_IMAGE_CONVERTER_CONFIG: ImageConfig = {
+  sourceFile: '',
   name: '',
   section: MemorySection.ROM,
   tileset: {
     shared: false,
     reduce: true,
-    compress: false
+    compress: ImageCompressionType.NONE
   },
   map: {
     generate: true,
@@ -103,7 +123,7 @@ export const DEFAULT_IMAGE_CONVERTER_CONFIG: ImagesConfig = {
       flipped: true,
       unique: true
     },
-    compress: false
+    compress: ImageCompressionType.NONE
   },
   animation: {
     isAnimation: false,

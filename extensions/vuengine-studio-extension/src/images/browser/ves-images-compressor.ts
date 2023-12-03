@@ -1,16 +1,25 @@
 import { AnimationConfig, COMPRESSION_FLAG_LENGTH, ImageCompressionType, TilesCompressionResult } from './ves-images-types';
 
-export function compressTiles(tilesData: string[], compressor: ImageCompressionType, animationConfig: AnimationConfig): TilesCompressionResult {
+export function compressTiles(tilesData: string[], compressor: ImageCompressionType, animationConfig: AnimationConfig, allowInflate: boolean = false): TilesCompressionResult {
+  let compressionResult: TilesCompressionResult = {
+    tilesData: tilesData,
+    frameTileOffsets: [],
+    compressionRatio: 0,
+  };
+
   switch (compressor) {
     case ImageCompressionType.RLE:
-      return compressTilesRle(tilesData, animationConfig);
-    default:
-      return {
-        tilesData: tilesData,
-        frameTileOffsets: [],
-        compressionRatio: 0,
-      };
+      compressionResult = compressTilesRle(tilesData, animationConfig);
+      break;
   }
+
+  // discard compression results if they're not smaller than the original size
+  if (!allowInflate && compressionResult.compressionRatio >= 0) {
+    compressionResult.tilesData = tilesData;
+    compressionResult.frameTileOffsets = [];
+  }
+
+  return compressionResult;
 }
 
 // Normal RLE applied to pixel pairs (4 bits or 1 hexadecimal digit)

@@ -1,4 +1,4 @@
-import { nls } from '@theia/core';
+import { MessageService, URI, nls } from '@theia/core';
 import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React from 'react';
 import { DataSection, MAX_RANGE, MIN_RANGE, PCMData } from './PCMTypes';
@@ -9,9 +9,11 @@ import { WorkspaceService } from '@theia/workspace/lib/browser';
 interface PCMProps {
     data: PCMData
     updateData: (data: PCMData) => void
+    fileUri: URI
     services: {
         fileService: FileService,
         fileDialogService: FileDialogService,
+        messageService: MessageService,
         workspaceService: WorkspaceService,
     }
 }
@@ -79,12 +81,20 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
                 canSelectFiles: true,
                 filters: { 'WAV': ['.wav'] }
             };
-            const uri = await this.props.services.fileDialogService.showOpenDialog(openFileDialogProps);
+            const currentPath = await this.props.services.fileService.resolve(this.props.fileUri.parent);
+            const uri = await this.props.services.fileDialogService.showOpenDialog(openFileDialogProps, currentPath);
             if (uri) {
                 const workspaceRootUri = this.props.services.workspaceService.tryGetRoots()[0]?.resource;
                 const source = await this.props.services.fileService.resolve(uri);
                 if (source.isFile) {
-                    this.setSourceFile(workspaceRootUri.relative(uri)!.fsPath());
+                    const relativeUri = workspaceRootUri.relative(uri);
+                    if (!relativeUri) {
+                        this.props.services.messageService.error(
+                            nls.localize('vuengine/pcmEditor/errorSourceFileMustBeInWorkspace', 'Source file must live in workspace.')
+                        );
+                    } else {
+                        this.setSourceFile(relativeUri.fsPath());
+                    }
                 }
             }
         };

@@ -27,7 +27,7 @@ export class VesProjectContribution implements CommandContribution, TabBarToolba
         await this.workspaceService.ready;
         commandRegistry.registerCommand(VesProjectCommands.EDIT_NAME, {
             isEnabled: () => this.workspaceService.opened,
-            isVisible: widget => widget.id === EXPLORER_VIEW_CONTAINER_ID,
+            isVisible: widget => widget?.id === EXPLORER_VIEW_CONTAINER_ID,
             execute: async () => {
                 await this.vesProjectService.projectDataReady;
                 const initialValue = await this.vesProjectService.getProjectName();

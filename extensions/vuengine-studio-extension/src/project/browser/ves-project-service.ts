@@ -155,6 +155,7 @@ export class VesProjectService {
         // update project data entries for changed files of registered types to project data
         // add new files of registered types to project data
         // remove deleted files of registered types from project data and delete corresponding generated code
+        // detect changes of forFiles and automatically convert?
 
         // project file
         if (this.workspaceProjectFileUri && change.type === FileChangeType.UPDATED && change.resource.isEqual(this.workspaceProjectFileUri)) {
