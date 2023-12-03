@@ -1,75 +1,104 @@
-{%- set sanitizedSpecName = name | sanitizeSpecName -%}
+{%- set sanitizedSpecName = item.name | sanitizeSpecName -%}
+{%- set imageData = itemUri | convertImage(item) -%}
+
+{%- set mapsDataTotalLength = 0 -%}
+{%- for map in imageData.maps -%}
+    {%- set mapsDataTotalLength = mapsDataTotalLength + map.data.length -%}
+{%- endfor -%}
 
 {%- set reducedTilesLabel = 'unreduced' -%}
-{%- if meta.mapReduceFlipped is defined and meta.mapReduceUnique is defined -%}
-    {%- if meta.mapReduceFlipped and meta.mapReduceUnique -%}
+{%- if item.map.reduce.flipped is defined and item.map.reduce.unique is defined -%}
+    {%- if item.map.reduce.flipped and item.map.reduce.unique -%}
         {%- set reducedTilesLabel = 'reduced by non-unique and flipped tiles' -%}
-    {%- elseif meta.mapReduceFlipped -%}
+    {%- elseif item.map.reduce.flipped -%}
         {%- set reducedTilesLabel = 'reduced by flipped tiles' -%}
-    {%- elseif meta.mapReduceUnique -%}
+    {%- elseif item.map.reduce.unique -%}
         {%- set reducedTilesLabel = 'reduced by non-unique tiles' -%}
     {%- endif -%}
 {%- endif -%}
 
 {%- set tilesCompressionLabel = 'not compressed' -%}
-{%- if tilesCompression is defined and tilesCompression != false -%}
-    {%- if meta.tilesCompressionRatio < 0 -%}
-        {%- set tilesCompressionLabel = tilesCompression | upper ~ ' compressed (' ~ meta.tilesCompressionRatio | round(2) ~ '%)' -%}
-    {%- elseif meta.tilesCompressionRatio == 0 -%}
-        {%- set tilesCompressionLabel = tilesCompression | upper ~ ' compression skipped for not reducing size (±' ~ meta.tilesCompressionRatio | round(2) ~ '%)' -%}
+{%- if imageData.tiles.compressionRatio is defined -%}
+    {%- if imageData.tiles.compressionRatio < 0 -%}
+        {%- set tilesCompressionLabel = item.tileset.compress | upper ~ ' compressed (' ~ imageData.tiles.compressionRatio | round(2) ~ '%)' -%}
+    {%- elseif imageData.tiles.compressionRatio == 0 -%}
+        {%- set tilesCompressionLabel = item.tileset.compress | upper ~ ' compression skipped for not reducing size (±' ~ imageData.tiles.compressionRatio | round(2) ~ '%)' -%}
     {%- else -%}
-        {%- set tilesCompressionLabel = tilesCompression | upper ~ ' compression skipped for inflating size (+' ~ meta.tilesCompressionRatio | round(2) ~ '%)' -%}
+        {%- set tilesCompressionLabel = item.tileset.compress | upper ~ ' compression skipped for inflating size (+' ~ imageData.tiles.compressionRatio | round(2) ~ '%)' -%}
     {%- endif -%}
 {%- endif -%}
 
 //---------------------------------------------------------------------------------------------------------
 //
 //  {{ sanitizedSpecName }}
-//  * {{ meta.imageWidth }}x{{ meta.imageHeight }} pixels
-{%- if tilesData.length %}
-//  * {{ meta.tilesCount }} tiles, {{ reducedTilesLabel }}, {{ tilesCompressionLabel }}
-{%- endif %}
-{%- if mapData.length %}
-//  * {{ meta.mapWidth }}x{{ meta.mapHeight }} map, not compressed
-{%- endif %}
-{%- if frameTileOffsets.length > 0 %}
-//  * {{ frameTileOffsets.length }} animation frames{% if meta.animation.frameWidth > 0 and meta.animation.frameHeight > 0 %}, {{ meta.animation.frameWidth }}x{{ meta.animation.frameHeight }}{% endif %}, {% if meta.animation.individualFiles %}individual files{% else %}spritesheet{% endif %}{% if meta.animation.largestFrame > 0 %}, largest frame: {{meta.animation.largestFrame}} tiles{% endif %}
-{%- endif %}
-{%- if tilesData.length and mapData.length %}
-//  Size: {{ (tilesData.length + 1) * 4 }} + {{ mapData.length * 2 }} = {{ ((tilesData.length + 1) * 4) + (mapData.length * 2) }}
-{%- elseif tilesData.length %}
-//  Size: {{ (tilesData.length + 1) * 4 }}
-{%- elseif mapData.length %}
-//  Size: {{ mapData.length * 2 }}
-{%- endif %}
+{% if imageData.maps.length -%}
+    //  * {{ imageData.maps[0].width * 8 }}x{{ imageData.maps[0].height * 8 }} pixels
+{% else -%}
+    //  * {{ imageData.tiles.width }}x{{ imageData.tiles.height }} pixels
+{% endif %}
+
+{%- if imageData.tiles.data.length -%}
+    //  * {{ imageData.tiles.count }} tiles, {{ reducedTilesLabel }}, {{ tilesCompressionLabel }}
+{% endif %}
+
+{%- for map in imageData.maps -%}
+    //  * {{ map.width }}x{{ map.height }} map, not compressed
+{% endfor -%}
+
+{%- if item.animation.isAnimation and imageData.tiles.count > 0 %}
+    {%- if item.animation.individualFiles and imageData.maps.length -%}
+        {%- set frameSize = imageData.maps[0].data.length -%}
+    {%- else -%}
+        {%- set frameSize = item.animation.frameHeight * item.animation.frameWidth -%}
+    {%- endif -%}
+    //  * {{ imageData.tiles.count / frameSize }} animation frames{% if item.animation.frameWidth > 0 and item.animation.frameHeight > 0 %}, {{ item.animation.frameWidth }}x{{ item.animation.frameHeight }}{% endif %}, {% if item.animation.individualFiles %}individual files{% else %}spritesheet{% endif %}{% if itemData.animation.largestFrame > 0 %}, largest frame: {{itemData.animation.largestFrame}} tiles{% endif %}
+{% endif %}
+
+{%- if imageData.tiles.data.length and imageData.maps.length -%}
+    //  Size: {{ (imageData.tiles.data.length + 1) * 4 }}
+    {%- for map in imageData.maps -%}
+        {{ ' + ' }}{{ map.data.length * 2 }}{{ ' ' }}
+    {%- endfor -%}
+    = {{ ((imageData.tiles.data.length + 1) * 4) + (mapsDataTotalLength * 2) }}
+{% elseif imageData.tiles.data.length -%}
+    //  Size: {{ (imageData.tiles.data.length + 1) * 4 }}
+{% elseif imageData.maps.length -%}
+    //  Size: {{ mapsDataTotalLength * 2 }}
+{% endif -%}
 //
 //---------------------------------------------------------------------------------------------------------
-{% if tilesData.length %}
-const uint32 {{ sanitizedSpecName }}Tiles[{{ (tilesData.length + 1) }}] __attribute__((aligned(4))){% if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
+{% if imageData.tiles.data.length %}
+const uint32 {{ sanitizedSpecName }}Tiles[{{ (imageData.tiles.data.length + 1) }}] __attribute__((aligned(4))){% if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
     {# prepend tile data with a custom compression algorithm flag -#}
-    {%- if tilesCompression is defined and tilesCompression != false and meta.tilesCompressionRatio < 0 -%}
+    {%- if item.tileset.compress is defined and item.tileset.compress != 'off' and imageData.tiles.compressionRatio < 0 -%}
         0x00000001,
     {%- else -%}
         0x00000000,
     {%- endif %}
-    {% for tileData in tilesData -%}
+    {% for tileData in imageData.tiles.data -%}
     0x{{ tileData }},
     {%- if loop.index % 8 == 0 and not loop.last %}{{ "\n    " }}{% endif -%}
     {%- endfor %}
 };
-{% endif %}{% if mapData.length %}
-const uint16 {{ sanitizedSpecName }}Map[{{ mapData.length }}] __attribute__((aligned(4))){% if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
+{% endif %}
+
+{%- for map in imageData.maps -%}
+{% if map.data.length %}
+const uint16 {{ sanitizedSpecName }}Map[{{ map.data.length }}] __attribute__((aligned(4))){% if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
-    {% for mapTile in mapData -%}
+    {% for mapTile in map.data -%}
     0x{{ mapTile }},
     {%- if loop.index % 8 == 0 and not loop.last %}{{ "\n    " }}{% endif -%}
     {%- endfor %}
 };
-{% endif %}{% if frameTileOffsets.length %}
-const uint32 {{ sanitizedSpecName }}TilesFrameOffsets[{{ frameTileOffsets.length }}] __attribute__((aligned(4))){% if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
+{% endif %}
+{%- endfor -%}
+
+{% if imageData.tiles.frameOffsets is defined and imageData.tiles.frameOffsets.length %}
+const uint32 {{ sanitizedSpecName }}TilesFrameOffsets[{{ imageData.tiles.frameOffsets.length }}] __attribute__((aligned(4))){% if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
-    {% for frameTileOffset in frameTileOffsets -%}
+    {% for frameTileOffset in imageData.tiles.frameOffsets -%}
     {{ frameTileOffset | intToHex(8) }},
     {%- if loop.index % 8 == 0 and not loop.last %}{{ "\n    " }}{% endif -%}
     {%- endfor %}

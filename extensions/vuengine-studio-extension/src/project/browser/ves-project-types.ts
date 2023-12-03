@@ -112,7 +112,8 @@ export const defaultProjectData: ProjectFile = {
     'image.c': {
       target: 'Converted/${_filename}.c',
       targetRoot: 'file',
-      template: 'templates/image.c.nj'
+      template: 'templates/image.c.nj',
+      itemSpecific: 'Image'
     },
     'romHeader.h': {
       target: 'source/romHeader.h',
@@ -233,139 +234,8 @@ export const defaultProjectData: ProjectFile = {
         required: ['sourceFile', 'section']
       },
       uiSchema: {
-        type: 'VerticalLayout',
-        elements: [
-          {
-            type: 'Control',
-            label: 'Image',
-            scope: '#/properties/sourceFile'
-          },
-          {
-            type: 'Control',
-            label: 'Name',
-            scope: '#/properties/name'
-          },
-          {
-            type: 'Control',
-            label: 'Store in',
-            scope: '#/properties/section'
-          },
-          {
-            type: 'Group',
-            label: 'Charset',
-            elements: [
-              {
-                type: 'HorizontalLayout',
-                elements: [
-                  {
-                    type: 'Control',
-                    label: 'Shared',
-                    scope: '#/properties/tileset/properties/shared'
-                  },
-                  {
-                    type: 'Control',
-                    label: 'Reduction',
-                    scope: '#/properties/tileset/properties/reduce'
-                  },
-                  {
-                    type: 'Control',
-                    label: 'Compression',
-                    scope: '#/properties/tileset/properties/compress'
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            type: 'Group',
-            label: 'Map',
-            elements: [
-              {
-                type: 'Control',
-                label: 'Generate',
-                scope: '#/properties/map/properties/generate'
-              },
-              {
-                type: 'HorizontalLayout',
-                rule: {
-                  effect: 'HIDE',
-                  condition: {
-                    scope: '#/properties/map/properties/generate',
-                    schema: {
-                      const: false
-                    }
-                  }
-                },
-                elements: [
-                  {
-                    type: 'Control',
-                    label: 'Reduce Flipped',
-                    scope: '#/properties/map/properties/reduce/properties/flipped'
-                  },
-                  {
-                    type: 'Control',
-                    label: 'Reduce Unique',
-                    scope: '#/properties/map/properties/reduce/properties/unique'
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            type: 'Group',
-            label: 'Animation',
-            elements: [
-              {
-                type: 'Control',
-                label: 'Is Animation',
-                scope: '#/properties/animation/properties/isAnimation'
-              },
-              {
-                type: 'VerticalLayout',
-                rule: {
-                  effect: 'HIDE',
-                  condition: {
-                    scope: '#/properties/animation/properties/isAnimation',
-                    schema: {
-                      const: false
-                    }
-                  }
-                },
-                elements: [
-                  {
-                    type: 'Control',
-                    label: 'Frames are individual images',
-                    scope: '#/properties/animation/properties/individualFiles'
-                  },
-                  {
-                    type: 'HorizontalLayout',
-                    rule: {
-                      effect: 'HIDE',
-                      condition: {
-                        scope: '#/properties/animation/properties/individualFiles',
-                        schema: {
-                          const: true
-                        }
-                      }
-                    },
-                    elements: [
-                      {
-                        type: 'Control',
-                        label: 'Width',
-                        scope: '#/properties/animation/properties/frameWidth'
-                      },
-                      {
-                        type: 'Control',
-                        label: 'Height',
-                        scope: '#/properties/animation/properties/frameHeight'
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
+        type: 'ImageConvEditor',
+        scope: '#'
       },
       icon: 'fa fa-image',
       templates: ['image.c'],

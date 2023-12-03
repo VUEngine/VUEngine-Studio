@@ -10,7 +10,8 @@ import * as nunjucks from 'nunjucks';
 import { VesAudioConverterService } from '../../audio-converter/browser/ves-audio-converter-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { compressTiles } from '../../images/browser/ves-images-compressor';
-import { AnimationConfig, ImageCompressionType, TilesCompressionResult } from '../../images/browser/ves-images-types';
+import { VesImagesService } from '../../images/browser/ves-images-service';
+import { AnimationConfig, ImageCompressionType, ImageConfig, TilesCompressionResult } from '../../images/browser/ves-images-types';
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { VesProcessService } from '../../process/common/ves-process-service-protocol';
 import { VesProjectService } from '../../project/browser/ves-project-service';
@@ -33,6 +34,8 @@ export class VesCodeGenService {
   protected vesAudioConverterService: VesAudioConverterService;
   @inject(VesCommonService)
   protected vesCommonService: VesCommonService;
+  @inject(VesImagesService)
+  protected vesImageService: VesImagesService;
   @inject(VesPluginsService)
   protected vesPluginsService: VesPluginsService;
   @inject(VesProcessService)
@@ -61,25 +64,27 @@ export class VesCodeGenService {
 
   async generateAll(): Promise<void> {
     const templates = this.vesProjectService.getProjectDataTemplates();
+    await this.workspaceService.ready;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     if (templates) {
       await Promise.all(Object.keys(templates).map(async templateId => {
         const template = templates[templateId];
         if (!template.itemSpecific) {
-          await this.renderTemplate(templateId);
+          return this.renderTemplate(templateId);
         } else {
-          // TODO
-          /*
-          const itemsForType = this.vesProjectService.getProjectDataItemsForType(template.itemSpecific);
-          if (itemsForType) {
-            await Promise.all(Object.keys(itemsForType).map(async itemId => {
-              const item = {
-                ...itemsForType[itemId],
-                _id: itemId,
-              };
-              await this.renderTemplate(templateId, item);
-            }));
+          const type = this.vesProjectService.getProjectDataType(template.itemSpecific);
+          if (type) {
+            const typeFiles = window.electronVesCore.findFiles(await this.fileService.fsPath(workspaceRootUri), `**/*${type.file}`, {
+              dot: false,
+              ignore: ['build/**'],
+              nodir: true
+            });
+            for (const typeFile of typeFiles) {
+              const typeFileUri = workspaceRootUri.resolve(typeFile);
+              const fileContents = await this.fileService.readFile(typeFileUri);
+              return this.renderTemplate(templateId, typeFileUri, JSON.parse(fileContents.value.toString()));
+            }
           }
-          */
         }
       }));
     }
@@ -130,8 +135,12 @@ export class VesCodeGenService {
 
     const uri = itemUri || new URI();
     const data = {
-      item: itemData,
-      project: this.vesProjectService.getProjectData()
+      item: {
+        ...(itemData || {}),
+        _filename: itemUri?.path.name,
+      },
+      project: this.vesProjectService.getProjectData(),
+      itemUri: itemUri
     };
 
     return this.renderFileFromTemplate(templateId, template, uri, data, encoding);
@@ -159,10 +168,7 @@ export class VesCodeGenService {
     if (typeData && Array.isArray(typeData.templates)) {
       await Promise.all(typeData.templates.map(async templateId => {
         numberOfGeneratedFiles++;
-        return this.renderTemplate(templateId, itemUri, {
-          ...itemData,
-          _filename: itemUri.path.name,
-        });
+        return this.renderTemplate(templateId, itemUri, itemData);
       }));
     };
 
@@ -319,12 +325,20 @@ export class VesCodeGenService {
       return obj;
     });
 
-    // nunjucks supports only async filters (in the ugly as hell way as below), but not functions
+    // nunjucks does not support _async_ functions, but only filters (in the ugly as hell way as below)
     env.addFilter('convertPcm', async (...args): Promise<void> => {
       const callback = args.pop();
-      const value: string = args[0];
+      const filePath: string = args[0];
       const range: number = args[1];
-      const result = await this.vesAudioConverterService.convertPcm(value, range);
+      const result = await this.vesAudioConverterService.convertPcm(filePath, range);
+      // eslint-disable-next-line no-null/no-null
+      callback(null, result);
+    }, true);
+    env.addFilter('convertImage', async (...args): Promise<void> => {
+      const callback = args.pop();
+      const imageConfigFileUri: URI = args[0];
+      const imageConfig: ImageConfig = args[1];
+      const result = await this.vesImageService.convertImage(imageConfigFileUri, imageConfig);
       // eslint-disable-next-line no-null/no-null
       callback(null, result);
     }, true);
