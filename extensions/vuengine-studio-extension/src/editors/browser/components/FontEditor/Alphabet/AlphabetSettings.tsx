@@ -1,6 +1,7 @@
 import { nls } from '@theia/core';
 import React from 'react';
-import { DataSection, FontEditorState, MAX_CHAR_COUNT, MIN_CHAR_COUNT, MIN_OFFSET } from '../FontEditorTypes';
+import { FontEditorState, MAX_CHAR_COUNT, MIN_CHAR_COUNT, MIN_OFFSET } from '../FontEditorTypes';
+import { DataSection } from '../../Common/CommonTypes';
 
 interface AlphabetSettingsProps {
     charCount: number

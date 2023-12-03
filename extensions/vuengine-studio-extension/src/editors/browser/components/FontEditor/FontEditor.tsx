@@ -10,7 +10,7 @@ import CharEditor from './CharEditor/CharEditor';
 import CharSettings from './CharEditor/CharSettings';
 import {
     CHAR_PIXEL_SIZE,
-    DataSection, FontData,
+    FontData,
     FontEditorState,
     FontEditorTools, Size,
     VariableSize
@@ -20,6 +20,7 @@ import CurrentCharInfo from './Tools/CurrentCharInfo';
 import ImportExport from './Tools/ImportExport';
 import Palette from './Tools/Palette';
 import Tools from './Tools/Tools';
+import { DataSection } from '../Common/CommonTypes';
 
 interface FontEditorProps {
     fontData: FontData

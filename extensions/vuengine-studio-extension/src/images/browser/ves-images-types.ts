@@ -1,14 +1,13 @@
 import URI from '@theia/core/lib/common/uri';
-import { MemorySection } from '../../build/browser/ves-build-types';
+import { DataSection } from '../../editors/browser/components/Common/CommonTypes';
 
 export interface ImageConfig {
   sourceFile: string
   name: string
-  section: MemorySection
+  section: DataSection
   tileset: {
     shared: boolean
-    reduce: boolean
-    compress: ImageCompressionType
+    compression: ImageCompressionType
   }
   map: {
     generate: boolean
@@ -16,7 +15,7 @@ export interface ImageConfig {
       flipped: boolean
       unique: boolean
     }
-    compress: ImageCompressionType
+    compression: ImageCompressionType
   }
   animation: AnimationConfig
 }
@@ -24,8 +23,7 @@ export interface ImageConfig {
 export interface AnimationConfig {
   isAnimation: boolean
   individualFiles: boolean
-  frameWidth: number
-  frameHeight: number
+  frames: number
 }
 
 export interface ImageConfigFileToBeConverted {
@@ -96,7 +94,7 @@ export enum ImagesLogLineType {
 }
 
 export enum ImageCompressionType {
-  NONE = 'off',
+  NONE = 'none',
   RLE = 'rle',
 }
 
@@ -111,11 +109,10 @@ export const COMPRESSION_FLAG_LENGTH = 1;
 export const DEFAULT_IMAGE_CONVERTER_CONFIG: ImageConfig = {
   sourceFile: '',
   name: '',
-  section: MemorySection.ROM,
+  section: DataSection.ROM,
   tileset: {
     shared: false,
-    reduce: true,
-    compress: ImageCompressionType.NONE
+    compression: ImageCompressionType.NONE
   },
   map: {
     generate: true,
@@ -123,12 +120,11 @@ export const DEFAULT_IMAGE_CONVERTER_CONFIG: ImageConfig = {
       flipped: true,
       unique: true
     },
-    compress: ImageCompressionType.NONE
+    compression: ImageCompressionType.NONE
   },
   animation: {
     isAnimation: false,
     individualFiles: false,
-    frameWidth: 0,
-    frameHeight: 0
+    frames: 0,
   }
 };

@@ -41,7 +41,7 @@ function compressTilesRle(tilesData: string[], animationConfig: AnimationConfig)
   let previousDigit = tilesData[0][0] ?? '';
 
   const isSpritesheet = animationConfig.isAnimation && !animationConfig.individualFiles;
-  const spritesheetFrameSize = (4 * animationConfig.frameWidth * animationConfig.frameHeight) || 4;
+  const spritesheetFrameSize = (animationConfig.frames > 0) ? tilesData.length / animationConfig.frames : 4;
 
   const addPreviousDigitToCurrentBlock = () => {
     currentBlock += (counter - 1).toString(16).toUpperCase() + previousDigit;

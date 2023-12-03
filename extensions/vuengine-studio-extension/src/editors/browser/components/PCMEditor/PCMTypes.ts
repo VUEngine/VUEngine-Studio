@@ -1,14 +1,11 @@
+import { DataSection } from '../Common/CommonTypes';
+
 export interface PCMData {
     name: string
     sourceFile: string
     range: number
     loop: boolean
     section: DataSection
-}
-
-export enum DataSection {
-    ROM = 'rom',
-    EXP = 'exp',
 }
 
 export const MIN_RANGE = 1;

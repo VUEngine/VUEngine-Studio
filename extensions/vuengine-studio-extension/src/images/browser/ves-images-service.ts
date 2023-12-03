@@ -187,7 +187,9 @@ export class VesImagesService {
         .map(async filePath => this.fileService.fsPath(imageConfigFileUri.parent.resolve(filePath))));
       imagePaths.push(...paths);
     } else if (imageConfig.sourceFile) {
-      imagePaths.push(imageConfigFileUri.parent.resolve(imageConfig.sourceFile).path.toString());
+      await this.workspaceService.ready;
+      const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
+      imagePaths.push(workspaceRootUri.resolve(imageConfig.sourceFile).path.toString());
     }
     const name = imageConfig.name ? imageConfig.name : imageConfigFileUri.path.name;
     const gritArguments = this.getGritArguments(name, imageConfig);
@@ -210,9 +212,6 @@ export class VesImagesService {
 
     return new Promise(resolve => {
       // wait for converting process to finish, then process further
-      // wait for converting process to finish, then process further
-      // TODO: dispose listener once done
-      // wait for converting process to finish, then process further
       // TODO: dispose listener once done
       const exitListener = this.vesProcessWatcher.onDidExitProcess(async ({ pId }) => {
         if (pId === processInfo.processManagerId) {
@@ -225,9 +224,9 @@ export class VesImagesService {
           // TODO: do only for __ANIMATED_SINGLE
           /*
           if (imageConfig.animation.isAnimation && !imageConfig.animation.individualFiles) {
-            const frameSize = (4 * imageConfig.animation.frameHeight * imageConfig.animation.frameWidth) || 4;
             convertedFileData.map(fileData => {
-              const frameCount = fileData.tiles.data.length / frameSize;
+              const frameCount = imageConfig.animation.frames || 1;
+              const frameSize = fileData.tiles.data.length / frameCount;
               const frameOffsets = [COMPRESSION_FLAG_LENGTH];
               for (let i = 1; i < frameCount; i++) {
                 frameOffsets.push(COMPRESSION_FLAG_LENGTH + (frameSize * i));
@@ -361,19 +360,19 @@ export class VesImagesService {
   }
 
   protected async handleCompression(imageConfig: ImageConfig, conversionResult: ConversionResult): Promise<void> {
-    if (imageConfig.tileset.compress !== ImageCompressionType.NONE) {
+    if (imageConfig.tileset.compression !== ImageCompressionType.NONE) {
       conversionResult.tiles = {
         ...conversionResult.tiles,
         ...compressTiles(
           conversionResult.tiles.data,
-          imageConfig.tileset.compress as ImageCompressionType,
+          imageConfig.tileset.compression as ImageCompressionType,
           imageConfig.animation,
           imageConfig.animation.isAnimation && imageConfig.animation.individualFiles
         ),
       };
     }
 
-    if (imageConfig.map.compress !== ImageCompressionType.NONE) {
+    if (imageConfig.map.compression !== ImageCompressionType.NONE) {
       // TODO
     }
   }
@@ -429,10 +428,6 @@ export class VesImagesService {
     for (const imageConfigFile of imageConfigFiles) {
       const imageConfigFileUri = workspaceRootUri.resolve(imageConfigFile);
       const config = await this.getConverterConfig(imageConfigFileUri);
-
-      if (!this.validateImagesConfig(config, imageConfigFileUri)) {
-        continue;
-      }
 
       const name = config.name ? config.name : imageConfigFileUri.path.name;
 
@@ -577,34 +572,8 @@ export class VesImagesService {
     return merged;
   }
 
-  // check converter config for validity
-  protected validateImagesConfig(config: ImageConfig, imageConfigFileUri: URI): boolean {
-    if (config.animation.isAnimation && !config.animation.individualFiles
-      && config.animation.frameHeight * config.animation.frameWidth === 0) {
-      this.pushLog({
-        timestamp: Date.now(),
-        text: `${this.labelProvider.getName(imageConfigFileUri)}: No frame dimensions specified for spritesheet animation.`,
-        type: ImagesLogLineType.Error,
-        uri: imageConfigFileUri
-      });
-      return false;
-    }
-
-    return true;
-  }
-
   protected getGritArguments(name: string, config: ImageConfig): string[] {
-    const gritArguments = ['-fh!', '-ftc', '-gB2', '-p!'];
-
-    // TODO: what is this doing exactly?
-    // -> without this, map reduction options do not work correctly. This needs to be set when with map reduction is turned on.
-    // -> Can we always set these and get rid of tileset.reduce?
-
-    // if (config.tileset.reduce) {
-    gritArguments.push('-mB16:hv_i11');
-    // } else {
-    //  gritArguments.push('-mB16:i11');
-    // }
+    const gritArguments = ['-fh!', '-ftc', '-gB2', '-p!', '-mB16:hv_i11'];
 
     if (config.map.generate) {
       if (config.map.reduce.flipped || config.map.reduce.unique) {
