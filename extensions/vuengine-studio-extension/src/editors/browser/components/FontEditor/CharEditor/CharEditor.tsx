@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { VariableSize } from '../FontEditorTypes';
 import CharEditorPixel from './CharEditorPixel';
 
@@ -25,25 +25,33 @@ export default function CharEditor(props: CharEditorProps): React.JSX.Element {
         charGrid
     } = props;
 
+    const pixels = useMemo(() => [...Array(charHeight)].map((h, y) => (
+        <div
+            key={`current-line-${y}`}
+            className={variableSize.enabled && y >= variableSize.y ? 'line inactive' : 'line'}
+        >
+            {[...Array(charWidth)].map((w, x) => <CharEditorPixel
+                key={`current-pixel-${y}-${x}`}
+                x={x}
+                y={y}
+                pixelColor={char && char[y] && char[y][x] ? char[y][x] : 0}
+                clickPixel={clickPixel}
+                paletteIndexL={paletteIndexL}
+                paletteIndexR={paletteIndexR}
+                active={!variableSize.enabled || x < (variableSize.x[charId] ?? charWidth)}
+            />)}
+        </div>)
+    ), [
+        char,
+        charId,
+        charHeight,
+        charWidth,
+        paletteIndexL,
+        paletteIndexR,
+        variableSize,
+    ]);
+
     return <div className={`current-character markers grid-${charGrid}`}>
-        {
-            [...Array(charHeight)].map((h, y) => (
-                <div
-                    key={`current-line-${y}`}
-                    className={variableSize.enabled && y >= variableSize.y ? 'line inactive' : 'line'}
-                >
-                    {[...Array(charWidth)].map((w, x) => <CharEditorPixel
-                        key={`current-pixel-${y}-${x}`}
-                        x={x}
-                        y={y}
-                        pixelColor={char && char[y] && char[y][x] ? char[y][x] : 0}
-                        clickPixel={clickPixel}
-                        paletteIndexL={paletteIndexL}
-                        paletteIndexR={paletteIndexR}
-                        active={!variableSize.enabled || x < (variableSize.x[charId] ?? charWidth)}
-                    />)}
-                </div>)
-            )
-        }
+        {pixels}
     </div>;
 }

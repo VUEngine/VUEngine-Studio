@@ -2,6 +2,7 @@
   display: inline-flex;
   flex-direction: column;
   height: 100%;
+  overflow: scroll;
 }
 
 .font-editor:focus {
@@ -27,7 +28,12 @@
 }
 
 .font-editor .editor .editor-column {
+  gap: 38px;
   min-width: 400px;
+}
+
+.font-editor .editor .alphabet-column {
+  gap: 38px;
 }
 
 /* Character Table */
@@ -52,102 +58,6 @@
 
 .font-editor .editor .characters.grid-3 {
   gap: 3px;
-}
-
-.font-editor.width-8.height-24 .editor.gap-0 .alphabet-column .font-properties,
-.font-editor.width-8.height-32 .editor.gap-0 .alphabet-column .font-properties,
-.font-editor.width-8.height-24 .editor.gap-0 .characters,
-.font-editor.width-8.height-32 .editor.gap-0 .characters {
-  width: calc(16 * 8px);
-}
-
-.font-editor.width-8.height-8 .editor.gap-0 .alphabet-column .font-properties,
-.font-editor.width-8.height-16 .editor.gap-0 .alphabet-column .font-properties,
-.font-editor.width-16.height-24 .editor.gap-0 .alphabet-column .font-properties,
-.font-editor.width-16.height-32 .editor.gap-0 .alphabet-column .font-properties,
-.font-editor.width-8.height-8 .editor.gap-0 .characters,
-.font-editor.width-8.height-16 .editor.gap-0 .characters,
-.font-editor.width-16.height-24 .editor.gap-0 .characters,
-.font-editor.width-16.height-32 .editor.gap-0 .characters {
-  width: calc(16 * 16px);
-}
-
-.font-editor.width-24 .editor.gap-0 .alphabet-column .font-properties,
-.font-editor.width-24 .editor.gap-0 .characters {
-  width: calc(16 * 24px);
-}
-
-.font-editor.width-16.height-8 .editor.gap-0 .alphabet-column .font-properties,
-.font-editor.width-16.height-16 .editor.gap-0 .alphabet-column .font-properties,
-.font-editor.width-32 .editor.gap-0 .alphabet-column .font-properties,
-.font-editor.width-16.height-8 .editor.gap-0 .characters,
-.font-editor.width-16.height-16 .editor.gap-0 .characters,
-.font-editor.width-32 .editor.gap-0 .characters {
-  width: calc(16 * 32px);
-}
-
-.font-editor.width-8.height-24 .editor.gap-2 .alphabet-column .font-properties,
-.font-editor.width-8.height-32 .editor.gap-2 .alphabet-column .font-properties,
-.font-editor.width-8.height-24 .editor.gap-2 .characters,
-.font-editor.width-8.height-32 .editor.gap-2 .characters {
-  width: calc(16 * (8px + 2px));
-}
-
-.font-editor.width-8.height-8 .editor.gap-2 .alphabet-column .font-properties,
-.font-editor.width-8.height-16 .editor.gap-2 .alphabet-column .font-properties,
-.font-editor.width-16.height-24 .editor.gap-2 .alphabet-column .font-properties,
-.font-editor.width-16.height-32 .editor.gap-2 .alphabet-column .font-properties,
-.font-editor.width-8.height-8 .editor.gap-2 .characters,
-.font-editor.width-8.height-16 .editor.gap-2 .characters,
-.font-editor.width-16.height-24 .editor.gap-2 .characters,
-.font-editor.width-16.height-32 .editor.gap-2 .characters {
-  width: calc(16 * (16px + 2px));
-}
-
-.font-editor.width-24 .editor.gap-2 .alphabet-column .font-properties,
-.font-editor.width-24 .editor.gap-2 .characters {
-  width: calc(16 * (24px + 2px));
-}
-
-.font-editor.width-16.height-8 .editor.gap-2 .alphabet-column .font-properties,
-.font-editor.width-16.height-16 .editor.gap-2 .alphabet-column .font-properties,
-.font-editor.width-32 .editor.gap-2 .alphabet-column .font-properties,
-.font-editor.width-16.height-8 .editor.gap-2 .characters,
-.font-editor.width-16.height-16 .editor.gap-2 .characters,
-.font-editor.width-32 .editor.gap-2 .characters {
-  width: calc(16 * (32px + 2px));
-}
-
-.font-editor.width-8.height-24 .editor.gap-3 .alphabet-column .font-properties,
-.font-editor.width-8.height-32 .editor.gap-3 .alphabet-column .font-properties,
-.font-editor.width-8.height-24 .editor.gap-3 .characters,
-.font-editor.width-8.height-32 .editor.gap-3 .characters {
-  width: calc(16 * (8px + 3px));
-}
-
-.font-editor.width-8.height-8 .editor.gap-3 .alphabet-column .font-properties,
-.font-editor.width-8.height-16 .editor.gap-3 .alphabet-column .font-properties,
-.font-editor.width-16.height-24 .editor.gap-3 .alphabet-column .font-properties,
-.font-editor.width-16.height-32 .editor.gap-3 .alphabet-column .font-properties,
-.font-editor.width-8.height-8 .editor.gap-3 .characters,
-.font-editor.width-8.height-16 .editor.gap-3 .characters,
-.font-editor.width-16.height-24 .editor.gap-3 .characters,
-.font-editor.width-16.height-32 .editor.gap-3 .characters {
-  width: calc(16 * (16px + 3px));
-}
-
-.font-editor.width-24 .editor.gap-3 .alphabet-column .font-properties,
-.font-editor.width-24 .editor.gap-3 .characters {
-  width: calc(16 * (24px + 3px));
-}
-
-.font-editor.width-16.height-8 .editor.gap-3 .alphabet-column .font-properties,
-.font-editor.width-16.height-16 .editor.gap-3 .alphabet-column .font-properties,
-.font-editor.width-32 .editor.gap-3 .alphabet-column .font-properties,
-.font-editor.width-16.height-8 .editor.gap-3 .characters,
-.font-editor.width-16.height-16 .editor.gap-3 .characters,
-.font-editor.width-32 .editor.gap-3 .characters {
-  width: calc(16 * (32px + 3px));
 }
 
 .font-editor .editor .characters .character {
@@ -357,34 +267,6 @@
 
 .font-editor .color-3 {
   background-color: #f00;
-}
-
-/* Font Properties */
-
-.font-editor .font-properties {
-  align-items: baseline;
-  display: flex;
-  flex-direction: row;
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
-.font-editor .font-properties>div {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  gap: 6px;
-}
-
-.font-editor .font-properties .character-size {
-  align-items: baseline;
-  display: flex;
-  flex-direction: row;
-  gap: 6px;
-}
-
-.font-editor .font-properties .character-size input {
-  flex-grow: 1;
 }
 
 /* Tools */
