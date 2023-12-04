@@ -2,6 +2,8 @@ import { nls } from '@theia/core';
 import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React from 'react';
 import { CHAR_PIXEL_SIZE, FontEditorState, MAX_CHAR_SIZE, MIN_CHAR_SIZE, MIN_VARIABLE_CHAR_SIZE, Size, VariableSize } from '../FontEditorTypes';
+import HContainer from '../../Common/HContainer';
+import VContainer from '../../Common/VContainer';
 
 interface CharSettingsProps {
     currentCharacter: number
@@ -68,45 +70,49 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
         });
     };
 
-    return <div className='font-properties'>
-        {variableSize.enabled && <div>
-            <label>
-                {nls.localize('vuengine/fontEditor/characterSize', 'Character Size')}
-            </label>
-            <div className='character-size'>
-                <input
-                    type="number"
-                    min={MIN_VARIABLE_CHAR_SIZE}
-                    max={charWidth}
-                    className="theia-input"
-                    value={variableSize.x[currentCharacter] ?? charWidth}
-                    onChange={onChangeVariablePixelWidth}
-                />
-                <div>×</div>
-                <input
-                    type="number"
-                    min={MIN_VARIABLE_CHAR_SIZE}
-                    max={charWidth}
-                    className="theia-input"
-                    value={variableSize.y}
-                    onChange={onChangeVariablePixelHeight}
-                />
-            </div>
-        </div>}
-        <div>
+    return <HContainer gap={20}>
+        {variableSize.enabled &&
+            <VContainer grow={1}>
+                <label>
+                    {nls.localize('vuengine/fontEditor/characterSize', 'Character Size')}
+                </label>
+                <HContainer>
+                    <input
+                        type="number"
+                        min={MIN_VARIABLE_CHAR_SIZE}
+                        max={charWidth}
+                        className="theia-input"
+                        style={{ flexGrow: 1 }}
+                        value={variableSize.x[currentCharacter] ?? charWidth}
+                        onChange={onChangeVariablePixelWidth}
+                    />
+                    <div>×</div>
+                    <input
+                        type="number"
+                        min={MIN_VARIABLE_CHAR_SIZE}
+                        max={charWidth}
+                        className="theia-input"
+                        style={{ flexGrow: 1 }}
+                        value={variableSize.y}
+                        onChange={onChangeVariablePixelHeight}
+                    />
+                </HContainer>
+            </VContainer>}
+        <VContainer grow={1}>
             {!variableSize.enabled && <label>
                 {nls.localize('vuengine/fontEditor/characterSize', 'Character Size')}
             </label>}
             {variableSize.enabled && <label>
                 {nls.localize('vuengine/fontEditor/maximum', 'Maximum')}
             </label>}
-            <div className='character-size'>
+            <HContainer>
                 <input
                     type="number"
                     step={CHAR_PIXEL_SIZE}
                     min={MIN_CHAR_SIZE * CHAR_PIXEL_SIZE}
                     max={MAX_CHAR_SIZE * CHAR_PIXEL_SIZE}
                     className="theia-input"
+                    style={{ flexGrow: 1 }}
                     id="#/properties/size/properties/x-input"
                     value={charWidth}
                     onChange={onChangePixelWidth}
@@ -118,13 +124,14 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
                     min={MIN_CHAR_SIZE * CHAR_PIXEL_SIZE}
                     max={MAX_CHAR_SIZE * CHAR_PIXEL_SIZE}
                     className="theia-input"
+                    style={{ flexGrow: 1 }}
                     id="#/properties/size/properties/y-input"
                     value={charHeight}
                     onChange={onChangePixelHeight}
                 />
-            </div>
-        </div>
-        <div>
+            </HContainer>
+        </VContainer>
+        <VContainer grow={1}>
             <label>
                 {nls.localize('vuengine/fontEditor/type', 'Type')}
             </label>
@@ -150,8 +157,8 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
                     }
                 )}
             />
-        </div>
-        <div>
+        </VContainer>
+        <VContainer grow={1}>
             <label>
                 {nls.localize('vuengine/fontEditor/grid', 'Grid')}
             </label>
@@ -164,6 +171,6 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
                 value={charGrid}
                 onChange={e => setState({ charGrid: parseInt(e.target.value) })}
             />
-        </div>
-    </div>;
+        </VContainer>
+    </HContainer>;
 }

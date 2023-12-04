@@ -8,7 +8,6 @@ interface HContainerProps {
 export default function HContainer(props: PropsWithChildren<HContainerProps>): React.JSX.Element {
     const { children, className, gap } = props;
 
-    // TODO: move to css class
     return <div
         style={{
             alignItems: 'center',

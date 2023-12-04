@@ -2,3 +2,7 @@
 .theia-select:focus {
     outline: 1px solid var(--theia-button-background)
 }
+
+.theia-select-component {
+    min-height: 26px;
+}

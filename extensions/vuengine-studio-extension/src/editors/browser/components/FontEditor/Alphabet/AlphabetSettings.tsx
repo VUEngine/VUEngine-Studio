@@ -1,15 +1,14 @@
 import { nls } from '@theia/core';
 import React from 'react';
 import { FontEditorState, MAX_CHAR_COUNT, MIN_CHAR_COUNT, MIN_OFFSET } from '../FontEditorTypes';
-import { DataSection } from '../../Common/CommonTypes';
+import VContainer from '../../Common/VContainer';
+import HContainer from '../../Common/HContainer';
 
 interface AlphabetSettingsProps {
     charCount: number
     setCharCount: (charCount: number) => void
     offset: number
     setOffset: (offset: number) => void
-    section: DataSection
-    setSection: (section: DataSection) => void
     alphabetGrid: number
     setState: (state: Partial<FontEditorState>) => void
 }
@@ -19,13 +18,12 @@ export default function AlphabetSettings(props: AlphabetSettingsProps): React.JS
     const {
         charCount, setCharCount,
         offset, setOffset,
-        // section, setSection,
         alphabetGrid,
         setState,
     } = props;
 
-    return <div className='font-properties'>
-        <div>
+    return <HContainer gap={20}>
+        <VContainer grow={1}>
             <label>
                 {nls.localize('vuengine/fontEditor/count', 'Count')}
             </label>
@@ -38,8 +36,8 @@ export default function AlphabetSettings(props: AlphabetSettingsProps): React.JS
                 value={charCount}
                 onChange={e => setCharCount(parseInt(e.target.value))}
             />
-        </div>
-        <div>
+        </VContainer>
+        <VContainer grow={1}>
             <label>
                 {nls.localize('vuengine/fontEditor/offset', 'Offset')}
             </label>
@@ -52,28 +50,8 @@ export default function AlphabetSettings(props: AlphabetSettingsProps): React.JS
                 value={offset}
                 onChange={e => setOffset(parseInt(e.target.value))}
             />
-        </div>
-        {/*
-        <div>
-            <label>
-                {nls.localize('vuengine/fontEditor/section', 'Section')}
-            </label>
-            <SelectComponent
-                defaultValue={section}
-                options={[{
-                    label: nls.localize('vuengine/fontEditor/romSpace', 'ROM Space'),
-                    value: DataSection.ROM,
-                    label: nls.localize('vuengine/fontEditor/romSpaceDescription', 'Save tile data to ROM space'),
-                }, {
-                    label: nls.localize('vuengine/fontEditor/expansionSpace', 'Expansion Space'),
-                    value: DataSection.EXP,
-                    label: nls.localize('vuengine/fontEditor/expansionSpaceDescription', 'Save tile data to expansion space'),
-                }]}
-                onChange={option => setSection(option.value as DataSection)}
-            />
-        </div>
-        */}
-        <div>
+        </VContainer>
+        <VContainer grow={1}>
             <label>
                 {nls.localize('vuengine/fontEditor/grid', 'Grid')}
             </label>
@@ -86,6 +64,6 @@ export default function AlphabetSettings(props: AlphabetSettingsProps): React.JS
                 value={alphabetGrid}
                 onChange={e => setState({ alphabetGrid: parseInt(e.target.value) })}
             />
-        </div>
-    </div>;
+        </VContainer>
+    </HContainer>;
 }

@@ -21,6 +21,9 @@ import ImportExport from './Tools/ImportExport';
 import Palette from './Tools/Palette';
 import Tools from './Tools/Tools';
 import { DataSection } from '../Common/CommonTypes';
+import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
+import HContainer from '../Common/HContainer';
+import VContainer from '../Common/VContainer';
 
 interface FontEditorProps {
     fontData: FontData
@@ -268,112 +271,133 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
             onMouseOver={() => this.setState({ active: true })}
             onMouseOut={() => this.setState({ active: false })}
         >
-            <div className='font-properties'>
-                <div>
-                    <label>
-                        {nls.localize('vuengine/fontEditor/name', 'Name')}
-                    </label>
-                    <input
-                        className="theia-input large"
-                        value={fontData.name}
-                        onChange={this.onChangeName.bind(this)}
-                    />
+            <VContainer gap={20}>
+                <HContainer gap={20}>
+                    <VContainer grow={4}>
+                        <label>
+                            {nls.localize('vuengine/fontEditor/name', 'Name')}
+                        </label>
+                        <input
+                            className="theia-input large"
+                            value={fontData.name}
+                            onChange={this.onChangeName.bind(this)}
+                        />
+                    </VContainer>
+                    <VContainer grow={1}>
+                        <label>
+                            {nls.localize('vuengine/fontEditor/compression', 'Compression')}
+                        </label>
+                        <SelectComponent
+                            defaultValue={fontData.compression}
+                            options={[{
+                                label: nls.localize('vuengine/fontEditor/none', 'None'),
+                                value: ImageCompressionType.NONE,
+                                description: nls.localize('vuengine/fontEditor/noCompressionDescription', 'Do not compress tile data'),
+                            }, {
+                                label: nls.localize('vuengine/fontEditor/rle', 'RLE'),
+                                value: ImageCompressionType.RLE,
+                                description: nls.localize('vuengine/fontEditor/rleCompressionDescription', 'Compress tile data with RLE'),
+                            }]}
+                            onChange={option => this.setCompression(option.value as ImageCompressionType)}
+                        />
+                    </VContainer>
+                    <VContainer grow={1}>
+                        <label>
+                            {nls.localize('vuengine/fontEditor/section', 'Section')}
+                        </label>
+                        <SelectComponent
+                            defaultValue={fontData.section}
+                            options={[{
+                                label: nls.localize('vuengine/fontEditor/romSpace', 'ROM Space'),
+                                value: DataSection.ROM,
+                                description: nls.localize('vuengine/fontEditor/romSpaceDescription', 'Save tile data to ROM space'),
+                            }, {
+                                label: nls.localize('vuengine/fontEditor/expansionSpace', 'Expansion Space'),
+                                value: DataSection.EXP,
+                                description: nls.localize('vuengine/fontEditor/expansionSpaceDescription', 'Save tile data to expansion space'),
+                            }]}
+                            onChange={option => this.setSection(option.value as DataSection)}
+                        />
+                    </VContainer>
+                </HContainer>
+                <div className='editor'>
+                    <div className='tools-column'>
+                        <CurrentCharInfo
+                            currentCharacter={this.state.currentCharacter}
+                        />
+                        <Palette
+                            paletteIndexL={this.state.paletteIndexL}
+                            paletteIndexR={this.state.paletteIndexR}
+                            setState={this.setState.bind(this)}
+                        />
+                        <Tools
+                            tool={this.state.tool}
+                            setState={this.setState.bind(this)}
+                        />
+                        <Actions
+                            clipboard={this.state.clipboard}
+                            charHeight={pixelHeight}
+                            charWidth={pixelWidth}
+                            currentCharData={characters[this.state.currentCharacter]}
+                            setCurrentCharData={this.setCurrentCharacterData.bind(this)}
+                            setState={this.setState.bind(this)}
+                        />
+                        <ImportExport
+                            fileDialogService={services.fileDialogService}
+                            fileService={services.fileService}
+                            messageService={services.messageService}
+                            baseUri={fileUri}
+                            setCharacters={this.setCharacters.bind(this)}
+                            size={fontData.size}
+                            offset={fontData.offset}
+                            characterCount={fontData.characterCount}
+                        />
+                    </div>
+                    <div className='editor-column'>
+                        <CharSettings
+                            currentCharacter={this.state.currentCharacter}
+                            charHeight={pixelHeight}
+                            charWidth={pixelWidth}
+                            variableSize={fontData.variableSize}
+                            setCharSize={this.setCharSize.bind(this)}
+                            charGrid={this.state.charGrid}
+                            setState={this.setState.bind(this)}
+                        />
+                        <CharEditor
+                            char={characters[this.state.currentCharacter]}
+                            charId={this.state.currentCharacter}
+                            charHeight={pixelHeight}
+                            charWidth={pixelWidth}
+                            variableSize={fontData.variableSize}
+                            clickPixel={this.clickPixel.bind(this)}
+                            paletteIndexL={this.state.paletteIndexL}
+                            paletteIndexR={this.state.paletteIndexR}
+                            charGrid={this.state.charGrid}
+                        />
+                    </div>
+                    <div className='alphabet-column'>
+                        <AlphabetSettings
+                            charCount={fontData.characterCount}
+                            setCharCount={this.setCharCount.bind(this)}
+                            offset={fontData.offset}
+                            setOffset={this.setOffset.bind(this)}
+                            alphabetGrid={this.state.alphabetGrid}
+                            setState={this.setState.bind(this)}
+                        />
+                        <Alphabet
+                            charsData={fontData.characters || []}
+                            offset={fontData.offset}
+                            charCount={fontData.characterCount}
+                            charHeight={pixelHeight}
+                            charWidth={pixelWidth}
+                            currentCharacter={this.state.currentCharacter}
+                            variableSize={fontData.variableSize}
+                            alphabetGrid={this.state.alphabetGrid}
+                            setState={this.setState.bind(this)}
+                        />
+                    </div>
                 </div>
-            </div>
-            <div className='font-properties'>
-                <div>
-                    <label>
-                        {nls.localize('vuengine/fontEditor/compression', 'Compression')}
-                    </label>
-                    <select
-                        className='theia-select'
-                        onChange={e => this.setCompression(e.target.value as ImageCompressionType)}
-                        value={fontData.compression}
-                    >
-                        <option value='none'>{nls.localize('vuengine/fontEditor/none', 'None')}</option>
-                        <option value='rle'>RLE</option>
-                    </select>
-                </div>
-            </div>
-            <div className='editor'>
-                <div className='tools-column'>
-                    <CurrentCharInfo
-                        currentCharacter={this.state.currentCharacter}
-                    />
-                    <Palette
-                        paletteIndexL={this.state.paletteIndexL}
-                        paletteIndexR={this.state.paletteIndexR}
-                        setState={this.setState.bind(this)}
-                    />
-                    <Tools
-                        tool={this.state.tool}
-                        setState={this.setState.bind(this)}
-                    />
-                    <Actions
-                        clipboard={this.state.clipboard}
-                        charHeight={pixelHeight}
-                        charWidth={pixelWidth}
-                        currentCharData={characters[this.state.currentCharacter]}
-                        setCurrentCharData={this.setCurrentCharacterData.bind(this)}
-                        setState={this.setState.bind(this)}
-                    />
-                    <ImportExport
-                        fileDialogService={services.fileDialogService}
-                        fileService={services.fileService}
-                        messageService={services.messageService}
-                        baseUri={fileUri}
-                        setCharacters={this.setCharacters.bind(this)}
-                        size={fontData.size}
-                        offset={fontData.offset}
-                        characterCount={fontData.characterCount}
-                    />
-                </div>
-                <div className='editor-column'>
-                    <CharSettings
-                        currentCharacter={this.state.currentCharacter}
-                        charHeight={pixelHeight}
-                        charWidth={pixelWidth}
-                        variableSize={fontData.variableSize}
-                        setCharSize={this.setCharSize.bind(this)}
-                        charGrid={this.state.charGrid}
-                        setState={this.setState.bind(this)}
-                    />
-                    <CharEditor
-                        char={characters[this.state.currentCharacter]}
-                        charId={this.state.currentCharacter}
-                        charHeight={pixelHeight}
-                        charWidth={pixelWidth}
-                        variableSize={fontData.variableSize}
-                        clickPixel={this.clickPixel.bind(this)}
-                        paletteIndexL={this.state.paletteIndexL}
-                        paletteIndexR={this.state.paletteIndexR}
-                        charGrid={this.state.charGrid}
-                    />
-                </div>
-                <div className='alphabet-column'>
-                    <AlphabetSettings
-                        charCount={fontData.characterCount}
-                        setCharCount={this.setCharCount.bind(this)}
-                        offset={fontData.offset}
-                        setOffset={this.setOffset.bind(this)}
-                        section={fontData.section}
-                        setSection={this.setSection.bind(this)}
-                        alphabetGrid={this.state.alphabetGrid}
-                        setState={this.setState.bind(this)}
-                    />
-                    <Alphabet
-                        charsData={fontData.characters || []}
-                        offset={fontData.offset}
-                        charCount={fontData.characterCount}
-                        charHeight={pixelHeight}
-                        charWidth={pixelWidth}
-                        currentCharacter={this.state.currentCharacter}
-                        variableSize={fontData.variableSize}
-                        alphabetGrid={this.state.alphabetGrid}
-                        setState={this.setState.bind(this)}
-                    />
-                </div>
-            </div>
+            </VContainer>
         </div>;
     }
 }
