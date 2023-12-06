@@ -31,13 +31,6 @@ export interface ImageConfigFileToBeConverted {
   config: ImageConfig
 }
 
-export interface ImagesLogLine {
-  timestamp: number
-  text: string
-  type: ImagesLogLineType
-  uri?: URI
-}
-
 export interface ConversionResultTilesData {
   compressionRatio?: number
   count: number
@@ -84,14 +77,6 @@ export interface ConvertedFileData {
   map: ConvertedFileMapData
   name: string
   tiles: ConvertedFileTilesData
-}
-
-export enum ImagesLogLineType {
-  Normal = 'normal',
-  Headline = 'headline',
-  Warning = 'warning',
-  Error = 'error',
-  Done = 'done',
 }
 
 export enum ImageCompressionType {

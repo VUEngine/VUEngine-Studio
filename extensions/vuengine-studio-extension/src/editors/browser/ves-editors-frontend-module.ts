@@ -7,28 +7,19 @@ import '../../../src/editors/browser/style/index.css';
 import { VesEditorsContextKeyService } from './ves-editors-context-key-service';
 import { VesEditorsLabelProviderContribution } from './ves-editors-label-provider';
 import { VesEditorsOpenHandler } from './ves-editors-open-handler';
-import { VesEditorsStatusBarContribution } from './ves-editors-statusbar-contribution';
 import { VesEditorsViewContribution } from './ves-editors-view';
 import { VesEditorsWidget, VesEditorsWidgetOptions } from './ves-editors-widget';
 import { VesWorkspaceCommandContribution } from './ves-workspace-commands';
-import { VesEditorsService } from './ves-editors-service';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // override new file dialog
     bind(VesWorkspaceCommandContribution).toSelf().inSingletonScope();
     rebind(WorkspaceCommandContribution).toService(VesWorkspaceCommandContribution);
 
-    // status bar entry
-    bind(VesEditorsStatusBarContribution).toSelf().inSingletonScope();
-    bind(FrontendApplicationContribution).toService(VesEditorsStatusBarContribution);
-
     // context key service
     bind(VesEditorsContextKeyService)
         .toSelf()
         .inSingletonScope();
-
-    // editors services
-    bind(VesEditorsService).toSelf().inSingletonScope();
 
     // editor view
     bind(VesEditorsViewContribution).toSelf().inSingletonScope();
