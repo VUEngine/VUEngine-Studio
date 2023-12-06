@@ -161,7 +161,7 @@ export class VesImagesService {
 
     await Promise.all(imageConfigFilesToBeConverted.map(async imageConfigFileToBeConverted => {
       const conversionResult = await this.convertImage(imageConfigFileToBeConverted.configFileUri, imageConfigFileToBeConverted.config);
-      // TODO: trigger template render
+      // TODO: trigger template render. We'll need a _fileUri property for each item to be added first.
       console.log(conversionResult);
     }));
   }
@@ -220,37 +220,25 @@ export class VesImagesService {
 
           this.removeUnusedEmptyTileAddedByGrit(imageConfig, convertedFileData);
 
-          // compute frame offsets for spritesheet animations
-          // TODO: do only for __ANIMATED_SINGLE
-          /*
-          if (imageConfig.animation.isAnimation && !imageConfig.animation.individualFiles) {
-            convertedFileData.map(fileData => {
-              const frameCount = imageConfig.animation.frames || 1;
-              const frameSize = fileData.tiles.data.length / frameCount;
-              const frameOffsets = [COMPRESSION_FLAG_LENGTH];
-              for (let i = 1; i < frameCount; i++) {
-                frameOffsets.push(COMPRESSION_FLAG_LENGTH + (frameSize * i));
-              }
-            });
-          }
-          */
-
           if (imageConfig.animation.isAnimation
             && imageConfig.animation.individualFiles) {
 
             let totalTilesCount = 0;
             let tilesData: string[] = [];
             let mapData: string[] = [];
-
-            let frameTileOffsets: number[] = [COMPRESSION_FLAG_LENGTH];
+            let height = 0;
+            let width = 0;
             let largestFrame = 0;
-            convertedFileData.map(output => {
-              totalTilesCount += output.tiles.count;
-              tilesData = tilesData.concat(output.tiles.data);
-              mapData = mapData.concat(output.map.data);
+            let frameTileOffsets: number[] = [COMPRESSION_FLAG_LENGTH];
+            convertedFileData.map(m => {
+              totalTilesCount += m.tiles.count;
+              tilesData = tilesData.concat(m.tiles.data);
+              mapData = mapData.concat(m.map.data);
+              height = m.map.height;
+              width = m.map.width;
               frameTileOffsets = frameTileOffsets.concat(tilesData.length + 1);
-              if (output.tiles.count > largestFrame) {
-                largestFrame = output.tiles.count;
+              if (m.tiles.count > largestFrame) {
+                largestFrame = m.tiles.count;
               }
             });
             frameTileOffsets.pop();
@@ -264,37 +252,58 @@ export class VesImagesService {
               count: totalTilesCount,
               data: tilesData,
               frameOffsets: frameTileOffsets,
-              height: 0, // TODO
+              height: height * 8,
               name,
-              width: 0, // TODO
+              width: width * 8,
             };
             result.maps.push({
               data: mapData,
-              height: 0, // TODO
+              height,
               name,
-              width: 0, // TODO
+              width,
             });
             result.animation = {
-              largestFrame
+              frames: convertedFileData.length,
+              largestFrame,
             };
             this.reportConverted(imageConfigFileUri);
 
           } else {
-            convertedFileData.map(output => {
-              if (output.tiles.data.length) {
+            // compute frame offsets for spritesheet animations
+            // TODO: do only for __ANIMATED_SINGLE
+            /*
+            if (imageConfig.animation.isAnimation && !imageConfig.animation.individualFiles) {
+              convertedFileData.map(fileData => {
+                const frameCount = imageConfig.animation.frames || 1;
+                const frameSize = fileData.tiles.data.length / frameCount;
+                const frameOffsets = [COMPRESSION_FLAG_LENGTH];
+                for (let i = 1; i < frameCount; i++) {
+                  frameOffsets.push(COMPRESSION_FLAG_LENGTH + (frameSize * i));
+                }
+              });
+            }
+            */
+
+            let frames = 0;
+            convertedFileData.map(m => {
+              if (m.tiles.data.length) {
                 result.tiles = {
-                  ...output.tiles,
-                  name: output.name
+                  ...m.tiles,
+                  name: m.name
                 };
               }
-              if (output.map.data.length) {
+              if (m.map.data.length) {
                 result.maps.push({
-                  ...output.map,
-                  name: output.name
+                  ...m.map,
+                  name: m.name
                 });
+                frames++;
               }
               this.reportConverted(imageConfigFileUri);
             });
+            result.animation = {
+              frames,
+            };
           }
 
           await this.handleCompression(imageConfig, result);
@@ -308,6 +317,7 @@ export class VesImagesService {
 
   protected async getConvertedFilesData(convertedFolderUri: URI): Promise<ConvertedFileData[]> {
     const generatedFiles = window.electronVesCore.findFiles(await this.fileService.fsPath(convertedFolderUri), '*.c')
+      .sort((a, b) => a.localeCompare(b))
       .map(file => convertedFolderUri.resolve(file));
 
     const convertedFileData: ConvertedFileData[] = [];
