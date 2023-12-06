@@ -57,6 +57,7 @@ export interface ConversionResultMapData {
 }
 
 export interface ConversionResultAnimationData {
+  frames?: number
   largestFrame?: number
 }
 

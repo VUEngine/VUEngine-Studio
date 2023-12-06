@@ -18,7 +18,7 @@
 {%- endif -%}
 
 {%- set tilesCompressionLabel = 'not compressed' -%}
-{%- if imageData.tiles.compressionRatio is defined -%}
+{%- if item.tileset.compression != 'none' and imageData.tiles.compressionRatio is defined -%}
     {%- if imageData.tiles.compressionRatio < 0 -%}
         {%- set tilesCompressionLabel = item.tileset.compression | upper ~ ' compressed (' ~ imageData.tiles.compressionRatio | round(2) ~ '%)' -%}
     {%- elseif imageData.tiles.compressionRatio == 0 -%}
@@ -46,7 +46,7 @@
 {% endfor -%}
 
 {%- if item.animation.isAnimation and imageData.tiles.count > 0 -%}
-    //  * {{ item.animation.frames }} animation frames, {% if item.animation.individualFiles %}individual files{% else %}spritesheet{% endif %}{% if itemData.animation.largestFrame > 0 %}, largest frame: {{itemData.animation.largestFrame}} tiles{% endif %}
+    //  * {{ imageData.animation.frames }} animation frames, {% if item.animation.individualFiles %}individual files{% else %}spritesheet{% endif %}{% if item.animation.individualFiles and imageData.animation.largestFrame is defined %}, largest frame: {{imageData.animation.largestFrame}} tiles{% endif %}
 {% endif -%}
 
 {%- if imageData.tiles.data.length and imageData.maps.length -%}
