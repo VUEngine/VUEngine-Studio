@@ -11,6 +11,16 @@ export namespace VesEditorsCommands {
         'vuengine/editors/generate',
         'vuengine/editors/commands/category'
     );
+    export const OPEN_IN_EDITOR: Command = Command.toLocalizedCommand(
+        {
+            id: 'ves:editors:openInEditor',
+            label: 'Open in graphical editor',
+            category: 'Editor',
+            iconClass: 'codicon codicon-preview',
+        },
+        'vuengine/editors/openInEditor',
+        'vuengine/editors/commands/category'
+    );
     export const OPEN_SOURCE: Command = Command.toLocalizedCommand(
         {
             id: 'ves:editors:showSource',

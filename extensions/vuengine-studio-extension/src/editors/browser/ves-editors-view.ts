@@ -127,6 +127,28 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                 });
             }
         }
+
+        commandRegistry.registerCommand(VesEditorsCommands.OPEN_IN_EDITOR, {
+            isEnabled: () => true,
+            isVisible: (widget: Widget) => {
+                const p = this.editorManager.all.find(w => w.id === widget.id)?.editor.uri.path;
+                if (p) {
+                    for (const t of Object.values(types || {})) {
+                        if ([p.ext, p.base].includes(t.file)) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            },
+            execute: async widget => {
+                const u = this.editorManager.all.find(w => w.id === widget.id)?.editor.uri;
+                if (u) {
+                    const opener = await this.openerService.getOpener(u);
+                    await opener.open(u);
+                }
+            },
+        });
     }
 
     registerToolbarItems(toolbar: TabBarToolbarRegistry): void {
@@ -140,6 +162,12 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             id: VesEditorsCommands.OPEN_SOURCE.id,
             command: VesEditorsCommands.OPEN_SOURCE.id,
             tooltip: VesEditorsCommands.OPEN_SOURCE.label,
+            priority: 1,
+        });
+        toolbar.registerItem({
+            id: VesEditorsCommands.OPEN_IN_EDITOR.id,
+            command: VesEditorsCommands.OPEN_IN_EDITOR.id,
+            tooltip: VesEditorsCommands.OPEN_IN_EDITOR.label,
             priority: 1,
         });
     }
@@ -174,7 +202,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             return;
         }
         this.editorManager.open(ref.uri, {
-            widgetOptions: { ref, mode: 'tab-after' }
+            widgetOptions: { ref },
         });
     }
 
