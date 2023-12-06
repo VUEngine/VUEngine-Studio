@@ -112,7 +112,7 @@ export class VesNewFileDialog extends ReactDialog<string> {
                                         const ext = this.props.types[typeId].file;
                                         return (
                                             <option value={ext} key={ext}>
-                                                {nls.localize(`vuengine/editors/newFileDialog/types/${typeId}`, this.props.types[typeId].schema.title || typeId)}
+                                                {nls.localize(`vuengine/projects/types/${typeId}`, this.props.types[typeId].schema.title || typeId)}
                                             </option>
                                         );
                                     })}

@@ -24,6 +24,7 @@ import {
   ProjectFileTemplatesWithContributor,
   ProjectFileType,
   ProjectFileTypesWithContributor,
+  ProjectContributor,
   VUENGINE_EXT,
   WithContributor,
   defaultProjectData
@@ -81,10 +82,26 @@ export class VesProjectService {
   getProjectDataItems(): ProjectFileItemsWithContributor | undefined {
     return this._projectData.combined?.items;
   }
-  getProjectDataItemsForType(typeId: string): ProjectFileItemWithContributor | undefined {
-    return this._projectData.combined?.items && this._projectData.combined?.items[typeId];
+  getProjectDataItemsForType(typeId: string, contributor?: ProjectContributor): ProjectFileItemWithContributor | undefined {
+    let result = {};
+    const items = this._projectData.combined?.items ? this._projectData.combined?.items[typeId] || {} : {};
+
+    if (contributor) {
+      Object.keys(items).map(id => {
+        // @ts-ignore
+        const item = items[id];
+        if (item._contributor === contributor || item._contributor.startsWith(`${contributor}:`)) {
+          // @ts-ignore
+          result[id] = item;
+        }
+      });
+    } else {
+      result = items;
+    }
+
+    return result;
   }
-  async setProjectDataItem(typeId: string, itemId: string, data: ProjectFileItem): Promise<boolean> {
+  async setProjectDataItem(typeId: string, itemId: string, data: ProjectFileItem, fileUri: URI): Promise<boolean> {
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     if (!workspaceRootUri) {
@@ -101,8 +118,9 @@ export class VesProjectService {
       this._projectData.combined.items[typeId] = {};
     }
     this._projectData.combined.items[typeId][itemId] = {
-      _contributor: 'project',
+      _contributor: ProjectContributor.Project,
       _contributorUri: workspaceRootUri.parent,
+      _fileUri: fileUri,
       ...data
     };
 
@@ -243,7 +261,7 @@ export class VesProjectService {
       }
       if (uri && pluginsData[installedPluginId]) {
         pluginsProjectDataWithContributors.push({
-          _contributor: `plugin:${installedPluginId}`,
+          _contributor: `${ProjectContributor.Plugin}:${installedPluginId}` as ProjectContributor,
           _contributorUri: uri,
           ...pluginsData[installedPluginId],
         });
@@ -253,12 +271,12 @@ export class VesProjectService {
     const resourcesUri = await this.vesCommonService.getResourcesUri();
     const projectDataWithContributors: (ProjectFile & WithContributor)[] = [
       {
-        _contributor: 'studio',
+        _contributor: ProjectContributor.Studio,
         _contributorUri: resourcesUri,
         ...defaultProjectData
       },
       {
-        _contributor: 'engine',
+        _contributor: ProjectContributor.Engine,
         _contributorUri: engineCoreProjectFileUri.parent,
         ...engineCoreProjectFileData
       },
@@ -267,7 +285,7 @@ export class VesProjectService {
 
     if (this.workspaceProjectFileUri) {
       projectDataWithContributors.push({
-        _contributor: 'project',
+        _contributor: ProjectContributor.Project,
         _contributorUri: this.workspaceProjectFileUri.parent,
         ...workspaceProjectFileData
       });
@@ -336,6 +354,7 @@ export class VesProjectService {
               const itemWithContributor = {
                 _contributor: projectDataWithContributor._contributor,
                 _contributorUri: projectDataWithContributor._contributorUri,
+                _fileUri: uri,
                 ...fileContentJson
               };
               if (type.file?.startsWith('.')) {

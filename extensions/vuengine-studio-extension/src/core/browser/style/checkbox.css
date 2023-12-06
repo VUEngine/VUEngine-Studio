@@ -4,7 +4,7 @@
 
 [type="checkbox"] {
     -webkit-appearance: none;
-    background-color: transparent;
+    background-color: unset !important;
     border: none !important;
     flex: unset !important;
     height: var(--theia-ui-font-size2);
@@ -14,6 +14,10 @@
     padding: 0;
     position: relative;
     width: calc(2 * (var(--theia-ui-font-size2) + var(--theia-border-width))) !important;
+}
+
+.quick-input-widget [type="checkbox"] {
+    background-color: unset !important;
 }
 
 [type="checkbox"]::before {

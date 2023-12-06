@@ -16,12 +16,12 @@ import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { deepmerge } from 'deepmerge-ts';
 import cloneDeep from 'lodash/cloneDeep';
 import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
+import { IsGeneratingFilesStatus } from '../../codegen/browser/ves-codegen-types';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { ProjectFile, ProjectFileType } from '../../project/browser/ves-project-types';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
 import { VES_RENDERERS } from './renderers/ves-renderers';
-import { IsGeneratingFilesStatus, VesEditorsService } from './ves-editors-service';
 
 export const VesEditorsWidgetOptions = Symbol('VesEditorsWidgetOptions');
 export interface VesEditorsWidgetOptions {
@@ -59,8 +59,6 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     protected readonly options: VesEditorsWidgetOptions;
     @inject(VesCodeGenService)
     protected readonly vesCodeGenService: VesCodeGenService;
-    @inject(VesEditorsService)
-    protected readonly vesEditorsService: VesEditorsService;
     @inject(VesProjectService)
     protected readonly vesProjectService: VesProjectService;
     @inject(VesRumblePackService)
@@ -293,12 +291,12 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     async generateFiles(): Promise<void> {
         this.generating = true;
         this.update();
-        this.vesEditorsService.isGeneratingFiles = IsGeneratingFilesStatus.active;
+        this.vesCodeGenService.isGeneratingFiles = IsGeneratingFilesStatus.active;
         // delay template rendering to allow frontend to update status bar
         window.setTimeout(async () => {
             const numberOfGeneratedFiles = await this.vesCodeGenService.renderTemplatesForItem(this.options.typeId, this.data, this.uri);
-            this.vesEditorsService.setNumberOfGeneratedFiles(numberOfGeneratedFiles);
-            this.vesEditorsService.isGeneratingFiles = IsGeneratingFilesStatus.done;
+            this.vesCodeGenService.setNumberOfGeneratedFiles(numberOfGeneratedFiles);
+            this.vesCodeGenService.isGeneratingFiles = IsGeneratingFilesStatus.done;
             this.generating = false;
             this.update();
         }, 100);

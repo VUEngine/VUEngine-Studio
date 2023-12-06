@@ -45,7 +45,7 @@ export interface ProjectFileItem {
 };
 
 export interface ProjectFileItemWithContributor extends ProjectFileItem {
-  [id: string]: unknown & WithContributor
+  [id: string]: unknown & WithContributor & WithFileUri
 };
 
 export interface ProjectFileItemsWithContributor {
@@ -97,14 +97,25 @@ export interface ProjectFileTemplate {
 }
 
 export interface WithContributor {
-  _contributor: string
+  _contributor: ProjectContributor
   _contributorUri: URI
+}
+
+export interface WithFileUri {
+  _fileUri: URI
 }
 
 export enum ProjectFileTemplateEncoding {
   ShiftJIS = 'shift_jis',
   utf8 = 'utf8',
   win1252 = 'win1252',
+}
+
+export enum ProjectContributor {
+  Engine = 'engine',
+  Plugin = 'plugin',
+  Project = 'project',
+  Studio = 'studio',
 }
 
 export const defaultProjectData: ProjectFile = {

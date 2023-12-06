@@ -13,8 +13,6 @@ import {
   DEFAULT_IMAGE_CONVERTER_CONFIG,
   ImageConfigFileToBeConverted,
   ImageConfig,
-  ImagesLogLine,
-  ImagesLogLineType,
   ConvertedFileData,
   COMPRESSION_FLAG_LENGTH,
   ConversionResult,
@@ -89,29 +87,13 @@ export class VesImagesService {
     return this._leftToConvert;
   }
 
-  // log
-  protected _log: ImagesLogLine[] = [];
-  protected readonly onDidChangeLogEmitter = new Emitter<ImagesLogLine[]>();
-  readonly onDidChangeLog = this.onDidChangeLogEmitter.event;
-  set log(log: ImagesLogLine[]) {
-    this._log = log;
-    this.onDidChangeLogEmitter.fire(this._log);
-  }
-  get log(): ImagesLogLine[] {
-    return this._log;
-  }
-  protected pushLog(line: ImagesLogLine): void {
-    this.log.push(line);
-    this.onDidChangeLogEmitter.fire(this._log);
-  }
-  clearLog(): void {
-    this.log = [];
-    this.onDidChangeLogEmitter.fire(this._log);
-  }
-
   @postConstruct()
   protected init(): void {
     this.bindEvents();
+  }
+
+  protected pushLog(line: any): void {
+    // TODO: push to output panel
   }
 
   async convertAll(changedOnly: boolean): Promise<void> {
@@ -128,7 +110,7 @@ export class VesImagesService {
       text: changedOnly
         ? nls.localize('vuengine/imageConverter/startingToConvertChanged', 'Starting to convert changed images...')
         : nls.localize('vuengine/imageConverter/startingToConvertAll', 'Starting to convert all images...'),
-      type: ImagesLogLineType.Headline,
+      // type: ImagesLogLineType.Headline,
     });
 
     const imageConfigFilesToBeConverted = await this.getImageConfigFilesToBeConverted(changedOnly);
@@ -137,12 +119,12 @@ export class VesImagesService {
       this.pushLog({
         timestamp: Date.now(),
         text: nls.localize('vuengine/imageConverter/noneFound', 'None found.'),
-        type: ImagesLogLineType.Normal,
+        // type: ImagesLogLineType.Normal,
       });
       this.pushLog({
         timestamp: Date.now(),
         text: '',
-        type: ImagesLogLineType.Normal,
+        // type: ImagesLogLineType.Normal,
       });
 
       return;
@@ -156,7 +138,7 @@ export class VesImagesService {
     this.pushLog({
       timestamp: Date.now(),
       text: nls.localize('vuengine/imageConverter/foundXImages', 'Found {0} images', this.totalToConvert),
-      type: ImagesLogLineType.Normal,
+      // type: ImagesLogLineType.Normal,
     });
 
     await Promise.all(imageConfigFilesToBeConverted.map(async imageConfigFileToBeConverted => {
@@ -354,7 +336,7 @@ export class VesImagesService {
     this.pushLog({
       timestamp: Date.now(),
       text: `Converted ${convertedImageUri.path.base}`,
-      type: ImagesLogLineType.Normal,
+      // type: ImagesLogLineType.Normal,
       uri: convertedImageUri,
     });
 
@@ -631,12 +613,12 @@ export class VesImagesService {
         this.pushLog({
           timestamp: Date.now(),
           text: nls.localize('vuengine/imageConverter/done', 'Done'),
-          type: ImagesLogLineType.Done,
+          // type: ImagesLogLineType.Done,
         });
         this.pushLog({
           timestamp: Date.now(),
           text: '',
-          type: ImagesLogLineType.Normal,
+          // type: ImagesLogLineType.Normal,
         });
       }
     });

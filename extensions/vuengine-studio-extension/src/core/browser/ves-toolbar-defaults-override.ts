@@ -34,6 +34,11 @@ export const VesToolbarDefaultsOverride: () => DeflatedToolbarTree = () => ({
                     'id': 'ves:flashCarts:flash',
                     'command': 'ves:flashCarts:flash',
                     'icon': 'codicon codicon-layout-statusbar'
+                },
+                {
+                    'id': 'ves:codegen:generateFiles',
+                    'command': 'ves:codegen:generateFiles',
+                    'icon': 'codicon codicon-server-process'
                 }
             ]
         ]

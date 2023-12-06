@@ -37,7 +37,6 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         if (img.colorType !== 3) {
           setError('wrong color type');
         } else {
-          console.log('img', img);
           setImageData(img);
           setHeight(height || img.height);
           setWidth(width || img.width);
