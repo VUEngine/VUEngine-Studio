@@ -1,5 +1,9 @@
-{%- set sanitizedSpecName = item.name | sanitizeSpecName -%}
-{%- set imageData = itemUri | convertImage(item) -%}
+{%- if item._forEachOfBasename is defined -%}
+    {%- set sanitizedSpecName = item._forEachOfBasename | sanitizeSpecName -%}
+{%- else -%}
+    {%- set sanitizedSpecName = item.name | sanitizeSpecName -%}
+{%- endif -%}
+{%- set imageData = itemUri | convertImage(item, item._forEachOf) -%}
 
 {%- set mapsDataTotalLength = 0 -%}
 {%- for map in imageData.maps -%}

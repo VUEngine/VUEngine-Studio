@@ -7,6 +7,7 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { OutputChannelManager, OutputChannelSeverity } from '@theia/output/lib/browser/output-channel';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import * as iconv from 'iconv-lite';
+import * as jsonLogic from 'json-logic-js';
 import * as nunjucks from 'nunjucks';
 import { VesAudioConverterService } from '../../audio-converter/browser/ves-audio-converter-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
@@ -21,9 +22,11 @@ import {
   ProjectFileTemplate,
   ProjectFileTemplateEncoding,
   ProjectFileTemplateEventType,
+  ProjectFileTemplateTargetForEachOfType,
   WithContributor
 } from '../../project/browser/ves-project-types';
 import { CODEGEN_CHANNEL_NAME, IsGeneratingFilesStatus, SHOW_DONE_DURATION } from './ves-codegen-types';
+import { FileStatWithMetadata } from '@theia/filesystem/lib/common/files';
 
 @injectable()
 export class VesCodeGenService {
@@ -187,8 +190,19 @@ export class VesCodeGenService {
   }
 
   protected isChanged(): boolean {
-    // TODO
+    // TODO: utilize this.fileHasChanged
     return false;
+  }
+
+  protected fileHasChanged(itemFileStat: FileStatWithMetadata, sourceFileStat: FileStatWithMetadata, convertedFileStat?: FileStatWithMetadata): boolean {
+    // if a file (or the conv file) has been edited (mtime) or has been moved or copied to this folder (ctime)
+    // after the converted file has been generated/last edited, consider it a change
+    return (!convertedFileStat
+      || sourceFileStat.ctime > convertedFileStat.mtime
+      || sourceFileStat.mtime > convertedFileStat.mtime
+      || itemFileStat.ctime > convertedFileStat.mtime
+      || itemFileStat.mtime > convertedFileStat.mtime
+    );
   }
 
   protected async renderTemplateToFile(
@@ -261,14 +275,14 @@ export class VesCodeGenService {
       itemUri: itemUri
     };
 
-    return this.renderFileFromTemplate(templateId, template, uri, data, encoding);
+    return this.renderFilesFromTemplate(templateId, template, uri, data, encoding);
   }
 
-  protected async renderFileFromTemplate(
+  protected async renderFilesFromTemplate(
     templateId: string,
     template: ProjectFileTemplate & WithContributor,
     itemUri: URI,
-    data: object,
+    data: any,
     encoding: ProjectFileTemplateEncoding
   ): Promise<void> {
     let templateUri = template._contributorUri;
@@ -287,24 +301,73 @@ export class VesCodeGenService {
 
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-    if (workspaceRootUri) {
-      const target = template.target
-        .replace(/\$\{([\s\S]*?)\}/ig, match => {
-          match = match.substring(2, match.length - 1);
-          // @ts-ignore
-          return this.getByKey(data.item, match);
+    if (!workspaceRootUri) {
+      return;
+    }
+
+    await Promise.all(template.targets.map(async t => {
+      if (t.conditions && jsonLogic.apply(t.conditions, data.item) !== true) {
+        return;
+      }
+
+      const findTargetAndRender = async (additionalData?: object): Promise<void> => {
+        const updatedData = {
+          ...data,
+          item: {
+            ...data.item,
+            ...(additionalData || {})
+          }
+        };
+
+        const target = t.path
+          .replace(/\$\{([\s\S]*?)\}/ig, match => {
+            match = match.substring(2, match.length - 1);
+            return this.getByKey(updatedData.item, match);
+          });
+
+        const targetPathParts = target.split('/');
+        let targetUri = t.root === 'project'
+          ? workspaceRootUri
+          : itemUri.parent;
+        targetPathParts.forEach(targetPathPart => {
+          targetUri = targetUri.resolve(targetPathPart);
         });
 
-      const targetPathParts = target.split('/');
-      let targetUri = template.targetRoot === 'project'
-        ? workspaceRootUri
-        : itemUri.parent;
-      targetPathParts.forEach(targetPathPart => {
-        targetUri = targetUri.resolve(targetPathPart);
-      });
+        return this.renderTemplateToFile(
+          templateId,
+          targetUri,
+          templateString,
+          updatedData,
+          encoding
+        );
+      };
 
-      return this.renderTemplateToFile(templateId, targetUri, templateString, data, encoding);
-    }
+      if (t.forEachOf) {
+        const forEachOfType = Object.keys(t.forEachOf)[0];
+        const forEachOfValue = Object.values(t.forEachOf)[0];
+        const items = [];
+        switch (forEachOfType) {
+          case ProjectFileTemplateTargetForEachOfType.var:
+            items.push(...data.item[forEachOfValue as string]);
+            if (!Array.isArray(items)) {
+              return console.error(`forEachOf "${forEachOfValue}" does not exist on item or is not an array`);
+            }
+            break;
+          case ProjectFileTemplateTargetForEachOfType.fileInFolder:
+            const paths = await Promise.all(window.electronVesCore.findFiles(await this.fileService.fsPath(itemUri.parent), forEachOfValue)
+              .map(async p => workspaceRootUri.relative(itemUri.parent.resolve(p))));
+            items.push(...paths);
+            break;
+        }
+
+        await Promise.all(items.map(async (x: string) => findTargetAndRender({
+          _forEachOf: x,
+          _forEachOfBasename: workspaceRootUri.resolve(x).path.name,
+        })));
+      } else {
+        return findTargetAndRender();
+      }
+    }));
   }
 
   protected async handlePluginChange(): Promise<void> {
@@ -443,7 +506,8 @@ export class VesCodeGenService {
       const callback = args.pop();
       const imageConfigFileUri: URI = args[0];
       const imageConfig: ImageConfig = args[1];
-      const result = await this.vesImageService.convertImage(imageConfigFileUri, imageConfig);
+      const filePath: string = args[2];
+      const result = await this.vesImageService.convertImage(imageConfigFileUri, imageConfig, filePath);
       // eslint-disable-next-line no-null/no-null
       callback(null, result);
     }, true);

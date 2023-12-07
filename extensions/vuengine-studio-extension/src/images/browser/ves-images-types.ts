@@ -2,7 +2,7 @@ import URI from '@theia/core/lib/common/uri';
 import { DataSection } from '../../editors/browser/components/Common/CommonTypes';
 
 export interface ImageConfig {
-  sourceFile: string
+  files: string[]
   name: string
   section: DataSection
   tileset: {
@@ -93,7 +93,7 @@ export interface TilesCompressionResult {
 export const COMPRESSION_FLAG_LENGTH = 1;
 
 export const DEFAULT_IMAGE_CONVERTER_CONFIG: ImageConfig = {
-  sourceFile: '',
+  files: [],
   name: '',
   section: DataSection.ROM,
   tileset: {

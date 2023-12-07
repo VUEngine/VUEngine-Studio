@@ -1,4 +1,5 @@
 import URI from '@theia/core/lib/common/uri';
+import { AdditionalOperation, RulesLogic } from 'json-logic-js';
 
 export const VUENGINE_EXT = 'vuengine';
 
@@ -87,9 +88,24 @@ export enum ProjectFileTemplateEventType {
   itemOfTypeGotDeleted = 'itemOfTypeGotDeleted',
 }
 
+export enum ProjectFileTemplateTargetRoot {
+  project = 'project',
+  file = 'file',
+}
+export enum ProjectFileTemplateTargetForEachOfType {
+  var = 'var',
+  fileInFolder = 'fileInFolder',
+}
+
+export interface ProjectFileTemplateTarget {
+  path: string
+  root: ProjectFileTemplateTargetRoot
+  forEachOf?: { [ProjectFileTemplateTargetForEachOfType.var]: string } | { [ProjectFileTemplateTargetForEachOfType.fileInFolder]: string | string[] }
+  conditions?: RulesLogic<AdditionalOperation>
+}
+
 export interface ProjectFileTemplate {
-  target: string
-  targetRoot: string
+  targets: ProjectFileTemplateTarget[]
   template: string
   encoding?: ProjectFileTemplateEncoding
   itemSpecific?: string
@@ -121,14 +137,61 @@ export enum ProjectContributor {
 export const defaultProjectData: ProjectFile = {
   templates: {
     'image.c': {
-      target: 'Converted/${_filename}.c',
-      targetRoot: 'file',
+      targets: [{
+        path: 'Converted/${_forEachOfBasename}.c',
+        root: ProjectFileTemplateTargetRoot.file,
+        forEachOf: { 'var': 'files' },
+        conditions: {
+          'and': [
+            { '>': [{ 'var': 'files.length' }, 0] },
+            {
+              'or': [
+                { '==': [{ 'var': 'animation.isAnimation' }, false] },
+                { '==': [{ 'var': 'animation.individualFiles' }, false] }
+              ]
+            },
+            { '==': [{ 'var': 'tileset.shared' }, false] }
+          ]
+        }
+      }, {
+        path: 'Converted/${_forEachOfBasename}.c',
+        root: ProjectFileTemplateTargetRoot.file,
+        forEachOf: { 'fileInFolder': ['*.png'] },
+        conditions: {
+          'and': [
+            { '==': [{ 'var': 'files.length' }, 0] },
+            {
+              'or': [
+                { '==': [{ 'var': 'animation.isAnimation' }, false] },
+                { '==': [{ 'var': 'animation.individualFiles' }, false] }
+              ]
+            },
+            { '==': [{ 'var': 'tileset.shared' }, false] }
+          ]
+        }
+      }, {
+        path: 'Converted/${_filename}.c',
+        root: ProjectFileTemplateTargetRoot.file,
+        conditions: {
+          'or': [
+            {
+              'and': [
+                { '==': [{ 'var': 'animation.isAnimation' }, true] },
+                { '==': [{ 'var': 'animation.individualFiles' }, true] }
+              ]
+            },
+            { '==': [{ 'var': 'tileset.shared' }, true] }
+          ]
+        }
+      }],
       template: 'templates/image.c.nj',
       itemSpecific: 'Image'
     },
     'romHeader.h': {
-      target: 'source/romHeader.h',
-      targetRoot: 'project',
+      targets: [{
+        path: 'source/romHeader.h',
+        root: ProjectFileTemplateTargetRoot.project,
+      }],
       template: 'templates/romHeader.h.nj',
       encoding: ProjectFileTemplateEncoding.ShiftJIS
     }
@@ -139,9 +202,11 @@ export const defaultProjectData: ProjectFile = {
       schema: {
         title: 'Image Conversion',
         properties: {
-          sourceFile: {
-            type: 'string',
-            default: ''
+          files: {
+            type: 'array',
+            items: {
+              type: 'string'
+            }
           },
           name: {
             type: 'string',
@@ -234,7 +299,7 @@ export const defaultProjectData: ProjectFile = {
             }
           }
         },
-        required: ['sourceFile', 'section']
+        required: ['files', 'section']
       },
       uiSchema: {
         type: 'ImageConvEditor',
