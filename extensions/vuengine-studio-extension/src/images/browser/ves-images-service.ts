@@ -1,24 +1,20 @@
-import { Emitter, isWindows, nls } from '@theia/core';
+import { isWindows } from '@theia/core';
 import { LabelProvider } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';
-import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { inject, injectable } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { FileStatWithMetadata } from '@theia/filesystem/lib/common/files';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { deepmerge } from 'deepmerge-ts';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
+import { compressTiles } from './ves-images-compressor';
 import {
-  DEFAULT_IMAGE_CONVERTER_CONFIG,
-  ImageConfigFileToBeConverted,
-  ImageConfig,
-  ConvertedFileData,
   COMPRESSION_FLAG_LENGTH,
   ConversionResult,
-  ImageCompressionType
+  ConvertedFileData,
+  ImageCompressionType,
+  ImageConfig
 } from './ves-images-types';
-import { compressTiles } from './ves-images-compressor';
 
 @injectable()
 export class VesImagesService {
@@ -35,120 +31,7 @@ export class VesImagesService {
   @inject(WorkspaceService)
   protected readonly workspaceService: WorkspaceService;
 
-  // is converting
-  protected _isConverting: boolean = false;
-  protected readonly onDidChangeIsConvertingEmitter = new Emitter<boolean>();
-  readonly onDidChangeIsConverting = this.onDidChangeIsConvertingEmitter.event;
-  set isConverting(isConverting: boolean) {
-    this._isConverting = isConverting;
-    this.onDidChangeIsConvertingEmitter.fire(this._isConverting);
-  }
-  get isConverting(): boolean {
-    return this._isConverting;
-  }
-
-  // progress
-  protected _progress: number = 0;
-  protected readonly onDidChangeProgressEmitter = new Emitter<number>();
-  readonly onDidChangeProgress = this.onDidChangeProgressEmitter.event;
-  set progress(progress: number) {
-    this._progress = progress > 100
-      ? 100
-      : progress > 0
-        ? progress
-        : 0;
-    this.onDidChangeProgressEmitter.fire(this._progress);
-  }
-  get progress(): number {
-    return this._progress;
-  }
-
-  // total images to convert
-  protected _totalToConvert: number = 0;
-  protected readonly onDidChangeTotalToConvertEmitter = new Emitter<number>();
-  readonly onDidChangeTotalToConvert = this.onDidChangeTotalToConvertEmitter.event;
-  set totalToConvert(totalToConvert: number) {
-    this._totalToConvert = totalToConvert;
-    this.onDidChangeTotalToConvertEmitter.fire(this._totalToConvert);
-  }
-  get totalToConvert(): number {
-    return this._totalToConvert;
-  }
-
-  // images left to convert
-  protected _leftToConvert: number = 0;
-  protected readonly onDidChangeLeftToConvertEmitter = new Emitter<number>();
-  readonly onDidChangeLeftToConvert = this.onDidChangeLeftToConvertEmitter.event;
-  set leftToConvert(leftToConvert: number) {
-    this._leftToConvert = leftToConvert;
-    this.onDidChangeLeftToConvertEmitter.fire(this._leftToConvert);
-  }
-  get leftToConvert(): number {
-    return this._leftToConvert;
-  }
-
-  @postConstruct()
-  protected init(): void {
-    this.bindEvents();
-  }
-
-  protected pushLog(line: any): void {
-    // TODO: push to output panel
-  }
-
-  async convertAll(changedOnly: boolean): Promise<void> {
-    if (this.isConverting) {
-      return;
-    }
-
-    await this.doConvertFiles(changedOnly);
-  }
-
-  protected async doConvertFiles(changedOnly: boolean): Promise<void> {
-    this.pushLog({
-      timestamp: Date.now(),
-      text: changedOnly
-        ? nls.localize('vuengine/imageConverter/startingToConvertChanged', 'Starting to convert changed images...')
-        : nls.localize('vuengine/imageConverter/startingToConvertAll', 'Starting to convert all images...'),
-      // type: ImagesLogLineType.Headline,
-    });
-
-    const imageConfigFilesToBeConverted = await this.getImageConfigFilesToBeConverted(changedOnly);
-
-    if (imageConfigFilesToBeConverted.length === 0) {
-      this.pushLog({
-        timestamp: Date.now(),
-        text: nls.localize('vuengine/imageConverter/noneFound', 'None found.'),
-        // type: ImagesLogLineType.Normal,
-      });
-      this.pushLog({
-        timestamp: Date.now(),
-        text: '',
-        // type: ImagesLogLineType.Normal,
-      });
-
-      return;
-    }
-
-    this.progress = 0;
-    this.isConverting = true;
-    this.totalToConvert = imageConfigFilesToBeConverted.length;
-    this.leftToConvert = this.totalToConvert;
-
-    this.pushLog({
-      timestamp: Date.now(),
-      text: nls.localize('vuengine/imageConverter/foundXImages', 'Found {0} images', this.totalToConvert),
-      // type: ImagesLogLineType.Normal,
-    });
-
-    await Promise.all(imageConfigFilesToBeConverted.map(async imageConfigFileToBeConverted => {
-      const conversionResult = await this.convertImage(imageConfigFileToBeConverted.configFileUri, imageConfigFileToBeConverted.config);
-      // TODO: trigger template render. We'll need a _fileUri property for each item to be added first.
-      console.log(conversionResult);
-    }));
-  }
-
-  async convertImage(imageConfigFileUri: URI, imageConfig: ImageConfig): Promise<ConversionResult> {
+  async convertImage(imageConfigFileUri: URI, imageConfig: ImageConfig, filePath?: string): Promise<ConversionResult> {
     const result: ConversionResult = {
       animation: {},
       maps: [],
@@ -162,17 +45,16 @@ export class VesImagesService {
     };
 
     // throw at grit
+    const files = filePath
+      ? [filePath]
+      : imageConfig.files || [];
     const gritUri = await this.getGritUri();
     const imagePaths: string[] = [];
-    if (imageConfig.tileset.shared || (imageConfig.animation.isAnimation && imageConfig.animation.individualFiles)) {
-      const paths = await Promise.all(window.electronVesCore.findFiles(await this.fileService.fsPath(imageConfigFileUri.parent), '*.png')
-        .map(async filePath => this.fileService.fsPath(imageConfigFileUri.parent.resolve(filePath))));
-      imagePaths.push(...paths);
-    } else if (imageConfig.sourceFile) {
-      await this.workspaceService.ready;
-      const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-      imagePaths.push(workspaceRootUri.resolve(imageConfig.sourceFile).path.toString());
-    }
+    await this.workspaceService.ready;
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
+    files.map(f => {
+      imagePaths.push(workspaceRootUri.resolve(f).path.toString());
+    });
     const name = imageConfig.name ? imageConfig.name : imageConfigFileUri.path.name;
     const gritArguments = this.getGritArguments(name, imageConfig);
     const tempDirName = `__${this.vesCommonService.nanoid()}`;
@@ -248,8 +130,6 @@ export class VesImagesService {
               frames: convertedFileData.length,
               largestFrame,
             };
-            this.reportConverted(imageConfigFileUri);
-
           } else {
             // compute frame offsets for spritesheet animations
             // TODO: do only for __ANIMATED_SINGLE
@@ -281,7 +161,6 @@ export class VesImagesService {
                 });
                 frames++;
               }
-              this.reportConverted(imageConfigFileUri);
             });
             result.animation = {
               frames,
@@ -330,25 +209,6 @@ export class VesImagesService {
     }));
 
     return convertedFileData;
-  }
-
-  protected reportConverted(convertedImageUri: URI): void {
-    this.pushLog({
-      timestamp: Date.now(),
-      text: `Converted ${convertedImageUri.path.base}`,
-      // type: ImagesLogLineType.Normal,
-      uri: convertedImageUri,
-    });
-
-    this.leftToConvert--;
-    this.progress = Math.ceil((this.totalToConvert - this.leftToConvert) * 100 / this.totalToConvert);
-
-  }
-
-  protected getGeneratedFileUri(imageConfigFileUri: URI, imageUri: URI): URI {
-    return imageConfigFileUri.parent
-      .resolve('Converted')
-      .resolve(`${imageUri.path.name}.c`);
   }
 
   protected async handleCompression(imageConfig: ImageConfig, conversionResult: ConversionResult): Promise<void> {
@@ -407,163 +267,6 @@ export class VesImagesService {
     });
   }
 
-  protected async getImageConfigFilesToBeConverted(changedOnly: boolean): Promise<ImageConfigFileToBeConverted[]> {
-    await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-
-    const imageConfigFilesToBeConverted: ImageConfigFileToBeConverted[] = [];
-    const imageConfigFiles = window.electronVesCore.findFiles(await this.fileService.fsPath(workspaceRootUri), '**/*.imageConv', {
-      dot: false,
-      ignore: ['build/**'],
-      nodir: true
-    });
-    for (const imageConfigFile of imageConfigFiles) {
-      const imageConfigFileUri = workspaceRootUri.resolve(imageConfigFile);
-      const config = await this.getConverterConfig(imageConfigFileUri);
-
-      const name = config.name ? config.name : imageConfigFileUri.path.name;
-
-      const images = await this.getRelevantImageFiles(changedOnly, imageConfigFileUri, config, name);
-      if (images.length === 0) {
-        // console.log(`No relevant images for ${imageConfigFileUri.path.base}`);
-        continue;
-      }
-
-      imageConfigFilesToBeConverted.push({
-        configFileUri: imageConfigFileUri,
-        config,
-      });
-    }
-
-    return imageConfigFilesToBeConverted;
-  }
-
-  protected async getRelevantImageFiles(changedOnly: boolean, imageConfigFileUri: URI, config: ImageConfig, name: string): Promise<URI[]> {
-    let foundImages: URI[] = [];
-    if (config.tileset.shared || (config.animation.isAnimation && config.animation.individualFiles)) {
-      const resolved = await this.fileService.resolve(imageConfigFileUri.parent);
-      if (resolved.children) {
-        await Promise.all(resolved.children.map(async child => {
-          if (child.name.endsWith('.png') && await this.fileService.exists(child.resource)) {
-            foundImages.push(child.resource);
-          }
-        }));
-      }
-    } else {
-      const fileUri = imageConfigFileUri.parent.resolve(config.sourceFile);
-      if (config.sourceFile.endsWith('.png') && await this.fileService.exists(fileUri)) {
-        foundImages.push(fileUri);
-      }
-    }
-
-    // if changedOnly flag is set, remove files that have not been changed
-    if (changedOnly) {
-      foundImages = await this.getOnlyChangedImages(foundImages, config, imageConfigFileUri, name);
-    }
-
-    // remove duplicates and return
-    return [...new Set(foundImages)];
-  }
-
-  protected async getOnlyChangedImages(
-    foundImages: URI[],
-    config: ImageConfig,
-    imageConfigFileUri: URI,
-    name: string,
-  ): Promise<URI[]> {
-    const imageConfigFileStat = await this.fileService.resolve(imageConfigFileUri, { resolveMetadata: true });
-    if ((config.animation.isAnimation && config.animation.individualFiles) || config.tileset.shared) {
-      /*
-      TODO:
-      if (!await this.newerThanCollectiveConvertedFile(foundImages, imageConfigFileUri, imageConfigFileStat, name)) {
-        return [];
-      }
-      */
-    } else {
-      const changedImages: URI[] = [];
-      await Promise.all(foundImages.map(async foundImage => {
-        const foundImageStat = await this.fileService.resolve(foundImage, { resolveMetadata: true });
-        const convertedFileUri = this.getGeneratedFileUri(imageConfigFileUri, foundImage);
-        const convertedFileStat = await this.fileService.exists(convertedFileUri)
-          ? await this.fileService.resolve(convertedFileUri, { resolveMetadata: true })
-          : undefined;
-        if (this.fileHasChanged(imageConfigFileStat, foundImageStat, convertedFileStat)) {
-          changedImages.push(foundImage);
-        }
-      }));
-      return changedImages;
-    }
-
-    return foundImages;
-  }
-
-  protected async isChanged(
-    imageUri: URI,
-    config: ImageConfig,
-    imageConfigFileUri: URI,
-    name: string,
-  ): Promise<boolean> {
-    const imageConfigFileStat = await this.fileService.resolve(imageConfigFileUri, { resolveMetadata: true });
-    if ((config.animation.isAnimation && config.animation.individualFiles) || config.tileset.shared) {
-      return this.newerThanCollectiveConvertedFile(imageUri, imageConfigFileUri, imageConfigFileStat, name);
-    } else {
-      const imageUriStat = await this.fileService.resolve(imageUri, { resolveMetadata: true });
-      const convertedFileUri = this.getGeneratedFileUri(imageConfigFileUri, imageUri);
-      const convertedFileStat = await this.fileService.exists(convertedFileUri)
-        ? await this.fileService.resolve(convertedFileUri, { resolveMetadata: true })
-        : undefined;
-      return this.fileHasChanged(imageConfigFileStat, imageUriStat, convertedFileStat);
-    }
-  }
-
-  protected fileHasChanged(imageConfigFileStat: FileStatWithMetadata, fileStat: FileStatWithMetadata, convertedFileStat?: FileStatWithMetadata): boolean {
-    // if an image file (or the image config file) has been edited (mtime) or has been moved or copied to this folder (ctime)
-    // after the converted file has been generated/last edited, consider it a change
-    return (!convertedFileStat
-      || fileStat.ctime > convertedFileStat.mtime
-      || fileStat.mtime > convertedFileStat.mtime
-      || imageConfigFileStat.ctime > convertedFileStat.mtime
-      || imageConfigFileStat.mtime > convertedFileStat.mtime
-    );
-  }
-
-  protected async newerThanCollectiveConvertedFile(
-    file: URI,
-    imageConfigFileUri: URI,
-    imageConfigFileStat: FileStatWithMetadata,
-    name: string): Promise<boolean> {
-    const convertedFileUri = imageConfigFileUri.parent.resolve('Converted').resolve(`${name}.c`);
-    if (!await this.fileService.exists(convertedFileUri)) {
-      return true;
-    }
-
-    let atLeastOneFileNewer = false;
-    const convertedFileStat = await this.fileService.exists(convertedFileUri)
-      ? await this.fileService.resolve(convertedFileUri, { resolveMetadata: true })
-      : undefined;
-
-    if (!atLeastOneFileNewer) {
-      const fileStat = await this.fileService.resolve(file, { resolveMetadata: true });
-      if (this.fileHasChanged(imageConfigFileStat, fileStat, convertedFileStat)) {
-        atLeastOneFileNewer = true;
-      }
-    }
-
-    return atLeastOneFileNewer;
-  }
-
-  protected async getConverterConfig(file: URI): Promise<ImageConfig> {
-    const fileContents = await this.fileService.readFile(file);
-    const config = JSON.parse(fileContents.value.toString());
-    const merged = deepmerge(DEFAULT_IMAGE_CONVERTER_CONFIG, config);
-
-    if (!Array.isArray(merged.images) || !merged.images.length) {
-      merged.images = ['.'];
-    }
-
-    return merged;
-  }
-
   protected getGritArguments(name: string, config: ImageConfig): string[] {
     const gritArguments = ['-fh!', '-ftc', '-gB2', '-p!', '-mB16:hv_i11'];
 
@@ -603,24 +306,5 @@ export class VesImagesService {
       .resolve(this.vesCommonService.getOs())
       .resolve('grit')
       .resolve(isWindows ? 'grit.exe' : 'grit');
-  }
-
-  protected bindEvents(): void {
-    this.onDidChangeLeftToConvert(left => {
-      if (left === 0) {
-        this.isConverting = false;
-        this.progress = 100;
-        this.pushLog({
-          timestamp: Date.now(),
-          text: nls.localize('vuengine/imageConverter/done', 'Done'),
-          // type: ImagesLogLineType.Done,
-        });
-        this.pushLog({
-          timestamp: Date.now(),
-          text: '',
-          // type: ImagesLogLineType.Normal,
-        });
-      }
-    });
   }
 }

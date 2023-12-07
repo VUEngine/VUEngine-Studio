@@ -56,7 +56,7 @@ export default function General(props: GeneralProps): React.JSX.Element {
         const name = workspaceRootUri.resolve(sourceFile).path.name.replace(/([A-Z])/g, ' $1').trim();
 
         const updateData: Partial<ImageConfig> = {
-            sourceFile
+            files: [sourceFile]
         };
 
         if (sourceFile) {
@@ -92,7 +92,7 @@ export default function General(props: GeneralProps): React.JSX.Element {
                     type="text"
                     className="theia-input"
                     style={{ flexGrow: 1 }}
-                    value={imageConvData.sourceFile}
+                    value={imageConvData.files[0]}
                     onBlur={e => setSourceFile(e.target.value)}
                     onChange={e => setSourceFile(e.target.value)}
                 />

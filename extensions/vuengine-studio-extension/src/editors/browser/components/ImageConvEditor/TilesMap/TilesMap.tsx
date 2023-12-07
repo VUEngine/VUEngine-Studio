@@ -70,7 +70,7 @@ export default function TilesMap(): React.JSX.Element {
                     checked={imageConvData.tileset.shared}
                     onChange={toggleShareTiles}
                 />
-                {nls.localize('vuengine/imageConvEditor/shareTiles', 'Convert all images in this folder with a shared tileset')}
+                {nls.localize('vuengine/imageConvEditor/shareTiles', 'All maps should share a single tileset')}
             </label>
         </VContainer>
         <VContainer>

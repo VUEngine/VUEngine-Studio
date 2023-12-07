@@ -35,7 +35,7 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
   return (
     <VContainer gap={10}>
       <div className="preview-container">
-        {imageConvData.sourceFile && <Sprite
+        {imageConvData.files && <Sprite
           animate={imageConvData.animation.isAnimation && state.preview.animations}
           frames={imageConvData.animation.isAnimation ? imageConvData.animation.frames : 1}
           displacement={{
@@ -44,7 +44,7 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
             z: 0,
             parallax: 0,
           }}
-          imagePath={imageConvData.sourceFile}
+          imagePath={imageConvData.files[0]}
           palette={state.preview.palette}
           zoom={state.preview.zoom}
           fileService={fileService}

@@ -2983,6 +2983,11 @@
   resolved "https://registry.yarnpkg.com/@types/js-yaml/-/js-yaml-3.12.9.tgz#b7a2bcc679a54c4240bd2909f58ce3396967e3f7"
   integrity sha512-s5v3+2RB96nd7AOZXLScwHDRClor83+0E5q+5fzq0fTFXw8spF3QWHAUmHwItmmlr7XnDjpM0FkAgNKHzDTXtg==
 
+"@types/json-logic-js@^2.0.6":
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/@types/json-logic-js/-/json-logic-js-2.0.6.tgz#ceb090bcaf7ec4d5c7c4c3b5225cf53733e76624"
+  integrity sha512-X8f94UmgbRE9kRs83J/Jf+fndEVbBGuZLIeLHBOKYGxAX2g8dMAV41RqwkvoMdybRZ3vZoHEdnMnF8VPiP0OOA==
+
 "@types/json-schema@*", "@types/json-schema@^7.0.13", "@types/json-schema@^7.0.3", "@types/json-schema@^7.0.5", "@types/json-schema@^7.0.7", "@types/json-schema@^7.0.8", "@types/json-schema@^7.0.9":
   version "7.0.14"
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.14.tgz#74a97a5573980802f32c8e47b663530ab3b6b7d1"
@@ -8976,6 +8981,11 @@ json-buffer@3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/json-buffer/-/json-buffer-3.0.1.tgz#9338802a30d3b6605fbe0613e094008ca8c05a13"
   integrity sha512-4bV5BfR2mqfQTJm+V5tPPdf+ZpuhiIvTuAB5g8kcrXOZpTT/QwwVRWBywX1ozr6lEuPdbHxwaJlm9G6mI2sfSQ==
+
+json-logic-js@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/json-logic-js/-/json-logic-js-2.0.2.tgz#b613e095f5e598cb78f7b9a2bbf638e74cf98158"
+  integrity sha512-ZBtBdMJieqQcH7IX/LaBsr5pX+Y5JIW+EhejtM3Ffg2jdN9Iwf+Ht6TbHnvAZ/YtwyuhPaCBlnvzrwVeWdvGDQ==
 
 json-parse-better-errors@^1.0.1:
   version "1.0.2"
