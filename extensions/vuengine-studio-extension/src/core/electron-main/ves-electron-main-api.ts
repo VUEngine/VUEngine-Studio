@@ -15,6 +15,7 @@ import { ImageData } from '../browser/ves-common-types';
 import {
     VES_CHANNEL_DEREFERENCE_JSON_SCHEMA,
     VES_CHANNEL_FIND_FILES,
+    VES_CHANNEL_GET_IMAGE_DIMENSIONS,
     VES_CHANNEL_GET_PHYSICAL_CPU_COUNT,
     VES_CHANNEL_GET_USER_DEFAULT,
     VES_CHANNEL_ON_SERIAL_DEVICE_CHANGE,
@@ -26,6 +27,7 @@ import {
     VES_CHANNEL_SET_ZOOM_FACTOR,
     VES_CHANNEL_SORT_JSON
 } from '../electron-common/ves-electron-api';
+import sizeOf from 'image-size';
 
 @injectable()
 export class VesMainApi implements ElectronMainApplicationContribution {
@@ -58,6 +60,7 @@ export class VesMainApi implements ElectronMainApplicationContribution {
 
             event.returnValue = results;
         });
+        ipcMain.handle(VES_CHANNEL_GET_IMAGE_DIMENSIONS, async (event, path: string) => sizeOf(path));
         ipcMain.on(VES_CHANNEL_GET_PHYSICAL_CPU_COUNT, event => {
             event.returnValue = require('physical-cpu-count');
         });
