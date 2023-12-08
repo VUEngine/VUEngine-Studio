@@ -1,4 +1,4 @@
-import { MessageService, URI, nls } from '@theia/core';
+import { MaybeArray, MessageService, URI, nls } from '@theia/core';
 import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
@@ -21,49 +21,64 @@ interface GeneralProps {
 export default function General(props: GeneralProps): React.JSX.Element {
     const { fileUri, fileService, fileDialogService, messageService, workspaceService } = props;
     const { imageConvData, setImageConvData } = useContext(ImageConvEditorContext) as ImageConvEditorContextType;
+    const workspaceRootUri = workspaceService.tryGetRoots()[0]?.resource;
 
     const setName = (n: string): void => {
         setImageConvData({ name: n.trim() });
     };
 
-    const selectSourceFile = async (): Promise<void> => {
+    const selectFiles = async (): Promise<void> => {
         const openFileDialogProps: OpenFileDialogProps = {
-            title: nls.localize('vuengine/imageConvEditor/selectSourceFile', 'Select source file'),
+            title: nls.localize('vuengine/imageConvEditor/selectFiles', 'Select files'),
             canSelectFolders: false,
             canSelectFiles: true,
+            canSelectMany: true,
             filters: { 'PNG': ['.png'] }
         };
         const currentPath = await fileService.resolve(fileUri.parent);
-        const uri = await fileDialogService.showOpenDialog(openFileDialogProps, currentPath);
-        if (uri) {
-            const workspaceRootUri = workspaceService.tryGetRoots()[0]?.resource;
-            const source = await fileService.resolve(uri);
-            if (source.isFile) {
-                const relativeUri = workspaceRootUri.relative(uri);
-                if (!relativeUri) {
-                    messageService.error(
-                        nls.localize('vuengine/imageConvEditor/errorSourceFileMustBeInWorkspace', 'Source file must live in workspace.')
-                    );
-                } else {
-                    setSourceFile(relativeUri.fsPath());
-                }
+        let uris: MaybeArray<URI> | undefined = await fileDialogService.showOpenDialog(openFileDialogProps, currentPath);
+        if (uris) {
+            const newFiles: string[] = [];
+            if (!Array.isArray(uris)) {
+                uris = [uris];
             }
+            await Promise.all(uris.map(async u => {
+                const source = await fileService.resolve(u);
+                if (source.isFile) {
+                    const relativeUri = workspaceRootUri.relative(u);
+                    if (!relativeUri) {
+                        messageService.error(
+                            nls.localize('vuengine/imageConvEditor/errorSourceFileMustBeInWorkspace', 'Source file must live in workspace.')
+                        );
+                    } else {
+                        newFiles.push(relativeUri.fsPath());
+                    }
+                }
+            }));
+            addFiles(newFiles);
         }
     };
 
-    const setSourceFile = async (sourceFile: string) => {
-        const workspaceRootUri = workspaceService.tryGetRoots()[0]?.resource;
-        const name = workspaceRootUri.resolve(sourceFile).path.name.replace(/([A-Z])/g, ' $1').trim();
-
+    const addFiles = async (newFiles: string[]) => {
         const updateData: Partial<ImageConfig> = {
-            files: [sourceFile]
+            files: [...new Set([
+                ...imageConvData.files,
+                ...newFiles,
+            ].sort())],
         };
 
-        if (sourceFile) {
+        if (updateData.files?.length) {
+            const name = workspaceRootUri.resolve(updateData.files[0]).path.name.replace(/([A-Z])/g, ' $1').trim();
             updateData.name = name;
         }
 
         setImageConvData(updateData);
+    };
+
+    const removeFile = async (index: number) => {
+        setImageConvData({
+            files: imageConvData.files.filter((f, i) => i !== index),
+        });
     };
 
     const setSection = (section: DataSection) => {
@@ -85,28 +100,6 @@ export default function General(props: GeneralProps): React.JSX.Element {
         </VContainer>
         <VContainer>
             <label>
-                {nls.localize('vuengine/imageConvEditor/path', 'Path')}
-            </label>
-            <HContainer>
-                <input
-                    type="text"
-                    className="theia-input"
-                    style={{ flexGrow: 1 }}
-                    value={imageConvData.files[0]}
-                    onBlur={e => setSourceFile(e.target.value)}
-                    onChange={e => setSourceFile(e.target.value)}
-                />
-                <button
-                    className="theia-button secondary"
-                    style={{ marginLeft: 0 }}
-                    onClick={selectSourceFile}
-                >
-                    <i className="fa fa-ellipsis-h" />
-                </button>
-            </HContainer>
-        </VContainer>
-        <VContainer>
-            <label>
                 {nls.localize('vuengine/imageConvEditor/section', 'Section')}
             </label>
             <SelectComponent
@@ -122,6 +115,35 @@ export default function General(props: GeneralProps): React.JSX.Element {
                 }]}
                 onChange={option => setSection(option.value as DataSection)}
             />
+        </VContainer>
+        <VContainer>
+            <label>
+                {nls.localize('vuengine/imageConvEditor/files', 'Files')}
+            </label>
+            <HContainer alignItems="start">
+                <HContainer grow={1} wrap="wrap">
+                    {imageConvData.files.length === 0
+                        ? 'No images select. All images in this folder will be converted.'
+                        : imageConvData.files.map((f, i) => {
+                            const fullUri = workspaceRootUri.resolve(f);
+                            return <div
+                                style={{ width: '30%' }}
+                                title={f}
+                            >
+                                <img src={fullUri.path.fsPath()} />
+                                {fullUri.path.base}
+                                <i className="fa fa-trash" onClick={() => removeFile(i)} />
+                            </div>;
+                        })}
+                </HContainer>
+                <button
+                    className="theia-button secondary"
+                    style={{ marginLeft: 0 }}
+                    onClick={selectFiles}
+                >
+                    <i className="fa fa-plus" />
+                </button>
+            </HContainer>
         </VContainer>
     </VContainer>;
 }
