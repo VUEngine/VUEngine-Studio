@@ -45,13 +45,17 @@ export class VesImagesService {
     };
 
     // throw at grit
-    const files = filePath
-      ? [filePath]
-      : imageConfig.files || [];
-    const gritUri = await this.getGritUri();
-    const imagePaths: string[] = [];
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
+    const files = filePath
+      ? [filePath]
+      : imageConfig.files.length
+        ? imageConfig.files
+        : await Promise.all(window.electronVesCore.findFiles(await this.fileService.fsPath(imageConfigFileUri.parent), '*.png')
+          .sort((a, b) => a.localeCompare(b))
+          .map(async p => workspaceRootUri.relative(imageConfigFileUri.parent.resolve(p))?.toString()!));
+    const gritUri = await this.getGritUri();
+    const imagePaths: string[] = [];
     files.map(f => {
       imagePaths.push(workspaceRootUri.resolve(f).path.toString());
     });
@@ -163,7 +167,7 @@ export class VesImagesService {
               }
             });
             result.animation = {
-              frames,
+              frames: imageConfig.animation.frames || frames,
             };
           }
 

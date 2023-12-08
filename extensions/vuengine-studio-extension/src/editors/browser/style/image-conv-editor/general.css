@@ -7,42 +7,65 @@
   outline: none;
 }
 
-.imageConvEditor .settings {
-  display: flex;
-  gap: var(--theia-ui-padding);
-}
-
-.imageConvEditor .settings .setting {
-  flex-grow: 1;
-}
-
-.imageConvEditor .setting {
+.imageConvEditor .filePreview {
   display: flex;
   flex-direction: column;
-  gap: var(--theia-ui-padding);
+  gap: 5px;
+  position: relative;
+  width: 256px;
 }
 
-.imageConvEditor .sourceFile {
+.imageConvEditor .filePreviewImage {
+  align-items: center;
+  background-color: var(--theia-input-background);
+  border-radius: 10px;
+  box-sizing: border-box;
   display: flex;
-  gap: var(--theia-ui-padding);
-  justify-content: space-between;
+  height: 256px;
+  justify-content: center;
+  padding: 10px;
+  width: 256px;
 }
 
-.imageConvEditor .sourceFile label {
+.imageConvEditor .filePreviewImage img {
+  max-height: 100%;
+  max-width: 100%;
+}
+
+.imageConvEditor .filePreviewTitle {
+  text-align: center;
+}
+
+.imageConvEditor .filePreviewMeta {
+  opacity: .5;
+  text-align: center;
+}
+
+.imageConvEditor .filePreviewActions {
+  cursor: pointer;
+  display: none;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+}
+
+.imageConvEditor .filePreview:hover .filePreviewActions {
+  display: block;
+}
+
+.imageConvEditor .fileAdd {
+  align-items: center;
+  border: 1px solid var(--theia-input-background);
+  border-radius: 10px;
+  box-sizing: border-box;
+  cursor: pointer;
   display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  gap: var(--theia-ui-padding);
+  height: 256px;
+  justify-content: center;
+  width: 256px;
 }
 
-.imageConvEditor .sourceFile > div {
-  align-items: end;
-  display: flex;
-}
-
-.imageConvEditor .sourceFile button {
-  height: calc(2 * var(--theia-border-width) + var(--theia-content-line-height) + 2px);
-  margin-left: 0;
-  min-width: 64px;
-  width: 64px;
+.imageConvEditor .fileAdd:hover {
+  background-color: var(--theia-input-background);
 }

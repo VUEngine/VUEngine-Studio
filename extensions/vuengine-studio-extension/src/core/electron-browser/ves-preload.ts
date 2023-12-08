@@ -7,6 +7,7 @@ import { ImageData } from '../browser/ves-common-types';
 import {
     VES_CHANNEL_DEREFERENCE_JSON_SCHEMA,
     VES_CHANNEL_FIND_FILES,
+    VES_CHANNEL_GET_IMAGE_DIMENSIONS,
     VES_CHANNEL_GET_PHYSICAL_CPU_COUNT,
     VES_CHANNEL_GET_USER_DEFAULT,
     VES_CHANNEL_ON_SERIAL_DEVICE_CHANGE,
@@ -19,6 +20,7 @@ import {
     VES_CHANNEL_SORT_JSON,
     VesCoreAPI
 } from '../electron-common/ves-electron-api';
+import { ISizeCalculationResult } from 'image-size/dist/types/interface';
 
 const { ipcRenderer, contextBridge } = require('electron');
 
@@ -40,6 +42,9 @@ const api: VesCoreAPI = {
     },
     findFiles: function (base: string, pattern: string | string[], options?: GlobOptionsWithFileTypesUnset): string[] {
         return ipcRenderer.sendSync(VES_CHANNEL_FIND_FILES, base, pattern, options);
+    },
+    getImageDimensions: async function (path: string): Promise<ISizeCalculationResult> {
+        return ipcRenderer.invoke(VES_CHANNEL_GET_IMAGE_DIMENSIONS, path);
     },
     getPhysicalCpuCount: function (): number {
         return ipcRenderer.sendSync(VES_CHANNEL_GET_PHYSICAL_CPU_COUNT);

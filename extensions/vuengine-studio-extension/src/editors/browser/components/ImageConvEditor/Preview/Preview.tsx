@@ -1,15 +1,15 @@
 import { nls } from '@theia/core';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import HContainer from '../../Common/HContainer';
+import Palette from '../../Common/Palette';
 import VContainer from '../../Common/VContainer';
+import Sprite from '../../EntityEditor/Preview/Sprite';
 import {
   ImageConvEditorContext,
   ImageConvEditorContextType,
 } from '../ImageConvEditorTypes';
-import Sprite from '../../EntityEditor/Preview/Sprite';
-import Palette from '../../Common/Palette';
 
 interface PreviewProps {
   fileService: FileService;
@@ -18,25 +18,16 @@ interface PreviewProps {
 
 export default function Preview(props: PreviewProps): React.JSX.Element {
   const { fileService, workspaceService } = props;
-  const { imageConvData } = useContext(ImageConvEditorContext) as ImageConvEditorContextType;
-  const { state, setState } = useContext(
-    ImageConvEditorContext
-  ) as ImageConvEditorContextType;
-
-  const setBooleanStateProperty = (property: string, checked: boolean) =>
-    setState({
-      ...state,
-      preview: {
-        ...state.preview,
-        [property]: checked,
-      },
-    });
+  const { filesToShow, imageConvData } = useContext(ImageConvEditorContext) as ImageConvEditorContextType;
+  const [showAnimations, setShowAnimations] = useState<boolean>(true);
+  const [palette, setPalette] = useState<string>('11100100');
+  const [zoom, setZoom] = useState<number>(1);
 
   return (
     <VContainer gap={10}>
       <div className="preview-container">
-        {imageConvData.files && <Sprite
-          animate={imageConvData.animation.isAnimation && state.preview.animations}
+        {Object.keys(filesToShow).length && <Sprite
+          animate={imageConvData.animation.isAnimation && showAnimations}
           frames={imageConvData.animation.isAnimation ? imageConvData.animation.frames : 1}
           displacement={{
             x: 0,
@@ -44,9 +35,9 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
             z: 0,
             parallax: 0,
           }}
-          imagePath={imageConvData.files[0]}
-          palette={state.preview.palette}
-          zoom={state.preview.zoom}
+          imagePath={Object.keys(filesToShow)[0]}
+          palette={palette}
+          zoom={zoom}
           fileService={fileService}
           workspaceService={workspaceService}
         />}
@@ -58,21 +49,15 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
         <HContainer>
           <input
             type="range"
-            value={state.preview.zoom}
+            value={zoom}
             max={10}
             min={1}
             onChange={e =>
-              setState({
-                ...state,
-                preview: {
-                  ...state.preview,
-                  zoom: parseInt(e.target.value),
-                },
-              })
+              setZoom(parseInt(e.target.value))
             }
           />
           <div style={{ minWidth: 24, textAlign: 'right', width: 24 }}>
-            {state.preview.zoom}
+            {zoom}
           </div>
         </HContainer>
       </VContainer>
@@ -83,9 +68,9 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
         <label>
           <input
             type="checkbox"
-            checked={state.preview.animations}
+            checked={showAnimations}
             onChange={e =>
-              setBooleanStateProperty('animations', e.target.checked)
+              setShowAnimations(e.target.checked)
             }
           />
           Show Animations
@@ -94,16 +79,10 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
       <VContainer>
         <label>Palette</label>
         <Palette
-          value={state.preview.palette}
-          updateValue={newValue => {
-            setState({
-              ...state,
-              preview: {
-                ...state.preview,
-                palette: newValue,
-              },
-            });
-          }}
+          value={palette}
+          updateValue={newValue =>
+            setPalette(newValue)
+          }
         />
       </VContainer>
     </VContainer>

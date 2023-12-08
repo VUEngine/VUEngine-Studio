@@ -1,22 +1,16 @@
 import React from 'react';
 import { ImageConfig } from '../../../../images/browser/ves-images-types';
+import { ISizeCalculationResult } from 'image-size/dist/types/interface';
 
 // @ts-ignore
 export const ImageConvEditorContext = React.createContext<ImageConvEditorContextType>({});
 
 export interface ImageConvEditorContextType {
-    state: ImageConvEditorState
-    setState: (state: Partial<ImageConvEditorState>) => void
+    filesToShow: { [path: string]: ISizeCalculationResult }
+    setFilesToShow: (filesToShow: { [path: string]: ISizeCalculationResult }) => void
     imageConvData: ImageConfig
     setImageConvData: (songData: Partial<ImageConfig>) => void
 }
 
 export const ImageConvEditorLayoutStorageName = 'ves-editors-ImageConvEditor-layout';
 
-export interface ImageConvEditorState {
-    preview: {
-        animations: boolean
-        palette: string
-        zoom: number
-    }
-}

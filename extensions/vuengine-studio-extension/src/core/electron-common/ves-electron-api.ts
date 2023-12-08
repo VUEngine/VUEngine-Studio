@@ -4,6 +4,7 @@ import { FileContent } from '@theia/filesystem/lib/common/files';
 import { GlobOptionsWithFileTypesUnset } from 'glob';
 import { VisitOptions } from 'sort-json';
 import { ImageData } from '../browser/ves-common-types';
+import { ISizeCalculationResult } from 'image-size/dist/types/interface';
 
 export interface VesCoreAPI {
     setZoomFactor(zoomFactor: number): void;
@@ -12,6 +13,7 @@ export interface VesCoreAPI {
     sortJson<T>(old: T, options?: VisitOptions): T;
     replaceInFiles(files: string[], from: string, to: string): any;
     findFiles(base: string, pattern: string | string[], options?: GlobOptionsWithFileTypesUnset): string[];
+    getImageDimensions(path: string): Promise<ISizeCalculationResult>;
     getPhysicalCpuCount(): number;
     parsePng(fileContent: FileContent): Promise<ImageData | false>;
     onUsbDeviceChange(handler: () => void): Disposable;
@@ -32,6 +34,7 @@ export const VES_CHANNEL_DEREFERENCE_JSON_SCHEMA = 'vesDereferenceJsonSchema';
 export const VES_CHANNEL_SORT_JSON = 'vesSortJson';
 export const VES_CHANNEL_REPLACE_IN_FILES = 'vesReplaceInFiles';
 export const VES_CHANNEL_FIND_FILES = 'vesFindFiles';
+export const VES_CHANNEL_GET_IMAGE_DIMENSIONS = 'vesGetIageDimensions';
 export const VES_CHANNEL_GET_PHYSICAL_CPU_COUNT = 'vesGetPhysicalCpuCount';
 export const VES_CHANNEL_PARSE_PNG = 'vesParsePng';
 export const VES_CHANNEL_ON_USB_DEVICE_CHANGE = 'vesOnUsbDeviceChange';
