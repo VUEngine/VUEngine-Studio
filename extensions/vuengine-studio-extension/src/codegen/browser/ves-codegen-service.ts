@@ -1,4 +1,4 @@
-import { Emitter, MessageService, QuickPickItem, QuickPickOptions, QuickPickService, nls } from '@theia/core';
+import { Emitter, MessageService, QuickInputService, QuickPickItem, QuickPickOptions, QuickPickService, nls } from '@theia/core';
 import { PreferenceService } from '@theia/core/lib/browser';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import URI from '@theia/core/lib/common/uri';
@@ -36,6 +36,8 @@ export class VesCodeGenService {
   protected readonly messageService: MessageService;
   @inject(OutputChannelManager)
   protected readonly outputChannelManager: OutputChannelManager;
+  @inject(QuickInputService)
+  protected quickInputService: QuickInputService;
   @inject(QuickPickService)
   protected quickPickService: QuickPickService;
   @inject(PreferenceService)
@@ -108,22 +110,13 @@ export class VesCodeGenService {
       const changedOnlySelection = await this.showChangedOnlySelection();
       if (changedOnlySelection !== undefined) {
         const changedOnly = changedOnlySelection?.id === 'changed';
-        this.generate([types].map(t => t.id!), changedOnly);
+        this.generate(types, changedOnly);
       }
     }
   }
 
-  protected async showTypeSelection(): Promise<QuickPickItem | undefined> {
-    const quickPickOptions: QuickPickOptions<QuickPickItem> = {
-      title: nls.localize('vuengine/codegen/chooseTypesToGenerate', 'Choose type(s) to generate files for'),
-      placeholder: nls.localize('vuengine/codegen/typeToFilter', 'Type to filter list'),
-      canSelectMany: true,
-      step: 1,
-      totalSteps: 2,
-    };
-
+  protected async showTypeSelection(): Promise<string[] | undefined> {
     const items: QuickPickItem[] = [];
-
     await this.vesProjectService.projectItemsReady;
     const types = this.vesProjectService.getProjectDataTypes() || {};
     Object.keys(types).map(typeId => {
@@ -140,10 +133,26 @@ export class VesCodeGenService {
         });
       }
     });
-
     items.sort((a, b) => a.label.localeCompare(b.label));
 
-    return this.quickPickService.show(items, quickPickOptions);
+    const pick = this.quickInputService.createQuickPick();
+    pick.items = items;
+    pick.selectedItems = items;
+    pick.title = nls.localize('vuengine/codegen/chooseTypesToGenerate', 'Choose type(s) to generate files for');
+    pick.placeholder = nls.localize('vuengine/codegen/typeToFilter', 'Type to filter list');
+    pick.canSelectMany = true;
+    pick.step = 1;
+    pick.totalSteps = 2;
+    pick.show();
+
+    return new Promise((resolve, reject) => {
+      pick.onDidAccept(() => {
+        pick.hide();
+        const t: string[] = [];
+        pick.selectedItems.map(s => s.id !== undefined ? t.push(s.id) : undefined);
+        resolve(t);
+      });
+    });
   }
 
   protected async showChangedOnlySelection(): Promise<QuickPickItem | undefined> {
