@@ -305,7 +305,6 @@ export class VesProjectService {
 
     // add types and templates to combined
     projectDataWithContributors.forEach(async projectDataWithContributor => {
-      console.log(JSON.stringify(projectDataWithContributors));
       ['templates', 'types'].forEach(combinedKey => {
         // @ts-ignore
         const data = projectDataWithContributor[combinedKey];

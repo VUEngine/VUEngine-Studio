@@ -1,5 +1,6 @@
 .jsonforms-container .categorization {
     display: flex;
+    flex-direction: row;
     gap: 20px;
 }
 
@@ -13,6 +14,7 @@
     cursor: pointer;
     margin-bottom: 1px;
     padding: 5px 20px;
+    white-space: nowrap;
 }
 
 .jsonforms-container .category-subcategories li:hover {
@@ -21,4 +23,8 @@
 
 .jsonforms-container .category-subcategories li.selected {
     background-color: var(--theia-list-activeSelectionBackground);
+}
+
+.jsonforms-container .categorization-detail {
+    flex-grow: 1;
 }
