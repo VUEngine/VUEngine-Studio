@@ -245,7 +245,11 @@ export class VesProjectService {
     // plugins
     this.vesPluginsService.setInstalledPlugins(workspaceProjectFileData?.plugins || []);
     const pluginsData = await this.getAllPluginsData();
-    this.vesPluginsService.setPluginsData(pluginsData);
+    const cleanedPluginsData: VesPluginsData = {};
+    Object.keys(pluginsData).map(pluginId => {
+      cleanedPluginsData[pluginId] = pluginsData[pluginId].plugin;
+    });
+    this.vesPluginsService.setPluginsData(cleanedPluginsData);
 
     // installed plugins
     const pluginsProjectDataWithContributors: (ProjectFile & WithContributor)[] = [];
@@ -301,6 +305,7 @@ export class VesProjectService {
 
     // add types and templates to combined
     projectDataWithContributors.forEach(async projectDataWithContributor => {
+      console.log(JSON.stringify(projectDataWithContributors));
       ['templates', 'types'].forEach(combinedKey => {
         // @ts-ignore
         const data = projectDataWithContributor[combinedKey];
@@ -393,7 +398,7 @@ export class VesProjectService {
   }
 
   // note: tests with caching plugin data in a single file did not increase performance much
-  async getAllPluginsData(): Promise<VesPluginsData> {
+  async getAllPluginsData(): Promise<{ [id: string]: Partial<ProjectFile> & { plugin: VesPluginsData } }> {
     const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
     const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
 
@@ -411,31 +416,31 @@ export class VesProjectService {
 
         const fileContent = await this.fileService.readFile(pluginFileUri);
         try {
-          const fileContentJson = JSON.parse(fileContent.value.toString()).plugin;
+          const fileContentJson = JSON.parse(fileContent.value.toString());
 
           const pluginId = `${prefix}/${pluginRelativeUri.path.toString().replace(/\\/g, '/')}`;
 
-          fileContentJson.name = pluginId;
+          fileContentJson.plugin.name = pluginId;
           const iconUri = pluginFileUri.parent.resolve('icon.png');
-          fileContentJson.icon = await this.fileService.exists(iconUri)
+          fileContentJson.plugin.icon = await this.fileService.exists(iconUri)
             ? iconUri.path.toString()
             : '';
-          fileContentJson.readme = pluginFileUri.parent.resolve('readme.md').path.toString();
+          fileContentJson.plugin.readme = pluginFileUri.parent.resolve('readme.md').path.toString();
 
-          fileContentJson.displayName = this.translatePluginField(fileContentJson.displayName, nls.locale || 'en');
-          fileContentJson.author = this.translatePluginField(fileContentJson.author, nls.locale || 'en');
-          fileContentJson.description = this.translatePluginField(fileContentJson.description, nls.locale || 'en');
-          fileContentJson.license = this.translatePluginField(fileContentJson.license, nls.locale || 'en');
+          fileContentJson.plugin.displayName = this.translatePluginField(fileContentJson.plugin.displayName, nls.locale || 'en');
+          fileContentJson.plugin.author = this.translatePluginField(fileContentJson.plugin.author, nls.locale || 'en');
+          fileContentJson.plugin.description = this.translatePluginField(fileContentJson.plugin.description, nls.locale || 'en');
+          fileContentJson.plugin.license = this.translatePluginField(fileContentJson.plugin.license, nls.locale || 'en');
 
-          if (Array.isArray(fileContentJson.tags)) {
+          if (Array.isArray(fileContentJson.plugin.tags)) {
             const tagsObject = {};
-            fileContentJson.tags.forEach((tag: any) => {
+            fileContentJson.plugin.tags.forEach((tag: any) => {
               // @ts-ignore
               tagsObject[this.translatePluginField(tag, 'en')] = this.translatePluginField(tag, nls.locale);
             });
-            fileContentJson.tags = tagsObject;
+            fileContentJson.plugin.tags = tagsObject;
           } else {
-            fileContentJson.tags = {};
+            fileContentJson.plugin.tags = {};
           }
 
           pluginsMap[pluginId] = fileContentJson;
