@@ -4,6 +4,7 @@ import URI from '@theia/core/lib/common/uri';
 import { injectable } from '@theia/core/shared/inversify';
 
 export interface VesEncodingOverride extends EncodingOverride {
+    filename?: string;
     endsWith?: string;
 }
 
@@ -19,6 +20,9 @@ export class VesEncodingRegistry extends EncodingRegistry {
         if (this.encodingOverrides && this.encodingOverrides.length) {
             for (const override of this.encodingOverrides) {
                 if (override.endsWith && resource.path.toString().endsWith(override.endsWith)) {
+                    return override.encoding;
+                }
+                if (override.filename && resource.path.base === override.filename) {
                     return override.encoding;
                 }
             }
