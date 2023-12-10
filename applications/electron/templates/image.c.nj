@@ -35,13 +35,7 @@
 //---------------------------------------------------------------------------------------------------------
 //
 //  {{ sanitizedSpecName }}
-{% if imageData.maps.length -%}
-    //  * {{ imageData.maps[0].width * 8 }}x{{ imageData.maps[0].height * 8 }} pixels
-{% else -%}
-    //  * {{ imageData.tiles.width }}x{{ imageData.tiles.height }} pixels
-{% endif %}
-
-{%- if imageData.tiles.data.length -%}
+{% if imageData.tiles.data.length -%}
     //  * {{ imageData.tiles.count }} tiles, {{ reducedTilesLabel }}, {{ tilesCompressionLabel }}
 {% endif %}
 
@@ -84,7 +78,7 @@ const uint32 {{ sanitizedSpecName }}Tiles[{{ (imageData.tiles.data.length + 1) }
 
 {%- for map in imageData.maps -%}
 {% if map.data.length %}
-const uint16 {{ sanitizedSpecName }}Map[{{ map.data.length }}] __attribute__((aligned(4))){% if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
+const uint16 {{ map.name | sanitizeSpecName }}Map[{{ map.data.length }}] __attribute__((aligned(4))){% if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
     {% for mapTile in map.data -%}
     0x{{ mapTile }},

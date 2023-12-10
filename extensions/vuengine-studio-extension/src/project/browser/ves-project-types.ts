@@ -261,11 +261,11 @@ export const defaultProjectData: ProjectFile = {
                 properties: {
                   flipped: {
                     type: 'boolean',
-                    default: false
+                    default: true
                   },
                   unique: {
                     type: 'boolean',
-                    default: false
+                    default: true
                   }
                 }
               },
