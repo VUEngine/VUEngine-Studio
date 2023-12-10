@@ -7,7 +7,7 @@ import { ProjectFileTemplateEncoding } from './ves-project-types';
 export class VesWorkspaceFrontendContribution extends WorkspaceFrontendContribution {
     configure(): void {
         super.configure();
-        this.encodingRegistry.registerOverride({ encoding: ProjectFileTemplateEncoding.win1252, endsWith: 'LanguageSpec.c' } as VesEncodingOverride);
+        this.encodingRegistry.registerOverride({ encoding: ProjectFileTemplateEncoding.win1252, filename: 'Languages.c' } as VesEncodingOverride);
         this.updateEncodingOverrides();
     }
 }
