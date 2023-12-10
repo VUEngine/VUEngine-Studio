@@ -88,6 +88,7 @@ export class VesCodeGenService {
   protected init(): void {
     this.doInit();
     this.bindEvents();
+    this.registerOutputChannel();
   }
 
   protected async doInit(): Promise<void> {
@@ -99,6 +100,10 @@ export class VesCodeGenService {
   protected bindEvents(): void {
     this.vesPluginsService.onDidChangeInstalledPlugins(async () =>
       this.handlePluginChange());
+  }
+
+  protected registerOutputChannel(): void {
+    this.logLine('');
   }
 
   async generateAll(): Promise<void> {
@@ -190,7 +195,7 @@ export class VesCodeGenService {
         return;
       }
       const items = this.vesProjectService.getProjectDataItemsForType(typeId, ProjectContributor.Project) || {};
-      return Promise.all(Object.values(items).map(async item => {
+      await Promise.all(Object.values(items).map(async item => {
         /*
         if (changedOnly && !this.hasChanges(type)) {
           return;
@@ -199,11 +204,11 @@ export class VesCodeGenService {
         try {
           const fileContents = await this.fileService.readFile(item._fileUri);
           const fileContentsJson = JSON.parse(fileContents.value.toString());
-          numberOfGeneratedFiles += await this.renderTemplatesForItem(typeId, fileContentsJson, item._fileUri);
+          const n = await this.renderTemplatesForItem(typeId, fileContentsJson, item._fileUri);
+          numberOfGeneratedFiles += n;
         } catch (error) {
           // TODO
         }
-        return;
       }));
     }));
 
@@ -277,10 +282,12 @@ export class VesCodeGenService {
   }
 
   protected logLine(message: string, severity: OutputChannelSeverity = OutputChannelSeverity.Info): void {
-    const date = new Date();
     const channel = this.outputChannelManager.getChannel(CODEGEN_CHANNEL_NAME);
-    channel.append(`${date.getHours()}:${date.getMinutes()}:${date.getSeconds()} `);
-    channel.appendLine(message, severity);
+    if (message) {
+      const date = new Date();
+      channel.append(`${date.getHours()}:${date.getMinutes()}:${date.getSeconds()} `);
+      channel.appendLine(message, severity);
+    }
   }
 
   async renderTemplatesForItem(typeId: string, itemData: any, itemUri: URI): Promise<number> {
@@ -289,7 +296,7 @@ export class VesCodeGenService {
     if (typeData && Array.isArray(typeData.templates)) {
       await Promise.all(typeData.templates.map(async templateId => {
         numberOfGeneratedFiles++;
-        return this.renderTemplate(templateId, itemUri, itemData);
+        await this.renderTemplate(templateId, itemUri, itemData);
       }));
     };
 
@@ -316,7 +323,7 @@ export class VesCodeGenService {
       itemUri: itemUri
     };
 
-    return this.renderFilesFromTemplate(templateId, template, uri, data, encoding);
+    await this.renderFilesFromTemplate(templateId, template, uri, data, encoding);
   }
 
   protected async renderFilesFromTemplate(
