@@ -1,4 +1,4 @@
-import { Emitter, MessageService, QuickInputService, QuickPickItem, QuickPickOptions, QuickPickService, nls } from '@theia/core';
+import { Emitter, MessageService, QuickInputService, QuickPickItem, nls } from '@theia/core';
 import { PreferenceService } from '@theia/core/lib/browser';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import URI from '@theia/core/lib/common/uri';
@@ -26,7 +26,6 @@ import {
   WithContributor
 } from '../../project/browser/ves-project-types';
 import { CODEGEN_CHANNEL_NAME, IsGeneratingFilesStatus, SHOW_DONE_DURATION } from './ves-codegen-types';
-import { FileStatWithMetadata } from '@theia/filesystem/lib/common/files';
 
 @injectable()
 export class VesCodeGenService {
@@ -38,8 +37,6 @@ export class VesCodeGenService {
   protected readonly outputChannelManager: OutputChannelManager;
   @inject(QuickInputService)
   protected quickInputService: QuickInputService;
-  @inject(QuickPickService)
-  protected quickPickService: QuickPickService;
   @inject(PreferenceService)
   protected preferenceService: PreferenceService;
   @inject(VesAudioConverterService)
@@ -106,12 +103,15 @@ export class VesCodeGenService {
 
   async generateAll(): Promise<void> {
     const types = await this.showTypeSelection();
-    if (types !== undefined) {
+    if (types !== undefined && types.length) {
+      /*
       const changedOnlySelection = await this.showChangedOnlySelection();
       if (changedOnlySelection !== undefined) {
         const changedOnly = changedOnlySelection?.id === 'changed';
         this.generate(types, changedOnly);
       }
+      */
+      this.generate(types);
     }
   }
 
@@ -138,28 +138,34 @@ export class VesCodeGenService {
     const pick = this.quickInputService.createQuickPick();
     pick.items = items;
     pick.selectedItems = items;
-    pick.title = nls.localize('vuengine/codegen/chooseTypesToGenerate', 'Choose type(s) to generate files for');
+    pick.title = nls.localize('vuengine/codegen/commands/generateFiles', 'Generate Files...');
+    pick.description = nls.localize('vuengine/codegen/chooseTypesToGenerate', 'Choose all type(s) you want to generate files for.');
     pick.placeholder = nls.localize('vuengine/codegen/typeToFilter', 'Type to filter list');
     pick.canSelectMany = true;
-    pick.step = 1;
-    pick.totalSteps = 2;
+    // pick.step = 1;
+    // pick.totalSteps = 2;
     pick.show();
 
     return new Promise((resolve, reject) => {
       pick.onDidAccept(() => {
+        // if (pick.selectedItems.length) {
         pick.hide();
         const t: string[] = [];
         pick.selectedItems.map(s => s.id !== undefined ? t.push(s.id) : undefined);
         resolve(t);
+        // }
       });
     });
   }
 
+  /*
   protected async showChangedOnlySelection(): Promise<QuickPickItem | undefined> {
     const quickPickOptions: QuickPickOptions<QuickPickItem> = {
-      title: nls.localize('vuengine/codegen/chooseTypesToGenerate', 'Choose type(s) to generate files for'),
+      title: nls.localize('vuengine/codegen/commands/generateFiles', 'Generate Files...'),
+      description: nls.localize('vuengine/codegen/allOrChanged', 'Do you want to general all or only changed files?'),
       step: 2,
       totalSteps: 2,
+      hideInput: true,
     };
 
     const items: QuickPickItem[] = [{
@@ -172,17 +178,24 @@ export class VesCodeGenService {
 
     return this.quickPickService.show(items, quickPickOptions);
   }
+  */
 
-  protected async generate(types: string[], changedOnly: boolean): Promise<void> {
+  protected async generate(types: string[]/* , changedOnly: boolean */): Promise<void> {
     this.isGeneratingFiles = IsGeneratingFilesStatus.active;
     let numberOfGeneratedFiles = 0;
 
     await Promise.all(types.map(async typeId => {
+      const type = this.vesProjectService.getProjectDataType(typeId);
+      if (!type) {
+        return;
+      }
       const items = this.vesProjectService.getProjectDataItemsForType(typeId, ProjectContributor.Project) || {};
       return Promise.all(Object.values(items).map(async item => {
-        if (changedOnly && !this.isChanged()) {
+        /*
+        if (changedOnly && !this.hasChanges(type)) {
           return;
         }
+        */
         try {
           const fileContents = await this.fileService.readFile(item._fileUri);
           const fileContentsJson = JSON.parse(fileContents.value.toString());
@@ -198,9 +211,26 @@ export class VesCodeGenService {
     this.isGeneratingFiles = IsGeneratingFilesStatus.done;
   }
 
-  protected isChanged(): boolean {
-    // TODO: utilize this.fileHasChanged
-    return false;
+  /*
+  protected hasChanges(type: ProjectFileType & WithContributor): boolean {
+    // TODO: at this point, we'd need to know which files are affected by a conversion file, e.g. imageConv, but this information is currently not available
+    let hasChanges = false;
+    type.templates?.map(templateId => {
+      const template = this.vesProjectService.getProjectDataTemplate(templateId);
+      if (!template) {
+        return;
+      }
+      template.targets.map(target => {
+        if (target.conditions && jsonLogic.apply(target.conditions, data.item) !== true) {
+          return;
+        }
+      });
+      // TODO: utilize this.fileHasChanged
+      // ...
+      hasChanges = false;
+    });
+
+    return hasChanges;
   }
 
   protected fileHasChanged(itemFileStat: FileStatWithMetadata, sourceFileStat: FileStatWithMetadata, convertedFileStat?: FileStatWithMetadata): boolean {
@@ -213,6 +243,7 @@ export class VesCodeGenService {
       || itemFileStat.mtime > convertedFileStat.mtime
     );
   }
+  */
 
   protected async renderTemplateToFile(
     templateId: string,
@@ -226,8 +257,7 @@ export class VesCodeGenService {
     return new Promise((resolve, reject) => {
       nunjucks.renderString(templateString, data, (err, res) => {
         if (err) {
-          const channel = this.outputChannelManager.getChannel(CODEGEN_CHANNEL_NAME);
-          channel.appendLine(
+          this.logLine(
             `Failed to render template ${templateId}. Nunjucks output: ${err}`,
             OutputChannelSeverity.Error
           );
@@ -238,17 +268,19 @@ export class VesCodeGenService {
             BinaryBuffer.wrap(iconv.encode(res, encoding))
           ).then(() => {
             const relPath = workspaceRootUri.relative(targetUri);
-            const channel = this.outputChannelManager.getChannel(CODEGEN_CHANNEL_NAME);
-            channel.appendLine(
-              `Rendered template ${templateId} to ${relPath}.`,
-              OutputChannelSeverity.Info
-            );
-
+            this.logLine(`Rendered template ${templateId} to ${relPath}.`);
             resolve();
           });
         }
       });
     });
+  }
+
+  protected logLine(message: string, severity: OutputChannelSeverity = OutputChannelSeverity.Info): void {
+    const date = new Date();
+    const channel = this.outputChannelManager.getChannel(CODEGEN_CHANNEL_NAME);
+    channel.append(`${date.getHours()}:${date.getMinutes()}:${date.getSeconds()} `);
+    channel.appendLine(message, severity);
   }
 
   async renderTemplatesForItem(typeId: string, itemData: any, itemUri: URI): Promise<number> {
