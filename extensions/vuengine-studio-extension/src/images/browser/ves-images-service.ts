@@ -80,7 +80,6 @@ export class VesImagesService {
 
     return new Promise(resolve => {
       // wait for converting process to finish, then process further
-      // TODO: dispose listener once done
       const exitListener = this.vesProcessWatcher.onDidExitProcess(async ({ pId }) => {
         if (pId === processInfo.processManagerId) {
           const convertedFileData = await this.getConvertedFilesData(tempDirUri);
@@ -135,8 +134,8 @@ export class VesImagesService {
               largestFrame,
             };
           } else {
-            // compute frame offsets for spritesheet animations
-            // TODO: do only for __ANIMATED_SINGLE
+            // We only need to generate TilesFrameOffsets for animations when either tiles are
+            // compressed or the map data is optimized
             /*
             if (imageConfig.animation.isAnimation && !imageConfig.animation.individualFiles) {
               convertedFileData.map(fileData => {
@@ -159,10 +158,23 @@ export class VesImagesService {
                 };
               }
               if (m.map.data.length) {
-                result.maps.push({
-                  ...m.map,
-                  name: m.name
-                });
+                // We can remove all but the first frame when this is an animation
+                // and the map data is not optimized (individualFiles: false).
+                if (imageConfig.animation.isAnimation && !imageConfig.animation.individualFiles &&
+                  imageConfig.animation.frames > 0) {
+                  const reducedMapDataLength = m.map.data.length / imageConfig.animation.frames;
+                  result.maps.push({
+                    data: m.map.data.filter((d, i) => i < reducedMapDataLength),
+                    height: m.map.height / imageConfig.animation.frames,
+                    width: m.map.width,
+                    name: m.name
+                  });
+                } else {
+                  result.maps.push({
+                    ...m.map,
+                    name: m.name
+                  });
+                }
                 frames++;
               }
             });
@@ -182,7 +194,6 @@ export class VesImagesService {
 
   protected async getConvertedFilesData(convertedFolderUri: URI): Promise<ConvertedFileData[]> {
     const generatedFiles = window.electronVesCore.findFiles(await this.fileService.fsPath(convertedFolderUri), '*.c')
-      .sort((a, b) => a.localeCompare(b))
       .map(file => convertedFolderUri.resolve(file));
 
     const convertedFileData: ConvertedFileData[] = [];
@@ -190,14 +201,14 @@ export class VesImagesService {
     // write all file contents to map
     await Promise.all(generatedFiles.map(async file => {
       const fileContent = (await this.fileService.readFile(file)).value.toString();
-      const name = fileContent.match(/\/\/\t(\w+)\, ([0-9]+)x([0-9]+)@2/) ?? ['', ''];
+      const name = fileContent.match(/(?<=\/\/{{BLOCK\().+?(?=\))/s) ?? [''];
       const tilesData = fileContent.match(/0x([0-9A-Fa-f]{8}),/g)?.map(hex => hex.substring(2, 10)) ?? [];
       const mapData = fileContent.match(/0x([0-9A-Fa-f]{4}),/g)?.map(hex => hex.substring(2, 6)) ?? [];
       const imageDimensions = fileContent.match(/, ([0-9]+)x([0-9]+)@2/) ?? [0, 0];
       const mapDimensions = fileContent.match(/, not compressed, ([0-9]+)x([0-9]+)/) ?? [0, 0];
 
       convertedFileData.push({
-        name: name[1],
+        name: name[0],
         tiles: {
           count: tilesData.length / 4,
           data: tilesData,
@@ -212,7 +223,8 @@ export class VesImagesService {
       });
     }));
 
-    return convertedFileData;
+    return convertedFileData
+      .sort((a, b) => a.name.localeCompare(b.name));
   }
 
   protected async handleCompression(imageConfig: ImageConfig, conversionResult: ConversionResult): Promise<void> {
@@ -275,7 +287,8 @@ export class VesImagesService {
     const gritArguments = ['-fh!', '-ftc', '-gB2', '-p!', '-mB16:hv_i11'];
 
     if (config.map.generate) {
-      if (config.map.reduce.flipped || config.map.reduce.unique) {
+      if ((!config.animation.isAnimation || config.animation.individualFiles) &&
+        (config.map.reduce.flipped || config.map.reduce.unique)) {
         let mapReduceArg = '-mR';
         if (config.map.reduce.unique) {
           mapReduceArg += 't';
@@ -295,7 +308,7 @@ export class VesImagesService {
       gritArguments.push('-gS');
       gritArguments.push('-O');
       gritArguments.push('__sharedTiles');
-      gritArguments.push('-s');
+      gritArguments.push('-S');
       gritArguments.push(name);
     }
 

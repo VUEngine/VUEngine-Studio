@@ -61,21 +61,22 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
           </div>
         </HContainer>
       </VContainer>
-      <VContainer>
-        <label>
-          {nls.localizeByDefault('Options')}
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            checked={showAnimations}
-            onChange={e =>
-              setShowAnimations(e.target.checked)
-            }
-          />
-          Show Animations
-        </label>
-      </VContainer>
+      {imageConvData.animation.isAnimation &&
+        <VContainer>
+          <label>
+            {nls.localizeByDefault('Options')}
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={showAnimations}
+              onChange={e =>
+                setShowAnimations(e.target.checked)
+              }
+            />
+            Show Animations
+          </label>
+        </VContainer>}
       <VContainer>
         <label>Palette</label>
         <Palette
