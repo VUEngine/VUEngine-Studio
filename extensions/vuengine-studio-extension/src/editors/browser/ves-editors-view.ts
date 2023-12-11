@@ -1,17 +1,20 @@
-import { Command, CommandContribution, CommandRegistry, CommandService, MenuContribution, MenuModelRegistry, UntitledResourceResolver } from '@theia/core';
+import { Command, CommandContribution, CommandRegistry, CommandService, MenuContribution, MenuModelRegistry, URI, UntitledResourceResolver } from '@theia/core';
 import { AbstractViewContribution, CommonCommands, CommonMenus, OpenerService, Widget, open } from '@theia/core/lib/browser';
+import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { UserWorkingDirectoryProvider } from '@theia/core/lib/browser/user-working-directory-provider';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { EditorManager } from '@theia/editor/lib/browser';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { NavigatorContextMenu } from '@theia/navigator/lib/browser/navigator-contribution';
+import { FILE_NAVIGATOR_ID, FileNavigatorWidget } from '@theia/navigator/lib/browser/navigator-widget';
+import { WorkspaceCommands } from '@theia/workspace/lib/browser';
+import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesEditorsCommands } from './ves-editors-commands';
 import { VesEditorsContextKeyService } from './ves-editors-context-key-service';
 import { VesEditorsWidget } from './ves-editors-widget';
-import { NavigatorContextMenu } from '@theia/navigator/lib/browser/navigator-contribution';
-import { WorkspaceCommands } from '@theia/workspace/lib/browser';
-import { FILE_NAVIGATOR_ID, FileNavigatorWidget } from '@theia/navigator/lib/browser/navigator-widget';
-import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
+import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 
 @injectable()
 export class VesEditorsViewContribution extends AbstractViewContribution<VesEditorsWidget> implements CommandContribution, MenuContribution, TabBarToolbarContribution {
@@ -19,12 +22,16 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
     protected readonly commandService: CommandService;
     @inject(EditorManager)
     protected readonly editorManager: EditorManager;
+    @inject(FileService)
+    protected readonly fileService: FileService;
     @inject(FrontendApplicationStateService)
     protected readonly frontendApplicationStateService: FrontendApplicationStateService;
     @inject(OpenerService)
     protected openerService: OpenerService;
     @inject(UntitledResourceResolver)
     protected readonly untitledResourceResolver: UntitledResourceResolver;
+    @inject(VesCommonService)
+    protected readonly vesCommonService: VesCommonService;
     @inject(VesEditorsContextKeyService)
     protected readonly contextKeyService: VesEditorsContextKeyService;
     @inject(VesProjectService)
@@ -77,6 +84,11 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             isEnabled: () => true,
             isVisible: widget => widget instanceof VesEditorsWidget,
             execute: widget => this.openSource(widget),
+        });
+        commandRegistry.registerCommand(VesEditorsCommands.GENERATE_ID, {
+            isEnabled: () => true,
+            isVisible: () => false,
+            execute: fileUri => this.generateId(fileUri),
         });
 
         commandRegistry.registerHandler(CommonCommands.UNDO.id, {
@@ -212,5 +224,16 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             return;
         }
         (ref as VesEditorsWidget).generateFiles();
+    }
+
+    protected async generateId(fileUri: URI): Promise<void> {
+        try {
+            const fileContents = await this.fileService.readFile(fileUri);
+            const fileContentsJson = JSON.parse(fileContents.value.toString());
+            fileContentsJson._id = this.vesCommonService.nanoid();
+            await this.fileService.writeFile(fileUri, BinaryBuffer.fromString(JSON.stringify(fileContentsJson, undefined, 4)));
+        } catch (error) {
+            console.error('Could not generate ID for file.', fileUri.path.fsPath());
+        }
     }
 }

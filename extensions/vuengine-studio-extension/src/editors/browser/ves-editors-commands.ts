@@ -8,7 +8,7 @@ export namespace VesEditorsCommands {
             category: 'Editor',
             iconClass: 'codicon codicon-server-process',
         },
-        'vuengine/editors/generate',
+        'vuengine/editors/commands/generate',
         'vuengine/editors/commands/category'
     );
     export const OPEN_IN_EDITOR: Command = Command.toLocalizedCommand(
@@ -18,7 +18,7 @@ export namespace VesEditorsCommands {
             category: 'Editor',
             iconClass: 'codicon codicon-preview',
         },
-        'vuengine/editors/openInEditor',
+        'vuengine/editors/commands/openInEditor',
         'vuengine/editors/commands/category'
     );
     export const OPEN_SOURCE: Command = Command.toLocalizedCommand(
@@ -28,7 +28,18 @@ export namespace VesEditorsCommands {
             category: 'Editor',
             iconClass: 'codicon codicon-json',
         },
-        'vuengine/editors/showSource',
+        'vuengine/editors/commands/showSource',
+        'vuengine/editors/commands/category'
+    );
+
+    export const GENERATE_ID: Command = Command.toLocalizedCommand(
+        {
+            id: 'ves:editors:generateId',
+            label: 'Generate new item ID',
+            category: 'Editor',
+            iconClass: 'codicon codicon-gear'
+        },
+        'vuengine/editors/commands/generateId',
         'vuengine/editors/commands/category'
     );
 };

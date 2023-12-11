@@ -1,4 +1,5 @@
-import { isWindows, nls } from '@theia/core';
+import { CommandService, MessageService, isWindows, nls } from '@theia/core';
+import { OpenerService } from '@theia/core/lib/browser';
 import { WindowTitleService } from '@theia/core/lib/browser/window/window-title-service';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import { Deferred } from '@theia/core/lib/common/promise-util';
@@ -10,12 +11,14 @@ import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VES_PREFERENCE_DIR } from '../../core/browser/ves-preference-configurations';
+import { VesEditorsCommands } from '../../editors/browser/ves-editors-commands';
 import { VesPluginsData } from '../../plugins/browser/ves-plugin';
 import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-service';
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } from '../../plugins/browser/ves-plugins-types';
 import { VesNewProjectTemplate } from './new-project/ves-new-project-form';
 import {
+  ProjectContributor,
   ProjectFile,
   ProjectFileItem,
   ProjectFileItemWithContributor,
@@ -24,7 +27,6 @@ import {
   ProjectFileTemplatesWithContributor,
   ProjectFileType,
   ProjectFileTypesWithContributor,
-  ProjectContributor,
   VUENGINE_EXT,
   WithContributor,
   defaultProjectData
@@ -32,8 +34,14 @@ import {
 
 @injectable()
 export class VesProjectService {
+  @inject(CommandService)
+  protected commandService: CommandService;
   @inject(FileService)
   protected fileService: FileService;
+  @inject(MessageService)
+  protected messageService: MessageService;
+  @inject(OpenerService)
+  protected openerService: OpenerService;
   @inject(VesBuildPathsService)
   private readonly vesBuildPathsService: VesBuildPathsService;
   @inject(VesCommonService)
@@ -169,11 +177,11 @@ export class VesProjectService {
     this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
       fileChangesEvent.changes.map(change => {
         // TODO: registered types
-        // move corresponding generated code for moved files of registered types
-        // update project data entries for changed files of registered types to project data
-        // add new files of registered types to project data
-        // remove deleted files of registered types from project data and delete corresponding generated code
-        // detect changes of forFiles and automatically convert?
+        // - move corresponding generated code for moved files of registered types
+        // - update project data entries for changed files of registered types to project data
+        // - add new files of registered types to project data
+        // - remove deleted files of registered types from project data and delete corresponding generated code
+        // - detect changes of forFiles and automatically convert?
 
         // project file
         if (this.workspaceProjectFileUri && change.type === FileChangeType.UPDATED && change.resource.isEqual(this.workspaceProjectFileUri)) {
@@ -364,9 +372,63 @@ export class VesProjectService {
               if (type.file?.startsWith('.')) {
                 if (fileContentJson._id) {
                   // @ts-ignore
+                  if (combined['items'][typeId][fileContentJson._id]) {
+                    const openFileButtonLabel = nls.localize(
+                      'vuengine/projects/openFile',
+                      'Open File',
+                    );
+                    const generateIdButtonLabel = nls.localize(
+                      'vuengine/projects/generateNewId',
+                      'Generate New ID',
+                    );
+                    this.messageService.warn(
+                      nls.localize(
+                        'vuengine/projects/duplicateItemIdDetected',
+                        'Duplicate item ID detected in file "{0}".',
+                        uri?.path.base,
+                      ),
+                      openFileButtonLabel,
+                      generateIdButtonLabel,
+                    ).then(async button => {
+                      switch (button) {
+                        case openFileButtonLabel:
+                          const opener = await this.openerService.getOpener(uri);
+                          return opener.open(uri);
+
+                        case generateIdButtonLabel:
+                          return this.commandService.executeCommand(VesEditorsCommands.GENERATE_ID.id, uri);
+                      }
+                    });
+                  }
+                  // @ts-ignore
                   combined['items'][typeId][fileContentJson._id] = itemWithContributor;
                 } else {
-                  console.error('Missing _id in item file.', uri?.path.toString());
+                  const openFileButtonLabel = nls.localize(
+                    'vuengine/projects/openFile',
+                    'Open File',
+                  );
+                  const generateIdButtonLabel = nls.localize(
+                    'vuengine/projects/generateId',
+                    'Generate ID',
+                  );
+                  this.messageService.warn(
+                    nls.localize(
+                      'vuengine/projects/missingItemIdDetected',
+                      'Missing item ID detected in file "{0}".',
+                      uri?.path.base,
+                    ),
+                    openFileButtonLabel,
+                    generateIdButtonLabel,
+                  ).then(async button => {
+                    switch (button) {
+                      case openFileButtonLabel:
+                        const opener = await this.openerService.getOpener(uri);
+                        return opener.open(uri);
+
+                      case generateIdButtonLabel:
+                        return this.commandService.executeCommand(VesEditorsCommands.GENERATE_ID.id, uri);
+                    }
+                  });
                 }
               } else {
                 // @ts-ignore
