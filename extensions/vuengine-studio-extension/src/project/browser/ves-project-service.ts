@@ -68,31 +68,31 @@ export class VesProjectService {
   protected workspaceProjectFileUri: URI | undefined;
 
   // project data
-  protected _projectData: ProjectFile;
+  protected _projectData: ProjectFile | undefined;
 
-  getProjectData(): ProjectFile {
+  getProjectData(): ProjectFile | undefined {
     return this._projectData;
   }
   getProjectDataTypes(): ProjectFileTypesWithContributor | undefined {
-    return this._projectData.combined?.types;
+    return this._projectData?.combined?.types;
   }
   getProjectDataType(typeId: string): ProjectFileType & WithContributor | undefined {
-    return this._projectData.combined?.types
-      && this._projectData.combined.types[typeId];
+    return this._projectData?.combined?.types
+      && this._projectData?.combined.types[typeId];
   }
   getProjectDataTemplates(): ProjectFileTemplatesWithContributor | undefined {
-    return this._projectData.combined?.templates;
+    return this._projectData?.combined?.templates;
   }
   getProjectDataTemplate(templateId: string): ProjectFileTemplate & WithContributor | undefined {
-    return this._projectData.combined?.templates
-      && this._projectData.combined?.templates[templateId];
+    return this._projectData?.combined?.templates
+      && this._projectData?.combined?.templates[templateId];
   }
   getProjectDataItems(): ProjectFileItemsWithContributor | undefined {
-    return this._projectData.combined?.items;
+    return this._projectData?.combined?.items;
   }
   getProjectDataItemsForType(typeId: string, contributor?: ProjectContributor): ProjectFileItemWithContributor | undefined {
     let result = {};
-    const items = this._projectData.combined?.items ? this._projectData.combined?.items[typeId] || {} : {};
+    const items = this._projectData?.combined?.items ? this._projectData?.combined?.items[typeId] || {} : {};
 
     if (contributor) {
       Object.keys(items).map(id => {
@@ -116,6 +116,9 @@ export class VesProjectService {
       return false;
     }
 
+    if (!this._projectData) {
+      this._projectData = {};
+    }
     if (!this._projectData.combined) {
       this._projectData.combined = {};
     }
@@ -125,6 +128,13 @@ export class VesProjectService {
     if (!this._projectData.combined.items[typeId]) {
       this._projectData.combined.items[typeId] = {};
     }
+
+    if (this._projectData.combined.items[typeId][itemId] === undefined) {
+      console.log('Added item to project data.', itemId);
+    } else {
+      console.log('Updated item in project data.', itemId);
+    }
+
     this._projectData.combined.items[typeId][itemId] = {
       _contributor: ProjectContributor.Project,
       _contributorUri: workspaceRootUri.parent,
@@ -135,22 +145,26 @@ export class VesProjectService {
     return true;
   }
   async deleteProjectDataItem(typeId: string, itemId: string): Promise<void> {
-    if (this._projectData.combined?.items
-      && this._projectData.combined.items[typeId]
-      && this._projectData.combined.items[typeId][itemId]) {
-      delete (this._projectData.combined.items[typeId][itemId]);
-      if (!Object.keys(this._projectData.combined.items[typeId]).length) {
-        delete this._projectData.combined.items[typeId];
+    if (this._projectData?.combined?.items
+      && this._projectData?.combined.items[typeId]
+      && this._projectData?.combined.items[typeId][itemId]) {
+      delete (this._projectData?.combined.items[typeId][itemId]);
+      if (!Object.keys(this._projectData?.combined.items[typeId]).length) {
+        delete this._projectData?.combined.items[typeId];
       }
-      if (!Object.keys(this._projectData.combined.items).length) {
-        delete this._projectData.combined.items;
+      if (!Object.keys(this._projectData?.combined.items).length) {
+        delete this._projectData?.combined.items;
       }
+      console.log('Removed item from project data.', itemId);
     }
   }
   getProjectPlugins(): string[] {
-    return this._projectData.plugins || [];
+    return this._projectData?.plugins || [];
   }
   async setProjectPlugins(plugins: string[]): Promise<void> {
+    if (!this._projectData) {
+      this._projectData = {};
+    }
     this._projectData.plugins = plugins;
     await this.saveProjectFile();
     // update data of plugins
@@ -176,12 +190,37 @@ export class VesProjectService {
 
     this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
       fileChangesEvent.changes.map(change => {
-        // TODO: registered types
-        // - move corresponding generated code for moved files of registered types
-        // - update project data entries for changed files of registered types to project data
-        // - add new files of registered types to project data
-        // - remove deleted files of registered types from project data and delete corresponding generated code
-        // - detect changes of forFiles and automatically convert?
+        // update project data when files of registered types change
+        const types = this.getProjectDataTypes() || {};
+        Object.keys(types).map(async typeId => {
+          const type = types[typeId];
+          if ([change.resource.path.ext, change.resource.path.base].includes(type.file)) {
+            if (![FileChangeType.DELETED, FileChangeType.UPDATED].includes(change.type)) {
+              return;
+            }
+            const items = this.getProjectDataItemsForType(typeId) || {};
+            const itemIdByUri = Object.keys(items).find(itemId => items[itemId]._fileUri.isEqual(change.resource));
+            switch (change.type) {
+              case FileChangeType.DELETED:
+                if (itemIdByUri) {
+                  this.deleteProjectDataItem(typeId, itemIdByUri);
+                }
+                break;
+              case FileChangeType.UPDATED:
+                try {
+                  const fileContents = await this.fileService.readFile(change.resource);
+                  const fileContentsJson = JSON.parse(fileContents.value.toString());
+                  if (itemIdByUri) {
+                    this.setProjectDataItem(typeId, itemIdByUri, fileContentsJson, change.resource);
+                  } else if (fileContentsJson._id) {
+                    this.setProjectDataItem(typeId, fileContentsJson._id, fileContentsJson, change.resource);
+                  }
+                } catch (error) {
+                }
+                break;
+            }
+          }
+        });
 
         // project file
         if (this.workspaceProjectFileUri && change.type === FileChangeType.UPDATED && change.resource.isEqual(this.workspaceProjectFileUri)) {
@@ -637,6 +676,9 @@ export class VesProjectService {
   }
 
   async setProjectName(name: string): Promise<void> {
+    if (!this._projectData) {
+      this._projectData = {};
+    }
     this._projectData.name = name;
     await this.saveProjectFile();
     this.updateWindowTitle();
