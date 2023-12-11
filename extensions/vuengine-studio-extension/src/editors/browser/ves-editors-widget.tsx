@@ -327,6 +327,12 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     }
 
     protected async mergeOntoDefaults(type: ProjectFileType): Promise<void> {
+        if (type.schema.properties) {
+            type.schema.properties['_id'] = {
+                type: 'string',
+                default: ''
+            };
+        }
         const schema = await window.electronVesCore.dereferenceJsonSchema(type.schema);
         this.data = this.generateDataFromSchema({
             ...schema,
