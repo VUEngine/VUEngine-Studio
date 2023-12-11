@@ -107,8 +107,8 @@ export class VesCodeGenService {
   }
 
   async generateAll(): Promise<void> {
-    const types = await this.showTypeSelection();
-    if (types !== undefined && types.length) {
+    const selectecTypes = await this.showTypeSelection();
+    if (selectecTypes !== undefined && selectecTypes.length) {
       /*
       const changedOnlySelection = await this.showChangedOnlySelection();
       if (changedOnlySelection !== undefined) {
@@ -116,14 +116,14 @@ export class VesCodeGenService {
         this.generate(types, changedOnly);
       }
       */
-      this.generate(types);
+      this.generate(selectecTypes);
     }
   }
 
   protected async showTypeSelection(): Promise<string[] | undefined> {
-    const items: QuickPickItem[] = [];
     await this.vesProjectService.projectItemsReady;
     const types = this.vesProjectService.getProjectDataTypes() || {};
+    const items: QuickPickItem[] = [];
     Object.keys(types).map(typeId => {
       const numberOfItems = Object.keys(this.vesProjectService.getProjectDataItemsForType(typeId, ProjectContributor.Project) || []).length;
       const type = types[typeId];
@@ -138,6 +138,12 @@ export class VesCodeGenService {
         });
       }
     });
+
+    if (!items.length) {
+      await this.messageService.info(nls.localize('vuengine/codegen/noFilesInThisProject', 'No templateable files could be found in this project.'));
+      return;
+    }
+
     items.sort((a, b) => a.label.localeCompare(b.label));
 
     const pick = this.quickInputService.createQuickPick();

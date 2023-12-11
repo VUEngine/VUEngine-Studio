@@ -294,8 +294,12 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         this.vesCodeGenService.isGeneratingFiles = IsGeneratingFilesStatus.active;
         // delay template rendering to allow frontend to update status bar
         window.setTimeout(async () => {
-            const numberOfGeneratedFiles = await this.vesCodeGenService.renderTemplatesForItem(this.options.typeId, this.data, this.uri);
-            this.vesCodeGenService.setNumberOfGeneratedFiles(numberOfGeneratedFiles);
+            try {
+                const numberOfGeneratedFiles = await this.vesCodeGenService.renderTemplatesForItem(this.options.typeId, this.data, this.uri);
+                this.vesCodeGenService.setNumberOfGeneratedFiles(numberOfGeneratedFiles);
+            } catch (error) {
+                console.error(`Error generating files for ${this.uri.path}`);
+            }
             this.vesCodeGenService.isGeneratingFiles = IsGeneratingFilesStatus.done;
             this.generating = false;
             this.update();
