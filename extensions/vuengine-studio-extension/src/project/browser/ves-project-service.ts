@@ -573,8 +573,7 @@ export class VesProjectService {
     if (projectFileUri && await this.fileService.exists(projectFileUri)) {
       const projectFileContents = await this.fileService.readFile(projectFileUri);
       try {
-        const projectFile: ProjectFile = JSON.parse(projectFileContents.value.toString());
-        return this.addIdToTypes(projectFile);
+        return JSON.parse(projectFileContents.value.toString());
       } catch (error) {
         console.error('Malformed project file could not be parsed.', projectFileUri?.path.toString());
       }
@@ -586,19 +585,6 @@ export class VesProjectService {
       }],
       plugins: [],
     };
-  }
-
-  protected addIdToTypes(projectFile: ProjectFile): ProjectFile {
-    for (const type of Object.values(projectFile.types || {})) {
-      if (type.file?.startsWith('.') && type.schema.properties) {
-        type.schema.properties['_id'] = {
-          type: 'string',
-          default: ''
-        };
-      }
-    }
-
-    return projectFile;
   }
 
   async saveProjectFile(): Promise<boolean> {
