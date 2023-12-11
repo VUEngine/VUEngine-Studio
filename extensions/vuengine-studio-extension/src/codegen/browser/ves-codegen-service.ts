@@ -100,6 +100,28 @@ export class VesCodeGenService {
   protected bindEvents(): void {
     this.vesPluginsService.onDidChangeInstalledPlugins(async () =>
       this.handlePluginChange());
+
+    /*
+    this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
+      fileChangesEvent.changes.map(change => {
+        // update converted files when files of registered types change
+        Object.values(this.vesProjectService.getProjectDataTypes() || {}).map(type => {
+          if ([change.resource.path.ext, change.resource.path.base].includes(type.file)) {
+            switch (change.type) {
+              case FileChangeType.DELETED:
+                // TODO: delete corresponding generated code for deleted files
+                break;
+              case FileChangeType.UPDATED:
+                // TODO: move corresponding generated code for moved files of registered types
+                break;
+            }
+          }
+        });
+
+        // TODO: detect changes of forFiles and automatically convert?
+      });
+    });
+    */
   }
 
   protected registerOutputChannel(): void {
