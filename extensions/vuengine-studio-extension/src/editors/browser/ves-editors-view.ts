@@ -3,18 +3,19 @@ import { AbstractViewContribution, CommonCommands, CommonMenus, OpenerService, W
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { UserWorkingDirectoryProvider } from '@theia/core/lib/browser/user-working-directory-provider';
+import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { EditorManager } from '@theia/editor/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { NavigatorContextMenu } from '@theia/navigator/lib/browser/navigator-contribution';
 import { FILE_NAVIGATOR_ID, FileNavigatorWidget } from '@theia/navigator/lib/browser/navigator-widget';
 import { WorkspaceCommands } from '@theia/workspace/lib/browser';
+import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesEditorsCommands } from './ves-editors-commands';
 import { VesEditorsContextKeyService } from './ves-editors-context-key-service';
 import { VesEditorsWidget } from './ves-editors-widget';
-import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 
 @injectable()
 export class VesEditorsViewContribution extends AbstractViewContribution<VesEditorsWidget> implements CommandContribution, MenuContribution, TabBarToolbarContribution {
@@ -30,6 +31,8 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
     protected openerService: OpenerService;
     @inject(UntitledResourceResolver)
     protected readonly untitledResourceResolver: UntitledResourceResolver;
+    @inject(VesCodeGenService)
+    protected readonly vesCodeGenService: VesCodeGenService;
     @inject(VesCommonService)
     protected readonly vesCommonService: VesCommonService;
     @inject(VesEditorsContextKeyService)
@@ -223,7 +226,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         if (!ref || !ref.uri) {
             return;
         }
-        (ref as VesEditorsWidget).generateFiles();
+        this.vesCodeGenService.generate([ref.typeId], ref.uri);
     }
 
     protected async generateId(fileUri: URI): Promise<void> {
