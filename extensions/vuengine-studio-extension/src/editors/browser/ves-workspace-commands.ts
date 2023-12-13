@@ -25,6 +25,7 @@ export class VesWorkspaceCommandContribution extends WorkspaceCommandContributio
                     let defaultExt = '.c / .h';
                     let defaultName = nls.localize('vuengine/editors/newFileDialog/untitled', 'Untitled');
                     if (!parentUri.isEqual(uri)) {
+                        // if not on a folder, check if we can preset a type base on the filename
                         Object.keys(types).map(typeId => {
                             types[typeId].forFiles?.map(f => {
                                 if ([uri.path.ext, uri.path.base].includes(f)) {
@@ -32,6 +33,13 @@ export class VesWorkspaceCommandContribution extends WorkspaceCommandContributio
                                     defaultExt = types[typeId].file;
                                 }
                             });
+                        });
+                    } else {
+                        // ... otherwise, try to match folder (and parent folder) name with a type name
+                        Object.keys(types).map(typeId => {
+                            if ([uri.path.base, uri.parent.path.base].includes(typeId)) {
+                                defaultExt = types[typeId].file;
+                            }
                         });
                     }
                     const dialog = new VesNewFileDialog({
