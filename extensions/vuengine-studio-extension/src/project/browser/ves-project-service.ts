@@ -130,9 +130,9 @@ export class VesProjectService {
     }
 
     if (this._projectData.combined.items[typeId][itemId] === undefined) {
-      console.log('Added item to project data.', itemId);
+      console.log('Added item to project data.', typeId, itemId);
     } else {
-      console.log('Updated item in project data.', itemId);
+      console.log('Updated item in project data.', typeId, itemId);
     }
 
     this._projectData.combined.items[typeId][itemId] = {
@@ -155,7 +155,7 @@ export class VesProjectService {
       if (!Object.keys(this._projectData?.combined.items).length) {
         delete this._projectData?.combined.items;
       }
-      console.log('Removed item from project data.', itemId);
+      console.log('Removed item from project data.', typeId, itemId);
     }
   }
   getProjectPlugins(): string[] {
@@ -191,36 +191,14 @@ export class VesProjectService {
     this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
       fileChangesEvent.changes.map(change => {
         // update project data when files of registered types change
-        const types = this.getProjectDataTypes() || {};
-        Object.keys(types).map(async typeId => {
-          const type = types[typeId];
-          if ([change.resource.path.ext, change.resource.path.base].includes(type.file)) {
-            if (![FileChangeType.DELETED, FileChangeType.UPDATED].includes(change.type)) {
-              return;
-            }
-            const items = this.getProjectDataItemsForType(typeId) || {};
-            const itemIdByUri = Object.keys(items).find(itemId => items[itemId]._fileUri.isEqual(change.resource));
-            switch (change.type) {
-              case FileChangeType.DELETED:
-                if (itemIdByUri) {
-                  this.deleteProjectDataItem(typeId, itemIdByUri);
-                }
-                break;
-              case FileChangeType.UPDATED:
-                try {
-                  const fileContents = await this.fileService.readFile(change.resource);
-                  const fileContentsJson = JSON.parse(fileContents.value.toString());
-                  if (itemIdByUri) {
-                    this.setProjectDataItem(typeId, itemIdByUri, fileContentsJson, change.resource);
-                  } else if (fileContentsJson._id) {
-                    this.setProjectDataItem(typeId, fileContentsJson._id, fileContentsJson, change.resource);
-                  }
-                } catch (error) {
-                }
-                break;
-            }
-          }
-        });
+        switch (change.type) {
+          case FileChangeType.DELETED:
+            this.handleFileDelete(change.resource);
+            break;
+          case FileChangeType.UPDATED:
+            this.handleFileUpdate(change.resource);
+            break;
+        }
 
         // project file
         if (this.workspaceProjectFileUri && change.type === FileChangeType.UPDATED && change.resource.isEqual(this.workspaceProjectFileUri)) {
@@ -233,6 +211,47 @@ export class VesProjectService {
         }
       });
     });
+  }
+
+  protected async handleFileDelete(fileUri: URI): Promise<void> {
+    const types = this.getProjectDataTypes() || {};
+    await Promise.all(Object.keys(types).map(async typeId => {
+      const type = types[typeId];
+      if ([fileUri.path.ext, fileUri.path.base].includes(type.file)) {
+        const items = this.getProjectDataItemsForType(typeId) || {};
+        const itemIdByUri = Object.keys(items).find(itemId => items[itemId]._fileUri.isEqual(fileUri));
+        if (itemIdByUri) {
+          return this.deleteProjectDataItem(typeId, itemIdByUri);
+        }
+      }
+    }));
+  }
+
+  protected async handleFileUpdate(fileUri: URI): Promise<void> {
+    const types = this.getProjectDataTypes() || {};
+    await Promise.all(Object.keys(types).map(async typeId => {
+      const type = types[typeId];
+      if ([fileUri.path.ext, fileUri.path.base].includes(type.file)) {
+        const items = this.getProjectDataItemsForType(typeId) || {};
+        const itemIdByUri = Object.keys(items).find(itemId => items[itemId]._fileUri.isEqual(fileUri));
+        try {
+          const fileContents = await this.fileService.readFile(fileUri);
+          const fileContentsJson = JSON.parse(fileContents.value.toString());
+          if (itemIdByUri) {
+            await this.setProjectDataItem(typeId, itemIdByUri, fileContentsJson, fileUri);
+          } else if (type.file.startsWith('.')) {
+            if (fileContentsJson._id) {
+              await this.setProjectDataItem(typeId, fileContentsJson._id, fileContentsJson, fileUri);
+            } else {
+              console.error('Can not update project data, missing _id property.', typeId);
+            }
+          } else {
+            await this.setProjectDataItem(typeId, ProjectContributor.Project, fileContentsJson, fileUri);
+          }
+        } catch (error) {
+        }
+      }
+    }));
   }
 
   protected async readProjectData(): Promise<void> {

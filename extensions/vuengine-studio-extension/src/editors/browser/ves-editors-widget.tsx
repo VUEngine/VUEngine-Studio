@@ -15,8 +15,6 @@ import { MonacoTextModelService } from '@theia/monaco/lib/browser/monaco-text-mo
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { deepmerge } from 'deepmerge-ts';
 import cloneDeep from 'lodash/cloneDeep';
-import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
-import { IsGeneratingFilesStatus } from '../../codegen/browser/ves-codegen-types';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { ProjectFile, ProjectFileType } from '../../project/browser/ves-project-types';
@@ -57,8 +55,6 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     protected readonly vesCommonService: VesCommonService;
     @inject(VesEditorsWidgetOptions)
     protected readonly options: VesEditorsWidgetOptions;
-    @inject(VesCodeGenService)
-    protected readonly vesCodeGenService: VesCodeGenService;
     @inject(VesProjectService)
     protected readonly vesProjectService: VesProjectService;
     @inject(VesRumblePackService)
@@ -81,6 +77,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     public autoSave: 'off' | 'afterDelay' | 'onFocusChange' | 'onWindowChange' = 'off';
     protected autoSaveDelay: number;
 
+    typeId: string;
     uri: URI;
     protected reference: Reference<MonacoEditorModel>;
     protected justSaved: boolean = false;
@@ -107,6 +104,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     @postConstruct()
     protected init(): void {
         this.uri = new URI(this.options.uri);
+        this.typeId = this.options.typeId;
 
         this.doInit();
         const label = this.labelProvider.getLongName(this.uri);
@@ -120,6 +118,8 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         this.title.caption = label;
         this.title.iconClass = 'fa fa-cog';
         this.title.closable = true;
+
+        this.setTitle();
 
         this.autoSave = this.editorPreferences['files.autoSave'];
         this.autoSaveDelay = this.editorPreferences['files.autoSaveDelay'];
@@ -195,8 +195,6 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         this.data = json as ItemData;
         await this.mergeOntoDefaults(type);
         this.setSavedData();
-
-        this.setTitle();
     }
 
     protected setTitle(): void {
@@ -213,7 +211,6 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         if (this.dirty) {
             this.data = this.savedData;
             this.setDirty(false);
-            this.setTitle();
         }
     }
 
@@ -229,7 +226,6 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     undo(): void {
         if (this.undoHistory()) {
             this.setDirty(this.dataHasBeenChanged());
-            this.setTitle();
             this.update();
         }
     }
@@ -237,7 +233,6 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     redo(): void {
         if (this.redoHistory()) {
             this.setDirty(this.dataHasBeenChanged());
-            this.setTitle();
             this.update();
         }
     }
@@ -288,34 +283,15 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         return false;
     }
 
-    async generateFiles(): Promise<void> {
-        this.generating = true;
-        this.update();
-        this.vesCodeGenService.isGeneratingFiles = IsGeneratingFilesStatus.active;
-        // delay template rendering to allow frontend to update status bar
-        window.setTimeout(async () => {
-            try {
-                const numberOfGeneratedFiles = await this.vesCodeGenService.renderTemplatesForItem(this.options.typeId, this.data, this.uri);
-                this.vesCodeGenService.setNumberOfGeneratedFiles(numberOfGeneratedFiles);
-            } catch (error) {
-                console.error(`Error generating files for ${this.uri.path}`);
-            }
-            this.vesCodeGenService.isGeneratingFiles = IsGeneratingFilesStatus.done;
-            this.generating = false;
-            this.update();
-        }, 100);
-    }
-
     async save(): Promise<void> {
         if (this.uri.scheme === UNTITLED_SCHEME) {
-            this.commandService.executeCommand(CommonCommands.SAVE_AS.id);
+            await this.commandService.executeCommand(CommonCommands.SAVE_AS.id);
         } else if (this.dirty) {
             try {
                 this.reference.object.textEditorModel.setValue(JSON.stringify(this.data, undefined, 4));
                 this.justSaved = true;
                 this.setDirty(false);
                 this.setSavedData();
-                this.generateFiles();
             } catch (error) {
                 console.error('Could not save');
             }
@@ -415,7 +391,6 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     protected handleChanged(data: ItemData): void {
         this.data = data;
         this.setDirty(this.dataHasBeenChanged());
-        this.setTitle();
         this.pushToHistory();
     }
 

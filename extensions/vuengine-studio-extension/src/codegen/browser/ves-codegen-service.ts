@@ -4,6 +4,7 @@ import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { FileChangeType, FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { OutputChannelManager, OutputChannelSeverity } from '@theia/output/lib/browser/output-channel';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import * as iconv from 'iconv-lite';
@@ -101,27 +102,44 @@ export class VesCodeGenService {
     this.vesPluginsService.onDidChangeInstalledPlugins(async () =>
       this.handlePluginChange());
 
-    /*
+    // TODO: ensure this is always called after onDidFilesChange in project service
     this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
       fileChangesEvent.changes.map(change => {
-        // update converted files when files of registered types change
-        Object.values(this.vesProjectService.getProjectDataTypes() || {}).map(type => {
-          if ([change.resource.path.ext, change.resource.path.base].includes(type.file)) {
-            switch (change.type) {
-              case FileChangeType.DELETED:
-                // TODO: delete corresponding generated code for deleted files
-                break;
-              case FileChangeType.UPDATED:
-                // TODO: move corresponding generated code for moved files of registered types
-                break;
-            }
-          }
-        });
+        // handle code generation when files of registered types change
+        switch (change.type) {
+          case FileChangeType.DELETED:
+            // this.handleFileDelete(change.resource);
+            break;
+          case FileChangeType.UPDATED:
+            this.handleFileUpdate(change.resource);
+            break;
+        }
 
         // TODO: detect changes of forFiles and automatically convert?
       });
     });
-    */
+  }
+
+  protected async handleFileDelete(fileUri: URI): Promise<void> {
+    const types = this.vesProjectService.getProjectDataTypes() || {};
+    await Promise.all(Object.keys(types).map(async typeId => {
+      const type = types[typeId];
+      if ([fileUri.path.ext, fileUri.path.base].includes(type.file)) {
+        // TODO: delete corresponding generated code for deleted files
+        // ...
+      }
+    }));
+  }
+
+  protected async handleFileUpdate(fileUri: URI): Promise<void> {
+    const types = this.vesProjectService.getProjectDataTypes() || {};
+    await Promise.all(Object.keys(types).map(async typeId => {
+      const type = types[typeId];
+      if ([fileUri.path.ext, fileUri.path.base].includes(type.file)) {
+        await this.generate([typeId], fileUri);
+        // TODO: move corresponding generated code for moved files of registered types
+      }
+    }));
   }
 
   protected registerOutputChannel(): void {
@@ -138,7 +156,7 @@ export class VesCodeGenService {
         this.generate(types, changedOnly);
       }
       */
-      this.generate(selectecTypes);
+      await this.generate(selectecTypes);
     }
   }
 
@@ -213,7 +231,7 @@ export class VesCodeGenService {
   }
   */
 
-  protected async generate(types: string[]/* , changedOnly: boolean */): Promise<void> {
+  async generate(types: string[]/* , changedOnly: boolean */, fileUri?: URI): Promise<void> {
     this.isGeneratingFiles = IsGeneratingFilesStatus.active;
     let numberOfGeneratedFiles = 0;
 
@@ -229,13 +247,15 @@ export class VesCodeGenService {
           return;
         }
         */
-        try {
-          const fileContents = await this.fileService.readFile(item._fileUri);
-          const fileContentsJson = JSON.parse(fileContents.value.toString());
-          const n = await this.renderTemplatesForItem(typeId, fileContentsJson, item._fileUri);
-          numberOfGeneratedFiles += n;
-        } catch (error) {
-          // TODO
+        if (!fileUri || fileUri.isEqual(item._fileUri)) {
+          try {
+            const fileContents = await this.fileService.readFile(item._fileUri);
+            const fileContentsJson = JSON.parse(fileContents.value.toString());
+            const n = await this.renderTemplatesForItem(typeId, fileContentsJson, item._fileUri);
+            numberOfGeneratedFiles += n;
+          } catch (error) {
+            // TODO
+          }
         }
       }));
     }));
@@ -313,7 +333,7 @@ export class VesCodeGenService {
     const channel = this.outputChannelManager.getChannel(CODEGEN_CHANNEL_NAME);
     if (message) {
       const date = new Date();
-      channel.append(`${date.getHours()}:${date.getMinutes()}:${date.getSeconds()} `);
+      channel.append(`${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')} `);
       channel.appendLine(message, severity);
     }
   }
