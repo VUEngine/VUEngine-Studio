@@ -327,7 +327,8 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     }
 
     protected async mergeOntoDefaults(type: ProjectFileType): Promise<void> {
-        if (type.schema.properties) {
+        const needsId = type.file.startsWith('.');
+        if (type.schema.properties && needsId) {
             type.schema.properties['_id'] = {
                 type: 'string',
                 default: ''
@@ -343,7 +344,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
             this.data.name = this.uri.path.name;
         }
 
-        if (!this.data?._id && type.file.startsWith('.')) {
+        if (!this.data?._id && needsId) {
             this.data!._id = this.vesCommonService.nanoid();
         }
 
