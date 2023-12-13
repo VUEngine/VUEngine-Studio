@@ -67,7 +67,7 @@ export default function General(props: GeneralProps): React.JSX.Element {
             ].sort())],
         };
 
-        if (updateData.files?.length) {
+        if (imageConvData.name === '' && updateData.files?.length) {
             const name = workspaceRootUri.resolve(updateData.files[0]).path.name.replace(/([A-Z])/g, ' $1').trim();
             updateData.name = name;
         }
@@ -75,9 +75,9 @@ export default function General(props: GeneralProps): React.JSX.Element {
         setImageConvData(updateData);
     };
 
-    const removeFile = async (index: number) => {
+    const removeFile = async (path: string) => {
         setImageConvData({
-            files: imageConvData.files.filter((f, i) => i !== index),
+            files: imageConvData.files.filter((f, i) => f !== path),
         });
     };
 
@@ -146,12 +146,12 @@ export default function General(props: GeneralProps): React.JSX.Element {
                             {fullUri.path.base}
                         </div>
                         <div className='filePreviewMeta'>
-                            {filesToShow[f].width}×{filesToShow[f].height}
+                            {filesToShow[f]}
                         </div>
                         <div className='filePreviewActions'>
                             <i
                                 className="fa fa-trash"
-                                onClick={() => removeFile(i)}
+                                onClick={() => removeFile(f)}
                             />
                         </div>
                     </div>;
