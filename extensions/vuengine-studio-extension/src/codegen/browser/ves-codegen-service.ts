@@ -4,7 +4,6 @@ import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { FileChangeType, FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { OutputChannelManager, OutputChannelSeverity } from '@theia/output/lib/browser/output-channel';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import * as iconv from 'iconv-lite';
@@ -102,22 +101,19 @@ export class VesCodeGenService {
     this.vesPluginsService.onDidChangeInstalledPlugins(async () =>
       this.handlePluginChange());
 
-    // TODO: ensure this is always called after onDidFilesChange in project service
-    this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
-      fileChangesEvent.changes.map(change => {
-        // handle code generation when files of registered types change
-        switch (change.type) {
-          case FileChangeType.DELETED:
-            // this.handleFileDelete(change.resource);
-            break;
-          case FileChangeType.UPDATED:
-            this.handleFileUpdate(change.resource);
-            break;
-        }
-
-        // TODO: detect changes of forFiles and automatically convert?
-      });
+    this.vesProjectService.onDidAddProjectItem(fileUri => {
+      this.handleFileUpdate(fileUri);
     });
+    this.vesProjectService.onDidUpdateProjectItem(fileUri => {
+      this.handleFileUpdate(fileUri);
+    });
+    /*
+    this.vesProjectService.onDidDeleteProjectItem(fileUri => {
+      this.handleFileDelete(fileUri);
+    });
+    */
+
+    // TODO: detect changes of forFiles and automatically convert?
   }
 
   protected async handleFileDelete(fileUri: URI): Promise<void> {
@@ -126,7 +122,6 @@ export class VesCodeGenService {
       const type = types[typeId];
       if ([fileUri.path.ext, fileUri.path.base].includes(type.file)) {
         // TODO: delete corresponding generated code for deleted files
-        // ...
       }
     }));
   }
@@ -137,7 +132,7 @@ export class VesCodeGenService {
       const type = types[typeId];
       if ([fileUri.path.ext, fileUri.path.base].includes(type.file)) {
         await this.generate([typeId], fileUri);
-        // TODO: move corresponding generated code for moved files of registered types
+        // TODO: delete corresponding generated code for moved files and regenerate at new location
       }
     }));
   }
