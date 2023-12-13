@@ -1,4 +1,4 @@
-import { CommandService, MessageService, isWindows, nls } from '@theia/core';
+import { CommandService, Emitter, MessageService, isWindows, nls } from '@theia/core';
 import { OpenerService } from '@theia/core/lib/browser';
 import { WindowTitleService } from '@theia/core/lib/browser/window/window-title-service';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
@@ -64,7 +64,18 @@ export class VesProjectService {
     return this._projectItemsReady.promise;
   }
 
+  protected readonly onDidAddProjectItemEmitter = new Emitter<URI>();
+  readonly onDidAddProjectItem = this.onDidAddProjectItemEmitter.event;
+  protected readonly onDidUpdateProjectItemEmitter = new Emitter<URI>();
+  readonly onDidUpdateProjectItem = this.onDidUpdateProjectItemEmitter.event;
+  protected readonly onDidDeleteProjectItemEmitter = new Emitter<URI>();
+  readonly onDidDeleteProjectItem = this.onDidDeleteProjectItemEmitter.event;
+
+  // Flag to work around files change event firing twice
+  // TODO: remove once revolved in Theia
+  // https://github.com/eclipse-theia/theia/issues/3512
   protected fileChangeEventLock: boolean = false;
+
   protected workspaceProjectFileUri: URI | undefined;
 
   // project data
@@ -129,11 +140,7 @@ export class VesProjectService {
       this._projectData.combined.items[typeId] = {};
     }
 
-    if (this._projectData.combined.items[typeId][itemId] === undefined) {
-      console.log('Added item to project data.', typeId, itemId);
-    } else {
-      console.log('Updated item in project data.', typeId, itemId);
-    }
+    const newItem = (this._projectData.combined.items[typeId][itemId] === undefined);
 
     this._projectData.combined.items[typeId][itemId] = {
       _contributor: ProjectContributor.Project,
@@ -142,9 +149,17 @@ export class VesProjectService {
       ...data
     };
 
+    if (newItem) {
+      this.onDidAddProjectItemEmitter.fire(fileUri);
+      console.log('Added item to project data.', typeId, itemId);
+    } else {
+      this.onDidUpdateProjectItemEmitter.fire(fileUri);
+      console.log('Updated item in project data.', typeId, itemId);
+    }
+
     return true;
   }
-  async deleteProjectDataItem(typeId: string, itemId: string): Promise<void> {
+  async deleteProjectDataItem(typeId: string, itemId: string, fileUri: URI): Promise<void> {
     if (this._projectData?.combined?.items
       && this._projectData?.combined.items[typeId]
       && this._projectData?.combined.items[typeId][itemId]) {
@@ -155,6 +170,7 @@ export class VesProjectService {
       if (!Object.keys(this._projectData?.combined.items).length) {
         delete this._projectData?.combined.items;
       }
+      this.onDidDeleteProjectItemEmitter.fire(fileUri);
       console.log('Removed item from project data.', typeId, itemId);
     }
   }
@@ -189,6 +205,10 @@ export class VesProjectService {
     });
 
     this.fileService.onDidFilesChange(async (fileChangesEvent: FileChangesEvent) => {
+      if (this.fileChangeEventLock) {
+        return;
+      }
+
       fileChangesEvent.changes.map(change => {
         // update project data when files of registered types change
         switch (change.type) {
@@ -202,15 +222,19 @@ export class VesProjectService {
 
         // project file
         if (this.workspaceProjectFileUri && change.type === FileChangeType.UPDATED && change.resource.isEqual(this.workspaceProjectFileUri)) {
-          if (!this.fileChangeEventLock) {
-            console.info('Manual change of project file.');
-            this.readProjectData();
-          } else {
-            this.fileChangeEventLock = false;
-          }
+          this.enableFileChangeEventLock();
+          console.info('Manual change of project file.');
+          this.readProjectData();
         }
       });
     });
+  }
+
+  protected enableFileChangeEventLock(): void {
+    this.fileChangeEventLock = true;
+    setTimeout(() => {
+      this.fileChangeEventLock = false;
+    }, 1000);
   }
 
   protected async handleFileDelete(fileUri: URI): Promise<void> {
@@ -221,7 +245,8 @@ export class VesProjectService {
         const items = this.getProjectDataItemsForType(typeId) || {};
         const itemIdByUri = Object.keys(items).find(itemId => items[itemId]._fileUri.isEqual(fileUri));
         if (itemIdByUri) {
-          return this.deleteProjectDataItem(typeId, itemIdByUri);
+          this.enableFileChangeEventLock();
+          return this.deleteProjectDataItem(typeId, itemIdByUri, fileUri);
         }
       }
     }));
@@ -238,14 +263,17 @@ export class VesProjectService {
           const fileContents = await this.fileService.readFile(fileUri);
           const fileContentsJson = JSON.parse(fileContents.value.toString());
           if (itemIdByUri) {
+            this.enableFileChangeEventLock();
             await this.setProjectDataItem(typeId, itemIdByUri, fileContentsJson, fileUri);
           } else if (type.file.startsWith('.')) {
             if (fileContentsJson._id) {
+              this.enableFileChangeEventLock();
               await this.setProjectDataItem(typeId, fileContentsJson._id, fileContentsJson, fileUri);
             } else {
               console.error('Can not update project data, missing _id property.', typeId);
             }
           } else {
+            this.enableFileChangeEventLock();
             await this.setProjectDataItem(typeId, ProjectContributor.Project, fileContentsJson, fileUri);
           }
         } catch (error) {
