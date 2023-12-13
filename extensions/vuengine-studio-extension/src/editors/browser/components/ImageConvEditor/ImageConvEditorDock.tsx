@@ -11,7 +11,6 @@ import TilesMap from './TilesMap/TilesMap';
 import Animation from './Animation/Animation';
 import Preview from './Preview/Preview';
 import General from './General/General';
-import { ISizeCalculationResult } from 'image-size/dist/types/interface';
 
 interface ImageConvEditorDockProps {
     data: ImageConfig
@@ -35,7 +34,7 @@ export default function ImageConvEditorDock(props: ImageConvEditorDockProps): Re
         messageService,
         workspaceService,
     } = props;
-    const [filesToShow, setFilesToShow] = useState<{ [path: string]: ISizeCalculationResult }>({});
+    const [filesToShow, setFilesToShow] = useState<{ [path: string]: string }>({});
     const workspaceRootUri = workspaceService.tryGetRoots()[0]?.resource;
 
     // let dockLayoutRef: DockLayout;
@@ -54,13 +53,20 @@ export default function ImageConvEditorDock(props: ImageConvEditorDockProps): Re
                     return relativePath;
                 }));
 
-        const result: { [path: string]: ISizeCalculationResult } = {};
+        const result: { [path: string]: string } = {};
         await Promise.all(f
             .sort((a, b) => a.localeCompare(b))
             .map(async p => {
-                const fullPath = workspaceRootUri.resolve(p).path.fsPath();
-                const dimensions = await window.electronVesCore.getImageDimensions(fullPath);
-                result[p] = dimensions;
+                let meta = nls.localize(
+                    'vuengine/imageConvEditor/fileNotFound',
+                    'File not found'
+                );
+                const resolvedUri = workspaceRootUri.resolve(p);
+                if (await fileService.exists(resolvedUri)) {
+                    const dimensions = await window.electronVesCore.getImageDimensions(resolvedUri.path.fsPath());
+                    meta = `${dimensions.width}×${dimensions.height}`;
+                }
+                result[p] = meta;
             }));
 
         setFilesToShow(result);
