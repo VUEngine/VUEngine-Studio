@@ -64,8 +64,6 @@ export class VesProjectService {
     return this._projectItemsReady.promise;
   }
 
-  protected knownContributors: { [contributor: string]: URI } = {};
-
   protected readonly onDidAddProjectItemEmitter = new Emitter<URI>();
   readonly onDidAddProjectItem = this.onDidAddProjectItemEmitter.event;
   protected readonly onDidUpdateProjectItemEmitter = new Emitter<URI>();
@@ -79,6 +77,8 @@ export class VesProjectService {
   protected fileChangeEventLock: boolean = false;
 
   protected workspaceProjectFileUri: URI | undefined;
+
+  protected knownContributors: { [contributor: string]: URI } = {};
 
   // project data
   protected _projectData: ProjectFile | undefined;
@@ -122,7 +122,7 @@ export class VesProjectService {
 
     return result;
   }
-  async setProjectDataItem(typeId: string, itemId: string, data: ProjectFileItem, fileUri: URI): Promise<boolean> {
+  protected setProjectDataItem(typeId: string, itemId: string, data: ProjectFileItem, fileUri: URI): boolean {
     if (!this._projectData) {
       this._projectData = {};
     }
@@ -177,7 +177,7 @@ export class VesProjectService {
 
     return true;
   }
-  async deleteProjectDataItem(typeId: string, itemId: string, fileUri: URI): Promise<void> {
+  protected deleteProjectDataItem(typeId: string, itemId: string, fileUri: URI): void {
     if (this._projectData?.combined?.items
       && this._projectData?.combined.items[typeId]
       && this._projectData?.combined.items[typeId][itemId]) {
@@ -192,10 +192,10 @@ export class VesProjectService {
       console.log(`Removed item from project data. Type: ${typeId}, ID: ${itemId}.`);
     }
   }
-  getProjectPlugins(): string[] {
+  protected getProjectPlugins(): string[] {
     return this._projectData?.plugins || [];
   }
-  async setProjectPlugins(plugins: string[]): Promise<void> {
+  protected async setProjectPlugins(plugins: string[]): Promise<void> {
     if (!this._projectData) {
       this._projectData = {};
     }
@@ -255,24 +255,24 @@ export class VesProjectService {
     }, 1000);
   }
 
-  protected async handleFileDelete(fileUri: URI): Promise<void> {
+  protected handleFileDelete(fileUri: URI): void {
     const types = this.getProjectDataTypes() || {};
-    await Promise.all(Object.keys(types).map(async typeId => {
+    Object.keys(types).map(async typeId => {
       const type = types[typeId];
       if ([fileUri.path.ext, fileUri.path.base].includes(type.file)) {
         const items = this.getProjectDataItemsForType(typeId) || {};
         const itemIdByUri = Object.keys(items).find(itemId => items[itemId]._fileUri.isEqual(fileUri));
         if (itemIdByUri) {
           this.enableFileChangeEventLock();
-          return this.deleteProjectDataItem(typeId, itemIdByUri, fileUri);
+          this.deleteProjectDataItem(typeId, itemIdByUri, fileUri);
         }
       }
-    }));
+    });
   }
 
-  protected async handleFileUpdate(fileUri: URI): Promise<void> {
+  protected handleFileUpdate(fileUri: URI): void {
     const types = this.getProjectDataTypes() || {};
-    await Promise.all(Object.keys(types).map(async typeId => {
+    Object.keys(types).map(async typeId => {
       const type = types[typeId];
       if ([fileUri.path.ext, fileUri.path.base].includes(type.file)) {
         const items = this.getProjectDataItemsForType(typeId) || {};
@@ -282,22 +282,22 @@ export class VesProjectService {
           const fileContentsJson = JSON.parse(fileContents.value.toString());
           if (itemIdByUri) {
             this.enableFileChangeEventLock();
-            await this.setProjectDataItem(typeId, itemIdByUri, fileContentsJson, fileUri);
+            this.setProjectDataItem(typeId, itemIdByUri, fileContentsJson, fileUri);
           } else if (type.file.startsWith('.')) {
             if (fileContentsJson._id) {
               this.enableFileChangeEventLock();
-              await this.setProjectDataItem(typeId, fileContentsJson._id, fileContentsJson, fileUri);
+              this.setProjectDataItem(typeId, fileContentsJson._id, fileContentsJson, fileUri);
             } else {
               console.error('Can not update project data, missing _id property.', typeId);
             }
           } else {
             this.enableFileChangeEventLock();
-            await this.setProjectDataItem(typeId, ProjectContributor.Project, fileContentsJson, fileUri);
+            this.setProjectDataItem(typeId, ProjectContributor.Project, fileContentsJson, fileUri);
           }
         } catch (error) {
         }
       }
-    }));
+    });
   }
 
   protected async readProjectData(): Promise<void> {
@@ -377,7 +377,7 @@ export class VesProjectService {
       } else if (installedPluginId.startsWith(USER_PLUGINS_PREFIX)) {
         uri = userPluginsUri.resolve(installedPluginId.replace(USER_PLUGINS_PREFIX, ''));
       }
-      if (uri && pluginsData[installedPluginId]) {
+      if (uri && pluginsData[installedPluginId] && this.workspaceProjectFileUri?.parent.isEqual(uri)) {
         const contributor = `${ProjectContributor.Plugin}:${installedPluginId}` as ProjectContributor;
         pluginsProjectDataWithContributors.push({
           _contributor: contributor,
@@ -389,22 +389,25 @@ export class VesProjectService {
     }));
 
     const resourcesUri = await this.vesCommonService.getResourcesUri();
-    const projectDataWithContributors: (ProjectFile & WithContributor)[] = [
-      {
-        _contributor: ProjectContributor.Studio,
-        _contributorUri: resourcesUri,
-        ...defaultProjectData
-      },
-      {
+    const projectDataWithContributors: (ProjectFile & WithContributor)[] = [{
+      _contributor: ProjectContributor.Studio,
+      _contributorUri: resourcesUri,
+      ...defaultProjectData
+    }];
+    this.knownContributors[ProjectContributor.Studio] = resourcesUri;
+
+    if (!this.workspaceProjectFileUri?.isEqual(engineCoreProjectFileUri)) {
+      projectDataWithContributors.push({
         _contributor: ProjectContributor.Engine,
         _contributorUri: engineCoreProjectFileUri.parent,
         ...engineCoreProjectFileData
-      },
-      ...pluginsProjectDataWithContributors,
-    ];
+      });
+      this.knownContributors[ProjectContributor.Engine] = engineCoreProjectFileUri.parent;
+    }
 
-    this.knownContributors[ProjectContributor.Studio] = resourcesUri;
-    this.knownContributors[ProjectContributor.Engine] = engineCoreProjectFileUri.parent;
+    if (pluginsProjectDataWithContributors.length) {
+      projectDataWithContributors.push(...pluginsProjectDataWithContributors);
+    }
 
     if (this.workspaceProjectFileUri) {
       projectDataWithContributors.push({
