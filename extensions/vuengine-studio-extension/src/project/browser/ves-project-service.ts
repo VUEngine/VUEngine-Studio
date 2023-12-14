@@ -64,6 +64,8 @@ export class VesProjectService {
     return this._projectItemsReady.promise;
   }
 
+  protected knownContributors: { [contributor: string]: URI } = {};
+
   protected readonly onDidAddProjectItemEmitter = new Emitter<URI>();
   readonly onDidAddProjectItem = this.onDidAddProjectItemEmitter.event;
   protected readonly onDidUpdateProjectItemEmitter = new Emitter<URI>();
@@ -121,12 +123,6 @@ export class VesProjectService {
     return result;
   }
   async setProjectDataItem(typeId: string, itemId: string, data: ProjectFileItem, fileUri: URI): Promise<boolean> {
-    await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-    if (!workspaceRootUri) {
-      return false;
-    }
-
     if (!this._projectData) {
       this._projectData = {};
     }
@@ -142,19 +138,41 @@ export class VesProjectService {
 
     const newItem = (this._projectData.combined.items[typeId][itemId] === undefined);
 
-    this._projectData.combined.items[typeId][itemId] = {
-      _contributor: ProjectContributor.Project,
-      _contributorUri: workspaceRootUri.parent,
-      _fileUri: fileUri,
-      ...data
-    };
-
     if (newItem) {
+      // check if uri is under any of a list of known contributors
+      let contributor: ProjectContributor;
+      let contributorUri: URI;
+      let matchedContributor = false;
+      Object.keys(this.knownContributors).map(c => {
+        const u = this.knownContributors[c];
+        if (!matchedContributor && u.isEqualOrParent(fileUri)) {
+          contributor = c as ProjectContributor;
+          contributorUri = u;
+          matchedContributor = true;
+        }
+      });
+      if (!matchedContributor) {
+        return false;
+      }
+
+      this._projectData.combined.items[typeId][itemId] = {
+        _contributor: contributor!,
+        _contributorUri: contributorUri!,
+        _fileUri: fileUri,
+        ...data
+      };
+
       this.onDidAddProjectItemEmitter.fire(fileUri);
-      console.log('Added item to project data.', typeId, itemId);
+      console.log(`Added item to project data. Type: ${typeId}, ID: ${itemId}, Contributor: ${contributor!}.`);
     } else {
+      this._projectData.combined.items[typeId][itemId] = {
+        ...this._projectData.combined.items[typeId][itemId],
+        _fileUri: fileUri,
+        ...data
+      };
+
       this.onDidUpdateProjectItemEmitter.fire(fileUri);
-      console.log('Updated item in project data.', typeId, itemId);
+      console.log(`Updated item in project data. Type: ${typeId}, ID: ${itemId}, Contributor: ${this._projectData.combined.items[typeId][itemId]._contributor}.`);
     }
 
     return true;
@@ -171,7 +189,7 @@ export class VesProjectService {
         delete this._projectData?.combined.items;
       }
       this.onDidDeleteProjectItemEmitter.fire(fileUri);
-      console.log('Removed item from project data.', typeId, itemId);
+      console.log(`Removed item from project data. Type: ${typeId}, ID: ${itemId}.`);
     }
   }
   getProjectPlugins(): string[] {
@@ -286,6 +304,8 @@ export class VesProjectService {
     await this.workspaceService.ready;
     const startTime = performance.now();
 
+    this.knownContributors = {};
+
     // workspace
     let workspaceProjectFileData: ProjectFile = {
       'folders':
@@ -358,11 +378,13 @@ export class VesProjectService {
         uri = userPluginsUri.resolve(installedPluginId.replace(USER_PLUGINS_PREFIX, ''));
       }
       if (uri && pluginsData[installedPluginId]) {
+        const contributor = `${ProjectContributor.Plugin}:${installedPluginId}` as ProjectContributor;
         pluginsProjectDataWithContributors.push({
-          _contributor: `${ProjectContributor.Plugin}:${installedPluginId}` as ProjectContributor,
+          _contributor: contributor,
           _contributorUri: uri,
           ...pluginsData[installedPluginId],
         });
+        this.knownContributors[contributor] = uri;
       }
     }));
 
@@ -381,12 +403,16 @@ export class VesProjectService {
       ...pluginsProjectDataWithContributors,
     ];
 
+    this.knownContributors[ProjectContributor.Studio] = resourcesUri;
+    this.knownContributors[ProjectContributor.Engine] = engineCoreProjectFileUri.parent;
+
     if (this.workspaceProjectFileUri) {
       projectDataWithContributors.push({
         _contributor: ProjectContributor.Project,
         _contributorUri: this.workspaceProjectFileUri.parent,
         ...workspaceProjectFileData
       });
+      this.knownContributors[ProjectContributor.Project] = this.workspaceProjectFileUri.parent;
     }
 
     const combined: {
