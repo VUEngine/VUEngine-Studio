@@ -235,7 +235,7 @@ export class VesCodeGenService {
       if (!type) {
         return;
       }
-      const items = this.vesProjectService.getProjectDataItemsForType(typeId, ProjectContributor.Project) || {};
+      const items = this.vesProjectService.getProjectDataItemsForType(typeId, fileUri ? undefined : ProjectContributor.Project) || {};
       await Promise.all(Object.values(items).map(async item => {
         /*
         if (changedOnly && !this.hasChanges(type)) {
@@ -315,8 +315,8 @@ export class VesCodeGenService {
             targetUri,
             BinaryBuffer.wrap(iconv.encode(res, encoding))
           ).then(() => {
-            const relPath = workspaceRootUri.relative(targetUri);
-            this.logLine(`Rendered template ${templateId} to ${relPath}.`);
+            const p = workspaceRootUri.relative(targetUri) ?? targetUri.path.fsPath();
+            this.logLine(`Rendered template ${templateId} to ${p}.`);
             resolve();
           });
         }
