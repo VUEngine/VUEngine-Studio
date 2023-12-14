@@ -24,17 +24,20 @@ export class VesWorkspaceCommandContribution extends WorkspaceCommandContributio
                     const parentUri = parent.resource;
                     let defaultExt = '.c / .h';
                     let defaultName = nls.localize('vuengine/editors/newFileDialog/untitled', 'Untitled');
+                    let didMatchType = false;
                     if (!parentUri.isEqual(uri)) {
-                        // if not on a folder, check if we can preset a type base on the filename
+                        // if not on a folder, check if we can preset a type based on the filename
                         Object.keys(types).map(typeId => {
                             types[typeId].forFiles?.map(f => {
                                 if ([uri.path.ext, uri.path.base].includes(f)) {
                                     defaultName = uri.path.name;
                                     defaultExt = types[typeId].file;
+                                    didMatchType = true;
                                 }
                             });
                         });
-                    } else {
+                    }
+                    if (!didMatchType) {
                         // ... otherwise, try to match folder (and parent folder) name with a type name
                         Object.keys(types).map(typeId => {
                             if ([uri.path.base, uri.parent.path.base].includes(typeId)) {
