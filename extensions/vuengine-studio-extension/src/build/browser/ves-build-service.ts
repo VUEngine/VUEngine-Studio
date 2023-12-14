@@ -610,6 +610,7 @@ export class VesBuildService {
       textLowerCase.includes('undefined symbol') ||
       textLowerCase.includes(' no rule to make target') ||
       textLowerCase.includes(' *** ') ||
+      textLowerCase.includes(':(.rodata+') ||
       textLowerCase.endsWith(': undefined')) {
       type = BuildLogLineType.Error;
     } else if (textLowerCase.includes('warning: ') ||

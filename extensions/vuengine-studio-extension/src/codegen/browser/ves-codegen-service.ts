@@ -338,20 +338,20 @@ export class VesCodeGenService {
     const typeData = this.vesProjectService.getProjectDataType(typeId);
     if (typeData && Array.isArray(typeData.templates)) {
       await Promise.all(typeData.templates.map(async templateId => {
-        numberOfGeneratedFiles++;
-        await this.renderTemplate(templateId, itemUri, itemData);
+        const n = await this.renderTemplate(templateId, itemUri, itemData);
+        numberOfGeneratedFiles += n;
       }));
     };
 
     return numberOfGeneratedFiles;
   }
 
-  protected async renderTemplate(templateId: string, itemUri?: URI, itemData?: any): Promise<void> {
+  protected async renderTemplate(templateId: string, itemUri?: URI, itemData?: any): Promise<number> {
     await this.vesProjectService.projectDataReady;
     const template = this.vesProjectService.getProjectDataTemplate(templateId);
     if (!template) {
       console.warn(`Template ${templateId} not found.`);
-      return;
+      return 0;
     }
 
     const encoding = template.encoding ? template.encoding : ProjectFileTemplateEncoding.utf8;
@@ -366,7 +366,7 @@ export class VesCodeGenService {
       itemUri: itemUri
     };
 
-    await this.renderFilesFromTemplate(templateId, template, uri, data, encoding);
+    return this.renderFilesFromTemplate(templateId, template, uri, data, encoding);
   }
 
   protected async renderFilesFromTemplate(
@@ -375,7 +375,7 @@ export class VesCodeGenService {
     itemUri: URI,
     data: any,
     encoding: ProjectFileTemplateEncoding
-  ): Promise<void> {
+  ): Promise<number> {
     let templateUri = template._contributorUri;
     const templatePathParts = template.template.split('/');
     templatePathParts.forEach(templatePathPart => {
@@ -387,14 +387,16 @@ export class VesCodeGenService {
       templateString = (await this.fileService.readFile(templateUri)).value.toString();
     } catch (error) {
       console.error(`Could not read template file at ${templateUri.path}`);
-      return;
+      return 0;
     }
 
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     if (!workspaceRootUri) {
-      return;
+      return 0;
     }
+
+    let numberOfGeneratedFiles = 0;
 
     await Promise.all(template.targets.map(async t => {
       if (t.conditions && jsonLogic.apply(t.conditions, data.item) !== true) {
@@ -424,6 +426,7 @@ export class VesCodeGenService {
           targetUri = targetUri.resolve(targetPathPart);
         });
 
+        numberOfGeneratedFiles++;
         return this.renderTemplateToFile(
           templateId,
           targetUri,
@@ -459,6 +462,8 @@ export class VesCodeGenService {
         return findTargetAndRender();
       }
     }));
+
+    return numberOfGeneratedFiles;
   }
 
   protected async handlePluginChange(): Promise<void> {
