@@ -3,7 +3,7 @@ import { AdditionalOperation, RulesLogic } from 'json-logic-js';
 
 export const VUENGINE_EXT = 'vuengine';
 
-export const CONFIG_ITEM_KEY = '_config';
+export const PROJECT_CHANNEL_NAME = 'Project Data';
 
 export interface WorkspaceFile {
   extensions?: {

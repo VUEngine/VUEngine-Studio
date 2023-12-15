@@ -7,6 +7,7 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileChangeType, FileChangesEvent } from '@theia/filesystem/lib/common/files';
+import { OutputChannelManager, OutputChannelSeverity } from '@theia/output/lib/browser/output-channel';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
@@ -18,6 +19,7 @@ import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } from '../../plugins/browser/ves-plugins-types';
 import { VesNewProjectTemplate } from './new-project/ves-new-project-form';
 import {
+  PROJECT_CHANNEL_NAME,
   ProjectContributor,
   ProjectFile,
   ProjectFileItem,
@@ -42,6 +44,8 @@ export class VesProjectService {
   protected messageService: MessageService;
   @inject(OpenerService)
   protected openerService: OpenerService;
+  @inject(OutputChannelManager)
+  protected readonly outputChannelManager: OutputChannelManager;
   @inject(VesBuildPathsService)
   private readonly vesBuildPathsService: VesBuildPathsService;
   @inject(VesCommonService)
@@ -163,7 +167,7 @@ export class VesProjectService {
       };
 
       this.onDidAddProjectItemEmitter.fire(fileUri);
-      console.log(`Added item to project data. Type: ${typeId}, ID: ${itemId}, Contributor: ${contributor!}.`);
+      this.logLine(`Added item to project data. Type: ${typeId}, ID: ${itemId}, Contributor: ${contributor!}.`);
     } else {
       this._projectData.combined.items[typeId][itemId] = {
         ...this._projectData.combined.items[typeId][itemId],
@@ -172,7 +176,7 @@ export class VesProjectService {
       };
 
       this.onDidUpdateProjectItemEmitter.fire(fileUri);
-      console.log(`Updated item in project data. Type: ${typeId}, ID: ${itemId}, Contributor: ${this._projectData.combined.items[typeId][itemId]._contributor}.`);
+      this.logLine(`Updated item in project data. Type: ${typeId}, ID: ${itemId}, Contributor: ${this._projectData.combined.items[typeId][itemId]._contributor}.`);
     }
 
     return true;
@@ -189,7 +193,7 @@ export class VesProjectService {
         delete this._projectData?.combined.items;
       }
       this.onDidDeleteProjectItemEmitter.fire(fileUri);
-      console.log(`Removed item from project data. Type: ${typeId}, ID: ${itemId}.`);
+      this.logLine(`Removed item from project data. Type: ${typeId}, ID: ${itemId}.`);
     }
   }
   protected getProjectPlugins(): string[] {
@@ -210,6 +214,7 @@ export class VesProjectService {
   protected init(): void {
     this.doInit();
     this.bindEvents();
+    this.registerOutputChannel();
   }
 
   protected async doInit(): Promise<void> {
@@ -241,7 +246,7 @@ export class VesProjectService {
         // project file
         if (this.workspaceProjectFileUri && change.type === FileChangeType.UPDATED && change.resource.isEqual(this.workspaceProjectFileUri)) {
           this.enableFileChangeEventLock();
-          console.info('Manual change of project file.');
+          this.logLine('Manual change of project file detected. Refreshing project data.');
           this.readProjectData();
         }
       });
@@ -288,7 +293,7 @@ export class VesProjectService {
               this.enableFileChangeEventLock();
               this.setProjectDataItem(typeId, fileContentsJson._id, fileContentsJson, fileUri);
             } else {
-              console.error('Can not update project data, missing _id property.', typeId);
+              this.logLine(`Can not update project data, missing _id property. Type: ${typeId}`, OutputChannelSeverity.Error);
             }
           } else {
             this.enableFileChangeEventLock();
@@ -744,6 +749,19 @@ export class VesProjectService {
     this._projectData.name = name;
     await this.saveProjectFile();
     this.updateWindowTitle();
+  }
+
+  protected registerOutputChannel(): void {
+    this.logLine('');
+  }
+
+  protected logLine(message: string, severity: OutputChannelSeverity = OutputChannelSeverity.Info): void {
+    const channel = this.outputChannelManager.getChannel(PROJECT_CHANNEL_NAME);
+    if (message) {
+      const date = new Date();
+      channel.append(`${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')} `);
+      channel.appendLine(message, severity);
+    }
   }
 
   async createProjectFromTemplate(

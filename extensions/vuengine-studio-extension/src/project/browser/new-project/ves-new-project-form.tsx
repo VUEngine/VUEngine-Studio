@@ -51,7 +51,7 @@ export const VES_NEW_PROJECT_TEMPLATES: VesNewProjectTemplate[] = [{
     id: 'vuengine-barebone',
     name: nls.localize('vuengine/projects/templates/bareboneTitle', 'Barebone'),
     repository: 'https://github.com/VUEngine/VUEngine-Barebone',
-    tag: 'ves-v0.1.0',
+    tag: 'ves-v0.2.0',
     description: nls.localize(
         'vuengine/projects/templates/bareboneDescription',
         'An (almost) empty project that includes a single custom state plus the most important plugins to add splash screens, automatic pause and more.'
@@ -75,7 +75,7 @@ export const VES_NEW_PROJECT_TEMPLATES: VesNewProjectTemplate[] = [{
     tag: 'ves-v0.2.0',
     description: nls.localize(
         'vuengine/projects/templates/showcaseDescription',
-        'Showcase project to be used as the foundation for learning about VUEngine\'s capabilities.'
+        'Showcase project to be used as the foundation for learning about VUEngine\'s concepts and capabilities.'
     ),
     labels: {
         name: [
@@ -85,8 +85,8 @@ export const VES_NEW_PROJECT_TEMPLATES: VesNewProjectTemplate[] = [{
         authors: [
             'Jorge Eremiev <jorgech3@gmail.com> and Christian Radke <c.radke@posteo.de>'
         ],
-        description: 'Description.',
-        headerName: 'VUEngine Showcase',
+        description: 'Showcase project to be used as the foundation for learning about VUEngine\'s concepts and capabilities.',
+        headerName: 'VUENGINE SHOWCASE',
         makerCode: 'VU',
     }
 }, /* {
