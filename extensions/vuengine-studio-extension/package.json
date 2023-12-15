@@ -172,8 +172,8 @@
   "scripts": {
     "build": "tsc -b",
     "clean": "rimraf lib *.tsbuildinfo",
-    "lint:fix": "eslint --ext js,jsx,ts,tsx src --fix",
-    "lint": "eslint --ext js,jsx,ts,tsx src",
+    "lint:fix": "eslint --ext jsx,ts,tsx src --fix",
+    "lint": "eslint --ext jsx,ts,tsx src",
     "prepare": "yarn clean && yarn build",
     "watch": "tsc -w"
   },
