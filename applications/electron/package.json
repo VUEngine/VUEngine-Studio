@@ -140,8 +140,6 @@
     "update:checksum": "ts-node scripts/update-checksum.ts",
     "update:blockmap": "ts-node scripts/update-blockmap.ts",
     "update:next": "ts-node ../../scripts/update-theia-to-next.ts",
-    "test": "mocha --timeout 60000 \"./test/*.spec.js\"",
-    "lint": "eslint --ext jsx,ts,tsx scripts && eslint --ext jsx,ts,tsx test",
-    "lint:fix": "eslint --ext jsx,ts,tsx scripts --fix && eslint --ext jsx,ts,tsx test -fix"
+    "test": "mocha --timeout 60000 \"./test/*.spec.js\""
   }
 }
