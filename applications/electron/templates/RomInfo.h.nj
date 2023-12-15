@@ -1,12 +1,11 @@
-{%- set item = project.combined.items.RomHeader | values | first -%}
 {%- import 'templates/partials/macros.nj' as macros -%}
 {% include('templates/partials/fileHeader.h.nj') %}
 
-#ifndef ROM_HEADER_H_
-#define ROM_HEADER_H_
+#ifndef ROM_INFO_H_
+#define ROM_INFO_H_
 
 
-{{ macros.sectionHeader('ROM Header Info') }}
+{{ macros.sectionHeader('ROM Info') }}
 
 // game title (20 chars) 	 ####################
 #define __GAME_TITLE		"{{ (item.gameTitle ~ '                    ') | truncate(20, true, '') }}"
