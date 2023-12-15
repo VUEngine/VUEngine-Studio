@@ -438,11 +438,13 @@ export class VesProjectService {
         const data = projectDataWithContributor[combinedKey];
         if (data) {
           Object.keys(data).forEach(dataKey => {
-            combined[combinedKey][dataKey] = {
-              _contributor: projectDataWithContributor._contributor,
-              _contributorUri: projectDataWithContributor._contributorUri,
-              ...data[dataKey],
-            };
+            if (data[dataKey].enabled !== false) {
+              combined[combinedKey][dataKey] = {
+                _contributor: projectDataWithContributor._contributor,
+                _contributorUri: projectDataWithContributor._contributorUri,
+                ...data[dataKey],
+              };
+            }
           });
         }
       });
