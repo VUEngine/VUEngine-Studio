@@ -3,7 +3,7 @@ import { ConfirmDialog } from '@theia/core/lib/browser';
 import React from 'react';
 import { ProjectFile, WithContributor } from '../../../../project/browser/ves-project-types';
 import LanguagesTable from './LanguagesTable';
-import { LANGUAGES, Translations, TranslationsData } from './TranslationsEditorTypes';
+import { LANGUAGES, Translation, Translations, TranslationsData } from './TranslationsEditorTypes';
 import TranslationsTable from './TranslationsTable';
 
 interface TranslationsEditorProps {
@@ -67,6 +67,7 @@ export default class TranslationsEditor extends React.Component<TranslationsEdit
         const filteredLanguageCodes = Object.keys(LANGUAGES).filter(c => !existingLanguageCodes.includes(c));
         const newLanguageCode = filteredLanguageCodes[0];
 
+        // add language itself
         const updatedLanguages = [...this.props.data.languages];
         updatedLanguages.push({
             code: newLanguageCode,
@@ -75,9 +76,17 @@ export default class TranslationsEditor extends React.Component<TranslationsEdit
             name: LANGUAGES[newLanguageCode],
         });
 
+        // add translations for language
+        const updatedTranslations: Translations = {};
+        Object.keys(this.props.data.translations).map(translationKey => {
+            updatedTranslations[translationKey] = this.props.data.translations[translationKey];
+            updatedTranslations[translationKey][newLanguageCode] = '';
+        });
+
         this.props.updateData({
             ...this.props.data,
-            languages: updatedLanguages
+            languages: updatedLanguages,
+            translations: updatedTranslations,
         });
     }
 
@@ -92,44 +101,63 @@ export default class TranslationsEditor extends React.Component<TranslationsEdit
         });
         const remove = await dialog.open();
         if (remove) {
+            // remove language itself
             const updatedLanguages = [...this.props.data.languages].filter(l => l.code !== code);
+            // remove translations for language
+            const updatedTranslations: Translations = {};
+            Object.keys(this.props.data.translations).map(translationKey => {
+                const updatedTranslation: Translation = {};
+                Object.keys(this.props.data.translations[translationKey]).map(languageId => {
+                    if (languageId !== code) {
+                        updatedTranslation[languageId] = this.props.data.translations[translationKey][languageId];
+                    }
+                });
+                updatedTranslations[translationKey] = updatedTranslation;
+            });
 
             this.props.updateData({
                 ...this.props.data,
-                languages: updatedLanguages
+                languages: updatedLanguages,
+                translations: updatedTranslations,
             });
         }
     }
 
     protected onChangeTranslationId(oldId: string, newId: string): void {
-        const updatedTranslations = { ...this.props.data.translations };
+        const updatedTranslations: Translations = {};
         const cleanedNewId = newId.replace(/[^A-Za-z0-9]/g, '');
-        if (!Object.keys(updatedTranslations).includes(cleanedNewId)) {
-            updatedTranslations[cleanedNewId] = updatedTranslations[oldId];
-            delete updatedTranslations[oldId];
-        }
-        // TODO: do not sort translations on the fly because that messes with a user's typing
-        // Instead, offer a button to trigger sorting
-        /*
-        updatedTranslations = window.electronVesCore.sortJson(updatedTranslations, {
-            depth: 1,
-            ignoreCase: true,
-        });
-        */
+        if (!Object.keys(this.props.data.translations).includes(cleanedNewId)) {
+            Object.keys(this.props.data.translations).map(key => {
+                const keyToUse = (key === oldId) ? cleanedNewId : key;
+                updatedTranslations[keyToUse] = this.props.data.translations[key];
+            });
 
-        this.props.updateData({
-            ...this.props.data,
-            translations: updatedTranslations
-        });
+            // TODO: do not sort translations on the fly because that messes with a user's typing
+            // Instead, offer a button to trigger sorting
+            /*
+            updatedTranslations = window.electronVesCore.sortJson(updatedTranslations, {
+                depth: 1,
+                ignoreCase: true,
+            });
+            */
+
+            this.props.updateData({
+                ...this.props.data,
+                translations: updatedTranslations
+            });
+        }
     }
 
     protected onChangeTranslation(id: string, languageCode: string, translation: string): void {
-        const updatedTranslations = { ...this.props.data.translations };
-        updatedTranslations[id][languageCode] = translation;
-
         this.props.updateData({
             ...this.props.data,
-            translations: updatedTranslations
+            translations: {
+                ...this.props.data.translations,
+                [id]: {
+                    ...this.props.data.translations[id],
+                    [languageCode]: translation,
+                }
+            }
         });
     }
 
@@ -210,8 +238,8 @@ export default class TranslationsEditor extends React.Component<TranslationsEdit
             </div>
 
             <br />
-            {combinedTranslations && Object.values(combinedTranslations).map(c => c._contributor !== 'project' &&
-                <div>
+            {combinedTranslations && Object.values(combinedTranslations).map((c, i) => c._contributor !== 'project' &&
+                <div key={`extra-translations-${i}`}>
                     <h3>
                         {c._contributor.replace('plugin:', '')}
                     </h3>
