@@ -24,7 +24,7 @@ export default function General(props: GeneralProps): React.JSX.Element {
     const workspaceRootUri = workspaceService.tryGetRoots()[0]?.resource;
 
     const setName = (n: string): void => {
-        setImageConvData({ name: n.trim() });
+        setImageConvData({ name: n });
     };
 
     const selectFiles = async (): Promise<void> => {

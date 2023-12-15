@@ -230,30 +230,30 @@ export class VesCodeGenService {
     this.isGeneratingFiles = IsGeneratingFilesStatus.active;
     let numberOfGeneratedFiles = 0;
 
-    await Promise.all(types.map(async typeId => {
-      const type = this.vesProjectService.getProjectDataType(typeId);
-      if (!type) {
-        return;
-      }
-      const items = this.vesProjectService.getProjectDataItemsForType(typeId, fileUri ? undefined : ProjectContributor.Project) || {};
-      await Promise.all(Object.values(items).map(async item => {
-        /*
-        if (changedOnly && !this.hasChanges(type)) {
+    try {
+      await Promise.all(types.map(async typeId => {
+        const type = this.vesProjectService.getProjectDataType(typeId);
+        if (!type) {
           return;
         }
-        */
-        if (!fileUri || fileUri.isEqual(item._fileUri)) {
-          try {
+        const items = this.vesProjectService.getProjectDataItemsForType(typeId, fileUri ? undefined : ProjectContributor.Project) || {};
+        await Promise.all(Object.values(items).map(async item => {
+          /*
+          if (changedOnly && !this.hasChanges(type)) {
+            return;
+          }
+          */
+          if (!fileUri || fileUri.isEqual(item._fileUri)) {
             const fileContents = await this.fileService.readFile(item._fileUri);
             const fileContentsJson = JSON.parse(fileContents.value.toString());
             const n = await this.renderTemplatesForItem(typeId, fileContentsJson, item._fileUri);
             numberOfGeneratedFiles += n;
-          } catch (error) {
-            // TODO
           }
-        }
+        }));
       }));
-    }));
+    } catch (error) {
+      this.isGeneratingFiles = IsGeneratingFilesStatus.hide;
+    }
 
     this.setNumberOfGeneratedFiles(numberOfGeneratedFiles);
     this.isGeneratingFiles = IsGeneratingFilesStatus.done;

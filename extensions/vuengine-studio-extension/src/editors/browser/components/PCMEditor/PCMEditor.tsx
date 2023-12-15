@@ -1,11 +1,13 @@
 import { MessageService, URI, nls } from '@theia/core';
 import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
-import React from 'react';
-import { MAX_RANGE, MIN_RANGE, PCMData } from './PCMTypes';
 import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import React from 'react';
 import { DataSection } from '../Common/CommonTypes';
+import HContainer from '../Common/HContainer';
+import VContainer from '../Common/VContainer';
+import { MAX_RANGE, MIN_RANGE, PCMData } from './PCMTypes';
 
 interface PCMProps {
     data: PCMData
@@ -34,7 +36,7 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
     protected onChangeName(e: React.ChangeEvent<HTMLInputElement>): void {
         this.props.updateData({
             ...this.props.data,
-            name: e.target.value.trim()
+            name: e.target.value
         });
     }
 
@@ -74,6 +76,7 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
 
     render(): React.JSX.Element {
         const { data } = this.props;
+        const workspaceRootUri = this.props.services.workspaceService.tryGetRoots()[0]?.resource;
 
         const selectSourceFile = async (): Promise<void> => {
             const openFileDialogProps: OpenFileDialogProps = {
@@ -85,7 +88,6 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
             const currentPath = await this.props.services.fileService.resolve(this.props.fileUri.parent);
             const uri = await this.props.services.fileDialogService.showOpenDialog(openFileDialogProps, currentPath);
             if (uri) {
-                const workspaceRootUri = this.props.services.workspaceService.tryGetRoots()[0]?.resource;
                 const source = await this.props.services.fileService.resolve(uri);
                 if (source.isFile) {
                     const relativeUri = workspaceRootUri.relative(uri);
@@ -100,8 +102,8 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
             }
         };
 
-        return <div className='pcmEditor'>
-            <div className='setting'>
+        return <VContainer gap={20} className='pcmEditor'>
+            <VContainer>
                 <label>
                     {nls.localize('vuengine/pcmEditor/name', 'Name')}
                 </label>
@@ -110,28 +112,32 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
                     value={data.name}
                     onChange={this.onChangeName.bind(this)}
                 />
-            </div>
-            <div className='sourceFile'>
+            </VContainer>
+            <VContainer>
                 <label>
                     {nls.localize('vuengine/emulator/path', 'Path')}
+                </label>
+                <HContainer gap={0}>
                     <input
                         type="text"
                         className="theia-input"
                         value={data.sourceFile}
+                        style={{ flexGrow: 1 }}
                         onBlur={e => this.setSourceFile(e.target.value)}
                         onChange={e => this.setSourceFile(e.target.value)}
                     />
-                </label>
-                <div>
                     <button
                         className="theia-button secondary"
                         onClick={selectSourceFile}
                     >
                         <i className="fa fa-ellipsis-h" />
                     </button>
-                </div>
-            </div>
-            <div className='setting'>
+                </HContainer>
+                {data.sourceFile && <div>
+                    <audio src={workspaceRootUri.resolve(data.sourceFile).path.fsPath()} controls={true} />
+                </div>}
+            </VContainer>
+            <VContainer>
                 <label>
                     {nls.localize('vuengine/pcmEditor/range', 'Range')}
                 </label>
@@ -144,8 +150,8 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
                     min={MIN_RANGE}
                     max={MAX_RANGE}
                 />
-            </div>
-            <div className='setting'>
+            </VContainer>
+            <VContainer>
                 <label>
                     {nls.localize('vuengine/pcmEditor/section', 'Section')}
                 </label>
@@ -162,17 +168,17 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
                     }]}
                     onChange={option => this.setSection(option.value as DataSection)}
                 />
-            </div>
-            <div>
+            </VContainer>
+            <VContainer>
                 <label className='setting'>
                     {nls.localize('vuengine/pcmEditor/loop', 'Loop')}
-                    <input
-                        type="checkbox"
-                        checked={data.loop}
-                        onChange={this.toggleLoop}
-                    />
                 </label>
-            </div>
-        </div>;
+                <input
+                    type="checkbox"
+                    checked={data.loop}
+                    onChange={this.toggleLoop}
+                />
+            </VContainer>
+        </VContainer>;
     }
 }
