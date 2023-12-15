@@ -747,67 +747,57 @@ export class VesProjectService {
   }
 
   async createProjectFromTemplate(
+    projectsBaseUri: URI,
     template: VesNewProjectTemplate,
     folder: string,
-    targetUri: URI,
     name: string,
     gameCode: string,
     author: string,
     makerCode: string
   ): Promise<boolean | string> {
-    const templateUri = await this.getTemplatesUri(template.id);
-
-    if (await this.fileService.exists(targetUri)) {
-      return 'Error: path does already exist';
-    }
-
     try {
-      // copy template folder to new project location
-      await this.fileService.copy(templateUri, targetUri);
-
       // modify files and folders
       const dirsToDelete = [
         VES_PREFERENCE_DIR,
-        '.git',
         '.github'
       ];
 
       for (const dirToDelete of dirsToDelete) {
-        const dirToDeleteUri = targetUri.resolve(dirToDelete);
+        const dirToDeleteUri = projectsBaseUri.resolve(dirToDelete);
         if (await this.fileService.exists(dirToDeleteUri)) {
           await this.fileService.delete(dirToDeleteUri, { recursive: true });
         }
       }
 
       await this.fileService.move(
-        targetUri.resolve(`${template.id}.${VUENGINE_EXT}`),
-        targetUri.resolve(`${folder}.${VUENGINE_EXT}`),
+        projectsBaseUri.resolve(`${template.id}.${VUENGINE_EXT}`),
+        projectsBaseUri.resolve(`${folder}.${VUENGINE_EXT}`),
       );
 
       // replace labels according to mapping file
       // the first three are most sensitive and should be replaced first
       await this.replaceInProject(
-        targetUri,
+        projectsBaseUri,
         template.labels['headerName'].substring(0, 20).padEnd(20, ' '), name.substring(0, 20).padEnd(20, ' ')
       );
       const templateGameCode = template.labels['gameCode'].substring(0, 4).padEnd(4, 'X');
-      await this.replaceInProject(targetUri,
+      await this.replaceInProject(projectsBaseUri,
         `"gameCodeId": "${templateGameCode.substring(1, 3)}",`,
         `"gameCodeId": "${gameCode.substring(0, 2).padEnd(2, 'X')}",`
       );
       await this.replaceInProject(
-        targetUri,
+        projectsBaseUri,
         `"${templateGameCode}"`, `"${templateGameCode.substring(0, 1)}${gameCode.substring(0, 2).padEnd(2, 'X')}${templateGameCode.substring(3, 4)}"`
       );
-      await this.replaceInProject(targetUri, `"${template.labels['makerCode'].substring(0, 2).padEnd(2, ' ')}"`, `"${makerCode.substring(0, 2).padEnd(2, ' ')}"`);
-      await this.replaceInProject(targetUri, template.labels['headerName'], name);
+      await this.replaceInProject(projectsBaseUri, `"${template.labels['makerCode'].substring(0, 2).padEnd(2, ' ')}"`, `"${makerCode.substring(0, 2).padEnd(2, ' ')}"`);
+      await this.replaceInProject(projectsBaseUri, template.labels['headerName'], name);
       await Promise.all(template.labels['name']?.map(async (value: string) => {
-        await this.replaceInProject(targetUri, value, name);
+        await this.replaceInProject(projectsBaseUri, value, name);
       }));
       await Promise.all(template.labels['authors']?.map(async (value: string) => {
-        await this.replaceInProject(targetUri, value, author);
+        await this.replaceInProject(projectsBaseUri, value, author);
       }));
-      await this.replaceInProject(targetUri, template.labels['description'], 'Description');
+      await this.replaceInProject(projectsBaseUri, template.labels['description'], 'Description');
     } catch (e) {
       return e;
     }
@@ -822,7 +812,7 @@ export class VesProjectService {
       .resolve(template);
   }
 
-  protected async replaceInProject(uri: URI, from: string, to: string): Promise<void> {
+  protected async replaceInProject(uri: URI, from: string, to: string): Promise<number> {
     let basepath = await this.fileService.fsPath(uri);
 
     if (isWindows) {
@@ -841,6 +831,8 @@ export class VesProjectService {
       );
 
     }
+
+    return 0;
   }
 
   protected async updateWindowTitle(): Promise<void> {

@@ -4,6 +4,7 @@ import { DialogProps } from '@theia/core/lib/browser/dialogs';
 import { ReactDialog } from '@theia/core/lib/browser/dialogs/react-dialog';
 import { Message } from '@theia/core/lib/browser/widgets/widget';
 import URI from '@theia/core/lib/common/uri';
+import { RequestService } from '@theia/core/shared/@theia/request';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
@@ -13,7 +14,8 @@ import { VesCommonService } from '../../../core/browser/ves-common-service';
 import { VesProjectCommands } from '../ves-project-commands';
 import { VesProjectPathsService } from '../ves-project-paths-service';
 import { VesProjectService } from '../ves-project-service';
-import { VesNewProjectFormComponent, VES_NEW_PROJECT_TEMPLATES } from './ves-new-project-form';
+import { VES_NEW_PROJECT_TEMPLATES, VesNewProjectFormComponent } from './ves-new-project-form';
+import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import { VUENGINE_EXT } from '../ves-project-types';
 
 @injectable()
@@ -28,6 +30,8 @@ export class VesNewProjectDialog extends ReactDialog<void> {
     protected readonly fileDialogService: FileDialogService;
     @inject(PreferenceService)
     protected readonly preferenceService: PreferenceService;
+    @inject(RequestService)
+    protected readonly requestService: RequestService;
     @inject(VesCommonService)
     protected readonly vesCommonService: VesCommonService;
     @inject(VesProjectService)
@@ -46,7 +50,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
     ) {
         super({
             title: VesProjectCommands.NEW.label!,
-            maxWidth: 600
+            maxWidth: 650,
         });
 
         this.appendCloseButton();
@@ -121,27 +125,60 @@ export class VesNewProjectDialog extends ReactDialog<void> {
                 ? new URI(`/${this.createProjectFormComponentRef.current?.state.path.replace(/\\/g, '/')}`).withScheme('file')
                 : new URI(this.createProjectFormComponentRef.current?.state.path).withScheme('file')
             : await this.vesProjectsPathsService.getProjectsBaseUri();
-        const pathExists = await this.fileService.exists(projectsBaseUri)
-            && (await this.fileService.resolve(projectsBaseUri)).isDirectory;
+        const pathExists = await this.fileService.exists(projectsBaseUri);
+        const pathIsFile = pathExists && (await this.fileService.resolve(projectsBaseUri)).isFile;
+        const folder = this.createProjectFormComponentRef.current?.state.folder ?? 'new-project';
+        const newProjectUri = projectsBaseUri.resolve(folder);
 
-        if (!pathExists) {
+        if (await this.fileService.exists(newProjectUri)) {
             this.setIsCreating(false);
-            this.setStatusMessage(`${warningIcon} ${nls.localize('vuengine/projects/errorBasePathDoesNotExist', 'Error: base path does not exist')}`);
+            this.setStatusMessage(`${warningIcon} ${nls.localize('vuengine/projects/errorFolderAlreadyExists', 'Error: project path already exists')}`);
             return;
         }
 
-        this.setStatusMessage(`${spinnerIcon} ${nls.localize('vuengine/projects/settingUpNewProject', 'Setting up new project')}...`);
+        if (pathIsFile) {
+            this.setIsCreating(false);
+            this.setStatusMessage(`${warningIcon} ${nls.localize('vuengine/projects/errorBasePathIsFile', 'Error: base path is a file')}`);
+            return;
+        }
+
+        if (!pathExists) {
+            await this.fileService.createFolder(projectsBaseUri);
+        }
+
+        this.setStatusMessage(`${spinnerIcon} ${nls.localize('vuengine/projects/settingUpNewProject', 'Setting up new project...')}`);
 
         const templateIndex = this.createProjectFormComponentRef.current?.state.template ?? 0;
         const template = VES_NEW_PROJECT_TEMPLATES[templateIndex];
-        const folder = this.createProjectFormComponentRef.current?.state.folder ?? 'new-project';
-        const newProjectUri = projectsBaseUri.resolve(folder);
         const newProjectWorkspaceFileUri = newProjectUri.resolve(`${folder}.${VUENGINE_EXT}`);
+        const useTagged = this.createProjectFormComponentRef.current?.state.useTagged;
+
+        this.setStatusMessage(`${spinnerIcon} ${nls.localize('vuengine/projects/downloadingTemplate', 'Downloading template, this may take a moment...')}`);
+        const templateArchiveUrl = useTagged
+            ? `${template.repository}/archive/refs/tags/${template.tag}.zip`
+            : `${template.repository}/archive/master.zip`;
+        const context = await this.requestService.request({ url: templateArchiveUrl });
+        if (context.res.statusCode !== 200) {
+            this.setIsCreating(false);
+            this.setStatusMessage(
+                `${warningIcon} ${nls.localize('vuengine/projects/couldNotDownloadFile', 'Could not download file from {0}', templateArchiveUrl)} (${context.res.statusCode})`
+            );
+            return;
+        }
+
+        const tempDir = window.electronVesCore.getTempDir();
+        const templateArchiveFolderUri = new URI(tempDir);
+        const templateArchiveFilename = `template-${this.vesCommonService.nanoid()}.zip`;
+        const templateArchiveUri = templateArchiveFolderUri.resolve(templateArchiveFilename);
+        await this.fileService.writeFile(templateArchiveUri, BinaryBuffer.wrap(context.buffer as Uint8Array));
+        const result = await window.electronVesCore.decompress(templateArchiveUri.path.fsPath(), templateArchiveFolderUri.path.fsPath());
+        await this.fileService.move(templateArchiveFolderUri.resolve(result[0]), newProjectUri);
+        await this.fileService.delete(templateArchiveUri);
 
         const response = await this.vesProjectsService.createProjectFromTemplate(
+            newProjectUri,
             template,
             folder,
-            newProjectUri,
             name,
             gameCode,
             author,

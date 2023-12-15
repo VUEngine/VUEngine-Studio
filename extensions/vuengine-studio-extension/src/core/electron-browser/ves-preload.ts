@@ -5,10 +5,12 @@ import { GlobOptionsWithFileTypesUnset } from 'glob';
 import { VisitOptions } from 'sort-json';
 import { ImageData } from '../browser/ves-common-types';
 import {
+    VES_CHANNEL_DECOMPRESS,
     VES_CHANNEL_DEREFERENCE_JSON_SCHEMA,
     VES_CHANNEL_FIND_FILES,
     VES_CHANNEL_GET_IMAGE_DIMENSIONS,
     VES_CHANNEL_GET_PHYSICAL_CPU_COUNT,
+    VES_CHANNEL_GET_TEMP_DIR,
     VES_CHANNEL_GET_USER_DEFAULT,
     VES_CHANNEL_ON_SERIAL_DEVICE_CHANGE,
     VES_CHANNEL_ON_TOUCHBAR_EVENT,
@@ -31,14 +33,20 @@ const api: VesCoreAPI = {
     getUserDefault: function (preference: string, type: string): string {
         return ipcRenderer.sendSync(VES_CHANNEL_GET_USER_DEFAULT, preference, type);
     },
+    getTempDir: function (): string {
+        return ipcRenderer.sendSync(VES_CHANNEL_GET_TEMP_DIR);
+    },
     dereferenceJsonSchema: function (schema: JsonSchema): Promise<JsonSchema> {
         return ipcRenderer.invoke(VES_CHANNEL_DEREFERENCE_JSON_SCHEMA, schema);
     },
     sortJson<T>(old: T, options?: VisitOptions): T {
         return ipcRenderer.sendSync(VES_CHANNEL_SORT_JSON, old, options);
     },
-    replaceInFiles: function (files: string[], from: string, to: string): any {
-        return ipcRenderer.sendSync(VES_CHANNEL_REPLACE_IN_FILES, files, from, to);
+    replaceInFiles: function (files: string[], from: string, to: string): Promise<number> {
+        return ipcRenderer.invoke(VES_CHANNEL_REPLACE_IN_FILES, files, from, to);
+    },
+    decompress: function (archivePath: string, targetPath: string): Promise<string[]> {
+        return ipcRenderer.invoke(VES_CHANNEL_DECOMPRESS, archivePath, targetPath);
     },
     findFiles: function (base: string, pattern: string | string[], options?: GlobOptionsWithFileTypesUnset): string[] {
         return ipcRenderer.sendSync(VES_CHANNEL_FIND_FILES, base, pattern, options);

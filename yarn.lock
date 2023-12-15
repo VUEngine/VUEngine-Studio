@@ -2846,6 +2846,13 @@
   dependencies:
     "@types/ms" "*"
 
+"@types/decompress@^4.2.4":
+  version "4.2.7"
+  resolved "https://registry.yarnpkg.com/@types/decompress/-/decompress-4.2.7.tgz#604f69b69d519ecb74dea1ea0829f159b85e1332"
+  integrity sha512-9z+8yjKr5Wn73Pt17/ldnmQToaFHZxK0N1GHysuk/JIPT8RIdQeoInM01wWPgypRcvb6VH1drjuFpQ4zmY437g==
+  dependencies:
+    "@types/node" "*"
+
 "@types/diff@^3.2.2":
   version "3.5.7"
   resolved "https://registry.yarnpkg.com/@types/diff/-/diff-3.5.7.tgz#d4c62845222b61f7517c4a6da301aaaef40cae44"
