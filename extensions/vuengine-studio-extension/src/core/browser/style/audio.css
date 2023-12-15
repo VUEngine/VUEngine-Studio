@@ -1,0 +1,22 @@
+audio {
+  background-color: var(--theia-input-background);
+  border: var(--theia-border-width) solid var(--theia-input-border);
+  border-radius: 2px;
+  height: calc(var(--theia-content-line-height) + 4px);
+}
+
+audio::-webkit-media-controls-enclosure {
+  background-color: transparent;
+}
+
+audio::-webkit-media-controls-panel {
+  padding: 0;
+}
+
+audio::-webkit-media-controls-current-time-display {
+  text-shadow: none;
+}
+
+audio::-webkit-media-controls-time-remaining-display {
+  text-shadow: none;
+}

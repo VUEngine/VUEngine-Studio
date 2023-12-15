@@ -34,7 +34,7 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
     protected onChangeName(e: React.ChangeEvent<HTMLInputElement>): void {
         this.props.updateData({
             ...this.props.data,
-            name: e.target.value.trim()
+            name: e.target.value
         });
     }
 

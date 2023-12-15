@@ -7,11 +7,11 @@ export default function General(): React.JSX.Element {
     const { entityData, setEntityData } = useContext(EntityEditorContext) as EntityEditorContextType;
 
     const setName = (n: string): void => {
-        setEntityData({ name: n.trim() });
+        setEntityData({ name: n });
     };
 
     const setExtraInfo = (e: string): void => {
-        setEntityData({ extraInfo: e.trim() });
+        setEntityData({ extraInfo: e });
     };
 
     const setPixelSizeX = (x: number): void => {

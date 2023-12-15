@@ -120,7 +120,7 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
     protected onChangeName(e: React.ChangeEvent<HTMLInputElement>): void {
         this.props.updateFontData({
             ...this.props.fontData,
-            name: e.target.value.trim()
+            name: e.target.value
         });
     }
 
