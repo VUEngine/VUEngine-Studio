@@ -62,6 +62,7 @@ export interface ProjectFileTypesWithContributor extends ProjectFileTypes {
 };
 
 export interface ProjectFileType {
+  enabled?: boolean
   file: string
   icon?: string
   schema: any
@@ -105,6 +106,7 @@ export interface ProjectFileTemplateTarget {
 }
 
 export interface ProjectFileTemplate {
+  enabled?: boolean
   targets: ProjectFileTemplateTarget[]
   template: string
   encoding?: ProjectFileTemplateEncoding
@@ -136,7 +138,7 @@ export enum ProjectContributor {
 
 export const defaultProjectData: ProjectFile = {
   templates: {
-    'image.c': {
+    'Image.c': {
       targets: [{
         path: 'Converted/${_forEachOfBasename}.c',
         root: ProjectFileTemplateTargetRoot.file,
@@ -184,15 +186,15 @@ export const defaultProjectData: ProjectFile = {
           ]
         }
       }],
-      template: 'templates/image.c.nj',
+      template: 'templates/Image.c.nj',
       itemSpecific: 'Image'
     },
-    'romHeader.h': {
+    'RomInfo.h': {
       targets: [{
-        path: 'source/romHeader.h',
+        path: 'headers/RomInfo.h',
         root: ProjectFileTemplateTargetRoot.project,
       }],
-      template: 'templates/romHeader.h.nj',
+      template: 'templates/RomInfo.h.nj',
       encoding: ProjectFileTemplateEncoding.ShiftJIS
     }
   },
@@ -306,13 +308,13 @@ export const defaultProjectData: ProjectFile = {
         scope: '#'
       },
       icon: 'fa fa-image',
-      templates: ['image.c'],
+      templates: ['Image.c'],
       forFiles: ['.png']
     },
-    RomHeader: {
-      file: 'RomHeader',
+    RomInfo: {
+      file: 'RomInfo',
       schema: {
-        title: 'ROM Header',
+        title: 'ROM Info',
         properties: {
           gameTitle: {
             type: 'string',
@@ -416,7 +418,7 @@ export const defaultProjectData: ProjectFile = {
         ]
       },
       icon: 'fa fa-microchip',
-      templates: ['romHeader.h']
+      templates: ['RomInfo.h']
     }
   }
 };
