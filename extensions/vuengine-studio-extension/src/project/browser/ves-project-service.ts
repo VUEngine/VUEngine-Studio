@@ -377,7 +377,7 @@ export class VesProjectService {
       } else if (installedPluginId.startsWith(USER_PLUGINS_PREFIX)) {
         uri = userPluginsUri.resolve(installedPluginId.replace(USER_PLUGINS_PREFIX, ''));
       }
-      if (uri && pluginsData[installedPluginId] && this.workspaceProjectFileUri?.parent.isEqual(uri)) {
+      if (uri && pluginsData[installedPluginId] && !this.workspaceProjectFileUri?.parent.isEqual(uri)) {
         const contributor = `${ProjectContributor.Plugin}:${installedPluginId}` as ProjectContributor;
         pluginsProjectDataWithContributors.push({
           _contributor: contributor,
