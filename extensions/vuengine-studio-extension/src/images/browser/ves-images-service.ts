@@ -61,8 +61,9 @@ export class VesImagesService {
     });
     const name = imageConfig.name ? imageConfig.name : imageConfigFileUri.path.name;
     const gritArguments = this.getGritArguments(name, imageConfig);
-    const tempDirName = `__${this.vesCommonService.nanoid()}`;
-    const tempDirUri = imageConfigFileUri.parent.resolve(tempDirName);
+    const tempDirName = `grit-${this.vesCommonService.nanoid()}`;
+    const tempDirBaseUri = new URI(window.electronVesCore.getTempDir());
+    const tempDirUri = tempDirBaseUri.resolve(tempDirName);
     if (!(await this.fileService.exists(tempDirUri))) {
       await this.fileService.createFolder(tempDirUri);
     }
