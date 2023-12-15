@@ -11,27 +11,15 @@
         "avoidEscape": true
       }
     ],
-    "@typescript-eslint/semi": [
-      "error",
-      "always"
-    ],
+    "@typescript-eslint/semi": ["error", "always"],
     "@typescript-eslint/type-annotation-spacing": "error",
-    "arrow-body-style": [
-      "error",
-      "as-needed"
-    ],
-    "arrow-parens": [
-      "error",
-      "as-needed"
-    ],
+    "arrow-body-style": ["error", "as-needed"],
+    "arrow-parens": ["error", "as-needed"],
     "camelcase": "off",
     "comma-dangle": "off",
     "curly": "error",
     "eol-last": "error",
-    "eqeqeq": [
-      "error",
-      "smart"
-    ],
+    "eqeqeq": ["error", "smart"],
     "guard-for-in": "error",
     "id-blacklist": "off",
     "id-match": "off",
@@ -64,10 +52,7 @@
     "no-unused-expressions": "error",
     "no-var": "error",
     "no-void": "error",
-    "one-var": [
-      "error",
-      "never"
-    ],
+    "one-var": ["error", "never"],
     "prefer-const": [
       "error",
       {
@@ -87,22 +72,14 @@
       "error",
       "always",
       {
-        "exceptions": [
-          "*",
-          "+",
-          "-",
-          "/"
-        ]
+        "exceptions": ["*", "+", "-", "/"]
       }
     ],
     "@typescript-eslint/tslint/config": [
       "error",
       {
         "rules": {
-          "jsdoc-format": [
-            true,
-            "check-multiline-start"
-          ],
+          "jsdoc-format": [true, "check-multiline-start"],
           "one-line": [
             true,
             "check-open-brace",
@@ -110,11 +87,7 @@
             "check-else",
             "check-whitespace"
           ],
-          "typedef": [
-            true,
-            "call-signature",
-            "property-declaration"
-          ],
+          "typedef": [true, "call-signature", "property-declaration"],
           "whitespace": [
             true,
             "check-branch",
@@ -130,10 +103,7 @@
   },
   "overrides": [
     {
-      "files": [
-        "dev-packages",
-        "*.{spec,espec,slow-spec}.{js,ts}"
-      ],
+      "files": ["dev-packages", "*.{spec,espec,slow-spec}.ts"],
       "rules": {
         "import/no-extraneous-dependencies": "off"
       }
