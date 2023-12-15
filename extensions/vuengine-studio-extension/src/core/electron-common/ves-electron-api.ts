@@ -9,10 +9,12 @@ import { ISizeCalculationResult } from 'image-size/dist/types/interface';
 export interface VesCoreAPI {
     setZoomFactor(zoomFactor: number): void;
     getUserDefault(preference: string, type: string): string;
+    getTempDir(): string;
     dereferenceJsonSchema(schema: JsonSchema): Promise<JsonSchema>;
     sortJson<T>(old: T, options?: VisitOptions): T;
-    replaceInFiles(files: string[], from: string, to: string): any;
+    replaceInFiles(files: string[], from: string, to: string): Promise<number>;
     findFiles(base: string, pattern: string | string[], options?: GlobOptionsWithFileTypesUnset): string[];
+    decompress(archivePath: string, targetPath: string): Promise<string[]>;
     getImageDimensions(path: string): Promise<ISizeCalculationResult>;
     getPhysicalCpuCount(): number;
     parsePng(fileContent: FileContent): Promise<ImageData | false>;
@@ -30,12 +32,14 @@ declare global {
 
 export const VES_CHANNEL_SET_ZOOM_FACTOR = 'vesSetZoomFactor';
 export const VES_CHANNEL_GET_USER_DEFAULT = 'vesGetUserDefault';
+export const VES_CHANNEL_DECOMPRESS = 'vesDecompress';
 export const VES_CHANNEL_DEREFERENCE_JSON_SCHEMA = 'vesDereferenceJsonSchema';
 export const VES_CHANNEL_SORT_JSON = 'vesSortJson';
 export const VES_CHANNEL_REPLACE_IN_FILES = 'vesReplaceInFiles';
 export const VES_CHANNEL_FIND_FILES = 'vesFindFiles';
 export const VES_CHANNEL_GET_IMAGE_DIMENSIONS = 'vesGetIageDimensions';
 export const VES_CHANNEL_GET_PHYSICAL_CPU_COUNT = 'vesGetPhysicalCpuCount';
+export const VES_CHANNEL_GET_TEMP_DIR = 'vesGetTempDir';
 export const VES_CHANNEL_PARSE_PNG = 'vesParsePng';
 export const VES_CHANNEL_ON_USB_DEVICE_CHANGE = 'vesOnUsbDeviceChange';
 export const VES_CHANNEL_ON_SERIAL_DEVICE_CHANGE = 'vesOnSerialDeviceChange';

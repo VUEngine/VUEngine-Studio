@@ -7,16 +7,21 @@ import {
     ipcMain, systemPreferences
 } from '@theia/electron/shared/electron';
 import { FileContent } from '@theia/filesystem/lib/common/files';
+import * as decompress from 'decompress';
 import { WebContents } from 'electron';
 import { glob } from 'glob';
+import sizeOf from 'image-size';
 import { injectable } from 'inversify';
+import { getTempDir } from '@theia/plugin-ext/lib/main/node/temp-dir-util';
 import sortJson from 'sort-json';
 import { ImageData } from '../browser/ves-common-types';
 import {
+    VES_CHANNEL_DECOMPRESS,
     VES_CHANNEL_DEREFERENCE_JSON_SCHEMA,
     VES_CHANNEL_FIND_FILES,
     VES_CHANNEL_GET_IMAGE_DIMENSIONS,
     VES_CHANNEL_GET_PHYSICAL_CPU_COUNT,
+    VES_CHANNEL_GET_TEMP_DIR,
     VES_CHANNEL_GET_USER_DEFAULT,
     VES_CHANNEL_ON_SERIAL_DEVICE_CHANGE,
     VES_CHANNEL_ON_TOUCHBAR_EVENT,
@@ -27,7 +32,6 @@ import {
     VES_CHANNEL_SET_ZOOM_FACTOR,
     VES_CHANNEL_SORT_JSON
 } from '../electron-common/ves-electron-api';
-import sizeOf from 'image-size';
 
 @injectable()
 export class VesMainApi implements ElectronMainApplicationContribution {
@@ -38,15 +42,23 @@ export class VesMainApi implements ElectronMainApplicationContribution {
         ipcMain.on(VES_CHANNEL_GET_USER_DEFAULT, (event, preference, type) => {
             event.returnValue = systemPreferences.getUserDefault(preference, type);
         });
+        ipcMain.on(VES_CHANNEL_GET_TEMP_DIR, event => {
+            event.returnValue = getTempDir('vuengine');
+        });
         ipcMain.handle(VES_CHANNEL_DEREFERENCE_JSON_SCHEMA, (event, schema) =>
             $RefParser.dereference(schema as JSONSchema)
         );
         ipcMain.on(VES_CHANNEL_SORT_JSON, (event, old, options) => {
             event.returnValue = sortJson(old, options);
         });
-        ipcMain.on(VES_CHANNEL_REPLACE_IN_FILES, (event, files, from, to) => {
+        ipcMain.handle(VES_CHANNEL_REPLACE_IN_FILES, (event, files, from, to) => {
             const replaceInFiles = require('replace-in-file');
-            event.returnValue = replaceInFiles({ files, from, to });
+            return new Promise((resolve, reject) => {
+                // @ts-ignore: suppress implicit any errors
+                replaceInFiles({ files, from, to }).then(({ changedFiles }) => {
+                    resolve(changedFiles);
+                });
+            });
         });
         ipcMain.on(VES_CHANNEL_FIND_FILES, (event, base, pattern, options) => {
             const results: string[] = [];
@@ -60,6 +72,9 @@ export class VesMainApi implements ElectronMainApplicationContribution {
 
             event.returnValue = results;
         });
+        ipcMain.handle(VES_CHANNEL_DECOMPRESS, async (event, archivePath, targetPath) =>
+            (await decompress.default(archivePath, targetPath)).map(f => f.path)
+        );
         ipcMain.handle(VES_CHANNEL_GET_IMAGE_DIMENSIONS, async (event, path: string) => sizeOf(path));
         ipcMain.on(VES_CHANNEL_GET_PHYSICAL_CPU_COUNT, event => {
             event.returnValue = require('physical-cpu-count');

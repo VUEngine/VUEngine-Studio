@@ -1,63 +1,29 @@
-.ves-new-project-input-label {
-    padding: 5px 0;
+.vesNewProjectDialogContainer {
+    width: calc(650px - (var(--theia-ui-padding) * 4));
 }
 
-.ves-new-project-path-separator {
-    /* background: var(--theia-input-background); */
-    font-size: var(--theia-ui-font-size1);
-    line-height: 24px;
-    padding: 0 4px;
-}
-
-.ves-new-project-templates-container {
+.vesNewProjectDialogTemplatesContainer {
     display: flex;
     flex-direction: row;
-    margin: 3px 0;
+    gap: 10px;
     outline: 0;
 }
-.ves-new-project-templates-container:focus {
+.vesNewProjectDialogTemplatesContainer:focus {
     box-shadow: none;
 }
 
-.ves-new-project-template {
-    background-position: center;
-    background-size: cover;
+.vesNewProjectDialogTemplate img {
     filter: grayscale(1);
+    float: left;
     height: 112px;
-    margin-right: 12px;
     width: 192px;
-    z-index: 1;
-}
-.ves-new-project-template:last-child {
-    margin-right: 0px;
 }
 
-.ves-new-project-template.selected {
+.vesNewProjectDialogTemplate.selected {
     filter: none;
-    outline: 4px solid var(--theia-secondaryButton-background);
+    outline: 5px solid var(--theia-secondaryButton-background);
 }
 
-.ves-new-project-templates-container:focus .ves-new-project-template.selected {
+.vesNewProjectDialogTemplatesContainer:focus .vesNewProjectDialogTemplate.selected {
     outline-color: var(--theia-button-background);
-}
-
-.ves-new-project-template-vuengine-platformer-demo {
-    background-image: url('../images/templates/vuengine-platformer-demo.png');
-}
-.ves-new-project-template-vuengine-barebone {
-    background-image: url('../images/templates/vuengine-barebone.png');
-}
-.ves-new-project-template-spong {
-    background-image: url('../images/templates/spong.png');
-}
-.ves-new-project-template-vue-master {
-    background-image: url('../images/templates/vue-master.png');
-}
-
-.ves-new-project-template-name {
-    margin: 8px 0 3px;
-}
-.ves-new-project-template-description {
-    font-style: italic;
-    min-height: 32px;
 }

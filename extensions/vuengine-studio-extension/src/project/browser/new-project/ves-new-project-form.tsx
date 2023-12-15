@@ -6,6 +6,8 @@ import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/br
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import filenamify from 'filenamify';
 import { VesCommonService } from '../../../core/browser/ves-common-service';
+import HContainer from '../../../editors/browser/components/Common/HContainer';
+import VContainer from '../../../editors/browser/components/Common/VContainer';
 import { VesProjectPathsService } from '../ves-project-paths-service';
 import { VesProjectPreferenceIds } from '../ves-project-preferences';
 
@@ -25,12 +27,15 @@ export interface VesNewProjectFormComponentState {
     template: number
     path: string
     folder: string,
+    useTagged: boolean,
     isCreating: boolean
 }
 
 export interface VesNewProjectTemplate {
-    name: string
     id: string
+    name: string
+    repository: string,
+    tag: string,
     description: string
     labels: {
         name: Array<string>
@@ -43,11 +48,13 @@ export interface VesNewProjectTemplate {
 }
 
 export const VES_NEW_PROJECT_TEMPLATES: VesNewProjectTemplate[] = [{
-    name: nls.localize('vuengine/projects/templates/bareboneTitle', 'Barebone'),
     id: 'vuengine-barebone',
+    name: nls.localize('vuengine/projects/templates/bareboneTitle', 'Barebone'),
+    repository: 'https://github.com/VUEngine/VUEngine-Barebone',
+    tag: 'ves-v0.1.0',
     description: nls.localize(
         'vuengine/projects/templates/bareboneDescription',
-        'An (almost) empty project that includes a single "Hello World" screen plus the most important plugins to add splash screens, automatic pause and more.'
+        'An (almost) empty project that includes a single custom state plus the most important plugins to add splash screens, automatic pause and more.'
     ),
     labels: {
         name: [
@@ -62,6 +69,27 @@ export const VES_NEW_PROJECT_TEMPLATES: VesNewProjectTemplate[] = [{
         makerCode: 'VU',
     }
 }, {
+    id: 'vuengine-showcase',
+    name: nls.localize('vuengine/projects/templates/showcaseTitle', 'Showcase'),
+    repository: 'https://github.com/VUEngine/VUEngine-Showcase',
+    tag: 'ves-v0.2.0',
+    description: nls.localize(
+        'vuengine/projects/templates/showcaseDescription',
+        'Showcase project to be used as the foundation for learning about VUEngine\'s capabilities.'
+    ),
+    labels: {
+        name: [
+            'VUEngine Showcase'
+        ],
+        gameCode: 'VVSM',
+        authors: [
+            'Jorge Eremiev <jorgech3@gmail.com> and Christian Radke <c.radke@posteo.de>'
+        ],
+        description: 'Description.',
+        headerName: 'VUEngine Showcase',
+        makerCode: 'VU',
+    }
+}, /* {
     name: nls.localize('vuengine/projects/templates/platformerTitle', 'Platform Game'),
     id: 'vuengine-platformer-demo',
     description: nls.localize(
@@ -80,46 +108,7 @@ export const VES_NEW_PROJECT_TEMPLATES: VesNewProjectTemplate[] = [{
         headerName: 'VUENGINE PLATFORMER',
         makerCode: 'VU'
     }
-}, {
-    name: nls.localize('vuengine/projects/templates/multiplayerTitle', 'Multiplayer Game'),
-    id: 'spong',
-    description: nls.localize(
-        'vuengine/projects/templates/multiplayerDescription',
-        'A simple Pong-like game that utilizes the engine\'s communication class for multiplayer matches over a link cable.'
-    ),
-    labels: {
-        name: [
-            'SPONG'
-        ],
-        gameCode: 'VSPM',
-        authors: [
-            'Jorge Eremiev <jorgech3@gmail.com> and Christian Radke <c.radke@posteo.de>'
-        ],
-        description: 'A simple Pong-like game that demonstrates VUEngine\'s multiplayer capabilities.',
-        headerName: 'SPONG',
-        makerCode: 'VU'
-    }
-}, {
-    name: nls.localize('vuengine/projects/templates/imageViewerTitle', 'Image Viewer'),
-    id: 'vue-master',
-    description: nls.localize(
-        'vuengine/projects/templates/imageViewerDescription',
-        'Stereo image viewer.'
-    ),
-    labels: {
-        name: [
-            'VUE-MASTER'
-        ],
-        gameCode: 'VVME',
-        authors: [
-            'STEREO BOY and KR155E'
-        ],
-        // eslint-disable-next-line max-len
-        description: 'VUE-MASTER (read: "View Master") is a take on the classic toy stereo image viewer. It\'s a Virtual Boy stereo viewer by Stereo Boy and KR155E, containing several stereo images. First and foremost, though, it is meant as a VUEngine template which allows anyone to compile their own stereo images into a ROM to view on real Virtual Boy hardware, without any programming knowledge.',
-        headerName: 'VUE-MASTER',
-        makerCode: 'CR'
-    }
-}];
+} */];
 
 export class VesNewProjectFormComponent extends React.Component<VesNewProjectFormComponentProps, VesNewProjectFormComponentState> {
     protected fileService: FileService;
@@ -147,6 +136,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
             makerCode: '',
             path: '',
             folder: 'my-project',
+            useTagged: true,
             isCreating: false
         };
 
@@ -172,12 +162,12 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
     }
 
     render(): React.JSX.Element {
-        return <>
-            <div style={{ display: 'flex' }}>
-                <div style={{ flexGrow: 1, paddingRight: 8 }}>
-                    <div className="ves-new-project-input-label">
+        return <VContainer gap={10} className='vesNewProjectDialogContainer'>
+            <HContainer gap={10}>
+                <VContainer grow={1}>
+                    <label>
                         {nls.localize('vuengine/projects/name', 'Name')}
-                    </div>
+                    </label>
                     <input
                         type="text"
                         className="theia-input"
@@ -188,11 +178,11 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                         tabIndex={1}
                         ref={this.nameInputComponentRef}
                     />
-                </div>
-                <div>
-                    <div className="ves-new-project-input-label">
+                </VContainer>
+                <VContainer>
+                    <label>
                         {nls.localize('vuengine/projects/gameCode', 'Game Code')}
-                    </div>
+                    </label>
                     <input
                         type="text"
                         className="theia-input"
@@ -204,14 +194,13 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                         minLength={2}
                         tabIndex={2}
                     />
-                </div>
-            </div>
-            <br />
-            <div style={{ display: 'flex' }}>
-                <div style={{ flexGrow: 1, paddingRight: 8 }}>
-                    <div className="ves-new-project-input-label">
+                </VContainer>
+            </HContainer>
+            <HContainer gap={10}>
+                <VContainer grow={1}>
+                    <label>
                         {nls.localize('vuengine/projects/author', 'Author')}
-                    </div>
+                    </label>
                     <input
                         type="text"
                         className="theia-input"
@@ -221,11 +210,11 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                         style={{ boxSizing: 'border-box', width: '100%' }}
                         tabIndex={3}
                     />
-                </div>
-                <div>
-                    <div className="ves-new-project-input-label">
+                </VContainer>
+                <VContainer>
+                    <label>
                         {nls.localize('vuengine/projects/makerCode', 'Maker Code')}
-                    </div>
+                    </label>
                     <input
                         type="text"
                         className="theia-input"
@@ -237,70 +226,95 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                         minLength={2}
                         tabIndex={4}
                     />
-                </div>
-            </div>
-            <br />
-            <div className="ves-new-project-input-label">
-                {nls.localize('vuengine/projects/path', 'Path')}
-            </div>
-            <div style={{ display: 'flex' }}>
-                <input
-                    type="text"
-                    className="theia-input"
-                    value={this.vesCommonService.formatPath(this.state.path)}
-                    onChange={this.updatePathFolder}
-                    size={this.state.path.length}
-                    style={{ fontFamily: 'monospace', maxWidth: 332 }}
-                    disabled={this.state.isCreating}
-                    tabIndex={5}
-                />
-                <button
-                    className="theia-button secondary"
-                    onClick={this.selectProjectFolder}
-                    style={{ marginLeft: 0, minWidth: 40, paddingBottom: 0 }}
-                    disabled={this.state.isCreating}
-                    tabIndex={6}
-                >
-                    <i
-                        style={{ fontSize: 16, verticalAlign: 'bottom' }}
-                        className="fa fa-ellipsis-h"
+                </VContainer>
+            </HContainer>
+            <VContainer>
+                <label>
+                    {nls.localize('vuengine/projects/path', 'Path')}
+                </label>
+                <HContainer>
+                    <input
+                        type="text"
+                        className="theia-input"
+                        value={this.vesCommonService.formatPath(this.state.path)}
+                        onChange={this.updatePathFolder}
+                        size={this.state.path.length}
+                        style={{ fontFamily: 'monospace', maxWidth: 332 }}
+                        disabled={this.state.isCreating}
+                        tabIndex={5}
                     />
-                </button>
-                <span className="ves-new-project-path-separator">
-                    {isWindows ? '\\' : '/'}
-                </span>
-                <input
-                    type="text"
-                    className="theia-input"
-                    value={this.state.folder}
-                    onChange={this.updatePathName}
-                    style={{ flexGrow: 1, fontFamily: 'monospace' }}
-                    disabled={this.state.isCreating}
-                    tabIndex={7}
-                />
-            </div>
+                    <button
+                        className="theia-button secondary"
+                        onClick={this.selectProjectFolder}
+                        style={{ marginLeft: 0, minWidth: 40, paddingBottom: 0 }}
+                        disabled={this.state.isCreating}
+                        tabIndex={6}
+                    >
+                        <i
+                            style={{ fontSize: 16, verticalAlign: 'bottom' }}
+                            className="fa fa-ellipsis-h"
+                        />
+                    </button>
+                    <span>
+                        {isWindows ? '\\' : '/'}
+                    </span>
+                    <input
+                        type="text"
+                        className="theia-input"
+                        value={this.state.folder}
+                        onChange={this.updatePathName}
+                        style={{ flexGrow: 1, fontFamily: 'monospace' }}
+                        disabled={this.state.isCreating}
+                        tabIndex={7}
+                    />
+                </HContainer>
+            </VContainer>
+            <VContainer gap={10}>
+                <label>
+                    {nls.localize('vuengine/projects/template', 'Template')}
+                </label>
+                <div className="vesNewProjectDialogTemplatesContainer" onKeyDown={this.handleTemplateKeyPress} tabIndex={8}>
+                    {VES_NEW_PROJECT_TEMPLATES.map((template, index) => {
+                        const selected = index === this.state.template ? ' selected' : '';
+                        const screeshotUrl = template.repository
+                            .replace('github.com', 'raw.githubusercontent.com')
+                            + '/' + template.tag + '/screenshot.png';
+                        return <div
+                            key={`ves-new-project-template-${index}`}
+                            data-template={VES_NEW_PROJECT_TEMPLATES[this.state.template].id}
+                            className={`vesNewProjectDialogTemplate${selected}`}
+                            onClick={() => this.updateTemplate(index)}
+                        >
+                            <img src={screeshotUrl} />
+                        </div>;
+                    })}
+                </div>
+                <VContainer>
+                    <div>
+                        {VES_NEW_PROJECT_TEMPLATES[this.state.template].name}
+                    </div>
+                    <div style={{ fontStyle: 'italic' }}>
+                        {VES_NEW_PROJECT_TEMPLATES[this.state.template].description}
+                    </div>
+                </VContainer>
+                <VContainer>
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={this.state.useTagged}
+                            onChange={this.toggleUseTagged}
+                        />
+                        {nls.localize('vuengine/projects/useTagged', 'Use tagged version')}
+                    </label>
+                    {!this.state.useTagged && nls.localize(
+                        'vuengine/projects/useTaggedWarning',
+                        // eslint-disable-next-line max-len
+                        'Warning: unchecking this will download the latest version of the template. Compatibility with your version of VUEngine is not guaranteed.'
+                    )}
+                </VContainer>
+            </VContainer>
             <br />
-            <div className="ves-new-project-input-label">
-                {nls.localize('vuengine/projects/template', 'Template')}
-            </div>
-            <div className="ves-new-project-templates-container" onKeyDown={this.handleTemplateKeyPress} tabIndex={8}>
-                {VES_NEW_PROJECT_TEMPLATES.map((template, index) => {
-                    const selected = index === this.state.template ? ' selected' : '';
-                    return <div
-                        key={`ves-new-project-template-${index}`}
-                        data-template={VES_NEW_PROJECT_TEMPLATES[this.state.template].id}
-                        className={`ves-new-project-template ves-new-project-template-${template.id}${selected}`}
-                        onClick={() => this.updateTemplate(index)}
-                    ></div>;
-                })}
-            </div>
-            <div className="ves-new-project-template-name">
-                {VES_NEW_PROJECT_TEMPLATES[this.state.template].name}
-            </div>
-            <div className="ves-new-project-template-description">
-                {VES_NEW_PROJECT_TEMPLATES[this.state.template].description}
-            </div>
-        </>;
+        </VContainer>;
     }
 
     protected handleTemplateKeyPress = (e: React.KeyboardEvent): void => {
@@ -347,6 +361,10 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
 
     protected updatePathName = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({
         folder: e.currentTarget.value
+    });
+
+    protected toggleUseTagged = (e: React.ChangeEvent<HTMLInputElement>) => this.setState({
+        useTagged: e.currentTarget.checked
     });
 
     protected makeGameCode(name: string): string {
