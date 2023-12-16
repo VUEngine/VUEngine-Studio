@@ -48,7 +48,7 @@ export interface VesNewProjectTemplate {
 }
 
 export const VES_NEW_PROJECT_TEMPLATES: VesNewProjectTemplate[] = [{
-    id: 'vuengine-barebone',
+    id: 'barebone',
     name: nls.localize('vuengine/projects/templates/bareboneTitle', 'Barebone'),
     repository: 'https://github.com/VUEngine/VUEngine-Barebone',
     tag: 'ves-v0.2.0',
@@ -69,7 +69,7 @@ export const VES_NEW_PROJECT_TEMPLATES: VesNewProjectTemplate[] = [{
         makerCode: 'VU',
     }
 }, {
-    id: 'vuengine-showcase',
+    id: 'showcase',
     name: nls.localize('vuengine/projects/templates/showcaseTitle', 'Showcase'),
     repository: 'https://github.com/VUEngine/VUEngine-Showcase',
     tag: 'ves-v0.2.0',
@@ -90,8 +90,10 @@ export const VES_NEW_PROJECT_TEMPLATES: VesNewProjectTemplate[] = [{
         makerCode: 'VU',
     }
 }, /* {
+    id: 'platformer-demo',
     name: nls.localize('vuengine/projects/templates/platformerTitle', 'Platform Game'),
-    id: 'vuengine-platformer-demo',
+    repository: 'https://github.com/VUEngine/VUEngine-Platformer-Demo',
+    tag: 'ves-v0.2.0',
     description: nls.localize(
         'vuengine/projects/templates/platformerDescription',
         'A full featured single level platforming game.'
@@ -276,17 +278,12 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                 <div className="vesNewProjectDialogTemplatesContainer" onKeyDown={this.handleTemplateKeyPress} tabIndex={8}>
                     {VES_NEW_PROJECT_TEMPLATES.map((template, index) => {
                         const selected = index === this.state.template ? ' selected' : '';
-                        const screeshotUrl = template.repository
-                            .replace('github.com', 'raw.githubusercontent.com')
-                            + '/' + template.tag + '/screenshot.png';
                         return <div
                             key={`ves-new-project-template-${index}`}
                             data-template={VES_NEW_PROJECT_TEMPLATES[this.state.template].id}
-                            className={`vesNewProjectDialogTemplate${selected}`}
+                            className={`vesNewProjectDialogTemplate ${template.id}${selected}`}
                             onClick={() => this.updateTemplate(index)}
-                        >
-                            <img src={screeshotUrl} />
-                        </div>;
+                        ></div>;
                     })}
                 </div>
                 <VContainer>

@@ -12,16 +12,30 @@
     box-shadow: none;
 }
 
-.vesNewProjectDialogTemplate img {
+.vesNewProjectDialogTemplate {
+    background-position: center;
+    background-size: cover;
     filter: grayscale(1);
-    float: left;
     height: 112px;
     width: 192px;
+    z-index: 1;
 }
 
 .vesNewProjectDialogTemplate.selected {
     filter: none;
     outline: 5px solid var(--theia-secondaryButton-background);
+}
+
+.vesNewProjectDialogTemplate.barebone {
+    background-image: url('../images/templates/barebone.png');
+}
+
+.vesNewProjectDialogTemplate.showcase {
+    background-image: url('../images/templates/showcase.png');
+}
+
+.vesNewProjectDialogTemplate.platformer-demo {
+    background-image: url('../images/templates/platformer-demo.png');
 }
 
 .vesNewProjectDialogTemplatesContainer:focus .vesNewProjectDialogTemplate.selected {
