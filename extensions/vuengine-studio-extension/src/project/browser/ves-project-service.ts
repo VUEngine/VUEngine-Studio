@@ -394,12 +394,13 @@ export class VesProjectService {
     }));
 
     const resourcesUri = await this.vesCommonService.getResourcesUri();
+    const studioTemplatesUri = resourcesUri.resolve('templates');
     const projectDataWithContributors: (ProjectFile & WithContributor)[] = [{
       _contributor: ProjectContributor.Studio,
-      _contributorUri: resourcesUri,
+      _contributorUri: studioTemplatesUri,
       ...defaultProjectData
     }];
-    this.knownContributors[ProjectContributor.Studio] = resourcesUri;
+    this.knownContributors[ProjectContributor.Studio] = studioTemplatesUri;
 
     if (!this.workspaceProjectFileUri?.isEqual(engineCoreProjectFileUri)) {
       projectDataWithContributors.push({
@@ -506,8 +507,10 @@ export class VesProjectService {
                     this.messageService.warn(
                       nls.localize(
                         'vuengine/projects/duplicateItemIdDetected',
-                        'Duplicate item ID detected in file "{0}".',
-                        uri?.path.base,
+                        'Duplicate item ID detected in file "{0}". Previously seen in file "{1}"',
+                        uri?.path.fsPath(),
+                        // @ts-ignore
+                        combined['items'][typeId][fileContentJson._id]._fileUri?.path.fsPath(),
                       ),
                       openFileButtonLabel,
                       generateIdButtonLabel,

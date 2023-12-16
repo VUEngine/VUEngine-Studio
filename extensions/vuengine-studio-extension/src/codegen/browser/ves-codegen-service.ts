@@ -226,6 +226,7 @@ export class VesCodeGenService {
   }
   */
 
+  // TODO: This currently is unable to convert items that are not in project file, e.g. unused plugins
   async generate(types: string[]/* , changedOnly: boolean */, fileUri?: URI): Promise<void> {
     this.isGeneratingFiles = IsGeneratingFilesStatus.active;
     let numberOfGeneratedFiles = 0;

@@ -34,9 +34,11 @@
           "files.watcherExclude": {
             "**/.git/objects/**": true,
             "**/.git/subtree-cache/**": true,
+            "**/node_modules/**": true,
+            "**/.hg/store/**": true,
             "**/build/*/**": true,
             "**/build/*.a": true,
-            "**/node_modules/**": true
+            "**/build/*.map": true
           },
           "git.autofetch": true,
           "security.workspace.trust.enabled": false,
