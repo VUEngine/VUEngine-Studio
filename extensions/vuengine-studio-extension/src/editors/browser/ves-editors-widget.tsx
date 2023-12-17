@@ -133,7 +133,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         const type = this.vesProjectService.getProjectDataType(this.typeId);
 
         const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/editors/resetLayout', 'Reset Layout?'),
+            title: nls.localize('vuengine/editors/resetEditorLayout', 'Reset Editor Layout'),
             msg: nls.localize(
                 'vuengine/editors/areYouSureYouWantToResetLayout',
                 'Are you sure you want to reset the {0} editor layout to default?',

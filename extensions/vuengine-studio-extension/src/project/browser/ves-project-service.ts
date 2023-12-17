@@ -325,12 +325,12 @@ export class VesProjectService {
         this.workspaceProjectFolderUri = this.workspaceProjectFileUri;
         this.workspaceProjectFileUri = undefined;
         const projectFiles = window.electronVesCore.findFiles(
-          await this.fileService.fsPath(this.workspaceProjectFolderUri),
+          this.workspaceProjectFolderUri.path.fsPath(),
           `*.${VUENGINE_EXT}`,
           {
             dot: false,
             ignore: ['build/**'],
-            maxDepth: 0,
+            maxDepth: 1,
             nodir: true,
           }
         );
