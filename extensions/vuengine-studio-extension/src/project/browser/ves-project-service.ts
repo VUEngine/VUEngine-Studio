@@ -80,6 +80,7 @@ export class VesProjectService {
   // https://github.com/eclipse-theia/theia/issues/3512
   protected fileChangeEventLock: boolean = false;
 
+  protected workspaceProjectFolderUri: URI | undefined;
   protected workspaceProjectFileUri: URI | undefined;
 
   protected knownContributors: { [contributor: string]: URI } = {};
@@ -321,10 +322,10 @@ export class VesProjectService {
     this.workspaceProjectFileUri = this.workspaceService.workspace?.resource;
     if (this.workspaceProjectFileUri) {
       if (this.workspaceService.workspace?.isDirectory) {
-        const workspaceProjectFolderUri = this.workspaceProjectFileUri;
+        this.workspaceProjectFolderUri = this.workspaceProjectFileUri;
         this.workspaceProjectFileUri = undefined;
         const projectFiles = window.electronVesCore.findFiles(
-          await this.fileService.fsPath(workspaceProjectFolderUri),
+          await this.fileService.fsPath(this.workspaceProjectFolderUri),
           `*.${VUENGINE_EXT}`,
           {
             dot: false,
@@ -336,9 +337,11 @@ export class VesProjectService {
         if (projectFiles.length) {
           const filename = this.vesCommonService.basename(projectFiles[0]);
           if (filename) {
-            this.workspaceProjectFileUri = workspaceProjectFolderUri?.resolve(filename);
+            this.workspaceProjectFileUri = this.workspaceProjectFolderUri?.resolve(filename);
           }
         }
+      } else {
+        this.workspaceProjectFolderUri = this.workspaceProjectFileUri.parent;
       }
     }
 
@@ -382,7 +385,7 @@ export class VesProjectService {
       } else if (installedPluginId.startsWith(USER_PLUGINS_PREFIX)) {
         uri = userPluginsUri.resolve(installedPluginId.replace(USER_PLUGINS_PREFIX, ''));
       }
-      if (uri && pluginsData[installedPluginId] && !this.workspaceProjectFileUri?.parent.isEqual(uri)) {
+      if (uri && pluginsData[installedPluginId] && !this.workspaceProjectFolderUri?.isEqual(uri)) {
         const contributor = `${ProjectContributor.Plugin}:${installedPluginId}` as ProjectContributor;
         pluginsProjectDataWithContributors.push({
           _contributor: contributor,
@@ -415,13 +418,13 @@ export class VesProjectService {
       projectDataWithContributors.push(...pluginsProjectDataWithContributors);
     }
 
-    if (this.workspaceProjectFileUri) {
+    if (this.workspaceProjectFolderUri) {
       projectDataWithContributors.push({
         _contributor: ProjectContributor.Project,
-        _contributorUri: this.workspaceProjectFileUri.parent,
+        _contributorUri: this.workspaceProjectFolderUri,
         ...workspaceProjectFileData
       });
-      this.knownContributors[ProjectContributor.Project] = this.workspaceProjectFileUri.parent;
+      this.knownContributors[ProjectContributor.Project] = this.workspaceProjectFolderUri;
     }
 
     const combined: {

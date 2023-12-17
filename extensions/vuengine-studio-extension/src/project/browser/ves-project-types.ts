@@ -186,7 +186,7 @@ export const defaultProjectData: ProjectFile = {
           ]
         }
       }],
-      template: 'templates/Image.c.nj',
+      template: 'Image.c.nj',
       itemSpecific: 'Image'
     },
     'RomInfo.h': {
@@ -194,7 +194,7 @@ export const defaultProjectData: ProjectFile = {
         path: 'headers/RomInfo.h',
         root: ProjectFileTemplateTargetRoot.project,
       }],
-      template: 'templates/RomInfo.h.nj',
+      template: 'RomInfo.h.nj',
       encoding: ProjectFileTemplateEncoding.ShiftJIS
     }
   },
