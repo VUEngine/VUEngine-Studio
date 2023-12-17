@@ -349,6 +349,7 @@ export class VesProjectService {
       workspaceProjectFileData = await this.readProjectFileData(this.workspaceProjectFileUri) || {};
       console.info(`Read project data from file ${this.workspaceProjectFileUri}.`);
     } else {
+      /*
       if (this.workspaceService.workspace?.resource) {
         this.workspaceProjectFileUri = this.workspaceService.workspace?.resource.resolve(`project.${VUENGINE_EXT}`);
         this._projectData = workspaceProjectFileData;
@@ -357,6 +358,7 @@ export class VesProjectService {
       } else {
         console.info('Could not find or create project file.');
       }
+      */
     }
 
     // engine
