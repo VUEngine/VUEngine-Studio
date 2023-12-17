@@ -1,9 +1,7 @@
 import { nls } from '@theia/core';
-import { ConfirmDialog, LocalStorageService } from '@theia/core/lib/browser';
-import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
 import DockLayout, { LayoutBase, LayoutData } from 'rc-dock';
 import React from 'react';
+import { EditorsDockInterface, EditorsServices } from '../../ves-editors-widget';
 import Animations from './Animations/Animations';
 import Behaviors from './Behaviors/Behaviors';
 import Children from './Children/Children';
@@ -11,8 +9,7 @@ import Collisions from './Collisions/Collisions';
 import {
   EntityData,
   EntityEditorContext,
-  EntityEditorLayoutStorageName,
-  EntityEditorState,
+  EntityEditorState
 } from './EntityEditorTypes';
 import General from './General/General';
 import Meshes from './Meshes/Meshes';
@@ -24,11 +21,8 @@ import Sprites from './Sprites/Sprites';
 interface EntityEditorProps {
   entityData: EntityData;
   updateEntityData: (entityData: EntityData) => void;
-  services: {
-    fileService: FileService;
-    localStorageService: LocalStorageService;
-    workspaceService: WorkspaceService;
-  };
+  dock: EditorsDockInterface
+  services: EditorsServices
 }
 
 export default class EntityEditor extends React.Component<
@@ -61,32 +55,8 @@ export default class EntityEditor extends React.Component<
     this.props.updateEntityData({ ...this.props.entityData, ...entityData });
   }
 
-  async resetLayout(): Promise<void> {
-    const dialog = new ConfirmDialog({
-      title: nls.localize('vuengine/entityEditor/resetLayout', 'Reset Layout'),
-      msg: nls.localize(
-        'vuengine/entityEditor/areYouSureYouWantToResetLayout',
-        'Are you sure you want to reset the layout to default?'
-      ),
-    });
-    const confirmed = await dialog.open();
-    if (confirmed) {
-      this.dockLayoutRef.loadLayout(this.defaultLayout);
-      await this.props.services.localStorageService.setData(
-        EntityEditorLayoutStorageName,
-        undefined
-      );
-    }
-  }
-
   async componentDidMount(): Promise<void> {
-    this.defaultLayout = this.dockLayoutRef.getLayout();
-    const savedLayout = await this.props.services.localStorageService.getData(
-      EntityEditorLayoutStorageName
-    );
-    if (savedLayout) {
-      this.dockLayoutRef.loadLayout(savedLayout as LayoutBase);
-    }
+    this.props.dock.restoreLayout();
   }
 
   render(): React.JSX.Element {
@@ -259,13 +229,6 @@ export default class EntityEditor extends React.Component<
 
     return (
       <div className="entityEditor">
-        {/* <button
-                className={'theia-button secondary large'}
-                title={nls.localize('vuengine/entityEditor/resetLayout', 'Reset Layout')}
-                onClick={this.resetLayout.bind(this)}
-            >
-                <i className='fa fa-undo' />
-            </button> */}
         <EntityEditorContext.Provider
           value={{
             state: this.state,
@@ -277,13 +240,8 @@ export default class EntityEditor extends React.Component<
           <DockLayout
             defaultLayout={defaultLayout}
             dropMode="edge"
-            ref={this.getRef}
-            onLayoutChange={layout =>
-              this.props.services.localStorageService.setData(
-                EntityEditorLayoutStorageName,
-                layout
-              )
-            }
+            ref={this.props.dock.getRef}
+            onLayoutChange={this.props.dock.persistLayout}
           />
         </EntityEditorContext.Provider>
       </div>

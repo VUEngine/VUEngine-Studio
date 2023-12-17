@@ -1,25 +1,23 @@
-import DockLayout, { LayoutBase, LayoutData } from 'rc-dock';
+import { CommonCommands } from '@theia/core/lib/browser';
+import DockLayout, { LayoutData } from 'rc-dock';
 import React from 'react';
+import { EditorsDockInterface, EditorsServices } from '../../ves-editors-widget';
 import { ChannelConfig, InstrumentConfig, MusicEditorContext, MusicEditorState, Notes, PatternConfig, SongData, SongNote } from './MusicEditorTypes';
 import MusicPlayer from './MusicPlayer';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
-import Instruments from './Sidebar/Instruments';
-import Waveforms from './Sidebar/Waveforms';
-import { CommonCommands, ConfirmDialog, LocalStorageService } from '@theia/core/lib/browser';
-import { CommandService, nls } from '@theia/core';
-import Note from './Sidebar/Note';
-import Song from './Sidebar/Song';
 import Channel from './Sidebar/Channel';
 import Input from './Sidebar/Input';
+import Instruments from './Sidebar/Instruments';
+import Note from './Sidebar/Note';
+import Song from './Sidebar/Song';
+import Waveforms from './Sidebar/Waveforms';
 
 interface MusicEditorProps {
     songData: SongData
     updateSongData: (songData: SongData) => void
-    services: {
-        commandService: CommandService
-        localStorageService: LocalStorageService
-    }
+    dock: EditorsDockInterface,
+    services: EditorsServices
 }
 
 export default class MusicEditor extends React.Component<MusicEditorProps, MusicEditorState> {
@@ -37,13 +35,6 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
             songLength: 0,
         };
     }
-
-    protected defaultLayout: LayoutBase;
-    protected dockLayoutRef: DockLayout;
-
-    getRef = (r: DockLayout) => {
-        this.dockLayoutRef = r;
-    };
 
     setChannel(channelId: number, channel: Partial<ChannelConfig>): void {
         this.setSongData({
@@ -253,18 +244,6 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
         }
     }
 
-    async resetLayout(): Promise<void> {
-        const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/musicEditor/resetLayout', 'Reset Layout?'),
-            msg: nls.localize('vuengine/musicEditor/areYouSureYouWantToResetLayout', 'Are you sure you want to reset the layout to default?'),
-        });
-        const confirmed = await dialog.open();
-        if (confirmed) {
-            this.dockLayoutRef.loadLayout(this.defaultLayout);
-            await this.props.services.localStorageService.setData('ves-editors-musicEditor-layout', undefined);
-        }
-    };
-
     protected computeSong(): void {
         const soloChannel = this.props.songData.channels.filter(c => c.solo).map(c => c.id).pop() ?? -1;
 
@@ -301,12 +280,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
     }
 
     async componentDidMount(): Promise<void> {
-        this.defaultLayout = this.dockLayoutRef.getLayout();
-        const savedLayout = await this.props.services.localStorageService.getData('ves-editors-musicEditor-layout');
-        if (savedLayout) {
-            this.dockLayoutRef.loadLayout(savedLayout as LayoutBase);
-        }
-
+        this.props.dock.restoreLayout();
         this.computeSong();
     }
 
@@ -487,13 +461,6 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                 >
                     <i className='fa fa-upload' />
                 </button>
-                <button
-                    className={'theia-button secondary large'}
-                    title='Reset Layout'
-                    onClick={this.resetLayout.bind(this)}
-                >
-                    <i className='fa fa-undo' />
-                </button>
             </div>
             <MusicEditorContext.Provider value={{
                 state: this.state,
@@ -526,10 +493,8 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                 <DockLayout
                     defaultLayout={defaultLayout}
                     dropMode='edge'
-                    ref={this.getRef}
-                    onLayoutChange={layout =>
-                        this.props.services.localStorageService.setData('ves-editors-musicEditor-layout', layout)
-                    }
+                    ref={this.props.dock.getRef}
+                    onLayoutChange={this.props.dock.persistLayout}
                 />
             </MusicEditorContext.Provider>
         </div>;

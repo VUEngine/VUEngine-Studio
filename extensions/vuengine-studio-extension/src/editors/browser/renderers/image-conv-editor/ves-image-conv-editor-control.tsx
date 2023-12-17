@@ -15,6 +15,7 @@ const VesImageConvEditorControl = ({ data, handleChange, path, config }: VesImag
         data={data}
         updateData={(newValue: ImageConfig) => handleChange(path, newValue)}
         fileUri={config.fileUri}
+        dock={config.dock}
         services={config.services}
     />;
 

@@ -42,4 +42,15 @@ export namespace VesEditorsCommands {
         'vuengine/editors/commands/generateId',
         'vuengine/editors/commands/category'
     );
+
+    export const RESET_LAYOUT: Command = Command.toLocalizedCommand(
+        {
+            id: 'ves:editors:resetLayout',
+            label: 'Reset editor layout',
+            category: 'Editor',
+            iconClass: 'codicon codicon-layout'
+        },
+        'vuengine/editors/commands/resetLayout',
+        'vuengine/editors/commands/category'
+    );
 };

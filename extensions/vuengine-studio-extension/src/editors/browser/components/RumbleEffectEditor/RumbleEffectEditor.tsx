@@ -1,17 +1,14 @@
-import { CommandService, nls } from '@theia/core';
+import { nls } from '@theia/core';
 import React from 'react';
 import { VesRumblePackCommands } from '../../../../rumble-pack/browser/ves-rumble-pack-commands';
-import { VesRumblePackService } from '../../../../rumble-pack/browser/ves-rumble-pack-service';
 import { RumblePakLogLine } from '../../../../rumble-pack/browser/ves-rumble-pack-types';
+import { EditorsServices } from '../../ves-editors-widget';
 import { BUILT_IN_EFFECTS, RumbleEffectData } from './RumbleEffectTypes';
 
 interface RumbleEffectProps {
     data: RumbleEffectData
     updateData: (data: RumbleEffectData) => void
-    services: {
-        commandService: CommandService,
-        vesRumblePackService: VesRumblePackService,
-    }
+    services: EditorsServices
 }
 
 interface RumbleEffectState {

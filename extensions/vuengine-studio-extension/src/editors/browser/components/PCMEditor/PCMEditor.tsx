@@ -1,9 +1,8 @@
-import { MessageService, URI, nls } from '@theia/core';
+import { URI, nls } from '@theia/core';
 import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
-import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
-import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import React from 'react';
+import { EditorsServices } from '../../ves-editors-widget';
 import { DataSection } from '../Common/CommonTypes';
 import HContainer from '../Common/HContainer';
 import VContainer from '../Common/VContainer';
@@ -13,12 +12,7 @@ interface PCMProps {
     data: PCMData
     updateData: (data: PCMData) => void
     fileUri: URI
-    services: {
-        fileService: FileService,
-        fileDialogService: FileDialogService,
-        messageService: MessageService,
-        workspaceService: WorkspaceService,
-    }
+    services: EditorsServices
 }
 
 interface PCMState {

@@ -10,6 +10,3 @@ export interface ImageConvEditorContextType {
     imageConvData: ImageConfig
     setImageConvData: (songData: Partial<ImageConfig>) => void
 }
-
-export const ImageConvEditorLayoutStorageName = 'ves-editors-ImageConvEditor-layout';
-

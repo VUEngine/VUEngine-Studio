@@ -13,6 +13,7 @@ interface VesEntityEditorControlProps {
 const VesEntityEditorControl = ({ data, handleChange, path, config }: VesEntityEditorControlProps) => <EntityEditor
     entityData={data}
     updateEntityData={(newValue: EntityData) => handleChange(path, newValue)}
+    dock={config.dock}
     services={config.services}
 />;
 

@@ -3,7 +3,7 @@ import { JsonForms } from '@jsonforms/react';
 import { JsonFormsStyleContext, StyleContext, vanillaCells, vanillaRenderers, vanillaStyles } from '@jsonforms/vanilla-renderers';
 import { Message } from '@phosphor/messaging';
 import { CommandService, Emitter, Event, MessageService, Reference, UNTITLED_SCHEME, URI, nls } from '@theia/core';
-import { CommonCommands, LabelProvider, LocalStorageService, Saveable, SaveableSource } from '@theia/core/lib/browser';
+import { CommonCommands, ConfirmDialog, LabelProvider, LocalStorageService, Saveable, SaveableSource } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
@@ -14,12 +14,12 @@ import { MonacoEditorModel } from '@theia/monaco/lib/browser/monaco-editor-model
 import { MonacoTextModelService } from '@theia/monaco/lib/browser/monaco-text-model-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { deepmerge } from 'deepmerge-ts';
-import cloneDeep from 'lodash/cloneDeep';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { ProjectFile, ProjectFileType } from '../../project/browser/ves-project-types';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
 import { VES_RENDERERS } from './renderers/ves-renderers';
+import DockLayout, { LayoutBase } from 'rc-dock';
 
 export const VesEditorsWidgetOptions = Symbol('VesEditorsWidgetOptions');
 export interface VesEditorsWidgetOptions {
@@ -31,7 +31,23 @@ export interface ItemData {
     [id: string]: unknown
 };
 
-const MAX_HISTORY_ENTRIES = 100;
+export interface EditorsDockInterface {
+    getRef: (r: DockLayout) => void,
+    setDefaultLayout: (defaultLayout: LayoutBase) => Promise<void>,
+    resetLayout: () => Promise<void>,
+    restoreLayout: () => Promise<void>,
+    persistLayout: (layout: LayoutBase | undefined) => Promise<void>,
+};
+
+export interface EditorsServices {
+    commandService: CommandService
+    fileService: FileService
+    fileDialogService: FileDialogService
+    messageService: MessageService
+    vesCommonService: VesCommonService
+    vesRumblePackService: VesRumblePackService
+    workspaceService: WorkspaceService
+};
 
 @injectable()
 export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableSource {
@@ -66,9 +82,6 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     protected data: ItemData | undefined;
     protected savedData: ItemData | undefined;
 
-    protected history: ItemData[] = [];
-    protected historyIndex: number = -1;
-
     protected schema: JsonSchema | undefined;
     protected uiSchema: UISchemaElement | undefined;
     private jsonformsOnChange: (state: Pick<JsonFormsCore, 'data' | 'errors'>) => void;
@@ -100,6 +113,51 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
 
     static readonly ID = 'vesEditorsWidget';
     static readonly LABEL = 'Editor';
+
+    protected defaultLayout: LayoutBase;
+    dockLayoutRef: DockLayout;
+
+    protected getDockLayoutRef = (r: DockLayout) => {
+        this.dockLayoutRef = r;
+    };
+
+    protected getLayoutLocalStorageId(): string {
+        return `ves-editors-${this.typeId}-layout`;
+    }
+
+    protected async setDefaultDockLayout(defaultLayout: LayoutBase): Promise<void> {
+        this.defaultLayout = defaultLayout;
+    };
+
+    async resetDockLayout(): Promise<void> {
+        const type = this.vesProjectService.getProjectDataType(this.typeId);
+
+        const dialog = new ConfirmDialog({
+            title: nls.localize('vuengine/editors/resetLayout', 'Reset Layout?'),
+            msg: nls.localize(
+                'vuengine/editors/areYouSureYouWantToResetLayout',
+                'Are you sure you want to reset the {0} editor layout to default?',
+                type?.schema.title
+            ),
+        });
+        const confirmed = await dialog.open();
+        if (confirmed) {
+            this.dockLayoutRef.loadLayout(this.defaultLayout);
+            return this.persistDockLayout(undefined);
+        }
+    };
+
+    protected async restoreDockLayout(): Promise<void> {
+        this.defaultLayout = this.dockLayoutRef.getLayout();
+        const savedLayout = await this.localStorageService.getData(this.getLayoutLocalStorageId());
+        if (savedLayout) {
+            this.dockLayoutRef.loadLayout(savedLayout as LayoutBase);
+        }
+    };
+
+    protected async persistDockLayout(layout: LayoutBase | undefined): Promise<void> {
+        return this.localStorageService.setData(this.getLayoutLocalStorageId(), layout);
+    };
 
     @postConstruct()
     protected init(): void {
@@ -179,7 +237,6 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
 
         await this.loadData(type);
 
-        this.initHistory();
         this.loading = false;
         this.update();
     }
@@ -224,63 +281,9 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     }
 
     undo(): void {
-        if (this.undoHistory()) {
-            this.setDirty(this.dataHasBeenChanged());
-            this.update();
-        }
     }
 
     redo(): void {
-        if (this.redoHistory()) {
-            this.setDirty(this.dataHasBeenChanged());
-            this.update();
-        }
-    }
-
-    protected initHistory(): void {
-        if (!this.history.length) {
-            this.pushToHistory();
-        }
-    }
-
-    protected pushToHistory(): void {
-        // only add to history if there have been changes compared to last history entry
-        if (this.historyIndex === -1 || JSON.stringify(this.data) !== JSON.stringify(this.history[this.historyIndex])) {
-            // remove any entries beyond current, aka invalidate redos
-            if (this.history.length > this.historyIndex + 1) {
-                this.history = this.history.slice(0, this.historyIndex + 1);
-            }
-
-            // truncate oldest entry if reached max history size
-            this.history.push(cloneDeep(this.data!));
-            if (this.history.length > MAX_HISTORY_ENTRIES) {
-                this.history.slice(1);
-            } else {
-                this.historyIndex++;
-            }
-        }
-    }
-
-    protected undoHistory(): boolean {
-        if (this.history[this.historyIndex - 1]) {
-            this.historyIndex--;
-            this.data = cloneDeep(this.history[this.historyIndex]);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    protected redoHistory(): boolean {
-        if (this.history[this.historyIndex + 1]) {
-            this.historyIndex++;
-            this.data = cloneDeep(this.history[this.historyIndex]);
-
-            return true;
-        }
-
-        return false;
     }
 
     async save(): Promise<void> {
@@ -391,7 +394,6 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     protected handleChanged(data: ItemData): void {
         this.data = data;
         this.setDirty(this.dataHasBeenChanged());
-        this.pushToHistory();
     }
 
     protected onAfterHide(msg: Message): void {
@@ -432,17 +434,23 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
                                     hideRequiredAsterisk: false,
                                     // TODO: refactor once there's a non-hacky way to inject custom data
                                     fileUri: this.uri,
+                                    dock: {
+                                        getRef: this.getDockLayoutRef.bind(this),
+                                        persistLayout: this.persistDockLayout.bind(this),
+                                        setDefaultLayout: this.setDefaultDockLayout.bind(this),
+                                        resetLayout: this.resetDockLayout.bind(this),
+                                        restoreLayout: this.restoreDockLayout.bind(this),
+                                    },
                                     services: {
                                         commandService: this.commandService,
                                         fileService: this.fileService,
                                         fileDialogService: this.fileDialogService,
-                                        localStorageService: this.localStorageService,
                                         messageService: this.messageService,
                                         vesCommonService: this.vesCommonService,
                                         vesRumblePackService: this.vesRumblePackService,
                                         workspaceService: this.workspaceService,
                                     },
-                                    projectData: this.projectData
+                                    projectData: this.projectData,
                                 }}
                             />
                         </JsonFormsStyleContext.Provider>

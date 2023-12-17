@@ -13,6 +13,7 @@ interface VesMusicEditorControlProps {
 const VesMusicEditorControl = ({ data, handleChange, path, config }: VesMusicEditorControlProps) => <MusicEditor
     songData={data}
     updateSongData={(newValue: SongData) => handleChange(path, newValue)}
+    dock={config.dock}
     services={config.services}
 />;
 

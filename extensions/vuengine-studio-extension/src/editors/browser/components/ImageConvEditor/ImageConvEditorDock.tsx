@@ -1,26 +1,20 @@
-import { MessageService, URI, nls } from '@theia/core';
-import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { URI, nls } from '@theia/core';
+import DockLayout, { LayoutData } from 'rc-dock';
 import React, { useEffect, useState } from 'react';
 import { ImageConfig } from '../../../../images/browser/ves-images-types';
-import { FileDialogService } from '@theia/filesystem/lib/browser';
-import { LocalStorageService } from '@theia/core/lib/browser';
-import { ImageConvEditorContext, ImageConvEditorLayoutStorageName } from './ImageConvEditorTypes';
-import DockLayout, { LayoutData } from 'rc-dock';
-import TilesMap from './TilesMap/TilesMap';
+import { EditorsDockInterface, EditorsServices } from '../../ves-editors-widget';
 import Animation from './Animation/Animation';
-import Preview from './Preview/Preview';
 import General from './General/General';
+import { ImageConvEditorContext } from './ImageConvEditorTypes';
+import Preview from './Preview/Preview';
+import TilesMap from './TilesMap/TilesMap';
 
 interface ImageConvEditorDockProps {
     data: ImageConfig
     updateData: (data: ImageConfig) => void
     fileUri: URI
-    fileService: FileService,
-    fileDialogService: FileDialogService
-    localStorageService: LocalStorageService
-    messageService: MessageService
-    workspaceService: WorkspaceService
+    dock: EditorsDockInterface
+    services: EditorsServices
 }
 
 export default function ImageConvEditorDock(props: ImageConvEditorDockProps): React.JSX.Element {
@@ -28,25 +22,16 @@ export default function ImageConvEditorDock(props: ImageConvEditorDockProps): Re
         data,
         updateData,
         fileUri,
-        fileService,
-        fileDialogService,
-        localStorageService,
-        messageService,
-        workspaceService,
+        dock,
+        services,
     } = props;
     const [filesToShow, setFilesToShow] = useState<{ [path: string]: string }>({});
-    const workspaceRootUri = workspaceService.tryGetRoots()[0]?.resource;
-
-    // let dockLayoutRef: DockLayout;
-
-    const getRef = (r: DockLayout) => {
-        // dockLayoutRef = r;
-    };
+    const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
 
     const determineFilesToShow = async () => {
         const f = data.files.length > 0
             ? data.files
-            : await Promise.all(window.electronVesCore.findFiles(await fileService.fsPath(fileUri.parent), '*.png')
+            : await Promise.all(window.electronVesCore.findFiles(await services.fileService.fsPath(fileUri.parent), '*.png')
                 .map(async p => {
                     const fullUri = fileUri.parent.resolve(p);
                     const relativePath = workspaceRootUri.relative(fullUri)?.toString()!;
@@ -62,7 +47,7 @@ export default function ImageConvEditorDock(props: ImageConvEditorDockProps): Re
                     'File not found'
                 );
                 const resolvedUri = workspaceRootUri.resolve(p);
-                if (await fileService.exists(resolvedUri)) {
+                if (await services.fileService.exists(resolvedUri)) {
                     const dimensions = await window.electronVesCore.getImageDimensions(resolvedUri.path.fsPath());
                     meta = `${dimensions.width}×${dimensions.height}`;
                 }
@@ -104,10 +89,10 @@ export default function ImageConvEditorDock(props: ImageConvEditorDockProps): Re
                                         <ImageConvEditorContext.Consumer>
                                             {context => <General
                                                 fileUri={fileUri}
-                                                fileService={fileService}
-                                                fileDialogService={fileDialogService}
-                                                messageService={messageService}
-                                                workspaceService={workspaceService}
+                                                fileService={services.fileService}
+                                                fileDialogService={services.fileDialogService}
+                                                messageService={services.messageService}
+                                                workspaceService={services.workspaceService}
                                             />}
                                         </ImageConvEditorContext.Consumer>
                                     ),
@@ -157,8 +142,8 @@ export default function ImageConvEditorDock(props: ImageConvEditorDockProps): Re
                             content: (
                                 <ImageConvEditorContext.Consumer>
                                     {context => <Preview
-                                        fileService={fileService}
-                                        workspaceService={workspaceService}
+                                        fileService={services.fileService}
+                                        workspaceService={services.workspaceService}
                                     />}
                                 </ImageConvEditorContext.Consumer>
                             ),
@@ -171,13 +156,6 @@ export default function ImageConvEditorDock(props: ImageConvEditorDockProps): Re
 
     return (
         <div className="imageConvEditor">
-            {/* <button
-              className={'theia-button secondary large'}
-              title={nls.localize('vuengine/entityEditor/resetLayout', 'Reset Layout')}
-              onClick={this.resetLayout.bind(this)}
-          >
-              <i className='fa fa-undo' />
-          </button> */}
             <ImageConvEditorContext.Provider
                 value={{
                     filesToShow,
@@ -189,13 +167,8 @@ export default function ImageConvEditorDock(props: ImageConvEditorDockProps): Re
                 <DockLayout
                     defaultLayout={defaultLayout}
                     dropMode="edge"
-                    ref={getRef}
-                    onLayoutChange={layout =>
-                        localStorageService.setData(
-                            ImageConvEditorLayoutStorageName,
-                            layout
-                        )
-                    }
+                    ref={dock.getRef}
+                    onLayoutChange={dock.persistLayout}
                 />
             </ImageConvEditorContext.Provider>
         </div>
