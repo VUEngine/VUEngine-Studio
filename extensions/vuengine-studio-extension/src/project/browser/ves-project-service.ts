@@ -317,7 +317,8 @@ export class VesProjectService {
       'folders':
         [{
           'path': ''
-        }]
+        }],
+      'plugins': []
     };
     this.workspaceProjectFileUri = this.workspaceService.workspace?.resource;
     if (this.workspaceProjectFileUri) {
@@ -349,16 +350,25 @@ export class VesProjectService {
       workspaceProjectFileData = await this.readProjectFileData(this.workspaceProjectFileUri) || {};
       console.info(`Read project data from file ${this.workspaceProjectFileUri}.`);
     } else {
-      /*
       if (this.workspaceService.workspace?.resource) {
-        this.workspaceProjectFileUri = this.workspaceService.workspace?.resource.resolve(`project.${VUENGINE_EXT}`);
-        this._projectData = workspaceProjectFileData;
-        await this.saveProjectFile();
-        console.info(`Could not find project file. Created new one at ${this.workspaceProjectFileUri}`);
+        const createFileButtonLabel = nls.localize('vuengine/projects/createProjectFile', 'Create a project file');
+        this.messageService.warn(
+          nls.localize(
+            'vuengine/projects/noProjectFileFound',
+            'No project file (*.{0}) could be found in the root of the current workspace. It is, however, needed for certain functionality like VUEngine plugins.',
+            VUENGINE_EXT
+          ),
+          createFileButtonLabel,
+        ).then(async button => {
+          if (button === createFileButtonLabel) {
+            this.workspaceProjectFileUri = this.workspaceService.workspace?.resource.resolve(`project.${VUENGINE_EXT}`);
+            this._projectData = workspaceProjectFileData;
+            await this.saveProjectFile();
+          }
+        });
       } else {
         console.info('Could not find or create project file.');
       }
-      */
     }
 
     // engine
