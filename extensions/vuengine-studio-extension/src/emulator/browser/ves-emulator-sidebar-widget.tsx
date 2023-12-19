@@ -1,4 +1,4 @@
-import { CommandService, nls } from '@theia/core';
+import { CommandService, isWindows, nls } from '@theia/core';
 import { ConfirmDialog, PreferenceService } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import URI from '@theia/core/lib/common/uri';
@@ -8,6 +8,7 @@ import * as React from '@theia/core/shared/react';
 import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import ReactTextareaAutosize from 'react-textarea-autosize';
+import { WINDOWS_EXECUTABLE_EXTENSIONS } from '../../core/browser/ves-common-types';
 import { VesEmulatorCommands } from './ves-emulator-commands';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
 import { VesEmulatorService } from './ves-emulator-service';
@@ -131,7 +132,11 @@ function EmulatorConfigs(props: EmulatorConfigsProps): React.JSX.Element {
       title: nls.localize('vuengine/emulator/selectEmulatorExecutable', 'Select emulator executable'),
       canSelectFolders: false,
       canSelectFiles: true,
-      filters: { 'Executables': ['.'] }
+      filters: {
+        'Executables': isWindows
+          ? WINDOWS_EXECUTABLE_EXTENSIONS
+          : ['.']
+      }
     };
     const currentPath = await props.fileService.exists(new URI(emulatorConfigs[index].path).withScheme('file'))
       ? await props.fileService.resolve(new URI(emulatorConfigs[index].path).withScheme('file'))

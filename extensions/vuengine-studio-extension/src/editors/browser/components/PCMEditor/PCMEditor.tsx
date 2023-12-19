@@ -77,7 +77,7 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
                 title: nls.localize('vuengine/pcmEditor/selectSourceFile', 'Select source file'),
                 canSelectFolders: false,
                 canSelectFiles: true,
-                filters: { 'WAV': ['.wav'] }
+                filters: { 'WAV': ['wav'] }
             };
             const currentPath = await this.props.services.fileService.resolve(this.props.fileUri.parent);
             const uri = await this.props.services.fileDialogService.showOpenDialog(openFileDialogProps, currentPath);

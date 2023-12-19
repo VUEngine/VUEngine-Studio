@@ -52,7 +52,7 @@ export default function ImportExport(props: ImportExportProps): React.JSX.Elemen
             title: nls.localize('vuengine/fontEditor/selectImageToImport', 'Select image file to import'),
             canSelectFolders: false,
             canSelectFiles: true,
-            filters: { 'png': ['.png'] }
+            filters: { 'PNG': ['png'] }
         };
         const currentPath = await props.fileService.resolve(props.baseUri);
         const uri = await props.fileDialogService.showOpenDialog(openFileDialogProps, currentPath);

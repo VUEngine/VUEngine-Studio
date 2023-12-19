@@ -33,7 +33,7 @@ export default function General(props: GeneralProps): React.JSX.Element {
             canSelectFolders: false,
             canSelectFiles: true,
             canSelectMany: true,
-            filters: { 'PNG': ['.png'] }
+            filters: { 'PNG': ['png'] }
         };
         const currentPath = await fileService.resolve(fileUri.parent);
         let uris: MaybeArray<URI> | undefined = await fileDialogService.showOpenDialog(openFileDialogProps, currentPath);

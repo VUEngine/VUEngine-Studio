@@ -11,4 +11,18 @@ export const PALETTE_INDEX_MAPPING: { [key: string]: number } = {
   '10': 2,
   '11': 3,
 };
-export const PALETTE_COLORS = ['#000', '#500', '#a00', '#f00'];
+export const PALETTE_COLORS = [
+  '#000',
+  '#500',
+  '#a00',
+  '#f00',
+];
+
+export const WINDOWS_EXECUTABLE_EXTENSIONS = [
+  'bat',
+  'bin',
+  'cmd',
+  'com',
+  'exe',
+  'ps1',
+];
