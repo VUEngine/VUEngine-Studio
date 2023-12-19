@@ -6,6 +6,7 @@ import { GettingStartedWidget } from '@theia/getting-started/lib/browser/getting
 import { VSXEnvironment } from '@theia/vsx-registry/lib/common/vsx-environment';
 import * as React from 'react';
 import { VesCoreContribution } from '../../core/browser/ves-core-contribution';
+import HContainer from '../../editors/browser/components/Common/HContainer';
 import { VesProjectCommands } from '../../project/browser/ves-project-commands';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 
@@ -56,7 +57,11 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
         return <>
             <div className='gs-content-container'>
                 {this.renderHeader()}
-                <hr className='gs-hr' />
+                <div className='flex-grid'>
+                    <div className='col'>
+                        {this.renderOpen()}
+                    </div>
+                </div>
                 <div className='flex-grid'>
                     <div className='col'>
                         {this.renderActions()}
@@ -70,33 +75,37 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
     }
 
     protected renderActions(): React.ReactNode {
-        return <>
-            <div className='flex-grid'>
-                <div className='col'>
-                    {this.renderOpen()}
+        return <HContainer alignItems='start' wrap='wrap'>
+            <div style={{ paddingRight: 20 }}>
+                <div className='flex-grid'>
+                    <div className='col'>
+                        {this.renderRecentWorkspaces()}
+                    </div>
+                </div>
+                <div className='flex-grid'>
+                    <div className='col'>
+                        {this.renderSettings()}
+                    </div>
+                </div>
+                <div className='flex-grid'>
+                    <div className='col'>
+                        {this.renderLinks()}
+                    </div>
+                </div>
+                <div className='flex-grid'>
+                    <div className='col'>
+                        {this.renderHelp()}
+                    </div>
                 </div>
             </div>
-            <div className='flex-grid'>
-                <div className='col'>
-                    {this.renderRecentWorkspaces()}
+            <div style={{ width: 384 }}>
+                <div className='flex-grid'>
+                    <div className='col'>
+                        {this.renderLearn()}
+                    </div>
                 </div>
             </div>
-            <div className='flex-grid'>
-                <div className='col'>
-                    {this.renderHelp()}
-                </div>
-            </div>
-            <div className='flex-grid'>
-                <div className='col'>
-                    {this.renderSettings()}
-                </div>
-            </div>
-            <div className='flex-grid'>
-                <div className='col'>
-                    {this.renderLinks()}
-                </div>
-            </div>
-        </>;
+        </HContainer>;
     }
 
     protected renderHeader(): React.ReactNode {
@@ -199,6 +208,23 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
                     onKeyDown={(e: React.KeyboardEvent) => this.doOpenExternalLinkEnter(e, VesCoreContribution.DOCUMENTATION_URL)}>
                     {nls.localizeByDefault('Documentation')}
                 </a>
+            </div>
+        </div>;
+    }
+
+    protected renderLearn(): React.ReactNode {
+        return <div className="gs-section">
+            <h3 className="gs-section-header">
+                <i className={codicon('lightbulb')}></i>
+                {nls.localize('vuengine/gettingStarted/learn', 'Learn')}
+            </h3>
+            <div className="gs-action-container">
+                {nls.localize(
+                    'vuengine/gettingStarted/showcaseIntroduction',
+                    // eslint-disable-next-line max-len
+                    'New to VUEngine? Create a new project based on VUEngine Showcase and dig into the sources to learn about the engine\'s concepts and capabilities. Various sample states expose you to key aspects of the engine step by step through cleanly written and properly commented code.'
+                )}
+                <div className="gs-learn-screenshot"></div>
             </div>
         </div>;
     }
