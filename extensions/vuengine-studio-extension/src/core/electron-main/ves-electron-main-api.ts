@@ -1,5 +1,5 @@
 import { default as $RefParser, default as JSONSchema } from '@apidevtools/json-schema-ref-parser';
-import { Disposable, MaybePromise } from '@theia/core';
+import { Disposable, MaybePromise, isWindows } from '@theia/core';
 import { ElectronMainApplication, ElectronMainApplicationContribution } from '@theia/core/lib/electron-main/electron-main-application';
 import { createDisposableListener } from '@theia/core/lib/electron-main/event-utils';
 import {
@@ -43,7 +43,8 @@ export class VesMainApi implements ElectronMainApplicationContribution {
             event.returnValue = systemPreferences.getUserDefault(preference, type);
         });
         ipcMain.on(VES_CHANNEL_GET_TEMP_DIR, event => {
-            event.returnValue = getTempDir('vuengine');
+            const tempDir = getTempDir('vuengine');
+            event.returnValue = isWindows ? `/${tempDir}` : tempDir;
         });
         ipcMain.handle(VES_CHANNEL_DEREFERENCE_JSON_SCHEMA, (event, schema) =>
             $RefParser.dereference(schema as JSONSchema)
