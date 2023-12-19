@@ -1,8 +1,8 @@
-import { CancellationTokenSource, isWindows, nls } from '@theia/core';
-import { Key, PreferenceService } from '@theia/core/lib/browser';
-import { DialogError, DialogProps } from '@theia/core/lib/browser/dialogs';
+import { isWindows, nls } from '@theia/core';
+import { PreferenceService } from '@theia/core/lib/browser';
+import { DialogProps } from '@theia/core/lib/browser/dialogs';
 import { ReactDialog } from '@theia/core/lib/browser/dialogs/react-dialog';
-import { Message, Widget } from '@theia/core/lib/browser/widgets/widget';
+import { Message } from '@theia/core/lib/browser/widgets/widget';
 import { ApplicationInfo, ApplicationServer } from '@theia/core/lib/common/application-protocol';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import URI from '@theia/core/lib/common/uri';
