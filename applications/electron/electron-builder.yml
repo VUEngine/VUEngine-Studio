@@ -57,6 +57,8 @@ win:
       to: app/binaries/vuengine-studio-tools/win
     - from: binaries/vuengine-studio-tools/linux/gcc
       to: app/binaries/vuengine-studio-tools/linux/gcc
+    - from: binaries/vuengine-studio-tools/linux/make
+      to: app/binaries/vuengine-studio-tools/linux/make
 
 mac:
   artifactName: VUEngine-Studio-${versionDashes}.${ext}
