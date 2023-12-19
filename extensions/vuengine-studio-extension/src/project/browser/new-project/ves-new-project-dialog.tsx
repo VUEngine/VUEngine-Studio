@@ -1,8 +1,10 @@
-import { isWindows, nls } from '@theia/core';
+import { CancellationTokenSource, isWindows, nls } from '@theia/core';
 import { Key, PreferenceService } from '@theia/core/lib/browser';
-import { DialogProps } from '@theia/core/lib/browser/dialogs';
+import { DialogError, DialogProps } from '@theia/core/lib/browser/dialogs';
 import { ReactDialog } from '@theia/core/lib/browser/dialogs/react-dialog';
-import { Message } from '@theia/core/lib/browser/widgets/widget';
+import { Message, Widget } from '@theia/core/lib/browser/widgets/widget';
+import { ApplicationInfo, ApplicationServer } from '@theia/core/lib/common/application-protocol';
+import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import URI from '@theia/core/lib/common/uri';
 import { RequestService } from '@theia/core/shared/@theia/request';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -14,9 +16,8 @@ import { VesCommonService } from '../../../core/browser/ves-common-service';
 import { VesProjectCommands } from '../ves-project-commands';
 import { VesProjectPathsService } from '../ves-project-paths-service';
 import { VesProjectService } from '../ves-project-service';
-import { VES_NEW_PROJECT_TEMPLATES, VesNewProjectFormComponent } from './ves-new-project-form';
-import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import { VUENGINE_EXT } from '../ves-project-types';
+import { VES_NEW_PROJECT_TEMPLATES, VesNewProjectFormComponent } from './ves-new-project-form';
 
 @injectable()
 export class VesNewProjectDialogProps extends DialogProps {
@@ -24,6 +25,8 @@ export class VesNewProjectDialogProps extends DialogProps {
 
 @injectable()
 export class VesNewProjectDialog extends ReactDialog<void> {
+    @inject(ApplicationServer)
+    protected readonly appServer: ApplicationServer;
     @inject(FileService)
     protected readonly fileService: FileService;
     @inject(FileDialogService)
@@ -41,6 +44,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
     @inject(WorkspaceService)
     protected readonly workspaceService: WorkspaceService;
 
+    protected applicationInfo: ApplicationInfo | undefined;
     protected createProjectFormComponentRef: React.RefObject<VesNewProjectFormComponent> = React.createRef();
     protected isCreating: boolean = false;
 
@@ -53,19 +57,28 @@ export class VesNewProjectDialog extends ReactDialog<void> {
             maxWidth: 650,
         });
 
-        this.appendCloseButton();
         this.appendAcceptButton(nls.localize('vuengine/projects/create', 'Create'));
 
-        if (this.closeButton) {
-            this.closeButton.tabIndex = 9;
-        }
         if (this.acceptButton) {
-            this.acceptButton.tabIndex = 10;
+            this.acceptButton.tabIndex = 11;
         }
+    }
+
+    protected handleEnter(event: KeyboardEvent): boolean | void {
+        this.accept();
+    }
+
+    protected async accept(): Promise<void> {
+        this.createProject();
     }
 
     @postConstruct()
     protected init(): void {
+        this.doInit();
+    }
+
+    protected async doInit(): Promise<void> {
+        this.applicationInfo = await this.appServer.getApplicationInfo();
         this.update();
     }
 
@@ -80,10 +93,6 @@ export class VesNewProjectDialog extends ReactDialog<void> {
         if (!this.isCreating) {
             super.close();
         };
-    }
-
-    protected addAcceptAction<K extends keyof HTMLElementEventMap>(element: HTMLElement, ...additionalEventTypes: K[]): void {
-        this.addKeyListener(element, Key.ENTER, () => this.createProject(), ...additionalEventTypes);
     }
 
     protected render(): React.ReactNode {
@@ -155,7 +164,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
 
         this.setStatusMessage(`${spinnerIcon} ${nls.localize('vuengine/projects/downloadingTemplate', 'Downloading template, this may take a moment...')}`);
         const templateArchiveUrl = useTagged
-            ? `${template.repository}/archive/refs/tags/${template.tag}.zip`
+            ? `${template.repository}/archive/refs/tags/ves-v${this.applicationInfo && this.applicationInfo.version}.zip`
             : `${template.repository}/archive/master.zip`;
         const context = await this.requestService.request({ url: templateArchiveUrl });
         if (context.res.statusCode !== 200) {

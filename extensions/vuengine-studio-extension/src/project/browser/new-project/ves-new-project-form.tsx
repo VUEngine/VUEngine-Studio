@@ -35,7 +35,6 @@ export interface VesNewProjectTemplate {
     id: string
     name: string
     repository: string,
-    tag: string,
     description: string
     labels: {
         name: Array<string>
@@ -51,7 +50,6 @@ export const VES_NEW_PROJECT_TEMPLATES: VesNewProjectTemplate[] = [{
     id: 'barebone',
     name: nls.localize('vuengine/projects/templates/bareboneTitle', 'Barebone'),
     repository: 'https://github.com/VUEngine/VUEngine-Barebone',
-    tag: 'ves-v0.2.0',
     description: nls.localize(
         'vuengine/projects/templates/bareboneDescription',
         'An (almost) empty project that includes a single custom state plus the most important plugins to add splash screens, automatic pause and more.'
@@ -72,7 +70,6 @@ export const VES_NEW_PROJECT_TEMPLATES: VesNewProjectTemplate[] = [{
     id: 'showcase',
     name: nls.localize('vuengine/projects/templates/showcaseTitle', 'Showcase'),
     repository: 'https://github.com/VUEngine/VUEngine-Showcase',
-    tag: 'ves-v0.2.0',
     description: nls.localize(
         'vuengine/projects/templates/showcaseDescription',
         'Showcase project to be used as the foundation for learning about VUEngine\'s concepts and capabilities.'
@@ -93,7 +90,6 @@ export const VES_NEW_PROJECT_TEMPLATES: VesNewProjectTemplate[] = [{
     id: 'platformer-demo',
     name: nls.localize('vuengine/projects/templates/platformerTitle', 'Platform Game'),
     repository: 'https://github.com/VUEngine/VUEngine-Platformer-Demo',
-    tag: 'ves-v0.2.0',
     description: nls.localize(
         'vuengine/projects/templates/platformerDescription',
         'A full featured single level platforming game.'
@@ -290,7 +286,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                     <div>
                         {VES_NEW_PROJECT_TEMPLATES[this.state.template].name}
                     </div>
-                    <div style={{ fontStyle: 'italic' }}>
+                    <div style={{ fontStyle: 'italic', minHeight: 40 }}>
                         {VES_NEW_PROJECT_TEMPLATES[this.state.template].description}
                     </div>
                 </VContainer>
@@ -303,14 +299,15 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
                         />
                         {nls.localize('vuengine/projects/useTagged', 'Use tagged version')}
                     </label>
-                    {!this.state.useTagged && nls.localize(
-                        'vuengine/projects/useTaggedWarning',
-                        // eslint-disable-next-line max-len
-                        'Warning: unchecking this will download the latest version of the template. Compatibility with your version of VUEngine is not guaranteed.'
-                    )}
+                    <div style={{ fontStyle: 'italic', minHeight: 40 }}>
+                        {!this.state.useTagged && nls.localize(
+                            'vuengine/projects/useTaggedWarning',
+                            // eslint-disable-next-line max-len
+                            'Warning: unchecking this will download the latest version of the template. Compatibility with your version of VUEngine is not guaranteed.'
+                        )}
+                    </div>
                 </VContainer>
             </VContainer>
-            <br />
         </VContainer>;
     }
 

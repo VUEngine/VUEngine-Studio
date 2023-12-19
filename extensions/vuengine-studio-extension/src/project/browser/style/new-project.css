@@ -15,6 +15,7 @@
 .vesNewProjectDialogTemplate {
     background-position: center;
     background-size: cover;
+    border-radius: 2px;
     filter: grayscale(1);
     height: 112px;
     width: 192px;
