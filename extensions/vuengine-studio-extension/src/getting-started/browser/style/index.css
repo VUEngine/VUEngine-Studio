@@ -2,3 +2,11 @@
     margin-left: 0;
     margin-right: calc(var(--theia-ui-padding) * 2);
 }
+
+.gs-learn-screenshot {
+    background-image: url('../images/learn.png');
+    border-radius: 5px;
+    height: 224px;
+    margin: 10px 0;
+    width: 384px;
+}
