@@ -45,13 +45,13 @@ export default function General(props: GeneralProps): React.JSX.Element {
             await Promise.all(uris.map(async u => {
                 const source = await fileService.resolve(u);
                 if (source.isFile) {
-                    const relativeUri = workspaceRootUri.relative(u);
-                    if (!relativeUri) {
+                    const relativePath = workspaceRootUri.relative(u);
+                    if (!relativePath) {
                         messageService.error(
                             nls.localize('vuengine/imageConvEditor/errorSourceFileMustBeInWorkspace', 'Source file must live in workspace.')
                         );
                     } else {
-                        newFiles.push(relativeUri.fsPath());
+                        newFiles.push(relativePath.toString().replace(/\\/g, '/'));
                     }
                 }
             }));

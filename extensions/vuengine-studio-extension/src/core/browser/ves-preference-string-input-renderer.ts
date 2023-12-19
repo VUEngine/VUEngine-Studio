@@ -56,7 +56,7 @@ export class VesPreferenceStringInputRenderer extends PreferenceStringInputRende
         if (dirUri) {
             const destinationFolder = await this.fileService.resolve(dirUri);
             if (destinationFolder.isDirectory) {
-                this.setPreferenceWithDebounce(destinationFolder.resource.path.toString());
+                this.setPreferenceWithDebounce(destinationFolder.resource.path.fsPath());
             }
         }
     };

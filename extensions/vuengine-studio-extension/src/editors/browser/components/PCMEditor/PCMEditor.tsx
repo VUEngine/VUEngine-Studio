@@ -40,7 +40,7 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
 
         this.props.updateData({
             ...this.props.data,
-            sourceFile,
+            sourceFile: sourceFile.replace(/\\/g, '/'),
             name,
         });
     };

@@ -1,5 +1,5 @@
 import { ApplicationShell, OpenerService, PreferenceScope, PreferenceService, QuickPickItem, QuickPickOptions } from '@theia/core/lib/browser';
-import { CommandService, MessageService, nls } from '@theia/core/lib/common';
+import { CommandService, MessageService, isWindows, nls } from '@theia/core/lib/common';
 import { QuickPickService } from '@theia/core/lib/common/quick-pick-service';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -145,13 +145,16 @@ export class VesEmulatorService {
       const opener = await this.openerService.getOpener(romUri);
       await opener.open(romUri);
     } else {
-      const emulatorUri = new URI(defaultEmulatorConfig.path).withScheme('file');
+      const emulatorPath = isWindows && !defaultEmulatorConfig.path.startsWith('/')
+        ? `/${defaultEmulatorConfig.path}`
+        : defaultEmulatorConfig.path;
+      const emulatorUri = new URI(emulatorPath).withScheme('file');
       const romPath = await this.fileService.fsPath(romUri);
       const emulatorArgs = defaultEmulatorConfig.args.replace(ROM_PLACEHOLDER, romPath).split(' ');
 
       if (emulatorUri.isEqual(new URI('').withScheme('file')) || !await this.fileService.exists(emulatorUri)) {
         this.messageService.error(
-          nls.localize('vuengine/emulator/emulatorPathDoesNotExist', `Emulator Path "${defaultEmulatorConfig.path}" does not exist.`)
+          nls.localize('vuengine/emulator/emulatorPathDoesNotExist', `Emulator Path "${emulatorPath}" does not exist.`)
         );
         return;
       }

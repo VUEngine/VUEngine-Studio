@@ -1,3 +1,4 @@
+import { isWindows } from '@theia/core';
 import { PreferenceService } from '@theia/core/lib/browser';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable } from '@theia/core/shared/inversify';
@@ -19,9 +20,15 @@ export class VesBuildPathsService {
     const defaultUri = resourcesUri
       .resolve('vuengine')
       .resolve('core');
-    const customUri = new URI(this.preferenceService.get(
+
+    const preference = this.preferenceService.get(
       VesBuildPreferenceIds.ENGINE_CORE_PATH
-    ) as string).withScheme('file');
+    ) as string;
+    const customUri = new URI(
+      isWindows && !preference.startsWith('/')
+        ? `/${preference}`
+        : preference
+    ).withScheme('file');
 
     return (!customUri.isEqual(new URI('').withScheme('file')) && await this.fileService.exists(customUri))
       ? customUri

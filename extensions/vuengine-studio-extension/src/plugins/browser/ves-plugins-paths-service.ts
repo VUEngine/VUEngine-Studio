@@ -1,3 +1,4 @@
+import { isWindows } from '@theia/core';
 import { PreferenceService } from '@theia/core/lib/browser';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import URI from '@theia/core/lib/common/uri';
@@ -22,7 +23,15 @@ export class VesPluginsPathsService {
     const defaultUri = resourcesUri
       .resolve('vuengine')
       .resolve('plugins');
-    const customUri = new URI(this.preferenceService.get(VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH) as string).withScheme('file');
+
+    const preference = this.preferenceService.get(
+      VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH
+    ) as string;
+    const customUri = new URI(
+      isWindows && !preference.startsWith('/')
+        ? `/${preference}`
+        : preference
+    ).withScheme('file');
 
     return (!customUri.isEqual(new URI('').withScheme('file')) && await this.fileService.exists(customUri))
       ? customUri
@@ -35,9 +44,15 @@ export class VesPluginsPathsService {
     const defaultUri = homedirUri
       .resolve('vuengine')
       .resolve('plugins');
-    const customUri = new URI(this.preferenceService.get(
+
+    const preference = this.preferenceService.get(
       VesPluginsPreferenceIds.USER_PLUGINS_PATH
-    ) as string).withScheme('file');
+    ) as string;
+    const customUri = new URI(
+      isWindows && !preference.startsWith('/')
+        ? `/${preference}`
+        : preference
+    ).withScheme('file');
 
     return (!customUri.isEqual(new URI('').withScheme('file')) && await this.fileService.exists(customUri))
       ? customUri

@@ -393,7 +393,7 @@ export class VesNewProjectFormComponent extends React.Component<VesNewProjectFor
             const destinationFolder = await this.fileService.resolve(destinationFolderUri);
             if (destinationFolder.isDirectory) {
                 this.setState({
-                    path: destinationFolder.resource.path.toString()
+                    path: destinationFolder.resource.path.fsPath()
                 });
             }
         }

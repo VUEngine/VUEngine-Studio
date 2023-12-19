@@ -32,6 +32,7 @@ export class VesImagesService {
   protected readonly workspaceService: WorkspaceService;
 
   async convertImage(imageConfigFileUri: URI, imageConfig: ImageConfig, filePath?: string): Promise<ConversionResult> {
+
     const result: ConversionResult = {
       animation: {},
       maps: [],
@@ -57,7 +58,7 @@ export class VesImagesService {
     const gritUri = await this.getGritUri();
     const imagePaths: string[] = [];
     files.map(f => {
-      imagePaths.push(workspaceRootUri.resolve(f).path.toString());
+      imagePaths.push(workspaceRootUri.resolve(f).path.fsPath());
     });
     const name = imageConfig.name ? imageConfig.name : imageConfigFileUri.path.name;
     const gritArguments = this.getGritArguments(name, imageConfig);

@@ -575,7 +575,7 @@ export class VesProjectService {
                 combined['items'][typeId][projectDataWithContributor._contributor] = itemWithContributor;
               }
             } catch (error) {
-              console.error('Malformed item file could not be parsed.', uri?.path.toString());
+              console.error('Malformed item file could not be parsed.', uri?.path.fsPath());
               return;
             }
           }
@@ -619,14 +619,14 @@ export class VesProjectService {
         try {
           const fileContentJson = JSON.parse(fileContent.value.toString());
 
-          const pluginId = `${prefix}/${pluginRelativeUri.path.toString().replace(/\\/g, '/')}`;
+          const pluginId = `${prefix}/${pluginRelativeUri.path.fsPath().replace(/\\/g, '/')}`;
 
           fileContentJson.plugin.name = pluginId;
           const iconUri = pluginFileUri.parent.resolve('icon.png');
           fileContentJson.plugin.icon = await this.fileService.exists(iconUri)
-            ? iconUri.path.toString()
+            ? iconUri.path.fsPath()
             : '';
-          fileContentJson.plugin.readme = pluginFileUri.parent.resolve('readme.md').path.toString();
+          fileContentJson.plugin.readme = pluginFileUri.parent.resolve('readme.md').path.fsPath();
 
           fileContentJson.plugin.displayName = this.translatePluginField(fileContentJson.plugin.displayName, nls.locale || 'en');
           fileContentJson.plugin.author = this.translatePluginField(fileContentJson.plugin.author, nls.locale || 'en');
@@ -646,7 +646,7 @@ export class VesProjectService {
 
           pluginsMap[pluginId] = fileContentJson;
         } catch (e) {
-          console.error(pluginFileUri.path.toString(), e);
+          console.error(pluginFileUri.path.fsPath(), e);
         }
       }
 
@@ -676,7 +676,7 @@ export class VesProjectService {
       try {
         return JSON.parse(projectFileContents.value.toString());
       } catch (error) {
-        console.error('Malformed project file could not be parsed.', projectFileUri?.path.toString());
+        console.error('Malformed project file could not be parsed.', projectFileUri?.path.fsPath());
       }
     }
 
@@ -725,7 +725,7 @@ export class VesProjectService {
           const configFileContents = await this.fileService.readFile(projectFileUri);
           projectData = JSON.parse(configFileContents.value.toString()) as ProjectFile;
         } catch (error) {
-          console.error('Malformed project file could not be parsed.', projectFileUri?.path.toString());
+          console.error('Malformed project file could not be parsed.', projectFileUri?.path.fsPath());
         }
       }
     } else {

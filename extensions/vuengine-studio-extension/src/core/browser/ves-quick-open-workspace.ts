@@ -21,7 +21,7 @@ export class VesQuickOpenWorkspace extends QuickOpenWorkspace {
             this.envServer.getHomeDirUri(),
             this.workspaceService.getUntitledWorkspace()
         ]);
-        const home = new URI(homeDirUri).path.toString();
+        const home = new URI(homeDirUri).path.fsPath();
         await this.preferences.ready;
         // Removed lines
         for (const workspace of workspaces) {
