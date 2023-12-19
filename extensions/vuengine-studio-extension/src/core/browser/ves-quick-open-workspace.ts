@@ -5,14 +5,11 @@ import { FileStat } from '@theia/filesystem/lib/common/files';
 import { QuickOpenWorkspace } from '@theia/workspace/lib/browser/quick-open-workspace';
 import { UntitledWorkspaceService } from '@theia/workspace/lib/common';
 import { VesProjectService } from '../../project/browser/ves-project-service';
-import { VesCommonService } from './ves-common-service';
 
 @injectable()
 export class VesQuickOpenWorkspace extends QuickOpenWorkspace {
     @inject(UntitledWorkspaceService)
     protected readonly untitledWorkspaceService: UntitledWorkspaceService;
-    @inject(VesCommonService)
-    protected readonly vesCommonService: VesCommonService;
     @inject(VesProjectService)
     protected readonly vesProjectsService: VesProjectService;
 
@@ -41,7 +38,7 @@ export class VesQuickOpenWorkspace extends QuickOpenWorkspace {
 
             this.items.push({
                 label: await this.vesProjectsService.getProjectName(uri), // Modified line
-                description: this.vesCommonService.formatPath(Path.tildify(uri.path.toString(), home)), // Modified line
+                description: Path.tildify(uri.path.fsPath(), home), // Modified line
                 iconClasses,
                 buttons: [this.removeRecentWorkspaceButton],
                 resource: uri,

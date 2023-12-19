@@ -5,7 +5,6 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import { GettingStartedWidget } from '@theia/getting-started/lib/browser/getting-started-widget';
 import { VSXEnvironment } from '@theia/vsx-registry/lib/common/vsx-environment';
 import * as React from 'react';
-import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesCoreContribution } from '../../core/browser/ves-core-contribution';
 import { VesProjectCommands } from '../../project/browser/ves-project-commands';
 import { VesProjectService } from '../../project/browser/ves-project-service';
@@ -15,8 +14,6 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
 
     @inject(VSXEnvironment)
     protected readonly environment: VSXEnvironment;
-    @inject(VesCommonService)
-    protected readonly vesCommonService: VesCommonService;
     @inject(VesProjectService)
     protected readonly vesProjectService: VesProjectService;
     @inject(WindowService)
@@ -46,7 +43,7 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
         for (const workspace of this.recentWorkspaces.slice(0, this.recentLimit)) {
             const uri = new URI(workspace);
             const pathLabel = this.labelProvider.getLongName(uri);
-            const path = this.vesCommonService.formatPath(this.home ? Path.tildify(pathLabel, this.home) : pathLabel);
+            const path = this.home ? Path.tildify(pathLabel, this.home) : pathLabel;
             const name = await this.vesProjectService.getProjectName(uri);
 
             this.vesRecentWorkspaces.push({
