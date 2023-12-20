@@ -105,7 +105,10 @@ export class VesCodeGenService {
       this.handleFileUpdate(fileUri);
     });
     this.vesProjectService.onDidUpdateProjectItem(fileUri => {
-      this.handleFileUpdate(fileUri);
+      // ignore files changes by git, etc
+      if (fileUri.scheme === 'file') {
+        this.handleFileUpdate(fileUri);
+      }
     });
     /*
     this.vesProjectService.onDidDeleteProjectItem(fileUri => {
