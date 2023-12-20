@@ -1,5 +1,6 @@
 import { nls } from '@theia/core';
 import React from 'react';
+import HContainer from '../Common/HContainer';
 import VContainer from '../Common/VContainer';
 import { BrightnessRepeatData } from './BrightnessRepeatTypes';
 import Editor from './Editor';
@@ -42,7 +43,7 @@ export default class BrightnessRepeatEditor extends React.Component<BrightnessRe
     }
 
     protected setValue(index: number, value: number): void {
-        const updatedValues = this.props.data.values;
+        const updatedValues = [...this.props.data.values];
         updatedValues[index] = value;
         this.props.updateData({
             ...this.props.data,
@@ -57,8 +58,8 @@ export default class BrightnessRepeatEditor extends React.Component<BrightnessRe
             tabIndex={0}
             className='brightnessRepeatEditor'
         >
-            <div className='options'>
-                <div>
+            <HContainer gap={20} alignItems='start'>
+                <VContainer grow={1} gap={20}>
                     <VContainer>
                         <label>
                             {nls.localize('vuengine/brightnessRepeatEditor/name', 'Name')}
@@ -87,7 +88,7 @@ export default class BrightnessRepeatEditor extends React.Component<BrightnessRe
                         />
                         {nls.localize('vuengine/brightnessRepeatEditor/mirror', 'Mirror')}
                     </label>
-                </div>
+                </VContainer>
                 <VContainer>
                     <label>Preview</label>
                     <Preview
@@ -95,8 +96,7 @@ export default class BrightnessRepeatEditor extends React.Component<BrightnessRe
                         values={data.values}
                     />
                 </VContainer>
-            </div>
-
+            </HContainer>
             <Editor
                 mirror={data.mirror}
                 values={data.values}

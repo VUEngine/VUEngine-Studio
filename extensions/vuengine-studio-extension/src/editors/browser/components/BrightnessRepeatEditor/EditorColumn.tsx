@@ -9,7 +9,8 @@ interface EditorColumnProps {
 export default function EditorColumn(props: EditorColumnProps): React.JSX.Element {
     const { index, brightness, setValue } = props;
 
-    const handleSelectInput = (event: React.MouseEvent) => // @ts-ignore
+    const handleSelectInput = (event: React.MouseEvent) =>
+        // @ts-ignore
         event.target.select();
 
     const onMouse = (e: React.MouseEvent<HTMLElement>) => {

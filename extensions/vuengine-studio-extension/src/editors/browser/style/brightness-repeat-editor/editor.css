@@ -23,7 +23,7 @@
   border: var(--theia-border-width) solid var(--theia-dropdown-border);
   box-sizing: border-box;
   cursor: pointer;
-  height: 150px;
+  height: 200px;
   position: relative;
   width: 100%;
 }

@@ -41,7 +41,7 @@ export default class ColumnTableEditor extends React.Component<ColumnTableEditor
     }
 
     protected setValue(index: number, value: ColumnTableEntry): void {
-        const updatedValues = this.props.data.values;
+        const updatedValues = [...this.props.data.values];
         updatedValues[index] = value;
         this.props.updateData({
             ...this.props.data,
@@ -56,38 +56,36 @@ export default class ColumnTableEditor extends React.Component<ColumnTableEditor
             tabIndex={0}
             className='columnTableEditor'
         >
-            <div className='options'>
-                <div>
-                    <VContainer>
-                        <label>
-                            {nls.localize('vuengine/columnTableEditor/name', 'Name')}
-                        </label>
-                        <input
-                            className="theia-input"
-                            value={data.name}
-                            onChange={this.onChangeName.bind(this)}
-                        />
-                    </VContainer>
-                    <VContainer>
-                        <label>
-                            {nls.localize('vuengine/columnTableEditor/description', 'Description')}
-                        </label>
-                        <input
-                            className="theia-input"
-                            value={data.description}
-                            onChange={this.onChangeDescription.bind(this)}
-                        />
-                    </VContainer>
+            <VContainer gap={20}>
+                <VContainer>
                     <label>
-                        <input
-                            type="checkbox"
-                            checked={data.mirror}
-                            onChange={this.onChangeMirror.bind(this)}
-                        />
-                        {nls.localize('vuengine/columnTableEditor/mirror', 'Mirror')}
+                        {nls.localize('vuengine/columnTableEditor/name', 'Name')}
                     </label>
-                </div>
-            </div>
+                    <input
+                        className="theia-input"
+                        value={data.name}
+                        onChange={this.onChangeName.bind(this)}
+                    />
+                </VContainer>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/columnTableEditor/description', 'Description')}
+                    </label>
+                    <input
+                        className="theia-input"
+                        value={data.description}
+                        onChange={this.onChangeDescription.bind(this)}
+                    />
+                </VContainer>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={data.mirror}
+                        onChange={this.onChangeMirror.bind(this)}
+                    />
+                    {nls.localize('vuengine/columnTableEditor/mirror', 'Mirror')}
+                </label>
+            </VContainer>
 
             <Editor
                 mirror={data.mirror}
