@@ -29,12 +29,14 @@ import { PreferenceTreeGenerator } from '@theia/preferences/lib/browser/util/pre
 import { PreferenceStringInputRenderer } from '@theia/preferences/lib/browser/views/components/preference-string-input';
 import { TestViewContribution } from '@theia/test/lib/browser/view/test-view-contribution';
 import { ToolbarDefaultsFactory } from '@theia/toolbar/lib/browser/toolbar-defaults';
+import { VSXExtensionsContribution } from '@theia/vsx-registry/lib/browser/vsx-extensions-contribution';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { QuickOpenWorkspace } from '@theia/workspace/lib/browser/quick-open-workspace';
 import '../../../src/core/browser/style/index.css';
 import { VesCommonService } from './ves-common-service';
 import { VesApplicationShell } from './ves-core-application-shell';
 import { VesColorContribution } from './ves-core-color-contribution';
+import { VesCoreCompactMainMenuContribution } from './ves-core-compact-main-menu-contribution';
 import { VesCoreContribution } from './ves-core-contribution';
 import { VesDebugFrontendApplicationContribution } from './ves-core-debug-contribution';
 import { VesDebugPrefixConfiguration } from './ves-core-debug-prefix-configuration';
@@ -52,9 +54,9 @@ import { VesQuickOpenWorkspace } from './ves-quick-open-workspace';
 import { VesThemeRegistry } from './ves-theme-registry';
 import { VesThemeService } from './ves-theme-service';
 import { VesToolbarDefaultsOverride } from './ves-toolbar-defaults-override';
+import { VesVSXExtensionsContribution } from './ves-vsx-extensions-contribution';
 import { VesWindowTitleService } from './ves-window-title-service';
 import { VesWorkspaceService } from './ves-workspace-service';
-import { VesCoreCompactMainMenuContribution } from './ves-core-compact-main-menu-contribution';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // rename default icon theme
@@ -175,4 +177,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // initially hide "open editors" tab of navigator
     bind(VesNavigatorWidgetFactory).toSelf();
     rebind(NavigatorWidgetFactory).to(VesNavigatorWidgetFactory);
+
+    // initially hide extensions widget
+    rebind(VSXExtensionsContribution).to(VesVSXExtensionsContribution).inSingletonScope();
 });
