@@ -30,6 +30,7 @@
     "@theia/preferences": "1.44.0",
     "@theia/preview": "1.44.0",
     "@theia/process": "1.44.0",
+    "@theia/scm": "1.44.0",
     "@theia/scm-extra": "1.44.0",
     "@theia/search-in-workspace": "1.44.0",
     "@theia/task": "1.44.0",

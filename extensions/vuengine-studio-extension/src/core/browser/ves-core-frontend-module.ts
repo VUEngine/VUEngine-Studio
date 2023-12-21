@@ -21,12 +21,15 @@ import { DebugFrontendApplicationContribution } from '@theia/debug/lib/browser/d
 import { DebugPrefixConfiguration } from '@theia/debug/lib/browser/debug-prefix-configuration';
 import { FileSystemFrontendContribution } from '@theia/filesystem/lib/browser/filesystem-frontend-contribution';
 import { MonacoThemeRegistry } from '@theia/monaco/lib/browser/textmate/monaco-theme-registry';
+import { FileNavigatorContribution } from '@theia/navigator/lib/browser/navigator-contribution';
 import { NavigatorWidgetFactory } from '@theia/navigator/lib/browser/navigator-widget-factory';
 import { OutlineViewContribution } from '@theia/outline-view/lib/browser/outline-view-contribution';
 import { PluginApiFrontendContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-contribution';
 import { PluginFrontendViewContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-view-contribution';
 import { PreferenceTreeGenerator } from '@theia/preferences/lib/browser/util/preference-tree-generator';
 import { PreferenceStringInputRenderer } from '@theia/preferences/lib/browser/views/components/preference-string-input';
+import { ScmContribution } from '@theia/scm/lib/browser/scm-contribution';
+import { SearchInWorkspaceFrontendContribution } from '@theia/search-in-workspace/lib/browser/search-in-workspace-frontend-contribution';
 import { TestViewContribution } from '@theia/test/lib/browser/view/test-view-contribution';
 import { ToolbarDefaultsFactory } from '@theia/toolbar/lib/browser/toolbar-defaults';
 import { VSXExtensionsContribution } from '@theia/vsx-registry/lib/browser/vsx-extensions-contribution';
@@ -45,12 +48,15 @@ import { VesCoreLabelProviderContribution } from './ves-core-label-provider';
 import { VesCorePreferenceSchema } from './ves-core-preferences';
 import { VesEncodingRegistry } from './ves-encoding-registry';
 import { VesFileSystemFrontendContribution } from './ves-filesystem-frontend-contribution';
+import { VesFileNavigatorContribution } from './ves-navigator-contribution';
 import { VesNavigatorWidgetFactory } from './ves-navigator-widget-factory';
 import { VesPreferenceConfigurations } from './ves-preference-configurations';
 import { VesPreferenceStringInputRenderer } from './ves-preference-string-input-renderer';
 import { VesPreferenceTreeGenerator } from './ves-preference-tree-generator';
 import './ves-preferences-monaco-contribution';
 import { VesQuickOpenWorkspace } from './ves-quick-open-workspace';
+import { VesScmContribution } from './ves-scm-contribution';
+import { VesSearchInWorkspaceFrontendContribution } from './ves-search-in-workspace-frontend-contribution';
 import { VesThemeRegistry } from './ves-theme-registry';
 import { VesThemeService } from './ves-theme-service';
 import { VesToolbarDefaultsOverride } from './ves-toolbar-defaults-override';
@@ -180,4 +186,11 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     // initially hide extensions widget
     rebind(VSXExtensionsContribution).to(VesVSXExtensionsContribution).inSingletonScope();
+
+    // initially open file explorer for workspaces, hide otherwise
+    rebind(FileNavigatorContribution).to(VesFileNavigatorContribution).inSingletonScope();
+
+    // initially hide search and git widgets if no workspace is opened
+    rebind(SearchInWorkspaceFrontendContribution).to(VesSearchInWorkspaceFrontendContribution).inSingletonScope();
+    rebind(ScmContribution).to(VesScmContribution).inSingletonScope();
 });
