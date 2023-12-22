@@ -13,12 +13,14 @@ VUEngine Studio is built upon Eclipse Theia, a framework for building cloud and 
 
 The following third party binaries that are shipped with VUEngine Studio come with their own licenses:
 
-- GCC by The GNU Project, with patches for V810 by ElmerPCFX
+- GCC by the GNU Project, with patches for V810 by ElmerPCFX
+- GNU Make by the GNU Project
 - Grit by Jasper Vijn, with patches for Virtual Boy by dasi
-- hf-cli by thunderstruck
-- MSYS by The MinGW Project
+- HyperBoyCli by thunderstruck
+- HyperFlasherCli by thunderstruck
+- MSYS by the MinGW Project
 - prog-vb by William D. Jones
-- RetroArch Web w/ Beetle VB core by the RetroArch and Mednafen teams
+- Retroarch Web with Beetle VB Core by the RetroArch and Mednafen teams
 
 ## Usage
 
