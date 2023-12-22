@@ -88,7 +88,7 @@ export const VES_NEW_PROJECT_TEMPLATES: VesNewProjectTemplate[] = [{
         makerCode: 'VU',
     }
 }, /* {
-    id: 'platformer-demo',
+    id: 'platformer',
     name: nls.localize('vuengine/projects/templates/platformerTitle', 'Platform Game'),
     repository: 'https://github.com/VUEngine/VUEngine-Platformer-Demo',
     description: nls.localize(
