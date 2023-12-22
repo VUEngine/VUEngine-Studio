@@ -861,6 +861,7 @@ export class VesProjectService {
       return window.electronVesCore.replaceInFiles(
         [
           `${basepath}/**/*.*`,
+          `${basepath}/**/*`,
           `${basepath}/*.*`,
           `${basepath}/*`,
         ],

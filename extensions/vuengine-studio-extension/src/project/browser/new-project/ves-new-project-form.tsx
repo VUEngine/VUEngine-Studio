@@ -58,12 +58,12 @@ export const VES_NEW_PROJECT_TEMPLATES: VesNewProjectTemplate[] = [{
         name: [
             'VUEngine Barebone'
         ],
-        gameCode: 'VXXM',
+        gameCode: 'VVBM',
         authors: [
             'Jorge Eremiev <jorgech3@gmail.com> and Christian Radke <c.radke@posteo.de>'
         ],
         description: 'Barebone project to be used as the foundation of new VUEngine projects.',
-        headerName: 'VUENGINE PROJECT',
+        headerName: 'VUENGINE BAREBONE',
         makerCode: 'VU',
     }
 }, {
@@ -72,7 +72,8 @@ export const VES_NEW_PROJECT_TEMPLATES: VesNewProjectTemplate[] = [{
     repository: 'https://github.com/VUEngine/VUEngine-Showcase',
     description: nls.localize(
         'vuengine/projects/templates/showcaseDescription',
-        'Showcase project to be used as the foundation for learning about VUEngine\'s concepts and capabilities.'
+        // eslint-disable-next-line max-len
+        'Showcase project to be used as the foundation for learning about VUEngine\'s concepts and capabilities step by step through cleanly written and properly commented code.'
     ),
     labels: {
         name: [
