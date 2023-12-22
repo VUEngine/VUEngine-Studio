@@ -100,7 +100,7 @@ export default function ConnectedFlashCarts(props: ConnectedFlashCartsProps): Re
                 )}
             </div>
         }
-        <div>
+        <div className='flashCarts'>
             {vesFlashCartService.connectedFlashCarts.map(
                 (connectedFlashCart: ConnectedFlashCart, index: number) => (
                     <div className='flashCart' key={`flashCart${index}`}>

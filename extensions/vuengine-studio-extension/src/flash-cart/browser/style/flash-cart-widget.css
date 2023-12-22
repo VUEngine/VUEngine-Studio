@@ -8,8 +8,10 @@
 
 #vesFlashCartWidget .connected-flash-carts {
   border-bottom: 1px solid var(--theia-activityBar-background);
+  display: flex;
+  flex-direction: column;
   flex-grow: 1;
-  overflow: auto;
+  overflow: hidden;
 }
 
 #vesFlashCartWidget {
@@ -19,15 +21,25 @@
 }
 
 #vesFlashCartWidget .flashingActions {
+  border-bottom: 1px solid var(--theia-activityBar-background);
   display: flex;
   flex-direction: column;
   gap: var(--theia-ui-padding);
   padding: calc(var(--theia-ui-padding) * 2);
 }
 
+#vesFlashCartWidget .flashCarts {
+  flex-grow: 1;
+  overflow: auto;
+}
+
 #vesFlashCartWidget .flashCart {
-  border-top: 1px solid var(--theia-activityBar-background);
+  border-bottom: 1px solid var(--theia-activityBar-background);
   padding: calc(var(--theia-ui-padding) * 2);
+}
+
+#vesFlashCartWidget .flashCart:last-child {
+  border-bottom-width: 0;
 }
 
 #vesFlashCartWidget .theia-button.abort,
@@ -71,13 +83,9 @@
   width: 150px;
 }
 
-#vesFlashCartWidget .infoPanel {
+#vesFlashCartWidget .connected-flash-carts > .infoPanel {
   border-top: 1px solid var(--theia-activityBar-background);
   padding: calc(var(--theia-ui-padding) * 2);
-}
-
-#vesFlashCartWidget .flashCartInfo>div:first-child>div.infoPanel>i {
-  top: calc(1px + (var(--theia-ui-padding) * 2));
 }
 
 #vesFlashCartWidget .infoPanel.success {
