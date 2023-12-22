@@ -1,0 +1,57 @@
+#vesFlashCartWidget .flashCartConfigsWrapper {
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+}
+  
+#vesFlashCartWidget .flashCartConfigsOverview {
+    border-bottom: 1px solid var(--theia-activityBar-background);
+    cursor: pointer;
+    padding: calc(var(--theia-ui-padding) * 2);
+    position: relative;
+}
+  
+#vesFlashCartWidget .flashCartConfigsOverview .fa {
+    position: absolute;
+    right: calc(var(--theia-ui-padding) * 2);
+    top: calc(50% - 5px);
+}
+  
+#vesFlashCartWidget .flashCartConfigs {
+    flex-grow: 1;
+}
+  
+#vesFlashCartWidget .flashCartConfigs .flashCartConfigsActions {
+    padding: calc(var(--theia-ui-padding) * 2);
+}
+
+#vesFlashCartWidget .flashCartConfig {
+    border-bottom: 1px solid var(--theia-activityBar-background);
+    display: flex;
+    flex-direction: column;
+    gap: var(--theia-ui-padding);
+    padding: calc(var(--theia-ui-padding) * 2);
+}
+  
+#vesFlashCartWidget .flashCartConfigs button {
+    height: calc(2 * var(--theia-border-width) + var(--theia-content-line-height) + 2px);
+    margin-left: 0;
+    min-width: 32px;
+    width: 32px;
+}
+  
+#vesFlashCartWidget .flashCartConfigs textarea {
+    line-height: 120%;
+    min-height: calc(2 * var(--theia-border-width) + var(--theia-content-line-height) + 2px);
+    padding: 3px 5px;
+    resize: vertical;
+}
+
+#vesFlashCartWidget .flashCartConfigs .deviceCodes button {
+    background-color: transparent;
+    border: 1px solid var(--theia-dropdown-border);
+}
+
+#vesFlashCartWidget .flashCartConfigs .deviceCodes button:hover {
+    background-color: var(--theia-dropdown-border);
+}

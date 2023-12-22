@@ -34,7 +34,7 @@ import {
   ROM_HEADER_MAKERS,
   RomHeader,
 } from './ves-emulator-types';
-import { VesEmulatorControls } from './widget/ves-emulator-controls-component';
+import { EmulatorControlsOverlay } from './components/EmulatorControlsOverlay';
 
 export const VesEmulatorWidgetOptions = Symbol('VesEmulatorWidgetOptions');
 export interface VesEmulatorWidgetOptions {
@@ -984,7 +984,7 @@ export class VesEmulatorWidget extends ReactWidget {
         </div>
         {this.state.showControls && (
           <div className="controlsOverlay">
-            <VesEmulatorControls
+            <EmulatorControlsOverlay
               commandService={this.commandService}
               keybindingRegistry={this.keybindingRegistry}
             />

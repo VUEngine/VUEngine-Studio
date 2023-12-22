@@ -16,7 +16,7 @@ export const HYPERBOY_IMAGE_PLACEHOLDER = '%HB_IMG%';
 
 export interface FlashCartConfig {
   name: string
-  deviceCodes: FlashCartDeviceCodes[],
+  deviceCodes: FlashCartDeviceCode[],
   size: number
   path: string
   args: string
@@ -24,7 +24,7 @@ export interface FlashCartConfig {
   image: string
 }
 
-export interface FlashCartDeviceCodes {
+export interface FlashCartDeviceCode {
   vid: number
   pid: number
   manufacturer: string
@@ -33,7 +33,7 @@ export interface FlashCartDeviceCodes {
 
 export interface ConnectedFlashCart {
   config: FlashCartConfig
-  deviceCodes: FlashCartDeviceCodes,
+  deviceCodes: FlashCartDeviceCode,
   port: string
   status: FlashCartStatus
   canHoldRom: boolean

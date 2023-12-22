@@ -5,15 +5,15 @@ import { KeymapsCommands } from '@theia/keymaps/lib/browser';
 import { VesEmulatorCommands } from '../ves-emulator-commands';
 import IMAGE_VB_CONTROLLER from '../../../../src/emulator/browser/images/vb-controller.png';
 
-export interface VesEmulatorControlsProps {
+export interface EmulatorControlsOverlayProps {
     commandService: CommandService
     keybindingRegistry: KeybindingRegistry
 }
 
-export interface VesEmulatorControlsState {
+export interface EmulatorControlsOverlayState {
 }
 
-export class VesEmulatorControls extends React.Component<VesEmulatorControlsProps, VesEmulatorControlsState> {
+export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOverlayProps, EmulatorControlsOverlayState> {
     protected commandService: CommandService;
     protected keybindingRegistry: KeybindingRegistry;
 
@@ -48,7 +48,7 @@ export class VesEmulatorControls extends React.Component<VesEmulatorControlsProp
     protected controllerButtonRTRef = React.createRef<HTMLDivElement>();
     protected controllerButtonPowerRef = React.createRef<HTMLDivElement>();
 
-    constructor(props: VesEmulatorControlsProps) {
+    constructor(props: EmulatorControlsOverlayProps) {
         super(props);
 
         this.commandService = props.commandService;

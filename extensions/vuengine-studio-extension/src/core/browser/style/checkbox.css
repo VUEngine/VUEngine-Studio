@@ -28,7 +28,6 @@
     cursor: pointer;
     display: inline-block;
     height: var(--theia-ui-font-size2);
-    outline: none !important;
     position: relative;
     vertical-align: bottom;
     width: calc(2 * var(--theia-ui-font-size2));
@@ -49,7 +48,7 @@
     border-radius: 50%;
     content: '';
     cursor: pointer;
-    height: 100%;
+    height: var(--theia-ui-font-size2);
     left: 0;
     padding: var(--theia-border-width);
     position: absolute;

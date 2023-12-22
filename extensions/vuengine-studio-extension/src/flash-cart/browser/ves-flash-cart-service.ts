@@ -447,7 +447,7 @@ export class VesFlashCartService {
 
   protected async matchFlashCart(device: USBDevice, flashCartConfigs: FlashCartConfig[]): Promise<ConnectedFlashCart | undefined> {
     for (const flashCartConfig of flashCartConfigs) {
-      for (const deviceCodes of flashCartConfig.deviceCodes) {
+      for (const deviceCodes of flashCartConfig.deviceCodes || []) {
         if (device.vendorId === deviceCodes.vid &&
           device.productId === deviceCodes.pid &&
           device.productName === deviceCodes.product &&
@@ -498,11 +498,15 @@ export class VesFlashCartService {
 
     return mergedFlashCartConfigs.map((flashCartConfig: FlashCartConfig) => ({
       ...flashCartConfig,
-      image: flashCartConfig.image
-        .replace(FLASHBOY_PLUS_IMAGE_PLACEHOLDER, IMAGE_FLASHBOY_PLUS)
-        .replace(HYPERFLASH32_IMAGE_PLACEHOLDER, IMAGE_HYPERFLASH32)
-        .replace(HYPERBOY_IMAGE_PLACEHOLDER, IMAGE_HYPERBOY),
+      image: this.replaceImagePlaceholders(flashCartConfig.image || ''),
     }));
+  }
+
+  replaceImagePlaceholders(image: string): string {
+    return image
+      .replace(FLASHBOY_PLUS_IMAGE_PLACEHOLDER, IMAGE_FLASHBOY_PLUS)
+      .replace(HYPERFLASH32_IMAGE_PLACEHOLDER, IMAGE_HYPERFLASH32)
+      .replace(HYPERBOY_IMAGE_PLACEHOLDER, IMAGE_HYPERBOY);
   }
 
   async getProgVbUri(): Promise<URI> {

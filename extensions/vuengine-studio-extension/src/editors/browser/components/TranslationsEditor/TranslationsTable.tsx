@@ -52,7 +52,6 @@ export default function TranslationsTable(props: TranslationsTableProps): React.
                                 <ReactTextareaAutosize
                                     className="theia-input"
                                     value={translations[s][lang.code]}
-                                    readOnly={!editTranslations}
                                     disabled={!editTranslations}
                                     maxRows={5}
                                     onChange={e => onChangeTranslation(s, lang.code, e.target.value)}

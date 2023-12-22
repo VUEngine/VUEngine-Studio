@@ -107,7 +107,7 @@ export default function LanguagesTable(props: LanguagesTableProps): React.JSX.El
                     <input
                         className="theia-input"
                         value={lang.code}
-                        readOnly={true}
+                        disabled={true}
                     />
                 </div>
                 <div className='languageName'>

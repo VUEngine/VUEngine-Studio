@@ -11,6 +11,7 @@
   border-bottom: 1px solid var(--theia-activityBar-background);
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
   gap: var(--theia-ui-padding);
   padding: calc(var(--theia-ui-padding) * 2);
 }
@@ -18,7 +19,6 @@
 #vesEmulatorSidebarWidget .emulatorConfigsWrapper {
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
   overflow: hidden;
 }
 

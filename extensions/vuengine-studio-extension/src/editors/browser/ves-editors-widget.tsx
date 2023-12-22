@@ -3,7 +3,7 @@ import { JsonForms } from '@jsonforms/react';
 import { JsonFormsStyleContext, StyleContext, vanillaCells, vanillaRenderers, vanillaStyles } from '@jsonforms/vanilla-renderers';
 import { Message } from '@phosphor/messaging';
 import { CommandService, Emitter, Event, MessageService, Reference, UNTITLED_SCHEME, URI, nls } from '@theia/core';
-import { CommonCommands, ConfirmDialog, LabelProvider, LocalStorageService, Saveable, SaveableSource } from '@theia/core/lib/browser';
+import { CommonCommands, ConfirmDialog, LabelProvider, LocalStorageService, PreferenceService, Saveable, SaveableSource } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
@@ -14,12 +14,12 @@ import { MonacoEditorModel } from '@theia/monaco/lib/browser/monaco-editor-model
 import { MonacoTextModelService } from '@theia/monaco/lib/browser/monaco-text-model-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { deepmerge } from 'deepmerge-ts';
+import DockLayout, { LayoutBase } from 'rc-dock';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { ProjectFile, ProjectFileType } from '../../project/browser/ves-project-types';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
 import { VES_RENDERERS } from './renderers/ves-renderers';
-import DockLayout, { LayoutBase } from 'rc-dock';
 
 export const VesEditorsWidgetOptions = Symbol('VesEditorsWidgetOptions');
 export interface VesEditorsWidgetOptions {
@@ -44,6 +44,7 @@ export interface EditorsServices {
     fileService: FileService
     fileDialogService: FileDialogService
     messageService: MessageService
+    preferenceService: PreferenceService
     vesCommonService: VesCommonService
     vesRumblePackService: VesRumblePackService
     workspaceService: WorkspaceService
@@ -67,6 +68,8 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     protected readonly localStorageService: LocalStorageService;
     @inject(MonacoTextModelService)
     protected readonly modelService: MonacoTextModelService;
+    @inject(PreferenceService)
+    protected readonly preferenceService: PreferenceService;
     @inject(VesCommonService)
     protected readonly vesCommonService: VesCommonService;
     @inject(VesEditorsWidgetOptions)
@@ -446,6 +449,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
                                         fileService: this.fileService,
                                         fileDialogService: this.fileDialogService,
                                         messageService: this.messageService,
+                                        preferenceService: this.preferenceService,
                                         vesCommonService: this.vesCommonService,
                                         vesRumblePackService: this.vesRumblePackService,
                                         workspaceService: this.workspaceService,
