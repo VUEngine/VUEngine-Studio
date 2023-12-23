@@ -26,6 +26,7 @@
         "applicationName": "VUEngine Studio",
         "defaultTheme": "Dark",
         "defaultIconTheme": "vuengine-studio-file-icons",
+        "reloadOnReconnect": true,
         "preferences": {
           "files.autoSave": "onFocusChange",
           "workbench.tree.renderIndentGuides": "none",
@@ -53,6 +54,7 @@
     },
     "backend": {
       "config": {
+        "frontendConnectionTimeout": -1,
         "resolveSystemPlugins": false,
         "startupTimeout": -1
       }
