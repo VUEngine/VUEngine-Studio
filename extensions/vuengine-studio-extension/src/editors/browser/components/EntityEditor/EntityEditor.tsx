@@ -19,8 +19,8 @@ import Scripts from './Scripts/Scripts';
 import Sprites from './Sprites/Sprites';
 
 interface EntityEditorProps {
-  entityData: EntityData;
-  updateEntityData: (entityData: EntityData) => void;
+  data: EntityData;
+  updateData: (entityData: EntityData) => void;
   dock: EditorsDockInterface
   services: EditorsServices
 }
@@ -51,8 +51,8 @@ export default class EntityEditor extends React.Component<
     this.dockLayoutRef = r;
   };
 
-  setEntityData(entityData: Partial<EntityData>): void {
-    this.props.updateEntityData({ ...this.props.entityData, ...entityData });
+  setData(entityData: Partial<EntityData>): void {
+    this.props.updateData({ ...this.props.data, ...entityData });
   }
 
   async componentDidMount(): Promise<void> {
@@ -136,7 +136,9 @@ export default class EntityEditor extends React.Component<
                     minWidth: 200,
                     content: (
                       <EntityEditorContext.Consumer>
-                        {context => <Collisions />}
+                        {context => <Collisions
+                          services={this.props.services}
+                        />}
                       </EntityEditorContext.Consumer>
                     ),
                   },
@@ -232,9 +234,9 @@ export default class EntityEditor extends React.Component<
         <EntityEditorContext.Provider
           value={{
             state: this.state,
-            entityData: this.props.entityData,
             setState: this.setState.bind(this),
-            setEntityData: this.setEntityData.bind(this),
+            data: this.props.data,
+            setData: this.setData.bind(this),
           }}
         >
           <DockLayout

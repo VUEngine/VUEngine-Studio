@@ -8,6 +8,6 @@ export default function Behaviors(props: BehaviorsProps): React.JSX.Element {
     // const { pattern, currentNote } = props;
 
     return <VContainer gap={10}>
-        Behaviors
+        [To be implemented]
     </VContainer>;
 }

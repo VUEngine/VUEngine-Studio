@@ -1,96 +1,99 @@
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
+import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React, { useContext } from 'react';
+import ColorSelector from '../../Common/ColorSelector';
 import HContainer from '../../Common/HContainer';
 import VContainer from '../../Common/VContainer';
-import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
+import { EntityEditorContext, EntityEditorContextType, Mesh, Wireframe } from '../EntityEditorTypes';
 import Segment from './Segment';
 
 interface MeshProps {
     index: number,
+    mesh: Mesh
 }
 
 export default function Mesh(props: MeshProps): React.JSX.Element {
-    const { entityData, setEntityData } = useContext(EntityEditorContext) as EntityEditorContextType;
-    const { index } = props;
-    const mesh = entityData.meshes.meshes[index];
+    const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { index, mesh } = props;
 
-    const setAllocator = (allocator: string): void => {
-        const updatedMeshes = { ...entityData.meshes };
-        updatedMeshes.meshes[index] = {
-            ...updatedMeshes.meshes[index],
-            wireframe: {
-                ...updatedMeshes.meshes[index].wireframe,
-                allocator
-            },
+    const setMesh = (partialMeshData: Partial<Mesh>): void => {
+        const updatedMeshesArray = [...data.meshes.meshes];
+        updatedMeshesArray[index] = {
+            ...updatedMeshesArray[index],
+            ...partialMeshData,
         };
 
-        setEntityData({ meshes: updatedMeshes });
+        const updatedMeshes = { ...data.meshes };
+        updatedMeshes.meshes = updatedMeshesArray;
+
+        setData({ meshes: updatedMeshes });
+    };
+
+    const setWireframe = (partialWireframe: Partial<Wireframe>): void => {
+        const updatedWireframe = { ...data.meshes.meshes[index].wireframe };
+
+        setMesh({
+            wireframe: {
+                ...updatedWireframe,
+                ...partialWireframe,
+            }
+        });
+    };
+
+    const setAllocator = (allocator: string): void => {
+        setWireframe({
+            allocator,
+        });
     };
 
     const setDisplacementX = (x: number): void => {
-        const updatedMeshes = { ...entityData.meshes };
-        updatedMeshes.meshes[index] = {
-            ...updatedMeshes.meshes[index],
-            wireframe: {
-                ...updatedMeshes.meshes[index].wireframe,
-                displacement: {
-                    ...updatedMeshes.meshes[index].wireframe.displacement,
-                    x,
-                },
+        setWireframe({
+            displacement: {
+                ...data.meshes.meshes[index].wireframe.displacement,
+                x,
             },
-        };
-
-        setEntityData({ meshes: updatedMeshes });
+        });
     };
 
     const setDisplacementY = (y: number): void => {
-        const updatedMeshes = { ...entityData.meshes };
-        updatedMeshes.meshes[index] = {
-            ...updatedMeshes.meshes[index],
-            wireframe: {
-                ...updatedMeshes.meshes[index].wireframe,
-                displacement: {
-                    ...updatedMeshes.meshes[index].wireframe.displacement,
-                    y,
-                },
+        setWireframe({
+            displacement: {
+                ...data.meshes.meshes[index].wireframe.displacement,
+                y,
             },
-        };
-
-        setEntityData({ meshes: updatedMeshes });
+        });
     };
 
     const setDisplacementZ = (z: number): void => {
-        const updatedMeshes = { ...entityData.meshes };
-        updatedMeshes.meshes[index] = {
-            ...updatedMeshes.meshes[index],
-            wireframe: {
-                ...updatedMeshes.meshes[index].wireframe,
-                displacement: {
-                    ...updatedMeshes.meshes[index].wireframe.displacement,
-                    z,
-                },
+        setWireframe({
+            displacement: {
+                ...data.meshes.meshes[index].wireframe.displacement,
+                z,
             },
-        };
+        });
+    };
 
-        setEntityData({ meshes: updatedMeshes });
+    const setColor = (color: number): void => {
+        setWireframe({
+            color
+        });
+    };
+
+    const setTransparent = (transparent: number): void => {
+        setWireframe({
+            transparent
+        });
     };
 
     const toggleInterlaced = (): void => {
-        const updatedMeshes = { ...entityData.meshes };
-        updatedMeshes.meshes[index] = {
-            ...updatedMeshes.meshes[index],
-            wireframe: {
-                ...updatedMeshes.meshes[index].wireframe,
-                interlaced: !updatedMeshes.meshes[index].wireframe.interlaced
-            },
-        };
-
-        setEntityData({ meshes: updatedMeshes });
+        setWireframe({
+            interlaced: !data.meshes.meshes[index].wireframe.interlaced,
+        });
     };
 
     const addSegment = (): void => {
-        const updatedMeshes = { ...entityData.meshes };
+        const updatedMeshes = { ...data.meshes };
         updatedMeshes.meshes[index].segments = [
             ...updatedMeshes.meshes[index].segments,
             {
@@ -109,7 +112,7 @@ export default function Mesh(props: MeshProps): React.JSX.Element {
             }
         ];
 
-        setEntityData({ meshes: updatedMeshes });
+        setData({ meshes: updatedMeshes });
     };
 
     const removeMesh = async (): Promise<void> => {
@@ -119,29 +122,38 @@ export default function Mesh(props: MeshProps): React.JSX.Element {
         });
         const confirmed = await dialog.open();
         if (confirmed) {
-            const updatedMeshes = { ...entityData.meshes };
+            const updatedMeshes = { ...data.meshes };
             updatedMeshes.meshes = [
-                ...entityData.meshes.meshes.slice(0, index),
-                ...entityData.meshes.meshes.slice(index + 1)
+                ...data.meshes.meshes.slice(0, index),
+                ...data.meshes.meshes.slice(index + 1)
             ];
 
-            setEntityData({ meshes: updatedMeshes });
+            setData({ meshes: updatedMeshes });
         }
     };
 
     return <div className='item'>
         <VContainer gap={10}>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/entityEditor/allocator', 'Class allocator')}
-                </label>
-                <input
-                    className='theia-input'
-                    type='string'
-                    value={mesh.wireframe.allocator}
-                    onChange={e => setAllocator(e.target.value)}
-                />
-            </VContainer>
+            <HContainer alignItems='end' gap={20}>
+                <VContainer grow={1}>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/allocator', 'Class allocator')}
+                    </label>
+                    <input
+                        className='theia-input'
+                        type='string'
+                        value={mesh.wireframe.allocator}
+                        onChange={e => setAllocator(e.target.value)}
+                    />
+                </VContainer>
+                <button
+                    className="theia-button secondary remove-button"
+                    onClick={removeMesh}
+                    title={nls.localize('vuengine/entityEditor/remove', 'Remove')}
+                >
+                    <i className='fa fa-trash' />
+                </button>
+            </HContainer>
             <VContainer>
                 <label>Displacement (X, Y, Z)</label>
                 <HContainer gap={10}>
@@ -166,15 +178,38 @@ export default function Mesh(props: MeshProps): React.JSX.Element {
                 </HContainer>
             </VContainer>
             <VContainer>
-                <label>
-                    {nls.localize('vuengine/entityEditor/interlaced', 'Interlaced')}
-                </label>
-                <input
-                    type="checkbox"
-                    checked={mesh.wireframe.interlaced}
-                    onChange={toggleInterlaced}
+                {nls.localize('vuengine/entityEditor/color', 'Color')}
+                <ColorSelector
+                    color={mesh.wireframe.color}
+                    updateColor={setColor}
                 />
             </VContainer>
+            <HContainer alignItems='start' gap={20}>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/transparency', 'Transparency')}
+                    </label>
+                    <SelectComponent
+                        options={[
+                            { value: '0', label: nls.localize('vuengine/entityEditor/transparencyNone', 'None') },
+                            { value: '1', label: nls.localize('vuengine/entityEditor/transparencyOdd', 'Odd') },
+                            { value: '2', label: nls.localize('vuengine/entityEditor/transparencyEven', 'Even') },
+                        ]}
+                        defaultValue={mesh.wireframe.transparent}
+                        onChange={option => setTransparent(parseInt(option.value || '0'))}
+                    />
+                </VContainer>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/interlaced', 'Interlaced')}
+                    </label>
+                    <input
+                        type="checkbox"
+                        checked={mesh.wireframe.interlaced}
+                        onChange={toggleInterlaced}
+                    />
+                </VContainer>
+            </HContainer>
             <VContainer>
                 <label>
                     {nls.localize('vuengine/entityEditor/segments', 'Segments')}
@@ -186,20 +221,14 @@ export default function Mesh(props: MeshProps): React.JSX.Element {
                         segmentIndex={segmentIndex}
                     />
                 )}
-                <div
-                    className='add-button'
+                <button
+                    className='theia-button secondary full-width'
                     onClick={addSegment}
                     title={nls.localize('vuengine/entityEditor/addSegment', 'Add Segment')}
                 >
                     <i className='fa fa-plus' />
-                </div>
+                </button>
             </VContainer>
-            <button
-                className="theia-button secondary remove-button"
-                onClick={removeMesh}
-            >
-                {nls.localize('vuengine/entityEditor/remove', 'Remove')}
-            </button>
         </VContainer>
     </div>;
 }

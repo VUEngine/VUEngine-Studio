@@ -8,6 +8,6 @@ export default function Scripts(props: ScriptsProps): React.JSX.Element {
     // const { pattern, currentNote } = props;
 
     return <VContainer gap={10}>
-        Scripts
+        [To be implemented]
     </VContainer>;
 }

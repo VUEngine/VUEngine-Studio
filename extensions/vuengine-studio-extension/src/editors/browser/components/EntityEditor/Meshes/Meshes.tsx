@@ -5,10 +5,10 @@ import { nls } from '@theia/core';
 import Mesh from './Mesh';
 
 export default function Meshes(): React.JSX.Element {
-    const { entityData, setEntityData } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
 
     const addMesh = (): void => {
-        const updatedMeshes = { ...entityData.meshes };
+        const updatedMeshes = { ...data.meshes };
         updatedMeshes.meshes = [
             ...updatedMeshes.meshes,
             {
@@ -19,7 +19,7 @@ export default function Meshes(): React.JSX.Element {
                         y: 0,
                         z: 0,
                     },
-                    color: 0,
+                    color: 3,
                     transparent: 0,
                     interlaced: false,
                 },
@@ -27,25 +27,26 @@ export default function Meshes(): React.JSX.Element {
             },
         ];
 
-        setEntityData({ meshes: updatedMeshes });
+        setData({ meshes: updatedMeshes });
     };
 
     return <VContainer gap={10}>
-        {entityData.meshes.meshes.length
-            ? entityData.meshes.meshes.map((mesh, index) =>
+        {data.meshes.meshes.length
+            ? data.meshes.meshes.map((m, i) =>
                 <Mesh
-                    key={`mesh-${index}`}
-                    index={index}
+                    key={`mesh-${i}`}
+                    index={i}
+                    mesh={m}
                 />
             )
             : <>{nls.localize('vuengine/entityEditor/noMeshes', 'No Meshes')}</>
         }
-        <div
-            className='add-button'
+        <button
+            className='theia-button secondary full-width'
             onClick={addMesh}
             title={nls.localize('vuengine/entityEditor/addMesh', 'Add Mesh')}
         >
             <i className='fa fa-plus' />
-        </div>
+        </button>
     </VContainer>;
 }

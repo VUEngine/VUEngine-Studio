@@ -9,5 +9,6 @@
 } */
 
 .theia-button.full-width {
+    margin-left: unset;
     width: 100% !important;
 }

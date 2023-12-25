@@ -3,7 +3,7 @@ import { JsonForms } from '@jsonforms/react';
 import { JsonFormsStyleContext, StyleContext, vanillaCells, vanillaRenderers, vanillaStyles } from '@jsonforms/vanilla-renderers';
 import { Message } from '@phosphor/messaging';
 import { CommandService, Emitter, Event, MessageService, Reference, UNTITLED_SCHEME, URI, nls } from '@theia/core';
-import { CommonCommands, ConfirmDialog, LabelProvider, LocalStorageService, PreferenceService, Saveable, SaveableSource } from '@theia/core/lib/browser';
+import { CommonCommands, ConfirmDialog, LabelProvider, LocalStorageService, OpenerService, PreferenceService, Saveable, SaveableSource } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
@@ -44,8 +44,10 @@ export interface EditorsServices {
     fileService: FileService
     fileDialogService: FileDialogService
     messageService: MessageService
+    openerService: OpenerService
     preferenceService: PreferenceService
     vesCommonService: VesCommonService
+    vesProjectService: VesProjectService,
     vesRumblePackService: VesRumblePackService
     workspaceService: WorkspaceService
 };
@@ -68,6 +70,8 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     protected readonly localStorageService: LocalStorageService;
     @inject(MonacoTextModelService)
     protected readonly modelService: MonacoTextModelService;
+    @inject(OpenerService)
+    protected readonly openerService: OpenerService;
     @inject(PreferenceService)
     protected readonly preferenceService: PreferenceService;
     @inject(VesCommonService)
@@ -168,6 +172,8 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         this.typeId = this.options.typeId;
 
         this.doInit();
+        this.bindEvents();
+
         const label = this.labelProvider.getLongName(this.uri);
 
         const path = (this.uri.scheme === UNTITLED_SCHEME)
@@ -184,14 +190,9 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
 
         this.autoSave = this.editorPreferences['files.autoSave'];
         this.autoSaveDelay = this.editorPreferences['files.autoSaveDelay'];
-        this.editorPreferences.onPreferenceChanged(ev => {
-            if (ev.preferenceName === 'files.autoSave') {
-                this.autoSave = ev.newValue;
-            }
-            if (ev.preferenceName === 'files.autoSaveDelay') {
-                this.autoSaveDelay = ev.newValue;
-            }
-        });
+    }
+
+    protected bindEvents(): void {
         this.onDirtyChanged(ev => {
             if (this.autoSave === 'afterDelay' && this.dirty) {
                 this.saveDelayed();
@@ -205,10 +206,31 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         this.toDispose.push(this.changeEmitter);
         this.jsonformsOnChange = (state: Pick<JsonFormsCore, 'data' | 'errors'>) =>
             this.changeEmitter.fire(state.data);
+
+        this.toDispose.pushAll([
+            this.vesProjectService.onDidAddProjectItem(() => this.rerenderOnProjectFileUpdate()),
+            this.vesProjectService.onDidDeleteProjectItem(() => this.rerenderOnProjectFileUpdate()),
+            this.vesProjectService.onDidUpdateProjectItem(() => this.rerenderOnProjectFileUpdate()),
+            this.editorPreferences.onPreferenceChanged(ev => {
+                if (ev.preferenceName === 'files.autoSave') {
+                    this.autoSave = ev.newValue;
+                }
+                if (ev.preferenceName === 'files.autoSaveDelay') {
+                    this.autoSaveDelay = ev.newValue;
+                }
+            }),
+        ]);
     }
 
+    protected rerenderOnProjectFileUpdate(): void {
+        console.log('rerenderOnProjectFileUpdate', this.justSaved, this.typeId);
+        if (!this.justSaved) {
+            this.update();
+        }
+    };
+
     protected async doInit(): Promise<void> {
-        await this.vesProjectService.projectDataReady;
+        await this.vesProjectService.projectItemsReady;
 
         const type = this.vesProjectService.getProjectDataType(this.options.typeId);
         if (!type) {
@@ -227,7 +249,10 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
                 await this.loadData(type);
                 this.update();
             } else {
-                this.justSaved = false;
+                // delay to only set back after project file update events have been processed
+                setTimeout(() => {
+                    this.justSaved = false;
+                }, 50);
             }
         });
 
@@ -449,8 +474,10 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
                                         fileService: this.fileService,
                                         fileDialogService: this.fileDialogService,
                                         messageService: this.messageService,
+                                        openerService: this.openerService,
                                         preferenceService: this.preferenceService,
                                         vesCommonService: this.vesCommonService,
+                                        vesProjectService: this.vesProjectService,
                                         vesRumblePackService: this.vesRumblePackService,
                                         workspaceService: this.workspaceService,
                                     },

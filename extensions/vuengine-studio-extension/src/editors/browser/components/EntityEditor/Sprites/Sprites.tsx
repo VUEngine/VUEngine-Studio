@@ -8,6 +8,6 @@ export default function Sprites(props: SpritesProps): React.JSX.Element {
     // const { pattern, currentNote } = props;
 
     return <VContainer gap={10}>
-        Sprites
+        [To be implemented]
     </VContainer>;
 }

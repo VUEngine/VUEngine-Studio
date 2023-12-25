@@ -17,7 +17,7 @@ interface PreviewProps {
 
 export default function Preview(props: PreviewProps): React.JSX.Element {
   const { fileService, workspaceService } = props;
-  const { state, setState } = useContext(
+  const { state, setState, data } = useContext(
     EntityEditorContext
   ) as EntityEditorContextType;
 
@@ -34,7 +34,7 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
     <VContainer gap={10}>
       <div className="preview-container">
         <Sprite
-          animate={state.preview.animations}
+          animate={state.preview.animations && data.animations.animations.length > 0}
           displacement={{
             x: 0,
             y: 0,
@@ -77,7 +77,8 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
         <label>
           <input
             type="checkbox"
-            checked={state.preview.sprites}
+            checked={state.preview.sprites && data.sprites.sprites.length > 0}
+            disabled={!data.sprites.sprites.length}
             onChange={e => setBooleanStateProperty('sprites', e.target.checked)}
           />
           Show Sprites
@@ -85,7 +86,8 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
         <label>
           <input
             type="checkbox"
-            checked={state.preview.meshes}
+            checked={state.preview.meshes && data.meshes.meshes.length > 0}
+            disabled={!data.meshes.meshes.length}
             onChange={e => setBooleanStateProperty('meshes', e.target.checked)}
           />
           Show Meshes
@@ -93,7 +95,8 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
         <label>
           <input
             type="checkbox"
-            checked={state.preview.collisions}
+            checked={state.preview.collisions && data.collisions.inGameType !== 'None'}
+            disabled={data.collisions.inGameType === 'None'}
             onChange={e =>
               setBooleanStateProperty('collisions', e.target.checked)
             }
@@ -103,7 +106,8 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
         <label>
           <input
             type="checkbox"
-            checked={state.preview.animations}
+            checked={state.preview.animations && data.animations.animations.length > 0}
+            disabled={!data.animations.animations.length}
             onChange={e =>
               setBooleanStateProperty('animations', e.target.checked)
             }
@@ -123,16 +127,16 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
       </VContainer>
       <VContainer>
         <label>BGMap Palettes</label>
-        {[...Array(4)].map((h, index) => (
-          <HContainer>
+        {[...Array(4)].map((h, i) => (
+          <HContainer key={`preview-palette-${i}`}>
             <div style={{ width: 16 }}>
-              {index}
+              {i}
             </div>
             <Palette
-              value={state.preview.palettes[index]}
+              value={state.preview.palettes[i]}
               updateValue={newValue => {
                 const updatedPalettes = state.preview.palettes;
-                updatedPalettes[index] = newValue;
+                updatedPalettes[i] = newValue;
                 setState({
                   ...state,
                   preview: {

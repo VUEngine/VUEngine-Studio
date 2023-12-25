@@ -4,36 +4,36 @@ import VContainer from '../../Common/VContainer';
 import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 
 export default function General(): React.JSX.Element {
-    const { entityData, setEntityData } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
 
     const setName = (n: string): void => {
-        setEntityData({ name: n });
+        setData({ name: n });
     };
 
     const setExtraInfo = (e: string): void => {
-        setEntityData({ extraInfo: e });
+        setData({ extraInfo: e });
     };
 
     const setPixelSizeX = (x: number): void => {
-        setEntityData({
+        setData({
             pixelSize: {
-                ...entityData.pixelSize, x
+                ...data.pixelSize, x
             }
         });
     };
 
     const setPixelSizeY = (y: number): void => {
-        setEntityData({
+        setData({
             pixelSize: {
-                ...entityData.pixelSize, y
+                ...data.pixelSize, y
             }
         });
     };
 
     const setPixelSizeZ = (z: number): void => {
-        setEntityData({
+        setData({
             pixelSize: {
-                ...entityData.pixelSize, z
+                ...data.pixelSize, z
             }
         });
     };
@@ -43,7 +43,7 @@ export default function General(): React.JSX.Element {
             <label>Name</label>
             <input
                 className='theia-input large'
-                value={entityData.name}
+                value={data.name}
                 onChange={e => setName(e.target.value)}
             />
         </VContainer>
@@ -51,7 +51,7 @@ export default function General(): React.JSX.Element {
             <label>Extra Info</label>
             <input
                 className='theia-input'
-                value={entityData.extraInfo}
+                value={data.extraInfo}
                 onChange={e => setExtraInfo(e.target.value)}
             />
         </VContainer>
@@ -64,21 +64,21 @@ export default function General(): React.JSX.Element {
                 <input
                     className='theia-input'
                     type='number'
-                    value={entityData.pixelSize.x}
+                    value={data.pixelSize.x}
                     onChange={e => setPixelSizeX(parseInt(e.target.value))}
                     min={0}
                 />
                 <input
                     className='theia-input'
                     type='number'
-                    value={entityData.pixelSize.y}
+                    value={data.pixelSize.y}
                     onChange={e => setPixelSizeY(parseInt(e.target.value))}
                     min={0}
                 />
                 <input
                     className='theia-input'
                     type='number'
-                    value={entityData.pixelSize.z}
+                    value={data.pixelSize.z}
                     onChange={e => setPixelSizeZ(parseInt(e.target.value))}
                     min={0}
                 />

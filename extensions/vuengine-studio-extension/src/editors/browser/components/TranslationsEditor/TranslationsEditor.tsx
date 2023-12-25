@@ -25,7 +25,7 @@ export default class TranslationsEditor extends React.Component<TranslationsEdit
         const updatedLanguages = [...this.props.data.languages];
         updatedLanguages[index] = {
             ...updatedLanguages[index],
-            flag: flag,
+            flag,
         };
 
         this.props.updateData({

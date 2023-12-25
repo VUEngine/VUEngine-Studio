@@ -4,5 +4,5 @@
 }
 
 .theia-select-component {
-    min-height: 26px;
+    min-height: calc(2 * var(--theia-border-width) + var(--theia-content-line-height) + 2px);
 }

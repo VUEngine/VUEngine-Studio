@@ -21,3 +21,8 @@
   font-size: 16px;
   vertical-align: middle;
 }
+
+.jsonforms-container button {
+  margin-left: 0;
+  min-height: calc(2 * var(--theia-border-width) + var(--theia-content-line-height) + 2px);
+}

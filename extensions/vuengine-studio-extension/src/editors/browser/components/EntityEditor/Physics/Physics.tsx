@@ -5,77 +5,77 @@ import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTyp
 import { nls } from '@theia/core';
 
 export default function Physics(): React.JSX.Element {
-    const { entityData, setEntityData } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
 
     const toggleEnabled = (): void => {
-        setEntityData({
+        setData({
             physics: {
-                ...entityData.physics,
-                enabled: !entityData.physics.enabled
+                ...data.physics,
+                enabled: !data.physics.enabled
             }
         });
     };
 
     const setMass = (mass: number): void => {
-        setEntityData({
+        setData({
             physics: {
-                ...entityData.physics, mass
+                ...data.physics, mass
             }
         });
     };
 
     const setFriction = (friction: number): void => {
-        setEntityData({
+        setData({
             physics: {
-                ...entityData.physics, friction
+                ...data.physics, friction
             }
         });
     };
 
     const setBounciness = (bounciness: number): void => {
-        setEntityData({
+        setData({
             physics: {
-                ...entityData.physics, bounciness
+                ...data.physics, bounciness
             }
         });
     };
 
     const setMaximumSpeed = (maximumSpeed: number): void => {
-        setEntityData({
+        setData({
             physics: {
-                ...entityData.physics, maximumSpeed
+                ...data.physics, maximumSpeed
             }
         });
     };
 
     const setMaximumVelocityX = (x: number): void => {
-        setEntityData({
+        setData({
             physics: {
-                ...entityData.physics,
+                ...data.physics,
                 maximumVelocity: {
-                    ...entityData.physics.maximumVelocity, x
+                    ...data.physics.maximumVelocity, x
                 }
             }
         });
     };
 
     const setMaximumVelocityY = (y: number): void => {
-        setEntityData({
+        setData({
             physics: {
-                ...entityData.physics,
+                ...data.physics,
                 maximumVelocity: {
-                    ...entityData.physics.maximumVelocity, y
+                    ...data.physics.maximumVelocity, y
                 }
             }
         });
     };
 
     const setMaximumVelocityZ = (z: number): void => {
-        setEntityData({
+        setData({
             physics: {
-                ...entityData.physics,
+                ...data.physics,
                 maximumVelocity: {
-                    ...entityData.physics.maximumVelocity, z
+                    ...data.physics.maximumVelocity, z
                 }
             }
         });
@@ -88,11 +88,11 @@ export default function Physics(): React.JSX.Element {
             </label>
             <input
                 type="checkbox"
-                checked={entityData.physics.enabled}
+                checked={data.physics.enabled}
                 onChange={e => toggleEnabled()}
             />
         </VContainer>
-        {entityData.physics.enabled && <>
+        {data.physics.enabled && <>
             <VContainer>
                 <label>
                     {nls.localize('vuengine/entityEditor/mass', 'Mass')}
@@ -100,7 +100,8 @@ export default function Physics(): React.JSX.Element {
                 <input
                     className='theia-input'
                     type='number'
-                    value={entityData.physics.mass}
+                    step="0.1"
+                    value={data.physics.mass}
                     onChange={e => setMass(parseFloat(e.target.value))}
                 />
             </VContainer>
@@ -111,7 +112,8 @@ export default function Physics(): React.JSX.Element {
                 <input
                     className='theia-input'
                     type='number'
-                    value={entityData.physics.friction}
+                    step="0.1"
+                    value={data.physics.friction}
                     onChange={e => setFriction(parseFloat(e.target.value))}
                 />
             </VContainer>
@@ -122,7 +124,8 @@ export default function Physics(): React.JSX.Element {
                 <input
                     className='theia-input'
                     type='number'
-                    value={entityData.physics.bounciness}
+                    step="0.1"
+                    value={data.physics.bounciness}
                     onChange={e => setBounciness(parseFloat(e.target.value))}
                 />
             </VContainer>
@@ -133,8 +136,8 @@ export default function Physics(): React.JSX.Element {
                 <input
                     className='theia-input'
                     type='number'
-                    value={entityData.physics.maximumSpeed}
-                    onChange={e => setMaximumSpeed(parseFloat(e.target.value))}
+                    value={data.physics.maximumSpeed}
+                    onChange={e => setMaximumSpeed(parseInt(e.target.value))}
                 />
             </VContainer>
             <VContainer>
@@ -145,21 +148,21 @@ export default function Physics(): React.JSX.Element {
                     <input
                         className='theia-input'
                         type='number'
-                        value={entityData.pixelSize.x}
+                        value={data.physics.maximumVelocity.x}
                         onChange={e => setMaximumVelocityX(parseInt(e.target.value))}
                         min={0}
                     />
                     <input
                         className='theia-input'
                         type='number'
-                        value={entityData.pixelSize.y}
+                        value={data.physics.maximumVelocity.y}
                         onChange={e => setMaximumVelocityY(parseInt(e.target.value))}
                         min={0}
                     />
                     <input
                         className='theia-input'
                         type='number'
-                        value={entityData.pixelSize.z}
+                        value={data.physics.maximumVelocity.z}
                         onChange={e => setMaximumVelocityZ(parseInt(e.target.value))}
                         min={0}
                     />

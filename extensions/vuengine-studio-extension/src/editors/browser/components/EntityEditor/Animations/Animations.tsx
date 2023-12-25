@@ -5,9 +5,9 @@ interface AnimationsProps {
 }
 
 export default function Animations(props: AnimationsProps): React.JSX.Element {
-    // const { pattern, currentNote } = props;
+    // const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
 
     return <VContainer gap={10}>
-        Animations
+        [To be implemented]
     </VContainer>;
 }

@@ -28,23 +28,6 @@
     border-color: var(--theia-button-hoverBackground);
 }
 
-.entityEditor .add-button {
-    align-items: center;
-    border: var(--theia-border-width) dashed var(--theia-dropdown-border);
-    color: var(--theia-dropdown-border);
-    cursor: pointer;
-    display: flex;
-    height: var(--theia-content-line-height);
-    justify-content: center;
-}
-
-.entityEditor .add-button:hover {
-    background-color: var(--theia-button-hoverBackground);
-    border-color: var(--theia-button-hoverBackground);
-    border-style: solid;
-    color: var(--theia-button-hoverForeground);
-}
-
 .entityEditor .remove-button {
     margin-left: 0;
     width: fit-content;

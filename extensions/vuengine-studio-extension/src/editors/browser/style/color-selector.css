@@ -1,0 +1,38 @@
+.colorSelector {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  height: calc(var(--theia-content-line-height) + 2 * var(--theia-border-width) + 2px);
+  max-width: 260px;
+  outline: 0;
+}
+
+.colorSelector div {
+  border-radius: 2px;
+  cursor: pointer;
+  flex-grow: 1;
+  outline-offset: 1px;
+}
+
+.colorSelector div.selected {
+  outline: 1px solid var(--theia-button-background);
+}
+.colorSelector:hover div.selected {
+  outline-style: dotted;
+}
+.colorSelector:hover div:hover {
+  outline: 1px solid var(--theia-button-background);
+}
+
+.colorSelector div:nth-child(1) {
+  background-color: #000;
+}
+.colorSelector div:nth-child(2) {
+  background-color: #500;
+}
+.colorSelector div:nth-child(3) {
+  background-color: #a00;
+}
+.colorSelector div:nth-child(4) {
+  background-color: #f00;
+}
