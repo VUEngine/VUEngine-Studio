@@ -1,5 +1,5 @@
 import { PreferenceService } from '@theia/core/lib/browser';
-import { CommandService, MessageService, isWindows, nls } from '@theia/core/lib/common';
+import { CommandService, MessageService, isOSX, isWindows, nls } from '@theia/core/lib/common';
 import { BinaryBufferWriteableStream } from '@theia/core/lib/common/buffer';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -206,6 +206,7 @@ export class VesFlashCartService {
           processId: processManagerId,
           progress: 0,
           log: [],
+          currentLogLine: 0,
         }
       };
     }));
@@ -293,22 +294,34 @@ export class VesFlashCartService {
     });
   }
 
-  protected processStreamData(pId: number, data: any): void {
+  protected processStreamData(pId: number, data: string): void {
     let flashCartStream = false;
 
     this.connectedFlashCarts.forEach(connectedFlashCart => {
       if (connectedFlashCart.status.processId === pId) {
         flashCartStream = true;
-        const trimmedData = data.trim();
+        data.split('\n').map((chunk, i) => {
+          if (i > 0) {
+            connectedFlashCart.status.currentLogLine++;
+          }
 
-        connectedFlashCart.status.log.push({
-          timestamp: Date.now(),
-          text: trimmedData
+          let returnValue;
+          do {
+            returnValue = this.interpretControlCharacters(connectedFlashCart, chunk);
+            if (returnValue) {
+              chunk = returnValue;
+            }
+          } while (returnValue);
+
+          connectedFlashCart.status.log[connectedFlashCart.status.currentLogLine] = {
+            timestamp: Date.now(),
+            text: (connectedFlashCart.status.log[connectedFlashCart.status.currentLogLine]?.text || '') + chunk,
+          };
         });
 
-        this.parseStreamDataProgVb(connectedFlashCart, trimmedData);
-        this.parseStreamDataHyperFlasherCli32(connectedFlashCart, trimmedData);
-        this.parseStreamDataHyperBoyCli(connectedFlashCart, trimmedData);
+        this.parseStreamDataProgVb(connectedFlashCart, data);
+        this.parseStreamDataHyperFlasherCli32(connectedFlashCart, data);
+        this.parseStreamDataHyperBoyCli(connectedFlashCart, data);
       }
     });
 
@@ -318,6 +331,43 @@ export class VesFlashCartService {
       // trigger change event
       this.connectedFlashCarts = this.connectedFlashCarts;
     }
+  }
+
+  protected interpretControlCharacters(connectedFlashCart: ConnectedFlashCart, output: string): string {
+    let matches;
+
+    // trimmed string starts with ESC[XA (move X lines up)
+    matches = output.trim().match(/^\x1B\[([1-9])A([\s\S]*)/);
+    if (matches?.length === 3) {
+      connectedFlashCart.status.currentLogLine -= parseInt(matches[1].trim());
+      return matches[2];
+    }
+
+    // trimmed string starts with ESC[XB (move X lines down)
+    matches = output.trim().match(/^\x1B\[([1-9])B([\s\S]*)/);
+    if (matches?.length === 3) {
+      connectedFlashCart.status.currentLogLine += parseInt(matches[1].trim());
+      return matches[2];
+    }
+
+    // trimmed string starts with ESC[0K, ESC[1K, ESC[2K (clear line)
+    matches = output.trim().match(/^\x1B\[([0-2])K([\s\S]*)/);
+    if (matches?.length === 3) {
+      connectedFlashCart.status.log[connectedFlashCart.status.currentLogLine] = {
+        ...connectedFlashCart.status.log[connectedFlashCart.status.currentLogLine],
+        text: '',
+      };
+      return matches[2];
+    }
+
+    // string contains ESC[?1hESC= (?)
+    /*
+    if (/\x1B\[\?1h\x1B\=/.test(output)) {
+      return output.replace(/\x1B\[\?1h\x1B\=/, '');
+    }
+    */
+
+    return '';
   }
 
   protected computeFlashingProgress(): void {
@@ -455,18 +505,37 @@ export class VesFlashCartService {
           return {
             config: flashCartConfig,
             deviceCodes,
-            port: device.serialNumber || '',
+            port: this.getPortName(device.serialNumber || ''),
             status: {
               processId: -1,
               step: '',
               progress: -1,
               log: [],
+              currentLogLine: 0,
             },
             canHoldRom: await this.determineCanHoldRom(flashCartConfig.size),
           };
         }
       }
     }
+  }
+
+  protected getPortName(serialNumber: string): string {
+    if (!serialNumber) {
+      return '';
+    }
+    if (isWindows) {
+      // just a random best guess
+      // TODO: (re-)implement port detection
+      return 'COM3';
+    }
+    if (isOSX) {
+      return `/dev/tty.usbserial-${serialNumber}`;
+    }
+
+    // just a random best guess
+    // TODO: (re-)implement port detection
+    return '/dev/ttyUSB0';
   }
 
   async detectConnectedFlashCarts(): Promise<void> {

@@ -101,104 +101,103 @@ export default function ConnectedFlashCarts(props: ConnectedFlashCartsProps): Re
             </div>
         }
         <div className='flashCarts'>
-            {vesFlashCartService.connectedFlashCarts.map(
-                (connectedFlashCart: ConnectedFlashCart, index: number) => (
-                    <div className='flashCart' key={`flashCart${index}`}>
-                        <div className='flashCartInfo'>
-                            <div>
-                                <h2>{connectedFlashCart.config.name}</h2>
-                                <div className={!connectedFlashCart.canHoldRom ? 'warning' : ''}>
-                                    <i className='fa fa-fw fa-microchip'></i>{' '}
-                                    {connectedFlashCart.config.size} MBit<br />
-                                    ({connectedFlashCart.config.padRom
-                                        ? 'Padding Enabled'
-                                        : 'Padding Disabled'})
-                                </div>
-                                <div>
-                                    <i className='fa fa-fw fa-usb'></i>{' '}
-                                    {connectedFlashCart.deviceCodes.vid}:
-                                    {connectedFlashCart.deviceCodes.pid}<br />
-                                    {connectedFlashCart.deviceCodes.manufacturer}<br />
-                                    {connectedFlashCart.deviceCodes.product}<br />
-                                    {connectedFlashCart.port}
-                                </div>
-                                <div>
-                                    <i className='fa fa-fw fa-terminal'></i>{' '}
-                                    {vesCommonService.basename(connectedFlashCart.config.path)}{' '}
-                                    {connectedFlashCart.config.args}
-                                </div>
-                                {!connectedFlashCart.canHoldRom &&
-                                    <div className="infoPanel warning">
-                                        <i className='fa fa-fw fa-exclamation-triangle'></i>{' '}
-                                        {nls.localize('vuengine/flashCarts/insufficientSpaceToHoldRom', 'Insufficient space to hold ROM')} ({
-                                            vesBuildService.bytesToMbit(vesBuildService.romSize)
-                                        } MBit)
-                                    </div>
-                                }
-                                {connectedFlashCart.status.progress === 100 ? (
-                                    <div className='infoPanel success'>
-                                        <i className='fa fa-fw fa-check'></i> {nls.localize('vuengine/flashCarts/done', 'Done')}
-                                    </div>
-                                ) : connectedFlashCart.status.progress > -1 ? (
-                                    <div className='infoPanel'>
-                                        <i className='fa fa-fw fa-cog fa-spin'></i>{' '}
-                                        {connectedFlashCart.status.step}...{' '}
-                                        {connectedFlashCart.status.progress}%
-                                    </div>
-                                ) : <></>}
+            {vesFlashCartService.connectedFlashCarts.map((connectedFlashCart: ConnectedFlashCart, index: number) => (
+                <div className='flashCart' key={`flashCart${index}`}>
+                    <div className='flashCartInfo'>
+                        <div>
+                            <h2>{connectedFlashCart.config.name}</h2>
+                            <div className={!connectedFlashCart.canHoldRom ? 'warning' : ''}>
+                                <i className='fa fa-fw fa-microchip'></i>{' '}
+                                {connectedFlashCart.config.size} MBit<br />
+                                ({connectedFlashCart.config.padRom
+                                    ? 'Padding Enabled'
+                                    : 'Padding Disabled'})
                             </div>
-                            {connectedFlashCart.config.image && (
-                                <div>
-                                    <img
-                                        src={connectedFlashCart.config.image}
-                                        style={
-                                            connectedFlashCart.config.name === HYPERFLASH32_PREFERENCE_NAME
-                                                ? {
-                                                    /* HyperFlash32 eInk label */
-                                                    backgroundImage: `url(${IMAGE_HYPERFLASH32_LABEL})`,
-                                                    backgroundPosition: '69% 28%',
-                                                    backgroundRepeat: 'no-repeat',
-                                                    backgroundSize: '76%',
-                                                }
-                                                : {}
-                                        }
-                                    />
+                            <div>
+                                <i className='fa fa-fw fa-usb'></i>{' '}
+                                {connectedFlashCart.deviceCodes.vid}:
+                                {connectedFlashCart.deviceCodes.pid}<br />
+                                {connectedFlashCart.deviceCodes.manufacturer}<br />
+                                {connectedFlashCart.deviceCodes.product}<br />
+                                {connectedFlashCart.port}
+                            </div>
+                            <div>
+                                <i className='fa fa-fw fa-terminal'></i>{' '}
+                                {vesCommonService.basename(connectedFlashCart.config.path)}{' '}
+                                {connectedFlashCart.config.args}
+                            </div>
+                            {!connectedFlashCart.canHoldRom &&
+                                <div className="infoPanel warning">
+                                    <i className='fa fa-fw fa-exclamation-triangle'></i>{' '}
+                                    {nls.localize('vuengine/flashCarts/insufficientSpaceToHoldRom', 'Insufficient space to hold ROM')} ({
+                                        vesBuildService.bytesToMbit(vesBuildService.romSize)
+                                    } MBit)
+                                </div>
+                            }
+                            {connectedFlashCart.status.progress === 100 ? (
+                                <div className='infoPanel success'>
+                                    <i className='fa fa-fw fa-check'></i> {nls.localize('vuengine/flashCarts/done', 'Done')}
+                                </div>
+                            ) : connectedFlashCart.status.progress > -1 ? (
+                                <div className='infoPanel'>
+                                    <i className='fa fa-fw fa-cog fa-spin'></i>{' '}
+                                    {connectedFlashCart.status.step}...{' '}
+                                    {connectedFlashCart.status.progress}%
+                                </div>
+                            ) : <></>}
+                        </div>
+                        {connectedFlashCart.config.image && (
+                            <div>
+                                <img
+                                    src={connectedFlashCart.config.image}
+                                    style={
+                                        connectedFlashCart.config.name === HYPERFLASH32_PREFERENCE_NAME
+                                            ? {
+                                                /* HyperFlash32 eInk label */
+                                                backgroundImage: `url(${IMAGE_HYPERFLASH32_LABEL})`,
+                                                backgroundPosition: '69% 28%',
+                                                backgroundRepeat: 'no-repeat',
+                                                backgroundSize: '76%',
+                                            }
+                                            : {}
+                                    }
+                                />
+                            </div>
+                        )}
+                    </div>
+
+                    {connectedFlashCart.status.log.length > 0 &&
+                        <div className='flashLogWrapper'>
+                            <button
+                                className='theia-button secondary'
+                                onClick={() => toggleLog(index)}
+                            >
+                                {showLog[index] ? 'Hide Terminal Output' : 'Show Terminal Output'}
+                            </button>
+                            {showLog[index] && (
+                                <div className='flashLog'>
+                                    <div>
+                                        {connectedFlashCart.status.log.map(
+                                            (line: FlashLogLine, idx: number) => (
+                                                line.text !== ''
+                                                    ? <div className="flashLogLine" key={`flashLogLine${idx}`}>
+                                                        <span className='timestamp'>
+                                                            {new Date(line.timestamp).toTimeString().substring(0, 8)}
+                                                        </span>
+                                                        <span className='text'>
+                                                            {line.text}
+                                                        </span>
+                                                    </div>
+                                                    : <div className='flashLogLine' key={`flashLogLine${idx}`}></div>
+                                            )
+                                        )}
+                                    </div>
                                 </div>
                             )}
                         </div>
-
-                        {connectedFlashCart.status.log.length > 0 &&
-                            <div className='flashLogWrapper'>
-                                <button
-                                    className='theia-button secondary'
-                                    onClick={() => toggleLog(index)}
-                                >
-                                    {showLog[index] ? 'Hide Log' : 'Show Log'}
-                                </button>
-                                {showLog[index] && (
-                                    <div className='flashLog'>
-                                        <div>
-                                            {connectedFlashCart.status.log.map(
-                                                (line: FlashLogLine, idx: number) => (
-                                                    line.text !== ''
-                                                        ? <div className="flashLogLine" key={`flashLogLine${idx}`}>
-                                                            <span className='timestamp'>
-                                                                {new Date(line.timestamp).toTimeString().substring(0, 8)}
-                                                            </span>
-                                                            <span className='text'>
-                                                                {line.text}
-                                                            </span>
-                                                        </div>
-                                                        : <div className='flashLogLine'></div>
-                                                )
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        }
-                    </div>
-                )
+                    }
+                </div>
+            )
             )}
         </div>
     </>;

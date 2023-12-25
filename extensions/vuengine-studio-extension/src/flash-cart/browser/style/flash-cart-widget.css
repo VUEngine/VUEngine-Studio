@@ -107,7 +107,7 @@
   font-family: monospace;
   font-size: 90%;
   line-height: 130%;
-  height: 300px;
+  max-height: 300px;
   overflow: auto;
 }
 

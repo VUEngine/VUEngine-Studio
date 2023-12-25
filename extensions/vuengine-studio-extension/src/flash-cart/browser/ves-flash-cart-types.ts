@@ -44,6 +44,7 @@ export interface FlashCartStatus {
   progress: number
   step: string
   log: FlashLogLine[]
+  currentLogLine: number
 }
 
 export interface FlashLogLine {
