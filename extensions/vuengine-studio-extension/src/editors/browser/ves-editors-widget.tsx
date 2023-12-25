@@ -223,7 +223,6 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     }
 
     protected rerenderOnProjectFileUpdate(): void {
-        console.log('rerenderOnProjectFileUpdate', this.justSaved, this.typeId);
         if (!this.justSaved) {
             this.update();
         }

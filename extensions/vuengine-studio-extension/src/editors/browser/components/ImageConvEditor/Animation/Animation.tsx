@@ -36,6 +36,9 @@ export default function Animation(): React.JSX.Element {
     return <VContainer gap={10}>
         <VContainer>
             <label>
+                {nls.localize('vuengine/imageConvEditor/animation', 'Animation')}
+            </label>
+            <label>
                 <input
                     type="checkbox"
                     checked={imageConvData.animation.isAnimation}
@@ -43,24 +46,24 @@ export default function Animation(): React.JSX.Element {
                 />
                 {nls.localize('vuengine/imageConvEditor/isAnimation', 'Is animation')}
             </label>
-        </VContainer>
-        {imageConvData.animation.isAnimation && <VContainer>
-            <label>{nls.localize('vuengine/imageConvEditor/frames', 'Frames')}</label>
-            <label>
+            {imageConvData.animation.isAnimation && <label>
                 <input
                     type="checkbox"
                     checked={imageConvData.animation.individualFiles}
                     onChange={toggleIndividualFiles}
                 />
-                {nls.localize('vuengine/imageConvEditor/individualFiles', 'Animation frames are separate image files')}
-            </label>
-            {!imageConvData.animation.individualFiles && <input
+                {nls.localize('vuengine/imageConvEditor/individualFiles', 'Frames are separate image files')}
+            </label>}
+        </VContainer>
+        {imageConvData.animation.isAnimation && !imageConvData.animation.individualFiles && <VContainer>
+            <label>{nls.localize('vuengine/imageConvEditor/frames', 'Frames')}</label>
+            <input
                 className='theia-input'
                 type='number'
                 value={imageConvData.animation.frames}
                 onChange={onChangeAnimationFrames}
                 min={0}
-            />}
+            />
         </VContainer>}
     </VContainer >;
 }
