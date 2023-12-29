@@ -1,5 +1,6 @@
 @import "../../../../../../node_modules/rc-dock/dist/rc-dock.css";
 @import "brightness-repeat-editor/index.css";
+@import "button.css";
 @import "color-selector.css";
 @import "column-table-editor/index.css";
 @import "entity-editor/index.css";

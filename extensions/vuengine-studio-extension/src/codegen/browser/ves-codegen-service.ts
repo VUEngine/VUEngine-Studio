@@ -593,6 +593,8 @@ export class VesCodeGenService {
       return obj;
     });
 
+    env.addFilter('removeEmpty', arr => arr.filter((e: unknown) => typeof e === 'string' && e.trim() !== ''));
+
     // nunjucks does not support _async_ functions, but only filters (in the ugly as hell way as below)
     env.addFilter('convertPcm', async (...args): Promise<void> => {
       const callback = args.pop();
@@ -602,6 +604,7 @@ export class VesCodeGenService {
       // eslint-disable-next-line no-null/no-null
       callback(null, result);
     }, true);
+
     env.addFilter('convertImage', async (...args): Promise<void> => {
       const callback = args.pop();
       const imageConfigFileUri: URI = args[0];
