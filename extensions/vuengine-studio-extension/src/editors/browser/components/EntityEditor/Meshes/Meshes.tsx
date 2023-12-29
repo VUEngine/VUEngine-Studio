@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import VContainer from '../../Common/VContainer';
-import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
+import { EntityEditorContext, EntityEditorContextType, Transparency } from '../EntityEditorTypes';
 import { nls } from '@theia/core';
 import Mesh from './Mesh';
 
@@ -20,7 +20,7 @@ export default function Meshes(): React.JSX.Element {
                         z: 0,
                     },
                     color: 3,
-                    transparent: 0,
+                    transparency: Transparency.None,
                     interlaced: false,
                 },
                 segments: [],

@@ -5,7 +5,7 @@ import React, { useContext } from 'react';
 import ColorSelector from '../../Common/ColorSelector';
 import HContainer from '../../Common/HContainer';
 import VContainer from '../../Common/VContainer';
-import { EntityEditorContext, EntityEditorContextType, Mesh, Wireframe } from '../EntityEditorTypes';
+import { EntityEditorContext, EntityEditorContextType, Mesh, Transparency, Wireframe } from '../EntityEditorTypes';
 import Segment from './Segment';
 
 interface MeshProps {
@@ -80,9 +80,9 @@ export default function Mesh(props: MeshProps): React.JSX.Element {
         });
     };
 
-    const setTransparent = (transparent: number): void => {
+    const setTransparency = (transparency: Transparency): void => {
         setWireframe({
-            transparent
+            transparency
         });
     };
 
@@ -117,7 +117,7 @@ export default function Mesh(props: MeshProps): React.JSX.Element {
 
     const removeMesh = async (): Promise<void> => {
         const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/entityEditor/remove', 'Remove'),
+            title: nls.localize('vuengine/entityEditor/removeMesh', 'Remove Mesh'),
             msg: nls.localize('vuengine/entityEditor/areYouSureYouWantToRemoveMesh', 'Are you sure you want to remove this mesh?'),
         });
         const confirmed = await dialog.open();
@@ -156,7 +156,7 @@ export default function Mesh(props: MeshProps): React.JSX.Element {
             </HContainer>
             <VContainer>
                 <label>Displacement (X, Y, Z)</label>
-                <HContainer gap={10}>
+                <HContainer>
                     <input
                         className='theia-input'
                         type='number'
@@ -177,26 +177,26 @@ export default function Mesh(props: MeshProps): React.JSX.Element {
                     />
                 </HContainer>
             </VContainer>
-            <VContainer>
-                {nls.localize('vuengine/entityEditor/color', 'Color')}
-                <ColorSelector
-                    color={mesh.wireframe.color}
-                    updateColor={setColor}
-                />
-            </VContainer>
-            <HContainer alignItems='start' gap={20}>
+            <HContainer alignItems='start' gap={10} wrap='wrap'>
+                <VContainer>
+                    {nls.localize('vuengine/entityEditor/color', 'Color')}
+                    <ColorSelector
+                        color={mesh.wireframe.color}
+                        updateColor={setColor}
+                    />
+                </VContainer>
                 <VContainer>
                     <label>
                         {nls.localize('vuengine/entityEditor/transparency', 'Transparency')}
                     </label>
                     <SelectComponent
                         options={[
-                            { value: '0', label: nls.localize('vuengine/entityEditor/transparencyNone', 'None') },
-                            { value: '1', label: nls.localize('vuengine/entityEditor/transparencyOdd', 'Odd') },
-                            { value: '2', label: nls.localize('vuengine/entityEditor/transparencyEven', 'Even') },
+                            { value: Transparency.None, label: nls.localize('vuengine/entityEditor/transparencyNone', 'None') },
+                            { value: Transparency.Odd, label: nls.localize('vuengine/entityEditor/transparencyOdd', 'Odd') },
+                            { value: Transparency.Even, label: nls.localize('vuengine/entityEditor/transparencyEven', 'Even') },
                         ]}
-                        defaultValue={mesh.wireframe.transparent}
-                        onChange={option => setTransparent(parseInt(option.value || '0'))}
+                        defaultValue={mesh.wireframe.transparency}
+                        onChange={option => setTransparency(option.value as Transparency)}
                     />
                 </VContainer>
                 <VContainer>

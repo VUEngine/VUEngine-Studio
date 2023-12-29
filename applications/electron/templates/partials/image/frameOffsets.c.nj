@@ -1,0 +1,9 @@
+{% if imageData.tiles.frameOffsets is defined and imageData.tiles.frameOffsets.length %}
+const uint32 {{ tileName }}TilesFrameOffsets[{{ imageData.tiles.frameOffsets.length }}] __attribute__((aligned(4))){% if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
+{
+    {% for frameTileOffset in imageData.tiles.frameOffsets -%}
+    {{ frameTileOffset | intToHex(8) }},
+    {%- if loop.index % 8 == 0 and not loop.last %}{{ "\n    " }}{% endif -%}
+    {%- endfor %}
+};
+{% endif %}

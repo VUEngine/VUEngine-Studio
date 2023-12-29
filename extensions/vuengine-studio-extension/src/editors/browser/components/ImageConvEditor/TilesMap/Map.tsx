@@ -4,10 +4,10 @@ import VContainer from '../../Common/VContainer';
 import { ImageConvEditorContext, ImageConvEditorContextType } from '../ImageConvEditorTypes';
 
 export default function Map(): React.JSX.Element {
-    const { imageConvData, setImageConvData } = useContext(ImageConvEditorContext) as ImageConvEditorContextType;
+    const { imageConvData, updateImageConvData } = useContext(ImageConvEditorContext) as ImageConvEditorContextType;
 
     const toggleGenerateMap = () => {
-        setImageConvData({
+        updateImageConvData({
             map: {
                 ...imageConvData.map,
                 generate: !imageConvData.map.generate
@@ -16,7 +16,7 @@ export default function Map(): React.JSX.Element {
     };
 
     const toggleReduceFlipped = () => {
-        setImageConvData({
+        updateImageConvData({
             map: {
                 ...imageConvData.map,
                 reduce: {
@@ -28,7 +28,7 @@ export default function Map(): React.JSX.Element {
     };
 
     const toggleReduceUnique = () => {
-        setImageConvData({
+        updateImageConvData({
             map: {
                 ...imageConvData.map,
                 reduce: {

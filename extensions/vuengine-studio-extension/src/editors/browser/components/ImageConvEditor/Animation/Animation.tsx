@@ -4,10 +4,10 @@ import VContainer from '../../Common/VContainer';
 import { ImageConvEditorContext, ImageConvEditorContextType } from '../ImageConvEditorTypes';
 
 export default function Animation(): React.JSX.Element {
-    const { imageConvData, setImageConvData } = useContext(ImageConvEditorContext) as ImageConvEditorContextType;
+    const { imageConvData, updateImageConvData } = useContext(ImageConvEditorContext) as ImageConvEditorContextType;
 
     const toggleIsAnimation = () => {
-        setImageConvData({
+        updateImageConvData({
             animation: {
                 ...imageConvData.animation,
                 isAnimation: !imageConvData.animation.isAnimation
@@ -16,7 +16,7 @@ export default function Animation(): React.JSX.Element {
     };
 
     const toggleIndividualFiles = () => {
-        setImageConvData({
+        updateImageConvData({
             animation: {
                 ...imageConvData.animation,
                 individualFiles: !imageConvData.animation.individualFiles
@@ -25,7 +25,7 @@ export default function Animation(): React.JSX.Element {
     };
 
     const onChangeAnimationFrames = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setImageConvData({
+        updateImageConvData({
             animation: {
                 ...imageConvData.animation,
                 frames: parseInt(e.target.value)

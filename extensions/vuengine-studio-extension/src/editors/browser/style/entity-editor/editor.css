@@ -21,6 +21,7 @@
 .entityEditor .item {
     align-items: center;
     border: var(--theia-border-width) solid var(--theia-dropdown-border);
+    border-radius: 2px;
     padding: calc(2 * var(--theia-ui-padding));
 }
 

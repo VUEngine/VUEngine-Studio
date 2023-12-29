@@ -60,40 +60,10 @@
 {% endif -%}
 //
 //---------------------------------------------------------------------------------------------------------
-{% if imageData.tiles.data.length %}
-const uint32 {{ sanitizedSpecName }}Tiles[{{ (imageData.tiles.data.length + 1) }}] __attribute__((aligned(4))){% if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
-{
-    {# prepend tile data with a custom compression algorithm flag -#}
-    {%- if item.tileset.compression is defined and item.tileset.compression != 'none' and imageData.tiles.compressionRatio < 0 -%}
-        0x00000001,
-    {%- else -%}
-        0x00000000,
-    {%- endif %}
-    {% for tileData in imageData.tiles.data -%}
-    0x{{ tileData }},
-    {%- if loop.index % 8 == 0 and not loop.last %}{{ "\n    " }}{% endif -%}
-    {%- endfor %}
-};
-{% endif %}
 
-{%- for map in imageData.maps -%}
-{% if map.data.length %}
-const uint16 {{ map.name | sanitizeSpecName }}Map[{{ map.data.length }}] __attribute__((aligned(4))){% if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
-{
-    {% for mapTile in map.data -%}
-    0x{{ mapTile }},
-    {%- if loop.index % 8 == 0 and not loop.last %}{{ "\n    " }}{% endif -%}
-    {%- endfor %}
-};
-{% endif %}
-{%- endfor -%}
-
-{% if imageData.tiles.frameOffsets is defined and imageData.tiles.frameOffsets.length %}
-const uint32 {{ sanitizedSpecName }}TilesFrameOffsets[{{ imageData.tiles.frameOffsets.length }}] __attribute__((aligned(4))){% if item.section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
-{
-    {% for frameTileOffset in imageData.tiles.frameOffsets -%}
-    {{ frameTileOffset | intToHex(8) }},
-    {%- if loop.index % 8 == 0 and not loop.last %}{{ "\n    " }}{% endif -%}
-    {%- endfor %}
-};
-{% endif %}
+{%- set tilesName = sanitizedSpecName -%}
+{%- set section = item.section -%}
+{%- set compression = item.tileset.compression -%}
+{%- include('templates/partials/image/tiles.c.nj') -%}
+{%- include('templates/partials/image/maps.c.nj') -%}
+{%- include('templates/partials/image/frameOffsets.c.nj') -%}

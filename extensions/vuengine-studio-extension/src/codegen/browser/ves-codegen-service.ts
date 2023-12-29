@@ -419,7 +419,7 @@ export class VesCodeGenService {
         const target = t.path
           .replace(/\$\{([\s\S]*?)\}/ig, match => {
             match = match.substring(2, match.length - 1);
-            return this.getByKey(updatedData.item, match);
+            return this.vesCommonService.getByKey(updatedData.item, match);
           });
 
         const targetPathParts = target.split('/');
@@ -441,12 +441,12 @@ export class VesCodeGenService {
       };
 
       if (t.forEachOf) {
-        const forEachOfType = Object.keys(t.forEachOf)[0];
-        const forEachOfValue = Object.values(t.forEachOf)[0];
+        const forEachOfType = Object.keys(t.forEachOf)[0] as string;
+        const forEachOfValue = Object.values(t.forEachOf)[0] as string;
         const items = [];
         switch (forEachOfType) {
           case ProjectFileTemplateTargetForEachOfType.var:
-            items.push(...data.item[forEachOfValue as string]);
+            items.push(...this.vesCommonService.getByKey(data.item, forEachOfValue));
             if (!Array.isArray(items)) {
               return console.error(`forEachOf "${forEachOfValue}" does not exist on item or is not an array`);
             }
@@ -458,9 +458,10 @@ export class VesCodeGenService {
             break;
         }
 
-        await Promise.all(items.map(async (x: string) => findTargetAndRender({
+        await Promise.all(items.map(async (x: unknown, index) => findTargetAndRender({
           _forEachOf: x,
-          _forEachOfBasename: workspaceRootUri.resolve(x).path.name,
+          _forEachOfIndex: index + 1,
+          _forEachOfBasename: workspaceRootUri.resolve(x as string).path.name,
         })));
       } else {
         return findTargetAndRender();
@@ -501,23 +502,6 @@ export class VesCodeGenService {
         }
       }));
     }
-  }
-
-  protected getByKey(o: any, s: string): any {
-    // convert indexes to properties
-    s = s.replace(/\[(\w+)\]/g, '.$1');
-    // strip leading dot
-    s = s.replace(/^\./, '');
-    const a = s.split('.');
-    for (let i = 0, n = a.length; i < n; ++i) {
-      const k = a[i];
-      if (k in o) {
-        o = o[k];
-      } else {
-        return '';
-      }
-    }
-    return o;
   }
 
   protected async configureTemplateEngine(): Promise<void> {

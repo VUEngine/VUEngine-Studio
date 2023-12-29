@@ -5,8 +5,6 @@ import { ImageConfig } from '../../../../images/browser/ves-images-types';
 export const ImageConvEditorContext = React.createContext<ImageConvEditorContextType>({});
 
 export interface ImageConvEditorContextType {
-    filesToShow: { [path: string]: string }
-    setFilesToShow: (filesToShow: { [path: string]: string }) => void
     imageConvData: ImageConfig
-    setImageConvData: (songData: Partial<ImageConfig>) => void
+    updateImageConvData: (data: Partial<ImageConfig>) => void
 }

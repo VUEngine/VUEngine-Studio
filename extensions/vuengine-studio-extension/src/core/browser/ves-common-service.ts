@@ -35,6 +35,23 @@ export class VesCommonService {
     return nanoid();
   }
 
+  getByKey(o: any, s: string): any {
+    // convert indexes to properties
+    s = s.replace(/\[(\w+)\]/g, '.$1');
+    // strip leading dot
+    s = s.replace(/^\./, '');
+    const a = s.split('.');
+    for (let i = 0, n = a.length; i < n; ++i) {
+      const k = a[i];
+      if (k in o) {
+        o = o[k];
+      } else {
+        return '';
+      }
+    }
+    return o;
+  }
+
   async getResourcesUri(): Promise<URI> {
     const envVar = await this.envVariablesServer.getValue('THEIA_APP_PROJECT_PATH');
     const applicationPath = envVar && envVar.value

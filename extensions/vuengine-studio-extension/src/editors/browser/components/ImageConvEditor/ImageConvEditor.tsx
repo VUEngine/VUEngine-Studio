@@ -1,5 +1,5 @@
-import { URI, nls } from '@theia/core';
-import React, { useEffect, useState } from 'react';
+import { URI } from '@theia/core';
+import React from 'react';
 import { ImageConfig } from '../../../../images/browser/ves-images-types';
 import { EditorsServices } from '../../ves-editors-widget';
 import HContainer from '../Common/HContainer';
@@ -25,56 +25,21 @@ export default function ImageConvEditor(props: ImageConvEditorProps): React.JSX.
         fileUri,
         services,
     } = props;
-    const [filesToShow, setFilesToShow] = useState<{ [path: string]: string }>({});
-    const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
 
-    const determineFilesToShow = async () => {
-        const f = data.files.length > 0
-            ? data.files
-            : await Promise.all(window.electronVesCore.findFiles(await services.fileService.fsPath(fileUri.parent), '*.png')
-                .map(async p => {
-                    const fullUri = fileUri.parent.resolve(p);
-                    const relativePath = workspaceRootUri.relative(fullUri)?.toString()!;
-                    return relativePath;
-                }));
-
-        const result: { [path: string]: string } = {};
-        await Promise.all(f
-            .sort((a, b) => a.localeCompare(b))
-            .map(async p => {
-                let meta = nls.localize(
-                    'vuengine/imageConvEditor/fileNotFound',
-                    'File not found'
-                );
-                const resolvedUri = workspaceRootUri.resolve(p);
-                if (await services.fileService.exists(resolvedUri)) {
-                    const dimensions = await window.electronVesCore.getImageDimensions(resolvedUri.path.fsPath());
-                    meta = `${dimensions.width}×${dimensions.height}`;
-                }
-                result[p] = meta;
-            }));
-
-        setFilesToShow(result);
+    const updateImageConvData = (updatedData: Partial<ImageConfig>): void => {
+        updateData({ ...data, ...updatedData });
     };
 
-    useEffect(() => {
-        determineFilesToShow();
-    }, [
-        data.files
-    ]);
-
-    const setImageConvData = (updatedData: Partial<ImageConfig>): void => {
-        updateData({ ...data, ...updatedData });
+    const updateFiles = (files: string[]): void => {
+        updateData({ ...data, files });
     };
 
     return (
         <div className="imageConvEditor">
             <ImageConvEditorContext.Provider
                 value={{
-                    filesToShow,
-                    setFilesToShow,
                     imageConvData: data,
-                    setImageConvData,
+                    updateImageConvData,
                 }}
             >
                 <VContainer gap={20}>
@@ -85,11 +50,12 @@ export default function ImageConvEditor(props: ImageConvEditorProps): React.JSX.
                         <Animation />
                     </HContainer>
                     <Images
+                        data={data.files}
+                        updateData={updateFiles}
+                        allInFolderAsFallback={true}
+                        canSelectMany={true}
                         fileUri={fileUri}
-                        fileService={services.fileService}
-                        fileDialogService={services.fileDialogService}
-                        messageService={services.messageService}
-                        workspaceService={services.workspaceService}
+                        services={services}
                     />
                 </VContainer>
             </ImageConvEditorContext.Provider>

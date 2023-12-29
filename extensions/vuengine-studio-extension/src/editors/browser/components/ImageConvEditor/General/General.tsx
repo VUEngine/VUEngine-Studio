@@ -10,14 +10,14 @@ interface GeneralProps {
 }
 
 export default function General(props: GeneralProps): React.JSX.Element {
-    const { imageConvData, setImageConvData } = useContext(ImageConvEditorContext) as ImageConvEditorContextType;
+    const { imageConvData, updateImageConvData } = useContext(ImageConvEditorContext) as ImageConvEditorContextType;
 
     const setName = (n: string): void => {
-        setImageConvData({ name: n });
+        updateImageConvData({ name: n });
     };
 
     const setSection = (section: DataSection) => {
-        setImageConvData({
+        updateImageConvData({
             section,
         });
     };

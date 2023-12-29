@@ -1,4 +1,4 @@
-import { nls } from '@theia/core';
+import { URI, nls } from '@theia/core';
 import DockLayout, { LayoutBase, LayoutData } from 'rc-dock';
 import React from 'react';
 import { EditorsDockInterface, EditorsServices } from '../../ves-editors-widget';
@@ -22,6 +22,7 @@ interface EntityEditorProps {
   data: EntityData;
   updateData: (entityData: EntityData) => void;
   dock: EditorsDockInterface
+  fileUri: URI
   services: EditorsServices
 }
 
@@ -180,7 +181,10 @@ export default class EntityEditor extends React.Component<
                     minWidth: 200,
                     content: (
                       <EntityEditorContext.Consumer>
-                        {context => <Sprites />}
+                        {context => <Sprites
+                          fileUri={this.props.fileUri}
+                          services={this.props.services}
+                        />}
                       </EntityEditorContext.Consumer>
                     ),
                   },

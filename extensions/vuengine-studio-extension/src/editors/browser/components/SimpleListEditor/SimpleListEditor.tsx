@@ -42,7 +42,7 @@ export default function SimpleListEditor(props: SimpleListEditorProps): React.JS
     };
 
     return <VContainer>
-        {data.map((item, index) =>
+        {data.length ? data.map((item, index) =>
             <HContainer
                 key={`list-editor-${index}`}
             >
@@ -60,7 +60,9 @@ export default function SimpleListEditor(props: SimpleListEditorProps): React.JS
                     <i className='fa fa-trash' />
                 </button>
             </HContainer>
-        )}
+        ) : <>
+            {nls.localize('vuengine/simpleListEditor/noItems', 'No Items')}
+        </>}
         <button
             className='theia-button secondary full-width'
             onClick={addItem}

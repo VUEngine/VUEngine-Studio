@@ -11,15 +11,16 @@
   border-radius: 2px;
   cursor: pointer;
   flex-grow: 1;
+  min-width: 32px;
   outline-offset: 1px;
 }
 
 .colorSelector div.selected {
   outline: 1px solid var(--theia-button-background);
 }
-.colorSelector:hover div.selected {
+/* .colorSelector:hover div.selected {
   outline-style: dotted;
-}
+} */
 .colorSelector:hover div:hover {
   outline: 1px solid var(--theia-button-background);
 }

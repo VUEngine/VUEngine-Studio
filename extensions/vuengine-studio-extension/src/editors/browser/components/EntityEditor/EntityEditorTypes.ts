@@ -1,4 +1,6 @@
 import React from 'react';
+import { ImageCompressionType } from '../../../../images/browser/ves-images-types';
+import { DataSection } from '../Common/CommonTypes';
 
 // @ts-ignore
 export const EntityEditorContext = React.createContext<EntityEditorContextType>({});
@@ -11,6 +13,35 @@ export interface EntityEditorContextType {
 }
 
 export const EntityEditorLayoutStorageName = 'ves-editors-entityEditor-layout';
+
+export const MIN_TEXTURE_PADDING = 0;
+export const MAX_TEXTURE_PADDING = 255;
+export const MIN_TEXTURE_SIZE = 1;
+export const MAX_TEXTURE_SIZE = 64;
+
+export enum SpriteType {
+    Bgmap = 'Bgmap',
+    Object = 'Object',
+}
+
+export enum Transparency {
+    None = 'None',
+    Odd = 'Odd',
+    Even = 'Even',
+}
+
+export enum DisplayMode {
+    Both = 'ON',
+    Left = 'LON',
+    Right = 'RON',
+}
+
+export enum BgmapMode {
+    Bgmap = 'Bgmap',
+    Object = 'Object',
+    Affine = 'Affine',
+    HBias = 'HBias',
+}
 
 export interface MeshSegment {
     fromVertex: {
@@ -35,7 +66,7 @@ export interface Wireframe {
         z: number
     }
     color: number
-    transparent: number
+    transparency: Transparency
     interlaced: boolean
 }
 
@@ -47,6 +78,43 @@ export interface Mesh {
 export interface Animation {
     name: string
     // ...
+}
+
+export interface Sprite {
+    class: string
+    section: DataSection
+    compression: ImageCompressionType
+    bgmapMode: BgmapMode
+    displayMode: DisplayMode
+    transparency: Transparency
+    displacement: {
+        x: number
+        y: number
+        z: number
+        parallax: number
+    }
+    manipulationFunction: string
+    texture: {
+        charset: {
+            optimized: boolean
+            shared: boolean
+        }
+        files: string[],
+        padding: {
+            x: number
+            y: number
+        }
+        palette: number
+        recycleable: boolean
+        flip: {
+            horizontal: boolean
+            vertical: boolean
+        },
+        size: {
+            x: number
+            y: number
+        }
+    }
 }
 
 export interface EntityData {
@@ -109,39 +177,7 @@ export interface EntityData {
     sprites: {
         type: string
         useZDisplacementInProjection: boolean
-        sprites: {
-            name: string
-            class: string
-            bgmapMode: string
-            displayMode: string
-            transparency: string
-            displacement: {
-                x: number
-                y: number
-                z: number
-                parallax: number
-            }
-            manipulationFunction: string
-            texture: {
-                charset: {
-                    type: string
-                }
-                image: {
-                    name: string
-                    chars: boolean
-                }
-                padding: {
-                    x: number
-                    y: number
-                }
-                palette: number
-                recycleable: boolean
-                size: {
-                    x: number
-                    y: number
-                }
-            }
-        }[]
+        sprites: Sprite[]
     }
 }
 

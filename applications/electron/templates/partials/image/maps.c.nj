@@ -1,0 +1,11 @@
+{%- for map in imageData.maps -%}
+{% if map.data.length %}
+const uint16 {{ map.name | sanitizeSpecName }}Map[{{ map.data.length }}] __attribute__((aligned(4))){% if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
+{
+    {% for mapTile in map.data -%}
+    0x{{ mapTile }},
+    {%- if loop.index % 8 == 0 and not loop.last %}{{ "\n    " }}{% endif -%}
+    {%- endfor %}
+};
+{% endif %}
+{%- endfor -%}

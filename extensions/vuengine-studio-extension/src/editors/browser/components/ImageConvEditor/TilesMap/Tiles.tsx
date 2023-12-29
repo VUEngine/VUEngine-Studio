@@ -6,10 +6,10 @@ import VContainer from '../../Common/VContainer';
 import { ImageConvEditorContext, ImageConvEditorContextType } from '../ImageConvEditorTypes';
 
 export default function Tiles(): React.JSX.Element {
-    const { imageConvData, setImageConvData } = useContext(ImageConvEditorContext) as ImageConvEditorContextType;
+    const { imageConvData, updateImageConvData } = useContext(ImageConvEditorContext) as ImageConvEditorContextType;
 
     const toggleShareTiles = () => {
-        setImageConvData({
+        updateImageConvData({
             tileset: {
                 ...imageConvData.tileset,
                 shared: !imageConvData.tileset.shared
@@ -18,7 +18,7 @@ export default function Tiles(): React.JSX.Element {
     };
 
     const setTilesCompression = (compression: ImageCompressionType) => {
-        setImageConvData({
+        updateImageConvData({
             tileset: {
                 ...imageConvData.tileset,
                 compression
