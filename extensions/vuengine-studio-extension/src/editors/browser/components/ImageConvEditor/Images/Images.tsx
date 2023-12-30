@@ -101,10 +101,10 @@ export default function Images(props: ImagesProps): React.JSX.Element {
         updateData(data.filter((f, i) => f !== path));
     };
 
-    return <VContainer gap={10}>
+    return <VContainer gap={10} overflow='hidden'>
         <label>
             {canSelectMany
-                ? nls.localize('vuengine/imageConvEditor/files', 'Image Files')
+                ? nls.localize('vuengine/imageConvEditor/xFiles', 'Image Files ({0})', Object.keys(filesToShow).length)
                 : nls.localize('vuengine/imageConvEditor/file', 'Image File')
             }
         </label>
@@ -117,7 +117,7 @@ export default function Images(props: ImagesProps): React.JSX.Element {
                 )}
             </div>
         }
-        <HContainer alignItems="start" gap={15} wrap="wrap">
+        <HContainer alignItems="start" gap={15} overflow='auto' wrap="wrap">
             {Object.keys(filesToShow).map((f, i) => {
                 const fullUri = workspaceRootUri.resolve(f);
                 return <div

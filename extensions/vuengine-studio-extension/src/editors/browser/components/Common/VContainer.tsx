@@ -4,10 +4,11 @@ interface VContainerProps {
     className?: string
     gap?: number
     grow?: number
+    overflow?: string
 }
 
 export default function VContainer(props: PropsWithChildren<VContainerProps>): React.JSX.Element {
-    const { children, className, gap, grow } = props;
+    const { children, className, gap, grow, overflow } = props;
 
     return <div
         style={{
@@ -15,6 +16,7 @@ export default function VContainer(props: PropsWithChildren<VContainerProps>): R
             flexDirection: 'column',
             gap: gap !== undefined ? `${gap}px` : '5px',
             flexGrow: grow,
+            overflow,
         }}
         className={className}
     >

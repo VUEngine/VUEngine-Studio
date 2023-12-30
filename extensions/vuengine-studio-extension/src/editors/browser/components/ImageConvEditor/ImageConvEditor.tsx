@@ -42,7 +42,7 @@ export default function ImageConvEditor(props: ImageConvEditorProps): React.JSX.
                     updateImageConvData,
                 }}
             >
-                <VContainer gap={20}>
+                <VContainer gap={20} overflow='hidden'>
                     <General />
                     <HContainer gap={20} alignItems='start' wrap='wrap'>
                         <Tiles />
