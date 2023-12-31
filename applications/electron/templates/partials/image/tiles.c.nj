@@ -1,5 +1,4 @@
 {%- if imageData.tiles.data.length %}
-
 const uint32 {{ tilesName }}Tiles[{{ (imageData.tiles.data.length + 1) }}] __attribute__((aligned(4))){% if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
     {# prepend tile data with a custom compression algorithm flag -#}

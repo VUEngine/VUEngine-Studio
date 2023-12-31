@@ -1,15 +1,15 @@
 import React, { useContext } from 'react';
 import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 
-interface SegmentProps {
-    meshIndex: number,
+interface MeshSegmentProps {
+    index: number,
     segmentIndex: number,
 }
 
-export default function Segment(props: SegmentProps): React.JSX.Element {
+export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element {
     const { data } = useContext(EntityEditorContext) as EntityEditorContextType;
-    const { meshIndex, segmentIndex } = props;
-    const segment = data.meshes.meshes[meshIndex].segments[segmentIndex];
+    const { index, segmentIndex } = props;
+    const segment = data.wireframes.wireframes[index].segments[segmentIndex];
 
     console.log(segment);
 

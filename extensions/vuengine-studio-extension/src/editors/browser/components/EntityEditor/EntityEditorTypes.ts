@@ -16,8 +16,14 @@ export const EntityEditorLayoutStorageName = 'ves-editors-entityEditor-layout';
 
 export const MIN_TEXTURE_PADDING = 0;
 export const MAX_TEXTURE_PADDING = 255;
-export const MIN_TEXTURE_SIZE = 1;
-export const MAX_TEXTURE_SIZE = 64;
+// TODO: compute min, max values from engineConfig.math.fixedPointPrecision
+// step would be PIXELS_TO_METERS(1), depending on fixedPointPrecision
+export const MIN_WIREFRAME_DISPLACEMENT = -511;
+export const MAX_WIREFRAME_DISPLACEMENT = 512;
+export const STEP_WIREFRAME_DISPLACEMENT = 0.1;
+export const MIN_SPHERE_RADIUS = 0;
+export const MAX_SPHERE_RADIUS = 512;
+export const STEP_SPHERE_RADIUS = 0.1;
 
 export enum SpriteType {
     Bgmap = 'Bgmap',
@@ -43,6 +49,12 @@ export enum BgmapMode {
     HBias = 'HBias',
 }
 
+export enum WireframeType {
+    Mesh = 'Mesh',
+    Sphere = 'Sphere',
+    Asterisk = 'Asterisk',
+}
+
 export interface MeshSegment {
     fromVertex: {
         x: number
@@ -59,7 +71,7 @@ export interface MeshSegment {
 }
 
 export interface Wireframe {
-    allocator: string
+    type: WireframeType
     displacement: {
         x: number
         y: number
@@ -70,9 +82,12 @@ export interface Wireframe {
     interlaced: boolean
 }
 
-export interface Mesh {
+export interface WireframeImpl {
     wireframe: Wireframe
-    segments: MeshSegment[]
+    segments: MeshSegment[] // only WireframeType.Mesh
+    length: number // only WireframeType.Asterisk
+    radius: number // only WireframeType.Sphere
+    drawCenter: boolean // only WireframeType.Sphere
 }
 
 export interface Animation {
@@ -81,9 +96,6 @@ export interface Animation {
 }
 
 export interface Sprite {
-    class: string
-    section: DataSection
-    compression: ImageCompressionType
     bgmapMode: BgmapMode
     displayMode: DisplayMode
     transparency: Transparency
@@ -95,11 +107,7 @@ export interface Sprite {
     }
     manipulationFunction: string
     texture: {
-        charset: {
-            optimized: boolean
-            shared: boolean
-        }
-        files: string[],
+        files: string[]
         padding: {
             x: number
             y: number
@@ -109,12 +117,19 @@ export interface Sprite {
         flip: {
             horizontal: boolean
             vertical: boolean
-        },
-        size: {
-            x: number
-            y: number
         }
     }
+}
+
+export interface Sprites {
+    type: string
+    customClass: string
+    useZDisplacementInProjection: boolean
+    sharedTiles: boolean
+    optimizedTiles: boolean
+    section: DataSection
+    compression: ImageCompressionType
+    sprites: Sprite[]
 }
 
 export interface EntityData {
@@ -159,8 +174,8 @@ export interface EntityData {
             layersToIgnore: string
         }[]
     }
-    meshes: {
-        meshes: Mesh[]
+    wireframes: {
+        wireframes: WireframeImpl[]
     }
     physics: {
         enabled: boolean
@@ -174,11 +189,7 @@ export interface EntityData {
             z: number
         }
     }
-    sprites: {
-        type: string
-        useZDisplacementInProjection: boolean
-        sprites: Sprite[]
-    }
+    sprites: Sprites
 }
 
 export interface EntityEditorState {
@@ -186,7 +197,7 @@ export interface EntityEditorState {
         anaglyph: boolean
         animations: boolean
         collisions: boolean
-        meshes: boolean
+        wireframes: boolean
         palettes: string[]
         sprites: boolean
         zoom: number

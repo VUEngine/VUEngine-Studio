@@ -12,11 +12,11 @@ import {
   EntityEditorState
 } from './EntityEditorTypes';
 import General from './General/General';
-import Meshes from './Meshes/Meshes';
 import Physics from './Physics/Physics';
 import Preview from './Preview/Preview';
 import Scripts from './Scripts/Scripts';
 import Sprites from './Sprites/Sprites';
+import Wireframes from './Wireframes/Wireframes';
 
 interface EntityEditorProps {
   data: EntityData;
@@ -37,7 +37,7 @@ export default class EntityEditor extends React.Component<
         anaglyph: false,
         animations: true,
         collisions: true,
-        meshes: true,
+        wireframes: true,
         palettes: ['11100100', '11100000', '11010000', '11100100'],
         sprites: true,
         zoom: 8,
@@ -144,20 +144,6 @@ export default class EntityEditor extends React.Component<
                     ),
                   },
                   {
-                    id: 'tab-meshes',
-                    title: nls.localize(
-                      'vuengine/entityEditor/meshes',
-                      'Meshes'
-                    ),
-                    minHeight: 200,
-                    minWidth: 200,
-                    content: (
-                      <EntityEditorContext.Consumer>
-                        {context => <Meshes />}
-                      </EntityEditorContext.Consumer>
-                    ),
-                  },
-                  {
                     id: 'tab-physics',
                     title: nls.localize(
                       'vuengine/entityEditor/physics',
@@ -199,6 +185,20 @@ export default class EntityEditor extends React.Component<
                     content: (
                       <EntityEditorContext.Consumer>
                         {context => <Scripts />}
+                      </EntityEditorContext.Consumer>
+                    ),
+                  },
+                  {
+                    id: 'tab-wireframes',
+                    title: nls.localize(
+                      'vuengine/entityEditor/wireframes',
+                      'Wireframes'
+                    ),
+                    minHeight: 200,
+                    minWidth: 200,
+                    content: (
+                      <EntityEditorContext.Consumer>
+                        {context => <Wireframes />}
                       </EntityEditorContext.Consumer>
                     ),
                   },

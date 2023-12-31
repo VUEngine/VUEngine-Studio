@@ -60,8 +60,7 @@
 {% endif -%}
 //
 //---------------------------------------------------------------------------------------------------------
-
-{%- set tilesName = sanitizedSpecName -%}
+{% set tilesName = sanitizedSpecName -%}
 {%- set section = item.section -%}
 {%- set compression = item.tileset.compression -%}
 {%- include('templates/partials/image/tiles.c.nj') -%}

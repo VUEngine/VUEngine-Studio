@@ -70,7 +70,7 @@ export default function Collisions(props: CollisionsProps): React.JSX.Element {
             {inGameTypesFileUri && <button
                 className='theia-button secondary'
                 onClick={openEditor}
-                title={nls.localize('vuengine/entityEditor/addMesh', 'Add Mesh')}
+                title={nls.localize('vuengine/entityEditor/addCollision', 'Add Collision')}
             >
                 <i className='fa fa-cog' />
             </button>}

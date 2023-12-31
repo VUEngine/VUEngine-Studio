@@ -34,7 +34,7 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
     <VContainer gap={10}>
       <div className="preview-container">
         <Sprite
-          animate={state.preview.animations && data.animations.animations.length > 0}
+          animate={state.preview.animations && data.animations?.animations?.length > 0}
           displacement={{
             x: 0,
             y: 0,
@@ -77,8 +77,8 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
         <label>
           <input
             type="checkbox"
-            checked={state.preview.sprites && data.sprites.sprites.length > 0}
-            disabled={!data.sprites.sprites.length}
+            checked={state.preview.sprites && data.sprites?.sprites?.length > 0}
+            disabled={!data.sprites?.sprites?.length}
             onChange={e => setBooleanStateProperty('sprites', e.target.checked)}
           />
           Show Sprites
@@ -86,17 +86,17 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
         <label>
           <input
             type="checkbox"
-            checked={state.preview.meshes && data.meshes.meshes.length > 0}
-            disabled={!data.meshes.meshes.length}
-            onChange={e => setBooleanStateProperty('meshes', e.target.checked)}
+            checked={state.preview.wireframes && data.wireframes?.wireframes?.length > 0}
+            disabled={!data.wireframes?.wireframes?.length}
+            onChange={e => setBooleanStateProperty('wireframes', e.target.checked)}
           />
-          Show Meshes
+          Show Wireframes
         </label>
         <label>
           <input
             type="checkbox"
-            checked={state.preview.collisions && data.collisions.inGameType !== 'None'}
-            disabled={data.collisions.inGameType === 'None'}
+            checked={state.preview.collisions && data.collisions?.inGameType !== 'None'}
+            disabled={data.collisions?.inGameType === 'None'}
             onChange={e =>
               setBooleanStateProperty('collisions', e.target.checked)
             }
@@ -106,8 +106,8 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
         <label>
           <input
             type="checkbox"
-            checked={state.preview.animations && data.animations.animations.length > 0}
-            disabled={!data.animations.animations.length}
+            checked={state.preview.animations && data.animations?.animations?.length > 0}
+            disabled={!data.animations?.animations?.length}
             onChange={e =>
               setBooleanStateProperty('animations', e.target.checked)
             }

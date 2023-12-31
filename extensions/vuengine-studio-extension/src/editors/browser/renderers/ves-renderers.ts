@@ -8,8 +8,6 @@ import VesFontEditorControl from './font-editor/ves-font-editor-control';
 import VesFontEditorControlTester from './font-editor/ves-font-editor-control-tester';
 import VesImageConvEditorControl from './image-conv-editor/ves-image-conv-editor-control';
 import VesImageConvEditorControlTester from './image-conv-editor/ves-image-conv-editor-control-tester';
-import VesMeshesControl from './meshes/ves-meshes-control';
-import VesMeshesControlTester from './meshes/ves-meshes-control-tester';
 import VesMusicEditorControl from './music-editor/ves-music-editor-control';
 import VesMusicEditorControlTester from './music-editor/ves-music-editor-control-tester';
 import VesPaletteControl from './palette/ves-palette-control';
@@ -30,7 +28,6 @@ export const VES_RENDERERS = [
     { tester: VesFontEditorControlTester, renderer: VesFontEditorControl },
     { tester: VesImageConvEditorControlTester, renderer: VesImageConvEditorControl },
     { tester: VesMusicEditorControlTester, renderer: VesMusicEditorControl },
-    { tester: VesMeshesControlTester, renderer: VesMeshesControl },
     { tester: VesPaletteControlTester, renderer: VesPaletteControl },
     { tester: VesPcmEditorControlTester, renderer: VesPcmEditorControl },
     { tester: VesRumbleEffectEditorControlTester, renderer: VesRumbleEffectEditorControl },

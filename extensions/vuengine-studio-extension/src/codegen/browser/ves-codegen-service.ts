@@ -518,7 +518,15 @@ export class VesCodeGenService {
       return base;
     });
 
+    env.addFilter('crc32', (value: object) => require('crc-32').str(JSON.stringify(value)));
+
+    env.addFilter('keys', (value: object) => Object.keys(value));
     env.addFilter('values', (value: object) => Object.values(value));
+
+    env.addFilter('setProperty', (obj: { [key: string]: any }, key: string, value: unknown) => {
+      obj[key] = value;
+      return obj;
+    });
 
     // @ts-ignore
     env.addFilter('typeId', (arr: unknown[], typeId: string) => arr.filter(item => item.typeId === typeId));

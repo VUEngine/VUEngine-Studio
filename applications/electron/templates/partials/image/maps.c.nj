@@ -1,6 +1,10 @@
 {%- for map in imageData.maps -%}
 {% if map.data.length %}
-const uint16 {{ map.name | sanitizeSpecName }}Map[{{ map.data.length }}] __attribute__((aligned(4))){% if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
+{%- set mapName = map.name | sanitizeSpecName -%}
+{%- if customMapPrefix is defined -%}
+    {%- set mapName = customMapPrefix ~ mapName -%}
+{%- endif %}
+const uint16 {{ mapName }}Map[{{ map.data.length }}] __attribute__((aligned(4))){% if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
     {% for mapTile in map.data -%}
     0x{{ mapTile }},
