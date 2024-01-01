@@ -55,7 +55,14 @@ export enum WireframeType {
     Asterisk = 'Asterisk',
 }
 
-export interface MeshSegment {
+export enum ColliderType {
+    Ball = 'Ball',
+    Box = 'Box',
+    InverseBox = 'InverseBox',
+    LineField = 'LineField',
+}
+
+export interface MeshSegmentData {
     fromVertex: {
         x: number
         y: number
@@ -82,9 +89,9 @@ export interface Wireframe {
     interlaced: boolean
 }
 
-export interface WireframeImpl {
+export interface WireframeData {
     wireframe: Wireframe
-    segments: MeshSegment[] // only WireframeType.Mesh
+    segments: MeshSegmentData[] // only WireframeType.Mesh
     length: number // only WireframeType.Asterisk
     radius: number // only WireframeType.Sphere
     drawCenter: boolean // only WireframeType.Sphere
@@ -93,6 +100,34 @@ export interface WireframeImpl {
 export interface Animation {
     name: string
     // ...
+}
+
+export interface ColliderData {
+    type: ColliderType
+    pixelSize: {
+        x: number
+        y: number
+        z: number
+    }
+    displacement: {
+        x: number
+        y: number
+        z: number
+        parallax: number
+    }
+    rotation: {
+        x: number
+        y: number
+        z: number
+    }
+    scale: {
+        x: number
+        y: number
+        z: number
+    }
+    checkForCollisions: boolean
+    layers: string[]
+    layersToCheck: string[]
 }
 
 export interface Sprite {
@@ -144,38 +179,12 @@ export interface EntityData {
         default: string
         animations: Animation[]
     }
-    collisions: {
+    colliders: {
         inGameType: string
-        shapes: {
-            type: string
-            pixelSize: {
-                x: number
-                y: number
-                z: number
-            }
-            displacement: {
-                x: number
-                y: number
-                z: number
-                parallax: number
-            }
-            rotation: {
-                x: number
-                y: number
-                z: number
-            }
-            scale: {
-                x: number
-                y: number
-                z: number
-            }
-            checkForCollisions: boolean
-            layers: string
-            layersToIgnore: string
-        }[]
+        colliders: ColliderData[]
     }
     wireframes: {
-        wireframes: WireframeImpl[]
+        wireframes: WireframeData[]
     }
     physics: {
         enabled: boolean
@@ -196,7 +205,7 @@ export interface EntityEditorState {
     preview: {
         anaglyph: boolean
         animations: boolean
-        collisions: boolean
+        colliders: boolean
         wireframes: boolean
         palettes: string[]
         sprites: boolean

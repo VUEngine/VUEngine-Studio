@@ -95,13 +95,13 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
         <label>
           <input
             type="checkbox"
-            checked={state.preview.collisions && data.collisions?.inGameType !== 'None'}
-            disabled={data.collisions?.inGameType === 'None'}
+            checked={state.preview.colliders && data.colliders?.inGameType !== 'None'}
+            disabled={data.colliders?.inGameType === 'None'}
             onChange={e =>
-              setBooleanStateProperty('collisions', e.target.checked)
+              setBooleanStateProperty('colliders', e.target.checked)
             }
           />
-          Show Collisions
+          Show Colliders
         </label>
         <label>
           <input

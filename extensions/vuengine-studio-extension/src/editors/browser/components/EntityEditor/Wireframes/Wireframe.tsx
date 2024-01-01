@@ -8,29 +8,30 @@ import VContainer from '../../Common/VContainer';
 import {
     EntityEditorContext,
     EntityEditorContextType,
-    MAX_WIREFRAME_DISPLACEMENT,
     MAX_SPHERE_RADIUS,
-    MIN_WIREFRAME_DISPLACEMENT,
+    MAX_WIREFRAME_DISPLACEMENT,
     MIN_SPHERE_RADIUS,
-    WireframeImpl,
-    STEP_WIREFRAME_DISPLACEMENT,
+    MIN_WIREFRAME_DISPLACEMENT,
+    MeshSegmentData,
     STEP_SPHERE_RADIUS,
+    STEP_WIREFRAME_DISPLACEMENT,
     Transparency,
     Wireframe,
+    WireframeData,
     WireframeType,
 } from '../EntityEditorTypes';
 import MeshSegment from './MeshSegment';
 
 interface WireframeProps {
-    index: number,
-    wireframe: WireframeImpl
+    index: number
+    wireframe: WireframeData
 }
 
 export default function Wireframe(props: WireframeProps): React.JSX.Element {
     const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
     const { index, wireframe } = props;
 
-    const setWireframe = (partialWireframeData: Partial<WireframeImpl>): void => {
+    const setWireframe = (partialWireframeData: Partial<WireframeData>): void => {
         const updatedWireframesArray = [...data.wireframes.wireframes];
         updatedWireframesArray[index] = {
             ...updatedWireframesArray[index],
@@ -43,12 +44,19 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
         setData({ wireframes: updatedWireframes });
     };
 
-    const setWireframeWireframe = (partialWireframe: Partial<Wireframe>): void => {
-        const updatedWireframe = { ...wireframe.wireframe };
+    const setSegment = (segmentIndex: number, segmentData: Partial<MeshSegmentData>): void => {
+        const updatedSegments = [...wireframe.segments];
+        updatedSegments[segmentIndex] = {
+            ...updatedSegments[segmentIndex],
+            ...segmentData,
+        };
+        setWireframe({ segments: updatedSegments });
+    };
 
+    const setWireframeWireframe = (partialWireframe: Partial<Wireframe>): void => {
         setWireframe({
             wireframe: {
-                ...updatedWireframe,
+                ...wireframe.wireframe,
                 ...partialWireframe,
             }
         });
@@ -124,26 +132,41 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
     };
 
     const addSegment = (): void => {
-        const updatedWireframes = { ...data.wireframes };
-        updatedWireframes.wireframes[index].segments = [
-            ...updatedWireframes.wireframes[index].segments,
-            {
-                fromVertex: {
-                    x: 0,
-                    y: 0,
-                    z: 0,
-                    parallax: 0,
-                },
-                toVertex: {
-                    x: 0,
-                    y: 0,
-                    z: 0,
-                    parallax: 0,
-                },
-            }
-        ];
+        setWireframe({
+            segments: [
+                ...wireframe.segments,
+                {
+                    fromVertex: {
+                        x: 0,
+                        y: 0,
+                        z: 0,
+                        parallax: 0,
+                    },
+                    toVertex: {
+                        x: 0,
+                        y: 0,
+                        z: 0,
+                        parallax: 0,
+                    },
+                }
+            ]
+        });
+    };
 
-        setData({ wireframes: updatedWireframes });
+    const removeSegment = async (segmentIndex: number): Promise<void> => {
+        const dialog = new ConfirmDialog({
+            title: nls.localize('vuengine/entityEditor/removeSegment', 'Remove Segment'),
+            msg: nls.localize('vuengine/entityEditor/areYouSureYouWantToRemoveSegment', 'Are you sure you want to remove this segment?'),
+        });
+        const confirmed = await dialog.open();
+        if (confirmed) {
+            setWireframe({
+                segments: [
+                    ...wireframe.segments.slice(0, segmentIndex),
+                    ...wireframe.segments.slice(segmentIndex + 1)
+                ]
+            });
+        }
     };
 
     const removeWireframe = async (): Promise<void> => {
@@ -231,7 +254,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                             <input
                                 className='theia-input'
                                 style={{ width: 48 }}
-                                type='float'
+                                type='number'
                                 min={MIN_WIREFRAME_DISPLACEMENT}
                                 max={MAX_WIREFRAME_DISPLACEMENT}
                                 step={STEP_WIREFRAME_DISPLACEMENT}
@@ -241,7 +264,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                             <input
                                 className='theia-input'
                                 style={{ width: 48 }}
-                                type='float'
+                                type='number'
                                 min={MIN_WIREFRAME_DISPLACEMENT}
                                 max={MAX_WIREFRAME_DISPLACEMENT}
                                 step={STEP_WIREFRAME_DISPLACEMENT}
@@ -251,7 +274,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                             <input
                                 className='theia-input'
                                 style={{ width: 48 }}
-                                type='float'
+                                type='number'
                                 min={MIN_WIREFRAME_DISPLACEMENT}
                                 max={MAX_WIREFRAME_DISPLACEMENT}
                                 step={STEP_WIREFRAME_DISPLACEMENT}
@@ -277,8 +300,9 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                     {wireframe.segments.map((segment, segmentIndex) =>
                         <MeshSegment
                             key={`segment-${segmentIndex}`}
-                            index={index}
-                            segmentIndex={segmentIndex}
+                            segment={segment}
+                            updateSegment={(s: Partial<MeshSegmentData>) => setSegment(segmentIndex, s)}
+                            removeSegment={() => removeSegment(segmentIndex)}
                         />
                     )}
                     <button
@@ -299,7 +323,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                         <input
                             className='theia-input'
                             style={{ width: 48 }}
-                            type='float'
+                            type='number'
                             min={MIN_SPHERE_RADIUS}
                             max={MAX_SPHERE_RADIUS}
                             step={STEP_SPHERE_RADIUS}
@@ -327,7 +351,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                     <input
                         className='theia-input'
                         style={{ width: 48 }}
-                        type='float'
+                        type='number'
                         min={0}
                         max={255}
                         step={0.1}

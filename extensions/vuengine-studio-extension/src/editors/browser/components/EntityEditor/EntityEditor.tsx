@@ -5,7 +5,7 @@ import { EditorsDockInterface, EditorsServices } from '../../ves-editors-widget'
 import Animations from './Animations/Animations';
 import Behaviors from './Behaviors/Behaviors';
 import Children from './Children/Children';
-import Collisions from './Collisions/Collisions';
+import Colliders from './Colliders/Colliders';
 import {
   EntityData,
   EntityEditorContext,
@@ -36,7 +36,7 @@ export default class EntityEditor extends React.Component<
       preview: {
         anaglyph: false,
         animations: true,
-        collisions: true,
+        colliders: true,
         wireframes: true,
         palettes: ['11100100', '11100000', '11010000', '11100100'],
         sprites: true,
@@ -128,16 +128,16 @@ export default class EntityEditor extends React.Component<
                     ),
                   },
                   {
-                    id: 'tab-collisions',
+                    id: 'tab-colliders',
                     title: nls.localize(
-                      'vuengine/entityEditor/collisions',
-                      'Collisions'
+                      'vuengine/entityEditor/colliders',
+                      'Colliders'
                     ),
                     minHeight: 200,
                     minWidth: 200,
                     content: (
                       <EntityEditorContext.Consumer>
-                        {context => <Collisions
+                        {context => <Colliders
                           services={this.props.services}
                         />}
                       </EntityEditorContext.Consumer>

@@ -34,20 +34,20 @@ export default function Wireframes(): React.JSX.Element {
     };
 
     return <VContainer gap={10}>
-        {data.wireframes.wireframes.length
-            ? data.wireframes.wireframes.map((m, i) =>
-                <Wireframe
-                    key={`wireframe-${i}`}
-                    index={i}
-                    wireframe={m}
-                />
-            )
-            : <>{nls.localize('vuengine/entityEditor/noWireframes', 'No Wireframes')}</>
-        }
+        <label>
+            {nls.localize('vuengine/entityEditor/wireframes', 'Wireframes')} ({data.wireframes.wireframes.length})
+        </label>
+        {data.wireframes.wireframes.length > 0 && data.wireframes.wireframes.map((wireframe, index) =>
+            <Wireframe
+                key={`wireframe-${index}`}
+                index={index}
+                wireframe={wireframe}
+            />
+        )}
         <button
             className='theia-button secondary full-width'
             onClick={addWireframe}
-            title={nls.localize('vuengine/entityEditor/addireframe', 'Add ireframe')}
+            title={nls.localize('vuengine/entityEditor/addWireframe', 'Add Wireframe')}
         >
             <i className='fa fa-plus' />
         </button>

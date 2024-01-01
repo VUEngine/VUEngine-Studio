@@ -219,17 +219,15 @@ export default function Sprites(props: SpritesProps): React.JSX.Element {
             <label>
                 {nls.localize('vuengine/entityEditor/xSprites', 'Sprites ({0})', data.sprites.sprites.length)}
             </label>
-            {data.sprites.sprites.length
-                ? data.sprites.sprites.map((s, i) =>
-                    <Sprite
-                        key={`sprite-${i}`}
-                        index={i}
-                        sprite={s}
-                        fileUri={fileUri}
-                        services={services}
-                    />
-                )
-                : nls.localize('vuengine/entityEditor/noSprites', 'No Sprites')}
+            {data.sprites.sprites.length && data.sprites.sprites.map((s, i) =>
+                <Sprite
+                    key={`sprite-${i}`}
+                    index={i}
+                    sprite={s}
+                    fileUri={fileUri}
+                    services={services}
+                />
+            )}
             <button
                 className='theia-button secondary full-width'
                 onClick={addSprite}

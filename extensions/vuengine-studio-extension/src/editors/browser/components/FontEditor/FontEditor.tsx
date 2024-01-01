@@ -25,8 +25,8 @@ import Palette from './Tools/Palette';
 import Tools from './Tools/Tools';
 
 interface FontEditorProps {
-    fontData: FontData
-    updateFontData: (fontData: FontData) => void
+    data: FontData
+    updateData: (data: FontData) => void
     fileUri: URI
     services: EditorsServices
 }
@@ -41,7 +41,7 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
             clipboard: undefined,
             paletteIndexL: 3,
             paletteIndexR: 0,
-            currentCharacter: this.props.fontData.offset,
+            currentCharacter: this.props.data.offset,
             charGrid: 1,
             alphabetGrid: 1
         };
@@ -55,7 +55,7 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
 
     protected keyEventListerner(e: KeyboardEvent): void {
         if (this.state.active && document.activeElement?.tagName !== 'INPUT') {
-            const { characterCount, offset } = this.props.fontData;
+            const { characterCount, offset } = this.props.data;
             const { currentCharacter } = this.state;
 
             switch (e.key) {
@@ -103,54 +103,81 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
         }
     }
 
+    protected removeTrailingNullsAndZeroesFromArray = (arr: any[]): any[] | null => {
+        // eslint-disable-next-line no-null/no-null
+        if (arr === null) {
+            return arr;
+        }
+
+        let toDelete = 0;
+        for (let c = arr.length - 1; c >= 0; c--) {
+            // eslint-disable-next-line no-null/no-null
+            if (arr[c] === null || arr[c] === 0) {
+                toDelete++;
+            } else {
+                break;
+            }
+        }
+        arr.splice(arr.length - toDelete, toDelete);
+
+        // eslint-disable-next-line no-null/no-null
+        return arr.length ? arr : null;
+    };
+
+    protected optimizeFontData = (fontData: FontData): FontData => {
+        // @ts-ignore
+        // eslint-disable-next-line no-null/no-null
+        fontData.characters = fontData.characters === null ? null :
+            this.removeTrailingNullsAndZeroesFromArray(fontData.characters.map(character =>
+                // eslint-disable-next-line no-null/no-null
+                character === null ? null :
+                    this.removeTrailingNullsAndZeroesFromArray(character.map(line =>
+                        this.removeTrailingNullsAndZeroesFromArray(line)
+                    ))));
+
+        return fontData;
+    };
+
+    protected updateFontData(partialFontData: Partial<FontData>): void {
+        this.props.updateData(
+            this.optimizeFontData({
+                ...this.props.data,
+                ...partialFontData,
+            })
+        );
+    };
+
     protected setCurrentCharacterData(character: number[][]): void {
-        const updatedCharacters = this.props.fontData.characters ?? [];
-        updatedCharacters[this.state.currentCharacter] = character;
-        this.props.updateFontData({
-            ...this.props.fontData,
-            characters: updatedCharacters
-        });
+        const characters = [...(this.props.data.characters || [])];
+        characters[this.state.currentCharacter] = character;
+        this.updateFontData({ characters });
     };
 
     protected onChangeName(e: React.ChangeEvent<HTMLInputElement>): void {
-        this.props.updateFontData({
-            ...this.props.fontData,
+        this.updateFontData({
             name: e.target.value
         });
     }
 
-    protected setCharCount(charCount: number): void {
-        this.props.updateFontData({
-            ...this.props.fontData,
-            characterCount: charCount
-        });
+    protected setCharCount(characterCount: number): void {
+        this.updateFontData({ characterCount });
     }
 
     protected setOffset(offset: number): void {
-        this.props.updateFontData({
-            ...this.props.fontData,
-            offset: offset
-        });
+        this.updateFontData({ offset });
     }
 
     protected setSection(section: DataSection): void {
-        this.props.updateFontData({
-            ...this.props.fontData,
-            section: section
-        });
+        this.updateFontData({ section });
     }
     protected setCompression(compression: ImageCompressionType): void {
-        this.props.updateFontData({
-            ...this.props.fontData,
-            compression: compression
-        });
+        this.updateFontData({ compression });
     }
 
     protected setCharSize(size?: Size, variableSize?: VariableSize): void {
-        this.props.updateFontData({
-            ...this.props.fontData,
-            size: size ?? this.props.fontData.size,
-            variableSize: variableSize ?? this.props.fontData.variableSize,
+        this.updateFontData({
+            size: size ?? this.props.data.size,
+            variableSize: variableSize ?? this.props.data.variableSize,
         });
     }
 
@@ -160,7 +187,7 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
                 this.setPixelColor(x, y, color);
                 break;
             case FontEditorTools.FILL:
-                const characters = this.props.fontData.characters || [];
+                const characters = this.props.data.characters || [];
                 const currentColor = characters[this.state.currentCharacter]
                     && characters[this.state.currentCharacter][y]
                     ? characters[this.state.currentCharacter][y][x] ?? 0
@@ -182,30 +209,24 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
     }
 
     protected setCharacters(characters: number[][][]): void {
-        this.props.updateFontData({
-            ...this.props.fontData,
-            characters: characters
-        });
+        this.updateFontData({ characters });
     }
 
     protected setPixelColor(x: number, y: number, color: number): void {
-        const updatedCharacters = [...this.props.fontData.characters];
-        if (!updatedCharacters[this.state.currentCharacter]) {
-            updatedCharacters[this.state.currentCharacter] = [];
+        const characters = [...this.props.data.characters];
+        if (!characters[this.state.currentCharacter]) {
+            characters[this.state.currentCharacter] = [];
         }
-        if (!updatedCharacters[this.state.currentCharacter][y]) {
-            updatedCharacters[this.state.currentCharacter][y] = [];
+        if (!characters[this.state.currentCharacter][y]) {
+            characters[this.state.currentCharacter][y] = [];
         }
-        updatedCharacters[this.state.currentCharacter][y][x] = color;
+        characters[this.state.currentCharacter][y][x] = color;
 
-        this.props.updateFontData({
-            ...this.props.fontData,
-            characters: updatedCharacters
-        });
+        this.updateFontData({ characters });
     }
 
     protected fillAll(x: number, y: number, color: number): void {
-        const characters = this.props.fontData.characters;
+        const characters = this.props.data.characters;
         const oldColor = characters[this.state.currentCharacter]
             && characters[this.state.currentCharacter][y]
             && characters[this.state.currentCharacter][y][x]
@@ -213,11 +234,11 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
             : 0;
         if (oldColor !== color) {
             const updatedCharacter = characters[this.state.currentCharacter] ?? [];
-            [...Array(this.props.fontData.size.y * CHAR_PIXEL_SIZE)].map((j, sy) => {
+            [...Array(this.props.data.size.y * CHAR_PIXEL_SIZE)].map((j, sy) => {
                 if (!updatedCharacter[sy]) {
                     updatedCharacter[sy] = [];
                 }
-                [...Array(this.props.fontData.size.x * CHAR_PIXEL_SIZE)].map((k, sx) => {
+                [...Array(this.props.data.size.x * CHAR_PIXEL_SIZE)].map((k, sx) => {
                     // eslint-disable-next-line no-null/no-null
                     if (updatedCharacter[sy][sx] === null
                         || updatedCharacter[sy][sx] === undefined
@@ -234,8 +255,8 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
     protected fill(char: number[][], x: number, y: number, oldColor: number, newColor: number): number[][] {
         const charColor = char && char[y] ? char[y][x] ?? 0 : 0;
         if (x >= 0 && y >= 0
-            && x < this.props.fontData.size.x * CHAR_PIXEL_SIZE
-            && y < this.props.fontData.size.y * CHAR_PIXEL_SIZE
+            && x < this.props.data.size.x * CHAR_PIXEL_SIZE
+            && y < this.props.data.size.y * CHAR_PIXEL_SIZE
             && charColor === oldColor) {
             if (!char[y]) {
                 char[y] = [];
@@ -251,12 +272,12 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
     }
 
     render(): React.JSX.Element {
-        const { fileUri, fontData, services } = this.props;
+        const { fileUri, data, services } = this.props;
 
-        const pixelWidth = fontData.size.x * CHAR_PIXEL_SIZE;
-        const pixelHeight = fontData.size.y * CHAR_PIXEL_SIZE;
+        const pixelWidth = data.size.x * CHAR_PIXEL_SIZE;
+        const pixelHeight = data.size.y * CHAR_PIXEL_SIZE;
 
-        const characters = this.props.fontData.characters || [];
+        const characters = this.props.data.characters || [];
 
         return <div
             tabIndex={0}
@@ -274,7 +295,7 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
                         </label>
                         <input
                             className="theia-input large"
-                            value={fontData.name}
+                            value={data.name}
                             onChange={this.onChangeName.bind(this)}
                         />
                     </VContainer>
@@ -283,7 +304,7 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
                             {nls.localize('vuengine/fontEditor/compression', 'Compression')}
                         </label>
                         <SelectComponent
-                            defaultValue={fontData.compression}
+                            defaultValue={data.compression}
                             options={[{
                                 label: nls.localize('vuengine/fontEditor/none', 'None'),
                                 value: ImageCompressionType.NONE,
@@ -301,7 +322,7 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
                             {nls.localize('vuengine/fontEditor/section', 'Section')}
                         </label>
                         <SelectComponent
-                            defaultValue={fontData.section}
+                            defaultValue={data.section}
                             options={[{
                                 label: nls.localize('vuengine/fontEditor/romSpace', 'ROM Space'),
                                 value: DataSection.ROM,
@@ -343,9 +364,9 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
                             messageService={services.messageService}
                             baseUri={fileUri}
                             setCharacters={this.setCharacters.bind(this)}
-                            size={fontData.size}
-                            offset={fontData.offset}
-                            characterCount={fontData.characterCount}
+                            size={data.size}
+                            offset={data.offset}
+                            characterCount={data.characterCount}
                         />
                     </div>
                     <div className='editor-column'>
@@ -353,7 +374,7 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
                             currentCharacter={this.state.currentCharacter}
                             charHeight={pixelHeight}
                             charWidth={pixelWidth}
-                            variableSize={fontData.variableSize}
+                            variableSize={data.variableSize}
                             setCharSize={this.setCharSize.bind(this)}
                             charGrid={this.state.charGrid}
                             setState={this.setState.bind(this)}
@@ -363,7 +384,7 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
                             charId={this.state.currentCharacter}
                             charHeight={pixelHeight}
                             charWidth={pixelWidth}
-                            variableSize={fontData.variableSize}
+                            variableSize={data.variableSize}
                             clickPixel={this.clickPixel.bind(this)}
                             paletteIndexL={this.state.paletteIndexL}
                             paletteIndexR={this.state.paletteIndexR}
@@ -372,21 +393,21 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
                     </div>
                     <div className='alphabet-column'>
                         <AlphabetSettings
-                            charCount={fontData.characterCount}
+                            charCount={data.characterCount}
                             setCharCount={this.setCharCount.bind(this)}
-                            offset={fontData.offset}
+                            offset={data.offset}
                             setOffset={this.setOffset.bind(this)}
                             alphabetGrid={this.state.alphabetGrid}
                             setState={this.setState.bind(this)}
                         />
                         <Alphabet
-                            charsData={fontData.characters || []}
-                            offset={fontData.offset}
-                            charCount={fontData.characterCount}
+                            charsData={data.characters || []}
+                            offset={data.offset}
+                            charCount={data.characterCount}
                             charHeight={pixelHeight}
                             charWidth={pixelWidth}
                             currentCharacter={this.state.currentCharacter}
-                            variableSize={fontData.variableSize}
+                            variableSize={data.variableSize}
                             alphabetGrid={this.state.alphabetGrid}
                             setState={this.setState.bind(this)}
                         />

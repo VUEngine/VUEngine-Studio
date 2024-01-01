@@ -1,5 +1,4 @@
 import { nls } from '@theia/core';
-import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React from 'react';
 import { CHAR_PIXEL_SIZE, FontEditorState, MAX_CHAR_SIZE, MIN_CHAR_SIZE, MIN_VARIABLE_CHAR_SIZE, Size, VariableSize } from '../FontEditorTypes';
 import HContainer from '../../Common/HContainer';
@@ -38,36 +37,53 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
     });
 
     const onChangePixelWidth = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const currentVariableSize = variableSize.x[currentCharacter] ?? charWidth;
         const newSize = parseInt(e.target.value);
-        const currentVariableSizeDifference = charWidth - currentVariableSize;
-        const newVariableSize = newSize - currentVariableSizeDifference;
 
-        const updatedVariableSizeX = [...variableSize.x];
-        updatedVariableSizeX[currentCharacter] = newVariableSize;
+        let updatedVariableSize;
+        if (variableSize.enabled) {
+            const currentVariableSize = variableSize.x[currentCharacter] ?? charWidth;
+            const currentVariableSizeDifference = charWidth - currentVariableSize;
+            const newVariableSize = newSize - currentVariableSizeDifference;
 
-        setCharSize({
-            x: newSize / CHAR_PIXEL_SIZE,
-            y: charHeight / CHAR_PIXEL_SIZE
-        }, {
-            ...variableSize,
-            x: updatedVariableSizeX
-        });
+            const updatedVariableSizeX = [...variableSize.x];
+            updatedVariableSizeX[currentCharacter] = newVariableSize;
+
+            updatedVariableSize = {
+                ...variableSize,
+                x: updatedVariableSizeX
+            };
+        }
+
+        setCharSize(
+            {
+                x: newSize / CHAR_PIXEL_SIZE,
+                y: charHeight / CHAR_PIXEL_SIZE
+            },
+            updatedVariableSize
+        );
     };
 
     const onChangePixelHeight = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const currentVariableSize = variableSize.y;
         const newSize = parseInt(e.target.value);
-        const currentVariableSizeDifference = charHeight - currentVariableSize;
-        const newVariableSize = newSize - currentVariableSizeDifference;
 
-        setCharSize({
-            x: charWidth / CHAR_PIXEL_SIZE,
-            y: newSize / CHAR_PIXEL_SIZE
-        }, {
-            ...variableSize,
-            y: newVariableSize
-        });
+        let updatedVariableSize;
+        if (variableSize.enabled) {
+            const currentVariableSize = variableSize.y;
+            const currentVariableSizeDifference = charHeight - currentVariableSize;
+            const newVariableSize = newSize - currentVariableSizeDifference;
+            updatedVariableSize = {
+                ...variableSize,
+                y: newVariableSize
+            };
+        }
+
+        setCharSize(
+            {
+                x: charWidth / CHAR_PIXEL_SIZE,
+                y: newSize / CHAR_PIXEL_SIZE
+            },
+            updatedVariableSize
+        );
     };
 
     return <HContainer gap={20}>
@@ -131,6 +147,7 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
                 />
             </HContainer>
         </VContainer>
+        {/*
         <VContainer grow={1}>
             <label>
                 {nls.localize('vuengine/fontEditor/type', 'Type')}
@@ -158,6 +175,7 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
                 )}
             />
         </VContainer>
+        */}
         <VContainer grow={1}>
             <label>
                 {nls.localize('vuengine/fontEditor/grid', 'Grid')}
