@@ -81,7 +81,7 @@ export default function Physics(): React.JSX.Element {
         });
     };
 
-    return <VContainer gap={10}>
+    return <VContainer gap={15}>
         <VContainer>
             <label>
                 {nls.localize('vuengine/entityEditor/enabled', 'Enabled')}
@@ -93,81 +93,90 @@ export default function Physics(): React.JSX.Element {
             />
         </VContainer>
         {data.physics.enabled && <>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/entityEditor/mass', 'Mass')}
-                </label>
-                <input
-                    className='theia-input'
-                    type='number'
-                    step="0.1"
-                    value={data.physics.mass}
-                    onChange={e => setMass(parseFloat(e.target.value))}
-                />
-            </VContainer>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/entityEditor/friction', 'Friction')}
-                </label>
-                <input
-                    className='theia-input'
-                    type='number'
-                    step="0.1"
-                    value={data.physics.friction}
-                    onChange={e => setFriction(parseFloat(e.target.value))}
-                />
-            </VContainer>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/entityEditor/bounciness', 'Bounciness')}
-                </label>
-                <input
-                    className='theia-input'
-                    type='number'
-                    step="0.1"
-                    value={data.physics.bounciness}
-                    onChange={e => setBounciness(parseFloat(e.target.value))}
-                />
-            </VContainer>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/entityEditor/maximumSpeed', 'Maximum Speed')}
-                </label>
-                <input
-                    className='theia-input'
-                    type='number'
-                    value={data.physics.maximumSpeed}
-                    onChange={e => setMaximumSpeed(parseInt(e.target.value))}
-                />
-            </VContainer>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/entityEditor/maximumVelocity', 'Maximum Velocity (X, Y, Z)')}
-                </label>
-                <HContainer gap={10}>
+            <HContainer gap={15} wrap='wrap'>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/mass', 'Mass')}
+                    </label>
                     <input
                         className='theia-input'
+                        style={{ width: 48 }}
                         type='number'
-                        value={data.physics.maximumVelocity.x}
-                        onChange={e => setMaximumVelocityX(parseInt(e.target.value))}
-                        min={0}
+                        step="0.1"
+                        value={data.physics.mass}
+                        onChange={e => setMass(parseFloat(e.target.value))}
                     />
+                </VContainer>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/friction', 'Friction')}
+                    </label>
                     <input
                         className='theia-input'
+                        style={{ width: 48 }}
                         type='number'
-                        value={data.physics.maximumVelocity.y}
-                        onChange={e => setMaximumVelocityY(parseInt(e.target.value))}
-                        min={0}
+                        step="0.1"
+                        value={data.physics.friction}
+                        onChange={e => setFriction(parseFloat(e.target.value))}
                     />
+                </VContainer>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/bounciness', 'Bounciness')}
+                    </label>
                     <input
                         className='theia-input'
+                        style={{ width: 48 }}
                         type='number'
-                        value={data.physics.maximumVelocity.z}
-                        onChange={e => setMaximumVelocityZ(parseInt(e.target.value))}
-                        min={0}
+                        step="0.1"
+                        value={data.physics.bounciness}
+                        onChange={e => setBounciness(parseFloat(e.target.value))}
                     />
-                </HContainer>
-            </VContainer>
+                </VContainer>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/maximumVelocity', 'Maximum Velocity (X, Y, Z)')}
+                    </label>
+                    <HContainer>
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            value={data.physics.maximumVelocity.x}
+                            onChange={e => setMaximumVelocityX(parseInt(e.target.value))}
+                            min={0}
+                        />
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            value={data.physics.maximumVelocity.y}
+                            onChange={e => setMaximumVelocityY(parseInt(e.target.value))}
+                            min={0}
+                        />
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            value={data.physics.maximumVelocity.z}
+                            onChange={e => setMaximumVelocityZ(parseInt(e.target.value))}
+                            min={0}
+                        />
+                    </HContainer>
+                </VContainer>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/maximumSpeed', 'Maximum Speed')}
+                    </label>
+                    <input
+                        className='theia-input'
+                        style={{ width: 48 }}
+                        type='number'
+                        value={data.physics.maximumSpeed}
+                        onChange={e => setMaximumSpeed(parseInt(e.target.value))}
+                    />
+                </VContainer>
+            </HContainer>
         </>}
     </VContainer>;
 }

@@ -31,7 +31,7 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
     });
 
   return (
-    <VContainer gap={10}>
+    <VContainer gap={15}>
       <div className="preview-container">
         <Sprite
           animate={state.preview.animations && data.animations?.animations?.length > 0}

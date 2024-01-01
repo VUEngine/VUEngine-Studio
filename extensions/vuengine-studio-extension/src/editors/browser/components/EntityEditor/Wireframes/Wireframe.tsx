@@ -194,8 +194,8 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
         >
             <i className='codicon codicon-x' />
         </button>
-        <VContainer gap={10}>
-            <HContainer alignItems='start' gap={10} grow={1} wrap='wrap'>
+        <VContainer gap={15}>
+            <HContainer alignItems='start' gap={15} grow={1} wrap='wrap'>
                 <VContainer>
                     <label>
                         {nls.localize('vuengine/entityEditor/type', 'Type')}
@@ -313,7 +313,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                 </VContainer>
             }
             {wireframe.wireframe.type === WireframeType.Sphere &&
-                <HContainer gap={10}>
+                <HContainer gap={15}>
                     <VContainer>
                         <label>
                             {nls.localize('vuengine/entityEditor/radius', 'Radius')}

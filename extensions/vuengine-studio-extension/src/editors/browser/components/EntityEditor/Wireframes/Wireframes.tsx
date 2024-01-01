@@ -33,7 +33,7 @@ export default function Wireframes(): React.JSX.Element {
         setData({ wireframes: updatedWireframes });
     };
 
-    return <VContainer gap={10}>
+    return <VContainer>
         <label>
             {nls.localize('vuengine/entityEditor/wireframes', 'Wireframes')} ({data.wireframes.wireframes.length})
         </label>

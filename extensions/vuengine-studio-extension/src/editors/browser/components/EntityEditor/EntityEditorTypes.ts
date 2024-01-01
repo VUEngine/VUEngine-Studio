@@ -1,6 +1,7 @@
 import React from 'react';
 import { ConversionResult, ImageCompressionType } from '../../../../images/browser/ves-images-types';
 import { DataSection } from '../Common/CommonTypes';
+import { EntityEditorSaveDataOptions } from './EntityEditor';
 
 // @ts-ignore
 export const EntityEditorContext = React.createContext<EntityEditorContextType>({});
@@ -9,13 +10,15 @@ export interface EntityEditorContextType {
     state: EntityEditorState
     setState: (state: Partial<EntityEditorState>) => void
     data: EntityData
-    setData: (partialData: Partial<EntityData>) => void
+    setData: (partialData: Partial<EntityData>, options?: EntityEditorSaveDataOptions) => void
 }
 
 export const EntityEditorLayoutStorageName = 'ves-editors-entityEditor-layout';
 
 export const MIN_TEXTURE_PADDING = 0;
 export const MAX_TEXTURE_PADDING = 255;
+export const MIN_ANIMATION_CYLCES = 0;
+export const MAX_ANIMATION_CYLCES = 255;
 // TODO: compute min, max values from engineConfig.math.fixedPointPrecision
 // step would be PIXELS_TO_METERS(1), depending on fixedPointPrecision
 export const MIN_WIREFRAME_DISPLACEMENT = -511;
@@ -97,9 +100,12 @@ export interface WireframeData {
     drawCenter: boolean // only WireframeType.Sphere
 }
 
-export interface Animation {
+export interface AnimationData {
     name: string
-    // ...
+    cycles: number
+    callback: string
+    loop: boolean
+    frames: number[]
 }
 
 export interface ColliderData {
@@ -177,8 +183,11 @@ export interface EntityData {
         z: number
     }
     animations: {
-        default: string
-        animations: Animation[]
+        enabled: boolean
+        default: number
+        totalFrames: number
+        multiframe: boolean
+        animations: AnimationData[]
     }
     colliders: {
         inGameType: string

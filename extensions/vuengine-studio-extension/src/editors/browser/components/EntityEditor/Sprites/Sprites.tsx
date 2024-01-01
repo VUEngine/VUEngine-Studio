@@ -17,6 +17,27 @@ interface SpritesProps {
 export default function Sprites(props: SpritesProps): React.JSX.Element {
     const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
     const { fileUri, services } = props;
+    const mostFilesOnASprite = Math.max(...data.sprites.sprites.map(s => s.texture.files.length));
+    const isMultiImageAnimation = mostFilesOnASprite > 1;
+
+    const getCharCount = (): number => {
+        let totalChars = 0;
+        data.sprites?.sprites?.map(s => {
+            if (s._imageData !== undefined && typeof s._imageData !== 'number') {
+                if (s._imageData.animation?.largestFrame) {
+                    totalChars += s._imageData.animation?.largestFrame;
+                } else {
+                    if (s._imageData.tiles?.count) {
+                        totalChars += data.animations?.enabled
+                            ? s._imageData.tiles?.count / data.animations?.totalFrames || 1
+                            : s._imageData.tiles?.count;
+                    }
+                }
+            }
+        });
+
+        return totalChars;
+    };
 
     const setType = (type: SpriteType): void => {
         setData({
@@ -27,6 +48,7 @@ export default function Sprites(props: SpritesProps): React.JSX.Element {
         });
     };
 
+    /*
     const setCustomClass = (customClass: string): void => {
         setData({
             sprites: {
@@ -35,6 +57,7 @@ export default function Sprites(props: SpritesProps): React.JSX.Element {
             }
         });
     };
+    */
 
     const setSection = (section: DataSection) => {
         setData({
@@ -51,6 +74,8 @@ export default function Sprites(props: SpritesProps): React.JSX.Element {
                 ...data.sprites,
                 compression,
             }
+        }, {
+            appendImageData: true,
         });
     };
 
@@ -69,6 +94,8 @@ export default function Sprites(props: SpritesProps): React.JSX.Element {
                 ...data.sprites,
                 optimizedTiles: !data.sprites.optimizedTiles,
             }
+        }, {
+            appendImageData: true,
         });
     };
 
@@ -78,8 +105,23 @@ export default function Sprites(props: SpritesProps): React.JSX.Element {
                 ...data.sprites,
                 sharedTiles: !data.sprites.sharedTiles,
             }
+        }, {
+            appendImageData: true,
         });
     };
+
+    const setAnimationFrames = (frames: number): void => {
+        setData({
+            animations: {
+                ...data.animations,
+                totalFrames: frames,
+            }
+        }, {
+            appendImageData: true
+        });
+    };
+
+    const charCount = getCharCount();
 
     const addSprite = (): void => {
         const updatedSprites = { ...data.sprites };
@@ -117,8 +159,41 @@ export default function Sprites(props: SpritesProps): React.JSX.Element {
         });
     };
 
-    return <VContainer gap={20}>
-        <HContainer alignItems='start' gap={10} wrap='wrap'>
+    const toggleAnimated = (): void => {
+        setData({
+            animations: {
+                ...data.animations,
+                enabled: !data.animations.enabled,
+            }
+        }, {
+            appendImageData: true
+        });
+    };
+
+    const toggleMultiframe = (): void => {
+        setData({
+            animations: {
+                ...data.animations,
+                multiframe: !data.animations.multiframe,
+            }
+        }, {
+            appendImageData: true
+        });
+    };
+
+    return <VContainer gap={15}>
+        <HContainer alignItems='start' gap={15} wrap='wrap'>
+            <VContainer>
+                <label>
+                    {nls.localize('vuengine/entityEditor/chars', 'Chars')}
+                </label>
+                <input
+                    className={`theia-input heavyness ${charCount > 1200 ? 'heavynessHeavy' : charCount > 600 ? 'heavynessMedium' : 'heavynessLight'}`}
+                    type='text'
+                    value={charCount}
+                    disabled
+                />
+            </VContainer>
             <VContainer>
                 <label>
                     {nls.localize('vuengine/entityEditor/spriteType', 'Type')}
@@ -135,6 +210,67 @@ export default function Sprites(props: SpritesProps): React.JSX.Element {
             </VContainer>
             <VContainer>
                 <label>
+                    {nls.localize('vuengine/entityEditor/animated', 'Animated')}
+                </label>
+                <input
+                    type="checkbox"
+                    checked={data.animations.enabled}
+                    onChange={toggleAnimated}
+                />
+            </VContainer>
+            {data.animations.enabled && <>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/frames', 'Frames')}
+                    </label>
+                    {/* TODO: determine max frames from engine config */}
+                    <input
+                        className='theia-input'
+                        style={{ width: 48 }}
+                        type='number'
+                        min={0}
+                        max={128}
+                        disabled={isMultiImageAnimation}
+                        value={isMultiImageAnimation ? mostFilesOnASprite : data.animations.totalFrames}
+                        onChange={e => setAnimationFrames(parseInt(e.target.value))}
+                    />
+                </VContainer>
+                {!isMultiImageAnimation && <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/multiframe', 'Multiframe')}
+                    </label>
+                    <input
+                        type="checkbox"
+                        checked={data.animations.multiframe}
+                        onChange={toggleMultiframe}
+                    />
+                </VContainer>}
+            </>}
+            {/* these setting are implicitly handled for animations */}
+            {!data.animations.enabled && <VContainer>
+                <label>
+                    {nls.localize('vuengine/entityEditor/tiles', 'Tiles')}
+                </label>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={data.sprites.optimizedTiles}
+                        onChange={toggleOptimizedTiles}
+                    />
+                    {nls.localize('vuengine/entityEditor/optimized', 'Optimized')}
+                </label>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={data.sprites.sharedTiles}
+                        onChange={toggleSharedTiles}
+                    />
+                    {nls.localize('vuengine/entityEditor/shared', 'Shared')}
+                </label>
+            </VContainer>}
+            {/*
+            <VContainer>
+                <label>
                     {nls.localize('vuengine/entityEditor/customClass', 'Custom Class')}
                 </label>
                 <input
@@ -142,6 +278,25 @@ export default function Sprites(props: SpritesProps): React.JSX.Element {
                     type='string'
                     value={data.sprites.customClass}
                     onChange={e => setCustomClass(e.target.value)}
+                />
+            </VContainer>
+            */}
+            <VContainer>
+                <label>
+                    {nls.localize('vuengine/entityEditor/compression', 'Compression')}
+                </label>
+                <SelectComponent
+                    defaultValue={data.sprites.compression}
+                    options={[{
+                        label: nls.localize('vuengine/entityEditor/compression/none', 'None'),
+                        value: ImageCompressionType.NONE,
+                        description: nls.localize('vuengine/entityEditor/compression/offDescription', 'Do not compress image data'),
+                    }, {
+                        label: nls.localize('vuengine/entityEditor/compression/rle', 'RLE'),
+                        value: ImageCompressionType.RLE,
+                        description: nls.localize('vuengine/entityEditor/compression/rleDescription', 'Compress image data with RLE'),
+                    }]}
+                    onChange={option => setTilesCompression(option.value as ImageCompressionType)}
                 />
             </VContainer>
             <VContainer>
@@ -164,45 +319,6 @@ export default function Sprites(props: SpritesProps): React.JSX.Element {
             </VContainer>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/entityEditor/compression', 'Compression')}
-                </label>
-                <SelectComponent
-                    defaultValue={data.sprites.compression}
-                    options={[{
-                        label: nls.localize('vuengine/entityEditor/compression/none', 'None'),
-                        value: ImageCompressionType.NONE,
-                        description: nls.localize('vuengine/entityEditor/compression/offDescription', 'Do not compress image data'),
-                    }, {
-                        label: nls.localize('vuengine/entityEditor/compression/rle', 'RLE'),
-                        value: ImageCompressionType.RLE,
-                        description: nls.localize('vuengine/entityEditor/compression/rleDescription', 'Compress image data with RLE'),
-                    }]}
-                    onChange={option => setTilesCompression(option.value as ImageCompressionType)}
-                />
-            </VContainer>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/entityEditor/tiles', 'Tiles')}
-                </label>
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={data.sprites.sharedTiles}
-                        onChange={toggleSharedTiles}
-                    />
-                    {nls.localize('vuengine/entityEditor/shared', 'Shared')}
-                </label>
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={data.sprites.optimizedTiles}
-                        onChange={toggleOptimizedTiles}
-                    />
-                    {nls.localize('vuengine/entityEditor/optimized', 'Optimized')}
-                </label>
-            </VContainer>
-            <VContainer>
-                <label>
                     {nls.localize('vuengine/entityEditor/projection', 'Projection')}
                 </label>
                 <label>
@@ -219,7 +335,7 @@ export default function Sprites(props: SpritesProps): React.JSX.Element {
             <label>
                 {nls.localize('vuengine/entityEditor/xSprites', 'Sprites ({0})', data.sprites.sprites.length)}
             </label>
-            {data.sprites.sprites.length && data.sprites.sprites.map((s, i) =>
+            {data.sprites.sprites.length > 0 && data.sprites.sprites.map((s, i) =>
                 <Sprite
                     key={`sprite-${i}`}
                     index={i}

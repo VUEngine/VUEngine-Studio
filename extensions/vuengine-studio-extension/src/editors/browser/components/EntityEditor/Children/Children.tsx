@@ -7,7 +7,7 @@ interface ChildrenProps {
 export default function Children(props: ChildrenProps): React.JSX.Element {
     // const { pattern, currentNote } = props;
 
-    return <VContainer gap={10}>
+    return <VContainer gap={15}>
         [To be implemented]
     </VContainer>;
 }

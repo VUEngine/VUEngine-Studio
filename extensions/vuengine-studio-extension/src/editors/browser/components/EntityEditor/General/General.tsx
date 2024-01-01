@@ -38,7 +38,7 @@ export default function General(): React.JSX.Element {
         });
     };
 
-    return <VContainer gap={10}>
+    return <VContainer gap={15}>
         <VContainer>
             <label>Name</label>
             <input
@@ -60,7 +60,7 @@ export default function General(): React.JSX.Element {
             <div>
                 Size of entity in pixels. Used by streaming to test if out of screen bounds. If 0, width and height will be inferred from the first sprite's texture's size.
             </div>
-            <HContainer gap={10}>
+            <HContainer gap={15}>
                 <input
                     className='theia-input'
                     type='number'

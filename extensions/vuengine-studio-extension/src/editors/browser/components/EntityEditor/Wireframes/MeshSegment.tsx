@@ -85,7 +85,7 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
         });
     };
 
-    return <div className="item">
+    return <HContainer className="item" gap={15} grow={1} wrap='wrap'>
         <button
             className="remove-button"
             onClick={removeSegment}
@@ -93,73 +93,71 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
         >
             <i className='codicon codicon-x' />
         </button>
-        <HContainer gap={10} grow={1} wrap='wrap'>
-            <VContainer>
-                <label>From (X, Y, Z, Parallax)</label>
-                <HContainer>
-                    <input
-                        className='theia-input'
-                        style={{ width: 48 }}
-                        type='number'
-                        value={segment.fromVertex.x}
-                        onChange={e => setFromX(parseFloat(e.target.value))}
-                    />
-                    <input
-                        className='theia-input'
-                        style={{ width: 48 }}
-                        type='number'
-                        value={segment.fromVertex.y}
-                        onChange={e => setFromY(parseFloat(e.target.value))}
-                    />
-                    <input
-                        className='theia-input'
-                        style={{ width: 48 }}
-                        type='number'
-                        value={segment.fromVertex.z}
-                        onChange={e => setFromZ(parseFloat(e.target.value))}
-                    />
-                    <input
-                        className='theia-input'
-                        style={{ width: 48 }}
-                        type='number'
-                        value={segment.fromVertex.parallax}
-                        onChange={e => setFromParallax(parseFloat(e.target.value))}
-                    />
-                </HContainer>
-            </VContainer>
-            <VContainer>
-                <label>To (X, Y, Z, Parallax)</label>
-                <HContainer>
-                    <input
-                        className='theia-input'
-                        style={{ width: 48 }}
-                        type='number'
-                        value={segment.toVertex.x}
-                        onChange={e => setToX(parseFloat(e.target.value))}
-                    />
-                    <input
-                        className='theia-input'
-                        style={{ width: 48 }}
-                        type='number'
-                        value={segment.toVertex.y}
-                        onChange={e => setToY(parseFloat(e.target.value))}
-                    />
-                    <input
-                        className='theia-input'
-                        style={{ width: 48 }}
-                        type='number'
-                        value={segment.toVertex.z}
-                        onChange={e => setToZ(parseFloat(e.target.value))}
-                    />
-                    <input
-                        className='theia-input'
-                        style={{ width: 48 }}
-                        type='number'
-                        value={segment.toVertex.parallax}
-                        onChange={e => setToParallax(parseFloat(e.target.value))}
-                    />
-                </HContainer>
-            </VContainer>
-        </HContainer>
-    </div>;
+        <VContainer>
+            <label>From (X, Y, Z, Parallax)</label>
+            <HContainer>
+                <input
+                    className='theia-input'
+                    style={{ width: 48 }}
+                    type='number'
+                    value={segment.fromVertex.x}
+                    onChange={e => setFromX(parseFloat(e.target.value))}
+                />
+                <input
+                    className='theia-input'
+                    style={{ width: 48 }}
+                    type='number'
+                    value={segment.fromVertex.y}
+                    onChange={e => setFromY(parseFloat(e.target.value))}
+                />
+                <input
+                    className='theia-input'
+                    style={{ width: 48 }}
+                    type='number'
+                    value={segment.fromVertex.z}
+                    onChange={e => setFromZ(parseFloat(e.target.value))}
+                />
+                <input
+                    className='theia-input'
+                    style={{ width: 48 }}
+                    type='number'
+                    value={segment.fromVertex.parallax}
+                    onChange={e => setFromParallax(parseFloat(e.target.value))}
+                />
+            </HContainer>
+        </VContainer>
+        <VContainer>
+            <label>To (X, Y, Z, Parallax)</label>
+            <HContainer>
+                <input
+                    className='theia-input'
+                    style={{ width: 48 }}
+                    type='number'
+                    value={segment.toVertex.x}
+                    onChange={e => setToX(parseFloat(e.target.value))}
+                />
+                <input
+                    className='theia-input'
+                    style={{ width: 48 }}
+                    type='number'
+                    value={segment.toVertex.y}
+                    onChange={e => setToY(parseFloat(e.target.value))}
+                />
+                <input
+                    className='theia-input'
+                    style={{ width: 48 }}
+                    type='number'
+                    value={segment.toVertex.z}
+                    onChange={e => setToZ(parseFloat(e.target.value))}
+                />
+                <input
+                    className='theia-input'
+                    style={{ width: 48 }}
+                    type='number'
+                    value={segment.toVertex.parallax}
+                    onChange={e => setToParallax(parseFloat(e.target.value))}
+                />
+            </HContainer>
+        </VContainer>
+    </HContainer>;
 }

@@ -27,6 +27,10 @@ interface EntityEditorProps {
   services: EditorsServices
 }
 
+export interface EntityEditorSaveDataOptions {
+  appendImageData?: boolean
+}
+
 export default class EntityEditor extends React.Component<
   EntityEditorProps,
   EntityEditorState
@@ -53,39 +57,43 @@ export default class EntityEditor extends React.Component<
     this.dockLayoutRef = r;
   };
 
-  protected async setData(entityData: Partial<EntityData>): Promise<void> {
-    const updatedData = { ...this.props.data, ...entityData };
-
-    this.props.updateData(
-      (await this.appendImageData(updatedData))
-    );
+  protected async setData(entityData: Partial<EntityData>, options?: EntityEditorSaveDataOptions): Promise<void> {
+    let updatedData = { ...this.props.data, ...entityData };
+    if (options?.appendImageData) {
+      updatedData = await this.appendImageData(updatedData);
+    }
+    this.props.updateData(updatedData);
   }
 
   protected async appendImageData(entityData: EntityData): Promise<EntityData> {
+    const mostFilesOnASprite = Math.max(...this.props.data.sprites.sprites.map(s => s.texture.files.length));
+    const isMultiImageAnimation = this.props.data.animations.enabled && mostFilesOnASprite > 1;
+    const optimizeTiles = (!this.props.data.animations.enabled && entityData.sprites.optimizedTiles)
+      || (this.props.data.animations.enabled && isMultiImageAnimation);
     const baseConfig = {
       animation: {
-        frames: 0,
-        individualFiles: false,
-        isAnimation: false
+        frames: isMultiImageAnimation ? mostFilesOnASprite : this.props.data.animations.totalFrames,
+        individualFiles: isMultiImageAnimation,
+        isAnimation: this.props.data.animations.enabled
       },
       files: [],
       map: {
         compression: entityData.sprites.compression,
         generate: true,
         reduce: {
-          flipped: entityData.sprites.optimizedTiles,
-          unique: entityData.sprites.optimizedTiles
+          flipped: optimizeTiles,
+          unique: optimizeTiles,
         }
       },
       name: this.props.services.vesCommonService.cleanSpecName(entityData.name),
       section: entityData.sprites.section,
       tileset: {
         compression: entityData.sprites.compression,
-        shared: entityData.sprites.sharedTiles,
+        shared: !this.props.data.animations.enabled && entityData.sprites.sharedTiles,
       }
     };
 
-    if (entityData.sprites?.sharedTiles) {
+    if (!this.props.data.animations.enabled && entityData.sprites?.sharedTiles) {
       const files: string[] = [];
       // keep track of added files to be able to map back maps later
       const spriteFilesIndex: { [key: string]: number } = {};

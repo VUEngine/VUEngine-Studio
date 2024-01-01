@@ -32,6 +32,29 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
         }
     };
 
+    const getHeavyness = (): number => {
+        let total = 0;
+
+        switch (collider.type) {
+            case ColliderType.Ball:
+                total += 1;
+                break;
+            case ColliderType.LineField:
+                total += 2;
+                break;
+            case ColliderType.Box:
+            case ColliderType.InverseBox:
+                total += 3;
+                break;
+        }
+
+        if (collider.checkForCollisions) {
+            total += 2;
+        }
+
+        return total;
+    };
+
     const setCollider = (partialColliderData: Partial<ColliderData>): void => {
         const updatedCollidersArray = [...data.colliders.colliders];
         updatedCollidersArray[index] = {
@@ -174,6 +197,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
         });
     };
 
+    const heavyness = getHeavyness();
+
     return <div className='item'>
         <button
             className="remove-button"
@@ -182,8 +207,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
         >
             <i className='codicon codicon-x' />
         </button>
-        <VContainer gap={10}>
-            <HContainer gap={10} grow={1} wrap='wrap'>
+        <VContainer gap={15}>
+            <HContainer gap={15} grow={1} wrap='wrap'>
                 <VContainer>
                     <label>
                         {nls.localize('vuengine/entityEditor/type', 'Type')}
@@ -212,8 +237,19 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                         [To Be Implemented]
                     </HContainer>
                 </VContainer>
+                <VContainer>
+                    <label>Heaviness</label>
+                    <HContainer>
+                        <input
+                            className={`theia-input heavyness ${heavyness > 4 ? 'heavynessHeavy' : heavyness > 2 ? 'heavynessMedium' : 'heavynessLight'}`}
+                            type='text'
+                            value={`${heavyness} / 5`}
+                            disabled
+                        />
+                    </HContainer>
+                </VContainer>
             </HContainer>
-            <HContainer gap={10} wrap='wrap'>
+            <HContainer gap={15} wrap='wrap'>
                 <VContainer>
                     <label>Displacement (X, Y, Z, Parallax)</label>
                     <HContainer>
@@ -326,7 +362,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     </HContainer>
                 </VContainer>
             </HContainer>
-            <HContainer gap={10} wrap='wrap'>
+            <HContainer gap={15} wrap='wrap'>
                 <VContainer>
                     <label>
                         {nls.localize('vuengine/entityEditor/checkForCollisions', 'Check For Collisions')}

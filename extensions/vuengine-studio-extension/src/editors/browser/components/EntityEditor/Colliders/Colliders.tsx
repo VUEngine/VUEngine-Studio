@@ -95,7 +95,7 @@ export default function Colliders(props: CollidersProps): React.JSX.Element {
         setData({ colliders });
     };
 
-    return <VContainer gap={20}>
+    return <VContainer gap={15}>
         <HContainer alignItems='end' gap={20}>
             <VContainer grow={1}>
                 <label>
@@ -115,7 +115,7 @@ export default function Colliders(props: CollidersProps): React.JSX.Element {
                 <i className='codicon codicon-settings-gear' />
             </button>
         </HContainer>
-        {data.colliders.inGameType !== 'None' && <VContainer gap={10}>
+        {data.colliders.inGameType !== 'None' && <VContainer>
             <label>
                 {nls.localize('vuengine/entityEditor/colliders', 'Colliders')} ({data.colliders.colliders.length})
             </label>

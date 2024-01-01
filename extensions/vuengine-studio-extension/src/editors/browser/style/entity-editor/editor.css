@@ -19,9 +19,10 @@
 }
 
 .entityEditor .item {
-    align-items: center;
     border: var(--theia-border-width) solid var(--theia-dropdown-border);
     border-radius: 2px;
+    max-height: 500px;
+    overflow: hidden;
     padding: calc(2 * var(--theia-ui-padding));
     position: relative;
 }
@@ -36,6 +37,7 @@
     border-bottom-left-radius: 2px;
     color: var(--theia-dropdown-border);
     cursor: pointer;
+    display: none;
     height: 32px;
     outline: none;
     position: absolute;
@@ -43,7 +45,11 @@
     top: 0;
     width: 32px;
 }
-.entityEditor .item .remove-button:hover {
+.entityEditor .item:hover .remove-button {
+    color: var(--theia-button-hoverBackground);
+    display: block;
+}
+.entityEditor .item:hover .remove-button:hover {
     background-color: var(--theia-button-hoverBackground);
     color: var(--theia-button-foreground);
 }
@@ -62,4 +68,19 @@
 .entityEditor .add-button:hover {
     color: var(--theia-button-foreground);
     border-color: var(--theia-button-hoverBackground);
+}
+
+.entityEditor .theia-input.heavyness {
+    padding-left: 0;
+    text-align: center;
+    width: 48px;
+}
+.entityEditor .theia-input.heavynessLight {
+    border-color: var(--theia-editorSuccess-foreground);
+}
+.entityEditor .theia-input.heavynessMedium {
+    border-color: var(--theia-editorWarning-foreground);
+}
+.entityEditor .theia-input.heavynessHeavy {
+    border-color: var(--theia-editorError-foreground);
 }
