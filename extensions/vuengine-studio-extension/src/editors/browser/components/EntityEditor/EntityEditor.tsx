@@ -1,6 +1,7 @@
 import { URI, nls } from '@theia/core';
 import DockLayout, { LayoutBase, LayoutData } from 'rc-dock';
 import React from 'react';
+import { ConversionResult } from '../../../../images/browser/ves-images-types';
 import { EditorsDockInterface, EditorsServices } from '../../ves-editors-widget';
 import Animations from './Animations/Animations';
 import Behaviors from './Behaviors/Behaviors';
@@ -52,8 +53,92 @@ export default class EntityEditor extends React.Component<
     this.dockLayoutRef = r;
   };
 
-  setData(entityData: Partial<EntityData>): void {
-    this.props.updateData({ ...this.props.data, ...entityData });
+  protected async setData(entityData: Partial<EntityData>): Promise<void> {
+    const updatedData = { ...this.props.data, ...entityData };
+
+    this.props.updateData(
+      (await this.appendImageData(updatedData))
+    );
+  }
+
+  protected async appendImageData(entityData: EntityData): Promise<EntityData> {
+    const baseConfig = {
+      animation: {
+        frames: 0,
+        individualFiles: false,
+        isAnimation: false
+      },
+      files: [],
+      map: {
+        compression: entityData.sprites.compression,
+        generate: true,
+        reduce: {
+          flipped: entityData.sprites.optimizedTiles,
+          unique: entityData.sprites.optimizedTiles
+        }
+      },
+      name: this.props.services.vesCommonService.cleanSpecName(entityData.name),
+      section: entityData.sprites.section,
+      tileset: {
+        compression: entityData.sprites.compression,
+        shared: entityData.sprites.sharedTiles,
+      }
+    };
+
+    if (entityData.sprites?.sharedTiles) {
+      const files: string[] = [];
+      // keep track of added files to be able to map back maps later
+      const spriteFilesIndex: { [key: string]: number } = {};
+      let mapCounter = 0;
+      entityData.sprites?.sprites?.map(s => {
+        if (s.texture?.files?.length) {
+          const file = s.texture.files[0];
+          if (!spriteFilesIndex[file]) {
+            files.push(file);
+            spriteFilesIndex[file] = mapCounter++;
+          }
+        }
+      });
+
+      const newImageData = await this.props.services.vesImagesService.convertImage(this.props.fileUri, {
+        ...baseConfig,
+        files,
+      });
+      // map imagedata back to sprites
+      entityData.sprites?.sprites?.map((sprite, index) => {
+        if (sprite.texture?.files?.length) {
+          sprite._imageData = {
+            tiles: (index === 0) ? newImageData.tiles : undefined,
+            maps: [newImageData.maps[spriteFilesIndex[sprite.texture.files[0]]]],
+            _dupeIndex: 1,
+          };
+        }
+      });
+    } else {
+      const convertedFilesMap: { [key: string]: ConversionResult & { _dupeIndex: number } } = {};
+      // for loop to handle sprites one after the other for dupe detection
+      for (let i = 0; i < entityData.sprites?.sprites?.length || 0; i++) {
+        const sprite = entityData.sprites?.sprites[i];
+        if (sprite.texture?.files?.length) {
+          // keep track of already converted files to avoid converting the same image twice
+          const checksum = require('crc-32').str(JSON.stringify(sprite.texture?.files || ''));
+          if (convertedFilesMap[checksum] !== undefined) {
+            sprite._imageData = convertedFilesMap[checksum]._dupeIndex;
+          } else {
+            const newImageData = await this.props.services.vesImagesService.convertImage(this.props.fileUri, {
+              ...baseConfig,
+              files: sprite.texture.files,
+            });
+            sprite._imageData = convertedFilesMap[checksum] = {
+              ...newImageData,
+              _dupeIndex: i + 1,
+            };
+          }
+        }
+      }
+    }
+
+    return entityData;
   }
 
   async componentDidMount(): Promise<void> {

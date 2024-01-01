@@ -1,5 +1,5 @@
 import React from 'react';
-import { ImageCompressionType } from '../../../../images/browser/ves-images-types';
+import { ConversionResult, ImageCompressionType } from '../../../../images/browser/ves-images-types';
 import { DataSection } from '../Common/CommonTypes';
 
 // @ts-ignore
@@ -154,6 +154,7 @@ export interface Sprite {
             vertical: boolean
         }
     }
+    _imageData?: Partial<ConversionResult & { _dupeIndex: number }> | number
 }
 
 export interface Sprites {

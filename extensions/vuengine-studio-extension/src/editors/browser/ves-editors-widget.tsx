@@ -16,6 +16,7 @@ import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { deepmerge } from 'deepmerge-ts';
 import DockLayout, { LayoutBase } from 'rc-dock';
 import { VesCommonService } from '../../core/browser/ves-common-service';
+import { VesImagesService } from '../../images/browser/ves-images-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { ProjectFile, ProjectFileType } from '../../project/browser/ves-project-types';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
@@ -47,6 +48,7 @@ export interface EditorsServices {
     openerService: OpenerService
     preferenceService: PreferenceService
     vesCommonService: VesCommonService
+    vesImagesService: VesImagesService
     vesProjectService: VesProjectService,
     vesRumblePackService: VesRumblePackService
     workspaceService: WorkspaceService
@@ -78,6 +80,8 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     protected readonly vesCommonService: VesCommonService;
     @inject(VesEditorsWidgetOptions)
     protected readonly options: VesEditorsWidgetOptions;
+    @inject(VesImagesService)
+    protected readonly vesImagesService: VesImagesService;
     @inject(VesProjectService)
     protected readonly vesProjectService: VesProjectService;
     @inject(VesRumblePackService)
@@ -476,6 +480,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
                                         openerService: this.openerService,
                                         preferenceService: this.preferenceService,
                                         vesCommonService: this.vesCommonService,
+                                        vesImagesService: this.vesImagesService,
                                         vesProjectService: this.vesProjectService,
                                         vesRumblePackService: this.vesRumblePackService,
                                         workspaceService: this.workspaceService,
