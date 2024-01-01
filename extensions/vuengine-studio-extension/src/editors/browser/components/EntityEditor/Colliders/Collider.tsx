@@ -175,45 +175,43 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
     };
 
     return <div className='item'>
+        <button
+            className="remove-button"
+            onClick={removeCollider}
+            title={nls.localize('vuengine/entityEditor/remove', 'Remove')}
+        >
+            <i className='codicon codicon-x' />
+        </button>
         <VContainer gap={10}>
-            <HContainer alignItems='start' gap={20}>
-                <HContainer gap={10} grow={1} wrap='wrap'>
-                    <VContainer>
-                        <label>
-                            {nls.localize('vuengine/entityEditor/type', 'Type')}
-                        </label>
-                        <SelectComponent
-                            options={[{
-                                value: ColliderType.Ball,
-                                label: nls.localize('vuengine/entityEditor/colliderTypeBall', 'Ball'),
-                            }, {
-                                value: ColliderType.Box,
-                                label: nls.localize('vuengine/entityEditor/colliderTypeBox', 'Box'),
-                            }, {
-                                value: ColliderType.InverseBox,
-                                label: nls.localize('vuengine/entityEditor/colliderTypeInverseBox', 'InverseBox'),
-                            }, {
-                                value: ColliderType.LineField,
-                                label: nls.localize('vuengine/entityEditor/colliderTypeLineField', 'LineField'),
-                            }]}
-                            defaultValue={collider.type}
-                            onChange={option => setType(option.value as ColliderType)}
-                        />
-                    </VContainer>
-                    <VContainer>
-                        <label>Collision Layers</label>
-                        <HContainer>
-                            [To Be Implemented]
-                        </HContainer>
-                    </VContainer>
-                </HContainer>
-                <button
-                    className="theia-button secondary remove-button"
-                    onClick={removeCollider}
-                    title={nls.localize('vuengine/entityEditor/remove', 'Remove')}
-                >
-                    <i className='fa fa-trash' />
-                </button>
+            <HContainer gap={10} grow={1} wrap='wrap'>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/type', 'Type')}
+                    </label>
+                    <SelectComponent
+                        options={[{
+                            value: ColliderType.Ball,
+                            label: nls.localize('vuengine/entityEditor/colliderTypeBall', 'Ball'),
+                        }, {
+                            value: ColliderType.Box,
+                            label: nls.localize('vuengine/entityEditor/colliderTypeBox', 'Box'),
+                        }, {
+                            value: ColliderType.InverseBox,
+                            label: nls.localize('vuengine/entityEditor/colliderTypeInverseBox', 'InverseBox'),
+                        }, {
+                            value: ColliderType.LineField,
+                            label: nls.localize('vuengine/entityEditor/colliderTypeLineField', 'LineField'),
+                        }]}
+                        defaultValue={collider.type}
+                        onChange={option => setType(option.value as ColliderType)}
+                    />
+                </VContainer>
+                <VContainer>
+                    <label>Collision Layers</label>
+                    <HContainer>
+                        [To Be Implemented]
+                    </HContainer>
+                </VContainer>
             </HContainer>
             <HContainer gap={10} wrap='wrap'>
                 <VContainer>

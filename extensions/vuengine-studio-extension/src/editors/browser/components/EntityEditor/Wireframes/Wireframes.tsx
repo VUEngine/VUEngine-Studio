@@ -45,11 +45,11 @@ export default function Wireframes(): React.JSX.Element {
             />
         )}
         <button
-            className='theia-button secondary full-width'
+            className='theia-button add-button full-width'
             onClick={addWireframe}
             title={nls.localize('vuengine/entityEditor/addWireframe', 'Add Wireframe')}
         >
-            <i className='fa fa-plus' />
+            <i className='codicon codicon-plus' />
         </button>
     </VContainer>;
 }

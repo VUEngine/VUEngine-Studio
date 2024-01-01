@@ -195,77 +195,75 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     };
 
     return <div className='item'>
+        <button
+            className="remove-button"
+            onClick={removeSprite}
+            title={nls.localize('vuengine/entityEditor/remove', 'Remove')}
+        >
+            <i className='codicon codicon-x' />
+        </button>
         <VContainer gap={10}>
-            <HContainer alignItems='start' gap={10}>
-                <HContainer gap={10} grow={1} wrap='wrap'>
-                    <VContainer>
-                        <label>
-                            {nls.localize('vuengine/entityEditor/padding', 'Padding (X, Y)')}
-                        </label>
-                        <HContainer>
-                            <input
-                                className='theia-input'
-                                style={{ width: 48 }}
-                                type='number'
-                                min={MIN_TEXTURE_PADDING}
-                                max={MAX_TEXTURE_PADDING}
-                                value={sprite.texture.padding.x}
-                                onChange={e => setPaddingX(parseInt(e.target.value))}
-                            />
-                            <input
-                                className='theia-input'
-                                style={{ width: 48 }}
-                                type='number'
-                                min={MIN_TEXTURE_PADDING}
-                                max={MAX_TEXTURE_PADDING}
-                                value={sprite.texture.padding.y}
-                                onChange={e => setPaddingY(parseInt(e.target.value))}
-                            />
-                        </HContainer>
-                    </VContainer>
-                    <VContainer>
-                        <label>
-                            {nls.localize('vuengine/entityEditor/displacement', 'Displacement (X, Y, Z, Parallax)')}
-                        </label>
-                        <HContainer>
-                            <input
-                                className='theia-input'
-                                style={{ width: 48 }}
-                                type='number'
-                                value={sprite.displacement.x}
-                                onChange={e => setDisplacementX(parseInt(e.target.value))}
-                            />
-                            <input
-                                className='theia-input'
-                                style={{ width: 48 }}
-                                type='number'
-                                value={sprite.displacement.y}
-                                onChange={e => setDisplacementY(parseInt(e.target.value))}
-                            />
-                            <input
-                                className='theia-input'
-                                style={{ width: 48 }}
-                                type='number'
-                                value={sprite.displacement.z}
-                                onChange={e => setDisplacementZ(parseInt(e.target.value))}
-                            />
-                            <input
-                                className='theia-input'
-                                style={{ width: 48 }}
-                                type='number'
-                                value={sprite.displacement.parallax}
-                                onChange={e => setDisplacementParallax(parseInt(e.target.value))}
-                            />
-                        </HContainer>
-                    </VContainer>
-                </HContainer>
-                <button
-                    className="theia-button secondary remove-button"
-                    onClick={removeSprite}
-                    title={nls.localize('vuengine/entityEditor/remove', 'Remove')}
-                >
-                    <i className='fa fa-trash' />
-                </button>
+            <HContainer gap={10} grow={1} wrap='wrap'>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/padding', 'Padding (X, Y)')}
+                    </label>
+                    <HContainer>
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            min={MIN_TEXTURE_PADDING}
+                            max={MAX_TEXTURE_PADDING}
+                            value={sprite.texture.padding.x}
+                            onChange={e => setPaddingX(parseInt(e.target.value))}
+                        />
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            min={MIN_TEXTURE_PADDING}
+                            max={MAX_TEXTURE_PADDING}
+                            value={sprite.texture.padding.y}
+                            onChange={e => setPaddingY(parseInt(e.target.value))}
+                        />
+                    </HContainer>
+                </VContainer>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/displacement', 'Displacement (X, Y, Z, Parallax)')}
+                    </label>
+                    <HContainer>
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            value={sprite.displacement.x}
+                            onChange={e => setDisplacementX(parseInt(e.target.value))}
+                        />
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            value={sprite.displacement.y}
+                            onChange={e => setDisplacementY(parseInt(e.target.value))}
+                        />
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            value={sprite.displacement.z}
+                            onChange={e => setDisplacementZ(parseInt(e.target.value))}
+                        />
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            value={sprite.displacement.parallax}
+                            onChange={e => setDisplacementParallax(parseInt(e.target.value))}
+                        />
+                    </HContainer>
+                </VContainer>
             </HContainer>
             <HContainer gap={10} wrap='wrap'>
                 <VContainer>

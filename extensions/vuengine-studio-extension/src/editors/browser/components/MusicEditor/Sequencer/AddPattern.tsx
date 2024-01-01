@@ -20,7 +20,7 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
         className={classNames.join(' ')}
         style={style}
     >
-        <i className='fa fa-plus' />
+        <i className='codicon codicon-plus' />
         <div className='patternSelect'>
             <button
                 className='newPattern'

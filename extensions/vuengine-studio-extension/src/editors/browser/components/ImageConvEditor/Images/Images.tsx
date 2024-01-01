@@ -136,7 +136,7 @@ export default function Images(props: ImagesProps): React.JSX.Element {
                     </div>
                     <div className='filePreviewActions'>
                         <i
-                            className="fa fa-trash"
+                            className="codicon codicon-x"
                             onClick={() => removeFile(f)}
                         />
                     </div>

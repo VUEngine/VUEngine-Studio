@@ -67,7 +67,7 @@ export default function TranslationsTable(props: TranslationsTableProps): React.
                         onClick={e => removeTranslation(s)}
                         title={nls.localize('vuengine/translationsEditor/deleteTranslation', 'Delete Translation')}
                     >
-                        <i className='fa fa-trash' />
+                        <i className='codicon codicon-x' />
                     </button>}
                 </div>
             </div>
@@ -76,7 +76,7 @@ export default function TranslationsTable(props: TranslationsTableProps): React.
             className='translationAdd'
             onClick={addTranslation}
         >
-            <i className='fa fa-plus' />
+            <i className='codicon codicon-plus' />
         </div>}
     </div>;
 }

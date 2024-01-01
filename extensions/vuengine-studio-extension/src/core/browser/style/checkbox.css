@@ -21,8 +21,8 @@
 }
 
 [type="checkbox"]::before {
-    background-color: var(--theia-input-background);
-    border: 1px solid var(--theia-input-background);
+    background-color: var(--theia-activityBar-background);
+    border: 1px solid var(--theia-activityBar-background);
     border-radius: 10px;
     content: '';
     cursor: pointer;

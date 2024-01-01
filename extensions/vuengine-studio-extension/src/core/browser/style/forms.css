@@ -12,3 +12,7 @@
     margin-left: unset;
     width: 100% !important;
 }
+
+.theia-button .codicon {
+    vertical-align: middle;
+}

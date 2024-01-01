@@ -67,7 +67,7 @@ export default function Instruments(): React.JSX.Element {
                     className='theia-button secondary'
                     onClick={addInstrument}
                 >
-                    <i className='fa fa-plus' />
+                    <i className='codicon codicon-plus' />
                 </button>
             </div>
         </VContainer>

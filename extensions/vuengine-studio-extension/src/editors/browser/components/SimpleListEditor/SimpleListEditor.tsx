@@ -57,7 +57,7 @@ export default function SimpleListEditor(props: SimpleListEditorProps): React.JS
                     onClick={() => removeItem(index)}
                     title={nls.localize('vuengine/simpleListEditor/removeItem', 'Remove Item')}
                 >
-                    <i className='fa fa-trash' />
+                    <i className='codicon codicon-x' />
                 </button>
             </HContainer>
         ) : <>
@@ -68,7 +68,7 @@ export default function SimpleListEditor(props: SimpleListEditorProps): React.JS
             onClick={addItem}
             title={nls.localize('vuengine/simpleListEditor/addItem', 'Add Item')}
         >
-            <i className='fa fa-plus' />
+            <i className='codicon codicon-plus' />
         </button>
     </VContainer>;
 }

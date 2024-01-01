@@ -187,110 +187,108 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
     };
 
     return <div className='item'>
+        <button
+            className="remove-button"
+            onClick={removeWireframe}
+            title={nls.localize('vuengine/entityEditor/remove', 'Remove')}
+        >
+            <i className='codicon codicon-x' />
+        </button>
         <VContainer gap={10}>
-            <HContainer alignItems='start' gap={20}>
-                <HContainer alignItems='start' gap={10} grow={1} wrap='wrap'>
-                    <VContainer>
-                        <label>
-                            {nls.localize('vuengine/entityEditor/type', 'Type')}
-                        </label>
-                        <SelectComponent
-                            options={[{
-                                value: WireframeType.Sphere,
-                                label: nls.localize('vuengine/entityEditor/wireframeTypeAffine', 'Sphere'),
-                            }, {
-                                value: WireframeType.Mesh,
-                                label: nls.localize('vuengine/entityEditor/wireframeTypeMesh', 'Mesh'),
-                            }, {
-                                value: WireframeType.Asterisk,
-                                label: nls.localize('vuengine/entityEditor/wireframeTypeAsterisk', 'Asterisk'),
-                            }]}
-                            defaultValue={wireframe.wireframe.type}
-                            onChange={option => setType(option.value as WireframeType)}
-                        />
-                    </VContainer>
-                    <VContainer>
-                        {nls.localize('vuengine/entityEditor/color', 'Color')}
-                        <ColorSelector
-                            color={wireframe.wireframe.color}
-                            updateColor={setColor}
-                        />
-                    </VContainer>
-                    <VContainer>
-                        <label>
-                            {nls.localize('vuengine/entityEditor/transparency', 'Transparency')}
-                        </label>
-                        <SelectComponent
-                            options={[{
-                                value: Transparency.None,
-                                label: nls.localize('vuengine/entityEditor/transparencyNone', 'None'),
-                                description: nls.localize('vuengine/entityEditor/transparencyNoneDescription', 'Display every frame'),
-                            }, {
-                                value: Transparency.Odd,
-                                label: nls.localize('vuengine/entityEditor/transparencyOdd', 'Odd'),
-                                description: nls.localize('vuengine/entityEditor/transparencyOddDescription', 'Display only every odd frame'),
-                            }, {
-                                value: Transparency.Even,
-                                label: nls.localize('vuengine/entityEditor/transparencyEven', 'Even'),
-                                description: nls.localize('vuengine/entityEditor/transparencyEvenDescription', 'Display only every even frame'),
-                            }]}
-                            defaultValue={wireframe.wireframe.transparency}
-                            onChange={option => setTransparency(option.value as Transparency)}
-                        />
-                    </VContainer>
-                    <VContainer>
-                        <label>
-                            {nls.localize('vuengine/entityEditor/interlaced', 'Interlaced')}
-                        </label>
+            <HContainer alignItems='start' gap={10} grow={1} wrap='wrap'>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/type', 'Type')}
+                    </label>
+                    <SelectComponent
+                        options={[{
+                            value: WireframeType.Sphere,
+                            label: nls.localize('vuengine/entityEditor/wireframeTypeAffine', 'Sphere'),
+                        }, {
+                            value: WireframeType.Mesh,
+                            label: nls.localize('vuengine/entityEditor/wireframeTypeMesh', 'Mesh'),
+                        }, {
+                            value: WireframeType.Asterisk,
+                            label: nls.localize('vuengine/entityEditor/wireframeTypeAsterisk', 'Asterisk'),
+                        }]}
+                        defaultValue={wireframe.wireframe.type}
+                        onChange={option => setType(option.value as WireframeType)}
+                    />
+                </VContainer>
+                <VContainer>
+                    {nls.localize('vuengine/entityEditor/color', 'Color')}
+                    <ColorSelector
+                        color={wireframe.wireframe.color}
+                        updateColor={setColor}
+                    />
+                </VContainer>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/transparency', 'Transparency')}
+                    </label>
+                    <SelectComponent
+                        options={[{
+                            value: Transparency.None,
+                            label: nls.localize('vuengine/entityEditor/transparencyNone', 'None'),
+                            description: nls.localize('vuengine/entityEditor/transparencyNoneDescription', 'Display every frame'),
+                        }, {
+                            value: Transparency.Odd,
+                            label: nls.localize('vuengine/entityEditor/transparencyOdd', 'Odd'),
+                            description: nls.localize('vuengine/entityEditor/transparencyOddDescription', 'Display only every odd frame'),
+                        }, {
+                            value: Transparency.Even,
+                            label: nls.localize('vuengine/entityEditor/transparencyEven', 'Even'),
+                            description: nls.localize('vuengine/entityEditor/transparencyEvenDescription', 'Display only every even frame'),
+                        }]}
+                        defaultValue={wireframe.wireframe.transparency}
+                        onChange={option => setTransparency(option.value as Transparency)}
+                    />
+                </VContainer>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/interlaced', 'Interlaced')}
+                    </label>
+                    <input
+                        type="checkbox"
+                        checked={wireframe.wireframe.interlaced}
+                        onChange={toggleInterlaced}
+                    />
+                </VContainer>
+                <VContainer>
+                    <label>Displacement (X, Y, Z)</label>
+                    <HContainer>
                         <input
-                            type="checkbox"
-                            checked={wireframe.wireframe.interlaced}
-                            onChange={toggleInterlaced}
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            min={MIN_WIREFRAME_DISPLACEMENT}
+                            max={MAX_WIREFRAME_DISPLACEMENT}
+                            step={STEP_WIREFRAME_DISPLACEMENT}
+                            value={wireframe.wireframe.displacement.x}
+                            onChange={e => setDisplacementX(parseFloat(e.target.value))}
                         />
-                    </VContainer>
-                    <VContainer>
-                        <label>Displacement (X, Y, Z)</label>
-                        <HContainer>
-                            <input
-                                className='theia-input'
-                                style={{ width: 48 }}
-                                type='number'
-                                min={MIN_WIREFRAME_DISPLACEMENT}
-                                max={MAX_WIREFRAME_DISPLACEMENT}
-                                step={STEP_WIREFRAME_DISPLACEMENT}
-                                value={wireframe.wireframe.displacement.x}
-                                onChange={e => setDisplacementX(parseFloat(e.target.value))}
-                            />
-                            <input
-                                className='theia-input'
-                                style={{ width: 48 }}
-                                type='number'
-                                min={MIN_WIREFRAME_DISPLACEMENT}
-                                max={MAX_WIREFRAME_DISPLACEMENT}
-                                step={STEP_WIREFRAME_DISPLACEMENT}
-                                value={wireframe.wireframe.displacement.y}
-                                onChange={e => setDisplacementY(parseFloat(e.target.value))}
-                            />
-                            <input
-                                className='theia-input'
-                                style={{ width: 48 }}
-                                type='number'
-                                min={MIN_WIREFRAME_DISPLACEMENT}
-                                max={MAX_WIREFRAME_DISPLACEMENT}
-                                step={STEP_WIREFRAME_DISPLACEMENT}
-                                value={wireframe.wireframe.displacement.z}
-                                onChange={e => setDisplacementZ(parseFloat(e.target.value))}
-                            />
-                        </HContainer>
-                    </VContainer>
-                </HContainer>
-                <button
-                    className="theia-button secondary remove-button"
-                    onClick={removeWireframe}
-                    title={nls.localize('vuengine/entityEditor/remove', 'Remove')}
-                >
-                    <i className='fa fa-trash' />
-                </button>
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            min={MIN_WIREFRAME_DISPLACEMENT}
+                            max={MAX_WIREFRAME_DISPLACEMENT}
+                            step={STEP_WIREFRAME_DISPLACEMENT}
+                            value={wireframe.wireframe.displacement.y}
+                            onChange={e => setDisplacementY(parseFloat(e.target.value))}
+                        />
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            min={MIN_WIREFRAME_DISPLACEMENT}
+                            max={MAX_WIREFRAME_DISPLACEMENT}
+                            step={STEP_WIREFRAME_DISPLACEMENT}
+                            value={wireframe.wireframe.displacement.z}
+                            onChange={e => setDisplacementZ(parseFloat(e.target.value))}
+                        />
+                    </HContainer>
+                </VContainer>
             </HContainer>
             {wireframe.wireframe.type === WireframeType.Mesh &&
                 <VContainer>
@@ -306,11 +304,11 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                         />
                     )}
                     <button
-                        className='theia-button secondary full-width'
+                        className='theia-button add-button full-width'
                         onClick={addSegment}
                         title={nls.localize('vuengine/entityEditor/addSegment', 'Add Segment')}
                     >
-                        <i className='fa fa-plus' />
+                        <i className='codicon codicon-plus' />
                     </button>
                 </VContainer>
             }

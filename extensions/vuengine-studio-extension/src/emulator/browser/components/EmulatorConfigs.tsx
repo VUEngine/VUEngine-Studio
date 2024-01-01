@@ -161,7 +161,7 @@ export default function EmulatorConfigs(props: EmulatorConfigsProps): React.JSX.
                             onClick={() => removeEmulatorConfig(index)}
                             title={nls.localize('vuengine/emulator/removeEmulatorConfig', 'Remove Emulator Config')}
                         >
-                            <i className='fa fa-trash' />
+                            <i className='codicon codicon-x' />
                         </button>
                     </div>
                 </div>
@@ -215,7 +215,7 @@ export default function EmulatorConfigs(props: EmulatorConfigsProps): React.JSX.
                     className='theia-button secondary full-width'
                     onClick={addEmulatorConfig}
                 >
-                    <i className='fa fa-plus' />
+                    <i className='codicon codicon-plus' />
                 </button>
             </div>
         </div>}

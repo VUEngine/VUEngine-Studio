@@ -159,7 +159,7 @@ export default function FlashCartConfigForm(props: FlashCartConfigProps): React.
                     onClick={() => props.removeFlashCartConfig(props.index)}
                     title={nls.localize('vuengine/flashCarts/configs/removeFlashCartConfig', 'Remove Flash Cart Config')}
                 >
-                    <i className='fa fa-trash' />
+                    <i className='codicon codicon-x' />
                 </button>}
             </HContainer>
             <HContainer gap={20}>
@@ -277,7 +277,7 @@ export default function FlashCartConfigForm(props: FlashCartConfigProps): React.
                                         title={nls.localize('vuengine/flashCarts/configs/removeDeviceCode', 'Remove Device Code')}
                                         onClick={() => removeDeviceCode(i)}
                                     >
-                                        <i className='fa fa-trash' />
+                                        <i className='codicon codicon-x' />
                                     </button>
                                 </VContainer>}
                             </HContainer>
@@ -318,7 +318,7 @@ export default function FlashCartConfigForm(props: FlashCartConfigProps): React.
                     className='theia-button secondary full-width'
                     onClick={addDeviceCode}
                 >
-                    <i className='fa fa-plus' />
+                    <i className='codicon codicon-plus' />
                 </button>}
             </VContainer>
         </VContainer>

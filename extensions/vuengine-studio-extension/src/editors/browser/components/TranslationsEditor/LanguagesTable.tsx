@@ -136,7 +136,7 @@ export default function LanguagesTable(props: LanguagesTableProps): React.JSX.El
                         onClick={e => removeLanguage(lang.code)}
                         title={nls.localize('vuengine/translationsEditor/deleteLanguage', 'Delete Language')}
                     >
-                        <i className='fa fa-trash' />
+                        <i className='codicon codicon-x' />
                     </button>
                 </div>
             </div>
@@ -145,7 +145,7 @@ export default function LanguagesTable(props: LanguagesTableProps): React.JSX.El
             className='languageAdd'
             onClick={addLanguage}
         >
-            <i className='fa fa-plus' />
+            <i className='codicon codicon-plus' />
         </div>
     </div>;
 }

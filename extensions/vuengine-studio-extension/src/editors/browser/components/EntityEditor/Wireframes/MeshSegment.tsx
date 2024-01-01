@@ -85,7 +85,14 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
         });
     };
 
-    return <HContainer alignItems='start' className="item" gap={20}>
+    return <div className="item">
+        <button
+            className="remove-button"
+            onClick={removeSegment}
+            title={nls.localize('vuengine/entityEditor/remove', 'Remove')}
+        >
+            <i className='codicon codicon-x' />
+        </button>
         <HContainer gap={10} grow={1} wrap='wrap'>
             <VContainer>
                 <label>From (X, Y, Z, Parallax)</label>
@@ -154,12 +161,5 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
                 </HContainer>
             </VContainer>
         </HContainer>
-        <button
-            className="theia-button secondary remove-button"
-            onClick={removeSegment}
-            title={nls.localize('vuengine/entityEditor/remove', 'Remove')}
-        >
-            <i className='fa fa-trash' />
-        </button>
-    </HContainer>;
+    </div>;
 }

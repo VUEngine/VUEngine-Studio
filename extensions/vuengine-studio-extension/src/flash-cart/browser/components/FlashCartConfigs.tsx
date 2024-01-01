@@ -119,7 +119,7 @@ export default function FlashCartConfigs(props: FlashCartConfigsProps): React.JS
                     className='theia-button secondary full-width'
                     onClick={addFlashCartConfig}
                 >
-                    <i className='fa fa-plus' />
+                    <i className='codicon codicon-plus' />
                 </button>
             </div>
         </div>}

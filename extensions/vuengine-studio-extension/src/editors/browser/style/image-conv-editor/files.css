@@ -8,7 +8,7 @@
 
 .jsonforms-container .filePreviewImage {
   align-items: center;
-  background-color: var(--theia-input-background);
+  background-color: var(--theia-activityBar-background);
   border-radius: 10px;
   box-sizing: border-box;
   display: flex;

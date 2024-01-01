@@ -112,7 +112,7 @@ export default function Colliders(props: CollidersProps): React.JSX.Element {
                 onClick={openEditor}
                 title={nls.localize('vuengine/entityEditor/manageInGameTypes', 'Manage In-Game Types')}
             >
-                <i className='fa fa-cog' />
+                <i className='codicon codicon-settings-gear' />
             </button>
         </HContainer>
         {data.colliders.inGameType !== 'None' && <VContainer gap={10}>
@@ -127,11 +127,11 @@ export default function Colliders(props: CollidersProps): React.JSX.Element {
                 />
             )}
             <button
-                className='theia-button secondary full-width'
+                className='theia-button add-button full-width'
                 onClick={addCollider}
                 title={nls.localize('vuengine/entityEditor/addCollider', 'Add Collider')}
             >
-                <i className='fa fa-plus' />
+                <i className='codicon codicon-plus' />
             </button>
         </VContainer>}
     </VContainer>;

@@ -23,13 +23,43 @@
     border: var(--theia-border-width) solid var(--theia-dropdown-border);
     border-radius: 2px;
     padding: calc(2 * var(--theia-ui-padding));
+    position: relative;
 }
 
 .entityEditor .item:hover {
     border-color: var(--theia-button-hoverBackground);
 }
 
-.entityEditor .remove-button {
-    margin-left: 0;
-    width: fit-content;
+.entityEditor .item .remove-button {
+    background-color: transparent;
+    border: 0;
+    border-bottom-left-radius: 2px;
+    color: var(--theia-dropdown-border);
+    cursor: pointer;
+    height: 32px;
+    outline: none;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 32px;
+}
+.entityEditor .item .remove-button:hover {
+    background-color: var(--theia-button-hoverBackground);
+    color: var(--theia-button-foreground);
+}
+
+.entityEditor .item .remove-button .codicon {
+    vertical-align: middle;
+}
+
+.entityEditor .add-button {
+    background-color: transparent;
+    border: var(--theia-border-width) solid var(--theia-dropdown-border);
+    color: var(--theia-dropdown-border);
+    height: 48px;
+    margin-bottom: 5px;
+}
+.entityEditor .add-button:hover {
+    color: var(--theia-button-foreground);
+    border-color: var(--theia-button-hoverBackground);
 }
