@@ -2,7 +2,6 @@ import { isOSX, isWindows } from '@theia/core';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { gunzip, gzip, strFromU8, strToU8 } from 'fflate';
 import { customAlphabet } from 'nanoid';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
@@ -87,16 +86,17 @@ export class VesCommonService {
   }
 
   async compressJson(data: any): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const buf = strToU8(JSON.stringify(data));
-      gzip(buf, { level: 9, mem: 12 }, (err, compressed) => {
-        if (err) {
-          console.error(err);
-          return;
-        }
-        resolve(this.bytesToBase64(compressed));
-      });
-    });
+    const stream = new Blob([JSON.stringify(data)], {
+      type: 'application/json',
+    }).stream();
+    const compressedReadableStream = stream.pipeThrough(
+      new CompressionStream('gzip')
+    );
+    const compressedResponse = new Response(compressedReadableStream);
+    const blob = await compressedResponse.blob();
+    const buffer = await blob.arrayBuffer();
+
+    return this.bytesToBase64(new Uint8Array(buffer));
   }
 
   async uncompressJson(data: any): Promise<unknown> {
@@ -104,16 +104,17 @@ export class VesCommonService {
       return data;
     }
 
-    return new Promise((resolve, reject) => {
-      const compressed = this.base64ToBytes(data);
-      gunzip(compressed, (err, uncompressed) => {
-        if (err) {
-          console.error(err);
-          return;
-        }
-        resolve(JSON.parse(strFromU8(uncompressed)));
-      });
-    });
+    const compressed = this.base64ToBytes(data);
+    const stream = new Blob([compressed], {
+      type: 'application/json',
+    }).stream();
+    const compressedReadableStream = stream.pipeThrough(
+      new DecompressionStream('gzip')
+    );
+    const resp = new Response(compressedReadableStream);
+    const blob = await resp.blob();
+
+    return JSON.parse(await blob.text());
   }
 
   protected async determineIsWslInstalled(): Promise<void> {
