@@ -128,6 +128,7 @@ export default function Sprites(props: SpritesProps): React.JSX.Element {
         updatedSprites.sprites = [
             ...updatedSprites.sprites,
             {
+                _imageData: 0,
                 bgmapMode: BgmapMode.Bgmap,
                 displayMode: DisplayMode.Both,
                 transparency: Transparency.None,

@@ -22,8 +22,8 @@
 .jsonforms-container .generatingOverlay.isGenerating {
   height: 100%;
   opacity: .75;
-  transition: opacity .5s;
-  transition-delay: .5s;
+  transition: opacity .8s;
+  transition-delay: .3s;
   width: 100%;
 }
 
