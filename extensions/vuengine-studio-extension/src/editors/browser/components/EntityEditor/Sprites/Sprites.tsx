@@ -1,13 +1,14 @@
 import { URI, nls } from '@theia/core';
-import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React, { useContext } from 'react';
 import { ImageCompressionType } from '../../../../../images/browser/ves-images-types';
 import { EditorsServices } from '../../../ves-editors-widget';
 import { DataSection } from '../../Common/CommonTypes';
+import HContainer from '../../Common/HContainer';
+import InfoLabel from '../../Common/InfoLabel';
+import RadioSelect from '../../Common/RadioSelect';
 import VContainer from '../../Common/VContainer';
 import { BgmapMode, DisplayMode, EntityEditorContext, EntityEditorContextType, SpriteType, Transparency } from '../EntityEditorTypes';
 import Sprite from './Sprite';
-import HContainer from '../../Common/HContainer';
 
 interface SpritesProps {
     fileUri: URI
@@ -197,14 +198,14 @@ export default function Sprites(props: SpritesProps): React.JSX.Element {
                 <label>
                     {nls.localize('vuengine/entityEditor/spriteType', 'Type')}
                 </label>
-                <SelectComponent
-                    defaultValue={data.sprites.type}
+                <RadioSelect
                     options={[{
                         value: SpriteType.Bgmap,
                     }, {
                         value: SpriteType.Object,
                     }]}
-                    onChange={option => setType(option.value as SpriteType)}
+                    defaultValue={data.sprites.type}
+                    onChange={options => setType(options[0].value as SpriteType)}
                 />
             </VContainer>
             <VContainer>
@@ -281,39 +282,47 @@ export default function Sprites(props: SpritesProps): React.JSX.Element {
             </VContainer>
             */}
             <VContainer>
-                <label>
-                    {nls.localize('vuengine/entityEditor/compression', 'Compression')}
-                </label>
-                <SelectComponent
-                    defaultValue={data.sprites.compression}
+                <InfoLabel
+                    label={nls.localize('vuengine/entityEditor/compression', 'Compression')}
+                    hoverService={props.services.hoverService}
+                    tooltip={nls.localize(
+                        'vuengine/entityEditor/compressionDescription',
+                        // eslint-disable-next-line max-len
+                        'Image data can be stored in a compressed format to save ROM space. Comes at the cost of a slightly higher CPU load when loading data into memory.'
+                    )}
+                />
+                <RadioSelect
                     options={[{
                         label: nls.localize('vuengine/entityEditor/compression/none', 'None'),
                         value: ImageCompressionType.NONE,
-                        description: nls.localize('vuengine/entityEditor/compression/offDescription', 'Do not compress image data'),
                     }, {
                         label: nls.localize('vuengine/entityEditor/compression/rle', 'RLE'),
                         value: ImageCompressionType.RLE,
-                        description: nls.localize('vuengine/entityEditor/compression/rleDescription', 'Compress image data with RLE'),
                     }]}
-                    onChange={option => setTilesCompression(option.value as ImageCompressionType)}
+                    defaultValue={data.sprites.compression}
+                    onChange={options => setTilesCompression(options[0].value as ImageCompressionType)}
                 />
             </VContainer>
             <VContainer>
-                <label>
-                    {nls.localize('vuengine/entityEditor/section', 'Section')}
-                </label>
-                <SelectComponent
+                <InfoLabel
+                    label={nls.localize('vuengine/entityEditor/section', 'Section')}
+                    hoverService={props.services.hoverService}
+                    tooltip={nls.localize(
+                        'vuengine/entityEditor/sectionDescription',
+                        // eslint-disable-next-line max-len
+                        'Defines whether image data should be stored in ROM space or Expansion space. You usually want to leave this untouched, since the latter only works on specially designed cartridges.'
+                    )}
+                />
+                <RadioSelect
                     defaultValue={data.sprites.section}
                     options={[{
-                        label: nls.localize('vuengine/entityEditor/romSpace', 'ROM Space'),
+                        label: 'ROM',
                         value: DataSection.ROM,
-                        description: nls.localize('vuengine/entityEditor/romSpaceDescription', 'Store image data in ROM space'),
                     }, {
-                        label: nls.localize('vuengine/entityEditor/expansionSpace', 'Expansion Space'),
+                        label: nls.localize('vuengine/entityEditor/expansion', 'Expansion'),
                         value: DataSection.EXP,
-                        description: nls.localize('vuengine/entityEditor/expansionSpaceDescription', 'Store image data in expansion space'),
                     }]}
-                    onChange={option => setSection(option.value as DataSection)}
+                    onChange={options => setSection(options[0].value as DataSection)}
                 />
             </VContainer>
             <VContainer>

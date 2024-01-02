@@ -1,4 +1,4 @@
-import { URI } from '@theia/core';
+import { URI, nls } from '@theia/core';
 import React from 'react';
 import { ImageConfig } from '../../../../images/browser/ves-images-types';
 import { EditorsServices } from '../../ves-editors-widget';
@@ -49,14 +49,28 @@ export default function ImageConvEditor(props: ImageConvEditorProps): React.JSX.
                         <Map />
                         <Animation />
                     </HContainer>
-                    <Images
-                        data={data.files}
-                        updateData={updateFiles}
-                        allInFolderAsFallback={true}
-                        canSelectMany={true}
-                        fileUri={fileUri}
-                        services={services}
-                    />
+                    <VContainer>
+                        <label>
+                            {nls.localize('vuengine/imageConvEditor/xFiles', 'Image Files ({0})', data.files.length)}
+                        </label>
+                        {data.files.length === 0 &&
+                            <div style={{ fontStyle: 'italic' }}>
+                                <i className='codicon codicon-info' style={{ verticalAlign: 'bottom' }} />{' '}
+                                {nls.localize(
+                                    'vuengine/imageConvEditor/noFilesSelected',
+                                    'No images selected. All images in this folder will be converted.'
+                                )}
+                            </div>
+                        }
+                        <Images
+                            data={data.files}
+                            updateData={updateFiles}
+                            allInFolderAsFallback={true}
+                            canSelectMany={true}
+                            fileUri={fileUri}
+                            services={services}
+                        />
+                    </VContainer>
                 </VContainer>
             </ImageConvEditorContext.Provider>
         </div>

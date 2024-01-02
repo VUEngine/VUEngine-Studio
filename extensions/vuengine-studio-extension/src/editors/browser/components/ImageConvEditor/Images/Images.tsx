@@ -3,7 +3,6 @@ import { OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import React, { useEffect, useState } from 'react';
 import { EditorsServices } from '../../../ves-editors-widget';
 import HContainer from '../../Common/HContainer';
-import VContainer from '../../Common/VContainer';
 
 interface ImagesProps {
     data: string[]
@@ -101,52 +100,35 @@ export default function Images(props: ImagesProps): React.JSX.Element {
         updateData(data.filter((f, i) => f !== path));
     };
 
-    return <VContainer gap={10} overflow='hidden'>
-        <label>
-            {canSelectMany
-                ? nls.localize('vuengine/imageConvEditor/xFiles', 'Image Files ({0})', Object.keys(filesToShow).length)
-                : nls.localize('vuengine/imageConvEditor/file', 'Image File')
-            }
-        </label>
-        {data.length === 0 && allInFolderAsFallback &&
-            <div style={{ fontStyle: 'italic' }}>
-                <i className='codicon codicon-info' style={{ verticalAlign: 'bottom' }} />{' '}
-                {nls.localize(
-                    'vuengine/imageConvEditor/noFilesSelected',
-                    'No images selected. All images in this folder will be converted.'
-                )}
+    return <HContainer alignItems="start" gap={15} overflow='hidden' wrap="wrap">
+        {Object.keys(filesToShow).map((f, i) => {
+            const fullUri = workspaceRootUri.resolve(f);
+            return <div
+                key={`image-${i}`}
+                className='filePreview'
+                title={f}
+            >
+                <div className='filePreviewImage'>
+                    <img src={fullUri.path.fsPath()} />
+                </div>
+                <div className='filePreviewTitle'>
+                    {fullUri.path.base}
+                </div>
+                <div className='filePreviewMeta'>
+                    {filesToShow[f]}
+                </div>
+                <div className='filePreviewActions'>
+                    <i
+                        className="codicon codicon-x"
+                        onClick={() => removeFile(f)}
+                    />
+                </div>
+            </div>;
+        })}
+        {(allInFolderAsFallback || !Object.keys(filesToShow).length) &&
+            <div className='fileAdd' onClick={selectFiles}>
+                <i className="codicon codicon-add" />
             </div>
         }
-        <HContainer alignItems="start" gap={15} overflow='auto' wrap="wrap">
-            {Object.keys(filesToShow).map((f, i) => {
-                const fullUri = workspaceRootUri.resolve(f);
-                return <div
-                    key={`image-${i}`}
-                    className='filePreview'
-                    title={f}
-                >
-                    <div className='filePreviewImage'>
-                        <img src={fullUri.path.fsPath()} />
-                    </div>
-                    <div className='filePreviewTitle'>
-                        {fullUri.path.base}
-                    </div>
-                    <div className='filePreviewMeta'>
-                        {filesToShow[f]}
-                    </div>
-                    <div className='filePreviewActions'>
-                        <i
-                            className="codicon codicon-x"
-                            onClick={() => removeFile(f)}
-                        />
-                    </div>
-                </div>;
-            })}
-            {(allInFolderAsFallback || !Object.keys(filesToShow).length) &&
-                <div className='fileAdd' onClick={selectFiles}>
-                    <i className="codicon codicon-add" />
-                </div>
-            }
-        </HContainer>
-    </VContainer>;
+    </HContainer>;
 }

@@ -1,0 +1,43 @@
+.radioSelect {
+    border-radius: 2px;
+    display: flex;
+    flex-direction: row;
+    outline: none;
+    user-select: none;
+}
+.radioSelect.canSelectMany {
+    gap: 4px;
+}
+
+.radioSelect:focus div.selected {
+    outline: 1px solid var(--theia-button-background);
+}
+
+.radioSelect div {
+    border: 1px solid var(--theia-activityBar-background);
+    color: var(--theia-activityBar-background);
+    cursor: pointer;
+    font-family: var(--theia-ui-font-family);
+    font-size: var(--theia-ui-font-size1);
+    line-height: var(--theia-content-line-height);
+    margin-right: -1px;
+    padding: 1px 8px;
+    text-align: center;
+}
+.radioSelect.canSelectMany div {
+    border-radius: 2px !important;
+}
+
+.radioSelect div.selected {
+    background-color: var(--theia-activityBar-background);
+    color: var(--theia-input-foreground);
+    position: relative;
+}
+
+.radioSelect div:first-child {
+    border-radius: 2px 0 0 2px;
+}
+.radioSelect div:last-child {
+    border-radius: 0 2px 2px 0;
+    margin-right: 0;
+}

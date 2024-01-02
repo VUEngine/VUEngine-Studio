@@ -1,9 +1,10 @@
 import { URI, nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
-import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React, { useContext } from 'react';
+import { ConversionResult } from 'src/images/browser/ves-images-types';
 import { EditorsServices } from '../../../ves-editors-widget';
 import HContainer from '../../Common/HContainer';
+import RadioSelect from '../../Common/RadioSelect';
 import VContainer from '../../Common/VContainer';
 import Images from '../../ImageConvEditor/Images/Images';
 import {
@@ -17,7 +18,7 @@ import {
     SpriteType,
     Transparency
 } from '../EntityEditorTypes';
-import { ConversionResult } from 'src/images/browser/ves-images-types';
+import InfoLabel from '../../Common/InfoLabel';
 
 interface SpriteProps {
     index: number
@@ -246,59 +247,77 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 />
             </VContainer>
             <VContainer>
-                <label>
-                    {nls.localize('vuengine/entityEditor/displayMode', 'Display Mode')}
-                </label>
-                <SelectComponent
+                <InfoLabel
+                    label={nls.localize('vuengine/entityEditor/displays', 'Displays')}
+                    hoverService={props.services.hoverService}
+                    tooltip={nls.localize(
+                        'vuengine/entityEditor/displayModeDescription',
+                        // eslint-disable-next-line max-len
+                        'Select which screens the sprite should be visible on. Can be used to set up a stereo sprite by creating one sprite each for the left and right eye versions.'
+                    )}
+                />
+                <RadioSelect
                     options={[
-                        { value: DisplayMode.Both, label: nls.localize('vuengine/entityEditor/displayModeBoth', 'Both') },
                         { value: DisplayMode.Left, label: nls.localize('vuengine/entityEditor/displayModeLeft', 'Left') },
                         { value: DisplayMode.Right, label: nls.localize('vuengine/entityEditor/displayModeRight', 'Right') },
                     ]}
-                    defaultValue={sprite.displayMode}
-                    onChange={option => setDisplayMode(option.value as DisplayMode)}
+                    canSelectMany={true}
+                    allowBlank={false}
+                    defaultValue={sprite.displayMode === DisplayMode.Both
+                        ? [DisplayMode.Left, DisplayMode.Right]
+                        : sprite.displayMode
+                    }
+                    onChange={options => setDisplayMode(options.length === 2
+                        ? DisplayMode.Both
+                        : options[0].value as DisplayMode)
+                    }
                 />
             </VContainer>
             <VContainer>
-                <label>
-                    {nls.localize('vuengine/entityEditor/transparency', 'Transparency')}
-                </label>
-                <SelectComponent
+                <InfoLabel
+                    label={nls.localize('vuengine/entityEditor/transparency', 'Transparency')}
+                    hoverService={props.services.hoverService}
+                    tooltip={nls.localize(
+                        'vuengine/entityEditor/spriteTransparencyDescription',
+                        // eslint-disable-next-line max-len
+                        'With transparency enabled, this sprite will only be shown on every even or odd screen, resulting in it appearing transparent (and slightly dimmer). This also halves CPU load since 50% less pixels have to be rendered per frame in average.'
+                    )}
+                />
+                <RadioSelect
                     options={[{
                         value: Transparency.None,
                         label: nls.localize('vuengine/entityEditor/transparencyNone', 'None'),
-                        description: nls.localize('vuengine/entityEditor/transparencyNoneDescription', 'Display every frame'),
                     }, {
                         value: Transparency.Odd,
                         label: nls.localize('vuengine/entityEditor/transparencyOdd', 'Odd'),
-                        description: nls.localize('vuengine/entityEditor/transparencyOddDescription', 'Display only every odd frame'),
                     }, {
                         value: Transparency.Even,
                         label: nls.localize('vuengine/entityEditor/transparencyEven', 'Even'),
-                        description: nls.localize('vuengine/entityEditor/transparencyEvenDescription', 'Display only every even frame'),
                     }]}
                     defaultValue={sprite.transparency}
-                    onChange={option => setTransparency(option.value as Transparency)}
+                    onChange={options => setTransparency(options[0].value as Transparency)}
                 />
             </VContainer>
             <VContainer>
                 <label>
                     {nls.localize('vuengine/entityEditor/palette', 'Palette')}
                 </label>
-                <input
-                    className='theia-input'
-                    style={{ width: 48 }}
-                    type='number'
-                    min={0}
-                    max={3}
-                    value={sprite.texture.palette}
-                    onChange={e => setPalette(parseInt(e.target.value))}
+                <RadioSelect
+                    options={[{ value: 0 }, { value: 1 }, { value: 2 }, { value: 3 }]}
+                    defaultValue={sprite.texture.palette}
+                    onChange={options => setPalette(options[0].value as number)}
                 />
             </VContainer>
             <VContainer>
-                <label>
-                    {nls.localize('vuengine/entityEditor/displacement', 'Displacement (X, Y, Z, Parallax)')}
-                </label>
+                <InfoLabel
+                    label={nls.localize('vuengine/entityEditor/displacement', 'Displacement (X, Y, Z, Parallax)')}
+                    hoverService={props.services.hoverService}
+                    tooltip={nls.localize(
+                        'vuengine/entityEditor/displacementDescription',
+                        // eslint-disable-next-line max-len
+                        'Offset this sprite by the given amount of pixels from the entity\'s center. The parallax value controls the depth, while the z value is used for fine tuning.'
+                    )}
+                />
                 <HContainer>
                     <input
                         className='theia-input'
@@ -331,37 +350,63 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 </HContainer>
             </VContainer>
             {data.sprites.type === SpriteType.Bgmap && <VContainer>
-                <label>
-                    {nls.localize('vuengine/entityEditor/bgmapMode', 'Bgmap Mode')}
-                </label>
-                <SelectComponent
+                <InfoLabel
+                    label={nls.localize('vuengine/entityEditor/bgmapMode', 'Bgmap Mode')}
+                    hoverService={props.services.hoverService}
+                    tooltip={<>
+                        <div>
+                            <b>{nls.localize('vuengine/entityEditor/bgmapModeBgmap', 'Bgmap')}: </b>
+                            {nls.localize(
+                                'vuengine/entityEditor/bgmapModeBgmapDescription',
+                                'A regular sprite with no effects applied.'
+                            )}
+                        </div><br />
+                        <div>
+                            <b>{nls.localize('vuengine/entityEditor/bgmapModeAffine', 'Affine')}: </b>
+                            {nls.localize(
+                                'vuengine/entityEditor/bgmapModeAffineDescription',
+                                'The sprite can be scaled and rotated. This mode needs a lot of CPU resources and should be used sparsely.'
+                            )}
+                        </div><br />
+                        <div>
+                            <b>{nls.localize('vuengine/entityEditor/bgmapModeHBias', 'HBias')}: </b>
+                            {nls.localize(
+                                'vuengine/entityEditor/bgmapModeHBiasDescription',
+                                'Each row of pixels of the sprite can be manipulated independently. This mode is slightly heavier on the CPU than regular Bgmap mode.'
+                            )}
+                        </div>
+                    </>}
+                />
+                <RadioSelect
                     options={[
                         {
                             value: BgmapMode.Bgmap,
                             label: nls.localize('vuengine/entityEditor/bgmapModeBgmap', 'Bgmap'),
-                            description: nls.localize('vuengine/entityEditor/bgmapModeBgmapDescription', 'A regular sprite with no effects applied'),
                         },
                         {
                             value: BgmapMode.Affine,
                             label: nls.localize('vuengine/entityEditor/bgmapModeAffine', 'Affine'),
-                            description: nls.localize('vuengine/entityEditor/bgmapModeAffineDescription', 'The sprite can be scaled and rotated'),
                         },
                         {
                             value: BgmapMode.HBias,
                             label: nls.localize('vuengine/entityEditor/bgmapModeHBias', 'HBias'),
-                            description: nls.localize('vuengine/entityEditor/bgmapModeHBiasDescription', 'Each row of pixels of the sprite can be manipulated independently'),
                         },
                     ]}
                     defaultValue={sprite.bgmapMode}
-                    onChange={option => setBgmapMode(option.value as BgmapMode)}
+                    onChange={options => setBgmapMode(options[0].value as BgmapMode)}
                 />
             </VContainer>}
             {(data.sprites.type === SpriteType.Bgmap && [BgmapMode.Affine, BgmapMode.HBias].includes(sprite.bgmapMode)) &&
                 <>
                     <VContainer>
-                        <label>
-                            {nls.localize('vuengine/entityEditor/padding', 'Padding (X, Y)')}
-                        </label>
+                        <InfoLabel
+                            label={nls.localize('vuengine/entityEditor/padding', 'Padding (X, Y)')}
+                            hoverService={props.services.hoverService}
+                            tooltip={nls.localize(
+                                'vuengine/entityEditor/paddingDescription',
+                                'Pad texture data in memory by the specified amount of blank pixels to prevent fragments of surrounding textures to appear at the outer edges.'
+                            )}
+                        />
                         <HContainer>
                             <input
                                 className='theia-input'
@@ -384,9 +429,14 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                         </HContainer>
                     </VContainer>
                     <VContainer>
-                        <label>
-                            {nls.localize('vuengine/entityEditor/manipulationFunction', 'Manipulation Function')}
-                        </label>
+                        <InfoLabel
+                            label={nls.localize('vuengine/entityEditor/manipulationFunction', 'Manipulation Function')}
+                            hoverService={props.services.hoverService}
+                            tooltip={nls.localize(
+                                'vuengine/entityEditor/manipulationFunctionDescription',
+                                'Provide the name of the function responsible for handling the Affine or HBias transformations of this sprite.'
+                            )}
+                        />
                         <input
                             className='theia-input'
                             type='string'
@@ -430,13 +480,26 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 </HContainer>
             </VContainer>
         </HContainer>
-        <Images
-            data={sprite.texture.files}
-            updateData={setFiles}
-            allInFolderAsFallback={false}
-            canSelectMany={data.animations.enabled}
-            fileUri={fileUri}
-            services={services}
-        />
+        <VContainer>
+            <InfoLabel
+                label={data.animations.enabled
+                    ? nls.localize('vuengine/entityEditor/files', 'Image File(s)')
+                    : nls.localize('vuengine/entityEditor/file', 'Image File')}
+                hoverService={props.services.hoverService}
+                tooltip={nls.localize(
+                    'vuengine/entityEditor/filesDescription',
+                    // eslint-disable-next-line max-len
+                    'PNG image to be used as texture. Must be four color indexed mode with the proper palette. When animations are enabled, select either a single file containing a vertical spritesheet, or multiple files, where each represents one animation frame.'
+                )}
+            />
+            <Images
+                data={sprite.texture.files}
+                updateData={setFiles}
+                allInFolderAsFallback={false}
+                canSelectMany={data.animations.enabled}
+                fileUri={fileUri}
+                services={services}
+            />
+        </VContainer>
     </VContainer>;
 }
