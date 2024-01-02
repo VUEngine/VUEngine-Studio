@@ -73,6 +73,37 @@ export default class EntityEditor extends React.Component<
     }
   }
 
+  protected async compressImageData(imageData: Partial<ConversionResult>): Promise<ConversionResult> {
+    if (imageData.tiles) {
+      let frameOffsets = {};
+      if (imageData.tiles.frameOffsets) {
+        frameOffsets = {
+          frameOffsets: await this.props.services.vesCommonService.compressJson(imageData.tiles.frameOffsets),
+        };
+      }
+      imageData = {
+        ...imageData,
+        tiles: {
+          ...imageData.tiles,
+          data: await this.props.services.vesCommonService.compressJson(imageData.tiles.data),
+          ...frameOffsets,
+        },
+      };
+    }
+
+    if (imageData.maps) {
+      imageData = {
+        ...imageData,
+        maps: await Promise.all(imageData.maps.map(async m => ({
+          ...m,
+          data: await this.props.services.vesCommonService.compressJson(m.data),
+        }))),
+      };
+    }
+
+    return imageData as ConversionResult;
+  }
+
   protected async appendImageData(entityData: EntityData): Promise<EntityData> {
     const mostFilesOnASprite = Math.max(...entityData.sprites.sprites.map(s => s.texture.files.length));
     const isMultiImageAnimation = entityData.animations.enabled && mostFilesOnASprite > 1;
@@ -121,15 +152,17 @@ export default class EntityEditor extends React.Component<
         files,
       });
       // map imagedata back to sprites
-      entityData.sprites?.sprites?.map((sprite, index) => {
+      await Promise.all(entityData.sprites?.sprites?.map(async (sprite, index) => {
         if (sprite.texture?.files?.length) {
           sprite._imageData = {
-            tiles: (index === 0) ? newImageData.tiles : undefined,
-            maps: [newImageData.maps[spriteFilesIndex[sprite.texture.files[0]]]],
+            ...(await this.compressImageData({
+              tiles: (index === 0) ? newImageData.tiles : undefined,
+              maps: [newImageData.maps[spriteFilesIndex[sprite.texture.files[0]]]],
+            })),
             _dupeIndex: 1,
           };
         }
-      });
+      }));
     } else {
       const convertedFilesMap: { [key: string]: ConversionResult & { _dupeIndex: number } } = {};
       // for loop to handle sprites one after the other for dupe detection
@@ -146,7 +179,7 @@ export default class EntityEditor extends React.Component<
               files: sprite.texture.files,
             });
             sprite._imageData = convertedFilesMap[checksum] = {
-              ...newImageData,
+              ...(await this.compressImageData(newImageData)),
               _dupeIndex: i + 1,
             };
           }

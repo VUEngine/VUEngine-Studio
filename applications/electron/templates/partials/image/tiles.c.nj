@@ -1,5 +1,6 @@
-{%- if imageData.tiles.data.length %}
-const uint32 {{ tilesName }}Tiles[{{ (imageData.tiles.data.length + 1) }}] __attribute__((aligned(4))){% if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
+{%- if imageData.tiles.data -%}
+{%- set tilesData = imageData.tiles.data | uncompressJson %}
+const uint32 {{ tilesName }}Tiles[{{ (tilesData.length + 1) }}] __attribute__((aligned(4))){% if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
     {# prepend tile data with a custom compression algorithm flag -#}
     {%- if compression is defined and compression != 'none' and imageData.tiles.compressionRatio < 0 -%}
@@ -7,7 +8,7 @@ const uint32 {{ tilesName }}Tiles[{{ (imageData.tiles.data.length + 1) }}] __att
     {%- else -%}
         0x00000000,
     {%- endif %}
-    {% for tileData in imageData.tiles.data -%}
+    {% for tileData in tilesData -%}
     0x{{ tileData }},
     {%- if loop.index % 8 == 0 and not loop.last %}{{ "\n    " }}{% endif -%}
     {%- endfor %}

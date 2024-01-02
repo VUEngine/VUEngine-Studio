@@ -2,6 +2,7 @@ import { isOSX, isWindows } from '@theia/core';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { gunzip, gzip, strFromU8, strToU8 } from 'fflate';
 import { customAlphabet } from 'nanoid';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
@@ -69,6 +70,50 @@ export class VesCommonService {
 
   cleanSpecName(name: string): string {
     return name.replace(/[^A-Za-z0-9_]/g, '');
+  }
+
+  protected base64ToBytes(base64: string): Uint8Array {
+    const binString = atob(base64);
+    return Uint8Array.from(binString, m => m.codePointAt(0) ?? 0);
+  }
+  protected bytesToBase64(bytes: Uint8Array): string {
+    let binary = '';
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+
+    return btoa(binary);
+  }
+
+  async compressJson(data: any): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const buf = strToU8(JSON.stringify(data));
+      gzip(buf, { level: 9, mem: 12 }, (err, compressed) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        resolve(this.bytesToBase64(compressed));
+      });
+    });
+  }
+
+  async uncompressJson(data: any): Promise<unknown> {
+    if (typeof data !== 'string') {
+      return data;
+    }
+
+    return new Promise((resolve, reject) => {
+      const compressed = this.base64ToBytes(data);
+      gunzip(compressed, (err, uncompressed) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        resolve(JSON.parse(strFromU8(uncompressed)));
+      });
+    });
   }
 
   protected async determineIsWslInstalled(): Promise<void> {

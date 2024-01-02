@@ -34,7 +34,7 @@ export interface ImageConfigFileToBeConverted {
 export interface ConversionResultTilesData {
   compressionRatio?: number
   count: number
-  data: string[]
+  data: string[] | string // string when compressed
   frameOffsets?: number[]
   height: number
   name: string
@@ -43,7 +43,7 @@ export interface ConversionResultTilesData {
 
 export interface ConversionResultMapData {
   compressionRatio?: number
-  data: string[]
+  data: string[] | string // string when compressed
   height: number
   name: string
   width: number

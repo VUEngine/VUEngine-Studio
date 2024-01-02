@@ -587,22 +587,21 @@ export class VesCodeGenService {
 
     env.addFilter('removeEmpty', arr => arr.filter((e: unknown) => typeof e === 'string' && e.trim() !== ''));
 
-    // nunjucks does not support _async_ functions, but only filters (in the ugly as hell way as below)
-    env.addFilter('convertPcm', async (...args): Promise<void> => {
-      const callback = args.pop();
-      const filePath: string = args[0];
-      const range: number = args[1];
+    // nunjucks does not support _async_ functions, but only filters
+    env.addFilter('convertPcm', async (filePath: string, range: number, callback): Promise<void> => {
       const result = await this.vesAudioConverterService.convertPcm(filePath, range);
       // eslint-disable-next-line no-null/no-null
       callback(null, result);
     }, true);
 
-    env.addFilter('convertImage', async (...args): Promise<void> => {
-      const callback = args.pop();
-      const imageConfigFileUri: URI = args[0];
-      const imageConfig: ImageConfig = args[1];
-      const filePath: string = args[2];
+    env.addFilter('convertImage', async (imageConfigFileUri: URI, imageConfig: ImageConfig, filePath: string, callback): Promise<void> => {
       const result = await this.vesImageService.convertImage(imageConfigFileUri, imageConfig, filePath);
+      // eslint-disable-next-line no-null/no-null
+      callback(null, result);
+    }, true);
+
+    env.addFilter('uncompressJson', async (str: unknown, callback): Promise<void> => {
+      const result = await this.vesCommonService.uncompressJson(str);
       // eslint-disable-next-line no-null/no-null
       callback(null, result);
     }, true);

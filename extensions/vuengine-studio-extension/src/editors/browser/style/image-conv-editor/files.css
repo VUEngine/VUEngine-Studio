@@ -47,7 +47,8 @@
 
 .jsonforms-container .fileAdd {
   align-items: center;
-  border: 1px solid var(--theia-input-background);
+  border: var(--theia-border-width) solid var(--theia-dropdown-border);
+  color: var(--theia-dropdown-border);
   border-radius: 10px;
   box-sizing: border-box;
   cursor: pointer;
@@ -59,4 +60,5 @@
 
 .jsonforms-container .fileAdd:hover {
   background-color: var(--theia-input-background);
+  color: inherit;
 }

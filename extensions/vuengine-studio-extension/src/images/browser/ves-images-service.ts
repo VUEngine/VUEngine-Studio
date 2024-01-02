@@ -234,7 +234,7 @@ export class VesImagesService {
       conversionResult.tiles = {
         ...conversionResult.tiles,
         ...compressTiles(
-          conversionResult.tiles.data,
+          conversionResult.tiles.data as string[],
           imageConfig.tileset.compression as ImageCompressionType,
           imageConfig.animation,
           imageConfig.animation.isAnimation && imageConfig.animation.individualFiles

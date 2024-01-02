@@ -24,7 +24,7 @@ export class VesCodeGenStatusBarContribution implements FrontendApplicationContr
     }
 
     setFileGenerateStatusBar(status: IsGeneratingFilesStatus): void {
-        let icon = 'codicon-gear~spin';
+        let icon = 'codicon-loading~spin';
         let label = nls.localize('vuengine/codegen/generating', 'Generating...');
 
         if (status === IsGeneratingFilesStatus.done) {

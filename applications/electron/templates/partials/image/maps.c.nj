@@ -1,15 +1,14 @@
 {%- for map in imageData.maps -%}
-{% if map.data.length %}
+{%- set mapData = map.data | uncompressJson -%}
 {%- set mapName = map.name | sanitizeSpecName -%}
 {%- if customMapPrefix is defined -%}
     {%- set mapName = customMapPrefix ~ mapName -%}
 {%- endif %}
-const uint16 {{ mapName }}Map[{{ map.data.length }}] __attribute__((aligned(4))){% if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
+const uint16 {{ mapName }}Map[{{ mapData.length }}] __attribute__((aligned(4))){% if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
-    {% for mapTile in map.data -%}
+    {% for mapTile in mapData -%}
     0x{{ mapTile }},
     {%- if loop.index % 8 == 0 and not loop.last %}{{ "\n    " }}{% endif -%}
     {%- endfor %}
 };
-{% endif %}
-{%- endfor -%}
+{% endfor -%}
