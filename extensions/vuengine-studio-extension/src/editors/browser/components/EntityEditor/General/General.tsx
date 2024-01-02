@@ -1,10 +1,18 @@
+import { HoverService } from '@theia/core/lib/browser';
 import React, { useContext } from 'react';
 import HContainer from '../../Common/HContainer';
+import InfoLabel from '../../Common/InfoLabel';
 import VContainer from '../../Common/VContainer';
 import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
+import { nls } from '@theia/core';
 
-export default function General(): React.JSX.Element {
+interface GeneralProps {
+    hoverService: HoverService
+}
+
+export default function General(props: GeneralProps): React.JSX.Element {
     const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { hoverService } = props;
 
     const setName = (n: string): void => {
         setData({ name: n });
@@ -40,49 +48,60 @@ export default function General(): React.JSX.Element {
 
     return <VContainer gap={15}>
         <VContainer>
-            <label>Name</label>
+            <label>
+                {nls.localize('vuengine/entityEditor/name', 'Name')}
+            </label>
             <input
                 className='theia-input large'
                 value={data.name}
                 onChange={e => setName(e.target.value)}
             />
         </VContainer>
-        <VContainer>
-            <label>Extra Info</label>
-            <input
-                className='theia-input'
-                value={data.extraInfo}
-                onChange={e => setExtraInfo(e.target.value)}
-            />
-        </VContainer>
-        <VContainer>
-            <label>Size (X, Y, Z)</label>
-            <div>
-                Size of entity in pixels. Used by streaming to test if out of screen bounds. If 0, width and height will be inferred from the first sprite's texture's size.
-            </div>
-            <HContainer gap={15}>
+        <HContainer gap={12}>
+            <VContainer grow={1}>
+                <label>
+                    {nls.localize('vuengine/entityEditor/extraInfo', 'Extra Info')}
+                </label>
                 <input
                     className='theia-input'
-                    type='number'
-                    value={data.pixelSize.x}
-                    onChange={e => setPixelSizeX(parseInt(e.target.value))}
-                    min={0}
+                    value={data.extraInfo}
+                    onChange={e => setExtraInfo(e.target.value)}
                 />
-                <input
-                    className='theia-input'
-                    type='number'
-                    value={data.pixelSize.y}
-                    onChange={e => setPixelSizeY(parseInt(e.target.value))}
-                    min={0}
+            </VContainer>
+            <VContainer>
+                <InfoLabel
+                    label={nls.localize('vuengine/entityEditor/entitySize', 'Size (X, Y, Z)')}
+                    hoverService={hoverService}
+                    // eslint-disable-next-line max-len
+                    tooltip={nls.localize('vuengine/entityEditor/entitySizeDescription', 'Size of the entity in pixels. Used by streaming to test if out of screen bounds. If 0, width and height will be inferred from the first sprite\'s texture\'s size.')}
                 />
-                <input
-                    className='theia-input'
-                    type='number'
-                    value={data.pixelSize.z}
-                    onChange={e => setPixelSizeZ(parseInt(e.target.value))}
-                    min={0}
-                />
-            </HContainer>
-        </VContainer>
+                <HContainer>
+                    <input
+                        className='theia-input'
+                        style={{ width: 48 }}
+                        type='number'
+                        value={data.pixelSize.x}
+                        onChange={e => setPixelSizeX(parseInt(e.target.value))}
+                        min={0}
+                    />
+                    <input
+                        className='theia-input'
+                        style={{ width: 48 }}
+                        type='number'
+                        value={data.pixelSize.y}
+                        onChange={e => setPixelSizeY(parseInt(e.target.value))}
+                        min={0}
+                    />
+                    <input
+                        className='theia-input'
+                        style={{ width: 48 }}
+                        type='number'
+                        value={data.pixelSize.z}
+                        onChange={e => setPixelSizeZ(parseInt(e.target.value))}
+                        min={0}
+                    />
+                </HContainer>
+            </VContainer>
+        </HContainer>
     </VContainer>;
 }

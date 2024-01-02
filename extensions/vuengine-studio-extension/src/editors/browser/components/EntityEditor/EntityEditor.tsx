@@ -215,7 +215,9 @@ export default class EntityEditor extends React.Component<
                     minWidth: 200,
                     content: (
                       <EntityEditorContext.Consumer>
-                        {context => <General />}
+                        {context => <General
+                          hoverService={this.props.services.hoverService}
+                        />}
                       </EntityEditorContext.Consumer>
                     ),
                   },

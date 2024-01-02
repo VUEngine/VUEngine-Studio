@@ -3,7 +3,17 @@ import { JsonForms } from '@jsonforms/react';
 import { JsonFormsStyleContext, StyleContext, vanillaCells, vanillaRenderers, vanillaStyles } from '@jsonforms/vanilla-renderers';
 import { Message } from '@phosphor/messaging';
 import { CommandService, Emitter, Event, MessageService, Reference, UNTITLED_SCHEME, URI, nls } from '@theia/core';
-import { CommonCommands, ConfirmDialog, LabelProvider, LocalStorageService, OpenerService, PreferenceService, Saveable, SaveableSource } from '@theia/core/lib/browser';
+import {
+    CommonCommands,
+    ConfirmDialog,
+    HoverService,
+    LabelProvider,
+    LocalStorageService,
+    OpenerService,
+    PreferenceService,
+    Saveable,
+    SaveableSource,
+} from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
@@ -44,6 +54,7 @@ export interface EditorsServices {
     commandService: CommandService
     fileService: FileService
     fileDialogService: FileDialogService
+    hoverService: HoverService
     messageService: MessageService
     openerService: OpenerService
     preferenceService: PreferenceService
@@ -64,6 +75,8 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     protected readonly fileDialogService: FileDialogService;
     @inject(FileService)
     protected readonly fileService: FileService;
+    @inject(HoverService)
+    protected readonly hoverService: HoverService;
     @inject(LabelProvider)
     protected readonly labelProvider: LabelProvider;
     @inject(MessageService)
@@ -496,6 +509,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
                                 commandService: this.commandService,
                                 fileService: this.fileService,
                                 fileDialogService: this.fileDialogService,
+                                hoverService: this.hoverService,
                                 messageService: this.messageService,
                                 openerService: this.openerService,
                                 preferenceService: this.preferenceService,

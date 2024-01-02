@@ -28,7 +28,7 @@ export default function Sprites(props: SpritesProps): React.JSX.Element {
                     totalChars += s._imageData.animation?.largestFrame;
                 } else {
                     if (s._imageData.tiles?.count) {
-                        totalChars += data.animations?.enabled
+                        totalChars += data.animations?.enabled && !data.animations.multiframe
                             ? s._imageData.tiles?.count / data.animations?.totalFrames || 1
                             : s._imageData.tiles?.count;
                     }
@@ -177,8 +177,6 @@ export default function Sprites(props: SpritesProps): React.JSX.Element {
                 ...data.animations,
                 multiframe: !data.animations.multiframe,
             }
-        }, {
-            appendImageData: true
         });
     };
 

@@ -42,7 +42,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
             } else if (imageData.animation?.largestFrame) {
                 return imageData.animation?.largestFrame;
             } else if (imageData.tiles?.count) {
-                return data.animations?.enabled
+                return data.animations?.enabled && !data.animations.multiframe
                     ? imageData.tiles?.count / data.animations?.totalFrames || 1
                     : imageData.tiles?.count;
             }

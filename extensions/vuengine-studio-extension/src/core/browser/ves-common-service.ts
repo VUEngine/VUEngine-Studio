@@ -71,11 +71,11 @@ export class VesCommonService {
     return name.replace(/[^A-Za-z0-9_]/g, '');
   }
 
-  protected base64ToBytes(base64: string): Uint8Array {
+  base64ToBytes(base64: string): Uint8Array {
     const binString = atob(base64);
     return Uint8Array.from(binString, m => m.codePointAt(0) ?? 0);
   }
-  protected bytesToBase64(bytes: Uint8Array): string {
+  bytesToBase64(bytes: Uint8Array): string {
     let binary = '';
     const len = bytes.byteLength;
     for (let i = 0; i < len; i++) {

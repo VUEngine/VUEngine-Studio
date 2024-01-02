@@ -31,7 +31,7 @@
     border-color: var(--theia-button-hoverBackground);
 }
 
-.entityEditor .item .remove-button {
+.entityEditor .item > .remove-button {
     background-color: transparent;
     border: 0;
     border-bottom-left-radius: 2px;
@@ -45,11 +45,11 @@
     top: 0;
     width: 32px;
 }
-.entityEditor .item:hover .remove-button {
+.entityEditor .item:hover > .remove-button {
     color: var(--theia-button-hoverBackground);
     display: block;
 }
-.entityEditor .item:hover .remove-button:hover {
+.entityEditor .item:hover > .remove-button:hover {
     background-color: var(--theia-button-hoverBackground);
     color: var(--theia-button-foreground);
 }

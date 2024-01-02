@@ -498,6 +498,7 @@ export class VesEmulatorWidget extends ReactWidget {
     const romContent = await this.fileService.readFile(romUri);
     const romContentBuffer = romContent.value.buffer;
     const romContentHeaderBuffer = romContentBuffer.slice(-544).slice(0, 32);
+    // TODO: move iconv to backend
     const romHeaderName = iconv.decode(
       Buffer.from(romContentHeaderBuffer.slice(0, 20)),
       'Shift_JIS'
@@ -506,13 +507,13 @@ export class VesEmulatorWidget extends ReactWidget {
     const romHeaderCode = romContentHeaderBuffer.slice(27, 31).toString();
     const romHeaderVersion = romContentHeaderBuffer.slice(31, 32)[0];
     this.state.romHeader = {
-      name: romHeaderName.padEnd(20, ' '),
+      name: romHeaderName.padEnd(20, ' '),
       maker: romHeaderMaker,
       code: romHeaderCode,
       version: romHeaderVersion,
     };
 
-    const romBase64 = Buffer.from(romContentBuffer).toString('base64');
+    const romBase64 = this.vesCommonService.bytesToBase64(romContentBuffer);
     this.sendRetroArchConfig();
     this.sendCoreOptions();
     this.sendCommand('start', {
