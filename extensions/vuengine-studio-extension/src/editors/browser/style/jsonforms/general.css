@@ -7,13 +7,28 @@
 }
 
 .jsonforms-container .generatingOverlay {
+  align-items: center;
   background-color: var(--theia-editor-background);
-  height: 100%;
-  opacity: .5;
+  display: flex;
+  height: 0;
+  justify-content: center;
+  opacity: 0;
   padding: 0;
   position: absolute;
-  width: 100%;
+  width: 0;
   z-index: 999999;
+}
+
+.jsonforms-container .generatingOverlay.isGenerating {
+  height: 100%;
+  opacity: .75;
+  transition: opacity .5s;
+  transition-delay: .5s;
+  width: 100%;
+}
+
+.jsonforms-container .generatingOverlay i {
+  font-size: 300%;
 }
 
 .jsonforms-container>div {

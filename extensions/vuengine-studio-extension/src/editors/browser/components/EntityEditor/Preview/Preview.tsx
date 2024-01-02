@@ -23,7 +23,6 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
 
   const setBooleanStateProperty = (property: string, checked: boolean) =>
     setState({
-      ...state,
       preview: {
         ...state.preview,
         [property]: checked,
@@ -59,7 +58,6 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
             min={1}
             onChange={e =>
               setState({
-                ...state,
                 preview: {
                   ...state.preview,
                   zoom: parseInt(e.target.value),
@@ -138,7 +136,6 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
                 const updatedPalettes = state.preview.palettes;
                 updatedPalettes[i] = newValue;
                 setState({
-                  ...state,
                   preview: {
                     ...state.preview,
                     palettes: updatedPalettes,

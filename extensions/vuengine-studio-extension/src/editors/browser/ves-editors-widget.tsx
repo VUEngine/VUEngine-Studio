@@ -105,8 +105,8 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     uri: URI;
     protected reference: Reference<MonacoEditorModel>;
     protected justSaved: boolean = false;
-    protected loading: boolean = true;
-    protected generating: boolean = false;
+    protected isLoading: boolean = true;
+    protected isGenerating: boolean = false;
 
     protected readonly onDirtyChangedEmitter = new Emitter<void>();
     get onDirtyChanged(): Event<void> {
@@ -169,6 +169,11 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     protected async persistDockLayout(layout: LayoutBase | undefined): Promise<void> {
         return this.localStorageService.setData(this.getLayoutLocalStorageId(), layout);
     };
+
+    protected setIsGenerating(isGenerating: boolean): void {
+        this.isGenerating = isGenerating;
+        this.update();
+    }
 
     @postConstruct()
     protected init(): void {
@@ -268,7 +273,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
 
         await this.loadData(type);
 
-        this.loading = false;
+        this.isLoading = false;
         this.update();
     }
 
@@ -312,12 +317,26 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     }
 
     undo(): void {
+        if (this.isGenerating) {
+            return;
+        }
+
+        // ...
     }
 
     redo(): void {
+        if (this.isGenerating) {
+            return;
+        }
+
+        // ...
     }
 
     async save(): Promise<void> {
+        if (this.isGenerating) {
+            return;
+        }
+
         if (this.uri.scheme === UNTITLED_SCHEME) {
             await this.commandService.executeCommand(CommonCommands.SAVE_AS.id);
         } else if (this.dirty) {
@@ -442,57 +461,60 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
 
     protected render(): React.ReactNode {
         return <div className="jsonforms-container" tabIndex={0}>
-            {this.loading
-                ? <div className="loader"><div></div></div>
-                : this.data
-                    ? <>
-                        {this.generating && <div className='generatingOverlay'></div>}
-                        <JsonFormsStyleContext.Provider value={this.getStyles()}>
-                            <JsonForms
-                                data={this.data}
-                                schema={this.schema}
-                                uischema={this.uiSchema}
-                                onChange={this.jsonformsOnChange}
-                                cells={vanillaCells}
-                                renderers={[
-                                    ...vanillaRenderers,
-                                    ...VES_RENDERERS
-                                ]}
-                                config={{
-                                    restrict: false,
-                                    trim: false,
-                                    showUnfocusedDescription: true,
-                                    hideRequiredAsterisk: false,
-                                    // TODO: refactor once there's a non-hacky way to inject custom data
-                                    fileUri: this.uri,
-                                    dock: {
-                                        getRef: this.getDockLayoutRef.bind(this),
-                                        persistLayout: this.persistDockLayout.bind(this),
-                                        setDefaultLayout: this.setDefaultDockLayout.bind(this),
-                                        resetLayout: this.resetDockLayout.bind(this),
-                                        restoreLayout: this.restoreDockLayout.bind(this),
-                                    },
-                                    services: {
-                                        commandService: this.commandService,
-                                        fileService: this.fileService,
-                                        fileDialogService: this.fileDialogService,
-                                        messageService: this.messageService,
-                                        openerService: this.openerService,
-                                        preferenceService: this.preferenceService,
-                                        vesCommonService: this.vesCommonService,
-                                        vesImagesService: this.vesImagesService,
-                                        vesProjectService: this.vesProjectService,
-                                        vesRumblePackService: this.vesRumblePackService,
-                                        workspaceService: this.workspaceService,
-                                    },
-                                    projectData: this.projectData,
-                                }}
-                            />
-                        </JsonFormsStyleContext.Provider>
-                    </>
-                    : <div className='error'>
-                        {nls.localize('vuengine/editors/errorCouldNotLoadItem', 'Error: could not load item.')}
-                    </div>}
+            <div className={`${this.isLoading || this.isGenerating ? 'generatingOverlay isGenerating' : 'generatingOverlay'}`}>
+                <i className='codicon codicon-loading codicon-modifier-spin' />
+            </div>
+            {!this.isLoading && this.data &&
+                <JsonFormsStyleContext.Provider value={this.getStyles()}>
+                    <JsonForms
+                        data={this.data}
+                        schema={this.schema}
+                        uischema={this.uiSchema}
+                        onChange={this.jsonformsOnChange}
+                        cells={vanillaCells}
+                        renderers={[
+                            ...vanillaRenderers,
+                            ...VES_RENDERERS
+                        ]}
+                        config={{
+                            restrict: false,
+                            trim: false,
+                            showUnfocusedDescription: true,
+                            hideRequiredAsterisk: true,
+                            // TODO: refactor once there's a non-hacky way to inject custom data
+                            fileUri: this.uri,
+                            isGenerating: this.isGenerating,
+                            setIsGenerating: this.setIsGenerating.bind(this),
+                            dock: {
+                                getRef: this.getDockLayoutRef.bind(this),
+                                persistLayout: this.persistDockLayout.bind(this),
+                                setDefaultLayout: this.setDefaultDockLayout.bind(this),
+                                resetLayout: this.resetDockLayout.bind(this),
+                                restoreLayout: this.restoreDockLayout.bind(this),
+                            },
+                            services: {
+                                commandService: this.commandService,
+                                fileService: this.fileService,
+                                fileDialogService: this.fileDialogService,
+                                messageService: this.messageService,
+                                openerService: this.openerService,
+                                preferenceService: this.preferenceService,
+                                vesCommonService: this.vesCommonService,
+                                vesImagesService: this.vesImagesService,
+                                vesProjectService: this.vesProjectService,
+                                vesRumblePackService: this.vesRumblePackService,
+                                workspaceService: this.workspaceService,
+                            },
+                            projectData: this.projectData,
+                        }}
+                    />
+                </JsonFormsStyleContext.Provider>
+            }
+            {!this.isLoading && !this.data &&
+                <div className='error'>
+                    {nls.localize('vuengine/editors/errorCouldNotLoadItem', 'Error: could not load item.')}
+                </div>
+            }
         </div>;
     }
 

@@ -22,8 +22,10 @@ import Wireframes from './Wireframes/Wireframes';
 interface EntityEditorProps {
   data: EntityData;
   updateData: (entityData: EntityData) => void;
-  dock: EditorsDockInterface
   fileUri: URI
+  isGenerating: boolean
+  setIsGenerating: (isGenerating: boolean) => void
+  dock: EditorsDockInterface
   services: EditorsServices
 }
 
@@ -59,22 +61,28 @@ export default class EntityEditor extends React.Component<
 
   protected async setData(entityData: Partial<EntityData>, options?: EntityEditorSaveDataOptions): Promise<void> {
     let updatedData = { ...this.props.data, ...entityData };
-    if (options?.appendImageData) {
-      updatedData = await this.appendImageData(updatedData);
+
+    if (!this.props.isGenerating) {
+      if (options?.appendImageData) {
+        this.props.setIsGenerating(true);
+        updatedData = await this.appendImageData(updatedData);
+        this.props.setIsGenerating(false);
+      }
+
+      this.props.updateData(updatedData);
     }
-    this.props.updateData(updatedData);
   }
 
   protected async appendImageData(entityData: EntityData): Promise<EntityData> {
-    const mostFilesOnASprite = Math.max(...this.props.data.sprites.sprites.map(s => s.texture.files.length));
-    const isMultiImageAnimation = this.props.data.animations.enabled && mostFilesOnASprite > 1;
-    const optimizeTiles = (!this.props.data.animations.enabled && entityData.sprites.optimizedTiles)
-      || (this.props.data.animations.enabled && isMultiImageAnimation);
+    const mostFilesOnASprite = Math.max(...entityData.sprites.sprites.map(s => s.texture.files.length));
+    const isMultiImageAnimation = entityData.animations.enabled && mostFilesOnASprite > 1;
+    const optimizeTiles = (!entityData.animations.enabled && entityData.sprites.optimizedTiles)
+      || (entityData.animations.enabled && isMultiImageAnimation);
     const baseConfig = {
       animation: {
-        frames: isMultiImageAnimation ? mostFilesOnASprite : this.props.data.animations.totalFrames,
+        frames: isMultiImageAnimation ? mostFilesOnASprite : entityData.animations.totalFrames,
         individualFiles: isMultiImageAnimation,
-        isAnimation: this.props.data.animations.enabled
+        isAnimation: entityData.animations.enabled
       },
       files: [],
       map: {
@@ -89,11 +97,11 @@ export default class EntityEditor extends React.Component<
       section: entityData.sprites.section,
       tileset: {
         compression: entityData.sprites.compression,
-        shared: !this.props.data.animations.enabled && entityData.sprites.sharedTiles,
+        shared: !entityData.animations.enabled && entityData.sprites.sharedTiles,
       }
     };
 
-    if (!this.props.data.animations.enabled && entityData.sprites?.sharedTiles) {
+    if (!entityData.animations.enabled && entityData.sprites?.sharedTiles) {
       const files: string[] = [];
       // keep track of added files to be able to map back maps later
       const spriteFilesIndex: { [key: string]: number } = {};

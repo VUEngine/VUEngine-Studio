@@ -15,6 +15,8 @@ const VesEntityEditorControl = ({ data, handleChange, path, config }: VesEntityE
         data={data}
         updateData={(newValue: EntityData) => handleChange(path, newValue)}
         fileUri={config.fileUri}
+        isGenerating={config.isGenerating}
+        setIsGenerating={config.setIsGenerating.bind(this)}
         dock={config.dock}
         services={config.services}
     />;

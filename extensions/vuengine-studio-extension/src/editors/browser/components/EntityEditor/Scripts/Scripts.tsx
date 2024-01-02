@@ -1,13 +1,8 @@
 import React from 'react';
 import VContainer from '../../Common/VContainer';
 
-interface ScriptsProps {
-}
-
-export default function Scripts(props: ScriptsProps): React.JSX.Element {
-    // const { pattern, currentNote } = props;
-
+export default function Scripts(): React.JSX.Element {
     return <VContainer gap={15}>
-        [To be implemented]
+        Scripting has yet to be implemented.
     </VContainer>;
 }
