@@ -1,7 +1,7 @@
 import { CommonCommands } from '@theia/core/lib/browser';
 import DockLayout, { LayoutData } from 'rc-dock';
-import React from 'react';
-import { EditorsDockInterface, EditorsServices } from '../../ves-editors-widget';
+import React, { useContext } from 'react';
+import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import { ChannelConfig, InstrumentConfig, MusicEditorContext, MusicEditorState, Notes, PatternConfig, SongData, SongNote } from './MusicEditorTypes';
 import MusicPlayer from './MusicPlayer';
 import PianoRoll from './PianoRoll/PianoRoll';
@@ -16,8 +16,6 @@ import Waveforms from './Sidebar/Waveforms';
 interface MusicEditorProps {
     songData: SongData
     updateSongData: (songData: SongData) => void
-    dock: EditorsDockInterface,
-    services: EditorsServices
 }
 
 export default class MusicEditor extends React.Component<MusicEditorProps, MusicEditorState> {
@@ -280,11 +278,13 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
     }
 
     async componentDidMount(): Promise<void> {
-        this.props.dock.restoreLayout();
+        const { dock } = useContext(EditorsContext) as EditorsContextType;
+        dock.restoreLayout();
         this.computeSong();
     }
 
     render(): React.JSX.Element {
+        const { dock, services } = useContext(EditorsContext) as EditorsContextType;
         const defaultLayout: LayoutData = {
             dockbox: {
                 mode: 'horizontal',
@@ -443,7 +443,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                 <button
                     className={'theia-button secondary large'}
                     title='Save'
-                    onClick={() => this.props.services.commandService.executeCommand(CommonCommands.SAVE.id)}
+                    onClick={() => services.commandService.executeCommand(CommonCommands.SAVE.id)}
                 >
                     <i className='fa fa-save' />
                 </button>
@@ -493,8 +493,8 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                 <DockLayout
                     defaultLayout={defaultLayout}
                     dropMode='edge'
-                    ref={this.props.dock.getRef}
-                    onLayoutChange={this.props.dock.persistLayout}
+                    ref={dock.getRef}
+                    onLayoutChange={dock.persistLayout}
                 />
             </MusicEditorContext.Provider>
         </div>;

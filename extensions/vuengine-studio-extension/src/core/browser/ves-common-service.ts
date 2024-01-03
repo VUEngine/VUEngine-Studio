@@ -94,6 +94,7 @@ export class VesCommonService {
       type: 'application/json',
     }).stream();
     const compressedReadableStream = stream.pipeThrough(
+      // @ts-ignore
       new CompressionStream('gzip')
     );
     const compressedResponse = new Response(compressedReadableStream);
@@ -113,6 +114,7 @@ export class VesCommonService {
       type: 'application/json',
     }).stream();
     const compressedReadableStream = stream.pipeThrough(
+      // @ts-ignore
       new DecompressionStream('gzip')
     );
     const resp = new Response(compressedReadableStream);

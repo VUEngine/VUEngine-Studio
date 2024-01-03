@@ -2,6 +2,7 @@ import { withJsonFormsControlProps } from '@jsonforms/react';
 import React from 'react';
 import PCMEditor from '../../components/PCMEditor/PCMEditor';
 import { PCMData } from '../../components/PCMEditor/PCMTypes';
+import { EditorsContext } from '../../ves-editors-types';
 
 interface VesPCMEditorControlProps {
     data: PCMData;
@@ -11,11 +12,11 @@ interface VesPCMEditorControlProps {
 }
 
 const VesPCMEditorControl = ({ data, handleChange, path, config }: VesPCMEditorControlProps) =>
-    <PCMEditor
-        data={data}
-        updateData={(newValue: PCMData) => handleChange(path, newValue)}
-        fileUri={config.fileUri}
-        services={config.services}
-    />;
+    <EditorsContext.Consumer>
+        {context => <PCMEditor
+            data={data}
+            updateData={(newValue: PCMData) => handleChange(path, newValue)}
+        />}
+    </EditorsContext.Consumer>;
 
 export default withJsonFormsControlProps(VesPCMEditorControl);

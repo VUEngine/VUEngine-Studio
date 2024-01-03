@@ -1,7 +1,6 @@
-import { URI, nls } from '@theia/core';
+import { nls } from '@theia/core';
 import React from 'react';
 import { ImageConfig } from '../../../../images/browser/ves-images-types';
-import { EditorsServices } from '../../ves-editors-widget';
 import HContainer from '../Common/HContainer';
 import VContainer from '../Common/VContainer';
 import Animation from './Animation/Animation';
@@ -14,17 +13,10 @@ import Tiles from './TilesMap/Tiles';
 interface ImageConvEditorProps {
     data: ImageConfig
     updateData: (data: ImageConfig) => void
-    fileUri: URI
-    services: EditorsServices
 }
 
 export default function ImageConvEditor(props: ImageConvEditorProps): React.JSX.Element {
-    const {
-        data,
-        updateData,
-        fileUri,
-        services,
-    } = props;
+    const { data, updateData } = props;
 
     const updateImageConvData = (updatedData: Partial<ImageConfig>): void => {
         updateData({ ...data, ...updatedData });
@@ -67,8 +59,6 @@ export default function ImageConvEditor(props: ImageConvEditorProps): React.JSX.
                             updateData={updateFiles}
                             allInFolderAsFallback={true}
                             canSelectMany={true}
-                            fileUri={fileUri}
-                            services={services}
                         />
                     </VContainer>
                 </VContainer>

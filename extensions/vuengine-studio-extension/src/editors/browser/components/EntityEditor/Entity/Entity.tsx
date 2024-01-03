@@ -1,5 +1,4 @@
 import { nls } from '@theia/core';
-import { HoverService } from '@theia/core/lib/browser';
 import React, { useContext } from 'react';
 import HContainer from '../../Common/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
@@ -9,13 +8,8 @@ import Behaviors from './Behaviors';
 import Children from './Children';
 import Physics from './Physics';
 
-interface EntityProps {
-    hoverService: HoverService
-}
-
-export default function Entity(props: EntityProps): React.JSX.Element {
+export default function Entity(): React.JSX.Element {
     const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
-    const { hoverService } = props;
 
     const setName = (n: string): void => {
         setData({ name: n });
@@ -74,7 +68,6 @@ export default function Entity(props: EntityProps): React.JSX.Element {
             <VContainer>
                 <InfoLabel
                     label={nls.localize('vuengine/entityEditor/entitySize', 'Size (x, y, z)')}
-                    hoverService={hoverService}
                     // eslint-disable-next-line max-len
                     tooltip={nls.localize('vuengine/entityEditor/entitySizeDescription', 'Size of the entity in pixels. Used by streaming to test if out of screen bounds. If 0, width and height will be inferred from the first sprite\'s texture\'s size.')}
                 />

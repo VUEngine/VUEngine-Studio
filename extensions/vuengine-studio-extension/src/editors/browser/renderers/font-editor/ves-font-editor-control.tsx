@@ -2,6 +2,7 @@ import { withJsonFormsControlProps } from '@jsonforms/react';
 import React from 'react';
 import FontEditor from '../../components/FontEditor/FontEditor';
 import { FontData } from '../../components/FontEditor/FontEditorTypes';
+import { EditorsContext } from '../../ves-editors-types';
 
 interface VesFontEditorControlProps {
     data: FontData;
@@ -11,11 +12,11 @@ interface VesFontEditorControlProps {
 }
 
 const VesFontEditorControl = ({ data, handleChange, path, config }: VesFontEditorControlProps) =>
-    <FontEditor
-        data={data}
-        updateData={(newValue: FontData) => handleChange(path, newValue)}
-        fileUri={config.fileUri}
-        services={config.services}
-    />;
+    <EditorsContext.Consumer>
+        {context => <FontEditor
+            data={data}
+            updateData={(newValue: FontData) => handleChange(path, newValue)}
+        />}
+    </EditorsContext.Consumer>;
 
 export default withJsonFormsControlProps(VesFontEditorControl);

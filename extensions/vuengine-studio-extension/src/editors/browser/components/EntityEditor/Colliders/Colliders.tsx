@@ -2,18 +2,14 @@ import { URI, nls } from '@theia/core';
 import { SelectComponent, SelectOption } from '@theia/core/lib/browser/widgets/select-component';
 import React, { useContext } from 'react';
 import { ProjectContributor } from '../../../../../project/browser/ves-project-types';
-import { EditorsServices } from '../../../ves-editors-widget';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/HContainer';
 import VContainer from '../../Common/VContainer';
 import { ColliderType, EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 import Collider from './Collider';
 
-interface CollidersProps {
-    services: EditorsServices
-}
-
-export default function Colliders(props: CollidersProps): React.JSX.Element {
-    const { services } = props;
+export default function Colliders(): React.JSX.Element {
+    const { services } = useContext(EditorsContext) as EditorsContextType;
     const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
 
     const setInGameType = (inGameType: string): void => {

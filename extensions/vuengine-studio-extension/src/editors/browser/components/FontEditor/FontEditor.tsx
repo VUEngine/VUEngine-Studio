@@ -1,9 +1,9 @@
-import { URI, nls } from '@theia/core';
+import { nls } from '@theia/core';
 import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import { injectable } from '@theia/core/shared/inversify';
-import React from 'react';
+import React, { useContext } from 'react';
 import { ImageCompressionType } from '../../../../images/browser/ves-images-types';
-import { EditorsServices } from '../../ves-editors-widget';
+import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import { DataSection } from '../Common/CommonTypes';
 import HContainer from '../Common/HContainer';
 import VContainer from '../Common/VContainer';
@@ -27,8 +27,6 @@ import Tools from './Tools/Tools';
 interface FontEditorProps {
     data: FontData
     updateData: (data: FontData) => void
-    fileUri: URI
-    services: EditorsServices
 }
 
 @injectable()
@@ -272,7 +270,8 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
     }
 
     render(): React.JSX.Element {
-        const { fileUri, data, services } = this.props;
+        const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
+        const { data } = this.props;
 
         const pixelWidth = data.size.x * CHAR_PIXEL_SIZE;
         const pixelHeight = data.size.y * CHAR_PIXEL_SIZE;

@@ -1,20 +1,19 @@
 import { MaybeArray, URI, nls } from '@theia/core';
 import { OpenFileDialogProps } from '@theia/filesystem/lib/browser';
-import React, { useEffect, useState } from 'react';
-import { EditorsServices } from '../../../ves-editors-widget';
+import React, { useContext, useEffect, useState } from 'react';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/HContainer';
 
 interface ImagesProps {
     data: string[]
     updateData: (data: string[]) => void
-    canSelectMany: boolean,
-    allInFolderAsFallback: boolean,
-    fileUri: URI
-    services: EditorsServices,
+    canSelectMany: boolean
+    allInFolderAsFallback: boolean
 }
 
 export default function Images(props: ImagesProps): React.JSX.Element {
-    const { data, updateData, canSelectMany, allInFolderAsFallback, fileUri, services } = props;
+    const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
+    const { data, updateData, canSelectMany, allInFolderAsFallback } = props;
     const [filesToShow, setFilesToShow] = useState<{ [path: string]: string }>({});
     const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
 

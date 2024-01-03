@@ -2,7 +2,7 @@ import { JsonFormsCore, JsonSchema, UISchemaElement } from '@jsonforms/core';
 import { JsonForms } from '@jsonforms/react';
 import { JsonFormsStyleContext, StyleContext, vanillaCells, vanillaRenderers, vanillaStyles } from '@jsonforms/vanilla-renderers';
 import { Message } from '@phosphor/messaging';
-import { CommandService, Emitter, Event, MessageService, Reference, UNTITLED_SCHEME, URI, nls } from '@theia/core';
+import { CommandService, Emitter, Event, MessageService, QuickPickService, Reference, UNTITLED_SCHEME, URI, nls } from '@theia/core';
 import {
     CommonCommands,
     ConfirmDialog,
@@ -28,9 +28,10 @@ import DockLayout, { LayoutBase } from 'rc-dock';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesImagesService } from '../../images/browser/ves-images-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
-import { ProjectFile, ProjectFileType } from '../../project/browser/ves-project-types';
+import { ProjectFileType } from '../../project/browser/ves-project-types';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
 import { VES_RENDERERS } from './renderers/ves-renderers';
+import { EditorsContext } from './ves-editors-types';
 
 export const VesEditorsWidgetOptions = Symbol('VesEditorsWidgetOptions');
 export interface VesEditorsWidgetOptions {
@@ -40,29 +41,6 @@ export interface VesEditorsWidgetOptions {
 
 export interface ItemData {
     [id: string]: unknown
-};
-
-export interface EditorsDockInterface {
-    getRef: (r: DockLayout) => void,
-    setDefaultLayout: (defaultLayout: LayoutBase) => Promise<void>,
-    resetLayout: () => Promise<void>,
-    restoreLayout: () => Promise<void>,
-    persistLayout: (layout: LayoutBase | undefined) => Promise<void>,
-};
-
-export interface EditorsServices {
-    commandService: CommandService
-    fileService: FileService
-    fileDialogService: FileDialogService
-    hoverService: HoverService
-    messageService: MessageService
-    openerService: OpenerService
-    preferenceService: PreferenceService
-    vesCommonService: VesCommonService
-    vesImagesService: VesImagesService
-    vesProjectService: VesProjectService,
-    vesRumblePackService: VesRumblePackService
-    workspaceService: WorkspaceService
 };
 
 @injectable()
@@ -87,6 +65,8 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     protected readonly modelService: MonacoTextModelService;
     @inject(OpenerService)
     protected readonly openerService: OpenerService;
+    @inject(QuickPickService)
+    protected readonly quickPickService: QuickPickService;
     @inject(PreferenceService)
     protected readonly preferenceService: PreferenceService;
     @inject(VesCommonService)
@@ -102,7 +82,6 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     @inject(WorkspaceService)
     private readonly workspaceService: WorkspaceService;
 
-    protected projectData: ProjectFile | undefined;
     protected data: ItemData | undefined;
     protected savedData: ItemData | undefined;
 
@@ -282,7 +261,6 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         if (type?.icon) {
             this.title.iconClass = type.icon;
         }
-        this.projectData = this.vesProjectService.getProjectData();
 
         await this.loadData(type);
 
@@ -478,51 +456,55 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
                 <i className='codicon codicon-loading codicon-modifier-spin' />
             </div>
             {!this.isLoading && this.data &&
-                <JsonFormsStyleContext.Provider value={this.getStyles()}>
-                    <JsonForms
-                        data={this.data}
-                        schema={this.schema}
-                        uischema={this.uiSchema}
-                        onChange={this.jsonformsOnChange}
-                        cells={vanillaCells}
-                        renderers={[
-                            ...vanillaRenderers,
-                            ...VES_RENDERERS
-                        ]}
-                        config={{
-                            restrict: false,
-                            trim: false,
-                            showUnfocusedDescription: true,
-                            hideRequiredAsterisk: true,
-                            // TODO: refactor once there's a non-hacky way to inject custom data
-                            fileUri: this.uri,
-                            isGenerating: this.isGenerating,
-                            setIsGenerating: this.setIsGenerating.bind(this),
-                            dock: {
-                                getRef: this.getDockLayoutRef.bind(this),
-                                persistLayout: this.persistDockLayout.bind(this),
-                                setDefaultLayout: this.setDefaultDockLayout.bind(this),
-                                resetLayout: this.resetDockLayout.bind(this),
-                                restoreLayout: this.restoreDockLayout.bind(this),
-                            },
-                            services: {
-                                commandService: this.commandService,
-                                fileService: this.fileService,
-                                fileDialogService: this.fileDialogService,
-                                hoverService: this.hoverService,
-                                messageService: this.messageService,
-                                openerService: this.openerService,
-                                preferenceService: this.preferenceService,
-                                vesCommonService: this.vesCommonService,
-                                vesImagesService: this.vesImagesService,
-                                vesProjectService: this.vesProjectService,
-                                vesRumblePackService: this.vesRumblePackService,
-                                workspaceService: this.workspaceService,
-                            },
-                            projectData: this.projectData,
-                        }}
-                    />
-                </JsonFormsStyleContext.Provider>
+                <EditorsContext.Provider
+                    value={{
+                        fileUri: this.uri,
+                        isGenerating: this.isGenerating,
+                        setIsGenerating: this.setIsGenerating.bind(this),
+                        dock: {
+                            getRef: this.getDockLayoutRef.bind(this),
+                            persistLayout: this.persistDockLayout.bind(this),
+                            setDefaultLayout: this.setDefaultDockLayout.bind(this),
+                            resetLayout: this.resetDockLayout.bind(this),
+                            restoreLayout: this.restoreDockLayout.bind(this),
+                        },
+                        services: {
+                            commandService: this.commandService,
+                            fileService: this.fileService,
+                            fileDialogService: this.fileDialogService,
+                            hoverService: this.hoverService,
+                            messageService: this.messageService,
+                            openerService: this.openerService,
+                            quickPickService: this.quickPickService,
+                            preferenceService: this.preferenceService,
+                            vesCommonService: this.vesCommonService,
+                            vesImagesService: this.vesImagesService,
+                            vesProjectService: this.vesProjectService,
+                            vesRumblePackService: this.vesRumblePackService,
+                            workspaceService: this.workspaceService,
+                        },
+                    }}
+                >
+                    <JsonFormsStyleContext.Provider value={this.getStyles()}>
+                        <JsonForms
+                            data={this.data}
+                            schema={this.schema}
+                            uischema={this.uiSchema}
+                            onChange={this.jsonformsOnChange}
+                            cells={vanillaCells}
+                            renderers={[
+                                ...vanillaRenderers,
+                                ...VES_RENDERERS
+                            ]}
+                            config={{
+                                restrict: false,
+                                trim: false,
+                                showUnfocusedDescription: true,
+                                hideRequiredAsterisk: true,
+                            }}
+                        />
+                    </JsonFormsStyleContext.Provider>
+                </EditorsContext.Provider>
             }
             {!this.isLoading && !this.data &&
                 <div className='error'>

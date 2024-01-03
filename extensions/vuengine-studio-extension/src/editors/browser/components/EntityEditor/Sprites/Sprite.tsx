@@ -1,9 +1,9 @@
-import { URI, nls } from '@theia/core';
+import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext } from 'react';
-import { ConversionResult } from 'src/images/browser/ves-images-types';
-import { EditorsServices } from '../../../ves-editors-widget';
+import { ConversionResult } from '../../../../../images/browser/ves-images-types';
 import HContainer from '../../Common/HContainer';
+import InfoLabel from '../../Common/InfoLabel';
 import RadioSelect from '../../Common/RadioSelect';
 import VContainer from '../../Common/VContainer';
 import Images from '../../ImageConvEditor/Images/Images';
@@ -18,18 +18,15 @@ import {
     SpriteType,
     Transparency
 } from '../EntityEditorTypes';
-import InfoLabel from '../../Common/InfoLabel';
 
 interface SpriteProps {
     index: number
     sprite: Sprite
-    fileUri: URI
-    services: EditorsServices
 }
 
 export default function Sprite(props: SpriteProps): React.JSX.Element {
     const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
-    const { index, sprite, fileUri, services } = props;
+    const { index, sprite } = props;
 
     const getCharCount = (imageData: Partial<ConversionResult & { _dupeIndex: number }> | number | undefined): number => {
         if (imageData !== undefined) {
@@ -249,7 +246,6 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
             <VContainer>
                 <InfoLabel
                     label={nls.localize('vuengine/entityEditor/displays', 'Displays')}
-                    hoverService={props.services.hoverService}
                     tooltip={nls.localize(
                         'vuengine/entityEditor/displayModeDescription',
                         // eslint-disable-next-line max-len
@@ -276,7 +272,6 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
             <VContainer>
                 <InfoLabel
                     label={nls.localize('vuengine/entityEditor/transparency', 'Transparency')}
-                    hoverService={props.services.hoverService}
                     tooltip={nls.localize(
                         'vuengine/entityEditor/spriteTransparencyDescription',
                         // eslint-disable-next-line max-len
@@ -311,7 +306,6 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
             <VContainer>
                 <InfoLabel
                     label={nls.localize('vuengine/entityEditor/displacement', 'Displacement (x, y, z, parallax)')}
-                    hoverService={props.services.hoverService}
                     tooltip={nls.localize(
                         'vuengine/entityEditor/displacementDescription',
                         // eslint-disable-next-line max-len
@@ -352,7 +346,6 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
             {data.sprites.type === SpriteType.Bgmap && <VContainer>
                 <InfoLabel
                     label={nls.localize('vuengine/entityEditor/bgmapMode', 'Bgmap Mode')}
-                    hoverService={props.services.hoverService}
                     tooltip={<>
                         <div>
                             <b>{nls.localize('vuengine/entityEditor/bgmapModeBgmap', 'Bgmap')}: </b>
@@ -401,7 +394,6 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     <VContainer>
                         <InfoLabel
                             label={nls.localize('vuengine/entityEditor/padding', 'Padding (X, Y)')}
-                            hoverService={props.services.hoverService}
                             tooltip={nls.localize(
                                 'vuengine/entityEditor/paddingDescription',
                                 'Pad texture data in memory by the specified amount of blank pixels to prevent fragments of surrounding textures to appear at the outer edges.'
@@ -431,7 +423,6 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     <VContainer>
                         <InfoLabel
                             label={nls.localize('vuengine/entityEditor/manipulationFunction', 'Manipulation Function')}
-                            hoverService={props.services.hoverService}
                             tooltip={nls.localize(
                                 'vuengine/entityEditor/manipulationFunctionDescription',
                                 'Provide the name of the function responsible for handling the Affine or HBias transformations of this sprite.'
@@ -485,7 +476,6 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 label={data.animations.enabled
                     ? nls.localize('vuengine/entityEditor/files', 'Image File(s)')
                     : nls.localize('vuengine/entityEditor/file', 'Image File')}
-                hoverService={props.services.hoverService}
                 tooltip={nls.localize(
                     'vuengine/entityEditor/filesDescription',
                     // eslint-disable-next-line max-len
@@ -497,8 +487,6 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 updateData={setFiles}
                 allInFolderAsFallback={false}
                 canSelectMany={data.animations.enabled}
-                fileUri={fileUri}
-                services={services}
             />
         </VContainer>
     </VContainer>;

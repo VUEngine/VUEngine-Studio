@@ -23,8 +23,8 @@ import {
   ProjectContributor,
   ProjectFile,
   ProjectFileItem,
-  ProjectFileItemWithContributor,
   ProjectFileItemsWithContributor,
+  ProjectFileItemsByTypeWithContributor,
   ProjectFileTemplate,
   ProjectFileTemplatesWithContributor,
   ProjectFileType,
@@ -105,10 +105,15 @@ export class VesProjectService {
     return this._projectData?.combined?.templates
       && this._projectData?.combined?.templates[templateId];
   }
-  getProjectDataItems(): ProjectFileItemsWithContributor | undefined {
+  getProjectDataItems(): ProjectFileItemsByTypeWithContributor | undefined {
     return this._projectData?.combined?.items;
   }
-  getProjectDataItemsForType(typeId: string, contributor?: ProjectContributor): ProjectFileItemWithContributor | undefined {
+  getProjectDataItemById(itemId: string, typeId: string): unknown {
+    if (this._projectData?.combined?.items && this._projectData?.combined?.items[typeId]) {
+      return this._projectData?.combined?.items[typeId][itemId];
+    }
+  }
+  getProjectDataItemsForType(typeId: string, contributor?: ProjectContributor): ProjectFileItemsWithContributor | undefined {
     let result = {};
     const items = this._projectData?.combined?.items ? this._projectData?.combined?.items[typeId] || {} : {};
 
@@ -440,7 +445,7 @@ export class VesProjectService {
     }
 
     const combined: {
-      [key: string]: ProjectFileItemsWithContributor | ProjectFileTemplatesWithContributor | ProjectFileTypesWithContributor
+      [key: string]: ProjectFileItemsByTypeWithContributor | ProjectFileTemplatesWithContributor | ProjectFileTypesWithContributor
     } = {
       items: {},
       templates: {},

@@ -1,15 +1,15 @@
-import { HoverService } from '@theia/core/lib/browser';
-import React, { PropsWithChildren, ReactElement } from 'react';
+import React, { PropsWithChildren, ReactElement, useContext } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
+import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 
 interface InfoLabelProps {
     label: string
     tooltip: string | ReactElement
-    hoverService: HoverService
 }
 
 export default function InfoLabel(props: PropsWithChildren<InfoLabelProps>): React.JSX.Element {
-    const { label, hoverService, tooltip } = props;
+    const { services } = useContext(EditorsContext) as EditorsContextType;
+    const { label, tooltip } = props;
 
     let content: string | HTMLElement = tooltip as string;
     if (typeof tooltip !== 'string') {
@@ -21,7 +21,7 @@ export default function InfoLabel(props: PropsWithChildren<InfoLabelProps>): Rea
     return <label>
         {label}
         <i className='codicon codicon-question' onMouseEnter={event => {
-            hoverService.requestHover({
+            services.hoverService.requestHover({
                 content: content,
                 target: event.currentTarget,
                 position: 'top',

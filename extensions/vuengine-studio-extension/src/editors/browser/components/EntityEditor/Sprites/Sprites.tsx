@@ -1,7 +1,6 @@
-import { URI, nls } from '@theia/core';
+import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import { ImageCompressionType } from '../../../../../images/browser/ves-images-types';
-import { EditorsServices } from '../../../ves-editors-widget';
 import { DataSection } from '../../Common/CommonTypes';
 import HContainer from '../../Common/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
@@ -10,14 +9,8 @@ import VContainer from '../../Common/VContainer';
 import { BgmapMode, DisplayMode, EntityEditorContext, EntityEditorContextType, SpriteType, Transparency } from '../EntityEditorTypes';
 import Sprite from './Sprite';
 
-interface SpritesProps {
-    fileUri: URI
-    services: EditorsServices
-}
-
-export default function Sprites(props: SpritesProps): React.JSX.Element {
+export default function Sprites(): React.JSX.Element {
     const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
-    const { fileUri, services } = props;
     const mostFilesOnASprite = Math.max(...data.sprites.sprites.map(s => s.texture.files.length));
     const isMultiImageAnimation = mostFilesOnASprite > 1;
 
@@ -284,7 +277,6 @@ export default function Sprites(props: SpritesProps): React.JSX.Element {
             <VContainer>
                 <InfoLabel
                     label={nls.localize('vuengine/entityEditor/compression', 'Compression')}
-                    hoverService={props.services.hoverService}
                     tooltip={nls.localize(
                         'vuengine/entityEditor/compressionDescription',
                         // eslint-disable-next-line max-len
@@ -306,7 +298,6 @@ export default function Sprites(props: SpritesProps): React.JSX.Element {
             <VContainer>
                 <InfoLabel
                     label={nls.localize('vuengine/entityEditor/section', 'Section')}
-                    hoverService={props.services.hoverService}
                     tooltip={nls.localize(
                         'vuengine/entityEditor/sectionDescription',
                         // eslint-disable-next-line max-len
@@ -348,8 +339,6 @@ export default function Sprites(props: SpritesProps): React.JSX.Element {
                     key={`sprite-${i}`}
                     index={i}
                     sprite={s}
-                    fileUri={fileUri}
-                    services={services}
                 />
             )}
             <button

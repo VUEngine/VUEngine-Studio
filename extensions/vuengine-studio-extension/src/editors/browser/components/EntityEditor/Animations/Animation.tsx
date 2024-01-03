@@ -2,6 +2,7 @@ import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext } from 'react';
 import HContainer from '../../Common/HContainer';
+import InfoLabel from '../../Common/InfoLabel';
 import VContainer from '../../Common/VContainer';
 import {
     AnimationData,
@@ -102,9 +103,13 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                 />
             </VContainer>
             <VContainer>
-                <label>
-                    {nls.localize('vuengine/entityEditor/default', 'Default')}
-                </label>
+                <InfoLabel
+                    label={nls.localize('vuengine/entityEditor/default', 'Default')}
+                    tooltip={nls.localize(
+                        'vuengine/entityEditor/defaultAnimationDescription',
+                        'Play this animation as the default when the entity is created.'
+                    )}
+                />
                 <input
                     type="checkbox"
                     checked={data.animations.default === index}
@@ -112,9 +117,13 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                 />
             </VContainer>
             <VContainer>
-                <label>
-                    {nls.localize('vuengine/entityEditor/cycles', 'Cycles')}
-                </label>
+                <InfoLabel
+                    label={nls.localize('vuengine/entityEditor/cycles', 'Cycles')}
+                    tooltip={nls.localize(
+                        'vuengine/entityEditor/animationCyclesDescription',
+                        'Each frame of this animation Number is display the fiven amount of CPU cycles.'
+                    )}
+                />
                 <input
                     className='theia-input'
                     style={{ width: 48 }}
@@ -126,9 +135,13 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                 />
             </VContainer>
             <VContainer>
-                <label>
-                    {nls.localize('vuengine/entityEditor/loop', 'Loop')}
-                </label>
+                <InfoLabel
+                    label={nls.localize('vuengine/entityEditor/loop', 'Loop')}
+                    tooltip={nls.localize(
+                        'vuengine/entityEditor/animationLoopDescription',
+                        'Should this animation play endlessly in a loop or stop and continue showing the last frame after playing it once?'
+                    )}
+                />
                 <input
                     type="checkbox"
                     checked={animation.loop}
@@ -136,9 +149,13 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                 />
             </VContainer>
             {!animation.loop && <VContainer>
-                <label>
-                    {nls.localize('vuengine/entityEditor/callback', 'Callback')}
-                </label>
+                <InfoLabel
+                    label={nls.localize('vuengine/entityEditor/callback', 'Callback')}
+                    tooltip={nls.localize(
+                        'vuengine/entityEditor/animationCallbackDescription',
+                        'Provide the name of the method to call on animation completion.'
+                    )}
+                />
                 <input
                     className='theia-input'
                     value={animation.callback}

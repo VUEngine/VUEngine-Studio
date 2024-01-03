@@ -2,6 +2,7 @@ import { withJsonFormsControlProps } from '@jsonforms/react';
 import React from 'react';
 import BrightnessRepeatEditor from '../../components/BrightnessRepeatEditor/BrightnessRepeatEditor';
 import { BrightnessRepeatData } from '../../components/BrightnessRepeatEditor/BrightnessRepeatTypes';
+import { EditorsContext } from '../../ves-editors-types';
 
 interface VesBrightnessRepeatEditorControlProps {
     data: BrightnessRepeatData;
@@ -10,9 +11,11 @@ interface VesBrightnessRepeatEditorControlProps {
 }
 
 const VesBrightnessRepeatEditorControl = ({ data, handleChange, path }: VesBrightnessRepeatEditorControlProps) =>
-    <BrightnessRepeatEditor
-        data={data}
-        updateData={(newValue: BrightnessRepeatData) => handleChange(path, newValue)}
-    />;
+    <EditorsContext.Consumer>
+        {context => <BrightnessRepeatEditor
+            data={data}
+            updateData={(newValue: BrightnessRepeatData) => handleChange(path, newValue)}
+        />}
+    </EditorsContext.Consumer>;
 
 export default withJsonFormsControlProps(VesBrightnessRepeatEditorControl);

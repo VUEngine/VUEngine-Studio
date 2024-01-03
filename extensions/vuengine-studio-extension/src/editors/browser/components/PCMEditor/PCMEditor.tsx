@@ -1,8 +1,8 @@
-import { URI, nls } from '@theia/core';
+import { nls } from '@theia/core';
 import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import { OpenFileDialogProps } from '@theia/filesystem/lib/browser';
-import React from 'react';
-import { EditorsServices } from '../../ves-editors-widget';
+import React, { useContext } from 'react';
+import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import { DataSection } from '../Common/CommonTypes';
 import HContainer from '../Common/HContainer';
 import VContainer from '../Common/VContainer';
@@ -11,8 +11,6 @@ import { MAX_RANGE, MIN_RANGE, PCMData } from './PCMTypes';
 interface PCMProps {
     data: PCMData
     updateData: (data: PCMData) => void
-    fileUri: URI
-    services: EditorsServices
 }
 
 interface PCMState {
@@ -35,7 +33,8 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
     }
 
     protected setSourceFile = async (sourceFile: string) => {
-        const workspaceRootUri = this.props.services.workspaceService.tryGetRoots()[0]?.resource;
+        const { services } = useContext(EditorsContext) as EditorsContextType;
+        const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
         const name = workspaceRootUri.resolve(sourceFile).path.name.replace(/([A-Z])/g, ' $1').trim();
 
         this.props.updateData({
@@ -69,8 +68,9 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
     };
 
     render(): React.JSX.Element {
+        const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
         const { data } = this.props;
-        const workspaceRootUri = this.props.services.workspaceService.tryGetRoots()[0]?.resource;
+        const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
 
         const selectSourceFile = async (): Promise<void> => {
             const openFileDialogProps: OpenFileDialogProps = {
@@ -79,14 +79,14 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
                 canSelectFiles: true,
                 filters: { 'WAV': ['wav'] }
             };
-            const currentPath = await this.props.services.fileService.resolve(this.props.fileUri.parent);
-            const uri = await this.props.services.fileDialogService.showOpenDialog(openFileDialogProps, currentPath);
+            const currentPath = await services.fileService.resolve(fileUri.parent);
+            const uri = await services.fileDialogService.showOpenDialog(openFileDialogProps, currentPath);
             if (uri) {
-                const source = await this.props.services.fileService.resolve(uri);
+                const source = await services.fileService.resolve(uri);
                 if (source.isFile) {
                     const relativeUri = workspaceRootUri.relative(uri);
                     if (!relativeUri) {
-                        this.props.services.messageService.error(
+                        services.messageService.error(
                             nls.localize('vuengine/pcmEditor/errorSourceFileMustBeInWorkspace', 'Source file must live in workspace.')
                         );
                     } else {

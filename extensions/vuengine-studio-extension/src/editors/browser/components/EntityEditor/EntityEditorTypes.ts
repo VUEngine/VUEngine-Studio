@@ -188,6 +188,7 @@ export interface Sprites {
 }
 
 export interface EntityData {
+    _id: string
     name: string
     extraInfo: string
     pixelSize: {

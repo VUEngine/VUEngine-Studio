@@ -967,12 +967,11 @@ export class VesBuildService {
       }
     ];
 
-    this.quickPickService.show<QuickPickItem>(buildTypes, quickPickOptions).then(selection => {
-      if (!selection) {
-        return;
-      }
-      this.setBuildMode(selection.label as BuildMode);
-    });
+    const selection = await this.quickPickService.show<QuickPickItem>(buildTypes, quickPickOptions);
+    if (!selection) {
+      return;
+    }
+    this.setBuildMode(selection.label as BuildMode);
   }
 
   async setBuildMode(buildMode: BuildMode): Promise<void> {

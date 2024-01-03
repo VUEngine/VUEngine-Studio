@@ -1,28 +1,15 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import VContainer from '../../Common/VContainer';
-import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
+import { EntityEditorContext, EntityEditorContextType, PositionedEntityData } from '../EntityEditorTypes';
+import PositionedEntities from './PositionedEntities';
 
 export default function Children(): React.JSX.Element {
     const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
 
-    const addChild = (): void => {
+    const updateChildren = async (positionedEntities: PositionedEntityData[]): Promise<void> => {
         const children = { ...data.children };
-        children.children = [
-            ...children.children,
-            {
-                itemId: '',
-                position: {
-                    x: 0,
-                    y: 0,
-                    z: 0,
-                    parallax: 0,
-                },
-                name: '',
-                extraInfo: '',
-                loadRegardlessOfPosition: false,
-            },
-        ];
+        children.children = positionedEntities;
 
         setData({ children });
     };
@@ -33,25 +20,10 @@ export default function Children(): React.JSX.Element {
                 data.children.children.length > 0 && ` (${data.children.children.length})`
             }
         </label>
-        <VContainer>
-            {data.children.children.length > 0 && data.children.children.map((child, index) =>
-                <>
-                    {/*
-                    <PositionedEntity
-                        key={`child-${index}`}
-                        index={index}
-                        positionedEntity={child}
-                    />
-                    */}
-                </>
-            )}
-            <button
-                className='theia-button add-button full-width'
-                onClick={addChild}
-                title={nls.localize('vuengine/entityEditor/addChildEntity', 'Add Child Entity')}
-            >
-                <i className='codicon codicon-plus' />
-            </button>
-        </VContainer>
-    </VContainer>;
+        <PositionedEntities
+            positionedEntities={data.children.children}
+            updatePositionedEntities={updateChildren}
+            itemIdsToIgnore={[data._id]}
+        />
+    </VContainer >;
 }

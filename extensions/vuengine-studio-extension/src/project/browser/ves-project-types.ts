@@ -22,7 +22,7 @@ export interface WorkspaceFile {
 
 export interface ProjectFile extends WorkspaceFile {
   combined?: {
-    items?: ProjectFileItemsWithContributor
+    items?: ProjectFileItemsByTypeWithContributor
     templates?: ProjectFileTemplatesWithContributor
     types?: ProjectFileTypesWithContributor
   }
@@ -45,12 +45,12 @@ export interface ProjectFileItem {
   [id: string]: unknown
 };
 
-export interface ProjectFileItemWithContributor extends ProjectFileItem {
+export interface ProjectFileItemsWithContributor extends ProjectFileItem {
   [id: string]: unknown & WithContributor & WithFileUri
 };
 
-export interface ProjectFileItemsWithContributor {
-  [typeId: string]: ProjectFileItemWithContributor
+export interface ProjectFileItemsByTypeWithContributor {
+  [typeId: string]: ProjectFileItemsWithContributor
 };
 
 export interface ProjectFileTypes {

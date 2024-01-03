@@ -1,8 +1,8 @@
-import { URI, nls } from '@theia/core';
+import { nls } from '@theia/core';
 import DockLayout, { LayoutBase, LayoutData } from 'rc-dock';
-import React from 'react';
+import React, { useContext } from 'react';
 import { ConversionResult } from '../../../../images/browser/ves-images-types';
-import { EditorsDockInterface, EditorsServices } from '../../ves-editors-widget';
+import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import Animations from './Animations/Animations';
 import Colliders from './Colliders/Colliders';
 import Entity from './Entity/Entity';
@@ -19,11 +19,6 @@ import Wireframes from './Wireframes/Wireframes';
 interface EntityEditorProps {
   data: EntityData;
   updateData: (entityData: EntityData) => void;
-  fileUri: URI
-  isGenerating: boolean
-  setIsGenerating: (isGenerating: boolean) => void
-  dock: EditorsDockInterface
-  services: EditorsServices
 }
 
 export interface EntityEditorSaveDataOptions {
@@ -57,13 +52,14 @@ export default class EntityEditor extends React.Component<
   };
 
   protected async setData(entityData: Partial<EntityData>, options?: EntityEditorSaveDataOptions): Promise<void> {
+    const { isGenerating, setIsGenerating } = useContext(EditorsContext) as EditorsContextType;
     let updatedData = { ...this.props.data, ...entityData };
 
-    if (!this.props.isGenerating) {
+    if (!isGenerating) {
       if (options?.appendImageData) {
-        this.props.setIsGenerating(true);
+        setIsGenerating(true);
         updatedData = await this.appendImageData(updatedData);
-        this.props.setIsGenerating(false);
+        setIsGenerating(false);
       }
 
       this.props.updateData(updatedData);
@@ -71,18 +67,19 @@ export default class EntityEditor extends React.Component<
   }
 
   protected async compressImageData(imageData: Partial<ConversionResult>): Promise<ConversionResult> {
+    const { services } = useContext(EditorsContext) as EditorsContextType;
     if (imageData.tiles) {
       let frameOffsets = {};
       if (imageData.tiles.frameOffsets) {
         frameOffsets = {
-          frameOffsets: await this.props.services.vesCommonService.compressJson(imageData.tiles.frameOffsets),
+          frameOffsets: await services.vesCommonService.compressJson(imageData.tiles.frameOffsets),
         };
       }
       imageData = {
         ...imageData,
         tiles: {
           ...imageData.tiles,
-          data: await this.props.services.vesCommonService.compressJson(imageData.tiles.data),
+          data: await services.vesCommonService.compressJson(imageData.tiles.data),
           ...frameOffsets,
         },
       };
@@ -93,7 +90,7 @@ export default class EntityEditor extends React.Component<
         ...imageData,
         maps: await Promise.all(imageData.maps.map(async m => ({
           ...m,
-          data: await this.props.services.vesCommonService.compressJson(m.data),
+          data: await services.vesCommonService.compressJson(m.data),
         }))),
       };
     }
@@ -102,6 +99,7 @@ export default class EntityEditor extends React.Component<
   }
 
   protected async appendImageData(entityData: EntityData): Promise<EntityData> {
+    const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
     const mostFilesOnASprite = Math.max(...entityData.sprites.sprites.map(s => s.texture.files.length));
     const isMultiImageAnimation = entityData.animations.enabled && mostFilesOnASprite > 1;
     const optimizeTiles = (!entityData.animations.enabled && entityData.sprites.optimizedTiles)
@@ -121,7 +119,7 @@ export default class EntityEditor extends React.Component<
           unique: optimizeTiles,
         }
       },
-      name: this.props.services.vesCommonService.cleanSpecName(entityData.name),
+      name: services.vesCommonService.cleanSpecName(entityData.name),
       section: entityData.sprites.section,
       tileset: {
         compression: entityData.sprites.compression,
@@ -144,7 +142,7 @@ export default class EntityEditor extends React.Component<
         }
       });
 
-      const newImageData = await this.props.services.vesImagesService.convertImage(this.props.fileUri, {
+      const newImageData = await services.vesImagesService.convertImage(fileUri, {
         ...baseConfig,
         files,
       });
@@ -171,7 +169,7 @@ export default class EntityEditor extends React.Component<
           if (convertedFilesMap[checksum] !== undefined) {
             sprite._imageData = convertedFilesMap[checksum]._dupeIndex;
           } else {
-            const newImageData = await this.props.services.vesImagesService.convertImage(this.props.fileUri, {
+            const newImageData = await services.vesImagesService.convertImage(fileUri, {
               ...baseConfig,
               files: sprite.texture.files,
             });
@@ -188,10 +186,12 @@ export default class EntityEditor extends React.Component<
   }
 
   async componentDidMount(): Promise<void> {
-    this.props.dock.restoreLayout();
+    const { dock } = useContext(EditorsContext) as EditorsContextType;
+    dock.restoreLayout();
   }
 
   render(): React.JSX.Element {
+    const { dock, services } = useContext(EditorsContext) as EditorsContextType;
     const defaultLayout: LayoutData = {
       dockbox: {
         mode: 'horizontal',
@@ -226,9 +226,7 @@ export default class EntityEditor extends React.Component<
                     minWidth: 200,
                     content: (
                       <EntityEditorContext.Consumer>
-                        {context => <Colliders
-                          services={this.props.services}
-                        />}
+                        {context => <Colliders />}
                       </EntityEditorContext.Consumer>
                     ),
                   },
@@ -242,9 +240,7 @@ export default class EntityEditor extends React.Component<
                     minWidth: 200,
                     content: (
                       <EntityEditorContext.Consumer>
-                        {context => <Entity
-                          hoverService={this.props.services.hoverService}
-                        />}
+                        {context => <Entity />}
                       </EntityEditorContext.Consumer>
                     ),
                   },
@@ -258,10 +254,7 @@ export default class EntityEditor extends React.Component<
                     minWidth: 200,
                     content: (
                       <EntityEditorContext.Consumer>
-                        {context => <Sprites
-                          fileUri={this.props.fileUri}
-                          services={this.props.services}
-                        />}
+                        {context => <Sprites />}
                       </EntityEditorContext.Consumer>
                     ),
                   },
@@ -311,8 +304,8 @@ export default class EntityEditor extends React.Component<
                   <EntityEditorContext.Consumer>
                     {context => (
                       <Preview
-                        fileService={this.props.services.fileService}
-                        workspaceService={this.props.services.workspaceService}
+                        fileService={services.fileService}
+                        workspaceService={services.workspaceService}
                       />
                     )}
                   </EntityEditorContext.Consumer>
@@ -338,8 +331,8 @@ export default class EntityEditor extends React.Component<
             style={{ flexGrow: 1 }}
             defaultLayout={defaultLayout}
             dropMode="edge"
-            ref={this.props.dock.getRef}
-            onLayoutChange={this.props.dock.persistLayout}
+            ref={dock.getRef}
+            onLayoutChange={dock.persistLayout}
           />
         </EntityEditorContext.Provider>
       </div>

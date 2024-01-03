@@ -4,10 +4,7 @@ import VContainer from '../../Common/VContainer';
 import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 import Animation from './Animation';
 
-interface AnimationsProps {
-}
-
-export default function Animations(props: AnimationsProps): React.JSX.Element {
+export default function Animations(): React.JSX.Element {
     const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
 
     const addAnimation = (): void => {
