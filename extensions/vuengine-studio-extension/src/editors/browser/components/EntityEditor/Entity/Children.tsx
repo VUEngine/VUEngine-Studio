@@ -1,8 +1,8 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
+import PositionedEntities from '../../Common/PositionedEntities/PositionedEntities';
 import VContainer from '../../Common/VContainer';
 import { EntityEditorContext, EntityEditorContextType, PositionedEntityData } from '../EntityEditorTypes';
-import PositionedEntities from './PositionedEntities';
 
 export default function Children(): React.JSX.Element {
     const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;

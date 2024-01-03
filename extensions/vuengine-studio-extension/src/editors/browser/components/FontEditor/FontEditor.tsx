@@ -272,7 +272,6 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
     }
 
     render(): React.JSX.Element {
-        const { fileUri, services } = this.props.context;
         const { data } = this.props;
 
         const pixelWidth = data.size.x * CHAR_PIXEL_SIZE;
@@ -393,10 +392,6 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
                             setState={this.setState.bind(this)}
                         />
                         <ImportExport
-                            fileDialogService={services.fileDialogService}
-                            fileService={services.fileService}
-                            messageService={services.messageService}
-                            baseUri={fileUri}
                             setCharacters={this.setCharacters.bind(this)}
                             size={data.size}
                             offset={data.offset}

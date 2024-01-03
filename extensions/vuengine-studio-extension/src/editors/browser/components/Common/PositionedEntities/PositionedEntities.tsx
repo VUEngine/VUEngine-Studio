@@ -2,8 +2,8 @@ import { QuickPickItem, QuickPickOptions, nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import VContainer from '../../Common/VContainer';
-import { PositionedEntityData } from '../EntityEditorTypes';
+import { PositionedEntityData } from '../../EntityEditor/EntityEditorTypes';
+import VContainer from '../VContainer';
 import PositionedEntity from './PositionedEntity';
 
 export interface PositionedEntitiesProps {
@@ -18,7 +18,7 @@ export default function PositionedEntities(props: PositionedEntitiesProps): Reac
 
     const showEntitySelection = async (): Promise<QuickPickItem | undefined> => {
         const quickPickOptions: QuickPickOptions<QuickPickItem> = {
-            title: nls.localize('vuengine/entityEditor/seelctEntity', 'Select Entity')
+            title: nls.localize('vuengine/editors/selectEntity', 'Select Entity')
         };
         const items: QuickPickItem[] = [];
         const entities = services.vesProjectService.getProjectDataItemsForType('Entity');
@@ -61,8 +61,8 @@ export default function PositionedEntities(props: PositionedEntitiesProps): Reac
 
     const removePositionedEntity = async (index: number): Promise<void> => {
         const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/entityEditor/removePositionedEntity', 'Remove Entity'),
-            msg: nls.localize('vuengine/entityEditor/areYouSureYouWantToRemoveEntity', 'Are you sure you want to remove this entity?'),
+            title: nls.localize('vuengine/editors/removePositionedEntity', 'Remove Entity'),
+            msg: nls.localize('vuengine/editors/areYouSureYouWantToRemoveEntity', 'Are you sure you want to remove this entity?'),
         });
         const confirmed = await dialog.open();
         if (confirmed) {
@@ -95,7 +95,7 @@ export default function PositionedEntities(props: PositionedEntitiesProps): Reac
         <button
             className='theia-button add-button full-width'
             onClick={addPositionedEntity}
-            title={nls.localize('vuengine/entityEditor/addEntity', 'Add Entity')}
+            title={nls.localize('vuengine/editors/addEntity', 'Add Entity')}
         >
             <i className='codicon codicon-plus' />
         </button>

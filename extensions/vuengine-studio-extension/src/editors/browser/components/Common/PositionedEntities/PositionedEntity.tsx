@@ -1,9 +1,9 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import HContainer from '../../Common/HContainer';
-import VContainer from '../../Common/VContainer';
-import { PositionedEntityData } from '../EntityEditorTypes';
+import HContainer from '../HContainer';
+import VContainer from '../VContainer';
+import { PositionedEntityData } from '../../EntityEditor/EntityEditorTypes';
 
 interface PositionedEntityProps {
     positionedEntity: PositionedEntityData
@@ -75,7 +75,7 @@ export default function PositionedEntity(props: PositionedEntityProps): React.JS
         <button
             className="remove-button"
             onClick={removePositionedEntity}
-            title={nls.localize('vuengine/entityEditor/remove', 'Remove')}
+            title={nls.localize('vuengine/editors/remove', 'Remove')}
         >
             <i className='codicon codicon-x' />
         </button>
@@ -149,7 +149,7 @@ export default function PositionedEntity(props: PositionedEntityProps): React.JS
                 </VContainer>
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/entityEditor/loadRegardlessOfPosition', 'Always load')}
+                        {nls.localize('vuengine/editors/loadRegardlessOfPosition', 'Always load')}
                     </label>
                     <input
                         type="checkbox"
@@ -159,7 +159,7 @@ export default function PositionedEntity(props: PositionedEntityProps): React.JS
                 </VContainer>
             </>
                 : <VContainer className='error'>
-                    {nls.localize('vuengine/entityEditor/entityNotFound', 'Entity could not be found')}
+                    {nls.localize('vuengine/editors/entityNotFound', 'Entity could not be found')}
                 </VContainer>}
         </HContainer>
     </div>;

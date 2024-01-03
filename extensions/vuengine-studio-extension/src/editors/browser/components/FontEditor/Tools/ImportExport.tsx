@@ -1,15 +1,11 @@
-import { MessageService, URI, nls } from '@theia/core';
-import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/browser';
-import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import React from 'react';
+import { nls } from '@theia/core';
+import { OpenFileDialogProps } from '@theia/filesystem/lib/browser';
+import React, { useContext } from 'react';
 import { ImageData } from '../../../../../core/browser/ves-common-types';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { Size } from '../FontEditorTypes';
 
 interface ImportExportProps {
-    fileDialogService: FileDialogService
-    fileService: FileService
-    messageService: MessageService
-    baseUri: URI
     setCharacters: (characters: number[][][]) => void
     size: Size
     offset: number
@@ -17,6 +13,7 @@ interface ImportExportProps {
 }
 
 export default function ImportExport(props: ImportExportProps): React.JSX.Element {
+    const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
     const imageDataToCharacters = (imageData: ImageData): number[][][] => {
         const charactersPerLine = imageData.width / (props.size.x * 8);
 
@@ -54,15 +51,15 @@ export default function ImportExport(props: ImportExportProps): React.JSX.Elemen
             canSelectFiles: true,
             filters: { 'PNG': ['png'] }
         };
-        const currentPath = await props.fileService.resolve(props.baseUri);
-        const uri = await props.fileDialogService.showOpenDialog(openFileDialogProps, currentPath);
+        const currentPath = await services.fileService.resolve(fileUri);
+        const uri = await services.fileDialogService.showOpenDialog(openFileDialogProps, currentPath);
         if (uri) {
-            const fileContent = await props.fileService.readFile(uri);
+            const fileContent = await services.fileService.readFile(uri);
             const imgData = await window.electronVesCore.parsePng(fileContent);
             if (imgData !== false) {
                 props.setCharacters(imageDataToCharacters(imgData));
             } else {
-                props.messageService.error(
+                services.messageService.error(
                     nls.localize('vuengine/fontEditor/errorImporting', 'There was as error importing the PNG file.')
                 );
             }

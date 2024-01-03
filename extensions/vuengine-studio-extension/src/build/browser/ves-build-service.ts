@@ -947,23 +947,23 @@ export class VesBuildService {
     const buildTypes: QuickPickItem[] = [
       {
         label: BuildMode.Release,
-        detail: `   ${nls.localize('vuengine/build/modes/releaseDescription', 'Includes no asserts or debug flags, for shipping only.')}`,
-        iconClasses: (BuildMode.Release === currentBuildMode) ? ['fa', 'fa-check-square-o'] : ['fa', 'fa-square-o'],
+        description: nls.localize('vuengine/build/modes/releaseDescription', 'Includes no asserts or debug flags, for shipping only.'),
+        iconClasses: ['codicon', (BuildMode.Release === currentBuildMode) ? 'codicon-pass-filled' : 'codicon-circle-large'],
       },
       {
         label: BuildMode.Beta,
-        detail: `   ${nls.localize('vuengine/build/modes/betaDescription', 'Includes selected asserts, for testing on emulators.')}`,
-        iconClasses: (BuildMode.Beta === currentBuildMode) ? ['fa', 'fa-check-square-o'] : ['fa', 'fa-square-o'],
+        description: nls.localize('vuengine/build/modes/betaDescription', 'Includes selected asserts, for testing on emulators.'),
+        iconClasses: ['codicon', (BuildMode.Beta === currentBuildMode) ? 'codicon-pass-filled' : 'codicon-circle-large'],
       },
       {
         label: BuildMode.Tools,
-        detail: `   ${nls.localize('vuengine/build/modes/toolsDescription', 'Includes selected asserts, includes debugging tools.')}`,
-        iconClasses: (BuildMode.Tools === currentBuildMode) ? ['fa', 'fa-check-square-o'] : ['fa', 'fa-square-o'],
+        description: nls.localize('vuengine/build/modes/toolsDescription', 'Includes selected asserts, includes debugging tools.'),
+        iconClasses: ['codicon', (BuildMode.Tools === currentBuildMode) ? 'codicon-pass-filled' : 'codicon-circle-large'],
       },
       {
         label: BuildMode.Debug,
-        detail: `   ${nls.localize('vuengine/build/modes/debugDescription', 'Includes all runtime assertions, includes debugging tools.')}`,
-        iconClasses: (BuildMode.Debug === currentBuildMode) ? ['fa', 'fa-check-square-o'] : ['fa', 'fa-square-o'],
+        description: nls.localize('vuengine/build/modes/debugDescription', 'Includes all runtime assertions, includes debugging tools.'),
+        iconClasses: ['codicon', (BuildMode.Debug === currentBuildMode) ? 'codicon-pass-filled' : 'codicon-circle-large'],
       }
     ];
 
