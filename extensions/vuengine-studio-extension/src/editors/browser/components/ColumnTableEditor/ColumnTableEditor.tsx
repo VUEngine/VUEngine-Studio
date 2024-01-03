@@ -56,7 +56,7 @@ export default class ColumnTableEditor extends React.Component<ColumnTableEditor
             tabIndex={0}
             className='columnTableEditor'
         >
-            <VContainer gap={20}>
+            <VContainer gap={15}>
                 <VContainer>
                     <label>
                         {nls.localize('vuengine/columnTableEditor/name', 'Name')}

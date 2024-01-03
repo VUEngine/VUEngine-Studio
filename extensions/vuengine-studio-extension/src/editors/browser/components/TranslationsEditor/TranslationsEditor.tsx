@@ -1,8 +1,8 @@
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
-import React, { useContext } from 'react';
+import React from 'react';
 import { WithContributor } from '../../../../project/browser/ves-project-types';
-import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
+import { EditorsContextType } from '../../ves-editors-types';
 import LanguagesTable from './LanguagesTable';
 import { LANGUAGES, Translation, Translations, TranslationsData } from './TranslationsEditorTypes';
 import TranslationsTable from './TranslationsTable';
@@ -10,6 +10,7 @@ import TranslationsTable from './TranslationsTable';
 interface TranslationsEditorProps {
     data: TranslationsData
     updateData: (data: TranslationsData) => void
+    context: EditorsContextType
 }
 
 interface TranslationsEditorState {
@@ -200,7 +201,7 @@ export default class TranslationsEditor extends React.Component<TranslationsEdit
     };
 
     render(): React.JSX.Element {
-        const { services } = useContext(EditorsContext) as EditorsContextType;
+        const { services } = this.props.context;
         const { languages, translations } = this.props.data;
         const combinedTranslations = services.vesProjectService.getProjectDataItemsForType('Translations') || {} as Translations & WithContributor;
 

@@ -1,11 +1,12 @@
 import { nls } from '@theia/core';
-import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import { injectable } from '@theia/core/shared/inversify';
-import React, { useContext } from 'react';
+import React from 'react';
 import { ImageCompressionType } from '../../../../images/browser/ves-images-types';
-import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
+import { EditorsContextType } from '../../ves-editors-types';
 import { DataSection } from '../Common/CommonTypes';
 import HContainer from '../Common/HContainer';
+import InfoLabel from '../Common/InfoLabel';
+import RadioSelect from '../Common/RadioSelect';
 import VContainer from '../Common/VContainer';
 import Alphabet from './Alphabet/Alphabet';
 import AlphabetSettings from './Alphabet/AlphabetSettings';
@@ -27,6 +28,7 @@ import Tools from './Tools/Tools';
 interface FontEditorProps {
     data: FontData
     updateData: (data: FontData) => void
+    context: EditorsContextType
 }
 
 @injectable()
@@ -270,7 +272,7 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
     }
 
     render(): React.JSX.Element {
-        const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
+        const { fileUri, services } = this.props.context;
         const { data } = this.props;
 
         const pixelWidth = data.size.x * CHAR_PIXEL_SIZE;
@@ -286,9 +288,9 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
             onMouseOver={() => this.setState({ active: true })}
             onMouseOut={() => this.setState({ active: false })}
         >
-            <VContainer gap={20}>
-                <HContainer gap={20}>
-                    <VContainer grow={4}>
+            <VContainer gap={15}>
+                <HContainer alignItems='start' gap={15} wrap='wrap'>
+                    <VContainer grow={1}>
                         <label>
                             {nls.localize('vuengine/fontEditor/name', 'Name')}
                         </label>
@@ -298,40 +300,73 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
                             onChange={this.onChangeName.bind(this)}
                         />
                     </VContainer>
-                    <VContainer grow={1}>
+                    <VContainer>
                         <label>
-                            {nls.localize('vuengine/fontEditor/compression', 'Compression')}
+                            {nls.localize('vuengine/fontEditor/size', 'Size')}
                         </label>
-                        <SelectComponent
-                            defaultValue={data.compression}
+                        <RadioSelect
                             options={[{
-                                label: nls.localize('vuengine/fontEditor/none', 'None'),
-                                value: ImageCompressionType.NONE,
-                                description: nls.localize('vuengine/fontEditor/noCompressionDescription', 'Do not compress tile data'),
+                                label: nls.localize('vuengine/fontEditor/fixed', 'Fixed'),
+                                value: '0',
+                                // description: nls.localize('vuengine/fontEditor/fixedSizeDescription', 'All characters have the same dimensions'),
                             }, {
-                                label: nls.localize('vuengine/fontEditor/rle', 'RLE'),
-                                value: ImageCompressionType.RLE,
-                                description: nls.localize('vuengine/fontEditor/rleCompressionDescription', 'Compress tile data with RLE'),
+                                label: nls.localize('vuengine/fontEditor/variable', 'Variable'),
+                                value: '1',
+                                // eslint-disable-next-line max-len
+                                // description: nls.localize('vuengine/fontEditor/variableSizeDescription', 'Every character can be of different width. Height is global. Allows for more dense or very small text. Uses Objects.'),
                             }]}
-                            onChange={option => this.setCompression(option.value as ImageCompressionType)}
+                            defaultValue={data.variableSize.enabled ? '1' : '0'}
+                            onChange={options => this.setCharSize(
+                                undefined,
+                                {
+                                    ...data.variableSize,
+                                    enabled: options[0].value === '1' ? true : false
+                                }
+                            )}
                         />
                     </VContainer>
-                    <VContainer grow={1}>
-                        <label>
-                            {nls.localize('vuengine/fontEditor/section', 'Section')}
-                        </label>
-                        <SelectComponent
+                    <VContainer>
+                        <InfoLabel
+                            label={nls.localize('vuengine/entityEditor/compression', 'Compression')}
+                            tooltip={nls.localize(
+                                'vuengine/entityEditor/compressionDescription',
+                                // eslint-disable-next-line max-len
+                                'Image data can be stored in a compressed format to save ROM space. Comes at the cost of a slightly higher CPU load when loading data into memory.'
+                            )}
+                            tooltipPosition='bottom'
+                        />
+                        <RadioSelect
+                            options={[{
+                                label: nls.localize('vuengine/entityEditor/none', 'None'),
+                                value: ImageCompressionType.NONE,
+                            }, {
+                                label: nls.localize('vuengine/entityEditor/rle', 'RLE'),
+                                value: ImageCompressionType.RLE,
+                            }]}
+                            defaultValue={data.compression}
+                            onChange={options => this.setCompression(options[0].value as ImageCompressionType)}
+                        />
+                    </VContainer>
+                    <VContainer>
+                        <InfoLabel
+                            label={nls.localize('vuengine/entityEditor/section', 'Section')}
+                            tooltip={nls.localize(
+                                'vuengine/entityEditor/sectionDescription',
+                                // eslint-disable-next-line max-len
+                                'Defines whether image data should be stored in ROM space or Expansion space. You usually want to leave this untouched, since the latter only works on specially designed cartridges.'
+                            )}
+                            tooltipPosition='bottom'
+                        />
+                        <RadioSelect
                             defaultValue={data.section}
                             options={[{
-                                label: nls.localize('vuengine/fontEditor/romSpace', 'ROM Space'),
+                                label: 'ROM',
                                 value: DataSection.ROM,
-                                description: nls.localize('vuengine/fontEditor/romSpaceDescription', 'Save tile data to ROM space'),
                             }, {
-                                label: nls.localize('vuengine/fontEditor/expansionSpace', 'Expansion Space'),
+                                label: nls.localize('vuengine/entityEditor/expansion', 'Expansion'),
                                 value: DataSection.EXP,
-                                description: nls.localize('vuengine/fontEditor/expansionSpaceDescription', 'Save tile data to expansion space'),
                             }]}
-                            onChange={option => this.setSection(option.value as DataSection)}
+                            onChange={options => this.setSection(options[0].value as DataSection)}
                         />
                     </VContainer>
                 </HContainer>

@@ -1,19 +1,27 @@
 import { nls } from '@theia/core';
-import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React, { useContext } from 'react';
+import { ImageCompressionType } from '../../../../../images/browser/ves-images-types';
 import { DataSection } from '../../Common/CommonTypes';
 import HContainer from '../../Common/HContainer';
+import InfoLabel from '../../Common/InfoLabel';
+import RadioSelect from '../../Common/RadioSelect';
 import VContainer from '../../Common/VContainer';
 import { ImageConvEditorContext, ImageConvEditorContextType } from '../ImageConvEditorTypes';
 
-interface GeneralProps {
-}
-
-export default function General(props: GeneralProps): React.JSX.Element {
+export default function General(): React.JSX.Element {
     const { imageConvData, updateImageConvData } = useContext(ImageConvEditorContext) as ImageConvEditorContextType;
 
     const setName = (n: string): void => {
         updateImageConvData({ name: n });
+    };
+
+    const setTilesCompression = (compression: ImageCompressionType) => {
+        updateImageConvData({
+            tileset: {
+                ...imageConvData.tileset,
+                compression
+            },
+        });
     };
 
     const setSection = (section: DataSection) => {
@@ -22,9 +30,9 @@ export default function General(props: GeneralProps): React.JSX.Element {
         });
     };
 
-    return <VContainer gap={10}>
+    return <VContainer gap={15}>
         <HContainer gap={10} wrap='wrap'>
-            <VContainer grow={4}>
+            <VContainer grow={1}>
                 <label>
                     {nls.localize('vuengine/imageConvEditor/name', 'Name')}
                 </label>
@@ -34,22 +42,48 @@ export default function General(props: GeneralProps): React.JSX.Element {
                     onChange={e => setName(e.target.value)}
                 />
             </VContainer>
-            <VContainer grow={1}>
-                <label>
-                    {nls.localize('vuengine/imageConvEditor/section', 'Section')}
-                </label>
-                <SelectComponent
+            <VContainer>
+                <InfoLabel
+                    label={nls.localize('vuengine/entityEditor/compression', 'Compression')}
+                    tooltip={nls.localize(
+                        'vuengine/entityEditor/compressionDescription',
+                        // eslint-disable-next-line max-len
+                        'Image data can be stored in a compressed format to save ROM space. Comes at the cost of a slightly higher CPU load when loading data into memory.'
+                    )}
+                    tooltipPosition='bottom'
+                />
+                <RadioSelect
+                    options={[{
+                        label: nls.localize('vuengine/entityEditor/none', 'None'),
+                        value: ImageCompressionType.NONE,
+                    }, {
+                        label: nls.localize('vuengine/entityEditor/rle', 'RLE'),
+                        value: ImageCompressionType.RLE,
+                    }]}
+                    defaultValue={imageConvData.tileset.compression}
+                    onChange={options => setTilesCompression(options[0].value as ImageCompressionType)}
+                />
+            </VContainer>
+            <VContainer>
+                <InfoLabel
+                    label={nls.localize('vuengine/entityEditor/section', 'Section')}
+                    tooltip={nls.localize(
+                        'vuengine/entityEditor/sectionDescription',
+                        // eslint-disable-next-line max-len
+                        'Defines whether image data should be stored in ROM space or Expansion space. You usually want to leave this untouched, since the latter only works on specially designed cartridges.'
+                    )}
+                    tooltipPosition='bottom'
+                />
+                <RadioSelect
                     defaultValue={imageConvData.section}
                     options={[{
-                        label: nls.localize('vuengine/imageConvEditor/romSpace', 'ROM Space'),
+                        label: 'ROM',
                         value: DataSection.ROM,
-                        description: nls.localize('vuengine/imageConvEditor/romSpaceDescription', 'Store image data in ROM space'),
                     }, {
-                        label: nls.localize('vuengine/imageConvEditor/expansionSpace', 'Expansion Space'),
+                        label: nls.localize('vuengine/entityEditor/expansion', 'Expansion'),
                         value: DataSection.EXP,
-                        description: nls.localize('vuengine/imageConvEditor/expansionSpaceDescription', 'Store image data in expansion space'),
                     }]}
-                    onChange={option => setSection(option.value as DataSection)}
+                    onChange={options => setSection(options[0].value as DataSection)}
                 />
             </VContainer>
         </HContainer>

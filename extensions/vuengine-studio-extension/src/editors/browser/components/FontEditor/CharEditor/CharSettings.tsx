@@ -1,8 +1,9 @@
 import { nls } from '@theia/core';
 import React from 'react';
-import { CHAR_PIXEL_SIZE, FontEditorState, MAX_CHAR_SIZE, MIN_CHAR_SIZE, MIN_VARIABLE_CHAR_SIZE, Size, VariableSize } from '../FontEditorTypes';
 import HContainer from '../../Common/HContainer';
 import VContainer from '../../Common/VContainer';
+import { CHAR_PIXEL_SIZE, FontEditorState, MAX_CHAR_SIZE, MIN_CHAR_SIZE, MIN_VARIABLE_CHAR_SIZE, Size, VariableSize } from '../FontEditorTypes';
+import RadioSelect from '../../Common/RadioSelect';
 
 interface CharSettingsProps {
     currentCharacter: number
@@ -86,29 +87,29 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
         );
     };
 
-    return <HContainer gap={20}>
+    return <HContainer gap={15}>
         {variableSize.enabled &&
-            <VContainer grow={1}>
+            <VContainer>
                 <label>
                     {nls.localize('vuengine/fontEditor/characterSize', 'Character Size')}
                 </label>
                 <HContainer>
                     <input
                         type="number"
+                        className="theia-input"
+                        style={{ width: 48 }}
                         min={MIN_VARIABLE_CHAR_SIZE}
                         max={charWidth}
-                        className="theia-input"
-                        style={{ flexGrow: 1 }}
                         value={variableSize.x[currentCharacter] ?? charWidth}
                         onChange={onChangeVariablePixelWidth}
                     />
                     <div>×</div>
                     <input
                         type="number"
+                        className="theia-input"
+                        style={{ width: 48 }}
                         min={MIN_VARIABLE_CHAR_SIZE}
                         max={charWidth}
-                        className="theia-input"
-                        style={{ flexGrow: 1 }}
                         value={variableSize.y}
                         onChange={onChangeVariablePixelHeight}
                     />
@@ -124,11 +125,11 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
             <HContainer>
                 <input
                     type="number"
+                    className="theia-input"
+                    style={{ width: 48 }}
                     step={CHAR_PIXEL_SIZE}
                     min={MIN_CHAR_SIZE * CHAR_PIXEL_SIZE}
                     max={MAX_CHAR_SIZE * CHAR_PIXEL_SIZE}
-                    className="theia-input"
-                    style={{ flexGrow: 1 }}
                     id="#/properties/size/properties/x-input"
                     value={charWidth}
                     onChange={onChangePixelWidth}
@@ -136,58 +137,25 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
                 <div>×</div>
                 <input
                     type="number"
+                    className="theia-input"
+                    style={{ width: 48 }}
                     step={CHAR_PIXEL_SIZE}
                     min={MIN_CHAR_SIZE * CHAR_PIXEL_SIZE}
                     max={MAX_CHAR_SIZE * CHAR_PIXEL_SIZE}
-                    className="theia-input"
-                    style={{ flexGrow: 1 }}
                     id="#/properties/size/properties/y-input"
                     value={charHeight}
                     onChange={onChangePixelHeight}
                 />
             </HContainer>
         </VContainer>
-        {/*
-        <VContainer grow={1}>
-            <label>
-                {nls.localize('vuengine/fontEditor/type', 'Type')}
-            </label>
-            <SelectComponent
-                defaultValue={variableSize.enabled ? '1' : '0'}
-                options={[{
-                    label: nls.localize('vuengine/fontEditor/fixedSize', 'Fixed Size'),
-                    value: '0',
-                    description: nls.localize('vuengine/fontEditor/fixedSizeDescription', 'All characters have the same dimensions'),
-                }, {
-                    label: nls.localize('vuengine/fontEditor/variableSize', 'Variable Size'),
-                    value: '1',
-                    description: nls.localize(
-                        'vuengine/fontEditor/variableSizeDescription',
-                        'Every character can be of different width. Height is global. Allows for more dense or very small text. Uses Objects.'
-                    ),
-                }]}
-                onChange={option => setCharSize(
-                    undefined,
-                    {
-                        ...variableSize,
-                        enabled: option.value === '1' ? true : false
-                    }
-                )}
-            />
-        </VContainer>
-        */}
-        <VContainer grow={1}>
+        <VContainer>
             <label>
                 {nls.localize('vuengine/fontEditor/grid', 'Grid')}
             </label>
-            <input
-                className="theia-input"
-                type="number"
-                step="1"
-                min="0"
-                max="3"
-                value={charGrid}
-                onChange={e => setState({ charGrid: parseInt(e.target.value) })}
+            <RadioSelect
+                options={[{ value: 0 }, { value: 1 }, { value: 2 }, { value: 3 }]}
+                defaultValue={charGrid}
+                onChange={options => setState({ charGrid: options[0].value as number })}
             />
         </VContainer>
     </HContainer>;

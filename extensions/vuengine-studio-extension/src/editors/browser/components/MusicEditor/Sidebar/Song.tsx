@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import HContainer from '../../Common/HContainer';
 import VContainer from '../../Common/VContainer';
 import { MAX_SPEED, MIN_SPEED, MusicEditorContext, MusicEditorContextType, PATTERN_SIZES, VOLUME_STEPS } from '../MusicEditorTypes';
+import RadioSelect from '../../Common/RadioSelect';
 
 export default function Song(): React.JSX.Element {
     const { songData, setSongData } = useContext(MusicEditorContext) as MusicEditorContextType;
@@ -95,15 +96,11 @@ export default function Song(): React.JSX.Element {
 
         <VContainer>
             Default Pattern Size
-            <select
-                className='theia-select'
-                value={songData.defaultPatternSize}
-                onChange={e => setDefaultPatternSize(parseInt(e.target.value))}
-            >
-                {PATTERN_SIZES.map(size =>
-                    <option key={`default-pattern-size-option-${size}`} value={size}>{size}</option>
-                )}
-            </select>
+            <RadioSelect
+                options={PATTERN_SIZES.map(size => ({ value: size }))}
+                defaultValue={songData.defaultPatternSize}
+                onChange={options => setDefaultPatternSize(options[0].value as number)}
+            />
         </VContainer>
     </VContainer>;
 }

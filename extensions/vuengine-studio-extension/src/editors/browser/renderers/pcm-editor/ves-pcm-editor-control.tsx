@@ -8,14 +8,14 @@ interface VesPCMEditorControlProps {
     data: PCMData;
     handleChange(path: string, value: PCMData): void;
     path: string;
-    config?: any;
 }
 
-const VesPCMEditorControl = ({ data, handleChange, path, config }: VesPCMEditorControlProps) =>
+const VesPCMEditorControl = ({ data, handleChange, path }: VesPCMEditorControlProps) =>
     <EditorsContext.Consumer>
         {context => <PCMEditor
             data={data}
             updateData={(newValue: PCMData) => handleChange(path, newValue)}
+            context={context}
         />}
     </EditorsContext.Consumer>;
 

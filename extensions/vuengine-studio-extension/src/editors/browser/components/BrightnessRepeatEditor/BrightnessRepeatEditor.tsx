@@ -58,8 +58,8 @@ export default class BrightnessRepeatEditor extends React.Component<BrightnessRe
             tabIndex={0}
             className='brightnessRepeatEditor'
         >
-            <HContainer gap={20} alignItems='start'>
-                <VContainer grow={1} gap={20}>
+            <HContainer gap={15} alignItems='start'>
+                <VContainer grow={1} gap={15}>
                     <VContainer>
                         <label>
                             {nls.localize('vuengine/brightnessRepeatEditor/name', 'Name')}

@@ -8,14 +8,14 @@ interface VesTranslationsEditorControlProps {
     data: TranslationsData;
     handleChange(path: string, value: TranslationsData): void;
     path: string;
-    config?: any;
 }
 
-const VesTranslationsEditorControl = ({ data, handleChange, path, config }: VesTranslationsEditorControlProps) =>
+const VesTranslationsEditorControl = ({ data, handleChange, path }: VesTranslationsEditorControlProps) =>
     <EditorsContext.Consumer>
         {context => <TranslationsEditor
             data={data}
             updateData={(newValue: TranslationsData) => handleChange(path, newValue)}
+            context={context}
         />}
     </EditorsContext.Consumer>;
 

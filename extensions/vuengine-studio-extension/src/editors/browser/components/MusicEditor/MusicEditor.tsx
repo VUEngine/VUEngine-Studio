@@ -1,7 +1,7 @@
 import { CommonCommands } from '@theia/core/lib/browser';
 import DockLayout, { LayoutData } from 'rc-dock';
-import React, { useContext } from 'react';
-import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
+import React from 'react';
+import { EditorsContextType } from '../../ves-editors-types';
 import { ChannelConfig, InstrumentConfig, MusicEditorContext, MusicEditorState, Notes, PatternConfig, SongData, SongNote } from './MusicEditorTypes';
 import MusicPlayer from './MusicPlayer';
 import PianoRoll from './PianoRoll/PianoRoll';
@@ -16,6 +16,7 @@ import Waveforms from './Sidebar/Waveforms';
 interface MusicEditorProps {
     songData: SongData
     updateSongData: (songData: SongData) => void
+    context: EditorsContextType
 }
 
 export default class MusicEditor extends React.Component<MusicEditorProps, MusicEditorState> {
@@ -278,13 +279,13 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
     }
 
     async componentDidMount(): Promise<void> {
-        const { dock } = useContext(EditorsContext) as EditorsContextType;
+        const { dock } = this.props.context;
         dock.restoreLayout();
         this.computeSong();
     }
 
     render(): React.JSX.Element {
-        const { dock, services } = useContext(EditorsContext) as EditorsContextType;
+        const { dock, services } = this.props.context;
         const defaultLayout: LayoutData = {
             dockbox: {
                 mode: 'horizontal',

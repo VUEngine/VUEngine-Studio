@@ -1,16 +1,18 @@
 import { nls } from '@theia/core';
-import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import { OpenFileDialogProps } from '@theia/filesystem/lib/browser';
-import React, { useContext } from 'react';
-import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
+import React from 'react';
+import { EditorsContextType } from '../../ves-editors-types';
 import { DataSection } from '../Common/CommonTypes';
 import HContainer from '../Common/HContainer';
+import InfoLabel from '../Common/InfoLabel';
+import RadioSelect from '../Common/RadioSelect';
 import VContainer from '../Common/VContainer';
 import { MAX_RANGE, MIN_RANGE, PCMData } from './PCMTypes';
 
 interface PCMProps {
     data: PCMData
     updateData: (data: PCMData) => void
+    context: EditorsContextType
 }
 
 interface PCMState {
@@ -33,7 +35,7 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
     }
 
     protected setSourceFile = async (sourceFile: string) => {
-        const { services } = useContext(EditorsContext) as EditorsContextType;
+        const { services } = this.props.context;
         const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
         const name = workspaceRootUri.resolve(sourceFile).path.name.replace(/([A-Z])/g, ' $1').trim();
 
@@ -68,7 +70,7 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
     };
 
     render(): React.JSX.Element {
-        const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
+        const { fileUri, services } = this.props.context;
         const { data } = this.props;
         const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
 
@@ -96,22 +98,48 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
             }
         };
 
-        return <VContainer gap={20} className='pcmEditor'>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/pcmEditor/name', 'Name')}
-                </label>
-                <input
-                    className="theia-input large"
-                    value={data.name}
-                    onChange={this.onChangeName.bind(this)}
-                />
-            </VContainer>
+        return <VContainer gap={15} className='pcmEditor'>
+            <HContainer alignItems='start' gap={15}>
+                <VContainer grow={1}>
+                    <label>
+                        {nls.localize('vuengine/pcmEditor/name', 'Name')}
+                    </label>
+                    <input
+                        className="theia-input large"
+                        value={data.name}
+                        onChange={this.onChangeName.bind(this)}
+                    />
+                </VContainer>
+                <VContainer>
+                    <VContainer>
+                        <InfoLabel
+                            label={nls.localize('vuengine/entityEditor/section', 'Section')}
+                            tooltip={nls.localize(
+                                'vuengine/pcmEditor/sectionDescription',
+                                // eslint-disable-next-line max-len
+                                'Defines whether PCM data should be stored in ROM space or Expansion space. You usually want to leave this untouched, since the latter only works on specially designed cartridges.'
+                            )}
+                            tooltipPosition='bottom'
+                        />
+                        <RadioSelect
+                            defaultValue={data.section}
+                            options={[{
+                                label: 'ROM',
+                                value: DataSection.ROM,
+                            }, {
+                                label: nls.localize('vuengine/entityEditor/expansion', 'Expansion'),
+                                value: DataSection.EXP,
+                            }]}
+                            onChange={options => this.setSection(options[0].value as DataSection)}
+                        />
+                    </VContainer>
+                </VContainer>
+            </HContainer>
             <VContainer>
                 <label>
                     {nls.localize('vuengine/emulator/path', 'Path')}
                 </label>
-                <HContainer gap={0}>
+                <HContainer>
                     <input
                         type="text"
                         className="theia-input"
@@ -131,48 +159,28 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
                     <audio src={workspaceRootUri.resolve(data.sourceFile).path.fsPath()} controls={true} />
                 </div>}
             </VContainer>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/pcmEditor/range', 'Range')}
-                </label>
-                <input
-                    type="number"
-                    className="theia-input"
-                    title={nls.localize('vuengine/pcmEditor/range', 'Range')}
-                    onChange={e => this.setRange(parseInt(e.target.value))}
-                    value={data.range}
-                    min={MIN_RANGE}
-                    max={MAX_RANGE}
-                />
-            </VContainer>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/pcmEditor/section', 'Section')}
-                </label>
-                <SelectComponent
-                    defaultValue={data.section}
-                    options={[{
-                        label: nls.localize('vuengine/pcmEditor/romSpace', 'ROM Space'),
-                        value: DataSection.ROM,
-                        description: nls.localize('vuengine/pcmEditor/romSpaceDescription', 'Save PCM data to ROM space'),
-                    }, {
-                        label: nls.localize('vuengine/pcmEditor/expansionSpace', 'Expansion Space'),
-                        value: DataSection.EXP,
-                        description: nls.localize('vuengine/pcmEditor/expansionSpaceDescription', 'Save PCM data to expansion space'),
-                    }]}
-                    onChange={option => this.setSection(option.value as DataSection)}
-                />
-            </VContainer>
-            <VContainer>
-                <label className='setting'>
-                    {nls.localize('vuengine/pcmEditor/loop', 'Loop')}
-                </label>
-                <input
-                    type="checkbox"
-                    checked={data.loop}
-                    onChange={this.toggleLoop}
-                />
-            </VContainer>
+            <HContainer gap={15}>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/pcmEditor/range', 'Range')}
+                    </label>
+                    <RadioSelect
+                        defaultValue={data.range}
+                        options={[{ value: 1 }, { value: 2 }, { value: 3 }, { value: 4 }, { value: 5 }]}
+                        onChange={options => this.setRange(options[0].value as number)}
+                    />
+                </VContainer>
+                <VContainer>
+                    <label className='setting'>
+                        {nls.localize('vuengine/pcmEditor/loop', 'Loop')}
+                    </label>
+                    <input
+                        type="checkbox"
+                        checked={data.loop}
+                        onChange={this.toggleLoop}
+                    />
+                </VContainer>
+            </HContainer>
         </VContainer>;
     }
 }

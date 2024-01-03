@@ -1,13 +1,14 @@
 import { nls } from '@theia/core';
-import React, { useContext } from 'react';
+import React from 'react';
 import { VesRumblePackCommands } from '../../../../rumble-pack/browser/ves-rumble-pack-commands';
 import { RumblePakLogLine } from '../../../../rumble-pack/browser/ves-rumble-pack-types';
-import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
+import { EditorsContextType } from '../../ves-editors-types';
 import { BUILT_IN_EFFECTS, RumbleEffectData } from './RumbleEffectTypes';
 
 interface RumbleEffectProps {
     data: RumbleEffectData
     updateData: (data: RumbleEffectData) => void
+    context: EditorsContextType
 }
 
 interface RumbleEffectState {
@@ -21,7 +22,7 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
             command: ''
         };
 
-        const { services } = useContext(EditorsContext) as EditorsContextType;
+        const { services } = this.props.context;
         services.vesRumblePackService.onDidChangeConnectedRumblePack(() => this.forceUpdate());
         services.vesRumblePackService.onDidChangeRumblePackLog(() => this.forceUpdate());
     }
@@ -93,7 +94,7 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
     };
 
     protected playEffect = () => {
-        const { services } = useContext(EditorsContext) as EditorsContextType;
+        const { services } = this.props.context;
         const data = this.props.data;
         const service = services.vesRumblePackService;
 
@@ -105,53 +106,26 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
         service.sendCommandPlayEffect(data.effect);
     };
 
-    protected detect = () => {
-        const { services } = useContext(EditorsContext) as EditorsContextType;
-        services.commandService.executeCommand(VesRumblePackCommands.DETECT.id);
-    };
+    protected detect = () => this.props.context.services.commandService.executeCommand(VesRumblePackCommands.DETECT.id);
 
-    protected sendCommand = () => {
-        const { services } = useContext(EditorsContext) as EditorsContextType;
-        services.vesRumblePackService.sendCommand(this.state.command);
-    };
+    protected sendCommand = () => this.props.context.services.vesRumblePackService.sendCommand(this.state.command);
 
-    protected sendCommandPrintMenu = () => {
-        const { services } = useContext(EditorsContext) as EditorsContextType;
-        services.vesRumblePackService.sendCommandPrintMenu();
-    };
+    protected sendCommandPrintMenu = () => this.props.context.services.vesRumblePackService.sendCommandPrintMenu();
 
-    protected sendCommandPrintVersion = () => {
-        const { services } = useContext(EditorsContext) as EditorsContextType;
-        services.vesRumblePackService.sendCommandPrintVersion();
-    };
+    protected sendCommandPrintVersion = () => this.props.context.services.vesRumblePackService.sendCommandPrintVersion();
 
-    protected sendCommandPrintVbCommandLineState = () => {
-        const { services } = useContext(EditorsContext) as EditorsContextType;
-        services.vesRumblePackService.sendCommandPrintVbCommandLineState();
-    };
+    protected sendCommandPrintVbCommandLineState = () => this.props.context.services.vesRumblePackService.sendCommandPrintVbCommandLineState();
 
-    protected sendCommandPrintVbSyncLineState = () => {
-        const { services } = useContext(EditorsContext) as EditorsContextType;
-        services.vesRumblePackService.sendCommandPrintVbSyncLineState();
-    };
+    protected sendCommandPrintVbSyncLineState = () => this.props.context.services.vesRumblePackService.sendCommandPrintVbSyncLineState();
 
-    protected sendCommandPlayLastEffect = () => {
-        const { services } = useContext(EditorsContext) as EditorsContextType;
-        services.vesRumblePackService.sendCommandPlayLastEffect();
-    };
+    protected sendCommandPlayLastEffect = () => this.props.context.services.vesRumblePackService.sendCommandPlayLastEffect();
 
-    protected sendCommandStopCurrentEffect = () => {
-        const { services } = useContext(EditorsContext) as EditorsContextType;
-        services.vesRumblePackService.sendCommandStopCurrentEffect();
-    };
+    protected sendCommandStopCurrentEffect = () => this.props.context.services.vesRumblePackService.sendCommandStopCurrentEffect();
 
-    protected clearLog = () => {
-        const { services } = useContext(EditorsContext) as EditorsContextType;
-        services.vesRumblePackService.rumblePackLog = [];
-    };
+    protected clearLog = () => this.props.context.services.vesRumblePackService.rumblePackLog = [];
 
     render(): React.JSX.Element {
-        const { services } = useContext(EditorsContext) as EditorsContextType;
+        const { services } = this.props.context;
         const { data } = this.props;
         const { command } = this.state;
 

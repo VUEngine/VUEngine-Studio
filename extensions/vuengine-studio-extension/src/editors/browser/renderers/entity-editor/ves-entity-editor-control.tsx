@@ -15,6 +15,7 @@ const VesEntityEditorControl = ({ data, handleChange, path }: VesEntityEditorCon
         {context => <EntityEditor
             data={data}
             updateData={(newValue: EntityData) => handleChange(path, newValue)}
+            context={context}
         />}
     </EditorsContext.Consumer>;
 

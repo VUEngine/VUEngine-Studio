@@ -61,6 +61,26 @@ export default function ImageConvEditor(props: ImageConvEditorProps): React.JSX.
                             canSelectMany={true}
                         />
                     </VContainer>
+                    <VContainer>
+                        <label>
+                            {nls.localize('vuengine/imageConvEditor/xFiles', 'Image Files ({0})', data.files.length)}
+                        </label>
+                        {data.files.length === 0 &&
+                            <div style={{ fontStyle: 'italic' }}>
+                                <i className='codicon codicon-info' style={{ verticalAlign: 'bottom' }} />{' '}
+                                {nls.localize(
+                                    'vuengine/imageConvEditor/noFilesSelected',
+                                    'No images selected. All images in this folder will be converted.'
+                                )}
+                            </div>
+                        }
+                        <Images
+                            data={data.files}
+                            updateData={updateFiles}
+                            allInFolderAsFallback={true}
+                            canSelectMany={true}
+                        />
+                    </VContainer>
                 </VContainer>
             </ImageConvEditorContext.Provider>
         </div>

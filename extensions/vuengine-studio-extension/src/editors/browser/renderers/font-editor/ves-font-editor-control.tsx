@@ -8,14 +8,14 @@ interface VesFontEditorControlProps {
     data: FontData;
     handleChange(path: string, value: FontData): void;
     path: string;
-    config?: any;
 }
 
-const VesFontEditorControl = ({ data, handleChange, path, config }: VesFontEditorControlProps) =>
+const VesFontEditorControl = ({ data, handleChange, path }: VesFontEditorControlProps) =>
     <EditorsContext.Consumer>
         {context => <FontEditor
             data={data}
             updateData={(newValue: FontData) => handleChange(path, newValue)}
+            context={context}
         />}
     </EditorsContext.Consumer>;
 

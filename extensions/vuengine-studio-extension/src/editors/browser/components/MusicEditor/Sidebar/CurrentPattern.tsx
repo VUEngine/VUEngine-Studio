@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import RadioSelect from '../../Common/RadioSelect';
 import VContainer from '../../Common/VContainer';
 import { MusicEditorContext, MusicEditorContextType, PATTERN_SIZES } from '../MusicEditorTypes';
 
@@ -36,15 +37,11 @@ export default function CurrentPattern(): React.JSX.Element {
         </VContainer>
         <VContainer>
             Size
-            <select
-                className='theia-select'
-                value={pattern.size}
-                onChange={e => setPatternSize(parseInt(e.target.value))}
-            >
-                {PATTERN_SIZES.map(size =>
-                    <option key={`current-pattern-size-option-${size}`} value={size}>{size}</option>
-                )}
-            </select>
+            <RadioSelect
+                options={PATTERN_SIZES.map(size => ({ value: size }))}
+                defaultValue={pattern.size}
+                onChange={options => setPatternSize(options[0].value as number)}
+            />
         </VContainer>
 
         {/*

@@ -1,8 +1,8 @@
 import { nls } from '@theia/core';
 import DockLayout, { LayoutBase, LayoutData } from 'rc-dock';
-import React, { useContext } from 'react';
+import React from 'react';
 import { ConversionResult } from '../../../../images/browser/ves-images-types';
-import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
+import { EditorsContextType } from '../../ves-editors-types';
 import Animations from './Animations/Animations';
 import Colliders from './Colliders/Colliders';
 import Entity from './Entity/Entity';
@@ -19,16 +19,14 @@ import Wireframes from './Wireframes/Wireframes';
 interface EntityEditorProps {
   data: EntityData;
   updateData: (entityData: EntityData) => void;
+  context: EditorsContextType
 }
 
 export interface EntityEditorSaveDataOptions {
   appendImageData?: boolean
 }
 
-export default class EntityEditor extends React.Component<
-  EntityEditorProps,
-  EntityEditorState
-> {
+export default class EntityEditor extends React.Component<EntityEditorProps, EntityEditorState> {
   constructor(props: EntityEditorProps) {
     super(props);
     this.state = {
@@ -52,7 +50,7 @@ export default class EntityEditor extends React.Component<
   };
 
   protected async setData(entityData: Partial<EntityData>, options?: EntityEditorSaveDataOptions): Promise<void> {
-    const { isGenerating, setIsGenerating } = useContext(EditorsContext) as EditorsContextType;
+    const { isGenerating, setIsGenerating } = this.props.context;
     let updatedData = { ...this.props.data, ...entityData };
 
     if (!isGenerating) {
@@ -67,7 +65,7 @@ export default class EntityEditor extends React.Component<
   }
 
   protected async compressImageData(imageData: Partial<ConversionResult>): Promise<ConversionResult> {
-    const { services } = useContext(EditorsContext) as EditorsContextType;
+    const { services } = this.props.context;
     if (imageData.tiles) {
       let frameOffsets = {};
       if (imageData.tiles.frameOffsets) {
@@ -99,7 +97,7 @@ export default class EntityEditor extends React.Component<
   }
 
   protected async appendImageData(entityData: EntityData): Promise<EntityData> {
-    const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
+    const { fileUri, services } = this.props.context;
     const mostFilesOnASprite = Math.max(...entityData.sprites.sprites.map(s => s.texture.files.length));
     const isMultiImageAnimation = entityData.animations.enabled && mostFilesOnASprite > 1;
     const optimizeTiles = (!entityData.animations.enabled && entityData.sprites.optimizedTiles)
@@ -186,12 +184,12 @@ export default class EntityEditor extends React.Component<
   }
 
   async componentDidMount(): Promise<void> {
-    const { dock } = useContext(EditorsContext) as EditorsContextType;
+    const { dock } = this.props.context;
     dock.restoreLayout();
   }
 
   render(): React.JSX.Element {
-    const { dock, services } = useContext(EditorsContext) as EditorsContextType;
+    const { dock, services } = this.props.context;
     const defaultLayout: LayoutData = {
       dockbox: {
         mode: 'horizontal',
