@@ -255,7 +255,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                     />
                 </VContainer>
                 <VContainer>
-                    <label>Displacement (X, Y, Z)</label>
+                    <label>Displacement (x, y, z)</label>
                     <HContainer>
                         <input
                             className='theia-input'

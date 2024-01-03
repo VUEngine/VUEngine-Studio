@@ -163,6 +163,19 @@ export interface Sprite {
     _imageData?: Partial<ConversionResult & { _dupeIndex: number }> | number
 }
 
+export interface PositionedEntityData {
+    itemId: string
+    position: {
+        x: number
+        y: number
+        z: number
+        parallax: number
+    }
+    name: string
+    extraInfo: string
+    loadRegardlessOfPosition: boolean
+}
+
 export interface Sprites {
     type: string
     customClass: string
@@ -188,6 +201,12 @@ export interface EntityData {
         totalFrames: number
         multiframe: boolean
         animations: AnimationData[]
+    }
+    behaviors: {
+        behaviors: string[]
+    }
+    children: {
+        children: PositionedEntityData[]
     }
     colliders: {
         inGameType: string

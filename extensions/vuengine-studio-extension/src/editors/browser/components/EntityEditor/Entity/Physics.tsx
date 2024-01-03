@@ -81,16 +81,19 @@ export default function Physics(): React.JSX.Element {
         });
     };
 
-    return <VContainer gap={15}>
+    return <VContainer gap={10}>
+        <label>
+            {nls.localize('vuengine/entityEditor/physics', 'Physics')}
+        </label>
         <VContainer>
             <label>
+                <input
+                    type="checkbox"
+                    checked={data.physics.enabled}
+                    onChange={e => toggleEnabled()}
+                />
                 {nls.localize('vuengine/entityEditor/enabled', 'Enabled')}
             </label>
-            <input
-                type="checkbox"
-                checked={data.physics.enabled}
-                onChange={e => toggleEnabled()}
-            />
         </VContainer>
         {data.physics.enabled && <>
             <HContainer gap={15} wrap='wrap'>
@@ -135,7 +138,7 @@ export default function Physics(): React.JSX.Element {
                 </VContainer>
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/entityEditor/maximumVelocity', 'Maximum Velocity (X, Y, Z)')}
+                        {nls.localize('vuengine/entityEditor/maximumVelocity', 'Maximum Velocity (x, y, z)')}
                     </label>
                     <HContainer>
                         <input

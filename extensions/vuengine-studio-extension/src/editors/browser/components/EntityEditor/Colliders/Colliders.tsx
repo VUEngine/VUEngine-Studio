@@ -127,7 +127,7 @@ export default function Colliders(props: CollidersProps): React.JSX.Element {
                 />
             )}
             <button
-                className='theia-button add-button full-width'
+                className='theia-button add-button large full-width'
                 onClick={addCollider}
                 title={nls.localize('vuengine/entityEditor/addCollider', 'Add Collider')}
             >

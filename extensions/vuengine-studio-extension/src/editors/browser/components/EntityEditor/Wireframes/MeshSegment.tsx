@@ -94,7 +94,7 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
             <i className='codicon codicon-x' />
         </button>
         <VContainer>
-            <label>From (X, Y, Z, Parallax)</label>
+            <label>From (x, y, z, parallax)</label>
             <HContainer>
                 <input
                     className='theia-input'
@@ -127,7 +127,7 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
             </HContainer>
         </VContainer>
         <VContainer>
-            <label>To (X, Y, Z, Parallax)</label>
+            <label>To (x, y, z, parallax)</label>
             <HContainer>
                 <input
                     className='theia-input'

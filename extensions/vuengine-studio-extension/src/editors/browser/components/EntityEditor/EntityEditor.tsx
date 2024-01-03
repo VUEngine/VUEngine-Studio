@@ -4,16 +4,13 @@ import React from 'react';
 import { ConversionResult } from '../../../../images/browser/ves-images-types';
 import { EditorsDockInterface, EditorsServices } from '../../ves-editors-widget';
 import Animations from './Animations/Animations';
-import Behaviors from './Behaviors/Behaviors';
-import Children from './Children/Children';
 import Colliders from './Colliders/Colliders';
+import Entity from './Entity/Entity';
 import {
   EntityData,
   EntityEditorContext,
   EntityEditorState
 } from './EntityEditorTypes';
-import General from './General/General';
-import Physics from './Physics/Physics';
 import Preview from './Preview/Preview';
 import Scripts from './Scripts/Scripts';
 import Sprites from './Sprites/Sprites';
@@ -206,22 +203,6 @@ export default class EntityEditor extends React.Component<
               {
                 tabs: [
                   {
-                    id: 'tab-general',
-                    title: nls.localize(
-                      'vuengine/entityEditor/general',
-                      'General'
-                    ),
-                    minHeight: 200,
-                    minWidth: 200,
-                    content: (
-                      <EntityEditorContext.Consumer>
-                        {context => <General
-                          hoverService={this.props.services.hoverService}
-                        />}
-                      </EntityEditorContext.Consumer>
-                    ),
-                  },
-                  {
                     id: 'tab-animations',
                     title: nls.localize(
                       'vuengine/entityEditor/animations',
@@ -232,34 +213,6 @@ export default class EntityEditor extends React.Component<
                     content: (
                       <EntityEditorContext.Consumer>
                         {context => <Animations />}
-                      </EntityEditorContext.Consumer>
-                    ),
-                  },
-                  {
-                    id: 'tab-behaviors',
-                    title: nls.localize(
-                      'vuengine/entityEditor/behaviors',
-                      'Behaviors'
-                    ),
-                    minHeight: 200,
-                    minWidth: 200,
-                    content: (
-                      <EntityEditorContext.Consumer>
-                        {context => <Behaviors />}
-                      </EntityEditorContext.Consumer>
-                    ),
-                  },
-                  {
-                    id: 'tab-children',
-                    title: nls.localize(
-                      'vuengine/entityEditor/children',
-                      'Children'
-                    ),
-                    minHeight: 200,
-                    minWidth: 200,
-                    content: (
-                      <EntityEditorContext.Consumer>
-                        {context => <Children />}
                       </EntityEditorContext.Consumer>
                     ),
                   },
@@ -280,16 +233,18 @@ export default class EntityEditor extends React.Component<
                     ),
                   },
                   {
-                    id: 'tab-physics',
+                    id: 'tab-entity',
                     title: nls.localize(
-                      'vuengine/entityEditor/physics',
-                      'Physics'
+                      'vuengine/entityEditor/entity',
+                      'Entity'
                     ),
                     minHeight: 200,
                     minWidth: 200,
                     content: (
                       <EntityEditorContext.Consumer>
-                        {context => <Physics />}
+                        {context => <Entity
+                          hoverService={this.props.services.hoverService}
+                        />}
                       </EntityEditorContext.Consumer>
                     ),
                   },
@@ -380,6 +335,7 @@ export default class EntityEditor extends React.Component<
           }}
         >
           <DockLayout
+            style={{ flexGrow: 1 }}
             defaultLayout={defaultLayout}
             dropMode="edge"
             ref={this.props.dock.getRef}

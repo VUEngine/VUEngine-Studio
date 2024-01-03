@@ -353,7 +353,7 @@ export default function Sprites(props: SpritesProps): React.JSX.Element {
                 />
             )}
             <button
-                className='theia-button add-button full-width'
+                className='theia-button add-button large full-width'
                 onClick={addSprite}
                 title={nls.localize('vuengine/entityEditor/addSprite', 'Add Sprite')}
             >

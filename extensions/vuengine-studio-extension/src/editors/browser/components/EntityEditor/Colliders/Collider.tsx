@@ -251,7 +251,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
             </HContainer>
             <HContainer gap={15} wrap='wrap'>
                 <VContainer>
-                    <label>Displacement (X, Y, Z, Parallax)</label>
+                    <label>Displacement (x, y, z, parallax)</label>
                     <HContainer>
                         <input
                             className='theia-input'
@@ -284,7 +284,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     </HContainer>
                 </VContainer>
                 <VContainer>
-                    <label>Size (X, Y, Z, Parallax)</label>
+                    <label>Size (x, y, z, parallax)</label>
                     <HContainer>
                         <input
                             className='theia-input'
@@ -310,7 +310,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     </HContainer>
                 </VContainer>
                 <VContainer>
-                    <label>Rotation (X, Y, Z, Parallax)</label>
+                    <label>Rotation (x, y, z, parallax)</label>
                     <HContainer>
                         <input
                             className='theia-input'
@@ -336,7 +336,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     </HContainer>
                 </VContainer>
                 <VContainer>
-                    <label>Scale (X, Y, Z, Parallax)</label>
+                    <label>Scale (x, y, z, parallax)</label>
                     <HContainer>
                         <input
                             className='theia-input'

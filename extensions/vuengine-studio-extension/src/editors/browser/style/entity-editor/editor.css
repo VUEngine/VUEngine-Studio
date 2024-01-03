@@ -58,18 +58,6 @@
     vertical-align: middle;
 }
 
-.entityEditor .add-button {
-    background-color: transparent;
-    border: var(--theia-border-width) solid var(--theia-dropdown-border);
-    color: var(--theia-dropdown-border);
-    height: 48px;
-    margin-bottom: 5px;
-}
-.entityEditor .add-button:hover {
-    color: var(--theia-button-foreground);
-    border-color: var(--theia-button-hoverBackground);
-}
-
 .entityEditor .theia-input.heavyness {
     padding-left: 0;
     text-align: center;

@@ -510,7 +510,7 @@ export class VesCodeGenService {
     const env = nunjucks.configure(await this.fileService.fsPath(resourcesUri));
 
     // add filters
-    env.addFilter('basename', (value: string, ending: boolean = true) => {
+    env.addFilter('basename', (value: URI | string, ending: boolean = true) => {
       let base = this.vesCommonService.basename(value);
       if (!ending) {
         base = base.replace(/\.[^/.]+$/, '');

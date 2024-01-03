@@ -310,7 +310,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/entityEditor/displacement', 'Displacement (X, Y, Z, Parallax)')}
+                    label={nls.localize('vuengine/entityEditor/displacement', 'Displacement (x, y, z, parallax)')}
                     hoverService={props.services.hoverService}
                     tooltip={nls.localize(
                         'vuengine/entityEditor/displacementDescription',

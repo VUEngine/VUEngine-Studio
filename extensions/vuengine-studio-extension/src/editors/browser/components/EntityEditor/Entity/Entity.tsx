@@ -1,16 +1,19 @@
+import { nls } from '@theia/core';
 import { HoverService } from '@theia/core/lib/browser';
 import React, { useContext } from 'react';
 import HContainer from '../../Common/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import VContainer from '../../Common/VContainer';
 import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
-import { nls } from '@theia/core';
+import Behaviors from './Behaviors';
+import Children from './Children';
+import Physics from './Physics';
 
-interface GeneralProps {
+interface EntityProps {
     hoverService: HoverService
 }
 
-export default function General(props: GeneralProps): React.JSX.Element {
+export default function Entity(props: EntityProps): React.JSX.Element {
     const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
     const { hoverService } = props;
 
@@ -57,8 +60,8 @@ export default function General(props: GeneralProps): React.JSX.Element {
                 onChange={e => setName(e.target.value)}
             />
         </VContainer>
-        <HContainer gap={12}>
-            <VContainer grow={1}>
+        <HContainer gap={15}>
+            <VContainer>
                 <label>
                     {nls.localize('vuengine/entityEditor/extraInfo', 'Extra Info')}
                 </label>
@@ -70,7 +73,7 @@ export default function General(props: GeneralProps): React.JSX.Element {
             </VContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/entityEditor/entitySize', 'Size (X, Y, Z)')}
+                    label={nls.localize('vuengine/entityEditor/entitySize', 'Size (x, y, z)')}
                     hoverService={hoverService}
                     // eslint-disable-next-line max-len
                     tooltip={nls.localize('vuengine/entityEditor/entitySizeDescription', 'Size of the entity in pixels. Used by streaming to test if out of screen bounds. If 0, width and height will be inferred from the first sprite\'s texture\'s size.')}
@@ -103,5 +106,8 @@ export default function General(props: GeneralProps): React.JSX.Element {
                 </HContainer>
             </VContainer>
         </HContainer>
+        <Physics />
+        <Behaviors />
+        <Children />
     </VContainer>;
 }

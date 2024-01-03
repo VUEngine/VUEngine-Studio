@@ -1309,7 +1309,7 @@
       "interlaced": "Interlaced",
       "mass": "Mass",
       "maximumSpeed": "Maximum Speed",
-      "maximumVelocity": "Maximum Velocity (X, Y, Z)",
+      "maximumVelocity": "Maximum Velocity (x, y, z)",
       "meshes": "Meshes",
       "noMeshes": "No Meshes",
       "physics": "Physics",

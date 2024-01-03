@@ -63,7 +63,11 @@ export class VesCommonService {
     return new URI(applicationPath).withScheme('file');
   }
 
-  basename(path: string): string {
+  basename(path: URI | string): string {
+    if (typeof path !== 'string') {
+      path = path.path.fsPath();
+    }
+
     return path.replace(/\\/g, '\/').split('/').pop() || '';
   }
 

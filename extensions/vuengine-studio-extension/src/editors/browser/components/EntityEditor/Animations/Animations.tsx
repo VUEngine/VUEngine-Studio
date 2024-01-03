@@ -58,7 +58,7 @@ export default function Animations(props: AnimationsProps): React.JSX.Element {
                 />
             )}
             <button
-                className='theia-button add-button full-width'
+                className='theia-button add-button large full-width'
                 onClick={addAnimation}
                 title={nls.localize('vuengine/entityEditor/addAnimation', 'Add Animation')}
             >

@@ -45,7 +45,7 @@ export default function Wireframes(): React.JSX.Element {
             />
         )}
         <button
-            className='theia-button add-button full-width'
+            className='theia-button add-button large full-width'
             onClick={addWireframe}
             title={nls.localize('vuengine/entityEditor/addWireframe', 'Add Wireframe')}
         >
