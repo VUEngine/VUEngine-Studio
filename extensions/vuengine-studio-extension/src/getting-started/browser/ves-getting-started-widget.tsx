@@ -167,20 +167,29 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
     protected renderOpen(): React.ReactNode {
         const newProject = (
             <button className="theia-button large" onClick={this.createNewProject}>
-                <i className="fa fa-plus"></i> {nls.localize('vuengine/projects/commands/newProject', 'New Project')}
+                <i className="codicon codicon-add"></i> {nls.localize('vuengine/projects/commands/newProject', 'New Project')}
             </button>
         );
 
-        const openProject = <button
+        const openWorkspace = <button
             className="theia-button large"
             tabIndex={0}
             onClick={this.doOpenWorkspace}
             onKeyDown={this.doOpenWorkspaceEnter}>
-            <i className="fa fa-file-code-o"></i> {nls.localize('vuengine/projects/commands/openProject', 'Open Project...')}
+            <i className="codicon codicon-file-code"></i> {nls.localize('vuengine/projects/commands/openWorkspace', 'Open Workspace...')}
+        </button>;
+
+        const openFolder = <button
+            className="theia-button large"
+            tabIndex={0}
+            onClick={this.doOpenFolder}
+            onKeyDown={this.doOpenFolderEnter}>
+            <i className="codicon codicon-folder"></i> {nls.localize('vuengine/projects/commands/openFolder', 'Open Folder...')}
         </button>;
 
         return <div className="gs-section">
-            {openProject}
+            {openWorkspace}
+            {openFolder}
             {newProject}
             <br />
             <br />

@@ -16,7 +16,7 @@ import { VesCommonService } from '../../../core/browser/ves-common-service';
 import { VesProjectCommands } from '../ves-project-commands';
 import { VesProjectPathsService } from '../ves-project-paths-service';
 import { VesProjectService } from '../ves-project-service';
-import { VUENGINE_EXT } from '../ves-project-types';
+import { VUENGINE_WORKSPACE_EXT } from '../ves-project-types';
 import { VES_NEW_PROJECT_TEMPLATES, VesNewProjectFormComponent } from './ves-new-project-form';
 
 @injectable()
@@ -159,7 +159,7 @@ export class VesNewProjectDialog extends ReactDialog<void> {
 
         const templateIndex = this.createProjectFormComponentRef.current?.state.template ?? 0;
         const template = VES_NEW_PROJECT_TEMPLATES[templateIndex];
-        const newProjectWorkspaceFileUri = newProjectUri.resolve(`${folder}.${VUENGINE_EXT}`);
+        const newProjectWorkspaceFileUri = newProjectUri.resolve(`${folder}.${VUENGINE_WORKSPACE_EXT}`);
         const useTagged = this.createProjectFormComponentRef.current?.state.useTagged;
 
         this.setStatusMessage(`${spinnerIcon} ${nls.localize('vuengine/projects/downloadingTemplate', 'Downloading template, this may take a moment...')}`);

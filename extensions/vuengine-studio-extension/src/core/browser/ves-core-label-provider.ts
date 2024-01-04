@@ -1,6 +1,7 @@
-import { injectable } from '@theia/core/shared/inversify';
-import URI from '@theia/core/lib/common/uri';
 import { LabelProviderContribution } from '@theia/core/lib/browser';
+import URI from '@theia/core/lib/common/uri';
+import { injectable } from '@theia/core/shared/inversify';
+import { VUENGINE_WORKSPACE_EXT } from '../../project/browser/ves-project-types';
 
 interface FileType {
     base?: string;
@@ -11,7 +12,7 @@ interface FileType {
 
 // TODO: move to file icon theme
 const FILE_TYPES: FileType[] = [{
-    ext: '.vuengine',
+    ext: `.${VUENGINE_WORKSPACE_EXT}`,
     icon: 'ves-codicon-file-icon codicon codicon-library medium-purple',
 }, {
     ext: '.vb',

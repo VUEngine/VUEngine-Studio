@@ -42,7 +42,8 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
         } else {
           await this.vesBuildService.buildModeQuickPick();
         }
-      }
+      },
+      isVisible: () => this.workspaceService.opened,
     });
 
     commandRegistry.registerCommand(VesBuildCommands.TOGGLE_DUMP_ELF, {
@@ -50,6 +51,7 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
         const current = this.preferenceService.get(VesBuildPreferenceIds.DUMP_ELF);
         this.preferenceService.set(VesBuildPreferenceIds.DUMP_ELF, !current, PreferenceScope.User);
       },
+      isVisible: () => this.workspaceService.opened,
       isToggled: () => !!this.preferenceService.get(VesBuildPreferenceIds.DUMP_ELF),
     });
 
@@ -58,6 +60,7 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
         const current = this.preferenceService.get(VesBuildPreferenceIds.PEDANTIC_WARNINGS);
         this.preferenceService.set(VesBuildPreferenceIds.PEDANTIC_WARNINGS, !current, PreferenceScope.User);
       },
+      isVisible: () => this.workspaceService.opened,
       isToggled: () => !!this.preferenceService.get(VesBuildPreferenceIds.PEDANTIC_WARNINGS),
     });
   }

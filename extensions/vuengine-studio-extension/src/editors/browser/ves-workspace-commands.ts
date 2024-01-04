@@ -50,6 +50,7 @@ export class VesWorkspaceCommandContribution extends WorkspaceCommandContributio
                         maxWidth: 500,
                         parentLabel: this.labelProvider.getLongName(parentUri) + '/',
                         types,
+                        vesProjectService: this.vesProjectService,
                         defaultName,
                         defaultExt,
                     });

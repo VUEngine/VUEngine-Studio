@@ -1,34 +1,17 @@
 import URI from '@theia/core/lib/common/uri';
 import { AdditionalOperation, RulesLogic } from 'json-logic-js';
 
-export const VUENGINE_EXT = 'vuengine';
+export const VUENGINE_WORKSPACE_EXT = 'workspace';
 
 export const PROJECT_CHANNEL_NAME = 'Project Data';
 
-export interface WorkspaceFile {
-  extensions?: {
-    recommendations?: {
-      [extensionId: string]: string
-    }
-  }
-  folders?: {
-    name?: string
-    path: string
-  }[]
-  settings?: {
-    [settingId: string]: unknown
-  }
-}
-
-export interface ProjectFile extends WorkspaceFile {
+export interface ProjectFile {
   combined?: {
     items?: ProjectFileItemsByTypeWithContributor
     templates?: ProjectFileTemplatesWithContributor
     types?: ProjectFileTypesWithContributor
   }
   items?: ProjectFileItems
-  name?: string
-  plugins?: string[]
   templates?: ProjectFileTemplates
   types?: ProjectFileTypes
 };
@@ -199,6 +182,25 @@ export const defaultProjectData: ProjectFile = {
     }
   },
   types: {
+    GameConfig: {
+      file: 'GameConfig',
+      schema: {
+        title: 'Game Config',
+        properties: {
+          plugins: {
+            type: 'array',
+            items: {
+              type: 'string'
+            }
+          },
+          projectTitle: {
+            type: 'string'
+          }
+        },
+        required: []
+      },
+      icon: 'fa fa-cog'
+    },
     Image: {
       file: '.imageConv',
       schema: {

@@ -1,5 +1,5 @@
 import * as monaco from '@theia/monaco-editor-core';
-import { VUENGINE_EXT } from '../../project/browser/ves-project-types';
+import { VUENGINE_WORKSPACE_EXT } from '../../project/browser/ves-project-types';
 
 monaco.languages.register({
     id: 'jsonc',
@@ -7,6 +7,6 @@ monaco.languages.register({
         'JSON with Comments'
     ],
     'extensions': [
-        `.${VUENGINE_EXT}`
+        `.${VUENGINE_WORKSPACE_EXT}`
     ]
 });

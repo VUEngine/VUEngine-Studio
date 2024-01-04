@@ -3,12 +3,14 @@ import { Dialog, DialogProps, Message } from '@theia/core/lib/browser';
 import { ReactDialog } from '@theia/core/lib/browser/dialogs/react-dialog';
 import { inject, injectable } from 'inversify';
 import * as React from 'react';
-import { ProjectFileTypesWithContributor } from '../../project/browser/ves-project-types';
+import { VesProjectService } from '../../project/browser/ves-project-service';
+import { ProjectContributor, ProjectFileTypesWithContributor } from '../../project/browser/ves-project-types';
 
 @injectable()
 export class VesNewFileDialogProps extends DialogProps {
     parentLabel: string;
     types: ProjectFileTypesWithContributor;
+    vesProjectService: VesProjectService;
     defaultName: string;
     defaultExt: string;
 }
@@ -38,6 +40,12 @@ export class VesNewFileDialog extends ReactDialog<string> {
     }
 
     protected render(): React.ReactNode {
+        const typeKeys = Object.keys(this.props.types);
+        const multiFileTypes = typeKeys.filter(typeId => this.props.types[typeId].file?.startsWith('.'));
+        const singleFileTypes = typeKeys.filter(typeId => !this.props.types[typeId].file?.startsWith('.') &&
+            // ignore if a file of this kind already exists
+            !this.props.vesProjectService.getProjectDataItemById(ProjectContributor.Project, typeId));
+
         return <>
             <div
                 title={this.props.parentLabel}
@@ -74,7 +82,10 @@ export class VesNewFileDialog extends ReactDialog<string> {
                             style={{ flexGrow: 1, width: 0 }}
                             spellCheck="false"
                             value={this.ext}
-                            disabled
+                            onChange={e => {
+                                this.ext = e.currentTarget.value;
+                                this.update();
+                            }}
                         />
                     </div>
                 </div>
@@ -103,22 +114,20 @@ export class VesNewFileDialog extends ReactDialog<string> {
                                 {nls.localize('vuengine/editors/newFileDialog/types/Text', 'Text')}
                             </option>
                         </optgroup>
-                        {[true, false].map(b => {
-                            const typeKeys = Object.keys(this.props.types);
-                            const options = typeKeys.filter(typeId => this.props.types[typeId].file?.startsWith('.') === b);
-                            if (options.length) {
-                                return <optgroup key={b ? 'true' : ' false'}>
-                                    {options.map(typeId => {
-                                        const ext = this.props.types[typeId].file;
-                                        return (
-                                            <option value={ext} key={ext}>
-                                                {nls.localize(`vuengine/projects/types/${typeId}`, this.props.types[typeId].schema.title || typeId)}
-                                            </option>
-                                        );
-                                    })}
-                                </optgroup>;
-                            }
-                        })}
+
+                        {[multiFileTypes, singleFileTypes].map((b, i) =>
+                            b.length > 0 &&
+                            <optgroup key={'optgroup-' + i}>
+                                {b.map(typeId => {
+                                    const ext = this.props.types[typeId].file;
+                                    return (
+                                        <option value={ext} key={ext}>
+                                            {nls.localize(`vuengine/projects/types/${typeId}`, this.props.types[typeId].schema.title || typeId)}
+                                        </option>
+                                    );
+                                })}
+                            </optgroup>
+                        )}
                     </select>
                 </div>
             </div >

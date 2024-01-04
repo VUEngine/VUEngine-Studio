@@ -4,15 +4,24 @@ import { VesBuildPreferenceIds } from './ves-build-preferences';
 import { VesBuildCommands } from './ves-build-commands';
 import { VesBuildService } from './ves-build-service';
 import { nls } from '@theia/core';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
 
 @injectable()
 export class VesBuildStatusBarContribution implements FrontendApplicationContribution {
-    @inject(PreferenceService) protected readonly preferenceService: PreferenceService;
-    @inject(StatusBar) protected readonly statusBar: StatusBar;
-    @inject(VesBuildService) protected readonly vesBuildService: VesBuildService;
+    @inject(PreferenceService)
+    protected readonly preferenceService: PreferenceService;
+    @inject(StatusBar)
+    protected readonly statusBar: StatusBar;
+    @inject(VesBuildService)
+    protected readonly vesBuildService: VesBuildService;
+    @inject(WorkspaceService)
+    protected readonly workspaceService: WorkspaceService;
 
-    onStart(app: FrontendApplication): void {
-        this.updateStatusBar();
+    async onStart(app: FrontendApplication): Promise<void> {
+        await this.workspaceService.ready;
+        if (this.workspaceService.opened) {
+            this.updateStatusBar();
+        }
     };
 
     updateStatusBar(): void {

@@ -187,7 +187,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // initially hide extensions widget
     rebind(VSXExtensionsContribution).to(VesVSXExtensionsContribution).inSingletonScope();
 
-    // initially open file explorer for workspaces, hide otherwise
+    // initially open file explorer for workspaces
     rebind(FileNavigatorContribution).to(VesFileNavigatorContribution).inSingletonScope();
 
     // initially hide search and git widgets if no workspace is opened

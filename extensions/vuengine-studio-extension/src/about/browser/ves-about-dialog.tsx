@@ -81,8 +81,8 @@ export class VesAboutDialog extends AboutDialog {
             </div>
             <div className="ves-about-paragraph">
                 <div>
-                    <i className="fa fa-link" /> <a href="#" onClick={() => this.openUrl('https://www.vuengine.dev/')}>
-                        {'https://www.vuengine.dev/'}
+                    <i className="fa fa-link" /> <a href="#" onClick={() => this.openUrl('https://www.vuengine.dev')}>
+                        {'https://www.vuengine.dev'}
                     </a>
                 </div>
                 <div>
@@ -104,7 +104,7 @@ export class VesAboutDialog extends AboutDialog {
     protected renderPatreon(): React.ReactNode {
         return <>
             <div className="ves-about-paragraph">
-                {nls.localize('vuengine/about/thankYouToOurSupporters', 'Thank you to our supporters on Patreon!')}<br/>
+                {nls.localize('vuengine/about/thankYouToOurSupporters', 'Thank you to our supporters on Patreon!')}<br />
                 <a href="#" onClick={() => this.openUrl('https://www.patreon.com/VUEngine')}>{'https://www.patreon.com/VUEngine'}</a>
             </div>
             {this.renderPatrons()}

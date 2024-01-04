@@ -34,9 +34,9 @@ extraResources:
     to: app/plugins
 
 fileAssociations:
-  - ext: vuengine
-    name: VUEngine Studio Project
-    description: VUEngine Studio project file
+  - ext: workspace
+    name: VUEngine Studio Workspace
+    description: VUEngine Studio Workspace file
     role: Editor
     rank: Owner
     isPackage: false

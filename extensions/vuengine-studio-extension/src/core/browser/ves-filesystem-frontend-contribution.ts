@@ -14,6 +14,10 @@ export class VesFileSystemFrontendContribution extends FileSystemFrontendContrib
             '*.make': 'makefile',
             '*.ld': 'c',
             'makefile*': 'makefile',
+            // TODO: create types for the following
+            '*.plugin': 'json',
+            '*.templateConfig': 'json',
+            '*.type': 'json',
         };
 
         await this.vesProjectService.projectDataReady;
