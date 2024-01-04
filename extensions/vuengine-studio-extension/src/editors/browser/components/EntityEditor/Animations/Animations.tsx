@@ -52,6 +52,7 @@ export default function Animations(): React.JSX.Element {
                     key={`animation-${index}`}
                     index={index}
                     animation={animation}
+                    totalFrames={data.animations.totalFrames}
                 />
             )}
             <button

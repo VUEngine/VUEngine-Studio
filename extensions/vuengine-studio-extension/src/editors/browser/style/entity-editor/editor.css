@@ -58,17 +58,17 @@
     vertical-align: middle;
 }
 
-.entityEditor .theia-input.heavyness {
+.entityEditor .theia-input.heaviness {
     padding-left: 0;
     text-align: center;
     width: 48px;
 }
-.entityEditor .theia-input.heavynessLight {
+.entityEditor .theia-input.heavinessLight {
     border-color: var(--theia-editorSuccess-foreground);
 }
-.entityEditor .theia-input.heavynessMedium {
+.entityEditor .theia-input.heavinessMedium {
     border-color: var(--theia-editorWarning-foreground);
 }
-.entityEditor .theia-input.heavynessHeavy {
+.entityEditor .theia-input.heavinessHeavy {
     border-color: var(--theia-editorError-foreground);
 }

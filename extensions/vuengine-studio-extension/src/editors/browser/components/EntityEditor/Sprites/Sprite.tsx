@@ -236,7 +236,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     {nls.localize('vuengine/entityEditor/chars', 'Chars')}
                 </label>
                 <input
-                    className='theia-input heavyness'
+                    className='theia-input heaviness'
                     style={{ width: 40 }}
                     type='text'
                     value={getCharCount(sprite._imageData)}

@@ -15,11 +15,12 @@ import {
 interface AnimationProps {
     index: number
     animation: AnimationData
+    totalFrames: number
 }
 
 export default function Animation(props: AnimationProps): React.JSX.Element {
     const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
-    const { index, animation } = props;
+    const { index, animation, totalFrames } = props;
 
     const removeAnimation = async (): Promise<void> => {
         const dialog = new ConfirmDialog({
@@ -81,6 +82,30 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
 
     const setCallback = (callback: string): void => {
         setAnimation({ callback });
+    };
+
+    const setFrame = (i: number, frame: number): void => {
+        const frames = [...animation.frames];
+        frames[i] = Math.min(Math.max(frame, 1), totalFrames);
+        setAnimation({ frames });
+    };
+
+    const addFrame = (): void => {
+        setAnimation({
+            frames: [
+                ...animation.frames,
+                Math.min((animation.frames.pop() || 0) + 1, totalFrames),
+            ]
+        });
+    };
+
+    const removeFrame = (i: number): void => {
+        setAnimation({
+            frames: [
+                ...animation.frames.slice(0, i),
+                ...animation.frames.slice(i + 1)
+            ]
+        });
     };
 
     return <VContainer className='item' gap={15}>
@@ -165,10 +190,37 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
         </HContainer>
         <VContainer>
             <label>
-                {nls.localize('vuengine/entityEditor/frames', 'Frames')}
+                {nls.localize('vuengine/entityEditor/frames', 'Frames')} ({animation.frames.length})
             </label>
-            <HContainer alignItems='start' gap={15} wrap='wrap'>
-                ...
+            <HContainer alignItems='start' wrap='wrap'>
+                {animation.frames.map((f, i) =>
+                    <HContainer gap={1}>
+                        <input
+                            key={`frame-${i}`}
+                            className='theia-input'
+                            style={{ width: 40 }}
+                            type='number'
+                            min={1}
+                            max={totalFrames}
+                            value={animation.frames[i]}
+                            onChange={e => setFrame(i, parseInt(e.target.value))}
+                        />
+                        <button
+                            className="theia-button secondary"
+                            onClick={() => removeFrame(i)}
+                            title={nls.localize('vuengine/entityEditor/removeFrame', 'Remove Frame')}
+                        >
+                            <i className='codicon codicon-x' />
+                        </button>
+                    </HContainer>
+                )}
+                <button
+                    className='theia-button add-button'
+                    onClick={addFrame}
+                    title={nls.localize('vuengine/entityEditor/addFrame', 'Add Frame')}
+                >
+                    <i className='codicon codicon-plus' />
+                </button>
             </HContainer>
         </VContainer>
     </VContainer>;

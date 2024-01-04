@@ -17,7 +17,7 @@ export const EntityEditorLayoutStorageName = 'ves-editors-entityEditor-layout';
 
 export const MIN_TEXTURE_PADDING = 0;
 export const MAX_TEXTURE_PADDING = 255;
-export const MIN_ANIMATION_CYLCES = 0;
+export const MIN_ANIMATION_CYLCES = 1;
 export const MAX_ANIMATION_CYLCES = 255;
 // TODO: compute min, max values from engineConfig.math.fixedPointPrecision
 // step would be PIXELS_TO_METERS(1), depending on fixedPointPrecision

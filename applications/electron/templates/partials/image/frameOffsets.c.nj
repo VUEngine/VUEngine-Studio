@@ -2,9 +2,9 @@
 {%- set frameTileOffsets = imageData.tiles.frameOffsets | uncompressJson %}
 const uint32 {{ tilesName }}TilesFrameOffsets[{{ frameTileOffsets.length }}] __attribute__((aligned(4))){% if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
-    {% for frameTileOffset in frameTileOffsets -%}
-    {{ frameTileOffset | intToHex(8) }},
-    {%- if loop.index % 8 == 0 and not loop.last %}{{ "\n    " }}{% endif -%}
-    {%- endfor %}
+	{% for frameTileOffset in frameTileOffsets -%}
+	{{ frameTileOffset | intToHex(8) }},
+	{%- if loop.index % 8 == 0 and not loop.last %}{{ "\n	" }}{% endif -%}
+	{%- endfor %}
 };
 {% endif -%}

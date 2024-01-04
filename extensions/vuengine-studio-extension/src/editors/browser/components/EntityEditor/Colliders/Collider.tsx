@@ -32,7 +32,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
         }
     };
 
-    const getHeavyness = (): number => {
+    const getHeaviness = (): number => {
         let total = 0;
 
         switch (collider.type) {
@@ -197,7 +197,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
         });
     };
 
-    const heavyness = getHeavyness();
+    const heaviness = getHeaviness();
 
     return <div className='item'>
         <button
@@ -241,9 +241,9 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     <label>Heaviness</label>
                     <HContainer>
                         <input
-                            className={`theia-input heavyness ${heavyness > 4 ? 'heavynessHeavy' : heavyness > 2 ? 'heavynessMedium' : 'heavynessLight'}`}
+                            className={`theia-input heaviness ${heaviness > 4 ? 'heavinessHeavy' : heaviness > 2 ? 'heavinessMedium' : 'heavinessLight'}`}
                             type='text'
-                            value={`${heavyness} / 5`}
+                            value={`${heaviness} / 5`}
                             disabled
                         />
                     </HContainer>

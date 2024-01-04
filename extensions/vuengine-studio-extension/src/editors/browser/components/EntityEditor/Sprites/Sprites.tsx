@@ -181,7 +181,7 @@ export default function Sprites(): React.JSX.Element {
                     {nls.localize('vuengine/entityEditor/chars', 'Chars')}
                 </label>
                 <input
-                    className={`theia-input heavyness ${charCount > 1200 ? 'heavynessHeavy' : charCount > 600 ? 'heavynessMedium' : 'heavynessLight'}`}
+                    className={`theia-input heaviness ${charCount > 1200 ? 'heavinessHeavy' : charCount > 600 ? 'heavinessMedium' : 'heavinessLight'}`}
                     type='text'
                     value={charCount}
                     disabled

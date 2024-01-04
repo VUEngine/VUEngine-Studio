@@ -1,62 +1,62 @@
 {%- if item._forEachOfBasename is defined -%}
-    {%- set sanitizedSpecName = item._forEachOfBasename | sanitizeSpecName -%}
+	{%- set sanitizedSpecName = item._forEachOfBasename | sanitizeSpecName -%}
 {%- else -%}
-    {%- set sanitizedSpecName = item.name | sanitizeSpecName -%}
+	{%- set sanitizedSpecName = item.name | sanitizeSpecName -%}
 {%- endif -%}
 {%- set imageData = itemUri | convertImage(item, item._forEachOf) -%}
 
 {%- set mapsDataTotalLength = 0 -%}
 {%- for map in imageData.maps -%}
-    {%- set mapsDataTotalLength = mapsDataTotalLength + map.data.length -%}
+	{%- set mapsDataTotalLength = mapsDataTotalLength + map.data.length -%}
 {%- endfor -%}
 
 {%- set reducedTilesLabel = 'unreduced' -%}
 {%- if item.map.reduce.flipped is defined and item.map.reduce.unique is defined -%}
-    {%- if item.map.reduce.flipped and item.map.reduce.unique -%}
-        {%- set reducedTilesLabel = 'reduced by non-unique and flipped tiles' -%}
-    {%- elseif item.map.reduce.flipped -%}
-        {%- set reducedTilesLabel = 'reduced by flipped tiles' -%}
-    {%- elseif item.map.reduce.unique -%}
-        {%- set reducedTilesLabel = 'reduced by non-unique tiles' -%}
-    {%- endif -%}
+	{%- if item.map.reduce.flipped and item.map.reduce.unique -%}
+		{%- set reducedTilesLabel = 'reduced by non-unique and flipped tiles' -%}
+	{%- elseif item.map.reduce.flipped -%}
+		{%- set reducedTilesLabel = 'reduced by flipped tiles' -%}
+	{%- elseif item.map.reduce.unique -%}
+		{%- set reducedTilesLabel = 'reduced by non-unique tiles' -%}
+	{%- endif -%}
 {%- endif -%}
 
 {%- set tilesCompressionLabel = 'not compressed' -%}
 {%- if item.tileset.compression != 'none' and imageData.tiles.compressionRatio is defined -%}
-    {%- if imageData.tiles.compressionRatio < 0 -%}
-        {%- set tilesCompressionLabel = item.tileset.compression | upper ~ ' compressed (' ~ imageData.tiles.compressionRatio | round(2) ~ '%)' -%}
-    {%- elseif imageData.tiles.compressionRatio == 0 -%}
-        {%- set tilesCompressionLabel = item.tileset.compression | upper ~ ' compression skipped for not reducing size (±' ~ imageData.tiles.compressionRatio | round(2) ~ '%)' -%}
-    {%- else -%}
-        {%- set tilesCompressionLabel = item.tileset.compression | upper ~ ' compression skipped for inflating size (+' ~ imageData.tiles.compressionRatio | round(2) ~ '%)' -%}
-    {%- endif -%}
+	{%- if imageData.tiles.compressionRatio < 0 -%}
+		{%- set tilesCompressionLabel = item.tileset.compression | upper ~ ' compressed (' ~ imageData.tiles.compressionRatio | round(2) ~ '%)' -%}
+	{%- elseif imageData.tiles.compressionRatio == 0 -%}
+		{%- set tilesCompressionLabel = item.tileset.compression | upper ~ ' compression skipped for not reducing size (±' ~ imageData.tiles.compressionRatio | round(2) ~ '%)' -%}
+	{%- else -%}
+		{%- set tilesCompressionLabel = item.tileset.compression | upper ~ ' compression skipped for inflating size (+' ~ imageData.tiles.compressionRatio | round(2) ~ '%)' -%}
+	{%- endif -%}
 {%- endif -%}
 
 //---------------------------------------------------------------------------------------------------------
 //
-//  {{ sanitizedSpecName }}
+//	{{ sanitizedSpecName }}
 {% if imageData.tiles.data.length -%}
-    //  * {{ imageData.tiles.count }} tiles, {{ reducedTilesLabel }}, {{ tilesCompressionLabel }}
+	//	* {{ imageData.tiles.count }} tiles, {{ reducedTilesLabel }}, {{ tilesCompressionLabel }}
 {% endif %}
 
 {%- for map in imageData.maps -%}
-    //  * {{ map.width }}x{{ map.height }} map, not compressed
+	//	* {{ map.width }}x{{ map.height }} map, not compressed
 {% endfor -%}
 
 {%- if item.animation.isAnimation and imageData.tiles.count > 0 -%}
-    //  * {{ imageData.animation.frames }} animation frames, {% if item.animation.individualFiles %}individual files{% else %}spritesheet{% endif %}{% if item.animation.individualFiles and imageData.animation.largestFrame is defined %}, largest frame: {{imageData.animation.largestFrame}} tiles{% endif %}
+	//	* {{ imageData.animation.frames }} animation frames, {% if item.animation.individualFiles %}individual files{% else %}spritesheet{% endif %}{% if item.animation.individualFiles and imageData.animation.largestFrame is defined %}, largest frame: {{imageData.animation.largestFrame}} tiles{% endif %}
 {% endif -%}
 
 {%- if imageData.tiles.data.length and imageData.maps.length -%}
-    //  Size: {{ (imageData.tiles.data.length + 1) * 4 }}
-    {%- for map in imageData.maps -%}
-        {{ ' + ' }}{{ map.data.length * 2 }}{{ ' ' }}
-    {%- endfor -%}
-    = {{ ((imageData.tiles.data.length + 1) * 4) + (mapsDataTotalLength * 2) }}
+	//	Size: {{ (imageData.tiles.data.length + 1) * 4 }}
+	{%- for map in imageData.maps -%}
+		{{ ' + ' }}{{ map.data.length * 2 }}{{ ' ' }}
+	{%- endfor -%}
+	= {{ ((imageData.tiles.data.length + 1) * 4) + (mapsDataTotalLength * 2) }}
 {% elseif imageData.tiles.data.length -%}
-    //  Size: {{ (imageData.tiles.data.length + 1) * 4 }}
+	//	Size: {{ (imageData.tiles.data.length + 1) * 4 }}
 {% elseif imageData.maps.length -%}
-    //  Size: {{ mapsDataTotalLength * 2 }}
+	//	Size: {{ mapsDataTotalLength * 2 }}
 {% endif -%}
 //
 //---------------------------------------------------------------------------------------------------------
