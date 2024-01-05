@@ -12,7 +12,6 @@ import {
   EntityEditorState
 } from './EntityEditorTypes';
 import Preview from './Preview/Preview';
-import Scripts from './Scripts/Scripts';
 import Sprites from './Sprites/Sprites';
 import Wireframes from './Wireframes/Wireframes';
 
@@ -37,7 +36,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
         wireframes: true,
         palettes: ['11100100', '11100000', '11010000', '11100100'],
         sprites: true,
-        zoom: 8,
+        zoom: 1,
       },
     };
   }
@@ -256,6 +255,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
                       </EntityEditorContext.Consumer>
                     ),
                   },
+                  /*
                   {
                     id: 'tab-scripts',
                     title: nls.localize(
@@ -270,6 +270,23 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
                       </EntityEditorContext.Consumer>
                     ),
                   },
+                  */
+                  /*
+                  {
+                    id: 'tab-states',
+                    title: nls.localize(
+                      'vuengine/entityEditor/states',
+                      'States'
+                    ),
+                    minHeight: 200,
+                    minWidth: 200,
+                    content: (
+                      <EntityEditorContext.Consumer>
+                        {context => <States />}
+                      </EntityEditorContext.Consumer>
+                    ),
+                  },
+                  */
                   {
                     id: 'tab-wireframes',
                     title: nls.localize(
@@ -301,10 +318,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
                 content: (
                   <EntityEditorContext.Consumer>
                     {context => (
-                      <Preview
-                        fileService={services.fileService}
-                        workspaceService={services.workspaceService}
-                      />
+                      <Preview />
                     )}
                   </EntityEditorContext.Consumer>
                 ),

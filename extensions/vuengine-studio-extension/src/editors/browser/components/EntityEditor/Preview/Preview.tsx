@@ -1,25 +1,15 @@
-import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
 import React, { useContext } from 'react';
 import HContainer from '../../Common/HContainer';
+import Palette from '../../Common/Palette';
 import VContainer from '../../Common/VContainer';
 import {
   EntityEditorContext,
   EntityEditorContextType,
 } from '../EntityEditorTypes';
 import Sprite from './Sprite';
-import Palette from '../../Common/Palette';
 
-interface PreviewProps {
-  fileService: FileService;
-  workspaceService: WorkspaceService;
-}
-
-export default function Preview(props: PreviewProps): React.JSX.Element {
-  const { fileService, workspaceService } = props;
-  const { state, setState, data } = useContext(
-    EntityEditorContext
-  ) as EntityEditorContextType;
+export default function Preview(): React.JSX.Element {
+  const { state, setState, data } = useContext(EntityEditorContext) as EntityEditorContextType;
 
   const setBooleanStateProperty = (property: string, checked: boolean) =>
     setState({
@@ -32,21 +22,15 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
   return (
     <VContainer gap={15}>
       <div className="preview-container">
-        <Sprite
-          animate={state.preview.animations && data.animations?.animations?.length > 0}
-          displacement={{
-            x: 0,
-            y: 0,
-            z: 10,
-            parallax: 0,
-          }}
-          frames={3}
-          imagePath="assets/images/Drone/Drone/Drone.png"
-          palette='11100100'
-          zoom={state.preview.zoom}
-          fileService={fileService}
-          workspaceService={workspaceService}
-        />
+        {state.preview.sprites && data.sprites?.sprites?.map(s =>
+          <Sprite
+            animate={state.preview.animations && data.animations?.enabled}
+            displacement={s.displacement}
+            frames={data.animations.totalFrames}
+            imagePath={s.texture.files[0]}
+            palette={state.preview.palettes[s.texture.palette]}
+            zoom={state.preview.zoom}
+          />)}
       </div>
       <VContainer>
         <label>Zoom</label>
@@ -81,6 +65,7 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
           />
           Show Sprites
         </label>
+        {/*
         <label>
           <input
             type="checkbox"
@@ -101,10 +86,11 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
           />
           Show Colliders
         </label>
+        */}
         <label>
           <input
             type="checkbox"
-            checked={state.preview.animations && data.animations?.animations?.length > 0}
+            checked={state.preview.animations && data.animations?.enabled}
             disabled={!data.animations?.animations?.length}
             onChange={e =>
               setBooleanStateProperty('animations', e.target.checked)
@@ -112,6 +98,7 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
           />
           Show Animations
         </label>
+        {/*
         <label>
           <input
             type="checkbox"
@@ -122,6 +109,7 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
           />
           Anaglyph Display Mode
         </label>
+        */}
       </VContainer>
       <VContainer>
         <label>BGMap Palettes</label>

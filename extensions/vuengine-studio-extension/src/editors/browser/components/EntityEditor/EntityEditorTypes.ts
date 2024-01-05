@@ -65,6 +65,12 @@ export enum ColliderType {
     LineField = 'LineField',
 }
 
+export enum Axis {
+    XAxis = 'X_AXIS',
+    YAxis = 'Y_AXIS',
+    ZAxis = 'Z_AXIS',
+}
+
 export interface MeshSegmentData {
     fromVertex: {
         x: number
@@ -227,6 +233,8 @@ export interface EntityData {
             y: number
             z: number
         }
+        gravityAxes: Axis[]
+        rotationAxes: Axis[]
     }
     sprites: Sprites
 }

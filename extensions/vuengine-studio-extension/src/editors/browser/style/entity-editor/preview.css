@@ -1,12 +1,13 @@
 .jsonforms-container .preview-container {
     align-items: center;
-    background-color: var(--theia-sideBar-background);
-    border-radius: 10px;
+    background-color: var(--theia-activityBar-background);
+    border-radius: 8px;
     box-sizing: border-box;
     display: flex;
     justify-content: center;
     height: 300px;
     overflow: hidden;
+    position: relative;
     width: 100%;
 }
 

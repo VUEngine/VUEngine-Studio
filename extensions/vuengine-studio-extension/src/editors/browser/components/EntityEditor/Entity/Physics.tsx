@@ -1,8 +1,10 @@
 import React, { useContext } from 'react';
 import HContainer from '../../Common/HContainer';
 import VContainer from '../../Common/VContainer';
-import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
+import { Axis, EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 import { nls } from '@theia/core';
+import RadioSelect from '../../Common/RadioSelect';
+import InfoLabel from '../../Common/InfoLabel';
 
 export default function Physics(): React.JSX.Element {
     const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
@@ -77,6 +79,24 @@ export default function Physics(): React.JSX.Element {
                 maximumVelocity: {
                     ...data.physics.maximumVelocity, z
                 }
+            }
+        });
+    };
+
+    const setGravityAxes = (gravityAxes: Axis[]): void => {
+        setData({
+            physics: {
+                ...data.physics,
+                gravityAxes,
+            }
+        });
+    };
+
+    const setRotationAxes = (rotationAxes: Axis[]): void => {
+        setData({
+            physics: {
+                ...data.physics,
+                rotationAxes,
             }
         });
     };
@@ -177,6 +197,53 @@ export default function Physics(): React.JSX.Element {
                         type='number'
                         value={data.physics.maximumSpeed}
                         onChange={e => setMaximumSpeed(parseInt(e.target.value))}
+                    />
+                </VContainer>
+                <VContainer>
+                    <InfoLabel
+                        label={nls.localize('vuengine/entityEditor/gravityAxes', 'Gravity Axes')}
+                        tooltip={nls.localize('vuengine/entityEditor/gravityAxesDescription', 'Select the axes on which the entity should be a subject to gravity.')}
+                    />
+                    <RadioSelect
+                        options={[{
+                            value: Axis.XAxis,
+                            label: 'X',
+                        }, {
+                            value: Axis.XAxis,
+                            label: 'Y',
+                        }, {
+                            value: Axis.XAxis,
+                            label: 'Z',
+                        }]}
+                        defaultValue={data.physics.gravityAxes}
+                        onChange={options => setGravityAxes(options.map(o => o.value) as Axis[])}
+                        canSelectMany
+                        allowBlank
+                    />
+                </VContainer>
+                <VContainer>
+                    <InfoLabel
+                        label={nls.localize('vuengine/entityEditor/rotationAxes', 'Rotation Axes')}
+                        tooltip={nls.localize(
+                            'vuengine/entityEditor/rotationAxesDescription',
+                            'Select the axes around which the entity\'s sprites should be rotated in sync with its physical body.'
+                        )}
+                    />
+                    <RadioSelect
+                        options={[{
+                            value: Axis.XAxis,
+                            label: 'X',
+                        }, {
+                            value: Axis.YAxis,
+                            label: 'Y',
+                        }, {
+                            value: Axis.ZAxis,
+                            label: 'Z',
+                        }]}
+                        defaultValue={data.physics.rotationAxes}
+                        onChange={options => setRotationAxes(options.map(o => o.value) as Axis[])}
+                        canSelectMany
+                        allowBlank
                     />
                 </VContainer>
             </HContainer>

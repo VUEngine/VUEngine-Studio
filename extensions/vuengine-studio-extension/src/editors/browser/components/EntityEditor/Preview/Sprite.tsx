@@ -1,7 +1,6 @@
-import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { ImageData } from '../../../../../core/browser/ves-common-types';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import CssImage from '../../Common/CssImage';
 import { Displacement } from '../EntityEditorTypes';
 
@@ -10,14 +9,12 @@ interface SpriteProps {
   frames: number;
   displacement: Displacement;
   imagePath: string;
-  fileService: FileService;
   palette: string
-  workspaceService: WorkspaceService;
   zoom: number;
 }
 
 export default function Sprite(props: SpriteProps): React.JSX.Element {
-  const { fileService, workspaceService } = props;
+  const { services } = useContext(EditorsContext) as EditorsContextType;
   const { animate, frames, displacement, imagePath, palette, zoom } = props;
   const [currentAnimationFrame, setCurrentAnimationFrame] = useState<number>(0);
   const [imageData, setImageData] = useState<ImageData>();
@@ -27,11 +24,11 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
   let timer: NodeJS.Timeout | undefined;
 
   const getData = async () => {
-    await workspaceService.ready;
-    const workspaceRootUri = workspaceService.tryGetRoots()[0]?.resource;
+    await services.workspaceService.ready;
+    const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
     const imageUri = workspaceRootUri.resolve(imagePath);
-    if (await fileService.exists(imageUri)) {
-      const imageFileContent = await fileService.readFile(imageUri);
+    if (await services.fileService.exists(imageUri)) {
+      const imageFileContent = await services.fileService.readFile(imageUri);
       const img = await window.electronVesCore.parsePng(imageFileContent);
       if (img) {
         if (img.colorType !== 3) {
@@ -61,7 +58,11 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     getData();
     updateAnimationFrame();
     return () => clearInterval(timer);
-  }, []);
+  }, [
+    height,
+    imagePath,
+    width,
+  ]);
 
   return (
     <>
@@ -78,6 +79,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
           marginRight: displacement.x < 0 ? -displacement.x * zoom : 0,
           marginTop: displacement.y > 0 ? displacement.y * zoom : 0,
           overflow: 'hidden',
+          position: 'absolute',
           width: width * zoom,
           zIndex: 100000 + (displacement.z !== 0 ? -displacement.z : 0),
         }}

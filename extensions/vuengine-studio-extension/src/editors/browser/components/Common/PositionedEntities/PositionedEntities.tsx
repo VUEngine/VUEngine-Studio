@@ -18,7 +18,8 @@ export default function PositionedEntities(props: PositionedEntitiesProps): Reac
 
     const showEntitySelection = async (): Promise<QuickPickItem | undefined> => {
         const quickPickOptions: QuickPickOptions<QuickPickItem> = {
-            title: nls.localize('vuengine/editors/selectEntity', 'Select Entity')
+            title: nls.localize('vuengine/editors/selectEntity', 'Select Entity'),
+            placeholder: nls.localize('vuengine/editors/selectEntityToAdd', 'Select an Entity to add...'),
         };
         const items: QuickPickItem[] = [];
         const entities = services.vesProjectService.getProjectDataItemsForType('Entity');
