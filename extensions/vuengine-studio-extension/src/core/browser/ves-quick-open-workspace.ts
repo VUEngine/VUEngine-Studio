@@ -33,8 +33,10 @@ export class VesQuickOpenWorkspace extends QuickOpenWorkspace {
             if (this.untitledWorkspaceService.isUntitledWorkspace(uri) || !stat) {
                 continue; // skip the temporary workspace files or an undefined stat.
             }
-            const icon = this.labelProvider.getIcon(stat);
-            const iconClasses = icon === '' ? undefined : [icon + ' file-icon'];
+            const icon =
+                (uri.path.ext === '.workspace') ? 'codicon codicon-folder-library medium-purple' : // Added line
+                    this.labelProvider.getIcon(stat);
+            const iconClasses = icon === '' ? undefined : [icon + ' ves-codicon-file-icon file-icon']; // Modified line
 
             this.items.push({
                 label: await this.vesProjectsService.getProjectName(uri), // Modified line
@@ -54,7 +56,7 @@ export class VesQuickOpenWorkspace extends QuickOpenWorkspace {
         this.quickInputService?.showQuickPick(this.items, {
             placeholder: nls.localize(
                 'theia/workspace/openRecentPlaceholder',
-                'Type the name of the project you want to open'), // Modified line
+                'Type the name of the workspace you want to open'),
             onDidTriggerItemButton: async context => {
                 const resource = (context.item).resource;
                 if (resource) {

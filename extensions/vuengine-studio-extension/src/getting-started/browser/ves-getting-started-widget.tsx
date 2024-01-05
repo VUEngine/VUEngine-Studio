@@ -176,7 +176,7 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
             tabIndex={0}
             onClick={this.doOpenWorkspace}
             onKeyDown={this.doOpenWorkspaceEnter}>
-            <i className="codicon codicon-file-code"></i> {nls.localize('vuengine/projects/commands/openWorkspace', 'Open Workspace...')}
+            <i className="codicon codicon-folder-library"></i> {nls.localize('vuengine/projects/commands/openWorkspace', 'Open Workspace...')}
         </button>;
 
         const openFolder = <button
