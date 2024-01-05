@@ -41,7 +41,7 @@ export default function ImageConvEditor(props: ImageConvEditorProps): React.JSX.
                         <Map />
                         <Animation />
                     </HContainer>
-                    <VContainer>
+                    <VContainer overflow='hidden'>
                         <label>
                             {nls.localize('vuengine/imageConvEditor/xFiles', 'Image Files ({0})', data.files.length)}
                         </label>

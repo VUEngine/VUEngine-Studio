@@ -59,6 +59,7 @@
     "physical-cpu-count": "^2.0.0",
     "rc-dock": "^3.2.12",
     "react-dom": "^18.2.0",
+    "react-select": "^5.8.0",
     "react-textarea-autosize": "^8.3.4",
     "replace-in-file": "^7.0.1",
     "sanitize-filename": "^1.6.3",

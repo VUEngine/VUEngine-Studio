@@ -482,12 +482,14 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     'PNG image to be used as texture. Must be four color indexed mode with the proper palette. When animations are enabled, select either a single file containing a vertical spritesheet, or multiple files, where each represents one animation frame.'
                 )}
             />
-            <Images
-                data={sprite.texture.files}
-                updateData={setFiles}
-                allInFolderAsFallback={false}
-                canSelectMany={data.animations.enabled}
-            />
+            <VContainer style={{ maxHeight: 400, overflow: 'hidden' }}>
+                <Images
+                    data={sprite.texture.files}
+                    updateData={setFiles}
+                    allInFolderAsFallback={false}
+                    canSelectMany={data.animations.enabled}
+                />
+            </VContainer>
         </VContainer>
     </VContainer>;
 }

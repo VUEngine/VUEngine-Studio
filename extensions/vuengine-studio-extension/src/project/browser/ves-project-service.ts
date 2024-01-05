@@ -417,12 +417,12 @@ export class VesProjectService {
     };
 
     // add types and templates to combined
-    projectDataWithContributors.forEach(async projectDataWithContributor => {
-      ['templates', 'types'].forEach(combinedKey => {
+    projectDataWithContributors.map(async projectDataWithContributor => {
+      ['templates', 'types'].map(combinedKey => {
         // @ts-ignore
         const data = projectDataWithContributor[combinedKey];
         if (data) {
-          Object.keys(data).forEach(dataKey => {
+          Object.keys(data).map(dataKey => {
             if (data[dataKey].enabled !== false) {
               combined[combinedKey][dataKey] = {
                 _contributor: projectDataWithContributor._contributor,
@@ -446,7 +446,7 @@ export class VesProjectService {
 
     // add items to combined
     const filePatterns = Object.values(combined.types).map((t: ProjectFileType) => t.file?.startsWith('.') ? `**/*${t.file}` : `**/${t.file}`);
-    projectDataWithContributors.forEach(async projectDataWithContributor => {
+    await Promise.all(projectDataWithContributors.map(async projectDataWithContributor => {
       // find item files
       const itemFiles = window.electronVesCore.findFiles(
         await this.fileService.fsPath(projectDataWithContributor._contributorUri),
@@ -458,9 +458,9 @@ export class VesProjectService {
         }
       );
       // find type
-      itemFiles.forEach(filename => {
+      await Promise.all(itemFiles.map(async filename => {
         const uri = projectDataWithContributor._contributorUri.resolve(filename);
-        Object.keys(combined.types).forEach(async typeId => {
+        await Promise.all(Object.keys(combined.types).map(async typeId => {
           const type = combined.types[typeId] as (ProjectFileType & WithContributor);
           if ([uri.path.ext, uri.path.base].includes(type.file)) {
             if (!combined['items'][typeId]) {
@@ -548,9 +548,9 @@ export class VesProjectService {
               return;
             }
           }
-        });
-      });
-    });
+        }));
+      }));
+    }));
 
     this._projectData = {
       ...this._projectData,
@@ -588,7 +588,7 @@ export class VesProjectService {
           const iconUri = pluginFileUri.parent.resolve('icon.png');
           const tagsObject = {};
           if (Array.isArray(fileContentJson.tags)) {
-            fileContentJson.tags.forEach((tag: any) => {
+            fileContentJson.tags.map((tag: any) => {
               // @ts-ignore
               tagsObject[this.translatePluginField(tag, 'en')] = this.translatePluginField(tag, nls.locale);
             });

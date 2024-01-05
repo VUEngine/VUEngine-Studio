@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useState } from 'react';
+import React, { useState } from 'react';
 
 export interface RadioSelectOption {
     value: string | number | boolean
@@ -13,7 +13,7 @@ interface RadioSelectProps {
     onChange: (options: RadioSelectOption[]) => void
 }
 
-export default function RadioSelect(props: PropsWithChildren<RadioSelectProps>): React.JSX.Element {
+export default function RadioSelect(props: RadioSelectProps): React.JSX.Element {
     const { allowBlank, options, canSelectMany, defaultValue, onChange } = props;
 
     const numberOfOptions = options.length;

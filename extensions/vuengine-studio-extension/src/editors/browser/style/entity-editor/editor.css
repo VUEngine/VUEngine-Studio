@@ -21,8 +21,6 @@
 .entityEditor .item {
     border: var(--theia-border-width) solid var(--theia-dropdown-border);
     border-radius: 2px;
-    max-height: 500px;
-    overflow: hidden;
     padding: calc(2 * var(--theia-ui-padding));
     position: relative;
 }

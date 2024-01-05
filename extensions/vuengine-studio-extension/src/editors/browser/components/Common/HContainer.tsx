@@ -6,11 +6,12 @@ interface HContainerProps {
     gap?: number
     grow?: number
     overflow?: string
+    style?: object
     wrap?: 'nowrap' | 'wrap' | 'wrap-reverse'
 }
 
 export default function HContainer(props: PropsWithChildren<HContainerProps>): React.JSX.Element {
-    const { alignItems, children, className, overflow, wrap, gap, grow } = props;
+    const { alignItems, children, className, overflow, wrap, gap, grow, style } = props;
 
     return <div
         style={{
@@ -21,6 +22,7 @@ export default function HContainer(props: PropsWithChildren<HContainerProps>): R
             flexWrap: wrap !== undefined ? wrap : 'nowrap',
             gap: gap !== undefined ? `${gap}px` : '5px',
             overflow,
+            ...(style || {}),
         }}
         className={className}
     >

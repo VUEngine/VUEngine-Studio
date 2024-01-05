@@ -99,7 +99,7 @@ export default function Images(props: ImagesProps): React.JSX.Element {
         updateData(data.filter((f, i) => f !== path));
     };
 
-    return <HContainer alignItems="start" gap={15} overflow='hidden' wrap="wrap">
+    return <HContainer alignItems="start" gap={15} overflow='auto' wrap="wrap">
         {Object.keys(filesToShow).map((f, i) => {
             const fullUri = workspaceRootUri.resolve(f);
             return <div

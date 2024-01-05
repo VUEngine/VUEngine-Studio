@@ -130,3 +130,7 @@ body>.dragging-layer {
 .jsonforms-container .dock-drop-layer .dock-drop-top:hover {
   opacity: 1;
 }
+
+.jsonforms-container .dock-nav-more {
+  color: var(--theia-editor-foreground);
+}

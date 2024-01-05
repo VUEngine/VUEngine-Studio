@@ -172,7 +172,9 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         this.uri = new URI(this.options.uri);
         this.typeId = this.options.typeId;
 
+        this.isLoading = true;
         this.doInit();
+
         this.bindEvents();
 
         const label = this.labelProvider.getLongName(this.uri);

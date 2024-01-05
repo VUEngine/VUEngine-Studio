@@ -1,10 +1,13 @@
-import { nls } from '@theia/core';
+import { URI, nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
+import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React, { useContext } from 'react';
+import { ProjectContributor } from '../../../../../project/browser/ves-project-types';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/HContainer';
+import MultiSelect, { MultiSelectOption } from '../../Common/MultiSelect';
 import VContainer from '../../Common/VContainer';
 import { ColliderData, ColliderType, EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
-import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 
 interface ColliderProps {
     index: number
@@ -13,7 +16,14 @@ interface ColliderProps {
 
 export default function Collider(props: ColliderProps): React.JSX.Element {
     const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { services } = useContext(EditorsContext) as EditorsContextType;
     const { index, collider } = props;
+
+    let colliderLayersFileUri: URI | undefined;
+    const colliderLayers = services.vesProjectService.getProjectDataItemsForType('ColliderLayers');
+    if (colliderLayers) {
+        colliderLayersFileUri = colliderLayers[ProjectContributor.Project]?._fileUri;
+    }
 
     const removeCollider = async (): Promise<void> => {
         const dialog = new ConfirmDialog({
@@ -197,6 +207,50 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
         });
     };
 
+    const getColliderLayerOptions = (): MultiSelectOption[] => {
+        const options: MultiSelectOption[] = [];
+
+        // get all colliders from all contributors
+        let clayers: string[] = [];
+        const cl = services.vesProjectService.getProjectDataItemsForType('ColliderLayers');
+        if (cl) {
+            Object.values(cl).map(c => {
+                clayers = clayers.concat(
+                    // @ts-ignore
+                    c.layers
+                );
+            });
+        }
+
+        // create options
+        clayers.filter((value, i, self) => self.indexOf(value) === i).sort().map(l => {
+            const o = { value: l, label: l };
+            options.push(o);
+        });
+
+        return options;
+    };
+    const colliderLayerOptions = getColliderLayerOptions();
+
+    const setColliderLayers = (layers: string[]): void => {
+        setCollider({ layers });
+    };
+
+    const setColliderLayersToCheck = (layersToCheck: string[]): void => {
+        setCollider({ layersToCheck });
+    };
+
+    const openEditor = async (): Promise<void> => {
+        if (!colliderLayersFileUri) {
+            const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
+            colliderLayersFileUri = workspaceRootUri.resolve('config').resolve('ColliderLayers');
+            await services.fileService.createFile(colliderLayersFileUri);
+        }
+
+        const opener = await services.openerService.getOpener(colliderLayersFileUri);
+        await opener.open(colliderLayersFileUri);
+    };
+
     const heaviness = getHeaviness();
 
     return <div className='item'>
@@ -208,7 +262,16 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
             <i className='codicon codicon-x' />
         </button>
         <VContainer gap={15}>
-            <HContainer gap={15} grow={1} wrap='wrap'>
+            <HContainer alignItems='end' gap={15} grow={1} wrap='wrap'>
+                <VContainer>
+                    <input
+                        className={`theia-input heaviness ${heaviness > 4 ? 'heavinessHeavy' : heaviness > 2 ? 'heavinessMedium' : 'heavinessLight'}`}
+                        type='text'
+                        value={`${heaviness} / 5`}
+                        disabled
+                        title={nls.localize('vuengine/entityEditor/heaviness', 'Heaviness')}
+                    />
+                </VContainer>
                 <VContainer>
                     <label>
                         {nls.localize('vuengine/entityEditor/type', 'Type')}
@@ -231,27 +294,34 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                         onChange={option => setType(option.value as ColliderType)}
                     />
                 </VContainer>
-                <VContainer>
-                    <label>Collision Layers</label>
+                <VContainer grow={1}>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/colliderLayers', 'Collider Layers')} ({collider.layers.length})
+                    </label>
                     <HContainer>
-                        [To Be Implemented]
-                    </HContainer>
-                </VContainer>
-                <VContainer>
-                    <label>Heaviness</label>
-                    <HContainer>
-                        <input
-                            className={`theia-input heaviness ${heaviness > 4 ? 'heavinessHeavy' : heaviness > 2 ? 'heavinessMedium' : 'heavinessLight'}`}
-                            type='text'
-                            value={`${heaviness} / 5`}
-                            disabled
-                        />
+                        <VContainer grow={1}>
+                            <MultiSelect
+                                defaultValue={collider.layers}
+                                onChange={options => setColliderLayers(options)}
+                                options={colliderLayerOptions}
+                            // onCreateOption={options => console.log(options)}
+                            />
+                        </VContainer>
+                        <button
+                            className='theia-button secondary'
+                            onClick={openEditor}
+                            title={nls.localize('vuengine/entityEditor/manageColliderLayers', 'Manage Collider Layers')}
+                        >
+                            <i className='codicon codicon-settings-gear' />
+                        </button>
                     </HContainer>
                 </VContainer>
             </HContainer>
             <HContainer gap={15} wrap='wrap'>
                 <VContainer>
-                    <label>Displacement (x, y, z, parallax)</label>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/colliderDisplacement', 'Displacement (x, y, z, parallax)')}
+                    </label>
                     <HContainer>
                         <input
                             className='theia-input'
@@ -284,7 +354,9 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     </HContainer>
                 </VContainer>
                 <VContainer>
-                    <label>Size (x, y, z, parallax)</label>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/colliderSize', 'Size (x, y, z, parallax)')}
+                    </label>
                     <HContainer>
                         <input
                             className='theia-input'
@@ -310,7 +382,9 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     </HContainer>
                 </VContainer>
                 <VContainer>
-                    <label>Rotation (x, y, z, parallax)</label>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/colliderRotation', 'Rotation (x, y, z, parallax)')}
+                    </label>
                     <HContainer>
                         <input
                             className='theia-input'
@@ -336,7 +410,9 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     </HContainer>
                 </VContainer>
                 <VContainer>
-                    <label>Scale (x, y, z, parallax)</label>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/colliderScale', 'Scale (x, y, z, parallax)')}
+                    </label>
                     <HContainer>
                         <input
                             className='theia-input'
@@ -362,7 +438,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     </HContainer>
                 </VContainer>
             </HContainer>
-            <HContainer gap={15} wrap='wrap'>
+            <HContainer alignItems='start' gap={15} wrap='wrap'>
                 <VContainer>
                     <label>
                         {nls.localize('vuengine/entityEditor/checkForCollisions', 'Check For Collisions')}
@@ -373,10 +449,24 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                         onChange={toggleCheckForCollisions}
                     />
                 </VContainer>
-                {collider.checkForCollisions && <VContainer>
-                    <label>Collision Layers to check against</label>
+                {collider.checkForCollisions && <VContainer grow={1}>
+                    <label>Collider Layers to check against</label>
                     <HContainer>
-                        [To Be Implemented]
+                        <VContainer grow={1}>
+                            <MultiSelect
+                                defaultValue={collider.layersToCheck}
+                                onChange={options => setColliderLayersToCheck(options)}
+                                options={colliderLayerOptions}
+                            // onCreateOption={options => console.log(options)}
+                            />
+                        </VContainer>
+                        <button
+                            className='theia-button secondary'
+                            onClick={openEditor}
+                            title={nls.localize('vuengine/entityEditor/manageColliderLayers', 'Manage Collider Layers')}
+                        >
+                            <i className='codicon codicon-settings-gear' />
+                        </button>
                     </HContainer>
                 </VContainer>}
             </HContainer>

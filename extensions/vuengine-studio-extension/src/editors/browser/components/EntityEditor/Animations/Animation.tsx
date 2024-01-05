@@ -194,7 +194,7 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
             </label>
             <HContainer alignItems='start' wrap='wrap'>
                 {animation.frames.map((f, i) =>
-                    <HContainer gap={1}>
+                    <HContainer key={`frame-${i}`} gap={1}>
                         <input
                             key={`frame-${i}`}
                             className='theia-input'

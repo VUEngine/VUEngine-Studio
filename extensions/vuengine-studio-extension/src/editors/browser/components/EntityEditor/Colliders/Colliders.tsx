@@ -92,7 +92,7 @@ export default function Colliders(): React.JSX.Element {
     };
 
     return <VContainer gap={15}>
-        <HContainer alignItems='end' gap={20}>
+        <HContainer alignItems='end'>
             <VContainer grow={1}>
                 <label>
                     {nls.localize('vuengine/entityEditor/inGameType', 'In-Game Type')}
