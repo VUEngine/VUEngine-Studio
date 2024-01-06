@@ -476,7 +476,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         <VContainer>
             <InfoLabel
                 label={data.animations.enabled
-                    ? nls.localize('vuengine/entityEditor/files', 'Image File(s)')
+                    ? nls.localize('vuengine/entityEditor/xFiles', 'Image Files ({0})', sprite.texture?.files?.length || 0)
                     : nls.localize('vuengine/entityEditor/file', 'Image File')}
                 tooltip={nls.localize(
                     'vuengine/entityEditor/filesDescription',
