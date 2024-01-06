@@ -283,8 +283,8 @@ export default function Sprites(): React.JSX.Element {
                     label={nls.localize('vuengine/entityEditor/compression', 'Compression')}
                     tooltip={nls.localize(
                         'vuengine/entityEditor/compressionDescription',
-                        // eslint-disable-next-line max-len
-                        'Image data can be stored in a compressed format to save ROM space. Comes at the cost of a slightly higher CPU load when loading data into memory.'
+                        'Image data can be stored in a compressed format to save ROM space. '
+                        + 'Comes at the cost of a slightly higher CPU load when loading data into memory.'
                     )}
                 />
                 <RadioSelect
@@ -304,8 +304,8 @@ export default function Sprites(): React.JSX.Element {
                     label={nls.localize('vuengine/entityEditor/section', 'Section')}
                     tooltip={nls.localize(
                         'vuengine/entityEditor/sectionDescription',
-                        // eslint-disable-next-line max-len
-                        'Defines whether image data should be stored in ROM space or Expansion space. You usually want to leave this untouched, since the latter only works on specially designed cartridges.'
+                        'Defines whether image data should be stored in ROM space or Expansion space. ' +
+                        'You usually want to leave this untouched, since the latter only works on specially designed cartridges.'
                     )}
                 />
                 <RadioSelect

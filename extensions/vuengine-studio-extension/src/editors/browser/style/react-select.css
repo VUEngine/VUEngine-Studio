@@ -46,18 +46,11 @@
     padding: 0px 4px;
 }
 
-.react-select__clear-indicator,
-.react-select__indicator-separator {
+.react-select__clear-indicator {
     visibility: hidden;
 }
-.react-select-container:hover .react-select__clear-indicator,
-.react-select-container:hover .react-select__indicator-separator {
+.react-select-container:hover .react-select__clear-indicator {
     visibility: visible;
-}
-
-.react-select__indicator-separator {
-    background-color: var(--theia-input-foreground);
-    opacity: .3;
 }
 
 /* Menu */

@@ -4,6 +4,8 @@ import { SelectComponent } from '@theia/core/lib/browser/widgets/select-componen
 import React, { useContext } from 'react';
 import ColorSelector from '../../Common/ColorSelector';
 import HContainer from '../../Common/HContainer';
+import InfoLabel from '../../Common/InfoLabel';
+import RadioSelect from '../../Common/RadioSelect';
 import VContainer from '../../Common/VContainer';
 import {
     EntityEditorContext,
@@ -223,25 +225,28 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                     />
                 </VContainer>
                 <VContainer>
-                    <label>
-                        {nls.localize('vuengine/entityEditor/transparency', 'Transparency')}
-                    </label>
-                    <SelectComponent
+                    <InfoLabel
+                        label={nls.localize('vuengine/entityEditor/transparency', 'Transparency')}
+                        tooltip={nls.localize(
+                            'vuengine/entityEditor/wireframeTransparencyDescription',
+                            'With transparency enabled, this wireframe will only be shown on every even or odd frame' +
+                            'resulting in it appearing transparent (and slightly dimmer). ' +
+                            'This also halves CPU load since 50% less pixels have to be rendered per frame in average.'
+                        )}
+                    />
+                    <RadioSelect
                         options={[{
                             value: Transparency.None,
                             label: nls.localize('vuengine/entityEditor/transparencyNone', 'None'),
-                            description: nls.localize('vuengine/entityEditor/transparencyNoneDescription', 'Display every frame'),
                         }, {
                             value: Transparency.Odd,
                             label: nls.localize('vuengine/entityEditor/transparencyOdd', 'Odd'),
-                            description: nls.localize('vuengine/entityEditor/transparencyOddDescription', 'Display only every odd frame'),
                         }, {
                             value: Transparency.Even,
                             label: nls.localize('vuengine/entityEditor/transparencyEven', 'Even'),
-                            description: nls.localize('vuengine/entityEditor/transparencyEvenDescription', 'Display only every even frame'),
                         }]}
                         defaultValue={wireframe.wireframe.transparency}
-                        onChange={option => setTransparency(option.value as Transparency)}
+                        onChange={options => setTransparency(options[0].value as Transparency)}
                     />
                 </VContainer>
                 <VContainer>

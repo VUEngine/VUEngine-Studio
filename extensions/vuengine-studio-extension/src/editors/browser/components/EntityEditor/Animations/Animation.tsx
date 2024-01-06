@@ -19,7 +19,7 @@ interface AnimationProps {
 }
 
 export default function Animation(props: AnimationProps): React.JSX.Element {
-    const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { data, setData, state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
     const { index, animation, totalFrames } = props;
 
     const removeAnimation = async (): Promise<void> => {
@@ -36,6 +36,13 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
             ];
             if (updatedAnimations.default === index && index > 0) {
                 updatedAnimations.default--;
+
+                setState({
+                    preview: {
+                        ...state.preview,
+                        currentAnimation: updatedAnimations.default,
+                    }
+                });
             }
 
             setData({ animations: updatedAnimations });
@@ -60,6 +67,13 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
     };
 
     const setDefault = (): void => {
+        setState({
+            preview: {
+                ...state.preview,
+                currentAnimation: index,
+            }
+        });
+
         setData({
             animations: {
                 ...data.animations,
@@ -108,120 +122,140 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
         });
     };
 
-    return <VContainer className='item' gap={15}>
-        <button
-            className="remove-button"
-            onClick={removeAnimation}
-            title={nls.localize('vuengine/entityEditor/remove', 'Remove')}
-        >
-            <i className='codicon codicon-x' />
-        </button>
-        <HContainer alignItems='start' gap={15} wrap='wrap'>
+    const setPreviewAnimation = (): void => {
+        setState({
+            preview: {
+                ...state.preview,
+                currentAnimation: index,
+            }
+        });
+    };
+
+    const resetPreviewAnimation = (): void => {
+        setState({
+            preview: {
+                ...state.preview,
+                currentAnimation: data.animations.default,
+            }
+        });
+    };
+
+    return <div onMouseEnter={setPreviewAnimation} onMouseLeave={resetPreviewAnimation}>
+        <VContainer className='item' gap={15}>
+            <button
+                className="remove-button"
+                onClick={removeAnimation}
+                title={nls.localize('vuengine/entityEditor/remove', 'Remove')}
+            >
+                <i className='codicon codicon-x' />
+            </button>
+            <HContainer alignItems='start' gap={15} wrap='wrap'>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/name', 'Name')}
+                    </label>
+                    <input
+                        className='theia-input'
+                        value={animation.name}
+                        onChange={e => setName(e.target.value)}
+                    />
+                </VContainer>
+                <VContainer>
+                    <InfoLabel
+                        label={nls.localize('vuengine/entityEditor/default', 'Default')}
+                        tooltip={nls.localize(
+                            'vuengine/entityEditor/defaultAnimationDescription',
+                            'Play this animation as the default when the entity is created.'
+                        )}
+                    />
+                    <input
+                        type="checkbox"
+                        checked={data.animations.default === index}
+                        onChange={setDefault}
+                    />
+                </VContainer>
+                <VContainer>
+                    <InfoLabel
+                        label={nls.localize('vuengine/entityEditor/cycles', 'Cycles')}
+                        tooltip={nls.localize(
+                            'vuengine/entityEditor/animationCyclesDescription',
+                            'Each frame of this animation Number is display the fiven amount of CPU cycles.'
+                        )}
+                    />
+                    <input
+                        className='theia-input'
+                        style={{ width: 48 }}
+                        type='number'
+                        min={MIN_ANIMATION_CYLCES}
+                        max={MAX_ANIMATION_CYLCES}
+                        value={animation.cycles}
+                        onChange={e => setCycles(parseInt(e.target.value))}
+                    />
+                </VContainer>
+                <VContainer>
+                    <InfoLabel
+                        label={nls.localize('vuengine/entityEditor/loop', 'Loop')}
+                        tooltip={nls.localize(
+                            'vuengine/entityEditor/animationLoopDescription',
+                            'Should this animation play endlessly in a loop or stop and continue showing the last frame after playing it once?'
+                        )}
+                    />
+                    <input
+                        type="checkbox"
+                        checked={animation.loop}
+                        onChange={toggleLoop}
+                    />
+                </VContainer>
+                {!animation.loop && <VContainer>
+                    <InfoLabel
+                        label={nls.localize('vuengine/entityEditor/callback', 'Callback')}
+                        tooltip={nls.localize(
+                            'vuengine/entityEditor/animationCallbackDescription',
+                            'Provide the name of the method to call on animation completion.'
+                        )}
+                    />
+                    <input
+                        className='theia-input'
+                        value={animation.callback}
+                        onChange={e => setCallback(e.target.value)}
+                    />
+                </VContainer>}
+            </HContainer>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/entityEditor/name', 'Name')}
+                    {nls.localize('vuengine/entityEditor/frames', 'Frames')} ({animation.frames.length})
                 </label>
-                <input
-                    className='theia-input'
-                    value={animation.name}
-                    onChange={e => setName(e.target.value)}
-                />
-            </VContainer>
-            <VContainer>
-                <InfoLabel
-                    label={nls.localize('vuengine/entityEditor/default', 'Default')}
-                    tooltip={nls.localize(
-                        'vuengine/entityEditor/defaultAnimationDescription',
-                        'Play this animation as the default when the entity is created.'
+                <HContainer alignItems='start' wrap='wrap'>
+                    {animation.frames.map((f, i) =>
+                        <HContainer key={`frame-${i}`} gap={1}>
+                            <input
+                                key={`frame-${i}`}
+                                className='theia-input'
+                                style={{ width: 40 }}
+                                type='number'
+                                min={1}
+                                max={totalFrames}
+                                value={animation.frames[i]}
+                                onChange={e => setFrame(i, parseInt(e.target.value))}
+                            />
+                            <button
+                                className="theia-button secondary"
+                                onClick={() => removeFrame(i)}
+                                title={nls.localize('vuengine/entityEditor/removeFrame', 'Remove Frame')}
+                            >
+                                <i className='codicon codicon-x' />
+                            </button>
+                        </HContainer>
                     )}
-                />
-                <input
-                    type="checkbox"
-                    checked={data.animations.default === index}
-                    onChange={setDefault}
-                />
+                    <button
+                        className='theia-button add-button'
+                        onClick={addFrame}
+                        title={nls.localize('vuengine/entityEditor/addFrame', 'Add Frame')}
+                    >
+                        <i className='codicon codicon-plus' />
+                    </button>
+                </HContainer>
             </VContainer>
-            <VContainer>
-                <InfoLabel
-                    label={nls.localize('vuengine/entityEditor/cycles', 'Cycles')}
-                    tooltip={nls.localize(
-                        'vuengine/entityEditor/animationCyclesDescription',
-                        'Each frame of this animation Number is display the fiven amount of CPU cycles.'
-                    )}
-                />
-                <input
-                    className='theia-input'
-                    style={{ width: 48 }}
-                    type='number'
-                    min={MIN_ANIMATION_CYLCES}
-                    max={MAX_ANIMATION_CYLCES}
-                    value={animation.cycles}
-                    onChange={e => setCycles(parseInt(e.target.value))}
-                />
-            </VContainer>
-            <VContainer>
-                <InfoLabel
-                    label={nls.localize('vuengine/entityEditor/loop', 'Loop')}
-                    tooltip={nls.localize(
-                        'vuengine/entityEditor/animationLoopDescription',
-                        'Should this animation play endlessly in a loop or stop and continue showing the last frame after playing it once?'
-                    )}
-                />
-                <input
-                    type="checkbox"
-                    checked={animation.loop}
-                    onChange={toggleLoop}
-                />
-            </VContainer>
-            {!animation.loop && <VContainer>
-                <InfoLabel
-                    label={nls.localize('vuengine/entityEditor/callback', 'Callback')}
-                    tooltip={nls.localize(
-                        'vuengine/entityEditor/animationCallbackDescription',
-                        'Provide the name of the method to call on animation completion.'
-                    )}
-                />
-                <input
-                    className='theia-input'
-                    value={animation.callback}
-                    onChange={e => setCallback(e.target.value)}
-                />
-            </VContainer>}
-        </HContainer>
-        <VContainer>
-            <label>
-                {nls.localize('vuengine/entityEditor/frames', 'Frames')} ({animation.frames.length})
-            </label>
-            <HContainer alignItems='start' wrap='wrap'>
-                {animation.frames.map((f, i) =>
-                    <HContainer key={`frame-${i}`} gap={1}>
-                        <input
-                            key={`frame-${i}`}
-                            className='theia-input'
-                            style={{ width: 40 }}
-                            type='number'
-                            min={1}
-                            max={totalFrames}
-                            value={animation.frames[i]}
-                            onChange={e => setFrame(i, parseInt(e.target.value))}
-                        />
-                        <button
-                            className="theia-button secondary"
-                            onClick={() => removeFrame(i)}
-                            title={nls.localize('vuengine/entityEditor/removeFrame', 'Remove Frame')}
-                        >
-                            <i className='codicon codicon-x' />
-                        </button>
-                    </HContainer>
-                )}
-                <button
-                    className='theia-button add-button'
-                    onClick={addFrame}
-                    title={nls.localize('vuengine/entityEditor/addFrame', 'Add Frame')}
-                >
-                    <i className='codicon codicon-plus' />
-                </button>
-            </HContainer>
         </VContainer>
-    </VContainer>;
+    </div>;
 }

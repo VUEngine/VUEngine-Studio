@@ -1,15 +1,30 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import { EditorsContext, EditorsContextType } from '../../../../../editors/browser/ves-editors-types';
+import { ProjectContributor } from '../../../../../project/browser/ves-project-types';
 import HContainer from '../../Common/HContainer';
 import Palette from '../../Common/Palette';
 import VContainer from '../../Common/VContainer';
 import {
+  AnimationData,
   EntityEditorContext,
   EntityEditorContextType,
+  Transparency,
 } from '../EntityEditorTypes';
 import Sprite from './Sprite';
+import { nls } from '@theia/core';
 
 export default function Preview(): React.JSX.Element {
   const { state, setState, data } = useContext(EntityEditorContext) as EntityEditorContextType;
+  const { services } = useContext(EditorsContext) as EditorsContextType;
+  const [currentAnimationFrame, setCurrentAnimationFrame] = useState<number>(0);
+  let timer: NodeJS.Timeout | undefined;
+
+  const engineConfig = services.vesProjectService.getProjectDataItemById(ProjectContributor.Project, 'EngineConfig');
+  // @ts-ignore
+  const frameMultiplicator = engineConfig && engineConfig.frameRate?.frameCycle ? engineConfig.frameRate.frameCycle + 1 : 1;
+
+  const animate = state.preview.animations && data.animations?.enabled;
+  const animation: AnimationData | undefined = data.animations?.animations ? data.animations.animations[state.preview.currentAnimation] : undefined;
 
   const setBooleanStateProperty = (property: string, checked: boolean) =>
     setState({
@@ -19,21 +34,56 @@ export default function Preview(): React.JSX.Element {
       },
     });
 
+  const updateAnimationFrame = () => {
+    timer = !timer
+      ? setInterval(() => {
+        setCurrentAnimationFrame(prevAnimationFrame =>
+          prevAnimationFrame + 1 < (animation?.frames?.length || 1) ? prevAnimationFrame + 1 : 0
+        );
+      }, frameMultiplicator * 20 * (animation?.cycles || 8))
+      : undefined;
+  };
+
+  useEffect(() => {
+    clearInterval(timer);
+    updateAnimationFrame();
+    return () => clearInterval(timer);
+  }, [
+    animation
+  ]);
+
   return (
     <VContainer gap={15}>
       <div className="preview-container">
+        {animate &&
+          <div className='current-frame'>
+            <div>
+              {animation?.name
+                ? `"${animation?.name}"`
+                : `Animation ${state.preview.currentAnimation + 1}`}
+            </div>
+            <div>
+              {currentAnimationFrame + 1}
+            </div>
+          </div>}
         {state.preview.sprites && data.sprites?.sprites?.map(s =>
           <Sprite
-            animate={state.preview.animations && data.animations?.enabled}
+            animate={animate}
             displacement={s.displacement}
-            frames={data.animations.totalFrames}
+            frames={data.animations?.totalFrames || 1}
+            currentAnimationFrame={currentAnimationFrame}
             imagePath={s.texture.files[0]}
+            flipHorizontally={s.texture.flip.horizontal}
+            flipVertically={s.texture.flip.vertical}
+            transparent={s.transparency !== Transparency.None}
             palette={state.preview.palettes[s.texture.palette]}
             zoom={state.preview.zoom}
           />)}
       </div>
       <VContainer>
-        <label>Zoom</label>
+        <label>
+          {nls.localize('vuengine/entityEditor/zoom', 'Zoom')}
+        </label>
         <HContainer>
           <input
             type="range"
@@ -55,7 +105,9 @@ export default function Preview(): React.JSX.Element {
         </HContainer>
       </VContainer>
       <VContainer>
-        <label>Options</label>
+        <label>
+          {nls.localize('vuengine/entityEditor/options', 'Options')}
+        </label>
         <label>
           <input
             type="checkbox"
@@ -63,7 +115,7 @@ export default function Preview(): React.JSX.Element {
             disabled={!data.sprites?.sprites?.length}
             onChange={e => setBooleanStateProperty('sprites', e.target.checked)}
           />
-          Show Sprites
+          {nls.localize('vuengine/entityEditor/showSprites', 'Show Sprites')}
         </label>
         {/*
         <label>
@@ -90,13 +142,13 @@ export default function Preview(): React.JSX.Element {
         <label>
           <input
             type="checkbox"
-            checked={state.preview.animations && data.animations?.enabled}
+            checked={animate}
             disabled={!data.animations?.animations?.length}
             onChange={e =>
               setBooleanStateProperty('animations', e.target.checked)
             }
           />
-          Show Animations
+          {nls.localize('vuengine/entityEditor/showAnimations', 'Show Animations')}
         </label>
         {/*
         <label>
@@ -112,7 +164,9 @@ export default function Preview(): React.JSX.Element {
         */}
       </VContainer>
       <VContainer>
-        <label>BGMap Palettes</label>
+        <label>
+          {nls.localize('vuengine/entityEditor/palettes', 'Palettes')}
+        </label>
         {[...Array(4)].map((h, i) => (
           <HContainer key={`preview-palette-${i}`}>
             <div style={{ width: 16 }}>

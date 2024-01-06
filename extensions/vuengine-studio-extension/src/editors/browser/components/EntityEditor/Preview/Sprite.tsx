@@ -7,21 +7,34 @@ import { Displacement } from '../EntityEditorTypes';
 interface SpriteProps {
   animate: boolean;
   frames: number;
+  currentAnimationFrame: number
   displacement: Displacement;
   imagePath: string;
   palette: string
   zoom: number;
+  flipHorizontally: boolean
+  flipVertically: boolean
+  transparent: boolean
 }
 
 export default function Sprite(props: SpriteProps): React.JSX.Element {
   const { services } = useContext(EditorsContext) as EditorsContextType;
-  const { animate, frames, displacement, imagePath, palette, zoom } = props;
-  const [currentAnimationFrame, setCurrentAnimationFrame] = useState<number>(0);
+  const {
+    animate,
+    frames,
+    currentAnimationFrame,
+    displacement,
+    imagePath,
+    palette,
+    zoom,
+    flipHorizontally,
+    flipVertically,
+    transparent,
+  } = props;
   const [imageData, setImageData] = useState<ImageData>();
   const [height, setHeight] = useState<number>(0);
   const [width, setWidth] = useState<number>(0);
   const [error, setError] = useState<string>();
-  let timer: NodeJS.Timeout | undefined;
 
   const getData = async () => {
     await services.workspaceService.ready;
@@ -46,40 +59,37 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     }
   };
 
-  const updateAnimationFrame = () => {
-    timer = !timer
-      ? setInterval(() => {
-        setCurrentAnimationFrame(prevAnimationFrame => prevAnimationFrame + 1 < frames ? prevAnimationFrame + 1 : 0);
-      }, 1000)
-      : undefined;
-  };
-
   useEffect(() => {
     getData();
-    updateAnimationFrame();
-    return () => clearInterval(timer);
   }, [
     height,
     imagePath,
     width,
   ]);
 
+  const transforms: string[] = [];
+  if (flipHorizontally) {
+    transforms.push('scaleX(-1)');
+  }
+  if (flipVertically) {
+    transforms.push('scaleY(-1)');
+  }
+
   return (
     <>
-      {animate && <div className='current-frame'>
-        {currentAnimationFrame + 1}
-      </div>}
       <div
         className={error ? 'sprite-error' : ''}
         style={{
           boxSizing: 'border-box',
           height: height * zoom / (frames || 1),
-          marginBottom: displacement.y < 0 ? -displacement.y * zoom : 0,
-          marginLeft: displacement.x > 0 ? displacement.x * zoom : 0,
-          marginRight: displacement.x < 0 ? -displacement.x * zoom : 0,
-          marginTop: displacement.y > 0 ? displacement.y * zoom : 0,
+          marginBottom: displacement.y < 0 ? -displacement.y * zoom * 2 : 0,
+          marginLeft: displacement.x > 0 ? displacement.x * zoom * 2 : 0,
+          marginRight: displacement.x < 0 ? -displacement.x * zoom * 2 : 0,
+          marginTop: displacement.y > 0 ? displacement.y * zoom * 2 : 0,
+          opacity: transparent ? .5 : 1,
           overflow: 'hidden',
           position: 'absolute',
+          transform: transforms.length ? transforms.join(' ') : undefined,
           width: width * zoom,
           zIndex: 100000 + (displacement.z !== 0 ? -displacement.z : 0),
         }}

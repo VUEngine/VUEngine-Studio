@@ -241,6 +241,7 @@ export interface EntityData {
 
 export interface EntityEditorState {
     preview: {
+        currentAnimation: number
         anaglyph: boolean
         animations: boolean
         colliders: boolean

@@ -41,5 +41,6 @@
 .jsonforms-container .preview-container .current-frame {
     position: absolute;
     right: 10px;
+    text-align: right;
     top: 10px;
 }

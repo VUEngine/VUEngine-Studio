@@ -248,8 +248,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     label={nls.localize('vuengine/entityEditor/displays', 'Displays')}
                     tooltip={nls.localize(
                         'vuengine/entityEditor/displayModeDescription',
-                        // eslint-disable-next-line max-len
-                        'Select which screens the sprite should be visible on. Can be used to set up a stereo sprite by creating one sprite each for the left and right eye versions.'
+                        'Select which screens the sprite should be visible on. ' +
+                        'Can be used to set up a stereo sprite by creating one sprite each for the left and right eye.'
                     )}
                 />
                 <RadioSelect
@@ -274,8 +274,9 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     label={nls.localize('vuengine/entityEditor/transparency', 'Transparency')}
                     tooltip={nls.localize(
                         'vuengine/entityEditor/spriteTransparencyDescription',
-                        // eslint-disable-next-line max-len
-                        'With transparency enabled, this sprite will only be shown on every even or odd screen, resulting in it appearing transparent (and slightly dimmer). This also halves CPU load since 50% less pixels have to be rendered per frame in average.'
+                        'With transparency enabled, this sprite will only be shown on every even or odd frame, ' +
+                        'resulting in it appearing transparent (and slightly dimmer). ' +
+                        'This also halves CPU load since 50% less pixels have to be rendered per frame in average.'
                     )}
                 />
                 <RadioSelect
@@ -308,8 +309,9 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     label={nls.localize('vuengine/entityEditor/displacement', 'Displacement (x, y, z, parallax)')}
                     tooltip={nls.localize(
                         'vuengine/entityEditor/displacementDescription',
-                        // eslint-disable-next-line max-len
-                        'Offset this sprite by the given amount of pixels from the entity\'s center. The parallax value controls the depth, while the z value is used for fine tuning.'
+                        'Offset this sprite by the given amount of pixels from the entity\'s center. ' +
+                        'The parallax value controls the depth, while the z value is used for fine tuning. ' +
+                        'Positive z (and parallax) values go into the screen, negative stick out.'
                     )}
                 />
                 <HContainer>
@@ -478,8 +480,9 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     : nls.localize('vuengine/entityEditor/file', 'Image File')}
                 tooltip={nls.localize(
                     'vuengine/entityEditor/filesDescription',
-                    // eslint-disable-next-line max-len
-                    'PNG image to be used as texture. Must be four color indexed mode with the proper palette. When animations are enabled, select either a single file containing a vertical spritesheet, or multiple files, where each represents one animation frame.'
+                    'PNG image to be used as texture. Must be four color indexed mode with the proper palette. ' +
+                    'When animations are enabled, select either a single file containing a vertical spritesheet, ' +
+                    'or multiple files, where each represents one animation frame.'
                 )}
             />
             <VContainer style={{ maxHeight: 400, overflow: 'hidden' }}>

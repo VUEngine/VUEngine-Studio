@@ -202,7 +202,10 @@ export default function Physics(): React.JSX.Element {
                 <VContainer>
                     <InfoLabel
                         label={nls.localize('vuengine/entityEditor/gravityAxes', 'Gravity Axes')}
-                        tooltip={nls.localize('vuengine/entityEditor/gravityAxesDescription', 'Select the axes on which the entity should be a subject to gravity.')}
+                        tooltip={nls.localize(
+                            'vuengine/entityEditor/gravityAxesDescription',
+                            'Select the axes on which the entity should be subject to gravity.'
+                        )}
                     />
                     <RadioSelect
                         options={[{
@@ -226,7 +229,9 @@ export default function Physics(): React.JSX.Element {
                         label={nls.localize('vuengine/entityEditor/rotationAxes', 'Rotation Axes')}
                         tooltip={nls.localize(
                             'vuengine/entityEditor/rotationAxesDescription',
-                            'Select the axes around which the entity\'s sprites should be rotated in sync with its physical body.'
+                            'Select the axes around which the entity\'s spatial rotation syncs with its body\'s direction, ' +
+                            'which propagates to its sprites, colliders and wireframes. ' +
+                            'Note that sprites need to use AFFINE mode to be able to be rotated.',
                         )}
                     />
                     <RadioSelect

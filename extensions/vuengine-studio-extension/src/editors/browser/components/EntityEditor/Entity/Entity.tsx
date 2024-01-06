@@ -68,8 +68,12 @@ export default function Entity(): React.JSX.Element {
             <VContainer>
                 <InfoLabel
                     label={nls.localize('vuengine/entityEditor/entitySize', 'Size (x, y, z)')}
-                    // eslint-disable-next-line max-len
-                    tooltip={nls.localize('vuengine/entityEditor/entitySizeDescription', 'Size of the entity in pixels. Used by streaming to test if out of screen bounds. If 0, width and height will be inferred from the first sprite\'s texture\'s size.')}
+                    tooltip={
+                        nls.localize(
+                            'vuengine/entityEditor/entitySizeDescription',
+                            'Size of the entity in pixels. Used by streaming to test if out of screen bounds. ' +
+                            'If 0, width and height will be inferred from the first sprite\'s texture\'s size.'
+                        )}
                 />
                 <HContainer>
                     <input

@@ -31,12 +31,13 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
     this.state = {
       preview: {
         anaglyph: false,
-        animations: true,
-        colliders: true,
-        wireframes: true,
+        animations: false,
+        currentAnimation: this.props.data.animations?.default || 0,
+        colliders: false,
+        wireframes: false,
         palettes: ['11100100', '11100000', '11010000', '11100100'],
         sprites: true,
-        zoom: 1,
+        zoom: 2,
       },
     };
   }
@@ -188,7 +189,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
   }
 
   render(): React.JSX.Element {
-    const { dock, services } = this.props.context;
+    const { dock } = this.props.context;
     const defaultLayout: LayoutData = {
       dockbox: {
         mode: 'horizontal',
