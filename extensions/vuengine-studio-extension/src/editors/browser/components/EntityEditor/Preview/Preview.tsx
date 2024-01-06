@@ -1,6 +1,9 @@
+import { nls } from '@theia/core';
 import React, { useContext, useEffect, useState } from 'react';
+import { PALETTE_COLORS } from '../../../../../core/browser/ves-common-types';
 import { EditorsContext, EditorsContextType } from '../../../../../editors/browser/ves-editors-types';
 import { ProjectContributor } from '../../../../../project/browser/ves-project-types';
+import ColorSelector from '../../Common/ColorSelector';
 import HContainer from '../../Common/HContainer';
 import Palette from '../../Common/Palette';
 import VContainer from '../../Common/VContainer';
@@ -11,7 +14,6 @@ import {
   Transparency,
 } from '../EntityEditorTypes';
 import Sprite from './Sprite';
-import { nls } from '@theia/core';
 
 export default function Preview(): React.JSX.Element {
   const { state, setState, data } = useContext(EntityEditorContext) as EntityEditorContextType;
@@ -31,6 +33,14 @@ export default function Preview(): React.JSX.Element {
       preview: {
         ...state.preview,
         [property]: checked,
+      },
+    });
+
+  const setBackgroundColor = (backgroundColor: number) =>
+    setState({
+      preview: {
+        ...state.preview,
+        backgroundColor: Math.min(Math.max(backgroundColor, -1), 3),
       },
     });
 
@@ -54,7 +64,10 @@ export default function Preview(): React.JSX.Element {
 
   return (
     <VContainer gap={15}>
-      <div className="preview-container">
+      <div
+        className="preview-container"
+        style={{ backgroundColor: state.preview.backgroundColor > -1 ? PALETTE_COLORS[state.preview.backgroundColor] : undefined }}
+      >
         {animate &&
           <div className='current-frame'>
             <div>
@@ -66,13 +79,14 @@ export default function Preview(): React.JSX.Element {
               {currentAnimationFrame + 1}
             </div>
           </div>}
-        {state.preview.sprites && data.sprites?.sprites?.map(s =>
+        {state.preview.sprites && data.sprites?.sprites?.map((s, i) =>
           <Sprite
+            key={`preview-sprite-${i}`}
             animate={animate}
             displacement={s.displacement}
             frames={data.animations?.totalFrames || 1}
             currentAnimationFrame={currentAnimationFrame}
-            imagePath={s.texture.files[0]}
+            images={s.texture.files}
             flipHorizontally={s.texture.flip.horizontal}
             flipVertically={s.texture.flip.vertical}
             transparent={s.transparency !== Transparency.None}
@@ -162,6 +176,16 @@ export default function Preview(): React.JSX.Element {
           Anaglyph Display Mode
         </label>
         */}
+      </VContainer>
+      <VContainer>
+        <label>
+          {nls.localize('vuengine/entityEditor/background', 'Background')}
+        </label>
+        <ColorSelector
+          color={state.preview.backgroundColor}
+          updateColor={setBackgroundColor}
+          includeTransparent
+        />
       </VContainer>
       <VContainer>
         <label>

@@ -241,6 +241,7 @@ export interface EntityData {
 
 export interface EntityEditorState {
     preview: {
+        backgroundColor: number
         currentAnimation: number
         anaglyph: boolean
         animations: boolean

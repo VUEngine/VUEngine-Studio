@@ -9,10 +9,13 @@ import VContainer from '../../Common/VContainer';
 import { BgmapMode, DisplayMode, EntityEditorContext, EntityEditorContextType, SpriteType, Transparency } from '../EntityEditorTypes';
 import Sprite from './Sprite';
 
-export default function Sprites(): React.JSX.Element {
+interface SpritesProps {
+    isMultiFileAnimation: boolean
+}
+
+export default function Sprites(props: SpritesProps): React.JSX.Element {
     const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
-    const mostFilesOnASprite = Math.max(...data.sprites.sprites.map(s => s.texture.files.length));
-    const isMultiImageAnimation = mostFilesOnASprite > 1;
+    const { isMultiFileAnimation } = props;
 
     const getCharCount = (): number => {
         let totalChars = 0;
@@ -155,14 +158,10 @@ export default function Sprites(): React.JSX.Element {
     };
 
     const toggleAnimated = (): void => {
-        // set total frames to 1 when disabling animations
-        const totalFrames = data.animations.enabled ? 1 : data.animations.totalFrames;
-
         setData({
             animations: {
                 ...data.animations,
                 enabled: !data.animations.enabled,
-                totalFrames,
             }
         }, {
             appendImageData: true
@@ -227,12 +226,12 @@ export default function Sprites(): React.JSX.Element {
                         type='number'
                         min={0}
                         max={128}
-                        disabled={isMultiImageAnimation}
-                        value={isMultiImageAnimation ? mostFilesOnASprite : data.animations.totalFrames}
+                        disabled={isMultiFileAnimation}
+                        value={data.animations.totalFrames}
                         onChange={e => setAnimationFrames(parseInt(e.target.value))}
                     />
                 </VContainer>
-                {!isMultiImageAnimation && <VContainer>
+                {!isMultiFileAnimation && <VContainer>
                     <label>
                         {nls.localize('vuengine/entityEditor/multiframe', 'Multiframe')}
                     </label>

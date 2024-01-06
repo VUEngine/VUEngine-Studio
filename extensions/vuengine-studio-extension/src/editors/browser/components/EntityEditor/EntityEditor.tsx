@@ -30,6 +30,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
     super(props);
     this.state = {
       preview: {
+        backgroundColor: 0,
         anaglyph: false,
         animations: false,
         currentAnimation: this.props.data.animations?.default || 0,
@@ -37,7 +38,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
         wireframes: false,
         palettes: ['11100100', '11100000', '11010000', '11100100'],
         sprites: true,
-        zoom: 2,
+        zoom: 1,
       },
     };
   }
@@ -51,7 +52,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
 
   protected async setData(entityData: Partial<EntityData>, options?: EntityEditorSaveDataOptions): Promise<void> {
     const { isGenerating, setIsGenerating } = this.props.context;
-    let updatedData = { ...this.props.data, ...entityData };
+    let updatedData = this.postProcessData({ ...this.props.data, ...entityData });
 
     if (!isGenerating) {
       if (options?.appendImageData) {
@@ -62,6 +63,22 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
 
       this.props.updateData(updatedData);
     }
+  }
+
+  protected postProcessData(entityData: EntityData): EntityData {
+    if (!entityData.animations.enabled) {
+      // set total frames to 1 when disabling animations
+      entityData.animations.totalFrames = 1;
+    } else {
+      // total frames to most images on sprite, if multi file animation
+      const mostFilesOnASprite = this.getMostFilesOnASprite(entityData);
+      const isMultiFileAnimation = mostFilesOnASprite > 1;
+      if (isMultiFileAnimation) {
+        entityData.animations.totalFrames = mostFilesOnASprite;
+      }
+    }
+
+    return entityData;
   }
 
   protected async compressImageData(imageData: Partial<ConversionResult>): Promise<ConversionResult> {
@@ -98,14 +115,14 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
 
   protected async appendImageData(entityData: EntityData): Promise<EntityData> {
     const { fileUri, services } = this.props.context;
-    const mostFilesOnASprite = Math.max(...entityData.sprites.sprites.map(s => s.texture.files.length));
-    const isMultiImageAnimation = entityData.animations.enabled && mostFilesOnASprite > 1;
+    const mostFilesOnASprite = this.getMostFilesOnASprite(entityData);
+    const isMultiFileAnimation = entityData.animations.enabled && mostFilesOnASprite > 1;
     const optimizeTiles = (!entityData.animations.enabled && entityData.sprites.optimizedTiles)
-      || (entityData.animations.enabled && isMultiImageAnimation);
+      || (entityData.animations.enabled && isMultiFileAnimation);
     const baseConfig = {
       animation: {
-        frames: isMultiImageAnimation ? mostFilesOnASprite : entityData.animations.totalFrames,
-        individualFiles: isMultiImageAnimation,
+        frames: isMultiFileAnimation ? mostFilesOnASprite : entityData.animations.totalFrames,
+        individualFiles: isMultiFileAnimation,
         isAnimation: entityData.animations.enabled
       },
       files: [],
@@ -183,6 +200,10 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
     return entityData;
   }
 
+  protected getMostFilesOnASprite(entityData: EntityData): number {
+    return Math.max(...entityData.sprites.sprites.map(s => s.texture.files.length));
+  }
+
   async componentDidMount(): Promise<void> {
     const { dock } = this.props.context;
     dock.restoreLayout();
@@ -190,6 +211,11 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
 
   render(): React.JSX.Element {
     const { dock } = this.props.context;
+    const { data } = this.props;
+
+    const mostFilesOnASprite = this.getMostFilesOnASprite(data);
+    const isMultiFileAnimation = mostFilesOnASprite > 1;
+
     const defaultLayout: LayoutData = {
       dockbox: {
         mode: 'horizontal',
@@ -252,7 +278,9 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
                     minWidth: 200,
                     content: (
                       <EntityEditorContext.Consumer>
-                        {context => <Sprites />}
+                        {context => <Sprites
+                          isMultiFileAnimation={isMultiFileAnimation}
+                        />}
                       </EntityEditorContext.Consumer>
                     ),
                   },
@@ -336,7 +364,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
           value={{
             state: this.state,
             setState: this.setState.bind(this),
-            data: this.props.data,
+            data,
             setData: this.setData.bind(this),
           }}
         >

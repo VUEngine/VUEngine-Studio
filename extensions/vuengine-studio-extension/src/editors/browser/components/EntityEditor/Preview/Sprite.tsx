@@ -9,7 +9,7 @@ interface SpriteProps {
   frames: number;
   currentAnimationFrame: number
   displacement: Displacement;
-  imagePath: string;
+  images: string[];
   palette: string
   zoom: number;
   flipHorizontally: boolean
@@ -24,46 +24,52 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     frames,
     currentAnimationFrame,
     displacement,
-    imagePath,
+    images,
     palette,
     zoom,
     flipHorizontally,
     flipVertically,
     transparent,
   } = props;
-  const [imageData, setImageData] = useState<ImageData>();
+  const [imageData, setImageData] = useState<ImageData[]>([]);
   const [height, setHeight] = useState<number>(0);
   const [width, setWidth] = useState<number>(0);
   const [error, setError] = useState<string>();
 
+  const isMultiFileAnimation = images.length > 1;
+
   const getData = async () => {
-    await services.workspaceService.ready;
-    const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
-    const imageUri = workspaceRootUri.resolve(imagePath);
-    if (await services.fileService.exists(imageUri)) {
-      const imageFileContent = await services.fileService.readFile(imageUri);
-      const img = await window.electronVesCore.parsePng(imageFileContent);
-      if (img) {
-        if (img.colorType !== 3) {
-          setError('wrong color type');
+    const allImageData: ImageData[] = [];
+    await Promise.all(images.map(async (image, index) => {
+      await services.workspaceService.ready;
+      const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
+      const imageUri = workspaceRootUri.resolve(image);
+      if (await services.fileService.exists(imageUri)) {
+        const imageFileContent = await services.fileService.readFile(imageUri);
+        const singleImageData = await window.electronVesCore.parsePng(imageFileContent);
+        if (singleImageData) {
+          if (singleImageData.colorType !== 3) {
+            setError('wrong color type');
+          } else {
+            allImageData[index] = singleImageData;
+            setHeight(height || singleImageData.height);
+            setWidth(width || singleImageData.width);
+          }
         } else {
-          setImageData(img);
-          setHeight(height || img.height);
-          setWidth(width || img.width);
+          setError('could not parse image');
         }
       } else {
-        setError('could not parse image');
+        setError('file not found');
       }
-    } else {
-      setError('file not found');
-    }
+    }));
+    setImageData(allImageData);
   };
 
   useEffect(() => {
     getData();
   }, [
     height,
-    imagePath,
+    images,
     width,
   ]);
 
@@ -75,13 +81,17 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     transforms.push('scaleY(-1)');
   }
 
+  const currentPixelData = animate && isMultiFileAnimation
+    ? imageData[currentAnimationFrame] ? imageData[currentAnimationFrame].pixelData : undefined
+    : imageData[0] ? imageData[0].pixelData : undefined;
+
   return (
     <>
       <div
         className={error ? 'sprite-error' : ''}
         style={{
           boxSizing: 'border-box',
-          height: height * zoom / (frames || 1),
+          height: height * zoom / (isMultiFileAnimation ? 1 : frames || 1),
           marginBottom: displacement.y < 0 ? -displacement.y * zoom * 2 : 0,
           marginLeft: displacement.x > 0 ? displacement.x * zoom * 2 : 0,
           marginRight: displacement.x < 0 ? -displacement.x * zoom * 2 : 0,
@@ -94,20 +104,22 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
           zIndex: 100000 + (displacement.z !== 0 ? -displacement.z : 0),
         }}
       >
-        {imageData &&
+        {!error && imageData.length > 0 &&
           <div style={{
             position: 'relative',
-            top: animate
+            top: animate && !isMultiFileAnimation
               ? (height * zoom / (frames || 1) * currentAnimationFrame * -1)
               : 0
           }}>
-            <CssImage
-              height={height}
-              palette={palette}
-              pixelData={imageData.pixelData}
-              pixelSize={zoom}
-              width={width}
-            />
+            {currentPixelData &&
+              <CssImage
+                height={height}
+                palette={palette}
+                pixelData={currentPixelData}
+                pixelSize={zoom}
+                width={width}
+              />
+            }
           </div>
         }
       </div>

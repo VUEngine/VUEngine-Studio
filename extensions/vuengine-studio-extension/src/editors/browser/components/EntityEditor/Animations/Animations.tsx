@@ -24,14 +24,10 @@ export default function Animations(): React.JSX.Element {
     };
 
     const toggleEnabled = (): void => {
-        // set total frames to 1 when disabling animations
-        const totalFrames = data.animations.enabled ? 1 : data.animations.totalFrames;
-
         setData({
             animations: {
                 ...data.animations,
                 enabled: !data.animations.enabled,
-                totalFrames,
             }
         });
     };

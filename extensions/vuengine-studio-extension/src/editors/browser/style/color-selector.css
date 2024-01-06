@@ -1,9 +1,11 @@
 .colorSelector {
+  --ves-color-selector-size: calc(var(--theia-content-line-height) + 2 * var(--theia-border-width) + 2px);
+}
+
+.colorSelector {
   display: flex;
   flex-direction: row;
   gap: 4px;
-  height: calc(var(--theia-content-line-height) + 2 * var(--theia-border-width) + 2px);
-  max-width: 260px;
   outline: 0;
 }
 
@@ -11,7 +13,9 @@
   border-radius: 2px;
   cursor: pointer;
   flex-grow: 1;
-  min-width: 32px;
+  height: var(--ves-color-selector-size);
+  max-width: var(--ves-color-selector-size);
+  min-width: var(--ves-color-selector-size);
   outline-offset: 1px;
 }
 
@@ -25,15 +29,18 @@
   outline: 1px solid var(--theia-button-background);
 }
 
-.colorSelector div:nth-child(1) {
+.colorSelector .color-0 {
+  background: repeating-conic-gradient(rgba(0,0,0,.3) 0% 25%, transparent 0% 50%) 50% / 13px 13px
+}
+.colorSelector .color-1 {
   background-color: #000;
 }
-.colorSelector div:nth-child(2) {
+.colorSelector .color-2 {
   background-color: #500;
 }
-.colorSelector div:nth-child(3) {
+.colorSelector .color-3 {
   background-color: #a00;
 }
-.colorSelector div:nth-child(4) {
+.colorSelector .color-4 {
   background-color: #f00;
 }
