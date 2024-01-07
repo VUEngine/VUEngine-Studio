@@ -239,6 +239,8 @@ export interface EntityData {
     sprites: Sprites
 }
 
+export const defaultCurrentAnimation = -1;
+export const defaultHighlightedSprite = -1;
 export interface EntityEditorState {
     preview: {
         backgroundColor: number

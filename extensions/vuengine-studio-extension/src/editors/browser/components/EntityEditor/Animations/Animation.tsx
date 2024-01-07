@@ -6,10 +6,11 @@ import InfoLabel from '../../Common/InfoLabel';
 import VContainer from '../../Common/VContainer';
 import {
     AnimationData,
+    defaultCurrentAnimation,
     EntityEditorContext,
     EntityEditorContextType,
     MAX_ANIMATION_CYLCES,
-    MIN_ANIMATION_CYLCES
+    MIN_ANIMATION_CYLCES,
 } from '../EntityEditorTypes';
 
 interface AnimationProps {
@@ -135,7 +136,7 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
         setState({
             preview: {
                 ...state.preview,
-                currentAnimation: data.animations.default,
+                currentAnimation: defaultCurrentAnimation,
             }
         });
     };

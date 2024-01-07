@@ -199,6 +199,16 @@ export const defaultProjectData: ProjectFile = {
         },
         required: []
       },
+      uiSchema: {
+        type: 'VerticalLayout',
+        elements: [
+          {
+            type: 'Control',
+            label: 'Project Title',
+            scope: '#/properties/projectTitle'
+          }
+        ]
+      },
       icon: 'fa fa-cog'
     },
     Image: {

@@ -9,7 +9,9 @@ import Entity from './Entity/Entity';
 import {
   EntityData,
   EntityEditorContext,
-  EntityEditorState
+  EntityEditorState,
+  defaultCurrentAnimation,
+  defaultHighlightedSprite
 } from './EntityEditorTypes';
 import Preview from './Preview/Preview';
 import Sprites from './Sprites/Sprites';
@@ -30,12 +32,12 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
     super(props);
     this.state = {
       preview: {
-        backgroundColor: 0,
+        backgroundColor: -1,
         anaglyph: false,
         animations: false,
-        currentAnimation: this.props.data.animations?.default || 0,
+        currentAnimation: this.props.data.animations?.default || defaultCurrentAnimation,
         colliders: false,
-        highlightedSprite: -1,
+        highlightedSprite: defaultHighlightedSprite,
         wireframes: false,
         palettes: ['11100100', '11100000', '11010000', '11100100'],
         sprites: true,
@@ -49,14 +51,14 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
   }
 
   protected async savePreviewState(): Promise<void> {
-    console.log('savePreviewState', this.getStateLocalStorageId(), this.state);
-    await this.props.context.services.localStorageService.setData<EntityEditorState>(this.getStateLocalStorageId(), this.state);
+    return this.props.context.services.localStorageService.setData<EntityEditorState>(this.getStateLocalStorageId(), this.state);
   }
 
   protected async restorePreviewState(): Promise<void> {
     const savedState = await this.props.context.services.localStorageService.getData<EntityEditorState>(this.getStateLocalStorageId());
-    console.log('restorePreviewState', this.getStateLocalStorageId(), savedState);
     if (savedState) {
+      savedState.preview.currentAnimation = defaultCurrentAnimation;
+      savedState.preview.highlightedSprite = defaultHighlightedSprite;
       this.setState({
         ...this.state,
         ...savedState,
@@ -247,34 +249,6 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
               {
                 tabs: [
                   {
-                    id: 'tab-animations',
-                    title: nls.localize(
-                      'vuengine/entityEditor/animations',
-                      'Animations'
-                    ),
-                    minHeight: 200,
-                    minWidth: 200,
-                    content: (
-                      <EntityEditorContext.Consumer>
-                        {context => <Animations />}
-                      </EntityEditorContext.Consumer>
-                    ),
-                  },
-                  {
-                    id: 'tab-colliders',
-                    title: nls.localize(
-                      'vuengine/entityEditor/colliders',
-                      'Colliders'
-                    ),
-                    minHeight: 200,
-                    minWidth: 200,
-                    content: (
-                      <EntityEditorContext.Consumer>
-                        {context => <Colliders />}
-                      </EntityEditorContext.Consumer>
-                    ),
-                  },
-                  {
                     id: 'tab-entity',
                     title: nls.localize(
                       'vuengine/entityEditor/entity',
@@ -301,6 +275,34 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
                         {context => <Sprites
                           isMultiFileAnimation={isMultiFileAnimation}
                         />}
+                      </EntityEditorContext.Consumer>
+                    ),
+                  },
+                  {
+                    id: 'tab-animations',
+                    title: nls.localize(
+                      'vuengine/entityEditor/animations',
+                      'Animations'
+                    ),
+                    minHeight: 200,
+                    minWidth: 200,
+                    content: (
+                      <EntityEditorContext.Consumer>
+                        {context => <Animations />}
+                      </EntityEditorContext.Consumer>
+                    ),
+                  },
+                  {
+                    id: 'tab-colliders',
+                    title: nls.localize(
+                      'vuengine/entityEditor/colliders',
+                      'Colliders'
+                    ),
+                    minHeight: 200,
+                    minWidth: 200,
+                    content: (
+                      <EntityEditorContext.Consumer>
+                        {context => <Colliders />}
                       </EntityEditorContext.Consumer>
                     ),
                   },

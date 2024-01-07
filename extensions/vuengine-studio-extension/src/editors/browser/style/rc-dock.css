@@ -44,6 +44,10 @@ body>.dragging-layer {
   padding-left: unset
 }
 
+.jsonforms-container .dock-nav {
+  margin-bottom: var(--theia-ui-padding);
+}
+
 .jsonforms-container .dock-nav-list {
   gap: calc(var(--theia-ui-padding) * 2);
 }

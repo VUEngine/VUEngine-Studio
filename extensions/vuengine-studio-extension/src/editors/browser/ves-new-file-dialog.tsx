@@ -40,7 +40,7 @@ export class VesNewFileDialog extends ReactDialog<string> {
     }
 
     protected render(): React.ReactNode {
-        const typeKeys = Object.keys(this.props.types);
+        const typeKeys = Object.keys(this.props.types).sort();
         const multiFileTypes = typeKeys.filter(typeId => this.props.types[typeId].file?.startsWith('.'));
         const singleFileTypes = typeKeys.filter(typeId => !this.props.types[typeId].file?.startsWith('.') &&
             // ignore if a file of this kind already exists
@@ -75,6 +75,7 @@ export class VesNewFileDialog extends ReactDialog<string> {
                                 this.update();
                             }}
                             autoFocus
+                            onFocus={e => e.target.select()}
                         />
                         <input
                             type="text"

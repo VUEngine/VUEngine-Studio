@@ -12,7 +12,9 @@ export default function Animations(): React.JSX.Element {
         updatedAnimations.animations = [
             ...updatedAnimations.animations,
             {
-                name: '',
+                name: data.animations.animations.length
+                    ? ''
+                    : nls.localize('vuengine/entityEditor/default', 'Default'),
                 cycles: 8,
                 frames: [],
                 loop: true,

@@ -40,6 +40,12 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
 
   const isMultiFileAnimation = images.length > 1;
 
+  const setImageError = (e: string): void => {
+    setHeight(32);
+    setWidth(32);
+    setError(e);
+  };
+
   const getData = async () => {
     const allImageData: ImageData[] = [];
     await Promise.all(images.map(async (image, index) => {
@@ -51,17 +57,17 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         const singleImageData = await window.electronVesCore.parsePng(imageFileContent);
         if (singleImageData) {
           if (singleImageData.colorType !== 3) {
-            setError('wrong color type');
+            setImageError('wrong color type');
           } else {
             allImageData[index] = singleImageData;
             setHeight(height || singleImageData.height);
             setWidth(width || singleImageData.width);
           }
         } else {
-          setError('could not parse image');
+          setImageError('could not parse image');
         }
       } else {
-        setError('file not found');
+        setImageError('file not found');
       }
     }));
     setImageData(allImageData);
@@ -93,6 +99,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     <>
       <div
         className={error ? 'sprite-error' : ''}
+        title={error ? error : ''}
         style={{
           boxSizing: 'border-box',
           height: height * zoom / (isMultiFileAnimation ? 1 : frames || 1),

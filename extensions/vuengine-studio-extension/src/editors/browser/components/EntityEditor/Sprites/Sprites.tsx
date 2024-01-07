@@ -255,14 +255,14 @@ export default function Sprites(props: SpritesProps): React.JSX.Element {
                     />
                     {nls.localize('vuengine/entityEditor/optimized', 'Optimized')}
                 </label>
-                <label>
+                {data.sprites.sprites.length > 1 && <label>
                     <input
                         type="checkbox"
                         checked={data.sprites.sharedTiles}
                         onChange={toggleSharedTiles}
                     />
                     {nls.localize('vuengine/entityEditor/shared', 'Shared')}
-                </label>
+                </label>}
             </VContainer>}
             {/*
             <VContainer>

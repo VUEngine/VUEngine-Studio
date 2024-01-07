@@ -333,15 +333,15 @@ export class VesProjectService {
     this.knownContributors = {};
 
     // workspace
-    let workspaceProjectFileData: ProjectFile = {};
+    let workspaceTypeData: ProjectFile = {};
     this.workspaceProjectFolderUri = this.workspaceService.tryGetRoots()[0]?.resource;
     if (this.workspaceProjectFolderUri) {
-      workspaceProjectFileData = await this.findContributions(this.workspaceProjectFolderUri);
+      workspaceTypeData = await this.findContributions(this.workspaceProjectFolderUri);
     }
 
     // engine
     const engineCoreUri = await this.vesBuildPathsService.getEngineCoreUri();
-    const engineCoreProjectFileData = await this.findContributions(engineCoreUri);
+    const engineCoreTypeData = await this.findContributions(engineCoreUri);
 
     // plugins
     const gameConfigFileUri = this.workspaceProjectFolderUri!.resolve('config').resolve('GameConfig');
@@ -366,12 +366,13 @@ export class VesProjectService {
       } else if (installedPluginId.startsWith(USER_PLUGINS_PREFIX)) {
         uri = userPluginsUri.resolve(installedPluginId.replace(USER_PLUGINS_PREFIX, ''));
       }
-      if (uri && pluginsData[installedPluginId] && !this.workspaceProjectFolderUri?.isEqual(uri)) {
+      const pluginsTypeData = uri ? await this.findContributions(uri) : undefined;
+      if (uri && pluginsTypeData && !this.workspaceProjectFolderUri?.isEqual(uri)) {
         const contributor = `${ProjectContributor.Plugin}:${installedPluginId}` as ProjectContributor;
         pluginsProjectDataWithContributors.push({
           _contributor: contributor,
           _contributorUri: uri,
-          ...pluginsData[installedPluginId],
+          ...pluginsTypeData,
         });
         this.knownContributors[contributor] = uri;
       }
@@ -390,7 +391,7 @@ export class VesProjectService {
       projectDataWithContributors.push({
         _contributor: ProjectContributor.Engine,
         _contributorUri: engineCoreUri,
-        ...engineCoreProjectFileData
+        ...engineCoreTypeData
       });
       this.knownContributors[ProjectContributor.Engine] = engineCoreUri;
     }
@@ -403,7 +404,7 @@ export class VesProjectService {
       projectDataWithContributors.push({
         _contributor: ProjectContributor.Project,
         _contributorUri: this.workspaceProjectFolderUri,
-        ...workspaceProjectFileData
+        ...workspaceTypeData
       });
       this.knownContributors[ProjectContributor.Project] = this.workspaceProjectFolderUri;
     }
@@ -436,7 +437,7 @@ export class VesProjectService {
     });
 
     this._projectData = {
-      ...workspaceProjectFileData,
+      ...workspaceTypeData,
       combined,
     };
 
@@ -658,12 +659,12 @@ export class VesProjectService {
     return result;
   }
 
-  async getProjectName(projectFileUri?: URI): Promise<string> {
+  async getProjectName(workspaceFileUri?: URI): Promise<string> {
     let projectTitle;
 
     // Attempt to retrieve project name from GameConfig file
-    const rootFolder = projectFileUri
-      ? projectFileUri.parent
+    const rootFolder = workspaceFileUri
+      ? workspaceFileUri.parent
       : this.workspaceService.tryGetRoots()[0]?.resource;
     if (rootFolder) {
       const gameConfigUri = rootFolder.resolve('config').resolve('GameConfig');
@@ -674,7 +675,7 @@ export class VesProjectService {
     }
 
     // Get from workspace service instead
-    if (!projectTitle && !projectFileUri && this.workspaceService.workspace) {
+    if (!projectTitle && !workspaceFileUri && this.workspaceService.workspace) {
       if (this.workspaceService.workspace?.isFile) {
         const workspaceParts = this.workspaceService.workspace.name.split('.');
         workspaceParts.pop();
@@ -686,7 +687,7 @@ export class VesProjectService {
 
     // Use base path instead
     if (!projectTitle) {
-      projectTitle = projectFileUri?.path?.base || '';
+      projectTitle = workspaceFileUri?.path?.base || '';
     }
 
     // Append folder suffix

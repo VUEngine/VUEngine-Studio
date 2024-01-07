@@ -18,15 +18,18 @@ import Sprite from './Sprite';
 export default function Preview(): React.JSX.Element {
   const { state, setState, data } = useContext(EntityEditorContext) as EntityEditorContextType;
   const { services } = useContext(EditorsContext) as EditorsContextType;
-  const [currentAnimationFrame, setCurrentAnimationFrame] = useState<number>(0);
+  const [currentAnimationStep, setCurrentAnimationStep] = useState<number>(0);
   let timer: NodeJS.Timeout | undefined;
 
   const engineConfig = services.vesProjectService.getProjectDataItemById(ProjectContributor.Project, 'EngineConfig');
   // @ts-ignore
   const frameMultiplicator = engineConfig && engineConfig.frameRate?.frameCycle ? engineConfig.frameRate.frameCycle + 1 : 1;
 
-  const animate = state.preview.animations && data.animations?.enabled;
-  const animation: AnimationData | undefined = data.animations?.animations ? data.animations.animations[state.preview.currentAnimation] : undefined;
+  const animate = (state.preview.animations && data.animations?.enabled) || state.preview.currentAnimation > -1;
+  const currentAnimation = state.preview.currentAnimation > -1 ? state.preview.currentAnimation : data.animations.default;
+  const animation: AnimationData | undefined = data.animations?.animations
+    ? data.animations.animations[currentAnimation]
+    : undefined;
 
   const setBooleanStateProperty = (property: string, checked: boolean) =>
     setState({
@@ -44,11 +47,11 @@ export default function Preview(): React.JSX.Element {
       },
     });
 
-  const updateAnimationFrame = () => {
+  const updateAnimationStep = () => {
     timer = !timer
       ? setInterval(() => {
-        setCurrentAnimationFrame(prevAnimationFrame =>
-          prevAnimationFrame + 1 < (animation?.frames?.length || 1) ? prevAnimationFrame + 1 : 0
+        setCurrentAnimationStep(prevAnimationStep =>
+          prevAnimationStep + 1 < (animation?.frames?.length || 1) ? prevAnimationStep + 1 : 0
         );
       }, frameMultiplicator * 20 * (animation?.cycles || 8))
       : undefined;
@@ -56,7 +59,7 @@ export default function Preview(): React.JSX.Element {
 
   useEffect(() => {
     clearInterval(timer);
-    updateAnimationFrame();
+    updateAnimationStep();
     return () => clearInterval(timer);
   }, [
     animation
@@ -73,10 +76,10 @@ export default function Preview(): React.JSX.Element {
             <div>
               {animation?.name
                 ? `"${animation?.name}"`
-                : `Animation ${state.preview.currentAnimation + 1}`}
+                : `Animation ${currentAnimation + 1}`}
             </div>
             <div>
-              {currentAnimationFrame + 1}
+              {currentAnimationStep + 1}
             </div>
           </div>}
         {state.preview.sprites && data.sprites?.sprites?.map((s, i) =>
@@ -85,7 +88,7 @@ export default function Preview(): React.JSX.Element {
             animate={animate}
             displacement={s.displacement}
             frames={data.animations?.totalFrames || 1}
-            currentAnimationFrame={currentAnimationFrame}
+            currentAnimationFrame={animation?.frames[currentAnimationStep] ?? currentAnimationStep}
             highlighted={state.preview.highlightedSprite === i}
             images={s.texture.files}
             flipHorizontally={s.texture.flip.horizontal}
