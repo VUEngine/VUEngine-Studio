@@ -1,0 +1,61 @@
+.vesDock {
+    --ves-dockbar-padding: calc(var(--theia-ui-padding) * 2);
+}
+
+.vesDock {
+    display: flex;
+    flex-grow: 1;
+}
+
+.vesDock > .p-DockPanel {
+    flex-grow: 1;
+}
+
+.vesDock .p-DockPanel-widget {
+    overflow: auto;
+    padding-top: var(--ves-dockbar-padding);
+}
+
+.vesDock .p-TabBar-tabIcon {
+    display: none;
+}
+
+#theia-main-content-panel  .vesDock .p-TabBar-tab {
+    background-color: transparent;
+    border-left-color: transparent;
+    border-right-color: transparent;
+}
+
+/*
+#theia-main-content-panel .vesDock .p-TabBar .p-TabBar-tab {
+    border-bottom-color: var(--theia-activityBar-background);
+}
+*/
+
+#theia-main-content-panel .vesDock .p-TabBar[data-orientation="horizontal"] .p-TabBar-tab {
+    font-weight: bold;
+    padding: 0 var(--ves-dockbar-padding) 0 0;
+}
+
+#theia-main-content-panel .vesDock .p-TabBar:not(.theia-tabBar-active) .p-TabBar-tab.p-mod-current .p-TabBar-tabLabel {
+    border-bottom: 2px solid var(--theia-editor-foreground);
+}
+
+#theia-main-content-panel .vesDock .p-DockPanel-handle[data-orientation="horizontal"] {
+    border-left: none;
+}
+
+#theia-main-content-panel .vesDock .p-DockPanel-handle[data-orientation="horizontal"]:after {
+    min-width: unset;
+    transform: unset;
+    left: calc(50% - 1px);
+    background-color: var(--theia-dropdown-border);
+    width: 2px;
+}
+
+#theia-main-content-panel .vesDock .p-DockPanel-handle[data-orientation="horizontal"]:hover:after {
+    background-color: var(--theia-sash-hoverBorder);
+    left: calc(50% - 2px);
+    width: 4px;
+    transition-delay: var(--theia-sash-hoverDelay);
+}

@@ -1,8 +1,9 @@
+import { DockLayout } from '@phosphor/widgets';
 import { nls } from '@theia/core';
-import DockLayout, { LayoutBase, LayoutData } from 'rc-dock';
 import React from 'react';
 import { ConversionResult } from '../../../../images/browser/ves-images-types';
 import { EditorsContextType } from '../../ves-editors-types';
+import { VesDock, WrapperWidget } from '../Common/Dock/VesDock';
 import Animations from './Animations/Animations';
 import Colliders from './Colliders/Colliders';
 import Entity from './Entity/Entity';
@@ -42,13 +43,6 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
       },
     };
   }
-
-  protected defaultLayout: LayoutBase;
-  protected dockLayoutRef: DockLayout;
-
-  getRef = (r: DockLayout) => {
-    this.dockLayoutRef = r;
-  };
 
   protected async setData(entityData: Partial<EntityData>, options?: EntityEditorSaveDataOptions): Promise<void> {
     const { isGenerating, setIsGenerating } = this.props.context;
@@ -205,157 +199,85 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
   }
 
   async componentDidMount(): Promise<void> {
-    const { dock } = this.props.context;
-    dock.restoreLayout();
+    // const { dock } = this.props.context;
+    // dock.restoreLayout();
   }
 
   render(): React.JSX.Element {
-    const { dock } = this.props.context;
     const { data } = this.props;
 
     const mostFilesOnASprite = this.getMostFilesOnASprite(data);
     const isMultiFileAnimation = mostFilesOnASprite > 1;
 
-    const defaultLayout: LayoutData = {
-      dockbox: {
-        mode: 'horizontal',
-        children: [
-          {
-            size: 99999,
-            mode: 'vertical',
-            children: [
-              {
-                tabs: [
-                  {
-                    id: 'tab-animations',
-                    title: nls.localize(
-                      'vuengine/entityEditor/animations',
-                      'Animations'
-                    ),
-                    minHeight: 200,
-                    minWidth: 200,
-                    content: (
-                      <EntityEditorContext.Consumer>
-                        {context => <Animations />}
-                      </EntityEditorContext.Consumer>
-                    ),
-                  },
-                  {
-                    id: 'tab-colliders',
-                    title: nls.localize(
-                      'vuengine/entityEditor/colliders',
-                      'Colliders'
-                    ),
-                    minHeight: 200,
-                    minWidth: 200,
-                    content: (
-                      <EntityEditorContext.Consumer>
-                        {context => <Colliders />}
-                      </EntityEditorContext.Consumer>
-                    ),
-                  },
-                  {
-                    id: 'tab-entity',
-                    title: nls.localize(
-                      'vuengine/entityEditor/entity',
-                      'Entity'
-                    ),
-                    minHeight: 200,
-                    minWidth: 200,
-                    content: (
-                      <EntityEditorContext.Consumer>
-                        {context => <Entity />}
-                      </EntityEditorContext.Consumer>
-                    ),
-                  },
-                  {
-                    id: 'tab-sprites',
-                    title: nls.localize(
-                      'vuengine/entityEditor/sprites',
-                      'Sprites'
-                    ),
-                    minHeight: 200,
-                    minWidth: 200,
-                    content: (
-                      <EntityEditorContext.Consumer>
-                        {context => <Sprites
-                          isMultiFileAnimation={isMultiFileAnimation}
-                        />}
-                      </EntityEditorContext.Consumer>
-                    ),
-                  },
-                  /*
-                  {
-                    id: 'tab-scripts',
-                    title: nls.localize(
-                      'vuengine/entityEditor/scripts',
-                      'Scripts'
-                    ),
-                    minHeight: 200,
-                    minWidth: 200,
-                    content: (
-                      <EntityEditorContext.Consumer>
-                        {context => <Scripts />}
-                      </EntityEditorContext.Consumer>
-                    ),
-                  },
-                  */
-                  /*
-                  {
-                    id: 'tab-states',
-                    title: nls.localize(
-                      'vuengine/entityEditor/states',
-                      'States'
-                    ),
-                    minHeight: 200,
-                    minWidth: 200,
-                    content: (
-                      <EntityEditorContext.Consumer>
-                        {context => <States />}
-                      </EntityEditorContext.Consumer>
-                    ),
-                  },
-                  */
-                  {
-                    id: 'tab-wireframes',
-                    title: nls.localize(
-                      'vuengine/entityEditor/wireframes',
-                      'Wireframes'
-                    ),
-                    minHeight: 200,
-                    minWidth: 200,
-                    content: (
-                      <EntityEditorContext.Consumer>
-                        {context => <Wireframes />}
-                      </EntityEditorContext.Consumer>
-                    ),
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            tabs: [
-              {
-                id: 'tab-preview',
-                title: nls.localize(
-                  'vuengine/entityEditor/preview',
-                  'Preview'
-                ),
-                minHeight: 250,
-                minWidth: 250,
-                content: (
-                  <EntityEditorContext.Consumer>
-                    {context => (
-                      <Preview />
-                    )}
-                  </EntityEditorContext.Consumer>
-                ),
-              },
-            ],
-          },
-        ],
-      },
+    const defaultLayout: DockLayout.ILayoutConfig = {
+      main: {
+        type: 'split-area',
+        orientation: 'horizontal',
+        children: [{
+          type: 'tab-area',
+          widgets: [
+            new WrapperWidget(
+              nls.localize('vuengine/entityEditor/animations', 'General'),
+              <EntityEditorContext.Consumer>
+                {context => <Animations />}
+              </EntityEditorContext.Consumer>
+            ),
+            new WrapperWidget(
+              nls.localize('vuengine/entityEditor/colliders', 'Colliders'),
+              <EntityEditorContext.Consumer>
+                {context => <Colliders />}
+              </EntityEditorContext.Consumer>
+            ),
+            new WrapperWidget(
+              nls.localize('vuengine/entityEditor/entity', 'Entity'),
+              <EntityEditorContext.Consumer>
+                {context => <Entity />}
+              </EntityEditorContext.Consumer>
+            ),
+            new WrapperWidget(
+              nls.localize('vuengine/entityEditor/sprites', 'Sprites'),
+              <EntityEditorContext.Consumer>
+                {context => <Sprites
+                  isMultiFileAnimation={isMultiFileAnimation}
+                />}
+              </EntityEditorContext.Consumer>
+            ),
+            /*
+            new WrapperWidget(
+              nls.localize('vuengine/entityEditor/scripts', 'Scripts'),
+              <EntityEditorContext.Consumer>
+                {context => <Scripts />}
+              </EntityEditorContext.Consumer>
+            ),
+            new WrapperWidget(
+              nls.localize('vuengine/entityEditor/states', 'States'),
+              <EntityEditorContext.Consumer>
+                {context => <States />}
+              </EntityEditorContext.Consumer>
+            ),
+            */
+            new WrapperWidget(
+              nls.localize('vuengine/entityEditor/wireframes', 'Wireframes'),
+              <EntityEditorContext.Consumer>
+                {context => <Wireframes />}
+              </EntityEditorContext.Consumer>
+            )
+          ],
+          currentIndex: 0
+        }, {
+          type: 'tab-area',
+          widgets: [
+            new WrapperWidget(
+              nls.localize('vuengine/entityEditor/preview', 'Preview'),
+              <EntityEditorContext.Consumer>
+                {context => <Preview />}
+              </EntityEditorContext.Consumer>
+            )
+          ],
+          currentIndex: 0
+        }],
+        sizes: [0.8, 0.2]
+      }
     };
 
     return (
@@ -368,12 +290,8 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
             setData: this.setData.bind(this),
           }}
         >
-          <DockLayout
-            style={{ flexGrow: 1 }}
+          <VesDock
             defaultLayout={defaultLayout}
-            dropMode="edge"
-            ref={dock.getRef}
-            onLayoutChange={dock.persistLayout}
           />
         </EntityEditorContext.Provider>
       </div>

@@ -13,8 +13,10 @@ import { VesWorkspaceCommandContribution } from './ves-workspace-commands';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // override new file dialog
-    bind(VesWorkspaceCommandContribution).toSelf().inSingletonScope();
-    rebind(WorkspaceCommandContribution).toService(VesWorkspaceCommandContribution);
+    rebind(WorkspaceCommandContribution).to(VesWorkspaceCommandContribution).inSingletonScope();
+
+    // layout restorer
+    // rebind(ShellLayoutRestorer).to(VesEditorsLayoutRestorer).inSingletonScope();
 
     // context key service
     bind(VesEditorsContextKeyService)
