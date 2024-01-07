@@ -246,6 +246,7 @@ export interface EntityEditorState {
         anaglyph: boolean
         animations: boolean
         colliders: boolean
+        highlightedSprite: number
         wireframes: boolean
         palettes: string[]
         sprites: boolean

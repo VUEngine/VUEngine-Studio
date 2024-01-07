@@ -86,6 +86,7 @@ export default function Preview(): React.JSX.Element {
             displacement={s.displacement}
             frames={data.animations?.totalFrames || 1}
             currentAnimationFrame={currentAnimationFrame}
+            highlighted={state.preview.highlightedSprite === i}
             images={s.texture.files}
             flipHorizontally={s.texture.flip.horizontal}
             flipVertically={s.texture.flip.vertical}

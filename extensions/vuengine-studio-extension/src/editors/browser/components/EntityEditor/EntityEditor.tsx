@@ -35,6 +35,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
         animations: false,
         currentAnimation: this.props.data.animations?.default || 0,
         colliders: false,
+        highlightedSprite: -1,
         wireframes: false,
         palettes: ['11100100', '11100000', '11010000', '11100100'],
         sprites: true,

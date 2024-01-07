@@ -9,6 +9,7 @@ interface SpriteProps {
   frames: number;
   currentAnimationFrame: number
   displacement: Displacement;
+  highlighted: boolean;
   images: string[];
   palette: string
   zoom: number;
@@ -24,6 +25,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     frames,
     currentAnimationFrame,
     displacement,
+    highlighted,
     images,
     palette,
     zoom,
@@ -85,6 +87,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     ? imageData[currentAnimationFrame] ? imageData[currentAnimationFrame].pixelData : undefined
     : imageData[0] ? imageData[0].pixelData : undefined;
 
+  const baseZIndex = highlighted ? 999999999 : 100000;
+
   return (
     <>
       <div
@@ -97,11 +101,12 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
           marginRight: displacement.x < 0 ? -displacement.x * zoom * 2 : 0,
           marginTop: displacement.y > 0 ? displacement.y * zoom * 2 : 0,
           opacity: transparent ? .5 : 1,
+          outline: highlighted ? '1px solid green' : undefined,
           overflow: 'hidden',
           position: 'absolute',
           transform: transforms.length ? transforms.join(' ') : undefined,
           width: width * zoom,
-          zIndex: 100000 + (displacement.z !== 0 ? -displacement.z : 0),
+          zIndex: baseZIndex + (displacement.z !== 0 ? -displacement.z : 0),
         }}
       >
         {!error && imageData.length > 0 &&
