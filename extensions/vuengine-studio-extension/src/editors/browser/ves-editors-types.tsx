@@ -1,6 +1,7 @@
 import { CommandService, MessageService, QuickPickService, URI } from '@theia/core';
 import {
     HoverService,
+    LocalStorageService,
     OpenerService,
     PreferenceService
 } from '@theia/core/lib/browser';
@@ -28,6 +29,7 @@ export interface EditorsServices {
     fileDialogService: FileDialogService
     hoverService: HoverService
     messageService: MessageService
+    localStorageService: LocalStorageService
     openerService: OpenerService
     quickPickService: QuickPickService
     preferenceService: PreferenceService

@@ -476,6 +476,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
                             fileDialogService: this.fileDialogService,
                             hoverService: this.hoverService,
                             messageService: this.messageService,
+                            localStorageService: this.localStorageService,
                             openerService: this.openerService,
                             quickPickService: this.quickPickService,
                             preferenceService: this.preferenceService,

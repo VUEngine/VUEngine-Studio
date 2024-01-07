@@ -1,5 +1,5 @@
 import { nls } from '@theia/core';
-import DockLayout, { LayoutBase, LayoutData } from 'rc-dock';
+import DockLayout, { LayoutData } from 'rc-dock';
 import React from 'react';
 import { ConversionResult } from '../../../../images/browser/ves-images-types';
 import { EditorsContextType } from '../../ves-editors-types';
@@ -44,12 +44,30 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
     };
   }
 
-  protected defaultLayout: LayoutBase;
-  protected dockLayoutRef: DockLayout;
+  protected getStateLocalStorageId(): string {
+    return `ves-editors-Entity-state/${this.props.context.fileUri.path.fsPath()}`;
+  }
 
-  getRef = (r: DockLayout) => {
-    this.dockLayoutRef = r;
-  };
+  protected async savePreviewState(): Promise<void> {
+    console.log('savePreviewState', this.getStateLocalStorageId(), this.state);
+    await this.props.context.services.localStorageService.setData<EntityEditorState>(this.getStateLocalStorageId(), this.state);
+  }
+
+  protected async restorePreviewState(): Promise<void> {
+    const savedState = await this.props.context.services.localStorageService.getData<EntityEditorState>(this.getStateLocalStorageId());
+    console.log('restorePreviewState', this.getStateLocalStorageId(), savedState);
+    if (savedState) {
+      this.setState({
+        ...this.state,
+        ...savedState,
+      });
+    }
+  }
+
+  protected async updateState(state: EntityEditorState): Promise<void> {
+    this.setState(state);
+    this.savePreviewState();
+  }
 
   protected async setData(entityData: Partial<EntityData>, options?: EntityEditorSaveDataOptions): Promise<void> {
     const { isGenerating, setIsGenerating } = this.props.context;
@@ -208,6 +226,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
   async componentDidMount(): Promise<void> {
     const { dock } = this.props.context;
     dock.restoreLayout();
+    this.restorePreviewState();
   }
 
   render(): React.JSX.Element {
@@ -364,7 +383,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
         <EntityEditorContext.Provider
           value={{
             state: this.state,
-            setState: this.setState.bind(this),
+            setState: this.updateState.bind(this),
             data,
             setData: this.setData.bind(this),
           }}
