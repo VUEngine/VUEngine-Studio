@@ -23,8 +23,8 @@ import {
   ProjectContributor,
   ProjectFile,
   ProjectFileItem,
-  ProjectFileItemsWithContributor,
   ProjectFileItemsByTypeWithContributor,
+  ProjectFileItemsWithContributor,
   ProjectFileTemplate,
   ProjectFileTemplatesWithContributor,
   ProjectFileType,
@@ -579,7 +579,7 @@ export class VesProjectService {
         dot: false,
         nodir: true
       });
-      for (const pluginFile of pluginFiles) {
+      await Promise.all(pluginFiles.map(async pluginFile => {
         const pluginFileUri = rootUri.resolve(pluginFile);
         const pluginRelativeUri = new URI(isWindows ? `/${pluginFile}` : pluginFile).withScheme('file').parent;
         const fileContent = await this.fileService.readFile(pluginFileUri);
@@ -596,6 +596,7 @@ export class VesProjectService {
           }
 
           pluginsMap[pluginId] = {
+            ...fileContentJson,
             name: pluginId,
             icon: await this.fileService.exists(iconUri)
               ? iconUri.path.fsPath()
@@ -610,7 +611,7 @@ export class VesProjectService {
         } catch (e) {
           console.error(pluginFileUri.path.fsPath(), e);
         }
-      }
+      }));
 
       return pluginsMap;
     };

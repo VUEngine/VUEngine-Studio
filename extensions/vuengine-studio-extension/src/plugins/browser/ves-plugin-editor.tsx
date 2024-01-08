@@ -4,13 +4,17 @@ import { Deferred } from '@theia/core/lib/common/promise-util';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { VesPlugin, VesPluginEditorComponent } from './ves-plugin';
+import { VesPlugin } from './ves-plugin';
 import { VesPluginsModel } from './ves-plugins-model';
+import VesPluginEditorComponent from './components/VesPluginEditorComponent';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
 
 @injectable()
 export class VesPluginEditor extends ReactWidget {
     @inject(CommandService)
     protected readonly commandService: CommandService;
+    @inject(FileService)
+    protected readonly fileService: FileService;
     @inject(VesPlugin)
     protected readonly plugin: VesPlugin;
     @inject(VesPluginsModel)
@@ -81,6 +85,7 @@ export class VesPluginEditor extends ReactWidget {
             ref={this.resolveScrollContainer}
             plugin={this.plugin}
             commandService={this.commandService}
+            fileService={this.fileService}
             workspaceService={this.workspaceService}
         />;
     }

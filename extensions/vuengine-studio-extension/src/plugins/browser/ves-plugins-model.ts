@@ -1,16 +1,13 @@
-import * as showdown from 'showdown';
-import sanitize from 'sanitize-html';
-import { injectable, inject, postConstruct } from '@theia/core/shared/inversify';
+import { PreferenceService } from '@theia/core/lib/browser';
 import { Emitter } from '@theia/core/lib/common/event';
 import { ProgressService } from '@theia/core/lib/common/progress-service';
 import { Deferred } from '@theia/core/lib/common/promise-util';
-import { PreferenceService } from '@theia/core/lib/browser';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { AUTHOR_SEARCH_QUERY, TAG_SEARCH_QUERY, VesPluginsSearchModel } from './ves-plugins-search-model';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesPlugin, VesPluginFactory } from './ves-plugin';
+import { AUTHOR_SEARCH_QUERY, TAG_SEARCH_QUERY, VesPluginsSearchModel } from './ves-plugins-search-model';
 import { VesPluginsService } from './ves-plugins-service';
-import URI from '@theia/core/lib/common/uri';
 
 @injectable()
 export class VesPluginsModel {
@@ -189,7 +186,7 @@ export class VesPluginsModel {
 
             const recommendedSorted = new Set(Array.from(allRecommendations).sort((a, b) => this.comparePlugins(a, b)).values());
             this._recommended = recommendedSorted;
-            return Promise.all(Array.from(recommendedSorted, plugin => this.refresh(plugin)));
+            return Promise.all(Array.from(recommendedSorted, async plugin => await this.refresh(plugin)));
         });
     }
 
@@ -204,19 +201,6 @@ export class VesPluginsModel {
         });
     }
 
-    protected compileReadme(readmeMarkdown: string): string {
-        const markdownConverter = new showdown.Converter({
-            noHeaderId: true,
-            strikethrough: true,
-            headerLevelStart: 2
-        });
-
-        const readmeHtml = markdownConverter.makeHtml(readmeMarkdown);
-        return sanitize(readmeHtml, {
-            allowedTags: sanitize.defaults.allowedTags.concat(['h1', 'h2', 'h3', 'h4', 'img'])
-        });
-    }
-
     protected async refresh(id: string): Promise<VesPlugin | undefined> {
         try {
             let plugin = this.getPlugin(id);
@@ -225,22 +209,7 @@ export class VesPluginsModel {
                 return;
             }
             plugin = this.setPlugin(id);
-
-            let renderedReadme = '';
-            const readmeUri = new URI(data.readme?.replace(/\\/g, '/')).withScheme('file');
-            if (data.readme && await this.fileService.exists(readmeUri)) {
-                const rawReadme = await this.fileService.readFile(readmeUri);
-                const readme = this.compileReadme(rawReadme.value.toString());
-                renderedReadme = readme;
-            }
-
-            plugin.update(Object.assign(data, {
-                displayName: data.displayName,
-                author: data.author,
-                description: data.description,
-                icon: data.icon,
-                readme: renderedReadme,
-            }));
+            plugin.update(data);
             return plugin;
         } catch (e) {
             return this.onDidFailRefresh(id, e);

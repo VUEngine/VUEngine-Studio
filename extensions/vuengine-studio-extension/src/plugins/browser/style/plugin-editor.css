@@ -5,3 +5,14 @@
 .ves-plugin-editor>.scroll-container {
     position: unset;
 }
+
+.ves-plugin-editor .ves-plugin-tab {
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-weight: bold;
+    line-height: 30px;
+}
+
+.ves-plugin-editor .ves-plugin-tab.active {
+    border-color: var(--theia-editor-foreground);
+}
