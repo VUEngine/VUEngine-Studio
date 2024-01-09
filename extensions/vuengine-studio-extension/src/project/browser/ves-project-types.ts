@@ -432,6 +432,27 @@ export const defaultProjectData: ProjectData = {
       },
       icon: 'fa fa-microchip',
       templates: ['RomInfo.h']
-    }
+    },
+    Sprite: {
+      enabled: false,
+      file: '.sprite',
+      schema: {
+        title: 'Sprite',
+        properties: {
+          name: {
+            type: 'string'
+          },
+          layers: {
+            type: 'string'
+          }
+        },
+        required: ['name']
+      },
+      uiSchema: {
+        type: 'SpriteEditor',
+        scope: '#'
+      },
+      icon: 'fa fa-image'
+    },
   }
 };

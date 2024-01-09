@@ -5,6 +5,7 @@ import {
     OpenerService,
     PreferenceService
 } from '@theia/core/lib/browser';
+import { ColorRegistry } from '@theia/core/lib/browser/color-registry';
 import * as React from '@theia/core/shared/react';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
@@ -24,6 +25,7 @@ export interface EditorsDockInterface {
 };
 
 export interface EditorsServices {
+    colorRegistry: ColorRegistry;
     commandService: CommandService
     fileService: FileService
     fileDialogService: FileDialogService

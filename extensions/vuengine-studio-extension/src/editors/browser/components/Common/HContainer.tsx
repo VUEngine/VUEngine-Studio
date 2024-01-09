@@ -15,7 +15,7 @@ export default function HContainer(props: PropsWithChildren<HContainerProps>): R
 
     return <div
         style={{
-            alignItems: alignItems !== undefined ? alignItems : 'center',
+            alignItems,
             display: 'flex',
             flexDirection: 'row',
             flexGrow: grow,

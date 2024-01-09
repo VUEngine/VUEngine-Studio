@@ -23,7 +23,7 @@ export default function ImageEditor(props: ImageEditorProps): React.JSX.Element 
     };
 
     const updateFiles = (files: string[]): void => {
-        updateData({ ...data, files });
+        updateImageData({ files });
     };
 
     return (

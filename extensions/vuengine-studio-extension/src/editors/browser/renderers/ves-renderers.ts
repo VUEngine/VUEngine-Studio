@@ -18,6 +18,8 @@ import VesRumbleEffectEditorControl from './rumble-effect-editor/ves-rumble-effe
 import VesRumbleEffectEditorControlTester from './rumble-effect-editor/ves-rumble-effect-editor-control-tester';
 import vesSimpleListEditorControl from './simple-list-editor/ves-simple-list-editor-control';
 import vesSimpleListEditorControlTester from './simple-list-editor/ves-simple-list-editor-control-tester';
+import vesSpriteEditorControl from './sprite-editor/ves-sprite-editor-control';
+import vesSpriteEditorControlTester from './sprite-editor/ves-sprite-editor-control-tester';
 import VesTranslationsEditorControl from './translations-editor/ves-translations-editor-control';
 import VesTranslationsEditorControlTester from './translations-editor/ves-translations-editor-control-tester';
 
@@ -32,5 +34,6 @@ export const VES_RENDERERS = [
     { tester: VesPcmEditorControlTester, renderer: VesPcmEditorControl },
     { tester: VesRumbleEffectEditorControlTester, renderer: VesRumbleEffectEditorControl },
     { tester: vesSimpleListEditorControlTester, renderer: vesSimpleListEditorControl },
+    { tester: vesSpriteEditorControlTester, renderer: vesSpriteEditorControl },
     { tester: VesTranslationsEditorControlTester, renderer: VesTranslationsEditorControl },
 ];

@@ -14,6 +14,7 @@ import {
     Saveable,
     SaveableSource,
 } from '@theia/core/lib/browser';
+import { ColorRegistry } from '@theia/core/lib/browser/color-registry';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
@@ -45,6 +46,8 @@ export interface ItemData {
 
 @injectable()
 export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableSource {
+    @inject(ColorRegistry)
+    private readonly colorRegistry: ColorRegistry;
     @inject(CommandService)
     protected readonly commandService: CommandService;
     @inject(EditorPreferences)
@@ -471,6 +474,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
                             restoreLayout: this.restoreDockLayout.bind(this),
                         },
                         services: {
+                            colorRegistry: this.colorRegistry,
                             commandService: this.commandService,
                             fileService: this.fileService,
                             fileDialogService: this.fileDialogService,

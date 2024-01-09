@@ -1874,6 +1874,11 @@
     node-addon-api "^3.2.1"
     node-gyp-build "^4.3.0"
 
+"@phosphor-icons/react@^2.0.15":
+  version "2.0.15"
+  resolved "https://registry.yarnpkg.com/@phosphor-icons/react/-/react-2.0.15.tgz#4d8e28484d45649f53a6cd75db161cf8b8379e1d"
+  integrity sha512-PQKNcRrfERlC8gJGNz0su0i9xVmeubXSNxucPcbCLDd9u0cwJVTEyYK87muul/svf0UXFdL2Vl6bbeOhT1Mwow==
+
 "@phosphor/algorithm@1", "@phosphor/algorithm@^1.2.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@phosphor/algorithm/-/algorithm-1.2.0.tgz#4a19aa59261b7270be696672dc3f0663f7bef152"
@@ -6501,6 +6506,11 @@ dotenv@~10.0.0:
   version "10.0.0"
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-10.0.0.tgz#3d4227b8fb95f81096cdd2b66653fb2c7085ba81"
   integrity sha512-rlBi9d8jpv9Sf1klPjNfFAuWDjKLwTIJJ/VxtoTwIR6hnZxcEOQCZg2oIL3MWBYw5GpUDKOEnND7LXTbIpQ03Q==
+
+dotting@^2.1.7:
+  version "2.1.7"
+  resolved "https://registry.yarnpkg.com/dotting/-/dotting-2.1.7.tgz#d2d6ce092128e9b5d93452dc35b941b3a1c66412"
+  integrity sha512-zEyg52DaCAi3epZyY3054gAbd3CB0GLZGZwWZP494sXRhqalV2RGAxM7WDQbUvxP+LV2w9vER5XsJQicEHkeYw==
 
 drivelist@^9.0.2:
   version "9.2.4"

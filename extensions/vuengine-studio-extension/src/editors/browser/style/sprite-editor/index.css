@@ -1,0 +1,43 @@
+.spriteEditor canvas {
+    border: 1px solid var(--theia-activityBar-background) !important;
+    border-radius: 2px;
+    box-sizing: border-box;
+}
+
+.spriteEditor .tool {
+    justify-content: center;
+    align-items: center;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    cursor: pointer;
+    display: flex;
+    height: 32px;
+    width: 32px;
+}
+
+.spriteEditor .tool:hover,
+.spriteEditor .tool.active {
+    border-color: var(--theia-button-background);
+}
+
+.spriteEditor .layer {
+    align-items: center;
+    border: 1px solid var(--theia-activityBar-background);
+    border-radius: 2px;
+    cursor: pointer;
+    display: flex;
+    padding: 6px;
+}
+
+.spriteEditor .layer:hover,
+.spriteEditor .layer.active {
+    border-color: var(--theia-button-background);
+}
+
+.spriteEditor .layer.dragging {
+    opacity: .5;
+}
+
+.spriteEditor .layer input {
+    width: 120px;
+}
