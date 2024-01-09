@@ -88,11 +88,6 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             isVisible: widget => widget instanceof VesEditorsWidget,
             execute: widget => this.openSource(widget),
         });
-        commandRegistry.registerCommand(VesEditorsCommands.RESET_LAYOUT, {
-            isEnabled: () => true,
-            isVisible: widget => widget instanceof VesEditorsWidget && (widget as VesEditorsWidget).dockLayoutRef !== undefined,
-            execute: widget => this.resetLayout(widget),
-        });
         commandRegistry.registerCommand(VesEditorsCommands.GENERATE_ID, {
             isEnabled: () => true,
             isVisible: () => false,
@@ -179,12 +174,6 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             priority: 0,
         });
         toolbar.registerItem({
-            id: VesEditorsCommands.RESET_LAYOUT.id,
-            command: VesEditorsCommands.RESET_LAYOUT.id,
-            tooltip: VesEditorsCommands.RESET_LAYOUT.label,
-            priority: 1,
-        });
-        toolbar.registerItem({
             id: VesEditorsCommands.OPEN_SOURCE.id,
             command: VesEditorsCommands.OPEN_SOURCE.id,
             tooltip: VesEditorsCommands.OPEN_SOURCE.label,
@@ -239,15 +228,6 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         }
         this.vesCodeGenService.generate([ref.typeId], ref.uri);
     }
-
-    protected async resetLayout(widget: Widget): Promise<void> {
-        const ref = widget instanceof VesEditorsWidget && widget || undefined;
-        if (!ref || !ref.typeId) {
-            return;
-        }
-
-        return (widget as VesEditorsWidget).resetDockLayout();
-    };
 
     protected async generateId(fileUri: URI): Promise<void> {
         try {
