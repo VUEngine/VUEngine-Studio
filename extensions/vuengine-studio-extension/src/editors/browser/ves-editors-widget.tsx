@@ -5,14 +5,13 @@ import { Message } from '@phosphor/messaging';
 import { CommandService, Emitter, Event, MessageService, QuickPickService, Reference, UNTITLED_SCHEME, URI, nls } from '@theia/core';
 import {
     CommonCommands,
-    ConfirmDialog,
     HoverService,
     LabelProvider,
     LocalStorageService,
     OpenerService,
     PreferenceService,
     Saveable,
-    SaveableSource,
+    SaveableSource
 } from '@theia/core/lib/browser';
 import { ColorRegistry } from '@theia/core/lib/browser/color-registry';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
@@ -25,7 +24,6 @@ import { MonacoEditorModel } from '@theia/monaco/lib/browser/monaco-editor-model
 import { MonacoTextModelService } from '@theia/monaco/lib/browser/monaco-text-model-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { deepmerge } from 'deepmerge-ts';
-import DockLayout, { LayoutBase } from 'rc-dock';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesImagesService } from '../../images/browser/ves-images-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
@@ -119,51 +117,6 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
 
     static readonly ID = 'vesEditorsWidget';
     static readonly LABEL = 'Editor';
-
-    protected defaultLayout: LayoutBase;
-    dockLayoutRef: DockLayout;
-
-    protected getDockLayoutRef = (r: DockLayout) => {
-        this.dockLayoutRef = r;
-    };
-
-    protected getLayoutLocalStorageId(): string {
-        return `ves-editors-${this.typeId}-layout`;
-    }
-
-    protected async setDefaultDockLayout(defaultLayout: LayoutBase): Promise<void> {
-        this.defaultLayout = defaultLayout;
-    };
-
-    async resetDockLayout(): Promise<void> {
-        const type = this.vesProjectService.getProjectDataType(this.typeId);
-
-        const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/editors/resetEditorLayout', 'Reset Editor Layout'),
-            msg: nls.localize(
-                'vuengine/editors/areYouSureYouWantToResetLayout',
-                'Are you sure you want to reset the {0} editor layout to default?',
-                type?.schema.title
-            ),
-        });
-        const confirmed = await dialog.open();
-        if (confirmed) {
-            this.dockLayoutRef.loadLayout(this.defaultLayout);
-            return this.persistDockLayout(undefined);
-        }
-    };
-
-    protected async restoreDockLayout(): Promise<void> {
-        this.defaultLayout = this.dockLayoutRef.getLayout();
-        const savedLayout = await this.localStorageService.getData(this.getLayoutLocalStorageId());
-        if (savedLayout) {
-            this.dockLayoutRef.loadLayout(savedLayout as LayoutBase);
-        }
-    };
-
-    protected async persistDockLayout(layout: LayoutBase | undefined): Promise<void> {
-        return this.localStorageService.setData(this.getLayoutLocalStorageId(), layout);
-    };
 
     protected setIsGenerating(isGenerating: boolean): void {
         this.isGenerating = isGenerating;
@@ -466,13 +419,6 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
                         fileUri: this.uri,
                         isGenerating: this.isGenerating,
                         setIsGenerating: this.setIsGenerating.bind(this),
-                        dock: {
-                            getRef: this.getDockLayoutRef.bind(this),
-                            persistLayout: this.persistDockLayout.bind(this),
-                            setDefaultLayout: this.setDefaultDockLayout.bind(this),
-                            resetLayout: this.resetDockLayout.bind(this),
-                            restoreLayout: this.restoreDockLayout.bind(this),
-                        },
                         services: {
                             colorRegistry: this.colorRegistry,
                             commandService: this.commandService,

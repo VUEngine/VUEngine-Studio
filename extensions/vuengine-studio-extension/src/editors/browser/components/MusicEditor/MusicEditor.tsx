@@ -1,17 +1,20 @@
 import { CommonCommands } from '@theia/core/lib/browser';
-import DockLayout, { LayoutData } from 'rc-dock';
 import React from 'react';
 import { EditorsContextType } from '../../ves-editors-types';
 import { ChannelConfig, InstrumentConfig, MusicEditorContext, MusicEditorState, Notes, PatternConfig, SongData, SongNote } from './MusicEditorTypes';
 import MusicPlayer from './MusicPlayer';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import Channel from './Sidebar/Channel';
 import Input from './Sidebar/Input';
 import Instruments from './Sidebar/Instruments';
 import Note from './Sidebar/Note';
 import Song from './Sidebar/Song';
 import Waveforms from './Sidebar/Waveforms';
+import HContainer from '../Common/HContainer';
+import VContainer from '../Common/VContainer';
+import { nls } from '@theia/core';
 
 interface MusicEditorProps {
     songData: SongData
@@ -279,131 +282,11 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
     }
 
     async componentDidMount(): Promise<void> {
-        const { dock } = this.props.context;
-        dock.restoreLayout();
         this.computeSong();
     }
 
     render(): React.JSX.Element {
-        const { dock, services } = this.props.context;
-        const defaultLayout: LayoutData = {
-            dockbox: {
-                mode: 'horizontal',
-                children: [
-                    {
-                        size: 99999,
-                        mode: 'vertical',
-                        children: [
-                            {
-                                tabs: [{
-                                    id: 'tab-sequencer',
-                                    title: 'Sequencer',
-                                    minHeight: 320,
-                                    minWidth: 250,
-                                    content:
-                                        <MusicEditorContext.Consumer>
-                                            {context =>
-                                                <Sequencer />
-                                            }
-                                        </MusicEditorContext.Consumer>
-                                },
-                                {
-                                    id: 'tab-instruments',
-                                    title: 'Instruments',
-                                    minHeight: 250,
-                                    minWidth: 250,
-                                    content:
-                                        <MusicEditorContext.Consumer>
-                                            {context =>
-                                                <Instruments />
-                                            }
-                                        </MusicEditorContext.Consumer>
-                                },
-                                {
-                                    id: 'tab-waveforms',
-                                    title: 'Waveforms',
-                                    minHeight: 250,
-                                    minWidth: 250,
-                                    content:
-                                        <MusicEditorContext.Consumer>
-                                            {context =>
-                                                <Waveforms />
-                                            }
-                                        </MusicEditorContext.Consumer>
-                                }]
-                            },
-                            {
-                                size: 99999,
-                                tabs: [{
-                                    id: 'tab-pianoroll',
-                                    title: 'Piano Roll',
-                                    minHeight: 250,
-                                    minWidth: 250,
-                                    content:
-                                        <MusicEditorContext.Consumer>
-                                            {context =>
-                                                <PianoRoll />
-                                            }
-                                        </MusicEditorContext.Consumer>
-                                }]
-                            }
-                        ]
-                    },
-                    {
-                        tabs: [
-                            {
-                                id: 'tab-song',
-                                title: 'Song',
-                                minHeight: 250,
-                                minWidth: 250,
-                                content:
-                                    <MusicEditorContext.Consumer>
-                                        {context =>
-                                            <Song />
-                                        }
-                                    </MusicEditorContext.Consumer>
-                            },
-                            {
-                                id: 'tab-channel',
-                                title: 'Channel',
-                                minHeight: 250,
-                                minWidth: 250,
-                                content:
-                                    <MusicEditorContext.Consumer>
-                                        {context =>
-                                            <Channel />
-                                        }
-                                    </MusicEditorContext.Consumer>
-                            },
-                            {
-                                id: 'tab-note',
-                                title: 'Note',
-                                minHeight: 250,
-                                minWidth: 250,
-                                content:
-                                    <MusicEditorContext.Consumer>
-                                        {context =>
-                                            <Note />
-                                        }
-                                    </MusicEditorContext.Consumer>
-                            },
-                            {
-                                id: 'tab-input',
-                                title: 'Input',
-                                minHeight: 250,
-                                minWidth: 250,
-                                content:
-                                    <MusicEditorContext.Consumer>
-                                        {context =>
-                                            <Input />
-                                        }
-                                    </MusicEditorContext.Consumer>
-                            }
-                        ]
-                    }
-                ]
-            }
-        };
+        const { services } = this.props.context;
 
         return <div className='musicEditor'>
             <MusicPlayer
@@ -417,6 +300,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                         : this.state.currentStep + 1
                 })}
             />
+
             <div className='toolbar'>
                 <button
                     className='theia-button secondary large playButton'
@@ -491,12 +375,108 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                 setInstruments: this.setInstruments.bind(this),
                 getChannelName: this.getChannelName.bind(this),
             }}>
-                <DockLayout
-                    defaultLayout={defaultLayout}
-                    dropMode='edge'
-                    ref={dock.getRef}
-                    onLayoutChange={dock.persistLayout}
-                />
+                <HContainer gap={20}>
+                    <VContainer gap={15} grow={1}>
+                        <Tabs style={{ height: 330 }}>
+                            <TabList>
+                                <Tab>
+                                    {nls.localize('vuengine/musicEditor/sequencer', 'Sequencer')}
+                                </Tab>
+                                <Tab>
+                                    {nls.localize('vuengine/musicEditor/instruments', 'Instruments')}
+                                </Tab>
+                                <Tab>
+                                    {nls.localize('vuengine/musicEditor/waveforms', 'Waveforms')}
+                                </Tab>
+                            </TabList>
+
+                            <TabPanel>
+                                <MusicEditorContext.Consumer>
+                                    {context =>
+                                        <Sequencer />
+                                    }
+                                </MusicEditorContext.Consumer>
+                            </TabPanel>
+                            <TabPanel>
+                                <MusicEditorContext.Consumer>
+                                    {context =>
+                                        <Instruments />
+                                    }
+                                </MusicEditorContext.Consumer>
+                            </TabPanel>
+                            <TabPanel>
+                                <MusicEditorContext.Consumer>
+                                    {context =>
+                                        <Waveforms />
+                                    }
+                                </MusicEditorContext.Consumer>
+                            </TabPanel>
+                        </Tabs>
+
+                        <Tabs style={{ flexGrow: 1 }}>
+                            <TabList>
+                                <Tab>
+                                    {nls.localize('vuengine/musicEditor/pianoRoll', 'Piano Roll')}
+                                </Tab>
+                            </TabList>
+
+                            <TabPanel>
+                                <MusicEditorContext.Consumer>
+                                    {context =>
+                                        <PianoRoll />
+                                    }
+                                </MusicEditorContext.Consumer>
+                            </TabPanel>
+                        </Tabs>
+                    </VContainer>
+                    <VContainer gap={15} style={{ width: 250 }}>
+                        <Tabs>
+                            <TabList>
+                                <Tab>
+                                    {nls.localize('vuengine/musicEditor/song', 'Song')}
+                                </Tab>
+                                <Tab>
+                                    {nls.localize('vuengine/musicEditor/channel', 'Channel')}
+                                </Tab>
+                                <Tab>
+                                    {nls.localize('vuengine/musicEditor/note', 'Note')}
+                                </Tab>
+                                <Tab>
+                                    {nls.localize('vuengine/musicEditor/input', 'Input')}
+                                </Tab>
+                            </TabList>
+
+                            <TabPanel>
+                                <MusicEditorContext.Consumer>
+                                    {context =>
+                                        <Song />
+                                    }
+                                </MusicEditorContext.Consumer>
+                            </TabPanel>
+                            <TabPanel>
+                                <MusicEditorContext.Consumer>
+                                    {context =>
+                                        <Channel />
+                                    }
+                                </MusicEditorContext.Consumer>
+                            </TabPanel>
+                            <TabPanel>
+                                <MusicEditorContext.Consumer>
+                                    {context =>
+                                        <Note />
+                                    }
+                                </MusicEditorContext.Consumer>
+                            </TabPanel>
+                            <TabPanel>
+                                <MusicEditorContext.Consumer>
+                                    {context =>
+                                        <Input />
+                                    }
+                                </MusicEditorContext.Consumer>
+                            </TabPanel>
+                        </Tabs>
+                    </VContainer>
+                </HContainer>
             </MusicEditorContext.Provider>
         </div>;
     }

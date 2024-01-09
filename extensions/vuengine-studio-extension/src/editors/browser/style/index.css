@@ -1,4 +1,3 @@
-@import "../../../../../../node_modules/rc-dock/dist/rc-dock.css";
 @import "brightness-repeat-editor/index.css";
 @import "button.css";
 @import "color-selector.css";
@@ -13,7 +12,6 @@
 @import "palette-renderer.css";
 @import "radio-select.css";
 @import "react-select.css";
-@import "rc-dock.css";
 @import "react-tabs.css";
 @import "rumble-effect-editor/index.css";
 @import "sprite-editor/index.css";
