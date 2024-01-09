@@ -6,26 +6,26 @@ import HContainer from '../../Common/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import RadioSelect from '../../Common/RadioSelect';
 import VContainer from '../../Common/VContainer';
-import { ImageConvEditorContext, ImageConvEditorContextType } from '../ImageConvEditorTypes';
+import { ImageEditorContext, ImageEditorContextType } from '../ImageEditorTypes';
 
 export default function General(): React.JSX.Element {
-    const { imageConvData, updateImageConvData } = useContext(ImageConvEditorContext) as ImageConvEditorContextType;
+    const { imageData, updateImageData } = useContext(ImageEditorContext) as ImageEditorContextType;
 
     const setName = (n: string): void => {
-        updateImageConvData({ name: n });
+        updateImageData({ name: n });
     };
 
     const setTilesCompression = (compression: ImageCompressionType) => {
-        updateImageConvData({
+        updateImageData({
             tileset: {
-                ...imageConvData.tileset,
+                ...imageData.tileset,
                 compression
             },
         });
     };
 
     const setSection = (section: DataSection) => {
-        updateImageConvData({
+        updateImageData({
             section,
         });
     };
@@ -34,11 +34,11 @@ export default function General(): React.JSX.Element {
         <HContainer gap={10} wrap='wrap'>
             <VContainer grow={1}>
                 <label>
-                    {nls.localize('vuengine/imageConvEditor/name', 'Name')}
+                    {nls.localize('vuengine/imageEditor/name', 'Name')}
                 </label>
                 <input
                     className='theia-input large'
-                    value={imageConvData.name}
+                    value={imageData.name}
                     onChange={e => setName(e.target.value)}
                 />
             </VContainer>
@@ -60,7 +60,7 @@ export default function General(): React.JSX.Element {
                         label: nls.localize('vuengine/entityEditor/rle', 'RLE'),
                         value: ImageCompressionType.RLE,
                     }]}
-                    defaultValue={imageConvData.tileset.compression}
+                    defaultValue={imageData.tileset.compression}
                     onChange={options => setTilesCompression(options[0].value as ImageCompressionType)}
                 />
             </VContainer>
@@ -75,7 +75,7 @@ export default function General(): React.JSX.Element {
                     tooltipPosition='bottom'
                 />
                 <RadioSelect
-                    defaultValue={imageConvData.section}
+                    defaultValue={imageData.section}
                     options={[{
                         label: 'ROM',
                         value: DataSection.ROM,

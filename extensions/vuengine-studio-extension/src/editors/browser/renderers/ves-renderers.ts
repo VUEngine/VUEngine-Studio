@@ -6,8 +6,8 @@ import VesEntityEditorControl from './entity-editor/ves-entity-editor-control';
 import VesEntityEditorControlTester from './entity-editor/ves-entity-editor-control-tester';
 import VesFontEditorControl from './font-editor/ves-font-editor-control';
 import VesFontEditorControlTester from './font-editor/ves-font-editor-control-tester';
-import VesImageConvEditorControl from './image-conv-editor/ves-image-conv-editor-control';
-import VesImageConvEditorControlTester from './image-conv-editor/ves-image-conv-editor-control-tester';
+import VesImageEditorControl from './image-editor/ves-image-editor-control';
+import VesImageEditorControlTester from './image-editor/ves-image-editor-control-tester';
 import VesMusicEditorControl from './music-editor/ves-music-editor-control';
 import VesMusicEditorControlTester from './music-editor/ves-music-editor-control-tester';
 import VesPaletteControl from './palette/ves-palette-control';
@@ -26,7 +26,7 @@ export const VES_RENDERERS = [
     { tester: VesColumnTableEditorControlTester, renderer: VesColumnTableEditorControl },
     { tester: VesEntityEditorControlTester, renderer: VesEntityEditorControl },
     { tester: VesFontEditorControlTester, renderer: VesFontEditorControl },
-    { tester: VesImageConvEditorControlTester, renderer: VesImageConvEditorControl },
+    { tester: VesImageEditorControlTester, renderer: VesImageEditorControl },
     { tester: VesMusicEditorControlTester, renderer: VesMusicEditorControl },
     { tester: VesPaletteControlTester, renderer: VesPaletteControl },
     { tester: VesPcmEditorControlTester, renderer: VesPcmEditorControl },

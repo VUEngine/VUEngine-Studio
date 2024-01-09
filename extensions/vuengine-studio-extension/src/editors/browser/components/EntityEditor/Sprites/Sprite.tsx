@@ -6,7 +6,7 @@ import HContainer from '../../Common/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import RadioSelect from '../../Common/RadioSelect';
 import VContainer from '../../Common/VContainer';
-import Images from '../../ImageConvEditor/Images/Images';
+import Images from '../../ImageEditor/Images/Images';
 import {
     BgmapMode,
     DisplayMode,

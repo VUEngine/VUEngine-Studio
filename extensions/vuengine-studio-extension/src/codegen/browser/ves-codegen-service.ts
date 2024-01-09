@@ -265,7 +265,7 @@ export class VesCodeGenService {
 
   /*
   protected hasChanges(type: ProjectDataType & WithContributor): boolean {
-    // TODO: at this point, we'd need to know which files are affected by a conversion file, e.g. imageConv, but this information is currently not available
+    // TODO: at this point, we'd need to know which files are affected by a conversion file, e.g. *.image, but this information is currently not available
     let hasChanges = false;
     type.templates?.map(templateId => {
       const template = this.vesProjectService.getProjectDataTemplate(templateId);

@@ -5,20 +5,20 @@ import HContainer from '../Common/HContainer';
 import VContainer from '../Common/VContainer';
 import Animation from './Animation/Animation';
 import General from './General/General';
-import { ImageConvEditorContext } from './ImageConvEditorTypes';
+import { ImageEditorContext } from './ImageEditorTypes';
 import Images from './Images/Images';
 import Map from './TilesMap/Map';
 import Tiles from './TilesMap/Tiles';
 
-interface ImageConvEditorProps {
+interface ImageEditorProps {
     data: ImageConfig
     updateData: (data: ImageConfig) => void
 }
 
-export default function ImageConvEditor(props: ImageConvEditorProps): React.JSX.Element {
+export default function ImageEditor(props: ImageEditorProps): React.JSX.Element {
     const { data, updateData } = props;
 
-    const updateImageConvData = (updatedData: Partial<ImageConfig>): void => {
+    const updateImageData = (updatedData: Partial<ImageConfig>): void => {
         updateData({ ...data, ...updatedData });
     };
 
@@ -27,11 +27,11 @@ export default function ImageConvEditor(props: ImageConvEditorProps): React.JSX.
     };
 
     return (
-        <div className="imageConvEditor">
-            <ImageConvEditorContext.Provider
+        <div className="imageEditor">
+            <ImageEditorContext.Provider
                 value={{
-                    imageConvData: data,
-                    updateImageConvData,
+                    imageData: data,
+                    updateImageData: updateImageData,
                 }}
             >
                 <VContainer gap={20} overflow='hidden'>
@@ -43,13 +43,13 @@ export default function ImageConvEditor(props: ImageConvEditorProps): React.JSX.
                     </HContainer>
                     <VContainer overflow='hidden'>
                         <label>
-                            {nls.localize('vuengine/imageConvEditor/xFiles', 'Image Files ({0})', data.files.length)}
+                            {nls.localize('vuengine/imageEditor/xFiles', 'Image Files ({0})', data.files.length)}
                         </label>
                         {data.files.length === 0 &&
                             <div style={{ fontStyle: 'italic' }}>
                                 <i className='codicon codicon-info' style={{ verticalAlign: 'bottom' }} />{' '}
                                 {nls.localize(
-                                    'vuengine/imageConvEditor/noFilesSelected',
+                                    'vuengine/imageEditor/noFilesSelected',
                                     'No images selected. All images in this folder will be converted.'
                                 )}
                             </div>
@@ -62,7 +62,7 @@ export default function ImageConvEditor(props: ImageConvEditorProps): React.JSX.
                         />
                     </VContainer>
                 </VContainer>
-            </ImageConvEditorContext.Provider>
+            </ImageEditorContext.Provider>
         </div>
     );
 }

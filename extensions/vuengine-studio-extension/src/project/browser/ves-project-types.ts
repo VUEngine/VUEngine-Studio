@@ -213,7 +213,7 @@ export const defaultProjectData: ProjectData = {
       icon: 'fa fa-cog'
     },
     Image: {
-      file: '.imageConv',
+      file: '.image',
       schema: {
         title: 'Image Conversion',
         properties: {
@@ -317,7 +317,7 @@ export const defaultProjectData: ProjectData = {
         required: ['files', 'section']
       },
       uiSchema: {
-        type: 'ImageConvEditor',
+        type: 'ImageEditor',
         scope: '#'
       },
       icon: 'fa fa-image',

@@ -34,7 +34,7 @@ export default function Images(props: ImagesProps): React.JSX.Element {
             .sort((a, b) => a.localeCompare(b))
             .map(async p => {
                 let meta = nls.localize(
-                    'vuengine/imageConvEditor/fileNotFound',
+                    'vuengine/imageEditor/fileNotFound',
                     'File not found'
                 );
                 const resolvedUri = workspaceRootUri.resolve(p);
@@ -56,7 +56,7 @@ export default function Images(props: ImagesProps): React.JSX.Element {
 
     const selectFiles = async (): Promise<void> => {
         const openFileDialogProps: OpenFileDialogProps = {
-            title: nls.localize('vuengine/imageConvEditor/selectFiles', 'Select files'),
+            title: nls.localize('vuengine/imageEditor/selectFiles', 'Select files'),
             canSelectFolders: false,
             canSelectFiles: true,
             canSelectMany,
@@ -75,7 +75,7 @@ export default function Images(props: ImagesProps): React.JSX.Element {
                     const relativePath = workspaceRootUri.relative(u);
                     if (!relativePath) {
                         services.messageService.error(
-                            nls.localize('vuengine/imageConvEditor/errorSourceFileMustBeInWorkspace', 'Source file must live in workspace.')
+                            nls.localize('vuengine/imageEditor/errorSourceFileMustBeInWorkspace', 'Source file must live in workspace.')
                         );
                     } else {
                         newFiles.push(relativePath.toString().replace(/\\/g, '/'));
