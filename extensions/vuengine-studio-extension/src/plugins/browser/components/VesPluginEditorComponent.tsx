@@ -1,19 +1,19 @@
 import { URI, nls } from "@theia/core";
 import DOMPurify from "dompurify";
 import React from "react";
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import sanitize from 'sanitize-html';
 import * as showdown from 'showdown';
-import HContainer from "../../../editors/browser/components/Common/HContainer";
-import VContainer from "../../../editors/browser/components/Common/VContainer";
 import { VesPluginsCommands } from "../ves-plugins-commands";
 import AbstractVesPluginComponent, { AbstractVesPluginComponentProps } from "./AbstractVesPluginComponent";
+import VContainer from "../../../editors/browser/components/Common/VContainer";
 
 export default class VesPluginEditorComponent extends AbstractVesPluginComponent {
     constructor(props: AbstractVesPluginComponentProps) {
         super(props);
         this.state = {
             renderedReadme: '',
-            tab: 0,
+            tab: 'details',
         };
     }
 
@@ -59,7 +59,7 @@ export default class VesPluginEditorComponent extends AbstractVesPluginComponent
     }
 
     render(): React.ReactNode {
-        const { id, icon, author, displayName, description, installed, repository, license, tags, dependencies } = this.props.plugin;
+        const { id, icon, author, displayName, description, repository, license, tags, dependencies } = this.props.plugin;
         const { baseStyle, scrollStyle } = this.getSubcomponentStyles();
 
         return <>
@@ -97,52 +97,54 @@ export default class VesPluginEditorComponent extends AbstractVesPluginComponent
                         style={baseStyle}
                     >
                         <VContainer gap={15}>
-                            <HContainer className="ves-plugin-tab-container" gap={15}>
-                                <div
-                                    className={`ves-plugin-tab ${this.state.tab === 0 ? 'active' : ''}`}
-                                    onClick={() => this.setState({ tab: 0 })}
-                                >
-                                    Details
-                                </div>
-                                <div
-                                    className={`ves-plugin-tab ${this.state.tab === 1 ? 'active' : ''}`}
-                                    onClick={() => this.setState({ tab: 1 })}
-                                >
-                                    Dependencies ({dependencies?.length || 0})
-                                </div>
-                                {false && installed && <div
-                                    className={`ves-plugin-tab ${this.state.tab === 2 ? 'active' : ''}`}
-                                    onClick={() => this.setState({ tab: 2 })}
-                                >
-                                    Configuration
-                                </div>}
-                            </HContainer>
 
-                            <VContainer style={{ display: this.state.tab === 0 ? 'flex' : 'none' }}>
-                                {this.state.renderedReadme
-                                    ? <div
-                                        dangerouslySetInnerHTML={{ __html: this.state.renderedReadme }}
-                                    />
-                                    : <>Loading...</>
-                                }
-                            </VContainer>
+                            <Tabs>
+                                <TabList>
+                                    <Tab>
+                                        {nls.localize('vuengine/plugins/details', 'Details')}
+                                    </Tab>
+                                    <Tab>
+                                        {nls.localize('vuengine/plugins/dependencies', 'Dependencies')} ({dependencies?.length || 0})
+                                    </Tab>
+                                    {/*
+                                    <Tab>
+                                        {nls.localize('vuengine/plugins/configuration', 'Configuration')}
+                                    </Tab>
+                                    */}
+                                </TabList>
 
-                            <VContainer style={{ display: this.state.tab === 1 ? 'flex' : 'none' }}>
-                                {dependencies?.length && dependencies?.length > 0
-                                    ? <ul>
-                                        {dependencies.map(dependency =>
-                                            <li>
-                                                <code>{dependency}</code>
-                                            </li>
-                                        )}
-                                    </ul>
-                                    : nls.localize('vuengine/plugins/noDependencies', 'This plugin has no dependencies.')
-                                }
-                            </VContainer>
+                                <TabPanel>
+                                    <VContainer>
+                                        {this.state.renderedReadme &&
+                                            <div
+                                                dangerouslySetInnerHTML={{ __html: this.state.renderedReadme }}
+                                            />
+                                        }
+                                    </VContainer>
+                                </TabPanel>
+                                <TabPanel>
+                                    <VContainer>
+                                        {dependencies?.length && dependencies?.length > 0
+                                            ? <ul>
+                                                {dependencies.map(dependency =>
+                                                    <li>
+                                                        <code>{dependency}</code>
+                                                    </li>
+                                                )}
+                                            </ul>
+                                            : nls.localize('vuengine/plugins/noDependencies', 'This plugin has no dependencies.')
+                                        }
+                                    </VContainer>
+                                </TabPanel>
+                                {/*
+                                <TabPanel>
+                                    <VContainer>
+                                        ...
+                                    </VContainer>
+                                </TabPanel>
+                                */}
+                            </Tabs>
 
-                            <VContainer style={{ display: this.state.tab === 2 ? 'flex' : 'none' }}>
-                                ...
-                            </VContainer>
                         </VContainer>
                     </div>
 

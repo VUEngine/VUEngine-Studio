@@ -1,8 +1,10 @@
 import { nls } from '@theia/core';
-import DockLayout, { LayoutData } from 'rc-dock';
 import React from 'react';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import { ConversionResult } from '../../../../images/browser/ves-images-types';
 import { EditorsContextType } from '../../ves-editors-types';
+import HContainer from '../Common/HContainer';
+import VContainer from '../Common/VContainer';
 import Animations from './Animations/Animations';
 import Colliders from './Colliders/Colliders';
 import Entity from './Entity/Entity';
@@ -226,179 +228,102 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
   }
 
   async componentDidMount(): Promise<void> {
-    const { dock } = this.props.context;
-    dock.restoreLayout();
     this.restorePreviewState();
   }
 
   render(): React.JSX.Element {
-    const { dock } = this.props.context;
     const { data } = this.props;
 
     const mostFilesOnASprite = this.getMostFilesOnASprite(data);
     const isMultiFileAnimation = mostFilesOnASprite > 1;
 
-    const defaultLayout: LayoutData = {
-      dockbox: {
-        mode: 'horizontal',
-        children: [
-          {
-            size: 99999,
-            mode: 'vertical',
-            children: [
-              {
-                tabs: [
-                  {
-                    id: 'tab-entity',
-                    title: nls.localize(
-                      'vuengine/entityEditor/entity',
-                      'Entity'
-                    ),
-                    minHeight: 200,
-                    minWidth: 200,
-                    content: (
-                      <EntityEditorContext.Consumer>
-                        {context => <Entity />}
-                      </EntityEditorContext.Consumer>
-                    ),
-                  },
-                  {
-                    id: 'tab-sprites',
-                    title: nls.localize(
-                      'vuengine/entityEditor/sprites',
-                      'Sprites'
-                    ),
-                    minHeight: 200,
-                    minWidth: 200,
-                    content: (
-                      <EntityEditorContext.Consumer>
-                        {context => <Sprites
-                          isMultiFileAnimation={isMultiFileAnimation}
-                        />}
-                      </EntityEditorContext.Consumer>
-                    ),
-                  },
-                  {
-                    id: 'tab-animations',
-                    title: nls.localize(
-                      'vuengine/entityEditor/animations',
-                      'Animations'
-                    ),
-                    minHeight: 200,
-                    minWidth: 200,
-                    content: (
-                      <EntityEditorContext.Consumer>
-                        {context => <Animations />}
-                      </EntityEditorContext.Consumer>
-                    ),
-                  },
-                  {
-                    id: 'tab-colliders',
-                    title: nls.localize(
-                      'vuengine/entityEditor/colliders',
-                      'Colliders'
-                    ),
-                    minHeight: 200,
-                    minWidth: 200,
-                    content: (
-                      <EntityEditorContext.Consumer>
-                        {context => <Colliders />}
-                      </EntityEditorContext.Consumer>
-                    ),
-                  },
-                  /*
-                  {
-                    id: 'tab-scripts',
-                    title: nls.localize(
-                      'vuengine/entityEditor/scripts',
-                      'Scripts'
-                    ),
-                    minHeight: 200,
-                    minWidth: 200,
-                    content: (
-                      <EntityEditorContext.Consumer>
-                        {context => <Scripts />}
-                      </EntityEditorContext.Consumer>
-                    ),
-                  },
-                  */
-                  /*
-                  {
-                    id: 'tab-states',
-                    title: nls.localize(
-                      'vuengine/entityEditor/states',
-                      'States'
-                    ),
-                    minHeight: 200,
-                    minWidth: 200,
-                    content: (
-                      <EntityEditorContext.Consumer>
-                        {context => <States />}
-                      </EntityEditorContext.Consumer>
-                    ),
-                  },
-                  */
-                  {
-                    id: 'tab-wireframes',
-                    title: nls.localize(
-                      'vuengine/entityEditor/wireframes',
-                      'Wireframes'
-                    ),
-                    minHeight: 200,
-                    minWidth: 200,
-                    content: (
-                      <EntityEditorContext.Consumer>
-                        {context => <Wireframes />}
-                      </EntityEditorContext.Consumer>
-                    ),
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            tabs: [
-              {
-                id: 'tab-preview',
-                title: nls.localize(
-                  'vuengine/entityEditor/preview',
-                  'Preview'
-                ),
-                minHeight: 250,
-                minWidth: 250,
-                content: (
-                  <EntityEditorContext.Consumer>
-                    {context => (
-                      <Preview />
-                    )}
-                  </EntityEditorContext.Consumer>
-                ),
-              },
-            ],
-          },
-        ],
-      },
-    };
-
     return (
-      <div className="entityEditor">
-        <EntityEditorContext.Provider
-          value={{
-            state: this.state,
-            setState: this.updateState.bind(this),
-            data,
-            setData: this.setData.bind(this),
-          }}
-        >
-          <DockLayout
-            style={{ flexGrow: 1 }}
-            defaultLayout={defaultLayout}
-            dropMode="edge"
-            ref={dock.getRef}
-            onLayoutChange={dock.persistLayout}
-          />
-        </EntityEditorContext.Provider>
-      </div>
+      <EntityEditorContext.Provider
+        value={{
+          state: this.state,
+          setState: this.updateState.bind(this),
+          data,
+          setData: this.setData.bind(this),
+        }}
+      >
+        <HContainer className="entityEditor" gap={20}>
+          <VContainer gap={15} grow={1}>
+            <Tabs>
+              <TabList>
+                <Tab>
+                  {nls.localize('vuengine/entityEditor/entity', 'Entity')}
+                </Tab>
+                <Tab>
+                  {nls.localize('vuengine/entityEditor/sprites', 'Sprites')} ({data.sprites.sprites.length})
+                </Tab>
+                <Tab>
+                  {nls.localize('vuengine/entityEditor/animations', 'Animations')} ({data.animations.animations.length})
+                </Tab>
+                <Tab>
+                  {nls.localize('vuengine/entityEditor/colliders', 'Colliders')} ({data.colliders.colliders.length})
+                </Tab>
+                <Tab>
+                  {nls.localize('vuengine/entityEditor/wireframes', 'Wireframes')} ({data.wireframes.wireframes.length})
+                </Tab>
+              </TabList>
+
+              <TabPanel>
+                <EntityEditorContext.Consumer>
+                  {context =>
+                    <Entity />
+                  }
+                </EntityEditorContext.Consumer>
+              </TabPanel>
+              <TabPanel>
+                <EntityEditorContext.Consumer>
+                  {context =>
+                    <Sprites
+                      isMultiFileAnimation={isMultiFileAnimation}
+                    />
+                  }
+                </EntityEditorContext.Consumer>
+              </TabPanel>
+              <TabPanel>
+                <EntityEditorContext.Consumer>
+                  {context =>
+                    <Animations />
+                  }
+                </EntityEditorContext.Consumer>
+              </TabPanel>
+              <TabPanel>
+                <EntityEditorContext.Consumer>
+                  {context =>
+                    <Colliders />
+                  }
+                </EntityEditorContext.Consumer>
+              </TabPanel>
+              <TabPanel>
+                <EntityEditorContext.Consumer>
+                  {context =>
+                    <Wireframes />
+                  }
+                </EntityEditorContext.Consumer>
+              </TabPanel>
+            </Tabs>
+
+          </VContainer>
+          <VContainer gap={15}>
+            <Tabs>
+              <TabList>
+                <Tab>{nls.localize('vuengine/entityEditor/preview', 'Preview')}</Tab>
+              </TabList>
+
+              <TabPanel>
+                <EntityEditorContext.Consumer>
+                  {context => (
+                    <Preview />
+                  )}
+                </EntityEditorContext.Consumer>
+              </TabPanel>
+            </Tabs>
+          </VContainer>
+        </HContainer>
+      </EntityEditorContext.Provider >
     );
   }
 }

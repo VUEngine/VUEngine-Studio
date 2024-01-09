@@ -8,7 +8,7 @@
     height: 300px;
     overflow: hidden;
     position: relative;
-    width: 100%;
+    width: 300px;
 }
 
 .jsonforms-container .preview-container .sprite-error {

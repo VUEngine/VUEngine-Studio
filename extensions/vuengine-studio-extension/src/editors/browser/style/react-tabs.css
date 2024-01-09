@@ -1,0 +1,33 @@
+.react-tabs__tab {
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    display: inline-block;
+    font-weight: bold;
+    line-height: 30px;
+    list-style: none;
+    margin-right: 15px;
+    user-select: none;
+}
+
+.react-tabs__tab:last-child {
+    margin-right: 0;
+}
+
+.react-tabs__tab:focus {
+    border-color: var(--theia-button-background);
+    outline: none;
+}
+
+.react-tabs__tab--selected {
+    border-color: var(--theia-editor-foreground);
+}
+
+
+.react-tabs {
+    flex-grow: 1;
+}
+
+.react-tabs__tab-list {
+    margin: 0 0 20px;
+    padding: 0;
+}

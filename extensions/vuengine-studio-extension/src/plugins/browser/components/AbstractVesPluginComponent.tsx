@@ -13,7 +13,7 @@ export interface AbstractVesPluginComponentProps {
 
 export interface AbstractVesPluginComponentState {
     renderedReadme?: string
-    tab?: number
+    tab?: string
 }
 
 export default abstract class AbstractVesPluginComponent extends React.Component<AbstractVesPluginComponentProps, AbstractVesPluginComponentState> {
