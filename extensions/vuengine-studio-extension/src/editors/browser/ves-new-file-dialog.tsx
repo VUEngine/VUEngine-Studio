@@ -4,12 +4,12 @@ import { ReactDialog } from '@theia/core/lib/browser/dialogs/react-dialog';
 import { inject, injectable } from 'inversify';
 import * as React from 'react';
 import { VesProjectService } from '../../project/browser/ves-project-service';
-import { ProjectContributor, ProjectFileTypesWithContributor } from '../../project/browser/ves-project-types';
+import { ProjectContributor, ProjectDataTypesWithContributor } from '../../project/browser/ves-project-types';
 
 @injectable()
 export class VesNewFileDialogProps extends DialogProps {
     parentLabel: string;
-    types: ProjectFileTypesWithContributor;
+    types: ProjectDataTypesWithContributor;
     vesProjectService: VesProjectService;
     defaultName: string;
     defaultExt: string;

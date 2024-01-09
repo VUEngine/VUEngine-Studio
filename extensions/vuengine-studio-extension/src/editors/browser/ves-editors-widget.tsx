@@ -28,7 +28,7 @@ import DockLayout, { LayoutBase } from 'rc-dock';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesImagesService } from '../../images/browser/ves-images-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
-import { ProjectFileType } from '../../project/browser/ves-project-types';
+import { ProjectDataType } from '../../project/browser/ves-project-types';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
 import { VES_RENDERERS } from './renderers/ves-renderers';
 import { EditorsContext } from './ves-editors-types';
@@ -211,9 +211,9 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
             this.changeEmitter.fire(state.data);
 
         this.toDispose.pushAll([
-            this.vesProjectService.onDidAddProjectItem(() => this.rerenderOnProjectFileUpdate()),
-            this.vesProjectService.onDidDeleteProjectItem(() => this.rerenderOnProjectFileUpdate()),
-            this.vesProjectService.onDidUpdateProjectItem(() => this.rerenderOnProjectFileUpdate()),
+            this.vesProjectService.onDidAddProjectItem(() => this.rerenderOnProjectDataUpdate()),
+            this.vesProjectService.onDidDeleteProjectItem(() => this.rerenderOnProjectDataUpdate()),
+            this.vesProjectService.onDidUpdateProjectItem(() => this.rerenderOnProjectDataUpdate()),
             this.editorPreferences.onPreferenceChanged(ev => {
                 if (ev.preferenceName === 'files.autoSave') {
                     this.autoSave = ev.newValue;
@@ -225,7 +225,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         ]);
     }
 
-    protected rerenderOnProjectFileUpdate(): void {
+    protected rerenderOnProjectDataUpdate(): void {
         if (!this.justSaved) {
             this.update();
         }
@@ -270,7 +270,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         this.update();
     }
 
-    protected async loadData(type: ProjectFileType): Promise<void> {
+    protected async loadData(type: ProjectDataType): Promise<void> {
         let json = {};
         try {
             json = JSON.parse(this.reference?.object.getText() || '{}');
@@ -348,7 +348,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         this.savedData = this.data;
     }
 
-    protected async mergeOntoDefaults(type: ProjectFileType): Promise<void> {
+    protected async mergeOntoDefaults(type: ProjectDataType): Promise<void> {
         const needsId = type.file.startsWith('.');
         if (type.schema.properties && needsId) {
             type.schema.properties['_id'] = {

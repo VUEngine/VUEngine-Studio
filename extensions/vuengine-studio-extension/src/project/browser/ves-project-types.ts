@@ -5,46 +5,47 @@ export const VUENGINE_WORKSPACE_EXT = 'workspace';
 
 export const PROJECT_CHANNEL_NAME = 'Project Data';
 
-export interface ProjectFile {
-  combined?: {
-    items?: ProjectFileItemsByTypeWithContributor
-    templates?: ProjectFileTemplatesWithContributor
-    types?: ProjectFileTypesWithContributor
-  }
-  items?: ProjectFileItems
-  templates?: ProjectFileTemplates
-  types?: ProjectFileTypes
+export interface ProjectData {
+  items?: ProjectDataItems
+  templates?: ProjectDataTemplates
+  types?: ProjectDataTypes
 };
 
-export interface ProjectFileItemsByType {
-  [typeId: string]: ProjectFileItems
+export interface ProjectDataWithContributor {
+  items?: ProjectDataItemsByTypeWithContributor
+  templates?: ProjectDataTemplatesWithContributor
+  types?: ProjectDataTypesWithContributor
 };
 
-export interface ProjectFileItems {
-  [itemId: string]: ProjectFileItem
+export interface ProjectDataItemsByType {
+  [typeId: string]: ProjectDataItems
 };
 
-export interface ProjectFileItem {
+export interface ProjectDataItems {
+  [itemId: string]: ProjectDataItem
+};
+
+export interface ProjectDataItem {
   [id: string]: unknown
 };
 
-export interface ProjectFileItemsWithContributor extends ProjectFileItem {
+export interface ProjectDataItemsWithContributor extends ProjectDataItem {
   [id: string]: unknown & WithContributor & WithFileUri
 };
 
-export interface ProjectFileItemsByTypeWithContributor {
-  [typeId: string]: ProjectFileItemsWithContributor
+export interface ProjectDataItemsByTypeWithContributor {
+  [typeId: string]: ProjectDataItemsWithContributor
 };
 
-export interface ProjectFileTypes {
-  [typeId: string]: ProjectFileType
+export interface ProjectDataTypes {
+  [typeId: string]: ProjectDataType
 };
 
-export interface ProjectFileTypesWithContributor extends ProjectFileTypes {
-  [typeId: string]: ProjectFileType & WithContributor
+export interface ProjectDataTypesWithContributor extends ProjectDataTypes {
+  [typeId: string]: ProjectDataType & WithContributor
 };
 
-export interface ProjectFileType {
+export interface ProjectDataType {
   enabled?: boolean
   file: string
   icon?: string
@@ -54,47 +55,47 @@ export interface ProjectFileType {
   forFiles?: string[]
 };
 
-export interface ProjectFileTemplates {
-  [key: string]: ProjectFileTemplate
+export interface ProjectDataTemplates {
+  [key: string]: ProjectDataTemplate
 }
 
-export interface ProjectFileTemplatesWithContributor extends ProjectFileTemplates {
-  [key: string]: ProjectFileTemplate & WithContributor
+export interface ProjectDataTemplatesWithContributor extends ProjectDataTemplates {
+  [key: string]: ProjectDataTemplate & WithContributor
 }
 
-export interface ProjectFileTemplateEvent {
-  type: ProjectFileTemplateEventType
+export interface ProjectDataTemplateEvent {
+  type: ProjectDataTemplateEventType
   value?: unknown
 }
 
-export enum ProjectFileTemplateEventType {
+export enum ProjectDataTemplateEventType {
   installedPluginsChanged = 'installedPluginsChanged',
   itemOfTypeGotDeleted = 'itemOfTypeGotDeleted',
 }
 
-export enum ProjectFileTemplateTargetRoot {
+export enum ProjectDataTemplateTargetRoot {
   project = 'project',
   file = 'file',
 }
-export enum ProjectFileTemplateTargetForEachOfType {
+export enum ProjectDataTemplateTargetForEachOfType {
   var = 'var',
   fileInFolder = 'fileInFolder',
 }
 
-export interface ProjectFileTemplateTarget {
+export interface ProjectDataTemplateTarget {
   path: string
-  root: ProjectFileTemplateTargetRoot
-  forEachOf?: { [ProjectFileTemplateTargetForEachOfType.var]: string } | { [ProjectFileTemplateTargetForEachOfType.fileInFolder]: string | string[] }
+  root: ProjectDataTemplateTargetRoot
+  forEachOf?: { [ProjectDataTemplateTargetForEachOfType.var]: string } | { [ProjectDataTemplateTargetForEachOfType.fileInFolder]: string | string[] }
   conditions?: RulesLogic<AdditionalOperation>
 }
 
-export interface ProjectFileTemplate {
+export interface ProjectDataTemplate {
   enabled?: boolean
-  targets: ProjectFileTemplateTarget[]
+  targets: ProjectDataTemplateTarget[]
   template: string
-  encoding?: ProjectFileTemplateEncoding
+  encoding?: ProjectDataTemplateEncoding
   itemSpecific?: string
-  events?: ProjectFileTemplateEvent[]
+  events?: ProjectDataTemplateEvent[]
 }
 
 export interface WithContributor {
@@ -106,7 +107,7 @@ export interface WithFileUri {
   _fileUri: URI
 }
 
-export enum ProjectFileTemplateEncoding {
+export enum ProjectDataTemplateEncoding {
   ShiftJIS = 'shift_jis',
   utf8 = 'utf8',
   win1252 = 'win1252',
@@ -119,12 +120,12 @@ export enum ProjectContributor {
   Studio = 'studio',
 }
 
-export const defaultProjectData: ProjectFile = {
+export const defaultProjectData: ProjectData = {
   templates: {
     'Image.c': {
       targets: [{
         path: 'Converted/${_forEachOfBasename}.c',
-        root: ProjectFileTemplateTargetRoot.file,
+        root: ProjectDataTemplateTargetRoot.file,
         forEachOf: { 'var': 'files' },
         conditions: {
           'and': [
@@ -140,7 +141,7 @@ export const defaultProjectData: ProjectFile = {
         }
       }, {
         path: 'Converted/${_forEachOfBasename}.c',
-        root: ProjectFileTemplateTargetRoot.file,
+        root: ProjectDataTemplateTargetRoot.file,
         forEachOf: { 'fileInFolder': ['*.png'] },
         conditions: {
           'and': [
@@ -156,7 +157,7 @@ export const defaultProjectData: ProjectFile = {
         }
       }, {
         path: 'Converted/${_filename}.c',
-        root: ProjectFileTemplateTargetRoot.file,
+        root: ProjectDataTemplateTargetRoot.file,
         conditions: {
           'or': [
             {
@@ -175,10 +176,10 @@ export const defaultProjectData: ProjectFile = {
     'RomInfo.h': {
       targets: [{
         path: 'headers/RomInfo.h',
-        root: ProjectFileTemplateTargetRoot.project,
+        root: ProjectDataTemplateTargetRoot.project,
       }],
       template: 'RomInfo.h.nj',
-      encoding: ProjectFileTemplateEncoding.ShiftJIS
+      encoding: ProjectDataTemplateEncoding.ShiftJIS
     }
   },
   types: {

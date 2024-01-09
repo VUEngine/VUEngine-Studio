@@ -19,10 +19,10 @@ import { VesProcessService } from '../../process/common/ves-process-service-prot
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import {
   ProjectContributor,
-  ProjectFileTemplate,
-  ProjectFileTemplateEncoding,
-  ProjectFileTemplateEventType,
-  ProjectFileTemplateTargetForEachOfType,
+  ProjectDataTemplate,
+  ProjectDataTemplateEncoding,
+  ProjectDataTemplateEventType,
+  ProjectDataTemplateTargetForEachOfType,
   WithContributor
 } from '../../project/browser/ves-project-types';
 import { CODEGEN_CHANNEL_NAME, IsGeneratingFilesStatus, SHOW_DONE_DURATION } from './ves-codegen-types';
@@ -264,7 +264,7 @@ export class VesCodeGenService {
   }
 
   /*
-  protected hasChanges(type: ProjectFileType & WithContributor): boolean {
+  protected hasChanges(type: ProjectDataType & WithContributor): boolean {
     // TODO: at this point, we'd need to know which files are affected by a conversion file, e.g. imageConv, but this information is currently not available
     let hasChanges = false;
     type.templates?.map(templateId => {
@@ -302,7 +302,7 @@ export class VesCodeGenService {
     targetUri: URI,
     templateString: string,
     data: object,
-    encoding: ProjectFileTemplateEncoding = ProjectFileTemplateEncoding.utf8
+    encoding: ProjectDataTemplateEncoding = ProjectDataTemplateEncoding.utf8
   ): Promise<void> {
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
@@ -358,7 +358,7 @@ export class VesCodeGenService {
       return 0;
     }
 
-    const encoding = template.encoding ? template.encoding : ProjectFileTemplateEncoding.utf8;
+    const encoding = template.encoding ? template.encoding : ProjectDataTemplateEncoding.utf8;
 
     const uri = itemUri || new URI();
     const data = {
@@ -375,10 +375,10 @@ export class VesCodeGenService {
 
   protected async renderFilesFromTemplate(
     templateId: string,
-    template: ProjectFileTemplate & WithContributor,
+    template: ProjectDataTemplate & WithContributor,
     itemUri: URI,
     data: any,
-    encoding: ProjectFileTemplateEncoding
+    encoding: ProjectDataTemplateEncoding
   ): Promise<number> {
     let templateUri = template._contributorUri;
     const templatePathParts = template.template.split('/');
@@ -445,13 +445,13 @@ export class VesCodeGenService {
         const forEachOfValue = Object.values(t.forEachOf)[0] as string;
         const items = [];
         switch (forEachOfType) {
-          case ProjectFileTemplateTargetForEachOfType.var:
+          case ProjectDataTemplateTargetForEachOfType.var:
             items.push(...this.vesCommonService.getByKey(data.item, forEachOfValue));
             if (!Array.isArray(items)) {
               return console.error(`forEachOf "${forEachOfValue}" does not exist on item or is not an array`);
             }
             break;
-          case ProjectFileTemplateTargetForEachOfType.fileInFolder:
+          case ProjectDataTemplateTargetForEachOfType.fileInFolder:
             const paths = await Promise.all(window.electronVesCore.findFiles(await this.fileService.fsPath(itemUri.parent), forEachOfValue)
               .map(async p => workspaceRootUri.relative(itemUri.parent.resolve(p))));
             items.push(...paths);
@@ -478,7 +478,7 @@ export class VesCodeGenService {
         const template = templates[templateId];
         if (template.events) {
           await Promise.all(template.events.map(async event => {
-            if (event.type === ProjectFileTemplateEventType.installedPluginsChanged) {
+            if (event.type === ProjectDataTemplateEventType.installedPluginsChanged) {
               return this.renderTemplate(templateId);
             }
           }));
@@ -494,7 +494,7 @@ export class VesCodeGenService {
         const template = templates[templateId];
         if (template.events) {
           await Promise.all(template.events.map(async templateEvent => {
-            if (templateEvent.type === ProjectFileTemplateEventType.itemOfTypeGotDeleted
+            if (templateEvent.type === ProjectDataTemplateEventType.itemOfTypeGotDeleted
               && templateEvent.value === typeId) {
               await this.renderTemplate(templateId);
             }
