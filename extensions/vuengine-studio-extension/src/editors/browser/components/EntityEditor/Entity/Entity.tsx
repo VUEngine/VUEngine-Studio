@@ -1,110 +1,60 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import HContainer from '../../Common/HContainer';
-import InfoLabel from '../../Common/InfoLabel';
 import VContainer from '../../Common/VContainer';
 import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
-import Behaviors from './Behaviors';
-import Children from './Children';
-import Physics from './Physics';
 
 export default function Entity(): React.JSX.Element {
     const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
+
+    const getCharCount = (): number => {
+        let totalChars = 0;
+        data.sprites?.sprites?.map(s => {
+            if (s._imageData !== undefined && typeof s._imageData !== 'number') {
+                if (s._imageData.animation?.largestFrame) {
+                    totalChars += s._imageData.animation?.largestFrame;
+                } else {
+                    if (s._imageData.tiles?.count) {
+                        totalChars += data.animations?.animations?.length > 0 && !data.animations.multiframe
+                            ? s._imageData.tiles?.count / data.animations?.totalFrames || 1
+                            : s._imageData.tiles?.count;
+                    }
+                }
+            }
+        });
+
+        return totalChars;
+    };
+
+    const charCount = getCharCount();
 
     const setName = (n: string): void => {
         setData({ name: n });
     };
 
-    const setExtraInfo = (e: string): void => {
-        setData({ extraInfo: e });
-    };
-
-    const setPixelSizeX = (x: number): void => {
-        setData({
-            pixelSize: {
-                ...data.pixelSize, x
-            }
-        });
-    };
-
-    const setPixelSizeY = (y: number): void => {
-        setData({
-            pixelSize: {
-                ...data.pixelSize, y
-            }
-        });
-    };
-
-    const setPixelSizeZ = (z: number): void => {
-        setData({
-            pixelSize: {
-                ...data.pixelSize, z
-            }
-        });
-    };
-
-    return <VContainer gap={15}>
+    return <HContainer gap={15} alignItems='start'>
         <VContainer>
             <label>
                 {nls.localize('vuengine/entityEditor/name', 'Name')}
             </label>
             <input
-                className='theia-input large'
+                className='theia-input'
                 value={data.name}
                 onChange={e => setName(e.target.value)}
             />
         </VContainer>
-        <HContainer gap={15}>
+        {charCount > 0 &&
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/entityEditor/extraInfo', 'Extra Info')}
+                    {nls.localize('vuengine/entityEditor/chars', 'Chars')}
                 </label>
                 <input
-                    className='theia-input'
-                    value={data.extraInfo}
-                    onChange={e => setExtraInfo(e.target.value)}
+                    className={`theia-input heaviness ${charCount > 1200 ? 'heavinessHeavy' : charCount > 600 ? 'heavinessMedium' : 'heavinessLight'}`}
+                    type='text'
+                    value={charCount}
+                    disabled
                 />
             </VContainer>
-            <VContainer>
-                <InfoLabel
-                    label={nls.localize('vuengine/entityEditor/entitySize', 'Size (x, y, z)')}
-                    tooltip={
-                        nls.localize(
-                            'vuengine/entityEditor/entitySizeDescription',
-                            'Size of the entity in pixels. Used by streaming to test if out of screen bounds. ' +
-                            'If 0, width and height will be inferred from the first sprite\'s texture\'s size.'
-                        )}
-                />
-                <HContainer>
-                    <input
-                        className='theia-input'
-                        style={{ width: 48 }}
-                        type='number'
-                        value={data.pixelSize.x}
-                        onChange={e => setPixelSizeX(parseInt(e.target.value))}
-                        min={0}
-                    />
-                    <input
-                        className='theia-input'
-                        style={{ width: 48 }}
-                        type='number'
-                        value={data.pixelSize.y}
-                        onChange={e => setPixelSizeY(parseInt(e.target.value))}
-                        min={0}
-                    />
-                    <input
-                        className='theia-input'
-                        style={{ width: 48 }}
-                        type='number'
-                        value={data.pixelSize.z}
-                        onChange={e => setPixelSizeZ(parseInt(e.target.value))}
-                        min={0}
-                    />
-                </HContainer>
-            </VContainer>
-        </HContainer>
-        <Physics />
-        <Behaviors />
-        <Children />
-    </VContainer>;
+        }
+    </HContainer>;
 }

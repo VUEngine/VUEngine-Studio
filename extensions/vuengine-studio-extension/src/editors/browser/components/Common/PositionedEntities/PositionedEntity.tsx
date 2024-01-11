@@ -1,9 +1,10 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
+import { WithFileUri } from '../../../../../project/browser/ves-project-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import { EntityData, PositionedEntityData } from '../../EntityEditor/EntityEditorTypes';
 import HContainer from '../HContainer';
 import VContainer from '../VContainer';
-import { PositionedEntityData } from '../../EntityEditor/EntityEditorTypes';
 
 interface PositionedEntityProps {
     positionedEntity: PositionedEntityData
@@ -15,7 +16,7 @@ export default function PositionedEntity(props: PositionedEntityProps): React.JS
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const { positionedEntity, updatePositionedEntity, removePositionedEntity } = props;
 
-    const entityItem = services.vesProjectService.getProjectDataItemById(positionedEntity.itemId, 'Entity');
+    const entityItem = services.vesProjectService.getProjectDataItemById(positionedEntity.itemId, 'Entity') as EntityData & WithFileUri;
 
     const setName = (name: string): void => {
         updatePositionedEntity({
@@ -71,6 +72,15 @@ export default function PositionedEntity(props: PositionedEntityProps): React.JS
         });
     };
 
+    const openEditor = async (): Promise<void> => {
+        console.log(entityItem);
+
+        if (entityItem && entityItem._fileUri) {
+            const opener = await services.openerService.getOpener(entityItem._fileUri);
+            await opener.open(entityItem._fileUri);
+        }
+    };
+
     return <div className='item'>
         <button
             className="remove-button"
@@ -81,17 +91,24 @@ export default function PositionedEntity(props: PositionedEntityProps): React.JS
         </button>
         <HContainer gap={15} wrap='wrap'>
             {entityItem ? <>
-                <VContainer>
-                    <label>Entity</label>
-                    <HContainer>
+                <HContainer alignItems='end'>
+                    <VContainer>
+                        <label>Entity</label>
                         <input
                             className='theia-input'
                             // @ts-ignore
                             value={entityItem.name}
                             disabled
                         />
-                    </HContainer>
-                </VContainer>
+                    </VContainer>
+                    <button
+                        className='theia-button secondary'
+                        onClick={openEditor}
+                        title={nls.localize('vuengine/entityEditor/editEntity', 'Edit Entity')}
+                    >
+                        <i className='codicon codicon-edit' />
+                    </button>
+                </HContainer>
                 <VContainer>
                     <label>Position (x, y, z, parallax)</label>
                     <HContainer>

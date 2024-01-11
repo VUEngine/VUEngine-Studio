@@ -377,57 +377,60 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
             }}>
                 <HContainer gap={20}>
                     <VContainer gap={15} grow={1}>
-                        <Tabs style={{ height: 330 }}>
-                            <TabList>
-                                <Tab>
-                                    {nls.localize('vuengine/musicEditor/sequencer', 'Sequencer')}
-                                </Tab>
-                                <Tab>
-                                    {nls.localize('vuengine/musicEditor/instruments', 'Instruments')}
-                                </Tab>
-                                <Tab>
-                                    {nls.localize('vuengine/musicEditor/waveforms', 'Waveforms')}
-                                </Tab>
-                            </TabList>
+                        <VContainer>
+                            <Tabs>
+                                <TabList>
+                                    <Tab>
+                                        {nls.localize('vuengine/musicEditor/sequencer', 'Sequencer')}
+                                    </Tab>
+                                    <Tab>
+                                        {nls.localize('vuengine/musicEditor/instruments', 'Instruments')}
+                                    </Tab>
+                                    <Tab>
+                                        {nls.localize('vuengine/musicEditor/waveforms', 'Waveforms')}
+                                    </Tab>
+                                </TabList>
 
-                            <TabPanel>
-                                <MusicEditorContext.Consumer>
-                                    {context =>
-                                        <Sequencer />
-                                    }
-                                </MusicEditorContext.Consumer>
-                            </TabPanel>
-                            <TabPanel>
-                                <MusicEditorContext.Consumer>
-                                    {context =>
-                                        <Instruments />
-                                    }
-                                </MusicEditorContext.Consumer>
-                            </TabPanel>
-                            <TabPanel>
-                                <MusicEditorContext.Consumer>
-                                    {context =>
-                                        <Waveforms />
-                                    }
-                                </MusicEditorContext.Consumer>
-                            </TabPanel>
-                        </Tabs>
+                                <TabPanel>
+                                    <MusicEditorContext.Consumer>
+                                        {context =>
+                                            <Sequencer />
+                                        }
+                                    </MusicEditorContext.Consumer>
+                                </TabPanel>
+                                <TabPanel>
+                                    <MusicEditorContext.Consumer>
+                                        {context =>
+                                            <Instruments />
+                                        }
+                                    </MusicEditorContext.Consumer>
+                                </TabPanel>
+                                <TabPanel>
+                                    <MusicEditorContext.Consumer>
+                                        {context =>
+                                            <Waveforms />
+                                        }
+                                    </MusicEditorContext.Consumer>
+                                </TabPanel>
+                            </Tabs>
+                        </VContainer>
+                        <VContainer gap={15} grow={1}>
+                            <Tabs>
+                                <TabList>
+                                    <Tab>
+                                        {nls.localize('vuengine/musicEditor/pianoRoll', 'Piano Roll')}
+                                    </Tab>
+                                </TabList>
 
-                        <Tabs style={{ flexGrow: 1 }}>
-                            <TabList>
-                                <Tab>
-                                    {nls.localize('vuengine/musicEditor/pianoRoll', 'Piano Roll')}
-                                </Tab>
-                            </TabList>
-
-                            <TabPanel>
-                                <MusicEditorContext.Consumer>
-                                    {context =>
-                                        <PianoRoll />
-                                    }
-                                </MusicEditorContext.Consumer>
-                            </TabPanel>
-                        </Tabs>
+                                <TabPanel>
+                                    <MusicEditorContext.Consumer>
+                                        {context =>
+                                            <PianoRoll />
+                                        }
+                                    </MusicEditorContext.Consumer>
+                                </TabPanel>
+                            </Tabs>
+                        </VContainer>
                     </VContainer>
                     <VContainer gap={15} style={{ width: 250 }}>
                         <Tabs>

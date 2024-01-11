@@ -1,12 +1,9 @@
-import { nls } from '@theia/core';
 import React from 'react';
-import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import { ConversionResult } from '../../../../images/browser/ves-images-types';
 import { EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/HContainer';
 import VContainer from '../Common/VContainer';
-import Animations from './Animations/Animations';
-import Colliders from './Colliders/Colliders';
+import Components from './Entity/Components';
 import Entity from './Entity/Entity';
 import {
   EntityData,
@@ -16,8 +13,8 @@ import {
   defaultHighlightedSprite
 } from './EntityEditorTypes';
 import Preview from './Preview/Preview';
-import Sprites from './Sprites/Sprites';
-import Wireframes from './Wireframes/Wireframes';
+import SpritesSettings from './Sprites/SpritesSettings';
+import CollidersSettings from './Collider/CollidersSettings';
 
 interface EntityEditorProps {
   data: EntityData;
@@ -89,7 +86,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
   }
 
   protected postProcessData(entityData: EntityData): EntityData {
-    if (!entityData.animations.enabled) {
+    if (!entityData.animations.animations.length) {
       // set total frames to 1 when disabling animations
       entityData.animations.totalFrames = 1;
     } else {
@@ -139,14 +136,14 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
   protected async appendImageData(entityData: EntityData): Promise<EntityData> {
     const { fileUri, services } = this.props.context;
     const mostFilesOnASprite = this.getMostFilesOnASprite(entityData);
-    const isMultiFileAnimation = entityData.animations.enabled && mostFilesOnASprite > 1;
-    const optimizeTiles = (!entityData.animations.enabled && entityData.sprites.optimizedTiles)
-      || (entityData.animations.enabled && isMultiFileAnimation);
+    const isMultiFileAnimation = entityData.animations.animations.length > 0 && mostFilesOnASprite > 1;
+    const optimizeTiles = (entityData.animations.animations.length === 0 && entityData.sprites.optimizedTiles)
+      || (entityData.animations.animations.length > 0 && isMultiFileAnimation);
     const baseConfig = {
       animation: {
         frames: isMultiFileAnimation ? mostFilesOnASprite : entityData.animations.totalFrames,
         individualFiles: isMultiFileAnimation,
-        isAnimation: entityData.animations.enabled
+        isAnimation: entityData.animations.animations.length > 0
       },
       files: [],
       map: {
@@ -161,11 +158,11 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
       section: entityData.sprites.section,
       tileset: {
         compression: entityData.sprites.compression,
-        shared: !entityData.animations.enabled && entityData.sprites.sharedTiles,
+        shared: !entityData.animations.animations.length && entityData.sprites.sharedTiles,
       }
     };
 
-    if (!entityData.animations.enabled && entityData.sprites?.sharedTiles) {
+    if (!entityData.animations.animations.length && entityData.sprites?.sharedTiles) {
       const files: string[] = [];
       // keep track of added files to be able to map back maps later
       const spriteFilesIndex: { [key: string]: number } = {};
@@ -194,6 +191,8 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
             })),
             _dupeIndex: 1,
           };
+        } else {
+          sprite._imageData = undefined;
         }
       }));
     } else {
@@ -216,6 +215,8 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
               _dupeIndex: i + 1,
             };
           }
+        } else {
+          sprite._imageData = undefined;
         }
       }
     }
@@ -248,79 +249,27 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
       >
         <HContainer className="entityEditor" gap={20}>
           <VContainer gap={15} grow={1}>
-            <Tabs>
-              <TabList>
-                <Tab>
-                  {nls.localize('vuengine/entityEditor/entity', 'Entity')}
-                </Tab>
-                <Tab>
-                  {nls.localize('vuengine/entityEditor/sprites', 'Sprites')} ({data.sprites.sprites.length})
-                </Tab>
-                <Tab>
-                  {nls.localize('vuengine/entityEditor/animations', 'Animations')} ({data.animations.animations.length})
-                </Tab>
-                <Tab>
-                  {nls.localize('vuengine/entityEditor/colliders', 'Colliders')} ({data.colliders.colliders.length})
-                </Tab>
-                <Tab>
-                  {nls.localize('vuengine/entityEditor/wireframes', 'Wireframes')} ({data.wireframes.wireframes.length})
-                </Tab>
-              </TabList>
-
-              <TabPanel>
-                <EntityEditorContext.Consumer>
-                  {context =>
-                    <Entity />
-                  }
-                </EntityEditorContext.Consumer>
-              </TabPanel>
-              <TabPanel>
-                <EntityEditorContext.Consumer>
-                  {context =>
-                    <Sprites
-                      isMultiFileAnimation={isMultiFileAnimation}
-                    />
-                  }
-                </EntityEditorContext.Consumer>
-              </TabPanel>
-              <TabPanel>
-                <EntityEditorContext.Consumer>
-                  {context =>
-                    <Animations />
-                  }
-                </EntityEditorContext.Consumer>
-              </TabPanel>
-              <TabPanel>
-                <EntityEditorContext.Consumer>
-                  {context =>
-                    <Colliders />
-                  }
-                </EntityEditorContext.Consumer>
-              </TabPanel>
-              <TabPanel>
-                <EntityEditorContext.Consumer>
-                  {context =>
-                    <Wireframes />
-                  }
-                </EntityEditorContext.Consumer>
-              </TabPanel>
-            </Tabs>
+            <EntityEditorContext.Consumer>
+              {context => <VContainer gap={15}>
+                <Entity />
+                <SpritesSettings
+                  isMultiFileAnimation={isMultiFileAnimation}
+                />
+                <CollidersSettings />
+                <Components />
+              </VContainer>
+              }
+            </EntityEditorContext.Consumer>
 
           </VContainer>
           <VContainer gap={15}>
-            <Tabs>
-              <TabList>
-                <Tab>{nls.localize('vuengine/entityEditor/preview', 'Preview')}</Tab>
-              </TabList>
 
-              <TabPanel>
-                <EntityEditorContext.Consumer>
-                  {context => (
-                    <Preview />
-                  )}
-                </EntityEditorContext.Consumer>
-              </TabPanel>
-            </Tabs>
+            <EntityEditorContext.Consumer>
+              {context => (
+                <Preview />
+              )}
+            </EntityEditorContext.Consumer>
+
           </VContainer>
         </HContainer>
       </EntityEditorContext.Provider >

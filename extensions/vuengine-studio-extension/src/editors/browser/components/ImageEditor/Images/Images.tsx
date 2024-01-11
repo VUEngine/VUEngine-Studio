@@ -3,17 +3,21 @@ import { OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import React, { useContext, useEffect, useState } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/HContainer';
+import VContainer from '../../Common/VContainer';
+import { Image, Images as ImagesIcon } from '@phosphor-icons/react';
 
 interface ImagesProps {
     data: string[]
     updateData: (data: string[]) => void
     canSelectMany: boolean
     allInFolderAsFallback: boolean
+    stack: boolean
+    showMetaData: boolean
 }
 
 export default function Images(props: ImagesProps): React.JSX.Element {
     const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
-    const { data, updateData, canSelectMany, allInFolderAsFallback } = props;
+    const { data, updateData, canSelectMany, allInFolderAsFallback, stack, showMetaData } = props;
     const [filesToShow, setFilesToShow] = useState<{ [path: string]: string }>({});
     const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
 
@@ -32,15 +36,23 @@ export default function Images(props: ImagesProps): React.JSX.Element {
         const result: { [path: string]: string } = {};
         await Promise.all(f
             .sort((a, b) => a.localeCompare(b))
-            .map(async p => {
+            .map(async (p, i) => {
+                if (stack && i > 0) {
+                    return;
+                }
+
                 let meta = nls.localize(
                     'vuengine/imageEditor/fileNotFound',
                     'File not found'
                 );
                 const resolvedUri = workspaceRootUri.resolve(p);
                 if (await services.fileService.exists(resolvedUri)) {
-                    const dimensions = await window.electronVesCore.getImageDimensions(resolvedUri.path.fsPath());
-                    meta = `${dimensions.width}×${dimensions.height}`;
+                    if (showMetaData) {
+                        const dimensions = await window.electronVesCore.getImageDimensions(resolvedUri.path.fsPath());
+                        meta = `${dimensions.width}×${dimensions.height}`;
+                    } else {
+                        meta = '';
+                    }
                 }
                 result[p] = meta;
             }));
@@ -96,26 +108,35 @@ export default function Images(props: ImagesProps): React.JSX.Element {
     };
 
     const removeFile = async (path: string) => {
-        updateData(data.filter((f, i) => f !== path));
+        if (stack) {
+            updateData([]);
+        } else {
+            updateData(data.filter((f, i) => f !== path));
+        }
     };
 
-    return <HContainer alignItems="start" gap={15} overflow='auto' wrap="wrap">
+    return <HContainer alignItems="start" gap={15} overflow={stack ? 'visible' : 'auto'} wrap="wrap">
         {Object.keys(filesToShow).map((f, i) => {
             const fullUri = workspaceRootUri.resolve(f);
             return <div
                 key={`image-${i}`}
-                className='filePreview'
+                className={`filePreview${stack && data.length > 1 ? ' multi' : ''}`}
                 title={f}
             >
                 <div className='filePreviewImage'>
                     <img src={fullUri.path.fsPath()} />
                 </div>
-                <div className='filePreviewTitle'>
-                    {fullUri.path.base}
-                </div>
-                <div className='filePreviewMeta'>
-                    {filesToShow[f]}
-                </div>
+                <VContainer gap={2}>
+                    <div className='filePreviewTitle'>
+                        {showMetaData && <>
+                            {fullUri.path.base}
+                            {stack && data.length > 1 && ' +' + (data.length - 1)}
+                        </>}
+                    </div>
+                    <div className='filePreviewMeta'>
+                        {filesToShow[f]}
+                    </div>
+                </VContainer>
                 <div className='filePreviewActions'>
                     <i
                         className="codicon codicon-x"
@@ -126,7 +147,10 @@ export default function Images(props: ImagesProps): React.JSX.Element {
         })}
         {(allInFolderAsFallback || !Object.keys(filesToShow).length) &&
             <div className='fileAdd' onClick={selectFiles}>
-                <i className="codicon codicon-add" />
+                {canSelectMany
+                    ? <ImagesIcon size={20} />
+                    : <Image size={20} />
+                }
             </div>
         }
     </HContainer>;

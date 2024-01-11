@@ -22,3 +22,16 @@
   vertical-align: text-bottom;
 }
 
+.jsonforms-container .count {
+  border-radius: 15px;
+  border: 1px solid;
+  display: inline-block;
+  font-size: 75%;
+  line-height: 100%;
+  min-width: 7px;
+  opacity: .4;
+  padding: 1px 2px;
+  text-align: center;
+  vertical-align: text-bottom;
+}
+

@@ -45,7 +45,7 @@
     width: unset;
 }
 
-.musicEditor .addPattern:hover i {
+.musicEditor .addPattern:hover > i {
     display: none;
 }
 

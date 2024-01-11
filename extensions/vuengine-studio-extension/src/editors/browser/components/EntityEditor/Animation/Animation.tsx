@@ -146,7 +146,7 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
             <button
                 className="remove-button"
                 onClick={removeAnimation}
-                title={nls.localize('vuengine/entityEditor/remove', 'Remove')}
+                title={nls.localize('vuengine/entityEditor/removeComponent', 'Remove Component')}
             >
                 <i className='codicon codicon-x' />
             </button>

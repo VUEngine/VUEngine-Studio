@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { PALETTE_COLORS, PALETTE_INDEX_MAPPING } from '../../../../core/browser/ves-common-types';
 
 interface CssImageProps {
@@ -12,7 +12,7 @@ interface CssImageProps {
 export default function CssImage(props: CssImageProps): React.JSX.Element {
     const { height, palette, pixelData, pixelSize, width } = props;
 
-    const boxShadow: string[] = useMemo<string[]>(() => {
+    const getBoxShadow = (): string[] => {
         const result: string[] = [];
         [...Array(height)].map((h, y) => {
             [...Array(width)].map((w, x) => {
@@ -30,13 +30,7 @@ export default function CssImage(props: CssImageProps): React.JSX.Element {
         });
 
         return result;
-    }, [
-        height,
-        palette,
-        pixelData,
-        pixelSize,
-        width
-    ]);
+    };
 
     return <div
         style={{
@@ -47,7 +41,7 @@ export default function CssImage(props: CssImageProps): React.JSX.Element {
         <div
             style={{
                 height: pixelSize,
-                boxShadow: boxShadow.join(','),
+                boxShadow: getBoxShadow().join(','),
                 marginLeft: -pixelSize,
                 marginTop: -pixelSize,
                 width: pixelSize,

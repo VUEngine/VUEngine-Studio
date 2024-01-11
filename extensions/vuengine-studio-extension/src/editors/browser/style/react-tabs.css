@@ -1,3 +1,12 @@
+.react-tabs {
+    flex-grow: 1;
+}
+
+.react-tabs__tab-list {
+    margin: 0 0 20px;
+    padding: 0;
+}
+
 .react-tabs__tab {
     border-bottom: 2px solid transparent;
     cursor: pointer;
@@ -22,12 +31,39 @@
     border-color: var(--theia-editor-foreground);
 }
 
-
-.react-tabs {
-    flex-grow: 1;
+.react-tabs__tab .count {
+    border-radius: 15px;
+    border: 1px solid;
+    display: inline-block;
+    font-size: 75%;
+    line-height: 100%;
+    min-width: 7px;
+    opacity: .4;
+    padding: 1px 2px;
+    text-align: center;
+    vertical-align: text-bottom;
 }
 
-.react-tabs__tab-list {
-    margin: 0 0 20px;
-    padding: 0;
+
+.react-tabs.sub .react-tabs__tab-list {
+    margin: 0;
+}
+
+.react-tabs.sub .react-tabs__tab {
+    border: 1px solid var(--theia-activityBar-background);
+    border-radius: 2px;
+    font-weight: normal;
+    line-height: 24px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    padding: 0 8px;
+}
+
+.react-tabs.sub .react-tabs__tab:empty {
+    display: none;
+}
+
+.react-tabs.sub .react-tabs__tab--selected {
+    background-color: var(--theia-activityBar-background);
+    border-color: var(--theia-activityBar-background);
 }

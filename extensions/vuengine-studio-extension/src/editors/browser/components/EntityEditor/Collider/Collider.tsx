@@ -257,7 +257,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
         <button
             className="remove-button"
             onClick={removeCollider}
-            title={nls.localize('vuengine/entityEditor/remove', 'Remove')}
+            title={nls.localize('vuengine/entityEditor/removeComponent', 'Remove Component')}
         >
             <i className='codicon codicon-x' />
         </button>
@@ -296,7 +296,12 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                 </VContainer>
                 <VContainer grow={1}>
                     <label>
-                        {nls.localize('vuengine/entityEditor/colliderLayers', 'Collider Layers')} ({collider.layers.length})
+                        {nls.localize('vuengine/entityEditor/colliderLayers', 'Collider Layers')}
+                        {collider.layers.length > 0 &&
+                            <>
+                                {' '}<span className='count'>{collider.layers.length}</span>
+                            </>
+                        }
                     </label>
                     <HContainer>
                         <VContainer grow={1}>
@@ -450,7 +455,14 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     />
                 </VContainer>
                 {collider.checkForCollisions && <VContainer grow={1}>
-                    <label>Collider Layers to check against</label>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/colliderLayersToCheckAgainst', 'Collider Layers to check against')}
+                        {collider.layersToCheck.length > 0 &&
+                            <>
+                                {' '}<span className='count'>{collider.layersToCheck.length}</span>
+                            </>
+                        }
+                    </label>
                     <HContainer>
                         <VContainer grow={1}>
                             <MultiSelect

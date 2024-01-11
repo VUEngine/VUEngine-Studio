@@ -48,28 +48,34 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
 
   const getData = async () => {
     const allImageData: ImageData[] = [];
-    await Promise.all(images.map(async (image, index) => {
-      await services.workspaceService.ready;
-      const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
-      const imageUri = workspaceRootUri.resolve(image);
-      if (await services.fileService.exists(imageUri)) {
-        const imageFileContent = await services.fileService.readFile(imageUri);
-        const singleImageData = await window.electronVesCore.parsePng(imageFileContent);
-        if (singleImageData) {
-          if (singleImageData.colorType !== 3) {
-            setImageError('wrong color type');
+
+    if (images.length) {
+      await Promise.all(images.map(async (image, index) => {
+        await services.workspaceService.ready;
+        const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
+        const imageUri = workspaceRootUri.resolve(image);
+        if (await services.fileService.exists(imageUri)) {
+          const imageFileContent = await services.fileService.readFile(imageUri);
+          const singleImageData = await window.electronVesCore.parsePng(imageFileContent);
+          if (singleImageData) {
+            if (singleImageData.colorType !== 3) {
+              setImageError('wrong color type');
+            } else {
+              allImageData[index] = singleImageData;
+              setHeight(height || singleImageData.height);
+              setWidth(width || singleImageData.width);
+            }
           } else {
-            allImageData[index] = singleImageData;
-            setHeight(height || singleImageData.height);
-            setWidth(width || singleImageData.width);
+            setImageError('could not parse image');
           }
         } else {
-          setImageError('could not parse image');
+          setImageError('file not found');
         }
-      } else {
-        setImageError('file not found');
-      }
-    }));
+      }));
+    } else {
+      setImageError('no file selected');
+    }
+
     setImageData(allImageData);
   };
 

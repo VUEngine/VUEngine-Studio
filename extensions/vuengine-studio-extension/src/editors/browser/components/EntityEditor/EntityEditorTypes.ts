@@ -196,14 +196,17 @@ export interface Sprites {
 export interface EntityData {
     _id: string
     name: string
-    extraInfo: string
-    pixelSize: {
-        x: number
-        y: number
-        z: number
+    extraProperties: {
+        enabled: boolean
+        extraInfo: string
+        pixelSize: {
+            x: number
+            y: number
+            z: number
+        }
     }
     animations: {
-        enabled: boolean
+        // enabled: boolean
         default: number
         totalFrames: number
         multiframe: boolean

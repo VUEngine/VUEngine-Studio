@@ -25,7 +25,9 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
             <button
                 className='newPattern'
                 onClick={() => addToSequence(channel.id, channel.patterns.length)}
-            >+</button>
+            >
+                <i className='codicon codicon-plus' />
+            </button>
             <div className='existingPatterns'>
                 {[0, 1].map(remainder => (
                     <div key={`channel-add-row-${remainder}`}>

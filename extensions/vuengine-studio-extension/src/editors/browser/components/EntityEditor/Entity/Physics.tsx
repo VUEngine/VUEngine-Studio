@@ -9,11 +9,11 @@ import InfoLabel from '../../Common/InfoLabel';
 export default function Physics(): React.JSX.Element {
     const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
 
-    const toggleEnabled = (): void => {
+    const disablePhysics = (): void => {
         setData({
             physics: {
                 ...data.physics,
-                enabled: !data.physics.enabled
+                enabled: false,
             }
         });
     };
@@ -101,22 +101,16 @@ export default function Physics(): React.JSX.Element {
         });
     };
 
-    return <VContainer gap={10}>
-        <label>
-            {nls.localize('vuengine/entityEditor/physics', 'Physics')}
-        </label>
-        <VContainer>
-            <label>
-                <input
-                    type="checkbox"
-                    checked={data.physics.enabled}
-                    onChange={e => toggleEnabled()}
-                />
-                {nls.localize('vuengine/entityEditor/enabled', 'Enabled')}
-            </label>
-        </VContainer>
-        {data.physics.enabled && <>
-            <HContainer gap={15} wrap='wrap'>
+    return <>
+        {data.physics.enabled &&
+            <HContainer className='item' gap={15} wrap='wrap'>
+                <button
+                    className="remove-button"
+                    onClick={disablePhysics}
+                    title={nls.localize('vuengine/entityEditor/removeComponent', 'Remove Component')}
+                >
+                    <i className='codicon codicon-x' />
+                </button>
                 <VContainer>
                     <label>
                         {nls.localize('vuengine/entityEditor/mass', 'Mass')}
@@ -252,6 +246,6 @@ export default function Physics(): React.JSX.Element {
                     />
                 </VContainer>
             </HContainer>
-        </>}
-    </VContainer>;
+        }
+    </>;
 }

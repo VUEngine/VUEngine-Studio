@@ -43,7 +43,8 @@ export default function ImageEditor(props: ImageEditorProps): React.JSX.Element 
                     </HContainer>
                     <VContainer overflow='hidden'>
                         <label>
-                            {nls.localize('vuengine/imageEditor/xFiles', 'Image Files ({0})', data.files.length)}
+                            {nls.localize('vuengine/imageEditor/files', 'Image Files')}
+                            {' '}<span className='count'>{data.files.length}</span>
                         </label>
                         {data.files.length === 0 &&
                             <div style={{ fontStyle: 'italic' }}>
@@ -59,6 +60,8 @@ export default function ImageEditor(props: ImageEditorProps): React.JSX.Element 
                             updateData={updateFiles}
                             allInFolderAsFallback={true}
                             canSelectMany={true}
+                            stack={false}
+                            showMetaData={true}
                         />
                     </VContainer>
                 </VContainer>

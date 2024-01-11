@@ -5,13 +5,14 @@ import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 
 interface InfoLabelProps {
     label: string
+    count?: number
     tooltip: string | ReactElement
     tooltipPosition?: HoverPosition
 }
 
 export default function InfoLabel(props: PropsWithChildren<InfoLabelProps>): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
-    const { label, tooltip, tooltipPosition } = props;
+    const { label, tooltip, tooltipPosition, count } = props;
 
     let content: string | HTMLElement = tooltip as string;
     if (typeof tooltip !== 'string') {
@@ -22,6 +23,9 @@ export default function InfoLabel(props: PropsWithChildren<InfoLabelProps>): Rea
 
     return <label>
         {label}
+        {count && <>
+            {' '}<span className='count'>{count}</span>
+        </>}
         <i className='codicon codicon-question' onMouseEnter={event => {
             services.hoverService.requestHover({
                 content: content,

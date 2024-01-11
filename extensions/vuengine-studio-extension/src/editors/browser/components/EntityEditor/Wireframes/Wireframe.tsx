@@ -192,7 +192,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
         <button
             className="remove-button"
             onClick={removeWireframe}
-            title={nls.localize('vuengine/entityEditor/remove', 'Remove')}
+            title={nls.localize('vuengine/entityEditor/removeComponent', 'Remove Component')}
         >
             <i className='codicon codicon-x' />
         </button>
@@ -299,6 +299,11 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                 <VContainer>
                     <label>
                         {nls.localize('vuengine/entityEditor/segments', 'Segments')}
+                        {wireframe.segments.length > 0 &&
+                            <>
+                                {' '}<span className='count'>{wireframe.segments.length}</span>
+                            </>
+                        }
                     </label>
                     {wireframe.segments.map((segment, segmentIndex) =>
                         <MeshSegment
