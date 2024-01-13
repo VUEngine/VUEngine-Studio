@@ -5,17 +5,25 @@ import { Axis, EntityEditorContext, EntityEditorContextType } from '../EntityEdi
 import { nls } from '@theia/core';
 import RadioSelect from '../../Common/RadioSelect';
 import InfoLabel from '../../Common/InfoLabel';
+import { ConfirmDialog } from '@theia/core/lib/browser';
 
 export default function Physics(): React.JSX.Element {
     const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
 
-    const disablePhysics = (): void => {
-        setData({
-            physics: {
-                ...data.physics,
-                enabled: false,
-            }
+    const disablePhysics = async (): Promise<void> => {
+        const dialog = new ConfirmDialog({
+            title: nls.localize('vuengine/entityEditor/removeComponent', 'Remove Component'),
+            msg: nls.localize('vuengine/entityEditor/areYouSureYouWantToRemoveComponent', 'Are you sure you want to remove this component?'),
         });
+        const confirmed = await dialog.open();
+        if (confirmed) {
+            setData({
+                physics: {
+                    ...data.physics,
+                    enabled: false,
+                }
+            });
+        }
     };
 
     const setMass = (mass: number): void => {

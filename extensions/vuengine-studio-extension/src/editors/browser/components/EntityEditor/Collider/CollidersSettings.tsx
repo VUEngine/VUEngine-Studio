@@ -12,12 +12,7 @@ export default function CollidersSettings(): React.JSX.Element {
     const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
 
     const setInGameType = (inGameType: string): void => {
-        setData({
-            colliders: {
-                ...data.colliders,
-                inGameType
-            }
-        });
+        setData({ inGameType });
     };
 
     const options: SelectOption[] = [{
@@ -55,7 +50,7 @@ export default function CollidersSettings(): React.JSX.Element {
     };
 
     return <>
-        {data.colliders.colliders.length > 0 &&
+        {data.components?.colliders.length > 0 &&
             <HContainer alignItems='end'>
                 <VContainer>
                     <label>
@@ -63,7 +58,7 @@ export default function CollidersSettings(): React.JSX.Element {
                     </label>
                     <SelectComponent
                         options={options}
-                        defaultValue={data.colliders.inGameType}
+                        defaultValue={data.inGameType}
                         onChange={inGameType => setInGameType(inGameType.value || 'None')}
                     />
                 </VContainer>

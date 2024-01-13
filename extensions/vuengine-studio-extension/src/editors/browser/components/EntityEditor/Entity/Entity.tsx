@@ -9,13 +9,13 @@ export default function Entity(): React.JSX.Element {
 
     const getCharCount = (): number => {
         let totalChars = 0;
-        data.sprites?.sprites?.map(s => {
+        data.components?.sprites?.map(s => {
             if (s._imageData !== undefined && typeof s._imageData !== 'number') {
                 if (s._imageData.animation?.largestFrame) {
                     totalChars += s._imageData.animation?.largestFrame;
                 } else {
                     if (s._imageData.tiles?.count) {
-                        totalChars += data.animations?.animations?.length > 0 && !data.animations.multiframe
+                        totalChars += data.components?.animations?.length > 0 && !data.animations.multiframe
                             ? s._imageData.tiles?.count / data.animations?.totalFrames || 1
                             : s._imageData.tiles?.count;
                     }
@@ -33,7 +33,7 @@ export default function Entity(): React.JSX.Element {
     };
 
     return <HContainer gap={15} alignItems='start'>
-        <VContainer>
+        <VContainer grow={1}>
             <label>
                 {nls.localize('vuengine/entityEditor/name', 'Name')}
             </label>

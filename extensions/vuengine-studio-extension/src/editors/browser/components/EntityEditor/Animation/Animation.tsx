@@ -1,5 +1,4 @@
 import { nls } from '@theia/core';
-import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext } from 'react';
 import HContainer from '../../Common/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
@@ -7,6 +6,7 @@ import VContainer from '../../Common/VContainer';
 import {
     AnimationData,
     defaultCurrentAnimation,
+    defaultHighlightedSprite,
     EntityEditorContext,
     EntityEditorContextType,
     MAX_ANIMATION_CYLCES,
@@ -16,55 +16,17 @@ import {
 interface AnimationProps {
     index: number
     animation: AnimationData
+    updateAnimation: (partialData: Partial<AnimationData>) => void
+    removeAnimation: () => void
     totalFrames: number
 }
 
 export default function Animation(props: AnimationProps): React.JSX.Element {
     const { data, setData, state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
-    const { index, animation, totalFrames } = props;
-
-    const removeAnimation = async (): Promise<void> => {
-        const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/entityEditor/removeAnimation', 'Remove Animation'),
-            msg: nls.localize('vuengine/entityEditor/areYouSureYouWantToRemoveAnimation', 'Are you sure you want to remove this Animation?'),
-        });
-        const confirmed = await dialog.open();
-        if (confirmed) {
-            const updatedAnimations = { ...data.animations };
-            updatedAnimations.animations = [
-                ...data.animations.animations.slice(0, index),
-                ...data.animations.animations.slice(index + 1)
-            ];
-            if (updatedAnimations.default === index && index > 0) {
-                updatedAnimations.default--;
-
-                setState({
-                    preview: {
-                        ...state.preview,
-                        currentAnimation: updatedAnimations.default,
-                    }
-                });
-            }
-
-            setData({ animations: updatedAnimations });
-        }
-    };
-
-    const setAnimation = (partialAnimationData: Partial<AnimationData>): void => {
-        const updatedAnimationsArray = [...data.animations.animations];
-        updatedAnimationsArray[index] = {
-            ...updatedAnimationsArray[index],
-            ...partialAnimationData,
-        };
-
-        const updatedAnimations = { ...data.animations };
-        updatedAnimations.animations = updatedAnimationsArray;
-
-        setData({ animations: updatedAnimations });
-    };
+    const { index, animation, updateAnimation, removeAnimation, totalFrames } = props;
 
     const setName = (name: string): void => {
-        setAnimation({ name });
+        updateAnimation({ name });
     };
 
     const setDefault = (): void => {
@@ -84,29 +46,29 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
     };
 
     const setCycles = (cycles: number): void => {
-        setAnimation({
+        updateAnimation({
             cycles: Math.min(Math.max(cycles, MIN_ANIMATION_CYLCES), MAX_ANIMATION_CYLCES),
         });
     };
 
     const toggleLoop = (): void => {
-        setAnimation({
+        updateAnimation({
             loop: !animation.loop
         });
     };
 
     const setCallback = (callback: string): void => {
-        setAnimation({ callback });
+        updateAnimation({ callback });
     };
 
     const setFrame = (i: number, frame: number): void => {
         const frames = [...animation.frames];
         frames[i] = Math.min(Math.max(frame, 1), totalFrames);
-        setAnimation({ frames });
+        updateAnimation({ frames });
     };
 
     const addFrame = (): void => {
-        setAnimation({
+        updateAnimation({
             frames: [
                 ...animation.frames,
                 Math.min((animation.frames.pop() || 0) + 1, totalFrames),
@@ -115,7 +77,7 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
     };
 
     const removeFrame = (i: number): void => {
-        setAnimation({
+        updateAnimation({
             frames: [
                 ...animation.frames.slice(0, i),
                 ...animation.frames.slice(i + 1)
@@ -128,6 +90,7 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
             preview: {
                 ...state.preview,
                 currentAnimation: index,
+                highlightedSprite: defaultHighlightedSprite,
             }
         });
     };
@@ -137,6 +100,7 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
             preview: {
                 ...state.preview,
                 currentAnimation: defaultCurrentAnimation,
+                highlightedSprite: defaultHighlightedSprite,
             }
         });
     };

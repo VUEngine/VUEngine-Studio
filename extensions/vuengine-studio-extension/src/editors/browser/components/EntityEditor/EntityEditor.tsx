@@ -67,14 +67,14 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
 
   protected async updateState(state: EntityEditorState): Promise<void> {
     this.setState(state);
-    this.savePreviewState();
+    await this.savePreviewState();
   }
 
   protected async setData(entityData: Partial<EntityData>, options?: EntityEditorSaveDataOptions): Promise<void> {
     const { isGenerating, setIsGenerating } = this.props.context;
-    let updatedData = this.postProcessData({ ...this.props.data, ...entityData });
 
     if (!isGenerating) {
+      let updatedData = this.postProcessData({ ...this.props.data, ...entityData });
       if (options?.appendImageData) {
         setIsGenerating(true);
         updatedData = await this.appendImageData(updatedData);
@@ -86,7 +86,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
   }
 
   protected postProcessData(entityData: EntityData): EntityData {
-    if (!entityData.animations.animations.length) {
+    if (!entityData.components?.animations.length) {
       // set total frames to 1 when disabling animations
       entityData.animations.totalFrames = 1;
     } else {
@@ -136,14 +136,14 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
   protected async appendImageData(entityData: EntityData): Promise<EntityData> {
     const { fileUri, services } = this.props.context;
     const mostFilesOnASprite = this.getMostFilesOnASprite(entityData);
-    const isMultiFileAnimation = entityData.animations.animations.length > 0 && mostFilesOnASprite > 1;
-    const optimizeTiles = (entityData.animations.animations.length === 0 && entityData.sprites.optimizedTiles)
-      || (entityData.animations.animations.length > 0 && isMultiFileAnimation);
+    const isMultiFileAnimation = entityData.components?.animations.length > 0 && mostFilesOnASprite > 1;
+    const optimizeTiles = (entityData.components?.animations.length === 0 && entityData.sprites.optimizedTiles)
+      || (entityData.components?.animations.length > 0 && isMultiFileAnimation);
     const baseConfig = {
       animation: {
         frames: isMultiFileAnimation ? mostFilesOnASprite : entityData.animations.totalFrames,
         individualFiles: isMultiFileAnimation,
-        isAnimation: entityData.animations.animations.length > 0
+        isAnimation: entityData.components?.animations.length > 0
       },
       files: [],
       map: {
@@ -158,16 +158,16 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
       section: entityData.sprites.section,
       tileset: {
         compression: entityData.sprites.compression,
-        shared: !entityData.animations.animations.length && entityData.sprites.sharedTiles,
+        shared: !entityData.components?.animations.length && entityData.sprites.sharedTiles,
       }
     };
 
-    if (!entityData.animations.animations.length && entityData.sprites?.sharedTiles) {
+    if (!entityData.components?.animations.length && entityData.sprites?.sharedTiles) {
       const files: string[] = [];
       // keep track of added files to be able to map back maps later
       const spriteFilesIndex: { [key: string]: number } = {};
       let mapCounter = 0;
-      entityData.sprites?.sprites?.map(s => {
+      entityData.components?.sprites?.map(s => {
         if (s.texture?.files?.length) {
           const file = s.texture.files[0];
           if (!spriteFilesIndex[file]) {
@@ -182,13 +182,14 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
         files,
       });
       // map imagedata back to sprites
-      await Promise.all(entityData.sprites?.sprites?.map(async (sprite, index) => {
+      await Promise.all(entityData.components?.sprites?.map(async (sprite, index) => {
         if (sprite.texture?.files?.length) {
+          const compressedImageData = await this.compressImageData({
+            tiles: (index === 0) ? newImageData.tiles : undefined,
+            maps: [newImageData.maps[spriteFilesIndex[sprite.texture.files[0]]]],
+          });
           sprite._imageData = {
-            ...(await this.compressImageData({
-              tiles: (index === 0) ? newImageData.tiles : undefined,
-              maps: [newImageData.maps[spriteFilesIndex[sprite.texture.files[0]]]],
-            })),
+            ...compressedImageData,
             _dupeIndex: 1,
           };
         } else {
@@ -198,8 +199,8 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
     } else {
       const convertedFilesMap: { [key: string]: ConversionResult & { _dupeIndex: number } } = {};
       // for loop to handle sprites one after the other for dupe detection
-      for (let i = 0; i < entityData.sprites?.sprites?.length || 0; i++) {
-        const sprite = entityData.sprites?.sprites[i];
+      for (let i = 0; i < entityData.components?.sprites?.length || 0; i++) {
+        const sprite = entityData.components?.sprites[i];
         if (sprite.texture?.files?.length) {
           // keep track of already converted files to avoid converting the same image twice
           const checksum = require('crc-32').str(JSON.stringify(sprite.texture?.files || ''));
@@ -210,8 +211,9 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
               ...baseConfig,
               files: sprite.texture.files,
             });
+            const compressedImageData = await this.compressImageData(newImageData);
             sprite._imageData = convertedFilesMap[checksum] = {
-              ...(await this.compressImageData(newImageData)),
+              ...compressedImageData,
               _dupeIndex: i + 1,
             };
           }
@@ -225,11 +227,11 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
   }
 
   protected getMostFilesOnASprite(entityData: EntityData): number {
-    return Math.max(...entityData.sprites.sprites.map(s => s.texture.files.length));
+    return Math.max(...entityData.components?.sprites.map(s => s.texture.files.length));
   }
 
   async componentDidMount(): Promise<void> {
-    this.restorePreviewState();
+    await this.restorePreviewState();
   }
 
   render(): React.JSX.Element {
@@ -250,14 +252,15 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
         <HContainer className="entityEditor" gap={20}>
           <VContainer gap={15} grow={1}>
             <EntityEditorContext.Consumer>
-              {context => <VContainer gap={15}>
-                <Entity />
-                <SpritesSettings
-                  isMultiFileAnimation={isMultiFileAnimation}
-                />
-                <CollidersSettings />
-                <Components />
-              </VContainer>
+              {context =>
+                <VContainer gap={15}>
+                  <Entity />
+                  <SpritesSettings
+                    isMultiFileAnimation={isMultiFileAnimation}
+                  />
+                  <CollidersSettings />
+                  <Components />
+                </VContainer>
               }
             </EntityEditorContext.Consumer>
 
@@ -265,9 +268,9 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
           <VContainer gap={15}>
 
             <EntityEditorContext.Consumer>
-              {context => (
+              {context =>
                 <Preview />
-              )}
+              }
             </EntityEditorContext.Consumer>
 
           </VContainer>

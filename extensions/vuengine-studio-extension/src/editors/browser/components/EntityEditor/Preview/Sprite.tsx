@@ -2,13 +2,13 @@ import React, { useContext, useEffect, useState } from 'react';
 import { ImageData } from '../../../../../core/browser/ves-common-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import CssImage from '../../Common/CssImage';
-import { Displacement } from '../EntityEditorTypes';
+import { PixelVector } from '../EntityEditorTypes';
 
 interface SpriteProps {
   animate: boolean;
   frames: number;
   currentAnimationFrame: number
-  displacement: Displacement;
+  displacement: PixelVector;
   highlighted: boolean;
   images: string[];
   palette: string
@@ -47,7 +47,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
   };
 
   const getData = async () => {
-    const allImageData: ImageData[] = [];
+    let allImageData: ImageData[] = [];
 
     if (images.length) {
       await Promise.all(images.map(async (image, index) => {
@@ -61,7 +61,11 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
             if (singleImageData.colorType !== 3) {
               setImageError('wrong color type');
             } else {
-              allImageData[index] = singleImageData;
+              allImageData = [
+                ...allImageData.slice(0, index),
+                singleImageData,
+                ...allImageData.slice(index),
+              ];
               setHeight(height || singleImageData.height);
               setWidth(width || singleImageData.width);
             }

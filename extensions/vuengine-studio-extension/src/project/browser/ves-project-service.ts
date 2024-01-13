@@ -108,7 +108,7 @@ export class VesProjectService {
   getProjectDataItems(): ProjectDataItemsByTypeWithContributor | undefined {
     return this._projectData?.items;
   }
-  getProjectDataItemById(itemId: string, typeId: string): unknown {
+  getProjectDataItemById(itemId: string, typeId: string): object | undefined {
     if (this._projectData?.items && this._projectData?.items[typeId]) {
       return this._projectData?.items[typeId][itemId];
     }

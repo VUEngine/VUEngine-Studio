@@ -1,17 +1,34 @@
 import { QuickPickItem, QuickPickOptions, nls } from '@theia/core';
+import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import PositionedEntity from '../../Common/PositionedEntities/PositionedEntity';
 import VContainer from '../../Common/VContainer';
-import AnimationsList from '../Animation/AnimationsList';
-import CollidersList from '../Collider/CollidersList';
-import BehaviorsList from '../Behavior/BehaviorsList';
-import ChildrenList from './ChildrenList';
+import Animation from '../Animation/Animation';
+import Behavior from '../Behavior/Behavior';
+import Collider from '../Collider/Collider';
+import { EntityEditorSaveDataOptions } from '../EntityEditor';
+import {
+    AnimationData,
+    BehaviorData,
+    BgmapMode,
+    ColliderData,
+    ColliderType,
+    ComponentData,
+    ComponentKey,
+    DisplayMode,
+    EntityEditorContext,
+    EntityEditorContextType,
+    SpriteData,
+    Transparency,
+    WireframeData,
+    WireframeType,
+} from '../EntityEditorTypes';
+import Sprite from '../Sprites/Sprite';
+import Wireframe from '../Wireframes/Wireframe';
 import ExtraProperties from './ExtraProperties';
 import Physics from './Physics';
-import { BgmapMode, ColliderType, DisplayMode, EntityEditorContext, EntityEditorContextType, Transparency, WireframeType } from '../EntityEditorTypes';
-import SpritesList from '../Sprites/SpritesList';
-import WireframesList from '../Wireframes/WireframesList';
 
 interface ComponentType {
     labelSingular: string
@@ -30,129 +47,140 @@ export default function Components(): React.JSX.Element {
     const [currentTab, setCurrentTab] = useState<number>(0);
 
     const addSprite = (): void => {
-        const updatedSprites = { ...data.sprites };
-        updatedSprites.sprites = [
-            ...updatedSprites.sprites,
-            {
-                _imageData: 0,
-                bgmapMode: BgmapMode.Bgmap,
-                displayMode: DisplayMode.Both,
-                transparency: Transparency.None,
-                displacement: {
+        const sprites = [...data.components?.sprites];
+        sprites.push({
+            _imageData: 0,
+            bgmapMode: BgmapMode.Bgmap,
+            displayMode: DisplayMode.Both,
+            transparency: Transparency.None,
+            displacement: {
+                x: 0,
+                y: 0,
+                z: 0,
+                parallax: 0,
+            },
+            manipulationFunction: '',
+            texture: {
+                files: [],
+                padding: {
                     x: 0,
                     y: 0,
-                    z: 0,
-                    parallax: 0,
                 },
-                manipulationFunction: '',
-                texture: {
-                    files: [],
-                    padding: {
-                        x: 0,
-                        y: 0,
-                    },
-                    palette: 0,
-                    recycleable: false,
-                    flip: {
-                        horizontal: false,
-                        vertical: false,
-                    },
+                palette: 0,
+                recycleable: false,
+                flip: {
+                    horizontal: false,
+                    vertical: false,
                 },
             },
-        ];
+        });
 
         setData({
-            sprites: updatedSprites,
+            components: {
+                ...data.components,
+                sprites
+            }
         });
     };
 
     const addBehavior = (): void => {
-        const updatedBehaviors = { ...data.behaviors };
-        updatedBehaviors.behaviors.push('');
+        const behaviors = [...data.components?.behaviors];
+        behaviors.push({
+            'name': '',
+        });
 
         setData({
-            behaviors: updatedBehaviors,
+            components: {
+                ...data.components,
+                behaviors
+            },
         });
     };
 
     const addAnimation = (): void => {
-        const updatedAnimations = { ...data.animations };
-        updatedAnimations.animations = [
-            ...updatedAnimations.animations,
-            {
-                name: data.animations.animations.length
-                    ? ''
-                    : nls.localize('vuengine/entityEditor/default', 'Default'),
-                cycles: 8,
-                frames: [],
-                loop: true,
-                callback: '',
-            },
-        ];
+        const animations = [...data.components?.animations];
+        animations.push({
+            name: data.components?.animations.length
+                ? ''
+                : nls.localize('vuengine/entityEditor/default', 'Default'),
+            cycles: 8,
+            frames: [],
+            loop: true,
+            callback: '',
+        });
 
-        setData({ animations: updatedAnimations });
+        setData({
+            components: {
+                ...data.components,
+                animations
+            }
+        });
     };
 
     const addCollider = (): void => {
-        const colliders = { ...data.colliders };
-        colliders.colliders = [
-            ...colliders.colliders,
-            {
-                type: ColliderType.Ball,
-                pixelSize: {
-                    x: 0,
-                    y: 0,
-                    z: 0,
-                },
+        const colliders = [...data.components?.colliders];
+        colliders.push({
+            type: ColliderType.Ball,
+            pixelSize: {
+                x: 0,
+                y: 0,
+                z: 0,
+            },
+            displacement: {
+                x: 0,
+                y: 0,
+                z: 0,
+                parallax: 0,
+            },
+            rotation: {
+                x: 0,
+                y: 0,
+                z: 0,
+            },
+            scale: {
+                x: 0,
+                y: 0,
+                z: 0,
+            },
+            checkForCollisions: false,
+            layers: [],
+            layersToCheck: [],
+        });
+
+        setData({
+            components: {
+                ...data.components,
+                colliders,
+            }
+        });
+    };
+
+    const addWireframe = (): void => {
+        const wireframes = [...data.components?.wireframes];
+        wireframes.push({
+            wireframe: {
+                type: WireframeType.Sphere,
                 displacement: {
                     x: 0,
                     y: 0,
                     z: 0,
-                    parallax: 0,
                 },
-                rotation: {
-                    x: 0,
-                    y: 0,
-                    z: 0,
-                },
-                scale: {
-                    x: 0,
-                    y: 0,
-                    z: 0,
-                },
-                checkForCollisions: false,
-                layers: [],
-                layersToCheck: [],
+                color: 3,
+                transparency: Transparency.None,
+                interlaced: false,
             },
-        ];
+            segments: [],
+            length: 0,
+            radius: 0,
+            drawCenter: true,
+        });
 
-        setData({ colliders });
-    };
-
-    const addWireframe = (): void => {
-        const updatedWireframes = { ...data.wireframes };
-        updatedWireframes.wireframes = [
-            ...updatedWireframes.wireframes,
-            {
-                wireframe: {
-                    type: WireframeType.Sphere,
-                    displacement: {
-                        x: 0,
-                        y: 0,
-                        z: 0,
-                    },
-                    color: 3,
-                    transparency: Transparency.None,
-                    interlaced: false,
-                },
-                segments: [],
-                length: 0,
-                radius: 0,
-                drawCenter: true,
-            },
-        ];
-
-        setData({ wireframes: updatedWireframes });
+        setData({
+            components: {
+                ...data.components,
+                wireframes,
+            }
+        });
     };
 
     const showEntitySelection = async (): Promise<QuickPickItem | undefined> => {
@@ -181,24 +209,27 @@ export default function Components(): React.JSX.Element {
     const addPositionedEntity = async (): Promise<void> => {
         const entityToAdd = await showEntitySelection();
         if (entityToAdd !== undefined) {
-            const children = { ...data.children };
-            children.children = [
-                ...children.children,
-                {
-                    itemId: entityToAdd.id!,
-                    position: {
-                        x: 0,
-                        y: 0,
-                        z: 0,
-                        parallax: 0,
-                    },
-                    name: '',
-                    extraInfo: '',
-                    loadRegardlessOfPosition: false,
+            const children = [...data.components?.children];
+            children.push({
+                itemId: entityToAdd.id!,
+                onScreenPosition: {
+                    x: 0,
+                    y: 0,
+                    z: 0,
+                    zDisplacement: 0,
                 },
-            ];
+                name: '',
+                children: [],
+                extraInfo: '',
+                loadRegardlessOfPosition: false,
+            });
 
-            setData({ children });
+            setData({
+                components: {
+                    ...data.components,
+                    children,
+                }
+            });
         }
     };
 
@@ -226,60 +257,117 @@ export default function Components(): React.JSX.Element {
             labelPlural: nls.localize('vuengine/entityEditor/sprites', 'Sprites'),
             allowAdd: true,
             addAction: addSprite,
-            showTab: data.sprites.sprites.length > 0,
-            count: data.sprites.sprites.length,
+            showTab: data.components?.sprites.length > 0,
+            count: data.components?.sprites.length,
             showCount: true,
-            tabContent: <SpritesList />
+            tabContent: <VContainer>
+                {data.components?.sprites.map((sprite, index) =>
+                    <Sprite
+                        key={`sprite-${index}`}
+                        index={index}
+                        sprite={sprite}
+                        updateSprite={(partialData: Partial<SpriteData>) => updateComponent('sprites', index, partialData)}
+                        removeSprite={() => removeComponent('wireframes', index)}
+                    />
+                )}
+            </VContainer>
         },
         {
             labelSingular: nls.localize('vuengine/entityEditor/animation', 'Animation'),
             labelPlural: nls.localize('vuengine/entityEditor/animations', 'Animations'),
             allowAdd: true,
             addAction: addAnimation,
-            showTab: data.animations.animations.length > 0,
-            count: data.animations.animations.length,
+            showTab: data.components?.animations.length > 0,
+            count: data.components?.animations.length,
             showCount: true,
-            tabContent: <AnimationsList />
+            tabContent: <VContainer>
+                {data.components?.animations.map((animation, index) =>
+                    <Animation
+                        key={`animation-${index}`}
+                        index={index}
+                        animation={animation}
+                        updateAnimation={(partialData: Partial<AnimationData>) => updateComponent('animations', index, partialData)}
+                        removeAnimation={() => removeComponent('animations', index)}
+                        totalFrames={data.animations.totalFrames}
+                    />
+                )}
+            </VContainer>
         },
         {
             labelSingular: nls.localize('vuengine/entityEditor/collider', 'Collider'),
             labelPlural: nls.localize('vuengine/entityEditor/colliders', 'Colliders'),
             allowAdd: true,
             addAction: addCollider,
-            showTab: data.colliders.colliders.length > 0,
-            count: data.colliders.colliders.length,
+            showTab: data.components?.colliders.length > 0,
+            count: data.components?.colliders.length,
             showCount: true,
-            tabContent: <CollidersList />
+            tabContent: <VContainer>
+                {data.components?.colliders.map((collider, index) =>
+                    <Collider
+                        key={`collider-${index}`}
+                        collider={collider}
+                        updateCollider={(partialData: Partial<ColliderData>) => updateComponent('colliders', index, partialData)}
+                        removeCollider={() => removeComponent('colliders', index)}
+                    />
+                )}
+            </VContainer>
         },
         {
             labelSingular: nls.localize('vuengine/entityEditor/wireframe', 'Wireframe'),
             labelPlural: nls.localize('vuengine/entityEditor/wireframes', 'Wireframes'),
             allowAdd: true,
             addAction: addWireframe,
-            showTab: data.wireframes.wireframes.length > 0,
-            count: data.wireframes.wireframes.length,
+            showTab: data.components?.wireframes.length > 0,
+            count: data.components?.wireframes.length,
             showCount: true,
-            tabContent: <WireframesList />
+            tabContent: <VContainer>
+                {data.components?.wireframes.map((wireframe, index) =>
+                    <Wireframe
+                        key={`wireframe-${index}`}
+                        wireframe={wireframe}
+                        updateWireframe={(partialData: Partial<WireframeData>) => updateComponent('wireframes', index, partialData)}
+                        removeWireframe={() => removeComponent('wireframes', index)}
+                    />
+                )}
+            </VContainer>
         },
         {
             labelSingular: nls.localize('vuengine/entityEditor/behavior', 'Behavior'),
             labelPlural: nls.localize('vuengine/entityEditor/behaviors', 'Behaviors'),
             allowAdd: true,
             addAction: addBehavior,
-            showTab: data.behaviors.behaviors.length > 0,
-            count: data.behaviors.behaviors.length,
+            showTab: data.components?.behaviors.length > 0,
+            count: data.components?.behaviors.length,
             showCount: true,
-            tabContent: <BehaviorsList />
+            tabContent: <VContainer>
+                {data.components?.behaviors.map((behavior, index) =>
+                    <Behavior
+                        key={'behavior-' + index}
+                        behavior={behavior}
+                        updateBehavior={(partialData: Partial<BehaviorData>) => updateComponent('behaviors', index, partialData)}
+                        removeBehavior={() => removeComponent('behaviors', index)}
+                    />
+                )}
+            </VContainer>
         },
         {
             labelSingular: nls.localize('vuengine/entityEditor/child', 'Child'),
             labelPlural: nls.localize('vuengine/entityEditor/children', 'Children'),
             allowAdd: true,
             addAction: addPositionedEntity,
-            showTab: data.children.children.length > 0,
-            count: data.children.children.length,
+            showTab: data.components?.children.length > 0,
+            count: data.components?.children.length,
             showCount: true,
-            tabContent: <ChildrenList />
+            tabContent: <VContainer>
+                {data.components?.children.map((child, index) =>
+                    <PositionedEntity
+                        key={'child-' + index}
+                        positionedEntity={child}
+                        updatePositionedEntity={partialPositionedEntity => updateComponent('children', index, partialPositionedEntity)}
+                        removePositionedEntity={() => removeComponent('children', index)}
+                    />
+                )}
+            </VContainer>
         },
         {
             labelSingular: nls.localize('vuengine/entityEditor/physics', 'Physics'),
@@ -329,8 +417,42 @@ export default function Components(): React.JSX.Element {
         if (componentToAdd) {
             componentTypes.map((t, i) => {
                 if (componentToAdd.id === i.toString()) {
-                    setCurrentTab(i);
+                    setCurrentTab(i + 1);
                     t.addAction();
+                }
+            });
+        }
+    };
+
+    const updateComponent = (key: ComponentKey, index: number, partialData: Partial<ComponentData>, options?: EntityEditorSaveDataOptions): void => {
+        const componentsArray = [...data.components[key]];
+        componentsArray[index] = {
+            ...componentsArray[index],
+            ...partialData,
+        };
+
+        setData({
+            components: {
+                ...data.components,
+                [key]: componentsArray,
+            }
+        }, options);
+    };
+
+    const removeComponent = async (key: ComponentKey, index: number): Promise<void> => {
+        const dialog = new ConfirmDialog({
+            title: nls.localize('vuengine/entityEditor/removeComponent', 'Remove Component'),
+            msg: nls.localize('vuengine/entityEditor/areYouSureYouWantToRemoveComponent', 'Are you sure you want to remove this component?'),
+        });
+        const confirmed = await dialog.open();
+        if (confirmed) {
+            setData({
+                components: {
+                    ...data.components,
+                    [key]: [
+                        ...data.components[key].slice(0, index),
+                        ...data.components[key].slice(index + 1)
+                    ],
                 }
             });
         }
@@ -342,11 +464,6 @@ export default function Components(): React.JSX.Element {
         <VContainer>
             <label>
                 {nls.localize('vuengine/entityEditor/components', 'Components')}
-                {totalComponents > 0 &&
-                    <>
-                        {' '}<span className='count'>{totalComponents}</span>
-                    </>
-                }
             </label>
             {totalComponents > 0 &&
                 <Tabs
@@ -355,6 +472,12 @@ export default function Components(): React.JSX.Element {
                     onSelect={setCurrentTab}
                 >
                     <TabList>
+                        <Tab>
+                            {nls.localize('vuengine/entityEditor/all', 'All')}
+                            {' '}<span className='count'>
+                                {totalComponents}
+                            </span>
+                        </Tab>
                         {componentTypes.map((t, i) =>
                             <Tab key={'tab' + i}>
                                 {t.showTab && <>
@@ -368,6 +491,20 @@ export default function Components(): React.JSX.Element {
                             </Tab>
                         )}
                     </TabList>
+                    <TabPanel>
+                        <VContainer>
+                            {componentTypes.map((t, j) =>
+                                <>
+                                    {t.showTab && <>
+                                        {totalComponents > 1 &&
+                                            <label className='light-label'>{t.labelPlural}</label>
+                                        }
+                                        {t.tabContent}
+                                    </>}
+                                </>
+                            )}
+                        </VContainer>
+                    </TabPanel>
                     {componentTypes.map((t, j) =>
                         <TabPanel key={'tabpanel' + j}>
                             {t.showTab && t.tabContent}

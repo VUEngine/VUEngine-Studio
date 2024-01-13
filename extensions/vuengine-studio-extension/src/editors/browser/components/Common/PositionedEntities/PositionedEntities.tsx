@@ -46,13 +46,14 @@ export default function PositionedEntities(props: PositionedEntitiesProps): Reac
                 ...positionedEntities,
                 {
                     itemId: entityToAdd.id!,
-                    position: {
+                    onScreenPosition: {
                         x: 0,
                         y: 0,
                         z: 0,
-                        parallax: 0,
+                        zDisplacement: 0,
                     },
                     name: '',
+                    children: [],
                     extraInfo: '',
                     loadRegardlessOfPosition: false,
                 },

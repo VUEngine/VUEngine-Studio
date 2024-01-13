@@ -1,5 +1,4 @@
 import { URI, nls } from '@theia/core';
-import { ConfirmDialog } from '@theia/core/lib/browser';
 import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React, { useContext } from 'react';
 import { ProjectContributor } from '../../../../../project/browser/ves-project-types';
@@ -7,40 +6,23 @@ import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/HContainer';
 import MultiSelect, { MultiSelectOption } from '../../Common/MultiSelect';
 import VContainer from '../../Common/VContainer';
-import { ColliderData, ColliderType, EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
+import { ColliderData, ColliderType } from '../EntityEditorTypes';
 
 interface ColliderProps {
-    index: number
     collider: ColliderData
+    updateCollider: (partialData: Partial<ColliderData>) => void
+    removeCollider: () => void
 }
 
 export default function Collider(props: ColliderProps): React.JSX.Element {
-    const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
     const { services } = useContext(EditorsContext) as EditorsContextType;
-    const { index, collider } = props;
+    const { collider, updateCollider, removeCollider } = props;
 
     let colliderLayersFileUri: URI | undefined;
     const colliderLayers = services.vesProjectService.getProjectDataItemsForType('ColliderLayers');
     if (colliderLayers) {
         colliderLayersFileUri = colliderLayers[ProjectContributor.Project]?._fileUri;
     }
-
-    const removeCollider = async (): Promise<void> => {
-        const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/entityEditor/removeCollider', 'Remove Collider'),
-            msg: nls.localize('vuengine/entityEditor/areYouSureYouWantToRemoveCollider', 'Are you sure you want to remove this Collider?'),
-        });
-        const confirmed = await dialog.open();
-        if (confirmed) {
-            const colliders = { ...data.colliders };
-            colliders.colliders = [
-                ...data.colliders.colliders.slice(0, index),
-                ...data.colliders.colliders.slice(index + 1)
-            ];
-
-            setData({ colliders });
-        }
-    };
 
     const getHeaviness = (): number => {
         let total = 0;
@@ -65,27 +47,14 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
         return total;
     };
 
-    const setCollider = (partialColliderData: Partial<ColliderData>): void => {
-        const updatedCollidersArray = [...data.colliders.colliders];
-        updatedCollidersArray[index] = {
-            ...updatedCollidersArray[index],
-            ...partialColliderData,
-        };
-
-        const colliders = { ...data.colliders };
-        colliders.colliders = updatedCollidersArray;
-
-        setData({ colliders });
-    };
-
     const setType = (type: ColliderType): void => {
-        setCollider({
+        updateCollider({
             type,
         });
     };
 
     const setPixelSizeX = (x: number): void => {
-        setCollider({
+        updateCollider({
             pixelSize: {
                 ...collider.pixelSize,
                 x,
@@ -94,7 +63,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
     };
 
     const setPixelSizeY = (y: number): void => {
-        setCollider({
+        updateCollider({
             pixelSize: {
                 ...collider.pixelSize,
                 y,
@@ -103,7 +72,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
     };
 
     const setPixelSizeZ = (z: number): void => {
-        setCollider({
+        updateCollider({
             pixelSize: {
                 ...collider.pixelSize,
                 z,
@@ -112,7 +81,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
     };
 
     const setDisplacementX = (x: number): void => {
-        setCollider({
+        updateCollider({
             displacement: {
                 ...collider.displacement,
                 x,
@@ -121,7 +90,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
     };
 
     const setDisplacementY = (y: number): void => {
-        setCollider({
+        updateCollider({
             displacement: {
                 ...collider.displacement,
                 y,
@@ -130,7 +99,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
     };
 
     const setDisplacementZ = (z: number): void => {
-        setCollider({
+        updateCollider({
             displacement: {
                 ...collider.displacement,
                 z,
@@ -139,7 +108,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
     };
 
     const setDisplacementParallax = (parallax: number): void => {
-        setCollider({
+        updateCollider({
             displacement: {
                 ...collider.displacement,
                 parallax,
@@ -148,7 +117,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
     };
 
     const setRotationX = (x: number): void => {
-        setCollider({
+        updateCollider({
             rotation: {
                 ...collider.rotation,
                 x,
@@ -157,7 +126,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
     };
 
     const setRotationY = (y: number): void => {
-        setCollider({
+        updateCollider({
             rotation: {
                 ...collider.rotation,
                 y,
@@ -166,7 +135,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
     };
 
     const setRotationZ = (z: number): void => {
-        setCollider({
+        updateCollider({
             rotation: {
                 ...collider.rotation,
                 z,
@@ -175,7 +144,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
     };
 
     const setScaleX = (x: number): void => {
-        setCollider({
+        updateCollider({
             scale: {
                 ...collider.scale,
                 x,
@@ -184,7 +153,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
     };
 
     const setScaleY = (y: number): void => {
-        setCollider({
+        updateCollider({
             scale: {
                 ...collider.scale,
                 y,
@@ -193,7 +162,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
     };
 
     const setScaleZ = (z: number): void => {
-        setCollider({
+        updateCollider({
             scale: {
                 ...collider.scale,
                 z,
@@ -202,7 +171,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
     };
 
     const toggleCheckForCollisions = (): void => {
-        setCollider({
+        updateCollider({
             checkForCollisions: !collider.checkForCollisions,
         });
     };
@@ -233,11 +202,11 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
     const colliderLayerOptions = getColliderLayerOptions();
 
     const setColliderLayers = (layers: string[]): void => {
-        setCollider({ layers });
+        updateCollider({ layers });
     };
 
     const setColliderLayersToCheck = (layersToCheck: string[]): void => {
-        setCollider({ layersToCheck });
+        updateCollider({ layersToCheck });
     };
 
     const openEditor = async (): Promise<void> => {

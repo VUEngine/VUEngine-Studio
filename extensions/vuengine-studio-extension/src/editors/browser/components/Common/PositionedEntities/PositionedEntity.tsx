@@ -32,8 +32,8 @@ export default function PositionedEntity(props: PositionedEntityProps): React.JS
 
     const setPositionX = (x: number): void => {
         updatePositionedEntity({
-            position: {
-                ...positionedEntity.position,
+            onScreenPosition: {
+                ...positionedEntity.onScreenPosition,
                 x,
             },
         });
@@ -41,8 +41,8 @@ export default function PositionedEntity(props: PositionedEntityProps): React.JS
 
     const setPositionY = (y: number): void => {
         updatePositionedEntity({
-            position: {
-                ...positionedEntity.position,
+            onScreenPosition: {
+                ...positionedEntity.onScreenPosition,
                 y,
             },
         });
@@ -50,18 +50,18 @@ export default function PositionedEntity(props: PositionedEntityProps): React.JS
 
     const setPositionZ = (z: number): void => {
         updatePositionedEntity({
-            position: {
-                ...positionedEntity.position,
+            onScreenPosition: {
+                ...positionedEntity.onScreenPosition,
                 z,
             },
         });
     };
 
-    const setPositionParallax = (parallax: number): void => {
+    const setPositionZDisplacement = (zDisplacement: number): void => {
         updatePositionedEntity({
-            position: {
-                ...positionedEntity.position,
-                parallax,
+            onScreenPosition: {
+                ...positionedEntity.onScreenPosition,
+                zDisplacement,
             },
         });
     };
@@ -110,35 +110,35 @@ export default function PositionedEntity(props: PositionedEntityProps): React.JS
                     </button>
                 </HContainer>
                 <VContainer>
-                    <label>Position (x, y, z, parallax)</label>
+                    <label>Position (x, y, z, z displacement)</label>
                     <HContainer>
                         <input
                             className='theia-input'
                             style={{ width: 48 }}
                             type='number'
-                            value={positionedEntity.position.x}
+                            value={positionedEntity.onScreenPosition.x}
                             onChange={e => setPositionX(parseInt(e.target.value))}
                         />
                         <input
                             className='theia-input'
                             style={{ width: 48 }}
                             type='number'
-                            value={positionedEntity.position.y}
+                            value={positionedEntity.onScreenPosition.y}
                             onChange={e => setPositionY(parseInt(e.target.value))}
                         />
                         <input
                             className='theia-input'
                             style={{ width: 48 }}
                             type='number'
-                            value={positionedEntity.position.z}
+                            value={positionedEntity.onScreenPosition.z}
                             onChange={e => setPositionZ(parseInt(e.target.value))}
                         />
                         <input
                             className='theia-input'
                             style={{ width: 48 }}
                             type='number'
-                            value={positionedEntity.position.parallax}
-                            onChange={e => setPositionParallax(parseInt(e.target.value))}
+                            value={positionedEntity.onScreenPosition.zDisplacement}
+                            onChange={e => setPositionZDisplacement(parseInt(e.target.value))}
                         />
                     </HContainer>
                 </VContainer>

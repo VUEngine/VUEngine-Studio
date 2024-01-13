@@ -10,7 +10,7 @@ export interface EntityEditorContextType {
     state: EntityEditorState
     setState: (state: Partial<EntityEditorState>) => void
     data: EntityData
-    setData: (partialData: Partial<EntityData>, options?: EntityEditorSaveDataOptions) => void
+    setData: (partialData: Partial<EntityData>, options?: EntityEditorSaveDataOptions) => Promise<void>
 }
 
 export const EntityEditorLayoutStorageName = 'ves-editors-entityEditor-layout';
@@ -71,35 +71,59 @@ export enum Axis {
     ZAxis = 'Z_AXIS',
 }
 
-export interface MeshSegmentData {
-    fromVertex: {
-        x: number
-        y: number
-        z: number
-        parallax: number
-    }
-    toVertex: {
-        x: number
-        y: number
-        z: number
-        parallax: number
-    }
+export interface PixelVector {
+    x: number // int16
+    y: number // int16
+    z: number // int16
+    parallax: number // int16
 }
 
-export interface Wireframe {
+export interface ScreenPixelVector {
+    x: number // int16
+    y: number // int16
+    z: number // int16
+    zDisplacement: number // int16
+}
+
+export interface PixelSize {
+    x: number // uint16
+    y: number // uint16
+    z: number // uint16
+}
+
+export interface PixelRotation {
+    x: number // int16
+    y: number // int16
+    z: number // int16
+}
+
+export interface Scale {
+    x: number // fix7_9
+    y: number // fix7_9
+    z: number // fix7_9
+}
+
+export interface Vector3D {
+    x: number // fixed_t
+    y: number // fixed_t
+    z: number // fixed_t
+}
+
+export interface MeshSegmentData {
+    fromVertex: PixelVector
+    toVertex: PixelVector
+}
+
+export interface WireframeConfigData {
     type: WireframeType
-    displacement: {
-        x: number
-        y: number
-        z: number
-    }
+    displacement: Vector3D
     color: number
     transparency: Transparency
     interlaced: boolean
 }
 
 export interface WireframeData {
-    wireframe: Wireframe
+    wireframe: WireframeConfigData
     segments: MeshSegmentData[] // only WireframeType.Mesh
     length: number // only WireframeType.Asterisk
     radius: number // only WireframeType.Sphere
@@ -114,44 +138,26 @@ export interface AnimationData {
     frames: number[]
 }
 
+export interface BehaviorData {
+    name: string
+}
+
 export interface ColliderData {
     type: ColliderType
-    pixelSize: {
-        x: number
-        y: number
-        z: number
-    }
-    displacement: {
-        x: number
-        y: number
-        z: number
-        parallax: number
-    }
-    rotation: {
-        x: number
-        y: number
-        z: number
-    }
-    scale: {
-        x: number
-        y: number
-        z: number
-    }
+    pixelSize: PixelSize
+    displacement: PixelVector
+    rotation: PixelRotation
+    scale: Scale
     checkForCollisions: boolean
     layers: string[]
     layersToCheck: string[]
 }
 
-export interface Sprite {
+export interface SpriteData {
     bgmapMode: BgmapMode
     displayMode: DisplayMode
     transparency: Transparency
-    displacement: {
-        x: number
-        y: number
-        z: number
-        parallax: number
-    }
+    displacement: PixelVector
     manipulationFunction: string
     texture: {
         files: string[]
@@ -171,27 +177,15 @@ export interface Sprite {
 
 export interface PositionedEntityData {
     itemId: string
-    position: {
-        x: number
-        y: number
-        z: number
-        parallax: number
-    }
+    onScreenPosition: ScreenPixelVector
     name: string
+    children: PositionedEntityData[]
     extraInfo: string
     loadRegardlessOfPosition: boolean
 }
 
-export interface Sprites {
-    type: string
-    customClass: string
-    useZDisplacementInProjection: boolean
-    sharedTiles: boolean
-    optimizedTiles: boolean
-    section: DataSection
-    compression: ImageCompressionType
-    sprites: Sprite[]
-}
+export type ComponentKey = 'animations' | 'behaviors' | 'children' | 'colliders' | 'sprites' | 'wireframes';
+export type ComponentData = AnimationData | BehaviorData | PositionedEntityData | ColliderData | SpriteData | WireframeData;
 
 export interface EntityData {
     _id: string
@@ -199,47 +193,41 @@ export interface EntityData {
     extraProperties: {
         enabled: boolean
         extraInfo: string
-        pixelSize: {
-            x: number
-            y: number
-            z: number
-        }
+        pixelSize: PixelSize
     }
     animations: {
-        // enabled: boolean
         default: number
         totalFrames: number
         multiframe: boolean
+    }
+    components: {
         animations: AnimationData[]
-    }
-    behaviors: {
-        behaviors: string[]
-    }
-    children: {
+        behaviors: BehaviorData[]
         children: PositionedEntityData[]
-    }
-    colliders: {
-        inGameType: string
         colliders: ColliderData[]
-    }
-    wireframes: {
+        sprites: SpriteData[]
         wireframes: WireframeData[]
     }
+    inGameType: string
     physics: {
         enabled: boolean
         mass: number
         friction: number
         bounciness: number
         maximumSpeed: number
-        maximumVelocity: {
-            x: number
-            y: number
-            z: number
-        }
+        maximumVelocity: Vector3D
         gravityAxes: Axis[]
         rotationAxes: Axis[]
     }
-    sprites: Sprites
+    sprites: {
+        type: SpriteType
+        customClass: string
+        useZDisplacementInProjection: boolean
+        sharedTiles: boolean
+        optimizedTiles: boolean
+        section: DataSection
+        compression: ImageCompressionType
+    }
 }
 
 export const defaultCurrentAnimation = -1;
@@ -257,11 +245,4 @@ export interface EntityEditorState {
         sprites: boolean
         zoom: number
     }
-}
-
-export interface Displacement {
-    x: number
-    y: number
-    z: number
-    parallax: number
 }

@@ -1,15 +1,13 @@
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
-import React, { useContext } from 'react';
+import React from 'react';
 import ColorSelector from '../../Common/ColorSelector';
 import HContainer from '../../Common/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import RadioSelect from '../../Common/RadioSelect';
 import VContainer from '../../Common/VContainer';
 import {
-    EntityEditorContext,
-    EntityEditorContextType,
     MAX_SPHERE_RADIUS,
     MAX_WIREFRAME_DISPLACEMENT,
     MIN_SPHERE_RADIUS,
@@ -18,33 +16,20 @@ import {
     STEP_SPHERE_RADIUS,
     STEP_WIREFRAME_DISPLACEMENT,
     Transparency,
-    Wireframe,
+    WireframeConfigData,
     WireframeData,
-    WireframeType,
+    WireframeType
 } from '../EntityEditorTypes';
 import MeshSegment from './MeshSegment';
 
 interface WireframeProps {
-    index: number
     wireframe: WireframeData
+    updateWireframe: (partialData: Partial<WireframeData>) => void
+    removeWireframe: () => void
 }
 
 export default function Wireframe(props: WireframeProps): React.JSX.Element {
-    const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
-    const { index, wireframe } = props;
-
-    const setWireframe = (partialWireframeData: Partial<WireframeData>): void => {
-        const updatedWireframesArray = [...data.wireframes.wireframes];
-        updatedWireframesArray[index] = {
-            ...updatedWireframesArray[index],
-            ...partialWireframeData,
-        };
-
-        const updatedWireframes = { ...data.wireframes };
-        updatedWireframes.wireframes = updatedWireframesArray;
-
-        setData({ wireframes: updatedWireframes });
-    };
+    const { wireframe, updateWireframe, removeWireframe } = props;
 
     const setSegment = (segmentIndex: number, segmentData: Partial<MeshSegmentData>): void => {
         const updatedSegments = [...wireframe.segments];
@@ -52,11 +37,11 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
             ...updatedSegments[segmentIndex],
             ...segmentData,
         };
-        setWireframe({ segments: updatedSegments });
+        updateWireframe({ segments: updatedSegments });
     };
 
-    const setWireframeWireframe = (partialWireframe: Partial<Wireframe>): void => {
-        setWireframe({
+    const updateWireframeWireframe = (partialWireframe: Partial<WireframeConfigData>): void => {
+        updateWireframe({
             wireframe: {
                 ...wireframe.wireframe,
                 ...partialWireframe,
@@ -65,13 +50,13 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
     };
 
     const setType = (type: WireframeType): void => {
-        setWireframeWireframe({
+        updateWireframeWireframe({
             type,
         });
     };
 
     const setDisplacementX = (x: number): void => {
-        setWireframeWireframe({
+        updateWireframeWireframe({
             displacement: {
                 ...wireframe.wireframe.displacement,
                 x: Math.min(Math.max(x, MIN_WIREFRAME_DISPLACEMENT), MAX_WIREFRAME_DISPLACEMENT),
@@ -80,7 +65,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
     };
 
     const setDisplacementY = (y: number): void => {
-        setWireframeWireframe({
+        updateWireframeWireframe({
             displacement: {
                 ...wireframe.wireframe.displacement,
                 y: Math.min(Math.max(y, MIN_WIREFRAME_DISPLACEMENT), MAX_WIREFRAME_DISPLACEMENT),
@@ -89,7 +74,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
     };
 
     const setDisplacementZ = (z: number): void => {
-        setWireframeWireframe({
+        updateWireframeWireframe({
             displacement: {
                 ...wireframe.wireframe.displacement,
                 z: Math.min(Math.max(z, MIN_WIREFRAME_DISPLACEMENT), MAX_WIREFRAME_DISPLACEMENT),
@@ -98,43 +83,43 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
     };
 
     const setColor = (color: number): void => {
-        setWireframeWireframe({
+        updateWireframeWireframe({
             color
         });
     };
 
     const setTransparency = (transparency: Transparency): void => {
-        setWireframeWireframe({
+        updateWireframeWireframe({
             transparency
         });
     };
 
     const toggleInterlaced = (): void => {
-        setWireframeWireframe({
+        updateWireframeWireframe({
             interlaced: !wireframe.wireframe.interlaced,
         });
     };
 
     const setRadius = (radius: number): void => {
-        setWireframe({
+        updateWireframe({
             radius
         });
     };
 
     const setLength = (length: number): void => {
-        setWireframe({
+        updateWireframe({
             length
         });
     };
 
     const toggleDrawCenter = (): void => {
-        setWireframe({
+        updateWireframe({
             drawCenter: !wireframe.drawCenter
         });
     };
 
     const addSegment = (): void => {
-        setWireframe({
+        updateWireframe({
             segments: [
                 ...wireframe.segments,
                 {
@@ -162,29 +147,12 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
         });
         const confirmed = await dialog.open();
         if (confirmed) {
-            setWireframe({
+            updateWireframe({
                 segments: [
                     ...wireframe.segments.slice(0, segmentIndex),
                     ...wireframe.segments.slice(segmentIndex + 1)
                 ]
             });
-        }
-    };
-
-    const removeWireframe = async (): Promise<void> => {
-        const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/entityEditor/removeWireframe', 'Remove Wireframe'),
-            msg: nls.localize('vuengine/entityEditor/areYouSureYouWantToRemoveWireframe', 'Are you sure you want to remove this Wireframe?'),
-        });
-        const confirmed = await dialog.open();
-        if (confirmed) {
-            const updatedWireframes = { ...data.wireframes };
-            updatedWireframes.wireframes = [
-                ...data.wireframes.wireframes.slice(0, index),
-                ...data.wireframes.wireframes.slice(index + 1)
-            ];
-
-            setData({ wireframes: updatedWireframes });
         }
     };
 

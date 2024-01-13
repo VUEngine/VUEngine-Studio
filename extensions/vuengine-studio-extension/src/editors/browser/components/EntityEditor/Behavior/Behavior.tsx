@@ -1,57 +1,36 @@
 import { nls } from '@theia/core';
-import { ConfirmDialog } from '@theia/core/lib/browser';
-import React, { useContext } from 'react';
+import React from 'react';
 import VContainer from '../../Common/VContainer';
 import {
-    EntityEditorContext,
-    EntityEditorContextType
+    BehaviorData
 } from '../EntityEditorTypes';
 
 interface BehaviorProps {
-    behavior: string
-    index: number
+    behavior: BehaviorData
+    updateBehavior: (partialData: Partial<BehaviorData>) => void
+    removeBehavior: () => void
 }
 
 export default function Behavior(props: BehaviorProps): React.JSX.Element {
-    const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
-    const { behavior, index } = props;
+    const { behavior, updateBehavior, removeBehavior } = props;
 
-    const remove = async (): Promise<void> => {
-        const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/entityEditor/removeBehavior', 'Remove Behavior'),
-            msg: nls.localize('vuengine/entityEditor/areYouSureYouWantToRemoveBehavior', 'Are you sure you want to remove this Behavior?'),
-        });
-        const confirmed = await dialog.open();
-        if (confirmed) {
-            const behaviors = { ...data.behaviors };
-            behaviors.behaviors = [
-                ...data.behaviors.behaviors.slice(0, index),
-                ...data.behaviors.behaviors.slice(index + 1)
-            ];
-
-            setData({ behaviors });
-        }
-    };
-
-    const setValue = (b: string): void => {
-        const behaviors = { ...data.behaviors };
-        behaviors.behaviors[index] = b;
-        setData({ behaviors });
+    const setName = (name: string): void => {
+        updateBehavior({ name });
     };
 
     return <div>
         <VContainer className='item' gap={15}>
             <button
                 className="remove-button"
-                onClick={remove}
+                onClick={removeBehavior}
                 title={nls.localize('vuengine/entityEditor/removeComponent', 'Remove Component')}
             >
                 <i className='codicon codicon-x' />
             </button>
             <input
                 className='theia-input'
-                value={behavior}
-                onChange={e => setValue(e.target.value)}
+                value={behavior.name}
+                onChange={e => setName(e.target.value)}
             />
         </VContainer>
     </div>;

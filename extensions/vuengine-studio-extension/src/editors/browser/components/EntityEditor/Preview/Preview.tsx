@@ -25,10 +25,10 @@ export default function Preview(): React.JSX.Element {
   // @ts-ignore
   const frameMultiplicator = engineConfig && engineConfig.frameRate?.frameCycle ? engineConfig.frameRate.frameCycle + 1 : 1;
 
-  const animate = (state.preview.animations && data.animations?.animations?.length > 0) || state.preview.currentAnimation > -1;
+  const animate = (state.preview.animations && data.components?.animations?.length > 0) || state.preview.currentAnimation > -1;
   const currentAnimation = state.preview.currentAnimation > -1 ? state.preview.currentAnimation : data.animations.default;
-  const animation: AnimationData | undefined = data.animations?.animations
-    ? data.animations.animations[currentAnimation]
+  const animation: AnimationData | undefined = data.components?.animations
+    ? data.components?.animations[currentAnimation]
     : undefined;
 
   const setBooleanStateProperty = (property: string, checked: boolean) =>
@@ -57,10 +57,10 @@ export default function Preview(): React.JSX.Element {
       : undefined;
   };
 
-  const showPreview = data.sprites.sprites.length /* ||
-    data.children.children.length ||
-    data.colliders.colliders.length ||
-    data.wireframes.wireframes.length */;
+  const showPreview = data.components?.sprites.length /* ||
+    data.components?.children.length ||
+    data.components?.colliders.length ||
+    data.components?.wireframes.length */;
 
   useEffect(() => {
     clearInterval(timer);
@@ -94,7 +94,7 @@ export default function Preview(): React.JSX.Element {
                   {currentAnimationStep + 1}
                 </div>
               </div>}
-            {state.preview.sprites && data.sprites?.sprites?.map((s, i) =>
+            {state.preview.sprites && data.components?.sprites?.map((s, i) =>
               <Sprite
                 key={`preview-sprite-${i}`}
                 animate={animate}
@@ -141,8 +141,8 @@ export default function Preview(): React.JSX.Element {
             <label>
               <input
                 type="checkbox"
-                checked={state.preview.sprites && data.sprites?.sprites?.length > 0}
-                disabled={!data.sprites?.sprites?.length}
+                checked={state.preview.sprites && data.components?.sprites?.length > 0}
+                disabled={!data.components?.sprites?.length}
                 onChange={e => setBooleanStateProperty('sprites', e.target.checked)}
               />
               {nls.localize('vuengine/entityEditor/showSprites', 'Show Sprites')}
@@ -151,8 +151,8 @@ export default function Preview(): React.JSX.Element {
         <label>
           <input
             type="checkbox"
-            checked={state.preview.wireframes && data.wireframes?.wireframes?.length > 0}
-            disabled={!data.wireframes?.wireframes?.length}
+            checked={state.preview.wireframes && data.components?.wireframes?.length > 0}
+            disabled={!data.components?.wireframes?.length}
             onChange={e => setBooleanStateProperty('wireframes', e.target.checked)}
           />
           Show Wireframes
@@ -173,7 +173,7 @@ export default function Preview(): React.JSX.Element {
               <input
                 type="checkbox"
                 checked={animate}
-                disabled={!data.animations?.animations?.length}
+                disabled={!data.components?.animations?.length}
                 onChange={e =>
                   setBooleanStateProperty('animations', e.target.checked)
                 }

@@ -4,17 +4,25 @@ import HContainer from '../../Common/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import VContainer from '../../Common/VContainer';
 import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
+import { ConfirmDialog } from '@theia/core/lib/browser';
 
 export default function ExtraProperties(): React.JSX.Element {
     const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
 
-    const disableExtraProperties = (): void => {
-        setData({
-            extraProperties: {
-                ...data.extraProperties,
-                enabled: false,
-            }
+    const disableExtraProperties = async (): Promise<void> => {
+        const dialog = new ConfirmDialog({
+            title: nls.localize('vuengine/entityEditor/removeComponent', 'Remove Component'),
+            msg: nls.localize('vuengine/entityEditor/areYouSureYouWantToRemoveComponent', 'Are you sure you want to remove this component?'),
         });
+        const confirmed = await dialog.open();
+        if (confirmed) {
+            setData({
+                extraProperties: {
+                    ...data.extraProperties,
+                    enabled: false,
+                }
+            });
+        }
     };
 
     const setExtraInfo = (e: string): void => {

@@ -45,8 +45,8 @@ export default function SpritesSettings(props: SpritesSettingsProps): React.JSX.
         });
     };
 
-    const setTilesCompression = (compression: ImageCompressionType) => {
-        setData({
+    const setTilesCompression = async (compression: ImageCompressionType): Promise<void> => {
+        await setData({
             sprites: {
                 ...data.sprites,
                 compression,
@@ -65,8 +65,8 @@ export default function SpritesSettings(props: SpritesSettingsProps): React.JSX.
         });
     };
 
-    const toggleOptimizedTiles = (): void => {
-        setData({
+    const toggleOptimizedTiles = async (): Promise<void> => {
+        await setData({
             sprites: {
                 ...data.sprites,
                 optimizedTiles: !data.sprites.optimizedTiles,
@@ -76,8 +76,8 @@ export default function SpritesSettings(props: SpritesSettingsProps): React.JSX.
         });
     };
 
-    const toggleSharedTiles = (): void => {
-        setData({
+    const toggleSharedTiles = async (): Promise<void> => {
+        await setData({
             sprites: {
                 ...data.sprites,
                 sharedTiles: !data.sprites.sharedTiles,
@@ -87,8 +87,8 @@ export default function SpritesSettings(props: SpritesSettingsProps): React.JSX.
         });
     };
 
-    const setAnimationFrames = (frames: number): void => {
-        setData({
+    const setAnimationFrames = async (frames: number): Promise<void> => {
+        await setData({
             animations: {
                 ...data.animations,
                 totalFrames: frames,
@@ -108,7 +108,7 @@ export default function SpritesSettings(props: SpritesSettingsProps): React.JSX.
     };
 
     return <>
-        {data.sprites.sprites.length > 0 &&
+        {data.components?.sprites.length > 0 &&
             <VContainer>
                 <label>
                     Sprites Settings
@@ -128,7 +128,7 @@ export default function SpritesSettings(props: SpritesSettingsProps): React.JSX.
                             onChange={options => setType(options[0].value as SpriteType)}
                         />
                     </VContainer>
-                    {data.animations.animations.length > 0 && <>
+                    {data.components?.animations.length > 0 && <>
                         <VContainer>
                             <label>
                                 {nls.localize('vuengine/entityEditor/frames', 'Frames')}
@@ -146,9 +146,14 @@ export default function SpritesSettings(props: SpritesSettingsProps): React.JSX.
                             />
                         </VContainer>
                         {!isMultiFileAnimation && <VContainer>
-                            <label>
-                                {nls.localize('vuengine/entityEditor/multiframe', 'Multiframe')}
-                            </label>
+                            <InfoLabel
+                                label={nls.localize('vuengine/entityEditor/multiframe', 'Multiframe')}
+                                tooltip={nls.localize(
+                                    'vuengine/entityEditor/multiframeDescription',
+                                    'With this enabled, chars for all animation frames are loaded into video memory at the same time. ' +
+                                    'This allows multiple sprites to use the same texture, but show a different frame each.'
+                                )}
+                            />
                             <input
                                 type="checkbox"
                                 checked={data.animations.multiframe}
@@ -157,7 +162,7 @@ export default function SpritesSettings(props: SpritesSettingsProps): React.JSX.
                         </VContainer>}
                     </>}
                     {/* these setting are implicitly handled for animations */}
-                    {data.animations.animations.length === 0 && <VContainer>
+                    {data.components?.animations.length === 0 && <VContainer>
                         <label>
                             {nls.localize('vuengine/entityEditor/tiles', 'Tiles')}
                         </label>
@@ -169,7 +174,7 @@ export default function SpritesSettings(props: SpritesSettingsProps): React.JSX.
                             />
                             {nls.localize('vuengine/entityEditor/optimized', 'Optimized')}
                         </label>
-                        {data.sprites.sprites.length > 1 && <label>
+                        {data.components?.sprites.length > 1 && <label>
                             <input
                                 type="checkbox"
                                 checked={data.sprites.sharedTiles}

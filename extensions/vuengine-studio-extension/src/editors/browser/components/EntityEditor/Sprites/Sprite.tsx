@@ -1,5 +1,4 @@
 import { nls } from '@theia/core';
-import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext, useEffect, useState } from 'react';
 import { ConversionResult } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
@@ -8,6 +7,7 @@ import InfoLabel from '../../Common/InfoLabel';
 import RadioSelect from '../../Common/RadioSelect';
 import VContainer from '../../Common/VContainer';
 import Images from '../../ImageEditor/Images/Images';
+import { EntityEditorSaveDataOptions } from '../EntityEditor';
 import {
     BgmapMode,
     DisplayMode,
@@ -15,20 +15,23 @@ import {
     EntityEditorContextType,
     MAX_TEXTURE_PADDING,
     MIN_TEXTURE_PADDING,
-    Sprite,
+    SpriteData,
     SpriteType,
-    Transparency
+    Transparency,
+    defaultCurrentAnimation
 } from '../EntityEditorTypes';
 
 interface SpriteProps {
     index: number
-    sprite: Sprite
+    sprite: SpriteData
+    updateSprite: (partialData: Partial<SpriteData>, options?: EntityEditorSaveDataOptions) => void
+    removeSprite: () => void
 }
 
 export default function Sprite(props: SpriteProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
-    const { data, setData, state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
-    const { index, sprite } = props;
+    const { data, state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { index, sprite, updateSprite, removeSprite } = props;
     const [dimensions, setDimensions] = useState<string>('');
     const [filename, setFilename] = useState<string>('');
 
@@ -55,7 +58,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         if (imageData !== undefined) {
             if (typeof imageData === 'number') {
                 if (imageData > 0) {
-                    const pointedToImageData = data.sprites?.sprites[imageData - 1]._imageData;
+                    const pointedToImageData = data.components?.sprites[imageData - 1]._imageData;
                     if (pointedToImageData !== undefined) {
                         return getCharCount(pointedToImageData as Partial<ConversionResult>);
                     }
@@ -63,7 +66,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
             } else if (imageData.animation?.largestFrame) {
                 return imageData.animation?.largestFrame;
             } else if (imageData.tiles?.count) {
-                return data.animations?.animations?.length > 0 && !data.animations.multiframe
+                return data.components?.animations?.length > 0 && !data.animations.multiframe
                     ? imageData.tiles?.count / data.animations?.totalFrames || 1
                     : imageData.tiles?.count;
             }
@@ -72,62 +75,45 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         return 0;
     };
 
-    const setSprite = (partialSpriteData: Partial<Sprite>, appendImageData = false): void => {
-        const updatedSpritesArray = [...data.sprites.sprites];
-        updatedSpritesArray[index] = {
-            ...updatedSpritesArray[index],
-            ...partialSpriteData,
-        };
-
-        const updatedSprites = { ...data.sprites };
-        updatedSprites.sprites = updatedSpritesArray;
-
-        setData({
-            sprites: updatedSprites
-        }, {
-            appendImageData
-        });
-    };
-
     const setManipulationFunction = (manipulationFunction: string): void => {
-        setSprite({
+        updateSprite({
             manipulationFunction,
         });
     };
 
     const setTransparency = (transparency: Transparency): void => {
-        setSprite({
+        updateSprite({
             transparency,
         });
     };
 
     const setBgmapMode = (bgmapMode: BgmapMode): void => {
-        setSprite({
+        updateSprite({
             bgmapMode,
         });
     };
 
     const setDisplayMode = (displayMode: DisplayMode): void => {
-        setSprite({
+        updateSprite({
             displayMode,
         });
     };
 
     const setPalette = (palette: number): void => {
-        setSprite({
+        updateSprite({
             texture: {
-                ...data.sprites.sprites[index].texture,
+                ...sprite.texture,
                 palette: Math.min(Math.max(palette, 0), 3),
             },
         });
     };
 
     const setPaddingX = (x: number): void => {
-        setSprite({
+        updateSprite({
             texture: {
-                ...data.sprites.sprites[index].texture,
+                ...sprite.texture,
                 padding: {
-                    ...data.sprites.sprites[index].texture.padding,
+                    ...sprite.texture.padding,
                     x: Math.min(Math.max(x, MIN_TEXTURE_PADDING), MAX_TEXTURE_PADDING),
                 },
             },
@@ -135,11 +121,11 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     };
 
     const setPaddingY = (y: number): void => {
-        setSprite({
+        updateSprite({
             texture: {
-                ...data.sprites.sprites[index].texture,
+                ...sprite.texture,
                 padding: {
-                    ...data.sprites.sprites[index].texture.padding,
+                    ...sprite.texture.padding,
                     y: Math.min(Math.max(y, MIN_TEXTURE_PADDING), MAX_TEXTURE_PADDING),
                 },
             },
@@ -147,43 +133,43 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     };
 
     const setDisplacementX = (x: number): void => {
-        setSprite({
+        updateSprite({
             displacement: {
-                ...data.sprites.sprites[index].displacement,
+                ...sprite.displacement,
                 x,
             },
         });
     };
 
     const setDisplacementY = (y: number): void => {
-        setSprite({
+        updateSprite({
             displacement: {
-                ...data.sprites.sprites[index].displacement,
+                ...sprite.displacement,
                 y,
             },
         });
     };
 
     const setDisplacementZ = (z: number): void => {
-        setSprite({
+        updateSprite({
             displacement: {
-                ...data.sprites.sprites[index].displacement,
+                ...sprite.displacement,
                 z,
             },
         });
     };
 
     const setDisplacementParallax = (parallax: number): void => {
-        setSprite({
+        updateSprite({
             displacement: {
-                ...data.sprites.sprites[index].displacement,
+                ...sprite.displacement,
                 parallax,
             },
         });
     };
 
     const toggleRecycleable = (): void => {
-        setSprite({
+        updateSprite({
             texture: {
                 ...sprite.texture,
                 recycleable: !sprite.texture.recycleable,
@@ -192,7 +178,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     };
 
     const toggleFlipHorizontally = (): void => {
-        setSprite({
+        updateSprite({
             texture: {
                 ...sprite.texture,
                 flip: {
@@ -204,7 +190,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     };
 
     const toggleFlipVertically = (): void => {
-        setSprite({
+        updateSprite({
             texture: {
                 ...sprite.texture,
                 flip: {
@@ -215,34 +201,15 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         });
     };
 
-    const removeSprite = async (): Promise<void> => {
-        const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/entityEditor/removeSprite', 'Remove Sprite'),
-            msg: nls.localize('vuengine/entityEditor/areYouSureYouWantToRemoveSprite', 'Are you sure you want to remove this sprite?'),
-        });
-        const confirmed = await dialog.open();
-        if (confirmed) {
-            const updatedSprites = { ...data.sprites };
-            updatedSprites.sprites = [
-                ...data.sprites.sprites.slice(0, index),
-                ...data.sprites.sprites.slice(index + 1)
-            ];
-
-            setData({
-                sprites: updatedSprites
-            }, {
-                appendImageData: true
-            });
-        }
-    };
-
     const setFiles = (files: string[]): void => {
-        setSprite({
+        updateSprite({
             texture: {
                 ...sprite.texture,
                 files
             }
-        }, true);
+        }, {
+            appendImageData: true,
+        });
     };
 
     const setPreviewSprite = (): void => {
@@ -250,6 +217,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
             preview: {
                 ...state.preview,
                 highlightedSprite: index,
+                currentAnimation: defaultCurrentAnimation,
             }
         });
     };
@@ -259,6 +227,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
             preview: {
                 ...state.preview,
                 highlightedSprite: -1,
+                currentAnimation: defaultCurrentAnimation,
             }
         });
     };
@@ -279,28 +248,14 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 <i className='codicon codicon-x' />
             </button>
             <VContainer>
-                {/*
-                <InfoLabel
-                    label={data.animations.animations.length > 0
-                        ? nls.localize('vuengine/entityEditor/xFiles', 'Image Files')
-                        : nls.localize('vuengine/entityEditor/file', 'Image File')}
-                    count={sprite.texture.files.length}
-                    tooltip={nls.localize(
-                        'vuengine/entityEditor/filesDescription',
-                        'PNG image to be used as texture. Must be four color indexed mode with the proper palette. ' +
-                        'When animations are enabled, select either a single file containing a vertical spritesheet, ' +
-                        'or multiple files, where each represents one animation frame.'
-                    )}
-                />
-                */}
                 <VContainer alignItems='start'>
                     <i
                         className='codicon codicon-question'
                         style={{
                             cursor: 'context-menu',
-                            left: 20,
+                            left: 24,
                             position: 'absolute',
-                            top: 20,
+                            top: 24,
                             zIndex: 10,
                         }}
                         onMouseEnter={event => {
@@ -312,7 +267,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                     'or multiple files, where each represents one animation frame.'
                                 ),
                                 target: event.currentTarget,
-                                position: 'top',
+                                position: 'right',
                             });
                         }}
                     />
@@ -320,7 +275,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                         data={sprite.texture.files}
                         updateData={setFiles}
                         allInFolderAsFallback={false}
-                        canSelectMany={data.animations.animations.length > 0}
+                        canSelectMany={data.components?.animations.length > 0}
                         stack={true}
                         showMetaData={false}
                     />
