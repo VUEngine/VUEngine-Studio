@@ -1,13 +1,11 @@
 import { nls } from '@theia/core';
 
+export type RumbleEffectFrequency = 160 | 240 | 320 | 400 | 50 | 95 | 135;
+
 export interface RumbleEffectData {
     name: string
     effect: number
-    frequency: number
-    sustainPositive: number
-    sustainNegative: number
-    overdrive: number
-    break: number
+    frequency: RumbleEffectFrequency
     stopBeforeStarting: boolean
 }
 
