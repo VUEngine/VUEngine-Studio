@@ -7,21 +7,6 @@
   overflow: hidden;
 }
 
-.rumbleEffectEditor .settings {
-  display: flex;
-  gap: 4px;
-}
-
-.rumbleEffectEditor .settings .setting {
-  flex-grow: 1;
-}
-
-.rumbleEffectEditor .setting {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
 .rumbleEffectEditor .connectionStatus {
   padding-top: 20px;
 }

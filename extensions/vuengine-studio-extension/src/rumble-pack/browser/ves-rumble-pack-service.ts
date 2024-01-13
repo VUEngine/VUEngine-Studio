@@ -101,9 +101,9 @@ export class VesRumblePackService {
           if (this._rumblePackLog.length) {
             this._rumblePackLog[this._rumblePackLog.length - 1].text += returnValueParts.shift();
           }
-          returnValueParts.map(returnValuePart =>
-            this.rumblePackLog.push({ timestamp: Date.now(), text: returnValuePart })
-          );
+          returnValueParts.map(returnValuePart => {
+            this.rumblePackLog.push({ timestamp: Date.now(), text: returnValuePart });
+          });
           // trigger event
           this.rumblePackLog = this.rumblePackLog;
         }
@@ -129,14 +129,6 @@ export class VesRumblePackService {
     return this.sendCommand('VER');
   }
 
-  async sendCommandPrintVbCommandLineState(): Promise<void> {
-    return this.sendCommand('VBC');
-  }
-
-  async sendCommandPrintVbSyncLineState(): Promise<void> {
-    return this.sendCommand('VBS');
-  }
-
   async sendCommandPlayLastEffect(): Promise<void> {
     return this.sendCommand('GO');
   }
@@ -146,27 +138,11 @@ export class VesRumblePackService {
   }
 
   async sendCommandPlayEffect(effect: number): Promise<void> {
-    return this.sendCommand(`HAP ${(++effect).toString().padStart(3, '0')}`);
+    return this.sendCommand(`TEF ${(++effect).toString().padStart(3, '0')}`);
   }
 
   async sendCommandSetFrequency(frequency: number): Promise<void> {
     return this.sendCommand(`FRQ ${frequency.toString().padStart(3, '0')}`);
-  }
-
-  async sendCommandSetOverdrive(overdrive: number): Promise<void> {
-    return this.sendCommand(`ODT ${overdrive.toString().padStart(3, '0')}`);
-  }
-
-  async sendCommandSetPositiveSustain(sustain: number): Promise<void> {
-    return this.sendCommand(`SPT ${sustain.toString().padStart(3, '0')}`);
-  }
-
-  async sendCommandSetNegativeSustain(sustain: number): Promise<void> {
-    return this.sendCommand(`SNT ${sustain.toString().padStart(3, '0')}`);
-  }
-
-  async sendCommandSetBreak(breakValue: number): Promise<void> {
-    return this.sendCommand(`BRT ${breakValue.toString().padStart(3, '0')}`);
   }
 
   async sendCommandEmulateVbByte(byte: string): Promise<void> {
