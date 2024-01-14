@@ -1,4 +1,4 @@
-import { QuickPickItem, QuickPickOptions, nls } from '@theia/core';
+import { QuickPickItem, QuickPickOptions, QuickPickSeparator, nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
@@ -122,9 +122,9 @@ export default function Components(): React.JSX.Element {
         colliders.push({
             type: ColliderType.Ball,
             pixelSize: {
-                x: 0,
-                y: 0,
-                z: 0,
+                x: 32,
+                y: 32,
+                z: 32,
             },
             displacement: {
                 x: 0,
@@ -138,9 +138,9 @@ export default function Components(): React.JSX.Element {
                 z: 0,
             },
             scale: {
-                x: 0,
-                y: 0,
-                z: 0,
+                x: 1,
+                y: 1,
+                z: 1,
             },
             checkForCollisions: false,
             layers: [],
@@ -267,7 +267,7 @@ export default function Components(): React.JSX.Element {
                         index={index}
                         sprite={sprite}
                         updateSprite={(partialData: Partial<SpriteData>) => updateComponent('sprites', index, partialData)}
-                        removeSprite={() => removeComponent('wireframes', index)}
+                        removeSprite={() => removeComponent('sprites', index)}
                     />
                 )}
             </VContainer>
@@ -396,18 +396,26 @@ export default function Components(): React.JSX.Element {
             title: nls.localize('vuengine/editors/addComponent', 'Add Component'),
             placeholder: nls.localize('vuengine/editors/selectComponentTypeToAdd', 'Select a component type to add...'),
         };
-        const items: QuickPickItem[] = [];
-        componentTypes.map((t, i) => {
-            if (t.allowAdd) {
-                items.push({
-                    id: i.toString(),
-                    label: t.labelSingular,
-                });
-            }
+        const items: (QuickPickItem | QuickPickSeparator)[] = [];
+        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map(tf => {
+            componentTypes.map((t, i) => {
+                if (t.allowAdd) {
+                    items.push({
+                        id: i.toString(),
+                        label: t.labelSingular,
+                    });
+                    if (items.length % 10 === 0) {
+                        items.push({
+                            type: 'separator',
+                            label: 'Überschrift',
+                        });
+                    }
+                }
+            });
         });
 
         return services.quickPickService.show(
-            items.sort((a, b) => a.label.localeCompare(b.label)),
+            items,
             quickPickOptions
         );
     };
@@ -483,7 +491,7 @@ export default function Components(): React.JSX.Element {
                                 {t.showTab && <>
                                     {t.labelPlural}
                                     {t.showCount && <>
-                                        {' '}<span className='count'>
+                                        {' '}<span key={'tab-' + i} className='count'>
                                             {t.count}
                                         </span>
                                     </>}
@@ -493,11 +501,11 @@ export default function Components(): React.JSX.Element {
                     </TabList>
                     <TabPanel>
                         <VContainer>
-                            {componentTypes.map((t, j) =>
+                            {componentTypes.map((t, i) =>
                                 <>
                                     {t.showTab && <>
                                         {totalComponents > 1 &&
-                                            <label className='light-label'>{t.labelPlural}</label>
+                                            <label key={'tabPanel-' + i} className='light-label'>{t.labelPlural}</label>
                                         }
                                         {t.tabContent}
                                     </>}
@@ -505,8 +513,8 @@ export default function Components(): React.JSX.Element {
                             )}
                         </VContainer>
                     </TabPanel>
-                    {componentTypes.map((t, j) =>
-                        <TabPanel key={'tabpanel' + j}>
+                    {componentTypes.map((t, i) =>
+                        <TabPanel key={'tabPanel-' + i}>
                             {t.showTab && t.tabContent}
                         </TabPanel>
                     )}

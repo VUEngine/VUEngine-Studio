@@ -29,24 +29,24 @@ export default function Palette(props: PaletteProps): React.JSX.Element {
         <HContainer className='palette-renderer' gap={2}>
             <div className={`value-${index0}`}>
                 <SelectComponent
-                    key="paletteIndex0"
                     options={paletteValues}
                     defaultValue={index0}
-                    onChange={option => updateValue(getUpdatedValue(0, option.value!))} />
+                    onChange={option => updateValue(getUpdatedValue(0, option.value!))}
+                />
             </div>
             <div className={`value-${index1}`}>
                 <SelectComponent
-                    key="paletteIndex1"
                     options={paletteValues}
                     defaultValue={index1}
-                    onChange={option => updateValue(getUpdatedValue(1, option.value!))} />
+                    onChange={option => updateValue(getUpdatedValue(1, option.value!))}
+                />
             </div>
             <div className={`value-${index2}`}>
                 <SelectComponent
-                    key="paletteIndex2"
                     options={paletteValues}
                     defaultValue={index2}
-                    onChange={option => updateValue(getUpdatedValue(2, option.value!))} />
+                    onChange={option => updateValue(getUpdatedValue(2, option.value!))}
+                />
             </div>
             <div className="value-00">
                 <div className="theia-select-component">

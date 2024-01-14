@@ -1,17 +1,18 @@
-import React, { PropsWithChildren } from 'react';
+import React, { MouseEventHandler, PropsWithChildren } from 'react';
 
 interface HContainerProps {
     alignItems?: string
     className?: string
     gap?: number
     grow?: number
+    onClick?: MouseEventHandler | undefined;
     overflow?: string
     style?: object
     wrap?: 'nowrap' | 'wrap' | 'wrap-reverse'
 }
 
 export default function HContainer(props: PropsWithChildren<HContainerProps>): React.JSX.Element {
-    const { alignItems, children, className, overflow, wrap, gap, grow, style } = props;
+    const { alignItems, children, className, onClick, overflow, wrap, gap, grow, style } = props;
 
     return <div
         style={{
@@ -25,6 +26,7 @@ export default function HContainer(props: PropsWithChildren<HContainerProps>): R
             ...(style || {}),
         }}
         className={className}
+        onClick={e => { if (onClick) { onClick(e); } }}
     >
         {children}
     </div>;

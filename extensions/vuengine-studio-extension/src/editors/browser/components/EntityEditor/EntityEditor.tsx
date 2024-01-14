@@ -1,8 +1,11 @@
+import { nls } from '@theia/core';
 import React from 'react';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import { ConversionResult } from '../../../../images/browser/ves-images-types';
 import { EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/HContainer';
 import VContainer from '../Common/VContainer';
+import CollidersSettings from './Collider/CollidersSettings';
 import Components from './Entity/Components';
 import Entity from './Entity/Entity';
 import {
@@ -13,8 +16,8 @@ import {
   defaultHighlightedSprite
 } from './EntityEditorTypes';
 import Preview from './Preview/Preview';
+import Scripts from './Scripts/Scripts';
 import SpritesSettings from './Sprites/SpritesSettings';
-import CollidersSettings from './Collider/CollidersSettings';
 
 interface EntityEditorProps {
   data: EntityData;
@@ -241,41 +244,53 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
     const isMultiFileAnimation = mostFilesOnASprite > 1;
 
     return (
-      <EntityEditorContext.Provider
-        value={{
-          state: this.state,
-          setState: this.updateState.bind(this),
-          data,
-          setData: this.setData.bind(this),
-        }}
-      >
-        <HContainer className="entityEditor" gap={20}>
-          <VContainer gap={15} grow={1}>
-            <EntityEditorContext.Consumer>
-              {context =>
-                <VContainer gap={15}>
-                  <Entity />
-                  <SpritesSettings
-                    isMultiFileAnimation={isMultiFileAnimation}
-                  />
-                  <CollidersSettings />
-                  <Components />
-                </VContainer>
-              }
-            </EntityEditorContext.Consumer>
-
-          </VContainer>
-          <VContainer gap={15}>
-
-            <EntityEditorContext.Consumer>
-              {context =>
-                <Preview />
-              }
-            </EntityEditorContext.Consumer>
-
-          </VContainer>
-        </HContainer>
-      </EntityEditorContext.Provider >
+      <VContainer className="entityEditor">
+        <EntityEditorContext.Provider
+          value={{
+            state: this.state,
+            setState: this.updateState.bind(this),
+            data,
+            setData: this.setData.bind(this),
+          }}
+        >
+          <Tabs>
+            <TabList>
+              <Tab>
+                {nls.localize('vuengine/entityEditor/entity', 'Entity')}
+              </Tab>
+              <Tab>
+                {nls.localize('vuengine/entityEditor/scripts', 'Scripts')}
+              </Tab>
+            </TabList>
+            <TabPanel>
+              <EntityEditorContext.Consumer>
+                {context =>
+                  <HContainer gap={20}>
+                    <VContainer gap={15} grow={1}>
+                      <Entity />
+                      <SpritesSettings
+                        isMultiFileAnimation={isMultiFileAnimation}
+                      />
+                      <CollidersSettings />
+                      <Components />
+                    </VContainer>
+                    <VContainer gap={15} style={{ width: 250 }}>
+                      <Preview />
+                    </VContainer>
+                  </HContainer>
+                }
+              </EntityEditorContext.Consumer>
+            </TabPanel>
+            <TabPanel style={{ overflow: 'hidden' }}>
+              <EntityEditorContext.Consumer>
+                {context =>
+                  <Scripts />
+                }
+              </EntityEditorContext.Consumer>
+            </TabPanel>
+          </Tabs>
+        </EntityEditorContext.Provider>
+      </VContainer>
     );
   }
 }

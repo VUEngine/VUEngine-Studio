@@ -1,0 +1,84 @@
+.scripted-action-container {
+    padding-top: 3px;
+    position: relative;
+    width: 300px;
+}
+
+.scripted-action {
+    cursor: pointer;
+}
+
+.scripted-action-container.root .scripted-action,
+.scripted-action-container.end .scripted-action {
+    background-color: var(--theia-dropdown-border);
+    cursor: default;
+    justify-content: center;
+}
+
+.scripted-action-container.root .scripted-action:hover,
+.scripted-action-container.end .scripted-action:hover {
+    border-color: transparent;
+}
+
+.scripted-action.active,
+.scripted-action:hover {
+    border-color: var(--theia-button-hoverBackground);
+}
+
+.scripted-action-container:not(.root):before,
+.scripted-action-container:not(.end) .scripted-action:before {
+    background-color: var(--theia-dropdown-border);
+    border-radius: 0 0 5px 5px;
+    bottom: -4px;
+    content: '';
+    display: block;
+    height: 3px;
+    left: calc(50% - 4px);
+    position: absolute;
+    width: 7px;
+}
+.scripted-action-container:before {
+    border-radius: 5px 5px 0 0 !important;
+    top: 0;
+}
+
+.scripted-action-container:not(.end) .scripted-action:after {
+    border-left: 1px dashed var(--theia-dropdown-border);
+    bottom: -50px;
+    content: '';
+    display: block;
+    height: 50px;
+    left: calc(50% - 1px);
+    position: absolute;
+}
+
+.scripted-action-container .add-button {
+    height: 10px;
+    margin-bottom: 2px;
+    min-height: unset;
+    opacity: 0;
+    transition: all .2s;
+    transition-delay: .2s;
+    z-index: 10;
+}
+
+.scripted-action-container .add-button:hover {
+    height: 32px;
+    opacity: 1;
+}
+
+.scripted-action-container .meta {
+    opacity: .3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.scripted-action-container.end {
+    align-items: center;
+}
+
+.scripted-action-container.end .scripted-action {
+    padding: var(--theia-ui-padding);
+    width: 16px;
+}

@@ -1,5 +1,8 @@
 .react-tabs {
+    display: flex;
+    flex-direction: column;
     flex-grow: 1;
+    overflow: hidden;
 }
 
 .react-tabs__tab-list {
@@ -42,6 +45,16 @@
     padding: 1px 2px;
     text-align: center;
     vertical-align: text-bottom;
+}
+
+.react-tabs__tab-panel {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: auto;
+}
+.react-tabs__tab-panel:empty {
+    flex-grow: unset;
 }
 
 

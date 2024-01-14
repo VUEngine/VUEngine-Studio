@@ -18,11 +18,13 @@
   display: flex;
   height: var(--ves-file-width);
   justify-content: center;
+  overflow: hidden;
   padding: 10px;
+  position: relative;
   width: var(--ves-file-width);
 }
 
-.jsonforms-container .filePreview.multi .filePreviewImage{
+.jsonforms-container .filePreview.multi .filePreviewImage {
   box-shadow: 1px 1px 0px var(--theia-editor-background), 
     4px 3px 0px var(--theia-activityBar-background), 
     5px 4px 0px var(--theia-editor-background), 

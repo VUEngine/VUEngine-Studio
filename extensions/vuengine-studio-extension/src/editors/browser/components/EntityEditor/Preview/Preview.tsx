@@ -71,7 +71,7 @@ export default function Preview(): React.JSX.Element {
   ]);
 
   return (
-    <VContainer style={{ width: 300 }}>
+    <VContainer>
       <VContainer>
         <label>
           {nls.localize('vuengine/entityEditor/preview', 'Preview')}

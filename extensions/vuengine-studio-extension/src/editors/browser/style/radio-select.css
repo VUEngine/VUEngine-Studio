@@ -14,8 +14,8 @@
 }
 
 .radioSelect div {
-    border: 1px solid var(--theia-activityBar-background);
-    color: var(--theia-activityBar-background);
+    border: 1px solid var(--theia-dropdown-border);
+    color: var(--theia-dropdown-border);
     cursor: pointer;
     font-family: var(--theia-ui-font-family);
     font-size: var(--theia-ui-font-size1);

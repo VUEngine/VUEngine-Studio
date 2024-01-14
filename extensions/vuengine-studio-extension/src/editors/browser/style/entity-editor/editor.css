@@ -18,12 +18,16 @@
     user-select: none;
 }
 
+.entityEditor {
+    --padding: calc(2 * var(--theia-ui-padding));
+}
+
 .entityEditor .item {
     background-color: var(--theia-editorGroupHeader-tabsBackground);
     border: var(--theia-border-width) solid var(--theia-dropdown-border);
     border-radius: 2px;
     flex-grow: 1;
-    padding: calc(2 * var(--theia-ui-padding));
+    padding: var(--padding);
     position: relative;
 }
 
@@ -58,6 +62,12 @@
     vertical-align: middle;
 }
 
+.entityEditor .item .header {
+    border-bottom: var(--theia-border-width) solid var(--theia-dropdown-border);
+    padding: var(--padding);
+    margin: calc(-1 * var(--padding)) calc(-1 * var(--padding)) 10px;
+}
+
 .entityEditor .theia-input.heaviness {
     padding-left: 0;
     text-align: center;
@@ -75,4 +85,9 @@
 
 .entityEditor .light-label {
     color: var(--theia-dropdown-border);
+}
+
+.entityEditor .colliderPreviewBall {
+    border: 1px dashed #6767bd;
+    position: relative;
 }
