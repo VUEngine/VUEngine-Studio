@@ -94,7 +94,7 @@ export class VesElectronMainApplication extends ElectronMainApplication {
     }
 
     protected getTitleBarStyle(config: FrontendApplicationConfig): 'native' | 'custom' {
-        return 'custom';
+        return 'native';
     }
 
     protected registerVesTouchBar(electronWindow: BrowserWindow, workspaceOpened: boolean): void {
