@@ -58,6 +58,10 @@ export class VesElectronMenuContribution extends ElectronMenuContribution {
         }
     }
 
+    protected createCustomTitleBar(app: FrontendApplication): void {
+        // override this with an empty function to prevent theia from layering its own top panel over our custom one
+    }
+
     protected async vesBindTouchBar(): Promise<void> {
         await this.workspaceService.ready;
         // TODO: add more touchbar modes for emulator etc
