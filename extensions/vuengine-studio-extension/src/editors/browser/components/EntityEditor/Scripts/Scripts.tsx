@@ -165,7 +165,7 @@ export default function Scripts(props: ScriptsProps): React.JSX.Element {
         <VContainer alignItems='center' gap={0} grow={1} overflow='auto'>
             <ScriptedAction
                 action={{
-                    name: 'Enitity Ready',
+                    name: 'Entity Ready',
                 }}
                 addAction={() => addAction(0)}
                 isCurrentAction={false}
