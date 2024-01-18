@@ -1,7 +1,6 @@
 import { PreferenceService } from '@theia/core/lib/browser';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { FileStat } from '@theia/filesystem/lib/common/files';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { WorkspaceData, WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesBuildPreferenceIds } from '../../build/browser/ves-build-preferences';
 import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-service';
@@ -39,48 +38,52 @@ export class VesWorkspaceService extends WorkspaceService {
         });
     }
 
-    protected async computeRoots(): Promise<FileStat[]> {
-        const roots = await super.computeRoots();
-        const engineRoots = await this.getEngineRoots();
-
-        return [
-            ...roots,
-            ...engineRoots
-        ];
+    protected async getWorkspaceDataFromFile(): Promise<WorkspaceData | undefined> {
+        const workspaceData = await super.getWorkspaceDataFromFile();
+        return this.addEngineFolders(workspaceData);
     }
 
-    protected async getEngineRoots(): Promise<Array<FileStat>> {
-        const roots: Array<FileStat> = [];
+    protected async addEngineFolders(workspaceData: WorkspaceData | undefined): Promise<WorkspaceData> {
+        if (!workspaceData) {
+            workspaceData = { folders: [] };
+        }
 
-        if (this.opened && !this._workspace?.isDirectory) {
-            const engineCoreInclude = this.preferenceService.get<boolean>(VesBuildPreferenceIds.ENGINE_CORE_INCLUDE_IN_WORKSPACE);
-            if (engineCoreInclude) {
-                const engineCoreUri = await this.vesBuildPathsService.getEngineCoreUri();
-                const coreFileStat = await this.toFileStat(engineCoreUri);
-                if (coreFileStat && await this.fileService.exists(coreFileStat.resource)) {
-                    roots.push(coreFileStat);
-                }
-            }
-
-            const enginePluginsInclude = this.preferenceService.get<boolean>(VesPluginsPreferenceIds.ENGINE_PLUGINS_INCLUDE_IN_WORKSPACE);
-            if (enginePluginsInclude) {
-                const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
-                const pluginsFileStat = await this.toFileStat(enginePluginsUri);
-                if (pluginsFileStat && await this.fileService.exists(pluginsFileStat.resource)) {
-                    roots.push(pluginsFileStat);
-                }
-            }
-
-            const userPluginsInclude = this.preferenceService.get<boolean>(VesPluginsPreferenceIds.USER_PLUGINS_INCLUDE_IN_WORKSPACE);
-            if (userPluginsInclude) {
-                const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
-                const userPluginsFileStat = await this.toFileStat(userPluginsUri);
-                if (userPluginsFileStat && await this.fileService.exists(userPluginsFileStat.resource)) {
-                    roots.push(userPluginsFileStat);
-                }
+        const engineCoreInclude = this.preferenceService.get<boolean>(VesBuildPreferenceIds.ENGINE_CORE_INCLUDE_IN_WORKSPACE);
+        if (engineCoreInclude) {
+            const engineCoreUri = await this.vesBuildPathsService.getEngineCoreUri();
+            const enginePathWithScheme = engineCoreUri.withScheme(engineCoreUri.scheme).toString();
+            if (!workspaceData.folders.filter(f => f.path === enginePathWithScheme).length) {
+                workspaceData.folders.push({
+                    path: enginePathWithScheme,
+                    name: 'VUEngine Core',
+                });
             }
         }
 
-        return roots;
+        const enginePluginsInclude = this.preferenceService.get<boolean>(VesPluginsPreferenceIds.ENGINE_PLUGINS_INCLUDE_IN_WORKSPACE);
+        if (enginePluginsInclude) {
+            const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
+            const enginePluginsPathWithScheme = enginePluginsUri.withScheme(enginePluginsUri.scheme).toString();
+            if (!workspaceData.folders.filter(f => f.path === enginePluginsPathWithScheme).length) {
+                workspaceData.folders.push({
+                    path: enginePluginsPathWithScheme,
+                    name: 'VUEngine Plugins',
+                });
+            }
+        }
+
+        const userPluginsInclude = this.preferenceService.get<boolean>(VesPluginsPreferenceIds.USER_PLUGINS_INCLUDE_IN_WORKSPACE);
+        if (userPluginsInclude) {
+            const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
+            const userPluginsPathWithScheme = userPluginsUri.withScheme(userPluginsUri.scheme).toString();
+            if (!workspaceData.folders.filter(f => f.path === userPluginsPathWithScheme).length) {
+                workspaceData.folders.push({
+                    path: userPluginsPathWithScheme,
+                    name: 'User Plugins',
+                });
+            }
+        }
+
+        return workspaceData;
     }
 }
