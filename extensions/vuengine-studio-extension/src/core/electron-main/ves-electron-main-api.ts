@@ -15,7 +15,9 @@ import { injectable } from 'inversify';
 import { getTempDir } from '@theia/plugin-ext/lib/main/node/temp-dir-util';
 import sortJson from 'sort-json';
 import { ImageData } from '../browser/ves-common-types';
+import { Octokit } from '@octokit/rest';
 import {
+    VES_CHANNEL_CHECK_UPDATE_AVAILABLE,
     VES_CHANNEL_DECOMPRESS,
     VES_CHANNEL_DEREFERENCE_JSON_SCHEMA,
     VES_CHANNEL_FIND_FILES,
@@ -60,6 +62,23 @@ export class VesMainApi implements ElectronMainApplicationContribution {
                     resolve(changedFiles);
                 });
             });
+        });
+        ipcMain.handle(VES_CHANNEL_CHECK_UPDATE_AVAILABLE, async (event, currentVersion) => {
+            const octokit = new Octokit();
+            const semver = require('semver');
+
+            const latestRelease = await octokit.rest.repos.getLatestRelease({
+                owner: 'VUEngine',
+                repo: 'VUEngine-Studio',
+            });
+            const newestVersion = latestRelease.data.tag_name.replace('v', '');
+
+            if (semver.gt(newestVersion, currentVersion)) {
+                return newestVersion;
+            } else {
+                return false;
+            }
+
         });
         ipcMain.on(VES_CHANNEL_FIND_FILES, (event, base, pattern, options) => {
             const results: string[] = [];

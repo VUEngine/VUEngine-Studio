@@ -2,9 +2,11 @@ import { JsonSchema } from '@jsonforms/core';
 import { Disposable } from '@theia/core/lib/common/disposable';
 import { FileContent } from '@theia/filesystem/lib/common/files';
 import { GlobOptionsWithFileTypesUnset } from 'glob';
+import { ISizeCalculationResult } from 'image-size/dist/types/interface';
 import { VisitOptions } from 'sort-json';
 import { ImageData } from '../browser/ves-common-types';
 import {
+    VES_CHANNEL_CHECK_UPDATE_AVAILABLE,
     VES_CHANNEL_DECOMPRESS,
     VES_CHANNEL_DEREFERENCE_JSON_SCHEMA,
     VES_CHANNEL_FIND_FILES,
@@ -22,7 +24,6 @@ import {
     VES_CHANNEL_SORT_JSON,
     VesCoreAPI
 } from '../electron-common/ves-electron-api';
-import { ISizeCalculationResult } from 'image-size/dist/types/interface';
 
 const { ipcRenderer, contextBridge } = require('electron');
 
@@ -47,6 +48,9 @@ const api: VesCoreAPI = {
     },
     decompress: function (archivePath: string, targetPath: string): Promise<string[]> {
         return ipcRenderer.invoke(VES_CHANNEL_DECOMPRESS, archivePath, targetPath);
+    },
+    checkUpdateAvailable: function (currentVersion: string): Promise<string | boolean> {
+        return ipcRenderer.invoke(VES_CHANNEL_CHECK_UPDATE_AVAILABLE, currentVersion);
     },
     findFiles: function (base: string, pattern: string | string[], options?: GlobOptionsWithFileTypesUnset): string[] {
         return ipcRenderer.sendSync(VES_CHANNEL_FIND_FILES, base, pattern, options);

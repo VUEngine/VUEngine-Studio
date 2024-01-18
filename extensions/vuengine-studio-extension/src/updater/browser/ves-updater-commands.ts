@@ -10,14 +10,4 @@ export namespace VesUpdaterCommands {
         'vuengine/updater/commands/checkForUpdates',
         'vuengine/updater/commands/category'
     );
-
-    export const RESTART_TO_UPDATE: Command = Command.toLocalizedCommand(
-        {
-            id: 'ves:updater:restartToUpdate',
-            label: 'Restart to Update',
-            category: 'Updater',
-        },
-        'vuengine/updater/commands/restartToUpdate',
-        'vuengine/updater/commands/category'
-    );
 }
