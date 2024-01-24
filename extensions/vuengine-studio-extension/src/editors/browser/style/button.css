@@ -8,7 +8,6 @@
   background-color: transparent;
   border: var(--theia-border-width) solid var(--theia-dropdown-border);
   color: var(--theia-dropdown-border);
-  margin-bottom: 5px;
 }
 .jsonforms-container .add-button:hover {
   color: var(--theia-button-foreground);

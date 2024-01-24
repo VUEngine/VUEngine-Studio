@@ -1,16 +1,43 @@
 /* eslint-disable no-null/no-null */
-import { Eraser, EyeClosed, Hand, HandEye, PaintBucket, PencilSimple, Selection, Trash } from '@phosphor-icons/react';
+import {
+    ArrowsOut,
+    CrosshairSimple,
+    Eraser,
+    EyeClosed,
+    FrameCorners,
+    GridFour,
+    Hand,
+    HandEye,
+    MagnifyingGlass,
+    PaintBucket,
+    PencilSimple,
+    Selection,
+    Trash,
+} from '@phosphor-icons/react';
+import { Eye } from '@phosphor-icons/react/dist/ssr';
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
-import { BrushTool, Dotting, DottingRef, PixelModifyItem, useBrush, useDotting, useGrids, useLayers } from 'dotting';
-import React, { BaseSyntheticEvent, useContext, useRef, useState } from 'react';
+import {
+    BrushTool,
+    CanvasDataChangeHandler,
+    CanvasHoverPixelChangeHandler,
+    CanvasInfoChangeHandler,
+    Dotting,
+    DottingRef,
+    PanZoom,
+    PixelModifyItem,
+    useBrush,
+    useDotting,
+    useGrids,
+    useHandlers,
+    useLayers,
+} from 'dotting';
+import React, { BaseSyntheticEvent, useContext, useEffect, useRef, useState } from 'react';
 import { PALETTE_COLORS } from '../../../../core/browser/ves-common-types';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/HContainer';
 import VContainer from '../Common/VContainer';
 import { SpriteData } from './SpriteEditorTypes';
-import RadioSelect from '../Common/RadioSelect';
-import { Eye } from '@phosphor-icons/react/dist/ssr';
 
 interface SpriteEditorProps {
     data: SpriteData
@@ -33,12 +60,21 @@ const CreateEmptySquareData = (
 
 export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
-    const { data, updateData } = props;
+    // const { data, updateData } = props;
     const ref = useRef<DottingRef>(null);
     const { clear, downloadImage, undo, redo } = useDotting(ref);
+    const {
+        addDataChangeListener,
+        removeDataChangeListener,
+        addHoverPixelChangeListener,
+        removeHoverPixelChangeListener,
+        addCanvasElementEventListener,
+        removeCanvasElementEventListener,
+        addCanvasInfoChangeEventListener,
+        removeCanvasInfoChangeEventListener,
+    } = useHandlers(ref);
     const { dimensions } = useGrids(ref);
-    // const { addDataChangeListener } = useHandlers(ref);
-    const { brushColor, brushTool, changeBrushColor, changeBrushTool } = useBrush(ref);
+    const { brushTool, changeBrushColor, changeBrushTool } = useBrush(ref);
     const {
         addLayer,
         changeLayerPosition,
@@ -49,15 +85,57 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
         removeLayer,
         reorderLayersByIds,
         setCurrentLayer,
-        showAllLayers,
         showLayer,
     } = useLayers(ref);
     const [draggingSectionId, setDraggingSectionId] = useState<string | null>(null);
     const [createdLayerCount, setCreatedLayerCount] = useState<number>(3);
+    const [primaryColor, setPrimaryColor] = useState<number>(3);
+    const [secondaryColor, setSecondaryColor] = useState<number>(0);
+    const [allowResize, setAllowResize] = useState<boolean>(false);
+    const [previousBrushTool, setPreviousBrushTool] = useState<BrushTool>(BrushTool.NONE);
     const [gridSize, setGridSize] = useState<number>(1);
+    const [hoveredPixel, setHoveredPixel] = useState<{ rowIndex: number; columnIndex: number; } | null>(null);
+    const [canvasPanZoom, setCanvasPanZoom] = useState<PanZoom | null>(null);
     const draggingItemIndex = useRef<number | null>(null);
     const draggingOverItemIndex = useRef<number | null>(null);
 
+    const toggleGrid = (): void => {
+        if (gridSize > 0) {
+            setGridSize(0);
+        } else {
+            setGridSize(1);
+        }
+    };
+
+    const bindKeyListeners = (): void => {
+        document.addEventListener('keydown', onKeyDown);
+        document.addEventListener('keyup', onKeyUp);
+    };
+
+    const unbindKeyListeners = (): void => {
+        document.removeEventListener('keydown', onKeyDown);
+        document.removeEventListener('keyup', onKeyUp);
+    };
+
+    const onKeyDown = (e: KeyboardEvent): void => {
+        if (!e.repeat && e.code === 'Space') {
+            setPreviousBrushTool(brushTool);
+            changeBrushTool(BrushTool.NONE);
+        }
+        if (!e.repeat && e.code === 'KeyX') {
+            const secColor = secondaryColor;
+            setSecondaryColor(primaryColor);
+            setPrimaryColor(secColor);
+        }
+    };
+
+    const onKeyUp = (e: KeyboardEvent): void => {
+        if (!e.repeat && e.code === 'Space') {
+            changeBrushTool(previousBrushTool);
+        }
+    };
+
+    /*
     const updateSpriteData = (updatedData: Partial<SpriteData>): void => {
         updateData({ ...data, ...updatedData });
     };
@@ -65,14 +143,7 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
     const updateName = (name: string): void => {
         updateSpriteData({ name });
     };
-
-    const updateWidth = (width: number): void => {
-        // TODO
-    };
-
-    const updateHeight = (width: number): void => {
-        // TODO
-    };
+    */
 
     const confirmClear = async (): Promise<void> => {
         const dialog = new ConfirmDialog({
@@ -119,41 +190,96 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
         setCurrentLayer(id);
     };
 
+    const handlDataChangeHandler: CanvasDataChangeHandler = ({ delta }) => {
+        // console.log('Data change', delta);
+    };
+
+    const handleHoverPixelChangeHandler: CanvasHoverPixelChangeHandler = ({ indices }) => {
+        setHoveredPixel(indices);
+    };
+
+    const handleCanvasInfoChangeHandler: CanvasInfoChangeHandler = ({ panZoom }) => {
+        setCanvasPanZoom(panZoom);
+    };
+
+    useEffect(() => {
+        addDataChangeListener(handlDataChangeHandler);
+        addHoverPixelChangeListener(handleHoverPixelChangeHandler);
+        addCanvasInfoChangeEventListener(handleCanvasInfoChangeHandler);
+        return () => {
+            removeDataChangeListener(handlDataChangeHandler);
+            removeHoverPixelChangeListener(handleHoverPixelChangeHandler);
+            removeCanvasInfoChangeEventListener(handleCanvasInfoChangeHandler);
+        };
+    }, []);
+
+    useEffect(() => {
+        const handleMouseDown = (e: MouseEvent) => {
+            if (e.buttons === 2) {
+                changeBrushColor(PALETTE_COLORS[secondaryColor]);
+            }
+        };
+        const handleMouseUp = (e: MouseEvent) => {
+            changeBrushColor(PALETTE_COLORS[primaryColor]);
+        };
+        addCanvasElementEventListener('mousedown', handleMouseDown);
+        addCanvasElementEventListener('mouseup', handleMouseUp);
+        return () => {
+            removeCanvasElementEventListener('mousedown', handleMouseDown);
+            removeCanvasElementEventListener('mouseup', handleMouseUp);
+        };
+    }, [primaryColor, secondaryColor]);
+
+    useEffect(() => {
+        bindKeyListeners();
+        return () => {
+            unbindKeyListeners();
+        };
+    }, [brushTool, secondaryColor, primaryColor]);
+
     return (
         <VContainer gap={15} className="spriteEditor">
-            <HContainer alignItems='stretch' gap={15} grow={1} overflow='hidden' style={{ /* position: 'relative' */ }}>
-                <VContainer gap={15} style={{ width: 73 /* position: 'absolute', top: 0, left: 0, zIndex: 100 */ }}>
-                    <HContainer gap={2} wrap='wrap'>
+            <HContainer alignItems='stretch' gap={15} grow={1} overflow='hidden'>
+                <VContainer gap={15} style={{ width: 73 }}>
+                    <HContainer gap={2} wrap='wrap' style={{ zIndex: 100 }}>
                         <div
-                            className={`tool ${brushColor === PALETTE_COLORS[3] ? 'active' : undefined}`}
+                            className={`tool ${primaryColor === 3 ? 'active' : undefined}`}
                             style={{ backgroundColor: PALETTE_COLORS[3] }}
-                            onClick={() => changeBrushColor(PALETTE_COLORS[3])}
+                            onClick={() => setPrimaryColor(3)}
+                            onContextMenu={() => setSecondaryColor(3)}
                         >
-                            {brushColor === PALETTE_COLORS[3] && 'L'}
+                            {primaryColor === 3 && 'L'}
+                            {secondaryColor === 3 && 'R'}
                         </div>
                         <div
-                            className={`tool ${brushColor === PALETTE_COLORS[2] ? 'active' : undefined}`}
+                            className={`tool ${primaryColor === 2 ? 'active' : undefined}`}
                             style={{ backgroundColor: PALETTE_COLORS[2] }}
-                            onClick={() => changeBrushColor(PALETTE_COLORS[2])}
+                            onClick={() => setPrimaryColor(2)}
+                            onContextMenu={() => setSecondaryColor(2)}
                         >
-                            {brushColor === PALETTE_COLORS[2] && 'L'}
+                            {primaryColor === 2 && 'L'}
+                            {secondaryColor === 2 && 'R'}
                         </div>
                         <div
-                            className={`tool ${brushColor === PALETTE_COLORS[1] ? 'active' : undefined}`}
+                            className={`tool ${primaryColor === 1 ? 'active' : undefined}`}
                             style={{ backgroundColor: PALETTE_COLORS[1] }}
-                            onClick={() => changeBrushColor(PALETTE_COLORS[1])}
+                            onClick={() => setPrimaryColor(1)}
+                            onContextMenu={() => setSecondaryColor(1)}
                         >
-                            {brushColor === PALETTE_COLORS[1] && 'L'}
+                            {primaryColor === 1 && 'L'}
+                            {secondaryColor === 1 && 'R'}
                         </div>
                         <div
-                            className={`tool ${brushColor === PALETTE_COLORS[0] ? 'active' : undefined}`}
+                            className={`tool ${primaryColor === 0 ? 'active' : undefined}`}
                             style={{ backgroundColor: PALETTE_COLORS[0] }}
-                            onClick={() => changeBrushColor(PALETTE_COLORS[0])}
+                            onClick={() => setPrimaryColor(0)}
+                            onContextMenu={() => setSecondaryColor(0)}
                         >
-                            {brushColor === PALETTE_COLORS[0] && 'L'}
+                            {primaryColor === 0 && 'L'}
+                            {secondaryColor === 0 && 'R'}
                         </div>
                     </HContainer>
-                    <HContainer gap={2} wrap='wrap'>
+                    <HContainer gap={2} wrap='wrap' style={{ zIndex: 100 }}>
                         <div
                             className='tool'
                             onClick={undo}
@@ -165,6 +291,17 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                             onClick={redo}
                         >
                             <i className='codicon codicon-redo' />
+                        </div>
+                        <div
+                            className='tool'
+                            onClick={undo}
+                        >
+                            <i className='codicon codicon-zoom-in' />
+                        </div>
+                        <div
+                            className='tool'
+                        >
+                            <i className='codicon codicon-zoom-out' />
                         </div>
                         <div
                             className='tool'
@@ -182,47 +319,61 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                             <Trash size={20} />
                         </div>
                     </HContainer>
-                    <HContainer gap={2} wrap='wrap'>
+                    <HContainer gap={2} wrap='wrap' style={{ zIndex: 100 }}>
                         <div
-                            className={`tool ${brushTool === BrushTool.NONE ? 'active' : undefined}`}
+                            className={`tool${gridSize > 0 ? ' active' : ''}`}
+                            onClick={toggleGrid}
+                        >
+                            <GridFour size={20} />
+                        </div>
+                        <div
+                            className={`tool${allowResize ? ' active' : ''}`}
+                            onClick={() => setAllowResize(!allowResize)}
+                        >
+                            <ArrowsOut size={20} />
+                        </div>
+                    </HContainer>
+                    <HContainer gap={2} wrap='wrap' style={{ zIndex: 100 }}>
+                        <div
+                            className={`tool${brushTool === BrushTool.NONE ? ' active' : ''}`}
                             onClick={() => changeBrushTool(BrushTool.NONE)}
                         >
                             <Hand size={20} />
                         </div>
                         <div
-                            className={`tool ${brushTool === BrushTool.DOT ? 'active' : undefined}`}
+                            className={`tool${brushTool === BrushTool.DOT ? ' active' : ''}`}
                             onClick={() => changeBrushTool(BrushTool.DOT)}
                         >
                             <PencilSimple size={20} />
                         </div>
                         <div
-                            className={`tool ${brushTool === BrushTool.ERASER ? 'active' : undefined}`}
+                            className={`tool${brushTool === BrushTool.ERASER ? ' active' : ''}`}
                             onClick={() => changeBrushTool(BrushTool.ERASER)}
                         >
                             <Eraser size={20} />
                         </div>
                         <div
-                            className={`tool ${brushTool === BrushTool.PAINT_BUCKET ? 'active' : undefined}`}
+                            className={`tool${brushTool === BrushTool.PAINT_BUCKET ? ' active' : ''}`}
                             onClick={() => changeBrushTool(BrushTool.PAINT_BUCKET)}
                         >
                             <PaintBucket size={20} />
                         </div>
                         {/*
                         <div
-                            className={`tool ${brushTool === BrushTool.PAINT_BUCKET ? 'active' : undefined}`}
-                            onClick={() => changeBrushTool(BrushTool.PAINT_BUCKET)}
+                            className={`tool ${brushTool === BrushTool.STROKE ? 'active' : undefined}`}
+                            onClick={() => changeBrushTool(BrushTool.STROKE)}
                         >
                             <PencilSimpleLine size={20} />
                         </div>
                         <div
-                            className={`tool ${brushTool === BrushTool.PAINT_BUCKET ? 'active' : undefined}`}
-                            onClick={() => changeBrushTool(BrushTool.PAINT_BUCKET)}
+                            className={`tool ${brushTool === BrushTool.SQUARE ? 'active' : undefined}`}
+                            onClick={() => changeBrushTool(BrushTool.SQUARE)}
                         >
                             <Square size={20} />
                         </div>
                         <div
-                            className={`tool ${brushTool === BrushTool.PAINT_BUCKET ? 'active' : undefined}`}
-                            onClick={() => changeBrushTool(BrushTool.PAINT_BUCKET)}
+                            className={`tool ${brushTool === BrushTool.CIRCLE ? 'active' : undefined}`}
+                            onClick={() => changeBrushTool(BrushTool.CIRCLE)}
                         >
                             <Circle size={20} />
                         </div>
@@ -236,192 +387,190 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                     </HContainer>
                 </VContainer>
                 <VContainer grow={1}>
-                    <Dotting
-                        backgroundColor='transparent'
-                        brushColor={PALETTE_COLORS[3]}
-                        defaultPixelColor={PALETTE_COLORS[0]}
-                        gridStrokeColor={services.colorRegistry.getCurrentColor('editor.background')}
-                        gridStrokeWidth={gridSize}
-                        isGridVisible={gridSize > 0}
-                        height={'100%'}
-                        initAutoScale={true}
-                        initLayers={[
-                            {
-                                id: 'layer1',
-                                data: CreateEmptySquareData(32),
-                            },
-                            {
-                                id: 'layer2',
-                                data: CreateEmptySquareData(32),
-                            },
-                            {
-                                id: 'layer3',
-                                data: CreateEmptySquareData(32),
-                            },
-                        ]}
-                        isGridFixed={false}
-                        isPanZoomable={true}
-                        maxScale={10}
-                        minScale={0.2}
-                        ref={ref}
-                        width={'100%'}
-                    />
-                </VContainer>
-                <VContainer gap={15} style={{ /* position: 'absolute', top: 0, right: 0, zIndex: 100 */ }}>
-                    {/*
-                    <label>
-                        {nls.localize('vuengine/spriteEditor/layers', 'Navigator')}
-                    </label>
-                    <VContainer>
+                    <div className='editorContainer'>
                         <Dotting
                             backgroundColor='transparent'
+                            brushColor={PALETTE_COLORS[primaryColor]}
                             defaultPixelColor={PALETTE_COLORS[0]}
-                            height={180}
+                            gridStrokeColor={services.colorRegistry.getCurrentColor('editor.background')}
+                            gridStrokeWidth={gridSize}
+                            isGridVisible={gridSize > 0}
+                            height={'100%'}
                             initAutoScale={true}
-                            isDrawingEnabled={false}
-                            isGridFixed={true}
-                            isGridVisible={false}
-                            isPanZoomable={false}
+                            initLayers={[
+                                {
+                                    id: 'layer1',
+                                    data: CreateEmptySquareData(32),
+                                },
+                                {
+                                    id: 'layer2',
+                                    data: CreateEmptySquareData(32),
+                                },
+                                {
+                                    id: 'layer3',
+                                    data: CreateEmptySquareData(32),
+                                },
+                            ]}
+                            isGridFixed={!allowResize}
+                            isPanZoomable={true}
+                            maxScale={10}
+                            minScale={0.05}
                             ref={ref}
                             width={'100%'}
                         />
-                    </VContainer>
-                    */}
-                    <VContainer style={{ overflowX: 'hidden', overflowY: 'auto' }}>
+                    </div>
+                </VContainer>
+                <VContainer gap={15} style={{ width: 200 }}>
+                    {/*
+                    <VContainer style={{ zIndex: 100 }}>
                         <label>
-                            <Eye size={20} onClick={showAllLayers} />
-                            {nls.localize('vuengine/spriteEditor/layers', 'Layers')}
+                            {nls.localize('vuengine/spriteEditor/navigator', 'Navigator')}
                         </label>
                         <VContainer>
-                            {layers.map((layer, index) => (
+                            <Dotting
+                                backgroundColor='transparent'
+                                defaultPixelColor={PALETTE_COLORS[0]}
+                                height={150}
+                                initAutoScale={true}
+                                isDrawingEnabled={false}
+                                isGridFixed={true}
+                                isGridVisible={false}
+                                isPanZoomable={false}
+                                ref={ref}
+                                width={'100%'}
+                            />
+                        </VContainer>
+                    </VContainer>
+                    */}
+                    <VContainer style={{ overflowX: 'hidden', overflowY: 'auto', zIndex: 100 }}>
+                        {/*
+                            <Eye size={20} onClick={showAllLayers} />
+                        */}
+                        {layers.map((layer, index) => (
+                            <div
+                                key={layer.id}
+                                className={`item layer ${currentLayer.id === layer.id ? 'active' : undefined} ${draggingSectionId === layer.id ? 'dragging' : undefined}`}
+                                style={{
+                                    alignItems: 'center',
+                                    display: 'flex',
+                                    gap: 5,
+                                    justifyContent: 'start',
+                                    opacity: layer.isVisible ? 1 : 0.5,
+                                }}
+                                onClick={e => onClickHandler(e, layer.id)}
+                                onDragStart={e => onDragStart(e, index, layer.id)}
+                                onDragEnter={e => onAvailableItemDragEnter(e, index)}
+                                onDragEnd={onDragEnd}
+                                onDragOver={onDragOver}
+                                draggable
+                            >
                                 <div
-                                    key={layer.id}
-                                    className={`layer ${currentLayer.id === layer.id ? 'active' : undefined} ${draggingSectionId === layer.id ? 'dragging' : undefined}`}
-                                    style={{
-                                        alignItems: 'center',
-                                        display: 'flex',
-                                        gap: 5,
-                                        justifyContent: 'start',
-                                        opacity: layer.isVisible ? 1 : 0.5,
+                                    onClick={e => {
+                                        e.stopPropagation();
+                                        if (layer.isVisible) {
+                                            hideLayer(layer.id);
+                                        } else {
+                                            showLayer(layer.id);
+                                        }
                                     }}
-                                    onClick={e => onClickHandler(e, layer.id)}
-                                    onDragStart={e => onDragStart(e, index, layer.id)}
-                                    onDragEnter={e => onAvailableItemDragEnter(e, index)}
-                                    onDragEnd={onDragEnd}
-                                    onDragOver={onDragOver}
-                                    draggable
                                 >
+                                    {layer.isVisible
+                                        ? <Eye size={20} />
+                                        : <EyeClosed size={20} />
+                                    }
+                                </div>
+                                <div
+                                    onClick={() => {
+                                        isolateLayer(layer.id);
+                                    }}
+                                >
+                                    <HandEye size={20} />
+                                </div>
+                                <div style={{ flexGrow: 1 }}>
+                                    <input
+                                        className='theia-input'
+                                        style={{ boxSizing: 'border-box', width: '100%' }}
+                                        value={layer.id}
+                                        readOnly
+                                    />
+                                </div>
+                                <div>
                                     <div
                                         onClick={e => {
                                             e.stopPropagation();
-                                            if (layer.isVisible) {
-                                                hideLayer(layer.id);
-                                            } else {
-                                                showLayer(layer.id);
-                                            }
+                                            removeLayer(layer.id);
                                         }}
                                     >
-                                        {layer.isVisible
-                                            ? <Eye size={20} />
-                                            : <EyeClosed size={20} />
-                                        }
-                                    </div>
-                                    <div
-                                        onClick={() => {
-                                            isolateLayer(layer.id);
-                                        }}
-                                    >
-                                        <HandEye size={20} />
-                                    </div>
-                                    <div>
-                                        <input
-                                            className='theia-input'
-                                            style={{ flexGrow: 1 }}
-                                            value={layer.id}
-                                            readOnly
-                                        />
-                                    </div>
-                                    <div>
-                                        <div
-                                            onClick={e => {
-                                                e.stopPropagation();
-                                                removeLayer(layer.id);
-                                            }}
-                                        >
-                                            <i className='codicon codicon-x' />
-                                        </div>
+                                        <i className='codicon codicon-x' />
                                     </div>
                                 </div>
-                            ))}
-
-                            <button
-                                className='theia-button add-button'
-                                onClick={() => {
-                                    addLayer(
-                                        nls.localize('vuengine/spriteEditor/layers', 'Layers') + ' ' + (createdLayerCount + 1),
-                                        layers.length
-                                    );
-                                    setCreatedLayerCount(createdLayerCount + 1);
-                                }}
-                                title={nls.localize('vuengine/spriteEditor/addLayer', 'Add Layer')}
-                            >
-                                <i className='codicon codicon-plus' />
-                            </button>
-                        </VContainer>
+                            </div>
+                        ))}
+                        <button
+                            className='theia-button add-button'
+                            onClick={() => {
+                                addLayer('layer' + (createdLayerCount + 1), layers.length);
+                                setCreatedLayerCount(createdLayerCount + 1);
+                            }}
+                            title={nls.localize('vuengine/spriteEditor/addLayer', 'Add Layer')}
+                        >
+                            <i className='codicon codicon-plus' />
+                        </button>
                     </VContainer>
                     <VContainer grow={1} justifyContent='end'>
-                        <VContainer>
-                            <label>
-                                {nls.localize('vuengine/spriteEditor/name', 'Name')}
-                            </label>
-                            <input
-                                className='theia-input'
-                                style={{ flexGrow: 1 }}
-                                value={data.name}
-                                onChange={e => updateName(e.target.value)}
-                            />
-                        </VContainer>
-                        <VContainer>
-                            <label>
-                                {nls.localize('vuengine/spriteEditor/dimensions', 'Dimensions')}
-                            </label>
-                            <HContainer alignItems='center'>
-                                <input
-                                    className='theia-input'
-                                    type='number'
-                                    style={{ flexGrow: 1 }}
-                                    min={8}
-                                    max={512}
-                                    step={8}
-                                    value={dimensions.columnCount}
-                                    onChange={e => updateWidth(parseInt(e.target.value))}
-                                />
-                                ×
-                                <input
-                                    className='theia-input'
-                                    type='number'
-                                    style={{ flexGrow: 1 }}
-                                    min={8}
-                                    max={512}
-                                    step={8}
-                                    value={dimensions.rowCount}
-                                    onChange={e => updateHeight(parseInt(e.target.value))}
-                                />
+                        <VContainer style={{ zIndex: 100 }}>
+                            <HContainer alignItems='center' gap={2}>
+                                <MagnifyingGlass /> {canvasPanZoom && (Math.round(canvasPanZoom.scale * 100) / 100)}
                             </HContainer>
-                        </VContainer>
-                        <VContainer>
-                            <label>
-                                {nls.localize('vuengine/entityEditor/grid', 'Grid')}
-                            </label>
-                            <RadioSelect
-                                options={[{ value: 0 }, { value: 1 }, { value: 2 }, { value: 3 }, { value: 4 }]}
-                                defaultValue={gridSize}
-                                onChange={options => setGridSize(options[0].value as number)}
-                            />
+                            <HContainer>
+                                <HContainer alignItems='center' gap={2}>
+                                    <FrameCorners /> {dimensions.columnCount}×{dimensions.rowCount}
+                                </HContainer>
+                                <HContainer alignItems='center' gap={2}>
+                                    {hoveredPixel && <>
+                                        <CrosshairSimple /> {hoveredPixel.columnIndex + 1}
+                                        :
+                                        {hoveredPixel.rowIndex + 1}
+                                    </>}
+                                </HContainer>
+                            </HContainer>
+                            {/*
+                            <VContainer>
+                                <label>
+                                    {nls.localize('vuengine/spriteEditor/name', 'Name')}
+                                </label>
+                                <input
+                                    className='theia-input'
+                                    style={{ flexGrow: 1 }}
+                                    value={data.name}
+                                    onChange={e => updateName(e.target.value)}
+                                />
+                            </VContainer>
+                            <VContainer>
+                                <label>
+                                    {nls.localize('vuengine/entityEditor/grid', 'Grid')}
+                                </label>
+                                <RadioSelect
+                                    options={[{ value: 0 }, { value: 1 }, { value: 2 }, { value: 3 }, { value: 4 }]}
+                                    defaultValue={gridSize}
+                                    onChange={options => setGridSize(options[0].value as number)}
+                                />
+                            </VContainer>
+                            */}
                         </VContainer>
                     </VContainer>
                 </VContainer>
-            </HContainer >
-        </VContainer >
+            </HContainer>
+            <HContainer overflow='auto' style={{ minHeight: 75, zIndex: 100 }}>
+                <div className='item frame active'></div>
+                <button
+                    className='theia-button add-button'
+                    onClick={() => { }}
+                    title={nls.localize('vuengine/spriteEditor/addFrame', 'Add Frame')}
+                >
+                    <i className='codicon codicon-plus' />
+                </button>
+            </HContainer>
+        </VContainer>
     );
 }
