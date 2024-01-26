@@ -46,7 +46,10 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 }
                 setFilename(fn);
                 const d = await window.electronVesCore.getImageDimensions(resolvedUri.path.fsPath());
-                setDimensions(`${d.width}×${d.height}`);
+                const width = d.width;
+                const height = d.height ? d.height / data.animations?.totalFrames : '';
+
+                setDimensions(`${width}×${height}`);
             }
         } else {
             setFilename('');

@@ -5,12 +5,11 @@ interface CssImageProps {
     height: number
     palette: string
     pixelData: number[][]
-    pixelSize: number
     width: number
 }
 
 export default function CssImage(props: CssImageProps): React.JSX.Element {
-    const { height, palette, pixelData, pixelSize, width } = props;
+    const { height, palette, pixelData, width } = props;
 
     const getBoxShadow = (): string[] => {
         const result: string[] = [];
@@ -20,8 +19,8 @@ export default function CssImage(props: CssImageProps): React.JSX.Element {
                 if (color === 0) {
                     return;
                 }
-                const xPos = (x + 1) * pixelSize;
-                const yPos = (y + 1) * pixelSize;
+                const xPos = (x + 1);
+                const yPos = (y + 1);
                 const paletteStartChar = ((3 - color) % 4) << 1;
                 result.push(
                     `${xPos}px ${yPos}px 0 0 ${PALETTE_COLORS[PALETTE_INDEX_MAPPING[palette.substring(paletteStartChar, paletteStartChar + 2)]]}`
@@ -34,17 +33,17 @@ export default function CssImage(props: CssImageProps): React.JSX.Element {
 
     return <div
         style={{
-            height: height * pixelSize,
-            width: width * pixelSize,
+            height: height,
+            width: width,
         }}
     >
         <div
             style={{
-                height: pixelSize,
+                height: 1,
                 boxShadow: getBoxShadow().join(','),
-                marginLeft: -pixelSize,
-                marginTop: -pixelSize,
-                width: pixelSize,
+                marginLeft: -1,
+                marginTop: -1,
+                width: 1,
             }}
         ></div>
     </div>;

@@ -69,61 +69,63 @@ export default function ExtraProperties(): React.JSX.Element {
     };
 
     return <>
-        {data.extraProperties.enabled && <HContainer gap={15} className='item'>
-            <button
-                className="remove-button"
-                onClick={disableExtraProperties}
-                title={nls.localize('vuengine/entityEditor/removeComponent', 'Remove Component')}
-            >
-                <i className='codicon codicon-x' />
-            </button>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/entityEditor/extraInfo', 'Extra Info')}
-                </label>
-                <input
-                    className='theia-input'
-                    value={data.extraProperties.extraInfo}
-                    onChange={e => setExtraInfo(e.target.value)}
-                />
-            </VContainer>
-            <VContainer>
-                <InfoLabel
-                    label={nls.localize('vuengine/entityEditor/entitySize', 'Size (x, y, z)')}
-                    tooltip={
-                        nls.localize(
-                            'vuengine/entityEditor/entitySizeDescription',
-                            'Size of the entity in pixels. Used by streaming to test if out of screen bounds. ' +
-                            'If 0, width and height will be inferred from the first sprite\'s texture\'s size.'
-                        )}
-                />
-                <HContainer>
+        {data.extraProperties.enabled &&
+            <HContainer gap={15} className='item'>
+                <button
+                    className="remove-button"
+                    onClick={disableExtraProperties}
+                    title={nls.localize('vuengine/entityEditor/removeComponent', 'Remove Component')}
+                >
+                    <i className='codicon codicon-x' />
+                </button>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/extraInfo', 'Extra Info')}
+                    </label>
                     <input
                         className='theia-input'
-                        style={{ width: 48 }}
-                        type='number'
-                        value={data.extraProperties.pixelSize.x}
-                        onChange={e => setPixelSizeX(parseInt(e.target.value))}
-                        min={0}
+                        value={data.extraProperties.extraInfo}
+                        onChange={e => setExtraInfo(e.target.value)}
                     />
-                    <input
-                        className='theia-input'
-                        style={{ width: 48 }}
-                        type='number'
-                        value={data.extraProperties.pixelSize.y}
-                        onChange={e => setPixelSizeY(parseInt(e.target.value))}
-                        min={0}
+                </VContainer>
+                <VContainer>
+                    <InfoLabel
+                        label={nls.localize('vuengine/entityEditor/entitySize', 'Size (x, y, z)')}
+                        tooltip={
+                            nls.localize(
+                                'vuengine/entityEditor/entitySizeDescription',
+                                'Size of the entity in pixels. Used by streaming to test if out of screen bounds. ' +
+                                'If 0, width and height will be inferred from the first sprite\'s texture\'s size.'
+                            )}
                     />
-                    <input
-                        className='theia-input'
-                        style={{ width: 48 }}
-                        type='number'
-                        value={data.extraProperties.pixelSize.z}
-                        onChange={e => setPixelSizeZ(parseInt(e.target.value))}
-                        min={0}
-                    />
-                </HContainer>
-            </VContainer>
-        </HContainer>}
+                    <HContainer>
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            value={data.extraProperties.pixelSize.x}
+                            onChange={e => setPixelSizeX(parseInt(e.target.value))}
+                            min={0}
+                        />
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            value={data.extraProperties.pixelSize.y}
+                            onChange={e => setPixelSizeY(parseInt(e.target.value))}
+                            min={0}
+                        />
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            value={data.extraProperties.pixelSize.z}
+                            onChange={e => setPixelSizeZ(parseInt(e.target.value))}
+                            min={0}
+                        />
+                    </HContainer>
+                </VContainer>
+            </HContainer>
+        }
     </>;
 }

@@ -7,8 +7,10 @@ import ColorSelector from '../../Common/ColorSelector';
 import HContainer from '../../Common/HContainer';
 import Palette from '../../Common/Palette';
 import VContainer from '../../Common/VContainer';
+import BoxCollider from '../Colliders/BoxCollider';
 import {
   AnimationData,
+  ColliderType,
   EntityEditorContext,
   EntityEditorContextType,
   Transparency,
@@ -93,22 +95,40 @@ export default function Preview(): React.JSX.Element {
                 <div>
                   {currentAnimationStep + 1}
                 </div>
-              </div>}
-            {state.preview.sprites && data.components?.sprites?.map((s, i) =>
-              <Sprite
-                key={`preview-sprite-${i}`}
-                animate={animate}
-                displacement={s.displacement}
-                frames={data.animations?.totalFrames || 1}
-                currentAnimationFrame={animation?.frames[currentAnimationStep - 1] ?? currentAnimationStep}
-                highlighted={state.preview.highlightedSprite === i}
-                images={s.texture.files}
-                flipHorizontally={s.texture.flip.horizontal}
-                flipVertically={s.texture.flip.vertical}
-                transparent={s.transparency !== Transparency.None}
-                palette={state.preview.palettes[s.texture.palette]}
-                zoom={state.preview.zoom}
-              />)}
+              </div>
+            }
+            <div
+              className="preview-container-world"
+              style={{ zoom: state.preview.zoom }}
+            >
+              {state.preview.sprites && data.components?.sprites?.map((sprite, i) =>
+                <Sprite
+                  key={`preview-sprite-${i}`}
+                  animate={animate}
+                  displacement={sprite.displacement}
+                  frames={data.animations?.totalFrames || 1}
+                  currentAnimationFrame={animation?.frames[currentAnimationStep - 1] ?? currentAnimationStep}
+                  highlighted={state.preview.highlightedSprite === i}
+                  images={sprite.texture.files}
+                  flipHorizontally={sprite.texture.flip.horizontal}
+                  flipVertically={sprite.texture.flip.vertical}
+                  transparent={sprite.transparency !== Transparency.None}
+                  palette={state.preview.palettes[sprite.texture.palette]}
+                />
+              )}
+              {state.preview.colliders && data.components?.colliders?.map((collider, i) => {
+                switch (collider.type) {
+                  case ColliderType.Box:
+                    return <BoxCollider
+                      size={collider.pixelSize}
+                      displacement={collider.displacement}
+                      rotation={collider.rotation}
+                      scale={collider.scale}
+                    />;
+
+                }
+              })}
+            </div>
           </div>
           <VContainer>
             <label>
@@ -157,18 +177,17 @@ export default function Preview(): React.JSX.Element {
           />
           Show Wireframes
         </label>
-        <label>
-          <input
-            type="checkbox"
-            checked={state.preview.colliders && data.colliders?.inGameType !== 'None'}
-            disabled={data.colliders?.inGameType === 'None'}
-            onChange={e =>
-              setBooleanStateProperty('colliders', e.target.checked)
-            }
-          />
-          Show Colliders
-        </label>
         */}
+            <label>
+              <input
+                type="checkbox"
+                checked={state.preview.colliders}
+                onChange={e =>
+                  setBooleanStateProperty('colliders', e.target.checked)
+                }
+              />
+              Show Colliders
+            </label>
             <label>
               <input
                 type="checkbox"

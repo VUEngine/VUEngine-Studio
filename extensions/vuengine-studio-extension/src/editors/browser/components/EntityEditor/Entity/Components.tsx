@@ -397,21 +397,13 @@ export default function Components(): React.JSX.Element {
             placeholder: nls.localize('vuengine/editors/selectComponentTypeToAdd', 'Select a component type to add...'),
         };
         const items: (QuickPickItem | QuickPickSeparator)[] = [];
-        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map(tf => {
-            componentTypes.map((t, i) => {
-                if (t.allowAdd) {
-                    items.push({
-                        id: i.toString(),
-                        label: t.labelSingular,
-                    });
-                    if (items.length % 10 === 0) {
-                        items.push({
-                            type: 'separator',
-                            label: 'Überschrift',
-                        });
-                    }
-                }
-            });
+        componentTypes.map((t, i) => {
+            if (t.allowAdd) {
+                items.push({
+                    id: i.toString(),
+                    label: t.labelSingular,
+                });
+            }
         });
 
         return services.quickPickService.show(

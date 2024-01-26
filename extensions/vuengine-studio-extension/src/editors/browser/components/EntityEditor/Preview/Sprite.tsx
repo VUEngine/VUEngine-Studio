@@ -12,7 +12,6 @@ interface SpriteProps {
   highlighted: boolean;
   images: string[];
   palette: string
-  zoom: number;
   flipHorizontally: boolean
   flipVertically: boolean
   transparent: boolean
@@ -28,7 +27,6 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     highlighted,
     images,
     palette,
-    zoom,
     flipHorizontally,
     flipVertically,
     transparent,
@@ -112,17 +110,17 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         title={error ? error : ''}
         style={{
           boxSizing: 'border-box',
-          height: height * zoom / (isMultiFileAnimation ? 1 : frames || 1),
-          marginBottom: displacement.y < 0 ? -displacement.y * zoom * 2 : 0,
-          marginLeft: displacement.x > 0 ? displacement.x * zoom * 2 : 0,
-          marginRight: displacement.x < 0 ? -displacement.x * zoom * 2 : 0,
-          marginTop: displacement.y > 0 ? displacement.y * zoom * 2 : 0,
+          height: height / (isMultiFileAnimation ? 1 : frames || 1),
+          marginBottom: displacement.y < 0 ? -displacement.y * 2 : 0,
+          marginLeft: displacement.x > 0 ? displacement.x * 2 : 0,
+          marginRight: displacement.x < 0 ? -displacement.x * 2 : 0,
+          marginTop: displacement.y > 0 ? displacement.y * 2 : 0,
           opacity: transparent ? .5 : 1,
           outline: highlighted ? '1px solid green' : undefined,
           overflow: 'hidden',
           position: 'absolute',
           transform: transforms.length ? transforms.join(' ') : undefined,
-          width: width * zoom,
+          width: width,
           zIndex: baseZIndex + (displacement.z !== 0 ? -displacement.z : 0),
         }}
       >
@@ -130,7 +128,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
           <div style={{
             position: 'relative',
             top: animate && !isMultiFileAnimation
-              ? (height * zoom / (frames || 1) * currentAnimationFrame * -1)
+              ? (height / (frames || 1) * currentAnimationFrame * -1)
               : 0
           }}>
             {currentPixelData &&
@@ -138,7 +136,6 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 height={height}
                 palette={palette}
                 pixelData={currentPixelData}
-                pixelSize={zoom}
                 width={width}
               />
             }

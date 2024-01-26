@@ -359,7 +359,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     </VContainer>
                     <VContainer>
                         <label>
-                            {nls.localize('vuengine/entityEditor/colliderSize', 'Size (x, y, z, parallax)')}
+                            {nls.localize('vuengine/entityEditor/colliderSize', 'Size (x, y, z)')}
                         </label>
                         <HContainer>
                             <input
@@ -396,7 +396,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 type='number'
                                 min={-360}
                                 max={360}
-                                step={0.1}
+                                step={0.5}
                                 value={collider.rotation.x}
                                 onChange={e => setRotationX(parseFloat(e.target.value))}
                             />
@@ -406,7 +406,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 type='number'
                                 min={-360}
                                 max={360}
-                                step={0.1}
+                                step={0.5}
                                 value={collider.rotation.y}
                                 onChange={e => setRotationY(parseFloat(e.target.value))}
                             />
@@ -416,7 +416,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 type='number'
                                 min={-360}
                                 max={360}
-                                step={0.1}
+                                step={0.5}
                                 value={collider.rotation.z}
                                 onChange={e => setRotationZ(parseFloat(e.target.value))}
                             />
@@ -424,7 +424,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     </VContainer>
                     <VContainer>
                         <label>
-                            {nls.localize('vuengine/entityEditor/colliderScale', 'Scale (x, y, z, parallax)')}
+                            {nls.localize('vuengine/entityEditor/colliderScale', 'Scale (x, y, z)')}
                         </label>
                         <HContainer>
                             <input
@@ -433,7 +433,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 type='number'
                                 min={0}
                                 max={64}
-                                step={0.1}
+                                step={0.5}
                                 value={collider.scale.x}
                                 onChange={e => setScaleX(parseFloat(e.target.value))}
                             />
@@ -443,7 +443,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 type='number'
                                 min={0}
                                 max={64}
-                                step={0.1}
+                                step={0.5}
                                 value={collider.scale.y}
                                 onChange={e => setScaleY(parseFloat(e.target.value))}
                             />
@@ -453,7 +453,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 type='number'
                                 min={0}
                                 max={64}
-                                step={0.1}
+                                step={0.5}
                                 value={collider.scale.z}
                                 onChange={e => setScaleZ(parseFloat(e.target.value))}
                             />
