@@ -389,6 +389,7 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                 <VContainer grow={1}>
                     <div className='editorContainer'>
                         <Dotting
+                            ref={ref}
                             backgroundColor='transparent'
                             brushColor={PALETTE_COLORS[primaryColor]}
                             defaultPixelColor={PALETTE_COLORS[0]}
@@ -413,9 +414,13 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                             ]}
                             isGridFixed={!allowResize}
                             isPanZoomable={true}
-                            maxScale={10}
+                            maxColumnCount={512}
+                            minColumnCount={8}
+                            maxRowCount={512}
+                            minRowCount={8}
                             minScale={0.05}
-                            ref={ref}
+                            maxScale={10}
+                            resizeUnit={8}
                             width={'100%'}
                         />
                     </div>

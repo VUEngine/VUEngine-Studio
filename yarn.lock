@@ -6809,10 +6809,10 @@ dotenv@~10.0.0:
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-10.0.0.tgz#3d4227b8fb95f81096cdd2b66653fb2c7085ba81"
   integrity sha512-rlBi9d8jpv9Sf1klPjNfFAuWDjKLwTIJJ/VxtoTwIR6hnZxcEOQCZg2oIL3MWBYw5GpUDKOEnND7LXTbIpQ03Q==
 
-dotting@^2.1.7:
-  version "2.1.7"
-  resolved "https://registry.yarnpkg.com/dotting/-/dotting-2.1.7.tgz#d2d6ce092128e9b5d93452dc35b941b3a1c66412"
-  integrity sha512-zEyg52DaCAi3epZyY3054gAbd3CB0GLZGZwWZP494sXRhqalV2RGAxM7WDQbUvxP+LV2w9vER5XsJQicEHkeYw==
+dotting@^2.1.8:
+  version "2.1.8"
+  resolved "https://registry.yarnpkg.com/dotting/-/dotting-2.1.8.tgz#f975764c31597670049f3877e0dd11dd26d0f8f5"
+  integrity sha512-cn+LMvpfl9VkJZ78Vy+gzcvQncoXQw4mlriR38ImnyauhcTAzhxwvEP14NWsV7FNcGS8gN2n94VwUEUitkUoMg==
 
 draco3d@^1.4.1:
   version "1.5.6"

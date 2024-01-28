@@ -45,7 +45,7 @@
     "datauri": "^3.0.0",
     "decompress": "^4.2.1",
     "deepmerge-ts": "^4.0.3",
-    "dotting": "^2.1.7",
+    "dotting": "^2.1.8",
     "electron": "^23.2.4",
     "express": "^4.17.1",
     "filenamify": "^4.3.0",
