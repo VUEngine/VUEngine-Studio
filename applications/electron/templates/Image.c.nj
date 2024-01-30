@@ -52,11 +52,11 @@
 	{%- for map in imageData.maps -%}
 		{{ ' + ' }}{{ map.data.length * 2 }}{{ ' ' }}
 	{%- endfor -%}
-	= {{ ((imageData.tiles.data.length + 1) * 4) + (mapsDataTotalLength * 2) }}
+	= {{ ((imageData.tiles.data.length + 1) * 4) + (mapsDataTotalLength * 2) }} byte
 {% elseif imageData.tiles.data.length -%}
-	//	Size: {{ (imageData.tiles.data.length + 1) * 4 }}
+	//	Size: {{ (imageData.tiles.data.length + 1) * 4 }} byte
 {% elseif imageData.maps.length -%}
-	//	Size: {{ mapsDataTotalLength * 2 }}
+	//	Size: {{ mapsDataTotalLength * 2 }} byte
 {% endif -%}
 //
 //---------------------------------------------------------------------------------------------------------
