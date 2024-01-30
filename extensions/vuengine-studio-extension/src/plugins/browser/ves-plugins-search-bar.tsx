@@ -20,13 +20,15 @@ export class VesPluginsSearchBar extends ReactWidget {
     protected input: HTMLInputElement | undefined;
 
     protected render(): React.ReactNode {
-        return <input type='text'
-            ref={input => this.input = input || undefined}
-            defaultValue={this.model.query}
-            className='theia-input'
-            placeholder={nls.localize('vuengine/plugins/searchPlugins', 'Search Plugins')}
-            onChange={this.updateQuery}>
-        </input>;
+        return <div className='vsx-search-container'>
+            <input type='text'
+                ref={input => this.input = input || undefined}
+                defaultValue={this.model.query}
+                className='theia-input'
+                placeholder={nls.localize('vuengine/plugins/searchPlugins', 'Search Plugins')}
+                onChange={this.updateQuery}>
+            </input>
+        </div>;
     }
 
     protected updateQuery = (e: React.ChangeEvent<HTMLInputElement>) => this.model.query = e.target.value;
