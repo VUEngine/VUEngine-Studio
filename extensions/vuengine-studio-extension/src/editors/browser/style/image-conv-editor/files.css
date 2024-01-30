@@ -39,6 +39,7 @@
 .jsonforms-container .filePreviewTitle {
   font-size: 80%;
   text-align: center;
+  overflow-wrap: break-word;
 }
 
 .jsonforms-container .filePreviewMeta {

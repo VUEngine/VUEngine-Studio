@@ -1,5 +1,8 @@
 .spriteEditor {
+    margin: calc(var(--theia-ui-padding) * 2);
     overflow: hidden !important;
+    padding: 0;
+    position: relative;
 }
 
 .spriteEditor canvas {

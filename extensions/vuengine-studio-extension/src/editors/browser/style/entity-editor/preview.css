@@ -1,10 +1,9 @@
 .jsonforms-container .preview-container {
     align-items: center;
-    background-color: var(--theia-activityBar-background);
-    border-radius: 8px;
+    border-radius: 5px;
     box-sizing: border-box;
     display: flex;
-    height: 300px;
+    height: 100%;
     justify-content: center;
     overflow: hidden;
     position: relative;
@@ -13,16 +12,15 @@
 
 .jsonforms-container .preview-container-world {
     align-items: center;
-    background-image: linear-gradient(transparent, transparent 49.9%, red 49.9%, red 50.1%, transparent 50.1%),
-        linear-gradient(90deg, transparent, transparent 49.9%, blue 49.9%, blue 50.1%, transparent 50.1%) /*, 
-        repeating-linear-gradient(transparent, transparent 7.9px, rgba(146,146,146,.2) 7.9px, rgba(146,146,146,.2) 8.1px),
-        repeating-linear-gradient(90deg, transparent, transparent 7.9px, rgba(146,146,146,.2) 7.9px, rgba(146,146,146,.2) 8.1px) */;
+    background:
+        linear-gradient(transparent, transparent 49.9%, rgba(255,0,0,.3) 49.9%, rgba(255,0,0,.3) 50.1%, transparent 50.1%),
+        linear-gradient(90deg, transparent, transparent 49.9%, rgba(0,0,255,.3) 49.9%, rgba(0,0,255,.3) 50.1%, transparent 50.1%),
+        repeating-conic-gradient(rgba(0,0,0,.3) 0% 25%, transparent 0% 50%) 50% / 12px 12px;
+    background-position: center;
     box-sizing: border-box;
     display: flex;
     justify-content: center;
-    height: 300px;
-    overflow: hidden;
-    perspective: 50px;
+    height: 100%;
     position: relative;
     transform-style: preserve-3d;
     width: 100%;

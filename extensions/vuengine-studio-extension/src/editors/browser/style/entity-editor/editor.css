@@ -6,23 +6,26 @@
     overflow: auto;
 }
 
-.jsonforms-container .dock-layout {
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    gap: 5px;
-    height: 100%;
-    overflow: hidden;
-    padding: 2px;
-    user-select: none;
-}
-
-.entityEditor {
+.jsonforms-container {
     --padding: calc(2 * var(--theia-ui-padding));
 }
 
-.entityEditor .item {
+.entityEditor {
+    position: relative;
+}
+
+.entityEditor .empty {
+    opacity: .3;
+}
+
+.entityEditor .current {
+    background: var(--theia-list-activeSelectionBackground);
+    color: var(--theia-list-activeSelectionForeground);
+    outline: var(--theia-focusBorder) solid 1px;
+    outline-offset: -1px;
+}
+
+.jsonforms-container .item {
     background-color: var(--theia-editorGroupHeader-tabsBackground);
     border: var(--theia-border-width) solid var(--theia-dropdown-border);
     border-radius: 2px;
@@ -31,11 +34,12 @@
     position: relative;
 }
 
-.entityEditor .item:hover {
+.jsonforms-container .item.active,
+.jsonforms-container .item:hover {
     border-color: var(--theia-button-hoverBackground);
 }
 
-.entityEditor .item > .remove-button {
+.jsonforms-container .item > .remove-button {
     background-color: transparent;
     border: 0;
     border-bottom-left-radius: 2px;
@@ -49,20 +53,20 @@
     top: 0;
     width: 32px;
 }
-.entityEditor .item:hover > .remove-button {
+.jsonforms-container .item:hover > .remove-button {
     color: var(--theia-button-hoverBackground);
     display: block;
 }
-.entityEditor .item:hover > .remove-button:hover {
+.jsonforms-container .item:hover > .remove-button:hover {
     background-color: var(--theia-button-hoverBackground);
     color: var(--theia-button-foreground);
 }
 
-.entityEditor .item .remove-button .codicon {
+.jsonforms-container .item .remove-button .codicon {
     vertical-align: middle;
 }
 
-.entityEditor .item .header {
+.jsonforms-container .item .header {
     border-bottom: var(--theia-border-width) solid var(--theia-dropdown-border);
     padding: var(--padding);
     margin: calc(-1 * var(--padding)) calc(-1 * var(--padding)) 10px;
@@ -85,9 +89,4 @@
 
 .entityEditor .light-label {
     color: var(--theia-dropdown-border);
-}
-
-.entityEditor .colliderPreviewBall {
-    border: 1px dashed #6767bd;
-    position: relative;
 }
