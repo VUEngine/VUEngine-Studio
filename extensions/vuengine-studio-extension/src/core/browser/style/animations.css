@@ -1,0 +1,20 @@
+:root {
+    --ves-animation-duration: .2s;
+}
+
+#theia-left-content-panel,
+#theia-left-content-panel > .p-Panel {
+    transition: 
+        width var(--ves-animation-duration);
+}
+
+#theia-bottom-split-panel,
+#theia-main-content-panel,
+#theia-main-content-panel .p-Widget,
+#theia-main-content-panel .monaco-editor,
+#theia-main-content-panel .monaco-editor div {
+    transition:
+        height var(--ves-animation-duration),
+        left var(--ves-animation-duration),
+        width var(--ves-animation-duration);
+}
