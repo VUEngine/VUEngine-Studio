@@ -1,14 +1,6 @@
 .spriteEditor {
     overflow: hidden !important;
 }
-.spriteEditor .editorContainer {
-    bottom: 0;
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
-    z-index: 10;
-}
 
 .spriteEditor canvas {
     border: none !important; 
@@ -36,31 +28,17 @@
     border-color: var(--theia-button-background);
 }
 
-.spriteEditor .item {
-    align-items: center;
-    background-color: var(--theia-editorGroupHeader-tabsBackground);
-    border: 1px solid var(--theia-activityBar-background);
-    border-radius: 2px;
-    cursor: pointer;
-    display: flex;
-    padding: 6px;
-}
-
 .spriteEditor .frame {
     box-sizing: border-box;
+    flex-grow: unset;
     height: 75px;
     min-height: 75px;
     min-width: 75px;
     width: 75px;
 }
 
-.spriteEditor .item:hover,
-.spriteEditor .item.active {
-    border-color: var(--theia-button-background);
-}
-
-.spriteEditor .item.dragging {
-    opacity: .5;
+.spriteEditor .layer {
+    padding: var(--theia-ui-padding)
 }
 
 .spriteEditor .layer input {

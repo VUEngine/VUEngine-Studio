@@ -1,10 +1,20 @@
-export interface SpriteLayerData {
-    id: string
+import { LayerDataForHook } from 'dotting';
+
+export const DEFAULT_SPRITE_SIZE = 16;
+export const PLACEHOLDER_LAYER_NAME = 'placeholderLayer';
+
+export interface ExtraSpriteLayerData {
     name: string
-    data: number[][]
 }
 
 export interface SpriteData {
-    name: string
-    layers: SpriteLayerData[]
+    dimensions: {
+        x: number
+        y: number
+    }
+    layers: SpriteLayersData
+}
+
+export interface SpriteLayersData {
+    [id: string]: (LayerDataForHook & ExtraSpriteLayerData)
 }
