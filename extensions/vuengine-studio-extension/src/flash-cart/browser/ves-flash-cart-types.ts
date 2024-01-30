@@ -1,4 +1,4 @@
-import { isOSX } from '@theia/core';
+import { isOSX, isWindows } from '@theia/core';
 
 export const PROG_VB_PLACEHOLDER = '%PROGVB%';
 export const HFCLI_PLACEHOLDER = '%HFCLI%';
@@ -92,9 +92,9 @@ export const BUILT_IN_FLASH_CART_CONFIGS: Array<FlashCartConfig> = [
     }],
     size: 32,
     path: HFCLI_PLACEHOLDER,
-    args: isOSX
-      ? `-p ${PORT_PLACEHOLDER} -x ${ROM_PLACEHOLDER} -n ${NAME_NO_SPACES_PLACEHOLDER} --slow`
-      : `-p ${PORT_PLACEHOLDER} -x ${ROM_PLACEHOLDER} -n ${NAME_NO_SPACES_PLACEHOLDER}`,
+    args: isWindows
+      ? `-p ${PORT_PLACEHOLDER} -x ${ROM_PLACEHOLDER} -n ${NAME_NO_SPACES_PLACEHOLDER}`
+      : `-p ${PORT_PLACEHOLDER} -x ${ROM_PLACEHOLDER} -n ${NAME_NO_SPACES_PLACEHOLDER} --slow`,
     padRom: false,
     image: HYPERFLASH32_IMAGE_PLACEHOLDER,
   },
@@ -109,9 +109,9 @@ export const BUILT_IN_FLASH_CART_CONFIGS: Array<FlashCartConfig> = [
     }],
     size: 32,
     path: HBCLI_PLACEHOLDER,
-    args: isOSX
-      ? `-p ${PORT_PLACEHOLDER} -f ${ROM_PLACEHOLDER} --slow`
-      : `-p ${PORT_PLACEHOLDER} -f ${ROM_PLACEHOLDER}`,
+    args: isWindows
+      ? `-p ${PORT_PLACEHOLDER} -f ${ROM_PLACEHOLDER}`
+      : `-p ${PORT_PLACEHOLDER} -f ${ROM_PLACEHOLDER} --slow`,
     padRom: false,
     image: HYPERBOY_IMAGE_PLACEHOLDER,
   },
