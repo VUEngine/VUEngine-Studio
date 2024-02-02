@@ -1,6 +1,7 @@
 import { ContextMenuRenderer } from '@theia/core/lib/browser';
 import { OpenerOptions, OpenerService, open } from '@theia/core/lib/browser/opener-service';
 import { TreeElement } from '@theia/core/lib/browser/source-tree';
+import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { MenuPath } from '@theia/core/lib/common';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable } from '@theia/core/shared/inversify';
@@ -69,6 +70,8 @@ export class VesPlugin implements VesPluginData, TreeElement {
     readonly pluginsService: VesPluginsService;
     @inject(WorkspaceService)
     readonly workspaceService: WorkspaceService;
+    @inject(WindowService)
+    readonly windowService: WindowService;
 
     protected readonly data: Partial<VesPluginData> = {};
 
@@ -183,6 +186,10 @@ export class VesPlugin implements VesPluginData, TreeElement {
 
     async doOpen(uri: URI, options?: OpenerOptions): Promise<void> {
         await open(this.openerService, uri, options);
+    }
+
+    async openUrl(url: string): Promise<void> {
+        await this.windowService.openNewWindow(url, { external: true });
     }
 
     render(): React.ReactNode {

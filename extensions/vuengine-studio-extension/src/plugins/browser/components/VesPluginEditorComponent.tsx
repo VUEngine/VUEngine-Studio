@@ -205,7 +205,7 @@ export default class VesPluginEditorComponent extends AbstractVesPluginComponent
 
         const plugin = this.props.plugin;
         if (plugin.repository) {
-            plugin.doOpen(new URI(plugin.repository).withScheme('file'));
+            plugin.openUrl(plugin.repository);
         }
     };
 }
