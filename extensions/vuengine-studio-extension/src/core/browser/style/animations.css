@@ -1,11 +1,7 @@
-:root {
-    --ves-animation-duration: .2s;
-}
-
 #theia-left-content-panel,
 #theia-left-content-panel > .p-Panel {
     transition: 
-        width var(--ves-animation-duration);
+        width .1s;
 }
 
 #theia-bottom-split-panel,
@@ -14,7 +10,29 @@
 #theia-main-content-panel .monaco-editor,
 #theia-main-content-panel .monaco-editor div {
     transition:
-        height var(--ves-animation-duration),
-        left var(--ves-animation-duration),
-        width var(--ves-animation-duration);
+        height .1s,
+        left .1s,
+        width .1s;
+}
+
+#ves-titlebar-application-title .applicationTitle,
+#theia-left-content-panel .p-TabBar-tabIcon,
+#theia-left-content-panel .theia-sidebar-menu,
+#theia-right-content-panel .p-TabBar-tabIcon,
+#theia-statusBar .area > div,
+#main-toolbar .toolbar-column > div,
+.p-TabBar-toolbar .item {
+    animation-name: fadeIn;
+    animation-duration: .3s;
+    animation-timing-function: ease-in-out;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
 }
