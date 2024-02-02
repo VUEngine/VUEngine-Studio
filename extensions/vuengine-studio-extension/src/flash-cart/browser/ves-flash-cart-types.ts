@@ -1,4 +1,4 @@
-import { isOSX, isWindows } from '@theia/core';
+import { isWindows } from '@theia/core';
 
 export const PROG_VB_PLACEHOLDER = '%PROGVB%';
 export const HFCLI_PLACEHOLDER = '%HFCLI%';
