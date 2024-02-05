@@ -1,20 +1,3 @@
-#theia-left-content-panel,
-#theia-left-content-panel > .p-Panel {
-    transition: 
-        width .1s;
-}
-
-#theia-bottom-split-panel,
-#theia-main-content-panel,
-#theia-main-content-panel .p-Widget,
-#theia-main-content-panel .monaco-editor,
-#theia-main-content-panel .monaco-editor div {
-    transition:
-        height .1s,
-        left .1s,
-        width .1s;
-}
-
 #ves-titlebar-application-title .applicationTitle,
 #theia-left-content-panel .p-TabBar-tabIcon,
 #theia-left-content-panel .theia-sidebar-menu,
