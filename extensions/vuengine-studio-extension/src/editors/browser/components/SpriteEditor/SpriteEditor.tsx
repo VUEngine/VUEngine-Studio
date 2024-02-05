@@ -17,8 +17,10 @@ import { PALETTE_COLORS } from '../../../../core/browser/ves-common-types';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/HContainer';
 import VContainer from '../Common/VContainer';
+import { DisplayMode } from '../EntityEditor/EntityEditorTypes';
 import PaletteSelect from './PaletteSelect';
 import SpriteEditorActions from './SpriteEditorActions';
+import SpriteEditorCurrentToolSettings from './SpriteEditorCurrentToolSettings';
 import SpriteEditorSettings from './SpriteEditorSettings';
 import SpriteEditorStatus from './SpriteEditorStatus';
 import SpriteEditorTools from './SpriteEditorTools';
@@ -106,11 +108,13 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                 [newId]: {
                     id: newId,
                     isVisible: true,
-                    name: nls.localize('vuengine/spriteEditor/layer', 'Layer') + ' 1',
                     data: createEmptyPixelData(
                         data.dimensions?.x || DEFAULT_SPRITE_SIZE,
                         data.dimensions?.y || DEFAULT_SPRITE_SIZE,
                     ),
+                    name: nls.localize('vuengine/spriteEditor/layer', 'Layer') + ' 1',
+                    parallax: 0,
+                    displayMode: DisplayMode.Both,
                 }
             }
         });
@@ -130,11 +134,13 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
         const newLayer = {
             id: services.vesCommonService.nanoid(),
             isVisible: true,
-            name: `${nls.localize('vuengine/spriteEditor/layer', 'Layer')} ${layers.length + 1}`,
             data: createEmptyPixelData(
                 data.dimensions?.x || DEFAULT_SPRITE_SIZE,
                 data.dimensions?.y || DEFAULT_SPRITE_SIZE,
             ),
+            name: `${nls.localize('vuengine/spriteEditor/layer', 'Layer')} ${layers.length + 1}`,
+            parallax: 0,
+            displayMode: DisplayMode.Both,
         };
         addLayer(newLayer.id, layers.length);
 
@@ -239,12 +245,12 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
     }, []);
 
     return (
-        <VContainer gap={15} className="spriteEditor">
+        <div className="spriteEditor">
             <Dotting
                 ref={ref}
                 backgroundColor='transparent'
-                brushColor={PALETTE_COLORS[primaryColor]}
-                defaultPixelColor={PALETTE_COLORS[0]}
+                brushColor={PALETTE_COLORS[data.colorMode][primaryColor]}
+                defaultPixelColor={PALETTE_COLORS[data.colorMode][0]}
                 gridStrokeColor={services.colorRegistry.getCurrentColor('editor.background')}
                 gridStrokeWidth={gridSize}
                 isGridVisible={gridSize > 0}
@@ -267,51 +273,70 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                 maxScale={10}
                 resizeUnit={8}
                 width={'100%'}
+                style={{ zIndex: 1 }}
             />
             <VContainer
                 gap={15}
                 style={{
-                    left: 0,
+                    bottom: 'calc(var(--padding) + 90px + 32px)',
+                    left: 'var(--padding)',
                     position: 'absolute',
-                    top: 0,
-                    width: 73,
+                    top: 'var(--padding)',
                 }}
             >
-                <PaletteSelect
-                    primaryColor={primaryColor}
-                    setPrimaryColor={setPrimaryColor}
-                    secondaryColor={secondaryColor}
-                    setSecondaryColor={setSecondaryColor}
-                    dottingRef={ref}
-                />
-                <SpriteEditorActions
-                    dottingRef={ref}
-                />
-                <SpriteEditorSettings
-                    allowResize={allowResize}
-                    setAllowResize={setAllowResize}
-                    gridSize={gridSize}
-                    setGridSize={setGridSize}
-                />
-                <SpriteEditorTools
-                    dottingRef={ref}
-                />
+                <div style={{ zIndex: 100 }}>
+                    <PaletteSelect
+                        data={data}
+                        setData={setData}
+                        colorMode={data.colorMode}
+                        primaryColor={primaryColor}
+                        setPrimaryColor={setPrimaryColor}
+                        secondaryColor={secondaryColor}
+                        setSecondaryColor={setSecondaryColor}
+                        dottingRef={ref}
+                    />
+                </div>
+                <VContainer
+                    gap={15}
+                    overflow='auto'
+                    style={{
+                        width: 80,
+                        zIndex: 100,
+                    }}
+                >
+                    <SpriteEditorActions
+                        dottingRef={ref}
+                    />
+                    <SpriteEditorSettings
+                        allowResize={allowResize}
+                        setAllowResize={setAllowResize}
+                        gridSize={gridSize}
+                        setGridSize={setGridSize}
+                    />
+                    <SpriteEditorTools
+                        dottingRef={ref}
+                    />
+                    <SpriteEditorCurrentToolSettings
+                        dottingRef={ref}
+                    />
+                </VContainer>
             </VContainer>
             <SpriteEditorStatus
                 dottingRef={ref}
                 style={{
-                    bottom: 90,
+                    bottom: 'calc(var(--padding) + 90px)',
                     position: 'absolute',
-                    left: 0,
+                    left: 'var(--padding)',
+                    zIndex: 100,
                 }}
             />
             <VContainer
                 gap={15}
                 style={{
-                    bottom: 90,
+                    bottom: 'calc(var(--padding) + 90px)',
                     position: 'absolute',
-                    right: 0,
-                    top: 0,
+                    right: 'var(--padding)',
+                    top: 'var(--padding)',
                     width: 200,
                 }}
             >
@@ -343,7 +368,7 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                     {data.layers && Object.values(data.layers).map((layer, index) => (
                         <div
                             key={layer.id}
-                            className={`item layer ${currentLayer?.id === layer.id ? 'active' : undefined} ${draggingSectionId === layer.id ? 'dragging' : undefined}`}
+                            className={`item layer${currentLayer?.id === layer.id ? ' active' : ''}${draggingSectionId === layer.id ? ' dragging' : ''}`}
                             style={{
                                 alignItems: 'center',
                                 display: 'flex',
@@ -428,20 +453,21 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                 style={{
                     minHeight: 75,
                     position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
+                    bottom: 'var(--padding)',
+                    left: 'var(--padding)',
+                    right: 'var(--padding)',
                 }}
             >
-                <div className='item frame active'></div>
+                <div className='item frame active' style={{ zIndex: 100 }}></div>
                 <button
                     className='theia-button add-button'
                     onClick={() => { }}
                     title={nls.localize('vuengine/spriteEditor/addFrame', 'Add Frame')}
+                    style={{ zIndex: 100 }}
                 >
                     <i className='codicon codicon-plus' />
                 </button>
             </HContainer>
-        </VContainer>
+        </div>
     );
 }

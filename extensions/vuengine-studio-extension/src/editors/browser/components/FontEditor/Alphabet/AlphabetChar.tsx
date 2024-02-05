@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { PALETTE_COLORS } from '../../../../../core/browser/ves-common-types';
+import { ColorMode, PALETTE_COLORS } from '../../../../../core/browser/ves-common-types';
 import { FontEditorState, VariableSize, win1252CharNames } from '../FontEditorTypes';
 
 interface AlphabetCharProps {
@@ -48,7 +48,7 @@ export default function AlphabetChar(props: AlphabetCharProps): React.JSX.Elemen
                             const xPos = (x + 1) * pixelSize;
                             const yPos = (y + 1) * pixelSize;
                             result.push(
-                                `${xPos}px ${yPos}px 0 0 ${PALETTE_COLORS[color]}`
+                                `${xPos}px ${yPos}px 0 0 ${PALETTE_COLORS[ColorMode.Default][color]}`
                             );
                         }
                     }

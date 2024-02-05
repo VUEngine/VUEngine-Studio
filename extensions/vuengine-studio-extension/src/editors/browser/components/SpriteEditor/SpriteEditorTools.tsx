@@ -62,19 +62,19 @@ export default function SpriteEditorTools(props: SpriteEditorToolsProps): React.
             </div>
             {/*
                         <div
-                            className={`tool ${brushTool === BrushTool.STROKE ? 'active' : undefined}`}
+                            className={`tool${brushTool === BrushTool.STROKE ? ' active' : ''}`}
                             onClick={() => changeBrushTool(BrushTool.STROKE)}
                         >
                             <PencilSimpleLine size={20} />
                         </div>
                         <div
-                            className={`tool ${brushTool === BrushTool.SQUARE ? 'active' : undefined}`}
+                            className={`tool${brushTool === BrushTool.SQUARE ? ' active' : ''}`}
                             onClick={() => changeBrushTool(BrushTool.SQUARE)}
                         >
                             <Square size={20} />
                         </div>
                         <div
-                            className={`tool ${brushTool === BrushTool.CIRCLE ? 'active' : undefined}`}
+                            className={`tool${brushTool === BrushTool.CIRCLE ? ' active' : ''}`}
                             onClick={() => changeBrushTool(BrushTool.CIRCLE)}
                         >
                             <Circle size={20} />

@@ -1,9 +1,20 @@
 .jsonforms-container {
+  --padding: calc(2 * var(--theia-ui-padding));
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   height: 100%;
   outline: none;
+  width: 100%;
+}
+
+.jsonforms-container > div {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: auto;
+  width: 100%;
 }
 
 .jsonforms-container>div {
@@ -15,7 +26,7 @@
   font-style: italic;
 }
 
-.jsonforms-container label .codicon-question {
+label i.codicon.codicon-question {
   cursor: context-menu;
   font-size: 14px;
   margin-left: 5px;

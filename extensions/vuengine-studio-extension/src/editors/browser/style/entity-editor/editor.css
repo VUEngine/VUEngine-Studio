@@ -1,14 +1,3 @@
-.jsonforms-container > div {
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    overflow: auto;
-}
-
-.jsonforms-container {
-    --padding: calc(2 * var(--theia-ui-padding));
-}
 
 .entityEditor {
     position: relative;
