@@ -50,6 +50,7 @@ export default function Components(): React.JSX.Element {
         const sprites = [...data.components?.sprites];
         sprites.push({
             _imageData: 0,
+            name: '',
             bgmapMode: BgmapMode.Bgmap,
             displayMode: DisplayMode.Both,
             transparency: Transparency.None,
@@ -86,7 +87,7 @@ export default function Components(): React.JSX.Element {
     const addBehavior = (): void => {
         const behaviors = [...data.components?.behaviors];
         behaviors.push({
-            'name': '',
+            name: '',
         });
 
         setData({
@@ -120,6 +121,7 @@ export default function Components(): React.JSX.Element {
     const addCollider = (): void => {
         const colliders = [...data.components?.colliders];
         colliders.push({
+            name: '',
             type: ColliderType.Ball,
             pixelSize: {
                 x: 32,
@@ -158,6 +160,7 @@ export default function Components(): React.JSX.Element {
     const addWireframe = (): void => {
         const wireframes = [...data.components?.wireframes];
         wireframes.push({
+            name: '',
             wireframe: {
                 type: WireframeType.Sphere,
                 displacement: {
@@ -264,7 +267,6 @@ export default function Components(): React.JSX.Element {
                 {data.components?.sprites.map((sprite, index) =>
                     <Sprite
                         key={`sprite-${index}`}
-                        index={index}
                         sprite={sprite}
                         updateSprite={(partialData: Partial<SpriteData>) => updateComponent('sprites', index, partialData)}
                         removeSprite={() => removeComponent('sprites', index)}

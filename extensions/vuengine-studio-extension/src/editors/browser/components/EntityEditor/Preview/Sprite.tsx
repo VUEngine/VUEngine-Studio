@@ -15,6 +15,8 @@ interface SpriteProps {
   flipHorizontally: boolean
   flipVertically: boolean
   transparent: boolean
+  canScale: boolean
+  projectionDepth: number
 }
 
 export default function Sprite(props: SpriteProps): React.JSX.Element {
@@ -22,11 +24,13 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
   const {
     animate,
     frames,
+    canScale,
     currentAnimationFrame,
     displacement,
     highlighted,
     images,
     palette,
+    projectionDepth,
     flipHorizontally,
     flipVertically,
     transparent,
@@ -104,44 +108,40 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
   const baseZIndex = highlighted ? 999999999 : 100000;
 
   return (
-    <>
-      <div
-        className={error ? 'sprite-error' : ''}
-        title={error ? error : ''}
-        style={{
-          boxSizing: 'border-box',
-          height: height / (isMultiFileAnimation ? 1 : frames || 1),
-          marginBottom: displacement.y < 0 ? -displacement.y * 2 : 0,
-          marginLeft: displacement.x > 0 ? displacement.x * 2 : 0,
-          marginRight: displacement.x < 0 ? -displacement.x * 2 : 0,
-          marginTop: displacement.y > 0 ? displacement.y * 2 : 0,
-          opacity: transparent ? .5 : 1,
-          outline: highlighted ? '1px solid green' : undefined,
-          overflow: 'hidden',
-          position: 'absolute',
-          transform: transforms.length ? transforms.join(' ') : undefined,
-          width: width,
-          zIndex: baseZIndex + (displacement.z !== 0 ? -displacement.z : 0),
-        }}
-      >
-        {!error && imageData.length > 0 &&
-          <div style={{
-            position: 'relative',
-            top: animate && !isMultiFileAnimation
-              ? (height / (frames || 1) * currentAnimationFrame * -1)
-              : 0
-          }}>
-            {currentPixelData &&
-              <CssImage
-                height={height}
-                palette={palette}
-                pixelData={currentPixelData}
-                width={width}
-              />
-            }
-          </div>
-        }
-      </div>
-    </>
+    <div
+      className={error ? 'sprite-error' : ''}
+      title={error ? error : ''}
+      style={{
+        boxSizing: 'border-box',
+        height: height / (isMultiFileAnimation ? 1 : frames || 1),
+        opacity: transparent ? .5 : 1,
+        outline: highlighted ? '1px solid green' : undefined,
+        overflow: 'hidden',
+        position: 'absolute',
+        scale: canScale ? undefined : (1 + (displacement.parallax / projectionDepth)),
+        transform: transforms.length ? transforms.join(' ') : undefined,
+        translate: `${displacement.x}px ${displacement.y}px ${-1 * displacement.parallax}px`,
+        width: width,
+        zIndex: baseZIndex + (displacement.z !== 0 ? -displacement.z : 0),
+      }}
+    >
+      {!error && imageData.length > 0 &&
+        <div style={{
+          position: 'relative',
+          top: animate && !isMultiFileAnimation
+            ? (height / (frames || 1) * currentAnimationFrame * -1)
+            : 0
+        }}>
+          {currentPixelData &&
+            <CssImage
+              height={height}
+              palette={palette}
+              pixelData={currentPixelData}
+              width={width}
+            />
+          }
+        </div>
+      }
+    </div>
   );
 }

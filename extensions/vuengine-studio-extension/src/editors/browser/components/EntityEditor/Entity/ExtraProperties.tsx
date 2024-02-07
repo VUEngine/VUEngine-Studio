@@ -70,7 +70,7 @@ export default function ExtraProperties(): React.JSX.Element {
 
     return <>
         {data.extraProperties.enabled &&
-            <HContainer gap={15} className='item'>
+            <HContainer gap={15} className='item' wrap='wrap'>
                 <button
                     className="remove-button"
                     onClick={disableExtraProperties}

@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { PixelRotation, PixelSize, PixelVector, Scale } from '../EntityEditorTypes';
+import { PixelRotation, PixelSize, PixelVector, Scale } from '../../EntityEditorTypes';
 
 const Cuboid = styled.div`
     --half-d: calc(var(--depth) / 2);
@@ -10,7 +10,7 @@ const Cuboid = styled.div`
 `;
 
 const CuboidFace = styled.div`
-    border: 0.25px dashed green;
+    border: 1px dashed green;
     box-sizing: border-box;
     position: absolute;
 `;
@@ -29,6 +29,8 @@ const CuboidFaceBack = styled(CuboidFace)`
 `;
 
 const CuboidFaceTop = styled(CuboidFace)`
+    border-bottom-width: 0;
+    border-top-width: 0;
     height: var(--depth);
     transform: rotateX(90deg);
     translate: calc(-1 * var(--half-w)) calc(var(--half-h) - var(--half-d)) 0;
@@ -36,12 +38,15 @@ const CuboidFaceTop = styled(CuboidFace)`
 `;
 
 const CuboidFaceBottom = styled(CuboidFace)`
+    border-bottom-width: 0;
+    border-top-width: 0;
     height: var(--depth);
     transform: rotateX(-90deg);
     translate: calc(-1 * var(--half-w)) calc(-1 * var(--half-h) - var(--half-d)) 0;
     width: var(--width);
 `;
 
+/*
 const CuboidFaceLeft = styled(CuboidFace)`
     height: var(--height);
     transform: rotateY(90deg);
@@ -55,6 +60,7 @@ const CuboidFaceRight = styled(CuboidFace)`
     translate: calc(-1 * var(--half-w) - var(--half-d)) calc(-1 * var(--half-h)) 0;
     width: var(--depth);
 `;
+*/
 
 export interface CubiodColiderProps {
     size: PixelSize
@@ -71,17 +77,14 @@ export default function BoxCollider(props: CubiodColiderProps): React.JSX.Elemen
         '--depth': `${size.z * scale.z}px`,
         '--height': `${size.y * scale.y}px`,
         '--width': `${size.x * scale.x}px`,
-        marginBottom: displacement.y < 0 ? -displacement.y * 2 : 0,
-        marginLeft: displacement.x > 0 ? displacement.x * 2 : 0,
-        marginRight: displacement.x < 0 ? -displacement.x * 2 : 0,
-        marginTop: displacement.y > 0 ? displacement.y * 2 : 0,
         transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) rotateZ(${rotation.z}deg)`,
+        translate: `${displacement.x}px ${displacement.y}px ${-1 * displacement.parallax}px`,
     }}>
         <CuboidFaceFront />
         <CuboidFaceBack />
         <CuboidFaceTop />
         <CuboidFaceBottom />
-        <CuboidFaceLeft />
-        <CuboidFaceRight />
+        {/* <CuboidFaceLeft /> */}
+        {/* <CuboidFaceRight /> */}
     </Cuboid>;
 }

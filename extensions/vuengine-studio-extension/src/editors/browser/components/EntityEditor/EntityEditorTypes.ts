@@ -123,11 +123,16 @@ export interface WireframeConfigData {
 }
 
 export interface WireframeData {
+    name: string
     wireframe: WireframeConfigData
     segments: MeshSegmentData[] // only WireframeType.Mesh
     length: number // only WireframeType.Asterisk
     radius: number // only WireframeType.Sphere
     drawCenter: boolean // only WireframeType.Sphere
+}
+
+export interface ScriptData {
+    function: string
 }
 
 export interface AnimationData {
@@ -143,6 +148,7 @@ export interface BehaviorData {
 }
 
 export interface ColliderData {
+    name: string
     type: ColliderType
     pixelSize: PixelSize
     displacement: PixelVector
@@ -154,6 +160,7 @@ export interface ColliderData {
 }
 
 export interface SpriteData {
+    name: string
     bgmapMode: BgmapMode
     displayMode: DisplayMode
     transparency: Transparency
@@ -184,8 +191,8 @@ export interface PositionedEntityData {
     loadRegardlessOfPosition: boolean
 }
 
-export type ComponentKey = 'animations' | 'behaviors' | 'children' | 'colliders' | 'sprites' | 'wireframes';
-export type ComponentData = AnimationData | BehaviorData | PositionedEntityData | ColliderData | SpriteData | WireframeData;
+export type ComponentKey = 'animations' | 'behaviors' | 'children' | 'colliders' | 'sprites' | 'wireframes' | 'scripts';
+export type ComponentData = AnimationData | BehaviorData | PositionedEntityData | ColliderData | SpriteData | WireframeData | ScriptData;
 
 export interface EntityData {
     _id: string
@@ -207,6 +214,7 @@ export interface EntityData {
         colliders: ColliderData[]
         sprites: SpriteData[]
         wireframes: WireframeData[]
+        scripts: ScriptData[]
     }
     inGameType: string
     physics: {
@@ -244,5 +252,6 @@ export interface EntityEditorState {
         palettes: string[]
         sprites: boolean
         zoom: number
+        projectionDepth: number
     }
 }

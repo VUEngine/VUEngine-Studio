@@ -5,12 +5,10 @@ import InfoLabel from '../../Common/InfoLabel';
 import VContainer from '../../Common/VContainer';
 import {
     AnimationData,
-    defaultCurrentAnimation,
-    defaultHighlightedSprite,
     EntityEditorContext,
     EntityEditorContextType,
     MAX_ANIMATION_CYLCES,
-    MIN_ANIMATION_CYLCES,
+    MIN_ANIMATION_CYLCES
 } from '../EntityEditorTypes';
 
 interface AnimationProps {
@@ -85,27 +83,7 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
         });
     };
 
-    const setPreviewAnimation = (): void => {
-        setState({
-            preview: {
-                ...state.preview,
-                currentAnimation: index,
-                highlightedSprite: defaultHighlightedSprite,
-            }
-        });
-    };
-
-    const resetPreviewAnimation = (): void => {
-        setState({
-            preview: {
-                ...state.preview,
-                currentAnimation: defaultCurrentAnimation,
-                highlightedSprite: defaultHighlightedSprite,
-            }
-        });
-    };
-
-    return <div onMouseEnter={setPreviewAnimation} onMouseLeave={resetPreviewAnimation}>
+    return <div>
         <VContainer className='item' gap={15}>
             <button
                 className="remove-button"

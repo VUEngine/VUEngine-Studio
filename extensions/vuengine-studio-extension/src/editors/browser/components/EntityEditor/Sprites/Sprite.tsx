@@ -17,12 +17,10 @@ import {
     MIN_TEXTURE_PADDING,
     SpriteData,
     SpriteType,
-    Transparency,
-    defaultCurrentAnimation
+    Transparency
 } from '../EntityEditorTypes';
 
 interface SpriteProps {
-    index: number
     sprite: SpriteData
     updateSprite: (partialData: Partial<SpriteData>, options?: EntityEditorSaveDataOptions) => void
     removeSprite: () => void
@@ -30,8 +28,8 @@ interface SpriteProps {
 
 export default function Sprite(props: SpriteProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
-    const { data, state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
-    const { index, sprite, updateSprite, removeSprite } = props;
+    const { data } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { sprite, updateSprite, removeSprite } = props;
     const [dimensions, setDimensions] = useState<string>('');
     const [filename, setFilename] = useState<string>('');
 
@@ -76,6 +74,12 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         }
 
         return 0;
+    };
+
+    const setName = (name: string): void => {
+        updateSprite({
+            name
+        });
     };
 
     const setManipulationFunction = (manipulationFunction: string): void => {
@@ -215,34 +219,14 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         });
     };
 
-    const setPreviewSprite = (): void => {
-        setState({
-            preview: {
-                ...state.preview,
-                highlightedSprite: index,
-                currentAnimation: defaultCurrentAnimation,
-            }
-        });
-    };
-
-    const resetPreviewSprite = (): void => {
-        setState({
-            preview: {
-                ...state.preview,
-                highlightedSprite: -1,
-                currentAnimation: defaultCurrentAnimation,
-            }
-        });
-    };
-
     useEffect(() => {
         getMetaData();
     }, [sprite.texture.files]);
 
     const charCount = getCharCount(sprite._imageData);
 
-    return <div onMouseEnter={setPreviewSprite} onMouseLeave={resetPreviewSprite}>
-        <HContainer className='item' gap={20}>
+    return <div>
+        <HContainer className='item' gap={20} wrap='wrap'>
             <button
                 className="remove-button"
                 onClick={removeSprite}
@@ -250,6 +234,16 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
             >
                 <i className='codicon codicon-x' />
             </button>
+            <VContainer>
+                <label>
+                    {nls.localize('vuengine/entityEditor/name', 'Name')}
+                </label>
+                <input
+                    className='theia-input'
+                    value={sprite.name}
+                    onChange={e => setName(e.target.value)}
+                />
+            </VContainer>
             <VContainer>
                 <VContainer alignItems='start'>
                     <i

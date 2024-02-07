@@ -1,15 +1,11 @@
-import { nls } from '@theia/core';
 import React, { useContext, useEffect, useState } from 'react';
-import { PALETTE_COLORS } from '../../../../../core/browser/ves-common-types';
+import { ColorMode, PALETTE_COLORS } from '../../../../../core/browser/ves-common-types';
 import { EditorsContext, EditorsContextType } from '../../../../../editors/browser/ves-editors-types';
 import { ProjectContributor } from '../../../../../project/browser/ves-project-types';
-import ColorSelector from '../../Common/ColorSelector';
-import HContainer from '../../Common/HContainer';
-import Palette from '../../Common/Palette';
-import VContainer from '../../Common/VContainer';
-import BoxCollider from '../Colliders/BoxCollider';
+import BoxCollider from './Colliders/BoxCollider';
 import {
   AnimationData,
+  BgmapMode,
   ColliderType,
   EntityEditorContext,
   EntityEditorContextType,
@@ -18,7 +14,7 @@ import {
 import Sprite from './Sprite';
 
 export default function Preview(): React.JSX.Element {
-  const { state, setState, data } = useContext(EntityEditorContext) as EntityEditorContextType;
+  const { state, data } = useContext(EntityEditorContext) as EntityEditorContextType;
   const { services } = useContext(EditorsContext) as EditorsContextType;
   const [currentAnimationStep, setCurrentAnimationStep] = useState<number>(0);
   let timer: NodeJS.Timeout | undefined;
@@ -33,22 +29,6 @@ export default function Preview(): React.JSX.Element {
     ? data.components?.animations[currentAnimation]
     : undefined;
 
-  const setBooleanStateProperty = (property: string, checked: boolean) =>
-    setState({
-      preview: {
-        ...state.preview,
-        [property]: checked,
-      },
-    });
-
-  const setBackgroundColor = (backgroundColor: number) =>
-    setState({
-      preview: {
-        ...state.preview,
-        backgroundColor: Math.min(Math.max(backgroundColor, -1), 3),
-      },
-    });
-
   const updateAnimationStep = () => {
     timer = !timer
       ? setInterval(() => {
@@ -59,10 +39,10 @@ export default function Preview(): React.JSX.Element {
       : undefined;
   };
 
-  const showPreview = data.components?.sprites.length /* ||
-    data.components?.children.length ||
-    data.components?.colliders.length ||
-    data.components?.wireframes.length */;
+  const showPreview = data.components?.sprites.length > 0 /* ||
+    data.components?.children.length > 0 ||
+    data.components?.colliders.length > 0 ||
+    data.components?.wireframes.length > 0 */;
 
   useEffect(() => {
     clearInterval(timer);
@@ -72,185 +52,59 @@ export default function Preview(): React.JSX.Element {
     animation
   ]);
 
-  return (
-    <VContainer>
-      <VContainer>
-        <label>
-          {nls.localize('vuengine/entityEditor/preview', 'Preview')}
-        </label>
-      </VContainer>
-      {showPreview
-        ? <VContainer gap={15}>
-          <div
-            className="preview-container"
-            style={{ backgroundColor: state.preview.backgroundColor > -1 ? PALETTE_COLORS[state.preview.backgroundColor] : undefined }}
-          >
-            {animate &&
-              <div className='current-frame'>
-                <div>
-                  {animation?.name
-                    ? `"${animation?.name}"`
-                    : `Animation ${currentAnimation + 1}`}
-                </div>
-                <div>
-                  {currentAnimationStep + 1}
-                </div>
-              </div>
-            }
-            <div
-              className="preview-container-world"
-              style={{ zoom: state.preview.zoom }}
-            >
-              {state.preview.sprites && data.components?.sprites?.map((sprite, i) =>
-                <Sprite
-                  key={`preview-sprite-${i}`}
-                  animate={animate}
-                  displacement={sprite.displacement}
-                  frames={data.animations?.totalFrames || 1}
-                  currentAnimationFrame={animation?.frames[currentAnimationStep - 1] ?? currentAnimationStep}
-                  highlighted={state.preview.highlightedSprite === i}
-                  images={sprite.texture.files}
-                  flipHorizontally={sprite.texture.flip.horizontal}
-                  flipVertically={sprite.texture.flip.vertical}
-                  transparent={sprite.transparency !== Transparency.None}
-                  palette={state.preview.palettes[sprite.texture.palette]}
-                />
-              )}
-              {state.preview.colliders && data.components?.colliders?.map((collider, i) => {
-                switch (collider.type) {
-                  case ColliderType.Box:
-                    return <BoxCollider
-                      size={collider.pixelSize}
-                      displacement={collider.displacement}
-                      rotation={collider.rotation}
-                      scale={collider.scale}
-                    />;
-
-                }
-              })}
+  return <>
+    {showPreview &&
+      <div
+        className="preview-container"
+        style={{ backgroundColor: state.preview.backgroundColor > -1 ? PALETTE_COLORS[ColorMode.Default][state.preview.backgroundColor] : undefined }}
+      >
+        {animate &&
+          <div className='current-frame'>
+            <div>
+              {animation?.name
+                ? `"${animation?.name}"`
+                : `Animation ${currentAnimation + 1}`}
+            </div>
+            <div>
+              {currentAnimationStep + 1}
             </div>
           </div>
-          <VContainer>
-            <label>
-              {nls.localize('vuengine/entityEditor/zoom', 'Zoom')}
-            </label>
-            <HContainer>
-              <input
-                type="range"
-                value={state.preview.zoom}
-                max={10}
-                min={1}
-                onChange={e =>
-                  setState({
-                    preview: {
-                      ...state.preview,
-                      zoom: parseInt(e.target.value),
-                    },
-                  })
-                }
-              />
-              <div style={{ minWidth: 24, textAlign: 'right', width: 24 }}>
-                {state.preview.zoom}
-              </div>
-            </HContainer>
-          </VContainer>
-          <VContainer>
-            <label>
-              {nls.localize('vuengine/entityEditor/options', 'Options')}
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={state.preview.sprites && data.components?.sprites?.length > 0}
-                disabled={!data.components?.sprites?.length}
-                onChange={e => setBooleanStateProperty('sprites', e.target.checked)}
-              />
-              {nls.localize('vuengine/entityEditor/showSprites', 'Show Sprites')}
-            </label>
-            {/*
-        <label>
-          <input
-            type="checkbox"
-            checked={state.preview.wireframes && data.components?.wireframes?.length > 0}
-            disabled={!data.components?.wireframes?.length}
-            onChange={e => setBooleanStateProperty('wireframes', e.target.checked)}
-          />
-          Show Wireframes
-        </label>
-        */}
-            <label>
-              <input
-                type="checkbox"
-                checked={state.preview.colliders}
-                onChange={e =>
-                  setBooleanStateProperty('colliders', e.target.checked)
-                }
-              />
-              Show Colliders
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={animate}
-                disabled={!data.components?.animations?.length}
-                onChange={e =>
-                  setBooleanStateProperty('animations', e.target.checked)
-                }
-              />
-              {nls.localize('vuengine/entityEditor/showAnimations', 'Show Animations')}
-            </label>
-            {/*
-        <label>
-          <input
-            type="checkbox"
-            checked={state.preview.anaglyph}
-            onChange={e =>
-              setBooleanStateProperty('anaglyph', e.target.checked)
-            }
-          />
-          Anaglyph Display Mode
-        </label>
-        */}
-          </VContainer>
-          <VContainer>
-            <label>
-              {nls.localize('vuengine/entityEditor/background', 'Background')}
-            </label>
-            <ColorSelector
-              color={state.preview.backgroundColor}
-              updateColor={setBackgroundColor}
-              includeTransparent
+        }
+        <div
+          className="preview-container-world"
+          style={{ perspective: state.preview.projectionDepth + 'px', zoom: state.preview.zoom }}
+        >
+          {state.preview.sprites && data.components?.sprites?.map((sprite, i) =>
+            <Sprite
+              key={`preview-sprite-${i}`}
+              animate={animate}
+              displacement={sprite.displacement}
+              frames={data.animations?.totalFrames || 1}
+              canScale={sprite.bgmapMode === BgmapMode.Affine}
+              projectionDepth={state.preview.projectionDepth}
+              currentAnimationFrame={animation?.frames[currentAnimationStep - 1] ?? currentAnimationStep}
+              highlighted={state.preview.highlightedSprite === i}
+              images={sprite.texture.files}
+              flipHorizontally={sprite.texture.flip.horizontal}
+              flipVertically={sprite.texture.flip.vertical}
+              transparent={sprite.transparency !== Transparency.None}
+              palette={state.preview.palettes[sprite.texture.palette]}
             />
-          </VContainer>
-          <VContainer>
-            <label>
-              {nls.localize('vuengine/entityEditor/palettes', 'Palettes')}
-            </label>
-            {[...Array(4)].map((h, i) => (
-              <HContainer key={`preview-palette-${i}`}>
-                <div style={{ width: 16 }}>
-                  {i}
-                </div>
-                <Palette
-                  value={state.preview.palettes[i]}
-                  updateValue={newValue => {
-                    const updatedPalettes = state.preview.palettes;
-                    updatedPalettes[i] = newValue;
-                    setState({
-                      preview: {
-                        ...state.preview,
-                        palettes: updatedPalettes,
-                      },
-                    });
-                  }}
-                />
-              </HContainer>
-            ))}
-          </VContainer>
-        </VContainer>
-        : <>
-          {nls.localize('vuengine/entityEditor/noPreviewableComponents', 'No previewable components found.')}
-        </>}
-    </VContainer>
-  );
+          )}
+          {state.preview.colliders && data.components?.colliders?.map((collider, i) => {
+            switch (collider.type) {
+              case ColliderType.Box:
+                return <BoxCollider
+                  size={collider.pixelSize}
+                  displacement={collider.displacement}
+                  rotation={collider.rotation}
+                  scale={collider.scale}
+                />;
+
+            }
+          })}
+        </div>
+      </div>
+    }
+  </>;
 }
