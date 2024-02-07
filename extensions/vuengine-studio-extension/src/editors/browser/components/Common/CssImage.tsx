@@ -1,15 +1,17 @@
 import React from 'react';
-import { PALETTE_COLORS, PALETTE_INDEX_MAPPING } from '../../../../core/browser/ves-common-types';
+import { ColorMode, PALETTE_COLORS, PALETTE_INDEX_MAPPING } from '../../../../core/browser/ves-common-types';
 
 interface CssImageProps {
     height: number
     palette: string
     pixelData: number[][]
     width: number
+    style?: object
+    useTextColor?: boolean
 }
 
 export default function CssImage(props: CssImageProps): React.JSX.Element {
-    const { height, palette, pixelData, width } = props;
+    const { height, palette, pixelData, width, style, useTextColor } = props;
 
     const getBoxShadow = (): string[] => {
         const result: string[] = [];
@@ -23,7 +25,10 @@ export default function CssImage(props: CssImageProps): React.JSX.Element {
                 const yPos = (y + 1);
                 const paletteStartChar = ((3 - color) % 4) << 1;
                 result.push(
-                    `${xPos}px ${yPos}px 0 0 ${PALETTE_COLORS[PALETTE_INDEX_MAPPING[palette.substring(paletteStartChar, paletteStartChar + 2)]]}`
+                    `${xPos}px ${yPos}px 0 0 ${useTextColor === true
+                        ? 'var(--theia-foreground)'
+                        : PALETTE_COLORS[ColorMode.Default][PALETTE_INDEX_MAPPING[palette.substring(paletteStartChar, paletteStartChar + 2)]]
+                    }`
                 );
             });
         });
@@ -33,6 +38,7 @@ export default function CssImage(props: CssImageProps): React.JSX.Element {
 
     return <div
         style={{
+            ...style,
             height: height,
             width: width,
         }}

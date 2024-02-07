@@ -1,4 +1,4 @@
-import { HoverPosition } from '@theia/core/lib/browser';
+import { HoverPosition, HoverService } from '@theia/core/lib/browser';
 import React, { PropsWithChildren, ReactElement, useContext } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
@@ -6,32 +6,37 @@ import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 interface InfoLabelProps {
     label: string
     count?: number
-    tooltip: string | ReactElement
+    tooltip?: string | ReactElement
     tooltipPosition?: HoverPosition
+    hoverService?: HoverService
 }
 
 export default function InfoLabel(props: PropsWithChildren<InfoLabelProps>): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
-    const { label, tooltip, tooltipPosition, count } = props;
+    const { label, tooltip, tooltipPosition, count, hoverService } = props;
 
     let content: string | HTMLElement = tooltip as string;
-    if (typeof tooltip !== 'string') {
+    if (tooltip && typeof tooltip !== 'string') {
         content = document.createElement('div');
         // eslint-disable-next-line no-unsanitized/property
         content.innerHTML = renderToStaticMarkup(tooltip);
     }
+
+    const hs = hoverService ? hoverService : services.hoverService;
 
     return <label>
         {label}
         {count && <>
             {' '}<span className='count'>{count}</span>
         </>}
-        <i className='codicon codicon-question' onMouseEnter={event => {
-            services.hoverService.requestHover({
-                content: content,
-                target: event.currentTarget,
-                position: tooltipPosition || 'top',
-            });
-        }} />
+        {tooltip &&
+            <i className='codicon codicon-question' onMouseEnter={event => {
+                hs.requestHover({
+                    content: content,
+                    target: event.currentTarget,
+                    position: tooltipPosition || 'top',
+                });
+            }} />
+        }
     </label>;
 }

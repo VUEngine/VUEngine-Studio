@@ -93,7 +93,7 @@ export default function RadioSelect(props: RadioSelectProps): React.JSX.Element 
         {options.map((o, i) =>
             <div
                 key={`radio-select-option-${i}`}
-                className={currentIndexes.includes(i) ? 'selected' : undefined}
+                className={currentIndexes.includes(i) ? 'selected' : ''}
                 onClick={() => toggleValue(i)}
             >
                 {o.label ? o.label : o.value}
