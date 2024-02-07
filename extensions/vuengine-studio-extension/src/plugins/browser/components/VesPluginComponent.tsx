@@ -7,7 +7,7 @@ export default class VesPluginComponent extends AbstractVesPluginComponent {
         return <div className='theia-vsx-extension ves-plugin'>
             {icon
                 ? <img className='theia-vsx-extension-icon' src={icon} />
-                : <div className='theia-vsx-extension-icon ves-placeholder'>
+                : <div className='theia-vsx-extension-icon vesPlaceholder'>
                     <i className="codicon codicon-plug" />
                 </div>}
             <div className='theia-vsx-extension-content'>
@@ -20,7 +20,7 @@ export default class VesPluginComponent extends AbstractVesPluginComponent {
                 </div>
                 <div className='noWrapInfo theia-vsx-extension-description'>{description}</div>
                 <div className='theia-vsx-extension-action-bar'>
-                    <span className='noWrapInfo ves-plugin-tags'>
+                    <span className='noWrapInfo vesPluginTags'>
                         {
                             // @ts-ignore
                             tags && Object.keys(tags).map(key => <span key={key}>{tags[key]}</span>)

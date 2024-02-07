@@ -10,7 +10,6 @@ import { VUENGINE_PLUGINS_PREFIX } from './ves-plugins-types';
 
 @injectable()
 export class VesPluginsService {
-
   @inject(FileService)
   protected fileService: FileService;
   @inject(VesCommonService)

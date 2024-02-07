@@ -1,13 +1,15 @@
 import { CommandService, nls } from '@theia/core';
-import { Message, ReactWidget, Widget } from '@theia/core/lib/browser';
+import { HoverService, Message, ReactWidget, Widget } from '@theia/core/lib/browser';
 import { Deferred } from '@theia/core/lib/common/promise-util';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { VesCommonService } from '../../core/browser/ves-common-service';
+import { VesProjectService } from '../../project/browser/ves-project-service';
+import VesPluginEditorComponent from './components/VesPluginEditorComponent';
 import { VesPlugin } from './ves-plugin';
 import { VesPluginsModel } from './ves-plugins-model';
-import VesPluginEditorComponent from './components/VesPluginEditorComponent';
-import { FileService } from '@theia/filesystem/lib/browser/file-service';
 
 @injectable()
 export class VesPluginEditor extends ReactWidget {
@@ -15,12 +17,18 @@ export class VesPluginEditor extends ReactWidget {
     protected readonly commandService: CommandService;
     @inject(FileService)
     protected readonly fileService: FileService;
+    @inject(HoverService)
+    protected readonly hoverService: HoverService;
     @inject(VesPlugin)
     protected readonly plugin: VesPlugin;
     @inject(VesPluginsModel)
     protected readonly model: VesPluginsModel;
     @inject(WorkspaceService)
     protected readonly workspaceService: WorkspaceService;
+    @inject(VesCommonService)
+    protected readonly vesCommonService: VesCommonService;
+    @inject(VesProjectService)
+    protected readonly vesProjectService: VesProjectService;
 
     static ID = 'ves-plugin-editor';
     protected readonly deferredScrollContainer = new Deferred<HTMLElement>();
@@ -86,7 +94,10 @@ export class VesPluginEditor extends ReactWidget {
             plugin={this.plugin}
             commandService={this.commandService}
             fileService={this.fileService}
+            hoverService={this.hoverService}
             workspaceService={this.workspaceService}
+            vesCommonService={this.vesCommonService}
+            vesProjectService={this.vesProjectService}
         />;
     }
 }

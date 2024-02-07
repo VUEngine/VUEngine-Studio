@@ -11,6 +11,7 @@ import VesPluginComponent from './components/VesPluginComponent';
 import { VesPluginUri } from './ves-plugin-uri';
 import { VesPluginsSearchModel } from './ves-plugins-search-model';
 import { VesPluginsService } from './ves-plugins-service';
+import { PluginConfiguration } from './ves-plugins-types';
 
 export const PLUGINS_CONTEXT_MENU: MenuPath = ['plugins_context_menu'];
 
@@ -34,6 +35,7 @@ export class VesPluginData {
     readonly license?: string;
     readonly tags?: string[];
     readonly dependencies?: string[];
+    readonly configuration?: PluginConfiguration[];
     static KEYS: Set<(keyof VesPluginData)> = new Set([
         'name',
         'displayName',
@@ -44,7 +46,8 @@ export class VesPluginData {
         'repository',
         'license',
         'tags',
-        'dependencies'
+        'dependencies',
+        'configuration',
     ]);
 }
 
@@ -143,12 +146,16 @@ export class VesPlugin implements VesPluginData, TreeElement {
         return this.getData('tags');
     }
 
+    get author(): string | undefined {
+        return this.getData('author');
+    }
+
     get dependencies(): string[] | undefined {
         return this.getData('dependencies');
     }
 
-    get author(): string | undefined {
-        return this.getData('author');
+    get configuration(): PluginConfiguration[] | undefined {
+        return this.getData('configuration');
     }
 
     async install(): Promise<void> {

@@ -1,19 +1,29 @@
 import { CommandService, nls } from "@theia/core";
-import React from "react";
-import { VesPlugin } from "../ves-plugin";
-import { WorkspaceService } from "@theia/workspace/lib/browser";
+import { HoverService } from "@theia/core/lib/browser";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
+import { WorkspaceService } from "@theia/workspace/lib/browser";
+import React from "react";
+import { VesCommonService } from "../../../core/browser/ves-common-service";
+import { VesProjectService } from "../../../project/browser/ves-project-service";
+import { VesPlugin } from "../ves-plugin";
 
 export interface AbstractVesPluginComponentProps {
     plugin: VesPlugin
     commandService?: CommandService
     fileService?: FileService
+    hoverService?: HoverService
     workspaceService: WorkspaceService
+    vesCommonService?: VesCommonService
+    vesProjectService?: VesProjectService
 }
 
 export interface AbstractVesPluginComponentState {
     renderedReadme?: string
     tab?: string
+    ready?: boolean
+    configuration: { [key: string]: any }
+    dirtyConfigurations: { [key: string]: boolean }
+    isSaving?: boolean
 }
 
 export default abstract class AbstractVesPluginComponent extends React.Component<AbstractVesPluginComponentProps, AbstractVesPluginComponentState> {

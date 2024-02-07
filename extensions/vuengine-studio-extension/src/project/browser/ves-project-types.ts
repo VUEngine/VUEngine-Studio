@@ -1,5 +1,7 @@
 import URI from '@theia/core/lib/common/uri';
 import { AdditionalOperation, RulesLogic } from 'json-logic-js';
+import { DEFAULT_SPRITE_SIZE } from '../../editors/browser/components/SpriteEditor/SpriteEditorTypes';
+import { VesPluginsData } from '../../plugins/browser/ves-plugin';
 
 export const VUENGINE_WORKSPACE_EXT = 'workspace';
 
@@ -12,6 +14,7 @@ export interface ProjectData {
 };
 
 export interface ProjectDataWithContributor {
+  plugins?: { [id: string]: VesPluginsData }
   items?: ProjectDataItemsByTypeWithContributor
   templates?: ProjectDataTemplatesWithContributor
   types?: ProjectDataTypesWithContributor
@@ -122,7 +125,7 @@ export enum ProjectContributor {
 
 export const defaultProjectData: ProjectData = {
   templates: {
-    'Image.c': {
+    'Image': {
       targets: [{
         path: 'Converted/${_forEachOfBasename}.c',
         root: ProjectDataTemplateTargetRoot.file,
@@ -173,7 +176,17 @@ export const defaultProjectData: ProjectData = {
       template: 'Image.c.nj',
       itemSpecific: 'Image'
     },
-    'RomInfo.h': {
+    'PluginsConfig': {
+      targets: [{
+        path: 'headers/PluginsConfig.h',
+        root: ProjectDataTemplateTargetRoot.project,
+      }],
+      template: 'PluginsConfig.h.nj',
+      events: [{
+        type: ProjectDataTemplateEventType.installedPluginsChanged,
+      }]
+    },
+    'RomInfo': {
       targets: [{
         path: 'headers/RomInfo.h',
         root: ProjectDataTemplateTargetRoot.project,
@@ -189,10 +202,7 @@ export const defaultProjectData: ProjectData = {
         title: 'Game Config',
         properties: {
           plugins: {
-            type: 'array',
-            items: {
-              type: 'string'
-            }
+            type: 'object'
           },
           projectTitle: {
             type: 'string'
@@ -210,7 +220,8 @@ export const defaultProjectData: ProjectData = {
           }
         ]
       },
-      icon: 'fa fa-cog'
+      icon: 'fa fa-cog',
+      templates: ['PluginsConfig']
     },
     Image: {
       file: '.image',
@@ -321,7 +332,7 @@ export const defaultProjectData: ProjectData = {
         scope: '#'
       },
       icon: 'fa fa-image',
-      templates: ['Image.c'],
+      templates: ['Image'],
       forFiles: ['.png']
     },
     RomInfo: {
@@ -431,22 +442,77 @@ export const defaultProjectData: ProjectData = {
         ]
       },
       icon: 'fa fa-microchip',
-      templates: ['RomInfo.h']
+      templates: ['RomInfo']
     },
     Sprite: {
-      enabled: false,
+      enabled: true,
       file: '.sprite',
       schema: {
         title: 'Sprite',
         properties: {
-          name: {
-            type: 'string'
+          colorMode: {
+            type: 'number'
+          },
+          dimensions: {
+            type: 'object',
+            properties: {
+              x: {
+                type: 'number',
+                default: DEFAULT_SPRITE_SIZE
+              },
+              y: {
+                type: 'number',
+                default: DEFAULT_SPRITE_SIZE
+              }
+            }
           },
           layers: {
-            type: 'string'
+            type: 'object',
+            properties: {},
+            additionalProperties: {
+              type: 'object',
+              properties: {
+                id: {
+                  type: 'string'
+                },
+                isVisible: {
+                  type: 'boolean'
+                },
+                data: {
+                  type: 'array',
+                  items: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        rowIndex: {
+                          type: 'integer'
+                        },
+                        columnIndex: {
+                          type: 'integer'
+                        },
+                        color: {
+                          type: 'string'
+                        }
+                      }
+                    }
+                  }
+                },
+                name: {
+                  type: 'string'
+                },
+                parallax: {
+                  type: 'number'
+                },
+                displayMode: {
+                  type: 'string',
+                  default: 'ON'
+                }
+              }
+            }
           }
         },
-        required: ['name']
+        required: []
       },
       uiSchema: {
         type: 'SpriteEditor',

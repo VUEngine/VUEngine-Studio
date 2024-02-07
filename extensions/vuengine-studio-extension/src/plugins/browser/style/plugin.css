@@ -1,5 +1,5 @@
-.theia-vsx-extension-icon.ves-placeholder i,
-.icon-container.ves-placeholder i {
+.ves-plugin-editor .theia-vsx-extension-icon.vesPlaceholder i,
+.ves-plugin-editor .icon-container.vesPlaceholder i {
     background: var(--theia-foreground);
     border-radius: 50%;
     color: var(--theia-sideBar-background);
@@ -11,14 +11,14 @@
     width: var(--theia-vsx-extension-icon-size);
 }
 
-.icon-container.ves-placeholder i {
+.ves-plugin-editor .icon-container.vesPlaceholder i {
     font-size: 64px;
     height: 126px;
     line-height: 126px;
     width: 126px;
 }
 
-.ves-plugin-tags span {
+.ves-plugin-editor .vesPluginTags span {
     background: var(--theia-foreground);
     border-radius: 10px;
     color: var(--theia-sideBar-background);
@@ -27,4 +27,19 @@
     line-height: 140%;
     margin-right: var(--theia-ui-padding);
     padding: 0 var(--theia-ui-padding);
+}
+
+.ves-plugin-editor .vesPluginConfigReset {
+    cursor: pointer;
+    opacity: .5;
+    translate: 0 5px;
+}
+
+.ves-plugin-editor .vesPluginConfigReset:focus,
+.ves-plugin-editor .vesPluginConfigReset:hover {
+    opacity: 1;
+}
+
+.ves-plugin-editor .theia-select-component {
+    width: 100%;
 }

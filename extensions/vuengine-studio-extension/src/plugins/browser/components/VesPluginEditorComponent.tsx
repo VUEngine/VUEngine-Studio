@@ -1,12 +1,18 @@
+import { ArrowCounterClockwise } from "@phosphor-icons/react";
 import { URI, nls } from "@theia/core";
+import { SelectComponent } from "@theia/core/lib/browser/widgets/select-component";
+import { BinaryBuffer } from "@theia/core/lib/common/buffer";
 import DOMPurify from "dompurify";
 import React from "react";
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import sanitize from 'sanitize-html';
 import * as showdown from 'showdown';
-import { VesPluginsCommands } from "../ves-plugins-commands";
-import AbstractVesPluginComponent, { AbstractVesPluginComponentProps } from "./AbstractVesPluginComponent";
+import HContainer from "../../../editors/browser/components/Common/HContainer";
+import InfoLabel from "../../../editors/browser/components/Common/InfoLabel";
 import VContainer from "../../../editors/browser/components/Common/VContainer";
+import { VesPluginsCommands } from "../ves-plugins-commands";
+import { PluginConfiguration, PluginConfigurationDataType } from "../ves-plugins-types";
+import AbstractVesPluginComponent, { AbstractVesPluginComponentProps } from "./AbstractVesPluginComponent";
 
 export default class VesPluginEditorComponent extends AbstractVesPluginComponent {
     constructor(props: AbstractVesPluginComponentProps) {
@@ -14,6 +20,10 @@ export default class VesPluginEditorComponent extends AbstractVesPluginComponent
         this.state = {
             renderedReadme: '',
             tab: 'details',
+            ready: false,
+            configuration: {},
+            dirtyConfigurations: {},
+            isSaving: false,
         };
     }
 
@@ -53,20 +63,120 @@ export default class VesPluginEditorComponent extends AbstractVesPluginComponent
     }
 
     async componentDidMount() {
+        const renderedReadme = await this.renderReadme(this.props.plugin.readme);
+        await this.props.vesProjectService?.projectItemsReady;
+
+        const workspaceRootUri = this.props.workspaceService.tryGetRoots()[0]?.resource;
+        const gameConfigFileUri = workspaceRootUri.resolve('config').resolve('GameConfig');
+        let configuration;
+        if (await this.props.fileService?.exists(gameConfigFileUri)) {
+            try {
+                const fileContent = await this.props.fileService?.readFile(gameConfigFileUri);
+                const gameConfig = fileContent ? JSON.parse(fileContent.value.toString()) : {};
+                configuration = gameConfig.plugins[this.props.plugin.id];
+            } catch (error) { }
+        }
+
         this.setState({
-            renderedReadme: await this.renderReadme(this.props.plugin.readme)
+            ready: true,
+            renderedReadme,
+            configuration: configuration || {},
         });
     }
 
+    async updateConfiguration(config: PluginConfiguration, value: any, persist?: boolean) {
+        const workspaceRootUri = this.props.workspaceService.tryGetRoots()[0]?.resource;
+        const gameConfigFileUri = workspaceRootUri.resolve('config').resolve('GameConfig');
+
+        // adjust value according to format
+        switch (config.dataType) {
+            case PluginConfigurationDataType.hex:
+                value = '0x' + (value as string).replace('0x', '').replace(/[^A-Fa-f0-9]/g, '').toUpperCase();
+                break;
+            case PluginConfigurationDataType.integer:
+                if (typeof value === 'string') {
+                    value = parseInt(value);
+                }
+                if (config.min && value < config.min) {
+                    value = config.min;
+                }
+                if (config.max && value > config.max) {
+                    value = config.max;
+                }
+                break;
+        }
+
+        // don't update if nothing changed
+        if (this.state.configuration[config.name] === value && !this.state.dirtyConfigurations[config.name]) {
+            return;
+        }
+
+        // update dirty config flags in state
+        const updatedDirtyConfigurations = {
+            ...this.state.dirtyConfigurations,
+            [config.name]: true,
+        }
+
+        // update state config
+        const updatedConfiguration = {
+            ...this.state.configuration,
+            [config.name]: value,
+        };
+
+        // sort updated state config keys alphabetically
+        const sortedConfiguration: { [id: string]: string } = {};
+        Object.keys(updatedConfiguration).sort((a, b) => a.localeCompare(b)).forEach(key => {
+            sortedConfiguration[key] = updatedConfiguration[key];
+        });
+
+        this.setState({
+            configuration: sortedConfiguration,
+            dirtyConfigurations: updatedDirtyConfigurations,
+        });
+
+        if (persist === true) {
+            this.setState({ isSaving: true });
+
+            // get current from file
+            if (await this.props.fileService?.exists(gameConfigFileUri)) {
+                const fileContent = await this.props.fileService?.readFile(gameConfigFileUri);
+                const gameConfig = fileContent ? JSON.parse(fileContent.value.toString()) : {};
+
+                // @ts-ignore
+                gameConfig.plugins[this.props.plugin.id][config.name] = value;
+
+                // persist to GameConfig file
+                await this.props.fileService?.writeFile(
+                    gameConfigFileUri,
+                    BinaryBuffer.fromString(JSON.stringify(gameConfig, undefined, 4)),
+                );
+            }
+
+            // let the code generation catch up
+            setTimeout(() => {
+                // update dirty config flags in state
+                const updatedDirtyConfigurations = {
+                    ...this.state.dirtyConfigurations,
+                    [config.name]: false,
+                }
+
+                this.setState({
+                    isSaving: false,
+                    dirtyConfigurations: updatedDirtyConfigurations,
+                });
+            }, 1000);
+        }
+    }
+
     render(): React.ReactNode {
-        const { id, icon, author, displayName, description, repository, license, tags, dependencies } = this.props.plugin;
+        const { id, icon, author, displayName, description, repository, license, tags, dependencies, configuration, installed } = this.props.plugin;
         const { baseStyle, scrollStyle } = this.getSubcomponentStyles();
 
         return <>
             <div className='header' style={baseStyle} ref={ref => this.header = (ref || undefined)}>
                 {icon ?
                     <img className='icon-container' src={icon} /> :
-                    <div className='icon-container ves-placeholder'><i className="codicon codicon-plug" /></div>}
+                    <div className='icon-container vesPlaceholder'><i className="codicon codicon-plug" /></div>}
                 <div className='details'>
                     <div className='title'>
                         <span title='Plugin name' className='name'>{displayName}</span>
@@ -78,7 +188,7 @@ export default class VesPluginEditorComponent extends AbstractVesPluginComponent
                         </span>
                         {repository && <span className='repository' onClick={this.openRepository}>Repository</span>}
                         {license && <span className='license'>{license}</span>}
-                        {tags && <span className='noWrapInfo ves-plugin-tags'>{
+                        {tags && <span className='noWrapInfo vesPluginTags'>{
                             // @ts-ignore
                             Object.keys(tags).map(key => <span onClick={() => this.searchTag(key)} key={key}>{tags[key]}</span>)
                         }</span>}
@@ -87,70 +197,160 @@ export default class VesPluginEditorComponent extends AbstractVesPluginComponent
                     {this.renderAction()}
                 </div>
             </div>
-            {
-                <div className='scroll-container'
-                    style={scrollStyle}
-                    ref={ref => this._scrollContainer = (ref || undefined)}>
-                    <div className='body'
-                        ref={ref => this.body = (ref || undefined)}
-                        onClick={this.openLink}
-                        style={baseStyle}
-                    >
-                        <VContainer gap={15}>
+            <div className='scroll-container'
+                style={scrollStyle}
+                ref={ref => this._scrollContainer = (ref || undefined)}>
+                <div className='body'
+                    ref={ref => this.body = (ref || undefined)}
+                    onClick={this.openLink}
+                    style={baseStyle}
+                >
+                    <VContainer gap={15} style={{ height: '100%' }}>
 
-                            <Tabs>
-                                <TabList>
-                                    <Tab>
-                                        {nls.localize('vuengine/plugins/details', 'Details')}
-                                    </Tab>
-                                    <Tab>
-                                        {nls.localize('vuengine/plugins/dependencies', 'Dependencies')}
-                                        {' '}<span className='count'>{dependencies?.length || 0}</span>
-                                    </Tab>
-                                    {/*
-                                    <Tab>
-                                        {nls.localize('vuengine/plugins/configuration', 'Configuration')}
-                                    </Tab>
-                                    */}
-                                </TabList>
+                        <Tabs>
+                            <TabList>
+                                <Tab>
+                                    {nls.localize('vuengine/plugins/details', 'Details')}
+                                </Tab>
+                                <Tab>
+                                    {nls.localize('vuengine/plugins/dependencies', 'Dependencies')}
+                                    {' '}<span className='count'>{dependencies?.length || 0}</span>
+                                </Tab>
+                                <Tab>
+                                    {nls.localize('vuengine/plugins/configuration', 'Configuration')}
+                                    {' '}<span className='count'>{configuration?.length || 0}</span>
+                                </Tab>
+                            </TabList>
 
-                                <TabPanel>
-                                    <VContainer>
-                                        {this.state.renderedReadme &&
-                                            <div
-                                                dangerouslySetInnerHTML={{ __html: this.state.renderedReadme }}
-                                            />
-                                        }
-                                    </VContainer>
-                                </TabPanel>
-                                <TabPanel>
-                                    <VContainer>
-                                        {dependencies?.length && dependencies?.length > 0
-                                            ? <ul>
-                                                {dependencies.map(dependency =>
-                                                    <li>
-                                                        <code>{dependency}</code>
-                                                    </li>
+                            <TabPanel>
+                                <VContainer>
+                                    {this.state.renderedReadme &&
+                                        <div
+                                            dangerouslySetInnerHTML={{ __html: this.state.renderedReadme }}
+                                        />
+                                    }
+                                </VContainer>
+                            </TabPanel>
+                            <TabPanel>
+                                <VContainer>
+                                    {dependencies?.length && dependencies?.length > 0
+                                        ? <>
+                                            <p>
+                                                {nls.localize(
+                                                    'vuengine/plugins/dependenciesDescription',
+                                                    'This plugin depends on the following plugins. These will be linked at build time.'
                                                 )}
-                                            </ul>
-                                            : nls.localize('vuengine/plugins/noDependencies', 'This plugin has no dependencies.')
-                                        }
-                                    </VContainer>
-                                </TabPanel>
-                                {/*
-                                <TabPanel>
-                                    <VContainer>
-                                        ...
-                                    </VContainer>
-                                </TabPanel>
-                                */}
-                            </Tabs>
+                                                <ul>
+                                                    {dependencies.map((d, i) =>
+                                                        <li key={i}>
+                                                            <code>{d}</code>
+                                                        </li>
+                                                    )}
+                                                </ul>
+                                            </p>
+                                        </>
+                                        : <p>
+                                            {nls.localize('vuengine/plugins/noDependencies', 'This plugin has no dependencies.')}
+                                        </p>
+                                    }
+                                </VContainer>
+                            </TabPanel>
+                            <TabPanel>
+                                <VContainer>
+                                    {this.state.ready && configuration?.length && configuration?.length > 0
+                                        ? <VContainer gap={15}>
+                                            {configuration.map((c, i) =>
+                                                <VContainer key={i}>
+                                                    <InfoLabel
+                                                        label={c.label}
+                                                        tooltip={c.description}
+                                                        hoverService={this.props.hoverService}
+                                                    />
+                                                    <HContainer>
+                                                        <div style={{ display: 'flex', flexGrow: 1 }}>
+                                                            {c.dataType === PluginConfigurationDataType.boolean &&
+                                                                <input
+                                                                    type="checkbox"
+                                                                    style={{ flexGrow: 1 }}
+                                                                    checked={this.state.configuration[c.name] ? this.state.configuration[c.name] : c.default}
+                                                                    readOnly={!installed || this.state.isSaving}
+                                                                    disabled={!installed || this.state.isSaving}
+                                                                    onChange={e => this.updateConfiguration(c, e.target.checked, true)}
+                                                                />
+                                                            }
+                                                            {c.dataType === PluginConfigurationDataType.integer &&
+                                                                <input
+                                                                    className='theia-input'
+                                                                    type='number'
+                                                                    style={{ flexGrow: 1 }}
+                                                                    value={this.state.configuration[c.name] ? this.state.configuration[c.name] : c.default}
+                                                                    min={c.min}
+                                                                    max={c.max}
+                                                                    step={c.step}
+                                                                    readOnly={!installed || this.state.isSaving}
+                                                                    disabled={!installed || this.state.isSaving}
+                                                                    onBlur={e => this.updateConfiguration(c, e.target.value, true)}
+                                                                    onChange={e => this.updateConfiguration(c, e.target.value)}
+                                                                />
+                                                            }
+                                                            {(c.dataType === PluginConfigurationDataType.string || c.dataType === PluginConfigurationDataType.hex) &&
+                                                                <input
+                                                                    className='theia-input'
+                                                                    type='string'
+                                                                    style={{ flexGrow: 1 }}
+                                                                    value={this.state.configuration[c.name] ? this.state.configuration[c.name] : c.default}
+                                                                    readOnly={!installed || this.state.isSaving}
+                                                                    disabled={!installed || this.state.isSaving}
+                                                                    onBlur={e => this.updateConfiguration(c, e.target.value, true)}
+                                                                    onChange={e => this.updateConfiguration(c, e.target.value)}
+                                                                />
+                                                            }
+                                                            {c.dataType === 'type' && <>
+                                                                {installed && !this.state.isSaving
+                                                                    ? <SelectComponent
+                                                                        defaultValue={this.state.configuration[c.name] ? this.state.configuration[c.name] : c.default}
+                                                                        options={Object.values(this.props.vesProjectService!.getProjectDataItemsForType('Font') || {}).map(f => ({
+                                                                            // @ts-ignore
+                                                                            value: this.props.vesCommonService?.cleanSpecName(f.name),
+                                                                        }))}
+                                                                        onChange={option => this.updateConfiguration(c, option.value, true)}
+                                                                    />
+                                                                    : <input
+                                                                        className='theia-input'
+                                                                        type='string'
+                                                                        style={{ flexGrow: 1 }}
+                                                                        value={this.state.configuration[c.name] ? this.state.configuration[c.name] : c.default}
+                                                                        readOnly
+                                                                        disabled
+                                                                    />}
+                                                            </>}
+                                                        </div>
+                                                        <div style={{ textAlign: 'right', width: 20 }}>
+                                                            {this.state.configuration[c.name] !== undefined && this.state.configuration[c.name] != c.default &&
+                                                                <div
+                                                                    className="vesPluginConfigReset"
+                                                                    title={nls.localize('vuengine/plugins/resetToDefault', 'Reset To Default')}
+                                                                    onClick={() => this.updateConfiguration(c, c.default, true)}
+                                                                >
+                                                                    <ArrowCounterClockwise size={16} />
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                    </HContainer>
+                                                </VContainer>
+                                            )}
+                                        </VContainer>
+                                        : <p>
+                                            {nls.localize('vuengine/plugins/noConfiguration', 'This plugin has no configuration.')}
+                                        </p>
+                                    }
+                                </VContainer>
+                            </TabPanel>
+                        </Tabs>
 
-                        </VContainer>
-                    </div>
-
-                </div >
-            }
+                    </VContainer>
+                </div>
+            </div>
         </>;
     }
 

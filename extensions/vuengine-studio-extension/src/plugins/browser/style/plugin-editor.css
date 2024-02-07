@@ -1,7 +1,10 @@
 .ves-plugin-editor .body {
+    box-sizing: border-box;
+    height: 100%;
     padding-top: calc(var(--theia-ui-padding)*2);
 }
 
 .ves-plugin-editor>.scroll-container {
+    flex-grow: 1;
     position: unset;
 }

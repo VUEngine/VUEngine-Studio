@@ -11,32 +11,25 @@ import { VesPluginsService } from './ves-plugins-service';
 
 @injectable()
 export class VesPluginsModel {
-
-    protected readonly onDidChangeDataEmitter = new Emitter<void>();
-    readonly onDidChangeData = this.onDidChangeDataEmitter.event;
-
     @inject(FileService)
     protected readonly fileService: FileService;
-
     @inject(VesPluginFactory)
     protected readonly pluginFactory: VesPluginFactory;
-
     @inject(ProgressService)
     protected readonly progressService: ProgressService;
-
     @inject(PreferenceService)
     protected readonly preferences: PreferenceService;
-
     @inject(WorkspaceService)
     protected readonly workspaceService: WorkspaceService;
-
     @inject(VesPluginsSearchModel)
     readonly search: VesPluginsSearchModel;
-
     @inject(VesPluginsService)
     readonly pluginsService: VesPluginsService;
 
     protected readonly initialized = new Deferred<void>();
+
+    protected readonly onDidChangeDataEmitter = new Emitter<void>();
+    readonly onDidChangeData = this.onDidChangeDataEmitter.event;
 
     @postConstruct()
     protected init(): void {

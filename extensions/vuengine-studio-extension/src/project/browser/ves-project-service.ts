@@ -16,7 +16,7 @@ import { VesEditorsCommands } from '../../editors/browser/ves-editors-commands';
 import { VesPluginsData } from '../../plugins/browser/ves-plugin';
 import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-service';
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
-import { USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } from '../../plugins/browser/ves-plugins-types';
+import { PluginConfiguration, USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } from '../../plugins/browser/ves-plugins-types';
 import { VesNewProjectTemplate } from './new-project/ves-new-project-form';
 import {
   PROJECT_CHANNEL_NAME,
@@ -132,6 +132,15 @@ export class VesProjectService {
 
     return result;
   }
+  getProjectDataPlugins(): { [id: string]: VesPluginsData } | undefined {
+    return this._projectData?.plugins;
+  }
+  protected setProjectDataPlugins(plugins: { [id: string]: VesPluginsData }): void {
+    if (!this._projectData) {
+      this._projectData = {};
+    }
+    this._projectData.plugins = plugins;
+  }
   protected setProjectDataItem(typeId: string, itemId: string, data: ProjectDataItem, fileUri: URI): boolean {
     if (!this._projectData) {
       this._projectData = {};
@@ -202,29 +211,51 @@ export class VesProjectService {
   protected getProjectPlugins(): string[] {
     const gameConfig = this.getProjectDataItemById(ProjectContributor.Project, 'GameConfig');
     // @ts-ignore
-    return gameConfig?.plugins || [];
+    return gameConfig?.plugins ? Object.keys(gameConfig?.plugins) : [];
   }
   protected async setProjectPlugins(installedPlugins: string[]): Promise<void> {
     if (this.workspaceProjectFolderUri) {
       const gameConfigFileUri = this.workspaceProjectFolderUri.resolve('config').resolve('GameConfig');
 
-      // update project data
-      this.setProjectDataItem('GameConfig', ProjectContributor.Project, {
-        ...(this.getProjectDataItemById(ProjectContributor.Project, 'GameConfig') as object),
-        plugins: installedPlugins,
-      }, gameConfigFileUri);
-
-      // persist to GameConfig file
+      // get current from file
       let gameConfig = {};
       if (await this.fileService.exists(gameConfigFileUri)) {
         const fileContent = await this.fileService.readFile(gameConfigFileUri);
         gameConfig = JSON.parse(fileContent.value.toString());
       }
+
+      // update plugins map
+      // @ts-ignore
+      const currentPlugins = gameConfig.plugins;
+      Object.keys(currentPlugins).map(pluginId => {
+        if (!installedPlugins.includes(pluginId)) {
+          delete currentPlugins[pluginId];
+        }
+      });
+      installedPlugins.map(pluginId => {
+        if (!currentPlugins[pluginId]) {
+          currentPlugins[pluginId] = {};
+        }
+      });
+
+      // sort updated plugins alphabetically
+      const sortedPlugins: { [id: string]: string } = {};
+      Object.keys(currentPlugins).sort((a, b) => a.localeCompare(b)).forEach(key => {
+        sortedPlugins[key] = currentPlugins[key];
+      });
+
+      // update project data
+      this.setProjectDataItem('GameConfig', ProjectContributor.Project, {
+        ...(this.getProjectDataItemById(ProjectContributor.Project, 'GameConfig') as object),
+        plugins: sortedPlugins,
+      }, gameConfigFileUri);
+
+      // persist to GameConfig file
       await this.fileService.writeFile(
         gameConfigFileUri,
         BinaryBuffer.fromString(JSON.stringify({
           ...gameConfig,
-          plugins: installedPlugins
+          plugins: sortedPlugins
         }, undefined, 4)),
       );
     }
@@ -345,11 +376,14 @@ export class VesProjectService {
     const gameConfigFileUri = this.workspaceProjectFolderUri!.resolve('config').resolve('GameConfig');
     let plugins: string[] = [];
     if (await this.fileService.exists(gameConfigFileUri)) {
-      const fileContent = await this.fileService.readFile(gameConfigFileUri);
-      plugins = JSON.parse(fileContent.value.toString()).plugins || [];
+      try {
+        const fileContent = await this.fileService.readFile(gameConfigFileUri);
+        plugins = Object.keys(JSON.parse(fileContent.value.toString()).plugins || {});
+      } catch (error) { }
     }
     this.vesPluginsService.setInstalledPlugins(plugins);
     const pluginsData = await this.getAllPluginsData();
+    this.setProjectDataPlugins(pluginsData);
     this.vesPluginsService.setPluginsData(pluginsData);
 
     // installed plugins
@@ -434,7 +468,10 @@ export class VesProjectService {
       });
     });
 
-    this._projectData = combinedProjectData;
+    this._projectData = {
+      ...this._projectData,
+      ...combinedProjectData,
+    };
 
     if (this._projectDataReady.state === 'unresolved') {
       this._projectDataReady.resolve();
@@ -548,7 +585,10 @@ export class VesProjectService {
       }));
     }));
 
-    this._projectData = combinedProjectData;
+    this._projectData = {
+      ...this._projectData,
+      ...combinedProjectData,
+    };
 
     if (this._projectItemsReady.state === 'unresolved') {
       this._projectItemsReady.resolve();
@@ -559,7 +599,7 @@ export class VesProjectService {
   }
 
   // note: tests with caching plugin data in a single file did not increase performance much
-  async getAllPluginsData(): Promise<{ [id: string]: VesPluginsData }> {
+  protected async getAllPluginsData(): Promise<{ [id: string]: VesPluginsData }> {
     const enginePluginsUri = await this.vesPluginsPathsService.getEnginePluginsUri();
     const userPluginsUri = await this.vesPluginsPathsService.getUserPluginsUri();
 
@@ -577,6 +617,7 @@ export class VesProjectService {
         const fileContent = await this.fileService.readFile(pluginFileUri);
         try {
           const fileContentJson = JSON.parse(fileContent.value.toString());
+          const localeKey = nls.locale || 'en';
           const pluginId = `${prefix}/${pluginRelativeUri.path.fsPath().replace(/\\/g, '/')}`;
           const iconUri = pluginFileUri.parent.resolve('icon.png');
           const tagsObject = {};
@@ -584,6 +625,16 @@ export class VesProjectService {
             fileContentJson.tags.map((tag: any) => {
               // @ts-ignore
               tagsObject[this.translatePluginField(tag, 'en')] = this.translatePluginField(tag, nls.locale);
+            });
+          }
+          const configuration: PluginConfiguration[] = [];
+          if (Array.isArray(fileContentJson.configuration)) {
+            fileContentJson.configuration.map((c: PluginConfiguration) => {
+              configuration.push({
+                ...c,
+                label: this.translatePluginField(c.label, localeKey),
+                description: c.description ? this.translatePluginField(c.description, localeKey) : undefined,
+              });
             });
           }
 
@@ -594,11 +645,12 @@ export class VesProjectService {
               ? iconUri.path.fsPath()
               : '',
             readme: pluginFileUri.parent.resolve('readme.md').path.fsPath(),
-            displayName: this.translatePluginField(fileContentJson.displayName, nls.locale || 'en'),
-            author: this.translatePluginField(fileContentJson.author, nls.locale || 'en'),
-            description: this.translatePluginField(fileContentJson.description, nls.locale || 'en'),
-            license: this.translatePluginField(fileContentJson.license, nls.locale || 'en'),
+            displayName: this.translatePluginField(fileContentJson.displayName, localeKey),
+            author: this.translatePluginField(fileContentJson.author, localeKey),
+            description: this.translatePluginField(fileContentJson.description, localeKey),
+            license: this.translatePluginField(fileContentJson.license, localeKey),
             tags: tagsObject,
+            configuration,
           };
         } catch (e) {
           console.error(pluginFileUri.path.fsPath(), e);
