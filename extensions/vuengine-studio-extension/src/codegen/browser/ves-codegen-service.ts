@@ -229,10 +229,16 @@ export class VesCodeGenService {
   }
   */
 
-  // TODO: This currently is unable to convert items that are not in project file, e.g. unused plugins
   async generate(types: string[]/* , changedOnly: boolean */, fileUri?: URI): Promise<void> {
     this.isGeneratingFiles = IsGeneratingFilesStatus.active;
     let numberOfGeneratedFiles = 0;
+
+    const convertItem = async (typeId: string, uri: URI) => {
+      const fileContents = await this.fileService.readFile(uri);
+      const fileContentsJson = JSON.parse(fileContents.value.toString());
+      const n = await this.renderTemplatesForItem(typeId, fileContentsJson, uri);
+      numberOfGeneratedFiles += n;
+    };
 
     try {
       await Promise.all(types.map(async typeId => {
@@ -240,20 +246,19 @@ export class VesCodeGenService {
         if (!type) {
           return;
         }
-        const items = this.vesProjectService.getProjectDataItemsForType(typeId, fileUri ? undefined : ProjectContributor.Project) || {};
-        await Promise.all(Object.values(items).map(async item => {
-          /*
-          if (changedOnly && !this.hasChanges(type)) {
-            return;
-          }
-          */
-          if (!fileUri || fileUri.isEqual(item._fileUri)) {
-            const fileContents = await this.fileService.readFile(item._fileUri);
-            const fileContentsJson = JSON.parse(fileContents.value.toString());
-            const n = await this.renderTemplatesForItem(typeId, fileContentsJson, item._fileUri);
-            numberOfGeneratedFiles += n;
-          }
-        }));
+        if (fileUri) {
+          await convertItem(typeId, fileUri);
+        } else {
+          const items = this.vesProjectService.getProjectDataItemsForType(typeId, ProjectContributor.Project) || {};
+          await Promise.all(Object.values(items).map(async item => {
+            /*
+            if (changedOnly && !this.hasChanges(type)) {
+              return;
+            }
+            */
+            await convertItem(typeId, item._fileUri);
+          }));
+        }
       }));
     } catch (error) {
       this.isGeneratingFiles = IsGeneratingFilesStatus.hide;
@@ -365,6 +370,7 @@ export class VesCodeGenService {
       item: {
         ...(itemData || {}),
         _filename: itemUri?.path.name,
+        _folder: itemUri?.parent.path.name,
       },
       project: this.vesProjectService.getProjectData(),
       itemUri: itemUri
