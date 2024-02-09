@@ -6,6 +6,7 @@ import {
     PreferenceService
 } from '@theia/core/lib/browser';
 import { ColorRegistry } from '@theia/core/lib/browser/color-registry';
+import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import * as React from '@theia/core/shared/react';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
@@ -30,6 +31,7 @@ export interface EditorsServices {
     vesImagesService: VesImagesService
     vesProjectService: VesProjectService,
     vesRumblePackService: VesRumblePackService
+    windowService: WindowService
     workspaceService: WorkspaceService
 };
 

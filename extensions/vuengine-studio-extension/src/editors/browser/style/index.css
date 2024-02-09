@@ -5,6 +5,7 @@
 @import "entity-editor/index.css";
 @import "font-editor/index.css";
 @import "image-conv-editor/index.css";
+@import "plugin-file-editor/index.css";
 @import "input.css";
 @import "input-renderer.css";
 @import "jsonforms/index.css";

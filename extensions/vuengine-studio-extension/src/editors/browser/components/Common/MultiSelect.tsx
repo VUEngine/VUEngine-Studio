@@ -31,16 +31,17 @@ interface RadioSelectProps {
     options: MultiSelectOption[]
     canSelectMany?: boolean
     defaultValue: string | string[]
+    placeholder?: string
     onChange: (options: string[]) => void
     onCreateOption?: (value: string) => void
 }
 
 export default function MultiSelect(props: RadioSelectProps): React.JSX.Element {
-    const { options, canSelectMany, defaultValue, onChange, onCreateOption } = props;
+    const { options, canSelectMany, defaultValue, placeholder, onChange, onCreateOption } = props;
 
     const value: MultiSelectOption[] = [];
     options.map(o => {
-        if (defaultValue.includes(o.value)) {
+        if (defaultValue && defaultValue.includes(o.value)) {
             value.push(o);
         }
     });
@@ -53,7 +54,7 @@ export default function MultiSelect(props: RadioSelectProps): React.JSX.Element 
         options={options}
         isMulti={canSelectMany || true}
         isSearchable
-        placeholder=''
+        placeholder={placeholder || ''}
         components={{
             ClearIndicator: CustomClearIndicator,
             MultiValueRemove: CustomMultiValueRemove,

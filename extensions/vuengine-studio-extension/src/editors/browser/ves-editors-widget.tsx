@@ -31,6 +31,7 @@ import { ProjectDataType } from '../../project/browser/ves-project-types';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
 import { VES_RENDERERS } from './renderers/ves-renderers';
 import { EditorsContext } from './ves-editors-types';
+import { WindowService } from '@theia/core/lib/browser/window/window-service';
 
 export const VesEditorsWidgetOptions = Symbol('VesEditorsWidgetOptions');
 export interface VesEditorsWidgetOptions {
@@ -80,6 +81,8 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     protected readonly vesProjectService: VesProjectService;
     @inject(VesRumblePackService)
     private readonly vesRumblePackService: VesRumblePackService;
+    @inject(WindowService)
+    private readonly windowService: WindowService;
     @inject(WorkspaceService)
     private readonly workspaceService: WorkspaceService;
 
@@ -434,6 +437,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
                             vesImagesService: this.vesImagesService,
                             vesProjectService: this.vesProjectService,
                             vesRumblePackService: this.vesRumblePackService,
+                            windowService: this.windowService,
                             workspaceService: this.workspaceService,
                         },
                     }}

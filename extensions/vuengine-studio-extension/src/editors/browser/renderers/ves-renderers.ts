@@ -14,6 +14,8 @@ import VesPaletteControl from './palette/ves-palette-control';
 import VesPaletteControlTester from './palette/ves-palette-control-tester';
 import VesPcmEditorControl from './pcm-editor/ves-pcm-editor-control';
 import VesPcmEditorControlTester from './pcm-editor/ves-pcm-editor-control-tester';
+import VesPluginFileEditorControl from './plugin-file-editor/ves-plugin-file-editor-control';
+import VesPluginFileEditorControlTester from './plugin-file-editor/ves-plugin-file-editor-control-tester';
 import VesRumbleEffectEditorControl from './rumble-effect-editor/ves-rumble-effect-editor-control';
 import VesRumbleEffectEditorControlTester from './rumble-effect-editor/ves-rumble-effect-editor-control-tester';
 import vesSimpleListEditorControl from './simple-list-editor/ves-simple-list-editor-control';
@@ -32,6 +34,7 @@ export const VES_RENDERERS = [
     { tester: VesMusicEditorControlTester, renderer: VesMusicEditorControl },
     { tester: VesPaletteControlTester, renderer: VesPaletteControl },
     { tester: VesPcmEditorControlTester, renderer: VesPcmEditorControl },
+    { tester: VesPluginFileEditorControlTester, renderer: VesPluginFileEditorControl },
     { tester: VesRumbleEffectEditorControlTester, renderer: VesRumbleEffectEditorControl },
     { tester: vesSimpleListEditorControlTester, renderer: vesSimpleListEditorControl },
     { tester: vesSpriteEditorControlTester, renderer: vesSpriteEditorControl },

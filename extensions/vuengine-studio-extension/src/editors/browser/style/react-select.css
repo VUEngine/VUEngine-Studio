@@ -53,6 +53,10 @@
     visibility: visible;
 }
 
+.react-select__placeholder {
+    opacity: .3;
+}
+
 /* Menu */
 
 .react-select__control--menu-is-open {

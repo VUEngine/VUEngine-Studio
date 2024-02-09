@@ -1,0 +1,1 @@
+PLUGINS = 	{% if item.dependencies is defined -%}{{ item.dependencies | sort | join(' \\\n\t\t\t  ') | safe }}{%- endif %}

@@ -132,10 +132,10 @@ export class VesProjectService {
 
     return result;
   }
-  getProjectDataPlugins(): { [id: string]: VesPluginsData } | undefined {
+  getProjectDataAllKnownPlugins(): { [id: string]: VesPluginsData } | undefined {
     return this._projectData?.plugins;
   }
-  protected setProjectDataPlugins(plugins: { [id: string]: VesPluginsData }): void {
+  protected setProjectDataAllKnownPlugins(plugins: { [id: string]: VesPluginsData }): void {
     if (!this._projectData) {
       this._projectData = {};
     }
@@ -383,7 +383,7 @@ export class VesProjectService {
     }
     this.vesPluginsService.setInstalledPlugins(plugins);
     const pluginsData = await this.getAllPluginsData();
-    this.setProjectDataPlugins(pluginsData);
+    this.setProjectDataAllKnownPlugins(pluginsData);
     this.vesPluginsService.setPluginsData(pluginsData);
 
     // installed plugins

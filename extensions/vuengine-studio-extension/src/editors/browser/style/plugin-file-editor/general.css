@@ -1,0 +1,15 @@
+.pluginFileEditor .noIcon,
+.pluginFileEditor .noPreview {
+  align-items: center;
+  border: var(--theia-border-width) solid var(--theia-dropdown-border);
+  border-radius: 2px;
+  color: var(--theia-dropdown-border);
+  display: flex;
+  height: 128px;
+  justify-content: center;
+  width: 128px;
+}
+.pluginFileEditor .noPreview {
+  height: 224px;
+  width: 384px;
+}

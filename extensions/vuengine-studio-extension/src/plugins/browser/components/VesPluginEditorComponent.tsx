@@ -1,6 +1,5 @@
 import { ArrowCounterClockwise } from "@phosphor-icons/react";
 import { URI, nls } from "@theia/core";
-import { SelectComponent } from "@theia/core/lib/browser/widgets/select-component";
 import { BinaryBuffer } from "@theia/core/lib/common/buffer";
 import DOMPurify from "dompurify";
 import React from "react";
@@ -13,6 +12,7 @@ import VContainer from "../../../editors/browser/components/Common/VContainer";
 import { VesPluginsCommands } from "../ves-plugins-commands";
 import { PluginConfiguration, PluginConfigurationDataType } from "../ves-plugins-types";
 import AbstractVesPluginComponent, { AbstractVesPluginComponentProps } from "./AbstractVesPluginComponent";
+import PluginDefaultInput from "./PluginDefaultInput";
 
 export default class VesPluginEditorComponent extends AbstractVesPluginComponent {
     constructor(props: AbstractVesPluginComponentProps) {
@@ -268,62 +268,14 @@ export default class VesPluginEditorComponent extends AbstractVesPluginComponent
                                                     />
                                                     <HContainer>
                                                         <div style={{ display: 'flex', flexGrow: 1 }}>
-                                                            {c.dataType === PluginConfigurationDataType.boolean &&
-                                                                <input
-                                                                    type="checkbox"
-                                                                    style={{ flexGrow: 1 }}
-                                                                    checked={this.state.configuration[c.name] ? this.state.configuration[c.name] : c.default}
-                                                                    readOnly={!installed || this.state.isSaving}
-                                                                    disabled={!installed || this.state.isSaving}
-                                                                    onChange={e => this.updateConfiguration(c, e.target.checked, true)}
-                                                                />
-                                                            }
-                                                            {c.dataType === PluginConfigurationDataType.integer &&
-                                                                <input
-                                                                    className='theia-input'
-                                                                    type='number'
-                                                                    style={{ flexGrow: 1 }}
-                                                                    value={this.state.configuration[c.name] ? this.state.configuration[c.name] : c.default}
-                                                                    min={c.min}
-                                                                    max={c.max}
-                                                                    step={c.step}
-                                                                    readOnly={!installed || this.state.isSaving}
-                                                                    disabled={!installed || this.state.isSaving}
-                                                                    onBlur={e => this.updateConfiguration(c, e.target.value, true)}
-                                                                    onChange={e => this.updateConfiguration(c, e.target.value)}
-                                                                />
-                                                            }
-                                                            {(c.dataType === PluginConfigurationDataType.string || c.dataType === PluginConfigurationDataType.hex) &&
-                                                                <input
-                                                                    className='theia-input'
-                                                                    type='string'
-                                                                    style={{ flexGrow: 1 }}
-                                                                    value={this.state.configuration[c.name] ? this.state.configuration[c.name] : c.default}
-                                                                    readOnly={!installed || this.state.isSaving}
-                                                                    disabled={!installed || this.state.isSaving}
-                                                                    onBlur={e => this.updateConfiguration(c, e.target.value, true)}
-                                                                    onChange={e => this.updateConfiguration(c, e.target.value)}
-                                                                />
-                                                            }
-                                                            {c.dataType === 'type' && <>
-                                                                {installed && !this.state.isSaving
-                                                                    ? <SelectComponent
-                                                                        defaultValue={this.state.configuration[c.name] ? this.state.configuration[c.name] : c.default}
-                                                                        options={Object.values(this.props.vesProjectService!.getProjectDataItemsForType('Font') || {}).map(f => ({
-                                                                            // @ts-ignore
-                                                                            value: this.props.vesCommonService?.cleanSpecName(f.name),
-                                                                        }))}
-                                                                        onChange={option => this.updateConfiguration(c, option.value, true)}
-                                                                    />
-                                                                    : <input
-                                                                        className='theia-input'
-                                                                        type='string'
-                                                                        style={{ flexGrow: 1 }}
-                                                                        value={this.state.configuration[c.name] ? this.state.configuration[c.name] : c.default}
-                                                                        readOnly
-                                                                        disabled
-                                                                    />}
-                                                            </>}
+                                                            <PluginDefaultInput
+                                                                config={c}
+                                                                value={this.state.configuration[c.name] ? this.state.configuration[c.name] : c.default}
+                                                                setValue={(value: any, persist?: boolean) => this.updateConfiguration(c, value, persist)}
+                                                                disabled={!installed || (this.state.isSaving ?? true)}
+                                                                vesCommonService={this.props.vesCommonService!}
+                                                                vesProjectService={this.props.vesProjectService!}
+                                                            />
                                                         </div>
                                                         <div style={{ textAlign: 'right', width: 20 }}>
                                                             {this.state.configuration[c.name] !== undefined && this.state.configuration[c.name] != c.default &&

@@ -176,6 +176,20 @@ export const defaultProjectData: ProjectData = {
       template: 'Image.c.nj',
       itemSpecific: 'Image'
     },
+    'PluginConfig': {
+      targets: [{
+        path: 'headers/Config.h',
+        root: ProjectDataTemplateTargetRoot.file,
+      }],
+      template: 'PluginConfig.h.nj'
+    },
+    'PluginConfigMake': {
+      targets: [{
+        path: 'config.make',
+        root: ProjectDataTemplateTargetRoot.file,
+      }],
+      template: 'config.make.nj'
+    },
     'PluginsConfig': {
       targets: [{
         path: 'headers/PluginsConfig.h',
@@ -334,6 +348,97 @@ export const defaultProjectData: ProjectData = {
       icon: 'fa fa-image',
       templates: ['Image'],
       forFiles: ['.png']
+    },
+    PluginFile: {
+      file: 'vuengine.plugin',
+      schema: {
+        title: 'Plugin File',
+        properties: {
+          displayName: {
+            type: 'object',
+            properties: {},
+            additionalProperties: {
+              type: 'string'
+            }
+          },
+          author: {
+            type: 'string'
+          },
+          description: {
+            type: 'object',
+            properties: {},
+            additionalProperties: {
+              type: 'string'
+            }
+          },
+          repository: {
+            type: 'string'
+          },
+          license: {
+            type: 'string'
+          },
+          tags: {
+            type: 'array',
+            items: {
+              type: 'array',
+              items: {
+                type: 'string'
+              }
+            }
+          },
+          dependencies: {
+            type: 'array',
+            items: {
+              type: 'string'
+            }
+          },
+          configuration: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                name: {
+                  type: 'string'
+                },
+                label: {
+                  type: 'string'
+                },
+                description: {
+                  type: 'string'
+                },
+                dataType: {
+                  type: 'string',
+                },
+                type: {
+                  type: 'string',
+                },
+                min: {
+                  type: 'integer',
+                },
+                max: {
+                  type: 'integer',
+                },
+                step: {
+                  type: 'integer',
+                },
+                default: {
+                  type: 'integer',
+                },
+              },
+            }
+          },
+        },
+        required: []
+      },
+      uiSchema: {
+        type: 'PluginFileEditor',
+        scope: '#'
+      },
+      icon: 'ves-codicon-file-icon codicon codicon-plug medium-purple',
+      templates: [
+        'PluginConfig',
+        'PluginConfigMake',
+      ]
     },
     RomInfo: {
       file: 'RomInfo',
