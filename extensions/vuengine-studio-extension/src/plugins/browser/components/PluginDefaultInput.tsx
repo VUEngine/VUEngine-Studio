@@ -55,7 +55,9 @@ export default function PluginDefaultInput(props: PluginDefaultInputProps): Reac
                 onChange={e => setValue(e.target.value)}
             />
         }
-        {(config.dataType === PluginConfigurationDataType.string || config.dataType === PluginConfigurationDataType.hex) &&
+        {(config.dataType === PluginConfigurationDataType.string
+            || config.dataType === PluginConfigurationDataType.constant
+            || config.dataType === PluginConfigurationDataType.hex) &&
             <input
                 className='theia-input'
                 type='string'

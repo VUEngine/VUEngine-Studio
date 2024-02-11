@@ -3,6 +3,7 @@ export const USER_PLUGINS_PREFIX = 'user//';
 
 export enum PluginConfigurationDataType {
     boolean = 'boolean',
+    constant = 'constant',
     hex = 'hex',
     integer = 'integer',
     string = 'string',
