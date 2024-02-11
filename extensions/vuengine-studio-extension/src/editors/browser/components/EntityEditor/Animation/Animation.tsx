@@ -15,26 +15,14 @@ interface AnimationProps {
     index: number
     animation: AnimationData
     updateAnimation: (partialData: Partial<AnimationData>) => void
-    removeAnimation: () => void
     totalFrames: number
 }
 
 export default function Animation(props: AnimationProps): React.JSX.Element {
-    const { data, setData, state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
-    const { index, animation, updateAnimation, removeAnimation, totalFrames } = props;
-
-    const setName = (name: string): void => {
-        updateAnimation({ name });
-    };
+    const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { index, animation, updateAnimation, totalFrames } = props;
 
     const setDefault = (): void => {
-        setState({
-            preview: {
-                ...state.preview,
-                currentAnimation: index,
-            }
-        });
-
         setData({
             animations: {
                 ...data.animations,
@@ -84,25 +72,8 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
     };
 
     return <div>
-        <VContainer className='item' gap={15}>
-            <button
-                className="remove-button"
-                onClick={removeAnimation}
-                title={nls.localize('vuengine/entityEditor/removeComponent', 'Remove Component')}
-            >
-                <i className='codicon codicon-x' />
-            </button>
+        <VContainer gap={15}>
             <HContainer alignItems='start' gap={15} wrap='wrap'>
-                <VContainer>
-                    <label>
-                        {nls.localize('vuengine/entityEditor/name', 'Name')}
-                    </label>
-                    <input
-                        className='theia-input'
-                        value={animation.name}
-                        onChange={e => setName(e.target.value)}
-                    />
-                </VContainer>
                 <VContainer>
                     <InfoLabel
                         label={nls.localize('vuengine/entityEditor/default', 'Default')}
@@ -117,7 +88,7 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                         onChange={setDefault}
                     />
                 </VContainer>
-                <VContainer>
+                <VContainer grow={1}>
                     <InfoLabel
                         label={nls.localize('vuengine/entityEditor/cycles', 'Cycles')}
                         tooltip={nls.localize(
@@ -127,7 +98,6 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                     />
                     <input
                         className='theia-input'
-                        style={{ width: 48 }}
                         type='number'
                         min={MIN_ANIMATION_CYLCES}
                         max={MAX_ANIMATION_CYLCES}
@@ -149,20 +119,22 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                         onChange={toggleLoop}
                     />
                 </VContainer>
-                {!animation.loop && <VContainer>
-                    <InfoLabel
-                        label={nls.localize('vuengine/entityEditor/callback', 'Callback')}
-                        tooltip={nls.localize(
-                            'vuengine/entityEditor/animationCallbackDescription',
-                            'Provide the name of the method to call on animation completion.'
-                        )}
-                    />
-                    <input
-                        className='theia-input'
-                        value={animation.callback}
-                        onChange={e => setCallback(e.target.value)}
-                    />
-                </VContainer>}
+                {!animation.loop &&
+                    <VContainer grow={1}>
+                        <InfoLabel
+                            label={nls.localize('vuengine/entityEditor/callback', 'Callback')}
+                            tooltip={nls.localize(
+                                'vuengine/entityEditor/animationCallbackDescription',
+                                'Provide the name of the method to call on animation completion.'
+                            )}
+                        />
+                        <input
+                            className='theia-input'
+                            value={animation.callback}
+                            onChange={e => setCallback(e.target.value)}
+                        />
+                    </VContainer>
+                }
             </HContainer>
             <VContainer>
                 <label>

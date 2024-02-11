@@ -50,26 +50,24 @@ export default function CollidersSettings(): React.JSX.Element {
     };
 
     return <>
-        {data.components?.colliders.length > 0 &&
-            <HContainer alignItems='end'>
-                <VContainer>
-                    <label>
-                        {nls.localize('vuengine/entityEditor/inGameType', 'In-Game Type')}
-                    </label>
-                    <SelectComponent
-                        options={options}
-                        defaultValue={data.inGameType}
-                        onChange={inGameType => setInGameType(inGameType.value || 'None')}
-                    />
-                </VContainer>
-                <button
-                    className='theia-button secondary'
-                    onClick={openEditor}
-                    title={nls.localize('vuengine/entityEditor/manageInGameTypes', 'Manage In-Game Types')}
-                >
-                    <i className='codicon codicon-settings-gear' />
-                </button>
-            </HContainer>
-        }
+        <HContainer alignItems='end'>
+            <VContainer grow={1}>
+                <label>
+                    {nls.localize('vuengine/entityEditor/entitysInGameType', 'Entity\'s In-Game Type')}
+                </label>
+                <SelectComponent
+                    options={options}
+                    defaultValue={data.inGameType}
+                    onChange={inGameType => setInGameType(inGameType.value || 'None')}
+                />
+            </VContainer>
+            <button
+                className='theia-button secondary'
+                onClick={openEditor}
+                title={nls.localize('vuengine/entityEditor/manageInGameTypes', 'Manage In-Game Types')}
+            >
+                <i className='codicon codicon-settings-gear' />
+            </button>
+        </HContainer>
     </>;
 }

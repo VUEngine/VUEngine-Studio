@@ -13,8 +13,8 @@
 .jsonforms-container .preview-container-world {
     align-items: center;
     background:
-        linear-gradient(transparent, transparent 49.9%, rgba(255,0,0,.3) 49.9%, rgba(255,0,0,.3) 50.1%, transparent 50.1%),
-        linear-gradient(90deg, transparent, transparent 49.9%, rgba(0,0,255,.3) 49.9%, rgba(0,0,255,.3) 50.1%, transparent 50.1%),
+        linear-gradient(transparent, transparent 49.9%, rgba(0,0,0,.6) 49.9%, rgba(0,0,0,.6) 50.1%, transparent 50.1%),
+        linear-gradient(90deg, transparent, transparent 49.9%, rgba(0,0,0,.6) 49.9%, rgba(0,0,0,.6) 50.1%, transparent 50.1%),
         repeating-conic-gradient(rgba(0,0,0,.3) 0% 25%, transparent 0% 50%) 50% / 12px 12px;
     background-position: center;
     box-sizing: border-box;
@@ -58,4 +58,5 @@
     right: 10px;
     text-align: right;
     top: 10px;
+    z-index: 10;
 }

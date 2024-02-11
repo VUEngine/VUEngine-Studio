@@ -132,7 +132,7 @@ export interface WireframeData {
 }
 
 export interface ScriptData {
-    function: string
+    name: string
 }
 
 export interface AnimationData {
@@ -191,7 +191,7 @@ export interface PositionedEntityData {
     loadRegardlessOfPosition: boolean
 }
 
-export type ComponentKey = 'animations' | 'behaviors' | 'children' | 'colliders' | 'sprites' | 'wireframes' | 'scripts';
+export type ComponentKey = 'animations' | 'behaviors' | 'children' | 'colliders' | 'scripts' | 'sprites' | 'wireframes';
 export type ComponentData = AnimationData | BehaviorData | PositionedEntityData | ColliderData | SpriteData | WireframeData | ScriptData;
 
 export interface EntityData {
@@ -238,16 +238,12 @@ export interface EntityData {
     }
 }
 
-export const defaultCurrentAnimation = -1;
-export const defaultHighlightedSprite = -1;
 export interface EntityEditorState {
+    currentComponent: string,
     preview: {
         backgroundColor: number
-        currentAnimation: number
         anaglyph: boolean
-        animations: boolean
         colliders: boolean
-        highlightedSprite: number
         wireframes: boolean
         palettes: string[]
         sprites: boolean

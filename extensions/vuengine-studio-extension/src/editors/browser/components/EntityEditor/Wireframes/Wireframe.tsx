@@ -25,11 +25,10 @@ import MeshSegment from './MeshSegment';
 interface WireframeProps {
     wireframe: WireframeData
     updateWireframe: (partialData: Partial<WireframeData>) => void
-    removeWireframe: () => void
 }
 
 export default function Wireframe(props: WireframeProps): React.JSX.Element {
-    const { wireframe, updateWireframe, removeWireframe } = props;
+    const { wireframe, updateWireframe } = props;
 
     const setSegment = (segmentIndex: number, segmentData: Partial<MeshSegmentData>): void => {
         const updatedSegments = [...wireframe.segments];
@@ -46,12 +45,6 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                 ...wireframe.wireframe,
                 ...partialWireframe,
             }
-        });
-    };
-
-    const setName = (name: string): void => {
-        updateWireframe({
-            name
         });
     };
 
@@ -162,27 +155,10 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
         }
     };
 
-    return <div className='item'>
-        <button
-            className="remove-button"
-            onClick={removeWireframe}
-            title={nls.localize('vuengine/entityEditor/removeComponent', 'Remove Component')}
-        >
-            <i className='codicon codicon-x' />
-        </button>
+    return (
         <VContainer gap={15}>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/entityEditor/name', 'Name')}
-                </label>
-                <input
-                    className='theia-input'
-                    value={wireframe.name}
-                    onChange={e => setName(e.target.value)}
-                />
-            </VContainer>
-            <HContainer alignItems='start' gap={15} grow={1} wrap='wrap'>
-                <VContainer>
+            <HContainer alignItems='start' gap={15}>
+                <VContainer grow={1}>
                     <label>
                         {nls.localize('vuengine/entityEditor/type', 'Type')}
                     </label>
@@ -208,6 +184,8 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                         updateColor={setColor}
                     />
                 </VContainer>
+            </HContainer>
+            <HContainer alignItems='start' gap={15}>
                 <VContainer>
                     <InfoLabel
                         label={nls.localize('vuengine/entityEditor/transparency', 'Transparency')}
@@ -243,42 +221,42 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                         onChange={toggleInterlaced}
                     />
                 </VContainer>
-                <VContainer>
-                    <label>Displacement (x, y, z)</label>
-                    <HContainer>
-                        <input
-                            className='theia-input'
-                            style={{ width: 48 }}
-                            type='number'
-                            min={MIN_WIREFRAME_DISPLACEMENT}
-                            max={MAX_WIREFRAME_DISPLACEMENT}
-                            step={STEP_WIREFRAME_DISPLACEMENT}
-                            value={wireframe.wireframe.displacement.x}
-                            onChange={e => setDisplacementX(parseFloat(e.target.value))}
-                        />
-                        <input
-                            className='theia-input'
-                            style={{ width: 48 }}
-                            type='number'
-                            min={MIN_WIREFRAME_DISPLACEMENT}
-                            max={MAX_WIREFRAME_DISPLACEMENT}
-                            step={STEP_WIREFRAME_DISPLACEMENT}
-                            value={wireframe.wireframe.displacement.y}
-                            onChange={e => setDisplacementY(parseFloat(e.target.value))}
-                        />
-                        <input
-                            className='theia-input'
-                            style={{ width: 48 }}
-                            type='number'
-                            min={MIN_WIREFRAME_DISPLACEMENT}
-                            max={MAX_WIREFRAME_DISPLACEMENT}
-                            step={STEP_WIREFRAME_DISPLACEMENT}
-                            value={wireframe.wireframe.displacement.z}
-                            onChange={e => setDisplacementZ(parseFloat(e.target.value))}
-                        />
-                    </HContainer>
-                </VContainer>
             </HContainer>
+            <VContainer>
+                <label>Displacement (x, y, z)</label>
+                <HContainer>
+                    <input
+                        className='theia-input'
+                        style={{ width: 48 }}
+                        type='number'
+                        min={MIN_WIREFRAME_DISPLACEMENT}
+                        max={MAX_WIREFRAME_DISPLACEMENT}
+                        step={STEP_WIREFRAME_DISPLACEMENT}
+                        value={wireframe.wireframe.displacement.x}
+                        onChange={e => setDisplacementX(parseFloat(e.target.value))}
+                    />
+                    <input
+                        className='theia-input'
+                        style={{ width: 48 }}
+                        type='number'
+                        min={MIN_WIREFRAME_DISPLACEMENT}
+                        max={MAX_WIREFRAME_DISPLACEMENT}
+                        step={STEP_WIREFRAME_DISPLACEMENT}
+                        value={wireframe.wireframe.displacement.y}
+                        onChange={e => setDisplacementY(parseFloat(e.target.value))}
+                    />
+                    <input
+                        className='theia-input'
+                        style={{ width: 48 }}
+                        type='number'
+                        min={MIN_WIREFRAME_DISPLACEMENT}
+                        max={MAX_WIREFRAME_DISPLACEMENT}
+                        step={STEP_WIREFRAME_DISPLACEMENT}
+                        value={wireframe.wireframe.displacement.z}
+                        onChange={e => setDisplacementZ(parseFloat(e.target.value))}
+                    />
+                </HContainer>
+            </VContainer>
             {wireframe.wireframe.type === WireframeType.Mesh &&
                 <VContainer>
                     <label>
@@ -352,6 +330,6 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                     />
                 </VContainer>
             }
-        </VContainer>
-    </div>;
+        </VContainer >
+    );
 }

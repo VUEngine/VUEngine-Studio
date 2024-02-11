@@ -1,46 +1,69 @@
-import {
-    Asterisk,
-    Atom,
-    CaretDown,
-    CaretRight,
-    CircleDashed,
-    Cube,
-    FilmStrip,
-    ImageSquare,
-    Minus,
-    Plus,
-    SneakerMove,
-    TreeStructure,
-    UserFocus,
-} from '@phosphor-icons/react';
-import { QuickPickItem, QuickPickOptions, nls } from '@theia/core';
-import { ConfirmDialog } from '@theia/core/lib/browser';
+import { QuickPickItem, QuickPickOptions, QuickPickSeparator, nls } from '@theia/core';
 import React, { useContext } from 'react';
-import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import HContainer from '../../Common/HContainer';
+import { Tree } from 'react-arborist';
 import VContainer from '../../Common/VContainer';
 import { BgmapMode, ColliderType, ComponentKey, DisplayMode, EntityEditorContext, EntityEditorContextType, Transparency, WireframeType } from '../EntityEditorTypes';
+import ComponentTreeNode from './ComponentTreeNode';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 
 interface ComponentType {
-    key?: ComponentKey
+    key: ComponentKey | 'extraProperties' | 'physics'
+    componentKey?: ComponentKey
     labelSingular: string
     labelPlural: string
+    allowAdd: boolean
     addAction: () => void
     hasContent: boolean
-    canHaveMany: boolean
-    count: number
-    iconComponent: React.JSX.Element
 }
 
-export default function ComponentsTree(): React.JSX.Element {
-    const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
+interface TreeNode {
+    id: string
+    name: string
+    children?: TreeNode[]
+}
+
+export default function ComponentTree(): React.JSX.Element {
+    const { data, setData, state } = useContext(EntityEditorContext) as EntityEditorContextType;
     const { services } = useContext(EditorsContext) as EditorsContextType;
+
+    const showComponentSelection = async (): Promise<QuickPickItem | undefined> => {
+        const quickPickOptions: QuickPickOptions<QuickPickItem> = {
+            title: nls.localize('vuengine/editors/addComponent', 'Add Component'),
+            placeholder: nls.localize('vuengine/editors/selectComponentTypeToAdd', 'Select a component type to add...'),
+        };
+        const items: (QuickPickItem | QuickPickSeparator)[] = [];
+        componentTypes.map((t, i) => {
+            if (t.allowAdd) {
+                items.push({
+                    id: i.toString(),
+                    label: t.labelSingular,
+                });
+            }
+        });
+
+        return services.quickPickService.show(
+            items,
+            quickPickOptions
+        );
+    };
+
+    const addComponent = async (): Promise<void> => {
+        const componentToAdd = await showComponentSelection();
+        if (componentToAdd) {
+            componentTypes.map((t, i) => {
+                if (componentToAdd.id === i.toString()) {
+                    t.addAction();
+                    // setState({ currentComponent: `${t.key}-${i}` });
+                }
+            });
+        }
+    };
 
     const addSprite = (): void => {
         const sprites = [...data.components?.sprites || []];
         sprites.push({
             _imageData: 0,
-            name: '',
+            name: nls.localize('vuengine/entityEditor/sprite', 'Sprite'),
             bgmapMode: BgmapMode.Bgmap,
             displayMode: DisplayMode.Both,
             transparency: Transparency.None,
@@ -77,7 +100,7 @@ export default function ComponentsTree(): React.JSX.Element {
     const addBehavior = (): void => {
         const behaviors = [...data.components?.behaviors || []];
         behaviors.push({
-            name: '',
+            name: nls.localize('vuengine/entityEditor/behavior', 'Behavior'),
         });
 
         setData({
@@ -91,9 +114,7 @@ export default function ComponentsTree(): React.JSX.Element {
     const addAnimation = (): void => {
         const animations = [...data.components?.animations || []];
         animations.push({
-            name: data.components?.animations.length
-                ? ''
-                : nls.localize('vuengine/entityEditor/default', 'Default'),
+            name: nls.localize('vuengine/entityEditor/animation', 'Animation'),
             cycles: 8,
             frames: [],
             loop: true,
@@ -111,7 +132,7 @@ export default function ComponentsTree(): React.JSX.Element {
     const addCollider = (): void => {
         const colliders = [...data.components?.colliders || []];
         colliders.push({
-            name: '',
+            name: nls.localize('vuengine/entityEditor/collider', 'Collider'),
             type: ColliderType.Ball,
             pixelSize: {
                 x: 32,
@@ -147,10 +168,24 @@ export default function ComponentsTree(): React.JSX.Element {
         });
     };
 
+    const addScript = (): void => {
+        const scripts = [...data.components?.scripts || []];
+        scripts.push({
+            name: nls.localize('vuengine/entityEditor/script', 'Script'),
+        });
+
+        setData({
+            components: {
+                ...data.components,
+                scripts,
+            }
+        });
+    };
+
     const addWireframe = (): void => {
         const wireframes = [...data.components?.wireframes || []];
         wireframes.push({
-            name: '',
+            name: nls.localize('vuengine/entityEditor/wireframe', 'Wireframe'),
             wireframe: {
                 type: WireframeType.Sphere,
                 displacement: {
@@ -172,20 +207,6 @@ export default function ComponentsTree(): React.JSX.Element {
             components: {
                 ...data.components,
                 wireframes,
-            }
-        });
-    };
-
-    const addScript = (): void => {
-        const scripts = [...data.components?.scripts || []];
-        scripts.push({
-            function: '',
-        });
-
-        setData({
-            components: {
-                ...data.components,
-                scripts,
             }
         });
     };
@@ -240,169 +261,154 @@ export default function ComponentsTree(): React.JSX.Element {
         }
     };
 
-    const togglePhysics = (): void => {
+    const enablePhysics = (): void => {
         setData({
             physics: {
                 ...data.physics,
-                enabled: !data.physics.enabled,
+                enabled: true,
             }
         });
     };
 
-    const toggleExtraProperties = (): void => {
+    const enableExtraProperties = (): void => {
         setData({
             extraProperties: {
                 ...data.extraProperties,
-                enabled: !data.extraProperties.enabled,
+                enabled: true,
             }
         });
-    };
-
-    const removeComponent = async (key: ComponentKey, index: number): Promise<void> => {
-        const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/entityEditor/removeComponent', 'Remove Component'),
-            msg: nls.localize('vuengine/entityEditor/areYouSureYouWantToRemoveComponent', 'Are you sure you want to remove this component?'),
-        });
-        const confirmed = await dialog.open();
-        if (confirmed) {
-            setData({
-                components: {
-                    ...data.components,
-                    [key]: [
-                        ...data.components[key].slice(0, index),
-                        ...data.components[key].slice(index + 1)
-                    ],
-                }
-            });
-        }
     };
 
     const componentTypes: ComponentType[] = [
         {
             key: 'sprites',
+            componentKey: 'sprites',
             labelSingular: nls.localize('vuengine/entityEditor/sprite', 'Sprite'),
             labelPlural: nls.localize('vuengine/entityEditor/sprites', 'Sprites'),
+            allowAdd: true,
             addAction: addSprite,
-            hasContent: data.components?.sprites?.length > 0,
-            canHaveMany: true,
-            count: data.components?.sprites?.length,
-            iconComponent: <ImageSquare />
+            hasContent: data.components?.sprites.length > 0,
         },
         {
             key: 'animations',
+            componentKey: 'animations',
             labelSingular: nls.localize('vuengine/entityEditor/animation', 'Animation'),
             labelPlural: nls.localize('vuengine/entityEditor/animations', 'Animations'),
+            allowAdd: true,
             addAction: addAnimation,
-            hasContent: data.components?.animations?.length > 0,
-            canHaveMany: true,
-            count: data.components?.animations?.length,
-            iconComponent: <FilmStrip />
+            hasContent: data.components?.animations.length > 0,
         },
         {
             key: 'colliders',
+            componentKey: 'colliders',
             labelSingular: nls.localize('vuengine/entityEditor/collider', 'Collider'),
             labelPlural: nls.localize('vuengine/entityEditor/colliders', 'Colliders'),
+            allowAdd: true,
             addAction: addCollider,
-            hasContent: data.components?.colliders?.length > 0,
-            canHaveMany: true,
-            count: data.components?.colliders?.length,
-            iconComponent: <CircleDashed />
+            hasContent: data.components?.colliders.length > 0,
         },
         {
             key: 'wireframes',
+            componentKey: 'wireframes',
             labelSingular: nls.localize('vuengine/entityEditor/wireframe', 'Wireframe'),
             labelPlural: nls.localize('vuengine/entityEditor/wireframes', 'Wireframes'),
+            allowAdd: true,
             addAction: addWireframe,
-            hasContent: data.components?.wireframes?.length > 0,
-            canHaveMany: true,
-            count: data.components?.wireframes?.length,
-            iconComponent: <Cube />
+            hasContent: data.components?.wireframes.length > 0,
         },
         {
             key: 'behaviors',
+            componentKey: 'behaviors',
             labelSingular: nls.localize('vuengine/entityEditor/behavior', 'Behavior'),
             labelPlural: nls.localize('vuengine/entityEditor/behaviors', 'Behaviors'),
+            allowAdd: true,
             addAction: addBehavior,
-            hasContent: data.components?.behaviors?.length > 0,
-            canHaveMany: true,
-            count: data.components?.behaviors?.length,
-            iconComponent: <SneakerMove />
+            hasContent: data.components?.behaviors.length > 0,
         },
         {
             key: 'children',
+            componentKey: 'children',
             labelSingular: nls.localize('vuengine/entityEditor/child', 'Child'),
             labelPlural: nls.localize('vuengine/entityEditor/children', 'Children'),
+            allowAdd: true,
             addAction: addPositionedEntity,
-            hasContent: data.components?.children?.length > 0,
-            canHaveMany: true,
-            count: data.components?.children?.length,
-            iconComponent: <UserFocus />
+            hasContent: data.components?.children.length > 0,
         },
         {
             key: 'scripts',
+            componentKey: 'scripts',
             labelSingular: nls.localize('vuengine/entityEditor/script', 'Script'),
             labelPlural: nls.localize('vuengine/entityEditor/scripts', 'Scripts'),
+            allowAdd: true,
             addAction: addScript,
-            hasContent: data.components?.scripts?.length > 0,
-            canHaveMany: true,
-            count: data.components?.scripts?.length,
-            iconComponent: <TreeStructure />
+            hasContent: data.components?.scripts.length > 0,
         },
         {
-            labelSingular: nls.localize('vuengine/entityEditor/physicalProperties', 'Physical Properties'),
-            labelPlural: nls.localize('vuengine/entityEditor/physicalProperties', 'Physical Properties'),
-            addAction: togglePhysics,
+            key: 'physics',
+            labelSingular: nls.localize('vuengine/entityEditor/physics', 'Physical Properties'),
+            labelPlural: nls.localize('vuengine/entityEditor/physics', 'Physical Properties'),
+            allowAdd: !data.physics.enabled,
+            addAction: enablePhysics,
             hasContent: data.physics.enabled,
-            canHaveMany: false,
-            count: data.physics.enabled ? 1 : 0,
-            iconComponent: <Atom />
         },
         {
+            key: 'extraProperties',
             labelSingular: nls.localize('vuengine/entityEditor/extraProperties', 'Extra Properties'),
             labelPlural: nls.localize('vuengine/entityEditor/extraProperties', 'Extra Properties'),
-            addAction: toggleExtraProperties,
+            allowAdd: !data.extraProperties.enabled,
+            addAction: enableExtraProperties,
             hasContent: data.extraProperties.enabled,
-            canHaveMany: false,
-            count: data.extraProperties.enabled ? 1 : 0,
-            iconComponent: <Asterisk />
         },
     ];
 
-    return <VContainer>
-        {componentTypes.map((componentType, i) => <>
-            <HContainer key={`component-${i}`} alignItems='center' className={!componentType.hasContent ? 'empty' : ''}>
-                <HContainer alignItems='center' grow={1}>
-                    <span style={{ alignItems: 'center', visibility: !componentType.hasContent ? 'hidden' : 'visible' }}>
-                        {componentType.key
-                            ? componentType.hasContent
-                                ? <CaretDown />
-                                : <CaretRight />
-                            : componentType.iconComponent
-                        }
-                    </span>
-                    {componentType.labelPlural}
-                </HContainer>
-                {componentType.key || !componentType.hasContent
-                    ? <Plus
-                        onClick={componentType.addAction}
-                    />
-                    : <Minus
-                        onClick={componentType.addAction}
-                    />
+    const treeData: TreeNode[] = [];
+    componentTypes
+        .sort((a, b) => a.labelPlural.localeCompare(b.labelPlural))
+        .map(componentType => {
+            if (componentType.hasContent) {
+                const newEntry: TreeNode = {
+                    id: componentType.key,
+                    name: componentType.labelPlural,
+                };
+                if (componentType.componentKey && data.components[componentType.componentKey]) {
+                    const newEntryChildren: TreeNode[] = [];
+                    data.components[componentType.componentKey].map((c, i) => {
+                        newEntryChildren.push({
+                            id: `${componentType.key}-${i}`,
+                            // @ts-ignore
+                            name: c.name ? c.name : `${componentType.labelPlural} ${i + 1}`,
+                        });
+                    });
+                    newEntry.children = newEntryChildren;
                 }
-            </HContainer>
-            {componentType.key && data.components[componentType.key] && data.components[componentType.key].map((c, j) =>
-                <HContainer key={`component-${i}-${j}`} alignItems='center' className='current' style={{ paddingLeft: 22 }}>
-                    <HContainer grow={1}>
-                        {/* TODO: properly get name, e.g. child name */}
-                        {/* @ts-ignore */}
-                        {componentType.iconComponent} {c.name || c.function || `${componentType.labelSingular} ${j + 1}`}
-                    </HContainer>
-                    <Minus
-                        onClick={() => removeComponent(componentType.key!, j)}
-                    />
-                </HContainer>
-            )}
-        </>)}
-    </VContainer>;
+                treeData.push(newEntry);
+            }
+        });
+
+    return (
+        <VContainer>
+            <label>
+                {nls.localize('vuengine/entityEditor/components', 'Components')}
+            </label>
+            <div className='ves-tree'>
+                <Tree
+                    data={treeData}
+                    indent={24}
+                    rowHeight={24}
+                    openByDefault={false}
+                    width='100%'
+                    selection={state.currentComponent}
+                >
+                    {ComponentTreeNode}
+                </Tree>
+            </div>
+            <button
+                className='theia-button add-button full-width'
+                onClick={addComponent}
+                title={nls.localize('vuengine/entityEditor/addComponent', 'Add Component')}
+            >
+                <i className='codicon codicon-plus' />
+            </button>
+        </VContainer>
+    );
 }

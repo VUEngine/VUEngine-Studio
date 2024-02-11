@@ -1,4 +1,3 @@
-import { nls } from '@theia/core';
 import React from 'react';
 import VContainer from '../../Common/VContainer';
 import {
@@ -8,30 +7,22 @@ import {
 interface BehaviorProps {
     behavior: BehaviorData
     updateBehavior: (partialData: Partial<BehaviorData>) => void
-    removeBehavior: () => void
 }
 
 export default function Behavior(props: BehaviorProps): React.JSX.Element {
-    const { behavior, updateBehavior, removeBehavior } = props;
+    const { behavior, updateBehavior } = props;
 
     const setName = (name: string): void => {
         updateBehavior({ name });
     };
 
-    return <div>
-        <VContainer className='item' gap={15}>
-            <button
-                className="remove-button"
-                onClick={removeBehavior}
-                title={nls.localize('vuengine/entityEditor/removeComponent', 'Remove Component')}
-            >
-                <i className='codicon codicon-x' />
-            </button>
+    return (
+        <VContainer gap={15}>
             <input
                 className='theia-input'
                 value={behavior.name}
                 onChange={e => setName(e.target.value)}
             />
         </VContainer>
-    </div>;
+    );
 }

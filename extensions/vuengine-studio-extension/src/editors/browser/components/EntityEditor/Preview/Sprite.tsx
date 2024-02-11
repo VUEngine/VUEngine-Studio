@@ -2,15 +2,16 @@ import React, { useContext, useEffect, useState } from 'react';
 import { ImageData } from '../../../../../core/browser/ves-common-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import CssImage from '../../Common/CssImage';
-import { PixelVector } from '../EntityEditorTypes';
+import { EntityEditorContext, EntityEditorContextType, PixelVector } from '../EntityEditorTypes';
 
 interface SpriteProps {
-  animate: boolean;
-  frames: number;
+  animate: boolean
+  frames: number
   currentAnimationFrame: number
-  displacement: PixelVector;
-  highlighted: boolean;
-  images: string[];
+  displacement: PixelVector
+  highlighted: boolean
+  images: string[]
+  index: number
   palette: string
   flipHorizontally: boolean
   flipVertically: boolean
@@ -20,6 +21,7 @@ interface SpriteProps {
 }
 
 export default function Sprite(props: SpriteProps): React.JSX.Element {
+  const { setState } = useContext(EntityEditorContext) as EntityEditorContextType;
   const { services } = useContext(EditorsContext) as EditorsContextType;
   const {
     animate,
@@ -28,6 +30,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     currentAnimationFrame,
     displacement,
     highlighted,
+    index,
     images,
     palette,
     projectionDepth,
@@ -52,7 +55,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     let allImageData: ImageData[] = [];
 
     if (images.length) {
-      await Promise.all(images.map(async (image, index) => {
+      await Promise.all(images.map(async (image, i) => {
         await services.workspaceService.ready;
         const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
         const imageUri = workspaceRootUri.resolve(image);
@@ -64,9 +67,9 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
               setImageError('wrong color type');
             } else {
               allImageData = [
-                ...allImageData.slice(0, index),
+                ...allImageData.slice(0, i),
                 singleImageData,
-                ...allImageData.slice(index),
+                ...allImageData.slice(i),
               ];
               setHeight(height || singleImageData.height);
               setWidth(width || singleImageData.width);
@@ -113,6 +116,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
       title={error ? error : ''}
       style={{
         boxSizing: 'border-box',
+        cursor: 'pointer',
         height: height / (isMultiFileAnimation ? 1 : frames || 1),
         opacity: transparent ? .5 : 1,
         outline: highlighted ? '1px solid green' : undefined,
@@ -124,6 +128,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         width: width,
         zIndex: baseZIndex + (displacement.z !== 0 ? -displacement.z : 0),
       }}
+      onClick={() => setState({ currentComponent: `sprites-${index}` })}
     >
       {!error && imageData.length > 0 &&
         <div style={{

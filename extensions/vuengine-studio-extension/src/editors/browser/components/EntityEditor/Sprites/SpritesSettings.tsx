@@ -1,6 +1,8 @@
 import { nls } from '@theia/core';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { ImageCompressionType } from '../../../../../images/browser/ves-images-types';
+import { ProjectContributor } from '../../../../../project/browser/ves-project-types';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { DataSection } from '../../Common/CommonTypes';
 import HContainer from '../../Common/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
@@ -14,7 +16,16 @@ interface SpritesSettingsProps {
 
 export default function SpritesSettings(props: SpritesSettingsProps): React.JSX.Element {
     const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { services } = useContext(EditorsContext) as EditorsContextType;
     const { isMultiFileAnimation } = props;
+    const [maxAnimationFrames, setMaxAnimationFrames] = useState<number>(256);
+
+    const getEngineSettings = async (): Promise<void> => {
+        await services.vesProjectService.projectItemsReady;
+        const engineConfig = services.vesProjectService.getProjectDataItemById(ProjectContributor.Project, 'EngineConfig');
+        // @ts-ignore
+        setMaxAnimationFrames(engineConfig?.animation?.maxFramesPerAnimationFunction || maxAnimationFrames);
+    };
 
     const setType = (type: SpriteType): void => {
         setData({
@@ -107,83 +118,143 @@ export default function SpritesSettings(props: SpritesSettingsProps): React.JSX.
         });
     };
 
+    useEffect(() => {
+        getEngineSettings();
+    }, []);
+
     return <>
-        {data.components?.sprites.length > 0 &&
+        <VContainer gap={15}>
+            <label>
+                {nls.localize('vuengine/entityEditor/generalSpritesSettings', 'General Sprites Settings')}
+            </label>
+            <HContainer gap={15}>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/spriteType', 'Type')}
+                    </label>
+                    <RadioSelect
+                        options={[{
+                            value: SpriteType.Bgmap,
+                        }, {
+                            value: SpriteType.Object,
+                        }]}
+                        defaultValue={data.sprites.type}
+                        onChange={options => setType(options[0].value as SpriteType)}
+                    />
+                </VContainer>
+                <VContainer>
+                    <InfoLabel
+                        label={nls.localize('vuengine/entityEditor/compression', 'Compression')}
+                        tooltip={nls.localize(
+                            'vuengine/entityEditor/compressionDescription',
+                            'Image data can be stored in a compressed format to save ROM space. '
+                            + 'Comes at the cost of a slightly higher CPU load when loading data into memory.'
+                        )}
+                    />
+                    <RadioSelect
+                        options={[{
+                            label: nls.localize('vuengine/entityEditor/compression/none', 'None'),
+                            value: ImageCompressionType.NONE,
+                        }, {
+                            label: nls.localize('vuengine/entityEditor/compression/rle', 'RLE'),
+                            value: ImageCompressionType.RLE,
+                        }]}
+                        defaultValue={data.sprites.compression}
+                        onChange={options => setTilesCompression(options[0].value as ImageCompressionType)}
+                    />
+                </VContainer>
+            </HContainer>
             <VContainer>
-                <label>
-                    Sprites Settings
-                </label>
-                <HContainer alignItems='start' gap={15} wrap='wrap'>
+                <InfoLabel
+                    label={nls.localize('vuengine/entityEditor/section', 'Section')}
+                    tooltip={nls.localize(
+                        'vuengine/entityEditor/sectionDescription',
+                        'Defines whether image data should be stored in ROM space or Expansion space. ' +
+                        'You usually want to leave this untouched, since the latter only works on specially designed cartridges.'
+                    )}
+                />
+                <RadioSelect
+                    defaultValue={data.sprites.section}
+                    options={[{
+                        label: 'ROM',
+                        value: DataSection.ROM,
+                    }, {
+                        label: nls.localize('vuengine/entityEditor/expansion', 'Expansion'),
+                        value: DataSection.EXP,
+                    }]}
+                    onChange={options => setSection(options[0].value as DataSection)}
+                />
+            </VContainer>
+            <HContainer gap={15}>
+                {data.components?.animations.length > 0 && <>
                     <VContainer>
                         <label>
-                            {nls.localize('vuengine/entityEditor/spriteType', 'Type')}
+                            {nls.localize('vuengine/entityEditor/frames', 'Frames')}
                         </label>
-                        <RadioSelect
-                            options={[{
-                                value: SpriteType.Bgmap,
-                            }, {
-                                value: SpriteType.Object,
-                            }]}
-                            defaultValue={data.sprites.type}
-                            onChange={options => setType(options[0].value as SpriteType)}
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            min={1}
+                            max={maxAnimationFrames}
+                            disabled={isMultiFileAnimation}
+                            value={data.animations.totalFrames}
+                            onChange={e => setAnimationFrames(parseInt(e.target.value))}
                         />
                     </VContainer>
-                    {data.components?.animations.length > 0 && <>
-                        <VContainer>
-                            <label>
-                                {nls.localize('vuengine/entityEditor/frames', 'Frames')}
-                            </label>
-                            {/* TODO: determine max frames from engine config */}
-                            <input
-                                className='theia-input'
-                                style={{ width: 48 }}
-                                type='number'
-                                min={0}
-                                max={128}
-                                disabled={isMultiFileAnimation}
-                                value={data.animations.totalFrames}
-                                onChange={e => setAnimationFrames(parseInt(e.target.value))}
-                            />
-                        </VContainer>
-                        {!isMultiFileAnimation && <VContainer>
-                            <InfoLabel
-                                label={nls.localize('vuengine/entityEditor/multiframe', 'Multiframe')}
-                                tooltip={nls.localize(
-                                    'vuengine/entityEditor/multiframeDescription',
-                                    'With this enabled, chars for all animation frames are loaded into video memory at the same time. ' +
-                                    'This allows multiple sprites to use the same texture, but show a different frame each.'
-                                )}
-                            />
-                            <input
-                                type="checkbox"
-                                checked={data.animations.multiframe}
-                                onChange={toggleMultiframe}
-                            />
-                        </VContainer>}
-                    </>}
-                    {/* these setting are implicitly handled for animations */}
-                    {data.components?.animations.length === 0 && <VContainer>
-                        <label>
-                            {nls.localize('vuengine/entityEditor/tiles', 'Tiles')}
-                        </label>
-                        <label>
-                            <input
-                                type="checkbox"
-                                checked={data.sprites.optimizedTiles}
-                                onChange={toggleOptimizedTiles}
-                            />
-                            {nls.localize('vuengine/entityEditor/optimized', 'Optimized')}
-                        </label>
-                        {data.components?.sprites.length > 1 && <label>
-                            <input
-                                type="checkbox"
-                                checked={data.sprites.sharedTiles}
-                                onChange={toggleSharedTiles}
-                            />
-                            {nls.localize('vuengine/entityEditor/shared', 'Shared')}
-                        </label>}
+                    {!isMultiFileAnimation && <VContainer>
+                        <InfoLabel
+                            label={nls.localize('vuengine/entityEditor/multiframe', 'Multiframe')}
+                            tooltip={nls.localize(
+                                'vuengine/entityEditor/multiframeDescription',
+                                'With this enabled, chars for all animation frames are loaded into video memory at the same time. ' +
+                                'This allows multiple sprites to use the same texture, but show a different frame each.'
+                            )}
+                        />
+                        <input
+                            type="checkbox"
+                            checked={data.animations.multiframe}
+                            onChange={toggleMultiframe}
+                        />
                     </VContainer>}
-                    {/*
+                </>}
+                {/* these setting are implicitly handled for animations */}
+                {data.components?.animations.length === 0 && <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/tiles', 'Tiles')}
+                    </label>
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={data.sprites.optimizedTiles}
+                            onChange={toggleOptimizedTiles}
+                        />
+                        {nls.localize('vuengine/entityEditor/optimized', 'Optimized')}
+                    </label>
+                    {data.components?.sprites.length > 1 && <label>
+                        <input
+                            type="checkbox"
+                            checked={data.sprites.sharedTiles}
+                            onChange={toggleSharedTiles}
+                        />
+                        {nls.localize('vuengine/entityEditor/shared', 'Shared')}
+                    </label>}
+                </VContainer>}
+            </HContainer>
+            <VContainer>
+                <label>
+                    {nls.localize('vuengine/entityEditor/projection', 'Projection')}
+                </label>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={data.sprites.useZDisplacementInProjection}
+                        onChange={toggleUseZDisplacementInProjection}
+                    />
+                    {nls.localize('vuengine/entityEditor/useZDisplacement', 'Use Z Displacement')}
+                </label>
+            </VContainer>
+            {/*
             <VContainer>
                 <label>
                     {nls.localize('vuengine/entityEditor/customClass', 'Custom Class')}
@@ -196,63 +267,6 @@ export default function SpritesSettings(props: SpritesSettingsProps): React.JSX.
                 />
             </VContainer>
             */}
-                    <VContainer>
-                        <InfoLabel
-                            label={nls.localize('vuengine/entityEditor/compression', 'Compression')}
-                            tooltip={nls.localize(
-                                'vuengine/entityEditor/compressionDescription',
-                                'Image data can be stored in a compressed format to save ROM space. '
-                                + 'Comes at the cost of a slightly higher CPU load when loading data into memory.'
-                            )}
-                        />
-                        <RadioSelect
-                            options={[{
-                                label: nls.localize('vuengine/entityEditor/compression/none', 'None'),
-                                value: ImageCompressionType.NONE,
-                            }, {
-                                label: nls.localize('vuengine/entityEditor/compression/rle', 'RLE'),
-                                value: ImageCompressionType.RLE,
-                            }]}
-                            defaultValue={data.sprites.compression}
-                            onChange={options => setTilesCompression(options[0].value as ImageCompressionType)}
-                        />
-                    </VContainer>
-                    <VContainer>
-                        <InfoLabel
-                            label={nls.localize('vuengine/entityEditor/section', 'Section')}
-                            tooltip={nls.localize(
-                                'vuengine/entityEditor/sectionDescription',
-                                'Defines whether image data should be stored in ROM space or Expansion space. ' +
-                                'You usually want to leave this untouched, since the latter only works on specially designed cartridges.'
-                            )}
-                        />
-                        <RadioSelect
-                            defaultValue={data.sprites.section}
-                            options={[{
-                                label: 'ROM',
-                                value: DataSection.ROM,
-                            }, {
-                                label: nls.localize('vuengine/entityEditor/expansion', 'Expansion'),
-                                value: DataSection.EXP,
-                            }]}
-                            onChange={options => setSection(options[0].value as DataSection)}
-                        />
-                    </VContainer>
-                    <VContainer>
-                        <label>
-                            {nls.localize('vuengine/entityEditor/projection', 'Projection')}
-                        </label>
-                        <label>
-                            <input
-                                type="checkbox"
-                                checked={data.sprites.useZDisplacementInProjection}
-                                onChange={toggleUseZDisplacementInProjection}
-                            />
-                            {nls.localize('vuengine/entityEditor/useZDisplacement', 'Use Z Displacement')}
-                        </label>
-                    </VContainer>
-                </HContainer>
-            </VContainer>
-        }
+        </VContainer>
     </>;
 }

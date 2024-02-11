@@ -1,0 +1,63 @@
+.ves-tree [role=tree],
+.ves-tree [role=tree] > div {
+    height: auto !important;
+}
+
+.ves-tree [role=tree] [role=treeitem] {
+    box-sizing: border-box;
+    display: flex;
+    line-height: var(--theia-content-line-height);
+    padding: 0 var(--theia-ui-padding);
+}
+
+.ves-tree [role=tree] [role=treeitem][aria-selected=true] {
+    background: var(--theia-list-inactiveSelectionBackground);
+    color: var(--theia-list-inactiveSelectionForeground);
+}
+
+.ves-tree [role=tree] [role=treeitem]:focus::after,
+.ves-tree [role=tree] [role=treeitem]:hover {
+    background: var(--theia-list-hoverBackground);
+    color: var(--theia-list-hoverForeground);
+    cursor: pointer;
+}
+
+.ves-tree [role=tree] [role=treeitem][aria-selected=true]:focus {
+    background: var(--theia-list-activeSelectionBackground);
+    color: var(--theia-list-activeSelectionForeground) !important;
+    outline: var(--theia-focusBorder) solid 1px;
+    outline-offset: -1px;
+}
+
+.ves-tree-node {
+    align-items: center;
+    display: flex;
+    flex-grow: 1;
+    gap: 5px;
+}
+
+.ves-tree-node.empty {
+    opacity: .3;
+}
+
+.ves-tree-node.empty:focus,
+.ves-tree-node.empty:hover {
+    opacity: 1;
+}
+
+.ves-tree-node-icon {
+    align-items: center;
+    display: flex;
+}
+
+.ves-tree-node-name {
+    flex-grow: 1;
+}
+
+.ves-tree-node-actions {
+    display: none;
+}
+
+.ves-tree-node:hover .ves-tree-node-actions {
+    display: flex;
+}

@@ -23,13 +23,13 @@ import {
 interface SpriteProps {
     sprite: SpriteData
     updateSprite: (partialData: Partial<SpriteData>, options?: EntityEditorSaveDataOptions) => void
-    removeSprite: () => void
+    isMultiFileAnimation: boolean
 }
 
 export default function Sprite(props: SpriteProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const { data } = useContext(EntityEditorContext) as EntityEditorContextType;
-    const { sprite, updateSprite, removeSprite } = props;
+    const { sprite, updateSprite, isMultiFileAnimation } = props;
     const [dimensions, setDimensions] = useState<string>('');
     const [filename, setFilename] = useState<string>('');
 
@@ -44,8 +44,11 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 }
                 setFilename(fn);
                 const d = await window.electronVesCore.getImageDimensions(resolvedUri.path.fsPath());
-                const width = d.width;
-                const height = d.height ? d.height / data.animations?.totalFrames : '';
+                const width = d.width ?? 0;
+                let height = d.height ?? 0;
+                if (data.components?.animations?.length > 0 && !isMultiFileAnimation && data.animations?.totalFrames) {
+                    height /= data.animations?.totalFrames;
+                }
 
                 setDimensions(`${width}×${height}`);
             }
@@ -74,12 +77,6 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         }
 
         return 0;
-    };
-
-    const setName = (name: string): void => {
-        updateSprite({
-            name
-        });
     };
 
     const setManipulationFunction = (manipulationFunction: string): void => {
@@ -221,53 +218,28 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
 
     useEffect(() => {
         getMetaData();
-    }, [sprite.texture.files]);
+    }, [
+        data.components?.animations?.length,
+        data.animations?.totalFrames,
+        isMultiFileAnimation,
+        sprite.texture.files
+    ]);
 
     const charCount = getCharCount(sprite._imageData);
 
-    return <div>
-        <HContainer className='item' gap={20} wrap='wrap'>
-            <button
-                className="remove-button"
-                onClick={removeSprite}
-                title={nls.localize('vuengine/entityEditor/removeComponent', 'Remove Component')}
-            >
-                <i className='codicon codicon-x' />
-            </button>
+    return (
+        <HContainer gap={20} wrap='wrap'>
             <VContainer>
-                <label>
-                    {nls.localize('vuengine/entityEditor/name', 'Name')}
-                </label>
-                <input
-                    className='theia-input'
-                    value={sprite.name}
-                    onChange={e => setName(e.target.value)}
+                <InfoLabel
+                    label={nls.localize('vuengine/entityEditor/image', 'Image')}
+                    tooltip={nls.localize(
+                        'vuengine/entityEditor/filesDescription',
+                        'PNG image to be used as texture. Must be four color indexed mode with the proper palette. ' +
+                        'When animations are enabled, select either a single file containing a vertical spritesheet, ' +
+                        'or multiple files, where each represents one animation frame.'
+                    )}
                 />
-            </VContainer>
-            <VContainer>
-                <VContainer alignItems='start'>
-                    <i
-                        className='codicon codicon-question'
-                        style={{
-                            cursor: 'context-menu',
-                            left: 24,
-                            position: 'absolute',
-                            top: 24,
-                            zIndex: 10,
-                        }}
-                        onMouseEnter={event => {
-                            services.hoverService.requestHover({
-                                content: nls.localize(
-                                    'vuengine/entityEditor/filesDescription',
-                                    'PNG image to be used as texture. Must be four color indexed mode with the proper palette. ' +
-                                    'When animations are enabled, select either a single file containing a vertical spritesheet, ' +
-                                    'or multiple files, where each represents one animation frame.'
-                                ),
-                                target: event.currentTarget,
-                                position: 'right',
-                            });
-                        }}
-                    />
+                <HContainer gap={15}>
                     <Images
                         data={sprite.texture.files}
                         updateData={setFiles}
@@ -276,45 +248,26 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                         stack={true}
                         showMetaData={false}
                     />
-                </VContainer>
-            </VContainer>
-            <VContainer gap={15}>
-                {(filename !== '' || dimensions !== '' || charCount > 0) &&
-                    <HContainer gap={15} wrap='wrap'>
+                    <VContainer grow={1}>
                         {filename !== '' &&
-                            <VContainer grow={1}>
-                                <input
-                                    className='theia-input'
-                                    type='text'
-                                    value={filename}
-                                    disabled
-                                />
-                            </VContainer>
+                            <div>
+                                {filename}
+                            </div>
                         }
                         {dimensions !== '' &&
-                            <VContainer>
-                                <input
-                                    className='theia-input'
-                                    style={{ width: 80 }}
-                                    type='text'
-                                    value={`${dimensions} px`}
-                                    disabled
-                                />
-                            </VContainer>
+                            <div>
+                                {dimensions} px
+                            </div>
                         }
                         {charCount > 0 &&
-                            <VContainer>
-                                <input
-                                    className='theia-input'
-                                    style={{ width: 80 }}
-                                    type='text'
-                                    value={`${charCount} ${nls.localize('vuengine/entityEditor/chars', 'Chars')}`}
-                                    disabled
-                                />
-                            </VContainer>
+                            <div>
+                                {charCount} {nls.localize('vuengine/entityEditor/chars', 'Chars')}
+                            </div>
                         }
-                    </HContainer>
-                }
+                    </VContainer>
+                </HContainer>
+            </VContainer>
+            <VContainer gap={15}>
                 <HContainer gap={15} wrap='wrap'>
                     <VContainer>
                         <InfoLabel
@@ -367,6 +320,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                             onChange={options => setTransparency(options[0].value as Transparency)}
                         />
                     </VContainer>
+                </HContainer>
+                <HContainer gap={15}>
                     <VContainer>
                         <label>
                             {nls.localize('vuengine/entityEditor/palette', 'Palette')}
@@ -376,47 +331,6 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                             defaultValue={sprite.texture.palette}
                             onChange={options => setPalette(options[0].value as number)}
                         />
-                    </VContainer>
-                    <VContainer>
-                        <InfoLabel
-                            label={nls.localize('vuengine/entityEditor/displacement', 'Displacement (x, y, z, parallax)')}
-                            tooltip={nls.localize(
-                                'vuengine/entityEditor/displacementDescription',
-                                'Offset this sprite by the given amount of pixels from the entity\'s center. ' +
-                                'The parallax value controls the depth, while the z value is used for fine tuning. ' +
-                                'Positive z (and parallax) values go into the screen, negative stick out.'
-                            )}
-                        />
-                        <HContainer>
-                            <input
-                                className='theia-input'
-                                style={{ width: 48 }}
-                                type='number'
-                                value={sprite.displacement.x}
-                                onChange={e => setDisplacementX(parseInt(e.target.value))}
-                            />
-                            <input
-                                className='theia-input'
-                                style={{ width: 48 }}
-                                type='number'
-                                value={sprite.displacement.y}
-                                onChange={e => setDisplacementY(parseInt(e.target.value))}
-                            />
-                            <input
-                                className='theia-input'
-                                style={{ width: 48 }}
-                                type='number'
-                                value={sprite.displacement.z}
-                                onChange={e => setDisplacementZ(parseInt(e.target.value))}
-                            />
-                            <input
-                                className='theia-input'
-                                style={{ width: 48 }}
-                                type='number'
-                                value={sprite.displacement.parallax}
-                                onChange={e => setDisplacementParallax(parseInt(e.target.value))}
-                            />
-                        </HContainer>
                     </VContainer>
                     {data.sprites.type === SpriteType.Bgmap && <VContainer>
                         <InfoLabel
@@ -464,90 +378,127 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                             onChange={options => setBgmapMode(options[0].value as BgmapMode)}
                         />
                     </VContainer>}
-                    {(data.sprites.type === SpriteType.Bgmap && [BgmapMode.Affine, BgmapMode.HBias].includes(sprite.bgmapMode)) &&
-                        <>
-                            <VContainer>
-                                <InfoLabel
-                                    label={nls.localize('vuengine/entityEditor/padding', 'Padding (X, Y)')}
-                                    tooltip={nls.localize(
-                                        'vuengine/entityEditor/paddingDescription',
-                                        // eslint-disable-next-line max-len
-                                        'Pad texture data in memory by the specified amount of blank pixels to prevent fragments of surrounding textures to appear at the outer edges.'
-                                    )}
-                                />
-                                <HContainer>
-                                    <input
-                                        className='theia-input'
-                                        style={{ width: 48 }}
-                                        type='number'
-                                        min={MIN_TEXTURE_PADDING}
-                                        max={MAX_TEXTURE_PADDING}
-                                        value={sprite.texture.padding.x}
-                                        onChange={e => setPaddingX(parseInt(e.target.value))}
-                                    />
-                                    <input
-                                        className='theia-input'
-                                        style={{ width: 48 }}
-                                        type='number'
-                                        min={MIN_TEXTURE_PADDING}
-                                        max={MAX_TEXTURE_PADDING}
-                                        value={sprite.texture.padding.y}
-                                        onChange={e => setPaddingY(parseInt(e.target.value))}
-                                    />
-                                </HContainer>
-                            </VContainer>
-                            <VContainer>
-                                <InfoLabel
-                                    label={nls.localize('vuengine/entityEditor/manipulationFunction', 'Manipulation Function')}
-                                    tooltip={nls.localize(
-                                        'vuengine/entityEditor/manipulationFunctionDescription',
-                                        'Provide the name of the function responsible for handling the Affine or HBias transformations of this sprite.'
-                                    )}
+                </HContainer>
+                {(data.sprites.type === SpriteType.Bgmap && [BgmapMode.Affine, BgmapMode.HBias].includes(sprite.bgmapMode)) &&
+                    <HContainer gap={15} wrap='wrap'>
+                        <VContainer>
+                            <InfoLabel
+                                label={nls.localize('vuengine/entityEditor/padding', 'Padding (X, Y)')}
+                                tooltip={nls.localize(
+                                    'vuengine/entityEditor/paddingDescription',
+                                    // eslint-disable-next-line max-len
+                                    'Pad texture data in memory by the specified amount of blank pixels to prevent fragments of surrounding textures to appear at the outer edges.'
+                                )}
+                            />
+                            <HContainer>
+                                <input
+                                    className='theia-input'
+                                    style={{ width: 48 }}
+                                    type='number'
+                                    min={MIN_TEXTURE_PADDING}
+                                    max={MAX_TEXTURE_PADDING}
+                                    value={sprite.texture.padding.x}
+                                    onChange={e => setPaddingX(parseInt(e.target.value))}
                                 />
                                 <input
                                     className='theia-input'
-                                    type='string'
-                                    value={sprite.manipulationFunction}
-                                    onChange={e => setManipulationFunction(e.target.value)}
+                                    style={{ width: 48 }}
+                                    type='number'
+                                    min={MIN_TEXTURE_PADDING}
+                                    max={MAX_TEXTURE_PADDING}
+                                    value={sprite.texture.padding.y}
+                                    onChange={e => setPaddingY(parseInt(e.target.value))}
                                 />
-                            </VContainer>
-                        </>
-                    }
-                </HContainer>
-                <HContainer alignItems='start' gap={15}>
-                    <VContainer>
-                        <label>
-                            {nls.localize('vuengine/entityEditor/texture', 'Texture')}
-                        </label>
-                        <HContainer gap={15} wrap="wrap">
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    checked={sprite.texture.flip.horizontal}
-                                    onChange={toggleFlipHorizontally}
-                                />
-                                {nls.localize('vuengine/entityEditor/flipHorizontally', 'Flip Horizontally')}
-                            </label>
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    checked={sprite.texture.flip.vertical}
-                                    onChange={toggleFlipVertically}
-                                />
-                                {nls.localize('vuengine/entityEditor/flipVertically', 'Flip Vertically')}
-                            </label>
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    checked={sprite.texture.recycleable}
-                                    onChange={toggleRecycleable}
-                                />
-                                {nls.localize('vuengine/entityEditor/recycleable', 'Recycleable')}
-                            </label>
-                        </HContainer>
-                    </VContainer>
-                </HContainer>
+                            </HContainer>
+                        </VContainer>
+                        <VContainer grow={1}>
+                            <InfoLabel
+                                label={nls.localize('vuengine/entityEditor/manipulationFunction', 'Manipulation Function')}
+                                tooltip={nls.localize(
+                                    'vuengine/entityEditor/manipulationFunctionDescription',
+                                    'Provide the name of the function responsible for handling the Affine or HBias transformations of this sprite.'
+                                )}
+                            />
+                            <input
+                                className='theia-input'
+                                type='string'
+                                value={sprite.manipulationFunction}
+                                onChange={e => setManipulationFunction(e.target.value)}
+                            />
+                        </VContainer>
+                    </HContainer>
+                }
+                <VContainer>
+                    <InfoLabel
+                        label={nls.localize('vuengine/entityEditor/displacement', 'Displacement (x, y, z, parallax)')}
+                        tooltip={nls.localize(
+                            'vuengine/entityEditor/displacementDescription',
+                            'Offset this sprite by the given amount of pixels from the entity\'s center. ' +
+                            'The parallax value controls the depth, while the z value is used for fine tuning. ' +
+                            'Positive z (and parallax) values go into the screen, negative stick out.'
+                        )}
+                    />
+                    <HContainer>
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            value={sprite.displacement.x}
+                            onChange={e => setDisplacementX(parseInt(e.target.value))}
+                        />
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            value={sprite.displacement.y}
+                            onChange={e => setDisplacementY(parseInt(e.target.value))}
+                        />
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            value={sprite.displacement.z}
+                            onChange={e => setDisplacementZ(parseInt(e.target.value))}
+                        />
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            value={sprite.displacement.parallax}
+                            onChange={e => setDisplacementParallax(parseInt(e.target.value))}
+                        />
+                    </HContainer>
+                </VContainer>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/texture', 'Texture')}
+                    </label>
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={sprite.texture.flip.horizontal}
+                            onChange={toggleFlipHorizontally}
+                        />
+                        {nls.localize('vuengine/entityEditor/flipHorizontally', 'Flip Horizontally')}
+                    </label>
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={sprite.texture.flip.vertical}
+                            onChange={toggleFlipVertically}
+                        />
+                        {nls.localize('vuengine/entityEditor/flipVertically', 'Flip Vertically')}
+                    </label>
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={sprite.texture.recycleable}
+                            onChange={toggleRecycleable}
+                        />
+                        {nls.localize('vuengine/entityEditor/recycleable', 'Recycleable')}
+                    </label>
+                </VContainer>
             </VContainer>
         </HContainer>
-    </div >;
+    );
 }

@@ -3,18 +3,14 @@ import { ConversionResult } from '../../../../images/browser/ves-images-types';
 import { EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/HContainer';
 import VContainer from '../Common/VContainer';
-import CollidersSettings from './Collider/CollidersSettings';
-import Components from './Entity/Components';
-import Entity from './Entity/Entity';
+import CurrentComponent from './Components/CurrentComponent';
+import ComponentTree from './Components/ComponentTree';
 import {
   EntityData,
   EntityEditorContext,
   EntityEditorState,
-  defaultCurrentAnimation,
-  defaultHighlightedSprite
 } from './EntityEditorTypes';
 import Preview from './Preview/Preview';
-import SpritesSettings from './Sprites/SpritesSettings';
 
 interface EntityEditorProps {
   data: EntityData;
@@ -30,13 +26,11 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
   constructor(props: EntityEditorProps) {
     super(props);
     this.state = {
+      currentComponent: '',
       preview: {
         backgroundColor: -1,
         anaglyph: false,
-        animations: false,
-        currentAnimation: this.props.data.animations?.default || defaultCurrentAnimation,
         colliders: true,
-        highlightedSprite: defaultHighlightedSprite,
         wireframes: true,
         palettes: ['11100100', '11100000', '11010000', '11100100'],
         sprites: true,
@@ -57,11 +51,10 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
   protected async restorePreviewState(): Promise<void> {
     const savedState = await this.props.context.services.localStorageService.getData<EntityEditorState>(this.getStateLocalStorageId());
     if (savedState) {
-      savedState.preview.currentAnimation = defaultCurrentAnimation;
-      savedState.preview.highlightedSprite = defaultHighlightedSprite;
       this.setState({
         ...this.state,
         ...savedState,
+        currentComponent: '',
       });
     }
   }
@@ -255,7 +248,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
             <EntityEditorContext.Consumer>
               {context =>
                 <VContainer gap={15} overflow='auto' style={{ width: 200 }}>
-                  <Entity />
+                  <ComponentTree />
                   {/*
                   <PreviewOptions />
                   */}
@@ -271,13 +264,9 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
             </EntityEditorContext.Consumer>
             <EntityEditorContext.Consumer>
               {context =>
-                <VContainer gap={15} overflow='auto' style={{ width: 300 }}>
-                  <SpritesSettings
-                    isMultiFileAnimation={isMultiFileAnimation}
-                  />
-                  <CollidersSettings />
-                  <Components />
-                </VContainer>
+                <CurrentComponent
+                  isMultiFileAnimation={isMultiFileAnimation}
+                />
               }
             </EntityEditorContext.Consumer>
           </HContainer>

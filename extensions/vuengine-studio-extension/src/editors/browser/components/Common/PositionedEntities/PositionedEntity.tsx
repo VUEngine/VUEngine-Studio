@@ -9,12 +9,11 @@ import VContainer from '../VContainer';
 interface PositionedEntityProps {
     positionedEntity: PositionedEntityData
     updatePositionedEntity: (partialPositionedEntity: Partial<PositionedEntityData>) => void
-    removePositionedEntity: () => void
 }
 
 export default function PositionedEntity(props: PositionedEntityProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
-    const { positionedEntity, updatePositionedEntity, removePositionedEntity } = props;
+    const { positionedEntity, updatePositionedEntity } = props;
 
     const entityItem = services.vesProjectService.getProjectDataItemById(positionedEntity.itemId, 'Entity') as EntityData & WithFileUri;
 
@@ -81,14 +80,7 @@ export default function PositionedEntity(props: PositionedEntityProps): React.JS
         }
     };
 
-    return <div className='item'>
-        <button
-            className="remove-button"
-            onClick={removePositionedEntity}
-            title={nls.localize('vuengine/editors/remove', 'Remove')}
-        >
-            <i className='codicon codicon-x' />
-        </button>
+    return (
         <HContainer gap={15} wrap='wrap'>
             {entityItem ? <>
                 <HContainer alignItems='end'>
@@ -179,5 +171,5 @@ export default function PositionedEntity(props: PositionedEntityProps): React.JS
                     {nls.localize('vuengine/editors/entityNotFound', 'Entity could not be found')}
                 </VContainer>}
         </HContainer>
-    </div>;
+    );
 }

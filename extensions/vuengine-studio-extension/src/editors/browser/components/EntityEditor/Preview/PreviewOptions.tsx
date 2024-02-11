@@ -10,9 +10,7 @@ import {
 } from '../EntityEditorTypes';
 
 export default function PreviewOptions(): React.JSX.Element {
-  const { state, setState, data } = useContext(EntityEditorContext) as EntityEditorContextType;
-
-  const animate = (state.preview.animations && data.components?.animations?.length > 0) || state.preview.currentAnimation > -1;
+  const { state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
 
   const setBooleanStateProperty = (property: string, checked: boolean) =>
     setState({
@@ -59,45 +57,6 @@ export default function PreviewOptions(): React.JSX.Element {
       <VContainer>
         <label>
           {nls.localize('vuengine/entityEditor/options', 'Options')}
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            checked={state.preview.sprites && data.components?.sprites?.length > 0}
-            disabled={!data.components?.sprites?.length}
-            onChange={e => setBooleanStateProperty('sprites', e.target.checked)}
-          />
-          {nls.localize('vuengine/entityEditor/showSprites', 'Show Sprites')}
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            checked={state.preview.wireframes && data.components?.wireframes?.length > 0}
-            disabled={!data.components?.wireframes?.length}
-            onChange={e => setBooleanStateProperty('wireframes', e.target.checked)}
-          />
-          Show Wireframes
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            checked={state.preview.colliders}
-            onChange={e =>
-              setBooleanStateProperty('colliders', e.target.checked)
-            }
-          />
-          Show Colliders
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            checked={animate}
-            disabled={!data.components?.animations?.length}
-            onChange={e =>
-              setBooleanStateProperty('animations', e.target.checked)
-            }
-          />
-          {nls.localize('vuengine/entityEditor/showAnimations', 'Show Animations')}
         </label>
         <label>
           <input

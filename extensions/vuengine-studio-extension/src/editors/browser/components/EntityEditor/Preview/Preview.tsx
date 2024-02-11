@@ -22,9 +22,10 @@ export default function Preview(): React.JSX.Element {
   const engineConfig = services.vesProjectService.getProjectDataItemById(ProjectContributor.Project, 'EngineConfig');
   // @ts-ignore
   const frameMultiplicator = engineConfig && engineConfig.frameRate?.frameCycle ? engineConfig.frameRate.frameCycle + 1 : 1;
-
-  const animate = (state.preview.animations && data.components?.animations?.length > 0) || state.preview.currentAnimation > -1;
-  const currentAnimation = state.preview.currentAnimation > -1 ? state.preview.currentAnimation : data.animations.default;
+  const animate = state.currentComponent?.startsWith('animations-');
+  const currentAnimation = state.currentComponent?.startsWith('animations-')
+    ? parseInt(state.currentComponent.split('animations-')[1])
+    : data.animations.default;
   const animation: AnimationData | undefined = data.components?.animations
     ? data.components?.animations[currentAnimation]
     : undefined;
@@ -39,11 +40,6 @@ export default function Preview(): React.JSX.Element {
       : undefined;
   };
 
-  const showPreview = data.components?.sprites.length > 0 /* ||
-    data.components?.children.length > 0 ||
-    data.components?.colliders.length > 0 ||
-    data.components?.wireframes.length > 0 */;
-
   useEffect(() => {
     clearInterval(timer);
     updateAnimationStep();
@@ -52,59 +48,51 @@ export default function Preview(): React.JSX.Element {
     animation
   ]);
 
-  return <>
-    {showPreview &&
-      <div
-        className="preview-container"
-        style={{ backgroundColor: state.preview.backgroundColor > -1 ? PALETTE_COLORS[ColorMode.Default][state.preview.backgroundColor] : undefined }}
-      >
-        {animate &&
-          <div className='current-frame'>
-            <div>
-              {animation?.name
-                ? `"${animation?.name}"`
-                : `Animation ${currentAnimation + 1}`}
-            </div>
-            <div>
-              {currentAnimationStep + 1}
-            </div>
-          </div>
-        }
-        <div
-          className="preview-container-world"
-          style={{ perspective: state.preview.projectionDepth + 'px', zoom: state.preview.zoom }}
-        >
-          {state.preview.sprites && data.components?.sprites?.map((sprite, i) =>
-            <Sprite
-              key={`preview-sprite-${i}`}
-              animate={animate}
-              displacement={sprite.displacement}
-              frames={data.animations?.totalFrames || 1}
-              canScale={sprite.bgmapMode === BgmapMode.Affine}
-              projectionDepth={state.preview.projectionDepth}
-              currentAnimationFrame={animation?.frames[currentAnimationStep - 1] ?? currentAnimationStep}
-              highlighted={state.preview.highlightedSprite === i}
-              images={sprite.texture.files}
-              flipHorizontally={sprite.texture.flip.horizontal}
-              flipVertically={sprite.texture.flip.vertical}
-              transparent={sprite.transparency !== Transparency.None}
-              palette={state.preview.palettes[sprite.texture.palette]}
-            />
-          )}
-          {state.preview.colliders && data.components?.colliders?.map((collider, i) => {
-            switch (collider.type) {
-              case ColliderType.Box:
-                return <BoxCollider
-                  size={collider.pixelSize}
-                  displacement={collider.displacement}
-                  rotation={collider.rotation}
-                  scale={collider.scale}
-                />;
-
-            }
-          })}
+  return (
+    <div
+      className="preview-container"
+      style={{ backgroundColor: state.preview.backgroundColor > -1 ? PALETTE_COLORS[ColorMode.Default][state.preview.backgroundColor] : undefined }}
+    >
+      {animate &&
+        <div className='current-frame'>
+          {currentAnimationStep + 1}
         </div>
+      }
+      <div
+        className="preview-container-world"
+        style={{ perspective: state.preview.projectionDepth + 'px', zoom: state.preview.zoom }}
+      >
+        {state.preview.sprites && data.components?.sprites?.map((sprite, i) =>
+          <Sprite
+            key={`preview-sprite-${i}`}
+            animate={animate}
+            displacement={sprite.displacement}
+            frames={data.animations?.totalFrames || 1}
+            canScale={sprite.bgmapMode === BgmapMode.Affine}
+            projectionDepth={state.preview.projectionDepth}
+            currentAnimationFrame={animation?.frames[currentAnimationStep - 1] ?? currentAnimationStep}
+            highlighted={state.currentComponent === `sprites-${i}`}
+            images={sprite.texture.files}
+            index={i}
+            flipHorizontally={sprite.texture.flip.horizontal}
+            flipVertically={sprite.texture.flip.vertical}
+            transparent={sprite.transparency !== Transparency.None}
+            palette={state.preview.palettes[sprite.texture.palette]}
+          />
+        )}
+        {state.preview.colliders && data.components?.colliders?.map((collider, i) => {
+          switch (collider.type) {
+            case ColliderType.Box:
+              return <BoxCollider
+                size={collider.pixelSize}
+                displacement={collider.displacement}
+                rotation={collider.rotation}
+                scale={collider.scale}
+              />;
+
+          }
+        })}
       </div>
-    }
-  </>;
+    </div>
+  );
 }

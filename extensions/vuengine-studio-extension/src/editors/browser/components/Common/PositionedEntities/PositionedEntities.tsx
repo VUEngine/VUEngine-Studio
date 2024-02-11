@@ -1,5 +1,4 @@
 import { QuickPickItem, QuickPickOptions, nls } from '@theia/core';
-import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { PositionedEntityData } from '../../EntityEditor/EntityEditorTypes';
@@ -61,20 +60,6 @@ export default function PositionedEntities(props: PositionedEntitiesProps): Reac
         }
     };
 
-    const removePositionedEntity = async (index: number): Promise<void> => {
-        const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/editors/removePositionedEntity', 'Remove Entity'),
-            msg: nls.localize('vuengine/editors/areYouSureYouWantToRemoveEntity', 'Are you sure you want to remove this entity?'),
-        });
-        const confirmed = await dialog.open();
-        if (confirmed) {
-            updatePositionedEntities([
-                ...positionedEntities.slice(0, index),
-                ...positionedEntities.slice(index + 1)
-            ]);
-        }
-    };
-
     const updatePositionedEntity = (index: number, partialPositionedEntityData: Partial<PositionedEntityData>): void => {
         const updatedPositionedEntityArray = [...positionedEntities];
         updatedPositionedEntityArray[index] = {
@@ -91,7 +76,6 @@ export default function PositionedEntities(props: PositionedEntitiesProps): Reac
                 key={`positioned-entity-${index}`}
                 positionedEntity={child}
                 updatePositionedEntity={(partialPositionedEntity: Partial<PositionedEntityData>) => updatePositionedEntity(index, partialPositionedEntity)}
-                removePositionedEntity={() => removePositionedEntity(index)}
             />
         )}
         <button
