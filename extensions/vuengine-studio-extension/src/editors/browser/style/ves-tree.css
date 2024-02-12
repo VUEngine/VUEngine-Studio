@@ -34,6 +34,7 @@
     display: flex;
     flex-grow: 1;
     gap: 5px;
+    overflow: hidden;
 }
 
 .ves-tree-node.empty {
@@ -52,6 +53,9 @@
 
 .ves-tree-node-name {
     flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .ves-tree-node-actions {

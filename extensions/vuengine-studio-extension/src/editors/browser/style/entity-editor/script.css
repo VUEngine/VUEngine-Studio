@@ -11,11 +11,11 @@
 .scripted-action-container.root .scripted-action,
 .scripted-action-container.end .scripted-action {
     background-color: var(--theia-dropdown-border);
-    cursor: default;
     justify-content: center;
 }
-
-.scripted-action-container.root .scripted-action:hover,
+.scripted-action-container.end .scripted-action {
+    cursor: default;
+}
 .scripted-action-container.end .scripted-action:hover {
     border-color: transparent;
 }

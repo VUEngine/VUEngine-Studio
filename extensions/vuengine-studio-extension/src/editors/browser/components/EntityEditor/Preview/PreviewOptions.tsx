@@ -1,24 +1,16 @@
-import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import ColorSelector from '../../Common/ColorSelector';
 import HContainer from '../../Common/HContainer';
-import Palette from '../../Common/Palette';
 import VContainer from '../../Common/VContainer';
 import {
   EntityEditorContext,
-  EntityEditorContextType
+  EntityEditorContextType,
+  MAX_PREVIEW_ZOOM,
+  MIN_PREVIEW_ZOOM
 } from '../EntityEditorTypes';
 
 export default function PreviewOptions(): React.JSX.Element {
   const { state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
-
-  const setBooleanStateProperty = (property: string, checked: boolean) =>
-    setState({
-      preview: {
-        ...state.preview,
-        [property]: checked,
-      },
-    });
 
   const setBackgroundColor = (backgroundColor: number) =>
     setState({
@@ -28,57 +20,64 @@ export default function PreviewOptions(): React.JSX.Element {
       },
     });
 
+  const setZoom = (zoom: number) => {
+    if (zoom < MIN_PREVIEW_ZOOM) {
+      zoom = MIN_PREVIEW_ZOOM;
+    }
+    if (zoom > MAX_PREVIEW_ZOOM) {
+      zoom = MAX_PREVIEW_ZOOM;
+    }
+    setState({
+      preview: {
+        ...state.preview,
+        zoom,
+      },
+    });
+  };
+
   return (
-    <VContainer gap={15}>
+    <VContainer alignItems='end' gap={15}>
+      <HContainer>
+        <button
+          className='theia-button secondary'
+          disabled={state.preview.zoom === MIN_PREVIEW_ZOOM}
+          onClick={() => setZoom(state.preview.zoom - 1)}
+        >
+          <i className='codicon codicon-zoom-out' />
+        </button>
+        <input
+          type='text'
+          className='theia-input'
+          style={{ padding: 0, textAlign: 'center', width: 40 }}
+          value={state.preview.zoom}
+          disabled
+        />
+        <button
+          className='theia-button secondary'
+          disabled={state.preview.zoom === MAX_PREVIEW_ZOOM}
+          onClick={() => setZoom(state.preview.zoom + 1)}
+        >
+          <i className='codicon codicon-zoom-in' />
+        </button>
+      </HContainer>
       <VContainer>
-        <label>
-          {nls.localize('vuengine/entityEditor/zoom', 'Zoom')}
-        </label>
-        <HContainer>
-          <input
-            type="range"
-            value={state.preview.zoom}
-            max={10}
-            min={1}
-            onChange={e =>
-              setState({
-                preview: {
-                  ...state.preview,
-                  zoom: parseInt(e.target.value),
-                },
-              })
-            }
-          />
-          <div style={{ minWidth: 24, textAlign: 'right', width: 24 }}>
-            {state.preview.zoom}
-          </div>
-        </HContainer>
-      </VContainer>
-      <VContainer>
-        <label>
-          {nls.localize('vuengine/entityEditor/options', 'Options')}
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            checked={state.preview.anaglyph}
-            onChange={e =>
-              setBooleanStateProperty('anaglyph', e.target.checked)
-            }
-          />
-          Anaglyph Display Mode
-        </label>
-      </VContainer>
-      <VContainer>
-        <label>
-          {nls.localize('vuengine/entityEditor/background', 'Background')}
-        </label>
         <ColorSelector
           color={state.preview.backgroundColor}
           updateColor={setBackgroundColor}
           includeTransparent
         />
       </VContainer>
+      {/*
+      <HContainer>
+        <input
+          type="checkbox"
+          checked={state.preview.anaglyph}
+          onChange={e =>
+            setBooleanStateProperty('anaglyph', e.target.checked)
+          }
+        />
+        Anaglyph
+      </HContainer>
       <VContainer>
         <label>
           {nls.localize('vuengine/entityEditor/palettes', 'Palettes')}
@@ -104,6 +103,7 @@ export default function PreviewOptions(): React.JSX.Element {
           </HContainer>
         ))}
       </VContainer>
+      */}
     </VContainer>
   );
 }

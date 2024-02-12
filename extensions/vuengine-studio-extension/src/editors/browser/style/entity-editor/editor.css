@@ -1,6 +1,9 @@
-
 .entityEditor {
-    position: relative;
+    padding: 0 !important;
+}
+
+.entityEditor > div {
+    padding: var(--padding);
 }
 
 .entityEditor .empty {

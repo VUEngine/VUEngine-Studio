@@ -2,6 +2,7 @@ import React from 'react';
 import { ConversionResult, ImageCompressionType } from '../../../../images/browser/ves-images-types';
 import { DataSection } from '../Common/CommonTypes';
 import { EntityEditorSaveDataOptions } from './EntityEditor';
+import { ScriptType, ScriptedActionData } from './Scripts/ScriptTypes';
 
 // @ts-ignore
 export const EntityEditorContext = React.createContext<EntityEditorContextType>({});
@@ -27,6 +28,8 @@ export const STEP_WIREFRAME_DISPLACEMENT = 0.1;
 export const MIN_SPHERE_RADIUS = 0;
 export const MAX_SPHERE_RADIUS = 512;
 export const STEP_SPHERE_RADIUS = 0.1;
+export const MIN_PREVIEW_ZOOM = 1;
+export const MAX_PREVIEW_ZOOM = 10;
 
 export enum SpriteType {
     Bgmap = 'Bgmap',
@@ -133,6 +136,8 @@ export interface WireframeData {
 
 export interface ScriptData {
     name: string
+    type: ScriptType
+    script: ScriptedActionData[]
 }
 
 export interface AnimationData {

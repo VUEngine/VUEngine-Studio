@@ -3,14 +3,17 @@ import { ConversionResult } from '../../../../images/browser/ves-images-types';
 import { EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/HContainer';
 import VContainer from '../Common/VContainer';
-import CurrentComponent from './Components/CurrentComponent';
 import ComponentTree from './Components/ComponentTree';
+import CurrentComponent from './Components/CurrentComponent';
+import EntityMeta from './Entity/EntityMeta';
 import {
   EntityData,
   EntityEditorContext,
   EntityEditorState,
 } from './EntityEditorTypes';
 import Preview from './Preview/Preview';
+import Script from './Scripts/Script';
+import PreviewOptions from './Preview/PreviewOptions';
 
 interface EntityEditorProps {
   data: EntityData;
@@ -235,44 +238,49 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
     const isMultiFileAnimation = mostFilesOnASprite > 1;
 
     return (
-      <VContainer className="entityEditor">
-        <EntityEditorContext.Provider
-          value={{
-            state: this.state,
-            setState: this.updateState.bind(this),
-            data,
-            setData: this.setData.bind(this),
-          }}
-        >
-          <HContainer gap={20} grow={1} overflow='hidden'>
-            <EntityEditorContext.Consumer>
-              {context =>
-                <VContainer gap={15} overflow='auto' style={{ width: 200 }}>
+      <EntityEditorContext.Provider
+        value={{
+          state: this.state,
+          setState: this.updateState.bind(this),
+          data,
+          setData: this.setData.bind(this),
+        }}
+      >
+        <HContainer className="entityEditor" gap={0} grow={1} overflow='hidden'>
+          <EntityEditorContext.Consumer>
+            {context =>
+              <VContainer gap={30} overflow='hidden' style={{ maxWidth: 200, minWidth: 200 }}>
+                <VContainer gap={15} grow={1} overflow='auto'>
+                  <EntityMeta />
                   <ComponentTree />
-                  {/*
+                </VContainer>
+                {!this.state.currentComponent?.startsWith('scripts-') &&
                   <PreviewOptions />
-                  */}
-                </VContainer>
-              }
-            </EntityEditorContext.Consumer>
-            <EntityEditorContext.Consumer>
-              {context =>
-                <VContainer gap={15} grow={1}>
-                  <Preview />
-                </VContainer>
-              }
-            </EntityEditorContext.Consumer>
-            <EntityEditorContext.Consumer>
-              {context =>
+                }
+              </VContainer>
+            }
+          </EntityEditorContext.Consumer>
+          <EntityEditorContext.Consumer>
+            {context =>
+              this.state.currentComponent?.startsWith('scripts-')
+                ? <Script
+                  index={parseInt(this.state.currentComponent?.split('-')[1] ?? '0')}
+                />
+                : <Preview />
+            }
+          </EntityEditorContext.Consumer>
+          <EntityEditorContext.Consumer>
+            {context =>
+              <VContainer gap={15} overflow='auto' style={{ maxWidth: 300, minWidth: 300 }}>
                 <CurrentComponent
                   isMultiFileAnimation={isMultiFileAnimation}
                 />
-              }
-            </EntityEditorContext.Consumer>
-          </HContainer>
+              </VContainer>
+            }
+          </EntityEditorContext.Consumer>
+        </HContainer>
 
-        </EntityEditorContext.Provider>
-      </VContainer>
+      </EntityEditorContext.Provider>
     );
   }
 }

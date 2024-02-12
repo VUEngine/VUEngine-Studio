@@ -1,0 +1,171 @@
+import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
+import React, { useContext } from 'react';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import VContainer from '../../Common/VContainer';
+import { EntityEditorContext, EntityEditorContextType, ScriptData } from '../EntityEditorTypes';
+import { AVAILABLE_ACTIONS, ActionConfigData, ScriptType } from './ScriptTypes';
+import { nls } from '@theia/core';
+import RadioSelect from '../../Common/RadioSelect';
+
+export default function ScriptedActionDetail(): React.JSX.Element {
+    const { services } = useContext(EditorsContext) as EditorsContextType;
+    const { data, setData, state } = useContext(EntityEditorContext) as EntityEditorContextType;
+
+    const currentComponentParts = state.currentComponent.split('-');
+    const currentScriptIndex = currentComponentParts[1] ? parseInt(currentComponentParts[1]) : 0;
+    const currentActionIndex = currentComponentParts[2] ? parseInt(currentComponentParts[2]) : -1;
+    const scriptConfig = data.components.scripts[currentScriptIndex];
+    const script = scriptConfig.script ?? [];
+    const currentScriptedAction = script[currentActionIndex];
+    const currentAction = AVAILABLE_ACTIONS[currentScriptedAction?.id ?? 0];
+
+    const setConfigValue = (key: string, value: any): void => {
+        const updatedScripts = [...data.components.scripts || []];
+        if (!updatedScripts[currentScriptIndex].script[currentActionIndex].config) {
+            updatedScripts[currentScriptIndex].script[currentActionIndex].config = {};
+        }
+        updatedScripts[currentScriptIndex].script[currentActionIndex].config![key] = value;
+
+        setData({
+            components: {
+                ...data.components,
+                scripts: updatedScripts,
+            }
+        });
+    };
+
+    const updateScript = (partialScriptData: Partial<ScriptData>): void => {
+        const updatedScripts = [...data.components.scripts || []];
+        updatedScripts[currentScriptIndex] = {
+            ...updatedScripts[currentScriptIndex],
+            ...partialScriptData,
+        };
+
+        setData({
+            components: {
+                ...data.components,
+                scripts: updatedScripts,
+            }
+        });
+    };
+
+    const setName = (name: string): void => {
+        updateScript({ name });
+    };
+    const setType = (type: ScriptType): void => {
+        updateScript({ type });
+    };
+
+    const getConfigControl = (config: ActionConfigData): React.JSX.Element => {
+        switch (config.type) {
+            case 'boolean':
+                // TODO
+                return <></>;
+            case 'type':
+                const items = Object.values(services.vesProjectService.getProjectDataItemsForType(config.typeId || '') || {});
+                // @ts-ignore
+                const defaultValue = items.find(item => item.name === config.default)?._id || '';
+                return <VContainer>
+                    <label>{config.label}</label>
+                    <SelectComponent
+                        options={items
+                            .sort((a, b) => {
+                                // @ts-ignore
+                                if (a.name > b.name) { return 1; }
+                                // @ts-ignore
+                                if (a.name < b.name) { return -1; }
+                                return 0;
+                            })
+                            .map(f => ({
+                                // @ts-ignore
+                                value: f._id, label: f.name
+                            }))}
+                        defaultValue={currentScriptedAction.config ? currentScriptedAction.config[config.key] : defaultValue}
+                        onChange={option => setConfigValue(config.key, option.value)}
+                    />
+                </VContainer>;
+            default:
+                return <VContainer>
+                    <label>{config.label}</label>
+                    <input
+                        className='theia-input'
+                        type={config.type}
+                        min={config.min}
+                        max={config.max}
+                        step={config.step}
+                        value={currentScriptedAction.config ? currentScriptedAction.config[config.key] : config.default}
+                        onChange={e => setConfigValue(config.key, e.target.value)}
+                    />
+                </VContainer>;
+        }
+    };
+
+    return <VContainer gap={15}>
+        {currentActionIndex === -1 &&
+            <>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/editors/type', 'Type')}
+                    </label>
+                    <RadioSelect
+                        options={[
+                            { value: ScriptType.Custom, label: nls.localize('vuengine/entityEditor/scriptTypeCustom', 'Custom') },
+                            { value: ScriptType.Inherited, label: nls.localize('vuengine/entityEditor/scriptTypeInherited', 'Inherited') },
+                        ]}
+                        canSelectMany={false}
+                        allowBlank={false}
+                        defaultValue={scriptConfig.type}
+                        onChange={options => setType(options[0].value as ScriptType)}
+                    />
+                </VContainer>
+                {scriptConfig.type === ScriptType.Custom &&
+                    <VContainer>
+                        <label>
+                            {nls.localize('vuengine/editors/name', 'Name')}
+                        </label>
+                        <input
+                            className='theia-input'
+                            type='string'
+                            value={scriptConfig.name}
+                            onChange={e => setName(e.target.value)}
+                        />
+                    </VContainer>
+                }
+                {scriptConfig.type === ScriptType.Inherited &&
+                    <VContainer>
+                        <label>
+                            {nls.localize('vuengine/entityEditor/inheritedFunction', 'Inherited Function')}
+                        </label>
+                        <SelectComponent
+                            options={[{
+                                value: 'Entity Created',
+                                description: 'This function is being called right after the entity had been created.'
+                            }, {
+                                value: 'Resume',
+                                description: 'This function is being called when the game resumes after exiting a special state, e.g. pause screen.'
+                            }]}
+                            defaultValue={scriptConfig.name}
+                            onChange={option => setName(option.value!)}
+                        />
+                    </VContainer>
+                }
+            </>
+        }
+        {currentActionIndex > -1 &&
+            <>
+                {currentAction.config &&
+                    <>
+                        {currentAction.config && currentAction.config.map((c, i) =>
+                            <div key={'control-' + i}>
+                                {getConfigControl(c)}
+                            </div>
+                        )}
+                    </>
+                }
+                {!currentAction.config &&
+                    nls.localize('vuengine/entityEditor/noActionConfiguration', 'This action does not need any configuration.')
+                }
+            </>
+        }
+    </VContainer>;
+}

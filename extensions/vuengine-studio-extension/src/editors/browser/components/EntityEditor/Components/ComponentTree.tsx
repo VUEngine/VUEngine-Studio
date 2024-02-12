@@ -5,6 +5,7 @@ import VContainer from '../../Common/VContainer';
 import { BgmapMode, ColliderType, ComponentKey, DisplayMode, EntityEditorContext, EntityEditorContextType, Transparency, WireframeType } from '../EntityEditorTypes';
 import ComponentTreeNode from './ComponentTreeNode';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import { ScriptType } from '../Scripts/ScriptTypes';
 
 interface ComponentType {
     key: ComponentKey | 'extraProperties' | 'physics'
@@ -172,6 +173,8 @@ export default function ComponentTree(): React.JSX.Element {
         const scripts = [...data.components?.scripts || []];
         scripts.push({
             name: nls.localize('vuengine/entityEditor/script', 'Script'),
+            type: ScriptType.Custom,
+            script: [],
         });
 
         setData({

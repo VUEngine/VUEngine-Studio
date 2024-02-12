@@ -22,6 +22,7 @@ import {
 import Sprite from '../Sprites/Sprite';
 import SpritesSettings from '../Sprites/SpritesSettings';
 import Wireframe from '../Wireframes/Wireframe';
+import ScriptedActionDetail from '../Scripts/ScriptedActionDetail';
 
 interface CurrentComponentProps {
     isMultiFileAnimation: boolean
@@ -48,7 +49,6 @@ export default function CurrentComponent(props: CurrentComponentProps): React.JS
 
     const getComponentEditor = (): React.JSX.Element => {
         const [type, indexString] = state.currentComponent.split('-');
-        console.log(type, indexString);
         const index = parseInt(indexString || '-1');
         if (index > -1) {
             switch (type) {
@@ -75,7 +75,7 @@ export default function CurrentComponent(props: CurrentComponentProps): React.JS
                         updateCollider={(partialData: Partial<ColliderData>) => updateComponent('colliders', index, partialData)}
                     />;
                 case 'scripts':
-                    return <></>;
+                    return <ScriptedActionDetail />;
                 case 'sprites':
                     return <Sprite
                         sprite={data.components.sprites[index]}
@@ -103,7 +103,7 @@ export default function CurrentComponent(props: CurrentComponentProps): React.JS
     const componentEditor = getComponentEditor();
 
     return (
-        <VContainer gap={30} overflow='auto' style={{ width: 300 }}>
+        <VContainer gap={30}>
             {state.currentComponent?.startsWith('sprites') &&
                 <SpritesSettings
                     isMultiFileAnimation={isMultiFileAnimation}

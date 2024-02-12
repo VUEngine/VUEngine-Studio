@@ -12,6 +12,7 @@ import {
   Transparency,
 } from '../EntityEditorTypes';
 import Sprite from './Sprite';
+import { nls } from '@theia/core';
 
 export default function Preview(): React.JSX.Element {
   const { state, data } = useContext(EntityEditorContext) as EntityEditorContextType;
@@ -55,7 +56,7 @@ export default function Preview(): React.JSX.Element {
     >
       {animate &&
         <div className='current-frame'>
-          {currentAnimationStep + 1}
+          {nls.localize('vuengine/entityEditor/frame', 'Frame')} {currentAnimationStep + 1}
         </div>
       }
       <div
