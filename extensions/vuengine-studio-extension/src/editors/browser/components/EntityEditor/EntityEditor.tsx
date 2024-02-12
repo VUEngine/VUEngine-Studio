@@ -249,7 +249,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
         <HContainer className="entityEditor" gap={0} grow={1} overflow='hidden'>
           <EntityEditorContext.Consumer>
             {context =>
-              <VContainer gap={30} overflow='hidden' style={{ maxWidth: 200, minWidth: 200 }}>
+              <VContainer gap={15} overflow='hidden' style={{ maxWidth: 200, minWidth: 200 }}>
                 <VContainer gap={15} grow={1} overflow='auto'>
                   <EntityMeta />
                   <ComponentTree />

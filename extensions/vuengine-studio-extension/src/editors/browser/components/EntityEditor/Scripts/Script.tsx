@@ -127,6 +127,7 @@ export default function Script(props: ScriptProps): React.JSX.Element {
             />
             {script.map((s, i) =>
                 <ScriptedAction
+                    key={i}
                     action={AVAILABLE_ACTIONS[s.id]}
                     scriptedAction={script[i]}
                     addAction={() => addAction(i + 1)}

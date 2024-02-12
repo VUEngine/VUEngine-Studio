@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 export interface RadioSelectOption {
     value: string | number | boolean
@@ -15,28 +15,33 @@ interface RadioSelectProps {
 
 export default function RadioSelect(props: RadioSelectProps): React.JSX.Element {
     const { allowBlank, options, canSelectMany, defaultValue, onChange } = props;
-
+    const [currentIndexes, setCurrentIndexes] = useState<number[]>([]);
+    const [classes, setClasses] = useState<string>('radioSelect');
     const numberOfOptions = options.length;
 
-    let defaultValueArray: (string | number | boolean)[] = [];
-    if (!Array.isArray(defaultValue)) {
-        defaultValueArray = [defaultValue];
-    } else {
-        defaultValueArray = defaultValue;
-    }
-    const defaultValueIndexes: number[] = [];
-    options.map((o, i) => {
-        if (defaultValueArray.includes(o.value)) {
-            defaultValueIndexes.push(i);
+    const getValues = () => {
+        let defaultValueArray: (string | number | boolean)[] = [];
+        if (!Array.isArray(defaultValue)) {
+            defaultValueArray = [defaultValue];
+        } else {
+            defaultValueArray = defaultValue;
         }
-    });
+        const defaultValueIndexes: number[] = [];
+        options.map((o, i) => {
+            if (defaultValueArray.includes(o.value)) {
+                defaultValueIndexes.push(i);
+            }
+        });
+        setCurrentIndexes(defaultValueIndexes);
+    };
 
-    const [currentIndexes, setCurrentIndexes] = useState<number[]>(defaultValueIndexes);
-
-    const classes: string[] = ['radioSelect'];
-    if (canSelectMany) {
-        classes.push('canSelectMany');
-    }
+    const getClasses = () => {
+        const c: string[] = ['radioSelect'];
+        if (canSelectMany) {
+            c.push('canSelectMany');
+        }
+        setClasses(c.join(' '));
+    };
 
     const handleKeyPress = (e: React.KeyboardEvent): void => {
         if (!canSelectMany && e.key === 'ArrowLeft') {
@@ -89,7 +94,15 @@ export default function RadioSelect(props: RadioSelectProps): React.JSX.Element 
         onChange(updatedOptions);
     };
 
-    return <div className={classes.join(' ')} onKeyDown={handleKeyPress} tabIndex={0}>
+    useEffect(() => {
+        getValues();
+        getClasses();
+    }, [
+        canSelectMany,
+        defaultValue,
+    ]);
+
+    return <div className={classes} onKeyDown={handleKeyPress} tabIndex={0}>
         {options.map((o, i) =>
             <div
                 key={`radio-select-option-${i}`}

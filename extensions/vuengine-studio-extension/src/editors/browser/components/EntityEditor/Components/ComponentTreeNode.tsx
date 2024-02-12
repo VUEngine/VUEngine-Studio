@@ -4,14 +4,17 @@ import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext } from 'react';
 import { NodeRendererProps } from 'react-arborist';
 import { ComponentKey, EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
+import { ScriptType } from '../Scripts/ScriptTypes';
 
 export default function ComponentTreeNode(props: NodeRendererProps<any>): React.JSX.Element {
     const { node, style, dragHandle } = props;
     const { data, setData, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
 
+    const [type, indexString] = node.id.split('-');
+    const index = parseInt(indexString || '-1');
+
     const getIcon = (): React.JSX.Element => {
         if (node.isLeaf) {
-            const [type] = node.id.split('-');
             switch (type) {
                 default:
                     return <File size={16} />;
@@ -52,16 +55,13 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
     };
 
     const handleRemove = async () => {
-        setState({ currentComponent: '' });
-
         const dialog = new ConfirmDialog({
             title: nls.localize('vuengine/entityEditor/removeComponent', 'Remove Component'),
             msg: nls.localize('vuengine/entityEditor/areYouSureYouWantToRemoveComponent', 'Are you sure you want to remove this component?'),
         });
         const confirmed = await dialog.open();
         if (confirmed) {
-            const [type, indexString] = node.id.split('-');
-            const index = parseInt(indexString || '0');
+            setState({ currentComponent: '' });
             switch (type) {
                 case 'animations':
                 case 'behaviors':
@@ -97,16 +97,41 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
         });
     };
 
-    const removeComponent = async (key: ComponentKey, index: number): Promise<void> => {
+    const removeComponent = async (key: ComponentKey, i: number): Promise<void> => {
         setData({
             components: {
                 ...data.components,
                 [key]: [
-                    ...data.components[key].slice(0, index),
-                    ...data.components[key].slice(index + 1)
+                    ...data.components[key].slice(0, i),
+                    ...data.components[key].slice(i + 1)
                 ],
             }
         });
+    };
+
+    const setName = (name: string): void => {
+        const updatedComponent = {
+            // @ts-ignore
+            ...data.components[type][index],
+            name,
+        };
+
+        if (type === 'scripts') {
+            updatedComponent.type = ScriptType.Custom;
+        }
+
+        const components = {
+            ...data.components,
+            [type]: [
+                // @ts-ignore
+                ...data.components[type].slice(0, index),
+                updatedComponent,
+                // @ts-ignore
+                ...data.components[type].slice(index + 1),
+            ]
+        };
+
+        setData({ components });
     };
 
     return (
@@ -124,14 +149,48 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
             <div
                 className='ves-tree-node-name'
                 onClick={handleClick}
+                onDoubleClick={() => {
+                    if (!node.parent?.isRoot && type !== 'children') {
+                        node.edit();
+                    }
+                }}
             >
-                {node.data.name}
+                {node.isEditing ? (
+                    <input
+                        type="text"
+                        defaultValue={node.data.name}
+                        onFocus={e => e.currentTarget.select()}
+                        onBlur={e => {
+                            node.submit(e.currentTarget.value);
+                            setName(e.currentTarget.value);
+                        }}
+                        onKeyDown={e => {
+                            if (e.key === 'Escape') {
+                                node.reset();
+                            } else if (e.key === 'Enter') {
+                                node.submit(e.currentTarget.value);
+                                setName(e.currentTarget.value);
+                            };
+                        }}
+                        autoFocus
+                    />
+                ) : (
+                    node.data.name
+                )}
             </div>
             <div className='ves-tree-node-actions'>
+                {node.isLeaf && !node.parent?.isRoot && type !== 'children' &&
+                    <i
+                        className='codicon codicon-edit'
+                        onClick={() => node.edit()}
+                        title={nls.localize('vuengine/entityEditor/editName', 'Edit Name')}
+                    />
+                }
                 {node.isLeaf &&
                     <i
-                        className='codicon codicon-remove'
+                        className='codicon codicon-trash'
                         onClick={handleRemove}
+                        title={nls.localize('vuengine/entityEditor/removeComponent', 'Remove Component')}
                     />
                 }
             </div>

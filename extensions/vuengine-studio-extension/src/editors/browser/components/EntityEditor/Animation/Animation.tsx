@@ -1,5 +1,7 @@
 import { nls } from '@theia/core';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import { ProjectContributor } from '../../../../../project/browser/ves-project-types';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import VContainer from '../../Common/VContainer';
@@ -20,7 +22,16 @@ interface AnimationProps {
 
 export default function Animation(props: AnimationProps): React.JSX.Element {
     const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { services } = useContext(EditorsContext) as EditorsContextType;
     const { index, animation, updateAnimation, totalFrames } = props;
+    const [maxAnimationFrames, setMaxAnimationFrames] = useState<number>(256);
+
+    const getEngineSettings = async (): Promise<void> => {
+        await services.vesProjectService.projectItemsReady;
+        const engineConfig = services.vesProjectService.getProjectDataItemById(ProjectContributor.Project, 'EngineConfig');
+        // @ts-ignore
+        setMaxAnimationFrames(engineConfig?.animation?.maxFramesPerAnimationFunction || maxAnimationFrames);
+    };
 
     const setDefault = (): void => {
         setData({
@@ -70,6 +81,10 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
             ]
         });
     };
+
+    useEffect(() => {
+        getEngineSettings();
+    }, []);
 
     return <div>
         <VContainer gap={15}>
@@ -138,7 +153,7 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
             </HContainer>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/entityEditor/frames', 'Frames')} ({animation.frames.length})
+                    {nls.localize('vuengine/entityEditor/frames', 'Frames')} <span className='count'>{animation.frames.length}</span>
                 </label>
                 <HContainer alignItems='start' wrap='wrap'>
                     {animation.frames.map((f, i) =>
@@ -162,13 +177,18 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                             </button>
                         </HContainer>
                     )}
-                    <button
-                        className='theia-button add-button'
-                        onClick={addFrame}
-                        title={nls.localize('vuengine/entityEditor/addFrame', 'Add Frame')}
-                    >
-                        <i className='codicon codicon-plus' />
-                    </button>
+                    {animation.frames.length < maxAnimationFrames
+                        ? <button
+                            className='theia-button add-button'
+                            onClick={addFrame}
+                            title={nls.localize('vuengine/entityEditor/addFrame', 'Add Frame')}
+                        >
+                            <i className='codicon codicon-plus' />
+                        </button>
+                        : <div>
+                            {nls.localize('vuengine/entityEditor/frameLimitReaced', 'Frame limit reached. Edit in EngineConfig if necessary.')}
+                        </div>
+                    }
                 </HContainer>
             </VContainer>
         </VContainer>

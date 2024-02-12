@@ -49,51 +49,50 @@ export default function Preview(): React.JSX.Element {
     animation
   ]);
 
-  return (
-    <div
-      className="preview-container"
-      style={{ backgroundColor: state.preview.backgroundColor > -1 ? PALETTE_COLORS[ColorMode.Default][state.preview.backgroundColor] : undefined }}
-    >
-      {animate &&
-        <div className='current-frame'>
-          {nls.localize('vuengine/entityEditor/frame', 'Frame')} {currentAnimationStep + 1}
-        </div>
-      }
-      <div
-        className="preview-container-world"
-        style={{ perspective: state.preview.projectionDepth + 'px', zoom: state.preview.zoom }}
-      >
-        {state.preview.sprites && data.components?.sprites?.map((sprite, i) =>
-          <Sprite
-            key={`preview-sprite-${i}`}
-            animate={animate}
-            displacement={sprite.displacement}
-            frames={data.animations?.totalFrames || 1}
-            canScale={sprite.bgmapMode === BgmapMode.Affine}
-            projectionDepth={state.preview.projectionDepth}
-            currentAnimationFrame={animation?.frames[currentAnimationStep - 1] ?? currentAnimationStep}
-            highlighted={state.currentComponent === `sprites-${i}`}
-            images={sprite.texture.files}
-            index={i}
-            flipHorizontally={sprite.texture.flip.horizontal}
-            flipVertically={sprite.texture.flip.vertical}
-            transparent={sprite.transparency !== Transparency.None}
-            palette={state.preview.palettes[sprite.texture.palette]}
-          />
-        )}
-        {state.preview.colliders && data.components?.colliders?.map((collider, i) => {
-          switch (collider.type) {
-            case ColliderType.Box:
-              return <BoxCollider
-                size={collider.pixelSize}
-                displacement={collider.displacement}
-                rotation={collider.rotation}
-                scale={collider.scale}
-              />;
-
-          }
-        })}
+  return <div className='preview-container'>
+    {animate &&
+      <div className='current-frame'>
+        {nls.localize('vuengine/entityEditor/frame', 'Frame')} {currentAnimationStep + 1}
       </div>
+    }
+    <div
+      className="preview-container-world"
+      style={{
+        background: state.preview.backgroundColor > -1 ? PALETTE_COLORS[ColorMode.Default][state.preview.backgroundColor] : undefined,
+        perspective: state.preview.projectionDepth + 'px',
+        zoom: state.preview.zoom,
+      }}
+    >
+      {state.preview.sprites && data.components?.sprites?.map((sprite, i) =>
+        <Sprite
+          key={`preview-sprite-${i}`}
+          animate={animate}
+          displacement={sprite.displacement}
+          frames={data.animations?.totalFrames || 1}
+          canScale={sprite.bgmapMode === BgmapMode.Affine}
+          projectionDepth={state.preview.projectionDepth}
+          currentAnimationFrame={animation?.frames[currentAnimationStep - 1] ?? currentAnimationStep}
+          highlighted={state.currentComponent === `sprites-${i}`}
+          images={sprite.texture.files}
+          index={i}
+          flipHorizontally={sprite.texture.flip.horizontal}
+          flipVertically={sprite.texture.flip.vertical}
+          transparent={sprite.transparency !== Transparency.None}
+          palette={state.preview.palettes[sprite.texture.palette]}
+        />
+      )}
+      {state.preview.colliders && data.components?.colliders?.map((collider, i) => {
+        switch (collider.type) {
+          case ColliderType.Box:
+            return <BoxCollider
+              size={collider.pixelSize}
+              displacement={collider.displacement}
+              rotation={collider.rotation}
+              scale={collider.scale}
+            />;
+
+        }
+      })}
     </div>
-  );
+  </div>;
 }

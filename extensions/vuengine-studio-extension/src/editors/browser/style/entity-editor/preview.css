@@ -1,13 +1,18 @@
 .jsonforms-container .preview-container {
-    align-items: center;
     border-radius: 5px;
-    box-sizing: border-box;
-    display: flex;
-    height: 100%;
-    justify-content: center;
+    flex-grow: 1;
+    margin: var(--padding);
     overflow: hidden;
+    padding: 0;
     position: relative;
-    width: 100%;
+}
+
+.jsonforms-container .preview-container .current-frame {
+    left: var(--padding);
+    position: absolute;
+    text-align: right;
+    top: var(--padding);
+    z-index: 10;
 }
 
 .jsonforms-container .preview-container-world {
@@ -15,18 +20,19 @@
     background:
         linear-gradient(transparent, transparent 49.9%, rgba(0,0,0,.6) 49.9%, rgba(0,0,0,.6) 50.1%, transparent 50.1%),
         linear-gradient(90deg, transparent, transparent 49.9%, rgba(0,0,0,.6) 49.9%, rgba(0,0,0,.6) 50.1%, transparent 50.1%),
-        repeating-conic-gradient(rgba(0,0,0,.3) 0% 25%, transparent 0% 50%) 50% / 12px 12px;
+        repeating-conic-gradient(rgba(0,0,0,.3) 0% 25%, transparent 0% 50%) 50% / 16px 16px;
     background-position: center;
     box-sizing: border-box;
     display: flex;
-    justify-content: center;
     height: 100%;
+    justify-content: center;
+    overflow: hidden;
     position: relative;
     transform-style: preserve-3d;
     width: 100%;
 }
 
-.jsonforms-container .preview-container .sprite-error {
+.jsonforms-container .preview-container-world .sprite-error {
     align-items: center;
     border: 1px dashed red;
     display: flex;
@@ -35,7 +41,7 @@
     position: relative;
 }
 
-.jsonforms-container .preview-container .sprite-error::after {
+.jsonforms-container .preview-container-world .sprite-error::after {
     border-top: 1px dashed red;
     content: '';
     display: block;
@@ -44,19 +50,11 @@
     width: 150%;
 }
 
-.jsonforms-container .preview-container .sprite-error::before {
+.jsonforms-container .preview-container-world .sprite-error::before {
     border-top: 1px dashed red;
     content: '';
     display: block;
     position: absolute;
     transform: rotate(-45deg);
     width: 150%;
-}
-
-.jsonforms-container .preview-container .current-frame {
-    left: calc(2 * var(--padding));
-    position: absolute;
-    text-align: right;
-    top: calc(2 * var(--padding));
-    z-index: 10;
 }

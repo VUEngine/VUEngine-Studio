@@ -33,7 +33,7 @@
     align-items: center;
     display: flex;
     flex-grow: 1;
-    gap: 5px;
+    gap: 2px;
     overflow: hidden;
 }
 
@@ -54,8 +54,19 @@
 .ves-tree-node-name {
     flex-grow: 1;
     overflow: hidden;
+    padding-left: 3px;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.ves-tree-node-name input {
+    background-color: transparent;
+    border: 1px solid red;
+    border-radius: 2px;
+    box-sizing: border-box;
+    color: var(--theia-foreground-color);
+    translate: -3px;
+    width: 100%;
 }
 
 .ves-tree-node-actions {
@@ -64,4 +75,14 @@
 
 .ves-tree-node:hover .ves-tree-node-actions {
     display: flex;
+}
+
+.ves-tree-node-actions i {
+    font-size: 100% !important;
+    border-radius: 2px;
+    padding: 3px;
+}
+
+.ves-tree-node-actions i:hover {
+    background-color: rgba(0,0,0,.3);
 }
