@@ -1,3 +1,4 @@
+import { nls } from "@theia/core";
 import React from "react";
 import AbstractVesPluginComponent from "./AbstractVesPluginComponent";
 
@@ -21,9 +22,12 @@ export default class VesPluginComponent extends AbstractVesPluginComponent {
                 <div className='noWrapInfo theia-vsx-extension-description'>{description}</div>
                 <div className='theia-vsx-extension-action-bar'>
                     <span className='noWrapInfo vesPluginTags'>
-                        {
+                        {tags && Object.keys(tags).length
                             // @ts-ignore
-                            tags && Object.keys(tags).map(key => <span key={key}>{tags[key]}</span>)
+                            ? Object.keys(tags).map(key => <span key={key} className="vesTag">{tags[key]}</span>)
+                            : <span style={{ opacity: .3 }}>
+                                {nls.localize('vuengine/plugins/noTags', 'No Tags')}
+                            </span>
                         }
                     </span>
                     {/* <span className='noWrapInfo theia-vsx-extension-publisher'>{author}</span> */}

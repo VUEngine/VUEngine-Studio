@@ -1,5 +1,5 @@
 import { CommandService, nls } from '@theia/core';
-import { HoverService, Message, ReactWidget, Widget } from '@theia/core/lib/browser';
+import { HoverService, Message, PreferenceService, ReactWidget, Widget } from '@theia/core/lib/browser';
 import { Deferred } from '@theia/core/lib/common/promise-util';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
@@ -10,6 +10,7 @@ import { VesProjectService } from '../../project/browser/ves-project-service';
 import VesPluginEditorComponent from './components/VesPluginEditorComponent';
 import { VesPlugin } from './ves-plugin';
 import { VesPluginsModel } from './ves-plugins-model';
+import { VesPluginsPathsService } from './ves-plugins-paths-service';
 
 @injectable()
 export class VesPluginEditor extends ReactWidget {
@@ -19,6 +20,8 @@ export class VesPluginEditor extends ReactWidget {
     protected readonly fileService: FileService;
     @inject(HoverService)
     protected readonly hoverService: HoverService;
+    @inject(PreferenceService)
+    protected readonly preferenceService: PreferenceService;
     @inject(VesPlugin)
     protected readonly plugin: VesPlugin;
     @inject(VesPluginsModel)
@@ -27,6 +30,8 @@ export class VesPluginEditor extends ReactWidget {
     protected readonly workspaceService: WorkspaceService;
     @inject(VesCommonService)
     protected readonly vesCommonService: VesCommonService;
+    @inject(VesPluginsPathsService)
+    readonly vesPluginsPathsService: VesPluginsPathsService;
     @inject(VesProjectService)
     protected readonly vesProjectService: VesProjectService;
 
@@ -95,9 +100,11 @@ export class VesPluginEditor extends ReactWidget {
             commandService={this.commandService}
             fileService={this.fileService}
             hoverService={this.hoverService}
+            preferenceService={this.preferenceService}
             workspaceService={this.workspaceService}
             vesCommonService={this.vesCommonService}
             vesProjectService={this.vesProjectService}
+            vesPluginsPathsService={this.vesPluginsPathsService}
         />;
     }
 }

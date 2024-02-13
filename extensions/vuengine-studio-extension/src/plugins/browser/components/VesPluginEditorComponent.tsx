@@ -9,8 +9,9 @@ import * as showdown from 'showdown';
 import HContainer from "../../../editors/browser/components/Common/HContainer";
 import InfoLabel from "../../../editors/browser/components/Common/InfoLabel";
 import VContainer from "../../../editors/browser/components/Common/VContainer";
+import { VesPlugin } from "../ves-plugin";
 import { VesPluginsCommands } from "../ves-plugins-commands";
-import { PluginConfiguration, PluginConfigurationDataType } from "../ves-plugins-types";
+import { PluginConfiguration, PluginConfigurationDataType, USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } from "../ves-plugins-types";
 import AbstractVesPluginComponent, { AbstractVesPluginComponentProps } from "./AbstractVesPluginComponent";
 import PluginDefaultInput from "./PluginDefaultInput";
 
@@ -35,13 +36,13 @@ export default class VesPluginEditorComponent extends AbstractVesPluginComponent
         return this._scrollContainer;
     }
 
-    protected async renderReadme(path: string | undefined): Promise<string> {
+    protected async renderReadme(plugin: VesPlugin): Promise<string> {
         let renderedReadme = '';
-        const readmeUri = new URI(path?.replace(/\\/g, '/')).withScheme('file');
-        if (path && await this.props.fileService?.exists(readmeUri)) {
+        const readmeUri = new URI(plugin.readme?.replace(/\\/g, '/')).withScheme('file');
+        if (plugin.readme && await this.props.fileService?.exists(readmeUri)) {
             const rawReadme = await this.props.fileService?.readFile(readmeUri);
             if (rawReadme) {
-                const readme = this.compileReadme(rawReadme.value.toString());
+                const readme = await this.compileReadme(rawReadme.value.toString(), plugin);
                 renderedReadme = DOMPurify.sanitize(readme);
             }
         }
@@ -49,21 +50,34 @@ export default class VesPluginEditorComponent extends AbstractVesPluginComponent
         return renderedReadme;
     }
 
-    protected compileReadme(readmeMarkdown: string): string {
+    protected async compileReadme(readmeMarkdown: string, plugin: VesPlugin): Promise<string> {
         const markdownConverter = new showdown.Converter({
             noHeaderId: true,
             strikethrough: true,
             headerLevelStart: 2
         });
 
-        const readmeHtml = markdownConverter.makeHtml(readmeMarkdown);
+        await this.props.preferenceService?.ready;
+        const enginePluginsUri = await this.props.vesPluginsPathsService?.getEnginePluginsUri();
+        const userPluginsUri = await this.props.vesPluginsPathsService?.getUserPluginsUri();
+        let baseUri = new URI;
+        if (plugin.id.startsWith(VUENGINE_PLUGINS_PREFIX)) {
+            baseUri = enginePluginsUri!.resolve(plugin.id.replace(VUENGINE_PLUGINS_PREFIX, ''));
+        } else if (plugin.id.startsWith(USER_PLUGINS_PREFIX)) {
+            baseUri = userPluginsUri!.resolve(plugin.id.replace(USER_PLUGINS_PREFIX, ''));
+        }
+
+        const readmeHtml = markdownConverter.makeHtml(readmeMarkdown
+            .replace('](', '](' + baseUri.path.fsPath() + '/')
+        );
+
         return sanitize(readmeHtml, {
             allowedTags: sanitize.defaults.allowedTags.concat(['h1', 'h2', 'h3', 'h4', 'img'])
         });
     }
 
     async componentDidMount() {
-        const renderedReadme = await this.renderReadme(this.props.plugin.readme);
+        const renderedReadme = await this.renderReadme(this.props.plugin);
         await this.props.vesProjectService?.projectItemsReady;
 
         const workspaceRootUri = this.props.workspaceService.tryGetRoots()[0]?.resource;
@@ -190,7 +204,7 @@ export default class VesPluginEditorComponent extends AbstractVesPluginComponent
                         {license && <span className='license'>{license}</span>}
                         {tags && <span className='noWrapInfo vesPluginTags'>{
                             // @ts-ignore
-                            Object.keys(tags).map(key => <span onClick={() => this.searchTag(key)} key={key}>{tags[key]}</span>)
+                            Object.keys(tags).map(key => <span className='vesTag' onClick={() => this.searchTag(key)} key={key}>{tags[key]}</span>)
                         }</span>}
                     </div>
                     <div className='description noWrapInfo'> {description} </div>

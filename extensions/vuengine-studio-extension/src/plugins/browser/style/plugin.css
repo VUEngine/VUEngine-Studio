@@ -1,5 +1,5 @@
-.ves-plugin-editor .theia-vsx-extension-icon.vesPlaceholder i,
-.ves-plugin-editor .icon-container.vesPlaceholder i {
+.theia-vsx-extension-icon.vesPlaceholder i,
+.icon-container.vesPlaceholder i {
     background: var(--theia-foreground);
     border-radius: 50%;
     color: var(--theia-sideBar-background);
@@ -11,14 +11,14 @@
     width: var(--theia-vsx-extension-icon-size);
 }
 
-.ves-plugin-editor .icon-container.vesPlaceholder i {
+.icon-container.vesPlaceholder i {
     font-size: 64px;
     height: 126px;
     line-height: 126px;
     width: 126px;
 }
 
-.ves-plugin-editor .vesPluginTags span {
+.vesPluginTags .vesTag {
     background: var(--theia-foreground);
     border-radius: 10px;
     color: var(--theia-sideBar-background);

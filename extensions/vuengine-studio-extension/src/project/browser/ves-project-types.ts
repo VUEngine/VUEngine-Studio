@@ -188,7 +188,7 @@ export const defaultProjectData: ProjectData = {
         path: 'config.make',
         root: ProjectDataTemplateTargetRoot.file,
       }],
-      template: 'config.make.nj'
+      template: 'PluginConfig.make.nj'
     },
     'PluginsConfig': {
       targets: [{

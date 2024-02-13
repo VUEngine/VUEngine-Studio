@@ -1,19 +1,22 @@
 import { CommandService, nls } from "@theia/core";
-import { HoverService } from "@theia/core/lib/browser";
+import { HoverService, PreferenceService } from "@theia/core/lib/browser";
 import { FileService } from "@theia/filesystem/lib/browser/file-service";
 import { WorkspaceService } from "@theia/workspace/lib/browser";
 import React from "react";
 import { VesCommonService } from "../../../core/browser/ves-common-service";
 import { VesProjectService } from "../../../project/browser/ves-project-service";
 import { VesPlugin } from "../ves-plugin";
+import { VesPluginsPathsService } from "../ves-plugins-paths-service";
 
 export interface AbstractVesPluginComponentProps {
     plugin: VesPlugin
     commandService?: CommandService
     fileService?: FileService
     hoverService?: HoverService
+    preferenceService?: PreferenceService
     workspaceService: WorkspaceService
     vesCommonService?: VesCommonService
+    vesPluginsPathsService?: VesPluginsPathsService
     vesProjectService?: VesProjectService
 }
 
