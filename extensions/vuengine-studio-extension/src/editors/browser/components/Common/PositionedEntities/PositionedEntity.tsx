@@ -72,8 +72,6 @@ export default function PositionedEntity(props: PositionedEntityProps): React.JS
     };
 
     const openEditor = async (): Promise<void> => {
-        console.log(entityItem);
-
         if (entityItem && entityItem._fileUri) {
             const opener = await services.openerService.getOpener(entityItem._fileUri);
             await opener.open(entityItem._fileUri);

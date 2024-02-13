@@ -38,7 +38,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
         palettes: ['11100100', '11100000', '11010000', '11100100'],
         sprites: true,
         zoom: 1,
-        projectionDepth: 512,
+        projectionDepth: 128,
       },
     };
   }
@@ -52,6 +52,8 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
   }
 
   protected async restorePreviewState(): Promise<void> {
+    // TODO: this can cause hard to track unwanted side effects with outdated states in storage
+    /*
     const savedState = await this.props.context.services.localStorageService.getData<EntityEditorState>(this.getStateLocalStorageId());
     if (savedState) {
       this.setState({
@@ -60,6 +62,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
         currentComponent: '',
       });
     }
+    */
   }
 
   protected async updateState(state: EntityEditorState): Promise<void> {

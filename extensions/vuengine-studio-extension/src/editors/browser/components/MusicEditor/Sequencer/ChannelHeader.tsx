@@ -13,9 +13,7 @@ export default function ChannelHeader(props: ChannelHeaderProps): React.JSX.Elem
     const { getChannelName, setCurrentChannel, toggleChannelMuted, toggleChannelSolo } = useContext(MusicEditorContext) as MusicEditorContextType;
     const { channel, number, muted, solo, instrumentName } = props;
 
-    const classNames = ['channelHeader'];
-
-    return <div className={classNames.join(' ')}>
+    return <div className='channelHeader'>
         <div
             className='channelInfo'
             onClick={() => setCurrentChannel(number)}

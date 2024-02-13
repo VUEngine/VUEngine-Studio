@@ -1,7 +1,7 @@
 import { Asterisk, Atom, CircleDashed, Cube, File, FilmStrip, Image, SneakerMove, TreeStructure, UserFocus } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { NodeRendererProps } from 'react-arborist';
 import { ComponentKey, EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 import { ScriptType } from '../Scripts/ScriptTypes';
@@ -9,6 +9,7 @@ import { ScriptType } from '../Scripts/ScriptTypes';
 export default function ComponentTreeNode(props: NodeRendererProps<any>): React.JSX.Element {
     const { node, style, dragHandle } = props;
     const { data, setData, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const [dragging, setDragging] = useState<boolean>(false);
 
     const [type, indexString] = node.id.split('-');
     const index = parseInt(indexString || '-1');
@@ -136,9 +137,11 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
 
     return (
         <div
-            className='ves-tree-node'
-            ref={dragHandle}
+            className={`ves-tree-node${dragging ? ' dragging' : ''}`}
+            ref={!node.parent?.isRoot ? dragHandle : undefined}
             style={style}
+            onDragStart={() => setDragging(true)}
+            onDragEnd={() => setDragging(false)}
         >
             <div
                 className='ves-tree-node-icon'

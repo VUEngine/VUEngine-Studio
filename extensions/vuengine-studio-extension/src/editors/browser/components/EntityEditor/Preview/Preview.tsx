@@ -31,22 +31,24 @@ export default function Preview(): React.JSX.Element {
     ? data.components?.animations[currentAnimation]
     : undefined;
 
-  const updateAnimationStep = () => {
-    timer = !timer
-      ? setInterval(() => {
+  const setAnimationInterval = () => {
+    if (animate) {
+      timer = setInterval(() => {
         setCurrentAnimationStep(prevAnimationStep =>
           prevAnimationStep + 1 < (animation?.frames?.length || 1) ? prevAnimationStep + 1 : 0
         );
-      }, frameMultiplicator * 20 * (animation?.cycles || 8))
-      : undefined;
+      },
+        frameMultiplicator * 20 * (animation?.cycles || 8)
+      );
+    }
   };
 
   useEffect(() => {
-    clearInterval(timer);
-    updateAnimationStep();
+    setAnimationInterval();
     return () => clearInterval(timer);
   }, [
-    animation
+    animate,
+    animation,
   ]);
 
   return <div className='preview-container'>
@@ -59,7 +61,7 @@ export default function Preview(): React.JSX.Element {
       className="preview-container-world"
       style={{
         background: state.preview.backgroundColor > -1 ? PALETTE_COLORS[ColorMode.Default][state.preview.backgroundColor] : undefined,
-        perspective: state.preview.projectionDepth + 'px',
+        perspective: `${state.preview.projectionDepth}px`,
         zoom: state.preview.zoom,
       }}
     >
@@ -70,7 +72,6 @@ export default function Preview(): React.JSX.Element {
           displacement={sprite.displacement}
           frames={data.animations?.totalFrames || 1}
           canScale={sprite.bgmapMode === BgmapMode.Affine}
-          projectionDepth={state.preview.projectionDepth}
           currentAnimationFrame={animation?.frames[currentAnimationStep - 1] ?? currentAnimationStep}
           highlighted={state.currentComponent === `sprites-${i}`}
           images={sprite.texture.files}

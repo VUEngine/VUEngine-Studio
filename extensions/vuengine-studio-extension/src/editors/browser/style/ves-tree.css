@@ -35,6 +35,11 @@
     flex-grow: 1;
     gap: 2px;
     overflow: hidden;
+    user-select: none;
+}
+
+.ves-tree-node.dragging {
+    opacity: .3;
 }
 
 .ves-tree-node.empty {

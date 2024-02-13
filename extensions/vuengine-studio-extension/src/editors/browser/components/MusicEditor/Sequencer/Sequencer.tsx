@@ -17,7 +17,7 @@ export default function Sequencer(): React.JSX.Element {
         {
             songData.channels.map(channel =>
                 <Channel
-                    key={`channel-${channel.id}`}
+                    key={channel.id}
                     channelConfig={channel}
                     number={channel.id}
                     otherSolo={soloChannel > -1 && soloChannel !== channel.id}

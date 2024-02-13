@@ -17,11 +17,10 @@ interface SpriteProps {
   flipVertically: boolean
   transparent: boolean
   canScale: boolean
-  projectionDepth: number
 }
 
 export default function Sprite(props: SpriteProps): React.JSX.Element {
-  const { setState } = useContext(EntityEditorContext) as EntityEditorContextType;
+  const { state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
   const { services } = useContext(EditorsContext) as EditorsContextType;
   const {
     animate,
@@ -33,7 +32,6 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     index,
     images,
     palette,
-    projectionDepth,
     flipHorizontally,
     flipVertically,
     transparent,
@@ -88,6 +86,23 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     setImageData(allImageData);
   };
 
+  const getTransform = () => {
+    const t: string[] = [];
+    if (flipHorizontally) {
+      t.push('scaleX(-1)');
+    }
+    if (flipVertically) {
+      t.push('scaleY(-1)');
+    }
+    if (!canScale && displacement.parallax !== 0) {
+      // compensate for scaling due to perspective
+      t.push(`scale(${1 + (displacement.parallax / state.preview.projectionDepth)})`);
+    }
+
+    console.log(t.join(' '));
+    return (t.join(' '));
+  };
+
   useEffect(() => {
     getData();
   }, [
@@ -95,14 +110,6 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     images,
     width,
   ]);
-
-  const transforms: string[] = [];
-  if (flipHorizontally) {
-    transforms.push('scaleX(-1)');
-  }
-  if (flipVertically) {
-    transforms.push('scaleY(-1)');
-  }
 
   const currentPixelData = animate && isMultiFileAnimation
     ? imageData[currentAnimationFrame] ? imageData[currentAnimationFrame].pixelData : undefined
@@ -122,8 +129,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         outline: highlighted ? '1px solid green' : undefined,
         overflow: 'hidden',
         position: 'absolute',
-        scale: canScale ? undefined : (1 + (displacement.parallax / projectionDepth)),
-        transform: transforms.length ? transforms.join(' ') : undefined,
+        transform: getTransform(),
         translate: `${displacement.x}px ${displacement.y}px ${-1 * displacement.parallax}px`,
         width: width,
         zIndex: baseZIndex + (displacement.z !== 0 ? -displacement.z : 0),

@@ -375,8 +375,8 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                 setInstruments: this.setInstruments.bind(this),
                 getChannelName: this.getChannelName.bind(this),
             }}>
-                <HContainer gap={20}>
-                    <VContainer gap={15} grow={1}>
+                <HContainer gap={15} overflow='hidden'>
+                    <VContainer gap={15} grow={1} overflow='auto'>
                         <VContainer>
                             <Tabs>
                                 <TabList>
@@ -432,7 +432,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                             </Tabs>
                         </VContainer>
                     </VContainer>
-                    <VContainer gap={15} style={{ width: 250 }}>
+                    <VContainer gap={15} overflow='auto' style={{ maxWidth: 250, minWidth: 250 }}>
                         <Tabs>
                             <TabList>
                                 <Tab>

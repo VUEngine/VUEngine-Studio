@@ -1,11 +1,11 @@
 import { QuickPickItem, QuickPickOptions, QuickPickSeparator, nls } from '@theia/core';
 import React, { useContext } from 'react';
 import { Tree } from 'react-arborist';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import VContainer from '../../Common/VContainer';
 import { BgmapMode, ColliderType, ComponentKey, DisplayMode, EntityEditorContext, EntityEditorContextType, Transparency, WireframeType } from '../EntityEditorTypes';
-import ComponentTreeNode from './ComponentTreeNode';
-import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { ScriptType } from '../Scripts/ScriptTypes';
+import ComponentTreeNode from './ComponentTreeNode';
 
 interface ComponentType {
     key: ComponentKey | 'extraProperties' | 'physics'
@@ -282,6 +282,31 @@ export default function ComponentTree(): React.JSX.Element {
         });
     };
 
+    const moveComponent = (
+        dragIds: string[],
+        parentId: string,
+        targetIndex: number,
+    ): void => {
+        const [type, indexString] = dragIds[0].split('-');
+        const currentIndex = parseInt(indexString || '-1');
+
+        if (type === parentId) {
+            // @ts-ignore
+            const componentsOfType = [...data.components[type]];
+            const removedItem = componentsOfType.splice(currentIndex, 1).pop();
+            componentsOfType.splice(targetIndex > currentIndex
+                ? targetIndex - 1
+                : targetIndex, 0, removedItem
+            );
+            setData({
+                components: {
+                    ...data.components,
+                    [type]: componentsOfType,
+                }
+            });
+        }
+    };
+
     const componentTypes: ComponentType[] = [
         {
             key: 'sprites',
@@ -398,8 +423,9 @@ export default function ComponentTree(): React.JSX.Element {
                     data={treeData}
                     indent={24}
                     rowHeight={24}
-                    openByDefault={false}
+                    openByDefault={true}
                     width='100%'
+                    onMove={({ dragIds, parentId, index }) => moveComponent(dragIds, parentId!, index)}
                     selection={state.currentComponent}
                 >
                     {ComponentTreeNode}
