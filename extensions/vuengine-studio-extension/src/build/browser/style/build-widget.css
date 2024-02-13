@@ -101,9 +101,16 @@
   margin-top: var(--theia-ui-padding);
 }
 
+#vesBuildWidget .buildLogButtons .theia-input {
+  flex-grow: 1;
+  width: 100%;
+}
 #vesBuildWidget .buildLogButtons .theia-button {
+  flex-grow: 0;
   font-size: 90%;
-  width: 25%;
+  min-width: 36px;
+  padding: 0;
+  white-space: nowrap;
 }
 
 #vesBuildWidget .buildLogWrapper {
@@ -170,8 +177,9 @@
 #vesBuildWidget .buildLogLine .text {
   display: table-cell;
   padding-right: var(--theia-ui-padding);
-  white-space: pre-wrap;
+  white-space: break-spaces;
   width: 100%;
+  word-break: break-word;
 }
 
 #vesBuildWidget .buildLogLine.headline .text,

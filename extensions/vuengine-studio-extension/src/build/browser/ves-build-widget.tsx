@@ -24,6 +24,7 @@ interface VesBuildWidgetState {
   timerInterval: NodeJS.Timeout | undefined
   outputRomExists: boolean
   autoScroll: boolean
+  searchTerm: string
 }
 
 @injectable()
@@ -57,6 +58,7 @@ export class VesBuildWidget extends ReactWidget {
     timerInterval: undefined,
     outputRomExists: false,
     autoScroll: true,
+    searchTerm: '',
   };
 
   protected buildLogLastElementRef = React.createRef<HTMLDivElement>();
@@ -284,34 +286,39 @@ export class VesBuildWidget extends ReactWidget {
         >
           <div className='buildLog'>
             <div>
-              {this.vesBuildService.buildStatus.log.map(
-                // TODO: context menu with option to copy (full) error message
-                (line: BuildLogLine, index: number) => (
-                  line.text !== ''
-                    ? <div
-                      className={`buildLogLine ${line.type}${line.file ? ' hasFileLink' : ''}`}
-                      key={`buildLogLine${index}`}
-                      onClick={e => this.openFile(e, line.file)}
-                      title={`${new Date(line.timestamp).toTimeString().substring(0, 8)} ${line.text}`}
-                    >
-                      <span className='icon'>
-                        {line.type === BuildLogLineType.Error
-                          ? <i className='codicon codicon-error' />
-                          : line.type === BuildLogLineType.Warning
-                            ? <i className='codicon codicon-warning' />
-                            : line.type === BuildLogLineType.Headline
-                              ? <i className='codicon codicon-info' />
-                              : line.type === BuildLogLineType.Done
-                                ? <i className='codicon codicon-pass-filled' />
-                                : <></>}
-                      </span>
-                      <span className='text'>
-                        {line.optimizedText ? line.optimizedText : line.text}
-                      </span>
-                    </div>
-                    : <div className='buildLogLine' key={`buildLogLine${index}`}></div>
+              {this.vesBuildService.buildStatus.log
+                .filter(l =>
+                  this.state.searchTerm === '' ||
+                  l.text.toLowerCase().includes(this.state.searchTerm.toLowerCase())
                 )
-              )}
+                .map(
+                  // TODO: context menu with option to copy (full) error message
+                  (line: BuildLogLine, index: number) => (
+                    line.text !== ''
+                      ? <div
+                        className={`buildLogLine ${line.type}${line.file ? ' hasFileLink' : ''}`}
+                        key={`buildLogLine${index}`}
+                        onClick={e => this.openFile(e, line.file)}
+                        title={`${new Date(line.timestamp).toTimeString().substring(0, 8)} ${line.text}`}
+                      >
+                        <span className='icon'>
+                          {line.type === BuildLogLineType.Error
+                            ? <i className='codicon codicon-error' />
+                            : line.type === BuildLogLineType.Warning
+                              ? <i className='codicon codicon-warning' />
+                              : line.type === BuildLogLineType.Headline
+                                ? <i className='codicon codicon-info' />
+                                : line.type === BuildLogLineType.Done
+                                  ? <i className='codicon codicon-pass-filled' />
+                                  : <></>}
+                        </span>
+                        <span className='text'>
+                          {line.optimizedText ? line.optimizedText : line.text}
+                        </span>
+                      </div>
+                      : <div className='buildLogLine' key={`buildLogLine${index}`}></div>
+                  )
+                )}
               <div ref={this.buildLogLastElementRef} key={'buildLogLineLast'}></div>
             </div>
           </div>
@@ -362,6 +369,12 @@ export class VesBuildWidget extends ReactWidget {
           >
             <i className='fa fa-trash-o'></i>
           </button>
+          <input
+            className='theia-input full-width'
+            placeholder={nls.localize('vuengine/build/searchLogPlaceholder', 'Search Log...')}
+            value={this.state.searchTerm}
+            onChange={e => this.setSearchTerm(e.target.value)}
+          />
         </div>
         {/* <div className='buildSelector'>
           <select className='theia-select' title='Build'>
@@ -417,6 +430,11 @@ export class VesBuildWidget extends ReactWidget {
 
   protected toggleAutoScroll = (): void => {
     this.state.autoScroll = !this.state.autoScroll;
+    this.update();
+  };
+
+  protected setSearchTerm = (searchTerm: string): void => {
+    this.state.searchTerm = searchTerm;
     this.update();
   };
 
