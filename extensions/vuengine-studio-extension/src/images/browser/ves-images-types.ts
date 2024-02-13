@@ -84,11 +84,7 @@ export enum ImageCompressionType {
   RLE = 'rle',
 }
 
-export interface TilesCompressionResult {
-  tilesData: string[]
-  frameTileOffsets: number[]
-  compressionRatio: number
-}
+export type TilesCompressionResult = Partial<ConversionResultTilesData>;
 
 export const COMPRESSION_FLAG_LENGTH = 1;
 

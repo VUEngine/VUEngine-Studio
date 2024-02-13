@@ -237,7 +237,7 @@ export class VesImagesService {
           conversionResult.tiles.data as string[],
           imageConfig.tileset.compression as ImageCompressionType,
           imageConfig.animation,
-          imageConfig.animation.isAnimation && imageConfig.animation.individualFiles
+          imageConfig.animation.isAnimation && imageConfig.animation.individualFiles,
         ),
       };
     }

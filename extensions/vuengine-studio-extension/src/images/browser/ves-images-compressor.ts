@@ -2,8 +2,8 @@ import { AnimationConfig, COMPRESSION_FLAG_LENGTH, ImageCompressionType, TilesCo
 
 export function compressTiles(tilesData: string[], compressor: ImageCompressionType, animationConfig: AnimationConfig, allowInflate: boolean = false): TilesCompressionResult {
   let compressionResult: TilesCompressionResult = {
-    tilesData: tilesData,
-    frameTileOffsets: [],
+    data: tilesData,
+    frameOffsets: [],
     compressionRatio: 0,
   };
 
@@ -14,9 +14,9 @@ export function compressTiles(tilesData: string[], compressor: ImageCompressionT
   }
 
   // discard compression results if they're not smaller than the original size
-  if (!allowInflate && compressionResult.compressionRatio >= 0) {
-    compressionResult.tilesData = tilesData;
-    compressionResult.frameTileOffsets = [];
+  if (!allowInflate && compressionResult.compressionRatio && compressionResult.compressionRatio >= 0) {
+    compressionResult.data = tilesData;
+    delete compressionResult.frameOffsets;
   }
 
   return compressionResult;
@@ -25,8 +25,7 @@ export function compressTiles(tilesData: string[], compressor: ImageCompressionT
 // Normal RLE applied to pixel pairs (4 bits or 1 hexadecimal digit)
 function compressTilesRle(tilesData: string[], animationConfig: AnimationConfig): TilesCompressionResult {
   const result: TilesCompressionResult = {
-    tilesData: tilesData,
-    frameTileOffsets: [],
+    data: tilesData,
     compressionRatio: 0,
   };
 
@@ -42,6 +41,10 @@ function compressTilesRle(tilesData: string[], animationConfig: AnimationConfig)
 
   const isSpritesheet = animationConfig.isAnimation && !animationConfig.individualFiles;
   const spritesheetFrameSize = (animationConfig.frames > 0) ? tilesData.length / animationConfig.frames : 4;
+
+  if (isSpritesheet) {
+    result.frameOffsets = [];
+  }
 
   const addPreviousDigitToCurrentBlock = () => {
     currentBlock += (counter - 1).toString(16).toUpperCase() + previousDigit;
@@ -79,20 +82,20 @@ function compressTilesRle(tilesData: string[], animationConfig: AnimationConfig)
       previousDigit = tilesData[index + 1] ? tilesData[index + 1][0] : '';
 
       // save tile offset
-      result.frameTileOffsets.push(compressedData.length + COMPRESSION_FLAG_LENGTH);
+      result.frameOffsets!.push(compressedData.length + COMPRESSION_FLAG_LENGTH);
     }
   };
 
   if (isSpritesheet) {
-    result.frameTileOffsets.unshift(COMPRESSION_FLAG_LENGTH);
-    result.frameTileOffsets.pop();
+    result.frameOffsets!.unshift(COMPRESSION_FLAG_LENGTH);
+    result.frameOffsets!.pop();
   } else {
     addPreviousDigitToCurrentBlock();
     // right-pad last block
     compressedData.push(currentBlock.padEnd(8, '0'));
   }
 
-  result.tilesData = compressedData;
+  result.data = compressedData;
   result.compressionRatio = - ((uncompressedLength - compressedData.length) / uncompressedLength * 100);
 
   return result;
