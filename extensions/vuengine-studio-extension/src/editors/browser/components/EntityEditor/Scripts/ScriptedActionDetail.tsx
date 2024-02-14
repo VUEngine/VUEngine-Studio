@@ -3,9 +3,10 @@ import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import VContainer from '../../Common/VContainer';
 import { EntityEditorContext, EntityEditorContextType, ScriptData } from '../EntityEditorTypes';
-import { AVAILABLE_ACTIONS, ActionConfigData, ScriptType } from './ScriptTypes';
+import { AVAILABLE_ACTIONS, ActionConfigData, ActionConfigType, ScriptType } from './ScriptTypes';
 import { nls } from '@theia/core';
 import RadioSelect from '../../Common/RadioSelect';
+import ReactTextareaAutosize from 'react-textarea-autosize';
 
 export default function ScriptedActionDetail(): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
@@ -58,45 +59,46 @@ export default function ScriptedActionDetail(): React.JSX.Element {
 
     const getConfigControl = (config: ActionConfigData): React.JSX.Element => {
         switch (config.type) {
-            case 'boolean':
+            case ActionConfigType.Boolean:
                 // TODO
                 return <></>;
-            case 'type':
+            case ActionConfigType.Type:
                 const items = Object.values(services.vesProjectService.getProjectDataItemsForType(config.typeId || '') || {});
                 // @ts-ignore
                 const defaultValue = items.find(item => item.name === config.default)?._id || '';
-                return <VContainer>
-                    <label>{config.label}</label>
-                    <SelectComponent
-                        options={items
-                            .sort((a, b) => {
-                                // @ts-ignore
-                                if (a.name > b.name) { return 1; }
-                                // @ts-ignore
-                                if (a.name < b.name) { return -1; }
-                                return 0;
-                            })
-                            .map(f => ({
-                                // @ts-ignore
-                                value: f._id, label: f.name
-                            }))}
-                        defaultValue={currentScriptedAction.config ? currentScriptedAction.config[config.key] : defaultValue}
-                        onChange={option => setConfigValue(config.key, option.value)}
-                    />
-                </VContainer>;
+                return <SelectComponent
+                    options={items
+                        .sort((a, b) => {
+                            // @ts-ignore
+                            if (a.name > b.name) { return 1; }
+                            // @ts-ignore
+                            if (a.name < b.name) { return -1; }
+                            return 0;
+                        })
+                        .map(f => ({
+                            // @ts-ignore
+                            value: f._id, label: f.name
+                        }))}
+                    defaultValue={currentScriptedAction.config ? currentScriptedAction.config[config.key] : defaultValue}
+                    onChange={option => setConfigValue(config.key, option.value)}
+                />;
+            case ActionConfigType.TextArea:
+                return <ReactTextareaAutosize
+                    className="theia-input"
+                    value={currentScriptedAction.config ? currentScriptedAction.config[config.key] : config.default}
+                    maxRows={8}
+                    onChange={e => setConfigValue(config.key, e.target.value)}
+                />;
             default:
-                return <VContainer>
-                    <label>{config.label}</label>
-                    <input
-                        className='theia-input'
-                        type={config.type}
-                        min={config.min}
-                        max={config.max}
-                        step={config.step}
-                        value={currentScriptedAction.config ? currentScriptedAction.config[config.key] : config.default}
-                        onChange={e => setConfigValue(config.key, e.target.value)}
-                    />
-                </VContainer>;
+                return <input
+                    className='theia-input'
+                    type={config.type}
+                    min={config.min}
+                    max={config.max}
+                    step={config.step}
+                    value={currentScriptedAction.config ? currentScriptedAction.config[config.key] : config.default}
+                    onChange={e => setConfigValue(config.key, e.target.value)}
+                />;
         }
     };
 
@@ -156,8 +158,11 @@ export default function ScriptedActionDetail(): React.JSX.Element {
                 {currentAction.config &&
                     <>
                         {currentAction.config && currentAction.config.map((c, i) =>
-                            <div key={'control-' + i}>
-                                {getConfigControl(c)}
+                            <div key={i}>
+                                <VContainer>
+                                    <label>{c.label}</label>
+                                    {getConfigControl(c)}
+                                </VContainer>
                             </div>
                         )}
                     </>

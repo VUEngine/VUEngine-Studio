@@ -99,7 +99,6 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
       t.push(`scale(${1 + (displacement.parallax / state.preview.projectionDepth)})`);
     }
 
-    console.log(t.join(' '));
     return (t.join(' '));
   };
 

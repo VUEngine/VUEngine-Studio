@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../../../editors/browser/ves-editors-types';
 import HContainer from '../../Common/HContainer';
 import VContainer from '../../Common/VContainer';
-import { ActionData, ScriptedActionData } from './ScriptTypes';
+import { AVAILABLE_ACTIONS, ActionConfigType, ActionData, ScriptedActionData } from './ScriptTypes';
 
 interface ScriptedActionProps {
     action: Partial<ActionData>
@@ -21,15 +21,16 @@ export default function ScriptedAction(props: ScriptedActionProps): React.JSX.El
     const { action, scriptedAction, addAction, removeAction, isCurrentAction, setCurrentAction, isRoot, isEndNode } = props;
 
     const meta: any[] = [];
-    if (action.config) {
+    if (action?.config) {
         action.config.map(c => {
             switch (c.type) {
-                case 'text':
+                case ActionConfigType.Text:
+                case ActionConfigType.TextArea:
                     meta.push(scriptedAction?.config && scriptedAction?.config[c.key]
                         ? '"' + scriptedAction?.config[c.key] + '"'
                         : '"' + c.default + '"');
                     break;
-                case 'type':
+                case ActionConfigType.Type:
                     meta.push(scriptedAction?.config && scriptedAction?.config[c.key]
                         // @ts-ignore
                         ? services.vesProjectService.getProjectDataItemById(scriptedAction?.config[c.key], c.typeId || '')?.name || c.default
@@ -44,10 +45,26 @@ export default function ScriptedAction(props: ScriptedActionProps): React.JSX.El
         });
     }
 
-    return <VContainer className={`scripted-action-container ${isRoot ? 'root' : ''} ${isEndNode ? 'end' : ''}`}>
+    const containerClasses = ['scripted-action-container'];
+    if (isRoot) {
+        containerClasses.push('root');
+    }
+    if (isEndNode) {
+        containerClasses.push('end');
+    }
+    if (action?.branches?.length) {
+        containerClasses.push('has-branches');
+    }
+
+    const actionClasses = ['scripted-action', 'item'];
+    if (isCurrentAction) {
+        actionClasses.push('active');
+    }
+
+    return <div className={containerClasses.join(' ')}>
         <HContainer
             alignItems='start'
-            className={`item scripted-action ${isCurrentAction ? 'active' : ''}`}
+            className={actionClasses.join(' ')}
             onClick={setCurrentAction}
         >
             {removeAction && <button
@@ -57,7 +74,7 @@ export default function ScriptedAction(props: ScriptedActionProps): React.JSX.El
             >
                 <i className='codicon codicon-x' />
             </button>}
-            {action.iconClass &&
+            {action?.iconClass &&
                 <div>
                     <i className={action.iconClass} />
                 </div>
@@ -73,12 +90,42 @@ export default function ScriptedAction(props: ScriptedActionProps): React.JSX.El
                 </VContainer>
             }
         </HContainer>
-        {!isEndNode && <button
-            className='theia-button add-button full-width'
-            onClick={addAction}
-            title={nls.localize('vuengine/editors/addAction', 'Add Action')}
-        >
-            <i className='codicon codicon-plus' />
-        </button>}
-    </VContainer>;
+        {action?.branches &&
+            <div className='scripted-action-branches'>
+                {action.branches?.map((b, i) =>
+                    <VContainer key={i}>
+                        <ScriptedAction
+                            action={{
+                                name: b.name,
+                            }}
+                            addAction={() => addAction()}
+                            isCurrentAction={false}
+                            setCurrentAction={() => { }}
+                            isRoot
+                        />
+                        {scriptedAction?.branches && scriptedAction?.branches[i].script.map((c, j) =>
+                            <ScriptedAction
+                                key={j}
+                                action={AVAILABLE_ACTIONS[c.id]}
+                                scriptedAction={c}
+                                addAction={() => addAction()}
+                                removeAction={() => removeAction!()}
+                                isCurrentAction={false}
+                                setCurrentAction={() => { }}
+                            />
+                        )}
+                    </VContainer>
+                )}
+            </div>
+        }
+        {
+            !isEndNode && <button
+                className='theia-button add-button full-width'
+                onClick={addAction}
+                title={nls.localize('vuengine/editors/addAction', 'Add Action')}
+            >
+                <i className='codicon codicon-plus' />
+            </button>
+        }
+    </div>;
 }

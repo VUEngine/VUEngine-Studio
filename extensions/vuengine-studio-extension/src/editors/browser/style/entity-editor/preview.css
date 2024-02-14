@@ -1,5 +1,6 @@
 .jsonforms-container .preview-container {
-    border-radius: 5px;
+    border: var(--theia-border-width) solid var(--theia-dropdown-border);
+    border-radius: 8px;
     flex-grow: 1;
     margin: var(--padding);
     overflow: hidden;
@@ -20,10 +21,11 @@
     background:
         linear-gradient(transparent, transparent 49.9%, rgba(0,0,0,.6) 49.9%, rgba(0,0,0,.6) 50.1%, transparent 50.1%),
         linear-gradient(90deg, transparent, transparent 49.9%, rgba(0,0,0,.6) 49.9%, rgba(0,0,0,.6) 50.1%, transparent 50.1%),
-        repeating-conic-gradient(rgba(0,0,0,.3) 0% 25%, transparent 0% 50%) 50% / 16px 16px;
+        repeating-conic-gradient(rgba(0,0,0,.2) 0% 25%, transparent 0% 50%) 50% / 16px 16px;
     background-position: center;
     box-sizing: border-box;
     display: flex;
+    cursor: grab;
     height: 100%;
     justify-content: center;
     overflow: hidden;

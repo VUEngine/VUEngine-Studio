@@ -9,7 +9,9 @@
   border: var(--theia-border-width) solid var(--theia-dropdown-border);
   color: var(--theia-dropdown-border);
 }
+.jsonforms-container .add-button:focus,
 .jsonforms-container .add-button:hover {
+  background-color: var(--theia-button-hoverBackground);
   color: var(--theia-button-foreground);
   border-color: var(--theia-button-hoverBackground);
 }

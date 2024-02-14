@@ -23,8 +23,7 @@ export default function PreviewOptions(): React.JSX.Element {
   const setZoom = (zoom: number) => {
     if (zoom < MIN_PREVIEW_ZOOM) {
       zoom = MIN_PREVIEW_ZOOM;
-    }
-    if (zoom > MAX_PREVIEW_ZOOM) {
+    } else if (zoom > MAX_PREVIEW_ZOOM) {
       zoom = MAX_PREVIEW_ZOOM;
     }
     setState({
@@ -41,21 +40,21 @@ export default function PreviewOptions(): React.JSX.Element {
         <button
           className='theia-button secondary'
           disabled={state.preview.zoom === MIN_PREVIEW_ZOOM}
-          onClick={() => setZoom(state.preview.zoom - 1)}
+          onClick={() => setZoom(Math.round(state.preview.zoom - 1))}
         >
           <i className='codicon codicon-zoom-out' />
         </button>
         <input
           type='text'
           className='theia-input'
-          style={{ padding: 0, textAlign: 'center', width: 40 }}
+          style={{ padding: 0, textAlign: 'center', width: 60 }}
           value={state.preview.zoom}
           disabled
         />
         <button
           className='theia-button secondary'
           disabled={state.preview.zoom === MAX_PREVIEW_ZOOM}
-          onClick={() => setZoom(state.preview.zoom + 1)}
+          onClick={() => setZoom(Math.round(state.preview.zoom + 1))}
         >
           <i className='codicon codicon-zoom-in' />
         </button>

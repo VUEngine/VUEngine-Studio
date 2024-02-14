@@ -9,13 +9,15 @@ import {
   ColliderType,
   EntityEditorContext,
   EntityEditorContextType,
+  MAX_PREVIEW_ZOOM,
+  MIN_PREVIEW_ZOOM,
   Transparency,
 } from '../EntityEditorTypes';
 import Sprite from './Sprite';
 import { nls } from '@theia/core';
 
 export default function Preview(): React.JSX.Element {
-  const { state, data } = useContext(EntityEditorContext) as EntityEditorContextType;
+  const { data, state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
   const { services } = useContext(EditorsContext) as EditorsContextType;
   const [currentAnimationStep, setCurrentAnimationStep] = useState<number>(0);
   let timer: NodeJS.Timeout | undefined;
@@ -43,6 +45,24 @@ export default function Preview(): React.JSX.Element {
     }
   };
 
+  const onWheel = (e: React.WheelEvent): void => {
+    const zoomSensitivityFactor = 250;
+    let zoom = Math.round((state.preview.zoom - e.deltaY / zoomSensitivityFactor));
+
+    if (zoom > MAX_PREVIEW_ZOOM) {
+      zoom = MAX_PREVIEW_ZOOM;
+    } else if (zoom < MIN_PREVIEW_ZOOM) {
+      zoom = MIN_PREVIEW_ZOOM;
+    }
+
+    setState({
+      preview: {
+        ...state.preview,
+        zoom: zoom
+      }
+    });
+  };
+
   useEffect(() => {
     setAnimationInterval();
     return () => clearInterval(timer);
@@ -51,7 +71,10 @@ export default function Preview(): React.JSX.Element {
     animation,
   ]);
 
-  return <div className='preview-container'>
+  return <div
+    className='preview-container'
+    onWheel={onWheel}
+  >
     {animate &&
       <div className='current-frame'>
         {nls.localize('vuengine/entityEditor/frame', 'Frame')} {currentAnimationStep + 1}
