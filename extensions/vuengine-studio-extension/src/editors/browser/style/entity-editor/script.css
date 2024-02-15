@@ -16,7 +16,12 @@
     flex-grow: 1;
     margin: var(--padding);
     overflow: hidden;
+    position: relative;
     user-select: none;
+}
+
+.script-container.dragging {
+    cursor: grabbing;
 }
 
 .scripted-action-container {

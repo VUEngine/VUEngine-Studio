@@ -2,9 +2,10 @@ import { QuickPickItem, QuickPickOptions, QuickPickSeparator, nls } from '@theia
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext, useState } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
+import { EntityEditorContext, EntityEditorContextType, MAX_PREVIEW_SCRIPT_ZOOM, MIN_PREVIEW_SCRIPT_ZOOM, WHEEL_SENSITIVITY } from '../EntityEditorTypes';
 import { AVAILABLE_ACTIONS } from './ScriptTypes';
 import ScriptedAction from './ScriptedAction';
+import PreviewOptions from '../Preview/PreviewOptions';
 
 interface ScriptProps {
     index: number
@@ -15,6 +16,9 @@ export default function Script(props: ScriptProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const { data, setData, state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
     const [zoom, setZoom] = useState<number>(1);
+    const [isDragging, setIsDragging] = useState<boolean>(false);
+    const [offsetX, setOffsetX] = useState<number>(0);
+    const [offsetY, setOffsetY] = useState<number>(0);
 
     const scriptConfig = data.components.scripts[index];
     const script = scriptConfig.script ?? [];
@@ -112,16 +116,29 @@ export default function Script(props: ScriptProps): React.JSX.Element {
     };
 
     const onWheel = (e: React.WheelEvent): void => {
-        const zoomSensitivityFactor = 500;
-        let z = zoom - e.deltaY / zoomSensitivityFactor;
+        if (e.ctrlKey) {
+            let z = zoom - e.deltaY / WHEEL_SENSITIVITY;
 
-        if (z > 2) {
-            z = 2;
-        } else if (z < 0.2) {
-            z = 0.2;
+            if (z > MAX_PREVIEW_SCRIPT_ZOOM) {
+                z = MAX_PREVIEW_SCRIPT_ZOOM;
+            } else if (z < MIN_PREVIEW_SCRIPT_ZOOM) {
+                z = MIN_PREVIEW_SCRIPT_ZOOM;
+            }
+
+            setZoom(z);
         }
+    };
 
-        setZoom(z);
+    const onMouseMove = (e: React.MouseEvent): void => {
+        if (isDragging) {
+            setOffsetX(offsetX + e.movementX);
+            setOffsetY(offsetY + e.movementY);
+        }
+    };
+
+    const center = (): void => {
+        setOffsetX(0);
+        setOffsetY(0);
     };
 
     const currentComponentParts = state.currentComponent.split('-');
@@ -129,13 +146,27 @@ export default function Script(props: ScriptProps): React.JSX.Element {
 
     return (
         <div
-            className='script-container'
+            className={`script-container${isDragging ? ' dragging' : ''}`}
             onWheel={onWheel}
+            onMouseDown={() => setIsDragging(true)}
+            onMouseUp={() => setIsDragging(false)}
+            onMouseLeave={() => setIsDragging(false)}
+            onMouseMove={onMouseMove}
         >
+            <PreviewOptions
+                enableBackground={false}
+                zoom={zoom}
+                setZoom={setZoom}
+                minZoom={MIN_PREVIEW_SCRIPT_ZOOM}
+                maxZoom={MAX_PREVIEW_SCRIPT_ZOOM}
+                zoomStep={0.1}
+                center={center}
+            />
             <div
                 className='script-inner-container'
                 style={{
-                    transform: `scale(${zoom})`
+                    transform: `scale(${zoom})`,
+                    translate: `${offsetX}px ${offsetY}px`,
                 }}
             >
                 <ScriptedAction

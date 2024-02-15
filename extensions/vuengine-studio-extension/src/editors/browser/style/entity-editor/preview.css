@@ -1,11 +1,19 @@
 .jsonforms-container .preview-container {
+    align-items: center;
     border: var(--theia-border-width) solid var(--theia-dropdown-border);
     border-radius: 8px;
+    cursor: grab;
+    display: flex;
     flex-grow: 1;
+    justify-content: center;
     margin: var(--padding);
     overflow: hidden;
     padding: 0;
     position: relative;
+}
+
+.jsonforms-container .preview-container.dragging {
+    cursor: grabbing;
 }
 
 .jsonforms-container .preview-container .current-frame {
@@ -19,19 +27,20 @@
 .jsonforms-container .preview-container-world {
     align-items: center;
     background:
-        linear-gradient(transparent, transparent 49.9%, rgba(0,0,0,.6) 49.9%, rgba(0,0,0,.6) 50.1%, transparent 50.1%),
-        linear-gradient(90deg, transparent, transparent 49.9%, rgba(0,0,0,.6) 49.9%, rgba(0,0,0,.6) 50.1%, transparent 50.1%),
+        linear-gradient(transparent, transparent 49.9875%, rgba(0,0,0,.2) 49.9875%, rgba(0,0,0,.2) 50.0125%, transparent 50.0125%),
+        linear-gradient(90deg, transparent, transparent 49.9875%, rgba(0,0,0,.2) 49.9875%, rgba(0,0,0,.2) 50.0125%, transparent 50.0125%),
         repeating-conic-gradient(rgba(0,0,0,.2) 0% 25%, transparent 0% 50%) 50% / 16px 16px;
     background-position: center;
     box-sizing: border-box;
     display: flex;
-    cursor: grab;
-    height: 100%;
+    max-height: 7500px;
+    min-height: 7500px;
     justify-content: center;
     overflow: hidden;
     position: relative;
     transform-style: preserve-3d;
-    width: 100%;
+    max-width: 7500px;
+    min-width: 7500px;
 }
 
 .jsonforms-container .preview-container-world .sprite-error {
@@ -59,4 +68,31 @@
     position: absolute;
     transform: rotate(-45deg);
     width: 150%;
+}
+
+.jsonforms-container .preview-options {
+    align-items: center;
+    bottom: var(--padding);
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 15px;
+    left: var(--padding);
+    position: absolute;
+    z-index: 999999999;
+}
+
+.jsonforms-container .preview-options .theia-button {
+    padding: 0;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    border-radius: 5px;
+}
+
+.jsonforms-container .preview-options .theia-input {
+    background-color: var(--theia-editorGroupHeader-tabsBackground);
+    border-radius: 5px;
+    padding: 0px;
+    text-align: center;
+    width: 50px;
 }

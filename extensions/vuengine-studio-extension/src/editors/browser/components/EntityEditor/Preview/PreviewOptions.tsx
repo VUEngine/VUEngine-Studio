@@ -2,14 +2,22 @@ import React, { useContext } from 'react';
 import ColorSelector from '../../Common/ColorSelector';
 import HContainer from '../../Common/HContainer';
 import VContainer from '../../Common/VContainer';
-import {
-  EntityEditorContext,
-  EntityEditorContextType,
-  MAX_PREVIEW_ZOOM,
-  MIN_PREVIEW_ZOOM
-} from '../EntityEditorTypes';
+import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
+import { CornersOut } from '@phosphor-icons/react';
 
-export default function PreviewOptions(): React.JSX.Element {
+interface PreviewOptionsProps {
+  enableBackground: boolean
+  zoom: number
+  setZoom: (zoom: number) => void
+  minZoom: number
+  maxZoom: number
+  zoomStep: number
+  roundZoomSteps?: boolean
+  center: () => void
+}
+
+export default function PreviewOptions(props: PreviewOptionsProps): React.JSX.Element {
+  const { enableBackground, zoom, setZoom, minZoom, maxZoom, zoomStep, roundZoomSteps, center } = props;
   const { state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
 
   const setBackgroundColor = (backgroundColor: number) =>
@@ -20,52 +28,56 @@ export default function PreviewOptions(): React.JSX.Element {
       },
     });
 
-  const setZoom = (zoom: number) => {
-    if (zoom < MIN_PREVIEW_ZOOM) {
-      zoom = MIN_PREVIEW_ZOOM;
-    } else if (zoom > MAX_PREVIEW_ZOOM) {
-      zoom = MAX_PREVIEW_ZOOM;
+  const applyZoom = (z: number) => {
+    if (setZoom) {
+      if (z < minZoom) {
+        z = minZoom;
+      } else if (z > maxZoom) {
+        z = maxZoom;
+      }
+      setZoom(z);
     }
-    setState({
-      preview: {
-        ...state.preview,
-        zoom,
-      },
-    });
   };
 
   return (
-    <VContainer alignItems='end' gap={15}>
-      <HContainer>
+    <div className='preview-options'>
+      <HContainer gap={3}>
         <button
           className='theia-button secondary'
-          disabled={state.preview.zoom === MIN_PREVIEW_ZOOM}
-          onClick={() => setZoom(Math.round(state.preview.zoom - 1))}
+          disabled={zoom === minZoom}
+          onClick={() => applyZoom(roundZoomSteps ? Math.round(zoom - zoomStep) : zoom - zoomStep)}
         >
           <i className='codicon codicon-zoom-out' />
         </button>
         <input
           type='text'
           className='theia-input'
-          style={{ padding: 0, textAlign: 'center', width: 60 }}
-          value={state.preview.zoom}
+          value={Math.round(zoom * 100) / 100}
           disabled
         />
         <button
           className='theia-button secondary'
-          disabled={state.preview.zoom === MAX_PREVIEW_ZOOM}
-          onClick={() => setZoom(Math.round(state.preview.zoom + 1))}
+          disabled={zoom === maxZoom}
+          onClick={() => applyZoom(roundZoomSteps ? Math.round(zoom + zoomStep) : zoom + zoomStep)}
         >
           <i className='codicon codicon-zoom-in' />
         </button>
       </HContainer>
-      <VContainer>
-        <ColorSelector
-          color={state.preview.backgroundColor}
-          updateColor={setBackgroundColor}
-          includeTransparent
-        />
-      </VContainer>
+      <button
+        className='theia-button secondary'
+        onClick={center}
+      >
+        <CornersOut size={20} />
+      </button>
+      {enableBackground &&
+        <VContainer>
+          <ColorSelector
+            color={state.preview.backgroundColor}
+            updateColor={setBackgroundColor}
+            includeTransparent
+          />
+        </VContainer>
+      }
       {/*
       <HContainer>
         <input
@@ -103,6 +115,6 @@ export default function PreviewOptions(): React.JSX.Element {
         ))}
       </VContainer>
       */}
-    </VContainer>
+    </div>
   );
 }

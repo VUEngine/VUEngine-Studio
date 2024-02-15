@@ -13,7 +13,6 @@ import {
 } from './EntityEditorTypes';
 import Preview from './Preview/Preview';
 import Script from './Scripts/Script';
-import PreviewOptions from './Preview/PreviewOptions';
 
 interface EntityEditorProps {
   data: EntityData;
@@ -257,9 +256,6 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
                   <EntityMeta />
                   <ComponentTree />
                 </VContainer>
-                {!this.state.currentComponent?.startsWith('scripts-') &&
-                  <PreviewOptions />
-                }
               </VContainer>
             }
           </EntityEditorContext.Consumer>

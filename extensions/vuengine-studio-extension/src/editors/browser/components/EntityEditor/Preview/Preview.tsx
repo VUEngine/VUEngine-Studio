@@ -9,17 +9,22 @@ import {
   ColliderType,
   EntityEditorContext,
   EntityEditorContextType,
-  MAX_PREVIEW_ZOOM,
-  MIN_PREVIEW_ZOOM,
+  MAX_PREVIEW_SPRITE_ZOOM,
+  MIN_PREVIEW_SPRITE_ZOOM,
   Transparency,
+  WHEEL_SENSITIVITY,
 } from '../EntityEditorTypes';
 import Sprite from './Sprite';
 import { nls } from '@theia/core';
+import PreviewOptions from './PreviewOptions';
 
 export default function Preview(): React.JSX.Element {
   const { data, state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
   const { services } = useContext(EditorsContext) as EditorsContextType;
   const [currentAnimationStep, setCurrentAnimationStep] = useState<number>(0);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [offsetX, setOffsetX] = useState<number>(0);
+  const [offsetY, setOffsetY] = useState<number>(0);
   let timer: NodeJS.Timeout | undefined;
 
   const engineConfig = services.vesProjectService.getProjectDataItemById(ProjectContributor.Project, 'EngineConfig');
@@ -46,21 +51,38 @@ export default function Preview(): React.JSX.Element {
   };
 
   const onWheel = (e: React.WheelEvent): void => {
-    const zoomSensitivityFactor = 250;
-    let zoom = Math.round((state.preview.zoom - e.deltaY / zoomSensitivityFactor));
+    if (e.ctrlKey) {
+      let zoom = Math.round((state.preview.zoom - e.deltaY / WHEEL_SENSITIVITY) * 100) / 100;
 
-    if (zoom > MAX_PREVIEW_ZOOM) {
-      zoom = MAX_PREVIEW_ZOOM;
-    } else if (zoom < MIN_PREVIEW_ZOOM) {
-      zoom = MIN_PREVIEW_ZOOM;
+      if (zoom > MAX_PREVIEW_SPRITE_ZOOM) {
+        zoom = MAX_PREVIEW_SPRITE_ZOOM;
+      } else if (zoom < MIN_PREVIEW_SPRITE_ZOOM) {
+        zoom = MIN_PREVIEW_SPRITE_ZOOM;
+      }
+
+      setZoom(zoom);
     }
+  };
 
+  const setZoom = (zoom: number): void => {
     setState({
       preview: {
         ...state.preview,
-        zoom: zoom
+        zoom,
       }
     });
+  };
+
+  const onMouseMove = (e: React.MouseEvent): void => {
+    if (isDragging) {
+      setOffsetX(offsetX + e.movementX / state.preview.zoom);
+      setOffsetY(offsetY + e.movementY / state.preview.zoom);
+    }
+  };
+
+  const center = (): void => {
+    setOffsetX(0);
+    setOffsetY(0);
   };
 
   useEffect(() => {
@@ -72,9 +94,23 @@ export default function Preview(): React.JSX.Element {
   ]);
 
   return <div
-    className='preview-container'
+    className={`preview-container${isDragging ? ' dragging' : ''}`}
+    onMouseDown={() => setIsDragging(true)}
+    onMouseUp={() => setIsDragging(false)}
+    onMouseLeave={() => setIsDragging(false)}
+    onMouseMove={onMouseMove}
     onWheel={onWheel}
   >
+    <PreviewOptions
+      enableBackground={false}
+      zoom={state.preview.zoom}
+      setZoom={setZoom}
+      minZoom={MIN_PREVIEW_SPRITE_ZOOM}
+      maxZoom={MAX_PREVIEW_SPRITE_ZOOM}
+      zoomStep={0.51}
+      roundZoomSteps
+      center={center}
+    />
     {animate &&
       <div className='current-frame'>
         {nls.localize('vuengine/entityEditor/frame', 'Frame')} {currentAnimationStep + 1}
@@ -86,6 +122,7 @@ export default function Preview(): React.JSX.Element {
         background: state.preview.backgroundColor > -1 ? PALETTE_COLORS[ColorMode.Default][state.preview.backgroundColor] : undefined,
         perspective: `${state.preview.projectionDepth}px`,
         zoom: state.preview.zoom,
+        translate: `${offsetX}px ${offsetY}px`,
       }}
     >
       {state.preview.sprites && data.components?.sprites?.map((sprite, i) =>
