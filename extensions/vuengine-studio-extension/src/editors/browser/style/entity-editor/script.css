@@ -15,7 +15,7 @@
     flex-direction: column;
     flex-grow: 1;
     overflow: auto;
-    padding: var(--padding) 0;
+    padding: var(--padding);
     position: relative;
     user-select: none;
 }
@@ -116,7 +116,7 @@
     border: var(--theia-border-width) dashed var(--theia-dropdown-border);
     border-radius: 10px;
     display: flex;
-    gap: 15px;
+    gap: 30px;
     margin-top: -27px;
     overflow: hidden;
     padding: 28px 28px var(--padding);

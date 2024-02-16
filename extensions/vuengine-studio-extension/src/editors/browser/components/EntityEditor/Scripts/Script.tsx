@@ -65,7 +65,7 @@ export default function Script(props: ScriptProps): React.JSX.Element {
     };
 
     return (
-        <VContainer grow={1} overflow='hidden' style={{ margin: 'var(--padding)', padding: 0, position: 'relative' }}>
+        <VContainer grow={1} overflow='hidden' style={{ margin: 'var(--padding) 0', padding: 0, position: 'relative' }}>
             <PreviewOptions
                 enableBackground={false}
                 zoom={zoom}
