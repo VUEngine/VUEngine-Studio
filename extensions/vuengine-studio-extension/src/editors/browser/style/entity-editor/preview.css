@@ -6,7 +6,7 @@
     display: flex;
     flex-grow: 1;
     justify-content: center;
-    margin: var(--padding);
+    margin: var(--padding) 0;
     overflow: hidden;
     padding: 0;
     position: relative;

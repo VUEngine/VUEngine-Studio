@@ -40,17 +40,6 @@ export default function SpriteEditorActions(props: SpriteEditorActionsProps): Re
             </div>
             <div
                 className='tool'
-                onClick={undo}
-            >
-                <i className='codicon codicon-zoom-in' />
-            </div>
-            <div
-                className='tool'
-            >
-                <i className='codicon codicon-zoom-out' />
-            </div>
-            <div
-                className='tool'
                 onClick={() => downloadImage({
                     type: 'png',
                     isGridVisible: false,

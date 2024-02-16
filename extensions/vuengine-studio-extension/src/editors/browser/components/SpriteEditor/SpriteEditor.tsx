@@ -15,7 +15,6 @@ import {
 import React, { BaseSyntheticEvent, useContext, useEffect, useRef, useState } from 'react';
 import { PALETTE_COLORS } from '../../../../core/browser/ves-common-types';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
-import HContainer from '../Common/HContainer';
 import VContainer from '../Common/VContainer';
 import { DisplayMode } from '../EntityEditor/EntityEditorTypes';
 import PaletteSelect from './PaletteSelect';
@@ -246,42 +245,11 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
 
     return (
         <div className="spriteEditor">
-            <Dotting
-                ref={ref}
-                backgroundColor='transparent'
-                brushColor={PALETTE_COLORS[data.colorMode][primaryColor]}
-                defaultPixelColor={PALETTE_COLORS[data.colorMode][0]}
-                gridStrokeColor={services.colorRegistry.getCurrentColor('editor.background')}
-                gridStrokeWidth={gridSize}
-                isGridVisible={gridSize > 0}
-                height={'100%'}
-                initAutoScale={true}
-                initLayers={[{
-                    id: PLACEHOLDER_LAYER_NAME,
-                    data: createEmptyPixelData(
-                        data.dimensions?.x || DEFAULT_SPRITE_SIZE,
-                        data.dimensions?.y || DEFAULT_SPRITE_SIZE,
-                    )
-                }]}
-                isGridFixed={!allowResize}
-                isPanZoomable={true}
-                maxColumnCount={512}
-                minColumnCount={8}
-                maxRowCount={512}
-                minRowCount={8}
-                minScale={0.05}
-                maxScale={10}
-                resizeUnit={8}
-                width={'100%'}
-                style={{ zIndex: 1 }}
-            />
             <VContainer
                 gap={15}
                 style={{
-                    bottom: 'calc(var(--padding) + 90px + 32px)',
-                    left: 'var(--padding)',
-                    position: 'absolute',
-                    top: 'var(--padding)',
+                    maxWidth: 66,
+                    minWidth: 66,
                 }}
             >
                 <div style={{ zIndex: 100 }}>
@@ -321,23 +289,51 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                     />
                 </VContainer>
             </VContainer>
-            <SpriteEditorStatus
-                dottingRef={ref}
-                style={{
-                    bottom: 'calc(var(--padding) + 90px)',
-                    position: 'absolute',
-                    left: 'var(--padding)',
-                    zIndex: 100,
-                }}
-            />
+            <div className='pixel-container'>
+                <SpriteEditorStatus
+                    dottingRef={ref}
+                    style={{
+                        bottom: 'var(--padding)',
+                        left: 'var(--padding)',
+                        position: 'absolute',
+                        zIndex: 100,
+                    }}
+                />
+                <Dotting
+                    ref={ref}
+                    backgroundColor='transparent'
+                    brushColor={PALETTE_COLORS[data.colorMode][primaryColor]}
+                    defaultPixelColor={PALETTE_COLORS[data.colorMode][0]}
+                    gridStrokeColor={services.colorRegistry.getCurrentColor('editor.background')}
+                    gridStrokeWidth={gridSize}
+                    isGridVisible={gridSize > 0}
+                    height={'100%'}
+                    initAutoScale={true}
+                    initLayers={[{
+                        id: PLACEHOLDER_LAYER_NAME,
+                        data: createEmptyPixelData(
+                            data.dimensions?.x || DEFAULT_SPRITE_SIZE,
+                            data.dimensions?.y || DEFAULT_SPRITE_SIZE,
+                        )
+                    }]}
+                    isGridFixed={!allowResize}
+                    isPanZoomable={true}
+                    maxColumnCount={512}
+                    minColumnCount={8}
+                    maxRowCount={512}
+                    minRowCount={8}
+                    minScale={0.05}
+                    maxScale={10}
+                    resizeUnit={8}
+                    width={'100%'}
+                    style={{ zIndex: 1 }}
+                />
+            </div>
             <VContainer
                 gap={15}
                 style={{
-                    bottom: 'calc(var(--padding) + 90px)',
-                    position: 'absolute',
-                    right: 'var(--padding)',
-                    top: 'var(--padding)',
-                    width: 200,
+                    maxWidth: 200,
+                    minWidth: 200,
                 }}
             >
                 {/*
@@ -448,14 +444,11 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                     </button>
                 </VContainer>
             </VContainer>
-            <HContainer
+            <VContainer
                 overflow='auto'
                 style={{
-                    minHeight: 75,
-                    position: 'absolute',
-                    bottom: 'var(--padding)',
-                    left: 'var(--padding)',
-                    right: 'var(--padding)',
+                    maxWidth: 75,
+                    minWidth: 75,
                 }}
             >
                 <div className='item frame active' style={{ zIndex: 100 }}></div>
@@ -467,7 +460,7 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                 >
                     <i className='codicon codicon-plus' />
                 </button>
-            </HContainer>
+            </VContainer>
         </div>
     );
 }

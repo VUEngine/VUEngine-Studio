@@ -4,7 +4,6 @@ import { ColorMode, PALETTE_COLORS } from '../../../../core/browser/ves-common-t
 import HContainer from '../Common/HContainer';
 import { SpriteData } from './SpriteEditorTypes';
 import VContainer from '../Common/VContainer';
-import RadioSelect from '../Common/RadioSelect';
 
 interface PaletteSelectProps {
     data: SpriteData
@@ -71,12 +70,13 @@ export default function PaletteSelect(props: PaletteSelectProps): React.JSX.Elem
 
     return (
         <VContainer>
-            <HContainer gap={2}>
+            <HContainer gap={2} wrap='wrap'>
                 <div
                     className={'tool'}
                     onClick={toggleHiColor}
+                    style={{ width: 66 }}
                 >
-                    {data.colorMode === ColorMode.HiColor ? ' HC' : '4C'}
+                    {data.colorMode === ColorMode.HiColor ? ' HiColor' : '4 Colors'}
                 </div>
                 {[...Array(PALETTE_COLORS[colorMode].length)].map((p, paletteIndex) => (
                     <div
@@ -91,6 +91,7 @@ export default function PaletteSelect(props: PaletteSelectProps): React.JSX.Elem
                     </div>
                 ))}
             </HContainer>
+            { /* }
             <RadioSelect
                 options={[{
                     label: 'Default',
@@ -102,6 +103,7 @@ export default function PaletteSelect(props: PaletteSelectProps): React.JSX.Elem
                 defaultValue={colorMode}
                 onChange={options => toggleHiColor()}
             />
+            { */ }
         </VContainer>
     );
 }

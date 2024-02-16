@@ -1,6 +1,9 @@
 .jsonforms-container > .spriteEditor {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    gap: 15px;
     overflow: hidden;
-    padding: 0;
     position: relative;
 }
 
@@ -9,7 +12,7 @@
 }
 
 .spriteEditor .tool {
-    background-color: var(--theia-editorGroupHeader-tabsBackground);
+    background-color: var(--theia-activityBar-background);
     box-sizing: border-box;
     justify-content: center;
     align-items: center;
@@ -23,7 +26,7 @@
 
 .spriteEditor .tool:hover,
 .spriteEditor .tool.active {
-    border-color: var(--theia-editorGroupHeader-tabsBackground);
+    border-color: var(--theia-activityBar-background);
     outline: 1px solid var(--theia-button-background);
     outline-offset: -1px;
 }
@@ -43,4 +46,12 @@
 
 .spriteEditor .layer input {
     width: 120px;
+}
+
+.spriteEditor .pixel-container {
+    border: var(--theia-border-width) solid var(--theia-dropdown-border);
+    border-radius: 8px;
+    flex-grow: 1;
+    overflow: hidden;
+    position: relative;
 }
