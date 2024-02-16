@@ -1,12 +1,12 @@
+import { nls } from '@theia/core';
 import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React, { useContext } from 'react';
+import ReactTextareaAutosize from 'react-textarea-autosize';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import RadioSelect from '../../Common/RadioSelect';
 import VContainer from '../../Common/VContainer';
 import { EntityEditorContext, EntityEditorContextType, ScriptData } from '../EntityEditorTypes';
 import { AVAILABLE_ACTIONS, ActionConfigData, ActionConfigType, ScriptType } from './ScriptTypes';
-import { nls } from '@theia/core';
-import RadioSelect from '../../Common/RadioSelect';
-import ReactTextareaAutosize from 'react-textarea-autosize';
 
 export default function ScriptedActionDetail(): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
@@ -16,24 +16,18 @@ export default function ScriptedActionDetail(): React.JSX.Element {
     const currentScriptIndex = currentComponentParts[1] ? parseInt(currentComponentParts[1]) : 0;
     const currentActionIndex = currentComponentParts[2] ? parseInt(currentComponentParts[2]) : -1;
     const scriptConfig = data.components.scripts[currentScriptIndex];
-    const script = scriptConfig.script ?? [];
-    const currentScriptedAction = script[currentActionIndex];
+    const script = scriptConfig?.script ?? [];
+    let currentScriptedAction = script[currentActionIndex];
+    // follow branches
+    let x = 3;
+    while (currentComponentParts[x] && currentComponentParts[x + 1] &&
+        currentScriptedAction.branches && currentScriptedAction.branches[parseInt(currentComponentParts[x])] &&
+        currentScriptedAction.branches[parseInt(currentComponentParts[x])].script &&
+        currentScriptedAction.branches[parseInt(currentComponentParts[x])].script[parseInt(currentComponentParts[x + 1])]) {
+        currentScriptedAction = currentScriptedAction.branches[parseInt(currentComponentParts[x])].script[parseInt(currentComponentParts[x + 1])];
+        x += 2;
+    }
     const currentAction = AVAILABLE_ACTIONS[currentScriptedAction?.id ?? 0];
-
-    const setConfigValue = (key: string, value: any): void => {
-        const updatedScripts = [...data.components.scripts || []];
-        if (!updatedScripts[currentScriptIndex].script[currentActionIndex].config) {
-            updatedScripts[currentScriptIndex].script[currentActionIndex].config = {};
-        }
-        updatedScripts[currentScriptIndex].script[currentActionIndex].config![key] = value;
-
-        setData({
-            components: {
-                ...data.components,
-                scripts: updatedScripts,
-            }
-        });
-    };
 
     const updateScript = (partialScriptData: Partial<ScriptData>): void => {
         const updatedScripts = [...data.components.scripts || []];
@@ -57,6 +51,21 @@ export default function ScriptedActionDetail(): React.JSX.Element {
         updateScript({ type });
     };
 
+    const setConfigValue = (key: string, value: any): void => {
+        const updatedScript = [
+            ...scriptConfig.script,
+        ];
+        updatedScript[currentActionIndex] = {
+            ...updatedScript[currentActionIndex],
+            config: {
+                ...updatedScript[currentActionIndex].config,
+                [key]: value,
+            },
+        };
+
+        updateScript({ script: updatedScript });
+    };
+
     const getConfigControl = (config: ActionConfigData): React.JSX.Element => {
         switch (config.type) {
             case ActionConfigType.Boolean:
@@ -66,8 +75,14 @@ export default function ScriptedActionDetail(): React.JSX.Element {
                 const items = Object.values(services.vesProjectService.getProjectDataItemsForType(config.typeId || '') || {});
                 // @ts-ignore
                 const defaultValue = items.find(item => item.name === config.default)?._id || '';
-                return <SelectComponent
-                    options={items
+                return <select
+                    className='theia-select'
+                    onChange={e => setConfigValue(config.key, e.target.value)}
+                    value={currentScriptedAction.config && currentScriptedAction.config[config.key]
+                        ? currentScriptedAction.config[config.key]
+                        : defaultValue}
+                >
+                    {items
                         .sort((a, b) => {
                             // @ts-ignore
                             if (a.name > b.name) { return 1; }
@@ -75,19 +90,20 @@ export default function ScriptedActionDetail(): React.JSX.Element {
                             if (a.name < b.name) { return -1; }
                             return 0;
                         })
-                        .map(f => ({
+                        .map((f, i) =>
                             // @ts-ignore
-                            value: f._id, label: f.name
-                        }))}
-                    defaultValue={currentScriptedAction.config ? currentScriptedAction.config[config.key] : defaultValue}
-                    onChange={option => setConfigValue(config.key, option.value)}
-                />;
+                            <option key={i} value={f._id}>{f.name}</option>
+                        )}
+                </select>;
             case ActionConfigType.TextArea:
                 return <ReactTextareaAutosize
                     className="theia-input"
-                    value={currentScriptedAction.config ? currentScriptedAction.config[config.key] : config.default}
+                    value={currentScriptedAction.config && currentScriptedAction.config[config.key]
+                        ? currentScriptedAction.config[config.key]
+                        : config.default}
                     maxRows={8}
                     onChange={e => setConfigValue(config.key, e.target.value)}
+                    style={{ resize: 'none' }}
                 />;
             default:
                 return <input
@@ -96,7 +112,9 @@ export default function ScriptedActionDetail(): React.JSX.Element {
                     min={config.min}
                     max={config.max}
                     step={config.step}
-                    value={currentScriptedAction.config ? currentScriptedAction.config[config.key] : config.default}
+                    value={currentScriptedAction.config && currentScriptedAction.config[config.key]
+                        ? currentScriptedAction.config[config.key]
+                        : config.default}
                     onChange={e => setConfigValue(config.key, e.target.value)}
                 />;
         }
@@ -155,7 +173,7 @@ export default function ScriptedActionDetail(): React.JSX.Element {
         }
         {currentActionIndex > -1 &&
             <>
-                {currentAction.config &&
+                {currentAction?.config &&
                     <>
                         {currentAction.config && currentAction.config.map((c, i) =>
                             <div key={i}>
@@ -167,7 +185,7 @@ export default function ScriptedActionDetail(): React.JSX.Element {
                         )}
                     </>
                 }
-                {!currentAction.config &&
+                {!currentAction?.config &&
                     nls.localize('vuengine/entityEditor/noActionConfiguration', 'This action does not need any configuration.')
                 }
             </>

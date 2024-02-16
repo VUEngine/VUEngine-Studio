@@ -256,7 +256,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
                   <EntityMeta />
                   <ComponentTree />
                 </VContainer>
-              </VContainer>
+                </VContainer>
             }
           </EntityEditorContext.Consumer>
           <EntityEditorContext.Consumer>

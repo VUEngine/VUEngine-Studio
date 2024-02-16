@@ -315,7 +315,7 @@ export default function ComponentTree(): React.JSX.Element {
             labelPlural: nls.localize('vuengine/entityEditor/sprites', 'Sprites'),
             allowAdd: true,
             addAction: addSprite,
-            hasContent: data.components?.sprites.length > 0,
+            hasContent: data.components?.sprites?.length > 0,
         },
         {
             key: 'animations',
@@ -324,7 +324,7 @@ export default function ComponentTree(): React.JSX.Element {
             labelPlural: nls.localize('vuengine/entityEditor/animations', 'Animations'),
             allowAdd: true,
             addAction: addAnimation,
-            hasContent: data.components?.animations.length > 0,
+            hasContent: data.components?.animations?.length > 0,
         },
         {
             key: 'colliders',
@@ -333,7 +333,7 @@ export default function ComponentTree(): React.JSX.Element {
             labelPlural: nls.localize('vuengine/entityEditor/colliders', 'Colliders'),
             allowAdd: true,
             addAction: addCollider,
-            hasContent: data.components?.colliders.length > 0,
+            hasContent: data.components?.colliders?.length > 0,
         },
         {
             key: 'wireframes',
@@ -342,7 +342,7 @@ export default function ComponentTree(): React.JSX.Element {
             labelPlural: nls.localize('vuengine/entityEditor/wireframes', 'Wireframes'),
             allowAdd: true,
             addAction: addWireframe,
-            hasContent: data.components?.wireframes.length > 0,
+            hasContent: data.components?.wireframes?.length > 0,
         },
         {
             key: 'behaviors',
@@ -351,7 +351,7 @@ export default function ComponentTree(): React.JSX.Element {
             labelPlural: nls.localize('vuengine/entityEditor/behaviors', 'Behaviors'),
             allowAdd: true,
             addAction: addBehavior,
-            hasContent: data.components?.behaviors.length > 0,
+            hasContent: data.components?.behaviors?.length > 0,
         },
         {
             key: 'children',
@@ -360,7 +360,7 @@ export default function ComponentTree(): React.JSX.Element {
             labelPlural: nls.localize('vuengine/entityEditor/children', 'Children'),
             allowAdd: true,
             addAction: addPositionedEntity,
-            hasContent: data.components?.children.length > 0,
+            hasContent: data.components?.children?.length > 0,
         },
         {
             key: 'scripts',
@@ -369,7 +369,7 @@ export default function ComponentTree(): React.JSX.Element {
             labelPlural: nls.localize('vuengine/entityEditor/scripts', 'Scripts'),
             allowAdd: true,
             addAction: addScript,
-            hasContent: data.components?.scripts.length > 0,
+            hasContent: data.components?.scripts?.length > 0,
         },
         {
             key: 'physics',
@@ -426,7 +426,7 @@ export default function ComponentTree(): React.JSX.Element {
                     openByDefault={true}
                     width='100%'
                     onMove={({ dragIds, parentId, index }) => moveComponent(dragIds, parentId!, index)}
-                    selection={state.currentComponent}
+                    selection={state.currentComponent.split('-', 2).join('-')} // ignore sub selections
                 >
                     {ComponentTreeNode}
                 </Tree>

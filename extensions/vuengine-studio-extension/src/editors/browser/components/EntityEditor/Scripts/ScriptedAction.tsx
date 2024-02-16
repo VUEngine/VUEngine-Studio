@@ -1,28 +1,124 @@
-import { nls } from '@theia/core';
+import { QuickPickItem, QuickPickOptions, QuickPickSeparator, nls } from '@theia/core';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../../../editors/browser/ves-editors-types';
 import HContainer from '../../Common/HContainer';
 import VContainer from '../../Common/VContainer';
 import { AVAILABLE_ACTIONS, ActionConfigType, ActionData, ScriptedActionData } from './ScriptTypes';
+import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
+import { ConfirmDialog } from '@theia/core/lib/browser';
 
 interface ScriptedActionProps {
+    id: string
+    index: number
+    script: ScriptedActionData[]
     action: Partial<ActionData>
     scriptedAction?: ScriptedActionData
-    addAction: () => void
-    removeAction?: () => void
-    isCurrentAction: boolean
-    setCurrentAction: () => void
+    updateScript: (script: ScriptedActionData[]) => void
     isRoot?: boolean
-    isEndNode?: boolean
+    isEnd?: boolean
 }
 
 export default function ScriptedAction(props: ScriptedActionProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
-    const { action, scriptedAction, addAction, removeAction, isCurrentAction, setCurrentAction, isRoot, isEndNode } = props;
+    const { state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { id, index, script, action, scriptedAction, updateScript, isRoot, isEnd } = props;
+
+    const setHighlightedAction = (actionIndex: number): void => {
+        setState({ currentComponent: id });
+    };
+
+    const showActionSelection = (): Promise<QuickPickItem | undefined> => {
+        const quickPickOptions: QuickPickOptions<QuickPickItem> = {
+            title: nls.localize('vuengine/editors/addAction', 'Add Action'),
+            placeholder: nls.localize('vuengine/editors/selectActionToAdd', 'Select an action to add...'),
+        };
+        let previopusCategory = '';
+        const items: (QuickPickItem | QuickPickSeparator)[] = [];
+        Object.values(AVAILABLE_ACTIONS)
+            .sort((a, b) => {
+                if (a.category > b.category) { return -1; }
+                if (a.category < b.category) { return 1; }
+                if (a.name > b.name) { return 1; }
+                if (a.name < b.name) { return -1; }
+                return 0;
+            })
+            .map(a => {
+                if (previopusCategory !== a.category) {
+                    previopusCategory = a.category;
+                    items.push({
+                        type: 'separator',
+                        label: a.category,
+                    });
+                }
+                items.push({
+                    id: a.id,
+                    label: a.name,
+                });
+            });
+
+        return services.quickPickService.show(
+            items,
+            quickPickOptions
+        );
+    };
+
+    const addAction = async (): Promise<void> => {
+        const actionToAdd = await showActionSelection();
+        if (actionToAdd) {
+            updateScript([
+                ...script.slice(0, index + 1),
+                {
+                    id: actionToAdd.id!,
+                },
+                ...script.slice(index + 1)
+            ]);
+
+            setHighlightedAction(index + 1);
+        }
+    };
+
+    const removeAction = async (): Promise<void> => {
+        const dialog = new ConfirmDialog({
+            title: nls.localize('vuengine/entityEditor/removeAction', 'Remove Action'),
+            msg: nls.localize('vuengine/entityEditor/areYouSureYouWantToRemoveAction', 'Are you sure you want to remove this action?'),
+        });
+        const confirmed = await dialog.open();
+        if (confirmed) {
+            updateScript([
+                ...script.slice(0, index),
+                ...script.slice(index + 1)
+            ]);
+
+            setHighlightedAction(-1);
+        }
+    };
+
+    const updateBranchScript = (branchIndex: number, branchScript: ScriptedActionData[]) => {
+        const updatedScript = [...script];
+
+        const updatedBranches = updatedScript[index].branches ?? [];
+        updatedBranches[branchIndex] = {
+            ...updatedBranches[branchIndex],
+            script: branchScript,
+        };
+
+        updatedScript[index] = {
+            ...updatedScript[index],
+            branches: updatedBranches,
+        };
+
+        updateScript(updatedScript);
+    };
+
+    const onClick = (): void => {
+        if (!isEnd && id !== '') {
+            setHighlightedAction(index);
+        }
+    };
 
     const meta: any[] = [];
     if (action?.config) {
-        action.config.map(c => {
+        action.config?.map(c => {
             switch (c.type) {
                 case ActionConfigType.Text:
                 case ActionConfigType.TextArea:
@@ -49,7 +145,7 @@ export default function ScriptedAction(props: ScriptedActionProps): React.JSX.El
     if (isRoot) {
         containerClasses.push('root');
     }
-    if (isEndNode) {
+    if (isEnd) {
         containerClasses.push('end');
     }
     if (action?.branches?.length) {
@@ -57,7 +153,7 @@ export default function ScriptedAction(props: ScriptedActionProps): React.JSX.El
     }
 
     const actionClasses = ['scripted-action', 'item'];
-    if (isCurrentAction) {
+    if (!isEnd && id === state.currentComponent) {
         actionClasses.push('active');
     }
 
@@ -65,24 +161,24 @@ export default function ScriptedAction(props: ScriptedActionProps): React.JSX.El
         <HContainer
             alignItems='start'
             className={actionClasses.join(' ')}
-            onClick={setCurrentAction}
+            onClick={onClick}
         >
-            {removeAction && <button
-                className="remove-button"
-                onClick={removeAction}
-                title={nls.localize('vuengine/entityEditor/removeAction', 'Remove Action')}
-            >
-                <i className='codicon codicon-x' />
-            </button>}
+            {!isEnd && !isRoot &&
+                <button
+                    className="remove-button"
+                    onClick={removeAction}
+                    title={nls.localize('vuengine/entityEditor/removeAction', 'Remove Action')}
+                >
+                    <i className='codicon codicon-x' />
+                </button>
+            }
             {action?.iconClass &&
-                <div>
-                    <i className={action.iconClass} />
-                </div>
+                <i className={action.iconClass} />
             }
             {action?.name &&
                 <VContainer gap={2} overflow='hidden'>
                     <div>{action.name}</div>
-                    {!isRoot && !isEndNode &&
+                    {!isRoot && !isEnd &&
                         <div className='meta'>
                             {meta.join(', ')}
                         </div>
@@ -93,33 +189,48 @@ export default function ScriptedAction(props: ScriptedActionProps): React.JSX.El
         {action?.branches &&
             <div className='scripted-action-branches'>
                 {action.branches?.map((b, i) =>
-                    <VContainer key={i}>
+                    <VContainer key={i} gap={0}>
                         <ScriptedAction
+                            id=''
+                            index={-2}
                             action={{
                                 name: b.name,
                             }}
-                            addAction={() => addAction()}
-                            isCurrentAction={false}
-                            setCurrentAction={() => { }}
+                            script={scriptedAction?.branches && scriptedAction?.branches[i] && scriptedAction?.branches[i].script
+                                ? scriptedAction?.branches[i].script
+                                : []}
+                            updateScript={(s: ScriptedActionData[]) => updateBranchScript(i, s)}
                             isRoot
                         />
-                        {scriptedAction?.branches && scriptedAction?.branches[i].script.map((c, j) =>
+                        {scriptedAction?.branches && scriptedAction?.branches[i] && scriptedAction?.branches[i].script?.map((c, j) =>
                             <ScriptedAction
+                                id={`${id}-${i}-${j}`}
+                                index={j} // TODO
                                 key={j}
+                                script={scriptedAction?.branches && scriptedAction?.branches[i] && scriptedAction?.branches[i].script
+                                    ? scriptedAction?.branches[i].script
+                                    : []}
                                 action={AVAILABLE_ACTIONS[c.id]}
+                                updateScript={(s: ScriptedActionData[]) => updateBranchScript(i, s)}
                                 scriptedAction={c}
-                                addAction={() => addAction()}
-                                removeAction={() => removeAction!()}
-                                isCurrentAction={false}
-                                setCurrentAction={() => { }}
                             />
                         )}
+                        <ScriptedAction
+                            id=''
+                            index={-2}
+                            script={[]}
+                            action={{
+                                iconClass: b.endNodeIconClass ? b.endNodeIconClass : 'codicon codicon-arrow-down',
+                            }}
+                            updateScript={() => { }}
+                            isEnd
+                        />
                     </VContainer>
                 )}
             </div>
         }
         {
-            !isEndNode && <button
+            !isEnd && <button
                 className='theia-button add-button full-width'
                 onClick={addAction}
                 title={nls.localize('vuengine/editors/addAction', 'Add Action')}

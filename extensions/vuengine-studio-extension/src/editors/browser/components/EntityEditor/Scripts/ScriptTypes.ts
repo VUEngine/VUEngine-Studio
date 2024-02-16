@@ -28,6 +28,7 @@ export interface ActionConfigData {
 
 export interface BranchData {
     name: string
+    endNodeIconClass?: string
     // condition
 }
 
@@ -136,7 +137,8 @@ export const AVAILABLE_ACTIONS: ActionMap = {
         iconClass: 'codicon codicon-refresh',
         template: 'templates/action/loop',
         branches: [{
-            name: 'Loop'
+            name: 'Loop',
+            endNodeIconClass: 'codicon codicon-refresh',
         }],
     },
     'ifElse': {
@@ -146,9 +148,9 @@ export const AVAILABLE_ACTIONS: ActionMap = {
         iconClass: 'codicon codicon-arrow-swap',
         template: 'templates/action/ifElse',
         branches: [{
-            name: 'If'
+            name: 'If',
         }, {
-            name: 'Else'
+            name: 'Else',
         }],
     },
     'setVariable': {

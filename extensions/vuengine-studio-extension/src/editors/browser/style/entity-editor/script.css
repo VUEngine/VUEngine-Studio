@@ -1,21 +1,21 @@
 .script-container {
     align-items: center;
-    /*
-    background-image: radial-gradient(var(--theia-dropdown-border) 1px, transparent 0);
-    background-size: 16px 16px;
-    */
-    background: radial-gradient(circle, transparent 15%, var(--theia-editor-background) 15%),
-        linear-gradient(0deg, transparent 49%, rgba(0,0,0,.2) 49%, rgba(0,0,0,.2) 51%, transparent 51%), 
-        linear-gradient(90deg, transparent 49%, rgba(0,0,0,.2) 49%, rgba(0,0,0,.2) 51%, transparent 51%);
+    background-image: radial-gradient(rgba(0, 0, 0, .2) 2px, transparent 0);
     background-size: 32px 32px;
+    /*
+    background: radial-gradient(circle, transparent 15%, var(--theia-editor-background) 15%),
+        linear-gradient(0deg, transparent 49%, rgba(0, 0, 0, .2) 49%, rgba(0, 0, 0, .2) 51%, transparent 51%), 
+        linear-gradient(90deg, transparent 49%, rgba(0, 0, 0, .2) 49%, rgba(0, 0, 0, .2) 51%, transparent 51%);
+    background-size: 32px 32px;
+    */
     border: var(--theia-border-width) solid var(--theia-dropdown-border);
     border-radius: 8px;
     cursor: grab;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    margin: var(--padding);
-    overflow: hidden;
+    overflow: auto;
+    padding: var(--padding);
     position: relative;
     user-select: none;
 }
@@ -28,15 +28,15 @@
     align-items: center;
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    padding-top: 3px;
+    gap: var(--theia-ui-padding);
+    padding-top: calc(var(--theia-ui-padding) - 2px);
     position: relative;
 }
 
 .scripted-action {
     box-shadow: 5px 5px rgba(0, 0, 0, .2);
     cursor: pointer;
-    width: 250px;
+    width: 200px;
 }
 
 .scripted-action-container.root .scripted-action,
@@ -45,7 +45,7 @@
     justify-content: center;
 }
 .scripted-action-container.end .scripted-action {
-    cursor: default;
+    cursor: unset;
 }
 .scripted-action-container.end .scripted-action:hover {
     border-color: transparent;
@@ -58,16 +58,17 @@
 
 .scripted-action-container:not(.end):not(.has-branches) .scripted-action:after,
 .scripted-action-branches:after {
-    border-left: 1px dashed var(--theia-dropdown-border);
-    bottom: -50px;
-    content: '';
-    display: block;
-    height: 50px;
-    left: calc(50% - 1px);
+    bottom: -22px;
+    color: var(--theia-dropdown-border);
+    content: '↓';
+    font-size: 16px;
+    left: calc(50% - 16px);
     position: absolute;
+    text-align: center;
+    width: 32px;
 }
 .scripted-action-branches:after {
-    bottom: -32px;
+    bottom: -1px;
 }
 
 /*
@@ -80,12 +81,12 @@
 .scripted-action-container .add-button {
     box-shadow: 5px 5px rgba(0, 0, 0, .2);
     height: 10px;
-    margin-bottom: 2px;
+    margin-bottom: 3px;
     min-height: unset;
     opacity: 0;
-    transition: all .2s;
-    transition-delay: .2s;
-    width: 250px !important;
+    transition: all .1s;
+    transition-delay: .3s;
+    width: 200px !important;
     z-index: 10;
 }
 
@@ -118,11 +119,16 @@
     gap: 15px;
     margin-top: -27px;
     overflow: hidden;
-    padding: 28px 28px 3px;
+    padding: 28px 28px var(--padding);
 }
 
 .scripted-action-branches .scripted-action-container.root .scripted-action {
     background-color: var(--theia-editor-background);
     justify-content: center;
     padding: var(--theia-ui-padding) var(--padding);
+}
+
+.scripted-action-branches .scripted-action-container.root .scripted-action:hover {
+    border-color: var(--theia-dropdown-border);
+    cursor: unset;
 }
