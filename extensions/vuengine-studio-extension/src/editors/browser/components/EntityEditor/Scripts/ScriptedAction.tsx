@@ -3,9 +3,10 @@ import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../../../editors/browser/ves-editors-types';
 import HContainer from '../../Common/HContainer';
 import VContainer from '../../Common/VContainer';
-import { AVAILABLE_ACTIONS, ActionConfigType, ActionData, ScriptedActionData } from './ScriptTypes';
+import { ScriptedActionData } from './ScriptTypes';
 import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 import { ConfirmDialog } from '@theia/core/lib/browser';
+import { AVAILABLE_ACTIONS, ActionConfigType, ActionData } from './AvailableActions';
 
 interface ScriptedActionProps {
     id: string

@@ -6,7 +6,9 @@ import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import RadioSelect from '../../Common/RadioSelect';
 import VContainer from '../../Common/VContainer';
 import { EntityEditorContext, EntityEditorContextType, ScriptData } from '../EntityEditorTypes';
-import { AVAILABLE_ACTIONS, ActionConfigData, ActionConfigType, ScriptType } from './ScriptTypes';
+import { ScriptType } from './ScriptTypes';
+import { AVAILABLE_ACTIONS, ActionConfigData, ActionConfigType } from './AvailableActions';
+import { ENTITY_FUNCTIONS } from './EntityFunctions';
 
 export default function ScriptedActionDetail(): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
@@ -157,13 +159,13 @@ export default function ScriptedActionDetail(): React.JSX.Element {
                             {nls.localize('vuengine/entityEditor/inheritedFunction', 'Inherited Function')}
                         </label>
                         <SelectComponent
-                            options={[{
-                                value: 'Entity Created',
-                                description: 'This function is being called right after the entity had been created.'
-                            }, {
-                                value: 'Resume',
-                                description: 'This function is being called when the game resumes after exiting a special state, e.g. pause screen.'
-                            }]}
+                            options={Object.values(ENTITY_FUNCTIONS)
+                                .sort((a, b) => a.label.localeCompare(b.label))
+                                .map(f => ({
+                                    value: f.name,
+                                    label: f.label,
+                                    description: f.description,
+                                }))}
                             defaultValue={scriptConfig.name}
                             onChange={option => setName(option.value!)}
                         />

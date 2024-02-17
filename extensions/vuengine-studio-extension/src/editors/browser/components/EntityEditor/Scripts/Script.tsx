@@ -1,9 +1,10 @@
 import React, { useContext, useState } from 'react';
 import { EntityEditorContext, EntityEditorContextType, MAX_PREVIEW_SCRIPT_ZOOM, MIN_PREVIEW_SCRIPT_ZOOM, WHEEL_SENSITIVITY } from '../EntityEditorTypes';
 import PreviewOptions from '../Preview/PreviewOptions';
-import { AVAILABLE_ACTIONS, ScriptedActionData } from './ScriptTypes';
+import { ScriptedActionData } from './ScriptTypes';
 import ScriptedAction from './ScriptedAction';
 import VContainer from '../../Common/VContainer';
+import { AVAILABLE_ACTIONS } from './AvailableActions';
 
 interface ScriptProps {
     index: number
