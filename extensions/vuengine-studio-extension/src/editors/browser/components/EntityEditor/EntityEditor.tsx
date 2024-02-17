@@ -73,14 +73,14 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
     const { isGenerating, setIsGenerating } = this.props.context;
 
     if (!isGenerating) {
+      setIsGenerating(true);
       let updatedData = this.postProcessData({ ...this.props.data, ...entityData });
       if (options?.appendImageData) {
-        setIsGenerating(true);
         updatedData = await this.appendImageData(updatedData);
-        setIsGenerating(false);
       }
 
       this.props.updateData(updatedData);
+      setIsGenerating(false);
     }
   }
 
@@ -256,7 +256,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
                   <EntityMeta />
                   <ComponentTree />
                 </VContainer>
-                </VContainer>
+              </VContainer>
             }
           </EntityEditorContext.Consumer>
           <EntityEditorContext.Consumer>

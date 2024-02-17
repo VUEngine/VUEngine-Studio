@@ -47,6 +47,7 @@
     align-items: center;
     border: 1px dashed red;
     display: flex;
+    height: 32px !important; /* override reduced height on animations */
     justify-content: center;
     overflow: hidden;
     position: relative;

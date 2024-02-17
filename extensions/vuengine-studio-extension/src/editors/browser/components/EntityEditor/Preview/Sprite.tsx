@@ -69,8 +69,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 singleImageData,
                 ...allImageData.slice(i),
               ];
-              setHeight(height || singleImageData.height);
-              setWidth(width || singleImageData.width);
+              setHeight(singleImageData.height);
+              setWidth(singleImageData.width);
             }
           } else {
             setImageError('could not parse image');
@@ -83,6 +83,9 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
       setImageError('no file selected');
     }
 
+    if (allImageData.length) {
+      setError(undefined);
+    }
     setImageData(allImageData);
   };
 
@@ -106,7 +109,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     getData();
   }, [
     height,
-    images,
+    images.length,
     width,
   ]);
 
@@ -123,7 +126,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
       style={{
         boxSizing: 'border-box',
         cursor: 'pointer',
-        height: height / (isMultiFileAnimation ? 1 : frames || 1),
+        height: height / (isMultiFileAnimation ? 1 : frames ?? 1),
         opacity: transparent ? .5 : 1,
         outline: highlighted ? '1px solid green' : undefined,
         overflow: 'hidden',
@@ -139,7 +142,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         <div style={{
           position: 'relative',
           top: animate && !isMultiFileAnimation
-            ? (height / (frames || 1) * currentAnimationFrame * -1)
+            ? (height / (frames ?? 1) * currentAnimationFrame * -1)
             : 0
         }}>
           {currentPixelData &&
