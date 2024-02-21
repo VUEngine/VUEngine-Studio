@@ -177,8 +177,12 @@
 #vesBuildWidget .buildLogLine .text {
   display: table-cell;
   padding-right: var(--theia-ui-padding);
-  white-space: break-spaces;
+  white-space: nowrap;
   width: 100%;
+}
+
+#vesBuildWidget .buildLog.linewrap .buildLogLine .text {
+  white-space: break-spaces;
   word-break: break-word;
 }
 

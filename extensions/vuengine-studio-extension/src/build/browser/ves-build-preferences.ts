@@ -18,6 +18,7 @@ export namespace VesBuildPreferenceIds {
     export const ENGINE_CORE_INCLUDE_IN_WORKSPACE = [CATEGORY, 'engine', 'core', 'includeInWorkspace'].join('.');
     export const PRE_BUILD_TASKS = [CATEGORY, 'tasks', 'pre'].join('.');
     export const POST_BUILD_TASKS = [CATEGORY, 'tasks', 'post'].join('.');
+    export const LOG_LINE_WRAP = [CATEGORY, 'logLineWrap'].join('.');
     export const USE_WSL = [CATEGORY, 'useWsl'].join('.');
 }
 
@@ -120,6 +121,13 @@ const properties: PreferenceSchemaProperties = {
             },
         },
         default: [],
+        scope: PreferenceScope.Folder,
+        overridable: true,
+    },
+    [VesBuildPreferenceIds.LOG_LINE_WRAP]: {
+        type: 'boolean',
+        description: nls.localize('vuengine/build/preferences/logLineWrap', 'Wrap lines in build log.'),
+        default: true,
         scope: PreferenceScope.Folder,
         overridable: true,
     },

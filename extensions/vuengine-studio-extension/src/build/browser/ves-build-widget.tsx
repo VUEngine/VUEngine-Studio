@@ -131,9 +131,10 @@ export class VesBuildWidget extends ReactWidget {
         case VesBuildPreferenceIds.BUILD_MODE:
         case VesBuildPreferenceIds.DUMP_ELF:
         case VesBuildPreferenceIds.ENGINE_CORE_PATH:
+        case VesBuildPreferenceIds.LOG_LINE_WRAP:
+        case VesBuildPreferenceIds.PEDANTIC_WARNINGS:
         case VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH:
         case VesPluginsPreferenceIds.USER_PLUGINS_PATH:
-        case VesBuildPreferenceIds.PEDANTIC_WARNINGS:
           this.update();
           break;
       }
@@ -157,6 +158,7 @@ export class VesBuildWidget extends ReactWidget {
   }
 
   protected render(): React.ReactNode {
+    const lineWrap = this.preferenceService.get(VesBuildPreferenceIds.LOG_LINE_WRAP) as boolean;
     const useWsl = this.preferenceService.get(VesBuildPreferenceIds.USE_WSL) as boolean;
     const isWslInstalled = useWsl && this.vesCommonService.isWslInstalled;
 
@@ -284,7 +286,7 @@ export class VesBuildWidget extends ReactWidget {
               : 'buildLogWrapper'
           }
         >
-          <div className='buildLog'>
+          <div className={`buildLog${lineWrap ? ' linewrap' : ''}`}>
             <div>
               {this.vesBuildService.buildStatus.log
                 .filter(l =>
@@ -332,6 +334,16 @@ export class VesBuildWidget extends ReactWidget {
             <i className={this.state.autoScroll
               ? 'fa fa-fw fa-long-arrow-down'
               : 'fa fa-fw fa-minus'
+            }></i>
+          </button>
+          <button
+            className="theia-button secondary"
+            title={nls.localize('vuengine/build/toggleLineWrap', 'Toggle line wrap')}
+            onClick={() => this.toggleLineWrap()}
+          >
+            <i className={lineWrap
+              ? 'codicon codicon-word-wrap'
+              : 'codicon codicon-list-selection'
             }></i>
           </button>
           {/* TODO: allow to filter for both warnings AND problems */}
@@ -431,6 +443,11 @@ export class VesBuildWidget extends ReactWidget {
   protected toggleAutoScroll = (): void => {
     this.state.autoScroll = !this.state.autoScroll;
     this.update();
+  };
+
+  protected toggleLineWrap = (): void => {
+    const lineWrap = this.preferenceService.get(VesBuildPreferenceIds.LOG_LINE_WRAP) as boolean;
+    this.preferenceService.set(VesBuildPreferenceIds.LOG_LINE_WRAP, !lineWrap);
   };
 
   protected setSearchTerm = (searchTerm: string): void => {
