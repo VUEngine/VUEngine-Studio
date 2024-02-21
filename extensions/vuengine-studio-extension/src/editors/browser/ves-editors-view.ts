@@ -1,5 +1,5 @@
 import { Command, CommandContribution, CommandRegistry, CommandService, MenuContribution, MenuModelRegistry, URI, UntitledResourceResolver } from '@theia/core';
-import { AbstractViewContribution, CommonCommands, CommonMenus, OpenerService, Widget, open } from '@theia/core/lib/browser';
+import { AbstractViewContribution, CommonCommands, OpenerService, Widget } from '@theia/core/lib/browser';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { UserWorkingDirectoryProvider } from '@theia/core/lib/browser/user-working-directory-provider';
@@ -105,18 +105,22 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
 
         await this.vesProjectService.projectDataReady;
         const types = this.vesProjectService.getProjectDataTypes();
+
         for (const typeId of Object.keys(types || {})) {
             const type = types![typeId];
+
+            // TODO: disabled for now since the Save As command is not working for
+            // untitled editors files. Need to investigate why that is the case.
+            /*
             if (type.file?.startsWith('.')) {
                 commandRegistry.registerCommand(Command.toLocalizedCommand(
                     {
                         id: `ves:editors:new-untitled:${typeId}`,
                         label: `New Untitled ${type.schema.title || typeId} File`,
-                        category: 'Editor',
+                        category: CommonCommands.FILE_CATEGORY,
                         iconClass: type.icon,
                     },
-                    `vuengine/editors/newUntitled/${typeId}`,
-                    'vuengine/editors/commands/category'
+                    `vuengine/editors/newUntitled/${typeId}`
                 ), {
                     isEnabled: () => true,
                     execute: async () => {
@@ -126,18 +130,18 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                     },
                 });
             }
+            */
 
+            // TODO: hide from command palette
             if (type.forFiles?.length) {
                 commandRegistry.registerCommand(Command.toLocalizedCommand(
                     {
                         id: `ves:editors:new-file:${typeId}`,
                         label: `New ${type.schema.title || typeId} File...`,
-                        category: 'Editor',
+                        category: CommonCommands.FILE_CATEGORY,
                     },
-                    `vuengine/editors/newFile/${typeId}`,
-                    'vuengine/editors/commands/category'
+                    `vuengine/editors/newFile/${typeId}`
                 ), {
-                    isEnabled: () => true,
                     execute: async () => this.commandService.executeCommand(WorkspaceCommands.NEW_FILE.id),
                 });
             }
@@ -192,6 +196,11 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         const types = this.vesProjectService.getProjectDataTypes();
         for (const typeId of Object.keys(types || {})) {
             const type = types![typeId];
+
+            // TODO: disabled for now since the Save As command is not working for
+            // untitled editors files. Need to investigate why that is the case.
+            /*
+            // contribute to "Create: New File..."" command
             if (type.file?.startsWith('.')) {
                 const id = `ves:editors:new-untitled:${typeId}`;
                 menus.registerMenuNode(CommonMenus.FILE_NEW_CONTRIBUTIONS, {
@@ -200,6 +209,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                     command: id,
                 });
             }
+            */
 
             if (type.forFiles?.length) {
                 menus.registerMenuAction(NavigatorContextMenu.NAVIGATION, {
