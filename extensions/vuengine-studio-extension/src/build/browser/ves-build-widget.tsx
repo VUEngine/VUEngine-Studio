@@ -20,7 +20,8 @@ import { VesBuildService } from './ves-build-service';
 import { BuildLogLine, BuildLogLineFileLink, BuildLogLineType, BuildResult } from './ves-build-types';
 
 interface VesBuildWidgetState {
-  logFilter: BuildLogLineType
+  filterErrors: boolean
+  filterWarnings: boolean
   timerInterval: NodeJS.Timeout | undefined
   outputRomExists: boolean
   autoScroll: boolean
@@ -54,7 +55,8 @@ export class VesBuildWidget extends ReactWidget {
   static readonly LABEL = nls.localize('vuengine/build/buildProject', 'Build Project');
 
   protected state: VesBuildWidgetState = {
-    logFilter: BuildLogLineType.Normal,
+    filterErrors: false,
+    filterWarnings: false,
     timerInterval: undefined,
     outputRomExists: false,
     autoScroll: true,
@@ -103,17 +105,19 @@ export class VesBuildWidget extends ReactWidget {
     this.vesBuildService.onDidChangeBuildMode(() => this.update());
     this.vesBuildService.onDidStartBuild(() => {
       this.startTimerInterval();
-      this.state.logFilter = BuildLogLineType.Normal;
+      this.state.filterErrors = false;
+      this.state.filterWarnings = false;
       this.title.className = 'ves-decorator-progress';
     });
     this.vesBuildService.onDidSucceedBuild(async () => {
       this.stopTimerInterval();
-      this.title.className = this.vesBuildService.getNumberOfWarnings() > 0
+      const numberOfWarnings = this.vesBuildService.getNumberOfWarnings();
+      this.title.className = numberOfWarnings > 0
         ? 'ves-decorator-warning'
         : 'ves-decorator-success';
       this.state.outputRomExists = await this.vesBuildService.outputRomExists();
-      if (!this.vesBuildService.getNumberOfWarnings() && this.preferenceService.get(VesBuildPreferenceIds.AUTO_FILTER_LOGS_ON_WARNING)) {
-        this.state.logFilter = BuildLogLineType.Warning;
+      if (numberOfWarnings > 0 && this.preferenceService.get(VesBuildPreferenceIds.AUTO_FILTER_LOGS_ON_WARNING)) {
+        this.state.filterWarnings = true;
       }
       this.update();
     });
@@ -122,7 +126,7 @@ export class VesBuildWidget extends ReactWidget {
       this.title.className = 'ves-decorator-error';
       this.state.outputRomExists = await this.vesBuildService.outputRomExists();
       if (this.preferenceService.get(VesBuildPreferenceIds.AUTO_FILTER_LOGS_ON_ERROR)) {
-        this.state.logFilter = BuildLogLineType.Error;
+        this.state.filterErrors = true;
       }
       this.update();
     });
@@ -133,6 +137,7 @@ export class VesBuildWidget extends ReactWidget {
         case VesBuildPreferenceIds.ENGINE_CORE_PATH:
         case VesBuildPreferenceIds.LOG_LINE_WRAP:
         case VesBuildPreferenceIds.PEDANTIC_WARNINGS:
+        case VesBuildPreferenceIds.USE_WSL:
         case VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH:
         case VesPluginsPreferenceIds.USER_PLUGINS_PATH:
           this.update();
@@ -277,22 +282,18 @@ export class VesBuildWidget extends ReactWidget {
             </div>
           )}
         </div>
-        <div
-          className={
-            this.state.logFilter !== BuildLogLineType.Normal
-              ? `buildLogWrapper filter${this.state.logFilter
-                .charAt(0)
-                .toUpperCase()}${this.state.logFilter.slice(1)}`
-              : 'buildLogWrapper'
-          }
-        >
+        <div className='buildLogWrapper'>
           <div className={`buildLog${lineWrap ? ' linewrap' : ''}`}>
             <div>
               {this.vesBuildService.buildStatus.log
-                .filter(l =>
-                  this.state.searchTerm === '' ||
-                  l.text.toLowerCase().includes(this.state.searchTerm.toLowerCase())
-                )
+                .filter(l => (
+                  (
+                    (!this.state.filterErrors && !this.state.filterWarnings) ||
+                    (this.state.filterErrors && l.type === BuildLogLineType.Error) ||
+                    (this.state.filterWarnings && l.type === BuildLogLineType.Warning)
+                  ) &&
+                  (this.state.searchTerm === '' || l.text.toLowerCase().includes(this.state.searchTerm.toLowerCase()))
+                ))
                 .map(
                   // TODO: context menu with option to copy (full) error message
                   (line: BuildLogLine, index: number) => (
@@ -339,47 +340,36 @@ export class VesBuildWidget extends ReactWidget {
           <button
             className="theia-button secondary"
             title={nls.localize('vuengine/build/toggleLineWrap', 'Toggle line wrap')}
-            onClick={() => this.toggleLineWrap()}
+            onClick={this.toggleLineWrap}
           >
             <i className={lineWrap
               ? 'codicon codicon-word-wrap'
               : 'codicon codicon-list-selection'
             }></i>
           </button>
-          {/* TODO: allow to filter for both warnings AND problems */}
           <button
             className={
-              this.state.logFilter === BuildLogLineType.Warning
+              this.state.filterWarnings
                 ? 'theia-button'
                 : 'theia-button secondary'
             }
             title={nls.localize('vuengine/build/showOnlyWarnings', 'Show only warnings')}
-            onClick={() => this.toggleFilter(BuildLogLineType.Warning)}
+            onClick={this.toggleFilterWarnings}
           >
             <i className='fa fa-exclamation-triangle'></i>{' '}
             {this.vesBuildService.getNumberOfWarnings()}
           </button>
           <button
             className={
-              this.state.logFilter === BuildLogLineType.Error
+              this.state.filterErrors
                 ? 'theia-button'
                 : 'theia-button secondary'
             }
             title={nls.localize('vuengine/build/showOnlyErrors', 'Show only errors')}
-            onClick={() => this.toggleFilter(BuildLogLineType.Error)}
+            onClick={this.toggleFilterErrors}
           >
             <i className='fa fa-times-circle-o'></i>{' '}
             {this.vesBuildService.getNumberOfErrors()}
-          </button>
-          <button
-            className='theia-button secondary'
-            title={nls.localize('vuengine/build/clearLogs', 'clearLogs')}
-            onClick={() => {
-              this.vesBuildService.clearLogs();
-              this.update();
-            }}
-          >
-            <i className='fa fa-trash-o'></i>
           </button>
           <input
             className='theia-input full-width'
@@ -387,6 +377,16 @@ export class VesBuildWidget extends ReactWidget {
             value={this.state.searchTerm}
             onChange={e => this.setSearchTerm(e.target.value)}
           />
+          <button
+            className='theia-button secondary'
+            title={nls.localize('vuengine/build/clearLog', 'Clear Log')}
+            onClick={() => {
+              this.vesBuildService.clearLogs();
+              this.update();
+            }}
+          >
+            <i className='fa fa-trash-o'></i>
+          </button>
         </div>
         {/* <div className='buildSelector'>
           <select className='theia-select' title='Build'>
@@ -434,9 +434,13 @@ export class VesBuildWidget extends ReactWidget {
         .padStart(2, '0')}`;
   }
 
-  protected toggleFilter = (type: BuildLogLineType): void => {
-    this.state.logFilter =
-      this.state.logFilter !== type ? type : BuildLogLineType.Normal;
+  protected toggleFilterErrors = (): void => {
+    this.state.filterErrors = !this.state.filterErrors;
+    this.update();
+  };
+
+  protected toggleFilterWarnings = (): void => {
+    this.state.filterWarnings = !this.state.filterWarnings;
     this.update();
   };
 
@@ -490,7 +494,6 @@ export class VesBuildWidget extends ReactWidget {
   }
 
   protected build = () => {
-    this.state.logFilter = BuildLogLineType.Normal;
     this.commandService.executeCommand(VesBuildCommands.BUILD.id);
   };
 
