@@ -975,7 +975,7 @@ export class VesBuildService {
   }
 
   async setBuildMode(buildMode: BuildMode): Promise<void> {
-    this.preferenceService.set(VesBuildPreferenceIds.BUILD_MODE, buildMode, PreferenceScope.User);
+    await this.preferenceService.set(VesBuildPreferenceIds.BUILD_MODE, buildMode, PreferenceScope.User);
 
     // To keep default ROM in sync with the currently selected build mode,
     // delete default ROM and copy over build mode ROM to this location, if it exists.

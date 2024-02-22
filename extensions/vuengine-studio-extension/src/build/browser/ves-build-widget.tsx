@@ -1,5 +1,5 @@
 import { CommandService, isWindows, nls } from '@theia/core';
-import { KeybindingRegistry, Message, PreferenceService } from '@theia/core/lib/browser';
+import { KeybindingRegistry, Message, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
@@ -15,7 +15,7 @@ import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-co
 import { VesFlashCartService } from '../../flash-cart/browser/ves-flash-cart-service';
 import { VesPluginsPreferenceIds } from '../../plugins/browser/ves-plugins-preferences';
 import { VesBuildCommands } from './ves-build-commands';
-import { VesBuildPreferenceIds } from './ves-build-preferences';
+import { VesBuildPreferenceIds, VesBuildPreferenceSchema } from './ves-build-preferences';
 import { VesBuildService } from './ves-build-service';
 import { BuildLogLine, BuildLogLineFileLink, BuildLogLineType, BuildResult } from './ves-build-types';
 
@@ -26,6 +26,8 @@ interface VesBuildWidgetState {
   outputRomExists: boolean
   autoScroll: boolean
   searchTerm: string
+  lineWrap: boolean
+  useWsl: boolean
 }
 
 @injectable()
@@ -61,6 +63,8 @@ export class VesBuildWidget extends ReactWidget {
     outputRomExists: false,
     autoScroll: true,
     searchTerm: '',
+    lineWrap: VesBuildPreferenceSchema.properties[VesBuildPreferenceIds.LOG_LINE_WRAP]?.default as boolean ?? true,
+    useWsl: VesBuildPreferenceSchema.properties[VesBuildPreferenceIds.USE_WSL]?.default as boolean ?? true,
   };
 
   protected buildLogLastElementRef = React.createRef<HTMLDivElement>();
@@ -75,6 +79,8 @@ export class VesBuildWidget extends ReactWidget {
   @postConstruct()
   protected init(): void {
     this.doInit();
+    this.bindEvents();
+
     this.id = VesBuildWidget.ID;
     this.title.iconClass = 'codicon codicon-tools';
     this.title.closable = true;
@@ -84,31 +90,61 @@ export class VesBuildWidget extends ReactWidget {
     this.title.className = '';
 
     this.update();
-    this.bindEvents();
   }
 
   protected async doInit(): Promise<void> {
     this.state.outputRomExists = await this.vesBuildService.outputRomExists();
+    this.update();
   }
 
   protected bindEvents(): void {
+    this.preferenceService.onPreferenceChanged(({ preferenceName, newValue }) => {
+      switch (preferenceName) {
+        case VesBuildPreferenceIds.BUILD_MODE:
+        case VesBuildPreferenceIds.DUMP_ELF:
+        case VesBuildPreferenceIds.ENGINE_CORE_PATH:
+        case VesBuildPreferenceIds.PEDANTIC_WARNINGS:
+        case VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH:
+        case VesPluginsPreferenceIds.USER_PLUGINS_PATH:
+          this.update();
+          break;
+        case VesBuildPreferenceIds.LOG_LINE_WRAP:
+          // TODO: this is not correctly initialized.
+          // Good luck fixing this, as the goddamn preferenceservice is returning the wrong value.
+          this.state.lineWrap = newValue;
+          this.update();
+          break;
+        case VesBuildPreferenceIds.USE_WSL:
+          this.state.useWsl = newValue;
+          this.update();
+          break;
+      }
+    });
+
     this.vesBuildService.onDidChangeIsCleaning(() => this.update());
+
     this.vesBuildService.onDidChangeIsQueued(isQueued => this.title.className = isQueued ? 'ves-decorator-queued' : '');
+
     this.vesBuildService.onDidChangeRomSize(() => this.update());
+
     this.vesBuildService.onDidChangeBuildStatus(status => {
       this.handleProgressDecorator();
       this.update();
     });
+
     this.onDidChangeVisibility(() => {
       this.handleProgressDecorator();
     });
+
     this.vesBuildService.onDidChangeBuildMode(() => this.update());
+
     this.vesBuildService.onDidStartBuild(() => {
       this.startTimerInterval();
       this.state.filterErrors = false;
       this.state.filterWarnings = false;
       this.title.className = 'ves-decorator-progress';
     });
+
     this.vesBuildService.onDidSucceedBuild(async () => {
       this.stopTimerInterval();
       const numberOfWarnings = this.vesBuildService.getNumberOfWarnings();
@@ -121,6 +157,7 @@ export class VesBuildWidget extends ReactWidget {
       }
       this.update();
     });
+
     this.vesBuildService.onDidFailBuild(async () => {
       this.stopTimerInterval();
       this.title.className = 'ves-decorator-error';
@@ -129,20 +166,6 @@ export class VesBuildWidget extends ReactWidget {
         this.state.filterErrors = true;
       }
       this.update();
-    });
-    this.preferenceService.onPreferenceChanged(({ preferenceName }) => {
-      switch (preferenceName) {
-        case VesBuildPreferenceIds.BUILD_MODE:
-        case VesBuildPreferenceIds.DUMP_ELF:
-        case VesBuildPreferenceIds.ENGINE_CORE_PATH:
-        case VesBuildPreferenceIds.LOG_LINE_WRAP:
-        case VesBuildPreferenceIds.PEDANTIC_WARNINGS:
-        case VesBuildPreferenceIds.USE_WSL:
-        case VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH:
-        case VesPluginsPreferenceIds.USER_PLUGINS_PATH:
-          this.update();
-          break;
-      }
     });
   }
 
@@ -163,9 +186,7 @@ export class VesBuildWidget extends ReactWidget {
   }
 
   protected render(): React.ReactNode {
-    const lineWrap = this.preferenceService.get(VesBuildPreferenceIds.LOG_LINE_WRAP) as boolean;
-    const useWsl = this.preferenceService.get(VesBuildPreferenceIds.USE_WSL) as boolean;
-    const isWslInstalled = useWsl && this.vesCommonService.isWslInstalled;
+    const doUseWsl = this.state.useWsl && this.vesCommonService.isWslInstalled;
 
     return (
       <>
@@ -238,7 +259,7 @@ export class VesBuildWidget extends ReactWidget {
               {this.vesBuildService.isCleaning && <i className='fa fa-cog fa-spin'></i>}
             </button>
           </div>
-          {isWindows && !isWslInstalled && (
+          {isWindows && !doUseWsl && (
             <div>
               <i className='fa fa-exclamation-triangle'></i> {nls.localize('vuengine/build/pleaseInstallWsl',
                 'Please consider installing WSL to massively improve build times.')} (
@@ -274,7 +295,7 @@ export class VesBuildWidget extends ReactWidget {
                 <span><i className='fa fa-wrench'></i> {this.vesBuildService.buildStatus.buildMode}</span>
                 {this.vesBuildService.buildStatus.active && this.vesBuildService.buildStatus.processId > 0 &&
                   <span><i className='fa fa-terminal'></i> PID {this.vesBuildService.buildStatus.processId}</span>}
-                {isWslInstalled &&
+                {doUseWsl &&
                   <span><i className='fa fa-linux'></i> WSL</span>}
                 {!this.vesBuildService.buildStatus.active && this.vesBuildService.romSize > 0 &&
                   <span><i className='fa fa-microchip'></i> {this.vesBuildService.bytesToMbit(this.vesBuildService.romSize)} MBit</span>}
@@ -283,7 +304,7 @@ export class VesBuildWidget extends ReactWidget {
           )}
         </div>
         <div className='buildLogWrapper'>
-          <div className={`buildLog${lineWrap ? ' linewrap' : ''}`}>
+          <div className={`buildLog${this.state.lineWrap ? ' linewrap' : ''}`}>
             <div>
               {this.vesBuildService.buildStatus.log
                 .filter(l => (
@@ -342,7 +363,7 @@ export class VesBuildWidget extends ReactWidget {
             title={nls.localize('vuengine/build/toggleLineWrap', 'Toggle line wrap')}
             onClick={this.toggleLineWrap}
           >
-            <i className={lineWrap
+            <i className={this.state.lineWrap
               ? 'codicon codicon-word-wrap'
               : 'codicon codicon-list-selection'
             }></i>
@@ -449,10 +470,8 @@ export class VesBuildWidget extends ReactWidget {
     this.update();
   };
 
-  protected toggleLineWrap = (): void => {
-    const lineWrap = this.preferenceService.get(VesBuildPreferenceIds.LOG_LINE_WRAP) as boolean;
-    this.preferenceService.set(VesBuildPreferenceIds.LOG_LINE_WRAP, !lineWrap);
-  };
+  protected toggleLineWrap = (): Promise<void> =>
+    this.preferenceService.set(VesBuildPreferenceIds.LOG_LINE_WRAP, !this.state.lineWrap, PreferenceScope.User);
 
   protected setSearchTerm = (searchTerm: string): void => {
     this.state.searchTerm = searchTerm;
