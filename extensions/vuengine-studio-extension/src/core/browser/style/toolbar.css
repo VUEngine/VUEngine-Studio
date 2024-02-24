@@ -2,6 +2,7 @@
   --theia-toolbar-height: var(--theia-statusBar-height);
   --theia-toolbar-item-padding: 4px;
   --theia-toolbar-icon-size: 16px;
+  border-bottom: var(--theia-border-width) solid var(--theia-statusBar-border);
   padding: 0 var(--theia-ui-padding);
   z-index: 1;
 }

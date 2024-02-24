@@ -2,10 +2,6 @@
   --theia-private-menubar-height: 38px;
 }
 
-#theia-top-panel {
-  border-bottom: unset;
-}
-
 #theia-top-panel,
 #theia-top-panel>div {
   -webkit-app-region: drag;
