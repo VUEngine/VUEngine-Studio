@@ -1,5 +1,6 @@
 import { nls } from '@theia/core';
 import React from 'react';
+import ReactTextareaAutosize from 'react-textarea-autosize';
 import HContainer from '../Common/HContainer';
 import VContainer from '../Common/VContainer';
 import { BrightnessRepeatData } from './BrightnessRepeatTypes';
@@ -59,7 +60,7 @@ export default class BrightnessRepeatEditor extends React.Component<BrightnessRe
             className='brightnessRepeatEditor'
         >
             <HContainer gap={15} alignItems='start'>
-                <VContainer grow={1} gap={15}>
+                <VContainer grow={1} gap={15} style={{ maxWidth: 500 }}>
                     <VContainer>
                         <label>
                             {nls.localize('vuengine/brightnessRepeatEditor/name', 'Name')}
@@ -74,10 +75,13 @@ export default class BrightnessRepeatEditor extends React.Component<BrightnessRe
                         <label>
                             {nls.localize('vuengine/brightnessRepeatEditor/description', 'Description')}
                         </label>
-                        <input
+                        <ReactTextareaAutosize
                             className="theia-input"
                             value={data.description}
+                            minRows={2}
+                            maxRows={4}
                             onChange={this.onChangeDescription.bind(this)}
+                            style={{ resize: 'none' }}
                         />
                     </VContainer>
                     <label>

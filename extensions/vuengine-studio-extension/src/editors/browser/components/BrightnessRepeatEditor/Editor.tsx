@@ -1,5 +1,5 @@
 import React from 'react';
-import EditorColumn from './EditorColumn';
+import VerticalRangeInput from '../Common/VerticalRangeInput';
 
 interface EditorProps {
     mirror: boolean
@@ -14,12 +14,16 @@ export default function Editor(props: EditorProps): React.JSX.Element {
         <div>
             {[...Array(48)].map((h, y) => {
                 const index = y;
-                const brightness = values[index] ?? 15;
-                return <EditorColumn
-                    key={`editor-col-${index}`}
-                    brightness={brightness}
+                const brightness = values[index] ?? 1;
+                return <VerticalRangeInput
+                    key={index}
                     index={index}
-                    setValue={setValue}
+                    min={1}
+                    max={16}
+                    maxWidth={24}
+                    barHeight={320}
+                    value={brightness}
+                    setValue={(value: number) => setValue(index, value)}
                 />;
             })}
         </div>
@@ -28,12 +32,16 @@ export default function Editor(props: EditorProps): React.JSX.Element {
             <div>
                 {[...Array(48)].map((h, y) => {
                     const index = y + 48;
-                    const brightness = values[index] ?? 15;
-                    return <EditorColumn
-                        key={`editor-col-${index}`}
-                        brightness={brightness}
+                    const brightness = values[index] ?? 1;
+                    return <VerticalRangeInput
+                        key={index}
                         index={index}
-                        setValue={setValue}
+                        min={1}
+                        max={16}
+                        maxWidth={24}
+                        barHeight={320}
+                        value={brightness}
+                        setValue={(value: number) => setValue(index, value)}
                     />;
                 })}
             </div>
