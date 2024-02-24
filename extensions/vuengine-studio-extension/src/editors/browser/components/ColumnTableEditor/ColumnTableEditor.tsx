@@ -3,6 +3,7 @@ import React from 'react';
 import VContainer from '../Common/VContainer';
 import { ColumnTableData, ColumnTableEntry } from './ColumnTableTypes';
 import Editor from './Editor';
+import ReactTextareaAutosize from 'react-textarea-autosize';
 
 interface ColumnTableEditorProps {
     data: ColumnTableData
@@ -56,7 +57,7 @@ export default class ColumnTableEditor extends React.Component<ColumnTableEditor
             tabIndex={0}
             className='columnTableEditor'
         >
-            <VContainer gap={15}>
+            <VContainer gap={15} style={{ maxWidth: 500 }}>
                 <VContainer>
                     <label>
                         {nls.localize('vuengine/columnTableEditor/name', 'Name')}
@@ -71,10 +72,13 @@ export default class ColumnTableEditor extends React.Component<ColumnTableEditor
                     <label>
                         {nls.localize('vuengine/columnTableEditor/description', 'Description')}
                     </label>
-                    <input
+                    <ReactTextareaAutosize
                         className="theia-input"
                         value={data.description}
+                        minRows={2}
+                        maxRows={4}
                         onChange={this.onChangeDescription.bind(this)}
+                        style={{ resize: 'none' }}
                     />
                 </VContainer>
                 <label>

@@ -15,7 +15,7 @@ export default function Editor(props: EditorProps): React.JSX.Element {
     return <div className='editor'>
         {[...Array(8)].map((i, j) => (!mirror || j < 4) &&
             <div
-                key={`editor-row-${j}`}
+                key={j}
             >
                 <div className='editorRowHeader'>
                     <div>
@@ -29,7 +29,7 @@ export default function Editor(props: EditorProps): React.JSX.Element {
                     const index = y + (j * 32);
                     const value = values[index] ?? {};
                     return <EditorColumn
-                        key={`editor-col-${index}`}
+                        key={index}
                         index={index}
                         value={value}
                         setValue={setValue}

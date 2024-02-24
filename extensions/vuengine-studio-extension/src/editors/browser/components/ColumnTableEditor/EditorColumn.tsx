@@ -10,40 +10,39 @@ interface EditorColumnProps {
 export default function EditorColumn(props: EditorColumnProps): React.JSX.Element {
     const { index, value, setValue } = props;
 
-    const handleSelectInput = (event: React.MouseEvent) => // @ts-ignore
+    const selectInput = (event: React.MouseEvent) => // @ts-ignore
         event.target.select();
 
     return <div
-        key={`editor-col-${index}`}
         className={`editor-col-${index}`}
     >
         <div className='index'>
-            {index}
+            {index + 1}
         </div>
         <input
             className="theia-input"
             type="number"
             step="1"
-            min={0}
-            max={15}
-            value={value.repeat ?? 15}
-            onClick={handleSelectInput}
+            min="1"
+            max="16"
+            value={value.repeat ?? 16}
+            onClick={selectInput}
             onChange={e => setValue(index, {
                 ...value,
-                repeat: parseInt(e.target.value)
+                repeat: Math.min(Math.max(parseInt(e.target.value === '' ? '16' : e.target.value), 1), 16)
             })}
         />
         <input
             className="theia-input"
             type="number"
             step="1"
-            min={0}
-            max={15}
-            value={value.time ?? 15}
-            onClick={handleSelectInput}
+            min="1"
+            max="16"
+            value={value.time ?? 16}
+            onClick={selectInput}
             onChange={e => setValue(index, {
                 ...value,
-                time: parseInt(e.target.value)
+                time: Math.min(Math.max(parseInt(e.target.value === '' ? '16' : e.target.value), 1), 16)
             })}
         />
     </div>;
