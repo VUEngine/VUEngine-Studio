@@ -24,6 +24,8 @@ import vesSpriteEditorControl from './sprite-editor/ves-sprite-editor-control';
 import vesSpriteEditorControlTester from './sprite-editor/ves-sprite-editor-control-tester';
 import VesTranslationsEditorControl from './translations-editor/ves-translations-editor-control';
 import VesTranslationsEditorControlTester from './translations-editor/ves-translations-editor-control-tester';
+import VesWaveFormEditorControl from './waveform-editor/ves-waveform-editor-control';
+import VesWaveFormEditorControlTester from './waveform-editor/ves-waveform-editor-control-tester';
 
 export const VES_RENDERERS = [
     { tester: VesBrightnessRepeatEditorControlTester, renderer: VesBrightnessRepeatEditorControl },
@@ -39,4 +41,5 @@ export const VES_RENDERERS = [
     { tester: vesSimpleListEditorControlTester, renderer: vesSimpleListEditorControl },
     { tester: vesSpriteEditorControlTester, renderer: vesSpriteEditorControl },
     { tester: VesTranslationsEditorControlTester, renderer: VesTranslationsEditorControl },
+    { tester: VesWaveFormEditorControlTester, renderer: VesWaveFormEditorControl },
 ];
