@@ -301,7 +301,6 @@ export class VesBuildService {
       }
     );
 
-    // @ts-ignore
     this.vesProcessWatcher.onDidReceiveError(async ({ pId }) => {
       if (this.buildStatus.processManagerId === pId) {
         await this.resetBuildStatus(BuildResult.failed);
@@ -309,7 +308,6 @@ export class VesBuildService {
       }
     });
 
-    // @ts-ignore
     this.vesProcessWatcher.onDidExitProcess(async ({ pId, event }) => {
       if (this.buildStatus.processManagerId === pId) {
         const step = event.code === 0
@@ -560,6 +558,7 @@ export class VesBuildService {
 
   protected parseBuildOutput(data: string): BuildLogLine {
     let text = data.trim();
+    this.buildStatus.step = text;
     const textLowerCase = text.toLowerCase();
     let optimizedText;
     let type = BuildLogLineType.Normal;
@@ -574,7 +573,6 @@ export class VesBuildService {
       type = BuildLogLineType.Done;
     } else if (textLowerCase.includes('preprocessing') || textLowerCase.includes('building')) {
       type = BuildLogLineType.Headline;
-      this.buildStatus.step = textLowerCase;
       this.buildStatus.stepsDone++;
       this.buildStatus.progress = this.computeProgress();
       const stepsDoneLabel = this.buildStatus.stepsDone.toString().padStart(
