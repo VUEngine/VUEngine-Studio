@@ -1,8 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { ImageData } from '../../../../../core/browser/ves-common-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import CssImage from '../../Common/CssImage';
-import { EntityEditorContext, EntityEditorContextType, PixelVector } from '../EntityEditorTypes';
+import CanvasImage from '../../Common/CanvasImage';
+import { PixelVector } from '../../Common/VUEngineTypes';
+import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 
 interface SpriteProps {
   animate: boolean
@@ -105,6 +106,17 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     return (t.join(' '));
   };
 
+  const currentPixelData = animate && isMultiFileAnimation
+    ? imageData[currentAnimationFrame] ? imageData[currentAnimationFrame].pixelData : undefined
+    : imageData[0] ? imageData[0].pixelData : undefined;
+
+  const baseZIndex = highlighted ? 999999 : 100000;
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setState({ currentComponent: `sprites-${index}` });
+  };
+
   useEffect(() => {
     getData();
   }, [
@@ -113,11 +125,33 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     width,
   ]);
 
-  const currentPixelData = animate && isMultiFileAnimation
-    ? imageData[currentAnimationFrame] ? imageData[currentAnimationFrame].pixelData : undefined
-    : imageData[0] ? imageData[0].pixelData : undefined;
+  /*
+  const onKeyDown = (e: KeyboardEvent): void => {
+    console.log(ref.current?.contains(document.activeElement));
+    if (document.activeElement === ref.current) {
+      if (!e.repeat) {
+        switch (e.code) {
+          case 'ArrowUp':
+            return moveCurrentComponent(0, -1);
+          case 'ArrowDown':
+            return moveCurrentComponent(0, 1);
+          case 'ArrowLeft':
+            return moveCurrentComponent(-1, 0);
+          case 'ArrowRight':
+            return moveCurrentComponent(1, 0);
+        }
+      }
+    }
+  };
 
-  const baseZIndex = highlighted ? 999999999 : 100000;
+  useEffect(() => {
+    document.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, []);
+  */
 
   return (
     <div
@@ -136,7 +170,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         width: width,
         zIndex: baseZIndex + (displacement.z !== 0 ? -displacement.z : 0),
       }}
-      onClick={() => setState({ currentComponent: `sprites-${index}` })}
+      onClick={handleClick}
     >
       {!error && imageData.length > 0 &&
         <div style={{
@@ -146,7 +180,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
             : 0
         }}>
           {currentPixelData &&
-            <CssImage
+            <CanvasImage
               height={height}
               palette={palette}
               pixelData={currentPixelData}

@@ -15,12 +15,11 @@ import {
     MeshSegmentData,
     STEP_SPHERE_RADIUS,
     STEP_WIREFRAME_DISPLACEMENT,
-    Transparency,
     WireframeConfigData,
     WireframeData,
-    WireframeType
 } from '../EntityEditorTypes';
 import MeshSegment from './MeshSegment';
+import { Transparency, WireframeType } from '../../Common/VUEngineTypes';
 
 interface WireframeProps {
     wireframe: WireframeData

@@ -3,6 +3,21 @@ import { ConversionResult, ImageCompressionType } from '../../../../images/brows
 import { DataSection } from '../Common/CommonTypes';
 import { EntityEditorSaveDataOptions } from './EntityEditor';
 import { ScriptType, ScriptedActionData } from './Scripts/ScriptTypes';
+import {
+    Axis,
+    BgmapMode,
+    ColliderType,
+    DisplayMode,
+    PixelRotation,
+    PixelSize,
+    PixelVector,
+    Scale,
+    ScreenPixelVector,
+    SpriteType,
+    Transparency,
+    Vector3D,
+    WireframeType
+} from '../Common/VUEngineTypes';
 
 // @ts-ignore
 export const EntityEditorContext = React.createContext<EntityEditorContextType>({});
@@ -33,86 +48,13 @@ export const MAX_PREVIEW_SPRITE_ZOOM = 20;
 export const MIN_PREVIEW_SCRIPT_ZOOM = 0.1;
 export const MAX_PREVIEW_SCRIPT_ZOOM = 1;
 export const WHEEL_SENSITIVITY = 50;
+export const COLLIDER_LINEFIELD_LENGTH_MIN = 0;
+export const COLLIDER_LINEFIELD_LENGTH_MAX = 512;
 
-export enum SpriteType {
-    Bgmap = 'Bgmap',
-    Object = 'Object',
-}
-
-export enum Transparency {
-    None = 'None',
-    Odd = 'Odd',
-    Even = 'Even',
-}
-
-export enum DisplayMode {
-    Both = 'ON',
-    Left = 'LON',
-    Right = 'RON',
-}
-
-export enum BgmapMode {
-    Bgmap = 'Bgmap',
-    Object = 'Object',
-    Affine = 'Affine',
-    HBias = 'HBias',
-}
-
-export enum WireframeType {
-    Mesh = 'Mesh',
-    Sphere = 'Sphere',
-    Asterisk = 'Asterisk',
-}
-
-export enum ColliderType {
-    Ball = 'Ball',
-    Box = 'Box',
-    InverseBox = 'InverseBox',
-    LineField = 'LineField',
-}
-
-export enum Axis {
-    XAxis = 'X_AXIS',
-    YAxis = 'Y_AXIS',
-    ZAxis = 'Z_AXIS',
-}
-
-export interface PixelVector {
-    x: number // int16
-    y: number // int16
-    z: number // int16
-    parallax: number // int16
-}
-
-export interface ScreenPixelVector {
-    x: number // int16
-    y: number // int16
-    z: number // int16
-    zDisplacement: number // int16
-}
-
-export interface PixelSize {
-    x: number // uint16
-    y: number // uint16
-    z: number // uint16
-}
-
-export interface PixelRotation {
-    x: number // int16
-    y: number // int16
-    z: number // int16
-}
-
-export interface Scale {
-    x: number // fix7_9
-    y: number // fix7_9
-    z: number // fix7_9
-}
-
-export interface Vector3D {
-    x: number // fixed_t
-    y: number // fixed_t
-    z: number // fixed_t
+export enum AxisNumeric {
+    X = 0,
+    Y = 1,
+    Z = 2,
 }
 
 export interface MeshSegmentData {

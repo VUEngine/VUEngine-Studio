@@ -5,6 +5,7 @@ import { DataSection } from '../../Common/CommonTypes';
 import HContainer from '../../Common/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import RadioSelect from '../../Common/RadioSelect';
+import SectionSelect from '../../Common/SectionSelect';
 import VContainer from '../../Common/VContainer';
 import { ImageEditorContext, ImageEditorContextType } from '../ImageEditorTypes';
 
@@ -64,28 +65,10 @@ export default function General(): React.JSX.Element {
                     onChange={options => setTilesCompression(options[0].value as ImageCompressionType)}
                 />
             </VContainer>
-            <VContainer>
-                <InfoLabel
-                    label={nls.localize('vuengine/entityEditor/section', 'Section')}
-                    tooltip={nls.localize(
-                        'vuengine/entityEditor/sectionDescription',
-                        'Defines whether image data should be stored in ROM space or Expansion space. ' +
-                        'You usually want to leave this untouched, since the latter only works on specially designed cartridges.'
-                    )}
-                    tooltipPosition='bottom'
-                />
-                <RadioSelect
-                    defaultValue={imageData.section}
-                    options={[{
-                        label: 'ROM',
-                        value: DataSection.ROM,
-                    }, {
-                        label: nls.localize('vuengine/entityEditor/expansion', 'Expansion'),
-                        value: DataSection.EXP,
-                    }]}
-                    onChange={options => setSection(options[0].value as DataSection)}
-                />
-            </VContainer>
+            <SectionSelect
+                value={imageData.section}
+                setValue={setSection}
+            />
         </HContainer>
     </VContainer>;
 }

@@ -5,18 +5,18 @@ import { ProjectContributor } from '../../../../../project/browser/ves-project-t
 import BoxCollider from './Colliders/BoxCollider';
 import {
   AnimationData,
-  BgmapMode,
-  ColliderType,
   EntityEditorContext,
   EntityEditorContextType,
   MAX_PREVIEW_SPRITE_ZOOM,
   MIN_PREVIEW_SPRITE_ZOOM,
-  Transparency,
   WHEEL_SENSITIVITY,
 } from '../EntityEditorTypes';
 import Sprite from './Sprite';
 import { nls } from '@theia/core';
 import PreviewOptions from './PreviewOptions';
+import { BgmapMode, ColliderType, Transparency } from '../../Common/VUEngineTypes';
+import BallCollider from './Colliders/BallCollider';
+import LineFieldCollider from './Colliders/LinefieldCollider';
 
 export default function Preview(): React.JSX.Element {
   const { data, state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
@@ -95,6 +95,7 @@ export default function Preview(): React.JSX.Element {
 
   return <div
     className={`preview-container${isDragging ? ' dragging' : ''}`}
+    onClick={() => setState({ currentComponent: '' })}
     onMouseDown={() => setIsDragging(true)}
     onMouseUp={() => setIsDragging(false)}
     onMouseLeave={() => setIsDragging(false)}
@@ -144,14 +145,34 @@ export default function Preview(): React.JSX.Element {
       )}
       {state.preview.colliders && data.components?.colliders?.map((collider, i) => {
         switch (collider.type) {
-          case ColliderType.Box:
-            return <BoxCollider
+          case ColliderType.Ball:
+            return <BallCollider
+              index={i}
+              highlighted={state.currentComponent === `colliders-${i}`}
               size={collider.pixelSize}
               displacement={collider.displacement}
               rotation={collider.rotation}
               scale={collider.scale}
             />;
-
+          case ColliderType.Box:
+          case ColliderType.InverseBox:
+            return <BoxCollider
+              index={i}
+              highlighted={state.currentComponent === `colliders-${i}`}
+              size={collider.pixelSize}
+              displacement={collider.displacement}
+              rotation={collider.rotation}
+              scale={collider.scale}
+            />;
+          case ColliderType.LineField:
+            return <LineFieldCollider
+              index={i}
+              highlighted={state.currentComponent === `colliders-${i}`}
+              size={collider.pixelSize}
+              displacement={collider.displacement}
+              rotation={collider.rotation}
+              scale={collider.scale}
+            />;
         }
       })}
     </div>

@@ -100,19 +100,23 @@ export default function CurrentComponent(props: CurrentComponentProps): React.JS
         return <></>;
     };
 
-    const componentEditor = getComponentEditor();
-
     return (
-        <VContainer gap={30}>
+        <VContainer gap={15}>
             {state.currentComponent?.startsWith('sprites') &&
-                <SpritesSettings
-                    isMultiFileAnimation={isMultiFileAnimation}
-                />
+                <>
+                    <SpritesSettings
+                        isMultiFileAnimation={isMultiFileAnimation}
+                    />
+                    <hr />
+                </>
             }
             {state.currentComponent?.startsWith('colliders') &&
-                <CollidersSettings />
+                <>
+                    <CollidersSettings />
+                    <hr />
+                </>
             }
-            {componentEditor}
+            {getComponentEditor()}
         </VContainer>
     );
 }

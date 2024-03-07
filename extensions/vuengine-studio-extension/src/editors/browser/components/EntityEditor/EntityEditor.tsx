@@ -37,7 +37,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
         palettes: ['11100100', '11100000', '11010000', '11100100'],
         sprites: true,
         zoom: 1,
-        projectionDepth: 128,
+        projectionDepth: 99999, // 128,
       },
     };
   }
@@ -248,10 +248,20 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
           setData: this.setData.bind(this),
         }}
       >
-        <HContainer className="entityEditor" gap={0} grow={1} overflow='hidden'>
+        <HContainer
+          className="entityEditor"
+          gap={0}
+          grow={1}
+          overflow='hidden'
+        >
           <EntityEditorContext.Consumer>
             {context =>
-              <VContainer gap={15} overflow='hidden' style={{ maxWidth: 200, minWidth: 200 }}>
+              <VContainer
+                gap={15}
+                overflow='hidden'
+                style={{ maxWidth: 200, minWidth: 200 }}
+                onClick={() => this.setState({ currentComponent: '' })}
+              >
                 <VContainer gap={15} grow={1} overflow='auto'>
                   <EntityMeta />
                   <ComponentTree />

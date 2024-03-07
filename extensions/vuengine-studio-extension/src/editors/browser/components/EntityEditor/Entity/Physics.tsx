@@ -1,10 +1,11 @@
 import React, { useContext } from 'react';
 import HContainer from '../../Common/HContainer';
 import VContainer from '../../Common/VContainer';
-import { Axis, EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
+import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 import { nls } from '@theia/core';
 import RadioSelect from '../../Common/RadioSelect';
 import InfoLabel from '../../Common/InfoLabel';
+import { Axis } from '../../Common/VUEngineTypes';
 
 export default function Physics(): React.JSX.Element {
     const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;

@@ -2,10 +2,12 @@ import { QuickPickItem, QuickPickOptions, QuickPickSeparator, nls } from '@theia
 import React, { useContext } from 'react';
 import { Tree } from 'react-arborist';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import { showEntitySelection } from '../../Common/Utils';
 import VContainer from '../../Common/VContainer';
-import { BgmapMode, ColliderType, ComponentKey, DisplayMode, EntityEditorContext, EntityEditorContextType, Transparency, WireframeType } from '../EntityEditorTypes';
+import { ComponentKey, EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 import { ScriptType } from '../Scripts/ScriptTypes';
 import ComponentTreeNode from './ComponentTreeNode';
+import { BgmapMode, ColliderType, DisplayMode, Transparency, WireframeType } from '../../Common/VUEngineTypes';
 
 interface ComponentType {
     key: ComponentKey | 'extraProperties' | 'physics'
@@ -214,31 +216,8 @@ export default function ComponentTree(): React.JSX.Element {
         });
     };
 
-    const showEntitySelection = async (): Promise<QuickPickItem | undefined> => {
-        const quickPickOptions: QuickPickOptions<QuickPickItem> = {
-            title: nls.localize('vuengine/editors/selectEntity', 'Select Entity'),
-            placeholder: nls.localize('vuengine/editors/selectEntityToAdd', 'Select an Entity to add...'),
-        };
-        const items: QuickPickItem[] = [];
-        const entities = services.vesProjectService.getProjectDataItemsForType('Entity');
-        if (entities) {
-            Object.keys(entities).map(k => {
-                if (k !== data._id) {
-                    const entity = entities[k];
-                    // @ts-ignore
-                    if (entity._id) {
-                        // @ts-ignore
-                        items.push({ id: entity._id, label: entity.name || entity._id });
-                    }
-                }
-            });
-        }
-
-        return services.quickPickService.show(items, quickPickOptions);
-    };
-
     const addPositionedEntity = async (): Promise<void> => {
-        const entityToAdd = await showEntitySelection();
+        const entityToAdd = await showEntitySelection(services.quickPickService, services.vesProjectService, [data._id]);
         if (entityToAdd !== undefined) {
             const children = [...data.components?.children || []];
             children.push({

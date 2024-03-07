@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from 'react';
+import React, { MouseEventHandler, PropsWithChildren } from 'react';
 
 interface VContainerProps {
     alignItems?: string
@@ -6,12 +6,13 @@ interface VContainerProps {
     gap?: number
     grow?: number
     justifyContent?: string
+    onClick?: MouseEventHandler | undefined;
     overflow?: string
     style?: object
 }
 
 export default function VContainer(props: PropsWithChildren<VContainerProps>): React.JSX.Element {
-    const { alignItems, justifyContent, children, className, gap, grow, overflow, style } = props;
+    const { alignItems, justifyContent, children, className, gap, grow, onClick, overflow, style } = props;
 
     return <div
         style={{
@@ -25,6 +26,7 @@ export default function VContainer(props: PropsWithChildren<VContainerProps>): R
             ...(style || {}),
         }}
         className={className}
+        onClick={e => { if (onClick) { onClick(e); } }}
     >
         {children}
     </div>;

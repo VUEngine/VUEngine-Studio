@@ -28,7 +28,8 @@ export default function PreviewOptions(props: PreviewOptionsProps): React.JSX.El
       },
     });
 
-  const applyZoom = (z: number) => {
+  const applyZoom = (e: React.MouseEvent, z: number) => {
+    e.stopPropagation();
     if (setZoom) {
       if (z < minZoom) {
         z = minZoom;
@@ -45,7 +46,7 @@ export default function PreviewOptions(props: PreviewOptionsProps): React.JSX.El
         <button
           className='theia-button secondary'
           disabled={zoom === minZoom}
-          onClick={() => applyZoom(roundZoomSteps ? Math.round(zoom - zoomStep) : zoom - zoomStep)}
+          onClick={e => applyZoom(e, roundZoomSteps ? Math.round(zoom - zoomStep) : zoom - zoomStep)}
         >
           <i className='codicon codicon-zoom-out' />
         </button>
@@ -58,14 +59,14 @@ export default function PreviewOptions(props: PreviewOptionsProps): React.JSX.El
         <button
           className='theia-button secondary'
           disabled={zoom === maxZoom}
-          onClick={() => applyZoom(roundZoomSteps ? Math.round(zoom + zoomStep) : zoom + zoomStep)}
+          onClick={e => applyZoom(e, roundZoomSteps ? Math.round(zoom + zoomStep) : zoom + zoomStep)}
         >
           <i className='codicon codicon-zoom-in' />
         </button>
       </HContainer>
       <button
         className='theia-button secondary'
-        onClick={center}
+        onClick={e => { e.stopPropagation(); center(); }}
       >
         <CornersOut size={20} />
       </button>

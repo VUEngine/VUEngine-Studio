@@ -22,6 +22,8 @@ import vesSimpleListEditorControl from './simple-list-editor/ves-simple-list-edi
 import vesSimpleListEditorControlTester from './simple-list-editor/ves-simple-list-editor-control-tester';
 import vesSpriteEditorControl from './sprite-editor/ves-sprite-editor-control';
 import vesSpriteEditorControlTester from './sprite-editor/ves-sprite-editor-control-tester';
+import vesStageEditorControl from './stage-editor/ves-stage-editor-control';
+import vesStageEditorControlTester from './stage-editor/ves-stage-editor-control-tester';
 import VesTranslationsEditorControl from './translations-editor/ves-translations-editor-control';
 import VesTranslationsEditorControlTester from './translations-editor/ves-translations-editor-control-tester';
 import VesWaveFormEditorControl from './waveform-editor/ves-waveform-editor-control';
@@ -40,6 +42,7 @@ export const VES_RENDERERS = [
     { tester: VesRumbleEffectEditorControlTester, renderer: VesRumbleEffectEditorControl },
     { tester: vesSimpleListEditorControlTester, renderer: vesSimpleListEditorControl },
     { tester: vesSpriteEditorControlTester, renderer: vesSpriteEditorControl },
+    { tester: vesStageEditorControlTester, renderer: vesStageEditorControl },
     { tester: VesTranslationsEditorControlTester, renderer: VesTranslationsEditorControl },
     { tester: VesWaveFormEditorControlTester, renderer: VesWaveFormEditorControl },
 ];

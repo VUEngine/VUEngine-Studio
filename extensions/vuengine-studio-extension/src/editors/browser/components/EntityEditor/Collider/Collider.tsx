@@ -1,12 +1,14 @@
 import { URI, nls } from '@theia/core';
 import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { ProjectContributor } from '../../../../../project/browser/ves-project-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/HContainer';
 import MultiSelect, { MultiSelectOption } from '../../Common/MultiSelect';
 import VContainer from '../../Common/VContainer';
-import { ColliderData, ColliderType } from '../EntityEditorTypes';
+import { COLLIDER_LINEFIELD_LENGTH_MAX, COLLIDER_LINEFIELD_LENGTH_MIN, ColliderData } from '../EntityEditorTypes';
+import { ColliderType } from '../../Common/VUEngineTypes';
+import RadioSelect from '../../Common/RadioSelect';
 
 interface ColliderProps {
     collider: ColliderData
@@ -16,6 +18,9 @@ interface ColliderProps {
 export default function Collider(props: ColliderProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const { collider, updateCollider } = props;
+    const [length, setLength] = useState<number>(0);
+    const [axis, setAxis] = useState<number>(0);
+    const [thickness, setThickness] = useState<number>(0);
 
     let colliderLayersFileUri: URI | undefined;
     const colliderLayers = services.vesProjectService.getProjectDataItemsForType('ColliderLayers');
@@ -75,6 +80,16 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
             pixelSize: {
                 ...collider.pixelSize,
                 z,
+            },
+        });
+    };
+
+    const setDiameter = (diameter: number): void => {
+        updateCollider({
+            pixelSize: {
+                x: diameter,
+                y: 0,
+                z: 0,
             },
         });
     };
@@ -169,6 +184,16 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
         });
     };
 
+    const setScale = (scale: number): void => {
+        updateCollider({
+            scale: {
+                x: scale,
+                y: 0,
+                z: 0,
+            },
+        });
+    };
+
     const toggleCheckForCollisions = (): void => {
         updateCollider({
             checkForCollisions: !collider.checkForCollisions,
@@ -220,6 +245,43 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
     };
 
     const heaviness = getHeaviness();
+
+    const updateLineField = (a: number, l: number, t: number): void => {
+        const cappedLength = Math.min(Math.max(l, COLLIDER_LINEFIELD_LENGTH_MIN), COLLIDER_LINEFIELD_LENGTH_MAX);
+
+        updateCollider({
+            pixelSize: {
+                x: a === 0 ? cappedLength : 0,
+                y: a === 1 ? cappedLength : 0,
+                z: a === 2 ? cappedLength : 0,
+            },
+            scale: {
+                x: a === 0 ? t : 0,
+                y: a === 1 ? t : 0,
+                z: a === 2 ? t : 0,
+            }
+        });
+
+        setAxis(a);
+        setLength(cappedLength);
+        setThickness(t);
+    };
+
+    useEffect(() => {
+        if (collider.pixelSize.x > 0) {
+            setLength(collider.pixelSize.x);
+            setThickness(collider.scale.x);
+            setAxis(0);
+        } else if (collider.pixelSize.y > 0) {
+            setLength(collider.pixelSize.y);
+            setThickness(collider.scale.y);
+            setAxis(1);
+        } else if (collider.pixelSize.z > 0) {
+            setLength(collider.pixelSize.z);
+            setThickness(collider.scale.z);
+            setAxis(2);
+        }
+    }, []);
 
     return (
         <VContainer gap={15}>
@@ -283,6 +345,100 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     </button>
                 </HContainer>
             </VContainer>
+            {(collider.type === ColliderType.Box || collider.type === ColliderType.InverseBox) &&
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/colliderSize', 'Size (x, y, z)')}
+                    </label>
+                    <HContainer>
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            value={collider.pixelSize.x}
+                            onChange={e => setPixelSizeX(parseFloat(e.target.value))}
+                        />
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            value={collider.pixelSize.y}
+                            onChange={e => setPixelSizeY(parseFloat(e.target.value))}
+                        />
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            value={collider.pixelSize.z}
+                            onChange={e => setPixelSizeZ(parseFloat(e.target.value))}
+                        />
+                    </HContainer>
+                </VContainer>
+            }
+            {collider.type === ColliderType.Ball &&
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/diameter', 'Diameter')}
+                    </label>
+                    <input
+                        className='theia-input'
+                        style={{ width: 48 }}
+                        type='number'
+                        value={collider.pixelSize.x}
+                        onChange={e => setDiameter(parseFloat(e.target.value))}
+                    />
+                </VContainer>
+            }
+            {collider.type === ColliderType.LineField &&
+                <HContainer gap={15}>
+                    <VContainer>
+                        <label>
+                            {nls.localize('vuengine/entityEditor/colliderLength', 'Length')}
+                        </label>
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            max={512}
+                            min={0}
+                            value={length}
+                            onChange={e => updateLineField(axis, parseFloat(e.target.value), thickness)}
+                        />
+                    </VContainer>
+                    <VContainer>
+                        <label>
+                            {nls.localize('vuengine/entityEditor/colliderAxis', 'Axis')}
+                        </label>
+                        <RadioSelect
+                            options={[{
+                                label: 'X',
+                                value: 0,
+                            }, {
+                                label: 'Y',
+                                value: 1,
+                            }, {
+                                label: 'Z',
+                                value: 2,
+                            }]}
+                            defaultValue={axis}
+                            onChange={options => updateLineField(options[0].value as number, length, thickness)}
+                            allowBlank
+                        />
+                    </VContainer>
+                    <VContainer>
+                        <label>
+                            {nls.localize('vuengine/entityEditor/thickness', 'Thickness')}
+                        </label>
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            value={thickness}
+                            onChange={e => updateLineField(axis, length, parseFloat(e.target.value))}
+                        />
+                    </VContainer>
+                </HContainer>
+            }
             <VContainer>
                 <label>
                     {nls.localize('vuengine/entityEditor/colliderDisplacement', 'Displacement (x, y, z, parallax)')}
@@ -315,34 +471,6 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                         type='number'
                         value={collider.displacement.parallax}
                         onChange={e => setDisplacementParallax(parseFloat(e.target.value))}
-                    />
-                </HContainer>
-            </VContainer>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/entityEditor/colliderSize', 'Size (x, y, z)')}
-                </label>
-                <HContainer>
-                    <input
-                        className='theia-input'
-                        style={{ width: 48 }}
-                        type='number'
-                        value={collider.pixelSize.x}
-                        onChange={e => setPixelSizeX(parseFloat(e.target.value))}
-                    />
-                    <input
-                        className='theia-input'
-                        style={{ width: 48 }}
-                        type='number'
-                        value={collider.pixelSize.y}
-                        onChange={e => setPixelSizeY(parseFloat(e.target.value))}
-                    />
-                    <input
-                        className='theia-input'
-                        style={{ width: 48 }}
-                        type='number'
-                        value={collider.pixelSize.z}
-                        onChange={e => setPixelSizeZ(parseFloat(e.target.value))}
                     />
                 </HContainer>
             </VContainer>
@@ -383,43 +511,59 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     />
                 </HContainer>
             </VContainer>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/entityEditor/colliderScale', 'Scale (x, y, z)')}
-                </label>
-                <HContainer>
+            {(collider.type === ColliderType.Box || collider.type === ColliderType.InverseBox) &&
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/colliderScale', 'Scale (x, y, z)')}
+                    </label>
+                    <HContainer>
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            min={0}
+                            max={64}
+                            step={0.5}
+                            value={collider.scale.x}
+                            onChange={e => setScaleX(parseFloat(e.target.value))}
+                        />
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            min={0}
+                            max={64}
+                            step={0.5}
+                            value={collider.scale.y}
+                            onChange={e => setScaleY(parseFloat(e.target.value))}
+                        />
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            min={0}
+                            max={64}
+                            step={0.1}
+                            value={collider.scale.z}
+                            onChange={e => setScaleZ(parseFloat(e.target.value))}
+                        />
+                    </HContainer>
+                </VContainer>
+            }
+            {collider.type === ColliderType.Ball &&
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/scale', 'Scale')}
+                    </label>
                     <input
                         className='theia-input'
                         style={{ width: 48 }}
                         type='number'
-                        min={0}
-                        max={64}
-                        step={0.5}
                         value={collider.scale.x}
-                        onChange={e => setScaleX(parseFloat(e.target.value))}
+                        onChange={e => setScale(parseFloat(e.target.value))}
                     />
-                    <input
-                        className='theia-input'
-                        style={{ width: 48 }}
-                        type='number'
-                        min={0}
-                        max={64}
-                        step={0.5}
-                        value={collider.scale.y}
-                        onChange={e => setScaleY(parseFloat(e.target.value))}
-                    />
-                    <input
-                        className='theia-input'
-                        style={{ width: 48 }}
-                        type='number'
-                        min={0}
-                        max={64}
-                        step={0.5}
-                        value={collider.scale.z}
-                        onChange={e => setScaleZ(parseFloat(e.target.value))}
-                    />
-                </HContainer>
-            </VContainer>
+                </VContainer>
+            }
             <VContainer>
                 <label>
                     {nls.localize('vuengine/entityEditor/checkForCollisions', 'Check For Collisions')}

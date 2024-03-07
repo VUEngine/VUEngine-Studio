@@ -4,8 +4,8 @@ import React from 'react';
 import { EditorsContextType } from '../../ves-editors-types';
 import { DataSection } from '../Common/CommonTypes';
 import HContainer from '../Common/HContainer';
-import InfoLabel from '../Common/InfoLabel';
 import RadioSelect from '../Common/RadioSelect';
+import SectionSelect from '../Common/SectionSelect';
 import VContainer from '../Common/VContainer';
 import { MAX_RANGE, MIN_RANGE, PCMData } from './PCMTypes';
 
@@ -110,30 +110,10 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
                         onChange={this.onChangeName.bind(this)}
                     />
                 </VContainer>
-                <VContainer>
-                    <VContainer>
-                        <InfoLabel
-                            label={nls.localize('vuengine/entityEditor/section', 'Section')}
-                            tooltip={nls.localize(
-                                'vuengine/pcmEditor/sectionDescription',
-                                // eslint-disable-next-line max-len
-                                'Defines whether PCM data should be stored in ROM space or Expansion space. You usually want to leave this untouched, since the latter only works on specially designed cartridges.'
-                            )}
-                            tooltipPosition='bottom'
-                        />
-                        <RadioSelect
-                            defaultValue={data.section}
-                            options={[{
-                                label: 'ROM',
-                                value: DataSection.ROM,
-                            }, {
-                                label: nls.localize('vuengine/entityEditor/expansion', 'Expansion'),
-                                value: DataSection.EXP,
-                            }]}
-                            onChange={options => this.setSection(options[0].value as DataSection)}
-                        />
-                    </VContainer>
-                </VContainer>
+                <SectionSelect
+                    value={data.section}
+                    setValue={this.setSection.bind(this)}
+                />
             </HContainer>
             <VContainer>
                 <label>

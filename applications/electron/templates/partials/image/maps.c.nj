@@ -4,7 +4,9 @@
 {%- if customMapPrefix is defined -%}
 	{%- set mapName = customMapPrefix ~ mapName -%}
 {%- endif %}
-const uint16 {{ mapName }}Map[] __attribute__((aligned(4))){% if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
+const uint16 {{ mapName }}Map[] __attribute__((aligned(4)))
+{%- if section == 'data' %} __attribute((section(".rodata"))){% endif %}
+{%- if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
 	{% for mapTile in mapData -%}
 	0x{{ mapTile }},

@@ -1,10 +1,27 @@
-import { Asterisk, Atom, CircleDashed, Cube, File, FilmStrip, Image, SneakerMove, TreeStructure, UserFocus } from '@phosphor-icons/react';
+import {
+    Asterisk,
+    Atom,
+    CircleDashed,
+    Cube,
+    DotsThreeOutline,
+    FadersHorizontal,
+    File,
+    FilmStrip,
+    Globe,
+    Image,
+    Selection,
+    SelectionInverse,
+    SneakerMove,
+    TreeStructure,
+    UserFocus,
+} from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext, useState } from 'react';
 import { NodeRendererProps } from 'react-arborist';
 import { ComponentKey, EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 import { ScriptType } from '../Scripts/ScriptTypes';
+import { ColliderType, WireframeType } from '../../Common/VUEngineTypes';
 
 export default function ComponentTreeNode(props: NodeRendererProps<any>): React.JSX.Element {
     const { node, style, dragHandle } = props;
@@ -26,9 +43,19 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                 case 'children':
                     return <UserFocus size={16} />;
                 case 'colliders':
-                    return <CircleDashed size={16} />;
+                    switch (data.components.colliders[index].type) {
+                        default:
+                        case ColliderType.Ball:
+                            return <CircleDashed size={16} />;
+                        case ColliderType.Box:
+                            return <Selection size={16} />;
+                        case ColliderType.InverseBox:
+                            return <SelectionInverse size={16} />;
+                        case ColliderType.LineField:
+                            return <DotsThreeOutline size={16} />;
+                    }
                 case 'extraProperties':
-                    return <Asterisk size={16} />;
+                    return <FadersHorizontal size={16} />;
                 case 'physics':
                     return <Atom size={16} />;
                 case 'scripts':
@@ -36,7 +63,15 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                 case 'sprites':
                     return <Image size={16} />;
                 case 'wireframes':
-                    return <Cube size={16} />;
+                    switch (data.components.wireframes[index].wireframe.type) {
+                        default:
+                        case WireframeType.Mesh:
+                            return <Cube size={16} />;
+                        case WireframeType.Sphere:
+                            return <Globe size={16} />;
+                        case WireframeType.Asterisk:
+                            return <Asterisk size={16} />;
+                    }
             }
         } else {
             if (node.isOpen) {
@@ -47,7 +82,9 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
         }
     };
 
-    const handleClick = () => {
+    const handleClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+
         if (node.isInternal) {
             node.toggle();
         }

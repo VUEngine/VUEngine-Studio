@@ -16,7 +16,6 @@ import React, { BaseSyntheticEvent, useContext, useEffect, useRef, useState } fr
 import { PALETTE_COLORS } from '../../../../core/browser/ves-common-types';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import VContainer from '../Common/VContainer';
-import { DisplayMode } from '../EntityEditor/EntityEditorTypes';
 import PaletteSelect from './PaletteSelect';
 import SpriteEditorActions from './SpriteEditorActions';
 import SpriteEditorCurrentToolSettings from './SpriteEditorCurrentToolSettings';
@@ -24,6 +23,7 @@ import SpriteEditorSettings from './SpriteEditorSettings';
 import SpriteEditorStatus from './SpriteEditorStatus';
 import SpriteEditorTools from './SpriteEditorTools';
 import { DEFAULT_SPRITE_SIZE, PLACEHOLDER_LAYER_NAME, SpriteData, SpriteLayersData } from './SpriteEditorTypes';
+import { DisplayMode } from '../Common/VUEngineTypes';
 
 interface SpriteEditorProps {
     data: SpriteData

@@ -6,18 +6,15 @@ import HContainer from '../../Common/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import RadioSelect from '../../Common/RadioSelect';
 import VContainer from '../../Common/VContainer';
+import { BgmapMode, DisplayMode, SpriteType, Transparency } from '../../Common/VUEngineTypes';
 import Images from '../../ImageEditor/Images/Images';
 import { EntityEditorSaveDataOptions } from '../EntityEditor';
 import {
-    BgmapMode,
-    DisplayMode,
     EntityEditorContext,
     EntityEditorContextType,
     MAX_TEXTURE_PADDING,
     MIN_TEXTURE_PADDING,
     SpriteData,
-    SpriteType,
-    Transparency
 } from '../EntityEditorTypes';
 
 interface SpriteProps {
@@ -30,7 +27,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const { data } = useContext(EntityEditorContext) as EntityEditorContextType;
     const { sprite, updateSprite, isMultiFileAnimation } = props;
-    const [dimensions, setDimensions] = useState<string>('');
+    const [dimensions, setDimensions] = useState<number[]>([]);
     const [filename, setFilename] = useState<string>('');
 
     const getMetaData = async (): Promise<void> => {
@@ -44,17 +41,11 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 }
                 setFilename(fn);
                 const d = await window.electronVesCore.getImageDimensions(resolvedUri.path.fsPath());
-                const width = d.width ?? 0;
-                let height = d.height ?? 0;
-                if (data.components?.animations?.length > 0 && !isMultiFileAnimation && data.animations?.totalFrames) {
-                    height /= data.animations?.totalFrames;
-                }
-
-                setDimensions(`${width}×${height}`);
+                setDimensions([d.width ?? 0, d.height ?? 0]);
             }
         } else {
             setFilename('');
-            setDimensions('');
+            setDimensions([]);
         }
     };
 
@@ -71,7 +62,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 return imageData.animation?.largestFrame;
             } else if (imageData.tiles?.count) {
                 return data.components?.animations?.length > 0 && !data.animations.multiframe
-                    ? imageData.tiles?.count / data.animations?.totalFrames || 1
+                    ? Math.round((imageData.tiles?.count / data.animations?.totalFrames || 1) * 100) / 100
                     : imageData.tiles?.count;
             }
         }
@@ -226,6 +217,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     ]);
 
     const charCount = getCharCount(sprite._imageData);
+    // if not an integer, the number of frames must be wrong
+    const invalidCharCount = charCount % 1 !== 0;
 
     return (
         <HContainer gap={20} wrap='wrap'>
@@ -254,19 +247,33 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                 {filename}
                             </div>
                         }
-                        {dimensions !== '' &&
-                            <div>
-                                {dimensions} px
-                            </div>
+
+                        {dimensions.length > 0 &&
+                            <>
+                                <div>
+                                    {dimensions[0]}×{dimensions[1]} px
+                                </div>
+                                {data.components?.animations?.length > 0 && !isMultiFileAnimation && data.animations?.totalFrames &&
+                                    <div>
+                                        (
+                                        {dimensions[0]}×{Math.round(dimensions[1] / data.animations?.totalFrames * 100) / 100} px × {data.animations?.totalFrames}
+                                        )
+                                    </div>
+                                }
+                            </>
                         }
+
                         {charCount > 0 &&
-                            <div>
+                            <div className={invalidCharCount ? 'error' : ''}>
+                                {invalidCharCount &&
+                                    <><i className='fa fa-warning' />{' '}</>
+                                }
                                 {charCount} {nls.localize('vuengine/entityEditor/chars', 'Chars')}
                             </div>
                         }
                     </VContainer>
                 </HContainer>
-            </VContainer>
+            </VContainer >
             <VContainer gap={15}>
                 <HContainer gap={15} wrap='wrap'>
                     <VContainer>
@@ -499,6 +506,6 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     </label>
                 </VContainer>
             </VContainer>
-        </HContainer>
+        </HContainer >
     );
 }

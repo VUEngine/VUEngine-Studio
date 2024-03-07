@@ -36,7 +36,8 @@ export class VesProcessServiceImpl implements VesProcessService {
       : this.rawProcessFactory(options);
     await new Promise((resolve, reject) => {
       newProcess.onStart(resolve);
-      newProcess.onError((error: ProcessErrorEvent) => console.log(error));
+      newProcess.onError(resolve);
+      newProcess.onClose(resolve);
     });
 
     const processManagerId = this.processManager.register(newProcess);

@@ -7,6 +7,7 @@ import { DataSection } from '../Common/CommonTypes';
 import HContainer from '../Common/HContainer';
 import InfoLabel from '../Common/InfoLabel';
 import RadioSelect from '../Common/RadioSelect';
+import SectionSelect from '../Common/SectionSelect';
 import VContainer from '../Common/VContainer';
 import Alphabet from './Alphabet/Alphabet';
 import AlphabetSettings from './Alphabet/AlphabetSettings';
@@ -346,28 +347,10 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
                             onChange={options => this.setCompression(options[0].value as ImageCompressionType)}
                         />
                     </VContainer>
-                    <VContainer>
-                        <InfoLabel
-                            label={nls.localize('vuengine/entityEditor/section', 'Section')}
-                            tooltip={nls.localize(
-                                'vuengine/entityEditor/sectionDescription',
-                                'Defines whether image data should be stored in ROM space or Expansion space. ' +
-                                'You usually want to leave this untouched, since the latter only works on specially designed cartridges.'
-                            )}
-                            tooltipPosition='bottom'
-                        />
-                        <RadioSelect
-                            defaultValue={data.section}
-                            options={[{
-                                label: 'ROM',
-                                value: DataSection.ROM,
-                            }, {
-                                label: nls.localize('vuengine/entityEditor/expansion', 'Expansion'),
-                                value: DataSection.EXP,
-                            }]}
-                            onChange={options => this.setSection(options[0].value as DataSection)}
-                        />
-                    </VContainer>
+                    <SectionSelect
+                        value={data.section}
+                        setValue={this.setSection.bind(this)}
+                    />
                 </HContainer>
                 <div className='editor'>
                     <div className='tools-column'>

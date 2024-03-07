@@ -7,8 +7,10 @@ import { DataSection } from '../../Common/CommonTypes';
 import HContainer from '../../Common/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import RadioSelect from '../../Common/RadioSelect';
+import SectionSelect from '../../Common/SectionSelect';
 import VContainer from '../../Common/VContainer';
-import { EntityEditorContext, EntityEditorContextType, SpriteType } from '../EntityEditorTypes';
+import { SpriteType } from '../../Common/VUEngineTypes';
+import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 
 interface SpritesSettingsProps {
     isMultiFileAnimation: boolean
@@ -164,27 +166,10 @@ export default function SpritesSettings(props: SpritesSettingsProps): React.JSX.
                     />
                 </VContainer>
             </HContainer>
-            <VContainer>
-                <InfoLabel
-                    label={nls.localize('vuengine/entityEditor/section', 'Section')}
-                    tooltip={nls.localize(
-                        'vuengine/entityEditor/sectionDescription',
-                        'Defines whether image data should be stored in ROM space or Expansion space. ' +
-                        'You usually want to leave this untouched, since the latter only works on specially designed cartridges.'
-                    )}
-                />
-                <RadioSelect
-                    defaultValue={data.sprites.section}
-                    options={[{
-                        label: 'ROM',
-                        value: DataSection.ROM,
-                    }, {
-                        label: nls.localize('vuengine/entityEditor/expansion', 'Expansion'),
-                        value: DataSection.EXP,
-                    }]}
-                    onChange={options => setSection(options[0].value as DataSection)}
-                />
-            </VContainer>
+            <SectionSelect
+                value={data.sprites.section}
+                setValue={setSection}
+            />
             <HContainer gap={15}>
                 {data.components?.animations.length > 0 && <>
                     <VContainer>
@@ -208,7 +193,7 @@ export default function SpritesSettings(props: SpritesSettingsProps): React.JSX.
                             tooltip={nls.localize(
                                 'vuengine/entityEditor/multiframeDescription',
                                 'With this enabled, chars for all animation frames are loaded into video memory at the same time. ' +
-                                'This allows multiple sprites to use the same texture, but show a different frame each.'
+                                'This allows multiple sprites to use the same texture, but show a different frame for each.'
                             )}
                         />
                         <input

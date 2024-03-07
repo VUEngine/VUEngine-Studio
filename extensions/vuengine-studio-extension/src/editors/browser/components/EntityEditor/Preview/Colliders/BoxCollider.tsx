@@ -1,16 +1,26 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
-import { PixelRotation, PixelSize, PixelVector, Scale } from '../../EntityEditorTypes';
+import { PixelRotation, PixelSize, PixelVector, Scale } from '../../../Common/VUEngineTypes';
+import { EntityEditorContext, EntityEditorContextType } from '../../EntityEditorTypes';
 
-const Cuboid = styled.div`
+interface CuboidProps {
+    highlighted: boolean
+}
+
+const Cuboid = styled.div<CuboidProps>`
     --half-d: calc(var(--depth) / 2);
     --half-h: calc(var(--height) / 2);
     --half-w: calc(var(--width) / 2);
     transform-style: preserve-3d;
+    z-index: ${p => p.highlighted ? 999999 : 110000};
 `;
 
-const CuboidFace = styled.div`
-    border: 1px dashed green;
+interface CuboidFaceProps {
+    highlighted: boolean
+}
+
+const CuboidFace = styled.div<CuboidFaceProps>`
+    border: ${p => p.highlighted ? '1px dashed green' : '.3px dashed yellow'};
     box-sizing: border-box;
     position: absolute;
 `;
@@ -62,29 +72,42 @@ const CuboidFaceRight = styled(CuboidFace)`
 `;
 */
 
-export interface CubiodColiderProps {
+export interface BoxColiderProps {
+    index: number
+    highlighted: boolean
     size: PixelSize
     displacement: PixelVector
     rotation: PixelRotation
     scale: Scale
 }
 
-export default function BoxCollider(props: CubiodColiderProps): React.JSX.Element {
-    const { size, displacement, rotation, scale } = props;
+export default function BoxCollider(props: BoxColiderProps): React.JSX.Element {
+    const { setState } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { index, highlighted, size, displacement, rotation, scale } = props;
 
-    return <Cuboid style={{
-        // @ts-ignore
-        '--depth': `${size.z * scale.z}px`,
-        '--height': `${size.y * scale.y}px`,
-        '--width': `${size.x * scale.x}px`,
-        transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) rotateZ(${rotation.z}deg)`,
-        translate: `${displacement.x}px ${displacement.y}px ${-1 * displacement.parallax}px`,
-    }}>
-        <CuboidFaceFront />
-        <CuboidFaceBack />
-        <CuboidFaceTop />
-        <CuboidFaceBottom />
-        {/* <CuboidFaceLeft /> */}
-        {/* <CuboidFaceRight /> */}
+    const handleClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setState({ currentComponent: `colliders-${index}` });
+    };
+
+    return <Cuboid
+        highlighted={highlighted}
+        onClick={handleClick}
+        style={{
+            // @ts-ignore
+            '--depth': `${size.z * scale.z}px`,
+            '--height': `${size.y * scale.y}px`,
+            '--width': `${size.x * scale.x}px`,
+            transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) rotateZ(${rotation.z}deg)`,
+            translate: `${displacement.x}px ${displacement.y}px ${-1 * displacement.parallax}px`,
+            cursor: 'pointer',
+        }}
+    >
+        <CuboidFaceFront highlighted={highlighted} />
+        <CuboidFaceBack highlighted={highlighted} />
+        <CuboidFaceTop highlighted={highlighted} />
+        <CuboidFaceBottom highlighted={highlighted} />
+        {/* <CuboidFaceLeft highlighted={highlighted} /> */}
+        {/* <CuboidFaceRight highlighted={highlighted} /> */}
     </Cuboid>;
 }

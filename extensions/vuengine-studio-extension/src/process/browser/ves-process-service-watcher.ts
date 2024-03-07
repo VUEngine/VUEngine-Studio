@@ -5,15 +5,15 @@ import { VesProcessService } from '../common/ves-process-service-protocol';
 
 @injectable()
 export class VesProcessWatcher {
-    public readonly onDidReceiveErrorStreamDataEmitter = new Emitter<{ pId: number, data: string }>();
+    readonly onDidReceiveErrorStreamDataEmitter = new Emitter<{ pId: number, data: string }>();
     public readonly onDidReceiveErrorStreamData: Event<{ pId: number, data: string }> = this.onDidReceiveErrorStreamDataEmitter.event;
-    public readonly onDidReceiveOutputStreamDataEmitter = new Emitter<{ pId: number, data: string }>();
+    readonly onDidReceiveOutputStreamDataEmitter = new Emitter<{ pId: number, data: string }>();
     public readonly onDidReceiveOutputStreamData: Event<{ pId: number, data: string }> = this.onDidReceiveOutputStreamDataEmitter.event;
-    public readonly onDidReceiveErrorEmitter = new Emitter<{ pId: number, event: ProcessErrorEvent }>();
+    readonly onDidReceiveErrorEmitter = new Emitter<{ pId: number, event: ProcessErrorEvent }>();
     public readonly onDidReceiveError: Event<{ pId: number, event: ProcessErrorEvent }> = this.onDidReceiveErrorEmitter.event;
-    public readonly onDidExitProcessEmitter = new Emitter<{ pId: number, event: IProcessExitEvent }>();
+    readonly onDidExitProcessEmitter = new Emitter<{ pId: number, event: IProcessExitEvent }>();
     public readonly onDidExitProcess: Event<{ pId: number, event: IProcessExitEvent }> = this.onDidExitProcessEmitter.event;
-    public readonly onDidCloseProcessEmitter = new Emitter<{ pId: number, event: IProcessExitEvent }>();
+    readonly onDidCloseProcessEmitter = new Emitter<{ pId: number, event: IProcessExitEvent }>();
     public readonly onDidCloseProcess: Event<{ pId: number, event: IProcessExitEvent }> = this.onDidCloseProcessEmitter.event;
 
     @inject(VesProcessService) protected readonly server: VesProcessService;

@@ -21,6 +21,15 @@
   padding: calc(var(--theia-ui-padding) * 2);
 }
 
+.jsonforms-container hr {
+  background-color: var(--theia-foreground);
+  border: none;
+  height: 1px;
+  margin: 0;
+  opacity: .1;
+  padding: 0;
+}
+
 .jsonforms-container .error {
   color: var(--theia-errorForeground);
   font-style: italic;
