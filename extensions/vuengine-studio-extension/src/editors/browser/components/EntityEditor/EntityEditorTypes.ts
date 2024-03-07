@@ -50,6 +50,9 @@ export const MAX_PREVIEW_SCRIPT_ZOOM = 1;
 export const WHEEL_SENSITIVITY = 50;
 export const COLLIDER_LINEFIELD_LENGTH_MIN = 0;
 export const COLLIDER_LINEFIELD_LENGTH_MAX = 512;
+export const COLLIDER_LINEFIELD_THICKNESS_MIN = 0;
+export const COLLIDER_LINEFIELD_THICKNESS_MAX = 512;
+export const WIREFRAME_CANVAS_PADDING = 1;
 
 export enum AxisNumeric {
     X = 0,

@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
-import { PixelRotation, PixelSize, PixelVector, Scale } from '../../../Common/VUEngineTypes';
-import { AxisNumeric, EntityEditorContext, EntityEditorContextType } from '../../EntityEditorTypes';
+import { PixelRotation, PixelVector } from '../../../Common/VUEngineTypes';
+import { AxisNumeric, ColliderData, EntityEditorContext, EntityEditorContextType } from '../../EntityEditorTypes';
 
 interface LineFieldFaceProps {
     axis: AxisNumeric
@@ -13,11 +13,13 @@ interface LineFieldFaceProps {
 }
 
 const LineFieldFace = styled.div<LineFieldFaceProps>`
-    border-top: ${p => p.highlighted ? '1px dashed green' : '.3px dashed yellow'};
+    border-top: .3px dashed yellow;
+    border-radius: ${p => p.highlighted ? '.5px' : '0'};
     box-sizing: border-box;
     cursor: pointer;
     display: flex;
     justify-content: center;
+    outline: ${p => p.highlighted ? '.5px solid rgba(0, 255, 0, .5)' : 'none'};
     position: absolute;
     transform: 
         rotateX(${p => p.rotation.x}deg) 
@@ -35,7 +37,7 @@ interface LineFieldNormalFaceProps {
 }
 
 const LineFieldNormalFace = styled.div<LineFieldNormalFaceProps>`
-    border-left: ${p => p.highlighted ? '1px dashed green' : '.3px dashed yellow'};
+    border-left: .3px dashed yellow;
     height: ${p => p.thickness}px;
     width: 0;
 `;
@@ -43,27 +45,24 @@ const LineFieldNormalFace = styled.div<LineFieldNormalFaceProps>`
 export interface LineFieldColiderProps {
     index: number
     highlighted: boolean
-    size: PixelSize
-    displacement: PixelVector
-    rotation: PixelRotation
-    scale: Scale
+    collider: ColliderData
 }
 
 export default function LineFieldCollider(props: LineFieldColiderProps): React.JSX.Element {
     const { setState } = useContext(EntityEditorContext) as EntityEditorContextType;
-    const { index, highlighted, size, displacement, rotation, scale } = props;
+    const { index, highlighted, collider } = props;
 
     let a = AxisNumeric.X;
-    let l = size.x;
-    let t = scale.x;
-    if (size.y > 0) {
+    let l = collider.pixelSize.x;
+    let t = collider.scale.x;
+    if (collider.pixelSize.y > 0) {
         a = AxisNumeric.Y;
-        l = size.y;
-        t = scale.y;
-    } else if (size.z > 0) {
+        l = collider.pixelSize.y;
+        t = collider.scale.y;
+    } else if (collider.pixelSize.z > 0) {
         a = AxisNumeric.Z;
-        l = size.z;
-        t = scale.z;
+        l = collider.pixelSize.z;
+        t = collider.scale.z;
     }
 
     const handleClick = (e: React.MouseEvent) => {
@@ -77,8 +76,8 @@ export default function LineFieldCollider(props: LineFieldColiderProps): React.J
         axis={a}
         length={l}
         thickness={t}
-        displacement={displacement}
-        rotation={rotation}
+        displacement={collider.displacement}
+        rotation={collider.rotation}
     >
         <LineFieldNormalFace
             highlighted={highlighted}

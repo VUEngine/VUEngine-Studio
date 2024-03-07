@@ -5,10 +5,16 @@ import { ProjectContributor } from '../../../../../project/browser/ves-project-t
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/HContainer';
 import MultiSelect, { MultiSelectOption } from '../../Common/MultiSelect';
-import VContainer from '../../Common/VContainer';
-import { COLLIDER_LINEFIELD_LENGTH_MAX, COLLIDER_LINEFIELD_LENGTH_MIN, ColliderData } from '../EntityEditorTypes';
-import { ColliderType } from '../../Common/VUEngineTypes';
 import RadioSelect from '../../Common/RadioSelect';
+import VContainer from '../../Common/VContainer';
+import { ColliderType } from '../../Common/VUEngineTypes';
+import {
+    COLLIDER_LINEFIELD_LENGTH_MAX,
+    COLLIDER_LINEFIELD_LENGTH_MIN,
+    COLLIDER_LINEFIELD_THICKNESS_MAX,
+    COLLIDER_LINEFIELD_THICKNESS_MIN,
+    ColliderData,
+} from '../EntityEditorTypes';
 
 interface ColliderProps {
     collider: ColliderData
@@ -248,6 +254,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
 
     const updateLineField = (a: number, l: number, t: number): void => {
         const cappedLength = Math.min(Math.max(l, COLLIDER_LINEFIELD_LENGTH_MIN), COLLIDER_LINEFIELD_LENGTH_MAX);
+        const cappedThickness = Math.min(Math.max(t, COLLIDER_LINEFIELD_THICKNESS_MIN), COLLIDER_LINEFIELD_THICKNESS_MAX);
 
         updateCollider({
             pixelSize: {
@@ -256,15 +263,15 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                 z: a === 2 ? cappedLength : 0,
             },
             scale: {
-                x: a === 0 ? t : 0,
-                y: a === 1 ? t : 0,
-                z: a === 2 ? t : 0,
+                x: a === 0 ? cappedThickness : 0,
+                y: a === 1 ? cappedThickness : 0,
+                z: a === 2 ? cappedThickness : 0,
             }
         });
 
         setAxis(a);
         setLength(cappedLength);
-        setThickness(t);
+        setThickness(cappedThickness);
     };
 
     useEffect(() => {

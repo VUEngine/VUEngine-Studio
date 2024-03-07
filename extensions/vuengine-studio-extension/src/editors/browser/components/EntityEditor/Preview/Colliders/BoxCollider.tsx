@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
-import { PixelRotation, PixelSize, PixelVector, Scale } from '../../../Common/VUEngineTypes';
-import { EntityEditorContext, EntityEditorContextType } from '../../EntityEditorTypes';
+import { ColliderData, EntityEditorContext, EntityEditorContextType } from '../../EntityEditorTypes';
 
 interface CuboidProps {
     highlighted: boolean
@@ -20,8 +19,10 @@ interface CuboidFaceProps {
 }
 
 const CuboidFace = styled.div<CuboidFaceProps>`
-    border: ${p => p.highlighted ? '1px dashed green' : '.3px dashed yellow'};
+    border: .3px dashed yellow;
+    border-radius: ${p => p.highlighted ? '.5px' : '0'};
     box-sizing: border-box;
+    outline: ${p => p.highlighted ? '.5px solid rgba(0, 255, 0, .5)' : 'none'};
     position: absolute;
 `;
 
@@ -75,15 +76,12 @@ const CuboidFaceRight = styled(CuboidFace)`
 export interface BoxColiderProps {
     index: number
     highlighted: boolean
-    size: PixelSize
-    displacement: PixelVector
-    rotation: PixelRotation
-    scale: Scale
+    collider: ColliderData
 }
 
 export default function BoxCollider(props: BoxColiderProps): React.JSX.Element {
     const { setState } = useContext(EntityEditorContext) as EntityEditorContextType;
-    const { index, highlighted, size, displacement, rotation, scale } = props;
+    const { index, highlighted, collider } = props;
 
     const handleClick = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -95,11 +93,11 @@ export default function BoxCollider(props: BoxColiderProps): React.JSX.Element {
         onClick={handleClick}
         style={{
             // @ts-ignore
-            '--depth': `${size.z * scale.z}px`,
-            '--height': `${size.y * scale.y}px`,
-            '--width': `${size.x * scale.x}px`,
-            transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) rotateZ(${rotation.z}deg)`,
-            translate: `${displacement.x}px ${displacement.y}px ${-1 * displacement.parallax}px`,
+            '--depth': `${collider.pixelSize.z * collider.scale.z}px`,
+            '--height': `${collider.pixelSize.y * collider.scale.y}px`,
+            '--width': `${collider.pixelSize.x * collider.scale.x}px`,
+            transform: `rotateX(${collider.rotation.x}deg) rotateY(${collider.rotation.y}deg) rotateZ(${collider.rotation.z}deg)`,
+            translate: `${collider.displacement.x}px ${collider.displacement.y}px ${-1 * collider.displacement.parallax}px`,
             cursor: 'pointer',
         }}
     >
