@@ -4,6 +4,7 @@ import { ProjectContributor } from '../../../../../project/browser/ves-project-t
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
+import { clamp } from '../../Common/Utils';
 import VContainer from '../../Common/VContainer';
 import {
     AnimationData,
@@ -44,7 +45,7 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
 
     const setCycles = (cycles: number): void => {
         updateAnimation({
-            cycles: Math.min(Math.max(cycles, MIN_ANIMATION_CYLCES), MAX_ANIMATION_CYLCES),
+            cycles: clamp(cycles, MIN_ANIMATION_CYLCES, MAX_ANIMATION_CYLCES),
         });
     };
 
@@ -60,7 +61,7 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
 
     const setFrame = (i: number, frame: number): void => {
         const frames = [...animation.frames];
-        frames[i] = Math.min(Math.max(frame, 1), totalFrames);
+        frames[i] = clamp(frame, 1, totalFrames);
         updateAnimation({ frames });
     };
 

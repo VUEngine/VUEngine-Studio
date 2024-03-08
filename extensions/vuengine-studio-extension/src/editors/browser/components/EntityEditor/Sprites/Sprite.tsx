@@ -16,6 +16,12 @@ import {
     MIN_TEXTURE_PADDING,
     SpriteData,
 } from '../EntityEditorTypes';
+import { clamp } from '../../Common/Utils';
+
+const MIN_TEXTURE_DISPLACEMENT = -256;
+const MAX_TEXTURE_DISPLACEMENT = 256;
+const MIN_TEXTURE_DISPLACEMENT_PARALLAX = -32;
+const MAX_TEXTURE_DISPLACEMENT_PARALLAX = 32;
 
 interface SpriteProps {
     sprite: SpriteData
@@ -98,67 +104,37 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         updateSprite({
             texture: {
                 ...sprite.texture,
-                palette: Math.min(Math.max(palette, 0), 3),
+                palette: clamp(palette, 0, 3),
             },
         });
     };
 
-    const setPaddingX = (x: number): void => {
+    const setPadding = (axis: 'x' | 'y', value: number): void => {
         updateSprite({
             texture: {
                 ...sprite.texture,
                 padding: {
                     ...sprite.texture.padding,
-                    x: Math.min(Math.max(x, MIN_TEXTURE_PADDING), MAX_TEXTURE_PADDING),
+                    [axis]: clamp(value, MIN_TEXTURE_PADDING, MAX_TEXTURE_PADDING),
                 },
             },
         });
     };
 
-    const setPaddingY = (y: number): void => {
+    const setDisplacement = (axis: 'x' | 'y' | 'z', value: number): void => {
         updateSprite({
-            texture: {
-                ...sprite.texture,
-                padding: {
-                    ...sprite.texture.padding,
-                    y: Math.min(Math.max(y, MIN_TEXTURE_PADDING), MAX_TEXTURE_PADDING),
-                },
+            displacement: {
+                ...sprite.displacement,
+                [axis]: clamp(value, MIN_TEXTURE_DISPLACEMENT, MAX_TEXTURE_DISPLACEMENT),
             },
         });
     };
 
-    const setDisplacementX = (x: number): void => {
+    const setDisplacementParallax = (value: number): void => {
         updateSprite({
             displacement: {
                 ...sprite.displacement,
-                x,
-            },
-        });
-    };
-
-    const setDisplacementY = (y: number): void => {
-        updateSprite({
-            displacement: {
-                ...sprite.displacement,
-                y,
-            },
-        });
-    };
-
-    const setDisplacementZ = (z: number): void => {
-        updateSprite({
-            displacement: {
-                ...sprite.displacement,
-                z,
-            },
-        });
-    };
-
-    const setDisplacementParallax = (parallax: number): void => {
-        updateSprite({
-            displacement: {
-                ...sprite.displacement,
-                parallax,
+                parallax: clamp(value, MIN_TEXTURE_DISPLACEMENT_PARALLAX, MAX_TEXTURE_DISPLACEMENT_PARALLAX),
             },
         });
     };
@@ -405,7 +381,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                     min={MIN_TEXTURE_PADDING}
                                     max={MAX_TEXTURE_PADDING}
                                     value={sprite.texture.padding.x}
-                                    onChange={e => setPaddingX(parseInt(e.target.value))}
+                                    onChange={e => setPadding('x', parseInt(e.target.value))}
                                 />
                                 <input
                                     className='theia-input'
@@ -414,7 +390,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                     min={MIN_TEXTURE_PADDING}
                                     max={MAX_TEXTURE_PADDING}
                                     value={sprite.texture.padding.y}
-                                    onChange={e => setPaddingY(parseInt(e.target.value))}
+                                    onChange={e => setPadding('y', parseInt(e.target.value))}
                                 />
                             </HContainer>
                         </VContainer>
@@ -450,27 +426,35 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                             className='theia-input'
                             style={{ width: 48 }}
                             type='number'
+                            min={MIN_TEXTURE_DISPLACEMENT}
+                            max={MAX_TEXTURE_DISPLACEMENT}
                             value={sprite.displacement.x}
-                            onChange={e => setDisplacementX(parseInt(e.target.value))}
+                            onChange={e => setDisplacement('x', parseInt(e.target.value))}
                         />
                         <input
                             className='theia-input'
                             style={{ width: 48 }}
                             type='number'
+                            min={MIN_TEXTURE_DISPLACEMENT}
+                            max={MAX_TEXTURE_DISPLACEMENT}
                             value={sprite.displacement.y}
-                            onChange={e => setDisplacementY(parseInt(e.target.value))}
+                            onChange={e => setDisplacement('y', parseInt(e.target.value))}
                         />
                         <input
                             className='theia-input'
                             style={{ width: 48 }}
                             type='number'
+                            min={MIN_TEXTURE_DISPLACEMENT}
+                            max={MAX_TEXTURE_DISPLACEMENT}
                             value={sprite.displacement.z}
-                            onChange={e => setDisplacementZ(parseInt(e.target.value))}
+                            onChange={e => setDisplacement('z', parseInt(e.target.value))}
                         />
                         <input
                             className='theia-input'
                             style={{ width: 48 }}
                             type='number'
+                            min={MIN_TEXTURE_DISPLACEMENT_PARALLAX}
+                            max={MAX_TEXTURE_DISPLACEMENT_PARALLAX}
                             value={sprite.displacement.parallax}
                             onChange={e => setDisplacementParallax(parseInt(e.target.value))}
                         />

@@ -16,6 +16,7 @@ export default function PreviewWireframe(props: PreviewWireframeProps): React.JS
     const { index, highlighted, wireframe } = props;
     const style = {
         borderRadius: highlighted ? .5 : 0,
+        cursor: 'pointer',
         display: 'flex',
         imageRendering: 'pixelated',
         opacity: wireframe.wireframe.transparency === Transparency.None ? 1 : .5,

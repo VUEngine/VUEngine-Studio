@@ -1,4 +1,5 @@
 import React from 'react';
+import { clamp } from '../Common/Utils';
 import { ColumnTableEntry } from './ColumnTableTypes';
 
 interface EditorColumnProps {
@@ -29,7 +30,7 @@ export default function EditorColumn(props: EditorColumnProps): React.JSX.Elemen
             onClick={selectInput}
             onChange={e => setValue(index, {
                 ...value,
-                repeat: Math.min(Math.max(parseInt(e.target.value === '' ? '16' : e.target.value), 1), 16)
+                repeat: clamp(parseInt(e.target.value === '' ? '16' : e.target.value), 1, 16),
             })}
         />
         <input
@@ -42,7 +43,7 @@ export default function EditorColumn(props: EditorColumnProps): React.JSX.Elemen
             onClick={selectInput}
             onChange={e => setValue(index, {
                 ...value,
-                time: Math.min(Math.max(parseInt(e.target.value === '' ? '16' : e.target.value), 1), 16)
+                time: clamp(parseInt(e.target.value === '' ? '16' : e.target.value), 1, 16),
             })}
         />
     </div>;

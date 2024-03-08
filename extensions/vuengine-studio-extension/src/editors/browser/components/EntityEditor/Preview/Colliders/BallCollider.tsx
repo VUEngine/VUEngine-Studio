@@ -11,11 +11,11 @@ interface BallFaceProps {
 }
 
 const BallFace = styled.div<BallFaceProps>`
-    border: .3px dashed yellow;
+    border: .5px dashed yellow;
     border-radius: 100%;
     box-sizing: border-box;
     cursor: pointer;
-    height: ${p => p.diameter}px
+    height: ${p => p.diameter}px;
     outline: ${p => p.highlighted ? '.5px solid rgba(0, 255, 0, .5)' : 'none'};
     position: absolute;
     transform: rotateX(${p => p.rotation.x}deg) rotateY(${p => p.rotation.y}deg) rotateZ(${p => p.rotation.z}deg);

@@ -13,7 +13,7 @@ interface LineFieldFaceProps {
 }
 
 const LineFieldFace = styled.div<LineFieldFaceProps>`
-    border-top: .3px dashed yellow;
+    border-top: .5px dashed yellow;
     border-radius: ${p => p.highlighted ? '.5px' : '0'};
     box-sizing: border-box;
     cursor: pointer;
@@ -37,7 +37,7 @@ interface LineFieldNormalFaceProps {
 }
 
 const LineFieldNormalFace = styled.div<LineFieldNormalFaceProps>`
-    border-left: .3px dashed yellow;
+    border-left: .5px dashed yellow;
     height: ${p => p.thickness}px;
     width: 0;
 `;

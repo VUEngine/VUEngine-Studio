@@ -19,7 +19,7 @@ interface CuboidFaceProps {
 }
 
 const CuboidFace = styled.div<CuboidFaceProps>`
-    border: .3px dashed yellow;
+    border: .5px dashed yellow;
     border-radius: ${p => p.highlighted ? '.5px' : '0'};
     box-sizing: border-box;
     outline: ${p => p.highlighted ? '.5px solid rgba(0, 255, 0, .5)' : 'none'};

@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { clamp } from './Utils';
 
 interface ColumnProps {
     maxWidth?: number
@@ -95,7 +96,7 @@ export default function VerticalRangeInput(props: VerticalRangeInputProps): Reac
             const rect = e.currentTarget.getBoundingClientRect();
             const y = e.clientY - rect.top;
             const step = rect.height / max;
-            const v = Math.min(Math.max(Math.ceil(max - (y / step)), min), max);
+            const v = clamp(Math.ceil(max - (y / step)), min, max);
             setValue(v);
         }
     };
@@ -123,7 +124,7 @@ export default function VerticalRangeInput(props: VerticalRangeInputProps): Reac
             value={value ?? min}
             onClick={handleSelectInput}
             onChange={e => setValue(
-                Math.min(Math.max(parseInt(e.target.value === '' ? `${min}` : e.target.value), min), max)
+                clamp(parseInt(e.target.value === '' ? `${min}` : e.target.value), min, max)
             )}
         />
     </Column>;

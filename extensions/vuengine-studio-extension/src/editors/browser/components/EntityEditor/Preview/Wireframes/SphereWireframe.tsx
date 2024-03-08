@@ -13,16 +13,20 @@ const plotCircle = (context: CanvasRenderingContext2D, radius: number, interlace
     let x = radius;
     let y = 0;
     let radiusError = 1 - x;
+    let lastStepPlotted = false;
 
     while (x >= y) {
-        context.fillRect(x + radius, y + radius, 1, 1);
-        context.fillRect(y + radius, x + radius, 1, 1);
-        context.fillRect(-x + radius, y + radius, 1, 1);
-        context.fillRect(-y + radius, x + radius, 1, 1);
-        context.fillRect(-x + radius, -y + radius, 1, 1);
-        context.fillRect(-y + radius, -x + radius, 1, 1);
-        context.fillRect(x + radius, -y + radius, 1, 1);
-        context.fillRect(y + radius, -x + radius, 1, 1);
+        if (!interlaced || !lastStepPlotted) {
+            context.fillRect(x + radius, y + radius, 1, 1);
+            context.fillRect(y + radius, x + radius, 1, 1);
+            context.fillRect(-x + radius, y + radius, 1, 1);
+            context.fillRect(-y + radius, x + radius, 1, 1);
+            context.fillRect(-x + radius, -y + radius, 1, 1);
+            context.fillRect(-y + radius, -x + radius, 1, 1);
+            context.fillRect(x + radius, -y + radius, 1, 1);
+            context.fillRect(y + radius, -x + radius, 1, 1);
+        }
+        lastStepPlotted = !lastStepPlotted;
         y++;
 
         if (radiusError < 0) {
@@ -66,6 +70,10 @@ export default function SphereWireframe(props: SphereWireframeProps): React.JSX.
             projectedRadius,
             wireframe.wireframe.interlaced,
         );
+
+        if (wireframe.drawCenter) {
+            context.fillRect(wireframe.radius - 1, wireframe.radius - 1, 2, 2);
+        }
     };
 
     useEffect(() => {
@@ -74,10 +82,11 @@ export default function SphereWireframe(props: SphereWireframeProps): React.JSX.
 
         draw(projectedRadius);
     }, [
+        wireframe.drawCenter,
+        wireframe.radius,
         wireframe.wireframe.color,
         wireframe.wireframe.displacement,
         wireframe.wireframe.interlaced,
-        wireframe.radius,
     ]);
 
     return <canvas

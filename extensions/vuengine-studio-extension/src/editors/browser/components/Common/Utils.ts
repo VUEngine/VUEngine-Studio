@@ -1,5 +1,10 @@
-import { QuickPickItem, QuickPickOptions, QuickPickService, nls } from '@theia/core';
+import { QuickPickItem, QuickPickOptions, QuickPickService, isNumber, nls } from '@theia/core';
 import { VesProjectService } from '../../../../project/browser/ves-project-service';
+
+export const clamp = (value: number, min: number, max: number, deflt: number = 0): number =>
+    isNumber(value)
+        ? Math.min(Math.max(value, min), max)
+        : deflt;
 
 export const showEntitySelection = async (quickPickService: QuickPickService, vesProjectService: VesProjectService, ignoreIds?: string[]): Promise<QuickPickItem | undefined> => {
     const quickPickOptions: QuickPickOptions<QuickPickItem> = {

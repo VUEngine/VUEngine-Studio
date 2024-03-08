@@ -15,6 +15,16 @@ import {
     COLLIDER_LINEFIELD_THICKNESS_MIN,
     ColliderData,
 } from '../EntityEditorTypes';
+import { clamp } from '../../Common/Utils';
+
+const MIN_COLLIDER_ROTATION = -360;
+const MAX_COLLIDER_ROTATION = 360;
+const MIN_COLLIDER_SCALE = 0;
+const MAX_COLLIDER_SCALE = 64;
+const MIN_COLLIDER_DISPLACEMENT = -256;
+const MAX_COLLIDER_DISPLACEMENT = 256;
+const MIN_COLLIDER_DISPLACEMENT_PARALLAX = -32;
+const MAX_COLLIDER_DISPLACEMENT_PARALLAX = 32;
 
 interface ColliderProps {
     collider: ColliderData
@@ -100,100 +110,46 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
         });
     };
 
-    const setDisplacementX = (x: number): void => {
+    const setDisplacement = (a: 'x' | 'y' | 'z', value: number): void => {
         updateCollider({
             displacement: {
                 ...collider.displacement,
-                x,
+                [a]: clamp(value, MIN_COLLIDER_DISPLACEMENT, MAX_COLLIDER_DISPLACEMENT),
             },
         });
     };
 
-    const setDisplacementY = (y: number): void => {
+    const setDisplacementParallax = (value: number): void => {
         updateCollider({
             displacement: {
                 ...collider.displacement,
-                y,
+                parallax: clamp(value, MIN_COLLIDER_DISPLACEMENT_PARALLAX, MAX_COLLIDER_DISPLACEMENT_PARALLAX),
             },
         });
     };
 
-    const setDisplacementZ = (z: number): void => {
-        updateCollider({
-            displacement: {
-                ...collider.displacement,
-                z,
-            },
-        });
-    };
-
-    const setDisplacementParallax = (parallax: number): void => {
-        updateCollider({
-            displacement: {
-                ...collider.displacement,
-                parallax,
-            },
-        });
-    };
-
-    const setRotationX = (x: number): void => {
+    const setRotation = (a: 'x' | 'y' | 'z', value: number): void => {
         updateCollider({
             rotation: {
                 ...collider.rotation,
-                x,
+                [a]: clamp(value, MIN_COLLIDER_ROTATION, MAX_COLLIDER_ROTATION),
             },
         });
     };
 
-    const setRotationY = (y: number): void => {
-        updateCollider({
-            rotation: {
-                ...collider.rotation,
-                y,
-            },
-        });
-    };
-
-    const setRotationZ = (z: number): void => {
-        updateCollider({
-            rotation: {
-                ...collider.rotation,
-                z,
-            },
-        });
-    };
-
-    const setScaleX = (x: number): void => {
+    const setScale = (a: 'x' | 'y' | 'z', value: number): void => {
         updateCollider({
             scale: {
                 ...collider.scale,
-                x,
+                [a]: clamp(value, MIN_COLLIDER_SCALE, MAX_COLLIDER_SCALE),
             },
         });
     };
 
-    const setScaleY = (y: number): void => {
+    const setBallScale = (value: number): void => {
         updateCollider({
             scale: {
-                ...collider.scale,
-                y,
-            },
-        });
-    };
-
-    const setScaleZ = (z: number): void => {
-        updateCollider({
-            scale: {
-                ...collider.scale,
-                z,
-            },
-        });
-    };
-
-    const setScale = (scale: number): void => {
-        updateCollider({
-            scale: {
-                x: scale,
+                x: clamp(value, MIN_COLLIDER_SCALE, MAX_COLLIDER_SCALE),
                 y: 0,
                 z: 0,
             },
@@ -253,8 +209,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
     const heaviness = getHeaviness();
 
     const updateLineField = (a: number, l: number, t: number): void => {
-        const cappedLength = Math.min(Math.max(l, COLLIDER_LINEFIELD_LENGTH_MIN), COLLIDER_LINEFIELD_LENGTH_MAX);
-        const cappedThickness = Math.min(Math.max(t, COLLIDER_LINEFIELD_THICKNESS_MIN), COLLIDER_LINEFIELD_THICKNESS_MAX);
+        const cappedLength = clamp(l, COLLIDER_LINEFIELD_LENGTH_MIN, COLLIDER_LINEFIELD_LENGTH_MAX);
+        const cappedThickness = clamp(t, COLLIDER_LINEFIELD_THICKNESS_MIN, COLLIDER_LINEFIELD_THICKNESS_MAX);
 
         updateCollider({
             pixelSize: {
@@ -455,27 +411,35 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                         className='theia-input'
                         style={{ width: 48 }}
                         type='number'
+                        min={MIN_COLLIDER_DISPLACEMENT}
+                        max={MAX_COLLIDER_DISPLACEMENT}
                         value={collider.displacement.x}
-                        onChange={e => setDisplacementX(parseFloat(e.target.value))}
+                        onChange={e => setDisplacement('x', parseFloat(e.target.value))}
                     />
                     <input
                         className='theia-input'
                         style={{ width: 48 }}
                         type='number'
+                        min={MIN_COLLIDER_DISPLACEMENT}
+                        max={MAX_COLLIDER_DISPLACEMENT}
                         value={collider.displacement.y}
-                        onChange={e => setDisplacementY(parseFloat(e.target.value))}
+                        onChange={e => setDisplacement('y', parseFloat(e.target.value))}
                     />
                     <input
                         className='theia-input'
                         style={{ width: 48 }}
                         type='number'
+                        min={MIN_COLLIDER_DISPLACEMENT}
+                        max={MAX_COLLIDER_DISPLACEMENT}
                         value={collider.displacement.z}
-                        onChange={e => setDisplacementZ(parseFloat(e.target.value))}
+                        onChange={e => setDisplacement('z', parseFloat(e.target.value))}
                     />
                     <input
                         className='theia-input'
                         style={{ width: 48 }}
                         type='number'
+                        min={MIN_COLLIDER_DISPLACEMENT_PARALLAX}
+                        max={MAX_COLLIDER_DISPLACEMENT_PARALLAX}
                         value={collider.displacement.parallax}
                         onChange={e => setDisplacementParallax(parseFloat(e.target.value))}
                     />
@@ -490,31 +454,31 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                         className='theia-input'
                         style={{ width: 48 }}
                         type='number'
-                        min={-360}
-                        max={360}
+                        min={MIN_COLLIDER_ROTATION}
+                        max={MAX_COLLIDER_ROTATION}
                         step={0.5}
                         value={collider.rotation.x}
-                        onChange={e => setRotationX(parseFloat(e.target.value))}
+                        onChange={e => setRotation('x', parseFloat(e.target.value))}
                     />
                     <input
                         className='theia-input'
                         style={{ width: 48 }}
                         type='number'
-                        min={-360}
-                        max={360}
+                        min={MIN_COLLIDER_ROTATION}
+                        max={MAX_COLLIDER_ROTATION}
                         step={0.5}
                         value={collider.rotation.y}
-                        onChange={e => setRotationY(parseFloat(e.target.value))}
+                        onChange={e => setRotation('y', parseFloat(e.target.value))}
                     />
                     <input
                         className='theia-input'
                         style={{ width: 48 }}
                         type='number'
-                        min={-360}
-                        max={360}
+                        min={MIN_COLLIDER_ROTATION}
+                        max={MAX_COLLIDER_ROTATION}
                         step={0.5}
                         value={collider.rotation.z}
-                        onChange={e => setRotationZ(parseFloat(e.target.value))}
+                        onChange={e => setRotation('z', parseFloat(e.target.value))}
                     />
                 </HContainer>
             </VContainer>
@@ -528,31 +492,31 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             className='theia-input'
                             style={{ width: 48 }}
                             type='number'
-                            min={0}
-                            max={64}
+                            min={MIN_COLLIDER_SCALE}
+                            max={MAX_COLLIDER_SCALE}
                             step={0.5}
                             value={collider.scale.x}
-                            onChange={e => setScaleX(parseFloat(e.target.value))}
+                            onChange={e => setScale('x', parseFloat(e.target.value))}
                         />
                         <input
                             className='theia-input'
                             style={{ width: 48 }}
                             type='number'
-                            min={0}
-                            max={64}
+                            min={MIN_COLLIDER_SCALE}
+                            max={MAX_COLLIDER_SCALE}
                             step={0.5}
                             value={collider.scale.y}
-                            onChange={e => setScaleY(parseFloat(e.target.value))}
+                            onChange={e => setScale('y', parseFloat(e.target.value))}
                         />
                         <input
                             className='theia-input'
                             style={{ width: 48 }}
                             type='number'
-                            min={0}
-                            max={64}
+                            min={MIN_COLLIDER_SCALE}
+                            max={MAX_COLLIDER_SCALE}
                             step={0.1}
                             value={collider.scale.z}
-                            onChange={e => setScaleZ(parseFloat(e.target.value))}
+                            onChange={e => setScale('z', parseFloat(e.target.value))}
                         />
                     </HContainer>
                 </VContainer>
@@ -566,8 +530,10 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                         className='theia-input'
                         style={{ width: 48 }}
                         type='number'
+                        min={MIN_COLLIDER_SCALE}
+                        max={MAX_COLLIDER_SCALE}
                         value={collider.scale.x}
-                        onChange={e => setScale(parseFloat(e.target.value))}
+                        onChange={e => setBallScale(parseFloat(e.target.value))}
                     />
                 </VContainer>
             }

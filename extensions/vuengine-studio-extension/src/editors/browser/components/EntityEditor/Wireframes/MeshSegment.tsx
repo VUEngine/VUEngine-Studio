@@ -3,6 +3,10 @@ import React from 'react';
 import HContainer from '../../Common/HContainer';
 import { MeshSegmentData } from '../EntityEditorTypes';
 import VContainer from '../../Common/VContainer';
+import { clamp } from '../../Common/Utils';
+
+const MIN_MESH_SEGMENT_VALUE = 0;
+const MAX_MESH_SEGMENT_VALUE = 512;
 
 interface MeshSegmentProps {
     segment: MeshSegmentData
@@ -22,11 +26,11 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
         });
     };
 
-    const setFromY = (y: number): void => {
+    const setFromY = (value: number): void => {
         updateSegment({
             fromVertex: {
                 ...segment.fromVertex,
-                y,
+                y: clamp(value, MIN_MESH_SEGMENT_VALUE, MAX_MESH_SEGMENT_VALUE),
             },
         });
     };

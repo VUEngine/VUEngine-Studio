@@ -1324,10 +1324,10 @@ export class VesEmulatorWidget extends ReactWidget {
       this.wrapperRef.current?.offsetWidth || screenResolution.width;
 
     if (canvasScale === 'full') {
-      const fullSizeCanvasScale = Math.min.apply(Math, [
+      const fullSizeCanvasScale = Math.min(
         wrapperHeight / screenResolution.height,
         wrapperWidth / screenResolution.width,
-      ]);
+      );
       return {
         height: fullSizeCanvasScale * screenResolution.height,
         width: fullSizeCanvasScale * screenResolution.width,
@@ -1341,7 +1341,7 @@ export class VesEmulatorWidget extends ReactWidget {
     } else {
       const preferredScale = parseInt(canvasScale.substring(1));
       const maxScale = this.determineMaxCanvasScaleFactor();
-      const actualScale = Math.min.apply(Math, [maxScale, preferredScale]);
+      const actualScale = Math.min(maxScale, preferredScale);
       return {
         height: actualScale * screenResolution.height,
         width: actualScale * screenResolution.width,
@@ -1356,10 +1356,10 @@ export class VesEmulatorWidget extends ReactWidget {
     const wrapperWidth =
       this.wrapperRef.current?.offsetWidth || screenResolution.width;
 
-    return Math.min.apply(Math, [
+    return Math.min(
       Math.floor(wrapperHeight / screenResolution.height),
       Math.floor(wrapperWidth / screenResolution.width),
-    ]);
+    );
   }
 
   protected getScreenResolution(): { height: number; width: number } {

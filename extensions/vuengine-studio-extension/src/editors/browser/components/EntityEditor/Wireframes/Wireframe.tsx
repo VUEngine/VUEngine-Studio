@@ -6,7 +6,9 @@ import ColorSelector from '../../Common/ColorSelector';
 import HContainer from '../../Common/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import RadioSelect from '../../Common/RadioSelect';
+import { clamp } from '../../Common/Utils';
 import VContainer from '../../Common/VContainer';
+import { Transparency, WireframeType } from '../../Common/VUEngineTypes';
 import {
     MAX_SPHERE_RADIUS,
     MAX_WIREFRAME_DISPLACEMENT,
@@ -19,7 +21,6 @@ import {
     WireframeData,
 } from '../EntityEditorTypes';
 import MeshSegment from './MeshSegment';
-import { Transparency, WireframeType } from '../../Common/VUEngineTypes';
 
 interface WireframeProps {
     wireframe: WireframeData
@@ -53,29 +54,11 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
         });
     };
 
-    const setDisplacementX = (x: number): void => {
+    const setDisplacement = (axis: 'x' | 'y' | 'z', value: number): void => {
         updateWireframeWireframe({
             displacement: {
                 ...wireframe.wireframe.displacement,
-                x: Math.min(Math.max(x, MIN_WIREFRAME_DISPLACEMENT), MAX_WIREFRAME_DISPLACEMENT),
-            },
-        });
-    };
-
-    const setDisplacementY = (y: number): void => {
-        updateWireframeWireframe({
-            displacement: {
-                ...wireframe.wireframe.displacement,
-                y: Math.min(Math.max(y, MIN_WIREFRAME_DISPLACEMENT), MAX_WIREFRAME_DISPLACEMENT),
-            },
-        });
-    };
-
-    const setDisplacementZ = (z: number): void => {
-        updateWireframeWireframe({
-            displacement: {
-                ...wireframe.wireframe.displacement,
-                z: Math.min(Math.max(z, MIN_WIREFRAME_DISPLACEMENT), MAX_WIREFRAME_DISPLACEMENT),
+                [axis]: clamp(value, MIN_WIREFRAME_DISPLACEMENT, MAX_WIREFRAME_DISPLACEMENT),
             },
         });
     };
@@ -232,7 +215,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                         max={MAX_WIREFRAME_DISPLACEMENT}
                         step={STEP_WIREFRAME_DISPLACEMENT}
                         value={wireframe.wireframe.displacement.x}
-                        onChange={e => setDisplacementX(parseFloat(e.target.value))}
+                        onChange={e => setDisplacement('x', parseFloat(e.target.value))}
                     />
                     <input
                         className='theia-input'
@@ -242,7 +225,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                         max={MAX_WIREFRAME_DISPLACEMENT}
                         step={STEP_WIREFRAME_DISPLACEMENT}
                         value={wireframe.wireframe.displacement.y}
-                        onChange={e => setDisplacementY(parseFloat(e.target.value))}
+                        onChange={e => setDisplacement('y', parseFloat(e.target.value))}
                     />
                     <input
                         className='theia-input'
@@ -252,7 +235,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                         max={MAX_WIREFRAME_DISPLACEMENT}
                         step={STEP_WIREFRAME_DISPLACEMENT}
                         value={wireframe.wireframe.displacement.z}
-                        onChange={e => setDisplacementZ(parseFloat(e.target.value))}
+                        onChange={e => setDisplacement('z', parseFloat(e.target.value))}
                     />
                 </HContainer>
             </VContainer>

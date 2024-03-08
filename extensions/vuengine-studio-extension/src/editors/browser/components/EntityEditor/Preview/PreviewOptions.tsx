@@ -5,6 +5,7 @@ import VContainer from '../../Common/VContainer';
 import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 import { CornersOut } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
+import { clamp } from '../../Common/Utils';
 
 interface PreviewOptionsProps {
   enableBackground: boolean
@@ -25,7 +26,7 @@ export default function PreviewOptions(props: PreviewOptionsProps): React.JSX.El
     setState({
       preview: {
         ...state.preview,
-        backgroundColor: Math.min(Math.max(backgroundColor, -1), 3),
+        backgroundColor: clamp(backgroundColor, -1, 3),
       },
     });
 
