@@ -77,8 +77,10 @@
     display: flex;
     flex-flow: row nowrap;
     gap: 15px;
+    justify-content: space-between;
     left: var(--padding);
     position: absolute;
+    right: var(--padding);
     z-index: 999999999;
 }
 

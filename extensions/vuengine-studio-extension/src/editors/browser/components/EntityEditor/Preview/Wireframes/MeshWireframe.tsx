@@ -1,12 +1,11 @@
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ColorMode, PALETTE_COLORS } from '../../../../../../core/browser/ves-common-types';
-import { EntityEditorContext, EntityEditorContextType, WIREFRAME_CANVAS_PADDING, WireframeData } from '../../EntityEditorTypes';
-import { Transparency } from '../../../Common/VUEngineTypes';
+import { WIREFRAME_CANVAS_PADDING, WireframeData } from '../../EntityEditorTypes';
 
 export interface MeshWireframeProps {
-    index: number
-    highlighted: boolean
     wireframe: WireframeData
+    style: Object
+    onClick: (e: React.MouseEvent) => void
 }
 
 // bresenham line algorithm
@@ -43,8 +42,7 @@ const plotLine = (context: CanvasRenderingContext2D, x0: number, y0: number, x1:
 };
 
 export default function MeshWireframe(props: MeshWireframeProps): React.JSX.Element {
-    const { setState } = useContext(EntityEditorContext) as EntityEditorContextType;
-    const { index, highlighted, wireframe } = props;
+    const { wireframe, style, onClick } = props;
     // eslint-disable-next-line no-null/no-null
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -62,15 +60,15 @@ export default function MeshWireframe(props: MeshWireframeProps): React.JSX.Elem
         const height = Math.abs(maxY - minY) || 1;
         const halfWidth = width / 2;
         const halfHeight = height / 2;
-
         const offsetX = (maxX + minX) / 2;
         const offsetY = (maxY + minY) / 2;
+        const halfPadding = WIREFRAME_CANVAS_PADDING / 2;
 
         canvas.height = height + WIREFRAME_CANVAS_PADDING;
         canvas.width = width + WIREFRAME_CANVAS_PADDING;
         canvas.style.translate =
-            `${wireframe.wireframe.displacement.x + halfWidth + minX}px ` +
-            `${wireframe.wireframe.displacement.y + halfHeight + minY}px ` +
+            `${wireframe.wireframe.displacement.x + halfWidth + minX + halfPadding}px ` +
+            `${wireframe.wireframe.displacement.y + halfHeight + minY + halfPadding}px ` +
             `${wireframe.wireframe.displacement.z * -1}px`;
 
         context.clearRect(0, 0, canvas.width, canvas.height);
@@ -86,11 +84,6 @@ export default function MeshWireframe(props: MeshWireframeProps): React.JSX.Elem
                 wireframe.wireframe.interlaced,
             );
         });
-    };
-
-    const handleClick = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        setState({ currentComponent: `wireframes-${index}` });
     };
 
     useEffect(() => {
@@ -124,14 +117,7 @@ export default function MeshWireframe(props: MeshWireframeProps): React.JSX.Elem
 
     return <canvas
         ref={canvasRef}
-        style={{
-            borderRadius: highlighted ? .5 : 0,
-            imageRendering: 'pixelated',
-            opacity: wireframe.wireframe.transparency === Transparency.None ? 1 : .5,
-            outline: highlighted ? '.5px solid rgba(0, 255, 0, .5)' : 'none',
-            position: 'absolute',
-            zIndex: highlighted ? 999999 : 120000,
-        }}
-        onClick={handleClick}
+        style={style}
+        onClick={onClick}
     />;
 }

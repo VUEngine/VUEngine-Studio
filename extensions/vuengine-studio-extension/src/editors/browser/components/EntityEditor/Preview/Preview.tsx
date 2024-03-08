@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { ColorMode, PALETTE_COLORS } from '../../../../../core/browser/ves-common-types';
 import { EditorsContext, EditorsContextType } from '../../../../../editors/browser/ves-editors-types';
 import { ProjectContributor } from '../../../../../project/browser/ves-project-types';
-import { BgmapMode, ColliderType, Transparency, WireframeType } from '../../Common/VUEngineTypes';
+import { BgmapMode, ColliderType, Transparency } from '../../Common/VUEngineTypes';
 import {
   AnimationData,
   EntityEditorContext,
@@ -17,7 +17,7 @@ import BoxCollider from './Colliders/BoxCollider';
 import LineFieldCollider from './Colliders/LineFieldCollider';
 import PreviewOptions from './PreviewOptions';
 import Sprite from './Sprite';
-import MeshWireframe from './Wireframes/MeshWireframe';
+import PreviewWireframe from './Wireframes/PreviewWireframe';
 
 export default function Preview(): React.JSX.Element {
   const { data, state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
@@ -104,7 +104,7 @@ export default function Preview(): React.JSX.Element {
     onWheel={onWheel}
   >
     <PreviewOptions
-      enableBackground={false}
+      enableBackground={true}
       zoom={state.preview.zoom}
       setZoom={setZoom}
       minZoom={MIN_PREVIEW_SPRITE_ZOOM}
@@ -170,17 +170,14 @@ export default function Preview(): React.JSX.Element {
             />;
         }
       })}
-      {state.preview.wireframes && data.components?.wireframes?.map((wireframe, i) => {
-        switch (wireframe.wireframe.type) {
-          case WireframeType.Mesh:
-            return <MeshWireframe
-              key={i}
-              index={i}
-              highlighted={state.currentComponent === `wireframes-${i}`}
-              wireframe={wireframe}
-            />;
-        }
-      })}
+      {state.preview.wireframes && data.components?.wireframes?.map((wireframe, i) =>
+        <PreviewWireframe
+          key={i}
+          index={i}
+          highlighted={state.currentComponent === `wireframes-${i}`}
+          wireframe={wireframe}
+        />
+      )}
     </div>
   </div>;
 }

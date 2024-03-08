@@ -1,13 +1,13 @@
 import {
     Asterisk,
     Atom,
+    Circle,
     CircleDashed,
-    Cube,
     DotsThreeOutline,
     FadersHorizontal,
     File,
     FilmStrip,
-    Globe,
+    Hexagon,
     Image,
     Selection,
     SelectionInverse,
@@ -66,9 +66,9 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                     switch (data.components.wireframes[index].wireframe.type) {
                         default:
                         case WireframeType.Mesh:
-                            return <Cube size={16} />;
+                            return <Hexagon size={16} />;
                         case WireframeType.Sphere:
-                            return <Globe size={16} />;
+                            return <Circle size={16} />;
                         case WireframeType.Asterisk:
                             return <Asterisk size={16} />;
                     }

@@ -42,7 +42,7 @@ export const MAX_WIREFRAME_DISPLACEMENT = 512;
 export const STEP_WIREFRAME_DISPLACEMENT = 0.1;
 export const MIN_SPHERE_RADIUS = 0;
 export const MAX_SPHERE_RADIUS = 512;
-export const STEP_SPHERE_RADIUS = 0.1;
+export const STEP_SPHERE_RADIUS = 1;
 export const MIN_PREVIEW_SPRITE_ZOOM = 1;
 export const MAX_PREVIEW_SPRITE_ZOOM = 20;
 export const MIN_PREVIEW_SCRIPT_ZOOM = 0.1;
@@ -191,16 +191,18 @@ export interface EntityData {
     }
 }
 
+export interface EntityEditorPreviewState {
+    backgroundColor: number
+    anaglyph: boolean
+    colliders: boolean
+    wireframes: boolean
+    palettes: string[]
+    sprites: boolean
+    zoom: number
+    projectionDepth: number
+}
+
 export interface EntityEditorState {
     currentComponent: string,
-    preview: {
-        backgroundColor: number
-        anaglyph: boolean
-        colliders: boolean
-        wireframes: boolean
-        palettes: string[]
-        sprites: boolean
-        zoom: number
-        projectionDepth: number
-    }
+    preview: EntityEditorPreviewState
 }

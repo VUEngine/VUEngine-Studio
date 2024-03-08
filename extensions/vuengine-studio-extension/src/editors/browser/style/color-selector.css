@@ -30,7 +30,8 @@
 }
 
 .colorSelector .color-0 {
-  background: repeating-conic-gradient(rgba(0,0,0,.3) 0% 25%, transparent 0% 50%) 50% / 13px 13px
+  background: repeating-conic-gradient(rgba(0,0,0,.3) 0% 25%, transparent 0% 50%) 50% / 13px 13px;
+  background-color: var(--theia-editor-background);
 }
 .colorSelector .color-1 {
   background-color: #000;
