@@ -1,3 +1,4 @@
+import { isBoolean, isNumber } from '@theia/core';
 import React from 'react';
 import { ConversionResult } from '../../../../images/browser/ves-images-types';
 import { EditorsContextType } from '../../ves-editors-types';
@@ -9,7 +10,10 @@ import EntityMeta from './Entity/EntityMeta';
 import {
   EntityData,
   EntityEditorContext,
+  EntityEditorPreviewState,
   EntityEditorState,
+  MAX_PREVIEW_SPRITE_ZOOM,
+  MIN_PREVIEW_SPRITE_ZOOM,
 } from './EntityEditorTypes';
 import Preview from './Preview/Preview';
 import Script from './Scripts/Script';
@@ -51,17 +55,44 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
   }
 
   protected async restorePreviewState(): Promise<void> {
-    // TODO: this can cause hard to track unwanted side effects with outdated states in storage
-    /*
+    // Beware! This can cause hard to track unwanted side effects with outdated states in storage. Apply values with caution.
     const savedState = await this.props.context.services.localStorageService.getData<EntityEditorState>(this.getStateLocalStorageId());
+    if (!savedState) {
+      return;
+    }
+
+    const overlayState: Partial<EntityEditorPreviewState> = {};
+    if (isBoolean(savedState.preview.anaglyph)) {
+      overlayState.anaglyph = (savedState.preview.anaglyph);
+    }
+    if (isNumber(savedState.preview.backgroundColor) &&
+      savedState.preview.backgroundColor < 3 &&
+      savedState.preview.backgroundColor > -1) {
+      overlayState.backgroundColor = (savedState.preview.backgroundColor);
+    }
+    if (isBoolean(savedState.preview.colliders)) {
+      overlayState.colliders = (savedState.preview.colliders);
+    }
+    if (isNumber(savedState.preview.zoom) &&
+      savedState.preview.zoom <= MAX_PREVIEW_SPRITE_ZOOM &&
+      savedState.preview.zoom >= MIN_PREVIEW_SPRITE_ZOOM) {
+      overlayState.zoom = (savedState.preview.zoom);
+    }
+    if (isBoolean(savedState.preview.sprites)) {
+      overlayState.sprites = (savedState.preview.sprites);
+    }
+    if (isBoolean(savedState.preview.wireframes)) {
+      overlayState.wireframes = (savedState.preview.wireframes);
+    }
+
     if (savedState) {
       this.setState({
-        ...this.state,
-        ...savedState,
-        currentComponent: '',
+        preview: {
+          ...this.state.preview,
+          ...overlayState,
+        }
       });
     }
-    */
   }
 
   protected async updateState(state: EntityEditorState): Promise<void> {
