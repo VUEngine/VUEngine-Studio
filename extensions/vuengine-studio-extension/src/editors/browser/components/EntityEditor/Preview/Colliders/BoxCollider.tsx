@@ -20,9 +20,10 @@ interface CuboidFaceProps {
 
 const CuboidFace = styled.div<CuboidFaceProps>`
     border: .5px dashed yellow;
-    border-radius: ${p => p.highlighted ? '.5px' : '0'};
+    border-radius: ${p => p.highlighted ? '.25px' : '0'};
     box-sizing: border-box;
-    outline: ${p => p.highlighted ? '.5px solid rgba(0, 255, 0, .5)' : 'none'};
+    outline: ${p => p.highlighted ? '1px solid #0f0' : 'none'};
+    outline-offset: 1px;
     position: absolute;
 `;
 

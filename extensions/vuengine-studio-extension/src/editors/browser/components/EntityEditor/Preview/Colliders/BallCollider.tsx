@@ -16,7 +16,8 @@ const BallFace = styled.div<BallFaceProps>`
     box-sizing: border-box;
     cursor: pointer;
     height: ${p => p.diameter}px;
-    outline: ${p => p.highlighted ? '.5px solid rgba(0, 255, 0, .5)' : 'none'};
+    outline: ${p => p.highlighted ? '1px solid #0f0' : 'none'};
+    outline-offset: 1px;
     position: absolute;
     transform: rotateX(${p => p.rotation.x}deg) rotateY(${p => p.rotation.y}deg) rotateZ(${p => p.rotation.z}deg);
     transform-style: preserve-3d;

@@ -14,12 +14,13 @@ interface LineFieldFaceProps {
 
 const LineFieldFace = styled.div<LineFieldFaceProps>`
     border-top: .5px dashed yellow;
-    border-radius: ${p => p.highlighted ? '.5px' : '0'};
+    border-radius: ${p => p.highlighted ? '.25px' : '0'};
     box-sizing: border-box;
     cursor: pointer;
     display: flex;
     justify-content: center;
-    outline: ${p => p.highlighted ? '.5px solid rgba(0, 255, 0, .5)' : 'none'};
+    outline: ${p => p.highlighted ? '1px solid #0f0' : 'none'};
+    outline-offset: 1px;
     position: absolute;
     transform: 
         rotateX(${p => p.rotation.x}deg) 

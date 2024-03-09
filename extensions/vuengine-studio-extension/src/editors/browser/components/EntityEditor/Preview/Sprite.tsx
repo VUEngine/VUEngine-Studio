@@ -158,12 +158,13 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
       className={error ? 'sprite-error' : ''}
       title={error ? error : ''}
       style={{
-        borderRadius: highlighted ? .5 : 0,
+        borderRadius: highlighted ? .25 : 0,
         boxSizing: 'border-box',
         cursor: 'pointer',
         height: height / (isMultiFileAnimation ? 1 : frames ?? 1),
         opacity: transparent ? .5 : 1,
-        outline: highlighted ? '.5px solid rgba(0, 255, 0, .5)' : undefined,
+        outline: highlighted ? '1px solid #0f0' : undefined,
+        outlineOffset: 1,
         overflow: 'hidden',
         position: 'absolute',
         transform: getTransform(),

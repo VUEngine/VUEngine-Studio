@@ -15,12 +15,13 @@ export default function PreviewWireframe(props: PreviewWireframeProps): React.JS
     const { setState } = useContext(EntityEditorContext) as EntityEditorContextType;
     const { index, highlighted, wireframe } = props;
     const style = {
-        borderRadius: highlighted ? .5 : 0,
+        borderRadius: highlighted ? .25 : 0,
         cursor: 'pointer',
         display: 'flex',
         imageRendering: 'pixelated',
         opacity: wireframe.wireframe.transparency === Transparency.None ? 1 : .5,
-        outline: highlighted ? '.5px solid rgba(0, 255, 0, .5)' : 'none',
+        outline: highlighted ? '1px solid #0f0' : 'none',
+        outlineOffset: 1,
         position: 'absolute',
         zIndex: highlighted ? 999999 : 120000,
     };
