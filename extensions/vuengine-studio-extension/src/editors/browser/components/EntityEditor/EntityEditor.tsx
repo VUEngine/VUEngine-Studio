@@ -1,7 +1,8 @@
 import { isBoolean, isNumber } from '@theia/core';
 import React from 'react';
-import { ConversionResult } from '../../../../images/browser/ves-images-types';
+import { ConversionResult, ImageCompressionType } from '../../../../images/browser/ves-images-types';
 import { EditorsContextType } from '../../ves-editors-types';
+import { DataSection } from '../Common/CommonTypes';
 import HContainer from '../Common/HContainer';
 import VContainer from '../Common/VContainer';
 import ComponentTree from './Components/ComponentTree';
@@ -181,7 +182,6 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
       },
       files: [],
       map: {
-        compression: entityData.sprites.compression,
         generate: true,
         reduce: {
           flipped: optimizeTiles,
@@ -189,14 +189,10 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
         }
       },
       name: services.vesCommonService.cleanSpecName(fileUri.path.name),
-      section: entityData.sprites.section,
       tileset: {
-        compression: entityData.sprites.compression,
         shared: !entityData.components?.animations.length && entityData.sprites.sharedTiles,
       }
     };
-
-    console.log('TEST', services.vesCommonService.cleanSpecName(fileUri.path.name));
 
     if (!entityData.components?.animations.length && entityData.sprites?.sharedTiles) {
       const files: string[] = [];
@@ -215,6 +211,21 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
 
       const newImageData = await services.vesImagesService.convertImage(fileUri, {
         ...baseConfig,
+        section: entityData.components?.sprites.length > 0
+          ? entityData.components?.sprites[0].section
+          : DataSection.ROM,
+        map: {
+          ...baseConfig.map,
+          compression: entityData.components?.sprites.length > 0
+            ? entityData.components?.sprites[0].compression
+            : ImageCompressionType.NONE,
+        },
+        tileset: {
+          ...baseConfig.tileset,
+          compression: entityData.components?.sprites.length > 0
+            ? entityData.components?.sprites[0].compression
+            : ImageCompressionType.NONE,
+        },
         files,
       });
       // map imagedata back to sprites
@@ -246,6 +257,15 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
           } else {
             const newImageData = await services.vesImagesService.convertImage(fileUri, {
               ...baseConfig,
+              section: sprite.section,
+              map: {
+                ...baseConfig.map,
+                compression: sprite.compression,
+              },
+              tileset: {
+                ...baseConfig.tileset,
+                compression: sprite.compression,
+              },
               files: sprite.texture.files,
             });
             setGeneratingProgress(i + 1 * 2 - 1, totalSprites * 2);
