@@ -23,13 +23,23 @@ import { ComponentKey, EntityEditorContext, EntityEditorContextType } from '../E
 import { ScriptType } from '../Scripts/ScriptTypes';
 import { ColliderType, WireframeType } from '../../Common/VUEngineTypes';
 
+const CLONABLE_COMPONENT_TYPES = [
+    'animations',
+    'children',
+    'colliders',
+    'scripts',
+    'sprites',
+    'wireframes',
+];
+
 export default function ComponentTreeNode(props: NodeRendererProps<any>): React.JSX.Element {
     const { node, style, dragHandle } = props;
     const { data, setData, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
     const [dragging, setDragging] = useState<boolean>(false);
 
-    const [type, indexString] = node.id.split('-');
-    const index = parseInt(indexString || '-1');
+    const nodeParts = node.id.split('-');
+    const type = nodeParts[0] as ComponentKey | 'physics' | 'extraProperties';
+    const index = parseInt(nodeParts[1] || '-1');
 
     const getIcon = (): React.JSX.Element => {
         if (node.isLeaf) {
@@ -108,7 +118,7 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                 case 'scripts':
                 case 'sprites':
                 case 'wireframes':
-                    return removeComponent(type, index);
+                    return removeComponent();
                 case 'physics':
                     return disablePhysics();
                 case 'extraProperties':
@@ -135,13 +145,29 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
         });
     };
 
-    const removeComponent = async (key: ComponentKey, i: number): Promise<void> => {
+    const removeComponent = async (): Promise<void> => {
         setData({
             components: {
                 ...data.components,
-                [key]: [
-                    ...data.components[key].slice(0, i),
-                    ...data.components[key].slice(i + 1)
+                [type]: [
+                    ...data.components[type as ComponentKey].slice(0, index),
+                    ...data.components[type as ComponentKey].slice(index + 1)
+                ],
+            }
+        });
+    };
+
+    const cloneComponent = async (): Promise<void> => {
+        const clone = {
+            ...data.components[type as ComponentKey][index],
+        };
+        setData({
+            components: {
+                ...data.components,
+                [type]: [
+                    ...data.components[type as ComponentKey].slice(0, index + 1),
+                    clone,
+                    ...data.components[type as ComponentKey].slice(index + 1),
                 ],
             }
         });
@@ -224,6 +250,13 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                         className='codicon codicon-edit'
                         onClick={() => node.edit()}
                         title={nls.localize('vuengine/entityEditor/editName', 'Edit Name')}
+                    />
+                }
+                {node.isLeaf && CLONABLE_COMPONENT_TYPES.includes(type) &&
+                    <i
+                        className='codicon codicon-copy'
+                        onClick={cloneComponent}
+                        title={nls.localize('vuengine/entityEditor/cloneComponent', 'Clone Component')}
                     />
                 }
                 {node.isLeaf &&
