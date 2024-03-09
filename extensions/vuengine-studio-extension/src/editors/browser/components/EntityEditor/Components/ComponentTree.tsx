@@ -382,7 +382,6 @@ export default function ComponentTree(): React.JSX.Element {
                     data.components[componentType.componentKey].map((c, i) => {
                         newEntryChildren.push({
                             id: `${componentType.key}-${i}`,
-                            // @ts-ignore
                             name: c.name ? c.name : `${componentType.labelPlural} ${i + 1}`,
                         });
                     });

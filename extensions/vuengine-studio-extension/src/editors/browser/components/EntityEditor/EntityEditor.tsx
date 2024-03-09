@@ -36,6 +36,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
       preview: {
         backgroundColor: -1,
         anaglyph: false,
+        children: true,
         colliders: true,
         wireframes: true,
         palettes: ['11100100', '11100000', '11010000', '11100100'],

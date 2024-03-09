@@ -32,9 +32,17 @@ const CLONABLE_COMPONENT_TYPES = [
     'wireframes',
 ];
 
+type HideableComponent = 'children' | 'colliders' | 'sprites' | 'wireframes';
+const HIDEABLE_COMPONENT_TYPES = [
+    'children',
+    'colliders',
+    'sprites',
+    'wireframes',
+];
+
 export default function ComponentTreeNode(props: NodeRendererProps<any>): React.JSX.Element {
     const { node, style, dragHandle } = props;
-    const { data, setData, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { data, setData, state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
     const [dragging, setDragging] = useState<boolean>(false);
 
     const nodeParts = node.id.split('-');
@@ -42,6 +50,9 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
     const index = parseInt(nodeParts[1] || '-1');
 
     const getIcon = (): React.JSX.Element => {
+        if (state.preview[type as HideableComponent] === false) {
+            return <i className='fa fa-eye-slash' />;
+        }
         if (node.isLeaf) {
             switch (type) {
                 default:
@@ -198,11 +209,31 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
         setData({ components });
     };
 
+    const toggleComponentVisibility = async (): Promise<void> => {
+        const t = type as 'children' | 'colliders' | 'sprites' | 'wireframes';
+        const visible = !state.preview[t];
+        setState({
+            preview: {
+                ...state.preview,
+                [t]: visible,
+            },
+        });
+
+        if (!visible) {
+            node.close();
+        } else {
+            node.open();
+        }
+    };
+
     return (
         <div
             className={`ves-tree-node${dragging ? ' dragging' : ''}`}
             ref={!node.parent?.isRoot ? dragHandle : undefined}
-            style={style}
+            style={{
+                ...style,
+                opacity: state.preview[type as HideableComponent] === false ? .5 : undefined,
+            }}
             onDragStart={() => setDragging(true)}
             onDragEnd={() => setDragging(false)}
         >
@@ -245,6 +276,13 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                 )}
             </div>
             <div className='ves-tree-node-actions'>
+                {!node.isLeaf && node.parent?.isRoot && HIDEABLE_COMPONENT_TYPES.includes(type) &&
+                    <i
+                        className={state.preview[type as HideableComponent] === false ? 'fa fa-eye-slash' : 'fa fa-eye'}
+                        onClick={toggleComponentVisibility}
+                        title={nls.localize('vuengine/entityEditor/toggleComponentVisibility', 'Toggle Component Visibility')}
+                    />
+                }
                 {node.isLeaf && !node.parent?.isRoot && type !== 'children' &&
                     <i
                         className='codicon codicon-edit'

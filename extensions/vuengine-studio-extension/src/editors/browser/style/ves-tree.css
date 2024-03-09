@@ -29,6 +29,11 @@
     outline-offset: -1px;
 }
 
+.ves-tree .fa {
+    text-align: center;
+    width: 16px;
+}
+
 .ves-tree-node {
     align-items: center;
     display: flex;

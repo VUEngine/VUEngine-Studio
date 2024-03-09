@@ -194,6 +194,7 @@ export interface EntityData {
 export interface EntityEditorPreviewState {
     backgroundColor: number
     anaglyph: boolean
+    children: boolean
     colliders: boolean
     wireframes: boolean
     palettes: string[]
