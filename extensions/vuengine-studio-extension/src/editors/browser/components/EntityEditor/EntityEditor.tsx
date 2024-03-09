@@ -41,7 +41,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
         wireframes: true,
         palettes: ['11100100', '11100000', '11010000', '11100100'],
         sprites: true,
-        zoom: 1,
+        zoom: 2,
         projectionDepth: 99999, // 128,
       },
     };
@@ -188,13 +188,15 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
           unique: optimizeTiles,
         }
       },
-      name: services.vesCommonService.cleanSpecName(entityData.name),
+      name: services.vesCommonService.cleanSpecName(fileUri.path.name),
       section: entityData.sprites.section,
       tileset: {
         compression: entityData.sprites.compression,
         shared: !entityData.components?.animations.length && entityData.sprites.sharedTiles,
       }
     };
+
+    console.log('TEST', services.vesCommonService.cleanSpecName(fileUri.path.name));
 
     if (!entityData.components?.animations.length && entityData.sprites?.sharedTiles) {
       const files: string[] = [];
@@ -296,13 +298,11 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
             {context =>
               <VContainer
                 gap={15}
-                overflow='hidden'
+                overflow='auto'
                 onClick={() => this.setState({ currentComponent: '' })}
               >
-                <VContainer gap={15} grow={1} overflow='auto'>
-                  <EntityMeta />
-                  <ComponentTree />
-                </VContainer>
+                <EntityMeta />
+                <ComponentTree />
               </VContainer>
             }
           </EntityEditorContext.Consumer>

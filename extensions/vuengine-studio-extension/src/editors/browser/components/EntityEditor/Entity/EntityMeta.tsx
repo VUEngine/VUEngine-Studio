@@ -6,15 +6,15 @@ import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTyp
 export default function EntityMeta(): React.JSX.Element {
     const { data } = useContext(EntityEditorContext) as EntityEditorContextType;
 
-    const getCharCount = (): number => {
-        let totalChars = 0;
+    const getTileCount = (): number => {
+        let totalTiles = 0;
         data.components?.sprites?.map(s => {
             if (s._imageData !== undefined && typeof s._imageData !== 'number') {
                 if (s._imageData.animation?.largestFrame) {
-                    totalChars += s._imageData.animation?.largestFrame;
+                    totalTiles += s._imageData.animation?.largestFrame;
                 } else {
                     if (s._imageData.tiles?.count) {
-                        totalChars += data.components?.animations?.length > 0 && !data.animations.multiframe
+                        totalTiles += data.components?.animations?.length > 0 && !data.animations.multiframe
                             ? s._imageData.tiles?.count / data.animations?.totalFrames || 1
                             : s._imageData.tiles?.count;
                     }
@@ -22,24 +22,26 @@ export default function EntityMeta(): React.JSX.Element {
             }
         });
 
-        return totalChars;
+        return totalTiles;
     };
 
-    const charCount = getCharCount();
+    const charCount = getTileCount();
 
-    return <VContainer gap={15}>
+    return <>
         {charCount > 0 &&
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/entityEditor/chars', 'Chars')}
-                </label>
-                <input
-                    className={`theia-input heaviness ${charCount > 1200 ? 'heavinessHeavy' : charCount > 600 ? 'heavinessMedium' : 'heavinessLight'}`}
-                    type='text'
-                    value={charCount}
-                    disabled
-                />
+            <VContainer gap={15}>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/tiles', 'Tiles')}
+                    </label>
+                    <input
+                        className={`theia-input heaviness ${charCount > 1200 ? 'heavinessHeavy' : charCount > 600 ? 'heavinessMedium' : 'heavinessLight'}`}
+                        type='text'
+                        value={charCount}
+                        disabled
+                    />
+                </VContainer>
             </VContainer>
         }
-    </VContainer>;
+    </>;
 }

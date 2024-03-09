@@ -113,6 +113,7 @@ export interface ColliderData {
 }
 
 export interface SpriteData {
+    _imageData?: Partial<ConversionResult & { _dupeIndex: number }> | number
     name: string
     bgmapMode: BgmapMode
     displayMode: DisplayMode
@@ -132,7 +133,8 @@ export interface SpriteData {
             vertical: boolean
         }
     }
-    _imageData?: Partial<ConversionResult & { _dupeIndex: number }> | number
+    section: DataSection
+    compression: ImageCompressionType
 }
 
 export interface PositionedEntityData {
@@ -149,7 +151,6 @@ export type ComponentData = AnimationData | BehaviorData | PositionedEntityData 
 
 export interface EntityData {
     _id: string
-    name: string
     extraProperties: {
         enabled: boolean
         extraInfo: string
@@ -186,8 +187,6 @@ export interface EntityData {
         useZDisplacementInProjection: boolean
         sharedTiles: boolean
         optimizedTiles: boolean
-        section: DataSection
-        compression: ImageCompressionType
     }
 }
 

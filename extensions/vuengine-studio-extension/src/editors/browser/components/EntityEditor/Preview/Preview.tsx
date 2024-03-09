@@ -1,3 +1,4 @@
+import { IdentificationCard } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { ColorMode, PALETTE_COLORS } from '../../../../../core/browser/ves-common-types';
@@ -86,6 +87,12 @@ export default function Preview(): React.JSX.Element {
     setOffsetY(0);
   };
 
+  const hasPreviewableComponents =
+    data.components?.children?.length +
+    data.components?.colliders?.length +
+    data.components?.sprites?.length +
+    data.components?.wireframes?.length > 0;
+
   useEffect(() => {
     setAnimationInterval();
     return () => clearInterval(timer);
@@ -94,90 +101,102 @@ export default function Preview(): React.JSX.Element {
     animation,
   ]);
 
-  return <div
-    className={`preview-container${isDragging ? ' dragging' : ''}`}
-    onClick={() => setState({ currentComponent: '' })}
-    onMouseDown={() => setIsDragging(true)}
-    onMouseUp={() => setIsDragging(false)}
-    onMouseLeave={() => setIsDragging(false)}
-    onMouseMove={onMouseMove}
-    onWheel={onWheel}
-  >
-    <PreviewOptions
-      enableBackground={true}
-      zoom={state.preview.zoom}
-      setZoom={setZoom}
-      minZoom={MIN_PREVIEW_SPRITE_ZOOM}
-      maxZoom={MAX_PREVIEW_SPRITE_ZOOM}
-      zoomStep={0.51}
-      roundZoomSteps
-      center={center}
-    />
-    {animate &&
-      <div className='current-frame'>
-        {nls.localize('vuengine/entityEditor/frame', 'Frame')} {currentAnimationStep + 1}
-      </div>
-    }
-    <div
-      className="preview-container-world"
-      style={{
-        background: state.preview.backgroundColor > -1 ? PALETTE_COLORS[ColorMode.Default][state.preview.backgroundColor] : undefined,
-        perspective: `${state.preview.projectionDepth}px`,
-        zoom: state.preview.zoom,
-        translate: `${offsetX}px ${offsetY}px`,
-      }}
+  return hasPreviewableComponents
+    ? <div
+      className={`preview-container draggable${isDragging ? ' dragging' : ''}`}
+      onClick={() => setState({ currentComponent: '' })}
+      onMouseDown={() => setIsDragging(true)}
+      onMouseUp={() => setIsDragging(false)}
+      onMouseLeave={() => setIsDragging(false)}
+      onMouseMove={onMouseMove}
+      onWheel={onWheel}
     >
-      {state.preview.sprites && data.components?.sprites?.map((sprite, i) =>
-        <Sprite
-          key={i}
-          animate={animate}
-          displacement={sprite.displacement}
-          frames={data.animations?.totalFrames || 1}
-          canScale={sprite.bgmapMode === BgmapMode.Affine}
-          currentAnimationFrame={animation?.frames[currentAnimationStep - 1] ?? currentAnimationStep}
-          highlighted={state.currentComponent === `sprites-${i}`}
-          images={sprite.texture.files}
-          index={i}
-          flipHorizontally={sprite.texture.flip.horizontal}
-          flipVertically={sprite.texture.flip.vertical}
-          transparent={sprite.transparency !== Transparency.None}
-          palette={state.preview.palettes[sprite.texture.palette]}
-        />
-      )}
-      {state.preview.colliders && data.components?.colliders?.map((collider, i) => {
-        switch (collider.type) {
-          case ColliderType.Ball:
-            return <BallCollider
-              key={i}
-              index={i}
-              highlighted={state.currentComponent === `colliders-${i}`}
-              collider={collider}
-            />;
-          case ColliderType.Box:
-          case ColliderType.InverseBox:
-            return <BoxCollider
-              key={i}
-              index={i}
-              highlighted={state.currentComponent === `colliders-${i}`}
-              collider={collider}
-            />;
-          case ColliderType.LineField:
-            return <LineFieldCollider
-              key={i}
-              index={i}
-              highlighted={state.currentComponent === `colliders-${i}`}
-              collider={collider}
-            />;
-        }
-      })}
-      {state.preview.wireframes && data.components?.wireframes?.map((wireframe, i) =>
-        <PreviewWireframe
-          key={i}
-          index={i}
-          highlighted={state.currentComponent === `wireframes-${i}`}
-          wireframe={wireframe}
-        />
-      )}
+      <PreviewOptions
+        enableBackground={true}
+        zoom={state.preview.zoom}
+        setZoom={setZoom}
+        minZoom={MIN_PREVIEW_SPRITE_ZOOM}
+        maxZoom={MAX_PREVIEW_SPRITE_ZOOM}
+        zoomStep={0.51}
+        roundZoomSteps
+        center={center}
+      />
+      {animate &&
+        <div className='current-frame'>
+          {nls.localize('vuengine/entityEditor/frame', 'Frame')} {currentAnimationStep + 1}
+        </div>
+      }
+      <div
+        className="preview-container-world"
+        style={{
+          background: state.preview.backgroundColor > -1 ? PALETTE_COLORS[ColorMode.Default][state.preview.backgroundColor] : undefined,
+          perspective: `${state.preview.projectionDepth}px`,
+          zoom: state.preview.zoom,
+          translate: `${offsetX}px ${offsetY}px`,
+        }}
+      >
+        {state.preview.sprites && data.components?.sprites?.map((sprite, i) =>
+          <Sprite
+            key={i}
+            animate={animate}
+            displacement={sprite.displacement}
+            frames={data.animations?.totalFrames || 1}
+            canScale={sprite.bgmapMode === BgmapMode.Affine}
+            currentAnimationFrame={animation?.frames[currentAnimationStep - 1] ?? currentAnimationStep}
+            highlighted={state.currentComponent === `sprites-${i}`}
+            images={sprite.texture.files}
+            index={i}
+            flipHorizontally={sprite.texture.flip.horizontal}
+            flipVertically={sprite.texture.flip.vertical}
+            transparent={sprite.transparency !== Transparency.None}
+            palette={state.preview.palettes[sprite.texture.palette]}
+          />
+        )}
+        {state.preview.colliders && data.components?.colliders?.map((collider, i) => {
+          switch (collider.type) {
+            case ColliderType.Ball:
+              return <BallCollider
+                key={i}
+                index={i}
+                highlighted={state.currentComponent === `colliders-${i}`}
+                collider={collider}
+              />;
+            case ColliderType.Box:
+            case ColliderType.InverseBox:
+              return <BoxCollider
+                key={i}
+                index={i}
+                highlighted={state.currentComponent === `colliders-${i}`}
+                collider={collider}
+              />;
+            case ColliderType.LineField:
+              return <LineFieldCollider
+                key={i}
+                index={i}
+                highlighted={state.currentComponent === `colliders-${i}`}
+                collider={collider}
+              />;
+          }
+        })}
+        {state.preview.wireframes && data.components?.wireframes?.map((wireframe, i) =>
+          <PreviewWireframe
+            key={i}
+            index={i}
+            highlighted={state.currentComponent === `wireframes-${i}`}
+            wireframe={wireframe}
+          />
+        )}
+      </div>
     </div>
-  </div>;
+    : <div className='preview-container'>
+      <div style={{ color: 'var(--theia-dropdown-border)' }}>
+        {/*
+        {nls.localize(
+          'vuengine/entityEditor/noPreviewableComponents',
+          'This entity does not yet have any previewable components (children, colliders, sprites or wireframes).',
+        )}
+        */}
+        <IdentificationCard size={32} />
+      </div>
+    </div>;
 }

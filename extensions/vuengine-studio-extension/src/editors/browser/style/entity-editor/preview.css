@@ -2,7 +2,6 @@
     align-items: center;
     border: var(--theia-border-width) solid var(--theia-dropdown-border);
     border-radius: 8px;
-    cursor: grab;
     display: flex;
     flex-grow: 1;
     justify-content: center;
@@ -10,6 +9,10 @@
     overflow: hidden;
     padding: 0;
     position: relative;
+}
+
+.jsonforms-container .preview-container.draggable {
+    cursor: grab;
 }
 
 .jsonforms-container .preview-container.dragging {
