@@ -316,21 +316,21 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     <HContainer>
                         <input
                             className='theia-input'
-                            style={{ width: 48 }}
+                            style={{ width: 54 }}
                             type='number'
                             value={collider.pixelSize.x}
                             onChange={e => setPixelSizeX(parseFloat(e.target.value))}
                         />
                         <input
                             className='theia-input'
-                            style={{ width: 48 }}
+                            style={{ width: 54 }}
                             type='number'
                             value={collider.pixelSize.y}
                             onChange={e => setPixelSizeY(parseFloat(e.target.value))}
                         />
                         <input
                             className='theia-input'
-                            style={{ width: 48 }}
+                            style={{ width: 54 }}
                             type='number'
                             value={collider.pixelSize.z}
                             onChange={e => setPixelSizeZ(parseFloat(e.target.value))}
@@ -345,7 +345,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     </label>
                     <input
                         className='theia-input'
-                        style={{ width: 48 }}
+                        style={{ width: 54 }}
                         type='number'
                         value={collider.pixelSize.x}
                         onChange={e => setDiameter(parseFloat(e.target.value))}
@@ -353,14 +353,14 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                 </VContainer>
             }
             {collider.type === ColliderType.LineField &&
-                <HContainer gap={15}>
+                <HContainer gap={15} wrap='wrap'>
                     <VContainer>
                         <label>
                             {nls.localize('vuengine/entityEditor/colliderLength', 'Length')}
                         </label>
                         <input
                             className='theia-input'
-                            style={{ width: 48 }}
+                            style={{ width: 54 }}
                             type='number'
                             max={512}
                             min={0}
@@ -394,7 +394,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                         </label>
                         <input
                             className='theia-input'
-                            style={{ width: 48 }}
+                            style={{ width: 54 }}
                             type='number'
                             value={thickness}
                             onChange={e => updateLineField(axis, length, parseFloat(e.target.value))}
@@ -409,7 +409,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                 <HContainer>
                     <input
                         className='theia-input'
-                        style={{ width: 48 }}
+                        style={{ width: 54 }}
                         type='number'
                         min={MIN_COLLIDER_DISPLACEMENT}
                         max={MAX_COLLIDER_DISPLACEMENT}
@@ -418,7 +418,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     />
                     <input
                         className='theia-input'
-                        style={{ width: 48 }}
+                        style={{ width: 54 }}
                         type='number'
                         min={MIN_COLLIDER_DISPLACEMENT}
                         max={MAX_COLLIDER_DISPLACEMENT}
@@ -427,7 +427,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     />
                     <input
                         className='theia-input'
-                        style={{ width: 48 }}
+                        style={{ width: 54 }}
                         type='number'
                         min={MIN_COLLIDER_DISPLACEMENT}
                         max={MAX_COLLIDER_DISPLACEMENT}
@@ -436,7 +436,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     />
                     <input
                         className='theia-input'
-                        style={{ width: 48 }}
+                        style={{ width: 54 }}
                         type='number'
                         min={MIN_COLLIDER_DISPLACEMENT_PARALLAX}
                         max={MAX_COLLIDER_DISPLACEMENT_PARALLAX}
@@ -452,7 +452,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                 <HContainer>
                     <input
                         className='theia-input'
-                        style={{ width: 48 }}
+                        style={{ width: 54 }}
                         type='number'
                         min={MIN_COLLIDER_ROTATION}
                         max={MAX_COLLIDER_ROTATION}
@@ -462,7 +462,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     />
                     <input
                         className='theia-input'
-                        style={{ width: 48 }}
+                        style={{ width: 54 }}
                         type='number'
                         min={MIN_COLLIDER_ROTATION}
                         max={MAX_COLLIDER_ROTATION}
@@ -472,7 +472,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     />
                     <input
                         className='theia-input'
-                        style={{ width: 48 }}
+                        style={{ width: 54 }}
                         type='number'
                         min={MIN_COLLIDER_ROTATION}
                         max={MAX_COLLIDER_ROTATION}
@@ -490,7 +490,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     <HContainer>
                         <input
                             className='theia-input'
-                            style={{ width: 48 }}
+                            style={{ width: 54 }}
                             type='number'
                             min={MIN_COLLIDER_SCALE}
                             max={MAX_COLLIDER_SCALE}
@@ -500,7 +500,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                         />
                         <input
                             className='theia-input'
-                            style={{ width: 48 }}
+                            style={{ width: 54 }}
                             type='number'
                             min={MIN_COLLIDER_SCALE}
                             max={MAX_COLLIDER_SCALE}
@@ -510,7 +510,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                         />
                         <input
                             className='theia-input'
-                            style={{ width: 48 }}
+                            style={{ width: 54 }}
                             type='number'
                             min={MIN_COLLIDER_SCALE}
                             max={MAX_COLLIDER_SCALE}
@@ -528,7 +528,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     </label>
                     <input
                         className='theia-input'
-                        style={{ width: 48 }}
+                        style={{ width: 54 }}
                         type='number'
                         min={MIN_COLLIDER_SCALE}
                         max={MAX_COLLIDER_SCALE}

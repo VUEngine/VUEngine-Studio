@@ -139,7 +139,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
 
     return (
         <VContainer gap={15}>
-            <HContainer alignItems='start' gap={15}>
+            <HContainer alignItems='start' gap={15} wrap='wrap'>
                 <VContainer grow={1}>
                     <label>
                         {nls.localize('vuengine/entityEditor/type', 'Type')}
@@ -167,7 +167,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                     />
                 </VContainer>
             </HContainer>
-            <HContainer alignItems='start' gap={15}>
+            <HContainer alignItems='start' gap={15} wrap='wrap'>
                 <VContainer>
                     <InfoLabel
                         label={nls.localize('vuengine/entityEditor/transparency', 'Transparency')}
@@ -209,7 +209,6 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                 <HContainer>
                     <input
                         className='theia-input'
-                        style={{ width: 48 }}
                         type='number'
                         min={MIN_WIREFRAME_DISPLACEMENT}
                         max={MAX_WIREFRAME_DISPLACEMENT}
@@ -219,7 +218,6 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                     />
                     <input
                         className='theia-input'
-                        style={{ width: 48 }}
                         type='number'
                         min={MIN_WIREFRAME_DISPLACEMENT}
                         max={MAX_WIREFRAME_DISPLACEMENT}
@@ -229,7 +227,6 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                     />
                     <input
                         className='theia-input'
-                        style={{ width: 48 }}
                         type='number'
                         min={MIN_WIREFRAME_DISPLACEMENT}
                         max={MAX_WIREFRAME_DISPLACEMENT}

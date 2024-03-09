@@ -76,7 +76,7 @@ export default function ExtraProperties(): React.JSX.Element {
                 <HContainer>
                     <input
                         className='theia-input'
-                        style={{ width: 48 }}
+                        style={{ width: 54 }}
                         type='number'
                         value={data.extraProperties.pixelSize.x}
                         onChange={e => setPixelSizeX(parseInt(e.target.value))}
@@ -84,7 +84,7 @@ export default function ExtraProperties(): React.JSX.Element {
                     />
                     <input
                         className='theia-input'
-                        style={{ width: 48 }}
+                        style={{ width: 54 }}
                         type='number'
                         value={data.extraProperties.pixelSize.y}
                         onChange={e => setPixelSizeY(parseInt(e.target.value))}
@@ -92,7 +92,7 @@ export default function ExtraProperties(): React.JSX.Element {
                     />
                     <input
                         className='theia-input'
-                        style={{ width: 48 }}
+                        style={{ width: 54 }}
                         type='number'
                         value={data.extraProperties.pixelSize.z}
                         onChange={e => setPixelSizeZ(parseInt(e.target.value))}

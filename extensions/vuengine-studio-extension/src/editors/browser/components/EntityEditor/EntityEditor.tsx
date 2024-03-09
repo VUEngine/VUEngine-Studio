@@ -290,14 +290,13 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
           className="entityEditor"
           gap={0}
           grow={1}
-          overflow='hidden'
+          overflow='auto'
         >
           <EntityEditorContext.Consumer>
             {context =>
               <VContainer
                 gap={15}
                 overflow='hidden'
-                style={{ maxWidth: 200, minWidth: 200 }}
                 onClick={() => this.setState({ currentComponent: '' })}
               >
                 <VContainer gap={15} grow={1} overflow='auto'>
@@ -318,7 +317,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
           </EntityEditorContext.Consumer>
           <EntityEditorContext.Consumer>
             {context =>
-              <VContainer gap={15} overflow='auto' style={{ maxWidth: 300, minWidth: 300 }}>
+              <VContainer gap={15} overflow='auto'>
                 <CurrentComponent
                   isMultiFileAnimation={isMultiFileAnimation}
                 />

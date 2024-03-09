@@ -129,7 +129,7 @@ export default function SpritesSettings(props: SpritesSettingsProps): React.JSX.
             <label>
                 {nls.localize('vuengine/entityEditor/generalSpritesSettings', 'General Sprites Settings')}
             </label>
-            <HContainer gap={15}>
+            <HContainer gap={15} wrap='wrap'>
                 <VContainer>
                     <label>
                         {nls.localize('vuengine/entityEditor/spriteType', 'Type')}

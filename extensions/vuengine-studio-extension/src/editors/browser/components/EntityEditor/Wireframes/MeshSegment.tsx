@@ -99,31 +99,31 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
         </button>
         <VContainer>
             <label>From (x, y, z, parallax)</label>
-            <HContainer>
+            <HContainer wrap='wrap'>
                 <input
                     className='theia-input'
-                    style={{ width: 48 }}
+                    style={{ width: 54 }}
                     type='number'
                     value={segment.fromVertex.x}
                     onChange={e => setFromX(parseFloat(e.target.value))}
                 />
                 <input
                     className='theia-input'
-                    style={{ width: 48 }}
+                    style={{ width: 54 }}
                     type='number'
                     value={segment.fromVertex.y}
                     onChange={e => setFromY(parseFloat(e.target.value))}
                 />
                 <input
                     className='theia-input'
-                    style={{ width: 48 }}
+                    style={{ width: 54 }}
                     type='number'
                     value={segment.fromVertex.z}
                     onChange={e => setFromZ(parseFloat(e.target.value))}
                 />
                 <input
                     className='theia-input'
-                    style={{ width: 48 }}
+                    style={{ width: 54 }}
                     type='number'
                     value={segment.fromVertex.parallax}
                     onChange={e => setFromParallax(parseFloat(e.target.value))}
@@ -132,31 +132,31 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
         </VContainer>
         <VContainer>
             <label>To (x, y, z, parallax)</label>
-            <HContainer>
+            <HContainer wrap='wrap'>
                 <input
                     className='theia-input'
-                    style={{ width: 48 }}
+                    style={{ width: 54 }}
                     type='number'
                     value={segment.toVertex.x}
                     onChange={e => setToX(parseFloat(e.target.value))}
                 />
                 <input
                     className='theia-input'
-                    style={{ width: 48 }}
+                    style={{ width: 54 }}
                     type='number'
                     value={segment.toVertex.y}
                     onChange={e => setToY(parseFloat(e.target.value))}
                 />
                 <input
                     className='theia-input'
-                    style={{ width: 48 }}
+                    style={{ width: 54 }}
                     type='number'
                     value={segment.toVertex.z}
                     onChange={e => setToZ(parseFloat(e.target.value))}
                 />
                 <input
                     className='theia-input'
-                    style={{ width: 48 }}
+                    style={{ width: 54 }}
                     type='number'
                     value={segment.toVertex.parallax}
                     onChange={e => setToParallax(parseFloat(e.target.value))}

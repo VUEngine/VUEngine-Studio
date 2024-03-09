@@ -208,15 +208,17 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                         'or multiple files, where each represents one animation frame.'
                     )}
                 />
-                <HContainer gap={15}>
-                    <Images
-                        data={sprite.texture.files}
-                        updateData={setFiles}
-                        allInFolderAsFallback={false}
-                        canSelectMany={data.components?.animations.length > 0}
-                        stack={true}
-                        showMetaData={false}
-                    />
+                <HContainer gap={0} wrap='wrap'>
+                    <div style={{ paddingRight: 10 }}>
+                        <Images
+                            data={sprite.texture.files}
+                            updateData={setFiles}
+                            allInFolderAsFallback={false}
+                            canSelectMany={data.components?.animations.length > 0}
+                            stack={true}
+                            showMetaData={false}
+                        />
+                    </div>
                     <VContainer grow={1}>
                         {filename !== '' &&
                             <div>
@@ -304,7 +306,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                         />
                     </VContainer>
                 </HContainer>
-                <HContainer gap={15}>
+                <HContainer gap={15} wrap='wrap'>
                     <VContainer>
                         <label>
                             {nls.localize('vuengine/entityEditor/palette', 'Palette')}
@@ -421,7 +423,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                             'Positive z (and parallax) values go into the screen, negative stick out.'
                         )}
                     />
-                    <HContainer>
+                    <HContainer wrap='wrap'>
                         <input
                             className='theia-input'
                             style={{ width: 48 }}

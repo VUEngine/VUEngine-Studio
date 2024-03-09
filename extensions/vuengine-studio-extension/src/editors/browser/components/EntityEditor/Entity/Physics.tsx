@@ -101,7 +101,7 @@ export default function Physics(): React.JSX.Element {
                 </label>
                 <input
                     className='theia-input'
-                    style={{ width: 48 }}
+                    style={{ width: 54 }}
                     type='number'
                     step="0.1"
                     value={data.physics.mass}
@@ -114,7 +114,7 @@ export default function Physics(): React.JSX.Element {
                 </label>
                 <input
                     className='theia-input'
-                    style={{ width: 48 }}
+                    style={{ width: 54 }}
                     type='number'
                     step="0.1"
                     value={data.physics.friction}
@@ -127,7 +127,7 @@ export default function Physics(): React.JSX.Element {
                 </label>
                 <input
                     className='theia-input'
-                    style={{ width: 48 }}
+                    style={{ width: 54 }}
                     type='number'
                     step="0.1"
                     value={data.physics.bounciness}
@@ -141,7 +141,7 @@ export default function Physics(): React.JSX.Element {
                 <HContainer>
                     <input
                         className='theia-input'
-                        style={{ width: 48 }}
+                        style={{ width: 54 }}
                         type='number'
                         value={data.physics.maximumVelocity.x}
                         onChange={e => setMaximumVelocityX(parseInt(e.target.value))}
@@ -149,7 +149,7 @@ export default function Physics(): React.JSX.Element {
                     />
                     <input
                         className='theia-input'
-                        style={{ width: 48 }}
+                        style={{ width: 54 }}
                         type='number'
                         value={data.physics.maximumVelocity.y}
                         onChange={e => setMaximumVelocityY(parseInt(e.target.value))}
@@ -157,7 +157,7 @@ export default function Physics(): React.JSX.Element {
                     />
                     <input
                         className='theia-input'
-                        style={{ width: 48 }}
+                        style={{ width: 54 }}
                         type='number'
                         value={data.physics.maximumVelocity.z}
                         onChange={e => setMaximumVelocityZ(parseInt(e.target.value))}
@@ -171,7 +171,7 @@ export default function Physics(): React.JSX.Element {
                 </label>
                 <input
                     className='theia-input'
-                    style={{ width: 48 }}
+                    style={{ width: 54 }}
                     type='number'
                     value={data.physics.maximumSpeed}
                     onChange={e => setMaximumSpeed(parseInt(e.target.value))}
