@@ -105,14 +105,16 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
     const { isGenerating, setIsGenerating } = this.props.context;
 
     if (!isGenerating) {
-      setIsGenerating(true);
-      let updatedData = this.postProcessData({ ...this.props.data, ...entityData });
+      const updatedData = this.postProcessData({ ...this.props.data, ...entityData });
       if (options?.appendImageData) {
-        updatedData = await this.appendImageData(updatedData);
+        setIsGenerating(true, 0);
+        this.appendImageData(updatedData).then(d => {
+          this.props.updateData(d);
+          setIsGenerating(false);
+        });
+      } else {
+        this.props.updateData(updatedData);
       }
-
-      this.props.updateData(updatedData);
-      setIsGenerating(false);
     }
   }
 
@@ -165,6 +167,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
   }
 
   protected async appendImageData(entityData: EntityData): Promise<EntityData> {
+    const { setGeneratingProgress } = this.props.context;
     const { fileUri, services } = this.props.context;
     const mostFilesOnASprite = this.getMostFilesOnASprite(entityData);
     const isMultiFileAnimation = entityData.components?.animations.length > 0 && mostFilesOnASprite > 1;
@@ -229,8 +232,9 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
       }));
     } else {
       const convertedFilesMap: { [key: string]: ConversionResult & { _dupeIndex: number } } = {};
+      const totalSprites = entityData.components?.sprites?.length || 0;
       // for loop to handle sprites one after the other for dupe detection
-      for (let i = 0; i < entityData.components?.sprites?.length || 0; i++) {
+      for (let i = 0; i < totalSprites; i++) {
         const sprite = entityData.components?.sprites[i];
         if (sprite.texture?.files?.length) {
           // keep track of already converted files to avoid converting the same image twice
@@ -242,6 +246,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
               ...baseConfig,
               files: sprite.texture.files,
             });
+            setGeneratingProgress(i + 1 * 2 - 1, totalSprites * 2);
             const compressedImageData = await this.compressImageData(newImageData);
             sprite._imageData = convertedFilesMap[checksum] = {
               ...compressedImageData,
@@ -251,6 +256,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
         } else {
           sprite._imageData = undefined;
         }
+        setGeneratingProgress(i + 1 * 2, totalSprites * 2);
       }
     }
 

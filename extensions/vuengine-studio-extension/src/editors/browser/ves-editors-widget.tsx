@@ -103,6 +103,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     protected justSaved: boolean = false;
     protected isLoading: boolean = true;
     protected isGenerating: boolean = false;
+    protected generatingProgress: number = -1;
 
     protected readonly onDirtyChangedEmitter = new Emitter<void>();
     get onDirtyChanged(): Event<void> {
@@ -121,8 +122,15 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
     static readonly ID = 'vesEditorsWidget';
     static readonly LABEL = 'Editor';
 
-    protected setIsGenerating(isGenerating: boolean): void {
+    protected setIsGenerating(isGenerating: boolean, progress: number = 0): void {
         this.isGenerating = isGenerating;
+        this.generatingProgress = isGenerating ? progress : -1;
+        this.update();
+    }
+
+    protected setGeneratingProgress(current: number, total: number): void {
+        const progress = Math.round(current * 100 / total * 100) / 100;
+        this.generatingProgress = progress;
         this.update();
     }
 
@@ -415,6 +423,9 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
         return <div className="jsonforms-container" tabIndex={0}>
             <div className={`${this.isLoading || this.isGenerating ? 'generatingOverlay isGenerating' : 'generatingOverlay'}`}>
                 <i className='codicon codicon-loading codicon-modifier-spin' />
+                {this.generatingProgress > -1 &&
+                    `${this.generatingProgress}%`
+                }
             </div>
             {!this.isLoading && this.data &&
                 <EditorsContext.Provider
@@ -422,6 +433,7 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
                         fileUri: this.uri,
                         isGenerating: this.isGenerating,
                         setIsGenerating: this.setIsGenerating.bind(this),
+                        setGeneratingProgress: this.setGeneratingProgress.bind(this),
                         services: {
                             colorRegistry: this.colorRegistry,
                             commandService: this.commandService,

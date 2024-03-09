@@ -58,7 +58,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     const getCharCount = (imageData: Partial<ConversionResult & { _dupeIndex: number }> | number | undefined): number => {
         if (imageData !== undefined) {
             if (typeof imageData === 'number') {
-                if (imageData > 0) {
+                if (imageData > 0 && data.components?.sprites[imageData - 1] !== undefined) {
                     const pointedToImageData = data.components?.sprites[imageData - 1]._imageData;
                     if (pointedToImageData !== undefined) {
                         return getCharCount(pointedToImageData as Partial<ConversionResult>);

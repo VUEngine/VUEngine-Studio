@@ -41,6 +41,7 @@ export const EditorsContext = React.createContext<EditorsContextType>({});
 export interface EditorsContextType {
     fileUri: URI
     isGenerating: boolean
-    setIsGenerating: (isGenerating: boolean) => void
+    setIsGenerating: (isGenerating: boolean, progress?: number) => void
+    setGeneratingProgress: (current: number, total: number) => void
     services: EditorsServices
 }

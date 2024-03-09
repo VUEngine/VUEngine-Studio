@@ -8,7 +8,7 @@
     padding: 0;
     position: absolute;
     width: 0;
-    z-index: 999999;
+    z-index: 999999999999;
   }
   
   .jsonforms-container .generatingOverlay.isGenerating {
@@ -20,5 +20,6 @@
   }
   
   .jsonforms-container .generatingOverlay i {
-    font-size: 300%;
+    font-size: 500%;
+    position: absolute;
   }
