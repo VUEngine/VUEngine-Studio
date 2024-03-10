@@ -80,7 +80,7 @@ export default function CurrentComponent(props: CurrentComponentProps): React.JS
                 case 'sprites':
                     return <Sprite
                         sprite={data.components.sprites[index]}
-                        updateSprite={(partialData: Partial<SpriteData>) => updateComponent('sprites', index, partialData)}
+                        updateSprite={(partialData: Partial<SpriteData>, options?: EntityEditorSaveDataOptions) => updateComponent('sprites', index, partialData, options)}
                         isMultiFileAnimation={isMultiFileAnimation}
                     />;
                 case 'wireframes':

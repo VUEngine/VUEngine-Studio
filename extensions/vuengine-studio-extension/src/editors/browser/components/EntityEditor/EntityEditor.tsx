@@ -135,7 +135,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
     return entityData;
   }
 
-  protected async compressImageData(imageData: Partial<ConversionResult>): Promise<ConversionResult> {
+  protected async compressImageDataAsJson(imageData: Partial<ConversionResult>): Promise<ConversionResult> {
     const { services } = this.props.context;
     if (imageData.tiles) {
       let frameOffsets = {};
@@ -170,6 +170,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
   protected async appendImageData(entityData: EntityData): Promise<EntityData> {
     const { setGeneratingProgress } = this.props.context;
     const { fileUri, services } = this.props.context;
+
     const mostFilesOnASprite = this.getMostFilesOnASprite(entityData);
     const isMultiFileAnimation = entityData.components?.animations.length > 0 && mostFilesOnASprite > 1;
     const optimizeTiles = (entityData.components?.animations.length === 0 && entityData.sprites.optimizedTiles)
@@ -231,7 +232,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
       // map imagedata back to sprites
       await Promise.all(entityData.components?.sprites?.map(async (sprite, index) => {
         if (sprite.texture?.files?.length) {
-          const compressedImageData = await this.compressImageData({
+          const compressedImageData = await this.compressImageDataAsJson({
             tiles: (index === 0) ? newImageData.tiles : undefined,
             maps: [newImageData.maps[spriteFilesIndex[sprite.texture.files[0]]]],
           });
@@ -246,7 +247,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
     } else {
       const convertedFilesMap: { [key: string]: ConversionResult & { _dupeIndex: number } } = {};
       const totalSprites = entityData.components?.sprites?.length || 0;
-      // for loop to handle sprites one after the other for dupe detection
+      // for loop to handle sprites synchronously for dupe detection
       for (let i = 0; i < totalSprites; i++) {
         const sprite = entityData.components?.sprites[i];
         if (sprite.texture?.files?.length) {
@@ -269,7 +270,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
               files: sprite.texture.files,
             });
             setGeneratingProgress(i + 1 * 2 - 1, totalSprites * 2);
-            const compressedImageData = await this.compressImageData(newImageData);
+            const compressedImageData = await this.compressImageDataAsJson(newImageData);
             sprite._imageData = convertedFilesMap[checksum] = {
               ...compressedImageData,
               _dupeIndex: i + 1,
