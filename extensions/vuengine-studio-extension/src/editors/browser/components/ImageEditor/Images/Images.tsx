@@ -126,17 +126,19 @@ export default function Images(props: ImagesProps): React.JSX.Element {
                 <div className='filePreviewImage'>
                     <img src={fullUri.path.fsPath()} />
                 </div>
-                <VContainer gap={2}>
-                    <div className='filePreviewTitle'>
-                        {showMetaData && <>
-                            {fullUri.path.base}
-                            {stack && data.length > 1 && ' +' + (data.length - 1)}
-                        </>}
-                    </div>
-                    <div className='filePreviewMeta'>
-                        {filesToShow[f]}
-                    </div>
-                </VContainer>
+                {(showMetaData || filesToShow[f]) &&
+                    <VContainer gap={2}>
+                        <div className='filePreviewTitle'>
+                            {showMetaData && <>
+                                {fullUri.path.base}
+                                {stack && data.length > 1 && ' +' + (data.length - 1)}
+                            </>}
+                        </div>
+                        <div className='filePreviewMeta'>
+                            {filesToShow[f]}
+                        </div>
+                    </VContainer>
+                }
                 <div className='filePreviewActions'>
                     <i
                         className="codicon codicon-x"

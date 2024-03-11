@@ -20,13 +20,14 @@ import { QuickPickItem, QuickPickOptions, QuickPickSeparator, nls } from '@theia
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext, useState } from 'react';
 import { NodeRendererProps } from 'react-arborist';
+import { ColorMode } from '../../../../../core/browser/ves-common-types';
 import { ImageCompressionType } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import { DataSection } from '../../Common/CommonTypes';
 import { showEntitySelection } from '../../Common/Utils';
-import { BgmapMode, ColliderType, DisplayMode, Transparency, WireframeType } from '../../Common/VUEngineTypes';
+import { BgmapMode, ColliderType, DisplayMode, Displays, Transparency, WireframeType } from '../../Common/VUEngineTypes';
 import { ComponentKey, EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 import { ScriptType } from '../Scripts/ScriptTypes';
-import { DataSection } from '../../Common/CommonTypes';
 
 const CLONABLE_COMPONENT_TYPES = [
     'animations',
@@ -333,7 +334,9 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
             _imageData: 0,
             name: nls.localize('vuengine/entityEditor/sprite', 'Sprite'),
             bgmapMode: BgmapMode.Bgmap,
-            displayMode: DisplayMode.Both,
+            colorMode: ColorMode.Default,
+            displayMode: DisplayMode.Mono,
+            displays: Displays.Both,
             transparency: Transparency.None,
             displacement: {
                 x: 0,
@@ -344,6 +347,7 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
             manipulationFunction: '',
             texture: {
                 files: [],
+                files2: [],
                 padding: {
                     x: 0,
                     y: 0,

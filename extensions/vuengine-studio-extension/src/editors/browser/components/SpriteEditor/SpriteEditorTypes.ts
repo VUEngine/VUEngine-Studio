@@ -1,6 +1,6 @@
 import { LayerDataForHook } from 'dotting';
 import { ColorMode } from '../../../../core/browser/ves-common-types';
-import { DisplayMode } from '../Common/VUEngineTypes';
+import { Displays } from '../Common/VUEngineTypes';
 
 export const DEFAULT_SPRITE_SIZE = 16;
 export const PLACEHOLDER_LAYER_NAME = 'placeholderLayer';
@@ -8,7 +8,7 @@ export const PLACEHOLDER_LAYER_NAME = 'placeholderLayer';
 export interface ExtraSpriteLayerData {
     name: string
     parallax: number
-    displayMode: DisplayMode
+    displayMode: Displays
 }
 
 export interface SpriteData {

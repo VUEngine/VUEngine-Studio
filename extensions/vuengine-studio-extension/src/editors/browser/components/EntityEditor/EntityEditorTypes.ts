@@ -1,13 +1,13 @@
 import React from 'react';
+import { ColorMode } from '../../../../core/browser/ves-common-types';
 import { ConversionResult, ImageCompressionType } from '../../../../images/browser/ves-images-types';
 import { DataSection } from '../Common/CommonTypes';
-import { EntityEditorSaveDataOptions } from './EntityEditor';
-import { ScriptType, ScriptedActionData } from './Scripts/ScriptTypes';
 import {
     Axis,
     BgmapMode,
     ColliderType,
     DisplayMode,
+    Displays,
     PixelRotation,
     PixelSize,
     PixelVector,
@@ -18,6 +18,8 @@ import {
     Vector3D,
     WireframeType
 } from '../Common/VUEngineTypes';
+import { EntityEditorSaveDataOptions } from './EntityEditor';
+import { ScriptType, ScriptedActionData } from './Scripts/ScriptTypes';
 
 // @ts-ignore
 export const EntityEditorContext = React.createContext<EntityEditorContextType>({});
@@ -116,12 +118,15 @@ export interface SpriteData {
     _imageData?: Partial<ConversionResult & { _dupeIndex: number }> | number
     name: string
     bgmapMode: BgmapMode
+    colorMode: ColorMode
     displayMode: DisplayMode
+    displays: Displays
     transparency: Transparency
     displacement: PixelVector
     manipulationFunction: string
     texture: {
         files: string[]
+        files2: string[] // files for right eye in stereo mode
         padding: {
             x: number
             y: number

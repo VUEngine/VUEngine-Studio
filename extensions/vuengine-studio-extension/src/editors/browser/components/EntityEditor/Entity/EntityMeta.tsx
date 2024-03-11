@@ -25,19 +25,19 @@ export default function EntityMeta(): React.JSX.Element {
         return totalTiles;
     };
 
-    const charCount = getTileCount();
+    const tileCount = getTileCount();
 
     return <>
-        {charCount > 0 &&
+        {tileCount > 0 &&
             <VContainer gap={15}>
                 <VContainer>
                     <label>
                         {nls.localize('vuengine/entityEditor/tiles', 'Tiles')}
                     </label>
                     <input
-                        className={`theia-input heaviness ${charCount > 1200 ? 'heavinessHeavy' : charCount > 600 ? 'heavinessMedium' : 'heavinessLight'}`}
+                        className={`theia-input heaviness ${tileCount > 1200 ? 'heavinessHeavy' : tileCount > 600 ? 'heavinessMedium' : 'heavinessLight'}`}
                         type='text'
-                        value={charCount}
+                        value={tileCount}
                         disabled
                     />
                 </VContainer>

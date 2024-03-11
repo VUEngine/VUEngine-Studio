@@ -53,7 +53,6 @@ export class VesImagesService {
       : imageConfig.files.length
         ? imageConfig.files
         : await Promise.all(window.electronVesCore.findFiles(await this.fileService.fsPath(imageConfigFileUri.parent), '*.png')
-          .sort((a, b) => a.localeCompare(b))
           .map(async p => workspaceRootUri.relative(imageConfigFileUri.parent.resolve(p))?.toString()!));
     const gritUri = await this.getGritUri();
     const imagePaths: string[] = [];
@@ -225,8 +224,7 @@ export class VesImagesService {
       });
     }));
 
-    return convertedFileData
-      .sort((a, b) => a.name.localeCompare(b.name));
+    return convertedFileData;
   }
 
   protected async handleCompression(imageConfig: ImageConfig, conversionResult: ConversionResult): Promise<void> {

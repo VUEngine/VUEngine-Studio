@@ -9,7 +9,7 @@ import RadioSelect from '../../Common/RadioSelect';
 import SectionSelect from '../../Common/SectionSelect';
 import { clamp } from '../../Common/Utils';
 import VContainer from '../../Common/VContainer';
-import { BgmapMode, DisplayMode, SpriteType, Transparency } from '../../Common/VUEngineTypes';
+import { BgmapMode, DisplayMode, Displays, SpriteType, Transparency } from '../../Common/VUEngineTypes';
 import Images from '../../ImageEditor/Images/Images';
 import { EntityEditorSaveDataOptions } from '../EntityEditor';
 import {
@@ -35,26 +35,32 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const { data } = useContext(EntityEditorContext) as EntityEditorContextType;
     const { sprite, updateSprite, isMultiFileAnimation } = props;
-    const [dimensions, setDimensions] = useState<number[]>([]);
-    const [filename, setFilename] = useState<string>('');
+    const [dimensions, setDimensions] = useState<number[][]>([[], []]);
+    const [filename, setFilename] = useState<string[]>([]);
 
     const getMetaData = async (): Promise<void> => {
-        if (sprite.texture?.files?.length) {
-            const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
-            const resolvedUri = workspaceRootUri.resolve(sprite.texture.files[0]);
-            if (await services.fileService.exists(resolvedUri)) {
-                let fn = resolvedUri.path.base;
-                if (sprite.texture.files.length > 1) {
-                    fn += ' +' + (sprite.texture.files.length - 1);
+        const dim: number[][] = [[], []];
+        const fn: string[] = [];
+        await Promise.all([sprite.texture?.files, sprite.texture?.files2].map(async (f, i) => {
+            if (f?.length) {
+                const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
+                const resolvedUri = workspaceRootUri.resolve(f[0]);
+                if (await services.fileService.exists(resolvedUri)) {
+                    fn[i] = resolvedUri.path.base;
+                    if (f.length > 1) {
+                        fn[i] += ' +' + (f.length - 1);
+                    }
+                    const d = await window.electronVesCore.getImageDimensions(resolvedUri.path.fsPath());
+                    dim[i] = [d.width ?? 0, d.height ?? 0];
                 }
-                setFilename(fn);
-                const d = await window.electronVesCore.getImageDimensions(resolvedUri.path.fsPath());
-                setDimensions([d.width ?? 0, d.height ?? 0]);
+            } else {
+                fn[i] = '';
+                dim[i] = [];
             }
-        } else {
-            setFilename('');
-            setDimensions([]);
-        }
+        }));
+
+        setFilename(fn);
+        setDimensions(dim);
     };
 
     const getTilesCount = (imageData: Partial<ConversionResult & { _dupeIndex: number }> | number | undefined): number => {
@@ -96,9 +102,33 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         });
     };
 
-    const setDisplayMode = (displayMode: DisplayMode): void => {
+    /*
+    const setColorMode = (colorMode: ColorMode): void => {
         updateSprite({
-            displayMode,
+            colorMode,
+        });
+    };
+    */
+
+    const setDisplayMode = (displayMode: DisplayMode): void => {
+        if (displayMode === DisplayMode.Stereo) {
+            updateSprite({
+                displayMode,
+            });
+        } else {
+            updateSprite({
+                displayMode,
+                texture: {
+                    ...sprite.texture,
+                    files2: [],
+                }
+            });
+        }
+    };
+
+    const setDisplays = (displays: Displays): void => {
+        updateSprite({
+            displays,
         });
     };
 
@@ -186,6 +216,17 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         });
     };
 
+    const setFiles2 = async (files: string[]): Promise<void> => {
+        updateSprite({
+            texture: {
+                ...sprite.texture,
+                files2: files
+            }
+        }, {
+            appendImageData: true,
+        });
+    };
+
     const setSection = (section: DataSection) => {
         updateSprite({
             section,
@@ -206,7 +247,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         data.components?.animations?.length,
         data.animations?.totalFrames,
         isMultiFileAnimation,
-        sprite.texture.files
+        sprite.texture?.files,
+        sprite.texture?.files2,
     ]);
 
     const tilesCount = getTilesCount(sprite._imageData);
@@ -214,10 +256,69 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     const invalidTilesCount = tilesCount % 1 !== 0;
 
     return (
-        <HContainer gap={15} wrap='wrap'>
+        <VContainer gap={15}>
+            <HContainer gap={15} wrap='wrap' style={{ justifyContent: 'space-between' }}>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/displayMode', 'Display Mode')}
+                    </label>
+                    <RadioSelect
+                        options={[{
+                            value: DisplayMode.Mono,
+                            label: nls.localize('vuengine/entityEditor/displayModeMono', 'Mono'),
+                        }, {
+                            value: DisplayMode.Stereo,
+                            label: nls.localize('vuengine/entityEditor/displayModeStereo', 'Stereo'),
+                        }]}
+                        defaultValue={sprite.displayMode}
+                        onChange={options => setDisplayMode(options[0].value as DisplayMode)}
+                    />
+                </VContainer>
+                {/*
+                <VContainer>
+                    <InfoLabel
+                        label={nls.localize('vuengine/entityEditor/colorMode', 'Color Mode')}
+                        tooltip={nls.localize(
+                            'vuengine/entityEditor/colorModeDescription',
+                            'Whether to use the system\'s default 4-color palette or HiColor mode, ' +
+                            'which simulates 7 colors by blending together adjacent frames to create mix colors. ' +
+                            'Note: This will require an additional WORLD.'
+                        )}
+                    />
+                    <RadioSelect
+                        options={[{
+                            value: ColorMode.Default,
+                            label: nls.localize('vuengine/entityEditor/colorModeDefault', 'Default'),
+                        }, {
+                            value: ColorMode.HiColor,
+                            label: nls.localize('vuengine/entityEditor/colorModeHiColor', 'HiColor'),
+                        }]}
+                        defaultValue={sprite.colorMode}
+                        onChange={options => setColorMode(options[0].value as ColorMode)}
+                    />
+                </VContainer>
+                */}
+                {tilesCount > 0 &&
+                    <VContainer>
+                        <label>
+                            {nls.localize('vuengine/entityEditor/tiles', 'Tiles')}
+                        </label>
+                        <input
+                            className={`theia-input heaviness${invalidTilesCount ? ' error' : ''}`}
+                            type='text'
+                            value={invalidTilesCount ? `⚠ ${tilesCount}` : tilesCount}
+                            style={{ width: 60 }}
+                            disabled
+                        />
+                    </VContainer>
+                }
+            </HContainer>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/entityEditor/image', 'Image')}
+                    label={sprite.displayMode === DisplayMode.Stereo
+                        ? nls.localize('vuengine/entityEditor/imageLeftEye', 'Image (Left Eye)')
+                        : nls.localize('vuengine/entityEditor/image', 'Image')
+                    }
                     tooltip={nls.localize(
                         'vuengine/entityEditor/filesDescription',
                         'PNG image to be used as texture. Must be four color indexed mode with the proper palette. ' +
@@ -225,10 +326,10 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                         'or multiple files, where each represents one animation frame.'
                     )}
                 />
-                <HContainer gap={0} wrap='wrap'>
+                <HContainer alignItems='center' gap={0} wrap='wrap'>
                     <div style={{ paddingRight: 10 }}>
                         <Images
-                            data={sprite.texture.files}
+                            data={sprite.texture?.files || []}
                             updateData={setFiles}
                             allInFolderAsFallback={false}
                             canSelectMany={data.components?.animations.length > 0}
@@ -237,91 +338,88 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                         />
                     </div>
                     <VContainer grow={1}>
-                        {filename !== '' &&
-                            <div>
-                                {filename}
+                        {(sprite.texture?.files || []).length === 0 &&
+                            <div className='empty'>
+                                {nls.localize('vuengine/entityEditor/noImageFileSelect', 'No Image File Selected')}
                             </div>
                         }
 
-                        {dimensions.length > 0 &&
+                        {filename[0] !== '' &&
+                            <div>
+                                {filename[0]}
+                            </div>
+                        }
+
+                        {dimensions[0].length > 0 &&
                             <>
                                 <div>
-                                    {dimensions[0]}×{dimensions[1]} px
+                                    {dimensions[0][0]}×{dimensions[0][1]} px
                                 </div>
                                 {data.components?.animations?.length > 0 && !isMultiFileAnimation && data.animations?.totalFrames &&
                                     <div>
                                         (
-                                        {dimensions[0]}×{Math.round(dimensions[1] / data.animations?.totalFrames * 100) / 100} px × {data.animations?.totalFrames}
+                                        {dimensions[0][0]}×{Math.round(dimensions[0][1] / data.animations?.totalFrames * 100) / 100} px × {data.animations?.totalFrames}
                                         )
                                     </div>
                                 }
                             </>
                         }
-
-                        {tilesCount > 0 &&
-                            <div className={invalidTilesCount ? 'error' : ''}>
-                                {invalidTilesCount &&
-                                    <><i className='fa fa-warning' />{' '}</>
-                                }
-                                {tilesCount} {nls.localize('vuengine/entityEditor/tiles', 'Tiles')}
-                            </div>
-                        }
                     </VContainer>
                 </HContainer>
             </VContainer >
-            <HContainer gap={15} wrap='wrap'>
+            {sprite.displayMode === DisplayMode.Stereo &&
                 <VContainer>
                     <InfoLabel
-                        label={nls.localize('vuengine/entityEditor/displays', 'Displays')}
+                        label={nls.localize('vuengine/entityEditor/imageRightEye', 'Image (Right Eye)')}
                         tooltip={nls.localize(
-                            'vuengine/entityEditor/displayModeDescription',
-                            'Select which screens the sprite should be visible on. ' +
-                            'Can be used to set up a stereo sprite by creating one sprite each for the left and right eye.'
+                            'vuengine/entityEditor/filesDescription',
+                            'PNG image to be used as texture. Must be four color indexed mode with the proper palette. ' +
+                            'When animations are enabled, select either a single file containing a vertical spritesheet, ' +
+                            'or multiple files, where each represents one animation frame.'
                         )}
                     />
-                    <RadioSelect
-                        options={[
-                            { value: DisplayMode.Left, label: nls.localize('vuengine/entityEditor/displayModeLeft', 'Left') },
-                            { value: DisplayMode.Right, label: nls.localize('vuengine/entityEditor/displayModeRight', 'Right') },
-                        ]}
-                        canSelectMany={true}
-                        allowBlank={false}
-                        defaultValue={sprite.displayMode === DisplayMode.Both
-                            ? [DisplayMode.Left, DisplayMode.Right]
-                            : sprite.displayMode
-                        }
-                        onChange={options => setDisplayMode(options.length === 2
-                            ? DisplayMode.Both
-                            : options[0].value as DisplayMode)
-                        }
-                    />
+                    <HContainer alignItems='center' gap={0} wrap='wrap'>
+                        <div style={{ paddingRight: 10 }}>
+                            <Images
+                                data={sprite.texture?.files2 || []}
+                                updateData={setFiles2}
+                                allInFolderAsFallback={false}
+                                canSelectMany={data.components?.animations.length > 0}
+                                stack={true}
+                                showMetaData={false}
+                            />
+                        </div>
+                        <VContainer grow={1}>
+                            {(sprite.texture?.files2 || []).length === 0 &&
+                                <div className='empty'>
+                                    {nls.localize('vuengine/entityEditor/noImageFileSelect', 'No Image File Selected')}
+                                </div>
+                            }
+
+                            {filename[1] !== '' &&
+                                <div>
+                                    {filename[1]}
+                                </div>
+                            }
+
+                            {dimensions[1].length > 0 &&
+                                <>
+                                    <div>
+                                        {dimensions[1][0]}×{dimensions[1][1]} px
+                                    </div>
+                                    {data.components?.animations?.length > 0 && !isMultiFileAnimation && data.animations?.totalFrames &&
+                                        <div>
+                                            (
+                                            {dimensions[1][0]}×{Math.round(dimensions[1][1] / data.animations?.totalFrames * 100) / 100} px × {data.animations?.totalFrames}
+                                            )
+                                        </div>
+                                    }
+                                </>
+                            }
+                        </VContainer>
+                    </HContainer>
                 </VContainer>
-                <VContainer>
-                    <InfoLabel
-                        label={nls.localize('vuengine/entityEditor/transparency', 'Transparency')}
-                        tooltip={nls.localize(
-                            'vuengine/entityEditor/spriteTransparencyDescription',
-                            'With transparency enabled, this sprite will only be shown on every even or odd frame, ' +
-                            'resulting in it appearing transparent (and slightly dimmer). ' +
-                            'This also halves CPU load since 50% less pixels have to be rendered per frame in average.'
-                        )}
-                    />
-                    <RadioSelect
-                        options={[{
-                            value: Transparency.None,
-                            label: nls.localize('vuengine/entityEditor/transparencyNone', 'None'),
-                        }, {
-                            value: Transparency.Odd,
-                            label: nls.localize('vuengine/entityEditor/transparencyOdd', 'Odd'),
-                        }, {
-                            value: Transparency.Even,
-                            label: nls.localize('vuengine/entityEditor/transparencyEven', 'Even'),
-                        }]}
-                        defaultValue={sprite.transparency}
-                        onChange={options => setTransparency(options[0].value as Transparency)}
-                    />
-                </VContainer>
-            </HContainer>
+            }
             <HContainer gap={15} wrap='wrap'>
                 <VContainer>
                     <label>
@@ -429,6 +527,61 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     </VContainer>
                 </HContainer>
             }
+            <HContainer gap={15} wrap='wrap'>
+                {sprite.displayMode === DisplayMode.Mono &&
+                    <VContainer>
+                        <InfoLabel
+                            label={nls.localize('vuengine/entityEditor/displays', 'Displays')}
+                            tooltip={nls.localize(
+                                'vuengine/entityEditor/displayModeDescription',
+                                'Select which screens the sprite should be visible on. ' +
+                                'Can be used to set up a stereo sprite by creating one sprite each for the left and right eye.'
+                            )}
+                        />
+                        <RadioSelect
+                            options={[
+                                { value: Displays.Left, label: nls.localize('vuengine/entityEditor/displayModeLeft', 'Left') },
+                                { value: Displays.Right, label: nls.localize('vuengine/entityEditor/displayModeRight', 'Right') },
+                            ]}
+                            canSelectMany={true}
+                            allowBlank={false}
+                            defaultValue={sprite.displays === Displays.Both
+                                ? [Displays.Left, Displays.Right]
+                                : sprite.displays
+                            }
+                            onChange={options => setDisplays(options.length === 2
+                                ? Displays.Both
+                                : options[0].value as Displays)
+                            }
+                        />
+                    </VContainer>
+                }
+                <VContainer>
+                    <InfoLabel
+                        label={nls.localize('vuengine/entityEditor/transparency', 'Transparency')}
+                        tooltip={nls.localize(
+                            'vuengine/entityEditor/spriteTransparencyDescription',
+                            'With transparency enabled, this sprite will only be shown on every even or odd frame, ' +
+                            'resulting in it appearing transparent (and slightly dimmer). ' +
+                            'This also halves CPU load since 50% less pixels have to be rendered per frame in average.'
+                        )}
+                    />
+                    <RadioSelect
+                        options={[{
+                            value: Transparency.None,
+                            label: nls.localize('vuengine/entityEditor/transparencyNone', 'None'),
+                        }, {
+                            value: Transparency.Odd,
+                            label: nls.localize('vuengine/entityEditor/transparencyOdd', 'Odd'),
+                        }, {
+                            value: Transparency.Even,
+                            label: nls.localize('vuengine/entityEditor/transparencyEven', 'Even'),
+                        }]}
+                        defaultValue={sprite.transparency}
+                        onChange={options => setTransparency(options[0].value as Transparency)}
+                    />
+                </VContainer>
+            </HContainer>
             <VContainer>
                 <InfoLabel
                     label={nls.localize('vuengine/entityEditor/displacement', 'Displacement (x, y, z, parallax)')}
@@ -507,31 +660,33 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     {nls.localize('vuengine/entityEditor/recycleable', 'Recycleable')}
                 </label>
             </VContainer>
-            <VContainer>
-                <InfoLabel
-                    label={nls.localize('vuengine/entityEditor/compression', 'Compression')}
-                    tooltip={nls.localize(
-                        'vuengine/entityEditor/compressionDescription',
-                        'Image data can be stored in a compressed format to save ROM space. '
-                        + 'Comes at the cost of a slightly higher CPU load when loading data into memory.'
-                    )}
+            <HContainer gap={15} wrap='wrap'>
+                <VContainer>
+                    <InfoLabel
+                        label={nls.localize('vuengine/entityEditor/compression', 'Compression')}
+                        tooltip={nls.localize(
+                            'vuengine/entityEditor/compressionDescription',
+                            'Image data can be stored in a compressed format to save ROM space. '
+                            + 'Comes at the cost of a slightly higher CPU load when loading data into memory.'
+                        )}
+                    />
+                    <RadioSelect
+                        options={[{
+                            label: nls.localize('vuengine/entityEditor/compression/none', 'None'),
+                            value: ImageCompressionType.NONE,
+                        }, {
+                            label: nls.localize('vuengine/entityEditor/compression/rle', 'RLE'),
+                            value: ImageCompressionType.RLE,
+                        }]}
+                        defaultValue={sprite.compression}
+                        onChange={options => setTilesCompression(options[0].value as ImageCompressionType)}
+                    />
+                </VContainer>
+                <SectionSelect
+                    value={sprite.section}
+                    setValue={setSection}
                 />
-                <RadioSelect
-                    options={[{
-                        label: nls.localize('vuengine/entityEditor/compression/none', 'None'),
-                        value: ImageCompressionType.NONE,
-                    }, {
-                        label: nls.localize('vuengine/entityEditor/compression/rle', 'RLE'),
-                        value: ImageCompressionType.RLE,
-                    }]}
-                    defaultValue={sprite.compression}
-                    onChange={options => setTilesCompression(options[0].value as ImageCompressionType)}
-                />
-            </VContainer>
-            <SectionSelect
-                value={sprite.section}
-                setValue={setSection}
-            />
-        </HContainer>
+            </HContainer>
+        </VContainer>
     );
 }

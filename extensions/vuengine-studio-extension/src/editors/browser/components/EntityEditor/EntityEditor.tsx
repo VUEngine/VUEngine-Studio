@@ -99,7 +99,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
 
   protected async updateState(state: EntityEditorState): Promise<void> {
     this.setState(state);
-    await this.savePreviewState();
+    return this.savePreviewState();
   }
 
   protected async setData(entityData: Partial<EntityData>, options?: EntityEditorSaveDataOptions): Promise<void> {
@@ -194,13 +194,19 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
         shared: !entityData.components?.animations.length && entityData.sprites.sharedTiles,
       }
     };
+    const totalSprites = entityData.components?.sprites?.length || 0;
 
-    if (!entityData.components?.animations.length && entityData.sprites?.sharedTiles) {
+    if (!entityData.components?.animations.length &&
+      (entityData.components?.sprites?.length === 1 || entityData.sprites?.sharedTiles)
+    ) {
       const files: string[] = [];
       // keep track of added files to be able to map back maps later
       const spriteFilesIndex: { [key: string]: number } = {};
       let mapCounter = 0;
-      entityData.components?.sprites?.map(s => {
+
+      // for loop to handle sprites synchronously to not mess up order
+      for (let i = 0; i < entityData.components?.sprites?.length || 0; i++) {
+        const s = entityData.components.sprites[i];
         if (s.texture?.files?.length) {
           const file = s.texture.files[0];
           if (!spriteFilesIndex[file]) {
@@ -208,7 +214,14 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
             spriteFilesIndex[file] = mapCounter++;
           }
         }
-      });
+        if (s.texture?.files2?.length) {
+          const file = s.texture.files2[0];
+          if (!spriteFilesIndex[file]) {
+            files.push(file);
+            spriteFilesIndex[file] = mapCounter++;
+          }
+        }
+      }
 
       const newImageData = await services.vesImagesService.convertImage(fileUri, {
         ...baseConfig,
@@ -229,24 +242,35 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
         },
         files,
       });
+
+      console.log('spriteFilesIndex', spriteFilesIndex);
+      console.log('newImageData', newImageData);
+      console.log('files', files);
+
       // map imagedata back to sprites
-      await Promise.all(entityData.components?.sprites?.map(async (sprite, index) => {
-        if (sprite.texture?.files?.length) {
+      // for loop to handle sprites synchronously to not mess up order
+      for (let i = 0; i < entityData.components?.sprites?.length || 0; i++) {
+        const s = entityData.components.sprites[i];
+        if (s.texture?.files?.length) {
+          const maps = [newImageData.maps[spriteFilesIndex[s.texture.files[0]]]];
+          if (s.texture?.files2?.length) {
+            maps.push(newImageData.maps[spriteFilesIndex[s.texture.files2[0]]]);
+          }
+          console.log('maps', maps);
           const compressedImageData = await this.compressImageDataAsJson({
-            tiles: (index === 0) ? newImageData.tiles : undefined,
-            maps: [newImageData.maps[spriteFilesIndex[sprite.texture.files[0]]]],
+            tiles: (i === 0) ? newImageData.tiles : undefined,
+            maps,
           });
-          sprite._imageData = {
+          s._imageData = {
             ...compressedImageData,
             _dupeIndex: 1,
           };
         } else {
-          sprite._imageData = undefined;
+          s._imageData = undefined;
         }
-      }));
+      };
     } else {
       const convertedFilesMap: { [key: string]: ConversionResult & { _dupeIndex: number } } = {};
-      const totalSprites = entityData.components?.sprites?.length || 0;
       // for loop to handle sprites synchronously for dupe detection
       for (let i = 0; i < totalSprites; i++) {
         const sprite = entityData.components?.sprites[i];
@@ -267,7 +291,10 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
                 ...baseConfig.tileset,
                 compression: sprite.compression,
               },
-              files: sprite.texture.files,
+              files: [
+                ...sprite.texture?.files,
+                ...(sprite.texture?.files2 || []),
+              ],
             });
             setGeneratingProgress(i + 1 * 2 - 1, totalSprites * 2);
             const compressedImageData = await this.compressImageDataAsJson(newImageData);

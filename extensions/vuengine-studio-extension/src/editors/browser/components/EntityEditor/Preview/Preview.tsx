@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { ColorMode, PALETTE_COLORS } from '../../../../../core/browser/ves-common-types';
 import { EditorsContext, EditorsContextType } from '../../../../../editors/browser/ves-editors-types';
 import { ProjectContributor } from '../../../../../project/browser/ves-project-types';
-import { BgmapMode, ColliderType, Transparency } from '../../Common/VUEngineTypes';
+import { ColliderType } from '../../Common/VUEngineTypes';
 import {
   AnimationData,
   EntityEditorContext,
@@ -138,17 +138,12 @@ export default function Preview(): React.JSX.Element {
         {state.preview.sprites && data.components?.sprites?.map((sprite, i) =>
           <Sprite
             key={i}
+            index={i}
+            sprite={sprite}
             animate={animate}
-            displacement={sprite.displacement}
             frames={data.animations?.totalFrames || 1}
-            canScale={sprite.bgmapMode === BgmapMode.Affine}
             currentAnimationFrame={animation?.frames[currentAnimationStep - 1] ?? currentAnimationStep}
             highlighted={state.currentComponent === `sprites-${i}`}
-            images={sprite.texture.files}
-            index={i}
-            flipHorizontally={sprite.texture.flip.horizontal}
-            flipVertically={sprite.texture.flip.vertical}
-            transparent={sprite.transparency !== Transparency.None}
             palette={state.preview.palettes[sprite.texture.palette]}
           />
         )}

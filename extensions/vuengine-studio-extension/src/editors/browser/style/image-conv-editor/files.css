@@ -1,4 +1,5 @@
 .jsonforms-container {
+  --ves-file-height: 150px;
   --ves-file-width: 150px;
 }
 
@@ -16,7 +17,7 @@
   border-radius: 10px;
   box-sizing: border-box;
   display: flex;
-  height: var(--ves-file-width);
+  height: var(--ves-file-height);
   justify-content: center;
   overflow: hidden;
   padding: 10px;
@@ -52,8 +53,8 @@
   cursor: pointer;
   display: none;
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 6px;
+  right: 6px;
   z-index: 10;
 }
 
@@ -69,7 +70,7 @@
   box-sizing: border-box;
   cursor: pointer;
   display: flex;
-  height: var(--ves-file-width);
+  height: var(--ves-file-height);
   justify-content: center;
   width: var(--ves-file-width);
 }

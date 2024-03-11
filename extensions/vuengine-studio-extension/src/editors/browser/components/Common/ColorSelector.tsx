@@ -36,7 +36,10 @@ export default function ColorSelector(props: ColorSelectorProps): React.JSX.Elem
                 key={`ves-new-project-c-${c}`}
                 data-c={c}
                 className={`color-${c + 1}${selected}`}
-                onClick={() => updateColor(c)}
+                onClick={e => {
+                    e.stopPropagation();
+                    updateColor(c);
+                }}
             ></div>;
         })}
     </div>;

@@ -1,11 +1,11 @@
+import { CornersOut, Square } from '@phosphor-icons/react';
+import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import ColorSelector from '../../Common/ColorSelector';
 import HContainer from '../../Common/HContainer';
+import { clamp } from '../../Common/Utils';
 import VContainer from '../../Common/VContainer';
 import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
-import { CornersOut } from '@phosphor-icons/react';
-import { nls } from '@theia/core';
-import { clamp } from '../../Common/Utils';
 
 interface PreviewOptionsProps {
   enableBackground: boolean
@@ -30,15 +30,15 @@ export default function PreviewOptions(props: PreviewOptionsProps): React.JSX.El
       },
     });
 
-  /*
-  const toggleAnaglyph = () =>
+  const toggleAnaglyph = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setState({
       preview: {
         ...state.preview,
         anaglyph: !state.preview.anaglyph,
       },
     });
-  */
+  };
 
   const applyZoom = (e: React.MouseEvent, z: number) => {
     e.stopPropagation();
@@ -89,7 +89,6 @@ export default function PreviewOptions(props: PreviewOptionsProps): React.JSX.El
         </button>
       </HContainer>
       <HContainer gap={15}>
-        {/*
         <button
           className='theia-button secondary'
           onClick={toggleAnaglyph}
@@ -112,7 +111,6 @@ export default function PreviewOptions(props: PreviewOptionsProps): React.JSX.El
             </>
           }
         </button>
-        */}
         {enableBackground &&
           <VContainer>
             <ColorSelector

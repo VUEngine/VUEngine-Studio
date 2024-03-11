@@ -16,6 +16,7 @@ import React, { BaseSyntheticEvent, useContext, useEffect, useRef, useState } fr
 import { PALETTE_COLORS } from '../../../../core/browser/ves-common-types';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import VContainer from '../Common/VContainer';
+import { Displays } from '../Common/VUEngineTypes';
 import PaletteSelect from './PaletteSelect';
 import SpriteEditorActions from './SpriteEditorActions';
 import SpriteEditorCurrentToolSettings from './SpriteEditorCurrentToolSettings';
@@ -23,7 +24,6 @@ import SpriteEditorSettings from './SpriteEditorSettings';
 import SpriteEditorStatus from './SpriteEditorStatus';
 import SpriteEditorTools from './SpriteEditorTools';
 import { DEFAULT_SPRITE_SIZE, PLACEHOLDER_LAYER_NAME, SpriteData, SpriteLayersData } from './SpriteEditorTypes';
-import { DisplayMode } from '../Common/VUEngineTypes';
 
 interface SpriteEditorProps {
     data: SpriteData
@@ -113,7 +113,7 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                     ),
                     name: nls.localize('vuengine/spriteEditor/layer', 'Layer') + ' 1',
                     parallax: 0,
-                    displayMode: DisplayMode.Both,
+                    displayMode: Displays.Both,
                 }
             }
         });
@@ -139,7 +139,7 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
             ),
             name: `${nls.localize('vuengine/spriteEditor/layer', 'Layer')} ${layers.length + 1}`,
             parallax: 0,
-            displayMode: DisplayMode.Both,
+            displayMode: Displays.Both,
         };
         addLayer(newLayer.id, layers.length);
 

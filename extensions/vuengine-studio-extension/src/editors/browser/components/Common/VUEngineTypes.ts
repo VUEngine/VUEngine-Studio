@@ -10,6 +10,11 @@ export enum Transparency {
 }
 
 export enum DisplayMode {
+    Mono = 'Mono',
+    Stereo = 'Stereo',
+}
+
+export enum Displays {
     Both = 'ON',
     Left = 'LON',
     Right = 'RON',
