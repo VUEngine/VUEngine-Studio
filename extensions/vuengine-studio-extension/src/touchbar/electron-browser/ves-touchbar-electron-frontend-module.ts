@@ -3,6 +3,5 @@ import { ElectronMenuContribution } from '@theia/core/lib/electron-browser/menu/
 import { VesElectronMenuContribution } from './ves-touchbar-electron-menu-contribution';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
-    bind(VesElectronMenuContribution).toSelf().inSingletonScope();
-    rebind(ElectronMenuContribution).toService(VesElectronMenuContribution);
+    rebind(ElectronMenuContribution).to(VesElectronMenuContribution).inSingletonScope();
 });

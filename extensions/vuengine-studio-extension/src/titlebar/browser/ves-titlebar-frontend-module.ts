@@ -15,9 +15,7 @@ import { VesTitlebarWindowControlsWidget } from './window-controls/ves-titlebar-
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // title bar application title
     bindViewContribution(bind, VesTitlebarApplicationTitleContribution);
-    bind(FrontendApplicationContribution).toService(
-        VesTitlebarApplicationTitleContribution
-    );
+    bind(FrontendApplicationContribution).toService(VesTitlebarApplicationTitleContribution);
     bind(VesTitlebarApplicationTitleWidget).toSelf();
     bind(WidgetFactory)
         .toDynamicValue(ctx => ({

@@ -3,6 +3,5 @@ import { ElectronMainApplication } from '@theia/core/lib/electron-main/electron-
 import { VesElectronMainApplication } from './ves-touchbar-electron-main-application';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
-    bind(VesElectronMainApplication).toSelf().inSingletonScope();
-    rebind(ElectronMainApplication).toService(VesElectronMainApplication);
+    rebind(ElectronMainApplication).to(VesElectronMainApplication).inSingletonScope();
 });
