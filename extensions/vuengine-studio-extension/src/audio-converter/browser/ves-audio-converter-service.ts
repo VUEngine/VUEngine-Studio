@@ -1,4 +1,3 @@
-import { LabelProvider } from '@theia/core/lib/browser';
 import { BinaryBufferReadableStream } from '@theia/core/lib/common/buffer';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
@@ -10,8 +9,6 @@ import { VesProcessWatcher } from '../../process/browser/ves-process-service-wat
 export class VesAudioConverterService {
   @inject(FileService)
   protected fileService: FileService;
-  @inject(LabelProvider)
-  protected readonly labelProvider: LabelProvider;
   @inject(VesCommonService)
   protected vesCommonService: VesCommonService;
   @inject(VesProcessWatcher)

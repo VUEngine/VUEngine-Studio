@@ -12,16 +12,13 @@ import { nls } from '@theia/core';
 export class VesEmulatorOpenHandler extends WidgetOpenHandler<VesEmulatorWidget> {
     readonly id = VesEmulatorWidget.ID;
     readonly label = nls.localize('vuengine/emulator/emulator', 'Emulator');
-    readonly supported = [
-        '.vb',
-        '.VB',
-    ];
+    readonly supported = ['.vb'];
 
     @inject(EditorManager)
     protected readonly editorManager: EditorManager;
 
     canHandle(uri: URI): number {
-        if (this.supported.includes(uri.path.ext)) {
+        if (this.supported.includes(uri.path.ext.toLowerCase())) {
             return Number.MAX_SAFE_INTEGER;
         }
 

@@ -1,7 +1,7 @@
 import { JsonFormsCore, JsonSchema, UISchemaElement } from '@jsonforms/core';
 import { JsonForms } from '@jsonforms/react';
 import { JsonFormsStyleContext, StyleContext, vanillaCells, vanillaRenderers, vanillaStyles } from '@jsonforms/vanilla-renderers';
-import { Message } from '@phosphor/messaging';
+import { Message } from '@theia/core/shared/@phosphor/messaging';
 import { CommandService, Emitter, Event, MessageService, QuickPickService, Reference, UNTITLED_SCHEME, URI, nls } from '@theia/core';
 import {
     CommonCommands,

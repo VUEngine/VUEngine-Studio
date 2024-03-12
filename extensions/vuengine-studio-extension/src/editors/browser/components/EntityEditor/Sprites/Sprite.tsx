@@ -316,8 +316,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
             <VContainer>
                 <InfoLabel
                     label={sprite.displayMode === DisplayMode.Stereo
-                        ? nls.localize('vuengine/entityEditor/imageLeftEye', 'Image (Left Eye)')
-                        : nls.localize('vuengine/entityEditor/image', 'Image')
+                        ? nls.localize('vuengine/entityEditor/sourceImageLeftEye', 'Source Image (Left Eye)')
+                        : nls.localize('vuengine/entityEditor/sourceImage', 'Source Image')
                     }
                     tooltip={nls.localize(
                         'vuengine/entityEditor/filesDescription',
@@ -370,7 +370,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
             {sprite.displayMode === DisplayMode.Stereo &&
                 <VContainer>
                     <InfoLabel
-                        label={nls.localize('vuengine/entityEditor/imageRightEye', 'Image (Right Eye)')}
+                        label={nls.localize('vuengine/entityEditor/sourceImageRightEye', 'Source Image (Right Eye)')}
                         tooltip={nls.localize(
                             'vuengine/entityEditor/filesDescription',
                             'PNG image to be used as texture. Must be four color indexed mode with the proper palette. ' +
