@@ -8,6 +8,7 @@ import {
     HoverService,
     LabelProvider,
     LocalStorageService,
+    NavigatableWidget,
     OpenerService,
     PreferenceService,
     Saveable,
@@ -15,6 +16,7 @@ import {
 } from '@theia/core/lib/browser';
 import { ColorRegistry } from '@theia/core/lib/browser/color-registry';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
+import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { EditorPreferences } from '@theia/editor/lib/browser';
@@ -31,7 +33,6 @@ import { ProjectDataType } from '../../project/browser/ves-project-types';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
 import { VES_RENDERERS } from './renderers/ves-renderers';
 import { EditorsContext } from './ves-editors-types';
-import { WindowService } from '@theia/core/lib/browser/window/window-service';
 
 export const VesEditorsWidgetOptions = Symbol('VesEditorsWidgetOptions');
 export interface VesEditorsWidgetOptions {
@@ -44,7 +45,7 @@ export interface ItemData {
 };
 
 @injectable()
-export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableSource {
+export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, Saveable, SaveableSource {
     @inject(ColorRegistry)
     private readonly colorRegistry: ColorRegistry;
     @inject(CommandService)
@@ -190,6 +191,14 @@ export class VesEditorsWidget extends ReactWidget implements Saveable, SaveableS
                 }
             }),
         ]);
+    }
+
+    getResourceUri(): URI | undefined {
+        return this.uri;
+    }
+
+    createMoveToUri(resourceUri: URI): URI | undefined {
+        return resourceUri;
     }
 
     protected rerenderOnProjectDataUpdate(): void {
