@@ -1,5 +1,5 @@
 import { Command, CommandContribution, CommandRegistry, CommandService, MenuContribution, MenuModelRegistry, URI, UntitledResourceResolver } from '@theia/core';
-import { AbstractViewContribution, CommonCommands, OpenerService, Widget } from '@theia/core/lib/browser';
+import { AbstractViewContribution, CommonCommands, OpenerService, Widget, open } from '@theia/core/lib/browser';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { UserWorkingDirectoryProvider } from '@theia/core/lib/browser/user-working-directory-provider';
@@ -109,9 +109,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         for (const typeId of Object.keys(types || {})) {
             const type = types![typeId];
 
-            // TODO: disabled for now since the Save As command is not working for
-            // untitled editors files. Need to investigate why that is the case.
-            /*
+            // TODO: Saving untitled editors is a bit buggy. Need to investigate why that is the case.
             if (type.file?.startsWith('.')) {
                 commandRegistry.registerCommand(Command.toLocalizedCommand(
                     {
@@ -130,7 +128,6 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                     },
                 });
             }
-            */
 
             // TODO: hide from command palette
             if (type.forFiles?.length) {
