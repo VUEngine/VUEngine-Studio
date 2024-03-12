@@ -1,0 +1,38 @@
+.vesMediaPreview {
+    align-items: center;
+    display: flex;
+    height: 100%;
+    justify-content: center;
+}
+
+.vesMediaPreview audio, 
+.vesMediaPreview img, 
+.vesMediaPreview video {
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, .2);
+}
+
+.vesMediaPreview img {
+    background-image: linear-gradient(45deg, rgb(230, 230, 230) 25%, transparent 25%, transparent 75%, rgb(230, 230, 230) 75%, rgb(230, 230, 230)), 
+        linear-gradient(45deg, rgb(230, 230, 230) 25%, transparent 25%, transparent 75%, rgb(230, 230, 230) 75%, rgb(230, 230, 230));
+    background-position: 0 0, 8px 8px;
+    background-size: 16px 16px;
+    /* cursor: zoom-in; */
+}
+body.theia-dark .vesMediaPreview img,
+body.theia-hc .vesMediaPreview img {
+    background-image: linear-gradient(45deg, rgb(20, 20, 20) 25%, transparent 25%, transparent 75%, rgb(20, 20, 20) 75%, rgb(20, 20, 20)),
+        linear-gradient(45deg, rgb(20, 20, 20) 25%, transparent 25%, transparent 75%, rgb(20, 20, 20) 75%, rgb(20, 20, 20));
+}
+
+.vesMediaPreview.scale-to-fit img,
+.vesMediaPreview.scale-to-fit video {
+    max-width: calc(100% - 20px);
+    max-height: calc(100% - 20px);
+    object-fit: contain;
+}
+
+.vesMediaPreview audio {
+    height: 54px;
+    border-radius: 54px;
+    padding: 0 calc(2 * var(--theia-ui-padding));
+}

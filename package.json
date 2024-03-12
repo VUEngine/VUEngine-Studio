@@ -94,6 +94,7 @@
     "vscode.less",
     "vscode.lua",
     "vscode.markdown-math",
+    "vscode.media-preview",
     "vscode.microsoft-authentication",
     "vscode.npm",
     "vscode.objective-c",

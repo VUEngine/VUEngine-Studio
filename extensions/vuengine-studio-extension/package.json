@@ -133,6 +133,9 @@
       "frontend": "lib/images/browser/ves-images-frontend-module"
     },
     {
+      "frontend": "lib/media-preview/browser/ves-media-preview-frontend-module"
+    },
+    {
       "backend": "lib/i18n/node/ves-i18n-backend-module"
     },
     {
