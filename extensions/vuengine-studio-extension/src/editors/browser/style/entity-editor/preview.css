@@ -73,32 +73,3 @@
     transform: rotate(-45deg);
     width: 150%;
 }
-
-.jsonforms-container .preview-options {
-    align-items: center;
-    bottom: var(--padding);
-    display: flex;
-    flex-flow: row nowrap;
-    gap: 15px;
-    justify-content: space-between;
-    left: var(--padding);
-    position: absolute;
-    right: var(--padding);
-    z-index: 999999999;
-}
-
-.jsonforms-container .preview-options .theia-button {
-    padding: 0;
-    align-items: center;
-    display: flex;
-    justify-content: center;
-    border-radius: 5px;
-}
-
-.jsonforms-container .preview-options .theia-input {
-    background-color: var(--theia-editorGroupHeader-tabsBackground);
-    border-radius: 5px;
-    padding: 0px;
-    text-align: center;
-    width: 50px;
-}

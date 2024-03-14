@@ -1,0 +1,10 @@
+.theia-button.controls-button {
+    align-items: center;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    margin-left: 0;
+    min-height: calc(2 * var(--theia-border-width) + var(--theia-content-line-height) + 2px);
+    min-width: 32px;
+    padding: 0;
+}

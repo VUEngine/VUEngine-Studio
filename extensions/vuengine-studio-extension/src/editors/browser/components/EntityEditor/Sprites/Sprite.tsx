@@ -353,12 +353,12 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                         {dimensions[0].length > 0 &&
                             <>
                                 <div>
-                                    {dimensions[0][0]}×{dimensions[0][1]} px
+                                    {dimensions[0][0]} × {dimensions[0][1]} px
                                 </div>
                                 {data.components?.animations?.length > 0 && !isMultiFileAnimation && data.animations?.totalFrames &&
                                     <div>
                                         (
-                                        {dimensions[0][0]}×{Math.round(dimensions[0][1] / data.animations?.totalFrames * 100) / 100} px × {data.animations?.totalFrames}
+                                        {dimensions[0][0]} × {Math.round(dimensions[0][1] / data.animations?.totalFrames * 100) / 100} px × {data.animations?.totalFrames}
                                         )
                                     </div>
                                 }
@@ -405,12 +405,12 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                             {dimensions[1].length > 0 &&
                                 <>
                                     <div>
-                                        {dimensions[1][0]}×{dimensions[1][1]} px
+                                        {dimensions[1][0]} × {dimensions[1][1]} px
                                     </div>
                                     {data.components?.animations?.length > 0 && !isMultiFileAnimation && data.animations?.totalFrames &&
                                         <div>
                                             (
-                                            {dimensions[1][0]}×{Math.round(dimensions[1][1] / data.animations?.totalFrames * 100) / 100} px × {data.animations?.totalFrames}
+                                            {dimensions[1][0]} × {Math.round(dimensions[1][1] / data.animations?.totalFrames * 100) / 100} px × {data.animations?.totalFrames}
                                             )
                                         </div>
                                     }

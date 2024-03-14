@@ -5,8 +5,11 @@ import URI from '@theia/core/lib/common/uri';
 import { Message } from '@theia/core/shared/@phosphor/messaging';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
-import { MediaFileType, SUPPORTED_AUDIO_FILES, SUPPORTED_IMAGE_FILES, SUPPORTED_VIDEO_FILES } from './ves-media-preview-types';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import MediaPreviewAudio from './components/MediaPreviewAudio';
+import MediaPreviewImage from './components/MediaPreviewImage';
+import MediaPreviewVideo from './components/MediaPreviewVideo';
+import { MEDIA_PREVIEW_SUPPORTED_AUDIO_FILES, MEDIA_PREVIEW_SUPPORTED_IMAGE_FILES, MEDIA_PREVIEW_SUPPORTED_VIDEO_FILES, MediaFileType } from './ves-media-preview-types';
 
 export const VesMediaPreviewWidgetOptions = Symbol('VesMediaPreviewWidgetOptions');
 export interface VesMediaPreviewWidgetOptions {
@@ -42,11 +45,11 @@ export class VesMediaPreviewWidget extends ReactWidget implements NavigatableWid
     this.title.closable = true;
 
     const ext = this.uri.path.ext;
-    if (SUPPORTED_IMAGE_FILES.includes(ext)) {
+    if (MEDIA_PREVIEW_SUPPORTED_IMAGE_FILES.includes(ext)) {
       this.type = MediaFileType.image;
-    } else if (SUPPORTED_VIDEO_FILES.includes(ext)) {
+    } else if (MEDIA_PREVIEW_SUPPORTED_VIDEO_FILES.includes(ext)) {
       this.type = MediaFileType.video;
-    } else if (SUPPORTED_AUDIO_FILES.includes(ext)) {
+    } else if (MEDIA_PREVIEW_SUPPORTED_AUDIO_FILES.includes(ext)) {
       this.type = MediaFileType.audio;
     }
 
@@ -68,24 +71,20 @@ export class VesMediaPreviewWidget extends ReactWidget implements NavigatableWid
   protected render(): React.ReactNode {
     this.title.iconClass = `file-icon ${this.labelProvider.getIcon(this.uri)}`;
 
-    return <div className='vesMediaPreview scale-to-fit'>
+    return <div className='vesMediaPreview'>
       {this.type === MediaFileType.image &&
-        <img
+        <MediaPreviewImage
           src={this.uri.path.fsPath()}
         />
       }
       {this.type === MediaFileType.audio &&
-        <audio
-          preload="auto"
+        <MediaPreviewAudio
           src={this.uri.path.fsPath()}
-          controls
         />
       }
       {this.type === MediaFileType.video &&
-        <video
+        <MediaPreviewVideo
           src={this.uri.path.fsPath()}
-          playsInline
-          controls
         />
       }
     </div>;

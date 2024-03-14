@@ -2,6 +2,7 @@ import { CornersOut, Square } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import ColorSelector from '../../Common/ColorSelector';
+import ZoomControls from '../../Common/Controls/ZoomControls';
 import HContainer from '../../Common/HContainer';
 import { clamp } from '../../Common/Utils';
 import VContainer from '../../Common/VContainer';
@@ -40,8 +41,7 @@ export default function PreviewOptions(props: PreviewOptionsProps): React.JSX.El
     });
   };
 
-  const applyZoom = (e: React.MouseEvent, z: number) => {
-    e.stopPropagation();
+  const applyZoom = (z: number) => {
     if (setZoom) {
       if (z < minZoom) {
         z = minZoom;
@@ -53,35 +53,19 @@ export default function PreviewOptions(props: PreviewOptionsProps): React.JSX.El
   };
 
   return (
-    <div className='preview-options'>
+    <div className='controls-container'>
       <HContainer gap={15}>
-        <HContainer gap={3}>
-          <button
-            className='theia-button secondary'
-            disabled={zoom === minZoom}
-            onClick={e => applyZoom(e, roundZoomSteps ? Math.round(zoom - zoomStep) : zoom - zoomStep)}
-            title={nls.localize('vuengine/editors/zoomOut', 'Zoom Out')}
-          >
-            <i className='codicon codicon-zoom-out' />
-          </button>
-          <input
-            type='text'
-            className='theia-input'
-            value={Math.round(zoom * 100) / 100}
-            disabled
-            title={nls.localize('vuengine/editors/currentZoomFactor', 'Current Zoom Factor')}
-          />
-          <button
-            className='theia-button secondary'
-            disabled={zoom === maxZoom}
-            onClick={e => applyZoom(e, roundZoomSteps ? Math.round(zoom + zoomStep) : zoom + zoomStep)}
-            title={nls.localize('vuengine/editors/zoomIn', 'Zoom In')}
-          >
-            <i className='codicon codicon-zoom-in' />
-          </button>
-        </HContainer>
+        <ZoomControls
+          zoom={zoom}
+          defaultZoom={1}
+          min={minZoom}
+          max={maxZoom}
+          step={zoomStep}
+          roundZoomSteps={roundZoomSteps ?? false}
+          applyZoom={applyZoom}
+        />
         <button
-          className='theia-button secondary'
+          className='theia-button secondary controls-button'
           onClick={e => { e.stopPropagation(); center(); }}
           title={nls.localize('vuengine/editors/centerView', 'Center View')}
         >
@@ -90,7 +74,7 @@ export default function PreviewOptions(props: PreviewOptionsProps): React.JSX.El
       </HContainer>
       <HContainer gap={15}>
         <button
-          className='theia-button secondary'
+          className='theia-button secondary controls-button'
           onClick={toggleAnaglyph}
           style={{
             paddingLeft: 4,

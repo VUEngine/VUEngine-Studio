@@ -16,7 +16,7 @@
         linear-gradient(45deg, rgb(230, 230, 230) 25%, transparent 25%, transparent 75%, rgb(230, 230, 230) 75%, rgb(230, 230, 230));
     background-position: 0 0, 8px 8px;
     background-size: 16px 16px;
-    /* cursor: zoom-in; */
+    image-rendering: pixelated;
 }
 body.theia-dark .vesMediaPreview img,
 body.theia-hc .vesMediaPreview img {
@@ -24,8 +24,8 @@ body.theia-hc .vesMediaPreview img {
         linear-gradient(45deg, rgb(20, 20, 20) 25%, transparent 25%, transparent 75%, rgb(20, 20, 20) 75%, rgb(20, 20, 20));
 }
 
-.vesMediaPreview.scale-to-fit img,
-.vesMediaPreview.scale-to-fit video {
+.vesMediaPreview img.scale-to-fit,
+.vesMediaPreview video {
     max-width: calc(100% - 20px);
     max-height: calc(100% - 20px);
     object-fit: contain;

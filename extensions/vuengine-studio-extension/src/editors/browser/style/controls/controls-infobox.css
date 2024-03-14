@@ -1,0 +1,11 @@
+.controls-infobox {
+    background-color: var(--theia-editorGroupHeader-tabsBackground);
+    border-radius: 5px;
+    line-height: var(--theia-content-line-height);
+    min-width: 32px;
+    padding: 2px calc(2 * var(--theia-ui-padding));
+    text-align: center;
+    text-overflow: ellipsis;
+    user-select: none;
+    white-space: nowrap;
+}

@@ -44,7 +44,7 @@ export default function SpriteEditorStatus(props: SpriteEditorStatusProps): Reac
                 <MagnifyingGlass /> {canvasPanZoom && (Math.round(canvasPanZoom.scale * 100) / 100)}
             </HContainer>
             <HContainer alignItems='center' gap={2}>
-                <FrameCorners /> {dimensions.columnCount}×{dimensions.rowCount}
+                <FrameCorners /> {dimensions.columnCount} × {dimensions.rowCount}
             </HContainer>
             <HContainer alignItems='center' gap={2}>
                 {hoveredPixel && <>
