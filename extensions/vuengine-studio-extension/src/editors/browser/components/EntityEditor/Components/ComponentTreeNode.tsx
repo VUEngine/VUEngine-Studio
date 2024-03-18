@@ -9,6 +9,7 @@ import {
     FilmStrip,
     Hexagon,
     Image,
+    Images,
     Plus,
     Selection,
     SelectionInverse,
@@ -91,6 +92,10 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                 case 'scripts':
                     return <TreeStructure size={16} />;
                 case 'sprites':
+                    if ((data.components.sprites[index].texture?.files?.length ?? 0) +
+                        (data.components.sprites[index].texture?.files2?.length ?? 0) > 1) {
+                        return <Images size={16} />;
+                    }
                     return <Image size={16} />;
                 case 'wireframes':
                     switch (data.components.wireframes[index].wireframe.type) {

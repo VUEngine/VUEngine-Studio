@@ -316,7 +316,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
             <VContainer>
                 <InfoLabel
                     label={sprite.displayMode === DisplayMode.Stereo
-                        ? nls.localize('vuengine/entityEditor/sourceImageLeftEye', 'Source Image (Left Eye)')
+                        ? nls.localize('vuengine/entityEditor/sourceImagesStereo', 'Source Images (Left/Right Eye)')
                         : nls.localize('vuengine/entityEditor/sourceImage', 'Source Image')
                     }
                     tooltip={nls.localize(
@@ -326,7 +326,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                         'or multiple files, where each represents one animation frame.'
                     )}
                 />
-                <HContainer alignItems='center' gap={0} wrap='wrap'>
+                <HContainer alignItems='center' gap={3} wrap='wrap'>
                     <div style={{ paddingRight: 10 }}>
                         <Images
                             data={sprite.texture?.files || []}
@@ -366,19 +366,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                         }
                     </VContainer>
                 </HContainer>
-            </VContainer >
-            {sprite.displayMode === DisplayMode.Stereo &&
-                <VContainer>
-                    <InfoLabel
-                        label={nls.localize('vuengine/entityEditor/sourceImageRightEye', 'Source Image (Right Eye)')}
-                        tooltip={nls.localize(
-                            'vuengine/entityEditor/filesDescription',
-                            'PNG image to be used as texture. Must be four color indexed mode with the proper palette. ' +
-                            'When animations are enabled, select either a single file containing a vertical spritesheet, ' +
-                            'or multiple files, where each represents one animation frame.'
-                        )}
-                    />
-                    <HContainer alignItems='center' gap={0} wrap='wrap'>
+                {sprite.displayMode === DisplayMode.Stereo &&
+                    <HContainer alignItems='center' gap={3} wrap='wrap'>
                         <div style={{ paddingRight: 10 }}>
                             <Images
                                 data={sprite.texture?.files2 || []}
@@ -418,8 +407,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                             }
                         </VContainer>
                     </HContainer>
-                </VContainer>
-            }
+                }
+            </VContainer >
             <HContainer gap={15} wrap='wrap'>
                 <VContainer>
                     <label>
