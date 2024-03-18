@@ -1,6 +1,6 @@
 import { isBoolean, isNumber } from '@theia/core';
 import React from 'react';
-import { ConversionResult, ImageCompressionType } from '../../../../images/browser/ves-images-types';
+import { ConversionResult, ConversionResultMapData, ImageCompressionType } from '../../../../images/browser/ves-images-types';
 import { EditorsContextType } from '../../ves-editors-types';
 import { DataSection } from '../Common/CommonTypes';
 import HContainer from '../Common/HContainer';
@@ -194,34 +194,22 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
         shared: !entityData.components?.animations.length && entityData.sprites.sharedTiles,
       }
     };
-    const totalSprites = entityData.components?.sprites?.length || 0;
+    const totalSprites = entityData.components?.sprites?.length ?? 0;
 
     if (!entityData.components?.animations.length &&
       (entityData.components?.sprites?.length === 1 || entityData.sprites?.sharedTiles)
     ) {
       const files: string[] = [];
-      // keep track of added files to be able to map back maps later
-      const spriteFilesIndex: { [key: string]: number } = {};
-      let mapCounter = 0;
-
-      // for loop to handle sprites synchronously to not mess up order
-      for (let i = 0; i < entityData.components?.sprites?.length || 0; i++) {
-        const s = entityData.components.sprites[i];
-        if (s.texture?.files?.length) {
-          const file = s.texture.files[0];
-          if (!spriteFilesIndex[file]) {
-            files.push(file);
-            spriteFilesIndex[file] = mapCounter++;
+      entityData.components?.sprites?.map(s => {
+        [s.texture?.files, s.texture?.files2].map(f => {
+          if (f?.length) {
+            const file = f[0];
+            if (!files.includes(file)) {
+              files.push(file);
+            }
           }
-        }
-        if (s.texture?.files2?.length) {
-          const file = s.texture.files2[0];
-          if (!spriteFilesIndex[file]) {
-            files.push(file);
-            spriteFilesIndex[file] = mapCounter++;
-          }
-        }
-      }
+        });
+      });
 
       const newImageData = await services.vesImagesService.convertImage(fileUri, {
         ...baseConfig,
@@ -243,40 +231,50 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
         files,
       });
 
-      console.log('spriteFilesIndex', spriteFilesIndex);
-      console.log('newImageData', newImageData);
-      console.log('files', files);
-
       // map imagedata back to sprites
-      // for loop to handle sprites synchronously to not mess up order
-      for (let i = 0; i < entityData.components?.sprites?.length || 0; i++) {
-        const s = entityData.components.sprites[i];
+      await services.workspaceService.ready;
+      const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
+      await Promise.all(entityData.components?.sprites?.map(async (s, i) => {
         if (s.texture?.files?.length) {
-          const maps = [newImageData.maps[spriteFilesIndex[s.texture.files[0]]]];
-          if (s.texture?.files2?.length) {
-            maps.push(newImageData.maps[spriteFilesIndex[s.texture.files2[0]]]);
+          if (s.texture?.files?.length) {
+            const maps: ConversionResultMapData[] = [];
+            const name = workspaceRootUri.resolve(s.texture.files[0]).path.name;
+            const foundMap = newImageData.maps.find(m => m.name === name);
+            if (foundMap) {
+              maps.push(foundMap);
+            }
+            if (s.texture?.files2?.length) {
+              const name2 = workspaceRootUri.resolve(s.texture.files2[0]).path.name;
+              const foundMap2 = newImageData.maps.find(m => m.name === name2);
+              if (foundMap2) {
+                maps.push(foundMap2);
+              }
+            }
+            const compressedImageData = await this.compressImageDataAsJson({
+              tiles: (i === 0) ? newImageData.tiles : undefined,
+              maps,
+            });
+            s._imageData = {
+              ...compressedImageData,
+              _dupeIndex: 1,
+            };
+          } else {
+            s._imageData = undefined;
           }
-          console.log('maps', maps);
-          const compressedImageData = await this.compressImageDataAsJson({
-            tiles: (i === 0) ? newImageData.tiles : undefined,
-            maps,
-          });
-          s._imageData = {
-            ...compressedImageData,
-            _dupeIndex: 1,
-          };
-        } else {
-          s._imageData = undefined;
         }
-      };
+      }));
     } else {
       const convertedFilesMap: { [key: string]: ConversionResult & { _dupeIndex: number } } = {};
       // for loop to handle sprites synchronously for dupe detection
       for (let i = 0; i < totalSprites; i++) {
         const sprite = entityData.components?.sprites[i];
         if (sprite.texture?.files?.length) {
+          const files = [
+            ...sprite.texture.files,
+            ...(sprite.texture.files2 ?? []),
+          ];
           // keep track of already converted files to avoid converting the same image twice
-          const checksum = require('crc-32').str(JSON.stringify(sprite.texture?.files || ''));
+          const checksum = require('crc-32').str(JSON.stringify(files));
           if (convertedFilesMap[checksum] !== undefined) {
             sprite._imageData = convertedFilesMap[checksum]._dupeIndex;
           } else {
@@ -290,11 +288,9 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
               tileset: {
                 ...baseConfig.tileset,
                 compression: sprite.compression,
+                shared: files.length === 2,
               },
-              files: [
-                ...sprite.texture?.files,
-                ...(sprite.texture?.files2 || []),
-              ],
+              files,
             });
             setGeneratingProgress(i + 1 * 2 - 1, totalSprites * 2);
             const compressedImageData = await this.compressImageDataAsJson(newImageData);
