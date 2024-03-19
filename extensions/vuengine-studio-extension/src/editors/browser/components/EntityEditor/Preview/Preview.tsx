@@ -44,7 +44,7 @@ export default function Preview(): React.JSX.Element {
     if (animate) {
       timer = setInterval(() => {
         setCurrentAnimationStep(prevAnimationStep =>
-          prevAnimationStep + 1 < (animation?.frames?.length || 1) ? prevAnimationStep + 1 : 0
+          prevAnimationStep + 1 <= (animation?.frames?.length || 1) ? prevAnimationStep + 1 : 1
         );
       },
         frameMultiplicator * 20 * (animation?.cycles || 8)
@@ -123,7 +123,7 @@ export default function Preview(): React.JSX.Element {
       />
       {animate &&
         <div className='current-frame'>
-          {nls.localize('vuengine/entityEditor/frame', 'Frame')} {currentAnimationStep + 1}
+          {nls.localize('vuengine/entityEditor/frame', 'Frame')} {currentAnimationStep}
         </div>
       }
       <div
@@ -142,7 +142,9 @@ export default function Preview(): React.JSX.Element {
             sprite={sprite}
             animate={animate}
             frames={data.animations?.totalFrames || 1}
-            currentAnimationFrame={animation?.frames[currentAnimationStep - 1] ?? currentAnimationStep}
+            currentAnimationFrame={animation?.frames && animation?.frames[currentAnimationStep - 1]
+              ? animation?.frames[currentAnimationStep - 1] - 1
+              : currentAnimationStep}
             highlighted={state.currentComponent === `sprites-${i}`}
             palette={state.preview.palettes[sprite.texture.palette]}
           />

@@ -39,6 +39,8 @@ const CLONABLE_COMPONENT_TYPES = [
     'wireframes',
 ];
 
+const ADDABLE_COMPONENT_TYPES = CLONABLE_COMPONENT_TYPES;
+
 type HideableComponent = 'children' | 'colliders' | 'sprites' | 'wireframes';
 const HIDEABLE_COMPONENT_TYPES = [
     'children',
@@ -92,8 +94,9 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                 case 'scripts':
                     return <TreeStructure size={16} />;
                 case 'sprites':
-                    if ((data.components.sprites[index].texture?.files?.length ?? 0) +
-                        (data.components.sprites[index].texture?.files2?.length ?? 0) > 1) {
+                    if (data.components.sprites[index].displayMode === DisplayMode.Stereo ||
+                        ((data.components.sprites[index].texture?.files?.length ?? 0) +
+                            (data.components.sprites[index].texture?.files2?.length ?? 0) > 1)) {
                         return <Images size={16} />;
                     }
                     return <Image size={16} />;
@@ -274,11 +277,13 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
             key: 'children',
             label: nls.localize('vuengine/entityEditor/child', 'Child'),
             allowAdd: true,
-        }, {
+        }, /*
+        {
             key: 'scripts',
             label: nls.localize('vuengine/entityEditor/script', 'Script'),
             allowAdd: true,
-        }, {
+        },*/
+        {
             key: 'physics',
             label: nls.localize('vuengine/entityEditor/physics', 'Physical Properties'),
             allowAdd: !data.physics.enabled,
@@ -594,7 +599,7 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                         title={nls.localize('vuengine/entityEditor/toggleComponentVisibility', 'Toggle Component Visibility')}
                     />
                 }
-                {!node.isLeaf && node.parent?.isRoot && HIDEABLE_COMPONENT_TYPES.includes(type) &&
+                {!node.isLeaf && node.parent?.isRoot && ADDABLE_COMPONENT_TYPES.includes(type) &&
                     <i
                         className='codicon codicon-plus'
                         onClick={() => doAddComponent(type)}

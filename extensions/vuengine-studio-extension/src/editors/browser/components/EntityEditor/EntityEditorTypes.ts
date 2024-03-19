@@ -33,6 +33,8 @@ export interface EntityEditorContextType {
 
 export const EntityEditorLayoutStorageName = 'ves-editors-entityEditor-layout';
 
+export const MIN_ENTITY_PIXEL_SIZE = 0;
+export const MAX_ENTITY_PIXEL_SIZE = 512;
 export const MIN_TEXTURE_PADDING = 0;
 export const MAX_TEXTURE_PADDING = 255;
 export const MIN_ANIMATION_CYLCES = 1;
@@ -54,6 +56,8 @@ export const COLLIDER_LINEFIELD_LENGTH_MIN = 0;
 export const COLLIDER_LINEFIELD_LENGTH_MAX = 512;
 export const COLLIDER_LINEFIELD_THICKNESS_MIN = 0;
 export const COLLIDER_LINEFIELD_THICKNESS_MAX = 512;
+export const MIN_COLLIDER_PIXEL_SIZE = 0;
+export const MAX_COLLIDER_PIXEL_SIZE = 512;
 export const WIREFRAME_CANVAS_PADDING = 1;
 
 export enum AxisNumeric {
@@ -157,9 +161,10 @@ export type ComponentData = AnimationData | BehaviorData | PositionedEntityData 
 export interface EntityData {
     _id: string
     extraProperties: {
-        enabled: boolean
+        enabled: boolean // flag just for the UI to be able to treat as component
         extraInfo: string
         pixelSize: PixelSize
+        customAllocator: string
     }
     animations: {
         default: number

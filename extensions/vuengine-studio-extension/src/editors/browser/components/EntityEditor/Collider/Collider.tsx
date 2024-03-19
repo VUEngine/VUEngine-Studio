@@ -6,6 +6,7 @@ import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/HContainer';
 import MultiSelect, { MultiSelectOption } from '../../Common/MultiSelect';
 import RadioSelect from '../../Common/RadioSelect';
+import { clamp } from '../../Common/Utils';
 import VContainer from '../../Common/VContainer';
 import { ColliderType } from '../../Common/VUEngineTypes';
 import {
@@ -14,8 +15,9 @@ import {
     COLLIDER_LINEFIELD_THICKNESS_MAX,
     COLLIDER_LINEFIELD_THICKNESS_MIN,
     ColliderData,
+    MAX_COLLIDER_PIXEL_SIZE,
+    MIN_COLLIDER_PIXEL_SIZE,
 } from '../EntityEditorTypes';
-import { clamp } from '../../Common/Utils';
 
 const MIN_COLLIDER_ROTATION = -360;
 const MAX_COLLIDER_ROTATION = 360;
@@ -73,29 +75,11 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
         });
     };
 
-    const setPixelSizeX = (x: number): void => {
+    const setPixelSize = (a: 'x' | 'y' | 'z', value: number): void => {
         updateCollider({
             pixelSize: {
                 ...collider.pixelSize,
-                x,
-            },
-        });
-    };
-
-    const setPixelSizeY = (y: number): void => {
-        updateCollider({
-            pixelSize: {
-                ...collider.pixelSize,
-                y,
-            },
-        });
-    };
-
-    const setPixelSizeZ = (z: number): void => {
-        updateCollider({
-            pixelSize: {
-                ...collider.pixelSize,
-                z,
+                [a]: clamp(value, MIN_COLLIDER_PIXEL_SIZE, MAX_COLLIDER_PIXEL_SIZE),
             },
         });
     };
@@ -319,21 +303,21 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             style={{ width: 54 }}
                             type='number'
                             value={collider.pixelSize.x}
-                            onChange={e => setPixelSizeX(parseFloat(e.target.value))}
+                            onChange={e => setPixelSize('x', parseFloat(e.target.value))}
                         />
                         <input
                             className='theia-input'
                             style={{ width: 54 }}
                             type='number'
                             value={collider.pixelSize.y}
-                            onChange={e => setPixelSizeY(parseFloat(e.target.value))}
+                            onChange={e => setPixelSize('y', parseFloat(e.target.value))}
                         />
                         <input
                             className='theia-input'
                             style={{ width: 54 }}
                             type='number'
                             value={collider.pixelSize.z}
-                            onChange={e => setPixelSizeZ(parseFloat(e.target.value))}
+                            onChange={e => setPixelSize('z', parseFloat(e.target.value))}
                         />
                     </HContainer>
                 </VContainer>

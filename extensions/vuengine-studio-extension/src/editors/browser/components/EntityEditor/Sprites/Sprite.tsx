@@ -326,7 +326,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                         'or multiple files, where each represents one animation frame.'
                     )}
                 />
-                <HContainer alignItems='center' gap={3} wrap='wrap'>
+                <HContainer alignItems='center' gap={3} wrap='nowrap'>
                     <div style={{ paddingRight: 10 }}>
                         <Images
                             data={sprite.texture?.files || []}
@@ -340,7 +340,18 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     <VContainer grow={1}>
                         {(sprite.texture?.files || []).length === 0 &&
                             <div className='empty'>
-                                {nls.localize('vuengine/entityEditor/noImageFileSelect', 'No Image File Selected')}
+                                {sprite.displayMode !== DisplayMode.Stereo &&
+                                    nls.localize(
+                                        'vuengine/entityEditor/noImageFileSelected',
+                                        'No Image File Selected'
+                                    )
+                                }
+                                {sprite.displayMode === DisplayMode.Stereo &&
+                                    nls.localize(
+                                        'vuengine/entityEditor/noImageFileSelectedForLeftEye',
+                                        'No Image File Selected For The Left Eye'
+                                    )
+                                }
                             </div>
                         }
 
@@ -367,7 +378,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     </VContainer>
                 </HContainer>
                 {sprite.displayMode === DisplayMode.Stereo &&
-                    <HContainer alignItems='center' gap={3} wrap='wrap'>
+                    <HContainer alignItems='center' gap={3} wrap='nowrap'>
                         <div style={{ paddingRight: 10 }}>
                             <Images
                                 data={sprite.texture?.files2 || []}
@@ -381,7 +392,10 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                         <VContainer grow={1}>
                             {(sprite.texture?.files2 || []).length === 0 &&
                                 <div className='empty'>
-                                    {nls.localize('vuengine/entityEditor/noImageFileSelect', 'No Image File Selected')}
+                                    {nls.localize(
+                                        'vuengine/entityEditor/noImageFileSelectedForRightEye',
+                                        'No Image File Selected For The Right Eye'
+                                    )}
                                 </div>
                             }
 

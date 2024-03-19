@@ -54,6 +54,7 @@
     justify-content: center;
     overflow: hidden;
     position: relative;
+    width: 32px;
 }
 
 .jsonforms-container .preview-container-world .sprite-error::after {
