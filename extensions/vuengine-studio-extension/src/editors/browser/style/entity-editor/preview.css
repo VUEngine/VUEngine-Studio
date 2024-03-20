@@ -22,7 +22,6 @@
 .jsonforms-container .preview-container .current-frame {
     left: var(--padding);
     position: absolute;
-    text-align: right;
     top: var(--padding);
     z-index: 10;
 }

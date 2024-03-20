@@ -55,8 +55,8 @@ const api: VesCoreAPI = {
     findFiles: function (base: string, pattern: string | string[], options?: GlobOptionsWithFileTypesUnset): string[] {
         return ipcRenderer.sendSync(VES_CHANNEL_FIND_FILES, base, pattern, options);
     },
-    getImageDimensions: async function (path: string): Promise<ISizeCalculationResult> {
-        return ipcRenderer.invoke(VES_CHANNEL_GET_IMAGE_DIMENSIONS, path);
+    getImageDimensions: function (path: string): ISizeCalculationResult {
+        return ipcRenderer.sendSync(VES_CHANNEL_GET_IMAGE_DIMENSIONS, path);
     },
     getPhysicalCpuCount: function (): number {
         return ipcRenderer.sendSync(VES_CHANNEL_GET_PHYSICAL_CPU_COUNT);

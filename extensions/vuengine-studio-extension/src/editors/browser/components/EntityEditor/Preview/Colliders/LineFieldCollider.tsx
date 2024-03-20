@@ -9,7 +9,7 @@ interface LineFieldFaceProps {
     thickness: number
     displacement: PixelVector
     rotation: PixelRotation
-    highlighted: boolean
+    highlighted: number // number to work around bug styled-component problem with boolean
 }
 
 const LineFieldFace = styled.div<LineFieldFaceProps>`
@@ -34,7 +34,7 @@ const LineFieldFace = styled.div<LineFieldFaceProps>`
 
 interface LineFieldNormalFaceProps {
     thickness: number
-    highlighted: boolean
+    highlighted: number // number to work around bug styled-component problem with boolean
 }
 
 const LineFieldNormalFace = styled.div<LineFieldNormalFaceProps>`
@@ -72,7 +72,7 @@ export default function LineFieldCollider(props: LineFieldColiderProps): React.J
     };
 
     return <LineFieldFace
-        highlighted={highlighted}
+        highlighted={highlighted ? 1 : 0}
         onClick={handleClick}
         axis={a}
         length={l}
@@ -81,7 +81,7 @@ export default function LineFieldCollider(props: LineFieldColiderProps): React.J
         rotation={collider.rotation}
     >
         <LineFieldNormalFace
-            highlighted={highlighted}
+            highlighted={highlighted ? 1 : 0}
             thickness={t}
         />
     </LineFieldFace>;

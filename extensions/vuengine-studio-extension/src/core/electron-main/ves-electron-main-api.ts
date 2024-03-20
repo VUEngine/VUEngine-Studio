@@ -95,7 +95,9 @@ export class VesMainApi implements ElectronMainApplicationContribution {
         ipcMain.handle(VES_CHANNEL_DECOMPRESS, async (event, archivePath, targetPath) =>
             (await decompress.default(archivePath, targetPath)).map(f => f.path)
         );
-        ipcMain.handle(VES_CHANNEL_GET_IMAGE_DIMENSIONS, async (event, path: string) => sizeOf(path));
+        ipcMain.on(VES_CHANNEL_GET_IMAGE_DIMENSIONS, async (event, path: string) => {
+            event.returnValue = sizeOf(path);
+        });
         ipcMain.on(VES_CHANNEL_GET_PHYSICAL_CPU_COUNT, event => {
             event.returnValue = require('physical-cpu-count');
         });

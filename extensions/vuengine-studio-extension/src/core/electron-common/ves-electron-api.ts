@@ -16,7 +16,7 @@ export interface VesCoreAPI {
     checkUpdateAvailable(currentVersion: string): Promise<string | boolean>;
     findFiles(base: string, pattern: string | string[], options?: GlobOptionsWithFileTypesUnset): string[];
     decompress(archivePath: string, targetPath: string): Promise<string[]>;
-    getImageDimensions(path: string): Promise<ISizeCalculationResult>;
+    getImageDimensions(path: string): ISizeCalculationResult;
     getPhysicalCpuCount(): number;
     parsePng(fileContent: FileContent): Promise<ImageData | false>;
     onUsbDeviceChange(handler: () => void): Disposable;

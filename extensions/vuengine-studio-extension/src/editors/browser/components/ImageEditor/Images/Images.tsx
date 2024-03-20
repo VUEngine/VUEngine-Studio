@@ -48,7 +48,7 @@ export default function Images(props: ImagesProps): React.JSX.Element {
                 const resolvedUri = workspaceRootUri.resolve(p);
                 if (await services.fileService.exists(resolvedUri)) {
                     if (showMetaData) {
-                        const dimensions = await window.electronVesCore.getImageDimensions(resolvedUri.path.fsPath());
+                        const dimensions = window.electronVesCore.getImageDimensions(resolvedUri.path.fsPath());
                         meta = `${dimensions.width}×${dimensions.height}`;
                     } else {
                         meta = '';

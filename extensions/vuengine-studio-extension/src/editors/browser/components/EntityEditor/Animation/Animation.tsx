@@ -61,7 +61,7 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
 
     const setFrame = (i: number, frame: number): void => {
         const frames = [...animation.frames];
-        frames[i] = clamp(frame, 1, totalFrames);
+        frames[i] = clamp(frame, 0, totalFrames - 1);
         updateAnimation({ frames });
     };
 
@@ -69,7 +69,7 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
         updateAnimation({
             frames: [
                 ...animation.frames,
-                Math.min((animation.frames.pop() || 0) + 1, totalFrames),
+                Math.min((animation.frames.pop() ?? -1) + 1, totalFrames - 1),
             ]
         });
     };
@@ -164,10 +164,10 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                                 className='theia-input'
                                 style={{ width: 40 }}
                                 type='number'
-                                min={1}
-                                max={totalFrames}
-                                value={animation.frames[i]}
-                                onChange={e => setFrame(i, parseInt(e.target.value))}
+                                min={0}
+                                max={totalFrames - 1}
+                                value={animation.frames[i] + 1}
+                                onChange={e => setFrame(i, parseInt(e.target.value) - 1)}
                             />
                             <button
                                 className="theia-button secondary"

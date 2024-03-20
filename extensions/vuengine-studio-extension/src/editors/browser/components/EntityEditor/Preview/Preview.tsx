@@ -40,16 +40,27 @@ export default function Preview(): React.JSX.Element {
     ? data.components?.animations[currentAnimation]
     : undefined;
 
+  const actualCurrentFrame = animation?.frames?.length
+    ? animation?.frames[currentAnimationStep] ?? 0
+    : currentAnimationStep;
+
   const setAnimationInterval = () => {
     if (animate) {
       timer = setInterval(() => {
         setCurrentAnimationStep(prevAnimationStep =>
-          prevAnimationStep + 1 <= (animation?.frames?.length || 1) ? prevAnimationStep + 1 : 1
+          prevAnimationStep + 1 < (animation?.frames?.length ?? 1)
+            ? prevAnimationStep + 1
+            : 0
         );
       },
-        frameMultiplicator * 20 * (animation?.cycles || 8)
+        frameMultiplicator * 20 * (animation?.cycles ?? 8)
       );
     }
+  };
+
+  const clearAnimationInterval = () => {
+    clearInterval(timer);
+    setCurrentAnimationStep(0);
   };
 
   const onWheel = (e: React.WheelEvent): void => {
@@ -95,7 +106,7 @@ export default function Preview(): React.JSX.Element {
 
   useEffect(() => {
     setAnimationInterval();
-    return () => clearInterval(timer);
+    return () => clearAnimationInterval();
   }, [
     animate,
     animation,
@@ -123,7 +134,12 @@ export default function Preview(): React.JSX.Element {
       />
       {animate &&
         <div className='current-frame'>
-          {nls.localize('vuengine/entityEditor/frame', 'Frame')} {currentAnimationStep}
+          <div>
+            {nls.localize('vuengine/entityEditor/step', 'Step')} {currentAnimationStep + 1}
+          </div>
+          <div>
+            {nls.localize('vuengine/entityEditor/frame', 'Frame')} {actualCurrentFrame + 1}
+          </div>
         </div>
       }
       <div
@@ -142,9 +158,7 @@ export default function Preview(): React.JSX.Element {
             sprite={sprite}
             animate={animate}
             frames={data.animations?.totalFrames || 1}
-            currentAnimationFrame={animation?.frames && animation?.frames[currentAnimationStep - 1]
-              ? animation?.frames[currentAnimationStep - 1] - 1
-              : currentAnimationStep}
+            currentAnimationFrame={actualCurrentFrame}
             highlighted={state.currentComponent === `sprites-${i}`}
             palette={state.preview.palettes[sprite.texture.palette]}
           />

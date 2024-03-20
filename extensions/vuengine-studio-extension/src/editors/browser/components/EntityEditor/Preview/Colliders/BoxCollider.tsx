@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { ColliderData, EntityEditorContext, EntityEditorContextType } from '../../EntityEditorTypes';
 
 interface CuboidProps {
-    highlighted: boolean
+    highlighted: number // number to work around bug styled-component problem with boolean
 }
 
 const Cuboid = styled.div<CuboidProps>`
@@ -15,7 +15,7 @@ const Cuboid = styled.div<CuboidProps>`
 `;
 
 interface CuboidFaceProps {
-    highlighted: boolean
+    highlighted: number // number to work around bug styled-component problem with boolean
 }
 
 const CuboidFace = styled.div<CuboidFaceProps>`
@@ -74,13 +74,13 @@ const CuboidFaceRight = styled(CuboidFace)`
 `;
 */
 
-export interface BoxColiderProps {
+export interface BoxColliderProps {
     index: number
     highlighted: boolean
     collider: ColliderData
 }
 
-export default function BoxCollider(props: BoxColiderProps): React.JSX.Element {
+export default function BoxCollider(props: BoxColliderProps): React.JSX.Element {
     const { setState } = useContext(EntityEditorContext) as EntityEditorContextType;
     const { index, highlighted, collider } = props;
 
@@ -90,7 +90,6 @@ export default function BoxCollider(props: BoxColiderProps): React.JSX.Element {
     };
 
     return <Cuboid
-        highlighted={highlighted}
         onClick={handleClick}
         style={{
             // @ts-ignore
@@ -102,10 +101,10 @@ export default function BoxCollider(props: BoxColiderProps): React.JSX.Element {
             cursor: 'pointer',
         }}
     >
-        <CuboidFaceFront highlighted={highlighted} />
-        <CuboidFaceBack highlighted={highlighted} />
-        <CuboidFaceTop highlighted={highlighted} />
-        <CuboidFaceBottom highlighted={highlighted} />
+        <CuboidFaceFront highlighted={highlighted ? 1 : 0} />
+        <CuboidFaceBack highlighted={highlighted ? 1 : 0} />
+        <CuboidFaceTop highlighted={highlighted ? 1 : 0} />
+        <CuboidFaceBottom highlighted={highlighted ? 1 : 0} />
         {/* <CuboidFaceLeft highlighted={highlighted} /> */}
         {/* <CuboidFaceRight highlighted={highlighted} /> */}
     </Cuboid>;

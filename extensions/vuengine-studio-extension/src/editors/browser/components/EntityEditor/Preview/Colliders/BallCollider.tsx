@@ -7,7 +7,7 @@ interface BallFaceProps {
     diameter: number
     displacement: PixelVector
     rotation: PixelRotation
-    highlighted: boolean
+    highlighted: number // number to work around bug styled-component problem with boolean
 }
 
 const BallFace = styled.div<BallFaceProps>`
@@ -44,7 +44,7 @@ export default function BallCollider(props: BallColliderProps): React.JSX.Elemen
     };
 
     return <BallFace
-        highlighted={highlighted}
+        highlighted={highlighted ? 1 : 0}
         onClick={handleClick}
         diameter={diameter}
         displacement={collider.displacement}
