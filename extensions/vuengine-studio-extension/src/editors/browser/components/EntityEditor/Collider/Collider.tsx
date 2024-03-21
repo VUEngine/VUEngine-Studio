@@ -8,25 +8,25 @@ import MultiSelect, { MultiSelectOption } from '../../Common/MultiSelect';
 import RadioSelect from '../../Common/RadioSelect';
 import { clamp } from '../../Common/Utils';
 import VContainer from '../../Common/VContainer';
-import { ColliderType } from '../../Common/VUEngineTypes';
+import { ColliderType, PixelRotation } from '../../Common/VUEngineTypes';
 import {
-    COLLIDER_LINEFIELD_LENGTH_MAX,
-    COLLIDER_LINEFIELD_LENGTH_MIN,
-    COLLIDER_LINEFIELD_THICKNESS_MAX,
-    COLLIDER_LINEFIELD_THICKNESS_MIN,
+    MAX_COLLIDER_LINEFIELD_LENGTH,
+    MIN_COLLIDER_LINEFIELD_LENGTH,
+    MAX_COLLIDER_LINEFIELD_THICKNESS,
+    MIN_COLLIDER_LINEFIELD_THICKNESS,
     ColliderData,
+    MAX_COLLIDER_DISPLACEMENT,
+    MAX_COLLIDER_DISPLACEMENT_PARALLAX,
     MAX_COLLIDER_PIXEL_SIZE,
+    MAX_COLLIDER_ROTATION,
+    MAX_COLLIDER_SCALE,
+    MIN_COLLIDER_DISPLACEMENT,
+    MIN_COLLIDER_DISPLACEMENT_PARALLAX,
     MIN_COLLIDER_PIXEL_SIZE,
+    MIN_COLLIDER_ROTATION,
+    MIN_COLLIDER_SCALE,
+    COLLIDER_ROTATION_RATIO,
 } from '../EntityEditorTypes';
-
-const MIN_COLLIDER_ROTATION = -360;
-const MAX_COLLIDER_ROTATION = 360;
-const MIN_COLLIDER_SCALE = 0;
-const MAX_COLLIDER_SCALE = 64;
-const MIN_COLLIDER_DISPLACEMENT = -256;
-const MAX_COLLIDER_DISPLACEMENT = 256;
-const MIN_COLLIDER_DISPLACEMENT_PARALLAX = -32;
-const MAX_COLLIDER_DISPLACEMENT_PARALLAX = 32;
 
 interface ColliderProps {
     collider: ColliderData
@@ -39,6 +39,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
     const [length, setLength] = useState<number>(0);
     const [axis, setAxis] = useState<number>(0);
     const [thickness, setThickness] = useState<number>(0);
+    const [rotationDegrees, setRotationDegrees] = useState<PixelRotation>({ x: 0, y: 0, z: 0 });
 
     let colliderLayersFileUri: URI | undefined;
     const colliderLayers = services.vesProjectService.getProjectDataItemsForType('ColliderLayers');
@@ -68,6 +69,12 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
 
         return total;
     };
+
+    const toDegrees = (engineRotation: number): number =>
+        engineRotation * COLLIDER_ROTATION_RATIO;
+
+    const toEngineRotation = (degrees: number): number =>
+        Math.round(degrees / COLLIDER_ROTATION_RATIO);
 
     const setType = (type: ColliderType): void => {
         updateCollider({
@@ -113,10 +120,17 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
     };
 
     const setRotation = (a: 'x' | 'y' | 'z', value: number): void => {
+        const engineRotation = clamp(toEngineRotation(value), MIN_COLLIDER_ROTATION, MAX_COLLIDER_ROTATION);
+
+        setRotationDegrees({
+            ...rotationDegrees,
+            [a]: toDegrees(engineRotation),
+        });
+
         updateCollider({
             rotation: {
                 ...collider.rotation,
-                [a]: clamp(value, MIN_COLLIDER_ROTATION, MAX_COLLIDER_ROTATION),
+                [a]: engineRotation,
             },
         });
     };
@@ -193,8 +207,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
     const heaviness = getHeaviness();
 
     const updateLineField = (a: number, l: number, t: number): void => {
-        const cappedLength = clamp(l, COLLIDER_LINEFIELD_LENGTH_MIN, COLLIDER_LINEFIELD_LENGTH_MAX);
-        const cappedThickness = clamp(t, COLLIDER_LINEFIELD_THICKNESS_MIN, COLLIDER_LINEFIELD_THICKNESS_MAX);
+        const cappedLength = clamp(l, MIN_COLLIDER_LINEFIELD_LENGTH, MAX_COLLIDER_LINEFIELD_LENGTH);
+        const cappedThickness = clamp(t, MIN_COLLIDER_LINEFIELD_THICKNESS, MAX_COLLIDER_LINEFIELD_THICKNESS);
 
         updateCollider({
             pixelSize: {
@@ -228,6 +242,12 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
             setThickness(collider.scale.z);
             setAxis(2);
         }
+
+        setRotationDegrees({
+            x: toDegrees(collider.rotation.x),
+            y: toDegrees(collider.rotation.y),
+            z: toDegrees(collider.rotation.z),
+        });
     }, []);
 
     return (
@@ -433,40 +453,50 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                 <label>
                     {nls.localize('vuengine/entityEditor/colliderRotation', 'Rotation (x, y, z)')}
                 </label>
-                <HContainer>
-                    <input
-                        className='theia-input'
-                        style={{ width: 54 }}
-                        type='number'
-                        min={MIN_COLLIDER_ROTATION}
-                        max={MAX_COLLIDER_ROTATION}
-                        step={0.5}
-                        value={collider.rotation.x}
-                        onChange={e => setRotation('x', parseFloat(e.target.value))}
-                    />
-                    <input
-                        className='theia-input'
-                        style={{ width: 54 }}
-                        type='number'
-                        min={MIN_COLLIDER_ROTATION}
-                        max={MAX_COLLIDER_ROTATION}
-                        step={0.5}
-                        value={collider.rotation.y}
-                        onChange={e => setRotation('y', parseFloat(e.target.value))}
-                    />
-                    <input
-                        className='theia-input'
-                        style={{ width: 54 }}
-                        type='number'
-                        min={MIN_COLLIDER_ROTATION}
-                        max={MAX_COLLIDER_ROTATION}
-                        step={0.5}
-                        value={collider.rotation.z}
-                        onChange={e => setRotation('z', parseFloat(e.target.value))}
-                    />
+                <HContainer wrap='wrap'>
+                    <HContainer gap={2}>
+                        <input
+                            className='theia-input'
+                            style={{ width: 78 }}
+                            type='number'
+                            min={MIN_COLLIDER_ROTATION}
+                            max={MAX_COLLIDER_ROTATION}
+                            step={COLLIDER_ROTATION_RATIO}
+                            value={rotationDegrees.x}
+                            onChange={e => setRotation('x', parseFloat(e.target.value))}
+                        />
+                        °
+                    </HContainer>
+                    <HContainer gap={2}>
+                        <input
+                            className='theia-input'
+                            style={{ width: 78 }}
+                            type='number'
+                            min={MIN_COLLIDER_ROTATION}
+                            max={MAX_COLLIDER_ROTATION}
+                            step={COLLIDER_ROTATION_RATIO}
+                            value={rotationDegrees.y}
+                            onChange={e => setRotation('y', parseFloat(e.target.value))}
+                        />
+                        °
+                    </HContainer>
+                    <HContainer gap={2}>
+                        <input
+                            className='theia-input'
+                            style={{ width: 78 }}
+                            type='number'
+                            min={MIN_COLLIDER_ROTATION}
+                            max={MAX_COLLIDER_ROTATION}
+                            step={COLLIDER_ROTATION_RATIO}
+                            value={rotationDegrees.z}
+                            onChange={e => setRotation('z', parseFloat(e.target.value))}
+                        />
+                        °
+                    </HContainer>
                 </HContainer>
             </VContainer>
-            {(collider.type === ColliderType.Box || collider.type === ColliderType.InverseBox) &&
+            {
+                (collider.type === ColliderType.Box || collider.type === ColliderType.InverseBox) &&
                 <VContainer>
                     <label>
                         {nls.localize('vuengine/entityEditor/colliderScale', 'Scale (x, y, z)')}
@@ -505,7 +535,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     </HContainer>
                 </VContainer>
             }
-            {collider.type === ColliderType.Ball &&
+            {
+                collider.type === ColliderType.Ball &&
                 <VContainer>
                     <label>
                         {nls.localize('vuengine/entityEditor/scale', 'Scale')}
@@ -531,7 +562,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     onChange={toggleCheckForCollisions}
                 />
             </VContainer>
-            {collider.checkForCollisions &&
+            {
+                collider.checkForCollisions &&
                 <VContainer grow={1}>
                     <label>
                         {nls.localize('vuengine/entityEditor/colliderLayersToCheckAgainst', 'Collider Layers to check against')}
@@ -560,6 +592,6 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     </HContainer>
                 </VContainer>
             }
-        </VContainer>
+        </VContainer >
     );
 }

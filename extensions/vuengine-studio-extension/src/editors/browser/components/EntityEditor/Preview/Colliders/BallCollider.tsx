@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
 import { PixelRotation, PixelVector } from '../../../Common/VUEngineTypes';
-import { ColliderData, EntityEditorContext, EntityEditorContextType } from '../../EntityEditorTypes';
+import { COLLIDER_ROTATION_RATIO, ColliderData, EntityEditorContext, EntityEditorContextType } from '../../EntityEditorTypes';
 
 interface BallFaceProps {
     diameter: number
@@ -11,19 +11,31 @@ interface BallFaceProps {
 }
 
 const BallFace = styled.div<BallFaceProps>`
+    align-items: center;
     border: .5px dashed yellow;
     border-radius: 100%;
     box-sizing: border-box;
     cursor: pointer;
+    display: flex;
     height: ${p => p.diameter}px;
+    justify-content: center;
     outline: ${p => p.highlighted ? '1px solid #0f0' : 'none'};
     outline-offset: 1px;
     position: absolute;
-    transform: rotateX(${p => p.rotation.x}deg) rotateY(${p => p.rotation.y}deg) rotateZ(${p => p.rotation.z}deg);
+    transform: rotateX(${p => p.rotation.x * COLLIDER_ROTATION_RATIO}deg) 
+        rotateY(${p => p.rotation.y * COLLIDER_ROTATION_RATIO}deg) 
+        rotateZ(${p => p.rotation.z * COLLIDER_ROTATION_RATIO}deg);
     transform-style: preserve-3d;
     translate: ${p => p.displacement.x}px ${p => p.displacement.y}px ${p => p.displacement.parallax * -1}px;
     width: ${p => p.diameter}px;
-    z-index: ${p => p.highlighted ? 999999 : 110000};
+    z-index: ${p => p.highlighted ? 999999 : 120000};
+`;
+
+const BallCenterFace = styled.div`
+    background-color: yellow;
+    border-radius: 1px;
+    height: 1px;
+    width: 1px;
 `;
 
 export interface BallColliderProps {
@@ -49,5 +61,7 @@ export default function BallCollider(props: BallColliderProps): React.JSX.Elemen
         diameter={diameter}
         displacement={collider.displacement}
         rotation={collider.rotation}
-    />;
+    >
+        <BallCenterFace />
+    </BallFace>;
 }

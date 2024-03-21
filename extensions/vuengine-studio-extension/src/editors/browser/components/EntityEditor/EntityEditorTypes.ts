@@ -34,7 +34,7 @@ export interface EntityEditorContextType {
 export const EntityEditorLayoutStorageName = 'ves-editors-entityEditor-layout';
 
 export const MIN_ENTITY_PIXEL_SIZE = 0;
-export const MAX_ENTITY_PIXEL_SIZE = 512;
+export const MAX_ENTITY_PIXEL_SIZE = 511;
 export const MIN_TEXTURE_PADDING = 0;
 export const MAX_TEXTURE_PADDING = 255;
 export const MIN_ANIMATION_CYLCES = 1;
@@ -45,20 +45,32 @@ export const MIN_WIREFRAME_DISPLACEMENT = -511;
 export const MAX_WIREFRAME_DISPLACEMENT = 512;
 export const STEP_WIREFRAME_DISPLACEMENT = 0.1;
 export const MIN_SPHERE_RADIUS = 0;
-export const MAX_SPHERE_RADIUS = 512;
+export const MAX_SPHERE_RADIUS = 511;
 export const STEP_SPHERE_RADIUS = 1;
 export const MIN_PREVIEW_SPRITE_ZOOM = 1;
 export const MAX_PREVIEW_SPRITE_ZOOM = 20;
 export const MIN_PREVIEW_SCRIPT_ZOOM = 0.1;
 export const MAX_PREVIEW_SCRIPT_ZOOM = 1;
 export const WHEEL_SENSITIVITY = 50;
-export const COLLIDER_LINEFIELD_LENGTH_MIN = 0;
-export const COLLIDER_LINEFIELD_LENGTH_MAX = 512;
-export const COLLIDER_LINEFIELD_THICKNESS_MIN = 0;
-export const COLLIDER_LINEFIELD_THICKNESS_MAX = 512;
-export const MIN_COLLIDER_PIXEL_SIZE = 0;
-export const MAX_COLLIDER_PIXEL_SIZE = 512;
 export const WIREFRAME_CANVAS_PADDING = 1;
+
+export const MIN_COLLIDER_PIXEL_SIZE = 0;
+export const MAX_COLLIDER_PIXEL_SIZE = 511;
+export const MIN_COLLIDER_ROTATION = 0;
+export const MAX_COLLIDER_ROTATION = 511;
+// VUEngine uses 512 segments for a full circle for easier computations.
+// On the frontend, we work in degrees, though.
+export const COLLIDER_ROTATION_RATIO = 0.703125; // 360/512
+export const MIN_COLLIDER_SCALE = 0;
+export const MAX_COLLIDER_SCALE = 64;
+export const MIN_COLLIDER_DISPLACEMENT = -256;
+export const MAX_COLLIDER_DISPLACEMENT = 256;
+export const MIN_COLLIDER_DISPLACEMENT_PARALLAX = -32;
+export const MAX_COLLIDER_DISPLACEMENT_PARALLAX = 32;
+export const MIN_COLLIDER_LINEFIELD_LENGTH = 0;
+export const MAX_COLLIDER_LINEFIELD_LENGTH = 511;
+export const MIN_COLLIDER_LINEFIELD_THICKNESS = 0;
+export const MAX_COLLIDER_LINEFIELD_THICKNESS = 511;
 
 export enum AxisNumeric {
     X = 0,

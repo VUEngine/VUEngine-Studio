@@ -1,28 +1,17 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
-import { ColliderData, EntityEditorContext, EntityEditorContextType } from '../../EntityEditorTypes';
+import { COLLIDER_ROTATION_RATIO, ColliderData, EntityEditorContext, EntityEditorContextType } from '../../EntityEditorTypes';
 
-interface CuboidProps {
-    highlighted: number // number to work around bug styled-component problem with boolean
-}
-
-const Cuboid = styled.div<CuboidProps>`
+const Cuboid = styled.div`
     --half-d: calc(var(--depth) / 2);
     --half-h: calc(var(--height) / 2);
     --half-w: calc(var(--width) / 2);
     transform-style: preserve-3d;
-    z-index: ${p => p.highlighted ? 999999 : 110000};
 `;
 
-interface CuboidFaceProps {
-    highlighted: number // number to work around bug styled-component problem with boolean
-}
-
-const CuboidFace = styled.div<CuboidFaceProps>`
+const CuboidFace = styled.div`
     border: .5px dashed yellow;
-    border-radius: ${p => p.highlighted ? '.25px' : '0'};
     box-sizing: border-box;
-    outline: ${p => p.highlighted ? '1px solid #0f0' : 'none'};
     outline-offset: 1px;
     position: absolute;
 `;
@@ -89,23 +78,44 @@ export default function BoxCollider(props: BoxColliderProps): React.JSX.Element 
         setState({ currentComponent: `colliders-${index}` });
     };
 
-    return <Cuboid
+    const width = collider.pixelSize.x * collider.scale.x;
+    const height = collider.pixelSize.y * collider.scale.y;
+    const depth = collider.pixelSize.z * collider.scale.z;
+    const isRotated = collider.rotation.x > 0 || collider.rotation.y > 0 || collider.rotation.z > 0;
+
+    return <div
         onClick={handleClick}
         style={{
-            // @ts-ignore
-            '--depth': `${collider.pixelSize.z * collider.scale.z}px`,
-            '--height': `${collider.pixelSize.y * collider.scale.y}px`,
-            '--width': `${collider.pixelSize.x * collider.scale.x}px`,
-            transform: `rotateX(${collider.rotation.x}deg) rotateY(${collider.rotation.y}deg) rotateZ(${collider.rotation.z}deg)`,
-            translate: `${collider.displacement.x}px ${collider.displacement.y}px ${-1 * collider.displacement.parallax}px`,
+            alignItems: 'center',
+            borderRadius: highlighted ? .25 : undefined,
             cursor: 'pointer',
+            display: 'flex',
+            height: isRotated ? height * 1.66 : height,
+            justifyContent: 'center',
+            outline: highlighted ? '1px solid #0f0' : undefined,
+            translate: `${collider.displacement.x}px ${collider.displacement.y}px ${-1 * collider.displacement.parallax}px`,
+            width: isRotated ? width * 1.66 : width,
+            zIndex: highlighted ? 999999 : 120000,
         }}
     >
-        <CuboidFaceFront highlighted={highlighted ? 1 : 0} />
-        <CuboidFaceBack highlighted={highlighted ? 1 : 0} />
-        <CuboidFaceTop highlighted={highlighted ? 1 : 0} />
-        <CuboidFaceBottom highlighted={highlighted ? 1 : 0} />
-        {/* <CuboidFaceLeft highlighted={highlighted} /> */}
-        {/* <CuboidFaceRight highlighted={highlighted} /> */}
-    </Cuboid>;
+        <Cuboid
+            onClick={handleClick}
+            style={{
+                // @ts-ignore
+                '--depth': `${depth}px`,
+                '--height': `${height}px`,
+                '--width': `${width}px`,
+                transform: `rotateX(${collider.rotation.x * COLLIDER_ROTATION_RATIO}deg) 
+                    rotateY(${collider.rotation.y * COLLIDER_ROTATION_RATIO}deg) 
+                    rotateZ(${collider.rotation.z * COLLIDER_ROTATION_RATIO}deg)`,
+            }}
+        >
+            <CuboidFaceFront />
+            <CuboidFaceBack />
+            <CuboidFaceTop />
+            <CuboidFaceBottom />
+            {/* <CuboidFaceLeft /> */}
+            {/* <CuboidFaceRight /> */}
+        </Cuboid>
+    </div>;
 }

@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
 import { PixelRotation, PixelVector } from '../../../Common/VUEngineTypes';
-import { AxisNumeric, ColliderData, EntityEditorContext, EntityEditorContextType } from '../../EntityEditorTypes';
+import { AxisNumeric, COLLIDER_ROTATION_RATIO, ColliderData, EntityEditorContext, EntityEditorContextType } from '../../EntityEditorTypes';
 
 interface LineFieldFaceProps {
     axis: AxisNumeric
@@ -23,12 +23,16 @@ const LineFieldFace = styled.div<LineFieldFaceProps>`
     outline-offset: 1px;
     position: absolute;
     transform: 
-        rotateX(${p => p.rotation.x}deg) 
-        rotateY(${p => p.axis === AxisNumeric.Z ? p.rotation.y - 90 : p.rotation.y}deg) 
-        rotateZ(${p => p.axis === AxisNumeric.Y ? p.rotation.z - 90 : p.rotation.z}deg);
+        rotateX(${p => p.rotation.x * COLLIDER_ROTATION_RATIO}deg) 
+        rotateY(${p => p.axis === AxisNumeric.Z
+        ? p.rotation.y * COLLIDER_ROTATION_RATIO - 90
+        : p.rotation.y * COLLIDER_ROTATION_RATIO}deg) 
+        rotateZ(${p => p.axis === AxisNumeric.Y
+        ? p.rotation.z * COLLIDER_ROTATION_RATIO - 90
+        : p.rotation.z * COLLIDER_ROTATION_RATIO}deg);
     transform-style: preserve-3d;
     translate: ${p => p.displacement.x}px ${p => p.displacement.y}px ${p => p.displacement.parallax * -1}px;
-    z-index: ${p => p.highlighted ? 999999 : 110000};
+    z-index: ${p => p.highlighted ? 999999 : 120000};
     width: ${p => p.length}px;
 `;
 

@@ -23,7 +23,7 @@ export default function PreviewWireframe(props: PreviewWireframeProps): React.JS
         outline: highlighted ? '1px solid #0f0' : 'none',
         outlineOffset: 1,
         position: 'absolute',
-        zIndex: highlighted ? 999999 : 120000,
+        zIndex: highlighted ? 999999 : 110000,
     };
 
     const handleClick = (e: React.MouseEvent) => {
