@@ -145,6 +145,22 @@ export class VesRumblePackService {
     return this.sendCommand(`FRQ ${frequency.toString().padStart(3, '0')}`);
   }
 
+  async sendCommandSetOverdrive(overdrive: number): Promise<void> {
+    return this.sendCommand(`SCO ODC ${overdrive.toString().padStart(3, '0')}`);
+  }
+
+  async sendCommandSetPositiveSustain(sustain: number): Promise<void> {
+    return this.sendCommand(`SCO SPT ${sustain.toString().padStart(3, '0')}`);
+  }
+
+  async sendCommandSetNegativeSustain(sustain: number): Promise<void> {
+    return this.sendCommand(`SCO SNT ${sustain.toString().padStart(3, '0')}`);
+  }
+
+  async sendCommandSetBreak(breakValue: number): Promise<void> {
+    return this.sendCommand(`SCO BRT ${breakValue.toString().padStart(3, '0')}`);
+  }
+
   async sendCommandEmulateVbByte(byte: string): Promise<void> {
     return this.sendCommand(`VB ${byte}`);
   }
