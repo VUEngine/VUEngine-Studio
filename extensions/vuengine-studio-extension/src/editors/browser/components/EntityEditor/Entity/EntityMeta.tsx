@@ -1,7 +1,7 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import VContainer from '../../Common/VContainer';
-import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
+import { EntityEditorContext, EntityEditorContextType, SpriteImageData } from '../EntityEditorTypes';
 
 export default function EntityMeta(): React.JSX.Element {
     const { data } = useContext(EntityEditorContext) as EntityEditorContextType;
@@ -9,16 +9,22 @@ export default function EntityMeta(): React.JSX.Element {
     const getTileCount = (): number => {
         let totalTiles = 0;
         data.components?.sprites?.map(s => {
-            if (s._imageData !== undefined && typeof s._imageData !== 'number') {
-                if (s._imageData.animation?.largestFrame) {
-                    totalTiles += s._imageData.animation?.largestFrame;
-                } else {
-                    if (s._imageData.tiles?.count) {
-                        totalTiles += data.components?.animations?.length > 0 && !data.animations.multiframe
-                            ? s._imageData.tiles?.count / data.animations?.totalFrames || 1
-                            : s._imageData.tiles?.count;
+            if (s._imageData !== undefined && typeof s._imageData !== 'number' && s._imageData.images?.length) {
+                [0, 1].map(i => {
+                    const imageData = s._imageData as SpriteImageData;
+                    if (imageData.images[i] !== undefined) {
+                        const images = imageData.images[i];
+                        if (images.animation?.largestFrame) {
+                            totalTiles += images.animation?.largestFrame ?? 0;
+                        } else {
+                            if (images.tiles?.count) {
+                                totalTiles += data.components?.animations?.length > 0 && !data.animations.multiframe
+                                    ? images.tiles?.count / data.animations?.totalFrames ?? 1
+                                    : images.tiles?.count;
+                            }
+                        }
                     }
-                }
+                });
             }
         });
 

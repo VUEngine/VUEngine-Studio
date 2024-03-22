@@ -130,8 +130,13 @@ export interface ColliderData {
     layersToCheck: string[]
 }
 
+export interface SpriteImageData {
+    dupeIndex: number,
+    images: Partial<ConversionResult>[], // index 1 only set for stereo animations
+}
+
 export interface SpriteData {
-    _imageData?: Partial<ConversionResult & { _dupeIndex: number }> | number
+    _imageData?: SpriteImageData | number
     name: string
     bgmapMode: BgmapMode
     colorMode: ColorMode

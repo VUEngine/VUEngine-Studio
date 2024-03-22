@@ -15,6 +15,7 @@ import {
   EntityEditorState,
   MAX_PREVIEW_SPRITE_ZOOM,
   MIN_PREVIEW_SPRITE_ZOOM,
+  SpriteImageData,
 } from './EntityEditorTypes';
 import Preview from './Preview/Preview';
 import Script from './Scripts/Script';
@@ -255,8 +256,10 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
               maps,
             });
             s._imageData = {
-              ...compressedImageData,
-              _dupeIndex: 1,
+              images: [{
+                ...compressedImageData
+              }],
+              dupeIndex: 1,
             };
           } else {
             s._imageData = undefined;
@@ -264,45 +267,55 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
         }
       }));
     } else {
-      const convertedFilesMap: { [key: string]: ConversionResult & { _dupeIndex: number } } = {};
+      const convertedFilesMap: { [key: string]: SpriteImageData } = {};
       // for loop to handle sprites synchronously for dupe detection
       for (let i = 0; i < totalSprites; i++) {
         const sprite = entityData.components?.sprites[i];
         if (sprite.texture?.files?.length) {
           const files = [
-            ...sprite.texture.files,
-            ...(sprite.texture.files2 ?? []),
+            sprite.texture.files,
+            (sprite.texture?.files2 ?? []),
           ];
           // keep track of already converted files to avoid converting the same image twice
           const checksum = require('crc-32').str(JSON.stringify(files));
           if (convertedFilesMap[checksum] !== undefined) {
-            sprite._imageData = convertedFilesMap[checksum]._dupeIndex;
+            sprite._imageData = convertedFilesMap[checksum].dupeIndex;
           } else {
-            const newImageData = await services.vesImagesService.convertImage(fileUri, {
-              ...baseConfig,
-              section: sprite.section,
-              map: {
-                ...baseConfig.map,
-                compression: sprite.compression,
-              },
-              tileset: {
-                ...baseConfig.tileset,
-                compression: sprite.compression,
-                shared: files.length === 2,
-              },
-              files,
-            });
-            setGeneratingProgress(i + 1 * 2 - 1, totalSprites * 2);
-            const compressedImageData = await this.compressImageDataAsJson(newImageData);
-            sprite._imageData = convertedFilesMap[checksum] = {
-              ...compressedImageData,
-              _dupeIndex: i + 1,
+            sprite._imageData = {
+              dupeIndex: i + 1,
+              images: [],
             };
+            await Promise.all(files.map(async (f, j) => {
+              if (f?.length) {
+                const nameSuffix = files.length === 2 ? j ? 'R' : 'L' : '';
+                const newImageData = await services.vesImagesService.convertImage(fileUri, {
+                  ...baseConfig,
+                  name: baseConfig.name + nameSuffix,
+                  section: sprite.section,
+                  map: {
+                    ...baseConfig.map,
+                    compression: sprite.compression,
+                  },
+                  tileset: {
+                    ...baseConfig.tileset,
+                    compression: sprite.compression,
+                    shared: false,
+                  },
+                  files: f,
+                });
+                setGeneratingProgress((i + 1) * 2 - 1, totalSprites * 2);
+                const compressedImageData = await this.compressImageDataAsJson(newImageData);
+                (sprite._imageData! as SpriteImageData).images[j] = {
+                  ...compressedImageData,
+                };
+              }
+            }));
+            convertedFilesMap[checksum] = sprite._imageData;
           }
         } else {
           sprite._imageData = undefined;
         }
-        setGeneratingProgress(i + 1 * 2, totalSprites * 2);
+        setGeneratingProgress((i + 1) * 2, totalSprites * 2);
       }
     }
 

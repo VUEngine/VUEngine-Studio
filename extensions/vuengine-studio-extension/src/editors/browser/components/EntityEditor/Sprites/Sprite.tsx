@@ -1,6 +1,6 @@
 import { nls } from '@theia/core';
 import React, { useContext, useEffect, useState } from 'react';
-import { ConversionResult, ImageCompressionType } from '../../../../../images/browser/ves-images-types';
+import { ImageCompressionType } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { DataSection } from '../../Common/CommonTypes';
 import HContainer from '../../Common/HContainer';
@@ -18,6 +18,7 @@ import {
     MAX_TEXTURE_PADDING,
     MIN_TEXTURE_PADDING,
     SpriteData,
+    SpriteImageData,
 } from '../EntityEditorTypes';
 
 const MIN_TEXTURE_DISPLACEMENT = -256;
@@ -67,21 +68,29 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         setDimensions(dim);
     };
 
-    const getTilesCount = (imageData: Partial<ConversionResult & { _dupeIndex: number }> | number | undefined): number => {
+    const getTilesCount = (imageData: SpriteImageData | number | undefined): number => {
         if (imageData !== undefined) {
             if (typeof imageData === 'number') {
                 if (imageData > 0 && data.components?.sprites[imageData - 1] !== undefined) {
                     const pointedToImageData = data.components?.sprites[imageData - 1]._imageData;
                     if (pointedToImageData !== undefined) {
-                        return getTilesCount(pointedToImageData as Partial<ConversionResult>);
+                        return getTilesCount(pointedToImageData);
                     }
                 }
-            } else if (imageData.animation?.largestFrame) {
-                return imageData.animation?.largestFrame;
-            } else if (imageData.tiles?.count) {
-                return data.components?.animations?.length > 0 && !data.animations.multiframe
-                    ? Math.round((imageData.tiles?.count / data.animations?.totalFrames || 1) * 100) / 100
-                    : imageData.tiles?.count;
+            } else {
+                let tileCount = 0;
+                [0, 1].map(i => {
+                    if (imageData.images && imageData.images[i]) {
+                        if (imageData.images[i].animation?.largestFrame) {
+                            tileCount += imageData.images[i].animation?.largestFrame ?? 0;
+                        } else if (imageData.images[i].tiles?.count) {
+                            tileCount += data.components?.animations?.length > 0 && !data.animations.multiframe
+                                ? Math.round((imageData.images[i].tiles?.count ?? 0 / data.animations?.totalFrames ?? 1) * 100) / 100
+                                : imageData.images[i].tiles?.count ?? 0;
+                        }
+                    }
+                });
+                return tileCount;
             }
         }
 
