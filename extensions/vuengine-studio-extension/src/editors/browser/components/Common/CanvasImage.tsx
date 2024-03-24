@@ -10,15 +10,23 @@ interface CanvasImageProps {
     parallaxDisplacement: number
     width: number
     style?: object
+    repeatX?: boolean
+    repeatY?: boolean
     useTextColor?: boolean
 }
 
 export default function CanvasImage(props: CanvasImageProps): React.JSX.Element {
-    const { height, palette, pixelData, displayMode, parallaxDisplacement, width, style, useTextColor } = props;
+    const { height, palette, pixelData, displayMode, parallaxDisplacement, width, style, repeatX, repeatY, useTextColor } = props;
     // eslint-disable-next-line no-null/no-null
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const effectiveParallaxDisplacement = displayMode === DisplayMode.Stereo ? parallaxDisplacement : 0;
+    const totalHeight = repeatY
+        ? (Math.round(Math.round(7500 / height) / 2) * 2 + 1) * height
+        : height;
+    const totalWidth = repeatX
+        ? (Math.round(Math.round(7500 / width) / 2) * 2 + 1) * width
+        : width;
 
     const drawToCanvas = (context: CanvasRenderingContext2D, pixels: number[][]) => {
         if (pixels === undefined) {
@@ -50,19 +58,30 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
             return;
         }
 
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        drawToCanvas(context, pixelData[0]);
+        if (!width || !height || !totalWidth || !totalHeight) {
+            return;
+        }
+
+        // create temporary canvas and pattern
+        const pattern = document.createElement('canvas');
+        pattern.width = width;
+        pattern.height = height;
+        const patternContext = pattern.getContext('2d');
+        if (!pattern || !patternContext) {
+            return;
+        }
+        drawToCanvas(patternContext, pixelData[0]);
 
         if (displayMode === DisplayMode.Stereo) {
-            const leftImageData = context.getImageData(0, 0, canvas.width, canvas.height);
+            const leftImageData = patternContext.getImageData(0, 0, canvas.width, canvas.height);
             let rightImageData = leftImageData;
 
             // when there's image data for the right eye, ...
             if (pixelData[1]) {
                 // create temporary canvas
                 const tempCanvas = document.createElement('canvas');
-                tempCanvas.width = canvas.width;
-                tempCanvas.height = canvas.height;
+                tempCanvas.width = width;
+                tempCanvas.height = height;
                 const tempCanvasContext = tempCanvas.getContext('2d');
                 if (!tempCanvasContext) {
                     return;
@@ -85,8 +104,16 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
                     leftImageData.data[x * 4 + 3] = 255;
                 }
             };
-            context.putImageData(leftImageData, 0, 0);
+            patternContext.putImageData(leftImageData, 0, 0);
         }
+
+        context.clearRect(0, 0, width, height);
+
+        // create repeatable pattern
+        const canvasPattern = patternContext.createPattern(pattern, 'repeat');
+        context.rect(0, 0, totalWidth, totalHeight);
+        context.fillStyle = canvasPattern as CanvasPattern;
+        context.fill();
     };
 
     useEffect(() => {
@@ -103,10 +130,12 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
     return <div style={style}>
         <canvas
             ref={canvasRef}
-            height={height}
-            width={width + Math.abs(effectiveParallaxDisplacement) * 2}
+            height={totalHeight}
+            width={totalWidth + Math.abs(effectiveParallaxDisplacement) * 2}
             style={{
-                imageRendering: 'pixelated'
+                imageRendering: 'pixelated',
+                marginTop: (repeatX || repeatY) ? 3 : undefined, // why?
+                opacity: (repeatX || repeatY) ? .25 : undefined,
             }}
         />
     </div>;

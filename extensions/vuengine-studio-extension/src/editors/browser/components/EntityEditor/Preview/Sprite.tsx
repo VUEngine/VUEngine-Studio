@@ -2,8 +2,9 @@ import React, { useContext, useEffect, useState } from 'react';
 import { ImageData } from '../../../../../core/browser/ves-common-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import CanvasImage from '../../Common/CanvasImage';
-import { BgmapMode, DisplayMode, Transparency } from '../../Common/VUEngineTypes';
+import { BgmapMode, DisplayMode, SpriteType, Transparency } from '../../Common/VUEngineTypes';
 import { EntityEditorContext, EntityEditorContextType, SpriteData } from '../EntityEditorTypes';
+import VContainer from '../../Common/VContainer';
 
 interface SpriteProps {
   animate: boolean
@@ -16,7 +17,7 @@ interface SpriteProps {
 }
 
 export default function Sprite(props: SpriteProps): React.JSX.Element {
-  const { state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
+  const { data, state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
   const { setIsGenerating, setGeneratingProgress, services } = useContext(EditorsContext) as EditorsContextType;
   const {
     animate,
@@ -33,6 +34,13 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
   const [error, setError] = useState<string>();
 
   const isMultiFileAnimation = sprite.texture.files.length > 1;
+  const isRepeated = data.sprites.type === SpriteType.Bgmap && (sprite.texture?.repeat?.x || sprite.texture?.repeat?.y);
+  const effectiveHeight = isRepeated && sprite.texture?.repeat?.size?.y
+    ? sprite.texture.repeat.size.y
+    : height;
+  const effectiveWidth = isRepeated && sprite.texture?.repeat?.size?.x
+    ? sprite.texture.repeat.size.x
+    : width;
 
   const setImageError = (e: string): void => {
     setHeight(32);
@@ -174,44 +182,62 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
   */
 
   return (
-    <div
-      className={error ? 'sprite-error' : ''}
-      title={error ? error : ''}
-      style={{
-        borderRadius: highlighted ? .25 : 0,
-        boxSizing: 'border-box',
-        cursor: 'pointer',
-        height: height / (isMultiFileAnimation ? 1 : frames ?? 1),
-        opacity: sprite.transparency !== Transparency.None ? .5 : 1,
-        outline: highlighted ? '1px solid #0f0' : undefined,
-        outlineOffset: 1,
-        overflow: 'hidden',
-        position: 'absolute',
-        transform: getTransform(),
-        translate: `${sprite.displacement.x}px ${sprite.displacement.y}px ${-1 * sprite.displacement.parallax}px`,
-        zIndex: baseZIndex + (sprite.displacement.z !== 0 ? -sprite.displacement.z : 0),
-      }}
+    <VContainer
+      alignItems='center'
+      justifyContent='center'
       onClick={handleClick}
+      style={{ position: 'absolute' }}
     >
-      {!error && imageData.length > 0 &&
-        <div style={{
-          position: 'relative',
-          top: animate && !isMultiFileAnimation
-            ? (height / (frames ?? 1) * currentAnimationFrame * -1)
-            : 0
-        }}>
-          {currentPixelData &&
-            <CanvasImage
-              height={height}
-              palette={palette}
-              pixelData={currentPixelData}
-              displayMode={state.preview.anaglyph ? DisplayMode.Stereo : DisplayMode.Mono}
-              parallaxDisplacement={sprite.displacement.parallax}
-              width={width}
-            />
-          }
-        </div>
+      {isRepeated &&
+        <CanvasImage
+          height={effectiveHeight}
+          palette={palette}
+          pixelData={currentPixelData}
+          displayMode={state.preview.anaglyph ? DisplayMode.Stereo : DisplayMode.Mono}
+          parallaxDisplacement={sprite.displacement.parallax}
+          repeatX={sprite.texture?.repeat?.x}
+          repeatY={sprite.texture?.repeat?.y}
+          width={effectiveWidth}
+        />
       }
-    </div>
+      <div
+        className={error ? 'sprite-error' : ''}
+        title={error ? error : ''}
+        style={{
+          borderRadius: highlighted ? .25 : 0,
+          boxSizing: 'border-box',
+          cursor: 'pointer',
+          height: effectiveHeight / (isMultiFileAnimation ? 1 : frames ?? 1),
+          opacity: sprite.transparency !== Transparency.None ? .5 : 1,
+          outline: highlighted ? '1px solid #0f0' : undefined,
+          outlineOffset: 1,
+          overflow: 'hidden',
+          position: 'absolute',
+          transform: getTransform(),
+          translate: `${sprite.displacement.x}px ${sprite.displacement.y}px ${-1 * sprite.displacement.parallax}px`,
+          zIndex: baseZIndex + (sprite.displacement.z !== 0 ? -sprite.displacement.z : 0),
+        }}
+      >
+        {!error && imageData.length > 0 &&
+          <div style={{
+            position: 'relative',
+            top: animate && !isMultiFileAnimation
+              ? (effectiveHeight / (frames ?? 1) * currentAnimationFrame * -1)
+              : 0
+          }}>
+            {currentPixelData &&
+              <CanvasImage
+                height={effectiveHeight}
+                palette={palette}
+                pixelData={currentPixelData}
+                displayMode={state.preview.anaglyph ? DisplayMode.Stereo : DisplayMode.Mono}
+                parallaxDisplacement={sprite.displacement.parallax}
+                width={effectiveWidth}
+              />
+            }
+          </div>
+        }
+      </div>
+    </VContainer>
   );
 }
