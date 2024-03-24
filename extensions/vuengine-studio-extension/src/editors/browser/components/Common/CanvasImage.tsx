@@ -21,10 +21,17 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
     const effectiveParallaxDisplacement = displayMode === DisplayMode.Stereo ? parallaxDisplacement : 0;
 
     const drawToCanvas = (context: CanvasRenderingContext2D, pixels: number[][]) => {
+        if (pixels === undefined) {
+            return;
+        }
+
         [...Array(height)].map((h, y) => {
             [...Array(width)].map((w, x) => {
+                if (pixels[y] === undefined || pixels[y][x] === undefined) {
+                    return;
+                }
                 const color = pixels[y][x];
-                if (color === 0) {
+                if (!color) {
                     return;
                 }
                 const paletteStartChar = ((3 - color) % 4) << 1;

@@ -1,4 +1,4 @@
-import { CornersOut } from '@phosphor-icons/react';
+import { CornersOut, Square } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import ColorSelector from '../../Common/ColorSelector';
@@ -31,7 +31,6 @@ export default function PreviewOptions(props: PreviewOptionsProps): React.JSX.El
       },
     });
 
-  /*
   const toggleAnaglyph = (e: React.MouseEvent) => {
     e.stopPropagation();
     setState({
@@ -41,7 +40,6 @@ export default function PreviewOptions(props: PreviewOptionsProps): React.JSX.El
       },
     });
   };
-  */
 
   const applyZoom = (z: number) => {
     if (setZoom) {
@@ -75,7 +73,6 @@ export default function PreviewOptions(props: PreviewOptionsProps): React.JSX.El
         </button>
       </HContainer>
       <HContainer gap={15}>
-        {/*
         <button
           className='theia-button secondary controls-button'
           onClick={toggleAnaglyph}
@@ -98,7 +95,6 @@ export default function PreviewOptions(props: PreviewOptionsProps): React.JSX.El
             </>
           }
         </button>
-        */}
         {enableBackground &&
           <VContainer>
             <ColorSelector

@@ -4,6 +4,7 @@
 }
 
 .ves-tree [role=tree] [role=treeitem] {
+    border-radius: 2px;
     box-sizing: border-box;
     display: flex;
     line-height: var(--theia-content-line-height);

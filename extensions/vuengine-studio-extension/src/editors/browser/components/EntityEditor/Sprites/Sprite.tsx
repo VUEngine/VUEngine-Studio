@@ -1,5 +1,6 @@
 import { nls } from '@theia/core';
 import React, { useContext, useEffect, useState } from 'react';
+// import { ColorMode } from '../../../../../core/browser/ves-common-types';
 import { ImageCompressionType } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { DataSection } from '../../Common/CommonTypes';
@@ -295,7 +296,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                             'vuengine/entityEditor/colorModeDescription',
                             'Whether to use the system\'s default 4-color palette or HiColor mode, ' +
                             'which simulates 7 colors by blending together adjacent frames to create mix colors. ' +
-                            'Note: This will require an additional WORLD.'
+                            'Note: Mixed colors look fine on hardware, but flicker on emulators.'
                         )}
                     />
                     <RadioSelect

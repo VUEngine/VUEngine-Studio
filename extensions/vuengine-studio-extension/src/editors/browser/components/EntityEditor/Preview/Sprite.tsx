@@ -17,7 +17,7 @@ interface SpriteProps {
 
 export default function Sprite(props: SpriteProps): React.JSX.Element {
   const { state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
-  const { services } = useContext(EditorsContext) as EditorsContextType;
+  const { setIsGenerating, setGeneratingProgress, services } = useContext(EditorsContext) as EditorsContextType;
   const {
     animate,
     frames,
@@ -41,19 +41,25 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
   };
 
   const getData = async () => {
+    setIsGenerating(true);
     const allImageData: ImageData[][] = [[], []];
+    let totalFiles = 0;
+    let processedFiles = 0;
 
     if (sprite.texture?.files?.length) {
-      const fileArrays = [
-        sprite.texture.files
-      ];
-      if (sprite.texture?.files2?.length) {
+      const fileArrays = [sprite.texture.files];
+      if (state.preview.anaglyph && sprite.texture?.files2?.length) {
         fileArrays.push(sprite.texture.files2);
       }
+
+      fileArrays.map(f => {
+        totalFiles += f.length;
+      });
+
+      await services.workspaceService.ready;
+      const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
       await Promise.all(fileArrays.map(async (f, i) => {
         await Promise.all(f.map(async (image, j) => {
-          await services.workspaceService.ready;
-          const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
           const imageUri = workspaceRootUri.resolve(image);
           if (await services.fileService.exists(imageUri)) {
             const imageFileContent = await services.fileService.readFile(imageUri);
@@ -76,6 +82,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
           } else {
             setImageError('file not found');
           }
+
+          setGeneratingProgress(++processedFiles, totalFiles);
         }));
       }));
     } else {
@@ -86,6 +94,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
       setError(undefined);
     }
     setImageData(allImageData);
+
+    setIsGenerating(false);
   };
 
   const getTransform = () => {
@@ -132,6 +142,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     height,
     sprite.texture.files.length,
     width,
+    state.preview.anaglyph,
   ]);
 
   /*

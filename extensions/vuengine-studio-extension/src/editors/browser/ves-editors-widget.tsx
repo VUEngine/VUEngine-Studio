@@ -130,7 +130,8 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     }
 
     protected setGeneratingProgress(current: number, total: number): void {
-        const progress = Math.round(current * 100 / total * 100) / 100;
+        const decimalPrecision = 10;
+        const progress = Math.round(current * 100 / total * decimalPrecision) / decimalPrecision;
         this.generatingProgress = progress;
         this.update();
     }
