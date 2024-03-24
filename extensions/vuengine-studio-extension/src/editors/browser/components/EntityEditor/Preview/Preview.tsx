@@ -50,7 +50,9 @@ export default function Preview(): React.JSX.Element {
         setCurrentAnimationStep(prevAnimationStep =>
           prevAnimationStep + 1 < (animation?.frames?.length ?? 1)
             ? prevAnimationStep + 1
-            : 0
+            : animation?.loop
+              ? 0
+              : prevAnimationStep
         );
       },
         frameMultiplicator * 20 * (animation?.cycles ?? 8)
