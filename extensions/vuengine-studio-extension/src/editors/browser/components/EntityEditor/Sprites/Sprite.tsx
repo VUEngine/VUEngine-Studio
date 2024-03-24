@@ -44,26 +44,22 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         const dim: number[][] = [[], []];
         const fn: string[] = [];
         const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
-        await Promise.all(
-            [
-                sprite.texture?.files,
-                sprite.texture?.files2
-            ].map(async (f, i) => {
-                fn[i] = '';
-                dim[i] = [];
-                if (f?.length) {
-                    const resolvedUri = workspaceRootUri.resolve(f[0]);
-                    if (await services.fileService.exists(resolvedUri)) {
-                        fn[i] = resolvedUri.path.base;
-                        if (f.length > 1) {
-                            fn[i] += ' +' + (f.length - 1);
-                        }
-                        const d = window.electronVesCore.getImageDimensions(resolvedUri.path.fsPath());
-                        dim[i] = [d.width ?? 0, d.height ?? 0];
-                    }
+        [
+            sprite.texture?.files,
+            sprite.texture?.files2
+        ].map(async (f, i) => {
+            fn[i] = '';
+            dim[i] = [];
+            if (f?.length) {
+                const resolvedUri = workspaceRootUri.resolve(f[0]);
+                fn[i] = resolvedUri.path.base;
+                if (f.length > 1) {
+                    fn[i] += ' +' + (f.length - 1);
                 }
-            })
-        );
+                const d = window.electronVesCore.getImageDimensions(resolvedUri.path.fsPath());
+                dim[i] = [d.width ?? 0, d.height ?? 0];
+            }
+        });
 
         setFilename(fn);
         setDimensions(dim);

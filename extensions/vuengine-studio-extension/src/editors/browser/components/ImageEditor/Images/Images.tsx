@@ -34,28 +34,24 @@ export default function Images(props: ImagesProps): React.JSX.Element {
                 : [];
 
         const result: { [path: string]: string } = {};
-        await Promise.all(f
-            .sort((a, b) => a.localeCompare(b))
-            .map(async (p, i) => {
-                if (stack && i > 0) {
-                    return;
-                }
+        f.sort((a, b) => a.localeCompare(b)).map(async (p, i) => {
+            if (stack && i > 0) {
+                return;
+            }
 
-                let meta = nls.localize(
-                    'vuengine/imageEditor/fileNotFound',
-                    'File not found'
-                );
-                const resolvedUri = workspaceRootUri.resolve(p);
-                if (await services.fileService.exists(resolvedUri)) {
-                    if (showMetaData) {
-                        const dimensions = window.electronVesCore.getImageDimensions(resolvedUri.path.fsPath());
-                        meta = `${dimensions.width}×${dimensions.height}`;
-                    } else {
-                        meta = '';
-                    }
-                }
-                result[p] = meta;
-            }));
+            let meta = nls.localize(
+                'vuengine/imageEditor/fileNotFound',
+                'File not found'
+            );
+            const resolvedUri = workspaceRootUri.resolve(p);
+            if (showMetaData) {
+                const dimensions = window.electronVesCore.getImageDimensions(resolvedUri.path.fsPath());
+                meta = `${dimensions.width}×${dimensions.height}`;
+            } else {
+                meta = '';
+            }
+            result[p] = meta;
+        });
 
         setFilesToShow(result);
     };
