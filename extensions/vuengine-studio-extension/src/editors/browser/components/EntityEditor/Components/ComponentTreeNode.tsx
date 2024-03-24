@@ -378,7 +378,7 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                     },
                 },
             },
-            section: DataSection.EXP,
+            section: DataSection.ROM,
             compression: ImageCompressionType.NONE,
         });
 
