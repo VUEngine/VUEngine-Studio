@@ -21,7 +21,10 @@ import {
     SpriteData,
     SpriteImageData,
 } from '../EntityEditorTypes';
+import { ArrowsHorizontal, ArrowsVertical } from '@phosphor-icons/react';
 
+const MIN_REPEAT_SIZE = 0;
+const MAX_REPEAT_SIZE = 512;
 const MIN_TEXTURE_DISPLACEMENT = -256;
 const MAX_TEXTURE_DISPLACEMENT = 256;
 const MIN_TEXTURE_DISPLACEMENT_PARALLAX = -32;
@@ -181,36 +184,57 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         });
     };
 
+    const toggleFlip = (a: 'x' | 'y'): void => {
+        const toggledValue = sprite.texture?.flip ?
+            !!!sprite.texture?.flip[a]
+            : true;
+        updateSprite({
+            texture: {
+                ...sprite.texture,
+                flip: {
+                    ...sprite.texture?.flip,
+                    [a]: toggledValue,
+                },
+            }
+        });
+    };
+
+    const toggleRepeat = (a: 'x' | 'y'): void => {
+        const toggledValue = sprite.texture?.repeat ?
+            !!!sprite.texture?.repeat[a]
+            : true;
+        updateSprite({
+            texture: {
+                ...sprite.texture,
+                repeat: {
+                    ...sprite.texture?.repeat,
+                    [a]: toggledValue
+                },
+            }
+        });
+    };
+
     const toggleRecycleable = (): void => {
         updateSprite({
             texture: {
                 ...sprite.texture,
-                recycleable: !sprite.texture.recycleable,
+                recycleable: !!!sprite.texture?.recycleable,
             }
         });
     };
 
-    const toggleFlipHorizontally = (): void => {
+    const setRepeatSize = (axis: 'x' | 'y', value: number): void => {
         updateSprite({
             texture: {
                 ...sprite.texture,
-                flip: {
-                    ...sprite.texture.flip,
-                    horizontal: !sprite.texture.flip.horizontal
-                },
-            }
-        });
-    };
-
-    const toggleFlipVertically = (): void => {
-        updateSprite({
-            texture: {
-                ...sprite.texture,
-                flip: {
-                    ...sprite.texture.flip,
-                    vertical: !sprite.texture.flip.vertical
-                },
-            }
+                repeat: {
+                    ...sprite.texture?.repeat,
+                    size: {
+                        ...sprite.texture?.repeat?.size,
+                        [axis]: clamp(value, MIN_REPEAT_SIZE, MAX_REPEAT_SIZE),
+                    }
+                }
+            },
         });
     };
 
@@ -648,31 +672,87 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 <label>
                     {nls.localize('vuengine/entityEditor/texture', 'Texture')}
                 </label>
+                <HContainer wrap='wrap'>
+                    <VContainer grow={1}>
+                        <label>
+                            <input
+                                type="checkbox"
+                                checked={sprite.texture?.flip?.y ?? false}
+                                onChange={() => toggleFlip('y')}
+                            />
+                            <ArrowsHorizontal size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/entityEditor/flip', 'Flip')}
+                        </label>
+                        <label>
+                            <input
+                                type="checkbox"
+                                checked={sprite.texture?.flip?.x ?? false}
+                                onChange={() => toggleFlip('x')}
+                            />
+                            <ArrowsVertical size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/entityEditor/flip', 'Flip')}
+                        </label>
+                    </VContainer>
+                    {data.sprites.type === SpriteType.Bgmap &&
+                        <VContainer grow={1}>
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    checked={sprite.texture?.repeat?.x ?? false}
+                                    onChange={() => toggleRepeat('x')}
+                                />
+                                <ArrowsHorizontal size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/entityEditor/repeat', 'Repeat')}
+                            </label>
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    checked={sprite.texture?.repeat?.y ?? false}
+                                    onChange={() => toggleRepeat('y')}
+                                />
+                                <ArrowsVertical size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/entityEditor/repeat', 'Repeat')}
+                            </label>
+                        </VContainer>
+                    }
+                </HContainer>
                 <label>
                     <input
                         type="checkbox"
-                        checked={sprite.texture.flip.horizontal}
-                        onChange={toggleFlipHorizontally}
-                    />
-                    {nls.localize('vuengine/entityEditor/flipHorizontally', 'Flip Horizontally')}
-                </label>
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={sprite.texture.flip.vertical}
-                        onChange={toggleFlipVertically}
-                    />
-                    {nls.localize('vuengine/entityEditor/flipVertically', 'Flip Vertically')}
-                </label>
-                <label>
-                    <input
-                        type="checkbox"
-                        checked={sprite.texture.recycleable}
+                        checked={sprite.texture?.recycleable ?? false}
                         onChange={toggleRecycleable}
                     />
                     {nls.localize('vuengine/entityEditor/recycleable', 'Recycleable')}
                 </label>
             </VContainer>
+            {data.sprites.type === SpriteType.Bgmap && (sprite.texture?.repeat?.x || sprite.texture?.repeat?.y) &&
+                <VContainer>
+                    <InfoLabel
+                        label={nls.localize('vuengine/entityEditor/repeatSize', 'Size (x, y)')}
+                        tooltip={nls.localize(
+                            'vuengine/entityEditor/repeatSizeDescription',
+                            'Overrides the sprite\'s size to provide culling for repeated textures. ' +
+                            'If 0, the value is inferred from the texture.'
+                        )}
+                    />
+                    <HContainer wrap='wrap'>
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            min={MIN_REPEAT_SIZE}
+                            max={MAX_REPEAT_SIZE}
+                            value={sprite.texture?.repeat?.size?.x ?? 0}
+                            onChange={e => setRepeatSize('x', parseInt(e.target.value))}
+                        />
+                        <input
+                            className='theia-input'
+                            style={{ width: 48 }}
+                            type='number'
+                            min={MIN_REPEAT_SIZE}
+                            max={MAX_REPEAT_SIZE}
+                            value={sprite.texture?.repeat?.size?.y ?? 0}
+                            onChange={e => setRepeatSize('y', parseInt(e.target.value))}
+                        />
+                    </HContainer>
+                </VContainer>
+            }
             <HContainer gap={15} wrap='wrap'>
                 <VContainer>
                     <InfoLabel

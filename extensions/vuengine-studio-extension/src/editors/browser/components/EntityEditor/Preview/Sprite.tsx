@@ -100,10 +100,10 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
 
   const getTransform = () => {
     const t: string[] = [];
-    if (sprite.texture.flip.horizontal) {
+    if (sprite.texture?.flip?.y) {
       t.push('scaleX(-1)');
     }
-    if (sprite.texture.flip.vertical) {
+    if (sprite.texture?.flip?.x) {
       t.push('scaleY(-1)');
     }
     if (sprite.bgmapMode !== BgmapMode.Affine && sprite.displacement.parallax !== 0) {

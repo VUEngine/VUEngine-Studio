@@ -35,17 +35,6 @@ export default function SpritesSettings(props: SpritesSettingsProps): React.JSX.
         });
     };
 
-    /*
-    const setCustomClass = (customClass: string): void => {
-        setData({
-            sprites: {
-                ...data.sprites,
-                customClass,
-            }
-        });
-    };
-    */
-
     const toggleUseZDisplacementInProjection = (): void => {
         setData({
             sprites: {
@@ -191,19 +180,6 @@ export default function SpritesSettings(props: SpritesSettingsProps): React.JSX.
                     {nls.localize('vuengine/entityEditor/useZDisplacement', 'Use Z Displacement')}
                 </label>
             </VContainer>
-            {/*
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/entityEditor/customClass', 'Custom Class')}
-                </label>
-                <input
-                    className='theia-input'
-                    type='string'
-                    value={data.sprites.customClass}
-                    onChange={e => setCustomClass(e.target.value)}
-                />
-            </VContainer>
-            */}
         </HContainer>
     </VContainer>;
 }

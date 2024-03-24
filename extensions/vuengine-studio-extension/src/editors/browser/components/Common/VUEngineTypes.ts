@@ -22,9 +22,21 @@ export enum Displays {
 
 export enum BgmapMode {
     Bgmap = 'Bgmap',
-    Object = 'Object',
     Affine = 'Affine',
     HBias = 'HBias',
+}
+
+export enum BgmapRepeatMode {
+    '1x1' = '1x1',
+    '1x2' = '1x2',
+    '1x4' = '1x4',
+    '1x8' = '1x8',
+    '2x1' = '2x1',
+    '2x2' = '2x2',
+    '2x4' = '2x4',
+    '4x1' = '4x1',
+    '4x2' = '4x2',
+    '8x1' = '8x1',
 }
 
 export enum WireframeType {

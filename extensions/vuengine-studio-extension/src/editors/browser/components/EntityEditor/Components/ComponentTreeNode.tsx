@@ -26,7 +26,7 @@ import { ImageCompressionType } from '../../../../../images/browser/ves-images-t
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { DataSection } from '../../Common/CommonTypes';
 import { showEntitySelection } from '../../Common/Utils';
-import { BgmapMode, ColliderType, DisplayMode, Displays, Transparency, WireframeType } from '../../Common/VUEngineTypes';
+import { BgmapMode, BgmapRepeatMode, ColliderType, DisplayMode, Displays, Transparency, WireframeType } from '../../Common/VUEngineTypes';
 import { ComponentKey, EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 import { ScriptType } from '../Scripts/ScriptTypes';
 
@@ -365,8 +365,17 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                 palette: 0,
                 recycleable: false,
                 flip: {
-                    horizontal: false,
-                    vertical: false,
+                    x: false,
+                    y: false,
+                },
+                repeat: {
+                    mode: BgmapRepeatMode['1x1'],
+                    x: false,
+                    y: false,
+                    size: {
+                        x: 0,
+                        y: 0,
+                    },
                 },
             },
             section: DataSection.EXP,

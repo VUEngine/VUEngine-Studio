@@ -5,6 +5,7 @@ import { DataSection } from '../Common/CommonTypes';
 import {
     Axis,
     BgmapMode,
+    BgmapRepeatMode,
     ColliderType,
     DisplayMode,
     Displays,
@@ -155,8 +156,18 @@ export interface SpriteData {
         palette: number
         recycleable: boolean
         flip: {
-            horizontal: boolean
-            vertical: boolean
+            x: boolean
+            y: boolean
+        }
+        repeat: {
+            // TODO: support all repeat modes
+            mode: BgmapRepeatMode
+            x: boolean
+            y: boolean
+            size: {
+                x: number
+                y: number
+            }
         }
     }
     section: DataSection
@@ -210,7 +221,6 @@ export interface EntityData {
     }
     sprites: {
         type: SpriteType
-        customClass: string
         useZDisplacementInProjection: boolean
         sharedTiles: boolean
         optimizedTiles: boolean
