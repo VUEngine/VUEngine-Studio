@@ -112,6 +112,12 @@ export default function Preview(): React.JSX.Element {
     animation,
   ]);
 
+  useEffect(() => {
+    setState({ currentAnimationStep });
+  }, [
+    currentAnimationStep,
+  ]);
+
   return hasPreviewableComponents
     ? <div
       className={`preview-container draggable${isDragging ? ' dragging' : ''}`}

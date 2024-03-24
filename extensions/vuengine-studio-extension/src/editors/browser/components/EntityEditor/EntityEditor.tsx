@@ -35,6 +35,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
     super(props);
     this.state = {
       currentComponent: '',
+      currentAnimationStep: 0,
       preview: {
         backgroundColor: -1,
         anaglyph: false,

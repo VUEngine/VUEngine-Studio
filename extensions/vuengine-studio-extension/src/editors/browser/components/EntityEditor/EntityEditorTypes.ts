@@ -231,5 +231,6 @@ export interface EntityEditorPreviewState {
 
 export interface EntityEditorState {
     currentComponent: string,
+    currentAnimationStep: number
     preview: EntityEditorPreviewState
 }
