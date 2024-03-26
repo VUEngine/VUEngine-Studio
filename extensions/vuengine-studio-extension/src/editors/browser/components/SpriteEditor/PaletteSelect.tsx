@@ -26,7 +26,7 @@ export default function PaletteSelect(props: PaletteSelectProps): React.JSX.Elem
         setSecondaryColor(mapColors(secondaryColor));
 
         setData({
-            colorMode: data.colorMode === ColorMode.Default ? ColorMode.HiColor : ColorMode.Default,
+            colorMode: data.colorMode === ColorMode.Default ? ColorMode.FrameBlend : ColorMode.Default,
         });
     };
 
@@ -35,7 +35,7 @@ export default function PaletteSelect(props: PaletteSelectProps): React.JSX.Elem
             default:
             case ColorMode.Default:
                 return color * 2;
-            case ColorMode.HiColor:
+            case ColorMode.FrameBlend:
                 return Math.floor(color / 2);
         }
     };
@@ -76,7 +76,7 @@ export default function PaletteSelect(props: PaletteSelectProps): React.JSX.Elem
                     onClick={toggleHiColor}
                     style={{ width: 66 }}
                 >
-                    {data.colorMode === ColorMode.HiColor ? ' HiColor' : '4 Colors'}
+                    {data.colorMode === ColorMode.FrameBlend ? ' HiColor' : '4 Colors'}
                 </div>
                 {[...Array(PALETTE_COLORS[colorMode].length)].map((p, paletteIndex) => (
                     <div

@@ -7,7 +7,7 @@ export interface ImageData {
 
 export enum ColorMode {
   Default = 0,
-  HiColor = 1,
+  FrameBlend = 1, // aka "HiColor"
 }
 
 export const PALETTE_INDEX_MAPPING: { [key: string]: number } = {

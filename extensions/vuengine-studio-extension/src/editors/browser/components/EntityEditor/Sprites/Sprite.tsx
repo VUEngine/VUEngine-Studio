@@ -1,6 +1,6 @@
 import { nls } from '@theia/core';
 import React, { useContext, useEffect, useState } from 'react';
-// import { ColorMode } from '../../../../../core/browser/ves-common-types';
+import { ColorMode } from '../../../../../core/browser/ves-common-types';
 import { ImageCompressionType } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { DataSection } from '../../Common/CommonTypes';
@@ -85,12 +85,12 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                             tileCount += imageData.images[i].animation?.largestFrame ?? 0;
                         } else if (imageData.images[i].tiles?.count) {
                             tileCount += data.components?.animations?.length > 0 && !data.animations.multiframe
-                                ? Math.round((imageData.images[i].tiles?.count ?? 0 / data.animations?.totalFrames ?? 1) * 100) / 100
+                                ? (imageData.images[i].tiles?.count ?? 0) / (data.animations?.totalFrames ?? 1)
                                 : imageData.images[i].tiles?.count ?? 0;
                         }
                     }
                 });
-                return tileCount;
+                return Math.round(tileCount * 100) / 100;
             }
         }
 
@@ -115,13 +115,11 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         });
     };
 
-    /*
     const setColorMode = (colorMode: ColorMode): void => {
         updateSprite({
             colorMode,
         });
     };
-    */
 
     const setDisplayMode = (displayMode: DisplayMode): void => {
         if (displayMode === DisplayMode.Stereo) {
@@ -291,7 +289,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
 
     return (
         <VContainer gap={15}>
-            <HContainer gap={15} wrap='wrap' style={{ justifyContent: 'space-between' }}>
+            <HContainer gap={15} wrap='wrap'>
                 <VContainer>
                     <label>
                         {nls.localize('vuengine/entityEditor/displayMode', 'Display Mode')}
@@ -308,41 +306,28 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                         onChange={options => setDisplayMode(options[0].value as DisplayMode)}
                     />
                 </VContainer>
-                {/*
-                <VContainer>
-                    <InfoLabel
-                        label={nls.localize('vuengine/entityEditor/colorMode', 'Color Mode')}
-                        tooltip={nls.localize(
-                            'vuengine/entityEditor/colorModeDescription',
-                            'Whether to use the system\'s default 4-color palette or HiColor mode, ' +
-                            'which simulates 7 colors by blending together adjacent frames to create mix colors. ' +
-                            'Note: Mixed colors look fine on hardware, but flicker on emulators.'
-                        )}
-                    />
-                    <RadioSelect
-                        options={[{
-                            value: ColorMode.Default,
-                            label: nls.localize('vuengine/entityEditor/colorModeDefault', 'Default'),
-                        }, {
-                            value: ColorMode.HiColor,
-                            label: nls.localize('vuengine/entityEditor/colorModeHiColor', 'HiColor'),
-                        }]}
-                        defaultValue={sprite.colorMode}
-                        onChange={options => setColorMode(options[0].value as ColorMode)}
-                    />
-                </VContainer>
-                */}
-                {tilesCount > 0 &&
+                {data.sprites.type === SpriteType.Bgmap && !data.components?.animations?.length &&
+                    !sprite.texture?.repeat?.x && !sprite.texture?.repeat?.y &&
                     <VContainer>
-                        <label>
-                            {nls.localize('vuengine/entityEditor/tiles', 'Tiles')}
-                        </label>
-                        <input
-                            className={`theia-input heaviness${invalidTilesCount ? ' error' : ''}`}
-                            type='text'
-                            value={invalidTilesCount ? `⚠ ${tilesCount}` : tilesCount}
-                            style={{ width: 60 }}
-                            disabled
+                        <InfoLabel
+                            label={nls.localize('vuengine/entityEditor/colorMode', 'Color Mode')}
+                            tooltip={nls.localize(
+                                'vuengine/entityEditor/colorModeDescription',
+                                'Whether to use the system\'s default 4 color palette or HiColor mode, ' +
+                                'which simulates 7 colors by blending together adjacent frames to create mix colors. ' +
+                                'Note: Mixed colors look fine on hardware, but flicker on emulators.'
+                            )}
+                        />
+                        <RadioSelect
+                            options={[{
+                                value: ColorMode.Default,
+                                label: nls.localize('vuengine/entityEditor/colorModeDefault', 'Default'),
+                            }, {
+                                value: ColorMode.FrameBlend,
+                                label: nls.localize('vuengine/entityEditor/colorModeHiColor', 'HiColor'),
+                            }]}
+                            defaultValue={sprite.colorMode}
+                            onChange={options => setColorMode(options[0].value as ColorMode)}
                         />
                     </VContainer>
                 }
@@ -408,6 +393,14 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                     </div>
                                 }
                             </>
+                        }
+
+                        {tilesCount > 0 &&
+                            <div
+                                className={invalidTilesCount ? ' error' : undefined}
+                            >
+                                {invalidTilesCount ? `⚠ ${tilesCount}` : tilesCount} {nls.localize('vuengine/entityEditor/tiles', 'Tiles')}
+                            </div>
                         }
                     </VContainer>
                 </HContainer>
