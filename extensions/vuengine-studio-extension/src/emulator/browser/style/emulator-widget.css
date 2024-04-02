@@ -1,4 +1,5 @@
 #vesEmulatorWidget {
+  container: emulator / inline-size;
   display: flex;
   flex-direction: column;
 }
@@ -33,12 +34,23 @@
   min-width: 384px;
   opacity: .5;
   padding-bottom: calc(var(--theia-ui-padding) * 2);
+  white-space: nowrap;
+}
+
+@container emulator (max-width: 560px) {
+  .emulator-header {
+    display: none;
+  }
 }
 
 .emulator-header>div {
   display: flex;
   flex-wrap: wrap;
   gap: 2px;
+}
+
+.emulator-header>div:last-child {
+  padding-left: 32px;
 }
 
 .emulator-header span {

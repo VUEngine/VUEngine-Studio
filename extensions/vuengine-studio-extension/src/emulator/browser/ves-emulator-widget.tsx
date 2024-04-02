@@ -52,6 +52,7 @@ export interface vesEmulatorWidgetState {
   frameAdvance: boolean;
   showControls: boolean;
   romHeader: RomHeader;
+  romSize: number;
   input: any /* eslint-disable-line */;
 }
 
@@ -193,6 +194,7 @@ export class VesEmulatorWidget extends ReactWidget {
         code: '',
         version: 0,
       },
+      romSize: 0,
       input: {},
     };
     this.keybindingToState();
@@ -512,6 +514,7 @@ export class VesEmulatorWidget extends ReactWidget {
       code: romHeaderCode,
       version: romHeaderVersion,
     };
+    this.state.romSize = romContentBuffer.length / 131072;
 
     const romBase64 = this.vesCommonService.bytesToBase64(romContentBuffer);
     this.sendRetroArchConfig();
@@ -968,6 +971,12 @@ export class VesEmulatorWidget extends ReactWidget {
                 <div>Version:</div>
                 <div>
                   1.<span>{this.state.romHeader.version}</span>
+                </div>
+              </div>
+              <div>
+                <div>Size:</div>
+                <div>
+                  <span>{this.state.romSize} MBit</span>
                 </div>
               </div>
             </div>
