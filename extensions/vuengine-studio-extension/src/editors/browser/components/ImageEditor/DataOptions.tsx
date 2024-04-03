@@ -1,20 +1,16 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
-import { ImageCompressionType } from '../../../../../images/browser/ves-images-types';
-import { DataSection } from '../../Common/CommonTypes';
-import HContainer from '../../Common/HContainer';
-import InfoLabel from '../../Common/InfoLabel';
-import RadioSelect from '../../Common/RadioSelect';
-import SectionSelect from '../../Common/SectionSelect';
-import VContainer from '../../Common/VContainer';
-import { ImageEditorContext, ImageEditorContextType } from '../ImageEditorTypes';
+import { ImageCompressionType } from '../../../../images/browser/ves-images-types';
+import { DataSection } from '../Common/CommonTypes';
+import HContainer from '../Common/HContainer';
+import InfoLabel from '../Common/InfoLabel';
+import RadioSelect from '../Common/RadioSelect';
+import SectionSelect from '../Common/SectionSelect';
+import VContainer from '../Common/VContainer';
+import { ImageEditorContext, ImageEditorContextType } from './ImageEditorTypes';
 
-export default function General(): React.JSX.Element {
+export default function DataOptions(): React.JSX.Element {
     const { imageData, updateImageData } = useContext(ImageEditorContext) as ImageEditorContextType;
-
-    const setName = (n: string): void => {
-        updateImageData({ name: n });
-    };
 
     const setTilesCompression = (compression: ImageCompressionType) => {
         updateImageData({
@@ -33,16 +29,6 @@ export default function General(): React.JSX.Element {
 
     return <VContainer gap={15}>
         <HContainer gap={10} wrap='wrap'>
-            <VContainer grow={1}>
-                <label>
-                    {nls.localize('vuengine/imageEditor/name', 'Name')}
-                </label>
-                <input
-                    className='theia-input large'
-                    value={imageData.name}
-                    onChange={e => setName(e.target.value)}
-                />
-            </VContainer>
             <VContainer>
                 <InfoLabel
                     label={nls.localize('vuengine/entityEditor/compression', 'Compression')}

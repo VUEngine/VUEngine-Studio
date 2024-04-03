@@ -27,22 +27,10 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
         };
     }
 
-    protected onChangeName(e: React.ChangeEvent<HTMLInputElement>): void {
-        this.props.updateData({
-            ...this.props.data,
-            name: e.target.value
-        });
-    }
-
     protected setSourceFile = async (sourceFile: string) => {
-        const { services } = this.props.context;
-        const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
-        const name = workspaceRootUri.resolve(sourceFile).path.name.replace(/([A-Z])/g, ' $1').trim();
-
         this.props.updateData({
             ...this.props.data,
             sourceFile: sourceFile.replace(/\\/g, '/'),
-            name,
         });
     };
 
@@ -99,22 +87,6 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
         };
 
         return <VContainer gap={15} className='pcmEditor'>
-            <HContainer alignItems='start' gap={15}>
-                <VContainer grow={1}>
-                    <label>
-                        {nls.localize('vuengine/pcmEditor/name', 'Name')}
-                    </label>
-                    <input
-                        className="theia-input large"
-                        value={data.name}
-                        onChange={this.onChangeName.bind(this)}
-                    />
-                </VContainer>
-                <SectionSelect
-                    value={data.section}
-                    setValue={this.setSection.bind(this)}
-                />
-            </HContainer>
             <VContainer>
                 <label>
                     {nls.localize('vuengine/emulator/path', 'Path')}
@@ -161,6 +133,10 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
                     />
                 </VContainer>
             </HContainer>
+            <SectionSelect
+                value={data.section}
+                setValue={this.setSection.bind(this)}
+            />
         </VContainer>;
     }
 }

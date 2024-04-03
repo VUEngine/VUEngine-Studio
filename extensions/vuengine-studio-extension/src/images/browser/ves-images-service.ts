@@ -13,7 +13,8 @@ import {
   ConversionResult,
   ConvertedFileData,
   ImageCompressionType,
-  ImageConfig
+  ImageConfig,
+  ImageConfigWithName
 } from './ves-images-types';
 
 @injectable()
@@ -31,7 +32,7 @@ export class VesImagesService {
   @inject(WorkspaceService)
   protected readonly workspaceService: WorkspaceService;
 
-  async convertImage(imageConfigFileUri: URI, imageConfig: ImageConfig, filePath?: string): Promise<ConversionResult> {
+  async convertImage(imageConfigFileUri: URI, imageConfig: ImageConfigWithName, filePath?: string): Promise<ConversionResult> {
 
     const result: ConversionResult = {
       animation: {},

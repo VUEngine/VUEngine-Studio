@@ -22,13 +22,6 @@ export default class BrightnessRepeatEditor extends React.Component<BrightnessRe
         };
     }
 
-    protected onChangeName(e: React.ChangeEvent<HTMLInputElement>): void {
-        this.props.updateData({
-            ...this.props.data,
-            name: e.target.value
-        });
-    }
-
     protected onChangeDescription(e: React.ChangeEvent<HTMLInputElement>): void {
         this.props.updateData({
             ...this.props.data,
@@ -61,16 +54,6 @@ export default class BrightnessRepeatEditor extends React.Component<BrightnessRe
         >
             <HContainer gap={15} alignItems='start'>
                 <VContainer grow={1} gap={15} style={{ maxWidth: 500 }}>
-                    <VContainer>
-                        <label>
-                            {nls.localize('vuengine/brightnessRepeatEditor/name', 'Name')}
-                        </label>
-                        <input
-                            className="theia-input"
-                            value={data.name}
-                            onChange={this.onChangeName.bind(this)}
-                        />
-                    </VContainer>
                     <VContainer>
                         <label>
                             {nls.localize('vuengine/brightnessRepeatEditor/description', 'Description')}

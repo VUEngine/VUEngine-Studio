@@ -88,16 +88,45 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
     };
 
     return <HContainer gap={15}>
+        {/*
+        <VContainer>
+            <label>
+                {nls.localize('vuengine/fontEditor/size', 'Size')}
+            </label>
+            <RadioSelect
+                options={[{
+                    label: nls.localize('vuengine/fontEditor/fixed', 'Fixed'),
+                    value: '0',
+                    // description: nls.localize('vuengine/fontEditor/fixedSizeDescription', 'All characters have the same dimensions'),
+                }, {
+                    label: nls.localize('vuengine/fontEditor/variable', 'Variable'),
+                    value: '1',
+                    // description: nls.localize(
+                    //     'vuengine/fontEditor/variableSizeDescription',
+                    //     'Every character can be of different width. Height is global. Allows for more dense or very small text. Uses Objects.'
+                    // ),
+                }]}
+                defaultValue={variableSize.enabled ? '1' : '0'}
+                onChange={options => setCharSize(
+                    undefined,
+                    {
+                        ...variableSize,
+                        enabled: options[0].value === '1' ? true : false
+                    }
+                )}
+            />
+        </VContainer>
+        */}
         {variableSize.enabled &&
             <VContainer>
                 <label>
                     {nls.localize('vuengine/fontEditor/characterSize', 'Character Size')}
                 </label>
-                <HContainer>
+                <HContainer alignItems='center'>
                     <input
                         type="number"
                         className="theia-input"
-                        style={{ width: 48 }}
+                        style={{ width: 32 }}
                         min={MIN_VARIABLE_CHAR_SIZE}
                         max={charWidth}
                         value={variableSize.x[currentCharacter] ?? charWidth}
@@ -107,7 +136,7 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
                     <input
                         type="number"
                         className="theia-input"
-                        style={{ width: 48 }}
+                        style={{ width: 32 }}
                         min={MIN_VARIABLE_CHAR_SIZE}
                         max={charWidth}
                         value={variableSize.y}
@@ -122,11 +151,11 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
             {variableSize.enabled && <label>
                 {nls.localize('vuengine/fontEditor/maximum', 'Maximum')}
             </label>}
-            <HContainer>
+            <HContainer alignItems='center'>
                 <input
                     type="number"
                     className="theia-input"
-                    style={{ width: 48 }}
+                    style={{ width: 32 }}
                     step={CHAR_PIXEL_SIZE}
                     min={MIN_CHAR_SIZE * CHAR_PIXEL_SIZE}
                     max={MAX_CHAR_SIZE * CHAR_PIXEL_SIZE}
@@ -138,7 +167,7 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
                 <input
                     type="number"
                     className="theia-input"
-                    style={{ width: 48 }}
+                    style={{ width: 32 }}
                     step={CHAR_PIXEL_SIZE}
                     min={MIN_CHAR_SIZE * CHAR_PIXEL_SIZE}
                     max={MAX_CHAR_SIZE * CHAR_PIXEL_SIZE}

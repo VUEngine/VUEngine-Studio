@@ -1,7 +1,7 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
-import VContainer from '../../Common/VContainer';
-import { ImageEditorContext, ImageEditorContextType } from '../ImageEditorTypes';
+import VContainer from '../Common/VContainer';
+import { ImageEditorContext, ImageEditorContextType } from './ImageEditorTypes';
 
 export default function Animation(): React.JSX.Element {
     const { imageData, updateImageData } = useContext(ImageEditorContext) as ImageEditorContextType;

@@ -33,13 +33,6 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
 
     protected rumblePakLogLineLastElementRef = React.createRef<HTMLDivElement>();
 
-    protected onChangeName(e: React.ChangeEvent<HTMLInputElement>): void {
-        this.props.updateData({
-            ...this.props.data,
-            name: e.target.value
-        });
-    }
-
     protected setEffect = (effect: number) => {
         this.props.updateData({
             ...this.props.data,
@@ -136,16 +129,6 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
         this.rumblePakLogLineLastElementRef.current?.scrollIntoView();
 
         return <VContainer className='rumbleEffectEditor' gap={15}>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/rumbleEffectEditor/name', 'Name')}
-                </label>
-                <input
-                    className="theia-input large"
-                    value={data.name}
-                    onChange={this.onChangeName.bind(this)}
-                />
-            </VContainer>
             <HContainer gap={15}>
                 <VContainer grow={1}>
                     <label>

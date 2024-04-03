@@ -1,7 +1,7 @@
 {%- if item._forEachOfBasename is defined -%}
 	{%- set sanitizedSpecName = item._forEachOfBasename | sanitizeSpecName -%}
 {%- else -%}
-	{%- set sanitizedSpecName = item.name | sanitizeSpecName -%}
+	{%- set sanitizedSpecName = itemUri | basename(false) | sanitizeSpecName -%}
 {%- endif -%}
 {%- set imageData = itemUri | convertImage(item, item._forEachOf) -%}
 

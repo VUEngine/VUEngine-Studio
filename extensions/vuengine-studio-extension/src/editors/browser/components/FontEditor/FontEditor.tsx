@@ -154,12 +154,6 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
         this.updateFontData({ characters });
     };
 
-    protected onChangeName(e: React.ChangeEvent<HTMLInputElement>): void {
-        this.updateFontData({
-            name: e.target.value
-        });
-    }
-
     protected setCharCount(characterCount: number): void {
         this.updateFontData({ characterCount });
     }
@@ -288,144 +282,107 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
             onMouseOver={() => this.setState({ active: true })}
             onMouseOut={() => this.setState({ active: false })}
         >
-            <VContainer gap={15}>
-                <HContainer alignItems='start' gap={15} wrap='wrap'>
-                    <VContainer grow={1}>
-                        <label>
-                            {nls.localize('vuengine/fontEditor/name', 'Name')}
-                        </label>
-                        <input
-                            className="theia-input large"
-                            value={data.name}
-                            onChange={this.onChangeName.bind(this)}
-                        />
-                    </VContainer>
-                    <VContainer>
-                        <label>
-                            {nls.localize('vuengine/fontEditor/size', 'Size')}
-                        </label>
-                        <RadioSelect
-                            options={[{
-                                label: nls.localize('vuengine/fontEditor/fixed', 'Fixed'),
-                                value: '0',
-                                // description: nls.localize('vuengine/fontEditor/fixedSizeDescription', 'All characters have the same dimensions'),
-                            }, {
-                                label: nls.localize('vuengine/fontEditor/variable', 'Variable'),
-                                value: '1',
-                                // eslint-disable-next-line max-len
-                                // description: nls.localize('vuengine/fontEditor/variableSizeDescription', 'Every character can be of different width. Height is global. Allows for more dense or very small text. Uses Objects.'),
-                            }]}
-                            defaultValue={data.variableSize.enabled ? '1' : '0'}
-                            onChange={options => this.setCharSize(
-                                undefined,
-                                {
-                                    ...data.variableSize,
-                                    enabled: options[0].value === '1' ? true : false
-                                }
-                            )}
-                        />
-                    </VContainer>
-                    <VContainer>
-                        <InfoLabel
-                            label={nls.localize('vuengine/entityEditor/compression', 'Compression')}
-                            tooltip={nls.localize(
-                                'vuengine/entityEditor/compressionDescription',
-                                // eslint-disable-next-line max-len
-                                'Image data can be stored in a compressed format to save ROM space. Comes at the cost of a slightly higher CPU load when loading data into memory.'
-                            )}
-                            tooltipPosition='bottom'
-                        />
-                        <RadioSelect
-                            options={[{
-                                label: nls.localize('vuengine/entityEditor/none', 'None'),
-                                value: ImageCompressionType.NONE,
-                            }, {
-                                label: nls.localize('vuengine/entityEditor/rle', 'RLE'),
-                                value: ImageCompressionType.RLE,
-                            }]}
-                            defaultValue={data.compression}
-                            onChange={options => this.setCompression(options[0].value as ImageCompressionType)}
-                        />
-                    </VContainer>
-                    <SectionSelect
-                        value={data.section}
-                        setValue={this.setSection.bind(this)}
+            <div className='editor'>
+                <div className='tools-column'>
+                    <CurrentCharInfo
+                        currentCharacter={this.state.currentCharacter}
                     />
-                </HContainer>
-                <div className='editor'>
-                    <div className='tools-column'>
-                        <CurrentCharInfo
-                            currentCharacter={this.state.currentCharacter}
-                        />
-                        <Palette
-                            paletteIndexL={this.state.paletteIndexL}
-                            paletteIndexR={this.state.paletteIndexR}
-                            setState={this.setState.bind(this)}
-                        />
-                        <Tools
-                            tool={this.state.tool}
-                            setState={this.setState.bind(this)}
-                        />
-                        <Actions
-                            clipboard={this.state.clipboard}
-                            charHeight={pixelHeight}
-                            charWidth={pixelWidth}
-                            currentCharData={characters[this.state.currentCharacter]}
-                            setCurrentCharData={this.setCurrentCharacterData.bind(this)}
-                            setState={this.setState.bind(this)}
-                        />
-                        <ImportExport
-                            setCharacters={this.setCharacters.bind(this)}
-                            size={data.size}
-                            offset={data.offset}
-                            characterCount={data.characterCount}
-                        />
-                    </div>
-                    <div className='editor-column'>
-                        <CharSettings
-                            currentCharacter={this.state.currentCharacter}
-                            charHeight={pixelHeight}
-                            charWidth={pixelWidth}
-                            variableSize={data.variableSize}
-                            setCharSize={this.setCharSize.bind(this)}
-                            charGrid={this.state.charGrid}
-                            setState={this.setState.bind(this)}
-                        />
-                        <CharEditor
-                            char={characters[this.state.currentCharacter]}
-                            charId={this.state.currentCharacter}
-                            charHeight={pixelHeight}
-                            charWidth={pixelWidth}
-                            variableSize={data.variableSize}
-                            clickPixel={this.clickPixel.bind(this)}
-                            paletteIndexL={this.state.paletteIndexL}
-                            paletteIndexR={this.state.paletteIndexR}
-                            charGrid={this.state.charGrid}
-                        />
-                    </div>
-                    <div className='alphabet-column'>
-                        <AlphabetSettings
-                            charCount={data.characterCount}
-                            setCharCount={this.setCharCount.bind(this)}
-                            offset={data.offset}
-                            setOffset={this.setOffset.bind(this)}
-                            alphabetGrid={this.state.alphabetGrid}
-                            setState={this.setState.bind(this)}
-                        />
-                        <Alphabet
-                            charsData={data.characters || []}
-                            offset={data.offset}
-                            charCount={data.characterCount}
-                            charHeight={pixelHeight}
-                            charWidth={pixelWidth}
-                            currentCharacter={this.state.currentCharacter}
-                            variableSize={data.variableSize}
-                            alphabetGrid={this.state.alphabetGrid}
-                            setState={this.setState.bind(this)}
-                        />
-                    </div>
+                    <Palette
+                        paletteIndexL={this.state.paletteIndexL}
+                        paletteIndexR={this.state.paletteIndexR}
+                        setState={this.setState.bind(this)}
+                    />
+                    <Tools
+                        tool={this.state.tool}
+                        setState={this.setState.bind(this)}
+                    />
+                    <Actions
+                        clipboard={this.state.clipboard}
+                        charHeight={pixelHeight}
+                        charWidth={pixelWidth}
+                        currentCharData={characters[this.state.currentCharacter]}
+                        setCurrentCharData={this.setCurrentCharacterData.bind(this)}
+                        setState={this.setState.bind(this)}
+                    />
+                    <ImportExport
+                        setCharacters={this.setCharacters.bind(this)}
+                        size={data.size}
+                        offset={data.offset}
+                        characterCount={data.characterCount}
+                    />
                 </div>
-            </VContainer>
+                <div className='editor-column'>
+                    <CharSettings
+                        currentCharacter={this.state.currentCharacter}
+                        charHeight={pixelHeight}
+                        charWidth={pixelWidth}
+                        variableSize={data.variableSize}
+                        setCharSize={this.setCharSize.bind(this)}
+                        charGrid={this.state.charGrid}
+                        setState={this.setState.bind(this)}
+                    />
+                    <CharEditor
+                        char={characters[this.state.currentCharacter]}
+                        charId={this.state.currentCharacter}
+                        charHeight={pixelHeight}
+                        charWidth={pixelWidth}
+                        variableSize={data.variableSize}
+                        clickPixel={this.clickPixel.bind(this)}
+                        paletteIndexL={this.state.paletteIndexL}
+                        paletteIndexR={this.state.paletteIndexR}
+                        charGrid={this.state.charGrid}
+                    />
+                </div>
+                <div className='alphabet-column'>
+                    <AlphabetSettings
+                        charCount={data.characterCount}
+                        setCharCount={this.setCharCount.bind(this)}
+                        offset={data.offset}
+                        setOffset={this.setOffset.bind(this)}
+                        alphabetGrid={this.state.alphabetGrid}
+                        setState={this.setState.bind(this)}
+                    />
+                    <Alphabet
+                        charsData={data.characters || []}
+                        offset={data.offset}
+                        charCount={data.characterCount}
+                        charHeight={pixelHeight}
+                        charWidth={pixelWidth}
+                        currentCharacter={this.state.currentCharacter}
+                        variableSize={data.variableSize}
+                        alphabetGrid={this.state.alphabetGrid}
+                        setState={this.setState.bind(this)}
+                    />
+                    <HContainer alignItems='start' gap={15} wrap='wrap'>
+                        <VContainer>
+                            <InfoLabel
+                                label={nls.localize('vuengine/entityEditor/compression', 'Compression')}
+                                tooltip={nls.localize(
+                                    'vuengine/entityEditor/compressionDescription',
+                                    // eslint-disable-next-line max-len
+                                    'Image data can be stored in a compressed format to save ROM space. Comes at the cost of a slightly higher CPU load when loading data into memory.'
+                                )}
+                                tooltipPosition='bottom'
+                            />
+                            <RadioSelect
+                                options={[{
+                                    label: nls.localize('vuengine/entityEditor/none', 'None'),
+                                    value: ImageCompressionType.NONE,
+                                }, {
+                                    label: nls.localize('vuengine/entityEditor/rle', 'RLE'),
+                                    value: ImageCompressionType.RLE,
+                                }]}
+                                defaultValue={data.compression}
+                                onChange={options => this.setCompression(options[0].value as ImageCompressionType)}
+                            />
+                        </VContainer>
+                        <SectionSelect
+                            value={data.section}
+                            setValue={this.setSection.bind(this)}
+                        />
+                    </HContainer>
+                </div>
+            </div>
         </div>;
     }
 }

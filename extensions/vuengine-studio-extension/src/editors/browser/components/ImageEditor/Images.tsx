@@ -1,9 +1,9 @@
 import { MaybeArray, URI, nls } from '@theia/core';
 import { OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import React, { useContext, useEffect, useState } from 'react';
-import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import HContainer from '../../Common/HContainer';
-import VContainer from '../../Common/VContainer';
+import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
+import HContainer from '../Common/HContainer';
+import VContainer from '../Common/VContainer';
 import { Image, Images as ImagesIcon } from '@phosphor-icons/react';
 
 interface ImagesProps {

@@ -3,12 +3,12 @@ import React from 'react';
 import { ImageConfig } from '../../../../images/browser/ves-images-types';
 import HContainer from '../Common/HContainer';
 import VContainer from '../Common/VContainer';
-import Animation from './Animation/Animation';
-import General from './General/General';
+import Animation from './Animation';
+import DataOptions from './DataOptions';
 import { ImageEditorContext } from './ImageEditorTypes';
-import Images from './Images/Images';
-import Map from './TilesMap/Map';
-import Tiles from './TilesMap/Tiles';
+import Images from './Images';
+import Map from './Map';
+import Tiles from './Tiles';
 
 interface ImageEditorProps {
     data: ImageConfig
@@ -35,11 +35,11 @@ export default function ImageEditor(props: ImageEditorProps): React.JSX.Element 
                 }}
             >
                 <VContainer gap={20} overflow='hidden'>
-                    <General />
                     <HContainer gap={20} alignItems='start' wrap='wrap'>
                         <Tiles />
                         <Map />
                         <Animation />
+                        <DataOptions />
                     </HContainer>
                     <VContainer overflow='hidden'>
                         <label>

@@ -20,13 +20,6 @@ export default class ColumnTableEditor extends React.Component<ColumnTableEditor
         };
     }
 
-    protected onChangeName(e: React.ChangeEvent<HTMLInputElement>): void {
-        this.props.updateData({
-            ...this.props.data,
-            name: e.target.value
-        });
-    }
-
     protected onChangeDescription(e: React.ChangeEvent<HTMLInputElement>): void {
         this.props.updateData({
             ...this.props.data,
@@ -58,16 +51,6 @@ export default class ColumnTableEditor extends React.Component<ColumnTableEditor
             className='columnTableEditor'
         >
             <VContainer gap={15} style={{ maxWidth: 500 }}>
-                <VContainer>
-                    <label>
-                        {nls.localize('vuengine/columnTableEditor/name', 'Name')}
-                    </label>
-                    <input
-                        className="theia-input"
-                        value={data.name}
-                        onChange={this.onChangeName.bind(this)}
-                    />
-                </VContainer>
                 <VContainer>
                     <label>
                         {nls.localize('vuengine/columnTableEditor/description', 'Description')}

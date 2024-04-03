@@ -248,10 +248,6 @@ export const defaultProjectData: ProjectData = {
               type: 'string'
             }
           },
-          name: {
-            type: 'string',
-            default: ''
-          },
           section: {
             type: 'string',
             oneOf: [

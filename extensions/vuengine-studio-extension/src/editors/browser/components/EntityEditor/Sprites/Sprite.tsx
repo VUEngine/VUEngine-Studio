@@ -11,7 +11,7 @@ import SectionSelect from '../../Common/SectionSelect';
 import { clamp } from '../../Common/Utils';
 import VContainer from '../../Common/VContainer';
 import { BgmapMode, DisplayMode, Displays, SpriteType, Transparency } from '../../Common/VUEngineTypes';
-import Images from '../../ImageEditor/Images/Images';
+import Images from '../../ImageEditor/Images';
 import { EntityEditorSaveDataOptions } from '../EntityEditor';
 import {
     EntityEditorContext,

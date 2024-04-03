@@ -1,6 +1,4 @@
-import { nls } from '@theia/core';
 import React from 'react';
-import VContainer from '../Common/VContainer';
 import Editor from './Editor';
 import { WaveFormData } from './WaveFormEditorTypes';
 
@@ -19,13 +17,6 @@ export default class WaveFormEditor extends React.Component<WaveFormEditorProps,
         };
     }
 
-    protected onChangeName(e: React.ChangeEvent<HTMLInputElement>): void {
-        this.props.updateData({
-            ...this.props.data,
-            name: e.target.value
-        });
-    }
-
     protected setValue(index: number, value: number): void {
         const updatedValues = [...this.props.data.values];
         updatedValues[index] = value;
@@ -42,16 +33,6 @@ export default class WaveFormEditor extends React.Component<WaveFormEditorProps,
             tabIndex={0}
             className='waveFormEditor'
         >
-            <VContainer style={{ maxWidth: 500 }}>
-                <label>
-                    {nls.localize('vuengine/waveFormEditor/name', 'Name')}
-                </label>
-                <input
-                    className="theia-input"
-                    value={data.name}
-                    onChange={this.onChangeName.bind(this)}
-                />
-            </VContainer>
             <Editor
                 values={data.values}
                 setValue={this.setValue.bind(this)}

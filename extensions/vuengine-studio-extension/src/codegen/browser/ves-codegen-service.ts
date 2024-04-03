@@ -13,7 +13,7 @@ import { VesAudioConverterService } from '../../audio-converter/browser/ves-audi
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { compressTiles } from '../../images/browser/ves-images-compressor';
 import { VesImagesService } from '../../images/browser/ves-images-service';
-import { AnimationConfig, ImageCompressionType, ImageConfig, TilesCompressionResult } from '../../images/browser/ves-images-types';
+import { AnimationConfig, ImageCompressionType, ImageConfigWithName, TilesCompressionResult } from '../../images/browser/ves-images-types';
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { VesProcessService } from '../../process/common/ves-process-service-protocol';
 import { VesProjectService } from '../../project/browser/ves-project-service';
@@ -600,7 +600,7 @@ export class VesCodeGenService {
       callback(null, result);
     }, true);
 
-    env.addFilter('convertImage', async (imageConfigFileUri: URI, imageConfig: ImageConfig, filePath: string, callback): Promise<void> => {
+    env.addFilter('convertImage', async (imageConfigFileUri: URI, imageConfig: ImageConfigWithName, filePath: string, callback): Promise<void> => {
       const result = await this.vesImageService.convertImage(imageConfigFileUri, imageConfig, filePath);
       // eslint-disable-next-line no-null/no-null
       callback(null, result);

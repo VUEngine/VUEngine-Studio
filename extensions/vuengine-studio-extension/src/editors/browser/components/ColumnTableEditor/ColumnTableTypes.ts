@@ -1,5 +1,4 @@
 export interface ColumnTableData {
-    name: string
     description: string
     mirror: boolean
     values: ColumnTableEntry[]

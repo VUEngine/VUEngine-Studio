@@ -3,7 +3,6 @@ import { DataSection } from '../../editors/browser/components/Common/CommonTypes
 
 export interface ImageConfig {
   files: string[]
-  name: string
   section: DataSection
   tileset: {
     shared: boolean
@@ -19,6 +18,10 @@ export interface ImageConfig {
   }
   animation: AnimationConfig
 }
+
+export type ImageConfigWithName = ImageConfig & {
+  name: string
+};
 
 export interface AnimationConfig {
   isAnimation: boolean
@@ -90,7 +93,6 @@ export const COMPRESSION_FLAG_LENGTH = 1;
 
 export const DEFAULT_IMAGE_CONVERTER_CONFIG: ImageConfig = {
   files: [],
-  name: '',
   section: DataSection.ROM,
   tileset: {
     shared: false,

@@ -13,7 +13,6 @@ export interface FontEditorState {
 }
 
 export interface FontData {
-    name: string
     offset: number
     characterCount: number
     size: Size
