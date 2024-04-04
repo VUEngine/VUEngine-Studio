@@ -692,11 +692,15 @@ export class VesProjectService {
       {
         nodir: true
       });
+      console.log('files', files);
 
     await Promise.all(files.map(async f => {
       const fileContent = await this.fileService.readFile(root.resolve(f));
       const fileContentJson = JSON.parse(fileContent.value.toString());
-      const t = f.startsWith('contributions/Type') ? 'types' : 'templates';
+      const t = f.startsWith('contributions/Type') ||
+        (isWindows && f.startsWith('contributions\\Type'))
+          ? 'types'
+          : 'templates';
       // @ts-ignore
       result[t][fileContent.resource.path.name] = fileContentJson;
     }));
