@@ -692,7 +692,6 @@ export class VesProjectService {
       {
         nodir: true
       });
-      console.log('files', files);
 
     await Promise.all(files.map(async f => {
       const fileContent = await this.fileService.readFile(root.resolve(f));
