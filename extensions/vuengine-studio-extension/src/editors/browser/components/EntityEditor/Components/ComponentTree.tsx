@@ -1,8 +1,10 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import { Tree } from 'react-arborist';
+import { WithFileUri } from '../../../../../project/browser/ves-project-types';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import VContainer from '../../Common/VContainer';
-import { ComponentKey, EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
+import { ComponentKey, EntityData, EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 import ComponentTreeNode from './ComponentTreeNode';
 
 interface ComponentType {
@@ -20,6 +22,7 @@ interface TreeNode {
 }
 
 export default function ComponentTree(): React.JSX.Element {
+    const { services } = useContext(EditorsContext) as EditorsContextType;
     const { data, setData, state } = useContext(EntityEditorContext) as EntityEditorContextType;
 
     const moveComponent = (
@@ -123,9 +126,20 @@ export default function ComponentTree(): React.JSX.Element {
                 if (componentType.componentKey && data.components[componentType.componentKey]) {
                     const newEntryChildren: TreeNode[] = [];
                     data.components[componentType.componentKey].map((c, i) => {
+                        const fallbackName = `${componentType.labelSingular} ${i + 1}`;
+                        let name = c.name ?? fallbackName;
+
+                        if (componentType.key === 'children') {
+                            // @ts-ignore
+                            const entityItem = services.vesProjectService.getProjectDataItemById(c.itemId, 'Entity') as EntityData & WithFileUri;
+                            if (entityItem) {
+                                name = entityItem._fileUri.path.name;
+                            }
+                        }
+
                         newEntryChildren.push({
                             id: `${componentType.key}-${i}`,
-                            name: c.name ? c.name : `${componentType.labelSingular} ${i + 1}`,
+                            name,
                         });
                     });
                     newEntry.children = newEntryChildren;
