@@ -6,26 +6,24 @@ import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/HContainer';
 import MultiSelect, { MultiSelectOption } from '../../Common/MultiSelect';
 import RadioSelect from '../../Common/RadioSelect';
+import Rotation from '../../Common/Rotation';
 import { clamp } from '../../Common/Utils';
 import VContainer from '../../Common/VContainer';
-import { ColliderType, PixelRotation } from '../../Common/VUEngineTypes';
+import { ColliderType, PixelVector } from '../../Common/VUEngineTypes';
 import {
-    MAX_COLLIDER_LINEFIELD_LENGTH,
-    MIN_COLLIDER_LINEFIELD_LENGTH,
-    MAX_COLLIDER_LINEFIELD_THICKNESS,
-    MIN_COLLIDER_LINEFIELD_THICKNESS,
     ColliderData,
     MAX_COLLIDER_DISPLACEMENT,
     MAX_COLLIDER_DISPLACEMENT_PARALLAX,
+    MAX_COLLIDER_LINEFIELD_LENGTH,
+    MAX_COLLIDER_LINEFIELD_THICKNESS,
     MAX_COLLIDER_PIXEL_SIZE,
-    MAX_COLLIDER_ROTATION,
-    MAX_COLLIDER_SCALE,
+    MAX_SCALE,
     MIN_COLLIDER_DISPLACEMENT,
     MIN_COLLIDER_DISPLACEMENT_PARALLAX,
+    MIN_COLLIDER_LINEFIELD_LENGTH,
+    MIN_COLLIDER_LINEFIELD_THICKNESS,
     MIN_COLLIDER_PIXEL_SIZE,
-    MIN_COLLIDER_ROTATION,
-    MIN_COLLIDER_SCALE,
-    COLLIDER_ROTATION_RATIO,
+    MIN_SCALE
 } from '../EntityEditorTypes';
 
 interface ColliderProps {
@@ -39,7 +37,6 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
     const [length, setLength] = useState<number>(0);
     const [axis, setAxis] = useState<number>(0);
     const [thickness, setThickness] = useState<number>(0);
-    const [rotationDegrees, setRotationDegrees] = useState<PixelRotation>({ x: 0, y: 0, z: 0 });
 
     let colliderLayersFileUri: URI | undefined;
     const colliderLayers = services.vesProjectService.getProjectDataItemsForType('ColliderLayers');
@@ -69,12 +66,6 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
 
         return total;
     };
-
-    const toDegrees = (engineRotation: number): number =>
-        engineRotation * COLLIDER_ROTATION_RATIO;
-
-    const toEngineRotation = (degrees: number): number =>
-        Math.round(degrees / COLLIDER_ROTATION_RATIO);
 
     const setType = (type: ColliderType): void => {
         updateCollider({
@@ -119,27 +110,15 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
         });
     };
 
-    const setRotation = (a: 'x' | 'y' | 'z', value: number): void => {
-        const engineRotation = clamp(toEngineRotation(value), MIN_COLLIDER_ROTATION, MAX_COLLIDER_ROTATION);
-
-        setRotationDegrees({
-            ...rotationDegrees,
-            [a]: toDegrees(engineRotation),
-        });
-
-        updateCollider({
-            rotation: {
-                ...collider.rotation,
-                [a]: engineRotation,
-            },
-        });
+    const setRotation = (rotation: PixelVector): void => {
+        updateCollider({ rotation });
     };
 
     const setScale = (a: 'x' | 'y' | 'z', value: number): void => {
         updateCollider({
             scale: {
                 ...collider.scale,
-                [a]: clamp(value, MIN_COLLIDER_SCALE, MAX_COLLIDER_SCALE),
+                [a]: clamp(value, MIN_SCALE, MAX_SCALE),
             },
         });
     };
@@ -147,7 +126,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
     const setBallScale = (value: number): void => {
         updateCollider({
             scale: {
-                x: clamp(value, MIN_COLLIDER_SCALE, MAX_COLLIDER_SCALE),
+                x: clamp(value, MIN_SCALE, MAX_SCALE),
                 y: 0,
                 z: 0,
             },
@@ -242,12 +221,6 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
             setThickness(collider.scale.z);
             setAxis(2);
         }
-
-        setRotationDegrees({
-            x: toDegrees(collider.rotation.x),
-            y: toDegrees(collider.rotation.y),
-            z: toDegrees(collider.rotation.z),
-        });
     }, []);
 
     return (
@@ -449,65 +422,23 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                     />
                 </HContainer>
             </VContainer>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/entityEditor/colliderRotation', 'Rotation (x, y, z)')}
-                </label>
-                <HContainer wrap='wrap'>
-                    <HContainer gap={2}>
-                        <input
-                            className='theia-input'
-                            style={{ width: 78 }}
-                            type='number'
-                            min={MIN_COLLIDER_ROTATION}
-                            max={MAX_COLLIDER_ROTATION}
-                            step={COLLIDER_ROTATION_RATIO}
-                            value={rotationDegrees.x}
-                            onChange={e => setRotation('x', parseFloat(e.target.value))}
-                        />
-                        °
-                    </HContainer>
-                    <HContainer gap={2}>
-                        <input
-                            className='theia-input'
-                            style={{ width: 78 }}
-                            type='number'
-                            min={MIN_COLLIDER_ROTATION}
-                            max={MAX_COLLIDER_ROTATION}
-                            step={COLLIDER_ROTATION_RATIO}
-                            value={rotationDegrees.y}
-                            onChange={e => setRotation('y', parseFloat(e.target.value))}
-                        />
-                        °
-                    </HContainer>
-                    <HContainer gap={2}>
-                        <input
-                            className='theia-input'
-                            style={{ width: 78 }}
-                            type='number'
-                            min={MIN_COLLIDER_ROTATION}
-                            max={MAX_COLLIDER_ROTATION}
-                            step={COLLIDER_ROTATION_RATIO}
-                            value={rotationDegrees.z}
-                            onChange={e => setRotation('z', parseFloat(e.target.value))}
-                        />
-                        °
-                    </HContainer>
-                </HContainer>
-            </VContainer>
+            <Rotation
+                rotation={collider.rotation}
+                updateRotation={setRotation}
+            />
             {
                 (collider.type === ColliderType.Box || collider.type === ColliderType.InverseBox) &&
                 <VContainer>
                     <label>
-                        {nls.localize('vuengine/entityEditor/colliderScale', 'Scale (x, y, z)')}
+                        {nls.localize('vuengine/entityEditor/scale', 'Scale (x, y, z)')}
                     </label>
                     <HContainer>
                         <input
                             className='theia-input'
                             style={{ width: 54 }}
                             type='number'
-                            min={MIN_COLLIDER_SCALE}
-                            max={MAX_COLLIDER_SCALE}
+                            min={MIN_SCALE}
+                            max={MAX_SCALE}
                             step={0.5}
                             value={collider.scale.x}
                             onChange={e => setScale('x', parseFloat(e.target.value))}
@@ -516,8 +447,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             className='theia-input'
                             style={{ width: 54 }}
                             type='number'
-                            min={MIN_COLLIDER_SCALE}
-                            max={MAX_COLLIDER_SCALE}
+                            min={MIN_SCALE}
+                            max={MAX_SCALE}
                             step={0.5}
                             value={collider.scale.y}
                             onChange={e => setScale('y', parseFloat(e.target.value))}
@@ -526,8 +457,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             className='theia-input'
                             style={{ width: 54 }}
                             type='number'
-                            min={MIN_COLLIDER_SCALE}
-                            max={MAX_COLLIDER_SCALE}
+                            min={MIN_SCALE}
+                            max={MAX_SCALE}
                             step={0.1}
                             value={collider.scale.z}
                             onChange={e => setScale('z', parseFloat(e.target.value))}
@@ -545,8 +476,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                         className='theia-input'
                         style={{ width: 54 }}
                         type='number'
-                        min={MIN_COLLIDER_SCALE}
-                        max={MAX_COLLIDER_SCALE}
+                        min={MIN_SCALE}
+                        max={MAX_SCALE}
                         value={collider.scale.x}
                         onChange={e => setBallScale(parseFloat(e.target.value))}
                     />

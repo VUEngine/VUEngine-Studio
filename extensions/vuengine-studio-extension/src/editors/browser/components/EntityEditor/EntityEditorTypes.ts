@@ -13,6 +13,8 @@ import {
     PixelSize,
     PixelVector,
     Scale,
+    ScreenPixelRotation,
+    ScreenPixelScale,
     ScreenPixelVector,
     SpriteType,
     Transparency,
@@ -34,6 +36,8 @@ export interface EntityEditorContextType {
 
 export const EntityEditorLayoutStorageName = 'ves-editors-entityEditor-layout';
 
+export const MIN_SCALE = 0;
+export const MAX_SCALE = 64;
 export const MIN_ENTITY_PIXEL_SIZE = 0;
 export const MAX_ENTITY_PIXEL_SIZE = 511;
 export const MIN_TEXTURE_PADDING = 0;
@@ -57,13 +61,6 @@ export const WIREFRAME_CANVAS_PADDING = 1;
 
 export const MIN_COLLIDER_PIXEL_SIZE = 0;
 export const MAX_COLLIDER_PIXEL_SIZE = 511;
-export const MIN_COLLIDER_ROTATION = 0;
-export const MAX_COLLIDER_ROTATION = 511;
-// VUEngine uses 512 segments for a full circle for easier computations.
-// On the frontend, we work in degrees, though.
-export const COLLIDER_ROTATION_RATIO = 0.703125; // 360/512
-export const MIN_COLLIDER_SCALE = 0;
-export const MAX_COLLIDER_SCALE = 64;
 export const MIN_COLLIDER_DISPLACEMENT = -256;
 export const MAX_COLLIDER_DISPLACEMENT = 256;
 export const MIN_COLLIDER_DISPLACEMENT_PARALLAX = -32;
@@ -177,6 +174,8 @@ export interface SpriteData {
 export interface PositionedEntityData {
     itemId: string
     onScreenPosition: ScreenPixelVector
+    onScreenRotation: ScreenPixelRotation
+    onScreenScale: ScreenPixelScale
     name: string
     children: PositionedEntityData[]
     extraInfo: string

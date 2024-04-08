@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
-import { COLLIDER_ROTATION_RATIO, ColliderData, EntityEditorContext, EntityEditorContextType } from '../../EntityEditorTypes';
+import { ROTATION_RATIO } from '../../../Common/VUEngineTypes';
+import { ColliderData, EntityEditorContext, EntityEditorContextType } from '../../EntityEditorTypes';
 
 const Cuboid = styled.div`
     --half-d: calc(var(--depth) / 2);
@@ -105,9 +106,9 @@ export default function BoxCollider(props: BoxColliderProps): React.JSX.Element 
                 '--depth': `${depth}px`,
                 '--height': `${height}px`,
                 '--width': `${width}px`,
-                transform: `rotateX(${collider.rotation.x * COLLIDER_ROTATION_RATIO}deg) 
-                    rotateY(${collider.rotation.y * COLLIDER_ROTATION_RATIO}deg) 
-                    rotateZ(${collider.rotation.z * COLLIDER_ROTATION_RATIO}deg)`,
+                transform: `rotateX(${collider.rotation.x * ROTATION_RATIO}deg) 
+                    rotateY(${collider.rotation.y * ROTATION_RATIO}deg) 
+                    rotateZ(${collider.rotation.z * ROTATION_RATIO}deg)`,
             }}
         >
             <CuboidFaceFront />

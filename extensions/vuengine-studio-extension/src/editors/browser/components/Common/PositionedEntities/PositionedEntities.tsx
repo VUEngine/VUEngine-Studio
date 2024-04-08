@@ -1,7 +1,8 @@
-import { QuickPickItem, QuickPickOptions, nls } from '@theia/core';
+import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { PositionedEntityData } from '../../EntityEditor/EntityEditorTypes';
+import { showEntitySelection } from '../Utils';
 import VContainer from '../VContainer';
 import PositionedEntity from './PositionedEntity';
 
@@ -15,31 +16,8 @@ export default function PositionedEntities(props: PositionedEntitiesProps): Reac
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const { positionedEntities, updatePositionedEntities, itemIdsToIgnore } = props;
 
-    const showEntitySelection = async (): Promise<QuickPickItem | undefined> => {
-        const quickPickOptions: QuickPickOptions<QuickPickItem> = {
-            title: nls.localize('vuengine/editors/selectEntity', 'Select Entity'),
-            placeholder: nls.localize('vuengine/editors/selectEntityToAdd', 'Select an Entity to add...'),
-        };
-        const items: QuickPickItem[] = [];
-        const entities = services.vesProjectService.getProjectDataItemsForType('Entity');
-        if (entities) {
-            Object.keys(entities).map(k => {
-                if (!itemIdsToIgnore || !itemIdsToIgnore.includes(k)) {
-                    const entity = entities[k];
-                    // @ts-ignore
-                    if (entity._id) {
-                        // @ts-ignore
-                        items.push({ id: entity._id, label: entity.name || entity._id });
-                    }
-                }
-            });
-        }
-
-        return services.quickPickService.show(items, quickPickOptions);
-    };
-
     const addPositionedEntity = async (): Promise<void> => {
-        const entityToAdd = await showEntitySelection();
+        const entityToAdd = await showEntitySelection(services.workspaceService, services.quickPickService, services.vesProjectService, itemIdsToIgnore);
         if (entityToAdd !== undefined) {
             updatePositionedEntities([
                 ...positionedEntities,
@@ -49,7 +27,16 @@ export default function PositionedEntities(props: PositionedEntitiesProps): Reac
                         x: 0,
                         y: 0,
                         z: 0,
-                        zDisplacement: 0,
+                    },
+                    onScreenRotation: {
+                        x: 0,
+                        y: 0,
+                        z: 0,
+                    },
+                    onScreenScale: {
+                        x: 0,
+                        y: 0,
+                        z: 0,
                     },
                     name: '',
                     children: [],

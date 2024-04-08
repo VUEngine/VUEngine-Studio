@@ -1,3 +1,9 @@
+export const MIN_ROTATION = 0;
+export const MAX_ROTATION = 511;
+// VUEngine uses 512 segments for a full circle for easier computations.
+// On the frontend, we work in degrees, though.
+export const ROTATION_RATIO = 0.703125; // 360/512
+
 export enum SpriteType {
     Bgmap = 'Bgmap',
     Object = 'Object',
@@ -69,7 +75,18 @@ export interface ScreenPixelVector {
     x: number // int16
     y: number // int16
     z: number // int16
-    zDisplacement: number // int16
+}
+
+export interface ScreenPixelScale {
+    x: number // float
+    y: number // float
+    z: number // float
+}
+
+export interface ScreenPixelRotation {
+    x: number // int16
+    y: number // int16
+    z: number // int16
 }
 
 export interface PixelSize {

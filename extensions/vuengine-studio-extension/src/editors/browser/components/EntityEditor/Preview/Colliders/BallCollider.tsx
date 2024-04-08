@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
-import { PixelRotation, PixelVector } from '../../../Common/VUEngineTypes';
-import { COLLIDER_ROTATION_RATIO, ColliderData, EntityEditorContext, EntityEditorContextType } from '../../EntityEditorTypes';
+import { PixelRotation, PixelVector, ROTATION_RATIO } from '../../../Common/VUEngineTypes';
+import { ColliderData, EntityEditorContext, EntityEditorContextType } from '../../EntityEditorTypes';
 
 interface BallFaceProps {
     diameter: number
@@ -22,9 +22,9 @@ const BallFace = styled.div<BallFaceProps>`
     outline: ${p => p.highlighted ? '1px solid #0f0' : 'none'};
     outline-offset: 1px;
     position: absolute;
-    transform: rotateX(${p => p.rotation.x * COLLIDER_ROTATION_RATIO}deg) 
-        rotateY(${p => p.rotation.y * COLLIDER_ROTATION_RATIO}deg) 
-        rotateZ(${p => p.rotation.z * COLLIDER_ROTATION_RATIO}deg);
+    transform: rotateX(${p => p.rotation.x * ROTATION_RATIO}deg) 
+        rotateY(${p => p.rotation.y * ROTATION_RATIO}deg) 
+        rotateZ(${p => p.rotation.z * ROTATION_RATIO}deg);
     transform-style: preserve-3d;
     translate: ${p => p.displacement.x}px ${p => p.displacement.y}px ${p => p.displacement.parallax * -1}px;
     width: ${p => p.diameter}px;
