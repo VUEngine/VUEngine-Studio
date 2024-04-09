@@ -2,6 +2,8 @@ import VesBrightnessRepeatEditorControl from './brightness-repeat-editor/ves-bri
 import VesBrightnessRepeatEditorControlTester from './brightness-repeat-editor/ves-brightness-repeat-editor-control-tester';
 import VesColumnTableEditorControl from './column-table-editor/ves-column-table-editor-control';
 import VesColumnTableEditorControlTester from './column-table-editor/ves-column-table-editor-control-tester';
+import vesCompilerConfigEditorControl from './compiler-config-editor/ves-compiler-config-editor-control';
+import vesCompilerConfigEditorControlTester from './compiler-config-editor/ves-compiler-config-editor-control-tester';
 import VesEntityEditorControl from './entity-editor/ves-entity-editor-control';
 import VesEntityEditorControlTester from './entity-editor/ves-entity-editor-control-tester';
 import VesFontEditorControl from './font-editor/ves-font-editor-control';
@@ -32,6 +34,7 @@ import VesWaveFormEditorControlTester from './waveform-editor/ves-waveform-edito
 export const VES_RENDERERS = [
     { tester: VesBrightnessRepeatEditorControlTester, renderer: VesBrightnessRepeatEditorControl },
     { tester: VesColumnTableEditorControlTester, renderer: VesColumnTableEditorControl },
+    { tester: vesCompilerConfigEditorControlTester, renderer: vesCompilerConfigEditorControl },
     { tester: VesEntityEditorControlTester, renderer: VesEntityEditorControl },
     { tester: VesFontEditorControlTester, renderer: VesFontEditorControl },
     { tester: VesImageEditorControlTester, renderer: VesImageEditorControl },
