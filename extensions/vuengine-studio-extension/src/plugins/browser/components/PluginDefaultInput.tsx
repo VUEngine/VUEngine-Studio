@@ -79,7 +79,7 @@ export default function PluginDefaultInput(props: PluginDefaultInputProps): Reac
                     {config.type && Object.values(items[config.type] ?? {})
                         // TODO: this will break for types without a name property
                         // @ts-ignore
-                        .sort((a, b) => a.name.localeCompare(b.name))
+                        .sort((a, b) => a.name?.localeCompare(b.name))
                         .map((f, i) =>
                             <option
                                 key={i}

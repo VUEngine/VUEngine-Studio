@@ -1,7 +1,6 @@
 import { nls } from '@theia/core';
 import React from 'react';
 import HContainer from '../Common/HContainer';
-import InfoLabel from '../Common/InfoLabel';
 import VContainer from '../Common/VContainer';
 import { CompilerConfigData, CompilerOptimization } from './CompilerConfigEditorTypes';
 
@@ -36,14 +35,9 @@ export default function CompilerConfig(props: CompilerConfigProps): React.JSX.El
 
     return <HContainer gap={15} wrap='wrap'>
         <VContainer grow={1}>
-            <InfoLabel
-                label={nls.localize('vuengine/compilerConfigEditor/optimization', 'Optimization')}
-                tooltip={nls.localize(
-                    'vuengine/compilerConfigEditor/optimizationDescription',
-                    'The optimization level the compiler should apply. ' +
-                    'Warning: Do not use O3 or 0fast for multiplayer games, as this causes unexpected out of sync behaviour when the framerate drops.'
-                )}
-            />
+            <label>
+                {nls.localize('vuengine/compilerConfigEditor/optimization', 'Optimization')}
+            </label>
             <select
                 className='theia-select'
                 onChange={e => setOptimization(e.target.value as CompilerOptimization)}
