@@ -74,20 +74,17 @@ export default function PluginDefaultInput(props: PluginDefaultInputProps): Reac
                 ? <select
                     value={value}
                     className='theia-select'
+                    style={{ width: '100%' }}
                     onChange={e => setValue(e.target.value, true)}
                 >
                     {config.type && Object.values(items[config.type] ?? {})
-                        // TODO: this will break for types without a name property
-                        // @ts-ignore
-                        .sort((a, b) => a.name?.localeCompare(b.name))
+                        .sort((a, b) => a._fileUri.path.name?.localeCompare(b._fileUri.path.name))
                         .map((f, i) =>
                             <option
                                 key={i}
-                                // @ts-ignore
-                                value={vesCommonService?.cleanSpecName(f.name ?? '')}
+                                value={vesCommonService?.cleanSpecName(f._fileUri.path.name ?? '')}
                             >
-                                {/* @ts-ignore */}
-                                {f.name}
+                                {f._fileUri.path.name}
                             </option>
                         )}
                 </select>
