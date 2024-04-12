@@ -16,7 +16,7 @@ Update all other occurences of PositionedEntitySpec and PositionedEntityROMSpec 
 
 Example:
 
-```
+```diff
 PositionedEntityROMSpec ExampleStageEntitySpecs[] =
 {
 -	{&ExampleEntitySpec, {8, 16, 4, 0}, 0, NULL, NULL, NULL, false},
@@ -35,7 +35,7 @@ Open `config/CompilerConfig` and change the value of `memorySections.dram.length
 
 Example:
 
-```
+```diff
     "memorySections": {
         "dram": {
 -            "length": -32,
