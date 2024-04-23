@@ -5,6 +5,7 @@ import { Message } from '@theia/core/shared/@phosphor/messaging';
 import { CommandService, Emitter, Event, MessageService, QuickPickService, Reference, UNTITLED_SCHEME, URI, nls } from '@theia/core';
 import {
     CommonCommands,
+    ExtractableWidget,
     HoverService,
     LabelProvider,
     LocalStorageService,
@@ -45,7 +46,7 @@ export interface ItemData {
 };
 
 @injectable()
-export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, Saveable, SaveableSource {
+export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, Saveable, SaveableSource, ExtractableWidget {
     @inject(ColorRegistry)
     private readonly colorRegistry: ColorRegistry;
     @inject(CommandService)
@@ -105,6 +106,9 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     protected isLoading: boolean = true;
     protected isGenerating: boolean = false;
     protected generatingProgress: number = -1;
+
+    isExtractable: boolean = false;
+    secondaryWindow: Window | undefined;
 
     protected readonly onDirtyChangedEmitter = new Emitter<void>();
     get onDirtyChanged(): Event<void> {

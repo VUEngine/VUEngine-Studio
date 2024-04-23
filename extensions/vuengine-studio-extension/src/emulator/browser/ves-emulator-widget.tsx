@@ -1,9 +1,11 @@
 import { CommandService, isWindows, nls } from '@theia/core';
 import {
   Endpoint,
+  ExtractableWidget,
   KeybindingRegistry,
   LocalStorageService,
   Message,
+  NavigatableWidget,
   PreferenceScope,
   PreferenceService,
   ScopedKeybinding,
@@ -57,7 +59,7 @@ export interface vesEmulatorWidgetState {
 }
 
 @injectable()
-export class VesEmulatorWidget extends ReactWidget {
+export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget, ExtractableWidget {
   @inject(CommandService)
   protected readonly commandService: CommandService;
   @inject(FileService)
@@ -94,6 +96,9 @@ export class VesEmulatorWidget extends ReactWidget {
   protected resource = '';
 
   protected state: vesEmulatorWidgetState;
+
+  isExtractable: boolean = false;
+  secondaryWindow: Window | undefined;
 
   @postConstruct()
   protected init(): void {
@@ -148,6 +153,14 @@ export class VesEmulatorWidget extends ReactWidget {
     setTimeout(() => {
       super.onCloseRequest(msg);
     }, 250);
+  }
+
+  getResourceUri(): URI | undefined {
+    return new URI(this.options.uri);
+  }
+
+  createMoveToUri(resourceUri: URI): URI | undefined {
+    return resourceUri;
   }
 
   isLoaded(): boolean {
