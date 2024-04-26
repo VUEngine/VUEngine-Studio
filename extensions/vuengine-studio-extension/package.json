@@ -111,6 +111,7 @@
     },
     {
       "frontend": "lib/core/browser/ves-core-frontend-module",
+      "secondaryWindow": "lib/core/browser/ves-core-secondary-window-styles",
       "backend": "lib/core/node/ves-core-backend-module"
     },
     {
