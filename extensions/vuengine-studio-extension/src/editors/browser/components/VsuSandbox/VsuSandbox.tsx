@@ -1,11 +1,16 @@
 import { nls } from '@theia/core';
-import React from 'react';
+import React, { useContext } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
+import { WithContributor, WithFileUri } from '../../../../project/browser/ves-project-types';
+import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
+import HContainer from '../Common/HContainer';
+import NumberArrayPreview from '../Common/NumberArrayPreview';
 import VContainer from '../Common/VContainer';
 import WaveForm from '../WaveFormEditor/WaveForm';
+import { WaveFormData } from '../WaveFormEditor/WaveFormEditorTypes';
+import Channel from './Channel';
 import ModulationData from './ModulationData';
 import { NUMBER_OF_CHANNELS, NUMBER_OF_WAVEFORM_BANKS, VsuChannelData, VsuData } from './VsuSandboxTypes';
-import Channel from './Channel';
 
 interface VsuSandboxProps {
     data: VsuData
@@ -13,7 +18,9 @@ interface VsuSandboxProps {
 }
 
 export default function VsuSandbox(props: VsuSandboxProps): React.JSX.Element {
+    const { services } = useContext(EditorsContext) as EditorsContextType;
     const { data, updateData } = props;
+    const waveForms = Object.values(services.vesProjectService.getProjectDataItemsForType('WaveForm') || {}) as (WaveFormData & WithContributor & WithFileUri)[];
 
     const setWaveform = (channel: number, waveform: number[]): void => {
         const waveforms = [
@@ -72,7 +79,6 @@ export default function VsuSandbox(props: VsuSandboxProps): React.JSX.Element {
                                 channel={data.channels[x]}
                                 setChannel={(channelData: VsuChannelData) => setChannelData(x, channelData)}
                                 waveForms={data.waveforms}
-                                modulationData={data.modulation}
                             />
                             {x < 5 &&
                                 <hr />
@@ -83,10 +89,23 @@ export default function VsuSandbox(props: VsuSandboxProps): React.JSX.Element {
             </TabPanel>
             {([...Array(NUMBER_OF_WAVEFORM_BANKS)].map((v, x) =>
                 <TabPanel key={x}>
-                    <WaveForm
-                        value={data.waveforms[x] ?? []}
-                        setValue={(waveform: number[]) => setWaveform(x, waveform)}
-                    />
+                    <VContainer gap={15} grow={1}>
+                        <HContainer overflow='scroll'>
+                            {(Object.values(waveForms).map((w, y) =>
+                                <NumberArrayPreview
+                                    key={y}
+                                    maximum={64}
+                                    data={w.values}
+                                    onClick={() => setWaveform(x, w.values)}
+                                    title={w._fileUri.path.name}
+                                />
+                            ))}
+                        </HContainer>
+                        <WaveForm
+                            value={data.waveforms[x] ?? []}
+                            setValue={(waveform: number[]) => setWaveform(x, waveform)}
+                        />
+                    </VContainer>
                 </TabPanel>
             ))}
             <TabPanel>

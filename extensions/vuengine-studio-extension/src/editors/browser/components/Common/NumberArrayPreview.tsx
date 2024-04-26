@@ -13,6 +13,7 @@ const ColumnContainer = styled.div`
     cursor: pointer;
     display: flex;
     height: 32px;
+    min-width: 32px;
     overflow: hidden;
     padding: 1px;
     user-select: none;
@@ -23,24 +24,27 @@ const ColumnContainer = styled.div`
 `;
 
 interface NumberArrayPreviewProps {
-    active: boolean
+    active?: boolean
     maximum: number
     data: number[]
+    title?: string
     onClick?: () => void
 }
 
 export default function NumberArrayPreview(props: NumberArrayPreviewProps): React.JSX.Element {
-    const { active, maximum, data, onClick } = props;
+    const { active, maximum, data, title, onClick } = props;
 
     return <ColumnContainer
         style={{
             borderColor: active ? 'var(--theia-button-background)' : undefined,
         }}
         onClick={onClick}
+        title={title}
     >
         {[...Array(32)].map((h, y) => {
             const v = data[y] ?? maximum;
             return <Column
+                key={h}
                 style={{
                     height: `${(v + 1) * 100 / maximum}%`
                 }}

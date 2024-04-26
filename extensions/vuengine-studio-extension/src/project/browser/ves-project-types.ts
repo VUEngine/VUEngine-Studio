@@ -712,7 +712,7 @@ export const defaultProjectData: ProjectData = {
                       type: 'boolean',
                       default: true
                     },
-                    decay: {
+                    sweep: {
                       type: 'boolean',
                       default: true
                     },

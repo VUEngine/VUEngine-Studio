@@ -14,7 +14,7 @@ export interface VsuChannelIntervalData {
 export interface VsuChannelSweepModulationData {
     enabled: boolean
     repeat: boolean
-    decay: boolean
+    sweep: boolean
     frequency: number
     interval: number
     sweepDown: boolean
@@ -45,3 +45,13 @@ export interface VsuData {
 
 export const NUMBER_OF_WAVEFORM_BANKS = 5;
 export const NUMBER_OF_CHANNELS = 6;
+export const ENVELOPE_INITIAL_VALUE_MIN = 0;
+export const ENVELOPE_INITIAL_VALUE_MAX = 15;
+export const ENVELOPE_STEP_TIME_MIN = 0;
+export const ENVELOPE_STEP_TIME_MAX = 7;
+export const SWEEP_MODULATION_INTERVAL_MIN = 0;
+export const SWEEP_MODULATION_INTERVAL_MAX = 7;
+export const SWEEP_MODULATION_FREQUENCY_MIN = 0;
+export const SWEEP_MODULATION_FREQUENCY_MAX = 1;
+export const SWEEP_MODULATION_SHIFT_MIN = 0;
+export const SWEEP_MODULATION_SHIFT_MAX = 7;
