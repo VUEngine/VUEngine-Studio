@@ -2,6 +2,7 @@
   container: emulator / inline-size;
   display: flex;
   flex-direction: column;
+  outline: none;
 }
 
 .emulator-controls {

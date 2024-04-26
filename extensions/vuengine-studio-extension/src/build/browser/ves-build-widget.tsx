@@ -86,7 +86,6 @@ export class VesBuildWidget extends ReactWidget {
     this.title.closable = true;
     this.title.label = VesBuildWidget.LABEL;
     this.title.caption = VesBuildWidget.LABEL;
-    this.node.tabIndex = 0; // required for this.node.focus() to work in this.onActivateRequest()
     this.title.className = '';
 
     this.update();
@@ -172,6 +171,7 @@ export class VesBuildWidget extends ReactWidget {
   protected onActivateRequest(msg: Message): void {
     super.onActivateRequest(msg);
     this.update();
+    this.node.tabIndex = 0;
     this.node.focus();
   }
 

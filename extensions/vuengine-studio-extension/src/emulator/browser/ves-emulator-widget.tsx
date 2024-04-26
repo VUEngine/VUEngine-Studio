@@ -97,7 +97,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
 
   protected state: vesEmulatorWidgetState;
 
-  isExtractable: boolean = false;
+  isExtractable: boolean = true;
   secondaryWindow: Window | undefined;
 
   @postConstruct()
@@ -407,14 +407,14 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
     this.processIframeMessage(e);
 
   protected bindListeners(): void {
-    document.addEventListener('keydown', this.keyEventListerner);
-    document.addEventListener('keyup', this.keyEventListerner);
+    this.node.addEventListener('keydown', this.keyEventListerner);
+    this.node.addEventListener('keyup', this.keyEventListerner);
     window.addEventListener('message', this.messageEventListerner);
   }
 
   protected unbindListeners(): void {
-    document.removeEventListener('keydown', this.keyEventListerner);
-    document.removeEventListener('keyup', this.keyEventListerner);
+    this.node.removeEventListener('keydown', this.keyEventListerner);
+    this.node.removeEventListener('keyup', this.keyEventListerner);
     window.removeEventListener('message', this.messageEventListerner);
   }
 
@@ -423,10 +423,8 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
     if (
       e.repeat || // ... on repeated event firing
       !this.isVisible || // ... if emulator is not visible
-      !this.state.loaded || // ... if emulator has not loaded yet
-      document.activeElement !== document.body
+      !this.state.loaded // ... if emulator has not loaded yet
     ) {
-      // ... if the body is not focused (emulator focus is equivalent to body focus)
       return;
     }
 
@@ -460,6 +458,12 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
         }
       }
     }
+  }
+
+  protected onActivateRequest(msg: Message): void {
+    super.onActivateRequest(msg);
+    this.node.tabIndex = 0;
+    this.node.focus();
   }
 
   protected async processIframeMessage(e: MessageEvent): Promise<void> {

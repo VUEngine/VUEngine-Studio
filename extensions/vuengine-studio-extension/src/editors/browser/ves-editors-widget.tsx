@@ -107,7 +107,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     protected isGenerating: boolean = false;
     protected generatingProgress: number = -1;
 
-    isExtractable: boolean = false;
+    isExtractable: boolean = true;
     secondaryWindow: Window | undefined;
 
     protected readonly onDirtyChangedEmitter = new Emitter<void>();

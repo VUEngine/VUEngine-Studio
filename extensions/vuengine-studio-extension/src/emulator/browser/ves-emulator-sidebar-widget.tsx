@@ -35,7 +35,6 @@ export class VesEmulatorSidebarWidget extends ReactWidget {
     this.title.iconClass = 'codicon codicon-run';
     this.title.closable = true;
     this.setTitle();
-    this.node.tabIndex = 0; // required for this.node.focus() to work in this.onActivateRequest()
     this.update();
 
     this.vesEmulatorService.onDidChangeIsQueued(isQueued => {
@@ -51,6 +50,7 @@ export class VesEmulatorSidebarWidget extends ReactWidget {
 
   protected onActivateRequest(msg: Message): void {
     super.onActivateRequest(msg);
+    this.node.tabIndex = 0;
     this.node.focus();
   }
 

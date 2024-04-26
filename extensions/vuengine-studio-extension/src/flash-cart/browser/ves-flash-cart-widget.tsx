@@ -47,7 +47,6 @@ export class VesFlashCartWidget extends ReactWidget {
     this.title.iconClass = 'codicon codicon-layout-statusbar';
     this.title.closable = true;
     this.setTitle();
-    this.node.tabIndex = 0; // required for this.node.focus() to work in this.onActivateRequest()
     this.bindEvents();
   }
 
@@ -87,6 +86,7 @@ export class VesFlashCartWidget extends ReactWidget {
 
   protected onActivateRequest(msg: Message): void {
     super.onActivateRequest(msg);
+    this.node.tabIndex = 0;
     this.node.focus();
   }
 
