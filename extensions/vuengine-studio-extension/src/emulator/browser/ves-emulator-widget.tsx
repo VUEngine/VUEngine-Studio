@@ -1,6 +1,5 @@
 import { CommandService, isWindows, nls } from '@theia/core';
 import {
-  Endpoint,
   ExtractableWidget,
   KeybindingRegistry,
   LocalStorageService,
@@ -8,7 +7,7 @@ import {
   NavigatableWidget,
   PreferenceScope,
   PreferenceService,
-  ScopedKeybinding,
+  ScopedKeybinding
 } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
@@ -24,6 +23,7 @@ import { WorkspaceService } from '@theia/workspace/lib/browser';
 import * as iconv from 'iconv-lite';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
+import { EmulatorControlsOverlay } from './components/EmulatorControlsOverlay';
 import { VesEmulatorCommands } from './ves-emulator-commands';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
 import { VesEmulatorService } from './ves-emulator-service';
@@ -36,7 +36,6 @@ import {
   ROM_HEADER_MAKERS,
   RomHeader,
 } from './ves-emulator-types';
-import { EmulatorControlsOverlay } from './components/EmulatorControlsOverlay';
 
 export const VesEmulatorWidgetOptions = Symbol('VesEmulatorWidgetOptions');
 export interface VesEmulatorWidgetOptions {
@@ -115,11 +114,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
     this.title.iconClass = 'codicon codicon-play';
     this.title.closable = true;
 
-    // TODO: find out why the emulator is only x1 size initially, without setTimeout
-    setTimeout(() => {
-      this.update();
-    }, 50);
-
     this.keybindingRegistry.onKeybindingsChanged(() => {
       this.keybindingToState();
       this.update();
@@ -144,8 +138,9 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
   }
 
   protected async doInit(): Promise<void> {
-    this.resource = await this.getResource();
     await this.initState();
+    this.resource = await this.getResource();
+    this.update();
   }
 
   protected onCloseRequest(msg: Message): void {
@@ -409,13 +404,11 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
   protected bindListeners(): void {
     this.node.addEventListener('keydown', this.keyEventListerner);
     this.node.addEventListener('keyup', this.keyEventListerner);
-    window.addEventListener('message', this.messageEventListerner);
   }
 
   protected unbindListeners(): void {
     this.node.removeEventListener('keydown', this.keyEventListerner);
     this.node.removeEventListener('keyup', this.keyEventListerner);
-    window.removeEventListener('message', this.messageEventListerner);
   }
 
   protected processKeyEvent(e: KeyboardEvent): void {
@@ -512,6 +505,9 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
   };
 
   protected startEmulator = async () => {
+    // using the iframe contentWindow instead of global window object,
+    // because the latter can change when moving to a secondary window
+    this.iframeRef.current?.contentWindow?.addEventListener('message', this.messageEventListerner);
     const romPath = await this.getRomPath();
     const romUri = new URI(romPath);
     const romContent = await this.fileService.readFile(romUri);
@@ -862,7 +858,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
               disabled={!this.state.loaded || this.state.showControls}
             >
               {Object.keys(EMULATION_SCALES).map((value, index) => (
-                <option value={value}>
+                <option key={index} value={value}>
                   {Object.values(EMULATION_SCALES)[index]}
                 </option>
               ))}
@@ -880,7 +876,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
               disabled={!this.state.loaded || this.state.showControls}
             >
               {Object.keys(EMULATION_STEREO_MODES).map((value, index) => (
-                <option value={value}>
+                <option key={index} value={value}>
                   {Object.values(EMULATION_STEREO_MODES)[index]}
                 </option>
               ))}
@@ -898,7 +894,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
               disabled={!this.state.loaded || this.state.showControls}
             >
               {Object.keys(EMULATION_MODES).map((value, index) => (
-                <option value={value}>
+                <option key={index} value={value}>
                   {Object.values(EMULATION_MODES)[index]}
                 </option>
               ))}
@@ -1022,8 +1018,22 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
   }
 
   protected async getResource(): Promise<string> {
+    /*
     return new Endpoint({ path: '/emulator/index.html' })
       .getRestUrl()
+      .toString();
+    */
+
+    // we need to use file:// here instead of localhost to avoid cross-origin and be able to use
+    // the iframe's inner window object to post messages, so it works in a secondary window
+    const resourcesUri = await this.vesCommonService.getResourcesUri();
+    return resourcesUri
+      .withScheme('file')
+      .resolve('binaries')
+      .resolve('vuengine-studio-tools')
+      .resolve('web')
+      .resolve('retroarch')
+      .resolve('index.html')
       .toString();
   }
 
