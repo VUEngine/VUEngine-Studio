@@ -1,5 +1,5 @@
 import React from 'react';
-import Editor from './Editor';
+import WaveForm from './WaveForm';
 import { WaveFormData } from './WaveFormEditorTypes';
 
 interface WaveFormEditorProps {
@@ -7,22 +7,15 @@ interface WaveFormEditorProps {
     updateData: (data: WaveFormData) => void
 }
 
-interface WaveFormState {
-}
-
-export default class WaveFormEditor extends React.Component<WaveFormEditorProps, WaveFormState> {
+export default class WaveFormEditor extends React.Component<WaveFormEditorProps> {
     constructor(props: WaveFormEditorProps) {
         super(props);
-        this.state = {
-        };
     }
 
-    protected setValue(index: number, value: number): void {
-        const updatedValues = [...this.props.data.values];
-        updatedValues[index] = value;
+    protected setValues(values: number[]): void {
         this.props.updateData({
             ...this.props.data,
-            values: updatedValues
+            values,
         });
     }
 
@@ -33,9 +26,9 @@ export default class WaveFormEditor extends React.Component<WaveFormEditorProps,
             tabIndex={0}
             className='waveFormEditor'
         >
-            <Editor
-                values={data.values}
-                setValue={this.setValue.bind(this)}
+            <WaveForm
+                value={data.values}
+                setValue={this.setValues.bind(this)}
             />
         </div>;
     }

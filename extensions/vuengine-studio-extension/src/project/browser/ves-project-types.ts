@@ -621,5 +621,163 @@ export const defaultProjectData: ProjectData = {
       },
       icon: 'fa fa-image'
     },
+    VsuSandbox: {
+      file: '.vsu',
+      schema: {
+        title: 'VSU Sandbox',
+        properties: {
+          channels: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                enabled: {
+                  type: 'boolean',
+                  default: true
+                },
+                interval: {
+                  type: 'object',
+                  properties: {
+                    enabled: {
+                      type: 'boolean',
+                      default: false
+                    },
+                    value: {
+                      type: 'integer',
+                      minimum: 0,
+                      maximum: 31
+                    }
+                  }
+                },
+                frequency: {
+                  type: 'integer',
+                  minimum: 0,
+                  maximum: 2047
+                },
+                waveform: {
+                  type: 'integer',
+                  minimum: 0,
+                  maximum: 4
+                },
+                stereoLevels: {
+                  type: 'object',
+                  properties: {
+                    left: {
+                      type: 'integer',
+                      minimum: 0,
+                      maximum: 15
+                    },
+                    right: {
+                      type: 'integer',
+                      minimum: 0,
+                      maximum: 15
+                    }
+                  }
+                },
+                envelope: {
+                  type: 'object',
+                  properties: {
+                    enabled: {
+                      type: 'boolean',
+                      default: false
+                    },
+                    repeat: {
+                      type: 'boolean',
+                      default: false
+                    },
+                    decay: {
+                      type: 'boolean',
+                      default: true
+                    },
+                    initialValue: {
+                      type: 'integer',
+                      minimum: 0,
+                      maximum: 15
+                    },
+                    stepTime: {
+                      type: 'integer',
+                      minimum: 0,
+                      maximum: 7
+                    },
+                  }
+                },
+                sweepModulation: {
+                  type: 'object',
+                  properties: {
+                    enabled: {
+                      type: 'boolean',
+                      default: false
+                    },
+                    repeat: {
+                      type: 'boolean',
+                      default: true
+                    },
+                    decay: {
+                      type: 'boolean',
+                      default: true
+                    },
+                    frequency: {
+                      type: 'integer',
+                      minimum: 0,
+                      maximum: 1
+                    },
+                    interval: {
+                      type: 'integer',
+                      minimum: 0,
+                      maximum: 7
+                    },
+                    sweepDown: {
+                      type: 'boolean',
+                      default: true
+                    },
+                    shift: {
+                      type: 'integer',
+                      minimum: 0,
+                      maximum: 7
+                    }
+                  }
+                },
+                tapLocation: {
+                  type: 'integer',
+                  minimum: 0,
+                  maximum: 7
+                }
+              }
+            }
+          },
+          waveforms: {
+            type: 'array',
+            items: {
+              type: 'array',
+              items: {
+                type: 'integer',
+                minimum: 1,
+                maximum: 64
+              },
+              minItems: 32,
+              maxItems: 32
+            },
+            minItems: 5,
+            maxItems: 5
+          },
+          modulation: {
+            type: 'array',
+            items: {
+              type: 'integer',
+              minimum: 1,
+              maximum: 256
+            },
+            minItems: 32,
+            maxItems: 32
+          }
+        },
+        required: []
+      },
+      uiSchema: {
+        type: 'VsuSandbox',
+        scope: '#'
+      },
+      icon: 'fa fa-tasks'
+    }
   }
 };

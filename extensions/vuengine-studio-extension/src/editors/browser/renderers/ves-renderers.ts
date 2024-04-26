@@ -28,6 +28,8 @@ import vesStageEditorControl from './stage-editor/ves-stage-editor-control';
 import vesStageEditorControlTester from './stage-editor/ves-stage-editor-control-tester';
 import VesTranslationsEditorControl from './translations-editor/ves-translations-editor-control';
 import VesTranslationsEditorControlTester from './translations-editor/ves-translations-editor-control-tester';
+import vesVsuSandboxControl from './vsu-sandbox/ves-vsu-sandbox-control';
+import vesVsuSandboxControlTester from './vsu-sandbox/ves-vsu-sandbox-control-tester';
 import VesWaveFormEditorControl from './waveform-editor/ves-waveform-editor-control';
 import VesWaveFormEditorControlTester from './waveform-editor/ves-waveform-editor-control-tester';
 
@@ -47,5 +49,6 @@ export const VES_RENDERERS = [
     { tester: vesSpriteEditorControlTester, renderer: vesSpriteEditorControl },
     { tester: vesStageEditorControlTester, renderer: vesStageEditorControl },
     { tester: VesTranslationsEditorControlTester, renderer: VesTranslationsEditorControl },
+    { tester: vesVsuSandboxControlTester, renderer: vesVsuSandboxControl },
     { tester: VesWaveFormEditorControlTester, renderer: VesWaveFormEditorControl },
 ];

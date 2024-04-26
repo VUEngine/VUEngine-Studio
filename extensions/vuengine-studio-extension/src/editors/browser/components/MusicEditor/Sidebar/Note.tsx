@@ -85,7 +85,6 @@ export default function Note(): React.JSX.Element {
                 <div style={{ minWidth: 24, textAlign: 'right', width: 24 }}>
                     {volumeL}
                 </div>
-
             </HContainer>
             <HContainer>
                 <div style={{ minWidth: 10, width: 10 }}>
