@@ -48,12 +48,7 @@
           "workspace.preserveWindow": true
         },
         "electron": {
-          "showWindowEarly": false,
-          "splashScreenOptions": {
-            "content": "resources/TheiaIDESplash.svg",
-            "height": 276,
-            "width": 446
-          }
+          "showWindowEarly": true
         }
       }
     },
