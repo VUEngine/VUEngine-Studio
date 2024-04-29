@@ -119,16 +119,16 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
       this.update();
     });
     this.preferenceService.onPreferenceChanged(({ preferenceName }) => {
-      if ([VesEmulatorPreferenceIds.EMULATOR_SCALE].includes(preferenceName)) {
+      if ([VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCALE].includes(preferenceName)) {
         this.update();
       } else if (
         [
-          VesEmulatorPreferenceIds.EMULATOR_EMULATION_MODE,
-          VesEmulatorPreferenceIds.EMULATOR_STEREO_MODE,
-          VesEmulatorPreferenceIds.EMULATOR_REWIND_ENABLE,
-          VesEmulatorPreferenceIds.EMULATOR_REWIND_GRANULARITY,
-          VesEmulatorPreferenceIds.EMULATOR_SLOW_MOTION_RATIO,
-          VesEmulatorPreferenceIds.EMULATOR_FAST_FORWARD_RATIO,
+          VesEmulatorPreferenceIds.EMULATOR_BUILTIN_EMULATION_MODE,
+          VesEmulatorPreferenceIds.EMULATOR_BUILTIN_STEREO_MODE,
+          VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_ENABLE,
+          VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_GRANULARITY,
+          VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SLOW_MOTION_RATIO,
+          VesEmulatorPreferenceIds.EMULATOR_BUILTIN_FAST_FORWARD_RATIO,
         ].includes(preferenceName)
       ) {
         this.update();
@@ -643,7 +643,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
           </div>
           <div>
             {(this.preferenceService.get(
-              VesEmulatorPreferenceIds.EMULATOR_REWIND_ENABLE
+              VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_ENABLE
             ) as boolean) && (
                 <button
                   className="theia-button secondary"
@@ -852,7 +852,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
               className="theia-select"
               title={nls.localize('vuengine/emulator/scale', 'Scale')}
               value={this.preferenceService.get(
-                VesEmulatorPreferenceIds.EMULATOR_SCALE
+                VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCALE
               )}
               onChange={this.setScale}
               disabled={!this.state.loaded || this.state.showControls}
@@ -870,7 +870,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
                 'Stereo Mode'
               )}
               value={this.preferenceService.get(
-                VesEmulatorPreferenceIds.EMULATOR_STEREO_MODE
+                VesEmulatorPreferenceIds.EMULATOR_BUILTIN_STEREO_MODE
               )}
               onChange={this.setStereoMode}
               disabled={!this.state.loaded || this.state.showControls}
@@ -888,7 +888,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
                 'Emulation Mode'
               )}
               value={this.preferenceService.get(
-                VesEmulatorPreferenceIds.EMULATOR_EMULATION_MODE
+                VesEmulatorPreferenceIds.EMULATOR_BUILTIN_EMULATION_MODE
               )}
               onChange={this.setEmulationMode}
               disabled={!this.state.loaded || this.state.showControls}
@@ -1157,7 +1157,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
   ): Promise<void> => {
     e.target.blur();
     await this.preferenceService.set(
-      VesEmulatorPreferenceIds.EMULATOR_EMULATION_MODE,
+      VesEmulatorPreferenceIds.EMULATOR_BUILTIN_EMULATION_MODE,
       e.target.value,
       PreferenceScope.User
     );
@@ -1169,7 +1169,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
   ): Promise<void> => {
     e.target.blur();
     await this.preferenceService.set(
-      VesEmulatorPreferenceIds.EMULATOR_STEREO_MODE,
+      VesEmulatorPreferenceIds.EMULATOR_BUILTIN_STEREO_MODE,
       e.target.value,
       PreferenceScope.User
     );
@@ -1181,7 +1181,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
   ): Promise<void> => {
     e.target.blur();
     await this.preferenceService.set(
-      VesEmulatorPreferenceIds.EMULATOR_SCALE,
+      VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCALE,
       e.target.value,
       PreferenceScope.User
     );
@@ -1190,10 +1190,10 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
 
   protected sendCoreOptions(): void {
     const emulationMode = this.preferenceService.get(
-      VesEmulatorPreferenceIds.EMULATOR_EMULATION_MODE
+      VesEmulatorPreferenceIds.EMULATOR_BUILTIN_EMULATION_MODE
     ) as string;
     let stereoMode = this.preferenceService.get(
-      VesEmulatorPreferenceIds.EMULATOR_STEREO_MODE
+      VesEmulatorPreferenceIds.EMULATOR_BUILTIN_STEREO_MODE
     ) as string;
     let anaglyphPreset = 'disabled';
     let colorMode = 'black & red';
@@ -1241,11 +1241,11 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
         cheevos_hardcore_mode_enable = false
         quit_press_twice = false
         rewind_enable = ${this.preferenceService.get(
-        VesEmulatorPreferenceIds.EMULATOR_REWIND_ENABLE
+        VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_ENABLE
       ) as boolean
       }
         rewind_granularity = ${this.preferenceService.get(
-        VesEmulatorPreferenceIds.EMULATOR_REWIND_GRANULARITY
+        VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_GRANULARITY
       ) as number
       }
         rewind_buffer_size = 50
@@ -1323,11 +1323,11 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
         screenshot_directory = "/home/web_user/retroarch/userdata"
 
         slowmotion_ratio = ${this.preferenceService.get(
-        VesEmulatorPreferenceIds.EMULATOR_SLOW_MOTION_RATIO
+        VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SLOW_MOTION_RATIO
       ) as number
       }
         fastforward_ratio = ${this.preferenceService.get(
-        VesEmulatorPreferenceIds.EMULATOR_FAST_FORWARD_RATIO
+        VesEmulatorPreferenceIds.EMULATOR_BUILTIN_FAST_FORWARD_RATIO
       ) as number
       }
 
@@ -1351,7 +1351,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
 
   protected getCanvasDimensions(): { height: number; width: number } {
     const canvasScale = this.preferenceService.get(
-      VesEmulatorPreferenceIds.EMULATOR_SCALE
+      VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCALE
     ) as string;
     const screenResolution = this.getScreenResolution();
     const wrapperHeight =
@@ -1400,7 +1400,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
 
   protected getScreenResolution(): { height: number; width: number } {
     const stereoMode = this.preferenceService.get(
-      VesEmulatorPreferenceIds.EMULATOR_STEREO_MODE
+      VesEmulatorPreferenceIds.EMULATOR_BUILTIN_STEREO_MODE
     ) as string;
     let x = VesEmulatorWidget.RESOLUTIONX;
     let y = VesEmulatorWidget.RESOLUTIONY;

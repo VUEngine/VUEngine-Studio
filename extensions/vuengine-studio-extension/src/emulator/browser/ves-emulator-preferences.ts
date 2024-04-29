@@ -12,34 +12,15 @@ export namespace VesEmulatorPreferenceIds {
 
   export const EMULATORS = [CATEGORY, 'custom', 'configs'].join('.');
   export const DEFAULT_EMULATOR = [CATEGORY, 'custom', 'default'].join('.');
-  export const EMULATOR_STEREO_MODE = [CATEGORY, 'builtIn', 'stereoMode'].join(
-    '.'
-  );
-  export const EMULATOR_EMULATION_MODE = [
-    CATEGORY,
-    'builtIn',
-    'emulationMode',
-  ].join('.');
-  export const EMULATOR_SCALE = [CATEGORY, 'builtIn', 'scale'].join('.');
   export const EMULATOR_AUTO_QUEUE = [CATEGORY, 'autoQueue'].join('.');
-  export const EMULATOR_REWIND_ENABLE = [CATEGORY, 'rewind', 'enable'].join(
-    '.'
-  );
-  export const EMULATOR_REWIND_GRANULARITY = [
-    CATEGORY,
-    'rewind',
-    'granularity',
-  ].join('.');
-  export const EMULATOR_SLOW_MOTION_RATIO = [
-    CATEGORY,
-    'slowMotion',
-    'ratio',
-  ].join('.');
-  export const EMULATOR_FAST_FORWARD_RATIO = [
-    CATEGORY,
-    'fastForward',
-    'ratio',
-  ].join('.');
+  export const EMULATOR_BUILTIN_STEREO_MODE = [CATEGORY, 'builtIn', 'stereoMode'].join('.');
+  export const EMULATOR_BUILTIN_EMULATION_MODE = [CATEGORY, 'builtIn', 'emulationMode'].join('.');
+  export const EMULATOR_BUILTIN_SCALE = [CATEGORY, 'builtIn', 'scale'].join('.');
+  export const EMULATOR_BUILTIN_REWIND_ENABLE = [CATEGORY, 'builtIn', 'rewind', 'enable'].join('.');
+  export const EMULATOR_BUILTIN_REWIND_GRANULARITY = [CATEGORY, 'builtIn', 'rewind', 'granularity'].join('.');
+  export const EMULATOR_BUILTIN_SLOW_MOTION_RATIO = [CATEGORY, 'builtIn', 'slowMotion', 'ratio'].join('.');
+  export const EMULATOR_BUILTIN_FAST_FORWARD_RATIO = [CATEGORY, 'builtIn', 'fastForward', 'ratio'].join('.');
+  export const EMULATOR_RED_VIPER_3DS_IP_ADDRESS = [CATEGORY, 'redViper', '3dsIpAddress'].join('.');
 }
 
 export const VesEmulatorPreferenceSchema: PreferenceSchema = {
@@ -89,7 +70,7 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
       scope: PreferenceScope.Folder,
       overridable: true,
     },
-    [VesEmulatorPreferenceIds.EMULATOR_STEREO_MODE]: {
+    [VesEmulatorPreferenceIds.EMULATOR_BUILTIN_STEREO_MODE]: {
       type: 'string',
       label: 'Stereo Mode',
       description: nls.localize(
@@ -102,7 +83,7 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
       scope: PreferenceScope.Folder,
       overridable: true,
     },
-    [VesEmulatorPreferenceIds.EMULATOR_EMULATION_MODE]: {
+    [VesEmulatorPreferenceIds.EMULATOR_BUILTIN_EMULATION_MODE]: {
       type: 'string',
       label: 'Emulation Mode',
       description: nls.localize(
@@ -115,7 +96,7 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
       scope: PreferenceScope.Folder,
       overridable: true,
     },
-    [VesEmulatorPreferenceIds.EMULATOR_SCALE]: {
+    [VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SCALE]: {
       type: 'string',
       label: 'Scale',
       description: nls.localize(
@@ -139,7 +120,7 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
       scope: PreferenceScope.Folder,
       overridable: true,
     },
-    [VesEmulatorPreferenceIds.EMULATOR_REWIND_ENABLE]: {
+    [VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_ENABLE]: {
       type: 'boolean',
       label: 'Enable Rewind',
       description: nls.localize(
@@ -150,7 +131,7 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
       scope: PreferenceScope.Folder,
       overridable: true,
     },
-    [VesEmulatorPreferenceIds.EMULATOR_REWIND_GRANULARITY]: {
+    [VesEmulatorPreferenceIds.EMULATOR_BUILTIN_REWIND_GRANULARITY]: {
       type: 'number',
       label: 'Rewind Granularity',
       description: nls.localize(
@@ -163,7 +144,7 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
       scope: PreferenceScope.Folder,
       overridable: true,
     },
-    [VesEmulatorPreferenceIds.EMULATOR_SLOW_MOTION_RATIO]: {
+    [VesEmulatorPreferenceIds.EMULATOR_BUILTIN_SLOW_MOTION_RATIO]: {
       type: 'number',
       label: 'Slow Motion Ratio',
       description: nls.localize(
@@ -177,7 +158,7 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
       scope: PreferenceScope.Folder,
       overridable: true,
     },
-    [VesEmulatorPreferenceIds.EMULATOR_FAST_FORWARD_RATIO]: {
+    [VesEmulatorPreferenceIds.EMULATOR_BUILTIN_FAST_FORWARD_RATIO]: {
       type: 'number',
       label: 'Fast Forward Ratio',
       description: nls.localize(
@@ -188,6 +169,17 @@ export const VesEmulatorPreferenceSchema: PreferenceSchema = {
       minimum: 0,
       maximum: 32,
       // TODO: allow 0.1 steps
+      scope: PreferenceScope.Folder,
+      overridable: true,
+    },
+    [VesEmulatorPreferenceIds.EMULATOR_RED_VIPER_3DS_IP_ADDRESS]: {
+      type: 'string',
+      label: '3DS IP Address',
+      description: nls.localize(
+        'vuengine/emulator/preferences/redViper3dsIpAddressDescription',
+        'The IP address of the Nintendo 3DS running Red Viper.'
+      ),
+      default: '192.168.0.100',
       scope: PreferenceScope.Folder,
       overridable: true,
     },

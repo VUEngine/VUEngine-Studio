@@ -58,8 +58,14 @@ export interface EmulatorConfig {
   args: string
 };
 
-export const DEFAULT_EMULATOR: EmulatorConfig = {
+export const DEFAULT_EMULATOR_CONFIG: EmulatorConfig = {
   name: nls.localize('vuengine/emulator/builtIn', 'Built-In'),
+  path: '',
+  args: '',
+};
+
+export const RED_VIPER_CONFIG: EmulatorConfig = {
+  name: 'Red Viper',
   path: '',
   args: '',
 };

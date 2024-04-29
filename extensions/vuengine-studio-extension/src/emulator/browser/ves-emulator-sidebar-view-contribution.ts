@@ -35,16 +35,6 @@ export namespace VesEmulatorSidebarCommands {
         'vuengine/emulator/sidebar/commands/showHelp',
         'vuengine/emulator/sidebar/commands/category'
     );
-
-    export const WIDGET_SETTINGS: Command = Command.toLocalizedCommand(
-        {
-            id: 'ves:emulatorSidebar:showSettings',
-            label: 'Show Flash Carts Preferences',
-            iconClass: 'codicon codicon-settings',
-        },
-        'vuengine/emulator/sidebar/commands/showSettings',
-        'vuengine/emulator/sidebar/commands/category'
-    );
 };
 
 @injectable()
@@ -98,13 +88,6 @@ export class VesEmulatorSidebarViewContribution extends AbstractViewContribution
                     widget.id === VesEmulatorSidebarWidget.ID,
                 execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'user-guide/emulator', false),
             });
-
-            commandRegistry.registerCommand(VesEmulatorSidebarCommands.WIDGET_SETTINGS, {
-                isEnabled: () => true,
-                isVisible: widget => widget !== undefined &&
-                    widget.id === VesEmulatorSidebarWidget.ID,
-                execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'emulator'),
-            });
         }
     }
 
@@ -118,16 +101,10 @@ export class VesEmulatorSidebarViewContribution extends AbstractViewContribution
                 priority: 1,
             });
             toolbar.registerItem({
-                id: VesEmulatorSidebarCommands.WIDGET_SETTINGS.id,
-                command: VesEmulatorSidebarCommands.WIDGET_SETTINGS.id,
-                tooltip: VesEmulatorSidebarCommands.WIDGET_SETTINGS.label,
-                priority: 2,
-            });
-            toolbar.registerItem({
                 id: VesEmulatorSidebarCommands.WIDGET_HELP.id,
                 command: VesEmulatorSidebarCommands.WIDGET_HELP.id,
                 tooltip: VesEmulatorSidebarCommands.WIDGET_HELP.label,
-                priority: 3,
+                priority: 2,
             });
         }
     }
