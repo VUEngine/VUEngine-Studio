@@ -44,7 +44,7 @@ export default function NumberArrayPreview(props: NumberArrayPreviewProps): Reac
         {[...Array(32)].map((h, y) => {
             const v = data[y] ?? maximum;
             return <Column
-                key={h}
+                key={y}
                 style={{
                     height: `${(v + 1) * 100 / maximum}%`
                 }}

@@ -93,7 +93,7 @@ export default function VsuSandbox(props: VsuSandboxProps): React.JSX.Element {
                         <HContainer overflow='scroll'>
                             {(Object.values(waveForms).map((w, y) =>
                                 <NumberArrayPreview
-                                    key={y}
+                                    key={`${x}-${y}`}
                                     maximum={64}
                                     data={w.values}
                                     onClick={() => setWaveform(x, w.values)}

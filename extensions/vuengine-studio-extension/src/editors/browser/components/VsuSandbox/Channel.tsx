@@ -10,6 +10,9 @@ import {
     ENVELOPE_INITIAL_VALUE_MIN,
     ENVELOPE_STEP_TIME_MAX,
     ENVELOPE_STEP_TIME_MIN,
+    ENVELOPE_STEP_TIME_VALUES,
+    INTERVAL_VALUES,
+    NOISE_TAP_LOCATIONS,
     NUMBER_OF_WAVEFORM_BANKS,
     SWEEP_MODULATION_FREQUENCY_MAX,
     SWEEP_MODULATION_FREQUENCY_MIN,
@@ -32,13 +35,16 @@ interface ChannelProps {
 export default function Channel(props: ChannelProps): React.JSX.Element {
     const { index, supportSweepAndModulation, isNoiseChannel, channel, setChannel, waveForms } = props;
 
-    const toHertz = (frequency: number): number =>
+    const frequencyToHertz = (frequency: number): number =>
         5000000 / ((2048 - frequency) * 32);
 
     /*
-    const fromHertz = (fHz: number): number =>
+    const frequencyFromHertz = (fHz: number): number =>
         Math.round(2048 - 5000000 / (32 * fHz));
     */
+
+    const noiseFrequencyToHertz = (frequency: number): number =>
+        500000 / (2048 - frequency);
 
     const toggleEnabled = () => {
         setChannel({
@@ -61,6 +67,13 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                 ...channel?.interval,
                 enabled: !channel?.interval?.enabled,
             },
+        });
+    };
+
+    const setTapLocation = (tapLocation: number) => {
+        setChannel({
+            ...channel,
+            tapLocation,
         });
     };
 
@@ -254,6 +267,23 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                     </> */}
                     </VContainer>
                 </>}
+                {isNoiseChannel &&
+
+                    <VContainer>
+                        <label>
+                            {nls.localize('vuengine/vsuSandbox/tapLocation', 'Tap Location')}
+                        </label>
+                        <select
+                            className="theia-select"
+                            value={channel?.tapLocation ?? 0}
+                            onChange={e => setTapLocation(parseInt(e.target.value))}
+                        >
+                            {NOISE_TAP_LOCATIONS.map((tl, i) =>
+                                <option value={i}>{tl}</option>
+                            )}
+                        </select>
+                    </VContainer>
+                }
                 <VContainer>
                     <label>
                         {nls.localize('vuengine/vsuSandbox/stereoLevels', 'Stereo Levels')}
@@ -304,31 +334,43 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                         value={channel?.frequency ?? 0}
                         onChange={e => setFrequency(parseInt(e.target.value))}
                     />
-                    {Math.round(toHertz(channel?.frequency ?? 0) * 100) / 100} Hz
+                    {!isNoiseChannel &&
+                        `${Math.round(frequencyToHertz(channel?.frequency ?? 0) * 100) / 100} Hz`
+                    }
+                    {isNoiseChannel &&
+                        `${Math.round(noiseFrequencyToHertz(channel?.frequency ?? 0) * 100) / 100} Hz`
+                    }
                 </VContainer>
                 <VContainer>
                     <label>
                         {nls.localize('vuengine/vsuSandbox/interval', 'Interval')}
                     </label>
-                    <label>
-                        <input
-                            type="checkbox"
-                            checked={channel?.interval?.enabled ?? false}
-                            onChange={toggleIntervalEnabled}
-                        />
-                        Enabled
-                    </label>
-                    {channel?.interval?.enabled &&
-                        <input
-                            className='theia-input'
-                            style={{ width: 72 }}
-                            type='number'
-                            min={0}
-                            max={31}
-                            value={channel?.interval?.value ?? 0}
-                            onChange={e => setInterval(parseInt(e.target.value))}
-                        />
-                    }
+                    <HContainer gap={15} wrap='wrap'>
+                        <label>
+                            <input
+                                type="checkbox"
+                                checked={channel?.interval?.enabled ?? false}
+                                onChange={toggleIntervalEnabled}
+                            />
+                            Enabled
+                        </label>
+                        {channel?.interval?.enabled &&
+                            <VContainer>
+                                <label>
+                                    {nls.localize('vuengine/vsuSandbox/length', 'Length')}
+                                </label>
+                                <select
+                                    className="theia-select"
+                                    value={channel?.interval?.value ?? 0}
+                                    onChange={e => setInterval(parseInt(e.target.value))}
+                                >
+                                    {INTERVAL_VALUES.map((intv, i) =>
+                                        <option value={i}>{intv} ms</option>
+                                    )}
+                                </select>
+                            </VContainer>
+                        }
+                    </HContainer>
                 </VContainer>
                 <VContainer>
                     <label>
@@ -376,6 +418,20 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                 </VContainer>
                                 <VContainer>
                                     <label>
+                                        {nls.localize('vuengine/vsuSandbox/stepTime', 'Step Time')}
+                                    </label>
+                                    <select
+                                        className="theia-select"
+                                        value={channel?.envelope?.stepTime ?? 0}
+                                        onChange={e => setEnvelopeStepTime(parseInt(e.target.value))}
+                                    >
+                                        {ENVELOPE_STEP_TIME_VALUES.map((st, i) =>
+                                            <option value={i}>{st} ms</option>
+                                        )}
+                                    </select>
+                                </VContainer>
+                                <VContainer>
+                                    <label>
                                         {nls.localize('vuengine/vsuSandbox/initialValue', 'Initial Value')}
                                     </label>
                                     <input
@@ -387,25 +443,6 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                         value={channel?.envelope?.initialValue ?? 0}
                                         onChange={e => setEnvelopeInitialValue(parseInt(e.target.value))}
                                     />
-                                </VContainer>
-                                <VContainer>
-                                    <label>
-                                        {nls.localize('vuengine/vsuSandbox/stepTime', 'Step Time')}
-                                    </label>
-                                    <select
-                                        className="theia-select"
-                                        value={channel?.envelope?.stepTime ?? 0}
-                                        onChange={e => setEnvelopeStepTime(parseInt(e.target.value))}
-                                    >
-                                        <option value="0">15.4 ms</option>
-                                        <option value="1">30.7 ms</option>
-                                        <option value="2">46.1 ms</option>
-                                        <option value="3">61.4 ms</option>
-                                        <option value="4">76.8 ms</option>
-                                        <option value="5">92.2 ms</option>
-                                        <option value="6">107.5 ms</option>
-                                        <option value="7">122.9 ms</option>
-                                    </select>
                                 </VContainer>
                             </>
                         }
