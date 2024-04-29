@@ -51,6 +51,7 @@ export default function EmulatorSidebar(props: EmulatorSidebarProps): React.JSX.
             />
         </div>
         <EmulatorConfigs
+            commandService={props.commandService}
             fileDialogService={props.fileDialogService}
             fileService={props.fileService}
             preferenceService={props.preferenceService}

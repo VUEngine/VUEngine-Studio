@@ -10,7 +10,7 @@ import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
-import { DEFAULT_EMULATOR, EmulatorConfig } from './ves-emulator-types';
+import { DEFAULT_EMULATOR_CONFIG, EmulatorConfig, RED_VIPER_CONFIG } from './ves-emulator-types';
 
 export const ROM_PLACEHOLDER = '%ROM%';
 
@@ -105,7 +105,7 @@ export class VesEmulatorService {
         return;
       }
 
-      const selectedEmulator = (selection.label === DEFAULT_EMULATOR.name)
+      const selectedEmulator = (selection.label === DEFAULT_EMULATOR_CONFIG.name)
         ? ''
         : selection.label;
 
@@ -141,9 +141,11 @@ export class VesEmulatorService {
   async runInEmulator(): Promise<void> {
     const defaultEmulatorConfig = this.getDefaultEmulatorConfig();
     const romUri = await this.vesBuildService.getDefaultRomUri();
-    if (defaultEmulatorConfig === DEFAULT_EMULATOR) {
+    if (defaultEmulatorConfig === DEFAULT_EMULATOR_CONFIG) {
       const opener = await this.openerService.getOpener(romUri);
       await opener.open(romUri);
+    } else if (defaultEmulatorConfig === RED_VIPER_CONFIG) {
+      alert('HELLO');
     } else {
       const emulatorPath = isWindows && !defaultEmulatorConfig.path.startsWith('/')
         ? `/${defaultEmulatorConfig.path}`
@@ -178,7 +180,7 @@ export class VesEmulatorService {
     const emulatorConfigs: EmulatorConfig[] = this.getEmulatorConfigs();
     const defaultEmulatorName: string = this.preferenceService.get(VesEmulatorPreferenceIds.DEFAULT_EMULATOR) as string;
 
-    let defaultEmulatorConfig = DEFAULT_EMULATOR;
+    let defaultEmulatorConfig = DEFAULT_EMULATOR_CONFIG;
     for (const emulatorConfig of emulatorConfigs) {
       if (emulatorConfig.name === defaultEmulatorName) {
         defaultEmulatorConfig = emulatorConfig;
@@ -192,7 +194,8 @@ export class VesEmulatorService {
     const customEmulatorConfigs: EmulatorConfig[] = this.preferenceService.get(VesEmulatorPreferenceIds.EMULATORS) ?? [];
 
     const emulatorConfigs = [
-      DEFAULT_EMULATOR,
+      DEFAULT_EMULATOR_CONFIG,
+      RED_VIPER_CONFIG,
       ...customEmulatorConfigs,
     ];
 
