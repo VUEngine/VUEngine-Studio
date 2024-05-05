@@ -147,6 +147,10 @@
       "backend": "lib/process/node/ves-process-service-backend-module"
     },
     {
+      "frontend": "lib/socket/browser/ves-socket-service-frontend-module",
+      "backend": "lib/socket/node/ves-socket-service-backend-module"
+    },
+    {
       "frontend": "lib/project/browser/ves-project-frontend-module"
     },
     {
