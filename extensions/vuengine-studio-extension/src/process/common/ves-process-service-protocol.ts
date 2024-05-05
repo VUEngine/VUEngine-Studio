@@ -21,8 +21,7 @@ export interface VesProcessServiceClient {
   onDidCloseProcess(pId: number, event: IProcessExitEvent): void;
 }
 
-export interface VesProcessService
-  extends RpcServer<VesProcessServiceClient> {
+export interface VesProcessService extends RpcServer<VesProcessServiceClient> {
   launchProcess(type: VesProcessType, options: ProcessOptions): Promise<{
     processManagerId: number;
     processId: number;

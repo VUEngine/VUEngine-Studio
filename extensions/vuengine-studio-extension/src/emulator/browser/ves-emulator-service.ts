@@ -5,12 +5,23 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import sanitize from 'sanitize-filename';
 import { VesBuildCommands } from '../../build/browser/ves-build-commands';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 import { VesProjectService } from '../../project/browser/ves-project-service';
+import { VesSocketWatcher } from '../../socket/browser/ves-socket-service-watcher';
+import { VesSocketService } from '../../socket/common/ves-socket-service-protocol';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
-import { DEFAULT_EMULATOR_CONFIG, EmulatorConfig, RED_VIPER_CONFIG } from './ves-emulator-types';
+import {
+  DEFAULT_EMULATOR_CONFIG,
+  EmulatorConfig,
+  RED_VIPER_CONFIG,
+  RED_VIPER_VBLINK_CHUNK_SIZE_KB,
+  RED_VIPER_VBLINK_PORT,
+  VbLinkStatus,
+  VbLinkStatusData,
+} from './ves-emulator-types';
 
 export const ROM_PLACEHOLDER = '%ROM%';
 
@@ -36,6 +47,10 @@ export class VesEmulatorService {
   private readonly vesProcessService: VesProcessService;
   @inject(VesProjectService)
   protected readonly vesProjectsService: VesProjectService;
+  @inject(VesSocketService)
+  protected readonly vesSocketService: VesSocketService;
+  @inject(VesSocketWatcher)
+  protected readonly vesSocketWatcher: VesSocketWatcher;
 
   // is queued
   protected _isQueued: boolean = false;
@@ -49,6 +64,22 @@ export class VesEmulatorService {
     return this._isQueued;
   }
 
+  // vb link status
+  protected _vbLinkStatus: VbLinkStatusData = {
+    status: VbLinkStatus.idle,
+    done: 0,
+    total: 0,
+  };
+  protected readonly onDidChangeVbLinkStatusEmitter = new Emitter<VbLinkStatusData>();
+  readonly onDidChangeVbLinkStatus = this.onDidChangeVbLinkStatusEmitter.event;
+  set vbLinkStatus(status: VbLinkStatusData) {
+    this._vbLinkStatus = status;
+    this.onDidChangeVbLinkStatusEmitter.fire(this._vbLinkStatus);
+  }
+  get vbLinkStatus(): VbLinkStatusData {
+    return this._vbLinkStatus;
+  }
+
   // default emulator
   protected readonly onDidChangeEmulatorEmitter = new Emitter<string>();
   readonly onDidChangeEmulator = this.onDidChangeEmulatorEmitter.event;
@@ -59,24 +90,6 @@ export class VesEmulatorService {
 
   @postConstruct()
   protected init(): void {
-    // watch for preference changes
-    this.preferenceService.onPreferenceChanged(
-      ({ preferenceName, newValue }) => {
-        switch (preferenceName) {
-          case VesEmulatorPreferenceIds.EMULATORS:
-            this.onDidChangeEmulatorConfigsEmitter.fire(
-              this.getEmulatorConfigs()
-            );
-            break;
-          case VesEmulatorPreferenceIds.DEFAULT_EMULATOR:
-            this.onDidChangeEmulatorEmitter.fire(
-              this.getDefaultEmulatorConfig().name
-            );
-            break;
-        }
-      }
-    );
-
     this.bindEvents();
   }
 
@@ -94,9 +107,10 @@ export class VesEmulatorService {
       const detail = this.shorten(emulatorConfig.args, 98);
       quickPickItems.push({
         label: emulatorConfig.name,
-        description: emulatorConfig.path,
-        detail: detail ? `   ${detail} ` : '',
-        iconClasses: (emulatorConfig.name === defaultEmulator) ? ['fa', 'fa-check-square-o'] : ['fa', 'fa-square-o'],
+        detail: (emulatorConfig.path || detail)
+          ? `   ${emulatorConfig.path} ${detail}`
+          : undefined,
+        iconClasses: ['codicon', (emulatorConfig.name === defaultEmulator) ? 'codicon-pass-filled' : 'codicon-circle-large'],
       });
     }
 
@@ -127,6 +141,25 @@ export class VesEmulatorService {
   }
 
   protected bindEvents(): void {
+    // watch for preference changes
+    this.preferenceService.onPreferenceChanged(
+      ({ preferenceName, newValue }) => {
+        switch (preferenceName) {
+          case VesEmulatorPreferenceIds.EMULATORS:
+            this.onDidChangeEmulatorConfigsEmitter.fire(
+              this.getEmulatorConfigs()
+            );
+            break;
+          case VesEmulatorPreferenceIds.DEFAULT_EMULATOR:
+            this.onDidChangeEmulatorEmitter.fire(
+              this.getDefaultEmulatorConfig().name
+            );
+            break;
+        }
+      }
+    );
+
+    // is queued
     this.vesBuildService.onDidSucceedBuild(async () => {
       if (this.isQueued) {
         this.isQueued = false;
@@ -136,16 +169,78 @@ export class VesEmulatorService {
     this.vesBuildService.onDidFailBuild(() => {
       this.isQueued = false;
     });
+
+    // red viper vblink
+    // once connected, send (u32) filename length, filename and (u32) ROM size in kilobytes
+    this.vesSocketWatcher.onDidConnect(async () => {
+      if (this.vbLinkStatus.status !== VbLinkStatus.connect) {
+        return;
+      }
+
+      const romUri = await this.vesBuildService.getDefaultRomUri();
+      const filename = await this.getRomName();
+      const filenameLength = filename.length;
+      const romData = await this.fileService.readFile(romUri);
+      const romSizeKb = romData.size / 1024;
+
+      this.vbLinkStatus = {
+        ...this.vbLinkStatus,
+        status: VbLinkStatus.initiate,
+        done: 0,
+        total: romSizeKb / RED_VIPER_VBLINK_CHUNK_SIZE_KB,
+        data: romData.value,
+      };
+      this.vesSocketService.write(this.numberToU32Buffer(filenameLength));
+      this.vesSocketService.write(filename);
+      this.vesSocketService.write(this.numberToU32Buffer(romSizeKb));
+    });
+    // on success, Red Viper replies with (u32) 0
+    this.vesSocketWatcher.onDidReceiveData(({ data }) => {
+      if (this.vbLinkStatus.status !== VbLinkStatus.initiate) {
+        return;
+      }
+
+      if (data.length === 4 && data.reduce((a, b) => a + b) === 0) {
+        // headers sent successful, we can now transfer the ROM file in chunks
+        this.vbLinkStatus = {
+          ...this.vbLinkStatus,
+          status: VbLinkStatus.transfer,
+        };
+
+        this.transferToRedViper();
+      }
+    });
+    this.vesSocketWatcher.onDidReceiveError(({ error }) => {
+      switch (this.vbLinkStatus.status) {
+        case VbLinkStatus.connect:
+          return this.messageService.error(
+            nls.localize('vuengine/emulator/redViper/connectError', 'Could not connect to 3DS.')
+          );
+        case VbLinkStatus.initiate:
+          return this.messageService.error(
+            nls.localize('vuengine/emulator/redViper/initError', 'There was an error initiating the ROM transfer to 3DS.')
+          );
+        case VbLinkStatus.transfer:
+          return this.messageService.error(
+            nls.localize('vuengine/emulator/redViper/transferError', 'There was an error while transferring the ROM to 3DS.')
+          );
+      }
+    });
+    this.vesSocketWatcher.onDidClose(() => {
+      this.vbLinkStatus = {
+        ...this.vbLinkStatus,
+        status: VbLinkStatus.idle,
+      };
+    });
   }
 
   async runInEmulator(): Promise<void> {
     const defaultEmulatorConfig = this.getDefaultEmulatorConfig();
     const romUri = await this.vesBuildService.getDefaultRomUri();
-    if (defaultEmulatorConfig === DEFAULT_EMULATOR_CONFIG) {
-      const opener = await this.openerService.getOpener(romUri);
-      await opener.open(romUri);
-    } else if (defaultEmulatorConfig === RED_VIPER_CONFIG) {
-      alert('HELLO');
+    if (defaultEmulatorConfig.name === DEFAULT_EMULATOR_CONFIG.name) {
+      this.runInBuiltInEmulator(romUri);
+    } else if (defaultEmulatorConfig.name === RED_VIPER_CONFIG.name) {
+      this.runInRedViper();
     } else {
       const emulatorPath = isWindows && !defaultEmulatorConfig.path.startsWith('/')
         ? `/${defaultEmulatorConfig.path}`
@@ -166,6 +261,40 @@ export class VesEmulatorService {
         args: emulatorArgs,
       });
     }
+  }
+
+  async runInBuiltInEmulator(romUri: URI): Promise<void> {
+    const opener = await this.openerService.getOpener(romUri);
+    await opener.open(romUri);
+  }
+
+  async runInRedViper(): Promise<void> {
+    if (this.vbLinkStatus.status !== VbLinkStatus.idle) {
+      return;
+    }
+
+    this.vbLinkStatus.status = VbLinkStatus.connect;
+    const ip = this.preferenceService.get(VesEmulatorPreferenceIds.EMULATOR_RED_VIPER_3DS_IP_ADDRESS, '');
+    this.vesSocketService.connect(RED_VIPER_VBLINK_PORT, ip);
+  }
+
+  async transferToRedViper(): Promise<void> {
+    // TODO
+  }
+
+  protected numberToU32Buffer(num: number): Buffer {
+    const byte1 = 0xff & num;
+    const byte2 = 0xff & (num >> 8);
+    const byte3 = 0xff & (num >> 16);
+    const byte4 = 0xff & (num >> 24);
+    return Buffer.from([byte1, byte2, byte3, byte4]);
+  }
+
+  protected async getRomName(): Promise<string> {
+    const projectName = await this.vesProjectsService.getProjectName();
+    const romName = projectName ?? 'output';
+
+    return `${sanitize(romName)}.vb`;
   }
 
   shorten(word: string, length: number): string {
@@ -195,7 +324,10 @@ export class VesEmulatorService {
 
     const emulatorConfigs = [
       DEFAULT_EMULATOR_CONFIG,
-      RED_VIPER_CONFIG,
+      {
+        ...RED_VIPER_CONFIG,
+        path: this.preferenceService.get(VesEmulatorPreferenceIds.EMULATOR_RED_VIPER_3DS_IP_ADDRESS, ''),
+      },
       ...customEmulatorConfigs,
     ];
 

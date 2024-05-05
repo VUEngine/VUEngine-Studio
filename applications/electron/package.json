@@ -85,7 +85,6 @@
     "@theia/notebook": "1.49.0",
     "@theia/output": "1.49.0",
     "@theia/plugin-ext": "1.49.0",
-    "@theia/plugin-ext-headless": "1.49.0",
     "@theia/plugin-ext-vscode": "1.49.0",
     "@theia/preferences": "1.49.0",
     "@theia/preview": "1.49.0",
