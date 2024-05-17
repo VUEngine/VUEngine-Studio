@@ -1,4 +1,5 @@
 import { default as $RefParser, default as JSONSchema } from '@apidevtools/json-schema-ref-parser';
+import { Octokit } from '@octokit/rest';
 import { Disposable, MaybePromise, isWindows } from '@theia/core';
 import { ElectronMainApplication, ElectronMainApplicationContribution } from '@theia/core/lib/electron-main/electron-main-application';
 import { createDisposableListener } from '@theia/core/lib/electron-main/event-utils';
@@ -7,15 +8,15 @@ import {
     ipcMain, systemPreferences
 } from '@theia/electron/shared/electron';
 import { FileContent } from '@theia/filesystem/lib/common/files';
+import { getTempDir } from '@theia/plugin-ext/lib/main/node/temp-dir-util';
 import * as decompress from 'decompress';
 import { WebContents } from 'electron';
 import { glob } from 'glob';
 import sizeOf from 'image-size';
 import { injectable } from 'inversify';
-import { getTempDir } from '@theia/plugin-ext/lib/main/node/temp-dir-util';
 import sortJson from 'sort-json';
+import zlib from 'zlib';
 import { ImageData } from '../browser/ves-common-types';
-import { Octokit } from '@octokit/rest';
 import {
     VES_CHANNEL_CHECK_UPDATE_AVAILABLE,
     VES_CHANNEL_DECOMPRESS,
@@ -32,7 +33,8 @@ import {
     VES_CHANNEL_REPLACE_IN_FILES,
     VES_CHANNEL_SEND_TOUCHBAR_COMMAND,
     VES_CHANNEL_SET_ZOOM_FACTOR,
-    VES_CHANNEL_SORT_JSON
+    VES_CHANNEL_SORT_JSON,
+    VES_CHANNEL_ZLIB_DEFLATE
 } from '../electron-common/ves-electron-api';
 
 @injectable()
@@ -78,7 +80,9 @@ export class VesMainApi implements ElectronMainApplicationContribution {
             } else {
                 return false;
             }
-
+        });
+        ipcMain.on(VES_CHANNEL_ZLIB_DEFLATE, (event, data) => {
+            event.returnValue = zlib.deflateSync(data);
         });
         ipcMain.on(VES_CHANNEL_FIND_FILES, (event, base, pattern, options) => {
             const results: string[] = [];
