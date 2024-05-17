@@ -8,10 +8,12 @@ export interface VesSocketServiceClient {
   onDidReceiveError(error: string): void;
   onDidConnect(): void;
   onDidClose(): void;
+  onDidTransferChunk(): void;
 }
 
 export interface VesSocketService extends RpcServer<VesSocketServiceClient> {
   connect(port: number, ip: string): void;
   destroy(): void;
   write(buffer: string | Uint8Array): void;
+  writeChunked(buffer: Uint8Array, chunkSizeBytes: number): void;
 }

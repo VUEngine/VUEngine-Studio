@@ -1,8 +1,7 @@
 import { nls } from '@theia/core';
-import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 
 export const RED_VIPER_VBLINK_PORT = 22082;
-export const RED_VIPER_VBLINK_CHUNK_SIZE_KB = 64;
+export const RED_VIPER_VBLINK_CHUNK_SIZE_BYTES = 16384;
 
 export enum VbLinkStatus {
   idle,
@@ -14,8 +13,7 @@ export enum VbLinkStatus {
 export interface VbLinkStatusData {
   status: VbLinkStatus
   done: number
-  total: number
-  data?: BinaryBuffer
+  data?: Buffer
 };
 
 export interface RomHeader {

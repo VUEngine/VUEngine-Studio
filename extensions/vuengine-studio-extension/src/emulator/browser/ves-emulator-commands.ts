@@ -336,9 +336,21 @@ export namespace VesEmulatorCommands {
     {
       id: 'ves:emulator:showSettings',
       label: 'Show Emulator Preferences',
+      category: 'Emulator',
       iconClass: 'codicon codicon-settings',
     },
     'vuengine/emulator/commands/showSettings',
+    'vuengine/emulator/commands/category'
+  );
+
+  export const CANCEL_RED_VIPER_TRANSFER: Command = Command.toLocalizedCommand(
+    {
+      id: 'ves:emulator:cancelRedViperTransfer',
+      label: 'Cancel Red Viper Transfer',
+      category: 'Emulator',
+      iconClass: 'codicon codicon-close',
+    },
+    'vuengine/emulator/commands/cancelRedViperTransfer',
     'vuengine/emulator/commands/category'
   );
 };
