@@ -14,6 +14,7 @@ export interface VesCoreAPI {
     sortJson<T>(old: T, options?: VisitOptions): T;
     replaceInFiles(files: string[], from: string, to: string): Promise<number>;
     checkUpdateAvailable(currentVersion: string): Promise<string | boolean>;
+    zlibDeflate(data: Buffer): Buffer;
     findFiles(base: string, pattern: string | string[], options?: GlobOptionsWithFileTypesUnset): string[];
     decompress(archivePath: string, targetPath: string): Promise<string[]>;
     getImageDimensions(path: string): ISizeCalculationResult;
@@ -47,3 +48,4 @@ export const VES_CHANNEL_ON_SERIAL_DEVICE_CHANGE = 'vesOnSerialDeviceChange';
 export const VES_CHANNEL_SEND_TOUCHBAR_COMMAND = 'vesSendTouchBarCommand';
 export const VES_CHANNEL_ON_TOUCHBAR_EVENT = 'vesOnTouchBarEvent';
 export const VES_CHANNEL_CHECK_UPDATE_AVAILABLE = 'vesCheckUpdateAvailable';
+export const VES_CHANNEL_ZLIB_DEFLATE = 'vesCheckZlibDeflate';

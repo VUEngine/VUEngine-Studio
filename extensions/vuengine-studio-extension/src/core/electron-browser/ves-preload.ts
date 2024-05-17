@@ -22,6 +22,7 @@ import {
     VES_CHANNEL_SEND_TOUCHBAR_COMMAND,
     VES_CHANNEL_SET_ZOOM_FACTOR,
     VES_CHANNEL_SORT_JSON,
+    VES_CHANNEL_ZLIB_DEFLATE,
     VesCoreAPI
 } from '../electron-common/ves-electron-api';
 
@@ -51,6 +52,9 @@ const api: VesCoreAPI = {
     },
     checkUpdateAvailable: function (currentVersion: string): Promise<string | boolean> {
         return ipcRenderer.invoke(VES_CHANNEL_CHECK_UPDATE_AVAILABLE, currentVersion);
+    },
+    zlibDeflate: function (data: Buffer): Buffer {
+        return ipcRenderer.sendSync(VES_CHANNEL_ZLIB_DEFLATE, data);
     },
     findFiles: function (base: string, pattern: string | string[], options?: GlobOptionsWithFileTypesUnset): string[] {
         return ipcRenderer.sendSync(VES_CHANNEL_FIND_FILES, base, pattern, options);
