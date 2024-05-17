@@ -4,8 +4,7 @@ import { inject, injectable } from '@theia/core/shared/inversify';
 import { VesEmulatorCommands } from './ves-emulator-commands';
 import { VesEmulatorPreferenceIds } from './ves-emulator-preferences';
 import { VesEmulatorService } from './ves-emulator-service';
-import { VesEmulatorSidebarCommands } from './ves-emulator-sidebar-view-contribution';
-import { VbLinkStatus } from './ves-emulator-types';
+import { RED_VIPER_VBLINK_CHUNK_SIZE_BYTES, VbLinkStatus } from './ves-emulator-types';
 
 @injectable()
 export class VesEmulatorStatusBarContribution implements FrontendApplicationContribution {
@@ -50,12 +49,13 @@ export class VesEmulatorStatusBarContribution implements FrontendApplicationCont
             this.statusBar.removeElement('ves-vblink-status');
         } else {
             const label = nls.localize('vuengine/emulator/redViper/transferring', 'Transferring to 3DS...');
+            const totalChunks = Math.ceil(this.vesEmulatorService.vbLinkStatus.data?.byteLength! / RED_VIPER_VBLINK_CHUNK_SIZE_BYTES);
             const progress = Math.round(
-                this.vesEmulatorService.vbLinkStatus.done * 100 / this.vesEmulatorService.vbLinkStatus.total
+                this.vesEmulatorService.vbLinkStatus.done * 100 / totalChunks
             );
             this.statusBar.setElement('ves-vblink-status', {
                 alignment: StatusBarAlignment.LEFT,
-                command: VesEmulatorSidebarCommands.WIDGET_TOGGLE.id,
+                command: VesEmulatorCommands.CANCEL_RED_VIPER_TRANSFER.id,
                 priority: 1,
                 text: `$(codicon-loading~spin) ${label} (${progress}%)`,
             });

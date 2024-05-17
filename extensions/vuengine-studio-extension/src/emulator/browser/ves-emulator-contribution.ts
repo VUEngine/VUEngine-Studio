@@ -24,6 +24,10 @@ export class VesEmulatorContribution implements CommandContribution, KeybindingC
       isVisible: () => this.workspaceService.opened,
       execute: () => this.vesEmulatorService.selectEmulator(),
     });
+    commandRegistry.registerCommand(VesEmulatorCommands.CANCEL_RED_VIPER_TRANSFER, {
+      isVisible: () => false,
+      execute: () => this.vesEmulatorService.cancelRedViperTransfer(),
+    });
 
     commandRegistry.registerCommand(VesEmulatorCommands.INPUT_L_UP, {
       execute: () => { },

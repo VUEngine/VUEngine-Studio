@@ -47,4 +47,24 @@ export class VesSocketServiceImpl implements VesSocketService {
   write(buffer: string | Uint8Array): void {
     this.socket?.write(buffer);
   }
+
+  writeChunked(buffer: Uint8Array, chunkSizeBytes: number): void {
+    const totalChunks = buffer.byteLength / chunkSizeBytes;
+    for (let i = 0; i < totalChunks; i++) {
+      const currentPosition = i * chunkSizeBytes;
+      const chunk = buffer.subarray(currentPosition, currentPosition + chunkSizeBytes);
+      if (chunk) {
+        this.socket?.write(this.numberToU32Buffer(chunk.byteLength));
+        this.socket?.write(chunk, this.client?.onDidTransferChunk);
+      }
+    }
+  }
+
+  protected numberToU32Buffer(num: number): Buffer {
+    const byte1 = 0xff & num;
+    const byte2 = 0xff & (num >> 8);
+    const byte3 = 0xff & (num >> 16);
+    const byte4 = 0xff & (num >> 24);
+    return Buffer.from([byte1, byte2, byte3, byte4]);
+  }
 }

@@ -12,6 +12,8 @@ export class VesSocketWatcher {
     public readonly onDidConnect: Event<{}> = this.onDidConnectEmitter.event;
     protected readonly onDidCloseEmitter = new Emitter<{}>();
     public readonly onDidClose: Event<{}> = this.onDidCloseEmitter.event;
+    protected readonly onDidTransferChunkEmitter = new Emitter<{}>();
+    public readonly onDidTransferChunk: Event<{}> = this.onDidTransferChunkEmitter.event;
 
     @inject(VesSocketService) protected readonly server: VesSocketService;
 
@@ -23,6 +25,7 @@ export class VesSocketWatcher {
             onDidReceiveError: (error: string) => this.onDidReceiveErrorEmitter.fire({ error }),
             onDidConnect: () => this.onDidConnectEmitter.fire({}),
             onDidClose: () => this.onDidCloseEmitter.fire({}),
+            onDidTransferChunk: () => this.onDidTransferChunkEmitter.fire({}),
         });
     }
 }

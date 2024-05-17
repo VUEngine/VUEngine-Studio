@@ -1,4 +1,4 @@
-import { ApplicationShell, OpenerService, PreferenceScope, PreferenceService, QuickPickItem, QuickPickOptions } from '@theia/core/lib/browser';
+import { ApplicationShell, ConfirmDialog, OpenerService, PreferenceScope, PreferenceService, QuickPickItem, QuickPickOptions } from '@theia/core/lib/browser';
 import { CommandService, MessageService, isWindows, nls } from '@theia/core/lib/common';
 import { QuickPickService } from '@theia/core/lib/common/quick-pick-service';
 import URI from '@theia/core/lib/common/uri';
@@ -17,7 +17,7 @@ import {
   DEFAULT_EMULATOR_CONFIG,
   EmulatorConfig,
   RED_VIPER_CONFIG,
-  RED_VIPER_VBLINK_CHUNK_SIZE_KB,
+  RED_VIPER_VBLINK_CHUNK_SIZE_BYTES,
   RED_VIPER_VBLINK_PORT,
   VbLinkStatus,
   VbLinkStatusData,
@@ -68,7 +68,6 @@ export class VesEmulatorService {
   protected _vbLinkStatus: VbLinkStatusData = {
     status: VbLinkStatus.idle,
     done: 0,
-    total: 0,
   };
   protected readonly onDidChangeVbLinkStatusEmitter = new Emitter<VbLinkStatusData>();
   readonly onDidChangeVbLinkStatus = this.onDidChangeVbLinkStatusEmitter.event;
@@ -181,36 +180,50 @@ export class VesEmulatorService {
       const filename = await this.getRomName();
       const filenameLength = filename.length;
       const romData = await this.fileService.readFile(romUri);
-      const romSizeKb = romData.size / 1024;
+      const deflatedRomData = window.electronVesCore.zlibDeflate(Buffer.from(romData.value.buffer));
+      const romSizeBytes = romData.value.byteLength;
 
       this.vbLinkStatus = {
-        ...this.vbLinkStatus,
         status: VbLinkStatus.initiate,
         done: 0,
-        total: romSizeKb / RED_VIPER_VBLINK_CHUNK_SIZE_KB,
-        data: romData.value,
+        data: Buffer.from(deflatedRomData),
       };
       this.vesSocketService.write(this.numberToU32Buffer(filenameLength));
       this.vesSocketService.write(filename);
-      this.vesSocketService.write(this.numberToU32Buffer(romSizeKb));
+      this.vesSocketService.write(this.numberToU32Buffer(romSizeBytes));
     });
     // on success, Red Viper replies with (u32) 0
     this.vesSocketWatcher.onDidReceiveData(({ data }) => {
-      if (this.vbLinkStatus.status !== VbLinkStatus.initiate) {
+      if (this.vbLinkStatus.status !== VbLinkStatus.initiate && this.vbLinkStatus.status !== VbLinkStatus.transfer) {
         return;
       }
 
       if (data.length === 4 && data.reduce((a, b) => a + b) === 0) {
-        // headers sent successful, we can now transfer the ROM file in chunks
-        this.vbLinkStatus = {
-          ...this.vbLinkStatus,
-          status: VbLinkStatus.transfer,
-        };
+        if (this.vbLinkStatus.status === VbLinkStatus.initiate) {
+          // headers sent successful, we can now transfer the ROM file
+          this.vbLinkStatus = {
+            ...this.vbLinkStatus,
+            status: VbLinkStatus.transfer,
+          };
 
-        this.transferToRedViper();
+          if (this.vbLinkStatus.data) {
+            // write zlib deflated ROM file in chunks
+            this.vesSocketService.writeChunked(this.vbLinkStatus.data, RED_VIPER_VBLINK_CHUNK_SIZE_BYTES);
+          }
+        } else if (this.vbLinkStatus.status === VbLinkStatus.transfer) {
+          // ROM sent successful
+          this.vbLinkStatus = {
+            ...this.vbLinkStatus,
+            status: VbLinkStatus.idle,
+          };
+        }
       }
     });
     this.vesSocketWatcher.onDidReceiveError(({ error }) => {
+      if (error?.startsWith && error.startsWith('Error: write EPIPE')) {
+        return;
+      }
+
       switch (this.vbLinkStatus.status) {
         case VbLinkStatus.connect:
           return this.messageService.error(
@@ -232,6 +245,25 @@ export class VesEmulatorService {
         status: VbLinkStatus.idle,
       };
     });
+    this.vesSocketWatcher.onDidTransferChunk(() => {
+      if (this.vbLinkStatus.status === VbLinkStatus.transfer) {
+        this.vbLinkStatus = {
+          ...this.vbLinkStatus,
+          done: this.vbLinkStatus.done + 1,
+        };
+      }
+    });
+  }
+
+  async cancelRedViperTransfer(): Promise<void> {
+    const dialog = new ConfirmDialog({
+      title: nls.localize('vuengine/emulator/redViper/cancelTransfer', 'Cancel Transfer'),
+      msg: nls.localize('vuengine/emulator/redViper/doYouWantToCancelTranfer', 'Do you want to cancel the file transfer?'),
+    });
+    const confirmed = await dialog.open();
+    if (confirmed) {
+      this.vesSocketService.destroy();
+    }
   }
 
   async runInEmulator(): Promise<void> {
@@ -278,18 +310,6 @@ export class VesEmulatorService {
     this.vesSocketService.connect(RED_VIPER_VBLINK_PORT, ip);
   }
 
-  async transferToRedViper(): Promise<void> {
-    // TODO
-  }
-
-  protected numberToU32Buffer(num: number): Buffer {
-    const byte1 = 0xff & num;
-    const byte2 = 0xff & (num >> 8);
-    const byte3 = 0xff & (num >> 16);
-    const byte4 = 0xff & (num >> 24);
-    return Buffer.from([byte1, byte2, byte3, byte4]);
-  }
-
   protected async getRomName(): Promise<string> {
     const projectName = await this.vesProjectsService.getProjectName();
     const romName = projectName ?? 'output';
@@ -332,5 +352,13 @@ export class VesEmulatorService {
     ];
 
     return emulatorConfigs;
+  }
+
+  protected numberToU32Buffer(num: number): Buffer {
+    const byte1 = 0xff & num;
+    const byte2 = 0xff & (num >> 8);
+    const byte3 = 0xff & (num >> 16);
+    const byte4 = 0xff & (num >> 24);
+    return Buffer.from([byte1, byte2, byte3, byte4]);
   }
 }
