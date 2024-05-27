@@ -29,16 +29,20 @@ interface NumberArrayPreviewProps {
     data: number[]
     title?: string
     onClick?: () => void
+    onMouseEnter?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
+    onMouseLeave?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
 }
 
 export default function NumberArrayPreview(props: NumberArrayPreviewProps): React.JSX.Element {
-    const { active, maximum, data, title, onClick } = props;
+    const { active, maximum, data, title, onClick, onMouseEnter, onMouseLeave } = props;
 
     return <ColumnContainer
         style={{
             borderColor: active ? 'var(--theia-button-background)' : undefined,
         }}
         onClick={onClick}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
         title={title}
     >
         {[...Array(32)].map((h, y) => {

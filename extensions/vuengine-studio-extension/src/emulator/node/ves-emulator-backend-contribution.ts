@@ -14,6 +14,20 @@ export class EmulatorBackendContribution implements BackendApplicationContributi
   protected readonly envVariablesServer: EnvVariablesServer;
 
   async configure(app: express.Application): Promise<void> {
-    app.use('/emulator', express.static(path.join(this.applicationPackage.projectPath, 'binaries', 'vuengine-studio-tools', 'web', 'retroarch'), { dotfiles: 'allow' }));
+    app.use(
+      '/emulator',
+      express.static(
+        path.join(
+          this.applicationPackage.projectPath,
+          'binaries',
+          'vuengine-studio-tools',
+          'web',
+          'retroarch'
+        ),
+        {
+          dotfiles: 'allow'
+        }
+      )
+    );
   }
 }

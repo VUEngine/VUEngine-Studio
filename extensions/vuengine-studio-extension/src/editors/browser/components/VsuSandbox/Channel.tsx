@@ -6,20 +6,20 @@ import RadioSelect from '../Common/RadioSelect';
 import { clamp } from '../Common/Utils';
 import VContainer from '../Common/VContainer';
 import {
-    ENVELOPE_INITIAL_VALUE_MAX,
-    ENVELOPE_INITIAL_VALUE_MIN,
-    ENVELOPE_STEP_TIME_MAX,
-    ENVELOPE_STEP_TIME_MIN,
-    ENVELOPE_STEP_TIME_VALUES,
-    INTERVAL_VALUES,
-    NOISE_TAP_LOCATIONS,
-    NUMBER_OF_WAVEFORM_BANKS,
-    SWEEP_MODULATION_FREQUENCY_MAX,
-    SWEEP_MODULATION_FREQUENCY_MIN,
-    SWEEP_MODULATION_INTERVAL_MAX,
-    SWEEP_MODULATION_INTERVAL_MIN,
-    SWEEP_MODULATION_SHIFT_MAX,
-    SWEEP_MODULATION_SHIFT_MIN,
+    VSU_ENVELOPE_INITIAL_VALUE_MAX,
+    VSU_ENVELOPE_INITIAL_VALUE_MIN,
+    VSU_ENVELOPE_STEP_TIME_MAX,
+    VSU_ENVELOPE_STEP_TIME_MIN,
+    VSU_ENVELOPE_STEP_TIME_VALUES,
+    VSU_INTERVAL_VALUES,
+    VSU_NOISE_TAP_LOCATIONS,
+    VSU_NUMBER_OF_WAVEFORM_BANKS,
+    VSU_SWEEP_MODULATION_FREQUENCY_MAX,
+    VSU_SWEEP_MODULATION_FREQUENCY_MIN,
+    VSU_SWEEP_MODULATION_INTERVAL_MAX,
+    VSU_SWEEP_MODULATION_INTERVAL_MIN,
+    VSU_SWEEP_MODULATION_SHIFT_MAX,
+    VSU_SWEEP_MODULATION_SHIFT_MIN,
     VsuChannelData
 } from './VsuSandboxTypes';
 
@@ -112,7 +112,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
             ...channel,
             envelope: {
                 ...channel?.envelope,
-                decay,
+                direction: decay,
             },
         });
     };
@@ -122,7 +122,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
             ...channel,
             envelope: {
                 ...channel?.envelope,
-                stepTime: clamp(stepTime, ENVELOPE_STEP_TIME_MIN, ENVELOPE_STEP_TIME_MAX),
+                stepTime: clamp(stepTime, VSU_ENVELOPE_STEP_TIME_MIN, VSU_ENVELOPE_STEP_TIME_MAX),
             },
         });
     };
@@ -132,7 +132,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
             ...channel,
             envelope: {
                 ...channel?.envelope,
-                initialValue: clamp(initialValue, ENVELOPE_INITIAL_VALUE_MIN, ENVELOPE_INITIAL_VALUE_MAX),
+                initialValue: clamp(initialValue, VSU_ENVELOPE_INITIAL_VALUE_MIN, VSU_ENVELOPE_INITIAL_VALUE_MAX),
             },
         });
     };
@@ -162,7 +162,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
             ...channel,
             sweepModulation: {
                 ...channel?.sweepModulation,
-                sweep,
+                modulation: sweep,
             },
         });
     };
@@ -172,7 +172,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
             ...channel,
             sweepModulation: {
                 ...channel?.sweepModulation,
-                frequency: clamp(frequency, SWEEP_MODULATION_FREQUENCY_MIN, SWEEP_MODULATION_FREQUENCY_MAX),
+                frequency: clamp(frequency, VSU_SWEEP_MODULATION_FREQUENCY_MIN, VSU_SWEEP_MODULATION_FREQUENCY_MAX),
             },
         });
     };
@@ -182,7 +182,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
             ...channel,
             sweepModulation: {
                 ...channel?.sweepModulation,
-                interval: clamp(interval, SWEEP_MODULATION_INTERVAL_MIN, SWEEP_MODULATION_INTERVAL_MAX),
+                interval: clamp(interval, VSU_SWEEP_MODULATION_INTERVAL_MIN, VSU_SWEEP_MODULATION_INTERVAL_MAX),
             },
         });
     };
@@ -192,7 +192,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
             ...channel,
             sweepModulation: {
                 ...channel?.sweepModulation,
-                sweepDown,
+                direction: sweepDown,
             },
         });
     };
@@ -202,7 +202,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
             ...channel,
             sweepModulation: {
                 ...channel?.sweepModulation,
-                shift: clamp(shift, SWEEP_MODULATION_SHIFT_MIN, SWEEP_MODULATION_SHIFT_MAX),
+                shift: clamp(shift, VSU_SWEEP_MODULATION_SHIFT_MIN, VSU_SWEEP_MODULATION_SHIFT_MAX),
             },
         });
     };
@@ -245,7 +245,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                     <VContainer>
                         {nls.localize('vuengine/vsuSandbox/waveForm', 'WaveForm')}
                         <HContainer>
-                            {([...Array(NUMBER_OF_WAVEFORM_BANKS)].map((v, x) =>
+                            {([...Array(VSU_NUMBER_OF_WAVEFORM_BANKS)].map((v, x) =>
                                 <NumberArrayPreview
                                     key={x}
                                     maximum={64}
@@ -278,7 +278,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                             value={channel?.tapLocation ?? 0}
                             onChange={e => setTapLocation(parseInt(e.target.value))}
                         >
-                            {NOISE_TAP_LOCATIONS.map((tl, i) =>
+                            {VSU_NOISE_TAP_LOCATIONS.map((tl, i) =>
                                 <option value={i}>{tl}</option>
                             )}
                         </select>
@@ -364,7 +364,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                     value={channel?.interval?.value ?? 0}
                                     onChange={e => setInterval(parseInt(e.target.value))}
                                 >
-                                    {INTERVAL_VALUES.map((intv, i) =>
+                                    {VSU_INTERVAL_VALUES.map((intv, i) =>
                                         <option value={i}>{intv} ms</option>
                                     )}
                                 </select>
@@ -406,12 +406,12 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                     <RadioSelect
                                         options={[{
                                             label: 'Grow',
-                                            value: false,
+                                            value: true,
                                         }, {
                                             label: 'Decay',
-                                            value: true,
+                                            value: false,
                                         }]}
-                                        defaultValue={channel?.envelope?.decay ?? true}
+                                        defaultValue={channel?.envelope?.direction ?? true}
                                         onChange={options => setEnvelopeDecay(options[0].value as boolean)}
                                         allowBlank
                                     />
@@ -425,7 +425,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                         value={channel?.envelope?.stepTime ?? 0}
                                         onChange={e => setEnvelopeStepTime(parseInt(e.target.value))}
                                     >
-                                        {ENVELOPE_STEP_TIME_VALUES.map((st, i) =>
+                                        {VSU_ENVELOPE_STEP_TIME_VALUES.map((st, i) =>
                                             <option value={i}>{st} ms</option>
                                         )}
                                     </select>
@@ -438,9 +438,9 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                         className='theia-input'
                                         style={{ width: 72 }}
                                         type='number'
-                                        min={ENVELOPE_INITIAL_VALUE_MIN}
-                                        max={ENVELOPE_INITIAL_VALUE_MAX}
-                                        value={channel?.envelope?.initialValue ?? 0}
+                                        min={VSU_ENVELOPE_INITIAL_VALUE_MIN}
+                                        max={VSU_ENVELOPE_INITIAL_VALUE_MAX}
+                                        value={channel?.envelope?.initialValue ?? 15}
                                         onChange={e => setEnvelopeInitialValue(parseInt(e.target.value))}
                                     />
                                 </VContainer>
@@ -482,13 +482,13 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                         </label>
                                         <RadioSelect
                                             options={[{
-                                                label: 'Sweep',
+                                                label: 'Modulation',
                                                 value: true,
                                             }, {
-                                                label: 'Modulation',
+                                                label: 'Sweep',
                                                 value: false,
                                             }]}
-                                            defaultValue={channel?.sweepModulation?.sweep ?? true}
+                                            defaultValue={channel?.sweepModulation?.modulation ?? true}
                                             onChange={options => setSweepModulationSweep(options[0].value as boolean)}
                                             allowBlank
                                         />
@@ -514,8 +514,8 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                             className='theia-input'
                                             style={{ width: 72 }}
                                             type='number'
-                                            min={SWEEP_MODULATION_INTERVAL_MIN}
-                                            max={SWEEP_MODULATION_INTERVAL_MAX}
+                                            min={VSU_SWEEP_MODULATION_INTERVAL_MIN}
+                                            max={VSU_SWEEP_MODULATION_INTERVAL_MAX}
                                             value={channel?.sweepModulation?.interval ?? 0}
                                             onChange={e => setSweepModulationInterval(parseInt(e.target.value))}
                                         />
@@ -526,13 +526,13 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                         </label>
                                         <RadioSelect
                                             options={[{
-                                                label: 'Down',
+                                                label: 'Up',
                                                 value: true,
                                             }, {
-                                                label: 'Up',
+                                                label: 'Down',
                                                 value: false,
                                             }]}
-                                            defaultValue={channel?.sweepModulation?.sweepDown ?? true}
+                                            defaultValue={channel?.sweepModulation?.direction ?? true}
                                             onChange={options => setSweepModulationSweepDown(options[0].value as boolean)}
                                             allowBlank
                                         />
@@ -545,8 +545,8 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                             className='theia-input'
                                             style={{ width: 72 }}
                                             type='number'
-                                            min={SWEEP_MODULATION_SHIFT_MIN}
-                                            max={SWEEP_MODULATION_SHIFT_MAX}
+                                            min={VSU_SWEEP_MODULATION_SHIFT_MIN}
+                                            max={VSU_SWEEP_MODULATION_SHIFT_MAX}
                                             value={channel?.sweepModulation?.shift ?? 0}
                                             onChange={e => setSweepModulationShift(parseInt(e.target.value))}
                                         />

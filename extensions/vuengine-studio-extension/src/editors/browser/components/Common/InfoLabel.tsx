@@ -30,13 +30,19 @@ export default function InfoLabel(props: PropsWithChildren<InfoLabelProps>): Rea
             {' '}<span className='count'>{count}</span>
         </>}
         {tooltip &&
-            <i className='codicon codicon-question' onMouseEnter={event => {
-                hs.requestHover({
-                    content: content,
-                    target: event.currentTarget,
-                    position: tooltipPosition || 'top',
-                });
-            }} />
+            <i
+                className='codicon codicon-question'
+                onMouseEnter={event => {
+                    hs.requestHover({
+                        content: content,
+                        target: event.currentTarget,
+                        position: tooltipPosition || 'top',
+                    });
+                }}
+                onMouseLeave={event => {
+                    hs.cancelHover();
+                }}
+            />
         }
     </label>;
 }

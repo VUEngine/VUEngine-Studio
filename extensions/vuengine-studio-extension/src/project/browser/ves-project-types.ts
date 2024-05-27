@@ -691,6 +691,7 @@ export const defaultProjectData: ProjectData = {
                     },
                     initialValue: {
                       type: 'integer',
+                      default: 15,
                       minimum: 0,
                       maximum: 15
                     },

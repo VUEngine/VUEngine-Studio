@@ -1,7 +1,7 @@
 export interface VsuChannelEnvelopeData {
     enabled: boolean
     repeat: boolean
-    decay: boolean
+    direction: boolean
     initialValue: number
     stepTime: number
 }
@@ -14,10 +14,10 @@ export interface VsuChannelIntervalData {
 export interface VsuChannelSweepModulationData {
     enabled: boolean
     repeat: boolean
-    sweep: boolean
+    modulation: boolean
     frequency: number
     interval: number
-    sweepDown: boolean
+    direction: boolean
     shift: number
 }
 
@@ -43,20 +43,21 @@ export interface VsuData {
     modulation: number[]
 }
 
-export const NUMBER_OF_WAVEFORM_BANKS = 5;
-export const NUMBER_OF_CHANNELS = 6;
-export const ENVELOPE_INITIAL_VALUE_MIN = 0;
-export const ENVELOPE_INITIAL_VALUE_MAX = 15;
-export const ENVELOPE_STEP_TIME_MIN = 0;
-export const ENVELOPE_STEP_TIME_MAX = 7;
-export const SWEEP_MODULATION_INTERVAL_MIN = 0;
-export const SWEEP_MODULATION_INTERVAL_MAX = 7;
-export const SWEEP_MODULATION_FREQUENCY_MIN = 0;
-export const SWEEP_MODULATION_FREQUENCY_MAX = 1;
-export const SWEEP_MODULATION_SHIFT_MIN = 0;
-export const SWEEP_MODULATION_SHIFT_MAX = 7;
+export const VSU_SAMPLE_RATE = 41700;
+export const VSU_NUMBER_OF_WAVEFORM_BANKS = 5;
+export const VSU_NUMBER_OF_CHANNELS = 6;
+export const VSU_ENVELOPE_INITIAL_VALUE_MIN = 0;
+export const VSU_ENVELOPE_INITIAL_VALUE_MAX = 15;
+export const VSU_ENVELOPE_STEP_TIME_MIN = 0;
+export const VSU_ENVELOPE_STEP_TIME_MAX = 7;
+export const VSU_SWEEP_MODULATION_INTERVAL_MIN = 0;
+export const VSU_SWEEP_MODULATION_INTERVAL_MAX = 7;
+export const VSU_SWEEP_MODULATION_FREQUENCY_MIN = 0;
+export const VSU_SWEEP_MODULATION_FREQUENCY_MAX = 1;
+export const VSU_SWEEP_MODULATION_SHIFT_MIN = 0;
+export const VSU_SWEEP_MODULATION_SHIFT_MAX = 7;
 
-export const ENVELOPE_STEP_TIME_VALUES = [
+export const VSU_ENVELOPE_STEP_TIME_VALUES = [
     15.4,
     30.7,
     46.1,
@@ -67,7 +68,7 @@ export const ENVELOPE_STEP_TIME_VALUES = [
     122.9,
 ];
 
-export const INTERVAL_VALUES = [
+export const VSU_INTERVAL_VALUES = [
     3.8,
     7.7,
     11.5,
@@ -102,13 +103,13 @@ export const INTERVAL_VALUES = [
     122.9,
 ];
 
-export const NOISE_TAP_LOCATIONS = [
-    14,
-    10,
-    13,
-    4,
-    8,
-    6,
-    9,
-    11,
+export const VSU_NOISE_TAP_LOCATIONS = [
+    15 - 1,
+    11 - 1,
+    14 - 1,
+    5 - 1,
+    9 - 1,
+    7 - 1,
+    10 - 1,
+    12 - 1,
 ];
