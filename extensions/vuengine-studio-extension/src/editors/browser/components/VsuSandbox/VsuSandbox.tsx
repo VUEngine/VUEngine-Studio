@@ -23,7 +23,8 @@ export default function VsuSandbox(props: VsuSandboxProps): React.JSX.Element {
     const { data, updateData } = props;
     const [audioContext, setAudioContext] = useState<AudioContext>();
     const [vsuEmulator, setVsuEmulator] = useState<AudioWorkletNode>();
-    const [enabled, setEnabled] = useState<boolean>(false);
+    const autoPlay = services.preferenceService.get(VesEditorsPreferenceIds.EDITORS_VSU_SANDBOX_AUTO_START) as boolean;
+    const [enabled, setEnabled] = useState<boolean>(autoPlay);
     const waveForms = Object.values(services.vesProjectService.getProjectDataItemsForType('WaveForm') || {}) as (WaveFormData & WithContributor & WithFileUri)[];
 
     const createAudioContext = async (): Promise<void> => {
@@ -50,8 +51,10 @@ export default function VsuSandbox(props: VsuSandboxProps): React.JSX.Element {
         setAudioContext(audioCtx);
         setVsuEmulator(vsuNode);
 
-        if (services.preferenceService.get(VesEditorsPreferenceIds.EDITORS_VSU_SANDBOX_AUTO_START)) {
-            toggleEnabled();
+        if (enabled) {
+            audioCtx?.resume();
+        } else {
+            audioCtx?.suspend();
         }
     };
 
