@@ -20,6 +20,7 @@ export class VesPreferenceTreeGenerator extends PreferenceTreeGenerator {
             .set(VesPluginsPreferenceIds.CATEGORY, VesBuildPreferenceIds.CATEGORY)
             .set(VesProjectPreferenceIds.CATEGORY, 'features')
             .set(VesUpdaterPreferenceIds.CATEGORY, 'features')
+            .set('editor', 'editors')
             .set('debug', '');
 
         super.init();
@@ -27,7 +28,7 @@ export class VesPreferenceTreeGenerator extends PreferenceTreeGenerator {
 
     protected readonly topLevelCategories = new Map([
         [COMMONLY_USED_SECTION_PREFIX, 'Commonly Used'],
-        ['editor', 'Text Editor'],
+        ['editors', 'Editors'], // custom category
         ['workbench', 'Workbench'],
         ['window', 'Window'],
         [VesBuildPreferenceIds.CATEGORY, 'Build'], // custom category

@@ -19,14 +19,14 @@ import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-
 export interface EditorsServices {
     colorRegistry: ColorRegistry;
     commandService: CommandService
-    fileService: FileService
     fileDialogService: FileDialogService
+    fileService: FileService
     hoverService: HoverService
-    messageService: MessageService
     localStorageService: LocalStorageService
+    messageService: MessageService
     openerService: OpenerService
-    quickPickService: QuickPickService
     preferenceService: PreferenceService
+    quickPickService: QuickPickService
     vesCommonService: VesCommonService
     vesImagesService: VesImagesService
     vesProjectService: VesProjectService,

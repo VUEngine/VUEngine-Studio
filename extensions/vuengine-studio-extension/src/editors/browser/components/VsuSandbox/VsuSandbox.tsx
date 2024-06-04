@@ -11,6 +11,7 @@ import { WaveFormData } from '../WaveFormEditor/WaveFormEditorTypes';
 import Channel from './Channel';
 import ModulationData from './ModulationData';
 import { VSU_NUMBER_OF_CHANNELS, VSU_NUMBER_OF_WAVEFORM_BANKS, VSU_SAMPLE_RATE, VsuChannelData, VsuData } from './VsuSandboxTypes';
+import { VesEditorsPreferenceIds } from '../../ves-editors-preferences';
 
 interface VsuSandboxProps {
     data: VsuData
@@ -48,7 +49,10 @@ export default function VsuSandbox(props: VsuSandboxProps): React.JSX.Element {
 
         setAudioContext(audioCtx);
         setVsuEmulator(vsuNode);
-        toggleEnabled();
+
+        if (services.preferenceService.get(VesEditorsPreferenceIds.EDITORS_VSU_SANDBOX_AUTO_START)) {
+            toggleEnabled();
+        }
     };
 
     const closeAudioContext = (): void => {

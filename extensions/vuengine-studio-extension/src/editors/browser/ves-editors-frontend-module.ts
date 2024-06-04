@@ -1,5 +1,5 @@
 import { CommandContribution, MenuContribution } from '@theia/core';
-import { FrontendApplicationContribution, LabelProviderContribution, OpenHandler, WidgetFactory } from '@theia/core/lib/browser';
+import { FrontendApplicationContribution, LabelProviderContribution, OpenHandler, PreferenceContribution, WidgetFactory } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { ContainerModule } from '@theia/core/shared/inversify';
 import { WorkspaceCommandContribution } from '@theia/workspace/lib/browser';
@@ -7,11 +7,15 @@ import '../../../src/editors/browser/style/index.css';
 import { VesEditorsContextKeyService } from './ves-editors-context-key-service';
 import { VesEditorsLabelProviderContribution } from './ves-editors-label-provider';
 import { VesEditorsOpenHandler } from './ves-editors-open-handler';
+import { VesEditorsPreferenceSchema } from './ves-editors-preferences';
 import { VesEditorsViewContribution } from './ves-editors-view';
 import { VesEditorsWidget, VesEditorsWidgetOptions } from './ves-editors-widget';
 import { VesWorkspaceCommandContribution } from './ves-workspace-commands';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
+    // preferences
+    bind(PreferenceContribution).toConstantValue({ schema: VesEditorsPreferenceSchema });
+
     // override new file dialog
     rebind(WorkspaceCommandContribution).to(VesWorkspaceCommandContribution).inSingletonScope();
 
