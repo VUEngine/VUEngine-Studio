@@ -96,7 +96,9 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     private jsonformsOnChange: (state: Pick<JsonFormsCore, 'data' | 'errors'>) => void;
 
     public dirty = false;
-    onContentChanged: Event<void>;
+
+    protected readonly onContentChangedEmitter = new Emitter<void>();
+    readonly onContentChanged = this.onContentChangedEmitter.event;
 
     typeId: string;
     uri: URI;
