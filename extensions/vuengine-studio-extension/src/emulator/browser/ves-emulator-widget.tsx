@@ -1,5 +1,6 @@
 import { CommandService, isWindows, nls } from '@theia/core';
 import {
+  Endpoint,
   ExtractableWidget,
   KeybindingRegistry,
   LocalStorageService,
@@ -404,11 +405,13 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
   protected bindListeners(): void {
     this.node.addEventListener('keydown', this.keyEventListerner);
     this.node.addEventListener('keyup', this.keyEventListerner);
+    window.addEventListener('message', this.messageEventListerner);
   }
 
   protected unbindListeners(): void {
     this.node.removeEventListener('keydown', this.keyEventListerner);
     this.node.removeEventListener('keyup', this.keyEventListerner);
+    window.removeEventListener('message', this.messageEventListerner);
   }
 
   protected processKeyEvent(e: KeyboardEvent): void {
@@ -505,9 +508,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
   };
 
   protected startEmulator = async () => {
-    // using the iframe contentWindow instead of global window object,
-    // because the latter can change when moving to a secondary window
-    this.iframeRef.current?.contentWindow?.addEventListener('message', this.messageEventListerner);
     const romPath = await this.getRomPath();
     const romUri = new URI(romPath);
     const romContent = await this.fileService.readFile(romUri);
@@ -1018,22 +1018,8 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
   }
 
   protected async getResource(): Promise<string> {
-    /*
     return new Endpoint({ path: '/emulator/index.html' })
       .getRestUrl()
-      .toString();
-    */
-
-    // we need to use file:// here instead of localhost to avoid cross-origin and be able to use
-    // the iframe's inner window object to post messages, so it works in a secondary window
-    const resourcesUri = await this.vesCommonService.getResourcesUri();
-    return resourcesUri
-      .withScheme('file')
-      .resolve('binaries')
-      .resolve('vuengine-studio-tools')
-      .resolve('web')
-      .resolve('retroarch')
-      .resolve('index.html')
       .toString();
   }
 
