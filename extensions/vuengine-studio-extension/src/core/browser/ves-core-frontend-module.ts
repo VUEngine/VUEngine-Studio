@@ -1,6 +1,7 @@
 import { CallHierarchyContribution } from '@theia/callhierarchy/lib/browser/callhierarchy-contribution';
 import {
     ApplicationShell, CorePreferenceContribution, FrontendApplicationContribution,
+    KeybindingContribution,
     LabelProviderContribution
 } from '@theia/core/lib/browser';
 import { ColorContribution } from '@theia/core/lib/browser/color-application-contribution';
@@ -84,10 +85,11 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // preferences
     rebind(CorePreferenceContribution).toConstantValue({ schema: VesCorePreferenceSchema });
 
-    // commands and menus
+    // commands, menus and keybindings
     bind(VesCoreContribution).toSelf().inSingletonScope();
     bind(CommandContribution).toService(VesCoreContribution);
     bind(MenuContribution).toService(VesCoreContribution);
+    bind(KeybindingContribution).toService(VesCoreContribution);
 
     // default configurations
     rebind(PreferenceConfigurations).to(VesPreferenceConfigurations).inSingletonScope();

@@ -1,13 +1,14 @@
-import { ApplicationShell, PreferenceService } from '@theia/core/lib/browser';
+import { ApplicationShell, KeybindingContribution, KeybindingRegistry, PreferenceService } from '@theia/core/lib/browser';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { CommandContribution, CommandRegistry } from '@theia/core/lib/common/command';
 import { MenuContribution, MenuModelRegistry } from '@theia/core/lib/common/menu';
+import { ElectronCommands } from '@theia/core/lib/electron-browser/menu/electron-menu-contribution';
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { VesCoreCommands } from './ves-core-commands';
 import { VesCoreMenus } from './ves-core-menus';
 
 @injectable()
-export class VesCoreContribution implements CommandContribution, MenuContribution {
+export class VesCoreContribution implements CommandContribution, MenuContribution, KeybindingContribution {
     @inject(ApplicationShell)
     protected readonly shell: ApplicationShell;
     @inject(PreferenceService)
@@ -41,6 +42,18 @@ export class VesCoreContribution implements CommandContribution, MenuContributio
             commandId: VesCoreCommands.SUPPORT.id,
             label: VesCoreCommands.SUPPORT.label,
             order: '3',
+        });
+    }
+
+    registerKeybindings(registry: KeybindingRegistry): void {
+        // rebind reload window command
+        registry.unregisterKeybinding({
+            command: ElectronCommands.RELOAD.id,
+            keybinding: 'ctrlcmd+r'
+        });
+        registry.registerKeybindings({
+            command: ElectronCommands.RELOAD.id,
+            keybinding: 'ctrlcmd+shift+r'
         });
     }
 }
