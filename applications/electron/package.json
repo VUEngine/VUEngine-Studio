@@ -48,7 +48,12 @@
           "workspace.preserveWindow": true
         },
         "electron": {
-          "showWindowEarly": true
+          "showWindowEarly": true,
+          "splashScreenOptions": {
+            "content": "resources/splash/index.html",
+            "height": 320,
+            "width": 320
+          }
         }
       }
     },
@@ -57,11 +62,6 @@
         "frontendConnectionTimeout": -1,
         "resolveSystemPlugins": false,
         "startupTimeout": -1
-      }
-    },
-    "generator": {
-      "config": {
-        "preloadTemplate": "./resources/splash/index.html"
       }
     }
   },
