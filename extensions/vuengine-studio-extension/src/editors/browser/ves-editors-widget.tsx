@@ -96,8 +96,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     private jsonformsOnChange: (state: Pick<JsonFormsCore, 'data' | 'errors'>) => void;
 
     public dirty = false;
-    public autoSave: 'off' | 'afterDelay' | 'onFocusChange' | 'onWindowChange' = 'off';
-    protected autoSaveDelay: number;
+    onContentChanged: Event<void>;
 
     typeId: string;
     uri: URI;
@@ -163,18 +162,9 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         this.title.closable = true;
 
         this.setTitle();
-
-        this.autoSave = this.editorPreferences['files.autoSave'];
-        this.autoSaveDelay = this.editorPreferences['files.autoSaveDelay'];
     }
 
     protected bindEvents(): void {
-        this.onDirtyChanged(ev => {
-            if (this.autoSave === 'afterDelay' && this.dirty) {
-                this.saveDelayed();
-            }
-        });
-
         this.onChange(d => {
             this.handleChanged(d);
         });
@@ -187,14 +177,6 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
             this.vesProjectService.onDidAddProjectItem(() => this.rerenderOnProjectDataUpdate()),
             this.vesProjectService.onDidDeleteProjectItem(() => this.rerenderOnProjectDataUpdate()),
             this.vesProjectService.onDidUpdateProjectItem(() => this.rerenderOnProjectDataUpdate()),
-            this.editorPreferences.onPreferenceChanged(ev => {
-                if (ev.preferenceName === 'files.autoSave') {
-                    this.autoSave = ev.newValue;
-                }
-                if (ev.preferenceName === 'files.autoSaveDelay') {
-                    this.autoSaveDelay = ev.newValue;
-                }
-            }),
         ]);
     }
 
@@ -418,19 +400,6 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     protected handleChanged(data: ItemData): void {
         this.data = data;
         this.setDirty(this.dataHasBeenChanged());
-    }
-
-    protected onAfterHide(msg: Message): void {
-        if (this.autoSave === 'onFocusChange' || this.autoSave === 'onWindowChange') {
-            this.save();
-        }
-    }
-
-    protected saveDelayed(): void {
-        const handle = window.setTimeout(() => {
-            this.save();
-            window.clearTimeout(handle);
-        }, this.autoSaveDelay);
     }
 
     protected render(): React.ReactNode {
