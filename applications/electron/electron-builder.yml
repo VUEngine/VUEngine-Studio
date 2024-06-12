@@ -21,6 +21,8 @@ files:
   - lib
   - scripts
   - "!**node_modules/**"
+  - resources/splash/index.html
+  - resources/icons/512x512.png
   - from: binaries/vuengine-studio-tools/web
     to: binaries/vuengine-studio-tools/web
   - from: documentation
