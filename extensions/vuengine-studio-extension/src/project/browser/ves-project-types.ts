@@ -622,6 +622,7 @@ export const defaultProjectData: ProjectData = {
       icon: 'fa fa-image'
     },
     VsuSandbox: {
+      enabled: false,
       file: '.vsu',
       schema: {
         title: 'VSU Sandbox',
