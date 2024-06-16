@@ -300,6 +300,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         } else if (this.dirty) {
             try {
                 this.reference.object.textEditorModel.setValue(JSON.stringify(this.data, undefined, 4));
+                this.reference.object.save();
                 this.justSaved = true;
                 this.setDirty(false);
                 this.setSavedData();
