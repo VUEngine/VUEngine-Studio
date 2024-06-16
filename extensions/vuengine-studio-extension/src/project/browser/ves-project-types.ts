@@ -195,10 +195,7 @@ export const defaultProjectData: ProjectData = {
         path: 'headers/PluginsConfig.h',
         root: ProjectDataTemplateTargetRoot.project,
       }],
-      template: 'PluginsConfig.h.nj',
-      events: [{
-        type: ProjectDataTemplateEventType.installedPluginsChanged,
-      }]
+      template: 'PluginsConfig.h.nj'
     },
     'RomInfo': {
       targets: [{

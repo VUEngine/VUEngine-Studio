@@ -98,7 +98,7 @@ export class VesCodeGenService {
   }
 
   protected bindEvents(): void {
-    this.vesPluginsService.onDidChangeInstalledPlugins(async () =>
+    this.vesProjectService.onDidUpdateGameConfig(async () =>
       this.handlePluginChange());
 
     this.vesProjectService.onDidAddProjectItem(fileUri => {

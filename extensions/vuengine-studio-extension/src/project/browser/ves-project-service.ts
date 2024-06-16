@@ -75,6 +75,8 @@ export class VesProjectService {
   readonly onDidUpdateProjectItem = this.onDidUpdateProjectItemEmitter.event;
   protected readonly onDidDeleteProjectItemEmitter = new Emitter<URI>();
   readonly onDidDeleteProjectItem = this.onDidDeleteProjectItemEmitter.event;
+  protected readonly onDidUpdateGameConfigEmitter = new Emitter<void>();
+  readonly onDidUpdateGameConfig = this.onDidUpdateGameConfigEmitter.event;
 
   // Flag to work around files change event firing twice
   // TODO: remove once revolved in Theia
@@ -258,6 +260,9 @@ export class VesProjectService {
           plugins: sortedPlugins
         }, undefined, 4)),
       );
+
+      // fire event
+      this.onDidUpdateGameConfigEmitter.fire();
     }
   }
 
@@ -698,8 +703,8 @@ export class VesProjectService {
       const fileContentJson = JSON.parse(fileContent.value.toString());
       const t = f.startsWith('contributions/Type') ||
         (isWindows && f.startsWith('contributions\\Type'))
-          ? 'types'
-          : 'templates';
+        ? 'types'
+        : 'templates';
       // @ts-ignore
       result[t][fileContent.resource.path.name] = fileContentJson;
     }));
