@@ -64,7 +64,7 @@ const properties: PreferenceSchemaProperties = {
     [VesBuildPreferenceIds.ENGINE_CORE_INCLUDE_IN_WORKSPACE]: {
         type: 'boolean',
         description: nls.localize('vuengine/build/preferences/includeEngineCoreInWorkspaceDescription', 'Automatically include VUEngine libraries in workspaces.'),
-        default: false,
+        default: true,
         scope: PreferenceScope.Folder,
         overridable: true,
     },

@@ -28,7 +28,7 @@ export const VesPluginsPreferenceSchema: PreferenceSchema = {
         [VesPluginsPreferenceIds.ENGINE_PLUGINS_INCLUDE_IN_WORKSPACE]: {
             type: 'boolean',
             description: nls.localize('vuengine/plugins/preferences/includeLibraryInWorkspaceDescription', 'Automatically include plugins library in workspaces.'),
-            default: false,
+            default: true,
             scope: PreferenceScope.Folder,
             overridable: true,
         },
