@@ -6,6 +6,7 @@ import React from "react";
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import sanitize from 'sanitize-html';
 import * as showdown from 'showdown';
+import { BuildMode } from "../../../build/browser/ves-build-types";
 import HContainer from "../../../editors/browser/components/Common/HContainer";
 import InfoLabel from "../../../editors/browser/components/Common/InfoLabel";
 import VContainer from "../../../editors/browser/components/Common/VContainer";
@@ -164,6 +165,28 @@ export default class VesPluginEditorComponent extends AbstractVesPluginComponent
                     gameConfigFileUri,
                     BinaryBuffer.fromString(JSON.stringify(gameConfig, undefined, 4)),
                 );
+
+                // remove library file to force rebuild
+                await this.props.workspaceService.ready;
+                const workspaceRootUri = this.props.workspaceService.tryGetRoots()[0]?.resource;
+                const buildPathUri = workspaceRootUri.resolve('build');
+                const pluginName = this.props.plugin.id.split('/').pop();
+                const libraryFileUris = [
+                    buildPathUri.resolve(`lib${pluginName}.a`)
+                ];
+                Object.values(BuildMode).map(mode => {
+                    const modeLc = mode.toLowerCase();
+                    libraryFileUris.push(
+                        buildPathUri.resolve(`working/libraries/${modeLc}/lib${pluginName}-${modeLc}.a`)
+                    );
+                })
+                console.log('libraryFileUris', libraryFileUris);
+                await Promise.all(libraryFileUris.map(async libraryFile => {
+                    console.log('libraryFile', libraryFile);
+                    if (await this.props.fileService?.exists(libraryFile)) {
+                        await this.props.fileService?.delete(libraryFile);
+                    }
+                }));
             }
 
             // let the code generation catch up

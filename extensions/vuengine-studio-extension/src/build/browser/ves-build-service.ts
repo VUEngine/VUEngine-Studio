@@ -428,6 +428,7 @@ export class VesBuildService {
 
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     const buildMode = (this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as string).toLowerCase();
+    const buildAll = this.preferenceService.get(VesBuildPreferenceIds.BUILD_ALL) as boolean;
     const dumpElf = this.preferenceService.get(VesBuildPreferenceIds.DUMP_ELF) as boolean;
     const pedanticWarnings = this.preferenceService.get(VesBuildPreferenceIds.PEDANTIC_WARNINGS) as boolean;
     const engineCoreUri = await this.vesBuildPathsService.getEngineCoreUri();
@@ -501,6 +502,7 @@ export class VesBuildService {
       options: {
         cwd: await this.fileService.fsPath(workspaceRootUri),
         env: {
+          BUILD_ALL: buildAll ? 1 : 0,
           DUMP_ELF: dumpElf ? 1 : 0,
           ENGINE_FOLDER: await this.convertoToEnvPath(isWslInstalled, engineCoreUri),
           LC_ALL: 'C',

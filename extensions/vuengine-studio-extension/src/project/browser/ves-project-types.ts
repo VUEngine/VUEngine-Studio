@@ -56,6 +56,7 @@ export interface ProjectDataType {
   uiSchema?: any
   templates?: string[]
   forFiles?: string[]
+  delete?: string[]
 };
 
 export interface ProjectDataTemplates {
