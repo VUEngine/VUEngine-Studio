@@ -32,6 +32,14 @@
           "workbench.tree.renderIndentGuides": "none",
           "editor.detectIndentation": false,
           "editor.insertSpaces": false,
+          "files.exclude": {
+            "**/.git": true,
+            "**/.svn": true,
+            "**/.hg": true,
+            "**/CVS": true,
+            "**/.DS_Store": true,
+            "**/build": true
+          },
           "files.watcherExclude": {
             "**/.git/objects/**": true,
             "**/.git/subtree-cache/**": true,
