@@ -16,7 +16,7 @@ export namespace VesBuildPreferenceIds {
     export const PEDANTIC_WARNINGS = [CATEGORY, 'pedanticWarnings'].join('.');
     export const ENGINE_CORE_PATH = [CATEGORY, 'engine', 'core', 'path'].join('.');
     export const ENGINE_CORE_INCLUDE_IN_WORKSPACE = [CATEGORY, 'engine', 'core', 'includeInWorkspace'].join('.');
-    export const BUILD_ALL = [CATEGORY, 'alwaysRebuildAllLibraries'].join('.');
+    export const BUILD_ALL = [CATEGORY, 'buildAll'].join('.');
     export const PRE_BUILD_TASKS = [CATEGORY, 'tasks', 'pre'].join('.');
     export const POST_BUILD_TASKS = [CATEGORY, 'tasks', 'post'].join('.');
     export const LOG_LINE_WRAP = [CATEGORY, 'logLineWrap'].join('.');
@@ -72,8 +72,8 @@ const properties: PreferenceSchemaProperties = {
     [VesBuildPreferenceIds.BUILD_ALL]: {
         type: 'boolean',
         description: nls.localize(
-            'vuengine/build/preferences/alwaysRebuildAllLibraries',
-            'Always rebuild all libraries, even when there have been no changes. Should be only needed while developing a plugin or library.'
+            'vuengine/build/preferences/buildAll',
+            'Always rebuild all libraries, even when there have been no changes. Should be needed only while developing a plugin or library.'
         ),
         default: false,
         scope: PreferenceScope.Folder,

@@ -21,6 +21,7 @@ import { ProcessOptions } from '@theia/process/lib/node';
 import { TaskEndedInfo, TaskEndedTypes, TaskService } from '@theia/task/lib/browser/task-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesCommonService } from '../../core/browser/ves-common-service';
+import { clamp } from '../../editors/browser/components/Common/Utils';
 import { VesEmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
 import { VesEmulatorPreferenceIds } from '../../emulator/browser/ves-emulator-preferences';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
@@ -357,14 +358,36 @@ export class VesBuildService {
     });
   }
 
+  // get number of all libraries for which there are no lib*.a files in build folder
+  protected async getNumberOfLibrariesToBuild(allPluginNames: string[]): Promise<number> {
+    const allLibs = ['core', ...allPluginNames.map(pluginName => pluginName.split('/').pop())];
+    const buildPathUri = await this.getBuildPathUri();
+    const buildModeLc = (this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode).toLowerCase();
+    const existingLibFiles = window.electronVesCore.findFiles(buildPathUri.path.fsPath(), [
+      `working/libraries/${buildModeLc}/lib*-${buildModeLc}.a`,
+      'lib*.a'
+    ]);
+
+    return allLibs.filter(libName =>
+      !existingLibFiles.includes(`lib${libName}.a`) &&
+      !existingLibFiles.includes(`working/libraries/${buildModeLc}/lib${libName}-${buildModeLc}.a`)
+    ).length;
+  }
+
   protected async build(): Promise<void> {
     let processManagerId = 0;
     let processId = 0;
     const buildMode = this.preferenceService.get(VesBuildPreferenceIds.BUILD_MODE) as BuildMode;
 
+    const buildAll = this.preferenceService.get(VesBuildPreferenceIds.BUILD_ALL) as boolean;
+    const allPluginNames = this.vesPluginsService.getActualUsedPluginNames();
+    const libsToBuild = buildAll
+      ? allPluginNames.length + 1 // plugins + core
+      : await this.getNumberOfLibrariesToBuild(allPluginNames);
+
     this.buildStatus = {
       active: false,
-      stepsTotal: 2 * (this.vesPluginsService.getActualUsedPluginNames().length + 2),
+      stepsTotal: 2 * (libsToBuild + 1), // + game, preprocess & build each
       stepsDone: 0,
       processManagerId,
       processId,
@@ -453,6 +476,7 @@ export class VesBuildService {
         'cd', await this.convertoToEnvPath(isWslInstalled, workspaceRootUri), '&&',
         'export', `PATH=${winPaths.join(':')}:$PATH`,
         'LC_ALL=C',
+        `BUILD_ALL=${buildAll ? 1 : 0}`,
         `MAKE_JOBS=${this.getThreads()}`,
         'PREPROCESSING_WAIT_FOR_LOCK_DELAY_FACTOR=0.0',
         `DUMP_ELF=${dumpElf ? 1 : 0}`,
@@ -695,7 +719,11 @@ export class VesBuildService {
 
   protected computeProgress(): number {
     // each headline indicates that a new chunk of work is being _started_, not finishing, hence -1
-    return Math.floor((this.buildStatus.stepsDone - 1) * 100 / this.buildStatus.stepsTotal);
+    return clamp(
+      Math.floor((this.buildStatus.stepsDone - 1) * 100 / this.buildStatus.stepsTotal),
+      0,
+      100,
+    );
   }
 
   bytesToMbit(bytes: number): number {
