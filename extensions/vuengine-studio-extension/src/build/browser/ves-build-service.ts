@@ -325,9 +325,11 @@ export class VesBuildService {
         data
           .trim() // remove trailing newline
           .split(/\n/) // split by newline
-          .forEach((d: string) =>
-            this.pushBuildLogLine(this.parseBuildOutput(d))
-          );
+          .forEach((d: string) => {
+            if (!d.includes('(skip)')) {
+              this.pushBuildLogLine(this.parseBuildOutput(d));
+            }
+          });
       }
     };
 
