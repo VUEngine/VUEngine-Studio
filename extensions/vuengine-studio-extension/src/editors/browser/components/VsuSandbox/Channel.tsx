@@ -1,10 +1,12 @@
 import { nls } from '@theia/core';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
 import HContainer from '../Common/HContainer';
 import NumberArrayPreview from '../Common/NumberArrayPreview';
 import RadioSelect from '../Common/RadioSelect';
 import { clamp } from '../Common/Utils';
 import VContainer from '../Common/VContainer';
+import { NOTES } from '../MusicEditor/MusicEditorTypes';
 import {
     VSU_ENVELOPE_INITIAL_VALUE_MAX,
     VSU_ENVELOPE_INITIAL_VALUE_MIN,
@@ -24,7 +26,6 @@ import {
     VSU_SWEEP_MODULATION_SHIFT_MIN,
     VsuChannelData
 } from './VsuSandboxTypes';
-import styled from 'styled-components';
 
 const WaveFormSelection = styled(HContainer)`
     outline: none;
@@ -46,6 +47,7 @@ interface ChannelProps {
 
 export default function Channel(props: ChannelProps): React.JSX.Element {
     const { index, supportSweepAndModulation, isNoiseChannel, channel, setChannel, waveForms, setPianoChannel } = props;
+    const [note, setNote] = useState<string>('');
 
     const frequencyToHertz = (frequency: number): number =>
         5000000 / ((2048 - frequency) * 32);
@@ -252,6 +254,28 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
         }
     };
 
+    const findNoteByFrequency = (): void => {
+        const frequency = channel?.frequency ?? 0;
+        const notesList = Object.keys(NOTES);
+        for (let i = 0; i < notesList.length; i++) {
+            const n = notesList[i];
+            const noteFrequency = NOTES[n];
+            if (noteFrequency > 0) {
+                if (frequency === noteFrequency) {
+                    return setNote(n);
+                } else if (frequency > noteFrequency) {
+                    return setNote(`${n}+`);
+                }
+            }
+        }
+
+        return setNote('');
+    };
+
+    useEffect(() => {
+        findNoteByFrequency();
+    }, [channel?.frequency]);
+
     return <VContainer gap={15}>
         <label>
             {nls.localize('vuengine/vsuSandbox/channel', 'Channel')} {index}
@@ -268,7 +292,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
             Enabled
         </label>
         {channel?.enabled &&
-            <HContainer gap={15} wrap='wrap'>
+            <HContainer gap={25} wrap='wrap'>
                 {!isNoiseChannel && <>
                     <VContainer>
                         {nls.localize('vuengine/vsuSandbox/waveForm', 'WaveForm')}
@@ -344,7 +368,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                     </label>
                     <input
                         className='theia-input'
-                        style={{ width: 72 }}
+                        style={{ width: 110 }}
                         type='number'
                         min={VSU_FREQUENCY_MIN}
                         max={VSU_FREQUENCY_MAX}
@@ -353,12 +377,20 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                         onFocus={() => setPianoChannel(index)}
                         onBlur={() => setPianoChannel(0)}
                     />
-                    {!isNoiseChannel &&
-                        `${Math.round(frequencyToHertz(channel?.frequency ?? 0) * 100) / 100} Hz`
-                    }
-                    {isNoiseChannel &&
-                        `${Math.round(noiseFrequencyToHertz(channel?.frequency ?? 0) * 100) / 100} Hz`
-                    }
+                    <HContainer>
+                        {!isNoiseChannel && <>
+                            <div>
+                                {Math.round(frequencyToHertz(channel?.frequency ?? 0) * 100) / 100} Hz
+                            </div>
+                            <div style={{ flexGrow: 1, textAlign: 'right' }}>
+                                {note}
+                            </div>
+                        </>
+                        }
+                        {isNoiseChannel &&
+                            `${Math.round(noiseFrequencyToHertz(channel?.frequency ?? 0) * 100) / 100} Hz`
+                        }
+                    </HContainer>
                 </VContainer>
                 <VContainer>
                     <label>
