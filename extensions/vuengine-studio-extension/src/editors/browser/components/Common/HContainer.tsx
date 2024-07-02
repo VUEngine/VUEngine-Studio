@@ -1,4 +1,4 @@
-import React, { MouseEventHandler, PropsWithChildren } from 'react';
+import React, { KeyboardEventHandler, MouseEventHandler, PropsWithChildren } from 'react';
 
 interface HContainerProps {
     alignItems?: string
@@ -6,13 +6,15 @@ interface HContainerProps {
     gap?: number
     grow?: number
     onClick?: MouseEventHandler | undefined;
+    onKeyDown?: KeyboardEventHandler | undefined;
     overflow?: string
     style?: object
+    tabIndex?: number
     wrap?: 'nowrap' | 'wrap' | 'wrap-reverse'
 }
 
 export default function HContainer(props: PropsWithChildren<HContainerProps>): React.JSX.Element {
-    const { alignItems, children, className, onClick, overflow, wrap, gap, grow, style } = props;
+    const { alignItems, children, className, onClick, onKeyDown, overflow, tabIndex, wrap, gap, grow, style } = props;
 
     return <div
         style={{
@@ -26,7 +28,9 @@ export default function HContainer(props: PropsWithChildren<HContainerProps>): R
             ...(style || {}),
         }}
         className={className}
+        tabIndex={tabIndex}
         onClick={e => { if (onClick) { onClick(e); } }}
+        onKeyDown={e => { if (onKeyDown) { onKeyDown(e); } }}
     >
         {children}
     </div>;

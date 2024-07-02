@@ -52,6 +52,7 @@
     flex-direction: column;
     flex-grow: 1;
     overflow: auto;
+    position: relative;
 }
 .react-tabs__tab-panel:empty {
     flex-grow: unset;

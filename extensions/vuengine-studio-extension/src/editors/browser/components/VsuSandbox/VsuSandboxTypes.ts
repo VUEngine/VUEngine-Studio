@@ -46,6 +46,8 @@ export interface VsuData {
 export const VSU_SAMPLE_RATE = 41700;
 export const VSU_NUMBER_OF_WAVEFORM_BANKS = 5;
 export const VSU_NUMBER_OF_CHANNELS = 6;
+export const VSU_FREQUENCY_MIN = 0;
+export const VSU_FREQUENCY_MAX = 2047;
 export const VSU_ENVELOPE_INITIAL_VALUE_MIN = 0;
 export const VSU_ENVELOPE_INITIAL_VALUE_MAX = 15;
 export const VSU_ENVELOPE_STEP_TIME_MIN = 0;

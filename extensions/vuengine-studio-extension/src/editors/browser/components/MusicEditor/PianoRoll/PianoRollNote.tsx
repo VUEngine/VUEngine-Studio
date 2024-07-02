@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { MusicEditorContext, MusicEditorContextType, Notes } from '../MusicEditorTypes';
+import { MusicEditorContext, MusicEditorContextType, NOTES } from '../MusicEditorTypes';
 
 interface PianoRollNoteProps {
     index: number
@@ -43,7 +43,7 @@ export default function PianoRollNote(props: PianoRollNoteProps): React.JSX.Elem
         onContextMenu={() => setNote(index, undefined)}
         onMouseDown={e => onMouse(e)}
         onMouseOver={e => onMouse(e)}
-        title={Notes[noteId]}
+        title={Object.keys(NOTES)[noteId]}
     />;
 }
 

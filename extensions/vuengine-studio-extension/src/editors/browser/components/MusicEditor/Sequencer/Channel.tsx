@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { ChannelConfig, HIGHEST_NOTE, LOWEST_NOTE, MusicEditorContext, MusicEditorContextType, Notes } from '../MusicEditorTypes';
+import { ChannelConfig, HIGHEST_NOTE, LOWEST_NOTE, MusicEditorContext, MusicEditorContextType, NOTES } from '../MusicEditorTypes';
 import AddPattern from './AddPattern';
 import ChannelHeader from './ChannelHeader';
 import Pattern from './Pattern';
@@ -29,7 +29,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
         classNames.push('current');
     }
 
-    const patternHeight = Notes
+    const patternHeight = Object.keys(NOTES)
         .filter((note, index) =>
             index <= LOWEST_NOTE &&
             index >= HIGHEST_NOTE)

@@ -2,7 +2,7 @@ import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import HContainer from '../../Common/HContainer';
 import VContainer from '../../Common/VContainer';
-import { HIGHEST_NOTE, LOWEST_NOTE, MusicEditorContext, MusicEditorContextType, Notes, VOLUME_STEPS } from '../MusicEditorTypes';
+import { HIGHEST_NOTE, LOWEST_NOTE, MusicEditorContext, MusicEditorContextType, NOTES, VOLUME_STEPS } from '../MusicEditorTypes';
 
 export default function Note(): React.JSX.Element {
     const { state, songData, setNote, setVolumeL, setVolumeR } = useContext(MusicEditorContext) as MusicEditorContextType;
@@ -47,7 +47,7 @@ export default function Note(): React.JSX.Element {
                 value={note ?? -1}
             >
                 <option value={undefined}>none</option>
-                {Notes.map((n, i) =>
+                {Object.keys(NOTES).map((n, i) =>
                     i <= LOWEST_NOTE &&
                     i >= HIGHEST_NOTE && (
                         <option key={`note-select-${i}`} value={i}>{n}</option>

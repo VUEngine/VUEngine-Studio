@@ -11,6 +11,8 @@ import {
     VSU_ENVELOPE_STEP_TIME_MAX,
     VSU_ENVELOPE_STEP_TIME_MIN,
     VSU_ENVELOPE_STEP_TIME_VALUES,
+    VSU_FREQUENCY_MAX,
+    VSU_FREQUENCY_MIN,
     VSU_INTERVAL_VALUES,
     VSU_NOISE_TAP_LOCATIONS,
     VSU_NUMBER_OF_WAVEFORM_BANKS,
@@ -22,6 +24,15 @@ import {
     VSU_SWEEP_MODULATION_SHIFT_MIN,
     VsuChannelData
 } from './VsuSandboxTypes';
+import styled from 'styled-components';
+
+const WaveFormSelection = styled(HContainer)`
+    outline: none;
+
+    &:focus > div.active {
+        border-color: var(--theia-button-background) !important;
+    }
+`;
 
 interface ChannelProps {
     index: number
@@ -30,10 +41,11 @@ interface ChannelProps {
     channel: VsuChannelData
     setChannel: (channel: VsuChannelData) => void
     waveForms: number[][]
+    setPianoChannel: (channel: number) => void
 }
 
 export default function Channel(props: ChannelProps): React.JSX.Element {
-    const { index, supportSweepAndModulation, isNoiseChannel, channel, setChannel, waveForms } = props;
+    const { index, supportSweepAndModulation, isNoiseChannel, channel, setChannel, waveForms, setPianoChannel } = props;
 
     const frequencyToHertz = (frequency: number): number =>
         5000000 / ((2048 - frequency) * 32);
@@ -220,8 +232,24 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
     const setFrequency = (frequency: number): void => {
         setChannel({
             ...channel,
-            frequency: clamp(frequency, 0, 2047),
+            frequency: clamp(frequency, VSU_FREQUENCY_MIN, VSU_FREQUENCY_MAX),
         });
+    };
+
+    const handleWaveFormKeyPress = (e: React.KeyboardEvent): void => {
+        if (e.key === 'ArrowLeft') {
+            if (channel.waveform === 0) {
+                setWaveform(VSU_NUMBER_OF_WAVEFORM_BANKS - 1);
+            } else {
+                setWaveform(channel.waveform - 1);
+            }
+        } else if (e.key === 'ArrowRight') {
+            if (channel.waveform === VSU_NUMBER_OF_WAVEFORM_BANKS - 1) {
+                setWaveform(0);
+            } else {
+                setWaveform(channel.waveform + 1);
+            }
+        }
     };
 
     return <VContainer gap={15}>
@@ -244,7 +272,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                 {!isNoiseChannel && <>
                     <VContainer>
                         {nls.localize('vuengine/vsuSandbox/waveForm', 'WaveForm')}
-                        <HContainer>
+                        <WaveFormSelection onKeyDown={handleWaveFormKeyPress} tabIndex={0}>
                             {([...Array(VSU_NUMBER_OF_WAVEFORM_BANKS)].map((v, x) =>
                                 <NumberArrayPreview
                                     key={x}
@@ -254,21 +282,10 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                     onClick={() => setWaveform(x)}
                                 />
                             ))}
-                        </HContainer>
-                        {/* supportSweepAndModulation && <>
-                        {nls.localize('vuengine/vsuSandbox/modulationData', 'Modulation Data')}
-                        <HContainer>
-                            <NumberArrayPreview
-                                maximum={256}
-                                active={true}
-                                data={modulationData ?? []}
-                            />
-                        </HContainer>
-                    </> */}
+                        </WaveFormSelection>
                     </VContainer>
                 </>}
                 {isNoiseChannel &&
-
                     <VContainer>
                         <label>
                             {nls.localize('vuengine/vsuSandbox/tapLocation', 'Tap Location')}
@@ -329,10 +346,12 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                         className='theia-input'
                         style={{ width: 72 }}
                         type='number'
-                        min={0}
-                        max={2047}
+                        min={VSU_FREQUENCY_MIN}
+                        max={VSU_FREQUENCY_MAX}
                         value={channel?.frequency ?? 0}
                         onChange={e => setFrequency(parseInt(e.target.value))}
+                        onFocus={() => setPianoChannel(index)}
+                        onBlur={() => setPianoChannel(0)}
                     />
                     {!isNoiseChannel &&
                         `${Math.round(frequencyToHertz(channel?.frequency ?? 0) * 100) / 100} Hz`
@@ -558,5 +577,5 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                 }
             </HContainer>
         }
-    </VContainer>;
+    </VContainer >;
 }

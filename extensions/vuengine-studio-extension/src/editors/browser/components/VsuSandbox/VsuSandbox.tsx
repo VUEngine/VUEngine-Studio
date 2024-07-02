@@ -10,8 +10,10 @@ import WaveForm from '../WaveFormEditor/WaveForm';
 import { WaveFormData } from '../WaveFormEditor/WaveFormEditorTypes';
 import Channel from './Channel';
 import ModulationData from './ModulationData';
-import { VSU_NUMBER_OF_CHANNELS, VSU_NUMBER_OF_WAVEFORM_BANKS, VSU_SAMPLE_RATE, VsuChannelData, VsuData } from './VsuSandboxTypes';
+import { VSU_FREQUENCY_MAX, VSU_FREQUENCY_MIN, VSU_NUMBER_OF_CHANNELS, VSU_NUMBER_OF_WAVEFORM_BANKS, VSU_SAMPLE_RATE, VsuChannelData, VsuData } from './VsuSandboxTypes';
 import { VesEditorsPreferenceIds } from '../../ves-editors-preferences';
+import Piano from './Piano';
+import { clamp } from '../Common/Utils';
 
 interface VsuSandboxProps {
     data: VsuData
@@ -24,6 +26,7 @@ export default function VsuSandbox(props: VsuSandboxProps): React.JSX.Element {
     const [audioContext, setAudioContext] = useState<AudioContext>();
     const [vsuEmulator, setVsuEmulator] = useState<AudioWorkletNode>();
     const autoPlay = services.preferenceService.get(VesEditorsPreferenceIds.EDITORS_VSU_SANDBOX_AUTO_START) as boolean;
+    const [pianoChannel, setPianoChannel] = useState<number>(0);
     const [enabled, setEnabled] = useState<boolean>(autoPlay);
     const waveForms = Object.values(services.vesProjectService.getProjectDataItemsForType('WaveForm') || {}) as (WaveFormData & WithContributor & WithFileUri)[];
 
@@ -102,6 +105,17 @@ export default function VsuSandbox(props: VsuSandboxProps): React.JSX.Element {
         });
     };
 
+    const setFrequency = (channel: number, frequency: number): void => {
+        if (channel < 0 || channel > VSU_NUMBER_OF_CHANNELS) {
+            return;
+        }
+
+        setChannelData(channel, {
+            ...data.channels[channel],
+            frequency: clamp(frequency, VSU_FREQUENCY_MIN, VSU_FREQUENCY_MAX),
+        });
+    };
+
     useEffect(() => {
         createAudioContext();
         return () => closeAudioContext();
@@ -120,7 +134,7 @@ export default function VsuSandbox(props: VsuSandboxProps): React.JSX.Element {
                 : 'theia-button secondary'
             }
             style={{
-                width: 80,
+                width: 75,
             }}
             disabled={audioContext === undefined}
             onClick={toggleEnabled}
@@ -145,24 +159,28 @@ export default function VsuSandbox(props: VsuSandboxProps): React.JSX.Element {
                 </Tab>
             </TabList>
             <TabPanel>
-                <VContainer gap={15}>
-                    {([...Array(VSU_NUMBER_OF_CHANNELS)].map((v, x) =>
-                        <>
-                            <Channel
-                                key={x}
-                                index={x + 1}
-                                supportSweepAndModulation={x === 4}
-                                isNoiseChannel={x === 5}
-                                channel={data.channels[x]}
-                                setChannel={(channelData: VsuChannelData) => setChannelData(x, channelData)}
-                                waveForms={data.waveforms}
-                            />
-                            {x < 5 &&
-                                <hr />
-                            }
-                        </>
-                    ))}
-                </VContainer>
+                <HContainer gap={0} overflow='hidden'>
+                    <Piano channel={pianoChannel} setFrequency={setFrequency} />
+                    <VContainer gap={15} grow={1} overflow='auto'>
+                        {([...Array(VSU_NUMBER_OF_CHANNELS)].map((v, x) =>
+                            <>
+                                <Channel
+                                    key={x}
+                                    index={x + 1}
+                                    supportSweepAndModulation={x === 4}
+                                    isNoiseChannel={x === 5}
+                                    channel={data.channels[x]}
+                                    setChannel={(channelData: VsuChannelData) => setChannelData(x, channelData)}
+                                    waveForms={data.waveforms}
+                                    setPianoChannel={setPianoChannel}
+                                />
+                                {x < 5 &&
+                                    <hr />
+                                }
+                            </>
+                        ))}
+                    </VContainer>
+                </HContainer>
             </TabPanel>
             {([...Array(VSU_NUMBER_OF_WAVEFORM_BANKS)].map((v, x) =>
                 <TabPanel key={x}>

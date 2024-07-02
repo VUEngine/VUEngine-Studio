@@ -19,7 +19,7 @@ const ColumnContainer = styled.div`
     user-select: none;
 
     &:hover {
-        border-color: var(--theia-button-background);
+        border-color: var(--theia-button-background) !important;
     }
 `;
 
@@ -38,11 +38,12 @@ export default function NumberArrayPreview(props: NumberArrayPreviewProps): Reac
 
     return <ColumnContainer
         style={{
-            borderColor: active ? 'var(--theia-button-background)' : undefined,
+            borderColor: active ? 'var(--theia-editor-foreground)' : undefined,
         }}
         onClick={onClick}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
+        className={active ? 'active' : undefined}
         title={title}
     >
         {[...Array(32)].map((h, y) => {
@@ -50,6 +51,7 @@ export default function NumberArrayPreview(props: NumberArrayPreviewProps): Reac
             return <Column
                 key={y}
                 style={{
+                    backgroundColor: active ? 'var(--theia-editor-foreground)' : undefined,
                     height: `${(v + 1) * 100 / maximum}%`
                 }}
             />;

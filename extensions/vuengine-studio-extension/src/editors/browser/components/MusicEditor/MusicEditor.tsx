@@ -1,7 +1,7 @@
 import { CommonCommands } from '@theia/core/lib/browser';
 import React from 'react';
 import { EditorsContextType } from '../../ves-editors-types';
-import { ChannelConfig, InstrumentConfig, MusicEditorContext, MusicEditorState, Notes, PatternConfig, SongData, SongNote } from './MusicEditorTypes';
+import { ChannelConfig, InstrumentConfig, MusicEditorContext, MusicEditorState, NOTES, PatternConfig, SongData, SongNote } from './MusicEditorTypes';
 import MusicPlayer from './MusicPlayer';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
@@ -260,7 +260,7 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                 [...Array(pattern.size)].forEach((s, i) => {
                     channelNotes[step + i] = (!channel.muted && !(soloChannel > -1 && soloChannel !== channel.id))
                         ? {
-                            note: pattern.notes[i] !== undefined ? Notes[pattern.notes[i]!] : undefined,
+                            note: pattern.notes[i] !== undefined ? Object.keys(NOTES)[pattern.notes[i]!] : undefined,
                             volumeL: (typeof pattern.volumeL[i] === 'number')
                                 ? 20 * Math.log10((pattern.volumeL[i]! / 100) ** 2) // convert to decibels
                                 : undefined,

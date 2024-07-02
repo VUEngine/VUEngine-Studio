@@ -1,7 +1,7 @@
-.musicEditor .pianoRollKey {
+.jsonforms-container .pianoRollKey {
     align-items: center;
     background-color: #fff;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 0px solid #ccc;
     border-right: 2px solid #999;
     box-sizing: border-box;
     color: #666;
@@ -15,37 +15,37 @@
     width: 75px;
 }
 
-.musicEditor .pianoRollRow:first-child .pianoRollKey {
+.jsonforms-container .pianoRollRow:first-child .pianoRollKey {
     border-top: 1px solid #ccc;
 }
 
-.musicEditor .pianoRollRow:last-child .pianoRollKey {
+.jsonforms-container .pianoRollRow:last-child .pianoRollKey {
     border-bottom: 1px solid #ccc;
 }
 
-.musicEditor .pianoRollRow:hover .pianoRollKey,
-.musicEditor .pianoRollKey:hover,
-.musicEditor .pianoRollKey.sharpNote:hover:after,
-.musicEditor .pianoRollRow:hover .pianoRollKey.sharpNote:after {
+.jsonforms-container .pianoRollRow:hover .pianoRollKey,
+.jsonforms-container .pianoRollKey:hover,
+.jsonforms-container .pianoRollKey.sharpNote:hover:after,
+.jsonforms-container .pianoRollRow:hover .pianoRollKey.sharpNote:after {
     background: var(--theia-button-background);
     color: var(--theia-button-foreground)
 }
 
-.musicEditor .pianoRollRow.cNote .pianoRollKey {
+.jsonforms-container .pianoRollRow.cNote .pianoRollKey {
     border-bottom-width: 3px;
 }
 
-.musicEditor .pianoRollRow.cNote:last-child .pianoRollKey {
+.jsonforms-container .pianoRollRow.cNote:last-child .pianoRollKey {
     border-bottom-width: 1px;
 }
 
-.musicEditor .pianoRollKey.sharpNote {
+.jsonforms-container .pianoRollKey.sharpNote {
     background-color: #fff !important;
     color: #ccc;
     position: relative;
 }
 
-.musicEditor .pianoRollKey.sharpNote:after {
+.jsonforms-container .pianoRollKey.sharpNote:after {
     background: linear-gradient(90deg, #000 50%, #555 100%);
     border-right: 2px solid #999;
     content: "";
@@ -55,12 +55,12 @@
     width: 55px;
 }
 
-.musicEditor .pianoRollKey>div {
+.jsonforms-container .pianoRollKey>div {
     display: none;
     z-index: 1;
 }
 
-.musicEditor .pianoRollRow:hover .pianoRollKey>div,
-.musicEditor .pianoRollRow.cNote .pianoRollKey>div {
+.jsonforms-container .pianoRollRow:hover .pianoRollKey>div,
+.jsonforms-container .pianoRollRow.cNote .pianoRollKey>div {
     display: block;
 }

@@ -1,12 +1,10 @@
 import React from 'react';
-import { HIGHEST_NOTE, LOWEST_NOTE, Notes } from '../MusicEditorTypes';
+import { HIGHEST_NOTE, LOWEST_NOTE, NOTES } from '../MusicEditorTypes';
 import PianoRollRow from './PianoRollRow';
 
 export default function PianoRollEditor(): React.JSX.Element {
-    const classNames = ['pianoRollEditor'];
-
-    return <div className={classNames.join(' ')}>
-        {Notes.map((note, index) =>
+    return <div className="pianoRollEditor">
+        {Object.keys(NOTES).map((note, index) =>
             index <= LOWEST_NOTE &&
             index >= HIGHEST_NOTE && <PianoRollRow
                 key={`pianoroll-row-${index}`}
