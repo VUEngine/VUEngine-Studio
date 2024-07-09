@@ -73,6 +73,6 @@ export interface PrePostBuildTask {
 }
 
 export enum PrePostBuildTaskType {
-  Task = 'Task',
-  Command = 'Command',
+  Task = 'task',
+  Command = 'command',
 }

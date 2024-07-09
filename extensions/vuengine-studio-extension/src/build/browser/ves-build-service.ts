@@ -898,7 +898,7 @@ export class VesBuildService {
         });
       }
 
-      switch (task.type) {
+      switch (task.type.toLowerCase()) {
         case PrePostBuildTaskType.Task:
           await this.runTask(task.name);
           completed++;

@@ -89,7 +89,7 @@ const properties: PreferenceSchemaProperties = {
             properties: {
                 type: {
                     type: 'string',
-                    description: 'Type - Task or Command',
+                    description: 'Type - "task" or "command"',
                     enum: [
                         PrePostBuildTaskType.Task,
                         PrePostBuildTaskType.Command,
@@ -103,7 +103,10 @@ const properties: PreferenceSchemaProperties = {
                 },
             },
         },
-        default: [],
+        default: [{
+            'type': 'command',
+            'name': 'core.saveAll',
+        }],
         scope: PreferenceScope.Folder,
         overridable: true,
     },
