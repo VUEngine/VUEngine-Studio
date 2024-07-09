@@ -32,7 +32,7 @@ export class VesEmulatorSidebarWidget extends ReactWidget {
   @postConstruct()
   protected init(): void {
     this.id = VesEmulatorSidebarWidget.ID;
-    this.title.iconClass = 'codicon codicon-run';
+    this.title.iconClass = 'codicon codicon-run-all';
     this.title.closable = true;
     this.setTitle();
     this.update();

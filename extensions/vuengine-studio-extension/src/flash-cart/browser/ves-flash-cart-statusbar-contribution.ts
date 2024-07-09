@@ -43,7 +43,7 @@ export class VesFlashCartStatusBarContribution implements FrontendApplicationCon
                 alignment: StatusBarAlignment.LEFT,
                 command: VesFlashCartCommands.WIDGET_TOGGLE.id,
                 priority: 1,
-                text: `$(codicon-layout-statusbar) ${label}`,
+                text: `$(codicon-empty-window codicon-rotate-180) ${label}`,
                 tooltip: nls.localize('vuengine/flashCarts/connectedFlashCarts', 'Connected Flash Carts')
             });
         } else {

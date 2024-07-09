@@ -48,7 +48,7 @@ export const VesToolbarDefaultsOverride: () => DeflatedToolbarTree = () => ({
                 {
                     'id': 'ves:build:build',
                     'command': 'ves:build:build',
-                    'icon': 'codicon codicon-tools'
+                    'icon': 'codicon codicon-symbol-property'
                 },
                 {
                     'id': 'ves:emulator:run',
@@ -58,7 +58,19 @@ export const VesToolbarDefaultsOverride: () => DeflatedToolbarTree = () => ({
                 {
                     'id': 'ves:flashCarts:flash',
                     'command': 'ves:flashCarts:flash',
-                    'icon': 'codicon codicon-layout-statusbar'
+                    'icon': 'codicon codicon-empty-window codicon-rotate-180'
+                }
+            ],
+            [
+                {
+                    'id': 'ves:export:export',
+                    'command': 'ves:export:export',
+                    'icon': 'codicon codicon-desktop-download'
+                },
+                {
+                    'id': 'ves:build:clean',
+                    'command': 'ves:build:clean',
+                    'icon': 'codicon codicon-trash'
                 }
             ],
             [

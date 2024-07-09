@@ -8,6 +8,11 @@
     transform: rotate(90deg);
 }
 
+.codicon-rotate-180:before {
+    display: inline-block;
+    transform: rotate(180deg);
+}
+
 .codicon-flip-y:before {
     display: inline-block;
     transform: rotate(180deg);
