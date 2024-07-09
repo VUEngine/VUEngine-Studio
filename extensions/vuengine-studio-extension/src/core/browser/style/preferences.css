@@ -7,3 +7,7 @@
 .ves-pref-input-wrapper .theia-input {
     flex-grow: 1;
 }
+
+.theia-settings-container .pref-content-container a.theia-json-input {
+    color: var(--theia-editor-foreground);
+}
