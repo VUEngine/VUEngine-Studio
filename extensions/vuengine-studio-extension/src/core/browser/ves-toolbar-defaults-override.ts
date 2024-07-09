@@ -14,6 +14,31 @@ export const VesToolbarDefaultsOverride: () => DeflatedToolbarTree = () => ({
                     'command': 'textEditor.commands.go.forward',
                     'icon': 'codicon codicon-arrow-right'
                 }
+            ],
+            [
+                {
+                    'id': 'core.save',
+                    'command': 'core.save',
+                    'icon': 'codicon codicon-save'
+                },
+                {
+                    'id': 'core.undo',
+                    'command': 'core.undo',
+                    'icon': 'codicon codicon-discard'
+                },
+                {
+                    'id': 'core.redo',
+                    'command': 'core.redo',
+                    'icon': 'codicon codicon-redo'
+                }
+            ],
+            [
+                {
+                    'id': 'workbench.action.showCommands',
+                    'command': 'workbench.action.showCommands',
+                    'icon': 'codicon codicon-terminal',
+                    'tooltip': 'Command Palette'
+                }
             ]
         ],
         [ToolbarAlignment.CENTER]: [
@@ -34,7 +59,9 @@ export const VesToolbarDefaultsOverride: () => DeflatedToolbarTree = () => ({
                     'id': 'ves:flashCarts:flash',
                     'command': 'ves:flashCarts:flash',
                     'icon': 'codicon codicon-layout-statusbar'
-                },
+                }
+            ],
+            [
                 {
                     'id': 'ves:codegen:generateFiles',
                     'command': 'ves:codegen:generateFiles',

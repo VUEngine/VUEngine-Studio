@@ -24,5 +24,6 @@
 
 #main-toolbar .separator {
   background-color: var(--theia-mainToolbar-foreground);
-  opacity: 0.1;
+  margin: 5px;
+  opacity: 0.3;
 }
