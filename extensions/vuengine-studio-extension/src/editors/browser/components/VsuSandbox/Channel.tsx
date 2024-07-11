@@ -25,7 +25,7 @@ import {
     VSU_SWEEP_MODULATION_SHIFT_MAX,
     VSU_SWEEP_MODULATION_SHIFT_MIN,
     VsuChannelData
-} from './VsuSandboxTypes';
+} from '../VsuEmulator/VsuEmulatorTypes';
 
 const WaveFormSelection = styled(HContainer)`
     outline: none;
