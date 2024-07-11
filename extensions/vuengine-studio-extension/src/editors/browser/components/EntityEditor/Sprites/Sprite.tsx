@@ -480,9 +480,15 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
             </VContainer >
             <HContainer gap={15} wrap='wrap'>
                 <VContainer>
-                    <label>
-                        {nls.localize('vuengine/entityEditor/displayMode', 'Display Mode')}
-                    </label>
+                    <InfoLabel
+                        label={nls.localize('vuengine/entityEditor/displayMode', 'Display Mode')}
+                        tooltip={nls.localize(
+                            'vuengine/entityEditor/displayModeDescription',
+                            'Select either a single image that is the same on both eyes, ' +
+                            'or two separate images, one for each eye. ' +
+                            'Stereo sprites require more system ressources.'
+                        )}
+                    />
                     <RadioSelect
                         options={[{
                             value: DisplayMode.Mono,
@@ -500,9 +506,10 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                         <InfoLabel
                             label={nls.localize('vuengine/entityEditor/displays', 'Displays')}
                             tooltip={nls.localize(
-                                'vuengine/entityEditor/displayModeDescription',
+                                'vuengine/entityEditor/displaysDescription',
                                 'Select which screens the sprite should be visible on. ' +
-                                'Can be used to set up a stereo sprite by creating one sprite each for the left and right eye.'
+                                'Use with care! It can be very uncomfortable for the viewer ' +
+                                "if left and right eye images don't match."
                             )}
                         />
                         <RadioSelect
@@ -824,7 +831,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                         tooltip={nls.localize(
                             'vuengine/entityEditor/compressionDescription',
                             'Image data can be stored in a compressed format to save ROM space. '
-                            + 'Comes at the cost of a slightly higher CPU load when loading data into memory.'
+                            + 'Comes at the cost of a slightly higher CPU load when loading data into memory. '
+                            + 'Will be skipped if compressed data is not smaller than source data . '
                         )}
                     />
                     <RadioSelect
