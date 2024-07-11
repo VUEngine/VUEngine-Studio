@@ -454,9 +454,11 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                             </div>
                                             {data.components?.animations?.length > 0 && !isMultiFileAnimation && data.animations?.totalFrames &&
                                                 <div>
-                                                    (
-                                                    {dimensions[1][0]} × {Math.round(dimensions[1][1] / data.animations?.totalFrames * 100) / 100} px × {data.animations?.totalFrames}
-                                                    )
+                                                    {dimensions[1][0]}
+                                                    {' × '}
+                                                    {Math.round(dimensions[1][1] / data.animations?.totalFrames * 100) / 100}
+                                                    {' px × '}
+                                                    {data.animations?.totalFrames}
                                                 </div>
                                             }
                                         </>
@@ -493,28 +495,31 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                         onChange={options => setDisplayMode(options[0].value as DisplayMode)}
                     />
                 </VContainer>
-                {data.sprites.type === SpriteType.Bgmap && !data.components?.animations?.length &&
-                    !sprite.texture?.repeat?.x && !sprite.texture?.repeat?.y &&
+                {sprite.displayMode === DisplayMode.Mono &&
                     <VContainer>
                         <InfoLabel
-                            label={nls.localize('vuengine/entityEditor/colorMode', 'Color Mode')}
+                            label={nls.localize('vuengine/entityEditor/displays', 'Displays')}
                             tooltip={nls.localize(
-                                'vuengine/entityEditor/colorModeDescription',
-                                'Whether to use the system\'s default 4 color palette or HiColor mode, ' +
-                                'which simulates 7 colors by blending together adjacent frames to create mix colors. ' +
-                                'Note: Mixed colors look fine on hardware, but flicker on emulators.'
+                                'vuengine/entityEditor/displayModeDescription',
+                                'Select which screens the sprite should be visible on. ' +
+                                'Can be used to set up a stereo sprite by creating one sprite each for the left and right eye.'
                             )}
                         />
                         <RadioSelect
-                            options={[{
-                                value: ColorMode.Default,
-                                label: nls.localize('vuengine/entityEditor/colorModeDefault', 'Default'),
-                            }, {
-                                value: ColorMode.FrameBlend,
-                                label: nls.localize('vuengine/entityEditor/colorModeHiColor', 'HiColor'),
-                            }]}
-                            defaultValue={sprite.colorMode}
-                            onChange={options => setColorMode(options[0].value as ColorMode)}
+                            options={[
+                                { value: Displays.Left, label: nls.localize('vuengine/entityEditor/displayModeLeft', 'Left') },
+                                { value: Displays.Right, label: nls.localize('vuengine/entityEditor/displayModeRight', 'Right') },
+                            ]}
+                            canSelectMany={true}
+                            allowBlank={false}
+                            defaultValue={sprite.displays === Displays.Both
+                                ? [Displays.Left, Displays.Right]
+                                : sprite.displays
+                            }
+                            onChange={options => setDisplays(options.length === 2
+                                ? Displays.Both
+                                : options[0].value as Displays)
+                            }
                         />
                     </VContainer>
                 }
@@ -627,31 +632,28 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 </HContainer>
             }
             <HContainer gap={15} wrap='wrap'>
-                {sprite.displayMode === DisplayMode.Mono &&
+                {data.sprites.type === SpriteType.Bgmap && !data.components?.animations?.length &&
+                    !sprite.texture?.repeat?.x && !sprite.texture?.repeat?.y &&
                     <VContainer>
                         <InfoLabel
-                            label={nls.localize('vuengine/entityEditor/displays', 'Displays')}
+                            label={nls.localize('vuengine/entityEditor/colorMode', 'Color Mode')}
                             tooltip={nls.localize(
-                                'vuengine/entityEditor/displayModeDescription',
-                                'Select which screens the sprite should be visible on. ' +
-                                'Can be used to set up a stereo sprite by creating one sprite each for the left and right eye.'
+                                'vuengine/entityEditor/colorModeDescription',
+                                'Whether to use the system\'s default 4 color palette or HiColor mode, ' +
+                                'which simulates 7 colors by blending together adjacent frames to create mix colors. ' +
+                                'Note: Mixed colors look fine on hardware, but flicker on emulators.'
                             )}
                         />
                         <RadioSelect
-                            options={[
-                                { value: Displays.Left, label: nls.localize('vuengine/entityEditor/displayModeLeft', 'Left') },
-                                { value: Displays.Right, label: nls.localize('vuengine/entityEditor/displayModeRight', 'Right') },
-                            ]}
-                            canSelectMany={true}
-                            allowBlank={false}
-                            defaultValue={sprite.displays === Displays.Both
-                                ? [Displays.Left, Displays.Right]
-                                : sprite.displays
-                            }
-                            onChange={options => setDisplays(options.length === 2
-                                ? Displays.Both
-                                : options[0].value as Displays)
-                            }
+                            options={[{
+                                value: ColorMode.Default,
+                                label: nls.localize('vuengine/entityEditor/colorModeDefault', 'Default'),
+                            }, {
+                                value: ColorMode.FrameBlend,
+                                label: nls.localize('vuengine/entityEditor/colorModeHiColor', 'HiColor'),
+                            }]}
+                            defaultValue={sprite.colorMode}
+                            onChange={options => setColorMode(options[0].value as ColorMode)}
                         />
                     </VContainer>
                 }
