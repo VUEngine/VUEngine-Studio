@@ -32,6 +32,13 @@ export enum BgmapMode {
     HBias = 'HBias',
 }
 
+export enum SpriteSourceType {
+    Image = 'image',
+    Sprite = 'sprite',
+    TileMap = 'tilemap',
+    Model = 'model',
+}
+
 export enum BgmapRepeatMode {
     '1x1' = '1x1',
     '1x2' = '1x2',

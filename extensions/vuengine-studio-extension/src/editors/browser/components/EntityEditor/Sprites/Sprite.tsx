@@ -1,3 +1,4 @@
+import { ArrowsHorizontal, ArrowsVertical } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
@@ -10,7 +11,7 @@ import RadioSelect from '../../Common/RadioSelect';
 import SectionSelect from '../../Common/SectionSelect';
 import { clamp } from '../../Common/Utils';
 import VContainer from '../../Common/VContainer';
-import { BgmapMode, DisplayMode, Displays, SpriteType, Transparency } from '../../Common/VUEngineTypes';
+import { BgmapMode, DisplayMode, Displays, SpriteSourceType, SpriteType, Transparency } from '../../Common/VUEngineTypes';
 import Images from '../../ImageEditor/Images';
 import { EntityEditorSaveDataOptions } from '../EntityEditor';
 import {
@@ -21,7 +22,6 @@ import {
     SpriteData,
     SpriteImageData,
 } from '../EntityEditorTypes';
-import { ArrowsHorizontal, ArrowsVertical } from '@phosphor-icons/react';
 
 const MIN_REPEAT_SIZE = 0;
 const MAX_REPEAT_SIZE = 512;
@@ -118,6 +118,12 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     const setColorMode = (colorMode: ColorMode): void => {
         updateSprite({
             colorMode,
+        });
+    };
+
+    const setSourceType = (sourceType: SpriteSourceType): void => {
+        updateSprite({
+            sourceType,
         });
     };
 
@@ -289,6 +295,187 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
 
     return (
         <VContainer gap={15}>
+            <VContainer>
+                <InfoLabel
+                    label={nls.localize('vuengine/entityEditor/spriteSource', 'Source')}
+                    tooltipPosition='left'
+                    tooltip={<>
+                        <div>
+                            {nls.localize(
+                                'vuengine/entityEditor/spriteSourceDescription',
+                                "The type of source to retrieve image data from for this sprite's texture."
+                            )}
+                        </div><br />
+                        <div>
+                            <b>{nls.localize('vuengine/entityEditor/spriteSourceModeImage', 'Image(s)')}: </b>
+                            {nls.localize(
+                                'vuengine/entityEditor/spriteSourceModeImageDescription',
+                                'PNG image file(s). Must be four color indexed mode with the proper palette. ' +
+                                'When animations are enabled, select either a single file containing a vertical spritesheet, ' +
+                                'or multiple files, where each represents one animation frame.'
+                            )}
+                        </div><br />
+                        <div>
+                            <b>{nls.localize('vuengine/entityEditor/spriteSourceModeSprite', 'Sprite')}: </b>
+                            {nls.localize(
+                                'vuengine/entityEditor/spriteSourceModeSpriteDescription',
+                                "VUEngine Studio's own, specialized image format"
+                            )}
+                        </div><br />
+                        <div>
+                            <b>{nls.localize('vuengine/entityEditor/spriteSourceModeTileMap', 'Tile Map')}: </b>
+                            {nls.localize(
+                                'vuengine/entityEditor/spriteSourceModeTileMapDescription',
+                                'A tile map that can be edited in-line in the editor. ' +
+                                'Select a PNG file containing a tileset as the source, then copy into the editor.'
+                            )}
+                        </div><br />
+                        <div>
+                            <b>{nls.localize('vuengine/entityEditor/spriteSourceModeModel', 'Model')}: </b>
+                            {nls.localize(
+                                'vuengine/entityEditor/spriteSourceModeModelDescription',
+                                'A 3D model file to render to a mono or stereo. ' +
+                                'Supported file types are [...].'
+                            )}
+                        </div><br />
+                    </>}
+                />
+                <RadioSelect
+                    options={[{
+                        value: SpriteSourceType.Image,
+                        label: nls.localize('vuengine/entityEditor/spriteSourceModeImage', 'Image(s)'),
+                    }, {
+                        value: SpriteSourceType.Sprite,
+                        label: nls.localize('vuengine/entityEditor/spriteSourceModeSprite', 'Sprite'),
+                    }, {
+                        value: SpriteSourceType.TileMap,
+                        label: nls.localize('vuengine/entityEditor/spriteSourceModeTileMap', 'Tile Map'),
+                    }, {
+                        value: SpriteSourceType.Model,
+                        label: nls.localize('vuengine/entityEditor/spriteSourceModeModel', 'Model'),
+                    }]}
+                    defaultValue={sprite.sourceType}
+                    onChange={options => setSourceType(options[0].value as SpriteSourceType)}
+                />
+                {sprite.sourceType === SpriteSourceType.Image &&
+                    <>
+                        <HContainer alignItems='center' gap={3} wrap='nowrap'>
+                            <div style={{ paddingRight: 10 }}>
+                                <Images
+                                    data={sprite.texture?.files || []}
+                                    updateData={setFiles}
+                                    allInFolderAsFallback={false}
+                                    canSelectMany={data.components?.animations.length > 0}
+                                    stack={true}
+                                    showMetaData={false}
+                                />
+                            </div>
+                            <VContainer grow={1}>
+                                {(sprite.texture?.files || []).length === 0 &&
+                                    <div className='empty'>
+                                        {sprite.displayMode !== DisplayMode.Stereo &&
+                                            nls.localize(
+                                                'vuengine/entityEditor/noImageFileSelected',
+                                                'No Image File Selected'
+                                            )
+                                        }
+                                        {sprite.displayMode === DisplayMode.Stereo &&
+                                            nls.localize(
+                                                'vuengine/entityEditor/noImageFileSelectedForLeftEye',
+                                                'No Image File Selected For The Left Eye'
+                                            )
+                                        }
+                                    </div>
+                                }
+
+                                {filename[0] !== '' &&
+                                    <div>
+                                        {filename[0]}
+                                    </div>
+                                }
+
+                                {dimensions[0].length > 0 &&
+                                    <>
+                                        <div>
+                                            {dimensions[0][0]} × {dimensions[0][1]} px
+                                        </div>
+                                        {data.components?.animations?.length > 0 && !isMultiFileAnimation && data.animations?.totalFrames &&
+                                            <div>
+                                                (
+                                                {dimensions[0][0]} × {Math.round(dimensions[0][1] / data.animations?.totalFrames * 100) / 100} px × {data.animations?.totalFrames}
+                                                )
+                                            </div>
+                                        }
+                                    </>
+                                }
+
+                                {tilesCount > 0 &&
+                                    <div
+                                        className={invalidTilesCount ? ' error' : undefined}
+                                    >
+                                        {invalidTilesCount ? `⚠ ${tilesCount}` : tilesCount} {nls.localize('vuengine/entityEditor/tiles', 'Tiles')}
+                                    </div>
+                                }
+                            </VContainer>
+                        </HContainer>
+
+                        {sprite.displayMode === DisplayMode.Stereo &&
+                            <HContainer alignItems='center' gap={3} wrap='nowrap'>
+                                <div style={{ paddingRight: 10 }}>
+                                    <Images
+                                        data={sprite.texture?.files2 || []}
+                                        updateData={setFiles2}
+                                        allInFolderAsFallback={false}
+                                        canSelectMany={data.components?.animations.length > 0}
+                                        stack={true}
+                                        showMetaData={false}
+                                    />
+                                </div>
+                                <VContainer grow={1}>
+                                    {(sprite.texture?.files2 || []).length === 0 &&
+                                        <div className='empty'>
+                                            {nls.localize(
+                                                'vuengine/entityEditor/noImageFileSelectedForRightEye',
+                                                'No Image File Selected For The Right Eye'
+                                            )}
+                                        </div>
+                                    }
+
+                                    {filename[1] !== '' &&
+                                        <div>
+                                            {filename[1]}
+                                        </div>
+                                    }
+
+                                    {dimensions[1].length > 0 &&
+                                        <>
+                                            <div>
+                                                {dimensions[1][0]} × {dimensions[1][1]} px
+                                            </div>
+                                            {data.components?.animations?.length > 0 && !isMultiFileAnimation && data.animations?.totalFrames &&
+                                                <div>
+                                                    (
+                                                    {dimensions[1][0]} × {Math.round(dimensions[1][1] / data.animations?.totalFrames * 100) / 100} px × {data.animations?.totalFrames}
+                                                    )
+                                                </div>
+                                            }
+                                        </>
+                                    }
+                                </VContainer>
+                            </HContainer>
+                        }
+                    </>
+                }
+                {sprite.sourceType === SpriteSourceType.Sprite &&
+                    <>This source type is not yet supported</>
+                }
+                {sprite.sourceType === SpriteSourceType.TileMap &&
+                    <>This source type is not yet supported</>
+                }
+                {sprite.sourceType === SpriteSourceType.Model &&
+                    <>This source type is not yet supported</>
+                }
+            </VContainer >
             <HContainer gap={15} wrap='wrap'>
                 <VContainer>
                     <label>
@@ -332,124 +519,6 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     </VContainer>
                 }
             </HContainer>
-            <VContainer>
-                <InfoLabel
-                    label={sprite.displayMode === DisplayMode.Stereo
-                        ? nls.localize('vuengine/entityEditor/sourceImagesStereo', 'Source Images (Left/Right Eye)')
-                        : nls.localize('vuengine/entityEditor/sourceImage', 'Source Image')
-                    }
-                    tooltip={nls.localize(
-                        'vuengine/entityEditor/filesDescription',
-                        'PNG image to be used as texture. Must be four color indexed mode with the proper palette. ' +
-                        'When animations are enabled, select either a single file containing a vertical spritesheet, ' +
-                        'or multiple files, where each represents one animation frame.'
-                    )}
-                />
-                <HContainer alignItems='center' gap={3} wrap='nowrap'>
-                    <div style={{ paddingRight: 10 }}>
-                        <Images
-                            data={sprite.texture?.files || []}
-                            updateData={setFiles}
-                            allInFolderAsFallback={false}
-                            canSelectMany={data.components?.animations.length > 0}
-                            stack={true}
-                            showMetaData={false}
-                        />
-                    </div>
-                    <VContainer grow={1}>
-                        {(sprite.texture?.files || []).length === 0 &&
-                            <div className='empty'>
-                                {sprite.displayMode !== DisplayMode.Stereo &&
-                                    nls.localize(
-                                        'vuengine/entityEditor/noImageFileSelected',
-                                        'No Image File Selected'
-                                    )
-                                }
-                                {sprite.displayMode === DisplayMode.Stereo &&
-                                    nls.localize(
-                                        'vuengine/entityEditor/noImageFileSelectedForLeftEye',
-                                        'No Image File Selected For The Left Eye'
-                                    )
-                                }
-                            </div>
-                        }
-
-                        {filename[0] !== '' &&
-                            <div>
-                                {filename[0]}
-                            </div>
-                        }
-
-                        {dimensions[0].length > 0 &&
-                            <>
-                                <div>
-                                    {dimensions[0][0]} × {dimensions[0][1]} px
-                                </div>
-                                {data.components?.animations?.length > 0 && !isMultiFileAnimation && data.animations?.totalFrames &&
-                                    <div>
-                                        (
-                                        {dimensions[0][0]} × {Math.round(dimensions[0][1] / data.animations?.totalFrames * 100) / 100} px × {data.animations?.totalFrames}
-                                        )
-                                    </div>
-                                }
-                            </>
-                        }
-
-                        {tilesCount > 0 &&
-                            <div
-                                className={invalidTilesCount ? ' error' : undefined}
-                            >
-                                {invalidTilesCount ? `⚠ ${tilesCount}` : tilesCount} {nls.localize('vuengine/entityEditor/tiles', 'Tiles')}
-                            </div>
-                        }
-                    </VContainer>
-                </HContainer>
-                {sprite.displayMode === DisplayMode.Stereo &&
-                    <HContainer alignItems='center' gap={3} wrap='nowrap'>
-                        <div style={{ paddingRight: 10 }}>
-                            <Images
-                                data={sprite.texture?.files2 || []}
-                                updateData={setFiles2}
-                                allInFolderAsFallback={false}
-                                canSelectMany={data.components?.animations.length > 0}
-                                stack={true}
-                                showMetaData={false}
-                            />
-                        </div>
-                        <VContainer grow={1}>
-                            {(sprite.texture?.files2 || []).length === 0 &&
-                                <div className='empty'>
-                                    {nls.localize(
-                                        'vuengine/entityEditor/noImageFileSelectedForRightEye',
-                                        'No Image File Selected For The Right Eye'
-                                    )}
-                                </div>
-                            }
-
-                            {filename[1] !== '' &&
-                                <div>
-                                    {filename[1]}
-                                </div>
-                            }
-
-                            {dimensions[1].length > 0 &&
-                                <>
-                                    <div>
-                                        {dimensions[1][0]} × {dimensions[1][1]} px
-                                    </div>
-                                    {data.components?.animations?.length > 0 && !isMultiFileAnimation && data.animations?.totalFrames &&
-                                        <div>
-                                            (
-                                            {dimensions[1][0]} × {Math.round(dimensions[1][1] / data.animations?.totalFrames * 100) / 100} px × {data.animations?.totalFrames}
-                                            )
-                                        </div>
-                                    }
-                                </>
-                            }
-                        </VContainer>
-                    </HContainer>
-                }
-            </VContainer >
             <HContainer gap={15} wrap='wrap'>
                 <VContainer>
                     <label>

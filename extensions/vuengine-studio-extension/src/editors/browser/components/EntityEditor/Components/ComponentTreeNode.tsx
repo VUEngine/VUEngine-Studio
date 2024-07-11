@@ -26,7 +26,7 @@ import { ImageCompressionType } from '../../../../../images/browser/ves-images-t
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { DataSection } from '../../Common/CommonTypes';
 import { showEntitySelection } from '../../Common/Utils';
-import { BgmapMode, BgmapRepeatMode, ColliderType, DisplayMode, Displays, Transparency, WireframeType } from '../../Common/VUEngineTypes';
+import { BgmapMode, BgmapRepeatMode, ColliderType, DisplayMode, Displays, SpriteSourceType, Transparency, WireframeType } from '../../Common/VUEngineTypes';
 import { ComponentKey, EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 import { ScriptType } from '../Scripts/ScriptTypes';
 
@@ -343,6 +343,7 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
         sprites.push({
             _imageData: 0,
             name: nls.localize('vuengine/entityEditor/sprite', 'Sprite'),
+            sourceType: SpriteSourceType.Image,
             bgmapMode: BgmapMode.Bgmap,
             colorMode: ColorMode.Default,
             displayMode: DisplayMode.Mono,

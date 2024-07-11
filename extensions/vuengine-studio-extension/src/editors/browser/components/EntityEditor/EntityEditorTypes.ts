@@ -16,6 +16,7 @@ import {
     ScreenPixelRotation,
     ScreenPixelScale,
     ScreenPixelVector,
+    SpriteSourceType,
     SpriteType,
     Transparency,
     Vector3D,
@@ -136,6 +137,7 @@ export interface SpriteImageData {
 export interface SpriteData {
     _imageData?: SpriteImageData | number
     name: string
+    sourceType: SpriteSourceType
     bgmapMode: BgmapMode
     colorMode: ColorMode
     displayMode: DisplayMode
