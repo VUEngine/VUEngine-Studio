@@ -1,5 +1,5 @@
 {%- import 'templates/partials/macros.nj' as macros -%}
-{%- set pluginMacroId = item._folder | basename | toUpperSnakeCase | replace('P_V_B', 'PVB') | replace('V_U_ENGINE', 'VUENGINE') -%}
+{%- set pluginMacroId = item._folder | basename | toUpperSnakeCase -%}
 {% include('templates/partials/fileHeader/fileHeader.h.nj') %}
 
 #ifndef __PLUGIN_{{ pluginMacroId }}_CONFIG_H_

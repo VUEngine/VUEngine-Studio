@@ -636,13 +636,17 @@ export class VesCodeGenService {
   }
 
   protected toUpperSnakeCase(key: string): string {
-    // force lowercase first char
-    let convertedKey = key.charAt(0).toLowerCase() + key.slice(1);
-    // replace all whitespaces
-    convertedKey = convertedKey.replace(/\s/g, '');
-    // convert to upper snake case
-    convertedKey = convertedKey.replace(/([A-Z])/g, $1 => '_' + $1.toLowerCase()).toUpperCase();
+    const splitCaps = (input: string) => input
+      .replace(/([a-z])([A-Z]+)/g, (m, s1, s2) => s1 + ' ' + s2)
+      .replace(/([A-Z])([A-Z]+)([^a-zA-Z0-9]*)$/, (m, s1, s2, s3) => s1 + s2.toLowerCase() + s3)
+      .replace(/([A-Z]+)([A-Z][a-z])/g, (m, s1, s2) => s1.toLowerCase() + ' ' + s2);
 
-    return convertedKey;
+    return splitCaps(key)
+      .replace(/\W+/g, ' ')
+      .split(/ |\B(?=[A-Z])/)
+      .map(word => word.toLowerCase())
+      .join('_')
+      .toUpperCase()
+      .replace('VU_ENGINE', 'VUENGINE'); // meh...
   }
 }
