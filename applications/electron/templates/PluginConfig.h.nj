@@ -16,10 +16,12 @@
 
 	{%- if configuration.dataType == 'string' or configuration.dataType == 'type' -%}
 		{%- set configValue = '"' ~ configValue ~ '"' -%}
+	{%- else -%}
+		{%- set configValue = '(' ~ configValue ~ ')' -%}
 	{%- endif -%}
 
 #ifndef __PLUGIN_{{ pluginMacroId }}_{{ configuration.name | toUpperSnakeCase }}
-#define __PLUGIN_{{ pluginMacroId }}_{{ configuration.name | toUpperSnakeCase }} ({{ configValue | safe }})
+#define __PLUGIN_{{ pluginMacroId }}_{{ configuration.name | toUpperSnakeCase }} {{ configValue | safe }}
 #endif
 {{- '\n\n' -}}
 

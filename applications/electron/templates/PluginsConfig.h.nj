@@ -22,9 +22,11 @@
 
                 {%- if configuration.dataType == 'string' or configuration.dataType == 'type' -%}
                     {%- set configValue = '"' ~ configValue ~ '"' -%}
+                {%- else -%}
+                    {%- set configValue = '(' ~ configValue ~ ')' -%}
                 {%- endif -%}
 
-				#define __PLUGIN_{{ installedPluginId | basename | toUpperSnakeCase | replace('P_V_B', 'PVB') | replace('V_U_ENGINE', 'VUENGINE') }}_{{ configuration.name | toUpperSnakeCase }} ({{ configValue | safe }})
+				#define __PLUGIN_{{ installedPluginId | basename | toUpperSnakeCase | replace('P_V_B', 'PVB') | replace('V_U_ENGINE', 'VUENGINE') }}_{{ configuration.name | toUpperSnakeCase }} {{ configValue | safe }}
 				{{- '\n' -}}
 
 			{%- endfor -%}
