@@ -164,9 +164,6 @@
       "electronMain": "lib/touchbar/electron-main/ves-touchbar-electron-main-application-module"
     },
     {
-      "frontendElectron": "lib/zoom/electron-browser/ves-zoom-frontend-module"
-    },
-    {
       "frontend": "lib/updater/browser/ves-updater-frontend-module"
     }
   ],
