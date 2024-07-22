@@ -15,6 +15,7 @@ import { glob } from 'glob';
 import sizeOf from 'image-size';
 import { injectable } from 'inversify';
 import sortJson from 'sort-json';
+import * as si from 'systeminformation';
 import zlib from 'zlib';
 import { ImageData } from '../browser/ves-common-types';
 import {
@@ -22,8 +23,8 @@ import {
     VES_CHANNEL_DECOMPRESS,
     VES_CHANNEL_DEREFERENCE_JSON_SCHEMA,
     VES_CHANNEL_FIND_FILES,
+    VES_CHANNEL_GET_CPU_INFORMATION,
     VES_CHANNEL_GET_IMAGE_DIMENSIONS,
-    VES_CHANNEL_GET_PHYSICAL_CPU_COUNT,
     VES_CHANNEL_GET_TEMP_DIR,
     VES_CHANNEL_GET_USER_DEFAULT,
     VES_CHANNEL_ON_SERIAL_DEVICE_CHANGE,
@@ -102,9 +103,7 @@ export class VesMainApi implements ElectronMainApplicationContribution {
         ipcMain.on(VES_CHANNEL_GET_IMAGE_DIMENSIONS, async (event, path: string) => {
             event.returnValue = sizeOf(path);
         });
-        ipcMain.on(VES_CHANNEL_GET_PHYSICAL_CPU_COUNT, event => {
-            event.returnValue = require('physical-cpu-count');
-        });
+        ipcMain.handle(VES_CHANNEL_GET_CPU_INFORMATION, async () => si.cpu());
         ipcMain.handle(VES_CHANNEL_PARSE_PNG, async (event, fileContent: FileContent) => {
             const PNG = require('@camoto/pngjs').PNG;
             let imageData: ImageData | false = false;
