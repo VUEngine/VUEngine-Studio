@@ -97,7 +97,7 @@ export default function CurrentComponent(props: CurrentComponentProps): React.JS
                     return <Physics />;
 
                 default:
-                    return <div className='empty' style={{ padding: 'var(--padding)' }}>
+                    return <div className='empty'>
                         {nls.localize(
                             'vuengine/entityEditor/noComponentSelected',
                             'No component selected. Select any component to edit its properties.',
@@ -111,21 +111,21 @@ export default function CurrentComponent(props: CurrentComponentProps): React.JS
 
     return (
         <VContainer gap={15}>
+            {getComponentEditor()}
             {state.currentComponent?.startsWith('sprites') &&
                 <>
+                    <hr />
                     <SpritesSettings
                         isMultiFileAnimation={isMultiFileAnimation}
                     />
-                    <hr />
                 </>
             }
             {state.currentComponent?.startsWith('colliders') &&
                 <>
-                    <CollidersSettings />
                     <hr />
+                    <CollidersSettings />
                 </>
             }
-            {getComponentEditor()}
         </VContainer>
     );
 }

@@ -24,6 +24,7 @@ import {
 } from '../Common/VUEngineTypes';
 import { EntityEditorSaveDataOptions } from './EntityEditor';
 import { ScriptType, ScriptedActionData } from './Scripts/ScriptTypes';
+import { ImageQuantizationSettingsType } from './Sprites/ImageQuantizationSettings';
 
 // @ts-ignore
 export const EntityEditorContext = React.createContext<EntityEditorContextType>({});
@@ -138,6 +139,7 @@ export interface SpriteData {
     _imageData?: SpriteImageData | number
     name: string
     sourceType: SpriteSourceType
+    imageQuantizationSettings: ImageQuantizationSettingsType,
     bgmapMode: BgmapMode
     colorMode: ColorMode
     displayMode: DisplayMode

@@ -1,10 +1,11 @@
+import { Image, Images as ImagesIcon } from '@phosphor-icons/react';
 import { MaybeArray, URI, nls } from '@theia/core';
 import { OpenFileDialogProps } from '@theia/filesystem/lib/browser';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/HContainer';
 import VContainer from '../Common/VContainer';
-import { Image, Images as ImagesIcon } from '@phosphor-icons/react';
+import { getMaxScaleInContainer } from '../Common/Utils';
 
 interface ImagesProps {
     data: string[]
@@ -13,13 +14,37 @@ interface ImagesProps {
     allInFolderAsFallback: boolean
     stack: boolean
     showMetaData: boolean
+    containerHeight?: number
+    containerWidth?: number
+    height?: number
+    width?: number
+    fileAddExtraAction?: () => void
 }
 
 export default function Images(props: ImagesProps): React.JSX.Element {
     const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
-    const { data, updateData, canSelectMany, allInFolderAsFallback, stack, showMetaData } = props;
+    const {
+        data,
+        updateData,
+        canSelectMany,
+        allInFolderAsFallback,
+        stack,
+        showMetaData,
+        containerHeight,
+        containerWidth,
+        height,
+        width,
+        fileAddExtraAction
+    } = props;
     const [filesToShow, setFilesToShow] = useState<{ [path: string]: string }>({});
     const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
+
+    const fileAddOnClick = () => {
+        selectFiles();
+        if (fileAddExtraAction) {
+            fileAddExtraAction();
+        }
+    };
 
     const determineFilesToShow = async () => {
         const f = data.length > 0
@@ -111,7 +136,25 @@ export default function Images(props: ImagesProps): React.JSX.Element {
         }
     };
 
-    return <HContainer alignItems="start" gap={15} overflow={stack ? 'visible' : 'auto'} wrap="wrap">
+    const scale = useMemo(() => getMaxScaleInContainer(containerHeight ?? 64, containerWidth ?? 64, height ?? 64, width ?? 64),
+        [
+            containerHeight,
+            containerWidth,
+            height,
+            width
+        ]);
+
+    return <HContainer
+        alignItems="start"
+        gap={15}
+        overflow={stack ? 'visible' : 'auto'}
+        wrap="wrap"
+        style={{
+            // @ts-ignore
+            '--ves-file-height': containerHeight ? `${containerHeight}px` : undefined,
+            '--ves-file-width': containerWidth ? `${containerWidth}px` : undefined,
+        }}
+    >
         {Object.keys(filesToShow).map((f, i) => {
             const fullUri = workspaceRootUri.resolve(f);
             return <div
@@ -120,7 +163,9 @@ export default function Images(props: ImagesProps): React.JSX.Element {
                 title={f}
             >
                 <div className='filePreviewImage'>
-                    <img src={fullUri.path.fsPath()} />
+                    <img src={fullUri.path.fsPath()} style={{
+                        transform: `scale(${scale})`
+                    }} />
                 </div>
                 {(showMetaData || filesToShow[f]) &&
                     <VContainer gap={2}>
@@ -135,16 +180,25 @@ export default function Images(props: ImagesProps): React.JSX.Element {
                         </div>
                     </VContainer>
                 }
-                <div className='filePreviewActions'>
-                    <i
-                        className="codicon codicon-x"
-                        onClick={() => removeFile(f)}
-                    />
+                <div
+                    className="filePreviewActions"
+                    title="Remove Image"
+                    onClick={() => removeFile(f)}
+                >
+                    <i className="codicon codicon-x" />
                 </div>
+                {scale !== 1 &&
+                    <div
+                        className="fileZoom"
+                        title="Preview Zoom"
+                    >
+                        <i className="codicon codicon-zoom-in" /> {scale}
+                    </div>
+                }
             </div>;
         })}
         {(allInFolderAsFallback || !Object.keys(filesToShow).length) &&
-            <div className='fileAdd' onClick={selectFiles}>
+            <div className='fileAdd' onClick={fileAddOnClick}>
                 {canSelectMany
                     ? <ImagesIcon size={20} />
                     : <Image size={20} />

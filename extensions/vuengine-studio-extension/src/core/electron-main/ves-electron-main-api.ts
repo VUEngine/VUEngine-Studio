@@ -14,6 +14,7 @@ import { WebContents } from 'electron';
 import { glob } from 'glob';
 import sizeOf from 'image-size';
 import { injectable } from 'inversify';
+import { PNG } from 'pngjs';
 import sortJson from 'sort-json';
 import * as si from 'systeminformation';
 import zlib from 'zlib';
@@ -105,23 +106,22 @@ export class VesMainApi implements ElectronMainApplicationContribution {
         });
         ipcMain.handle(VES_CHANNEL_GET_CPU_INFORMATION, async () => si.cpu());
         ipcMain.handle(VES_CHANNEL_PARSE_PNG, async (event, fileContent: FileContent) => {
-            const PNG = require('@camoto/pngjs').PNG;
             let imageData: ImageData | false = false;
 
             await new Promise<void>((resolve, reject) => {
                 new PNG({
-                    keepIndexed: true,
-                }).parse(fileContent.value.buffer, (error: unknown, data: unknown): void => {
+                    // keepIndexed: true,
+                }).parse(Buffer.from(fileContent.value.buffer), (error: unknown, data: unknown): void => {
                     if (error) {
                         console.error('Error while parsing PNG', error, data);
                         resolve();
                     }
                 }).on('parsed', function (): void {
-                    // @ts-ignore: suppress implicit any errors
                     const png = this;
 
                     const height = png.height;
                     const width = png.width;
+                    // @ts-ignore
                     const colorType = png._parser._parser._colorType;
 
                     const pixelData: number[][] = [];

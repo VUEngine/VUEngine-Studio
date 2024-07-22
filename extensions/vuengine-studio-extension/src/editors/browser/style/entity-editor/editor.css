@@ -1,8 +1,6 @@
 .entityEditor {
     container: entityEditor / inline-size;
     padding: 0 !important;
-    --ves-file-height: 80px;
-    --ves-file-width: 100px;
 }
 
 @container entityEditor (max-width: 1000px) {

@@ -544,7 +544,7 @@ export const defaultProjectData: ProjectData = {
       templates: ['RomInfo']
     },
     Sprite: {
-      enabled: false,
+      enabled: true,
       file: '.sprite',
       schema: {
         title: 'Sprite',

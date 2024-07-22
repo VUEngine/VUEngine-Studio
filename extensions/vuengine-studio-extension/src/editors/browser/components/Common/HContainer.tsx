@@ -5,6 +5,7 @@ interface HContainerProps {
     className?: string
     gap?: number
     grow?: number
+    justifyContent?: string
     onClick?: MouseEventHandler | undefined;
     onKeyDown?: KeyboardEventHandler | undefined;
     overflow?: string
@@ -14,7 +15,7 @@ interface HContainerProps {
 }
 
 export default function HContainer(props: PropsWithChildren<HContainerProps>): React.JSX.Element {
-    const { alignItems, children, className, onClick, onKeyDown, overflow, tabIndex, wrap, gap, grow, style } = props;
+    const { alignItems, children, className, justifyContent, onClick, onKeyDown, overflow, tabIndex, wrap, gap, grow, style } = props;
 
     return <div
         style={{
@@ -24,6 +25,7 @@ export default function HContainer(props: PropsWithChildren<HContainerProps>): R
             flexGrow: grow,
             flexWrap: wrap !== undefined ? wrap : 'nowrap',
             gap: gap !== undefined ? `${gap}px` : '5px',
+            justifyContent,
             overflow,
             ...(style || {}),
         }}
