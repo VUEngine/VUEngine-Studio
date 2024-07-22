@@ -307,8 +307,19 @@ export class VesBuildService {
 
     this.pushBuildLogLine({
       type: BuildLogLineType.Normal,
-      text: `${nls.localize('vuengine/build/logicalCores', 'Logical Cores')}: ` +
-        `${this.cpuInfo.cores} (${this.cpuInfo.performanceCores} Performance, ${this.cpuInfo.efficiencyCores} Efficiency)`,
+      text: `${nls.localize('vuengine/build/logicalCores', 'Logical Cores')}: ${this.cpuInfo.cores}`,
+      timestamp: Date.now(),
+    });
+
+    this.pushBuildLogLine({
+      type: BuildLogLineType.Normal,
+      text: `${nls.localize('vuengine/build/performanceCores', 'Performance Cores')}: ${this.cpuInfo.performanceCores}`,
+      timestamp: Date.now(),
+    });
+
+    this.pushBuildLogLine({
+      type: BuildLogLineType.Normal,
+      text: `${nls.localize('vuengine/build/efficiencyCores', 'Efficiency Cores')}: ${this.cpuInfo.efficiencyCores}`,
       timestamp: Date.now(),
     });
 
@@ -455,6 +466,7 @@ export class VesBuildService {
       };
 
       const buildParams = await this.getBuildProcessParams();
+      console.info('Starting build with params', buildParams);
       await this.deleteRom();
       ({ processManagerId, processId } = await this.vesProcessService.launchProcess(VesProcessType.Raw, buildParams));
 
@@ -790,9 +802,12 @@ export class VesBuildService {
 
   // returns affinity mask to use only performance cores
   protected getProcessorAffinityMask(): string {
-    const performanceCores = this.cpuInfo?.performanceCores ?? 1;
-    const maskValue = Math.pow(2, performanceCores) - 1;
-    const pCoreMask = maskValue.toString(16).toUpperCase();
+    let pCoreMask = 'FFFFFFFF';
+    const performanceCores = this.cpuInfo?.performanceCores ?? 0;
+    if (performanceCores > 0) {
+      const maskValue = Math.pow(2, performanceCores) - 1;
+      pCoreMask = maskValue.toString(16).toUpperCase();
+    }
     return isWindows ? pCoreMask : `0x${pCoreMask}`;
   }
 
