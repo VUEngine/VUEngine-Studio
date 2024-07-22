@@ -17,9 +17,11 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { isLinux } from '@theia/monaco-editor-core/esm/vs/base/common/platform';
 import { ProcessOptions } from '@theia/process/lib/node';
 import { TaskEndedInfo, TaskEndedTypes, TaskService } from '@theia/task/lib/browser/task-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { Systeminformation } from 'systeminformation';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { clamp } from '../../editors/browser/components/Common/Utils';
 import { VesEmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
@@ -83,6 +85,8 @@ export class VesBuildService {
   protected readonly vesProcessWatcher: VesProcessWatcher;
   @inject(WorkspaceService)
   protected readonly workspaceService: WorkspaceService;
+
+  protected cpuInfo: Systeminformation.CpuData;
 
   protected _ready = new Deferred<void>();
   get ready(): Promise<void> {
@@ -220,6 +224,7 @@ export class VesBuildService {
   }
 
   protected async doInit(): Promise<void> {
+    this.cpuInfo = await window.electronVesCore.getCpuInformation();
     await this.workspaceService.ready;
     this.lastBuildMode = await this.localStorageService.getData(this.getLastBuildModeStorageKey());
     await this.resetBuildStatus();
@@ -279,6 +284,39 @@ export class VesBuildService {
     }
 
     this._ready.resolve();
+  }
+
+  protected printCpuInformation(): void {
+    this.pushBuildLogLine({
+      type: BuildLogLineType.Headline,
+      text: nls.localize('vuengine/build/cpuInformation', 'CPU Information'),
+      timestamp: Date.now(),
+    });
+
+    this.pushBuildLogLine({
+      type: BuildLogLineType.Normal,
+      text: `${nls.localize('vuengine/build/model', 'Model')}: ${this.cpuInfo.manufacturer} ${this.cpuInfo.brand}`,
+      timestamp: Date.now(),
+    });
+
+    this.pushBuildLogLine({
+      type: BuildLogLineType.Normal,
+      text: `${nls.localize('vuengine/build/physicalCores', 'Physical Cores')}: ${this.cpuInfo.physicalCores}`,
+      timestamp: Date.now(),
+    });
+
+    this.pushBuildLogLine({
+      type: BuildLogLineType.Normal,
+      text: `${nls.localize('vuengine/build/logicalCores', 'Logical Cores')}: ` +
+        `${this.cpuInfo.cores} (${this.cpuInfo.performanceCores} Performance, ${this.cpuInfo.efficiencyCores} Efficiency)`,
+      timestamp: Date.now(),
+    });
+
+    this.pushBuildLogLine({
+      type: BuildLogLineType.Normal,
+      text: '',
+      timestamp: Date.now(),
+    });
   }
 
   protected bindEvents(): void {
@@ -401,6 +439,8 @@ export class VesBuildService {
       endDate: undefined,
     };
 
+    this.printCpuInformation();
+
     this.lastBuildMode = buildMode;
 
     await this.runPreBuildTasks();
@@ -415,6 +455,7 @@ export class VesBuildService {
       };
 
       const buildParams = await this.getBuildProcessParams();
+      console.log('buildParams', buildParams);
       await this.deleteRom();
       ({ processManagerId, processId } = await this.vesProcessService.launchProcess(VesProcessType.Raw, buildParams));
 
@@ -474,7 +515,7 @@ export class VesBuildService {
 
     if (isWindows) {
       const winPaths = await Promise.all(pathUris.map(async p => this.convertoToEnvPath(isWslInstalled, p)));
-      const args = [
+      const preMakeArgs = [
         'cd', await this.convertoToEnvPath(isWslInstalled, workspaceRootUri), '&&',
         'export', `PATH=${winPaths.join(':')}:$PATH`,
         'LC_ALL=C',
@@ -483,6 +524,8 @@ export class VesBuildService {
         'PREPROCESSING_WAIT_FOR_LOCK_DELAY_FACTOR=0.0',
         `DUMP_ELF=${dumpElf ? 1 : 0}`,
         `PRINT_PEDANTIC_WARNINGS=${pedanticWarnings ? 1 : 0}`, '&&',
+      ];
+      const makeArgs = [
         'make', 'all',
         '-e', `TYPE=${buildMode}`,
         `ENGINE_FOLDER=${await this.convertoToEnvPath(isWslInstalled, engineCoreUri)}`,
@@ -491,24 +534,37 @@ export class VesBuildService {
         '-f', await this.convertoToEnvPath(isWslInstalled, makefileUri),
       ];
 
-      return isWslInstalled
-        ? {
+      if (isWslInstalled) {
+        return {
           command: 'wsl.exe',
-          args: args,
+          args: [
+            ...preMakeArgs,
+            'taskset',
+            this.getProcessorAffinityMask(),
+            ...makeArgs,
+          ],
           options: {
             cwd: await this.fileService.fsPath(workspaceRootUri)
           },
-        }
-        : {
-          command: await this.fileService.fsPath(await this.vesBuildPathsService.getMsysBashUri()),
+        };
+      } else {
+        return {
+          command: 'START',
           args: [
+            '/AFFINITY',
+            this.getProcessorAffinityMask(),
+            await this.fileService.fsPath(await this.vesBuildPathsService.getMsysBashUri()),
             '--login',
-            '-c', args.join(' '),
+            '-c', [
+              ...preMakeArgs,
+              ...makeArgs,
+            ].join(' '),
           ],
           options: {
             cwd: await this.fileService.fsPath(workspaceRootUri),
-          },
+          }
         };
+      }
     }
 
     const paths = await Promise.all(pathUris.map(async p => this.fileService.fsPath(p)));
@@ -517,14 +573,26 @@ export class VesBuildService {
       paths.push(pathEnvVar.value!);
     }
 
+    let command = 'make';
+    let args = [
+      'all',
+      '-e', `TYPE=${buildMode}`,
+      '-f', await this.convertoToEnvPath(isWslInstalled, makefileUri),
+      '-C', await this.convertoToEnvPath(isWslInstalled, workspaceRootUri),
+    ];
+
+    if (isLinux) {
+      command = 'taskset';
+      args = [
+        this.getProcessorAffinityMask(),
+        'make',
+        ...args,
+      ];
+    }
+
     return {
-      command: 'make',
-      args: [
-        'all',
-        '-e', `TYPE=${buildMode}`,
-        '-f', await this.convertoToEnvPath(isWslInstalled, makefileUri),
-        '-C', await this.convertoToEnvPath(isWslInstalled, workspaceRootUri),
-      ],
+      command,
+      args,
       options: {
         cwd: await this.fileService.fsPath(workspaceRootUri),
         env: {
@@ -716,7 +784,15 @@ export class VesBuildService {
   }
 
   protected getThreads(): number {
-    return window.electronVesCore.getPhysicalCpuCount();
+    return this.cpuInfo?.physicalCores ?? 1;
+  }
+
+  // returns affinity mask to use only performance cores
+  protected getProcessorAffinityMask(): string {
+    const performanceCores = this.cpuInfo?.performanceCores ?? 1;
+    const maskValue = Math.pow(2, performanceCores) - 1;
+    const pCoreMask = maskValue.toString(16).toUpperCase();
+    return `0x${pCoreMask}`;
   }
 
   protected computeProgress(): number {

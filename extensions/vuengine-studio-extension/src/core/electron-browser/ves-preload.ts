@@ -4,14 +4,15 @@ import { FileContent } from '@theia/filesystem/lib/common/files';
 import { GlobOptionsWithFileTypesUnset } from 'glob';
 import { ISizeCalculationResult } from 'image-size/dist/types/interface';
 import { VisitOptions } from 'sort-json';
+import { Systeminformation } from 'systeminformation';
 import { ImageData } from '../browser/ves-common-types';
 import {
     VES_CHANNEL_CHECK_UPDATE_AVAILABLE,
     VES_CHANNEL_DECOMPRESS,
     VES_CHANNEL_DEREFERENCE_JSON_SCHEMA,
     VES_CHANNEL_FIND_FILES,
+    VES_CHANNEL_GET_CPU_INFORMATION,
     VES_CHANNEL_GET_IMAGE_DIMENSIONS,
-    VES_CHANNEL_GET_PHYSICAL_CPU_COUNT,
     VES_CHANNEL_GET_TEMP_DIR,
     VES_CHANNEL_GET_USER_DEFAULT,
     VES_CHANNEL_ON_SERIAL_DEVICE_CHANGE,
@@ -62,8 +63,8 @@ const api: VesCoreAPI = {
     getImageDimensions: function (path: string): ISizeCalculationResult {
         return ipcRenderer.sendSync(VES_CHANNEL_GET_IMAGE_DIMENSIONS, path);
     },
-    getPhysicalCpuCount: function (): number {
-        return ipcRenderer.sendSync(VES_CHANNEL_GET_PHYSICAL_CPU_COUNT);
+    getCpuInformation: function (): Promise<Systeminformation.CpuData> {
+        return ipcRenderer.invoke(VES_CHANNEL_GET_CPU_INFORMATION);
     },
     parsePng: async function (fileContent: FileContent): Promise<ImageData | false> {
         return ipcRenderer.invoke(VES_CHANNEL_PARSE_PNG, fileContent);
