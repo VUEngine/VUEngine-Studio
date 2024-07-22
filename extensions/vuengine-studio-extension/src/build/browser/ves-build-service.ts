@@ -552,6 +552,8 @@ export class VesBuildService {
           args: [
             '/c', 'start',
             '/affinity', this.getProcessorAffinityMask(),
+            '/b',
+            '/realtime',
             await this.fileService.fsPath(await this.vesBuildPathsService.getMsysBashUri()),
             '--login',
             '-c', [
