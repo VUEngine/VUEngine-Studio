@@ -455,7 +455,6 @@ export class VesBuildService {
       };
 
       const buildParams = await this.getBuildProcessParams();
-      console.log('buildParams', buildParams);
       await this.deleteRom();
       ({ processManagerId, processId } = await this.vesProcessService.launchProcess(VesProcessType.Raw, buildParams));
 
@@ -549,10 +548,10 @@ export class VesBuildService {
         };
       } else {
         return {
-          command: 'START',
+          command: 'cmd.exe',
           args: [
-            '/AFFINITY',
-            this.getProcessorAffinityMask(),
+            '/c', 'start',
+            '/affinity', this.getProcessorAffinityMask(),
             await this.fileService.fsPath(await this.vesBuildPathsService.getMsysBashUri()),
             '--login',
             '-c', [
@@ -792,7 +791,7 @@ export class VesBuildService {
     const performanceCores = this.cpuInfo?.performanceCores ?? 1;
     const maskValue = Math.pow(2, performanceCores) - 1;
     const pCoreMask = maskValue.toString(16).toUpperCase();
-    return `0x${pCoreMask}`;
+    return isWindows ? pCoreMask : `0x${pCoreMask}`;
   }
 
   protected computeProgress(): number {
