@@ -29,6 +29,7 @@ import { showEntitySelection } from '../../Common/Utils';
 import { BgmapMode, BgmapRepeatMode, ColliderType, DisplayMode, Displays, SpriteSourceType, Transparency, WireframeType } from '../../Common/VUEngineTypes';
 import { ComponentKey, EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 import { ScriptType } from '../Scripts/ScriptTypes';
+import { DEFAULT_COLOR_DISTANCE_FORMULA, DEFAULT_IMAGE_QUANTIZATION_ALGORITHM, DEFAULT_PALETTE_QUANTIZATION_ALGORITHM } from '../Sprites/ImageQuantizationSettings';
 
 const CLONABLE_COMPONENT_TYPES = [
     'animations',
@@ -344,6 +345,11 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
             _imageData: 0,
             name: nls.localize('vuengine/entityEditor/sprite', 'Sprite'),
             sourceType: SpriteSourceType.Image,
+            imageQuantizationSettings: {
+                colorDistanceFormula: DEFAULT_COLOR_DISTANCE_FORMULA,
+                paletteQuantizationAlgorithm: DEFAULT_PALETTE_QUANTIZATION_ALGORITHM,
+                imageQuantizationAlgorithm: DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
+            },
             bgmapMode: BgmapMode.Bgmap,
             colorMode: ColorMode.Default,
             displayMode: DisplayMode.Mono,
