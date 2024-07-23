@@ -141,7 +141,11 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
   protected async doInit(): Promise<void> {
     await this.initState();
     this.resource = await this.getResource();
-    this.update();
+
+    // TODO: find out why the emulator is only x1 size initially, without setTimeout
+    setTimeout(() => {
+      this.update();
+    }, 50);
   }
 
   protected onCloseRequest(msg: Message): void {
