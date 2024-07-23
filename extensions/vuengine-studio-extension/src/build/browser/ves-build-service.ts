@@ -246,7 +246,7 @@ export class VesBuildService {
         this.commandService.executeCommand(VesBuildCommands.WIDGET_TOGGLE.id);
       }
     } else {
-      this.build();
+      await this.build();
       if (this.preferenceService.get(VesEmulatorPreferenceIds.EMULATOR_AUTO_QUEUE)) {
         this.commandService.executeCommand(VesEmulatorCommands.RUN.id);
       }
