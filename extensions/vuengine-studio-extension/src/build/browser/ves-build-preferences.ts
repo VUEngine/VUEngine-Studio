@@ -103,11 +103,10 @@ const properties: PreferenceSchemaProperties = {
                 },
             },
         },
-        // TODO: re-enable once https://github.com/eclipse-theia/theia/issues/13923 is fixed
-        default: [/* {
+        default: [{
             'type': 'command',
             'name': 'core.saveAll',
-        } */],
+        }],
         scope: PreferenceScope.Folder,
         overridable: true,
     },

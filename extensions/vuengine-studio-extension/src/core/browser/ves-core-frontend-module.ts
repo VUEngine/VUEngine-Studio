@@ -27,7 +27,7 @@ import { NavigatorWidgetFactory } from '@theia/navigator/lib/browser/navigator-w
 import { OutlineViewContribution } from '@theia/outline-view/lib/browser/outline-view-contribution';
 import { PluginApiFrontendContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-contribution';
 import { PluginFrontendViewContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-view-contribution';
-import { PreferenceTreeGenerator } from '@theia/preferences/lib/browser/util/preference-tree-generator';
+import { PreferenceLayoutProvider } from '@theia/preferences/lib/browser/util/preference-layout';
 import { PreferenceStringInputRenderer } from '@theia/preferences/lib/browser/views/components/preference-string-input';
 import { ScmContribution } from '@theia/scm/lib/browser/scm-contribution';
 import { SearchInWorkspaceFrontendContribution } from '@theia/search-in-workspace/lib/browser/search-in-workspace-frontend-contribution';
@@ -52,8 +52,8 @@ import { VesFileSystemFrontendContribution } from './ves-filesystem-frontend-con
 import { VesFileNavigatorContribution } from './ves-navigator-contribution';
 import { VesNavigatorWidgetFactory } from './ves-navigator-widget-factory';
 import { VesPreferenceConfigurations } from './ves-preference-configurations';
+import { VesPreferenceLayoutProvider } from './ves-preference-layout';
 import { VesPreferenceStringInputRenderer } from './ves-preference-string-input-renderer';
-import { VesPreferenceTreeGenerator } from './ves-preference-tree-generator';
 import './ves-preferences-monaco-contribution';
 import { VesQuickOpenWorkspace } from './ves-quick-open-workspace';
 import { VesScmContribution } from './ves-scm-contribution';
@@ -95,7 +95,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     rebind(PreferenceConfigurations).to(VesPreferenceConfigurations).inSingletonScope();
 
     // add custom preference tree categories
-    rebind(PreferenceTreeGenerator).to(VesPreferenceTreeGenerator).inSingletonScope();
+    rebind(PreferenceLayoutProvider).to(VesPreferenceLayoutProvider).inSingletonScope();
 
     // application shell overrides
     rebind(ApplicationShell).to(VesApplicationShell).inSingletonScope();
