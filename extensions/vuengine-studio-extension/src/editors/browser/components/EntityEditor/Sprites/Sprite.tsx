@@ -325,11 +325,10 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                 )}
                             </div><br />
                             <div>
-                                <b>{nls.localize('vuengine/entityEditor/spriteSourceModeImage', 'Image(s)')}: </b>
+                                <b>{nls.localize('vuengine/entityEditor/spriteSourceModeImage', 'Image')}: </b>
                                 {nls.localize(
                                     'vuengine/entityEditor/spriteSourceModeImageDescription',
-                                    'PNG image file(s). Must be four color indexed mode with the proper palette. ' +
-                                    'When animations are enabled, select either a single file containing a vertical spritesheet, ' +
+                                    'PNG image file. When animations are enabled, select either a single file containing a vertical spritesheet, ' +
                                     'or multiple files, where each represents one animation frame.'
                                 )}
                             </div><br />
@@ -337,7 +336,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                 <b>{nls.localize('vuengine/entityEditor/spriteSourceModeSprite', 'Sprite')}: </b>
                                 {nls.localize(
                                     'vuengine/entityEditor/spriteSourceModeSpriteDescription',
-                                    "VUEngine Studio's own, specialized image format"
+                                    "VUEngine Studio's native image format that supports layers and animations."
                                 )}
                             </div><br />
                             <div>
@@ -361,7 +360,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     <RadioSelect
                         options={[{
                             value: SpriteSourceType.Image,
-                            label: nls.localize('vuengine/entityEditor/spriteSourceModeImage', 'Image(s)'),
+                            label: nls.localize('vuengine/entityEditor/spriteSourceModeImage', 'Image'),
                         }, {
                             value: SpriteSourceType.Sprite,
                             label: nls.localize('vuengine/entityEditor/spriteSourceModeSprite', 'Sprite'),

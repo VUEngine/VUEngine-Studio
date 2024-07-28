@@ -9,6 +9,7 @@
     overflow: hidden;
     padding: 0;
     position: relative;
+    --ves-preview-size: 10000px;
 }
 
 .jsonforms-container .preview-container.draggable {
@@ -28,21 +29,32 @@
 
 .jsonforms-container .preview-container-world {
     align-items: center;
-    background:
-        linear-gradient(transparent, transparent 49.9875%, rgba(0,0,0,.2) 49.9875%, rgba(0,0,0,.2) 50.0125%, transparent 50.0125%),
-        linear-gradient(90deg, transparent, transparent 49.9875%, rgba(0,0,0,.2) 49.9875%, rgba(0,0,0,.2) 50.0125%, transparent 50.0125%),
-        repeating-conic-gradient(rgba(0,0,0,.2) 0% 25%, transparent 0% 50%) 50% / 16px 16px;
+    background: repeating-conic-gradient(rgba(0,0,0,.2) 0% 25%, transparent 0% 50%) 50% / 16px 16px;
     background-position: center;
     box-sizing: border-box;
     display: flex;
-    max-height: 7500px;
-    min-height: 7500px;
+    max-height: var(--ves-preview-size);
+    min-height: var(--ves-preview-size);
     justify-content: center;
     overflow: hidden;
     position: relative;
     transform-style: preserve-3d;
-    max-width: 7500px;
-    min-width: 7500px;
+    max-width: var(--ves-preview-size);
+    min-width: var(--ves-preview-size);
+}
+
+.jsonforms-container .preview-container-world-center-horizontal {
+    background-color: rgba(0, 0, 0, .5);
+    height: 2px;
+    position: absolute;
+    width: var(--ves-preview-size);
+}
+
+.jsonforms-container .preview-container-world-center-vertical {
+    background-color: rgba(0, 0, 0, .5);
+    height: var(--ves-preview-size);
+    position: absolute;
+    width: 2px;
 }
 
 .jsonforms-container .preview-container-world .sprite-error {
