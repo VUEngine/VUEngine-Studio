@@ -159,6 +159,8 @@ export default function Preview(): React.JSX.Element {
           translate: `${offsetX}px ${offsetY}px`,
         }}
       >
+        <div className="preview-container-world-center-vertical"></div>
+        <div className="preview-container-world-center-horizontal"></div>
         {state.preview.sprites && data.components?.sprites?.map((sprite, i) =>
           <Sprite
             key={i}
