@@ -11,10 +11,11 @@ interface RadioSelectProps {
     allowBlank?: boolean
     defaultValue: string | number | boolean | (string | number | boolean)[]
     onChange: (options: RadioSelectOption[]) => void
+    disabled?: boolean
 }
 
 export default function RadioSelect(props: RadioSelectProps): React.JSX.Element {
-    const { allowBlank, options, canSelectMany, defaultValue, onChange } = props;
+    const { allowBlank, options, canSelectMany, defaultValue, onChange, disabled } = props;
     const [currentIndexes, setCurrentIndexes] = useState<number[]>([]);
     const [classes, setClasses] = useState<string>('radioSelect');
     const numberOfOptions = options.length;
@@ -39,6 +40,9 @@ export default function RadioSelect(props: RadioSelectProps): React.JSX.Element 
         const c: string[] = ['radioSelect'];
         if (canSelectMany) {
             c.push('canSelectMany');
+        }
+        if (disabled) {
+            c.push('disabled');
         }
         setClasses(c.join(' '));
     };
@@ -70,6 +74,10 @@ export default function RadioSelect(props: RadioSelectProps): React.JSX.Element 
     };
 
     const toggleValue = (i: number): void => {
+        if (disabled) {
+            return;
+        }
+
         if (canSelectMany) {
             if (currentIndexes.includes(i)) {
                 updateValue(currentIndexes.filter(ci => ci !== i));
@@ -100,6 +108,7 @@ export default function RadioSelect(props: RadioSelectProps): React.JSX.Element 
     }, [
         canSelectMany,
         defaultValue,
+        disabled,
     ]);
 
     return <div className={classes} onKeyDown={handleKeyPress} tabIndex={0}>

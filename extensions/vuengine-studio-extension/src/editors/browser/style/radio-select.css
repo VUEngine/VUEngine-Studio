@@ -8,6 +8,9 @@
 .radioSelect.canSelectMany {
     gap: 4px;
 }
+.radioSelect.disabled {
+    opacity: .5;
+}
 
 .radioSelect:focus div.selected {
     outline: 1px solid var(--theia-button-background);
@@ -26,6 +29,9 @@
 }
 .radioSelect.canSelectMany div {
     border-radius: 2px !important;
+}
+.radioSelect.disabled div {
+    cursor: default;
 }
 
 .radioSelect div.selected {

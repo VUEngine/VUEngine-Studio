@@ -22,14 +22,18 @@ import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext, useState } from 'react';
 import { NodeRendererProps } from 'react-arborist';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
-import { ImageCompressionType } from '../../../../../images/browser/ves-images-types';
+import {
+    DEFAULT_COLOR_DISTANCE_FORMULA,
+    DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
+    DEFAULT_PALETTE_QUANTIZATION_ALGORITHM,
+    ImageCompressionType
+} from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { DataSection } from '../../Common/CommonTypes';
 import { showEntitySelection } from '../../Common/Utils';
 import { BgmapMode, BgmapRepeatMode, ColliderType, DisplayMode, Displays, SpriteSourceType, Transparency, WireframeType } from '../../Common/VUEngineTypes';
 import { ComponentKey, EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 import { ScriptType } from '../Scripts/ScriptTypes';
-import { DEFAULT_COLOR_DISTANCE_FORMULA, DEFAULT_IMAGE_QUANTIZATION_ALGORITHM, DEFAULT_PALETTE_QUANTIZATION_ALGORITHM } from '../Sprites/ImageQuantizationSettings';
 
 const CLONABLE_COMPONENT_TYPES = [
     'animations',

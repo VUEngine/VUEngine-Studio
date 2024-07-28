@@ -1,5 +1,7 @@
+import * as iq from 'image-q';
 import URI from '@theia/core/lib/common/uri';
 import { DataSection } from '../../editors/browser/components/Common/CommonTypes';
+import { BasicSelectOption } from 'src/editors/browser/components/Common/BasicSelect';
 
 export interface ImageConfig {
   files: string[]
@@ -112,3 +114,130 @@ export const DEFAULT_IMAGE_CONVERTER_CONFIG: ImageConfig = {
     frames: 0,
   }
 };
+
+export interface ImageQuantizationSettingsType {
+  colorDistanceFormula: iq.ColorDistanceFormula,
+  paletteQuantizationAlgorithm: iq.PaletteQuantization | 'none',
+  imageQuantizationAlgorithm: iq.ImageQuantization,
+}
+
+export const colorDistanceFormulaOptions: BasicSelectOption[] = [
+  {
+    label: 'CIE94 (Textiles)',
+    value: 'cie94-textiles'
+  },
+  {
+    label: 'CIE94 (Graphic Arts)',
+    value: 'cie94-graphic-arts'
+  },
+  {
+    label: 'CIEDE2000',
+    value: 'ciede2000'
+  },
+  {
+    label: 'Color Metric',
+    value: 'color-metric'
+  },
+  {
+    label: 'Euclidean',
+    value: 'euclidean'
+  },
+  {
+    label: 'Euclidean BT709',
+    value: 'euclidean-bt709'
+  },
+  {
+    label: 'Euclidean BT709 (No Alpha)',
+    value: 'euclidean-bt709-noalpha'
+  },
+  {
+    label: 'Manhattan',
+    value: 'manhattan'
+  },
+  {
+    label: 'Manhattan BT709',
+    value: 'manhattan-bt709'
+  },
+  {
+    label: 'Manhattan (nommyde)',
+    value: 'manhattan-nommyde'
+  },
+  {
+    label: 'PNGQuant',
+    value: 'pngquant'
+  },
+];
+
+export const paletteQuantizationAlgorithmOptions: BasicSelectOption[] = [
+  {
+    label: 'None',
+    value: 'none'
+  },
+  {
+    label: 'NeuQuant (Integer)',
+    value: 'neuquant'
+  },
+  {
+    label: 'NeuQuant (Floating Point)',
+    value: 'neuquant-float'
+  },
+  {
+    label: 'RGBQuant',
+    value: 'rgbquant'
+  },
+  {
+    label: 'WuQuant',
+    value: 'wuquant'
+  },
+];
+
+export const imageQuantizationAlgorithmOptions: BasicSelectOption[] = [
+  {
+    label: 'Nearest Color',
+    value: 'nearest'
+  },
+  {
+    label: 'Riemersma',
+    value: 'riemersma'
+  },
+  {
+    label: 'Floyd-Steinberg',
+    value: 'floyd-steinberg'
+  },
+  {
+    label: 'False Floyd Steinberg',
+    value: 'false-floyd-steinberg'
+  },
+  {
+    label: 'Stucki',
+    value: 'stucki'
+  },
+  {
+    label: 'Atkinson',
+    value: 'atkinson'
+  },
+  {
+    label: 'Jarvis',
+    value: 'jarvis'
+  },
+  {
+    label: 'Burkes',
+    value: 'burkes'
+  },
+  {
+    label: 'Sierra',
+    value: 'sierra'
+  },
+  {
+    label: 'Two-Row Sierra',
+    value: 'two-sierra'
+  },
+  {
+    label: 'Sierra Lite',
+    value: 'sierra-lite'
+  },
+];
+
+export const DEFAULT_COLOR_DISTANCE_FORMULA = 'euclidean';
+export const DEFAULT_PALETTE_QUANTIZATION_ALGORITHM = 'none';
+export const DEFAULT_IMAGE_QUANTIZATION_ALGORITHM = 'nearest';
