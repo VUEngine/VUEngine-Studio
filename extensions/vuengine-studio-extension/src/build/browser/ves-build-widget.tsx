@@ -273,7 +273,7 @@ export class VesBuildWidget extends ReactWidget {
           {this.vesBuildService.buildStatus.log.length > 0 && (
             <div className='buildStatus'>
               {this.vesBuildService.buildStatus.active ? (
-                <div>
+                <div className='buildStatusActivity'>
                   <i className='fa fa-cog fa-spin'></i>{' '}
                   {this.vesBuildService.buildStatus.step}...
                 </div>

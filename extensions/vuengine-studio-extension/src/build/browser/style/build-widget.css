@@ -69,6 +69,12 @@
   flex-grow: 1;
 }
 
+#vesBuildWidget .buildStatusActivity {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 #vesBuildWidget .buildStatus>div:last-child {
   font-size: 80%;
 }
