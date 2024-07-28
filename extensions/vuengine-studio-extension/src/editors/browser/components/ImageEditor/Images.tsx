@@ -1,23 +1,20 @@
 import { Image, Images as ImagesIcon } from '@phosphor-icons/react';
 import { MaybeArray, URI, nls } from '@theia/core';
 import { OpenFileDialogProps } from '@theia/filesystem/lib/browser';
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/HContainer';
 import VContainer from '../Common/VContainer';
-import { getMaxScaleInContainer } from '../Common/Utils';
 
 interface ImagesProps {
     data: string[]
-    updateData: (data: string[]) => void
+    updateData?: (data: string[]) => void
     canSelectMany: boolean
     allInFolderAsFallback: boolean
     stack: boolean
     showMetaData: boolean
-    containerHeight?: number
-    containerWidth?: number
-    height?: number
-    width?: number
+    containerHeight?: string
+    containerWidth?: string
     fileAddExtraAction?: () => void
 }
 
@@ -32,14 +29,16 @@ export default function Images(props: ImagesProps): React.JSX.Element {
         showMetaData,
         containerHeight,
         containerWidth,
-        height,
-        width,
         fileAddExtraAction
     } = props;
     const [filesToShow, setFilesToShow] = useState<{ [path: string]: string }>({});
     const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
 
     const fileAddOnClick = () => {
+        if (!updateData) {
+            return;
+        }
+
         selectFiles();
         if (fileAddExtraAction) {
             fileAddExtraAction();
@@ -47,7 +46,7 @@ export default function Images(props: ImagesProps): React.JSX.Element {
     };
 
     const determineFilesToShow = async () => {
-        const f = data.length > 0
+        const files = data.length > 0
             ? data
             : allInFolderAsFallback
                 ? await Promise.all(window.electronVesCore.findFiles(await services.fileService.fsPath(fileUri.parent), '*.png')
@@ -59,24 +58,26 @@ export default function Images(props: ImagesProps): React.JSX.Element {
                 : [];
 
         const result: { [path: string]: string } = {};
-        f.sort((a, b) => a.localeCompare(b)).map(async (p, i) => {
-            if (stack && i > 0) {
-                return;
-            }
+        files
+            .sort((a, b) => a.localeCompare(b))
+            .map(async (p, i) => {
+                if (stack && i > 0) {
+                    return;
+                }
 
-            let meta = nls.localize(
-                'vuengine/imageEditor/fileNotFound',
-                'File not found'
-            );
-            const resolvedUri = workspaceRootUri.resolve(p);
-            if (showMetaData) {
-                const dimensions = window.electronVesCore.getImageDimensions(resolvedUri.path.fsPath());
-                meta = `${dimensions.width}×${dimensions.height}`;
-            } else {
-                meta = '';
-            }
-            result[p] = meta;
-        });
+                let meta = nls.localize(
+                    'vuengine/imageEditor/fileNotFound',
+                    'File not found'
+                );
+                const resolvedUri = workspaceRootUri.resolve(p);
+                if (!p.startsWith('data:') && showMetaData) {
+                    const dimensions = window.electronVesCore.getImageDimensions(resolvedUri.path.fsPath());
+                    meta = `${dimensions.width}×${dimensions.height}`;
+                } else {
+                    meta = '';
+                }
+                result[p] = meta;
+            });
 
         setFilesToShow(result);
     };
@@ -125,47 +126,37 @@ export default function Images(props: ImagesProps): React.JSX.Element {
             ...newFiles,
         ].sort())];
 
-        updateData(updatedFiles);
-    };
-
-    const removeFile = async (path: string) => {
-        if (stack) {
-            updateData([]);
-        } else {
-            updateData(data.filter((f, i) => f !== path));
+        if (updateData) {
+            updateData(updatedFiles);
         }
     };
 
-    const scale = useMemo(() => getMaxScaleInContainer(containerHeight ?? 64, containerWidth ?? 64, height ?? 64, width ?? 64),
-        [
-            containerHeight,
-            containerWidth,
-            height,
-            width
-        ]);
+    const removeFile = async (path: string) => {
+        if (updateData) {
+            updateData(stack ? [] : data.filter((f, i) => f !== path));
+        }
+    };
 
     return <HContainer
-        alignItems="start"
         gap={15}
+        grow={1}
         overflow={stack ? 'visible' : 'auto'}
         wrap="wrap"
         style={{
             // @ts-ignore
-            '--ves-file-height': containerHeight ? `${containerHeight}px` : undefined,
-            '--ves-file-width': containerWidth ? `${containerWidth}px` : undefined,
+            '--ves-file-height': containerHeight,
+            '--ves-file-width': containerWidth,
         }}
     >
         {Object.keys(filesToShow).map((f, i) => {
             const fullUri = workspaceRootUri.resolve(f);
+            const imageUrl = f.startsWith('data:') ? f : fullUri.path.fsPath();
             return <div
                 key={`image-${i}`}
                 className={`filePreview${stack && data.length > 1 ? ' multi' : ''}`}
-                title={f}
+                title={f.startsWith('data:') ? undefined : f}
             >
-                <div className='filePreviewImage'>
-                    <img src={fullUri.path.fsPath()} style={{
-                        transform: `scale(${scale})`
-                    }} />
+                <div className='filePreviewImage' style={{ backgroundImage: `url('${imageUrl}')` }}>
                 </div>
                 {(showMetaData || filesToShow[f]) &&
                     <VContainer gap={2}>
@@ -180,25 +171,19 @@ export default function Images(props: ImagesProps): React.JSX.Element {
                         </div>
                     </VContainer>
                 }
-                <div
-                    className="filePreviewActions"
-                    title="Remove Image"
-                    onClick={() => removeFile(f)}
-                >
-                    <i className="codicon codicon-x" />
-                </div>
-                {scale !== 1 &&
+                {updateData &&
                     <div
-                        className="fileZoom"
-                        title="Preview Zoom"
+                        className="filePreviewActions"
+                        title="Remove Image"
+                        onClick={() => removeFile(f)}
                     >
-                        <i className="codicon codicon-zoom-in" /> {scale}
+                        <i className="codicon codicon-x" />
                     </div>
                 }
             </div>;
         })}
         {(allInFolderAsFallback || !Object.keys(filesToShow).length) &&
-            <div className='fileAdd' onClick={fileAddOnClick}>
+            <div className={updateData ? 'fileAdd' : 'fileAdd disabled'} onClick={fileAddOnClick}>
                 {canSelectMany
                     ? <ImagesIcon size={20} />
                     : <Image size={20} />

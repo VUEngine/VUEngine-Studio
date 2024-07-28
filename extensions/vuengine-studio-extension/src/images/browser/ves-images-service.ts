@@ -33,7 +33,6 @@ export class VesImagesService {
   protected readonly workspaceService: WorkspaceService;
 
   async convertImage(imageConfigFileUri: URI, imageConfig: ImageConfigWithName, filePath?: string): Promise<ConversionResult> {
-
     const result: ConversionResult = {
       animation: {},
       maps: [],
@@ -204,6 +203,7 @@ export class VesImagesService {
     // write all file contents to map
     await Promise.all(generatedFiles.map(async file => {
       const fileContent = (await this.fileService.readFile(file)).value.toString();
+      // @ts-ignore
       const name = fileContent.match(/(?<=\/\/{{BLOCK\().+?(?=\))/s) ?? [''];
       const tilesData = fileContent.match(/0x([0-9A-Fa-f]{8}),/g)?.map(hex => hex.substring(2, 10)) ?? [];
       const mapData = fileContent.match(/0x([0-9A-Fa-f]{4}),/g)?.map(hex => hex.substring(2, 6)) ?? [];

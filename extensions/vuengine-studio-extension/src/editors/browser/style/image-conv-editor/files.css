@@ -4,36 +4,37 @@
 }
 
 .jsonforms-container .filePreview {
+  background-color: var(--theia-activityBar-background);
+  border-radius: 2px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 5px;
+  height: var(--ves-file-height);
+  padding: var(--theia-ui-padding);
   position: relative;
-  width: calc(var(--ves-file-width) + var(--theia-ui-padding) * 2);
+  width: var(--ves-file-width);
 }
 
 .jsonforms-container .filePreviewImage {
   align-items: center;
-  background-color: var(--theia-activityBar-background);
-  border-radius: 2px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
   display: flex;
-  height: var(--ves-file-height);
+  flex-grow: 1;
+  height: 100%;
+  image-rendering: pixelated;
   justify-content: center;
   overflow: hidden;
-  padding: var(--theia-ui-padding);
   position: relative;
   user-select: none;
-  width: var(--ves-file-width);
+  width: 100%;
 }
 
 .jsonforms-container .filePreview.multi .filePreviewImage {
   box-shadow: 1px 1px 0px var(--theia-editor-background), 
     5px 5px 0px var(--theia-activityBar-background);
-}
-
-.jsonforms-container .filePreviewImage img {
-  image-rendering: pixelated;
-  max-height: 100%;
-  max-width: 100%;
 }
 
 .jsonforms-container .filePreviewTitle {
@@ -49,6 +50,7 @@
 }
 
 .jsonforms-container .filePreviewActions {
+  background-color: var(--theia-activityBar-background);
   border-bottom-left-radius: 2px;
   border-top-right-radius: 2px;
   cursor: pointer;
@@ -70,30 +72,20 @@
   color: #f1f1f1;
 }
 
-.jsonforms-container .fileZoom {
-  bottom: 0;
-  display: flex;
-  left: 0;
-  opacity: .6;
-  padding: calc(2 * var(--theia-ui-padding));
-  position: absolute;
-  z-index: 10;
-}
-
 .jsonforms-container .fileAdd {
   align-items: center;
   border: var(--theia-border-width) solid var(--theia-dropdown-border);
   color: var(--theia-dropdown-border);
   border-radius: 2px;
   box-sizing: border-box;
-  cursor: pointer;
   display: flex;
-  height: calc(var(--ves-file-height) + var(--theia-ui-padding) * 2);
+  height: var(--ves-file-height);
   justify-content: center;
-  width: calc(var(--ves-file-width) + var(--theia-ui-padding) * 2);
+  width: var(--ves-file-width);
 }
 
-.jsonforms-container .fileAdd:hover {
+.jsonforms-container .fileAdd:not(.disabled):hover {
   background-color: var(--theia-input-background);
   color: inherit;
+  cursor: pointer;
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { ColorMode } from '../../../../core/browser/ves-common-types';
-import { ConversionResult, ImageCompressionType } from '../../../../images/browser/ves-images-types';
+import { ConversionResult, ImageCompressionType, ImageQuantizationSettingsType } from '../../../../images/browser/ves-images-types';
 import { DataSection } from '../Common/CommonTypes';
 import {
     Axis,
@@ -24,7 +24,6 @@ import {
 } from '../Common/VUEngineTypes';
 import { EntityEditorSaveDataOptions } from './EntityEditor';
 import { ScriptType, ScriptedActionData } from './Scripts/ScriptTypes';
-import { ImageQuantizationSettingsType } from './Sprites/ImageQuantizationSettings';
 
 // @ts-ignore
 export const EntityEditorContext = React.createContext<EntityEditorContextType>({});

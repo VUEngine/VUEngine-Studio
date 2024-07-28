@@ -1,24 +1,22 @@
 import * as iq from 'image-q';
 import { PNG } from 'pngjs/browser';
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
+import {
+    colorDistanceFormulaOptions,
+    DEFAULT_COLOR_DISTANCE_FORMULA,
+    DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
+    DEFAULT_PALETTE_QUANTIZATION_ALGORITHM,
+    imageQuantizationAlgorithmOptions,
+    ImageQuantizationSettingsType,
+    paletteQuantizationAlgorithmOptions
+} from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import BasicSelect, { BasicSelectOption } from '../../Common/BasicSelect';
+import BasicSelect from '../../Common/BasicSelect';
 import HContainer from '../../Common/HContainer';
-import { getMaxScaleInContainer } from '../../Common/Utils';
 import VContainer from '../../Common/VContainer';
 import Images from '../../ImageEditor/Images';
 import ColorModeSelect from './ColorModeSelect';
-
-export interface ImageQuantizationSettingsType {
-    colorDistanceFormula: iq.ColorDistanceFormula,
-    paletteQuantizationAlgorithm: iq.PaletteQuantization | 'none',
-    imageQuantizationAlgorithm: iq.ImageQuantization,
-}
-
-export const DEFAULT_COLOR_DISTANCE_FORMULA = 'euclidean';
-export const DEFAULT_PALETTE_QUANTIZATION_ALGORITHM = 'none';
-export const DEFAULT_IMAGE_QUANTIZATION_ALGORITHM = 'nearest';
 
 interface ImageQuantizationSettingsProps {
     image: string
@@ -31,123 +29,6 @@ interface ImageQuantizationSettingsProps {
     height: number
     width: number
 }
-
-const colorDistanceFormulaOptions: BasicSelectOption[] = [
-    {
-        label: 'CIE94 (Textiles)',
-        value: 'cie94-textiles'
-    },
-    {
-        label: 'CIE94 (Graphic Arts)',
-        value: 'cie94-graphic-arts'
-    },
-    {
-        label: 'CIEDE2000',
-        value: 'ciede2000'
-    },
-    {
-        label: 'Color Metric',
-        value: 'color-metric'
-    },
-    {
-        label: 'Euclidean',
-        value: 'euclidean'
-    },
-    {
-        label: 'Euclidean BT709',
-        value: 'euclidean-bt709'
-    },
-    {
-        label: 'Euclidean BT709 (No Alpha)',
-        value: 'euclidean-bt709-noalpha'
-    },
-    {
-        label: 'Manhattan',
-        value: 'manhattan'
-    },
-    {
-        label: 'Manhattan BT709',
-        value: 'manhattan-bt709'
-    },
-    {
-        label: 'Manhattan (nommyde)',
-        value: 'manhattan-nommyde'
-    },
-    {
-        label: 'PNGQuant',
-        value: 'pngquant'
-    },
-];
-
-const paletteQuantizationAlgorithmOptions: BasicSelectOption[] = [
-    {
-        label: 'None',
-        value: 'none'
-    },
-    {
-        label: 'NeuQuant (Integer)',
-        value: 'neuquant'
-    },
-    {
-        label: 'NeuQuant (Floating Point)',
-        value: 'neuquant-float'
-    },
-    {
-        label: 'RGBQuant',
-        value: 'rgbquant'
-    },
-    {
-        label: 'WuQuant',
-        value: 'wuquant'
-    },
-];
-
-const imageQuantizationAlgorithmOptions: BasicSelectOption[] = [
-    {
-        label: 'Nearest Color',
-        value: 'nearest'
-    },
-    {
-        label: 'Riemersma',
-        value: 'riemersma'
-    },
-    {
-        label: 'Floyd-Steinberg',
-        value: 'floyd-steinberg'
-    },
-    {
-        label: 'False Floyd Steinberg',
-        value: 'false-floyd-steinberg'
-    },
-    {
-        label: 'Stucki',
-        value: 'stucki'
-    },
-    {
-        label: 'Atkinson',
-        value: 'atkinson'
-    },
-    {
-        label: 'Jarvis',
-        value: 'jarvis'
-    },
-    {
-        label: 'Burkes',
-        value: 'burkes'
-    },
-    {
-        label: 'Sierra',
-        value: 'sierra'
-    },
-    {
-        label: 'Two-Row Sierra',
-        value: 'two-sierra'
-    },
-    {
-        label: 'Sierra Lite',
-        value: 'sierra-lite'
-    },
-];
 
 export default function ImageQuantizationSettings(props: ImageQuantizationSettingsProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
@@ -167,9 +48,6 @@ export default function ImageQuantizationSettings(props: ImageQuantizationSettin
     const [progress, setProgress] = useState<number>(0);
     const [targetPalette, setTargetPalette] = useState<iq.utils.Palette>();
 
-    const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
-    const resolvedImageUri = workspaceRootUri.resolve(image ?? '');
-
     const quantizeImage = async () => {
         setProgress(0);
         setResultImageBase64('');
@@ -177,7 +55,7 @@ export default function ImageQuantizationSettings(props: ImageQuantizationSettin
         if (imageData && targetPalette) {
             let pointContainer = iq.utils.PointContainer.fromUint8Array(imageData.data, imageData.width, imageData.height);
 
-            if (quantizationSettings?.paletteQuantizationAlgorithm && quantizationSettings?.paletteQuantizationAlgorithm !== 'none') {
+            if (quantizationSettings?.paletteQuantizationAlgorithm !== undefined && quantizationSettings?.paletteQuantizationAlgorithm !== 'none') {
                 const reducedPalette = await iq.buildPalette([pointContainer], {
                     colorDistanceFormula: quantizationSettings?.colorDistanceFormula ?? DEFAULT_COLOR_DISTANCE_FORMULA,
                     paletteQuantization: quantizationSettings?.paletteQuantizationAlgorithm,
@@ -204,20 +82,19 @@ export default function ImageQuantizationSettings(props: ImageQuantizationSettin
     };
 
     const readImageData = async () => {
-        const imageFileContent = await services.fileService.readFile(resolvedImageUri);
-        const data = PNG.sync.read(Buffer.from(imageFileContent.value.buffer));
+        let data;
+        if (image) {
+            const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
+            const resolvedImageUri = workspaceRootUri.resolve(image);
+            const imageFileContent = await services.fileService.readFile(resolvedImageUri);
+            data = PNG.sync.read(Buffer.from(imageFileContent.value.buffer));
+        }
         setImageData(data);
     };
 
-    const scale = useMemo(() => getMaxScaleInContainer(256, 256, height, width),
-        [
-            height,
-            width
-        ]);
-
     const buildTargetPalette = async () => {
         const palette = await iq.buildPalette([]);
-        const point0 = iq.utils.Point.createByRGBA(0, 0, 0, 0);
+        const point0 = iq.utils.Point.createByRGBA(0, 0, 0, 255);
         const pointMixed01 = iq.utils.Point.createByRGBA(42, 0, 0, 255);
         const point1 = iq.utils.Point.createByRGBA(85, 0, 0, 255);
         const pointMixed12 = iq.utils.Point.createByRGBA(127, 0, 0, 255);
@@ -248,14 +125,11 @@ export default function ImageQuantizationSettings(props: ImageQuantizationSettin
     ]);
 
     return (
-        <div className="jsonforms-container" style={{
-            height: '425px',
-            width: '564px'
-        }}>
+        <div className="jsonforms-container">
             <VContainer gap={10} style={{ padding: '1px' }}>
-                <VContainer>
-                    <HContainer>
-                        <VContainer>
+                <VContainer grow={1}>
+                    <HContainer grow={1}>
+                        <VContainer style={{ width: '50%' }}>
                             <label>Source</label>
                             <Images
                                 data={image ? [image] : []}
@@ -264,113 +138,111 @@ export default function ImageQuantizationSettings(props: ImageQuantizationSettin
                                 canSelectMany={false}
                                 stack={true}
                                 showMetaData={false}
-                                containerHeight={256}
-                                containerWidth={256}
-                                height={height}
-                                width={width}
+                                containerHeight={'100%'}
+                                containerWidth={'100%'}
                             />
                         </VContainer>
-                        {image &&
-                            <>
-                                <VContainer justifyContent="center">
-                                    <label>&nbsp;</label>
-                                    <i className="codicon codicon-arrow-right"></i>
-                                </VContainer>
-                                <VContainer>
-                                    <label>Result</label>
-                                    <div className="filePreviewImage" style={{
-                                        height: '256px',
-                                        width: '256px',
-                                    }}>
-                                        {!resultImageBase64
-                                            ? <VContainer
-                                                alignItems="center"
-                                                justifyContent="center"
-                                                style={{ lineHeight: 1 }}
-                                            >
+
+                        <VContainer justifyContent="center">
+                            <label>&nbsp;</label>
+                            <i className="codicon codicon-arrow-right"></i>
+                        </VContainer>
+                        <VContainer style={{ width: '50%' }}>
+                            <label>Result</label>
+                            <VContainer grow={1} style={{ position: 'relative' }}>
+                                <Images
+                                    data={image && resultImageBase64 ? [`data:image/png;base64,${resultImageBase64}`] : []}
+                                    allInFolderAsFallback={false}
+                                    canSelectMany={false}
+                                    stack={true}
+                                    showMetaData={false}
+                                    containerHeight={'100%'}
+                                    containerWidth={'100%'}
+                                />
+                                {!resultImageBase64 &&
+                                    <VContainer
+                                        alignItems="center"
+                                        justifyContent="center"
+                                        style={{
+                                            backgroundColor: 'var(--theia-activityBar-background)',
+                                            borderRadius: 2,
+                                            bottom: 0,
+                                            left: 0,
+                                            lineHeight: 1,
+                                            position: 'absolute',
+                                            right: 0,
+                                            top: 0,
+                                        }}
+                                    >
+                                        {image &&
+                                            <>
                                                 <i
                                                     className="codicon codicon-loading codicon-modifier-spin"
                                                     style={{ fontSize: '4rem', position: 'absolute' }}
                                                 ></i>
                                                 {Math.round(progress)}%
-                                            </VContainer>
-                                            : <>
-                                                <img
-                                                    src={`data:image/png;base64,${resultImageBase64}`}
-                                                    style={{
-                                                        backgroundColor: '#000',
-                                                        transform: `scale(${scale})`
-                                                    }}
-                                                />
-                                                {scale !== 1 &&
-                                                    <div
-                                                        className="fileZoom"
-                                                        title="Preview Zoom"
-                                                    >
-                                                        <i className="codicon codicon-zoom-in" /> {scale}
-                                                    </div>
-                                                }
                                             </>
                                         }
-                                    </div>
-                                </VContainer>
-                            </>
-                        }
-                    </HContainer>
-                    {height > 0 &&
-                        <VContainer style={{ opacity: .6 }}>
-                            {width} × {height} px
-                        </VContainer>
-                    }
-                </VContainer>
-                {image &&
-                    <>
-                        <HContainer gap={10}>
-                            <VContainer style={{ width: '50%' }}>
-                                <label>Image Quantization Algorithm</label>
-                                <BasicSelect
-                                    options={imageQuantizationAlgorithmOptions}
-                                    value={quantizationSettings?.imageQuantizationAlgorithm ?? DEFAULT_IMAGE_QUANTIZATION_ALGORITHM}
-                                    onChange={e => updateQuantizationSettings({
-                                        imageQuantizationAlgorithm: e.target.value as iq.ImageQuantization,
-                                    })}
-                                />
-                            </VContainer>
-                            <VContainer style={{ width: '50%' }}>
-                                <label>Palette Quantization Algorithm</label>
-                                <BasicSelect
-                                    options={paletteQuantizationAlgorithmOptions}
-                                    value={quantizationSettings?.paletteQuantizationAlgorithm ?? DEFAULT_PALETTE_QUANTIZATION_ALGORITHM}
-                                    onChange={e => updateQuantizationSettings({
-                                        paletteQuantizationAlgorithm: e.target.value as iq.PaletteQuantization,
-                                    })}
-                                />
-                            </VContainer>
-                        </HContainer>
-                        <HContainer gap={10}>
-                            <VContainer style={{ width: '50%' }}>
-                                <label>Color Distance Formula</label>
-                                <BasicSelect
-                                    options={colorDistanceFormulaOptions}
-                                    value={quantizationSettings?.colorDistanceFormula ?? DEFAULT_COLOR_DISTANCE_FORMULA}
-                                    onChange={e => updateQuantizationSettings({
-                                        colorDistanceFormula: e.target.value as iq.ColorDistanceFormula,
-                                    })}
-                                />
-                            </VContainer>
-                            <VContainer style={{ width: '50%' }}>
-                                {allowFrameBlendMode &&
-                                    <ColorModeSelect
-                                        value={colorMode}
-                                        setValue={newColorMode => updateColorMode(newColorMode)}
-                                        hoverService={services.hoverService}
-                                    />
+                                    </VContainer>
                                 }
-
                             </VContainer>
-                        </HContainer>
-                    </>
-                }
+                        </VContainer>
+                    </HContainer>
+                    <VContainer style={{ opacity: .6 }}>
+                        {height
+                            ? <>{width} × {height} px</>
+                            : <>&nbsp;</>
+                        }
+                    </VContainer>
+                </VContainer>
+                <HContainer gap={10}>
+                    <VContainer style={{ width: '50%' }}>
+                        <label>Image Quantization Algorithm</label>
+                        <BasicSelect
+                            options={imageQuantizationAlgorithmOptions}
+                            value={quantizationSettings?.imageQuantizationAlgorithm ?? DEFAULT_IMAGE_QUANTIZATION_ALGORITHM}
+                            onChange={e => updateQuantizationSettings({
+                                imageQuantizationAlgorithm: e.target.value as iq.ImageQuantization,
+                            })}
+                            disabled={!image}
+                        />
+                    </VContainer>
+                    <VContainer style={{ width: '50%' }}>
+                        <label>Palette Quantization Algorithm</label>
+                        <BasicSelect
+                            options={paletteQuantizationAlgorithmOptions}
+                            value={quantizationSettings?.paletteQuantizationAlgorithm ?? DEFAULT_PALETTE_QUANTIZATION_ALGORITHM}
+                            onChange={e => updateQuantizationSettings({
+                                paletteQuantizationAlgorithm: e.target.value as iq.PaletteQuantization,
+                            })}
+                            disabled={!image}
+                        />
+                    </VContainer>
+                </HContainer>
+                <HContainer gap={10}>
+                    <VContainer style={{ width: '50%' }}>
+                        <label>Color Distance Formula</label>
+                        <BasicSelect
+                            options={colorDistanceFormulaOptions}
+                            value={quantizationSettings?.colorDistanceFormula ?? DEFAULT_COLOR_DISTANCE_FORMULA}
+                            onChange={e => updateQuantizationSettings({
+                                colorDistanceFormula: e.target.value as iq.ColorDistanceFormula,
+                            })}
+                            disabled={!image}
+                        />
+                    </VContainer>
+                    <VContainer style={{ width: '50%' }}>
+                        {allowFrameBlendMode &&
+                            <ColorModeSelect
+                                value={colorMode}
+                                setValue={newColorMode => updateColorMode(newColorMode)}
+                                hoverService={services.hoverService}
+                                disabled={!image}
+                            />
+                        }
+
+                    </VContainer>
+                </HContainer>
             </VContainer>
         </div>
     );

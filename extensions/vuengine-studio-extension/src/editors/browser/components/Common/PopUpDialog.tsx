@@ -5,10 +5,12 @@ interface PopUpDialogProps {
     setOpen: (setOpen: boolean) => void;
     title: string;
     error?: string;
+    height?: string
+    width?: string
 }
 
 export default function PopUpDialog(props: PropsWithChildren<PopUpDialogProps>): React.JSX.Element {
-    const { open, setOpen, title, error, children } = props;
+    const { open, setOpen, title, error, height, width, children } = props;
 
     const close = () => setOpen(false);
 
@@ -25,7 +27,7 @@ export default function PopUpDialog(props: PropsWithChildren<PopUpDialogProps>):
             };
         }}
     >
-        <div className="dialogBlock"
+        <div className="dialogBlock" style={{ height, width }}
         >
             <div className="dialogTitle">
                 <div>{title}</div>
@@ -35,7 +37,7 @@ export default function PopUpDialog(props: PropsWithChildren<PopUpDialogProps>):
                 >
                 </i>
             </div>
-            <div className="dialogContent">
+            <div className="dialogContent" style={{ flexGrow: 1 }}>
                 {children}
             </div>
             <div className="dialogControl">

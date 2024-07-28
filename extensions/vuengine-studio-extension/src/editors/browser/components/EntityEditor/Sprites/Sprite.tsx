@@ -2,11 +2,12 @@ import { ArrowsHorizontal, ArrowsVertical } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
-import { ImageCompressionType } from '../../../../../images/browser/ves-images-types';
+import { ImageCompressionType, ImageQuantizationSettingsType } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { DataSection } from '../../Common/CommonTypes';
 import HContainer from '../../Common/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
+import PopUpDialog from '../../Common/PopUpDialog';
 import RadioSelect from '../../Common/RadioSelect';
 import SectionSelect from '../../Common/SectionSelect';
 import { clamp } from '../../Common/Utils';
@@ -22,8 +23,7 @@ import {
     SpriteData,
     SpriteImageData,
 } from '../EntityEditorTypes';
-import ImageQuantizationSettings, { ImageQuantizationSettingsType } from './ImageQuantizationSettings';
-import PopUpDialog from '../../Common/PopUpDialog';
+import ImageQuantizationSettings from './ImageQuantizationSettings';
 
 const MIN_REPEAT_SIZE = 0;
 const MAX_REPEAT_SIZE = 512;
@@ -386,10 +386,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                         canSelectMany={data.components?.animations.length > 0}
                                         stack={true}
                                         showMetaData={false}
-                                        containerHeight={80}
-                                        containerWidth={100}
-                                        height={dimensions[0].length > 1 ? dimensions[0][1] : 0}
-                                        width={dimensions[0].length > 1 ? dimensions[0][0] : 0}
+                                        containerHeight='80px'
+                                        containerWidth='100px'
                                         fileAddExtraAction={() => setQuantizationDialogOpen(true)}
                                     />
                                 </div>
@@ -468,10 +466,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                             canSelectMany={data.components?.animations.length > 0}
                                             stack={true}
                                             showMetaData={false}
-                                            containerHeight={80}
-                                            containerWidth={100}
-                                            height={dimensions[1].length > 1 ? dimensions[1][1] : 0}
-                                            width={dimensions[1].length > 1 ? dimensions[1][0] : 0}
+                                            containerHeight='80px'
+                                            containerWidth='100px'
                                         />
                                     </div>
                                     <VContainer grow={1} justifyContent="center">
@@ -880,6 +876,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 open={quantizationDialogOpen}
                 setOpen={setQuantizationDialogOpen}
                 title={nls.localize('vuengine/entityEditor/imageQuantizationSettings', 'Image Quantization Settings')}
+                height='100%'
+                width='100%'
             >
                 <ImageQuantizationSettings
                     image={sprite.texture?.files[0]}

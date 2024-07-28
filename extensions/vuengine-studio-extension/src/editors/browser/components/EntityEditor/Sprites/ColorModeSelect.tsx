@@ -10,10 +10,11 @@ interface ColorModeSelectProps {
     value: ColorMode
     setValue: (value: ColorMode) => void
     hoverService: HoverService
+    disabled?: boolean
 }
 
 export default function ColorModeSelect(props: ColorModeSelectProps): React.JSX.Element {
-    const { value, setValue, hoverService } = props;
+    const { value, setValue, hoverService, disabled } = props;
 
     return <VContainer>
         <InfoLabel
@@ -36,6 +37,7 @@ export default function ColorModeSelect(props: ColorModeSelectProps): React.JSX.
             }]}
             defaultValue={value}
             onChange={options => setValue(options[0].value as ColorMode)}
+            disabled={disabled}
         />
     </VContainer>;
 }
