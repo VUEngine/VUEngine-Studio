@@ -1,7 +1,18 @@
-import * as iq from 'image-q';
 import URI from '@theia/core/lib/common/uri';
+import * as iq from 'image-q';
+import { ColorMode } from '../../core/browser/ves-common-types';
+import { BasicSelectOption } from '../../editors/browser/components/Common/BasicSelect';
 import { DataSection } from '../../editors/browser/components/Common/CommonTypes';
-import { BasicSelectOption } from 'src/editors/browser/components/Common/BasicSelect';
+
+export const DEFAULT_COLOR_DISTANCE_FORMULA = 'euclidean';
+export const DEFAULT_PALETTE_QUANTIZATION_ALGORITHM = 'none';
+export const DEFAULT_IMAGE_QUANTIZATION_ALGORITHM = 'nearest';
+
+export const TILE_HEIGHT = 8;
+export const TILE_WIDTH = 8;
+export const TILES_PER_UINT32 = 4;
+export const BITS_PER_PIXEL = 2;
+export const PIXELS_BITS_PER_TILE = TILE_HEIGHT * TILE_WIDTH;
 
 export interface ImageConfig {
   files: string[]
@@ -19,6 +30,8 @@ export interface ImageConfig {
     compression: ImageCompressionType
   }
   animation: AnimationConfig
+  imageProcessingSettings: ImageProcessingSettings,
+  colorMode: ColorMode
 }
 
 export type ImageConfigWithName = ImageConfig & {
@@ -112,10 +125,16 @@ export const DEFAULT_IMAGE_CONVERTER_CONFIG: ImageConfig = {
     isAnimation: false,
     individualFiles: false,
     frames: 0,
-  }
+  },
+  imageProcessingSettings: {
+    colorDistanceFormula: DEFAULT_COLOR_DISTANCE_FORMULA,
+    paletteQuantizationAlgorithm: DEFAULT_PALETTE_QUANTIZATION_ALGORITHM,
+    imageQuantizationAlgorithm: DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
+  },
+  colorMode: ColorMode.Default
 };
 
-export interface ImageQuantizationSettingsType {
+export interface ImageProcessingSettings {
   colorDistanceFormula: iq.ColorDistanceFormula,
   paletteQuantizationAlgorithm: iq.PaletteQuantization | 'none',
   imageQuantizationAlgorithm: iq.ImageQuantization,
@@ -237,13 +256,3 @@ export const imageQuantizationAlgorithmOptions: BasicSelectOption[] = [
     value: 'sierra-lite'
   },
 ];
-
-export const DEFAULT_COLOR_DISTANCE_FORMULA = 'euclidean';
-export const DEFAULT_PALETTE_QUANTIZATION_ALGORITHM = 'none';
-export const DEFAULT_IMAGE_QUANTIZATION_ALGORITHM = 'nearest';
-
-export const TILE_HEIGHT = 8;
-export const TILE_WIDTH = 8;
-export const TILES_PER_UINT32 = 4;
-export const BITS_PER_PIXEL = 2;
-export const PIXELS_BITS_PER_TILE = TILE_HEIGHT * TILE_WIDTH;

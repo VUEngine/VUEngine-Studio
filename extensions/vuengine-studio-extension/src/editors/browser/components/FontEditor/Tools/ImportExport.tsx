@@ -1,7 +1,6 @@
 import { nls } from '@theia/core';
 import { OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import React, { useContext } from 'react';
-import { ImageData } from '../../../../../core/browser/ves-common-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { Size } from '../FontEditorTypes';
 
@@ -14,6 +13,7 @@ interface ImportExportProps {
 
 export default function ImportExport(props: ImportExportProps): React.JSX.Element {
     const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
+    /*
     const imageDataToCharacters = (imageData: ImageData): number[][][] => {
         const charactersPerLine = imageData.width / (props.size.x * 8);
 
@@ -44,6 +44,8 @@ export default function ImportExport(props: ImportExportProps): React.JSX.Elemen
 
         return characters;
     };
+    */
+
     const selectImageFile = async (): Promise<void> => {
         const openFileDialogProps: OpenFileDialogProps = {
             title: nls.localize('vuengine/fontEditor/selectImageToImport', 'Select image file to import'),

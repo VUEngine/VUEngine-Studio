@@ -1,5 +1,4 @@
 import * as iq from 'image-q';
-import { PNG } from 'pngjs/browser';
 import React, { useContext, useEffect, useState } from 'react';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
 import {
@@ -7,8 +6,8 @@ import {
     DEFAULT_COLOR_DISTANCE_FORMULA,
     DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
     DEFAULT_PALETTE_QUANTIZATION_ALGORITHM,
+    ImageProcessingSettings,
     imageQuantizationAlgorithmOptions,
-    ImageQuantizationSettingsType,
     paletteQuantizationAlgorithmOptions
 } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
@@ -18,11 +17,11 @@ import VContainer from '../../Common/VContainer';
 import Images from '../../ImageEditor/Images';
 import ColorModeSelect from './ColorModeSelect';
 
-interface ImageQuantizationSettingsProps {
+interface ImageProcessingSettingsFormProps {
     image: string
     setFiles: (files: string[]) => void
-    quantizationSettings: ImageQuantizationSettingsType
-    updateQuantizationSettings: (quantizationSettings: Partial<ImageQuantizationSettingsType>) => void
+    processingSettings: ImageProcessingSettings
+    updateProcessingSettings: (processingSettings: Partial<ImageProcessingSettings>) => void
     colorMode: ColorMode
     updateColorMode: (colorMode: ColorMode) => void
     allowFrameBlendMode: boolean
@@ -30,98 +29,39 @@ interface ImageQuantizationSettingsProps {
     width: number
 }
 
-export default function ImageQuantizationSettings(props: ImageQuantizationSettingsProps): React.JSX.Element {
+export default function ImageProcessingSettingsForm(props: ImageProcessingSettingsFormProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const {
         image,
         setFiles,
-        quantizationSettings,
-        updateQuantizationSettings,
+        processingSettings,
+        updateProcessingSettings,
         colorMode,
         updateColorMode,
         allowFrameBlendMode,
         height,
         width
     } = props;
-    const [imageData, setImageData] = useState<PNG>();
     const [resultImageBase64, setResultImageBase64] = useState<string>('');
     const [progress, setProgress] = useState<number>(0);
-    const [targetPalette, setTargetPalette] = useState<iq.utils.Palette>();
 
+    // TODO: just render sprite._imageData here instead?
     const quantizeImage = async () => {
         setProgress(0);
         setResultImageBase64('');
 
-        if (imageData && targetPalette) {
-            let pointContainer = iq.utils.PointContainer.fromUint8Array(imageData.data, imageData.width, imageData.height);
-
-            if (quantizationSettings?.paletteQuantizationAlgorithm !== undefined && quantizationSettings?.paletteQuantizationAlgorithm !== 'none') {
-                const reducedPalette = await iq.buildPalette([pointContainer], {
-                    colorDistanceFormula: quantizationSettings?.colorDistanceFormula ?? DEFAULT_COLOR_DISTANCE_FORMULA,
-                    paletteQuantization: quantizationSettings?.paletteQuantizationAlgorithm,
-                    colors: colorMode === ColorMode.FrameBlend ? 7 : 4,
-                });
-                pointContainer = await iq.applyPalette(pointContainer, reducedPalette);
-            }
-
-            const outPointContainer = await iq.applyPalette(pointContainer, targetPalette, {
-                colorDistanceFormula: quantizationSettings?.colorDistanceFormula ?? DEFAULT_COLOR_DISTANCE_FORMULA,
-                imageQuantization: quantizationSettings?.imageQuantizationAlgorithm ?? DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
-                onProgress: p => setProgress(p),
-            });
-
-            const output = PNG.sync.write({
-                ...imageData,
-                data: Buffer.from(outPointContainer.toUint8Array())
-            } as PNG, {
-                // colorType: 3
-            });
-
+        if (image !== undefined && processingSettings !== undefined && colorMode !== undefined) {
+            const output = await services.vesImagesService.quantizeImage(image, processingSettings, colorMode, setProgress);
             setResultImageBase64(Buffer.from(output).toString('base64'));
         }
     };
 
-    const readImageData = async () => {
-        let data;
-        if (image) {
-            const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
-            const resolvedImageUri = workspaceRootUri.resolve(image);
-            const imageFileContent = await services.fileService.readFile(resolvedImageUri);
-            data = PNG.sync.read(Buffer.from(imageFileContent.value.buffer));
-        }
-        setImageData(data);
-    };
-
-    const buildTargetPalette = async () => {
-        const palette = await iq.buildPalette([]);
-        const point0 = iq.utils.Point.createByRGBA(0, 0, 0, 255);
-        const pointMixed01 = iq.utils.Point.createByRGBA(42, 0, 0, 255);
-        const point1 = iq.utils.Point.createByRGBA(85, 0, 0, 255);
-        const pointMixed12 = iq.utils.Point.createByRGBA(127, 0, 0, 255);
-        const point2 = iq.utils.Point.createByRGBA(170, 0, 0, 255);
-        const pointMixed23 = iq.utils.Point.createByRGBA(212, 0, 0, 255);
-        const point3 = iq.utils.Point.createByRGBA(255, 0, 0, 255);
-        const paletteColors = colorMode === ColorMode.FrameBlend
-            ? [point0, pointMixed01, point1, pointMixed12, point2, pointMixed23, point3]
-            : [point0, point1, point2, point3];
-        paletteColors.forEach(pc => palette.add(pc));
-        setTargetPalette(palette);
-    };
-
-    useEffect(() => {
-        readImageData();
-    }, [image]);
-
-    useEffect(() => {
-        buildTargetPalette();
-    }, [colorMode]);
-
     useEffect(() => {
         quantizeImage();
     }, [
-        imageData,
-        quantizationSettings,
-        targetPalette,
+        image,
+        processingSettings,
+        colorMode,
     ]);
 
     return (
@@ -200,8 +140,8 @@ export default function ImageQuantizationSettings(props: ImageQuantizationSettin
                         <label>Image Quantization Algorithm</label>
                         <BasicSelect
                             options={imageQuantizationAlgorithmOptions}
-                            value={quantizationSettings?.imageQuantizationAlgorithm ?? DEFAULT_IMAGE_QUANTIZATION_ALGORITHM}
-                            onChange={e => updateQuantizationSettings({
+                            value={processingSettings?.imageQuantizationAlgorithm ?? DEFAULT_IMAGE_QUANTIZATION_ALGORITHM}
+                            onChange={e => updateProcessingSettings({
                                 imageQuantizationAlgorithm: e.target.value as iq.ImageQuantization,
                             })}
                             disabled={!image}
@@ -211,8 +151,8 @@ export default function ImageQuantizationSettings(props: ImageQuantizationSettin
                         <label>Palette Quantization Algorithm</label>
                         <BasicSelect
                             options={paletteQuantizationAlgorithmOptions}
-                            value={quantizationSettings?.paletteQuantizationAlgorithm ?? DEFAULT_PALETTE_QUANTIZATION_ALGORITHM}
-                            onChange={e => updateQuantizationSettings({
+                            value={processingSettings?.paletteQuantizationAlgorithm ?? DEFAULT_PALETTE_QUANTIZATION_ALGORITHM}
+                            onChange={e => updateProcessingSettings({
                                 paletteQuantizationAlgorithm: e.target.value as iq.PaletteQuantization,
                             })}
                             disabled={!image}
@@ -224,8 +164,8 @@ export default function ImageQuantizationSettings(props: ImageQuantizationSettin
                         <label>Color Distance Formula</label>
                         <BasicSelect
                             options={colorDistanceFormulaOptions}
-                            value={quantizationSettings?.colorDistanceFormula ?? DEFAULT_COLOR_DISTANCE_FORMULA}
-                            onChange={e => updateQuantizationSettings({
+                            value={processingSettings?.colorDistanceFormula ?? DEFAULT_COLOR_DISTANCE_FORMULA}
+                            onChange={e => updateProcessingSettings({
                                 colorDistanceFormula: e.target.value as iq.ColorDistanceFormula,
                             })}
                             disabled={!image}

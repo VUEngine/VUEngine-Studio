@@ -91,10 +91,11 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     const allImageData: number[][][][] = [[], [], [], []];
 
     if (!sprite._imageData || typeof sprite._imageData === 'number') {
+      setIsGenerating(false);
       return setImageError('no image data');
     }
 
-    await Promise.all(sprite._imageData.images.map(async (singleImageData, i) => {
+    await Promise.all(sprite._imageData?.images.map(async (singleImageData, i) => {
       const decompressedTileData = await services.vesCommonService.uncompressJson(singleImageData.tiles?.data) as string[];
       if (singleImageData.maps) {
         await Promise.all(singleImageData.maps.map(async (singleImageDataMap, j) => {
@@ -104,7 +105,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         }));
       }
     }));
-    if (allImageData[0][0].length && allImageData[0][0][0].length) {
+    if (allImageData[0].length && allImageData[0][0].length && allImageData[0][0][0].length) {
       setError(undefined);
       setHeight(allImageData[0][0].length);
       setWidth(allImageData[0][0][0].length);
@@ -202,7 +203,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
       onClick={handleClick}
       style={{ position: 'absolute' }}
     >
-      {isRepeated &&
+      {!error && isRepeated &&
         <CanvasImage
           height={effectiveHeight}
           palette={palette}

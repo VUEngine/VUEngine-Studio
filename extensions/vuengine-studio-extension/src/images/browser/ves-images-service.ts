@@ -1,10 +1,15 @@
 import { isWindows } from '@theia/core';
 import { LabelProvider } from '@theia/core/lib/browser';
+import { BinaryBuffer } from '@theia/core/lib/common/buffer';
+import { Deferred } from '@theia/core/lib/common/promise-util';
 import URI from '@theia/core/lib/common/uri';
-import { inject, injectable } from '@theia/core/shared/inversify';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import * as iq from 'image-q';
+import { PNG, PNGWithMetadata } from 'pngjs/browser';
 import { VesCommonService } from '../../core/browser/ves-common-service';
+import { ColorMode } from '../../core/browser/ves-common-types';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 import { compressTiles } from './ves-images-compressor';
@@ -12,9 +17,12 @@ import {
   COMPRESSION_FLAG_LENGTH,
   ConversionResult,
   ConvertedFileData,
+  DEFAULT_COLOR_DISTANCE_FORMULA,
+  DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
   ImageCompressionType,
   ImageConfig,
-  ImageConfigWithName
+  ImageConfigWithName,
+  ImageProcessingSettings
 } from './ves-images-types';
 
 @injectable()
@@ -32,6 +40,23 @@ export class VesImagesService {
   @inject(WorkspaceService)
   protected readonly workspaceService: WorkspaceService;
 
+  protected _ready = new Deferred<void>();
+  get ready(): Promise<void> {
+    return this._ready.promise;
+  }
+
+  protected targetPalettes: iq.utils.Palette[];
+
+  @postConstruct()
+  protected init(): void {
+    this.doInit();
+  }
+
+  protected async doInit(): Promise<void> {
+    await this.buildPalettes();
+    this._ready.resolve();
+  }
+
   async convertImage(imageConfigFileUri: URI, imageConfig: ImageConfigWithName, filePath?: string): Promise<ConversionResult> {
     const result: ConversionResult = {
       animation: {},
@@ -45,7 +70,7 @@ export class VesImagesService {
       },
     };
 
-    // throw at grit
+    // gather grit options
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     const files = filePath
@@ -56,10 +81,6 @@ export class VesImagesService {
           .sort((a, b) => a.localeCompare(b))
           .map(p => workspaceRootUri.relative(imageConfigFileUri.parent.resolve(p))?.toString()!);
     const gritUri = await this.getGritUri();
-    const imagePaths: string[] = [];
-    files.map(f => {
-      imagePaths.push(workspaceRootUri.resolve(f).path.fsPath());
-    });
     const name = imageConfig.name ? imageConfig.name : imageConfigFileUri.path.name;
     const gritArguments = this.getGritArguments(name, imageConfig);
     const tempDirName = `grit-${this.vesCommonService.nanoid()}`;
@@ -69,10 +90,22 @@ export class VesImagesService {
       await this.fileService.createFolder(tempDirUri);
     }
 
+    // preprocess images
+    const processedImagePaths: string[] = [];
+    await Promise.all(files.map(async imagePath => {
+      const processedImage = await this.quantizeImage(imagePath, imageConfig.imageProcessingSettings, imageConfig.colorMode);
+      const filename = workspaceRootUri.resolve(imagePath).path.name;
+      const randomFileUri = tempDirUri.resolve(`${filename}.png`);
+      // @ts-ignore
+      await this.fileService.writeFile(randomFileUri, BinaryBuffer.fromString(processedImage));
+      processedImagePaths.push(randomFileUri.path.fsPath());
+    }));
+
+    // throw at grit
     const processInfo = await this.vesProcessService.launchProcess(VesProcessType.Raw, {
       command: await this.fileService.fsPath(gritUri),
       args: [
-        ...imagePaths,
+        ...processedImagePaths,
         ...gritArguments
       ],
       options: {
@@ -191,6 +224,49 @@ export class VesImagesService {
           resolve(result);
         }
       });
+    });
+  }
+
+  async quantizeImage(
+    imagePath: string,
+    processingSettings: ImageProcessingSettings,
+    colorMode: ColorMode,
+    setProgress?: (p: number) => void
+  ): Promise<Buffer> {
+    await this.workspaceService.ready;
+    await this.ready;
+
+    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
+    const resolvedImageUri = workspaceRootUri.resolve(imagePath);
+    const imageFileContent = await this.fileService.readFile(resolvedImageUri);
+    const imageData = PNG.sync.read(Buffer.from(imageFileContent.value.buffer));
+
+    let pointContainer = iq.utils.PointContainer.fromUint8Array(imageData.data, imageData.width, imageData.height);
+
+    if (processingSettings?.paletteQuantizationAlgorithm !== 'none') {
+      const reducedPalette = await iq.buildPalette([pointContainer], {
+        colorDistanceFormula: processingSettings?.colorDistanceFormula ?? DEFAULT_COLOR_DISTANCE_FORMULA,
+        paletteQuantization: processingSettings?.paletteQuantizationAlgorithm,
+        colors: colorMode === ColorMode.FrameBlend ? 7 : 4,
+      });
+      pointContainer = await iq.applyPalette(pointContainer, reducedPalette);
+    }
+
+    const outPointContainer = await iq.applyPalette(pointContainer, this.targetPalettes[colorMode], {
+      colorDistanceFormula: processingSettings?.colorDistanceFormula ?? DEFAULT_COLOR_DISTANCE_FORMULA,
+      imageQuantization: processingSettings?.imageQuantizationAlgorithm ?? DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
+      onProgress: p => {
+        if (setProgress) {
+          setProgress(p);
+        }
+      },
+    });
+
+    return PNG.sync.write({
+      ...imageData,
+      data: Buffer.from(outPointContainer.toUint8Array())
+    } as PNGWithMetadata, {
+      // colorType: 3
     });
   }
 
@@ -327,4 +403,27 @@ export class VesImagesService {
       .resolve('grit')
       .resolve(isWindows ? 'grit.exe' : 'grit');
   }
+
+  protected async buildPalettes(): Promise<void> {
+    this.targetPalettes = [
+      await this.buildPalette(ColorMode.Default),
+      await this.buildPalette(ColorMode.FrameBlend),
+    ];
+  }
+
+  protected async buildPalette(colorMode: ColorMode): Promise<iq.utils.Palette> {
+    const palette = await iq.buildPalette([]);
+    const point0 = iq.utils.Point.createByRGBA(0, 0, 0, 255);
+    const pointMixed01 = iq.utils.Point.createByRGBA(42, 0, 0, 255);
+    const point1 = iq.utils.Point.createByRGBA(85, 0, 0, 255);
+    const pointMixed12 = iq.utils.Point.createByRGBA(127, 0, 0, 255);
+    const point2 = iq.utils.Point.createByRGBA(170, 0, 0, 255);
+    const pointMixed23 = iq.utils.Point.createByRGBA(212, 0, 0, 255);
+    const point3 = iq.utils.Point.createByRGBA(255, 0, 0, 255);
+    const paletteColors = colorMode === ColorMode.FrameBlend
+      ? [point0, pointMixed01, point1, pointMixed12, point2, pointMixed23, point3]
+      : [point0, point1, point2, point3];
+    paletteColors.forEach(pc => palette.add(pc));
+    return palette;
+  };
 }

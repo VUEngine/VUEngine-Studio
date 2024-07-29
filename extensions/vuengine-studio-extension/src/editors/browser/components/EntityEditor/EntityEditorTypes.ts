@@ -1,6 +1,6 @@
 import React from 'react';
 import { ColorMode } from '../../../../core/browser/ves-common-types';
-import { ConversionResult, ImageCompressionType, ImageQuantizationSettingsType } from '../../../../images/browser/ves-images-types';
+import { ConversionResult, ImageCompressionType, ImageProcessingSettings } from '../../../../images/browser/ves-images-types';
 import { DataSection } from '../Common/CommonTypes';
 import {
     Axis,
@@ -138,7 +138,7 @@ export interface SpriteData {
     _imageData?: SpriteImageData | number
     name: string
     sourceType: SpriteSourceType
-    imageQuantizationSettings: ImageQuantizationSettingsType,
+    imageProcessingSettings: ImageProcessingSettings,
     bgmapMode: BgmapMode
     colorMode: ColorMode
     displayMode: DisplayMode
