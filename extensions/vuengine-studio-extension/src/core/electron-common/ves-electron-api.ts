@@ -1,11 +1,9 @@
 import { JsonSchema } from '@jsonforms/core';
 import { Disposable } from '@theia/core/lib/common/disposable';
-import { FileContent } from '@theia/filesystem/lib/common/files';
 import { GlobOptionsWithFileTypesUnset } from 'glob';
 import { ISizeCalculationResult } from 'image-size/dist/types/interface';
 import { VisitOptions } from 'sort-json';
 import { Systeminformation } from 'systeminformation';
-import { ImageData } from '../browser/ves-common-types';
 
 export interface VesCoreAPI {
     setZoomFactor(zoomFactor: number): void;
@@ -20,7 +18,6 @@ export interface VesCoreAPI {
     decompress(archivePath: string, targetPath: string): Promise<string[]>;
     getImageDimensions(path: string): ISizeCalculationResult;
     getCpuInformation(): Promise<Systeminformation.CpuData>;
-    parsePng(fileContent: FileContent): Promise<ImageData | false>;
     onUsbDeviceChange(handler: () => void): Disposable;
     onSerialDeviceChange(handler: () => void): Disposable;
     sendTouchBarCommand(command: string, data?: any): void;
@@ -43,7 +40,6 @@ export const VES_CHANNEL_FIND_FILES = 'vesFindFiles';
 export const VES_CHANNEL_GET_IMAGE_DIMENSIONS = 'vesGetIageDimensions';
 export const VES_CHANNEL_GET_CPU_INFORMATION = 'vesGetCpuInformation';
 export const VES_CHANNEL_GET_TEMP_DIR = 'vesGetTempDir';
-export const VES_CHANNEL_PARSE_PNG = 'vesParsePng';
 export const VES_CHANNEL_ON_USB_DEVICE_CHANGE = 'vesOnUsbDeviceChange';
 export const VES_CHANNEL_ON_SERIAL_DEVICE_CHANGE = 'vesOnSerialDeviceChange';
 export const VES_CHANNEL_SEND_TOUCHBAR_COMMAND = 'vesSendTouchBarCommand';

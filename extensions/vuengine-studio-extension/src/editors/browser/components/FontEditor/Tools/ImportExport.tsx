@@ -54,6 +54,7 @@ export default function ImportExport(props: ImportExportProps): React.JSX.Elemen
         const currentPath = await services.fileService.resolve(fileUri);
         const uri = await services.fileDialogService.showOpenDialog(openFileDialogProps, currentPath);
         if (uri) {
+            /*
             const fileContent = await services.fileService.readFile(uri);
             const imgData = await window.electronVesCore.parsePng(fileContent);
             if (imgData !== false) {
@@ -63,6 +64,7 @@ export default function ImportExport(props: ImportExportProps): React.JSX.Elemen
                     nls.localize('vuengine/fontEditor/errorImporting', 'There was as error importing the PNG file.')
                 );
             }
+            */
         }
     };
 
