@@ -72,7 +72,10 @@ export class VesCommonService {
   }
 
   cleanSpecName(name: string): string {
-    return name.replace(/[^A-Za-z0-9_]/g, '');
+    return name
+      .replace(/[-\s]/g, '_') // replace some by underscore
+      .replace(/[^A-Za-z0-9_]/g, '') // remove all that are not of the given characters
+      .replace(/[_+]/g, '_'); // replace multiple underscores by one
   }
 
   base64ToBytes(base64: string): Uint8Array {

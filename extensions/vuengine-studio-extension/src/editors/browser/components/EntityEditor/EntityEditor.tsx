@@ -240,7 +240,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
         if (s.texture?.files?.length) {
           if (s.texture?.files?.length) {
             const maps: ConversionResultMapData[] = [];
-            const name = workspaceRootUri.resolve(s.texture.files[0]).path.name;
+            const name = services.vesCommonService.cleanSpecName(workspaceRootUri.resolve(s.texture.files[0]).path.name);
             const foundMap = newImageData.maps.find(m => m.name === name);
             if (foundMap) {
               maps.push(foundMap);
