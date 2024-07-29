@@ -241,3 +241,9 @@ export const imageQuantizationAlgorithmOptions: BasicSelectOption[] = [
 export const DEFAULT_COLOR_DISTANCE_FORMULA = 'euclidean';
 export const DEFAULT_PALETTE_QUANTIZATION_ALGORITHM = 'none';
 export const DEFAULT_IMAGE_QUANTIZATION_ALGORITHM = 'nearest';
+
+export const TILE_HEIGHT = 8;
+export const TILE_WIDTH = 8;
+export const TILES_PER_UINT32 = 4;
+export const BITS_PER_PIXEL = 2;
+export const PIXELS_BITS_PER_TILE = TILE_HEIGHT * TILE_WIDTH;
