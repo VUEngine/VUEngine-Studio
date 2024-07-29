@@ -7,18 +7,15 @@ import {
     IpcMainEvent,
     ipcMain, systemPreferences
 } from '@theia/electron/shared/electron';
-import { FileContent } from '@theia/filesystem/lib/common/files';
 import { getTempDir } from '@theia/plugin-ext/lib/main/node/temp-dir-util';
 import * as decompress from 'decompress';
 import { WebContents } from 'electron';
 import { glob } from 'glob';
 import sizeOf from 'image-size';
 import { injectable } from 'inversify';
-import { PNG } from 'pngjs';
 import sortJson from 'sort-json';
 import * as si from 'systeminformation';
 import zlib from 'zlib';
-import { ImageData } from '../browser/ves-common-types';
 import {
     VES_CHANNEL_CHECK_UPDATE_AVAILABLE,
     VES_CHANNEL_DECOMPRESS,
@@ -31,7 +28,6 @@ import {
     VES_CHANNEL_ON_SERIAL_DEVICE_CHANGE,
     VES_CHANNEL_ON_TOUCHBAR_EVENT,
     VES_CHANNEL_ON_USB_DEVICE_CHANGE,
-    VES_CHANNEL_PARSE_PNG,
     VES_CHANNEL_REPLACE_IN_FILES,
     VES_CHANNEL_SEND_TOUCHBAR_COMMAND,
     VES_CHANNEL_SET_ZOOM_FACTOR,
@@ -105,42 +101,6 @@ export class VesMainApi implements ElectronMainApplicationContribution {
             event.returnValue = sizeOf(path);
         });
         ipcMain.handle(VES_CHANNEL_GET_CPU_INFORMATION, async () => si.cpu());
-        ipcMain.handle(VES_CHANNEL_PARSE_PNG, async (event, fileContent: FileContent) => {
-            let imageData: ImageData | false = false;
-
-            await new Promise<void>((resolve, reject) => {
-                new PNG({
-                    // keepIndexed: true,
-                }).parse(Buffer.from(fileContent.value.buffer), (error: unknown, data: unknown): void => {
-                    if (error) {
-                        console.error('Error while parsing PNG', error, data);
-                        resolve();
-                    }
-                }).on('parsed', function (): void {
-                    const png = this;
-
-                    const height = png.height;
-                    const width = png.width;
-                    // @ts-ignore
-                    const colorType = png._parser._parser._colorType;
-
-                    const pixelData: number[][] = [];
-                    [...Array(height)].map((h, y) => {
-                        const line: number[] = [];
-                        [...Array(width)].map((w, x) => {
-                            line.push(png.data[y * width + x]);
-                        });
-                        pixelData.push(line);
-                    });
-
-                    imageData = { height, width, colorType, pixelData };
-
-                    resolve();
-                });
-            });
-
-            return imageData;
-        });
     }
 }
 

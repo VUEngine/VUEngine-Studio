@@ -1,11 +1,9 @@
 import { JsonSchema } from '@jsonforms/core';
 import { Disposable } from '@theia/core/lib/common/disposable';
-import { FileContent } from '@theia/filesystem/lib/common/files';
 import { GlobOptionsWithFileTypesUnset } from 'glob';
 import { ISizeCalculationResult } from 'image-size/dist/types/interface';
 import { VisitOptions } from 'sort-json';
 import { Systeminformation } from 'systeminformation';
-import { ImageData } from '../browser/ves-common-types';
 import {
     VES_CHANNEL_CHECK_UPDATE_AVAILABLE,
     VES_CHANNEL_DECOMPRESS,
@@ -18,7 +16,6 @@ import {
     VES_CHANNEL_ON_SERIAL_DEVICE_CHANGE,
     VES_CHANNEL_ON_TOUCHBAR_EVENT,
     VES_CHANNEL_ON_USB_DEVICE_CHANGE,
-    VES_CHANNEL_PARSE_PNG,
     VES_CHANNEL_REPLACE_IN_FILES,
     VES_CHANNEL_SEND_TOUCHBAR_COMMAND,
     VES_CHANNEL_SET_ZOOM_FACTOR,
@@ -65,9 +62,6 @@ const api: VesCoreAPI = {
     },
     getCpuInformation: function (): Promise<Systeminformation.CpuData> {
         return ipcRenderer.invoke(VES_CHANNEL_GET_CPU_INFORMATION);
-    },
-    parsePng: async function (fileContent: FileContent): Promise<ImageData | false> {
-        return ipcRenderer.invoke(VES_CHANNEL_PARSE_PNG, fileContent);
     },
     onUsbDeviceChange: function (handler: () => void): Disposable {
         const h = (_event: unknown) => {
