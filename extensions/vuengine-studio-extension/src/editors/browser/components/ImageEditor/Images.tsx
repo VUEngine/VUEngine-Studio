@@ -1,5 +1,6 @@
 import { Image, Images as ImagesIcon } from '@phosphor-icons/react';
 import { MaybeArray, URI, nls } from '@theia/core';
+import { ConfirmDialog } from '@theia/core/lib/browser';
 import { OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import React, { useContext, useEffect, useState } from 'react';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
@@ -88,6 +89,44 @@ export default function Images(props: ImagesProps): React.JSX.Element {
         data
     ]);
 
+    const confirmSaveCopy = async (sourceUri: URI, targetUri: URI): Promise<boolean> => {
+        const dialog = new ConfirmDialog({
+            title: nls.localize('vuengine/imageEditor/saveCopy', 'Save Copy'),
+            msg: nls.localize(
+                'vuengine/imageEditor/areYouSureYouWantToSaveACopyInWorkspace',
+                'Only files in the current workspace folder can be used. ' +
+                'Do you want to save a copy of "{0}" ' +
+                'in the workspace to be able to use this file?',
+                targetUri.path.base
+            ),
+            maxWidth: 400,
+        });
+        const confirmed = await dialog.open();
+        if (confirmed) {
+            // TODO: the save dialog must not allow to navigate out of the workspace
+            /*
+            const saveFilterDialogProps: SaveFileDialogProps = {
+                title: nls.localize('vuengine/imageEditor/saveCopy', 'Save Copy'),
+                inputValue: filename,
+                filters: { 'PNG': ['png'] }
+            };
+            const selected = await services.fileDialogService.showSaveDialog(
+                saveFilterDialogProps,
+                baseFolder
+            );
+            */
+            try {
+                await services.fileService.copy(sourceUri, targetUri);
+            } catch (error) {
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
+    };
+
     const selectFiles = async (): Promise<void> => {
         const openFileDialogProps: OpenFileDialogProps = {
             title: nls.localize('vuengine/imageEditor/selectFiles', 'Select files'),
@@ -103,14 +142,17 @@ export default function Images(props: ImagesProps): React.JSX.Element {
             if (!Array.isArray(uris)) {
                 uris = [uris];
             }
-            await Promise.all(uris.map(async u => {
-                const source = await services.fileService.resolve(u);
+            await Promise.all(uris.map(async uri => {
+                const source = await services.fileService.resolve(uri);
                 if (source.isFile) {
-                    const relativePath = workspaceRootUri.relative(u);
+                    const relativePath = workspaceRootUri.relative(uri);
                     if (!relativePath) {
-                        services.messageService.error(
-                            nls.localize('vuengine/imageEditor/errorSourceFileMustBeInWorkspace', 'Source file must live in workspace.')
-                        );
+                        const targetUri = fileUri.parent.resolve(source.resource.path.base);
+                        const relativeTargetFilePath = workspaceRootUri.relative(targetUri)?.toString().replace(/\\/g, '/');
+                        const confirmed = await confirmSaveCopy(uri as URI, targetUri);
+                        if (confirmed && relativeTargetFilePath) {
+                            newFiles.push(relativeTargetFilePath);
+                        }
                     } else {
                         newFiles.push(relativePath.toString().replace(/\\/g, '/'));
                     }
