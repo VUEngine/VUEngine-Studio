@@ -75,6 +75,7 @@ export class VesCommonService {
     return name
       .replace(/[-\s]/g, '_') // replace some by underscore
       .replace(/[^A-Za-z0-9_]/g, '') // remove all that are not of the given characters
+      .replace(/^[0-9]+/, '_') // replace leading numbers
       .replace(/[_+]/g, '_'); // replace multiple underscores by one
   }
 

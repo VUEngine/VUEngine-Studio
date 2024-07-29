@@ -170,8 +170,8 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
   }
 
   protected async appendImageData(entityData: EntityData): Promise<EntityData> {
-    const { setGeneratingProgress } = this.props.context;
-    const { fileUri, services } = this.props.context;
+    const { fileUri, services, setGeneratingProgress } = this.props.context;
+    const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
 
     const mostFilesOnASprite = this.getMostFilesOnASprite(entityData);
     const isMultiFileAnimation = entityData.components?.animations.length > 0 && mostFilesOnASprite > 1;
@@ -213,6 +213,11 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
         });
       });
 
+      if (!files.length) {
+        return entityData;
+      }
+
+      const name = services.vesCommonService.cleanSpecName(workspaceRootUri.resolve(files[0]).path.name);
       const newImageData = await services.vesImagesService.convertImage(fileUri, {
         ...baseConfig,
         section: entityData.components?.sprites.length > 0
@@ -231,16 +236,15 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
             : ImageCompressionType.NONE,
         },
         files,
+        name,
       });
 
       // map imagedata back to sprites
       await services.workspaceService.ready;
-      const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
       await Promise.all(entityData.components?.sprites?.map(async (s, i) => {
         if (s.texture?.files?.length) {
           if (s.texture?.files?.length) {
             const maps: ConversionResultMapData[] = [];
-            const name = services.vesCommonService.cleanSpecName(workspaceRootUri.resolve(s.texture.files[0]).path.name);
             const foundMap = newImageData.maps.find(m => m.name === name);
             if (foundMap) {
               maps.push(foundMap);
@@ -288,10 +292,11 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
             };
             await Promise.all(files.map(async (f, j) => {
               if (f?.length) {
+                const name = services.vesCommonService.cleanSpecName(workspaceRootUri.resolve(f[0]).path.name);
                 const nameSuffix = files.length === 2 ? j ? 'R' : 'L' : '';
                 const newImageData = await services.vesImagesService.convertImage(fileUri, {
                   ...baseConfig,
-                  name: baseConfig.name + nameSuffix,
+                  name: name + nameSuffix,
                   section: sprite.section,
                   map: {
                     ...baseConfig.map,

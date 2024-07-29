@@ -1,10 +1,10 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { ImageData } from '../../../../../core/browser/ves-common-types';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { ConversionResultMapData, PIXELS_BITS_PER_TILE, TILE_HEIGHT, TILE_WIDTH, TILES_PER_UINT32 } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import CanvasImage from '../../Common/CanvasImage';
+import VContainer from '../../Common/VContainer';
 import { BgmapMode, DisplayMode, SpriteType, Transparency } from '../../Common/VUEngineTypes';
 import { EntityEditorContext, EntityEditorContextType, SpriteData } from '../EntityEditorTypes';
-import VContainer from '../../Common/VContainer';
 
 interface SpriteProps {
   animate: boolean
@@ -16,9 +16,47 @@ interface SpriteProps {
   palette: string
 }
 
+const imageDataToPixelData = (tilesData: string[], mapData: ConversionResultMapData): number[][] => {
+  const pixelData: number[][] = [];
+
+  for (let mapY = 0; mapY < mapData.height; mapY++) {
+    for (let mapX = 0; mapX < mapData.width; mapX++) {
+
+      // combine 4 (TILES_PER_UINT32) adjacent values to get one tile
+      const tileStartIndex = parseInt(mapData.data[mapX + (mapY * mapData.width)] ?? 1, 16) * TILES_PER_UINT32;
+      let combinedTileData = '';
+      for (let tileSegmentIndex = 0; tileSegmentIndex < TILES_PER_UINT32; tileSegmentIndex++) {
+        const tileData = tilesData[tileStartIndex + tileSegmentIndex] ?? 0;
+        const tileValue = parseInt(`0x${tileData}`);
+        combinedTileData = tileValue.toString(2).padStart(32, '0') + combinedTileData;
+      }
+
+      // get current tile's pixels
+      for (let tileY = 0; tileY < TILE_HEIGHT; tileY++) {
+        const pixelYPosition = (mapY * TILE_HEIGHT) + tileY;
+        for (let tileX = 0; tileX < TILE_WIDTH; tileX++) {
+          const pixelXPosition = (mapX * TILE_WIDTH) + tileX;
+          // find the current pixel's value by getting 2 offset bits from combined tile data
+          // (reverted, first pixel is last in data)
+          const pixelIndex = 2 * (PIXELS_BITS_PER_TILE - (tileY * TILE_HEIGHT) - tileX);
+          const pixelValue = parseInt(combinedTileData.substring(pixelIndex - 2, pixelIndex), 2);
+          // set pixel value
+          if (!pixelData[pixelYPosition]) {
+            pixelData[pixelYPosition] = [];
+          }
+          pixelData[pixelYPosition][pixelXPosition] = pixelValue;
+        }
+      }
+
+    }
+  }
+
+  return pixelData;
+};
+
 export default function Sprite(props: SpriteProps): React.JSX.Element {
   const { data, state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
-  const { setIsGenerating, setGeneratingProgress, services } = useContext(EditorsContext) as EditorsContextType;
+  const { setIsGenerating, services } = useContext(EditorsContext) as EditorsContextType;
   const {
     animate,
     frames,
@@ -28,7 +66,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     palette,
     sprite,
   } = props;
-  const [imageData, setImageData] = useState<ImageData[][]>([]);
+  const [imageData, setImageData] = useState<number[][][][]>([]);
   const [height, setHeight] = useState<number>(0);
   const [width, setWidth] = useState<number>(0);
   const [error, setError] = useState<string>();
@@ -50,58 +88,28 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
 
   const getData = async () => {
     setIsGenerating(true);
-    const allImageData: ImageData[][] = [[], []];
-    let totalFiles = 0;
-    let processedFiles = 0;
+    const allImageData: number[][][][] = [[], [], [], []];
 
-    if (sprite.texture?.files?.length) {
-      const fileArrays = [sprite.texture.files];
-      if (state.preview.anaglyph && sprite.texture?.files2?.length) {
-        fileArrays.push(sprite.texture.files2);
-      }
+    if (!sprite._imageData || typeof sprite._imageData === 'number') {
+      return setImageError('no image data');
+    }
 
-      fileArrays.map(f => {
-        totalFiles += f.length;
-      });
-
-      await services.workspaceService.ready;
-      const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
-      await Promise.all(fileArrays.map(async (f, i) => {
-        await Promise.all(f.map(async (image, j) => {
-          const imageUri = workspaceRootUri.resolve(image);
-          if (await services.fileService.exists(imageUri)) {
-            const imageFileContent = await services.fileService.readFile(imageUri);
-            const singleImageData = await window.electronVesCore.parsePng(imageFileContent);
-            if (singleImageData) {
-              if (singleImageData.colorType !== 3) {
-                setImageError('wrong color type');
-              } else {
-                allImageData[i] = [
-                  ...allImageData[i].slice(0, j),
-                  singleImageData,
-                  ...allImageData[i].slice(j),
-                ];
-                setHeight(singleImageData.height);
-                setWidth(singleImageData.width);
-              }
-            } else {
-              setImageError('could not parse image');
-            }
-          } else {
-            setImageError('file not found');
-          }
-
-          setGeneratingProgress(++processedFiles, totalFiles);
+    await Promise.all(sprite._imageData.images.map(async (singleImageData, i) => {
+      const decompressedTileData = await services.vesCommonService.uncompressJson(singleImageData.tiles?.data) as string[];
+      if (singleImageData.maps) {
+        await Promise.all(singleImageData.maps.map(async (singleImageDataMap, j) => {
+          const decompressedMapData = await services.vesCommonService.uncompressJson(singleImageDataMap?.data) as string[];
+          allImageData[i][j] = imageDataToPixelData(decompressedTileData, { ...singleImageDataMap, data: decompressedMapData });
+          // setGeneratingProgress(++processedFiles, totalFiles);
         }));
-      }));
-    } else {
-      setImageError('no file selected');
-    }
-
-    if (allImageData[0] && allImageData[0].length) {
+      }
+    }));
+    if (allImageData[0][0].length && allImageData[0][0][0].length) {
       setError(undefined);
+      setHeight(allImageData[0][0].length);
+      setWidth(allImageData[0][0][0].length);
+      setImageData(allImageData);
     }
-    setImageData(allImageData);
 
     setIsGenerating(false);
   };
@@ -122,20 +130,29 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     return (t.join(' '));
   };
 
-  const currentPixelData: number[][][] = [];
-  if (animate && isMultiFileAnimation) {
-    [0, 1].map(k => {
-      if (imageData[k] && imageData[k][currentAnimationFrame]) {
-        currentPixelData.push(imageData[k][currentAnimationFrame].pixelData);
-      }
-    });
-  } else {
-    [0, 1].map(k => {
-      if (imageData[k] && imageData[k][0]) {
-        currentPixelData.push(imageData[k][0].pixelData);
-      }
-    });
-  }
+  const currentPixelData: number[][][] = useMemo(() => {
+    const result: number[][][] = [];
+
+    if (animate && isMultiFileAnimation) {
+      [0, 1].map(k => {
+        if (imageData[k] && imageData[k][currentAnimationFrame]) {
+          result.push(imageData[k][currentAnimationFrame]);
+        }
+      });
+    } else {
+      [0, 1].map(k => {
+        if (imageData[k] && imageData[k][0]) {
+          result.push(imageData[k][0]);
+        }
+      });
+    }
+
+    return result;
+  }, [
+    animate,
+    isMultiFileAnimation,
+    imageData
+  ]);
 
   const baseZIndex = highlighted ? 999999 : 100000;
 
@@ -147,10 +164,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
   useEffect(() => {
     getData();
   }, [
-    height,
-    sprite.texture.files.length,
-    width,
-    state.preview.anaglyph,
+    sprite._imageData,
   ]);
 
   /*
@@ -218,7 +232,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
           zIndex: baseZIndex + (sprite.displacement.z !== 0 ? -sprite.displacement.z : 0),
         }}
       >
-        {!error && imageData.length > 0 &&
+        {!error && currentPixelData &&
           <div style={{
             position: 'relative',
             top: animate && !isMultiFileAnimation
