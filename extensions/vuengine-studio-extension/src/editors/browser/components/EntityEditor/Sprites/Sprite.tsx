@@ -2,7 +2,7 @@ import { ArrowsHorizontal, ArrowsVertical } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
-import { ImageCompressionType, ImageQuantizationSettingsType } from '../../../../../images/browser/ves-images-types';
+import { ImageCompressionType, ImageProcessingSettings } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { DataSection } from '../../Common/CommonTypes';
 import HContainer from '../../Common/HContainer';
@@ -23,7 +23,7 @@ import {
     SpriteData,
     SpriteImageData,
 } from '../EntityEditorTypes';
-import ImageQuantizationSettings from './ImageQuantizationSettings';
+import ImageProcessingSettingsForm from './ImageProcessingSettingsForm';
 
 const MIN_REPEAT_SIZE = 0;
 const MAX_REPEAT_SIZE = 512;
@@ -42,7 +42,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const { data } = useContext(EntityEditorContext) as EntityEditorContextType;
     const { sprite, updateSprite, isMultiFileAnimation } = props;
-    const [quantizationDialogOpen, setQuantizationDialogOpen] = useState<boolean>(false);
+    const [processingDialogOpen, setProcessingDialogOpen] = useState<boolean>(false);
     const [dimensions, setDimensions] = useState<number[][]>([[], []]);
     const [filename, setFilename] = useState<string[]>([]);
 
@@ -126,6 +126,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     const setColorMode = (colorMode: ColorMode): void => {
         updateSprite({
             colorMode,
+        }, {
+            appendImageData: true,
         });
     };
 
@@ -279,12 +281,14 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         });
     };
 
-    const updateQuantizationSettings = (imageQuantizationSettings: Partial<ImageQuantizationSettingsType>) => {
+    const updateImageProcessingSettings = (partialImageProcessingSettings: Partial<ImageProcessingSettings>) => {
         updateSprite({
-            imageQuantizationSettings: {
-                ...sprite.imageQuantizationSettings,
-                ...imageQuantizationSettings
+            imageProcessingSettings: {
+                ...sprite.imageProcessingSettings,
+                ...partialImageProcessingSettings
             },
+        }, {
+            appendImageData: true,
         });
     };
 
@@ -387,7 +391,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                         showMetaData={false}
                                         containerHeight='80px'
                                         containerWidth='100px'
-                                        fileAddExtraAction={() => setQuantizationDialogOpen(true)}
+                                        fileAddExtraAction={() => setProcessingDialogOpen(true)}
                                     />
                                 </div>
                                 <VContainer grow={1} justifyContent="center">
@@ -443,8 +447,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                                 <VContainer alignItems="end" justifyContent="end" grow={1}>
                                                     <button
                                                         className="theia-button secondary"
-                                                        title={nls.localize('vuengine/entityEditor/imageQuantizationSettings', 'Image Quantization Settings')}
-                                                        onClick={() => setQuantizationDialogOpen(true)}
+                                                        title={nls.localize('vuengine/entityEditor/imageProcessingSettings', 'Image Processing Settings')}
+                                                        onClick={() => setProcessingDialogOpen(true)}
                                                     >
                                                         <i className="codicon codicon-settings-gear" />
                                                     </button>
@@ -872,17 +876,17 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 </HContainer>
             </VContainer>
             <PopUpDialog
-                open={quantizationDialogOpen}
-                setOpen={setQuantizationDialogOpen}
-                title={nls.localize('vuengine/entityEditor/imageQuantizationSettings', 'Image Quantization Settings')}
+                open={processingDialogOpen}
+                setOpen={setProcessingDialogOpen}
+                title={nls.localize('vuengine/entityEditor/imageProcessingSettings', 'Image Processing Settings')}
                 height='100%'
                 width='100%'
             >
-                <ImageQuantizationSettings
+                <ImageProcessingSettingsForm
                     image={sprite.texture?.files[0]}
                     setFiles={setFiles}
-                    quantizationSettings={sprite.imageQuantizationSettings}
-                    updateQuantizationSettings={updateQuantizationSettings}
+                    processingSettings={sprite.imageProcessingSettings}
+                    updateProcessingSettings={updateImageProcessingSettings}
                     colorMode={allowFrameBlendMode ? sprite.colorMode : ColorMode.Default}
                     updateColorMode={setColorMode}
                     allowFrameBlendMode={allowFrameBlendMode}

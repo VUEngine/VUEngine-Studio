@@ -349,7 +349,7 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
             _imageData: 0,
             name: nls.localize('vuengine/entityEditor/sprite', 'Sprite'),
             sourceType: SpriteSourceType.Image,
-            imageQuantizationSettings: {
+            imageProcessingSettings: {
                 colorDistanceFormula: DEFAULT_COLOR_DISTANCE_FORMULA,
                 paletteQuantizationAlgorithm: DEFAULT_PALETTE_QUANTIZATION_ALGORITHM,
                 imageQuantizationAlgorithm: DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,

@@ -194,7 +194,9 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
       name: services.vesCommonService.cleanSpecName(fileUri.path.name),
       tileset: {
         shared: !entityData.components?.animations.length && entityData.sprites.sharedTiles,
-      }
+      },
+      imageProcessingSettings: entityData.components?.sprites[0].imageProcessingSettings,
+      colorMode: entityData.components?.sprites[0].colorMode,
     };
     const totalSprites = entityData.components?.sprites?.length ?? 0;
 
@@ -214,6 +216,9 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
       });
 
       if (!files.length) {
+        entityData.components?.sprites?.map(s => {
+          s._imageData = 0;
+        });
         return entityData;
       }
 
@@ -308,6 +313,8 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
                     shared: false,
                   },
                   files: f,
+                  imageProcessingSettings: sprite.imageProcessingSettings,
+                  colorMode: sprite.colorMode,
                 });
                 setGeneratingProgress((i + 1) * 2 - 1, totalSprites * 2);
                 const compressedImageData = await this.compressImageDataAsJson(newImageData);

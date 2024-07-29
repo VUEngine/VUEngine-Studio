@@ -331,7 +331,30 @@ export const defaultProjectData: ProjectData = {
                 default: 0
               },
             }
-          }
+          },
+          imageProcessingSettings: {
+            type: 'object',
+            properties: {
+              colorDistanceFormula: {
+                type: 'string',
+                default: 'euclidean'
+              },
+              imageQuantizationAlgorithm: {
+                type: 'string',
+                default: 'nearest'
+              },
+              paletteQuantizationAlgorithm: {
+                type: 'string',
+                default: 'none'
+              }
+            }
+          },
+          'colorMode': {
+            type: 'number',
+            default: 0,
+            min: 0,
+            max: 1
+          },
         },
         required: ['files', 'section']
       },
