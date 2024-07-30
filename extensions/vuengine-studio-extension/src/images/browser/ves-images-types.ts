@@ -5,7 +5,6 @@ import { BasicSelectOption } from '../../editors/browser/components/Common/Basic
 import { DataSection } from '../../editors/browser/components/Common/CommonTypes';
 
 export const DEFAULT_COLOR_DISTANCE_FORMULA = 'euclidean';
-export const DEFAULT_PALETTE_QUANTIZATION_ALGORITHM = 'none';
 export const DEFAULT_IMAGE_QUANTIZATION_ALGORITHM = 'nearest';
 
 export const TILE_HEIGHT = 8;
@@ -128,7 +127,6 @@ export const DEFAULT_IMAGE_CONVERTER_CONFIG: ImageConfig = {
   },
   imageProcessingSettings: {
     colorDistanceFormula: DEFAULT_COLOR_DISTANCE_FORMULA,
-    paletteQuantizationAlgorithm: DEFAULT_PALETTE_QUANTIZATION_ALGORITHM,
     imageQuantizationAlgorithm: DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
   },
   colorMode: ColorMode.Default
@@ -136,7 +134,6 @@ export const DEFAULT_IMAGE_CONVERTER_CONFIG: ImageConfig = {
 
 export interface ImageProcessingSettings {
   colorDistanceFormula: iq.ColorDistanceFormula,
-  paletteQuantizationAlgorithm: iq.PaletteQuantization | 'none',
   imageQuantizationAlgorithm: iq.ImageQuantization,
 }
 
@@ -184,29 +181,6 @@ export const colorDistanceFormulaOptions: BasicSelectOption[] = [
   {
     label: 'PNGQuant',
     value: 'pngquant'
-  },
-];
-
-export const paletteQuantizationAlgorithmOptions: BasicSelectOption[] = [
-  {
-    label: 'None',
-    value: 'none'
-  },
-  {
-    label: 'NeuQuant (Integer)',
-    value: 'neuquant'
-  },
-  {
-    label: 'NeuQuant (Floating Point)',
-    value: 'neuquant-float'
-  },
-  {
-    label: 'RGBQuant',
-    value: 'rgbquant'
-  },
-  {
-    label: 'WuQuant',
-    value: 'wuquant'
   },
 ];
 

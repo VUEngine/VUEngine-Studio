@@ -25,7 +25,6 @@ import { ColorMode } from '../../../../../core/browser/ves-common-types';
 import {
     DEFAULT_COLOR_DISTANCE_FORMULA,
     DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
-    DEFAULT_PALETTE_QUANTIZATION_ALGORITHM,
     ImageCompressionType
 } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
@@ -351,7 +350,6 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
             sourceType: SpriteSourceType.Image,
             imageProcessingSettings: {
                 colorDistanceFormula: DEFAULT_COLOR_DISTANCE_FORMULA,
-                paletteQuantizationAlgorithm: DEFAULT_PALETTE_QUANTIZATION_ALGORITHM,
                 imageQuantizationAlgorithm: DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
             },
             bgmapMode: BgmapMode.Bgmap,

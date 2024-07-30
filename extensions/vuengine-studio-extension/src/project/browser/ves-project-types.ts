@@ -342,10 +342,6 @@ export const defaultProjectData: ProjectData = {
               imageQuantizationAlgorithm: {
                 type: 'string',
                 default: 'nearest'
-              },
-              paletteQuantizationAlgorithm: {
-                type: 'string',
-                default: 'none'
               }
             }
           },

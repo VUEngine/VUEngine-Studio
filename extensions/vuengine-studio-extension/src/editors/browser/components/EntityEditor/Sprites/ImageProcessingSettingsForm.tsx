@@ -6,10 +6,8 @@ import {
     ConversionResult,
     DEFAULT_COLOR_DISTANCE_FORMULA,
     DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
-    DEFAULT_PALETTE_QUANTIZATION_ALGORITHM,
     ImageProcessingSettings,
     imageQuantizationAlgorithmOptions,
-    paletteQuantizationAlgorithmOptions
 } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import BasicSelect from '../../Common/BasicSelect';
@@ -152,7 +150,7 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                     </VContainer>
                 </VContainer>
                 <HContainer gap={10}>
-                    <VContainer style={{ width: '50%' }}>
+                    <VContainer>
                         <label>Image Quantization Algorithm</label>
                         <BasicSelect
                             options={imageQuantizationAlgorithmOptions}
@@ -163,20 +161,7 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                             disabled={!image}
                         />
                     </VContainer>
-                    <VContainer style={{ width: '50%' }}>
-                        <label>Palette Quantization Algorithm</label>
-                        <BasicSelect
-                            options={paletteQuantizationAlgorithmOptions}
-                            value={processingSettings?.paletteQuantizationAlgorithm ?? DEFAULT_PALETTE_QUANTIZATION_ALGORITHM}
-                            onChange={e => updateProcessingSettings({
-                                paletteQuantizationAlgorithm: e.target.value as iq.PaletteQuantization,
-                            })}
-                            disabled={!image}
-                        />
-                    </VContainer>
-                </HContainer>
-                <HContainer gap={10}>
-                    <VContainer style={{ width: '50%' }}>
+                    <VContainer>
                         <label>Color Distance Formula</label>
                         <BasicSelect
                             options={colorDistanceFormulaOptions}
@@ -187,7 +172,7 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                             disabled={!image}
                         />
                     </VContainer>
-                    <VContainer style={{ width: '50%' }}>
+                    <VContainer>
                         {allowFrameBlendMode &&
                             <ColorModeSelect
                                 value={colorMode}
