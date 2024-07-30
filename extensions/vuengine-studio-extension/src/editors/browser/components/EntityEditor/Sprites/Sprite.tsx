@@ -1,5 +1,5 @@
 import { ArrowsHorizontal, ArrowsVertical } from '@phosphor-icons/react';
-import { nls } from '@theia/core';
+import { isNumber, nls } from '@theia/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
 import { ImageCompressionType, ImageProcessingSettings } from '../../../../../images/browser/ves-images-types';
@@ -885,6 +885,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 <ImageProcessingSettingsForm
                     image={sprite.texture?.files[0]}
                     setFiles={setFiles}
+                    imageData={!isNumber(sprite._imageData) ? sprite._imageData?.images[0] : undefined}
                     processingSettings={sprite.imageProcessingSettings}
                     updateProcessingSettings={updateImageProcessingSettings}
                     colorMode={allowFrameBlendMode ? sprite.colorMode : ColorMode.Default}

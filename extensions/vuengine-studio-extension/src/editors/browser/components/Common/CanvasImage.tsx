@@ -7,7 +7,7 @@ interface CanvasImageProps {
     palette: string
     pixelData: number[][][]
     displayMode: DisplayMode
-    parallaxDisplacement: number
+    parallaxDisplacement?: number
     width: number
     colorMode: ColorMode
     style?: object
@@ -33,7 +33,7 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
     // eslint-disable-next-line no-null/no-null
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const effectiveParallaxDisplacement = displayMode === DisplayMode.Stereo ? parallaxDisplacement : 0;
+    const effectiveParallaxDisplacement = displayMode === DisplayMode.Stereo ? parallaxDisplacement ?? 0 : 0;
     const totalHeight = repeatY
         ? (Math.round(Math.round(7500 / height) / 2) * 2 + 1) * height
         : height;
@@ -55,14 +55,21 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
 
         [...Array(height)].map((h, y) => {
             [...Array(width)].map((w, x) => {
-                if (pixels[y] === undefined || pixels[height + y][x] === undefined || pixels[y][x] === undefined) {
+                if (
+                    pixels[y] === undefined ||
+                    pixels[y][x] === undefined ||
+                    (colorMode === ColorMode.FrameBlend && (
+                        pixels[height + y] === undefined ||
+                        pixels[height + y][x] === undefined
+                    ))
+                ) {
                     return;
                 }
                 const effectColorByPalette = getEffectColorByPalette(pixels[y][x] ?? 0);
                 const fillColor = useTextColor === true
                     ? 'var(--theia-foreground)'
                     : getColor(
-                        // for HiColor, find middle value of the two images (both are over/under)
+                        // for HiColor, find middle value of the two images (both are combined in one, over/under)
                         colorMode === ColorMode.FrameBlend
                             ? (effectColorByPalette * 2 + getEffectColorByPalette(pixels[height + y][x]) * 2) / 2
                             : effectColorByPalette
@@ -150,16 +157,15 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
         width,
     ]);
 
-    return <div style={style}>
-        <canvas
-            ref={canvasRef}
-            height={totalHeight}
-            width={totalWidth + Math.abs(effectiveParallaxDisplacement) * 2}
-            style={{
-                imageRendering: 'pixelated',
-                marginTop: (repeatX || repeatY) ? 3 : undefined, // why?
-                opacity: (repeatX || repeatY) ? .25 : undefined,
-            }}
-        />
-    </div>;
+    return <canvas
+        ref={canvasRef}
+        height={totalHeight}
+        width={totalWidth + Math.abs(effectiveParallaxDisplacement) * 2}
+        style={{
+            ...style,
+            imageRendering: 'pixelated',
+            marginTop: (repeatX || repeatY) ? 3 : undefined, // why?
+            opacity: (repeatX || repeatY) ? .25 : undefined,
+        }}
+    />;
 }

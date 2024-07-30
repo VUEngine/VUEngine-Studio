@@ -46,15 +46,15 @@ export const showEntitySelection = async (
     return quickPickService.show(items, quickPickOptions);
 };
 
-export const getMaxScaleInContainer = (containerHeight: number, containerWidth: number, height: number, width: number) => {
+export const getMaxScaleInContainer = (containerWidth: number, containerHeight: number, width: number, height: number, integerScale = false) => {
     let heightScale = 0;
     if (containerHeight && height) {
-        heightScale = Math.floor(containerHeight / height);
+        heightScale = integerScale ? Math.floor(containerHeight / height) : containerHeight / height;
     }
 
     let widthScale = 0;
     if (containerWidth && width) {
-        widthScale = Math.floor(containerWidth / width);
+        widthScale = integerScale ? Math.floor(containerWidth / width) : containerWidth / width;
     }
 
     return heightScale || widthScale

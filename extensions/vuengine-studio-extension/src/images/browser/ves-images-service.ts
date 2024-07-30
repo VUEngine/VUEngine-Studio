@@ -15,6 +15,7 @@ import { compressTiles } from './ves-images-compressor';
 import {
   COMPRESSION_FLAG_LENGTH,
   ConversionResult,
+  ConversionResultMapData,
   ConvertedFileData,
   DEFAULT_COLOR_DISTANCE_FORMULA,
   DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
@@ -22,7 +23,11 @@ import {
   ImageCompressionType,
   ImageConfig,
   ImageConfigWithName,
-  ImageProcessingSettings
+  ImageProcessingSettings,
+  PIXELS_BITS_PER_TILE,
+  TILE_HEIGHT,
+  TILE_WIDTH,
+  TILES_PER_UINT32
 } from './ves-images-types';
 
 @injectable()
@@ -304,6 +309,53 @@ export class VesImagesService {
       colorType: 3
     });
   }
+
+  // convert tile and map data (grit output) to a pixel data array that can be thrown at a CanvasImage element
+  imageDataToPixelData(tilesData: string[], mapData: ConversionResultMapData): number[][] {
+    const pixelData: number[][] = [];
+
+    for (let mapY = 0; mapY < mapData.height; mapY++) {
+      for (let mapX = 0; mapX < mapData.width; mapX++) {
+
+        // combine 4 (TILES_PER_UINT32) adjacent values to get one tile
+        const tileStartIndex = parseInt(mapData.data[mapX + (mapY * mapData.width)], 16) * TILES_PER_UINT32;
+        let tileData = '';
+        for (let tileSegmentIndex = 0; tileSegmentIndex < TILES_PER_UINT32; tileSegmentIndex++) {
+          const tileSegmentData = tilesData[tileStartIndex + tileSegmentIndex];
+          const tileSegmentValue = parseInt(`0x${tileSegmentData}`);
+          tileData = tileSegmentValue.toString(2).padStart(32, '0') + tileData;
+          /*
+          if (tileSegmentData === undefined) {
+            console.log('tileStartIndex', tileStartIndex);
+            console.log('mapX', mapX);
+            console.log('mapY', mapY);
+            console.log('tilesData.length', tilesData.length);
+          }
+          */
+        }
+
+        // get current tile's pixels
+        for (let tileY = 0; tileY < TILE_HEIGHT; tileY++) {
+          const pixelYPosition = (mapY * TILE_HEIGHT) + tileY;
+          for (let tileX = 0; tileX < TILE_WIDTH; tileX++) {
+            const pixelXPosition = (mapX * TILE_WIDTH) + tileX;
+            // find the current pixel's value by getting 2 offset bits from combined tile data
+            // (reverted, first pixel is last in data)
+            const pixelIndex = 2 * (PIXELS_BITS_PER_TILE - (tileY * TILE_HEIGHT) - tileX);
+            const pixelValue = parseInt(tileData.substring(pixelIndex - 2, pixelIndex), 2);
+            // set pixel value
+            if (!pixelData[pixelYPosition]) {
+              pixelData[pixelYPosition] = [];
+            }
+            pixelData[pixelYPosition][pixelXPosition] = pixelValue;
+          }
+        }
+
+      }
+    }
+
+    return pixelData;
+  };
 
   protected async getConvertedFilesData(convertedFolderUri: URI): Promise<ConvertedFileData[]> {
     const generatedFiles = window.electronVesCore.findFiles(await this.fileService.fsPath(convertedFolderUri), '*.c')
