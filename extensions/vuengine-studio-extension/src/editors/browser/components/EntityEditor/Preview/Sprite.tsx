@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
-import { ConversionResultMapData, PIXELS_BITS_PER_TILE, TILE_HEIGHT, TILE_WIDTH, TILES_PER_UINT32 } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import CanvasImage from '../../Common/CanvasImage';
 import VContainer from '../../Common/VContainer';
@@ -16,52 +15,6 @@ interface SpriteProps {
   index: number
   palette: string
 }
-
-const imageDataToPixelData = (tilesData: string[], mapData: ConversionResultMapData): number[][] => {
-  const pixelData: number[][] = [];
-
-  for (let mapY = 0; mapY < mapData.height; mapY++) {
-    for (let mapX = 0; mapX < mapData.width; mapX++) {
-
-      // combine 4 (TILES_PER_UINT32) adjacent values to get one tile
-      const tileStartIndex = parseInt(mapData.data[mapX + (mapY * mapData.width)], 16) * TILES_PER_UINT32;
-      let tileData = '';
-      for (let tileSegmentIndex = 0; tileSegmentIndex < TILES_PER_UINT32; tileSegmentIndex++) {
-        const tileSegmentData = tilesData[tileStartIndex + tileSegmentIndex];
-        const tileSegmentValue = parseInt(`0x${tileSegmentData}`);
-        tileData = tileSegmentValue.toString(2).padStart(32, '0') + tileData;
-        /*
-        if (tileSegmentData === undefined) {
-          console.log('tileStartIndex', tileStartIndex);
-          console.log('mapX', mapX);
-          console.log('mapY', mapY);
-          console.log('tilesData.length', tilesData.length);
-        }
-        */
-      }
-
-      // get current tile's pixels
-      for (let tileY = 0; tileY < TILE_HEIGHT; tileY++) {
-        const pixelYPosition = (mapY * TILE_HEIGHT) + tileY;
-        for (let tileX = 0; tileX < TILE_WIDTH; tileX++) {
-          const pixelXPosition = (mapX * TILE_WIDTH) + tileX;
-          // find the current pixel's value by getting 2 offset bits from combined tile data
-          // (reverted, first pixel is last in data)
-          const pixelIndex = 2 * (PIXELS_BITS_PER_TILE - (tileY * TILE_HEIGHT) - tileX);
-          const pixelValue = parseInt(tileData.substring(pixelIndex - 2, pixelIndex), 2);
-          // set pixel value
-          if (!pixelData[pixelYPosition]) {
-            pixelData[pixelYPosition] = [];
-          }
-          pixelData[pixelYPosition][pixelXPosition] = pixelValue;
-        }
-      }
-
-    }
-  }
-
-  return pixelData;
-};
 
 export default function Sprite(props: SpriteProps): React.JSX.Element {
   const { data, state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
@@ -108,11 +61,11 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     }
 
     await Promise.all(sprite._imageData?.images.map(async (singleImageData, i) => {
-      const decompressedTileData = await services.vesCommonService.uncompressJson(singleImageData.tiles?.data) as string[];
+      const uncompressedTileData = await services.vesCommonService.uncompressJson(singleImageData.tiles?.data) as string[];
       if (singleImageData.maps) {
         await Promise.all(singleImageData.maps.map(async (singleImageDataMap, j) => {
-          const decompressedMapData = await services.vesCommonService.uncompressJson(singleImageDataMap?.data) as string[];
-          allImageData[i][j] = imageDataToPixelData(decompressedTileData, { ...singleImageDataMap, data: decompressedMapData });
+          const uncompressedMapData = await services.vesCommonService.uncompressJson(singleImageDataMap?.data) as string[];
+          allImageData[i][j] = services.vesImagesService.imageDataToPixelData(uncompressedTileData, { ...singleImageDataMap, data: uncompressedMapData });
           // setGeneratingProgress(++processedFiles, totalFiles);
         }));
       }
