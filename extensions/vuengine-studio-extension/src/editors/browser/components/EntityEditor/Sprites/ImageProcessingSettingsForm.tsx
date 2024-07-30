@@ -134,7 +134,8 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                                                 width={width}
                                                 colorMode={colorMode}
                                                 style={{
-                                                    transform: `scale(${canvasScale})`
+                                                    backgroundColor: '#000',
+                                                    transform: `scale(${canvasScale})`,
                                                 }}
                                             />
                                         }

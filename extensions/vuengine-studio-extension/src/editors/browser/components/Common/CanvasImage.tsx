@@ -46,7 +46,7 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
             return;
         }
 
-        const getEffectColorByPalette = (color: number) => {
+        const getEffectiveColorByPalette = (color: number) => {
             const paletteStartChar = ((3 - color) % 4) << 1;
             return PALETTE_BIT_INDEX_MAP[palette.substring(paletteStartChar, paletteStartChar + 2)];
         };
@@ -65,15 +65,21 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
                 ) {
                     return;
                 }
-                const effectColorByPalette = getEffectColorByPalette(pixels[y][x] ?? 0);
+
+                let effectiveColorByPalette = getEffectiveColorByPalette(pixels[y][x] ?? 0);
+                if (colorMode === ColorMode.FrameBlend) {
+                    // for HiColor, find middle value of the two images (both are combined in one, over/under)
+                    effectiveColorByPalette = (effectiveColorByPalette * 2 + getEffectiveColorByPalette(pixels[height + y][x]) * 2) / 2;
+                }
+
+                // don't draw black pixels, we want index 0 to be transparent
+                if (effectiveColorByPalette === 0) {
+                    return;
+                }
+
                 const fillColor = useTextColor === true
                     ? 'var(--theia-foreground)'
-                    : getColor(
-                        // for HiColor, find middle value of the two images (both are combined in one, over/under)
-                        colorMode === ColorMode.FrameBlend
-                            ? (effectColorByPalette * 2 + getEffectColorByPalette(pixels[height + y][x]) * 2) / 2
-                            : effectColorByPalette
-                    );
+                    : getColor(effectiveColorByPalette);
 
                 context.fillStyle = fillColor;
                 context.fillRect(x + Math.abs(effectiveParallaxDisplacement) - effectiveParallaxDisplacement, y, 1, 1);
