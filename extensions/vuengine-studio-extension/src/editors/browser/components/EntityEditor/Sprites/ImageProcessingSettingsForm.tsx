@@ -1,3 +1,4 @@
+import { nls } from '@theia/core';
 import * as iq from 'image-q';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
@@ -13,11 +14,11 @@ import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import BasicSelect from '../../Common/BasicSelect';
 import CanvasImage from '../../Common/CanvasImage';
 import HContainer from '../../Common/HContainer';
+import { getMaxScaleInContainer } from '../../Common/Utils';
 import VContainer from '../../Common/VContainer';
 import { DisplayMode } from '../../Common/VUEngineTypes';
 import Images from '../../ImageEditor/Images';
 import ColorModeSelect from './ColorModeSelect';
-import { getMaxScaleInContainer } from '../../Common/Utils';
 
 interface ImageProcessingSettingsFormProps {
     image: string
@@ -151,28 +152,6 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                 </VContainer>
                 <HContainer gap={10}>
                     <VContainer>
-                        <label>Image Quantization Algorithm</label>
-                        <BasicSelect
-                            options={imageQuantizationAlgorithmOptions}
-                            value={processingSettings?.imageQuantizationAlgorithm ?? DEFAULT_IMAGE_QUANTIZATION_ALGORITHM}
-                            onChange={e => updateProcessingSettings({
-                                imageQuantizationAlgorithm: e.target.value as iq.ImageQuantization,
-                            })}
-                            disabled={!image}
-                        />
-                    </VContainer>
-                    <VContainer>
-                        <label>Color Distance Formula</label>
-                        <BasicSelect
-                            options={colorDistanceFormulaOptions}
-                            value={processingSettings?.colorDistanceFormula ?? DEFAULT_COLOR_DISTANCE_FORMULA}
-                            onChange={e => updateProcessingSettings({
-                                colorDistanceFormula: e.target.value as iq.ColorDistanceFormula,
-                            })}
-                            disabled={!image}
-                        />
-                    </VContainer>
-                    <VContainer>
                         {allowFrameBlendMode &&
                             <ColorModeSelect
                                 value={colorMode}
@@ -181,8 +160,48 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                                 disabled={!image}
                             />
                         }
-
                     </VContainer>
+                    <VContainer>
+                        <label>Dither</label>
+                        <label>
+                            <input
+                                type="checkbox"
+                                checked={processingSettings?.imageQuantizationAlgorithm !== 'nearest'}
+                                onChange={() => {
+                                    updateProcessingSettings({
+                                        imageQuantizationAlgorithm: processingSettings?.imageQuantizationAlgorithm === 'nearest' ? 'floyd-steinberg' : 'nearest',
+                                    });
+                                }}
+                            />
+                            {nls.localize('vuengine/editors/enable', 'Enable')}
+                        </label>
+                    </VContainer>
+                    {processingSettings?.imageQuantizationAlgorithm !== 'nearest' &&
+                        <>
+                            <VContainer>
+                                <label>Quantization Algorithm</label>
+                                <BasicSelect
+                                    options={imageQuantizationAlgorithmOptions}
+                                    value={processingSettings?.imageQuantizationAlgorithm ?? DEFAULT_IMAGE_QUANTIZATION_ALGORITHM}
+                                    onChange={e => updateProcessingSettings({
+                                        imageQuantizationAlgorithm: e.target.value as iq.ImageQuantization,
+                                    })}
+                                    disabled={!image}
+                                />
+                            </VContainer>
+                            <VContainer>
+                                <label>Color Distance Formula</label>
+                                <BasicSelect
+                                    options={colorDistanceFormulaOptions}
+                                    value={processingSettings?.colorDistanceFormula ?? DEFAULT_COLOR_DISTANCE_FORMULA}
+                                    onChange={e => updateProcessingSettings({
+                                        colorDistanceFormula: e.target.value as iq.ColorDistanceFormula,
+                                    })}
+                                    disabled={!image}
+                                />
+                            </VContainer>
+                        </>
+                    }
                 </HContainer>
             </VContainer >
         </div >
