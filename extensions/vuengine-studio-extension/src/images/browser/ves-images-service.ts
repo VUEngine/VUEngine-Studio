@@ -19,7 +19,6 @@ import {
   ConvertedFileData,
   DEFAULT_COLOR_DISTANCE_FORMULA,
   DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
-  DEFAULT_PALETTE_QUANTIZATION_ALGORITHM,
   ImageCompressionType,
   ImageConfig,
   ImageConfigWithName,
@@ -250,17 +249,7 @@ export class VesImagesService {
     const imageData = camoto.PNG.sync.read(Buffer.from(imageFileContent.value.buffer));
 
     // create point container
-    let pointContainer = iq.utils.PointContainer.fromUint8Array(imageData.data, imageData.width, imageData.height);
-
-    // apply palette quantization
-    if (processingSettings?.paletteQuantizationAlgorithm !== 'none') {
-      const reducedPalette = await iq.buildPalette([pointContainer], {
-        colorDistanceFormula: processingSettings?.colorDistanceFormula ?? DEFAULT_COLOR_DISTANCE_FORMULA,
-        paletteQuantization: processingSettings?.paletteQuantizationAlgorithm ?? DEFAULT_PALETTE_QUANTIZATION_ALGORITHM,
-        colors: colorMode === ColorMode.FrameBlend ? 7 : 4,
-      });
-      pointContainer = await iq.applyPalette(pointContainer, reducedPalette);
-    }
+    const pointContainer = iq.utils.PointContainer.fromUint8Array(imageData.data, imageData.width, imageData.height);
 
     // apply reduced palette, optionally dither
     const outPointContainer = await iq.applyPalette(pointContainer, this.targetPalettes[colorMode], {
