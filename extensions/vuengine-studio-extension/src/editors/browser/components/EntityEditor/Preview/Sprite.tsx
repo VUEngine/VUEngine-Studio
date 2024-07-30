@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { ColorMode } from '../../../../../core/browser/ves-common-types';
 import { ConversionResultMapData, PIXELS_BITS_PER_TILE, TILE_HEIGHT, TILE_WIDTH, TILES_PER_UINT32 } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import CanvasImage from '../../Common/CanvasImage';
@@ -81,9 +82,12 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
 
   const isMultiFileAnimation = sprite.texture.files.length > 1;
   const isRepeated = data.sprites.type === SpriteType.Bgmap && (sprite.texture?.repeat?.x || sprite.texture?.repeat?.y);
-  const effectiveHeight = isRepeated && sprite.texture?.repeat?.size?.y
+  let effectiveHeight = isRepeated && sprite.texture?.repeat?.size?.y
     ? sprite.texture.repeat.size.y
     : height;
+  if (sprite.colorMode === ColorMode.FrameBlend) {
+    effectiveHeight = effectiveHeight / 2;
+  }
   const effectiveWidth = isRepeated && sprite.texture?.repeat?.size?.x
     ? sprite.texture.repeat.size.x
     : width;
@@ -221,6 +225,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
           repeatX={sprite.texture?.repeat?.x}
           repeatY={sprite.texture?.repeat?.y}
           width={effectiveWidth}
+          colorMode={sprite.colorMode}
         />
       }
       <div
@@ -256,6 +261,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 displayMode={state.preview.anaglyph ? DisplayMode.Stereo : DisplayMode.Mono}
                 parallaxDisplacement={sprite.displacement.parallax}
                 width={effectiveWidth}
+                colorMode={sprite.colorMode}
               />
             }
           </div>
