@@ -6,7 +6,7 @@ import VContainer from '../../Common/VContainer';
 import { BgmapMode, DisplayMode, SpriteType, Transparency } from '../../Common/VUEngineTypes';
 import { EntityEditorContext, EntityEditorContextType, SpriteData } from '../EntityEditorTypes';
 
-interface SpriteProps {
+interface SpritePreviewProps {
   animate: boolean
   sprite: SpriteData
   frames: number
@@ -16,7 +16,7 @@ interface SpriteProps {
   palette: string
 }
 
-export default function Sprite(props: SpriteProps): React.JSX.Element {
+export default function SpritePreview(props: SpritePreviewProps): React.JSX.Element {
   const { data, state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
   const { setIsGenerating, services } = useContext(EditorsContext) as EditorsContextType;
   const {

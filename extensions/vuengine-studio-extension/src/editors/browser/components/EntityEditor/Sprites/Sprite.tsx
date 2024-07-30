@@ -131,11 +131,13 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         });
     };
 
+    /*
     const setSourceType = (sourceType: SpriteSourceType): void => {
         updateSprite({
             sourceType,
         });
     };
+    */
 
     const setDisplayMode = (displayMode: DisplayMode): void => {
         if (displayMode === DisplayMode.Stereo) {
@@ -318,6 +320,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         <>
             <VContainer gap={15}>
                 <VContainer>
+                    {/*
                     <InfoLabel
                         label={nls.localize('vuengine/entityEditor/spriteSource', 'Source')}
                         tooltipPosition='bottom'
@@ -377,6 +380,16 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                         }]}
                         defaultValue={sprite.sourceType}
                         onChange={options => setSourceType(options[0].value as SpriteSourceType)}
+                    />
+                    */}
+                    <InfoLabel
+                        label={nls.localize('vuengine/entityEditor/sourceImage', 'Source Image')}
+                        tooltip={nls.localize(
+                            'vuengine/entityEditor/spriteSourceModeImageDescription',
+                            'PNG image file to use as image data source. ' +
+                            'When animations are enabled, select either a single file containing a vertical spritesheet, ' +
+                            'or multiple files, where each represents one animation frame.'
+                        )}
                     />
                     {sprite.sourceType === SpriteSourceType.Image &&
                         <>
