@@ -17,7 +17,7 @@ import BallCollider from './Colliders/BallCollider';
 import BoxCollider from './Colliders/BoxCollider';
 import LineFieldCollider from './Colliders/LineFieldCollider';
 import PreviewOptions from './PreviewOptions';
-import Sprite from './Sprite';
+import SpritePreview from './SpritePreview';
 import PreviewWireframe from './Wireframes/PreviewWireframe';
 
 export default function Preview(): React.JSX.Element {
@@ -162,7 +162,7 @@ export default function Preview(): React.JSX.Element {
         <div className="preview-container-world-center-vertical"></div>
         <div className="preview-container-world-center-horizontal"></div>
         {state.preview.sprites && data.components?.sprites?.map((sprite, i) =>
-          <Sprite
+          <SpritePreview
             key={i}
             index={i}
             sprite={sprite}
