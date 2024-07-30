@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { ColorMode, PALETTE_COLORS, PALETTE_INDEX_MAPPING } from '../../../../core/browser/ves-common-types';
+import { ColorMode, PALETTE_COLORS, PALETTE_BIT_INDEX_MAP } from '../../../../core/browser/ves-common-types';
 import { DisplayMode } from './VUEngineTypes';
 
 interface CanvasImageProps {
@@ -45,7 +45,7 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
                 const paletteStartChar = ((3 - color) % 4) << 1;
                 context.fillStyle = useTextColor === true
                     ? 'var(--theia-foreground)'
-                    : PALETTE_COLORS[ColorMode.Default][PALETTE_INDEX_MAPPING[palette.substring(paletteStartChar, paletteStartChar + 2)]];
+                    : PALETTE_COLORS[ColorMode.Default][PALETTE_BIT_INDEX_MAP[palette.substring(paletteStartChar, paletteStartChar + 2)]];
                 context.fillRect(x + Math.abs(effectiveParallaxDisplacement) - effectiveParallaxDisplacement, y, 1, 1);
             });
         });

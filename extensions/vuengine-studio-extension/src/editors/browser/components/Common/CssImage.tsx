@@ -1,5 +1,5 @@
 import React from 'react';
-import { ColorMode, PALETTE_COLORS, PALETTE_INDEX_MAPPING } from '../../../../core/browser/ves-common-types';
+import { ColorMode, PALETTE_COLORS, PALETTE_BIT_INDEX_MAP } from '../../../../core/browser/ves-common-types';
 
 interface CssImageProps {
     height: number
@@ -27,7 +27,7 @@ export default function CssImage(props: CssImageProps): React.JSX.Element {
                 result.push(
                     `${xPos}px ${yPos}px 0 0 ${useTextColor === true
                         ? 'var(--theia-foreground)'
-                        : PALETTE_COLORS[ColorMode.Default][PALETTE_INDEX_MAPPING[palette.substring(paletteStartChar, paletteStartChar + 2)]]
+                        : PALETTE_COLORS[ColorMode.Default][PALETTE_BIT_INDEX_MAP[palette.substring(paletteStartChar, paletteStartChar + 2)]]
                     }`
                 );
             });

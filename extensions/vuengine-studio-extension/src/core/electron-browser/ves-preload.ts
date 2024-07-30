@@ -18,7 +18,6 @@ import {
     VES_CHANNEL_ON_USB_DEVICE_CHANGE,
     VES_CHANNEL_REPLACE_IN_FILES,
     VES_CHANNEL_SEND_TOUCHBAR_COMMAND,
-    VES_CHANNEL_SET_ZOOM_FACTOR,
     VES_CHANNEL_SORT_JSON,
     VES_CHANNEL_ZLIB_DEFLATE,
     VesCoreAPI
@@ -27,9 +26,6 @@ import {
 const { ipcRenderer, contextBridge } = require('electron');
 
 const api: VesCoreAPI = {
-    setZoomFactor: function (zoomFactor: number): void {
-        ipcRenderer.send(VES_CHANNEL_SET_ZOOM_FACTOR, zoomFactor);
-    },
     getUserDefault: function (preference: string, type: string): string {
         return ipcRenderer.sendSync(VES_CHANNEL_GET_USER_DEFAULT, preference, type);
     },

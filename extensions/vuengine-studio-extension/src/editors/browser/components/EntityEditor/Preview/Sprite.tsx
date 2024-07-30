@@ -23,12 +23,20 @@ const imageDataToPixelData = (tilesData: string[], mapData: ConversionResultMapD
     for (let mapX = 0; mapX < mapData.width; mapX++) {
 
       // combine 4 (TILES_PER_UINT32) adjacent values to get one tile
-      const tileStartIndex = parseInt(mapData.data[mapX + (mapY * mapData.width)] ?? 1, 16) * TILES_PER_UINT32;
-      let combinedTileData = '';
+      const tileStartIndex = parseInt(mapData.data[mapX + (mapY * mapData.width)], 16) * TILES_PER_UINT32;
+      let tileData = '';
       for (let tileSegmentIndex = 0; tileSegmentIndex < TILES_PER_UINT32; tileSegmentIndex++) {
-        const tileData = tilesData[tileStartIndex + tileSegmentIndex] ?? 0;
-        const tileValue = parseInt(`0x${tileData}`);
-        combinedTileData = tileValue.toString(2).padStart(32, '0') + combinedTileData;
+        const tileSegmentData = tilesData[tileStartIndex + tileSegmentIndex];
+        const tileSegmentValue = parseInt(`0x${tileSegmentData}`);
+        tileData = tileSegmentValue.toString(2).padStart(32, '0') + tileData;
+        /*
+        if (tileSegmentData === undefined) {
+          console.log('tileStartIndex', tileStartIndex);
+          console.log('mapX', mapX);
+          console.log('mapY', mapY);
+          console.log('tilesData.length', tilesData.length);
+        }
+        */
       }
 
       // get current tile's pixels
@@ -39,7 +47,7 @@ const imageDataToPixelData = (tilesData: string[], mapData: ConversionResultMapD
           // find the current pixel's value by getting 2 offset bits from combined tile data
           // (reverted, first pixel is last in data)
           const pixelIndex = 2 * (PIXELS_BITS_PER_TILE - (tileY * TILE_HEIGHT) - tileX);
-          const pixelValue = parseInt(combinedTileData.substring(pixelIndex - 2, pixelIndex), 2);
+          const pixelValue = parseInt(tileData.substring(pixelIndex - 2, pixelIndex), 2);
           // set pixel value
           if (!pixelData[pixelYPosition]) {
             pixelData[pixelYPosition] = [];
