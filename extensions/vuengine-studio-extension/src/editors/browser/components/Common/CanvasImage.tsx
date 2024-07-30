@@ -9,6 +9,7 @@ interface CanvasImageProps {
     displayMode: DisplayMode
     parallaxDisplacement: number
     width: number
+    colorMode: ColorMode
     style?: object
     repeatX?: boolean
     repeatY?: boolean
@@ -16,7 +17,19 @@ interface CanvasImageProps {
 }
 
 export default function CanvasImage(props: CanvasImageProps): React.JSX.Element {
-    const { height, palette, pixelData, displayMode, parallaxDisplacement, width, style, repeatX, repeatY, useTextColor } = props;
+    const {
+        height,
+        palette,
+        pixelData,
+        displayMode,
+        parallaxDisplacement,
+        width,
+        colorMode,
+        style,
+        repeatX,
+        repeatY,
+        useTextColor
+    } = props;
     // eslint-disable-next-line no-null/no-null
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -33,19 +46,29 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
             return;
         }
 
+        const getEffectColorByPalette = (color: number) => {
+            const paletteStartChar = ((3 - color) % 4) << 1;
+            return PALETTE_BIT_INDEX_MAP[palette.substring(paletteStartChar, paletteStartChar + 2)];
+        };
+        const getColor = (color: number) =>
+            PALETTE_COLORS[colorMode][color];
+
         [...Array(height)].map((h, y) => {
             [...Array(width)].map((w, x) => {
-                if (pixels[y] === undefined || pixels[y][x] === undefined) {
+                if (pixels[y] === undefined || pixels[height + y][x] === undefined || pixels[y][x] === undefined) {
                     return;
                 }
-                const color = pixels[y][x];
-                if (!color) {
-                    return;
-                }
-                const paletteStartChar = ((3 - color) % 4) << 1;
-                context.fillStyle = useTextColor === true
+                const effectColorByPalette = getEffectColorByPalette(pixels[y][x] ?? 0);
+                const fillColor = useTextColor === true
                     ? 'var(--theia-foreground)'
-                    : PALETTE_COLORS[ColorMode.Default][PALETTE_BIT_INDEX_MAP[palette.substring(paletteStartChar, paletteStartChar + 2)]];
+                    : getColor(
+                        // for HiColor, find middle value of the two images (both are over/under)
+                        colorMode === ColorMode.FrameBlend
+                            ? (effectColorByPalette * 2 + getEffectColorByPalette(pixels[height + y][x]) * 2) / 2
+                            : effectColorByPalette
+                    );
+
+                context.fillStyle = fillColor;
                 context.fillRect(x + Math.abs(effectiveParallaxDisplacement) - effectiveParallaxDisplacement, y, 1, 1);
             });
         });
