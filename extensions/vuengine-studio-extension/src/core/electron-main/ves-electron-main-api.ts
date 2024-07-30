@@ -30,7 +30,6 @@ import {
     VES_CHANNEL_ON_USB_DEVICE_CHANGE,
     VES_CHANNEL_REPLACE_IN_FILES,
     VES_CHANNEL_SEND_TOUCHBAR_COMMAND,
-    VES_CHANNEL_SET_ZOOM_FACTOR,
     VES_CHANNEL_SORT_JSON,
     VES_CHANNEL_ZLIB_DEFLATE
 } from '../electron-common/ves-electron-api';
@@ -38,9 +37,6 @@ import {
 @injectable()
 export class VesMainApi implements ElectronMainApplicationContribution {
     onStart(application: ElectronMainApplication): MaybePromise<void> {
-        ipcMain.on(VES_CHANNEL_SET_ZOOM_FACTOR, (event, zoomFactor) => {
-            event.sender.setZoomFactor(zoomFactor);
-        });
         ipcMain.on(VES_CHANNEL_GET_USER_DEFAULT, (event, preference, type) => {
             event.returnValue = systemPreferences.getUserDefault(preference, type);
         });

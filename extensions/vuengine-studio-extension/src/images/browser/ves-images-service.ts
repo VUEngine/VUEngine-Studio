@@ -7,9 +7,8 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import * as iq from 'image-q';
-import { PNG, PNGWithMetadata } from 'pngjs/browser';
 import { VesCommonService } from '../../core/browser/ves-common-service';
-import { ColorMode } from '../../core/browser/ves-common-types';
+import { ColorMode, PALETTE_R_VALUES, PALETTE_VALUE_INDEX_MAP } from '../../core/browser/ves-common-types';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 import { compressTiles } from './ves-images-compressor';
@@ -19,6 +18,7 @@ import {
   ConvertedFileData,
   DEFAULT_COLOR_DISTANCE_FORMULA,
   DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
+  DEFAULT_PALETTE_QUANTIZATION_ALGORITHM,
   ImageCompressionType,
   ImageConfig,
   ImageConfigWithName,
@@ -236,22 +236,28 @@ export class VesImagesService {
     await this.workspaceService.ready;
     await this.ready;
 
+    // read image file
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     const resolvedImageUri = workspaceRootUri.resolve(imagePath);
     const imageFileContent = await this.fileService.readFile(resolvedImageUri);
-    const imageData = PNG.sync.read(Buffer.from(imageFileContent.value.buffer));
+    // Using the Camoto fork of pngjs here, because it supports generating indexed PNGs
+    const camoto = require('@camoto/pngjs/browser');
+    const imageData = camoto.PNG.sync.read(Buffer.from(imageFileContent.value.buffer));
 
+    // create point container
     let pointContainer = iq.utils.PointContainer.fromUint8Array(imageData.data, imageData.width, imageData.height);
 
+    // apply palette quantization
     if (processingSettings?.paletteQuantizationAlgorithm !== 'none') {
       const reducedPalette = await iq.buildPalette([pointContainer], {
         colorDistanceFormula: processingSettings?.colorDistanceFormula ?? DEFAULT_COLOR_DISTANCE_FORMULA,
-        paletteQuantization: processingSettings?.paletteQuantizationAlgorithm,
+        paletteQuantization: processingSettings?.paletteQuantizationAlgorithm ?? DEFAULT_PALETTE_QUANTIZATION_ALGORITHM,
         colors: colorMode === ColorMode.FrameBlend ? 7 : 4,
       });
       pointContainer = await iq.applyPalette(pointContainer, reducedPalette);
     }
 
+    // apply reduced palette, optionally dither
     const outPointContainer = await iq.applyPalette(pointContainer, this.targetPalettes[colorMode], {
       colorDistanceFormula: processingSettings?.colorDistanceFormula ?? DEFAULT_COLOR_DISTANCE_FORMULA,
       imageQuantization: processingSettings?.imageQuantizationAlgorithm ?? DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
@@ -262,11 +268,40 @@ export class VesImagesService {
       },
     });
 
-    return PNG.sync.write({
+    // post process resulting point container into an indexed array
+    const outPointContainerArray = outPointContainer.toUint8Array();
+    const indexedPoints: number[] = [];
+    if (colorMode === ColorMode.FrameBlend) {
+      for (let x = 0; x < outPointContainerArray.length; x += 4) {
+        indexedPoints.push(PALETTE_VALUE_INDEX_MAP[1][outPointContainerArray[x]]);
+      }
+      for (let x = 0; x < outPointContainerArray.length; x += 4) {
+        indexedPoints.push(PALETTE_VALUE_INDEX_MAP[2][outPointContainerArray[x]]);
+      }
+    } else {
+      for (let x = 0; x < outPointContainerArray.length; x += 4) {
+        indexedPoints.push(PALETTE_VALUE_INDEX_MAP[0][outPointContainerArray[x]]);
+      }
+    };
+
+    // create indexed png image
+    return camoto.PNG.sync.write({
       ...imageData,
-      data: Buffer.from(outPointContainer.toUint8Array())
-    } as PNGWithMetadata, {
-      // colorType: 3
+      alpha: false,
+      bpp: 1,
+      color: true,
+      colorType: 3,
+      data: Buffer.from(indexedPoints),
+      depth: 8,
+      gamma: 0,
+      height: colorMode === ColorMode.FrameBlend ? imageData.height * 2 : imageData.height,
+      interlace: false,
+      palette: PALETTE_R_VALUES[0].map(r => [r, 0, 0, 255])
+    }, {
+      bitDepth: 8,
+      inputColorType: 3,
+      inputHasAlpha: false,
+      colorType: 3
     });
   }
 
@@ -412,17 +447,9 @@ export class VesImagesService {
   }
 
   protected async buildPalette(colorMode: ColorMode): Promise<iq.utils.Palette> {
+    const paletteColors = PALETTE_R_VALUES[colorMode]
+      .map(r => iq.utils.Point.createByRGBA(r, 0, 0, 255));
     const palette = await iq.buildPalette([]);
-    const point0 = iq.utils.Point.createByRGBA(0, 0, 0, 255);
-    const pointMixed01 = iq.utils.Point.createByRGBA(42, 0, 0, 255);
-    const point1 = iq.utils.Point.createByRGBA(85, 0, 0, 255);
-    const pointMixed12 = iq.utils.Point.createByRGBA(127, 0, 0, 255);
-    const point2 = iq.utils.Point.createByRGBA(170, 0, 0, 255);
-    const pointMixed23 = iq.utils.Point.createByRGBA(212, 0, 0, 255);
-    const point3 = iq.utils.Point.createByRGBA(255, 0, 0, 255);
-    const paletteColors = colorMode === ColorMode.FrameBlend
-      ? [point0, pointMixed01, point1, pointMixed12, point2, pointMixed23, point3]
-      : [point0, point1, point2, point3];
     paletteColors.forEach(pc => palette.add(pc));
     return palette;
   };

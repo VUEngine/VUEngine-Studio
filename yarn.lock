@@ -993,6 +993,11 @@
     "@babel/helper-validator-identifier" "^7.22.20"
     to-fast-properties "^2.0.0"
 
+"@camoto/pngjs@^6.1.0":
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/@camoto/pngjs/-/pngjs-6.1.0.tgz#4f4fdc83bdf94854f1a30877fde1cad6d4ac44b5"
+  integrity sha512-0mwwlqkoQbyMVGCalNplOtjjAg1b/fHNtyvE4prJn7lvKftcDEs0+wd6dpSmD+C8gBJZMJdon4JCzy39ypkiMw==
+
 "@cspotcode/source-map-support@^0.8.0":
   version "0.8.1"
   resolved "https://registry.yarnpkg.com/@cspotcode/source-map-support/-/source-map-support-0.8.1.tgz#00629c35a688e05a88b1cda684fb9d5e73f000a1"
@@ -11649,11 +11654,6 @@ plist@^3.0.1, plist@^3.0.4:
     "@xmldom/xmldom" "^0.8.8"
     base64-js "^1.5.1"
     xmlbuilder "^15.1.1"
-
-pngjs@^7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/pngjs/-/pngjs-7.0.0.tgz#a8b7446020ebbc6ac739db6c5415a65d17090e26"
-  integrity sha512-LKWqWJRhstyYo9pGvgor/ivk2w94eSjE3RGVuzLGlr3NmD8bf7RcYGze1mNdEHRP6TRP6rMuDHk5t44hnTRyow==
 
 portfinder@^1.0.28:
   version "1.0.32"

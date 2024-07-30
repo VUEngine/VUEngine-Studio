@@ -6,7 +6,6 @@ import { VisitOptions } from 'sort-json';
 import { Systeminformation } from 'systeminformation';
 
 export interface VesCoreAPI {
-    setZoomFactor(zoomFactor: number): void;
     getUserDefault(preference: string, type: string): string;
     getTempDir(): string;
     dereferenceJsonSchema(schema: JsonSchema): Promise<JsonSchema>;
@@ -30,7 +29,6 @@ declare global {
     }
 }
 
-export const VES_CHANNEL_SET_ZOOM_FACTOR = 'vesSetZoomFactor';
 export const VES_CHANNEL_GET_USER_DEFAULT = 'vesGetUserDefault';
 export const VES_CHANNEL_DECOMPRESS = 'vesDecompress';
 export const VES_CHANNEL_DEREFERENCE_JSON_SCHEMA = 'vesDereferenceJsonSchema';
