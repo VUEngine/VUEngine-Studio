@@ -157,16 +157,16 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                     </VContainer>
                 </VContainer>
                 <HContainer gap={20}>
-                    <VContainer>
-                        {allowFrameBlendMode &&
+                    {allowFrameBlendMode &&
+                        <VContainer>
                             <ColorModeSelect
-                                value={colorMode}
+                                value={colorMode ?? ColorMode.Default}
                                 setValue={newColorMode => updateColorMode(newColorMode)}
                                 hoverService={services.hoverService}
                                 disabled={!image}
                             />
-                        }
-                    </VContainer>
+                        </VContainer>
+                    }
                     <HContainer gap={10}>
                         <VContainer>
                             <label>
