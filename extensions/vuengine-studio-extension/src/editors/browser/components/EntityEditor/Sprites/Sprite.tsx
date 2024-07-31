@@ -891,7 +891,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
             <PopUpDialog
                 open={processingDialogOpen}
                 setOpen={setProcessingDialogOpen}
-                title={nls.localize('vuengine/entityEditor/imageProcessingSettings', 'Image Processing Settings')}
+                title={nls.localize('vuengine/editors/imageProcessingSettings', 'Image Processing Settings')}
                 height='100%'
                 width='100%'
             >

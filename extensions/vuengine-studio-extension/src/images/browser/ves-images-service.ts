@@ -17,8 +17,10 @@ import {
   ConversionResult,
   ConversionResultMapData,
   ConvertedFileData,
-  DEFAULT_COLOR_DISTANCE_FORMULA,
+  DEFAULT_COLOR_DISTANCE_CALCULATOR,
+  DEFAULT_DITHER_SERPENTINE,
   DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
+  DEFAULT_MINIMUM_COLOR_DISTANCE_TO_DITHER,
   ImageCompressionType,
   ImageConfig,
   ImageConfigWithName,
@@ -235,7 +237,6 @@ export class VesImagesService {
     imagePath: string,
     processingSettings: ImageProcessingSettings,
     colorMode: ColorMode,
-    setProgress?: (p: number) => void
   ): Promise<Buffer> {
     await this.workspaceService.ready;
     await this.ready;
@@ -251,16 +252,8 @@ export class VesImagesService {
     // create point container
     const pointContainer = iq.utils.PointContainer.fromUint8Array(imageData.data, imageData.width, imageData.height);
 
-    // apply reduced palette, optionally dither
-    const outPointContainer = await iq.applyPalette(pointContainer, this.targetPalettes[colorMode], {
-      colorDistanceFormula: processingSettings?.colorDistanceFormula ?? DEFAULT_COLOR_DISTANCE_FORMULA,
-      imageQuantization: processingSettings?.imageQuantizationAlgorithm ?? DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
-      onProgress: p => {
-        if (setProgress) {
-          setProgress(p);
-        }
-      },
-    });
+    // apply reduced palette
+    const outPointContainer = this.applyPaletteToPointContainer(pointContainer, this.targetPalettes[colorMode], processingSettings);
 
     // post process resulting point container into an indexed array
     const outPointContainerArray = outPointContainer.toUint8Array();
@@ -349,6 +342,75 @@ export class VesImagesService {
 
     return pixelData;
   };
+
+  protected applyPaletteToPointContainer(
+    pointContainer: iq.utils.PointContainer,
+    palette: iq.utils.Palette,
+    processingSettings: ImageProcessingSettings
+  ): iq.utils.PointContainer {
+    const imageQuantizer = (processingSettings?.imageQuantizationAlgorithm ?? DEFAULT_IMAGE_QUANTIZATION_ALGORITHM) !== 'nearest'
+      ? new iq.image.ErrorDiffusionArray(
+        this.getDistanceCalculator(processingSettings?.distanceCalculator ?? DEFAULT_COLOR_DISTANCE_CALCULATOR),
+        this.getErrorDiffusionArrayKernel(processingSettings?.imageQuantizationAlgorithm ?? DEFAULT_IMAGE_QUANTIZATION_ALGORITHM),
+        processingSettings?.serpentine || DEFAULT_DITHER_SERPENTINE,
+        processingSettings?.minimumColorDistanceToDither || DEFAULT_MINIMUM_COLOR_DISTANCE_TO_DITHER,
+      )
+      : new iq.image.NearestColor(
+        this.getDistanceCalculator(processingSettings?.distanceCalculator ?? DEFAULT_COLOR_DISTANCE_CALCULATOR),
+      );
+
+    return imageQuantizer.quantizeSync(pointContainer, palette);
+  }
+
+  protected getDistanceCalculator(distanceCalculator: string): iq.distance.AbstractDistanceCalculator {
+    switch (distanceCalculator) {
+      case 'cie94-graphic-arts':
+        return new iq.distance.CIE94GraphicArts();
+      case 'ciede2000':
+        return new iq.distance.CIEDE2000();
+      case 'color-metric':
+        return new iq.distance.CMetric();
+      case 'euclidean':
+      default:
+        return new iq.distance.Euclidean();
+      case 'euclidean-bt709':
+        return new iq.distance.EuclideanBT709();
+      case 'euclidean-bt709-noalpha':
+        return new iq.distance.EuclideanBT709NoAlpha();
+      case 'manhattan':
+        return new iq.distance.Manhattan();
+      case 'manhattan-bt709':
+        return new iq.distance.ManhattanBT709();
+      case 'manhattan-nommyde':
+        return new iq.distance.ManhattanNommyde();
+      case 'pngquant':
+        return new iq.distance.PNGQuant();
+    }
+  }
+
+  protected getErrorDiffusionArrayKernel(imageQuantizationAlgorithm: string): number {
+    switch (imageQuantizationAlgorithm) {
+      case 'atkinson':
+        return iq.image.ErrorDiffusionArrayKernel.Atkinson;
+      case 'burkes':
+        return iq.image.ErrorDiffusionArrayKernel.Burkes;
+      case 'floyd-steinberg':
+      default:
+        return iq.image.ErrorDiffusionArrayKernel.FloydSteinberg;
+      case 'false-floyd-steinberg':
+        return iq.image.ErrorDiffusionArrayKernel.FalseFloydSteinberg;
+      case 'jarvis':
+        return iq.image.ErrorDiffusionArrayKernel.Jarvis;
+      case 'sierra':
+        return iq.image.ErrorDiffusionArrayKernel.Sierra;
+      case 'sierra-lite':
+        return iq.image.ErrorDiffusionArrayKernel.SierraLite;
+      case 'stucki':
+        return iq.image.ErrorDiffusionArrayKernel.Stucki;
+      case 'two-sierra':
+        return iq.image.ErrorDiffusionArrayKernel.TwoSierra;
+    }
+  }
 
   protected async getConvertedFilesData(convertedFolderUri: URI): Promise<ConvertedFileData[]> {
     const generatedFiles = window.electronVesCore.findFiles(await this.fileService.fsPath(convertedFolderUri), '*.c')

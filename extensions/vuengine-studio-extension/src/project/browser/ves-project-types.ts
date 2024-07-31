@@ -335,13 +335,21 @@ export const defaultProjectData: ProjectData = {
           imageProcessingSettings: {
             type: 'object',
             properties: {
-              colorDistanceFormula: {
+              distanceCalculator: {
                 type: 'string',
                 default: 'euclidean'
               },
               imageQuantizationAlgorithm: {
                 type: 'string',
                 default: 'nearest'
+              },
+              minimumColorDistanceToDither: {
+                type: 'number',
+                default: 0
+              },
+              serpentine: {
+                type: 'boolean',
+                default: false,
               }
             }
           },

@@ -4,8 +4,10 @@ import { ColorMode } from '../../core/browser/ves-common-types';
 import { BasicSelectOption } from '../../editors/browser/components/Common/BasicSelect';
 import { DataSection } from '../../editors/browser/components/Common/CommonTypes';
 
-export const DEFAULT_COLOR_DISTANCE_FORMULA = 'euclidean';
+export const DEFAULT_COLOR_DISTANCE_CALCULATOR = 'euclidean';
 export const DEFAULT_IMAGE_QUANTIZATION_ALGORITHM = 'nearest';
+export const DEFAULT_MINIMUM_COLOR_DISTANCE_TO_DITHER = 0;
+export const DEFAULT_DITHER_SERPENTINE = false;
 
 export const TILE_HEIGHT = 8;
 export const TILE_WIDTH = 8;
@@ -126,24 +128,24 @@ export const DEFAULT_IMAGE_CONVERTER_CONFIG: ImageConfig = {
     frames: 0,
   },
   imageProcessingSettings: {
-    colorDistanceFormula: DEFAULT_COLOR_DISTANCE_FORMULA,
+    distanceCalculator: DEFAULT_COLOR_DISTANCE_CALCULATOR,
     imageQuantizationAlgorithm: DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
+    minimumColorDistanceToDither: DEFAULT_MINIMUM_COLOR_DISTANCE_TO_DITHER,
+    serpentine: DEFAULT_DITHER_SERPENTINE,
   },
   colorMode: ColorMode.Default
 };
 
 export interface ImageProcessingSettings {
-  colorDistanceFormula: iq.ColorDistanceFormula,
+  distanceCalculator: iq.ColorDistanceFormula,
   imageQuantizationAlgorithm: iq.ImageQuantization,
+  minimumColorDistanceToDither: number,
+  serpentine: boolean,
 }
 
-export const colorDistanceFormulaOptions: BasicSelectOption[] = [
+export const DISTANCE_CALCULATOR_OPTIONS: BasicSelectOption[] = [
   {
-    label: 'CIE94 (Textiles)',
-    value: 'cie94-textiles'
-  },
-  {
-    label: 'CIE94 (Graphic Arts)',
+    label: 'CIE94',
     value: 'cie94-graphic-arts'
   },
   {
@@ -184,15 +186,7 @@ export const colorDistanceFormulaOptions: BasicSelectOption[] = [
   },
 ];
 
-export const imageQuantizationAlgorithmOptions: BasicSelectOption[] = [
-  {
-    label: 'Nearest Color',
-    value: 'nearest'
-  },
-  {
-    label: 'Riemersma',
-    value: 'riemersma'
-  },
+export const IMAGE_QUANTIZATION_ALGORITHM_OPTIONS: BasicSelectOption[] = [
   {
     label: 'Floyd-Steinberg',
     value: 'floyd-steinberg'

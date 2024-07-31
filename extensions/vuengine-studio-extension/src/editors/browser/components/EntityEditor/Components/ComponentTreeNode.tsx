@@ -23,8 +23,10 @@ import React, { useContext, useState } from 'react';
 import { NodeRendererProps } from 'react-arborist';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
 import {
-    DEFAULT_COLOR_DISTANCE_FORMULA,
+    DEFAULT_COLOR_DISTANCE_CALCULATOR,
+    DEFAULT_DITHER_SERPENTINE,
     DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
+    DEFAULT_MINIMUM_COLOR_DISTANCE_TO_DITHER,
     ImageCompressionType
 } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
@@ -349,8 +351,10 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
             name: nls.localize('vuengine/entityEditor/sprite', 'Sprite'),
             sourceType: SpriteSourceType.Image,
             imageProcessingSettings: {
-                colorDistanceFormula: DEFAULT_COLOR_DISTANCE_FORMULA,
+                distanceCalculator: DEFAULT_COLOR_DISTANCE_CALCULATOR,
                 imageQuantizationAlgorithm: DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
+                minimumColorDistanceToDither: DEFAULT_MINIMUM_COLOR_DISTANCE_TO_DITHER,
+                serpentine: DEFAULT_DITHER_SERPENTINE,
             },
             bgmapMode: BgmapMode.Bgmap,
             colorMode: ColorMode.Default,
