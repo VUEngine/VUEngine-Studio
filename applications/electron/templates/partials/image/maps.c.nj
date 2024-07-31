@@ -4,13 +4,18 @@
 {%- if customMapPrefix is defined -%}
 	{%- set mapName = customMapPrefix ~ mapName -%}
 {%- endif %}
+{%- set reducedMapDataLength = mapData.length / frameCount -%}
 const uint16 {{ mapName }}Map[] __attribute__((aligned(4)))
 {%- if section == 'data' %} __attribute((section(".rodata"))){% endif %}
 {%- if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =
 {
 	{% for mapTile in mapData -%}
+	{#- We only need to print the first frame when this is an animation -#}
+	{#- and the map data is not optimized (individualFiles: false). -#}
+	{%- if not isSpritesheetAnimation or loop.index0 < reducedMapDataLength -%}
 	0x{{ mapTile }},
 	{%- if loop.index % 8 == 0 and not loop.last %}{{ "\n	" }}{% endif -%}
+	{%- endif -%}
 	{%- endfor %}
 };
 {% endfor -%}

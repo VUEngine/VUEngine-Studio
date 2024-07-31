@@ -199,23 +199,10 @@ export class VesImagesService {
                 };
               }
               if (m.map.data.length) {
-                // We can remove all but the first frame when this is an animation
-                // and the map data is not optimized (individualFiles: false).
-                if (imageConfig.animation.isAnimation && !imageConfig.animation.individualFiles &&
-                  imageConfig.animation.frames > 0) {
-                  const reducedMapDataLength = m.map.data.length / imageConfig.animation.frames;
-                  result.maps.push({
-                    data: m.map.data.filter((d, i) => i < reducedMapDataLength),
-                    height: m.map.height / imageConfig.animation.frames,
-                    width: m.map.width,
-                    name: m.name
-                  });
-                } else {
-                  result.maps.push({
-                    ...m.map,
-                    name: m.name
-                  });
-                }
+                result.maps.push({
+                  ...m.map,
+                  name: m.name
+                });
                 frames++;
               }
             });
@@ -348,12 +335,12 @@ export class VesImagesService {
     palette: iq.utils.Palette,
     processingSettings: ImageProcessingSettings
   ): iq.utils.PointContainer {
-    const imageQuantizer = (processingSettings?.imageQuantizationAlgorithm ?? DEFAULT_IMAGE_QUANTIZATION_ALGORITHM) !== 'nearest'
+    const imageQuantizer = (processingSettings?.imageQuantizationAlgorithm ?? 'nearest') !== 'nearest'
       ? new iq.image.ErrorDiffusionArray(
         this.getDistanceCalculator(processingSettings?.distanceCalculator ?? DEFAULT_COLOR_DISTANCE_CALCULATOR),
         this.getErrorDiffusionArrayKernel(processingSettings?.imageQuantizationAlgorithm ?? DEFAULT_IMAGE_QUANTIZATION_ALGORITHM),
-        processingSettings?.serpentine || DEFAULT_DITHER_SERPENTINE,
-        processingSettings?.minimumColorDistanceToDither || DEFAULT_MINIMUM_COLOR_DISTANCE_TO_DITHER,
+        processingSettings?.serpentine ?? DEFAULT_DITHER_SERPENTINE,
+        processingSettings?.minimumColorDistanceToDither ?? DEFAULT_MINIMUM_COLOR_DISTANCE_TO_DITHER,
       )
       : new iq.image.NearestColor(
         this.getDistanceCalculator(processingSettings?.distanceCalculator ?? DEFAULT_COLOR_DISTANCE_CALCULATOR),
