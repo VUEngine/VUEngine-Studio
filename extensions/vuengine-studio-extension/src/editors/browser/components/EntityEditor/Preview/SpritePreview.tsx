@@ -52,7 +52,7 @@ export default function SpritePreview(props: SpritePreviewProps): React.JSX.Elem
 
   const getData = async () => {
     setIsGenerating(true);
-    const allImageData: number[][][][] = [[], [], [], []];
+    const allImageData: number[][][][] = [];
 
     if (!sprite._imageData || typeof sprite._imageData === 'number') {
       setIsGenerating(false);
@@ -64,6 +64,9 @@ export default function SpritePreview(props: SpritePreviewProps): React.JSX.Elem
       if (singleImageData.maps) {
         await Promise.all(singleImageData.maps.map(async (singleImageDataMap, j) => {
           const uncompressedMapData = await services.vesCommonService.uncompressJson(singleImageDataMap?.data) as string[];
+          if (allImageData[i] === undefined) {
+            allImageData[i] = [];
+          }
           allImageData[i][j] = services.vesImagesService.imageDataToPixelData(uncompressedTileData, { ...singleImageDataMap, data: uncompressedMapData });
           // setGeneratingProgress(++processedFiles, totalFiles);
         }));
@@ -106,8 +109,8 @@ export default function SpritePreview(props: SpritePreviewProps): React.JSX.Elem
       });
     } else {
       [0, 1].map(k => {
-        if (imageData[k] && imageData[k][0]) {
-          result.push(imageData[k][0]);
+        if (imageData[k]) {
+          imageData[k].map(i => result.push(i));
         }
       });
     }
