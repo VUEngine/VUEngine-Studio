@@ -9,6 +9,7 @@ import { WorkspaceService } from '@theia/workspace/lib/browser';
 import * as iq from 'image-q';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { ColorMode, PALETTE_R_VALUES, PALETTE_VALUE_INDEX_MAP } from '../../core/browser/ves-common-types';
+import { roundToNextMultipleOf8 } from '../../editors/browser/components/Common/Utils';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
 import { compressTiles } from './ves-images-compressor';
@@ -236,8 +237,29 @@ export class VesImagesService {
     const camoto = require('@camoto/pngjs/browser');
     const imageData = camoto.PNG.sync.read(Buffer.from(imageFileContent.value.buffer));
 
+    // pad to next multiple of 8 if necessary
+    const paddedHeight = roundToNextMultipleOf8(imageData.height);
+    const paddedWidth = roundToNextMultipleOf8(imageData.width);
+    if (paddedHeight > imageData.height || paddedWidth > imageData.width) {
+      const imageDataArray = Array.from(imageData.data);
+      if (paddedWidth > imageData.width) {
+        // pad width (each line)
+        const valuesToAddPerLine = [...Array(paddedWidth - imageData.width)].map(i => [0, 0, 0, 255]).flat(1);
+        const valuesPerLine = 4 * imageData.width;
+        [...Array(imageData.height)].map((i, j) => {
+          // pad from bottom to top line to work around added values messing up counts
+          imageDataArray.splice((imageData.height - j) * valuesPerLine, 0, ...valuesToAddPerLine);
+        });
+      }
+      // pad height
+      if (paddedHeight > imageData.height) {
+        [...Array((paddedHeight - imageData.height) * paddedWidth)].map(i => imageDataArray.push(0, 0, 0, 255));
+      }
+      imageData.data = new Uint8Array(imageDataArray as number[]);
+    }
+
     // create point container
-    const pointContainer = iq.utils.PointContainer.fromUint8Array(imageData.data, imageData.width, imageData.height);
+    const pointContainer = iq.utils.PointContainer.fromUint8Array(imageData.data, paddedWidth, paddedHeight);
 
     // apply reduced palette
     const outPointContainer = this.applyPaletteToPointContainer(pointContainer, this.targetPalettes[colorMode], processingSettings);
@@ -268,9 +290,10 @@ export class VesImagesService {
       data: Buffer.from(indexedPoints),
       depth: 8,
       gamma: 0,
-      height: colorMode === ColorMode.FrameBlend ? imageData.height * 2 : imageData.height,
+      height: colorMode === ColorMode.FrameBlend ? paddedHeight * 2 : paddedHeight,
       interlace: false,
-      palette: PALETTE_R_VALUES[0].map(r => [r, 0, 0, 255])
+      palette: PALETTE_R_VALUES[0].map(r => [r, 0, 0, 255]),
+      width: paddedWidth
     }, {
       bitDepth: 8,
       inputColorType: 3,

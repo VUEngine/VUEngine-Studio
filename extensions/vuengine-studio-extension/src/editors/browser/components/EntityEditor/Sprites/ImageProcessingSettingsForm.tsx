@@ -1,6 +1,6 @@
 import { nls } from '@theia/core';
 import * as iq from 'image-q';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
 import {
     ConversionResult,
@@ -9,14 +9,14 @@ import {
     DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
     DEFAULT_MINIMUM_COLOR_DISTANCE_TO_DITHER,
     DISTANCE_CALCULATOR_OPTIONS,
-    ImageProcessingSettings,
     IMAGE_QUANTIZATION_ALGORITHM_OPTIONS,
+    ImageProcessingSettings,
 } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import BasicSelect from '../../Common/BasicSelect';
 import CanvasImage from '../../Common/CanvasImage';
 import HContainer from '../../Common/HContainer';
-import { getMaxScaleInContainer } from '../../Common/Utils';
+import { getMaxScaleInContainer, roundToNextMultipleOf8 } from '../../Common/Utils';
 import VContainer from '../../Common/VContainer';
 import { DisplayMode } from '../../Common/VUEngineTypes';
 import Images from '../../ImageEditor/Images';
@@ -66,12 +66,15 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
 
     const findCanvasScale = () => {
         setCanvasScale(getMaxScaleInContainer(
-            canvasContainerRef.current?.clientWidth ?? width,
-            canvasContainerRef.current?.clientHeight ?? height,
-            width,
-            height,
+            canvasContainerRef.current?.clientWidth ?? paddedWidth,
+            canvasContainerRef.current?.clientHeight ?? paddedHeight,
+            paddedWidth,
+            paddedHeight,
         ));
     };
+
+    const paddedHeight = useMemo(() => roundToNextMultipleOf8(height), [height]);
+    const paddedWidth = useMemo(() => roundToNextMultipleOf8(width), [width]);
 
     useEffect(() => {
         uncompressImageData();
@@ -87,8 +90,8 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
         resizeObserver.observe(canvasContainerRef.current);
         return () => resizeObserver.disconnect();
     }, [
-        height,
-        width,
+        paddedHeight,
+        paddedWidth,
     ]);
 
     return (
@@ -97,9 +100,17 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                 <VContainer grow={1}>
                     <HContainer grow={1}>
                         <VContainer style={{ width: '50%' }}>
-                            <label>
-                                {nls.localize('vuengine/editors/source', 'Source')}
-                            </label>
+                            <HContainer justifyContent='space-between'>
+                                <label>
+                                    {nls.localize('vuengine/editors/source', 'Source')}
+                                </label>
+                                <VContainer style={{ opacity: .6 }}>
+                                    {height
+                                        ? <>{width} × {height} px</>
+                                        : <>&nbsp;</>
+                                    }
+                                </VContainer>
+                            </HContainer>
                             <Images
                                 data={image ? [image] : []}
                                 updateData={setFiles}
@@ -117,9 +128,17 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                             <i className="codicon codicon-arrow-right"></i>
                         </VContainer>
                         <VContainer style={{ width: '50%' }}>
-                            <label>
-                                {nls.localize('vuengine/editors/result', 'Result')}
-                            </label>
+                            <HContainer justifyContent='space-between'>
+                                <label>
+                                    {nls.localize('vuengine/editors/result', 'Result')}
+                                </label>
+                                {
+                                    (paddedHeight > height || paddedWidth > width) &&
+                                    <VContainer style={{ opacity: .6 }}>
+                                        {nls.localize('vuengine/editors/paddedTo', 'Padded to')} {paddedWidth} × {paddedHeight} px
+                                    </VContainer>
+                                }
+                            </HContainer>
                             <VContainer grow={1} style={{ position: 'relative' }}>
                                 <div
                                     className="filePreview"
@@ -132,11 +151,11 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                                     <div className="filePreviewImage" ref={canvasContainerRef}>
                                         {uncompressedImageData &&
                                             <CanvasImage
-                                                height={height}
+                                                height={paddedHeight}
                                                 palette={'11100100'}
                                                 pixelData={[uncompressedImageData]}
                                                 displayMode={DisplayMode.Mono}
-                                                width={width}
+                                                width={paddedWidth}
                                                 colorMode={colorMode}
                                                 style={{
                                                     backgroundColor: '#000',
@@ -149,12 +168,6 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                             </VContainer>
                         </VContainer>
                     </HContainer>
-                    <VContainer style={{ opacity: .6 }}>
-                        {height
-                            ? <>{width} × {height} px</>
-                            : <>&nbsp;</>
-                        }
-                    </VContainer>
                 </VContainer>
                 <HContainer gap={20}>
                     {allowFrameBlendMode &&
