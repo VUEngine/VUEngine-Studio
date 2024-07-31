@@ -3,12 +3,14 @@ import * as iq from 'image-q';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
 import {
-    colorDistanceFormulaOptions,
     ConversionResult,
-    DEFAULT_COLOR_DISTANCE_FORMULA,
+    DEFAULT_COLOR_DISTANCE_CALCULATOR,
+    DEFAULT_DITHER_SERPENTINE,
     DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
+    DEFAULT_MINIMUM_COLOR_DISTANCE_TO_DITHER,
+    DISTANCE_CALCULATOR_OPTIONS,
     ImageProcessingSettings,
-    imageQuantizationAlgorithmOptions,
+    IMAGE_QUANTIZATION_ALGORITHM_OPTIONS,
 } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import BasicSelect from '../../Common/BasicSelect';
@@ -95,7 +97,9 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                 <VContainer grow={1}>
                     <HContainer grow={1}>
                         <VContainer style={{ width: '50%' }}>
-                            <label>Source</label>
+                            <label>
+                                {nls.localize('vuengine/editors/source', 'Source')}
+                            </label>
                             <Images
                                 data={image ? [image] : []}
                                 updateData={setFiles}
@@ -113,7 +117,9 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                             <i className="codicon codicon-arrow-right"></i>
                         </VContainer>
                         <VContainer style={{ width: '50%' }}>
-                            <label>Result</label>
+                            <label>
+                                {nls.localize('vuengine/editors/result', 'Result')}
+                            </label>
                             <VContainer grow={1} style={{ position: 'relative' }}>
                                 <div
                                     className="filePreview"
@@ -150,7 +156,7 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                         }
                     </VContainer>
                 </VContainer>
-                <HContainer gap={10}>
+                <HContainer gap={20}>
                     <VContainer>
                         {allowFrameBlendMode &&
                             <ColorModeSelect
@@ -161,47 +167,91 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                             />
                         }
                     </VContainer>
-                    <VContainer>
-                        <label>Dither</label>
-                        <label>
-                            <input
-                                type="checkbox"
-                                checked={processingSettings?.imageQuantizationAlgorithm !== 'nearest'}
-                                onChange={() => {
-                                    updateProcessingSettings({
-                                        imageQuantizationAlgorithm: processingSettings?.imageQuantizationAlgorithm === 'nearest' ? 'floyd-steinberg' : 'nearest',
-                                    });
-                                }}
-                            />
-                            {nls.localize('vuengine/editors/enable', 'Enable')}
-                        </label>
-                    </VContainer>
-                    {processingSettings?.imageQuantizationAlgorithm !== 'nearest' &&
-                        <>
-                            <VContainer>
-                                <label>Quantization Algorithm</label>
-                                <BasicSelect
-                                    options={imageQuantizationAlgorithmOptions}
-                                    value={processingSettings?.imageQuantizationAlgorithm ?? DEFAULT_IMAGE_QUANTIZATION_ALGORITHM}
-                                    onChange={e => updateProcessingSettings({
-                                        imageQuantizationAlgorithm: e.target.value as iq.ImageQuantization,
-                                    })}
-                                    disabled={!image}
+                    <HContainer gap={10}>
+                        <VContainer>
+                            <label>
+                                {nls.localize('vuengine/editors/dither', 'Dither')}
+                            </label>
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    checked={processingSettings?.imageQuantizationAlgorithm !== 'nearest'}
+                                    onChange={() => {
+                                        updateProcessingSettings({
+                                            imageQuantizationAlgorithm: processingSettings?.imageQuantizationAlgorithm === 'nearest' ? 'floyd-steinberg' : 'nearest',
+                                        });
+                                    }}
                                 />
-                            </VContainer>
-                            <VContainer>
-                                <label>Color Distance Formula</label>
-                                <BasicSelect
-                                    options={colorDistanceFormulaOptions}
-                                    value={processingSettings?.colorDistanceFormula ?? DEFAULT_COLOR_DISTANCE_FORMULA}
-                                    onChange={e => updateProcessingSettings({
-                                        colorDistanceFormula: e.target.value as iq.ColorDistanceFormula,
-                                    })}
-                                    disabled={!image}
-                                />
-                            </VContainer>
-                        </>
-                    }
+                                {nls.localize('vuengine/editors/enable', 'Enable')}
+                            </label>
+                            {processingSettings?.imageQuantizationAlgorithm !== 'nearest' &&
+                                <label>
+                                    <input
+                                        type="checkbox"
+                                        checked={processingSettings?.serpentine ?? DEFAULT_DITHER_SERPENTINE}
+                                        onChange={() => {
+                                            updateProcessingSettings({
+                                                serpentine: !processingSettings?.serpentine,
+                                            });
+                                        }}
+                                    />
+                                    {nls.localize('vuengine/editors/serpentine', 'Serpentine')}
+                                </label>
+                            }
+                        </VContainer>
+                        {processingSettings?.imageQuantizationAlgorithm !== 'nearest' &&
+                            <>
+                                <VContainer style={{ minWidth: 200 }}>
+                                    <label>
+                                        {nls.localize('vuengine/editors/quantizationAlgorithm', 'Quantization Algorithm')}
+                                    </label>
+                                    <BasicSelect
+                                        options={IMAGE_QUANTIZATION_ALGORITHM_OPTIONS}
+                                        value={processingSettings?.imageQuantizationAlgorithm ?? DEFAULT_IMAGE_QUANTIZATION_ALGORITHM}
+                                        onChange={e => updateProcessingSettings({
+                                            imageQuantizationAlgorithm: e.target.value as iq.ImageQuantization,
+                                        })}
+                                        disabled={!image}
+                                    />
+                                </VContainer>
+                                <VContainer>
+                                    <label>
+                                        {nls.localize('vuengine/editors/minimumColorDistance', 'Minimum Color Distance')}
+                                    </label>
+                                    <HContainer>
+                                        <input
+                                            type='range'
+                                            min={0}
+                                            max={1}
+                                            step={0.05}
+                                            value={processingSettings?.minimumColorDistanceToDither ?? DEFAULT_MINIMUM_COLOR_DISTANCE_TO_DITHER}
+                                            onChange={e => updateProcessingSettings({
+                                                minimumColorDistanceToDither: parseFloat(e.target.value),
+                                            })}
+                                        />
+                                        <div style={{ minWidth: 32, textAlign: 'right', width: 32 }}>
+                                            {processingSettings?.minimumColorDistanceToDither ?? 0}
+                                        </div>
+                                    </HContainer>
+                                </VContainer>
+                                {processingSettings?.minimumColorDistanceToDither > 0 &&
+                                    <VContainer style={{ minWidth: 200 }}>
+                                        <label>
+                                            {nls.localize('vuengine/editors/colorDistanceCalculator', 'Color Distance Calculator')}
+                                        </label>
+                                        <BasicSelect
+                                            options={DISTANCE_CALCULATOR_OPTIONS}
+                                            value={processingSettings?.distanceCalculator ?? DEFAULT_COLOR_DISTANCE_CALCULATOR}
+                                            onChange={e => updateProcessingSettings({
+                                                distanceCalculator: e.target.value as iq.ColorDistanceFormula,
+                                            })}
+                                            disabled={!image}
+                                        />
+                                    </VContainer>
+                                }
+                            </>
+                        }
+                    </HContainer>
                 </HContainer>
             </VContainer >
         </div >
