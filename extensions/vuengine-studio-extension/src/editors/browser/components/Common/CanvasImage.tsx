@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { ColorMode, PALETTE_COLORS, PALETTE_BIT_INDEX_MAP } from '../../../../core/browser/ves-common-types';
+import { ColorMode, PALETTE_BIT_INDEX_MAP, PALETTE_COLORS } from '../../../../core/browser/ves-common-types';
 import { DisplayMode } from './VUEngineTypes';
 
 interface CanvasImageProps {
@@ -180,8 +180,8 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
         width={totalWidth + Math.abs(effectiveParallaxDisplacement) * 2}
         style={{
             ...style,
+            float: 'left', // fix top offset on small sprites
             imageRendering: 'pixelated',
-            marginTop: (repeatX || repeatY) ? 3 : undefined, // why?
             opacity: (repeatX || repeatY) ? .25 : undefined,
         }}
     />;

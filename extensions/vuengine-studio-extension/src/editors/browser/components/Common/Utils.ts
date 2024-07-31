@@ -61,3 +61,5 @@ export const getMaxScaleInContainer = (containerWidth: number, containerHeight: 
         ? Math.min(heightScale, widthScale)
         : 1;
 };
+
+export const roundToNextMultipleOf8 = (x: number) => (x + 7) & (-8);
