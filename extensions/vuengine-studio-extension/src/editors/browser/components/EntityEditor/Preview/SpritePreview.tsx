@@ -68,11 +68,11 @@ export default function SpritePreview(props: SpritePreviewProps): React.JSX.Elem
             allImageData[i] = [];
           }
           allImageData[i][j] = services.vesImagesService.imageDataToPixelData(uncompressedTileData, { ...singleImageDataMap, data: uncompressedMapData });
-          // setGeneratingProgress(++processedFiles, totalFiles);
         }));
       }
     }));
-    if (allImageData[0].length && allImageData[0][0].length && allImageData[0][0][0].length) {
+
+    if (allImageData[0] && allImageData[0] && allImageData[0][0] && allImageData[0][0][0]) {
       setError(undefined);
       setHeight(allImageData[0][0].length);
       setWidth(allImageData[0][0][0].length);
