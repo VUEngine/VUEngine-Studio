@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { ColorMode, PALETTE_COLORS, PALETTE_BIT_INDEX_MAP } from '../../../../core/browser/ves-common-types';
 import { DisplayMode } from './VUEngineTypes';
 
@@ -33,13 +33,7 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
     // eslint-disable-next-line no-null/no-null
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const effectiveParallaxDisplacement = displayMode === DisplayMode.Stereo ? parallaxDisplacement ?? 0 : 0;
-    const totalHeight = repeatY
-        ? (Math.round(Math.round(7500 / height) / 2) * 2 + 1) * height
-        : height;
-    const totalWidth = repeatX
-        ? (Math.round(Math.round(7500 / width) / 2) * 2 + 1) * width
-        : width;
+    const effectiveParallaxDisplacement = displayMode === DisplayMode.Stereo ? (parallaxDisplacement ?? 0) : 0;
 
     const drawToCanvas = (context: CanvasRenderingContext2D, pixels: number[][]) => {
         if (pixels === undefined) {
@@ -152,15 +146,32 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
         context.fill();
     };
 
+    const totalHeight = useMemo(() => repeatY
+        ? (Math.round(Math.round(10000 / height) / 2) * 2 + 1) * height
+        : height
+        , [
+            height,
+            repeatY
+        ]);
+
+    const totalWidth = useMemo(() => repeatX
+        ? (Math.round(Math.round(10000 / width) / 2) * 2 + 1) * width
+        : width
+        , [
+            width,
+            repeatX
+        ]);
+
     useEffect(() => {
         draw();
     }, [
+        colorMode,
         displayMode,
-        height,
         palette,
         parallaxDisplacement,
         pixelData,
-        width,
+        totalHeight,
+        totalWidth,
     ]);
 
     return <canvas

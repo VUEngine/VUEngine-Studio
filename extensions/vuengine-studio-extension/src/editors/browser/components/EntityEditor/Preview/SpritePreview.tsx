@@ -35,12 +35,11 @@ export default function SpritePreview(props: SpritePreviewProps): React.JSX.Elem
 
   const isMultiFileAnimation = sprite.texture.files.length > 1;
   const isRepeated = data.sprites.type === SpriteType.Bgmap && (sprite.texture?.repeat?.x || sprite.texture?.repeat?.y);
-  let effectiveHeight = isRepeated && sprite.texture?.repeat?.size?.y
+  const effectiveHeight = isRepeated && sprite.texture?.repeat?.size?.y
     ? sprite.texture.repeat.size.y
-    : height;
-  if (sprite.colorMode === ColorMode.FrameBlend) {
-    effectiveHeight = effectiveHeight / 2;
-  }
+    : sprite.colorMode === ColorMode.FrameBlend
+      ? height / 2
+      : height;
   const effectiveWidth = isRepeated && sprite.texture?.repeat?.size?.x
     ? sprite.texture.repeat.size.x
     : width;
