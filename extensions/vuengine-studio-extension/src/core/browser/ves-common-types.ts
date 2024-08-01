@@ -1,10 +1,3 @@
-export interface ImageData {
-  height: number
-  width: number
-  colorType: number
-  pixelData: number[][]
-};
-
 export enum ColorMode {
   Default = 0,
   FrameBlend = 1, // aka "HiColor"

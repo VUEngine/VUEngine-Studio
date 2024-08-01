@@ -54,11 +54,3 @@ label i.codicon.codicon-question {
   text-align: center;
   vertical-align: text-bottom;
 }
-
-.jsonforms-container .p-Widget.dialogOverlay {
-  position: absolute;
-}
-.jsonforms-container .p-Widget.dialogOverlay .dialogContent {
-  max-height: unset;
-}
-

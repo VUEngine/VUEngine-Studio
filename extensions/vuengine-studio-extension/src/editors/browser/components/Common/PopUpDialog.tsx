@@ -19,6 +19,7 @@ export default function PopUpDialog(props: PropsWithChildren<PopUpDialogProps>):
         style={{
             display: open ? 'flex' : 'none',
             height: '100%',
+            position: 'absolute',
             width: '100%',
         }}
         onKeyDown={e => {
@@ -37,7 +38,7 @@ export default function PopUpDialog(props: PropsWithChildren<PopUpDialogProps>):
                 >
                 </i>
             </div>
-            <div className="dialogContent" style={{ flexGrow: 1 }}>
+            <div className="dialogContent" style={{ flexGrow: 1, maxHeight: 'unset' }}>
                 {children}
             </div>
             <div className="dialogControl">
