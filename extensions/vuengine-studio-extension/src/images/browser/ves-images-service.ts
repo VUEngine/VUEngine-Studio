@@ -26,6 +26,8 @@ import {
   ImageConfig,
   ImageConfigWithName,
   ImageProcessingSettings,
+  MAX_IMAGE_HEIGHT,
+  MAX_IMAGE_WIDTH,
   PIXELS_BITS_PER_TILE,
   TILE_HEIGHT,
   TILE_WIDTH,
@@ -236,24 +238,47 @@ export class VesImagesService {
     // Using the Camoto fork of pngjs here, because it supports generating indexed PNGs
     const camoto = require('@camoto/pngjs/browser');
     const imageData = camoto.PNG.sync.read(Buffer.from(imageFileContent.value.buffer));
+    let height = imageData.height;
+    let width = imageData.width;
+
+    // crop to 512x512 max
+    if (height > MAX_IMAGE_HEIGHT || width > MAX_IMAGE_WIDTH) {
+      let imageDataArray = Array.from(imageData.data);
+      // crop height
+      if (height > MAX_IMAGE_HEIGHT) {
+        imageDataArray = imageDataArray.slice(0, width * MAX_IMAGE_HEIGHT * 4);
+        height = MAX_IMAGE_HEIGHT;
+      }
+      // crop width
+      if (width > MAX_IMAGE_WIDTH) {
+        const valuesPerLine = 4 * width;
+        const numberOfValuesToCropPerLine = 4 * (width - MAX_IMAGE_WIDTH);
+        [...Array(height)].map((i, j) => {
+          // loop from bottom to top line to work around modified lengths messing up counts
+          imageDataArray.splice((height - j) * valuesPerLine, numberOfValuesToCropPerLine);
+        });
+        width = MAX_IMAGE_WIDTH;
+      }
+      imageData.data = new Uint8Array(imageDataArray as number[]);
+    }
 
     // pad to next multiple of 8 if necessary
-    const paddedHeight = roundToNextMultipleOf8(imageData.height);
-    const paddedWidth = roundToNextMultipleOf8(imageData.width);
-    if (paddedHeight > imageData.height || paddedWidth > imageData.width) {
+    const paddedHeight = roundToNextMultipleOf8(height);
+    const paddedWidth = roundToNextMultipleOf8(width);
+    if (paddedHeight > height || paddedWidth > width) {
       const imageDataArray = Array.from(imageData.data);
-      if (paddedWidth > imageData.width) {
+      if (paddedWidth > width) {
         // pad width (each line)
-        const valuesToAddPerLine = [...Array(paddedWidth - imageData.width)].map(i => [0, 0, 0, 255]).flat(1);
-        const valuesPerLine = 4 * imageData.width;
-        [...Array(imageData.height)].map((i, j) => {
-          // pad from bottom to top line to work around added values messing up counts
-          imageDataArray.splice((imageData.height - j) * valuesPerLine, 0, ...valuesToAddPerLine);
+        const valuesToAddPerLine = [...Array(paddedWidth - width)].map(i => [0, 0, 0, 255]).flat(1);
+        const valuesPerLine = 4 * width;
+        [...Array(height)].map((i, j) => {
+          // loop from bottom to top line to work around modified lengths messing up counts
+          imageDataArray.splice((height - j) * valuesPerLine, 0, ...valuesToAddPerLine);
         });
       }
       // pad height
-      if (paddedHeight > imageData.height) {
-        [...Array((paddedHeight - imageData.height) * paddedWidth)].map(i => imageDataArray.push(0, 0, 0, 255));
+      if (paddedHeight > height) {
+        [...Array((paddedHeight - height) * paddedWidth)].map(i => imageDataArray.push(0, 0, 0, 255));
       }
       imageData.data = new Uint8Array(imageDataArray as number[]);
     }
