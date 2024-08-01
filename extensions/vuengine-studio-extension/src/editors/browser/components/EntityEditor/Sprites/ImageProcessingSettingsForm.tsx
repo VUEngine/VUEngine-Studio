@@ -155,18 +155,20 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                                 <label>
                                     {nls.localize('vuengine/editors/result', 'Result')}
                                 </label>
-                                <VContainer style={{ opacity: .6 }}>
-                                    {
-                                        isPadded && isCropped
-                                            ? <>{nls.localize('vuengine/editors/paddedAndCroppedTo', 'Padded and cropped to')}</>
-                                            : isPadded
-                                                ? <>{nls.localize('vuengine/editors/paddedTo', 'Padded to')}</>
-                                                : isCropped
-                                                    ? <>{nls.localize('vuengine/editors/croppedTo', 'Cropped to')}</>
-                                                    : <></>
-                                    }
-                                    {' '}{finalWidth} × {finalHeight} px
-                                </VContainer>
+                                {height > 0 && width > 0 &&
+                                    <VContainer style={{ opacity: .6 }}>
+                                        {
+                                            isPadded && isCropped
+                                                ? <>{nls.localize('vuengine/editors/paddedAndCroppedTo', 'Padded and cropped to')}</>
+                                                : isPadded
+                                                    ? <>{nls.localize('vuengine/editors/paddedTo', 'Padded to')}</>
+                                                    : isCropped
+                                                        ? <>{nls.localize('vuengine/editors/croppedTo', 'Cropped to')}</>
+                                                        : <></>
+                                        }
+                                        {' '}{finalWidth} × {finalHeight} px
+                                    </VContainer>
+                                }
                             </HContainer>
                             <VContainer grow={1} style={{ position: 'relative' }}>
                                 <div
