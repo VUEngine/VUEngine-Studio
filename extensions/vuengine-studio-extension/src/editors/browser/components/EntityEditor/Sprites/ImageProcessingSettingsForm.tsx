@@ -1,6 +1,7 @@
 import { nls } from '@theia/core';
 import * as iq from 'image-q';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import styled from 'styled-components';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
 import {
     ConversionResult,
@@ -11,16 +12,23 @@ import {
     DISTANCE_CALCULATOR_OPTIONS,
     IMAGE_QUANTIZATION_ALGORITHM_OPTIONS,
     ImageProcessingSettings,
+    MAX_IMAGE_HEIGHT,
+    MAX_IMAGE_WIDTH,
 } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import BasicSelect from '../../Common/BasicSelect';
 import CanvasImage from '../../Common/CanvasImage';
 import HContainer from '../../Common/HContainer';
-import { getMaxScaleInContainer, roundToNextMultipleOf8 } from '../../Common/Utils';
+import { clamp, getMaxScaleInContainer, roundToNextMultipleOf8 } from '../../Common/Utils';
 import VContainer from '../../Common/VContainer';
 import { DisplayMode } from '../../Common/VUEngineTypes';
 import Images from '../../ImageEditor/Images';
 import ColorModeSelect from './ColorModeSelect';
+
+const ReconvertButton = styled.button`
+    background-color: transparent;
+    height: 100%;
+`;
 
 interface ImageProcessingSettingsFormProps {
     image: string
@@ -33,6 +41,7 @@ interface ImageProcessingSettingsFormProps {
     allowFrameBlendMode: boolean
     height: number
     width: number
+    convertImage?: () => void
 }
 
 export default function ImageProcessingSettingsForm(props: ImageProcessingSettingsFormProps): React.JSX.Element {
@@ -47,7 +56,8 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
         updateColorMode,
         allowFrameBlendMode,
         height,
-        width
+        width,
+        convertImage
     } = props;
     const [uncompressedImageData, setUncompressedImageData] = useState<number[][]>([]);
     const [canvasScale, setCanvasScale] = useState<number>(1);
@@ -66,15 +76,17 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
 
     const findCanvasScale = () => {
         setCanvasScale(getMaxScaleInContainer(
-            canvasContainerRef.current?.clientWidth ?? paddedWidth,
-            canvasContainerRef.current?.clientHeight ?? paddedHeight,
-            paddedWidth,
-            paddedHeight,
+            canvasContainerRef.current?.clientWidth ?? finalWidth,
+            canvasContainerRef.current?.clientHeight ?? finalHeight,
+            finalWidth,
+            finalHeight,
         ));
     };
 
-    const paddedHeight = useMemo(() => roundToNextMultipleOf8(height), [height]);
-    const paddedWidth = useMemo(() => roundToNextMultipleOf8(width), [width]);
+    const finalHeight = useMemo(() => clamp(roundToNextMultipleOf8(height), 0, MAX_IMAGE_HEIGHT), [height]);
+    const finalWidth = useMemo(() => clamp(roundToNextMultipleOf8(width), 0, MAX_IMAGE_WIDTH), [width]);
+    const isPadded = finalHeight > height || finalWidth > width;
+    const isCropped = height > MAX_IMAGE_HEIGHT || width > MAX_IMAGE_WIDTH;
 
     useEffect(() => {
         uncompressImageData();
@@ -90,8 +102,8 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
         resizeObserver.observe(canvasContainerRef.current);
         return () => resizeObserver.disconnect();
     }, [
-        paddedHeight,
-        paddedWidth,
+        finalHeight,
+        finalWidth,
     ]);
 
     return (
@@ -125,19 +137,36 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
 
                         <VContainer justifyContent="center">
                             <label>&nbsp;</label>
-                            <i className="codicon codicon-arrow-right"></i>
+                            {convertImage &&
+                                <ReconvertButton
+                                    className="theia-button"
+                                    title={nls.localize('vuengine/entityEditor/reconvertImage', 'Reconvert Image')}
+                                    onClick={convertImage}
+                                >
+                                    <i className="codicon codicon-arrow-right"></i>
+                                </ReconvertButton>
+                            }
+                            {!convertImage &&
+                                <i className="codicon codicon-arrow-right"></i>
+                            }
                         </VContainer>
                         <VContainer style={{ width: '50%' }}>
                             <HContainer justifyContent='space-between'>
                                 <label>
                                     {nls.localize('vuengine/editors/result', 'Result')}
                                 </label>
-                                {
-                                    (paddedHeight > height || paddedWidth > width) &&
-                                    <VContainer style={{ opacity: .6 }}>
-                                        {nls.localize('vuengine/editors/paddedTo', 'Padded to')} {paddedWidth} × {paddedHeight} px
-                                    </VContainer>
-                                }
+                                <VContainer style={{ opacity: .6 }}>
+                                    {
+                                        isPadded && isCropped
+                                            ? <>{nls.localize('vuengine/editors/paddedAndCroppedTo', 'Padded and cropped to')}</>
+                                            : isPadded
+                                                ? <>{nls.localize('vuengine/editors/paddedTo', 'Padded to')}</>
+                                                : isCropped
+                                                    ? <>{nls.localize('vuengine/editors/croppedTo', 'Cropped to')}</>
+                                                    : <></>
+                                    }
+                                    {' '}{finalWidth} × {finalHeight} px
+                                </VContainer>
                             </HContainer>
                             <VContainer grow={1} style={{ position: 'relative' }}>
                                 <div
@@ -151,11 +180,11 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                                     <div className="filePreviewImage" ref={canvasContainerRef}>
                                         {uncompressedImageData &&
                                             <CanvasImage
-                                                height={paddedHeight}
+                                                height={finalHeight}
                                                 palette={'11100100'}
                                                 pixelData={[uncompressedImageData]}
                                                 displayMode={DisplayMode.Mono}
-                                                width={paddedWidth}
+                                                width={finalWidth}
                                                 colorMode={colorMode}
                                                 style={{
                                                     backgroundColor: '#000',
@@ -170,16 +199,14 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                     </HContainer>
                 </VContainer>
                 <HContainer gap={20}>
-                    {allowFrameBlendMode &&
-                        <VContainer>
-                            <ColorModeSelect
-                                value={colorMode ?? ColorMode.Default}
-                                setValue={newColorMode => updateColorMode(newColorMode)}
-                                hoverService={services.hoverService}
-                                disabled={!image}
-                            />
-                        </VContainer>
-                    }
+                    <VContainer>
+                        <ColorModeSelect
+                            value={colorMode ?? ColorMode.Default}
+                            setValue={newColorMode => updateColorMode(newColorMode)}
+                            hoverService={services.hoverService}
+                            disabled={!image || !allowFrameBlendMode}
+                        />
+                    </VContainer>
                     <HContainer gap={10}>
                         <VContainer>
                             <label>

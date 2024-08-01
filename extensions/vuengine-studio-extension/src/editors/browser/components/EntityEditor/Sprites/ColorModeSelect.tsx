@@ -19,12 +19,27 @@ export default function ColorModeSelect(props: ColorModeSelectProps): React.JSX.
     return <VContainer>
         <InfoLabel
             label={nls.localize('vuengine/entityEditor/colorMode', 'Color Mode')}
-            tooltip={nls.localize(
-                'vuengine/entityEditor/colorModeDescription',
-                'Whether to use the system\'s default 4 color palette or HiColor mode, ' +
-                'which simulates 7 colors by blending together adjacent frames to create mix colors. ' +
-                'Note: Mixed colors look fine on hardware, but flicker on emulators.'
-            )}
+            tooltip={<>
+                <div>
+                    {nls.localize(
+                        'vuengine/entityEditor/colorModeDescription',
+                        'Whether to use the system\'s default 4 color palette or HiColor mode, ' +
+                        'which simulates 7 colors by blending together adjacent frames to create mix colors. '
+                    )}
+                </div>
+                <div>
+                    {nls.localize(
+                        'vuengine/entityEditor/colorModeHiColorFlickerNote',
+                        'Note: Mixed colors look fine on hardware, but flicker on emulators.'
+                    )}
+                </div>
+                <div>
+                    {nls.localize(
+                        'vuengine/entityEditor/colorModeHiColorMaxHeightNote',
+                        'Note: HiColor sprites can be 256 pixels high max.'
+                    )}
+                </div>
+            </>}
             hoverService={hoverService}
         />
         <RadioSelect

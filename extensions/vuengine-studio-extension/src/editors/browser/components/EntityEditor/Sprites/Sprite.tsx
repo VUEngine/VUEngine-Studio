@@ -2,7 +2,7 @@ import { ArrowsHorizontal, ArrowsVertical } from '@phosphor-icons/react';
 import { isNumber, nls } from '@theia/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
-import { ImageCompressionType, ImageProcessingSettings } from '../../../../../images/browser/ves-images-types';
+import { ImageCompressionType, ImageProcessingSettings, MAX_IMAGE_HEIGHT, MAX_IMAGE_WIDTH } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { DataSection } from '../../Common/CommonTypes';
 import HContainer from '../../Common/HContainer';
@@ -10,7 +10,7 @@ import InfoLabel from '../../Common/InfoLabel';
 import PopUpDialog from '../../Common/PopUpDialog';
 import RadioSelect from '../../Common/RadioSelect';
 import SectionSelect from '../../Common/SectionSelect';
-import { clamp } from '../../Common/Utils';
+import { clamp, roundToNextMultipleOf8 } from '../../Common/Utils';
 import VContainer from '../../Common/VContainer';
 import { BgmapMode, DisplayMode, Displays, SpriteSourceType, SpriteType, Transparency } from '../../Common/VUEngineTypes';
 import Images from '../../ImageEditor/Images';
@@ -47,9 +47,13 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     const [filename, setFilename] = useState<string[]>([]);
 
     const allowFrameBlendMode = data.sprites.type === SpriteType.Bgmap &&
+        // No HiColor support for animated sprites
         !data.components?.animations?.length &&
+        // No HiColor support for repeated sprites
         !sprite.texture?.repeat?.x &&
-        !sprite.texture?.repeat?.y;
+        !sprite.texture?.repeat?.y &&
+        // FrameBlend sprites are stored in a single map, aligned top/down. Therefore, they can't be higher than 256 px.
+        dimensions[0][3] <= 256;
 
     const getMetaData = async (): Promise<void> => {
         const dim: number[][] = [[], []];
@@ -68,7 +72,12 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     fn[i] += ' +' + (f.length - 1);
                 }
                 const d = window.electronVesCore.getImageDimensions(resolvedUri.path.fsPath());
-                dim[i] = [d.width ?? 0, d.height ?? 0];
+
+                const imageHeight = d.height ?? 0;
+                const imageWidth = d.width ?? 0;
+                const finalHeight = clamp(roundToNextMultipleOf8(imageHeight), 0, MAX_IMAGE_HEIGHT);
+                const finalWidth = clamp(roundToNextMultipleOf8(imageWidth), 0, MAX_IMAGE_WIDTH);
+                dim[i] = [imageWidth, imageHeight, finalWidth, finalHeight];
             }
         });
 
@@ -103,6 +112,12 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         }
 
         return 0;
+    };
+
+    const reconvertImage = (): void => {
+        updateSprite({}, {
+            appendImageData: true,
+        });
     };
 
     const setManipulationFunction = (manipulationFunction: string): void => {
@@ -431,12 +446,17 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                             }
 
                                             <HContainer>
-                                                <VContainer>
+                                                <VContainer grow={1}>
                                                     {dimensions[0].length > 1 &&
                                                         <div style={{ opacity: .6 }}>
                                                             <div>
                                                                 {dimensions[0][0]} × {dimensions[0][1]} px
                                                             </div>
+                                                            {(dimensions[0][0] !== dimensions[0][2] || dimensions[0][1] !== dimensions[0][3]) &&
+                                                                <div>
+                                                                    (→ {dimensions[0][2]} × {dimensions[0][3]} px)
+                                                                </div>
+                                                            }
                                                             {data.components?.animations?.length > 0 && !isMultiFileAnimation && data.animations?.totalFrames &&
                                                                 <div>
                                                                     (
@@ -457,13 +477,20 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                                         </div>
                                                     }
                                                 </VContainer>
-                                                <VContainer alignItems="end" justifyContent="end" grow={1}>
+                                                <VContainer alignItems="end" justifyContent="end">
                                                     <button
                                                         className="theia-button secondary"
                                                         title={nls.localize('vuengine/entityEditor/imageProcessingSettings', 'Image Processing Settings')}
                                                         onClick={() => setProcessingDialogOpen(true)}
                                                     >
-                                                        <i className="codicon codicon-settings-gear" />
+                                                        <i className="codicon codicon-settings" />
+                                                    </button>
+                                                    <button
+                                                        className="theia-button secondary"
+                                                        title={nls.localize('vuengine/entityEditor/reconvertImage', 'Reconvert Image')}
+                                                        onClick={reconvertImage}
+                                                    >
+                                                        <i className="codicon codicon-sync" />
                                                     </button>
                                                 </VContainer>
                                             </HContainer>
@@ -506,6 +533,11 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                                         <div>
                                                             {dimensions[1][0]} × {dimensions[1][1]} px
                                                         </div>
+                                                        {dimensions[1][0] !== dimensions[1][2] || dimensions[1][1] !== dimensions[1][3] &&
+                                                            <div>
+                                                                <i className="codicon codicon-arrow-right"></i> {dimensions[1][2]} × {dimensions[1][3]} px
+                                                            </div>
+                                                        }
                                                         {data.components?.animations?.length > 0 && !isMultiFileAnimation && data.animations?.totalFrames &&
                                                             <div>
                                                                 {dimensions[1][0]}
@@ -906,6 +938,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     allowFrameBlendMode={allowFrameBlendMode}
                     height={dimensions[0].length > 1 ? dimensions[0][1] : 0}
                     width={dimensions[0].length > 1 ? dimensions[0][0] : 0}
+                    convertImage={reconvertImage}
                 />
             </PopUpDialog>
         </>
