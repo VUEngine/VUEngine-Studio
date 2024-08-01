@@ -128,9 +128,9 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     static readonly ID = 'vesEditorsWidget';
     static readonly LABEL = 'Editor';
 
-    protected setIsGenerating(isGenerating: boolean, progress: number = 0): void {
+    protected setIsGenerating(isGenerating: boolean, progress: number = -1): void {
         this.isGenerating = isGenerating;
-        this.generatingProgress = isGenerating ? progress : -1;
+        this.generatingProgress = isGenerating && progress > -1 ? progress : -1;
         this.update();
     }
 

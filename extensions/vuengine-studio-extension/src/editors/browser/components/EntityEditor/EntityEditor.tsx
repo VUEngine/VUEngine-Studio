@@ -110,7 +110,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
     if (!isGenerating) {
       const updatedData = this.postProcessData({ ...this.props.data, ...entityData });
       if (options?.appendImageData) {
-        setIsGenerating(true, 0);
+        setIsGenerating(true);
         this.appendImageData(updatedData).then(d => {
           this.props.updateData(d);
           setIsGenerating(false);
