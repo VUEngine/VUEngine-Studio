@@ -8,6 +8,7 @@ import DataOptions from './DataOptions';
 import { ImageEditorContext } from './ImageEditorTypes';
 import Images from './Images';
 import Map from './Map';
+import Quantisation from './Quantisation';
 import Tiles from './Tiles';
 
 interface ImageEditorProps {
@@ -40,6 +41,7 @@ export default function ImageEditor(props: ImageEditorProps): React.JSX.Element 
                         <Map />
                         <Animation />
                         <DataOptions />
+                        <Quantisation />
                     </HContainer>
                     <VContainer overflow='hidden'>
                         <label>

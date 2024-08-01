@@ -32,15 +32,13 @@ const ReconvertButton = styled.button`
 
 interface ImageProcessingSettingsFormProps {
     image: string
-    setFiles: (files: string[]) => void
+    setFiles?: (files: string[]) => void
     imageData?: Partial<ConversionResult>
     processingSettings: ImageProcessingSettings
     updateProcessingSettings: (processingSettings: Partial<ImageProcessingSettings>) => void
     colorMode: ColorMode
     updateColorMode: (colorMode: ColorMode) => void
     allowFrameBlendMode: boolean
-    height: number
-    width: number
     convertImage?: () => void
 }
 
@@ -55,14 +53,28 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
         colorMode,
         updateColorMode,
         allowFrameBlendMode,
-        height,
-        width,
         convertImage
     } = props;
-    const [uncompressedImageData, setUncompressedImageData] = useState<number[][]>([]);
+    const [pixelData, setPixelData] = useState<number[][]>([]);
+    const [resultImageBase64, setResultImageBase64] = useState<string>('');
     const [canvasScale, setCanvasScale] = useState<number>(1);
+    const [height, setHeight] = useState<number>(0);
+    const [width, setWidth] = useState<number>(0);
     // eslint-disable-next-line no-null/no-null
     const canvasContainerRef = useRef<HTMLDivElement>(null);
+
+    const getImageDimensions = async () => {
+        const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
+        const resolvedImageUri = workspaceRootUri.resolve(image);
+        const d = window.electronVesCore.getImageDimensions(resolvedImageUri.path.fsPath());
+        setHeight(d.height ?? 0);
+        setWidth(d.width ?? 0);
+    };
+
+    const getImageDataFromFile = async () => {
+        const output = await services.vesImagesService.quantizeImage(image, processingSettings, colorMode);
+        setResultImageBase64(Buffer.from(output).toString('base64'));
+    };
 
     const uncompressImageData = async () => {
         let data: number[][] = [[], []];
@@ -71,7 +83,7 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
             const uncompressedMapData = await services.vesCommonService.uncompressJson(imageData.maps[0]?.data) as string[];
             data = services.vesImagesService.imageDataToPixelData(uncompressedTileData, { ...imageData.maps[0], data: uncompressedMapData });
         }
-        setUncompressedImageData(data);
+        setPixelData(data);
     };
 
     const findCanvasScale = () => {
@@ -89,9 +101,28 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
     const isCropped = height > MAX_IMAGE_HEIGHT || width > MAX_IMAGE_WIDTH;
 
     useEffect(() => {
-        uncompressImageData();
+        getImageDimensions();
+    }, [
+        image,
+    ]);
+
+    useEffect(() => {
+        if (imageData) {
+            uncompressImageData();
+        }
     }, [
         imageData,
+    ]);
+
+    useEffect(() => {
+        if (!imageData) {
+            // use image file as fallback if no imageData was provided
+            getImageDataFromFile();
+        }
+    }, [
+        image,
+        colorMode,
+        processingSettings,
     ]);
 
     useEffect(() => {
@@ -136,7 +167,7 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                         </VContainer>
 
                         <VContainer justifyContent="center">
-                            <label>&nbsp;</label>
+                            <label style={{ width: 34 }}>&nbsp;</label>
                             {convertImage &&
                                 <ReconvertButton
                                     className="theia-button"
@@ -180,11 +211,11 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                                     }}
                                 >
                                     <div className="filePreviewImage" ref={canvasContainerRef}>
-                                        {uncompressedImageData &&
+                                        {pixelData.length > 0 &&
                                             <CanvasImage
                                                 height={finalHeight}
                                                 palette={'11100100'}
-                                                pixelData={[uncompressedImageData]}
+                                                pixelData={[pixelData]}
                                                 displayMode={DisplayMode.Mono}
                                                 width={finalWidth}
                                                 colorMode={colorMode}
@@ -193,6 +224,35 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                                                     transform: `scale(${canvasScale})`,
                                                 }}
                                             />
+                                        }
+                                        {!pixelData.length && image && resultImageBase64 &&
+                                            <>
+                                                <div
+                                                    style={{
+                                                        backgroundColor: '#000',
+                                                        backgroundImage: `url(data:image/png;base64,${resultImageBase64})`,
+                                                        backgroundPosition: 'bottom',
+                                                        height: finalHeight,
+                                                        width: finalWidth,
+                                                        position: 'absolute',
+                                                        opacity: .5,
+                                                        transform: `scale(${canvasScale})`,
+                                                        zIndex: 2,
+                                                    }}
+                                                />
+                                                <div
+                                                    style={{
+                                                        backgroundColor: '#000',
+                                                        backgroundImage: `url(data:image/png;base64,${resultImageBase64})`,
+                                                        backgroundPosition: 'top',
+                                                        height: finalHeight,
+                                                        width: finalWidth,
+                                                        position: 'absolute',
+                                                        transform: `scale(${canvasScale})`,
+                                                        zIndex: 1,
+                                                    }}
+                                                />
+                                            </>
                                         }
                                     </div>
                                 </div>
@@ -209,7 +269,7 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                             disabled={!image || !allowFrameBlendMode}
                         />
                     </VContainer>
-                    <HContainer gap={10}>
+                    <HContainer gap={10} style={{ minHeight: 64 }}>
                         <VContainer>
                             <label>
                                 {nls.localize('vuengine/editors/dither', 'Dither')}

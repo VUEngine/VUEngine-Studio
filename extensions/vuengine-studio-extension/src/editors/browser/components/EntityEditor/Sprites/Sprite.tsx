@@ -936,8 +936,6 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     colorMode={allowFrameBlendMode ? sprite.colorMode : ColorMode.Default}
                     updateColorMode={setColorMode}
                     allowFrameBlendMode={allowFrameBlendMode}
-                    height={dimensions[0].length > 1 ? dimensions[0][1] : 0}
-                    width={dimensions[0].length > 1 ? dimensions[0][0] : 0}
                     convertImage={reconvertImage}
                 />
             </PopUpDialog>
