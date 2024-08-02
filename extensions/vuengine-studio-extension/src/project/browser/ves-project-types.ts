@@ -571,7 +571,7 @@ export const defaultProjectData: ProjectData = {
       templates: ['RomInfo']
     },
     Sprite: {
-      enabled: true,
+      enabled: false,
       file: '.sprite',
       schema: {
         title: 'Sprite',
@@ -647,7 +647,7 @@ export const defaultProjectData: ProjectData = {
       icon: 'fa fa-image'
     },
     VsuSandbox: {
-      enabled: true,
+      enabled: false,
       file: '.vsu',
       schema: {
         title: 'VSU Sandbox',

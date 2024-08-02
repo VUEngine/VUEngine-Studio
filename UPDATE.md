@@ -2,6 +2,81 @@
 
 This document describes which breaking changes have been made to VUEngine Studio and VUEngine Core and which actions need to be taken by the developer in order to update existing VUEngine Studio projects.
 
+## VUEngine Studio Preview v0.5.0
+
+### Entity collision flags
+
+#### What has changed?
+
+The `Entity` class now has different flags to keep track of collision checks and if enabled instead of a single one.
+
+- Removed `allowCollisions`
+- Added `collisionsEnabled`
+- Added `checkingCollisions`
+
+In this context, a few methods have been renamed.
+
+- `Collider::activeCollisionChecks` -> `Collider::checkCollisions`
+- `Entity::allowCollisions` -> `Entity::collisionsEnabled`
+- `Entity::activeCollisionChecks` -> `Entity::checkCollisions`
+
+Note that the above also affect inheriting classes like `Actor`.
+
+#### How to update projects
+
+If you use any of these methods or flags in your project, update accordingly.
+
+Example:
+
+```diff
+-	SomeEntity::activeCollisionChecks(this, false);
++	SomeEntity::checkCollisions(this, false);
+```
+
+### Renamed HardwareManager and VIPManager methods
+
+#### What has changed?
+
+Some methods related to the VIP's drawing and displaying operations have been renamed.
+
+- `HardwareManager::enableRendering()` -> `HardwareManager::startDrawing()`
+- `HardwareManager::disableRendering()` -> `HardwareManager::stopDrawing()`
+- `HardwareManager::displayOn()` -> `HardwareManager::turnDisplayOn()`
+- `HardwareManager::displayOff()` -> `HardwareManager::turnDisplayOff()`
+- `VIPManager::enableDrawing()` -> `VIPManager::startDrawing()`
+- `VIPManager::disableDrawing()` -> `VIPManager::stopDrawing()`
+- `VIPManager::displayOn()` -> `VIPManager::turnDisplayOn()`
+- `VIPManager::displayOff()` -> `VIPManager::turnDisplayOff()`
+
+#### How to update projects
+
+If you use any of these methods in your project, update method calls accordingly.
+
+### VirtualList push methods return type
+
+#### What has changed?
+
+`VirtualList::pushFront` and `VirtualList::pushBack` now return a `VirtualNode`instead of an `int32`.
+
+#### How to update projects
+
+If you're working with VirtualLists and use the above method(s), you want to update your code accordingly.
+
+```diff
+-	SomeActor::activeCollisionChecks(this, false);
++	SomeActor::checkCollisions(this, false);
+```
+
+### Moved lastCameraDisplacement Vector
+
+#### What has changed?
+
+The `CameraMovementManager->lastCameraDisplacement` vector has been moved to `Camera->lastDisplacement`.
+
+#### How to update projects
+
+If your code accesses the vector, update accordingly.
+
 ## VUEngine Studio Preview v0.4.0
 
 ### PositionedEntitySpec
