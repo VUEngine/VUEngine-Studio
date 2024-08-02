@@ -232,7 +232,7 @@ export const defaultProjectData: ProjectData = {
           }
         ]
       },
-      icon: 'fa fa-cog',
+      icon: 'codicon codicon-gear',
       templates: ['PluginsConfig']
     },
     Image: {
@@ -366,7 +366,7 @@ export const defaultProjectData: ProjectData = {
         type: 'ImageEditor',
         scope: '#'
       },
-      icon: 'fa fa-image',
+      icon: 'codicon codicon-file-media',
       templates: ['Image'],
       forFiles: ['.png']
     },
@@ -644,7 +644,7 @@ export const defaultProjectData: ProjectData = {
         type: 'SpriteEditor',
         scope: '#'
       },
-      icon: 'fa fa-image'
+      icon: 'codicon codicon-circuit-board'
     },
     VsuSandbox: {
       enabled: false,
@@ -804,7 +804,7 @@ export const defaultProjectData: ProjectData = {
         type: 'VsuSandbox',
         scope: '#'
       },
-      icon: 'fa fa-tasks'
+      icon: 'codicon codicon-graph'
     }
   }
 };
