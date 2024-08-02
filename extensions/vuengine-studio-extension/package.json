@@ -40,6 +40,7 @@
     "@theia/vsx-registry": "1.52.0",
     "@theia/workspace": "1.52.0",
     "crc-32": "^1.2.2",
+    "crop-image-data": "^1.0.4",
     "datauri": "^3.0.0",
     "decompress": "^4.2.1",
     "deepmerge-ts": "^4.0.3",

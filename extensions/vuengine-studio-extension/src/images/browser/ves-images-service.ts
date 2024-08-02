@@ -6,6 +6,7 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import cropImageData from 'crop-image-data';
 import * as iq from 'image-q';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { ColorMode, PALETTE_R_VALUES, PALETTE_VALUE_INDEX_MAP } from '../../core/browser/ves-common-types';
@@ -238,47 +239,37 @@ export class VesImagesService {
     // Using the Camoto fork of pngjs here, because it supports generating indexed PNGs
     const camoto = require('@camoto/pngjs/browser');
     const imageData = camoto.PNG.sync.read(Buffer.from(imageFileContent.value.buffer));
-    let height = imageData.height;
-    let width = imageData.width;
 
     // crop to 512x512 max
-    if (height > MAX_IMAGE_HEIGHT || width > MAX_IMAGE_WIDTH) {
-      let imageDataArray = Array.from(imageData.data);
-      // crop height
-      if (height > MAX_IMAGE_HEIGHT) {
-        imageDataArray = imageDataArray.slice(0, width * MAX_IMAGE_HEIGHT * 4);
-        height = MAX_IMAGE_HEIGHT;
-      }
-      // crop width
-      if (width > MAX_IMAGE_WIDTH) {
-        const valuesPerLine = 4 * width;
-        const numberOfValuesToCropPerLine = 4 * (width - MAX_IMAGE_WIDTH);
-        [...Array(height)].map((i, j) => {
-          // loop from bottom to top line to work around modified lengths messing up counts
-          imageDataArray.splice((height - j) * valuesPerLine, numberOfValuesToCropPerLine);
-        });
-        width = MAX_IMAGE_WIDTH;
-      }
-      imageData.data = new Uint8Array(imageDataArray as number[]);
+    if (imageData.height > MAX_IMAGE_HEIGHT || imageData.width > MAX_IMAGE_WIDTH) {
+      const croppedImageData = cropImageData(imageData, {
+        top: 0,
+        right: imageData.width - MAX_IMAGE_WIDTH,
+        bottom: imageData.height - MAX_IMAGE_HEIGHT,
+        left: 0,
+      });
+      imageData.data = croppedImageData.data;
+      imageData.height = croppedImageData.height;
+      imageData.width = croppedImageData.width;
     }
 
     // pad to next multiple of 8 if necessary
-    const paddedHeight = roundToNextMultipleOf8(height);
-    const paddedWidth = roundToNextMultipleOf8(width);
-    if (paddedHeight > height || paddedWidth > width) {
+    const paddedHeight = roundToNextMultipleOf8(imageData.height);
+    const paddedWidth = roundToNextMultipleOf8(imageData.width);
+    if (paddedHeight > imageData.height || paddedWidth > imageData.width) {
       const imageDataArray = Array.from(imageData.data);
-      if (paddedWidth > width) {
+      if (paddedWidth > imageData.width) {
         // pad width (each line)
-        const valuesToAddPerLine = [...Array(paddedWidth - width)].map(i => [0, 0, 0, 255]).flat(1);
-        const valuesPerLine = 4 * width;
-        [...Array(height)].map((i, j) => {
+        const valuesToAddPerLine = [...Array(paddedWidth - imageData.width)].map(i => [0, 0, 0, 255]).flat(1);
+        const valuesPerLine = 4 * imageData.width;
+        [...Array(imageData.height)].map((i, j) => {
           // loop from bottom to top line to work around modified lengths messing up counts
-          imageDataArray.splice((height - j) * valuesPerLine, 0, ...valuesToAddPerLine);
+          imageDataArray.splice((imageData.height - j) * valuesPerLine, 0, ...valuesToAddPerLine);
         });
       }
       // pad height
-      if (paddedHeight > height) {
-        [...Array((paddedHeight - height) * paddedWidth)].map(i => imageDataArray.push(0, 0, 0, 255));
+      if (paddedHeight > imageData.height) {
+        [...Array((paddedHeight - imageData.height) * paddedWidth)].map(i => imageDataArray.push(0, 0, 0, 255));
       }
       imageData.data = new Uint8Array(imageDataArray as number[]);
     }

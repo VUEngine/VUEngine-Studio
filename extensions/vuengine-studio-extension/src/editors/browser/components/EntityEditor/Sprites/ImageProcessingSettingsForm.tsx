@@ -64,16 +64,25 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
     const canvasContainerRef = useRef<HTMLDivElement>(null);
 
     const getImageDimensions = async () => {
-        const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
-        const resolvedImageUri = workspaceRootUri.resolve(image);
-        const d = window.electronVesCore.getImageDimensions(resolvedImageUri.path.fsPath());
-        setHeight(d.height ?? 0);
-        setWidth(d.width ?? 0);
+        if (image) {
+            const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
+            const resolvedImageUri = workspaceRootUri.resolve(image);
+            const d = window.electronVesCore.getImageDimensions(resolvedImageUri.path.fsPath());
+            setHeight(d.height ?? 0);
+            setWidth(d.width ?? 0);
+        } else {
+            setHeight(0);
+            setWidth(0);
+        }
     };
 
     const getImageDataFromFile = async () => {
-        const output = await services.vesImagesService.quantizeImage(image, processingSettings, colorMode);
-        setResultImageBase64(Buffer.from(output).toString('base64'));
+        if (image) {
+            const output = await services.vesImagesService.quantizeImage(image, processingSettings, colorMode);
+            setResultImageBase64(Buffer.from(output).toString('base64'));
+        } else {
+            setResultImageBase64('');
+        }
     };
 
     const uncompressImageData = async () => {
@@ -109,6 +118,8 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
     useEffect(() => {
         if (imageData) {
             uncompressImageData();
+        } else {
+            setPixelData([]);
         }
     }, [
         imageData,

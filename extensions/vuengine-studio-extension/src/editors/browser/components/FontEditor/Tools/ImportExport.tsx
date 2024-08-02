@@ -23,7 +23,6 @@ export default function ImportExport(props: ImportExportProps): React.JSX.Elemen
     const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
 
     const parseIndexedPng = async (fileContent: FileContent): Promise<ParsedImageData | false> => {
-        console.log('parseIndexedPng');
         const PNG = require('@camoto/pngjs/browser').PNG;
         let imageData: ParsedImageData | false = false;
 
@@ -38,7 +37,6 @@ export default function ImportExport(props: ImportExportProps): React.JSX.Elemen
             }).on('parsed', function (): void {
                 // @ts-ignore: suppress implicit any errors
                 const png = this;
-                console.log('png', png);
 
                 const height = png.height;
                 const width = png.width;
@@ -59,7 +57,6 @@ export default function ImportExport(props: ImportExportProps): React.JSX.Elemen
             });
         });
 
-        console.log('imageData', imageData);
         return imageData;
     };
 
@@ -104,9 +101,7 @@ export default function ImportExport(props: ImportExportProps): React.JSX.Elemen
         const currentPath = await services.fileService.resolve(fileUri);
         const uri = await services.fileDialogService.showOpenDialog(openFileDialogProps, currentPath);
         if (uri) {
-            console.log('uri', uri);
             const fileContent = await services.fileService.readFile(uri);
-            console.log('fileContent', fileContent);
             const imgData = await parseIndexedPng(fileContent);
             if (imgData !== false) {
                 props.setCharacters(imageDataToCharacters(imgData));
