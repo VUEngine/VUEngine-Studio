@@ -1,5 +1,5 @@
 import { Image, Images as ImagesIcon } from '@phosphor-icons/react';
-import { MaybeArray, URI, nls } from '@theia/core';
+import { MaybeArray, URI, isWindows, nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import { OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import React, { useContext, useEffect, useState } from 'react';
@@ -192,7 +192,11 @@ export default function Images(props: ImagesProps): React.JSX.Element {
     >
         {Object.keys(filesToShow).map((f, i) => {
             const fullUri = workspaceRootUri.resolve(f);
-            const imageUrl = f.startsWith('data:') ? f : fullUri.path.fsPath();
+            const imageUrl = f.startsWith('data:')
+                ? f
+                : isWindows
+                    ? `/${fullUri.path.fsPath()}`.replace(/\\/g, '/')
+                    : fullUri.path.fsPath();
             return <div
                 key={`image-${i}`}
                 className={`filePreview${stack && data.length > 1 ? ' multi' : ''}`}
