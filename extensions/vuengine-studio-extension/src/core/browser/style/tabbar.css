@@ -2,6 +2,10 @@
     font-size: 30px;
 }
 
+.theia-sidebar-menu .codicon.codicon-menu {
+    font-size: 18px;
+}
+
 /* Custom tabbar decorators */
 .p-TabBar.theia-app-sides .p-TabBar-tab[class*=ves-decorator]:after {
     background-color: var(--theia-activityBarBadge-background);
