@@ -24,6 +24,7 @@ import {
     SpriteImageData,
 } from '../EntityEditorTypes';
 import ImageProcessingSettingsForm from './ImageProcessingSettingsForm';
+import SpritesSettings from './SpritesSettings';
 
 const MIN_REPEAT_SIZE = 0;
 const MAX_REPEAT_SIZE = 512;
@@ -920,6 +921,10 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     />
                 </HContainer>
             </VContainer>
+            <hr />
+            <SpritesSettings
+                isMultiFileAnimation={isMultiFileAnimation}
+            />
             <PopUpDialog
                 open={processingDialogOpen}
                 setOpen={setProcessingDialogOpen}

@@ -73,8 +73,9 @@
 }
 
 iframe.emulator-iframe {
-  background: #111;
+  background: rgba(0,0,0,.3);
   border: none;
+  border-radius: 2px;
   overflow: hidden;
   z-index: -1;
   /* prevent focus on iframe to intercept key presses */

@@ -24,6 +24,7 @@ import SpriteEditorSettings from './SpriteEditorSettings';
 import SpriteEditorStatus from './SpriteEditorStatus';
 import SpriteEditorTools from './SpriteEditorTools';
 import { DEFAULT_SPRITE_SIZE, PLACEHOLDER_LAYER_NAME, SpriteData, SpriteLayersData } from './SpriteEditorTypes';
+import HContainer from '../Common/HContainer';
 
 interface SpriteEditorProps {
     data: SpriteData
@@ -77,7 +78,6 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
             ...data,
             ...partialData,
         });
-        console.log('data', data, partialData);
     };
 
     const initLayers = (resolvedLayers: SpriteLayersData): void => {
@@ -244,12 +244,12 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
     }, []);
 
     return (
-        <div className="spriteEditor">
+        <HContainer className="spriteEditor">
             <VContainer
                 gap={15}
                 style={{
-                    maxWidth: 66,
-                    minWidth: 66,
+                    maxWidth: 80,
+                    minWidth: 80,
                 }}
             >
                 <div style={{ zIndex: 100 }}>
@@ -329,14 +329,15 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                     style={{ zIndex: 1 }}
                 />
             </div>
-            <VContainer
-                gap={15}
-                style={{
-                    maxWidth: 200,
-                    minWidth: 200,
-                }}
-            >
-                {/*
+            <HContainer gap={15}>
+                <VContainer
+                    gap={15}
+                    style={{
+                        maxWidth: 200,
+                        minWidth: 200,
+                    }}
+                >
+                    {/*
                     <VContainer style={{ zIndex: 100 }}>
                         <label>
                             {nls.localize('vuengine/spriteEditor/navigator', 'Navigator')}
@@ -357,110 +358,111 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                         </VContainer>
                     </VContainer>
                     */}
-                <VContainer style={{ overflowX: 'hidden', overflowY: 'auto', zIndex: 100 }}>
-                    {/*
+                    <VContainer style={{ overflowX: 'hidden', overflowY: 'auto', zIndex: 100 }}>
+                        {/*
                             <Eye size={20} onClick={showAllLayers} />
                         */}
-                    {data.layers && Object.values(data.layers).map((layer, index) => (
-                        <div
-                            key={layer.id}
-                            className={`item layer${currentLayer?.id === layer.id ? ' active' : ''}${draggingSectionId === layer.id ? ' dragging' : ''}`}
-                            style={{
-                                alignItems: 'center',
-                                display: 'flex',
-                                gap: 5,
-                                justifyContent: 'start',
-                                opacity: layer.isVisible ? 1 : 0.5,
-                            }}
-                            onClick={e => onClickHandler(e, layer.id)}
-                            /*
-                            onDragStart={e => onDragStart(e, index, layer.id)}
-                            onDragEnter={e => onAvailableItemDragEnter(e, index)}
-                            onDragEnd={onDragEnd}
-                            onDragOver={onDragOver}
-                            */
-                            draggable
-                        >
-                            {Object.values(data.layers).length > 1 &&
-                                <button
-                                    className="remove-button"
+                        {data.layers && Object.values(data.layers).map((layer, index) => (
+                            <div
+                                key={layer.id}
+                                className={`item layer${currentLayer?.id === layer.id ? ' active' : ''}${draggingSectionId === layer.id ? ' dragging' : ''}`}
+                                style={{
+                                    alignItems: 'center',
+                                    display: 'flex',
+                                    gap: 5,
+                                    justifyContent: 'start',
+                                    opacity: layer.isVisible ? 1 : 0.5,
+                                }}
+                                onClick={e => onClickHandler(e, layer.id)}
+                                /*
+                                onDragStart={e => onDragStart(e, index, layer.id)}
+                                onDragEnter={e => onAvailableItemDragEnter(e, index)}
+                                onDragEnd={onDragEnd}
+                                onDragOver={onDragOver}
+                                */
+                                draggable
+                            >
+                                {Object.values(data.layers).length > 1 &&
+                                    <button
+                                        className="remove-button"
+                                        onClick={e => {
+                                            e.stopPropagation();
+                                            removeLayer(layer.id);
+                                        }}
+                                        title={nls.localize('vuengine/spriteEditor/removeLayer', 'Remove Layer')}
+                                    >
+                                        <i className='codicon codicon-x' />
+                                    </button>
+                                }
+                                <div
+                                    style={{ cursor: 'pointer' }}
                                     onClick={e => {
                                         e.stopPropagation();
-                                        removeLayer(layer.id);
+                                        if (layer.isVisible) {
+                                            hideDataLayer(layer.id);
+                                        } else {
+                                            showDataLayer(layer.id);
+                                        }
                                     }}
-                                    title={nls.localize('vuengine/spriteEditor/removeLayer', 'Remove Layer')}
                                 >
-                                    <i className='codicon codicon-x' />
-                                </button>
-                            }
-                            <div
-                                style={{ cursor: 'pointer' }}
-                                onClick={e => {
-                                    e.stopPropagation();
-                                    if (layer.isVisible) {
-                                        hideDataLayer(layer.id);
-                                    } else {
-                                        showDataLayer(layer.id);
+                                    {layer.isVisible
+                                        ? <Eye size={16} />
+                                        : <EyeClosed size={16} />
                                     }
-                                }}
-                            >
-                                {layer.isVisible
-                                    ? <Eye size={16} />
-                                    : <EyeClosed size={16} />
-                                }
+                                </div>
+                                <div
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={() => {
+                                        isolateLayer(layer.id);
+                                    }}
+                                >
+                                    <HandEye size={16} />
+                                </div>
+                                <div
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={e => {
+                                        duplicateLayer(layer, index + 1);
+                                    }}
+                                >
+                                    <Copy size={16} />
+                                </div>
+                                <div style={{ flexGrow: 1 }}>
+                                    <input
+                                        className='theia-input'
+                                        style={{ boxSizing: 'border-box', width: '100%' }}
+                                        value={layer.name}
+                                        readOnly
+                                    />
+                                </div>
                             </div>
-                            <div
-                                style={{ cursor: 'pointer' }}
-                                onClick={() => {
-                                    isolateLayer(layer.id);
-                                }}
-                            >
-                                <HandEye size={16} />
-                            </div>
-                            <div
-                                style={{ cursor: 'pointer' }}
-                                onClick={e => {
-                                    duplicateLayer(layer, index + 1);
-                                }}
-                            >
-                                <Copy size={16} />
-                            </div>
-                            <div style={{ flexGrow: 1 }}>
-                                <input
-                                    className='theia-input'
-                                    style={{ boxSizing: 'border-box', width: '100%' }}
-                                    value={layer.name}
-                                    readOnly
-                                />
-                            </div>
-                        </div>
-                    ))}
+                        ))}
+                        <button
+                            className='theia-button add-button'
+                            onClick={addDataLayer}
+                            title={nls.localize('vuengine/spriteEditor/addLayer', 'Add Layer')}
+                        >
+                            <i className='codicon codicon-plus' />
+                        </button>
+                    </VContainer>
+                </VContainer>
+                <VContainer
+                    overflow='auto'
+                    style={{
+                        maxWidth: 75,
+                        minWidth: 75,
+                    }}
+                >
+                    <div className='item frame active' style={{ zIndex: 100 }}></div>
                     <button
                         className='theia-button add-button'
-                        onClick={addDataLayer}
-                        title={nls.localize('vuengine/spriteEditor/addLayer', 'Add Layer')}
+                        onClick={() => { }}
+                        title={nls.localize('vuengine/spriteEditor/addFrame', 'Add Frame')}
+                        style={{ zIndex: 100 }}
                     >
                         <i className='codicon codicon-plus' />
                     </button>
                 </VContainer>
-            </VContainer>
-            <VContainer
-                overflow='auto'
-                style={{
-                    maxWidth: 75,
-                    minWidth: 75,
-                }}
-            >
-                <div className='item frame active' style={{ zIndex: 100 }}></div>
-                <button
-                    className='theia-button add-button'
-                    onClick={() => { }}
-                    title={nls.localize('vuengine/spriteEditor/addFrame', 'Add Frame')}
-                    style={{ zIndex: 100 }}
-                >
-                    <i className='codicon codicon-plus' />
-                </button>
-            </VContainer>
-        </div>
+            </HContainer>
+        </HContainer>
     );
 }

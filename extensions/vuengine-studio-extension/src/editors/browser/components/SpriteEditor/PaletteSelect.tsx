@@ -74,7 +74,7 @@ export default function PaletteSelect(props: PaletteSelectProps): React.JSX.Elem
                 <div
                     className={'tool'}
                     onClick={toggleHiColor}
-                    style={{ width: 66 }}
+                    style={{ width: 70 }}
                 >
                     {data.colorMode === ColorMode.FrameBlend ? ' HiColor' : '4 Colors'}
                 </div>

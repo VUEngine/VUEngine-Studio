@@ -129,7 +129,8 @@
 }
 
 #vesBuildWidget .buildLog {
-  border: 1px solid var(--theia-activityBar-background);
+  border: 1px solid var(--theia-secondaryButton-background);
+  border-radius: 2px;
   box-sizing: border-box;
   flex-grow: 1;
   font-family: monospace;

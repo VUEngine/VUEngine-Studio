@@ -244,5 +244,6 @@ export interface EntityEditorPreviewState {
 export interface EntityEditorState {
     currentComponent: string,
     currentAnimationStep: number
+    leftSidebarOpen: boolean,
     preview: EntityEditorPreviewState
 }

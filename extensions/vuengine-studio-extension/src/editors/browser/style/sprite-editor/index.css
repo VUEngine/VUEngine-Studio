@@ -1,7 +1,6 @@
 .jsonforms-container > .spriteEditor {
-    display: flex;
-    flex-direction: row;
     flex-grow: 1;
+    justify-content: space-between;
     gap: 15px;
     overflow: hidden;
     position: relative;
@@ -20,8 +19,8 @@
     border-radius: 2px;
     cursor: pointer;
     display: flex;
-    min-height: 32px;
-    min-width: 32px;
+    min-height: 34px;
+    min-width: 34px;
 }
 
 .spriteEditor .tool:hover,
@@ -49,9 +48,10 @@
 }
 
 .spriteEditor .pixel-container {
-    border: var(--theia-border-width) solid var(--theia-dropdown-border);
-    border-radius: 8px;
+    background-image: radial-gradient(rgba(0, 0, 0, .3) 2px, transparent 0);
+    background-size: 16px 16px;
     flex-grow: 1;
+    inset: 0;
     overflow: hidden;
-    position: relative;
+    position: absolute;
 }

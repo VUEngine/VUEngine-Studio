@@ -154,11 +154,21 @@ export default function ComponentTree(): React.JSX.Element {
     });
 
     return (
-        <VContainer grow={1}>
-            <label>
+        <VContainer
+            style={{
+                overflow: 'hidden',
+                zIndex: 1,
+            }}
+        >
+            <label style={{
+                padding: '0 var(--padding)',
+            }}>
                 {nls.localize('vuengine/entityEditor/components', 'Components')}
             </label>
-            <div className='ves-tree'>
+            <div className='ves-tree' style={{
+                overflow: 'auto',
+                paddingBottom: 'var(--padding)',
+            }}>
                 <Tree
                     data={treeData}
                     indent={24}

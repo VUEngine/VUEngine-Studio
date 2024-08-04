@@ -1,14 +1,12 @@
 .jsonforms-container .preview-container {
     align-items: center;
-    border: var(--theia-border-width) solid var(--theia-dropdown-border);
-    border-radius: 8px;
     display: flex;
     flex-grow: 1;
+    inset: 0;
     justify-content: center;
-    margin: var(--padding) 0;
     overflow: hidden;
     padding: 0;
-    position: relative;
+    position: absolute;
     --ves-preview-size: 10000px;
 }
 
@@ -44,17 +42,36 @@
 }
 
 .jsonforms-container .preview-container-world-center-horizontal {
-    background-color: rgba(0, 0, 0, .5);
+    background-color: #000;
     height: 2px;
+    opacity: .2;
     position: absolute;
     width: var(--ves-preview-size);
 }
 
 .jsonforms-container .preview-container-world-center-vertical {
-    background-color: rgba(0, 0, 0, .5);
+    background-color: #000;
     height: var(--ves-preview-size);
+    opacity: .2;
     position: absolute;
     width: 2px;
+}
+
+.jsonforms-container .preview-container-world.background-color-0 {
+    background: #000;
+}
+.jsonforms-container .preview-container-world.background-color-0 .preview-container-world-center-horizontal,
+.jsonforms-container .preview-container-world.background-color-0 .preview-container-world-center-vertical {
+    background: #f00;
+}
+.jsonforms-container .preview-container-world.background-color-1 {
+    background: #500;
+}
+.jsonforms-container .preview-container-world.background-color-2 {
+    background: #a00;
+}
+.jsonforms-container .preview-container-world.background-color-3 {
+    background: #f00;
 }
 
 .jsonforms-container .preview-container-world .sprite-error {

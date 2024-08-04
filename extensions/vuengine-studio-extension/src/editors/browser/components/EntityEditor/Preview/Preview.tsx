@@ -1,7 +1,6 @@
 import { IdentificationCard } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { useContext, useEffect, useState } from 'react';
-import { ColorMode, PALETTE_COLORS } from '../../../../../core/browser/ves-common-types';
 import { EditorsContext, EditorsContextType } from '../../../../../editors/browser/ves-editors-types';
 import { ProjectContributor } from '../../../../../project/browser/ves-project-types';
 import { ColliderType } from '../../Common/VUEngineTypes';
@@ -151,9 +150,8 @@ export default function Preview(): React.JSX.Element {
         </div>
       }
       <div
-        className="preview-container-world"
+        className={`preview-container-world background-color-${state.preview.backgroundColor}`}
         style={{
-          background: state.preview.backgroundColor > -1 ? PALETTE_COLORS[ColorMode.Default][state.preview.backgroundColor] : undefined,
           perspective: `${state.preview.projectionDepth}px`,
           zoom: state.preview.zoom,
           translate: `${offsetX}px ${offsetY}px`,

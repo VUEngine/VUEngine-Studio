@@ -1,10 +1,10 @@
-import { isBoolean, isNumber } from '@theia/core';
+import { isBoolean, isNumber, nls } from '@theia/core';
 import React from 'react';
+import styled from 'styled-components';
 import { ConversionResult, ConversionResultMapData, ImageCompressionType } from '../../../../images/browser/ves-images-types';
 import { EditorsContextType } from '../../ves-editors-types';
 import { DataSection } from '../Common/CommonTypes';
 import HContainer from '../Common/HContainer';
-import VContainer from '../Common/VContainer';
 import ComponentTree from './Components/ComponentTree';
 import CurrentComponent from './Components/CurrentComponent';
 import EntityMeta from './Entity/EntityMeta';
@@ -19,6 +19,54 @@ import {
 } from './EntityEditorTypes';
 import Preview from './Preview/Preview';
 import Script from './Scripts/Script';
+
+interface EditorSidebarProps {
+  show: boolean
+  orientation: 'left' | 'right'
+}
+
+const EditorSidebar = styled.div<EditorSidebarProps>`
+  background-color: rgba(17, 17, 17, .9);
+  border-radius: 2px;
+  border: 1px solid var(--theia-activityBar-background);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  margin-${p => p.orientation}: ${p => p.show ? 0 : 'calc(-320px - 1px - var(--padding))'};
+  max-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  transition: all .1s;
+  width: 320px;
+  z-index: 100;
+
+  body.light-vuengine & {
+    background-color: rgba(236, 236, 236, .9);
+  }
+`;
+
+interface ShowTreeButtonProps {
+  show: boolean
+}
+
+const ShowTreeButton = styled.button<ShowTreeButtonProps>`
+  left: var(--padding);
+  opacity: ${p => p.show ? 1 : 0};
+  position: absolute;
+  top: calc(var(--padding) + 4px);
+  transition: all .1s;
+  width: 32px;
+  z-index: 100;
+`;
+
+const HideTreeButton = styled.button`
+  padding: 0;
+  position: absolute;
+  right: 3px;
+  top: 3px;
+  width: 32px;
+  z-index: 100;
+`;
 
 interface EntityEditorProps {
   data: EntityData;
@@ -36,6 +84,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
     this.state = {
       currentComponent: '',
       currentAnimationStep: 0,
+      leftSidebarOpen: true,
       preview: {
         backgroundColor: -1,
         anaglyph: false,
@@ -171,8 +220,8 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
 
   protected async appendImageData(entityData: EntityData): Promise<EntityData> {
     const { fileUri, services, setGeneratingProgress } = this.props.context;
-    const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
 
+    const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
     const mostFilesOnASprite = this.getMostFilesOnASprite(entityData);
     const isMultiFileAnimation = entityData.components?.animations.length > 0 && mostFilesOnASprite > 1;
     const optimizeTiles = (entityData.components?.animations.length === 0 && entityData.sprites.optimizedTiles)
@@ -350,32 +399,16 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
     const isMultiFileAnimation = mostFilesOnASprite > 1;
 
     return (
-      <EntityEditorContext.Provider
-        value={{
-          state: this.state,
-          setState: this.updateState.bind(this),
-          data,
-          setData: this.setData.bind(this),
-        }}
-      >
-        <HContainer
-          className="entityEditor"
-          gap={0}
-          grow={1}
-          overflow='auto'
+      <div
+        className="entityEditor">
+        <EntityEditorContext.Provider
+          value={{
+            state: this.state,
+            setState: this.updateState.bind(this),
+            data,
+            setData: this.setData.bind(this),
+          }}
         >
-          <EntityEditorContext.Consumer>
-            {context =>
-              <VContainer
-                gap={15}
-                overflow='auto'
-                onClick={() => this.setState({ currentComponent: '' })}
-              >
-                <EntityMeta />
-                <ComponentTree />
-              </VContainer>
-            }
-          </EntityEditorContext.Consumer>
           <EntityEditorContext.Consumer>
             {context =>
               this.state.currentComponent?.startsWith('scripts-')
@@ -386,17 +419,60 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
             }
           </EntityEditorContext.Consumer>
           <EntityEditorContext.Consumer>
-            {context =>
-              <VContainer gap={15} overflow='auto'>
+            {context => <HContainer
+              alignItems='start'
+              grow={1}
+              justifyContent='space-between'
+              overflow='hidden'
+              style={{
+                marginBottom: 40,
+              }}
+            >
+              <EditorSidebar
+                show={this.state.leftSidebarOpen}
+                orientation='left'
+                style={{ position: 'relative' }}
+              >
+                <HideTreeButton
+                  className="theia-button secondary"
+                  title={nls.localize('vuengine/entityEditor/showComponentsTree', 'Show Components Tree')}
+                  onClick={() => this.setState({
+                    ...this.state,
+                    leftSidebarOpen: false,
+                  })}
+                >
+                  <i className="codicon codicon-chevron-left" />
+                </HideTreeButton>
+                <EntityMeta />
+                <ComponentTree />
+              </EditorSidebar>
+              {!this.state.leftSidebarOpen &&
+                <ShowTreeButton
+                  show={!this.state.leftSidebarOpen}
+                  className="theia-button secondary"
+                  title={nls.localize('vuengine/entityEditor/showComponentsTree', 'Show Components Tree')}
+                  onClick={() => this.setState({
+                    ...this.state,
+                    leftSidebarOpen: true,
+                  })}
+                >
+                  <i className="codicon codicon-list-tree" />
+                </ShowTreeButton>
+              }
+
+              <EditorSidebar
+                show={this.state.currentComponent.includes('-') || ['colliders', 'extraProperties', 'physics', 'sprites'].includes(this.state.currentComponent)}
+                orientation='right'
+              >
                 <CurrentComponent
                   isMultiFileAnimation={isMultiFileAnimation}
                 />
-              </VContainer>
+              </EditorSidebar>
+            </HContainer>
             }
           </EntityEditorContext.Consumer>
-        </HContainer>
-
-      </EntityEditorContext.Provider>
+        </EntityEditorContext.Provider>
+      </div>
     );
   }
 }

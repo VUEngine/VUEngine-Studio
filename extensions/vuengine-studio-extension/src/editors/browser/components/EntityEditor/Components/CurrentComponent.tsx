@@ -19,11 +19,10 @@ import {
     SpriteData,
     WireframeData,
 } from '../EntityEditorTypes';
+import ScriptedActionDetail from '../Scripts/ScriptedActionDetail';
 import Sprite from '../Sprites/Sprite';
 import SpritesSettings from '../Sprites/SpritesSettings';
 import Wireframe from '../Wireframes/Wireframe';
-import ScriptedActionDetail from '../Scripts/ScriptedActionDetail';
-import { nls } from '@theia/core';
 
 interface CurrentComponentProps {
     isMultiFileAnimation: boolean
@@ -95,7 +94,7 @@ export default function CurrentComponent(props: CurrentComponentProps): React.JS
                     return <ExtraProperties />;
                 case 'physics':
                     return <Physics />;
-
+                /*
                 default:
                     return <div className='empty'>
                         {nls.localize(
@@ -103,6 +102,7 @@ export default function CurrentComponent(props: CurrentComponentProps): React.JS
                             'No component selected. Select any component to edit its properties.',
                         )}
                     </div>;
+                */
             }
         }
 
@@ -110,21 +110,22 @@ export default function CurrentComponent(props: CurrentComponentProps): React.JS
     };
 
     return (
-        <VContainer gap={15}>
+        <VContainer
+            gap={15}
+            style={{
+                overflow: 'auto',
+                padding: 'var(--padding)',
+                zIndex: 1,
+            }}
+        >
             {getComponentEditor()}
-            {state.currentComponent?.startsWith('sprites') &&
-                <>
-                    <hr />
-                    <SpritesSettings
-                        isMultiFileAnimation={isMultiFileAnimation}
-                    />
-                </>
+            {state.currentComponent === 'sprites' &&
+                <SpritesSettings
+                    isMultiFileAnimation={isMultiFileAnimation}
+                />
             }
-            {state.currentComponent?.startsWith('colliders') &&
-                <>
-                    <hr />
-                    <CollidersSettings />
-                </>
+            {state.currentComponent === 'colliders' &&
+                <CollidersSettings />
             }
         </VContainer>
     );

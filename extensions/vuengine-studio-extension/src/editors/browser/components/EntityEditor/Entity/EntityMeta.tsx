@@ -35,17 +35,26 @@ export default function EntityMeta(): React.JSX.Element {
 
     return <>
         {tileCount > 0 &&
-            <VContainer gap={15}>
+            <VContainer
+                gap={15}
+                style={{
+                    overflow: 'visible',
+                    padding: 'var(--padding)',
+                    zIndex: 1,
+                }}
+            >
                 <VContainer>
                     <label>
                         {nls.localize('vuengine/entityEditor/tiles', 'Tiles')}
                     </label>
-                    <input
-                        className={`theia-input heaviness ${tileCount > 1200 ? 'heavinessHeavy' : tileCount > 600 ? 'heavinessMedium' : 'heavinessLight'}`}
-                        type='text'
-                        value={tileCount}
-                        disabled
-                    />
+                    <div>
+                        <input
+                            className={`theia-input heaviness ${tileCount > 1200 ? 'heavinessHeavy' : tileCount > 600 ? 'heavinessMedium' : 'heavinessLight'}`}
+                            type='text'
+                            value={tileCount}
+                            disabled
+                        />
+                    </div>
                 </VContainer>
             </VContainer>
         }

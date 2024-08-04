@@ -8,5 +8,5 @@
     left: calc(2 * var(--theia-ui-padding));
     position: absolute;
     right: calc(2 * var(--theia-ui-padding));
-    z-index: 4000;
+    z-index: 100;
 }

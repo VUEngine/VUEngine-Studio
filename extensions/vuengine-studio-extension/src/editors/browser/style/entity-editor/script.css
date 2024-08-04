@@ -1,22 +1,15 @@
 .script-container {
     align-items: center;
-    background-image: radial-gradient(rgba(0, 0, 0, .2) 2px, transparent 0);
-    background-size: 32px 32px;
-    /*
-    background: radial-gradient(circle, transparent 15%, var(--theia-editor-background) 15%),
-        linear-gradient(0deg, transparent 49%, rgba(0, 0, 0, .2) 49%, rgba(0, 0, 0, .2) 51%, transparent 51%), 
-        linear-gradient(90deg, transparent 49%, rgba(0, 0, 0, .2) 49%, rgba(0, 0, 0, .2) 51%, transparent 51%);
-    background-size: 32px 32px;
-    */
-    border: var(--theia-border-width) solid var(--theia-dropdown-border);
-    border-radius: 8px;
+    background-image: radial-gradient(rgba(0, 0, 0, .3) 2px, transparent 0);
+    background-size: 16px 16px;
     cursor: grab;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+    inset: 0;
     overflow: auto;
     padding: var(--padding);
-    position: relative;
+    position: absolute;
     user-select: none;
 }
 
