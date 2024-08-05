@@ -241,7 +241,6 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
             json = JSON.parse(this.reference?.object.getText() || '{}');
         } catch (error) {
             console.error('Malformed JSON, could not update editor.');
-            return;
         }
         this.data = json as ItemData;
         await this.mergeOntoDefaults(type);
@@ -347,40 +346,69 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
      * Generates JSON from schema, using either values present in data or schema default.
      * Will only contain properties that are present in the schema.
      */
-    protected generateDataFromSchema(schema: any, data: any): any {
+    protected generateDataFromSchema(schema: any, data?: any): any {
         if (!schema) {
             return;
         }
 
-        const getValue = (def: any) => (data !== undefined)
+        const getValue = (defaultValue: any) => (data !== undefined)
             ? data
             : (schema.default !== undefined)
                 ? schema.default
-                : def;
+                : defaultValue;
 
         switch (schema.type) {
             case 'array':
-                // TODO: validate against schema
-                return getValue([]);
+                const resultArray: any[] = [];
+                if (data?.length > 0) {
+                    data.map((dataValue: any) => {
+                        resultArray.push(this.generateDataFromSchema(
+                            schema.items,
+                            dataValue
+                        ));
+                    });
+                }
+                if ((schema.minItems !== undefined) && resultArray.length < schema.minItems) {
+                    [...Array(schema.minItems - resultArray.length)].map(x => {
+                        resultArray.push(this.generateDataFromSchema(
+                            schema.items,
+                        ));
+                    });
+                }
+                if ((schema.maxItems !== undefined) && resultArray.length > schema.maxItems) {
+                    resultArray.splice(schema.maxItems - 1);
+                }
+                return resultArray;
+
             case 'boolean':
                 return getValue(false);
+
             case 'integer':
             case 'number':
+                let resultNumber = getValue(0);
+                if (schema.minimum && resultNumber < schema.minimum) {
+                    resultNumber = schema.minimum;
+                }
+                if (schema.maximum && resultNumber > schema.maximum) {
+                    resultNumber = schema.maximum;
+                }
                 return getValue(0);
+
             case 'object':
-                let parsedData: any = {};
+                let resultObject: any = {};
                 if (schema.properties) {
-                    Object.keys(schema.properties).forEach(item => {
-                        parsedData[item] = this.generateDataFromSchema(
-                            schema.properties![item],
-                            data ? data[item] : undefined
+                    Object.keys(schema.properties).forEach(key => {
+                        resultObject[key] = this.generateDataFromSchema(
+                            schema.properties![key],
+                            data ? data[key] : undefined
                         );
                     });
                 }
                 if (schema.additionalProperties) {
-                    parsedData = deepmerge(parsedData, data);
+                    resultObject = deepmerge(resultObject, data);
                 }
-                return parsedData;
+                return resultObject;
+
             case 'string':
                 return getValue('');
         }
