@@ -12,7 +12,7 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
         {
             [...Array(96)].map((h, y) => {
                 const index = mirror && y >= 48 ? 95 - y : y;
-                const brightness = values[index] ?? 15;
+                const brightness = values[index] ?? 1;
                 return <div
                     key={`preview-row-${y}`}
                     style={{

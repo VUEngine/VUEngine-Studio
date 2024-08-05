@@ -48,7 +48,7 @@ const BarContainer = styled.div<BarContainerProps>`
 `;
 
 const Bar = styled.div`
-    background-color: var(--theia-dropdown-border);
+    background-color: var(--theia-editor-foreground);
     bottom: 0;
     height: 0;
     position: absolute;

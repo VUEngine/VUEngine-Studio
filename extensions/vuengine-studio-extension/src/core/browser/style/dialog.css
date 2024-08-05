@@ -4,4 +4,5 @@
 
 .p-Widget.dialogOverlay .dialogTitle {
     background-color: var(--theia-titleBar-activeBackground);
+    color: #fff;
 }

@@ -16,10 +16,15 @@
   opacity: 0.5;
 }
 
-#theia-statusBar .area.left .element:first-child:not(.has-background) {
-  margin-left: var(--theia-ui-padding);
+#theia-statusBar .area.left .element:first-child {
+  margin-left: 0 !important;
+  padding-left: calc(2 * var(--theia-ui-padding));
+}
+
+#theia-statusBar .area.right .element:last-child {
+  padding-right: calc(2 * var(--theia-ui-padding));
 }
 
 #theia-statusBar .area.right {
-  padding-right: var(--theia-ui-padding);
+  padding-right: 0;
 }

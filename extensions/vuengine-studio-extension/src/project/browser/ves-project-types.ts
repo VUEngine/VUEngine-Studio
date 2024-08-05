@@ -659,7 +659,7 @@ export const defaultProjectData: ProjectData = {
               properties: {
                 enabled: {
                   type: 'boolean',
-                  default: true
+                  default: false
                 },
                 interval: {
                   type: 'object',
@@ -770,7 +770,9 @@ export const defaultProjectData: ProjectData = {
                   maximum: 7
                 }
               }
-            }
+            },
+            minItems: 6,
+            maxItems: 6,
           },
           waveforms: {
             type: 'array',
