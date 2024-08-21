@@ -4,26 +4,27 @@
   width: 40px;
 }
 
+.palette-renderer .theia-select-component .theia-select-component-label,
+.palette-renderer .theia-select-component .theia-select-component-chevron {
+  color: #fff;
+}
+
 /* .theia-select-component-dropdown .theia-select-component-option:nth-child(1), */
 .palette-renderer .value-11 .theia-select-component {
   background-color: #ff0000;
-  color: #fff;
 }
 
 /* .theia-select-component-dropdown .theia-select-component-option:nth-child(2), */
 .palette-renderer .value-10 .theia-select-component {
   background-color: #aa0000;
-  color: #fff;
 }
 
 /* .theia-select-component-dropdown .theia-select-component-option:nth-child(3), */
 .palette-renderer .value-01 .theia-select-component {
   background-color: #550000;
-  color: #fff;
 }
 
 /* .theia-select-component-dropdown .theia-select-component-option:nth-child(4), */
 .palette-renderer .value-00 .theia-select-component {
   background-color: #000000;
-  color: #fff;
 }

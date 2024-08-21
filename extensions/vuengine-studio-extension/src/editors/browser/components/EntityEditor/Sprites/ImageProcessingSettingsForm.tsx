@@ -87,11 +87,15 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
 
     const uncompressImageData = async () => {
         let data: number[][] = [[], []];
-        const uncompressedTileData = await services.vesCommonService.uncompressJson(imageData?.tiles?.data) as string[];
-        if (imageData?.maps) {
-            const uncompressedMapData = await services.vesCommonService.uncompressJson(imageData.maps[0]?.data) as string[];
-            data = services.vesImagesService.imageDataToPixelData(uncompressedTileData, { ...imageData.maps[0], data: uncompressedMapData });
+        if (!imageData?.maps) {
+            return;
         }
+        const uncompressedTileData = await services.vesCommonService.uncompressJson(imageData?.tiles?.data) as string[];
+        if (!uncompressedTileData) {
+            return;
+        }
+        const uncompressedMapData = await services.vesCommonService.uncompressJson(imageData.maps[0]?.data) as string[];
+        data = services.vesImagesService.imageDataToPixelData(uncompressedTileData, { ...imageData.maps[0], data: uncompressedMapData });
         setPixelData(data);
     };
 

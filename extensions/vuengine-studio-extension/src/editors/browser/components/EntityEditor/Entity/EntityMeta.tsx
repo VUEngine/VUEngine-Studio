@@ -39,7 +39,7 @@ export default function EntityMeta(): React.JSX.Element {
                 gap={15}
                 style={{
                     overflow: 'visible',
-                    padding: 'var(--padding)',
+                    padding: 'var(--padding) var(--padding) 0',
                     zIndex: 1,
                 }}
             >

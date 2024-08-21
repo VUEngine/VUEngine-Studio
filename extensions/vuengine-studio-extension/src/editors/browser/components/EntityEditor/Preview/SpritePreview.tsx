@@ -60,16 +60,20 @@ export default function SpritePreview(props: SpritePreviewProps): React.JSX.Elem
     }
 
     await Promise.all(sprite._imageData?.images.map(async (singleImageData, i) => {
-      const uncompressedTileData = await services.vesCommonService.uncompressJson(singleImageData.tiles?.data) as string[];
-      if (singleImageData.maps) {
-        await Promise.all(singleImageData.maps.map(async (singleImageDataMap, j) => {
-          const uncompressedMapData = await services.vesCommonService.uncompressJson(singleImageDataMap?.data) as string[];
-          if (allImageData[i] === undefined) {
-            allImageData[i] = [];
-          }
-          allImageData[i][j] = services.vesImagesService.imageDataToPixelData(uncompressedTileData, { ...singleImageDataMap, data: uncompressedMapData });
-        }));
+      if (!singleImageData.maps) {
+        return;
       }
+      const uncompressedTileData = await services.vesCommonService.uncompressJson(singleImageData.tiles?.data) as string[];
+      if (!uncompressedTileData) {
+        return;
+      }
+      await Promise.all(singleImageData.maps.map(async (singleImageDataMap, j) => {
+        const uncompressedMapData = await services.vesCommonService.uncompressJson(singleImageDataMap?.data) as string[];
+        if (allImageData[i] === undefined) {
+          allImageData[i] = [];
+        }
+        allImageData[i][j] = services.vesImagesService.imageDataToPixelData(uncompressedTileData, { ...singleImageDataMap, data: uncompressedMapData });
+      }));
     }));
 
     if (allImageData[0] && allImageData[0] && allImageData[0][0] && allImageData[0][0][0]) {

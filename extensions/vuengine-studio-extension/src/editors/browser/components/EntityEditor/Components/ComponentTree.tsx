@@ -161,7 +161,7 @@ export default function ComponentTree(): React.JSX.Element {
             }}
         >
             <label style={{
-                padding: '0 var(--padding)',
+                padding: 'var(--padding) var(--padding) 0',
             }}>
                 {nls.localize('vuengine/entityEditor/components', 'Components')}
             </label>

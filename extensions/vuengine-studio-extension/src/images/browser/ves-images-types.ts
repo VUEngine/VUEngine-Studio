@@ -17,6 +17,8 @@ export const PIXELS_BITS_PER_TILE = TILE_HEIGHT * TILE_WIDTH;
 export const MAX_IMAGE_HEIGHT = 512;
 export const MAX_IMAGE_WIDTH = 512;
 
+export const SHARED_TILES_FILENAME = '__sharedTiles';
+
 export interface ImageConfig {
   files: string[]
   section: DataSection

@@ -30,6 +30,7 @@ import {
   MAX_IMAGE_HEIGHT,
   MAX_IMAGE_WIDTH,
   PIXELS_BITS_PER_TILE,
+  SHARED_TILES_FILENAME,
   TILE_HEIGHT,
   TILE_WIDTH,
   TILES_PER_UINT32
@@ -554,7 +555,7 @@ export class VesImagesService {
     if (config.tileset.shared) {
       gritArguments.push('-gS');
       gritArguments.push('-O');
-      gritArguments.push('__sharedTiles');
+      gritArguments.push(SHARED_TILES_FILENAME);
       gritArguments.push('-S');
       gritArguments.push(name);
     }

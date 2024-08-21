@@ -9,7 +9,7 @@
     background-position: center center;
     background-repeat: no-repeat;
     background-size: 32vh;
-    border-radius: 12px;
+    border-radius: 8px;
 }
 
 body.theia-dark .theia-ApplicationShell > .p-SplitPanel > .p-SplitPanel {
