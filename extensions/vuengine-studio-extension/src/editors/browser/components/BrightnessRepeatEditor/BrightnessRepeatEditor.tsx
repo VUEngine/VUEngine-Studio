@@ -18,8 +18,7 @@ interface BrightnessRepeatState {
 export default class BrightnessRepeatEditor extends React.Component<BrightnessRepeatEditorProps, BrightnessRepeatState> {
     constructor(props: BrightnessRepeatEditorProps) {
         super(props);
-        this.state = {
-        };
+        this.state = {};
     }
 
     protected onChangeDescription(e: React.ChangeEvent<HTMLInputElement>): void {

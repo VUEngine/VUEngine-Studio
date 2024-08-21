@@ -14,7 +14,7 @@ export default function Editor(props: EditorProps): React.JSX.Element {
         <div>
             {[...Array(48)].map((h, y) => {
                 const index = y;
-                const brightness = values[index] ?? 1;
+                const brightness = values[index] ?? 0;
                 return <VerticalRangeInput
                     key={index}
                     index={index}
@@ -22,8 +22,8 @@ export default function Editor(props: EditorProps): React.JSX.Element {
                     max={16}
                     maxWidth={24}
                     barHeight={320}
-                    value={brightness}
-                    setValue={(value: number) => setValue(index, value)}
+                    value={brightness + 1}
+                    setValue={(value: number) => setValue(index, value - 1)}
                 />;
             })}
         </div>
@@ -32,7 +32,7 @@ export default function Editor(props: EditorProps): React.JSX.Element {
             <div>
                 {[...Array(48)].map((h, y) => {
                     const index = y + 48;
-                    const brightness = values[index] ?? 1;
+                    const brightness = values[index] ?? 0;
                     return <VerticalRangeInput
                         key={index}
                         index={index}
@@ -40,8 +40,8 @@ export default function Editor(props: EditorProps): React.JSX.Element {
                         max={16}
                         maxWidth={24}
                         barHeight={320}
-                        value={brightness}
-                        setValue={(value: number) => setValue(index, value)}
+                        value={brightness + 1}
+                        setValue={(value: number) => setValue(index, value - 1)}
                     />;
                 })}
             </div>

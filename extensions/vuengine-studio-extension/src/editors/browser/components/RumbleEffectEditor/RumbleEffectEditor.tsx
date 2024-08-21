@@ -1,13 +1,25 @@
 import { nls } from '@theia/core';
+import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React from 'react';
 import { VesRumblePackCommands } from '../../../../rumble-pack/browser/ves-rumble-pack-commands';
 import { RumblePakLogLine } from '../../../../rumble-pack/browser/ves-rumble-pack-types';
 import { EditorsContextType } from '../../ves-editors-types';
-import { BUILT_IN_EFFECTS, RumbleEffectData, RumbleEffectFrequency } from './RumbleEffectTypes';
-import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
-import VContainer from '../Common/VContainer';
 import HContainer from '../Common/HContainer';
 import { clamp } from '../Common/Utils';
+import VContainer from '../Common/VContainer';
+import {
+    BUILT_IN_EFFECTS,
+    MAX_RUMBLE_EFFECT_BREAK,
+    MAX_RUMBLE_EFFECT_OVERDRIVE,
+    MAX_RUMBLE_EFFECT_SUSTAIN_NEGATIVE,
+    MAX_RUMBLE_EFFECT_SUSTAIN_POSITIVE,
+    MIN_RUMBLE_EFFECT_BREAK,
+    MIN_RUMBLE_EFFECT_OVERDRIVE,
+    MIN_RUMBLE_EFFECT_SUSTAIN_NEGATIVE,
+    MIN_RUMBLE_EFFECT_SUSTAIN_POSITIVE,
+    RumbleEffectData,
+    RumbleEffectFrequency,
+} from './RumbleEffectTypes';
 
 interface RumbleEffectProps {
     data: RumbleEffectData
@@ -50,35 +62,45 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
     protected setStateSustainPositive = (sustain: number) => {
         this.props.updateData({
             ...this.props.data,
-            sustainPositive: clamp(sustain, 0, 255),
+            sustainPositive: clamp(
+                sustain,
+                MIN_RUMBLE_EFFECT_SUSTAIN_POSITIVE,
+                MAX_RUMBLE_EFFECT_SUSTAIN_POSITIVE
+            ),
         });
     };
 
     protected setStateSustainNegative = (sustain: number) => {
-        if (sustain >= 0 && sustain <= 255) {
-            this.props.updateData({
-                ...this.props.data,
-                sustainNegative: clamp(sustain, 0, 255),
-            });
-        }
+        this.props.updateData({
+            ...this.props.data,
+            sustainNegative: clamp(
+                sustain,
+                MIN_RUMBLE_EFFECT_SUSTAIN_NEGATIVE,
+                MAX_RUMBLE_EFFECT_SUSTAIN_NEGATIVE
+            ),
+        });
     };
 
     protected setStateOverdrive = (overdrive: number) => {
-        if (overdrive >= 0 && overdrive <= 255) {
-            this.props.updateData({
-                ...this.props.data,
-                overdrive: clamp(overdrive, 0, 255),
-            });
-        }
+        this.props.updateData({
+            ...this.props.data,
+            overdrive: clamp(
+                overdrive,
+                MIN_RUMBLE_EFFECT_OVERDRIVE,
+                MAX_RUMBLE_EFFECT_OVERDRIVE
+            ),
+        });
     };
 
     protected setStateBreak = (breakValue: number) => {
-        if (breakValue >= 0 && breakValue <= 255) {
-            this.props.updateData({
-                ...this.props.data,
-                break: clamp(breakValue, 0, 255),
-            });
-        }
+        this.props.updateData({
+            ...this.props.data,
+            break: clamp(
+                breakValue,
+                MIN_RUMBLE_EFFECT_BREAK,
+                MAX_RUMBLE_EFFECT_BREAK
+            ),
+        });
     };
 
     protected toggleStopBeforeStarting = () => {
@@ -138,7 +160,7 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                         defaultValue={data.effect}
                         options={BUILT_IN_EFFECTS.map((value, index) => ({
                             label: value,
-                            value: index.toString(),
+                            value: (index + 1).toString(),
                         }))}
                         onChange={option => this.setEffect(option.value ? parseInt(option.value) : 1)}
                     />
@@ -168,8 +190,8 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                         title={nls.localize('vuengine/rumbleEffectEditor/overdrive', 'Overdrive')}
                         onChange={e => this.setStateOverdrive(parseInt(e.target.value))}
                         value={data.overdrive}
-                        min="0"
-                        max="255"
+                        min={MIN_RUMBLE_EFFECT_OVERDRIVE}
+                        max={MAX_RUMBLE_EFFECT_OVERDRIVE}
                     />
                 </VContainer>
                 <VContainer grow={1}>
@@ -182,8 +204,8 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                         title={nls.localize('vuengine/rumbleEffectEditor/break', 'Break')}
                         onChange={e => this.setStateBreak(parseInt(e.target.value))}
                         value={data.break}
-                        min="0"
-                        max="255"
+                        min={MIN_RUMBLE_EFFECT_BREAK}
+                        max={MAX_RUMBLE_EFFECT_BREAK}
                     />
                 </VContainer>
                 <VContainer grow={1}>
@@ -196,8 +218,8 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                         title={nls.localize('vuengine/rumbleEffectEditor/positiveSustain', 'Positive Sustain')}
                         onChange={e => this.setStateSustainPositive(parseInt(e.target.value))}
                         value={data.sustainPositive}
-                        min="0"
-                        max="255"
+                        min={MIN_RUMBLE_EFFECT_SUSTAIN_POSITIVE}
+                        max={MAX_RUMBLE_EFFECT_SUSTAIN_POSITIVE}
                     />
                 </VContainer>
                 <VContainer grow={1}>
@@ -210,8 +232,8 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                         title={nls.localize('vuengine/rumbleEffectEditor/negativeSustain', 'Negative Sustain')}
                         onChange={e => this.setStateSustainNegative(parseInt(e.target.value))}
                         value={data.sustainNegative}
-                        min="0"
-                        max="255"
+                        min={MIN_RUMBLE_EFFECT_SUSTAIN_NEGATIVE}
+                        max={MAX_RUMBLE_EFFECT_SUSTAIN_NEGATIVE}
                     />
                 </VContainer>
             </HContainer>
@@ -222,7 +244,7 @@ export default class RumbleEffectEditor extends React.Component<RumbleEffectProp
                         checked={data.stopBeforeStarting}
                         onChange={this.toggleStopBeforeStarting}
                     />
-                    {nls.localize('vuengine/rumbleEffectEditor/stopBeforeStarting', 'Stop before starting')}
+                    {nls.localize('vuengine/rumbleEffectEditor/stopBeforeStarting', 'Stop previous effect(s) before starting this')}
                 </label>
             </VContainer>
             <VContainer className="connectionStatus">

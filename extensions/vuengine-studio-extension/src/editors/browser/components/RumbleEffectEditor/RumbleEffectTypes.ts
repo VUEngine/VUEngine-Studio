@@ -137,3 +137,12 @@ export const BUILT_IN_EFFECTS = [
     `122) ${nls.localize('vuengine/rumblePack/effects/smoothHum', 'Smooth Hum {0} (No kick or brake pulse)', 4)} – 20 % `,
     `123) ${nls.localize('vuengine/rumblePack/effects/smoothHum', 'Smooth Hum {0} (No kick or brake pulse)', 5)} – 10 % `,
 ];
+
+export const MIN_RUMBLE_EFFECT_BREAK = 0;
+export const MAX_RUMBLE_EFFECT_BREAK = 255;
+export const MIN_RUMBLE_EFFECT_OVERDRIVE = 0;
+export const MAX_RUMBLE_EFFECT_OVERDRIVE = 126;
+export const MIN_RUMBLE_EFFECT_SUSTAIN_NEGATIVE = 0;
+export const MAX_RUMBLE_EFFECT_SUSTAIN_NEGATIVE = 255;
+export const MIN_RUMBLE_EFFECT_SUSTAIN_POSITIVE = 0;
+export const MAX_RUMBLE_EFFECT_SUSTAIN_POSITIVE = 255;
