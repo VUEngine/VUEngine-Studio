@@ -1,3 +1,21 @@
 .p-Widget.theia-sidepanel-toolbar {
     border-bottom: 1px solid var(--theia-activityBar-background);
 }
+
+.p-TabBar.theia-app-sides .p-TabBar-content {
+    gap: 0;
+}
+.p-TabBar.theia-app-sides .p-TabBar-tab:hover {
+    background-color: var(--theia-activityBar-hoverBackground);
+}
+.p-TabBar.theia-app-sides.theia-app-left .p-TabBar-tab {
+    border-radius: 0 8px 8px 0;
+}
+.p-TabBar.theia-app-sides.theia-app-right .p-TabBar-tab {
+    border-radius: 8px 0 0 8px;
+}
+
+.p-Widget .theia-sidebar-menu-item i:hover {
+    background-color: var(--theia-activityBar-hoverBackground);
+    border-radius: 0 8px 8px 0;
+}
