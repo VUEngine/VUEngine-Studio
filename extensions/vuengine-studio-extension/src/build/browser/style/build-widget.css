@@ -1,20 +1,22 @@
 #vesBuildWidget {
   display: flex;
   flex-direction: column;
+  gap: var(--theia-ui-padding);
   line-height: 130%;
   padding: calc(var(--theia-ui-padding) * 2);
   min-width: 250px;
 }
 
-#vesBuildWidget .vesProgressBar {
-  margin-bottom: var(--theia-ui-padding);
+#vesBuildWidget .buildActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--theia-ui-padding);
 }
 
 #vesBuildWidget .buildButtons {
   display: flex;
   flex-direction: row;
-  gap: 5px;
-  margin-bottom: var(--theia-ui-padding);
+  gap: var(--theia-ui-padding);
 }
 
 #vesBuildWidget .buildButtons .theia-button {
@@ -55,14 +57,9 @@
   width: 100%;
 }
 
-#vesBuildWidget .buildSelector {
-  margin-top: calc(var(--theia-ui-padding) * 2);
-}
-
 #vesBuildWidget .buildMeta {
   display: flex;
   flex-direction: column;
-  margin: var(--theia-ui-padding) 0;
 }
 
 #vesBuildWidget .buildStatus {
@@ -91,10 +88,6 @@
   color: var(--theia-editorError-foreground);
 }
 
-#vesBuildWidget .buildStatusMeta {
-  margin-top: var(--theia-ui-padding);
-}
-
 #vesBuildWidget .buildStatusMeta span {
   margin-right: var(--theia-ui-padding);
 }
@@ -106,8 +99,7 @@
 
 #vesBuildWidget .buildLogButtons {
   display: flex;
-  gap: 5px;
-  margin-top: var(--theia-ui-padding);
+  gap: var(--theia-ui-padding);
 }
 
 #vesBuildWidget .buildLogButtons .theia-input {
@@ -150,7 +142,7 @@
 }
 
 #vesBuildWidget .buildLogLine:empty {
-  height: 5px;
+  height: var(--theia-ui-padding);
 }
 
 #vesBuildWidget .buildLogLine:hover {

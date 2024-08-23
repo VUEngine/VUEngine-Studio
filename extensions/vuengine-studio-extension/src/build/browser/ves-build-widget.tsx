@@ -269,8 +269,8 @@ export class VesBuildWidget extends ReactWidget {
             </div>
           )}
         </div>
-        <div className='buildMeta'>
-          {this.vesBuildService.buildStatus.log.length > 0 && (
+        {this.vesBuildService.buildStatus.log.length > 0 && (
+          <div className='buildMeta'>
             <div className='buildStatus'>
               {this.vesBuildService.buildStatus.active ? (
                 <div className='buildStatusActivity'>
@@ -301,8 +301,8 @@ export class VesBuildWidget extends ReactWidget {
                   <span><i className='fa fa-microchip'></i> {this.vesBuildService.bytesToMbit(this.vesBuildService.romSize)} MBit</span>}
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
         <div className='buildLogWrapper'>
           <div className={`buildLog${this.state.lineWrap ? ' linewrap' : ''}`}>
             <div>
