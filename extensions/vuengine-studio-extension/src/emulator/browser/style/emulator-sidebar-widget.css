@@ -1,6 +1,7 @@
 #vesEmulatorSidebarWidget {
   display: flex;
   flex-direction: column;
+  outline: none;
 }
 
 #vesEmulatorSidebarWidget .theia-button {

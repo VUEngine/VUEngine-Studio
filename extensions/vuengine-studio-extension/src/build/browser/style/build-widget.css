@@ -5,6 +5,7 @@
   line-height: 130%;
   padding: calc(var(--theia-ui-padding) * 2);
   min-width: 250px;
+  outline: none;
 }
 
 #vesBuildWidget .buildActions {

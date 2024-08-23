@@ -24,6 +24,7 @@
   display: flex;
   flex-grow: 1;
   height: 100%;
+  image-rendering: pixelated;
   justify-content: center;
   overflow: hidden;
   position: relative;
@@ -31,9 +32,11 @@
   width: 100%;
 }
 
-.jsonforms-container .filePreview.multi .filePreviewImage {
-  box-shadow: 1px 1px 0px var(--theia-editor-background), 
-    5px 5px 0px var(--theia-activityBar-background);
+.jsonforms-container .filePreview.multi {
+  box-shadow: 1px 1px 0px var(--theia-editor-background),    
+    3px 3px 0px var(--theia-activityBar-background), 
+    4px 4px 0px var(--theia-editor-background),    
+    6px 6px 0px var(--theia-activityBar-background)
 }
 
 .jsonforms-container .filePreviewTitle {
