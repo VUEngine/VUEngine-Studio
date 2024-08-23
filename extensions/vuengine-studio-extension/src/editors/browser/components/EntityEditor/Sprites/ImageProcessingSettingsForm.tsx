@@ -12,7 +12,6 @@ import {
     DISTANCE_CALCULATOR_OPTIONS,
     IMAGE_QUANTIZATION_ALGORITHM_OPTIONS,
     ImageProcessingSettings,
-    MAX_IMAGE_HEIGHT,
     MAX_IMAGE_WIDTH,
 } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
@@ -108,10 +107,10 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
         ));
     };
 
-    const finalHeight = useMemo(() => clamp(roundToNextMultipleOf8(height), 0, MAX_IMAGE_HEIGHT), [height]);
+    const finalHeight = useMemo(() => clamp(roundToNextMultipleOf8(height), 0, height), [height]);
     const finalWidth = useMemo(() => clamp(roundToNextMultipleOf8(width), 0, MAX_IMAGE_WIDTH), [width]);
     const isPadded = finalHeight > height || finalWidth > width;
-    const isCropped = height > MAX_IMAGE_HEIGHT || width > MAX_IMAGE_WIDTH;
+    const isCropped = width > MAX_IMAGE_WIDTH;
 
     useEffect(() => {
         getImageDimensions();

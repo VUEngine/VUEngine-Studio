@@ -14,7 +14,6 @@ export const TILE_WIDTH = 8;
 export const TILES_PER_UINT32 = 4;
 export const BITS_PER_PIXEL = 2;
 export const PIXELS_BITS_PER_TILE = TILE_HEIGHT * TILE_WIDTH;
-export const MAX_IMAGE_HEIGHT = 512;
 export const MAX_IMAGE_WIDTH = 512;
 
 export const SHARED_TILES_FILENAME = '__sharedTiles';
@@ -59,9 +58,7 @@ export interface ConversionResultTilesData {
   count: number
   data: string[] | string // string when compressed
   frameOffsets?: number[]
-  height: number
   name: string
-  width: number
 }
 
 export interface ConversionResultMapData {
@@ -86,8 +83,6 @@ export interface ConversionResult {
 export interface ConvertedFileTilesData {
   count: number
   data: string[]
-  height: number
-  width: number
 }
 
 export interface ConvertedFileMapData {

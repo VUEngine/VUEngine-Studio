@@ -27,7 +27,6 @@ import {
   ImageConfig,
   ImageConfigWithName,
   ImageProcessingSettings,
-  MAX_IMAGE_HEIGHT,
   MAX_IMAGE_WIDTH,
   PIXELS_BITS_PER_TILE,
   SHARED_TILES_FILENAME,
@@ -75,9 +74,7 @@ export class VesImagesService {
       tiles: {
         count: 0,
         data: [],
-        height: 0,
         name: '',
-        width: 0,
       },
     };
 
@@ -90,7 +87,7 @@ export class VesImagesService {
         ? imageConfig.files
         : window.electronVesCore.findFiles(imageConfigFileUri.parent.path.fsPath(), '*.png')
           .sort((a, b) => a.localeCompare(b))
-          .map(p => workspaceRootUri.relative(imageConfigFileUri.parent.resolve(p))?.toString()!);
+          .map(p => workspaceRootUri.relative(imageConfigFileUri.parent.resolve(p))?.fsPath()!);
     const gritUri = await this.getGritUri();
     const name = imageConfig.name ? imageConfig.name : imageConfigFileUri.path.name;
     const gritArguments = this.getGritArguments(name, imageConfig);
@@ -103,6 +100,12 @@ export class VesImagesService {
 
     // preprocess images
     const processedImagePaths: string[] = [];
+    /*
+    if (files.length > 2) {
+      // skip quantizing for videos to prevent memory issues
+      files.map(f => processedImagePaths.push(workspaceRootUri.resolve(f).path.fsPath()));
+    } else {
+    */
     await Promise.all(files.map(async imagePath => {
       const processedImage = await this.quantizeImage(imagePath, imageConfig.imageProcessingSettings, imageConfig.colorMode);
       const filename = workspaceRootUri.resolve(imagePath).path.name;
@@ -111,6 +114,9 @@ export class VesImagesService {
       await this.fileService.writeFile(randomFileUri, BinaryBuffer.fromString(processedImage));
       processedImagePaths.push(randomFileUri.path.fsPath());
     }));
+    /*
+    }
+    */
 
     // throw at grit
     const processInfo = await this.vesProcessService.launchProcess(VesProcessType.Raw, {
@@ -165,9 +171,7 @@ export class VesImagesService {
               count: totalTilesCount,
               data: tilesData,
               frameOffsets: frameTileOffsets,
-              height: height * 8,
               name,
-              width: width * 8,
             };
             result.maps.push({
               data: mapData,
@@ -241,12 +245,13 @@ export class VesImagesService {
     const camoto = require('@camoto/pngjs/browser');
     const imageData = camoto.PNG.sync.read(Buffer.from(imageFileContent.value.buffer));
 
-    // crop to 512x512 max
-    if (imageData.height > MAX_IMAGE_HEIGHT || imageData.width > MAX_IMAGE_WIDTH) {
+    // Crop width to 512 px max
+    // We do NOT crop height, because animation spritesheets might be higher
+    if (imageData.width > MAX_IMAGE_WIDTH) {
       const croppedImageData = cropImageData(imageData, {
         top: 0,
         right: imageData.width - MAX_IMAGE_WIDTH,
-        bottom: imageData.height - MAX_IMAGE_HEIGHT,
+        bottom: imageData.height,
         left: 0,
       });
       imageData.data = croppedImageData.data;
@@ -452,7 +457,6 @@ export class VesImagesService {
       const name = fileContent.match(/(?<=\/\/{{BLOCK\().+?(?=\))/s) ?? [''];
       const tilesData = fileContent.match(/0x([0-9A-Fa-f]{8}),/g)?.map(hex => hex.substring(2, 10)) ?? [];
       const mapData = fileContent.match(/0x([0-9A-Fa-f]{4}),/g)?.map(hex => hex.substring(2, 6)) ?? [];
-      const imageDimensions = fileContent.match(/, ([0-9]+)x([0-9]+)@2/) ?? [0, 0];
       const mapDimensions = fileContent.match(/, not compressed, ([0-9]+)x([0-9]+)/) ?? [0, 0];
 
       convertedFileData.push({
@@ -460,8 +464,6 @@ export class VesImagesService {
         tiles: {
           count: tilesData.length / 4,
           data: tilesData,
-          height: imageDimensions[2] as number,
-          width: imageDimensions[1] as number,
         },
         map: {
           data: mapData,
