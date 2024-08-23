@@ -1,9 +1,8 @@
 import { isBoolean, isNumber, nls } from '@theia/core';
 import React from 'react';
 import styled from 'styled-components';
-import { ConversionResult, ConversionResultMapData, ImageCompressionType } from '../../../../images/browser/ves-images-types';
+import { ConversionResult } from '../../../../images/browser/ves-images-types';
 import { EditorsContextType } from '../../ves-editors-types';
-import { DataSection } from '../Common/CommonTypes';
 import HContainer from '../Common/HContainer';
 import ComponentTree from './Components/ComponentTree';
 import CurrentComponent from './Components/CurrentComponent';
@@ -224,161 +223,70 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
     const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
     const mostFilesOnASprite = this.getMostFilesOnASprite(entityData);
     const isMultiFileAnimation = entityData.components?.animations.length > 0 && mostFilesOnASprite > 1;
-    const optimizeTiles = (entityData.components?.animations.length === 0 && entityData.sprites.optimizedTiles)
-      || (entityData.components?.animations.length > 0 && isMultiFileAnimation);
-    const baseConfig = {
-      animation: {
-        frames: isMultiFileAnimation ? mostFilesOnASprite : entityData.animations.totalFrames,
-        individualFiles: isMultiFileAnimation,
-        isAnimation: entityData.components?.animations.length > 0
-      },
-      files: [],
-      map: {
-        generate: true,
-        reduce: {
-          flipped: optimizeTiles,
-          unique: optimizeTiles,
-        }
-      },
-      name: services.vesCommonService.cleanSpecName(fileUri.path.name),
-      tileset: {
-        shared: !entityData.components?.animations.length && entityData.sprites.sharedTiles,
-      },
-      imageProcessingSettings: entityData.components?.sprites[0].imageProcessingSettings,
-      colorMode: entityData.components?.sprites[0].colorMode,
-    };
     const totalSprites = entityData.components?.sprites?.length ?? 0;
 
-    if (!entityData.components?.animations.length &&
-      (entityData.components?.sprites?.length === 1 || entityData.sprites?.sharedTiles)
-    ) {
-      const files: string[] = [];
-      entityData.components?.sprites?.map(s => {
-        [s.texture?.files, s.texture?.files2].map(f => {
-          if (f?.length) {
-            const file = f[0];
-            if (!files.includes(file)) {
-              files.push(file);
-            }
-          }
-        });
-      });
-
-      if (!files.length) {
-        entityData.components?.sprites?.map(s => {
-          s._imageData = 0;
-        });
-        return entityData;
-      }
-
-      const name = services.vesCommonService.cleanSpecName(workspaceRootUri.resolve(files[0]).path.name);
-      const newImageData = await services.vesImagesService.convertImage(fileUri, {
-        ...baseConfig,
-        section: entityData.components?.sprites.length > 0
-          ? entityData.components?.sprites[0].section
-          : DataSection.ROM,
-        map: {
-          ...baseConfig.map,
-          compression: entityData.components?.sprites.length > 0
-            ? entityData.components?.sprites[0].compression
-            : ImageCompressionType.NONE,
-        },
-        tileset: {
-          ...baseConfig.tileset,
-          compression: entityData.components?.sprites.length > 0
-            ? entityData.components?.sprites[0].compression
-            : ImageCompressionType.NONE,
-        },
-        files,
-        name,
-      });
-
-      // map imagedata back to sprites
-      await services.workspaceService.ready;
-      await Promise.all(entityData.components?.sprites?.map(async (s, i) => {
-        if (s.texture?.files?.length) {
-          if (s.texture?.files?.length) {
-            const maps: ConversionResultMapData[] = [];
-            const foundMap = newImageData.maps.find(m => m.name === name);
-            if (foundMap) {
-              maps.push(foundMap);
-            }
-            if (s.texture?.files2?.length) {
-              const name2 = workspaceRootUri.resolve(s.texture.files2[0]).path.name;
-              const foundMap2 = newImageData.maps.find(m => m.name === name2);
-              if (foundMap2) {
-                maps.push(foundMap2);
-              }
-            }
-            const compressedImageData = await this.compressImageDataAsJson({
-              tiles: (i === 0) ? newImageData.tiles : undefined,
-              maps,
-            });
-            s._imageData = {
-              images: [{
-                ...compressedImageData
-              }],
-              dupeIndex: 1,
-            };
-          } else {
-            s._imageData = undefined;
-          }
+    for (let i = 0; i < totalSprites; i++) {
+      const sprite = entityData.components?.sprites[i];
+      const optimizeTiles = (entityData.components?.animations.length === 0 && sprite.optimizeTiles)
+        || (entityData.components?.animations.length > 0 && isMultiFileAnimation);
+      if (sprite.texture?.files?.length) {
+        // possible scenarios:
+        // 1) mono image: files.length = 1
+        // 2) stereo image: files.length = 1 && files2.length = 1
+        // 3) mono video: files.length = n
+        // 4) stereo video: files.length = n && files2.length = n
+        let files = [
+          sprite.texture?.files || [],
+          sprite.texture?.files2 || [],
+        ];
+        const isStereoSprite = sprite.texture?.files?.length === 1 && sprite.texture?.files2?.length === 1;
+        if (isStereoSprite) {
+          files = [[sprite.texture.files[0], sprite.texture.files2[0]]];
         }
-      }));
-    } else {
-      const convertedFilesMap: { [key: string]: SpriteImageData } = {};
-      // for loop to handle sprites synchronously for dupe detection
-      for (let i = 0; i < totalSprites; i++) {
-        const sprite = entityData.components?.sprites[i];
-        if (sprite.texture?.files?.length) {
-          const files = [
-            sprite.texture.files,
-            (sprite.texture?.files2 ?? []),
-          ];
-          // keep track of already converted files to avoid converting the same image twice
-          const checksum = require('crc-32').str(JSON.stringify(files));
-          if (convertedFilesMap[checksum] !== undefined) {
-            sprite._imageData = convertedFilesMap[checksum].dupeIndex;
-          } else {
-            sprite._imageData = {
-              dupeIndex: i + 1,
-              images: [],
-            };
-            await Promise.all(files.map(async (f, j) => {
-              if (f?.length) {
-                const name = services.vesCommonService.cleanSpecName(workspaceRootUri.resolve(f[0]).path.name);
-                const nameSuffix = files.length === 2 ? j ? 'R' : 'L' : '';
-                const newImageData = await services.vesImagesService.convertImage(fileUri, {
-                  ...baseConfig,
-                  name: name + nameSuffix,
-                  section: sprite.section,
-                  map: {
-                    ...baseConfig.map,
-                    compression: sprite.compression,
-                  },
-                  tileset: {
-                    ...baseConfig.tileset,
-                    compression: sprite.compression,
-                    shared: false,
-                  },
-                  files: f,
-                  imageProcessingSettings: sprite.imageProcessingSettings,
-                  colorMode: sprite.colorMode,
-                });
-                setGeneratingProgress((i + 1) * 2 - 1, totalSprites * 2);
-                const compressedImageData = await this.compressImageDataAsJson(newImageData);
-                (sprite._imageData! as SpriteImageData).images[j] = {
-                  ...compressedImageData,
-                };
-              }
-            }));
-            convertedFilesMap[checksum] = sprite._imageData;
+        sprite._imageData = {
+          images: [],
+        };
+        await Promise.all(files.map(async (f, j) => {
+          if (!f?.length) {
+            return;
           }
-        } else {
-          sprite._imageData = undefined;
-        }
-        setGeneratingProgress((i + 1) * 2, totalSprites * 2);
+
+          const name = services.vesCommonService.cleanSpecName(workspaceRootUri.resolve(f[0]).path.name);
+          const nameSuffix = files.length === 2 ? j ? 'R' : 'L' : '';
+          const newImageData = await services.vesImagesService.convertImage(fileUri, {
+            name: name + nameSuffix,
+            section: sprite.section,
+            animation: {
+              frames: isMultiFileAnimation ? mostFilesOnASprite : entityData.animations.totalFrames,
+              individualFiles: isMultiFileAnimation,
+              isAnimation: entityData.components?.animations.length > 0
+            },
+            map: {
+              compression: sprite.compression,
+              generate: true,
+              reduce: {
+                flipped: optimizeTiles,
+                unique: optimizeTiles,
+              },
+            },
+            tileset: {
+              compression: sprite.compression,
+              shared: isStereoSprite,
+            },
+            files: f,
+            imageProcessingSettings: sprite.imageProcessingSettings,
+            colorMode: sprite.colorMode,
+          });
+          setGeneratingProgress((i + 1) * 2 - 1, totalSprites * 2);
+          const compressedImageData = await this.compressImageDataAsJson(newImageData);
+          (sprite._imageData! as SpriteImageData).images[j] = {
+            ...compressedImageData,
+          };
+        }));
+      } else {
+        sprite._imageData = undefined;
       }
+      setGeneratingProgress((i + 1) * 2, totalSprites * 2);
     }
 
     return entityData;

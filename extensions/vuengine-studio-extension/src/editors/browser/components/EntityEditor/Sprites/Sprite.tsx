@@ -2,7 +2,7 @@ import { ArrowsHorizontal, ArrowsVertical } from '@phosphor-icons/react';
 import { isNumber, nls } from '@theia/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
-import { ImageCompressionType, ImageProcessingSettings, MAX_IMAGE_HEIGHT, MAX_IMAGE_WIDTH } from '../../../../../images/browser/ves-images-types';
+import { ImageCompressionType, ImageProcessingSettings, MAX_IMAGE_WIDTH } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { DataSection } from '../../Common/CommonTypes';
 import HContainer from '../../Common/HContainer';
@@ -76,7 +76,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
 
                 const imageHeight = d.height ?? 0;
                 const imageWidth = d.width ?? 0;
-                const finalHeight = clamp(roundToNextMultipleOf8(imageHeight), 0, MAX_IMAGE_HEIGHT);
+                const finalHeight = clamp(roundToNextMultipleOf8(imageHeight), 0, imageHeight);
                 const finalWidth = clamp(roundToNextMultipleOf8(imageWidth), 0, MAX_IMAGE_WIDTH);
                 dim[i] = [imageWidth, imageHeight, finalWidth, finalHeight];
             }
@@ -252,6 +252,14 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 ...sprite.texture,
                 recycleable: !!!sprite.texture?.recycleable,
             }
+        });
+    };
+
+    const toggleOptimizeTiles = (): void => {
+        updateSprite({
+            optimizeTiles: !!!sprite.optimizeTiles,
+        }, {
+            appendImageData: true,
         });
     };
 
@@ -892,6 +900,20 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                         </HContainer>
                     </VContainer>
                 }
+                {/* this setting is implicitly handled for animations */}
+                {data.components?.animations.length === 0 && <VContainer>
+                    <label>
+                        {nls.localize('vuengine/entityEditor/tiles', 'Tiles')}
+                    </label>
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={sprite.optimizeTiles}
+                            onChange={toggleOptimizeTiles}
+                        />
+                        {nls.localize('vuengine/entityEditor/optimize', 'Optimize')}
+                    </label>
+                </VContainer>}
                 <HContainer gap={15} wrap='wrap'>
                     <VContainer>
                         <InfoLabel

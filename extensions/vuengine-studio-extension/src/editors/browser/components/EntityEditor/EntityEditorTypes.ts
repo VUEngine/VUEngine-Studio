@@ -130,7 +130,6 @@ export interface ColliderData {
 }
 
 export interface SpriteImageData {
-    dupeIndex: number,
     images: Partial<ConversionResult>[], // index 1 only set for stereo animations
 }
 
@@ -146,6 +145,7 @@ export interface SpriteData {
     transparency: Transparency
     displacement: PixelVector
     manipulationFunction: string
+    optimizeTiles: boolean
     texture: {
         files: string[]
         files2: string[] // files for right eye in stereo mode
@@ -224,8 +224,6 @@ export interface EntityData {
     sprites: {
         type: SpriteType
         useZDisplacementInProjection: boolean
-        sharedTiles: boolean
-        optimizedTiles: boolean
     }
 }
 

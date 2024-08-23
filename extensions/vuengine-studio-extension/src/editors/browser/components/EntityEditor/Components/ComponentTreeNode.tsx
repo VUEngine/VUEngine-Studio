@@ -368,6 +368,7 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                 parallax: 0,
             },
             manipulationFunction: '',
+            optimizeTiles: true,
             texture: {
                 files: [],
                 files2: [],

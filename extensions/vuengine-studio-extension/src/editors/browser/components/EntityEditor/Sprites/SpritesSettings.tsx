@@ -44,28 +44,6 @@ export default function SpritesSettings(props: SpritesSettingsProps): React.JSX.
         });
     };
 
-    const toggleOptimizedTiles = async (): Promise<void> => {
-        await setData({
-            sprites: {
-                ...data.sprites,
-                optimizedTiles: !data.sprites.optimizedTiles,
-            }
-        }, {
-            appendImageData: true,
-        });
-    };
-
-    const toggleSharedTiles = async (): Promise<void> => {
-        await setData({
-            sprites: {
-                ...data.sprites,
-                sharedTiles: !data.sprites.sharedTiles,
-            }
-        }, {
-            appendImageData: true,
-        });
-    };
-
     const setAnimationFrames = async (frames: number): Promise<void> => {
         await setData({
             animations: {
@@ -144,28 +122,6 @@ export default function SpritesSettings(props: SpritesSettingsProps): React.JSX.
                         />
                     </VContainer>}
                 </>}
-                {/* these setting are implicitly handled for animations */}
-                {data.components?.animations.length === 0 && <VContainer>
-                    <label>
-                        {nls.localize('vuengine/entityEditor/tiles', 'Tiles')}
-                    </label>
-                    <label>
-                        <input
-                            type="checkbox"
-                            checked={data.sprites.optimizedTiles}
-                            onChange={toggleOptimizedTiles}
-                        />
-                        {nls.localize('vuengine/entityEditor/optimize', 'Optimize')}
-                    </label>
-                    {data.components?.sprites.length > 1 && <label>
-                        <input
-                            type="checkbox"
-                            checked={data.sprites.sharedTiles}
-                            onChange={toggleSharedTiles}
-                        />
-                        {nls.localize('vuengine/entityEditor/share', 'Share')}
-                    </label>}
-                </VContainer>}
             </HContainer>
             <VContainer>
                 <label>

@@ -73,7 +73,7 @@ export class VesCommonService {
 
   cleanSpecName(name: string): string {
     return name
-      .replace(/[-\s]/g, '_') // replace some by underscore
+      .replace(/[-\s]/g, '') // remove some
       .replace(/[^A-Za-z0-9_]/g, '') // remove all that are not of the given characters
       .replace(/^[0-9]+/, '_') // replace leading numbers
       .replace(/[_+]/g, '_'); // replace multiple underscores by one
