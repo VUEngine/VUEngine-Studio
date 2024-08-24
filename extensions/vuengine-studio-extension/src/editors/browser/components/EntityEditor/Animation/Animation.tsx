@@ -13,18 +13,20 @@ import {
     MAX_ANIMATION_CYLCES,
     MIN_ANIMATION_CYLCES
 } from '../EntityEditorTypes';
+import AnimationsSettings from './AnimationsSettings';
 
 interface AnimationProps {
     index: number
     animation: AnimationData
     updateAnimation: (partialData: Partial<AnimationData>) => void
     totalFrames: number
+    isMultiFileAnimation: boolean
 }
 
 export default function Animation(props: AnimationProps): React.JSX.Element {
     const { data, setData, state } = useContext(EntityEditorContext) as EntityEditorContextType;
     const { services } = useContext(EditorsContext) as EditorsContextType;
-    const { index, animation, updateAnimation, totalFrames } = props;
+    const { index, animation, updateAnimation, totalFrames, isMultiFileAnimation } = props;
     const [maxAnimationFrames, setMaxAnimationFrames] = useState<number>(256);
 
     const getEngineSettings = async (): Promise<void> => {
@@ -192,6 +194,10 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                     }
                 </HContainer>
             </VContainer>
+            <hr />
+            <AnimationsSettings
+                isMultiFileAnimation={isMultiFileAnimation}
+            />
         </VContainer>
     </div>;
 }

@@ -43,10 +43,10 @@ label i.codicon.codicon-question {
 }
 
 .jsonforms-container .count {
-  border-radius: 15px;
+  border-radius: 4px;
   border: 1px solid;
   display: inline-block;
-  font-size: 75%;
+  font-size: 80%;
   line-height: 100%;
   min-width: 7px;
   opacity: .4;

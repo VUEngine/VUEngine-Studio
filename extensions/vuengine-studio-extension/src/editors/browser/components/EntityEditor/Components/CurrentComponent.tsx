@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import PositionedEntity from '../../Common/PositionedEntities/PositionedEntity';
 import VContainer from '../../Common/VContainer';
 import Animation from '../Animation/Animation';
+import AnimationsSettings from '../Animation/AnimationsSettings';
 import Behavior from '../Behavior/Behavior';
 import Collider from '../Collider/Collider';
 import CollidersSettings from '../Collider/CollidersSettings';
@@ -58,6 +59,7 @@ export default function CurrentComponent(props: CurrentComponentProps): React.JS
                         animation={data.components.animations[index]}
                         updateAnimation={(partialData: Partial<AnimationData>) => updateComponent('animations', index, partialData)}
                         totalFrames={data.animations.totalFrames}
+                        isMultiFileAnimation={isMultiFileAnimation}
                     />;
                 case 'behaviors':
                     return <Behavior
@@ -119,10 +121,13 @@ export default function CurrentComponent(props: CurrentComponentProps): React.JS
             }}
         >
             {getComponentEditor()}
-            {state.currentComponent === 'sprites' &&
-                <SpritesSettings
+            {state.currentComponent === 'animations' &&
+                <AnimationsSettings
                     isMultiFileAnimation={isMultiFileAnimation}
                 />
+            }
+            {state.currentComponent === 'sprites' &&
+                <SpritesSettings />
             }
             {state.currentComponent === 'colliders' &&
                 <CollidersSettings />

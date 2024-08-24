@@ -306,6 +306,8 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
     const mostFilesOnASprite = this.getMostFilesOnASprite(data);
     const isMultiFileAnimation = mostFilesOnASprite > 1;
 
+    console.log('getProjectDataItemsForType', this.props.context.services.vesProjectService.getProjectDataItemsForType('Entity'));
+
     return (
       <div
         className="entityEditor">
@@ -369,7 +371,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
               }
 
               <EditorSidebar
-                show={this.state.currentComponent.includes('-') || ['colliders', 'extraProperties', 'physics', 'sprites'].includes(this.state.currentComponent)}
+                show={this.state.currentComponent.includes('-') || ['animations', 'colliders', 'extraProperties', 'physics', 'sprites'].includes(this.state.currentComponent)}
                 orientation='right'
               >
                 <CurrentComponent

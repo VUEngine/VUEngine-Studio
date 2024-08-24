@@ -944,9 +944,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 </HContainer>
             </VContainer>
             <hr />
-            <SpritesSettings
-                isMultiFileAnimation={isMultiFileAnimation}
-            />
+            <SpritesSettings />
             <PopUpDialog
                 open={processingDialogOpen}
                 setOpen={setProcessingDialogOpen}

@@ -50,7 +50,7 @@ export default function Rotation(props: PropsWithChildren<RotationProps>): React
             <HContainer gap={2}>
                 <input
                     className='theia-input'
-                    style={{ width: 78 }}
+                    style={{ width: 76 }}
                     type='number'
                     min={MIN_ROTATION}
                     max={MAX_ROTATION}
@@ -63,7 +63,7 @@ export default function Rotation(props: PropsWithChildren<RotationProps>): React
             <HContainer gap={2}>
                 <input
                     className='theia-input'
-                    style={{ width: 78 }}
+                    style={{ width: 76 }}
                     type='number'
                     min={MIN_ROTATION}
                     max={MAX_ROTATION}
@@ -76,7 +76,7 @@ export default function Rotation(props: PropsWithChildren<RotationProps>): React
             <HContainer gap={2}>
                 <input
                     className='theia-input'
-                    style={{ width: 78 }}
+                    style={{ width: 76 }}
                     type='number'
                     min={MIN_ROTATION}
                     max={MAX_ROTATION}
