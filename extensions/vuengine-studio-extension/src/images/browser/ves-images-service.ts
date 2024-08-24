@@ -102,12 +102,16 @@ export class VesImagesService {
     } else {
     */
     await Promise.all(files.map(async imagePath => {
-      const processedImage = await this.quantizeImage(imageConfigFileUri.parent, imagePath, imageConfig.imageProcessingSettings, imageConfig.colorMode);
-      const filename = imageConfigFileUri.parent.resolve(imagePath).path.name;
-      const randomFileUri = tempDirUri.resolve(`${filename}.png`);
-      // @ts-ignore
-      await this.fileService.writeFile(randomFileUri, BinaryBuffer.fromString(processedImage));
-      processedImagePaths.push(randomFileUri.path.fsPath());
+      const fileUri = imageConfigFileUri.parent.resolve(imagePath);
+      try {
+        const processedImage = await this.quantizeImage(imageConfigFileUri.parent, imagePath, imageConfig.imageProcessingSettings, imageConfig.colorMode);
+        const randomFileUri = tempDirUri.resolve(`${fileUri.path.name}.png`);
+        // @ts-ignore
+        await this.fileService.writeFile(randomFileUri, BinaryBuffer.fromString(processedImage));
+        processedImagePaths.push(randomFileUri.path.fsPath());
+      } catch (error) {
+        console.error('Could not process image', fileUri.path.fsPath(), `(${imageConfigFileUri.path.base})`, error);
+      }
     }));
     /*
     }

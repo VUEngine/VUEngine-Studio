@@ -58,7 +58,7 @@ export default function Images(props: ImagesProps): React.JSX.Element {
                 : [];
 
         const result: { [path: string]: string } = {};
-        files
+        await Promise.all(files
             .sort((a, b) => a.localeCompare(b))
             .map(async (p, i) => {
                 if (stack && i > 0) {
@@ -80,7 +80,7 @@ export default function Images(props: ImagesProps): React.JSX.Element {
                     meta = '';
                 }
                 result[p] = meta;
-            });
+            }));
 
         setFilesToShow(result);
     };
