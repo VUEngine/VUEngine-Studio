@@ -4,6 +4,16 @@ This document describes which breaking changes have been made to VUEngine Studio
 
 ## VUEngine Studio Preview v0.5.0
 
+### Updated engine config
+
+#### What has changed?
+
+There have been some changes to the engine config, mainly introducing new config macros to support new wireframe features. Furthermore, several templates have been updated.
+
+#### How to update projects
+
+You will want to regenerate all auto-generated files once with the `Code Generator: Generate Files...` command.
+
 ### Relative source file paths
 
 #### What has changed?
