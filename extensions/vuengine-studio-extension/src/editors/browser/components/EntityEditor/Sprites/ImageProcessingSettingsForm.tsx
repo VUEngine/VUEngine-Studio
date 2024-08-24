@@ -65,13 +65,17 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
     const getImageDimensions = async () => {
         if (image) {
             const resolvedImageUri = fileUri.parent.resolve(image);
-            const d = window.electronVesCore.getImageDimensions(resolvedImageUri.path.fsPath());
-            setHeight(d.height ?? 0);
-            setWidth(d.width ?? 0);
-        } else {
-            setHeight(0);
-            setWidth(0);
+            const exists = await services.fileService.exists(resolvedImageUri);
+            if (exists) {
+                const d = window.electronVesCore.getImageDimensions(resolvedImageUri.path.fsPath());
+                setHeight(d.height ?? 0);
+                setWidth(d.width ?? 0);
+                return;
+            }
         }
+
+        setHeight(0);
+        setWidth(0);
     };
 
     const getImageDataFromFile = async () => {

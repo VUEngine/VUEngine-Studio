@@ -40,7 +40,7 @@ interface SpriteProps {
 }
 
 export default function Sprite(props: SpriteProps): React.JSX.Element {
-    const { fileUri } = useContext(EditorsContext) as EditorsContextType;
+    const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
     const { data } = useContext(EntityEditorContext) as EntityEditorContextType;
     const { sprite, updateSprite, isMultiFileAnimation } = props;
     const [processingDialogOpen, setProcessingDialogOpen] = useState<boolean>(false);
@@ -71,10 +71,14 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 if (f.length > 1) {
                     fn[i] += ' +' + (f.length - 1);
                 }
-                const d = window.electronVesCore.getImageDimensions(resolvedUri.path.fsPath());
+                const exists = await services.fileService.exists(resolvedUri);
+                let d;
+                if (exists) {
+                    d = window.electronVesCore.getImageDimensions(resolvedUri.path.fsPath());
+                }
 
-                const imageHeight = d.height ?? 0;
-                const imageWidth = d.width ?? 0;
+                const imageHeight = d?.height ?? 0;
+                const imageWidth = d?.width ?? 0;
                 const finalHeight = clamp(roundToNextMultipleOf8(imageHeight), 0, imageHeight);
                 const finalWidth = clamp(roundToNextMultipleOf8(imageWidth), 0, MAX_IMAGE_WIDTH);
                 dim[i] = [imageWidth, imageHeight, finalWidth, finalHeight];
@@ -430,7 +434,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                         fileAddExtraAction={() => setProcessingDialogOpen(true)}
                                     />
                                 </div>
-                                <VContainer grow={1} justifyContent="center">
+                                <VContainer grow={1} justifyContent="center" overflow="hidden">
                                     {(sprite.texture?.files || []).length === 0
                                         ? <div className='empty'>
                                             {sprite.displayMode !== DisplayMode.Stereo &&
@@ -448,7 +452,13 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                         </div>
                                         : <>
                                             {filename[0] !== '' &&
-                                                <div>
+                                                <div
+                                                    style={{
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                    }}
+                                                    title={filename[0]}
+                                                >
                                                     {filename[0]}
                                                 </div>
                                             }
@@ -521,7 +531,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                             containerWidth='100px'
                                         />
                                     </div>
-                                    <VContainer grow={1} justifyContent="center">
+                                    <VContainer grow={1} justifyContent="center" overflow="hidden">
                                         {(sprite.texture?.files2 || []).length === 0
                                             ? <div className='empty'>
                                                 {nls.localize(
@@ -531,7 +541,13 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                             </div>
                                             : <>
                                                 {filename[1] !== '' &&
-                                                    <div>
+                                                    <div
+                                                        style={{
+                                                            overflow: 'hidden',
+                                                            textOverflow: 'ellipsis',
+                                                        }}
+                                                        title={filename[1]}
+                                                    >
                                                         {filename[1]}
                                                     </div>
                                                 }
