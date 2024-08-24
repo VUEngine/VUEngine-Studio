@@ -60,14 +60,15 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
                     return;
                 }
 
-                let effectiveColorByPalette = getEffectiveColorByPalette(pixels[y][x] ?? 0);
+                const originalColorIndex = pixels[y][x];
+                let effectiveColorByPalette = getEffectiveColorByPalette(originalColorIndex ?? 0);
                 if (colorMode === ColorMode.FrameBlend) {
                     // for HiColor, find middle value of the two images (both are combined in one, over/under)
                     effectiveColorByPalette = (effectiveColorByPalette * 2 + getEffectiveColorByPalette(pixels[height + y][x]) * 2) / 2;
                 }
 
-                // don't draw black pixels, we want index 0 to be transparent
-                if (effectiveColorByPalette === 0) {
+                // don't draw index 0; neither does the VB
+                if (originalColorIndex === 0) {
                     return;
                 }
 
