@@ -60,7 +60,8 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
     render(): React.JSX.Element {
         const { fileUri, services } = this.props.context;
         const { data } = this.props;
-        const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
+
+        const configFileParentUri = fileUri.parent;
 
         const selectSourceFile = async (): Promise<void> => {
             const openFileDialogProps: OpenFileDialogProps = {
@@ -69,12 +70,12 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
                 canSelectFiles: true,
                 filters: { 'WAV': ['wav'] }
             };
-            const currentPath = await services.fileService.resolve(fileUri.parent);
+            const currentPath = await services.fileService.resolve(configFileParentUri);
             const uri = await services.fileDialogService.showOpenDialog(openFileDialogProps, currentPath);
             if (uri) {
                 const source = await services.fileService.resolve(uri);
                 if (source.isFile) {
-                    const relativeUri = workspaceRootUri.relative(uri);
+                    const relativeUri = configFileParentUri.relative(uri);
                     if (!relativeUri) {
                         services.messageService.error(
                             nls.localize('vuengine/pcmEditor/errorSourceFileMustBeInWorkspace', 'Source file must live in workspace.')
@@ -108,7 +109,7 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
                     </button>
                 </HContainer>
                 {data.sourceFile && <div>
-                    <audio src={workspaceRootUri.resolve(data.sourceFile).path.fsPath()} controls={true} />
+                    <audio src={configFileParentUri.resolve(data.sourceFile).path.fsPath()} controls={true} />
                 </div>}
             </VContainer>
             <HContainer gap={15}>

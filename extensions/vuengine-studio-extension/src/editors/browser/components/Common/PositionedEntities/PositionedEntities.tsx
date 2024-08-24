@@ -17,7 +17,7 @@ export default function PositionedEntities(props: PositionedEntitiesProps): Reac
     const { positionedEntities, updatePositionedEntities, itemIdsToIgnore } = props;
 
     const addPositionedEntity = async (): Promise<void> => {
-        const entityToAdd = await showEntitySelection(services.workspaceService, services.quickPickService, services.vesProjectService, itemIdsToIgnore);
+        const entityToAdd = await showEntitySelection(services.quickPickService, services.vesProjectService, itemIdsToIgnore);
         if (entityToAdd !== undefined) {
             updatePositionedEntities([
                 ...positionedEntities,

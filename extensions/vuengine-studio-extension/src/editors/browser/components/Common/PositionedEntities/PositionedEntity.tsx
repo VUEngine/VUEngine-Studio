@@ -1,6 +1,6 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
-import { WithFileUri } from '../../../../../project/browser/ves-project-types';
+import { WithContributor, WithFileUri } from '../../../../../project/browser/ves-project-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { EntityData, MAX_SCALE, MIN_SCALE, PositionedEntityData } from '../../EntityEditor/EntityEditorTypes';
 import HContainer from '../HContainer';
@@ -18,8 +18,7 @@ export default function PositionedEntity(props: PositionedEntityProps): React.JS
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const { positionedEntity, updatePositionedEntity } = props;
 
-    const entityItem = services.vesProjectService.getProjectDataItemById(positionedEntity.itemId, 'Entity') as EntityData & WithFileUri;
-    const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
+    const entityItem = services.vesProjectService.getProjectDataItemById(positionedEntity.itemId, 'Entity') as EntityData & WithFileUri & WithContributor;
 
     const setName = (name: string): void => {
         updatePositionedEntity({
@@ -79,7 +78,7 @@ export default function PositionedEntity(props: PositionedEntityProps): React.JS
                         <input
                             className='theia-input'
                             value={entityItem._fileUri.path.name}
-                            title={workspaceRootUri.path.relative(entityItem._fileUri.path)?.fsPath()}
+                            title={entityItem._contributorUri.parent.path.relative(entityItem._fileUri.path)?.fsPath()}
                             disabled
                         />
                     </VContainer>

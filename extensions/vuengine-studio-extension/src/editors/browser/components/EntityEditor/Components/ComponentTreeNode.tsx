@@ -521,7 +521,7 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
     };
 
     const addPositionedEntity = async (): Promise<void> => {
-        const entityToAdd = await showEntitySelection(services.workspaceService, services.quickPickService, services.vesProjectService, [data._id]);
+        const entityToAdd = await showEntitySelection(services.quickPickService, services.vesProjectService, [data._id]);
         if (entityToAdd !== undefined) {
             const children = [...data.components?.children || []];
             children.push({

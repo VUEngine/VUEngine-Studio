@@ -611,8 +611,8 @@ export class VesCodeGenService {
     env.addFilter('removeEmpty', arr => arr.filter((e: unknown) => typeof e === 'string' && e.trim() !== ''));
 
     // nunjucks does not support _async_ functions, but only filters
-    env.addFilter('convertPcm', async (filePath: string, range: number, callback): Promise<void> => {
-      const result = await this.vesAudioConverterService.convertPcm(filePath, range);
+    env.addFilter('convertPcm', async (configFileUri: URI, filePath: string, range: number, callback): Promise<void> => {
+      const result = await this.vesAudioConverterService.convertPcm(configFileUri, filePath, range);
       // eslint-disable-next-line no-null/no-null
       callback(null, result);
     }, true);

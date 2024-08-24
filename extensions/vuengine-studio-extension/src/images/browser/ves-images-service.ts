@@ -5,7 +5,6 @@ import { Deferred } from '@theia/core/lib/common/promise-util';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
 import cropImageData from 'crop-image-data';
 import * as iq from 'image-q';
 import { VesCommonService } from '../../core/browser/ves-common-service';
@@ -47,8 +46,6 @@ export class VesImagesService {
   protected vesProcessService: VesProcessService;
   @inject(VesProcessWatcher)
   protected readonly vesProcessWatcher: VesProcessWatcher;
-  @inject(WorkspaceService)
-  protected readonly workspaceService: WorkspaceService;
 
   protected _ready = new Deferred<void>();
   get ready(): Promise<void> {
@@ -79,15 +76,13 @@ export class VesImagesService {
     };
 
     // gather grit options
-    await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
     const files = filePath
       ? [filePath]
       : imageConfig.files.length
         ? imageConfig.files
         : window.electronVesCore.findFiles(imageConfigFileUri.parent.path.fsPath(), '*.png')
           .sort((a, b) => a.localeCompare(b))
-          .map(p => workspaceRootUri.relative(imageConfigFileUri.parent.resolve(p))?.fsPath()!);
+          .map(p => imageConfigFileUri.parent.relative(imageConfigFileUri.parent.resolve(p))?.fsPath()!);
     const gritUri = await this.getGritUri();
     const name = imageConfig.name ? imageConfig.name : imageConfigFileUri.path.name;
     const gritArguments = this.getGritArguments(name, imageConfig);
@@ -103,12 +98,12 @@ export class VesImagesService {
     /*
     if (files.length > 2) {
       // skip quantizing for videos to prevent memory issues
-      files.map(f => processedImagePaths.push(workspaceRootUri.resolve(f).path.fsPath()));
+      files.map(f => processedImagePaths.push(imageConfigFileUri.parent.resolve(f).path.fsPath()));
     } else {
     */
     await Promise.all(files.map(async imagePath => {
-      const processedImage = await this.quantizeImage(imagePath, imageConfig.imageProcessingSettings, imageConfig.colorMode);
-      const filename = workspaceRootUri.resolve(imagePath).path.name;
+      const processedImage = await this.quantizeImage(imageConfigFileUri.parent, imagePath, imageConfig.imageProcessingSettings, imageConfig.colorMode);
+      const filename = imageConfigFileUri.parent.resolve(imagePath).path.name;
       const randomFileUri = tempDirUri.resolve(`${filename}.png`);
       // @ts-ignore
       await this.fileService.writeFile(randomFileUri, BinaryBuffer.fromString(processedImage));
@@ -230,16 +225,15 @@ export class VesImagesService {
   }
 
   async quantizeImage(
+    configFileUri: URI,
     imagePath: string,
     processingSettings: ImageProcessingSettings,
     colorMode: ColorMode,
   ): Promise<Buffer> {
-    await this.workspaceService.ready;
     await this.ready;
 
     // read image file
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-    const resolvedImageUri = workspaceRootUri.resolve(imagePath);
+    const resolvedImageUri = configFileUri.resolve(imagePath);
     const imageFileContent = await this.fileService.readFile(resolvedImageUri);
     // Using the Camoto fork of pngjs here, because it supports generating indexed PNGs
     const camoto = require('@camoto/pngjs/browser');

@@ -4,6 +4,31 @@ This document describes which breaking changes have been made to VUEngine Studio
 
 ## VUEngine Studio Preview v0.5.0
 
+### Relative source file paths
+
+#### What has changed?
+
+Source file paths referenced from several custom file files are now stored relative to the respective config file, rather than the workspace root. Affected file types:
+
+- `*.entity`
+- `*.image`
+- `*.pcm`
+
+#### How to update projects
+
+Adjust file paths if you use any of the above file types. To do so, open the files in source mode, e.g. by clicking the curly braces icon to the top left of the respective file's editor.
+
+Example:
+
+```diff
+assets/Entity/MyEntity/MyEntity.entity:
+
+"files": [
+-	"assets/Entity/MyEntity/MyEntity.png"
++	"MyEntity.png"
+],
+```
+
 ### Entity collision flags
 
 #### What has changed?

@@ -40,7 +40,7 @@ interface SpriteProps {
 }
 
 export default function Sprite(props: SpriteProps): React.JSX.Element {
-    const { services } = useContext(EditorsContext) as EditorsContextType;
+    const { fileUri } = useContext(EditorsContext) as EditorsContextType;
     const { data } = useContext(EntityEditorContext) as EntityEditorContextType;
     const { sprite, updateSprite, isMultiFileAnimation } = props;
     const [processingDialogOpen, setProcessingDialogOpen] = useState<boolean>(false);
@@ -59,7 +59,6 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     const getMetaData = async (): Promise<void> => {
         const dim: number[][] = [[], []];
         const fn: string[] = [];
-        const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
         [
             sprite.texture?.files,
             sprite.texture?.files2
@@ -67,7 +66,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
             fn[i] = '';
             dim[i] = [];
             if (f?.length) {
-                const resolvedUri = workspaceRootUri.resolve(f[0]);
+                const resolvedUri = fileUri.parent.resolve(f[0]);
                 fn[i] = resolvedUri.path.base;
                 if (f.length > 1) {
                     fn[i] += ' +' + (f.length - 1);

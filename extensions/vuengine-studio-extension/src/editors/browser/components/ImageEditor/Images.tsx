@@ -33,7 +33,6 @@ export default function Images(props: ImagesProps): React.JSX.Element {
         fileAddExtraAction
     } = props;
     const [filesToShow, setFilesToShow] = useState<{ [path: string]: string }>({});
-    const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
 
     const fileAddOnClick = () => {
         if (!updateData) {
@@ -53,7 +52,7 @@ export default function Images(props: ImagesProps): React.JSX.Element {
                 ? await Promise.all(window.electronVesCore.findFiles(await services.fileService.fsPath(fileUri.parent), '*.png')
                     .map(async p => {
                         const fullUri = fileUri.parent.resolve(p);
-                        const relativePath = workspaceRootUri.relative(fullUri)?.toString()!;
+                        const relativePath = fileUri.parent.relative(fullUri)?.toString()!;
                         return relativePath;
                     }))
                 : [];
@@ -70,7 +69,7 @@ export default function Images(props: ImagesProps): React.JSX.Element {
                     'vuengine/imageEditor/fileNotFound',
                     'File not found'
                 );
-                const resolvedUri = workspaceRootUri.resolve(p);
+                const resolvedUri = fileUri.parent.resolve(p);
                 if (!p.startsWith('data:') && showMetaData) {
                     const dimensions = window.electronVesCore.getImageDimensions(resolvedUri.path.fsPath());
                     meta = `${dimensions.width}×${dimensions.height}`;
@@ -93,10 +92,9 @@ export default function Images(props: ImagesProps): React.JSX.Element {
         const dialog = new ConfirmDialog({
             title: nls.localize('vuengine/imageEditor/saveCopy', 'Save Copy'),
             msg: nls.localize(
-                'vuengine/imageEditor/areYouSureYouWantToSaveACopyInWorkspace',
-                'Only files in the current workspace folder can be used. ' +
-                'Do you want to save a copy of "{0}" ' +
-                'in the workspace to be able to use this file?',
+                'vuengine/imageEditor/areYouSureYouWantToSaveACopy',
+                "Only files below the current file's folder can be used. " +
+                'Do you want to save a copy of "{0}" to be able to use this file?',
                 targetUri.path.base
             ),
             maxWidth: 400,
@@ -145,10 +143,10 @@ export default function Images(props: ImagesProps): React.JSX.Element {
             await Promise.all(uris.map(async uri => {
                 const source = await services.fileService.resolve(uri);
                 if (source.isFile) {
-                    const relativePath = workspaceRootUri.relative(uri);
+                    const relativePath = fileUri.parent.relative(uri);
                     if (!relativePath) {
                         const targetUri = fileUri.parent.resolve(source.resource.path.base);
-                        const relativeTargetFilePath = workspaceRootUri.relative(targetUri)?.toString().replace(/\\/g, '/');
+                        const relativeTargetFilePath = fileUri.parent.relative(targetUri)?.toString().replace(/\\/g, '/');
                         const confirmed = await confirmSaveCopy(uri as URI, targetUri);
                         if (confirmed && relativeTargetFilePath) {
                             newFiles.push(relativeTargetFilePath);
@@ -191,7 +189,7 @@ export default function Images(props: ImagesProps): React.JSX.Element {
         }}
     >
         {Object.keys(filesToShow).map((f, i) => {
-            const fullUri = workspaceRootUri.resolve(f);
+            const fullUri = fileUri.parent.resolve(f);
             const imageUrl = f.startsWith('data:')
                 ? f
                 : isWindows

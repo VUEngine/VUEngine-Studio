@@ -42,7 +42,7 @@ interface ImageProcessingSettingsFormProps {
 }
 
 export default function ImageProcessingSettingsForm(props: ImageProcessingSettingsFormProps): React.JSX.Element {
-    const { services } = useContext(EditorsContext) as EditorsContextType;
+    const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
     const {
         image,
         setFiles,
@@ -64,8 +64,7 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
 
     const getImageDimensions = async () => {
         if (image) {
-            const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
-            const resolvedImageUri = workspaceRootUri.resolve(image);
+            const resolvedImageUri = fileUri.parent.resolve(image);
             const d = window.electronVesCore.getImageDimensions(resolvedImageUri.path.fsPath());
             setHeight(d.height ?? 0);
             setWidth(d.width ?? 0);
@@ -77,7 +76,7 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
 
     const getImageDataFromFile = async () => {
         if (image) {
-            const output = await services.vesImagesService.quantizeImage(image, processingSettings, colorMode);
+            const output = await services.vesImagesService.quantizeImage(fileUri.parent, image, processingSettings, colorMode);
             setResultImageBase64(Buffer.from(output).toString('base64'));
         } else {
             setResultImageBase64('');

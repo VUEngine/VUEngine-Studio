@@ -220,7 +220,6 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
   protected async appendImageData(entityData: EntityData): Promise<EntityData> {
     const { fileUri, services, setGeneratingProgress } = this.props.context;
 
-    const workspaceRootUri = services.workspaceService.tryGetRoots()[0]?.resource;
     const mostFilesOnASprite = this.getMostFilesOnASprite(entityData);
     const isMultiFileAnimation = entityData.components?.animations.length > 0 && mostFilesOnASprite > 1;
     const totalSprites = entityData.components?.sprites?.length ?? 0;
@@ -251,7 +250,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
             return;
           }
 
-          const name = services.vesCommonService.cleanSpecName(workspaceRootUri.resolve(f[0]).path.name);
+          const name = services.vesCommonService.cleanSpecName(fileUri.parent.resolve(f[0]).path.name);
           const nameSuffix = files.length === 2 ? j ? 'R' : 'L' : '';
           const newImageData = await services.vesImagesService.convertImage(fileUri, {
             name: name + nameSuffix,
@@ -305,8 +304,6 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
 
     const mostFilesOnASprite = this.getMostFilesOnASprite(data);
     const isMultiFileAnimation = mostFilesOnASprite > 1;
-
-    console.log('getProjectDataItemsForType', this.props.context.services.vesProjectService.getProjectDataItemsForType('Entity'));
 
     return (
       <div
