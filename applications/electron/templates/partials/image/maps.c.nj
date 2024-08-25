@@ -4,7 +4,7 @@
 {%- if customMapPrefix is defined -%}
 	{%- set mapName = customMapPrefix ~ mapName -%}
 {%- endif %}
-{%- set reducedMapDataLength = mapData.length / frameCount -%}
+{%- set reducedMapDataLength = mapData.length / frameCount %}
 const uint16 {{ mapName }}Map[] __attribute__((aligned(4)))
 {%- if section == 'data' %} __attribute((section(".rodata"))){% endif %}
 {%- if section == 'exp' %} __attribute((section(".expdata"))){% endif %} =

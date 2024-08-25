@@ -253,7 +253,6 @@ export class VesImagesService {
         left: 0,
       });
       imageData.data = croppedImageData.data;
-      imageData.height = croppedImageData.height;
       imageData.width = croppedImageData.width;
     }
 
@@ -282,7 +281,7 @@ export class VesImagesService {
     const pointContainer = iq.utils.PointContainer.fromUint8Array(imageData.data, paddedWidth, paddedHeight);
 
     // apply reduced palette
-    const outPointContainer = this.applyPaletteToPointContainer(pointContainer, this.targetPalettes[colorMode], processingSettings);
+    const outPointContainer = this.applyPaletteToPointContainer(pointContainer, this.targetPalettes[colorMode ?? ColorMode.Default], processingSettings);
 
     // post process resulting point container into an indexed array
     const outPointContainerArray = outPointContainer.toUint8Array();
