@@ -11,6 +11,10 @@
     width: var(--theia-vsx-extension-icon-size);
 }
 
+.theia-vsx-extensions-search-bar .theia-input:focus {
+    border: var(--theia-border-width) solid var(--theia-dropdown-border)
+}
+
 .icon-container.vesPlaceholder i {
     font-size: 64px;
     height: 126px;
