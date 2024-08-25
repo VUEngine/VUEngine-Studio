@@ -6,6 +6,7 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesPlugin, VesPluginFactory } from './ves-plugin';
+import { VesPluginTag, VesPluginTagFactory } from './ves-plugin-tag';
 import { AUTHOR_SEARCH_QUERY, TAG_SEARCH_QUERY, VesPluginsSearchModel } from './ves-plugins-search-model';
 import { VesPluginsService } from './ves-plugins-service';
 
@@ -15,6 +16,8 @@ export class VesPluginsModel {
     protected readonly fileService: FileService;
     @inject(VesPluginFactory)
     protected readonly pluginFactory: VesPluginFactory;
+    @inject(VesPluginTagFactory)
+    protected readonly pluginTagFactory: VesPluginTagFactory;
     @inject(ProgressService)
     protected readonly progressService: ProgressService;
     @inject(PreferenceService)
@@ -40,10 +43,14 @@ export class VesPluginsModel {
         this.pluginsService.onDidChangePluginsData(async () => {
             await this.initSearchResult();
             await this.initInstalled();
+            await this.initTags();
             await this.initRecommended();
             this.initialized.resolve();
         });
-        this.pluginsService.onDidChangeInstalledPlugins(() => this.updateInstalled());
+        this.pluginsService.onDidChangeInstalledPlugins(() => {
+            this.updateTags();
+            this.updateInstalled();
+        });
     }
 
     protected async initInstalled(): Promise<void> {
@@ -58,6 +65,14 @@ export class VesPluginsModel {
         this.search.onDidChangeQuery(() => this.updateSearchResult());
         try {
             this.updateSearchResult();
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    protected async initTags(): Promise<void> {
+        try {
+            await this.updateTags();
         } catch (e) {
             console.error(e);
         }
@@ -78,6 +93,7 @@ export class VesPluginsModel {
     }
 
     protected readonly plugins = new Map<string, VesPlugin>();
+    protected readonly pluginTags = new Map<string, VesPluginTag>();
 
     protected _installed = new Set<string>();
     get installed(): IterableIterator<string> {
@@ -93,6 +109,11 @@ export class VesPluginsModel {
         return this._searchResult.values();
     }
 
+    protected _tags = new Set<string>();
+    get tags(): IterableIterator<string> {
+        return this._tags.values();
+    }
+
     protected _recommended = new Set<string>();
     get recommended(): IterableIterator<string> {
         return this._recommended.values();
@@ -102,6 +123,10 @@ export class VesPluginsModel {
         return this.plugins.get(id);
     }
 
+    getPluginTag(id: string): VesPluginTag | undefined {
+        return this.pluginTags.get(id);
+    }
+
     protected setPlugin(id: string): VesPlugin {
         let plugin = this.plugins.get(id);
         if (!plugin) {
@@ -109,6 +134,15 @@ export class VesPluginsModel {
             this.plugins.set(id, plugin);
         }
         return plugin;
+    }
+
+    protected setPluginTag(id: string, count: number): VesPluginTag {
+        let pluginTag = this.pluginTags.get(id);
+        if (!pluginTag) {
+            pluginTag = this.pluginTagFactory({ id, count });
+            this.pluginTags.set(id, pluginTag);
+        }
+        return pluginTag;
     }
 
     protected doChange<T>(task: () => Promise<T>): Promise<T>;
@@ -167,6 +201,21 @@ export class VesPluginsModel {
             }
             const installedSorted = Array.from(installed).sort((a, b) => this.comparePlugins(a, b));
             this._installed = new Set(installedSorted.values());
+        });
+    }
+
+    protected async updateTags(): Promise<void> {
+        return this.doChange(async () => {
+            const tagCounts = this.pluginsService.getPluginTags();
+            const tags = new Set<string>();
+            if (tagCounts) {
+                for (const tag of Object.keys(tagCounts)) {
+                    this.setPluginTag(tag, tagCounts[tag]);
+                    tags.add(tag);
+                }
+            }
+            const tagsSorted = Array.from(tags).sort();
+            this._tags = new Set(tagsSorted.values());
         });
     }
 

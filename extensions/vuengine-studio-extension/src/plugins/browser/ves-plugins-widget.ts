@@ -81,6 +81,9 @@ export class VesPluginsWidget extends SourceTreeWidget implements BadgeWidget {
     protected async computeTitle(): Promise<void> {
         let label = '';
         switch (this.options.id) {
+            case VesPluginsSourceOptions.TAGS:
+                label = nls.localize('vuengine/plugins/tags', 'Tags');
+                break;
             case VesPluginsSourceOptions.INSTALLED:
                 label = nls.localize('vuengine/plugins/installed', 'Installed');
                 break;

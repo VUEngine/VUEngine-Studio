@@ -18,7 +18,7 @@
     width: 126px;
 }
 
-.vesPluginTags .vesTag {
+.vesTag {
     background: var(--theia-foreground);
     border-radius: 10px;
     color: var(--theia-sideBar-background);
@@ -27,6 +27,10 @@
     line-height: 140%;
     margin-right: var(--theia-ui-padding);
     padding: 0 var(--theia-ui-padding);
+}
+
+.vesTag.large {
+    font-size: 100%;
 }
 
 .ves-plugin-editor .vesPluginConfigReset {

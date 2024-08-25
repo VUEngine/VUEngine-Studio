@@ -21,3 +21,7 @@ export interface PluginConfiguration {
     step?: number
     default: null | string | boolean | number
 }
+
+export interface PluginTagCounts {
+    [tag: string]: number
+};

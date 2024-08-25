@@ -1,11 +1,11 @@
-import { injectable, inject, postConstruct } from '@theia/core/shared/inversify';
-import { ViewContainer, PanelLayout, ViewContainerPart, Message } from '@theia/core/lib/browser';
-import { generateWidgetId } from './ves-plugins-widget';
-import { VesPluginsSourceOptions } from './ves-plugins-source';
-import { VesPluginsModel } from './ves-plugins-model';
-import { VesPluginsSearchMode } from './ves-plugins-search-model';
-import { VesPluginsSearchBar } from './ves-plugins-search-bar';
 import { nls } from '@theia/core';
+import { Message, PanelLayout, ViewContainer, ViewContainerPart } from '@theia/core/lib/browser';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { VesPluginsModel } from './ves-plugins-model';
+import { VesPluginsSearchBar } from './ves-plugins-search-bar';
+import { VesPluginsSearchMode } from './ves-plugins-search-model';
+import { VesPluginsSourceOptions } from './ves-plugins-source';
+import { generateWidgetId } from './ves-plugins-widget';
 
 @injectable()
 export class VesPluginsViewContainer extends ViewContainer {
@@ -103,6 +103,8 @@ export class VesPluginsViewContainer extends ViewContainer {
         switch (this.currentMode) {
             case VesPluginsSearchMode.Installed:
                 return [generateWidgetId(VesPluginsSourceOptions.INSTALLED)];
+            case VesPluginsSearchMode.Tags:
+                return [generateWidgetId(VesPluginsSourceOptions.TAGS)];
             case VesPluginsSearchMode.Recommended:
                 return [generateWidgetId(VesPluginsSourceOptions.RECOMMENDED)];
             case VesPluginsSearchMode.Search:

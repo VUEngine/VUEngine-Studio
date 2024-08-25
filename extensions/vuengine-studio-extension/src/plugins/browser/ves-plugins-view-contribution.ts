@@ -9,7 +9,7 @@ import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
 import { VesPluginsCommands } from './ves-plugins-commands';
 import { VesPluginsModel } from './ves-plugins-model';
-import { AUTHOR_SEARCH_QUERY, INSTALLED_QUERY, RECOMMENDED_QUERY, TAG_SEARCH_QUERY } from './ves-plugins-search-model';
+import { AUTHOR_SEARCH_QUERY, INSTALLED_QUERY, RECOMMENDED_QUERY, TAG_SEARCH_QUERY, TAGS_QUERY } from './ves-plugins-search-model';
 import { VesPluginsSourceOptions } from './ves-plugins-source';
 import { VesPluginsViewContainer } from './ves-plugins-view-container';
 import { VesPluginsWidget } from './ves-plugins-widget';
@@ -74,6 +74,10 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
                 execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'user-guide/vuengine-plugins', false),
             });
 
+            commandRegistry.registerCommand(VesPluginsCommands.SHOW_TAGS, {
+                execute: () => this.showPluginTags()
+            });
+
             commandRegistry.registerCommand(VesPluginsCommands.SHOW_INSTALLED, {
                 execute: () => this.showInstalledPlugins()
             });
@@ -100,6 +104,11 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
                 execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'plugins'),
             });
         }
+    }
+
+    protected async showPluginTags(): Promise<void> {
+        await this.openView({ activate: true });
+        this.model.search.query = TAGS_QUERY;
     }
 
     protected async showInstalledPlugins(): Promise<void> {

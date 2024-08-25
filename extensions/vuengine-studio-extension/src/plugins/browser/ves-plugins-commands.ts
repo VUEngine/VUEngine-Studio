@@ -11,6 +11,16 @@ export namespace VesPluginsCommands {
         'vuengine/plugins/commands/category'
     );
 
+    export const SHOW_TAGS: Command = Command.toLocalizedCommand(
+        {
+            id: 'ves:plugins:showTags',
+            label: 'Show Plugin Tags',
+            category: 'Plugins',
+        },
+        'vuengine/plugins/commands/showTags',
+        'vuengine/plugins/commands/category'
+    );
+
     export const SHOW_INSTALLED: Command = Command.toLocalizedCommand(
         {
             id: 'ves:plugins:showInstalled',

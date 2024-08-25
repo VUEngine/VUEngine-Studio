@@ -5,12 +5,14 @@ export enum VesPluginsSearchMode {
     Initial,
     None,
     Search,
+    Tags,
     Installed,
     Recommended,
 }
 
 export const INSTALLED_QUERY = '@installed';
 export const RECOMMENDED_QUERY = '@recommended';
+export const TAGS_QUERY = '@tags';
 export const TAG_SEARCH_QUERY = '@tag:';
 export const AUTHOR_SEARCH_QUERY = '@author:';
 
@@ -20,6 +22,7 @@ export class VesPluginsSearchModel {
     protected readonly onDidChangeQueryEmitter = new Emitter<string>();
     readonly onDidChangeQuery = this.onDidChangeQueryEmitter.event;
     protected readonly specialQueries = new Map<string, VesPluginsSearchMode>([
+        [TAGS_QUERY, VesPluginsSearchMode.Tags],
         [INSTALLED_QUERY, VesPluginsSearchMode.Installed],
         [RECOMMENDED_QUERY, VesPluginsSearchMode.Recommended],
     ]);

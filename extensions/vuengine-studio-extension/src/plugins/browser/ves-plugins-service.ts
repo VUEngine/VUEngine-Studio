@@ -6,7 +6,7 @@ import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesPluginData, VesPluginsData } from './ves-plugin';
 import { VesPluginsPathsService } from './ves-plugins-paths-service';
-import { VUENGINE_PLUGINS_PREFIX } from './ves-plugins-types';
+import { PluginTagCounts, VUENGINE_PLUGINS_PREFIX } from './ves-plugins-types';
 
 @injectable()
 export class VesPluginsService {
@@ -82,6 +82,20 @@ export class VesPluginsService {
 
   getInstalledPlugins(): Array<string> {
     return this.installedPlugins;
+  }
+
+  getPluginTags(): PluginTagCounts {
+    const tags: PluginTagCounts = {};
+    Object.values(this.pluginsData).forEach(plugin =>
+      Object.values(plugin.tags || {}).forEach(tag => {
+        if (tags[tag] === undefined) {
+          tags[tag] = 1;
+        } else {
+          tags[tag] = tags[tag] + 1;
+        }
+      })
+    );
+    return tags;
   }
 
   getRecommendedPlugins(): Array<string> {
