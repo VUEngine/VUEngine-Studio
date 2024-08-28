@@ -18,7 +18,7 @@
   flex-wrap: wrap;
   gap: 2px;
   max-width: 286px;
-  padding: 3px;
+  padding: 2px;
 }
 
 .font-editor .characters .character {
@@ -72,7 +72,6 @@
   border-radius: 1px;
   /* filter: none; */
   outline: 2px solid var(--theia-focusBorder);
-  outline-offset: 1px;
   z-index: 1;
 }
 

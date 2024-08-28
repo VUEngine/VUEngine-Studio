@@ -214,7 +214,9 @@ export const defaultProjectData: ProjectData = {
         title: 'Game Config',
         properties: {
           plugins: {
-            type: 'object'
+            type: 'object',
+            properties: {},
+            additionalProperties: true,
           },
           projectTitle: {
             type: 'string'
@@ -281,7 +283,8 @@ export const defaultProjectData: ProjectData = {
                 ],
                 default: 'none'
               }
-            }
+            },
+            additionalProperties: false,
           },
           map: {
             type: 'object',
@@ -313,7 +316,8 @@ export const defaultProjectData: ProjectData = {
                 ],
                 default: 'none'
               }
-            }
+            },
+            additionalProperties: false,
           },
           animation: {
             type: 'object',
@@ -351,7 +355,8 @@ export const defaultProjectData: ProjectData = {
                 type: 'boolean',
                 default: false,
               }
-            }
+            },
+            additionalProperties: false,
           },
           'colorMode': {
             type: 'number',
@@ -446,6 +451,7 @@ export const defaultProjectData: ProjectData = {
                   type: 'integer',
                 },
               },
+              additionalProperties: false,
             }
           },
         },
@@ -590,7 +596,8 @@ export const defaultProjectData: ProjectData = {
                 type: 'number',
                 default: DEFAULT_SPRITE_SIZE
               }
-            }
+            },
+            additionalProperties: false,
           },
           layers: {
             type: 'object',
@@ -620,7 +627,8 @@ export const defaultProjectData: ProjectData = {
                         color: {
                           type: 'string'
                         }
-                      }
+                      },
+                      additionalProperties: false,
                     }
                   }
                 },
@@ -634,7 +642,8 @@ export const defaultProjectData: ProjectData = {
                   type: 'string',
                   default: 'ON'
                 }
-              }
+              },
+              additionalProperties: false,
             }
           }
         },
@@ -673,7 +682,8 @@ export const defaultProjectData: ProjectData = {
                       minimum: 0,
                       maximum: 31
                     }
-                  }
+                  },
+                  additionalProperties: false,
                 },
                 frequency: {
                   type: 'integer',
@@ -698,7 +708,8 @@ export const defaultProjectData: ProjectData = {
                       minimum: 0,
                       maximum: 15
                     }
-                  }
+                  },
+                  additionalProperties: false,
                 },
                 envelope: {
                   type: 'object',
@@ -726,7 +737,8 @@ export const defaultProjectData: ProjectData = {
                       minimum: 0,
                       maximum: 7
                     },
-                  }
+                  },
+                  additionalProperties: false,
                 },
                 sweepModulation: {
                   type: 'object',
@@ -762,14 +774,16 @@ export const defaultProjectData: ProjectData = {
                       minimum: 0,
                       maximum: 7
                     }
-                  }
+                  },
+                  additionalProperties: false,
                 },
                 tapLocation: {
                   type: 'integer',
                   minimum: 0,
                   maximum: 7
                 }
-              }
+              },
+              additionalProperties: false,
             },
             minItems: 6,
             maxItems: 6,

@@ -404,7 +404,9 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
                         );
                     });
                 }
-                if (schema.additionalProperties) {
+                // TODO: support for 'patternProperties'
+                // TODO: support for non-boolean 'additionalProperties'
+                if (schema.additionalProperties !== false) {
                     resultObject = deepmerge(resultObject, data);
                 }
                 return resultObject;
