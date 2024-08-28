@@ -1,6 +1,6 @@
-{%- import 'templates/partials/macros.nj' as macros -%}
+{%- import 'templates/partials/macros.njk' as macros -%}
 {%- set pluginMacroId = item._folder | basename | toUpperSnakeCase -%}
-{% include('templates/partials/fileHeader/fileHeader.h.nj') %}
+{% include('templates/partials/fileHeader/fileHeader.h.njk') %}
 
 #ifndef __PLUGIN_{{ pluginMacroId }}_CONFIG_H_
 #define __PLUGIN_{{ pluginMacroId }}_CONFIG_H_

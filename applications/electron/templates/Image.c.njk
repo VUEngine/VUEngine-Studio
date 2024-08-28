@@ -68,6 +68,6 @@
 {%- if item.animation.isAnimation and not item.animation.individualFiles and imageData.animation.frames > 0 -%}
 	{%- set isSpritesheetAnimation = true -%}
 {%- endif -%}
-{%- include('templates/partials/image/tiles.c.nj') -%}
-{%- include('templates/partials/image/maps.c.nj') -%}
-{%- include('templates/partials/image/frameOffsets.c.nj') -%}
+{%- include('templates/partials/image/tiles.c.njk') -%}
+{%- include('templates/partials/image/maps.c.njk') -%}
+{%- include('templates/partials/image/frameOffsets.c.njk') -%}

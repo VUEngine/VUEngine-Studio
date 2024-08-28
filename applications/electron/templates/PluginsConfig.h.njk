@@ -1,7 +1,7 @@
-{%- import 'templates/partials/macros.nj' as macros -%}
+{%- import 'templates/partials/macros.njk' as macros -%}
 {%- set installedPlugins = project.items.GameConfig.project.plugins -%}
 {%- set allPlugins = project.plugins -%}
-{% include('templates/partials/fileHeader/fileHeader.h.nj') %}
+{% include('templates/partials/fileHeader/fileHeader.h.njk') %}
 
 #ifndef PLUGINS_CONFIG_H_
 #define PLUGINS_CONFIG_H_
