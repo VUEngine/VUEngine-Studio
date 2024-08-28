@@ -1,17 +1,19 @@
-import React, { useMemo } from 'react';
-import { FontEditorState, MAX_CHAR_COUNT, VariableSize } from '../FontEditorTypes';
+import { nls } from '@theia/core';
+import React, { useEffect, useState } from 'react';
+import VContainer from '../../Common/VContainer';
+import { VariableSize } from '../FontEditorTypes';
 import AlphabetChar from './AlphabetChar';
 
 interface AlphabetProps {
     charsData: number[][][]
     offset: number
     charCount: number
-    charHeight: number
     charWidth: number
-    currentCharacter: number
+    charHeight: number
+    currentCharacterIndex: number
+    setCurrentCharacterIndex: (currentCharacter: number) => void
+    setCurrentCharacterHoverIndex: React.Dispatch<React.SetStateAction<number>>
     variableSize: VariableSize
-    alphabetGrid: number
-    setState: (state: Partial<FontEditorState>) => void
 }
 
 export default function Alphabet(props: AlphabetProps): React.JSX.Element {
@@ -19,40 +21,69 @@ export default function Alphabet(props: AlphabetProps): React.JSX.Element {
         charsData,
         charHeight, charWidth,
         offset, charCount,
-        currentCharacter,
+        currentCharacterIndex, setCurrentCharacterIndex: setCurrentCharacter, setCurrentCharacterHoverIndex,
         variableSize,
-        alphabetGrid,
-        setState,
     } = props;
+    const [controlCharacters, setControlCharacters] = useState<React.JSX.Element>();
+    const [asciiCharacters, setAsciiCharacters] = useState<React.JSX.Element>();
+    const [extendedCharacters, setExtendedCharacters] = useState<React.JSX.Element>();
 
-    const alphabet = useMemo(() => [...Array(16)].map((i, line) => (
-        <div key={`characters-line-${line}`} className="line">
-            {[...Array(MAX_CHAR_COUNT / 16)].map((j, index) => {
-                const character = (line * 16) + index;
-                return <AlphabetChar
-                    key={`character-${character}`}
-                    line={line}
-                    index={index}
-                    charData={charsData[character]}
-                    offset={offset}
-                    charCount={charCount}
-                    charHeight={charHeight}
-                    charWidth={charWidth}
-                    currentCharacter={currentCharacter}
-                    variableSize={variableSize}
-                    setState={setState}
-                />;
-            })}
-        </div>
-    )), [
+    const getCharacters = (count: number, start: number) => <>
+        {[...Array(count)].map((i, x) => {
+            const character = start + x;
+            return <AlphabetChar
+                key={`character-${character}`}
+                index={character}
+                charData={charsData[character]}
+                offset={offset}
+                charCount={charCount}
+                charHeight={charHeight}
+                charWidth={charWidth}
+                currentCharacterIndex={currentCharacterIndex}
+                setCurrentCharacterIndex={setCurrentCharacter}
+                setCurrentCharacterHoverIndex={setCurrentCharacterHoverIndex}
+                variableSize={variableSize}
+            />;
+        })}
+    </>;
+
+    useEffect(() => {
+        setControlCharacters(getCharacters(32, 0));
+        setAsciiCharacters(getCharacters(96, 32));
+        setExtendedCharacters(getCharacters(128, 128));
+    }, [
         charsData,
         charHeight, charWidth,
         offset, charCount,
-        currentCharacter,
+        currentCharacterIndex,
         variableSize,
     ]);
 
-    return <div className={`characters markers grid-${alphabetGrid}`}>
-        {alphabet}
-    </div>;
+    return (
+        <VContainer grow={1} overflow='hidden'>
+            <label>
+                {nls.localize('vuengine/fontEditor/alphabet', 'Alphabet')}
+            </label>
+            <VContainer style={{
+                overflowX: 'hidden',
+                overflowY: 'auto',
+            }}>
+                {controlCharacters &&
+                    <div className="characters">
+                        {controlCharacters && controlCharacters}
+                    </div>
+                }
+                {asciiCharacters &&
+                    <div className="characters">
+                        {asciiCharacters && asciiCharacters}
+                    </div>
+                }
+                {extendedCharacters &&
+                    <div className="characters">
+                        {extendedCharacters}
+                    </div>
+                }
+            </VContainer>
+        </VContainer>
+    );
 }

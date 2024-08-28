@@ -1,10 +1,11 @@
 import { ArrowsOut, GridFour } from '@phosphor-icons/react';
 import React from 'react';
 import HContainer from '../Common/HContainer';
+import { SpriteEditorTool } from './SpriteEditorTool';
 
 interface SpriteEditorSettingsProps {
-    allowResize: boolean
-    setAllowResize: (allowResize: boolean) => void
+    allowResize?: boolean
+    setAllowResize?: (allowResize: boolean) => void
     gridSize: number
     setGridSize: (gridSize: number) => void
 }
@@ -18,18 +19,20 @@ export default function SpriteEditorSettings(props: SpriteEditorSettingsProps): 
 
     return (
         <HContainer gap={2} wrap='wrap'>
-            <div
-                className={`tool${gridSize > 0 ? ' active' : ''}`}
+            <SpriteEditorTool
+                className={gridSize > 0 ? 'active' : ''}
                 onClick={toggleGrid}
             >
                 <GridFour size={20} />
-            </div>
-            <div
-                className={`tool${allowResize ? ' active' : ''}`}
-                onClick={() => setAllowResize(!allowResize)}
-            >
-                <ArrowsOut size={20} />
-            </div>
+            </SpriteEditorTool>
+            {allowResize !== undefined && setAllowResize !== undefined &&
+                <SpriteEditorTool
+                    className={allowResize ? 'active' : ''}
+                    onClick={() => setAllowResize(!allowResize)}
+                >
+                    <ArrowsOut size={20} />
+                </SpriteEditorTool>
+            }
         </HContainer>
     );
 }

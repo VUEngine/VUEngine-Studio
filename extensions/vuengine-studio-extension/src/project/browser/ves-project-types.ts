@@ -174,7 +174,7 @@ export const defaultProjectData: ProjectData = {
           ]
         }
       }],
-      template: 'Image.c.nj',
+      template: 'Image.c.njk',
       itemSpecific: 'Image'
     },
     'PluginConfig': {
@@ -182,28 +182,28 @@ export const defaultProjectData: ProjectData = {
         path: 'headers/Config.h',
         root: ProjectDataTemplateTargetRoot.file,
       }],
-      template: 'PluginConfig.h.nj'
+      template: 'PluginConfig.h.njk'
     },
     'PluginConfigMake': {
       targets: [{
         path: 'config.make',
         root: ProjectDataTemplateTargetRoot.file,
       }],
-      template: 'PluginConfig.make.nj'
+      template: 'PluginConfig.make.njk'
     },
     'PluginsConfig': {
       targets: [{
         path: 'headers/PluginsConfig.h',
         root: ProjectDataTemplateTargetRoot.project,
       }],
-      template: 'PluginsConfig.h.nj'
+      template: 'PluginsConfig.h.njk'
     },
     'RomInfo': {
       targets: [{
         path: 'headers/RomInfo.h',
         root: ProjectDataTemplateTargetRoot.project,
       }],
-      template: 'RomInfo.h.nj',
+      template: 'RomInfo.h.njk',
       encoding: ProjectDataTemplateEncoding.ShiftJIS
     }
   },
@@ -571,7 +571,7 @@ export const defaultProjectData: ProjectData = {
       templates: ['RomInfo']
     },
     Sprite: {
-      enabled: true,
+      enabled: false,
       file: '.sprite',
       schema: {
         title: 'Sprite',

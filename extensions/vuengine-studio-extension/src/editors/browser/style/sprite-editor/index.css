@@ -10,26 +10,6 @@
     border: none !important; 
 }
 
-.spriteEditor .tool {
-    background-color: var(--theia-activityBar-background);
-    box-sizing: border-box;
-    justify-content: center;
-    align-items: center;
-    border: 2px solid transparent;
-    border-radius: 2px;
-    cursor: pointer;
-    display: flex;
-    min-height: 34px;
-    min-width: 34px;
-}
-
-.spriteEditor .tool:hover,
-.spriteEditor .tool.active {
-    border-color: var(--theia-activityBar-background);
-    outline: 1px solid var(--theia-button-background);
-    outline-offset: -1px;
-}
-
 .spriteEditor .frame {
     box-sizing: border-box;
     flex-grow: unset;
@@ -48,7 +28,7 @@
 }
 
 .spriteEditor .pixel-container {
-    background-image: radial-gradient(rgba(0, 0, 0, .3) 2px, transparent 0);
+    background-image: radial-gradient(rgba(0, 0, 0, .3) 1px, transparent 0);
     background-size: 16px 16px;
     flex-grow: 1;
     inset: 0;

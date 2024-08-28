@@ -1,67 +1,97 @@
 import { nls } from '@theia/core';
 import React from 'react';
-import { FontEditorState, MAX_CHAR_COUNT, MIN_CHAR_COUNT, MIN_OFFSET } from '../FontEditorTypes';
-import VContainer from '../../Common/VContainer';
 import HContainer from '../../Common/HContainer';
-import RadioSelect from '../../Common/RadioSelect';
+import InfoLabel from '../../Common/InfoLabel';
+import { clamp } from '../../Common/Utils';
+import VContainer from '../../Common/VContainer';
+import { MAX_CHAR_COUNT, MAX_PAGE_SIZE, MIN_CHAR_COUNT, MIN_OFFSET, MIN_PAGE_SIZE } from '../FontEditorTypes';
+import FontTileInfo from '../Tools/FontTileInfo';
 
 interface AlphabetSettingsProps {
     charCount: number
     setCharCount: (charCount: number) => void
     offset: number
     setOffset: (offset: number) => void
-    alphabetGrid: number
-    setState: (state: Partial<FontEditorState>) => void
+    pageSize: number
+    setPageSize: (pageSize: number) => void
+    sizeX: number
+    sizeY: number
 }
 
 export default function AlphabetSettings(props: AlphabetSettingsProps): React.JSX.Element {
+    const { charCount, setCharCount, offset, setOffset, pageSize, setPageSize, sizeX, sizeY } = props;
 
-    const {
-        charCount, setCharCount,
-        offset, setOffset,
-        alphabetGrid,
-        setState,
-    } = props;
+    const effectiveMaxCharCount = MAX_CHAR_COUNT - offset;
+    const effectiveMaxOffset = MAX_CHAR_COUNT - charCount;
+    const effectiveMaxPageSize = MAX_PAGE_SIZE - effectiveMaxOffset;
 
-    return <HContainer gap={15}>
+    return <HContainer gap={10} justifyContent='space-between'>
+        <HContainer gap={10}>
+            <VContainer>
+                <label>
+                    {nls.localize('vuengine/fontEditor/count', 'Count')}
+                </label>
+                <input
+                    type="number"
+                    className="theia-input"
+                    style={{ width: 48 }}
+                    step="1"
+                    min={MIN_CHAR_COUNT}
+                    max={effectiveMaxCharCount}
+                    value={charCount}
+                    onChange={e => setCharCount(
+                        clamp(parseInt(e.target.value), MIN_CHAR_COUNT, effectiveMaxCharCount)
+                    )}
+                />
+            </VContainer>
+            <VContainer>
+                <label>
+                    {nls.localize('vuengine/fontEditor/offset', 'Offset')}
+                </label>
+                <input
+                    type="number"
+                    className="theia-input"
+                    style={{ width: 48 }}
+                    step="1"
+                    min={MIN_OFFSET}
+                    max={effectiveMaxOffset}
+                    value={offset}
+                    onChange={e => setOffset(
+                        clamp(parseInt(e.target.value), MIN_OFFSET, effectiveMaxOffset)
+                    )}
+                />
+            </VContainer>
+            <VContainer>
+                <InfoLabel
+                    label={nls.localize('vuengine/fontEditor/pageSize', 'Page Size')}
+                    tooltip={nls.localize(
+                        'vuengine/fontEditor/pageSizeDescription',
+                        'Tiles for this amount of characters will be loaded to memory at once. ' +
+                        'For all regular use cases, this should be the total amount of characters in the font.'
+                    )}
+                />
+                <input
+                    type="number"
+                    className="theia-input"
+                    style={{ width: 48 }}
+                    step="1"
+                    min={MIN_PAGE_SIZE}
+                    max={effectiveMaxPageSize}
+                    value={pageSize}
+                    onChange={e => setPageSize(
+                        clamp(parseInt(e.target.value), MIN_PAGE_SIZE, effectiveMaxPageSize)
+                    )}
+                />
+            </VContainer>
+        </HContainer>
         <VContainer>
             <label>
-                {nls.localize('vuengine/fontEditor/count', 'Count')}
+                {nls.localize('vuengine/fontEditor/tiles', 'Tiles')}
             </label>
-            <input
-                type="number"
-                className="theia-input"
-                style={{ width: 48 }}
-                step="1"
-                min={MIN_CHAR_COUNT}
-                max={MAX_CHAR_COUNT - offset}
-                value={charCount}
-                onChange={e => setCharCount(parseInt(e.target.value))}
-            />
-        </VContainer>
-        <VContainer grow={1}>
-            <label>
-                {nls.localize('vuengine/fontEditor/offset', 'Offset')}
-            </label>
-            <input
-                type="number"
-                className="theia-input"
-                style={{ width: 48 }}
-                step="1"
-                min={MIN_OFFSET}
-                max={MAX_CHAR_COUNT - charCount}
-                value={offset}
-                onChange={e => setOffset(parseInt(e.target.value))}
-            />
-        </VContainer>
-        <VContainer>
-            <label>
-                {nls.localize('vuengine/fontEditor/grid', 'Grid')}
-            </label>
-            <RadioSelect
-                options={[{ value: 0 }, { value: 1 }, { value: 2 }, { value: 3 }]}
-                defaultValue={alphabetGrid}
-                onChange={options => setState({ alphabetGrid: options[0].value as number })}
+            <FontTileInfo
+                charCount={pageSize}
+                sizeX={sizeX}
+                sizeY={sizeY}
             />
         </VContainer>
     </HContainer>;

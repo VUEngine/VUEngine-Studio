@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useContext, useEffect, useMemo, useRef } from 'react';
 import { ColorMode, PALETTE_BIT_INDEX_MAP, PALETTE_COLORS } from '../../../../core/browser/ves-common-types';
+import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import { DisplayMode } from './VUEngineTypes';
 
 interface CanvasImageProps {
@@ -17,6 +18,7 @@ interface CanvasImageProps {
 }
 
 export default function CanvasImage(props: CanvasImageProps): React.JSX.Element {
+    const { services } = useContext(EditorsContext) as EditorsContextType;
     const {
         height,
         palette,
@@ -33,6 +35,7 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
     // eslint-disable-next-line no-null/no-null
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
+    const textColor = services.colorRegistry.getCurrentColor('editor.foreground') ?? '#000';
     const effectiveParallaxDisplacement = displayMode === DisplayMode.Stereo ? (parallaxDisplacement ?? 0) : 0;
 
     const drawToCanvas = (context: CanvasRenderingContext2D, pixels: number[][]) => {
@@ -73,7 +76,7 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
                 }
 
                 const fillColor = useTextColor === true
-                    ? 'var(--theia-foreground)'
+                    ? textColor
                     : getColor(effectiveColorByPalette);
 
                 context.fillStyle = fillColor;

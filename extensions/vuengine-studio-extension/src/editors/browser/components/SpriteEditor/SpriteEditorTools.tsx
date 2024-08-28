@@ -2,6 +2,7 @@ import { Eraser, Hand, PaintBucket, PencilSimple, Selection } from '@phosphor-ic
 import { BrushTool, DottingRef, useBrush } from 'dotting';
 import React, { useEffect, useState } from 'react';
 import HContainer from '../Common/HContainer';
+import { SpriteEditorTool } from './SpriteEditorTool';
 
 interface SpriteEditorToolsProps {
     dottingRef: React.RefObject<DottingRef>
@@ -36,56 +37,56 @@ export default function SpriteEditorTools(props: SpriteEditorToolsProps): React.
 
     return (
         <HContainer gap={2} wrap='wrap'>
-            <div
-                className={`tool${brushTool === BrushTool.NONE ? ' active' : ''}`}
+            <SpriteEditorTool
+                className={brushTool === BrushTool.NONE ? 'active' : ''}
                 onClick={() => changeBrushTool(BrushTool.NONE)}
             >
                 <Hand size={20} />
-            </div>
-            <div
-                className={`tool${brushTool === BrushTool.DOT ? ' active' : ''}`}
+            </SpriteEditorTool>
+            <SpriteEditorTool
+                className={brushTool === BrushTool.DOT ? 'active' : ''}
                 onClick={() => changeBrushTool(BrushTool.DOT)}
             >
                 <PencilSimple size={20} />
-            </div>
-            <div
-                className={`tool${brushTool === BrushTool.ERASER ? ' active' : ''}`}
+            </SpriteEditorTool>
+            <SpriteEditorTool
+                className={brushTool === BrushTool.ERASER ? 'active' : ''}
                 onClick={() => changeBrushTool(BrushTool.ERASER)}
             >
                 <Eraser size={20} />
-            </div>
-            <div
-                className={`tool${brushTool === BrushTool.PAINT_BUCKET ? ' active' : ''}`}
+            </SpriteEditorTool>
+            <SpriteEditorTool
+                className={brushTool === BrushTool.PAINT_BUCKET ? 'active' : ''}
                 onClick={() => changeBrushTool(BrushTool.PAINT_BUCKET)}
             >
                 <PaintBucket size={20} />
-            </div>
+            </SpriteEditorTool>
             {/*
-                        <div
-                            className={`tool${brushTool === BrushTool.STROKE ? ' active' : ''}`}
-                            onClick={() => changeBrushTool(BrushTool.STROKE)}
-                        >
-                            <PencilSimpleLine size={20} />
-                        </div>
-                        <div
-                            className={`tool${brushTool === BrushTool.SQUARE ? ' active' : ''}`}
-                            onClick={() => changeBrushTool(BrushTool.SQUARE)}
-                        >
-                            <Square size={20} />
-                        </div>
-                        <div
-                            className={`tool${brushTool === BrushTool.CIRCLE ? ' active' : ''}`}
-                            onClick={() => changeBrushTool(BrushTool.CIRCLE)}
-                        >
-                            <Circle size={20} />
-                        </div>
-                        */}
-            <div
+                <SpriteEditorTool
+                    className={brushTool === BrushTool.STROKE ? 'active' : ''}
+                    onClick={() => changeBrushTool(BrushTool.STROKE)}
+                >
+                    <PencilSimpleLine size={20} />
+                </SpriteEditorTool>
+                <SpriteEditorTool
+                    className={brushTool === BrushTool.SQUARE ? 'active' : ''}
+                    onClick={() => changeBrushTool(BrushTool.SQUARE)}
+                >
+                    <Square size={20} />
+                </SpriteEditorTool>
+                <SpriteEditorTool
+                    className={brushTool === BrushTool.CIRCLE ? 'active' : ''}
+                    onClick={() => changeBrushTool(BrushTool.CIRCLE)}
+                >
+                    <Circle size={20} />
+                </SpriteEditorTool>
+            */}
+            <SpriteEditorTool
                 className={`tool ${brushTool === BrushTool.SELECT ? 'active' : undefined}`}
                 onClick={() => changeBrushTool(BrushTool.SELECT)}
             >
                 <Selection size={20} />
-            </div>
+            </SpriteEditorTool>
         </HContainer>
     );
 }

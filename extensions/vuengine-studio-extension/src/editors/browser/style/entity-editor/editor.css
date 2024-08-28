@@ -57,21 +57,21 @@
     margin: calc(-1 * var(--padding)) calc(-1 * var(--padding)) 10px;
 }
 
-.entityEditor .theia-input.heaviness {
+.jsonforms-container .theia-input.heaviness {
     padding-left: 0;
     text-align: center;
     width: 48px;
 }
-.entityEditor .theia-input.heavinessLight {
+.jsonforms-container .theia-input.heavinessLight {
     border-color: var(--theia-editorSuccess-foreground);
 }
-.entityEditor .theia-input.heavinessMedium {
+.jsonforms-container .theia-input.heavinessMedium {
     border-color: var(--theia-editorWarning-foreground);
 }
-.entityEditor .theia-input.heavinessHeavy {
+.jsonforms-container .theia-input.heavinessHeavy {
     border-color: var(--theia-editorError-foreground);
 }
 
-.entityEditor .light-label {
+.jsonforms-container .light-label {
     color: var(--theia-dropdown-border);
 }

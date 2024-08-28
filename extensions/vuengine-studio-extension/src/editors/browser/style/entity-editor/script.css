@@ -1,6 +1,6 @@
 .script-container {
     align-items: center;
-    background-image: radial-gradient(rgba(0, 0, 0, .3) 2px, transparent 0);
+    background-image: radial-gradient(rgba(0, 0, 0, .3) 1px, transparent 0);
     background-size: 16px 16px;
     cursor: grab;
     display: flex;

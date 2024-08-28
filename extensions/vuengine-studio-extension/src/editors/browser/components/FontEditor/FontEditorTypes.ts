@@ -1,25 +1,15 @@
 import { ImageCompressionType } from '../../../../images/browser/ves-images-types';
 import { DataSection } from '../Common/CommonTypes';
 
-export interface FontEditorState {
-    active: boolean
-    clipboard: number[][] | undefined
-    tool: FontEditorTools
-    paletteIndexL: number
-    paletteIndexR: number
-    currentCharacter: number
-    charGrid: number
-    alphabetGrid: number
-}
-
 export interface FontData {
-    offset: number
     characterCount: number
+    characters: number[][][]
+    compression: ImageCompressionType
+    pageSize: number
+    offset: number
+    section: DataSection
     size: Size
     variableSize: VariableSize
-    section: DataSection
-    compression: ImageCompressionType
-    characters: number[][][]
 }
 
 export interface Size {
@@ -33,7 +23,7 @@ export interface VariableSize {
     y: number
 }
 
-export enum FontEditorTools {
+export enum FontEditorTool {
     PENCIL,
     FILL,
     FILL_ALL,
@@ -60,16 +50,20 @@ export const win1252CharNames = [
 
 export const CHAR_PIXEL_SIZE = 8;
 export const MIN_CHAR_SIZE = 1;
-export const MAX_CHAR_SIZE = 4;
+export const MAX_CHAR_SIZE = 64;
 export const DEFAULT_CHAR_SIZE = MIN_CHAR_SIZE;
 
 export const MIN_CHAR_COUNT = 1;
 export const MAX_CHAR_COUNT = 256;
-export const DEFAULT_CHAR_COUNT = 128;
+export const DEFAULT_CHAR_COUNT = MAX_CHAR_COUNT;
 
 export const MIN_OFFSET = 0;
 export const MAX_OFFSET = MAX_CHAR_COUNT - MIN_CHAR_COUNT;
 export const DEFAULT_OFFSET = MIN_OFFSET;
+
+export const MIN_PAGE_SIZE = MIN_CHAR_COUNT;
+export const MAX_PAGE_SIZE = MAX_CHAR_COUNT;
+export const DEFAULT_PAGE_SIZE = MAX_PAGE_SIZE;
 
 export const DEFAULT_VARIABLE_SIZE_ENABLED = false;
 export const MIN_VARIABLE_CHAR_SIZE = 1;

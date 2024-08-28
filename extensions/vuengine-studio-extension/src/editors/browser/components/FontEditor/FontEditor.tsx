@@ -1,118 +1,123 @@
+/* eslint-disable no-null/no-null */
 import { nls } from '@theia/core';
-import { injectable } from '@theia/core/shared/inversify';
-import React from 'react';
+import { CanvasDataChangeHandler, Dotting, DottingRef, PixelModifyItem, useDotting, useHandlers } from 'dotting';
+import React, { useEffect, useRef, useState } from 'react';
+import styled from 'styled-components';
+import { ColorMode, PALETTE_COLORS, PALETTE_INDICES } from '../../../../core/browser/ves-common-types';
 import { ImageCompressionType } from '../../../../images/browser/ves-images-types';
-import { EditorsContextType } from '../../ves-editors-types';
 import { DataSection } from '../Common/CommonTypes';
 import HContainer from '../Common/HContainer';
 import InfoLabel from '../Common/InfoLabel';
 import RadioSelect from '../Common/RadioSelect';
 import SectionSelect from '../Common/SectionSelect';
 import VContainer from '../Common/VContainer';
+import PaletteSelect from '../SpriteEditor/PaletteSelect';
+import SpriteEditorCurrentToolSettings from '../SpriteEditor/SpriteEditorCurrentToolSettings';
+import SpriteEditorStatus from '../SpriteEditor/SpriteEditorStatus';
+import SpriteEditorTools from '../SpriteEditor/SpriteEditorTools';
+import SpriteEditorUndoRedo from '../SpriteEditor/SpriteEditorUndoRedo';
 import Alphabet from './Alphabet/Alphabet';
 import AlphabetSettings from './Alphabet/AlphabetSettings';
-import CharEditor from './CharEditor/CharEditor';
-import CharSettings from './CharEditor/CharSettings';
+import CharSettings from './Alphabet/CharSettings';
 import {
     CHAR_PIXEL_SIZE,
     FontData,
-    FontEditorState,
-    FontEditorTools, Size,
+    Size,
     VariableSize
 } from './FontEditorTypes';
 import Actions from './Tools/Actions';
 import CurrentCharInfo from './Tools/CurrentCharInfo';
-import ImportExport from './Tools/ImportExport';
-import Palette from './Tools/Palette';
-import Tools from './Tools/Tools';
 
 interface FontEditorProps {
     data: FontData
     updateData: (data: FontData) => void
-    context: EditorsContextType
 }
 
-@injectable()
-export default class FontEditor extends React.Component<FontEditorProps, FontEditorState> {
-    constructor(props: FontEditorProps) {
-        super(props);
-        this.state = {
-            active: true,
-            tool: FontEditorTools.PENCIL,
-            clipboard: undefined,
-            paletteIndexL: 3,
-            paletteIndexR: 0,
-            currentCharacter: this.props.data.offset,
-            charGrid: 1,
-            alphabetGrid: 1
-        };
+const EditorSidebar = styled.div`
+  background-color: rgba(17, 17, 17, .9);
+  border-radius: 2px;
+  border: 1px solid var(--theia-activityBar-background);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: var(--padding);
+  transition: all .1s;
+  z-index: 100;
 
-        document.addEventListener('keydown', this.keyEventListerner.bind(this));
-    }
+  body.light-vuengine & {
+    background-color: rgba(236, 236, 236, .9);
+  }
+`;
 
-    componentWillUnmount(): void {
-        document.removeEventListener('keydown', this.keyEventListerner);
-    }
+export default function FontEditor(props: FontEditorProps): React.JSX.Element {
+    const { data, updateData } = props;
+    const [active, setActive] = useState<boolean>(false);
+    const [primaryColorIndex, setPrimaryColorIndex] = useState<number>(3);
+    const [secondaryColorIndex, setSecondaryColorIndex] = useState<number>(0);
+    const [currentCharacterIndex, setCurrentCharacterIndex] = useState<number>(data.offset);
+    const [currentCharacterHoverIndex, setCurrentCharacterHoverIndex] = useState<number>(data.offset);
+    const [canvasHeight, setCanvasHeight] = useState<number | string>('100%');
+    const [canvasWidth, setCanvasWidth] = useState<number | string>('100%');
+    const canvasContainerRef = useRef<HTMLDivElement>(null);
+    const dottingRef = useRef<DottingRef>(null);
+    const { setData } = useDotting(dottingRef);
+    const { addDataChangeListener, removeDataChangeListener } = useHandlers(dottingRef);
 
-    protected keyEventListerner(e: KeyboardEvent): void {
-        if (this.state.active && document.activeElement?.tagName !== 'INPUT') {
-            const { characterCount, offset } = this.props.data;
-            const { currentCharacter } = this.state;
+    const charPixelWidth = data.size.x * CHAR_PIXEL_SIZE;
+    const charPixelHeight = data.size.y * CHAR_PIXEL_SIZE;
 
+    const characters = data.characters || [];
+
+    const keyEventListerner = (e: KeyboardEvent): void => {
+        if (active && document.activeElement?.tagName !== 'INPUT') {
             switch (e.key) {
                 case 'ArrowDown':
-                    this.setState({
-                        currentCharacter: currentCharacter + 16 < offset + characterCount
-                            ? currentCharacter + 16
-                            : currentCharacter
-                    });
+                    setCurrentCharacterIndex(currentCharacterIndex + 16 < data.offset + data.characterCount
+                        ? currentCharacterIndex + 16
+                        : currentCharacterIndex);
                     break;
                 case 'ArrowLeft':
-                    this.setState({
-                        currentCharacter: currentCharacter > offset
-                            ? currentCharacter - 1
-                            : currentCharacter
-                    });
+                    setCurrentCharacterIndex(currentCharacterIndex > data.offset
+                        ? currentCharacterIndex - 1
+                        : currentCharacterIndex);
                     break;
                 case 'ArrowRight':
-                    this.setState({
-                        currentCharacter: currentCharacter + 1 < offset + characterCount
-                            ? currentCharacter + 1
-                            : currentCharacter
-                    });
+                    setCurrentCharacterIndex(currentCharacterIndex + 1 < data.offset + data.characterCount
+                        ? currentCharacterIndex + 1
+                        : currentCharacterIndex);
                     break;
                 case 'ArrowUp':
-                    this.setState({
-                        currentCharacter: currentCharacter - 16 >= offset
-                            ? currentCharacter - 16
-                            : currentCharacter
-                    });
+                    setCurrentCharacterIndex(currentCharacterIndex - 16 >= data.offset
+                        ? currentCharacterIndex - 16
+                        : currentCharacterIndex);
                     break;
                 case '1':
-                    this.setState({ paletteIndexL: 0 });
+                    setPrimaryColorIndex(0);
                     break;
                 case '2':
-                    this.setState({ paletteIndexL: 1 });
+                    setPrimaryColorIndex(1);
                     break;
                 case '3':
-                    this.setState({ paletteIndexL: 2 });
+                    setPrimaryColorIndex(2);
                     break;
                 case '4':
-                    this.setState({ paletteIndexL: 3 });
+                    setPrimaryColorIndex(3);
                     break;
             }
         }
-    }
+    };
 
-    protected removeTrailingNullsAndZeroesFromArray = (arr: any[]): any[] | null => {
-        // eslint-disable-next-line no-null/no-null
+    const removeTrailingNullsAndZeroesFromArray = (arr: any[]): any[] | null => {
         if (arr === null) {
             return arr;
         }
 
         let toDelete = 0;
         for (let c = arr.length - 1; c >= 0; c--) {
-            // eslint-disable-next-line no-null/no-null
             if (arr[c] === null || arr[c] === 0) {
                 toDelete++;
             } else {
@@ -121,268 +126,340 @@ export default class FontEditor extends React.Component<FontEditorProps, FontEdi
         }
         arr.splice(arr.length - toDelete, toDelete);
 
-        // eslint-disable-next-line no-null/no-null
         return arr.length ? arr : null;
     };
 
-    protected optimizeFontData = (fontData: FontData): FontData => {
+    const optimizeFontData = (fontData: FontData): FontData => {
         // @ts-ignore
-        // eslint-disable-next-line no-null/no-null
         fontData.characters = fontData.characters === null ? null :
-            this.removeTrailingNullsAndZeroesFromArray(fontData.characters.map(character =>
-                // eslint-disable-next-line no-null/no-null
+            removeTrailingNullsAndZeroesFromArray(fontData.characters.map(character =>
                 character === null ? null :
-                    this.removeTrailingNullsAndZeroesFromArray(character.map(line =>
-                        this.removeTrailingNullsAndZeroesFromArray(line)
+                    removeTrailingNullsAndZeroesFromArray(character.map(line =>
+                        removeTrailingNullsAndZeroesFromArray(line)
                     ))));
 
         return fontData;
     };
 
-    protected updateFontData(partialFontData: Partial<FontData>): void {
-        this.props.updateData(
-            this.optimizeFontData({
-                ...this.props.data,
+    const updateFontData = (partialFontData: Partial<FontData>): void => {
+        updateData(
+            optimizeFontData({
+                ...data,
                 ...partialFontData,
             })
         );
     };
 
-    protected setCurrentCharacterData(character: number[][]): void {
-        const characters = [...(this.props.data.characters || [])];
-        characters[this.state.currentCharacter] = character;
-        this.updateFontData({ characters });
+    const setCurrentCharacterData = (character: number[][]): void => {
+        const updatedCharacters = [...(data.characters || [])];
+        updatedCharacters[currentCharacterIndex] = character;
+        updateFontData({ characters: updatedCharacters });
     };
 
-    protected setCharCount(characterCount: number): void {
-        this.updateFontData({ characterCount });
-    }
+    const setSection = (section: DataSection): void => {
+        updateFontData({ section });
+    };
 
-    protected setOffset(offset: number): void {
-        this.updateFontData({ offset });
-    }
+    const setCompression = (compression: ImageCompressionType): void => {
+        updateFontData({ compression });
+    };
 
-    protected setSection(section: DataSection): void {
-        this.updateFontData({ section });
-    }
-    protected setCompression(compression: ImageCompressionType): void {
-        this.updateFontData({ compression });
-    }
-
-    protected setCharSize(size?: Size, variableSize?: VariableSize): void {
-        this.updateFontData({
-            size: size ?? this.props.data.size,
-            variableSize: variableSize ?? this.props.data.variableSize,
+    const setCharSize = (size?: Size, variableSize?: VariableSize): void => {
+        updateFontData({
+            size: size ?? data.size,
+            variableSize: variableSize ?? data.variableSize,
         });
-    }
+    };
 
-    protected clickPixel(x: number, y: number, color: number): void {
-        switch (this.state.tool) {
-            case FontEditorTools.PENCIL:
-                this.setPixelColor(x, y, color);
-                break;
-            case FontEditorTools.FILL:
-                const characters = this.props.data.characters || [];
-                const currentColor = characters[this.state.currentCharacter]
-                    && characters[this.state.currentCharacter][y]
-                    ? characters[this.state.currentCharacter][y][x] ?? 0
-                    : 0;
-                if (currentColor !== color) {
-                    this.setCurrentCharacterData(this.fill(
-                        characters[this.state.currentCharacter] ?? [],
-                        x,
-                        y,
-                        currentColor,
-                        color
-                    ));
-                }
-                break;
-            case FontEditorTools.FILL_ALL:
-                this.fillAll(x, y, color);
-                break;
+    const setCharacterCount = (characterCount: number): void => {
+        const partialFontPage: Partial<FontData> = { characterCount };
+        const maxPageSize = characterCount;
+        if (data.pageSize > maxPageSize) {
+            partialFontPage.pageSize = maxPageSize;
         }
-    }
 
-    protected setCharacters(characters: number[][][]): void {
-        this.updateFontData({ characters });
-    }
+        updateFontData(partialFontPage);
+    };
 
-    protected setPixelColor(x: number, y: number, color: number): void {
-        const characters = [...this.props.data.characters];
-        if (!characters[this.state.currentCharacter]) {
-            characters[this.state.currentCharacter] = [];
-        }
-        if (!characters[this.state.currentCharacter][y]) {
-            characters[this.state.currentCharacter][y] = [];
-        }
-        characters[this.state.currentCharacter][y][x] = color;
+    const setOffset = (offset: number): void => {
+        updateFontData({ offset });
+    };
 
-        this.updateFontData({ characters });
-    }
+    const setPageSize = (pageSize: number): void => {
+        updateFontData({ pageSize });
+    };
 
-    protected fillAll(x: number, y: number, color: number): void {
-        const characters = this.props.data.characters;
-        const oldColor = characters[this.state.currentCharacter]
-            && characters[this.state.currentCharacter][y]
-            && characters[this.state.currentCharacter][y][x]
-            ? characters[this.state.currentCharacter][y][x]
-            : 0;
-        if (oldColor !== color) {
-            const updatedCharacter = characters[this.state.currentCharacter] ?? [];
-            [...Array(this.props.data.size.y * CHAR_PIXEL_SIZE)].map((j, sy) => {
-                if (!updatedCharacter[sy]) {
-                    updatedCharacter[sy] = [];
-                }
-                [...Array(this.props.data.size.x * CHAR_PIXEL_SIZE)].map((k, sx) => {
-                    // eslint-disable-next-line no-null/no-null
-                    if (updatedCharacter[sy][sx] === null
-                        || updatedCharacter[sy][sx] === undefined
-                        || updatedCharacter[sy][sx] === oldColor) {
-                        updatedCharacter[sy][sx] = color;
-                    }
-                });
-            });
+    const setCharacters = (updatedCharacters: number[][][]): void => {
+        updateFontData({ characters: updatedCharacters });
+    };
 
-            this.setCurrentCharacterData(updatedCharacter);
-        }
-    }
-
-    protected fill(char: number[][], x: number, y: number, oldColor: number, newColor: number): number[][] {
+    const fill = (char: number[][], x: number, y: number, oldColor: number, newColor: number): number[][] => {
         const charColor = char && char[y] ? char[y][x] ?? 0 : 0;
         if (x >= 0 && y >= 0
-            && x < this.props.data.size.x * CHAR_PIXEL_SIZE
-            && y < this.props.data.size.y * CHAR_PIXEL_SIZE
+            && x < charPixelWidth
+            && y < charPixelHeight
             && charColor === oldColor) {
             if (!char[y]) {
                 char[y] = [];
             }
             char[y][x] = newColor;
-            char = this.fill(char, x, y + 1, oldColor, newColor);
-            char = this.fill(char, x, y - 1, oldColor, newColor);
-            char = this.fill(char, x + 1, y, oldColor, newColor);
-            char = this.fill(char, x - 1, y, oldColor, newColor);
+            char = fill(char, x, y + 1, oldColor, newColor);
+            char = fill(char, x, y - 1, oldColor, newColor);
+            char = fill(char, x + 1, y, oldColor, newColor);
+            char = fill(char, x - 1, y, oldColor, newColor);
         }
 
         return char;
-    }
+    };
 
-    render(): React.JSX.Element {
-        const { data } = this.props;
+    const getCurrentCharacterDottingData = (): PixelModifyItem[][] => {
+        const currentCharacterData = characters[currentCharacterIndex] ?? [];
+        const dottingData: PixelModifyItem[][] = [];
+        const effectiveHeight = data.variableSize.enabled ? data.variableSize.y : charPixelHeight;
+        [...Array(charPixelHeight)].forEach((j, y) => {
+            const newRow: PixelModifyItem[] = [];
+            const effectiveWidth = data.variableSize.enabled ? data.variableSize.x[currentCharacterIndex] ?? charPixelWidth : charPixelWidth;
+            [...Array(charPixelWidth)].forEach((i, x) => {
+                const paletteColor = PALETTE_COLORS[ColorMode.Default][currentCharacterData[y] !== undefined &&
+                    currentCharacterData[y] !== null &&
+                    currentCharacterData[y][x] !== undefined &&
+                    currentCharacterData[y][x] !== null
+                    ? currentCharacterData[y][x] : 0];
+                const color = x > (effectiveWidth - 1) || y > (effectiveHeight - 1)
+                    ? '#333'
+                    : paletteColor;
+                newRow.push({
+                    rowIndex: y,
+                    columnIndex: x,
+                    color,
+                });
+            });
+            dottingData.push(newRow);
+        });
+        return dottingData;
+    };
 
-        const pixelWidth = data.size.x * CHAR_PIXEL_SIZE;
-        const pixelHeight = data.size.y * CHAR_PIXEL_SIZE;
+    const applyPixelChanges = (modifiedPixels: PixelModifyItem[]): void => {
+        const updatedCharacter = [...(characters[currentCharacterIndex] ?? [])];
+        modifiedPixels.forEach(mp => {
+            if (updatedCharacter[mp.rowIndex] === null || updatedCharacter[mp.rowIndex] === undefined) {
+                updatedCharacter[mp.rowIndex] = [];
+            }
+            updatedCharacter[mp.rowIndex][mp.columnIndex] = PALETTE_INDICES[mp.color];
+        });
+        setCurrentCharacterData(updatedCharacter);
+    };
 
-        const characters = this.props.data.characters || [];
+    const dataChangeHandler: CanvasDataChangeHandler = ({ delta }) => {
+        if (delta?.modifiedPixels?.length) {
+            applyPixelChanges(delta.modifiedPixels);
+        }
+    };
 
-        return <div
-            tabIndex={0}
-            className={`font-editor width-${pixelWidth} height-${pixelHeight}`}
-            onFocus={() => this.setState({ active: true })}
-            onBlur={() => this.setState({ active: false })}
-            onMouseOver={() => this.setState({ active: true })}
-            onMouseOut={() => this.setState({ active: false })}
+    useEffect(() => {
+        setData(getCurrentCharacterDottingData());
+    }, [
+        currentCharacterIndex,
+        data.size,
+        data.variableSize,
+    ]);
+
+    useEffect(() => {
+        addDataChangeListener(dataChangeHandler);
+        return () => {
+            removeDataChangeListener(dataChangeHandler);
+        };
+    }, [
+        currentCharacterIndex,
+        data,
+        addDataChangeListener,
+        removeDataChangeListener,
+    ]);
+
+    useEffect(() => {
+        document.addEventListener('keydown', keyEventListerner);
+        return () => {
+            document.removeEventListener('keydown', keyEventListerner);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!canvasContainerRef.current) {
+            return;
+        }
+        const resizeObserver = new ResizeObserver(() => {
+            setCanvasWidth(canvasContainerRef.current?.clientWidth ?? canvasHeight);
+            setCanvasHeight(canvasContainerRef.current?.clientHeight ?? canvasWidth);
+        });
+        resizeObserver.observe(canvasContainerRef.current);
+        return () => resizeObserver.disconnect();
+    }, [
+        canvasContainerRef
+    ]);
+
+    return <div
+        tabIndex={0}
+        className={`font-editor width-${charPixelWidth} height-${charPixelHeight}`}
+        onFocus={() => setActive(true)}
+        onBlur={() => setActive(false)}
+        onMouseOver={() => setActive(true)}
+        onMouseOut={() => setActive(false)}
+    >
+        <div
+            ref={canvasContainerRef}
+            style={{
+                backgroundImage: 'radial-gradient(rgba(0, 0, 0, .3) 1px, transparent 0)',
+                backgroundSize: '16px 16px',
+                display: 'flex',
+                alignItems: 'center',
+                inset: 0,
+                justifyContent: 'center',
+                overflow: 'hidden',
+                padding: 0,
+                position: 'absolute',
+            }}
         >
-            <div className='editor'>
-                <div className='tools-column'>
-                    <CurrentCharInfo
-                        currentCharacter={this.state.currentCharacter}
+            <SpriteEditorStatus
+                dottingRef={dottingRef}
+                style={{
+                    bottom: 'var(--padding)',
+                    left: 'var(--padding)',
+                    position: 'absolute',
+                    zIndex: 100,
+                }}
+            />
+            <Dotting
+                backgroundColor='transparent'
+                brushColor={PALETTE_COLORS[ColorMode.Default][primaryColorIndex]}
+                defaultPixelColor={PALETTE_COLORS[ColorMode.Default][0]}
+                gridStrokeColor={'#333'}
+                height={canvasHeight}
+                initLayers={[{
+                    id: 'layer1',
+                    data: getCurrentCharacterDottingData(),
+                }]}
+                initAutoScale={true}
+                isGridFixed={true}
+                isGridVisible={true}
+                isPanZoomable={true}
+                maxScale={10}
+                minScale={0.05}
+                ref={dottingRef}
+                width={canvasWidth}
+            />
+        </div>
+        <HContainer
+            alignItems='start'
+            grow={1}
+            justifyContent='space-between'
+            overflow='hidden'
+        >
+            <VContainer
+                gap={10}
+                overflow='hidden'
+                style={{
+                    maxHeight: 'calc(100% - 32px)',
+                    width: 82,
+                    zIndex: 100,
+                }}
+            >
+                <PaletteSelect
+                    primaryColor={primaryColorIndex}
+                    setPrimaryColor={setPrimaryColorIndex}
+                    secondaryColor={secondaryColorIndex}
+                    setSecondaryColor={setSecondaryColorIndex}
+                    dottingRef={dottingRef}
+                />
+                <SpriteEditorUndoRedo
+                    dottingRef={dottingRef}
+                />
+
+                <VContainer gap={10} overflow='auto'>
+                    <SpriteEditorTools
+                        dottingRef={dottingRef}
                     />
-                    <Palette
-                        paletteIndexL={this.state.paletteIndexL}
-                        paletteIndexR={this.state.paletteIndexR}
-                        setState={this.setState.bind(this)}
-                    />
-                    <Tools
-                        tool={this.state.tool}
-                        setState={this.setState.bind(this)}
+                    <SpriteEditorCurrentToolSettings
+                        dottingRef={dottingRef}
                     />
                     <Actions
-                        clipboard={this.state.clipboard}
-                        charHeight={pixelHeight}
-                        charWidth={pixelWidth}
-                        currentCharData={characters[this.state.currentCharacter]}
-                        setCurrentCharData={this.setCurrentCharacterData.bind(this)}
-                        setState={this.setState.bind(this)}
-                    />
-                    <ImportExport
-                        setCharacters={this.setCharacters.bind(this)}
-                        size={data.size}
                         offset={data.offset}
                         characterCount={data.characterCount}
+                        charPixelHeight={charPixelHeight}
+                        charPixelWidth={charPixelWidth}
+                        currentCharData={characters[currentCharacterIndex]}
+                        setCurrentCharData={setCurrentCharacterData}
+                        dottingRef={dottingRef}
+                        applyPixelChanges={applyPixelChanges}
+                        setCharacters={setCharacters}
                     />
-                </div>
-                <div className='editor-column'>
-                    <CharSettings
-                        currentCharacter={this.state.currentCharacter}
-                        charHeight={pixelHeight}
-                        charWidth={pixelWidth}
-                        variableSize={data.variableSize}
-                        setCharSize={this.setCharSize.bind(this)}
-                        charGrid={this.state.charGrid}
-                        setState={this.setState.bind(this)}
-                    />
-                    <CharEditor
-                        char={characters[this.state.currentCharacter]}
-                        charId={this.state.currentCharacter}
-                        charHeight={pixelHeight}
-                        charWidth={pixelWidth}
-                        variableSize={data.variableSize}
-                        clickPixel={this.clickPixel.bind(this)}
-                        paletteIndexL={this.state.paletteIndexL}
-                        paletteIndexR={this.state.paletteIndexR}
-                        charGrid={this.state.charGrid}
-                    />
-                </div>
-                <div className='alphabet-column'>
-                    <AlphabetSettings
-                        charCount={data.characterCount}
-                        setCharCount={this.setCharCount.bind(this)}
-                        offset={data.offset}
-                        setOffset={this.setOffset.bind(this)}
-                        alphabetGrid={this.state.alphabetGrid}
-                        setState={this.setState.bind(this)}
-                    />
+                </VContainer>
+            </VContainer>
+            <EditorSidebar>
+                <VContainer overflow='hidden'>
+                    <HContainer justifyContent='space-between'>
+                        <CharSettings
+                            currentCharacter={currentCharacterIndex}
+                            charHeight={charPixelHeight}
+                            charWidth={charPixelWidth}
+                            variableSize={data.variableSize}
+                            setCharSize={setCharSize}
+                        />
+                        <CurrentCharInfo
+                            currentCharacterIndex={currentCharacterIndex}
+                            currentCharacterHoverIndex={currentCharacterHoverIndex}
+                        />
+                    </HContainer>
                     <Alphabet
                         charsData={data.characters || []}
                         offset={data.offset}
                         charCount={data.characterCount}
-                        charHeight={pixelHeight}
-                        charWidth={pixelWidth}
-                        currentCharacter={this.state.currentCharacter}
+                        charHeight={charPixelHeight}
+                        charWidth={charPixelWidth}
+                        currentCharacterIndex={currentCharacterIndex}
+                        setCurrentCharacterIndex={setCurrentCharacterIndex}
                         variableSize={data.variableSize}
-                        alphabetGrid={this.state.alphabetGrid}
-                        setState={this.setState.bind(this)}
+                        setCurrentCharacterHoverIndex={setCurrentCharacterHoverIndex}
                     />
-                    <HContainer alignItems='start' gap={15} wrap='wrap'>
-                        <VContainer>
-                            <InfoLabel
-                                label={nls.localize('vuengine/entityEditor/compression', 'Compression')}
-                                tooltip={nls.localize(
-                                    'vuengine/entityEditor/compressionDescription',
-                                    // eslint-disable-next-line max-len
-                                    'Image data can be stored in a compressed format to save ROM space. Comes at the cost of a slightly higher CPU load when loading data into memory.'
-                                )}
-                                tooltipPosition='bottom'
-                            />
-                            <RadioSelect
-                                options={[{
-                                    label: nls.localize('vuengine/entityEditor/none', 'None'),
-                                    value: ImageCompressionType.NONE,
-                                }, {
-                                    label: nls.localize('vuengine/entityEditor/rle', 'RLE'),
-                                    value: ImageCompressionType.RLE,
-                                }]}
-                                defaultValue={data.compression}
-                                onChange={options => this.setCompression(options[0].value as ImageCompressionType)}
-                            />
-                        </VContainer>
-                        <SectionSelect
-                            value={data.section}
-                            setValue={this.setSection.bind(this)}
+                    <AlphabetSettings
+                        charCount={data.characterCount}
+                        setCharCount={setCharacterCount}
+                        offset={data.offset}
+                        setOffset={setOffset}
+                        pageSize={data.pageSize}
+                        setPageSize={setPageSize}
+                        sizeX={data.size.x}
+                        sizeY={data.size.y}
+                    />
+                </VContainer>
+                <HContainer gap={15} justifyContent="space-between">
+                    <VContainer>
+                        <InfoLabel
+                            label={nls.localize('vuengine/entityEditor/compression', 'Compression')}
+                            tooltip={nls.localize(
+                                'vuengine/entityEditor/compressionDescription',
+                                // eslint-disable-next-line max-len
+                                'Image data can be stored in a compressed format to save ROM space. Comes at the cost of a slightly higher CPU load when loading data into memory.'
+                            )}
+                            tooltipPosition='bottom'
                         />
-                    </HContainer>
-                </div>
-            </div>
-        </div>;
-    }
+                        <RadioSelect
+                            options={[{
+                                label: nls.localize('vuengine/entityEditor/none', 'None'),
+                                value: ImageCompressionType.NONE,
+                            }, {
+                                label: nls.localize('vuengine/entityEditor/rle', 'RLE'),
+                                value: ImageCompressionType.RLE,
+                            }]}
+                            defaultValue={data.compression}
+                            onChange={options => setCompression(options[0].value as ImageCompressionType)}
+                        />
+                    </VContainer>
+                    <SectionSelect
+                        value={data.section}
+                        setValue={setSection}
+                    />
+                </HContainer>
+            </EditorSidebar>
+        </HContainer >
+    </div >;
 }

@@ -15,7 +15,6 @@ const VesFontEditorControl = ({ data, handleChange, path }: VesFontEditorControl
         {context => <FontEditor
             data={data}
             updateData={(newValue: FontData) => handleChange(path, newValue)}
-            context={context}
         />}
     </EditorsContext.Consumer>;
 

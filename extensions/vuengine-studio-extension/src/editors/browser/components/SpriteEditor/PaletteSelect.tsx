@@ -2,13 +2,12 @@ import { DottingRef, useBrush, useHandlers } from 'dotting';
 import React, { useEffect } from 'react';
 import { ColorMode, PALETTE_COLORS } from '../../../../core/browser/ves-common-types';
 import HContainer from '../Common/HContainer';
-import { SpriteData } from './SpriteEditorTypes';
 import VContainer from '../Common/VContainer';
+import { SpriteEditorTool } from './SpriteEditorTool';
 
 interface PaletteSelectProps {
-    data: SpriteData
-    setData: (partialData: Partial<SpriteData>) => void
-    colorMode: ColorMode
+    colorMode?: ColorMode
+    setColorMode?: (color: ColorMode) => void
     primaryColor: number
     setPrimaryColor: (color: number) => void
     secondaryColor: number
@@ -17,21 +16,23 @@ interface PaletteSelectProps {
 }
 
 export default function PaletteSelect(props: PaletteSelectProps): React.JSX.Element {
-    const { data, setData, colorMode, primaryColor, setPrimaryColor, secondaryColor, setSecondaryColor, dottingRef } = props;
+    const { colorMode, setColorMode, primaryColor, setPrimaryColor, secondaryColor, setSecondaryColor, dottingRef } = props;
     const { changeBrushColor } = useBrush(dottingRef);
     const { addCanvasElementEventListener, removeCanvasElementEventListener } = useHandlers(dottingRef);
+
+    const paletteColors = PALETTE_COLORS[colorMode ?? ColorMode.Default];
 
     const toggleHiColor = (): void => {
         setPrimaryColor(mapColors(primaryColor));
         setSecondaryColor(mapColors(secondaryColor));
 
-        setData({
-            colorMode: data.colorMode === ColorMode.Default ? ColorMode.FrameBlend : ColorMode.Default,
-        });
+        if (setColorMode) {
+            setColorMode(colorMode === ColorMode.Default ? ColorMode.FrameBlend : ColorMode.Default);
+        }
     };
 
     const mapColors = (color: number): number => {
-        switch (data.colorMode) {
+        switch (colorMode) {
             default:
             case ColorMode.Default:
                 return color * 2;
@@ -50,11 +51,11 @@ export default function PaletteSelect(props: PaletteSelectProps): React.JSX.Elem
 
     const handleMouseDown = (e: MouseEvent) => {
         if (e.buttons === 2) {
-            changeBrushColor(PALETTE_COLORS[colorMode][secondaryColor]);
+            changeBrushColor(paletteColors[secondaryColor]);
         }
     };
     const handleMouseUp = (e: MouseEvent) => {
-        changeBrushColor(PALETTE_COLORS[colorMode][primaryColor]);
+        changeBrushColor(paletteColors[primaryColor]);
     };
 
     useEffect(() => {
@@ -71,24 +72,28 @@ export default function PaletteSelect(props: PaletteSelectProps): React.JSX.Elem
     return (
         <VContainer>
             <HContainer gap={2} wrap='wrap'>
-                <div
-                    className={'tool'}
-                    onClick={toggleHiColor}
-                    style={{ width: 70 }}
-                >
-                    {data.colorMode === ColorMode.FrameBlend ? ' HiColor' : '4 Colors'}
-                </div>
-                {[...Array(PALETTE_COLORS[colorMode].length)].map((p, paletteIndex) => (
-                    <div
+                {colorMode !== undefined && setColorMode !== undefined &&
+                    <SpriteEditorTool
+                        onClick={toggleHiColor}
+                        style={{ width: 70 }}
+                    >
+                        {colorMode === ColorMode.FrameBlend ? ' HiColor' : '4 Colors'}
+                    </SpriteEditorTool>
+                }
+                {[...Array(paletteColors.length)].map((p, paletteIndex) => (
+                    <SpriteEditorTool
                         key={paletteIndex}
-                        className={`tool${primaryColor === paletteIndex ? ' active' : ''}`}
-                        style={{ backgroundColor: PALETTE_COLORS[colorMode][paletteIndex] }}
+                        className={primaryColor === paletteIndex ? 'active' : ''}
+                        style={{
+                            backgroundColor: paletteColors[paletteIndex],
+                            color: '#fff',
+                        }}
                         onClick={() => setPrimaryColor(paletteIndex)}
                         onContextMenu={() => setSecondaryColor(paletteIndex)}
                     >
                         {primaryColor === paletteIndex && 'L'}
                         {secondaryColor === paletteIndex && 'R'}
-                    </div>
+                    </SpriteEditorTool>
                 ))}
             </HContainer>
             { /* }

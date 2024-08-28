@@ -13,18 +13,18 @@ import {
     useLayers
 } from 'dotting';
 import React, { BaseSyntheticEvent, useContext, useEffect, useRef, useState } from 'react';
-import { PALETTE_COLORS } from '../../../../core/browser/ves-common-types';
+import { ColorMode, PALETTE_COLORS } from '../../../../core/browser/ves-common-types';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
+import HContainer from '../Common/HContainer';
 import VContainer from '../Common/VContainer';
 import { Displays } from '../Common/VUEngineTypes';
 import PaletteSelect from './PaletteSelect';
-import SpriteEditorActions from './SpriteEditorActions';
+import SpriteEditorUndoRedo from './SpriteEditorUndoRedo';
 import SpriteEditorCurrentToolSettings from './SpriteEditorCurrentToolSettings';
 import SpriteEditorSettings from './SpriteEditorSettings';
 import SpriteEditorStatus from './SpriteEditorStatus';
 import SpriteEditorTools from './SpriteEditorTools';
 import { DEFAULT_SPRITE_SIZE, PLACEHOLDER_LAYER_NAME, SpriteData, SpriteLayersData } from './SpriteEditorTypes';
-import HContainer from '../Common/HContainer';
 
 interface SpriteEditorProps {
     data: SpriteData
@@ -46,6 +46,9 @@ const createEmptyPixelData = (width: number, height: number): PixelModifyItem[][
 export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const { data, updateData } = props;
+    const [canvasHeight, setCanvasHeight] = useState<number | string>('100%');
+    const [canvasWidth, setCanvasWidth] = useState<number | string>('100%');
+    const canvasContainerRef = useRef<HTMLDivElement>(null);
     const ref = useRef<DottingRef>(null);
     const {
         addDataChangeListener,
@@ -78,6 +81,10 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
             ...data,
             ...partialData,
         });
+    };
+
+    const setColorMode = (colorMode: ColorMode): void => {
+        setData({ colorMode });
     };
 
     const initLayers = (resolvedLayers: SpriteLayersData): void => {
@@ -243,6 +250,20 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
         initData();
     }, []);
 
+    useEffect(() => {
+        if (!canvasContainerRef.current) {
+            return;
+        }
+        const resizeObserver = new ResizeObserver(() => {
+            setCanvasWidth(canvasContainerRef.current?.clientWidth ?? canvasHeight);
+            setCanvasHeight(canvasContainerRef.current?.clientHeight ?? canvasWidth);
+        });
+        resizeObserver.observe(canvasContainerRef.current);
+        return () => resizeObserver.disconnect();
+    }, [
+        canvasContainerRef
+    ]);
+
     return (
         <HContainer className="spriteEditor">
             <VContainer
@@ -254,9 +275,8 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
             >
                 <div style={{ zIndex: 100 }}>
                     <PaletteSelect
-                        data={data}
-                        setData={setData}
                         colorMode={data.colorMode}
+                        setColorMode={setColorMode}
                         primaryColor={primaryColor}
                         setPrimaryColor={setPrimaryColor}
                         secondaryColor={secondaryColor}
@@ -272,7 +292,7 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                         zIndex: 100,
                     }}
                 >
-                    <SpriteEditorActions
+                    <SpriteEditorUndoRedo
                         dottingRef={ref}
                     />
                     <SpriteEditorSettings
@@ -289,7 +309,7 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                     />
                 </VContainer>
             </VContainer>
-            <div className='pixel-container'>
+            <div className='pixel-container' ref={canvasContainerRef}>
                 <SpriteEditorStatus
                     dottingRef={ref}
                     style={{
@@ -307,7 +327,7 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                     gridStrokeColor={services.colorRegistry.getCurrentColor('editor.background')}
                     gridStrokeWidth={gridSize}
                     isGridVisible={gridSize > 0}
-                    height={'100%'}
+                    height={canvasHeight}
                     initAutoScale={true}
                     initLayers={[{
                         id: PLACEHOLDER_LAYER_NAME,
@@ -325,7 +345,7 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                     minScale={0.05}
                     maxScale={10}
                     resizeUnit={8}
-                    width={'100%'}
+                    width={canvasWidth}
                     style={{ zIndex: 1 }}
                 />
             </div>

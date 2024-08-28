@@ -1,76 +1,80 @@
 import React, { useMemo } from 'react';
-import { ColorMode, PALETTE_COLORS } from '../../../../../core/browser/ves-common-types';
-import { FontEditorState, VariableSize, win1252CharNames } from '../FontEditorTypes';
+import { ColorMode } from '../../../../../core/browser/ves-common-types';
+import CanvasImage from '../../Common/CanvasImage';
+import { DisplayMode } from '../../Common/VUEngineTypes';
+import { VariableSize } from '../FontEditorTypes';
 
 interface AlphabetCharProps {
-    line: number
     index: number
     charData: number[][]
     offset: number
     charCount: number
     charHeight: number
     charWidth: number
-    currentCharacter: number
+    currentCharacterIndex: number
+    setCurrentCharacterIndex: (currentCharacter: number) => void
+    setCurrentCharacterHoverIndex: React.Dispatch<React.SetStateAction<number>>
     variableSize: VariableSize
-    setState: (state: Partial<FontEditorState>) => void
 }
 
 export default function AlphabetChar(props: AlphabetCharProps): React.JSX.Element {
     const {
         charData,
         charHeight, charWidth,
-        line, index,
+        index,
         offset, charCount,
-        currentCharacter,
+        currentCharacterIndex, setCurrentCharacterIndex: setCurrentCharacter, setCurrentCharacterHoverIndex,
         variableSize,
-        setState
     } = props;
 
     const classNames = ['character'];
-    const character = (line * 16) + index;
-    if (character < offset || character >= offset + charCount) {
+    if (index < offset || index >= offset + charCount) {
         classNames.push('inactive');
     }
-    if (character === currentCharacter) {
+    if (index === currentCharacterIndex) {
         classNames.push('active');
     }
 
-    // TODO: try using CssImage for this
-    const boxShadow = useMemo(() => {
-        const result: string[] = [];
+    const pixeldata = useMemo(() => {
+        const result: number[][] = [];
         [...Array(charHeight)].map((h, y) => {
+            const resultRow: number[] = [];
             if (!variableSize.enabled || y < variableSize.y) {
                 [...Array(charWidth)].map((w, x) => {
-                    if (!variableSize.enabled || x < (variableSize.x[line * 16 + index] ?? charWidth)) {
+                    if (!variableSize.enabled || x < (variableSize.x[index] ?? charWidth)) {
                         const color = charData && charData[y] && charData[y][x] ? charData[y][x] : 0;
-                        if (color > 0) {
-                            const pixelSize = (charWidth > 16 || charHeight > 16) ? 1 : 2;
-                            const xPos = (x + 1) * pixelSize;
-                            const yPos = (y + 1) * pixelSize;
-                            result.push(
-                                `${xPos}px ${yPos}px 0 0 ${PALETTE_COLORS[ColorMode.Default][color]}`
-                            );
-                        }
+                        resultRow.push(color);
                     }
                 });
             }
+            result.push(resultRow);
         });
-        return result.join(',');
+        return result;
     }, [
         charData,
         charHeight, charWidth,
-        line, index,
+        index,
         variableSize,
     ]);
 
     return <div
         className={classNames.join(' ')}
-        title={win1252CharNames[character]}
-        onClick={() => !classNames.includes('inactive') && setState({ currentCharacter: character })}
+        onClick={() => !classNames.includes('inactive') && setCurrentCharacter(index)}
+        onMouseOver={() => setCurrentCharacterHoverIndex(index)}
+        onMouseOut={() => setCurrentCharacterHoverIndex(-1)}
     >
-        <div
-            key={`character-pixels-${character}`}
-            style={{ boxShadow }}
-        ></div>
+        <CanvasImage
+            height={charHeight}
+            palette={'11100100'}
+            pixelData={[pixeldata]}
+            style={{
+                zoom: charWidth === 8 && charHeight <= 16 || charHeight === 8 && charWidth <= 16
+                    ? 2
+                    : undefined
+            }}
+            width={charWidth}
+            displayMode={DisplayMode.Mono}
+            colorMode={ColorMode.Default}
+        />
     </div>;
 }

@@ -54,6 +54,7 @@ export const DOT_BRUSH_PATTERNS = [
         [1, 1, 1, 1],
         [1, 1, 1, 1],
     ],
+    /*
     [
         [0, 1, 1, 1, 0],
         [1, 1, 1, 1, 1],
@@ -75,4 +76,5 @@ export const DOT_BRUSH_PATTERNS = [
         [1, 1, 1, 1, 1],
         [1, 1, 1, 1, 1],
     ],
+    */
 ];

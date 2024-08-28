@@ -18,6 +18,13 @@ export const PALETTE_COLORS: string[][] = [[
   '#ff0000',
 ]];
 
+export const PALETTE_INDICES: { [rgb: string]: number } = {
+  '#000': 0,
+  '#500': 1,
+  '#a00': 2,
+  '#f00': 3,
+};
+
 export const PALETTE_R_VALUES: number[][] = [
   [0, 85, 170, 255],
   [0, 42, 85, 127, 170, 212, 255],

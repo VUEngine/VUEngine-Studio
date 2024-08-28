@@ -1,33 +1,54 @@
+import { Clipboard, CopySimple, Trash } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
-import cloneDeep from 'lodash/cloneDeep';
-import React from 'react';
-import { FontEditorState } from '../FontEditorTypes';
+import { ConfirmDialog } from '@theia/core/lib/browser';
+import { DottingRef, PixelModifyItem, useData, useDotting } from 'dotting';
+import React, { useState } from 'react';
+import HContainer from '../../Common/HContainer';
+import { SpriteEditorTool } from '../../SpriteEditor/SpriteEditorTool';
+import ImportExport from './ImportExport';
 
 interface ActionsProps {
-    clipboard: number[][] | undefined,
-    charHeight: number,
-    charWidth: number,
+    offset: number
+    characterCount: number
+    charPixelHeight: number,
+    charPixelWidth: number,
     currentCharData: number[][]
     setCurrentCharData: (data: number[][]) => void
-    setState: (state: Partial<FontEditorState>) => void
+    dottingRef: React.RefObject<DottingRef>
+    applyPixelChanges: (modifiedPixels: PixelModifyItem[]) => void
+    setCharacters: (updatedCharacters: number[][][]) => void
 }
 
 export default function Actions(props: ActionsProps): React.JSX.Element {
     const {
-        clipboard,
-        charHeight, charWidth,
-        currentCharData, setCurrentCharData,
-        setState
+        charPixelHeight, charPixelWidth,
+        /* currentCharData, setCurrentCharData, */
+        characterCount,
+        offset,
+        dottingRef,
+        applyPixelChanges,
+        setCharacters,
     } = props;
+    const [clipboard, setClipboard] = useState<PixelModifyItem[][]>();
+    const { clear, setData } = useDotting(dottingRef);
+    const { dataArray } = useData(dottingRef);
 
-    const clear = (): void => {
-        setCurrentCharData([]);
+    const confirmClear = async (): Promise<void> => {
+        const dialog = new ConfirmDialog({
+            title: nls.localize('vuengine/spriteEditor/clear', 'Clear'),
+            msg: nls.localize('vuengine/spriteEditor/areYouSureYouWantToClear', 'Are you sure you want to clear the entire canvas?'),
+        });
+        const confirmed = await dialog.open();
+        if (confirmed) {
+            clear();
+        }
     };
 
+    /*
     const rotate = (): void => {
         const updatedCharacter = currentCharData ?? [];
 
-        const n = charHeight;
+        const n = charPixelHeight;
         const x = Math.floor(n / 2);
         const y = n - 1;
         let k;
@@ -51,9 +72,11 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
     const mirrorHorizontally = (): void => {
         const updatedCharacter = currentCharData ?? [];
 
-        [...Array(charHeight)].map((j, y) => {
-            if (!updatedCharacter[y]) { updatedCharacter[y] = []; }
-            [...Array(charWidth)].map((k, x) => {
+        [...Array(charPixelHeight)].map((j, y) => {
+            if (!updatedCharacter[y]) {
+                updatedCharacter[y] = [];
+            }
+            [...Array(charPixelWidth)].map((k, x) => {
                 if (!updatedCharacter[y][x]) { updatedCharacter[y][x] = 0; }
             });
             updatedCharacter[y] = updatedCharacter[y].reverse();
@@ -65,182 +88,77 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
     const mirrorVertically = (): void => {
         const updatedCharacter = currentCharData ?? [];
 
-        [...Array(charHeight)].map((j, y) => {
-            if (!updatedCharacter[y]) { updatedCharacter[y] = []; }
+        [...Array(charPixelHeight)].map((j, y) => {
+            if (!updatedCharacter[y]) {
+                updatedCharacter[y] = [];
+            }
         });
 
         setCurrentCharData(updatedCharacter.reverse());
     };
-
-    const moveUp = (): void => {
-        if (!currentCharData || currentCharData.length < 1) { return; }
-
-        setCurrentCharData([
-            ...currentCharData.slice(1),
-            []
-        ]);
-    };
-
-    const moveDown = (): void => {
-        if (!currentCharData || currentCharData.length < 1) { return; }
-
-        [...Array(charHeight)].map((j, y) => {
-            if (!currentCharData[y]) { currentCharData[y] = []; }
-        });
-
-        setCurrentCharData([
-            [],
-            ...currentCharData.slice(0, -1)
-        ]);
-    };
-
-    const moveLeft = (): void => {
-        if (!currentCharData || currentCharData.length < 1) { return; }
-
-        setCurrentCharData(currentCharData.map(line => [...line.slice(1), 0]));
-    };
-
-    const moveRight = (): void => {
-        if (!currentCharData || currentCharData.length < 1) { return; }
-
-        currentCharData.map((j, y) => {
-            const line = currentCharData[y];
-            [...Array(charWidth)].map((k, x) => {
-                if (!line[x]) { line[x] = 0; }
-            });
-        });
-
-        setCurrentCharData(currentCharData.map(line => [0, ...line.slice(0, -1)]));
-    };
-
-    const toneUp = (): void => {
-        const updatedCharacter = currentCharData ?? [];
-
-        [...Array(charHeight)].map((j, y) => {
-            if (!updatedCharacter[y]) { updatedCharacter[y] = []; }
-            [...Array(charWidth)].map((k, x) => {
-                if (!updatedCharacter[y][x]) { updatedCharacter[y][x] = 0; }
-                if (updatedCharacter[y][x] < 3) { updatedCharacter[y][x]++; }
-            });
-        });
-
-        setCurrentCharData(updatedCharacter);
-    };
-
-    const toneDown = (): void => {
-        const updatedCharacter = currentCharData ?? [];
-
-        [...Array(charHeight)].map((j, y) => {
-            if (!updatedCharacter[y]) { updatedCharacter[y] = []; }
-            [...Array(charWidth)].map((k, x) => {
-                if (!updatedCharacter[y][x]) { updatedCharacter[y][x] = 0; }
-                if (updatedCharacter[y][x] > 0) { updatedCharacter[y][x]--; }
-            });
-        });
-
-        setCurrentCharData(updatedCharacter);
-    };
+    */
 
     const copy = (): void => {
-        if (!currentCharData || currentCharData.length < 1) { return; }
-
-        setState({ clipboard: currentCharData });
+        setClipboard(dataArray);
     };
 
     const paste = (): void => {
-        if (!currentCharData || currentCharData.length < 1) { return; }
-
         if (clipboard) {
-            setCurrentCharData(cloneDeep(clipboard));
+            // write to dotting
+            setData(clipboard);
+
+            // write to character data, since no change event is triggered on the above
+            const modifiedPixels: PixelModifyItem[] = [];
+            clipboard.forEach(c => modifiedPixels.push(...c));
+            applyPixelChanges(modifiedPixels);
         }
     };
 
-    return <div className="tools">
-        <button
-            className="theia-button secondary"
-            title={nls.localize('vuengine/fontEditor/actions/clear', 'Clear')}
-            onClick={clear}
-        >
-            <i className="fa fa-trash"></i>
-        </button>
-        <button
-            className="theia-button secondary"
+    return <HContainer gap={2} wrap='wrap'>
+        {/* }
+        <SpriteEditorTool
             title={nls.localize('vuengine/fontEditor/actions/rotate', 'Rotate')}
             onClick={rotate}
         >
-            <i className="fa fa-rotate-right"></i>
-        </button>
-        <button
-            className="theia-button secondary"
+            <ArrowClockwise size={20} />
+        </SpriteEditorTool>
+        <SpriteEditorTool
             title={nls.localize('vuengine/fontEditor/actions/mirrorHorizontally', 'Mirror Horizontally')}
             onClick={mirrorHorizontally}
         >
-            <i className="fa fa-arrows-h"></i>
-        </button>
-        <button
-            className="theia-button secondary"
+            <FlipHorizontal size={20} />
+        </SpriteEditorTool>
+        <SpriteEditorTool
             title={nls.localize('vuengine/fontEditor/actions/mirrorVertically', 'Mirror Vertically')}
             onClick={mirrorVertically}
         >
-            <i className="fa fa-arrows-v"></i>
-        </button>
-        <button
-            className="theia-button secondary"
-            title={nls.localize('vuengine/fontEditor/actions/moveUp', 'Move Up')}
-            onClick={moveUp}
-        >
-            <i className="fa fa-arrow-up"></i>
-        </button>
-        <button
-            className="theia-button secondary"
-            title={nls.localize('vuengine/fontEditor/actions/moveDown', 'Move Down')}
-            onClick={moveDown}
-        >
-            <i className="fa fa-arrow-down"></i>
-        </button>
-        <button
-            className="theia-button secondary"
-            title={nls.localize('vuengine/fontEditor/actions/moveLeft', 'Move Left')}
-            onClick={moveLeft}
-        >
-            <i className="fa fa-arrow-left"></i>
-        </button>
-        <button
-            className="theia-button secondary"
-            title={nls.localize('vuengine/fontEditor/actions/moveRight', 'Move Right')}
-            onClick={moveRight}
-        >
-            <i className="fa fa-arrow-right"></i>
-        </button>
-        <button
-            className="theia-button secondary"
-            title={nls.localize('vuengine/fontEditor/actions/toneDown', 'Tone Down')}
-            onClick={toneDown}
-        >
-            <i className="fa fa-sun-o"></i>
-            <i className="fa fa-long-arrow-down"></i>
-        </button>
-        <button
-            className="theia-button secondary"
-            title={nls.localize('vuengine/fontEditor/actions/toneUp', 'Tone Up')}
-            onClick={toneUp}
-        >
-            <i className="fa fa-sun-o"></i>
-            <i className="fa fa-long-arrow-up"></i>
-        </button>
-        <button
-            className="theia-button secondary"
+            <FlipVertical size={20} />
+        </SpriteEditorTool>
+        {*/}
+        <SpriteEditorTool
             title={nls.localize('vuengine/fontEditor/actions/copy', 'Copy')}
             onClick={copy}
         >
-            <i className="fa fa-clone"></i>
-        </button>
-        <button
-            className="theia-button secondary"
+            <CopySimple size={20} />
+        </SpriteEditorTool>
+        <SpriteEditorTool
             title={nls.localize('vuengine/fontEditor/actions/paste', 'Paste')}
             onClick={paste}
         >
-            <i className="fa fa-paste"></i>
-        </button>
-    </div>;
+            <Clipboard size={20} />
+        </SpriteEditorTool>
+        <SpriteEditorTool
+            title={nls.localize('vuengine/fontEditor/actions/clear', 'Clear')}
+            onClick={confirmClear}
+        >
+            <Trash size={20} />
+        </SpriteEditorTool>
+        <ImportExport
+            setCharacters={setCharacters}
+            charPixelHeight={charPixelHeight}
+            charPixelWidth={charPixelWidth}
+            offset={offset}
+            characterCount={characterCount}
+        />
+    </HContainer>;
 }

@@ -3,7 +3,8 @@ import { OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import { FileContent } from '@theia/filesystem/lib/common/files';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import { Size } from '../FontEditorTypes';
+import { SpriteEditorTool } from '../../SpriteEditor/SpriteEditorTool';
+import { FileArrowDown } from '@phosphor-icons/react';
 
 export interface ParsedImageData {
     height: number
@@ -13,13 +14,15 @@ export interface ParsedImageData {
 };
 
 interface ImportExportProps {
-    setCharacters: (characters: number[][][]) => void
-    size: Size
+    charPixelHeight: number,
+    charPixelWidth: number,
     offset: number
     characterCount: number
+    setCharacters: (characters: number[][][]) => void
 }
 
 export default function ImportExport(props: ImportExportProps): React.JSX.Element {
+    const { charPixelHeight, charPixelWidth, offset, characterCount, setCharacters } = props;
     const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
 
     const parseIndexedPng = async (fileContent: FileContent): Promise<ParsedImageData | false> => {
@@ -61,22 +64,22 @@ export default function ImportExport(props: ImportExportProps): React.JSX.Elemen
     };
 
     const imageDataToCharacters = (imageData: ParsedImageData): number[][][] => {
-        const charactersPerLine = imageData.width / (props.size.x * 8);
+        const charactersPerLine = imageData.width / (charPixelWidth);
 
         const characters: number[][][] = [];
         [...Array(256)].map((i, c) => {
-            if (c < props.offset || c >= props.offset + props.characterCount) {
+            if (c < offset || c >= offset + characterCount) {
                 // @ts-ignore
                 // eslint-disable-next-line no-null/no-null
                 characters[c] = null;
             } else {
                 characters[c] = [];
-                [...Array(props.size.y * 8)].map((j, y) => {
+                [...Array(charPixelHeight)].map((j, y) => {
                     characters[c][y] = [];
-                    [...Array(props.size.x * 8)].map((k, x) => {
-                        const offsetCurrentCharacter = c - props.offset;
-                        const currentYIndex = (Math.floor(offsetCurrentCharacter / charactersPerLine) * (props.size.y * 8)) + y;
-                        const currentXIndex = (offsetCurrentCharacter % charactersPerLine) * (props.size.x * 8) + x;
+                    [...Array(charPixelWidth)].map((k, x) => {
+                        const offsetCurrentCharacter = c - offset;
+                        const currentYIndex = (Math.floor(offsetCurrentCharacter / charactersPerLine) * (charPixelHeight)) + y;
+                        const currentXIndex = (offsetCurrentCharacter % charactersPerLine) * (charPixelWidth) + x;
                         const paletteIndex = imageData.pixelData[currentYIndex] && imageData.pixelData[currentYIndex][currentXIndex]
                             ? imageData.pixelData[currentYIndex][currentXIndex]
                             : 0;
@@ -104,7 +107,7 @@ export default function ImportExport(props: ImportExportProps): React.JSX.Elemen
             const fileContent = await services.fileService.readFile(uri);
             const imgData = await parseIndexedPng(fileContent);
             if (imgData !== false) {
-                props.setCharacters(imageDataToCharacters(imgData));
+                setCharacters(imageDataToCharacters(imgData));
             } else {
                 services.messageService.error(
                     nls.localize('vuengine/fontEditor/errorImporting', 'There was as error importing the PNG file.')
@@ -113,21 +116,20 @@ export default function ImportExport(props: ImportExportProps): React.JSX.Elemen
         }
     };
 
-    return <div className='tools'>
-        <button
-            className='theia-button secondary full-width'
+    return <>
+        <SpriteEditorTool
             title={nls.localize('vuengine/fontEditor/actions/import', 'Import')}
             onClick={selectImageFile}
         >
-            {nls.localize('vuengine/fontEditor/actions/import', 'Import')}
-        </button>
+            <FileArrowDown size={20} />
+        </SpriteEditorTool>
         { /* }
-        <button
-            className='theia-button secondary full-width'
+        <SpriteEditorTool
+            style={{ width: 70 }}
             title={nls.localize('vuengine/fontEditor/actions/export', 'Export')}
         >
-            {nls.localize('vuengine/fontEditor/actions/export', 'Export')}
-        </button>
+            <FileArrowUp size={20} />
+        </SpriteEditorTool>
         { */ }
-    </div>;
+    </>;
 }

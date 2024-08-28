@@ -1,22 +1,26 @@
 import React from 'react';
 import { win1252CharNames } from '../FontEditorTypes';
+import VContainer from '../../Common/VContainer';
 
 interface CurrentCharInfoProps {
-    currentCharacter: number
+    currentCharacterIndex: number
+    currentCharacterHoverIndex: number
 }
 
 export default function CurrentCharInfo(props: CurrentCharInfoProps): React.JSX.Element {
-    const { currentCharacter } = props;
+    const { currentCharacterIndex, currentCharacterHoverIndex } = props;
 
-    return <div className='current-character-info'>
+    const effectiveCurrentCharacterIndex = currentCharacterHoverIndex > -1 ? currentCharacterHoverIndex : currentCharacterIndex;
+
+    return <VContainer className='current-character-info'>
         <input
             type="string"
             maxLength={1}
             minLength={1}
-            className="theia-input large"
-            value={win1252CharNames[currentCharacter]}
+            className="theia-input"
+            value={win1252CharNames[effectiveCurrentCharacterIndex]}
             readOnly
         />
-        {currentCharacter} / 0x{currentCharacter.toString(16).toUpperCase().padStart(2, '0')}
-    </div>;
+        {effectiveCurrentCharacterIndex} / 0x{effectiveCurrentCharacterIndex.toString(16).toUpperCase().padStart(2, '0')}
+    </VContainer>;
 }

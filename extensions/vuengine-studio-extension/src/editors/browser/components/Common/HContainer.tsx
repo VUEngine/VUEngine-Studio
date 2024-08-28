@@ -8,6 +8,7 @@ interface HContainerProps {
     justifyContent?: string
     onClick?: MouseEventHandler | undefined;
     onKeyDown?: KeyboardEventHandler | undefined;
+    onMouseOver?: MouseEventHandler | undefined;
     overflow?: string
     style?: object
     tabIndex?: number
@@ -15,7 +16,7 @@ interface HContainerProps {
 }
 
 export default function HContainer(props: PropsWithChildren<HContainerProps>): React.JSX.Element {
-    const { alignItems, children, className, justifyContent, onClick, onKeyDown, overflow, tabIndex, wrap, gap, grow, style } = props;
+    const { alignItems, children, className, justifyContent, onClick, onKeyDown, onMouseOver, overflow, tabIndex, wrap, gap, grow, style } = props;
 
     return <div
         style={{
@@ -33,6 +34,7 @@ export default function HContainer(props: PropsWithChildren<HContainerProps>): R
         tabIndex={tabIndex}
         onClick={e => { if (onClick) { onClick(e); } }}
         onKeyDown={e => { if (onKeyDown) { onKeyDown(e); } }}
+        onMouseOver={e => { if (onMouseOver) { onMouseOver(e); } }}
     >
         {children}
     </div>;
