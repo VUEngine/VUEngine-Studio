@@ -304,7 +304,8 @@ export const defaultProjectData: ProjectData = {
                     type: 'boolean',
                     default: false
                   }
-                }
+                },
+                additionalProperties: false,
               },
               compression: {
                 type: 'string',
@@ -334,7 +335,8 @@ export const defaultProjectData: ProjectData = {
                 type: 'integer',
                 default: 0
               },
-            }
+            },
+            additionalProperties: false,
           },
           imageProcessingSettings: {
             type: 'object',

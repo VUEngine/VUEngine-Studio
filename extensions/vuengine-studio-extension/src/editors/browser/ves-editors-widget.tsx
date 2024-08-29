@@ -324,7 +324,8 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         const schema = await window.electronVesCore.dereferenceJsonSchema(type.schema);
         this.data = this.generateDataFromSchema({
             ...schema,
-            type: 'object'
+            type: 'object',
+            additionalProperties: false,
         }, this.data);
 
         if (this.data?.name === '') {
