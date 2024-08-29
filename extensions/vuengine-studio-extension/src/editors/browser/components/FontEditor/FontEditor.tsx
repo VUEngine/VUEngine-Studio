@@ -5,6 +5,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { ColorMode, PALETTE_COLORS, PALETTE_INDICES } from '../../../../core/browser/ves-common-types';
 import { ImageCompressionType } from '../../../../images/browser/ves-images-types';
+import { EDITORS_COMMANDS } from '../../ves-editors-commands';
+import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../ves-editors-types';
 import { DataSection } from '../Common/CommonTypes';
 import HContainer from '../Common/HContainer';
 import InfoLabel from '../Common/InfoLabel';
@@ -55,7 +57,6 @@ const EditorSidebar = styled.div`
 
 export default function FontEditor(props: FontEditorProps): React.JSX.Element {
     const { data, updateData } = props;
-    const [active, setActive] = useState<boolean>(false);
     const [primaryColorIndex, setPrimaryColorIndex] = useState<number>(3);
     const [secondaryColorIndex, setSecondaryColorIndex] = useState<number>(0);
     const [currentCharacterIndex, setCurrentCharacterIndex] = useState<number>(data.offset);
@@ -72,42 +73,45 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
 
     const characters = data.characters || [];
 
-    const keyEventListerner = (e: KeyboardEvent): void => {
-        if (active && document.activeElement?.tagName !== 'INPUT') {
-            switch (e.key) {
-                case 'ArrowDown':
-                    setCurrentCharacterIndex(currentCharacterIndex + 16 < data.offset + data.characterCount
-                        ? currentCharacterIndex + 16
-                        : currentCharacterIndex);
-                    break;
-                case 'ArrowLeft':
-                    setCurrentCharacterIndex(currentCharacterIndex > data.offset
-                        ? currentCharacterIndex - 1
-                        : currentCharacterIndex);
-                    break;
-                case 'ArrowRight':
-                    setCurrentCharacterIndex(currentCharacterIndex + 1 < data.offset + data.characterCount
-                        ? currentCharacterIndex + 1
-                        : currentCharacterIndex);
-                    break;
-                case 'ArrowUp':
-                    setCurrentCharacterIndex(currentCharacterIndex - 16 >= data.offset
-                        ? currentCharacterIndex - 16
-                        : currentCharacterIndex);
-                    break;
-                case '1':
-                    setPrimaryColorIndex(0);
-                    break;
-                case '2':
-                    setPrimaryColorIndex(1);
-                    break;
-                case '3':
-                    setPrimaryColorIndex(2);
-                    break;
-                case '4':
-                    setPrimaryColorIndex(3);
-                    break;
-            }
+    const commandListener = (e: CustomEvent): void => {
+        switch (e.detail) {
+            case EDITORS_COMMANDS.FontEditor.commands.alphabetNavigateLineDown.id:
+                setCurrentCharacterIndex(currentCharacterIndex + 16 < data.offset + data.characterCount
+                    ? currentCharacterIndex + 16
+                    : currentCharacterIndex);
+                break;
+            case EDITORS_COMMANDS.FontEditor.commands.alphabetNavigatePrevChar.id:
+                setCurrentCharacterIndex(currentCharacterIndex > data.offset
+                    ? currentCharacterIndex - 1
+                    : currentCharacterIndex);
+                break;
+            case EDITORS_COMMANDS.FontEditor.commands.alphabetNavigateNextChar.id:
+                setCurrentCharacterIndex(currentCharacterIndex + 1 < data.offset + data.characterCount
+                    ? currentCharacterIndex + 1
+                    : currentCharacterIndex);
+                break;
+            case EDITORS_COMMANDS.FontEditor.commands.alphabetNavigateLineUp.id:
+                setCurrentCharacterIndex(currentCharacterIndex - 16 >= data.offset
+                    ? currentCharacterIndex - 16
+                    : currentCharacterIndex);
+                break;
+            case EDITORS_COMMANDS.FontEditor.commands.swapColors.id:
+                const secColorIndex = secondaryColorIndex;
+                setSecondaryColorIndex(primaryColorIndex);
+                setPrimaryColorIndex(secColorIndex);
+                break;
+            case EDITORS_COMMANDS.FontEditor.commands.paletteSelectIndex1.id:
+                setPrimaryColorIndex(0);
+                break;
+            case EDITORS_COMMANDS.FontEditor.commands.paletteSelectIndex2.id:
+                setPrimaryColorIndex(1);
+                break;
+            case EDITORS_COMMANDS.FontEditor.commands.paletteSelectIndex3.id:
+                setPrimaryColorIndex(2);
+                break;
+            case EDITORS_COMMANDS.FontEditor.commands.paletteSelectIndex4.id:
+                setPrimaryColorIndex(3);
+                break;
         }
     };
 
@@ -277,11 +281,15 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
     ]);
 
     useEffect(() => {
-        document.addEventListener('keydown', keyEventListerner);
+        document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
         return () => {
-            document.removeEventListener('keydown', keyEventListerner);
+            document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
         };
-    }, []);
+    }, [
+        currentCharacterIndex,
+        primaryColorIndex,
+        secondaryColorIndex,
+    ]);
 
     useEffect(() => {
         if (!canvasContainerRef.current) {
@@ -300,10 +308,6 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
     return <div
         tabIndex={0}
         className={`font-editor width-${charPixelWidth} height-${charPixelHeight}`}
-        onFocus={() => setActive(true)}
-        onBlur={() => setActive(false)}
-        onMouseOver={() => setActive(true)}
-        onMouseOut={() => setActive(false)}
     >
         <div
             ref={canvasContainerRef}

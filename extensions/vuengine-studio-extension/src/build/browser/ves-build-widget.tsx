@@ -1,5 +1,5 @@
 import { CommandService, isWindows, nls } from '@theia/core';
-import { KeybindingRegistry, Message, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
+import { Message, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
@@ -36,8 +36,6 @@ export class VesBuildWidget extends ReactWidget {
   private readonly commandService: CommandService;
   @inject(EditorManager)
   private readonly editorManager: EditorManager;
-  @inject(KeybindingRegistry)
-  protected readonly keybindingRegistry!: KeybindingRegistry;
   @inject(PreferenceService)
   private readonly preferenceService: PreferenceService;
   @inject(VesBuildService)
@@ -227,7 +225,7 @@ export class VesBuildWidget extends ReactWidget {
               onClick={this.run}
               title={this.vesEmulatorService.isQueued
                 ? `${nls.localize('vuengine/emulator/runQueued', 'Run Queued')}...`
-                : `${nls.localize('vuengine/emulator/commands/run', 'Run on Emulator')}${this.getKeybindingLabel(VesEmulatorCommands.RUN.id, true)}`}
+                : `${nls.localize('vuengine/emulator/commands/run', 'Run on Emulator')}${this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.RUN.id, true)}`}
             >
               {this.vesEmulatorService.isQueued && <i className='fa fa-hourglass-half'></i>}
             </button>
@@ -236,7 +234,7 @@ export class VesBuildWidget extends ReactWidget {
               onClick={this.flash}
               title={this.vesFlashCartService.isQueued
                 ? `${nls.localize('vuengine/flashCarts/flashingQueued', 'Flashing Queued')}...`
-                : `${nls.localize('vuengine/flashCarts/commands/flash', 'Flash to Flash Cart')}${this.getKeybindingLabel(VesFlashCartCommands.FLASH.id, true)}`}
+                : `${nls.localize('vuengine/flashCarts/commands/flash', 'Flash to Flash Cart')}${this.vesCommonService.getKeybindingLabel(VesFlashCartCommands.FLASH.id, true)}`}
             >
               {this.vesFlashCartService.isQueued && <i className='fa fa-hourglass-half'></i>}
             </button>
@@ -245,7 +243,7 @@ export class VesBuildWidget extends ReactWidget {
               onClick={this.export}
               title={this.vesExportService.isQueued
                 ? `${nls.localize('vuengine/export/exportQueued', 'Export Queued')}...`
-                : `${nls.localize('vuengine/export/commands/export', 'Export ROM...')}${this.getKeybindingLabel(VesExportCommands.EXPORT.id, true)}`}
+                : `${nls.localize('vuengine/export/commands/export', 'Export ROM...')}${this.vesCommonService.getKeybindingLabel(VesExportCommands.EXPORT.id, true)}`}
             >
               {this.vesExportService.isQueued && <i className='fa fa-hourglass-half'></i>}
             </button>
@@ -254,7 +252,7 @@ export class VesBuildWidget extends ReactWidget {
               onClick={this.clean}
               title={this.vesBuildService.isCleaning
                 ? `${nls.localize('vuengine/build/cleaning', 'Cleaning')}...`
-                : `${nls.localize('vuengine/build/commands/clean', 'Clean Build Folder')}${this.getKeybindingLabel(VesBuildCommands.CLEAN.id, true)}`}
+                : `${nls.localize('vuengine/build/commands/clean', 'Clean Build Folder')}${this.vesCommonService.getKeybindingLabel(VesBuildCommands.CLEAN.id, true)}`}
             >
               {this.vesBuildService.isCleaning && <i className='fa fa-cog fa-spin'></i>}
             </button>
@@ -491,26 +489,6 @@ export class VesBuildWidget extends ReactWidget {
       editorWidget.editor.revealPosition(editorWidget.editor.cursor);
     }
   };
-
-  // TODO: move to common service
-  protected getKeybindingLabel(
-    commandId: string,
-    wrapInBrackets: boolean = false
-  ): string {
-    const keybinding = this.keybindingRegistry.getKeybindingsForCommand(commandId)[0];
-    let keybindingAccelerator = keybinding
-      ? this.keybindingRegistry.acceleratorFor(keybinding, '+').join(', ')
-      : '';
-
-    keybindingAccelerator = keybindingAccelerator
-      .replace(' ', nls.localize('vuengine/general/space', 'Space'));
-
-    if (wrapInBrackets && keybindingAccelerator !== '') {
-      keybindingAccelerator = ` (${keybindingAccelerator})`;
-    }
-
-    return keybindingAccelerator;
-  }
 
   protected build = () => {
     this.commandService.executeCommand(VesBuildCommands.BUILD.id);

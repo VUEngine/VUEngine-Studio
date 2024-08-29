@@ -62,7 +62,10 @@ export default function Alphabet(props: AlphabetProps): React.JSX.Element {
     return (
         <VContainer grow={1} overflow='hidden'>
             <label>
-                {nls.localize('vuengine/fontEditor/alphabet', 'Alphabet')}
+                {nls.localize('vuengine/fontEditor/alphabet', 'Alphabet')}{' '}
+                <span className="secondaryText">
+                    ({nls.localize('vuengine/fontEditor/alphabetNavigationDescription', 'Shift + Arrow Keys To Navigate')})
+                </span>
             </label>
             <VContainer style={{
                 overflowX: 'hidden',

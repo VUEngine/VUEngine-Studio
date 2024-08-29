@@ -41,14 +41,6 @@ export default function PaletteSelect(props: PaletteSelectProps): React.JSX.Elem
         }
     };
 
-    const onKeyDown = (e: KeyboardEvent): void => {
-        if (!e.repeat && e.code === 'KeyX') {
-            const secColor = secondaryColor;
-            setSecondaryColor(primaryColor);
-            setPrimaryColor(secColor);
-        }
-    };
-
     const handleMouseDown = (e: MouseEvent) => {
         if (e.buttons === 2) {
             changeBrushColor(paletteColors[secondaryColor]);
@@ -59,11 +51,9 @@ export default function PaletteSelect(props: PaletteSelectProps): React.JSX.Elem
     };
 
     useEffect(() => {
-        document.addEventListener('keydown', onKeyDown);
         addCanvasElementEventListener('mousedown', handleMouseDown);
         addCanvasElementEventListener('mouseup', handleMouseUp);
         return () => {
-            document.removeEventListener('keydown', onKeyDown);
             removeCanvasElementEventListener('mousedown', handleMouseDown);
             removeCanvasElementEventListener('mouseup', handleMouseUp);
         };

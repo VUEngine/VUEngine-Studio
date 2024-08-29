@@ -1,3 +1,7 @@
+[id^='vesEditorsWidget'] {
+  outline: none;
+}
+
 .jsonforms-container {
   --padding: calc(2 * var(--theia-ui-padding));
   box-sizing: border-box;

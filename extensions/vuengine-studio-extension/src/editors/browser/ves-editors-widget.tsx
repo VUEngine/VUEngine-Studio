@@ -33,7 +33,7 @@ import { VesProjectService } from '../../project/browser/ves-project-service';
 import { ProjectDataType } from '../../project/browser/ves-project-types';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
 import { VES_RENDERERS } from './renderers/ves-renderers';
-import { EditorsContext } from './ves-editors-types';
+import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext } from './ves-editors-types';
 
 export const VesEditorsWidgetOptions = Symbol('VesEditorsWidgetOptions');
 export interface VesEditorsWidgetOptions {
@@ -166,6 +166,12 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         this.setTitle();
     }
 
+    dispatchCommandEvent(commandId: string): void {
+        const resetInputsEvent = new CustomEvent(EDITORS_COMMAND_EXECUTED_EVENT_NAME, { detail: commandId });
+        // console.info(`Emitting event: EDITORS_COMMAND_EXECUTED_EVENT_NAME ${commandId}`);
+        document.dispatchEvent(resetInputsEvent);
+    }
+
     protected bindEvents(): void {
         this.onChange(d => {
             this.handleChanged(d);
@@ -254,6 +260,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     }
 
     protected onActivateRequest(msg: Message): void {
+        this.node.tabIndex = 0;
         this.node.focus();
     }
 
@@ -437,7 +444,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     }
 
     protected render(): React.ReactNode {
-        return <div className="jsonforms-container" tabIndex={0}>
+        return <div className="jsonforms-container">
             <div className={`${this.isLoading || this.isGenerating ? 'generatingOverlay isGenerating' : 'generatingOverlay'}`}>
                 <i className='codicon codicon-loading codicon-modifier-spin' />
                 {this.generatingProgress > -1 &&

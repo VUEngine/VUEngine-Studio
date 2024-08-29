@@ -1,5 +1,5 @@
 import { CommandContribution, MenuContribution } from '@theia/core';
-import { FrontendApplicationContribution, LabelProviderContribution, OpenHandler, PreferenceContribution, WidgetFactory } from '@theia/core/lib/browser';
+import { FrontendApplicationContribution, KeybindingContribution, LabelProviderContribution, OpenHandler, PreferenceContribution, WidgetFactory } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { ContainerModule } from '@theia/core/shared/inversify';
 import { WorkspaceCommandContribution } from '@theia/workspace/lib/browser';
@@ -28,6 +28,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(VesEditorsViewContribution).toSelf().inSingletonScope();
     bind(FrontendApplicationContribution).toService(VesEditorsViewContribution);
     bind(CommandContribution).toService(VesEditorsViewContribution);
+    bind(KeybindingContribution).toService(VesEditorsViewContribution);
     bind(MenuContribution).toService(VesEditorsViewContribution);
     bind(TabBarToolbarContribution).toService(VesEditorsViewContribution);
     bind(LabelProviderContribution).to(VesEditorsLabelProviderContribution).inSingletonScope();

@@ -1,5 +1,5 @@
 import { Command, CommandContribution, CommandRegistry, CommandService, MenuContribution, MenuModelRegistry, URI, UntitledResourceResolver } from '@theia/core';
-import { AbstractViewContribution, CommonCommands, OpenerService, Widget, open } from '@theia/core/lib/browser';
+import { AbstractViewContribution, CommonCommands, KeybindingRegistry, OpenerService, Widget, open } from '@theia/core/lib/browser';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { UserWorkingDirectoryProvider } from '@theia/core/lib/browser/user-working-directory-provider';
@@ -13,7 +13,7 @@ import { WorkspaceCommands } from '@theia/workspace/lib/browser';
 import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
-import { VesEditorsCommands } from './ves-editors-commands';
+import { EDITORS_COMMANDS, VesEditorsCommands } from './ves-editors-commands';
 import { VesEditorsContextKeyService } from './ves-editors-context-key-service';
 import { VesEditorsWidget } from './ves-editors-widget';
 
@@ -95,12 +95,23 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         });
 
         commandRegistry.registerHandler(CommonCommands.UNDO.id, {
-            isEnabled: () => this.shell.activeWidget instanceof VesEditorsWidget,
-            execute: () => (this.shell.activeWidget as VesEditorsWidget).undo()
+            isEnabled: () => this.shell.currentWidget instanceof VesEditorsWidget,
+            execute: () => (this.shell.currentWidget as VesEditorsWidget).undo()
         });
         commandRegistry.registerHandler(CommonCommands.REDO.id, {
-            isEnabled: () => this.shell.activeWidget instanceof VesEditorsWidget,
-            execute: () => (this.shell.activeWidget as VesEditorsWidget).redo()
+            isEnabled: () => this.shell.currentWidget instanceof VesEditorsWidget,
+            execute: () => (this.shell.currentWidget as VesEditorsWidget).redo()
+        });
+
+        commandRegistry.registerHandler(CommonCommands.COPY.id, {
+            isEnabled: () => this.shell.currentWidget instanceof VesEditorsWidget,
+            // @ts-ignore
+            execute: () => this.shell.currentWidget?.dispatchCommandEvent(CommonCommands.COPY.id),
+        });
+        commandRegistry.registerHandler(CommonCommands.PASTE.id, {
+            isEnabled: () => this.shell.currentWidget instanceof VesEditorsWidget,
+            // @ts-ignore
+            execute: () => this.shell.currentWidget?.dispatchCommandEvent(CommonCommands.PASTE.id),
         });
 
         await this.vesProjectService.projectDataReady;
@@ -164,6 +175,34 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                     await opener.open(u);
                 }
             },
+        });
+
+        Object.values(EDITORS_COMMANDS).map(category => {
+            Object.values(category.commands).map(command => {
+                commandRegistry.registerCommand({
+                    id: command.id,
+                    label: command.label,
+                    category: category.category,
+                }, {
+                    isEnabled: () => true,
+                    // @ts-ignore
+                    isVisible: () => this.shell.currentWidget?.typeId === category.typeId,
+                    // @ts-ignore
+                    execute: () => this.shell.currentWidget?.dispatchCommandEvent(command.id),
+                });
+            });
+        });
+    }
+
+    registerKeybindings(registry: KeybindingRegistry): void {
+        Object.values(EDITORS_COMMANDS).map(category => {
+            Object.values(category.commands).map(command => {
+                registry.registerKeybindings({
+                    command: command.id,
+                    when: 'graphicalEditorFocus',
+                    keybinding: command.keybinding,
+                });
+            });
         });
     }
 

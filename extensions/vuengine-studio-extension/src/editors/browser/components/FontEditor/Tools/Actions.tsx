@@ -1,8 +1,9 @@
 import { Clipboard, CopySimple, Trash } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
-import { ConfirmDialog } from '@theia/core/lib/browser';
+import { CommonCommands, ConfirmDialog } from '@theia/core/lib/browser';
 import { DottingRef, PixelModifyItem, useData, useDotting } from 'dotting';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../../ves-editors-types';
 import HContainer from '../../Common/HContainer';
 import { SpriteEditorTool } from '../../SpriteEditor/SpriteEditorTool';
 import ImportExport from './ImportExport';
@@ -32,6 +33,17 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
     const [clipboard, setClipboard] = useState<PixelModifyItem[][]>();
     const { clear, setData } = useDotting(dottingRef);
     const { dataArray } = useData(dottingRef);
+
+    const commandListener = (e: CustomEvent): void => {
+        switch (e.detail) {
+            case CommonCommands.COPY.id:
+                copy();
+                break;
+            case CommonCommands.PASTE.id:
+                paste();
+                break;
+        }
+    };
 
     const confirmClear = async (): Promise<void> => {
         const dialog = new ConfirmDialog({
@@ -113,6 +125,16 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
             applyPixelChanges(modifiedPixels);
         }
     };
+
+    useEffect(() => {
+        document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
+        return () => {
+            document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
+        };
+    }, [
+        clipboard,
+        applyPixelChanges,
+    ]);
 
     return <HContainer gap={2} wrap='wrap'>
         {/* }

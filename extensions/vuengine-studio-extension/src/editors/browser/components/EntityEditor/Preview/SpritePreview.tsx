@@ -139,34 +139,6 @@ export default function SpritePreview(props: SpritePreviewProps): React.JSX.Elem
     sprite._imageData,
   ]);
 
-  /*
-  const onKeyDown = (e: KeyboardEvent): void => {
-    console.log(ref.current?.contains(document.activeElement));
-    if (document.activeElement === ref.current) {
-      if (!e.repeat) {
-        switch (e.code) {
-          case 'ArrowUp':
-            return moveCurrentComponent(0, -1);
-          case 'ArrowDown':
-            return moveCurrentComponent(0, 1);
-          case 'ArrowLeft':
-            return moveCurrentComponent(-1, 0);
-          case 'ArrowRight':
-            return moveCurrentComponent(1, 0);
-        }
-      }
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener('keydown', onKeyDown);
-
-    return () => {
-      document.removeEventListener('keydown', onKeyDown);
-    };
-  }, []);
-  */
-
   return (
     <VContainer
       alignItems='center'

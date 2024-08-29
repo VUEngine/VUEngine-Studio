@@ -45,3 +45,5 @@ export interface EditorsContextType {
     setGeneratingProgress: (current: number, total: number) => void
     services: EditorsServices
 }
+
+export const EDITORS_COMMAND_EXECUTED_EVENT_NAME = 'vesEditorsCommandExecuted';

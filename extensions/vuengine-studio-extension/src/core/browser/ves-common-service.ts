@@ -1,4 +1,5 @@
-import { isOSX, isWindows } from '@theia/core';
+import { isOSX, isWindows, nls } from '@theia/core';
+import { KeybindingRegistry } from '@theia/core/lib/browser';
 import { EnvVariablesServer } from '@theia/core/lib/common/env-variables';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -10,6 +11,8 @@ import { VesProcessService, VesProcessType } from '../../process/common/ves-proc
 export class VesCommonService {
   @inject(EnvVariablesServer)
   protected envVariablesServer: EnvVariablesServer;
+  @inject(KeybindingRegistry)
+  protected readonly keybindingRegistry!: KeybindingRegistry;
   @inject(VesProcessService)
   protected readonly vesProcessService: VesProcessService;
   @inject(VesProcessWatcher)
@@ -135,6 +138,25 @@ export class VesCommonService {
       '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
       '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
     return !!urlPattern.test(url);
+  }
+
+  getKeybindingLabel(
+    commandId: string,
+    wrapInBrackets: boolean = false
+  ): string {
+    const keybinding = this.keybindingRegistry.getKeybindingsForCommand(commandId)[0];
+    let keybindingAccelerator = keybinding
+      ? this.keybindingRegistry.acceleratorFor(keybinding, '+').join(', ')
+      : '';
+
+    keybindingAccelerator = keybindingAccelerator
+      .replace(' ', nls.localize('vuengine/general/space', 'Space'));
+
+    if (wrapInBrackets && keybindingAccelerator !== '') {
+      keybindingAccelerator = ` (${keybindingAccelerator})`;
+    }
+
+    return keybindingAccelerator;
   }
 
   protected async determineIsWslInstalled(): Promise<void> {
