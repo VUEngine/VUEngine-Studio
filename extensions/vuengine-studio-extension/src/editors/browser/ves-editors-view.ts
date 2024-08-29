@@ -96,22 +96,26 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
 
         commandRegistry.registerHandler(CommonCommands.UNDO.id, {
             isEnabled: () => this.shell.currentWidget instanceof VesEditorsWidget,
-            execute: () => (this.shell.currentWidget as VesEditorsWidget).undo()
+            execute: () => {
+                (this.shell.currentWidget as VesEditorsWidget)?.undo();
+                (this.shell.currentWidget as VesEditorsWidget)?.dispatchCommandEvent(CommonCommands.UNDO.id);
+            }
         });
         commandRegistry.registerHandler(CommonCommands.REDO.id, {
             isEnabled: () => this.shell.currentWidget instanceof VesEditorsWidget,
-            execute: () => (this.shell.currentWidget as VesEditorsWidget).redo()
+            execute: () => {
+                (this.shell.currentWidget as VesEditorsWidget)?.redo();
+                (this.shell.currentWidget as VesEditorsWidget)?.dispatchCommandEvent(CommonCommands.REDO.id);
+            }
         });
 
         commandRegistry.registerHandler(CommonCommands.COPY.id, {
             isEnabled: () => this.shell.currentWidget instanceof VesEditorsWidget,
-            // @ts-ignore
-            execute: () => this.shell.currentWidget?.dispatchCommandEvent(CommonCommands.COPY.id),
+            execute: () => (this.shell.currentWidget as VesEditorsWidget)?.dispatchCommandEvent(CommonCommands.COPY.id),
         });
         commandRegistry.registerHandler(CommonCommands.PASTE.id, {
             isEnabled: () => this.shell.currentWidget instanceof VesEditorsWidget,
-            // @ts-ignore
-            execute: () => this.shell.currentWidget?.dispatchCommandEvent(CommonCommands.PASTE.id),
+            execute: () => (this.shell.currentWidget as VesEditorsWidget)?.dispatchCommandEvent(CommonCommands.PASTE.id),
         });
 
         await this.vesProjectService.projectDataReady;
@@ -185,10 +189,8 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                     category: category.category,
                 }, {
                     isEnabled: () => true,
-                    // @ts-ignore
-                    isVisible: () => this.shell.currentWidget?.typeId === category.typeId,
-                    // @ts-ignore
-                    execute: () => this.shell.currentWidget?.dispatchCommandEvent(command.id),
+                    isVisible: () => (this.shell.currentWidget as VesEditorsWidget)?.typeId === category.typeId,
+                    execute: () => (this.shell.currentWidget as VesEditorsWidget)?.dispatchCommandEvent(command.id),
                 });
             });
         });

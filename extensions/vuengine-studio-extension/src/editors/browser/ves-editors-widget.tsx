@@ -21,6 +21,7 @@ import { Message } from '@theia/core/shared/@phosphor/messaging';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { EditorPreferences } from '@theia/editor/lib/browser';
+import { UndoRedoService } from '@theia/editor/lib/browser/undo-redo-service';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { MonacoEditorModel } from '@theia/monaco/lib/browser/monaco-editor-model';
@@ -73,6 +74,8 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     protected readonly quickPickService: QuickPickService;
     @inject(PreferenceService)
     protected readonly preferenceService: PreferenceService;
+    @inject(UndoRedoService)
+    protected readonly undoRedoService: UndoRedoService;
     @inject(VesCommonService)
     protected readonly vesCommonService: VesCommonService;
     @inject(VesEditorsWidgetOptions)
@@ -94,6 +97,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     protected schema: JsonSchema | undefined;
     protected uiSchema: UISchemaElement | undefined;
     private jsonformsOnChange: (state: Pick<JsonFormsCore, 'data' | 'errors'>) => void;
+    private justAppliedUndoRedo = false;
 
     public dirty = false;
 
@@ -285,7 +289,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
             return;
         }
 
-        // ...
+        this.undoRedoService.undo(this.uri);
     }
 
     redo(): void {
@@ -293,7 +297,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
             return;
         }
 
-        // ...
+        this.undoRedoService.redo(this.uri);
     }
 
     async save(): Promise<void> {
@@ -439,7 +443,28 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     }
 
     protected handleChanged(data: ItemData): void {
+        if (this.justAppliedUndoRedo) {
+            this.justAppliedUndoRedo = false;
+            return;
+        }
+
+        const oldData = this.data;
         this.data = data;
+        this.undoRedoService.pushElement(this.uri,
+            async () => {
+                this.data = oldData;
+                this.setDirty(this.dataHasBeenChanged());
+                this.justAppliedUndoRedo = true;
+                this.update();
+            },
+            async () => {
+                this.data = data;
+                this.setDirty(this.dataHasBeenChanged());
+                this.justAppliedUndoRedo = true;
+                this.update();
+            },
+        );
+
         this.setDirty(this.dataHasBeenChanged());
     }
 

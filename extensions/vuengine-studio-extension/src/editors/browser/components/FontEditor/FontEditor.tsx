@@ -1,5 +1,6 @@
 /* eslint-disable no-null/no-null */
 import { nls } from '@theia/core';
+import { CommonCommands } from '@theia/core/lib/browser';
 import { CanvasDataChangeHandler, Dotting, DottingRef, PixelModifyItem, useDotting, useHandlers } from 'dotting';
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
@@ -65,7 +66,7 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
     const [canvasWidth, setCanvasWidth] = useState<number | string>('100%');
     const canvasContainerRef = useRef<HTMLDivElement>(null);
     const dottingRef = useRef<DottingRef>(null);
-    const { setData } = useDotting(dottingRef);
+    const { setData, undo, redo } = useDotting(dottingRef);
     const { addDataChangeListener, removeDataChangeListener } = useHandlers(dottingRef);
 
     const charPixelWidth = data.size.x * CHAR_PIXEL_SIZE;
@@ -75,6 +76,12 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
 
     const commandListener = (e: CustomEvent): void => {
         switch (e.detail) {
+            case CommonCommands.UNDO.id:
+                undo();
+                break;
+            case CommonCommands.REDO.id:
+                redo();
+                break;
             case EDITORS_COMMANDS.FontEditor.commands.alphabetNavigateLineDown.id:
                 setCurrentCharacterIndex(currentCharacterIndex + 16 < data.offset + data.characterCount
                     ? currentCharacterIndex + 16
