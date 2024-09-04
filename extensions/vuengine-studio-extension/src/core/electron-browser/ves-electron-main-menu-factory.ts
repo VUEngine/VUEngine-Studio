@@ -7,7 +7,7 @@ import { injectable } from '@theia/core/shared/inversify';
 export class VesElectronMainMenuFactory extends ElectronMainMenuFactory {
     createElectronMenuBar(): MenuDto[] | undefined {
         const menuModel = this.menuProvider.getMenu(MAIN_MENU_BAR);
-        this._menu = this.fillMenuTemplate([], menuModel, [], { /* honorDisabled: false, */ rootMenuPath: MAIN_MENU_BAR });
+        this._menu = this.fillMenuTemplate([], menuModel, [], { /* honorDisabled: false, */ rootMenuPath: MAIN_MENU_BAR }, false);
         if (isOSX) {
             this._menu.unshift(this.createOSXMenu());
         }
