@@ -75,7 +75,6 @@
   },
   "dependencies": {
     "@theia/bulk-edit": "1.53.0",
-    "@theia/collaboration": "1.53.0",
     "@theia/console": "1.53.0",
     "@theia/core": "1.53.0",
     "@theia/debug": "1.53.0",
