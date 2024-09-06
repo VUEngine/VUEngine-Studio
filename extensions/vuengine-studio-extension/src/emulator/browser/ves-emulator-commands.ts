@@ -3,7 +3,7 @@ import { Command } from '@theia/core';
 export namespace VesEmulatorCommands {
   export const RUN: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:run',
+      id: 'emulator.run',
       label: 'Run on Emulator',
       category: 'Emulator',
     },
@@ -13,7 +13,7 @@ export namespace VesEmulatorCommands {
 
   export const SELECT: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:selectEmulator',
+      id: 'emulator.selectEmulator',
       label: 'Set Default Emulator Config...',
       category: 'Emulator',
     },
@@ -23,7 +23,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_L_UP: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:controller:lUp',
+      id: 'emulator.input.controller.lUp',
       label: 'Left D-Pad ⇧',
       category: 'Emulator Game Pad',
     },
@@ -33,7 +33,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_L_RIGHT: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:controller:lRight',
+      id: 'emulator.input.controller.lRight',
       label: 'Left D-Pad ⇨',
       category: 'Emulator Game Pad',
     },
@@ -43,7 +43,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_L_DOWN: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:controller:lDown',
+      id: 'emulator.input.controller.lDown',
       label: 'Left D-Pad ⇩',
       category: 'Emulator Game Pad',
     },
@@ -53,7 +53,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_L_LEFT: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:controller:lLeft',
+      id: 'emulator.input.controller.lLeft',
       label: 'Left D-Pad ⇦',
       category: 'Emulator Game Pad',
     },
@@ -63,7 +63,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_START: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:controller:start',
+      id: 'emulator.input.controller.start',
       label: 'Start',
       category: 'Emulator Game Pad',
     },
@@ -73,7 +73,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_SELECT: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:controller:select',
+      id: 'emulator.input.controller.select',
       label: 'Select',
       category: 'Emulator Game Pad',
     },
@@ -83,7 +83,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_L_TRIGGER: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:controller:lTrigger',
+      id: 'emulator.input.controller.lTrigger',
       label: 'Left Trigger',
       category: 'Emulator Game Pad',
     },
@@ -93,7 +93,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_R_UP: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:controller:rUp',
+      id: 'emulator.input.controller.rUp',
       label: 'Right D-Pad ⇧',
       category: 'Emulator Game Pad',
     },
@@ -103,7 +103,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_R_RIGHT: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:controller:rRight',
+      id: 'emulator.input.controller.rRight',
       label: 'Right D-Pad ⇨',
       category: 'Emulator Game Pad',
     },
@@ -113,7 +113,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_R_DOWN: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:controller:rDown',
+      id: 'emulator.input.controller.rDown',
       label: 'Right D-Pad ⇩',
       category: 'Emulator Game Pad',
     },
@@ -123,7 +123,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_R_LEFT: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:controller:rLeft',
+      id: 'emulator.input.controller.rLeft',
       label: 'Right D-Pad ⇦',
       category: 'Emulator Game Pad',
     },
@@ -133,7 +133,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_B: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:controller:b',
+      id: 'emulator.input.controller.b',
       label: 'B',
       category: 'Emulator Game Pad',
     },
@@ -143,7 +143,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_A: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:controller:a',
+      id: 'emulator.input.controller.a',
       label: 'A',
       category: 'Emulator Game Pad',
     },
@@ -153,7 +153,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_R_TRIGGER: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:controller:rTrigger',
+      id: 'emulator.input.controller.rTrigger',
       label: 'Right Trigger',
       category: 'Emulator Game Pad',
     },
@@ -163,7 +163,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_SAVE_STATE: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:saveState',
+      id: 'emulator.input.saveState',
       label: 'Save State',
       category: 'Emulator',
     },
@@ -173,7 +173,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_LOAD_STATE: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:loadState',
+      id: 'emulator.input.loadState',
       label: 'Load State',
       category: 'Emulator',
     },
@@ -183,7 +183,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_STATE_SLOT_DECREASE: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:stateSlotDecrease',
+      id: 'emulator.input.stateSlotDecrease',
       label: 'Decrease Save State Slot',
       category: 'Emulator',
     },
@@ -193,7 +193,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_STATE_SLOT_INCREASE: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:stateSlotIncrease',
+      id: 'emulator.input.stateSlotIncrease',
       label: 'Increase Save State Slot',
       category: 'Emulator',
     },
@@ -203,7 +203,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_TOGGLE_FAST_FORWARD: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:toggleFastForward',
+      id: 'emulator.input.toggleFastForward',
       label: 'Toggle Fast Forward',
       category: 'Emulator',
     },
@@ -213,7 +213,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_PAUSE_TOGGLE: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:pauseToggle',
+      id: 'emulator.input.pauseToggle',
       label: 'Toggle Pause',
       category: 'Emulator',
     },
@@ -223,7 +223,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_TOGGLE_SLOWMOTION: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:toggleSlowmotion',
+      id: 'emulator.input.toggleSlowmotion',
       label: 'Toggle Slow Motion',
       category: 'Emulator',
     },
@@ -233,7 +233,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_TOGGLE_LOW_POWER: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:toggleLowPower',
+      id: 'emulator.input.toggleLowPower',
       label: 'Toggle Low Power Signal',
       category: 'Emulator',
     },
@@ -243,7 +243,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_REWIND: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:rewind',
+      id: 'emulator.input.rewind',
       label: 'Rewind',
       category: 'Emulator',
     },
@@ -253,7 +253,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_FRAME_ADVANCE: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:frameAdvance',
+      id: 'emulator.input.frameAdvance',
       label: 'Frame Advance',
       category: 'Emulator',
     },
@@ -263,7 +263,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_RESET: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:reset',
+      id: 'emulator.input.reset',
       label: 'Reset',
       category: 'Emulator',
     },
@@ -273,7 +273,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_AUDIO_MUTE: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:audioMute',
+      id: 'emulator.input.audioMute',
       label: 'Audio Mute',
       category: 'Emulator',
     },
@@ -283,7 +283,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_FULLSCREEN: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:fullscreen',
+      id: 'emulator.input.fullscreen',
       label: 'Fullscreen',
       category: 'Emulator',
     },
@@ -293,7 +293,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_TOGGLE_CONTROLS_OVERLAY: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:toggleControlsOverlay',
+      id: 'emulator.input.toggleControlsOverlay',
       label: 'Toggle Controls Overlay',
       category: 'Emulator',
     },
@@ -303,7 +303,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_SCREENSHOT: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:screenshot',
+      id: 'emulator.input.screenshot',
       label: 'Take Screenshot',
       category: 'Emulator',
     },
@@ -313,7 +313,7 @@ export namespace VesEmulatorCommands {
 
   export const INPUT_DUMP_SRAM: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:input:dumpSram',
+      id: 'emulator.input.dumpSram',
       label: 'Dump SRAM',
       category: 'Emulator',
     },
@@ -323,7 +323,7 @@ export namespace VesEmulatorCommands {
 
   export const WIDGET_HELP: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:showHelp',
+      id: 'emulator.showHelp',
       label: 'Show Handbook Page',
       category: 'Emulator',
       iconClass: 'codicon codicon-book',
@@ -334,7 +334,7 @@ export namespace VesEmulatorCommands {
 
   export const WIDGET_SETTINGS: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:showSettings',
+      id: 'emulator.showSettings',
       label: 'Show Emulator Preferences',
       category: 'Emulator',
       iconClass: 'codicon codicon-settings',
@@ -345,7 +345,7 @@ export namespace VesEmulatorCommands {
 
   export const CANCEL_RED_VIPER_TRANSFER: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:emulator:cancelRedViperTransfer',
+      id: 'emulator.cancelRedViperTransfer',
       label: 'Cancel Red Viper Transfer',
       category: 'Emulator',
       iconClass: 'codicon codicon-close',

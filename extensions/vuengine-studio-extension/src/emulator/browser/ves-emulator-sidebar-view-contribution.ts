@@ -9,7 +9,7 @@ import { VesCoreCommands } from '../../core/browser/ves-core-commands';
 export namespace VesEmulatorSidebarCommands {
     export const WIDGET_TOGGLE: Command = Command.toLocalizedCommand(
         {
-            id: 'ves:emulatorSidebar:toggleView',
+            id: 'emulatorSidebar.toggleView',
             label: 'Toggle Emulator View',
         },
         'vuengine/emulator/sidebar/commands/toggleView',
@@ -18,7 +18,7 @@ export namespace VesEmulatorSidebarCommands {
 
     export const WIDGET_EXPAND: Command = Command.toLocalizedCommand(
         {
-            id: 'ves:emulatorSidebar:expandView',
+            id: 'emulatorSidebar.expandView',
             label: 'Toggle Maximized',
             iconClass: 'codicon codicon-arrow-both',
         },
@@ -28,7 +28,7 @@ export namespace VesEmulatorSidebarCommands {
 
     export const WIDGET_HELP: Command = Command.toLocalizedCommand(
         {
-            id: 'ves:emulatorSidebar:showHelp',
+            id: 'emulatorSidebar.showHelp',
             label: 'Show Handbook Page',
             iconClass: 'codicon codicon-book',
         },

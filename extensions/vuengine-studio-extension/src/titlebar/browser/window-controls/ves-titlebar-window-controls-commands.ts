@@ -3,7 +3,7 @@ import { Command } from '@theia/core';
 export namespace VesTitlebarWindowControlCommands {
   export const MINIMIZE: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:titlebar:minimizeWindow',
+      id: 'titlebar.minimizeWindow',
       label: 'Minimize Window',
       category: 'Window',
       iconClass: 'window-minimize',
@@ -14,7 +14,7 @@ export namespace VesTitlebarWindowControlCommands {
 
   export const MAXIMIZE: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:titlebar:maximizeWindow',
+      id: 'titlebar.maximizeWindow',
       label: 'Maximize Window',
       category: 'Window',
       iconClass: 'window-maximize',
@@ -25,7 +25,7 @@ export namespace VesTitlebarWindowControlCommands {
 
   export const UNMAXIMIZE: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:titlebar:unmaximizeWindow',
+      id: 'titlebar.unmaximizeWindow',
       label: 'Unmaximize Window',
       category: 'Window',
       iconClass: 'window-unmaximize',

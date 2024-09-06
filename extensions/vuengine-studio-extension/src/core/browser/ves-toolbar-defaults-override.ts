@@ -1,41 +1,48 @@
+import { CommonCommands, quickCommand } from '@theia/core/lib/browser';
+import { EditorCommands } from '@theia/editor/lib/browser';
 import { DeflatedToolbarTree, ToolbarAlignment } from '@theia/toolbar/lib/browser/toolbar-interfaces';
+import { VesBuildCommands } from '../../build/browser/ves-build-commands';
+import { VesCodeGenCommands } from '../../codegen/browser/ves-codegen-commands';
+import { VesEmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
+import { VesExportCommands } from '../../export/browser/ves-export-commands';
+import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
 
 export const VesToolbarDefaultsOverride: () => DeflatedToolbarTree = () => ({
     items: {
         [ToolbarAlignment.LEFT]: [
             [
                 {
-                    'id': 'textEditor.commands.go.back',
-                    'command': 'textEditor.commands.go.back',
+                    'id': EditorCommands.GO_BACK.id,
+                    'command': EditorCommands.GO_BACK.id,
                     'icon': 'codicon codicon-arrow-left'
                 },
                 {
-                    'id': 'textEditor.commands.go.forward',
-                    'command': 'textEditor.commands.go.forward',
+                    'id': EditorCommands.GO_FORWARD.id,
+                    'command': EditorCommands.GO_FORWARD.id,
                     'icon': 'codicon codicon-arrow-right'
                 }
             ],
             [
                 {
-                    'id': 'core.save',
-                    'command': 'core.save',
+                    'id': CommonCommands.SAVE.id,
+                    'command': CommonCommands.SAVE.id,
                     'icon': 'codicon codicon-save'
                 },
                 {
-                    'id': 'core.undo',
-                    'command': 'core.undo',
+                    'id': CommonCommands.UNDO.id,
+                    'command': CommonCommands.UNDO.id,
                     'icon': 'codicon codicon-discard'
                 },
                 {
-                    'id': 'core.redo',
-                    'command': 'core.redo',
+                    'id': CommonCommands.REDO.id,
+                    'command': CommonCommands.REDO.id,
                     'icon': 'codicon codicon-redo'
                 }
             ],
             [
                 {
-                    'id': 'workbench.action.showCommands',
-                    'command': 'workbench.action.showCommands',
+                    'id': quickCommand.id,
+                    'command': quickCommand.id,
                     'icon': 'codicon codicon-terminal',
                     'tooltip': 'Command Palette'
                 }
@@ -46,37 +53,37 @@ export const VesToolbarDefaultsOverride: () => DeflatedToolbarTree = () => ({
         [ToolbarAlignment.RIGHT]: [
             [
                 {
-                    'id': 'ves:build:build',
-                    'command': 'ves:build:build',
+                    'id': VesBuildCommands.BUILD.id,
+                    'command': VesBuildCommands.BUILD.id,
                     'icon': 'codicon codicon-symbol-property'
                 },
                 {
-                    'id': 'ves:emulator:run',
-                    'command': 'ves:emulator:run',
+                    'id': VesEmulatorCommands.RUN.id,
+                    'command': VesEmulatorCommands.RUN.id,
                     'icon': 'codicon codicon-run'
                 },
                 {
-                    'id': 'ves:flashCarts:flash',
-                    'command': 'ves:flashCarts:flash',
+                    'id': VesFlashCartCommands.FLASH.id,
+                    'command': VesFlashCartCommands.FLASH.id,
                     'icon': 'codicon codicon-empty-window codicon-rotate-180'
                 }
             ],
             [
                 {
-                    'id': 'ves:export:export',
-                    'command': 'ves:export:export',
+                    'id': VesExportCommands.EXPORT.id,
+                    'command': VesExportCommands.EXPORT.id,
                     'icon': 'codicon codicon-desktop-download'
                 },
                 {
-                    'id': 'ves:build:clean',
-                    'command': 'ves:build:clean',
+                    'id': VesBuildCommands.CLEAN.id,
+                    'command': VesBuildCommands.CLEAN.id,
                     'icon': 'codicon codicon-trash'
                 }
             ],
             [
                 {
-                    'id': 'ves:codegen:generateFiles',
-                    'command': 'ves:codegen:generateFiles',
+                    'id': VesCodeGenCommands.GENERATE_FILES.id,
+                    'command': VesCodeGenCommands.GENERATE_FILES.id,
                     'icon': 'codicon codicon-server-process'
                 }
             ]

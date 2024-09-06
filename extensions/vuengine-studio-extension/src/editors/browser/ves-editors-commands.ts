@@ -3,7 +3,7 @@ import { Command, nls } from '@theia/core';
 export namespace VesEditorsCommands {
     export const GENERATE: Command = Command.toLocalizedCommand(
         {
-            id: 'ves:editors:generate',
+            id: 'editors.generate',
             label: 'Generate File(s)',
             category: 'Editor',
             iconClass: 'codicon codicon-server-process',
@@ -13,7 +13,7 @@ export namespace VesEditorsCommands {
     );
     export const OPEN_IN_EDITOR: Command = Command.toLocalizedCommand(
         {
-            id: 'ves:editors:openInEditor',
+            id: 'editors.openInEditor',
             label: 'Open in graphical editor',
             category: 'Editor',
             iconClass: 'codicon codicon-preview',
@@ -23,7 +23,7 @@ export namespace VesEditorsCommands {
     );
     export const OPEN_SOURCE: Command = Command.toLocalizedCommand(
         {
-            id: 'ves:editors:showSource',
+            id: 'editors.showSource',
             label: 'Show Source',
             category: 'Editor',
             iconClass: 'codicon codicon-json',
@@ -34,7 +34,7 @@ export namespace VesEditorsCommands {
 
     export const GENERATE_ID: Command = Command.toLocalizedCommand(
         {
-            id: 'ves:editors:generateId',
+            id: 'editors.generateId',
             label: 'Generate new item ID',
             category: 'Editor',
             iconClass: 'codicon codicon-gear'
@@ -47,52 +47,77 @@ export namespace VesEditorsCommands {
 export const EDITORS_COMMANDS = {
     'FontEditor': {
         typeId: 'Font',
-        category: nls.localize('Font Editor', 'vuengine/editors/commands/fontEditor/category'),
+        category: nls.localize('vuengine/editors/commands/fontEditor/category', 'Font Editor'),
         commands: {
             paletteSelectIndex1: {
-                id: 'ves:editors:fontEditor:paletteSelectIndex1',
-                label: nls.localize('Select Palette Index 1', 'vuengine/editors/commands/fontEditor/paletteSelectIndex1'),
+                id: 'editors.fontEditor.paletteSelectIndex1',
+                label: nls.localize('vuengine/editors/commands/fontEditor/paletteSelectIndex1', 'Select Palette Index 1'),
                 keybinding: '1',
             },
             paletteSelectIndex2: {
-                id: 'ves:editors:fontEditor:paletteSelectIndex2',
-                label: nls.localize('Select Palette Index 2', 'vuengine/editors/commands/fontEditor/paletteSelectIndex2'),
+                id: 'editors.fontEditor.paletteSelectIndex2',
+                label: nls.localize('vuengine/editors/commands/fontEditor/paletteSelectIndex2', 'Select Palette Index 2'),
                 keybinding: '2',
             },
             paletteSelectIndex3: {
-                id: 'ves:editors:fontEditor:paletteSelectIndex3',
-                label: nls.localize('Select Palette Index 3', 'vuengine/editors/commands/fontEditor/paletteSelectIndex1'),
+                id: 'editors.fontEditor.paletteSelectIndex3',
+                label: nls.localize('vuengine/editors/commands/fontEditor/paletteSelectIndex3', 'Select Palette Index 3'),
                 keybinding: '3',
             },
             paletteSelectIndex4: {
-                id: 'ves:editors:fontEditor:paletteSelectIndex4',
-                label: nls.localize('Select Palette Index 4', 'vuengine/editors/commands/fontEditor/paletteSelectIndex1'),
+                id: 'editors.fontEditor.paletteSelectIndex4',
+                label: nls.localize('vuengine/editors/commands/fontEditor/paletteSelectIndex4', 'Select Palette Index 4'),
                 keybinding: '4',
             },
             swapColors: {
-                id: 'ves:editors:fontEditor:swapColors',
-                label: nls.localize('Swap Colors', 'vuengine/editors/commands/fontEditor/swapColors'),
+                id: 'editors.fontEditor.swapColors',
+                label: nls.localize('vuengine/editors/commands/fontEditor/swapColors', 'Swap Colors'),
                 keybinding: 'x',
             },
             alphabetNavigatePrevChar: {
-                id: 'ves:editors:fontEditor:alphabetNavigatePrevChar',
-                label: nls.localize('Alphabet: Navigate Previous Character', 'vuengine/editors/commands/fontEditor/alphabetNavigatePrevChar'),
+                id: 'editors.fontEditor.alphabetNavigatePrevChar',
+                label: nls.localize('vuengine/editors/commands/fontEditor/alphabetNavigatePrevChar', 'Alphabet: Navigate Previous Character'),
                 keybinding: 'shift+left',
             },
             alphabetNavigateNextChar: {
-                id: 'ves:editors:fontEditor:alphabetNavigateNextChar',
-                label: nls.localize('Alphabet: Navigate Next Character', 'vuengine/editors/commands/fontEditor/alphabetNavigateNextChar'),
+                id: 'editors.fontEditor.alphabetNavigateNextChar',
+                label: nls.localize('vuengine/editors/commands/fontEditor/alphabetNavigateNextChar', 'Alphabet: Navigate Next Character'),
                 keybinding: 'shift+right',
             },
             alphabetNavigateLineUp: {
-                id: 'ves:editors:fontEditor:alphabetNavigateLineUp',
-                label: nls.localize('Alphabet: Navigate Line Up', 'vuengine/editors/commands/fontEditor/alphabetNavigateLineUp'),
+                id: 'editors.fontEditor.alphabetNavigateLineUp',
+                label: nls.localize('vuengine/editors/commands/fontEditor/alphabetNavigateLineUp', 'Alphabet: Navigate Line Up'),
                 keybinding: 'shift+up',
             },
             alphabetNavigateLineDown: {
-                id: 'ves:editors:fontEditor:alphabetNavigateLineDown',
-                label: nls.localize('Alphabet: Navigate Line Down', 'vuengine/editors/commands/fontEditor/alphabetNavigateLineDown'),
+                id: 'editors.fontEditor.alphabetNavigateLineDown',
+                label: nls.localize('vuengine/editors/commands/fontEditor/alphabetNavigateLineDown', 'Alphabet: Navigate Line Down'),
                 keybinding: 'shift+down',
+            },
+            toolDrag: {
+                id: 'editors.fontEditor.toolDrag',
+                label: nls.localize('vuengine/editors/commands/fontEditor/toolDrag', 'Tool: Drag'),
+                keybinding: 'v',
+            },
+            toolPencil: {
+                id: 'editors.fontEditor.toolPencil',
+                label: nls.localize('vuengine/editors/commands/fontEditor/toolPencil', 'Tool: Pencil'),
+                keybinding: 'b',
+            },
+            toolEraser: {
+                id: 'editors.fontEditor.toolEraser',
+                label: nls.localize('vuengine/editors/commands/fontEditor/toolEraser', 'Tool: Eraser'),
+                keybinding: 'e',
+            },
+            toolPaintBucket: {
+                id: 'editors.fontEditor.toolPaintBucket',
+                label: nls.localize('vuengine/editors/commands/fontEditor/toolPaintBucket', 'Tool: Paint Bucket'),
+                keybinding: 'g',
+            },
+            toolMarquee: {
+                id: 'editors.fontEditor.toolMarquee',
+                label: nls.localize('vuengine/editors/commands/fontEditor/toolMarquee', 'Tool: Marquee'),
+                keybinding: 'm',
             },
         },
     },

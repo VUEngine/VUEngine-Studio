@@ -3,7 +3,7 @@ import { Command } from '@theia/core';
 export namespace VesMigrateCommands {
   export const MIGRATE: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:migrate:migrate',
+      id: 'migrate.migrate',
       label: 'Migrate Project',
       category: 'Projects',
     },

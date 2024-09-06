@@ -3,7 +3,7 @@ import { Command } from '@theia/core';
 export namespace VesBuildCommands {
   export const BUILD: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:build:build',
+      id: 'build.build',
       label: 'Build Project',
       category: 'Build',
     },
@@ -13,7 +13,7 @@ export namespace VesBuildCommands {
 
   export const CLEAN: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:build:clean',
+      id: 'build.clean',
       label: 'Clean Build Folder',
       category: 'Build',
     },
@@ -23,7 +23,7 @@ export namespace VesBuildCommands {
 
   export const SET_MODE: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:build:setMode',
+      id: 'build.setMode',
       label: 'Set Build Mode...',
       category: 'Build',
     },
@@ -33,7 +33,7 @@ export namespace VesBuildCommands {
 
   export const TOGGLE_DUMP_ELF: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:build:toggleDumpElf',
+      id: 'build.toggleDumpElf',
       label: 'Toggle Dump ELF',
       category: 'Build',
     },
@@ -43,7 +43,7 @@ export namespace VesBuildCommands {
 
   export const TOGGLE_PEDANTIC_WARNINGS: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:build:togglePedanticWarnings',
+      id: 'build.togglePedanticWarnings',
       label: 'Toggle Pedantic Warnings',
       category: 'Build',
     },
@@ -53,7 +53,7 @@ export namespace VesBuildCommands {
 
   export const WIDGET_TOGGLE: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:build:toggleView',
+      id: 'build.toggleView',
       label: 'Toggle Build View',
     },
     'vuengine/build/commands/toggleView',
@@ -62,7 +62,7 @@ export namespace VesBuildCommands {
 
   export const WIDGET_EXPAND: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:build:expandView',
+      id: 'build.expandView',
       label: 'Toggle Maximized',
       iconClass: 'codicon codicon-arrow-both',
     },
@@ -72,7 +72,7 @@ export namespace VesBuildCommands {
 
   export const WIDGET_HELP: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:build:showHelp',
+      id: 'build.showHelp',
       label: 'Show Handbook Page',
       iconClass: 'codicon codicon-book',
     },
@@ -82,7 +82,7 @@ export namespace VesBuildCommands {
 
   export const WIDGET_SETTINGS: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:build:showSettings',
+      id: 'build.showSettings',
       label: 'Show Build Preferences',
       iconClass: 'codicon codicon-settings',
     },

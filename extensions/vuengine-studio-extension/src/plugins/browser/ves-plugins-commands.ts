@@ -3,7 +3,7 @@ import { Command } from '@theia/core';
 export namespace VesPluginsCommands {
     export const NEW: Command = Command.toLocalizedCommand(
         {
-            id: 'ves:plugins:new',
+            id: 'plugins.new',
             label: 'New Plugin',
             category: 'Plugins',
         },
@@ -13,7 +13,7 @@ export namespace VesPluginsCommands {
 
     export const SHOW_TAGS: Command = Command.toLocalizedCommand(
         {
-            id: 'ves:plugins:showTags',
+            id: 'plugins.showTags',
             label: 'Show Plugin Tags',
             category: 'Plugins',
         },
@@ -23,7 +23,7 @@ export namespace VesPluginsCommands {
 
     export const SHOW_INSTALLED: Command = Command.toLocalizedCommand(
         {
-            id: 'ves:plugins:showInstalled',
+            id: 'plugins.showInstalled',
             label: 'Show Installed Plugins',
             category: 'Plugins',
         },
@@ -33,7 +33,7 @@ export namespace VesPluginsCommands {
 
     export const SHOW_RECOMMENDATIONS: Command = Command.toLocalizedCommand(
         {
-            id: 'ves:plugins:showRecommendations',
+            id: 'plugins.showRecommendations',
             label: 'Show Recommended Plugins',
             category: 'Plugins',
         },
@@ -43,7 +43,7 @@ export namespace VesPluginsCommands {
 
     export const SEARCH_BY_TAG: Command = Command.toLocalizedCommand(
         {
-            id: 'ves:plugins:searchByTag',
+            id: 'plugins.searchByTag',
             label: 'Search By Tag',
             category: 'Plugins',
         },
@@ -53,7 +53,7 @@ export namespace VesPluginsCommands {
 
     export const SEARCH_BY_AUTHOR: Command = Command.toLocalizedCommand(
         {
-            id: 'ves:plugins:searchByAuthor',
+            id: 'plugins.searchByAuthor',
             label: 'Search By Author',
             category: 'Plugins',
         },
@@ -64,7 +64,7 @@ export namespace VesPluginsCommands {
 
     export const WIDGET_TOGGLE: Command = Command.toLocalizedCommand(
         {
-            id: 'ves:plugins:toggleView',
+            id: 'plugins.toggleView',
             label: 'Toggle Plugins View',
         },
         'vuengine/plugins/commands/toggleView',
@@ -73,7 +73,7 @@ export namespace VesPluginsCommands {
 
     export const WIDGET_CLEAR_ALL: Command = Command.toLocalizedCommand(
         {
-            id: 'ves:plugins:clearAll',
+            id: 'plugins.clearAll',
             label: 'Clear Search Results',
             iconClass: 'codicon codicon-clear-all',
             category: 'Plugins',
@@ -84,7 +84,7 @@ export namespace VesPluginsCommands {
 
     export const WIDGET_HELP: Command = Command.toLocalizedCommand(
         {
-            id: 'ves:plugins:showHelp',
+            id: 'plugins.showHelp',
             label: 'Show Handbook Page',
             iconClass: 'codicon codicon-book',
             category: 'Plugins',
@@ -95,7 +95,7 @@ export namespace VesPluginsCommands {
 
     export const WIDGET_SETTINGS: Command = Command.toLocalizedCommand(
         {
-            id: 'ves:plugins:showSettings',
+            id: 'plugins.showSettings',
             label: 'Show Plugins Preferences',
             iconClass: 'codicon codicon-settings',
             category: 'Plugins',

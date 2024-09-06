@@ -3,7 +3,7 @@ import { Command } from '@theia/core';
 export namespace VesCodeGenCommands {
   export const GENERATE_FILES: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:codegen:generateFiles',
+      id: 'codegen.generateFiles',
       label: 'Generate Files...',
       category: 'Code Generator',
     },
@@ -13,7 +13,7 @@ export namespace VesCodeGenCommands {
 
   export const SHOW_OUTPUT_CHANNEL: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:codegen:showOutput',
+      id: 'codegen.showOutput',
       label: 'Show Output',
       category: 'Code Generator',
     },

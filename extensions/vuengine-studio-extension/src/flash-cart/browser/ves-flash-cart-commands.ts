@@ -3,7 +3,7 @@ import { Command } from '@theia/core';
 export namespace VesFlashCartCommands {
   export const FLASH: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:flashCarts:flash',
+      id: 'flashCarts.flash',
       label: 'Flash to Flash Cart',
       category: 'Flash Carts',
     },
@@ -13,7 +13,7 @@ export namespace VesFlashCartCommands {
 
   export const DETECT: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:flashCarts:detectConnected',
+      id: 'flashCarts.detectConnected',
       label: 'Detect Connected Flash Carts',
       category: 'Flash Carts',
     },
@@ -23,7 +23,7 @@ export namespace VesFlashCartCommands {
 
   export const WIDGET_TOGGLE: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:flashCarts:toggleView',
+      id: 'flashCarts.toggleView',
       label: 'Toggle Flash Carts View',
     },
     'vuengine/flashCarts/commands/toggleView',
@@ -32,7 +32,7 @@ export namespace VesFlashCartCommands {
 
   export const WIDGET_EXPAND: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:flashCarts:expandView',
+      id: 'flashCarts.expandView',
       label: 'Toggle Maximized',
       iconClass: 'codicon codicon-arrow-both',
     },
@@ -42,7 +42,7 @@ export namespace VesFlashCartCommands {
 
   export const WIDGET_HELP: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:flashCarts:showHelp',
+      id: 'flashCarts.showHelp',
       label: 'Show Handbook Page',
       iconClass: 'codicon codicon-book',
     },
@@ -52,7 +52,7 @@ export namespace VesFlashCartCommands {
 
   export const WIDGET_SETTINGS: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:flashCarts:showSettings',
+      id: 'flashCarts.showSettings',
       label: 'Show Flash Carts Preferences',
       iconClass: 'codicon codicon-settings',
     },
@@ -62,7 +62,7 @@ export namespace VesFlashCartCommands {
 
   export const WIDGET_REFRESH: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:flashCarts:widgetRefresh',
+      id: 'flashCarts.widgetRefresh',
       label: 'Detect Connected Flash Carts',
       category: 'Flash Carts',
       iconClass: 'codicon codicon-refresh',

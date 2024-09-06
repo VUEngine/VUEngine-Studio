@@ -128,7 +128,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             if (type.file?.startsWith('.')) {
                 commandRegistry.registerCommand(Command.toLocalizedCommand(
                     {
-                        id: `ves:editors:new-untitled:${typeId}`,
+                        id: `editors.new-untitled.${typeId}`,
                         label: `New Untitled ${type.schema.title || typeId} File`,
                         category: CommonCommands.FILE_CATEGORY,
                         iconClass: type.icon,
@@ -148,7 +148,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             if (type.forFiles?.length) {
                 commandRegistry.registerCommand(Command.toLocalizedCommand(
                     {
-                        id: `ves:editors:new-file:${typeId}`,
+                        id: `editors.new-file.${typeId}`,
                         label: `New ${type.schema.title || typeId} File...`,
                         category: CommonCommands.FILE_CATEGORY,
                     },
@@ -240,7 +240,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             /*
             // contribute to "Create: New File..."" command
             if (type.file?.startsWith('.')) {
-                const id = `ves:editors:new-untitled:${typeId}`;
+                const id = `editors.new-untitled.${typeId}`;
                 menus.registerMenuNode(CommonMenus.FILE_NEW_CONTRIBUTIONS, {
                     id,
                     sortString: typeId,
@@ -251,7 +251,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
 
             if (type.forFiles?.length) {
                 menus.registerMenuAction(NavigatorContextMenu.NAVIGATION, {
-                    commandId: `ves:editors:new-file:${typeId}`,
+                    commandId: `editors.new-file.${typeId}`,
                     order: '-500',
                     when: type.forFiles.map(f => `explorerResourceExt == ${f}`).join(' || '),
                 });

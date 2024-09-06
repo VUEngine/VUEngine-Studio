@@ -3,7 +3,7 @@ import { Command } from '@theia/core';
 export namespace VesCoreCommands {
     export const REPORT_ISSUE: Command = Command.toLocalizedCommand(
         {
-            id: 'ves:general:reportIssue',
+            id: 'ves.reportIssue',
             label: 'Report Issue',
             category: 'VUEngine Studio',
         },
@@ -12,7 +12,7 @@ export namespace VesCoreCommands {
     );
     export const SUPPORT: Command = Command.toLocalizedCommand(
         {
-            id: 'ves:general:support',
+            id: 'ves.support',
             label: 'Support Us',
             category: 'VUEngine Studio',
         },
@@ -21,7 +21,7 @@ export namespace VesCoreCommands {
     );
     export const OPEN_DOCUMENTATION: Command = Command.toLocalizedCommand(
         {
-            id: 'ves:general:openDocumentation',
+            id: 'ves.openDocumentation',
             label: 'Open Documentation',
             category: 'VUEngine Studio',
         },

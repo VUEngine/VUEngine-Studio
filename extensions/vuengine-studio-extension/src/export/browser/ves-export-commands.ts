@@ -3,7 +3,7 @@ import { Command } from '@theia/core';
 export namespace VesExportCommands {
   export const EXPORT: Command = Command.toLocalizedCommand(
     {
-      id: 'ves:export:export',
+      id: 'export.export',
       label: 'Export ROM...',
       category: 'Export',
     },

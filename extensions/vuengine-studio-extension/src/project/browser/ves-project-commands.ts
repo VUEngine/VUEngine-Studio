@@ -3,7 +3,7 @@ import { Command } from '@theia/core';
 export namespace VesProjectCommands {
     export const NEW: Command = Command.toLocalizedCommand(
         {
-            id: 'ves:project:new',
+            id: 'project.new',
             label: 'Create New Project',
             iconClass: 'codicon codicon-add'
         },
@@ -12,7 +12,7 @@ export namespace VesProjectCommands {
 
     export const TOGGLE_WIDGET: Command = Command.toLocalizedCommand(
         {
-            id: 'ves:project:toggleView',
+            id: 'project.toggleView',
             label: 'Toggle Project View',
         },
         'vuengine/projects/commands/toggleView'
