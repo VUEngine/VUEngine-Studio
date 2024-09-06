@@ -112,12 +112,13 @@ export class VesExportService {
   }
 
   protected async confirmOverwrite(uri: URI): Promise<boolean> {
+    // We only need this in browsers. Electron brings up the OS-level confirmation dialog instead.
     if (environment.electron.is()) {
       return true;
     }
     const confirmed = await new ConfirmDialog({
       title: nls.localize('vuengine/export/overwrite', 'Overwrite'),
-      msg: nls.localize('vuengine/export/doYouReallyWantToOverwrite', 'Do you really want to overwrite "{0}"?', uri.toString()),
+      msg: nls.localize('vuengine/export/doYouReallyWantToOverwrite', 'Do you really want to overwrite "{0}"?', uri.path.fsPath()),
     }).open();
     return !!confirmed;
   }

@@ -1,5 +1,5 @@
-[id^='vesEditorsWidget'] {
-  outline: none;
+[id^=vesEditorsWidget] {
+  outline: none !important;
 }
 
 .jsonforms-container {

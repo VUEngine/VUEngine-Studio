@@ -2,33 +2,25 @@ import { Clipboard, CopySimple, Trash } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import { CommonCommands, ConfirmDialog } from '@theia/core/lib/browser';
 import { DottingRef, PixelModifyItem, useData, useDotting } from 'dotting';
-import React, { useEffect, useState } from 'react';
-import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../../ves-editors-types';
+import React, { useContext, useEffect, useState } from 'react';
+import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/HContainer';
+import VContainer from '../../Common/VContainer';
 import { SpriteEditorTool } from '../../SpriteEditor/SpriteEditorTool';
-import ImportExport from './ImportExport';
 
 interface ActionsProps {
-    offset: number
-    characterCount: number
-    charPixelHeight: number,
-    charPixelWidth: number,
     currentCharData: number[][]
-    setCurrentCharData: (data: number[][]) => void
     dottingRef: React.RefObject<DottingRef>
     applyPixelChanges: (modifiedPixels: PixelModifyItem[]) => void
     setCharacters: (updatedCharacters: number[][][]) => void
 }
 
 export default function Actions(props: ActionsProps): React.JSX.Element {
+    const { services } = useContext(EditorsContext) as EditorsContextType;
     const {
-        charPixelHeight, charPixelWidth,
         /* currentCharData, setCurrentCharData, */
-        characterCount,
-        offset,
         dottingRef,
         applyPixelChanges,
-        setCharacters,
     } = props;
     const [clipboard, setClipboard] = useState<PixelModifyItem[][]>();
     const { clear, setData } = useDotting(dottingRef);
@@ -136,51 +128,66 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
         applyPixelChanges,
     ]);
 
-    return <HContainer gap={2} wrap='wrap'>
-        {/* }
-        <SpriteEditorTool
-            title={nls.localize('vuengine/fontEditor/actions/rotate', 'Rotate')}
-            onClick={rotate}
-        >
-            <ArrowClockwise size={20} />
-        </SpriteEditorTool>
-        <SpriteEditorTool
-            title={nls.localize('vuengine/fontEditor/actions/mirrorHorizontally', 'Mirror Horizontally')}
-            onClick={mirrorHorizontally}
-        >
-            <FlipHorizontal size={20} />
-        </SpriteEditorTool>
-        <SpriteEditorTool
-            title={nls.localize('vuengine/fontEditor/actions/mirrorVertically', 'Mirror Vertically')}
-            onClick={mirrorVertically}
-        >
-            <FlipVertical size={20} />
-        </SpriteEditorTool>
-        {*/}
-        <SpriteEditorTool
-            title={nls.localize('vuengine/fontEditor/actions/copy', 'Copy')}
-            onClick={copy}
-        >
-            <CopySimple size={20} />
-        </SpriteEditorTool>
-        <SpriteEditorTool
-            title={nls.localize('vuengine/fontEditor/actions/paste', 'Paste')}
-            onClick={paste}
-        >
-            <Clipboard size={20} />
-        </SpriteEditorTool>
-        <SpriteEditorTool
-            title={nls.localize('vuengine/fontEditor/actions/clear', 'Clear')}
-            onClick={confirmClear}
-        >
-            <Trash size={20} />
-        </SpriteEditorTool>
-        <ImportExport
-            setCharacters={setCharacters}
-            charPixelHeight={charPixelHeight}
-            charPixelWidth={charPixelWidth}
-            offset={offset}
-            characterCount={characterCount}
-        />
-    </HContainer>;
+    return (
+        <VContainer>
+            <label>
+                {nls.localize('vuengine/fontEditor/actions', 'Actions')}
+            </label>
+            <HContainer gap={2} wrap='wrap'>
+                {/* }
+                <SpriteEditorTool
+                    title={
+                        nls.localize('vuengine/fontEditor/actions/rotate', 'Rotate') +
+                        services.vesCommonService.getKeybindingLabel(EDITORS_COMMANDS.FontEditor.commands.rotate.id, true)
+                    }
+                    onClick={rotate}
+                >
+                    <ArrowClockwise size={20} />
+                </SpriteEditorTool>
+                <SpriteEditorTool
+                    title={
+                        nls.localize('vuengine/fontEditor/actions/mirrorHorizontally', 'Mirror Horizontally') +
+                        services.vesCommonService.getKeybindingLabel(EDITORS_COMMANDS.FontEditor.commands.mirrorHorizontally.id, true)
+                    }
+                    onClick={mirrorHorizontally}
+                >
+                    <FlipHorizontal size={20} />
+                </SpriteEditorTool>
+                <SpriteEditorTool
+                    title={
+                        nls.localize('vuengine/fontEditor/actions/mirrorVertically', 'Mirror Vertically') +
+                        services.vesCommonService.getKeybindingLabel(EDITORS_COMMANDS.FontEditor.commands.mirrorVertically.id, true)
+                    }
+                    onClick={mirrorVertically}
+                >
+                    <FlipVertical size={20} />
+                </SpriteEditorTool>
+                {*/}
+                <SpriteEditorTool
+                    title={
+                        nls.localize('vuengine/fontEditor/actions/copy', 'Copy Current Character') +
+                        services.vesCommonService.getKeybindingLabel(CommonCommands.COPY.id, true)
+                    }
+                    onClick={copy}
+                >
+                    <CopySimple size={20} />
+                </SpriteEditorTool>
+                <SpriteEditorTool
+                    title={
+                        nls.localize('vuengine/fontEditor/actions/paste', 'Paste To Current Character') +
+                        services.vesCommonService.getKeybindingLabel(CommonCommands.PASTE.id, true)
+                    }
+                    onClick={paste}
+                >
+                    <Clipboard size={20} />
+                </SpriteEditorTool>
+                <SpriteEditorTool
+                    title={nls.localize('vuengine/fontEditor/actions/clear', 'Clear Current Character')}
+                    onClick={confirmClear}
+                >
+                    <Trash size={20} />
+                </SpriteEditorTool>
+            </HContainer>
+        </VContainer>
+    );
 }

@@ -1,18 +1,18 @@
 import React, { PropsWithChildren } from 'react';
 
 interface PopUpDialogProps {
-    open: boolean;
-    setOpen: (setOpen: boolean) => void;
-    title: string;
-    error?: string;
+    open: boolean
+    onClose: () => void
+    onOk: () => void
+    okLabel?: string
+    title: string
+    error?: string
     height?: string
     width?: string
 }
 
 export default function PopUpDialog(props: PropsWithChildren<PopUpDialogProps>): React.JSX.Element {
-    const { open, setOpen, title, error, height, width, children } = props;
-
-    const close = () => setOpen(false);
+    const { open, onClose, onOk, okLabel, title, error, height, width, children } = props;
 
     return <div
         className="p-Widget dialogOverlay"
@@ -24,17 +24,22 @@ export default function PopUpDialog(props: PropsWithChildren<PopUpDialogProps>):
         }}
         onKeyDown={e => {
             if (e.key === 'Escape') {
-                close();
+                onClose();
             };
         }}
     >
-        <div className="dialogBlock" style={{ height, width }}
+        <div className="dialogBlock" style={{
+            height,
+            maxWidth: '100%',
+            overflow: 'hidden',
+            width,
+        }}
         >
             <div className="dialogTitle">
                 <div>{title}</div>
                 <i
                     className="codicon codicon-close action-label closeButton"
-                    onClick={close}
+                    onClick={onClose}
                 >
                 </i>
             </div>
@@ -47,12 +52,12 @@ export default function PopUpDialog(props: PropsWithChildren<PopUpDialogProps>):
                 </div>
                 <button
                     className="theia-button main"
-                    onClick={close}
+                    onClick={onOk}
                     style={{
                         minWidth: '65px',
                     }}
                 >
-                    OK
+                    {okLabel ? okLabel : 'OK'}
                 </button>
             </div>
         </div>

@@ -6,7 +6,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { ColorMode, PALETTE_COLORS, PALETTE_INDICES } from '../../../../core/browser/ves-common-types';
 import { ImageCompressionType } from '../../../../images/browser/ves-images-types';
-import { EDITORS_COMMANDS } from '../../ves-editors-commands';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../ves-editors-types';
 import { DataSection } from '../Common/CommonTypes';
 import HContainer from '../Common/HContainer';
@@ -18,7 +17,6 @@ import PaletteSelect from '../SpriteEditor/PaletteSelect';
 import SpriteEditorCurrentToolSettings from '../SpriteEditor/SpriteEditorCurrentToolSettings';
 import SpriteEditorStatus from '../SpriteEditor/SpriteEditorStatus';
 import SpriteEditorTools from '../SpriteEditor/SpriteEditorTools';
-import SpriteEditorUndoRedo from '../SpriteEditor/SpriteEditorUndoRedo';
 import Alphabet from './Alphabet/Alphabet';
 import AlphabetSettings from './Alphabet/AlphabetSettings';
 import CharSettings from './Alphabet/CharSettings';
@@ -30,6 +28,7 @@ import {
 } from './FontEditorTypes';
 import Actions from './Tools/Actions';
 import CurrentCharInfo from './Tools/CurrentCharInfo';
+import ImportExportTools from './Tools/ImportExport/ImportExportTools';
 
 interface FontEditorProps {
     data: FontData
@@ -49,7 +48,7 @@ const EditorSidebar = styled.div`
   overflow-y: auto;
   padding: var(--padding);
   transition: all .1s;
-  z-index: 100;
+  z-index: 101;
 
   body.light-vuengine & {
     background-color: rgba(236, 236, 236, .9);
@@ -82,43 +81,6 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
             case CommonCommands.REDO.id:
                 redo();
                 break;
-            case EDITORS_COMMANDS.FontEditor.commands.alphabetNavigateLineDown.id:
-                setCurrentCharacterIndex(currentCharacterIndex + 16 < data.offset + data.characterCount
-                    ? currentCharacterIndex + 16
-                    : currentCharacterIndex);
-                break;
-            case EDITORS_COMMANDS.FontEditor.commands.alphabetNavigatePrevChar.id:
-                setCurrentCharacterIndex(currentCharacterIndex > data.offset
-                    ? currentCharacterIndex - 1
-                    : currentCharacterIndex);
-                break;
-            case EDITORS_COMMANDS.FontEditor.commands.alphabetNavigateNextChar.id:
-                setCurrentCharacterIndex(currentCharacterIndex + 1 < data.offset + data.characterCount
-                    ? currentCharacterIndex + 1
-                    : currentCharacterIndex);
-                break;
-            case EDITORS_COMMANDS.FontEditor.commands.alphabetNavigateLineUp.id:
-                setCurrentCharacterIndex(currentCharacterIndex - 16 >= data.offset
-                    ? currentCharacterIndex - 16
-                    : currentCharacterIndex);
-                break;
-            case EDITORS_COMMANDS.FontEditor.commands.swapColors.id:
-                const secColorIndex = secondaryColorIndex;
-                setSecondaryColorIndex(primaryColorIndex);
-                setPrimaryColorIndex(secColorIndex);
-                break;
-            case EDITORS_COMMANDS.FontEditor.commands.paletteSelectIndex1.id:
-                setPrimaryColorIndex(0);
-                break;
-            case EDITORS_COMMANDS.FontEditor.commands.paletteSelectIndex2.id:
-                setPrimaryColorIndex(1);
-                break;
-            case EDITORS_COMMANDS.FontEditor.commands.paletteSelectIndex3.id:
-                setPrimaryColorIndex(2);
-                break;
-            case EDITORS_COMMANDS.FontEditor.commands.paletteSelectIndex4.id:
-                setPrimaryColorIndex(3);
-                break;
         }
     };
 
@@ -128,16 +90,16 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
         }
 
         let toDelete = 0;
-        for (let c = arr.length - 1; c >= 0; c--) {
+        for (let c = (arr?.length || 0) - 1; c >= 0; c--) {
             if (arr[c] === null || arr[c] === 0) {
                 toDelete++;
             } else {
                 break;
             }
         }
-        arr.splice(arr.length - toDelete, toDelete);
+        arr?.splice(arr.length - toDelete, toDelete);
 
-        return arr.length ? arr : null;
+        return arr?.length ? arr : null;
     };
 
     const optimizeFontData = (fontData: FontData): FontData => {
@@ -292,11 +254,7 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
         return () => {
             document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
         };
-    }, [
-        currentCharacterIndex,
-        primaryColorIndex,
-        secondaryColorIndex,
-    ]);
+    }, []);
 
     useEffect(() => {
         if (!canvasContainerRef.current) {
@@ -371,20 +329,16 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
                 style={{
                     maxHeight: 'calc(100% - 32px)',
                     width: 82,
-                    zIndex: 100,
+                    zIndex: 102,
                 }}
             >
                 <PaletteSelect
-                    primaryColor={primaryColorIndex}
-                    setPrimaryColor={setPrimaryColorIndex}
-                    secondaryColor={secondaryColorIndex}
-                    setSecondaryColor={setSecondaryColorIndex}
+                    primaryColorIndex={primaryColorIndex}
+                    setPrimaryColorIndex={setPrimaryColorIndex}
+                    secondaryColorIndex={secondaryColorIndex}
+                    setSecondaryColorIndex={setSecondaryColorIndex}
                     dottingRef={dottingRef}
                 />
-                <SpriteEditorUndoRedo
-                    dottingRef={dottingRef}
-                />
-
                 <VContainer gap={10} overflow='auto'>
                     <SpriteEditorTools
                         dottingRef={dottingRef}
@@ -393,15 +347,18 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
                         dottingRef={dottingRef}
                     />
                     <Actions
-                        offset={data.offset}
-                        characterCount={data.characterCount}
-                        charPixelHeight={charPixelHeight}
-                        charPixelWidth={charPixelWidth}
                         currentCharData={characters[currentCharacterIndex]}
-                        setCurrentCharData={setCurrentCharacterData}
                         dottingRef={dottingRef}
                         applyPixelChanges={applyPixelChanges}
                         setCharacters={setCharacters}
+                    />
+                    <ImportExportTools
+                        characters={data.characters}
+                        setCharacters={setCharacters}
+                        charPixelHeight={charPixelHeight}
+                        charPixelWidth={charPixelWidth}
+                        offset={data.offset}
+                        characterCount={data.characterCount}
                     />
                 </VContainer>
             </VContainer>

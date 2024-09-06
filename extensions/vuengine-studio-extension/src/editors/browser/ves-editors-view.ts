@@ -1,5 +1,5 @@
 import { Command, CommandContribution, CommandRegistry, CommandService, MenuContribution, MenuModelRegistry, URI, UntitledResourceResolver } from '@theia/core';
-import { AbstractViewContribution, CommonCommands, KeybindingRegistry, OpenerService, Widget, open } from '@theia/core/lib/browser';
+import { AbstractViewContribution, CommonCommands, KeybindingContribution, KeybindingRegistry, OpenerService, Widget, open } from '@theia/core/lib/browser';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { UserWorkingDirectoryProvider } from '@theia/core/lib/browser/user-working-directory-provider';
@@ -18,7 +18,8 @@ import { VesEditorsContextKeyService } from './ves-editors-context-key-service';
 import { VesEditorsWidget } from './ves-editors-widget';
 
 @injectable()
-export class VesEditorsViewContribution extends AbstractViewContribution<VesEditorsWidget> implements CommandContribution, MenuContribution, TabBarToolbarContribution {
+export class VesEditorsViewContribution extends AbstractViewContribution<VesEditorsWidget>
+    implements CommandContribution, KeybindingContribution, MenuContribution, TabBarToolbarContribution {
     @inject(CommandService)
     protected readonly commandService: CommandService;
     @inject(EditorManager)
@@ -181,15 +182,15 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             },
         });
 
-        Object.values(EDITORS_COMMANDS).map(category => {
-            Object.values(category.commands).map(command => {
+        Object.values(EDITORS_COMMANDS).map(editor => {
+            Object.values(editor.commands).map(command => {
                 commandRegistry.registerCommand({
                     id: command.id,
                     label: command.label,
-                    category: category.category,
+                    category: editor.category,
                 }, {
                     isEnabled: () => true,
-                    isVisible: () => (this.shell.currentWidget as VesEditorsWidget)?.typeId === category.typeId,
+                    isVisible: () => (this.shell.currentWidget as VesEditorsWidget)?.typeId === editor.typeId,
                     execute: () => (this.shell.currentWidget as VesEditorsWidget)?.dispatchCommandEvent(command.id),
                 });
             });
@@ -197,8 +198,8 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
     }
 
     registerKeybindings(registry: KeybindingRegistry): void {
-        Object.values(EDITORS_COMMANDS).map(category => {
-            Object.values(category.commands).map(command => {
+        Object.values(EDITORS_COMMANDS).map(editor => {
+            Object.values(editor.commands).map(command => {
                 registry.registerKeybindings({
                     command: command.id,
                     when: 'graphicalEditorFocus',

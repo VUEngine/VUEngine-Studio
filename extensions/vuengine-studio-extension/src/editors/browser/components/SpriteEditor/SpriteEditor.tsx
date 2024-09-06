@@ -277,10 +277,10 @@ export default function SpriteEditor(props: SpriteEditorProps): React.JSX.Elemen
                     <PaletteSelect
                         colorMode={data.colorMode}
                         setColorMode={setColorMode}
-                        primaryColor={primaryColor}
-                        setPrimaryColor={setPrimaryColor}
-                        secondaryColor={secondaryColor}
-                        setSecondaryColor={setSecondaryColor}
+                        primaryColorIndex={primaryColor}
+                        setPrimaryColorIndex={setPrimaryColor}
+                        secondaryColorIndex={secondaryColor}
+                        setSecondaryColorIndex={setSecondaryColor}
                         dottingRef={ref}
                     />
                 </div>

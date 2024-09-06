@@ -1,4 +1,4 @@
-import { CommandRegistry, CommandService } from '@theia/core';
+import { CommandContribution, CommandRegistry, CommandService } from '@theia/core';
 import { AbstractViewContribution, CommonCommands } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
@@ -8,7 +8,7 @@ import { VesEmulatorContextKeyService } from './ves-emulator-context-key-service
 import { VesEmulatorWidget } from './ves-emulator-widget';
 
 @injectable()
-export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmulatorWidget> implements TabBarToolbarContribution {
+export class VesEmulatorViewContribution extends AbstractViewContribution<VesEmulatorWidget> implements CommandContribution, TabBarToolbarContribution {
   @inject(CommandService)
   private readonly commandService: CommandService;
   @inject(VesEmulatorContextKeyService)

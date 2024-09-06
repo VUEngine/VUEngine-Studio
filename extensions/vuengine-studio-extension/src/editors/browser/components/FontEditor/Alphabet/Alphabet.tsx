@@ -1,5 +1,7 @@
 import { nls } from '@theia/core';
 import React, { useEffect, useState } from 'react';
+import { EDITORS_COMMANDS } from '../../../ves-editors-commands';
+import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../../ves-editors-types';
 import VContainer from '../../Common/VContainer';
 import { VariableSize } from '../FontEditorTypes';
 import AlphabetChar from './AlphabetChar';
@@ -21,7 +23,7 @@ export default function Alphabet(props: AlphabetProps): React.JSX.Element {
         charsData,
         charHeight, charWidth,
         offset, charCount,
-        currentCharacterIndex, setCurrentCharacterIndex: setCurrentCharacter, setCurrentCharacterHoverIndex,
+        currentCharacterIndex, setCurrentCharacterIndex, setCurrentCharacterHoverIndex,
         variableSize,
     } = props;
     const [controlCharacters, setControlCharacters] = useState<React.JSX.Element>();
@@ -40,12 +42,37 @@ export default function Alphabet(props: AlphabetProps): React.JSX.Element {
                 charHeight={charHeight}
                 charWidth={charWidth}
                 currentCharacterIndex={currentCharacterIndex}
-                setCurrentCharacterIndex={setCurrentCharacter}
+                setCurrentCharacterIndex={setCurrentCharacterIndex}
                 setCurrentCharacterHoverIndex={setCurrentCharacterHoverIndex}
                 variableSize={variableSize}
             />;
         })}
     </>;
+
+    const commandListener = (e: CustomEvent): void => {
+        switch (e.detail) {
+            case EDITORS_COMMANDS.FontEditor.commands.alphabetNavigateLineDown.id:
+                setCurrentCharacterIndex(currentCharacterIndex + 16 < offset + charCount
+                    ? currentCharacterIndex + 16
+                    : currentCharacterIndex);
+                break;
+            case EDITORS_COMMANDS.FontEditor.commands.alphabetNavigatePrevChar.id:
+                setCurrentCharacterIndex(currentCharacterIndex > offset
+                    ? currentCharacterIndex - 1
+                    : currentCharacterIndex);
+                break;
+            case EDITORS_COMMANDS.FontEditor.commands.alphabetNavigateNextChar.id:
+                setCurrentCharacterIndex(currentCharacterIndex + 1 < offset + charCount
+                    ? currentCharacterIndex + 1
+                    : currentCharacterIndex);
+                break;
+            case EDITORS_COMMANDS.FontEditor.commands.alphabetNavigateLineUp.id:
+                setCurrentCharacterIndex(currentCharacterIndex - 16 >= offset
+                    ? currentCharacterIndex - 16
+                    : currentCharacterIndex);
+                break;
+        }
+    };
 
     useEffect(() => {
         setControlCharacters(getCharacters(32, 0));
@@ -57,6 +84,18 @@ export default function Alphabet(props: AlphabetProps): React.JSX.Element {
         offset, charCount,
         currentCharacterIndex,
         variableSize,
+    ]);
+
+    useEffect(() => {
+        document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
+        return () => {
+            document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
+        };
+    }, [
+        offset,
+        charCount,
+        currentCharacterIndex,
+        setCurrentCharacterIndex,
     ]);
 
     return (

@@ -300,19 +300,27 @@ export class VesImagesService {
     };
 
     // create indexed png image
+    return this.getIndexedPng(
+      Buffer.from(indexedPoints),
+      colorMode === ColorMode.FrameBlend ? paddedHeight * 2 : paddedHeight,
+      paddedWidth
+    );
+  }
+
+  getIndexedPng(imageData: Uint8Array, height: number, width: number): Buffer {
+    const camoto = require('@camoto/pngjs/browser');
     return camoto.PNG.sync.write({
-      ...imageData,
       alpha: false,
       bpp: 1,
       color: true,
       colorType: 3,
-      data: Buffer.from(indexedPoints),
+      data: Buffer.from(imageData),
       depth: 8,
       gamma: 0,
-      height: colorMode === ColorMode.FrameBlend ? paddedHeight * 2 : paddedHeight,
+      height,
       interlace: false,
       palette: PALETTE_R_VALUES[0].map(r => [r, 0, 0, 255]),
-      width: paddedWidth
+      width,
     }, {
       bitDepth: 8,
       inputColorType: 3,

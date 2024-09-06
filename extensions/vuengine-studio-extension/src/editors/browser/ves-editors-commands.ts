@@ -69,6 +69,21 @@ export const EDITORS_COMMANDS = {
                 label: nls.localize('vuengine/editors/commands/fontEditor/paletteSelectIndex4', 'Select Palette Index 4'),
                 keybinding: '4',
             },
+            paletteSelectIndex5: {
+                id: 'editors.fontEditor.paletteSelectIndex5',
+                label: nls.localize('vuengine/editors/commands/fontEditor/paletteSelectIndex5', 'Select Palette Index 5'),
+                keybinding: '5',
+            },
+            paletteSelectIndex6: {
+                id: 'editors.fontEditor.paletteSelectIndex6',
+                label: nls.localize('vuengine/editors/commands/fontEditor/paletteSelectIndex6', 'Select Palette Index 6'),
+                keybinding: '6',
+            },
+            paletteSelectIndex7: {
+                id: 'editors.fontEditor.paletteSelectIndex7',
+                label: nls.localize('vuengine/editors/commands/fontEditor/paletteSelectIndex7', 'Select Palette Index 7'),
+                keybinding: '7',
+            },
             swapColors: {
                 id: 'editors.fontEditor.swapColors',
                 label: nls.localize('vuengine/editors/commands/fontEditor/swapColors', 'Swap Colors'),
