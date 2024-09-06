@@ -80,7 +80,8 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
 
     const getImageDataFromFile = async () => {
         if (image) {
-            const output = await services.vesImagesService.quantizeImage(fileUri.parent, image, processingSettings, colorMode);
+            const imageUri = fileUri.parent.resolve(image);
+            const output = await services.vesImagesService.quantizeImage(imageUri, processingSettings, colorMode);
             setResultImageBase64(Buffer.from(output).toString('base64'));
         } else {
             setResultImageBase64('');

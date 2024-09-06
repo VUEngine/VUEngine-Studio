@@ -14,6 +14,7 @@ interface ImagesProps {
     allInFolderAsFallback: boolean
     stack: boolean
     showMetaData: boolean
+    absolutePaths?: boolean
     containerHeight?: string
     containerWidth?: string
     fileAddExtraAction?: () => void
@@ -28,6 +29,7 @@ export default function Images(props: ImagesProps): React.JSX.Element {
         allInFolderAsFallback,
         stack,
         showMetaData,
+        absolutePaths,
         containerHeight,
         containerWidth,
         fileAddExtraAction
@@ -146,16 +148,20 @@ export default function Images(props: ImagesProps): React.JSX.Element {
             await Promise.all(uris.map(async uri => {
                 const source = await services.fileService.resolve(uri);
                 if (source.isFile) {
-                    const relativePath = fileUri.parent.relative(uri);
-                    if (!relativePath) {
-                        const targetUri = fileUri.parent.resolve(source.resource.path.base);
-                        const relativeTargetFilePath = fileUri.parent.relative(targetUri)?.toString().replace(/\\/g, '/');
-                        const confirmed = await confirmSaveCopy(uri as URI, targetUri);
-                        if (confirmed && relativeTargetFilePath) {
-                            newFiles.push(relativeTargetFilePath);
-                        }
+                    if (absolutePaths) {
+                        newFiles.push(uri.path.fsPath());
                     } else {
-                        newFiles.push(relativePath.toString().replace(/\\/g, '/'));
+                        const relativePath = fileUri.parent.relative(uri);
+                        if (!relativePath) {
+                            const targetUri = fileUri.parent.resolve(source.resource.path.base);
+                            const relativeTargetFilePath = fileUri.parent.relative(targetUri)?.toString().replace(/\\/g, '/');
+                            const confirmed = await confirmSaveCopy(uri as URI, targetUri);
+                            if (confirmed && relativeTargetFilePath) {
+                                newFiles.push(relativeTargetFilePath);
+                            }
+                        } else {
+                            newFiles.push(relativePath.toString().replace(/\\/g, '/'));
+                        }
                     }
                 }
             }));
@@ -192,7 +198,7 @@ export default function Images(props: ImagesProps): React.JSX.Element {
         }}
     >
         {Object.keys(filesToShow).map((f, i) => {
-            const fullUri = fileUri.parent.resolve(f);
+            const fullUri = absolutePaths ? new URI(f) : fileUri.parent.resolve(f);
             const imageUrl = f.startsWith('data:')
                 ? f
                 : isWindows

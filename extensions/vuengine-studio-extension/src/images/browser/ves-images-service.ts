@@ -104,7 +104,8 @@ export class VesImagesService {
     await Promise.all(files.map(async imagePath => {
       const fileUri = imageConfigFileUri.parent.resolve(imagePath);
       try {
-        const processedImage = await this.quantizeImage(imageConfigFileUri.parent, imagePath, imageConfig.imageProcessingSettings, imageConfig.colorMode);
+        const imageUri = imageConfigFileUri.parent.resolve(imagePath);
+        const processedImage = await this.quantizeImage(imageUri, imageConfig.imageProcessingSettings, imageConfig.colorMode);
         const randomFileUri = tempDirUri.resolve(`${fileUri.path.name}.png`);
         // @ts-ignore
         await this.fileService.writeFile(randomFileUri, BinaryBuffer.fromString(processedImage));
@@ -229,16 +230,14 @@ export class VesImagesService {
   }
 
   async quantizeImage(
-    configFileUri: URI,
-    imagePath: string,
+    imageUri: URI,
     processingSettings: ImageProcessingSettings,
     colorMode: ColorMode,
   ): Promise<Buffer> {
     await this.ready;
 
     // read image file
-    const resolvedImageUri = configFileUri.resolve(imagePath);
-    const imageFileContent = await this.fileService.readFile(resolvedImageUri);
+    const imageFileContent = await this.fileService.readFile(imageUri);
     // Using the Camoto fork of pngjs here, because it supports generating indexed PNGs
     const camoto = require('@camoto/pngjs/browser');
     const imageData = camoto.PNG.sync.read(Buffer.from(imageFileContent.value.buffer));

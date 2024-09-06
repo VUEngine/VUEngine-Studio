@@ -1,4 +1,3 @@
-import { nls } from '@theia/core';
 import React, { useEffect, useState } from 'react';
 import { EDITORS_COMMANDS } from '../../../ves-editors-commands';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../../ves-editors-types';
@@ -99,33 +98,25 @@ export default function Alphabet(props: AlphabetProps): React.JSX.Element {
     ]);
 
     return (
-        <VContainer grow={1} overflow='hidden'>
-            <label>
-                {nls.localize('vuengine/fontEditor/alphabet', 'Alphabet')}{' '}
-                <span className="secondaryText">
-                    ({nls.localize('vuengine/fontEditor/alphabetNavigationDescription', 'Shift + Arrow Keys To Navigate')})
-                </span>
-            </label>
-            <VContainer style={{
-                overflowX: 'hidden',
-                overflowY: 'auto',
-            }}>
-                {controlCharacters &&
-                    <div className="characters">
-                        {controlCharacters && controlCharacters}
-                    </div>
-                }
-                {asciiCharacters &&
-                    <div className="characters">
-                        {asciiCharacters && asciiCharacters}
-                    </div>
-                }
-                {extendedCharacters &&
-                    <div className="characters">
-                        {extendedCharacters}
-                    </div>
-                }
-            </VContainer>
+        <VContainer style={{
+            overflowX: 'hidden',
+            overflowY: 'auto',
+        }}>
+            {controlCharacters &&
+                <div className="characters">
+                    {controlCharacters && controlCharacters}
+                </div>
+            }
+            {asciiCharacters &&
+                <div className="characters">
+                    {asciiCharacters && asciiCharacters}
+                </div>
+            }
+            {extendedCharacters &&
+                <div className="characters">
+                    {extendedCharacters}
+                </div>
+            }
         </VContainer>
     );
 }

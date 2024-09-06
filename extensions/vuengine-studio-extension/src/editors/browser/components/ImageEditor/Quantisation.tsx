@@ -41,7 +41,8 @@ export default function Quantisation(): React.JSX.Element {
         </VContainer>
         <PopUpDialog
             open={processingDialogOpen}
-            setOpen={setProcessingDialogOpen}
+            onClose={() => setProcessingDialogOpen(false)}
+            onOk={() => setProcessingDialogOpen(false)}
             title={nls.localize('vuengine/editors/imageProcessingSettings', 'Image Processing Settings')}
             height='100%'
             width='100%'

@@ -354,11 +354,11 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
                     />
                     <ImportExportTools
                         characters={data.characters}
-                        setCharacters={setCharacters}
                         charPixelHeight={charPixelHeight}
                         charPixelWidth={charPixelWidth}
                         offset={data.offset}
                         characterCount={data.characterCount}
+                        updateFontData={updateFontData}
                     />
                 </VContainer>
             </VContainer>
@@ -377,17 +377,25 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
                             currentCharacterHoverIndex={currentCharacterHoverIndex}
                         />
                     </HContainer>
-                    <Alphabet
-                        charsData={data.characters || []}
-                        offset={data.offset}
-                        charCount={data.characterCount}
-                        charHeight={charPixelHeight}
-                        charWidth={charPixelWidth}
-                        currentCharacterIndex={currentCharacterIndex}
-                        setCurrentCharacterIndex={setCurrentCharacterIndex}
-                        variableSize={data.variableSize}
-                        setCurrentCharacterHoverIndex={setCurrentCharacterHoverIndex}
-                    />
+                    <VContainer grow={1} overflow='hidden'>
+                        <label>
+                            {nls.localize('vuengine/fontEditor/alphabet', 'Alphabet')}{' '}
+                            <span className="secondaryText">
+                                ({nls.localize('vuengine/fontEditor/alphabetNavigationDescription', 'Shift + Arrow Keys To Navigate')})
+                            </span>
+                        </label>
+                        <Alphabet
+                            charsData={data.characters || []}
+                            offset={data.offset}
+                            charCount={data.characterCount}
+                            charHeight={charPixelHeight}
+                            charWidth={charPixelWidth}
+                            variableSize={data.variableSize}
+                            currentCharacterIndex={currentCharacterIndex}
+                            setCurrentCharacterIndex={setCurrentCharacterIndex}
+                            setCurrentCharacterHoverIndex={setCurrentCharacterHoverIndex}
+                        />
+                    </VContainer>
                     <AlphabetSettings
                         charCount={data.characterCount}
                         setCharCount={setCharacterCount}
