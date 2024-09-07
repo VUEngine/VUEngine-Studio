@@ -52,37 +52,37 @@ export const EDITORS_COMMANDS = {
             paletteSelectIndex1: {
                 id: 'editors.fontEditor.paletteSelectIndex1',
                 label: nls.localize('vuengine/editors/commands/fontEditor/paletteSelectIndex1', 'Select Palette Index 1'),
-                keybinding: '1',
+                keybinding: 'shift+1',
             },
             paletteSelectIndex2: {
                 id: 'editors.fontEditor.paletteSelectIndex2',
                 label: nls.localize('vuengine/editors/commands/fontEditor/paletteSelectIndex2', 'Select Palette Index 2'),
-                keybinding: '2',
+                keybinding: 'shift+2',
             },
             paletteSelectIndex3: {
                 id: 'editors.fontEditor.paletteSelectIndex3',
                 label: nls.localize('vuengine/editors/commands/fontEditor/paletteSelectIndex3', 'Select Palette Index 3'),
-                keybinding: '3',
+                keybinding: 'shift+3',
             },
             paletteSelectIndex4: {
                 id: 'editors.fontEditor.paletteSelectIndex4',
                 label: nls.localize('vuengine/editors/commands/fontEditor/paletteSelectIndex4', 'Select Palette Index 4'),
-                keybinding: '4',
+                keybinding: 'shift+4',
             },
             paletteSelectIndex5: {
                 id: 'editors.fontEditor.paletteSelectIndex5',
                 label: nls.localize('vuengine/editors/commands/fontEditor/paletteSelectIndex5', 'Select Palette Index 5'),
-                keybinding: '5',
+                keybinding: 'shift+5',
             },
             paletteSelectIndex6: {
                 id: 'editors.fontEditor.paletteSelectIndex6',
                 label: nls.localize('vuengine/editors/commands/fontEditor/paletteSelectIndex6', 'Select Palette Index 6'),
-                keybinding: '6',
+                keybinding: 'shift+6',
             },
             paletteSelectIndex7: {
                 id: 'editors.fontEditor.paletteSelectIndex7',
                 label: nls.localize('vuengine/editors/commands/fontEditor/paletteSelectIndex7', 'Select Palette Index 7'),
-                keybinding: '7',
+                keybinding: 'shift+7',
             },
             swapColors: {
                 id: 'editors.fontEditor.swapColors',

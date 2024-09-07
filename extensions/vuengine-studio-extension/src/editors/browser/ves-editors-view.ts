@@ -1,5 +1,5 @@
 import { Command, CommandContribution, CommandRegistry, CommandService, MenuContribution, MenuModelRegistry, URI, UntitledResourceResolver } from '@theia/core';
-import { AbstractViewContribution, CommonCommands, KeybindingContribution, KeybindingRegistry, OpenerService, Widget, open } from '@theia/core/lib/browser';
+import { AbstractViewContribution, CommonCommands, CommonMenus, KeybindingContribution, KeybindingRegistry, OpenerService, Widget, open } from '@theia/core/lib/browser';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { UserWorkingDirectoryProvider } from '@theia/core/lib/browser/user-working-directory-provider';
@@ -130,7 +130,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                 commandRegistry.registerCommand(Command.toLocalizedCommand(
                     {
                         id: `editors.new-untitled.${typeId}`,
-                        label: `New Untitled ${type.schema.title || typeId} File`,
+                        label: `New ${type.schema.title || typeId} File`,
                         category: CommonCommands.FILE_CATEGORY,
                         iconClass: type.icon,
                     },
@@ -145,7 +145,6 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                 });
             }
 
-            // TODO: hide from command palette
             if (type.forFiles?.length) {
                 commandRegistry.registerCommand(Command.toLocalizedCommand(
                     {
@@ -155,6 +154,8 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                     },
                     `vuengine/editors/newFile/${typeId}`
                 ), {
+                    // hide "new xyz conversion file" commands from command palette
+                    isVisible: widget => this.shell.currentWidget?.id === 'files',
                     execute: async () => this.commandService.executeCommand(WorkspaceCommands.NEW_FILE.id),
                 });
             }
@@ -189,7 +190,8 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                     label: command.label,
                     category: editor.category,
                 }, {
-                    isEnabled: () => true,
+                    // enable and make visible only for the current type's editor
+                    isEnabled: () => (this.shell.currentWidget as VesEditorsWidget)?.typeId === editor.typeId,
                     isVisible: () => (this.shell.currentWidget as VesEditorsWidget)?.typeId === editor.typeId,
                     execute: () => (this.shell.currentWidget as VesEditorsWidget)?.dispatchCommandEvent(command.id),
                 });
@@ -236,10 +238,6 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         for (const typeId of Object.keys(types || {})) {
             const type = types![typeId];
 
-            // TODO: disabled for now since the Save As command is not working for
-            // untitled editors files. Need to investigate why that is the case.
-            /*
-            // contribute to "Create: New File..."" command
             if (type.file?.startsWith('.')) {
                 const id = `editors.new-untitled.${typeId}`;
                 menus.registerMenuNode(CommonMenus.FILE_NEW_CONTRIBUTIONS, {
@@ -248,7 +246,6 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                     command: id,
                 });
             }
-            */
 
             if (type.forFiles?.length) {
                 menus.registerMenuAction(NavigatorContextMenu.NAVIGATION, {
