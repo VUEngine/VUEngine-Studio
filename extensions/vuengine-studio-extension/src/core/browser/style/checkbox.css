@@ -10,7 +10,7 @@
     height: var(--theia-ui-font-size2);
     line-height: var(--theia-ui-font-size2);
     margin: 0 var(--theia-ui-padding) 0 0;
-    outline: none;
+    outline: none !important;
     padding: 0;
     position: relative;
     width: calc(2 * (var(--theia-ui-font-size2) + var(--theia-border-width))) !important;

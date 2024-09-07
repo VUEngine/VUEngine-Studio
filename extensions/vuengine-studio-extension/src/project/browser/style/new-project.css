@@ -6,7 +6,7 @@
     display: flex;
     flex-direction: row;
     gap: 10px;
-    outline: 0;
+    outline: none !important;
 }
 .vesNewProjectDialogTemplatesContainer:focus {
     box-shadow: none;

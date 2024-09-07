@@ -1,4 +1,10 @@
+/*
 .monaco-editor, 
 .monaco-editor-background {
     background-color: transparent !important;
+}
+*/
+
+.monaco-keybinding > .monaco-keybinding-key {
+    color: unset;
 }
