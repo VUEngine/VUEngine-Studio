@@ -8,7 +8,7 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import cropImageData from 'crop-image-data';
 import * as iq from 'image-q';
 import { VesCommonService } from '../../core/browser/ves-common-service';
-import { ColorMode, PALETTE_R_VALUES, PALETTE_VALUE_INDEX_MAP } from '../../core/browser/ves-common-types';
+import { ColorMode, PALETTE_R_VALUES, PALETTE_VALUE_INDEX_MAP, PALETTE_VALUE_INVERSION_MAP } from '../../core/browser/ves-common-types';
 import { roundToNextMultipleOf8 } from '../../editors/browser/components/Common/Utils';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
@@ -274,6 +274,15 @@ export class VesImagesService {
         [...Array((paddedHeight - imageData.height) * paddedWidth)].map(i => imageDataArray.push(0, 0, 0, 255));
       }
       imageData.data = new Uint8Array(imageDataArray as number[]);
+    }
+
+    if (processingSettings.invert) {
+      for (let i = 0; i < imageData.data.length; i += 4) {
+        // ignore fully transparent pixels
+        if (imageData.data[i + 3] > 0) {
+          imageData.data[i] = PALETTE_VALUE_INVERSION_MAP[colorMode][imageData.data[i]];
+        }
+      }
     }
 
     // create point container

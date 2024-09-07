@@ -140,6 +140,7 @@ export interface ImageProcessingSettings {
   imageQuantizationAlgorithm: iq.ImageQuantization,
   minimumColorDistanceToDither: number,
   serpentine: boolean,
+  invert?: boolean,
 }
 
 export const DISTANCE_CALCULATOR_OPTIONS: BasicSelectOption[] = [

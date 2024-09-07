@@ -66,6 +66,21 @@ export const PALETTE_VALUE_INDEX_MAP: { [value: number]: number }[] = [
     255: 3,
   }];
 
+export const PALETTE_VALUE_INVERSION_MAP: { [value: number]: number }[] = [{
+  0: 255,
+  85: 170,
+  170: 85,
+  255: 0,
+}, {
+  0: 255,
+  42: 212,
+  85: 170,
+  127: 127,
+  170: 85,
+  212: 42,
+  255: 0,
+}];
+
 export const WINDOWS_EXECUTABLE_EXTENSIONS = [
   'bat',
   'bin',

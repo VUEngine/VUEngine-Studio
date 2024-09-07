@@ -1,6 +1,7 @@
 import { nls, URI } from '@theia/core';
 import { OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import React, { useContext, useEffect, useState } from 'react';
+import styled from 'styled-components';
 import { ColorMode } from '../../../../../../core/browser/ves-common-types';
 import {
     DEFAULT_COLOR_DISTANCE_CALCULATOR,
@@ -30,6 +31,11 @@ interface ImportSettingsProps {
     setImportCharacterCount: React.Dispatch<React.SetStateAction<number>>
 }
 
+const ReconvertButton = styled.button`
+    background-color: transparent;
+    height: 100%;
+`;
+
 export default function ImportSettings(props: ImportSettingsProps): React.JSX.Element {
     const {
         open,
@@ -47,6 +53,7 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
     const [sourceImagePath, setSourceImagePath] = useState<string>();
     const [sourceImageHeight, setSourceImageHeight] = useState<number>(0);
     const [sourceImageWidth, setSourceImageWidth] = useState<number>(0);
+    const [invert, setInvert] = useState<boolean>(false);
 
     const charPixelHeight = importedCharHeight;
     const charPixelWidth = importedCharWidth;
@@ -149,6 +156,7 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                 imageQuantizationAlgorithm: DEFAULT_IMAGE_QUANTIZATION_ALGORITHM,
                 minimumColorDistanceToDither: DEFAULT_MINIMUM_COLOR_DISTANCE_TO_DITHER,
                 serpentine: DEFAULT_DITHER_SERPENTINE,
+                invert,
             },
             ColorMode.Default,
         );
@@ -180,12 +188,13 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
         importedCharWidth,
         importOffset,
         sourceImagePath,
+        invert,
     ]);
 
     return (
         <VContainer gap={10} grow={1} overflow='hidden' style={{ padding: '1px' }}>
-            <VContainer grow={1}>
-                <HContainer grow={1}>
+            <VContainer grow={1} overflow='hidden'>
+                <HContainer grow={1} overflow='hidden'>
                     <VContainer style={{ width: '50%' }} overflow='hidden'>
                         <HContainer justifyContent='space-between'>
                             <label>
@@ -212,9 +221,15 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                     </VContainer>
                     <VContainer justifyContent="center">
                         <label style={{ width: 34 }}>&nbsp;</label>
-                        <i className="codicon codicon-arrow-right"></i>
+                        <ReconvertButton
+                            className="theia-button"
+                            title={nls.localize('vuengine/editors/reconvertImage', 'Reconvert Image')}
+                            onClick={sourceImageToCharacters}
+                        >
+                            <i className="codicon codicon-arrow-right"></i>
+                        </ReconvertButton>
                     </VContainer>
-                    <VContainer style={{ width: '50%' }}>
+                    <VContainer style={{ width: '50%' }} overflow='hidden'>
                         <label>
                             {nls.localize('vuengine/editors/result', 'Result')}
                         </label>
@@ -300,6 +315,16 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                         onChange={e => setImportOffset(
                             clamp(!isNaN(parseInt(e.target.value)) ? parseInt(e.target.value) : 0, MIN_OFFSET, MAX_OFFSET)
                         )}
+                    />
+                </VContainer>
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/fontEditor/invertColors', 'Invert Colors')}
+                    </label>
+                    <input
+                        type="checkbox"
+                        checked={invert}
+                        onChange={() => setInvert(!invert)}
                     />
                 </VContainer>
             </HContainer>
