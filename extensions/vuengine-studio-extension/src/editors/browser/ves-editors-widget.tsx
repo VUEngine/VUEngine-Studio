@@ -371,7 +371,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
 
         switch (schema.type) {
             case 'array':
-                const resultArray: any[] = [];
+                let resultArray: any[] = [];
                 if (data?.length > 0) {
                     data.map((dataValue: any) => {
                         resultArray.push(this.generateDataFromSchema(
@@ -379,6 +379,8 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
                             dataValue
                         ));
                     });
+                } else if (schema.default !== undefined) {
+                    resultArray = schema.default;
                 }
                 if ((schema.minItems !== undefined) && resultArray.length < schema.minItems) {
                     [...Array(schema.minItems - resultArray.length)].map(x => {
