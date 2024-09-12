@@ -37,8 +37,7 @@
             "**/.svn": true,
             "**/.hg": true,
             "**/CVS": true,
-            "**/.DS_Store": true,
-            "**/build": true
+            "**/.DS_Store": true
           },
           "files.watcherExclude": {
             "**/.git/objects/**": true,

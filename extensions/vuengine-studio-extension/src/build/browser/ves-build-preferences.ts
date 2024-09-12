@@ -11,6 +11,7 @@ export namespace VesBuildPreferenceIds {
     export const AUTO_FILTER_LOGS_ON_ERROR = [CATEGORY, 'autoFilterLogsOnError'].join('.');
     export const AUTO_FILTER_LOGS_ON_WARNING = [CATEGORY, 'autoFilterLogsOnWarning'].join('.');
     export const AUTO_OPEN_WIDGET_ON_ERROR = [CATEGORY, 'autoOpenWidgetOnError'].join('.');
+    export const HIDE_BUILD_FOLDER = [CATEGORY, 'hideBuildFolder'].join('.');
     export const BUILD_MODE = [CATEGORY, 'mode'].join('.');
     export const DUMP_ELF = [CATEGORY, 'dumpElf'].join('.');
     export const PEDANTIC_WARNINGS = [CATEGORY, 'pedanticWarnings'].join('.');
@@ -179,6 +180,13 @@ const properties: PreferenceSchemaProperties = {
     [VesBuildPreferenceIds.AUTO_OPEN_WIDGET_ON_ERROR]: {
         type: 'boolean',
         description: nls.localize('vuengine/build/preferences/autoOpenWidgetOnError', 'Automatically open widget when the build failed.'),
+        default: true,
+        scope: PreferenceScope.Folder,
+        overridable: true,
+    },
+    [VesBuildPreferenceIds.HIDE_BUILD_FOLDER]: {
+        type: 'boolean',
+        description: nls.localize('vuengine/build/preferences/hideBuildFolder', 'Hide build folder in file explorer.'),
         default: true,
         scope: PreferenceScope.Folder,
         overridable: true,
