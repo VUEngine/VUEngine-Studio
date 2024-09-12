@@ -219,7 +219,6 @@ export class VesBuildService {
 
   @postConstruct()
   protected init(): void {
-    this.bindEvents();
     this.doInit();
   }
 
@@ -228,6 +227,7 @@ export class VesBuildService {
     await this.workspaceService.ready;
     this.lastBuildMode = await this.localStorageService.getData(this.getLastBuildModeStorageKey());
     await this.resetBuildStatus();
+    this.bindEvents();
   }
 
   async doBuild(force: boolean = false): Promise<void> {
@@ -330,7 +330,10 @@ export class VesBuildService {
     });
   }
 
-  protected bindEvents(): void {
+  protected async bindEvents(): Promise<void> {
+    // must wait for preference service to be ready, otherwise onPreferenceChanged would fire when preference values are initially set
+    await this.preferenceService.ready;
+
     // init flags
     this.frontendApplicationStateService.onStateChanged(
       async (state: FrontendApplicationState) => {
@@ -342,10 +345,12 @@ export class VesBuildService {
 
     // watch for preference changes
     this.preferenceService.onPreferenceChanged(
-      ({ preferenceName, newValue }) => {
+      ({ preferenceName, newValue, oldValue }) => {
         switch (preferenceName) {
           case VesBuildPreferenceIds.BUILD_MODE:
-            this.onDidChangeBuildModeEmitter.fire(newValue);
+            if (newValue !== oldValue) {
+              this.onDidChangeBuildModeEmitter.fire(newValue);
+            }
             break;
         }
       }
@@ -405,6 +410,23 @@ export class VesBuildService {
       this.romSize = 0;
       if (this.preferenceService.get(VesBuildPreferenceIds.AUTO_OPEN_WIDGET_ON_ERROR)) {
         this.commandService.executeCommand(VesBuildCommands.WIDGET_TOGGLE.id, true);
+      }
+    });
+
+    this.onDidChangeBuildMode(async buildMode => {
+      // delete library files to force rebuild
+      await this.deleteLibraryFiles();
+
+      // To keep default ROM in sync with the currently selected build mode,
+      // delete default ROM and copy over build mode ROM to this location, if it exists.
+      await this.deleteRom();
+      const defaultRomUri = await this.getDefaultRomUri();
+      const modeRomUri = await this.getBuildModeRomUri(buildMode);
+
+      if (defaultRomUri !== undefined && modeRomUri !== undefined) {
+        if (await this.fileService.exists(modeRomUri)) {
+          await this.fileService.copy(modeRomUri, defaultRomUri);
+        }
       }
     });
   }
@@ -1099,18 +1121,6 @@ export class VesBuildService {
 
   async setBuildMode(buildMode: BuildMode): Promise<void> {
     await this.preferenceService.set(VesBuildPreferenceIds.BUILD_MODE, buildMode, PreferenceScope.User);
-
-    // To keep default ROM in sync with the currently selected build mode,
-    // delete default ROM and copy over build mode ROM to this location, if it exists.
-    await this.deleteRom();
-    const defaultRomUri = await this.getDefaultRomUri();
-    const modeRomUri = await this.getBuildModeRomUri(buildMode);
-
-    if (defaultRomUri !== undefined && modeRomUri !== undefined) {
-      if (await this.fileService.exists(modeRomUri)) {
-        await this.fileService.copy(modeRomUri, defaultRomUri);
-      }
-    }
   }
 
   async getDefaultRomUri(): Promise<URI> {
@@ -1148,16 +1158,7 @@ export class VesBuildService {
         await this.fileService.delete(buildPathModeUri, { recursive: true });
       }
 
-      if (await this.fileService.exists(buildPathUri)) {
-        const files = await this.fileService.resolve(buildPathUri);
-        if (files.children) {
-          for (const child of files.children) {
-            if (child.name.endsWith('.a')) {
-              this.fileService.delete(child.resource);
-            }
-          }
-        }
-      }
+      await this.deleteLibraryFiles();
     }
 
     this.isCleaning = false;
@@ -1165,6 +1166,20 @@ export class VesBuildService {
     if (this.isQueued) {
       this.isQueued = false;
       this.commandService.executeCommand(VesBuildCommands.BUILD.id, true);
+    }
+  }
+
+  protected async deleteLibraryFiles(): Promise<void> {
+    const buildPathUri = await this.getBuildPathUri();
+    if (await this.fileService.exists(buildPathUri)) {
+      const files = await this.fileService.resolve(buildPathUri);
+      if (files.children) {
+        await Promise.all(files.children.map(async child => {
+          if (child.name.endsWith('.a')) {
+            await this.fileService.delete(child.resource);
+          }
+        }));
+      }
     }
   }
 
