@@ -575,7 +575,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
               title={`${this.state.paused
                 ? nls.localize('vuengine/emulator/resume', 'Resume')
                 : nls.localize('vuengine/emulator/pause', 'Pause')
-                }${this.getKeybindingLabel(
+                }${this.vesCommonService.getKeybindingLabel(
                   VesEmulatorCommands.INPUT_PAUSE_TOGGLE.id,
                   true
                 )}`}
@@ -589,7 +589,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
             <button
               className="theia-button secondary"
               title={`${VesEmulatorCommands.INPUT_RESET.label
-                }${this.getKeybindingLabel(
+                }${this.vesCommonService.getKeybindingLabel(
                   VesEmulatorCommands.INPUT_RESET.id,
                   true
                 )}`}
@@ -603,7 +603,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
               title={`${this.state.muted
                 ? nls.localize('vuengine/emulator/unmute', 'Unmute')
                 : nls.localize('vuengine/emulator/mute', 'Mute')
-                }${this.getKeybindingLabel(
+                }${this.vesCommonService.getKeybindingLabel(
                   VesEmulatorCommands.INPUT_AUDIO_MUTE.id,
                   true
                 )}`}
@@ -623,7 +623,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
                 this.state.lowPower ? 'theia-button' : 'theia-button secondary'
               }
               title={`${VesEmulatorCommands.INPUT_TOGGLE_LOW_POWER.label
-                }${this.getKeybindingLabel(
+                }${this.vesCommonService.getKeybindingLabel(
                   VesEmulatorCommands.INPUT_TOGGLE_LOW_POWER.id,
                   true
                 )}`}
@@ -652,7 +652,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
                 <button
                   className="theia-button secondary"
                   title={`${VesEmulatorCommands.INPUT_REWIND.label
-                    }${this.getKeybindingLabel(
+                    }${this.vesCommonService.getKeybindingLabel(
                       VesEmulatorCommands.INPUT_REWIND.id,
                       true
                     )}`}
@@ -675,7 +675,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
                   : 'theia-button secondary'
               }
               title={`${VesEmulatorCommands.INPUT_TOGGLE_SLOWMOTION.label
-                }${this.getKeybindingLabel(
+                }${this.vesCommonService.getKeybindingLabel(
                   VesEmulatorCommands.INPUT_TOGGLE_SLOWMOTION.id,
                   true
                 )}`}
@@ -697,7 +697,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
                   : 'theia-button secondary'
               }
               title={`${VesEmulatorCommands.INPUT_FRAME_ADVANCE.label
-                }${this.getKeybindingLabel(
+                }${this.vesCommonService.getKeybindingLabel(
                   VesEmulatorCommands.INPUT_FRAME_ADVANCE.id,
                   true
                 )}`}
@@ -720,7 +720,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
                   : 'theia-button secondary'
               }
               title={`${VesEmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.label
-                }${this.getKeybindingLabel(
+                }${this.vesCommonService.getKeybindingLabel(
                   VesEmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.id,
                   true
                 )}`}
@@ -740,7 +740,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
             <button
               className="theia-button secondary"
               title={`${VesEmulatorCommands.INPUT_SAVE_STATE.label
-                }${this.getKeybindingLabel(
+                }${this.vesCommonService.getKeybindingLabel(
                   VesEmulatorCommands.INPUT_SAVE_STATE.id,
                   true
                 )}`}
@@ -759,7 +759,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
             <button
               className="theia-button secondary"
               title={`${VesEmulatorCommands.INPUT_LOAD_STATE.label
-                }${this.getKeybindingLabel(
+                }${this.vesCommonService.getKeybindingLabel(
                   VesEmulatorCommands.INPUT_LOAD_STATE.id,
                   true
                 )}`}
@@ -792,7 +792,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
             <button
               className="theia-button secondary"
               title={`${VesEmulatorCommands.INPUT_STATE_SLOT_DECREASE.label
-                }${this.getKeybindingLabel(
+                }${this.vesCommonService.getKeybindingLabel(
                   VesEmulatorCommands.INPUT_STATE_SLOT_DECREASE.id,
                   true
                 )}`}
@@ -811,7 +811,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
             <button
               className="theia-button secondary"
               title={`${VesEmulatorCommands.INPUT_STATE_SLOT_INCREASE.label
-                }${this.getKeybindingLabel(
+                }${this.vesCommonService.getKeybindingLabel(
                   VesEmulatorCommands.INPUT_STATE_SLOT_INCREASE.id,
                   true
                 )}`}
@@ -831,7 +831,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
             <button
               className="theia-button secondary"
               title={`${VesEmulatorCommands.INPUT_DUMP_SRAM.label
-                }${this.getKeybindingLabel(
+                }${this.vesCommonService.getKeybindingLabel(
                   VesEmulatorCommands.INPUT_DUMP_SRAM.id,
                   true
                 )}`}
@@ -908,7 +908,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
             <button
               className="theia-button secondary"
               title={`${VesEmulatorCommands.INPUT_FULLSCREEN.label
-                }${this.getKeybindingLabel(
+                }${this.vesCommonService.getKeybindingLabel(
                   VesEmulatorCommands.INPUT_FULLSCREEN.id,
                   true
                 )}`}
@@ -922,7 +922,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
             <button
               className="theia-button secondary"
               title={`${VesEmulatorCommands.INPUT_SCREENSHOT.label
-                }${this.getKeybindingLabel(
+                }${this.vesCommonService.getKeybindingLabel(
                   VesEmulatorCommands.INPUT_SCREENSHOT.id,
                   true
                 )}`}
@@ -942,7 +942,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
               title={`${nls.localize(
                 'vuengine/emulator/configureInput',
                 'Configure Input'
-              )}${this.getKeybindingLabel(
+              )}${this.vesCommonService.getKeybindingLabel(
                 VesEmulatorCommands.INPUT_TOGGLE_CONTROLS_OVERLAY.id,
                 true
               )}`}
@@ -1014,6 +1014,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
             <EmulatorControlsOverlay
               commandService={this.commandService}
               keybindingRegistry={this.keybindingRegistry}
+              vesCommonService={this.vesCommonService}
             />
           </div>
         )}
@@ -1428,28 +1429,6 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
       button = keyCode.substring(5);
     }
     return button.toLowerCase();
-  }
-
-  protected getKeybindingLabel(
-    commandId: string,
-    wrapInBrackets: boolean = false
-  ): string {
-    const keybinding =
-      this.keybindingRegistry.getKeybindingsForCommand(commandId)[0];
-    let keybindingAccelerator = keybinding
-      ? this.keybindingRegistry.acceleratorFor(keybinding, '+').join(', ')
-      : '';
-
-    keybindingAccelerator = keybindingAccelerator.replace(
-      ' ',
-      nls.localize('vuengine/general/space', 'Space')
-    );
-
-    if (wrapInBrackets && keybindingAccelerator !== '') {
-      keybindingAccelerator = ` (${keybindingAccelerator})`;
-    }
-
-    return keybindingAccelerator;
   }
 
   protected deleteSramAndRestart = async () => {

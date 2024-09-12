@@ -1,13 +1,15 @@
-import * as React from '@theia/core/shared/react';
-import { CommandService, nls } from '@theia/core';
+import { CommandService } from '@theia/core';
 import { KeybindingRegistry } from '@theia/core/lib/browser';
+import * as React from '@theia/core/shared/react';
 import { KeymapsCommands } from '@theia/keymaps/lib/browser';
-import { VesEmulatorCommands } from '../ves-emulator-commands';
+import { VesCommonService } from 'src/core/browser/ves-common-service';
 import IMAGE_VB_CONTROLLER from '../../../../src/emulator/browser/images/vb-controller.png';
+import { VesEmulatorCommands } from '../ves-emulator-commands';
 
 export interface EmulatorControlsOverlayProps {
     commandService: CommandService
     keybindingRegistry: KeybindingRegistry
+    vesCommonService: VesCommonService
 }
 
 export interface EmulatorControlsOverlayState {
@@ -16,6 +18,7 @@ export interface EmulatorControlsOverlayState {
 export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOverlayProps, EmulatorControlsOverlayState> {
     protected commandService: CommandService;
     protected keybindingRegistry: KeybindingRegistry;
+    protected vesCommonService: VesCommonService;
 
     protected controllerButtonAssignmentSelectRef = React.createRef<HTMLDivElement>();
     protected controllerButtonAssignmentStartRef = React.createRef<HTMLDivElement>();
@@ -52,6 +55,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
         super(props);
 
         this.commandService = props.commandService;
+        this.vesCommonService = props.vesCommonService;
         this.keybindingRegistry = props.keybindingRegistry;
     }
 
@@ -71,7 +75,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             </span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_L_TRIGGER.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_L_TRIGGER.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -87,7 +91,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             </span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_L_UP.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_L_UP.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -102,7 +106,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             </span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_L_RIGHT.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_L_RIGHT.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -117,7 +121,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             </span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_L_DOWN.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_L_DOWN.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -132,7 +136,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             </span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_L_LEFT.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_L_LEFT.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -148,7 +152,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             </span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_SELECT.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_SELECT.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -163,7 +167,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             </span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_START.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_START.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -290,7 +294,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             </span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_R_TRIGGER.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_R_TRIGGER.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -306,7 +310,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             </span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_R_UP.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_R_UP.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -321,7 +325,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             </span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_R_RIGHT.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_R_RIGHT.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -336,7 +340,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             </span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_R_DOWN.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_R_DOWN.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -351,7 +355,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             </span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_R_LEFT.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_R_LEFT.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -367,7 +371,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             </span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_A.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_A.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -382,7 +386,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             </span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_B.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_B.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -394,7 +398,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             <span>{VesEmulatorCommands.INPUT_PAUSE_TOGGLE.label}</span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_PAUSE_TOGGLE.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_PAUSE_TOGGLE.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -407,7 +411,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             <span>{VesEmulatorCommands.INPUT_RESET.label}</span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_RESET.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_RESET.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -415,7 +419,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             <span>{VesEmulatorCommands.INPUT_AUDIO_MUTE.label}</span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_AUDIO_MUTE.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_AUDIO_MUTE.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -423,7 +427,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             <span>{VesEmulatorCommands.INPUT_TOGGLE_LOW_POWER.label}</span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_TOGGLE_LOW_POWER.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_TOGGLE_LOW_POWER.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -433,7 +437,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             <span>{VesEmulatorCommands.INPUT_FRAME_ADVANCE.label}</span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_FRAME_ADVANCE.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_FRAME_ADVANCE.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -441,7 +445,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             <span>{VesEmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.label}</span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_TOGGLE_FAST_FORWARD.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -449,7 +453,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             <span>{VesEmulatorCommands.INPUT_TOGGLE_SLOWMOTION.label}</span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_TOGGLE_SLOWMOTION.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_TOGGLE_SLOWMOTION.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -457,7 +461,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             <span>{VesEmulatorCommands.INPUT_REWIND.label}</span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_REWIND.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_REWIND.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -467,7 +471,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             <span>{VesEmulatorCommands.INPUT_SAVE_STATE.label}</span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_SAVE_STATE.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_SAVE_STATE.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -475,7 +479,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             <span>{VesEmulatorCommands.INPUT_LOAD_STATE.label}</span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_LOAD_STATE.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_LOAD_STATE.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -483,7 +487,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             <span>{VesEmulatorCommands.INPUT_STATE_SLOT_INCREASE.label}</span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_STATE_SLOT_INCREASE.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_STATE_SLOT_INCREASE.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -491,7 +495,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             <span>{VesEmulatorCommands.INPUT_STATE_SLOT_DECREASE.label}</span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_STATE_SLOT_DECREASE.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_STATE_SLOT_DECREASE.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -501,7 +505,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             <span>{VesEmulatorCommands.INPUT_FULLSCREEN.label}</span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_FULLSCREEN.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_FULLSCREEN.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -509,7 +513,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             <span>{VesEmulatorCommands.INPUT_SCREENSHOT.label}</span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_SCREENSHOT.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_SCREENSHOT.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -517,7 +521,7 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
                             <span>{VesEmulatorCommands.INPUT_TOGGLE_CONTROLS_OVERLAY.label}</span>
                             <span>
                                 <button className='theia-button secondary' onClick={this.openKeymaps}>
-                                    {this.getKeybindingLabel(VesEmulatorCommands.INPUT_TOGGLE_CONTROLS_OVERLAY.id, false)}
+                                    {this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.INPUT_TOGGLE_CONTROLS_OVERLAY.id, false)}
                                 </button>
                             </span>
                         </div>
@@ -529,25 +533,6 @@ export class EmulatorControlsOverlay extends React.Component<EmulatorControlsOve
 
     protected toggleRefHighlighted = (buttonOverlayRef: React.RefObject<HTMLDivElement>) =>
         buttonOverlayRef.current?.classList.toggle('highlighted');
-
-    protected getKeybindingLabel(
-        commandId: string,
-        wrapInBrackets: boolean = false
-    ): string {
-        const keybinding = this.keybindingRegistry.getKeybindingsForCommand(commandId)[0];
-        let keybindingAccelerator = keybinding
-            ? this.keybindingRegistry.acceleratorFor(keybinding, '+').join(', ')
-            : '';
-
-        keybindingAccelerator = keybindingAccelerator
-            .replace(' ', nls.localize('vuengine/general/space', 'Space'));
-
-        if (wrapInBrackets && keybindingAccelerator !== '') {
-            keybindingAccelerator = ` (${keybindingAccelerator})`;
-        }
-
-        return keybindingAccelerator;
-    }
 
     protected openKeymaps = async () => this.commandService.executeCommand(KeymapsCommands.OPEN_KEYMAPS.id);
 }

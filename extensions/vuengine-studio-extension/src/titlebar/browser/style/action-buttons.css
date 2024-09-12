@@ -1,57 +1,24 @@
 #ves-titlebar-action-buttons {
-  margin: 0 8px;
   order: 3;
-  padding-top: 5px;
   text-align: right;
   white-space: nowrap;
   z-index: 1;
 }
 
-#ves-titlebar-action-buttons .theia-button {
+.titlebar-action-button {
   -webkit-app-region: no-drag;
-  background-color: var(--theia-titleBar-buttonBackground);
   cursor: pointer;
-  font-size: 17px;
-  line-height: 27px;
-  margin-left: 4px;
-  min-width: 36px;
-  padding: 1px 0 0;
+  display: inline-block;
+  fill: var(--theia-titleBar-activeForeground);
+  font-size: 18px;
+  height: var(--theia-private-menubar-height);
+  line-height: var(--theia-private-menubar-height);
+  text-align: center;
+  width: 46px;
 }
 
-#ves-titlebar-action-buttons .theia-button i {
-  line-height: 16px;
-  width: 16px;
-}
 
-#ves-titlebar-action-buttons .theia-button.active,
-#ves-titlebar-action-buttons .theia-button:enabled:hover {
-  background-color: var(--theia-titleBar-hoverButtonBackground);
-}
-
-/* #ves-titlebar-action-buttons .theia-button.build.success {
-  background-color: var(--theia-editorSuccess-foreground);
-} */
-#ves-titlebar-action-buttons .theia-button.build.warning {
-  background-color: var(--theia-editorWarning-foreground);
-}
-#ves-titlebar-action-buttons .theia-button.build.error {
-  background-color: var(--theia-editorError-foreground);
-}
-
-#ves-titlebar-action-buttons .theia-button.queued {
-  animation-name: pulseQueued;
-  animation-duration: 2s;
-  animation-iteration-count: infinite;
-}
-
-@keyframes pulseQueued {
-  0% {
-    background-color: var(--theia-titleBar-buttonBackground);
-  }
-  50% {
-    background-color: var(--theia-titleBar-hoverButtonBackground);
-  }
-  100% {
-    background-color: var(--theia-titleBar-buttonBackground);
-  }
+.titlebar-action-button:hover,
+.titlebar-action-button:active {
+  background: rgba(255, 255, 255, .3);
 }

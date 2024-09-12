@@ -5,7 +5,7 @@
   z-index: 1;
 }
 
-#ves-titlebar-window-controls .titlebar-window-controls-button {
+.titlebar-window-controls-button {
   -webkit-app-region: no-drag;
   display: inline-block;
   fill: var(--theia-titleBar-activeForeground);
@@ -16,7 +16,7 @@
   width: 46px;
 }
 
-#ves-titlebar-window-controls .titlebar-window-controls-button:hover,
-#ves-titlebar-window-controls .titlebar-window-controls-button:active {
+.titlebar-window-controls-button:hover,
+.titlebar-window-controls-button:active {
   background: rgba(255, 255, 255, .3);
 }

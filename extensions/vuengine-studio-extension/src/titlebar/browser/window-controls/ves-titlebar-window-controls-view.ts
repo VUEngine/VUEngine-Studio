@@ -6,7 +6,6 @@ import { VesTitlebarWindowControlCommands } from './ves-titlebar-window-controls
 
 @injectable()
 export class VesTitlebarWindowControlsContribution extends AbstractViewContribution<VesTitlebarWindowControlsWidget> {
-
     constructor() {
         super({
             widgetId: VesTitlebarWindowControlsWidget.ID,
