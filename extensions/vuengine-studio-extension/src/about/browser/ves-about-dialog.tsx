@@ -50,7 +50,7 @@ export class VesAboutDialog extends AboutDialog {
     }
 
     protected renderHeader(): React.ReactNode {
-        // const applicationInfo = this.applicationInfo;
+        const applicationInfo = this.applicationInfo;
         const applicationName = FrontendApplicationConfigProvider.get().applicationName;
 
         return <div className="ves-about-paragraph ves-about-flex-grid">
@@ -61,8 +61,7 @@ export class VesAboutDialog extends AboutDialog {
                 <h1>
                     {applicationName}
                     <span className="ves-about-sub-header">
-                        {' Preview'}
-                        {/* applicationInfo && ` ${applicationInfo.version}` */}
+                        {applicationInfo && ` ${applicationInfo.version}`}
                     </span>
                 </h1>
                 {this.renderCopyright()}
@@ -96,7 +95,6 @@ export class VesAboutDialog extends AboutDialog {
 
     protected renderVersions(): React.ReactNode {
         return <div className="ves-about-paragraph">
-            <div>{nls.localize('vuengine/about/version', 'Version')}: {this.applicationInfo && this.applicationInfo.version}</div>
             <div>{nls.localize('vuengine/about/vsCodeApiVersion', 'VSCode API Version')}: {VSCODE_DEFAULT_API_VERSION}</div>
         </div>;
     }

@@ -22,6 +22,7 @@ files:
   - scripts
   - "!**node_modules/**"
   - resources/splash/index.html
+  - resources/splash/splash.mp4
   - resources/icons/512x512.png
   - from: binaries/vuengine-studio-tools/web
     to: binaries/vuengine-studio-tools/web

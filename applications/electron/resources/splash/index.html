@@ -4,59 +4,132 @@
 <head>
   <meta charset="utf-8">
   <style type="text/css">
-    @keyframes splashFadeIn {
+    body {
+      -webkit-app-region: drag;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    @keyframes videoFade {
       0% {
         opacity: 0;
       }
 
-      100% {
-        opacity: 0.2;
-      }
-    }
-
-    @keyframes splashPulse {
-      0% {
-        opacity: 0.2;
+      15% {
+        opacity: 1;
       }
 
-      50% {
+      75% {
         opacity: 1;
       }
 
       100% {
-        opacity: 0.2;
+        opacity: 0;
       }
     }
 
-    .logo {
-      -webkit-app-region: drag;
-      background: none;
-      animation-name: splashFadeIn, splashPulse;
-      animation-duration: 0.5s, 2s;
-      animation-delay: 0s, 0.5s;
-      animation-timing-function: linear, linear;
-      animation-iteration-count: 1, infinite;
+    @keyframes infoFadeIn {
+      0% {
+        opacity: 0;
+      }
+
+      60% {
+        opacity: 0;
+      }
+
+      100% {
+        opacity: 1;
+      }
+    }
+
+    @keyframes logoPulse {
+      0% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
+
+      100% {
+        opacity: 1;
+      }
+    }
+
+    .splash-container {
+      animation-name: videoFade;
+      animation-duration: 4.2s;
+      animation-delay: 0.1s;
+      animation-timing-function: linear;
+      animation-iteration-count: 1;
+      align-items: center;
+      display: flex;
+      height: 280px;
+      opacity: 0;
+      overflow: hidden;
+      position: absolute;
+      width: 560px;
+      z-index: 10;
+    }
+
+    .info-container {
+      align-items: center;
+      animation-name: infoFadeIn;
+      animation-duration: 3.25s;
+      animation-delay: 0s;
+      animation-timing-function: linear;
+      animation-iteration-count: 1;
+      background-color: #111;
+      box-sizing: border-box;
+      color: #ccc;
+      display: flex;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      gap: 20px;
+      height: 280px;
+      opacity: 1;
+      padding: 10px;
+      position: absolute;
+      width: 560px;
       z-index: 1;
     }
 
-    .logo::after {
-      animation: none;
-      background: transparent no-repeat center url('../icons/512x512.png');
-      background-size: contain;
-      height: 320px;
-      content: "";
-      margin-left: -160px;
-      margin-top: -160px;
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 320px;
+    .info-container img {
+      animation-name: logoPulse;
+      animation-duration: 2s;
+      animation-delay: 4s;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+    }
+
+    h1 {
+      font-size: 29px;
+      white-space: nowrap;
+    }
+
+    .copyright {
+      font-size: 12px;
+      letter-spacing: -.5px;
     }
   </style>
 </head>
 
 <body>
-  <div class="logo"></div>
+  <div class="splash-container">
+    <video src="./splash.mp4" preload="auto" autoplay></video>
+  </div>
+  <div class="info-container">
+    <img src="../icons/512x512.png" height="200" width="200" />
+    <div>
+      <h1>
+        VUEngine Studio
+        <span style="opacity: .5;">0.6.0</span>
+      </h1>
+      <p class="copyright">
+        © 2022-2024 Christian Radke and Jorge Andres Eremiev
+        <br /><br />
+      </p>
+    </div>
+  </div>
 </body>
 
 </html>

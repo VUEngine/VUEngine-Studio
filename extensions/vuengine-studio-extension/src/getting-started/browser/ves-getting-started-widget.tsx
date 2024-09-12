@@ -111,7 +111,7 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
     protected renderHeader(): React.ReactNode {
         return <div className='gs-header'>
             <h1>
-                {this.applicationName}
+                {this.applicationName}{' '}
                 <span className="gs-sub-header">
                     {this.renderVersion()}
                 </span>
@@ -197,9 +197,8 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
     }
 
     protected renderVersion(): React.ReactNode {
-        return <span className='gs-sub-header' >
-            {' Preview'}
-            {/* this.applicationInfo ? ` ${this.applicationInfo.version} (Preview)` : ' (Preview)' */}
+        return <span className='gs-sub-header'>
+            {this.applicationInfo && this.applicationInfo.version}
         </span>;
     }
 

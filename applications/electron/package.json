@@ -58,8 +58,8 @@
           "showWindowEarly": false,
           "splashScreenOptions": {
             "content": "resources/splash/index.html",
-            "height": 320,
-            "width": 320
+            "height": 280,
+            "width": 560
           }
         }
       }
