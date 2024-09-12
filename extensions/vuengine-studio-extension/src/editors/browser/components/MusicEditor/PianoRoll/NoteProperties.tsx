@@ -1,22 +1,40 @@
-import React, { useContext } from 'react';
-import { MusicEditorContext, MusicEditorContextType } from '../MusicEditorTypes';
+import { nls } from '@theia/core';
+import React from 'react';
+import { SongData } from '../MusicEditorTypes';
 import NotePropertiesNote from './NotePropertiesNote';
 
-export default function NoteProperties(): React.JSX.Element {
-    const { state, songData } = useContext(MusicEditorContext) as MusicEditorContextType;
+interface NotePropertiesProps {
+    songData: SongData
+    currentNote: number
+    setCurrentNote: (currentNote: number) => void
+    currentChannelId: number
+    currentPatternId: number
+    setNote: (index: number, note: number | undefined) => void
+}
 
-    const channel = songData.channels[state.currentChannel];
-    const pattern = channel.patterns[state.currentPattern];
+export default function NoteProperties(props: NotePropertiesProps): React.JSX.Element {
+    const {
+        songData,
+        currentNote, setCurrentNote,
+        currentChannelId,
+        currentPatternId,
+        setNote,
+    } = props;
 
-    const classNames = ['noteProperties'];
+    const channel = songData.channels[currentChannelId];
+    const pattern = channel.patterns[currentPatternId];
 
     let volumeL = 100;
     let volumeR = 100;
 
-    return <div className={classNames.join(' ')}>
-        <div className='notePropertiesHeader'>
-            <div>Effects</div>
-            <div>Volume</div>
+    return <div className="metaLine" style={{ marginTop: 3 }}>
+        <div className="metaLineHeader">
+            <div>
+                {nls.localize('vuengine/musicEditor/effects', 'Effects')}
+            </div>
+            <div>
+                {nls.localize('vuengine/musicEditor/volume', 'Volume')}
+            </div>
         </div>
         {[...Array(pattern.size)].map((x, index) => {
             volumeL = pattern.volumeL[index] ?? volumeL;
@@ -25,10 +43,13 @@ export default function NoteProperties(): React.JSX.Element {
                 <NotePropertiesNote
                     key={`pianoroll-note-properties-volume-note-${index}`}
                     index={index}
-                    current={index === state.currentNote}
+                    current={index === currentNote}
                     effects={[]}
                     volumeL={volumeL}
                     volumeR={volumeR}
+                    songData={songData}
+                    setCurrentNote={setCurrentNote}
+                    setNote={setNote}
                 />
             );
         })}

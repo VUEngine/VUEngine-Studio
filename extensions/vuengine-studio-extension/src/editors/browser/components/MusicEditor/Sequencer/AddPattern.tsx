@@ -1,24 +1,49 @@
-import React, { useContext } from 'react';
-import { ChannelConfig, MusicEditorContext, MusicEditorContextType } from '../MusicEditorTypes';
+import { nls } from '@theia/core';
+import React from 'react';
+import { ChannelConfig, SongData } from '../MusicEditorTypes';
 
 interface AddPatternProps {
     channel: ChannelConfig
-    height: number
+    setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
+    songData: SongData
+    setCurrentPatternId: (channel: number, patternId: number) => void
 }
 
 export default function AddPattern(props: AddPatternProps): React.JSX.Element {
-    const { addToSequence } = useContext(MusicEditorContext) as MusicEditorContextType;
-    const { channel, height } = props;
+    const {
+        channel, setChannel,
+        songData,
+        setCurrentPatternId,
+    } = props;
 
-    const classNames = ['addPattern'];
+    const addToSequence = (channelId: number, patternId: number): void => {
+        const updatedChannel = {
+            ...songData.channels[channelId],
+            sequence: [
+                ...songData.channels[channelId].sequence,
+                patternId
+            ],
+        };
 
-    const style = {
-        height: `${height / 2}px`,
+        const largestPatternId = songData.channels[channelId].patterns.length - 1;
+        if (patternId > largestPatternId) {
+            updatedChannel.patterns.push({
+                name: '',
+                size: songData.defaultPatternSize,
+                notes: [],
+                volumeL: [],
+                volumeR: [],
+                effects: [],
+            });
+        }
+
+        setChannel(channelId, updatedChannel);
+        setCurrentPatternId(channelId, patternId);
     };
 
     return <div
-        className={classNames.join(' ')}
-        style={style}
+        title={nls.localize('vuengine/musicEditor/addPattern', 'Add Pattern')}
+        className="addPattern"
     >
         <i className='codicon codicon-plus' />
         <div className='patternSelect'>
@@ -29,19 +54,13 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
                 <i className='codicon codicon-plus' />
             </button>
             <div className='existingPatterns'>
-                {[0, 1].map(remainder => (
-                    <div key={`channel-add-row-${remainder}`}>
-                        {channel.patterns.map((pattern, patternId) => {
-                            if (patternId % 2 === remainder) {
-                                return (<button
-                                    key={`channel-${channel.id}-add-${patternId}`}
-                                    onClick={() => addToSequence(channel.id, patternId)}
-                                >
-                                    {patternId + 1}
-                                </button>);
-                            }
-                        })}
-                    </div>
+                {channel.patterns.map((pattern, patternId) => (
+                    <button
+                        key={`channel-${channel.id}-add-${patternId}`}
+                        onClick={() => addToSequence(channel.id, patternId)}
+                    >
+                        {patternId + 1}
+                    </button>
                 ))}
             </div>
         </div>

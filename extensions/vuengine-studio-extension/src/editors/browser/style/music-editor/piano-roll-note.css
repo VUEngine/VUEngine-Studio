@@ -32,6 +32,10 @@
     background-color: var(--theia-focusBorder) !important;
 }
 
+.musicEditor .pianoRollNote.otherChannelSet {
+    background-color: var(--theia-editor-foreground) !important;
+}
+
 .musicEditor .pianoRollNote.nth {
     margin-right: 3px;
 }

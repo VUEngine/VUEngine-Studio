@@ -1,25 +1,26 @@
 .musicEditor .pattern {
-    align-items: end;
+    align-items: center;
     background-color: var(--theia-secondaryButton-background);
+    border: 1px solid transparent;
+    border-radius: 2px;
     box-sizing: border-box;
     color: transparent;
     cursor: grab;
     display: flex;
-    justify-content: end;
+    justify-content: center;
     margin-right: 1px;
     overflow: hidden;
-    padding: 3px;
     position: relative;
 }
 
-.musicEditor .channel.current .pattern,
+/* .musicEditor .channel.current .pattern, */
 .musicEditor .channel:hover .pattern {
     color: unset;
 }
 
 .musicEditor .pattern:hover,
 .musicEditor .pattern.current {
-    outline: 1px solid var(--theia-focusBorder);
+    border-color: var(--theia-focusBorder);
 }
 
 .musicEditor .pattern .notes {
@@ -29,21 +30,23 @@
 }
 
 .musicEditor .pattern .remove {
+    background-color: var(--theia-secondaryButton-hoverBackground);
     cursor: pointer;
     display: none;
-    font-size: 13px;
     position: absolute;
     right: 0;
     text-align: center;
     top: 0;
-    width: 12px;
+    width: 14px;
+    bottom: 0;
+    line-height: 21px;
 }
 
-.musicEditor .pattern .remove:hover {
-    color: var(--theia-focusBorder);
+.musicEditor .pattern.current .remove:hover {
+    background-color: var(--theia-focusBorder);
 }
 
-.musicEditor .pattern:hover .remove {
+.musicEditor .pattern.current:hover .remove {
     display: block;
 }
 

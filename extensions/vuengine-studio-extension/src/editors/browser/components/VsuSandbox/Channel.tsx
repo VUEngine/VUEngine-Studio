@@ -341,7 +341,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                             step={1}
                             onChange={e => setStereoLevel('left', parseInt(e.target.value))}
                         />
-                        <div style={{ minWidth: 24, textAlign: 'right', width: 24 }}>
+                        <div style={{ minWidth: 24, overflow: 'hidden', textAlign: 'right', width: 24 }}>
                             {channel?.stereoLevels?.left ?? 15}
                         </div>
                     </HContainer>
@@ -357,7 +357,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                             step={1}
                             onChange={e => setStereoLevel('right', parseInt(e.target.value))}
                         />
-                        <div style={{ minWidth: 24, textAlign: 'right', width: 24 }}>
+                        <div style={{ minWidth: 24, overflow: 'hidden', textAlign: 'right', width: 24 }}>
                             {channel?.stereoLevels?.right ?? 15}
                         </div>
                     </HContainer>

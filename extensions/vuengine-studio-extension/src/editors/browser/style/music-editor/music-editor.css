@@ -1,11 +1,3 @@
-.musicEditor {
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    overflow: hidden;
-}
-
 .musicEditor .inputWithAction {
     display: flex;
     gap: 5px;
@@ -19,9 +11,4 @@
     margin: 0;
     min-width: 32px;
     width: 32px;
-}
-
-.musicEditor .divider {
-    border-top: var(--theia-sash-width) dashed var(--theia-sideBar-background);
-    margin: 20px 0;
 }

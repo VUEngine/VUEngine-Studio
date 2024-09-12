@@ -1,19 +1,42 @@
-import React, { useContext } from 'react';
-import { ChannelConfig, HIGHEST_NOTE, LOWEST_NOTE, MusicEditorContext, MusicEditorContextType, NOTES } from '../MusicEditorTypes';
+import React from 'react';
+import { ChannelConfig, HIGHEST_NOTE, LOWEST_NOTE, NOTES, SongData } from '../MusicEditorTypes';
 import AddPattern from './AddPattern';
 import ChannelHeader from './ChannelHeader';
 import Pattern from './Pattern';
 
 interface ChannelProps {
     channelConfig: ChannelConfig
+    currentChannelId: number
+    setCurrentChannelId: (currentChannelId: number) => void
+    currentPatternId: number
+    setCurrentPatternId: (channel: number, patternId: number) => void
+    currentSequenceIndex: number
+    setCurrentSequenceIndex: (channel: number, sequenceIndex: number) => void
+    getChannelName: (channelId: number) => string
+    instrumentName: string
     number: number
     otherSolo: boolean
-    instrumentName: string
+    setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
+    songData: SongData,
+    toggleChannelMuted: (channelId: number) => void
+    toggleChannelSolo: (channelId: number) => void
 }
 
 export default function Channel(props: ChannelProps): React.JSX.Element {
-    const { state, setCurrentChannel, toggleChannelCollapsed } = useContext(MusicEditorContext) as MusicEditorContextType;
-    const { channelConfig, number, otherSolo, instrumentName } = props;
+    const {
+        channelConfig,
+        currentChannelId, setCurrentChannelId,
+        currentPatternId, setCurrentPatternId,
+        currentSequenceIndex, setCurrentSequenceIndex,
+        getChannelName,
+        instrumentName,
+        number,
+        otherSolo,
+        setChannel,
+        songData,
+        toggleChannelMuted,
+        toggleChannelSolo,
+    } = props;
 
     const classNames = ['channel'];
     if (channelConfig.muted || otherSolo) {
@@ -22,10 +45,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
     if (channelConfig.solo) {
         classNames.push('solo');
     }
-    if (channelConfig.collapsed) {
-        classNames.push('collapsed');
-    }
-    if (state.currentChannel === number) {
+    if (currentChannelId === number) {
         classNames.push('current');
     }
 
@@ -35,35 +55,44 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
             index >= HIGHEST_NOTE)
         .length;
 
-    return channelConfig.collapsed
-        ? <div
-            className='collapsedChannel'
-            onClick={() => toggleChannelCollapsed(number)}
-        />
-        : <div className={classNames.join(' ')}>
+    return (
+        <div className={classNames.join(' ')}>
             <ChannelHeader
                 channel={channelConfig}
                 number={number}
                 muted={channelConfig.muted}
                 solo={channelConfig.solo}
                 instrumentName={instrumentName}
+                setCurrentChannelId={setCurrentChannelId}
+                getChannelName={getChannelName}
+                toggleChannelMuted={toggleChannelMuted}
+                toggleChannelSolo={toggleChannelSolo}
             />
             {channelConfig.sequence.map((patternId, index) =>
                 <Pattern
                     key={`channel-${number}-pattern-${index}`}
+                    songData={songData}
                     index={index}
                     channel={number}
                     pattern={channelConfig.patterns[patternId]}
                     patternId={patternId}
                     height={patternHeight}
+                    currentChannelId={currentChannelId}
+                    currentPatternId={currentPatternId}
+                    currentSequenceIndex={currentSequenceIndex}
+                    setCurrentSequenceIndex={setCurrentSequenceIndex}
+                    setChannel={setChannel}
                 />)}
             <AddPattern
                 channel={channelConfig}
-                height={patternHeight}
+                setChannel={setChannel}
+                songData={songData}
+                setCurrentPatternId={setCurrentPatternId}
             />
             <div
                 className='patternFill'
-                onClick={() => setCurrentChannel(number)}
+                onClick={() => setCurrentChannelId(number)}
             ></div>
-        </div>;
+        </div>
+    );
 }

@@ -2,7 +2,7 @@
     border-radius: 2px;
     display: flex;
     flex-direction: row;
-    outline: none;
+    outline: none !important;
     user-select: none;
 }
 .radioSelect.canSelectMany {

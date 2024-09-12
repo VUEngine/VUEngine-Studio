@@ -1,14 +1,15 @@
 .musicEditor .addPattern {
     align-items: center;
     border: 1px solid #333;
+    border-radius: 2px;
     box-sizing: border-box;
     color: #333;
     cursor: pointer;
     display: flex;
     justify-content: center;
     margin-right: 2px;
-    min-width: 20px;
-    width: 20px;
+    min-width: 23px;
+    width: 23px;
 }
 
 .addPattern .patternSelect {
@@ -19,21 +20,25 @@
 }
 
 .addPattern button {
+    align-items: center;
     background-color: var(--theia-secondaryButton-background);
+    border-radius: 2px;
     border: 0;
+    color: var(--theia-secondaryButton-foreground);
     cursor: pointer;
+    display: flex;
     font-size: 12px;
     height: 100%;
-    min-width: 15px;
+    justify-content: center;
+    min-height: unset;
+    min-width: 16px;
     padding: 0;
-    text-align: center;
-    width: 15px;
-    color: var(--theia-secondaryButton-foreground);
+    width: 16px;
 }
 
 .addPattern button.newPattern {
-    min-width: 20px;
-    width: 20px;
+    min-width: 23px;
+    width: 23px;
 }
 
 .addPattern button:hover {
@@ -55,7 +60,6 @@
 
 .addPattern .existingPatterns {
     display: flex;
-    flex-direction: column;
     flex-grow: 1;
     gap: 1px;
 }

@@ -1,116 +1,121 @@
-import { CommonCommands } from '@theia/core/lib/browser';
-import React from 'react';
-import { EditorsContextType } from '../../ves-editors-types';
-import { ChannelConfig, InstrumentConfig, MusicEditorContext, MusicEditorState, NOTES, PatternConfig, SongData, SongNote } from './MusicEditorTypes';
+import { ChartScatter, FadersHorizontal, GearSix, Guitar, Keyboard } from '@phosphor-icons/react';
+import { nls } from '@theia/core';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
+import { EDITORS_COMMANDS } from '../../ves-editors-commands';
+import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../ves-editors-types';
+import HContainer from '../Common/HContainer';
+import VContainer from '../Common/VContainer';
+import MusicEditorToolbar from './MusicEditorToolbar';
+import { ChannelConfig, InstrumentConfig, NOTES, PatternConfig, SongData, SongNote } from './MusicEditorTypes';
 import MusicPlayer from './MusicPlayer';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
-import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import Channel from './Sidebar/Channel';
-import Input from './Sidebar/Input';
+import ImportExport from './Sidebar/ImportExport';
+import InputDevices from './Sidebar/InputDevices';
 import Instruments from './Sidebar/Instruments';
 import Note from './Sidebar/Note';
+import Pattern from './Sidebar/Pattern';
+import Patterns from './Sidebar/Patterns';
 import Song from './Sidebar/Song';
-import Waveforms from './Sidebar/Waveforms';
-import HContainer from '../Common/HContainer';
-import VContainer from '../Common/VContainer';
-import { nls } from '@theia/core';
 
 interface MusicEditorProps {
     songData: SongData
     updateSongData: (songData: SongData) => void
-    context: EditorsContextType
 }
 
-export default class MusicEditor extends React.Component<MusicEditorProps, MusicEditorState> {
-    constructor(props: MusicEditorProps) {
-        super(props);
-        this.state = {
-            playing: false,
-            recording: false,
-            currentStep: 0,
-            currentChannel: 0,
-            currentPattern: 0,
-            currentNote: -1,
-            currentInstrument: 0,
-            song: [],
-            songLength: 0,
-        };
-    }
+export default function MusicEditor(props: MusicEditorProps): React.JSX.Element {
+    const { songData, updateSongData } = props;
+    const [playing, setPlaying] = useState<boolean>(false);
+    const [currentStep, setCurrentStep] = useState<number>(0);
+    const [currentChannelId, setCurrentChannelId] = useState<number>(0);
+    const [currentSequenceIndex, setCurrentSequenceIndex] = useState<number>(0);
+    const [currentPatternId, setCurrentPatternId] = useState<number>(0);
+    const [currentNote, setCurrentNote] = useState<number>(-1);
+    const [currentInstrument, setCurrentInstrument] = useState<number>(0);
+    const [playRangeStart, setPlayRangeStart] = useState<number>(-1);
+    const [playRangeEnd, setPlayRangeEnd] = useState<number>(-1);
+    const [song, setSong] = useState<(SongNote | undefined)[][]>([]);
+    const [songLength, setSongLength] = useState<number>(0);
 
-    setChannel(channelId: number, channel: Partial<ChannelConfig>): void {
-        this.setSongData({
+    const setChannel = (channelId: number, channel: Partial<ChannelConfig>): void => {
+        updateSongData({
+            ...songData,
             channels: [
-                ...this.props.songData.channels.slice(0, channelId),
+                ...songData.channels.slice(0, channelId),
                 {
-                    ...this.props.songData.channels[channelId],
+                    ...songData.channels[channelId],
                     ...channel
                 },
-                ...this.props.songData.channels.slice(channelId + 1)
+                ...songData.channels.slice(channelId + 1)
             ]
         });
-    }
+    };
 
-    setPattern(channelId: number, patternId: number, pattern: Partial<PatternConfig>): void {
-        this.setChannel(channelId, {
+    const setPattern = (channelId: number, patternId: number, pattern: Partial<PatternConfig>): void => {
+        setChannel(channelId, {
             patterns: [
-                ...this.props.songData.channels[channelId].patterns.slice(0, patternId),
+                ...songData.channels[channelId].patterns.slice(0, patternId),
                 {
-                    ...this.props.songData.channels[channelId].patterns[patternId],
+                    ...songData.channels[channelId].patterns[patternId],
                     ...pattern
                 },
-                ...this.props.songData.channels[channelId].patterns.slice(patternId + 1)
+                ...songData.channels[channelId].patterns.slice(patternId + 1)
             ]
         });
-    }
+    };
 
-    playNote(note: number): void {
-        if (!this.state.playing) {
+    const playNote = (note: number): void => {
+        if (!playing) {
             /*
             const synth = new Tone.Synth().toDestination();
             synth.triggerAttackRelease(Notes[note], '16n');
             */
         }
-    }
+    };
 
-    setCurrentChannel(id: number): void {
-        this.setState({
-            currentChannel: id,
-            currentPattern: this.props.songData.channels[id].sequence[0] ?? -1,
-            currentNote: -1,
-        });
-    }
+    const updateCurrentChannelId = (id: number): void => {
+        setCurrentChannelId(id);
+        setCurrentPatternId(songData.channels[id].sequence[0] ?? -1);
+        setCurrentNote(-1);
+        setPlayRangeStart(-1);
+        setPlayRangeEnd(-1);
+    };
 
-    setCurrentPattern(channel: number, pattern: number): void {
-        this.setState({
-            currentChannel: channel,
-            currentPattern: pattern,
-            currentNote: -1,
-        });
-    }
+    const updateCurrentSequenceIndex = (channel: number, sequenceIndex: number): void => {
+        setCurrentChannelId(channel);
+        setCurrentSequenceIndex(sequenceIndex);
+        setCurrentPatternId(songData.channels[channel].sequence[sequenceIndex]);
+        setCurrentNote(-1);
+        setPlayRangeStart(-1);
+        setPlayRangeEnd(-1);
+    };
 
-    setCurrentNote(id: number): void {
-        this.setState({
-            currentNote: id,
-        });
-    }
+    const updateCurrentPatternId = (channel: number, pattern: number): void => {
+        setCurrentChannelId(channel);
+        setCurrentPatternId(pattern);
+        setCurrentNote(-1);
+        setPlayRangeStart(-1);
+        setPlayRangeEnd(-1);
+    };
 
-    setCurrentInstrument(id: number): void {
-        this.setState({
-            currentInstrument: id,
-        });
-    }
+    const togglePlaying = (): void => {
+        setCurrentStep(playRangeStart > -1 ? currentPatternNoteOffset + playRangeStart : 0);
+        setPlaying(!playing);
+    };
 
-    toggleChannelMuted(channelId: number): void {
-        this.setChannel(this.state.currentChannel, {
-            muted: !this.props.songData.channels[channelId].muted,
+    const toggleChannelMuted = (channelId: number): void => {
+        setChannel(currentChannelId, {
+            muted: !songData.channels[channelId].muted,
             solo: false
         });
-    }
+    };
 
-    toggleChannelSolo(channelId: number): void {
-        this.setSongData({
-            channels: this.props.songData.channels.map((channel, index) => (index === channelId ? {
+    const toggleChannelSolo = (channelId: number): void => {
+        updateSongData({
+            ...songData,
+            channels: songData.channels.map((channel, index) => (index === channelId ? {
                 ...channel,
                 solo: !channel.solo,
                 muted: false,
@@ -119,121 +124,22 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                 collapsed: false,
             }))
         });
-    }
+    };
 
-    toggleChannelCollapsed(channelId: number): void {
-        this.setChannel(channelId, {
-            collapsed: !this.props.songData.channels[channelId].collapsed,
-            solo: this.props.songData.channels[channelId].solo = false,
-        });
-    }
-
-    setChannelVolume(volume: number): void {
-        this.setChannel(this.state.currentChannel, {
-            volume: volume,
-        });
-    }
-
-    setChannelInstrument(instrument: number): void {
-        this.setChannel(this.state.currentChannel, {
-            instrument: instrument,
-        });
-    }
-
-    setNote(index: number, note: number | undefined): void {
-        const updatedNotes = [...this.props.songData.channels[this.state.currentChannel].patterns[this.state.currentPattern].notes];
+    const setNote = (index: number, note: number | undefined): void => {
+        const updatedNotes = [...songData.channels[currentChannelId].patterns[currentPatternId].notes];
         updatedNotes[index] = note;
-        this.setPattern(this.state.currentChannel, this.state.currentPattern, {
+        setPattern(currentChannelId, currentPatternId, {
             notes: updatedNotes
         });
-    }
+    };
 
-    setVolumeL(index: number, volume: number | undefined): void {
-        const updatedVolume = [...this.props.songData.channels[this.state.currentChannel].patterns[this.state.currentPattern].volumeL];
-        updatedVolume[index] = volume;
-        this.setPattern(this.state.currentChannel, this.state.currentPattern, {
-            volumeL: updatedVolume
-        });
-    }
+    const setInstruments = (instruments: InstrumentConfig[]): void => {
+        updateSongData({ ...songData, instruments });
+    };
 
-    setVolumeR(index: number, volume: number | undefined): void {
-        const updatedVolume = [...this.props.songData.channels[this.state.currentChannel].patterns[this.state.currentPattern].volumeR];
-        updatedVolume[index] = volume;
-        this.setPattern(this.state.currentChannel, this.state.currentPattern, {
-            volumeR: updatedVolume
-        });
-    }
-
-    addToSequence(channelId: number, patternId: number): void {
-        const updatedChannel = {
-            ...this.props.songData.channels[channelId],
-            sequence: [
-                ...this.props.songData.channels[channelId].sequence,
-                patternId
-            ],
-        };
-
-        const largestPatternId = this.props.songData.channels[channelId].patterns.length - 1;
-        if (patternId > largestPatternId) {
-            updatedChannel.patterns.push({
-                name: '',
-                size: this.props.songData.defaultPatternSize,
-                notes: [],
-                volumeL: [],
-                volumeR: [],
-                effects: [],
-            });
-        }
-
-        this.setChannel(channelId, updatedChannel);
-        this.setState({
-            currentChannel: channelId,
-            currentPattern: patternId,
-        });
-    }
-
-    removeFromSequence(channelId: number, index: number): void {
-        this.setChannel(channelId, {
-            sequence: [
-                ...this.props.songData.channels[channelId].sequence.slice(0, index),
-                ...this.props.songData.channels[channelId].sequence.slice(index + 1)
-            ],
-        });
-    }
-
-    moveSequencePattern(channelId: number, from: number, to: number): void {
-        const sequence = [...this.props.songData.channels[channelId].sequence];
-        const removedPattern = sequence.splice(from, 1).pop();
-        sequence.splice(to > from ? to - 1 : to, 0, removedPattern!);
-        this.setChannel(channelId, {
-            sequence: sequence
-        });
-    }
-
-    setPatternName(name: string): void {
-        this.setPattern(this.state.currentChannel, this.state.currentPattern, {
-            name: name,
-        });
-    }
-
-    setPatternSize(size: number): void {
-        this.setPattern(this.state.currentChannel, this.state.currentPattern, {
-            size: size,
-        });
-    }
-
-    setSongData(songData: Partial<SongData>): void {
-        this.props.updateSongData({ ...this.props.songData, ...songData });
-        this.computeSong();
-    }
-
-    setInstruments(i: InstrumentConfig[]): void {
-        this.setSongData({ instruments: i });
-    }
-
-    getChannelName(i: number): string {
+    const getChannelName = (i: number): string => {
         switch (i) {
-            default:
             case 0:
             case 1:
             case 2:
@@ -243,20 +149,22 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                 return 'Sweep';
             case 5:
                 return 'Noise';
+            default:
+                return '-';
         }
-    }
+    };
 
-    protected computeSong(): void {
-        const soloChannel = this.props.songData.channels.filter(c => c.solo).map(c => c.id).pop() ?? -1;
+    const computeSong = (): void => {
+        const soloChannel = songData.channels.filter(c => c.solo).map(c => c.id).pop() ?? -1;
 
-        let songLength = 0;
-        const song: (SongNote | undefined)[][] = [];
+        let newSongLength = 0;
+        const newSong: (SongNote | undefined)[][] = [];
 
-        this.props.songData.channels.forEach(channel => {
+        songData.channels.forEach(channel => {
             const channelNotes: (SongNote | undefined)[] = [];
             let step = 0;
             channel.sequence.forEach(patternId => {
-                const pattern = this.props.songData.channels[channel.id].patterns[patternId];
+                const pattern = songData.channels[channel.id].patterns[patternId];
                 [...Array(pattern.size)].forEach((s, i) => {
                     channelNotes[step + i] = (!channel.muted && !(soloChannel > -1 && soloChannel !== channel.id))
                         ? {
@@ -271,216 +179,203 @@ export default class MusicEditor extends React.Component<MusicEditorProps, Music
                 step += pattern.size;
             });
             if (channelNotes.length) {
-                if (channelNotes.length > songLength) {
-                    songLength = channelNotes.length;
+                if (channelNotes.length > newSongLength) {
+                    newSongLength = channelNotes.length;
                 }
-                song.push(channelNotes);
+                newSong.push(channelNotes);
             }
         });
 
-        this.setState({ song, songLength });
-    }
+        setSong(newSong);
+        setSongLength(newSongLength);
+    };
 
-    async componentDidMount(): Promise<void> {
-        this.computeSong();
-    }
+    const commandListener = (e: CustomEvent): void => {
+        switch (e.detail) {
+            case EDITORS_COMMANDS.MusicEditor.commands.playPause.id:
+                togglePlaying();
+                break;
+        }
+    };
 
-    render(): React.JSX.Element {
-        const { services } = this.props.context;
+    // the starting note index of the current pattern
+    const currentPatternNoteOffset = useMemo(() => {
+        let result = 0;
+        const currentChannel = songData.channels[currentChannelId];
+        currentChannel.sequence.forEach((s, sequenceIndex) => {
+            if (currentSequenceIndex > sequenceIndex) {
+                result += currentChannel.patterns[s].size;
+            }
+        });
 
-        return <div className='musicEditor'>
+        return result;
+    }, [
+        songData.channels,
+        currentChannelId,
+        currentSequenceIndex,
+    ]);
+
+    useEffect(() => {
+        computeSong();
+    }, [
+        songData
+    ]);
+
+    useEffect(() => {
+        document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
+        return () => {
+            document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
+        };
+    }, [
+        playing,
+        setPlaying,
+    ]);
+
+    return (
+        <HContainer className='musicEditor' gap={20} overflow='hidden'>
             <MusicPlayer
-                currentStep={this.state.currentStep}
-                playing={this.state.playing}
-                speed={60000 / this.props.songData.speed}
-                song={this.state.song}
-                increaseCurrentStep={() => this.setState({
-                    currentStep: this.state.currentStep + 1 >= this.state.songLength
-                        ? 0
-                        : this.state.currentStep + 1
-                })}
+                currentStep={currentStep}
+                playing={playing}
+                speed={60000 / songData.speed}
+                song={song}
+                increaseCurrentStep={() => {
+                    const startNoteIndex = playRangeStart > -1
+                        ? currentPatternNoteOffset + playRangeStart
+                        : 0;
+                    const endNoteIndex = playRangeEnd > -1
+                        ? currentPatternNoteOffset + playRangeEnd
+                        : songLength;
+                    setCurrentStep(currentStep + 1 > endNoteIndex
+                        ? startNoteIndex
+                        : currentStep + 1);
+                }}
             />
-
-            <div className='toolbar'>
-                <button
-                    className='theia-button secondary large playButton'
-                    title={this.state.playing ? 'Play' : 'Stop'}
-                    onClick={() => {
-                        this.setState({
-                            currentStep: 0,
-                            playing: !this.state.playing,
-                        });
-                    }}
-                >
-                    <i className={`fa fa-${this.state.playing ? 'stop' : 'play'}`} />
-                </button>
-                <div className='currentStep'>
-                    {this.state.currentStep}
-                </div>
-                <button
-                    className={`theia-button ${this.state.recording ? 'primary' : 'secondary'} large recordButton`}
-                    title='Recording Mode'
-                    disabled={true}
-                    onClick={() => this.setState({ recording: !this.state.recording })}
-                >
-                    <i className='fa fa-circle' />
-                </button>
-                <button
-                    className={'theia-button secondary large'}
-                    title='Save'
-                    onClick={() => services.commandService.executeCommand(CommonCommands.SAVE.id)}
-                >
-                    <i className='fa fa-save' />
-                </button>
-                <button
-                    className={'theia-button secondary large'}
-                    title='Import'
-                    disabled={true}
-                >
-                    <i className='fa fa-download' />
-                </button>
-                <button
-                    className={'theia-button secondary large'}
-                    title='Export'
-                    disabled={true}
-                >
-                    <i className='fa fa-upload' />
-                </button>
-            </div>
-            <MusicEditorContext.Provider value={{
-                state: this.state,
-                songData: this.props.songData,
-                setState: this.setState.bind(this),
-                setSongData: this.setSongData.bind(this),
-                setChannel: this.setChannel.bind(this),
-                setPattern: this.setPattern.bind(this),
-                playNote: this.playNote.bind(this),
-                setCurrentChannel: this.setCurrentChannel.bind(this),
-                setCurrentPattern: this.setCurrentPattern.bind(this),
-                setCurrentNote: this.setCurrentNote.bind(this),
-                setCurrentInstrument: this.setCurrentInstrument.bind(this),
-                toggleChannelMuted: this.toggleChannelMuted.bind(this),
-                toggleChannelSolo: this.toggleChannelSolo.bind(this),
-                toggleChannelCollapsed: this.toggleChannelCollapsed.bind(this),
-                setChannelVolume: this.setChannelVolume.bind(this),
-                setChannelInstrument: this.setChannelInstrument.bind(this),
-                setNote: this.setNote.bind(this),
-                setVolumeL: this.setVolumeL.bind(this),
-                setVolumeR: this.setVolumeR.bind(this),
-                addToSequence: this.addToSequence.bind(this),
-                removeFromSequence: this.removeFromSequence.bind(this),
-                moveSequencePattern: this.moveSequencePattern.bind(this),
-                setPatternName: this.setPatternName.bind(this),
-                setPatternSize: this.setPatternSize.bind(this),
-                setInstruments: this.setInstruments.bind(this),
-                getChannelName: this.getChannelName.bind(this),
-            }}>
-                <HContainer gap={15} overflow='hidden'>
-                    <VContainer gap={15} grow={1} overflow='auto'>
-                        <VContainer>
-                            <Tabs>
-                                <TabList>
-                                    <Tab>
-                                        {nls.localize('vuengine/musicEditor/sequencer', 'Sequencer')}
-                                    </Tab>
-                                    <Tab>
-                                        {nls.localize('vuengine/musicEditor/instruments', 'Instruments')}
-                                    </Tab>
-                                    <Tab>
-                                        {nls.localize('vuengine/musicEditor/waveforms', 'Waveforms')}
-                                    </Tab>
-                                </TabList>
-
-                                <TabPanel>
-                                    <MusicEditorContext.Consumer>
-                                        {context =>
-                                            <Sequencer />
-                                        }
-                                    </MusicEditorContext.Consumer>
-                                </TabPanel>
-                                <TabPanel>
-                                    <MusicEditorContext.Consumer>
-                                        {context =>
-                                            <Instruments />
-                                        }
-                                    </MusicEditorContext.Consumer>
-                                </TabPanel>
-                                <TabPanel>
-                                    <MusicEditorContext.Consumer>
-                                        {context =>
-                                            <Waveforms />
-                                        }
-                                    </MusicEditorContext.Consumer>
-                                </TabPanel>
-                            </Tabs>
+            <VContainer gap={10} grow={1}>
+                <MusicEditorToolbar
+                    currentStep={currentStep}
+                    playing={playing}
+                    togglePlaying={togglePlaying}
+                />
+                <Sequencer
+                    songData={songData}
+                    currentStep={currentStep}
+                    playing={playing}
+                    currentPatternId={currentPatternId}
+                    setCurrentPatternId={updateCurrentPatternId}
+                    currentChannelId={currentChannelId}
+                    setCurrentChannelId={updateCurrentChannelId}
+                    currentSequenceIndex={currentSequenceIndex}
+                    setCurrentSequenceIndex={updateCurrentSequenceIndex}
+                    getChannelName={getChannelName}
+                    toggleChannelMuted={toggleChannelMuted}
+                    toggleChannelSolo={toggleChannelSolo}
+                    setChannel={setChannel}
+                />
+                <PianoRoll
+                    songData={songData}
+                    currentStep={currentStep}
+                    playing={playing}
+                    currentNote={currentNote}
+                    setCurrentNote={setCurrentNote}
+                    currentPatternId={currentPatternId}
+                    currentPatternNoteOffset={currentPatternNoteOffset}
+                    currentChannelId={currentChannelId}
+                    currentSequenceIndex={currentSequenceIndex}
+                    getChannelName={getChannelName}
+                    playRangeStart={playRangeStart}
+                    setPlayRangeStart={setPlayRangeStart}
+                    playRangeEnd={playRangeEnd}
+                    setPlayRangeEnd={setPlayRangeEnd}
+                    playNote={playNote}
+                    setNote={setNote}
+                />
+            </VContainer>
+            <VContainer gap={15} overflow='auto' style={{ maxWidth: 250, minWidth: 250 }}>
+                <Tabs>
+                    <TabList>
+                        <Tab
+                            title={nls.localize('vuengine/musicEditor/selected', 'Selected')}
+                        >
+                            <FadersHorizontal size={20} />
+                        </Tab>
+                        <Tab
+                            title={nls.localize('vuengine/musicEditor/instruments', 'Instruments')}
+                        >
+                            <Guitar size={20} />
+                        </Tab>
+                        <Tab
+                            title={nls.localize('vuengine/musicEditor/patterns', 'Patterns')}
+                        >
+                            <ChartScatter size={20} />
+                        </Tab>
+                        <Tab
+                            title={nls.localize('vuengine/musicEditor/inputDevices', 'Input Devices')}
+                        >
+                            <Keyboard size={20} />
+                        </Tab>
+                        <Tab
+                            title={nls.localize('vuengine/musicEditor/settings', 'Settings')}
+                        >
+                            <GearSix size={20} />
+                        </Tab>
+                    </TabList>
+                    <TabPanel>
+                        <VContainer gap={15}>
+                            <Channel
+                                songData={songData}
+                                currentChannelId={currentChannelId}
+                                setCurrentChannelId={setCurrentChannelId}
+                                getChannelName={getChannelName}
+                                setChannel={setChannel}
+                                toggleChannelMuted={toggleChannelMuted}
+                                toggleChannelSolo={toggleChannelSolo}
+                            />
+                            <hr />
+                            <Pattern
+                                songData={songData}
+                                currentChannelId={currentChannelId}
+                                currentPatternId={currentPatternId}
+                                setCurrentPatternId={updateCurrentPatternId}
+                                setPattern={setPattern}
+                            />
+                            <hr />
+                            <Note
+                                songData={songData}
+                                currentChannelId={currentChannelId}
+                                currentPatternId={currentPatternId}
+                                setCurrentPatternId={updateCurrentPatternId}
+                                currentNote={currentNote}
+                                setNote={setNote}
+                                setPattern={setPattern}
+                            />
                         </VContainer>
-                        <VContainer gap={15} grow={1}>
-                            <Tabs>
-                                <TabList>
-                                    <Tab>
-                                        {nls.localize('vuengine/musicEditor/pianoRoll', 'Piano Roll')}
-                                    </Tab>
-                                </TabList>
-
-                                <TabPanel>
-                                    <MusicEditorContext.Consumer>
-                                        {context =>
-                                            <PianoRoll />
-                                        }
-                                    </MusicEditorContext.Consumer>
-                                </TabPanel>
-                            </Tabs>
+                    </TabPanel>
+                    <TabPanel>
+                        <Instruments
+                            songData={songData}
+                            currentInstrument={currentInstrument}
+                            setCurrentInstrument={setCurrentInstrument}
+                            setInstruments={setInstruments}
+                        />
+                    </TabPanel>
+                    <TabPanel>
+                        <Patterns />
+                    </TabPanel>
+                    <TabPanel>
+                        <InputDevices />
+                    </TabPanel>
+                    <TabPanel>
+                        <VContainer gap={15}>
+                            <Song
+                                songData={songData}
+                                setSongData={updateSongData}
+                            />
+                            <hr />
+                            <ImportExport />
                         </VContainer>
-                    </VContainer>
-                    <VContainer gap={15} overflow='auto' style={{ maxWidth: 250, minWidth: 250 }}>
-                        <Tabs>
-                            <TabList>
-                                <Tab>
-                                    {nls.localize('vuengine/musicEditor/song', 'Song')}
-                                </Tab>
-                                <Tab>
-                                    {nls.localize('vuengine/musicEditor/channel', 'Channel')}
-                                </Tab>
-                                <Tab>
-                                    {nls.localize('vuengine/musicEditor/note', 'Note')}
-                                </Tab>
-                                <Tab>
-                                    {nls.localize('vuengine/musicEditor/input', 'Input')}
-                                </Tab>
-                            </TabList>
-
-                            <TabPanel>
-                                <MusicEditorContext.Consumer>
-                                    {context =>
-                                        <Song />
-                                    }
-                                </MusicEditorContext.Consumer>
-                            </TabPanel>
-                            <TabPanel>
-                                <MusicEditorContext.Consumer>
-                                    {context =>
-                                        <Channel />
-                                    }
-                                </MusicEditorContext.Consumer>
-                            </TabPanel>
-                            <TabPanel>
-                                <MusicEditorContext.Consumer>
-                                    {context =>
-                                        <Note />
-                                    }
-                                </MusicEditorContext.Consumer>
-                            </TabPanel>
-                            <TabPanel>
-                                <MusicEditorContext.Consumer>
-                                    {context =>
-                                        <Input />
-                                    }
-                                </MusicEditorContext.Consumer>
-                            </TabPanel>
-                        </Tabs>
-                    </VContainer>
-                </HContainer>
-            </MusicEditorContext.Provider>
-        </div>;
-    }
+                    </TabPanel>
+                </Tabs>
+            </VContainer>
+        </HContainer>
+    );
 }

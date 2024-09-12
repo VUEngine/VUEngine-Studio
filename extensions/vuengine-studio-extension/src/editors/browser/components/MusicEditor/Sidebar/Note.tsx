@@ -1,49 +1,81 @@
 import { nls } from '@theia/core';
-import React, { useContext } from 'react';
+import React from 'react';
 import HContainer from '../../Common/HContainer';
 import VContainer from '../../Common/VContainer';
-import { HIGHEST_NOTE, LOWEST_NOTE, MusicEditorContext, MusicEditorContextType, NOTES, VOLUME_STEPS } from '../MusicEditorTypes';
+import { HIGHEST_NOTE, LOWEST_NOTE, NOTES, PatternConfig, SongData, VOLUME_STEPS } from '../MusicEditorTypes';
 
-export default function Note(): React.JSX.Element {
-    const { state, songData, setNote, setVolumeL, setVolumeR } = useContext(MusicEditorContext) as MusicEditorContextType;
+interface NoteProps {
+    songData: SongData
+    currentChannelId: number
+    currentPatternId: number
+    currentNote: number
+    setCurrentPatternId: (channelId: number, patternId: number) => void
+    setPattern: (channelId: number, patternId: number, pattern: Partial<PatternConfig>) => void
+    setNote: (index: number, note: number | undefined) => void
+}
 
-    const pattern = songData.channels[state.currentChannel].patterns[state.currentPattern];
+export default function Note(props: NoteProps): React.JSX.Element {
+    const {
+        songData,
+        currentChannelId,
+        currentPatternId,
+        currentNote,
+        setNote,
+        setPattern,
+    } = props;
 
-    if (state.currentNote === -1) {
+    const pattern = songData.channels[currentChannelId].patterns[currentPatternId];
+
+    const setVolumeL = (index: number, volume: number | undefined): void => {
+        const updatedVolume = [...songData.channels[currentChannelId].patterns[currentPatternId].volumeL];
+        updatedVolume[index] = volume;
+        setPattern(currentChannelId, currentPatternId, {
+            volumeL: updatedVolume
+        });
+    };
+
+    const setVolumeR = (index: number, volume: number | undefined): void => {
+        const updatedVolume = [...songData.channels[currentChannelId].patterns[currentPatternId].volumeR];
+        updatedVolume[index] = volume;
+        setPattern(currentChannelId, currentPatternId, {
+            volumeR: updatedVolume
+        });
+    };
+
+    if (currentNote === -1) {
         return <VContainer gap={10}>
-            {nls.localize(
-                'vuengine/musicEditor/selectANote',
-                'Select a note to edit its properties'
-            )}
+            {nls.localize('vuengine/musicEditor/selectNoteToEditProperties', 'Select a note to edit its properties')}
         </VContainer>;
     }
 
-    const note = pattern.notes[state.currentNote];
+    const note = pattern.notes[currentNote];
     let volumeL = 100;
     let volumeR = 100;
     pattern.volumeL
-        .filter((n, i) => i < state.currentNote)
+        .filter((n, i) => i < currentNote)
         .forEach((n, i) => {
             if (n !== undefined) {
                 volumeL = n;
             }
         });
     pattern.volumeR
-        .filter((n, i) => i < state.currentNote)
+        .filter((n, i) => i < currentNote)
         .forEach((n, i) => {
             if (n !== undefined) {
                 volumeR = n;
             }
         });
-    volumeL = pattern.volumeL[state.currentNote] ?? volumeL;
-    volumeR = pattern.volumeR[state.currentNote] ?? volumeR;
+    volumeL = pattern.volumeL[currentNote] ?? volumeL;
+    volumeR = pattern.volumeR[currentNote] ?? volumeR;
 
     return <VContainer gap={10}>
         <VContainer>
-            Note
+            <label>
+                {nls.localize('vuengine/musicEditor/note', 'Note')}
+            </label>
             <select
                 className='theia-select'
-                onChange={e => setNote(state.currentNote, parseInt(e.target.value))}
+                onChange={e => setNote(currentNote, parseInt(e.target.value))}
                 value={note ?? -1}
             >
                 <option value={undefined}>none</option>
@@ -64,15 +96,16 @@ export default function Note(): React.JSX.Element {
                         label: n.toString()
                     })))}
                 defaultValue={note?.toString() ?? '-1'}
-                onChange={option => setNote(state.currentNote, parseInt(option.value!))}
+                onChange={option => setNote(currentNote, parseInt(option.value!))}
             /> */}
         </VContainer>
-
         <VContainer>
-            <label>Volume</label>
+            <label>
+                {nls.localize('vuengine/musicEditor/volume', 'Volume')}
+            </label>
             <HContainer>
                 <div style={{ minWidth: 10, width: 10 }}>
-                    L
+                    {nls.localize('vuengine/musicEditor/leftShort', 'L')}
                 </div>
                 <input
                     type='range'
@@ -80,15 +113,15 @@ export default function Note(): React.JSX.Element {
                     max={100}
                     min={0}
                     step={100 / VOLUME_STEPS}
-                    onChange={e => setVolumeL(state.currentNote, parseInt(e.target.value))}
+                    onChange={e => setVolumeL(currentNote, parseInt(e.target.value))}
                 />
-                <div style={{ minWidth: 24, textAlign: 'right', width: 24 }}>
+                <div style={{ minWidth: 24, overflow: 'hidden', textAlign: 'right', width: 24 }}>
                     {volumeL}
                 </div>
             </HContainer>
             <HContainer>
                 <div style={{ minWidth: 10, width: 10 }}>
-                    R
+                    {nls.localize('vuengine/musicEditor/rightShort', 'R')}
                 </div>
                 <input
                     type='range'
@@ -96,16 +129,17 @@ export default function Note(): React.JSX.Element {
                     max={100}
                     min={0}
                     step={100 / VOLUME_STEPS}
-                    onChange={e => setVolumeR(state.currentNote, parseInt(e.target.value))}
+                    onChange={e => setVolumeR(currentNote, parseInt(e.target.value))}
                 />
-                <div style={{ minWidth: 24, textAlign: 'right', width: 24 }}>
+                <div style={{ minWidth: 24, overflow: 'hidden', textAlign: 'right', width: 24 }}>
                     {volumeR}
                 </div>
             </HContainer>
         </VContainer>
-
         <VContainer>
-            <label>Effects</label>
+            <label>
+                {nls.localize('vuengine/musicEditor/effects', 'Effects')}
+            </label>
             <i>Not yet implemented</i>
         </VContainer>
     </VContainer>;

@@ -13,6 +13,6 @@
 }
 
 .musicEditor .pianoRoll .stepIndicator {
-    margin-left: -1px;
-    width: 4px;
+    top: 16px;
+    width: 3px;
 }

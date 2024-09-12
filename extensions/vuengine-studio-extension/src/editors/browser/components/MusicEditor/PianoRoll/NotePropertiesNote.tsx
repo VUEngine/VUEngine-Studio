@@ -1,6 +1,6 @@
 import { nls } from '@theia/core';
-import React, { useContext } from 'react';
-import { MusicEditorContext, MusicEditorContextType } from '../MusicEditorTypes';
+import React from 'react';
+import { SongData } from '../MusicEditorTypes';
 
 interface NotePropertiesNoteProps {
     index: number
@@ -8,13 +8,15 @@ interface NotePropertiesNoteProps {
     effects: string[]
     volumeL: number
     volumeR: number
+    songData: SongData
+    setCurrentNote: (currentNote: number) => void
+    setNote: (index: number, note: number | undefined) => void
 }
 
 export default function NotePropertiesNote(props: NotePropertiesNoteProps): React.JSX.Element {
-    const { songData, setCurrentNote, setNote } = useContext(MusicEditorContext) as MusicEditorContextType;
-    const { index, current, volumeL, volumeR, effects } = props;
+    const { index, current, volumeL, volumeR, effects, songData, setCurrentNote, setNote } = props;
 
-    const classNames = ['notePropertiesNote'];
+    const classNames = ['metaLineNote'];
     if ((index + 1) % songData.bar === 0) {
         classNames.push('nth');
     }

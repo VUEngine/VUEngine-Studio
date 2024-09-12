@@ -2,6 +2,7 @@
     display: flex;
     flex-direction: row;
     flex-grow: 1;
+    min-height: 24px;
     padding: 1px 0;
 }
 
@@ -11,6 +12,7 @@
 
 .musicEditor .collapsedChannel {
     background-color: var(--theia-secondaryButton-background);
+    border-radius: 2px;
     cursor: pointer;
     height: 5px;
     margin: 1px 0;
@@ -19,6 +21,7 @@
 
 .musicEditor .patternFill {
     background-color: var(--theia-secondaryButton-background);
+    border-radius: 2px;
     cursor: pointer;
     flex-grow: 1;
     opacity: 0;
@@ -26,5 +29,5 @@
 
 .musicEditor .channel:hover .patternFill,
 .musicEditor .channel.current .patternFill {
-    opacity: .4;
+    opacity: .2;
 }

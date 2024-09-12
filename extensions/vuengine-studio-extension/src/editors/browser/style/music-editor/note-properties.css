@@ -1,11 +1,11 @@
-.musicEditor .noteProperties {
+.musicEditor .metaLine {
     display: flex;
     flex-direction: row;
     flex-grow: 1;
     padding-right: 10px;
 }
 
-.musicEditor .notePropertiesHeader {
+.musicEditor .metaLineHeader {
     display: flex;
     flex-direction: column;
     height: 28px;
@@ -15,7 +15,7 @@
     width: 75px;
 }
 
-.musicEditor .notePropertiesHeader div {
+.musicEditor .metaLineHeader div {
     align-items: center;
     display: flex;
     flex-grow: 1;

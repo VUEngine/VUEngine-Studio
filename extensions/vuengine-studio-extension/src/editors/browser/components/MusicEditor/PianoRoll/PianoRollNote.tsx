@@ -1,16 +1,23 @@
-import React, { useContext } from 'react';
-import { MusicEditorContext, MusicEditorContextType, NOTES } from '../MusicEditorTypes';
+import { nls } from '@theia/core';
+import React from 'react';
+import { NOTES, SongData } from '../MusicEditorTypes';
 
 interface PianoRollNoteProps {
+    songData: SongData
     index: number
     noteId: number
     set: boolean
+    otherChannels: number[]
     current: boolean
+    setCurrentNote: (note: number) => void
+    setNote: (index: number, note: number | undefined) => void
+    playNote: (note: number) => void
 }
 
 export default function PianoRollNote(props: PianoRollNoteProps): React.JSX.Element {
-    const { songData, playNote, setCurrentNote, setNote } = useContext(MusicEditorContext) as MusicEditorContextType;
-    const { index, noteId, current, set } = props;
+    const { index, noteId, current, set, otherChannels, songData, playNote, setCurrentNote, setNote } = props;
+
+    // Object.keys(otherChannelsNotes[index] ?? {}).includes(noteIdStr)
 
     const classNames = ['pianoRollNote'];
     if ((index + 1) % songData.bar === 0) {
@@ -18,9 +25,19 @@ export default function PianoRollNote(props: PianoRollNoteProps): React.JSX.Elem
     }
     if (set) {
         classNames.push('set');
+    } else if (otherChannels.length) {
+        classNames.push('otherChannelSet');
     }
     if (current) {
         classNames.push('current');
+    }
+
+    let title = `${nls.localize('vuengine/musicEditor/note', 'Note')}: ${Object.keys(NOTES)[noteId]}`;
+    if (otherChannels.length) {
+        const prefix = otherChannels.length === 1
+            ? nls.localize('vuengine/musicEditor/alsoOnChannel', 'Also on channel')
+            : nls.localize('vuengine/musicEditor/alsoOnChannels', 'Also on channels');
+        title += ` – ${prefix} ${otherChannels.join(', ')}`;
     }
 
     const onMouse = (e: React.MouseEvent<HTMLElement>) => {
@@ -43,7 +60,7 @@ export default function PianoRollNote(props: PianoRollNoteProps): React.JSX.Elem
         onContextMenu={() => setNote(index, undefined)}
         onMouseDown={e => onMouse(e)}
         onMouseOver={e => onMouse(e)}
-        title={Object.keys(NOTES)[noteId]}
+        title={title}
     />;
 }
 

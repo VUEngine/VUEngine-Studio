@@ -1,41 +1,72 @@
 import { nls } from '@theia/core';
-import React, { useContext, useState } from 'react';
-import { HIGHEST_NOTE, LOWEST_NOTE, MusicEditorContext, MusicEditorContextType, PatternConfig, PATTERN_NOTE_HEIGHT, PATTERN_NOTE_WIDTH } from '../MusicEditorTypes';
+import React, { useState } from 'react';
+import { ChannelConfig, HIGHEST_NOTE, LOWEST_NOTE, PATTERN_NOTE_HEIGHT, PATTERN_NOTE_WIDTH, PatternConfig, SongData } from '../MusicEditorTypes';
 
 interface PatternProps {
+    songData: SongData
     index: number
     pattern: PatternConfig
     channel: number
     height: number
     patternId: number
+    currentChannelId: number
+    currentPatternId: number
+    currentSequenceIndex: number
+    setCurrentSequenceIndex: (channel: number, sequenceIndex: number) => void
+    setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
 }
 
 export default function Pattern(props: PatternProps): React.JSX.Element {
-    const { state, moveSequencePattern, setCurrentPattern, removeFromSequence } = useContext(MusicEditorContext) as MusicEditorContextType;
     const [dragged, setDragged] = useState<boolean>(false);
     const {
+        songData,
         index,
         channel,
         height,
         pattern,
         patternId,
+        currentChannelId,
+        currentPatternId,
+        currentSequenceIndex, setCurrentSequenceIndex,
+        setChannel,
     } = props;
 
     const classNames = ['pattern'];
-    if (state.currentChannel === channel && state.currentPattern === patternId) {
+    if (currentChannelId === channel && currentPatternId === patternId) {
         classNames.push('current');
     }
 
     const boxShadow: string[] = [];
+    const boxShadowColor = currentChannelId === channel && currentSequenceIndex === index
+        ? 'var(--theia-focusBorder)'
+        : 'var(--theia-editor-foreground)';
     pattern.notes.forEach((note, i) => {
         if (note !== undefined
             && note >= HIGHEST_NOTE
             && note <= LOWEST_NOTE) {
             boxShadow.push(
-                `${(i + 1) * PATTERN_NOTE_WIDTH}px ${(note - HIGHEST_NOTE) * PATTERN_NOTE_HEIGHT}px 0 0 #f00`
+                `${(i + 1) * PATTERN_NOTE_WIDTH}px ${(note - HIGHEST_NOTE) * PATTERN_NOTE_HEIGHT}px 0 0 ${boxShadowColor}`
             );
         }
     });
+
+    const moveSequencePattern = (channelId: number, from: number, to: number): void => {
+        const sequence = [...songData.channels[channelId].sequence];
+        const removedPattern = sequence.splice(from, 1).pop();
+        sequence.splice(to > from ? to - 1 : to, 0, removedPattern!);
+        setChannel(channelId, {
+            sequence: sequence
+        });
+    };
+
+    const removeFromSequence = (channelId: number, i: number): void => {
+        setChannel(channelId, {
+            sequence: [
+                ...songData.channels[channelId].sequence.slice(0, i),
+                ...songData.channels[channelId].sequence.slice(i + 1)
+            ],
+        });
+    };
 
     const onDragStart = (e: React.DragEvent<HTMLDivElement>): void => {
         setDragged(true);
@@ -76,13 +107,13 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
     return <div
         className={classNames.join(' ')}
         style={{
-            height: `${height * PATTERN_NOTE_HEIGHT}px`,
+            height: `${height * PATTERN_NOTE_HEIGHT + 3}px`,
             minWidth: `${(pattern.size * PATTERN_NOTE_WIDTH) - 1}px`,
             width: `${(pattern.size * PATTERN_NOTE_WIDTH) - 1}px`
         }}
         data-channel={channel}
         data-position={index}
-        onClick={() => setCurrentPattern(channel, patternId)}
+        onClick={() => setCurrentSequenceIndex(channel, index)}
         draggable={true}
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}

@@ -136,4 +136,15 @@ export const EDITORS_COMMANDS = {
             },
         },
     },
+    'MusicEditor': {
+        typeId: 'Audio',
+        category: nls.localize('vuengine/editors/commands/musicEditor/category', 'Music Editor'),
+        commands: {
+            playPause: {
+                id: 'editors.musicEditor.playPause',
+                label: nls.localize('vuengine/editors/commands/musicEditor/playPause', 'Play / Pause'),
+                keybinding: 'space',
+            },
+        }
+    }
 };

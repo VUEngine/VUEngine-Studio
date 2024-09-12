@@ -1,20 +1,36 @@
 .musicEditor .pianoRollHeader {
-    display: flex;
-    flex-direction: row;
-    flex-grow: 1;
-    padding-right: 12px;
+    padding-top: 1px;
 }
 
-.musicEditor .pianoRollHeaderTitle {
-    align-items: center;
-    background-color: var(--theia-secondaryButton-hoverBackground);
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    font-size: 14px;
-    justify-content: center;
-    margin-right: 3px;
-    min-width: 65px;
-    padding-left: 3px;
-    width: 65px;
+.musicEditor .pianoRollHeader .metaLineNote {
+    margin-right: 0;
+    padding-right: 1px;
+}
+.musicEditor .pianoRollHeader .metaLineNote.nth {
+    padding-right: 3px;
+}
+
+.musicEditor .pianoRollHeader .metaLineNote.rangeStart::before {
+    border-right: 10px solid transparent;
+    border-top: 10px solid var(--theia-focusBorder);
+    content: "";
+    top: 0;
+    position: absolute;
+    left: 0;
+    z-index: 1;
+}
+
+.musicEditor .pianoRollHeader .metaLineNote.rangeEnd::after {
+    border-left: 10px solid transparent;
+    border-top: 10px solid var(--theia-focusBorder);
+    content: "";
+    top: 0;
+    position: absolute;
+    right: 0;
+    z-index: 1;
+}
+.musicEditor .pianoRollHeader .metaLineNote.rangeStart,
+.musicEditor .pianoRollHeader .metaLineNote.rangeEnd,
+.musicEditor .pianoRollHeader .metaLineNote.inRange {
+    border-top: 1px solid var(--theia-focusBorder);
 }

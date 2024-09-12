@@ -1,5 +1,6 @@
 .musicEditor .channelHeader {
     background-color: var(--theia-secondaryButton-background);
+    border-radius: 2px;
     box-sizing: border-box;
     color: var(--theia-secondaryButton-foreground);
     display: flex;
@@ -7,18 +8,26 @@
     font-size: 10px;
     margin-right: 3px;
     min-width: 75px;
+    overflow: hidden;
     width: 75px;
 }
 
 .musicEditor .channelInfo {
+    align-items: start;
     cursor: pointer;
-    padding: 3px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    gap: 2px;
+    justify-content: center;
+    padding: 0 5px;
     width: 53px;
 }
 
 .musicEditor .channelInstrument {
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .musicEditor .channelButtons {
@@ -27,6 +36,7 @@
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+    font-size: 9px;
     gap: 1px;
     height: 100%;
 }
@@ -38,6 +48,11 @@
     display: flex;
     justify-content: center;
     flex-grow: 1;
+    width: 20px;
+}
+
+.musicEditor .channelButton:hover {
+    background-color: var(--theia-primaryButton-background) !important;
 }
 
 .musicEditor .channel.current .channelHeader,
@@ -49,7 +64,7 @@
     opacity: .5;
 }
 
-.musicEditor .channelButton.hover i,
+.musicEditor .channelButton:hover i,
 .musicEditor .channelButton.active i {
     opacity: 1;
 }
@@ -62,11 +77,11 @@
     border: 1px solid var(--theia-secondaryButton-foreground);
     box-sizing: border-box;
     height: 6px;
-    margin-top: 4px;
+    width: 100%;
 }
 
 .musicEditor .channelVolume div {
-    width: 100%;
-    height: 100%;
     background: var(--theia-secondaryButton-foreground);
+    height: 100%;
+    width: 100%;
 }

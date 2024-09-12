@@ -1,25 +1,54 @@
-import React, { useContext } from 'react';
+import { nls } from '@theia/core';
+import React from 'react';
+import HContainer from '../../Common/HContainer';
 import RadioSelect from '../../Common/RadioSelect';
 import VContainer from '../../Common/VContainer';
-import { MusicEditorContext, MusicEditorContextType, PATTERN_SIZES } from '../MusicEditorTypes';
+import { PATTERN_SIZES, PatternConfig, SongData } from '../MusicEditorTypes';
 
-export default function CurrentPattern(): React.JSX.Element {
-    const { state, songData, setCurrentPattern, setPatternName, setPatternSize } = useContext(MusicEditorContext) as MusicEditorContextType;
+interface CurrentPatternProps {
+    songData: SongData
+    currentChannelId: number
+    currentPatternId: number
+    setCurrentPatternId: (channelId: number, patternId: number) => void
+    setPattern: (channelId: number, patternId: number, pattern: Partial<PatternConfig>) => void
+}
 
-    const channel = songData.channels[state.currentChannel];
-    const pattern = channel.patterns[state.currentPattern];
+export default function CurrentPattern(props: CurrentPatternProps): React.JSX.Element {
+    const {
+        songData,
+        currentChannelId,
+        currentPatternId, setCurrentPatternId,
+        setPattern,
+    } = props;
+
+    const channel = songData.channels[currentChannelId];
+    const pattern = channel.patterns[currentPatternId];
 
     const getName = (i: number): string => channel.patterns[i].name
         ? `${i + 1}: ${channel.patterns[i].name}`
         : (i + 1).toString();
 
+    const setPatternName = (name: string): void => {
+        setPattern(currentChannelId, currentPatternId, {
+            name: name,
+        });
+    };
+
+    const setPatternSize = (size: number): void => {
+        setPattern(currentChannelId, currentPatternId, {
+            size: size,
+        });
+    };
+
     return <VContainer gap={10}>
         <VContainer>
-            <label>Pattern</label>
+            <label>
+                {nls.localize('vuengine/musicEditor/pattern', 'Pattern')}
+            </label>
             <select
                 className='theia-select'
-                value={state.currentPattern}
-                onChange={e => setCurrentPattern(channel.id, parseInt(e.target.value))}
+                value={currentPatternId}
+                onChange={e => setCurrentPatternId(channel.id, parseInt(e.target.value))}
             >
                 {channel.patterns.map((n, i) => (
                     <option key={`select-pattern-${i}`} value={i}>{getName(i)}</option>
@@ -27,22 +56,26 @@ export default function CurrentPattern(): React.JSX.Element {
             </select>
         </VContainer>
 
-        <VContainer>
-            <label>Name</label>
-            <input
-                className='theia-input'
-                value={pattern.name}
-                onChange={e => setPatternName(e.target.value)}
-            />
-        </VContainer>
-        <VContainer>
-            Size
-            <RadioSelect
-                options={PATTERN_SIZES.map(size => ({ value: size }))}
-                defaultValue={pattern.size}
-                onChange={options => setPatternSize(options[0].value as number)}
-            />
-        </VContainer>
+        <HContainer gap={15}>
+            <VContainer style={{ width: 110 }}>
+                <label>
+                    {nls.localize('vuengine/musicEditor/name', 'Name')}
+                </label>
+                <input
+                    className='theia-input'
+                    value={pattern.name}
+                    onChange={e => setPatternName(e.target.value)}
+                />
+            </VContainer>
+            <VContainer>
+                Size
+                <RadioSelect
+                    options={PATTERN_SIZES.map(size => ({ value: size }))}
+                    defaultValue={pattern.size}
+                    onChange={options => setPatternSize(options[0].value as number)}
+                />
+            </VContainer>
+        </HContainer>
 
         {/*
         <VContainer>
@@ -69,7 +102,7 @@ export default function CurrentPattern(): React.JSX.Element {
                     min={0}
                     step={100 / VOLUME_STEPS}
                 />
-                <div style={{ minWidth: 24, textAlign: 'right', width: 24 }}>
+                <div style={{ minWidth: 24, overflow: 'hidden', textAlign: 'right', width: 24 }}>
                     100
                 </div>
             </HContainer>
@@ -84,7 +117,7 @@ export default function CurrentPattern(): React.JSX.Element {
                     min={0}
                     step={100 / VOLUME_STEPS}
                 />
-                <div style={{ minWidth: 24, textAlign: 'right', width: 24 }}>
+                <div style={{ minWidth: 24, overflow: 'hidden', textAlign: 'right', width: 24 }}>
                     100
                 </div>
             </HContainer>

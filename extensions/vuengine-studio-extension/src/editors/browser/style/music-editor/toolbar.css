@@ -3,11 +3,9 @@
     display: flex;
     flex-direction: row;
     gap: 2px;
-    margin-bottom: 10px;
 }
 
 .musicEditor .toolbar button {
-    height: 32px;
     margin-left: 0px;
     min-width: unset;
     padding: 0;
@@ -21,14 +19,15 @@
 .musicEditor .toolbar .currentStep {
     align-items: center;
     border: 1px solid var(--theia-secondaryButton-background);
+    border-radius: 2px;
     box-sizing: border-box;
     display: flex;
-    height: 32px;
+    height: 26px;
     justify-content: center;
-    margin-right: 10px;
+    margin-right: 5px;
     width: 63px;
 }
 
 .musicEditor .toolbar .recordButton {
-    margin-right: 10px;
+    margin-right: 5px;
 }

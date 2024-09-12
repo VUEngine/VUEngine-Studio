@@ -1,32 +1,66 @@
-import React, { useContext } from 'react';
-import { MusicEditorContext, MusicEditorContextType } from '../MusicEditorTypes';
+import React from 'react';
+import { SongData } from '../MusicEditorTypes';
 import StepIndicator from '../Sequencer/StepIndicator';
 import NoteProperties from './NoteProperties';
 import PianoRollEditor from './PianoRollEditor';
+import PianoRollHeader from './PianoRollHeader';
 
-export default function PianoRoll(): React.JSX.Element {
-    const { state, songData } = useContext(MusicEditorContext) as MusicEditorContextType;
+interface PianoRollProps {
+    songData: SongData
+    currentNote: number
+    setCurrentNote: (currentNote: number) => void
+    currentChannelId: number
+    currentPatternId: number
+    currentPatternNoteOffset: number
+    currentSequenceIndex: number
+    currentStep: number
+    playing: boolean
+    getChannelName: (channelId: number) => string
+    playRangeStart: number
+    setPlayRangeStart: (playRangeStart: number) => void
+    playRangeEnd: number
+    setPlayRangeEnd: (playRangeEnd: number) => void
+    setNote: (index: number, note: number | undefined) => void
+    playNote: (note: number) => void
+}
 
-    const channel = songData.channels[state.currentChannel];
-    const pattern = channel.patterns[state.currentPattern];
+export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
+    const {
+        songData,
+        currentNote, setCurrentNote,
+        currentChannelId,
+        currentPatternId,
+        currentPatternNoteOffset,
+        currentSequenceIndex,
+        currentStep,
+        playing,
+        getChannelName,
+        playRangeStart, setPlayRangeStart,
+        playRangeEnd, setPlayRangeEnd,
+        setNote,
+        playNote,
+    } = props;
 
-    if (state.currentPattern === -1) {
-        return <div>
-            Select a pattern to edit
-        </div>;
+    const channel = songData.channels[currentChannelId];
+    const pattern = channel.patterns[currentPatternId];
+
+    if (currentPatternId === -1) {
+        return <>
+            {/* nls.localize('vuengine/musicEditor/selectPatternToEdit', 'Select a pattern to edit') */}
+        </>;
     }
 
     const classNames = ['pianoRoll'];
     classNames.push(`size-${pattern.size}`);
 
     let currentPatternStep = -1;
-    if (channel.id === state.currentChannel) {
+    if (channel.id === currentChannelId) {
         let patternStartStep = 0;
         channel.sequence.forEach((patternId, index) => {
             const patternSize = channel.patterns[patternId].size;
             const patternEndStep = patternStartStep + patternSize;
-            if (patternId === state.currentPattern && state.currentStep >= patternStartStep && state.currentStep < patternEndStep) {
-                currentPatternStep = state.currentStep - patternStartStep;
+            if (patternId === currentPatternId && currentStep >= patternStartStep && currentStep < patternEndStep) {
+                currentPatternStep = currentStep - patternStartStep;
                 return;
             }
             patternStartStep += patternSize;
@@ -37,10 +71,37 @@ export default function PianoRoll(): React.JSX.Element {
         {<StepIndicator
             currentStep={currentPatternStep}
             pianoRollSize={pattern.size}
-            hidden={!state.playing || currentPatternStep === -1}
+            hidden={!playing || currentPatternStep === -1}
         />}
-        {/* <PianoRollHeader/> */}
-        <PianoRollEditor />
-        <NoteProperties />
+        <PianoRollHeader
+            songData={songData}
+            currentChannelId={currentChannelId}
+            currentPatternId={currentPatternId}
+            currentNote={currentNote}
+            getChannelName={getChannelName}
+            playRangeStart={playRangeStart}
+            setPlayRangeStart={setPlayRangeStart}
+            playRangeEnd={playRangeEnd}
+            setPlayRangeEnd={setPlayRangeEnd}
+        />
+        <PianoRollEditor
+            songData={songData}
+            currentChannelId={currentChannelId}
+            currentPatternId={currentPatternId}
+            currentPatternNoteOffset={currentPatternNoteOffset}
+            currentSequenceIndex={currentSequenceIndex}
+            currentNote={currentNote}
+            setCurrentNote={setCurrentNote}
+            setNote={setNote}
+            playNote={playNote}
+        />
+        <NoteProperties
+            songData={songData}
+            currentNote={currentNote}
+            setCurrentNote={setCurrentNote}
+            currentChannelId={currentChannelId}
+            currentPatternId={currentPatternId}
+            setNote={setNote}
+        />
     </div>;
 }

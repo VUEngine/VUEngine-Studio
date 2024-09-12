@@ -1,41 +1,50 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import HContainer from '../../Common/HContainer';
-import VContainer from '../../Common/VContainer';
-import { MAX_SPEED, MIN_SPEED, MusicEditorContext, MusicEditorContextType, PATTERN_SIZES, VOLUME_STEPS } from '../MusicEditorTypes';
 import RadioSelect from '../../Common/RadioSelect';
+import VContainer from '../../Common/VContainer';
+import { MAX_SPEED, MIN_SPEED, PATTERN_SIZES, SongData, VOLUME_STEPS } from '../MusicEditorTypes';
+import { nls } from '@theia/core';
 
-export default function Song(): React.JSX.Element {
-    const { songData, setSongData } = useContext(MusicEditorContext) as MusicEditorContextType;
+interface SongProps {
+    songData: SongData
+    setSongData: (songData: SongData) => void
+}
+
+export default function Song(props: SongProps): React.JSX.Element {
+    const { songData, setSongData } = props;
 
     const setName = (n: string): void => {
-        setSongData({ name: n });
+        setSongData({ ...songData, name: n });
     };
 
     const setBar = (b: number): void => {
-        setSongData({ bar: b });
+        setSongData({ ...songData, bar: b });
     };
 
     const setSpeed = (s: number): void => {
         if (s <= MAX_SPEED && s >= MIN_SPEED) {
-            setSongData({ speed: s });
+            setSongData({ ...songData, speed: s });
         }
     };
 
     const setVolume = (v: number): void => {
         if (v <= 100 && v >= 0) {
-            setSongData({ volume: v });
+            setSongData({ ...songData, volume: v });
         }
     };
 
     const setDefaultPatternSize = (size: number): void => {
         setSongData({
+            ...songData,
             defaultPatternSize: size,
         });
     };
 
     return <VContainer gap={10}>
         <VContainer>
-            <label>Song Name</label>
+            <label>
+                {nls.localize('vuengine/musicEditor/songName', 'Song Name')}
+            </label>
             <input
                 className='theia-input'
                 value={songData.name}
@@ -44,7 +53,9 @@ export default function Song(): React.JSX.Element {
         </VContainer>
 
         <VContainer>
-            <label>Master Volume</label>
+            <label>
+                {nls.localize('vuengine/musicEditor/masterVolume', 'Master Volume')}
+            </label>
             <HContainer>
                 <input
                     type='range'
@@ -54,14 +65,16 @@ export default function Song(): React.JSX.Element {
                     step={100 / VOLUME_STEPS}
                     onChange={e => setVolume(parseInt(e.target.value))}
                 />
-                <div style={{ minWidth: 24, textAlign: 'right', width: 24 }}>
+                <div style={{ minWidth: 24, overflow: 'hidden', textAlign: 'right', width: 24 }}>
                     {songData.volume}
                 </div>
             </HContainer>
         </VContainer>
 
         <VContainer>
-            <label>BPM</label>
+            <label>
+                {nls.localize('vuengine/musicEditor/bpm', 'BPM')}
+            </label>
             <HContainer>
                 <input
                     type='range'
@@ -71,14 +84,16 @@ export default function Song(): React.JSX.Element {
                     step={10}
                     onChange={e => setSpeed(parseInt(e.target.value))}
                 />
-                <div style={{ minWidth: 24, textAlign: 'right', width: 24 }}>
+                <div style={{ minWidth: 24, overflow: 'hidden', textAlign: 'right', width: 24 }}>
                     {songData.speed}
                 </div>
             </HContainer>
         </VContainer>
 
         <VContainer>
-            <label>Bar</label>
+            <label>
+                {nls.localize('vuengine/musicEditor/bar', 'Bar')}
+            </label>
             <HContainer>
                 <input
                     type='range'
@@ -88,14 +103,14 @@ export default function Song(): React.JSX.Element {
                     step={2}
                     onChange={e => setBar(parseInt(e.target.value))}
                 />
-                <div style={{ minWidth: 24, textAlign: 'right', width: 24 }}>
+                <div style={{ minWidth: 24, overflow: 'hidden', textAlign: 'right', width: 24 }}>
                     {songData.bar}
                 </div>
             </HContainer>
         </VContainer>
 
         <VContainer>
-            Default Pattern Size
+            {nls.localize('vuengine/musicEditor/defaultPatternSize', 'Default Pattern Size')}
             <RadioSelect
                 options={PATTERN_SIZES.map(size => ({ value: size }))}
                 defaultValue={songData.defaultPatternSize}
