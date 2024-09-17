@@ -658,7 +658,6 @@ export const defaultProjectData: ProjectData = {
       icon: 'codicon codicon-circuit-board'
     },
     VsuSandbox: {
-      enabled: false,
       file: '.vsu',
       schema: {
         title: 'VSU Sandbox',
@@ -703,12 +702,14 @@ export const defaultProjectData: ProjectData = {
                     left: {
                       type: 'integer',
                       minimum: 0,
-                      maximum: 15
+                      maximum: 15,
+                      default: 15,
                     },
                     right: {
                       type: 'integer',
                       minimum: 0,
-                      maximum: 15
+                      maximum: 15,
+                      default: 15,
                     }
                   },
                   additionalProperties: false,
@@ -724,7 +725,7 @@ export const defaultProjectData: ProjectData = {
                       type: 'boolean',
                       default: false
                     },
-                    decay: {
+                    direction: {
                       type: 'boolean',
                       default: true
                     },
@@ -742,7 +743,7 @@ export const defaultProjectData: ProjectData = {
                   },
                   additionalProperties: false,
                 },
-                sweepModulation: {
+                sweepMod: {
                   type: 'object',
                   properties: {
                     enabled: {
@@ -753,7 +754,7 @@ export const defaultProjectData: ProjectData = {
                       type: 'boolean',
                       default: true
                     },
-                    sweep: {
+                    function: {
                       type: 'boolean',
                       default: true
                     },
@@ -767,7 +768,7 @@ export const defaultProjectData: ProjectData = {
                       minimum: 0,
                       maximum: 7
                     },
-                    sweepDown: {
+                    direction: {
                       type: 'boolean',
                       default: true
                     },
@@ -797,7 +798,8 @@ export const defaultProjectData: ProjectData = {
               items: {
                 type: 'integer',
                 minimum: 1,
-                maximum: 64
+                maximum: 64,
+                default: 1,
               },
               minItems: 32,
               maxItems: 32
@@ -810,7 +812,8 @@ export const defaultProjectData: ProjectData = {
             items: {
               type: 'integer',
               minimum: 1,
-              maximum: 256
+              maximum: 256,
+              default: 1,
             },
             minItems: 32,
             maxItems: 32

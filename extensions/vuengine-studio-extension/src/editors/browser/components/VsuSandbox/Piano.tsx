@@ -11,11 +11,11 @@ export default function Piano(props: PianoProps): React.JSX.Element {
     const { channel, setFrequency } = props;
 
     return <div className="pianoRollEditor" style={{
-        minWidth: channel === 0 ? 0 : 95,
-        opacity: channel === 0 ? 0 : 1,
-        overflowY: channel === 0 ? 'hidden' : 'auto',
-        transition: 'all 0.2s',
-        width: channel === 0 ? 0 : 95,
+        minWidth: 85,
+        opacity: channel === 0 ? .3 : 1,
+        overflowY: 'auto',
+        transition: 'opacity .2s',
+        width: 85,
     }}>
         {Object.keys(NOTES).map((note, index) =>
             index <= LOWEST_NOTE &&

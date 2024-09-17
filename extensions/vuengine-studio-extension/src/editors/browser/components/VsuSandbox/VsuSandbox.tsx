@@ -86,7 +86,7 @@ export default function VsuSandbox(props: VsuSandboxProps): React.JSX.Element {
                 </Tab>
             </TabList>
             <TabPanel key="tabpanel-channels">
-                <HContainer gap={0} overflow='hidden'>
+                <HContainer gap={10} overflow='hidden'>
                     <Piano channel={pianoChannel} setFrequency={setFrequency} />
                     <VContainer gap={15} grow={1} overflow='auto'>
                         {([...Array(VSU_NUMBER_OF_CHANNELS)].map((v, x) =>

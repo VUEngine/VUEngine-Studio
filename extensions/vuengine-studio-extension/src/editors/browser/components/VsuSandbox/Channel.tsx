@@ -28,7 +28,7 @@ import {
 } from '../VsuEmulator/VsuEmulatorTypes';
 
 const WaveFormSelection = styled(HContainer)`
-    outline: none;
+    outline: none !important;
 
     &:focus > div.active {
         border-color: var(--theia-button-background) !important;
@@ -154,9 +154,9 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
     const toggleSweepModulationEnabled = () => {
         setChannel({
             ...channel,
-            sweepModulation: {
-                ...channel?.sweepModulation,
-                enabled: !channel?.sweepModulation?.enabled,
+            sweepMod: {
+                ...channel?.sweepMod,
+                enabled: !channel?.sweepMod?.enabled,
             },
         });
     };
@@ -164,19 +164,19 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
     const toggleSweepModulationRepeat = () => {
         setChannel({
             ...channel,
-            sweepModulation: {
-                ...channel?.sweepModulation,
-                repeat: !channel?.sweepModulation?.repeat,
+            sweepMod: {
+                ...channel?.sweepMod,
+                repeat: !channel?.sweepMod?.repeat,
             },
         });
     };
 
-    const setSweepModulationSweep = (sweep: boolean) => {
+    const setSweepModulationFunction = (modulation: boolean) => {
         setChannel({
             ...channel,
-            sweepModulation: {
-                ...channel?.sweepModulation,
-                modulation: sweep,
+            sweepMod: {
+                ...channel?.sweepMod,
+                function: modulation,
             },
         });
     };
@@ -184,8 +184,8 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
     const setSweepModulationFrequency = (frequency: number) => {
         setChannel({
             ...channel,
-            sweepModulation: {
-                ...channel?.sweepModulation,
+            sweepMod: {
+                ...channel?.sweepMod,
                 frequency: clamp(frequency, VSU_SWEEP_MODULATION_FREQUENCY_MIN, VSU_SWEEP_MODULATION_FREQUENCY_MAX),
             },
         });
@@ -194,19 +194,19 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
     const setSweepModulationInterval = (interval: number) => {
         setChannel({
             ...channel,
-            sweepModulation: {
-                ...channel?.sweepModulation,
+            sweepMod: {
+                ...channel?.sweepMod,
                 interval: clamp(interval, VSU_SWEEP_MODULATION_INTERVAL_MIN, VSU_SWEEP_MODULATION_INTERVAL_MAX),
             },
         });
     };
 
-    const setSweepModulationSweepDown = (sweepDown: boolean) => {
+    const setSweepModulationSweepDown = (direction: boolean) => {
         setChannel({
             ...channel,
-            sweepModulation: {
-                ...channel?.sweepModulation,
-                direction: sweepDown,
+            sweepMod: {
+                ...channel?.sweepMod,
+                direction,
             },
         });
     };
@@ -214,8 +214,8 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
     const setSweepModulationShift = (shift: number) => {
         setChannel({
             ...channel,
-            sweepModulation: {
-                ...channel?.sweepModulation,
+            sweepMod: {
+                ...channel?.sweepMod,
                 shift: clamp(shift, VSU_SWEEP_MODULATION_SHIFT_MIN, VSU_SWEEP_MODULATION_SHIFT_MAX),
             },
         });
@@ -509,23 +509,23 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                 <label>
                                     <input
                                         type="checkbox"
-                                        checked={channel?.sweepModulation?.enabled ?? false}
+                                        checked={channel?.sweepMod?.enabled ?? false}
                                         onChange={toggleSweepModulationEnabled}
                                     />
                                     Enabled
                                 </label>
-                                {channel?.sweepModulation?.enabled &&
+                                {channel?.sweepMod?.enabled &&
                                     <label>
                                         <input
                                             type="checkbox"
-                                            checked={channel?.sweepModulation?.repeat ?? false}
+                                            checked={channel?.sweepMod?.repeat ?? false}
                                             onChange={toggleSweepModulationRepeat}
                                         />
                                         Repeat
                                     </label>
                                 }
                             </VContainer>
-                            {channel?.sweepModulation?.enabled &&
+                            {channel?.sweepMod?.enabled &&
                                 <>
                                     <VContainer>
                                         <label>
@@ -539,8 +539,8 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                                 label: 'Sweep',
                                                 value: false,
                                             }]}
-                                            defaultValue={channel?.sweepModulation?.modulation ?? true}
-                                            onChange={options => setSweepModulationSweep(options[0].value as boolean)}
+                                            defaultValue={channel?.sweepMod?.function ?? true}
+                                            onChange={options => setSweepModulationFunction(options[0].value as boolean)}
                                             allowBlank
                                         />
                                     </VContainer>
@@ -550,7 +550,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                         </label>
                                         <select
                                             className="theia-select"
-                                            value={channel?.sweepModulation?.frequency ?? 0}
+                                            value={channel?.sweepMod?.frequency ?? 0}
                                             onChange={e => setSweepModulationFrequency(parseInt(e.target.value))}
                                         >
                                             <option value="0">0.96 ms</option>
@@ -567,41 +567,45 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                             type='number'
                                             min={VSU_SWEEP_MODULATION_INTERVAL_MIN}
                                             max={VSU_SWEEP_MODULATION_INTERVAL_MAX}
-                                            value={channel?.sweepModulation?.interval ?? 0}
+                                            value={channel?.sweepMod?.interval ?? 0}
                                             onChange={e => setSweepModulationInterval(parseInt(e.target.value))}
                                         />
                                     </VContainer>
-                                    <VContainer>
-                                        <label>
-                                            {nls.localize('vuengine/vsuSandbox/sweep', 'Sweep')}
-                                        </label>
-                                        <RadioSelect
-                                            options={[{
-                                                label: 'Up',
-                                                value: true,
-                                            }, {
-                                                label: 'Down',
-                                                value: false,
-                                            }]}
-                                            defaultValue={channel?.sweepModulation?.direction ?? true}
-                                            onChange={options => setSweepModulationSweepDown(options[0].value as boolean)}
-                                            allowBlank
-                                        />
-                                    </VContainer>
-                                    <VContainer>
-                                        <label>
-                                            {nls.localize('vuengine/vsuSandbox/shiftAmount', 'Shift Amount')}
-                                        </label>
-                                        <input
-                                            className='theia-input'
-                                            style={{ width: 72 }}
-                                            type='number'
-                                            min={VSU_SWEEP_MODULATION_SHIFT_MIN}
-                                            max={VSU_SWEEP_MODULATION_SHIFT_MAX}
-                                            value={channel?.sweepModulation?.shift ?? 0}
-                                            onChange={e => setSweepModulationShift(parseInt(e.target.value))}
-                                        />
-                                    </VContainer>
+                                    {!channel?.sweepMod?.function &&
+                                        <>
+                                            <VContainer>
+                                                <label>
+                                                    {nls.localize('vuengine/vsuSandbox/sweep', 'Sweep')}
+                                                </label>
+                                                <RadioSelect
+                                                    options={[{
+                                                        label: 'Up',
+                                                        value: true,
+                                                    }, {
+                                                        label: 'Down',
+                                                        value: false,
+                                                    }]}
+                                                    defaultValue={channel?.sweepMod?.direction ?? true}
+                                                    onChange={options => setSweepModulationSweepDown(options[0].value as boolean)}
+                                                    allowBlank
+                                                />
+                                            </VContainer>
+                                            <VContainer>
+                                                <label>
+                                                    {nls.localize('vuengine/vsuSandbox/shiftAmount', 'Shift Amount')}
+                                                </label>
+                                                <input
+                                                    className='theia-input'
+                                                    style={{ width: 72 }}
+                                                    type='number'
+                                                    min={VSU_SWEEP_MODULATION_SHIFT_MIN}
+                                                    max={VSU_SWEEP_MODULATION_SHIFT_MAX}
+                                                    value={channel?.sweepMod?.shift ?? 0}
+                                                    onChange={e => setSweepModulationShift(parseInt(e.target.value))}
+                                                />
+                                            </VContainer>
+                                        </>
+                                    }
                                 </>
                             }
                         </HContainer>

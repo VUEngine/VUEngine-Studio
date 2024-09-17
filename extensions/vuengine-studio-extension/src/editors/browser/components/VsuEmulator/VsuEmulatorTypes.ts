@@ -14,7 +14,7 @@ export interface VsuChannelIntervalData {
 export interface VsuChannelSweepModulationData {
     enabled: boolean
     repeat: boolean
-    modulation: boolean
+    function: boolean
     frequency: number
     interval: number
     direction: boolean
@@ -33,17 +33,19 @@ export interface VsuChannelData {
     waveform: number
     stereoLevels: VsuChannelStereoLevelsData
     envelope: VsuChannelEnvelopeData
-    sweepModulation: VsuChannelSweepModulationData
+    sweepMod: VsuChannelSweepModulationData
     tapLocation: number
 }
 
+export type WaveformData = number[];
+
 export interface VsuData {
     channels: VsuChannelData[]
-    waveforms: number[][]
+    waveforms: WaveformData[]
     modulation: number[]
 }
 
-export const VSU_SAMPLE_RATE = 41700;
+export const VSU_SAMPLE_RATE = 41667;
 export const VSU_NUMBER_OF_WAVEFORM_BANKS = 5;
 export const VSU_NUMBER_OF_CHANNELS = 6;
 export const VSU_FREQUENCY_MIN = 0;
