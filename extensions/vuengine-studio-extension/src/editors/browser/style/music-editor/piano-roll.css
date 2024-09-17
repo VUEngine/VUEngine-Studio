@@ -1,9 +1,0 @@
-.musicEditor .pianoRoll {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    font-size: 10px;
-    height: 100%;
-    overflow: hidden;
-    position: relative;
-}

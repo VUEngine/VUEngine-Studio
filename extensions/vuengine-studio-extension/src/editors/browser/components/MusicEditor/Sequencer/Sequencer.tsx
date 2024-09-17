@@ -1,7 +1,15 @@
 import React from 'react';
+import styled from 'styled-components';
 import { ChannelConfig, SongData } from '../MusicEditorTypes';
 import Channel from './Channel';
 import StepIndicator from './StepIndicator';
+
+export const StyledSequencer = styled.div`
+    display: flex;
+    flex-direction: column;
+    padding-right: 10px;
+    position: relative;
+`;
 
 interface SequencerProps {
     songData: SongData
@@ -35,10 +43,11 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
 
     const soloChannel = songData.channels.filter(c => c.solo).map(c => c.id).pop() ?? -1;
 
-    return <div className='sequencer'>
-        {< StepIndicator
+    return <StyledSequencer>
+        {<StepIndicator
             currentStep={currentStep}
-            pianoRollSize={undefined}
+            bar={songData.bar}
+            isPianoRoll={false}
             hidden={!playing}
         />}
         {
@@ -63,5 +72,5 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
                 />
             )
         }
-    </div>;
+    </StyledSequencer>;
 }

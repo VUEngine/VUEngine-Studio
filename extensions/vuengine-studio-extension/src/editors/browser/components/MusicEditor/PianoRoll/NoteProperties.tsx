@@ -1,11 +1,35 @@
 import { nls } from '@theia/core';
 import React from 'react';
+import styled from 'styled-components';
 import { SongData } from '../MusicEditorTypes';
 import NotePropertiesNote from './NotePropertiesNote';
 
+export const MetaLine = styled.div`
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    padding-right: 10px;
+`;
+
+export const MetaLineHeader = styled.div`
+    display: flex;
+    flex-direction: column;
+    height: 28px;
+    margin-right: 3px;
+    min-width: 75px;
+    opacity: .5;
+    width: 75px;
+`;
+
+export const MetaLineHeaderLine = styled.div`
+    align-items: center;
+    display: flex;
+    flex-grow: 1;
+    min-height: 13px;
+`;
+
 interface NotePropertiesProps {
     songData: SongData
-    currentNote: number
     setCurrentNote: (currentNote: number) => void
     currentChannelId: number
     currentPatternId: number
@@ -15,7 +39,7 @@ interface NotePropertiesProps {
 export default function NoteProperties(props: NotePropertiesProps): React.JSX.Element {
     const {
         songData,
-        currentNote, setCurrentNote,
+        setCurrentNote,
         currentChannelId,
         currentPatternId,
         setNote,
@@ -27,15 +51,15 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
     let volumeL = 100;
     let volumeR = 100;
 
-    return <div className="metaLine" style={{ marginTop: 3 }}>
-        <div className="metaLineHeader">
-            <div>
+    return <MetaLine style={{ marginTop: 3 }}>
+        <MetaLineHeader>
+            <MetaLineHeaderLine>
                 {nls.localize('vuengine/musicEditor/effects', 'Effects')}
-            </div>
-            <div>
+            </MetaLineHeaderLine>
+            <MetaLineHeaderLine>
                 {nls.localize('vuengine/musicEditor/volume', 'Volume')}
-            </div>
-        </div>
+            </MetaLineHeaderLine>
+        </MetaLineHeader>
         {[...Array(pattern.size)].map((x, index) => {
             volumeL = pattern.volumeL[index] ?? volumeL;
             volumeR = pattern.volumeR[index] ?? volumeR;
@@ -43,7 +67,6 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                 <NotePropertiesNote
                     key={`pianoroll-note-properties-volume-note-${index}`}
                     index={index}
-                    current={index === currentNote}
                     effects={[]}
                     volumeL={volumeL}
                     volumeR={volumeR}
@@ -53,5 +76,5 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                 />
             );
         })}
-    </div>;
+    </MetaLine>;
 }

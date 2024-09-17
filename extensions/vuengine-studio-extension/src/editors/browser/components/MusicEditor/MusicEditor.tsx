@@ -232,7 +232,7 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
     ]);
 
     return (
-        <HContainer className='musicEditor' gap={20} overflow='hidden'>
+        <HContainer className="musicEditor" gap={20} overflow="hidden">
             <MusicPlayer
                 currentStep={currentStep}
                 playing={playing}
@@ -250,7 +250,7 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                         : currentStep + 1);
                 }}
             />
-            <VContainer gap={10} grow={1}>
+            <VContainer gap={10} grow={1} overflow="hidden">
                 <MusicEditorToolbar
                     currentStep={currentStep}
                     playing={playing}
@@ -290,7 +290,7 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                     setNote={setNote}
                 />
             </VContainer>
-            <VContainer gap={15} overflow='auto' style={{ maxWidth: 250, minWidth: 250 }}>
+            <VContainer gap={15} overflow="auto" style={{ maxWidth: 250, minWidth: 250 }}>
                 <Tabs>
                     <TabList>
                         <Tab

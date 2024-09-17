@@ -1,18 +1,4 @@
-.musicEditor .pianoRollNote {
-    background-color: var(--theia-secondaryButton-background);
-    cursor: crosshair;
-    margin-bottom: 1px;
-    margin-right: 1px;
-    min-height: 8px;
-    min-width: 8px;
-    flex-grow: 1;
-}
-
 .musicEditor .pianoRollRow:hover .pianoRollNote {
-    background-color: var(--theia-secondaryButton-hoverBackground);
-}
-
-.musicEditor .pianoRollNote.current {
     background-color: var(--theia-secondaryButton-hoverBackground);
 }
 
@@ -22,20 +8,4 @@
 
 .musicEditor .pianoRollRow.cNote:last-child .pianoRollNote {
     margin-bottom: 0;
-}
-
-.musicEditor .pianoRollNote:hover {
-    outline: 1px solid var(--theia-focusBorder);
-}
-
-.musicEditor .pianoRollNote.set {
-    background-color: var(--theia-focusBorder) !important;
-}
-
-.musicEditor .pianoRollNote.otherChannelSet {
-    background-color: var(--theia-editor-foreground) !important;
-}
-
-.musicEditor .pianoRollNote.nth {
-    margin-right: 3px;
 }

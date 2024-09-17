@@ -1,9 +1,21 @@
 import React from 'react';
+import styled from 'styled-components';
 import { SongData } from '../MusicEditorTypes';
 import StepIndicator from '../Sequencer/StepIndicator';
 import NoteProperties from './NoteProperties';
 import PianoRollEditor from './PianoRollEditor';
 import PianoRollHeader from './PianoRollHeader';
+
+export const StyledPianoRoll = styled.div`
+    align-items: start;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    font-size: 10px;
+    height: 100%;
+    overflow-x: auto;
+    position: relative;
+`;
 
 interface PianoRollProps {
     songData: SongData
@@ -42,7 +54,6 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
     } = props;
 
     const channel = songData.channels[currentChannelId];
-    const pattern = channel.patterns[currentPatternId];
 
     if (currentPatternId === -1) {
         return <>
@@ -50,16 +61,13 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         </>;
     }
 
-    const classNames = ['pianoRoll'];
-    classNames.push(`size-${pattern.size}`);
-
     let currentPatternStep = -1;
     if (channel.id === currentChannelId) {
         let patternStartStep = 0;
         channel.sequence.forEach((patternId, index) => {
             const patternSize = channel.patterns[patternId].size;
             const patternEndStep = patternStartStep + patternSize;
-            if (patternId === currentPatternId && currentStep >= patternStartStep && currentStep < patternEndStep) {
+            if (index === currentSequenceIndex && currentStep >= patternStartStep && currentStep < patternEndStep) {
                 currentPatternStep = currentStep - patternStartStep;
                 return;
             }
@@ -67,17 +75,17 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         });
     }
 
-    return <div className={classNames.join(' ')}>
+    return <StyledPianoRoll className="pianoRoll">
         {<StepIndicator
             currentStep={currentPatternStep}
-            pianoRollSize={pattern.size}
+            bar={songData.bar}
+            isPianoRoll={true}
             hidden={!playing || currentPatternStep === -1}
         />}
         <PianoRollHeader
             songData={songData}
             currentChannelId={currentChannelId}
             currentPatternId={currentPatternId}
-            currentNote={currentNote}
             getChannelName={getChannelName}
             playRangeStart={playRangeStart}
             setPlayRangeStart={setPlayRangeStart}
@@ -97,11 +105,10 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         />
         <NoteProperties
             songData={songData}
-            currentNote={currentNote}
             setCurrentNote={setCurrentNote}
             currentChannelId={currentChannelId}
             currentPatternId={currentPatternId}
             setNote={setNote}
         />
-    </div>;
+    </StyledPianoRoll>;
 }

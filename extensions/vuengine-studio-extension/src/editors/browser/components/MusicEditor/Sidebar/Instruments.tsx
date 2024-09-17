@@ -1,9 +1,25 @@
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React from 'react';
+import styled from 'styled-components';
 import VContainer from '../../Common/VContainer';
 import WaveForm from '../../WaveFormEditor/WaveForm';
 import { InstrumentConfig, SongData } from '../MusicEditorTypes';
+
+export const InputWithAction = styled.div`
+    display: flex;
+    gap: 5px;
+
+    :first-child {
+        flex-grow: 1;
+    }
+`;
+
+export const InputWithActionButton = styled.button`
+    margin: 0;
+    min-width: 32px;
+    width: 32px;
+`;
 
 interface InstrumentsProps {
     songData: SongData
@@ -73,7 +89,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
     return <VContainer gap={10}>
         <VContainer>
             {nls.localize('vuengine/musicEditor/instrument', 'Instrument')}
-            <div className='inputWithAction'>
+            <InputWithAction>
                 <select
                     className='theia-select'
                     onChange={e => setCurrentInstrument(parseInt(e.target.value))}
@@ -83,22 +99,22 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                         <option key={`instrument-select-${i}`} value={i}>{n.name}</option>
                     )}
                 </select>
-                <button
+                <InputWithActionButton
                     className='theia-button secondary'
                     onClick={removeCurrentInstrument}
                     title={nls.localize('vuengine/musicEditor/deleteInstrument', 'Delete Instrument')}
                     disabled={songData.instruments.length <= 1}
                 >
                     <i className='fa fa-minus' />
-                </button>
-                <button
+                </InputWithActionButton>
+                <InputWithActionButton
                     className='theia-button secondary'
                     title={nls.localize('vuengine/musicEditor/addInstrument', 'Add Instrument')}
                     onClick={addInstrument}
                 >
                     <i className='codicon codicon-plus' />
-                </button>
-            </div>
+                </InputWithActionButton>
+            </InputWithAction>
         </VContainer>
         <VContainer>
             <label>

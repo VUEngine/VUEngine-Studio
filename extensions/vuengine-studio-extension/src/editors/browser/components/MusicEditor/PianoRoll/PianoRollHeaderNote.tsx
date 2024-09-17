@@ -1,10 +1,57 @@
 import React from 'react';
 import { SongData } from '../MusicEditorTypes';
+import { MetaLineNote, MetaLineNoteProps } from './NotePropertiesNote';
+import styled from 'styled-components';
+
+interface HeaderNoteProps extends MetaLineNoteProps {
+    rangeStart: boolean
+    rangeEnd: boolean
+    inRange: boolean
+}
+
+export const HeaderNote = styled(MetaLineNote) <HeaderNoteProps>`
+    ${p => (p.rangeStart || p.rangeEnd || p.inRange) && `
+        border-top: 1px solid var(--theia-focusBorder);
+    `}
+    margin-right: ${p => p.rangeEnd
+        ? '2px'
+        : '0'
+    };
+    padding-right: ${p => p.nth
+        ? p.rangeEnd
+            ? '0'
+            : '2px'
+        : '1px'
+    };  
+    
+    ${p => p.rangeStart && `
+        &::before {
+            border-right: 10px solid transparent;
+            border-top: 10px solid var(--theia-focusBorder);
+            content: "";
+            top: 0;
+            position: absolute;
+            left: 0;
+            z-index: 1;
+        }
+    `}
+
+    ${p => p.rangeEnd && `
+        &::after {
+            border-left: 10px solid transparent;
+            border-top: 10px solid var(--theia-focusBorder);
+            content: "";
+            top: 0;
+            position: absolute;
+            right: 0;
+            z-index: 1;
+        }
+    `}
+`;
 
 interface PianoRollHeaderNoteProps {
     songData: SongData
     index: number
-    current: boolean
     currentChannelId: number
     currentPatternId: number
     playRangeStart: number
@@ -17,7 +64,6 @@ export default function PianoRollHeaderNote(props: PianoRollHeaderNoteProps): Re
     const {
         songData,
         index,
-        current,
         currentChannelId,
         currentPatternId,
         playRangeStart, setPlayRangeStart,
@@ -28,11 +74,9 @@ export default function PianoRollHeaderNote(props: PianoRollHeaderNoteProps): Re
     const pattern = channel.patterns[currentPatternId];
 
     const classNames = ['metaLineNote'];
+    /*
     if ((index + 1) % songData.bar === 0) {
         classNames.push('nth');
-    }
-    if (current) {
-        classNames.push('current');
     }
     if (playRangeStart === index) {
         classNames.push('rangeStart');
@@ -41,6 +85,7 @@ export default function PianoRollHeaderNote(props: PianoRollHeaderNoteProps): Re
     } else if (index > playRangeStart && index < playRangeEnd) {
         classNames.push('inRange');
     }
+    */
 
     const updatePlayRangeStart = (start: number): void => {
         setPlayRange(start);
@@ -83,10 +128,15 @@ export default function PianoRollHeaderNote(props: PianoRollHeaderNoteProps): Re
         setPlayRangeEnd(end);
     };
 
-    return <div
-        className={classNames.join(' ')}
-        onClick={() => updatePlayRangeStart(index)}
-        onContextMenu={() => updatePlayRangeEnd(index)}
-    >
-    </div>;
+    return (
+        <HeaderNote
+            className={classNames.join(' ')}
+            nth={(index + 1) % songData.bar === 0}
+            rangeStart={playRangeStart === index}
+            rangeEnd={playRangeEnd === index}
+            inRange={index > playRangeStart && index < playRangeEnd}
+            onClick={() => updatePlayRangeStart(index)}
+            onContextMenu={() => updatePlayRangeEnd(index)}
+        />
+    );
 }

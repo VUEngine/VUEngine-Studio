@@ -1,6 +1,40 @@
 import { nls } from '@theia/core';
 import React from 'react';
+import styled from 'styled-components';
 import { NOTES, SongData } from '../MusicEditorTypes';
+
+interface NoteProps {
+    current: boolean
+    nth: boolean
+    otherChannelSet: boolean
+    set: boolean
+}
+
+const Note = styled.div<NoteProps>`
+    background-color: ${p => p.set
+        ? 'var(--theia-focusBorder) !important'
+        : p.otherChannelSet
+            ? 'var(--theia-editor-foreground) !important'
+            : p.current
+                ? 'var(--theia-secondaryButton-hoverBackground) !important'
+                : 'var(--theia-secondaryButton-background)'
+    };
+    cursor: crosshair;
+    flex-grow: 1;
+    margin-bottom: 1px;
+    margin-right: ${p => p.nth
+        ? '3px'
+        : '1px'
+    };
+    min-height: 11px;
+    max-height: 11px;
+    min-width: 17px;
+    max-width: 17px;
+
+    &:hover {
+        outline: 1px solid var(--theia-focusBorder);
+    }
+`;
 
 interface PianoRollNoteProps {
     songData: SongData
@@ -20,14 +54,6 @@ export default function PianoRollNote(props: PianoRollNoteProps): React.JSX.Elem
     // Object.keys(otherChannelsNotes[index] ?? {}).includes(noteIdStr)
 
     const classNames = ['pianoRollNote'];
-    if ((index + 1) % songData.bar === 0) {
-        classNames.push('nth');
-    }
-    if (set) {
-        classNames.push('set');
-    } else if (otherChannels.length) {
-        classNames.push('otherChannelSet');
-    }
     if (current) {
         classNames.push('current');
     }
@@ -35,8 +61,8 @@ export default function PianoRollNote(props: PianoRollNoteProps): React.JSX.Elem
     let title = `${nls.localize('vuengine/musicEditor/note', 'Note')}: ${Object.keys(NOTES)[noteId]}`;
     if (otherChannels.length) {
         const prefix = otherChannels.length === 1
-            ? nls.localize('vuengine/musicEditor/alsoOnChannel', 'Also on channel')
-            : nls.localize('vuengine/musicEditor/alsoOnChannels', 'Also on channels');
+            ? nls.localize('vuengine/musicEditor/setOnChannel', 'Set on channel')
+            : nls.localize('vuengine/musicEditor/setOnChannels', 'Set on channels');
         title += ` – ${prefix} ${otherChannels.join(', ')}`;
     }
 
@@ -50,8 +76,12 @@ export default function PianoRollNote(props: PianoRollNoteProps): React.JSX.Elem
         e.preventDefault();
     };
 
-    return <div
+    return <Note
         className={classNames.join(' ')}
+        current={current}
+        nth={(index + 1) % songData.bar === 0}
+        set={set}
+        otherChannelSet={otherChannels.length > 0}
         onClick={() => {
             setNote(index, noteId);
             setCurrentNote(index);

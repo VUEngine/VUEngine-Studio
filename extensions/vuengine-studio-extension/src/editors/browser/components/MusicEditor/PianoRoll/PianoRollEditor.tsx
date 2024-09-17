@@ -1,6 +1,16 @@
 import React, { useMemo } from 'react';
 import { HIGHEST_NOTE, LOWEST_NOTE, NOTES, SongData } from '../MusicEditorTypes';
 import PianoRollRow from './PianoRollRow';
+import styled from 'styled-components';
+
+export const StyledPianoRollEditor = styled.div`
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    height: 100%;
+    overflow-y: scroll;
+    padding: 1px 0;
+`;
 
 interface PianoRollEditorProps {
     songData: SongData
@@ -60,7 +70,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         currentSequenceIndex,
     ]);
 
-    return <div className="pianoRollEditor">
+    return <StyledPianoRollEditor>
         {Object.keys(NOTES).map((note, index) =>
             index <= LOWEST_NOTE &&
             index >= HIGHEST_NOTE && <PianoRollRow
@@ -76,5 +86,5 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                 setNote={setNote}
                 playNote={playNote}
             />)}
-    </div>;
+    </StyledPianoRollEditor>;
 }

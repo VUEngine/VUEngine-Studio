@@ -1,7 +1,23 @@
 import React from 'react';
+import styled from 'styled-components';
+import { LOWEST_NOTE, SongData } from '../MusicEditorTypes';
 import PianoRollKey from './PianoRollKey';
 import PianoRollNote from './PianoRollNote';
-import { SongData } from '../MusicEditorTypes';
+
+interface RowProps {
+    cNote: boolean
+    last: boolean
+}
+
+const Row = styled.div<RowProps>`
+    min-height: ${p => p.last
+        ? '11px'
+        : p.cNote
+            ? '14px'
+            : '12px'
+    };
+    display: flex;
+`;
 
 interface PianoRollRowProps {
     songData: SongData
@@ -38,7 +54,11 @@ export default function PianoRollRow(props: PianoRollRowProps): React.JSX.Elemen
         classNames.push('cNote');
     }
 
-    return <div className={classNames.join(' ')}>
+    return <Row
+        className={classNames.join(' ')}
+        cNote={note.startsWith('C') && note.length === 2}
+        last={noteId === LOWEST_NOTE}
+    >
         <PianoRollKey
             noteId={noteId}
             note={note}
@@ -61,5 +81,5 @@ export default function PianoRollRow(props: PianoRollRowProps): React.JSX.Elemen
                     setNote={setNote}
                 />);
         })}
-    </div>;
+    </Row>;
 }
