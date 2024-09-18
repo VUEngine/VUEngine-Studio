@@ -21,6 +21,26 @@
   padding-left: calc(2 * var(--theia-ui-padding));
 }
 
+#theia-statusBar .area.left .element[id='status-bar-statusBar.collaboration']:first-child {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  padding: 0;
+  width: 48px;
+}
+#theia-statusBar .area.left .element[id='status-bar-statusBar.collaboration']:first-child i {
+  margin: 0;
+}
+#theia-statusBar .area.left .element[id='status-bar-statusBar.collaboration'].active:first-child {
+  background-color: var(--theia-button-background);
+}
+#theia-statusBar .area.left .element[id='status-bar-statusBar.collaboration'].active:first-child:hover {
+  background-color: var(--theia-button-hoverBackground);
+}
+#theia-statusBar .area.left .element[id='status-bar-statusBar.collaboration'].active:first-child i {
+  color: #fff;
+}
+
 #theia-statusBar .area.right .element:last-child {
   padding-right: calc(2 * var(--theia-ui-padding));
 }
