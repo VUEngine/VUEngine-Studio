@@ -1,7 +1,7 @@
 import { ApplicationShell, KeybindingContribution, KeybindingRegistry, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
 import { CommandContribution, CommandRegistry, MAIN_MENU_BAR, MenuContribution, MenuModelRegistry, nls } from '@theia/core/lib/common';
 import { inject, injectable } from '@theia/core/shared/inversify';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
 import { VesBuildCommands } from './ves-build-commands';
 import { VesBuildPreferenceIds } from './ves-build-preferences';
 import { VesBuildService } from './ves-build-service';
@@ -22,20 +22,24 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
   private readonly preferenceService: PreferenceService;
   @inject(VesBuildService)
   private readonly vesBuildService: VesBuildService;
-  @inject(WorkspaceService)
-  private readonly workspaceService: WorkspaceService;
+  @inject(VesWorkspaceService)
+  private readonly workspaceService: VesWorkspaceService;
 
   registerCommands(commandRegistry: CommandRegistry): void {
     commandRegistry.registerCommand(VesBuildCommands.CLEAN, {
+      isEnabled: () => !this.workspaceService.isCollaboration(),
       isVisible: () => this.workspaceService.opened,
       execute: () => this.vesBuildService.doClean(),
     });
     commandRegistry.registerCommand(VesBuildCommands.BUILD, {
+      isEnabled: () => !this.workspaceService.isCollaboration(),
       isVisible: () => this.workspaceService.opened,
       execute: (force: boolean = false) => this.vesBuildService.doBuild(force),
     });
 
     commandRegistry.registerCommand(VesBuildCommands.SET_MODE, {
+      isEnabled: () => !this.workspaceService.isCollaboration(),
+      isVisible: () => this.workspaceService.opened,
       execute: async (buildMode?: BuildMode) => {
         if (buildMode) {
           await this.vesBuildService.setBuildMode(buildMode);
@@ -43,25 +47,26 @@ export class VesBuildContribution implements CommandContribution, KeybindingCont
           await this.vesBuildService.buildModeQuickPick();
         }
       },
-      isVisible: () => this.workspaceService.opened,
     });
 
     commandRegistry.registerCommand(VesBuildCommands.TOGGLE_DUMP_ELF, {
+      isEnabled: () => !this.workspaceService.isCollaboration(),
+      isVisible: () => this.workspaceService.opened,
+      isToggled: () => !!this.preferenceService.get(VesBuildPreferenceIds.DUMP_ELF),
       execute: () => {
         const current = this.preferenceService.get(VesBuildPreferenceIds.DUMP_ELF);
         this.preferenceService.set(VesBuildPreferenceIds.DUMP_ELF, !current, PreferenceScope.User);
       },
-      isVisible: () => this.workspaceService.opened,
-      isToggled: () => !!this.preferenceService.get(VesBuildPreferenceIds.DUMP_ELF),
     });
 
     commandRegistry.registerCommand(VesBuildCommands.TOGGLE_PEDANTIC_WARNINGS, {
+      isEnabled: () => !this.workspaceService.isCollaboration(),
+      isVisible: () => this.workspaceService.opened,
+      isToggled: () => !!this.preferenceService.get(VesBuildPreferenceIds.PEDANTIC_WARNINGS),
       execute: () => {
         const current = this.preferenceService.get(VesBuildPreferenceIds.PEDANTIC_WARNINGS);
         this.preferenceService.set(VesBuildPreferenceIds.PEDANTIC_WARNINGS, !current, PreferenceScope.User);
       },
-      isVisible: () => this.workspaceService.opened,
-      isToggled: () => !!this.preferenceService.get(VesBuildPreferenceIds.PEDANTIC_WARNINGS),
     });
   }
 
