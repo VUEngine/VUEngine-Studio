@@ -52,7 +52,7 @@
 }
 
 .musicEditor .channelButton:hover {
-    background-color: var(--theia-primaryButton-background) !important;
+    background-color: var(--theia-button-hoverBackground) !important;
 }
 
 .musicEditor .channel.current .channelHeader,

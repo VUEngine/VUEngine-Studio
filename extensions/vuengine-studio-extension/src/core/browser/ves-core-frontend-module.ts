@@ -1,4 +1,5 @@
 import { CallHierarchyContribution } from '@theia/callhierarchy/lib/browser/callhierarchy-contribution';
+import { CollaborationFrontendContribution } from '@theia/collaboration/lib/browser/collaboration-frontend-contribution';
 import { CollaborationWorkspaceService } from '@theia/collaboration/lib/browser/collaboration-workspace-service';
 import { FilterContribution } from '@theia/core';
 import {
@@ -39,6 +40,7 @@ import { TypeHierarchyContribution } from '@theia/typehierarchy/lib/browser/type
 import { VSXExtensionsContribution } from '@theia/vsx-registry/lib/browser/vsx-extensions-contribution';
 import { QuickOpenWorkspace } from '@theia/workspace/lib/browser/quick-open-workspace';
 import '../../../src/core/browser/style/index.css';
+import { VesCollaborationFrontendContribution } from './ves-collaboration-frontend-contribution';
 import { VesCommonService } from './ves-common-service';
 import { VesApplicationShell } from './ves-core-application-shell';
 import { VesColorContribution } from './ves-core-color-contribution';
@@ -140,6 +142,9 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     // custom file extensions
     rebind(FileSystemFrontendContribution).to(VesFileSystemFrontendContribution).inSingletonScope();
+
+    // customize collaboration functionality
+    rebind(CollaborationFrontendContribution).to(VesCollaborationFrontendContribution).inSingletonScope();
 
     // quick open workspace
     rebind(QuickOpenWorkspace).to(VesQuickOpenWorkspace).inSingletonScope();
