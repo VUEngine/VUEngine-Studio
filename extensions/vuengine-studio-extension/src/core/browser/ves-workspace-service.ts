@@ -1,13 +1,14 @@
+import { CollaborationWorkspaceService } from '@theia/collaboration/lib/browser/collaboration-workspace-service';
 import { PreferenceService } from '@theia/core/lib/browser';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { WorkspaceData, WorkspaceService } from '@theia/workspace/lib/browser';
+import { WorkspaceData } from '@theia/workspace/lib/browser';
 import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesBuildPreferenceIds } from '../../build/browser/ves-build-preferences';
 import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-service';
 import { VesPluginsPreferenceIds } from '../../plugins/browser/ves-plugins-preferences';
 
 @injectable()
-export class VesWorkspaceService extends WorkspaceService {
+export class VesWorkspaceService extends CollaborationWorkspaceService {
     @inject(PreferenceService)
     protected readonly preferenceService: PreferenceService;
     @inject(VesBuildPathsService)
