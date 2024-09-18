@@ -547,9 +547,9 @@ export class VesBuildService {
     ];
 
     if (isWindows) {
-      const winPaths = await Promise.all(pathUris.map(async p => this.convertoToEnvPath(isWslInstalled, p)));
+      const winPaths = await Promise.all(pathUris.map(async p => this.convertToEnvPath(isWslInstalled, p)));
       const preMakeArgs = [
-        'cd', await this.convertoToEnvPath(isWslInstalled, workspaceRootUri), '&&',
+        'cd', await this.convertToEnvPath(isWslInstalled, workspaceRootUri), '&&',
         'export', `PATH=${winPaths.join(':')}:$PATH`,
         'LC_ALL=C',
         `BUILD_ALL=${buildAll ? 1 : 0}`,
@@ -561,10 +561,10 @@ export class VesBuildService {
       const makeArgs = [
         'make', 'all',
         '-e', `TYPE=${buildMode}`,
-        `ENGINE_FOLDER=${await this.convertoToEnvPath(isWslInstalled, engineCoreUri)}`,
-        `PLUGINS_FOLDER=${await this.convertoToEnvPath(isWslInstalled, enginePluginsUri)}`,
-        `USER_PLUGINS_FOLDER=${await this.convertoToEnvPath(isWslInstalled, userPluginsUri)}`,
-        '-f', await this.convertoToEnvPath(isWslInstalled, makefileUri),
+        `ENGINE_FOLDER=${await this.convertToEnvPath(isWslInstalled, engineCoreUri)}`,
+        `PLUGINS_FOLDER=${await this.convertToEnvPath(isWslInstalled, enginePluginsUri)}`,
+        `USER_PLUGINS_FOLDER=${await this.convertToEnvPath(isWslInstalled, userPluginsUri)}`,
+        '-f', await this.convertToEnvPath(isWslInstalled, makefileUri),
       ];
 
       if (isWslInstalled) {
@@ -613,8 +613,8 @@ export class VesBuildService {
     let args = [
       'all',
       '-e', `TYPE=${buildMode}`,
-      '-f', await this.convertoToEnvPath(isWslInstalled, makefileUri),
-      '-C', await this.convertoToEnvPath(isWslInstalled, workspaceRootUri),
+      '-f', await this.convertToEnvPath(isWslInstalled, makefileUri),
+      '-C', await this.convertToEnvPath(isWslInstalled, workspaceRootUri),
     ];
 
     if (isLinux) {
@@ -634,13 +634,13 @@ export class VesBuildService {
         env: {
           BUILD_ALL: buildAll ? 1 : 0,
           DUMP_ELF: dumpElf ? 1 : 0,
-          ENGINE_FOLDER: await this.convertoToEnvPath(isWslInstalled, engineCoreUri),
+          ENGINE_FOLDER: await this.convertToEnvPath(isWslInstalled, engineCoreUri),
           LC_ALL: 'C',
           PREPROCESSING_WAIT_FOR_LOCK_DELAY_FACTOR: '0.000',
           MAKE_JOBS: this.getThreads(),
           PATH: paths.join(':'),
-          PLUGINS_FOLDER: await this.convertoToEnvPath(isWslInstalled, enginePluginsUri),
-          USER_PLUGINS_FOLDER: await this.convertoToEnvPath(isWslInstalled, userPluginsUri),
+          PLUGINS_FOLDER: await this.convertToEnvPath(isWslInstalled, enginePluginsUri),
+          USER_PLUGINS_FOLDER: await this.convertToEnvPath(isWslInstalled, userPluginsUri),
           PRINT_PEDANTIC_WARNINGS: pedanticWarnings ? 1 : 0,
         },
       },
@@ -804,7 +804,7 @@ export class VesBuildService {
     await this.resetBuildStatus(BuildResult.aborted);
   }
 
-  async convertoToEnvPath(isWslInstalled: boolean, uri: URI): Promise<string> {
+  async convertToEnvPath(isWslInstalled: boolean, uri: URI): Promise<string> {
     const path = await this.fileService.fsPath(uri);
     let envPath = path
       .replace(/\\/g, '/')
