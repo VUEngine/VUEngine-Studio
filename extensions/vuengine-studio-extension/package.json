@@ -14,6 +14,7 @@
     "@phosphor-icons/react": "^2.0.15",
     "@theia/bulk-edit": "1.53.2",
     "@theia/callhierarchy": "1.53.2",
+    "@theia/collaboration": "1.53.2",
     "@theia/core": "1.53.2",
     "@theia/debug": "1.53.2",
     "@theia/editor": "1.53.2",

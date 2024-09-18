@@ -1,4 +1,5 @@
 import { CallHierarchyContribution } from '@theia/callhierarchy/lib/browser/callhierarchy-contribution';
+import { CollaborationWorkspaceService } from '@theia/collaboration/lib/browser/collaboration-workspace-service';
 import { FilterContribution } from '@theia/core';
 import {
     ApplicationShell, CorePreferenceContribution, FrontendApplicationContribution,
@@ -36,7 +37,6 @@ import { TestViewContribution } from '@theia/test/lib/browser/view/test-view-con
 import { ToolbarDefaultsFactory } from '@theia/toolbar/lib/browser/toolbar-defaults';
 import { TypeHierarchyContribution } from '@theia/typehierarchy/lib/browser/typehierarchy-contribution';
 import { VSXExtensionsContribution } from '@theia/vsx-registry/lib/browser/vsx-extensions-contribution';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { QuickOpenWorkspace } from '@theia/workspace/lib/browser/quick-open-workspace';
 import '../../../src/core/browser/style/index.css';
 import { VesCommonService } from './ves-common-service';
@@ -145,7 +145,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     rebind(QuickOpenWorkspace).to(VesQuickOpenWorkspace).inSingletonScope();
 
     // workspace service
-    rebind(WorkspaceService).to(VesWorkspaceService).inSingletonScope();
+    rebind(CollaborationWorkspaceService).to(VesWorkspaceService).inSingletonScope();
 
     // themes
     rebind(ThemeService).to(VesThemeService).inSingletonScope();
