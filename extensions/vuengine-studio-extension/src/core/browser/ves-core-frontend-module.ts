@@ -33,6 +33,7 @@ import { ScmContribution } from '@theia/scm/lib/browser/scm-contribution';
 import { SearchInWorkspaceFrontendContribution } from '@theia/search-in-workspace/lib/browser/search-in-workspace-frontend-contribution';
 import { TestViewContribution } from '@theia/test/lib/browser/view/test-view-contribution';
 import { ToolbarDefaultsFactory } from '@theia/toolbar/lib/browser/toolbar-defaults';
+import { TypeHierarchyContribution } from '@theia/typehierarchy/lib/browser/typehierarchy-contribution';
 import { VSXExtensionsContribution } from '@theia/vsx-registry/lib/browser/vsx-extensions-contribution';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { QuickOpenWorkspace } from '@theia/workspace/lib/browser/quick-open-workspace';
@@ -156,6 +157,14 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     // remove test view
     rebind(TestViewContribution).toConstantValue({
+        registerCommands: () => { },
+        registerMenus: () => { },
+        registerKeybindings: () => { },
+        registerToolbarItems: () => { }
+    } as any);
+
+    // remove type hierarchy view
+    rebind(TypeHierarchyContribution).toConstantValue({
         registerCommands: () => { },
         registerMenus: () => { },
         registerKeybindings: () => { },

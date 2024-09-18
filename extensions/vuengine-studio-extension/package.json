@@ -37,6 +37,7 @@
     "@theia/task": "1.53.2",
     "@theia/test": "1.53.2",
     "@theia/toolbar": "1.53.2",
+    "@theia/typehierarchy": "1.53.2",
     "@theia/vsx-registry": "1.53.2",
     "@theia/workspace": "1.53.2",
     "crc-32": "^1.2.2",
