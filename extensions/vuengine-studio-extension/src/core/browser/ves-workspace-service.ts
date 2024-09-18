@@ -39,6 +39,10 @@ export class VesWorkspaceService extends CollaborationWorkspaceService {
         });
     }
 
+    isCollaboration(): boolean {
+        return this.collabWorkspace !== undefined;
+    }
+
     protected async getWorkspaceDataFromFile(): Promise<WorkspaceData | undefined> {
         const workspaceData = await super.getWorkspaceDataFromFile();
         return this.addEngineFolders(workspaceData);

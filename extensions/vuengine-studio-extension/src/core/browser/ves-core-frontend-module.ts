@@ -150,7 +150,8 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     rebind(QuickOpenWorkspace).to(VesQuickOpenWorkspace).inSingletonScope();
 
     // workspace service
-    rebind(CollaborationWorkspaceService).to(VesWorkspaceService).inSingletonScope();
+    bind(VesWorkspaceService).toSelf().inSingletonScope();
+    rebind(CollaborationWorkspaceService).toService(VesWorkspaceService);
 
     // themes
     rebind(ThemeService).to(VesThemeService).inSingletonScope();
