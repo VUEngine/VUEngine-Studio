@@ -16,6 +16,14 @@ export class VesWorkspaceCommandContribution extends WorkspaceCommandContributio
         await this.vesProjectService.projectDataReady;
         const types = this.vesProjectService.getProjectDataTypes() || {};
 
+        // remove js debug commands
+        // TODO: move to own contribution. proves to be problematic, though. race condition?
+        commandRegistry.unregisterCommand('extension.js-debug.addXHRBreakpoints');
+        commandRegistry.unregisterCommand('extension.js-debug.editXHRBreakpoints');
+        commandRegistry.unregisterCommand('extension.js-debug.removeXHRBreakpoint');
+        commandRegistry.unregisterCommand('extension.js-debug.addCustomBreakpoints');
+        commandRegistry.unregisterCommand('extension.js-debug.removeAllCustomBreakpoints');
+
         commandRegistry.unregisterCommand(WorkspaceCommands.NEW_FILE);
         commandRegistry.registerCommand(WorkspaceCommands.NEW_FILE, new WorkspaceRootUriAwareCommandHandler(this.workspaceService, this.selectionService, {
             execute: async uri => {
