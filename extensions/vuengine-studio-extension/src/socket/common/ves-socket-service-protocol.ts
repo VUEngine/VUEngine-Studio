@@ -1,6 +1,6 @@
 import { RpcServer } from '@theia/core';
 
-export const VES_SOCKET_SERVICE_PATH = '/ves/services/socket';
+export const VES_SOCKET_SERVICE_PATH = '/services/ves/socket';
 export const VesSocketService = Symbol('VesSocketService');
 
 export interface VesSocketServiceClient {

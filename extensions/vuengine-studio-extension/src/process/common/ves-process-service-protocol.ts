@@ -5,7 +5,7 @@ import {
   ProcessOptions,
 } from '@theia/process/lib/node';
 
-export const VES_PROCESS_SERVICE_PATH = '/ves/services/process';
+export const VES_PROCESS_SERVICE_PATH = '/services/ves/process';
 export const VesProcessService = Symbol('VesProcessService');
 
 export enum VesProcessType {
