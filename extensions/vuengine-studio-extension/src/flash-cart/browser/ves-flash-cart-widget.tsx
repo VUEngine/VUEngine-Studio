@@ -48,6 +48,7 @@ export class VesFlashCartWidget extends ReactWidget {
     this.title.closable = true;
     this.setTitle();
     this.bindEvents();
+    this.update();
   }
 
   protected async doInit(): Promise<void> {
