@@ -31,7 +31,7 @@ import { deepmerge } from 'deepmerge-ts';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesImagesService } from '../../images/browser/ves-images-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
-import { ProjectDataType } from '../../project/browser/ves-project-types';
+import { ProjectDataType, WithContributor } from '../../project/browser/ves-project-types';
 import { VesRumblePackService } from '../../rumble-pack/browser/ves-rumble-pack-service';
 import { VES_RENDERERS } from './renderers/ves-renderers';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext } from './ves-editors-types';
@@ -91,26 +91,29 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     @inject(WorkspaceService)
     private readonly workspaceService: WorkspaceService;
 
-    protected data: ItemData | undefined;
-    protected savedData: ItemData | undefined;
+    static readonly ID = 'vesEditorsWidget';
+    static readonly LABEL = 'Editor';
+
+    typeId: string;
+    uri: URI;
 
     protected schema: JsonSchema | undefined;
     protected uiSchema: UISchemaElement | undefined;
-    private jsonformsOnChange: (state: Pick<JsonFormsCore, 'data' | 'errors'>) => void;
-    private justAppliedUndoRedo = false;
 
-    public dirty = false;
+    protected data: ItemData | undefined;
+
+    private onEditorContentHasChanged: (state: Pick<JsonFormsCore, 'data' | 'errors'>) => void;
 
     protected readonly onContentChangedEmitter = new Emitter<void>();
     readonly onContentChanged = this.onContentChangedEmitter.event;
 
-    typeId: string;
-    uri: URI;
     protected reference: Reference<MonacoEditorModel>;
-    protected justSaved: boolean = false;
-    protected isLoading: boolean = true;
-    protected isGenerating: boolean = false;
-    protected generatingProgress: number = -1;
+
+    protected justRequestedUpdate: boolean;
+    protected justUpdatedModel: boolean;
+    protected isLoading: boolean;
+    protected isGenerating: boolean;
+    protected generatingProgress: number;
 
     isExtractable: boolean = true;
     secondaryWindow: Window | undefined;
@@ -120,17 +123,56 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         return this.onDirtyChangedEmitter.event;
     }
 
+    get dirty(): boolean {
+        return this.reference?.object.dirty;
+    }
+
     get saveable(): Saveable {
         return this;
     }
 
-    protected changeEmitter = new Emitter<Readonly<ItemData>>();
-    get onChange(): Event<Readonly<ItemData>> {
-        return this.changeEmitter.event;
+    @postConstruct()
+    protected init(): void {
+        this.uri = new URI(this.options.uri);
+        this.typeId = this.options.typeId;
+
+        this.initMembers();
+
+        this.doInit();
+        this.bindEvents();
+
+        const path = (this.uri.scheme === UNTITLED_SCHEME)
+            ? `untitled-${this.options.typeId}-${this.vesCommonService.nanoid()}`
+            : this.uri.path;
+        this.id = `vesEditorsWidget:${path}`;
+
+        this.title.iconClass = 'fa fa-cog';
+        this.title.closable = true;
+
+        this.setTitle();
+
+        // render initial loading spinner
+        this.update();
     }
 
-    static readonly ID = 'vesEditorsWidget';
-    static readonly LABEL = 'Editor';
+    protected initMembers(): void {
+        this.justRequestedUpdate = false;
+        this.justUpdatedModel = false;
+        this.isLoading = true;
+        this.isGenerating = false;
+        this.generatingProgress = -1;
+    }
+
+    protected setTitle(): void {
+        const name = this.labelProvider.getLongName(this.uri);
+        this.title.label = name;
+        this.title.caption = name;
+    }
+
+    protected onActivateRequest(msg: Message): void {
+        this.node.tabIndex = 0;
+        this.node.focus();
+    }
 
     protected setIsGenerating(isGenerating: boolean, progress: number = -1): void {
         this.isGenerating = isGenerating;
@@ -145,31 +187,6 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         this.update();
     }
 
-    @postConstruct()
-    protected init(): void {
-        this.uri = new URI(this.options.uri);
-        this.typeId = this.options.typeId;
-
-        this.isLoading = true;
-        this.doInit();
-
-        this.bindEvents();
-
-        const label = this.labelProvider.getLongName(this.uri);
-
-        const path = (this.uri.scheme === UNTITLED_SCHEME)
-            ? `untitled-${this.options.typeId}-${this.vesCommonService.nanoid()}`
-            : this.uri.path;
-        this.id = `vesEditorsWidget:${path}`;
-
-        this.title.label = label;
-        this.title.caption = label;
-        this.title.iconClass = 'fa fa-cog';
-        this.title.closable = true;
-
-        this.setTitle();
-    }
-
     dispatchCommandEvent(commandId: string): void {
         const resetInputsEvent = new CustomEvent(EDITORS_COMMAND_EXECUTED_EVENT_NAME, { detail: commandId });
         // console.info(`Emitting event: EDITORS_COMMAND_EXECUTED_EVENT_NAME ${commandId}`);
@@ -177,18 +194,12 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     }
 
     protected bindEvents(): void {
-        this.onChange(d => {
-            this.handleChanged(d);
-        });
-
-        this.toDispose.push(this.changeEmitter);
-        this.jsonformsOnChange = (state: Pick<JsonFormsCore, 'data' | 'errors'>) =>
-            this.changeEmitter.fire(state.data);
+        this.onEditorContentHasChanged = (state: Pick<JsonFormsCore, 'data' | 'errors'>) => this.handleEditorChange(state.data);
 
         this.toDispose.pushAll([
-            this.vesProjectService.onDidAddProjectItem(() => this.rerenderOnProjectDataUpdate()),
-            this.vesProjectService.onDidDeleteProjectItem(() => this.rerenderOnProjectDataUpdate()),
-            this.vesProjectService.onDidUpdateProjectItem(() => this.rerenderOnProjectDataUpdate()),
+            this.vesProjectService.onDidAddProjectItem(() => this.update()),
+            this.vesProjectService.onDidDeleteProjectItem(() => this.update()),
+            this.vesProjectService.onDidUpdateProjectItem(() => this.update()),
         ]);
     }
 
@@ -197,13 +208,19 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     }
 
     createMoveToUri(resourceUri: URI): URI | undefined {
-        return resourceUri;
+        return this.uri;
     }
 
-    protected rerenderOnProjectDataUpdate(): void {
-        if (!this.justSaved) {
-            this.update();
-        }
+    close(): void {
+        super.close();
+    }
+
+    update(): void {
+        this.justRequestedUpdate = true;
+        setTimeout(() => {
+            this.justRequestedUpdate = false;
+        }, 50);
+        super.update();
     };
 
     protected async doInit(): Promise<void> {
@@ -220,18 +237,8 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
             return;
         }
         this.toDispose.push(this.reference = reference);
-        this.reference.object.onDidSaveModel(async () => {
-            this.changeEmitter.fire(this.data!);
-            if (!this.justSaved) {
-                await this.loadData(type);
-                this.update();
-            } else {
-                // delay to only set back after project file update events have been processed
-                setTimeout(() => {
-                    this.justSaved = false;
-                }, 50);
-            }
-        });
+        this.reference?.object.onContentChanged(() => this.handleModelChange(type));
+        this.reference?.object.onDirtyChanged(() => this.onDirtyChangedEmitter.fire());
 
         this.schema = type?.schema;
         this.uiSchema = type?.uiSchema;
@@ -241,8 +248,8 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
 
         await this.loadData(type);
 
-        this.isLoading = false;
         this.update();
+        this.isLoading = false;
     }
 
     protected async loadData(type: ProjectDataType): Promise<void> {
@@ -254,25 +261,10 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         }
         this.data = json as ItemData;
         await this.mergeOntoDefaults(type);
-        this.setSavedData();
-    }
-
-    protected setTitle(): void {
-        const name = this.uri.path.base;
-        this.title.label = name;
-        this.title.caption = name;
-    }
-
-    protected onActivateRequest(msg: Message): void {
-        this.node.tabIndex = 0;
-        this.node.focus();
     }
 
     async revert(options?: Saveable.RevertOptions): Promise<void> {
-        if (this.dirty) {
-            this.data = this.savedData;
-            this.setDirty(false);
-        }
+        this.reference?.object.revert();
     }
 
     createSnapshot(): Saveable.Snapshot {
@@ -290,6 +282,8 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         }
 
         this.undoRedoService.undo(this.uri);
+        this.update();
+        this.updateModel();
     }
 
     redo(): void {
@@ -298,6 +292,8 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         }
 
         this.undoRedoService.redo(this.uri);
+        this.update();
+        this.updateModel();
     }
 
     async save(): Promise<void> {
@@ -307,21 +303,13 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
 
         if (this.uri.scheme === UNTITLED_SCHEME) {
             await this.commandService.executeCommand(CommonCommands.SAVE_AS.id);
-        } else if (this.dirty) {
+        } else {
             try {
-                this.reference.object.textEditorModel.setValue(JSON.stringify(this.data, undefined, 4));
-                this.reference.object.save();
-                this.justSaved = true;
-                this.setDirty(false);
-                this.setSavedData();
+                this.reference?.object.save();
             } catch (error) {
                 console.error('Could not save');
             }
         }
-    }
-
-    protected setSavedData(): void {
-        this.savedData = this.data;
     }
 
     protected async mergeOntoDefaults(type: ProjectDataType): Promise<void> {
@@ -430,44 +418,55 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         }
     }
 
-    protected dataHasBeenChanged(): boolean {
-        return JSON.stringify(this.data) !== JSON.stringify(this.savedData);
-    }
-
-    protected setDirty(dirty: boolean): void {
-        if (this.dirty !== dirty) {
-            this.dirty = dirty;
-            this.onDirtyChangedEmitter.fire();
-        }
-    }
-
     protected async load(): Promise<void> {
     }
 
-    protected handleChanged(data: ItemData): void {
-        if (this.justAppliedUndoRedo) {
-            this.justAppliedUndoRedo = false;
+    protected handleEditorChange(newData: ItemData): void {
+        if (this.justRequestedUpdate) {
+            this.justRequestedUpdate = false;
             return;
         }
 
         const oldData = this.data;
-        this.data = data;
+
+        if (JSON.stringify(oldData) === JSON.stringify(newData)) {
+            return;
+        }
+
+        this.data = newData;
+        this.pushUndoRedo({ ...oldData }, { ...newData });
+
+        this.updateModel();
+    }
+
+    protected pushUndoRedo(oldData: ItemData, newData: ItemData): void {
         this.undoRedoService.pushElement(this.uri,
+            // undo
             async () => {
-                this.data = oldData;
-                this.setDirty(this.dataHasBeenChanged());
-                this.justAppliedUndoRedo = true;
-                this.update();
+                this.data = { ...oldData };
             },
+            // redo
             async () => {
-                this.data = data;
-                this.setDirty(this.dataHasBeenChanged());
-                this.justAppliedUndoRedo = true;
-                this.update();
+                this.data = { ...newData };
             },
         );
+    }
 
-        this.setDirty(this.dataHasBeenChanged());
+    protected async handleModelChange(type: ProjectDataType & WithContributor): Promise<void> {
+        if (this.justUpdatedModel) {
+            this.justUpdatedModel = false;
+            return;
+        }
+
+        await this.loadData(type);
+        this.update();
+
+    }
+
+    protected updateModel(): void {
+        this.justUpdatedModel = true;
+        this.reference?.object.textEditorModel.pushStackElement();
+        this.reference?.object.textEditorModel.setValue(JSON.stringify(this.data, undefined, 4));
     }
 
     protected render(): React.ReactNode {
@@ -510,7 +509,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
                             data={this.data}
                             schema={this.schema}
                             uischema={this.uiSchema}
-                            onChange={this.jsonformsOnChange}
+                            onChange={this.onEditorContentHasChanged}
                             cells={vanillaCells}
                             renderers={[
                                 ...vanillaRenderers,
