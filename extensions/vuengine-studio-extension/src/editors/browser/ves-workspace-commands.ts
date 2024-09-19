@@ -64,16 +64,25 @@ export class VesWorkspaceCommandContribution extends WorkspaceCommandContributio
                     });
                     dialog.open().then(async value => {
                         if (value) {
-                            const createFile = async (n: string) => {
-                                const fileUri = parentUri.resolve(n);
-                                await this.fileService.create(fileUri);
+                            const createFile = async (n: string, ext?: string) => {
+                                const fileName = ext ? n + ext : n;
+                                const fileUri = parentUri.resolve(fileName);
+                                let fileValue;
+                                if (ext) {
+                                    const type = this.vesProjectService.getProjectDataTypeByExt(ext);
+                                    if (type) {
+                                        const data = await this.vesProjectService.getSchemaDefaults(type);
+                                        fileValue = JSON.stringify(data, undefined, 4);
+                                    }
+                                }
+                                await this.fileService.create(fileUri, fileValue);
                                 this.fireCreateNewFile({ parent: parentUri, uri: fileUri });
                                 open(this.openerService, fileUri);
                             };
                             const name = value.substring(0, value.indexOf('.'));
                             const extensions = value.substring(value.indexOf('.'));
                             if (extensions) {
-                                extensions.split(' / ').forEach(async ext => createFile(name + ext));
+                                extensions.split(' / ').forEach(async ext => createFile(name, ext));
                             } else {
                                 createFile(name);
                             }

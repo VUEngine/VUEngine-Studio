@@ -9,10 +9,12 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileChangeType, FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { OutputChannelManager, OutputChannelSeverity } from '@theia/output/lib/browser/output-channel';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { deepmerge } from 'deepmerge-ts';
 import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VES_PREFERENCE_DIR } from '../../core/browser/ves-preference-configurations';
 import { VesEditorsCommands } from '../../editors/browser/ves-editors-commands';
+import { ItemData } from '../../editors/browser/ves-editors-widget';
 import { VesPluginsData } from '../../plugins/browser/ves-plugin';
 import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-service';
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
@@ -93,28 +95,43 @@ export class VesProjectService {
   getProjectData(): ProjectDataWithContributor | undefined {
     return this._projectData;
   }
+
   getProjectDataTypes(): ProjectDataTypesWithContributor | undefined {
     return this._projectData?.types;
   }
+
   getProjectDataType(typeId: string): ProjectDataType & WithContributor | undefined {
     return this._projectData?.types
       && this._projectData?.types[typeId];
   }
+
+  getProjectDataTypeByExt(file: string): ProjectDataType & WithContributor | undefined {
+    if (!this._projectData?.types) {
+      return;
+    }
+
+    return Object.values(this._projectData?.types).filter((type: ProjectDataType & WithContributor) => type.file === file)[0];
+  }
+
   getProjectDataTemplates(): ProjectDataTemplatesWithContributor | undefined {
     return this._projectData?.templates;
   }
+
   getProjectDataTemplate(templateId: string): ProjectDataTemplate & WithContributor | undefined {
     return this._projectData?.templates
       && this._projectData?.templates[templateId];
   }
+
   getProjectDataItems(): ProjectDataItemsByTypeWithContributor | undefined {
     return this._projectData?.items;
   }
+
   getProjectDataItemById(itemId: string, typeId: string): object | undefined {
     if (this._projectData?.items && this._projectData?.items[typeId]) {
       return this._projectData?.items[typeId][itemId];
     }
   }
+
   getProjectDataItemsForType(typeId: string, contributor?: ProjectContributor): ProjectDataItemsWithContributor | undefined {
     let result = {};
     const items = this._projectData?.items ? this._projectData?.items[typeId] || {} : {};
@@ -134,15 +151,126 @@ export class VesProjectService {
 
     return result;
   }
+
   getProjectDataAllKnownPlugins(): { [id: string]: VesPluginsData } | undefined {
     return this._projectData?.plugins;
   }
+
+  async getSchemaDefaults(type: ProjectDataType, existingData: ItemData = {}): Promise<ItemData> {
+    const needsId = type.file.startsWith('.');
+    if (type.schema.properties && needsId) {
+      type.schema.properties['_id'] = {
+        type: 'string',
+        default: ''
+      };
+    }
+    const schema = await window.electronVesCore.dereferenceJsonSchema(type.schema);
+    let data: ItemData = this.generateDataFromJsonSchema({
+      ...schema,
+      type: 'object',
+      additionalProperties: false,
+    }, existingData);
+    /*
+        if (data?.name === '') {
+          data.name = this.uri.path.name;
+        }
+    */
+    if (!data?._id && needsId) {
+      data!._id = this.vesCommonService.nanoid();
+    }
+
+    data = window.electronVesCore.sortJson(data ?? {}, {
+      depth: 8,
+      ignoreCase: true,
+      reverse: false,
+    });
+
+    return data;
+  }
+
+  /**
+   * Generates JSON from schema, using either values present in data or schema default.
+   * Will only contain properties that are present in the schema.
+   */
+  protected generateDataFromJsonSchema(schema: any, data?: any): any {
+    if (!schema) {
+      return;
+    }
+
+    const getValue = (defaultValue: any) => (data !== undefined)
+      ? data
+      : (schema.default !== undefined)
+        ? schema.default
+        : defaultValue;
+
+    switch (schema.type) {
+      case 'array':
+        let resultArray: any[] = [];
+        if (data?.length > 0) {
+          data.map((dataValue: any) => {
+            resultArray.push(this.generateDataFromJsonSchema(
+              schema.items,
+              dataValue
+            ));
+          });
+        } else if (schema.default !== undefined) {
+          resultArray = schema.default;
+        }
+        if ((schema.minItems !== undefined) && resultArray.length < schema.minItems) {
+          [...Array(schema.minItems - resultArray.length)].map(x => {
+            resultArray.push(this.generateDataFromJsonSchema(
+              schema.items,
+            ));
+          });
+        }
+        if ((schema.maxItems !== undefined) && resultArray.length > schema.maxItems) {
+          resultArray.splice(schema.maxItems - 1);
+        }
+        return resultArray;
+
+      case 'boolean':
+        return getValue(false);
+
+      case 'integer':
+      case 'number':
+        let resultNumber = getValue(0);
+        if (schema.minimum && resultNumber < schema.minimum) {
+          resultNumber = schema.minimum;
+        }
+        if (schema.maximum && resultNumber > schema.maximum) {
+          resultNumber = schema.maximum;
+        }
+        return getValue(0);
+
+      case 'object':
+        let resultObject: any = {};
+        if (schema.properties) {
+          Object.keys(schema.properties).forEach(key => {
+            resultObject[key] = this.generateDataFromJsonSchema(
+              schema.properties![key],
+              data ? data[key] : undefined
+            );
+          });
+        }
+        // TODO: support for 'patternProperties'
+        // TODO: support for non-boolean 'additionalProperties'
+        if (schema.additionalProperties !== false) {
+          resultObject = deepmerge(resultObject, data);
+        }
+        return resultObject;
+
+      case 'string':
+        return getValue('');
+    }
+  }
+
   protected setProjectDataAllKnownPlugins(plugins: { [id: string]: VesPluginsData }): void {
     if (!this._projectData) {
       this._projectData = {};
     }
     this._projectData.plugins = plugins;
   }
+
   protected setProjectDataItem(typeId: string, itemId: string, data: ProjectDataItem, fileUri: URI): boolean {
     if (!this._projectData) {
       this._projectData = {};
@@ -195,6 +323,7 @@ export class VesProjectService {
 
     return true;
   }
+
   protected deleteProjectDataItem(typeId: string, itemId: string, fileUri: URI): void {
     if (this._projectData?.items
       && this._projectData?.items[typeId]
@@ -210,11 +339,13 @@ export class VesProjectService {
       this.logLine(`Removed item from project data. Type: ${typeId}, ID: ${itemId}.`);
     }
   }
+
   protected getProjectPlugins(): string[] {
     const gameConfig = this.getProjectDataItemById(ProjectContributor.Project, 'GameConfig');
     // @ts-ignore
     return gameConfig?.plugins ? Object.keys(gameConfig?.plugins) : [];
   }
+
   protected async setProjectPlugins(installedPlugins: string[]): Promise<void> {
     if (this.workspaceProjectFolderUri) {
       const gameConfigFileUri = this.workspaceProjectFolderUri.resolve('config').resolve('GameConfig');

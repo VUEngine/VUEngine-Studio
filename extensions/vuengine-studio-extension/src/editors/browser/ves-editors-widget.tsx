@@ -27,7 +27,6 @@ import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { MonacoEditorModel } from '@theia/monaco/lib/browser/monaco-editor-model';
 import { MonacoTextModelService } from '@theia/monaco/lib/browser/monaco-text-model-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { deepmerge } from 'deepmerge-ts';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesImagesService } from '../../images/browser/ves-images-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
@@ -260,7 +259,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
             console.error('Malformed JSON, could not update editor.');
         }
         this.data = json as ItemData;
-        await this.mergeOntoDefaults(type);
+        this.data = await this.vesProjectService.getSchemaDefaults(type, this.data);
     }
 
     async revert(options?: Saveable.RevertOptions): Promise<void> {
@@ -309,112 +308,6 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
             } catch (error) {
                 console.error('Could not save');
             }
-        }
-    }
-
-    protected async mergeOntoDefaults(type: ProjectDataType): Promise<void> {
-        const needsId = type.file.startsWith('.');
-        if (type.schema.properties && needsId) {
-            type.schema.properties['_id'] = {
-                type: 'string',
-                default: ''
-            };
-        }
-        const schema = await window.electronVesCore.dereferenceJsonSchema(type.schema);
-        this.data = this.generateDataFromSchema({
-            ...schema,
-            type: 'object',
-            additionalProperties: false,
-        }, this.data);
-
-        if (this.data?.name === '') {
-            this.data.name = this.uri.path.name;
-        }
-
-        if (!this.data?._id && needsId) {
-            this.data!._id = this.vesCommonService.nanoid();
-        }
-
-        this.data = window.electronVesCore.sortJson(this.data ?? {}, {
-            depth: 8,
-            ignoreCase: true,
-            reverse: false,
-        });
-    }
-
-    /**
-     * Generates JSON from schema, using either values present in data or schema default.
-     * Will only contain properties that are present in the schema.
-     */
-    protected generateDataFromSchema(schema: any, data?: any): any {
-        if (!schema) {
-            return;
-        }
-
-        const getValue = (defaultValue: any) => (data !== undefined)
-            ? data
-            : (schema.default !== undefined)
-                ? schema.default
-                : defaultValue;
-
-        switch (schema.type) {
-            case 'array':
-                let resultArray: any[] = [];
-                if (data?.length > 0) {
-                    data.map((dataValue: any) => {
-                        resultArray.push(this.generateDataFromSchema(
-                            schema.items,
-                            dataValue
-                        ));
-                    });
-                } else if (schema.default !== undefined) {
-                    resultArray = schema.default;
-                }
-                if ((schema.minItems !== undefined) && resultArray.length < schema.minItems) {
-                    [...Array(schema.minItems - resultArray.length)].map(x => {
-                        resultArray.push(this.generateDataFromSchema(
-                            schema.items,
-                        ));
-                    });
-                }
-                if ((schema.maxItems !== undefined) && resultArray.length > schema.maxItems) {
-                    resultArray.splice(schema.maxItems - 1);
-                }
-                return resultArray;
-
-            case 'boolean':
-                return getValue(false);
-
-            case 'integer':
-            case 'number':
-                let resultNumber = getValue(0);
-                if (schema.minimum && resultNumber < schema.minimum) {
-                    resultNumber = schema.minimum;
-                }
-                if (schema.maximum && resultNumber > schema.maximum) {
-                    resultNumber = schema.maximum;
-                }
-                return getValue(0);
-
-            case 'object':
-                let resultObject: any = {};
-                if (schema.properties) {
-                    Object.keys(schema.properties).forEach(key => {
-                        resultObject[key] = this.generateDataFromSchema(
-                            schema.properties![key],
-                            data ? data[key] : undefined
-                        );
-                    });
-                }
-                // TODO: support for 'patternProperties'
-                // TODO: support for non-boolean 'additionalProperties'
-                if (schema.additionalProperties !== false) {
-                    resultObject = deepmerge(resultObject, data);
-                }
-                return resultObject;
-
-            case 'string':
-                return getValue('');
         }
     }
 
