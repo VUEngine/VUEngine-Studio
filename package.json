@@ -61,6 +61,7 @@
     "eclipse-theia.builtin-extension-pack": "https://open-vsx.org/api/eclipse-theia/builtin-extension-pack/1.83.1/file/eclipse-theia.builtin-extension-pack-1.83.1.vsix"
   },
   "theiaPluginsExcludeIds": [
+    "ms-vscode.js-debug",
     "ms-vscode.js-debug-companion",
     "ms-vscode.references-view",
     "vscode.bat",
@@ -95,7 +96,6 @@
     "vscode.less",
     "vscode.lua",
     "vscode.markdown-math",
-    "vscode.media-preview",
     "vscode.microsoft-authentication",
     "vscode.npm",
     "vscode.objective-c",
@@ -112,6 +112,7 @@
     "vscode.rust",
     "vscode.scss",
     "vscode.shaderlab",
+    "vscode.simple-browser",
     "vscode.sql",
     "vscode.swift",
     "vscode.theme-abyss",
@@ -124,6 +125,7 @@
     "vscode.theme-solarized-dark",
     "vscode.theme-solarized-light",
     "vscode.theme-tomorrow-night-blue",
+    "vscode.tunnel-forwarding",
     "vscode.typescript-language-features",
     "vscode.typescript",
     "vscode.vb",
