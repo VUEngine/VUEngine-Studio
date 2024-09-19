@@ -1,9 +1,11 @@
-import { ApplicationShell, KeybindingContribution, KeybindingRegistry, PreferenceService } from '@theia/core/lib/browser';
+import { isOSX } from '@theia/core';
+import { ApplicationShell, CommonCommands, KeybindingContribution, KeybindingRegistry, PreferenceService } from '@theia/core/lib/browser';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { CommandContribution, CommandRegistry } from '@theia/core/lib/common/command';
 import { MenuContribution, MenuModelRegistry } from '@theia/core/lib/common/menu';
 import { ElectronCommands } from '@theia/core/lib/electron-browser/menu/electron-menu-contribution';
 import { inject, injectable } from '@theia/core/shared/inversify';
+import { WorkspaceCommands } from '@theia/workspace/lib/browser';
 import { VesCoreCommands } from './ves-core-commands';
 import { VesCoreMenus } from './ves-core-menus';
 
@@ -55,5 +57,18 @@ export class VesCoreContribution implements CommandContribution, MenuContributio
             command: ElectronCommands.RELOAD.id,
             keybinding: 'ctrlcmd+shift+r'
         });
+
+        registry.registerKeybindings({
+            command: CommonCommands.CLOSE_TAB.id,
+            keybinding: 'ctrlcmd+w'
+        });
+
+        if (isOSX) {
+            registry.registerKeybindings({
+                command: WorkspaceCommands.FILE_RENAME.id,
+                keybinding: 'enter',
+                when: 'filesExplorerFocus',
+            });
+        }
     }
 }
