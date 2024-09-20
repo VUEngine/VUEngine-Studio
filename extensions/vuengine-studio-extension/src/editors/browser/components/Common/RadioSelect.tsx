@@ -113,7 +113,13 @@ export default function RadioSelect(props: RadioSelectProps): React.JSX.Element 
         disabled,
     ]);
 
-    return <div className={classes} onKeyDown={handleKeyPress} onFocus={onFocus} onBlur={onBlur} tabIndex={0}>
+    return <div
+        className={classes}
+        onKeyDown={handleKeyPress}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        tabIndex={0}
+    >
         {options.map((o, i) =>
             <div
                 key={`radio-select-option-${i}`}

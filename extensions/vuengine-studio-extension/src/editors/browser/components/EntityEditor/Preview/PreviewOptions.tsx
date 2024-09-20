@@ -1,11 +1,13 @@
 import { CornersOut, Square } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import ColorSelector from '../../Common/ColorSelector';
 import ZoomControls from '../../Common/Controls/ZoomControls';
 import HContainer from '../../Common/HContainer';
 import { clamp } from '../../Common/Utils';
 import VContainer from '../../Common/VContainer';
+import { INPUT_BLOCKING_COMMANDS } from '../EntityEditor';
 import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 
 interface PreviewOptionsProps {
@@ -27,6 +29,7 @@ export default function PreviewOptions(props: PreviewOptionsProps): React.JSX.El
     previewAnaglyph, setPreviewAnaglyph,
     previewBackgroundColor, setPreviewBackgroundColor,
   } = useContext(EntityEditorContext) as EntityEditorContextType;
+  const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
 
   const setBackgroundColor = (backgroundColor: number) =>
     setPreviewBackgroundColor(clamp(backgroundColor, -1, 3));
@@ -96,6 +99,8 @@ export default function PreviewOptions(props: PreviewOptionsProps): React.JSX.El
               color={previewBackgroundColor}
               updateColor={setBackgroundColor}
               includeTransparent
+              onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+              onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
             />
           </VContainer>
         }

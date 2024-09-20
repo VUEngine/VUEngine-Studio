@@ -524,6 +524,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                         type="checkbox"
                         checked={collider.checkForCollisions}
                         onChange={toggleCheckForCollisions}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
                 </VContainer>
                 {

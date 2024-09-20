@@ -4,10 +4,12 @@ interface ColorSelectorProps {
     color: number;
     updateColor: (newColor: number) => void;
     includeTransparent?: boolean
+    onFocus?: () => void
+    onBlur?: () => void
 }
 
 export default function ColorSelector(props: ColorSelectorProps): React.JSX.Element {
-    const { color, updateColor, includeTransparent } = props;
+    const { color, updateColor, includeTransparent, onFocus, onBlur } = props;
 
     const colors = includeTransparent
         ? [-1, 0, 1, 2, 3]
@@ -29,7 +31,13 @@ export default function ColorSelector(props: ColorSelectorProps): React.JSX.Elem
         }
     };
 
-    return <div className="colorSelector" onKeyDown={handleKeyPress} tabIndex={0}>
+    return <div
+        className="colorSelector"
+        onKeyDown={handleKeyPress}
+        tabIndex={0}
+        onFocus={onFocus}
+        onBlur={onBlur}
+    >
         {colors.map(c => {
             const selected = c === color ? ' selected' : '';
             return <div

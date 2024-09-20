@@ -865,6 +865,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                     type="checkbox"
                                     checked={sprite.texture?.flip?.y ?? false}
                                     onChange={() => toggleFlip('y')}
+                                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                                 />
                                 <ArrowsHorizontal size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/entityEditor/flip', 'Flip')}
                             </label>
@@ -873,6 +875,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                     type="checkbox"
                                     checked={sprite.texture?.flip?.x ?? false}
                                     onChange={() => toggleFlip('x')}
+                                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                                 />
                                 <ArrowsVertical size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/entityEditor/flip', 'Flip')}
                             </label>
@@ -884,6 +888,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                         type="checkbox"
                                         checked={sprite.texture?.repeat?.x ?? false}
                                         onChange={() => toggleRepeat('x')}
+                                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                                     />
                                     <ArrowsHorizontal size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/entityEditor/repeat', 'Repeat')}
                                 </label>
@@ -892,6 +898,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                         type="checkbox"
                                         checked={sprite.texture?.repeat?.y ?? false}
                                         onChange={() => toggleRepeat('y')}
+                                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                                     />
                                     <ArrowsVertical size={16} style={{ verticalAlign: 'text-bottom' }} /> {nls.localize('vuengine/entityEditor/repeat', 'Repeat')}
                                 </label>
@@ -903,6 +911,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                             type="checkbox"
                             checked={sprite.texture?.recycleable ?? false}
                             onChange={toggleRecycleable}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
                         {nls.localize('vuengine/entityEditor/recycleable', 'Recycleable')}
                     </label>
@@ -954,6 +964,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                             type="checkbox"
                             checked={sprite.optimizeTiles}
                             onChange={toggleOptimizeTiles}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
                         {nls.localize('vuengine/entityEditor/optimize', 'Optimize')}
                     </label>

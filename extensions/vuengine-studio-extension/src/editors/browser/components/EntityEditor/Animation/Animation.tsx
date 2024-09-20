@@ -105,6 +105,8 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                         type="checkbox"
                         checked={data.animations.default === index}
                         onChange={setDefault}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
                 </VContainer>
                 <VContainer grow={1}>
@@ -138,6 +140,8 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                         type="checkbox"
                         checked={animation.loop}
                         onChange={toggleLoop}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
                 </VContainer>
                 {!animation.loop &&

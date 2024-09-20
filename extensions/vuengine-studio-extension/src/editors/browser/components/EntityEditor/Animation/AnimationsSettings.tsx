@@ -83,6 +83,8 @@ export default function AnimationsSettings(props: AnimationsSettingsProps): Reac
                     type="checkbox"
                     checked={data.animations.multiframe}
                     onChange={toggleMultiframe}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />
             </VContainer>}
         </HContainer>

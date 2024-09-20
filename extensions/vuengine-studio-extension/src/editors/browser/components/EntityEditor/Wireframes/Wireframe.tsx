@@ -150,6 +150,8 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                         }]}
                         defaultValue={wireframe.type}
                         onChange={option => setType(option.value as WireframeType)}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
                 </VContainer>
                 <VContainer>
@@ -157,6 +159,8 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                     <ColorSelector
                         color={wireframe.color}
                         updateColor={setColor}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
                 </VContainer>
             </HContainer>
@@ -196,6 +200,8 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                         type="checkbox"
                         checked={wireframe.interlaced}
                         onChange={toggleInterlaced}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
                 </VContainer>
             </HContainer>
@@ -293,6 +299,8 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                             type="checkbox"
                             checked={wireframe.drawCenter}
                             onChange={toggleDrawCenter}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
                     </VContainer>
                 </HContainer>

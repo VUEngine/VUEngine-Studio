@@ -62,6 +62,8 @@ export default function SpritesSettings(): React.JSX.Element {
                         type="checkbox"
                         checked={data.sprites.useZDisplacementInProjection}
                         onChange={toggleUseZDisplacementInProjection}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
                     {nls.localize('vuengine/entityEditor/useZDisplacement', 'Use Z Displacement')}
                 </label>

@@ -22,6 +22,7 @@ import { clamp, getMaxScaleInContainer, roundToNextMultipleOf8 } from '../../Com
 import VContainer from '../../Common/VContainer';
 import { DisplayMode } from '../../Common/VUEngineTypes';
 import Images from '../../ImageEditor/Images';
+import { INPUT_BLOCKING_COMMANDS } from '../EntityEditor';
 import ColorModeSelect from './ColorModeSelect';
 
 const ReconvertButton = styled.button`
@@ -42,7 +43,7 @@ interface ImageProcessingSettingsFormProps {
 }
 
 export default function ImageProcessingSettingsForm(props: ImageProcessingSettingsFormProps): React.JSX.Element {
-    const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
+    const { fileUri, services, disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const {
         image,
         setFiles,
@@ -301,6 +302,8 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                                             imageQuantizationAlgorithm: processingSettings?.imageQuantizationAlgorithm === 'nearest' ? 'floyd-steinberg' : 'nearest',
                                         });
                                     }}
+                                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                                 />
                                 {nls.localize('vuengine/editors/enable', 'Enable')}
                             </label>
@@ -314,6 +317,8 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                                                 serpentine: !processingSettings?.serpentine,
                                             });
                                         }}
+                                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                                     />
                                     {nls.localize('vuengine/editors/serpentine', 'Serpentine')}
                                 </label>
@@ -348,6 +353,8 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                                             onChange={e => updateProcessingSettings({
                                                 minimumColorDistanceToDither: parseFloat(e.target.value),
                                             })}
+                                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                                         />
                                         <div style={{ minWidth: 32, textAlign: 'right', width: 32 }}>
                                             {processingSettings?.minimumColorDistanceToDither ?? 0}
