@@ -5,7 +5,7 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { Emitter } from '@theia/core/shared/vscode-languageserver-protocol';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
+import { FileContent } from '@theia/filesystem/lib/common/files';
 import IMAGE_HYPERBOY from '../../../src/flash-cart/browser/images/HyperBoy.png';
 import IMAGE_FLASHBOY_PLUS from '../../../src/flash-cart/browser/images/flashboy-plus.png';
 import IMAGE_HYPERFLASH32 from '../../../src/flash-cart/browser/images/hyperflash32-with-label.png';
@@ -53,8 +53,6 @@ export class VesFlashCartService {
   protected readonly vesProcessWatcher: VesProcessWatcher;
   @inject(VesProjectService)
   protected readonly vesProjectsService: VesProjectService;
-  @inject(WorkspaceService)
-  private readonly workspaceService: WorkspaceService;
 
   // is queued
   protected _isQueued: boolean = false;
@@ -177,10 +175,21 @@ export class VesFlashCartService {
       }
 
       const defaultRomUri = await this.vesBuildService.getDefaultRomUri();
-      const romUri = connectedFlashCart.config.padRom &&
-        await this.padRom(connectedFlashCart.config.size)
-        ? await this.getPaddedRomUri(connectedFlashCart.config.size)
-        : defaultRomUri;
+      if (!await this.vesBuildService.outputRomExists()) {
+        this.messageService.error(
+          nls.localize('vuengine/flashCarts/romNotFound', 'ROM not found')
+        );
+        return connectedFlashCart;
+      }
+
+      const romContent = await this.fileService.readFile(defaultRomUri);
+      const outputRomBuffer = await this.padRom(
+        romContent,
+        connectedFlashCart.config.padRom ? connectedFlashCart.config.size : 0
+      );
+      const tempDirBaseUri = new URI(window.electronVesCore.getTempDir());
+      const outputRomUri = tempDirBaseUri.resolve('output.vb');
+      await this.fileService.writeFile(outputRomUri, outputRomBuffer);
 
       const projectName = await this.vesProjectsService.getProjectName();
 
@@ -188,7 +197,7 @@ export class VesFlashCartService {
         ? connectedFlashCart.config.args
           .replace(NAME_PLACEHOLDER, projectName)
           .replace(NAME_NO_SPACES_PLACEHOLDER, projectName.replace(/ /g, ''))
-          .replace(ROM_PLACEHOLDER, await this.fileService.fsPath(romUri))
+          .replace(ROM_PLACEHOLDER, outputRomUri.path.fsPath())
           .replace(PORT_PLACEHOLDER, connectedFlashCart.port)
           .split(' ')
         : [];
@@ -395,36 +404,18 @@ export class VesFlashCartService {
       .replace(/\\/g, '/');
   }
 
-  protected async padRom(size: number): Promise<boolean> {
-    const romUri = await this.vesBuildService.getDefaultRomUri();
-    const paddedRomUri = await this.getPaddedRomUri(size);
-    if (!await this.vesBuildService.outputRomExists()) {
-      return false;
-    }
-
+  protected async padRom(romContent: FileContent, size: number): Promise<BinaryBufferWriteableStream> {
     const targetSize = size * 128;
-    const romContent = await this.fileService.readFile(romUri);
     const romSize = romContent.size / 1024;
-    const timesToMirror = targetSize / romSize;
+    const timesToMirror = Math.max(targetSize / romSize, 1);
 
-    if (romSize >= targetSize) {
-      return false;
-    }
-
-    const paddedRomBuffer = BinaryBufferWriteableStream.create();
+    const outputRomBuffer = BinaryBufferWriteableStream.create();
     [...Array(timesToMirror)].forEach(function (): void {
-      paddedRomBuffer.write(romContent.value);
+      outputRomBuffer.write(romContent.value);
     });
-    paddedRomBuffer.end();
-    await this.fileService.writeFile(paddedRomUri, paddedRomBuffer);
+    outputRomBuffer.end();
 
-    return true;
-  }
-
-  protected async getPaddedRomUri(size: number): Promise<URI> {
-    await this.workspaceService.ready;
-    const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-    return workspaceRootUri.resolve('build').resolve(`outputPadded${size}.vb`);
+    return outputRomBuffer;
   }
 
   protected async parseStreamDataHyperFlasherCli32(connectedFlashCart: ConnectedFlashCart, data: any): Promise<void> {
@@ -513,7 +504,7 @@ export class VesFlashCartService {
               log: [],
               currentLogLine: 0,
             },
-            canHoldRom: await this.determineCanHoldRom(flashCartConfig.size),
+            canHoldRom: this.determineCanHoldRom(flashCartConfig.size),
           };
         }
       }
@@ -541,7 +532,6 @@ export class VesFlashCartService {
   async detectConnectedFlashCarts(): Promise<void> {
     navigator.usb.requestDevice({ filters: [] }).catch(() => { });
     const devices: USBDevice[] = await navigator.usb.getDevices();
-    console.log('USB devices found', devices);
     if (devices.length > 0) {
       const flashCartConfigs: FlashCartConfig[] = this.getFlashCartConfigs();
       const connectedFlashCarts: ConnectedFlashCart[] = [];
@@ -608,8 +598,7 @@ export class VesFlashCartService {
       .resolve(isWindows ? 'hfcli.exe' : 'hfcli');
   }
 
-  protected async determineCanHoldRom(flashSize: number): Promise<boolean> {
-    await this.vesBuildService.ready;
+  protected determineCanHoldRom(flashSize: number): boolean {
     return flashSize >= this.vesBuildService.bytesToMbit(this.vesBuildService.romSize);
   }
 

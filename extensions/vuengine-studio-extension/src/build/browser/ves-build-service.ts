@@ -337,7 +337,7 @@ export class VesBuildService {
     // init flags
     this.frontendApplicationStateService.onStateChanged(
       async (state: FrontendApplicationState) => {
-        if (state === 'attached_shell') {
+        if (state === 'ready') {
           await this.determineRomSize();
         }
       }
