@@ -6,6 +6,7 @@ import HContainer from '../../Common/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import VContainer from '../../Common/VContainer';
 import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
+import { INPUT_BLOCKING_COMMANDS } from '../EntityEditor';
 
 interface AnimationsSettingsProps {
     isMultiFileAnimation: boolean
@@ -13,7 +14,7 @@ interface AnimationsSettingsProps {
 
 export default function AnimationsSettings(props: AnimationsSettingsProps): React.JSX.Element {
     const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
-    const { services } = useContext(EditorsContext) as EditorsContextType;
+    const { services, disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const { isMultiFileAnimation } = props;
     const [maxAnimationFrames, setMaxAnimationFrames] = useState<number>(256);
 
@@ -65,6 +66,8 @@ export default function AnimationsSettings(props: AnimationsSettingsProps): Reac
                     disabled={isMultiFileAnimation}
                     value={data.animations.totalFrames}
                     onChange={e => setAnimationFrames(parseInt(e.target.value))}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />
             </VContainer>
             {!isMultiFileAnimation && <VContainer>

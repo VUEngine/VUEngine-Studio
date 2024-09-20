@@ -1,3 +1,7 @@
+.entityEditor {
+    outline: none !important;
+}
+
 .entityEditor .empty {
     opacity: .3;
 }

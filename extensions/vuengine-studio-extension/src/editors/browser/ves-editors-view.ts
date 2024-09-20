@@ -1,5 +1,5 @@
-import { Command, CommandContribution, CommandRegistry, CommandService, MenuContribution, MenuModelRegistry, URI, UntitledResourceResolver, isObject } from '@theia/core';
-import { AbstractViewContribution, CommonCommands, CommonMenus, KeybindingContribution, KeybindingRegistry, OpenerService, Widget, open } from '@theia/core/lib/browser';
+import { Command, CommandRegistry, CommandService, MenuModelRegistry, URI, UntitledResourceResolver } from '@theia/core';
+import { AbstractViewContribution, CommonCommands, CommonMenus, KeybindingRegistry, OpenerService, Widget, open } from '@theia/core/lib/browser';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { UserWorkingDirectoryProvider } from '@theia/core/lib/browser/user-working-directory-provider';

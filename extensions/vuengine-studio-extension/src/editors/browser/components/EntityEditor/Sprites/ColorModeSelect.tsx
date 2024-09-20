@@ -1,10 +1,12 @@
 import { nls } from '@theia/core';
 import { HoverService } from '@theia/core/lib/browser';
-import React from 'react';
+import React, { useContext } from 'react';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import InfoLabel from '../../Common/InfoLabel';
 import RadioSelect from '../../Common/RadioSelect';
 import VContainer from '../../Common/VContainer';
+import { INPUT_BLOCKING_COMMANDS } from '../EntityEditor';
 
 interface ColorModeSelectProps {
     value: ColorMode
@@ -15,6 +17,7 @@ interface ColorModeSelectProps {
 
 export default function ColorModeSelect(props: ColorModeSelectProps): React.JSX.Element {
     const { value, setValue, hoverService, disabled } = props;
+    const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
 
     return <VContainer>
         <InfoLabel
@@ -52,6 +55,8 @@ export default function ColorModeSelect(props: ColorModeSelectProps): React.JSX.
             }]}
             defaultValue={value}
             onChange={options => setValue(options[0].value as ColorMode)}
+            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
             disabled={disabled}
         />
     </VContainer>;

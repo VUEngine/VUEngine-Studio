@@ -9,10 +9,11 @@ import { EntityEditorContext, EntityEditorContextType, ScriptData } from '../Ent
 import { ScriptType } from './ScriptTypes';
 import { AVAILABLE_ACTIONS, ActionConfigData, ActionConfigType } from './AvailableActions';
 import { ENTITY_FUNCTIONS } from './EntityFunctions';
+import { INPUT_BLOCKING_COMMANDS } from '../EntityEditor';
 
 export default function ScriptedActionDetail(): React.JSX.Element {
-    const { services } = useContext(EditorsContext) as EditorsContextType;
     const { data, setData, currentComponent } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { services, enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
 
     const currentComponentParts = currentComponent.split('-');
     const currentScriptIndex = currentComponentParts[1] ? parseInt(currentComponentParts[1]) : 0;
@@ -138,6 +139,8 @@ export default function ScriptedActionDetail(): React.JSX.Element {
                         allowBlank={false}
                         defaultValue={scriptConfig.type}
                         onChange={options => setType(options[0].value as ScriptType)}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
                 </VContainer>
                 {scriptConfig.type === ScriptType.Custom &&

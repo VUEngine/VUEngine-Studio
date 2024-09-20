@@ -5,13 +5,17 @@ import { EditorsContext, EditorsContextType } from '../../../../../editors/brows
 import { ProjectContributor } from '../../../../../project/browser/ves-project-types';
 import VContainer from '../../Common/VContainer';
 import { ColliderType } from '../../Common/VUEngineTypes';
+import { EntityEditorSaveDataOptions } from '../EntityEditor';
+import { EntityEditorCommands } from '../EntityEditorCommands';
 import {
   AnimationData,
+  ComponentData,
+  ComponentKey,
   EntityEditorContext,
   EntityEditorContextType,
   MAX_PREVIEW_SPRITE_ZOOM,
   MIN_PREVIEW_SPRITE_ZOOM,
-  WHEEL_SENSITIVITY,
+  WHEEL_SENSITIVITY
 } from '../EntityEditorTypes';
 import BallCollider from './Colliders/BallCollider';
 import BoxCollider from './Colliders/BoxCollider';
@@ -19,10 +23,10 @@ import LineFieldCollider from './Colliders/LineFieldCollider';
 import PreviewOptions from './PreviewOptions';
 import SpritePreview from './SpritePreview';
 import PreviewWireframe from './Wireframes/PreviewWireframe';
-import { EntityEditorCommands } from '../EntityEditorCommands';
 
 interface PreviewProps {
   hasAnyComponent: boolean
+  updateComponent: (key: ComponentKey, index: number, partialData: Partial<ComponentData>, options?: EntityEditorSaveDataOptions) => void,
 }
 
 export default function Preview(props: PreviewProps): React.JSX.Element {

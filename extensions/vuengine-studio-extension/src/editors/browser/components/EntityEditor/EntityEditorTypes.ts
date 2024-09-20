@@ -101,6 +101,13 @@ export const MAX_COLLIDER_LINEFIELD_LENGTH = 511;
 export const MIN_COLLIDER_LINEFIELD_THICKNESS = 0;
 export const MAX_COLLIDER_LINEFIELD_THICKNESS = 511;
 
+export const MIN_SPRITE_REPEAT_SIZE = 0;
+export const MAX_SPRITE_REPEAT_SIZE = 512;
+export const MIN_SPRITE_TEXTURE_DISPLACEMENT = -256;
+export const MAX_SPRITE_TEXTURE_DISPLACEMENT = 256;
+export const MIN_SPRITE_TEXTURE_DISPLACEMENT_PARALLAX = -32;
+export const MAX_SPRITE_TEXTURE_DISPLACEMENT_PARALLAX = 32;
+
 export enum AxisNumeric {
     X = 0,
     Y = 1,
@@ -113,16 +120,15 @@ export interface MeshSegmentData {
 }
 
 export interface WireframeConfigData {
+}
+
+export interface WireframeData {
+    name: string
     type: WireframeType
     displacement: Vector3D
     color: number
     transparency: Transparency
     interlaced: boolean
-}
-
-export interface WireframeData {
-    name: string
-    wireframe: WireframeConfigData
     segments: MeshSegmentData[] // only WireframeType.Mesh
     length: number // only WireframeType.Asterisk
     radius: number // only WireframeType.Sphere
@@ -217,6 +223,25 @@ export interface PositionedEntityData {
 
 export type ComponentKey = 'animations' | 'behaviors' | 'children' | 'colliders' | 'scripts' | 'sprites' | 'wireframes';
 export type ComponentData = AnimationData | BehaviorData | PositionedEntityData | ColliderData | SpriteData | WireframeData | ScriptData;
+
+export const CLONABLE_COMPONENT_TYPES = [
+    'animations',
+    'children',
+    'colliders',
+    'scripts',
+    'sprites',
+    'wireframes',
+];
+
+export const ADDABLE_COMPONENT_TYPES = CLONABLE_COMPONENT_TYPES;
+
+export type HideableComponent = 'children' | 'colliders' | 'sprites' | 'wireframes';
+export const HIDEABLE_COMPONENT_TYPES = [
+    'children',
+    'colliders',
+    'sprites',
+    'wireframes',
+];
 
 export interface EntityData {
     _id: string

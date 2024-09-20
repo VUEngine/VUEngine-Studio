@@ -14,6 +14,7 @@ import {
     MIN_ANIMATION_CYLCES
 } from '../EntityEditorTypes';
 import AnimationsSettings from './AnimationsSettings';
+import { INPUT_BLOCKING_COMMANDS } from '../EntityEditor';
 
 interface AnimationProps {
     index: number
@@ -25,7 +26,7 @@ interface AnimationProps {
 
 export default function Animation(props: AnimationProps): React.JSX.Element {
     const { data, setData, currentAnimationStep } = useContext(EntityEditorContext) as EntityEditorContextType;
-    const { services } = useContext(EditorsContext) as EditorsContextType;
+    const { services, disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const { index, animation, updateAnimation, totalFrames, isMultiFileAnimation } = props;
     const [maxAnimationFrames, setMaxAnimationFrames] = useState<number>(256);
 
@@ -121,6 +122,8 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                         max={MAX_ANIMATION_CYLCES}
                         value={animation.cycles}
                         onChange={e => setCycles(parseInt(e.target.value))}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
                 </VContainer>
                 <VContainer>
@@ -170,6 +173,8 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                                 max={totalFrames - 1}
                                 value={animation.frames[i] + 1}
                                 onChange={e => setFrame(i, parseInt(e.target.value) - 1)}
+                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                             />
                             <button
                                 className="theia-button secondary"

@@ -19,7 +19,7 @@ export default function PreviewWireframe(props: PreviewWireframeProps): React.JS
         cursor: 'pointer',
         display: 'flex',
         imageRendering: 'pixelated',
-        opacity: wireframe.wireframe.transparency === Transparency.None ? 1 : .5,
+        opacity: wireframe.transparency === Transparency.None ? 1 : .5,
         outline: highlighted ? '1px solid #0f0' : 'none',
         outlineOffset: 1,
         position: 'absolute',
@@ -31,7 +31,7 @@ export default function PreviewWireframe(props: PreviewWireframeProps): React.JS
         setCurrentComponent(`wireframes-${index}`);
     };
 
-    switch (wireframe.wireframe.type) {
+    switch (wireframe.type) {
         case WireframeType.Mesh:
             return <MeshWireframe
                 wireframe={wireframe}

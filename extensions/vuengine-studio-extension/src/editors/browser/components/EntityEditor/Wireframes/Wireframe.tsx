@@ -1,7 +1,8 @@
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
-import React from 'react';
+import React, { useContext } from 'react';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import ColorSelector from '../../Common/ColorSelector';
 import HContainer from '../../Common/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
@@ -9,6 +10,7 @@ import RadioSelect from '../../Common/RadioSelect';
 import { clamp } from '../../Common/Utils';
 import VContainer from '../../Common/VContainer';
 import { Transparency, WireframeType } from '../../Common/VUEngineTypes';
+import { INPUT_BLOCKING_COMMANDS } from '../EntityEditor';
 import {
     MAX_SPHERE_RADIUS,
     MAX_WIREFRAME_DISPLACEMENT,
@@ -17,7 +19,6 @@ import {
     MeshSegmentData,
     STEP_SPHERE_RADIUS,
     STEP_WIREFRAME_DISPLACEMENT,
-    WireframeConfigData,
     WireframeData,
 } from '../EntityEditorTypes';
 import MeshSegment from './MeshSegment';
@@ -29,6 +30,7 @@ interface WireframeProps {
 
 export default function Wireframe(props: WireframeProps): React.JSX.Element {
     const { wireframe, updateWireframe } = props;
+    const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
 
     const setSegment = (segmentIndex: number, segmentData: Partial<MeshSegmentData>): void => {
         const updatedSegments = [...wireframe.segments];
@@ -39,45 +41,36 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
         updateWireframe({ segments: updatedSegments });
     };
 
-    const updateWireframeWireframe = (partialWireframe: Partial<WireframeConfigData>): void => {
-        updateWireframe({
-            wireframe: {
-                ...wireframe.wireframe,
-                ...partialWireframe,
-            }
-        });
-    };
-
     const setType = (type: WireframeType): void => {
-        updateWireframeWireframe({
+        updateWireframe({
             type,
         });
     };
 
     const setDisplacement = (axis: 'x' | 'y' | 'z', value: number): void => {
-        updateWireframeWireframe({
+        updateWireframe({
             displacement: {
-                ...wireframe.wireframe.displacement,
+                ...wireframe.displacement,
                 [axis]: clamp(value, MIN_WIREFRAME_DISPLACEMENT, MAX_WIREFRAME_DISPLACEMENT),
             },
         });
     };
 
     const setColor = (color: number): void => {
-        updateWireframeWireframe({
+        updateWireframe({
             color
         });
     };
 
     const setTransparency = (transparency: Transparency): void => {
-        updateWireframeWireframe({
+        updateWireframe({
             transparency
         });
     };
 
     const toggleInterlaced = (): void => {
-        updateWireframeWireframe({
-            interlaced: !wireframe.wireframe.interlaced,
+        updateWireframe({
+            interlaced: !wireframe.interlaced,
         });
     };
 
@@ -155,14 +148,14 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                             value: WireframeType.Asterisk,
                             label: nls.localize('vuengine/entityEditor/wireframeTypeAsterisk', 'Asterisk'),
                         }]}
-                        defaultValue={wireframe.wireframe.type}
+                        defaultValue={wireframe.type}
                         onChange={option => setType(option.value as WireframeType)}
                     />
                 </VContainer>
                 <VContainer>
                     {nls.localize('vuengine/entityEditor/color', 'Color')}
                     <ColorSelector
-                        color={wireframe.wireframe.color}
+                        color={wireframe.color}
                         updateColor={setColor}
                     />
                 </VContainer>
@@ -189,8 +182,10 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                             value: Transparency.Even,
                             label: nls.localize('vuengine/entityEditor/transparencyEven', 'Even'),
                         }]}
-                        defaultValue={wireframe.wireframe.transparency}
+                        defaultValue={wireframe.transparency}
                         onChange={options => setTransparency(options[0].value as Transparency)}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
                 </VContainer>
                 <VContainer>
@@ -199,7 +194,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                     </label>
                     <input
                         type="checkbox"
-                        checked={wireframe.wireframe.interlaced}
+                        checked={wireframe.interlaced}
                         onChange={toggleInterlaced}
                     />
                 </VContainer>
@@ -213,8 +208,10 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                         min={MIN_WIREFRAME_DISPLACEMENT}
                         max={MAX_WIREFRAME_DISPLACEMENT}
                         step={STEP_WIREFRAME_DISPLACEMENT}
-                        value={wireframe.wireframe.displacement.x}
+                        value={wireframe.displacement.x}
                         onChange={e => setDisplacement('x', parseFloat(e.target.value))}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
                     <input
                         className='theia-input'
@@ -222,8 +219,11 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                         min={MIN_WIREFRAME_DISPLACEMENT}
                         max={MAX_WIREFRAME_DISPLACEMENT}
                         step={STEP_WIREFRAME_DISPLACEMENT}
-                        value={wireframe.wireframe.displacement.y}
+                        value={wireframe.displacement.y}
                         onChange={e => setDisplacement('y', parseFloat(e.target.value))}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+
                     />
                     <input
                         className='theia-input'
@@ -231,12 +231,15 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                         min={MIN_WIREFRAME_DISPLACEMENT}
                         max={MAX_WIREFRAME_DISPLACEMENT}
                         step={STEP_WIREFRAME_DISPLACEMENT}
-                        value={wireframe.wireframe.displacement.z}
+                        value={wireframe.displacement.z}
                         onChange={e => setDisplacement('z', parseFloat(e.target.value))}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+
                     />
                 </HContainer>
             </VContainer>
-            {wireframe.wireframe.type === WireframeType.Mesh &&
+            {wireframe.type === WireframeType.Mesh &&
                 <VContainer>
                     <label>
                         {nls.localize('vuengine/entityEditor/segments', 'Segments')}
@@ -263,7 +266,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                     </button>
                 </VContainer>
             }
-            {wireframe.wireframe.type === WireframeType.Sphere &&
+            {wireframe.type === WireframeType.Sphere &&
                 <HContainer gap={15}>
                     <VContainer>
                         <label>
@@ -278,6 +281,8 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                             step={STEP_SPHERE_RADIUS}
                             value={wireframe.radius}
                             onChange={e => setRadius(parseFloat(e.target.value))}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
                     </VContainer>
                     <VContainer>
@@ -292,7 +297,7 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                     </VContainer>
                 </HContainer>
             }
-            {wireframe.wireframe.type === WireframeType.Asterisk &&
+            {wireframe.type === WireframeType.Asterisk &&
                 <VContainer>
                     <label>
                         {nls.localize('vuengine/entityEditor/length', 'Length')}
@@ -306,6 +311,8 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                         step={0.1}
                         value={wireframe.length}
                         onChange={e => setLength(parseFloat(e.target.value))}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
                 </VContainer>
             }

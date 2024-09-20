@@ -4,7 +4,11 @@ import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import CanvasImage from '../../Common/CanvasImage';
 import VContainer from '../../Common/VContainer';
 import { BgmapMode, DisplayMode, SpriteType, Transparency } from '../../Common/VUEngineTypes';
-import { EntityEditorContext, EntityEditorContextType, SpriteData } from '../EntityEditorTypes';
+import {
+  EntityEditorContext,
+  EntityEditorContextType,
+  SpriteData
+} from '../EntityEditorTypes';
 
 interface SpritePreviewProps {
   animate: boolean

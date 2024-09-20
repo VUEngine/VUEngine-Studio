@@ -23,28 +23,17 @@ import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { NodeRendererProps } from 'react-arborist';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { ColliderType, DisplayMode, WireframeType } from '../../Common/VUEngineTypes';
-import { ComponentKey, EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
-import { ScriptType } from '../Scripts/ScriptTypes';
 import { EntityEditorCommands } from '../EntityEditorCommands';
-
-const CLONABLE_COMPONENT_TYPES = [
-    'animations',
-    'children',
-    'colliders',
-    'scripts',
-    'sprites',
-    'wireframes',
-];
-
-const ADDABLE_COMPONENT_TYPES = CLONABLE_COMPONENT_TYPES;
-
-type HideableComponent = 'children' | 'colliders' | 'sprites' | 'wireframes';
-const HIDEABLE_COMPONENT_TYPES = [
-    'children',
-    'colliders',
-    'sprites',
-    'wireframes',
-];
+import {
+    ADDABLE_COMPONENT_TYPES,
+    CLONABLE_COMPONENT_TYPES,
+    ComponentKey,
+    EntityEditorContext,
+    EntityEditorContextType,
+    HIDEABLE_COMPONENT_TYPES,
+    HideableComponent,
+} from '../EntityEditorTypes';
+import { ScriptType } from '../Scripts/ScriptTypes';
 
 export default function ComponentTreeNode(props: NodeRendererProps<any>): React.JSX.Element {
     const { node, style, dragHandle } = props;
@@ -145,7 +134,7 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                     }
                     return <Image size={16} />;
                 case 'wireframes':
-                    switch (data.components.wireframes[index].wireframe.type) {
+                    switch (data.components.wireframes[index].type) {
                         default:
                         case WireframeType.Mesh:
                             return <Hexagon size={16} />;

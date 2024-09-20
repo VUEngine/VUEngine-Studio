@@ -7,15 +7,16 @@ import {
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/HContainer';
 import { showEntitySelection } from '../Common/Utils';
-import { ColliderType, Transparency, WireframeType } from '../Common/VUEngineTypes';
 import ComponentTree from './Components/ComponentTree';
 import CurrentComponent from './Components/CurrentComponent';
 import EntityMeta from './Entity/EntityMeta';
 import { EntityEditorCommands } from './EntityEditorCommands';
 import {
+  ComponentData,
   ComponentKey,
   EntityData,
   EntityEditorContext,
+  HIDEABLE_COMPONENT_TYPES,
   LocalStorageEntityEditorState,
   MAX_PREVIEW_SPRITE_ZOOM,
   MIN_PREVIEW_SPRITE_ZOOM,
@@ -23,7 +24,6 @@ import {
 } from './EntityEditorTypes';
 import Preview from './Preview/Preview';
 import Script from './Scripts/Script';
-import { ScriptType } from './Scripts/ScriptTypes';
 
 interface EditorSidebarProps {
   show: boolean
@@ -85,6 +85,17 @@ export interface EntityEditorSaveDataOptions {
 
 const getMostFilesOnASprite = (entityData: EntityData): number =>
   Math.max(...entityData.components?.sprites.map(s => s.texture.files.length));
+
+export const INPUT_BLOCKING_COMMANDS = [
+  EntityEditorCommands.MOVE_COMPONENT_DOWN.id,
+  EntityEditorCommands.MOVE_COMPONENT_LEFT.id,
+  EntityEditorCommands.MOVE_COMPONENT_RIGHT.id,
+  EntityEditorCommands.MOVE_COMPONENT_UP.id,
+  EntityEditorCommands.INCREASE_COMPONENT_Z_DISPLACEMENT.id,
+  EntityEditorCommands.DECREASE_COMPONENT_Z_DISPLACEMENT.id,
+  EntityEditorCommands.INCREASE_COMPONENT_PARALLAX.id,
+  EntityEditorCommands.DECREASE_COMPONENT_PARALLAX.id,
+];
 
 export default function EntityEditor(props: EntityEditorProps): React.JSX.Element {
   const { data, updateData } = props;
@@ -470,17 +481,73 @@ export default function EntityEditor(props: EntityEditorProps): React.JSX.Elemen
     setCurrentComponent('extraProperties');
   };
 
+  const updateComponent = (key: ComponentKey, index: number, partialData: Partial<ComponentData>, options?: EntityEditorSaveDataOptions): void => {
+    const componentsArray = [...data.components[key]];
+    componentsArray[index] = {
+      ...componentsArray[index],
+      ...partialData,
+    };
+
+    setData({
+      components: {
+        ...data.components,
+        [key]: componentsArray,
+      }
+    }, options);
+  };
+
+  const setCurrentComponentDisplacement = (axis: 'x' | 'y' | 'z' | 'parallax', direction: 'up' | 'down'): void => {
+    const [type, indexString] = currentComponent.split('-');
+    const index = parseInt(indexString || '-1');
+    if (index > -1 && HIDEABLE_COMPONENT_TYPES.includes(type)) {
+      // @ts-ignore
+      const currentDisplacement = data.components[type as ComponentKey][index].displacement;
+      if (currentDisplacement) {
+        updateComponent(type as ComponentKey, index, {
+          displacement: {
+            ...currentDisplacement,
+            [axis]: direction === 'down' ? currentDisplacement[axis] - 1 : currentDisplacement[axis] + 1,
+          }
+        });
+      }
+    }
+  };
+
   const commandListener = (e: CustomEvent): void => {
     switch (e.detail) {
       case EntityEditorCommands.ADD_COMPONENT.id:
         addComponent();
+        break;
+      case EntityEditorCommands.MOVE_COMPONENT_DOWN.id:
+        setCurrentComponentDisplacement('y', 'up');
+        break;
+      case EntityEditorCommands.MOVE_COMPONENT_UP.id:
+        setCurrentComponentDisplacement('y', 'down');
+        break;
+      case EntityEditorCommands.MOVE_COMPONENT_LEFT.id:
+        setCurrentComponentDisplacement('x', 'down');
+        break;
+      case EntityEditorCommands.MOVE_COMPONENT_RIGHT.id:
+        setCurrentComponentDisplacement('x', 'up');
+        break;
+      case EntityEditorCommands.INCREASE_COMPONENT_Z_DISPLACEMENT.id:
+        setCurrentComponentDisplacement('z', 'up');
+        break;
+      case EntityEditorCommands.DECREASE_COMPONENT_Z_DISPLACEMENT.id:
+        setCurrentComponentDisplacement('z', 'down');
+        break;
+      case EntityEditorCommands.INCREASE_COMPONENT_PARALLAX.id:
+        setCurrentComponentDisplacement('parallax', 'up');
+        break;
+      case EntityEditorCommands.DECREASE_COMPONENT_PARALLAX.id:
+        setCurrentComponentDisplacement('parallax', 'down');
         break;
     }
   };
 
   useEffect(() => {
     enableCommands([
-      EntityEditorCommands.ADD_COMPONENT.id,
+      ...Object.values(EntityEditorCommands).map(c => c.id)
     ]);
   }, []);
 
@@ -490,6 +557,7 @@ export default function EntityEditor(props: EntityEditorProps): React.JSX.Elemen
       document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
     };
   }, [
+    currentComponent,
     data.components,
   ]);
 
@@ -511,7 +579,9 @@ export default function EntityEditor(props: EntityEditorProps): React.JSX.Elemen
 
   return (
     <div
-      className="entityEditor">
+      className="entityEditor"
+      tabIndex={0}
+    >
       <EntityEditorContext.Provider
         value={{
           data,
@@ -548,6 +618,7 @@ export default function EntityEditor(props: EntityEditorProps): React.JSX.Elemen
               />
               : <Preview
                 hasAnyComponent={hasAnyComponent}
+                updateComponent={updateComponent}
               />
           }
         </EntityEditorContext.Consumer>
@@ -593,6 +664,7 @@ export default function EntityEditor(props: EntityEditorProps): React.JSX.Elemen
               >
                 <CurrentComponent
                   isMultiFileAnimation={isMultiFileAnimation}
+                  updateComponent={updateComponent}
                 />
               </EditorSidebar>
             </HContainer>

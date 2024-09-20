@@ -14,24 +14,23 @@ import { clamp, roundToNextMultipleOf8 } from '../../Common/Utils';
 import VContainer from '../../Common/VContainer';
 import { BgmapMode, DisplayMode, Displays, SpriteSourceType, SpriteType, Transparency } from '../../Common/VUEngineTypes';
 import Images from '../../ImageEditor/Images';
-import { EntityEditorSaveDataOptions } from '../EntityEditor';
+import { EntityEditorSaveDataOptions, INPUT_BLOCKING_COMMANDS } from '../EntityEditor';
 import {
     EntityEditorContext,
     EntityEditorContextType,
+    MAX_SPRITE_REPEAT_SIZE,
+    MAX_SPRITE_TEXTURE_DISPLACEMENT,
+    MAX_SPRITE_TEXTURE_DISPLACEMENT_PARALLAX,
     MAX_TEXTURE_PADDING,
+    MIN_SPRITE_REPEAT_SIZE,
+    MIN_SPRITE_TEXTURE_DISPLACEMENT,
+    MIN_SPRITE_TEXTURE_DISPLACEMENT_PARALLAX,
     MIN_TEXTURE_PADDING,
     SpriteData,
     SpriteImageData,
 } from '../EntityEditorTypes';
 import ImageProcessingSettingsForm from './ImageProcessingSettingsForm';
 import SpritesSettings from './SpritesSettings';
-
-const MIN_REPEAT_SIZE = 0;
-const MAX_REPEAT_SIZE = 512;
-const MIN_TEXTURE_DISPLACEMENT = -256;
-const MAX_TEXTURE_DISPLACEMENT = 256;
-const MIN_TEXTURE_DISPLACEMENT_PARALLAX = -32;
-const MAX_TEXTURE_DISPLACEMENT_PARALLAX = 32;
 
 interface SpriteProps {
     sprite: SpriteData
@@ -40,7 +39,7 @@ interface SpriteProps {
 }
 
 export default function Sprite(props: SpriteProps): React.JSX.Element {
-    const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
+    const { fileUri, services, disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const { data } = useContext(EntityEditorContext) as EntityEditorContextType;
     const { sprite, updateSprite, isMultiFileAnimation } = props;
     const [processingDialogOpen, setProcessingDialogOpen] = useState<boolean>(false);
@@ -205,7 +204,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         updateSprite({
             displacement: {
                 ...sprite.displacement,
-                [axis]: clamp(value, MIN_TEXTURE_DISPLACEMENT, MAX_TEXTURE_DISPLACEMENT),
+                [axis]: clamp(value, MIN_SPRITE_TEXTURE_DISPLACEMENT, MAX_SPRITE_TEXTURE_DISPLACEMENT),
             },
         });
     };
@@ -214,7 +213,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
         updateSprite({
             displacement: {
                 ...sprite.displacement,
-                parallax: clamp(value, MIN_TEXTURE_DISPLACEMENT_PARALLAX, MAX_TEXTURE_DISPLACEMENT_PARALLAX),
+                parallax: clamp(value, MIN_SPRITE_TEXTURE_DISPLACEMENT_PARALLAX, MAX_SPRITE_TEXTURE_DISPLACEMENT_PARALLAX),
             },
         });
     };
@@ -274,7 +273,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     ...sprite.texture?.repeat,
                     size: {
                         ...sprite.texture?.repeat?.size,
-                        [axis]: clamp(value, MIN_REPEAT_SIZE, MAX_REPEAT_SIZE),
+                        [axis]: clamp(value, MIN_SPRITE_REPEAT_SIZE, MAX_SPRITE_REPEAT_SIZE),
                     }
                 }
             },
@@ -407,6 +406,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                         }]}
                         defaultValue={sprite.sourceType}
                         onChange={options => setSourceType(options[0].value as SpriteSourceType)}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
                     */}
                     <InfoLabel
@@ -611,6 +612,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                             }]}
                             defaultValue={sprite.displayMode}
                             onChange={options => setDisplayMode(options[0].value as DisplayMode)}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
                     </VContainer>
                     {sprite.displayMode === DisplayMode.Mono &&
@@ -639,6 +642,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                     ? Displays.Both
                                     : options[0].value as Displays)
                                 }
+                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                             />
                         </VContainer>
                     }
@@ -652,6 +657,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                             options={[{ value: 0 }, { value: 1 }, { value: 2 }, { value: 3 }]}
                             defaultValue={sprite.texture.palette}
                             onChange={options => setPalette(options[0].value as number)}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
                     </VContainer>
                     <VContainer>
@@ -677,6 +684,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                             }]}
                             defaultValue={sprite.transparency}
                             onChange={options => setTransparency(options[0].value as Transparency)}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
                     </VContainer>
                 </HContainer>
@@ -695,37 +704,45 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                             className='theia-input'
                             style={{ width: 48 }}
                             type='number'
-                            min={MIN_TEXTURE_DISPLACEMENT}
-                            max={MAX_TEXTURE_DISPLACEMENT}
+                            min={MIN_SPRITE_TEXTURE_DISPLACEMENT}
+                            max={MAX_SPRITE_TEXTURE_DISPLACEMENT}
                             value={sprite.displacement.x}
                             onChange={e => setDisplacement('x', parseInt(e.target.value))}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
                         <input
                             className='theia-input'
                             style={{ width: 48 }}
                             type='number'
-                            min={MIN_TEXTURE_DISPLACEMENT}
-                            max={MAX_TEXTURE_DISPLACEMENT}
+                            min={MIN_SPRITE_TEXTURE_DISPLACEMENT}
+                            max={MAX_SPRITE_TEXTURE_DISPLACEMENT}
                             value={sprite.displacement.y}
                             onChange={e => setDisplacement('y', parseInt(e.target.value))}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
                         <input
                             className='theia-input'
                             style={{ width: 48 }}
                             type='number'
-                            min={MIN_TEXTURE_DISPLACEMENT}
-                            max={MAX_TEXTURE_DISPLACEMENT}
+                            min={MIN_SPRITE_TEXTURE_DISPLACEMENT}
+                            max={MAX_SPRITE_TEXTURE_DISPLACEMENT}
                             value={sprite.displacement.z}
                             onChange={e => setDisplacement('z', parseInt(e.target.value))}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
                         <input
                             className='theia-input'
                             style={{ width: 48 }}
                             type='number'
-                            min={MIN_TEXTURE_DISPLACEMENT_PARALLAX}
-                            max={MAX_TEXTURE_DISPLACEMENT_PARALLAX}
+                            min={MIN_SPRITE_TEXTURE_DISPLACEMENT_PARALLAX}
+                            max={MAX_SPRITE_TEXTURE_DISPLACEMENT_PARALLAX}
                             value={sprite.displacement.parallax}
                             onChange={e => setDisplacementParallax(parseInt(e.target.value))}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
                     </HContainer>
                 </VContainer>
@@ -775,6 +792,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                 ]}
                                 defaultValue={sprite.bgmapMode}
                                 onChange={options => setBgmapMode(options[0].value as BgmapMode)}
+                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                             />
                         </VContainer>
                     </HContainer>
@@ -800,6 +819,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                     max={MAX_TEXTURE_PADDING}
                                     value={sprite.texture.padding.x}
                                     onChange={e => setPadding('x', parseInt(e.target.value))}
+                                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                                 />
                                 <input
                                     className='theia-input'
@@ -809,6 +830,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                     max={MAX_TEXTURE_PADDING}
                                     value={sprite.texture.padding.y}
                                     onChange={e => setPadding('y', parseInt(e.target.value))}
+                                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                                 />
                             </HContainer>
                         </VContainer>
@@ -825,6 +848,8 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                 type='string'
                                 value={sprite.manipulationFunction}
                                 onChange={e => setManipulationFunction(e.target.value)}
+                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                             />
                         </VContainer>
                     </HContainer>
@@ -898,19 +923,23 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                 className='theia-input'
                                 style={{ width: 48 }}
                                 type='number'
-                                min={MIN_REPEAT_SIZE}
-                                max={MAX_REPEAT_SIZE}
+                                min={MIN_SPRITE_REPEAT_SIZE}
+                                max={MAX_SPRITE_REPEAT_SIZE}
                                 value={sprite.texture?.repeat?.size?.x ?? 0}
                                 onChange={e => setRepeatSize('x', parseInt(e.target.value))}
+                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                             />
                             <input
                                 className='theia-input'
                                 style={{ width: 48 }}
                                 type='number'
-                                min={MIN_REPEAT_SIZE}
-                                max={MAX_REPEAT_SIZE}
+                                min={MIN_SPRITE_REPEAT_SIZE}
+                                max={MAX_SPRITE_REPEAT_SIZE}
                                 value={sprite.texture?.repeat?.size?.y ?? 0}
                                 onChange={e => setRepeatSize('y', parseInt(e.target.value))}
+                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                             />
                         </HContainer>
                     </VContainer>
@@ -950,11 +979,15 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                             }]}
                             defaultValue={sprite.compression}
                             onChange={options => setTilesCompression(options[0].value as ImageCompressionType)}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
                     </VContainer>
                     <SectionSelect
                         value={sprite.section}
                         setValue={setSection}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
                 </HContainer>
             </VContainer>

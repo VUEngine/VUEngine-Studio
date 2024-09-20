@@ -67,12 +67,12 @@ export default function MeshWireframe(props: MeshWireframeProps): React.JSX.Elem
         canvas.height = height + WIREFRAME_CANVAS_PADDING;
         canvas.width = width + WIREFRAME_CANVAS_PADDING;
         canvas.style.translate =
-            `${wireframe.wireframe.displacement.x + halfWidth + minX + halfPadding}px ` +
-            `${wireframe.wireframe.displacement.y + halfHeight + minY + halfPadding}px ` +
-            `${wireframe.wireframe.displacement.z * -1}px`;
+            `${wireframe.displacement.x + halfWidth + minX + halfPadding}px ` +
+            `${wireframe.displacement.y + halfHeight + minY + halfPadding}px ` +
+            `${wireframe.displacement.z * -1}px`;
 
         context.clearRect(0, 0, canvas.width, canvas.height);
-        context.fillStyle = PALETTE_COLORS[ColorMode.Default][wireframe.wireframe.color];
+        context.fillStyle = PALETTE_COLORS[ColorMode.Default][wireframe.color];
 
         projectedSegments.map(s => {
             plotLine(
@@ -81,7 +81,7 @@ export default function MeshWireframe(props: MeshWireframeProps): React.JSX.Elem
                 s[1] + halfHeight - offsetY,
                 s[2] + halfWidth - offsetX,
                 s[3] + halfHeight - offsetY,
-                wireframe.wireframe.interlaced,
+                wireframe.interlaced,
             );
         });
     };
@@ -109,9 +109,9 @@ export default function MeshWireframe(props: MeshWireframeProps): React.JSX.Elem
             Math.max(...yValues),
         );
     }, [
-        wireframe.wireframe.color,
-        wireframe.wireframe.displacement,
-        wireframe.wireframe.interlaced,
+        wireframe.color,
+        wireframe.displacement,
+        wireframe.interlaced,
         wireframe.segments,
     ]);
 

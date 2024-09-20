@@ -1,9 +1,11 @@
 import { nls } from '@theia/core';
-import React from 'react';
+import React, { useContext } from 'react';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/HContainer';
-import { MeshSegmentData } from '../EntityEditorTypes';
-import VContainer from '../../Common/VContainer';
 import { clamp } from '../../Common/Utils';
+import VContainer from '../../Common/VContainer';
+import { INPUT_BLOCKING_COMMANDS } from '../EntityEditor';
+import { MeshSegmentData } from '../EntityEditorTypes';
 
 const MIN_MESH_SEGMENT_VALUE = 0;
 const MAX_MESH_SEGMENT_VALUE = 512;
@@ -16,6 +18,7 @@ interface MeshSegmentProps {
 
 export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element {
     const { segment, updateSegment, removeSegment } = props;
+    const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
 
     const setFromX = (x: number): void => {
         updateSegment({
@@ -106,6 +109,8 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
                     type='number'
                     value={segment.fromVertex.x}
                     onChange={e => setFromX(parseFloat(e.target.value))}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />
                 <input
                     className='theia-input'
@@ -113,6 +118,8 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
                     type='number'
                     value={segment.fromVertex.y}
                     onChange={e => setFromY(parseFloat(e.target.value))}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />
                 <input
                     className='theia-input'
@@ -120,6 +127,8 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
                     type='number'
                     value={segment.fromVertex.z}
                     onChange={e => setFromZ(parseFloat(e.target.value))}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />
                 <input
                     className='theia-input'
@@ -127,6 +136,8 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
                     type='number'
                     value={segment.fromVertex.parallax}
                     onChange={e => setFromParallax(parseFloat(e.target.value))}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />
             </HContainer>
         </VContainer>
@@ -139,6 +150,8 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
                     type='number'
                     value={segment.toVertex.x}
                     onChange={e => setToX(parseFloat(e.target.value))}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />
                 <input
                     className='theia-input'
@@ -146,6 +159,8 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
                     type='number'
                     value={segment.toVertex.y}
                     onChange={e => setToY(parseFloat(e.target.value))}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />
                 <input
                     className='theia-input'
@@ -153,6 +168,8 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
                     type='number'
                     value={segment.toVertex.z}
                     onChange={e => setToZ(parseFloat(e.target.value))}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />
                 <input
                     className='theia-input'
@@ -160,6 +177,8 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
                     type='number'
                     value={segment.toVertex.parallax}
                     onChange={e => setToParallax(parseFloat(e.target.value))}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />
             </HContainer>
         </VContainer>

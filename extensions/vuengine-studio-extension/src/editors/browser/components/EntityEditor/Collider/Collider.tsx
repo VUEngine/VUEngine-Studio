@@ -26,6 +26,7 @@ import {
     MIN_SCALE
 } from '../EntityEditorTypes';
 import CollidersSettings from './CollidersSettings';
+import { INPUT_BLOCKING_COMMANDS } from '../EntityEditor';
 
 interface ColliderProps {
     collider: ColliderData
@@ -33,7 +34,7 @@ interface ColliderProps {
 }
 
 export default function Collider(props: ColliderProps): React.JSX.Element {
-    const { services } = useContext(EditorsContext) as EditorsContextType;
+    const { services, disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const { collider, updateCollider } = props;
     const [length, setLength] = useState<number>(0);
     const [axis, setAxis] = useState<number>(0);
@@ -299,6 +300,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 type='number'
                                 value={collider.pixelSize.x}
                                 onChange={e => setPixelSize('x', parseFloat(e.target.value))}
+                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                             />
                             <input
                                 className='theia-input'
@@ -306,6 +309,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 type='number'
                                 value={collider.pixelSize.y}
                                 onChange={e => setPixelSize('y', parseFloat(e.target.value))}
+                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                             />
                             <input
                                 className='theia-input'
@@ -313,6 +318,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 type='number'
                                 value={collider.pixelSize.z}
                                 onChange={e => setPixelSize('z', parseFloat(e.target.value))}
+                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                             />
                         </HContainer>
                     </VContainer>
@@ -328,6 +335,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             type='number'
                             value={collider.pixelSize.x}
                             onChange={e => setDiameter(parseFloat(e.target.value))}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
                     </VContainer>
                 }
@@ -345,6 +354,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 min={0}
                                 value={length}
                                 onChange={e => updateLineField(axis, parseFloat(e.target.value), thickness)}
+                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                             />
                         </VContainer>
                         <VContainer>
@@ -364,6 +375,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 }]}
                                 defaultValue={axis}
                                 onChange={options => updateLineField(options[0].value as number, length, thickness)}
+                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                                 allowBlank
                             />
                         </VContainer>
@@ -377,6 +390,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 type='number'
                                 value={thickness}
                                 onChange={e => updateLineField(axis, length, parseFloat(e.target.value))}
+                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                             />
                         </VContainer>
                     </HContainer>
@@ -394,6 +409,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             max={MAX_COLLIDER_DISPLACEMENT}
                             value={collider.displacement.x}
                             onChange={e => setDisplacement('x', parseFloat(e.target.value))}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
                         <input
                             className='theia-input'
@@ -403,6 +420,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             max={MAX_COLLIDER_DISPLACEMENT}
                             value={collider.displacement.y}
                             onChange={e => setDisplacement('y', parseFloat(e.target.value))}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
                         <input
                             className='theia-input'
@@ -412,6 +431,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             max={MAX_COLLIDER_DISPLACEMENT}
                             value={collider.displacement.z}
                             onChange={e => setDisplacement('z', parseFloat(e.target.value))}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
                         <input
                             className='theia-input'
@@ -421,6 +442,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             max={MAX_COLLIDER_DISPLACEMENT_PARALLAX}
                             value={collider.displacement.parallax}
                             onChange={e => setDisplacementParallax(parseFloat(e.target.value))}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
                     </HContainer>
                 </VContainer>
@@ -444,6 +467,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 step={0.5}
                                 value={collider.scale.x}
                                 onChange={e => setScale('x', parseFloat(e.target.value))}
+                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                             />
                             <input
                                 className='theia-input'
@@ -454,6 +479,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 step={0.5}
                                 value={collider.scale.y}
                                 onChange={e => setScale('y', parseFloat(e.target.value))}
+                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                             />
                             <input
                                 className='theia-input'
@@ -464,6 +491,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 step={0.1}
                                 value={collider.scale.z}
                                 onChange={e => setScale('z', parseFloat(e.target.value))}
+                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                             />
                         </HContainer>
                     </VContainer>
@@ -482,6 +511,8 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             max={MAX_SCALE}
                             value={collider.scale.x}
                             onChange={e => setBallScale(parseFloat(e.target.value))}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
                     </VContainer>
                 }

@@ -1,13 +1,16 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/HContainer';
 import RadioSelect from '../../Common/RadioSelect';
 import VContainer from '../../Common/VContainer';
 import { SpriteType } from '../../Common/VUEngineTypes';
+import { INPUT_BLOCKING_COMMANDS } from '../EntityEditor';
 import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 
 export default function SpritesSettings(): React.JSX.Element {
     const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
 
     const setType = (type: SpriteType): void => {
         setData({
@@ -45,6 +48,8 @@ export default function SpritesSettings(): React.JSX.Element {
                         }]}
                         defaultValue={data.sprites.type}
                         onChange={options => setType(options[0].value as SpriteType)}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
                 </VContainer>
             </HContainer>

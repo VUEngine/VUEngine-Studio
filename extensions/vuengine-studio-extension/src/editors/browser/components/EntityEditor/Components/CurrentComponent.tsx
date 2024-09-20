@@ -27,26 +27,12 @@ import Wireframe from '../Wireframes/Wireframe';
 
 interface CurrentComponentProps {
     isMultiFileAnimation: boolean
+    updateComponent: (key: ComponentKey, index: number, partialData: Partial<ComponentData>, options?: EntityEditorSaveDataOptions) => void,
 }
 
 export default function CurrentComponent(props: CurrentComponentProps): React.JSX.Element {
-    const { isMultiFileAnimation } = props;
-    const { data, setData, currentComponent } = useContext(EntityEditorContext) as EntityEditorContextType;
-
-    const updateComponent = (key: ComponentKey, index: number, partialData: Partial<ComponentData>, options?: EntityEditorSaveDataOptions): void => {
-        const componentsArray = [...data.components[key]];
-        componentsArray[index] = {
-            ...componentsArray[index],
-            ...partialData,
-        };
-
-        setData({
-            components: {
-                ...data.components,
-                [key]: componentsArray,
-            }
-        }, options);
-    };
+    const { isMultiFileAnimation, updateComponent } = props;
+    const { data, currentComponent } = useContext(EntityEditorContext) as EntityEditorContextType;
 
     const getComponentEditor = (): React.JSX.Element => {
         const [type, indexString] = currentComponent.split('-');
