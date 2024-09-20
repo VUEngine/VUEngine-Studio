@@ -82,7 +82,6 @@
     "@theia/metrics": "1.53.2",
     "@theia/monaco": "1.53.2",
     "@theia/navigator": "1.53.2",
-    "@theia/notebook": "1.53.2",
     "@theia/output": "1.53.2",
     "@theia/plugin-metrics": "1.53.2",
     "@theia/plugin-ext": "1.53.2",

@@ -1,4 +1,5 @@
 import { CallHierarchyContribution } from '@theia/callhierarchy/lib/browser/callhierarchy-contribution';
+import { FilterContribution } from '@theia/core';
 import {
     ApplicationShell, CorePreferenceContribution, FrontendApplicationContribution,
     KeybindingContribution,
@@ -16,7 +17,7 @@ import { ThemeService } from '@theia/core/lib/browser/theming';
 import { WindowTitleService } from '@theia/core/lib/browser/window/window-title-service';
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { MenuContribution } from '@theia/core/lib/common/menu';
-import { ContainerModule } from '@theia/core/shared/inversify';
+import { ContainerModule, interfaces } from '@theia/core/shared/inversify';
 import { DebugConsoleContribution } from '@theia/debug/lib/browser/console/debug-console-contribution';
 import { DebugFrontendApplicationContribution } from '@theia/debug/lib/browser/debug-frontend-application-contribution';
 import { DebugPrefixConfiguration } from '@theia/debug/lib/browser/debug-prefix-configuration';
@@ -50,6 +51,7 @@ import { VesCoreLabelProviderContribution } from './ves-core-label-provider';
 import { VesCorePreferenceSchema } from './ves-core-preferences';
 import { VesEncodingRegistry } from './ves-encoding-registry';
 import { VesFileSystemFrontendContribution } from './ves-filesystem-frontend-contribution';
+import { VesFilterContribution } from './ves-filter-contribution';
 import { VesFileNavigatorContribution } from './ves-navigator-contribution';
 import { VesNavigatorWidgetFactory } from './ves-navigator-widget-factory';
 import { VesPreferenceConfigurations } from './ves-preference-configurations';
@@ -67,6 +69,15 @@ import { VesWindowTitleService } from './ves-window-title-service';
 import { VesWorkspaceService } from './ves-workspace-service';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
+    const removeContribution = (serviceIdentifier: interfaces.ServiceIdentifier) => {
+        rebind(serviceIdentifier).toConstantValue({
+            registerCommands: () => { },
+            registerMenus: () => { },
+            registerKeybindings: () => { },
+            registerToolbarItems: () => { }
+        } as any);
+    };
+
     // rename default icon theme
     // @ts-ignore
     rebind(DefaultFileIconThemeContribution).to(VesDefaultFileIconThemeContribution).inSingletonScope();
@@ -108,68 +119,27 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     bind(VesEncodingRegistry).toSelf().inSingletonScope();
     rebind(EncodingRegistry).toService(VesEncodingRegistry);
 
+    // various removals
+    bind(FilterContribution).to(VesFilterContribution).inSingletonScope();
+
     // remove debug features
     rebind(DebugFrontendApplicationContribution).to(VesDebugFrontendApplicationContribution).inSingletonScope();
-    rebind(DebugConsoleContribution).toConstantValue({
-        registerCommands: () => { },
-        registerMenus: () => { },
-        registerKeybindings: () => { },
-        registerToolbarItems: () => { }
-    } as any);
+    removeContribution(DebugConsoleContribution);
     rebind(DebugPrefixConfiguration).to(VesDebugPrefixConfiguration).inSingletonScope();
-    // TODO: remove Preferences->Extensions->Debug (-> bindDebugPreferences)
 
-    // remove plugin frontend feature
-    rebind(PluginFrontendViewContribution).toConstantValue({
-        registerCommands: () => { },
-        registerMenus: () => { },
-        registerKeybindings: () => { },
-        registerToolbarItems: () => { }
-    } as any);
-    rebind(PluginApiFrontendContribution).toConstantValue({
-        registerCommands: () => { },
-        registerMenus: () => { },
-        registerKeybindings: () => { },
-        registerToolbarItems: () => { }
-    } as any);
-
-    // remove outline view
-    rebind(OutlineViewContribution).toConstantValue({
-        registerCommands: () => { },
-        registerMenus: () => { },
-        registerKeybindings: () => { },
-        registerToolbarItems: () => { }
-    } as any);
+    // remove various contributions
+    removeContribution(PluginFrontendViewContribution);
+    removeContribution(PluginApiFrontendContribution);
+    removeContribution(OutlineViewContribution);
+    removeContribution(CallHierarchyContribution);
+    removeContribution(TestViewContribution);
+    removeContribution(TypeHierarchyContribution);
 
     // common service
     bind(VesCommonService).toSelf().inSingletonScope();
 
-    // remove call hierarchy
-    rebind(CallHierarchyContribution).toConstantValue({
-        registerCommands: () => { },
-        registerMenus: () => { },
-        registerKeybindings: () => { },
-        registerToolbarItems: () => { }
-    } as any);
-
     // custom file extensions
     rebind(FileSystemFrontendContribution).to(VesFileSystemFrontendContribution).inSingletonScope();
-
-    // remove test view
-    rebind(TestViewContribution).toConstantValue({
-        registerCommands: () => { },
-        registerMenus: () => { },
-        registerKeybindings: () => { },
-        registerToolbarItems: () => { }
-    } as any);
-
-    // remove type hierarchy view
-    rebind(TypeHierarchyContribution).toConstantValue({
-        registerCommands: () => { },
-        registerMenus: () => { },
-        registerKeybindings: () => { },
-        registerToolbarItems: () => { }
-    } as any);
 
     // quick open workspace
     rebind(QuickOpenWorkspace).to(VesQuickOpenWorkspace).inSingletonScope();
