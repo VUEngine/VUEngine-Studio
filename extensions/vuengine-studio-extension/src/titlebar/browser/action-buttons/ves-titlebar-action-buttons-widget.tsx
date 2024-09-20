@@ -1,6 +1,5 @@
 import { CommandService, Emitter } from '@theia/core';
 import { ApplicationShell, CommonCommands, Widget } from '@theia/core/lib/browser';
-import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
@@ -16,8 +15,6 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
     protected applicationShell: ApplicationShell;
     @inject(CommandService)
     protected readonly commandService!: CommandService;
-    @inject(FrontendApplicationStateService)
-    protected readonly frontendApplicationStateService: FrontendApplicationStateService;
     @inject(VesCommonService)
     protected readonly vesCommonService: VesCommonService;
 
@@ -41,12 +38,6 @@ export class VesTitlebarActionButtonsWidget extends ReactWidget {
         this.onDidChangeIsMaximized(() => this.update());
 
         this.update();
-
-        this.frontendApplicationStateService.onStateChanged((state: FrontendApplicationState) => {
-            if (state === 'attached_shell') {
-                this.update();
-            };
-        });
 
         this.applicationShell.mainPanel.onDidToggleMaximized(widget => this.handleToggleMaximized(widget));
         this.applicationShell.bottomPanel.onDidToggleMaximized(widget => this.handleToggleMaximized(widget));
