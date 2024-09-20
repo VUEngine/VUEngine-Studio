@@ -512,12 +512,11 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
   };
 
   protected startEmulator = async () => {
-    const romPath = await this.getRomPath();
-    const romUri = new URI(romPath);
+    const defaultRomUri = await this.vesBuildService.getDefaultRomUri();
+    const romUri = this.options ? new URI(this.options.uri) : defaultRomUri;
     const romContent = await this.fileService.readFile(romUri);
     const romContentBuffer = romContent.value.buffer;
     const romContentHeaderBuffer = romContentBuffer.slice(-544).slice(0, 32);
-    // TODO: move iconv to backend
     const romHeaderName = iconv.decode(
       Buffer.from(romContentHeaderBuffer.slice(0, 20)),
       'Shift_JIS'
@@ -537,7 +536,7 @@ export class VesEmulatorWidget extends ReactWidget implements NavigatableWidget,
     this.sendRetroArchConfig();
     this.sendCoreOptions();
     this.sendCommand('start', {
-      namespace: romPath,
+      namespace: await this.getRomPath(),
       rom: `data:application/octet-stream;base64,${romBase64}`,
     });
   };

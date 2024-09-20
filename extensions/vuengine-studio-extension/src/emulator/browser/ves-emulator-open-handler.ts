@@ -36,6 +36,6 @@ export class VesEmulatorOpenHandler extends WidgetOpenHandler<VesEmulatorWidget>
     }
 
     protected createWidgetOptions(uri: URI): VesEmulatorWidgetOptions {
-        return { uri: uri.path.fsPath() };
+        return { uri: uri.withoutFragment().toString() };
     }
 }
