@@ -21,11 +21,11 @@ interface ScriptedActionProps {
 
 export default function ScriptedAction(props: ScriptedActionProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
-    const { state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { currentComponent, setCurrentComponent } = useContext(EntityEditorContext) as EntityEditorContextType;
     const { id, index, script, action, scriptedAction, updateScript, isRoot, isEnd } = props;
 
     const setHighlightedAction = (actionIndex: number): void => {
-        setState({ currentComponent: id });
+        setCurrentComponent(id);
     };
 
     const showActionSelection = (): Promise<QuickPickItem | undefined> => {
@@ -154,7 +154,7 @@ export default function ScriptedAction(props: ScriptedActionProps): React.JSX.El
     }
 
     const actionClasses = ['scripted-action', 'item'];
-    if (!isEnd && id === state.currentComponent) {
+    if (!isEnd && id === currentComponent) {
         actionClasses.push('active');
     }
 

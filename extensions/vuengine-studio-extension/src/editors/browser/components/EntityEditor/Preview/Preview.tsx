@@ -1,8 +1,9 @@
-import { IdentificationCard } from '@phosphor-icons/react';
+import { PuzzlePiece } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../../../editors/browser/ves-editors-types';
 import { ProjectContributor } from '../../../../../project/browser/ves-project-types';
+import VContainer from '../../Common/VContainer';
 import { ColliderType } from '../../Common/VUEngineTypes';
 import {
   AnimationData,
@@ -18,11 +19,27 @@ import LineFieldCollider from './Colliders/LineFieldCollider';
 import PreviewOptions from './PreviewOptions';
 import SpritePreview from './SpritePreview';
 import PreviewWireframe from './Wireframes/PreviewWireframe';
+import { EntityEditorCommands } from '../EntityEditorCommands';
 
-export default function Preview(): React.JSX.Element {
-  const { data, state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
+interface PreviewProps {
+  hasAnyComponent: boolean
+}
+
+export default function Preview(props: PreviewProps): React.JSX.Element {
+  const { hasAnyComponent } = props;
+  const {
+    currentComponent, setCurrentComponent,
+    currentAnimationStep, setCurrentAnimationStep,
+    previewBackgroundColor,
+    previewPalettes,
+    previewProjectionDepth,
+    previewShowColliders,
+    previewShowSprites,
+    previewShowWireframes,
+    previewZoom, setPreviewZoom,
+  } = useContext(EntityEditorContext) as EntityEditorContextType;
+  const { data } = useContext(EntityEditorContext) as EntityEditorContextType;
   const { services } = useContext(EditorsContext) as EditorsContextType;
-  const [currentAnimationStep, setCurrentAnimationStep] = useState<number>(0);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [offsetX, setOffsetX] = useState<number>(0);
   const [offsetY, setOffsetY] = useState<number>(0);
@@ -31,9 +48,9 @@ export default function Preview(): React.JSX.Element {
   const engineConfig = services.vesProjectService.getProjectDataItemById(ProjectContributor.Project, 'EngineConfig');
   // @ts-ignore
   const frameMultiplicator = engineConfig && engineConfig.frameRate?.frameCycle ? engineConfig.frameRate.frameCycle + 1 : 1;
-  const animate = state.currentComponent?.startsWith('animations-');
-  const currentAnimation = state.currentComponent?.startsWith('animations-')
-    ? parseInt(state.currentComponent.split('animations-')[1])
+  const animate = currentComponent?.startsWith('animations-');
+  const currentAnimation = currentComponent?.startsWith('animations-')
+    ? parseInt(currentComponent.split('animations-')[1])
     : data.animations.default;
   const animation: AnimationData | undefined = data.components?.animations
     ? data.components?.animations[currentAnimation]
@@ -66,7 +83,7 @@ export default function Preview(): React.JSX.Element {
 
   const onWheel = (e: React.WheelEvent): void => {
     if (e.ctrlKey) {
-      let zoom = Math.round((state.preview.zoom - e.deltaY / WHEEL_SENSITIVITY) * 100) / 100;
+      let zoom = Math.round((previewZoom - e.deltaY / WHEEL_SENSITIVITY) * 100) / 100;
 
       if (zoom > MAX_PREVIEW_SPRITE_ZOOM) {
         zoom = MAX_PREVIEW_SPRITE_ZOOM;
@@ -74,23 +91,14 @@ export default function Preview(): React.JSX.Element {
         zoom = MIN_PREVIEW_SPRITE_ZOOM;
       }
 
-      setZoom(zoom);
+      setPreviewZoom(zoom);
     }
-  };
-
-  const setZoom = (zoom: number): void => {
-    setState({
-      preview: {
-        ...state.preview,
-        zoom,
-      }
-    });
   };
 
   const onMouseMove = (e: React.MouseEvent): void => {
     if (isDragging) {
-      setOffsetX(offsetX + e.movementX / state.preview.zoom);
-      setOffsetY(offsetY + e.movementY / state.preview.zoom);
+      setOffsetX(offsetX + e.movementX / previewZoom);
+      setOffsetY(offsetY + e.movementY / previewZoom);
     }
   };
 
@@ -113,16 +121,10 @@ export default function Preview(): React.JSX.Element {
     animation,
   ]);
 
-  useEffect(() => {
-    setState({ currentAnimationStep });
-  }, [
-    currentAnimationStep,
-  ]);
-
   return hasPreviewableComponents
     ? <div
       className={`preview-container draggable${isDragging ? ' dragging' : ''}`}
-      onClick={() => setState({ currentComponent: '' })}
+      onClick={() => setCurrentComponent('')}
       onMouseDown={() => setIsDragging(true)}
       onMouseUp={() => setIsDragging(false)}
       onMouseLeave={() => setIsDragging(false)}
@@ -131,8 +133,8 @@ export default function Preview(): React.JSX.Element {
     >
       <PreviewOptions
         enableBackground={true}
-        zoom={state.preview.zoom}
-        setZoom={setZoom}
+        zoom={previewZoom}
+        setZoom={setPreviewZoom}
         minZoom={MIN_PREVIEW_SPRITE_ZOOM}
         maxZoom={MAX_PREVIEW_SPRITE_ZOOM}
         zoomStep={0.51}
@@ -150,16 +152,16 @@ export default function Preview(): React.JSX.Element {
         </div>
       }
       <div
-        className={`preview-container-world background-color-${state.preview.backgroundColor}`}
+        className={`preview-container-world background-color-${previewBackgroundColor}`}
         style={{
-          perspective: `${state.preview.projectionDepth}px`,
-          zoom: state.preview.zoom,
+          perspective: `${previewProjectionDepth}px`,
+          zoom: previewZoom,
           translate: `${offsetX}px ${offsetY}px`,
         }}
       >
         <div className="preview-container-world-center-vertical"></div>
         <div className="preview-container-world-center-horizontal"></div>
-        {state.preview.sprites && data.components?.sprites?.map((sprite, i) =>
+        {previewShowSprites && data.components?.sprites?.map((sprite, i) =>
           <SpritePreview
             key={i}
             index={i}
@@ -167,17 +169,17 @@ export default function Preview(): React.JSX.Element {
             animate={animate}
             frames={data.animations?.totalFrames || 1}
             currentAnimationFrame={actualCurrentFrame}
-            highlighted={state.currentComponent === `sprites-${i}`}
-            palette={state.preview.palettes[sprite.texture.palette]}
+            highlighted={currentComponent === `sprites-${i}`}
+            palette={previewPalettes[sprite.texture.palette]}
           />
         )}
-        {state.preview.colliders && data.components?.colliders?.map((collider, i) => {
+        {previewShowColliders && data.components?.colliders?.map((collider, i) => {
           switch (collider.type) {
             case ColliderType.Ball:
               return <BallCollider
                 key={i}
                 index={i}
-                highlighted={state.currentComponent === `colliders-${i}`}
+                highlighted={currentComponent === `colliders-${i}`}
                 collider={collider}
               />;
             case ColliderType.Box:
@@ -185,37 +187,81 @@ export default function Preview(): React.JSX.Element {
               return <BoxCollider
                 key={i}
                 index={i}
-                highlighted={state.currentComponent === `colliders-${i}`}
+                highlighted={currentComponent === `colliders-${i}`}
                 collider={collider}
               />;
             case ColliderType.LineField:
               return <LineFieldCollider
                 key={i}
                 index={i}
-                highlighted={state.currentComponent === `colliders-${i}`}
+                highlighted={currentComponent === `colliders-${i}`}
                 collider={collider}
               />;
           }
         })}
-        {state.preview.wireframes && data.components?.wireframes?.map((wireframe, i) =>
+        {previewShowWireframes && data.components?.wireframes?.map((wireframe, i) =>
           <PreviewWireframe
             key={i}
             index={i}
-            highlighted={state.currentComponent === `wireframes-${i}`}
+            highlighted={currentComponent === `wireframes-${i}`}
             wireframe={wireframe}
           />
         )}
       </div>
     </div>
     : <div className='preview-container'>
-      <div style={{ color: 'var(--theia-dropdown-border)' }}>
-        {/*
-        {nls.localize(
-          'vuengine/entityEditor/noPreviewableComponents',
-          'This entity does not yet have any previewable components (children, colliders, sprites or wireframes).',
-        )}
-        */}
-        <IdentificationCard size={32} />
-      </div>
-    </div>;
+      <VContainer alignItems='center' style={{ color: 'var(--theia-dropdown-border)' }}>
+        {!hasAnyComponent
+          ? <>
+            <PuzzlePiece size={32} />
+            <div
+              style={{
+                fontSize: '160%'
+              }}
+            >
+              {
+                nls.localize(
+                  'vuengine/entityEditor/entityIsEmpty',
+                  'This entity is empty',
+                )
+              }
+            </div>
+            <div>
+              {nls.localize(
+                'vuengine/entityEditor/clickBelowToAddFirstComponent',
+                'Click below to add the first component',
+              )}
+            </div>
+            <button
+              className='theia-button secondary large'
+              onClick={() => services.commandService.executeCommand(EntityEditorCommands.ADD_COMPONENT.id)}
+              style={{
+                marginTop: 20
+              }}
+            >
+              <i className='codicon codicon-add' /> {nls.localize('vuengine/editors/addComponent', 'Add Component')}
+            </button>
+          </>
+          : <>
+            <PuzzlePiece size={32} />
+            <div
+              style={{
+                fontSize: '160%'
+              }}
+            >
+              {nls.localize(
+                'vuengine/entityEditor/noPreviewableComponents',
+                'This entity does not yet have any previewable components',
+              )}
+            </div>
+            <div>
+              {nls.localize(
+                'vuengine/entityEditor/previewableComponentsList',
+                'Add either a child, collider, sprite or wireframe',
+              )}
+            </div>
+          </>
+        }
+      </VContainer>
+    </div >;
 }

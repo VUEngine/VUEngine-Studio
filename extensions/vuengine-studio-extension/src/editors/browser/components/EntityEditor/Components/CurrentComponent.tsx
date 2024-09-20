@@ -31,7 +31,7 @@ interface CurrentComponentProps {
 
 export default function CurrentComponent(props: CurrentComponentProps): React.JSX.Element {
     const { isMultiFileAnimation } = props;
-    const { state, data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { data, setData, currentComponent } = useContext(EntityEditorContext) as EntityEditorContextType;
 
     const updateComponent = (key: ComponentKey, index: number, partialData: Partial<ComponentData>, options?: EntityEditorSaveDataOptions): void => {
         const componentsArray = [...data.components[key]];
@@ -49,7 +49,7 @@ export default function CurrentComponent(props: CurrentComponentProps): React.JS
     };
 
     const getComponentEditor = (): React.JSX.Element => {
-        const [type, indexString] = state.currentComponent.split('-');
+        const [type, indexString] = currentComponent.split('-');
         const index = parseInt(indexString || '-1');
         if (index > -1) {
             switch (type) {
@@ -121,15 +121,15 @@ export default function CurrentComponent(props: CurrentComponentProps): React.JS
             }}
         >
             {getComponentEditor()}
-            {state.currentComponent === 'animations' &&
+            {currentComponent === 'animations' &&
                 <AnimationsSettings
                     isMultiFileAnimation={isMultiFileAnimation}
                 />
             }
-            {state.currentComponent === 'sprites' &&
+            {currentComponent === 'sprites' &&
                 <SpritesSettings />
             }
-            {state.currentComponent === 'colliders' &&
+            {currentComponent === 'colliders' &&
                 <CollidersSettings />
             }
         </VContainer>

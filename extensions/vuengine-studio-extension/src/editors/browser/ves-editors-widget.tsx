@@ -95,6 +95,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
 
     typeId: string;
     uri: URI;
+    commands: { [commandId: string]: boolean } = {};
 
     protected schema: JsonSchema | undefined;
     protected uiSchema: UISchemaElement | undefined;
@@ -362,6 +363,14 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         this.reference?.object.textEditorModel.setValue(JSON.stringify(this.data, undefined, 4));
     }
 
+    protected enableCommands(commandIds: string[]): void {
+        commandIds.map(commandId => this.commands[commandId] = true);
+    }
+
+    protected disableCommands(commandIds: string[]): void {
+        commandIds.map(commandId => this.commands[commandId] = false);
+    }
+
     protected render(): React.ReactNode {
         return <div className="jsonforms-container">
             <div className={`${this.isLoading || this.isGenerating ? 'generatingOverlay isGenerating' : 'generatingOverlay'}`}>
@@ -377,6 +386,8 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
                         isGenerating: this.isGenerating,
                         setIsGenerating: this.setIsGenerating.bind(this),
                         setGeneratingProgress: this.setGeneratingProgress.bind(this),
+                        enableCommands: this.enableCommands.bind(this),
+                        disableCommands: this.disableCommands.bind(this),
                         services: {
                             colorRegistry: this.colorRegistry,
                             commandService: this.commandService,

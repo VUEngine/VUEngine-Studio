@@ -20,25 +20,20 @@ interface PreviewOptionsProps {
 }
 
 export default function PreviewOptions(props: PreviewOptionsProps): React.JSX.Element {
-  const { enableBackground, zoom, setZoom, minZoom, maxZoom, zoomStep, roundZoomSteps, center } = props;
-  const { state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
+  const {
+    enableBackground, zoom, setZoom, minZoom, maxZoom, zoomStep, roundZoomSteps, center,
+  } = props;
+  const {
+    previewAnaglyph, setPreviewAnaglyph,
+    previewBackgroundColor, setPreviewBackgroundColor,
+  } = useContext(EntityEditorContext) as EntityEditorContextType;
 
   const setBackgroundColor = (backgroundColor: number) =>
-    setState({
-      preview: {
-        ...state.preview,
-        backgroundColor: clamp(backgroundColor, -1, 3),
-      },
-    });
+    setPreviewBackgroundColor(clamp(backgroundColor, -1, 3));
 
   const toggleAnaglyph = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setState({
-      preview: {
-        ...state.preview,
-        anaglyph: !state.preview.anaglyph,
-      },
-    });
+    setPreviewAnaglyph(previousValue => !previousValue);
   };
 
   const applyZoom = (z: number) => {
@@ -80,11 +75,11 @@ export default function PreviewOptions(props: PreviewOptionsProps): React.JSX.El
             paddingLeft: 4,
             paddingRight: 4,
           }}
-          title={`${nls.localize('vuengine/editors/anaglyph', 'Anaglyph')}: ${state.preview.anaglyph
+          title={`${nls.localize('vuengine/editors/anaglyph', 'Anaglyph')}: ${previewAnaglyph
             ? nls.localize('vuengine/editors/enabled', 'Enabled')
             : nls.localize('vuengine/editors/disabled', 'Disabled')}`}
         >
-          {state.preview.anaglyph
+          {previewAnaglyph
             ? <>
               <Square size={16} weight="fill" color="red" />
               <Square size={16} weight="fill" color="blue" />
@@ -98,7 +93,7 @@ export default function PreviewOptions(props: PreviewOptionsProps): React.JSX.El
         {enableBackground &&
           <VContainer>
             <ColorSelector
-              color={state.preview.backgroundColor}
+              color={previewBackgroundColor}
               updateColor={setBackgroundColor}
               includeTransparent
             />
@@ -115,9 +110,9 @@ export default function PreviewOptions(props: PreviewOptionsProps): React.JSX.El
                 {i}
               </div>
               <Palette
-                value={state.preview.palettes[i]}
+                value={previewPalettes[i]}
                 updateValue={newValue => {
-                  const updatedPalettes = state.preview.palettes;
+                  const updatedPalettes = previewPalettes;
                   updatedPalettes[i] = newValue;
                   setState({
                     preview: {

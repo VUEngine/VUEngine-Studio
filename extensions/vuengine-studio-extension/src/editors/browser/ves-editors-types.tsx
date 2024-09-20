@@ -43,7 +43,20 @@ export interface EditorsContextType {
     isGenerating: boolean
     setIsGenerating: (isGenerating: boolean, progress?: number) => void
     setGeneratingProgress: (current: number, total: number) => void
+    enableCommands: (commandIds: string[]) => void
+    disableCommands: (commandIds: string[]) => void
     services: EditorsServices
 }
 
 export const EDITORS_COMMAND_EXECUTED_EVENT_NAME = 'vesEditorsCommandExecuted';
+
+export interface EditorCommand {
+    id: string
+    label: string
+    category: string
+    keybinding?: string
+}
+
+export interface EditorCommands {
+    [id: string]: EditorCommand
+}

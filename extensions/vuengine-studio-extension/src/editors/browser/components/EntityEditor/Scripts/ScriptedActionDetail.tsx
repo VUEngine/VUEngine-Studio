@@ -12,9 +12,9 @@ import { ENTITY_FUNCTIONS } from './EntityFunctions';
 
 export default function ScriptedActionDetail(): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
-    const { data, setData, state } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { data, setData, currentComponent } = useContext(EntityEditorContext) as EntityEditorContextType;
 
-    const currentComponentParts = state.currentComponent.split('-');
+    const currentComponentParts = currentComponent.split('-');
     const currentScriptIndex = currentComponentParts[1] ? parseInt(currentComponentParts[1]) : 0;
     const currentActionIndex = currentComponentParts[2] ? parseInt(currentComponentParts[2]) : -1;
     const scriptConfig = data.components.scripts[currentScriptIndex];

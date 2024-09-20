@@ -192,7 +192,7 @@ export class VesProjectService {
    * Generates JSON from schema, using either values present in data or schema default.
    * Will only contain properties that are present in the schema.
    */
-  protected generateDataFromJsonSchema(schema: any, data?: any): any {
+  generateDataFromJsonSchema(schema: any, data?: any): any {
     if (!schema) {
       return;
     }

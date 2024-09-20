@@ -1,4 +1,4 @@
-import { Command, CommandContribution, CommandRegistry, CommandService, MenuContribution, MenuModelRegistry, URI, UntitledResourceResolver } from '@theia/core';
+import { Command, CommandContribution, CommandRegistry, CommandService, MenuContribution, MenuModelRegistry, URI, UntitledResourceResolver, isObject } from '@theia/core';
 import { AbstractViewContribution, CommonCommands, CommonMenus, KeybindingContribution, KeybindingRegistry, OpenerService, Widget, open } from '@theia/core/lib/browser';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
@@ -13,13 +13,12 @@ import { WorkspaceCommands } from '@theia/workspace/lib/browser';
 import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
-import { EDITORS_COMMANDS, VesEditorsCommands } from './ves-editors-commands';
+import { EditorsCommands, VesEditorsCommands } from './ves-editors-commands';
 import { VesEditorsContextKeyService } from './ves-editors-context-key-service';
 import { VesEditorsWidget } from './ves-editors-widget';
 
 @injectable()
-export class VesEditorsViewContribution extends AbstractViewContribution<VesEditorsWidget>
-    implements CommandContribution, KeybindingContribution, MenuContribution, TabBarToolbarContribution {
+export class VesEditorsViewContribution extends AbstractViewContribution<VesEditorsWidget> implements TabBarToolbarContribution {
     @inject(CommandService)
     protected readonly commandService: CommandService;
     @inject(EditorManager)
@@ -79,6 +78,8 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
     }
 
     async registerCommands(commandRegistry: CommandRegistry): Promise<void> {
+        super.registerCommands(commandRegistry);
+
         commandRegistry.registerCommand(VesEditorsCommands.GENERATE, {
             isEnabled: () => true,
             isVisible: widget => widget instanceof VesEditorsWidget,
@@ -117,6 +118,21 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         commandRegistry.registerHandler(CommonCommands.PASTE.id, {
             isEnabled: () => this.shell.currentWidget instanceof VesEditorsWidget,
             execute: () => (this.shell.currentWidget as VesEditorsWidget)?.dispatchCommandEvent(CommonCommands.PASTE.id),
+        });
+
+        EditorsCommands.map(editor => {
+            Object.values(editor).map(command => {
+                commandRegistry.registerCommand({
+                    id: command.id,
+                    label: command.label,
+                    category: command.category,
+                }, {
+                    // enable and make visible only for the editors for which command is registered
+                    isEnabled: () => this.shell.currentWidget instanceof VesEditorsWidget && this.shell.currentWidget.commands[command.id] === true,
+                    isVisible: () => this.shell.currentWidget instanceof VesEditorsWidget && this.shell.currentWidget.commands[command.id] === true,
+                    execute: () => this.shell.currentWidget instanceof VesEditorsWidget && this.shell.currentWidget.dispatchCommandEvent(command.id),
+                });
+            });
         });
 
         await this.vesProjectService.projectDataReady;
@@ -182,31 +198,20 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                 }
             },
         });
-
-        Object.values(EDITORS_COMMANDS).map(editor => {
-            Object.values(editor.commands).map(command => {
-                commandRegistry.registerCommand({
-                    id: command.id,
-                    label: command.label,
-                    category: editor.category,
-                }, {
-                    // enable and make visible only for the current type's editor
-                    isEnabled: () => (this.shell.currentWidget as VesEditorsWidget)?.typeId === editor.typeId,
-                    isVisible: () => (this.shell.currentWidget as VesEditorsWidget)?.typeId === editor.typeId,
-                    execute: () => (this.shell.currentWidget as VesEditorsWidget)?.dispatchCommandEvent(command.id),
-                });
-            });
-        });
     }
 
     registerKeybindings(registry: KeybindingRegistry): void {
-        Object.values(EDITORS_COMMANDS).map(editor => {
-            Object.values(editor.commands).map(command => {
-                registry.registerKeybindings({
-                    command: command.id,
-                    when: 'graphicalEditorFocus',
-                    keybinding: command.keybinding,
-                });
+        super.registerKeybindings(registry);
+
+        EditorsCommands.map(editor => {
+            Object.values(editor).map(command => {
+                if (command.keybinding) {
+                    registry.registerKeybindings({
+                        command: command.id,
+                        when: 'graphicalEditorFocus',
+                        keybinding: command.keybinding,
+                    });
+                }
             });
         });
     }
@@ -233,6 +238,8 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
     }
 
     async registerMenus(menus: MenuModelRegistry): Promise<void> {
+        super.registerMenus(menus);
+
         await this.vesProjectService.projectDataReady;
         const types = this.vesProjectService.getProjectDataTypes();
         for (const typeId of Object.keys(types || {})) {

@@ -1,11 +1,11 @@
 import { ChartScatter, FadersHorizontal, GearSix, Guitar, Keyboard } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
-import { EDITORS_COMMANDS } from '../../ves-editors-commands';
-import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../ves-editors-types';
+import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/HContainer';
 import VContainer from '../Common/VContainer';
+import { MusicEditorCommands } from './MusicEditorCommands';
 import MusicEditorToolbar from './MusicEditorToolbar';
 import { ChannelConfig, InstrumentConfig, NOTES, PatternConfig, SongData, SongNote } from './MusicEditorTypes';
 import MusicPlayer from './MusicPlayer';
@@ -25,8 +25,13 @@ interface MusicEditorProps {
     updateSongData: (songData: SongData) => void
 }
 
+export const INPUT_BLOCKING_COMMANDS = [
+    MusicEditorCommands.PLAY_PAUSE.id,
+];
+
 export default function MusicEditor(props: MusicEditorProps): React.JSX.Element {
     const { songData, updateSongData } = props;
+    const { enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const [playing, setPlaying] = useState<boolean>(false);
     const [currentStep, setCurrentStep] = useState<number>(0);
     const [currentChannelId, setCurrentChannelId] = useState<number>(0);
@@ -192,7 +197,7 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
 
     const commandListener = (e: CustomEvent): void => {
         switch (e.detail) {
-            case EDITORS_COMMANDS.MusicEditor.commands.playPause.id:
+            case MusicEditorCommands.PLAY_PAUSE.id:
                 togglePlaying();
                 break;
         }
@@ -214,6 +219,12 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
         currentChannelId,
         currentSequenceIndex,
     ]);
+
+    useEffect(() => {
+        enableCommands([
+            MusicEditorCommands.PLAY_PAUSE.id,
+        ]);
+    }, []);
 
     useEffect(() => {
         computeSong();

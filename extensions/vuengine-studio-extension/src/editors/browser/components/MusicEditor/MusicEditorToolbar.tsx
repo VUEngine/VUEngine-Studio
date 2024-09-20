@@ -1,8 +1,8 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import styled from 'styled-components';
-import { EDITORS_COMMANDS } from '../../ves-editors-commands';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
+import { MusicEditorCommands } from './MusicEditorCommands';
 
 export const StyledMusicEditorToolbar = styled.div`
     align-items: center;
@@ -51,7 +51,7 @@ export default function MusicEditorToolbar(props: MusicEditorToolbarProps): Reac
                 title={(playing
                     ? nls.localize('vuengine/musicEditor/play', 'Play')
                     : nls.localize('vuengine/musicEditor/stop', 'Stop')) +
-                    services.vesCommonService.getKeybindingLabel(EDITORS_COMMANDS.MusicEditor.commands.playPause.id, true)
+                    services.vesCommonService.getKeybindingLabel(MusicEditorCommands.PLAY_PAUSE.id, true)
                 }
                 onClick={togglePlaying}
             >

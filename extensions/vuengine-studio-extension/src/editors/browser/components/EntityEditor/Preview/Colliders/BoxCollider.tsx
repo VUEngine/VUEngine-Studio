@@ -71,12 +71,12 @@ export interface BoxColliderProps {
 }
 
 export default function BoxCollider(props: BoxColliderProps): React.JSX.Element {
-    const { setState } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { setCurrentComponent } = useContext(EntityEditorContext) as EntityEditorContextType;
     const { index, highlighted, collider } = props;
 
     const handleClick = (e: React.MouseEvent) => {
         e.stopPropagation();
-        setState({ currentComponent: `colliders-${index}` });
+        setCurrentComponent(`colliders-${index}`);
     };
 
     const width = collider.pixelSize.x * collider.scale.x;

@@ -22,8 +22,9 @@ interface TreeNode {
 }
 
 export default function ComponentTree(): React.JSX.Element {
+    const { currentComponent } = useContext(EntityEditorContext) as EntityEditorContextType;
     const { services } = useContext(EditorsContext) as EditorsContextType;
-    const { data, setData, state } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { data, setData } = useContext(EntityEditorContext) as EntityEditorContextType;
 
     const moveComponent = (
         dragIds: string[],
@@ -176,7 +177,7 @@ export default function ComponentTree(): React.JSX.Element {
                     openByDefault={true}
                     width='100%'
                     onMove={({ dragIds, parentId, index }) => moveComponent(dragIds, parentId!, index)}
-                    selection={state.currentComponent.split('-', 2).join('-')} // ignore sub selections
+                    selection={currentComponent.split('-', 2).join('-')} // ignore sub selections
                 >
                     {ComponentTreeNode}
                 </Tree>

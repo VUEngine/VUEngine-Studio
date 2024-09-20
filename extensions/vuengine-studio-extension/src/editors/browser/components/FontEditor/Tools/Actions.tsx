@@ -138,7 +138,7 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
                 <SpriteEditorTool
                     title={
                         nls.localize('vuengine/fontEditor/actions/rotate', 'Rotate') +
-                        services.vesCommonService.getKeybindingLabel(EDITORS_COMMANDS.FontEditor.commands.rotate.id, true)
+                        services.vesCommonService.getKeybindingLabel(FontEditorCommands.ROTATE.id, true)
                     }
                     onClick={rotate}
                 >
@@ -147,7 +147,7 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
                 <SpriteEditorTool
                     title={
                         nls.localize('vuengine/fontEditor/actions/mirrorHorizontally', 'Mirror Horizontally') +
-                        services.vesCommonService.getKeybindingLabel(EDITORS_COMMANDS.FontEditor.commands.mirrorHorizontally.id, true)
+                        services.vesCommonService.getKeybindingLabel(FontEditorCommands.MIRROR_HORIZONTALLY.id, true)
                     }
                     onClick={mirrorHorizontally}
                 >
@@ -156,7 +156,7 @@ export default function Actions(props: ActionsProps): React.JSX.Element {
                 <SpriteEditorTool
                     title={
                         nls.localize('vuengine/fontEditor/actions/mirrorVertically', 'Mirror Vertically') +
-                        services.vesCommonService.getKeybindingLabel(EDITORS_COMMANDS.FontEditor.commands.mirrorVertically.id, true)
+                        services.vesCommonService.getKeybindingLabel(FontEditorCommands.MIRROR_VERTICALLY.id, true)
                     }
                     onClick={mirrorVertically}
                 >

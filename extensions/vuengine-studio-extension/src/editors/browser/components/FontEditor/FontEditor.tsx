@@ -2,11 +2,11 @@
 import { nls } from '@theia/core';
 import { CommonCommands } from '@theia/core/lib/browser';
 import { CanvasDataChangeHandler, Dotting, DottingRef, PixelModifyItem, useDotting, useHandlers } from 'dotting';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { ColorMode, PALETTE_COLORS, PALETTE_INDICES } from '../../../../core/browser/ves-common-types';
 import { ImageCompressionType } from '../../../../images/browser/ves-images-types';
-import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../ves-editors-types';
+import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import { DataSection } from '../Common/CommonTypes';
 import HContainer from '../Common/HContainer';
 import InfoLabel from '../Common/InfoLabel';
@@ -29,6 +29,7 @@ import {
 import Actions from './Tools/Actions';
 import CurrentCharInfo from './Tools/CurrentCharInfo';
 import ImportExportTools from './Tools/ImportExport/ImportExportTools';
+import { FontEditorCommands } from './FontEditorCommands';
 
 interface FontEditorProps {
     data: FontData
@@ -55,8 +56,23 @@ const EditorSidebar = styled.div`
   }
 `;
 
+export const INPUT_BLOCKING_COMMANDS = [
+    FontEditorCommands.ALPHABET_NAVIGATE_LINE_DOWN.id,
+    FontEditorCommands.ALPHABET_NAVIGATE_LINE_UP.id,
+    FontEditorCommands.ALPHABET_NAVIGATE_PREV_CHAR.id,
+    FontEditorCommands.ALPHABET_NAVIGATE_NEXT_CHAR.id,
+    FontEditorCommands.PALETTE_SELECT_INDEX_1.id,
+    FontEditorCommands.PALETTE_SELECT_INDEX_2.id,
+    FontEditorCommands.PALETTE_SELECT_INDEX_3.id,
+    FontEditorCommands.PALETTE_SELECT_INDEX_4.id,
+    FontEditorCommands.PALETTE_SELECT_INDEX_5.id,
+    FontEditorCommands.PALETTE_SELECT_INDEX_6.id,
+    FontEditorCommands.PALETTE_SELECT_INDEX_7.id,
+];
+
 export default function FontEditor(props: FontEditorProps): React.JSX.Element {
     const { data, updateData } = props;
+    const { enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const [primaryColorIndex, setPrimaryColorIndex] = useState<number>(3);
     const [secondaryColorIndex, setSecondaryColorIndex] = useState<number>(0);
     const [currentCharacterIndex, setCurrentCharacterIndex] = useState<number>(data.offset);
@@ -250,6 +266,12 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
     ]);
 
     useEffect(() => {
+        enableCommands([
+            ...Object.values(FontEditorCommands).map(c => c.id)
+        ]);
+    }, []);
+
+    useEffect(() => {
         document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
         return () => {
             document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
@@ -381,7 +403,7 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
                         <label>
                             {nls.localize('vuengine/fontEditor/alphabet', 'Alphabet')}{' '}
                             <span className="secondaryText">
-                                ({nls.localize('vuengine/fontEditor/alphabetNavigationDescription', 'Shift + Arrow Keys To Navigate')})
+                                ({nls.localize('vuengine/fontEditor/alphabetNavigationDescription', 'Arrow Keys To Navigate')})
                             </span>
                         </label>
                         <Alphabet

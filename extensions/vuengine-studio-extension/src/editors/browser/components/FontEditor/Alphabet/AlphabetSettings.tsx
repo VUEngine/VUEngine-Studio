@@ -1,9 +1,11 @@
 import { nls } from '@theia/core';
-import React from 'react';
+import React, { useContext } from 'react';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import { clamp } from '../../Common/Utils';
 import VContainer from '../../Common/VContainer';
+import { INPUT_BLOCKING_COMMANDS } from '../FontEditor';
 import { MAX_CHAR_COUNT, MAX_PAGE_SIZE, MIN_CHAR_COUNT, MIN_OFFSET, MIN_PAGE_SIZE } from '../FontEditorTypes';
 import FontTileInfo from '../Tools/FontTileInfo';
 
@@ -20,6 +22,7 @@ interface AlphabetSettingsProps {
 
 export default function AlphabetSettings(props: AlphabetSettingsProps): React.JSX.Element {
     const { charCount, setCharCount, offset, setOffset, pageSize, setPageSize, sizeX, sizeY } = props;
+    const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
 
     const effectiveMaxCharCount = MAX_CHAR_COUNT - offset;
     const effectiveMaxOffset = MAX_CHAR_COUNT - charCount;
@@ -42,6 +45,8 @@ export default function AlphabetSettings(props: AlphabetSettingsProps): React.JS
                     onChange={e => setCharCount(
                         clamp(parseInt(e.target.value), MIN_CHAR_COUNT, effectiveMaxCharCount)
                     )}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />
             </VContainer>
             <VContainer>
@@ -59,6 +64,8 @@ export default function AlphabetSettings(props: AlphabetSettingsProps): React.JS
                     onChange={e => setOffset(
                         clamp(parseInt(e.target.value), MIN_OFFSET, effectiveMaxOffset)
                     )}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />
             </VContainer>
             <VContainer>
@@ -81,6 +88,8 @@ export default function AlphabetSettings(props: AlphabetSettingsProps): React.JS
                     onChange={e => setPageSize(
                         clamp(parseInt(e.target.value), MIN_PAGE_SIZE, effectiveMaxPageSize)
                     )}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />
             </VContainer>
         </HContainer>

@@ -12,7 +12,7 @@ export interface PreviewWireframeProps {
 }
 
 export default function PreviewWireframe(props: PreviewWireframeProps): React.JSX.Element {
-    const { setState } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { setCurrentComponent } = useContext(EntityEditorContext) as EntityEditorContextType;
     const { index, highlighted, wireframe } = props;
     const style = {
         borderRadius: highlighted ? .25 : 0,
@@ -28,7 +28,7 @@ export default function PreviewWireframe(props: PreviewWireframeProps): React.JS
 
     const handleClick = (e: React.MouseEvent) => {
         e.stopPropagation();
-        setState({ currentComponent: `wireframes-${index}` });
+        setCurrentComponent(`wireframes-${index}`);
     };
 
     switch (wireframe.wireframe.type) {

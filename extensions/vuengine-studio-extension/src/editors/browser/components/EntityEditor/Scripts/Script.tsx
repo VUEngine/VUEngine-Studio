@@ -12,13 +12,13 @@ interface ScriptProps {
 
 export default function Script(props: ScriptProps): React.JSX.Element {
     const { index } = props;
-    const { data, setData, state } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { data, setData, currentComponent } = useContext(EntityEditorContext) as EntityEditorContextType;
     const [zoom, setZoom] = useState<number>(1);
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [offsetX, setOffsetX] = useState<number>(0);
     const [offsetY, setOffsetY] = useState<number>(0);
 
-    const currentComponentParts = state.currentComponent.split('-');
+    const currentComponentParts = currentComponent.split('-');
     const currentScriptIndex = currentComponentParts[1] ? parseInt(currentComponentParts[1]) : 0;
 
     const scriptConfig = data.components.scripts[currentScriptIndex];

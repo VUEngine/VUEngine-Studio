@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { EDITORS_COMMANDS } from '../../../ves-editors-commands';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../../ves-editors-types';
 import VContainer from '../../Common/VContainer';
+import { FontEditorCommands } from '../FontEditorCommands';
 import { VariableSize } from '../FontEditorTypes';
 import AlphabetChar from './AlphabetChar';
 
@@ -50,22 +50,22 @@ export default function Alphabet(props: AlphabetProps): React.JSX.Element {
 
     const commandListener = (e: CustomEvent): void => {
         switch (e.detail) {
-            case EDITORS_COMMANDS.FontEditor.commands.alphabetNavigateLineDown.id:
+            case FontEditorCommands.ALPHABET_NAVIGATE_LINE_DOWN.id:
                 setCurrentCharacterIndex(currentCharacterIndex + 16 < offset + charCount
                     ? currentCharacterIndex + 16
                     : currentCharacterIndex);
                 break;
-            case EDITORS_COMMANDS.FontEditor.commands.alphabetNavigatePrevChar.id:
+            case FontEditorCommands.ALPHABET_NAVIGATE_PREV_CHAR.id:
                 setCurrentCharacterIndex(currentCharacterIndex > offset
                     ? currentCharacterIndex - 1
                     : currentCharacterIndex);
                 break;
-            case EDITORS_COMMANDS.FontEditor.commands.alphabetNavigateNextChar.id:
+            case FontEditorCommands.ALPHABET_NAVIGATE_NEXT_CHAR.id:
                 setCurrentCharacterIndex(currentCharacterIndex + 1 < offset + charCount
                     ? currentCharacterIndex + 1
                     : currentCharacterIndex);
                 break;
-            case EDITORS_COMMANDS.FontEditor.commands.alphabetNavigateLineUp.id:
+            case FontEditorCommands.ALPHABET_NAVIGATE_LINE_UP.id:
                 setCurrentCharacterIndex(currentCharacterIndex - 16 >= offset
                     ? currentCharacterIndex - 16
                     : currentCharacterIndex);

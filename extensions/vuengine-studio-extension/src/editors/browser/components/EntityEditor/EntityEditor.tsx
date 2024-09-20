@@ -1,23 +1,29 @@
-import { isBoolean, isNumber, nls } from '@theia/core';
-import React from 'react';
+import { isBoolean, isNumber, nls, QuickPickItem, QuickPickOptions, QuickPickSeparator } from '@theia/core';
+import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { ConversionResult } from '../../../../images/browser/ves-images-types';
-import { EditorsContextType } from '../../ves-editors-types';
+import {
+  ConversionResult
+} from '../../../../images/browser/ves-images-types';
+import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/HContainer';
+import { showEntitySelection } from '../Common/Utils';
+import { ColliderType, Transparency, WireframeType } from '../Common/VUEngineTypes';
 import ComponentTree from './Components/ComponentTree';
 import CurrentComponent from './Components/CurrentComponent';
 import EntityMeta from './Entity/EntityMeta';
+import { EntityEditorCommands } from './EntityEditorCommands';
 import {
+  ComponentKey,
   EntityData,
   EntityEditorContext,
-  EntityEditorPreviewState,
-  EntityEditorState,
+  LocalStorageEntityEditorState,
   MAX_PREVIEW_SPRITE_ZOOM,
   MIN_PREVIEW_SPRITE_ZOOM,
   SpriteImageData,
 } from './EntityEditorTypes';
 import Preview from './Preview/Preview';
 import Script from './Scripts/Script';
+import { ScriptType } from './Scripts/ScriptTypes';
 
 interface EditorSidebarProps {
   show: boolean
@@ -77,116 +83,110 @@ export interface EntityEditorSaveDataOptions {
   appendImageData?: boolean
 }
 
-export default class EntityEditor extends React.Component<EntityEditorProps, EntityEditorState> {
-  constructor(props: EntityEditorProps) {
-    super(props);
-    this.state = {
-      currentComponent: '',
-      currentAnimationStep: 0,
-      leftSidebarOpen: true,
-      preview: {
-        backgroundColor: -1,
-        anaglyph: false,
-        children: true,
-        colliders: true,
-        wireframes: true,
-        palettes: ['11100100', '11100000', '11010000', '11100100'],
-        sprites: true,
-        zoom: 2,
-        projectionDepth: 99999, // 128,
-      },
-    };
-  }
+const getMostFilesOnASprite = (entityData: EntityData): number =>
+  Math.max(...entityData.components?.sprites.map(s => s.texture.files.length));
 
-  protected getStateLocalStorageId(): string {
-    return `ves-editors-Entity-state/${this.props.context.fileUri.path.fsPath()}`;
-  }
+export default function EntityEditor(props: EntityEditorProps): React.JSX.Element {
+  const { data, updateData } = props;
+  const { fileUri, isGenerating, setIsGenerating, setGeneratingProgress, enableCommands, services } = useContext(EditorsContext) as EditorsContextType;
 
-  protected async savePreviewState(): Promise<void> {
-    return this.props.context.services.localStorageService.setData<EntityEditorState>(this.getStateLocalStorageId(), this.state);
-  }
+  const [currentComponent, setCurrentComponent] = useState<string>('');
+  const [currentAnimationStep, setCurrentAnimationStep] = useState<number>(0);
+  const [leftSidebarOpen, setLeftSidebarOpen] = useState<boolean>(true);
+  const [previewAnaglyph, setPreviewAnaglyph] = useState<boolean>(false);
+  const [previewProjectionDepth, setPreviewProjectionDepth] = useState<number>(99999/* 128 */);
+  const [previewBackgroundColor, setPreviewBackgroundColor] = useState<number>(-1);
+  const [previewPalettes, setPreviewPalettes] = useState<string[]>(['11100100', '11100000', '11010000', '11100100']);
+  const [previewShowChildren, setPreviewShowChildren] = useState<boolean>(true);
+  const [previewShowColliders, setPreviewShowColliders] = useState<boolean>(true);
+  const [previewShowSprites, setPreviewShowSprites] = useState<boolean>(true);
+  const [previewShowWireframes, setPreviewShowWireframes] = useState<boolean>(true);
+  const [previewZoom, setPreviewZoom] = useState<number>(2);
 
-  protected async restorePreviewState(): Promise<void> {
+  const mostFilesOnASprite = getMostFilesOnASprite(data);
+  const isMultiFileAnimation = mostFilesOnASprite > 1;
+  const hasAnyComponent = data.physics.enabled || data.extraProperties.enabled || Object.values(data.components).filter(c => c.length > 0).length > 0;
+
+  const getStateLocalStorageId = (): string =>
+    `ves-editors-Entity-state/${fileUri.path.fsPath()}`;
+
+  const savePreviewState = async (): Promise<void> =>
+    services.localStorageService.setData<LocalStorageEntityEditorState>(getStateLocalStorageId(), {
+      previewAnaglyph,
+      previewBackgroundColor,
+      previewShowChildren,
+      previewShowColliders,
+      previewShowSprites,
+      previewShowWireframes,
+      previewZoom,
+    });
+
+  const restorePreviewState = async (): Promise<void> => {
     // Beware! This can cause hard to track unwanted side effects with outdated states in storage. Apply values with caution.
-    const savedState = await this.props.context.services.localStorageService.getData<EntityEditorState>(this.getStateLocalStorageId());
+    const savedState = await services.localStorageService.getData<LocalStorageEntityEditorState>(getStateLocalStorageId());
     if (!savedState) {
       return;
     }
 
-    const overlayState: Partial<EntityEditorPreviewState> = {};
-    if (isBoolean(savedState.preview.anaglyph)) {
-      overlayState.anaglyph = (savedState.preview.anaglyph);
+    if (isBoolean(savedState.previewAnaglyph)) {
+      setPreviewAnaglyph(savedState.previewAnaglyph);
     }
-    if (isNumber(savedState.preview.backgroundColor) &&
-      savedState.preview.backgroundColor < 3 &&
-      savedState.preview.backgroundColor > -1) {
-      overlayState.backgroundColor = (savedState.preview.backgroundColor);
+    if (isNumber(savedState.previewBackgroundColor) &&
+      savedState.previewBackgroundColor < 3 &&
+      savedState.previewBackgroundColor > -1) {
+      setPreviewBackgroundColor(savedState.previewBackgroundColor);
     }
-    if (isBoolean(savedState.preview.colliders)) {
-      overlayState.colliders = (savedState.preview.colliders);
+    if (isBoolean(savedState.previewShowChildren)) {
+      setPreviewShowChildren(savedState.previewShowChildren);
     }
-    if (isNumber(savedState.preview.zoom) &&
-      savedState.preview.zoom <= MAX_PREVIEW_SPRITE_ZOOM &&
-      savedState.preview.zoom >= MIN_PREVIEW_SPRITE_ZOOM) {
-      overlayState.zoom = (savedState.preview.zoom);
+    if (isBoolean(savedState.previewShowColliders)) {
+      setPreviewShowColliders(savedState.previewShowColliders);
     }
-    if (isBoolean(savedState.preview.sprites)) {
-      overlayState.sprites = (savedState.preview.sprites);
+    if (isBoolean(savedState.previewShowSprites)) {
+      setPreviewShowSprites(savedState.previewShowSprites);
     }
-    if (isBoolean(savedState.preview.wireframes)) {
-      overlayState.wireframes = (savedState.preview.wireframes);
+    if (isBoolean(savedState.previewShowWireframes)) {
+      setPreviewShowWireframes(savedState.previewShowWireframes);
     }
+    if (isNumber(savedState.previewZoom) &&
+      savedState.previewZoom <= MAX_PREVIEW_SPRITE_ZOOM &&
+      savedState.previewZoom >= MIN_PREVIEW_SPRITE_ZOOM) {
+      setPreviewZoom(savedState.previewZoom);
+    }
+  };
 
-    if (savedState) {
-      this.setState({
-        preview: {
-          ...this.state.preview,
-          ...overlayState,
-        }
-      });
-    }
-  }
-
-  protected async updateState(state: EntityEditorState): Promise<void> {
-    this.setState(state);
-    return this.savePreviewState();
-  }
-
-  protected async setData(entityData: Partial<EntityData>, options?: EntityEditorSaveDataOptions): Promise<void> {
-    const { isGenerating, setIsGenerating } = this.props.context;
-
+  const setData = async (entityData: Partial<EntityData>, options?: EntityEditorSaveDataOptions): Promise<void> => {
     if (!isGenerating) {
-      const updatedData = this.postProcessData({ ...this.props.data, ...entityData });
+      const updatedData = postProcessData({ ...data, ...entityData });
       if (options?.appendImageData) {
         setIsGenerating(true);
-        this.appendImageData(updatedData).then(d => {
-          this.props.updateData(d);
+        appendImageData(updatedData).then(d => {
+          updateData(d);
           setIsGenerating(false);
         });
       } else {
-        this.props.updateData(updatedData);
+        updateData(updatedData);
       }
     }
-  }
+  };
 
-  protected postProcessData(entityData: EntityData): EntityData {
+  const postProcessData = (entityData: EntityData): EntityData => {
     if (!entityData.components?.animations.length) {
       // set total frames to 1 when disabling animations
       entityData.animations.totalFrames = 1;
     } else {
       // total frames to most images on sprite, if multi file animation
-      const mostFilesOnASprite = this.getMostFilesOnASprite(entityData);
-      const isMultiFileAnimation = mostFilesOnASprite > 1;
-      if (isMultiFileAnimation) {
+      const entityMostFilesOnASprite = getMostFilesOnASprite(entityData);
+      const entityIsMultiFileAnimation = entityMostFilesOnASprite > 1;
+      if (entityIsMultiFileAnimation) {
         entityData.animations.totalFrames = mostFilesOnASprite;
       }
     }
 
     return entityData;
-  }
+  };
 
-  protected async compressImageDataAsJson(imageData: Partial<ConversionResult>): Promise<ConversionResult> {
-    const { services } = this.props.context;
+  const compressImageDataAsJson = async (imageData: Partial<ConversionResult>): Promise<ConversionResult> => {
     if (imageData.tiles) {
       let frameOffsets = {};
       if (imageData.tiles.frameOffsets) {
@@ -215,19 +215,17 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
     }
 
     return imageData as ConversionResult;
-  }
+  };
 
-  protected async appendImageData(entityData: EntityData): Promise<EntityData> {
-    const { fileUri, services, setGeneratingProgress } = this.props.context;
-
-    const mostFilesOnASprite = this.getMostFilesOnASprite(entityData);
-    const isMultiFileAnimation = entityData.components?.animations.length > 0 && mostFilesOnASprite > 1;
+  const appendImageData = async (entityData: EntityData): Promise<EntityData> => {
+    const entityMostFilesOnASprite = getMostFilesOnASprite(entityData);
+    const entityIsMultiFileAnimation = entityData.components?.animations.length > 0 && entityMostFilesOnASprite > 1;
     const totalSprites = entityData.components?.sprites?.length ?? 0;
 
     for (let i = 0; i < totalSprites; i++) {
       const sprite = entityData.components?.sprites[i];
       const optimizeTiles = (entityData.components?.animations.length === 0 && sprite.optimizeTiles)
-        || (entityData.components?.animations.length > 0 && isMultiFileAnimation);
+        || (entityData.components?.animations.length > 0 && entityIsMultiFileAnimation);
       if (sprite.texture?.files?.length) {
         // possible scenarios:
         // 1) mono image: files.length = 1
@@ -256,8 +254,8 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
             name: name + nameSuffix,
             section: sprite.section,
             animation: {
-              frames: isMultiFileAnimation ? mostFilesOnASprite : entityData.animations.totalFrames,
-              individualFiles: isMultiFileAnimation,
+              frames: entityIsMultiFileAnimation ? mostFilesOnASprite : entityData.animations.totalFrames,
+              individualFiles: entityIsMultiFileAnimation,
               isAnimation: entityData.components?.animations.length > 0
             },
             map: {
@@ -277,7 +275,7 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
             colorMode: sprite.colorMode,
           });
           setGeneratingProgress((i + 1) * 2 - 1, totalSprites * 2);
-          const compressedImageData = await this.compressImageDataAsJson(newImageData);
+          const compressedImageData = await compressImageDataAsJson(newImageData);
           (sprite._imageData! as SpriteImageData).images[j] = {
             ...compressedImageData,
           };
@@ -289,42 +287,271 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
     }
 
     return entityData;
-  }
+  };
 
-  protected getMostFilesOnASprite(entityData: EntityData): number {
-    return Math.max(...entityData.components?.sprites.map(s => s.texture.files.length));
-  }
+  const showComponentSelection = async (): Promise<QuickPickItem | undefined> => {
+    const quickPickOptions: QuickPickOptions<QuickPickItem> = {
+      title: nls.localize('vuengine/editors/addComponent', 'Add Component'),
+      placeholder: nls.localize('vuengine/editors/selectComponentTypeToAdd', 'Select a component type to add...'),
+    };
+    const items: (QuickPickItem | QuickPickSeparator)[] = [];
+    [{
+      key: 'sprites',
+      label: nls.localize('vuengine/entityEditor/sprite', 'Sprite'),
+      allowAdd: true,
+    }, {
+      key: 'animations',
+      label: nls.localize('vuengine/entityEditor/animation', 'Animation'),
+      allowAdd: true,
+    }, {
+      key: 'colliders',
+      label: nls.localize('vuengine/entityEditor/collider', 'Collider'),
+      allowAdd: true,
+    }, {
+      key: 'wireframes',
+      label: nls.localize('vuengine/entityEditor/wireframe', 'Wireframe'),
+      allowAdd: true,
+    }, {
+      key: 'behaviors',
+      label: nls.localize('vuengine/entityEditor/behavior', 'Behavior'),
+      allowAdd: true,
+    }, {
+      key: 'children',
+      label: nls.localize('vuengine/entityEditor/child', 'Child'),
+      allowAdd: true,
+    }, /*
+    {
+        key: 'scripts',
+        label: nls.localize('vuengine/entityEditor/script', 'Script'),
+        allowAdd: true,
+    },*/
+    {
+      key: 'physics',
+      label: nls.localize('vuengine/entityEditor/physics', 'Physical Properties'),
+      allowAdd: !data.physics.enabled,
+    }, {
+      key: 'extraProperties',
+      label: nls.localize('vuengine/entityEditor/extraProperties', 'Extra Properties'),
+      allowAdd: !data.extraProperties.enabled,
+    }]
+      .sort((a, b) => a.label.localeCompare(b.label))
+      .map(t => {
+        if (t.allowAdd) {
+          items.push({
+            id: t.key,
+            label: t.label,
+          });
+        }
+      });
 
-  async componentDidMount(): Promise<void> {
-    await this.restorePreviewState();
-  }
+    return services.quickPickService.show(
+      items,
+      quickPickOptions
+    );
+  };
 
-  render(): React.JSX.Element {
-    const { data } = this.props;
+  const addComponent = async (): Promise<void> => {
+    const componentToAdd = await showComponentSelection();
+    if (componentToAdd && componentToAdd.id) {
+      doAddComponent(componentToAdd.id);
+    }
+  };
 
-    const mostFilesOnASprite = this.getMostFilesOnASprite(data);
-    const isMultiFileAnimation = mostFilesOnASprite > 1;
+  const doAddComponent = async (t: string): Promise<void> => {
+    switch (t) {
+      case 'animations':
+        return addComponentByType(t, nls.localize('vuengine/entityEditor/animation', 'Animation'));
+      case 'behaviors':
+        return addComponentByType(t, nls.localize('vuengine/entityEditor/animation', 'Animation'));
+      case 'children':
+        return addPositionedEntity();
+      case 'colliders':
+        return addComponentByType(t, nls.localize('vuengine/entityEditor/colliders', 'Collider'));
+      case 'extraProperties':
+        return enableExtraProperties();
+      case 'physics':
+        return enablePhysics();
+      case 'scripts':
+        return addComponentByType(t, nls.localize('vuengine/entityEditor/scripts', 'Script'));
+      case 'sprites':
+        return addComponentByType(t, nls.localize('vuengine/entityEditor/sprites', 'Sprite'));
+      case 'wireframes':
+        return addComponentByType(t, nls.localize('vuengine/entityEditor/wireframes', 'Wireframes'));
+    }
+  };
 
-    return (
-      <div
-        className="entityEditor">
-        <EntityEditorContext.Provider
-          value={{
-            state: this.state,
-            setState: this.updateState.bind(this),
-            data,
-            setData: this.setData.bind(this),
-          }}
-        >
-          <EntityEditorContext.Consumer>
-            {context =>
-              this.state.currentComponent?.startsWith('scripts-')
-                ? <Script
-                  index={parseInt(this.state.currentComponent?.split('-')[1] ?? '0')}
-                />
-                : <Preview />
-            }
-          </EntityEditorContext.Consumer>
+  const addComponentByType = async (componentKey: ComponentKey, name: string): Promise<void> => {
+    const updatedComponentKeyData = data.components && data.components[componentKey] ? [...data.components[componentKey]] : [];
+    const type = services.vesProjectService.getProjectDataType('Entity');
+    if (!type) {
+      return;
+    }
+    const schema = await window.electronVesCore.dereferenceJsonSchema(type.schema);
+    if (!schema?.properties?.components?.properties || !schema?.properties?.components?.properties[componentKey]) {
+      return;
+    }
+    const newComponentData = services.vesProjectService.generateDataFromJsonSchema(schema?.properties?.components?.properties[componentKey].items);
+    if (!newComponentData) {
+      return;
+    }
+
+    updatedComponentKeyData.push({
+      ...newComponentData,
+      name,
+    });
+
+    setData({
+      components: {
+        ...data.components,
+        [componentKey]: updatedComponentKeyData,
+      }
+    });
+
+    setCurrentComponent(`${componentKey}-${updatedComponentKeyData.length - 1}`);
+  };
+
+  const addPositionedEntity = async (): Promise<void> => {
+    const entityToAdd = await showEntitySelection(services.quickPickService, services.vesProjectService, [data._id]);
+    if (entityToAdd !== undefined) {
+      const updatedChildren = [...data.components?.children || []];
+      updatedChildren.push({
+        itemId: entityToAdd.id!,
+        onScreenPosition: {
+          x: 0,
+          y: 0,
+          z: 0,
+        },
+        onScreenRotation: {
+          x: 0,
+          y: 0,
+          z: 0,
+        },
+        onScreenScale: {
+          x: 0,
+          y: 0,
+          z: 0,
+        },
+        name: '',
+        children: [],
+        extraInfo: '',
+        loadRegardlessOfPosition: false,
+      });
+
+      setData({
+        components: {
+          ...data.components,
+          children: updatedChildren,
+        }
+      });
+
+      setCurrentComponent(`children-${updatedChildren.length - 1}`);
+    }
+  };
+
+  const enablePhysics = (): void => {
+    setData({
+      physics: {
+        ...data.physics,
+        enabled: true,
+      }
+    });
+
+    setCurrentComponent('physics');
+  };
+
+  const enableExtraProperties = (): void => {
+    setData({
+      extraProperties: {
+        ...data.extraProperties,
+        enabled: true,
+      }
+    });
+
+    setCurrentComponent('extraProperties');
+  };
+
+  const commandListener = (e: CustomEvent): void => {
+    switch (e.detail) {
+      case EntityEditorCommands.ADD_COMPONENT.id:
+        addComponent();
+        break;
+    }
+  };
+
+  useEffect(() => {
+    enableCommands([
+      EntityEditorCommands.ADD_COMPONENT.id,
+    ]);
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
+    return () => {
+      document.removeEventListener(EDITORS_COMMAND_EXECUTED_EVENT_NAME, commandListener);
+    };
+  }, [
+    data.components,
+  ]);
+
+  useEffect(() => {
+    restorePreviewState();
+  }, []);
+
+  useEffect(() => {
+    savePreviewState();
+  }, [
+    previewAnaglyph,
+    previewBackgroundColor,
+    previewShowChildren,
+    previewShowColliders,
+    previewShowSprites,
+    previewShowWireframes,
+    previewZoom,
+  ]);
+
+  return (
+    <div
+      className="entityEditor">
+      <EntityEditorContext.Provider
+        value={{
+          data,
+          setData: setData,
+          currentComponent: currentComponent,
+          setCurrentComponent: setCurrentComponent,
+          currentAnimationStep: currentAnimationStep,
+          setCurrentAnimationStep: setCurrentAnimationStep,
+          previewAnaglyph: previewAnaglyph,
+          setPreviewAnaglyph: setPreviewAnaglyph,
+          previewBackgroundColor: previewBackgroundColor,
+          setPreviewBackgroundColor: setPreviewBackgroundColor,
+          previewPalettes: previewPalettes,
+          setPreviewPalettes: setPreviewPalettes,
+          previewProjectionDepth: previewProjectionDepth,
+          setPreviewProjectionDepth: setPreviewProjectionDepth,
+          previewShowChildren: previewShowChildren,
+          setPreviewShowChildren: setPreviewShowChildren,
+          previewShowColliders: previewShowColliders,
+          setPreviewShowColliders: setPreviewShowColliders,
+          previewShowSprites: previewShowSprites,
+          setPreviewShowSprites: setPreviewShowSprites,
+          previewShowWireframes: previewShowWireframes,
+          setPreviewShowWireframes: setPreviewShowWireframes,
+          previewZoom: previewZoom,
+          setPreviewZoom: setPreviewZoom,
+        }}
+      >
+        <EntityEditorContext.Consumer>
+          {context =>
+            currentComponent?.startsWith('scripts-')
+              ? <Script
+                index={parseInt(currentComponent?.split('-')[1] ?? '0')}
+              />
+              : <Preview
+                hasAnyComponent={hasAnyComponent}
+              />
+          }
+        </EntityEditorContext.Consumer>
+        {hasAnyComponent &&
           <EntityEditorContext.Consumer>
             {context => <HContainer
               alignItems='start'
@@ -336,39 +563,32 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
               }}
             >
               <EditorSidebar
-                show={this.state.leftSidebarOpen}
+                show={leftSidebarOpen}
                 orientation='left'
                 style={{ position: 'relative' }}
               >
                 <HideTreeButton
                   className="theia-button secondary"
                   title={nls.localize('vuengine/entityEditor/showComponentsTree', 'Show Components Tree')}
-                  onClick={() => this.setState({
-                    ...this.state,
-                    leftSidebarOpen: false,
-                  })}
+                  onClick={() => setLeftSidebarOpen(false)}
                 >
                   <i className="codicon codicon-chevron-left" />
                 </HideTreeButton>
                 <EntityMeta />
                 <ComponentTree />
               </EditorSidebar>
-              {!this.state.leftSidebarOpen &&
+              {!leftSidebarOpen &&
                 <ShowTreeButton
-                  show={!this.state.leftSidebarOpen}
+                  show={!leftSidebarOpen}
                   className="theia-button secondary"
                   title={nls.localize('vuengine/entityEditor/showComponentsTree', 'Show Components Tree')}
-                  onClick={() => this.setState({
-                    ...this.state,
-                    leftSidebarOpen: true,
-                  })}
+                  onClick={() => setLeftSidebarOpen(true)}
                 >
                   <i className="codicon codicon-list-tree" />
                 </ShowTreeButton>
               }
-
               <EditorSidebar
-                show={this.state.currentComponent.includes('-') || ['animations', 'colliders', 'extraProperties', 'physics', 'sprites'].includes(this.state.currentComponent)}
+                show={currentComponent.includes('-') || ['animations', 'colliders', 'extraProperties', 'physics', 'sprites'].includes(currentComponent)}
                 orientation='right'
               >
                 <CurrentComponent
@@ -378,8 +598,8 @@ export default class EntityEditor extends React.Component<EntityEditorProps, Ent
             </HContainer>
             }
           </EntityEditorContext.Consumer>
-        </EntityEditorContext.Provider>
-      </div>
-    );
-  }
+        }
+      </EntityEditorContext.Provider>
+    </div>
+  );
 }

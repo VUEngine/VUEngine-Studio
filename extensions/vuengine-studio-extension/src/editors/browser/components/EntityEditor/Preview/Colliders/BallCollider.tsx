@@ -45,14 +45,14 @@ export interface BallColliderProps {
 }
 
 export default function BallCollider(props: BallColliderProps): React.JSX.Element {
-    const { setState } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { setCurrentComponent } = useContext(EntityEditorContext) as EntityEditorContextType;
     const { index, highlighted, collider } = props;
 
     const diameter = collider.pixelSize.x * collider.scale.x;
 
     const handleClick = (e: React.MouseEvent) => {
         e.stopPropagation();
-        setState({ currentComponent: `colliders-${index}` });
+        setCurrentComponent(`colliders-${index}`);
     };
 
     return <BallFace

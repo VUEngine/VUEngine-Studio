@@ -1,8 +1,10 @@
 import { nls } from '@theia/core';
-import React from 'react';
+import React, { useContext } from 'react';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/HContainer';
 import { clamp, roundToNextMultipleOf8 } from '../../Common/Utils';
 import VContainer from '../../Common/VContainer';
+import { INPUT_BLOCKING_COMMANDS } from '../FontEditor';
 import { CHAR_PIXEL_SIZE, MAX_CHAR_SIZE, MIN_CHAR_SIZE, Size, VariableSize } from '../FontEditorTypes';
 
 interface CharSettingsProps {
@@ -14,10 +16,8 @@ interface CharSettingsProps {
 }
 
 export default function CharSettings(props: CharSettingsProps): React.JSX.Element {
-    const {
-        currentCharacter,
-        charHeight, charWidth, variableSize, setCharSize,
-    } = props;
+    const { currentCharacter, charHeight, charWidth, variableSize, setCharSize } = props;
+    const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
 
     /*
     const onChangeVariablePixelWidth = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -178,6 +178,8 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
                     id="#/properties/size/properties/x-input"
                     value={charWidth}
                     onChange={onChangePixelWidth}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />
                 <div style={{ paddingBottom: 3 }}>×</div>
                 <input
@@ -190,6 +192,8 @@ export default function CharSettings(props: CharSettingsProps): React.JSX.Elemen
                     id="#/properties/size/properties/y-input"
                     value={charHeight}
                     onChange={onChangePixelHeight}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />
             </HContainer>
         </VContainer>

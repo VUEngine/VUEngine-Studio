@@ -2,10 +2,10 @@ import { nls } from '@theia/core';
 import { DottingRef, useBrush, useHandlers } from 'dotting';
 import React, { useContext, useEffect } from 'react';
 import { ColorMode, PALETTE_COLORS } from '../../../../core/browser/ves-common-types';
-import { EDITORS_COMMANDS } from '../../ves-editors-commands';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/HContainer';
 import VContainer from '../Common/VContainer';
+import { FontEditorCommands } from '../FontEditor/FontEditorCommands';
 import { SpriteEditorTool } from './SpriteEditorTool';
 
 interface PaletteSelectProps {
@@ -56,34 +56,34 @@ export default function PaletteSelect(props: PaletteSelectProps): React.JSX.Elem
 
     const commandListener = (e: CustomEvent): void => {
         switch (e.detail) {
-            case EDITORS_COMMANDS.FontEditor.commands.swapColors.id:
+            case FontEditorCommands.SWAP_COLORS.id:
                 const secColorIndex = secondaryColorIndex;
                 setSecondaryColorIndex(primaryColorIndex);
                 setPrimaryColorIndex(secColorIndex);
                 break;
-            case EDITORS_COMMANDS.FontEditor.commands.paletteSelectIndex1.id:
+            case FontEditorCommands.PALETTE_SELECT_INDEX_1.id:
                 setPrimaryColorIndex(0);
                 break;
-            case EDITORS_COMMANDS.FontEditor.commands.paletteSelectIndex2.id:
+            case FontEditorCommands.PALETTE_SELECT_INDEX_2.id:
                 setPrimaryColorIndex(1);
                 break;
-            case EDITORS_COMMANDS.FontEditor.commands.paletteSelectIndex3.id:
+            case FontEditorCommands.PALETTE_SELECT_INDEX_3.id:
                 setPrimaryColorIndex(2);
                 break;
-            case EDITORS_COMMANDS.FontEditor.commands.paletteSelectIndex4.id:
+            case FontEditorCommands.PALETTE_SELECT_INDEX_4.id:
                 setPrimaryColorIndex(3);
                 break;
-            case EDITORS_COMMANDS.FontEditor.commands.paletteSelectIndex5.id:
+            case FontEditorCommands.PALETTE_SELECT_INDEX_5.id:
                 if (colorMode === ColorMode.FrameBlend) {
                     setPrimaryColorIndex(4);
                 }
                 break;
-            case EDITORS_COMMANDS.FontEditor.commands.paletteSelectIndex6.id:
+            case FontEditorCommands.PALETTE_SELECT_INDEX_6.id:
                 if (colorMode === ColorMode.FrameBlend) {
                     setPrimaryColorIndex(5);
                 }
                 break;
-            case EDITORS_COMMANDS.FontEditor.commands.paletteSelectIndex7.id:
+            case FontEditorCommands.PALETTE_SELECT_INDEX_7.id:
                 if (colorMode === ColorMode.FrameBlend) {
                     setPrimaryColorIndex(6);
                 }
@@ -126,8 +126,20 @@ export default function PaletteSelect(props: PaletteSelectProps): React.JSX.Elem
                             : nls.localize('vuengine/spriteEditor/4colors', '4 Colors')}
                     </SpriteEditorTool>
                 }
-                {[...Array(paletteColors.length)].map((p, paletteIndex) => (
-                    <SpriteEditorTool
+                {[...Array(paletteColors.length)].map((p, paletteIndex) => {
+                    const commandId = () => {
+                        switch (paletteIndex) {
+                            default:
+                            case 0: return FontEditorCommands.PALETTE_SELECT_INDEX_1.id;
+                            case 1: return FontEditorCommands.PALETTE_SELECT_INDEX_2.id;
+                            case 2: return FontEditorCommands.PALETTE_SELECT_INDEX_3.id;
+                            case 3: return FontEditorCommands.PALETTE_SELECT_INDEX_4.id;
+                            case 4: return FontEditorCommands.PALETTE_SELECT_INDEX_5.id;
+                            case 5: return FontEditorCommands.PALETTE_SELECT_INDEX_6.id;
+                            case 6: return FontEditorCommands.PALETTE_SELECT_INDEX_7.id;
+                        }
+                    };
+                    return (<SpriteEditorTool
                         key={paletteIndex}
                         className={primaryColorIndex === paletteIndex ? 'active' : ''}
                         style={{
@@ -136,8 +148,7 @@ export default function PaletteSelect(props: PaletteSelectProps): React.JSX.Elem
                         }}
                         title={
                             nls.localize('vuengine/spriteEditor/paletteIndex', 'Palette Index') + ' ' + (paletteIndex + 1) +
-                            // @ts-ignore
-                            services.vesCommonService.getKeybindingLabel(EDITORS_COMMANDS.FontEditor.commands[`paletteSelectIndex${paletteIndex + 1}`].id, true)
+                            services.vesCommonService.getKeybindingLabel(commandId(), true)
                         }
                         onClick={() => setPrimaryColorIndex(paletteIndex)}
                         onContextMenu={() => setSecondaryColorIndex(paletteIndex)}
@@ -145,7 +156,8 @@ export default function PaletteSelect(props: PaletteSelectProps): React.JSX.Elem
                         {primaryColorIndex === paletteIndex && 'L'}
                         {secondaryColorIndex === paletteIndex && 'R'}
                     </SpriteEditorTool>
-                ))}
+                    );
+                })}
             </HContainer>
             { /* }
             <RadioSelect

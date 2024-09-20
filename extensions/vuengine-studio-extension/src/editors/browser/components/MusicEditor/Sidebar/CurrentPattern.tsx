@@ -1,8 +1,10 @@
 import { nls } from '@theia/core';
-import React from 'react';
+import React, { useContext } from 'react';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/HContainer';
 import RadioSelect from '../../Common/RadioSelect';
 import VContainer from '../../Common/VContainer';
+import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor';
 import { PATTERN_SIZES, PatternConfig, SongData } from '../MusicEditorTypes';
 
 interface CurrentPatternProps {
@@ -20,6 +22,7 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
         currentPatternId, setCurrentPatternId,
         setPattern,
     } = props;
+    const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
 
     const channel = songData.channels[currentChannelId];
     const pattern = channel.patterns[currentPatternId];
@@ -65,6 +68,8 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                     className='theia-input'
                     value={pattern.name}
                     onChange={e => setPatternName(e.target.value)}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />
             </VContainer>
             <VContainer>

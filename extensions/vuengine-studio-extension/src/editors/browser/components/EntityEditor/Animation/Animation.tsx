@@ -24,7 +24,7 @@ interface AnimationProps {
 }
 
 export default function Animation(props: AnimationProps): React.JSX.Element {
-    const { data, setData, state } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { data, setData, currentAnimationStep } = useContext(EntityEditorContext) as EntityEditorContextType;
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const { index, animation, updateAnimation, totalFrames, isMultiFileAnimation } = props;
     const [maxAnimationFrames, setMaxAnimationFrames] = useState<number>(256);
@@ -163,7 +163,7 @@ export default function Animation(props: AnimationProps): React.JSX.Element {
                         <HContainer key={`frame-${i}`} gap={1}>
                             <input
                                 key={`frame-${i}`}
-                                className={i === state.currentAnimationStep ? 'theia-input current' : 'theia-input'}
+                                className={i === currentAnimationStep ? 'theia-input current' : 'theia-input'}
                                 style={{ width: 40 }}
                                 type='number'
                                 min={0}

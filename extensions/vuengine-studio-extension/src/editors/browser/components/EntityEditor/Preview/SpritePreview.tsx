@@ -17,7 +17,7 @@ interface SpritePreviewProps {
 }
 
 export default function SpritePreview(props: SpritePreviewProps): React.JSX.Element {
-  const { data, state, setState } = useContext(EntityEditorContext) as EntityEditorContextType;
+  const { data, previewProjectionDepth, previewAnaglyph, setCurrentComponent } = useContext(EntityEditorContext) as EntityEditorContextType;
   const { setIsGenerating, services } = useContext(EditorsContext) as EditorsContextType;
   const {
     animate,
@@ -96,7 +96,7 @@ export default function SpritePreview(props: SpritePreviewProps): React.JSX.Elem
     }
     if (sprite.bgmapMode !== BgmapMode.Affine && sprite.displacement.parallax !== 0) {
       // compensate for scaling due to perspective
-      t.push(`scale(${1 + (sprite.displacement.parallax / state.preview.projectionDepth)})`);
+      t.push(`scale(${1 + (sprite.displacement.parallax / previewProjectionDepth)})`);
     }
 
     return (t.join(' '));
@@ -130,7 +130,7 @@ export default function SpritePreview(props: SpritePreviewProps): React.JSX.Elem
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setState({ currentComponent: `sprites-${index}` });
+    setCurrentComponent(`sprites-${index}`);
   };
 
   useEffect(() => {
@@ -151,7 +151,7 @@ export default function SpritePreview(props: SpritePreviewProps): React.JSX.Elem
           height={effectiveHeight}
           palette={palette}
           pixelData={currentPixelData}
-          displayMode={state.preview.anaglyph ? DisplayMode.Stereo : DisplayMode.Mono}
+          displayMode={previewAnaglyph ? DisplayMode.Stereo : DisplayMode.Mono}
           parallaxDisplacement={sprite.displacement.parallax}
           repeatX={sprite.texture?.repeat?.x}
           repeatY={sprite.texture?.repeat?.y}
@@ -189,7 +189,7 @@ export default function SpritePreview(props: SpritePreviewProps): React.JSX.Elem
                 height={effectiveHeight}
                 palette={palette}
                 pixelData={currentPixelData}
-                displayMode={state.preview.anaglyph ? DisplayMode.Stereo : DisplayMode.Mono}
+                displayMode={previewAnaglyph ? DisplayMode.Stereo : DisplayMode.Mono}
                 parallaxDisplacement={sprite.displacement.parallax}
                 width={effectiveWidth}
                 colorMode={sprite.colorMode}

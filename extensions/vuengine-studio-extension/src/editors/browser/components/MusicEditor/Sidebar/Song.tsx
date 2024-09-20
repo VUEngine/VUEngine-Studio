@@ -1,9 +1,11 @@
-import React from 'react';
+import { nls } from '@theia/core';
+import React, { useContext } from 'react';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/HContainer';
 import RadioSelect from '../../Common/RadioSelect';
 import VContainer from '../../Common/VContainer';
+import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor';
 import { MAX_SPEED, MIN_SPEED, PATTERN_SIZES, SongData, VOLUME_STEPS } from '../MusicEditorTypes';
-import { nls } from '@theia/core';
 
 interface SongProps {
     songData: SongData
@@ -12,6 +14,7 @@ interface SongProps {
 
 export default function Song(props: SongProps): React.JSX.Element {
     const { songData, setSongData } = props;
+    const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
 
     const setName = (n: string): void => {
         setSongData({ ...songData, name: n });
@@ -49,6 +52,8 @@ export default function Song(props: SongProps): React.JSX.Element {
                 className='theia-input'
                 value={songData.name}
                 onChange={e => setName(e.target.value)}
+                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
             />
         </VContainer>
 

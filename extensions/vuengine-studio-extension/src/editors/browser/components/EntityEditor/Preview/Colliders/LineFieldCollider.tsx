@@ -54,7 +54,7 @@ export interface LineFieldColiderProps {
 }
 
 export default function LineFieldCollider(props: LineFieldColiderProps): React.JSX.Element {
-    const { setState } = useContext(EntityEditorContext) as EntityEditorContextType;
+    const { setCurrentComponent } = useContext(EntityEditorContext) as EntityEditorContextType;
     const { index, highlighted, collider } = props;
 
     let a = AxisNumeric.X;
@@ -72,7 +72,7 @@ export default function LineFieldCollider(props: LineFieldColiderProps): React.J
 
     const handleClick = (e: React.MouseEvent) => {
         e.stopPropagation();
-        setState({ currentComponent: `colliders-${index}` });
+        setCurrentComponent(`colliders-${index}`);
     };
 
     return <LineFieldFace

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import { ColorMode } from '../../../../core/browser/ves-common-types';
 import { ConversionResult, ImageCompressionType, ImageProcessingSettings } from '../../../../images/browser/ves-images-types';
 import { DataSection } from '../Common/CommonTypes';
@@ -28,11 +28,41 @@ import { ScriptType, ScriptedActionData } from './Scripts/ScriptTypes';
 // @ts-ignore
 export const EntityEditorContext = React.createContext<EntityEditorContextType>({});
 
+export interface LocalStorageEntityEditorState {
+    previewAnaglyph: boolean
+    previewBackgroundColor: number
+    previewShowChildren: boolean
+    previewShowColliders: boolean
+    previewShowSprites: boolean
+    previewShowWireframes: boolean
+    previewZoom: number
+}
+
 export interface EntityEditorContextType {
-    state: EntityEditorState
-    setState: (state: Partial<EntityEditorState>) => void
     data: EntityData
     setData: (partialData: Partial<EntityData>, options?: EntityEditorSaveDataOptions) => Promise<void>
+    currentComponent: string
+    setCurrentComponent: Dispatch<SetStateAction<string>>
+    currentAnimationStep: number
+    setCurrentAnimationStep: Dispatch<SetStateAction<number>>
+    previewAnaglyph: boolean
+    setPreviewAnaglyph: Dispatch<SetStateAction<boolean>>
+    previewBackgroundColor: number
+    setPreviewBackgroundColor: Dispatch<SetStateAction<number>>
+    previewPalettes: string[]
+    setPreviewPalettes: Dispatch<SetStateAction<string[]>>
+    previewProjectionDepth: number
+    setPreviewProjectionDepth: Dispatch<SetStateAction<number>>
+    previewShowChildren: boolean
+    setPreviewShowChildren: Dispatch<SetStateAction<boolean>>
+    previewShowColliders: boolean
+    setPreviewShowColliders: Dispatch<SetStateAction<boolean>>
+    previewShowSprites: boolean
+    setPreviewShowSprites: Dispatch<SetStateAction<boolean>>
+    previewShowWireframes: boolean
+    setPreviewShowWireframes: Dispatch<SetStateAction<boolean>>
+    previewZoom: number
+    setPreviewZoom: Dispatch<SetStateAction<number>>
 }
 
 export const EntityEditorLayoutStorageName = 'ves-editors-entityEditor-layout';
@@ -225,23 +255,4 @@ export interface EntityData {
         type: SpriteType
         useZDisplacementInProjection: boolean
     }
-}
-
-export interface EntityEditorPreviewState {
-    backgroundColor: number
-    anaglyph: boolean
-    children: boolean
-    colliders: boolean
-    wireframes: boolean
-    palettes: string[]
-    sprites: boolean
-    zoom: number
-    projectionDepth: number
-}
-
-export interface EntityEditorState {
-    currentComponent: string,
-    currentAnimationStep: number
-    leftSidebarOpen: boolean,
-    preview: EntityEditorPreviewState
 }
