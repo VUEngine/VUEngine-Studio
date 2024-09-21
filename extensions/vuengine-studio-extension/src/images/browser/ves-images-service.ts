@@ -341,7 +341,6 @@ export class VesImagesService {
   imageDataToPixelData(tilesData: string[], mapData: ConversionResultMapData, compression: ImageCompressionType): number[][] {
     const pixelData: number[][] = [];
 
-    console.log('tilesData', tilesData);
     if (compression !== ImageCompressionType.NONE) {
       tilesData = decompressTiles(tilesData, compression);
     }

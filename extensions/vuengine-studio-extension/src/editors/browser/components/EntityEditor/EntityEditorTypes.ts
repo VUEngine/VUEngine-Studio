@@ -41,6 +41,7 @@ export interface LocalStorageEntityEditorState {
 export interface EntityEditorContextType {
     data: EntityData
     setData: (partialData: Partial<EntityData>, options?: EntityEditorSaveDataOptions) => Promise<void>
+    removeComponent: (key: ComponentKey | 'extraProperties' | 'physics', index: number) => void
     currentComponent: string
     setCurrentComponent: Dispatch<SetStateAction<string>>
     currentAnimationStep: number

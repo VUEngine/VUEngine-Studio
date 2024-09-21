@@ -54,7 +54,7 @@ export interface EditorCommand {
     id: string
     label: string
     category: string
-    keybinding?: string
+    keybinding?: string | string[]
 }
 
 export interface EditorCommands {

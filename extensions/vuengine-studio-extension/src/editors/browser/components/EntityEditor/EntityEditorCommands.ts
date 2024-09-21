@@ -1,10 +1,29 @@
 import { nls } from '@theia/core';
+import { EditorCommands } from '../../ves-editors-types';
 
-export const EntityEditorCommands = {
+export const EntityEditorCommands: EditorCommands = {
     ADD_COMPONENT: {
         id: 'editors.entityEditor.addComponent',
         label: nls.localize('vuengine/editors/commands/entityEditor/addComponent', 'Add Component'),
         category: nls.localize('vuengine/editors/commands/entityEditor/category', 'Entity Editor'),
+    },
+    CENTER_CURRENT_COMPONENT: {
+        id: 'editors.entityEditor.centerCurrentComponent',
+        label: nls.localize('vuengine/editors/commands/entityEditor/centerCurrentComponent', 'Center Current Component'),
+        category: nls.localize('vuengine/editors/commands/entityEditor/category', 'Entity Editor'),
+        keybinding: 'space',
+    },
+    DELETE_CURRENT_COMPONENT: {
+        id: 'editors.entityEditor.deleteCurrentComponent',
+        label: nls.localize('vuengine/editors/commands/entityEditor/deleteCurrentComponent', 'Delete Current Component'),
+        category: nls.localize('vuengine/editors/commands/entityEditor/category', 'Entity Editor'),
+        keybinding: ['backspace', 'delete'],
+    },
+    DESELECT_CURRENT_COMPONENT: {
+        id: 'editors.entityEditor.deselectCurrentComponent',
+        label: nls.localize('vuengine/editors/commands/entityEditor/deselectCurrentComponent', 'Deselect Current Component'),
+        category: nls.localize('vuengine/editors/commands/entityEditor/category', 'Entity Editor'),
+        keybinding: 'esc',
     },
     MOVE_COMPONENT_UP: {
         id: 'editors.entityEditor.moveComponentUp',

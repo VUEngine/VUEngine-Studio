@@ -24,6 +24,7 @@ import {
 } from './EntityEditorTypes';
 import Preview from './Preview/Preview';
 import Script from './Scripts/Script';
+import { ConfirmDialog } from '@theia/core/lib/browser';
 
 interface EditorSidebarProps {
   show: boolean
@@ -87,6 +88,9 @@ const getMostFilesOnASprite = (entityData: EntityData): number =>
   Math.max(...entityData.components?.sprites.map(s => s.texture.files.length));
 
 export const INPUT_BLOCKING_COMMANDS = [
+  EntityEditorCommands.CENTER_CURRENT_COMPONENT.id,
+  EntityEditorCommands.DELETE_CURRENT_COMPONENT.id,
+  EntityEditorCommands.DESELECT_CURRENT_COMPONENT.id,
   EntityEditorCommands.MOVE_COMPONENT_DOWN.id,
   EntityEditorCommands.MOVE_COMPONENT_LEFT.id,
   EntityEditorCommands.MOVE_COMPONENT_RIGHT.id,
@@ -481,6 +485,61 @@ export default function EntityEditor(props: EntityEditorProps): React.JSX.Elemen
     setCurrentComponent('extraProperties');
   };
 
+  const removeComponent = async (key: ComponentKey | 'extraProperties' | 'physics', index: number) => {
+    const dialog = new ConfirmDialog({
+      title: nls.localize('vuengine/entityEditor/removeComponent', 'Remove Component'),
+      msg: nls.localize('vuengine/entityEditor/areYouSureYouWantToRemoveComponent', 'Are you sure you want to remove this component?'),
+    });
+    const confirmed = await dialog.open();
+    if (confirmed) {
+      setCurrentComponent('');
+      switch (key) {
+        case 'animations':
+        case 'behaviors':
+        case 'children':
+        case 'colliders':
+        case 'scripts':
+        case 'sprites':
+        case 'wireframes':
+          return doRemoveComponent(key, index);
+        case 'physics':
+          return disablePhysics();
+        case 'extraProperties':
+          return disableExtraProperties();
+      }
+    }
+  };
+
+  const doRemoveComponent = async (key: ComponentKey, index: number): Promise<void> => {
+    setData({
+      components: {
+        ...data.components,
+        [key]: [
+          ...data.components[key as ComponentKey].slice(0, index),
+          ...data.components[key as ComponentKey].slice(index + 1)
+        ],
+      }
+    });
+  };
+
+  const disablePhysics = async (): Promise<void> => {
+    setData({
+      physics: {
+        ...data.physics,
+        enabled: false,
+      }
+    });
+  };
+
+  const disableExtraProperties = async (): Promise<void> => {
+    setData({
+      extraProperties: {
+        ...data.extraProperties,
+        enabled: false,
+      }
+    });
+  };
+
   const updateComponent = (key: ComponentKey, index: number, partialData: Partial<ComponentData>, options?: EntityEditorSaveDataOptions): void => {
     const componentsArray = [...data.components[key]];
     componentsArray[index] = {
@@ -496,19 +555,26 @@ export default function EntityEditor(props: EntityEditorProps): React.JSX.Elemen
     }, options);
   };
 
-  const setCurrentComponentDisplacement = (axis: 'x' | 'y' | 'z' | 'parallax', direction: 'up' | 'down'): void => {
+  const setCurrentComponentDisplacement = (displacements: { axis: 'x' | 'y' | 'z' | 'parallax', offset: number }[]): void => {
     const [type, indexString] = currentComponent.split('-');
     const index = parseInt(indexString || '-1');
     if (index > -1 && HIDEABLE_COMPONENT_TYPES.includes(type)) {
       // @ts-ignore
       const currentDisplacement = data.components[type as ComponentKey][index].displacement;
       if (currentDisplacement) {
-        updateComponent(type as ComponentKey, index, {
-          displacement: {
-            ...currentDisplacement,
-            [axis]: direction === 'down' ? currentDisplacement[axis] - 1 : currentDisplacement[axis] + 1,
-          }
-        });
+        const displacement = {
+          ...currentDisplacement,
+        };
+        if (displacements.length) {
+          displacements.map(d => displacement[d.axis] = currentDisplacement[d.axis] + d.offset);
+        } else {
+          displacement.x = 0;
+          displacement.y = 0;
+          displacement.z = 0;
+          displacement.parallax = 0;
+        }
+
+        updateComponent(type as ComponentKey, index, { displacement });
       }
     }
   };
@@ -518,29 +584,39 @@ export default function EntityEditor(props: EntityEditorProps): React.JSX.Elemen
       case EntityEditorCommands.ADD_COMPONENT.id:
         addComponent();
         break;
+      case EntityEditorCommands.CENTER_CURRENT_COMPONENT.id:
+        setCurrentComponentDisplacement([]);
+        break;
+      case EntityEditorCommands.DELETE_CURRENT_COMPONENT.id:
+        const [type, indexString] = currentComponent.split('-');
+        removeComponent(type as ComponentKey | 'extraProperties' | 'physics', parseInt(indexString));
+        break;
+      case EntityEditorCommands.DESELECT_CURRENT_COMPONENT.id:
+        setCurrentComponent('');
+        break;
       case EntityEditorCommands.MOVE_COMPONENT_DOWN.id:
-        setCurrentComponentDisplacement('y', 'up');
+        setCurrentComponentDisplacement([{ axis: 'y', offset: 1 }]);
         break;
       case EntityEditorCommands.MOVE_COMPONENT_UP.id:
-        setCurrentComponentDisplacement('y', 'down');
+        setCurrentComponentDisplacement([{ axis: 'y', offset: -1 }]);
         break;
       case EntityEditorCommands.MOVE_COMPONENT_LEFT.id:
-        setCurrentComponentDisplacement('x', 'down');
+        setCurrentComponentDisplacement([{ axis: 'x', offset: -1 }]);
         break;
       case EntityEditorCommands.MOVE_COMPONENT_RIGHT.id:
-        setCurrentComponentDisplacement('x', 'up');
+        setCurrentComponentDisplacement([{ axis: 'x', offset: 1 }]);
         break;
       case EntityEditorCommands.INCREASE_COMPONENT_Z_DISPLACEMENT.id:
-        setCurrentComponentDisplacement('z', 'up');
+        setCurrentComponentDisplacement([{ axis: 'z', offset: 1 }]);
         break;
       case EntityEditorCommands.DECREASE_COMPONENT_Z_DISPLACEMENT.id:
-        setCurrentComponentDisplacement('z', 'down');
+        setCurrentComponentDisplacement([{ axis: 'z', offset: -1 }]);
         break;
       case EntityEditorCommands.INCREASE_COMPONENT_PARALLAX.id:
-        setCurrentComponentDisplacement('parallax', 'up');
+        setCurrentComponentDisplacement([{ axis: 'parallax', offset: 1 }]);
         break;
       case EntityEditorCommands.DECREASE_COMPONENT_PARALLAX.id:
-        setCurrentComponentDisplacement('parallax', 'down');
+        setCurrentComponentDisplacement([{ axis: 'parallax', offset: -1 }]);
         break;
     }
   };
@@ -586,6 +662,7 @@ export default function EntityEditor(props: EntityEditorProps): React.JSX.Elemen
         value={{
           data,
           setData: setData,
+          removeComponent: removeComponent,
           currentComponent: currentComponent,
           setCurrentComponent: setCurrentComponent,
           currentAnimationStep: currentAnimationStep,
@@ -619,6 +696,7 @@ export default function EntityEditor(props: EntityEditorProps): React.JSX.Elemen
               : <Preview
                 hasAnyComponent={hasAnyComponent}
                 updateComponent={updateComponent}
+                setCurrentComponentDisplacement={setCurrentComponentDisplacement}
               />
           }
         </EntityEditorContext.Consumer>

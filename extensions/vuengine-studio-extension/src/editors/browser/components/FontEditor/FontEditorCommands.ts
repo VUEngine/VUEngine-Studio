@@ -1,6 +1,7 @@
 import { nls } from '@theia/core';
+import { EditorCommands } from '../../ves-editors-types';
 
-export const FontEditorCommands = {
+export const FontEditorCommands: EditorCommands = {
     PALETTE_SELECT_INDEX_1: {
         id: 'editors.fontEditor.paletteSelectIndex1',
         label: nls.localize('vuengine/editors/commands/fontEditor/paletteSelectIndex1', 'Select Palette Index 1'),

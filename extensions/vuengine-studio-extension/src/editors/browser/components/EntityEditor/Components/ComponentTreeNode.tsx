@@ -18,7 +18,6 @@ import {
     UserFocus,
 } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
-import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
 import { NodeRendererProps } from 'react-arborist';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
@@ -38,6 +37,7 @@ import { ScriptType } from '../Scripts/ScriptTypes';
 export default function ComponentTreeNode(props: NodeRendererProps<any>): React.JSX.Element {
     const { node, style, dragHandle } = props;
     const {
+        removeComponent,
         setCurrentComponent,
         previewShowChildren, setPreviewShowChildren,
         previewShowColliders, setPreviewShowColliders,
@@ -165,61 +165,6 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
         }
 
         setCurrentComponent(node.id);
-    };
-
-    const handleRemove = async () => {
-        const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/entityEditor/removeComponent', 'Remove Component'),
-            msg: nls.localize('vuengine/entityEditor/areYouSureYouWantToRemoveComponent', 'Are you sure you want to remove this component?'),
-        });
-        const confirmed = await dialog.open();
-        if (confirmed) {
-            setCurrentComponent('');
-            switch (type) {
-                case 'animations':
-                case 'behaviors':
-                case 'children':
-                case 'colliders':
-                case 'scripts':
-                case 'sprites':
-                case 'wireframes':
-                    return removeComponent();
-                case 'physics':
-                    return disablePhysics();
-                case 'extraProperties':
-                    return disableExtraProperties();
-            }
-        }
-    };
-
-    const disablePhysics = async (): Promise<void> => {
-        setData({
-            physics: {
-                ...data.physics,
-                enabled: false,
-            }
-        });
-    };
-
-    const disableExtraProperties = async (): Promise<void> => {
-        setData({
-            extraProperties: {
-                ...data.extraProperties,
-                enabled: false,
-            }
-        });
-    };
-
-    const removeComponent = async (): Promise<void> => {
-        setData({
-            components: {
-                ...data.components,
-                [type]: [
-                    ...data.components[type as ComponentKey].slice(0, index),
-                    ...data.components[type as ComponentKey].slice(index + 1)
-                ],
-            }
-        });
     };
 
     const cloneComponent = async (): Promise<void> => {
@@ -356,7 +301,7 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                 {node.isLeaf && node.id !== 'addComponent' &&
                     <i
                         className='codicon codicon-trash'
-                        onClick={handleRemove}
+                        onClick={() => removeComponent(type, index)}
                         title={nls.localize('vuengine/entityEditor/removeComponent', 'Remove Component')}
                     />
                 }

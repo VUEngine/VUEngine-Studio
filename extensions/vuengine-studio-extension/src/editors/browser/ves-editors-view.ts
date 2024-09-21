@@ -206,11 +206,16 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         EditorsCommands.map(editor => {
             Object.values(editor).map(command => {
                 if (command.keybinding) {
-                    registry.registerKeybindings({
-                        command: command.id,
-                        when: 'graphicalEditorFocus',
-                        keybinding: command.keybinding,
-                    });
+                    if (!Array.isArray(command.keybinding)) {
+                        command.keybinding = [command.keybinding];
+                    }
+                    command.keybinding.map(keybinding =>
+                        registry.registerKeybindings({
+                            command: command.id,
+                            when: 'graphicalEditorFocus',
+                            keybinding,
+                        })
+                    );
                 }
             });
         });

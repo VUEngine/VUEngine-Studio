@@ -27,10 +27,11 @@ import PreviewWireframe from './Wireframes/PreviewWireframe';
 interface PreviewProps {
   hasAnyComponent: boolean
   updateComponent: (key: ComponentKey, index: number, partialData: Partial<ComponentData>, options?: EntityEditorSaveDataOptions) => void,
+  setCurrentComponentDisplacement: (displacements: { axis: 'x' | 'y' | 'z' | 'parallax', offset: number }[]) => void
 }
 
 export default function Preview(props: PreviewProps): React.JSX.Element {
-  const { hasAnyComponent } = props;
+  const { hasAnyComponent, setCurrentComponentDisplacement } = props;
   const {
     currentComponent, setCurrentComponent,
     currentAnimationStep, setCurrentAnimationStep,
@@ -48,6 +49,11 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
   const [offsetX, setOffsetX] = useState<number>(0);
   const [offsetY, setOffsetY] = useState<number>(0);
   let timer: NodeJS.Timeout | undefined;
+
+  const classNames = ['preview-container'];
+  if (isDragging) {
+    classNames.push('dragging');
+  }
 
   const engineConfig = services.vesProjectService.getProjectDataItemById(ProjectContributor.Project, 'EngineConfig');
   // @ts-ignore
@@ -96,13 +102,23 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
       }
 
       setPreviewZoom(zoom);
+    } else {
+      setOffsetX(offsetX - e.deltaX / previewZoom);
+      setOffsetY(offsetY - e.deltaY / previewZoom);
     }
   };
 
   const onMouseMove = (e: React.MouseEvent): void => {
     if (isDragging) {
-      setOffsetX(offsetX + e.movementX / previewZoom);
-      setOffsetY(offsetY + e.movementY / previewZoom);
+      if (currentComponent) {
+        setCurrentComponentDisplacement([
+          { axis: 'x', offset: Math.round(e.movementX / previewZoom) },
+          { axis: 'y', offset: Math.round(e.movementY / previewZoom) },
+        ]);
+      } else {
+        setOffsetX(offsetX + e.movementX / previewZoom);
+        setOffsetY(offsetY + e.movementY / previewZoom);
+      }
     }
   };
 
@@ -127,7 +143,7 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
 
   return hasPreviewableComponents
     ? <div
-      className={`preview-container draggable${isDragging ? ' dragging' : ''}`}
+      className={classNames.join(' ')}
       onClick={() => setCurrentComponent('')}
       onMouseDown={() => setIsDragging(true)}
       onMouseUp={() => setIsDragging(false)}
@@ -171,6 +187,7 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
             index={i}
             sprite={sprite}
             animate={animate}
+            dragging={isDragging}
             frames={data.animations?.totalFrames || 1}
             currentAnimationFrame={actualCurrentFrame}
             highlighted={currentComponent === `sprites-${i}`}

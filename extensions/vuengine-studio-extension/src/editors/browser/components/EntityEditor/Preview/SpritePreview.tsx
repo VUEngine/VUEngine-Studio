@@ -13,6 +13,7 @@ import {
 
 interface SpritePreviewProps {
   animate: boolean
+  dragging: boolean
   sprite: SpriteData
   frames: number
   currentAnimationFrame: number
@@ -22,17 +23,9 @@ interface SpritePreviewProps {
 }
 
 export default function SpritePreview(props: SpritePreviewProps): React.JSX.Element {
+  const { animate, dragging, frames, currentAnimationFrame, highlighted, index, palette, sprite } = props;
   const { data, previewProjectionDepth, previewAnaglyph, setCurrentComponent } = useContext(EntityEditorContext) as EntityEditorContextType;
   const { setIsGenerating, services } = useContext(EditorsContext) as EditorsContextType;
-  const {
-    animate,
-    frames,
-    currentAnimationFrame,
-    highlighted,
-    index,
-    palette,
-    sprite,
-  } = props;
   const [imageData, setImageData] = useState<number[][][][]>([]);
   const [height, setHeight] = useState<number>(0);
   const [width, setWidth] = useState<number>(0);
@@ -173,7 +166,7 @@ export default function SpritePreview(props: SpritePreviewProps): React.JSX.Elem
         style={{
           borderRadius: highlighted ? .25 : 0,
           boxSizing: 'border-box',
-          cursor: 'pointer',
+          cursor: dragging ? 'grabbing' : 'pointer',
           height: effectiveHeight / (isMultiFileAnimation ? 1 : frames ?? 1),
           opacity: sprite.transparency !== Transparency.None ? .5 : 1,
           outline: highlighted ? '1px solid #0f0' : undefined,

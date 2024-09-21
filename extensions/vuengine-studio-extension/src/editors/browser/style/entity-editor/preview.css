@@ -10,10 +10,6 @@
     --ves-preview-size: 10000px;
 }
 
-.jsonforms-container .preview-container.draggable {
-    cursor: grab;
-}
-
 .jsonforms-container .preview-container.dragging {
     cursor: grabbing;
 }
