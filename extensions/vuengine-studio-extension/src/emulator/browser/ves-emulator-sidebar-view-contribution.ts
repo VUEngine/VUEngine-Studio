@@ -2,9 +2,8 @@ import { Command, CommandRegistry, CommandService, MenuModelRegistry } from '@th
 import { AbstractViewContribution, CommonCommands, CommonMenus, FrontendApplication, KeybindingRegistry } from '@theia/core/lib/browser';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { inject, injectable } from '@theia/core/shared/inversify';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
-import { VesEmulatorSidebarWidget } from './ves-emulator-sidebar-widget';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
+import { VesEmulatorSidebarWidget } from './ves-emulator-sidebar-widget';
 
 export namespace VesEmulatorSidebarCommands {
     export const WIDGET_TOGGLE: Command = Command.toLocalizedCommand(
@@ -41,8 +40,6 @@ export namespace VesEmulatorSidebarCommands {
 export class VesEmulatorSidebarViewContribution extends AbstractViewContribution<VesEmulatorSidebarWidget> implements TabBarToolbarContribution {
     @inject(CommandService)
     protected readonly commandService: CommandService;
-    @inject(WorkspaceService)
-    protected readonly workspaceService: WorkspaceService;
 
     constructor() {
         super({
@@ -56,80 +53,65 @@ export class VesEmulatorSidebarViewContribution extends AbstractViewContribution
     }
 
     async initializeLayout(app: FrontendApplication): Promise<void> {
-        await this.workspaceService.ready;
-        if (this.workspaceService.opened) {
-            await this.openView({ activate: false, reveal: false });
-        }
+        await this.openView({ activate: false, reveal: false });
     }
 
     async registerCommands(commandRegistry: CommandRegistry): Promise<void> {
         super.registerCommands(commandRegistry);
 
-        await this.workspaceService.ready;
-        if (this.workspaceService.opened) {
-            commandRegistry.registerCommand(VesEmulatorSidebarCommands.WIDGET_TOGGLE, {
-                execute: () => this.toggleView()
-            });
+        commandRegistry.registerCommand(VesEmulatorSidebarCommands.WIDGET_TOGGLE, {
+            execute: () => this.toggleView()
+        });
 
-            commandRegistry.registerCommand(VesEmulatorSidebarCommands.WIDGET_EXPAND, {
-                isEnabled: () => true,
-                isVisible: widget => widget !== undefined &&
-                    widget.id === VesEmulatorSidebarWidget.ID,
-                execute: async widget => widget !== undefined &&
-                    widget.id === VesEmulatorSidebarWidget.ID &&
-                    await this.openView({ activate: true, reveal: true }) &&
-                    this.commandService.executeCommand(CommonCommands.TOGGLE_MAXIMIZED.id)
-            });
+        commandRegistry.registerCommand(VesEmulatorSidebarCommands.WIDGET_EXPAND, {
+            isEnabled: () => true,
+            isVisible: widget => widget !== undefined &&
+                widget.id === VesEmulatorSidebarWidget.ID,
+            execute: async widget => widget !== undefined &&
+                widget.id === VesEmulatorSidebarWidget.ID &&
+                await this.openView({ activate: true, reveal: true }) &&
+                this.commandService.executeCommand(CommonCommands.TOGGLE_MAXIMIZED.id)
+        });
 
-            commandRegistry.registerCommand(VesEmulatorSidebarCommands.WIDGET_HELP, {
-                isEnabled: () => true,
-                isVisible: widget => widget !== undefined &&
-                    widget.id !== undefined &&
-                    widget.id === VesEmulatorSidebarWidget.ID,
-                execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'user-guide/emulator', false),
-            });
-        }
+        commandRegistry.registerCommand(VesEmulatorSidebarCommands.WIDGET_HELP, {
+            isEnabled: () => true,
+            isVisible: widget => widget !== undefined &&
+                widget.id !== undefined &&
+                widget.id === VesEmulatorSidebarWidget.ID,
+            execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'user-guide/emulator', false),
+        });
     }
 
     async registerToolbarItems(toolbar: TabBarToolbarRegistry): Promise<void> {
-        await this.workspaceService.ready;
-        if (this.workspaceService.opened) {
-            toolbar.registerItem({
-                id: VesEmulatorSidebarCommands.WIDGET_EXPAND.id,
-                command: VesEmulatorSidebarCommands.WIDGET_EXPAND.id,
-                tooltip: VesEmulatorSidebarCommands.WIDGET_EXPAND.label,
-                priority: 1,
-            });
-            toolbar.registerItem({
-                id: VesEmulatorSidebarCommands.WIDGET_HELP.id,
-                command: VesEmulatorSidebarCommands.WIDGET_HELP.id,
-                tooltip: VesEmulatorSidebarCommands.WIDGET_HELP.label,
-                priority: 2,
-            });
-        }
+        toolbar.registerItem({
+            id: VesEmulatorSidebarCommands.WIDGET_EXPAND.id,
+            command: VesEmulatorSidebarCommands.WIDGET_EXPAND.id,
+            tooltip: VesEmulatorSidebarCommands.WIDGET_EXPAND.label,
+            priority: 1,
+        });
+        toolbar.registerItem({
+            id: VesEmulatorSidebarCommands.WIDGET_HELP.id,
+            command: VesEmulatorSidebarCommands.WIDGET_HELP.id,
+            tooltip: VesEmulatorSidebarCommands.WIDGET_HELP.label,
+            priority: 2,
+        });
     }
 
     async registerMenus(menus: MenuModelRegistry): Promise<void> {
         super.registerMenus(menus);
 
-        await this.workspaceService.ready;
-        if (this.workspaceService.opened) {
-            menus.registerMenuAction(CommonMenus.VIEW_VIEWS, {
-                commandId: VesEmulatorSidebarCommands.WIDGET_TOGGLE.id,
-                label: this.viewLabel
-            });
-        }
+        menus.registerMenuAction(CommonMenus.VIEW_VIEWS, {
+            commandId: VesEmulatorSidebarCommands.WIDGET_TOGGLE.id,
+            label: this.viewLabel
+        });
     }
 
     async registerKeybindings(keybindings: KeybindingRegistry): Promise<void> {
         super.registerKeybindings(keybindings);
 
-        await this.workspaceService.ready;
-        if (this.workspaceService.opened) {
-            keybindings.registerKeybinding({
-                command: VesEmulatorSidebarCommands.WIDGET_TOGGLE.id,
-                keybinding: 'ctrlcmd+shift+e'
-            });
-        }
+        keybindings.registerKeybinding({
+            command: VesEmulatorSidebarCommands.WIDGET_TOGGLE.id,
+            keybinding: 'ctrlcmd+shift+e'
+        });
     }
 }

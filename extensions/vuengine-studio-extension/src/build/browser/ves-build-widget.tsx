@@ -4,6 +4,7 @@ import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
 import { EditorManager } from '@theia/editor/lib/browser';
+import NoWorkspaceOpened from '../../core/browser/components/NoWorkspaceOpened';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
@@ -14,11 +15,11 @@ import { VesExportService } from '../../export/browser/ves-export-service';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
 import { VesFlashCartService } from '../../flash-cart/browser/ves-flash-cart-service';
 import { VesPluginsPreferenceIds } from '../../plugins/browser/ves-plugins-preferences';
+import NoBuildInCollaboration from './components/NoBuildInCollaboration';
 import { VesBuildCommands } from './ves-build-commands';
 import { VesBuildPreferenceIds, VesBuildPreferenceSchema } from './ves-build-preferences';
 import { VesBuildService } from './ves-build-service';
 import { BuildLogLine, BuildLogLineFileLink, BuildLogLineType, BuildResult } from './ves-build-types';
-import NoBuildInCollaboration from './components/NoBuildInCollaboration';
 
 interface VesBuildWidgetState {
   filterErrors: boolean
@@ -187,232 +188,237 @@ export class VesBuildWidget extends ReactWidget {
   protected render(): React.ReactNode {
     const doUseWsl = this.state.useWsl && this.vesCommonService.isWslInstalled;
 
-    return this.workspaceService.isCollaboration()
-      ? (
-        <NoBuildInCollaboration />
-      )
-      : (
-        <>
-          <div className='buildActions'>
-            {this.vesBuildService.buildStatus.active &&
-              this.vesBuildService.buildStatus.progress > -1 && (
-                <div className='buildPanel'>
-                  <div className={`vesProgressBar ${this.vesBuildService.getNumberOfWarnings() && 'withWarnings'}`}>
-                    <div style={{ width: this.vesBuildService.buildStatus.progress + '%' }}></div>
-                    <span>
-                      {this.vesBuildService.buildStatus.progress}%
-                    </span>
-                  </div>
-                </div>
-              )}
-            {!this.vesBuildService.buildStatus.active && (
-              <>
-                <div className='buildButtons'>
-                  <button
-                    className='theia-button large build'
-                    disabled={!this.workspaceService.opened}
-                    onClick={this.build}
-                  >
-                    {nls.localize('vuengine/build/build', 'Build')}
-                  </button>
-                </div>
-              </>
-            )}
-            <div className='buildButtons'>
-              <button
-                className='theia-button secondary codicon codicon-circle-slash'
-                disabled={!this.vesBuildService.buildStatus.active}
-                onClick={this.abort}
-                title={nls.localize('vuengine/build/abortBuild', 'Abort build')}
-              />
-              <button
-                className={`theia-button secondary ${this.vesEmulatorService.isQueued ? 'queued' : 'codicon codicon-run'}`}
-                onClick={this.run}
-                title={this.vesEmulatorService.isQueued
-                  ? `${nls.localize('vuengine/emulator/runQueued', 'Run Queued')}...`
-                  : `${nls.localize('vuengine/emulator/commands/run', 'Run on Emulator')}${this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.RUN.id, true)}`}
-              >
-                {this.vesEmulatorService.isQueued && <i className='fa fa-hourglass-half'></i>}
-              </button>
-              <button
-                className={`theia-button secondary ${this.vesFlashCartService.isQueued ? 'queued' : 'codicon codicon-empty-window codicon-rotate-180'}`}
-                onClick={this.flash}
-                title={this.vesFlashCartService.isQueued
-                  ? `${nls.localize('vuengine/flashCarts/flashingQueued', 'Flashing Queued')}...`
-                  : `${nls.localize('vuengine/flashCarts/commands/flash', 'Flash to Flash Cart')}${this.vesCommonService.getKeybindingLabel(VesFlashCartCommands.FLASH.id, true)}`}
-              >
-                {this.vesFlashCartService.isQueued && <i className='fa fa-hourglass-half'></i>}
-              </button>
-              <button
-                className={`theia-button secondary ${this.vesExportService.isQueued ? 'queued' : 'codicon codicon-desktop-download'}`}
-                onClick={this.export}
-                title={this.vesExportService.isQueued
-                  ? `${nls.localize('vuengine/export/exportQueued', 'Export Queued')}...`
-                  : `${nls.localize('vuengine/export/commands/export', 'Export ROM...')}${this.vesCommonService.getKeybindingLabel(VesExportCommands.EXPORT.id, true)}`}
-              >
-                {this.vesExportService.isQueued && <i className='fa fa-hourglass-half'></i>}
-              </button>
-              <button
-                className={`theia-button secondary ${!this.vesBuildService.isCleaning && 'codicon codicon-trash'}`}
-                onClick={this.clean}
-                title={this.vesBuildService.isCleaning
-                  ? `${nls.localize('vuengine/build/cleaning', 'Cleaning')}...`
-                  : `${nls.localize('vuengine/build/commands/clean', 'Clean Build Folder')}${this.vesCommonService.getKeybindingLabel(VesBuildCommands.CLEAN.id, true)}`}
-              >
-                {this.vesBuildService.isCleaning && <i className='fa fa-cog fa-spin'></i>}
-              </button>
-            </div>
-            {isWindows && !doUseWsl && (
-              <div>
-                <i className='fa fa-exclamation-triangle'></i> {nls.localize('vuengine/build/pleaseInstallWsl',
-                  'Please consider installing WSL to massively improve build times.')} (
-                <a href="#" onClick={this.openWslDocs}>{nls.localize('vuengine/documentation/documentation',
-                  'Documentation')}</a>
-                )
-              </div>
-            )}
-          </div>
-          {this.vesBuildService.buildStatus.log.length > 0 && (
-            <div className='buildMeta'>
-              <div className='buildStatus'>
-                {this.vesBuildService.buildStatus.active ? (
-                  <div className='buildStatusActivity'>
-                    <i className='fa fa-cog fa-spin'></i>{' '}
-                    {this.vesBuildService.buildStatus.step}...
-                  </div>
-                ) : this.vesBuildService.buildStatus.step === BuildResult.done ? (
-                  <div className={this.vesBuildService.getNumberOfWarnings() > 0 ? 'warning' : 'success'}>
-                    {this.vesBuildService.getNumberOfWarnings() > 0
-                      ? <><i className='fa fa-exclamation-triangle'></i> {nls.localize('vuengine/build/buildSuccessfulWithWarnings', 'Build successful (with warnings)')}</>
-                      : <><i className='fa fa-check'></i> {nls.localize('vuengine/build/buildSuccessful', 'Build successful')}</>}
-                    {this.vesBuildService.getNumberOfWarnings() > 0 && ''}
-                  </div>
-                ) : (
-                  <div className='error'>
-                    <i className='fa fa-times-circle-o'></i> Build{' '}
-                    {this.vesBuildService.buildStatus.step}
+    return !this.workspaceService.opened
+      ? <NoWorkspaceOpened
+        commandService={this.commandService}
+      />
+      : this.workspaceService.isCollaboration()
+        ? (
+          <NoBuildInCollaboration />
+        )
+        : (
+          <div className='buildWidget'>
+            <div className='buildActions'>
+              {this.vesBuildService.buildStatus.active &&
+                this.vesBuildService.buildStatus.progress > -1 && (
+                  <div className='buildPanel'>
+                    <div className={`vesProgressBar ${this.vesBuildService.getNumberOfWarnings() && 'withWarnings'}`}>
+                      <div style={{ width: this.vesBuildService.buildStatus.progress + '%' }}></div>
+                      <span>
+                        {this.vesBuildService.buildStatus.progress}%
+                      </span>
+                    </div>
                   </div>
                 )}
-                <div className='buildStatusMeta'>
-                  <span><i className='fa fa-clock-o'></i> {this.getDuration()}</span>
-                  <span><i className='fa fa-wrench'></i> {this.vesBuildService.buildStatus.buildMode}</span>
-                  {this.vesBuildService.buildStatus.active && this.vesBuildService.buildStatus.processId > 0 &&
-                    <span><i className='fa fa-terminal'></i> PID {this.vesBuildService.buildStatus.processId}</span>}
-                  {doUseWsl &&
-                    <span><i className='fa fa-linux'></i> WSL</span>}
-                  {!this.vesBuildService.buildStatus.active && this.vesBuildService.romSize > 0 &&
-                    <span><i className='fa fa-microchip'></i> {this.vesBuildService.bytesToMbit(this.vesBuildService.romSize)} MBit</span>}
+              {!this.vesBuildService.buildStatus.active && (
+                <>
+                  <div className='buildButtons'>
+                    <button
+                      className='theia-button large build'
+                      disabled={!this.workspaceService.opened}
+                      onClick={this.build}
+                    >
+                      {nls.localize('vuengine/build/build', 'Build')}
+                    </button>
+                  </div>
+                </>
+              )}
+              <div className='buildButtons'>
+                <button
+                  className='theia-button secondary codicon codicon-circle-slash'
+                  disabled={!this.vesBuildService.buildStatus.active}
+                  onClick={this.abort}
+                  title={nls.localize('vuengine/build/abortBuild', 'Abort build')}
+                />
+                <button
+                  className={`theia-button secondary ${this.vesEmulatorService.isQueued ? 'queued' : 'codicon codicon-run'}`}
+                  onClick={this.run}
+                  title={this.vesEmulatorService.isQueued
+                    ? `${nls.localize('vuengine/emulator/runQueued', 'Run Queued')}...`
+                    : `${nls.localize('vuengine/emulator/commands/run', 'Run on Emulator')}${this.vesCommonService.getKeybindingLabel(VesEmulatorCommands.RUN.id, true)}`}
+                >
+                  {this.vesEmulatorService.isQueued && <i className='fa fa-hourglass-half'></i>}
+                </button>
+                <button
+                  className={`theia-button secondary ${this.vesFlashCartService.isQueued ? 'queued' : 'codicon codicon-empty-window codicon-rotate-180'}`}
+                  onClick={this.flash}
+                  title={this.vesFlashCartService.isQueued
+                    ? `${nls.localize('vuengine/flashCarts/flashingQueued', 'Flashing Queued')}...`
+                    : `${nls.localize('vuengine/flashCarts/commands/flash', 'Flash to Flash Cart')}${this.vesCommonService.getKeybindingLabel(VesFlashCartCommands.FLASH.id, true)
+                    }`}
+                >
+                  {this.vesFlashCartService.isQueued && <i className='fa fa-hourglass-half'></i>}
+                </button>
+                <button
+                  className={`theia-button secondary ${this.vesExportService.isQueued ? 'queued' : 'codicon codicon-desktop-download'}`}
+                  onClick={this.export}
+                  title={this.vesExportService.isQueued
+                    ? `${nls.localize('vuengine/export/exportQueued', 'Export Queued')}...`
+                    : `${nls.localize('vuengine/export/commands/export', 'Export ROM...')}${this.vesCommonService.getKeybindingLabel(VesExportCommands.EXPORT.id, true)}`}
+                >
+                  {this.vesExportService.isQueued && <i className='fa fa-hourglass-half'></i>}
+                </button>
+                <button
+                  className={`theia-button secondary ${!this.vesBuildService.isCleaning && 'codicon codicon-trash'}`}
+                  onClick={this.clean}
+                  title={this.vesBuildService.isCleaning
+                    ? `${nls.localize('vuengine/build/cleaning', 'Cleaning')}...`
+                    : `${nls.localize('vuengine/build/commands/clean', 'Clean Build Folder')}${this.vesCommonService.getKeybindingLabel(VesBuildCommands.CLEAN.id, true)}`}
+                >
+                  {this.vesBuildService.isCleaning && <i className='fa fa-cog fa-spin'></i>}
+                </button>
+              </div>
+              {isWindows && !doUseWsl && (
+                <div>
+                  <i className='fa fa-exclamation-triangle'></i> {nls.localize('vuengine/build/pleaseInstallWsl',
+                    'Please consider installing WSL to massively improve build times.')} (
+                  <a href="#" onClick={this.openWslDocs}>{nls.localize('vuengine/documentation/documentation',
+                    'Documentation')}</a>
+                  )
+                </div>
+              )}
+            </div>
+            {this.vesBuildService.buildStatus.log.length > 0 && (
+              <div className='buildMeta'>
+                <div className='buildStatus'>
+                  {this.vesBuildService.buildStatus.active ? (
+                    <div className='buildStatusActivity'>
+                      <i className='fa fa-cog fa-spin'></i>{' '}
+                      {this.vesBuildService.buildStatus.step}...
+                    </div>
+                  ) : this.vesBuildService.buildStatus.step === BuildResult.done ? (
+                    <div className={this.vesBuildService.getNumberOfWarnings() > 0 ? 'warning' : 'success'}>
+                      {this.vesBuildService.getNumberOfWarnings() > 0
+                        ? <><i className='fa fa-exclamation-triangle'></i> {nls.localize('vuengine/build/buildSuccessfulWithWarnings', 'Build successful (with warnings)')}</>
+                        : <><i className='fa fa-check'></i> {nls.localize('vuengine/build/buildSuccessful', 'Build successful')}</>}
+                      {this.vesBuildService.getNumberOfWarnings() > 0 && ''}
+                    </div>
+                  ) : (
+                    <div className='error'>
+                      <i className='fa fa-times-circle-o'></i> Build{' '}
+                      {this.vesBuildService.buildStatus.step}
+                    </div>
+                  )}
+                  <div className='buildStatusMeta'>
+                    <span><i className='fa fa-clock-o'></i> {this.getDuration()}</span>
+                    <span><i className='fa fa-wrench'></i> {this.vesBuildService.buildStatus.buildMode}</span>
+                    {this.vesBuildService.buildStatus.active && this.vesBuildService.buildStatus.processId > 0 &&
+                      <span><i className='fa fa-terminal'></i> PID {this.vesBuildService.buildStatus.processId}</span>}
+                    {doUseWsl &&
+                      <span><i className='fa fa-linux'></i> WSL</span>}
+                    {!this.vesBuildService.buildStatus.active && this.vesBuildService.romSize > 0 &&
+                      <span><i className='fa fa-microchip'></i> {this.vesBuildService.bytesToMbit(this.vesBuildService.romSize)} MBit</span>}
+                  </div>
+                </div>
+              </div>
+            )}
+            <div className='buildLogWrapper'>
+              <div className={`buildLog${this.state.lineWrap ? ' linewrap' : ''}`}>
+                <div>
+                  {this.vesBuildService.buildStatus.log
+                    .filter(l => (
+                      (
+                        (!this.state.filterErrors && !this.state.filterWarnings) ||
+                        (this.state.filterErrors && l.type === BuildLogLineType.Error) ||
+                        (this.state.filterWarnings && l.type === BuildLogLineType.Warning)
+                      ) &&
+                      (this.state.searchTerm === '' || l.text.toLowerCase().includes(this.state.searchTerm.toLowerCase()))
+                    ))
+                    .map(
+                      // TODO: context menu with option to copy (full) error message
+                      (line: BuildLogLine, index: number) => (
+                        line.text !== ''
+                          ? <div
+                            className={`buildLogLine ${line.type}${line.file ? ' hasFileLink' : ''}`}
+                            key={`buildLogLine${index}`}
+                            onClick={e => this.openFile(e, line.file)}
+                            title={`${new Date(line.timestamp).toTimeString().substring(0, 8)} ${line.text}`}
+                          >
+                            <span className='icon'>
+                              {line.type === BuildLogLineType.Error
+                                ? <i className='codicon codicon-error' />
+                                : line.type === BuildLogLineType.Warning
+                                  ? <i className='codicon codicon-warning' />
+                                  : line.type === BuildLogLineType.Headline
+                                    ? <i className='codicon codicon-info' />
+                                    : line.type === BuildLogLineType.Done
+                                      ? <i className='codicon codicon-pass-filled' />
+                                      : <></>}
+                            </span>
+                            <span className='text'>
+                              {line.optimizedText ? line.optimizedText : line.text}
+                            </span>
+                          </div>
+                          : <div className='buildLogLine' key={`buildLogLine${index}`}></div>
+                      )
+                    )}
+                  <div ref={this.buildLogLastElementRef} key={'buildLogLineLast'}></div>
                 </div>
               </div>
             </div>
-          )}
-          <div className='buildLogWrapper'>
-            <div className={`buildLog${this.state.lineWrap ? ' linewrap' : ''}`}>
-              <div>
-                {this.vesBuildService.buildStatus.log
-                  .filter(l => (
-                    (
-                      (!this.state.filterErrors && !this.state.filterWarnings) ||
-                      (this.state.filterErrors && l.type === BuildLogLineType.Error) ||
-                      (this.state.filterWarnings && l.type === BuildLogLineType.Warning)
-                    ) &&
-                    (this.state.searchTerm === '' || l.text.toLowerCase().includes(this.state.searchTerm.toLowerCase()))
-                  ))
-                  .map(
-                    // TODO: context menu with option to copy (full) error message
-                    (line: BuildLogLine, index: number) => (
-                      line.text !== ''
-                        ? <div
-                          className={`buildLogLine ${line.type}${line.file ? ' hasFileLink' : ''}`}
-                          key={`buildLogLine${index}`}
-                          onClick={e => this.openFile(e, line.file)}
-                          title={`${new Date(line.timestamp).toTimeString().substring(0, 8)} ${line.text}`}
-                        >
-                          <span className='icon'>
-                            {line.type === BuildLogLineType.Error
-                              ? <i className='codicon codicon-error' />
-                              : line.type === BuildLogLineType.Warning
-                                ? <i className='codicon codicon-warning' />
-                                : line.type === BuildLogLineType.Headline
-                                  ? <i className='codicon codicon-info' />
-                                  : line.type === BuildLogLineType.Done
-                                    ? <i className='codicon codicon-pass-filled' />
-                                    : <></>}
-                          </span>
-                          <span className='text'>
-                            {line.optimizedText ? line.optimizedText : line.text}
-                          </span>
-                        </div>
-                        : <div className='buildLogLine' key={`buildLogLine${index}`}></div>
-                    )
-                  )}
-                <div ref={this.buildLogLastElementRef} key={'buildLogLineLast'}></div>
-              </div>
+            <div className='buildLogButtons'>
+              <button
+                className="theia-button secondary"
+                title={nls.localize('vuengine/build/toggleAutomaticScrolling', 'Toggle automatic scrolling')}
+                onClick={() => this.toggleAutoScroll()}
+              >
+                <i className={this.state.autoScroll
+                  ? 'fa fa-fw fa-long-arrow-down'
+                  : 'fa fa-fw fa-minus'
+                }></i>
+              </button>
+              <button
+                className="theia-button secondary"
+                title={nls.localize('vuengine/build/toggleLineWrap', 'Toggle line wrap')}
+                onClick={this.toggleLineWrap}
+              >
+                <i className={this.state.lineWrap
+                  ? 'codicon codicon-word-wrap'
+                  : 'codicon codicon-list-selection'
+                }></i>
+              </button>
+              <button
+                className={
+                  this.state.filterWarnings
+                    ? 'theia-button'
+                    : 'theia-button secondary'
+                }
+                title={nls.localize('vuengine/build/showOnlyWarnings', 'Show only warnings')}
+                onClick={this.toggleFilterWarnings}
+              >
+                <i className='fa fa-exclamation-triangle'></i>{' '}
+                {this.vesBuildService.getNumberOfWarnings()}
+              </button>
+              <button
+                className={
+                  this.state.filterErrors
+                    ? 'theia-button'
+                    : 'theia-button secondary'
+                }
+                title={nls.localize('vuengine/build/showOnlyErrors', 'Show only errors')}
+                onClick={this.toggleFilterErrors}
+              >
+                <i className='fa fa-times-circle-o'></i>{' '}
+                {this.vesBuildService.getNumberOfErrors()}
+              </button>
+              <input
+                className='theia-input full-width'
+                placeholder={nls.localize('vuengine/build/searchLogPlaceholder', 'Search Log...')}
+                value={this.state.searchTerm}
+                onChange={e => this.setSearchTerm(e.target.value)}
+              />
+              <button
+                className='theia-button secondary'
+                title={nls.localize('vuengine/build/clearLog', 'Clear Log')}
+                onClick={() => {
+                  this.vesBuildService.clearLogs();
+                  this.update();
+                }}
+              >
+                <i className='fa fa-trash-o'></i>
+              </button>
             </div>
-          </div>
-          <div className='buildLogButtons'>
-            <button
-              className="theia-button secondary"
-              title={nls.localize('vuengine/build/toggleAutomaticScrolling', 'Toggle automatic scrolling')}
-              onClick={() => this.toggleAutoScroll()}
-            >
-              <i className={this.state.autoScroll
-                ? 'fa fa-fw fa-long-arrow-down'
-                : 'fa fa-fw fa-minus'
-              }></i>
-            </button>
-            <button
-              className="theia-button secondary"
-              title={nls.localize('vuengine/build/toggleLineWrap', 'Toggle line wrap')}
-              onClick={this.toggleLineWrap}
-            >
-              <i className={this.state.lineWrap
-                ? 'codicon codicon-word-wrap'
-                : 'codicon codicon-list-selection'
-              }></i>
-            </button>
-            <button
-              className={
-                this.state.filterWarnings
-                  ? 'theia-button'
-                  : 'theia-button secondary'
-              }
-              title={nls.localize('vuengine/build/showOnlyWarnings', 'Show only warnings')}
-              onClick={this.toggleFilterWarnings}
-            >
-              <i className='fa fa-exclamation-triangle'></i>{' '}
-              {this.vesBuildService.getNumberOfWarnings()}
-            </button>
-            <button
-              className={
-                this.state.filterErrors
-                  ? 'theia-button'
-                  : 'theia-button secondary'
-              }
-              title={nls.localize('vuengine/build/showOnlyErrors', 'Show only errors')}
-              onClick={this.toggleFilterErrors}
-            >
-              <i className='fa fa-times-circle-o'></i>{' '}
-              {this.vesBuildService.getNumberOfErrors()}
-            </button>
-            <input
-              className='theia-input full-width'
-              placeholder={nls.localize('vuengine/build/searchLogPlaceholder', 'Search Log...')}
-              value={this.state.searchTerm}
-              onChange={e => this.setSearchTerm(e.target.value)}
-            />
-            <button
-              className='theia-button secondary'
-              title={nls.localize('vuengine/build/clearLog', 'Clear Log')}
-              onClick={() => {
-                this.vesBuildService.clearLogs();
-                this.update();
-              }}
-            >
-              <i className='fa fa-trash-o'></i>
-            </button>
-          </div>
-          {/* <div className='buildSelector'>
+            {/* <div className='buildSelector'>
           <select className='theia-select' title='Build'>
             <option value='latest'>
               {`✔ – ${new Date(
@@ -421,8 +427,8 @@ export class VesBuildWidget extends ReactWidget {
             </option>
           </select>
         </div> */}
-        </>
-      );
+          </div>
+        );
   }
 
   protected startTimerInterval(): void {

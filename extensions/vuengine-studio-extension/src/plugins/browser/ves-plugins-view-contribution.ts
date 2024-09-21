@@ -5,7 +5,6 @@ import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/li
 import { AbstractViewContribution } from '@theia/core/lib/browser/shell/view-contribution';
 import { CommandRegistry, CommandService } from '@theia/core/lib/common/command';
 import { inject, injectable } from '@theia/core/shared/inversify';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesCoreCommands } from '../../core/browser/ves-core-commands';
 import { VesPluginsCommands } from './ves-plugins-commands';
 import { VesPluginsModel } from './ves-plugins-model';
@@ -24,8 +23,6 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
     protected readonly commandRegistry: CommandRegistry;
     @inject(CommandService)
     protected readonly commandService: CommandService;
-    @inject(WorkspaceService)
-    protected readonly workspaceService: WorkspaceService;
 
     constructor() {
         super({
@@ -39,71 +36,65 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
     }
 
     async initializeLayout(app: FrontendApplication): Promise<void> {
-        await this.workspaceService.ready;
-        if (this.workspaceService.opened) {
-            await this.openView({ activate: false, reveal: false });
-        }
+        await this.openView({ activate: false, reveal: false });
     }
 
     async registerCommands(commandRegistry: CommandRegistry): Promise<void> {
         super.registerCommands(commandRegistry);
 
-        await this.workspaceService.ready;
-        if (this.workspaceService.opened) {
-            commandRegistry.registerCommand(VesPluginsCommands.WIDGET_TOGGLE, {
-                execute: () => this.toggleView()
-            });
+        commandRegistry.registerCommand(VesPluginsCommands.WIDGET_TOGGLE, {
+            execute: () => this.toggleView()
+        });
 
-            commandRegistry.registerCommand(VesPluginsCommands.WIDGET_CLEAR_ALL, {
-                isEnabled: () => !!this.model.search.query,
-                isVisible: widget => widget !== undefined &&
-                    [
-                        `${VesPluginsWidget.ID}:${VesPluginsSourceOptions.SEARCH_RESULT}`,
-                        VesPluginsViewContainer.ID
-                    ].includes(widget.id),
-                execute: () => this.model.search.query = '',
-            });
+        commandRegistry.registerCommand(VesPluginsCommands.WIDGET_CLEAR_ALL, {
+            isEnabled: () => !!this.model.search.query,
+            isVisible: widget => widget !== undefined &&
+                [
+                    `${VesPluginsWidget.ID}:${VesPluginsSourceOptions.SEARCH_RESULT}`,
+                    VesPluginsViewContainer.ID
+                ].includes(widget.id),
+            execute: () => this.model.search.query = '',
+        });
 
-            commandRegistry.registerCommand(VesPluginsCommands.WIDGET_HELP, {
-                isEnabled: () => true,
-                isVisible: widget => widget !== undefined &&
-                    [
-                        `${VesPluginsWidget.ID}:${VesPluginsSourceOptions.SEARCH_RESULT}`,
-                        VesPluginsViewContainer.ID
-                    ].includes(widget.id),
-                execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'user-guide/vuengine-plugins', false),
-            });
+        commandRegistry.registerCommand(VesPluginsCommands.WIDGET_HELP, {
+            isEnabled: () => true,
+            isVisible: widget => widget !== undefined &&
+                [
+                    `${VesPluginsWidget.ID}:${VesPluginsSourceOptions.SEARCH_RESULT}`,
+                    VesPluginsViewContainer.ID
+                ].includes(widget.id),
+            execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'user-guide/vuengine-plugins', false),
+        });
 
-            commandRegistry.registerCommand(VesPluginsCommands.SHOW_TAGS, {
-                execute: () => this.showPluginTags()
-            });
+        commandRegistry.registerCommand(VesPluginsCommands.SHOW_TAGS, {
+            execute: () => this.showPluginTags()
+        });
 
-            commandRegistry.registerCommand(VesPluginsCommands.SHOW_INSTALLED, {
-                execute: () => this.showInstalledPlugins()
-            });
+        commandRegistry.registerCommand(VesPluginsCommands.SHOW_INSTALLED, {
+            execute: () => this.showInstalledPlugins()
+        });
 
-            commandRegistry.registerCommand(VesPluginsCommands.SHOW_RECOMMENDATIONS, {
-                execute: () => this.showRecommendedPlugins()
-            });
+        commandRegistry.registerCommand(VesPluginsCommands.SHOW_RECOMMENDATIONS, {
+            execute: () => this.showRecommendedPlugins()
+        });
 
-            commandRegistry.registerCommand(VesPluginsCommands.SEARCH_BY_TAG, {
-                execute: (tag?: string) => this.showSearchByTag(tag)
-            });
+        commandRegistry.registerCommand(VesPluginsCommands.SEARCH_BY_TAG, {
+            execute: (tag?: string) => this.showSearchByTag(tag)
+        });
 
-            commandRegistry.registerCommand(VesPluginsCommands.SEARCH_BY_AUTHOR, {
-                execute: (author?: string) => this.showSearchByAuthor(author)
-            });
+        commandRegistry.registerCommand(VesPluginsCommands.SEARCH_BY_AUTHOR, {
+            execute: (author?: string) => this.showSearchByAuthor(author)
+        });
 
-            commandRegistry.registerCommand(VesPluginsCommands.WIDGET_SETTINGS, {
-                isEnabled: () => true,
-                isVisible: widget => widget !== undefined &&
-                    [
-                        `${VesPluginsWidget.ID}:${VesPluginsSourceOptions.SEARCH_RESULT}`,
-                        VesPluginsViewContainer.ID
-                    ].includes(widget.id),
-                execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'plugins'),
-            });
-        }
+        commandRegistry.registerCommand(VesPluginsCommands.WIDGET_SETTINGS, {
+            isEnabled: () => true,
+            isVisible: widget => widget !== undefined &&
+                [
+                    `${VesPluginsWidget.ID}:${VesPluginsSourceOptions.SEARCH_RESULT}`,
+                    VesPluginsViewContainer.ID
+                ].includes(widget.id),
+            execute: () => this.commandService.executeCommand(CommonCommands.OPEN_PREFERENCES.id, 'plugins'),
+        });
     }
 
     protected async showPluginTags(): Promise<void> {
@@ -132,50 +123,41 @@ export class VesPluginsViewContribution extends AbstractViewContribution<VesPlug
     }
 
     async registerToolbarItems(toolbar: TabBarToolbarRegistry): Promise<void> {
-        await this.workspaceService.ready;
-        if (this.workspaceService.opened) {
-            toolbar.registerItem({
-                id: VesPluginsCommands.WIDGET_CLEAR_ALL.id,
-                command: VesPluginsCommands.WIDGET_CLEAR_ALL.id,
-                tooltip: VesPluginsCommands.WIDGET_CLEAR_ALL.label,
-                priority: 0,
-            });
-            toolbar.registerItem({
-                id: VesPluginsCommands.WIDGET_HELP.id,
-                command: VesPluginsCommands.WIDGET_HELP.id,
-                tooltip: VesPluginsCommands.WIDGET_HELP.label,
-                priority: 1,
-            });
-            toolbar.registerItem({
-                id: VesPluginsCommands.WIDGET_SETTINGS.id,
-                command: VesPluginsCommands.WIDGET_SETTINGS.id,
-                tooltip: VesPluginsCommands.WIDGET_SETTINGS.label,
-                priority: 2,
-            });
-        }
+        toolbar.registerItem({
+            id: VesPluginsCommands.WIDGET_CLEAR_ALL.id,
+            command: VesPluginsCommands.WIDGET_CLEAR_ALL.id,
+            tooltip: VesPluginsCommands.WIDGET_CLEAR_ALL.label,
+            priority: 0,
+        });
+        toolbar.registerItem({
+            id: VesPluginsCommands.WIDGET_HELP.id,
+            command: VesPluginsCommands.WIDGET_HELP.id,
+            tooltip: VesPluginsCommands.WIDGET_HELP.label,
+            priority: 1,
+        });
+        toolbar.registerItem({
+            id: VesPluginsCommands.WIDGET_SETTINGS.id,
+            command: VesPluginsCommands.WIDGET_SETTINGS.id,
+            tooltip: VesPluginsCommands.WIDGET_SETTINGS.label,
+            priority: 2,
+        });
     }
 
     async registerMenus(menus: MenuModelRegistry): Promise<void> {
         super.registerMenus(menus);
 
-        await this.workspaceService.ready;
-        if (this.workspaceService.opened) {
-            menus.registerMenuAction(CommonMenus.VIEW_VIEWS, {
-                commandId: VesPluginsCommands.WIDGET_TOGGLE.id,
-                label: this.viewLabel
-            });
-        }
+        menus.registerMenuAction(CommonMenus.VIEW_VIEWS, {
+            commandId: VesPluginsCommands.WIDGET_TOGGLE.id,
+            label: this.viewLabel
+        });
     }
 
     async registerKeybindings(keybindings: KeybindingRegistry): Promise<void> {
         super.registerKeybindings(keybindings);
 
-        await this.workspaceService.ready;
-        if (this.workspaceService.opened) {
-            keybindings.registerKeybinding({
-                command: VesPluginsCommands.WIDGET_TOGGLE.id,
-                keybinding: 'ctrlcmd+shift+l'
-            });
-        }
+        keybindings.registerKeybinding({
+            command: VesPluginsCommands.WIDGET_TOGGLE.id,
+            keybinding: 'ctrlcmd+shift+l'
+        });
     }
 }

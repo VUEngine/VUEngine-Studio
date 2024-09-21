@@ -8,6 +8,7 @@ import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesBuildService } from '../../build/browser/ves-build-service';
+import NoWorkspaceOpened from '../../core/browser/components/NoWorkspaceOpened';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import FlashCarts from './components/FlashCarts';
 import { VesFlashCartService } from './ves-flash-cart-service';
@@ -100,15 +101,19 @@ export class VesFlashCartWidget extends ReactWidget {
   }
 
   protected render(): React.ReactNode {
-    return <FlashCarts
-      commandService={this.commandService}
-      fileService={this.fileService}
-      fileDialogService={this.fileDialogService}
-      preferenceService={this.preferenceService}
-      vesBuildService={this.vesBuildService}
-      vesCommonService={this.vesCommonService}
-      vesFlashCartService={this.vesFlashCartService}
-      workspaceService={this.workspaceService}
-    />;
+    return !this.workspaceService.opened
+      ? <NoWorkspaceOpened
+        commandService={this.commandService}
+      />
+      : <FlashCarts
+        commandService={this.commandService}
+        fileService={this.fileService}
+        fileDialogService={this.fileDialogService}
+        preferenceService={this.preferenceService}
+        vesBuildService={this.vesBuildService}
+        vesCommonService={this.vesCommonService}
+        vesFlashCartService={this.vesFlashCartService}
+        workspaceService={this.workspaceService}
+      />;
   }
 }
