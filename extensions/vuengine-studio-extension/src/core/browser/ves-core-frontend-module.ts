@@ -32,8 +32,6 @@ import { PluginApiFrontendContribution } from '@theia/plugin-ext/lib/main/browse
 import { PluginFrontendViewContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-view-contribution';
 import { PreferenceLayoutProvider } from '@theia/preferences/lib/browser/util/preference-layout';
 import { PreferenceStringInputRenderer } from '@theia/preferences/lib/browser/views/components/preference-string-input';
-import { ScmContribution } from '@theia/scm/lib/browser/scm-contribution';
-import { SearchInWorkspaceFrontendContribution } from '@theia/search-in-workspace/lib/browser/search-in-workspace-frontend-contribution';
 import { TestViewContribution } from '@theia/test/lib/browser/view/test-view-contribution';
 import { ToolbarDefaultsFactory } from '@theia/toolbar/lib/browser/toolbar-defaults';
 import { TypeHierarchyContribution } from '@theia/typehierarchy/lib/browser/typehierarchy-contribution';
@@ -61,8 +59,6 @@ import { VesPreferenceLayoutProvider } from './ves-preference-layout';
 import { VesPreferenceStringInputRenderer } from './ves-preference-string-input-renderer';
 import './ves-preferences-monaco-contribution';
 import { VesQuickOpenWorkspace } from './ves-quick-open-workspace';
-import { VesScmContribution } from './ves-scm-contribution';
-import { VesSearchInWorkspaceFrontendContribution } from './ves-search-in-workspace-frontend-contribution';
 import { VesThemeRegistry } from './ves-theme-registry';
 import { VesThemeService } from './ves-theme-service';
 import { VesToolbarDefaultsOverride } from './ves-toolbar-defaults-override';
@@ -176,8 +172,4 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     // initially open file explorer for workspaces
     rebind(FileNavigatorContribution).to(VesFileNavigatorContribution).inSingletonScope();
-
-    // initially hide search and git widgets if no workspace is opened
-    rebind(SearchInWorkspaceFrontendContribution).to(VesSearchInWorkspaceFrontendContribution).inSingletonScope();
-    rebind(ScmContribution).to(VesScmContribution).inSingletonScope();
 });

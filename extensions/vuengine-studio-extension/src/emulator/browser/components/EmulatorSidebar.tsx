@@ -16,12 +16,11 @@ interface EmulatorSidebarProps {
 }
 
 export default function EmulatorSidebar(props: EmulatorSidebarProps): React.JSX.Element {
-    const { isQueued } = props;
-    const run = () => props.commandService.executeCommand(VesEmulatorCommands.RUN.id);
+    const { isQueued, commandService, fileDialogService, fileService, preferenceService } = props;
+    const run = () => commandService.executeCommand(VesEmulatorCommands.RUN.id);
 
     return <>
         <div className='runActions'>
-
             {isQueued ? (
                 <>
                     <div className='queuedInfo'>
@@ -47,14 +46,14 @@ export default function EmulatorSidebar(props: EmulatorSidebarProps): React.JSX.
             )}
 
             <EmulatorAutoQueuePreference
-                preferenceService={props.preferenceService}
+                preferenceService={preferenceService}
             />
         </div>
         <EmulatorConfigs
-            commandService={props.commandService}
-            fileDialogService={props.fileDialogService}
-            fileService={props.fileService}
-            preferenceService={props.preferenceService}
+            commandService={commandService}
+            fileDialogService={fileDialogService}
+            fileService={fileService}
+            preferenceService={preferenceService}
         />
     </>;
 }

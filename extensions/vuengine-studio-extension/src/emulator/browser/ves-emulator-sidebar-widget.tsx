@@ -6,6 +6,8 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import * as React from '@theia/core/shared/react';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
+import NoWorkspaceOpened from '../../core/browser/components/NoWorkspaceOpened';
 import EmulatorSidebar from './components/EmulatorSidebar';
 import { VesEmulatorService } from './ves-emulator-service';
 
@@ -21,6 +23,8 @@ export class VesEmulatorSidebarWidget extends ReactWidget {
   private readonly preferenceService: PreferenceService;
   @inject(VesEmulatorService)
   private readonly vesEmulatorService: VesEmulatorService;
+  @inject(WorkspaceService)
+  private readonly workspaceService: WorkspaceService;
 
   static readonly ID = 'vesEmulatorSidebarWidget';
   static readonly LABEL = nls.localize('vuengine/emulator/emulator', 'Emulator');
@@ -56,12 +60,16 @@ export class VesEmulatorSidebarWidget extends ReactWidget {
 
   protected render(): React.ReactNode {
 
-    return <EmulatorSidebar
-      isQueued={this.vesEmulatorService.isQueued}
-      commandService={this.commandService}
-      fileService={this.fileService}
-      fileDialogService={this.fileDialogService}
-      preferenceService={this.preferenceService}
-    />;
+    return !this.workspaceService.opened
+      ? <NoWorkspaceOpened
+        commandService={this.commandService}
+      />
+      : <EmulatorSidebar
+        isQueued={this.vesEmulatorService.isQueued}
+        commandService={this.commandService}
+        fileService={this.fileService}
+        fileDialogService={this.fileDialogService}
+        preferenceService={this.preferenceService}
+      />;
   }
 }
