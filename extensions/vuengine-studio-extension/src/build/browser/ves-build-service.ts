@@ -414,6 +414,10 @@ export class VesBuildService {
     });
 
     this.onDidChangeBuildMode(async buildMode => {
+      if (!this.workspaceService.opened) {
+        return;
+      }
+
       // delete library files to force rebuild
       await this.deleteLibraryFiles();
 
@@ -678,7 +682,10 @@ export class VesBuildService {
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
 
-    const buildPathUri = workspaceRootUri.resolve('build');
+    const buildPathUri = workspaceRootUri?.resolve('build');
+    if (!buildPathUri) {
+      return new URI();
+    }
 
     return buildMode
       ? buildPathUri
@@ -930,7 +937,7 @@ export class VesBuildService {
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
 
-    const taskInfo = await this.taskService.runWorkspaceTask(this.taskService.startUserAction(), workspaceRootUri.toString(), taskName);
+    const taskInfo = await this.taskService.runWorkspaceTask(this.taskService.startUserAction(), workspaceRootUri?.toString(), taskName);
 
     if (!taskInfo) {
       return this.pushBuildLogLine({
@@ -1126,6 +1133,9 @@ export class VesBuildService {
   async getDefaultRomUri(): Promise<URI> {
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
+    if (!workspaceRootUri) {
+      return new URI();
+    }
 
     return workspaceRootUri
       ? workspaceRootUri
@@ -1137,6 +1147,9 @@ export class VesBuildService {
   async getBuildModeRomUri(buildMode: BuildMode): Promise<URI> {
     await this.workspaceService.ready;
     const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
+    if (!workspaceRootUri) {
+      return new URI();
+    }
 
     return workspaceRootUri
       .resolve('build')

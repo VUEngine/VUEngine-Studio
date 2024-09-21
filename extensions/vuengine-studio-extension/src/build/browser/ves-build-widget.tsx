@@ -97,6 +97,11 @@ export class VesBuildWidget extends ReactWidget {
   }
 
   protected bindEvents(): void {
+    this.workspaceService.onDidChangeRoots((isCollaboration: boolean) => {
+      if (isCollaboration) {
+        this.update();
+      }
+    });
     this.preferenceService.onPreferenceChanged(({ preferenceName, newValue }) => {
       switch (preferenceName) {
         case VesBuildPreferenceIds.BUILD_MODE:

@@ -3,7 +3,8 @@ import { ReactWidget } from '@theia/core/lib/browser/widgets/react-widget';
 import { WindowTitleService } from '@theia/core/lib/browser/window/window-title-service';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import * as React from '@theia/core/shared/react';
-import { WorkspaceCommands, WorkspaceService } from '@theia/workspace/lib/browser';
+import { WorkspaceCommands } from '@theia/workspace/lib/browser';
+import { VesWorkspaceService } from '../../../core/browser/ves-workspace-service';
 
 @injectable()
 export class VesTitlebarApplicationTitleWidget extends ReactWidget {
@@ -11,8 +12,8 @@ export class VesTitlebarApplicationTitleWidget extends ReactWidget {
   protected readonly commandService: CommandService;
   @inject(WindowTitleService)
   private readonly windowTitleService: WindowTitleService;
-  @inject(WorkspaceService)
-  private readonly workspaceService: WorkspaceService;
+  @inject(VesWorkspaceService)
+  private readonly workspaceService: VesWorkspaceService;
 
   static readonly ID = 'ves-titlebar-application-title';
   static readonly LABEL = 'Titlebar Action Buttons';
@@ -47,6 +48,9 @@ export class VesTitlebarApplicationTitleWidget extends ReactWidget {
   protected render(): React.ReactNode {
     return <div onDoubleClick={this.maximizeWindow}>
       <div className="applicationTitle" onClick={this.openRecentWorkspace}>
+        {this.workspaceService.isCollaboration() && <>
+          <i className="codicon codicon-broadcast"></i>
+        </>}
         {this.applicationTitle}
       </div>
     </div>;

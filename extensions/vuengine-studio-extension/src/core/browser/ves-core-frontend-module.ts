@@ -16,7 +16,6 @@ import {
 } from '@theia/core/lib/browser/menu/browser-menu-plugin';
 import { PreferenceConfigurations } from '@theia/core/lib/browser/preferences/preference-configurations';
 import { ThemeService } from '@theia/core/lib/browser/theming';
-import { WindowTitleService } from '@theia/core/lib/browser/window/window-title-service';
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { MenuContribution } from '@theia/core/lib/common/menu';
 import { ContainerModule, interfaces } from '@theia/core/shared/inversify';
@@ -63,7 +62,6 @@ import { VesThemeRegistry } from './ves-theme-registry';
 import { VesThemeService } from './ves-theme-service';
 import { VesToolbarDefaultsOverride } from './ves-toolbar-defaults-override';
 import { VesVSXExtensionsContribution } from './ves-vsx-extensions-contribution';
-import { VesWindowTitleService } from './ves-window-title-service';
 import { VesWorkspaceService } from './ves-workspace-service';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
@@ -152,9 +150,6 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // themes
     rebind(ThemeService).to(VesThemeService).inSingletonScope();
     rebind(MonacoThemeRegistry).to(VesThemeRegistry).inSingletonScope();
-
-    // window title service
-    rebind(WindowTitleService).to(VesWindowTitleService).inSingletonScope();
 
     // toolbar default config
     rebind(ToolbarDefaultsFactory).toConstantValue(VesToolbarDefaultsOverride);

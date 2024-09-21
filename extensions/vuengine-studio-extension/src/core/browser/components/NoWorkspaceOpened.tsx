@@ -10,7 +10,7 @@ export default function NoWorkspaceOpened(props: NoWorkspaceOpenedProps): React.
     const { commandService } = props;
     const openWorkspace = () => commandService.executeCommand(WorkspaceCommands.OPEN_WORKSPACE.id);
 
-    return <div className="theia-TreeContainer empty">
+    return <div className="theia-TreeContainer empty" style={{ boxSizing: 'border-box' }}>
         <div className="theia-WelcomeView">
             <div>
                 <span>

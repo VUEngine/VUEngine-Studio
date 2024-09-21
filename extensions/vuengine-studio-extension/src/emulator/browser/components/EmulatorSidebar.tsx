@@ -19,7 +19,7 @@ export default function EmulatorSidebar(props: EmulatorSidebarProps): React.JSX.
     const { isQueued, commandService, fileDialogService, fileService, preferenceService } = props;
     const run = () => commandService.executeCommand(VesEmulatorCommands.RUN.id);
 
-    return <>
+    return <div className='emulatorSidebarWidget'>
         <div className='runActions'>
             {isQueued ? (
                 <>
@@ -55,5 +55,5 @@ export default function EmulatorSidebar(props: EmulatorSidebarProps): React.JSX.
             fileService={fileService}
             preferenceService={preferenceService}
         />
-    </>;
+    </div>;
 }

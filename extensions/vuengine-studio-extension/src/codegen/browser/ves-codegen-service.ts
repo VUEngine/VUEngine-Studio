@@ -5,12 +5,12 @@ import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { OutputChannelManager, OutputChannelSeverity } from '@theia/output/lib/browser/output-channel';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
 import * as iconv from 'iconv-lite';
 import * as jsonLogic from 'json-logic-js';
 import * as nunjucks from 'nunjucks';
 import { VesAudioConverterService } from '../../audio-converter/browser/ves-audio-converter-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
+import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
 import { compressTiles } from '../../images/browser/ves-images-compressor';
 import { VesImagesService } from '../../images/browser/ves-images-service';
 import { AnimationConfig, ImageCompressionType, ImageConfigWithName, TilesCompressionResult } from '../../images/browser/ves-images-types';
@@ -51,8 +51,8 @@ export class VesCodeGenService {
   protected vesProcessService: VesProcessService;
   @inject(VesProjectService)
   protected vesProjectService: VesProjectService;
-  @inject(WorkspaceService)
-  protected workspaceService: WorkspaceService;
+  @inject(VesWorkspaceService)
+  protected workspaceService: VesWorkspaceService;
 
   protected timeout: number = 0;
 
@@ -321,14 +321,30 @@ export class VesCodeGenService {
           );
           reject();
         } else if (res) {
-          this.fileService.writeFile(
-            targetUri,
-            BinaryBuffer.wrap(iconv.encode(res, encoding))
-          ).then(() => {
-            const p = workspaceRootUri.relative(targetUri) ?? targetUri.path.fsPath();
-            this.logLine(`Rendered template ${templateId} to ${p}.`);
-            resolve();
-          });
+          const writeFile = () => {
+            this.fileService.writeFile(
+              targetUri,
+              BinaryBuffer.wrap(iconv.encode(res, encoding))
+            ).then(() => {
+              const p = workspaceRootUri.relative(targetUri) ?? targetUri.path.fsPath();
+              this.logLine(`Rendered template ${templateId} to ${p}.`);
+              resolve();
+            });
+          };
+          if (this.workspaceService.isCollaboration()) {
+            // delete first when in collab session, otherwise it won't let us overwrite
+            this.fileService.exists(targetUri).then(exists => {
+              if (exists) {
+                this.fileService.delete(targetUri).then(() => {
+                  writeFile();
+                });
+              } else {
+                writeFile();
+              }
+            });
+          } else {
+            writeFile();
+          }
         }
       });
     });

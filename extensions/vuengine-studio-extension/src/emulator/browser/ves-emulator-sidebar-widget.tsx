@@ -6,8 +6,8 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import * as React from '@theia/core/shared/react';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
 import NoWorkspaceOpened from '../../core/browser/components/NoWorkspaceOpened';
+import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
 import EmulatorSidebar from './components/EmulatorSidebar';
 import { VesEmulatorService } from './ves-emulator-service';
 
@@ -23,8 +23,8 @@ export class VesEmulatorSidebarWidget extends ReactWidget {
   private readonly preferenceService: PreferenceService;
   @inject(VesEmulatorService)
   private readonly vesEmulatorService: VesEmulatorService;
-  @inject(WorkspaceService)
-  private readonly workspaceService: WorkspaceService;
+  @inject(VesWorkspaceService)
+  private readonly workspaceService: VesWorkspaceService;
 
   static readonly ID = 'vesEmulatorSidebarWidget';
   static readonly LABEL = nls.localize('vuengine/emulator/emulator', 'Emulator');
@@ -38,8 +38,17 @@ export class VesEmulatorSidebarWidget extends ReactWidget {
     this.id = VesEmulatorSidebarWidget.ID;
     this.title.iconClass = 'codicon codicon-run-all';
     this.title.closable = true;
+    this.bindEvents();
     this.setTitle();
     this.update();
+  }
+
+  protected bindEvents(): void {
+    this.workspaceService.onDidChangeRoots((isCollaboration: boolean) => {
+      if (isCollaboration) {
+        this.update();
+      }
+    });
 
     this.vesEmulatorService.onDidChangeIsQueued(isQueued => {
       this.title.className = isQueued ? 'ves-decorator-queued' : '';

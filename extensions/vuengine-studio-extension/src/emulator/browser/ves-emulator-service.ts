@@ -273,9 +273,9 @@ export class VesEmulatorService {
     const defaultEmulatorConfig = this.getDefaultEmulatorConfig();
     const romUri = await this.vesBuildService.getDefaultRomUri();
     if (defaultEmulatorConfig.name === DEFAULT_EMULATOR_CONFIG.name) {
-      this.runInBuiltInEmulator(romUri);
+      return this.runInBuiltInEmulator(romUri);
     } else if (defaultEmulatorConfig.name === RED_VIPER_CONFIG.name) {
-      this.runInRedViper();
+      return this.runInRedViper();
     } else {
       const emulatorPath = isWindows && !defaultEmulatorConfig.path.startsWith('/')
         ? `/${defaultEmulatorConfig.path}`
