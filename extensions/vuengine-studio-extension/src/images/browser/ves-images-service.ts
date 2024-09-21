@@ -12,7 +12,7 @@ import { ColorMode, PALETTE_R_VALUES, PALETTE_VALUE_INDEX_MAP, PALETTE_VALUE_INV
 import { roundToNextMultipleOf8 } from '../../editors/browser/components/Common/Utils';
 import { VesProcessWatcher } from '../../process/browser/ves-process-service-watcher';
 import { VesProcessService, VesProcessType } from '../../process/common/ves-process-service-protocol';
-import { compressTiles } from './ves-images-compressor';
+import { compressTiles, decompressTiles } from './ves-images-compressor';
 import {
   COMPRESSION_FLAG_LENGTH,
   ConversionResult,
@@ -338,8 +338,13 @@ export class VesImagesService {
   }
 
   // convert tile and map data (grit output) to a pixel data array that can be thrown at a CanvasImage element
-  imageDataToPixelData(tilesData: string[], mapData: ConversionResultMapData): number[][] {
+  imageDataToPixelData(tilesData: string[], mapData: ConversionResultMapData, compression: ImageCompressionType): number[][] {
     const pixelData: number[][] = [];
+
+    console.log('tilesData', tilesData);
+    if (compression !== ImageCompressionType.NONE) {
+      tilesData = decompressTiles(tilesData, compression);
+    }
 
     const V_FLIP_MASK = 1 << 12;
     const H_FLIP_MASK = 1 << 13;

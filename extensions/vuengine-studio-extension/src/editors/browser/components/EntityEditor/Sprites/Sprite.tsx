@@ -1022,6 +1022,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     colorMode={allowFrameBlendMode ? sprite.colorMode : ColorMode.Default}
                     updateColorMode={setColorMode}
                     allowFrameBlendMode={allowFrameBlendMode}
+                    compression={sprite.compression}
                     convertImage={reconvertImage}
                 />
             </PopUpDialog>

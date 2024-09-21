@@ -11,6 +11,7 @@ import {
     DEFAULT_MINIMUM_COLOR_DISTANCE_TO_DITHER,
     DISTANCE_CALCULATOR_OPTIONS,
     IMAGE_QUANTIZATION_ALGORITHM_OPTIONS,
+    ImageCompressionType,
     ImageProcessingSettings,
     MAX_IMAGE_WIDTH,
 } from '../../../../../images/browser/ves-images-types';
@@ -39,6 +40,7 @@ interface ImageProcessingSettingsFormProps {
     colorMode: ColorMode
     updateColorMode: (colorMode: ColorMode) => void
     allowFrameBlendMode: boolean
+    compression: ImageCompressionType
     convertImage?: () => void
 }
 
@@ -53,7 +55,8 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
         colorMode,
         updateColorMode,
         allowFrameBlendMode,
-        convertImage
+        compression,
+        convertImage,
     } = props;
     const [pixelData, setPixelData] = useState<number[][]>([]);
     const [resultImageBase64, setResultImageBase64] = useState<string>('');
@@ -99,7 +102,11 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
             return;
         }
         const uncompressedMapData = await services.vesCommonService.uncompressJson(imageData.maps[0]?.data) as string[];
-        data = services.vesImagesService.imageDataToPixelData(uncompressedTileData, { ...imageData.maps[0], data: uncompressedMapData });
+
+        const actualCompression = compression === ImageCompressionType.RLE && imageData.tiles?.compressionRatio && imageData.tiles?.compressionRatio < 0
+            ? ImageCompressionType.RLE
+            : ImageCompressionType.NONE;
+        data = services.vesImagesService.imageDataToPixelData(uncompressedTileData, { ...imageData.maps[0], data: uncompressedMapData }, actualCompression);
         setPixelData(data);
     };
 

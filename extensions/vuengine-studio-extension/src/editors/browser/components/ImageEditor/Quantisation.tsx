@@ -4,8 +4,8 @@ import { ColorMode } from '../../../../core/browser/ves-common-types';
 import { ImageProcessingSettings } from '../../../../images/browser/ves-images-types';
 import PopUpDialog from '../Common/PopUpDialog';
 import VContainer from '../Common/VContainer';
-import { ImageEditorContext, ImageEditorContextType } from './ImageEditorTypes';
 import ImageProcessingSettingsForm from '../EntityEditor/Sprites/ImageProcessingSettingsForm';
+import { ImageEditorContext, ImageEditorContextType } from './ImageEditorTypes';
 
 export default function Quantisation(): React.JSX.Element {
     const { imageData, updateImageData } = useContext(ImageEditorContext) as ImageEditorContextType;
@@ -53,6 +53,7 @@ export default function Quantisation(): React.JSX.Element {
                 updateProcessingSettings={updateImageProcessingSettings}
                 colorMode={allowFrameBlendMode ? imageData.colorMode : ColorMode.Default}
                 updateColorMode={setColorMode}
+                compression={imageData.tileset.compression}
                 allowFrameBlendMode={allowFrameBlendMode}
             />
         </PopUpDialog>

@@ -100,3 +100,33 @@ function compressTilesRle(tilesData: string[], animationConfig: AnimationConfig)
 
   return result;
 }
+
+export function decompressTiles(compressedTilesData: string[], compressor: ImageCompressionType): string[] {
+  switch (compressor) {
+    case ImageCompressionType.RLE:
+      return decompressTilesRle(compressedTilesData);
+  }
+
+  return compressedTilesData;
+}
+
+function decompressTilesRle(compressedTilesData: string[]): string[] {
+  const decompressedTilesData: string[] = [];
+
+  let currentBlock = '';
+  for (const compressedBlock of compressedTilesData) {
+    for (let i = 0; i < 8; i += 2) {
+      const length = parseInt(compressedBlock.substring(i, i + 1), 16) + 1;
+      const value = compressedBlock.substring(i + 1, i + 2);
+      for (let j = 0; j < length; j++) {
+        currentBlock += value;
+        if (currentBlock.length === 8) {
+          decompressedTilesData.push(currentBlock);
+          currentBlock = '';
+        }
+      }
+    }
+  }
+
+  return decompressedTilesData;
+}

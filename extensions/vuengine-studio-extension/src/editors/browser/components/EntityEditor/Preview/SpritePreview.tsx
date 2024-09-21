@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
+import { ImageCompressionType } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import CanvasImage from '../../Common/CanvasImage';
 import VContainer from '../../Common/VContainer';
@@ -76,7 +77,10 @@ export default function SpritePreview(props: SpritePreviewProps): React.JSX.Elem
         if (allImageData[i] === undefined) {
           allImageData[i] = [];
         }
-        allImageData[i][j] = services.vesImagesService.imageDataToPixelData(uncompressedTileData, { ...singleImageDataMap, data: uncompressedMapData });
+        const compression = sprite.compression === ImageCompressionType.RLE && singleImageData.tiles?.compressionRatio && singleImageData.tiles?.compressionRatio < 0
+          ? ImageCompressionType.RLE
+          : ImageCompressionType.NONE;
+        allImageData[i][j] = services.vesImagesService.imageDataToPixelData(uncompressedTileData, { ...singleImageDataMap, data: uncompressedMapData }, compression);
       }));
     }));
 
