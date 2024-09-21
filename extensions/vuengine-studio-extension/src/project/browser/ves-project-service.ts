@@ -443,24 +443,14 @@ export class VesProjectService {
       }
 
       fileChangesEvent.changes.map(change => {
-        if (this.gameConfigFileUri && change.resource.isEqual(this.gameConfigFileUri)) {
-          if (this.justWroteGameConfigFile) {
-            this.justWroteGameConfigFile = false;
-            return;
-          }
-          this.enableFileChangeEventLock();
-          this.updateWindowTitle();
-          this.readProjectData();
-        } else {
-          // update project data when files of registered types change
-          switch (change.type) {
-            case FileChangeType.DELETED:
-              this.handleFileDelete(change.resource);
-              break;
-            case FileChangeType.UPDATED:
-              this.handleFileUpdate(change.resource);
-              break;
-          }
+        // update project data when files of registered types change
+        switch (change.type) {
+          case FileChangeType.DELETED:
+            this.handleFileDelete(change.resource);
+            break;
+          case FileChangeType.UPDATED:
+            this.handleFileUpdate(change.resource);
+            break;
         }
       });
     });
@@ -489,33 +479,43 @@ export class VesProjectService {
   }
 
   protected handleFileUpdate(fileUri: URI): void {
-    const types = this.getProjectDataTypes() || {};
-    Object.keys(types).map(async typeId => {
-      const type = types[typeId];
-      if ([fileUri.path.ext, fileUri.path.base].includes(type.file)) {
-        const items = this.getProjectDataItemsForType(typeId) || {};
-        const itemIdByUri = Object.keys(items).find(itemId => items[itemId]._fileUri.isEqual(fileUri));
-        try {
-          const fileContents = await this.fileService.readFile(fileUri);
-          const fileContentsJson = JSON.parse(fileContents.value.toString());
-          if (itemIdByUri) {
-            this.enableFileChangeEventLock();
-            this.setProjectDataItem(typeId, itemIdByUri, fileContentsJson, fileUri);
-          } else if (type.file.startsWith('.')) {
-            if (fileContentsJson._id) {
-              this.enableFileChangeEventLock();
-              this.setProjectDataItem(typeId, fileContentsJson._id, fileContentsJson, fileUri);
-            } else {
-              this.logLine(`Can not update project data, missing _id property. Type: ${typeId}`, OutputChannelSeverity.Error);
-            }
-          } else {
-            this.enableFileChangeEventLock();
-            this.setProjectDataItem(typeId, ProjectContributor.Project, fileContentsJson, fileUri);
-          }
-        } catch (error) {
-        }
+    if (this.gameConfigFileUri && fileUri.isEqual(this.gameConfigFileUri)) {
+      if (this.justWroteGameConfigFile) {
+        this.justWroteGameConfigFile = false;
+        return;
       }
-    });
+      this.enableFileChangeEventLock();
+      this.updateWindowTitle();
+      this.readProjectData();
+    } else {
+      const types = this.getProjectDataTypes() || {};
+      Object.keys(types).map(async typeId => {
+        const type = types[typeId];
+        if ([fileUri.path.ext, fileUri.path.base].includes(type.file)) {
+          const items = this.getProjectDataItemsForType(typeId) || {};
+          const itemIdByUri = Object.keys(items).find(itemId => items[itemId]._fileUri.isEqual(fileUri));
+          try {
+            const fileContents = await this.fileService.readFile(fileUri);
+            const fileContentsJson = JSON.parse(fileContents.value.toString());
+            if (itemIdByUri) {
+              this.enableFileChangeEventLock();
+              this.setProjectDataItem(typeId, itemIdByUri, fileContentsJson, fileUri);
+            } else if (type.file.startsWith('.')) {
+              if (fileContentsJson._id) {
+                this.enableFileChangeEventLock();
+                this.setProjectDataItem(typeId, fileContentsJson._id, fileContentsJson, fileUri);
+              } else {
+                this.logLine(`Can not update project data, missing _id property. Type: ${typeId}`, OutputChannelSeverity.Error);
+              }
+            } else {
+              this.enableFileChangeEventLock();
+              this.setProjectDataItem(typeId, ProjectContributor.Project, fileContentsJson, fileUri);
+            }
+          } catch (error) {
+          }
+        }
+      });
+    }
   }
 
   protected async readProjectData(): Promise<void> {
