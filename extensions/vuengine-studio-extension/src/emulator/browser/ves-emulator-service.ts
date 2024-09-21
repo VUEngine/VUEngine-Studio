@@ -258,7 +258,10 @@ export class VesEmulatorService {
   async cancelRedViperTransfer(): Promise<void> {
     const dialog = new ConfirmDialog({
       title: nls.localize('vuengine/emulator/redViper/cancelTransfer', 'Cancel Transfer'),
-      msg: nls.localize('vuengine/emulator/redViper/doYouWantToCancelTranfer', 'Do you want to cancel the file transfer?'),
+      msg: nls.localize(
+        'vuengine/emulator/redViper/areYouSureYouWantToCancelTranfer',
+        'Are you sure you want to cancel the file transfer to Red Viper?'
+      ),
     });
     const confirmed = await dialog.open();
     if (confirmed) {
@@ -305,7 +308,10 @@ export class VesEmulatorService {
       return;
     }
 
-    this.vbLinkStatus.status = VbLinkStatus.connect;
+    this.vbLinkStatus = {
+      ...this.vbLinkStatus,
+      status: VbLinkStatus.connect,
+    };
     const ip = this.preferenceService.get(VesEmulatorPreferenceIds.EMULATOR_RED_VIPER_3DS_IP_ADDRESS, '');
     this.vesSocketService.connect(RED_VIPER_VBLINK_PORT, ip);
   }
