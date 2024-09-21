@@ -48,16 +48,20 @@ export class VesEmulatorStatusBarContribution implements FrontendApplicationCont
         if (this.vesEmulatorService.vbLinkStatus.status === VbLinkStatus.idle) {
             this.statusBar.removeElement('ves-vblink-status');
         } else {
-            const label = nls.localize('vuengine/emulator/redViper/transferring', 'Transferring to 3DS...');
-            const totalChunks = Math.ceil(this.vesEmulatorService.vbLinkStatus.data?.byteLength! / RED_VIPER_VBLINK_CHUNK_SIZE_BYTES);
-            const progress = Math.round(
-                this.vesEmulatorService.vbLinkStatus.done * 100 / totalChunks
-            );
+            let label = nls.localize('vuengine/emulator/redViper/connecting', 'Connecting to 3DS...');
+            if (this.vesEmulatorService.vbLinkStatus.status !== VbLinkStatus.connect) {
+                label = nls.localize('vuengine/emulator/redViper/transferring', 'Transferring to 3DS...');
+                const totalChunks = Math.ceil(this.vesEmulatorService.vbLinkStatus.data?.byteLength! / RED_VIPER_VBLINK_CHUNK_SIZE_BYTES);
+                const progress = Math.round(
+                    this.vesEmulatorService.vbLinkStatus.done * 100 / totalChunks
+                );
+                label = `${label} (${progress}%)`;
+            }
             this.statusBar.setElement('ves-vblink-status', {
                 alignment: StatusBarAlignment.LEFT,
                 command: VesEmulatorCommands.CANCEL_RED_VIPER_TRANSFER.id,
                 priority: 1,
-                text: `$(codicon-loading~spin) ${label} (${progress}%)`,
+                text: `$(codicon-loading~spin) ${label}`,
             });
         }
     }
