@@ -4,11 +4,17 @@
   outline: none;
 }
 
-#vesEmulatorSidebarWidget .theia-button {
+.emulatorSidebarWidget {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.emulatorSidebarWidget .theia-button {
   margin-left: 0;
 }
 
-#vesEmulatorSidebarWidget .runActions {
+.emulatorSidebarWidget .runActions {
   border-bottom: 1px solid var(--theia-activityBar-background);
   display: flex;
   flex-direction: column;
@@ -17,35 +23,35 @@
   padding: calc(var(--theia-ui-padding) * 2);
 }
 
-#vesEmulatorSidebarWidget .emulatorConfigsWrapper {
+.emulatorSidebarWidget .emulatorConfigsWrapper {
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-#vesEmulatorSidebarWidget .emulatorConfigsOverview {
+.emulatorSidebarWidget .emulatorConfigsOverview {
   border-bottom: 1px solid var(--theia-activityBar-background);
   cursor: pointer;
   padding: calc(var(--theia-ui-padding) * 2);
   position: relative;
 }
 
-#vesEmulatorSidebarWidget .emulatorConfigsOverview .fa {
+.emulatorSidebarWidget .emulatorConfigsOverview .fa {
   position: absolute;
   right: calc(var(--theia-ui-padding) * 2);
   top: calc(50% - 5px);
 }
 
-#vesEmulatorSidebarWidget .emulatorConfigs {
+.emulatorSidebarWidget .emulatorConfigs {
   flex-grow: 1;
   overflow: auto;
 }
 
-#vesEmulatorSidebarWidget .emulatorConfigs .emulatorConfigsActions {
+.emulatorSidebarWidget .emulatorConfigs .emulatorConfigsActions {
   padding: calc(var(--theia-ui-padding) * 2);
 }
 
-#vesEmulatorSidebarWidget .emulatorConfig {
+.emulatorSidebarWidget .emulatorConfig {
   border-bottom: 1px solid var(--theia-activityBar-background);
   display: flex;
   flex-direction: column;
@@ -53,31 +59,31 @@
   padding: calc(var(--theia-ui-padding) * 2);
 }
 
-#vesEmulatorSidebarWidget .emulatorConfig>div {
+.emulatorSidebarWidget .emulatorConfig>div {
   display: flex;
   gap: var(--theia-ui-padding);
   justify-content: space-between;
 }
 
-#vesEmulatorSidebarWidget .emulatorConfig>div>div {
+.emulatorSidebarWidget .emulatorConfig>div>div {
   align-items: end;
   display: flex;
 }
 
-#vesEmulatorSidebarWidget .emulatorConfig label {
+.emulatorSidebarWidget .emulatorConfig label {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
   gap: 4px;
 }
 
-#vesEmulatorSidebarWidget .emulatorConfig button {
+.emulatorSidebarWidget .emulatorConfig button {
   height: calc(2 * var(--theia-border-width) + var(--theia-content-line-height) + 2px);
   min-width: 32px;
   width: 32px;
 }
 
-#vesEmulatorSidebarWidget .emulatorConfig textarea {
+.emulatorSidebarWidget .emulatorConfig textarea {
   line-height: 120%;
   min-height: calc(2 * var(--theia-border-width) + var(--theia-content-line-height) + 2px);
   padding: 3px 5px;

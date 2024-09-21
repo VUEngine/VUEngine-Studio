@@ -1,18 +1,20 @@
 import { CommandService, Emitter, MessageService, isWindows, nls } from '@theia/core';
 import { OpenerService } from '@theia/core/lib/browser';
+import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { WindowTitleService } from '@theia/core/lib/browser/window/window-title-service';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
+import { FrontendApplicationState } from '@theia/core/lib/common/frontend-application-state';
 import { Deferred } from '@theia/core/lib/common/promise-util';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { FileChangeType, FileChangesEvent } from '@theia/filesystem/lib/common/files';
 import { OutputChannelManager, OutputChannelSeverity } from '@theia/output/lib/browser/output-channel';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { deepmerge } from 'deepmerge-ts';
 import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VES_PREFERENCE_DIR } from '../../core/browser/ves-preference-configurations';
+import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
 import { VesEditorsCommands } from '../../editors/browser/ves-editors-commands';
 import { ItemData } from '../../editors/browser/ves-editors-widget';
 import { VesPluginsData } from '../../plugins/browser/ves-plugin';
@@ -43,6 +45,8 @@ export class VesProjectService {
   protected commandService: CommandService;
   @inject(FileService)
   protected fileService: FileService;
+  @inject(FrontendApplicationStateService)
+  protected readonly frontendApplicationStateService: FrontendApplicationStateService;
   @inject(MessageService)
   protected messageService: MessageService;
   @inject(OpenerService)
@@ -59,8 +63,8 @@ export class VesProjectService {
   private readonly vesPluginsPathsService: VesPluginsPathsService;
   @inject(WindowTitleService)
   private readonly windowTitleService: WindowTitleService;
-  @inject(WorkspaceService)
-  private readonly workspaceService: WorkspaceService;
+  @inject(VesWorkspaceService)
+  private readonly workspaceService: VesWorkspaceService;
 
   protected readonly _projectDataReady = new Deferred<void>();
   get projectDataReady(): Promise<void> {
@@ -86,6 +90,8 @@ export class VesProjectService {
   protected fileChangeEventLock: boolean = false;
 
   protected workspaceProjectFolderUri: URI | undefined;
+  protected gameConfigFileUri: URI | undefined;
+  protected justWroteGameConfigFile: boolean = false;
 
   protected knownContributors: { [contributor: string]: URI } = {};
 
@@ -348,12 +354,10 @@ export class VesProjectService {
 
   protected async setProjectPlugins(installedPlugins: string[]): Promise<void> {
     if (this.workspaceProjectFolderUri) {
-      const gameConfigFileUri = this.workspaceProjectFolderUri.resolve('config').resolve('GameConfig');
-
       // get current from file
       let gameConfig = {};
-      if (await this.fileService.exists(gameConfigFileUri)) {
-        const fileContent = await this.fileService.readFile(gameConfigFileUri);
+      if (this.gameConfigFileUri && await this.fileService.exists(this.gameConfigFileUri)) {
+        const fileContent = await this.fileService.readFile(this.gameConfigFileUri);
         gameConfig = JSON.parse(fileContent.value.toString());
       }
 
@@ -381,11 +385,16 @@ export class VesProjectService {
       this.setProjectDataItem('GameConfig', ProjectContributor.Project, {
         ...(this.getProjectDataItemById(ProjectContributor.Project, 'GameConfig') as object),
         plugins: sortedPlugins,
-      }, gameConfigFileUri);
+      }, this.gameConfigFileUri!);
 
       // persist to GameConfig file
+      if (this.workspaceService.isCollaboration() && this.gameConfigFileUri && await this.fileService.exists(this.gameConfigFileUri)) {
+        // delete first when in collab session, otherwise it won't let us overwrite
+        await this.fileService.delete(this.gameConfigFileUri!);
+      }
+      this.justWroteGameConfigFile = true;
       await this.fileService.writeFile(
-        gameConfigFileUri,
+        this.gameConfigFileUri!,
         BinaryBuffer.fromString(JSON.stringify({
           ...gameConfig,
           plugins: sortedPlugins
@@ -406,10 +415,24 @@ export class VesProjectService {
 
   protected async doInit(): Promise<void> {
     await this.readProjectData();
-    this.updateWindowTitle();
   }
 
-  protected bindEvents(): void {
+  protected async bindEvents(): Promise<void> {
+    this.workspaceService.onDidChangeRoots(async (isCollaboration: boolean) => {
+      if (isCollaboration) {
+        this.updateWindowTitle();
+        await this.readProjectData();
+      }
+    });
+
+    this.frontendApplicationStateService.onStateChanged(
+      async (state: FrontendApplicationState) => {
+        if (state === 'ready') {
+          this.updateWindowTitle();
+        }
+      }
+    );
+
     this.vesPluginsService.onDidChangeInstalledPlugins((installedPlugins: string[]) => {
       this.setProjectPlugins(installedPlugins);
     });
@@ -420,14 +443,24 @@ export class VesProjectService {
       }
 
       fileChangesEvent.changes.map(change => {
-        // update project data when files of registered types change
-        switch (change.type) {
-          case FileChangeType.DELETED:
-            this.handleFileDelete(change.resource);
-            break;
-          case FileChangeType.UPDATED:
-            this.handleFileUpdate(change.resource);
-            break;
+        if (this.gameConfigFileUri && change.resource.isEqual(this.gameConfigFileUri)) {
+          if (this.justWroteGameConfigFile) {
+            this.justWroteGameConfigFile = false;
+            return;
+          }
+          this.enableFileChangeEventLock();
+          this.updateWindowTitle();
+          this.readProjectData();
+        } else {
+          // update project data when files of registered types change
+          switch (change.type) {
+            case FileChangeType.DELETED:
+              this.handleFileDelete(change.resource);
+              break;
+            case FileChangeType.UPDATED:
+              this.handleFileUpdate(change.resource);
+              break;
+          }
         }
       });
     });
@@ -490,6 +523,13 @@ export class VesProjectService {
 
     // do nothing when no project is opened
     if (!this.workspaceService.opened) {
+      if (this._projectDataReady.state === 'unresolved') {
+        this._projectDataReady.resolve();
+      }
+      if (this._projectItemsReady.state === 'unresolved') {
+        this._projectItemsReady.resolve();
+      }
+
       return;
     }
 
@@ -500,6 +540,7 @@ export class VesProjectService {
     // workspace
     let workspaceTypeData: ProjectData = {};
     this.workspaceProjectFolderUri = this.workspaceService.tryGetRoots()[0]?.resource;
+    this.gameConfigFileUri = this.workspaceProjectFolderUri?.resolve('config').resolve('GameConfig');
     if (this.workspaceProjectFolderUri) {
       workspaceTypeData = await this.findContributions(this.workspaceProjectFolderUri);
     }
@@ -509,11 +550,10 @@ export class VesProjectService {
     const engineCoreTypeData = await this.findContributions(engineCoreUri);
 
     // plugins
-    const gameConfigFileUri = this.workspaceProjectFolderUri!.resolve('config').resolve('GameConfig');
     let plugins: string[] = [];
-    if (await this.fileService.exists(gameConfigFileUri)) {
+    if (this.gameConfigFileUri && await this.fileService.exists(this.gameConfigFileUri)) {
       try {
-        const fileContent = await this.fileService.readFile(gameConfigFileUri);
+        const fileContent = await this.fileService.readFile(this.gameConfigFileUri);
         plugins = Object.keys(JSON.parse(fileContent.value.toString()).plugins || {});
       } catch (error) { }
     }
@@ -870,8 +910,8 @@ export class VesProjectService {
     }
 
     // Use base path instead
-    if (!projectTitle) {
-      projectTitle = workspaceFileUri?.path?.base || '';
+    if (!projectTitle && workspaceFileUri) {
+      projectTitle = workspaceFileUri.path?.base || '';
     }
 
     // Append folder suffix
@@ -882,7 +922,7 @@ export class VesProjectService {
     }
     */
 
-    return projectTitle || 'VUEngine Studio';
+    return projectTitle ?? 'VUEngine Studio';
   }
 
   protected registerOutputChannel(): void {

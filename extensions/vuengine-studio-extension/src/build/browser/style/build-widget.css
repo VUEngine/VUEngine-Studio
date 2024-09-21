@@ -13,106 +13,106 @@
   padding: calc(var(--theia-ui-padding) * 2);
 }
 
-#vesBuildWidget .buildActions {
+.buildWidget .buildActions {
   display: flex;
   flex-direction: column;
   gap: var(--theia-ui-padding);
 }
 
-#vesBuildWidget .buildButtons {
+.buildWidget .buildButtons {
   display: flex;
   flex-direction: row;
   gap: var(--theia-ui-padding);
 }
 
-#vesBuildWidget .buildButtons .theia-button {
+.buildWidget .buildButtons .theia-button {
   font-size: 90%;
   width: 20%;
 }
 
-#vesBuildWidget .theia-button {
+.buildWidget .theia-button {
   flex-grow: 1;
   margin: 0;
   min-height: 22px;
   min-width: unset;
 }
 
-#vesBuildWidget .theia-button:last-child {
+.buildWidget .theia-button:last-child {
   margin-right: 0;
 }
 
-#vesBuildWidget .theia-button.build {
+.buildWidget .theia-button.build {
   font-size: 100%;
   width: 100%;
 }
 
-#vesBuildWidget .buildOptions {
+.buildWidget .buildOptions {
   display: block;
 }
 
-#vesBuildWidget .buildOptions.theia-settings-container .single-pref {
+.buildWidget .buildOptions.theia-settings-container .single-pref {
   padding: var(--theia-ui-padding) 0;
 }
 
-#vesBuildWidget .buildOptions.theia-settings-container .pref-content-container .pref-input {
+.buildWidget .buildOptions.theia-settings-container .pref-content-container .pref-input {
   display: flex;
   max-width: unset;
 }
 
-#vesBuildWidget .buildSelector .theia-select {
+.buildWidget .buildSelector .theia-select {
   width: 100%;
 }
 
-#vesBuildWidget .buildMeta {
+.buildWidget .buildMeta {
   display: flex;
   flex-direction: column;
 }
 
-#vesBuildWidget .buildStatus {
+.buildWidget .buildStatus {
   flex-grow: 1;
 }
 
-#vesBuildWidget .buildStatusActivity {
+.buildWidget .buildStatusActivity {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-#vesBuildWidget .buildStatus>div:last-child {
+.buildWidget .buildStatus>div:last-child {
   font-size: 80%;
 }
 
-#vesBuildWidget .buildStatus .success {
+.buildWidget .buildStatus .success {
   color: var(--theia-editorSuccess-foreground);
 }
 
-#vesBuildWidget .buildStatus .warning {
+.buildWidget .buildStatus .warning {
   color: var(--theia-editorWarning-foreground);
 }
 
-#vesBuildWidget .buildStatus .error {
+.buildWidget .buildStatus .error {
   color: var(--theia-editorError-foreground);
 }
 
-#vesBuildWidget .buildStatusMeta span {
+.buildWidget .buildStatusMeta span {
   margin-right: var(--theia-ui-padding);
 }
 
-#vesBuildWidget .buildMode,
-#vesBuildWidget .buildProcess {
+.buildWidget .buildMode,
+.buildWidget .buildProcess {
   padding: 0 calc(var(--theia-ui-padding) * 2);
 }
 
-#vesBuildWidget .buildLogButtons {
+.buildWidget .buildLogButtons {
   display: flex;
   gap: var(--theia-ui-padding);
 }
 
-#vesBuildWidget .buildLogButtons .theia-input {
+.buildWidget .buildLogButtons .theia-input {
   flex-grow: 1;
   width: 100%;
 }
-#vesBuildWidget .buildLogButtons .theia-button {
+.buildWidget .buildLogButtons .theia-button {
   flex-grow: 0;
   font-size: 90%;
   min-width: 36px;
@@ -120,13 +120,13 @@
   white-space: nowrap;
 }
 
-#vesBuildWidget .buildLogWrapper {
+.buildWidget .buildLogWrapper {
   display: flex;
   flex-grow: 1;
   height: 0;
 }
 
-#vesBuildWidget .buildLog {
+.buildWidget .buildLog {
   border: 1px solid var(--theia-secondaryButton-background);
   border-radius: 2px;
   box-sizing: border-box;
@@ -137,68 +137,68 @@
   overflow: auto;
 }
 
-#vesBuildWidget .buildLog>div {
+.buildWidget .buildLog>div {
   display: table;
   padding: var(--theia-ui-padding) 0;
   width: 100%;
 }
 
-#vesBuildWidget .buildLogLine {
+.buildWidget .buildLogLine {
   display: table-row;
 }
 
-#vesBuildWidget .buildLogLine:empty {
+.buildWidget .buildLogLine:empty {
   height: var(--theia-ui-padding);
 }
 
-#vesBuildWidget .buildLogLine:hover {
+.buildWidget .buildLogLine:hover {
   background: rgba(0, 0, 0, 0.2);
 }
 
-#vesBuildWidget .buildLogLine.hasFileLink {
+.buildWidget .buildLogLine.hasFileLink {
   cursor: pointer;
 }
 
-#vesBuildWidget .buildLogLine .icon {
+.buildWidget .buildLogLine .icon {
   display: table-cell;
   padding: 0 var(--theia-ui-padding);
 }
 
-#vesBuildWidget .buildLogLine .icon .codicon {
+.buildWidget .buildLogLine .icon .codicon {
   font-size: 100%;
   vertical-align: text-bottom;
 }
 
-#vesBuildWidget .buildLogLine.headline .icon,
-#vesBuildWidget .buildLogLine.normal .icon {
+.buildWidget .buildLogLine.headline .icon,
+.buildWidget .buildLogLine.normal .icon {
   opacity: 0.5;
 }
 
-#vesBuildWidget .buildLogLine .text {
+.buildWidget .buildLogLine .text {
   display: table-cell;
   padding-right: var(--theia-ui-padding);
   white-space: nowrap;
   width: 100%;
 }
 
-#vesBuildWidget .buildLog.linewrap .buildLogLine .text {
+.buildWidget .buildLog.linewrap .buildLogLine .text {
   white-space: break-spaces;
   word-break: break-word;
 }
 
-#vesBuildWidget .buildLogLine.headline .text,
-#vesBuildWidget .buildLogLine.done .text {
+.buildWidget .buildLogLine.headline .text,
+.buildWidget .buildLogLine.done .text {
   font-weight: bold;
 }
 
-#vesBuildWidget .buildLogLine.warning {
+.buildWidget .buildLogLine.warning {
   color: var(--theia-editorWarning-foreground);
 }
 
-#vesBuildWidget .buildLogLine.error {
+.buildWidget .buildLogLine.error {
   color: var(--theia-editorError-foreground);
 }
 
-#vesBuildWidget .buildLogLine.done {
+.buildWidget .buildLogLine.done {
   color: var(--theia-editorSuccess-foreground);
 }

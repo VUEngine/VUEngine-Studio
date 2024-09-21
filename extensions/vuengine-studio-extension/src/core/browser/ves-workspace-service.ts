@@ -1,6 +1,8 @@
 import { CollaborationWorkspaceService } from '@theia/collaboration/lib/browser/collaboration-workspace-service';
+import { Emitter } from '@theia/core';
 import { PreferenceService } from '@theia/core/lib/browser';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { FileStat } from '@theia/filesystem/lib/common/files';
 import { WorkspaceData } from '@theia/workspace/lib/browser';
 import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesBuildPreferenceIds } from '../../build/browser/ves-build-preferences';
@@ -15,6 +17,9 @@ export class VesWorkspaceService extends CollaborationWorkspaceService {
     protected readonly vesBuildPathsService: VesBuildPathsService;
     @inject(VesPluginsPathsService)
     protected readonly vesPluginsPathsService: VesPluginsPathsService;
+
+    protected readonly onDidChangeRootsEmitter = new Emitter<boolean>();
+    readonly onDidChangeRoots = this.onDidChangeRootsEmitter.event;
 
     @postConstruct()
     protected init(): void {
@@ -41,6 +46,14 @@ export class VesWorkspaceService extends CollaborationWorkspaceService {
 
     isCollaboration(): boolean {
         return this.collabWorkspace !== undefined;
+    }
+
+    protected override async computeRoots(): Promise<FileStat[]> {
+        const result: FileStat[] = await super.computeRoots();
+        setTimeout(() => {
+            this.onDidChangeRootsEmitter.fire(this.isCollaboration());
+        }, 1);
+        return result;
     }
 
     protected async getWorkspaceDataFromFile(): Promise<WorkspaceData | undefined> {

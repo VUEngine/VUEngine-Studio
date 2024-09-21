@@ -9,17 +9,19 @@
 
 #ves-titlebar-application-title .applicationTitle {
   -webkit-app-region: no-drag;
-  cursor: pointer;
+  align-items: center;
   border-radius: 5px;
   box-sizing: border-box;
-  display: inline-block;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 5px;
   height: calc(var(--theia-private-menubar-height) - 10px);
+  justify-content: center;
   left: 35%;
   line-height: calc(var(--theia-private-menubar-height) - 10px);
   overflow: hidden;
   padding: 0 20px 0 10px;
   position: fixed;
-  text-align: center;
   text-overflow: ellipsis;
   top: 5px;
   white-space: nowrap;

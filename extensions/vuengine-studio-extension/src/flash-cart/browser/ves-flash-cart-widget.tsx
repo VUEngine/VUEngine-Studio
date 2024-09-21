@@ -6,10 +6,10 @@ import { inject, injectable, postConstruct } from '@theia/core/shared/inversify'
 import * as React from '@theia/core/shared/react';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
-import { WorkspaceService } from '@theia/workspace/lib/browser';
 import { VesBuildService } from '../../build/browser/ves-build-service';
 import NoWorkspaceOpened from '../../core/browser/components/NoWorkspaceOpened';
 import { VesCommonService } from '../../core/browser/ves-common-service';
+import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
 import FlashCarts from './components/FlashCarts';
 import { VesFlashCartService } from './ves-flash-cart-service';
 
@@ -31,8 +31,8 @@ export class VesFlashCartWidget extends ReactWidget {
   private readonly vesCommonService: VesCommonService;
   @inject(VesFlashCartService)
   private readonly vesFlashCartService: VesFlashCartService;
-  @inject(WorkspaceService)
-  private readonly workspaceService: WorkspaceService;
+  @inject(VesWorkspaceService)
+  private readonly workspaceService: VesWorkspaceService;
 
   static readonly ID = 'vesFlashCartWidget';
   static readonly LABEL = nls.localize('vuengine/flashCarts/flashCarts', 'Flash Carts');
@@ -58,6 +58,11 @@ export class VesFlashCartWidget extends ReactWidget {
   }
 
   protected bindEvents(): void {
+    this.workspaceService.onDidChangeRoots((isCollaboration: boolean) => {
+      if (isCollaboration) {
+        this.update();
+      }
+    });
     this.vesFlashCartService.onDidChangeConnectedFlashCarts(() => {
       this.setTitle();
       this.update();
