@@ -47,7 +47,7 @@ export default function FlashCartConfigs(props: FlashCartConfigsProps): React.JS
         [
             ...(flashCartConfigs || []),
             {
-                name: nls.localize('vuengine/flashCarts/configs/new', 'New'),
+                name: nls.localizeByDefault('New'),
                 size: 16,
                 padRom: false,
                 path: '',

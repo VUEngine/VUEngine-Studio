@@ -1,44 +1,45 @@
 import React from 'react';
 import styled from 'styled-components';
 
-interface StyledStepIndicatorProps {
-    isPianoRoll: boolean
-}
-
-const StyledStepIndicator = styled.div<StyledStepIndicatorProps>`
+const StyledStepIndicator = styled.div`
     background-color: var(--theia-focusBorder);
     bottom: 0;
     left: 0;
     position: absolute;
-    top: ${p => p.isPianoRoll ? 17 : 0}px;
-    width: ${p => p.isPianoRoll ? 3 : 2}px;
     z-index: 1;
 `;
 
 interface StepIndicatorProps {
     currentStep: number
-    bar: number
+    noteResolution: number
     isPianoRoll: boolean
     hidden: boolean
 }
 
 export default function StepIndicator(props: StepIndicatorProps): React.JSX.Element {
-    const { currentStep, bar, isPianoRoll, hidden } = props;
+    const { currentStep, noteResolution, isPianoRoll, hidden } = props;
 
     let offset = 0;
     if (isPianoRoll) {
-        offset = 75 + currentStep * 18 + Math.round(currentStep / bar) * 2;
+        const headerWidth = 50;
+        const noteWidth = 16;
+        const elapsedNotesWidth = currentStep * noteWidth;
+        const dividers4Total = Math.round(currentStep / 4);
+        const dividersNoteResolutionTotal = Math.round(currentStep / (noteResolution ?? 1));
+        offset = headerWidth + elapsedNotesWidth + dividers4Total + dividersNoteResolutionTotal;
     } else {
-        offset = 75 + currentStep * 2;
+        const patternNoteWidth = 16 / noteResolution;
+        const headerWidth = 73;
+        const elapsedNotesWidth = currentStep * patternNoteWidth;
+        offset = headerWidth + elapsedNotesWidth;
     }
 
     const style = {
         display: hidden ? 'none' : undefined,
         left: offset,
+        top: isPianoRoll ? 14 : 0,
+        width: isPianoRoll ? 3 : 1,
     };
 
-    return <StyledStepIndicator
-        isPianoRoll={isPianoRoll}
-        style={style}
-    />;
+    return <StyledStepIndicator style={style} />;
 }

@@ -1,16 +1,21 @@
+import { DataSection } from '../Common/CommonTypes';
+import { VsuChannelEnvelopeData, VsuChannelIntervalData, VsuChannelSweepModulationData } from '../VsuEmulator/VsuEmulatorTypes';
+
 export interface SongData {
     name: string
-    channels: ChannelConfig[],
-    instruments: InstrumentConfig[],
+    channels: ChannelConfig[]
+    instruments: InstrumentConfig[]
     speed: number
-    volume: number
-    bar: number
-    defaultPatternSize: number,
+    waveforms: number[][]
+    noteResolution: number
+    loop: boolean
+    defaultBar: string
+    section: DataSection
 }
 
 export interface PatternConfig {
-    name: string,
-    size: number,
+    name: string
+    bar: string
     notes: (number | undefined)[]
     volumeL: (number | undefined)[]
     volumeR: (number | undefined)[]
@@ -19,23 +24,36 @@ export interface PatternConfig {
 
 export interface ChannelConfig {
     id: number
-    instrument: number,
-    sequence: number[],
-    patterns: PatternConfig[],
-    volume: number,
-    muted: boolean,
+    instrument: number
+    sequence: number[]
+    patterns: PatternConfig[]
+    muted: boolean
     solo: boolean
 }
 
 export interface InstrumentConfig {
-    name: string,
-    waveform: number[],
+    name: string
+    waveform: number
+    interval: VsuChannelIntervalData
+    envelope: VsuChannelEnvelopeData
+    sweepMod: VsuChannelSweepModulationData
 }
 
 export interface SongNote {
     note: string | undefined
     volumeL: number | undefined
     volumeR: number | undefined
+}
+
+export enum MusicEditorMode {
+    PIANOROLL,
+    TRACKER,
+}
+
+export enum MusicEditorTool {
+    DEFAULT,
+    ERASER,
+    MARQUEE,
 }
 
 export const NOTES: { [note: string]: number } = {
@@ -168,7 +186,31 @@ export const MAX_SPEED = 1200;
 export const MIN_SPEED = 30;
 
 export const PATTERN_NOTE_HEIGHT = 0.25;
-export const PATTERN_NOTE_WIDTH = 2;
 
 export const VOLUME_STEPS = 16;
-export const PATTERN_SIZES = [8, 16, 32, 64];
+
+// length value is bar * 4
+export const BAR_PATTERN_LENGTH_MULT_MAP: { [bar: string]: number } = {
+    '2/2': 4,
+    '3/2': 6,
+    '2/4': 2,
+    '3/4': 3,
+    '4/4': 4,
+    '5/4': 5,
+    '6/4': 6,
+    '3/8': 1.5,
+    '4/8': 2,
+    '6/8': 3,
+    '7/8': 3.5,
+    '11/8': 5.5,
+    '4/16': 1,
+    '15/16': 4.6875,
+    '12/16': 3,
+};
+
+export enum NoteResolution {
+    QUARTER = 4,
+    EIGHTH = 8,
+    SIXTEENTH = 16,
+    THIRTYSECOND = 32,
+}

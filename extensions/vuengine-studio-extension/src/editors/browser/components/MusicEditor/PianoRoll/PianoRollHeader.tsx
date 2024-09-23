@@ -1,12 +1,8 @@
 import { nls } from '@theia/core';
 import React from 'react';
-import { SongData } from '../MusicEditorTypes';
+import { BAR_PATTERN_LENGTH_MULT_MAP, SongData } from '../MusicEditorTypes';
+import { MetaLine, MetaLineHeader } from './NoteProperties';
 import PianoRollHeaderNote from './PianoRollHeaderNote';
-import styled from 'styled-components';
-
-const Header = styled.div`
-    padding-top: 1px;
-`;
 
 interface PianoRollHeaderProps {
     songData: SongData
@@ -31,16 +27,16 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
 
     const channel = songData.channels[currentChannelId];
     const pattern = channel.patterns[currentPatternId];
+    const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern.bar] * songData.noteResolution;
 
-    return <Header className="metaLine">
-        <div
-            className="metaLineHeader"
+    return <MetaLine style={{ paddingTop: 1 }}>
+        <MetaLineHeader
             style={{ height: 15 }}
             title={`${nls.localize('vuengine/musicEditor/channel', 'Channel')} / ${nls.localize('vuengine/musicEditor/pattern', 'Pattern')}`}
         >
             {getChannelName(currentChannelId)} / {currentPatternId !== undefined ? currentPatternId + 1 : '-'}
-        </div>
-        {[...Array(pattern.size)].map((x, index) => (
+        </MetaLineHeader>
+        {[...Array(patternSize)].map((x, index) => (
             <PianoRollHeaderNote
                 songData={songData}
                 key={index}
@@ -54,5 +50,5 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
             />
         ))
         }
-    </Header>;
+    </MetaLine>;
 }

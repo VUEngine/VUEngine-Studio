@@ -1,11 +1,13 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import BasicSelect from '../../Common/BasicSelect';
 import HContainer from '../../Common/HContainer';
-import RadioSelect from '../../Common/RadioSelect';
 import VContainer from '../../Common/VContainer';
 import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor';
-import { PATTERN_SIZES, PatternConfig, SongData } from '../MusicEditorTypes';
+import { BAR_PATTERN_LENGTH_MULT_MAP, PatternConfig, SongData } from '../MusicEditorTypes';
+import { InputWithAction, InputWithActionButton } from './Instruments';
+import { ConfirmDialog } from '@theia/core/lib/browser';
 
 interface CurrentPatternProps {
     songData: SongData
@@ -32,35 +34,61 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
         : (i + 1).toString();
 
     const setPatternName = (name: string): void => {
-        setPattern(currentChannelId, currentPatternId, {
-            name: name,
-        });
+        setPattern(currentChannelId, currentPatternId, { name });
     };
 
-    const setPatternSize = (size: number): void => {
-        setPattern(currentChannelId, currentPatternId, {
-            size: size,
-        });
+    const setBar = (bar: string): void => {
+        setPattern(currentChannelId, currentPatternId, { bar });
     };
 
-    return <VContainer gap={10}>
+    const addPattern = () => {
+        // TODO
+    };
+
+    const removeCurrentPattern = async () => {
+        const dialog = new ConfirmDialog({
+            title: nls.localize('vuengine/musicEditor/deletePatternQuestion', 'Delete Pattern?'),
+            msg: nls.localize('vuengine/musicEditor/areYouSureYouWantToDeletePattern', 'Are you sure you want to completely delete this pattern?'),
+        });
+        const remove = await dialog.open();
+        if (remove) {
+            // TODO
+        }
+    };
+
+    return <VContainer gap={15}>
         <VContainer>
             <label>
-                {nls.localize('vuengine/musicEditor/pattern', 'Pattern')}
+                {nls.localize('vuengine/musicEditor/currentPattern', 'Current Pattern')}
             </label>
-            <select
-                className='theia-select'
-                value={currentPatternId}
-                onChange={e => setCurrentPatternId(channel.id, parseInt(e.target.value))}
-            >
-                {channel.patterns.map((n, i) => (
-                    <option key={`select-pattern-${i}`} value={i}>{getName(i)}</option>
-                ))}
-            </select>
+            <InputWithAction>
+                <select
+                    className='theia-select'
+                    value={currentPatternId}
+                    onChange={e => setCurrentPatternId(channel.id, parseInt(e.target.value))}
+                >
+                    {channel.patterns.map((n, i) => (
+                        <option key={`select-pattern-${i}`} value={i}>{getName(i)}</option>
+                    ))}
+                </select>
+                <InputWithActionButton
+                    className='theia-button secondary'
+                    title={nls.localize('vuengine/musicEditor/deletePattern', 'Delete Pattern')}
+                    onClick={removeCurrentPattern}
+                >
+                    <i className='fa fa-minus' />
+                </InputWithActionButton>
+                <InputWithActionButton
+                    className='theia-button secondary'
+                    title={nls.localize('vuengine/musicEditor/addPattern', 'Add Pattern')}
+                    onClick={addPattern}
+                >
+                    <i className='codicon codicon-plus' />
+                </InputWithActionButton>
+            </InputWithAction>
         </VContainer>
-
         <HContainer gap={15}>
-            <VContainer style={{ width: 110 }}>
+            <VContainer grow={1}>
                 <label>
                     {nls.localize('vuengine/musicEditor/name', 'Name')}
                 </label>
@@ -73,60 +101,15 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                 />
             </VContainer>
             <VContainer>
-                Size
-                <RadioSelect
-                    options={PATTERN_SIZES.map(size => ({ value: size }))}
-                    defaultValue={pattern.size}
-                    onChange={options => setPatternSize(options[0].value as number)}
+                <label>
+                    {nls.localize('vuengine/musicEditor/bar', 'Bar')}
+                </label>
+                <BasicSelect
+                    options={Object.keys(BAR_PATTERN_LENGTH_MULT_MAP).map(v => ({ value: v }))}
+                    value={pattern.bar}
+                    onChange={e => setBar(e.target.value)}
                 />
             </VContainer>
         </HContainer>
-
-        {/*
-        <VContainer>
-            Instrument
-            <select
-                className='theia-select'
-            >
-                <option value={0}>Channel Default</option>
-            </select>
-        </VContainer>
-        */}
-
-        {/*
-        <VContainer>
-            <label>Pattern Master Volume</label>
-            <HContainer>
-                <div style={{ minWidth: 10, width: 10 }}>
-                    L
-                </div>
-                <input
-                    type='range'
-                    value={100}
-                    max={100}
-                    min={0}
-                    step={100 / VOLUME_STEPS}
-                />
-                <div style={{ minWidth: 24, overflow: 'hidden', textAlign: 'right', width: 24 }}>
-                    100
-                </div>
-            </HContainer>
-            <HContainer>
-                <div style={{ minWidth: 10, width: 10 }}>
-                    R
-                </div>
-                <input
-                    type='range'
-                    value={100}
-                    max={100}
-                    min={0}
-                    step={100 / VOLUME_STEPS}
-                />
-                <div style={{ minWidth: 24, overflow: 'hidden', textAlign: 'right', width: 24 }}>
-                    100
-                </div>
-            </HContainer>
-        </VContainer>
-        */}
     </VContainer>;
 }

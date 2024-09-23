@@ -1,5 +1,5 @@
 import { nls } from '@theia/core';
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import { ChannelConfig, SongData } from '../MusicEditorTypes';
 import CurrentChannel from './CurrentChannel';
 
@@ -7,20 +7,22 @@ interface ChannelProps {
     songData: SongData
     currentChannelId: number
     setCurrentChannelId: (currentChannelId: number) => void
-    getChannelName: (channelId: number) => string
     setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
     toggleChannelMuted: (channelId: number) => void
     toggleChannelSolo: (channelId: number) => void
+    setCurrentInstrument: Dispatch<SetStateAction<number>>
+    setSidebarTab: Dispatch<SetStateAction<number>>
 }
 
 export default function Channel(props: ChannelProps): React.JSX.Element {
     const {
         songData,
         currentChannelId, setCurrentChannelId,
-        getChannelName,
         setChannel,
         toggleChannelMuted,
         toggleChannelSolo,
+        setCurrentInstrument,
+        setSidebarTab,
     } = props;
 
     return <>
@@ -31,10 +33,11 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                 setCurrentChannelId={setCurrentChannelId}
                 toggleChannelMuted={toggleChannelMuted}
                 toggleChannelSolo={toggleChannelSolo}
-                getChannelName={getChannelName}
                 setChannel={setChannel}
+                setCurrentInstrument={setCurrentInstrument}
+                setSidebarTab={setSidebarTab}
             />
-            : <div>
+            : <div className="lightLabel">
                 {nls.localize('vuengine/musicEditor/selectChannelToEditProperties', 'Select a channel to edit its properties')}
             </div>}
     </>;

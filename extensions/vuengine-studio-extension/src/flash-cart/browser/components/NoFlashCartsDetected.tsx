@@ -10,7 +10,7 @@ export default function NoFlashCartsDetected(props: NoFlashCartsDetectedProps): 
     const { commandService } = props;
     const detect = () => commandService.executeCommand(VesFlashCartCommands.DETECT.id);
 
-    return <div className="theia-TreeContainer empty" style={{ boxSizing: 'border-box' }}>
+    return <div className="theia-TreeContainer lightLabel" style={{ boxSizing: 'border-box' }}>
         <div className="theia-WelcomeView">
             <div>
                 <span>{nls.localize('vuengine/flashCarts/noneFound', 'No flash carts found.')}</span>

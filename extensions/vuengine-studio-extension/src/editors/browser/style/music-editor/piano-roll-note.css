@@ -3,7 +3,7 @@
 }
 
 .musicEditor .pianoRollRow.cNote .pianoRollNote {
-    margin-bottom: 3px;
+    margin-bottom: 2px;
 }
 
 .musicEditor .pianoRollRow.cNote:last-child .pianoRollNote {

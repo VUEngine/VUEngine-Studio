@@ -1,24 +1,27 @@
-import { ChartScatter, FadersHorizontal, GearSix, Guitar, Keyboard } from '@phosphor-icons/react';
+import { FadersHorizontal, GearSix, Guitar, Keyboard } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/HContainer';
+import PopUpDialog from '../Common/PopUpDialog';
 import VContainer from '../Common/VContainer';
+import WaveformWithPresets from '../VsuSandbox/WaveformWithPresets';
 import { MusicEditorCommands } from './MusicEditorCommands';
 import MusicEditorToolbar from './MusicEditorToolbar';
-import { ChannelConfig, InstrumentConfig, NOTES, PatternConfig, SongData, SongNote } from './MusicEditorTypes';
+import { BAR_PATTERN_LENGTH_MULT_MAP, ChannelConfig, InstrumentConfig, MusicEditorMode, MusicEditorTool, NOTES, PatternConfig, SongData, SongNote } from './MusicEditorTypes';
 import MusicPlayer from './MusicPlayer';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
 import Channel from './Sidebar/Channel';
+import CurrentNote from './Sidebar/CurrentNote';
 import ImportExport from './Sidebar/ImportExport';
 import InputDevices from './Sidebar/InputDevices';
 import Instruments from './Sidebar/Instruments';
-import Note from './Sidebar/Note';
 import Pattern from './Sidebar/Pattern';
-import Patterns from './Sidebar/Patterns';
 import Song from './Sidebar/Song';
+import Waveforms from './Sidebar/Waveforms';
+import Tracker from './Tracker/Tracker';
 
 interface MusicEditorProps {
     songData: SongData
@@ -27,13 +30,19 @@ interface MusicEditorProps {
 
 export const INPUT_BLOCKING_COMMANDS = [
     MusicEditorCommands.PLAY_PAUSE.id,
+    MusicEditorCommands.STOP.id,
+    MusicEditorCommands.TOOL_PENCIL.id,
+    MusicEditorCommands.TOOL_ERASER.id,
+    MusicEditorCommands.TOOL_MARQUEE.id,
 ];
 
 export default function MusicEditor(props: MusicEditorProps): React.JSX.Element {
     const { songData, updateSongData } = props;
     const { enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const [playing, setPlaying] = useState<boolean>(false);
-    const [currentStep, setCurrentStep] = useState<number>(0);
+    const [tool, setTool] = useState<MusicEditorTool>(MusicEditorTool.DEFAULT);
+    const [editorMode, setEditorMode] = useState<MusicEditorMode>(MusicEditorMode.PIANOROLL);
+    const [currentStep, setCurrentStep] = useState<number>(-1);
     const [currentChannelId, setCurrentChannelId] = useState<number>(0);
     const [currentSequenceIndex, setCurrentSequenceIndex] = useState<number>(0);
     const [currentPatternId, setCurrentPatternId] = useState<number>(0);
@@ -43,6 +52,15 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
     const [playRangeEnd, setPlayRangeEnd] = useState<number>(-1);
     const [song, setSong] = useState<(SongNote | undefined)[][]>([]);
     const [songLength, setSongLength] = useState<number>(0);
+    const [sidebarTab, setSidebarTab] = useState<number>(0);
+    const [waveformDialogOpen, setWaveformDialogOpen] = useState<number>(-1);
+
+    const updatePlayRangeStart = (value: number) => {
+        if (currentStep > -1) {
+            setCurrentStep(value);
+        }
+        setPlayRangeStart(value);
+    };
 
     const setChannel = (channelId: number, channel: Partial<ChannelConfig>): void => {
         updateSongData({
@@ -86,6 +104,7 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
         setCurrentNote(-1);
         setPlayRangeStart(-1);
         setPlayRangeEnd(-1);
+        setSidebarTab(0);
     };
 
     const updateCurrentSequenceIndex = (channel: number, sequenceIndex: number): void => {
@@ -95,6 +114,7 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
         setCurrentNote(-1);
         setPlayRangeStart(-1);
         setPlayRangeEnd(-1);
+        setSidebarTab(0);
     };
 
     const updateCurrentPatternId = (channel: number, pattern: number): void => {
@@ -103,15 +123,32 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
         setCurrentNote(-1);
         setPlayRangeStart(-1);
         setPlayRangeEnd(-1);
+        setSidebarTab(0);
+    };
+
+    const updateCurrentNote = (note: number): void => {
+        setSidebarTab(0);
+        setCurrentNote(note);
+    };
+
+    const toggleEditorMode = (): void => {
+        setEditorMode(editorMode === MusicEditorMode.PIANOROLL ? MusicEditorMode.TRACKER : MusicEditorMode.PIANOROLL);
     };
 
     const togglePlaying = (): void => {
-        setCurrentStep(playRangeStart > -1 ? currentPatternNoteOffset + playRangeStart : 0);
+        if (currentStep === -1) {
+            setCurrentStep(playRangeStart);
+        }
         setPlaying(!playing);
     };
 
+    const stopPlaying = (): void => {
+        setCurrentStep(-1);
+        setPlaying(false);
+    };
+
     const toggleChannelMuted = (channelId: number): void => {
-        setChannel(currentChannelId, {
+        setChannel(channelId, {
             muted: !songData.channels[channelId].muted,
             solo: false
         });
@@ -143,20 +180,26 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
         updateSongData({ ...songData, instruments });
     };
 
+    const setWaveform = (value: number[]): void => {
+        const updatedWaveforms = [...songData.waveforms];
+        updatedWaveforms[waveformDialogOpen] = value;
+
+        updateSongData({ ...songData, waveforms: updatedWaveforms });
+    };
+
     const getChannelName = (i: number): string => {
         switch (i) {
             case 0:
             case 1:
             case 2:
             case 3:
-                return `Wave ${i + 1}`;
+                return `${nls.localize('vuengine/musicEditor/waveShort', 'W')}${i + 1}`;
             case 4:
-                return 'Sweep';
+                return nls.localize('vuengine/musicEditor/sweepModulationShort', 'SM');
             case 5:
-                return 'Noise';
-            default:
-                return '-';
+                return nls.localize('vuengine/musicEditor/noiseShort', 'N');
         }
+        return '';
     };
 
     const computeSong = (): void => {
@@ -170,7 +213,8 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
             let step = 0;
             channel.sequence.forEach(patternId => {
                 const pattern = songData.channels[channel.id].patterns[patternId];
-                [...Array(pattern.size)].forEach((s, i) => {
+                const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern.bar] * songData.noteResolution;
+                [...Array(patternSize)].forEach((s, i) => {
                     channelNotes[step + i] = (!channel.muted && !(soloChannel > -1 && soloChannel !== channel.id))
                         ? {
                             note: pattern.notes[i] !== undefined ? Object.keys(NOTES)[pattern.notes[i]!] : undefined,
@@ -181,7 +225,7 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                         }
                         : undefined;
                 });
-                step += pattern.size;
+                step += patternSize;
             });
             if (channelNotes.length) {
                 if (channelNotes.length > newSongLength) {
@@ -200,6 +244,18 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
             case MusicEditorCommands.PLAY_PAUSE.id:
                 togglePlaying();
                 break;
+            case MusicEditorCommands.STOP.id:
+                stopPlaying();
+                break;
+            case MusicEditorCommands.TOOL_PENCIL.id:
+                setTool(MusicEditorTool.DEFAULT);
+                break;
+            case MusicEditorCommands.TOOL_ERASER.id:
+                setTool(MusicEditorTool.ERASER);
+                break;
+            case MusicEditorCommands.TOOL_MARQUEE.id:
+                // setTool(MusicEditorTool.MARQUEE);
+                break;
         }
     };
 
@@ -209,7 +265,9 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
         const currentChannel = songData.channels[currentChannelId];
         currentChannel.sequence.forEach((s, sequenceIndex) => {
             if (currentSequenceIndex > sequenceIndex) {
-                result += currentChannel.patterns[s].size;
+                const pattern = currentChannel.patterns[s];
+                const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern.bar] * songData.noteResolution;
+                result += patternSize;
             }
         });
 
@@ -222,7 +280,7 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
 
     useEffect(() => {
         enableCommands([
-            MusicEditorCommands.PLAY_PAUSE.id,
+            ...Object.values(MusicEditorCommands).map(c => c.id)
         ]);
     }, []);
 
@@ -243,89 +301,109 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
     ]);
 
     return (
-        <HContainer className="musicEditor" gap={20} overflow="hidden">
+        <HContainer className="musicEditor" overflow="hidden" style={{ padding: 0 }}>
             <MusicPlayer
                 currentStep={currentStep}
                 playing={playing}
                 speed={60000 / songData.speed}
                 song={song}
                 increaseCurrentStep={() => {
+                    const nextStep = currentStep + 1;
                     const startNoteIndex = playRangeStart > -1
                         ? currentPatternNoteOffset + playRangeStart
                         : 0;
                     const endNoteIndex = playRangeEnd > -1
                         ? currentPatternNoteOffset + playRangeEnd
                         : songLength;
-                    setCurrentStep(currentStep + 1 > endNoteIndex
-                        ? startNoteIndex
-                        : currentStep + 1);
+                    if (nextStep > endNoteIndex) {
+                        if (songData.loop) {
+                            setCurrentStep(startNoteIndex);
+                        } else {
+                            setCurrentStep(-1);
+                            setPlaying(false);
+                        }
+                    } else {
+                        setCurrentStep(nextStep);
+                    }
                 }}
             />
-            <VContainer gap={10} grow={1} overflow="hidden">
+            <VContainer gap={0} grow={1} overflow="hidden">
                 <MusicEditorToolbar
                     currentStep={currentStep}
                     playing={playing}
+                    editorMode={editorMode}
+                    toggleEditorMode={toggleEditorMode}
                     togglePlaying={togglePlaying}
+                    stopPlaying={stopPlaying}
+                    tool={tool}
+                    setTool={setTool}
                 />
-                <Sequencer
-                    songData={songData}
-                    currentStep={currentStep}
-                    playing={playing}
-                    currentPatternId={currentPatternId}
-                    setCurrentPatternId={updateCurrentPatternId}
-                    currentChannelId={currentChannelId}
-                    setCurrentChannelId={updateCurrentChannelId}
-                    currentSequenceIndex={currentSequenceIndex}
-                    setCurrentSequenceIndex={updateCurrentSequenceIndex}
-                    getChannelName={getChannelName}
-                    toggleChannelMuted={toggleChannelMuted}
-                    toggleChannelSolo={toggleChannelSolo}
-                    setChannel={setChannel}
-                />
-                <PianoRoll
-                    songData={songData}
-                    currentStep={currentStep}
-                    playing={playing}
-                    currentNote={currentNote}
-                    setCurrentNote={setCurrentNote}
-                    currentPatternId={currentPatternId}
-                    currentPatternNoteOffset={currentPatternNoteOffset}
-                    currentChannelId={currentChannelId}
-                    currentSequenceIndex={currentSequenceIndex}
-                    getChannelName={getChannelName}
-                    playRangeStart={playRangeStart}
-                    setPlayRangeStart={setPlayRangeStart}
-                    playRangeEnd={playRangeEnd}
-                    setPlayRangeEnd={setPlayRangeEnd}
-                    playNote={playNote}
-                    setNote={setNote}
-                />
+                {editorMode === MusicEditorMode.TRACKER
+                    ? <Tracker />
+                    : <>
+                        <Sequencer
+                            songData={songData}
+                            currentStep={currentStep}
+                            currentPatternId={currentPatternId}
+                            setCurrentPatternId={updateCurrentPatternId}
+                            currentChannelId={currentChannelId}
+                            setCurrentChannelId={updateCurrentChannelId}
+                            currentSequenceIndex={currentSequenceIndex}
+                            setCurrentSequenceIndex={updateCurrentSequenceIndex}
+                            getChannelName={getChannelName}
+                            toggleChannelMuted={toggleChannelMuted}
+                            toggleChannelSolo={toggleChannelSolo}
+                            setChannel={setChannel}
+                        />
+                        <PianoRoll
+                            songData={songData}
+                            currentStep={currentStep}
+                            currentNote={currentNote}
+                            setCurrentNote={updateCurrentNote}
+                            currentPatternId={currentPatternId}
+                            currentPatternNoteOffset={currentPatternNoteOffset}
+                            currentChannelId={currentChannelId}
+                            currentSequenceIndex={currentSequenceIndex}
+                            getChannelName={getChannelName}
+                            playRangeStart={playRangeStart}
+                            setPlayRangeStart={updatePlayRangeStart}
+                            playRangeEnd={playRangeEnd}
+                            setPlayRangeEnd={setPlayRangeEnd}
+                            playNote={playNote}
+                            setNote={setNote}
+                            tool={tool}
+                        />
+                    </>
+                }
             </VContainer>
-            <VContainer gap={15} overflow="auto" style={{ maxWidth: 250, minWidth: 250 }}>
-                <Tabs>
-                    <TabList>
+            <VContainer gap={15} overflow="auto" style={{ maxWidth: 300, minWidth: 300 }}>
+                <Tabs
+                    selectedIndex={sidebarTab}
+                    onSelect={index => setSidebarTab(index)}
+                    style={{ padding: 'calc(var(--theia-ui-padding) * 2)' }}
+                >
+                    <TabList style={{ display: 'flex' }}>
                         <Tab
                             title={nls.localize('vuengine/musicEditor/selected', 'Selected')}
+                            style={{ display: 'flex', flexGrow: 1, height: 26, justifyContent: 'center', marginRight: 0 }}
                         >
                             <FadersHorizontal size={20} />
                         </Tab>
                         <Tab
                             title={nls.localize('vuengine/musicEditor/instruments', 'Instruments')}
+                            style={{ display: 'flex', flexGrow: 1, height: 26, justifyContent: 'center', marginRight: 0 }}
                         >
                             <Guitar size={20} />
                         </Tab>
                         <Tab
-                            title={nls.localize('vuengine/musicEditor/patterns', 'Patterns')}
-                        >
-                            <ChartScatter size={20} />
-                        </Tab>
-                        <Tab
                             title={nls.localize('vuengine/musicEditor/inputDevices', 'Input Devices')}
+                            style={{ display: 'flex', flexGrow: 1, height: 26, justifyContent: 'center', marginRight: 0 }}
                         >
                             <Keyboard size={20} />
                         </Tab>
                         <Tab
                             title={nls.localize('vuengine/musicEditor/settings', 'Settings')}
+                            style={{ display: 'flex', flexGrow: 1, height: 26, justifyContent: 'center', marginRight: 0 }}
                         >
                             <GearSix size={20} />
                         </Tab>
@@ -336,10 +414,11 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                                 songData={songData}
                                 currentChannelId={currentChannelId}
                                 setCurrentChannelId={setCurrentChannelId}
-                                getChannelName={getChannelName}
                                 setChannel={setChannel}
                                 toggleChannelMuted={toggleChannelMuted}
                                 toggleChannelSolo={toggleChannelSolo}
+                                setCurrentInstrument={setCurrentInstrument}
+                                setSidebarTab={setSidebarTab}
                             />
                             <hr />
                             <Pattern
@@ -350,7 +429,7 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                                 setPattern={setPattern}
                             />
                             <hr />
-                            <Note
+                            <CurrentNote
                                 songData={songData}
                                 currentChannelId={currentChannelId}
                                 currentPatternId={currentPatternId}
@@ -367,10 +446,8 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                             currentInstrument={currentInstrument}
                             setCurrentInstrument={setCurrentInstrument}
                             setInstruments={setInstruments}
+                            setSidebarTab={setSidebarTab}
                         />
-                    </TabPanel>
-                    <TabPanel>
-                        <Patterns />
                     </TabPanel>
                     <TabPanel>
                         <InputDevices />
@@ -382,11 +459,29 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                                 setSongData={updateSongData}
                             />
                             <hr />
+                            <Waveforms
+                                songData={songData}
+                                setWaveformDialogOpen={setWaveformDialogOpen}
+                            />
+                            <hr />
                             <ImportExport />
                         </VContainer>
                     </TabPanel>
                 </Tabs>
             </VContainer>
+            <PopUpDialog
+                open={waveformDialogOpen > -1}
+                onClose={() => setWaveformDialogOpen(-1)}
+                onOk={() => setWaveformDialogOpen(-1)}
+                title={nls.localize('vuengine/musicEditor/editWaveform', 'Edit Waveform')}
+                height='100%'
+                width='100%'
+            >
+                <WaveformWithPresets
+                    value={songData.waveforms[Math.max(0, waveformDialogOpen)]}
+                    setValue={setWaveform}
+                />
+            </PopUpDialog>
         </HContainer>
     );
 }

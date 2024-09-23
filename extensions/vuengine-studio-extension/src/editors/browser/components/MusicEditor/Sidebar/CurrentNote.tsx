@@ -4,7 +4,7 @@ import HContainer from '../../Common/HContainer';
 import VContainer from '../../Common/VContainer';
 import { HIGHEST_NOTE, LOWEST_NOTE, NOTES, PatternConfig, SongData, VOLUME_STEPS } from '../MusicEditorTypes';
 
-interface NoteProps {
+interface CurrentNoteProps {
     songData: SongData
     currentChannelId: number
     currentPatternId: number
@@ -14,7 +14,7 @@ interface NoteProps {
     setNote: (index: number, note: number | undefined) => void
 }
 
-export default function Note(props: NoteProps): React.JSX.Element {
+export default function CurrentNote(props: CurrentNoteProps): React.JSX.Element {
     const {
         songData,
         currentChannelId,
@@ -43,7 +43,7 @@ export default function Note(props: NoteProps): React.JSX.Element {
     };
 
     if (currentNote === -1) {
-        return <VContainer gap={10}>
+        return <VContainer gap={15} className="lightLabel">
             {nls.localize('vuengine/musicEditor/selectNoteToEditProperties', 'Select a note to edit its properties')}
         </VContainer>;
     }
@@ -68,10 +68,10 @@ export default function Note(props: NoteProps): React.JSX.Element {
     volumeL = pattern.volumeL[currentNote] ?? volumeL;
     volumeR = pattern.volumeR[currentNote] ?? volumeR;
 
-    return <VContainer gap={10}>
+    return <VContainer gap={15}>
         <VContainer>
             <label>
-                {nls.localize('vuengine/musicEditor/note', 'Note')}
+                {nls.localize('vuengine/musicEditor/currentNote', 'Current Note')}
             </label>
             <select
                 className='theia-select'

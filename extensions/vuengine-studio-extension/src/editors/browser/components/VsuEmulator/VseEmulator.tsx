@@ -40,6 +40,7 @@ export default function VsuEmulator(props: VsuEmulatorProps): React.JSX.Element 
             .toString();
 
         const audioCtx = new AudioContext({
+            latencyHint: 'interactive',
             sampleRate: VSU_SAMPLE_RATE,
         });
         await audioCtx.audioWorklet.addModule(workerPath);
@@ -154,7 +155,7 @@ export default function VsuEmulator(props: VsuEmulatorProps): React.JSX.Element 
             : 'theia-button secondary'
         }
         style={{
-            width: 75,
+            width: 70,
         }}
         disabled={initialized === undefined}
         onClick={toggleEnabled}

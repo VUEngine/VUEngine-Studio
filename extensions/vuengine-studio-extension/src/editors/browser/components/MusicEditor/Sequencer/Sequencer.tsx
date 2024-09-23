@@ -3,11 +3,13 @@ import styled from 'styled-components';
 import { ChannelConfig, SongData } from '../MusicEditorTypes';
 import Channel from './Channel';
 import StepIndicator from './StepIndicator';
+import VContainer from '../../Common/VContainer';
+import ChannelHeader from './ChannelHeader';
 
 export const StyledSequencer = styled.div`
     display: flex;
-    flex-direction: column;
-    padding-right: 10px;
+    flex-direction: row;
+    margin: 0 calc(var(--theia-ui-padding) * 2);
     position: relative;
 `;
 
@@ -20,7 +22,6 @@ interface SequencerProps {
     currentSequenceIndex: number
     setCurrentSequenceIndex: (channel: number, sequenceIndex: number) => void
     currentStep: number
-    playing: boolean
     getChannelName: (channelId: number) => string
     toggleChannelMuted: (channelId: number) => void
     toggleChannelSolo: (channelId: number) => void
@@ -34,7 +35,6 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
         currentPatternId, setCurrentPatternId,
         currentSequenceIndex, setCurrentSequenceIndex,
         currentStep,
-        playing,
         getChannelName,
         toggleChannelMuted,
         toggleChannelSolo,
@@ -46,31 +46,40 @@ export default function Sequencer(props: SequencerProps): React.JSX.Element {
     return <StyledSequencer>
         {<StepIndicator
             currentStep={currentStep}
-            bar={songData.bar}
+            noteResolution={songData.noteResolution}
             isPianoRoll={false}
-            hidden={!playing}
+            hidden={currentStep === -1}
         />}
-        {
-            songData.channels.map(channel =>
+        <VContainer gap={1}>
+            {songData.channels.map(channel =>
+                <ChannelHeader
+                    channel={channel}
+                    number={channel.id}
+                    currentChannelId={currentChannelId}
+                    setCurrentChannelId={setCurrentChannelId}
+                    getChannelName={getChannelName}
+                    toggleChannelMuted={toggleChannelMuted}
+                    toggleChannelSolo={toggleChannelSolo}
+                />
+            )}
+        </VContainer>
+        <VContainer gap={1} overflow="auto" style={{ paddingBottom: 3 }}>
+            {songData.channels.map(channel =>
                 <Channel
                     key={channel.id}
                     channelConfig={channel}
                     number={channel.id}
                     songData={songData}
                     otherSolo={soloChannel > -1 && soloChannel !== channel.id}
-                    instrumentName={songData.instruments[channel.instrument].name}
                     currentChannelId={currentChannelId}
                     setCurrentChannelId={setCurrentChannelId}
-                    getChannelName={getChannelName}
-                    toggleChannelMuted={toggleChannelMuted}
-                    toggleChannelSolo={toggleChannelSolo}
                     currentPatternId={currentPatternId}
                     setCurrentPatternId={setCurrentPatternId}
                     currentSequenceIndex={currentSequenceIndex}
                     setCurrentSequenceIndex={setCurrentSequenceIndex}
                     setChannel={setChannel}
                 />
-            )
-        }
+            )}
+        </VContainer>
     </StyledSequencer>;
 }

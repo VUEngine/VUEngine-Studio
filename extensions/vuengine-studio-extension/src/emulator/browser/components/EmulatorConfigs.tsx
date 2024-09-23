@@ -45,7 +45,7 @@ export default function EmulatorConfigs(props: EmulatorConfigsProps): React.JSX.
         [
             ...(emulatorConfigs || []),
             {
-                name: nls.localize('vuengine/emulator/new', 'New'),
+                name: nls.localizeByDefault('New'),
                 path: '',
                 args: '%ROM%'
             }

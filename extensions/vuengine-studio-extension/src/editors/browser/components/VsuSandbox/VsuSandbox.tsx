@@ -1,19 +1,15 @@
 import { nls } from '@theia/core';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
-import { WithContributor, WithFileUri } from '../../../../project/browser/ves-project-types';
-import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/HContainer';
-import NumberArrayPreview from '../Common/NumberArrayPreview';
 import { clamp } from '../Common/Utils';
 import VContainer from '../Common/VContainer';
 import VsuEmulator from '../VsuEmulator/VseEmulator';
 import { VSU_FREQUENCY_MAX, VSU_FREQUENCY_MIN, VSU_NUMBER_OF_CHANNELS, VSU_NUMBER_OF_WAVEFORM_BANKS, VsuChannelData, VsuData } from '../VsuEmulator/VsuEmulatorTypes';
-import WaveForm from '../WaveFormEditor/WaveForm';
-import { WaveFormData } from '../WaveFormEditor/WaveFormEditorTypes';
 import Channel from './Channel';
 import ModulationData from './ModulationData';
 import Piano from './Piano';
+import WaveformWithPresets from './WaveformWithPresets';
 
 interface VsuSandboxProps {
     data: VsuData
@@ -21,10 +17,8 @@ interface VsuSandboxProps {
 }
 
 export default function VsuSandbox(props: VsuSandboxProps): React.JSX.Element {
-    const { services } = useContext(EditorsContext) as EditorsContextType;
     const { data, updateData } = props;
     const [pianoChannel, setPianoChannel] = useState<number>(0);
-    const waveForms = Object.values(services.vesProjectService.getProjectDataItemsForType('WaveForm') || {}) as (WaveFormData & WithContributor & WithFileUri)[];
 
     const setWaveform = (channel: number, waveform: number[]): void => {
         const waveforms = [
@@ -110,43 +104,10 @@ export default function VsuSandbox(props: VsuSandboxProps): React.JSX.Element {
             </TabPanel>
             {([...Array(VSU_NUMBER_OF_WAVEFORM_BANKS)].map((v, x) =>
                 <TabPanel key={`tabpanel-waveform-${x}`}>
-                    <VContainer gap={15} grow={1}>
-                        <VContainer>
-                            <label>
-                                {nls.localize('vuengine/vsuSandbox/presetsClickToApply', 'Presets (Click to apply)')}
-                            </label>
-                            <HContainer overflow='scroll'>
-                                {(Object.values(waveForms).map((w, y) =>
-                                    <NumberArrayPreview
-                                        key={`tabpanel-waveform-${x}-${y}`}
-                                        maximum={64}
-                                        data={w.values}
-                                        onClick={() => setWaveform(x, w.values)}
-                                        onMouseEnter={event => {
-                                            services.hoverService.requestHover({
-                                                content: w._fileUri.path.name,
-                                                target: event.currentTarget,
-                                                position: 'bottom',
-                                            });
-                                        }}
-                                        onMouseLeave={event => {
-                                            services.hoverService.cancelHover();
-                                        }}
-
-                                    />
-                                ))}
-                            </HContainer>
-                        </VContainer>
-                        <VContainer grow={1}>
-                            <label>
-                                {nls.localize('vuengine/vsuSandbox/values', 'Values')}
-                            </label>
-                            <WaveForm
-                                value={data.waveforms[x] ?? []}
-                                setValue={(waveform: number[]) => setWaveform(x, waveform)}
-                            />
-                        </VContainer>
-                    </VContainer>
+                    <WaveformWithPresets
+                        value={data.waveforms[x]}
+                        setValue={value => setWaveform(x, value)}
+                    />
                 </TabPanel>
             ))}
             <TabPanel>
@@ -156,5 +117,5 @@ export default function VsuSandbox(props: VsuSandboxProps): React.JSX.Element {
                 />
             </TabPanel>
         </Tabs>
-    </VContainer>;
+    </VContainer >;
 }

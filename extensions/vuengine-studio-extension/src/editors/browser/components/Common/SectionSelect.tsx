@@ -17,7 +17,7 @@ export default function SectionSelect(props: SectionSelectProps): React.JSX.Elem
 
     return <VContainer>
         <InfoLabel
-            label={nls.localize('vuengine/editors/section', 'Section')}
+            label={nls.localize('vuengine/editors/dataSection', 'Data Section')}
             tooltip={nls.localize(
                 'vuengine/editors/sectionDescription',
                 'Defines whether data should be stored in ROM space, Data space or Expansion space. ' +

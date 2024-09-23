@@ -437,7 +437,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                 </div>
                                 <VContainer grow={1} justifyContent="center" overflow="hidden">
                                     {(sprite.texture?.files || []).length === 0
-                                        ? <div className='empty'>
+                                        ? <div className="lightLabel">
                                             {sprite.displayMode !== DisplayMode.Stereo &&
                                                 nls.localize(
                                                     'vuengine/entityEditor/noImageFileSelected',
@@ -534,7 +534,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                     </div>
                                     <VContainer grow={1} justifyContent="center" overflow="hidden">
                                         {(sprite.texture?.files2 || []).length === 0
-                                            ? <div className='empty'>
+                                            ? <div className="lightLabel">
                                                 {nls.localize(
                                                     'vuengine/entityEditor/noImageFileSelectedForRightEye',
                                                     'No Image File Selected For The Right Eye'

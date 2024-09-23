@@ -4,9 +4,7 @@ import { ChannelConfig } from '../MusicEditorTypes';
 interface ChannelHeaderProps {
     channel: ChannelConfig
     number: number
-    muted: boolean
-    solo: boolean
-    instrumentName: string
+    currentChannelId: number
     setCurrentChannelId: (currentChannelId: number) => void
     getChannelName: (channelId: number) => string
     toggleChannelMuted: (channelId: number) => void
@@ -14,9 +12,14 @@ interface ChannelHeaderProps {
 }
 
 export default function ChannelHeader(props: ChannelHeaderProps): React.JSX.Element {
-    const { channel, number, muted, solo, setCurrentChannelId, getChannelName, toggleChannelMuted, toggleChannelSolo } = props;
+    const { channel, number, currentChannelId, setCurrentChannelId, getChannelName, toggleChannelMuted, toggleChannelSolo } = props;
 
-    return <div className='channelHeader'>
+    const classNames = ['channelHeader'];
+    if (currentChannelId === number) {
+        classNames.push('current');
+    }
+
+    return <div className={classNames.join(' ')}>
         <div
             className='channelInfo'
             onClick={() => setCurrentChannelId(number)}
@@ -24,27 +27,19 @@ export default function ChannelHeader(props: ChannelHeaderProps): React.JSX.Elem
             <div className='channelName'>
                 {getChannelName(number)}
             </div>
-            { /* }
-            <div className='channelInstrument'>
-                {instrumentName}
-            </div>
-            { */ }
-            {channel.volume < 100 && <div className='channelVolume'>
-                <div style={{ width: `${channel.volume}%` }}></div>
-            </div>}
         </div>
         <div className='channelButtons'>
             <div
-                className={`channelButton ${muted ? 'active' : ''}`}
+                className={`channelButton ${channel.muted ? 'active' : ''}`}
                 onClick={() => toggleChannelMuted(number)}
             >
-                <i className={`fa fa-volume-${muted ? 'off' : 'up'}`} />
+                <i className={`fa fa-volume-${channel.muted ? 'off' : 'up'}`} />
             </div>
             <div
-                className={`channelButton ${solo ? 'active' : ''}`}
+                className={`channelButton ${channel.solo ? 'active' : ''}`}
                 onClick={() => toggleChannelSolo(number)}
             >
-                <i className={`fa fa-star${solo ? '' : '-o'}`} />
+                <i className={`fa fa-star${channel.solo ? '' : '-o'}`} />
             </div>
         </div>
     </div>;

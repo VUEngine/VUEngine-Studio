@@ -1,11 +1,11 @@
 import { nls } from '@theia/core';
 import React from 'react';
 import styled from 'styled-components';
-import { NOTES, SongData } from '../MusicEditorTypes';
+import { MusicEditorTool, NOTES } from '../MusicEditorTypes';
 
 interface NoteProps {
     current: boolean
-    nth: boolean
+    noteResolution: number
     otherChannelSet: boolean
     set: boolean
 }
@@ -22,34 +22,40 @@ const Note = styled.div<NoteProps>`
     cursor: crosshair;
     flex-grow: 1;
     margin-bottom: 1px;
-    margin-right: ${p => p.nth
-        ? '3px'
-        : '1px'
-    };
+    margin-right: 1px;
     min-height: 11px;
     max-height: 11px;
-    min-width: 17px;
-    max-width: 17px;
+    min-width: 15px;
+    max-width: 15px;
 
     &:hover {
         outline: 1px solid var(--theia-focusBorder);
+        outline-offset: 1px;
+        z-index: 10;
+    }
+    &:nth-child(4n + 1) {
+        margin-right: 2px;
+    }
+    &:nth-child(${p => p.noteResolution}n + 1) {
+        margin-right: 3px;
     }
 `;
 
 interface PianoRollNoteProps {
-    songData: SongData
     index: number
     noteId: number
+    noteResolution: number
     set: boolean
     otherChannels: number[]
     current: boolean
     setCurrentNote: (note: number) => void
     setNote: (index: number, note: number | undefined) => void
     playNote: (note: number) => void
+    tool: MusicEditorTool
 }
 
 export default function PianoRollNote(props: PianoRollNoteProps): React.JSX.Element {
-    const { index, noteId, current, set, otherChannels, songData, playNote, setCurrentNote, setNote } = props;
+    const { index, noteId, current, set, otherChannels, noteResolution, playNote, setCurrentNote, setNote, tool } = props;
 
     // Object.keys(otherChannelsNotes[index] ?? {}).includes(noteIdStr)
 
@@ -79,13 +85,17 @@ export default function PianoRollNote(props: PianoRollNoteProps): React.JSX.Elem
     return <Note
         className={classNames.join(' ')}
         current={current}
-        nth={(index + 1) % songData.bar === 0}
+        noteResolution={noteResolution}
         set={set}
         otherChannelSet={otherChannels.length > 0}
         onClick={() => {
-            setNote(index, noteId);
-            setCurrentNote(index);
-            playNote(noteId);
+            if (tool === MusicEditorTool.ERASER) {
+                setNote(index, undefined);
+            } else {
+                setNote(index, noteId);
+                setCurrentNote(index);
+                playNote(noteId);
+            }
         }}
         onContextMenu={() => setNote(index, undefined)}
         onMouseDown={e => onMouse(e)}

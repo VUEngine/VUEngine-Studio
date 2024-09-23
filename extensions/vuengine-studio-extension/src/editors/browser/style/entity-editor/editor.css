@@ -2,10 +2,6 @@
     outline: none !important;
 }
 
-.entityEditor .empty {
-    opacity: .3;
-}
-
 .entityEditor .current {
     background: var(--theia-list-activeSelectionBackground);
     color: var(--theia-list-activeSelectionForeground);
@@ -76,6 +72,6 @@
     border-color: var(--theia-editorError-foreground);
 }
 
-.jsonforms-container .light-label {
+.jsonforms-container .lightLabel {
     color: var(--theia-dropdown-border);
 }

@@ -1,11 +1,12 @@
 import { nls } from '@theia/core';
 import React, { useState } from 'react';
-import { ChannelConfig, HIGHEST_NOTE, LOWEST_NOTE, PATTERN_NOTE_HEIGHT, PATTERN_NOTE_WIDTH, PatternConfig, SongData } from '../MusicEditorTypes';
+import { ChannelConfig, HIGHEST_NOTE, LOWEST_NOTE, PATTERN_NOTE_HEIGHT, PatternConfig, SongData } from '../MusicEditorTypes';
 
 interface PatternProps {
     songData: SongData
     index: number
     pattern: PatternConfig
+    patternSize: number
     channel: number
     height: number
     patternId: number
@@ -24,6 +25,7 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
         channel,
         height,
         pattern,
+        patternSize,
         patternId,
         currentChannelId,
         currentPatternId,
@@ -37,15 +39,13 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
     }
 
     const boxShadow: string[] = [];
-    const boxShadowColor = currentChannelId === channel && currentSequenceIndex === index
-        ? 'var(--theia-focusBorder)'
-        : 'var(--theia-editor-foreground)';
+    const patternNoteWidth = 16 / songData.noteResolution;
     pattern.notes.forEach((note, i) => {
         if (note !== undefined
             && note >= HIGHEST_NOTE
             && note <= LOWEST_NOTE) {
             boxShadow.push(
-                `${(i + 1) * PATTERN_NOTE_WIDTH}px ${(note - HIGHEST_NOTE) * PATTERN_NOTE_HEIGHT}px 0 0 ${boxShadowColor}`
+                `${(i + 1) * patternNoteWidth}px ${(note - HIGHEST_NOTE) * PATTERN_NOTE_HEIGHT}px 0 0 var(--theia-editor-foreground)`
             );
         }
     });
@@ -107,9 +107,12 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
     return <div
         className={classNames.join(' ')}
         style={{
+            backgroundColor: currentChannelId === channel && currentSequenceIndex === index
+                ? 'var(--theia-focusBorder)'
+                : undefined,
             height: `${height * PATTERN_NOTE_HEIGHT + 3}px`,
-            minWidth: `${(pattern.size * PATTERN_NOTE_WIDTH) - 1}px`,
-            width: `${(pattern.size * PATTERN_NOTE_WIDTH) - 1}px`
+            minWidth: `${(patternSize * patternNoteWidth) - 1}px`,
+            width: `${(patternSize * patternNoteWidth) - 1}px`
         }}
         data-channel={channel}
         data-position={index}
@@ -126,8 +129,8 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
             style={{
                 boxShadow: boxShadow.join(','),
                 height: '1px',
-                marginLeft: `-${PATTERN_NOTE_WIDTH}px`,
-                width: `${PATTERN_NOTE_WIDTH}px`,
+                marginLeft: `-${patternNoteWidth}px`,
+                width: `${patternNoteWidth}px`,
             }}
         />
         {patternId + 1}

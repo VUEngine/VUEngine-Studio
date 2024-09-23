@@ -1,10 +1,9 @@
 import { nls } from '@theia/core';
 import React from 'react';
 import styled from 'styled-components';
-import { SongData } from '../MusicEditorTypes';
 
 export interface MetaLineNoteProps {
-    nth: boolean
+    noteResolution: number
 }
 
 export const MetaLineNote = styled.div<MetaLineNoteProps>`
@@ -15,16 +14,19 @@ export const MetaLineNote = styled.div<MetaLineNoteProps>`
     flex-grow: 1;
     gap: 1px;
     margin-bottom: 1px;
-    margin-right: ${p => p.nth
-        ? '3px'
-        : '1px'
-    };
-    min-width: 17px;
-    max-width: 17px;
+    margin-right: 1px;
+    min-width: 15px;
+    max-width: 15px;
     position: relative;
 
     &:hover {
         outline: 1px solid var(--theia-focusBorder);
+    }
+    &:nth-child(4n + 1) {
+        margin-right: 2px;
+    }
+    &:nth-child(${p => p.noteResolution}n + 1) {
+        margin-right: 3px;
     }
 `;
 
@@ -57,20 +59,20 @@ interface NotePropertiesNoteProps {
     effects: string[]
     volumeL: number
     volumeR: number
-    songData: SongData
+    noteResolution: number
     setCurrentNote: (currentNote: number) => void
     setNote: (index: number, note: number | undefined) => void
 }
 
 export default function NotePropertiesNote(props: NotePropertiesNoteProps): React.JSX.Element {
-    const { index, volumeL, volumeR, effects, songData, setCurrentNote, setNote } = props;
+    const { index, volumeL, volumeR, effects, noteResolution, setCurrentNote, setNote } = props;
 
     const labelEffects = nls.localize('vuengine/musicEditor/effects', 'Effects');
     const leftLabel = nls.localize('vuengine/musicEditor/left', 'Left');
     const rightLabel = nls.localize('vuengine/musicEditor/right', 'Right');
 
     return <MetaLineNote
-        nth={(index + 1) % songData.bar === 0}
+        noteResolution={noteResolution}
         title={`${effects.length} ${labelEffects}, ${leftLabel}: ${volumeL}%/${rightLabel}: ${volumeR}%`}
         onClick={() => setCurrentNote(index)}
         onContextMenu={() => setNote(index, undefined)}

@@ -1,8 +1,6 @@
 import { nls } from '@theia/core';
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
 import HContainer from '../Common/HContainer';
-import NumberArrayPreview from '../Common/NumberArrayPreview';
 import RadioSelect from '../Common/RadioSelect';
 import { clamp } from '../Common/Utils';
 import VContainer from '../Common/VContainer';
@@ -17,7 +15,6 @@ import {
     VSU_FREQUENCY_MIN,
     VSU_INTERVAL_VALUES,
     VSU_NOISE_TAP_LOCATIONS,
-    VSU_NUMBER_OF_WAVEFORM_BANKS,
     VSU_SWEEP_MODULATION_FREQUENCY_MAX,
     VSU_SWEEP_MODULATION_FREQUENCY_MIN,
     VSU_SWEEP_MODULATION_INTERVAL_MAX,
@@ -26,14 +23,7 @@ import {
     VSU_SWEEP_MODULATION_SHIFT_MIN,
     VsuChannelData
 } from '../VsuEmulator/VsuEmulatorTypes';
-
-const WaveFormSelection = styled(HContainer)`
-    outline: none !important;
-
-    &:focus > div.active {
-        border-color: var(--theia-button-background) !important;
-    }
-`;
+import WaveformSelect from './WaveformSelect';
 
 interface ChannelProps {
     index: number
@@ -201,7 +191,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
         });
     };
 
-    const setSweepModulationSweepDown = (direction: boolean) => {
+    const setSweepModulationDirection = (direction: boolean) => {
         setChannel({
             ...channel,
             sweepMod: {
@@ -236,22 +226,6 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
             ...channel,
             frequency: clamp(frequency, VSU_FREQUENCY_MIN, VSU_FREQUENCY_MAX),
         });
-    };
-
-    const handleWaveFormKeyPress = (e: React.KeyboardEvent): void => {
-        if (e.key === 'ArrowLeft') {
-            if (channel.waveform === 0) {
-                setWaveform(VSU_NUMBER_OF_WAVEFORM_BANKS - 1);
-            } else {
-                setWaveform(channel.waveform - 1);
-            }
-        } else if (e.key === 'ArrowRight') {
-            if (channel.waveform === VSU_NUMBER_OF_WAVEFORM_BANKS - 1) {
-                setWaveform(0);
-            } else {
-                setWaveform(channel.waveform + 1);
-            }
-        }
     };
 
     const findNoteByFrequency = (): void => {
@@ -296,17 +270,11 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                 {!isNoiseChannel && <>
                     <VContainer>
                         {nls.localize('vuengine/vsuSandbox/waveForm', 'WaveForm')}
-                        <WaveFormSelection onKeyDown={handleWaveFormKeyPress} tabIndex={0}>
-                            {([...Array(VSU_NUMBER_OF_WAVEFORM_BANKS)].map((v, x) =>
-                                <NumberArrayPreview
-                                    key={x}
-                                    maximum={64}
-                                    active={x === (channel?.waveform ?? 0)}
-                                    data={waveForms[x] ?? []}
-                                    onClick={() => setWaveform(x)}
-                                />
-                            ))}
-                        </WaveFormSelection>
+                        <WaveformSelect
+                            value={channel?.waveform}
+                            setValue={setWaveform}
+                            waveforms={waveForms}
+                        />
                     </VContainer>
                 </>}
                 {isNoiseChannel &&
@@ -502,7 +470,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                 {supportSweepAndModulation &&
                     <VContainer>
                         <label>
-                            {nls.localize('vuengine/vsuSandbox/sweepModulation', 'Sweep/Modulation')}
+                            {nls.localize('vuengine/vsuSandbox/sweepModulation', ' Sweep / Modulation')}
                         </label>
                         <HContainer gap={15} wrap='wrap'>
                             <VContainer>
@@ -586,7 +554,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                                         value: false,
                                                     }]}
                                                     defaultValue={channel?.sweepMod?.direction ?? true}
-                                                    onChange={options => setSweepModulationSweepDown(options[0].value as boolean)}
+                                                    onChange={options => setSweepModulationDirection(options[0].value as boolean)}
                                                     allowBlank
                                                 />
                                             </VContainer>

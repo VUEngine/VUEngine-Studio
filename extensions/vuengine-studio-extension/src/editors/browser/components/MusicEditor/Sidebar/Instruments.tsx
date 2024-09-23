@@ -1,12 +1,11 @@
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
-import React, { useContext } from 'react';
+import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import VContainer from '../../Common/VContainer';
-import WaveForm from '../../WaveFormEditor/WaveForm';
-import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor';
 import { InstrumentConfig, SongData } from '../MusicEditorTypes';
+import Instrument from './Instrument';
 
 export const InputWithAction = styled.div`
     display: flex;
@@ -20,6 +19,7 @@ export const InputWithAction = styled.div`
 export const InputWithActionButton = styled.button`
     margin: 0;
     min-width: 32px;
+    padding: 0;
     width: 32px;
 `;
 
@@ -28,48 +28,33 @@ interface InstrumentsProps {
     currentInstrument: number
     setCurrentInstrument: (instrument: number) => void
     setInstruments: (instruments: InstrumentConfig[]) => void
+    setSidebarTab: Dispatch<SetStateAction<number>>
 }
 
 export default function Instruments(props: InstrumentsProps): React.JSX.Element {
     const {
         songData,
-        currentInstrument,
-        setCurrentInstrument,
+        currentInstrument, setCurrentInstrument,
         setInstruments,
+        setSidebarTab,
     } = props;
-    const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
-
+    const { services } = useContext(EditorsContext) as EditorsContextType;
     const instrument = songData.instruments[currentInstrument];
 
-    const setName = (name: string) => {
-        const updatedInstruments = [...songData.instruments];
-        updatedInstruments[currentInstrument] = {
-            ...updatedInstruments[currentInstrument],
-            name,
-        };
-
-        setInstruments(updatedInstruments);
-    };
-
-    const setWaveform = (waveform: number[]) => {
-        const updatedInstruments = [...songData.instruments];
-        updatedInstruments[currentInstrument] = {
-            ...updatedInstruments[currentInstrument],
-            waveform,
-        };
-
-        setInstruments(updatedInstruments);
-    };
-
-    const addInstrument = () => {
-        setCurrentInstrument(songData.instruments.length);
-        setInstruments([
-            ...songData.instruments,
-            {
-                name: nls.localize('vuengine/musicEditor/new', 'New'),
-                waveform: [...Array(32)].map(x => 1),
-            }
-        ]);
+    const addInstrument = async () => {
+        const type = services.vesProjectService.getProjectDataType('Audio');
+        const schema = await window.electronVesCore.dereferenceJsonSchema(type!.schema);
+        const newInstrument = services.vesProjectService.generateDataFromJsonSchema(schema?.properties?.instruments?.items);
+        if (newInstrument) {
+            setInstruments([
+                ...songData.instruments,
+                {
+                    ...newInstrument,
+                    name: nls.localizeByDefault('New'),
+                },
+            ]);
+            setCurrentInstrument(songData.instruments.length);
+        }
     };
 
     const removeCurrentInstrument = async () => {
@@ -89,9 +74,9 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
         }
     };
 
-    return <VContainer gap={10}>
+    return <VContainer gap={15}>
         <VContainer>
-            {nls.localize('vuengine/musicEditor/instrument', 'Instrument')}
+            {nls.localize('vuengine/musicEditor/instruments', 'Instruments')}
             <InputWithAction>
                 <select
                     className='theia-select'
@@ -104,8 +89,8 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                 </select>
                 <InputWithActionButton
                     className='theia-button secondary'
-                    onClick={removeCurrentInstrument}
                     title={nls.localize('vuengine/musicEditor/deleteInstrument', 'Delete Instrument')}
+                    onClick={removeCurrentInstrument}
                     disabled={songData.instruments.length <= 1}
                 >
                     <i className='fa fa-minus' />
@@ -119,26 +104,11 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                 </InputWithActionButton>
             </InputWithAction>
         </VContainer>
-        <VContainer>
-            <label>
-                {nls.localize('vuengine/musicEditor/name', 'Name')}
-            </label>
-            <input
-                className='theia-input'
-                value={instrument.name}
-                onChange={e => setName(e.target.value)}
-                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-            />
-        </VContainer>
-        <VContainer>
-            <label>
-                {nls.localize('vuengine/musicEditor/waveform', 'Waveform')}
-            </label>
-            <WaveForm
-                value={instrument.waveform}
-                setValue={setWaveform}
-            />
-        </VContainer>
+        <Instrument
+            songData={songData}
+            currentInstrument={currentInstrument}
+            setInstruments={setInstruments}
+            setSidebarTab={setSidebarTab}
+        />
     </VContainer>;
 }

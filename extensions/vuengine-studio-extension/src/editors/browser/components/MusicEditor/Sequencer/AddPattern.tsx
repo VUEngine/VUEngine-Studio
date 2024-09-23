@@ -1,5 +1,6 @@
 import { nls } from '@theia/core';
-import React from 'react';
+import React, { useContext } from 'react';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { ChannelConfig, SongData } from '../MusicEditorTypes';
 
 interface AddPatternProps {
@@ -15,8 +16,9 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
         songData,
         setCurrentPatternId,
     } = props;
+    const { services } = useContext(EditorsContext) as EditorsContextType;
 
-    const addToSequence = (channelId: number, patternId: number): void => {
+    const addToSequence = async (channelId: number, patternId: number): Promise<void> => {
         const updatedChannel = {
             ...songData.channels[channelId],
             sequence: [
@@ -27,14 +29,11 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
 
         const largestPatternId = songData.channels[channelId].patterns.length - 1;
         if (patternId > largestPatternId) {
-            updatedChannel.patterns.push({
-                name: '',
-                size: songData.defaultPatternSize,
-                notes: [],
-                volumeL: [],
-                volumeR: [],
-                effects: [],
-            });
+            const type = services.vesProjectService.getProjectDataType('Audio');
+            const schema = await window.electronVesCore.dereferenceJsonSchema(type!.schema);
+            // @ts-ignore
+            const newPattern = services.vesProjectService.generateDataFromJsonSchema(schema?.properties?.channels?.items?.properties?.patterns?.items);
+            updatedChannel.patterns.push(newPattern);
         }
 
         setChannel(channelId, updatedChannel);
@@ -42,13 +41,13 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
     };
 
     return <div
-        title={nls.localize('vuengine/musicEditor/addPattern', 'Add Pattern')}
         className="addPattern"
     >
         <i className='codicon codicon-plus' />
         <div className='patternSelect'>
             <button
                 className='newPattern'
+                title={nls.localize('vuengine/musicEditor/addNewPattern', 'Add New Pattern')}
                 onClick={() => addToSequence(channel.id, channel.patterns.length)}
             >
                 <i className='codicon codicon-plus' />
@@ -56,7 +55,8 @@ export default function AddPattern(props: AddPatternProps): React.JSX.Element {
             <div className='existingPatterns'>
                 {channel.patterns.map((pattern, patternId) => (
                     <button
-                        key={`channel-${channel.id}-add-${patternId}`}
+                        key={patternId}
+                        title={nls.localize('vuengine/musicEditor/addPatternX', 'Add Pattern {0}', patternId)}
                         onClick={() => addToSequence(channel.id, patternId)}
                     >
                         {patternId + 1}

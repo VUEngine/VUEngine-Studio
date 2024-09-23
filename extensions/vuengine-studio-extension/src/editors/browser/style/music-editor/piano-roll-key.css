@@ -1,8 +1,7 @@
 .jsonforms-container .pianoRollKey {
     align-items: center;
-    background-color: #fff;
+    background-color: #f1f1f1;
     border-bottom: 0px solid #ccc;
-    border-right: 2px solid #999;
     box-sizing: border-box;
     color: #666;
     cursor: pointer;
@@ -10,17 +9,9 @@
     font-size: 8px;
     margin-right: 3px;
     min-height: 10px;
-    min-width: 75px;
+    min-width: 50px;
     padding-left: 3px;
-    width: 75px;
-}
-
-.jsonforms-container .pianoRollRow:first-child .pianoRollKey {
-    border-top: 1px solid #ccc;
-}
-
-.jsonforms-container .pianoRollRow:last-child .pianoRollKey {
-    border-bottom: 1px solid #ccc;
+    width: 50px;
 }
 
 .jsonforms-container .pianoRollRow:hover .pianoRollKey,
@@ -32,7 +23,7 @@
 }
 
 .jsonforms-container .pianoRollRow.cNote .pianoRollKey {
-    border-bottom-width: 3px;
+    border-bottom-width: 2px;
 }
 
 .jsonforms-container .pianoRollRow.cNote:last-child .pianoRollKey {
@@ -40,19 +31,18 @@
 }
 
 .jsonforms-container .pianoRollKey.sharpNote {
-    background-color: #fff !important;
+    background-color: #eee !important;
     color: #ccc;
     position: relative;
 }
 
 .jsonforms-container .pianoRollKey.sharpNote:after {
-    background: linear-gradient(90deg, #000 50%, #555 100%);
-    border-right: 2px solid #999;
+    background: #111;
     content: "";
     height: 100%;
     position: absolute;
     left: 0;
-    width: 55px;
+    width: 75%;
 }
 
 .jsonforms-container .pianoRollKey>div {

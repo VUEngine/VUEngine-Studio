@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { LOWEST_NOTE, SongData } from '../MusicEditorTypes';
+import { BAR_PATTERN_LENGTH_MULT_MAP, LOWEST_NOTE, MusicEditorTool, SongData } from '../MusicEditorTypes';
 import PianoRollKey from './PianoRollKey';
 import PianoRollNote from './PianoRollNote';
 
@@ -13,7 +13,7 @@ const Row = styled.div<RowProps>`
     min-height: ${p => p.last
         ? '11px'
         : p.cNote
-            ? '14px'
+            ? '13px'
             : '12px'
     };
     display: flex;
@@ -30,6 +30,7 @@ interface PianoRollRowProps {
     otherChannelsNotes: { [noteId: string]: number[] }[]
     setNote: (index: number, note: number | undefined) => void
     playNote: (note: number) => void
+    tool: MusicEditorTool
 }
 
 export default function PianoRollRow(props: PianoRollRowProps): React.JSX.Element {
@@ -43,10 +44,12 @@ export default function PianoRollRow(props: PianoRollRowProps): React.JSX.Elemen
         currentNote, setCurrentNote,
         playNote,
         setNote,
+        tool,
     } = props;
 
     const channel = songData.channels[currentChannelId];
     const pattern = channel.patterns[currentPatternId];
+    const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern.bar] * songData.noteResolution;
     const noteIdStr = noteId.toString();
 
     const classNames = ['pianoRollRow'];
@@ -64,12 +67,12 @@ export default function PianoRollRow(props: PianoRollRowProps): React.JSX.Elemen
             note={note}
             playNote={playNote}
         />
-        {[...Array(pattern.size)].map((x, lineIndex) => {
+        {[...Array(patternSize)].map((x, lineIndex) => {
             const otherChannelsIndex = Object.keys(otherChannelsNotes[lineIndex] ?? {}).find(key => key === noteIdStr);
             const otherChannels = otherChannelsIndex ? otherChannelsNotes[lineIndex][otherChannelsIndex] : [];
             return (
                 <PianoRollNote
-                    songData={songData}
+                    noteResolution={songData.noteResolution}
                     key={`pianoroll-row-${lineIndex}-note-${note}`}
                     index={lineIndex}
                     noteId={noteId}
@@ -79,6 +82,7 @@ export default function PianoRollRow(props: PianoRollRowProps): React.JSX.Elemen
                     setCurrentNote={setCurrentNote}
                     playNote={playNote}
                     setNote={setNote}
+                    tool={tool}
                 />);
         })}
     </Row>;

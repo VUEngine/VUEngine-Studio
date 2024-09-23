@@ -2,7 +2,7 @@ import React, { ChangeEventHandler } from 'react';
 
 export interface BasicSelectOption {
     value: string | number | readonly string[] | undefined
-    label: string
+    label?: string
 }
 
 interface BasicSelectProps {
@@ -24,7 +24,7 @@ export default function BasicSelect(props: BasicSelectProps): React.JSX.Element 
     >
         {options.map((option, i) =>
             <option value={option.value} key={i}>
-                {option.label}
+                {option.label ?? option.value}
             </option>
         )}
     </select>;

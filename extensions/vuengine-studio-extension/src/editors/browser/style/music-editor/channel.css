@@ -3,20 +3,10 @@
     flex-direction: row;
     flex-grow: 1;
     min-height: 24px;
-    padding: 1px 0;
 }
 
 .musicEditor .channel.muted {
     opacity: .4;
-}
-
-.musicEditor .collapsedChannel {
-    background-color: var(--theia-secondaryButton-background);
-    border-radius: 2px;
-    cursor: pointer;
-    height: 5px;
-    margin: 1px 0;
-    width: 75px;
 }
 
 .musicEditor .patternFill {
@@ -27,7 +17,6 @@
     opacity: 0;
 }
 
-.musicEditor .channel:hover .patternFill,
-.musicEditor .channel.current .patternFill {
-    opacity: .2;
+.musicEditor .channel:hover .patternFill {
+    opacity: .1;
 }

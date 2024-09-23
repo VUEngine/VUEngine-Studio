@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { SongData } from '../MusicEditorTypes';
+import { BAR_PATTERN_LENGTH_MULT_MAP, MusicEditorTool, SongData } from '../MusicEditorTypes';
 import StepIndicator from '../Sequencer/StepIndicator';
 import NoteProperties from './NoteProperties';
 import PianoRollEditor from './PianoRollEditor';
@@ -14,6 +14,7 @@ export const StyledPianoRoll = styled.div`
     font-size: 10px;
     height: 100%;
     overflow-x: auto;
+    margin: calc(var(--theia-ui-padding) * 2);
     position: relative;
 `;
 
@@ -26,7 +27,6 @@ interface PianoRollProps {
     currentPatternNoteOffset: number
     currentSequenceIndex: number
     currentStep: number
-    playing: boolean
     getChannelName: (channelId: number) => string
     playRangeStart: number
     setPlayRangeStart: (playRangeStart: number) => void
@@ -34,6 +34,7 @@ interface PianoRollProps {
     setPlayRangeEnd: (playRangeEnd: number) => void
     setNote: (index: number, note: number | undefined) => void
     playNote: (note: number) => void
+    tool: MusicEditorTool
 }
 
 export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
@@ -45,12 +46,12 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         currentPatternNoteOffset,
         currentSequenceIndex,
         currentStep,
-        playing,
         getChannelName,
         playRangeStart, setPlayRangeStart,
         playRangeEnd, setPlayRangeEnd,
         setNote,
         playNote,
+        tool,
     } = props;
 
     const channel = songData.channels[currentChannelId];
@@ -65,7 +66,8 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
     if (channel.id === currentChannelId) {
         let patternStartStep = 0;
         channel.sequence.forEach((patternId, index) => {
-            const patternSize = channel.patterns[patternId].size;
+            const pattern = channel.patterns[patternId];
+            const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern.bar] * songData.noteResolution;
             const patternEndStep = patternStartStep + patternSize;
             if (index === currentSequenceIndex && currentStep >= patternStartStep && currentStep < patternEndStep) {
                 currentPatternStep = currentStep - patternStartStep;
@@ -78,9 +80,9 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
     return <StyledPianoRoll className="pianoRoll">
         {<StepIndicator
             currentStep={currentPatternStep}
-            bar={songData.bar}
+            noteResolution={songData.noteResolution}
             isPianoRoll={true}
-            hidden={!playing || currentPatternStep === -1}
+            hidden={currentStep === -1 || currentPatternStep === -1}
         />}
         <PianoRollHeader
             songData={songData}
@@ -102,6 +104,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             setCurrentNote={setCurrentNote}
             setNote={setNote}
             playNote={playNote}
+            tool={tool}
         />
         <NoteProperties
             songData={songData}

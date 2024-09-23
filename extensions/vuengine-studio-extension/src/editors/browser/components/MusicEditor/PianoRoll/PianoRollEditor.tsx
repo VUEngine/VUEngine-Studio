@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
-import { HIGHEST_NOTE, LOWEST_NOTE, NOTES, SongData } from '../MusicEditorTypes';
-import PianoRollRow from './PianoRollRow';
 import styled from 'styled-components';
+import { BAR_PATTERN_LENGTH_MULT_MAP, HIGHEST_NOTE, LOWEST_NOTE, MusicEditorTool, NOTES, SongData } from '../MusicEditorTypes';
+import PianoRollRow from './PianoRollRow';
 
 export const StyledPianoRollEditor = styled.div`
     display: flex;
@@ -22,6 +22,7 @@ interface PianoRollEditorProps {
     setCurrentNote: (note: number) => void
     setNote: (index: number, note: number | undefined) => void
     playNote: (note: number) => void
+    tool: MusicEditorTool
 }
 
 export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.Element {
@@ -34,18 +35,21 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         currentNote, setCurrentNote,
         setNote,
         playNote,
+        tool,
     } = props;
 
     const otherChannelsNotes = useMemo(() => {
         const currentChannel = songData.channels[currentChannelId];
-        const currentPatternSize = currentChannel.patterns[currentPatternId].size;
+        const currentPattern = currentChannel.patterns[currentPatternId];
+        const currentPatternSize = BAR_PATTERN_LENGTH_MULT_MAP[currentPattern.bar] * songData.noteResolution;
         const result: { [noteId: number]: number[] }[] = [];
         songData.channels.forEach((channel, channelIndex) => {
             if (channelIndex !== currentChannelId) {
                 let patternNoteOffset = 0;
                 channel.sequence.forEach(s => {
                     const pattern = channel.patterns[s];
-                    [...Array(pattern.size)].forEach((x, noteIndex) => {
+                    const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern.bar] * songData.noteResolution;
+                    [...Array(patternSize)].forEach((x, noteIndex) => {
                         const note = pattern.notes[noteIndex];
                         if (note && noteIndex >= currentPatternNoteOffset - patternNoteOffset && noteIndex < currentPatternNoteOffset + currentPatternSize - patternNoteOffset) {
                             const index = patternNoteOffset + noteIndex - currentPatternNoteOffset;
@@ -58,7 +62,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                             result[index][note].push(channelIndex);
                         }
                     });
-                    patternNoteOffset += pattern.size;
+                    patternNoteOffset += patternSize;
                 });
             }
         });
@@ -85,6 +89,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                 setCurrentNote={setCurrentNote}
                 setNote={setNote}
                 playNote={playNote}
+                tool={tool}
             />)}
     </StyledPianoRollEditor>;
 }

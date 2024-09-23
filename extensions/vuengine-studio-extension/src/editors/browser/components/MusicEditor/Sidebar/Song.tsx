@@ -1,11 +1,15 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import BasicSelect from '../../Common/BasicSelect';
+import { DataSection } from '../../Common/CommonTypes';
 import HContainer from '../../Common/HContainer';
+import InfoLabel from '../../Common/InfoLabel';
 import RadioSelect from '../../Common/RadioSelect';
+import SectionSelect from '../../Common/SectionSelect';
 import VContainer from '../../Common/VContainer';
 import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor';
-import { MAX_SPEED, MIN_SPEED, PATTERN_SIZES, SongData, VOLUME_STEPS } from '../MusicEditorTypes';
+import { BAR_PATTERN_LENGTH_MULT_MAP, MAX_SPEED, MIN_SPEED, NoteResolution, SongData } from '../MusicEditorTypes';
 
 interface SongProps {
     songData: SongData
@@ -20,8 +24,26 @@ export default function Song(props: SongProps): React.JSX.Element {
         setSongData({ ...songData, name: n });
     };
 
-    const setBar = (b: number): void => {
-        setSongData({ ...songData, bar: b });
+    const setDefaultBar = (defaultBar: string): void => {
+        setSongData({ ...songData, defaultBar });
+    };
+
+    const setSection = (section: DataSection): void => {
+        setSongData({ ...songData, section });
+    };
+
+    const setNoteResolution = (noteResolution: number): void => {
+        // TODO: we also need to adjust patterns when changing resolution.
+        // add notes when selecting a larger resolution
+        // remove notes when selecting a smaller resolution
+        // TODO: we need a confirm dialog explaining the consequences
+        // show number of notes which would be deleted
+
+        setSongData({ ...songData, noteResolution });
+    };
+
+    const toggleLoop = (): void => {
+        setSongData({ ...songData, loop: !songData.loop });
     };
 
     const setSpeed = (s: number): void => {
@@ -30,20 +52,7 @@ export default function Song(props: SongProps): React.JSX.Element {
         }
     };
 
-    const setVolume = (v: number): void => {
-        if (v <= 100 && v >= 0) {
-            setSongData({ ...songData, volume: v });
-        }
-    };
-
-    const setDefaultPatternSize = (size: number): void => {
-        setSongData({
-            ...songData,
-            defaultPatternSize: size,
-        });
-    };
-
-    return <VContainer gap={10}>
+    return <VContainer gap={15}>
         <VContainer>
             <label>
                 {nls.localize('vuengine/musicEditor/songName', 'Song Name')}
@@ -59,26 +68,7 @@ export default function Song(props: SongProps): React.JSX.Element {
 
         <VContainer>
             <label>
-                {nls.localize('vuengine/musicEditor/masterVolume', 'Master Volume')}
-            </label>
-            <HContainer>
-                <input
-                    type='range'
-                    value={songData.volume}
-                    max={100}
-                    min={0}
-                    step={100 / VOLUME_STEPS}
-                    onChange={e => setVolume(parseInt(e.target.value))}
-                />
-                <div style={{ minWidth: 24, overflow: 'hidden', textAlign: 'right', width: 24 }}>
-                    {songData.volume}
-                </div>
-            </HContainer>
-        </VContainer>
-
-        <VContainer>
-            <label>
-                {nls.localize('vuengine/musicEditor/bpm', 'BPM')}
+                {nls.localize('vuengine/musicEditor/speedBpm', 'Speed (BPM)')}
             </label>
             <HContainer>
                 <input
@@ -97,30 +87,63 @@ export default function Song(props: SongProps): React.JSX.Element {
 
         <VContainer>
             <label>
-                {nls.localize('vuengine/musicEditor/bar', 'Bar')}
-            </label>
-            <HContainer>
                 <input
-                    type='range'
-                    value={songData.bar}
-                    max={16}
-                    min={2}
-                    step={2}
-                    onChange={e => setBar(parseInt(e.target.value))}
+                    type="checkbox"
+                    checked={songData.loop}
+                    onChange={() => toggleLoop()}
                 />
-                <div style={{ minWidth: 24, overflow: 'hidden', textAlign: 'right', width: 24 }}>
-                    {songData.bar}
-                </div>
-            </HContainer>
+                {nls.localize('vuengine/musicEditor/loop', 'Loop')}
+            </label>
         </VContainer>
 
-        <VContainer>
-            {nls.localize('vuengine/musicEditor/defaultPatternSize', 'Default Pattern Size')}
-            <RadioSelect
-                options={PATTERN_SIZES.map(size => ({ value: size }))}
-                defaultValue={songData.defaultPatternSize}
-                onChange={options => setDefaultPatternSize(options[0].value as number)}
-            />
-        </VContainer>
+        <HContainer gap={15}>
+            <VContainer grow={1}>
+                <label>
+                    {nls.localize('vuengine/musicEditor/defaultBar', 'Default Bar')}
+                </label>
+                <BasicSelect
+                    options={Object.keys(BAR_PATTERN_LENGTH_MULT_MAP).map(v => ({ value: v }))}
+                    value={songData.defaultBar}
+                    onChange={e => setDefaultBar(e.target.value)}
+                />
+            </VContainer>
+            <VContainer>
+                <InfoLabel
+                    label={nls.localize('vuengine/musicEditor/noteResolution', 'Note Resolution')}
+                    tooltip={nls.localize(
+                        'vuengine/musicEditor/noteResolutionDescription',
+                        'This defines the length of every single note in this song, ' +
+                        'or, in other words, the amount of notes per whole tone segment. ' +
+                        'The higher the value, the more detailed sound you can create, ' +
+                        'but also the higher the required storage space. '
+                    )}
+                />
+                <RadioSelect
+                    options={[{
+                        label: '1/4',
+                        value: NoteResolution.QUARTER,
+                    }, {
+                        label: '1/8',
+                        value: NoteResolution.EIGHTH,
+                    }, {
+                        label: '1/16',
+                        value: NoteResolution.SIXTEENTH,
+                    }, {
+                        label: '1/32',
+                        value: NoteResolution.THIRTYSECOND,
+                    }]}
+                    defaultValue={songData.noteResolution}
+                    onChange={options => setNoteResolution(options[0].value as number)}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                />
+            </VContainer>
+        </HContainer>
+        <SectionSelect
+            value={songData.section}
+            setValue={setSection}
+            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+        />
     </VContainer>;
 }

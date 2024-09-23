@@ -1,7 +1,7 @@
 import { nls } from '@theia/core';
 import React from 'react';
 import styled from 'styled-components';
-import { SongData } from '../MusicEditorTypes';
+import { BAR_PATTERN_LENGTH_MULT_MAP, SongData } from '../MusicEditorTypes';
 import NotePropertiesNote from './NotePropertiesNote';
 
 export const MetaLine = styled.div`
@@ -16,9 +16,9 @@ export const MetaLineHeader = styled.div`
     flex-direction: column;
     height: 28px;
     margin-right: 3px;
-    min-width: 75px;
+    min-width: 50px;
     opacity: .5;
-    width: 75px;
+    width: 50px;
 `;
 
 export const MetaLineHeaderLine = styled.div`
@@ -47,6 +47,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
 
     const channel = songData.channels[currentChannelId];
     const pattern = channel.patterns[currentPatternId];
+    const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern.bar] * songData.noteResolution;
 
     let volumeL = 100;
     let volumeR = 100;
@@ -60,7 +61,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                 {nls.localize('vuengine/musicEditor/volume', 'Volume')}
             </MetaLineHeaderLine>
         </MetaLineHeader>
-        {[...Array(pattern.size)].map((x, index) => {
+        {[...Array(patternSize)].map((x, index) => {
             volumeL = pattern.volumeL[index] ?? volumeL;
             volumeR = pattern.volumeR[index] ?? volumeR;
             return (
@@ -68,9 +69,9 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                     key={`pianoroll-note-properties-volume-note-${index}`}
                     index={index}
                     effects={[]}
+                    noteResolution={songData.noteResolution}
                     volumeL={volumeL}
                     volumeR={volumeR}
-                    songData={songData}
                     setCurrentNote={setCurrentNote}
                     setNote={setNote}
                 />

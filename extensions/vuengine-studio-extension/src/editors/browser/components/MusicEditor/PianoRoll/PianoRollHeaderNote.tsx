@@ -1,7 +1,7 @@
 import React from 'react';
-import { SongData } from '../MusicEditorTypes';
-import { MetaLineNote, MetaLineNoteProps } from './NotePropertiesNote';
 import styled from 'styled-components';
+import { BAR_PATTERN_LENGTH_MULT_MAP, SongData } from '../MusicEditorTypes';
+import { MetaLineNote, MetaLineNoteProps } from './NotePropertiesNote';
 
 interface HeaderNoteProps extends MetaLineNoteProps {
     rangeStart: boolean
@@ -13,16 +13,8 @@ export const HeaderNote = styled(MetaLineNote) <HeaderNoteProps>`
     ${p => (p.rangeStart || p.rangeEnd || p.inRange) && `
         border-top: 1px solid var(--theia-focusBorder);
     `}
-    margin-right: ${p => p.rangeEnd
-        ? '2px'
-        : '0'
-    };
-    padding-right: ${p => p.nth
-        ? p.rangeEnd
-            ? '0'
-            : '2px'
-        : '1px'
-    };  
+    margin-right: 0px !important;
+    padding-right: 1px;
     
     ${p => p.rangeStart && `
         &::before {
@@ -47,6 +39,13 @@ export const HeaderNote = styled(MetaLineNote) <HeaderNoteProps>`
             z-index: 1;
         }
     `}
+
+    &:nth-child(4n + 1) {
+        padding-right: 2px;
+    }
+    &:nth-child(${p => p.noteResolution}n + 1) {
+        padding-right: 3px;
+    }
 `;
 
 interface PianoRollHeaderNoteProps {
@@ -72,6 +71,7 @@ export default function PianoRollHeaderNote(props: PianoRollHeaderNoteProps): Re
 
     const channel = songData.channels[currentChannelId];
     const pattern = channel.patterns[currentPatternId];
+    const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern.bar] * songData.noteResolution;
 
     const classNames = ['metaLineNote'];
     /*
@@ -108,7 +108,7 @@ export default function PianoRollHeaderNote(props: PianoRollHeaderNoteProps): Re
             start = 0;
         }
         if (end === -1 && start > -1) {
-            end = pattern.size - 1;
+            end = patternSize - 1;
         }
 
         // handle end < start
@@ -131,7 +131,7 @@ export default function PianoRollHeaderNote(props: PianoRollHeaderNoteProps): Re
     return (
         <HeaderNote
             className={classNames.join(' ')}
-            nth={(index + 1) % songData.bar === 0}
+            noteResolution={songData.noteResolution}
             rangeStart={playRangeStart === index}
             rangeEnd={playRangeEnd === index}
             inRange={index > playRangeStart && index < playRangeEnd}

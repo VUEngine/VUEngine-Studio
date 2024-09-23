@@ -84,7 +84,7 @@ export default function CurrentComponent(props: CurrentComponentProps): React.JS
                     return <Physics />;
                 /*
                 default:
-                    return <div className='empty'>
+                    return <div className="lightLabel">
                         {nls.localize(
                             'vuengine/entityEditor/noComponentSelected',
                             'No component selected. Select any component to edit its properties.',
