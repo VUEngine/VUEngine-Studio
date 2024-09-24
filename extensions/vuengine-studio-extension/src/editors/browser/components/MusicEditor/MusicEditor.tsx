@@ -6,10 +6,21 @@ import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType
 import HContainer from '../Common/HContainer';
 import PopUpDialog from '../Common/PopUpDialog';
 import VContainer from '../Common/VContainer';
+import ModulationData from '../VsuSandbox/ModulationData';
 import WaveformWithPresets from '../VsuSandbox/WaveformWithPresets';
 import { MusicEditorCommands } from './MusicEditorCommands';
 import MusicEditorToolbar from './MusicEditorToolbar';
-import { BAR_PATTERN_LENGTH_MULT_MAP, ChannelConfig, InstrumentConfig, MusicEditorMode, MusicEditorTool, NOTES, PatternConfig, SongData, SongNote } from './MusicEditorTypes';
+import {
+    BAR_PATTERN_LENGTH_MULT_MAP,
+    ChannelConfig,
+    InstrumentConfig,
+    MusicEditorMode,
+    MusicEditorTool,
+    NOTES,
+    PatternConfig,
+    SongData,
+    SongNote
+} from './MusicEditorTypes';
 import MusicPlayer from './MusicPlayer';
 import PianoRoll from './PianoRoll/PianoRoll';
 import Sequencer from './Sequencer/Sequencer';
@@ -54,6 +65,7 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
     const [songLength, setSongLength] = useState<number>(0);
     const [sidebarTab, setSidebarTab] = useState<number>(0);
     const [waveformDialogOpen, setWaveformDialogOpen] = useState<number>(-1);
+    const [modulationDataDialogOpen, setModulationDataDialogOpen] = useState<number>(-1);
 
     const updatePlayRangeStart = (value: number) => {
         if (currentStep > -1) {
@@ -187,19 +199,14 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
         updateSongData({ ...songData, waveforms: updatedWaveforms });
     };
 
-    const getChannelName = (i: number): string => {
-        switch (i) {
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-                return `${nls.localize('vuengine/musicEditor/waveShort', 'W')}${i + 1}`;
-            case 4:
-                return nls.localize('vuengine/musicEditor/sweepModulationShort', 'SM');
-            case 5:
-                return nls.localize('vuengine/musicEditor/noiseShort', 'N');
-        }
-        return '';
+    const setInstrumentModulationData = (modulationData: number[]) => {
+        const updatedInstruments = [...songData.instruments];
+        updatedInstruments[currentInstrument] = {
+            ...updatedInstruments[currentInstrument],
+            modulationData,
+        };
+
+        setInstruments(updatedInstruments);
     };
 
     const computeSong = (): void => {
@@ -350,7 +357,6 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                             setCurrentChannelId={updateCurrentChannelId}
                             currentSequenceIndex={currentSequenceIndex}
                             setCurrentSequenceIndex={updateCurrentSequenceIndex}
-                            getChannelName={getChannelName}
                             toggleChannelMuted={toggleChannelMuted}
                             toggleChannelSolo={toggleChannelSolo}
                             setChannel={setChannel}
@@ -364,7 +370,6 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                             currentPatternNoteOffset={currentPatternNoteOffset}
                             currentChannelId={currentChannelId}
                             currentSequenceIndex={currentSequenceIndex}
-                            getChannelName={getChannelName}
                             playRangeStart={playRangeStart}
                             setPlayRangeStart={updatePlayRangeStart}
                             playRangeEnd={playRangeEnd}
@@ -380,9 +385,8 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                 <Tabs
                     selectedIndex={sidebarTab}
                     onSelect={index => setSidebarTab(index)}
-                    style={{ padding: 'calc(var(--theia-ui-padding) * 2)' }}
                 >
-                    <TabList style={{ display: 'flex' }}>
+                    <TabList style={{ display: 'flex', padding: 'var(--padding) var(--padding) 0 var(--padding)' }}>
                         <Tab
                             title={nls.localize('vuengine/musicEditor/selected', 'Selected')}
                             style={{ display: 'flex', flexGrow: 1, height: 26, justifyContent: 'center', marginRight: 0 }}
@@ -409,7 +413,7 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                         </Tab>
                     </TabList>
                     <TabPanel>
-                        <VContainer gap={15}>
+                        <VContainer gap={15} style={{ padding: '0 var(--padding) var(--padding) var(--padding)' }}>
                             <Channel
                                 songData={songData}
                                 currentChannelId={currentChannelId}
@@ -441,22 +445,27 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                         </VContainer>
                     </TabPanel>
                     <TabPanel>
-                        <Instruments
-                            songData={songData}
-                            currentInstrument={currentInstrument}
-                            setCurrentInstrument={setCurrentInstrument}
-                            setInstruments={setInstruments}
-                            setSidebarTab={setSidebarTab}
-                        />
+                        <VContainer gap={15} style={{ padding: '0 var(--padding) var(--padding) var(--padding)' }}>
+                            <Instruments
+                                songData={songData}
+                                currentInstrument={currentInstrument}
+                                setCurrentInstrument={setCurrentInstrument}
+                                setInstruments={setInstruments}
+                                setSidebarTab={setSidebarTab}
+                                setModulationDataDialogOpen={setModulationDataDialogOpen}
+                            />
+                        </VContainer>
                     </TabPanel>
                     <TabPanel>
-                        <InputDevices />
+                        <VContainer gap={15} style={{ padding: '0 var(--padding) var(--padding) var(--padding)' }}>
+                            <InputDevices />
+                        </VContainer>
                     </TabPanel>
                     <TabPanel>
-                        <VContainer gap={15}>
+                        <VContainer gap={15} style={{ padding: '0 var(--padding) var(--padding) var(--padding)' }}>
                             <Song
                                 songData={songData}
-                                setSongData={updateSongData}
+                                updateSongData={updateSongData}
                             />
                             <hr />
                             <Waveforms
@@ -473,7 +482,8 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                 open={waveformDialogOpen > -1}
                 onClose={() => setWaveformDialogOpen(-1)}
                 onOk={() => setWaveformDialogOpen(-1)}
-                title={nls.localize('vuengine/musicEditor/editWaveform', 'Edit Waveform')}
+                title={nls.localize('vuengine/musicEditor/editWaveform', 'Edit Waveform')
+                }
                 height='100%'
                 width='100%'
             >
@@ -482,6 +492,21 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                     setValue={setWaveform}
                 />
             </PopUpDialog>
-        </HContainer>
+            <PopUpDialog
+                open={modulationDataDialogOpen > -1}
+                onClose={() => setModulationDataDialogOpen(-1)}
+                onOk={() => setModulationDataDialogOpen(-1)}
+                title={nls.localize('vuengine/musicEditor/editModulationData', 'Edit Modulation Data')}
+                height='100%'
+                width='100%'
+            >
+                {songData.instruments[modulationDataDialogOpen] &&
+                    <ModulationData
+                        value={songData.instruments[modulationDataDialogOpen].modulationData}
+                        setValue={setInstrumentModulationData}
+                    />
+                }
+            </PopUpDialog>
+        </HContainer >
     );
 }

@@ -1,58 +1,6 @@
 import { nls } from '@theia/core';
 import React from 'react';
-import styled from 'styled-components';
-
-export interface MetaLineNoteProps {
-    noteResolution: number
-}
-
-export const MetaLineNote = styled.div<MetaLineNoteProps>`
-    align-items: center;
-    cursor: ew-resize;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    gap: 1px;
-    margin-bottom: 1px;
-    margin-right: 1px;
-    min-width: 15px;
-    max-width: 15px;
-    position: relative;
-
-    &:hover {
-        outline: 1px solid var(--theia-focusBorder);
-    }
-    &:nth-child(4n + 1) {
-        margin-right: 2px;
-    }
-    &:nth-child(${p => p.noteResolution}n + 1) {
-        margin-right: 3px;
-    }
-`;
-
-export const MetaLineNoteEffects = styled.div`
-    align-items: center;
-    display: flex;
-    font-size: 8px;
-    flex-grow: 1;
-    justify-content: center;
-    overflow: hidden;
-    width: 100%;
-`;
-
-export const MetaLineNoteVolume = styled.div`
-    align-items: end;
-    background-color: var(--theia-secondaryButton-background);
-    display: flex;
-    height: 16px;
-    width: 100%;
-`;
-
-export const MetaLineNoteVolumeChannel = styled.div`
-    background-color: var(--theia-editor-foreground);
-    flex-grow: 1;
-    opacity: .4;
-`;
+import { MetaLineNote, MetaLineNoteEffects, MetaLineNoteVolume, MetaLineNoteVolumeChannel } from './StyledComponents';
 
 interface NotePropertiesNoteProps {
     index: number
@@ -72,7 +20,7 @@ export default function NotePropertiesNote(props: NotePropertiesNoteProps): Reac
     const rightLabel = nls.localize('vuengine/musicEditor/right', 'Right');
 
     return <MetaLineNote
-        noteResolution={noteResolution}
+        className={`noteResolution${noteResolution}`}
         title={`${effects.length} ${labelEffects}, ${leftLabel}: ${volumeL}%/${rightLabel}: ${volumeR}%`}
         onClick={() => setCurrentNote(index)}
         onContextMenu={() => setNote(index, undefined)}

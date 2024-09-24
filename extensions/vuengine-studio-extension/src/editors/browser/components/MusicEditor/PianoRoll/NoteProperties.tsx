@@ -1,32 +1,8 @@
 import { nls } from '@theia/core';
 import React from 'react';
-import styled from 'styled-components';
 import { BAR_PATTERN_LENGTH_MULT_MAP, SongData } from '../MusicEditorTypes';
 import NotePropertiesNote from './NotePropertiesNote';
-
-export const MetaLine = styled.div`
-    display: flex;
-    flex-direction: row;
-    flex-grow: 1;
-    padding-right: 10px;
-`;
-
-export const MetaLineHeader = styled.div`
-    display: flex;
-    flex-direction: column;
-    height: 28px;
-    margin-right: 3px;
-    min-width: 50px;
-    opacity: .5;
-    width: 50px;
-`;
-
-export const MetaLineHeaderLine = styled.div`
-    align-items: center;
-    display: flex;
-    flex-grow: 1;
-    min-height: 13px;
-`;
+import { MetaLine, MetaLineHeader, MetaLineHeaderLine } from './StyledComponents';
 
 interface NotePropertiesProps {
     songData: SongData
@@ -52,7 +28,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
     let volumeL = 100;
     let volumeR = 100;
 
-    return <MetaLine style={{ marginTop: 3 }}>
+    return <MetaLine style={{ bottom: 0 }}>
         <MetaLineHeader>
             <MetaLineHeaderLine>
                 {nls.localize('vuengine/musicEditor/effects', 'Effects')}

@@ -1,4 +1,5 @@
 import { nls } from '@theia/core';
+import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import BasicSelect from '../../Common/BasicSelect';
@@ -7,7 +8,6 @@ import VContainer from '../../Common/VContainer';
 import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor';
 import { BAR_PATTERN_LENGTH_MULT_MAP, PatternConfig, SongData } from '../MusicEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
-import { ConfirmDialog } from '@theia/core/lib/browser';
 
 interface CurrentPatternProps {
     songData: SongData

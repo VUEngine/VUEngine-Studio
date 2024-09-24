@@ -13,7 +13,7 @@ const ColumnContainer = styled.div`
     cursor: pointer;
     display: flex;
     height: 32px;
-    min-width: 32px;
+    width: 32px;
     overflow: hidden;
     padding: 1px;
     user-select: none;

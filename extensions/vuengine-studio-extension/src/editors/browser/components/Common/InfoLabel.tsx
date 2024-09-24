@@ -5,6 +5,7 @@ import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 
 interface InfoLabelProps {
     label: string
+    subLabel?: string
     count?: number
     tooltip?: string | ReactElement
     tooltipPosition?: HoverPosition
@@ -13,7 +14,7 @@ interface InfoLabelProps {
 
 export default function InfoLabel(props: PropsWithChildren<InfoLabelProps>): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
-    const { label, tooltip, tooltipPosition, count, hoverService } = props;
+    const { label, subLabel, tooltip, tooltipPosition, count, hoverService } = props;
 
     let content: string | HTMLElement = tooltip as string;
     if (tooltip && typeof tooltip !== 'string') {
@@ -44,5 +45,8 @@ export default function InfoLabel(props: PropsWithChildren<InfoLabelProps>): Rea
                 }}
             />
         }
+        {subLabel && <>
+            {' '}<span className='lightLabel'>{subLabel}</span>
+        </>}
     </label>;
 }

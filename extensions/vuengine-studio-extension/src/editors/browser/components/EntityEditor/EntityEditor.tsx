@@ -26,19 +26,13 @@ import Preview from './Preview/Preview';
 import Script from './Scripts/Script';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 
-interface EditorSidebarProps {
-  show: boolean
-  orientation: 'left' | 'right'
-}
-
-const EditorSidebar = styled.div<EditorSidebarProps>`
+const EditorSidebar = styled.div`
   background-color: rgba(17, 17, 17, .9);
   border-radius: 2px;
   border: 1px solid var(--theia-activityBar-background);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  margin-${p => p.orientation}: ${p => p.show ? 0 : 'calc(-320px - 1px - var(--padding))'};
   max-height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
@@ -51,13 +45,8 @@ const EditorSidebar = styled.div<EditorSidebarProps>`
   }
 `;
 
-interface ShowTreeButtonProps {
-  show: boolean
-}
-
-const ShowTreeButton = styled.button<ShowTreeButtonProps>`
+const ShowTreeButton = styled.button`
   left: var(--padding);
-  opacity: ${p => p.show ? 1 : 0};
   position: absolute;
   top: calc(var(--padding) + 4px);
   transition: all .1s;
@@ -712,9 +701,10 @@ export default function EntityEditor(props: EntityEditorProps): React.JSX.Elemen
               }}
             >
               <EditorSidebar
-                show={leftSidebarOpen}
-                orientation='left'
-                style={{ position: 'relative' }}
+                style={{
+                  marginLeft: leftSidebarOpen ? 0 : 'calc(-320px - 1px - var(--padding))',
+                  position: 'relative',
+                }}
               >
                 <HideTreeButton
                   className="theia-button secondary"
@@ -728,7 +718,9 @@ export default function EntityEditor(props: EntityEditorProps): React.JSX.Elemen
               </EditorSidebar>
               {!leftSidebarOpen &&
                 <ShowTreeButton
-                  show={!leftSidebarOpen}
+                  style={{
+                    opacity: leftSidebarOpen ? 0 : 1,
+                  }}
                   className="theia-button secondary"
                   title={nls.localize('vuengine/entityEditor/showComponentsTree', 'Show Components Tree')}
                   onClick={() => setLeftSidebarOpen(true)}
@@ -737,8 +729,12 @@ export default function EntityEditor(props: EntityEditorProps): React.JSX.Elemen
                 </ShowTreeButton>
               }
               <EditorSidebar
-                show={currentComponent.includes('-') || ['animations', 'colliders', 'extraProperties', 'physics', 'sprites'].includes(currentComponent)}
-                orientation='right'
+                style={{
+                  marginRight: currentComponent.includes('-') || ['animations', 'colliders', 'extraProperties', 'physics', 'sprites'].includes(currentComponent)
+                    ? 0
+                    : 'calc(-320px - 1px - var(--padding))',
+                }}
+
               >
                 <CurrentComponent
                   isMultiFileAnimation={isMultiFileAnimation}
@@ -750,6 +746,6 @@ export default function EntityEditor(props: EntityEditorProps): React.JSX.Elemen
           </EntityEditorContext.Consumer>
         }
       </EntityEditorContext.Provider>
-    </div>
+    </div >
   );
 }

@@ -1,9 +1,12 @@
 import React from 'react';
-import { BAR_PATTERN_LENGTH_MULT_MAP, ChannelConfig, HIGHEST_NOTE, LOWEST_NOTE, NOTES, SongData } from '../MusicEditorTypes';
+import { BAR_PATTERN_LENGTH_MULT_MAP, ChannelConfig, SongData } from '../MusicEditorTypes';
 import AddPattern from './AddPattern';
+import ChannelHeader from './ChannelHeader';
 import Pattern from './Pattern';
+import { StyledChannel, StyledPatternFill } from './StyledComponents';
 
 interface ChannelProps {
+    songData: SongData
     channelConfig: ChannelConfig
     currentChannelId: number
     setCurrentChannelId: (currentChannelId: number) => void
@@ -14,11 +17,13 @@ interface ChannelProps {
     number: number
     otherSolo: boolean
     setChannel: (channelId: number, channel: Partial<ChannelConfig>) => void
-    songData: SongData,
+    toggleChannelMuted: (channelId: number) => void
+    toggleChannelSolo: (channelId: number) => void
 }
 
 export default function Channel(props: ChannelProps): React.JSX.Element {
     const {
+        songData,
         channelConfig,
         currentChannelId, setCurrentChannelId,
         currentPatternId, setCurrentPatternId,
@@ -26,10 +31,10 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
         number,
         otherSolo,
         setChannel,
-        songData,
+        toggleChannelMuted, toggleChannelSolo,
     } = props;
 
-    const classNames = ['channel'];
+    const classNames = [];
     if (channelConfig.muted || otherSolo) {
         classNames.push('muted');
     }
@@ -40,24 +45,24 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
         classNames.push('current');
     }
 
-    const patternHeight = Object.keys(NOTES)
-        .filter((note, index) =>
-            index <= LOWEST_NOTE &&
-            index >= HIGHEST_NOTE)
-        .length;
-
     return (
-        <div className={classNames.join(' ')}>
+        <StyledChannel className={classNames.join(' ')}>
+            <ChannelHeader
+                channel={channelConfig}
+                currentChannelId={currentChannelId}
+                setCurrentChannelId={setCurrentChannelId}
+                toggleChannelMuted={toggleChannelMuted}
+                toggleChannelSolo={toggleChannelSolo}
+            />
             {channelConfig.sequence.map((patternId, index) =>
                 <Pattern
-                    key={`channel-${number}-pattern-${index}`}
                     songData={songData}
+                    key={index}
                     index={index}
                     channel={number}
                     pattern={channelConfig.patterns[patternId]}
                     patternSize={BAR_PATTERN_LENGTH_MULT_MAP[channelConfig.patterns[patternId].bar] * songData.noteResolution}
                     patternId={patternId}
-                    height={patternHeight}
                     currentChannelId={currentChannelId}
                     currentPatternId={currentPatternId}
                     currentSequenceIndex={currentSequenceIndex}
@@ -65,15 +70,14 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                     setChannel={setChannel}
                 />)}
             <AddPattern
+                songData={songData}
                 channel={channelConfig}
                 setChannel={setChannel}
-                songData={songData}
                 setCurrentPatternId={setCurrentPatternId}
             />
-            <div
-                className='patternFill'
+            <StyledPatternFill
                 onClick={() => setCurrentChannelId(number)}
-            ></div>
-        </div>
+            ></StyledPatternFill>
+        </StyledChannel>
     );
 }

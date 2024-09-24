@@ -1,23 +1,8 @@
 import React from 'react';
-import styled from 'styled-components';
 import { BAR_PATTERN_LENGTH_MULT_MAP, LOWEST_NOTE, MusicEditorTool, SongData } from '../MusicEditorTypes';
 import PianoRollKey from './PianoRollKey';
 import PianoRollNote from './PianoRollNote';
-
-interface RowProps {
-    cNote: boolean
-    last: boolean
-}
-
-const Row = styled.div<RowProps>`
-    min-height: ${p => p.last
-        ? '11px'
-        : p.cNote
-            ? '13px'
-            : '12px'
-    };
-    display: flex;
-`;
+import { StyledPianoRollRow } from './StyledComponents';
 
 interface PianoRollRowProps {
     songData: SongData
@@ -52,16 +37,15 @@ export default function PianoRollRow(props: PianoRollRowProps): React.JSX.Elemen
     const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern.bar] * songData.noteResolution;
     const noteIdStr = noteId.toString();
 
-    const classNames = ['pianoRollRow'];
+    const classNames = [];
     if (note.startsWith('C') && note.length === 2) {
         classNames.push('cNote');
     }
+    if (noteId === LOWEST_NOTE) {
+        classNames.push('last');
+    }
 
-    return <Row
-        className={classNames.join(' ')}
-        cNote={note.startsWith('C') && note.length === 2}
-        last={noteId === LOWEST_NOTE}
-    >
+    return <StyledPianoRollRow className={classNames.join(' ')}>
         <PianoRollKey
             noteId={noteId}
             note={note}
@@ -85,5 +69,5 @@ export default function PianoRollRow(props: PianoRollRowProps): React.JSX.Elemen
                     tool={tool}
                 />);
         })}
-    </Row>;
+    </StyledPianoRollRow>;
 }

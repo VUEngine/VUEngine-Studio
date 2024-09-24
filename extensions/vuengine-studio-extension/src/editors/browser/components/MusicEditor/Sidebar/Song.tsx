@@ -13,23 +13,23 @@ import { BAR_PATTERN_LENGTH_MULT_MAP, MAX_SPEED, MIN_SPEED, NoteResolution, Song
 
 interface SongProps {
     songData: SongData
-    setSongData: (songData: SongData) => void
+    updateSongData: (songData: SongData) => void
 }
 
 export default function Song(props: SongProps): React.JSX.Element {
-    const { songData, setSongData } = props;
+    const { songData, updateSongData } = props;
     const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
 
     const setName = (n: string): void => {
-        setSongData({ ...songData, name: n });
+        updateSongData({ ...songData, name: n });
     };
 
     const setDefaultBar = (defaultBar: string): void => {
-        setSongData({ ...songData, defaultBar });
+        updateSongData({ ...songData, defaultBar });
     };
 
     const setSection = (section: DataSection): void => {
-        setSongData({ ...songData, section });
+        updateSongData({ ...songData, section });
     };
 
     const setNoteResolution = (noteResolution: number): void => {
@@ -39,16 +39,16 @@ export default function Song(props: SongProps): React.JSX.Element {
         // TODO: we need a confirm dialog explaining the consequences
         // show number of notes which would be deleted
 
-        setSongData({ ...songData, noteResolution });
+        updateSongData({ ...songData, noteResolution });
     };
 
     const toggleLoop = (): void => {
-        setSongData({ ...songData, loop: !songData.loop });
+        updateSongData({ ...songData, loop: !songData.loop });
     };
 
     const setSpeed = (s: number): void => {
         if (s <= MAX_SPEED && s >= MIN_SPEED) {
-            setSongData({ ...songData, speed: s });
+            updateSongData({ ...songData, speed: s });
         }
     };
 

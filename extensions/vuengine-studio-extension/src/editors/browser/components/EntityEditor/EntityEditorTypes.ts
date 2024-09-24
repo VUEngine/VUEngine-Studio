@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import { createContext, Dispatch, SetStateAction } from 'react';
 import { ColorMode } from '../../../../core/browser/ves-common-types';
 import { ConversionResult, ImageCompressionType, ImageProcessingSettings } from '../../../../images/browser/ves-images-types';
 import { DataSection } from '../Common/CommonTypes';
@@ -23,10 +23,10 @@ import {
     WireframeType
 } from '../Common/VUEngineTypes';
 import { EntityEditorSaveDataOptions } from './EntityEditor';
-import { ScriptType, ScriptedActionData } from './Scripts/ScriptTypes';
+import { ScriptedActionData, ScriptType } from './Scripts/ScriptTypes';
 
 // @ts-ignore
-export const EntityEditorContext = React.createContext<EntityEditorContextType>({});
+export const EntityEditorContext = createContext<EntityEditorContextType>({});
 
 export interface LocalStorageEntityEditorState {
     previewAnaglyph: boolean

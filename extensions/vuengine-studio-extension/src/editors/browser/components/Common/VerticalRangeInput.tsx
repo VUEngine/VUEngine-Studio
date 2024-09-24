@@ -2,16 +2,11 @@ import React from 'react';
 import styled from 'styled-components';
 import { clamp } from './Utils';
 
-interface ColumnProps {
-    maxWidth?: number
-}
-
-const Column = styled.div<ColumnProps>`
+const Column = styled.div`
     display: flex;
     flex-direction: column;
     flex-grow: 1;
     gap: 2px;
-    ${p => p.maxWidth ? `max-width: ${p.maxWidth}px;` : ''}
     min-width: 24px;
 `;
 
@@ -24,20 +19,13 @@ const Index = styled.div`
     line-height: 14px;
 `;
 
-interface BarContainerProps {
-    height?: number
-    steps: number
-}
-
-const BarContainer = styled.div<BarContainerProps>`
+const BarContainer = styled.div`
     background-image: repeating-linear-gradient(to bottom, transparent, transparent 50%, rgba(0, 0, 0, .2) 50%, rgba(0, 0, 0, .2));
-    background-size: 100% calc(100% / ${p => p.steps / 2});
     border: var(--theia-border-width) solid var(--theia-dropdown-border);
     border-radius: 2px;
     box-sizing: border-box;
     cursor: pointer;
     flex-grow: 1;
-    ${p => p.height ? `height: ${p.height}px;` : ''}
     overflow: hidden;
     position: relative;
     width: 100%;
@@ -101,15 +89,17 @@ export default function VerticalRangeInput(props: VerticalRangeInputProps): Reac
         }
     };
 
-    return <Column maxWidth={maxWidth}>
+    return <Column style={{ maxWidth }}>
         <Index>
             {index + 1}
         </Index>
         <BarContainer
-            steps={max}
-            height={barHeight}
             onMouseDown={onMouse}
             onMouseMoveCapture={onMouse}
+            style={{
+                backgroundSize: `100% calc(100% / ${max / 2})`,
+                height: barHeight,
+            }}
         >
             <Bar
                 style={{ height: `${value / max * 100}%` }}

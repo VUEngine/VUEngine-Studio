@@ -263,7 +263,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                 checked={channel?.enabled ?? false}
                 onChange={toggleEnabled}
             />
-            Enabled
+            {nls.localizeByDefault('Enabled')}
         </label>
         {channel?.enabled &&
             <HContainer gap={25} wrap='wrap'>
@@ -371,7 +371,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                 checked={channel?.interval?.enabled ?? false}
                                 onChange={toggleIntervalEnabled}
                             />
-                            Enabled
+                            {nls.localizeByDefault('Enabled')}
                         </label>
                         {channel?.interval?.enabled &&
                             <VContainer>
@@ -403,7 +403,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                     checked={channel?.envelope?.enabled ?? false}
                                     onChange={toggleEnvelopeEnabled}
                                 />
-                                Enabled
+                                {nls.localizeByDefault('Enabled')}
                             </label>
                             {channel?.envelope?.enabled &&
                                 <label>
@@ -480,7 +480,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                         checked={channel?.sweepMod?.enabled ?? false}
                                         onChange={toggleSweepModulationEnabled}
                                     />
-                                    Enabled
+                                    {nls.localizeByDefault('Enabled')}
                                 </label>
                                 {channel?.sweepMod?.enabled &&
                                     <label>
@@ -489,7 +489,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                             checked={channel?.sweepMod?.repeat ?? false}
                                             onChange={toggleSweepModulationRepeat}
                                         />
-                                        Repeat
+                                        {nls.localizeByDefault('Repeat')}
                                     </label>
                                 }
                             </VContainer>

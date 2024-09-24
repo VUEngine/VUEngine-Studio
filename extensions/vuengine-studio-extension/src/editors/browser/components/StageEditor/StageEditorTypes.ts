@@ -1,10 +1,10 @@
-import React from 'react';
-import { StageEditorSaveDataOptions } from './StageEditor';
+import { createContext } from 'react';
 import { Brightness, PixelSize, PixelVector, Vector3D } from '../Common/VUEngineTypes';
 import { PositionedEntityData } from '../EntityEditor/EntityEditorTypes';
+import { StageEditorSaveDataOptions } from './StageEditor';
 
 // @ts-ignore
-export const StageEditorContext = React.createContext<StageEditorContextType>({});
+export const StageEditorContext = createContext<StageEditorContextType>({});
 
 export interface StageEditorContextType {
     state: StageEditorState

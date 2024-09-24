@@ -1,46 +1,60 @@
 import React from 'react';
 import { ChannelConfig } from '../MusicEditorTypes';
+import { StyledChannelHeader, StyledChannelHeaderButton, StyledChannelHeaderButtons, StyledChannelHeaderInfo } from './StyledComponents';
+import { nls } from '@theia/core';
 
 interface ChannelHeaderProps {
     channel: ChannelConfig
-    number: number
     currentChannelId: number
     setCurrentChannelId: (currentChannelId: number) => void
-    getChannelName: (channelId: number) => string
     toggleChannelMuted: (channelId: number) => void
     toggleChannelSolo: (channelId: number) => void
 }
 
 export default function ChannelHeader(props: ChannelHeaderProps): React.JSX.Element {
-    const { channel, number, currentChannelId, setCurrentChannelId, getChannelName, toggleChannelMuted, toggleChannelSolo } = props;
+    const { channel, currentChannelId, setCurrentChannelId, toggleChannelMuted, toggleChannelSolo } = props;
 
-    const classNames = ['channelHeader'];
-    if (currentChannelId === number) {
+    const classNames = [];
+    if (currentChannelId === channel.id) {
         classNames.push('current');
     }
 
-    return <div className={classNames.join(' ')}>
-        <div
-            className='channelInfo'
-            onClick={() => setCurrentChannelId(number)}
+    const getChannelName = (i: number): string => {
+        switch (i) {
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+                return `${nls.localize('vuengine/musicEditor/waveShort', 'W')}${i + 1}`;
+            case 4:
+                return nls.localize('vuengine/musicEditor/sweepModulationShort', 'SM');
+            case 5:
+                return nls.localize('vuengine/musicEditor/noiseShort', 'N');
+        }
+        return '';
+    };
+
+    return <StyledChannelHeader className={classNames.join(' ')}>
+        <StyledChannelHeaderInfo
+            onClick={() => setCurrentChannelId(channel.id)}
         >
             <div className='channelName'>
-                {getChannelName(number)}
+                {getChannelName(channel.id)}
             </div>
-        </div>
-        <div className='channelButtons'>
-            <div
-                className={`channelButton ${channel.muted ? 'active' : ''}`}
-                onClick={() => toggleChannelMuted(number)}
+        </StyledChannelHeaderInfo>
+        <StyledChannelHeaderButtons>
+            <StyledChannelHeaderButton
+                className={channel.muted ? 'active' : undefined}
+                onClick={() => toggleChannelMuted(channel.id)}
             >
                 <i className={`fa fa-volume-${channel.muted ? 'off' : 'up'}`} />
-            </div>
-            <div
-                className={`channelButton ${channel.solo ? 'active' : ''}`}
-                onClick={() => toggleChannelSolo(number)}
+            </StyledChannelHeaderButton>
+            <StyledChannelHeaderButton
+                className={channel.solo ? 'active' : undefined}
+                onClick={() => toggleChannelSolo(channel.id)}
             >
                 <i className={`fa fa-star${channel.solo ? '' : '-o'}`} />
-            </div>
-        </div>
-    </div>;
+            </StyledChannelHeaderButton>
+        </StyledChannelHeaderButtons>
+    </StyledChannelHeader>;
 }

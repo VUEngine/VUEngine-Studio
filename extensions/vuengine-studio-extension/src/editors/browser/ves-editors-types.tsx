@@ -1,3 +1,4 @@
+import { createContext } from 'react';
 import { CommandService, MessageService, QuickPickService, URI } from '@theia/core';
 import {
     HoverService,
@@ -7,7 +8,6 @@ import {
 } from '@theia/core/lib/browser';
 import { ColorRegistry } from '@theia/core/lib/browser/color-registry';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
-import * as React from '@theia/core/shared/react';
 import { FileDialogService } from '@theia/filesystem/lib/browser';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { WorkspaceService } from '@theia/workspace/lib/browser';
@@ -36,7 +36,7 @@ export interface EditorsServices {
 };
 
 // @ts-ignore
-export const EditorsContext = React.createContext<EditorsContextType>({});
+export const EditorsContext = createContext<EditorsContextType>({});
 
 export interface EditorsContextType {
     fileUri: URI

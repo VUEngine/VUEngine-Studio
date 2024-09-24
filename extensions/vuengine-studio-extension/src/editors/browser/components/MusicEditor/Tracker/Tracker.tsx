@@ -9,7 +9,7 @@ export default function Tracker(props: TrackerProps): React.JSX.Element {
     } = props;
 
     return (
-        <div style={{ margin: 'calc(var(--theia-ui-padding) * 2)' }}>
+        <div style={{ margin: 'var(--padding)' }}>
             Tracker mode not yet implemented.
         </div>
     );

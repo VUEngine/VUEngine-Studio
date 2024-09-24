@@ -1,8 +1,8 @@
-import React from 'react';
+import { createContext } from 'react';
 import { ImageConfig } from '../../../../images/browser/ves-images-types';
 
 // @ts-ignore
-export const ImageEditorContext = React.createContext<ImageEditorContextType>({});
+export const ImageEditorContext = createContext<ImageEditorContextType>({});
 
 export interface ImageEditorContextType {
     imageData: ImageConfig

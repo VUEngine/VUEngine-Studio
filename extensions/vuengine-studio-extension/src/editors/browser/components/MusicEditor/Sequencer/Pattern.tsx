@@ -1,6 +1,10 @@
 import { nls } from '@theia/core';
-import React, { useState } from 'react';
-import { ChannelConfig, HIGHEST_NOTE, LOWEST_NOTE, PATTERN_NOTE_HEIGHT, PatternConfig, SongData } from '../MusicEditorTypes';
+import React, { useMemo, useState } from 'react';
+import { ColorMode } from '../../../../../core/browser/ves-common-types';
+import CanvasImage from '../../Common/CanvasImage';
+import { DisplayMode } from '../../Common/VUEngineTypes';
+import { ChannelConfig, HIGHEST_NOTE, LOWEST_NOTE, PATTERN_HEIGHT, PATTERN_MAPPING_FACTOR, PatternConfig, SongData } from '../MusicEditorTypes';
+import { StyledPattern, StyledPatternRemove } from './StyledComponents';
 
 interface PatternProps {
     songData: SongData
@@ -8,7 +12,6 @@ interface PatternProps {
     pattern: PatternConfig
     patternSize: number
     channel: number
-    height: number
     patternId: number
     currentChannelId: number
     currentPatternId: number
@@ -23,7 +26,6 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
         songData,
         index,
         channel,
-        height,
         pattern,
         patternSize,
         patternId,
@@ -33,22 +35,38 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
         setChannel,
     } = props;
 
-    const classNames = ['pattern'];
+    const classNames = [];
     if (currentChannelId === channel && currentPatternId === patternId) {
         classNames.push('current');
     }
 
-    const boxShadow: string[] = [];
-    const patternNoteWidth = 16 / songData.noteResolution;
-    pattern.notes.forEach((note, i) => {
-        if (note !== undefined
-            && note >= HIGHEST_NOTE
-            && note <= LOWEST_NOTE) {
-            boxShadow.push(
-                `${(i + 1) * patternNoteWidth}px ${(note - HIGHEST_NOTE) * PATTERN_NOTE_HEIGHT}px 0 0 var(--theia-editor-foreground)`
-            );
-        }
-    });
+    const patternNoteWidth = Math.max(0, 16 / songData.noteResolution);
+    const patternPixels: number[][][] = useMemo(() => {
+        const result: number[][] = [[]];
+
+        // init array
+        const emptyLine = [...Array(patternSize)].map(v => 0);
+        [...Array(PATTERN_HEIGHT)].map(v => result.push([...emptyLine]));
+
+        // find set notes
+        let noteIndexPointer = 0;
+        pattern.notes.forEach((note, i) => {
+            if (note !== undefined
+                && note >= HIGHEST_NOTE
+                && note <= LOWEST_NOTE) {
+                const noteYPosition = Math.round(PATTERN_MAPPING_FACTOR * (note - HIGHEST_NOTE));
+                for (let k = 0; k < patternNoteWidth; k++) {
+                    result[noteYPosition][noteIndexPointer + k] = 1;
+                }
+            }
+            noteIndexPointer += patternNoteWidth;
+        });
+
+        return [result];
+    }, [
+        pattern.notes,
+        songData.noteResolution,
+    ]);
 
     const moveSequencePattern = (channelId: number, from: number, to: number): void => {
         const sequence = [...songData.channels[channelId].sequence];
@@ -104,45 +122,51 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
         e.currentTarget.classList.remove('dragOver');
     };
 
-    return <div
-        className={classNames.join(' ')}
-        style={{
-            backgroundColor: currentChannelId === channel && currentSequenceIndex === index
-                ? 'var(--theia-focusBorder)'
-                : undefined,
-            height: `${height * PATTERN_NOTE_HEIGHT + 3}px`,
-            minWidth: `${(patternSize * patternNoteWidth) - 1}px`,
-            width: `${(patternSize * patternNoteWidth) - 1}px`
-        }}
-        data-channel={channel}
-        data-position={index}
-        onClick={() => setCurrentSequenceIndex(channel, index)}
-        draggable={true}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-        onDragEnter={onDragEnter}
-        onDragLeave={onDragLeave}
-        onDrop={onDrop}
-    >
-        <div
-            className='notes'
+    return (
+        <StyledPattern
+            className={classNames.join(' ')}
             style={{
-                boxShadow: boxShadow.join(','),
-                height: '1px',
-                marginLeft: `-${patternNoteWidth}px`,
-                width: `${patternNoteWidth}px`,
+                backgroundColor: currentChannelId === channel && currentSequenceIndex === index
+                    ? 'var(--theia-focusBorder)'
+                    : undefined,
+                height: `${PATTERN_HEIGHT}px`,
+                minWidth: `${(patternSize * patternNoteWidth) - 1}px`,
+                width: `${(patternSize * patternNoteWidth) - 1}px`
             }}
-        />
-        {patternId + 1}
-        <div
-            className='remove'
-            title={nls.localize('vuengine/musicEditor/removePattern', 'Remove Pattern')}
-            onClick={e => {
-                removeFromSequence(channel, index);
-                e.stopPropagation();
-            }}
+            data-channel={channel}
+            data-position={index}
+            onClick={() => setCurrentSequenceIndex(channel, index)}
+            draggable={true}
+            onDragStart={onDragStart}
+            onDragEnd={onDragEnd}
+            onDragEnter={onDragEnter}
+            onDragLeave={onDragLeave}
+            onDrop={onDrop}
         >
-            &times;
-        </div>
-    </div>;
+            <CanvasImage
+                height={PATTERN_HEIGHT}
+                palette={'00000000'}
+                pixelData={patternPixels}
+                useTextColor
+                width={patternSize}
+                displayMode={DisplayMode.Mono}
+                colorMode={ColorMode.Default}
+                style={{
+                    left: 0,
+                    position: 'absolute',
+                    top: 0,
+                }}
+            />
+            {patternId + 1}
+            <StyledPatternRemove
+                title={nls.localize('vuengine/musicEditor/removePattern', 'Remove Pattern')}
+                onClick={e => {
+                    removeFromSequence(channel, index);
+                    e.stopPropagation();
+                }}
+            >
+                &times;
+            </StyledPatternRemove>
+        </StyledPattern>
+    );
 }

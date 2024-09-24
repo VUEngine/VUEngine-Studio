@@ -1,13 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
-
-const StyledStepIndicator = styled.div`
-    background-color: var(--theia-focusBorder);
-    bottom: 0;
-    left: 0;
-    position: absolute;
-    z-index: 1;
-`;
+import { StyledStepIndicator } from './StyledComponents';
 
 interface StepIndicatorProps {
     currentStep: number
@@ -20,8 +12,8 @@ export default function StepIndicator(props: StepIndicatorProps): React.JSX.Elem
     const { currentStep, noteResolution, isPianoRoll, hidden } = props;
 
     let offset = 0;
+    const headerWidth = 50;
     if (isPianoRoll) {
-        const headerWidth = 50;
         const noteWidth = 16;
         const elapsedNotesWidth = currentStep * noteWidth;
         const dividers4Total = Math.round(currentStep / 4);
@@ -29,9 +21,9 @@ export default function StepIndicator(props: StepIndicatorProps): React.JSX.Elem
         offset = headerWidth + elapsedNotesWidth + dividers4Total + dividersNoteResolutionTotal;
     } else {
         const patternNoteWidth = 16 / noteResolution;
-        const headerWidth = 73;
+        const headerPadding = 3;
         const elapsedNotesWidth = currentStep * patternNoteWidth;
-        offset = headerWidth + elapsedNotesWidth;
+        offset = headerWidth + headerPadding + elapsedNotesWidth;
     }
 
     const style = {

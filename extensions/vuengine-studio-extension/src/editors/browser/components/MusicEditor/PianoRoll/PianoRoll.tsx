@@ -1,22 +1,10 @@
 import React from 'react';
-import styled from 'styled-components';
 import { BAR_PATTERN_LENGTH_MULT_MAP, MusicEditorTool, SongData } from '../MusicEditorTypes';
 import StepIndicator from '../Sequencer/StepIndicator';
 import NoteProperties from './NoteProperties';
 import PianoRollEditor from './PianoRollEditor';
 import PianoRollHeader from './PianoRollHeader';
-
-export const StyledPianoRoll = styled.div`
-    align-items: start;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    font-size: 10px;
-    height: 100%;
-    overflow-x: auto;
-    margin: calc(var(--theia-ui-padding) * 2);
-    position: relative;
-`;
+import { StyledPianoRoll } from './StyledComponents';
 
 interface PianoRollProps {
     songData: SongData
@@ -27,7 +15,6 @@ interface PianoRollProps {
     currentPatternNoteOffset: number
     currentSequenceIndex: number
     currentStep: number
-    getChannelName: (channelId: number) => string
     playRangeStart: number
     setPlayRangeStart: (playRangeStart: number) => void
     playRangeEnd: number
@@ -46,7 +33,6 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         currentPatternNoteOffset,
         currentSequenceIndex,
         currentStep,
-        getChannelName,
         playRangeStart, setPlayRangeStart,
         playRangeEnd, setPlayRangeEnd,
         setNote,
@@ -77,7 +63,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         });
     }
 
-    return <StyledPianoRoll className="pianoRoll">
+    return <StyledPianoRoll>
         {<StepIndicator
             currentStep={currentPatternStep}
             noteResolution={songData.noteResolution}
@@ -88,7 +74,6 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             songData={songData}
             currentChannelId={currentChannelId}
             currentPatternId={currentPatternId}
-            getChannelName={getChannelName}
             playRangeStart={playRangeStart}
             setPlayRangeStart={setPlayRangeStart}
             playRangeEnd={playRangeEnd}

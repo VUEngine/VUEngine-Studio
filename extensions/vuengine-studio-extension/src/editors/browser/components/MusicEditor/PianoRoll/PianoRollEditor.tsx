@@ -1,16 +1,7 @@
 import React, { useMemo } from 'react';
-import styled from 'styled-components';
 import { BAR_PATTERN_LENGTH_MULT_MAP, HIGHEST_NOTE, LOWEST_NOTE, MusicEditorTool, NOTES, SongData } from '../MusicEditorTypes';
 import PianoRollRow from './PianoRollRow';
-
-export const StyledPianoRollEditor = styled.div`
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    height: 100%;
-    overflow-y: scroll;
-    padding: 1px 0;
-`;
+import { StyledPianoRollEditor } from './StyledComponents';
 
 interface PianoRollEditorProps {
     songData: SongData
@@ -79,7 +70,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
             index <= LOWEST_NOTE &&
             index >= HIGHEST_NOTE && <PianoRollRow
                 songData={songData}
-                key={`pianoroll-row-${index}`}
+                key={index}
                 note={note}
                 noteId={index}
                 otherChannelsNotes={otherChannelsNotes}

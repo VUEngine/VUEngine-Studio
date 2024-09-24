@@ -12,7 +12,7 @@ interface PianoKeysProps {
 export default function PianoKeys(props: PianoKeysProps): React.JSX.Element {
     const { note, noteId, channel, setFrequency } = props;
 
-    const classNames = ['pianoRollRow'];
+    const classNames = [];
     if (note.startsWith('C') && note.length === 2) {
         classNames.push('cNote');
     }

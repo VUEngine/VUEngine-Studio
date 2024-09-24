@@ -29,6 +29,7 @@ interface InstrumentsProps {
     setCurrentInstrument: (instrument: number) => void
     setInstruments: (instruments: InstrumentConfig[]) => void
     setSidebarTab: Dispatch<SetStateAction<number>>
+    setModulationDataDialogOpen: Dispatch<SetStateAction<number>>
 }
 
 export default function Instruments(props: InstrumentsProps): React.JSX.Element {
@@ -37,6 +38,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
         currentInstrument, setCurrentInstrument,
         setInstruments,
         setSidebarTab,
+        setModulationDataDialogOpen,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const instrument = songData.instruments[currentInstrument];
@@ -109,6 +111,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
             currentInstrument={currentInstrument}
             setInstruments={setInstruments}
             setSidebarTab={setSidebarTab}
+            setModulationDataDialogOpen={setModulationDataDialogOpen}
         />
     </VContainer>;
 }

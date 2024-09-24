@@ -10,8 +10,8 @@ export const StyledMusicEditorToolbar = styled.div`
     align-items: center;
     display: flex;
     flex-direction: row;
-    gap: calc(var(--theia-ui-padding) * 2);
-    margin: calc(var(--theia-ui-padding) * 2);
+    gap: var(--padding);
+    margin: var(--padding);
 `;
 
 export const StyledMusicEditorToolbarGroup = styled.div`
@@ -102,7 +102,7 @@ export default function MusicEditorToolbar(props: MusicEditorToolbarProps): Reac
                     <i className="fa fa-stop" />
                 </StyledMusicEditorToolbarButton>
                 <StyledMusicEditorToolbarCurrentStep>
-                    {currentStep === -1 ? 0 : currentStep}
+                    {currentStep + 1}
                 </StyledMusicEditorToolbarCurrentStep>
             </StyledMusicEditorToolbarGroup>
             <StyledMusicEditorToolbarGroup>

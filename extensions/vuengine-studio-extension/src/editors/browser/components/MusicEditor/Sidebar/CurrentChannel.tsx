@@ -1,9 +1,9 @@
 import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction } from 'react';
+import BasicSelect from '../../Common/BasicSelect';
 import HContainer from '../../Common/HContainer';
 import VContainer from '../../Common/VContainer';
 import { ChannelConfig, SongData } from '../MusicEditorTypes';
-import BasicSelect from '../../Common/BasicSelect';
 import { InputWithAction, InputWithActionButton } from './Instruments';
 
 interface CurrentChannelProps {

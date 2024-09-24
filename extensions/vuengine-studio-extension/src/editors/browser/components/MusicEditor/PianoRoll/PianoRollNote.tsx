@@ -1,45 +1,7 @@
 import { nls } from '@theia/core';
 import React from 'react';
-import styled from 'styled-components';
 import { MusicEditorTool, NOTES } from '../MusicEditorTypes';
-
-interface NoteProps {
-    current: boolean
-    noteResolution: number
-    otherChannelSet: boolean
-    set: boolean
-}
-
-const Note = styled.div<NoteProps>`
-    background-color: ${p => p.set
-        ? 'var(--theia-focusBorder) !important'
-        : p.otherChannelSet
-            ? 'var(--theia-editor-foreground) !important'
-            : p.current
-                ? 'var(--theia-secondaryButton-hoverBackground) !important'
-                : 'var(--theia-secondaryButton-background)'
-    };
-    cursor: crosshair;
-    flex-grow: 1;
-    margin-bottom: 1px;
-    margin-right: 1px;
-    min-height: 11px;
-    max-height: 11px;
-    min-width: 15px;
-    max-width: 15px;
-
-    &:hover {
-        outline: 1px solid var(--theia-focusBorder);
-        outline-offset: 1px;
-        z-index: 10;
-    }
-    &:nth-child(4n + 1) {
-        margin-right: 2px;
-    }
-    &:nth-child(${p => p.noteResolution}n + 1) {
-        margin-right: 3px;
-    }
-`;
+import { StyledPianoRollNote } from './StyledComponents';
 
 interface PianoRollNoteProps {
     index: number
@@ -59,9 +21,15 @@ export default function PianoRollNote(props: PianoRollNoteProps): React.JSX.Elem
 
     // Object.keys(otherChannelsNotes[index] ?? {}).includes(noteIdStr)
 
-    const classNames = ['pianoRollNote'];
+    const classNames = [`noteResolution${noteResolution}`];
     if (current) {
         classNames.push('current');
+    }
+    if (set) {
+        classNames.push('set');
+    }
+    if (otherChannels.length > 0) {
+        classNames.push('otherChannelSet');
     }
 
     let title = `${nls.localize('vuengine/musicEditor/note', 'Note')}: ${Object.keys(NOTES)[noteId]}`;
@@ -82,12 +50,8 @@ export default function PianoRollNote(props: PianoRollNoteProps): React.JSX.Elem
         e.preventDefault();
     };
 
-    return <Note
+    return <StyledPianoRollNote
         className={classNames.join(' ')}
-        current={current}
-        noteResolution={noteResolution}
-        set={set}
-        otherChannelSet={otherChannels.length > 0}
         onClick={() => {
             if (tool === MusicEditorTool.ERASER) {
                 setNote(index, undefined);

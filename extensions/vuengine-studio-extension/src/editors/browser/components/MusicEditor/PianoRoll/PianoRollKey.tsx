@@ -1,4 +1,5 @@
 import React from 'react';
+import { StyledPianoRollKey, StyledPianoRollKeyName } from './StyledComponents';
 
 interface PianoRollKeyProps {
     noteId: number
@@ -9,7 +10,7 @@ interface PianoRollKeyProps {
 export default function PianoRollKey(props: PianoRollKeyProps): React.JSX.Element {
     const { noteId, note, playNote } = props;
 
-    const classNames = ['pianoRollKey'];
+    const classNames = [];
     if (note.includes('#')) {
         classNames.push('sharpNote');
     }
@@ -26,12 +27,14 @@ export default function PianoRollKey(props: PianoRollKeyProps): React.JSX.Elemen
         e.preventDefault();
     };
 
-    return <div
+    return <StyledPianoRollKey
         className={classNames.join(' ')}
         onClick={onClick}
         onMouseDown={onMouse}
         onMouseOver={onMouse}
     >
-        <div>{note}</div>
-    </div>;
+        <StyledPianoRollKeyName>
+            {note}
+        </StyledPianoRollKeyName>
+    </StyledPianoRollKey>;
 }

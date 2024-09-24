@@ -1,5 +1,5 @@
 import { DataSection } from '../Common/CommonTypes';
-import { VsuChannelEnvelopeData, VsuChannelIntervalData, VsuChannelSweepModulationData } from '../VsuEmulator/VsuEmulatorTypes';
+import { VsuChannelEnvelopeData, VsuChannelIntervalData, VsuChannelStereoLevelsData, VsuChannelSweepModulationData } from '../VsuEmulator/VsuEmulatorTypes';
 
 export interface SongData {
     name: string
@@ -33,16 +33,25 @@ export interface ChannelConfig {
 
 export interface InstrumentConfig {
     name: string
+    type: MusicEditorInstrumentType
     waveform: number
+    volume: VsuChannelStereoLevelsData
     interval: VsuChannelIntervalData
     envelope: VsuChannelEnvelopeData
     sweepMod: VsuChannelSweepModulationData
+    modulationData: number[]
+    tapLocation: number
 }
 
 export interface SongNote {
     note: string | undefined
     volumeL: number | undefined
     volumeR: number | undefined
+}
+
+export enum MusicEditorInstrumentType {
+    WAVE = 'wave',
+    NOISE = 'noise',
 }
 
 export enum MusicEditorMode {
@@ -181,11 +190,16 @@ export const NOTES: { [note: string]: number } = {
 
 export const LOWEST_NOTE = 95; // C2;
 export const HIGHEST_NOTE = 12; // B8;
+export const NOTE_SPECTRUM = LOWEST_NOTE - HIGHEST_NOTE + 1;
+
+export const PATTERN_HEIGHT = Math.round(NOTE_SPECTRUM / 4);
+export const PATTERN_MAPPING_FACTOR = PATTERN_HEIGHT / NOTE_SPECTRUM;
+
+export const PIANO_ROLL_NOTE_HEIGHT = 9;
+export const PIANO_ROLL_NOTE_WIDTH = 15;
 
 export const MAX_SPEED = 1200;
 export const MIN_SPEED = 30;
-
-export const PATTERN_NOTE_HEIGHT = 0.25;
 
 export const VOLUME_STEPS = 16;
 

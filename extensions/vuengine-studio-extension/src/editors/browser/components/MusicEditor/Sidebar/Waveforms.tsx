@@ -18,14 +18,12 @@ export default function Waveforms(props: WaveformsProps): React.JSX.Element {
     return <VContainer>
         <InfoLabel
             label={nls.localize('vuengine/musicEditor/waveforms', 'Waveforms')}
+            subLabel={nls.localize('vuengine/editors/clickToEdit', 'Click To Edit')}
             tooltip={nls.localize(
                 'vuengine/musicEditor/waveformsDescription',
                 'You can set up up to 5 waveforms that can be used by instruments.'
             )}
         />
-        <div className="lightLabel">
-            {nls.localize('vuengine/editors/clickToEdit', 'Click To Edit')}
-        </div>
         <HContainer>
             {([...Array(VSU_NUMBER_OF_WAVEFORM_BANKS)].map((v, x) =>
                 <NumberArrayPreview
