@@ -1,6 +1,6 @@
 appId: dev.vuengine.studio
 productName: VUEngine
-copyright: Copyright © 2006-2023 VUEngine
+copyright: Copyright © 2006-2024 VUEngine
 electronDist: ../../node_modules/electron/dist
 electronVersion: 30.4.0
 # Although it is generally not recommended to disable asar, it is required for Theia.
@@ -22,7 +22,8 @@ files:
   - scripts
   - "!**node_modules/**"
   - resources/splash/index.html
-  - resources/splash/splash.mp4
+  - resources/splash/splash.gif
+  - resources/splash/slogan.png
   - resources/icons/512x512.png
   - from: binaries/vuengine-studio-tools/web
     to: binaries/vuengine-studio-tools/web

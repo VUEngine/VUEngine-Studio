@@ -7,10 +7,10 @@
     body {
       -webkit-app-region: drag;
       margin: 0;
-      overflow: hidden;
+      user-select: none;
     }
 
-    @keyframes videoFade {
+    @keyframes animFade {
       0% {
         opacity: 0;
       }
@@ -57,25 +57,27 @@
     }
 
     .splash-container {
-      animation-name: videoFade;
+      border-radius: 10px;
+      overflow: hidden;
+      height: 260px;
+      position: relative;
+      width: 560px;
+    }
+
+    .anim {
+      animation-name: animFade;
       animation-duration: 4.2s;
       animation-delay: 0.1s;
       animation-timing-function: linear;
       animation-iteration-count: 1;
-      align-items: center;
-      display: flex;
-      height: 280px;
       opacity: 0;
-      overflow: hidden;
-      position: absolute;
-      width: 560px;
       z-index: 10;
     }
 
     .info-container {
       align-items: center;
       animation-name: infoFadeIn;
-      animation-duration: 3.25s;
+      animation-duration: 3.5s;
       animation-delay: 0s;
       animation-timing-function: linear;
       animation-iteration-count: 1;
@@ -84,50 +86,88 @@
       color: #ccc;
       display: flex;
       font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-      gap: 20px;
-      height: 280px;
+      gap: 15px;
+      height: 260px;
+      left: 0;
       opacity: 1;
-      padding: 10px;
+      padding: 15px;
       position: absolute;
+      top: 0;
       width: 560px;
       z-index: 1;
     }
 
-    .info-container img {
-      animation-name: logoPulse;
-      animation-duration: 2s;
+    .logo {
+      /*
       animation-delay: 4s;
-      animation-timing-function: linear;
+      animation-duration: 2s;
       animation-iteration-count: infinite;
+      animation-name: logoPulse;
+      animation-timing-function: linear;
+      */
+      left: 14px;
+      position: absolute;
+      top: 30px;
     }
 
-    h1 {
-      font-size: 29px;
+    .title {
+      font-size: 27px;
+      font-weight: bold;
+      left: 236px;
+      position: absolute;
+      top: 38px;
       white-space: nowrap;
     }
 
+    .slogan {
+      left: 236px;
+      position: absolute;
+      top: 76px;
+    }
+
     .copyright {
-      font-size: 12px;
-      letter-spacing: -.5px;
+      color: #aaa;
+      font-size: 11px;
+      left: 236px;
+      position: absolute;
+      top: 140px;
+    }
+
+    .thanks {
+      color: #aaa;
+      font-size: 9px;
+      left: 236px;
+      position: absolute;
+      top: 158px;
+      width: 280px;
+      line-height: 9px;
     }
   </style>
 </head>
 
 <body>
   <div class="splash-container">
-    <video src="./splash.mp4" preload="auto" autoplay></video>
-  </div>
-  <div class="info-container">
-    <img src="../icons/512x512.png" height="200" width="200" />
-    <div>
-      <h1>
-        VUEngine Studio
-        <span style="opacity: .5;">0.6.0</span>
-      </h1>
-      <p class="copyright">
-        © 2022-2024 Christian Radke and Jorge Andres Eremiev
-        <br /><br />
-      </p>
+    <img class="anim" src="./splash.gif" height="260" width="560" />
+    <div class="info-container">
+      <img class="logo" src="../icons/512x512.png" height="205" width="205" />
+      <div>
+        <div class="title">
+          VUEngine Studio
+          <span style="opacity: .5;">0.6.0</span>
+        </div>
+        <img class="slogan" src="./slogan.png" width="282" />
+        <div class="copyright">
+          © 2022-2024 Christian Radke and Jorge Andres Eremiev
+        </div>
+        <div class="thanks">
+          Made possible by our supporters on Patreon. Thank you!<br>
+          Adam Wannamaker, Alec Kafka, Benjamin Stevens, Bnjmn Mrph, Cameron Hollaway, chairodactyl, Christopher
+          Garland, David Baisley, Domenic Umberto Raso, Eric Freeman, Gregory VanNostrand, IanelGreenleaf, Jose Zagal,
+          Luke Gerhardt, Marten Reiß, Michael Ortega, NeGiZON, norty, Patrick Fenton, Patrick-VB, Randy Jeffery,
+          RetroOnyx, Richard Corlett, Sean Machan, Simon Gellis, Steven Hagelgans, Studio Kerga, Tony, Troy Bonneau,
+          tydyedsyko et al.
+        </div>
+      </div>
     </div>
   </div>
 </body>

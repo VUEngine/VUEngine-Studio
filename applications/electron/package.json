@@ -51,7 +51,7 @@
           "showWindowEarly": false,
           "splashScreenOptions": {
             "content": "resources/splash/index.html",
-            "height": 280,
+            "height": 260,
             "width": 560
           }
         }
