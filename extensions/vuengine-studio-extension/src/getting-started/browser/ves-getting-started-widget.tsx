@@ -2,7 +2,7 @@ import { Path, URI, nls } from '@theia/core';
 import { PreferenceService, codicon } from '@theia/core/lib/browser';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
-import { GettingStartedWidget } from '@theia/getting-started/lib/browser/getting-started-widget';
+import { GettingStartedWidget, PreferencesProps } from '@theia/getting-started/lib/browser/getting-started-widget';
 import { VSXEnvironment } from '@theia/vsx-registry/lib/common/vsx-environment';
 import * as React from 'react';
 import { VesCoreContribution } from '../../core/browser/ves-core-contribution';
@@ -267,4 +267,41 @@ export class VesGettingStartedWidget extends GettingStartedWidget {
             </div>
         );
     }
+
+    protected renderPreferences(): React.ReactNode {
+        return <VesWelcomePreferences preferenceService={this.preferenceService}></VesWelcomePreferences>;
+    }
+}
+
+function VesWelcomePreferences(props: PreferencesProps): React.JSX.Element {
+    const [startupEditor, setStartupEditor] = React.useState<string>(
+        props.preferenceService.get('workbench.startupEditor', 'welcomePageInEmptyWorkbench')
+    );
+    React.useEffect(() => {
+        const prefListener = props.preferenceService.onPreferenceChanged(change => {
+            if (change.preferenceName === 'workbench.startupEditor') {
+                const prefValue = change.newValue;
+                setStartupEditor(prefValue);
+            }
+        });
+        return () => prefListener.dispose();
+    }, [props.preferenceService]);
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.target.checked ? 'welcomePageInEmptyWorkbench' : 'none';
+        props.preferenceService.updateValue('workbench.startupEditor', newValue);
+    };
+    return (
+        <div className='gs-preference'>
+            <input
+                type="checkbox"
+                className="theia-input"
+                id="startupEditor"
+                onChange={handleChange}
+                checked={startupEditor === 'welcomePage' || startupEditor === 'welcomePageInEmptyWorkbench'}
+            />
+            <label htmlFor="startupEditor">
+                {nls.localize('vuengine/gettingStarted/showOnStartup', 'Show welcome page on startup when no workspace is opened')}
+            </label>
+        </div>
+    );
 }
