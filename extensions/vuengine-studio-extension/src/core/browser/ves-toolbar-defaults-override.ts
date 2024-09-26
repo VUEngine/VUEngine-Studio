@@ -6,6 +6,7 @@ import { VesCodeGenCommands } from '../../codegen/browser/ves-codegen-commands';
 import { VesEmulatorCommands } from '../../emulator/browser/ves-emulator-commands';
 import { VesExportCommands } from '../../export/browser/ves-export-commands';
 import { VesFlashCartCommands } from '../../flash-cart/browser/ves-flash-cart-commands';
+import { VesProjectCommands } from '../../project/browser/ves-project-commands';
 
 export const VesToolbarDefaultsOverride: () => DeflatedToolbarTree = () => ({
     items: {
@@ -49,6 +50,13 @@ export const VesToolbarDefaultsOverride: () => DeflatedToolbarTree = () => ({
             ]
         ],
         [ToolbarAlignment.CENTER]: [
+            [
+                {
+                    'id': VesProjectCommands.WIDGET_TOGGLE.id,
+                    'command': 'project.toggleView',
+                    'icon': 'fa fa-th'
+                }
+            ]
         ],
         [ToolbarAlignment.RIGHT]: [
             [
