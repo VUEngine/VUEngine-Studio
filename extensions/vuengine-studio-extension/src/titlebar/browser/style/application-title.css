@@ -33,6 +33,28 @@
   background-color: rgba(255, 255, 255, .3);
 }
 
+#ves-titlebar-application-title .applicationTitle .closeButton {
+  align-items: center;
+  border-radius: 5px;
+  display: none;
+  height: 20px;
+  justify-content: center;
+  opacity: .5;
+  position: absolute;
+  right: 6px;
+  width: 20px;
+}
+
+#ves-titlebar-application-title .applicationTitle .closeButton:hover {
+  background: #fff;
+  color: var(--theia-focusBorder);
+  opacity: 1;
+}
+
+#ves-titlebar-application-title .applicationTitle:hover .closeButton {
+  display: flex;
+}
+
 @media (max-width: 1200px) {
   .theia-ApplicationShell:not(.os-osx) #ves-titlebar-application-title .applicationTitle {
     left: 40%;

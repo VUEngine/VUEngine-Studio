@@ -52,6 +52,9 @@ export class VesTitlebarApplicationTitleWidget extends ReactWidget {
           <i className="codicon codicon-broadcast"></i>
         </>}
         {this.applicationTitle}
+        <div className="closeButton" onClick={this.closeWorkspace}>
+          <i className="codicon codicon-close" />
+        </div>
       </div>
     </div>;
   }
@@ -70,4 +73,5 @@ export class VesTitlebarApplicationTitleWidget extends ReactWidget {
   }
 
   protected openRecentWorkspace = async () => this.commandService.executeCommand(WorkspaceCommands.OPEN_RECENT_WORKSPACE.id);
+  protected closeWorkspace = async () => this.commandService.executeCommand(WorkspaceCommands.CLOSE.id);
 }
