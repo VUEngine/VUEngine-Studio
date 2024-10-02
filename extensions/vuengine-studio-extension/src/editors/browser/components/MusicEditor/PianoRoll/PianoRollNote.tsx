@@ -1,15 +1,13 @@
-import { nls } from '@theia/core';
 import React from 'react';
-import { MusicEditorTool, NOTES } from '../MusicEditorTypes';
+import { MusicEditorTool } from '../MusicEditorTypes';
 import { StyledPianoRollNote } from './StyledComponents';
 
 interface PianoRollNoteProps {
     index: number
     noteId: number
-    noteResolution: number
     set: boolean
-    otherChannels: number[]
-    current: boolean
+    currentChannelId: number
+    channelNotes: number[]
     setCurrentNote: (note: number) => void
     setNote: (index: number, note: number | undefined) => void
     playNote: (note: number) => void
@@ -17,54 +15,32 @@ interface PianoRollNoteProps {
 }
 
 export default function PianoRollNote(props: PianoRollNoteProps): React.JSX.Element {
-    const { index, noteId, current, set, otherChannels, noteResolution, playNote, setCurrentNote, setNote, tool } = props;
+    const { index, noteId, set, currentChannelId, channelNotes, playNote, setCurrentNote, setNote, tool } = props;
 
-    // Object.keys(otherChannelsNotes[index] ?? {}).includes(noteIdStr)
-
-    const classNames = [`noteResolution${noteResolution}`];
-    if (current) {
-        classNames.push('current');
-    }
+    const classNames = [];
     if (set) {
-        classNames.push('set');
+        classNames.push(`current-${currentChannelId + 1}`);
     }
-    if (otherChannels.length > 0) {
-        classNames.push('otherChannelSet');
-    }
+    channelNotes.map(cn => classNames.push(`set-${cn + 1}`));
 
-    let title = `${nls.localize('vuengine/musicEditor/note', 'Note')}: ${Object.keys(NOTES)[noteId]}`;
-    if (otherChannels.length) {
-        const prefix = otherChannels.length === 1
-            ? nls.localize('vuengine/musicEditor/setOnChannel', 'Set on channel')
-            : nls.localize('vuengine/musicEditor/setOnChannels', 'Set on channels');
-        title += ` – ${prefix} ${otherChannels.join(', ')}`;
-    }
-
-    const onMouse = (e: React.MouseEvent<HTMLElement>) => {
-        if (e.buttons === 1) {
+    const onClick = (e: React.MouseEvent<HTMLElement>) => {
+        if (tool === MusicEditorTool.ERASER) {
+            doUnsetNote();
+        } else {
             setNote(index, noteId);
             playNote(noteId);
-        } else if (e.buttons === 2) {
-            setNote(index, undefined);
+            setCurrentNote(index);
         }
-        e.preventDefault();
+    };
+
+    const doUnsetNote = () => {
+        setNote(index, undefined);
     };
 
     return <StyledPianoRollNote
         className={classNames.join(' ')}
-        onClick={() => {
-            if (tool === MusicEditorTool.ERASER) {
-                setNote(index, undefined);
-            } else {
-                setNote(index, noteId);
-                setCurrentNote(index);
-                playNote(noteId);
-            }
-        }}
-        onContextMenu={() => setNote(index, undefined)}
-        onMouseDown={e => onMouse(e)}
-        onMouseOver={e => onMouse(e)}
-        title={title}
+        onClick={onClick}
+        onContextMenu={doUnsetNote}
     />;
 }
 

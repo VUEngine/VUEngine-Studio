@@ -3,9 +3,11 @@ import React from 'react';
 import { BAR_PATTERN_LENGTH_MULT_MAP, SongData } from '../MusicEditorTypes';
 import NotePropertiesNote from './NotePropertiesNote';
 import { MetaLine, MetaLineHeader, MetaLineHeaderLine } from './StyledComponents';
+import { MagicWand, SpeakerHigh } from '@phosphor-icons/react';
 
 interface NotePropertiesProps {
     songData: SongData
+    currentNote: number
     setCurrentNote: (currentNote: number) => void
     currentChannelId: number
     currentPatternId: number
@@ -15,7 +17,7 @@ interface NotePropertiesProps {
 export default function NoteProperties(props: NotePropertiesProps): React.JSX.Element {
     const {
         songData,
-        setCurrentNote,
+        currentNote, setCurrentNote,
         currentChannelId,
         currentPatternId,
         setNote,
@@ -30,11 +32,11 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
 
     return <MetaLine style={{ bottom: 0 }}>
         <MetaLineHeader>
-            <MetaLineHeaderLine>
-                {nls.localize('vuengine/musicEditor/effects', 'Effects')}
+            <MetaLineHeaderLine title={nls.localize('vuengine/musicEditor/effects', 'Effects')}>
+                <MagicWand size={13} />
             </MetaLineHeaderLine>
-            <MetaLineHeaderLine>
-                {nls.localize('vuengine/musicEditor/volume', 'Volume')}
+            <MetaLineHeaderLine title={nls.localize('vuengine/musicEditor/volume', 'Volume')}>
+                <SpeakerHigh size={13} />
             </MetaLineHeaderLine>
         </MetaLineHeader>
         {[...Array(patternSize)].map((x, index) => {
@@ -48,6 +50,7 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
                     noteResolution={songData.noteResolution}
                     volumeL={volumeL}
                     volumeR={volumeR}
+                    current={currentNote === index}
                     setCurrentNote={setCurrentNote}
                     setNote={setNote}
                 />

@@ -1,9 +1,10 @@
 import { nls } from '@theia/core';
-import React, { useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { ColorMode } from '../../../../../core/browser/ves-common-types';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import CanvasImage from '../../Common/CanvasImage';
 import { DisplayMode } from '../../Common/VUEngineTypes';
-import { ChannelConfig, HIGHEST_NOTE, LOWEST_NOTE, PATTERN_HEIGHT, PATTERN_MAPPING_FACTOR, PatternConfig, SongData } from '../MusicEditorTypes';
+import { ChannelConfig, PATTERN_HEIGHT, PATTERN_MAPPING_FACTOR, PatternConfig, SongData } from '../MusicEditorTypes';
 import { StyledPattern, StyledPatternRemove } from './StyledComponents';
 
 interface PatternProps {
@@ -34,11 +35,10 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
         currentSequenceIndex, setCurrentSequenceIndex,
         setChannel,
     } = props;
+    const { services } = useContext(EditorsContext) as EditorsContextType;
 
-    const classNames = [];
-    if (currentChannelId === channel && currentPatternId === patternId) {
-        classNames.push('current');
-    }
+    const isCurrent = currentChannelId === channel && currentPatternId === patternId;
+    const textColor = isCurrent ? '#fff' : services.colorRegistry.getCurrentColor('editor.foreground') ?? '#000';
 
     const patternNoteWidth = Math.max(0, 16 / songData.noteResolution);
     const patternPixels: number[][][] = useMemo(() => {
@@ -51,10 +51,9 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
         // find set notes
         let noteIndexPointer = 0;
         pattern.notes.forEach((note, i) => {
-            if (note !== undefined
-                && note >= HIGHEST_NOTE
-                && note <= LOWEST_NOTE) {
-                const noteYPosition = Math.round(PATTERN_MAPPING_FACTOR * (note - HIGHEST_NOTE));
+            // eslint-disable-next-line no-null/no-null
+            if (note !== undefined && note !== null) {
+                const noteYPosition = Math.round(PATTERN_MAPPING_FACTOR * note);
                 for (let k = 0; k < patternNoteWidth; k++) {
                     result[noteYPosition][noteIndexPointer + k] = 1;
                 }
@@ -124,7 +123,7 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
 
     return (
         <StyledPattern
-            className={classNames.join(' ')}
+            className={isCurrent ? 'current' : undefined}
             style={{
                 backgroundColor: currentChannelId === channel && currentSequenceIndex === index
                     ? 'var(--theia-focusBorder)'
@@ -147,7 +146,7 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
                 height={PATTERN_HEIGHT}
                 palette={'00000000'}
                 pixelData={patternPixels}
-                useTextColor
+                textColor={textColor}
                 width={patternSize}
                 displayMode={DisplayMode.Mono}
                 colorMode={ColorMode.Default}

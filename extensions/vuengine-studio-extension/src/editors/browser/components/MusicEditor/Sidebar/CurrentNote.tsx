@@ -2,7 +2,7 @@ import { nls } from '@theia/core';
 import React from 'react';
 import HContainer from '../../Common/HContainer';
 import VContainer from '../../Common/VContainer';
-import { HIGHEST_NOTE, LOWEST_NOTE, NOTES, PatternConfig, SongData, VOLUME_STEPS } from '../MusicEditorTypes';
+import { NOTES, PatternConfig, SongData, VOLUME_STEPS } from '../MusicEditorTypes';
 
 interface CurrentNoteProps {
     songData: SongData
@@ -80,19 +80,16 @@ export default function CurrentNote(props: CurrentNoteProps): React.JSX.Element 
             >
                 <option value={undefined}>none</option>
                 {Object.keys(NOTES).map((n, i) =>
-                    i <= LOWEST_NOTE &&
-                    i >= HIGHEST_NOTE && (
-                        <option key={`note-select-${i}`} value={i}>{n}</option>
-                    ))}
+                    <option key={`note-select-${i}`} value={i}>{n}</option>
+                )}
             </select>
             {/* <SelectComponent
                 options={[{
                     value: '-1',
                     label: 'none'
                 }].concat(Notes
-                    .filter((n, i) => (i <= LOWEST_NOTE && i >= HIGHEST_NOTE))
                     .map((n, i) => ({
-                        value: (i + HIGHEST_NOTE).toString(),
+                        value: i.toString(),
                         label: n.toString()
                     })))}
                 defaultValue={note?.toString() ?? '-1'}

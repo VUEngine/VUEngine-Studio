@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import { BAR_PATTERN_LENGTH_MULT_MAP, MusicEditorTool, SongData } from '../MusicEditorTypes';
 import StepIndicator from '../Sequencer/StepIndicator';
 import NoteProperties from './NoteProperties';
@@ -22,6 +22,8 @@ interface PianoRollProps {
     setNote: (index: number, note: number | undefined) => void
     playNote: (note: number) => void
     tool: MusicEditorTool
+    lastSetNoteId: number
+    setLastSetNoteId: Dispatch<SetStateAction<number>>
 }
 
 export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
@@ -38,9 +40,15 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         setNote,
         playNote,
         tool,
+        lastSetNoteId, setLastSetNoteId,
     } = props;
 
     const channel = songData.channels[currentChannelId];
+
+    const classNames = [
+        `noteResolution-${songData.noteResolution}`,
+        `currentNote-${currentNote}`,
+    ];
 
     if (currentPatternId === -1) {
         return <>
@@ -63,7 +71,9 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         });
     }
 
-    return <StyledPianoRoll>
+    return <StyledPianoRoll
+        className={classNames.join(' ')}
+    >
         {<StepIndicator
             currentStep={currentPatternStep}
             noteResolution={songData.noteResolution}
@@ -85,14 +95,16 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             currentPatternId={currentPatternId}
             currentPatternNoteOffset={currentPatternNoteOffset}
             currentSequenceIndex={currentSequenceIndex}
-            currentNote={currentNote}
             setCurrentNote={setCurrentNote}
             setNote={setNote}
             playNote={playNote}
             tool={tool}
+            lastSetNoteId={lastSetNoteId}
+            setLastSetNoteId={setLastSetNoteId}
         />
         <NoteProperties
             songData={songData}
+            currentNote={currentNote}
             setCurrentNote={setCurrentNote}
             currentChannelId={currentChannelId}
             currentPatternId={currentPatternId}

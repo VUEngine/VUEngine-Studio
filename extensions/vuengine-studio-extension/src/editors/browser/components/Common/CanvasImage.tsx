@@ -1,6 +1,5 @@
-import React, { useContext, useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { ColorMode, PALETTE_BIT_INDEX_MAP, PALETTE_COLORS } from '../../../../core/browser/ves-common-types';
-import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import { DisplayMode } from './VUEngineTypes';
 
 interface CanvasImageProps {
@@ -14,11 +13,10 @@ interface CanvasImageProps {
     style?: object
     repeatX?: boolean
     repeatY?: boolean
-    useTextColor?: boolean
+    textColor?: string
 }
 
 export default function CanvasImage(props: CanvasImageProps): React.JSX.Element {
-    const { services } = useContext(EditorsContext) as EditorsContextType;
     const {
         height,
         palette,
@@ -30,12 +28,11 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
         style,
         repeatX,
         repeatY,
-        useTextColor
+        textColor
     } = props;
     // eslint-disable-next-line no-null/no-null
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const textColor = services.colorRegistry.getCurrentColor('editor.foreground') ?? '#000';
     const effectiveParallaxDisplacement = displayMode === DisplayMode.Stereo ? (parallaxDisplacement ?? 0) : 0;
 
     const drawToCanvas = (context: CanvasRenderingContext2D, pixels: number[][]) => {
@@ -75,9 +72,7 @@ export default function CanvasImage(props: CanvasImageProps): React.JSX.Element 
                     return;
                 }
 
-                const fillColor = useTextColor === true
-                    ? textColor
-                    : getColor(effectiveColorByPalette);
+                const fillColor = textColor ?? getColor(effectiveColorByPalette);
 
                 context.fillStyle = fillColor;
                 context.fillRect(x + Math.abs(effectiveParallaxDisplacement) - effectiveParallaxDisplacement, y, 1, 1);

@@ -65,19 +65,28 @@ export enum MusicEditorTool {
     MARQUEE,
 }
 
+export enum NoteResolution {
+    QUARTER = 4,
+    EIGHTH = 8,
+    SIXTEENTH = 16,
+    THIRTYSECOND = 32,
+}
+
 export const NOTES: { [note: string]: number } = {
-    'B9': 0,
-    'A#9': 0,
-    'A9': 0,
-    'G#9': 0,
-    'G9': 0,
-    'F#9': 0,
-    'F9': 0,
-    'E9': 0,
-    'D#9': 0,
-    'D9': 0,
-    'C#9': 0,
-    'C9': 2029,
+    /*
+        'B9': 0,
+        'A#9': 0,
+        'A9': 0,
+        'G#9': 0,
+        'G9': 0,
+        'F#9': 0,
+        'F9': 0,
+        'E9': 0,
+        'D#9': 0,
+        'D9': 0,
+        'C#9': 0,
+        'C9': 2029,
+    */
     'B8': 2028,
     'A#8': 2027,
     'A8': 2026,
@@ -162,38 +171,37 @@ export const NOTES: { [note: string]: number } = {
     'D2': 0,
     'C#2': 0,
     'C2': 0,
-    'B1': 0,
-    'A#1': 0,
-    'A1': 0,
-    'G#1': 0,
-    'G1': 0,
-    'F#1': 0,
-    'F1': 0,
-    'E1': 0,
-    'D#1': 0,
-    'D1': 0,
-    'C#1': 0,
-    'C1': 0,
-    'B0': 0,
-    'A#0': 0,
-    'A0': 0,
-    'G#0': 0,
-    'G0': 0,
-    'F#0': 0,
-    'F0': 0,
-    'E0': 0,
-    'D#0': 0,
-    'D0': 0,
-    'C#0': 0,
-    'C0': 0,
+    /*
+        'B1': 0,
+        'A#1': 0,
+        'A1': 0,
+        'G#1': 0,
+        'G1': 0,
+        'F#1': 0,
+        'F1': 0,
+        'E1': 0,
+        'D#1': 0,
+        'D1': 0,
+        'C#1': 0,
+        'C1': 0,
+        'B0': 0,
+        'A#0': 0,
+        'A0': 0,
+        'G#0': 0,
+        'G0': 0,
+        'F#0': 0,
+        'F0': 0,
+        'E0': 0,
+        'D#0': 0,
+        'D0': 0,
+        'C#0': 0,
+        'C0': 0,
+    */
 };
 
-export const LOWEST_NOTE = 95; // C2;
-export const HIGHEST_NOTE = 12; // B8;
-export const NOTE_SPECTRUM = LOWEST_NOTE - HIGHEST_NOTE + 1;
-
-export const PATTERN_HEIGHT = Math.round(NOTE_SPECTRUM / 4);
-export const PATTERN_MAPPING_FACTOR = PATTERN_HEIGHT / NOTE_SPECTRUM;
+export const NOTES_SPECTRUM = Object.keys(NOTES).length;
+export const PATTERN_HEIGHT = Math.round(NOTES_SPECTRUM / 4);
+export const PATTERN_MAPPING_FACTOR = PATTERN_HEIGHT / NOTES_SPECTRUM;
 
 export const PIANO_ROLL_NOTE_HEIGHT = 9;
 export const PIANO_ROLL_NOTE_WIDTH = 15;
@@ -222,9 +230,11 @@ export const BAR_PATTERN_LENGTH_MULT_MAP: { [bar: string]: number } = {
     '12/16': 3,
 };
 
-export enum NoteResolution {
-    QUARTER = 4,
-    EIGHTH = 8,
-    SIXTEENTH = 16,
-    THIRTYSECOND = 32,
-}
+export const CHANNEL_BG_COLORS = [
+    '#5a8ea3',
+    '#a6d2d1',
+    '#bcab43',
+    '#efc24b',
+    '#df6745',
+    '#e370a9',
+];

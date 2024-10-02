@@ -1,6 +1,7 @@
 import { BrushTool, DottingRef, useBrush } from 'dotting';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { ColorMode } from '../../../../core/browser/ves-common-types';
+import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import CanvasImage from '../Common/CanvasImage';
 import HContainer from '../Common/HContainer';
 import { DisplayMode } from '../Common/VUEngineTypes';
@@ -13,8 +14,11 @@ interface SpriteEditorCurrentToolSettingsProps {
 
 export default function SpriteEditorCurrentToolSettings(props: SpriteEditorCurrentToolSettingsProps): React.JSX.Element {
     const { dottingRef } = props;
+    const { services } = useContext(EditorsContext) as EditorsContextType;
     const { brushTool, changeBrushPattern } = useBrush(dottingRef);
     const [dotBrushPattern, setDotBrushPattern] = useState<number>(0);
+
+    const textColor = services.colorRegistry.getCurrentColor('editor.foreground') ?? '#000';
 
     return (
         [BrushTool.DOT, BrushTool.ERASER].includes(brushTool) ?
@@ -33,7 +37,7 @@ export default function SpriteEditorCurrentToolSettings(props: SpriteEditorCurre
                             palette={'00000000'}
                             pixelData={[p]}
                             style={{ zoom: 3 }}
-                            useTextColor
+                            textColor={textColor}
                             width={p.length}
                             displayMode={DisplayMode.Mono}
                             colorMode={ColorMode.Default}

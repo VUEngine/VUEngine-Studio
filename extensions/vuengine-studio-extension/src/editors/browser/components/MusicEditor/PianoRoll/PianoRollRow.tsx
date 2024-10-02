@@ -1,68 +1,60 @@
-import React from 'react';
-import { BAR_PATTERN_LENGTH_MULT_MAP, LOWEST_NOTE, MusicEditorTool, SongData } from '../MusicEditorTypes';
+import React, { Dispatch, memo, SetStateAction } from 'react';
+import { MusicEditorTool } from '../MusicEditorTypes';
 import PianoRollKey from './PianoRollKey';
 import PianoRollNote from './PianoRollNote';
 import { StyledPianoRollRow } from './StyledComponents';
 
 interface PianoRollRowProps {
-    songData: SongData
     note: string
     noteId: number
     currentChannelId: number
     currentPatternId: number
-    currentNote: number
     setCurrentNote: (note: number) => void
-    otherChannelsNotes: { [noteId: string]: number[] }[]
+    channelsNotes: { [noteId: string]: number[] }[]
     setNote: (index: number, note: number | undefined) => void
     playNote: (note: number) => void
     tool: MusicEditorTool
+    patternSize: number
+    notes: (number | undefined)[]
+    lastSetNoteId: number
+    setLastSetNoteId: Dispatch<SetStateAction<number>>
+    noteResolution: number
+    bar: string
 }
 
-export default function PianoRollRow(props: PianoRollRowProps): React.JSX.Element {
+export default memo(function PianoRollRow(props: PianoRollRowProps): React.JSX.Element {
     const {
-        songData,
         note,
         noteId,
-        otherChannelsNotes,
         currentChannelId,
-        currentPatternId,
-        currentNote, setCurrentNote,
+        channelsNotes,
+        setCurrentNote,
         playNote,
         setNote,
         tool,
+        patternSize,
+        notes,
     } = props;
 
-    const channel = songData.channels[currentChannelId];
-    const pattern = channel.patterns[currentPatternId];
-    const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern.bar] * songData.noteResolution;
     const noteIdStr = noteId.toString();
 
-    const classNames = [];
-    if (note.startsWith('C') && note.length === 2) {
-        classNames.push('cNote');
-    }
-    if (noteId === LOWEST_NOTE) {
-        classNames.push('last');
-    }
-
-    return <StyledPianoRollRow className={classNames.join(' ')}>
+    return <StyledPianoRollRow>
         <PianoRollKey
             noteId={noteId}
             note={note}
             playNote={playNote}
         />
         {[...Array(patternSize)].map((x, lineIndex) => {
-            const otherChannelsIndex = Object.keys(otherChannelsNotes[lineIndex] ?? {}).find(key => key === noteIdStr);
-            const otherChannels = otherChannelsIndex ? otherChannelsNotes[lineIndex][otherChannelsIndex] : [];
+            const channelsIndex = Object.keys(channelsNotes[lineIndex] ?? {}).find(key => key === noteIdStr);
+            const channelNotes = channelsIndex ? channelsNotes[lineIndex][channelsIndex] : [];
             return (
                 <PianoRollNote
-                    noteResolution={songData.noteResolution}
-                    key={`pianoroll-row-${lineIndex}-note-${note}`}
+                    key={lineIndex}
                     index={lineIndex}
                     noteId={noteId}
-                    current={currentNote === lineIndex}
-                    set={pattern.notes[lineIndex] === noteId}
-                    otherChannels={otherChannels}
+                    set={notes[lineIndex] === noteId}
+                    currentChannelId={currentChannelId}
+                    channelNotes={channelNotes}
                     setCurrentNote={setCurrentNote}
                     playNote={playNote}
                     setNote={setNote}
@@ -70,4 +62,21 @@ export default function PianoRollRow(props: PianoRollRowProps): React.JSX.Elemen
                 />);
         })}
     </StyledPianoRollRow>;
-}
+}, (oldProps, newProps) => {
+    const propsAreEqual =
+        oldProps.tool === newProps.tool &&
+        oldProps.currentChannelId === newProps.currentChannelId &&
+        oldProps.currentPatternId === newProps.currentPatternId &&
+        oldProps.bar === newProps.bar &&
+        oldProps.noteResolution === newProps.noteResolution &&
+        JSON.stringify(oldProps.notes) === JSON.stringify(newProps.notes);
+    /*
+    newProps.notes[newProps.lastSetNoteId] !== newProps.noteId &&
+    oldProps.notes[newProps.lastSetNoteId] !== newProps.noteId;
+
+    // reset last set note id after every check, to not re-render on unrelated changes
+    newProps.setLastSetNoteId(-1);
+    */
+
+    return propsAreEqual;
+});

@@ -27,7 +27,7 @@ export default function PianoRollHeaderNote(props: PianoRollHeaderNoteProps): Re
     const pattern = channel.patterns[currentPatternId];
     const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern.bar] * songData.noteResolution;
 
-    const classNames = [`noteResolution${songData.noteResolution}`];
+    const classNames = [];
     if (playRangeStart === index) {
         classNames.push('rangeStart');
     } else if (playRangeEnd === index) {

@@ -30,6 +30,8 @@ export default function StepIndicator(props: StepIndicatorProps): React.JSX.Elem
         display: hidden ? 'none' : undefined,
         left: offset,
         top: isPianoRoll ? 14 : 0,
+        bottom: isPianoRoll ? undefined : 11,
+        height: isPianoRoll ? 845 : undefined,
         width: isPianoRoll ? 3 : 1,
     };
 

@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { PATTERN_HEIGHT } from '../MusicEditorTypes';
+import { CHANNEL_BG_COLORS, PATTERN_HEIGHT } from '../MusicEditorTypes';
 
 // these need to be in a single fine for references to each other to work
 
@@ -44,6 +44,7 @@ export const StyledChannelHeader = styled.div`
     display: flex;
     flex-direction: row;
     font-size: 10px;
+    font-weight: bold;
     height: ${PATTERN_HEIGHT}px;
     left: 0;
     margin-right: 2px;
@@ -57,7 +58,6 @@ export const StyledChannelHeader = styled.div`
 
 export const StyledChannelHeaderInfo = styled.div`
     align-items: start;
-    background-color: var(--theia-secondaryButton-background);
     box-sizing: border-box;
     cursor: pointer;
     display: flex;
@@ -66,42 +66,109 @@ export const StyledChannelHeaderInfo = styled.div`
     padding: 0 5px;
     width: 26px;
 
-    ${StyledChannel}:hover & {
-        background-color: var(--theia-secondaryButton-hoverBackground);
+    ${StyledChannel}:nth-child(1) & {
+        background-color: ${CHANNEL_BG_COLORS[0]}85;
+    }
+    ${StyledChannel}:nth-child(1):hover & {
+        background-color: ${CHANNEL_BG_COLORS[0]};
+    }
+    ${StyledChannel}:nth-child(2) & {
+        background-color: ${CHANNEL_BG_COLORS[1]}85;
+    }
+    ${StyledChannel}:nth-child(2):hover & {
+        background-color: ${CHANNEL_BG_COLORS[1]};
+    }
+    ${StyledChannel}:nth-child(3) & {
+        background-color: ${CHANNEL_BG_COLORS[2]}85;
+    }
+    ${StyledChannel}:nth-child(3):hover & {
+        background-color: ${CHANNEL_BG_COLORS[2]};
+    }
+    ${StyledChannel}:nth-child(4) & {
+        background-color: ${CHANNEL_BG_COLORS[3]}85;
+    }
+    ${StyledChannel}:nth-child(4):hover & {
+        background-color: ${CHANNEL_BG_COLORS[3]};
+    }
+    ${StyledChannel}:nth-child(5) & {
+        background-color: ${CHANNEL_BG_COLORS[4]}85;
+    }
+    ${StyledChannel}:nth-child(5):hover & {
+        background-color: ${CHANNEL_BG_COLORS[4]};
+    }
+    ${StyledChannel}:nth-child(6) & {
+        background-color: ${CHANNEL_BG_COLORS[5]}85;
+    }
+    ${StyledChannel}:nth-child(6):hover & {
+        background-color: ${CHANNEL_BG_COLORS[5]};
     }
 
     ${StyledChannelHeader}.current & {
-        background-color: var(--theia-focusBorder);
+        background-color: var(--theia-focusBorder) !important;
+        color: #fff;
     }
 `;
 
 export const StyledChannelHeaderButtons = styled.div`
-    background-color: var(--theia-editor-background);
     display: flex;
     font-size: 10px;
     height: 100%;
+
+    ${StyledChannel}:nth-child(1) & {
+        background-color: ${CHANNEL_BG_COLORS[0]}85;
+    }
+    ${StyledChannel}:nth-child(1):hover & {
+        background-color: ${CHANNEL_BG_COLORS[0]};
+    }
+    ${StyledChannel}:nth-child(2) & {
+        background-color: ${CHANNEL_BG_COLORS[1]}85;
+    }
+    ${StyledChannel}:nth-child(2):hover & {
+        background-color: ${CHANNEL_BG_COLORS[1]};
+    }
+    ${StyledChannel}:nth-child(3) & {
+        background-color: ${CHANNEL_BG_COLORS[2]}85;
+    }
+    ${StyledChannel}:nth-child(3):hover & {
+        background-color: ${CHANNEL_BG_COLORS[2]};
+    }
+    ${StyledChannel}:nth-child(4) & {
+        background-color: ${CHANNEL_BG_COLORS[3]}85;
+    }
+    ${StyledChannel}:nth-child(4):hover & {
+        background-color: ${CHANNEL_BG_COLORS[3]};
+    }
+    ${StyledChannel}:nth-child(5) & {
+        background-color: ${CHANNEL_BG_COLORS[4]}85;
+    }
+    ${StyledChannel}:nth-child(5):hover & {
+        background-color: ${CHANNEL_BG_COLORS[4]};
+    }
+    ${StyledChannel}:nth-child(6) & {
+        background-color: ${CHANNEL_BG_COLORS[5]}85;
+    }
+    ${StyledChannel}:nth-child(6):hover & {
+        background-color: ${CHANNEL_BG_COLORS[5]};
+    }
 `;
 
 export const StyledChannelHeaderButton = styled.div`
     align-items: center;
-    background-color: var(--theia-secondaryButton-background);
     cursor: pointer;
     display: flex;
     justify-content: center;
     flex-grow: 1;
     width: 12px;
 
-    ${StyledChannel}:hover & {
-        background-color: var(--theia-secondaryButton-hoverBackground);
-    }
-
     ${StyledChannel} &:hover,
     ${StyledChannel} &.active {
-        background-color: transparent;
+        background-color: var(--theia-editor-background);
+        color: #fff;
     }
 
     ${StyledChannelHeader}.current & {
         background-color: var(--theia-focusBorder);
+        color: #fff;
     }
 
     ${StyledChannelHeader}.current &:hover {

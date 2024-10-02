@@ -1,9 +1,9 @@
-import { nls } from '@theia/core';
 import React from 'react';
 import { MetaLineNote, MetaLineNoteEffects, MetaLineNoteVolume, MetaLineNoteVolumeChannel } from './StyledComponents';
 
 interface NotePropertiesNoteProps {
     index: number
+    current: boolean
     effects: string[]
     volumeL: number
     volumeR: number
@@ -13,19 +13,15 @@ interface NotePropertiesNoteProps {
 }
 
 export default function NotePropertiesNote(props: NotePropertiesNoteProps): React.JSX.Element {
-    const { index, volumeL, volumeR, effects, noteResolution, setCurrentNote, setNote } = props;
-
-    const labelEffects = nls.localize('vuengine/musicEditor/effects', 'Effects');
-    const leftLabel = nls.localize('vuengine/musicEditor/left', 'Left');
-    const rightLabel = nls.localize('vuengine/musicEditor/right', 'Right');
+    const { index, current, volumeL, volumeR, effects, setCurrentNote, setNote } = props;
 
     return <MetaLineNote
-        className={`noteResolution${noteResolution}`}
-        title={`${effects.length} ${labelEffects}, ${leftLabel}: ${volumeL}%/${rightLabel}: ${volumeR}%`}
+        className={current ? 'current' : undefined}
         onClick={() => setCurrentNote(index)}
         onContextMenu={() => setNote(index, undefined)}
     >
         <MetaLineNoteEffects>
+            {effects.join('/')}
         </MetaLineNoteEffects>
         <MetaLineNoteVolume>
             <MetaLineNoteVolumeChannel style={{ height: `${volumeL}%` }} />

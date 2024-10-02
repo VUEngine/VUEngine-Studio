@@ -1,5 +1,5 @@
 import React from 'react';
-import { HIGHEST_NOTE, LOWEST_NOTE, NOTES } from '../MusicEditor/MusicEditorTypes';
+import { NOTES } from '../MusicEditor/MusicEditorTypes';
 import PianoKeys from './PianoKeys';
 
 interface PianoProps {
@@ -18,8 +18,7 @@ export default function Piano(props: PianoProps): React.JSX.Element {
         width: 85,
     }}>
         {Object.keys(NOTES).map((note, index) =>
-            index <= LOWEST_NOTE &&
-            index >= HIGHEST_NOTE && <PianoKeys
+            <PianoKeys
                 key={`pianoroll-row-${index}`}
                 note={note}
                 noteId={index}

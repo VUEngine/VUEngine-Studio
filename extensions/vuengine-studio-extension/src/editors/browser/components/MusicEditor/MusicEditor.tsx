@@ -66,6 +66,12 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
     const [sidebarTab, setSidebarTab] = useState<number>(0);
     const [waveformDialogOpen, setWaveformDialogOpen] = useState<number>(-1);
     const [modulationDataDialogOpen, setModulationDataDialogOpen] = useState<number>(-1);
+    const [lastSetNoteId, setLastSetNoteId] = useState<number>(-1);
+
+    const updateNote = (index: number, note: number | undefined) => {
+        setLastSetNoteId(index);
+        setNote(index, note);
+    };
 
     const updatePlayRangeStart = (value: number) => {
         if (currentStep > -1) {
@@ -375,8 +381,10 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                             playRangeEnd={playRangeEnd}
                             setPlayRangeEnd={setPlayRangeEnd}
                             playNote={playNote}
-                            setNote={setNote}
+                            setNote={updateNote}
                             tool={tool}
+                            lastSetNoteId={lastSetNoteId}
+                            setLastSetNoteId={setLastSetNoteId}
                         />
                     </>
                 }
@@ -439,7 +447,7 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                                 currentPatternId={currentPatternId}
                                 setCurrentPatternId={updateCurrentPatternId}
                                 currentNote={currentNote}
-                                setNote={setNote}
+                                setNote={updateNote}
                                 setPattern={setPattern}
                             />
                         </VContainer>

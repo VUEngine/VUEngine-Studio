@@ -1,4 +1,3 @@
-import { nls } from '@theia/core';
 import React from 'react';
 import { BAR_PATTERN_LENGTH_MULT_MAP, SongData } from '../MusicEditorTypes';
 import PianoRollHeaderNote from './PianoRollHeaderNote';
@@ -29,8 +28,7 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
 
     return <MetaLine style={{ top: 0 }}>
         <MetaLineHeader
-            style={{ height: 15 }}
-            title={`${nls.localize('vuengine/musicEditor/channel', 'Channel')} / ${nls.localize('vuengine/musicEditor/pattern', 'Pattern')}`}
+            style={{ height: 11 }}
         >
             <MetaLineHeaderLine>
             </MetaLineHeaderLine>
@@ -50,4 +48,4 @@ export default function PianoRollHeader(props: PianoRollHeaderProps): React.JSX.
         ))
         }
     </MetaLine>;
-}
+};
