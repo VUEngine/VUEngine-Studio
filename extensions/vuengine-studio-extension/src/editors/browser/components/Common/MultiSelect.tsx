@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import { GroupBase, OptionProps } from 'react-select';
+import { GroupBase, MenuPlacement, OptionProps } from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 import Select from 'react-select';
 
@@ -27,17 +27,18 @@ const CustomMultiValueRemove: FunctionComponent<OptionProps<MultiSelectOption, t
     </div>
 }</>;
 
-interface RadioSelectProps {
+interface MultiSelectProps {
     options: MultiSelectOption[]
     canSelectMany?: boolean
     defaultValue: string | string[]
     placeholder?: string
+    menuPlacement?: MenuPlacement
     onChange: (options: string[]) => void
     onCreateOption?: (value: string) => void
 }
 
-export default function MultiSelect(props: RadioSelectProps): React.JSX.Element {
-    const { options, canSelectMany, defaultValue, placeholder, onChange, onCreateOption } = props;
+export default function MultiSelect(props: MultiSelectProps): React.JSX.Element {
+    const { options, canSelectMany, defaultValue, placeholder, menuPlacement, onChange, onCreateOption } = props;
 
     const value: MultiSelectOption[] = [];
     options.map(o => {
@@ -52,9 +53,9 @@ export default function MultiSelect(props: RadioSelectProps): React.JSX.Element 
         onChange={(opts: MultiSelectOption[]) => onChange(opts.map(opt => opt.value))}
         onCreateOption={onCreateOption}
         options={options}
-        isMulti={canSelectMany || true}
+        isMulti={canSelectMany ?? true}
         isSearchable
-        placeholder={placeholder || ''}
+        placeholder={placeholder ?? ''}
         components={{
             ClearIndicator: CustomClearIndicator,
             MultiValueRemove: CustomMultiValueRemove,
@@ -64,5 +65,7 @@ export default function MultiSelect(props: RadioSelectProps): React.JSX.Element 
         unstyled
         className="react-select-container"
         classNamePrefix="react-select"
+        maxMenuHeight={212}
+        menuPlacement={menuPlacement}
     />;
 }

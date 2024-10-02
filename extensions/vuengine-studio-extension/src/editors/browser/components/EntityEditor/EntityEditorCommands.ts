@@ -17,7 +17,7 @@ export const EntityEditorCommands: EditorCommands = {
         id: 'editors.entityEditor.deleteCurrentComponent',
         label: nls.localize('vuengine/editors/commands/entityEditor/deleteCurrentComponent', 'Delete Current Component'),
         category: nls.localize('vuengine/editors/commands/entityEditor/category', 'Entity Editor'),
-        keybinding: ['backspace', 'delete'],
+        keybinding: ['ctrlcmd+backspace', 'delete'],
     },
     DESELECT_CURRENT_COMPONENT: {
         id: 'editors.entityEditor.deselectCurrentComponent',

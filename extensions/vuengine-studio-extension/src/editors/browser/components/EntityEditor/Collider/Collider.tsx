@@ -545,6 +545,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                     defaultValue={collider.layersToCheck}
                                     onChange={options => setColliderLayersToCheck(options)}
                                     options={colliderLayerOptions}
+                                    menuPlacement='top'
                                 // onCreateOption={options => console.log(options)}
                                 />
                             </VContainer>
