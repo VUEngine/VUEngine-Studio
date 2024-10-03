@@ -89,3 +89,5 @@ export const WINDOWS_EXECUTABLE_EXTENSIONS = [
   'exe',
   'ps1',
 ];
+
+export const VES_VERSION = '0.6.0';

@@ -111,6 +111,14 @@ export interface WithFileUri {
   _fileUri: URI
 }
 
+export interface WithVersion {
+  _version: string
+}
+
+export interface WithType {
+  type: ProjectDataType & WithContributor
+}
+
 export enum ProjectDataTemplateEncoding {
   ShiftJIS = 'shift_jis',
   utf8 = 'utf8',

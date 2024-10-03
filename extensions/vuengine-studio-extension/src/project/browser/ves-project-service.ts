@@ -13,6 +13,7 @@ import { OutputChannelManager, OutputChannelSeverity } from '@theia/output/lib/b
 import { deepmerge } from 'deepmerge-ts';
 import { VesBuildPathsService } from '../../build/browser/ves-build-paths-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
+import { VES_VERSION } from '../../core/browser/ves-common-types';
 import { VES_PREFERENCE_DIR } from '../../core/browser/ves-preference-configurations';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
 import { VesEditorsCommands } from '../../editors/browser/ves-editors-commands';
@@ -36,8 +37,12 @@ import {
   ProjectDataWithContributor,
   VUENGINE_WORKSPACE_EXT,
   WithContributor,
+  WithFileUri,
+  WithType,
+  WithVersion,
   defaultProjectData
 } from './ves-project-types';
+import { VesProjectCommands } from './ves-project-commands';
 
 @injectable()
 export class VesProjectService {
@@ -73,6 +78,17 @@ export class VesProjectService {
   protected readonly _projectItemsReady = new Deferred<void>();
   get projectItemsReady(): Promise<void> {
     return this._projectItemsReady.promise;
+  }
+
+  protected _isUpdatingFiles: boolean = false;
+  protected readonly onDidChangeIsUpdatingFilesEmitter = new Emitter<boolean>();
+  readonly onDidChangeIsUpdatingFiles = this.onDidChangeIsUpdatingFilesEmitter.event;
+  set isUpdatingFiles(flag: boolean) {
+    this._isUpdatingFiles = flag;
+    this.onDidChangeIsUpdatingFilesEmitter.fire(this._isUpdatingFiles);
+  }
+  get isUpdatingFiles(): boolean {
+    return this._isUpdatingFiles;
   }
 
   protected readonly onDidAddProjectItemEmitter = new Emitter<URI>();
@@ -167,9 +183,13 @@ export class VesProjectService {
     if (type.schema.properties && needsId) {
       type.schema.properties['_id'] = {
         type: 'string',
-        default: ''
+        default: this.vesCommonService.nanoid(),
       };
     }
+    type.schema.properties['_version'] = {
+      type: 'string',
+      default: VES_VERSION,
+    };
     const schema = await window.electronVesCore.dereferenceJsonSchema(type.schema);
     let data: ItemData = this.generateDataFromJsonSchema({
       ...schema,
@@ -181,9 +201,6 @@ export class VesProjectService {
           data.name = this.uri.path.name;
         }
     */
-    if (!data?._id && needsId) {
-      data!._id = this.vesCommonService.nanoid();
-    }
 
     data = window.electronVesCore.sortJson(data ?? {}, {
       depth: 8,
@@ -318,13 +335,19 @@ export class VesProjectService {
       this.logLine(`Added item to project data. Type: ${typeId}, ID: ${itemId}, Contributor: ${contributor!}.`);
     } else {
       this._projectData.items[typeId][itemId] = {
-        ...this._projectData.items[typeId][itemId],
+        _contributor: this._projectData.items[typeId][itemId]._contributor,
+        _contributorUri: this._projectData.items[typeId][itemId]._contributorUri,
         _fileUri: fileUri,
         ...data
       };
 
       this.onDidUpdateProjectItemEmitter.fire(fileUri);
       this.logLine(`Updated item in project data. Type: ${typeId}, ID: ${itemId}, Contributor: ${this._projectData.items[typeId][itemId]._contributor}.`);
+    }
+
+    // check version
+    if (data._version !== VES_VERSION) {
+      this.promptForFilesUpdate(1);
     }
 
     return true;
@@ -772,6 +795,23 @@ export class VesProjectService {
 
     const duration = performance.now() - startTime;
     console.log(`Getting VUEngine project data took: ${Math.round(duration)} ms.`);
+
+    // check for outdated items
+    const outdatedItems = await this.getOutdatedProjectItems();
+    if (outdatedItems.length) {
+      await this.promptForFilesUpdate(outdatedItems.length);
+    }
+  }
+
+  protected async promptForFilesUpdate(numberOfFiles: number): Promise<void> {
+    const updateFiles = nls.localize('vuengine/projects/updateFiles', 'Update Files');
+    const answer = await this.messageService.warn(
+      nls.localize('vuengine/projects/foundOutdatedFiles', 'Found {0} outdated item files. These can be updated automatically.', numberOfFiles),
+      updateFiles,
+    );
+    if (answer === updateFiles) {
+      this.commandService.executeCommand(VesProjectCommands.UPDATE_FILES.id);
+    }
   }
 
   // note: tests with caching plugin data in a single file did not increase performance much
@@ -1032,5 +1072,88 @@ export class VesProjectService {
     this.windowTitleService.update({
       projectName: await this.getProjectName()
     });
+  }
+
+  async getOutdatedProjectItems(): Promise<(unknown & WithContributor & WithFileUri & WithVersion & WithType)[]> {
+    const outdatedItems: (unknown & WithContributor & WithFileUri & WithVersion & WithType)[] = [];
+
+    // find all items
+    const itemsByType = this.getProjectDataItems();
+    if (!itemsByType) {
+      return outdatedItems;
+    }
+
+    // get project-contributed items
+    const projectItems: (unknown & WithContributor & WithFileUri & WithVersion & WithType)[] = [];
+    Object.keys(itemsByType).map(typeId => {
+      const type = this.getProjectDataType(typeId);
+      Object.values(itemsByType[typeId]).map((item: unknown & WithContributor & WithFileUri & WithVersion) => {
+        if (item._contributor === ProjectContributor.Project) {
+          projectItems.push({
+            ...item,
+            type: type!,
+          });
+        }
+      });
+    });
+    if (!projectItems.length) {
+      return outdatedItems;
+    }
+
+    // find outdated items
+    projectItems.map(item => {
+      if (item._version !== VES_VERSION) {
+        outdatedItems.push(item);
+      }
+    });
+
+    return outdatedItems;
+  }
+
+  async updateFiles(): Promise<void> {
+    this.isUpdatingFiles = true;
+
+    // get outdated files
+    const outdatedItems = await this.getOutdatedProjectItems();
+    if (!outdatedItems.length) {
+      this.isUpdatingFiles = false;
+      await this.messageService.info(
+        nls.localize('vuengine/projects/AllItemFilesUpToDate', 'All item files are already up-to-date.'),
+      );
+      return;
+    }
+
+    // update outdated items
+    await Promise.all(outdatedItems.map(async itemtoUpdate => {
+      try {
+        const fileContent = await this.fileService.readFile(itemtoUpdate._fileUri);
+        const fileContentJson = JSON.parse(fileContent.value.buffer.toString()) as ItemData;
+        const updatedFileContentJson = await this.getSchemaDefaults(itemtoUpdate.type, fileContentJson);
+        const updatedFileContentBuffer = BinaryBuffer.fromString(JSON.stringify(updatedFileContentJson, undefined, 4));
+        await this.fileService.writeFile(itemtoUpdate._fileUri, updatedFileContentBuffer);
+        this.logLine(`Updated item file ${this.workspaceProjectFolderUri?.relative(itemtoUpdate._fileUri)!.fsPath()}.`);
+      } catch (error) {
+        await this.messageService.error(nls.localize(
+          'vuengine/projects/errorUpdatingFile',
+          'Encountered an error when trying to update {0}: {1}',
+          itemtoUpdate._fileUri.path.fsPath(),
+          error,
+        ));
+      }
+    }));
+
+    // update project data
+    await this.readProjectData();
+
+    // report
+    this.isUpdatingFiles = false;
+    const viewLogs = nls.localize('vuengine/projects/viewLogs', 'View Logs');
+    const answer = await this.messageService.info(
+      nls.localize('vuengine/projects/updatedItemFiles', 'Successfully updated {0} item files.', outdatedItems.length),
+      viewLogs,
+    );
+    if (answer === viewLogs) {
+      this.outputChannelManager.getChannel(PROJECT_CHANNEL_NAME).show();
+    }
   }
 }

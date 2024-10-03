@@ -1,4 +1,5 @@
-import { PreferenceContribution } from '@theia/core/lib/browser';
+import { FrontendApplicationContribution, PreferenceContribution } from '@theia/core/lib/browser';
+import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { ContainerModule } from '@theia/core/shared/inversify';
 import { WorkspaceFrontendContribution } from '@theia/workspace/lib/browser';
@@ -11,8 +12,8 @@ import { VesProjectContribution } from './ves-project-contribution';
 import { VesProjectPathsService } from './ves-project-paths-service';
 import { VesProjectPreferenceSchema } from './ves-project-preferences';
 import { VesProjectService } from './ves-project-service';
+import { VesProjectStatusBarContribution } from './ves-project-statusbar-contribution';
 import { VesWorkspaceFrontendContribution } from './ves-project-workspace-frontend-contribution';
-import { TabBarToolbarContribution } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 
 export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // commands
@@ -22,6 +23,10 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     // preferences
     bind(PreferenceContribution).toConstantValue({ schema: VesProjectPreferenceSchema });
+
+    // status bar entry
+    bind(VesProjectStatusBarContribution).toSelf().inSingletonScope();
+    bind(FrontendApplicationContribution).toService(VesProjectStatusBarContribution);
 
     // project service
     bind(VesProjectService).toSelf().inSingletonScope();

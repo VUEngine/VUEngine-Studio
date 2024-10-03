@@ -2,16 +2,26 @@ import { CommandContribution, CommandRegistry } from '@theia/core/lib/common/com
 import { inject, injectable } from '@theia/core/shared/inversify';
 import { VesNewProjectDialog } from './new-project/ves-new-project-dialog';
 import { VesProjectCommands } from './ves-project-commands';
+import { VesProjectService } from './ves-project-service';
+import { WorkspaceService } from '@theia/workspace/lib/browser';
 
 @injectable()
 export class VesProjectContribution implements CommandContribution {
     @inject(VesNewProjectDialog)
     private readonly vesNewProjectDialog: VesNewProjectDialog;
+    @inject(VesProjectService)
+    private readonly vesProjectService: VesProjectService;
+    @inject(WorkspaceService)
+    private readonly workspaceService: WorkspaceService;
 
     async registerCommands(commandRegistry: CommandRegistry): Promise<void> {
 
         commandRegistry.registerCommand(VesProjectCommands.NEW, {
             execute: () => !this.vesNewProjectDialog.isVisible && this.vesNewProjectDialog.open()
+        });
+        commandRegistry.registerCommand(VesProjectCommands.UPDATE_FILES, {
+            isVisible: () => this.workspaceService.opened,
+            execute: () => this.vesProjectService.updateFiles(),
         });
 
         /*

@@ -17,4 +17,12 @@ export namespace VesProjectCommands {
         },
         'vuengine/projects/commands/toggleView'
     );
+
+    export const UPDATE_FILES: Command = Command.toLocalizedCommand(
+        {
+            id: 'project.updateFiles',
+            label: 'Update item files',
+        },
+        'vuengine/projects/commands/updateFiles'
+    );
 }
