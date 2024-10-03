@@ -363,12 +363,10 @@ export class VesCodeGenService {
     const typeData = this.vesProjectService.getProjectDataType(typeId);
     if (typeData && Array.isArray(typeData.delete)) {
       await Promise.all(typeData.delete.map(async deletePath => {
-        console.log('deletePath', deletePath);
         await this.workspaceService.ready;
         const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
         const deletePathUri = workspaceRootUri.resolve(deletePath);
         if (await this.fileService?.exists(deletePathUri)) {
-          console.log('DELETE');
           await this.fileService?.delete(deletePathUri);
         }
       }));
