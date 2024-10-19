@@ -19,9 +19,6 @@ import { ThemeService } from '@theia/core/lib/browser/theming';
 import { CommandContribution } from '@theia/core/lib/common/command';
 import { MenuContribution } from '@theia/core/lib/common/menu';
 import { ContainerModule, interfaces } from '@theia/core/shared/inversify';
-import { DebugConsoleContribution } from '@theia/debug/lib/browser/console/debug-console-contribution';
-import { DebugFrontendApplicationContribution } from '@theia/debug/lib/browser/debug-frontend-application-contribution';
-import { DebugPrefixConfiguration } from '@theia/debug/lib/browser/debug-prefix-configuration';
 import { FileSystemFrontendContribution } from '@theia/filesystem/lib/browser/filesystem-frontend-contribution';
 import { MonacoThemeRegistry } from '@theia/monaco/lib/browser/textmate/monaco-theme-registry';
 import { FileNavigatorContribution } from '@theia/navigator/lib/browser/navigator-contribution';
@@ -43,8 +40,6 @@ import { VesApplicationShell } from './ves-core-application-shell';
 import { VesColorContribution } from './ves-core-color-contribution';
 import { VesCoreCompactMainMenuContribution } from './ves-core-compact-main-menu-contribution';
 import { VesCoreContribution } from './ves-core-contribution';
-import { VesDebugFrontendApplicationContribution } from './ves-core-debug-contribution';
-import { VesDebugPrefixConfiguration } from './ves-core-debug-prefix-configuration';
 import { VesDefaultFileIconThemeContribution } from './ves-core-icon-theme-contribution';
 import { VesCoreLabelProviderContribution } from './ves-core-label-provider';
 import { VesCorePreferenceSchema } from './ves-core-preferences';
@@ -117,11 +112,6 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
 
     // various removals
     bind(FilterContribution).to(VesFilterContribution).inSingletonScope();
-
-    // remove debug features
-    rebind(DebugFrontendApplicationContribution).to(VesDebugFrontendApplicationContribution).inSingletonScope();
-    removeContribution(DebugConsoleContribution);
-    rebind(DebugPrefixConfiguration).to(VesDebugPrefixConfiguration).inSingletonScope();
 
     // remove various contributions
     removeContribution(PluginFrontendViewContribution);

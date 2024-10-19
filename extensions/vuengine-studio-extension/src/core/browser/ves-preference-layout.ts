@@ -15,7 +15,7 @@ export class VesPreferenceLayoutProvider extends PreferenceLayoutProvider {
         const textEditorNode = DEFAULT_LAYOUT.slice(0, 1)[0];
         const featuresNode = DEFAULT_LAYOUT.slice(3, 4)[0];
         featuresNode.children = [
-            ...featuresNode.children!.filter(c => c.id !== 'features.debug'),
+            ...featuresNode.children!,
             {
                 id: `features.${VesProjectPreferenceIds.CATEGORY}`,
                 label: nls.localize('vuengine/preferences/project', 'Project'),

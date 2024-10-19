@@ -23,8 +23,6 @@ export class VesFilterContribution implements FilterContribution {
         (
           // @ts-ignore // filter test extension properties
           contrib.schema.properties['testing.openTesting'] === undefined &&
-          // @ts-ignore // filter debug extension properties
-          contrib.schema.properties['debug.trace'] === undefined &&
           // @ts-ignore // filter notebook extension properties
           contrib.schema.properties['notebook.lineNumbers'] === undefined
         )
