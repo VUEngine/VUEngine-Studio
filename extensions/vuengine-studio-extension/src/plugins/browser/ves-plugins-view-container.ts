@@ -27,7 +27,7 @@ export class VesPluginsViewContainer extends ViewContainer {
         this.setTitleOptions({
             label: VesPluginsViewContainer.LABEL,
             iconClass: 'codicon codicon-plug',
-            closeable: true
+            closeable: false
         });
     }
 

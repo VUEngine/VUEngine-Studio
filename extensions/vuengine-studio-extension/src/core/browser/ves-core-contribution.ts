@@ -4,7 +4,10 @@ import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { CommandContribution, CommandRegistry } from '@theia/core/lib/common/command';
 import { MenuContribution, MenuModelRegistry } from '@theia/core/lib/common/menu';
 import { ElectronCommands } from '@theia/core/lib/electron-browser/menu/electron-menu-contribution';
-import { inject, injectable } from '@theia/core/shared/inversify';
+import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { EXPLORER_VIEW_CONTAINER_TITLE_OPTIONS } from '@theia/navigator/lib/browser/navigator-widget-factory';
+import { SCM_VIEW_CONTAINER_TITLE_OPTIONS } from '@theia/scm/lib/browser/scm-contribution';
+import { SEARCH_VIEW_CONTAINER_TITLE_OPTIONS } from '@theia/search-in-workspace/lib/browser/search-in-workspace-factory';
 import { WorkspaceCommands } from '@theia/workspace/lib/browser';
 import { VesCoreCommands } from './ves-core-commands';
 import { VesCoreMenus } from './ves-core-menus';
@@ -21,6 +24,14 @@ export class VesCoreContribution implements CommandContribution, MenuContributio
     static REPORT_ISSUE_URL = 'https://github.com/VUEngine/VUEngine-Studio/issues/new';
     static SUPPORT_URL = 'https://www.patreon.com/VUEngine';
     static DOCUMENTATION_URL = 'https://www.vuengine.dev/documentation/';
+
+    @postConstruct()
+    protected init(): void {
+        // make default views unclosable
+        EXPLORER_VIEW_CONTAINER_TITLE_OPTIONS.closeable = false;
+        SCM_VIEW_CONTAINER_TITLE_OPTIONS.closeable = false;
+        SEARCH_VIEW_CONTAINER_TITLE_OPTIONS.closeable = false;
+    };
 
     registerCommands(commandRegistry: CommandRegistry): void {
         commandRegistry.registerCommand(VesCoreCommands.REPORT_ISSUE, {

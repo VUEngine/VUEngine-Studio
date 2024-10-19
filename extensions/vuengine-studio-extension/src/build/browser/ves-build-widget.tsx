@@ -83,7 +83,7 @@ export class VesBuildWidget extends ReactWidget {
 
     this.id = VesBuildWidget.ID;
     this.title.iconClass = 'codicon codicon-tools';
-    this.title.closable = true;
+    this.title.closable = false;
     this.title.label = VesBuildWidget.LABEL;
     this.title.caption = VesBuildWidget.LABEL;
     this.title.className = '';

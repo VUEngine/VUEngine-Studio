@@ -46,7 +46,7 @@ export class VesFlashCartWidget extends ReactWidget {
     this.doInit();
     this.id = VesFlashCartWidget.ID;
     this.title.iconClass = 'codicon codicon-multiple-windows codicon-rotate-180';
-    this.title.closable = true;
+    this.title.closable = false;
     this.setTitle();
     this.bindEvents();
     this.update();
