@@ -13,6 +13,7 @@ const DELETE_PATHS = [
     'node_modules/unzip-stream/testData*'
 ];
 
+/*
 const EXECUTABLE_PATHS = [
     'binaries/vuengine-studio-tools/${os}/gcc/bin',
     'binaries/vuengine-studio-tools/${os}/gcc/libexec/gcc/v810/4.7.4',
@@ -21,8 +22,10 @@ const EXECUTABLE_PATHS = [
     'binaries/vuengine-studio-tools/${os}/hb-cli/hbcli',
     'binaries/vuengine-studio-tools/${os}/hf-cli/hfcli',
     'binaries/vuengine-studio-tools/${os}/make/make',
+    'binaries/vuengine-studio-tools/${os}/prog-vb/prog-vb',
     'vuengine/core/lib/compiler/preprocessor',
 ];
+*/
 
 const signCommand = path.join(__dirname, 'sign.sh');
 // const notarizeCommand = path.join(__dirname, 'notarize.sh');
@@ -65,6 +68,7 @@ exports.default = async function (context) {
     }
 
     // Set executable flags
+    /*
     for (const execPath of EXECUTABLE_PATHS) {
         const resolvedPath = path.resolve(appPath, replaceOs(execPath));
         if (fs.existsSync(resolvedPath)) {
@@ -79,6 +83,7 @@ exports.default = async function (context) {
             }
         }
     }
+    */
 
     // Only continue for macOS
     if (context.packager.platform.name !== 'mac') {

@@ -546,7 +546,7 @@ export class VesBuildService {
 
     const pathUris: URI[] = [
       compilerUri.resolve('bin'),
-      compilerUri.resolve('libexec').resolve('bin'),
+      compilerUri.resolve('libexec').resolve('gcc').resolve('v810').resolve('4.7.4'),
       makeUri,
     ];
 
