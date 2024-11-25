@@ -100,7 +100,7 @@ export default function Script(props: ScriptProps): React.JSX.Element {
                     <ScriptedAction
                         id={`scripts-${index}`}
                         action={{
-                            name: scriptConfig?.name,
+                            label: scriptConfig?.name,
                         }}
                         script={script}
                         index={-1}

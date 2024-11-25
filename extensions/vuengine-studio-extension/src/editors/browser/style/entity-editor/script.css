@@ -29,7 +29,11 @@
 .scripted-action {
     box-shadow: 5px 5px rgba(0, 0, 0, .2);
     cursor: pointer;
-    width: 200px;
+    width: 250px;
+}
+
+.scripted-action i {
+    padding-top: 2px;
 }
 
 .scripted-action-container.root .scripted-action,
@@ -79,7 +83,7 @@
     opacity: 0;
     transition: all .1s;
     transition-delay: .3s;
-    width: 200px !important;
+    width: 250px !important;
     z-index: 10;
 }
 

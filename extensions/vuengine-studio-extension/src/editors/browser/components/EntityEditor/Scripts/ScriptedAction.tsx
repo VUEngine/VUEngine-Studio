@@ -39,8 +39,8 @@ export default function ScriptedAction(props: ScriptedActionProps): React.JSX.El
             .sort((a, b) => {
                 if (a.category > b.category) { return -1; }
                 if (a.category < b.category) { return 1; }
-                if (a.name > b.name) { return 1; }
-                if (a.name < b.name) { return -1; }
+                if (a.label > b.label) { return 1; }
+                if (a.label < b.label) { return -1; }
                 return 0;
             })
             .map(a => {
@@ -53,7 +53,8 @@ export default function ScriptedAction(props: ScriptedActionProps): React.JSX.El
                 }
                 items.push({
                     id: a.id,
-                    label: a.name,
+                    label: a.label,
+                    description: a.description,
                 });
             });
 
@@ -118,8 +119,8 @@ export default function ScriptedAction(props: ScriptedActionProps): React.JSX.El
     };
 
     const meta: any[] = [];
-    if (action?.config) {
-        action.config?.map(c => {
+    if (action?.arguments) {
+        action.arguments?.map(c => {
             switch (c.type) {
                 case ActionConfigType.Text:
                 case ActionConfigType.TextArea:
@@ -176,9 +177,9 @@ export default function ScriptedAction(props: ScriptedActionProps): React.JSX.El
             {action?.iconClass &&
                 <i className={action.iconClass} />
             }
-            {action?.name &&
+            {action?.label &&
                 <VContainer gap={2} overflow='hidden'>
-                    <div>{action.name}</div>
+                    <div>{action.label}</div>
                     {!isRoot && !isEnd &&
                         <div className='meta'>
                             {meta.join(', ')}
@@ -195,7 +196,7 @@ export default function ScriptedAction(props: ScriptedActionProps): React.JSX.El
                             id=''
                             index={-2}
                             action={{
-                                name: b.name,
+                                label: b.name,
                             }}
                             script={scriptedAction?.branches && scriptedAction?.branches[i] && scriptedAction?.branches[i].script
                                 ? scriptedAction?.branches[i].script

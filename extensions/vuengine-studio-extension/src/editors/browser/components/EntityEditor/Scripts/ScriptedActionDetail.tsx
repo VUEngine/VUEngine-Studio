@@ -7,9 +7,10 @@ import RadioSelect from '../../Common/RadioSelect';
 import VContainer from '../../Common/VContainer';
 import { EntityEditorContext, EntityEditorContextType, ScriptData } from '../EntityEditorTypes';
 import { ScriptType } from './ScriptTypes';
-import { AVAILABLE_ACTIONS, ActionConfigData, ActionConfigType } from './AvailableActions';
+import { AVAILABLE_ACTIONS, ActionArgumentsData, ActionConfigType } from './AvailableActions';
 import { ENTITY_FUNCTIONS } from './EntityFunctions';
 import { INPUT_BLOCKING_COMMANDS } from '../EntityEditor';
+import InfoLabel from '../../Common/InfoLabel';
 
 export default function ScriptedActionDetail(): React.JSX.Element {
     const { data, setData, currentComponent } = useContext(EntityEditorContext) as EntityEditorContextType;
@@ -69,7 +70,7 @@ export default function ScriptedActionDetail(): React.JSX.Element {
         updateScript({ script: updatedScript });
     };
 
-    const getConfigControl = (config: ActionConfigData): React.JSX.Element => {
+    const getConfigControl = (config: ActionArgumentsData): React.JSX.Element => {
         switch (config.type) {
             case ActionConfigType.Boolean:
                 // TODO
@@ -176,21 +177,24 @@ export default function ScriptedActionDetail(): React.JSX.Element {
                 }
             </>
         }
+        <VContainer>
+            <label>{currentAction?.label}</label>
+            <div className='secondaryText'>
+                {currentAction?.description}
+            </div>
+        </VContainer>
         {currentActionIndex > -1 &&
             <>
-                {currentAction?.config &&
-                    <>
-                        {currentAction.config && currentAction.config.map((c, i) =>
-                            <div key={i}>
-                                <VContainer>
-                                    <label>{c.label}</label>
-                                    {getConfigControl(c)}
-                                </VContainer>
-                            </div>
-                        )}
-                    </>
-                }
-                {!currentAction?.config &&
+                {currentAction?.arguments && currentAction.arguments.map((c, i) =>
+                    <VContainer key={i}>
+                        <InfoLabel
+                            label={c.label}
+                            tooltip={c.description}
+                        />
+                        {getConfigControl(c)}
+                    </VContainer>
+                )}
+                {!currentAction?.arguments &&
                     nls.localize('vuengine/entityEditor/noActionConfiguration', 'This action does not need any configuration.')
                 }
             </>
