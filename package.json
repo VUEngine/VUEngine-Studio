@@ -58,7 +58,8 @@
   },
   "theiaPluginsDir": "plugins",
   "theiaPlugins": {
-    "eclipse-theia.builtin-extension-pack": "https://open-vsx.org/api/eclipse-theia/builtin-extension-pack/1.83.1/file/eclipse-theia.builtin-extension-pack-1.83.1.vsix"
+    "eclipse-theia.builtin-extension-pack": "https://open-vsx.org/api/eclipse-theia/builtin-extension-pack/1.83.1/file/eclipse-theia.builtin-extension-pack-1.83.1.vsix",
+    "vuengine-language-server": "https://github.com/VUEngine/VUEngine-Language-Server/releases/download/v0.5.0/vuengine-language-server-0.5.0.vsix"
   },
   "theiaPluginsExcludeIds": [
     "ms-vscode.js-debug",
