@@ -32,6 +32,7 @@ import { PreferenceLayoutProvider } from '@theia/preferences/lib/browser/util/pr
 import { PreferenceStringInputRenderer } from '@theia/preferences/lib/browser/views/components/preference-string-input';
 import { TestViewContribution } from '@theia/test/lib/browser/view/test-view-contribution';
 import { ToolbarDefaultsFactory } from '@theia/toolbar/lib/browser/toolbar-defaults';
+import { TypeHierarchyContribution } from '@theia/typehierarchy/lib/browser/typehierarchy-contribution';
 import { VSXExtensionsContribution } from '@theia/vsx-registry/lib/browser/vsx-extensions-contribution';
 import { QuickOpenWorkspace } from '@theia/workspace/lib/browser/quick-open-workspace';
 import '../../../src/core/browser/style/index.css';
@@ -126,6 +127,7 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     removeContribution(PluginApiFrontendContribution);
     removeContribution(CallHierarchyContribution);
     removeContribution(TestViewContribution);
+    removeContribution(TypeHierarchyContribution);
 
     // common service
     bind(VesCommonService).toSelf().inSingletonScope();

@@ -105,7 +105,6 @@
     "@theia/terminal": "1.55.0",
     "@theia/timeline": "1.55.0",
     "@theia/toolbar": "1.55.0",
-    "@theia/typehierarchy": "1.55.0",
     "@theia/userstorage": "1.55.0",
     "@theia/variable-resolver": "1.55.0",
     "@theia/vsx-registry": "1.55.0",

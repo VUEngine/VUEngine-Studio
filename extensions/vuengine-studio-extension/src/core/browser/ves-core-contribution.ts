@@ -1,21 +1,27 @@
-import { isOSX } from '@theia/core';
-import { ApplicationShell, CommonCommands, KeybindingContribution, KeybindingRegistry, PreferenceService } from '@theia/core/lib/browser';
+import { isOSX, URI } from '@theia/core';
+import { ApplicationShell, CommonCommands, KeybindingContribution, KeybindingRegistry, OpenerService, PreferenceService } from '@theia/core/lib/browser';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { CommandContribution, CommandRegistry } from '@theia/core/lib/common/command';
 import { MenuContribution, MenuModelRegistry } from '@theia/core/lib/common/menu';
 import { ElectronCommands } from '@theia/core/lib/electron-browser/menu/electron-menu-contribution';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
+import { EditorWidget } from '@theia/editor/lib/browser';
 import { EXPLORER_VIEW_CONTAINER_TITLE_OPTIONS } from '@theia/navigator/lib/browser/navigator-widget-factory';
 import { SCM_VIEW_CONTAINER_TITLE_OPTIONS } from '@theia/scm/lib/browser/scm-contribution';
 import { SEARCH_VIEW_CONTAINER_TITLE_OPTIONS } from '@theia/search-in-workspace/lib/browser/search-in-workspace-factory';
 import { WorkspaceCommands } from '@theia/workspace/lib/browser';
 import { VesCoreCommands } from './ves-core-commands';
 import { VesCoreMenus } from './ves-core-menus';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
 
 @injectable()
 export class VesCoreContribution implements CommandContribution, MenuContribution, KeybindingContribution {
     @inject(ApplicationShell)
     protected readonly shell: ApplicationShell;
+    @inject(FileService)
+    protected fileService: FileService;
+    @inject(OpenerService)
+    protected openerService: OpenerService;
     @inject(PreferenceService)
     protected readonly preferenceService: PreferenceService;
     @inject(WindowService)
@@ -43,6 +49,28 @@ export class VesCoreContribution implements CommandContribution, MenuContributio
         commandRegistry.registerCommand(VesCoreCommands.OPEN_DOCUMENTATION, {
             execute: path => this.windowService.openNewWindow(`${VesCoreContribution.DOCUMENTATION_URL}${path ? path : ''}`, { external: true })
         });
+        commandRegistry.registerCommand(VesCoreCommands.SWITCH_HEADER_SOURCE, {
+            isEnabled: () => this.shell.currentWidget instanceof EditorWidget && (
+                ((this.shell.currentWidget as EditorWidget).getResourceUri()?.path.base.endsWith('.c') ?? false) ||
+                ((this.shell.currentWidget as EditorWidget).getResourceUri()?.path.base.endsWith('.h') ?? false)
+            ),
+            execute: async () => {
+                const uri = (this.shell.currentWidget as EditorWidget).getResourceUri();
+                if (uri) {
+                    const fsPath = uri.path.fsPath();
+                    const updatedPath = fsPath.endsWith('.h')
+                        ? fsPath.slice(0, -2) + '.c'
+                        : fsPath.endsWith('.c')
+                            ? fsPath.slice(0, -2) + '.h'
+                            : fsPath;
+                    const switchedUri = new URI(updatedPath);
+                    if (await this.fileService.exists(switchedUri)) {
+                        const opener = await this.openerService.getOpener(switchedUri);
+                        await opener.open(switchedUri);
+                    }
+                }
+            }
+        });
     }
 
     registerMenus(menus: MenuModelRegistry): void {
@@ -59,6 +87,11 @@ export class VesCoreContribution implements CommandContribution, MenuContributio
     }
 
     registerKeybindings(registry: KeybindingRegistry): void {
+        registry.registerKeybindings({
+            command: VesCoreCommands.SWITCH_HEADER_SOURCE.id,
+            keybinding: 'alt+o'
+        });
+
         // rebind reload window command
         registry.unregisterKeybinding({
             command: ElectronCommands.RELOAD.id,

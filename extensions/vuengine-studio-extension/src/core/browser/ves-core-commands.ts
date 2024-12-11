@@ -28,4 +28,13 @@ export namespace VesCoreCommands {
         'vuengine/documentation/commands/openDocumentation',
         'vuengine/documentation/commands/category'
     );
+    export const SWITCH_HEADER_SOURCE: Command = Command.toLocalizedCommand(
+        {
+            id: 'ves.switchHeaderSource',
+            label: 'Switch Header/Source',
+            category: 'Editor',
+        },
+        'vuengine/general/commands/switchHeaderSource',
+        'vuengine/editor/commands/category'
+    );
 }
