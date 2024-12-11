@@ -69,6 +69,7 @@
     "vscode.builtin-notebook-renderers",
     "vscode.clojure",
     "vscode.coffeescript",
+    "vscode.cpp",
     "vscode.csharp",
     "vscode.css-language-features",
     "vscode.css",

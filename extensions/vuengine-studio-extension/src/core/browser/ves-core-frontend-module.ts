@@ -26,14 +26,12 @@ import { FileSystemFrontendContribution } from '@theia/filesystem/lib/browser/fi
 import { MonacoThemeRegistry } from '@theia/monaco/lib/browser/textmate/monaco-theme-registry';
 import { FileNavigatorContribution } from '@theia/navigator/lib/browser/navigator-contribution';
 import { NavigatorWidgetFactory } from '@theia/navigator/lib/browser/navigator-widget-factory';
-import { OutlineViewContribution } from '@theia/outline-view/lib/browser/outline-view-contribution';
 import { PluginApiFrontendContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-contribution';
 import { PluginFrontendViewContribution } from '@theia/plugin-ext/lib/main/browser/plugin-frontend-view-contribution';
 import { PreferenceLayoutProvider } from '@theia/preferences/lib/browser/util/preference-layout';
 import { PreferenceStringInputRenderer } from '@theia/preferences/lib/browser/views/components/preference-string-input';
 import { TestViewContribution } from '@theia/test/lib/browser/view/test-view-contribution';
 import { ToolbarDefaultsFactory } from '@theia/toolbar/lib/browser/toolbar-defaults';
-import { TypeHierarchyContribution } from '@theia/typehierarchy/lib/browser/typehierarchy-contribution';
 import { VSXExtensionsContribution } from '@theia/vsx-registry/lib/browser/vsx-extensions-contribution';
 import { QuickOpenWorkspace } from '@theia/workspace/lib/browser/quick-open-workspace';
 import '../../../src/core/browser/style/index.css';
@@ -126,10 +124,8 @@ export default new ContainerModule((bind, unbind, isBound, rebind) => {
     // remove various contributions
     removeContribution(PluginFrontendViewContribution);
     removeContribution(PluginApiFrontendContribution);
-    removeContribution(OutlineViewContribution);
     removeContribution(CallHierarchyContribution);
     removeContribution(TestViewContribution);
-    removeContribution(TypeHierarchyContribution);
 
     // common service
     bind(VesCommonService).toSelf().inSingletonScope();

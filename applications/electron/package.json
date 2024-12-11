@@ -33,6 +33,9 @@
           "workbench.tree.renderIndentGuides": "none",
           "editor.detectIndentation": false,
           "editor.insertSpaces": false,
+          "editor.rulers": [
+            108
+          ],
           "files.watcherExclude": {
             "**/.git/objects/**": true,
             "**/.git/subtree-cache/**": true,
@@ -45,6 +48,7 @@
           "git.autofetch": true,
           "security.workspace.trust.enabled": false,
           "toolbar.showToolbar": true,
+          "window.tabbar.enhancedPreview": "visual",
           "window.title": "${projectName}",
           "workspace.preserveWindow": true
         },
@@ -84,6 +88,7 @@
     "@theia/metrics": "1.55.0",
     "@theia/monaco": "1.55.0",
     "@theia/navigator": "1.55.0",
+    "@theia/outline-view": "1.55.0",
     "@theia/output": "1.55.0",
     "@theia/plugin-metrics": "1.55.0",
     "@theia/plugin-ext": "1.55.0",
@@ -100,6 +105,7 @@
     "@theia/terminal": "1.55.0",
     "@theia/timeline": "1.55.0",
     "@theia/toolbar": "1.55.0",
+    "@theia/typehierarchy": "1.55.0",
     "@theia/userstorage": "1.55.0",
     "@theia/variable-resolver": "1.55.0",
     "@theia/vsx-registry": "1.55.0",
