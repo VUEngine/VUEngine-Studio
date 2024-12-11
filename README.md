@@ -15,6 +15,7 @@ The following third party binaries that are shipped with VUEngine Studio come wi
 
 - GCC by the GNU Project, with patches for V810 by ElmerPCFX
 - GNU Make by the GNU Project
+- clang-format by the GNU Project
 - Grit by Jasper Vijn, with patches for Virtual Boy by dasi
 - HyperBoyCli by thunderstruck
 - HyperFlasherCli by thunderstruck
