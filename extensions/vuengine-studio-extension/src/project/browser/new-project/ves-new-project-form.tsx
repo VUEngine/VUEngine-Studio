@@ -6,8 +6,8 @@ import { FileDialogService, OpenFileDialogProps } from '@theia/filesystem/lib/br
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import filenamify from 'filenamify';
 import { VesCommonService } from '../../../core/browser/ves-common-service';
-import HContainer from '../../../editors/browser/components/Common/HContainer';
-import VContainer from '../../../editors/browser/components/Common/VContainer';
+import HContainer from '../../../editors/browser/components/Common/Base/HContainer';
+import VContainer from '../../../editors/browser/components/Common/Base/VContainer';
 import { VesProjectPathsService } from '../ves-project-paths-service';
 import { VesProjectPreferenceIds } from '../ves-project-preferences';
 

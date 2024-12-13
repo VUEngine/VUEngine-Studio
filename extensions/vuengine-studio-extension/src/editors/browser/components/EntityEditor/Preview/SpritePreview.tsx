@@ -3,7 +3,7 @@ import { ColorMode } from '../../../../../core/browser/ves-common-types';
 import { ImageCompressionType } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import CanvasImage from '../../Common/CanvasImage';
-import VContainer from '../../Common/VContainer';
+import VContainer from '../../Common/Base/VContainer';
 import { BgmapMode, DisplayMode, SpriteType, Transparency } from '../../Common/VUEngineTypes';
 import {
   EntityEditorContext,

@@ -4,8 +4,8 @@ import { ConfirmDialog } from '@theia/core/lib/browser';
 import { OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import React, { useContext, useEffect, useState } from 'react';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
-import HContainer from '../Common/HContainer';
-import VContainer from '../Common/VContainer';
+import HContainer from '../Common/Base/HContainer';
+import VContainer from '../Common/Base/VContainer';
 
 interface ImagesProps {
     data: string[]

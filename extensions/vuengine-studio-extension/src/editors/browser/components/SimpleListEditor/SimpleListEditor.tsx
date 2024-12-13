@@ -1,6 +1,6 @@
 import React from 'react';
-import HContainer from '../Common/HContainer';
-import VContainer from '../Common/VContainer';
+import HContainer from '../Common/Base/HContainer';
+import VContainer from '../Common/Base/VContainer';
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 

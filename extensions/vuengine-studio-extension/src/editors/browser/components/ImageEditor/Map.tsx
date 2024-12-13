@@ -1,6 +1,6 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
-import VContainer from '../Common/VContainer';
+import VContainer from '../Common/Base/VContainer';
 import { ImageEditorContext, ImageEditorContextType } from './ImageEditorTypes';
 
 export default function Map(): React.JSX.Element {

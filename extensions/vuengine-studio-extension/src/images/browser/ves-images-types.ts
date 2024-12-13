@@ -1,7 +1,7 @@
 import URI from '@theia/core/lib/common/uri';
 import * as iq from 'image-q';
 import { ColorMode } from '../../core/browser/ves-common-types';
-import { BasicSelectOption } from '../../editors/browser/components/Common/BasicSelect';
+import { BasicSelectOption } from '../../editors/browser/components/Common/Base/BasicSelect';
 import { DataSection } from '../../editors/browser/components/Common/CommonTypes';
 
 export const DEFAULT_COLOR_DISTANCE_CALCULATOR = 'euclidean';

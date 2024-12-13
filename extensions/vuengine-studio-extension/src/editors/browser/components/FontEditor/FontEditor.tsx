@@ -8,11 +8,11 @@ import { ColorMode, PALETTE_COLORS, PALETTE_INDICES } from '../../../../core/bro
 import { ImageCompressionType } from '../../../../images/browser/ves-images-types';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import { DataSection } from '../Common/CommonTypes';
-import HContainer from '../Common/HContainer';
+import HContainer from '../Common/Base/HContainer';
 import InfoLabel from '../Common/InfoLabel';
-import RadioSelect from '../Common/RadioSelect';
+import RadioSelect from '../Common/Base/RadioSelect';
 import SectionSelect from '../Common/SectionSelect';
-import VContainer from '../Common/VContainer';
+import VContainer from '../Common/Base/VContainer';
 import PaletteSelect from '../SpriteEditor/PaletteSelect';
 import SpriteEditorCurrentToolSettings from '../SpriteEditor/SpriteEditorCurrentToolSettings';
 import SpriteEditorStatus from '../SpriteEditor/SpriteEditorStatus';

@@ -1,11 +1,11 @@
 import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import HContainer from '../../Common/HContainer';
+import HContainer from '../../Common/Base/HContainer';
 import NumberArrayPreview from '../../Common/NumberArrayPreview';
-import RadioSelect from '../../Common/RadioSelect';
+import RadioSelect from '../../Common/Base/RadioSelect';
 import { clamp } from '../../Common/Utils';
-import VContainer from '../../Common/VContainer';
+import VContainer from '../../Common/Base/VContainer';
 import {
     VSU_ENVELOPE_INITIAL_VALUE_MAX,
     VSU_ENVELOPE_INITIAL_VALUE_MIN,

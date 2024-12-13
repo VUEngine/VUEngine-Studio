@@ -1,7 +1,7 @@
 import { nls } from '@theia/core';
 import { SelectComponent, SelectOption } from '@theia/core/lib/browser/widgets/select-component';
 import React from 'react';
-import HContainer from './HContainer';
+import HContainer from './Base/HContainer';
 
 interface PaletteProps {
     value: string;

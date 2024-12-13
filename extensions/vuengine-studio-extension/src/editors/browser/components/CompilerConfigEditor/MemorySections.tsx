@@ -1,8 +1,8 @@
 import { nls } from '@theia/core';
 import React from 'react';
-import HContainer from '../Common/HContainer';
+import HContainer from '../Common/Base/HContainer';
 import { CompilerConfigData, MemorySectionsDataKeys } from './CompilerConfigEditorTypes';
-import VContainer from '../Common/VContainer';
+import VContainer from '../Common/Base/VContainer';
 import InfoLabel from '../Common/InfoLabel';
 
 interface MemorySectionsProps {

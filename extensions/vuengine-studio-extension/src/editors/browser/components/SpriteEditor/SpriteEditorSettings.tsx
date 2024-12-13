@@ -1,6 +1,6 @@
 import { ArrowsOut, GridFour } from '@phosphor-icons/react';
 import React from 'react';
-import HContainer from '../Common/HContainer';
+import HContainer from '../Common/Base/HContainer';
 import { SpriteEditorTool } from './SpriteEditorTool';
 
 interface SpriteEditorSettingsProps {

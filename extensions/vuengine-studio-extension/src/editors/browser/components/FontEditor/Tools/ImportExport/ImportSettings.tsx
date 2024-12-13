@@ -10,9 +10,9 @@ import {
     DEFAULT_MINIMUM_COLOR_DISTANCE_TO_DITHER
 } from '../../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../../ves-editors-types';
-import HContainer from '../../../Common/HContainer';
+import HContainer from '../../../Common/Base/HContainer';
 import { clamp, roundToNextMultipleOf8 } from '../../../Common/Utils';
-import VContainer from '../../../Common/VContainer';
+import VContainer from '../../../Common/Base/VContainer';
 import Images from '../../../ImageEditor/Images';
 import Alphabet from '../../Alphabet/Alphabet';
 import { CHAR_PIXEL_SIZE, MAX_CHAR_COUNT, MAX_CHAR_SIZE, MAX_OFFSET, MIN_CHAR_SIZE, MIN_OFFSET } from '../../FontEditorTypes';

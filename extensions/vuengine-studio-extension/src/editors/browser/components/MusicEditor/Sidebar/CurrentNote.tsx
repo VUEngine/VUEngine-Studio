@@ -1,7 +1,7 @@
 import { nls } from '@theia/core';
 import React from 'react';
-import HContainer from '../../Common/HContainer';
-import VContainer from '../../Common/VContainer';
+import HContainer from '../../Common/Base/HContainer';
+import VContainer from '../../Common/Base/VContainer';
 import { NOTES, PatternConfig, SongData, VOLUME_STEPS } from '../MusicEditorTypes';
 
 interface CurrentNoteProps {

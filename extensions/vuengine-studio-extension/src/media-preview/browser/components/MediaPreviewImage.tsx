@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ZoomControls from '../../../editors/browser/components/Common/Controls/ZoomControls';
-import HContainer from '../../../editors/browser/components/Common/HContainer';
+import HContainer from '../../../editors/browser/components/Common/Base/HContainer';
 import { MEDIA_PREVIEW_ZOOM_LEVELS, MEDIA_PREVIEW_ZOOM_LEVELS_DEFAULT_INDEX } from '../ves-media-preview-types';
 
 interface MediaPreviewImageProps {

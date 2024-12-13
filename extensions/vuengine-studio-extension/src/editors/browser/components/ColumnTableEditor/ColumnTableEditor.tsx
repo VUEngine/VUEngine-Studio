@@ -1,6 +1,6 @@
 import { nls } from '@theia/core';
 import React from 'react';
-import VContainer from '../Common/VContainer';
+import VContainer from '../Common/Base/VContainer';
 import { ColumnTableData, ColumnTableEntry } from './ColumnTableTypes';
 import Editor from './Editor';
 import ReactTextareaAutosize from 'react-textarea-autosize';

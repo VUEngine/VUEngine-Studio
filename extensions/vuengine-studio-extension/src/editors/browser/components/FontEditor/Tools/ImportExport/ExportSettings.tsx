@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../../ves-editors-types';
-import HContainer from '../../../Common/HContainer';
+import HContainer from '../../../Common/Base/HContainer';
 import { MAX_CHAR_COUNT } from '../../FontEditorTypes';
-import VContainer from '../../../Common/VContainer';
+import VContainer from '../../../Common/Base/VContainer';
 import { nls } from '@theia/core';
 import { clamp } from '../../../Common/Utils';
 

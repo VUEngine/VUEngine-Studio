@@ -15,8 +15,8 @@ import {
 import React, { BaseSyntheticEvent, useContext, useEffect, useRef, useState } from 'react';
 import { ColorMode, PALETTE_COLORS } from '../../../../core/browser/ves-common-types';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
-import HContainer from '../Common/HContainer';
-import VContainer from '../Common/VContainer';
+import HContainer from '../Common/Base/HContainer';
+import VContainer from '../Common/Base/VContainer';
 import { Displays } from '../Common/VUEngineTypes';
 import PaletteSelect from './PaletteSelect';
 import SpriteEditorUndoRedo from './SpriteEditorUndoRedo';

@@ -1,6 +1,6 @@
 import { DottingRef, useDotting } from 'dotting';
 import React from 'react';
-import HContainer from '../Common/HContainer';
+import HContainer from '../Common/Base/HContainer';
 import { SpriteEditorTool } from './SpriteEditorTool';
 
 interface SpriteEditorUndoRedoProps {

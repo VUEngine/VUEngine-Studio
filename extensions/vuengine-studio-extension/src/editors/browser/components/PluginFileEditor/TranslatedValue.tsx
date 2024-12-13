@@ -1,7 +1,7 @@
 import { nls } from '@theia/core';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import React from 'react';
-import HContainer from '../Common/HContainer';
+import HContainer from '../Common/Base/HContainer';
 import { LANGUAGES } from '../TranslationsEditor/TranslationsEditorTypes';
 import { PluginFileTranslatedField } from './PluginFileEditorTypes';
 

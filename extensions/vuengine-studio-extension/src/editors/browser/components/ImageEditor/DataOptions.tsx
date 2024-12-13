@@ -2,11 +2,11 @@ import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import { ImageCompressionType } from '../../../../images/browser/ves-images-types';
 import { DataSection } from '../Common/CommonTypes';
-import HContainer from '../Common/HContainer';
+import HContainer from '../Common/Base/HContainer';
 import InfoLabel from '../Common/InfoLabel';
-import RadioSelect from '../Common/RadioSelect';
+import RadioSelect from '../Common/Base/RadioSelect';
 import SectionSelect from '../Common/SectionSelect';
-import VContainer from '../Common/VContainer';
+import VContainer from '../Common/Base/VContainer';
 import { ImageEditorContext, ImageEditorContextType } from './ImageEditorTypes';
 
 export default function DataOptions(): React.JSX.Element {

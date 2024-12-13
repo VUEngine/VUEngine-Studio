@@ -1,5 +1,5 @@
 import React from 'react';
-import VerticalRangeInput from '../Common/VerticalRangeInput';
+import VerticalRangeInput from '../Common/Base/VerticalRangeInput';
 
 interface WaveFormProps {
     value: number[]

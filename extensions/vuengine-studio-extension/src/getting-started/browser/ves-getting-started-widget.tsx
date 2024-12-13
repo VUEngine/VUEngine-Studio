@@ -6,7 +6,7 @@ import { GettingStartedWidget, PreferencesProps } from '@theia/getting-started/l
 import { VSXEnvironment } from '@theia/vsx-registry/lib/common/vsx-environment';
 import * as React from 'react';
 import { VesCoreContribution } from '../../core/browser/ves-core-contribution';
-import HContainer from '../../editors/browser/components/Common/HContainer';
+import HContainer from '../../editors/browser/components/Common/Base/HContainer';
 import { VesProjectCommands } from '../../project/browser/ves-project-commands';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 

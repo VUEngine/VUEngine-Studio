@@ -3,12 +3,11 @@ import { ConfirmDialog } from '@theia/core/lib/browser';
 import { SelectComponent } from '@theia/core/lib/browser/widgets/select-component';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
+import HContainer from '../../Common/Base/HContainer';
+import VContainer from '../../Common/Base/VContainer';
 import ColorSelector from '../../Common/ColorSelector';
-import HContainer from '../../Common/HContainer';
-import InfoLabel from '../../Common/InfoLabel';
-import RadioSelect from '../../Common/RadioSelect';
+import TransparencySelect from '../../Common/TransparencySelect';
 import { clamp } from '../../Common/Utils';
-import VContainer from '../../Common/VContainer';
 import { Transparency, WireframeType } from '../../Common/VUEngineTypes';
 import { INPUT_BLOCKING_COMMANDS } from '../EntityEditor';
 import {
@@ -165,33 +164,12 @@ export default function Wireframe(props: WireframeProps): React.JSX.Element {
                 </VContainer>
             </HContainer>
             <HContainer alignItems='start' gap={15} wrap='wrap'>
-                <VContainer>
-                    <InfoLabel
-                        label={nls.localize('vuengine/entityEditor/transparency', 'Transparency')}
-                        tooltip={nls.localize(
-                            'vuengine/entityEditor/wireframeTransparencyDescription',
-                            'With transparency enabled, this wireframe will only be shown on every even or odd frame' +
-                            'resulting in it appearing transparent (and slightly dimmer). ' +
-                            'This also halves CPU load since 50% less pixels have to be rendered per frame in average.'
-                        )}
-                    />
-                    <RadioSelect
-                        options={[{
-                            value: Transparency.None,
-                            label: nls.localize('vuengine/entityEditor/transparencyNone', 'None'),
-                        }, {
-                            value: Transparency.Odd,
-                            label: nls.localize('vuengine/entityEditor/transparencyOdd', 'Odd'),
-                        }, {
-                            value: Transparency.Even,
-                            label: nls.localize('vuengine/entityEditor/transparencyEven', 'Even'),
-                        }]}
-                        defaultValue={wireframe.transparency}
-                        onChange={options => setTransparency(options[0].value as Transparency)}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                    />
-                </VContainer>
+                <TransparencySelect
+                    value={wireframe.transparency}
+                    setValue={setTransparency}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                />
                 <VContainer>
                     <label>
                         {nls.localize('vuengine/entityEditor/interlaced', 'Interlaced')}

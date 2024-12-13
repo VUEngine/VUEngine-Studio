@@ -1,8 +1,8 @@
 import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction } from 'react';
-import BasicSelect from '../../Common/BasicSelect';
-import HContainer from '../../Common/HContainer';
-import VContainer from '../../Common/VContainer';
+import BasicSelect from '../../Common/Base/BasicSelect';
+import HContainer from '../../Common/Base/HContainer';
+import VContainer from '../../Common/Base/VContainer';
 import { ChannelConfig, SongData } from '../MusicEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
 

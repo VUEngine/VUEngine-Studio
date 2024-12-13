@@ -5,13 +5,13 @@ import { ColorMode } from '../../../../../core/browser/ves-common-types';
 import { ImageCompressionType, ImageProcessingSettings, MAX_IMAGE_WIDTH } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { DataSection } from '../../Common/CommonTypes';
-import HContainer from '../../Common/HContainer';
+import HContainer from '../../Common/Base/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
-import PopUpDialog from '../../Common/PopUpDialog';
-import RadioSelect from '../../Common/RadioSelect';
+import PopUpDialog from '../../Common/Base/PopUpDialog';
+import RadioSelect from '../../Common/Base/RadioSelect';
 import SectionSelect from '../../Common/SectionSelect';
 import { clamp, roundToNextMultipleOf8 } from '../../Common/Utils';
-import VContainer from '../../Common/VContainer';
+import VContainer from '../../Common/Base/VContainer';
 import { BgmapMode, DisplayMode, Displays, SpriteSourceType, SpriteType, Transparency } from '../../Common/VUEngineTypes';
 import Images from '../../ImageEditor/Images';
 import { EntityEditorSaveDataOptions, INPUT_BLOCKING_COMMANDS } from '../EntityEditor';
@@ -31,6 +31,7 @@ import {
 } from '../EntityEditorTypes';
 import ImageProcessingSettingsForm from './ImageProcessingSettingsForm';
 import SpritesSettings from './SpritesSettings';
+import TransparencySelect from '../../Common/TransparencySelect';
 
 interface SpriteProps {
     sprite: SpriteData
@@ -661,33 +662,12 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                             onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
                     </VContainer>
-                    <VContainer>
-                        <InfoLabel
-                            label={nls.localize('vuengine/entityEditor/transparency', 'Transparency')}
-                            tooltip={nls.localize(
-                                'vuengine/entityEditor/spriteTransparencyDescription',
-                                'With transparency enabled, this sprite will only be shown on every even or odd frame, ' +
-                                'resulting in it appearing transparent (and slightly dimmer). ' +
-                                'This also halves CPU load since 50% less pixels have to be rendered per frame in average.'
-                            )}
-                        />
-                        <RadioSelect
-                            options={[{
-                                value: Transparency.None,
-                                label: nls.localize('vuengine/entityEditor/transparencyNone', 'None'),
-                            }, {
-                                value: Transparency.Odd,
-                                label: nls.localize('vuengine/entityEditor/transparencyOdd', 'Odd'),
-                            }, {
-                                value: Transparency.Even,
-                                label: nls.localize('vuengine/entityEditor/transparencyEven', 'Even'),
-                            }]}
-                            defaultValue={sprite.transparency}
-                            onChange={options => setTransparency(options[0].value as Transparency)}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                        />
-                    </VContainer>
+                    <TransparencySelect
+                        value={sprite.transparency}
+                        setValue={setTransparency}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    />
                 </HContainer>
                 <VContainer>
                     <InfoLabel

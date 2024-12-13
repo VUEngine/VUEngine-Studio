@@ -1,13 +1,13 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import BasicSelect from '../../Common/BasicSelect';
+import BasicSelect from '../../Common/Base/BasicSelect';
 import { DataSection } from '../../Common/CommonTypes';
-import HContainer from '../../Common/HContainer';
+import HContainer from '../../Common/Base/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
-import RadioSelect from '../../Common/RadioSelect';
+import RadioSelect from '../../Common/Base/RadioSelect';
 import SectionSelect from '../../Common/SectionSelect';
-import VContainer from '../../Common/VContainer';
+import VContainer from '../../Common/Base/VContainer';
 import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor';
 import { BAR_PATTERN_LENGTH_MULT_MAP, MAX_SPEED, MIN_SPEED, NoteResolution, SongData } from '../MusicEditorTypes';
 

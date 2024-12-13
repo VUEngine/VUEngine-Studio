@@ -7,8 +7,8 @@ import React from 'react';
 import ReactTextareaAutosize from 'react-textarea-autosize';
 import IMAGE_FLASH_CART from '../../../../src/flash-cart/browser/images/flash-cart.png';
 import { WINDOWS_EXECUTABLE_EXTENSIONS } from '../../../core/browser/ves-common-types';
-import HContainer from '../../../editors/browser/components/Common/HContainer';
-import VContainer from '../../../editors/browser/components/Common/VContainer';
+import HContainer from '../../../editors/browser/components/Common/Base/HContainer';
+import VContainer from '../../../editors/browser/components/Common/Base/VContainer';
 import { VesFlashCartService } from '../ves-flash-cart-service';
 import { FlashCartConfig, FlashCartDeviceCode } from '../ves-flash-cart-types';
 

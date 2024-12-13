@@ -16,11 +16,11 @@ import {
     MAX_IMAGE_WIDTH,
 } from '../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import BasicSelect from '../../Common/BasicSelect';
+import BasicSelect from '../../Common/Base/BasicSelect';
 import CanvasImage from '../../Common/CanvasImage';
-import HContainer from '../../Common/HContainer';
+import HContainer from '../../Common/Base/HContainer';
 import { clamp, getMaxScaleInContainer, roundToNextMultipleOf8 } from '../../Common/Utils';
-import VContainer from '../../Common/VContainer';
+import VContainer from '../../Common/Base/VContainer';
 import { DisplayMode } from '../../Common/VUEngineTypes';
 import Images from '../../ImageEditor/Images';
 import { INPUT_BLOCKING_COMMANDS } from '../EntityEditor';

@@ -3,7 +3,7 @@ import { nls } from '@theia/core';
 import React, { useContext, useEffect, useState } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../../../editors/browser/ves-editors-types';
 import { ProjectContributor } from '../../../../../project/browser/ves-project-types';
-import VContainer from '../../Common/VContainer';
+import VContainer from '../../Common/Base/VContainer';
 import { ColliderType } from '../../Common/VUEngineTypes';
 import { EntityEditorSaveDataOptions } from '../EntityEditor';
 import { EntityEditorCommands } from '../EntityEditorCommands';

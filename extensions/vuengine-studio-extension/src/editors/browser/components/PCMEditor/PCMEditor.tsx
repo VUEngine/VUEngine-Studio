@@ -3,10 +3,10 @@ import { OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import React from 'react';
 import { EditorsContextType } from '../../ves-editors-types';
 import { DataSection } from '../Common/CommonTypes';
-import HContainer from '../Common/HContainer';
-import RadioSelect from '../Common/RadioSelect';
+import HContainer from '../Common/Base/HContainer';
+import RadioSelect from '../Common/Base/RadioSelect';
 import SectionSelect from '../Common/SectionSelect';
-import VContainer from '../Common/VContainer';
+import VContainer from '../Common/Base/VContainer';
 import { MAX_RANGE, MIN_RANGE, PCMData } from './PCMTypes';
 
 interface PCMProps {

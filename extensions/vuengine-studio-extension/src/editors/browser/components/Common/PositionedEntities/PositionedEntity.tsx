@@ -3,10 +3,10 @@ import React, { useContext } from 'react';
 import { WithContributor, WithFileUri } from '../../../../../project/browser/ves-project-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { EntityData, MAX_SCALE, MIN_SCALE, PositionedEntityData } from '../../EntityEditor/EntityEditorTypes';
-import HContainer from '../HContainer';
+import HContainer from '../Base/HContainer';
 import Rotation from '../Rotation';
 import { clamp } from '../Utils';
-import VContainer from '../VContainer';
+import VContainer from '../Base/VContainer';
 import { PixelVector } from '../VUEngineTypes';
 
 interface PositionedEntityProps {
@@ -127,7 +127,7 @@ export default function PositionedEntity(props: PositionedEntityProps): React.JS
                     <HContainer>
                         <input
                             className='theia-input'
-                            style={{ width: 54 }}
+                            style={{ width: 50 }}
                             type='number'
                             min={MIN_SCALE}
                             max={MAX_SCALE}
@@ -137,7 +137,7 @@ export default function PositionedEntity(props: PositionedEntityProps): React.JS
                         />
                         <input
                             className='theia-input'
-                            style={{ width: 54 }}
+                            style={{ width: 50 }}
                             type='number'
                             min={MIN_SCALE}
                             max={MAX_SCALE}
@@ -147,7 +147,7 @@ export default function PositionedEntity(props: PositionedEntityProps): React.JS
                         />
                         <input
                             className='theia-input'
-                            style={{ width: 54 }}
+                            style={{ width: 50 }}
                             type='number'
                             min={MIN_SCALE}
                             max={MAX_SCALE}

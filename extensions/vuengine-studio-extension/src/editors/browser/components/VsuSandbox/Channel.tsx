@@ -1,9 +1,9 @@
 import { nls } from '@theia/core';
 import React, { useEffect, useState } from 'react';
-import HContainer from '../Common/HContainer';
-import RadioSelect from '../Common/RadioSelect';
+import HContainer from '../Common/Base/HContainer';
+import RadioSelect from '../Common/Base/RadioSelect';
 import { clamp } from '../Common/Utils';
-import VContainer from '../Common/VContainer';
+import VContainer from '../Common/Base/VContainer';
 import { NOTES } from '../MusicEditor/MusicEditorTypes';
 import {
     VSU_ENVELOPE_INITIAL_VALUE_MAX,

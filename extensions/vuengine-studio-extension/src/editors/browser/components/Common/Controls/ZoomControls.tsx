@@ -1,5 +1,5 @@
 import React from 'react';
-import HContainer from '../HContainer';
+import HContainer from '../Base/HContainer';
 import { nls } from '@theia/core';
 
 interface ZoomControlsProps {

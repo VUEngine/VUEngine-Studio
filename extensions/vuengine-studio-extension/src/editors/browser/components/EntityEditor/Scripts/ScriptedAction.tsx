@@ -1,8 +1,8 @@
 import { QuickPickItem, QuickPickOptions, QuickPickSeparator, nls } from '@theia/core';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../../../editors/browser/ves-editors-types';
-import HContainer from '../../Common/HContainer';
-import VContainer from '../../Common/VContainer';
+import HContainer from '../../Common/Base/HContainer';
+import VContainer from '../../Common/Base/VContainer';
 import { ScriptedActionData } from './ScriptTypes';
 import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 import { ConfirmDialog } from '@theia/core/lib/browser';

@@ -1,8 +1,8 @@
 import { nls } from '@theia/core';
 import React from 'react';
 import { ImageConfig } from '../../../../images/browser/ves-images-types';
-import HContainer from '../Common/HContainer';
-import VContainer from '../Common/VContainer';
+import HContainer from '../Common/Base/HContainer';
+import VContainer from '../Common/Base/VContainer';
 import Animation from './Animation';
 import DataOptions from './DataOptions';
 import { ImageEditorContext } from './ImageEditorTypes';

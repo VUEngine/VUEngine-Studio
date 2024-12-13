@@ -4,9 +4,9 @@ import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import ColorSelector from '../../Common/ColorSelector';
 import ZoomControls from '../../Common/Controls/ZoomControls';
-import HContainer from '../../Common/HContainer';
+import HContainer from '../../Common/Base/HContainer';
 import { clamp } from '../../Common/Utils';
-import VContainer from '../../Common/VContainer';
+import VContainer from '../../Common/Base/VContainer';
 import { INPUT_BLOCKING_COMMANDS } from '../EntityEditor';
 import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 

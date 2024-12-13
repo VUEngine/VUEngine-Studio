@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 import { Tree } from 'react-arborist';
 import { WithFileUri } from '../../../../../project/browser/ves-project-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import VContainer from '../../Common/VContainer';
+import VContainer from '../../Common/Base/VContainer';
 import { ComponentKey, EntityData, EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
 import ComponentTreeNode from './ComponentTreeNode';
 

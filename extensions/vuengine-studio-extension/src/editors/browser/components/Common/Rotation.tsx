@@ -1,8 +1,8 @@
 import { nls } from '@theia/core';
 import React, { PropsWithChildren, useEffect, useState } from 'react';
-import HContainer from './HContainer';
+import HContainer from './Base/HContainer';
 import { clamp } from './Utils';
-import VContainer from './VContainer';
+import VContainer from './Base/VContainer';
 import { MAX_ROTATION, MIN_ROTATION, PixelRotation, ROTATION_RATIO } from './VUEngineTypes';
 
 interface RotationProps {

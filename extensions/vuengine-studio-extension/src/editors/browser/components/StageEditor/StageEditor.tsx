@@ -1,7 +1,7 @@
 import React from 'react';
 import { EditorsContextType } from '../../ves-editors-types';
-import HContainer from '../Common/HContainer';
-import VContainer from '../Common/VContainer';
+import HContainer from '../Common/Base/HContainer';
+import VContainer from '../Common/Base/VContainer';
 import { StageData, StageEditorContext, StageEditorState } from './StageEditorTypes';
 
 interface StageEditorProps {

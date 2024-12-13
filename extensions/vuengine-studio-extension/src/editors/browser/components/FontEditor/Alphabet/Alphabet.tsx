@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME } from '../../../ves-editors-types';
-import VContainer from '../../Common/VContainer';
+import VContainer from '../../Common/Base/VContainer';
 import { FontEditorCommands } from '../FontEditorCommands';
 import { VariableSize } from '../FontEditorTypes';
 import AlphabetChar from './AlphabetChar';

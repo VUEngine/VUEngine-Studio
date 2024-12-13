@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import PositionedEntity from '../../Common/PositionedEntities/PositionedEntity';
-import VContainer from '../../Common/VContainer';
+import VContainer from '../../Common/Base/VContainer';
 import Animation from '../Animation/Animation';
 import AnimationsSettings from '../Animation/AnimationsSettings';
 import Behavior from '../Behavior/Behavior';

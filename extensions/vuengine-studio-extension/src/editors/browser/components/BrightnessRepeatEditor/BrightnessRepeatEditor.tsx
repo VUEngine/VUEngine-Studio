@@ -1,8 +1,8 @@
 import { nls } from '@theia/core';
 import React from 'react';
 import ReactTextareaAutosize from 'react-textarea-autosize';
-import HContainer from '../Common/HContainer';
-import VContainer from '../Common/VContainer';
+import HContainer from '../Common/Base/HContainer';
+import VContainer from '../Common/Base/VContainer';
 import { BrightnessRepeatData } from './BrightnessRepeatTypes';
 import Editor from './Editor';
 import Preview from './Preview';

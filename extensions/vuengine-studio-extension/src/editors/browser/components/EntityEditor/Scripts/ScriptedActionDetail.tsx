@@ -3,8 +3,8 @@ import { SelectComponent } from '@theia/core/lib/browser/widgets/select-componen
 import React, { useContext } from 'react';
 import ReactTextareaAutosize from 'react-textarea-autosize';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import RadioSelect from '../../Common/RadioSelect';
-import VContainer from '../../Common/VContainer';
+import RadioSelect from '../../Common/Base/RadioSelect';
+import VContainer from '../../Common/Base/VContainer';
 import { EntityEditorContext, EntityEditorContextType, ScriptData } from '../EntityEditorTypes';
 import { ScriptType } from './ScriptTypes';
 import { AVAILABLE_ACTIONS, ActionArgumentsData, ActionConfigType } from './AvailableActions';

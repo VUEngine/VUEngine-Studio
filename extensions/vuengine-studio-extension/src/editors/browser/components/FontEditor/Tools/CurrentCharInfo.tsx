@@ -1,6 +1,6 @@
 import React from 'react';
 import { win1252CharNames } from '../FontEditorTypes';
-import VContainer from '../../Common/VContainer';
+import VContainer from '../../Common/Base/VContainer';
 
 interface CurrentCharInfoProps {
     currentCharacterIndex: number

@@ -1,9 +1,9 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import HContainer from '../../Common/HContainer';
+import HContainer from '../../Common/Base/HContainer';
 import { clamp } from '../../Common/Utils';
-import VContainer from '../../Common/VContainer';
+import VContainer from '../../Common/Base/VContainer';
 import { INPUT_BLOCKING_COMMANDS } from '../EntityEditor';
 import { MeshSegmentData } from '../EntityEditorTypes';
 
@@ -105,7 +105,7 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
             <HContainer wrap='wrap'>
                 <input
                     className='theia-input'
-                    style={{ width: 54 }}
+                    style={{ width: 50 }}
                     type='number'
                     value={segment.fromVertex.x}
                     onChange={e => setFromX(parseFloat(e.target.value))}
@@ -114,7 +114,7 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
                 />
                 <input
                     className='theia-input'
-                    style={{ width: 54 }}
+                    style={{ width: 50 }}
                     type='number'
                     value={segment.fromVertex.y}
                     onChange={e => setFromY(parseFloat(e.target.value))}
@@ -123,7 +123,7 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
                 />
                 <input
                     className='theia-input'
-                    style={{ width: 54 }}
+                    style={{ width: 50 }}
                     type='number'
                     value={segment.fromVertex.z}
                     onChange={e => setFromZ(parseFloat(e.target.value))}
@@ -132,7 +132,7 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
                 />
                 <input
                     className='theia-input'
-                    style={{ width: 54 }}
+                    style={{ width: 50 }}
                     type='number'
                     value={segment.fromVertex.parallax}
                     onChange={e => setFromParallax(parseFloat(e.target.value))}
@@ -146,7 +146,7 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
             <HContainer wrap='wrap'>
                 <input
                     className='theia-input'
-                    style={{ width: 54 }}
+                    style={{ width: 50 }}
                     type='number'
                     value={segment.toVertex.x}
                     onChange={e => setToX(parseFloat(e.target.value))}
@@ -155,7 +155,7 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
                 />
                 <input
                     className='theia-input'
-                    style={{ width: 54 }}
+                    style={{ width: 50 }}
                     type='number'
                     value={segment.toVertex.y}
                     onChange={e => setToY(parseFloat(e.target.value))}
@@ -164,7 +164,7 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
                 />
                 <input
                     className='theia-input'
-                    style={{ width: 54 }}
+                    style={{ width: 50 }}
                     type='number'
                     value={segment.toVertex.z}
                     onChange={e => setToZ(parseFloat(e.target.value))}
@@ -173,7 +173,7 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
                 />
                 <input
                     className='theia-input'
-                    style={{ width: 54 }}
+                    style={{ width: 50 }}
                     type='number'
                     value={segment.toVertex.parallax}
                     onChange={e => setToParallax(parseFloat(e.target.value))}

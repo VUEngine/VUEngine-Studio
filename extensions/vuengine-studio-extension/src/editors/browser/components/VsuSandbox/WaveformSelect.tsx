@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import HContainer from '../Common/HContainer';
+import HContainer from '../Common/Base/HContainer';
 import NumberArrayPreview from '../Common/NumberArrayPreview';
 import { VSU_NUMBER_OF_WAVEFORM_BANKS } from '../VsuEmulator/VsuEmulatorTypes';
 

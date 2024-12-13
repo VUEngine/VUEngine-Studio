@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { clamp } from './Utils';
+import { clamp } from '../Utils';
 
 const Column = styled.div`
     display: flex;

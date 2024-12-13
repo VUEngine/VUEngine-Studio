@@ -4,8 +4,8 @@ import PluginDefaultInput from '../../../../plugins/browser/components/PluginDef
 import { PluginConfiguration, PluginConfigurationDataType } from '../../../../plugins/browser/ves-plugins-types';
 import { ProjectDataTypesWithContributor } from '../../../../project/browser/ves-project-types';
 import { EditorsContextType } from '../../ves-editors-types';
-import HContainer from '../Common/HContainer';
-import VContainer from '../Common/VContainer';
+import HContainer from '../Common/Base/HContainer';
+import VContainer from '../Common/Base/VContainer';
 import { PluginConfigurationData, PluginFileTranslatedField } from './PluginFileEditorTypes';
 import TranslatedValue from './TranslatedValue';
 

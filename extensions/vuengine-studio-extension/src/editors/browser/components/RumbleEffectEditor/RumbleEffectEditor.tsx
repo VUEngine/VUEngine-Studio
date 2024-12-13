@@ -4,9 +4,9 @@ import React from 'react';
 import { VesRumblePackCommands } from '../../../../rumble-pack/browser/ves-rumble-pack-commands';
 import { RumblePakLogLine } from '../../../../rumble-pack/browser/ves-rumble-pack-types';
 import { EditorsContextType } from '../../ves-editors-types';
-import HContainer from '../Common/HContainer';
+import HContainer from '../Common/Base/HContainer';
 import { clamp } from '../Common/Utils';
-import VContainer from '../Common/VContainer';
+import VContainer from '../Common/Base/VContainer';
 import {
     BUILT_IN_RUMBLE_EFFECTS,
     DEFAULT_RUMBLE_EFFECT,

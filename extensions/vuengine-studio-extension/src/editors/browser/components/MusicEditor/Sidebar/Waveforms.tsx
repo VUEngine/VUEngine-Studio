@@ -1,9 +1,9 @@
 import { nls } from '@theia/core';
 import React, { Dispatch, SetStateAction } from 'react';
-import HContainer from '../../Common/HContainer';
+import HContainer from '../../Common/Base/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import NumberArrayPreview from '../../Common/NumberArrayPreview';
-import VContainer from '../../Common/VContainer';
+import VContainer from '../../Common/Base/VContainer';
 import { VSU_NUMBER_OF_WAVEFORM_BANKS } from '../../VsuEmulator/VsuEmulatorTypes';
 import { SongData } from '../MusicEditorTypes';
 

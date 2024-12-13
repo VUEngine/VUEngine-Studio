@@ -2,7 +2,7 @@
 import { withJsonFormsControlProps } from '@jsonforms/react';
 import React from 'react';
 import Palette from '../../components/Common/Palette';
-import VContainer from '../../components/Common/VContainer';
+import VContainer from '../../components/Common/Base/VContainer';
 
 interface VesPaletteControlProps {
     data: string;

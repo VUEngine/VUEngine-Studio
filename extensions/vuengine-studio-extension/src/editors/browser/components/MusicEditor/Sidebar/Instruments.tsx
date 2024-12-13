@@ -3,7 +3,7 @@ import { ConfirmDialog } from '@theia/core/lib/browser';
 import React, { Dispatch, SetStateAction, useContext } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import VContainer from '../../Common/VContainer';
+import VContainer from '../../Common/Base/VContainer';
 import { InstrumentConfig, SongData } from '../MusicEditorTypes';
 import Instrument from './Instrument';
 

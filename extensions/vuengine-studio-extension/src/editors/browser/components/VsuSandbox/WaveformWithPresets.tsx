@@ -2,9 +2,9 @@ import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import { WithContributor, WithFileUri } from '../../../../project/browser/ves-project-types';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
-import HContainer from '../Common/HContainer';
+import HContainer from '../Common/Base/HContainer';
 import NumberArrayPreview from '../Common/NumberArrayPreview';
-import VContainer from '../Common/VContainer';
+import VContainer from '../Common/Base/VContainer';
 import WaveForm from '../WaveFormEditor/WaveForm';
 import { WaveFormData } from '../WaveFormEditor/WaveFormEditorTypes';
 

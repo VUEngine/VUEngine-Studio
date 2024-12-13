@@ -5,7 +5,7 @@ import {
   ConversionResult
 } from '../../../../images/browser/ves-images-types';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
-import HContainer from '../Common/HContainer';
+import HContainer from '../Common/Base/HContainer';
 import { showEntitySelection } from '../Common/Utils';
 import ComponentTree from './Components/ComponentTree';
 import CurrentComponent from './Components/CurrentComponent';

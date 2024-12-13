@@ -3,9 +3,9 @@ import { SelectComponent, SelectOption } from '@theia/core/lib/browser/widgets/s
 import React, { useContext } from 'react';
 import { ProjectContributor } from '../../../../../project/browser/ves-project-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import VContainer from '../../Common/VContainer';
+import VContainer from '../../Common/Base/VContainer';
 import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';
-import HContainer from '../../Common/HContainer';
+import HContainer from '../../Common/Base/HContainer';
 
 export default function CollidersSettings(): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;

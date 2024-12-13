@@ -3,8 +3,8 @@ import { DottingRef, useBrush, useHandlers } from 'dotting';
 import React, { useContext, useEffect } from 'react';
 import { ColorMode, PALETTE_COLORS } from '../../../../core/browser/ves-common-types';
 import { EDITORS_COMMAND_EXECUTED_EVENT_NAME, EditorsContext, EditorsContextType } from '../../ves-editors-types';
-import HContainer from '../Common/HContainer';
-import VContainer from '../Common/VContainer';
+import HContainer from '../Common/Base/HContainer';
+import VContainer from '../Common/Base/VContainer';
 import { FontEditorCommands } from '../FontEditor/FontEditorCommands';
 import { SpriteEditorTool } from './SpriteEditorTool';
 

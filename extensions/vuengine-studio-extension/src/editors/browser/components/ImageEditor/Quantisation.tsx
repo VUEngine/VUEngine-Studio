@@ -2,8 +2,8 @@ import { nls } from '@theia/core';
 import React, { useContext, useState } from 'react';
 import { ColorMode } from '../../../../core/browser/ves-common-types';
 import { ImageProcessingSettings } from '../../../../images/browser/ves-images-types';
-import PopUpDialog from '../Common/PopUpDialog';
-import VContainer from '../Common/VContainer';
+import PopUpDialog from '../Common/Base/PopUpDialog';
+import VContainer from '../Common/Base/VContainer';
 import ImageProcessingSettingsForm from '../EntityEditor/Sprites/ImageProcessingSettingsForm';
 import { ImageEditorContext, ImageEditorContextType } from './ImageEditorTypes';
 

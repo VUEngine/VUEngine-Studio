@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { PositionedEntityData } from '../../EntityEditor/EntityEditorTypes';
 import { showEntitySelection } from '../Utils';
-import VContainer from '../VContainer';
+import VContainer from '../Base/VContainer';
 import PositionedEntity from './PositionedEntity';
 
 export interface PositionedEntitiesProps {

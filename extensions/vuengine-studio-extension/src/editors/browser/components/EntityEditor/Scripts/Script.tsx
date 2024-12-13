@@ -3,7 +3,7 @@ import { EntityEditorContext, EntityEditorContextType, MAX_PREVIEW_SCRIPT_ZOOM, 
 import PreviewOptions from '../Preview/PreviewOptions';
 import { ScriptedActionData } from './ScriptTypes';
 import ScriptedAction from './ScriptedAction';
-import VContainer from '../../Common/VContainer';
+import VContainer from '../../Common/Base/VContainer';
 import { AVAILABLE_ACTIONS } from './AvailableActions';
 
 interface ScriptProps {

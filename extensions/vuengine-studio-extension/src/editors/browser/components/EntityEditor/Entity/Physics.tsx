@@ -1,10 +1,10 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import HContainer from '../../Common/HContainer';
+import HContainer from '../../Common/Base/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
-import RadioSelect from '../../Common/RadioSelect';
-import VContainer from '../../Common/VContainer';
+import RadioSelect from '../../Common/Base/RadioSelect';
+import VContainer from '../../Common/Base/VContainer';
 import { Axis } from '../../Common/VUEngineTypes';
 import { INPUT_BLOCKING_COMMANDS } from '../EntityEditor';
 import { EntityEditorContext, EntityEditorContextType } from '../EntityEditorTypes';

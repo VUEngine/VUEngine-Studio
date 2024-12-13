@@ -1,5 +1,5 @@
 import React from 'react';
-import VContainer from '../Common/VContainer';
+import VContainer from '../Common/Base/VContainer';
 import CompilerConfig from './CompilerConfig';
 import { CompilerConfigData } from './CompilerConfigEditorTypes';
 import MemorySections from './MemorySections';

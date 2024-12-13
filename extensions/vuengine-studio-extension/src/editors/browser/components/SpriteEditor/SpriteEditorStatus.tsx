@@ -2,7 +2,7 @@
 import { CrosshairSimple, FrameCorners, MagnifyingGlass } from '@phosphor-icons/react';
 import { CanvasHoverPixelChangeHandler, CanvasInfoChangeHandler, DottingRef, PanZoom, useGrids, useHandlers } from 'dotting';
 import React, { useEffect, useState } from 'react';
-import HContainer from '../Common/HContainer';
+import HContainer from '../Common/Base/HContainer';
 
 interface SpriteEditorStatusProps {
     dottingRef: React.RefObject<DottingRef>

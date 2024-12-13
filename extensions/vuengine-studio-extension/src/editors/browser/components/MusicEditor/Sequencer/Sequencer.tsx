@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import VContainer from '../../Common/VContainer';
+import VContainer from '../../Common/Base/VContainer';
 import { ChannelConfig, SongData } from '../MusicEditorTypes';
 import Channel from './Channel';
 import StepIndicator from './StepIndicator';

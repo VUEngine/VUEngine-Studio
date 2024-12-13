@@ -1,9 +1,9 @@
 import { nls } from '@theia/core';
 import React, { useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
-import HContainer from '../Common/HContainer';
+import HContainer from '../Common/Base/HContainer';
 import { clamp } from '../Common/Utils';
-import VContainer from '../Common/VContainer';
+import VContainer from '../Common/Base/VContainer';
 import VsuEmulator from '../VsuEmulator/VseEmulator';
 import { VSU_FREQUENCY_MAX, VSU_FREQUENCY_MIN, VSU_NUMBER_OF_CHANNELS, VSU_NUMBER_OF_WAVEFORM_BANKS, VsuChannelData, VsuData } from '../VsuEmulator/VsuEmulatorTypes';
 import Channel from './Channel';

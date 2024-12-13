@@ -1,10 +1,10 @@
 import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import HContainer from '../../Common/HContainer';
+import HContainer from '../../Common/Base/HContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import { clamp } from '../../Common/Utils';
-import VContainer from '../../Common/VContainer';
+import VContainer from '../../Common/Base/VContainer';
 import { INPUT_BLOCKING_COMMANDS } from '../FontEditor';
 import { MAX_CHAR_COUNT, MAX_PAGE_SIZE, MIN_CHAR_COUNT, MIN_OFFSET, MIN_PAGE_SIZE } from '../FontEditorTypes';
 import FontTileInfo from '../Tools/FontTileInfo';
