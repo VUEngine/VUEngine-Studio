@@ -1,5 +1,5 @@
 import { Command, CommandRegistry, CommandService, MenuModelRegistry, URI, UntitledResourceResolver } from '@theia/core';
-import { AbstractViewContribution, CommonCommands, CommonMenus, KeybindingRegistry, OpenerService, Widget, open } from '@theia/core/lib/browser';
+import { AbstractViewContribution, CommonCommands, CommonMenus, KeybindingRegistry, OpenerService, Widget } from '@theia/core/lib/browser';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { UserWorkingDirectoryProvider } from '@theia/core/lib/browser/user-working-directory-provider';
@@ -141,7 +141,8 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         for (const typeId of Object.keys(types || {})) {
             const type = types![typeId];
 
-            // TODO: Saving untitled editors is a bit buggy. Need to investigate why that is the case.
+            // TODO: Need a strategy to handle relative file paths, e.g. for sprites in entity editor
+            /*
             if (type.file?.startsWith('.')) {
                 commandRegistry.registerCommand(Command.toLocalizedCommand(
                     {
@@ -160,6 +161,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                     },
                 });
             }
+            */
 
             if (type.forFiles?.length) {
                 commandRegistry.registerCommand(Command.toLocalizedCommand(
