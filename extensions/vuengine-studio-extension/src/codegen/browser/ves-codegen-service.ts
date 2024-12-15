@@ -146,7 +146,7 @@ export class VesCodeGenService {
     this.logLine('');
   }
 
-  async generateAll(): Promise<void> {
+  async promptGenerateAll(): Promise<void> {
     const selectecTypes = await this.showTypeSelection();
     if (selectecTypes !== undefined && selectecTypes.length) {
       /*

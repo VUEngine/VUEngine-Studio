@@ -12,7 +12,7 @@
 	{%- for installedPluginId in installedPlugins | keys | sort -%}
 		{%- if allPlugins[installedPluginId] is defined 
 			and allPlugins[installedPluginId].configuration is defined
-			and allPlugins[installedPluginId].configuration.length -%}
+			and allPlugins[installedPluginId].configuration | length -%}
 			{{- '\n' -}}
 			{%- for configuration in allPlugins[installedPluginId].configuration -%}
                 {%- set configValue = configuration.default -%}

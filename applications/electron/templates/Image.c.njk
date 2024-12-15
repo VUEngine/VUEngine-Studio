@@ -7,7 +7,7 @@
 
 {%- set mapsDataTotalLength = 0 -%}
 {%- for map in imageData.maps -%}
-	{%- set mapsDataTotalLength = mapsDataTotalLength + map.data.length -%}
+	{%- set mapsDataTotalLength = mapsDataTotalLength + map.data | length -%}
 {%- endfor -%}
 
 {%- set reducedTilesLabel = 'unreduced' -%}
@@ -35,7 +35,7 @@
 //---------------------------------------------------------------------------------------------------------
 //
 //	{{ sanitizedSpecName }}
-{% if imageData.tiles.data.length -%}
+{% if imageData.tiles.data | length -%}
 	//	* {{ imageData.tiles.count }} tiles, {{ reducedTilesLabel }}, {{ tilesCompressionLabel }}
 {% endif %}
 
@@ -47,15 +47,15 @@
 	//	* {{ imageData.animation.frames }} animation frames, {% if item.animation.individualFiles %}individual files{% else %}spritesheet{% endif %}{% if item.animation.individualFiles and imageData.animation.largestFrame is defined %}, largest frame: {{imageData.animation.largestFrame}} tiles{% endif %}
 {% endif -%}
 
-{%- if imageData.tiles.data.length and imageData.maps.length -%}
-	//	Size: {{ (imageData.tiles.data.length + 1) * 4 }}
+{%- if imageData.tiles.data | length and imageData.maps | length -%}
+	//	Size: {{ (imageData.tiles.data | length + 1) * 4 }}
 	{%- for map in imageData.maps -%}
-		{{ ' + ' }}{{ map.data.length * 2 }}{{ ' ' }}
+		{{ ' + ' }}{{ map.data | length * 2 }}{{ ' ' }}
 	{%- endfor -%}
-	= {{ ((imageData.tiles.data.length + 1) * 4) + (mapsDataTotalLength * 2) }} byte
-{% elseif imageData.tiles.data.length -%}
-	//	Size: {{ (imageData.tiles.data.length + 1) * 4 }} byte
-{% elseif imageData.maps.length -%}
+	= {{ ((imageData.tiles.data | length + 1) * 4) + (mapsDataTotalLength * 2) }} byte
+{% elseif imageData.tiles.data | length -%}
+	//	Size: {{ (imageData.tiles.data | length + 1) * 4 }} byte
+{% elseif imageData.maps | length -%}
 	//	Size: {{ mapsDataTotalLength * 2 }} byte
 {% endif -%}
 //
