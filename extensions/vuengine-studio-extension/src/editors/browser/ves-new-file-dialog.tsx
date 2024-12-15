@@ -65,7 +65,7 @@ export class VesNewFileDialog extends ReactDialog<string> {
                         <input
                             type="text"
                             className="theia-input"
-                            style={{ display: this.ext.startsWith('.') ? 'block' : 'none', flexGrow: 2, width: 0 }}
+                            style={{ flexGrow: 2, width: 0 }}
                             spellCheck="false"
                             placeholder={nls.localize('vuengine/editors/newFileDialog/fileName', 'File Name')}
                             value={this.name}
@@ -82,11 +82,13 @@ export class VesNewFileDialog extends ReactDialog<string> {
                             className="theia-input"
                             style={{ flexGrow: 1, width: 0 }}
                             spellCheck="false"
+                            placeholder={`.${nls.localize('vuengine/editors/newFileDialog/extension', 'extension')}`}
                             value={this.ext}
                             onChange={e => {
                                 this.ext = e.currentTarget.value;
                                 this.update();
                             }}
+                            onFocus={e => e.target.select()}
                         />
                     </div>
                 </div>
@@ -97,22 +99,27 @@ export class VesNewFileDialog extends ReactDialog<string> {
                         style={{ flexGrow: 1 }}
                         value={this.ext}
                         onChange={e => {
-                            this.ext = e.currentTarget.value;
+                            if (e.currentTarget.value.startsWith('.')) {
+                                this.ext = e.currentTarget.value;
+                            } else {
+                                this.name = e.currentTarget.value.split('.')[0];
+                                this.ext = e.currentTarget.value.split('.').slice(1).join('.');
+                            }
                             this.update();
                         }}
                     >
                         <optgroup>
+                            <option value="">
+                                {nls.localize('vuengine/editors/newFileDialog/types/None', 'None')}
+                            </option>
                             <option value=".c / .h">
-                                {nls.localize('vuengine/editors/newFileDialog/types/CSourceAndHeader', 'C Source & Header')}
+                                {nls.localize('vuengine/editors/newFileDialog/types/SourceAndHeader', 'Source & Header')}
                             </option>
                             <option value=".c">
-                                {nls.localize('vuengine/editors/newFileDialog/types/CSource', 'C Source Code')}
+                                {nls.localize('vuengine/editors/newFileDialog/types/Source', 'Source Code')}
                             </option>
                             <option value=".h">
-                                {nls.localize('vuengine/editors/newFileDialog/types/CHeader', 'C Header')}
-                            </option>
-                            <option value=".txt">
-                                {nls.localize('vuengine/editors/newFileDialog/types/Text', 'Text')}
+                                {nls.localize('vuengine/editors/newFileDialog/types/Header', 'Header')}
                             </option>
                         </optgroup>
 
@@ -131,7 +138,7 @@ export class VesNewFileDialog extends ReactDialog<string> {
                         )}
                     </select>
                 </div>
-            </div >
+            </div>
             <div className="error"></div>
         </>;
     }

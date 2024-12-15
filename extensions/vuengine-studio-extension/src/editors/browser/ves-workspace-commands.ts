@@ -22,7 +22,7 @@ export class VesWorkspaceCommandContribution extends WorkspaceCommandContributio
                 const parent = await this.getDirectory(uri);
                 if (parent) {
                     const parentUri = parent.resource;
-                    let defaultExt = '.c / .h';
+                    let defaultExt = '';
                     let defaultName = nls.localize('vuengine/editors/newFileDialog/untitled', 'Untitled');
                     let didMatchType = false;
                     if (!parentUri.isEqual(uri)) {
