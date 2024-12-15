@@ -99,7 +99,8 @@ export class VesCodeGenService {
 
   protected bindEvents(): void {
     this.vesProjectService.onDidUpdateGameConfig(async () =>
-      this.handlePluginChange());
+      // delay to allow project data to get updated first
+      setTimeout(() => this.handlePluginChange(), 500));
 
     this.vesProjectService.onDidAddProjectItem(fileUri => {
       this.handleFileUpdate(fileUri);
