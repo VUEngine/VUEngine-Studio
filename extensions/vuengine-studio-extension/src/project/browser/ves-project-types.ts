@@ -416,8 +416,9 @@ export const defaultProjectData: ProjectData = {
           tags: {
             type: 'array',
             items: {
-              type: 'array',
-              items: {
+              type: 'object',
+              properties: {},
+              additionalProperties: {
                 type: 'string'
               }
             }
