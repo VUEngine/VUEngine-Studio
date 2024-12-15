@@ -145,22 +145,27 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
         const options: MultiSelectOption[] = [];
 
         // get all colliders from all contributors
-        let clayers: string[] = [];
+        let clayers: Record<string, string> = {};
         const cl = services.vesProjectService.getProjectDataItemsForType('ColliderLayers');
         if (cl) {
             Object.values(cl).map(c => {
-                clayers = clayers.concat(
+                clayers = {
+                    ...clayers,
                     // @ts-ignore
-                    c.layers
-                );
+                    ...(c.layers ?? {})
+                };
             });
         }
 
         // create options
-        clayers.filter((value, i, self) => self.indexOf(value) === i).sort().map(l => {
-            const o = { value: l, label: l };
-            options.push(o);
-        });
+        Object.entries(clayers)
+            .sort(([, a], [, b]) => a.localeCompare(b))
+            .map(([key, value]: string[]) => {
+                options.push({
+                    value: key,
+                    label: value,
+                });
+            });
 
         return options;
     };

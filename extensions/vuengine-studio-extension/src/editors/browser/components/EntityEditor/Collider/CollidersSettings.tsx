@@ -16,27 +16,32 @@ export default function CollidersSettings(): React.JSX.Element {
     };
 
     const options: SelectOption[] = [{
-        value: 'None',
+        value: '',
         label: nls.localize('vuengine/entityEditor/inGameTypeNone', 'None'),
     }];
     let inGameTypesFileUri: URI | undefined;
     const inGameTypes = services.vesProjectService.getProjectDataItemsForType('InGameTypes');
-    let combinedInGameTypes: string[] = [];
+    let combinedInGameTypes: Record<string, string> = {};
     if (inGameTypes) {
         inGameTypesFileUri = inGameTypes[ProjectContributor.Project]?._fileUri;
 
-        Object.values(ProjectContributor).map(c => {
-            // @ts-ignore
-            combinedInGameTypes = combinedInGameTypes.concat(inGameTypes[c]?.types || []);
+        Object.values(ProjectContributor).forEach(c => {
+            combinedInGameTypes = {
+                ...combinedInGameTypes,
+                // @ts-ignore
+                ...(inGameTypes[c]?.types ?? {}),
+            };
         });
-        combinedInGameTypes = combinedInGameTypes.filter((value, index, self) => self.indexOf(value) === index);
+    };
 
-        combinedInGameTypes.sort().map(c => {
+    Object.entries(combinedInGameTypes)
+        .sort(([, a], [, b]) => a.localeCompare(b))
+        .map(([key, value]: string[]) => {
             options.push({
-                value: c,
+                label: value,
+                value: key,
             });
         });
-    }
 
     const openEditor = async (): Promise<void> => {
         if (!inGameTypesFileUri) {
@@ -58,7 +63,7 @@ export default function CollidersSettings(): React.JSX.Element {
                 <SelectComponent
                     options={options}
                     defaultValue={data.inGameType}
-                    onChange={inGameType => setInGameType(inGameType.value || 'None')}
+                    onChange={inGameType => setInGameType(inGameType.value || '')}
                 />
             </VContainer>
             <button

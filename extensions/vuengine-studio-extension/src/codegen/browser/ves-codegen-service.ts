@@ -652,9 +652,11 @@ export class VesCodeGenService {
 
   protected toUpperSnakeCase(key: string): string {
     const splitCaps = (input: string) => input
-      .replace(/([a-z])([A-Z]+)/g, (m, s1, s2) => s1 + ' ' + s2)
-      .replace(/([A-Z])([A-Z]+)([^a-zA-Z0-9]*)$/, (m, s1, s2, s3) => s1 + s2.toLowerCase() + s3)
-      .replace(/([A-Z]+)([A-Z][a-z])/g, (m, s1, s2) => s1.toLowerCase() + ' ' + s2);
+      ? input
+        .replace(/([a-z])([A-Z]+)/g, (m, s1, s2) => s1 + ' ' + s2)
+        .replace(/([A-Z])([A-Z]+)([^a-zA-Z0-9]*)$/, (m, s1, s2, s3) => s1 + s2.toLowerCase() + s3)
+        .replace(/([A-Z]+)([A-Z][a-z])/g, (m, s1, s2) => s1.toLowerCase() + ' ' + s2)
+      : '';
 
     return splitCaps(key)
       .replace(/\W+/g, ' ')
