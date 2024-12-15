@@ -10,10 +10,17 @@ const asyncRimraf = util.promisify(rimraf);
 
 const DELETE_PATHS = [
     'node_modules/unzip-stream/aa.zip',
-    'node_modules/unzip-stream/testData*'
+    'node_modules/unzip-stream/testData*',
+    'vuengine/core/.git',
+    'vuengine/core/.gitattributes',
+    'vuengine/core/.github',
+    'vuengine/core/.gitignore',
+    'vuengine/plugins/.git',
+    'vuengine/plugins/.gitattributes',
+    'vuengine/plugins/.github',
+    'vuengine/plugins/.gitignore',
 ];
 
-/*
 const EXECUTABLE_PATHS = [
     'binaries/vuengine-studio-tools/${os}/gcc/bin',
     'binaries/vuengine-studio-tools/${os}/gcc/libexec/gcc/v810/4.7.4',
@@ -25,7 +32,10 @@ const EXECUTABLE_PATHS = [
     'binaries/vuengine-studio-tools/${os}/prog-vb/prog-vb',
     'vuengine/core/lib/compiler/preprocessor',
 ];
-*/
+
+const LIBRARY_PATHS = [
+    'vuengine',
+];
 
 const signCommand = path.join(__dirname, 'sign.sh');
 // const notarizeCommand = path.join(__dirname, 'notarize.sh');
@@ -67,23 +77,28 @@ exports.default = async function (context) {
         await asyncRimraf(resolvedPath);
     }
 
-    // Set executable flags
-    /*
-    for (const execPath of EXECUTABLE_PATHS) {
-        const resolvedPath = path.resolve(appPath, replaceOs(execPath));
-        if (fs.existsSync(resolvedPath)) {
-            console.log(`chmod ${resolvedPath}...`);
-            if (fs.lstatSync(resolvedPath).isDirectory()) {
-                const files = fs.readdirSync(resolvedPath);
-                files.forEach(file => {
-                    fs.chmodSync(path.resolve(resolvedPath, file), '755');
-                });
-            } else {
-                fs.chmodSync(resolvedPath, '755');
+    const recursiveChmod = (paths, permissions) => {
+        for (const p of paths) {
+            const resolvedPath = path.resolve(appPath, replaceOs(p));
+            if (fs.existsSync(resolvedPath)) {
+                if (fs.lstatSync(resolvedPath).isDirectory()) {
+                    const files = fs.readdirSync(resolvedPath);
+                    files.forEach(file => {
+                        recursiveChmod([path.resolve(resolvedPath, file)], permissions);
+                    });
+                } else {
+                    console.log(`chmod ${resolvedPath} ${permissions}`);
+                    fs.chmodSync(resolvedPath, permissions);
+                }
             }
         }
-    }
-    */
+    };
+
+    // Set executable flags on binaries
+    recursiveChmod(EXECUTABLE_PATHS, '755');
+
+    // Make bundled libs read-only
+    recursiveChmod(LIBRARY_PATHS, '444');
 
     // Only continue for macOS
     if (context.packager.platform.name !== 'mac') {
