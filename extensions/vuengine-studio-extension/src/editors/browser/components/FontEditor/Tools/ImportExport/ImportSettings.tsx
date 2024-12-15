@@ -11,10 +11,11 @@ import {
 } from '../../../../../../images/browser/ves-images-types';
 import { EditorsContext, EditorsContextType } from '../../../../ves-editors-types';
 import HContainer from '../../../Common/Base/HContainer';
-import { clamp, roundToNextMultipleOf8 } from '../../../Common/Utils';
 import VContainer from '../../../Common/Base/VContainer';
+import { clamp, roundToNextMultipleOf8 } from '../../../Common/Utils';
 import Images from '../../../ImageEditor/Images';
 import Alphabet from '../../Alphabet/Alphabet';
+import { INPUT_BLOCKING_COMMANDS } from '../../FontEditor';
 import { CHAR_PIXEL_SIZE, MAX_CHAR_COUNT, MAX_CHAR_SIZE, MAX_OFFSET, MIN_CHAR_SIZE, MIN_OFFSET } from '../../FontEditorTypes';
 import { ParsedImageData } from './ImportExportTools';
 
@@ -49,7 +50,7 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
         setImportOffset,
         setImportCharacterCount,
     } = props;
-    const { fileUri, services } = useContext(EditorsContext) as EditorsContextType;
+    const { disableCommands, enableCommands, fileUri, services } = useContext(EditorsContext) as EditorsContextType;
     const [sourceImagePath, setSourceImagePath] = useState<string>();
     const [sourceImageHeight, setSourceImageHeight] = useState<number>(0);
     const [sourceImageWidth, setSourceImageWidth] = useState<number>(0);
@@ -283,6 +284,8 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                                 MIN_CHAR_SIZE * CHAR_PIXEL_SIZE,
                                 MAX_CHAR_SIZE * CHAR_PIXEL_SIZE
                             ))}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
                         <div style={{ paddingBottom: 3 }}>×</div>
                         <input
@@ -298,6 +301,8 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                                 MIN_CHAR_SIZE * CHAR_PIXEL_SIZE,
                                 MAX_CHAR_SIZE * CHAR_PIXEL_SIZE
                             ))}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
                     </HContainer>
                 </VContainer>
@@ -315,6 +320,8 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                         onChange={e => setImportOffset(
                             clamp(!isNaN(parseInt(e.target.value)) ? parseInt(e.target.value) : 0, MIN_OFFSET, MAX_OFFSET)
                         )}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
                 </VContainer>
                 <VContainer>
@@ -325,6 +332,8 @@ export default function ImportSettings(props: ImportSettingsProps): React.JSX.El
                         type="checkbox"
                         checked={invert}
                         onChange={() => setInvert(!invert)}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
                 </VContainer>
             </HContainer>
