@@ -13,9 +13,10 @@ VUEngine Studio is built upon Eclipse Theia, a framework for building cloud and 
 
 The following third party binaries that are shipped with VUEngine Studio come with their own licenses:
 
+- clang-format by the GNU Project
+- doxygen by Dimitri van Heesch
 - GCC by the GNU Project, with patches for V810 by ElmerPCFX
 - GNU Make by the GNU Project
-- clang-format by the GNU Project
 - Grit by Jasper Vijn, with patches for Virtual Boy by dasi
 - HyperBoyCli by thunderstruck
 - HyperFlasherCli by thunderstruck
