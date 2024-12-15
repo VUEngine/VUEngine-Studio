@@ -2,12 +2,11 @@ import { nls } from '@theia/core';
 import { OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import React from 'react';
 import { EditorsContextType } from '../../ves-editors-types';
-import { DataSection } from '../Common/CommonTypes';
 import HContainer from '../Common/Base/HContainer';
-import RadioSelect from '../Common/Base/RadioSelect';
-import SectionSelect from '../Common/SectionSelect';
 import VContainer from '../Common/Base/VContainer';
-import { MAX_RANGE, MIN_RANGE, PCMData } from './PCMTypes';
+import { DataSection } from '../Common/CommonTypes';
+import SectionSelect from '../Common/SectionSelect';
+import { PCMData } from './PCMTypes';
 
 interface PCMProps {
     data: PCMData
@@ -32,15 +31,6 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
             ...this.props.data,
             sourceFile: sourceFile.replace(/\\/g, '/'),
         });
-    };
-
-    protected setRange = (range: number) => {
-        if (range >= MIN_RANGE && range <= MAX_RANGE) {
-            this.props.updateData({
-                ...this.props.data,
-                range,
-            });
-        }
     };
 
     protected setSection = (section: DataSection) => {
@@ -113,16 +103,6 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
                 </div>}
             </VContainer>
             <HContainer gap={15}>
-                <VContainer>
-                    <label>
-                        {nls.localize('vuengine/pcmEditor/range', 'Range')}
-                    </label>
-                    <RadioSelect
-                        defaultValue={data.range}
-                        options={[{ value: 1 }, { value: 2 }, { value: 3 }, { value: 4 }, { value: 5 }]}
-                        onChange={options => this.setRange(options[0].value as number)}
-                    />
-                </VContainer>
                 <VContainer>
                     <label className='setting'>
                         {nls.localize('vuengine/pcmEditor/loop', 'Loop')}
