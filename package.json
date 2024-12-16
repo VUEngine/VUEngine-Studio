@@ -16,7 +16,7 @@
     "node": ">=12.14.1"
   },
   "devDependencies": {
-    "@theia/cli": "1.56.0",
+    "@theia/cli": "1.57.0",
     "@typescript-eslint/eslint-plugin": "^4.25.0",
     "@typescript-eslint/eslint-plugin-tslint": "^4.25.0",
     "@typescript-eslint/parser": "^4.25.0",
@@ -58,7 +58,7 @@
   },
   "theiaPluginsDir": "plugins",
   "theiaPlugins": {
-    "eclipse-theia.builtin-extension-pack": "https://open-vsx.org/api/eclipse-theia/builtin-extension-pack/1.83.1/file/eclipse-theia.builtin-extension-pack-1.83.1.vsix",
+    "eclipse-theia.builtin-extension-pack": "https://open-vsx.org/api/eclipse-theia/builtin-extension-pack/1.95.3/file/eclipse-theia.builtin-extension-pack-1.95.3.vsix",
     "vuengine.virtual-c-language-support": "https://github.com/VUEngine/Virtual-C-Language-Support/releases/download/v0.6.0/virtual-c-language-support-0.6.0.vsix"
   },
   "theiaPluginsExcludeIds": [
