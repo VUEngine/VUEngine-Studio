@@ -1,18 +1,18 @@
 import { isOSX, URI } from '@theia/core';
-import { ApplicationShell, CommonCommands, KeybindingContribution, KeybindingRegistry, OpenerService, PreferenceService } from '@theia/core/lib/browser';
+import { ApplicationShell, KeybindingContribution, KeybindingRegistry, OpenerService, PreferenceService } from '@theia/core/lib/browser';
 import { WindowService } from '@theia/core/lib/browser/window/window-service';
 import { CommandContribution, CommandRegistry } from '@theia/core/lib/common/command';
 import { MenuContribution, MenuModelRegistry } from '@theia/core/lib/common/menu';
 import { ElectronCommands } from '@theia/core/lib/electron-browser/menu/electron-menu-contribution';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { EditorWidget } from '@theia/editor/lib/browser';
+import { FileService } from '@theia/filesystem/lib/browser/file-service';
 import { EXPLORER_VIEW_CONTAINER_TITLE_OPTIONS } from '@theia/navigator/lib/browser/navigator-widget-factory';
 import { SCM_VIEW_CONTAINER_TITLE_OPTIONS } from '@theia/scm/lib/browser/scm-contribution';
 import { SEARCH_VIEW_CONTAINER_TITLE_OPTIONS } from '@theia/search-in-workspace/lib/browser/search-in-workspace-factory';
 import { WorkspaceCommands } from '@theia/workspace/lib/browser';
 import { VesCoreCommands } from './ves-core-commands';
 import { VesCoreMenus } from './ves-core-menus';
-import { FileService } from '@theia/filesystem/lib/browser/file-service';
 
 @injectable()
 export class VesCoreContribution implements CommandContribution, MenuContribution, KeybindingContribution {
@@ -100,11 +100,6 @@ export class VesCoreContribution implements CommandContribution, MenuContributio
         registry.registerKeybindings({
             command: ElectronCommands.RELOAD.id,
             keybinding: 'ctrlcmd+shift+r'
-        });
-
-        registry.registerKeybindings({
-            command: CommonCommands.CLOSE_TAB.id,
-            keybinding: 'ctrlcmd+w'
         });
 
         if (isOSX) {
