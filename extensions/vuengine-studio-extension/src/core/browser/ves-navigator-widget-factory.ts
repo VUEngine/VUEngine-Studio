@@ -6,7 +6,10 @@ import { NavigatorWidgetFactory } from '@theia/navigator/lib/browser/navigator-w
 export class VesNavigatorWidgetFactory extends NavigatorWidgetFactory {
     // initially hide "open editors" tab of navigator
     protected openEditorsWidgetOptions: ViewContainer.Factory.WidgetOptions = {
-        ...super.openEditorsWidgetOptions,
+        order: 0,
+        canHide: true,
+        initiallyCollapsed: true,
+        weight: 20,
         initiallyHidden: true,
     };
 }

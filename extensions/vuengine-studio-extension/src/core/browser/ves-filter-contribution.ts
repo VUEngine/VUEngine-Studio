@@ -17,16 +17,15 @@ export class VesFilterContribution implements FilterContribution {
     registry.addFilters([
       PreferenceContribution
     ], [
-      contrib =>
-        // @ts-ignore
-        contrib?.schema?.properties === undefined ||
+      (contrib: PreferenceContribution) =>
+        contrib.schema?.properties === undefined ||
         (
-          // @ts-ignore // filter test extension properties
-          contrib.schema.properties['testing.openTesting'] === undefined &&
-          // @ts-ignore // filter debug extension properties
-          contrib.schema.properties['debug.trace'] === undefined &&
-          // @ts-ignore // filter notebook extension properties
-          contrib.schema.properties['notebook.lineNumbers'] === undefined
+          // filter test extension properties
+          contrib.schema?.properties['testing.openTesting'] === undefined &&
+          // filter debug extension properties
+          contrib.schema?.properties['debug.trace'] === undefined &&
+          // filter notebook extension properties
+          contrib.schema?.properties['notebook.lineNumbers'] === undefined
         )
     ]);
     registry.addFilters([
