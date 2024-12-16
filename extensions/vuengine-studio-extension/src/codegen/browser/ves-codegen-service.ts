@@ -490,8 +490,7 @@ export class VesCodeGenService {
             }
             break;
           case ProjectDataTemplateTargetForEachOfType.fileInFolder:
-            const paths = await Promise.all(window.electronVesCore.findFiles(await this.fileService.fsPath(itemUri.parent), forEachOfValue)
-              .map(async p => workspaceRootUri.relative(itemUri.parent.resolve(p))));
+            const paths = await Promise.all(window.electronVesCore.findFiles(await this.fileService.fsPath(itemUri.parent), forEachOfValue));
             items.push(...paths);
             break;
         }
