@@ -278,7 +278,7 @@ export class VesProjectService {
         // TODO: support for 'patternProperties'
         // TODO: support for non-boolean 'additionalProperties'
         if (schema.additionalProperties !== false) {
-          resultObject = deepmerge(resultObject, data);
+          resultObject = deepmerge(resultObject, data ?? {});
         }
         return resultObject;
 
@@ -799,6 +799,7 @@ export class VesProjectService {
     // check for outdated items
     const outdatedItems = await this.getOutdatedProjectItems();
     if (outdatedItems.length) {
+      console.log('Outdated item files found', outdatedItems);
       await this.promptForFilesUpdate(outdatedItems.length);
     }
   }

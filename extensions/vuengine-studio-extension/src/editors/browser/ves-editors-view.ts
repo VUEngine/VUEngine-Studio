@@ -1,5 +1,5 @@
-import { Command, CommandRegistry, CommandService, MenuModelRegistry, URI, UntitledResourceResolver } from '@theia/core';
-import { AbstractViewContribution, CommonCommands, CommonMenus, KeybindingRegistry, OpenerService, Widget } from '@theia/core/lib/browser';
+import { Command, CommandRegistry, CommandService, MenuModelRegistry, UntitledResourceResolver, URI } from '@theia/core';
+import { AbstractViewContribution, CommonCommands, KeybindingRegistry, OpenerService, Widget } from '@theia/core/lib/browser';
 import { FrontendApplicationState, FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { TabBarToolbarContribution, TabBarToolbarRegistry } from '@theia/core/lib/browser/shell/tab-bar-toolbar';
 import { UserWorkingDirectoryProvider } from '@theia/core/lib/browser/user-working-directory-provider';
@@ -142,6 +142,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
             const type = types![typeId];
 
             // TODO: Need a strategy to handle relative file paths, e.g. for sprites in entity editor
+            // See also: line 256
             /*
             if (type.file?.startsWith('.')) {
                 commandRegistry.registerCommand(Command.toLocalizedCommand(
@@ -154,6 +155,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                     `vuengine/editors/newUntitled/${typeId}`
                 ), {
                     isEnabled: () => true,
+                    isVisible: () => false,
                     execute: async () => {
                         const untitledUri = this.untitledResourceResolver.createUntitledURI(type.file, await this.workingDirProvider.getUserWorkingDir());
                         await this.untitledResourceResolver.resolve(untitledUri);
@@ -182,7 +184,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         commandRegistry.registerCommand(VesEditorsCommands.OPEN_IN_EDITOR, {
             isEnabled: () => true,
             isVisible: (widget: Widget) => {
-                const p = this.editorManager.all.find(w => w.id === widget.id)?.editor.uri.path;
+                const p = this.editorManager.all.find(w => w.id === widget?.id)?.editor.uri.path;
                 if (p) {
                     for (const t of Object.values(types || {})) {
                         if ([p.ext, p.base].includes(t.file)) {
@@ -193,7 +195,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                 return false;
             },
             execute: async widget => {
-                const u = this.editorManager.all.find(w => w.id === widget.id)?.editor.uri;
+                const u = this.editorManager.all.find(w => w.id === widget?.id)?.editor.uri;
                 if (u) {
                     const opener = await this.openerService.getOpener(u);
                     await opener.open(u);
@@ -252,6 +254,9 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         for (const typeId of Object.keys(types || {})) {
             const type = types![typeId];
 
+            // TODO: Need a strategy to handle relative file paths, e.g. for sprites in entity editor
+            // See also: line 144
+            /*
             if (type.file?.startsWith('.')) {
                 const id = `editors.new-untitled.${typeId}`;
                 menus.registerMenuNode(CommonMenus.FILE_NEW_CONTRIBUTIONS, {
@@ -260,6 +265,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
                     command: id,
                 });
             }
+            */
 
             if (type.forFiles?.length) {
                 menus.registerMenuAction(NavigatorContextMenu.NAVIGATION, {

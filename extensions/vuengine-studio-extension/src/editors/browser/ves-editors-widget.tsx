@@ -160,10 +160,12 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         this.uri = new URI(this.options.uri);
         this.typeId = this.options.typeId;
 
-        const fileStats = await this.fileService.resolve(this.uri);
-        this.isReadOnly = fileStats.isReadonly;
-        if (this.isReadOnly) {
-            lock(this.title);
+        if (this.uri.scheme !== UNTITLED_SCHEME) {
+            const fileStats = await this.fileService.resolve(this.uri);
+            this.isReadOnly = fileStats.isReadonly;
+            if (this.isReadOnly) {
+                lock(this.title);
+            }
         }
 
         await this.vesProjectService.projectItemsReady;

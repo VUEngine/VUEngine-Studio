@@ -16,7 +16,7 @@ export class VesWorkspaceCommandContribution extends WorkspaceCommandContributio
         await this.vesProjectService.projectDataReady;
         const types = this.vesProjectService.getProjectDataTypes() || {};
 
-        commandRegistry.unregisterCommand(WorkspaceCommands.NEW_FILE);
+        commandRegistry.unregisterCommand(WorkspaceCommands.NEW_FILE.id);
         commandRegistry.registerCommand(WorkspaceCommands.NEW_FILE, new WorkspaceRootUriAwareCommandHandler(this.workspaceService, this.selectionService, {
             execute: async uri => {
                 const parent = await this.getDirectory(uri);
