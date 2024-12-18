@@ -14,7 +14,11 @@ const VesPCMEditorControl = ({ data, handleChange, path }: VesPCMEditorControlPr
     <EditorsContext.Consumer>
         {context => <PCMEditor
             data={data}
-            updateData={(newValue: PCMData) => handleChange(path, newValue)}
+            updateData={(newValue: PCMData) => {
+                if (!context.isReadonly) {
+                    handleChange(path, newValue);
+                }
+            }}
             context={context}
         />}
     </EditorsContext.Consumer>;

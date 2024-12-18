@@ -14,7 +14,11 @@ const VesColumnTableEditorControl = ({ data, handleChange, path }: VesColumnTabl
     <EditorsContext.Consumer>
         {context => <ColumnTableEditor
             data={data}
-            updateData={(newValue: ColumnTableData) => handleChange(path, newValue)}
+            updateData={(newValue: ColumnTableData) => {
+                if (!context.isReadonly) {
+                    handleChange(path, newValue);
+                }
+            }}
         />}
     </EditorsContext.Consumer>;
 

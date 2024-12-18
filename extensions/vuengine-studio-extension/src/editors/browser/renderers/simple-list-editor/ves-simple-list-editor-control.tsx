@@ -1,6 +1,7 @@
 import { withJsonFormsControlProps } from '@jsonforms/react';
 import React from 'react';
 import SimpleListEditor from '../../components/SimpleListEditor/SimpleListEditor';
+import { EditorsContext } from '../../ves-editors-types';
 
 interface VesSimpleListEditorControlProps {
     data: Record<string, string>;
@@ -9,9 +10,15 @@ interface VesSimpleListEditorControlProps {
 }
 
 const VesSimpleListEditorControl = ({ data, handleChange, path }: VesSimpleListEditorControlProps) =>
-    <SimpleListEditor
-        data={data}
-        updateData={(newValue: Record<string, string>) => handleChange(path, newValue)}
-    />;
+    <EditorsContext.Consumer>
+        {context => <SimpleListEditor
+            data={data}
+            updateData={(newValue: Record<string, string>) => {
+                if (!context.isReadonly) {
+                    handleChange(path, newValue);
+                }
+            }}
+        />}
+    </EditorsContext.Consumer>;
 
 export default withJsonFormsControlProps(VesSimpleListEditorControl);

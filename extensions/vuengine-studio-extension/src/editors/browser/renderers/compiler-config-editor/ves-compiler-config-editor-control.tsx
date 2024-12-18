@@ -14,7 +14,11 @@ const VesCompilerConfigEditorControl = ({ data, handleChange, path }: VesCompile
     <EditorsContext.Consumer>
         {context => <CompilerConfigEditor
             data={data}
-            updateData={(newValue: CompilerConfigData) => handleChange(path, newValue)}
+            updateData={(newValue: CompilerConfigData) => {
+                if (!context.isReadonly) {
+                    handleChange(path, newValue);
+                }
+            }}
         />}
     </EditorsContext.Consumer>;
 

@@ -14,7 +14,11 @@ const VesMusicEditorControl = ({ data, handleChange, path }: VesMusicEditorContr
     <EditorsContext.Consumer>
         {context => <MusicEditor
             songData={data}
-            updateSongData={(newValue: SongData) => handleChange(path, newValue)}
+            updateSongData={(newValue: SongData) => {
+                if (!context.isReadonly) {
+                    handleChange(path, newValue);
+                }
+            }}
         />}
     </EditorsContext.Consumer>;
 

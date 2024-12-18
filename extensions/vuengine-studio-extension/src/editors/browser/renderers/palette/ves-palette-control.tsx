@@ -1,8 +1,9 @@
 
 import { withJsonFormsControlProps } from '@jsonforms/react';
 import React from 'react';
-import Palette from '../../components/Common/Palette';
 import VContainer from '../../components/Common/Base/VContainer';
+import Palette from '../../components/Common/Palette';
+import { EditorsContext } from '../../ves-editors-types';
 
 interface VesPaletteControlProps {
     data: string;
@@ -12,13 +13,21 @@ interface VesPaletteControlProps {
 }
 
 const VesPaletteControl = ({ data, handleChange, path, label }: VesPaletteControlProps) => (
-    <VContainer>
-        <label>{label}</label>
-        <Palette
-            value={data}
-            updateValue={(newValue: string) => handleChange(path, newValue)}
-        />
-    </VContainer>
+    <EditorsContext.Consumer>
+        {context =>
+            <VContainer>
+                <label>{label}</label>
+                <Palette
+                    value={data}
+                    updateValue={(newValue: string) => {
+                        if (!context.isReadonly) {
+                            handleChange(path, newValue);
+                        }
+                    }}
+                />
+            </VContainer>}
+    </EditorsContext.Consumer>
+
 );
 
 export default withJsonFormsControlProps(VesPaletteControl);

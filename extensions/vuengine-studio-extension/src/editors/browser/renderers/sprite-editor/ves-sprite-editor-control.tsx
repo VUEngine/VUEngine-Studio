@@ -14,7 +14,11 @@ const VesSpriteEditorControl = ({ data, handleChange, path }: VesSpriteEditorCon
     <EditorsContext.Consumer>
         {context => <SpriteEditor
             data={data}
-            updateData={(newValue: SpriteData) => handleChange(path, newValue)}
+            updateData={(newValue: SpriteData) => {
+                if (!context.isReadonly) {
+                    handleChange(path, newValue);
+                }
+            }}
         />}
     </EditorsContext.Consumer>;
 

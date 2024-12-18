@@ -14,7 +14,11 @@ const VesStageEditorControl = ({ data, handleChange, path }: VesStageEditorContr
     <EditorsContext.Consumer>
         {context => <StageEditor
             data={data}
-            updateData={(newValue: StageData) => handleChange(path, newValue)}
+            updateData={(newValue: StageData) => {
+                if (!context.isReadonly) {
+                    handleChange(path, newValue);
+                }
+            }}
             context={context}
         />}
     </EditorsContext.Consumer>;

@@ -14,7 +14,11 @@ const VesImageEditorControl = ({ data, handleChange, path }: VesImageEditorContr
     <EditorsContext.Consumer>
         {context => <ImageEditor
             data={data}
-            updateData={(newValue: ImageConfig) => handleChange(path, newValue)}
+            updateData={(newValue: ImageConfig) => {
+                if (!context.isReadonly) {
+                    handleChange(path, newValue);
+                }
+            }}
         />}
     </EditorsContext.Consumer>;
 

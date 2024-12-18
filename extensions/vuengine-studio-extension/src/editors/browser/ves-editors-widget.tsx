@@ -8,6 +8,7 @@ import {
     HoverService,
     LabelProvider,
     LocalStorageService,
+    lock,
     NavigatableWidget,
     OpenerService,
     PreferenceService,
@@ -111,6 +112,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
 
     protected justRequestedUpdate: boolean;
     protected justUpdatedModel: boolean;
+    protected isReadOnly = false;
     protected isLoading: boolean;
     protected isGenerating: boolean;
     protected generatingProgress: number;
@@ -124,7 +126,9 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
     }
 
     get dirty(): boolean {
-        return this.reference?.object.dirty;
+        return this.isReadOnly
+            ? false
+            : this.reference?.object.dirty;
     }
 
     get saveable(): Saveable {
@@ -133,13 +137,10 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
 
     @postConstruct()
     protected init(): void {
-        this.uri = new URI(this.options.uri);
-        this.typeId = this.options.typeId;
-
-        this.initMembers();
-
         this.doInit();
         this.bindEvents();
+
+        this.initMembers();
 
         const path = (this.uri.scheme === UNTITLED_SCHEME)
             ? `untitled-${this.options.typeId}-${this.vesCommonService.nanoid()}`
@@ -153,6 +154,44 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
 
         // render initial loading spinner
         this.update();
+    }
+
+    protected async doInit(): Promise<void> {
+        this.uri = new URI(this.options.uri);
+        this.typeId = this.options.typeId;
+
+        const fileStats = await this.fileService.resolve(this.uri);
+        this.isReadOnly = fileStats.isReadonly;
+        if (this.isReadOnly) {
+            lock(this.title);
+        }
+
+        await this.vesProjectService.projectItemsReady;
+
+        const type = this.vesProjectService.getProjectDataType(this.options.typeId);
+        if (!type) {
+            return;
+        }
+
+        const reference = await this.modelService.createModelReference(this.uri);
+        if (this.toDispose.disposed) {
+            reference.dispose();
+            return;
+        }
+        this.toDispose.push(this.reference = reference);
+        this.reference?.object.onContentChanged(() => this.handleModelChange(type));
+        this.reference?.object.onDirtyChanged(() => this.onDirtyChangedEmitter.fire());
+
+        this.schema = type?.schema;
+        this.uiSchema = type?.uiSchema;
+        if (type?.icon) {
+            this.title.iconClass = type.icon;
+        }
+
+        await this.loadData(type);
+
+        this.update();
+        this.isLoading = false;
     }
 
     protected initMembers(): void {
@@ -222,35 +261,6 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
         }, 50);
         super.update();
     };
-
-    protected async doInit(): Promise<void> {
-        await this.vesProjectService.projectItemsReady;
-
-        const type = this.vesProjectService.getProjectDataType(this.options.typeId);
-        if (!type) {
-            return;
-        }
-
-        const reference = await this.modelService.createModelReference(this.uri);
-        if (this.toDispose.disposed) {
-            reference.dispose();
-            return;
-        }
-        this.toDispose.push(this.reference = reference);
-        this.reference?.object.onContentChanged(() => this.handleModelChange(type));
-        this.reference?.object.onDirtyChanged(() => this.onDirtyChangedEmitter.fire());
-
-        this.schema = type?.schema;
-        this.uiSchema = type?.uiSchema;
-        if (type?.icon) {
-            this.title.iconClass = type.icon;
-        }
-
-        await this.loadData(type);
-
-        this.update();
-        this.isLoading = false;
-    }
 
     protected async loadData(type: ProjectDataType): Promise<void> {
         let json = {};
@@ -384,6 +394,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
                     value={{
                         fileUri: this.uri,
                         isGenerating: this.isGenerating,
+                        isReadonly: this.isReadOnly,
                         setIsGenerating: this.setIsGenerating.bind(this),
                         setGeneratingProgress: this.setGeneratingProgress.bind(this),
                         enableCommands: this.enableCommands.bind(this),
@@ -415,6 +426,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
                             uischema={this.uiSchema}
                             onChange={this.onEditorContentHasChanged}
                             cells={vanillaCells}
+                            readonly={this.isReadOnly}
                             renderers={[
                                 ...vanillaRenderers,
                                 ...VES_RENDERERS

@@ -14,7 +14,11 @@ const VesVsuSandboxControl = ({ data, handleChange, path }: VesVsuSandboxControl
     <EditorsContext.Consumer>
         {context => <VsuSandbox
             data={data}
-            updateData={(newValue: VsuData) => handleChange(path, newValue)}
+            updateData={(newValue: VsuData) => {
+                if (!context.isReadonly) {
+                    handleChange(path, newValue);
+                }
+            }}
         />}
     </EditorsContext.Consumer>;
 

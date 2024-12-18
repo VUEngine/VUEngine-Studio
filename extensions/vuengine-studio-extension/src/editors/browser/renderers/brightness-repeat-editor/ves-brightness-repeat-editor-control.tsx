@@ -14,7 +14,11 @@ const VesBrightnessRepeatEditorControl = ({ data, handleChange, path }: VesBrigh
     <EditorsContext.Consumer>
         {context => <BrightnessRepeatEditor
             data={data}
-            updateData={(newValue: BrightnessRepeatData) => handleChange(path, newValue)}
+            updateData={(newValue: BrightnessRepeatData) => {
+                if (!context.isReadonly) {
+                    handleChange(path, newValue);
+                }
+            }}
         />}
     </EditorsContext.Consumer>;
 

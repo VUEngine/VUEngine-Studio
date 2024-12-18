@@ -14,7 +14,11 @@ const VesFontEditorControl = ({ data, handleChange, path }: VesFontEditorControl
     <EditorsContext.Consumer>
         {context => <FontEditor
             data={data}
-            updateData={(newValue: FontData) => handleChange(path, newValue)}
+            updateData={(newValue: FontData) => {
+                if (!context.isReadonly) {
+                    handleChange(path, newValue);
+                }
+            }}
         />}
     </EditorsContext.Consumer>;
 

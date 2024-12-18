@@ -14,7 +14,11 @@ const VesTranslationsEditorControl = ({ data, handleChange, path }: VesTranslati
     <EditorsContext.Consumer>
         {context => <TranslationsEditor
             data={data}
-            updateData={(newValue: TranslationsData) => handleChange(path, newValue)}
+            updateData={(newValue: TranslationsData) => {
+                if (!context.isReadonly) {
+                    handleChange(path, newValue);
+                }
+            }}
             context={context}
         />}
     </EditorsContext.Consumer>;

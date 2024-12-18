@@ -41,6 +41,7 @@ export const EditorsContext = createContext<EditorsContextType>({});
 export interface EditorsContextType {
     fileUri: URI
     isGenerating: boolean
+    isReadonly: boolean
     setIsGenerating: (isGenerating: boolean, progress?: number) => void
     setGeneratingProgress: (current: number, total: number) => void
     enableCommands: (commandIds: string[]) => void

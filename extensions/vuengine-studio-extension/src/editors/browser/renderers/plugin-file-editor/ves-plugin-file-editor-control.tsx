@@ -14,7 +14,11 @@ const VesPluginFileEditorControl = ({ data, handleChange, path }: VesPluginFileE
     <EditorsContext.Consumer>
         {context => <PluginFileEditor
             data={data}
-            updateData={(newValue: PluginFileData) => handleChange(path, newValue)}
+            updateData={(newValue: PluginFileData) => {
+                if (!context.isReadonly) {
+                    handleChange(path, newValue);
+                }
+            }}
             context={context}
         />}
     </EditorsContext.Consumer>;

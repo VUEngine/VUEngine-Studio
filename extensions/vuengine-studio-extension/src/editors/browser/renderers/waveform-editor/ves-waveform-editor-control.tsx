@@ -14,7 +14,11 @@ const VesWaveFormEditorControl = ({ data, handleChange, path }: VesWaveFormEdito
     <EditorsContext.Consumer>
         {context => <WaveFormEditor
             data={data}
-            updateData={(newValue: WaveFormData) => handleChange(path, newValue)}
+            updateData={(newValue: WaveFormData) => {
+                if (!context.isReadonly) {
+                    handleChange(path, newValue);
+                }
+            }}
         />}
     </EditorsContext.Consumer>;
 

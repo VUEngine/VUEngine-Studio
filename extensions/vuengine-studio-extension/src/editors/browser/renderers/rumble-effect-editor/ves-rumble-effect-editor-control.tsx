@@ -14,7 +14,11 @@ const VesRumbleEffectEditorControl = ({ data, handleChange, path }: VesRumbleEff
     <EditorsContext.Consumer>
         {context => <RumbleEffectEditor
             data={data}
-            updateData={(newValue: RumbleEffectData) => handleChange(path, newValue)}
+            updateData={(newValue: RumbleEffectData) => {
+                if (!context.isReadonly) {
+                    handleChange(path, newValue);
+                }
+            }}
             context={context}
         />}
     </EditorsContext.Consumer>;
