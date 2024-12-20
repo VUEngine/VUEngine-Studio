@@ -3,3 +3,9 @@
 // {{ title | upper }}
 //=========================================================================================================
 {%- endmacro -%}
+
+{%- macro append(array, value, condition=true) -%}
+    {%- if (condition) -%}
+        {%- set array = (array.push(value), array) -%}
+    {%- endif -%}
+{%- endmacro -%}

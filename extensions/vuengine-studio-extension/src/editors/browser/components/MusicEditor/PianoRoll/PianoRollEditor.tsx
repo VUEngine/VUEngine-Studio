@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction, useMemo } from 'react';
-import { BAR_PATTERN_LENGTH_MULT_MAP, MusicEditorTool, NOTES, SongData } from '../MusicEditorTypes';
+import { BAR_PATTERN_LENGTH_MULT_MAP, MusicEditorTool, MusicEvent, NOTES, SongData } from '../MusicEditorTypes';
 import PianoRollRow from './PianoRollRow';
 import { StyledPianoRollEditor } from './StyledComponents';
 
@@ -9,7 +9,7 @@ interface PianoRollEditorProps {
     currentPatternId: number
     currentPatternNoteOffset: number
     currentSequenceIndex: number
-    setCurrentNote: (note: number) => void
+    setCurrentTick: (note: number) => void
     setNote: (index: number, note: number | undefined) => void
     playNote: (note: number) => void
     tool: MusicEditorTool
@@ -24,7 +24,7 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
         currentPatternId,
         currentPatternNoteOffset,
         currentSequenceIndex,
-        setCurrentNote,
+        setCurrentTick,
         setNote,
         playNote,
         tool,
@@ -46,7 +46,9 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                 const otherChannelPattern = otherChannel.patterns[s];
                 const otherChannelPatternSize = BAR_PATTERN_LENGTH_MULT_MAP[otherChannelPattern.bar] * songData.noteResolution;
                 [...Array(otherChannelPatternSize)].forEach((x, noteIndex) => {
-                    const note = otherChannelPattern.notes[noteIndex];
+                    const note = otherChannelPattern.events[noteIndex]
+                        ? otherChannelPattern.events[noteIndex][MusicEvent.Note] ?? -1
+                        : -1;
                     if (note !== undefined &&
                         // eslint-disable-next-line no-null/no-null
                         note !== null &&
@@ -83,12 +85,12 @@ export default function PianoRollEditor(props: PianoRollEditorProps): React.JSX.
                 channelsNotes={channelsNotes}
                 currentChannelId={currentChannelId}
                 currentPatternId={currentPatternId}
-                setCurrentNote={setCurrentNote}
+                setCurrentTick={setCurrentTick}
                 setNote={setNote}
                 playNote={playNote}
                 tool={tool}
                 patternSize={patternSize}
-                notes={pattern.notes}
+                events={pattern.events}
                 lastSetNoteId={lastSetNoteId}
                 setLastSetNoteId={setLastSetNoteId}
                 noteResolution={songData.noteResolution}

@@ -92,95 +92,97 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
         });
     };
 
-    return <HContainer className="item" gap={15} grow={1} wrap='wrap'>
-        <button
-            className="remove-button"
-            onClick={removeSegment}
-            title={nls.localize('vuengine/entityEditor/removeComponent', 'Remove Component')}
-        >
-            <i className='codicon codicon-x' />
-        </button>
-        <VContainer>
-            <label>From (x, y, z, parallax)</label>
-            <HContainer wrap='wrap'>
-                <input
-                    className='theia-input'
-                    style={{ width: 50 }}
-                    type='number'
-                    value={segment.fromVertex.x}
-                    onChange={e => setFromX(parseFloat(e.target.value))}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                />
-                <input
-                    className='theia-input'
-                    style={{ width: 50 }}
-                    type='number'
-                    value={segment.fromVertex.y}
-                    onChange={e => setFromY(parseFloat(e.target.value))}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                />
-                <input
-                    className='theia-input'
-                    style={{ width: 50 }}
-                    type='number'
-                    value={segment.fromVertex.z}
-                    onChange={e => setFromZ(parseFloat(e.target.value))}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                />
-                <input
-                    className='theia-input'
-                    style={{ width: 50 }}
-                    type='number'
-                    value={segment.fromVertex.parallax}
-                    onChange={e => setFromParallax(parseFloat(e.target.value))}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                />
-            </HContainer>
-        </VContainer>
-        <VContainer>
-            <label>To (x, y, z, parallax)</label>
-            <HContainer wrap='wrap'>
-                <input
-                    className='theia-input'
-                    style={{ width: 50 }}
-                    type='number'
-                    value={segment.toVertex.x}
-                    onChange={e => setToX(parseFloat(e.target.value))}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                />
-                <input
-                    className='theia-input'
-                    style={{ width: 50 }}
-                    type='number'
-                    value={segment.toVertex.y}
-                    onChange={e => setToY(parseFloat(e.target.value))}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                />
-                <input
-                    className='theia-input'
-                    style={{ width: 50 }}
-                    type='number'
-                    value={segment.toVertex.z}
-                    onChange={e => setToZ(parseFloat(e.target.value))}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                />
-                <input
-                    className='theia-input'
-                    style={{ width: 50 }}
-                    type='number'
-                    value={segment.toVertex.parallax}
-                    onChange={e => setToParallax(parseFloat(e.target.value))}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                />
-            </HContainer>
-        </VContainer>
-    </HContainer>;
+    return (
+        <HContainer className="item" gap={15} grow={1} wrap='wrap'>
+            <button
+                className="remove-button"
+                onClick={removeSegment}
+                title={nls.localize('vuengine/entityEditor/removeComponent', 'Remove Component')}
+            >
+                <i className='codicon codicon-x' />
+            </button>
+            <VContainer>
+                <label>From (x, y, z, parallax)</label>
+                <HContainer wrap='wrap'>
+                    <input
+                        className='theia-input'
+                        style={{ width: 50 }}
+                        type='number'
+                        value={segment.fromVertex.x}
+                        onChange={e => setFromX(parseFloat(e.target.value))}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    />
+                    <input
+                        className='theia-input'
+                        style={{ width: 50 }}
+                        type='number'
+                        value={segment.fromVertex.y}
+                        onChange={e => setFromY(parseFloat(e.target.value))}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    />
+                    <input
+                        className='theia-input'
+                        style={{ width: 50 }}
+                        type='number'
+                        value={segment.fromVertex.z}
+                        onChange={e => setFromZ(parseFloat(e.target.value))}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    />
+                    <input
+                        className='theia-input'
+                        style={{ width: 50 }}
+                        type='number'
+                        value={segment.fromVertex.parallax}
+                        onChange={e => setFromParallax(parseFloat(e.target.value))}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    />
+                </HContainer>
+            </VContainer>
+            <VContainer>
+                <label>To (x, y, z, parallax)</label>
+                <HContainer wrap='wrap'>
+                    <input
+                        className='theia-input'
+                        style={{ width: 50 }}
+                        type='number'
+                        value={segment.toVertex.x}
+                        onChange={e => setToX(parseFloat(e.target.value))}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    />
+                    <input
+                        className='theia-input'
+                        style={{ width: 50 }}
+                        type='number'
+                        value={segment.toVertex.y}
+                        onChange={e => setToY(parseFloat(e.target.value))}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    />
+                    <input
+                        className='theia-input'
+                        style={{ width: 50 }}
+                        type='number'
+                        value={segment.toVertex.z}
+                        onChange={e => setToZ(parseFloat(e.target.value))}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    />
+                    <input
+                        className='theia-input'
+                        style={{ width: 50 }}
+                        type='number'
+                        value={segment.toVertex.parallax}
+                        onChange={e => setToParallax(parseFloat(e.target.value))}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    />
+                </HContainer>
+            </VContainer>
+        </HContainer>
+    );
 }

@@ -28,8 +28,15 @@ interface InstrumentsProps {
     currentInstrument: number
     setCurrentInstrument: (instrument: number) => void
     setInstruments: (instruments: InstrumentConfig[]) => void
-    setSidebarTab: Dispatch<SetStateAction<number>>
+    setWaveformDialogOpen: Dispatch<SetStateAction<number>>
     setModulationDataDialogOpen: Dispatch<SetStateAction<number>>
+    playing: boolean
+    testing: boolean
+    setTesting: (testing: boolean) => void
+    setTestingDuration: (note: number) => void
+    setTestingNote: (note: number) => void
+    setTestingInstrument: (note: number) => void
+    setTestingChannel: (channel: number) => void
 }
 
 export default function Instruments(props: InstrumentsProps): React.JSX.Element {
@@ -37,8 +44,9 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
         songData,
         currentInstrument, setCurrentInstrument,
         setInstruments,
-        setSidebarTab,
-        setModulationDataDialogOpen,
+        setWaveformDialogOpen, setModulationDataDialogOpen,
+        playing,
+        testing, setTesting, setTestingDuration, setTestingChannel, setTestingNote, setTestingInstrument,
     } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
     const instrument = songData.instruments[currentInstrument];
@@ -110,8 +118,15 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
             songData={songData}
             currentInstrument={currentInstrument}
             setInstruments={setInstruments}
-            setSidebarTab={setSidebarTab}
+            setWaveformDialogOpen={setWaveformDialogOpen}
             setModulationDataDialogOpen={setModulationDataDialogOpen}
+            playing={playing}
+            testing={testing}
+            setTesting={setTesting}
+            setTestingDuration={setTestingDuration}
+            setTestingNote={setTestingNote}
+            setTestingInstrument={setTestingInstrument}
+            setTestingChannel={setTestingChannel}
         />
     </VContainer>;
 }

@@ -4,7 +4,7 @@ import { ColorMode } from '../../../../../core/browser/ves-common-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import CanvasImage from '../../Common/CanvasImage';
 import { DisplayMode } from '../../Common/VUEngineTypes';
-import { ChannelConfig, PATTERN_HEIGHT, PATTERN_MAPPING_FACTOR, PatternConfig, SongData } from '../MusicEditorTypes';
+import { ChannelConfig, MusicEvent, PATTERN_HEIGHT, PATTERN_MAPPING_FACTOR, PatternConfig, SongData } from '../MusicEditorTypes';
 import { StyledPattern, StyledPatternRemove } from './StyledComponents';
 
 interface PatternProps {
@@ -49,21 +49,20 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
         [...Array(PATTERN_HEIGHT)].map(v => result.push([...emptyLine]));
 
         // find set notes
-        let noteIndexPointer = 0;
-        pattern.notes.forEach((note, i) => {
-            // eslint-disable-next-line no-null/no-null
-            if (note !== undefined && note !== null) {
+        Object.keys(pattern.events).forEach((key: string) => {
+            const numKey = parseInt(key);
+            const note = pattern.events[numKey][MusicEvent.Note];
+            if (note) {
                 const noteYPosition = Math.round(PATTERN_MAPPING_FACTOR * note);
                 for (let k = 0; k < patternNoteWidth; k++) {
-                    result[noteYPosition][noteIndexPointer + k] = 1;
+                    result[noteYPosition][numKey * patternNoteWidth + k] = 1;
                 }
             }
-            noteIndexPointer += patternNoteWidth;
         });
 
         return [result];
     }, [
-        pattern.notes,
+        pattern.events,
         songData.noteResolution,
     ]);
 

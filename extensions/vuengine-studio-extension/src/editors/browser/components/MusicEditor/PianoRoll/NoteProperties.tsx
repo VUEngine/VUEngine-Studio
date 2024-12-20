@@ -1,14 +1,14 @@
+import { MagicWand } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React from 'react';
-import { BAR_PATTERN_LENGTH_MULT_MAP, SongData } from '../MusicEditorTypes';
+import { BAR_PATTERN_LENGTH_MULT_MAP, MusicEvent, SongData } from '../MusicEditorTypes';
 import NotePropertiesNote from './NotePropertiesNote';
 import { MetaLine, MetaLineHeader, MetaLineHeaderLine } from './StyledComponents';
-import { MagicWand, SpeakerHigh } from '@phosphor-icons/react';
 
 interface NotePropertiesProps {
     songData: SongData
-    currentNote: number
-    setCurrentNote: (currentNote: number) => void
+    currentTick: number
+    setCurrentTick: (currentTick: number) => void
     currentChannelId: number
     currentPatternId: number
     setNote: (index: number, note: number | undefined) => void
@@ -17,7 +17,7 @@ interface NotePropertiesProps {
 export default function NoteProperties(props: NotePropertiesProps): React.JSX.Element {
     const {
         songData,
-        currentNote, setCurrentNote,
+        currentTick, setCurrentTick,
         currentChannelId,
         currentPatternId,
         setNote,
@@ -27,31 +27,23 @@ export default function NoteProperties(props: NotePropertiesProps): React.JSX.El
     const pattern = channel.patterns[currentPatternId];
     const patternSize = BAR_PATTERN_LENGTH_MULT_MAP[pattern.bar] * songData.noteResolution;
 
-    let volumeL = 100;
-    let volumeR = 100;
-
     return <MetaLine style={{ bottom: 0 }}>
         <MetaLineHeader>
             <MetaLineHeaderLine title={nls.localize('vuengine/musicEditor/effects', 'Effects')}>
-                <MagicWand size={13} />
-            </MetaLineHeaderLine>
-            <MetaLineHeaderLine title={nls.localize('vuengine/musicEditor/volume', 'Volume')}>
-                <SpeakerHigh size={13} />
+                <MagicWand size={16} />
             </MetaLineHeaderLine>
         </MetaLineHeader>
         {[...Array(patternSize)].map((x, index) => {
-            volumeL = pattern.volumeL[index] ?? volumeL;
-            volumeR = pattern.volumeR[index] ?? volumeR;
+            const events = pattern.events[index] ?? {};
+            const effects = Object.keys(events).filter(e => e !== MusicEvent.Note) as MusicEvent[];
             return (
                 <NotePropertiesNote
-                    key={`pianoroll-note-properties-volume-note-${index}`}
+                    key={index}
                     index={index}
-                    effects={[]}
+                    effects={effects}
                     noteResolution={songData.noteResolution}
-                    volumeL={volumeL}
-                    volumeR={volumeR}
-                    current={currentNote === index}
-                    setCurrentNote={setCurrentNote}
+                    current={currentTick === index}
+                    setCurrentTick={setCurrentTick}
                     setNote={setNote}
                 />
             );

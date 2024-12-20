@@ -81,7 +81,7 @@ export default function MusicEditorToolbar(props: MusicEditorToolbarProps): Reac
             </StyledMusicEditorToolbarGroup>
             <StyledMusicEditorToolbarGroup>
                 <StyledMusicEditorToolbarWideButton
-                    className='theia-button secondary'
+                    className={`theia-button ${playing ? 'primary' : 'secondary'}`}
                     title={(playing
                         ? nls.localize('vuengine/musicEditor/pause', 'Pause')
                         : nls.localize('vuengine/musicEditor/play', 'Play')) +

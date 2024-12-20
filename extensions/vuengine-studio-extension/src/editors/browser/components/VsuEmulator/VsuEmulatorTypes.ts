@@ -34,7 +34,7 @@ export interface VsuChannelData {
     stereoLevels: VsuChannelStereoLevelsData
     envelope: VsuChannelEnvelopeData
     sweepMod: VsuChannelSweepModulationData
-    tapLocation: number
+    tap: number
 }
 
 export type WaveformData = number[];
@@ -107,13 +107,48 @@ export const VSU_INTERVAL_VALUES = [
     122.9,
 ];
 
-export const VSU_NOISE_TAP_LOCATIONS = [
-    15 - 1,
-    11 - 1,
-    14 - 1,
-    5 - 1,
-    9 - 1,
-    7 - 1,
-    10 - 1,
-    12 - 1,
+export const VSU_NOISE_TAP = [
+    [14, 32767],
+    [10, 1953],
+    [13, 254],
+    [4, 217],
+    [8, 73],
+    [6, 63],
+    [9, 42],
+    [11, 28],
 ];
+
+export const DEFAULT_VSU_DATA: VsuData = {
+    channels: [...Array(6)].map(c => ({
+        enabled: false,
+        interval: {
+            enabled: false,
+            value: 0,
+        },
+        frequency: 0,
+        waveform: 0,
+        stereoLevels: {
+            left: 0,
+            right: 0,
+        },
+        envelope: {
+            enabled: false,
+            repeat: false,
+            direction: false,
+            initialValue: 0,
+            stepTime: 0,
+        },
+        sweepMod: {
+            enabled: false,
+            repeat: false,
+            function: false,
+            frequency: 0,
+            interval: 0,
+            direction: false,
+            shift: 0,
+        },
+        tap: 0,
+    })) as VsuChannelData[],
+    waveforms: [...Array(6)].map((c, i) => [...Array(32)].map(w => 0)),
+    modulation: [...Array(32)].map(w => 0),
+};

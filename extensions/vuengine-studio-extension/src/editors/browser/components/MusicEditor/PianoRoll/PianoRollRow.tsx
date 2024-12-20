@@ -1,5 +1,5 @@
 import React, { Dispatch, memo, SetStateAction } from 'react';
-import { MusicEditorTool } from '../MusicEditorTypes';
+import { EventsMap, MusicEditorTool, MusicEvent } from '../MusicEditorTypes';
 import PianoRollKey from './PianoRollKey';
 import PianoRollNote from './PianoRollNote';
 import { StyledPianoRollRow } from './StyledComponents';
@@ -9,13 +9,13 @@ interface PianoRollRowProps {
     noteId: number
     currentChannelId: number
     currentPatternId: number
-    setCurrentNote: (note: number) => void
+    setCurrentTick: (note: number) => void
     channelsNotes: { [noteId: string]: number[] }[]
     setNote: (index: number, note: number | undefined) => void
     playNote: (note: number) => void
     tool: MusicEditorTool
     patternSize: number
-    notes: (number | undefined)[]
+    events: EventsMap
     lastSetNoteId: number
     setLastSetNoteId: Dispatch<SetStateAction<number>>
     noteResolution: number
@@ -28,12 +28,12 @@ export default memo(function PianoRollRow(props: PianoRollRowProps): React.JSX.E
         noteId,
         currentChannelId,
         channelsNotes,
-        setCurrentNote,
+        setCurrentTick,
         playNote,
         setNote,
         tool,
         patternSize,
-        notes,
+        events,
     } = props;
 
     const noteIdStr = noteId.toString();
@@ -47,15 +47,16 @@ export default memo(function PianoRollRow(props: PianoRollRowProps): React.JSX.E
         {[...Array(patternSize)].map((x, lineIndex) => {
             const channelsIndex = Object.keys(channelsNotes[lineIndex] ?? {}).find(key => key === noteIdStr);
             const channelNotes = channelsIndex ? channelsNotes[lineIndex][channelsIndex] : [];
+            const lineNote = events[lineIndex] ? events[lineIndex][MusicEvent.Note] ?? -1 : -1;
             return (
                 <PianoRollNote
                     key={lineIndex}
                     index={lineIndex}
                     noteId={noteId}
-                    set={notes[lineIndex] === noteId}
+                    set={lineNote === noteId}
                     currentChannelId={currentChannelId}
                     channelNotes={channelNotes}
-                    setCurrentNote={setCurrentNote}
+                    setCurrentTick={setCurrentTick}
                     playNote={playNote}
                     setNote={setNote}
                     tool={tool}
@@ -69,7 +70,7 @@ export default memo(function PianoRollRow(props: PianoRollRowProps): React.JSX.E
         oldProps.currentPatternId === newProps.currentPatternId &&
         oldProps.bar === newProps.bar &&
         oldProps.noteResolution === newProps.noteResolution &&
-        JSON.stringify(oldProps.notes) === JSON.stringify(newProps.notes);
+        JSON.stringify(oldProps.events) === JSON.stringify(newProps.events);
     /*
     newProps.notes[newProps.lastSetNoteId] !== newProps.noteId &&
     oldProps.notes[newProps.lastSetNoteId] !== newProps.noteId;

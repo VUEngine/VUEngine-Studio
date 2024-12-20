@@ -1,4 +1,4 @@
-import { CommandService, Emitter, MessageService, isWindows, nls } from '@theia/core';
+import { CommandService, Emitter, MessageService, QuickInputService, isWindows, nls } from '@theia/core';
 import { OpenerService } from '@theia/core/lib/browser';
 import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { WindowTitleService } from '@theia/core/lib/browser/window/window-title-service';
@@ -56,6 +56,8 @@ export class VesProjectService {
   protected messageService: MessageService;
   @inject(OpenerService)
   protected openerService: OpenerService;
+  @inject(QuickInputService)
+  protected readonly quickInputService: QuickInputService;
   @inject(OutputChannelManager)
   protected readonly outputChannelManager: OutputChannelManager;
   @inject(VesBuildPathsService)
@@ -285,6 +287,40 @@ export class VesProjectService {
       case 'string':
         return getValue('');
     }
+  }
+
+  async createNewFileForType(typeId: string): Promise<URI | undefined> {
+    const type = this.getProjectDataType(typeId);
+    if (this.workspaceProjectFolderUri === undefined || !type || !type.file.startsWith('.')) {
+      return;
+    }
+
+    const defaultName = nls.localize('vuengine/editors/newFileDialog/untitled', 'Untitled');
+    const filename = await this.quickInputService.input({
+      value: defaultName,
+      title: nls.localize('vuengine/projects/newFileName', 'New File Name'),
+    });
+
+    if (!filename) {
+      return;
+    }
+
+    const baseUri = this.workspaceProjectFolderUri.resolve('assets').resolve(typeId);
+    let fileUri = baseUri?.resolve(`${filename}${type.file}`);
+    let count = 1;
+    while ((await this.fileService.exists(fileUri))) {
+      fileUri = baseUri?.resolve(`${filename}-${count}${type.file}`);
+      count++;
+    }
+
+    let fileValue;
+    if (type) {
+      const data = await this.getSchemaDefaults(type);
+      fileValue = JSON.stringify(data, undefined, 4);
+    }
+    await this.fileService.create(fileUri, fileValue);
+
+    return fileUri;
   }
 
   protected setProjectDataAllKnownPlugins(plugins: { [id: string]: VesPluginsData }): void {

@@ -42,7 +42,7 @@ export default function WaveformSelect(props: WaveformSelectProps): React.JSX.El
             {([...Array(VSU_NUMBER_OF_WAVEFORM_BANKS)].map((v, x) =>
                 <NumberArrayPreview
                     key={x}
-                    maximum={64}
+                    maximum={63}
                     active={x === value}
                     data={waveforms[x]}
                     onClick={() => setValue(x)}

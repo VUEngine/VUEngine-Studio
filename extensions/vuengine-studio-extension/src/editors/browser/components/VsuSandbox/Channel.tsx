@@ -14,7 +14,7 @@ import {
     VSU_FREQUENCY_MAX,
     VSU_FREQUENCY_MIN,
     VSU_INTERVAL_VALUES,
-    VSU_NOISE_TAP_LOCATIONS,
+    VSU_NOISE_TAP,
     VSU_SWEEP_MODULATION_FREQUENCY_MAX,
     VSU_SWEEP_MODULATION_FREQUENCY_MIN,
     VSU_SWEEP_MODULATION_INTERVAL_MAX,
@@ -74,10 +74,10 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
         });
     };
 
-    const setTapLocation = (tapLocation: number) => {
+    const setTap = (tap: number) => {
         setChannel({
             ...channel,
-            tapLocation,
+            tap,
         });
     };
 
@@ -280,15 +280,15 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                 {isNoiseChannel &&
                     <VContainer>
                         <label>
-                            {nls.localize('vuengine/vsuSandbox/tapLocation', 'Tap Location')}
+                            {nls.localize('vuengine/vsuSandbox/tap', 'Tap')}
                         </label>
                         <select
                             className="theia-select"
-                            value={channel?.tapLocation ?? 0}
-                            onChange={e => setTapLocation(parseInt(e.target.value))}
+                            value={channel?.tap ?? 0}
+                            onChange={e => setTap(parseInt(e.target.value))}
                         >
-                            {VSU_NOISE_TAP_LOCATIONS.map((tl, i) =>
-                                <option value={i}>{tl}</option>
+                            {VSU_NOISE_TAP.map((tl, i) =>
+                                <option value={i}>{tl[0]}</option>
                             )}
                         </select>
                     </VContainer>

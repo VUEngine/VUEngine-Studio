@@ -18,7 +18,7 @@ export default function StepIndicator(props: StepIndicatorProps): React.JSX.Elem
         const elapsedNotesWidth = currentStep * noteWidth;
         const dividers4Total = Math.round(currentStep / 4);
         const dividersNoteResolutionTotal = Math.round(currentStep / (noteResolution ?? 1));
-        offset = headerWidth + elapsedNotesWidth + dividers4Total + dividersNoteResolutionTotal;
+        offset = 2 + headerWidth + elapsedNotesWidth + dividers4Total + dividersNoteResolutionTotal;
     } else {
         const patternNoteWidth = 16 / noteResolution;
         const headerPadding = 3;
@@ -32,7 +32,8 @@ export default function StepIndicator(props: StepIndicatorProps): React.JSX.Elem
         top: isPianoRoll ? 14 : 0,
         bottom: isPianoRoll ? undefined : 11,
         height: isPianoRoll ? 845 : undefined,
-        width: isPianoRoll ? 3 : 1,
+        opacity: isPianoRoll ? .5 : 1,
+        width: isPianoRoll ? 15 : 1,
     };
 
     return <StyledStepIndicator style={style} />;

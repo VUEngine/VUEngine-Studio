@@ -1,10 +1,12 @@
 import { nls } from '@theia/core';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Tab, TabList, TabPanel, Tabs } from 'react-tabs';
+import { VesEditorsPreferenceIds } from '../../ves-editors-preferences';
+import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
-import { clamp } from '../Common/Utils';
 import VContainer from '../Common/Base/VContainer';
-import VsuEmulator from '../VsuEmulator/VseEmulator';
+import { clamp } from '../Common/Utils';
+import VsuEmulator from '../VsuEmulator/VsuEmulator';
 import { VSU_FREQUENCY_MAX, VSU_FREQUENCY_MIN, VSU_NUMBER_OF_CHANNELS, VSU_NUMBER_OF_WAVEFORM_BANKS, VsuChannelData, VsuData } from '../VsuEmulator/VsuEmulatorTypes';
 import Channel from './Channel';
 import ModulationData from './ModulationData';
@@ -17,8 +19,17 @@ interface VsuSandboxProps {
 }
 
 export default function VsuSandbox(props: VsuSandboxProps): React.JSX.Element {
+    const { services } = useContext(EditorsContext) as EditorsContextType;
     const { data, updateData } = props;
     const [pianoChannel, setPianoChannel] = useState<number>(0);
+    const autoPlay = services.preferenceService.get(VesEditorsPreferenceIds.EDITORS_VSU_SANDBOX_AUTO_START) as boolean;
+    const [initialized, setInitialized] = useState<boolean>(false);
+    const [enabled, setEnabled] = useState<boolean>(autoPlay);
+
+    const toggleEnabled = () => {
+        const updatedEnabled = !enabled;
+        setEnabled(updatedEnabled);
+    };
 
     const setWaveform = (channel: number, waveform: number[]): void => {
         const waveforms = [
@@ -64,7 +75,23 @@ export default function VsuSandbox(props: VsuSandboxProps): React.JSX.Element {
     return <VContainer>
         <VsuEmulator
             data={data}
+            enabled={enabled}
+            setInitialized={setInitialized}
         />
+        <button
+            className={initialized && enabled
+                ? 'theia-button'
+                : 'theia-button secondary'
+            }
+            style={{
+                width: 70,
+            }}
+            disabled={initialized === undefined}
+            onClick={toggleEnabled}
+        >
+            <i className={`fa fa-${initialized && enabled ? 'stop' : 'play'}`}
+            />
+        </button>
         <Tabs>
             <TabList>
                 <Tab key="tab-channels">

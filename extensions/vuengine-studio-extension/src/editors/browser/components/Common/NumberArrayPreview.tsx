@@ -1,11 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const Column = styled.div`
-    background-color: var(--theia-dropdown-border);
-    width: 1px;
-`;
-
 const ColumnContainer = styled.div`
     align-items: end;
     border: 1px solid var(--theia-dropdown-border);
@@ -13,10 +8,12 @@ const ColumnContainer = styled.div`
     cursor: pointer;
     display: flex;
     height: 32px;
-    width: 32px;
     overflow: hidden;
     padding: 1px;
+    position: relative;
     user-select: none;
+    width: 32px;
+    z-index: 1;
 
     &:hover {
         border-color: var(--theia-button-background) !important;
@@ -27,6 +24,8 @@ interface NumberArrayPreviewProps {
     active?: boolean
     maximum: number
     data: number[]
+    height?: number
+    width?: number
     title?: string
     onClick?: () => void
     onMouseEnter?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
@@ -34,25 +33,27 @@ interface NumberArrayPreviewProps {
 }
 
 export default function NumberArrayPreview(props: NumberArrayPreviewProps): React.JSX.Element {
-    const { active, maximum, data, title, onClick, onMouseEnter, onMouseLeave } = props;
+    const { active, maximum, data, height, width, title, onClick, onMouseEnter, onMouseLeave } = props;
 
     return <ColumnContainer
-        style={{
-            borderColor: active ? 'var(--theia-editor-foreground)' : undefined,
-        }}
         onClick={onClick}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
-        className={active ? 'active' : undefined}
+        style={{
+            borderColor: active ? 'var(--theia-editor-foreground)' : undefined,
+            height,
+            width,
+        }}
         title={title}
     >
-        {[...Array(32)].map((h, y) => {
+        {[...Array(data.length)].map((h, y) => {
             const v = data[y] ?? maximum;
-            return <Column
+            return <div
                 key={y}
                 style={{
-                    backgroundColor: active ? 'var(--theia-editor-foreground)' : undefined,
-                    height: `${(v + 1) * 100 / maximum}%`
+                    height: `${v * 100 / maximum}%`,
+                    backgroundColor: active ? 'var(--theia-editor-foreground)' : 'var(--theia-dropdown-border)',
+                    width: (width ?? 32) / data.length,
                 }}
             />;
         })}

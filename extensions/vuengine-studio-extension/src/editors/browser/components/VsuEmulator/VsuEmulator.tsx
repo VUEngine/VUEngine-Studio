@@ -1,32 +1,18 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { VesEditorsPreferenceIds } from '../../ves-editors-preferences';
 import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import { VSU_SAMPLE_RATE, VsuData } from './VsuEmulatorTypes';
 
 interface VsuEmulatorProps {
     data: VsuData
+    enabled: boolean
+    setInitialized: (initialized: boolean) => void
 }
 
 export default function VsuEmulator(props: VsuEmulatorProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
-    const { data } = props;
+    const { data, enabled, setInitialized } = props;
     const audioContextRef = useRef<AudioContext>();
     const [vsuEmulator, setVsuEmulator] = useState<AudioWorkletNode>();
-    const autoPlay = services.preferenceService.get(VesEditorsPreferenceIds.EDITORS_VSU_SANDBOX_AUTO_START) as boolean;
-    const [enabled, setEnabled] = useState<boolean>(autoPlay);
-    const [initialized, setInitialized] = useState<boolean>(false);
-
-    const toggleEnabled = () => {
-        const updatedEnabled = !enabled;
-
-        if (updatedEnabled) {
-            audioContextRef.current?.resume();
-        } else {
-            audioContextRef.current?.suspend();
-        }
-
-        setEnabled(updatedEnabled);
-    };
 
     const createAudioContext = async (): Promise<void> => {
         const resourcesUri = await services.vesCommonService.getResourcesUri();
@@ -67,6 +53,14 @@ export default function VsuEmulator(props: VsuEmulatorProps): React.JSX.Element 
         createAudioContext();
         return () => closeAudioContext();
     }, []);
+
+    useEffect(() => {
+        if (enabled) {
+            audioContextRef.current?.resume();
+        } else {
+            audioContextRef.current?.suspend();
+        }
+    }, [enabled]);
 
     useEffect(() => vsuEmulator?.port.postMessage({ field: 'ch1EnvDirection', data: data.channels[0].envelope.direction }), [vsuEmulator, data.channels[0].envelope.direction]);
     useEffect(() => vsuEmulator?.port.postMessage({ field: 'ch2EnvDirection', data: data.channels[1].envelope.direction }), [vsuEmulator, data.channels[1].envelope.direction]);
@@ -135,7 +129,7 @@ export default function VsuEmulator(props: VsuEmulatorProps): React.JSX.Element 
     useEffect(() => vsuEmulator?.port.postMessage({ field: 'ch5ModFrequency', data: data.channels[4].sweepMod.frequency }), [vsuEmulator, data.channels[4].sweepMod.frequency]);
     useEffect(() => vsuEmulator?.port.postMessage({ field: 'ch5ModRepeat', data: data.channels[4].sweepMod.repeat }), [vsuEmulator, data.channels[4].sweepMod.repeat]);
     useEffect(() => vsuEmulator?.port.postMessage({ field: 'ch5SweepShift', data: data.channels[4].sweepMod.shift }), [vsuEmulator, data.channels[4].sweepMod.shift]);
-    useEffect(() => vsuEmulator?.port.postMessage({ field: 'ch6TapLocation', data: data.channels[5].tapLocation }), [vsuEmulator, data.channels[5].tapLocation]);
+    useEffect(() => vsuEmulator?.port.postMessage({ field: 'ch6Tap', data: data.channels[5].tap }), [vsuEmulator, data.channels[5].tap]);
     useEffect(() => vsuEmulator?.port.postMessage({ field: 'waveform1', data: data.waveforms[0] }), [vsuEmulator, data.waveforms[0]]);
     useEffect(() => vsuEmulator?.port.postMessage({ field: 'waveform2', data: data.waveforms[1] }), [vsuEmulator, data.waveforms[1]]);
     useEffect(() => vsuEmulator?.port.postMessage({ field: 'waveform3', data: data.waveforms[2] }), [vsuEmulator, data.waveforms[2]]);
@@ -149,18 +143,5 @@ export default function VsuEmulator(props: VsuEmulatorProps): React.JSX.Element 
     useEffect(() => vsuEmulator?.port.postMessage({ field: 'ch5Enabled', data: data.channels[4].enabled }), [vsuEmulator, data.channels[4].enabled]);
     useEffect(() => vsuEmulator?.port.postMessage({ field: 'ch6Enabled', data: data.channels[5].enabled }), [vsuEmulator, data.channels[5].enabled]);
 
-    return <button
-        className={initialized && enabled
-            ? 'theia-button'
-            : 'theia-button secondary'
-        }
-        style={{
-            width: 70,
-        }}
-        disabled={initialized === undefined}
-        onClick={toggleEnabled}
-    >
-        <i className={`fa fa-${initialized && enabled ? 'stop' : 'play'}`}
-        />
-    </button>;
+    return <></>;
 }

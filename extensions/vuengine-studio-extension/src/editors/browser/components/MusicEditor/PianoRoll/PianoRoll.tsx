@@ -8,8 +8,8 @@ import { StyledPianoRoll } from './StyledComponents';
 
 interface PianoRollProps {
     songData: SongData
-    currentNote: number
-    setCurrentNote: (currentNote: number) => void
+    currentTick: number
+    setCurrentTick: (currentTick: number) => void
     currentChannelId: number
     currentPatternId: number
     currentPatternNoteOffset: number
@@ -29,7 +29,7 @@ interface PianoRollProps {
 export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
     const {
         songData,
-        currentNote, setCurrentNote,
+        currentTick, setCurrentTick,
         currentChannelId,
         currentPatternId,
         currentPatternNoteOffset,
@@ -47,7 +47,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
 
     const classNames = [
         `noteResolution-${songData.noteResolution}`,
-        `currentNote-${currentNote}`,
+        `currentTick-${currentTick}`,
     ];
 
     if (currentPatternId === -1) {
@@ -95,7 +95,7 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
             currentPatternId={currentPatternId}
             currentPatternNoteOffset={currentPatternNoteOffset}
             currentSequenceIndex={currentSequenceIndex}
-            setCurrentNote={setCurrentNote}
+            setCurrentTick={setCurrentTick}
             setNote={setNote}
             playNote={playNote}
             tool={tool}
@@ -104,8 +104,8 @@ export default function PianoRoll(props: PianoRollProps): React.JSX.Element {
         />
         <NoteProperties
             songData={songData}
-            currentNote={currentNote}
-            setCurrentNote={setCurrentNote}
+            currentTick={currentTick}
+            setCurrentTick={setCurrentTick}
             currentChannelId={currentChannelId}
             currentPatternId={currentPatternId}
             setNote={setNote}

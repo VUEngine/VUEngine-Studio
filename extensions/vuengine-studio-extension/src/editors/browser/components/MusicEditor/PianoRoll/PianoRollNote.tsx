@@ -8,14 +8,14 @@ interface PianoRollNoteProps {
     set: boolean
     currentChannelId: number
     channelNotes: number[]
-    setCurrentNote: (note: number) => void
+    setCurrentTick: (note: number) => void
     setNote: (index: number, note: number | undefined) => void
     playNote: (note: number) => void
     tool: MusicEditorTool
 }
 
 export default function PianoRollNote(props: PianoRollNoteProps): React.JSX.Element {
-    const { index, noteId, set, currentChannelId, channelNotes, playNote, setCurrentNote, setNote, tool } = props;
+    const { index, noteId, set, currentChannelId, channelNotes, playNote, setCurrentTick, setNote, tool } = props;
 
     const classNames = [];
     if (set) {
@@ -29,7 +29,7 @@ export default function PianoRollNote(props: PianoRollNoteProps): React.JSX.Elem
         } else {
             setNote(index, noteId);
             playNote(noteId);
-            setCurrentNote(index);
+            setCurrentTick(index);
         }
     };
 

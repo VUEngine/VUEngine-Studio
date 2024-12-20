@@ -12,12 +12,8 @@ interface AddPatternProps {
 }
 
 export default function AddPattern(props: AddPatternProps): React.JSX.Element {
-    const {
-        songData,
-        channel, setChannel,
-        setCurrentPatternId,
-    } = props;
     const { services } = useContext(EditorsContext) as EditorsContextType;
+    const { songData, channel, setChannel, setCurrentPatternId } = props;
 
     const addToSequence = async (channelId: number, patternId: number): Promise<void> => {
         const updatedChannel = {

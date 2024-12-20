@@ -33,7 +33,7 @@ export default function ScriptedAction(props: ScriptedActionProps): React.JSX.El
             title: nls.localize('vuengine/editors/addAction', 'Add Action'),
             placeholder: nls.localize('vuengine/editors/selectActionToAdd', 'Select an action to add...'),
         };
-        let previopusCategory = '';
+        let previousCategory = '';
         const items: (QuickPickItem | QuickPickSeparator)[] = [];
         Object.values(AVAILABLE_ACTIONS)
             .sort((a, b) => {
@@ -44,8 +44,8 @@ export default function ScriptedAction(props: ScriptedActionProps): React.JSX.El
                 return 0;
             })
             .map(a => {
-                if (previopusCategory !== a.category) {
-                    previopusCategory = a.category;
+                if (previousCategory !== a.category) {
+                    previousCategory = a.category;
                     items.push({
                         type: 'separator',
                         label: a.category,

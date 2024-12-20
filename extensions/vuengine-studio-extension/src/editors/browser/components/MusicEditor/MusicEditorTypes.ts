@@ -6,51 +6,55 @@ export interface SongData {
     channels: ChannelConfig[]
     instruments: InstrumentConfig[]
     speed: number
-    waveforms: number[][]
     noteResolution: number
     loop: boolean
     defaultBar: string
     section: DataSection
 }
 
+export enum MusicEvent {
+    Instrument = 'instrument',
+    Note = 'note',
+    NoteCut = 'noteCut',
+    Volume = 'volume',
+    MasterVolume = 'masterVolume',
+}
+
+export type MusicEventMap = Record<string, number>;
+export type EventsMap = Record<number, MusicEventMap>;
+
 export interface PatternConfig {
     name: string
     bar: string
-    notes: (number | undefined)[]
-    volumeL: (number | undefined)[]
-    volumeR: (number | undefined)[]
-    effects: (string[] | undefined)[]
+    events: EventsMap
 }
 
 export interface ChannelConfig {
     id: number
+    type: MusicEditorChannelType
     instrument: number
     sequence: number[]
     patterns: PatternConfig[]
+    allowSkip: boolean
     muted: boolean
     solo: boolean
 }
 
 export interface InstrumentConfig {
     name: string
-    type: MusicEditorInstrumentType
-    waveform: number
+    type: MusicEditorChannelType
+    waveform: string
     volume: VsuChannelStereoLevelsData
     interval: VsuChannelIntervalData
     envelope: VsuChannelEnvelopeData
     sweepMod: VsuChannelSweepModulationData
     modulationData: number[]
-    tapLocation: number
+    tap: number
 }
 
-export interface SongNote {
-    note: string | undefined
-    volumeL: number | undefined
-    volumeR: number | undefined
-}
-
-export enum MusicEditorInstrumentType {
+export enum MusicEditorChannelType {
     WAVE = 'wave',
+    SWEEPMOD = 'sweepMod',
     NOISE = 'noise',
 }
 
@@ -226,7 +230,7 @@ export const BAR_PATTERN_LENGTH_MULT_MAP: { [bar: string]: number } = {
     '7/8': 3.5,
     '11/8': 5.5,
     '4/16': 1,
-    '15/16': 4.6875,
+    '15/16': 3.75,
     '12/16': 3,
 };
 
@@ -238,3 +242,5 @@ export const CHANNEL_BG_COLORS = [
     '#df6745',
     '#e370a9',
 ];
+
+export const SINGLE_NOTE_TESTING_DURATION = 300;

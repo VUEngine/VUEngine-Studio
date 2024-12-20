@@ -1,31 +1,34 @@
 import React from 'react';
-import { MetaLineNote, MetaLineNoteEffects, MetaLineNoteVolume, MetaLineNoteVolumeChannel } from './StyledComponents';
+import { MusicEvent } from '../MusicEditorTypes';
+import { MetaLineNote, MetaLineNoteEffects } from './StyledComponents';
+import { AVAILABLE_EVENTS } from '../Sidebar/AvailableEvents';
 
 interface NotePropertiesNoteProps {
     index: number
     current: boolean
-    effects: string[]
-    volumeL: number
-    volumeR: number
+    effects: MusicEvent[]
     noteResolution: number
-    setCurrentNote: (currentNote: number) => void
+    setCurrentTick: (currentTick: number) => void
     setNote: (index: number, note: number | undefined) => void
 }
 
 export default function NotePropertiesNote(props: NotePropertiesNoteProps): React.JSX.Element {
-    const { index, current, volumeL, volumeR, effects, setCurrentNote, setNote } = props;
+    const { index, current, effects, setCurrentTick, setNote } = props;
+
+    let effectsLabel;
+    if (effects.length > 1) {
+        effectsLabel = effects.length;
+    } else if (effects.length === 1) {
+        effectsLabel = AVAILABLE_EVENTS[effects[0]].shortId;
+    }
 
     return <MetaLineNote
         className={current ? 'current' : undefined}
-        onClick={() => setCurrentNote(index)}
+        onClick={() => setCurrentTick(index)}
         onContextMenu={() => setNote(index, undefined)}
     >
         <MetaLineNoteEffects>
-            {effects.join('/')}
+            {effectsLabel}
         </MetaLineNoteEffects>
-        <MetaLineNoteVolume>
-            <MetaLineNoteVolumeChannel style={{ height: `${volumeL}%` }} />
-            <MetaLineNoteVolumeChannel style={{ height: `${volumeR}%` }} />
-        </MetaLineNoteVolume>
     </MetaLineNote>;
 }

@@ -68,7 +68,7 @@ export default function Song(props: SongProps): React.JSX.Element {
 
         <VContainer>
             <label>
-                {nls.localize('vuengine/musicEditor/speedBpm', 'Speed (BPM)')}
+                {nls.localize('vuengine/musicEditor/tickDurationUs', 'Tick duration (in microseconds)')}
             </label>
             <HContainer>
                 <input

@@ -5,6 +5,7 @@ import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
 import { ChannelConfig, SongData } from '../MusicEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
+import HoverInfo from '../../Common/HoverInfo';
 
 interface CurrentChannelProps {
     songData: SongData
@@ -36,66 +37,90 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
         });
     };
 
+    const toggleChannelAllowSkip = (): void => {
+        setChannel(currentChannelId, {
+            allowSkip: !songData.channels[currentChannelId].allowSkip,
+        });
+    };
+
     const editInstrument = (): void => {
         setCurrentInstrument(channel.instrument);
         setSidebarTab(1);
     };
 
-    return <VContainer gap={15}>
-        <VContainer>
-            <label>
-                {nls.localize('vuengine/musicEditor/currentChannel', 'Current Channel')}
-            </label>
-            <BasicSelect
-                options={[{
-                    label: `1: ${nls.localize('vuengine/musicEditor/wave', 'Wave')} 1`,
-                    value: 0,
-                }, {
-                    label: `2: ${nls.localize('vuengine/musicEditor/wave', 'Wave')} 2`,
-                    value: 1,
-                }, {
-                    label: `3: ${nls.localize('vuengine/musicEditor/wave', 'Wave')} 3`,
-                    value: 2,
-                }, {
-                    label: `4: ${nls.localize('vuengine/musicEditor/wave', 'Wave')} 4`,
-                    value: 3,
-                }, {
-                    label: `5: ${nls.localize('vuengine/musicEditor/sweepModulation', 'Sweep / Modulation')}`,
-                    value: 4,
-                }, {
-                    label: `6: ${nls.localize('vuengine/musicEditor/noise', 'Noise')}`,
-                    value: 5,
-                }]}
-                value={channel.id}
-                onChange={e => setCurrentChannelId(parseInt(e.target.value))}
-            />
-        </VContainer>
-
-        <HContainer alignItems='end' gap={20}>
-            <VContainer grow={1}>
-                <label>
-                    {nls.localize('vuengine/musicEditor/instrument', 'Instrument')}
-                </label>
-                <InputWithAction>
-                    <select
-                        className='theia-select'
-                        onChange={e => setChannelInstrument(parseInt(e.target.value))}
-                        value={channel.instrument}
-                    >
-                        {songData.instruments.map((n, i) =>
-                            <option key={`instrument-select-${i}`} value={i}>{n.name}</option>
-                        )}
-                    </select>
-                    <InputWithActionButton
-                        className='theia-button secondary'
-                        title={nls.localize('vuengine/musicEditor/editInstrument', 'Edit Instrument')}
-                        onClick={editInstrument}
-                    >
-                        <i className='codicon codicon-settings-gear' />
-                    </InputWithActionButton>
-                </InputWithAction>
-            </VContainer>
+    return (
+        <VContainer gap={15}>
             <VContainer>
+                <label>
+                    {nls.localize('vuengine/musicEditor/currentChannel', 'Current Channel')}
+                </label>
+                <BasicSelect
+                    options={[{
+                        label: `1: ${nls.localize('vuengine/musicEditor/wave', 'Wave')} 1`,
+                        value: 0,
+                    }, {
+                        label: `2: ${nls.localize('vuengine/musicEditor/wave', 'Wave')} 2`,
+                        value: 1,
+                    }, {
+                        label: `3: ${nls.localize('vuengine/musicEditor/wave', 'Wave')} 3`,
+                        value: 2,
+                    }, {
+                        label: `4: ${nls.localize('vuengine/musicEditor/wave', 'Wave')} 4`,
+                        value: 3,
+                    }, {
+                        label: `5: ${nls.localize('vuengine/musicEditor/sweepModulation', 'Sweep / Modulation')}`,
+                        value: 4,
+                    }, {
+                        label: `6: ${nls.localize('vuengine/musicEditor/noise', 'Noise')}`,
+                        value: 5,
+                    }]}
+                    value={channel.id}
+                    onChange={e => setCurrentChannelId(parseInt(e.target.value))}
+                />
+            </VContainer>
+
+            <HContainer alignItems='end' gap={20}>
+                <VContainer grow={1}>
+                    <label>
+                        {nls.localize('vuengine/musicEditor/instrument', 'Instrument')}
+                    </label>
+                    <InputWithAction>
+                        <select
+                            className='theia-select'
+                            onChange={e => setChannelInstrument(parseInt(e.target.value))}
+                            value={channel.instrument}
+                        >
+                            {songData.instruments.map((n, i) =>
+                                <option key={`instrument-select-${i}`} value={i}>{n.name}</option>
+                            )}
+                        </select>
+                        <InputWithActionButton
+                            className='theia-button secondary'
+                            title={nls.localize('vuengine/musicEditor/editInstrument', 'Edit Instrument')}
+                            onClick={editInstrument}
+                        >
+                            <i className='codicon codicon-settings-gear' />
+                        </InputWithActionButton>
+                    </InputWithAction>
+                </VContainer>
+            </HContainer>
+            <HContainer gap={10}>
+                <VContainer>
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={channel.allowSkip}
+                            onChange={() => toggleChannelAllowSkip()}
+                        />
+                        {nls.localize('vuengine/musicEditor/skip', 'Skip')}
+                        <HoverInfo
+                            value={nls.localize(
+                                'vuengine/musicEditor/allowSkipDescription',
+                                'Allow to skip notes during play back if no sound source is available at the time.'
+                            )}
+                        />
+                    </label>
+                </VContainer>
                 <VContainer>
                     <label>
                         <input
@@ -116,7 +141,7 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                         {nls.localize('vuengine/musicEditor/solo', 'Solo')}
                     </label>
                 </VContainer>
-            </VContainer>
-        </HContainer>
-    </VContainer>;
+            </HContainer>
+        </VContainer>
+    );
 }

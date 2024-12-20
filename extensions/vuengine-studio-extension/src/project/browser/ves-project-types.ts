@@ -107,6 +107,10 @@ export interface WithContributor {
   _contributorUri: URI
 }
 
+export interface WithId {
+  _id: string
+}
+
 export interface WithFileUri {
   _fileUri: URI
 }
@@ -789,7 +793,7 @@ export const defaultProjectData: ProjectData = {
                   },
                   additionalProperties: false,
                 },
-                tapLocation: {
+                tap: {
                   type: 'integer',
                   minimum: 0,
                   maximum: 7
