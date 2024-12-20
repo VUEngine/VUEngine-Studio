@@ -2,9 +2,9 @@
 
 This document describes which breaking changes have been made to VUEngine Studio and VUEngine Core and which actions need to be taken by the developer in order to update existing VUEngine Studio projects.
 
-## VUEngine Studio Preview v0.6.0
+## VUEngine Studio v1.0.0
 
--
+...
 
 ## VUEngine Studio Preview v0.5.0
 

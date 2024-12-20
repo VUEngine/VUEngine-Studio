@@ -3,7 +3,7 @@
   "name": "vuengine-studio",
   "description": "Nintendo Virtual Boy game development application",
   "productName": "VUEngine Studio",
-  "version": "0.6.0",
+  "version": "1.0.0",
   "main": "scripts/ves-electron-main.js",
   "license": "MIT",
   "author": "KR155E <c.radke@posteo.de>",
