@@ -4,7 +4,6 @@
 #ifndef ROM_INFO_H_
 #define ROM_INFO_H_
 
-
 {{ macros.sectionHeader('ROM Info') }}
 
 // game title (20 chars) 	 ####################
@@ -15,6 +14,5 @@
 #define __GAME_CODE			"{{ (item.gameCodeSystem ~ ' ') | truncate(1, true, '') }}{{ (item.gameCodeId ~ '  ') | truncate(2, true, '') }}{{ (item.gameCodeLanguage ~ ' ') | truncate(1, true, '') }}"
 // revision (1.x)			 #
 #define __ROM_VERSION		 {{ (item.revision ~ '') | truncate(1, true, '') }}
-
 
 #endif

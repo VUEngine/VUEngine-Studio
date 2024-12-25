@@ -6,7 +6,6 @@
 #ifndef PLUGINS_CONFIG_H_
 #define PLUGINS_CONFIG_H_
 
-
 {{ macros.sectionHeader('Configuration Macros') }}
 {% if installedPlugins is defined and allPlugins is defined -%}
 	{%- for installedPluginId in installedPlugins | keys | sort -%}

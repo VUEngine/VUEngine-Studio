@@ -32,6 +32,7 @@
           "workbench.startupEditor": "welcomePageInEmptyWorkbench",
           "workbench.tree.renderIndentGuides": "none",
           "editor.detectIndentation": false,
+          "editor.inlayHints.fontSize": 10,
           "editor.insertSpaces": false,
           "editor.rulers": [
             108
