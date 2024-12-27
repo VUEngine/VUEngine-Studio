@@ -68,7 +68,7 @@ export default function Song(props: SongProps): React.JSX.Element {
 
         <VContainer>
             <label>
-                {nls.localize('vuengine/musicEditor/tickDurationUs', 'Tick duration (in microseconds)')}
+                {nls.localize('vuengine/musicEditor/tickDurationMs', 'Tick duration (in milliseconds)')}
             </label>
             <HContainer>
                 <input
@@ -76,7 +76,7 @@ export default function Song(props: SongProps): React.JSX.Element {
                     value={songData.speed}
                     max={MAX_SPEED}
                     min={MIN_SPEED}
-                    step={10}
+                    step={1}
                     onChange={e => setSpeed(parseInt(e.target.value))}
                 />
                 <div style={{ minWidth: 24, overflow: 'hidden', textAlign: 'right', width: 24 }}>

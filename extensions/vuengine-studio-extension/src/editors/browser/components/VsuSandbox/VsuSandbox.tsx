@@ -23,7 +23,6 @@ export default function VsuSandbox(props: VsuSandboxProps): React.JSX.Element {
     const { data, updateData } = props;
     const [pianoChannel, setPianoChannel] = useState<number>(0);
     const autoPlay = services.preferenceService.get(VesEditorsPreferenceIds.EDITORS_VSU_SANDBOX_AUTO_START) as boolean;
-    const [initialized, setInitialized] = useState<boolean>(false);
     const [enabled, setEnabled] = useState<boolean>(autoPlay);
 
     const toggleEnabled = () => {
@@ -76,20 +75,19 @@ export default function VsuSandbox(props: VsuSandboxProps): React.JSX.Element {
         <VsuEmulator
             data={data}
             enabled={enabled}
-            setInitialized={setInitialized}
+            onTick={() => { }}
         />
         <button
-            className={initialized && enabled
+            className={enabled
                 ? 'theia-button'
                 : 'theia-button secondary'
             }
             style={{
                 width: 70,
             }}
-            disabled={initialized === undefined}
             onClick={toggleEnabled}
         >
-            <i className={`fa fa-${initialized && enabled ? 'stop' : 'play'}`}
+            <i className={`fa fa-${enabled ? 'stop' : 'play'}`}
             />
         </button>
         <Tabs>

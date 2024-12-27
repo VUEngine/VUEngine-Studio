@@ -59,6 +59,8 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
     const [testingChannel, setTestingChannel] = useState<number>(0);
     const [tool, setTool] = useState<MusicEditorTool>(MusicEditorTool.DEFAULT);
     const [editorMode, setEditorMode] = useState<MusicEditorMode>(MusicEditorMode.PIANOROLL);
+    const [playbackElapsedTime, setPlaybackElapsedTime] = useState<number>(0);
+    const [totalLength, setTotalLength] = useState<number>(0);
     const [currentStep, setCurrentStep] = useState<number>(-1);
     const [currentChannelId, setCurrentChannelId] = useState<number>(0);
     const [currentSequenceIndex, setCurrentSequenceIndex] = useState<number>(0);
@@ -167,8 +169,8 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
     };
 
     const stopPlaying = (): void => {
-        setCurrentStep(-1);
         setPlaying(false);
+        setCurrentStep(-1);
     };
 
     const toggleChannelMuted = (channelId: number): void => {
@@ -312,6 +314,10 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                 playRangeStart={playRangeStart}
                 playRangeEnd={playRangeEnd}
                 currentPatternNoteOffset={currentPatternNoteOffset}
+                playbackElapsedTime={playbackElapsedTime}
+                setPlaybackElapsedTime={setPlaybackElapsedTime}
+                totalLength={totalLength}
+                setTotalLength={setTotalLength}
             />
             <VContainer gap={0} grow={1} overflow="hidden">
                 <MusicEditorToolbar
@@ -323,6 +329,9 @@ export default function MusicEditor(props: MusicEditorProps): React.JSX.Element 
                     stopPlaying={stopPlaying}
                     tool={tool}
                     setTool={setTool}
+                    playbackElapsedTime={playbackElapsedTime}
+                    totalLength={totalLength}
+                    speed={songData.speed}
                 />
                 {editorMode === MusicEditorMode.TRACKER
                     ? <Tracker />

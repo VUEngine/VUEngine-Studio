@@ -1,27 +1,31 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
+import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import VsuEmulator from '../VsuEmulator/VsuEmulator';
 import { DEFAULT_VSU_DATA, VsuChannelData, VsuData } from '../VsuEmulator/VsuEmulatorTypes';
-import { BAR_PATTERN_LENGTH_MULT_MAP, EventsMap, MusicEditorChannelType, MusicEvent, NOTES, SongData } from './MusicEditorTypes';
-import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import { WaveFormData } from '../WaveFormEditor/WaveFormEditorTypes';
+import { BAR_PATTERN_LENGTH_MULT_MAP, EventsMap, MusicEditorChannelType, MusicEvent, NOTES, SongData } from './MusicEditorTypes';
 
 interface MusicPlayerStateRef {
+    playing: boolean
+    currentStep: number
     songData: SongData
     flatEventsMap: Record<number, EventsMap>
     vsuData: VsuData
     playRangeStart: number
     playRangeEnd: number
     currentPatternNoteOffset: number
+    totalLength: number
+    startTime: number
 }
 
 interface MusicPlayerProps {
     songData: SongData
     currentStep: number
-    setCurrentStep: (currentStep: number) => void
+    setCurrentStep: React.Dispatch<React.SetStateAction<number>>
     playing: boolean
-    setPlaying: (playing: boolean) => void
+    setPlaying: React.Dispatch<React.SetStateAction<boolean>>
     testing: boolean
-    setTesting: (playing: boolean) => void
+    setTesting: React.Dispatch<React.SetStateAction<boolean>>
     testingInstrument: number
     testingNote: number
     testingDuration: number
@@ -29,6 +33,10 @@ interface MusicPlayerProps {
     playRangeStart: number
     playRangeEnd: number
     currentPatternNoteOffset: number
+    playbackElapsedTime: number
+    setPlaybackElapsedTime: React.Dispatch<React.SetStateAction<number>>
+    totalLength: number
+    setTotalLength: React.Dispatch<React.SetStateAction<number>>
 }
 
 export default function MusicPlayer(props: MusicPlayerProps): React.JSX.Element {
@@ -38,17 +46,20 @@ export default function MusicPlayer(props: MusicPlayerProps): React.JSX.Element 
         currentStep, setCurrentStep,
         playing, setPlaying,
         testing, setTesting, testingDuration, testingNote, testingInstrument, testingChannel,
-        playRangeStart, playRangeEnd, currentPatternNoteOffset
+        playRangeStart, playRangeEnd, currentPatternNoteOffset,
+        playbackElapsedTime, setPlaybackElapsedTime,
+        totalLength, setTotalLength
     } = props;
     const [flatEventsMap, setFlatEventsMap] = useState<Record<number, EventsMap>>({});
-    const [totalLength, setTotalLength] = useState<number>(0);
+    const [startTime, setStartTime] = useState<number>(0);
     const [vsuData, setVsuData] = useState<VsuData>(DEFAULT_VSU_DATA);
     const [timer, setTimer] = useState<NodeJS.Timeout>();
-    const [initialized, setInitialized] = useState<boolean>(false);
     const stateRef = useRef<MusicPlayerStateRef>();
 
     // This always has the current state, even from the timeouts
-    stateRef.current = { songData, flatEventsMap, vsuData, playRangeStart, playRangeEnd, currentPatternNoteOffset };
+    stateRef.current = {
+        playing, currentStep, songData, flatEventsMap, vsuData, playRangeStart, playRangeEnd, currentPatternNoteOffset, totalLength, startTime
+    };
 
     const updateChannel = (channel: number, partialChannel: Partial<VsuChannelData>): void =>
         setVsuData(d => {
@@ -133,27 +144,24 @@ export default function MusicPlayer(props: MusicPlayerProps): React.JSX.Element 
         setTotalLength(newTotalLength);
     };
 
-    const getNextStep = (current: number) => {
-        const currentPlayRangeStart = (stateRef.current?.playRangeStart ?? 0);
-        const currentPlayRangeEnd = (stateRef.current?.playRangeEnd ?? 0);
-        const currentCurrentPatternNoteOffset = (stateRef.current?.currentPatternNoteOffset ?? 0);
-        const currentSongData = stateRef.current?.songData;
-        let nextStep = current + 1;
+    const getNextStep = (elapsedSteps: number) => {
+        const currentPlayRangeStart = stateRef.current!.playRangeStart;
+        const currentPlayRangeEnd = stateRef.current!.playRangeEnd;
+        const currentCurrentPatternNoteOffset = stateRef.current!.currentPatternNoteOffset;
+        const currentSongData = stateRef.current!.songData;
         const startNoteIndex = currentPlayRangeStart > -1
             ? currentCurrentPatternNoteOffset + currentPlayRangeStart
             : 0;
         const endNoteIndex = currentPlayRangeEnd > -1
             ? currentCurrentPatternNoteOffset + currentPlayRangeEnd
-            : totalLength;
-        if (nextStep > endNoteIndex && currentSongData?.loop) {
-            nextStep = startNoteIndex;
-        } else if (nextStep > (endNoteIndex + 1)) {
-            nextStep = -1;
-            setPlaying(false);
-            setCurrentStep(-1);
+            : stateRef.current!.totalLength;
+        if (elapsedSteps > endNoteIndex && currentSongData?.loop) {
+            return startNoteIndex;
+        } else if (elapsedSteps > (endNoteIndex + 1)) {
+            return -1;
         }
 
-        return nextStep;
+        return elapsedSteps;
     };
 
     const processStep = (current: number) => {
@@ -188,24 +196,39 @@ export default function MusicPlayer(props: MusicPlayerProps): React.JSX.Element 
         });
     };
 
-    const step = (current: number) => {
-        if (playing) {
-            const currentSongData = stateRef.current?.songData;
-            setCurrentStep(current);
-            processStep(current);
-            const nextStep = getNextStep(current);
-            if (nextStep > -1) {
-                // TODO: Use correct speed. It is defined in microseconds, but applied here as milliseconds.
-                setTimer(setTimeout(() => step(nextStep), currentSongData?.speed));
-            }
+    const onTick = () => {
+        if (!stateRef.current!.playing) {
+            return;
+        }
+
+        const elapsedTime = performance.now() - stateRef.current!.startTime;
+        setPlaybackElapsedTime(elapsedTime);
+
+        const elapsedSteps = Math.round(elapsedTime / stateRef.current!.songData.speed);
+        const nextStep = getNextStep(elapsedSteps);
+        if (nextStep === -1) {
+            setPlaying(false);
+        }
+
+        setCurrentStep(nextStep);
+
+        if (nextStep > stateRef.current!.currentStep) {
+            processStep(nextStep);
+        } else if (nextStep < stateRef.current!.currentStep) {
+            setStartTime(performance.now());
         }
     };
 
     useEffect(() => {
         clearTimeout(timer);
         if (playing) {
+            if (currentStep > -1) {
+                setStartTime(performance.now() - playbackElapsedTime);
+                processStep(currentStep);
+            } else {
+                setStartTime(performance.now());
+            }
             setInitialVsuConfiguration();
-            step(currentStep);
         }
     }, [playing]);
 
@@ -239,8 +262,8 @@ export default function MusicPlayer(props: MusicPlayerProps): React.JSX.Element 
     return (
         <VsuEmulator
             data={vsuData}
-            enabled={initialized && (playing || testing)}
-            setInitialized={setInitialized}
+            enabled={playing || testing}
+            onTick={() => onTick()}
         />
     );
 }

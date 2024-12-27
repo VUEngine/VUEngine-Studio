@@ -363,9 +363,9 @@ export class VesCodeGenService {
   async deleteFilesForItem(typeId: string): Promise<void> {
     const typeData = this.vesProjectService.getProjectDataType(typeId);
     if (typeData && Array.isArray(typeData.delete)) {
+      await this.workspaceService.ready;
+      const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
       await Promise.all(typeData.delete.map(async deletePath => {
-        await this.workspaceService.ready;
-        const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
         const deletePathUri = workspaceRootUri.resolve(deletePath);
         if (await this.fileService?.exists(deletePathUri)) {
           await this.fileService?.delete(deletePathUri);

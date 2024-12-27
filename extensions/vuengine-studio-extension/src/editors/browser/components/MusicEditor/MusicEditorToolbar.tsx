@@ -35,16 +35,20 @@ export const StyledMusicEditorToolbarWideButton = styled(StyledMusicEditorToolba
     width: 50px;
 `;
 
-export const StyledMusicEditorToolbarCurrentStep = styled.div`
+export const StyledMusicEditorToolbarTime = styled.div`
     align-items: center;
     border: 1px solid var(--theia-secondaryButton-background);
     border-radius: 2px;
     box-sizing: border-box;
     display: flex;
+    flex-direction: column;
+    font-family: monospace;
+    font-size: 10px;
     height: 26px;
     justify-content: center;
-    margin-right: 5px;
-    width: 50px;
+    line-height: 100%;
+    padding-top: 1px;
+    width: 60px;
 `;
 
 interface MusicEditorToolbarProps {
@@ -56,11 +60,16 @@ interface MusicEditorToolbarProps {
     stopPlaying: () => void
     tool: MusicEditorTool
     setTool: Dispatch<SetStateAction<MusicEditorTool>>
+    playbackElapsedTime: number
+    totalLength: number
+    speed: number
 }
 
 export default function MusicEditorToolbar(props: MusicEditorToolbarProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
-    const { currentStep, playing, editorMode, toggleEditorMode, togglePlaying, stopPlaying, tool, setTool } = props;
+    const {
+        currentStep, playing, editorMode, toggleEditorMode, togglePlaying, stopPlaying, tool, setTool, playbackElapsedTime, totalLength, speed
+    } = props;
 
     return (
         <StyledMusicEditorToolbar>
@@ -101,9 +110,26 @@ export default function MusicEditorToolbar(props: MusicEditorToolbarProps): Reac
                 >
                     <i className="fa fa-stop" />
                 </StyledMusicEditorToolbarButton>
-                <StyledMusicEditorToolbarCurrentStep>
+                <StyledMusicEditorToolbarTime>
                     {currentStep + 1}
-                </StyledMusicEditorToolbarCurrentStep>
+                </StyledMusicEditorToolbarTime>
+                <StyledMusicEditorToolbarTime>
+                    <span>
+                        {currentStep > -1
+                            ? Math.floor(playbackElapsedTime / 1000 / 60) + ':' +
+                            Math.floor((playbackElapsedTime / 1000) % 60).toString().padStart(2, '0') + ',' +
+                            Math.floor((playbackElapsedTime / 100) % 10)
+                            : '0:00,0'
+                        }
+                    </span>
+                    <span>
+                        {
+                            Math.floor(totalLength * speed / 1000 / 60) + ':' +
+                            Math.floor((totalLength * speed / 1000) % 60).toString().padStart(2, '0') + ',' +
+                            Math.floor((totalLength * speed / 100) % 10)
+                        }
+                    </span>
+                </StyledMusicEditorToolbarTime>
             </StyledMusicEditorToolbarGroup>
             <StyledMusicEditorToolbarGroup>
                 <StyledMusicEditorToolbarButton

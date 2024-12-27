@@ -211,7 +211,7 @@ export const PIANO_ROLL_NOTE_HEIGHT = 9;
 export const PIANO_ROLL_NOTE_WIDTH = 15;
 
 export const MAX_SPEED = 1200;
-export const MIN_SPEED = 30;
+export const MIN_SPEED = 1;
 
 export const VOLUME_STEPS = 16;
 

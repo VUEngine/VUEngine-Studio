@@ -5,12 +5,13 @@ import { VSU_SAMPLE_RATE, VsuData } from './VsuEmulatorTypes';
 interface VsuEmulatorProps {
     data: VsuData
     enabled: boolean
-    setInitialized: (initialized: boolean) => void
+    onTick: () => void
 }
 
 export default function VsuEmulator(props: VsuEmulatorProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
-    const { data, enabled, setInitialized } = props;
+    const { data, enabled, onTick } = props;
+    const [initialized, setInitialized] = useState<boolean>(false);
     const audioContextRef = useRef<AudioContext>();
     const [vsuEmulator, setVsuEmulator] = useState<AudioWorkletNode>();
 
@@ -34,15 +35,14 @@ export default function VsuEmulator(props: VsuEmulatorProps): React.JSX.Element 
             outputChannelCount: [2],
         });
         vsuNode.connect(audioCtx.destination);
-
+        vsuNode.port.onmessage = e => onTick();
         audioContextRef.current = audioCtx;
         setVsuEmulator(vsuNode);
+        setInitialized(true);
 
         if (!enabled) {
             audioCtx?.suspend();
         }
-
-        setInitialized(true);
     };
 
     const closeAudioContext = (): void => {
@@ -55,7 +55,7 @@ export default function VsuEmulator(props: VsuEmulatorProps): React.JSX.Element 
     }, []);
 
     useEffect(() => {
-        if (enabled) {
+        if (enabled && initialized) {
             audioContextRef.current?.resume();
         } else {
             audioContextRef.current?.suspend();

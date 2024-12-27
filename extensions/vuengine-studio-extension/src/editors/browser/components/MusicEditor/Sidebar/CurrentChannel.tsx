@@ -104,7 +104,7 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                     </InputWithAction>
                 </VContainer>
             </HContainer>
-            <HContainer gap={10}>
+            <HContainer gap={10} justifyContent='space-between'>
                 <VContainer>
                     <label>
                         <input
@@ -116,31 +116,33 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                         <HoverInfo
                             value={nls.localize(
                                 'vuengine/musicEditor/allowSkipDescription',
-                                'Allow to skip notes during play back if no sound source is available at the time.'
+                                'Allow to skip notes during play back if no sound source is available when requested.'
                             )}
                         />
                     </label>
                 </VContainer>
-                <VContainer>
-                    <label>
-                        <input
-                            type="checkbox"
-                            checked={channel.muted}
-                            onChange={() => toggleChannelMuted(channel.id)}
-                        />
-                        {nls.localize('vuengine/musicEditor/muted', 'Muted')}
-                    </label>
-                </VContainer>
-                <VContainer>
-                    <label>
-                        <input
-                            type="checkbox"
-                            checked={channel.solo}
-                            onChange={() => toggleChannelSolo(channel.id)}
-                        />
-                        {nls.localize('vuengine/musicEditor/solo', 'Solo')}
-                    </label>
-                </VContainer>
+                <HContainer gap={10}>
+                    <VContainer>
+                        <label>
+                            <input
+                                type="checkbox"
+                                checked={channel.muted}
+                                onChange={() => toggleChannelMuted(channel.id)}
+                            />
+                            {nls.localize('vuengine/musicEditor/muted', 'Muted')}
+                        </label>
+                    </VContainer>
+                    <VContainer>
+                        <label>
+                            <input
+                                type="checkbox"
+                                checked={channel.solo}
+                                onChange={() => toggleChannelSolo(channel.id)}
+                            />
+                            {nls.localize('vuengine/musicEditor/solo', 'Solo')}
+                        </label>
+                    </VContainer>
+                </HContainer>
             </HContainer>
         </VContainer>
     );
