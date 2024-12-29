@@ -33,7 +33,7 @@ export const AVAILABLE_EVENTS: EventMap = {
         id: MusicEvent.Volume,
         shortId: 'V',
         label: nls.localize('vuengine/musicEditor/effects/setVolume', 'Set Volume'),
-        description: nls.localize('vuengine/musicEditor/effects/setVolumeDescription', 'Change left and right volume level for the current channel.'),
+        description: nls.localize('vuengine/musicEditor/effects/setVolumeDescription', 'Change left and right volume levels for the current channel.'),
         category: nls.localize('vuengine/musicEditor/effects/volume', 'Volume'),
         defaultValue: 0xFF,
     },

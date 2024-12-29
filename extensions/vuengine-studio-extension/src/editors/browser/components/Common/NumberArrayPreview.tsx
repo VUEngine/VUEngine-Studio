@@ -5,7 +5,6 @@ const ColumnContainer = styled.div`
     align-items: end;
     border: 1px solid var(--theia-dropdown-border);
     border-radius: 2px;
-    cursor: pointer;
     display: flex;
     height: 32px;
     overflow: hidden;
@@ -15,7 +14,11 @@ const ColumnContainer = styled.div`
     width: 32px;
     z-index: 1;
 
-    &:hover {
+    &.editable {
+    cursor: pointer;
+    }
+
+    &.editable:hover {
         border-color: var(--theia-button-background) !important;
     }
 `;
@@ -36,6 +39,7 @@ export default function NumberArrayPreview(props: NumberArrayPreviewProps): Reac
     const { active, maximum, data, height, width, title, onClick, onMouseEnter, onMouseLeave } = props;
 
     return <ColumnContainer
+        className={onClick ? 'editable' : undefined}
         onClick={onClick}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}

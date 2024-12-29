@@ -1,5 +1,5 @@
 import { nls } from '@theia/core';
-import React, { Dispatch, SetStateAction, useContext, useState } from 'react';
+import React, { Dispatch, SetStateAction, useContext, useMemo, useState } from 'react';
 import { WithContributor, WithFileUri } from 'src/project/browser/ves-project-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import BasicSelect from '../../Common/Base/BasicSelect';
@@ -28,6 +28,9 @@ import { WaveFormData } from '../../WaveFormEditor/WaveFormEditorTypes';
 import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor';
 import { InstrumentConfig, MusicEditorChannelType, NOTES, SongData } from '../MusicEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
+
+const ENVELOPE_PREVIEW_RESOLUTION = 16;
+const ENVELOPE_PREVIEW_SIZE = 272;
 
 interface InstrumentProps {
     songData: SongData
@@ -321,6 +324,34 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const waveform = services.vesProjectService.getProjectDataItemById(instrument.waveform, 'WaveForm') as WaveFormData & WithFileUri & WithContributor;
 
+    const envelopePreviewData = useMemo(() => {
+        const result: number[] = [...Array(ENVELOPE_PREVIEW_SIZE)].map(v => 0);
+
+        if (instrument.envelope.enabled && instrument.envelope.initialValue > 0) {
+            const endVolume = instrument.envelope.direction ? instrument.envelope.initialValue : 0;
+            const cycleDuration = (instrument.envelope.stepTime + 1) * ENVELOPE_PREVIEW_RESOLUTION;
+            const stepIncrease = instrument.envelope.initialValue / cycleDuration;
+            for (let index = 0; index < ENVELOPE_PREVIEW_SIZE; index++) {
+                if (index >= cycleDuration && !instrument.envelope.repeat) {
+                    result[index] = endVolume;
+                } else {
+                    const stepDelta = (index % cycleDuration) * stepIncrease;
+                    result[index] = instrument.envelope.direction
+                        ? stepDelta
+                        : instrument.envelope.initialValue - stepDelta;
+                }
+            }
+        }
+
+        return result;
+    }, [
+        instrument.envelope.enabled,
+        instrument.envelope.initialValue,
+        instrument.envelope.direction,
+        instrument.envelope.repeat,
+        instrument.envelope.stepTime,
+    ]);
+
     return < VContainer gap={15} >
         <VContainer grow={1}>
             <label>
@@ -490,7 +521,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                         onChange={e => setInterval(parseInt(e.target.value))}
                     >
                         {VSU_INTERVAL_VALUES.map((intv, i) =>
-                            <option value={i}>{intv} ms</option>
+                            <option key={i} value={i}>{intv} ms</option>
                         )}
                     </select>
                 </VContainer>
@@ -542,43 +573,57 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                 }
             </HContainer>
             {instrument.envelope.enabled &&
-                <HContainer gap={15}>
-                    <VContainer>
-                        <label>
-                            {nls.localize('vuengine/musicEditor/stepTime', 'Step Time')}
-                        </label>
-                        <select
-                            className="theia-select"
-                            value={instrument.envelope.stepTime
+                <VContainer>
+                    <HContainer gap={15}>
+                        <VContainer>
+                            <label>
+                                {nls.localize('vuengine/musicEditor/stepTime', 'Step Time')}
+                            </label>
+                            <select
+                                className="theia-select"
+                                value={instrument.envelope.stepTime
 
-                            }
-                            onChange={e => setEnvelopeStepTime(parseInt(e.target.value))}
-                        >
-                            {VSU_ENVELOPE_STEP_TIME_VALUES.map((st, i) =>
-                                <option value={i}>{st} ms</option>
-                            )}
-                        </select>
-                    </VContainer>
+                                }
+                                onChange={e => setEnvelopeStepTime(parseInt(e.target.value))}
+                            >
+                                {VSU_ENVELOPE_STEP_TIME_VALUES.map((st, i) =>
+                                    <option key={i} value={i}>{st} ms</option>
+                                )}
+                            </select>
+                        </VContainer>
+                        <VContainer>
+                            <label>
+                                {nls.localize('vuengine/musicEditor/initialVolume', 'Initial Volume')}
+                            </label>
+                            <HContainer alignItems="center">
+                                <input
+                                    type="range"
+                                    min={VSU_ENVELOPE_INITIAL_VALUE_MIN}
+                                    max={VSU_ENVELOPE_INITIAL_VALUE_MAX}
+                                    value={instrument.envelope.initialValue}
+                                    onChange={e => setEnvelopeInitialValue(parseInt(e.target.value))}
+                                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                />
+                                <div style={{ minWidth: 24, overflow: 'hidden', textAlign: 'right', width: 24 }}>
+                                    {instrument.envelope.initialValue}
+                                </div>
+                            </HContainer>
+                        </VContainer>
+                    </HContainer>
                     <VContainer>
                         <label>
-                            {nls.localize('vuengine/musicEditor/initialVolume', 'Initial Volume')}
+                            {nls.localize('vuengine/musicEditor/preview', 'Preview')}
                         </label>
-                        <HContainer alignItems="center">
-                            <input
-                                type="range"
-                                min={VSU_ENVELOPE_INITIAL_VALUE_MIN}
-                                max={VSU_ENVELOPE_INITIAL_VALUE_MAX}
-                                value={instrument.envelope.initialValue}
-                                onChange={e => setEnvelopeInitialValue(parseInt(e.target.value))}
-                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                            />
-                            <div style={{ minWidth: 24, overflow: 'hidden', textAlign: 'right', width: 24 }}>
-                                {instrument.envelope.initialValue}
-                            </div>
-                        </HContainer>
+                        <NumberArrayPreview
+                            active={true}
+                            height={48}
+                            width={ENVELOPE_PREVIEW_SIZE}
+                            maximum={15}
+                            data={envelopePreviewData}
+                        />
                     </VContainer>
-                </HContainer>
+                </VContainer>
             }
         </VContainer>
         {
