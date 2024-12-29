@@ -1,7 +1,12 @@
+export enum VsuEnvelopeDirection {
+    'Decay' = 0,
+    'Grow' = 1
+}
+
 export interface VsuChannelEnvelopeData {
     enabled: boolean
     repeat: boolean
-    direction: boolean
+    direction: VsuEnvelopeDirection
     initialValue: number
     stepTime: number
 }
@@ -11,13 +16,23 @@ export interface VsuChannelIntervalData {
     value: number
 }
 
+export enum VsuSweepModulationFunction {
+    'Sweep' = 0,
+    'Modulation' = 1
+}
+
+export enum VsuSweepDirection {
+    'Down' = 0,
+    'Up' = 1
+}
+
 export interface VsuChannelSweepModulationData {
     enabled: boolean
     repeat: boolean
-    function: boolean
+    function: VsuSweepModulationFunction
     frequency: number
     interval: number
-    direction: boolean
+    direction: VsuSweepDirection
     shift: number
 }
 
@@ -134,17 +149,17 @@ export const DEFAULT_VSU_DATA: VsuData = {
         envelope: {
             enabled: false,
             repeat: false,
-            direction: false,
+            direction: VsuEnvelopeDirection.Decay,
             initialValue: 0,
             stepTime: 0,
         },
         sweepMod: {
             enabled: false,
             repeat: false,
-            function: false,
+            function: VsuSweepModulationFunction.Sweep,
             frequency: 0,
             interval: 0,
-            direction: false,
+            direction: VsuSweepDirection.Down,
             shift: 0,
         },
         tap: 0,

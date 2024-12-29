@@ -23,6 +23,9 @@ import {
     VSU_SWEEP_MODULATION_INTERVAL_MIN,
     VSU_SWEEP_MODULATION_SHIFT_MAX,
     VSU_SWEEP_MODULATION_SHIFT_MIN,
+    VsuEnvelopeDirection,
+    VsuSweepDirection,
+    VsuSweepModulationFunction,
 } from '../../VsuEmulator/VsuEmulatorTypes';
 import { WaveFormData } from '../../WaveFormEditor/WaveFormEditorTypes';
 import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor';
@@ -182,13 +185,13 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         setInstruments(updatedInstruments);
     };
 
-    const setEnvelopeDecay = (decay: boolean) => {
+    const setEnvelopeDirection = (direction: VsuEnvelopeDirection) => {
         const updatedInstruments = [...songData.instruments];
         updatedInstruments[currentInstrument] = {
             ...updatedInstruments[currentInstrument],
             envelope: {
                 ...instrument.envelope,
-                direction: decay,
+                direction,
             },
         };
 
@@ -247,13 +250,13 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         setInstruments(updatedInstruments);
     };
 
-    const setSweepModulationFunction = (modulation: boolean) => {
+    const setSweepModulationFunction = (fnc: VsuSweepModulationFunction) => {
         const updatedInstruments = [...songData.instruments];
         updatedInstruments[currentInstrument] = {
             ...updatedInstruments[currentInstrument],
             sweepMod: {
                 ...instrument.sweepMod,
-                function: modulation,
+                function: fnc,
             },
         };
 
@@ -286,7 +289,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         setInstruments(updatedInstruments);
     };
 
-    const setSweepModulationDirection = (direction: boolean) => {
+    const setSweepDirection = (direction: VsuSweepDirection) => {
         const updatedInstruments = [...songData.instruments];
         updatedInstruments[currentInstrument] = {
             ...updatedInstruments[currentInstrument],
@@ -494,9 +497,13 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         }
         <HContainer gap={15}>
             <VContainer>
-                <label>
-                    {nls.localize('vuengine/musicEditor/interval', 'Interval')}
-                </label>
+                <InfoLabel
+                    label={nls.localize('vuengine/musicEditor/interval', 'Interval')}
+                    tooltip={
+                        nls.localize('vuengine/musicEditor/intervalDescription',
+                            'Interval, when enabled, specifies how long sound should be generated before automatically being shut off. '
+                        )}
+                />
                 <VContainer gap={15}>
                     <label>
                         <input
@@ -530,9 +537,15 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         <VContainer gap={15}>
             <HContainer gap={15}>
                 <VContainer>
-                    <label>
-                        {nls.localize('vuengine/musicEditor/envelope', 'Envelope')}
-                    </label>
+                    <InfoLabel
+                        label={nls.localize('vuengine/musicEditor/envelope', 'Envelope')}
+                        tooltip={
+                            nls.localize('vuengine/musicEditor/envelopeDescription',
+                                'The envelope acts like a master volume setting independent from the stereo levels. ' +
+                                'It can be configured to grow or decay automatically over time, and optionally reload ' +
+                                'a pre-configured value and repeat the grow/decay process. '
+                            )}
+                    />
                     <label>
                         <input
                             type="checkbox"
@@ -560,13 +573,13 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                         <RadioSelect
                             options={[{
                                 label: 'Grow',
-                                value: true,
+                                value: VsuEnvelopeDirection.Grow,
                             }, {
                                 label: 'Decay',
-                                value: false,
+                                value: VsuEnvelopeDirection.Decay,
                             }]}
                             defaultValue={instrument.envelope.direction}
-                            onChange={options => setEnvelopeDecay(options[0].value as boolean)}
+                            onChange={options => setEnvelopeDirection(options[0].value as VsuEnvelopeDirection)}
                             allowBlank
                         />
                     </VContainer>
@@ -612,9 +625,10 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                         </VContainer>
                     </HContainer>
                     <VContainer>
-                        <label>
-                            {nls.localize('vuengine/musicEditor/preview', 'Preview')}
-                        </label>
+                        <InfoLabel
+                            label={nls.localize('vuengine/musicEditor/preview', 'Preview')}
+                        // subLabel={nls.localize('vuengine/musicEditor/volumeOverTime', 'Volume over time')}
+                        />
                         <NumberArrayPreview
                             active={true}
                             height={48}
@@ -631,9 +645,34 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
             <>
                 <HContainer gap={15}>
                     <VContainer>
-                        <label>
-                            {nls.localize('vuengine/musicEditor/sweepMod', 'Sweep / Mod.')}
-                        </label>
+                        <InfoLabel
+                            label={nls.localize('vuengine/musicEditor/sweepMod', 'Sweep / Mod.')}
+                            tooltip={<>
+                                {nls.localize('vuengine/musicEditor/sweepModDescription',
+                                    'The VSU\'s channel 5 has, in addition to all of the features of channels 1-4, ' +
+                                    'support for frequency sweep and modulation functions, which will modify the current frequency value over time.'
+                                )}
+                                <br /><br />
+                                <b>{nls.localize('vuengine/musicEditor/sweep', 'Sweep')}</b>{': '}
+                                {nls.localize(
+                                    'vuengine/musicEditor/sweepDescription',
+                                    'The sweep function produces a new frequency value relative to the current frequency value. ' +
+                                    'The new frequency value is calculated by shifting the current frequency value right by a ' +
+                                    'specified number of bits, then adding or subtracting the result to or from the current frequency ' +
+                                    'value. This results in a sliding pitch on the logarithmic scale, as though along octaves. '
+                                )}
+                                <br /><br />
+                                <b>{nls.localize('vuengine/musicEditor/modulation', 'Modulation')}</b>{': '}
+                                {nls.localize(
+                                    'vuengine/musicEditor/modulationDescription',
+                                    'The modulation function produces a new frequency value by reading modulation values from VSU memory. ' +
+                                    'Each frequency modification frame, a new frequency value is calculated by reading a modulation value ' +
+                                    'and adding it to the most recent frequency value written to the frequency registers. ' +
+                                    'After processing all 32 modulation values, frequency modification processing can either stop or continue ' +
+                                    'from the first modulation value. '
+                                )}
+                            </>}
+                        />
                         <label>
                             <input
                                 type="checkbox"
@@ -660,14 +699,14 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                             </label>
                             <RadioSelect
                                 options={[{
-                                    label: 'Modulation',
-                                    value: true,
-                                }, {
                                     label: 'Sweep',
-                                    value: false,
+                                    value: VsuSweepModulationFunction.Sweep,
+                                }, {
+                                    label: 'Modulation',
+                                    value: VsuSweepModulationFunction.Modulation,
                                 }]}
                                 defaultValue={instrument.sweepMod.function}
-                                onChange={options => setSweepModulationFunction(options[0].value as boolean)}
+                                onChange={options => setSweepModulationFunction(options[0].value as VsuSweepModulationFunction)}
                                 allowBlank
                             />
                         </VContainer>
@@ -709,7 +748,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                                     />
                                 </VContainer>
                             </HContainer>
-                            {!instrument.sweepMod.function &&
+                            {instrument.sweepMod.function === VsuSweepModulationFunction.Sweep &&
                                 <HContainer gap={15}>
                                     <VContainer>
                                         <label>
@@ -718,13 +757,13 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                                         <RadioSelect
                                             options={[{
                                                 label: 'Up',
-                                                value: true,
+                                                value: VsuSweepDirection.Up,
                                             }, {
                                                 label: 'Down',
-                                                value: false,
+                                                value: VsuSweepDirection.Down,
                                             }]}
                                             defaultValue={instrument.sweepMod.direction}
-                                            onChange={options => setSweepModulationDirection(options[0].value as boolean)}
+                                            onChange={options => setSweepDirection(options[0].value as VsuSweepDirection)}
                                             allowBlank
                                         />
                                     </VContainer>
@@ -746,7 +785,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                                     </VContainer>
                                 </HContainer>
                             }
-                            {instrument.sweepMod.function &&
+                            {instrument.sweepMod.function === VsuSweepModulationFunction.Modulation &&
                                 <VContainer>
                                     <label>
                                         {nls.localize('vuengine/musicEditor/modulationData', 'Modulation Data')}

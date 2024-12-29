@@ -21,7 +21,10 @@ import {
     VSU_SWEEP_MODULATION_INTERVAL_MIN,
     VSU_SWEEP_MODULATION_SHIFT_MAX,
     VSU_SWEEP_MODULATION_SHIFT_MIN,
-    VsuChannelData
+    VsuChannelData,
+    VsuEnvelopeDirection,
+    VsuSweepDirection,
+    VsuSweepModulationFunction
 } from '../VsuEmulator/VsuEmulatorTypes';
 import WaveformSelect from './WaveformSelect';
 
@@ -111,12 +114,12 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
         });
     };
 
-    const setEnvelopeDecay = (decay: boolean) => {
+    const setEnvelopeDirection = (direction: VsuEnvelopeDirection) => {
         setChannel({
             ...channel,
             envelope: {
                 ...channel?.envelope,
-                direction: decay,
+                direction,
             },
         });
     };
@@ -161,12 +164,12 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
         });
     };
 
-    const setSweepModulationFunction = (modulation: boolean) => {
+    const setSweepModulationFunction = (fnc: VsuSweepModulationFunction) => {
         setChannel({
             ...channel,
             sweepMod: {
                 ...channel?.sweepMod,
-                function: modulation,
+                function: fnc,
             },
         });
     };
@@ -191,7 +194,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
         });
     };
 
-    const setSweepModulationDirection = (direction: boolean) => {
+    const setSweepDirection = (direction: VsuSweepDirection) => {
         setChannel({
             ...channel,
             sweepMod: {
@@ -425,13 +428,13 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                     <RadioSelect
                                         options={[{
                                             label: 'Grow',
-                                            value: true,
+                                            value: VsuEnvelopeDirection.Grow,
                                         }, {
                                             label: 'Decay',
-                                            value: false,
+                                            value: VsuEnvelopeDirection.Decay,
                                         }]}
                                         defaultValue={channel?.envelope?.direction ?? true}
-                                        onChange={options => setEnvelopeDecay(options[0].value as boolean)}
+                                        onChange={options => setEnvelopeDirection(options[0].value as VsuEnvelopeDirection)}
                                         allowBlank
                                     />
                                 </VContainer>
@@ -502,13 +505,13 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                         <RadioSelect
                                             options={[{
                                                 label: 'Modulation',
-                                                value: true,
+                                                value: VsuSweepModulationFunction.Modulation,
                                             }, {
                                                 label: 'Sweep',
-                                                value: false,
+                                                value: VsuSweepModulationFunction.Sweep,
                                             }]}
-                                            defaultValue={channel?.sweepMod?.function ?? true}
-                                            onChange={options => setSweepModulationFunction(options[0].value as boolean)}
+                                            defaultValue={channel?.sweepMod?.function ?? VsuSweepModulationFunction.Sweep}
+                                            onChange={options => setSweepModulationFunction(options[0].value as VsuSweepModulationFunction)}
                                             allowBlank
                                         />
                                     </VContainer>
@@ -539,7 +542,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                             onChange={e => setSweepModulationInterval(parseInt(e.target.value))}
                                         />
                                     </VContainer>
-                                    {!channel?.sweepMod?.function &&
+                                    {channel?.sweepMod?.function === VsuSweepModulationFunction.Sweep &&
                                         <>
                                             <VContainer>
                                                 <label>
@@ -548,13 +551,13 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                                 <RadioSelect
                                                     options={[{
                                                         label: 'Up',
-                                                        value: true,
+                                                        value: VsuSweepDirection.Up,
                                                     }, {
                                                         label: 'Down',
-                                                        value: false,
+                                                        value: VsuSweepDirection.Down,
                                                     }]}
                                                     defaultValue={channel?.sweepMod?.direction ?? true}
-                                                    onChange={options => setSweepModulationDirection(options[0].value as boolean)}
+                                                    onChange={options => setSweepDirection(options[0].value as VsuSweepDirection)}
                                                     allowBlank
                                                 />
                                             </VContainer>

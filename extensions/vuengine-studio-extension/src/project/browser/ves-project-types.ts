@@ -2,6 +2,7 @@ import URI from '@theia/core/lib/common/uri';
 import { AdditionalOperation, RulesLogic } from 'json-logic-js';
 import { DEFAULT_SPRITE_SIZE } from '../../editors/browser/components/SpriteEditor/SpriteEditorTypes';
 import { VesPluginsData } from '../../plugins/browser/ves-plugin';
+import { VsuEnvelopeDirection, VsuSweepDirection, VsuSweepModulationFunction } from 'src/editors/browser/components/VsuEmulator/VsuEmulatorTypes';
 
 export const VUENGINE_WORKSPACE_EXT = 'workspace';
 
@@ -740,7 +741,7 @@ export const defaultProjectData: ProjectData = {
                     },
                     direction: {
                       type: 'boolean',
-                      default: true
+                      default: VsuEnvelopeDirection.Decay
                     },
                     initialValue: {
                       type: 'integer',
@@ -769,7 +770,7 @@ export const defaultProjectData: ProjectData = {
                     },
                     function: {
                       type: 'boolean',
-                      default: true
+                      default: VsuSweepModulationFunction.Sweep
                     },
                     frequency: {
                       type: 'integer',
@@ -783,7 +784,7 @@ export const defaultProjectData: ProjectData = {
                     },
                     direction: {
                       type: 'boolean',
-                      default: true
+                      default: VsuSweepDirection.Up
                     },
                     shift: {
                       type: 'integer',
