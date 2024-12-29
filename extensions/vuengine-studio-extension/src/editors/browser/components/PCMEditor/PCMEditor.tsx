@@ -116,11 +116,11 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
             <HContainer gap={15}>
                 <VContainer>
                     <InfoLabel
-                        label={nls.localize('vuengine/pcmEditor/range', 'Range')}
+                        label={nls.localize('vuengine/pcmEditor/volumeResolution', 'Volume Resolution')}
                         tooltip={nls.localize(
-                            'vuengine/pcmEditor/rangeDescription',
-                            'PCM samples are usually of lower volume than other sound. ' +
-                            'VUEngine can dynamically allocate up to 5 channels for playback to increase volume.'
+                            'vuengine/pcmEditor/volumeResolutionDescription',
+                            'VUEngine can dynamically allocate up to 5 channels for playback to increase volume amplitude resolution. ' +
+                            'Thus, a higher value can deliver finer nuances in volume changes at a small performance cost.'
                         )}
                     />
                     <RadioSelect

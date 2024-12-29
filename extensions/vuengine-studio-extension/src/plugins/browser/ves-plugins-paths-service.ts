@@ -20,22 +20,22 @@ export class VesPluginsPathsService {
 
   async getEnginePluginsUri(): Promise<URI> {
     const resourcesUri = await this.vesCommonService.getResourcesUri();
-    const defaultUri = resourcesUri
+    let pluginsUri = resourcesUri
       .resolve('vuengine')
       .resolve('plugins');
 
-    const preference = this.preferenceService.get(
-      VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH
-    ) as string;
-    const customUri = new URI(
-      isWindows && !preference.startsWith('/')
+    const preference = this.preferenceService.get(VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH) as string;
+    if (preference !== '') {
+      const customUri = new URI(isWindows && !preference.startsWith('/')
         ? `/${preference}`
         : preference
-    ).withScheme('file');
+      ).withScheme('file');
+      if (!customUri.isEqual(new URI('').withScheme('file'))) {
+        pluginsUri = customUri;
+      }
+    }
 
-    return (!customUri.isEqual(new URI('').withScheme('file')) && await this.fileService.exists(customUri))
-      ? customUri
-      : defaultUri;
+    return pluginsUri;
   }
 
   async getUserPluginsUri(): Promise<URI> {

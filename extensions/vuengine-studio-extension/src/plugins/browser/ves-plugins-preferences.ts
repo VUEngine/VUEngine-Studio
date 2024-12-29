@@ -16,7 +16,12 @@ export const VesPluginsPreferenceSchema: PreferenceSchema = {
     'properties': {
         [VesPluginsPreferenceIds.ENGINE_PLUGINS_PATH]: {
             type: 'string',
-            description: nls.localize('vuengine/plugins/preferences/libraryPathDescription', 'Full path to plugins library. Must be a folder named "plugins" inside a parent folder named "vuengine". Must not live inside the VUEngine Core or user plugins directories. Must not contain repeated occurences of any of the terms "core", "plugins", "user" or "vuengine". Uses built-in VUEngine Plugins library when left blank.'),
+            description: nls.localize(
+                'vuengine/plugins/preferences/libraryPathDescription',
+                'Full path to plugins library. Must be a folder named "plugins" inside a parent folder named "vuengine". ' +
+                'Must not live inside the VUEngine Core or user plugins directories. Must not contain repeated occurences of any of the terms "core", ' +
+                '"plugins", "user" or "vuengine". Uses built-in VUEngine Plugins library when left blank.'
+            ),
             default: '',
             additionalProperties: {
                 // @ts-ignore
@@ -34,7 +39,12 @@ export const VesPluginsPreferenceSchema: PreferenceSchema = {
         },
         [VesPluginsPreferenceIds.USER_PLUGINS_PATH]: {
             type: 'string',
-            description: nls.localize('vuengine/plugins/preferences/userLibraryPathDescription', 'Full path to base folder that contains user plugins. Must be a folder named "user" inside a parent folder named "vuengine". Must not live inside the VUEngine Plugins or Core directories. Must not contain repeated occurences of any of the terms "core", "plugins", "user" or "vuengine". Defaults to [HOME]/vuengine/plugins if left blank.'),
+            description: nls.localize(
+                'vuengine/plugins/preferences/userLibraryPathDescription',
+                'Full path to base folder that contains user plugins. Must be a folder named "user" inside a parent folder named "vuengine". ' +
+                'Must not live inside the VUEngine Plugins or Core directories. Must not contain repeated occurences of any of the terms "core", ' +
+                '"plugins", "user" or "vuengine". Defaults to [HOME]/vuengine/plugins if left blank.'
+            ),
             additionalProperties: {
                 // @ts-ignore
                 isDirectory: true,

@@ -17,22 +17,22 @@ export class VesBuildPathsService {
 
   async getEngineCoreUri(): Promise<URI> {
     const resourcesUri = await this.vesCommonService.getResourcesUri();
-    const defaultUri = resourcesUri
+    let coreUri = resourcesUri
       .resolve('vuengine')
       .resolve('core');
 
-    const preference = this.preferenceService.get(
-      VesBuildPreferenceIds.ENGINE_CORE_PATH
-    ) as string;
-    const customUri = new URI(
-      isWindows && !preference.startsWith('/')
+    const preference = this.preferenceService.get(VesBuildPreferenceIds.ENGINE_CORE_PATH) as string;
+    if (preference !== '') {
+      const customUri = new URI(isWindows && !preference.startsWith('/')
         ? `/${preference}`
         : preference
-    ).withScheme('file');
+      ).withScheme('file');
+      if (!customUri.isEqual(new URI('').withScheme('file'))) {
+        coreUri = customUri;
+      }
+    }
 
-    return (!customUri.isEqual(new URI('').withScheme('file')) && await this.fileService.exists(customUri))
-      ? customUri
-      : defaultUri;
+    return coreUri;
   }
 
   async getMakeUri(isWslInstalled: boolean = false): Promise<URI> {

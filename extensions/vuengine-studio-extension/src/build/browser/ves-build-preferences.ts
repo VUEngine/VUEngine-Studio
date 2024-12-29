@@ -53,8 +53,12 @@ const properties: PreferenceSchemaProperties = {
     },
     [VesBuildPreferenceIds.ENGINE_CORE_PATH]: {
         type: 'string',
-        // eslint-disable-next-line max-len
-        description: nls.localize('vuengine/build/preferences/engineCorePathDescription', 'Full path to core library. Must be a folder named "core" inside a parent folder named "vuengine". Must not live inside the VUEngine Plugins or user plugins directories. Must not contain repeated occurences of any of the terms "core", "plugins", "user" or "vuengine". Uses built-in VUEngine Core when left blank.'),
+        description: nls.localize(
+            'vuengine/build/preferences/engineCorePathDescription',
+            'Full path to core library. Must be a folder named "core" inside a parent folder named "vuengine". ' +
+            'Must not live inside the VUEngine Plugins or user plugins directories. Must not contain repeated ' +
+            'occurences of any of the terms "core", "plugins", "user" or "vuengine". Uses built-in VUEngine Core when left blank.'
+        ),
         default: '',
         additionalProperties: {
             // @ts-ignore
