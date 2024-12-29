@@ -21,14 +21,14 @@ export const VesProjectPreferenceSchema: PreferenceSchema = {
                 // @ts-ignore
                 isDirectory: true,
             },
-            scope: PreferenceScope.User,
+            scope: PreferenceScope.Folder,
             overridable: true,
         },
         [VesProjectPreferenceIds.AUTHOR]: {
             type: 'string',
             description: nls.localize('vuengine/projects/preferences/authorDescription', 'Default author name to use for new projects.'),
             default: nls.localize('vuengine/projects/preferences/authorDefault', 'VUEngine Studio User'),
-            scope: PreferenceScope.User,
+            scope: PreferenceScope.Folder,
             overridable: true,
         },
         [VesProjectPreferenceIds.MAKER_CODE]: {
@@ -37,14 +37,14 @@ export const VesProjectPreferenceSchema: PreferenceSchema = {
             maxLength: 2,
             description: nls.localize('vuengine/projects/preferences/makerCodeDescription', 'Default Maker Code to place in ROM header of new projects.'),
             default: 'VU',
-            scope: PreferenceScope.User,
+            scope: PreferenceScope.Folder,
             overridable: true,
         },
         [VesProjectPreferenceIds.CHECK_FOR_OUTDATED_FILES]: {
             type: 'boolean',
             description: nls.localize('vuengine/projects/preferences/checkForOutdatedFiles', 'Automatically check for, and report, outdated item files.'),
             default: true,
-            scope: PreferenceScope.User,
+            scope: PreferenceScope.Folder,
             overridable: true,
         },
     },

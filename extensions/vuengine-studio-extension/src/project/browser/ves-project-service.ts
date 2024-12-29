@@ -1,5 +1,5 @@
 import { CommandService, Emitter, MessageService, QuickInputService, isWindows, nls } from '@theia/core';
-import { OpenerService, PreferenceService } from '@theia/core/lib/browser';
+import { OpenerService, PreferenceScope, PreferenceService } from '@theia/core/lib/browser';
 import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { WindowTitleService } from '@theia/core/lib/browser/window/window-title-service';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
@@ -853,15 +853,19 @@ export class VesProjectService {
   }
 
   protected async promptForFilesUpdate(numberOfFiles: number): Promise<void> {
-    const updateFiles = nls.localize('vuengine/projects/updateFiles', 'Update Files');
+    const updateFiles = nls.localize('vuengine/projects/yes', 'Yes');
+    const disableChecks = nls.localize('vuengine/projects/disableChecks', 'No, Disable Checks');
     const answer = await this.messageService.warn(
       numberOfFiles === 1
-        ? nls.localize('vuengine/projects/foundOutdatedFile', 'Found 1 outdated item file. It can be updated automatically.')
-        : nls.localize('vuengine/projects/foundOutdatedFiles', 'Found {0} outdated item files. These can be updated automatically.', numberOfFiles),
+        ? nls.localize('vuengine/projects/foundOutdatedFile', 'Found 1 outdated item file. Should it be updated automatically?')
+        : nls.localize('vuengine/projects/foundOutdatedFiles', 'Found {0} outdated item files. Should they be updated automatically?', numberOfFiles),
       updateFiles,
+      disableChecks,
     );
     if (answer === updateFiles) {
       this.commandService.executeCommand(VesProjectCommands.UPDATE_FILES.id);
+    } else if (answer === disableChecks) {
+      this.preferenceService.set(VesProjectPreferenceIds.CHECK_FOR_OUTDATED_FILES, false, PreferenceScope.User);
     }
   }
 
