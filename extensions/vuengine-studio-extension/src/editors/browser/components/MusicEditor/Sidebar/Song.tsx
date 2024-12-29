@@ -10,6 +10,7 @@ import SectionSelect from '../../Common/SectionSelect';
 import VContainer from '../../Common/Base/VContainer';
 import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor';
 import { BAR_PATTERN_LENGTH_MULT_MAP, MAX_SPEED, MIN_SPEED, NoteResolution, SongData } from '../MusicEditorTypes';
+import Range from '../../Common/Base/Range';
 
 interface SongProps {
     songData: SongData
@@ -70,19 +71,13 @@ export default function Song(props: SongProps): React.JSX.Element {
             <label>
                 {nls.localize('vuengine/musicEditor/tickDurationMs', 'Tick duration (in milliseconds)')}
             </label>
-            <HContainer>
-                <input
-                    type='range'
-                    value={songData.speed}
-                    max={MAX_SPEED}
-                    min={MIN_SPEED}
-                    step={1}
-                    onChange={e => setSpeed(parseInt(e.target.value))}
-                />
-                <div style={{ minWidth: 24, overflow: 'hidden', textAlign: 'right', width: 24 }}>
-                    {songData.speed}
-                </div>
-            </HContainer>
+            <Range
+                value={songData.speed}
+                max={MAX_SPEED}
+                min={MIN_SPEED}
+                setValue={(v: number) => setSpeed(v)}
+                commandsToDisable={INPUT_BLOCKING_COMMANDS}
+            />
         </VContainer>
 
         <VContainer>

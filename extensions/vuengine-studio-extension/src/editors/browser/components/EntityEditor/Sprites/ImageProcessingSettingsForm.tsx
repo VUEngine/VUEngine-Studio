@@ -25,6 +25,7 @@ import { DisplayMode } from '../../Common/VUEngineTypes';
 import Images from '../../ImageEditor/Images';
 import { INPUT_BLOCKING_COMMANDS } from '../EntityEditor';
 import ColorModeSelect from './ColorModeSelect';
+import Range from '../../Common/Base/Range';
 
 const ReconvertButton = styled.button`
     background-color: transparent;
@@ -350,23 +351,16 @@ export default function ImageProcessingSettingsForm(props: ImageProcessingSettin
                                     <label>
                                         {nls.localize('vuengine/editors/minimumColorDistance', 'Minimum Color Distance')}
                                     </label>
-                                    <HContainer>
-                                        <input
-                                            type='range'
-                                            min={0}
-                                            max={1}
-                                            step={0.05}
-                                            value={processingSettings?.minimumColorDistanceToDither ?? DEFAULT_MINIMUM_COLOR_DISTANCE_TO_DITHER}
-                                            onChange={e => updateProcessingSettings({
-                                                minimumColorDistanceToDither: parseFloat(e.target.value),
-                                            })}
-                                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                                        />
-                                        <div style={{ minWidth: 32, textAlign: 'right', width: 32 }}>
-                                            {processingSettings?.minimumColorDistanceToDither ?? 0}
-                                        </div>
-                                    </HContainer>
+                                    <Range
+                                        value={processingSettings?.minimumColorDistanceToDither ?? DEFAULT_MINIMUM_COLOR_DISTANCE_TO_DITHER}
+                                        max={1}
+                                        min={0}
+                                        step={0.05}
+                                        setValue={(v: number) => updateProcessingSettings({
+                                            minimumColorDistanceToDither: v,
+                                        })}
+                                        commandsToDisable={INPUT_BLOCKING_COMMANDS}
+                                    />
                                 </VContainer>
                                 {processingSettings?.minimumColorDistanceToDither > 0 &&
                                     <VContainer style={{ minWidth: 200 }}>

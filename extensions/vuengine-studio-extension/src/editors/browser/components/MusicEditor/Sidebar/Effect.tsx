@@ -6,6 +6,7 @@ import InfoLabel from '../../Common/InfoLabel';
 import { clamp } from '../../Common/Utils';
 import { MusicEvent, SongData } from '../MusicEditorTypes';
 import { AVAILABLE_EVENTS } from './AvailableEvents';
+import Range from '../../Common/Base/Range';
 
 const getNthByte = (num: number, byte: number): number =>
     parseInt('0x' + (clamp((num ?? 0), 0, 255).toString(16).padStart(2, '0'))[byte]);
@@ -51,33 +52,25 @@ export default function Effect(props: EffectProps): React.JSX.Element {
                         <div style={{ minWidth: 10, width: 10 }}>
                             L
                         </div>
-                        <input
-                            type="range"
+                        <Range
                             value={getNthByte(value, 1)}
                             max={15}
                             min={0}
-                            step={1}
-                            onChange={e => setValue(setNthByte(value, 1, parseInt(e.target.value)))}
+                            setValue={(v: number) => setValue(setNthByte(value, 1, v))}
+                            width="100%"
                         />
-                        <div style={{ minWidth: 24, overflow: 'hidden', textAlign: 'right', width: 24 }}>
-                            {getNthByte(value, 1)}
-                        </div>
                     </HContainer>
                     <HContainer alignItems="center">
                         <div style={{ minWidth: 10, width: 10 }}>
                             R
                         </div>
-                        <input
-                            type="range"
+                        <Range
                             value={getNthByte(value, 0)}
                             max={15}
                             min={0}
-                            step={1}
-                            onChange={e => setValue(setNthByte(value, 0, parseInt(e.target.value)))}
+                            setValue={(v: number) => setValue(setNthByte(value, 0, v))}
+                            width="100%"
                         />
-                        <div style={{ minWidth: 24, overflow: 'hidden', textAlign: 'right', width: 24 }}>
-                            {getNthByte(value, 0)}
-                        </div>
                     </HContainer>
                 </VContainer>
             }

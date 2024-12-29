@@ -17,14 +17,124 @@
 
 input[type="range"] {
     appearance: none;
-    background: var(--theia-input-background);
+    background: transparent;
     border: var(--theia-border-width) solid var(--theia-dropdown-border);
     border-radius: 100px;
     cursor: ew-resize;
-    height: var(--theia-ui-font-size2);
+    height: var(--theia-ui-padding);
     margin: 0;
+    position: relative;
     width: 100%;
 }
+
+input[type="range"]::before {
+    background: var(--theia-input-background);
+    border-radius: 100px;
+    content: '';
+    display: block;
+    height: var(--theia-ui-padding);
+    position: absolute;
+}
+input[type="range"].value-1::before { width: 1%; }
+input[type="range"].value-2::before { width: 2%; }
+input[type="range"].value-3::before { width: 3%; }
+input[type="range"].value-4::before { width: 4%; }
+input[type="range"].value-5::before { width: 5%; }
+input[type="range"].value-6::before { width: 6%; }
+input[type="range"].value-7::before { width: 7%; }
+input[type="range"].value-8::before { width: 8%; }
+input[type="range"].value-9::before { width: 9%; }
+input[type="range"].value-10::before { width: 10%; }
+input[type="range"].value-11::before { width: 11%; }
+input[type="range"].value-12::before { width: 12%; }
+input[type="range"].value-13::before { width: 13%; }
+input[type="range"].value-14::before { width: 14%; }
+input[type="range"].value-15::before { width: 15%; }
+input[type="range"].value-16::before { width: 16%; }
+input[type="range"].value-17::before { width: 17%; }
+input[type="range"].value-18::before { width: 18%; }
+input[type="range"].value-19::before { width: 19%; }
+input[type="range"].value-20::before { width: 20%; }
+input[type="range"].value-21::before { width: 21%; }
+input[type="range"].value-22::before { width: 22%; }
+input[type="range"].value-23::before { width: 23%; }
+input[type="range"].value-24::before { width: 24%; }
+input[type="range"].value-25::before { width: 25%; }
+input[type="range"].value-26::before { width: 26%; }
+input[type="range"].value-27::before { width: 27%; }
+input[type="range"].value-28::before { width: 28%; }
+input[type="range"].value-29::before { width: 29%; }
+input[type="range"].value-30::before { width: 30%; }
+input[type="range"].value-31::before { width: 31%; }
+input[type="range"].value-32::before { width: 32%; }
+input[type="range"].value-33::before { width: 33%; }
+input[type="range"].value-34::before { width: 34%; }
+input[type="range"].value-35::before { width: 35%; }
+input[type="range"].value-36::before { width: 36%; }
+input[type="range"].value-37::before { width: 37%; }
+input[type="range"].value-38::before { width: 38%; }
+input[type="range"].value-39::before { width: 39%; }
+input[type="range"].value-40::before { width: 40%; }
+input[type="range"].value-41::before { width: 41%; }
+input[type="range"].value-42::before { width: 42%; }
+input[type="range"].value-43::before { width: 43%; }
+input[type="range"].value-44::before { width: 44%; }
+input[type="range"].value-45::before { width: 45%; }
+input[type="range"].value-46::before { width: 46%; }
+input[type="range"].value-47::before { width: 47%; }
+input[type="range"].value-48::before { width: 48%; }
+input[type="range"].value-49::before { width: 49%; }
+input[type="range"].value-50::before { width: 50%; }
+input[type="range"].value-51::before { width: 51%; }
+input[type="range"].value-52::before { width: 52%; }
+input[type="range"].value-53::before { width: 53%; }
+input[type="range"].value-54::before { width: 54%; }
+input[type="range"].value-55::before { width: 55%; }
+input[type="range"].value-56::before { width: 56%; }
+input[type="range"].value-57::before { width: 57%; }
+input[type="range"].value-58::before { width: 58%; }
+input[type="range"].value-59::before { width: 59%; }
+input[type="range"].value-60::before { width: 60%; }
+input[type="range"].value-61::before { width: 61%; }
+input[type="range"].value-62::before { width: 62%; }
+input[type="range"].value-63::before { width: 63%; }
+input[type="range"].value-64::before { width: 64%; }
+input[type="range"].value-65::before { width: 65%; }
+input[type="range"].value-66::before { width: 66%; }
+input[type="range"].value-67::before { width: 67%; }
+input[type="range"].value-68::before { width: 68%; }
+input[type="range"].value-69::before { width: 69%; }
+input[type="range"].value-70::before { width: 70%; }
+input[type="range"].value-71::before { width: 71%; }
+input[type="range"].value-72::before { width: 72%; }
+input[type="range"].value-73::before { width: 73%; }
+input[type="range"].value-74::before { width: 74%; }
+input[type="range"].value-75::before { width: 75%; }
+input[type="range"].value-76::before { width: 76%; }
+input[type="range"].value-77::before { width: 77%; }
+input[type="range"].value-78::before { width: 78%; }
+input[type="range"].value-79::before { width: 79%; }
+input[type="range"].value-80::before { width: 80%; }
+input[type="range"].value-81::before { width: 81%; }
+input[type="range"].value-82::before { width: 82%; }
+input[type="range"].value-83::before { width: 83%; }
+input[type="range"].value-84::before { width: 84%; }
+input[type="range"].value-85::before { width: 85%; }
+input[type="range"].value-86::before { width: 86%; }
+input[type="range"].value-87::before { width: 87%; }
+input[type="range"].value-88::before { width: 88%; }
+input[type="range"].value-89::before { width: 89%; }
+input[type="range"].value-90::before { width: 90%; }
+input[type="range"].value-91::before { width: 91%; }
+input[type="range"].value-92::before { width: 92%; }
+input[type="range"].value-93::before { width: 93%; }
+input[type="range"].value-94::before { width: 94%; }
+input[type="range"].value-95::before { width: 95%; }
+input[type="range"].value-96::before { width: 96%; }
+input[type="range"].value-97::before { width: 97%; }
+input[type="range"].value-98::before { width: 98%; }
+input[type="range"].value-99::before { width: 99%; }
+input[type="range"].value-100::before { width: 100%; }
 
 input[type="range"]:focus {
     outline-width: 0;
@@ -32,16 +142,23 @@ input[type="range"]:focus {
 
 input[type="range"]::-webkit-slider-thumb {
     appearance: none;
-    height: var(--theia-ui-font-size2);
-    width: var(--theia-ui-font-size2);
-    border-radius: 100px;
     background: var(--theia-foreground);
+    border-radius: 100px;
     cursor: ew-resize;
+    height: calc(var(--theia-ui-font-size2) + 2 * var(--theia-border-width));
+    position: relative;
+    width: calc(var(--theia-ui-font-size2) + 2 * var(--theia-border-width));
+    z-index: 100;
+}
+
+input[type="range"]:active::-webkit-slider-thumb,
+input[type="range"]:focus::-webkit-slider-thumb {
+    outline: 1px solid var(--theia-focusBorder);
 }
 
 input[type="range"]:active,
 input[type="range"]:focus {
-    outline: 1px solid var(--theia-button-background);
+    outline: 1px solid var(--theia-focusBorder);
 }
 
 input[type=range]::-webkit-slider-runnable-track {

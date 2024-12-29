@@ -5,6 +5,7 @@ import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import BasicSelect from '../../Common/Base/BasicSelect';
 import HContainer from '../../Common/Base/HContainer';
 import RadioSelect from '../../Common/Base/RadioSelect';
+import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import NumberArrayPreview from '../../Common/NumberArrayPreview';
@@ -42,11 +43,11 @@ interface InstrumentProps {
     setModulationDataDialogOpen: Dispatch<SetStateAction<number>>
     playing: boolean
     testing: boolean
-    setTesting: (testing: boolean) => void
-    setTestingDuration: (note: number) => void
-    setTestingNote: (note: number) => void
-    setTestingInstrument: (note: number) => void
-    setTestingChannel: (channel: number) => void
+    setTesting: Dispatch<SetStateAction<boolean>>
+    setTestingDuration: Dispatch<SetStateAction<number>>
+    setTestingNote: Dispatch<SetStateAction<number>>
+    setTestingInstrument: Dispatch<SetStateAction<number>>
+    setTestingChannel: Dispatch<SetStateAction<number>>
 }
 
 export default function Instrument(props: InstrumentProps): React.JSX.Element {
@@ -63,6 +64,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
 
     const instrument = songData.instruments[currentInstrument];
 
+    // TODO: why does changing the frequency have no effect on channel 5?
     const startTesting = () => {
         setTesting(true);
         setTestingDuration(0);
@@ -361,7 +363,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         instrument.envelope.stepTime,
     ]);
 
-    return < VContainer gap={15} >
+    return <VContainer gap={15}>
+        <hr />
         <VContainer grow={1}>
             <label>
                 {nls.localize('vuengine/musicEditor/name', 'Name')}
@@ -404,37 +407,27 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                 <div style={{ minWidth: 10, width: 10 }}>
                     L
                 </div>
-                <input
-                    type="range"
-                    value={instrument.volume.left ?? 15}
+                <Range
+                    value={instrument.volume.left}
                     max={15}
                     min={0}
-                    step={1}
-                    onChange={e => setVolume('left', parseInt(e.target.value))}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    setValue={(v: number) => setVolume('left', v)}
+                    commandsToDisable={INPUT_BLOCKING_COMMANDS}
+                    width="100%"
                 />
-                <div style={{ minWidth: 24, overflow: 'hidden', textAlign: 'right', width: 24 }}>
-                    {instrument.volume.left ?? 15}
-                </div>
             </HContainer>
             <HContainer alignItems="center">
                 <div style={{ minWidth: 10, width: 10 }}>
                     R
                 </div>
-                <input
-                    type="range"
-                    value={instrument.volume.right ?? 15}
+                <Range
+                    value={instrument.volume.right}
                     max={15}
                     min={0}
-                    step={1}
-                    onChange={e => setVolume('right', parseInt(e.target.value))}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                    setValue={(v: number) => setVolume('right', v)}
+                    commandsToDisable={INPUT_BLOCKING_COMMANDS}
+                    width="100%"
                 />
-                <div style={{ minWidth: 24, overflow: 'hidden', textAlign: 'right', width: 24 }}>
-                    {instrument.volume.right ?? 15}
-                </div>
             </HContainer>
         </VContainer>
         {
@@ -501,6 +494,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                 />
             </VContainer>
         }
+        <hr />
         <HContainer gap={15}>
             <VContainer>
                 <InfoLabel
@@ -540,6 +534,7 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                 </VContainer>
             }
         </HContainer>
+        <hr />
         <VContainer gap={15}>
             <HContainer gap={15}>
                 <VContainer>
@@ -591,9 +586,9 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                     </VContainer>
                 }
             </HContainer>
-            {instrument.envelope.enabled &&
-                <VContainer>
-                    <HContainer gap={15}>
+            <VContainer>
+                <HContainer gap={15}>
+                    {instrument.envelope.enabled &&
                         <VContainer>
                             <label>
                                 {nls.localize('vuengine/musicEditor/stepTime', 'Step Time')}
@@ -610,26 +605,21 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                                 )}
                             </select>
                         </VContainer>
-                        <VContainer>
-                            <label>
-                                {nls.localize('vuengine/musicEditor/initialVolume', 'Initial Volume')}
-                            </label>
-                            <HContainer alignItems="center">
-                                <input
-                                    type="range"
-                                    min={VSU_ENVELOPE_INITIAL_VALUE_MIN}
-                                    max={VSU_ENVELOPE_INITIAL_VALUE_MAX}
-                                    value={instrument.envelope.initialValue}
-                                    onChange={e => setEnvelopeInitialValue(parseInt(e.target.value))}
-                                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                                />
-                                <div style={{ minWidth: 24, overflow: 'hidden', textAlign: 'right', width: 24 }}>
-                                    {instrument.envelope.initialValue}
-                                </div>
-                            </HContainer>
-                        </VContainer>
-                    </HContainer>
+                    }
+                    <VContainer>
+                        <label>
+                            {nls.localize('vuengine/musicEditor/initialVolume', 'Initial Volume')}
+                        </label>
+                        <Range
+                            value={instrument.envelope.initialValue}
+                            max={VSU_ENVELOPE_INITIAL_VALUE_MAX}
+                            min={VSU_ENVELOPE_INITIAL_VALUE_MIN}
+                            setValue={setEnvelopeInitialValue}
+                            commandsToDisable={INPUT_BLOCKING_COMMANDS}
+                        />
+                    </VContainer>
+                </HContainer>
+                {instrument.envelope.enabled &&
                     <VContainer>
                         <InfoLabel
                             label={nls.localize('vuengine/musicEditor/preview', 'Preview')}
@@ -643,8 +633,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                             data={envelopePreviewData}
                         />
                     </VContainer>
-                </VContainer>
-            }
+                }
+            </VContainer>
         </VContainer>
         {
             instrument.type === MusicEditorChannelType.SWEEPMOD &&
@@ -811,22 +801,17 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                 </VContainer>
             </>
         }
+        <hr />
         <VContainer>
             <label>
                 {nls.localize('vuengine/musicEditor/try', 'Try')}
             </label>
             <InputWithAction>
                 <BasicSelect
-                    options={[
-                        {
-                            value: undefined,
-                            label: nls.localize('vuengine/musicEditor/none', 'None'),
-                        },
-                        ...Object.keys(NOTES).map((n, i) => ({
-                            label: n,
-                            value: i,
-                        }))
-                    ]}
+                    options={Object.keys(NOTES).map((n, i) => ({
+                        label: n,
+                        value: i,
+                    }))}
                     value={instrumentTestingNote}
                     onChange={e => {
                         const noteId = parseInt(e.currentTarget.value);
@@ -846,7 +831,6 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                         ? <i className='fa fa-stop' />
                         : <i className='fa fa-play' />
                     }
-
                 </InputWithActionButton>
             </InputWithAction>
         </VContainer>

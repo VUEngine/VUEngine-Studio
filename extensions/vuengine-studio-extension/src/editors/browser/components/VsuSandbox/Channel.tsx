@@ -2,8 +2,9 @@ import { nls } from '@theia/core';
 import React, { useEffect, useState } from 'react';
 import HContainer from '../Common/Base/HContainer';
 import RadioSelect from '../Common/Base/RadioSelect';
-import { clamp } from '../Common/Utils';
+import Range from '../Common/Base/Range';
 import VContainer from '../Common/Base/VContainer';
+import { clamp } from '../Common/Utils';
 import { NOTES } from '../MusicEditor/MusicEditorTypes';
 import {
     VSU_ENVELOPE_INITIAL_VALUE_MAX,
@@ -304,33 +305,23 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                         <div style={{ minWidth: 10, width: 10 }}>
                             L
                         </div>
-                        <input
-                            type='range'
-                            value={channel?.stereoLevels?.left ?? 15}
+                        <Range
+                            value={channel?.stereoLevels?.left}
                             max={15}
                             min={0}
-                            step={1}
-                            onChange={e => setStereoLevel('left', parseInt(e.target.value))}
+                            setValue={(v: number) => setStereoLevel('left', v)}
                         />
-                        <div style={{ minWidth: 24, overflow: 'hidden', textAlign: 'right', width: 24 }}>
-                            {channel?.stereoLevels?.left ?? 15}
-                        </div>
                     </HContainer>
                     <HContainer alignItems='center'>
                         <div style={{ minWidth: 10, width: 10 }}>
                             R
                         </div>
-                        <input
-                            type='range'
-                            value={channel?.stereoLevels?.right ?? 15}
+                        <Range
+                            value={channel?.stereoLevels?.right}
                             max={15}
                             min={0}
-                            step={1}
-                            onChange={e => setStereoLevel('right', parseInt(e.target.value))}
+                            setValue={(v: number) => setStereoLevel('right', v)}
                         />
-                        <div style={{ minWidth: 24, overflow: 'hidden', textAlign: 'right', width: 24 }}>
-                            {channel?.stereoLevels?.right ?? 15}
-                        </div>
                     </HContainer>
                 </VContainer>
                 <VContainer>

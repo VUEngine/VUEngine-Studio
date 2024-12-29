@@ -92,6 +92,26 @@ export default function MusicPlayer(props: MusicPlayerProps): React.JSX.Element 
                     // "enabled" must be last key to override implicit enablement e.g. through "interval" setting
                     enabled: testing ? index === testingChannel : false,
                 };
+
+                /*
+                                updatedChannels = [
+                                    ...updatedChannels.slice(0, index),
+                                    {
+                                        ...updatedChannels[index],
+                                        envelope: instrument.envelope,
+                                        frequency: testing ? testingNote : 0,
+                                        interval: instrument.interval,
+                                        stereoLevels: instrument.volume,
+                                        sweepMod: instrument.sweepMod,
+                                        tap: instrument.tap,
+                                        waveform: channel.type !== MusicEditorChannelType.NOISE ? index : 0,
+                                        // "enabled" must be last key to override implicit enablement e.g. through "interval" setting
+                                        enabled: testing ? index === testingChannel : false,
+                                    },
+                                    ...updatedChannels.slice(index),
+                                ];
+                */
+
                 updatedWaveforms = [
                     ...updatedWaveforms.slice(0, index),
                     {
@@ -106,12 +126,12 @@ export default function MusicPlayer(props: MusicPlayerProps): React.JSX.Element 
             }
         });
 
-        setVsuData({
-            ...vsuData,
+        setVsuData(previousData => ({
+            ...previousData,
             channels: updatedChannels,
             waveforms: updatedWaveforms,
             modulation: modulationData,
-        });
+        }));
     };
 
     const computeSong = (): void => {
