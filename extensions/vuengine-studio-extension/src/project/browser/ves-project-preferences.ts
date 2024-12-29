@@ -8,6 +8,7 @@ export namespace VesProjectPreferenceIds {
     export const BASE_PATH = [CATEGORY, 'basePath'].join('.');
     export const AUTHOR = [CATEGORY, 'author'].join('.');
     export const MAKER_CODE = [CATEGORY, 'makerCode'].join('.');
+    export const CHECK_FOR_OUTDATED_FILES = [CATEGORY, 'checkForOutdatedFiles'].join('.');
 }
 
 export const VesProjectPreferenceSchema: PreferenceSchema = {
@@ -36,6 +37,13 @@ export const VesProjectPreferenceSchema: PreferenceSchema = {
             maxLength: 2,
             description: nls.localize('vuengine/projects/preferences/makerCodeDescription', 'Default Maker Code to place in ROM header of new projects.'),
             default: 'VU',
+            scope: PreferenceScope.User,
+            overridable: true,
+        },
+        [VesProjectPreferenceIds.CHECK_FOR_OUTDATED_FILES]: {
+            type: 'boolean',
+            description: nls.localize('vuengine/projects/preferences/checkForOutdatedFiles', 'Automatically check for, and report, outdated item files.'),
+            default: true,
             scope: PreferenceScope.User,
             overridable: true,
         },

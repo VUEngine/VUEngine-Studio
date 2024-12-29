@@ -1,5 +1,5 @@
 import { CommandService, Emitter, MessageService, QuickInputService, isWindows, nls } from '@theia/core';
-import { OpenerService } from '@theia/core/lib/browser';
+import { OpenerService, PreferenceService } from '@theia/core/lib/browser';
 import { FrontendApplicationStateService } from '@theia/core/lib/browser/frontend-application-state';
 import { WindowTitleService } from '@theia/core/lib/browser/window/window-title-service';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
@@ -23,6 +23,8 @@ import { VesPluginsPathsService } from '../../plugins/browser/ves-plugins-paths-
 import { VesPluginsService } from '../../plugins/browser/ves-plugins-service';
 import { PluginConfiguration, USER_PLUGINS_PREFIX, VUENGINE_PLUGINS_PREFIX } from '../../plugins/browser/ves-plugins-types';
 import { VesNewProjectTemplate } from './new-project/ves-new-project-form';
+import { VesProjectCommands } from './ves-project-commands';
+import { VesProjectPreferenceIds } from './ves-project-preferences';
 import {
   PROJECT_CHANNEL_NAME,
   ProjectContributor,
@@ -42,7 +44,6 @@ import {
   WithVersion,
   defaultProjectData
 } from './ves-project-types';
-import { VesProjectCommands } from './ves-project-commands';
 
 @injectable()
 export class VesProjectService {
@@ -60,6 +61,8 @@ export class VesProjectService {
   protected readonly quickInputService: QuickInputService;
   @inject(OutputChannelManager)
   protected readonly outputChannelManager: OutputChannelManager;
+  @inject(PreferenceService)
+  protected readonly preferenceService: PreferenceService;
   @inject(VesBuildPathsService)
   private readonly vesBuildPathsService: VesBuildPathsService;
   @inject(VesCommonService)
@@ -193,11 +196,14 @@ export class VesProjectService {
       default: VES_VERSION,
     };
     const schema = await window.electronVesCore.dereferenceJsonSchema(type.schema);
-    let data: ItemData = this.generateDataFromJsonSchema({
-      ...schema,
-      type: 'object',
-      additionalProperties: false,
-    }, existingData);
+    let data: ItemData = {
+      ...this.generateDataFromJsonSchema({
+        ...schema,
+        type: 'object',
+        additionalProperties: false,
+      }, existingData),
+      _version: VES_VERSION,
+    };
     /*
         if (data?.name === '') {
           data.name = this.uri.path.name;
@@ -382,8 +388,11 @@ export class VesProjectService {
     }
 
     // check version
-    if (data._version !== VES_VERSION) {
-      this.promptForFilesUpdate(1);
+    const checkForOutdatedFiles = this.preferenceService.get(VesProjectPreferenceIds.CHECK_FOR_OUTDATED_FILES) as boolean;
+    if (checkForOutdatedFiles) {
+      if (data._version !== VES_VERSION) {
+        this.promptForFilesUpdate(1);
+      }
     }
 
     return true;
@@ -833,17 +842,22 @@ export class VesProjectService {
     console.log(`Getting VUEngine project data took: ${Math.round(duration)} ms.`);
 
     // check for outdated items
-    const outdatedItems = await this.getOutdatedProjectItems();
-    if (outdatedItems.length) {
-      console.log('Outdated item files found', outdatedItems);
-      await this.promptForFilesUpdate(outdatedItems.length);
+    const checkForOutdatedFiles = this.preferenceService.get(VesProjectPreferenceIds.CHECK_FOR_OUTDATED_FILES) as boolean;
+    if (checkForOutdatedFiles) {
+      const outdatedItems = await this.getOutdatedProjectItems();
+      if (outdatedItems.length) {
+        console.log('Outdated item files found', outdatedItems);
+        await this.promptForFilesUpdate(outdatedItems.length);
+      }
     }
   }
 
   protected async promptForFilesUpdate(numberOfFiles: number): Promise<void> {
     const updateFiles = nls.localize('vuengine/projects/updateFiles', 'Update Files');
     const answer = await this.messageService.warn(
-      nls.localize('vuengine/projects/foundOutdatedFiles', 'Found {0} outdated item files. These can be updated automatically.', numberOfFiles),
+      numberOfFiles === 1
+        ? nls.localize('vuengine/projects/foundOutdatedFile', 'Found 1 outdated item file. It can be updated automatically.')
+        : nls.localize('vuengine/projects/foundOutdatedFiles', 'Found {0} outdated item files. These can be updated automatically.', numberOfFiles),
       updateFiles,
     );
     if (answer === updateFiles) {
