@@ -4,14 +4,12 @@ import { VSU_SAMPLE_RATE, VsuData } from './VsuEmulatorTypes';
 
 interface VsuEmulatorProps {
     data: VsuData
-    enabled: boolean
     onTick: () => void
 }
 
 export default function VsuEmulator(props: VsuEmulatorProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
-    const { data, enabled, onTick } = props;
-    const [initialized, setInitialized] = useState<boolean>(false);
+    const { data, onTick } = props;
     const audioContextRef = useRef<AudioContext>();
     const [vsuEmulator, setVsuEmulator] = useState<AudioWorkletNode>();
 
@@ -38,11 +36,6 @@ export default function VsuEmulator(props: VsuEmulatorProps): React.JSX.Element 
         vsuNode.port.onmessage = e => onTick();
         audioContextRef.current = audioCtx;
         setVsuEmulator(vsuNode);
-        setInitialized(true);
-
-        if (!enabled) {
-            audioCtx?.suspend();
-        }
     };
 
     const closeAudioContext = (): void => {
@@ -53,14 +46,6 @@ export default function VsuEmulator(props: VsuEmulatorProps): React.JSX.Element 
         createAudioContext();
         return () => closeAudioContext();
     }, []);
-
-    useEffect(() => {
-        if (enabled && initialized) {
-            audioContextRef.current?.resume();
-        } else {
-            audioContextRef.current?.suspend();
-        }
-    }, [enabled]);
 
     useEffect(() => vsuEmulator?.port.postMessage({ field: 'ch1EnvDirection', data: data.channels[0].envelope.direction }), [vsuEmulator, data.channels[0].envelope.direction]);
     useEffect(() => vsuEmulator?.port.postMessage({ field: 'ch2EnvDirection', data: data.channels[1].envelope.direction }), [vsuEmulator, data.channels[1].envelope.direction]);

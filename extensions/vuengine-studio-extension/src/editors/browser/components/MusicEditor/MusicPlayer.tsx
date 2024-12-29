@@ -260,10 +260,13 @@ export default function MusicPlayer(props: MusicPlayerProps): React.JSX.Element 
     useEffect(() => clearTimeout(timer), []);
 
     return (
-        <VsuEmulator
-            data={vsuData}
-            enabled={playing || testing}
-            onTick={() => onTick()}
-        />
+        <>
+            {(playing || testing) &&
+                <VsuEmulator
+                    data={vsuData}
+                    onTick={() => onTick()}
+                />
+            }
+        </>
     );
 }

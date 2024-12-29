@@ -243,4 +243,4 @@ export const CHANNEL_BG_COLORS = [
     '#e370a9',
 ];
 
-export const SINGLE_NOTE_TESTING_DURATION = 300;
+export const SINGLE_NOTE_TESTING_DURATION = 500;

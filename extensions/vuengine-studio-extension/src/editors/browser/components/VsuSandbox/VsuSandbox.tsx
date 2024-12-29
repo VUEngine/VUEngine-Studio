@@ -72,11 +72,10 @@ export default function VsuSandbox(props: VsuSandboxProps): React.JSX.Element {
     };
 
     return <VContainer>
-        <VsuEmulator
+        {enabled && <VsuEmulator
             data={data}
-            enabled={enabled}
             onTick={() => { }}
-        />
+        />}
         <button
             className={enabled
                 ? 'theia-button'
