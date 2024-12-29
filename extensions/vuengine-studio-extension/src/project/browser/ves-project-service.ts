@@ -853,16 +853,18 @@ export class VesProjectService {
   }
 
   protected async promptForFilesUpdate(numberOfFiles: number): Promise<void> {
-    const updateFiles = nls.localize('vuengine/projects/yes', 'Yes');
+    const yes = nls.localize('vuengine/projects/yes', 'Yes');
+    const no = nls.localize('vuengine/projects/no', 'No');
     const disableChecks = nls.localize('vuengine/projects/disableChecks', 'No, Disable Checks');
     const answer = await this.messageService.warn(
       numberOfFiles === 1
         ? nls.localize('vuengine/projects/foundOutdatedFile', 'Found 1 outdated item file. Should it be updated automatically?')
         : nls.localize('vuengine/projects/foundOutdatedFiles', 'Found {0} outdated item files. Should they be updated automatically?', numberOfFiles),
-      updateFiles,
+      yes,
+      no,
       disableChecks,
     );
-    if (answer === updateFiles) {
+    if (answer === yes) {
       this.commandService.executeCommand(VesProjectCommands.UPDATE_FILES.id);
     } else if (answer === disableChecks) {
       this.preferenceService.set(VesProjectPreferenceIds.CHECK_FOR_OUTDATED_FILES, false, PreferenceScope.User);

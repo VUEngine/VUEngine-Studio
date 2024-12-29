@@ -3,10 +3,12 @@ import { OpenFileDialogProps } from '@theia/filesystem/lib/browser';
 import React from 'react';
 import { EditorsContextType } from '../../ves-editors-types';
 import HContainer from '../Common/Base/HContainer';
+import RadioSelect from '../Common/Base/RadioSelect';
 import VContainer from '../Common/Base/VContainer';
 import { DataSection } from '../Common/CommonTypes';
+import InfoLabel from '../Common/InfoLabel';
 import SectionSelect from '../Common/SectionSelect';
-import { PCMData } from './PCMTypes';
+import { PCM_MAX_RANGE, PCM_MIN_RANGE, PCMData } from './PCMTypes';
 
 interface PCMProps {
     data: PCMData
@@ -31,6 +33,15 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
             ...this.props.data,
             sourceFile: sourceFile.replace(/\\/g, '/'),
         });
+    };
+
+    protected setRange = (range: number) => {
+        if (range >= PCM_MIN_RANGE && range <= PCM_MAX_RANGE) {
+            this.props.updateData({
+                ...this.props.data,
+                range,
+            });
+        }
     };
 
     protected setSection = (section: DataSection) => {
@@ -103,6 +114,21 @@ export default class PCMEditor extends React.Component<PCMProps, PCMState> {
                 </div>}
             </VContainer>
             <HContainer gap={15}>
+                <VContainer>
+                    <InfoLabel
+                        label={nls.localize('vuengine/pcmEditor/range', 'Range')}
+                        tooltip={nls.localize(
+                            'vuengine/pcmEditor/rangeDescription',
+                            'PCM samples are usually of lower volume than other sound. ' +
+                            'VUEngine can dynamically allocate up to 5 channels for playback to increase volume.'
+                        )}
+                    />
+                    <RadioSelect
+                        defaultValue={data.range}
+                        options={[{ value: 1 }, { value: 2 }, { value: 3 }, { value: 4 }, { value: 5 }]}
+                        onChange={options => this.setRange(options[0].value as number)}
+                    />
+                </VContainer>
                 <VContainer>
                     <label className='setting'>
                         {nls.localize('vuengine/pcmEditor/loop', 'Loop')}
