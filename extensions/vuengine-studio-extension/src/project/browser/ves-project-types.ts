@@ -1,8 +1,8 @@
 import URI from '@theia/core/lib/common/uri';
 import { AdditionalOperation, RulesLogic } from 'json-logic-js';
 import { DEFAULT_SPRITE_SIZE } from '../../editors/browser/components/SpriteEditor/SpriteEditorTypes';
+import { VsuEnvelopeDirection, VsuSweepDirection, VsuSweepModulationFunction } from '../../editors/browser/components/VsuEmulator/VsuEmulatorTypes';
 import { VesPluginsData } from '../../plugins/browser/ves-plugin';
-import { VsuEnvelopeDirection, VsuSweepDirection, VsuSweepModulationFunction } from 'src/editors/browser/components/VsuEmulator/VsuEmulatorTypes';
 
 export const VUENGINE_WORKSPACE_EXT = 'workspace';
 

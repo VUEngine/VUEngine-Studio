@@ -32,7 +32,6 @@ import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor';
 import { InstrumentConfig, MusicEditorChannelType, NOTES, SongData } from '../MusicEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
 
-const ENVELOPE_PREVIEW_RESOLUTION = 16;
 const ENVELOPE_PREVIEW_SIZE = 272;
 
 interface InstrumentProps {
@@ -328,20 +327,27 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
     const waveform = services.vesProjectService.getProjectDataItemById(instrument.waveform, 'WaveForm') as WaveFormData & WithFileUri & WithContributor;
 
     const envelopePreviewData = useMemo(() => {
-        const result: number[] = [...Array(ENVELOPE_PREVIEW_SIZE)].map(v => 0);
+        let result: number[] = [];
 
-        if (instrument.envelope.enabled && instrument.envelope.initialValue > 0) {
-            const endVolume = instrument.envelope.direction ? instrument.envelope.initialValue : 0;
-            const cycleDuration = (instrument.envelope.stepTime + 1) * ENVELOPE_PREVIEW_RESOLUTION;
-            const stepIncrease = instrument.envelope.initialValue / cycleDuration;
+        if (instrument.envelope.direction === VsuEnvelopeDirection.Decay && instrument.envelope.initialValue === 0) {
+            result = [...Array(ENVELOPE_PREVIEW_SIZE)].map(v => 0);
+        } else if (instrument.envelope.direction === VsuEnvelopeDirection.Grow && instrument.envelope.initialValue === 15) {
+            result = [...Array(ENVELOPE_PREVIEW_SIZE)].map(v => 15);
+        } else if (instrument.envelope.enabled) {
+            const endVolume = instrument.envelope.direction === VsuEnvelopeDirection.Grow ? 15 : 0;
+            const numberOfSteps = instrument.envelope.direction === VsuEnvelopeDirection.Grow ? 15 - instrument.envelope.initialValue : instrument.envelope.initialValue;
+            const cycleDuration = (instrument.envelope.stepTime + 1) * numberOfSteps;
+            const stepDecrease = instrument.envelope.initialValue / cycleDuration;
+            const stepIncrease = numberOfSteps / cycleDuration;
             for (let index = 0; index < ENVELOPE_PREVIEW_SIZE; index++) {
                 if (index >= cycleDuration && !instrument.envelope.repeat) {
                     result[index] = endVolume;
                 } else {
-                    const stepDelta = (index % cycleDuration) * stepIncrease;
-                    result[index] = instrument.envelope.direction
-                        ? stepDelta
-                        : instrument.envelope.initialValue - stepDelta;
+                    const decayStepDelta = (index % cycleDuration) * stepDecrease;
+                    const growStepDelta = (index % cycleDuration) * stepIncrease;
+                    result[index] = instrument.envelope.direction === VsuEnvelopeDirection.Grow
+                        ? instrument.envelope.initialValue + growStepDelta
+                        : instrument.envelope.initialValue - decayStepDelta;
                 }
             }
         }
