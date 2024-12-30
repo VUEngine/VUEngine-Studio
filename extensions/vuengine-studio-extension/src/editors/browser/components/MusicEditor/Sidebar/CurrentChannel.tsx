@@ -1,11 +1,13 @@
 import { nls } from '@theia/core';
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction, useContext } from 'react';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import BasicSelect from '../../Common/Base/BasicSelect';
 import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
+import HoverInfo from '../../Common/HoverInfo';
+import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor';
 import { ChannelConfig, SongData } from '../MusicEditorTypes';
 import { InputWithAction, InputWithActionButton } from './Instruments';
-import HoverInfo from '../../Common/HoverInfo';
 
 interface CurrentChannelProps {
     songData: SongData
@@ -19,6 +21,7 @@ interface CurrentChannelProps {
 }
 
 export default function CurrentChannel(props: CurrentChannelProps): React.JSX.Element {
+    const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const {
         songData,
         currentChannelId, setCurrentChannelId,
@@ -76,6 +79,8 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                     }]}
                     value={channel.id}
                     onChange={e => setCurrentChannelId(parseInt(e.target.value))}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />
             </VContainer>
 
@@ -89,6 +94,8 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                             className='theia-select'
                             onChange={e => setChannelInstrument(parseInt(e.target.value))}
                             value={channel.instrument}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         >
                             {songData.instruments.map((n, i) =>
                                 <option key={`instrument-select-${i}`} value={i}>{n.name}</option>
@@ -98,6 +105,8 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                             className='theia-button secondary'
                             title={nls.localize('vuengine/musicEditor/editInstrument', 'Edit Instrument')}
                             onClick={editInstrument}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         >
                             <i className='codicon codicon-settings-gear' />
                         </InputWithActionButton>
@@ -111,6 +120,8 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                             type="checkbox"
                             checked={channel.allowSkip}
                             onChange={() => toggleChannelAllowSkip()}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
                         {nls.localize('vuengine/musicEditor/skip', 'Skip')}
                         <HoverInfo
@@ -128,6 +139,8 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                                 type="checkbox"
                                 checked={channel.muted}
                                 onChange={() => toggleChannelMuted(channel.id)}
+                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                             />
                             {nls.localize('vuengine/musicEditor/muted', 'Muted')}
                         </label>
@@ -138,6 +151,8 @@ export default function CurrentChannel(props: CurrentChannelProps): React.JSX.El
                                 type="checkbox"
                                 checked={channel.solo}
                                 onChange={() => toggleChannelSolo(channel.id)}
+                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                             />
                             {nls.localize('vuengine/musicEditor/solo', 'Solo')}
                         </label>

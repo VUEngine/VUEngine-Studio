@@ -13,10 +13,16 @@ export interface SongData {
 }
 
 export enum MusicEvent {
+    Arpeggio = 'arpeggio',
     Instrument = 'instrument',
     Note = 'note',
     NoteCut = 'noteCut',
+    PortamentoDown = 'PortamentoDown',
+    PortamentoUp = 'PortamentoUp',
+    TonePortamento = 'tonePortamento',
+    Vibrato = 'vibrato',
     Volume = 'volume',
+    VolumeSlide = 'volumeSlide',
     MasterVolume = 'masterVolume',
 }
 

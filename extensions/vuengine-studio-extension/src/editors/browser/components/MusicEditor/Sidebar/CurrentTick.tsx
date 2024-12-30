@@ -147,6 +147,8 @@ export default function CurrentTick(props: CurrentNoteProps): React.JSX.Element 
                         ]}
                         value={note}
                         onChange={e => updateEvents(currentNote, MusicEvent.Note, parseInt(e.target.value))}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
                     {/* <SelectComponent
                         options={[{
@@ -164,6 +166,8 @@ export default function CurrentTick(props: CurrentNoteProps): React.JSX.Element 
                         className={`theia-button ${testing ? 'primary' : 'secondary'}`}
                         title={nls.localize('vuengine/musicEditor/try', 'Try')}
                         onClick={() => testing ? stopTesting() : startTesting(note)}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         disabled={playing}
                     >
                         {testing
@@ -198,6 +202,8 @@ export default function CurrentTick(props: CurrentNoteProps): React.JSX.Element 
                         className="theia-button add-button full-width"
                         onClick={addEvent}
                         title={nls.localize('vuengine/musicEditor/addEffect', 'Add Effect')}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     >
                         <i className='codicon codicon-plus' />
                     </button>

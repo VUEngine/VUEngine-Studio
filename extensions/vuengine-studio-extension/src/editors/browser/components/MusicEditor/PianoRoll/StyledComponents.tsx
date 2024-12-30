@@ -245,10 +245,11 @@ export const MetaLineNote = styled.div`
 export const MetaLineNoteEffects = styled.div`
     align-items: center;
     display: flex;
+    flex-direction: column;
     flex-grow: 1;
     justify-content: center;
-    min-height: 13px;
-    max-height: 23px;
+    min-height: 28px;
+    max-height: 28px;
     overflow: hidden;
     width: 100%;    
     

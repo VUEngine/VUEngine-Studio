@@ -6,6 +6,7 @@ import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import VContainer from '../../Common/Base/VContainer';
 import { InstrumentConfig, SongData } from '../MusicEditorTypes';
 import Instrument from './Instrument';
+import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor';
 
 export const InputWithAction = styled.div`
     display: flex;
@@ -48,7 +49,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
         playing,
         testing, setTesting, setTestingDuration, setTestingChannel, setTestingNote, setTestingInstrument,
     } = props;
-    const { services } = useContext(EditorsContext) as EditorsContextType;
+    const { disableCommands, enableCommands, services } = useContext(EditorsContext) as EditorsContextType;
     const instrument = songData.instruments[currentInstrument];
 
     const addInstrument = async () => {
@@ -102,6 +103,8 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                     title={nls.localize('vuengine/musicEditor/deleteInstrument', 'Delete Instrument')}
                     onClick={removeCurrentInstrument}
                     disabled={songData.instruments.length <= 1}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 >
                     <i className='fa fa-minus' />
                 </InputWithActionButton>
@@ -109,6 +112,8 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                     className='theia-button secondary'
                     title={nls.localize('vuengine/musicEditor/addInstrument', 'Add Instrument')}
                     onClick={addInstrument}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 >
                     <i className='codicon codicon-plus' />
                 </InputWithActionButton>

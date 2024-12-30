@@ -15,20 +15,18 @@ interface NotePropertiesNoteProps {
 export default function NotePropertiesNote(props: NotePropertiesNoteProps): React.JSX.Element {
     const { index, current, effects, setCurrentTick, setNote } = props;
 
-    let effectsLabel;
-    if (effects.length > 1) {
-        effectsLabel = effects.length;
-    } else if (effects.length === 1) {
-        effectsLabel = AVAILABLE_EVENTS[effects[0]].shortId;
-    }
-
     return <MetaLineNote
         className={current ? 'current' : undefined}
         onClick={() => setCurrentTick(index)}
         onContextMenu={() => setNote(index, undefined)}
     >
         <MetaLineNoteEffects>
-            {effectsLabel}
+            <div>
+                {effects.slice(0, 2).map(e => AVAILABLE_EVENTS[e].shortId)}
+            </div>
+            {effects.length > 2 &&
+                <div>+{effects.length - 2}</div>
+            }
         </MetaLineNoteEffects>
     </MetaLineNote>;
 }

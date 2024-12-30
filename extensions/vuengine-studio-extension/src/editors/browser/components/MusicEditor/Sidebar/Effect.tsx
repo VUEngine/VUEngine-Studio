@@ -1,12 +1,14 @@
 import { nls } from '@theia/core';
-import React from 'react';
+import React, { useContext } from 'react';
+import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
+import Range from '../../Common/Base/Range';
 import VContainer from '../../Common/Base/VContainer';
 import InfoLabel from '../../Common/InfoLabel';
 import { clamp } from '../../Common/Utils';
+import { INPUT_BLOCKING_COMMANDS } from '../MusicEditor';
 import { MusicEvent, SongData } from '../MusicEditorTypes';
 import { AVAILABLE_EVENTS } from './AvailableEvents';
-import Range from '../../Common/Base/Range';
 
 const getNthByte = (num: number, byte: number): number =>
     parseInt('0x' + (clamp((num ?? 0), 0, 255).toString(16).padStart(2, '0'))[byte]);
@@ -28,6 +30,7 @@ interface EffectProps {
 }
 
 export default function Effect(props: EffectProps): React.JSX.Element {
+    const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
     const { songData, event, value, setValue, removeEvent } = props;
 
     const eventDetails = AVAILABLE_EVENTS[event];
@@ -58,6 +61,7 @@ export default function Effect(props: EffectProps): React.JSX.Element {
                             min={0}
                             setValue={(v: number) => setValue(setNthByte(value, 1, v))}
                             width="100%"
+                            commandsToDisable={INPUT_BLOCKING_COMMANDS}
                         />
                     </HContainer>
                     <HContainer alignItems="center">
@@ -70,9 +74,21 @@ export default function Effect(props: EffectProps): React.JSX.Element {
                             min={0}
                             setValue={(v: number) => setValue(setNthByte(value, 0, v))}
                             width="100%"
+                            commandsToDisable={INPUT_BLOCKING_COMMANDS}
                         />
                     </HContainer>
                 </VContainer>
+            }
+
+            {event === MusicEvent.MasterVolume &&
+                <Range
+                    value={value}
+                    max={15}
+                    min={0}
+                    setValue={setValue}
+                    width="100%"
+                    commandsToDisable={INPUT_BLOCKING_COMMANDS}
+                />
             }
 
             {event === MusicEvent.Instrument &&
@@ -81,6 +97,8 @@ export default function Effect(props: EffectProps): React.JSX.Element {
                         className='theia-select'
                         onChange={e => setValue(parseInt(e.target.value))}
                         value={value}
+                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     >
                         {songData.instruments.map((n, i) =>
                             <option key={i} value={i}>{n.name}</option>

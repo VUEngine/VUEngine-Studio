@@ -5,6 +5,7 @@ import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 import { MusicEditorCommands } from './MusicEditorCommands';
 import { MusicEditorMode, MusicEditorTool } from './MusicEditorTypes';
 import { DotsNine, Eraser, PencilSimple, PianoKeys, Selection } from '@phosphor-icons/react';
+import { INPUT_BLOCKING_COMMANDS } from './MusicEditor';
 
 export const StyledMusicEditorToolbar = styled.div`
     align-items: center;
@@ -66,7 +67,7 @@ interface MusicEditorToolbarProps {
 }
 
 export default function MusicEditorToolbar(props: MusicEditorToolbarProps): React.JSX.Element {
-    const { services } = useContext(EditorsContext) as EditorsContextType;
+    const { disableCommands, enableCommands, services } = useContext(EditorsContext) as EditorsContextType;
     const {
         currentStep, playing, editorMode, toggleEditorMode, togglePlaying, stopPlaying, tool, setTool, playbackElapsedTime, totalLength, speed
     } = props;
@@ -81,6 +82,8 @@ export default function MusicEditorToolbar(props: MusicEditorToolbarProps): Reac
                         : nls.localize('vuengine/musicEditor/switchToPianoRollMode', 'Switch To Piano Roll Mode'))
                     }
                     onClick={toggleEditorMode}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 >
                     {editorMode === MusicEditorMode.PIANOROLL
                         ? <PianoKeys size={20} style={{ rotate: '-90deg' }} />
@@ -97,6 +100,8 @@ export default function MusicEditorToolbar(props: MusicEditorToolbarProps): Reac
                         services.vesCommonService.getKeybindingLabel(MusicEditorCommands.PLAY_PAUSE.id, true)
                     }
                     onClick={togglePlaying}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     style={{ outlineWidth: playing ? 1 : 0 }}
                 >
                     <i className={`fa fa-${playing ? 'pause' : 'play'}`} />
@@ -107,6 +112,8 @@ export default function MusicEditorToolbar(props: MusicEditorToolbarProps): Reac
                         services.vesCommonService.getKeybindingLabel(MusicEditorCommands.STOP.id, true)
                     }
                     onClick={stopPlaying}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 >
                     <i className="fa fa-stop" />
                 </StyledMusicEditorToolbarButton>
@@ -139,6 +146,8 @@ export default function MusicEditorToolbar(props: MusicEditorToolbarProps): Reac
                     }
                     onClick={() => setTool(MusicEditorTool.DEFAULT)}
                     style={{ outlineWidth: tool === MusicEditorTool.DEFAULT ? 1 : 0 }}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 >
                     <PencilSimple size={17} />
                 </StyledMusicEditorToolbarButton>
@@ -149,6 +158,8 @@ export default function MusicEditorToolbar(props: MusicEditorToolbarProps): Reac
                     }
                     onClick={() => setTool(MusicEditorTool.ERASER)}
                     style={{ outlineWidth: tool === MusicEditorTool.ERASER ? 1 : 0 }}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 >
                     <Eraser size={17} />
                 </StyledMusicEditorToolbarButton>
@@ -159,6 +170,8 @@ export default function MusicEditorToolbar(props: MusicEditorToolbarProps): Reac
                     }
                     onClick={() => setTool(MusicEditorTool.MARQUEE)}
                     style={{ outlineWidth: tool === MusicEditorTool.MARQUEE ? 1 : 0 }}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     disabled={true}
                 >
                     <Selection size={17} />
@@ -170,6 +183,8 @@ export default function MusicEditorToolbar(props: MusicEditorToolbarProps): Reac
                 title='Recording Mode'
                 disabled={true}
                 onClick={() => setState({ recording: !recording })}
+                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
             >
                 <i className='fa fa-circle' />
             </StyledMusicEditorToolbarButton>

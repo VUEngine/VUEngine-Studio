@@ -510,6 +510,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                             type="checkbox"
                             checked={instrument.interval?.enabled}
                             onChange={toggleIntervalEnabled}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
                         {nls.localizeByDefault('Enabled')}
                     </label>
@@ -552,6 +554,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                             type="checkbox"
                             checked={instrument.envelope.enabled}
                             onChange={toggleEnvelopeEnabled}
+                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                         />
                         {nls.localizeByDefault('Enabled')}
                     </label>
@@ -561,6 +565,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                                 type="checkbox"
                                 checked={instrument.envelope.repeat}
                                 onChange={toggleEnvelopeRepeat}
+                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                             />
                             Repeat
                         </label>
@@ -674,6 +680,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                                 type="checkbox"
                                 checked={instrument.sweepMod.enabled}
                                 onChange={toggleSweepModulationEnabled}
+                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                             />
                             {nls.localizeByDefault('Enabled')}
                         </label>
@@ -683,6 +691,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                                     type="checkbox"
                                     checked={instrument.sweepMod.repeat}
                                     onChange={toggleSweepModulationRepeat}
+                                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                                 />
                                 {nls.localizeByDefault('Repeat')}
                             </label>
@@ -826,6 +836,8 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                     title={nls.localize('vuengine/musicEditor/try', 'Try')}
                     onClick={() => testing ? stopTesting() : startTesting()}
                     disabled={playing}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 >
                     {testing
                         ? <i className='fa fa-stop' />

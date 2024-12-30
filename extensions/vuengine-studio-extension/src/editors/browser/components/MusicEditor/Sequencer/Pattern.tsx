@@ -45,17 +45,18 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
         const result: number[][] = [[]];
 
         // init array
-        const emptyLine = [...Array(patternSize)].map(v => 0);
+        const emptyLine = [...Array(patternSize * patternNoteWidth)].map(v => 0);
         [...Array(PATTERN_HEIGHT)].map(v => result.push([...emptyLine]));
 
         // find set notes
         Object.keys(pattern.events).forEach((key: string) => {
-            const numKey = parseInt(key);
-            const note = pattern.events[numKey][MusicEvent.Note];
+            const tick = parseInt(key);
+            const event = pattern.events[tick];
+            const note = event[MusicEvent.Note];
             if (note) {
                 const noteYPosition = Math.round(PATTERN_MAPPING_FACTOR * note);
                 for (let k = 0; k < patternNoteWidth; k++) {
-                    result[noteYPosition][numKey * patternNoteWidth + k] = 1;
+                    result[noteYPosition][tick * patternNoteWidth + k] = 1;
                 }
             }
         });
@@ -146,7 +147,7 @@ export default function Pattern(props: PatternProps): React.JSX.Element {
                 palette={'00000000'}
                 pixelData={patternPixels}
                 textColor={textColor}
-                width={patternSize}
+                width={patternSize * patternNoteWidth}
                 displayMode={DisplayMode.Mono}
                 colorMode={ColorMode.Default}
                 style={{

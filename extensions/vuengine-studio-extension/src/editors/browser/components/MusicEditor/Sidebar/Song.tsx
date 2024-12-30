@@ -86,6 +86,8 @@ export default function Song(props: SongProps): React.JSX.Element {
                     type="checkbox"
                     checked={songData.loop}
                     onChange={() => toggleLoop()}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />
                 {nls.localize('vuengine/musicEditor/loop', 'Loop')}
             </label>
@@ -100,6 +102,8 @@ export default function Song(props: SongProps): React.JSX.Element {
                     options={Object.keys(BAR_PATTERN_LENGTH_MULT_MAP).map(v => ({ value: v }))}
                     value={songData.defaultBar}
                     onChange={e => setDefaultBar(e.target.value)}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />
             </VContainer>
             <VContainer>

@@ -66,6 +66,8 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                     className='theia-select'
                     value={currentPatternId}
                     onChange={e => setCurrentPatternId(channel.id, parseInt(e.target.value))}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 >
                     {channel.patterns.map((n, i) => (
                         <option key={`select-pattern-${i}`} value={i}>{getName(i)}</option>
@@ -75,6 +77,8 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                     className='theia-button secondary'
                     title={nls.localize('vuengine/musicEditor/deletePattern', 'Delete Pattern')}
                     onClick={removeCurrentPattern}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 >
                     <i className='fa fa-minus' />
                 </InputWithActionButton>
@@ -82,6 +86,8 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                     className='theia-button secondary'
                     title={nls.localize('vuengine/musicEditor/addPattern', 'Add Pattern')}
                     onClick={addPattern}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 >
                     <i className='codicon codicon-plus' />
                 </InputWithActionButton>
@@ -108,6 +114,8 @@ export default function CurrentPattern(props: CurrentPatternProps): React.JSX.El
                     options={Object.keys(BAR_PATTERN_LENGTH_MULT_MAP).map(v => ({ value: v }))}
                     value={pattern.bar}
                     onChange={e => setBar(e.target.value)}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />
             </VContainer>
         </HContainer>
