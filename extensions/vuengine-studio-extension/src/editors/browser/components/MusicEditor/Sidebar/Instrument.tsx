@@ -20,6 +20,7 @@ import {
     VSU_NOISE_TAP,
     VSU_SWEEP_MODULATION_FREQUENCY_MAX,
     VSU_SWEEP_MODULATION_FREQUENCY_MIN,
+    VSU_SWEEP_MODULATION_FREQUENCY_VALUES,
     VSU_SWEEP_MODULATION_INTERVAL_MAX,
     VSU_SWEEP_MODULATION_INTERVAL_MIN,
     VSU_SWEEP_MODULATION_SHIFT_MAX,
@@ -134,39 +135,14 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         setInstruments(updatedInstruments);
     };
 
-    const toggleIntervalEnabled = () => {
+    const updateInterval = (interval: number) => {
         const updatedInstruments = [...songData.instruments];
         updatedInstruments[currentInstrument] = {
             ...updatedInstruments[currentInstrument],
             interval: {
                 ...instrument.interval,
-                enabled: !instrument.interval?.enabled,
-            },
-        };
-
-        setInstruments(updatedInstruments);
-    };
-
-    const setInterval = (interval: number) => {
-        const updatedInstruments = [...songData.instruments];
-        updatedInstruments[currentInstrument] = {
-            ...updatedInstruments[currentInstrument],
-            interval: {
-                ...instrument.interval,
-                value: clamp(interval, 0, 31),
-            },
-        };
-
-        setInstruments(updatedInstruments);
-    };
-
-    const toggleEnvelopeEnabled = () => {
-        const updatedInstruments = [...songData.instruments];
-        updatedInstruments[currentInstrument] = {
-            ...updatedInstruments[currentInstrument],
-            envelope: {
-                ...instrument.envelope,
-                enabled: !instrument.envelope.enabled,
+                enabled: interval !== 0,
+                value: clamp(interval - 1, 0, VSU_INTERVAL_VALUES.length - 1),
             },
         };
 
@@ -186,13 +162,14 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         setInstruments(updatedInstruments);
     };
 
-    const setEnvelopeDirection = (direction: VsuEnvelopeDirection) => {
+    const setEnvelopeType = (type: -1 | VsuEnvelopeDirection) => {
         const updatedInstruments = [...songData.instruments];
         updatedInstruments[currentInstrument] = {
             ...updatedInstruments[currentInstrument],
             envelope: {
                 ...instrument.envelope,
-                direction,
+                enabled: type !== -1,
+                direction: type === -1 ? VsuEnvelopeDirection.Decay : type as VsuEnvelopeDirection,
             },
         };
 
@@ -225,19 +202,6 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         setInstruments(updatedInstruments);
     };
 
-    const toggleSweepModulationEnabled = () => {
-        const updatedInstruments = [...songData.instruments];
-        updatedInstruments[currentInstrument] = {
-            ...updatedInstruments[currentInstrument],
-            sweepMod: {
-                ...instrument.sweepMod,
-                enabled: !instrument.sweepMod.enabled,
-            },
-        };
-
-        setInstruments(updatedInstruments);
-    };
-
     const toggleSweepModulationRepeat = () => {
         const updatedInstruments = [...songData.instruments];
         updatedInstruments[currentInstrument] = {
@@ -251,13 +215,14 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         setInstruments(updatedInstruments);
     };
 
-    const setSweepModulationFunction = (fnc: VsuSweepModulationFunction) => {
+    const updateSweepModulationFunction = (fnc: -1 | VsuSweepModulationFunction) => {
         const updatedInstruments = [...songData.instruments];
         updatedInstruments[currentInstrument] = {
             ...updatedInstruments[currentInstrument],
             sweepMod: {
                 ...instrument.sweepMod,
-                function: fnc,
+                enabled: fnc !== -1,
+                function: fnc === -1 ? VsuSweepModulationFunction.Sweep : fnc,
             },
         };
 
@@ -364,112 +329,124 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
     ]);
 
     return <VContainer gap={15}>
-        <hr />
-        <VContainer grow={1}>
-            <label>
-                {nls.localize('vuengine/musicEditor/name', 'Name')}
-            </label>
-            <input
-                className='theia-input'
-                value={instrument.name}
-                onChange={e => setName(e.target.value)}
-                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-            />
-        </VContainer>
-        <VContainer>
-            <label>
-                {nls.localize('vuengine/musicEditor/type', 'Type')}
-            </label>
-            <RadioSelect
-                options={[{
-                    label: nls.localize('vuengine/musicEditor/wave', 'Wave'),
-                    value: MusicEditorChannelType.WAVE,
-                }, {
-
-                    label: nls.localize('vuengine/musicEditor/waveAndSweepMod', 'Wave + Sweep / Mod.'),
-                    value: MusicEditorChannelType.SWEEPMOD,
-                }, {
-                    label: nls.localize('vuengine/musicEditor/noise', 'Noise'),
-                    value: MusicEditorChannelType.NOISE,
-                }]}
-                defaultValue={instrument.type}
-                onChange={options => setType(options[0].value as MusicEditorChannelType)}
-                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-            />
-        </VContainer>
-        <VContainer>
-            <label>
-                {nls.localize('vuengine/musicEditor/volume', 'Volume')}
-            </label>
-            <HContainer alignItems="center">
-                <div style={{ minWidth: 10, width: 10 }}>
-                    L
-                </div>
-                <Range
-                    value={instrument.volume.left}
-                    max={15}
-                    min={0}
-                    setValue={(v: number) => setVolume('left', v)}
-                    commandsToDisable={INPUT_BLOCKING_COMMANDS}
-                    width="100%"
+        <HContainer gap={15}>
+            <VContainer grow={1}>
+                <label>
+                    {nls.localize('vuengine/musicEditor/name', 'Name')}
+                </label>
+                <input
+                    className='theia-input'
+                    value={instrument.name}
+                    onChange={e => setName(e.target.value)}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />
-            </HContainer>
-            <HContainer alignItems="center">
-                <div style={{ minWidth: 10, width: 10 }}>
-                    R
-                </div>
-                <Range
-                    value={instrument.volume.right}
-                    max={15}
-                    min={0}
-                    setValue={(v: number) => setVolume('right', v)}
-                    commandsToDisable={INPUT_BLOCKING_COMMANDS}
-                    width="100%"
-                />
-            </HContainer>
-        </VContainer>
-        {
-            instrument.type !== MusicEditorChannelType.NOISE &&
+            </VContainer>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/musicEditor/waveform', 'Waveform')}
+                    {nls.localize('vuengine/musicEditor/type', 'Type')}
                 </label>
-                <HContainer gap={10}>
-                    <NumberArrayPreview
-                        active={true}
-                        height={64}
-                        width={64}
-                        maximum={64}
-                        data={waveform ? waveform.values : [...Array(32)].map(v => 0)}
-                        onClick={() => setWaveformDialogOpen(currentInstrument)}
+                <BasicSelect
+                    options={[{
+                        label: nls.localize('vuengine/musicEditor/wave', 'Wave'),
+                        value: MusicEditorChannelType.WAVE,
+                    }, {
+
+                        label: nls.localize('vuengine/musicEditor/sweepMod', 'Sweep / Mod.'),
+                        value: MusicEditorChannelType.SWEEPMOD,
+                    }, {
+                        label: nls.localize('vuengine/musicEditor/noise', 'Noise'),
+                        value: MusicEditorChannelType.NOISE,
+                    }]}
+                    value={instrument.type}
+                    onChange={e => setType(e.currentTarget.value as MusicEditorChannelType)}
+                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                />
+            </VContainer>
+        </HContainer>
+        <HContainer gap={15}>
+            <VContainer>
+                <label>
+                    {nls.localize('vuengine/musicEditor/volume', 'Volume')}
+                </label>
+                <HContainer alignItems="center">
+                    <div style={{ minWidth: 10, width: 10 }}>
+                        L
+                    </div>
+                    <Range
+                        value={instrument.volume.left}
+                        max={15}
+                        min={0}
+                        setValue={(v: number) => setVolume('left', v)}
+                        commandsToDisable={INPUT_BLOCKING_COMMANDS}
+                        width="100%"
                     />
-                    <VContainer gap={0}>
-                        {waveform
-                            ? <>
-                                <div>
-                                    {waveform._fileUri.path.name}
-                                </div>
-                                {/*
-                                <div className='lightLabel'>
-                                    {waveform._contributor}
-                                </div>
-                                */}
-                            </>
-                            : <>
-                                <div>
-                                    {nls.localize('vuengine/musicEditor/none', 'None')}
-                                </div>
-                                <div className='lightLabel'>
-                                    {nls.localize('vuengine/musicEditor/clickToSelect', 'Click to select')}
-                                </div>
-                            </>
-                        }
-                    </VContainer>
+                </HContainer>
+                <HContainer alignItems="center">
+                    <div style={{ minWidth: 10, width: 10 }}>
+                        R
+                    </div>
+                    <Range
+                        value={instrument.volume.right}
+                        max={15}
+                        min={0}
+                        setValue={(v: number) => setVolume('right', v)}
+                        commandsToDisable={INPUT_BLOCKING_COMMANDS}
+                        width="100%"
+                    />
                 </HContainer>
             </VContainer>
-        }
+            {
+                instrument.type !== MusicEditorChannelType.NOISE &&
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/musicEditor/waveform', 'Waveform')}
+                    </label>
+                    <VContainer>
+                        <NumberArrayPreview
+                            active={true}
+                            height={52}
+                            width={64}
+                            maximum={64}
+                            data={waveform ? waveform.values : [...Array(32)].map(v => 0)}
+                            onClick={() => setWaveformDialogOpen(currentInstrument)}
+                        />
+                        {!waveform &&
+                            <div className='lightLabel' style={{ margin: '-42px auto 0' }}>
+                                {nls.localize('vuengine/musicEditor/none', 'None')}
+                            </div>
+                        }
+                    </VContainer>
+                </VContainer>
+            }
+        </HContainer>
+        <VContainer>
+            <InfoLabel
+                label={nls.localize('vuengine/musicEditor/noteDuration', 'Note Duration')}
+                tooltip={
+                    nls.localize('vuengine/musicEditor/noteDurationDescription',
+                        'Specifies how long the current note should play before automatically being shut off.'
+                    )}
+            />
+            <Range
+                value={instrument.interval?.enabled ? instrument.interval?.value + 1 : 0}
+                options={[
+                    {
+                        value: 0,
+                        label: 'Unlimited',
+                    },
+                    ...VSU_INTERVAL_VALUES.map((o, i) => ({
+                        value: i + 1,
+                        label: `${o.toString()} ms`,
+                    })),
+                ]}
+                max={VSU_INTERVAL_VALUES.length}
+                min={0}
+                setValue={updateInterval}
+                commandsToDisable={INPUT_BLOCKING_COMMANDS}
+            />
+        </VContainer>
         {
             instrument.type === MusicEditorChannelType.NOISE &&
             <VContainer>
@@ -495,72 +472,55 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
             </VContainer>
         }
         <hr />
-        <HContainer gap={15}>
+        <VContainer gap={15}>
             <VContainer>
                 <InfoLabel
-                    label={nls.localize('vuengine/musicEditor/interval', 'Interval')}
+                    label={nls.localize('vuengine/musicEditor/envelope', 'Envelope')}
                     tooltip={
-                        nls.localize('vuengine/musicEditor/intervalDescription',
-                            'Interval, when enabled, specifies how long sound should be generated before automatically being shut off. '
+                        nls.localize('vuengine/musicEditor/envelopeDescription',
+                            'The envelope acts like a master volume setting independent from the stereo levels. ' +
+                            'It can be configured to grow or decay automatically over time, and optionally reload ' +
+                            'a pre-configured value and repeat the grow/decay process. '
                         )}
                 />
-                <VContainer gap={15}>
-                    <label>
-                        <input
-                            type="checkbox"
-                            checked={instrument.interval?.enabled}
-                            onChange={toggleIntervalEnabled}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                        />
-                        {nls.localizeByDefault('Enabled')}
-                    </label>
-                </VContainer>
+                <RadioSelect
+                    options={[{
+                        label: nls.localize('vuengine/musicEditor/off', 'Off'),
+                        value: -1,
+                    }, {
+                        label: nls.localize('vuengine/musicEditor/envelopeGrow', 'Grow'),
+                        value: VsuEnvelopeDirection.Grow,
+                    }, {
+                        label: nls.localize('vuengine/musicEditor/envelopeDecay', 'Decay'),
+                        value: VsuEnvelopeDirection.Decay,
+                    }]}
+                    defaultValue={instrument.envelope.enabled ? instrument.envelope.direction : -1}
+                    onChange={options => setEnvelopeType(options[0].value as -1 | VsuEnvelopeDirection)}
+                    allowBlank
+                />
             </VContainer>
-            {instrument.interval?.enabled &&
-                <VContainer>
-                    <label>
-                        {nls.localize('vuengine/musicEditor/length', 'Length')}
-                    </label>
-                    <select
-                        className="theia-select"
-                        value={instrument.interval?.value
-
-                        }
-                        onChange={e => setInterval(parseInt(e.target.value))}
-                    >
-                        {VSU_INTERVAL_VALUES.map((intv, i) =>
-                            <option key={i} value={i}>{intv} ms</option>
-                        )}
-                    </select>
-                </VContainer>
-            }
-        </HContainer>
-        <hr />
-        <VContainer gap={15}>
-            <HContainer gap={15}>
-                <VContainer>
-                    <InfoLabel
-                        label={nls.localize('vuengine/musicEditor/envelope', 'Envelope')}
-                        tooltip={
-                            nls.localize('vuengine/musicEditor/envelopeDescription',
-                                'The envelope acts like a master volume setting independent from the stereo levels. ' +
-                                'It can be configured to grow or decay automatically over time, and optionally reload ' +
-                                'a pre-configured value and repeat the grow/decay process. '
-                            )}
-                    />
-                    <label>
-                        <input
-                            type="checkbox"
-                            checked={instrument.envelope.enabled}
-                            onChange={toggleEnvelopeEnabled}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                        />
-                        {nls.localizeByDefault('Enabled')}
-                    </label>
-                    {instrument.envelope.enabled &&
-                        <label>
+            <VContainer gap={15}>
+                {instrument.envelope.enabled &&
+                    <HContainer gap={15}>
+                        <VContainer>
+                            <label>
+                                {nls.localize('vuengine/musicEditor/interval', 'Interval')}
+                            </label>
+                            <Range
+                                value={instrument.envelope.stepTime}
+                                setValue={setEnvelopeStepTime}
+                                min={0}
+                                max={VSU_ENVELOPE_STEP_TIME_VALUES.length - 1}
+                                options={VSU_ENVELOPE_STEP_TIME_VALUES.map((st, i) => ({
+                                    value: i,
+                                    label: `${st} ms`,
+                                }))}
+                            />
+                        </VContainer>
+                        <VContainer>
+                            <label>
+                                {nls.localizeByDefault('Repeat')}
+                            </label>
                             <input
                                 type="checkbox"
                                 checked={instrument.envelope.repeat}
@@ -568,63 +528,21 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                                 onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                                 onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                             />
-                            Repeat
-                        </label>
-                    }
-                </VContainer>
-                {instrument.envelope.enabled &&
-                    <VContainer>
-                        <label>
-                            {nls.localize('vuengine/musicEditor/type', 'Type')}
-                        </label>
-                        <RadioSelect
-                            options={[{
-                                label: 'Grow',
-                                value: VsuEnvelopeDirection.Grow,
-                            }, {
-                                label: 'Decay',
-                                value: VsuEnvelopeDirection.Decay,
-                            }]}
-                            defaultValue={instrument.envelope.direction}
-                            onChange={options => setEnvelopeDirection(options[0].value as VsuEnvelopeDirection)}
-                            allowBlank
-                        />
-                    </VContainer>
-                }
-            </HContainer>
-            <VContainer>
-                <HContainer gap={15}>
-                    {instrument.envelope.enabled &&
-                        <VContainer>
-                            <label>
-                                {nls.localize('vuengine/musicEditor/stepTime', 'Step Time')}
-                            </label>
-                            <select
-                                className="theia-select"
-                                value={instrument.envelope.stepTime
-
-                                }
-                                onChange={e => setEnvelopeStepTime(parseInt(e.target.value))}
-                            >
-                                {VSU_ENVELOPE_STEP_TIME_VALUES.map((st, i) =>
-                                    <option key={i} value={i}>{st} ms</option>
-                                )}
-                            </select>
                         </VContainer>
-                    }
-                    <VContainer>
-                        <label>
-                            {nls.localize('vuengine/musicEditor/initialVolume', 'Initial Volume')}
-                        </label>
-                        <Range
-                            value={instrument.envelope.initialValue}
-                            max={VSU_ENVELOPE_INITIAL_VALUE_MAX}
-                            min={VSU_ENVELOPE_INITIAL_VALUE_MIN}
-                            setValue={setEnvelopeInitialValue}
-                            commandsToDisable={INPUT_BLOCKING_COMMANDS}
-                        />
-                    </VContainer>
-                </HContainer>
+                    </HContainer>
+                }
+                <VContainer>
+                    <label>
+                        {nls.localize('vuengine/musicEditor/initialVolume', 'Initial Volume')}
+                    </label>
+                    <Range
+                        value={instrument.envelope.initialValue}
+                        max={VSU_ENVELOPE_INITIAL_VALUE_MAX}
+                        min={VSU_ENVELOPE_INITIAL_VALUE_MIN}
+                        setValue={setEnvelopeInitialValue}
+                        commandsToDisable={INPUT_BLOCKING_COMMANDS}
+                    />
+                </VContainer>
                 {instrument.envelope.enabled &&
                     <VContainer>
                         <InfoLabel
@@ -645,48 +563,91 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
         {
             instrument.type === MusicEditorChannelType.SWEEPMOD &&
             <>
-                <HContainer gap={15}>
-                    <VContainer>
-                        <InfoLabel
-                            label={nls.localize('vuengine/musicEditor/sweepMod', 'Sweep / Mod.')}
-                            tooltip={<>
-                                {nls.localize('vuengine/musicEditor/sweepModDescription',
-                                    'The VSU\'s channel 5 has, in addition to all of the features of channels 1-4, ' +
-                                    'support for frequency sweep and modulation functions, which will modify the current frequency value over time.'
-                                )}
-                                <br /><br />
-                                <b>{nls.localize('vuengine/musicEditor/sweep', 'Sweep')}</b>{': '}
-                                {nls.localize(
-                                    'vuengine/musicEditor/sweepDescription',
-                                    'The sweep function produces a new frequency value relative to the current frequency value. ' +
-                                    'The new frequency value is calculated by shifting the current frequency value right by a ' +
-                                    'specified number of bits, then adding or subtracting the result to or from the current frequency ' +
-                                    'value. This results in a sliding pitch on the logarithmic scale, as though along octaves. '
-                                )}
-                                <br /><br />
-                                <b>{nls.localize('vuengine/musicEditor/modulation', 'Modulation')}</b>{': '}
-                                {nls.localize(
-                                    'vuengine/musicEditor/modulationDescription',
-                                    'The modulation function produces a new frequency value by reading modulation values from VSU memory. ' +
-                                    'Each frequency modification frame, a new frequency value is calculated by reading a modulation value ' +
-                                    'and adding it to the most recent frequency value written to the frequency registers. ' +
-                                    'After processing all 32 modulation values, frequency modification processing can either stop or continue ' +
-                                    'from the first modulation value. '
-                                )}
-                            </>}
-                        />
-                        <label>
-                            <input
-                                type="checkbox"
-                                checked={instrument.sweepMod.enabled}
-                                onChange={toggleSweepModulationEnabled}
-                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                            />
-                            {nls.localizeByDefault('Enabled')}
-                        </label>
-                        {instrument.sweepMod.enabled &&
-                            <label>
+                <hr />
+                <VContainer>
+                    <InfoLabel
+                        label={nls.localize('vuengine/musicEditor/sweepModulation', 'Sweep / Modulation')}
+                        tooltip={<>
+                            {nls.localize('vuengine/musicEditor/sweepModDescription',
+                                'The VSU\'s channel 5 has, in addition to all of the features of channels 1-4, ' +
+                                'support for frequency sweep and modulation functions, which will modify the current frequency value over time.'
+                            )}
+                            <br /><br />
+                            <b>{nls.localize('vuengine/musicEditor/sweep', 'Sweep')}</b>{': '}
+                            {nls.localize(
+                                'vuengine/musicEditor/sweepDescription',
+                                'The sweep function produces a new frequency value relative to the current frequency value. ' +
+                                'The new frequency value is calculated by shifting the current frequency value right by a ' +
+                                'specified number of bits, then adding or subtracting the result to or from the current frequency ' +
+                                'value. This results in a sliding pitch on the logarithmic scale, as though along octaves. '
+                            )}
+                            <br /><br />
+                            <b>{nls.localize('vuengine/musicEditor/modulation', 'Modulation')}</b>{': '}
+                            {nls.localize(
+                                'vuengine/musicEditor/modulationDescription',
+                                'The modulation function produces a new frequency value by reading modulation values from VSU memory. ' +
+                                'Each frequency modification frame, a new frequency value is calculated by reading a modulation value ' +
+                                'and adding it to the most recent frequency value written to the frequency registers. ' +
+                                'After processing all 32 modulation values, frequency modification processing can either stop or continue ' +
+                                'from the first modulation value. '
+                            )}
+                        </>}
+                    />
+                    <RadioSelect
+                        options={[{
+                            label: nls.localize('vuengine/musicEditor/off', 'Off'),
+                            value: -1,
+                        }, {
+                            label: nls.localize('vuengine/musicEditor/sweep', 'Sweep'),
+                            value: VsuSweepModulationFunction.Sweep,
+                        }, {
+                            label: nls.localize('vuengine/musicEditor/modulation', 'Modulation'),
+                            value: VsuSweepModulationFunction.Modulation,
+                        }]}
+                        defaultValue={instrument.sweepMod.enabled ? instrument.sweepMod.function : -1}
+                        onChange={options => updateSweepModulationFunction(options[0].value as -1 | VsuSweepModulationFunction)}
+                        allowBlank
+                    />
+                </VContainer>
+                {instrument.sweepMod.enabled &&
+                    <>
+                        <HContainer gap={15}>
+                            <VContainer>
+                                <label>
+                                    {nls.localize('vuengine/musicEditor/clockFrequency', 'Clock Frequency')}
+                                </label>
+                                <RadioSelect
+                                    options={VSU_SWEEP_MODULATION_FREQUENCY_VALUES.map((v, i) => ({
+                                        label: `${v} ms`,
+                                        value: i,
+                                    }))}
+                                    defaultValue={instrument.sweepMod.frequency}
+                                    onChange={options => setSweepModulationFrequency(options[0].value as number)}
+                                    allowBlank
+                                />
+                            </VContainer>
+                            <VContainer>
+                                <label>
+                                    {nls.localize('vuengine/musicEditor/interval', 'Interval')}
+                                </label>
+                                <input
+                                    className='theia-input'
+                                    style={{ width: 72 }}
+                                    type='number'
+                                    min={VSU_SWEEP_MODULATION_INTERVAL_MIN}
+                                    max={VSU_SWEEP_MODULATION_INTERVAL_MAX}
+                                    value={instrument.sweepMod.interval}
+                                    onChange={e => setSweepModulationInterval(
+                                        e.target.value === ''
+                                            ? VSU_SWEEP_MODULATION_INTERVAL_MIN
+                                            : clamp(parseInt(e.target.value), VSU_SWEEP_MODULATION_INTERVAL_MIN, VSU_SWEEP_MODULATION_INTERVAL_MAX)
+                                    )}
+                                />
+                            </VContainer>
+                            <VContainer>
+                                <label>
+                                    {nls.localizeByDefault('Repeat')}
+                                </label>
                                 <input
                                     type="checkbox"
                                     checked={instrument.sweepMod.repeat}
@@ -694,121 +655,58 @@ export default function Instrument(props: InstrumentProps): React.JSX.Element {
                                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                                 />
-                                {nls.localizeByDefault('Repeat')}
-                            </label>
-                        }
-                    </VContainer>
-                    {instrument.sweepMod.enabled &&
-                        <VContainer>
-                            <label>
-                                {nls.localize('vuengine/musicEditor/type', 'Type')}
-                            </label>
-                            <RadioSelect
-                                options={[{
-                                    label: 'Sweep',
-                                    value: VsuSweepModulationFunction.Sweep,
-                                }, {
-                                    label: 'Modulation',
-                                    value: VsuSweepModulationFunction.Modulation,
-                                }]}
-                                defaultValue={instrument.sweepMod.function}
-                                onChange={options => setSweepModulationFunction(options[0].value as VsuSweepModulationFunction)}
-                                allowBlank
-                            />
-                        </VContainer>
-                    }
-                </HContainer>
-                <VContainer gap={15}>
-                    {instrument.sweepMod.enabled &&
-                        <>
+                            </VContainer>
+                        </HContainer>
+                        {instrument.sweepMod.function === VsuSweepModulationFunction.Sweep &&
                             <HContainer gap={15}>
                                 <VContainer>
                                     <label>
-                                        {nls.localize('vuengine/musicEditor/clockFrequency', 'Clock Frequency')}
+                                        {nls.localize('vuengine/musicEditor/direction', 'Direction')}
                                     </label>
-                                    <select
-                                        className="theia-select"
-                                        value={instrument.sweepMod.frequency
-
-                                        }
-                                        onChange={e => setSweepModulationFrequency(parseInt(e.target.value))}
-                                    >
-                                        <option value="0">0.96 ms</option>
-                                        <option value="1">7.68 ms</option>
-                                    </select>
+                                    <RadioSelect
+                                        options={[{
+                                            label: 'Up',
+                                            value: VsuSweepDirection.Up,
+                                        }, {
+                                            label: 'Down',
+                                            value: VsuSweepDirection.Down,
+                                        }]}
+                                        defaultValue={instrument.sweepMod.direction}
+                                        onChange={options => setSweepDirection(options[0].value as VsuSweepDirection)}
+                                        allowBlank
+                                    />
                                 </VContainer>
                                 <VContainer>
                                     <label>
-                                        {nls.localize('vuengine/musicEditor/interval', 'Interval')}
+                                        {nls.localize('vuengine/musicEditor/shiftAmount', 'Shift Amount')}
                                     </label>
-                                    <input
-                                        className='theia-input'
-                                        style={{ width: 72 }}
-                                        type='number'
-                                        min={VSU_SWEEP_MODULATION_INTERVAL_MIN}
-                                        max={VSU_SWEEP_MODULATION_INTERVAL_MAX}
-                                        value={instrument.sweepMod.interval
-
-                                        }
-                                        onChange={e => setSweepModulationInterval(parseInt(e.target.value))}
+                                    <Range
+                                        min={VSU_SWEEP_MODULATION_SHIFT_MIN}
+                                        max={VSU_SWEEP_MODULATION_SHIFT_MAX}
+                                        value={instrument.sweepMod.shift}
+                                        setValue={setSweepModulationShift}
+                                        commandsToDisable={INPUT_BLOCKING_COMMANDS}
                                     />
                                 </VContainer>
                             </HContainer>
-                            {instrument.sweepMod.function === VsuSweepModulationFunction.Sweep &&
-                                <HContainer gap={15}>
-                                    <VContainer>
-                                        <label>
-                                            {nls.localize('vuengine/musicEditor/sweep', 'Sweep')}
-                                        </label>
-                                        <RadioSelect
-                                            options={[{
-                                                label: 'Up',
-                                                value: VsuSweepDirection.Up,
-                                            }, {
-                                                label: 'Down',
-                                                value: VsuSweepDirection.Down,
-                                            }]}
-                                            defaultValue={instrument.sweepMod.direction}
-                                            onChange={options => setSweepDirection(options[0].value as VsuSweepDirection)}
-                                            allowBlank
-                                        />
-                                    </VContainer>
-                                    <VContainer>
-                                        <label>
-                                            {nls.localize('vuengine/musicEditor/shiftAmount', 'Shift Amount')}
-                                        </label>
-                                        <input
-                                            className='theia-input'
-                                            style={{ width: 72 }}
-                                            type='number'
-                                            min={VSU_SWEEP_MODULATION_SHIFT_MIN}
-                                            max={VSU_SWEEP_MODULATION_SHIFT_MAX}
-                                            value={instrument.sweepMod.shift
-
-                                            }
-                                            onChange={e => setSweepModulationShift(parseInt(e.target.value))}
-                                        />
-                                    </VContainer>
-                                </HContainer>
-                            }
-                            {instrument.sweepMod.function === VsuSweepModulationFunction.Modulation &&
-                                <VContainer>
-                                    <label>
-                                        {nls.localize('vuengine/musicEditor/modulationData', 'Modulation Data')}
-                                    </label>
-                                    <NumberArrayPreview
-                                        active={true}
-                                        maximum={256}
-                                        height={64}
-                                        width={64}
-                                        data={instrument.modulationData}
-                                        onClick={() => setModulationDataDialogOpen(currentInstrument)}
-                                    />
-                                </VContainer>
-                            }
-                        </>
-                    }
-                </VContainer>
+                        }
+                        {instrument.sweepMod.function === VsuSweepModulationFunction.Modulation &&
+                            <VContainer>
+                                <label>
+                                    {nls.localize('vuengine/musicEditor/modulationData', 'Modulation Data')}
+                                </label>
+                                <NumberArrayPreview
+                                    active={true}
+                                    maximum={256}
+                                    height={64}
+                                    width={64}
+                                    data={instrument.modulationData}
+                                    onClick={() => setModulationDataDialogOpen(currentInstrument)}
+                                />
+                            </VContainer>
+                        }
+                    </>
+                }
             </>
         }
         <hr />

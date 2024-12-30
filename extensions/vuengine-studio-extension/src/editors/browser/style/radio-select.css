@@ -26,6 +26,7 @@
     margin-right: -1px;
     padding: 1px 8px;
     text-align: center;
+    white-space: nowrap;
 }
 .radioSelect.canSelectMany div {
     border-radius: 2px !important;

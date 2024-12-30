@@ -119,6 +119,7 @@ export default function Instruments(props: InstrumentsProps): React.JSX.Element 
                 </InputWithActionButton>
             </InputWithAction>
         </VContainer>
+        <hr />
         <Instrument
             songData={songData}
             currentInstrument={currentInstrument}

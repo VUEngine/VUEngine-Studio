@@ -124,7 +124,11 @@ export default function CurrentTick(props: CurrentNoteProps): React.JSX.Element 
                     min={1}
                     max={patternSize}
                     value={currentNote + 1}
-                    onChange={e => setCurrentTick(clamp(parseInt(e.target.value) - 1, 0, patternSize - 1, 0))}
+                    onChange={e => setCurrentTick(
+                        e.target.value === ''
+                            ? 0
+                            : clamp(parseInt(e.target.value) - 1, 0, patternSize - 1, 0)
+                    )}
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                 />

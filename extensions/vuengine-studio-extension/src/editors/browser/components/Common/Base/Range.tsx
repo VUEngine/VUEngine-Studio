@@ -1,13 +1,15 @@
 import React, { ChangeEventHandler, PropsWithChildren, useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
-import HContainer from './HContainer';
 import { clamp } from '../Utils';
+import BasicSelect, { BasicSelectOption } from './BasicSelect';
+import HContainer from './HContainer';
 
 interface RangeProps {
     min: number
     max: number
     step?: number
     value: number
+    options?: BasicSelectOption[]
     setValue: (value: number) => void
     commandsToDisable?: string[]
     width?: string | number
@@ -15,7 +17,7 @@ interface RangeProps {
 
 export default function Range(props: PropsWithChildren<RangeProps>): React.JSX.Element {
     const { disableCommands, enableCommands } = useContext(EditorsContext) as EditorsContextType;
-    const { min, max, step, value, setValue, commandsToDisable, width } = props;
+    const { min, max, step, value, options, setValue, commandsToDisable, width } = props;
 
     let inputWidth = 32;
     if (max >= 1000) {
@@ -38,6 +40,7 @@ export default function Range(props: PropsWithChildren<RangeProps>): React.JSX.E
         <input
             type="range"
             className={`value-${Math.round(100 / (max - min) * (value ?? max))}`}
+            style={{ flexGrow: 1 }}
             min={min}
             max={max}
             step={step}
@@ -46,18 +49,29 @@ export default function Range(props: PropsWithChildren<RangeProps>): React.JSX.E
             onFocus={() => { if (commandsToDisable) { disableCommands(commandsToDisable); } }}
             onBlur={() => { if (commandsToDisable) { enableCommands(commandsToDisable); } }}
         />
-        <input
-            type="number"
-            className="theia-input"
-            style={{ minWidth: inputWidth, width: inputWidth }}
-            min={min}
-            max={max}
-            step={step}
-            value={value ?? max}
-            onChange={onChange}
-            onFocus={() => { if (commandsToDisable) { disableCommands(commandsToDisable); } }}
-            onBlur={() => { if (commandsToDisable) { enableCommands(commandsToDisable); } }}
-        />
+        {
+            options
+                ? <BasicSelect
+                    options={options}
+                    style={{ width: 'unset' }}
+                    value={value ?? max}
+                    onChange={onChange as unknown as React.ChangeEventHandler<HTMLSelectElement>}
+                    onFocus={() => { if (commandsToDisable) { disableCommands(commandsToDisable); } }}
+                    onBlur={() => { if (commandsToDisable) { enableCommands(commandsToDisable); } }}
+                />
+                : <input
+                    type="number"
+                    className="theia-input"
+                    style={{ minWidth: inputWidth, width: inputWidth }}
+                    min={min}
+                    max={max}
+                    step={step}
+                    value={value ?? max}
+                    onChange={onChange}
+                    onFocus={() => { if (commandsToDisable) { disableCommands(commandsToDisable); } }}
+                    onBlur={() => { if (commandsToDisable) { enableCommands(commandsToDisable); } }}
+                />
+        }
     </HContainer>;
 }
 

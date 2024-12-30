@@ -76,6 +76,11 @@ export const VSU_SWEEP_MODULATION_FREQUENCY_MAX = 1;
 export const VSU_SWEEP_MODULATION_SHIFT_MIN = 0;
 export const VSU_SWEEP_MODULATION_SHIFT_MAX = 7;
 
+export const VSU_SWEEP_MODULATION_FREQUENCY_VALUES = [
+    0.96,
+    7.68,
+];
+
 export const VSU_ENVELOPE_STEP_TIME_VALUES = [
     15.4,
     30.7,
