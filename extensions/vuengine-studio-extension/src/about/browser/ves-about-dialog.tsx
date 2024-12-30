@@ -72,7 +72,7 @@ export class VesAboutDialog extends AboutDialog {
     protected renderCopyright(): React.ReactNode {
         return <>
             <div className="ves-about-paragraph">
-                © 2022-2024 <a href={'mailto:c.radke@posteo.de'}>
+                © 2022-2025 <a href={'mailto:c.radke@posteo.de'}>
                     Christian Radke
                 </a> {nls.localize('vuengine/about/and', 'and')} <a href={'mailto:jorgech3@gmail.com'}>
                     Jorge Andres Eremiev
