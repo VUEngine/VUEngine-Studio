@@ -35,7 +35,7 @@
           "editor.inlayHints.fontSize": 10,
           "editor.insertSpaces": false,
           "editor.rulers": [
-            108
+            140
           ],
           "files.watcherExclude": {
             "**/.git/objects/**": true,
