@@ -14,16 +14,16 @@
 			and allPlugins[installedPluginId].configuration | length -%}
 			{{- '\n' -}}
 			{%- for configuration in allPlugins[installedPluginId].configuration -%}
-                {%- set configValue = configuration.default -%}
-                {%- if installedPlugins[installedPluginId][configuration.name] is defined -%}
-                    {%- set configValue = installedPlugins[installedPluginId][configuration.name] -%}
-                {%- endif -%}
+				{%- set configValue = configuration.default -%}
+				{%- if installedPlugins[installedPluginId][configuration.name] is defined -%}
+					{%- set configValue = installedPlugins[installedPluginId][configuration.name] -%}
+				{%- endif -%}
 
-                {%- if configuration.dataType == 'string' or configuration.dataType == 'type' -%}
-                    {%- set configValue = '"' ~ configValue ~ '"' -%}
-                {%- else -%}
-                    {%- set configValue = '(' ~ configValue ~ ')' -%}
-                {%- endif -%}
+				{%- if configuration.dataType == 'string' or configuration.dataType == 'type' -%}
+					{%- set configValue = '"' ~ configValue ~ '"' -%}
+				{%- else -%}
+					{%- set configValue = '(' ~ configValue ~ ')' -%}
+				{%- endif -%}
 
 				#define __PLUGIN_{{ installedPluginId | basename | toUpperSnakeCase }}_{{ configuration.name | toUpperSnakeCase }} {{ configValue | safe }}
 				{{- '\n' -}}
