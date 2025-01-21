@@ -6,29 +6,29 @@ export const clamp = (value: number, min: number, max: number, deflt: number = 0
         ? Math.min(Math.max(value, min), max)
         : deflt;
 
-export const showEntitySelection = async (
+export const showActorSelection = async (
     quickPickService: QuickPickService,
     vesProjectService: VesProjectService,
     ignoreIds?: string[]
 ): Promise<QuickPickItem | undefined> => {
     const quickPickOptions: QuickPickOptions<QuickPickItem> = {
-        title: nls.localize('vuengine/editors/selectEntity', 'Select Entity'),
-        placeholder: nls.localize('vuengine/editors/selectEntityToAdd', 'Select an Entity to add...'),
+        title: nls.localize('vuengine/editors/selectActor', 'Select Actor'),
+        placeholder: nls.localize('vuengine/editors/selectActorToAdd', 'Select an Actor to add...'),
     };
     const items: QuickPickItem[] = [];
-    const entities = vesProjectService.getProjectDataItemsForType('Entity');
-    if (entities) {
-        Object.keys(entities).map(k => {
+    const actors = vesProjectService.getProjectDataItemsForType('Actor');
+    if (actors) {
+        Object.keys(actors).map(k => {
             if (!ignoreIds || !ignoreIds.includes(k)) {
-                const entity = entities[k];
+                const actor = actors[k];
                 // @ts-ignore
-                if (entity._id) {
+                if (actor._id) {
                     items.push({
                         // @ts-ignore
-                        id: entity._id,
-                        // description: `(${entity._id})`,
-                        label: entity._fileUri.path.name,
-                        detail: entity._contributorUri.parent.path.relative(entity._fileUri.path)?.fsPath(),
+                        id: actor._id,
+                        // description: `(${actor._id})`,
+                        label: actor._fileUri.path.name,
+                        detail: actor._contributorUri.parent.path.relative(actor._fileUri.path)?.fsPath(),
                     });
                 }
             }

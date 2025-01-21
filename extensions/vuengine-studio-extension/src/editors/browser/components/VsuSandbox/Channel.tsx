@@ -335,7 +335,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                         min={VSU_FREQUENCY_MIN}
                         max={VSU_FREQUENCY_MAX}
                         value={channel?.frequency ?? 0}
-                        onChange={e => setFrequency(parseInt(e.target.value))}
+                        onChange={e => setFrequency(e.target.value === '' ? 0 : parseInt(e.target.value))}
                         onFocus={() => setPianoChannel(index)}
                         onBlur={() => setPianoChannel(0)}
                     />
@@ -454,7 +454,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                         min={VSU_ENVELOPE_INITIAL_VALUE_MIN}
                                         max={VSU_ENVELOPE_INITIAL_VALUE_MAX}
                                         value={channel?.envelope?.initialValue ?? 15}
-                                        onChange={e => setEnvelopeInitialValue(parseInt(e.target.value))}
+                                        onChange={e => setEnvelopeInitialValue(e.target.value === '' ? 0 : parseInt(e.target.value))}
                                     />
                                 </VContainer>
                             </>
@@ -530,7 +530,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                             min={VSU_SWEEP_MODULATION_INTERVAL_MIN}
                                             max={VSU_SWEEP_MODULATION_INTERVAL_MAX}
                                             value={channel?.sweepMod?.interval ?? 0}
-                                            onChange={e => setSweepModulationInterval(parseInt(e.target.value))}
+                                            onChange={e => setSweepModulationInterval(e.target.value === '' ? 0 : parseInt(e.target.value))}
                                         />
                                     </VContainer>
                                     {channel?.sweepMod?.function === VsuSweepModulationFunction.Sweep &&
@@ -563,7 +563,7 @@ export default function Channel(props: ChannelProps): React.JSX.Element {
                                                     min={VSU_SWEEP_MODULATION_SHIFT_MIN}
                                                     max={VSU_SWEEP_MODULATION_SHIFT_MAX}
                                                     value={channel?.sweepMod?.shift ?? 0}
-                                                    onChange={e => setSweepModulationShift(parseInt(e.target.value))}
+                                                    onChange={e => setSweepModulationShift(e.target.value === '' ? 0 : parseInt(e.target.value))}
                                                 />
                                             </VContainer>
                                         </>

@@ -159,7 +159,7 @@ export default function PluginConfiguration(props: PluginConfigurationProps): Re
                         className='theia-input'
                         style={{ width: 48 }}
                         value={data.min}
-                        onChange={e => setMin(parseInt(e.target.value))}
+                        onChange={e => setMin(e.target.value === '' ? 0 : parseInt(e.target.value))}
                     />
                 </VContainer>
                 <VContainer>
@@ -171,7 +171,7 @@ export default function PluginConfiguration(props: PluginConfigurationProps): Re
                         className='theia-input'
                         style={{ width: 48 }}
                         value={data.max}
-                        onChange={e => setMax(parseInt(e.target.value))}
+                        onChange={e => setMax(e.target.value === '' ? 0 : parseInt(e.target.value))}
                     />
                 </VContainer>
                 <VContainer>
@@ -183,7 +183,7 @@ export default function PluginConfiguration(props: PluginConfigurationProps): Re
                         className='theia-input'
                         style={{ width: 48 }}
                         value={data.step}
-                        onChange={e => setStep(parseInt(e.target.value))}
+                        onChange={e => setStep(e.target.value === '' ? 0 : parseInt(e.target.value))}
                     />
                 </VContainer>
             </>}

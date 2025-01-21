@@ -28,7 +28,7 @@ export default function Animation(): React.JSX.Element {
         updateImageData({
             animation: {
                 ...imageData.animation,
-                frames: parseInt(e.target.value)
+                frames: e.target.value === '' ? 0 : parseInt(e.target.value)
             },
         });
     };

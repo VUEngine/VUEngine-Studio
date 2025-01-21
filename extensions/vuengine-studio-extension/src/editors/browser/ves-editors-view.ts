@@ -141,7 +141,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         for (const typeId of Object.keys(types || {})) {
             const type = types![typeId];
 
-            // TODO: Need a strategy to handle relative file paths, e.g. for sprites in entity editor
+            // TODO: Need a strategy to handle relative file paths, e.g. for sprites in actor editor
             // See also: line 256
             /*
             if (type.file?.startsWith('.')) {
@@ -254,7 +254,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         for (const typeId of Object.keys(types || {})) {
             const type = types![typeId];
 
-            // TODO: Need a strategy to handle relative file paths, e.g. for sprites in entity editor
+            // TODO: Need a strategy to handle relative file paths, e.g. for sprites in actor editor
             // See also: line 144
             /*
             if (type.file?.startsWith('.')) {

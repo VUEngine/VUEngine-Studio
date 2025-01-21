@@ -60,8 +60,8 @@ export default function TranslatedValue(props: TranslatedValueProps): React.JSX.
 
     const removeTranslation = async (langCode: string): Promise<void> => {
         const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/entityEditor/removeTranslation', 'Remove Translation'),
-            msg: nls.localize('vuengine/entityEditor/areYouSureYouWantToRemoveTranslation', 'Are you sure you want to remove this translation?'),
+            title: nls.localize('vuengine/actorEditor/removeTranslation', 'Remove Translation'),
+            msg: nls.localize('vuengine/actorEditor/areYouSureYouWantToRemoveTranslation', 'Are you sure you want to remove this translation?'),
         });
         const confirmed = await dialog.open();
         if (confirmed) {

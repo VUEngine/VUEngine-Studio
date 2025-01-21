@@ -248,7 +248,7 @@ export class VesImagesService {
       const croppedImageData = cropImageData(imageData, {
         top: 0,
         right: imageData.width - MAX_IMAGE_WIDTH,
-        bottom: imageData.height,
+        bottom: 0,
         left: 0,
       });
       imageData.data = croppedImageData.data;

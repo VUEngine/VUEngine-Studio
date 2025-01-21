@@ -4,7 +4,7 @@ import { ColorMode } from '../../../../core/browser/ves-common-types';
 import { ImageProcessingSettings } from '../../../../images/browser/ves-images-types';
 import PopUpDialog from '../Common/Base/PopUpDialog';
 import VContainer from '../Common/Base/VContainer';
-import ImageProcessingSettingsForm from '../EntityEditor/Sprites/ImageProcessingSettingsForm';
+import ImageProcessingSettingsForm from '../ActorEditor/Sprites/ImageProcessingSettingsForm';
 import { ImageEditorContext, ImageEditorContextType } from './ImageEditorTypes';
 
 export default function Quantisation(): React.JSX.Element {
@@ -33,7 +33,7 @@ export default function Quantisation(): React.JSX.Element {
             </label>
             <button
                 className="theia-button secondary"
-                title={nls.localize('vuengine/entityEditor/imageProcessingSettings', 'Image Processing Settings')}
+                title={nls.localize('vuengine/actorEditor/imageProcessingSettings', 'Image Processing Settings')}
                 onClick={() => setProcessingDialogOpen(true)}
             >
                 <i className="codicon codicon-settings" />
