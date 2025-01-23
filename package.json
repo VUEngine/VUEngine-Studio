@@ -40,6 +40,7 @@
     "build:applications:dev": "yarn build:extensions && lerna run build --concurrency 1",
     "build:extensions": "lerna run build",
     "download:plugins": "theia download:plugins --rate-limit=15 --parallel=false --ignore-errors",
+    "prePackageTools": "cd applications/electron/binaries/vuengine-studio-tools && npm run prePackage",
     "package:applications": "lerna run package --concurrency 1",
     "package:applications:preview": "lerna run package:preview --concurrency 1",
     "package:applications:prod": "lerna run package:prod --concurrency 1",

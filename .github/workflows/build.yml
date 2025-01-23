@@ -21,7 +21,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0 # To fetch all history for all branches and tags. (Will be required for caching with lerna: https://github.com/markuplint/markuplint/pull/111)
-          lfs: true
           submodules: recursive
 
       - name: Use Node.js ${{ matrix.node }}
@@ -41,6 +40,7 @@ jobs:
           yarn --skip-integrity-check --network-timeout 100000
           yarn build
           yarn download:plugins
+          yarn prePackageTools
           yarn electron package
         env:
           NODE_OPTIONS: --max_old_space_size=4096

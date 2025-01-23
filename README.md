@@ -57,8 +57,6 @@ After cloning, load git submodules with
 
     yarn modules:init
 
-Make sure you have git-lfs installed, as there's some large binaries included.
-
 They can be updated at a later point with
 
     yarn modules:update
