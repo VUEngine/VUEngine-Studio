@@ -550,6 +550,11 @@ export class VesBuildService {
       makeUri,
     ];
 
+    if (isOSX) {
+      const sedUri = await this.vesBuildPathsService.getMakeUri(isWslInstalled);
+      pathUris.push(sedUri);
+    }
+
     if (isWindows) {
       const winPaths = await Promise.all(pathUris.map(async p => this.convertToEnvPath(isWslInstalled, p)));
       const preMakeArgs = [
