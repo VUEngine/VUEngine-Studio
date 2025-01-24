@@ -551,7 +551,7 @@ export class VesBuildService {
     ];
 
     if (isOSX) {
-      const sedUri = await this.vesBuildPathsService.getMakeUri(isWslInstalled);
+      const sedUri = await this.vesBuildPathsService.getSedUri(isWslInstalled);
       pathUris.push(sedUri);
     }
 
