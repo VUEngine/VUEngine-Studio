@@ -50,7 +50,7 @@ export class VesBuildPathsService {
       .resolve('binaries')
       .resolve('vuengine-studio-tools')
       .resolve(isWslInstalled ? 'linux' : this.vesCommonService.getOs())
-      .resolve('sed');
+      .resolve('gnu-sed');
   }
 
   async getCompilerUri(isWslInstalled: boolean = false): Promise<URI> {
