@@ -1,6 +1,6 @@
 # VUEngine Studio
 
-VUEngine Studio is a custom integrated development environment (IDE), tailor-made for [Nintendo Virtual Boy](https://www.virtual-boy.com) game development with [VUEngine](https://github.com/VUEngine/VUEngine-Core), our versatile, object oriented Nintendo Virtual Boy game engine.
+[VUEngine Studio](https://www.vuengine.dev/) is a custom integrated development environment (IDE), tailor-made for [Nintendo Virtual Boy](https://www.virtual-boy.com) game development with [VUEngine](https://github.com/VUEngine/VUEngine-Core), our versatile, object oriented Nintendo Virtual Boy game engine.
 
 ![](VUEngine-Studio.png?raw=true)
 
