@@ -6,7 +6,7 @@ import { StageData, StageEditorContext, StageEditorState } from './StageEditorTy
 
 interface StageEditorProps {
   data: StageData;
-  updateData: (entityData: StageData) => void;
+  updateData: (stageData: StageData) => void;
   context: EditorsContextType
 }
 

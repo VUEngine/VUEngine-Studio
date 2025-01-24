@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 import { Brightness, PixelSize, PixelVector, Vector3D } from '../Common/VUEngineTypes';
-import { PositionedEntityData } from '../EntityEditor/EntityEditorTypes';
+import { PositionedActorData } from '../ActorEditor/ActorEditorTypes';
 import { StageEditorSaveDataOptions } from './StageEditor';
 
 // @ts-ignore
@@ -13,7 +13,7 @@ export interface StageEditorContextType {
     setData: (partialData: Partial<StageData>, options?: StageEditorSaveDataOptions) => Promise<void>
 }
 
-export interface StageEntityData {
+export interface StageActorData {
     pinToScreen: boolean // true -> UI, false -> normal
 }
 
@@ -24,7 +24,7 @@ export interface StageData {
         sounds: string[]
         textureSpecs: string[]
     }
-    entities: (PositionedEntityData & StageEntityData)[]
+    entities: (PositionedActorData & StageActorData)[]
     level: {
         cameraFrustum: {
             x0: number

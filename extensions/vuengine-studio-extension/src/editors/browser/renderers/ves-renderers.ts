@@ -1,11 +1,11 @@
 import VesBrightnessRepeatEditorControl from './brightness-repeat-editor/ves-brightness-repeat-editor-control';
 import VesBrightnessRepeatEditorControlTester from './brightness-repeat-editor/ves-brightness-repeat-editor-control-tester';
 import VesColumnTableEditorControl from './column-table-editor/ves-column-table-editor-control';
+import VesActorEditorControl from './actor-editor/ves-actor-editor-control';
 import VesColumnTableEditorControlTester from './column-table-editor/ves-column-table-editor-control-tester';
 import vesCompilerConfigEditorControl from './compiler-config-editor/ves-compiler-config-editor-control';
 import vesCompilerConfigEditorControlTester from './compiler-config-editor/ves-compiler-config-editor-control-tester';
-import VesEntityEditorControl from './entity-editor/ves-entity-editor-control';
-import VesEntityEditorControlTester from './entity-editor/ves-entity-editor-control-tester';
+import VesActorEditorControlTester from './actor-editor/ves-actor-editor-control-tester';
 import VesFontEditorControl from './font-editor/ves-font-editor-control';
 import VesFontEditorControlTester from './font-editor/ves-font-editor-control-tester';
 import VesImageEditorControl from './image-editor/ves-image-editor-control';
@@ -34,10 +34,10 @@ import VesWaveFormEditorControl from './waveform-editor/ves-waveform-editor-cont
 import VesWaveFormEditorControlTester from './waveform-editor/ves-waveform-editor-control-tester';
 
 export const VES_RENDERERS = [
+    { tester: VesActorEditorControlTester, renderer: VesActorEditorControl },
     { tester: VesBrightnessRepeatEditorControlTester, renderer: VesBrightnessRepeatEditorControl },
     { tester: VesColumnTableEditorControlTester, renderer: VesColumnTableEditorControl },
     { tester: vesCompilerConfigEditorControlTester, renderer: vesCompilerConfigEditorControl },
-    { tester: VesEntityEditorControlTester, renderer: VesEntityEditorControl },
     { tester: VesFontEditorControlTester, renderer: VesFontEditorControl },
     { tester: VesImageEditorControlTester, renderer: VesImageEditorControl },
     { tester: VesMusicEditorControlTester, renderer: VesMusicEditorControl },

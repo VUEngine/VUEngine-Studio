@@ -1,5 +1,5 @@
 import { Command } from '@theia/core';
-import { EntityEditorCommands } from './components/EntityEditor/EntityEditorCommands';
+import { ActorEditorCommands } from './components/ActorEditor/ActorEditorCommands';
 import { FontEditorCommands } from './components/FontEditor/FontEditorCommands';
 import { MusicEditorCommands } from './components/MusicEditor/MusicEditorCommands';
 import { EditorCommands } from './ves-editors-types';
@@ -49,7 +49,7 @@ export namespace VesEditorsCommands {
 };
 
 export const EditorsCommands: EditorCommands[] = [
-    EntityEditorCommands,
+    ActorEditorCommands,
     FontEditorCommands,
     MusicEditorCommands,
 ];

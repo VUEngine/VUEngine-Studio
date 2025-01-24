@@ -432,9 +432,9 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
                 <HContainer gap={15} justifyContent="space-between">
                     <VContainer>
                         <InfoLabel
-                            label={nls.localize('vuengine/entityEditor/compression', 'Compression')}
+                            label={nls.localize('vuengine/actorEditor/compression', 'Compression')}
                             tooltip={nls.localize(
-                                'vuengine/entityEditor/compressionDescription',
+                                'vuengine/actorEditor/compressionDescription',
                                 // eslint-disable-next-line max-len
                                 'Image data can be stored in a compressed format to save ROM space. Comes at the cost of a slightly higher CPU load when loading data into memory.'
                             )}
@@ -442,10 +442,10 @@ export default function FontEditor(props: FontEditorProps): React.JSX.Element {
                         />
                         <RadioSelect
                             options={[{
-                                label: nls.localize('vuengine/entityEditor/none', 'None'),
+                                label: nls.localize('vuengine/actorEditor/none', 'None'),
                                 value: ImageCompressionType.NONE,
                             }, {
-                                label: nls.localize('vuengine/entityEditor/rle', 'RLE'),
+                                label: nls.localize('vuengine/actorEditor/rle', 'RLE'),
                                 value: ImageCompressionType.RLE,
                             }]}
                             defaultValue={data.compression}

@@ -56,7 +56,7 @@ export default function Rotation(props: PropsWithChildren<RotationProps>): React
                     max={MAX_ROTATION}
                     step={ROTATION_RATIO}
                     value={rotationDegrees.x}
-                    onChange={e => setRotation('x', parseFloat(e.target.value))}
+                    onChange={e => setRotation('x', e.target.value === '' ? 0 : parseFloat(e.target.value))}
                 />
                 °
             </HContainer>
@@ -69,7 +69,7 @@ export default function Rotation(props: PropsWithChildren<RotationProps>): React
                     max={MAX_ROTATION}
                     step={ROTATION_RATIO}
                     value={rotationDegrees.y}
-                    onChange={e => setRotation('y', parseFloat(e.target.value))}
+                    onChange={e => setRotation('y', e.target.value === '' ? 0 : parseFloat(e.target.value))}
                 />
                 °
             </HContainer>
@@ -82,7 +82,7 @@ export default function Rotation(props: PropsWithChildren<RotationProps>): React
                     max={MAX_ROTATION}
                     step={ROTATION_RATIO}
                     value={rotationDegrees.z}
-                    onChange={e => setRotation('z', parseFloat(e.target.value))}
+                    onChange={e => setRotation('z', e.target.value === '' ? 0 : parseFloat(e.target.value))}
                 />
                 °
             </HContainer>

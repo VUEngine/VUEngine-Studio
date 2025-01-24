@@ -40,7 +40,7 @@ export default function Effect(props: EffectProps): React.JSX.Element {
             <button
                 className="remove-button"
                 onClick={() => removeEvent(event)}
-                title={nls.localize('vuengine/entityEditor/removeEffect', 'Remove Effect')}
+                title={nls.localize('vuengine/actorEditor/removeEffect', 'Remove Effect')}
             >
                 <i className='codicon codicon-x' />
             </button>

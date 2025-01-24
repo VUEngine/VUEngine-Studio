@@ -19,10 +19,9 @@ export class VesFileNavigatorFilter extends FileNavigatorFilter {
     protected async doInit(): Promise<void> {
         super.doInit();
 
-        await this.preferenceService.ready;
         this.preferenceService.onPreferenceChanged(({ preferenceName, newValue }) => {
             if (preferenceName === VesBuildPreferenceIds.HIDE_BUILD_FOLDER) {
-                this.filterPredicate = this.createFilterPredicate(newValue as FileNavigatorFilter.Exclusions | undefined || {});
+                this.filterPredicate = this.createFilterPredicate(this.filesPreferences['files.exclude']);
                 this.fireFilterChanged();
             }
         });
