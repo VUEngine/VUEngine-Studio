@@ -148,7 +148,7 @@ export class VesCodeGenService {
 
   async promptGenerateAll(): Promise<void> {
     const selectecTypes = await this.showTypeSelection();
-    if (selectecTypes !== undefined && selectecTypes.length) {
+    if (selectecTypes?.length) {
       /*
       const changedOnlySelection = await this.showChangedOnlySelection();
       if (changedOnlySelection !== undefined) {
@@ -156,7 +156,7 @@ export class VesCodeGenService {
         this.generate(types, changedOnly);
       }
       */
-      await this.generate(selectecTypes);
+      return this.generate(selectecTypes);
     }
   }
 
@@ -167,14 +167,25 @@ export class VesCodeGenService {
     Object.keys(types).map(typeId => {
       const numberOfItems = Object.keys(this.vesProjectService.getProjectDataItemsForType(typeId, ProjectContributor.Project) || []).length;
       const type = types[typeId];
-      if (numberOfItems > 0) {
+      const templates = type.templates?.map(templateId => this.vesProjectService.getProjectDataTemplate(templateId))
+        .filter(template => template?.enabled !== false);
+      const iconClasses = type.icon?.split(' ') || ['codicon', 'codicon-file-code'];
+      const templateTargets: string[] = [];
+      templates?.map(t => {
+        t?.targets?.map(target => {
+          const root = target.root === 'file' ? '{file}/' : '';
+          templateTargets.push(`${root}${target.path}`);
+        });
+      });
+      if (templateTargets?.length) {
         items.push({
           id: typeId,
           label: nls.localize(`vuengine/projects/types/${typeId}`, type.schema.title || typeId),
-          // iconClasses: type.icon?.split(' ') || [],
+          iconClasses,
           description: (numberOfItems === 1)
-            ? nls.localize('vuengine/codegen/oneFile', '1 file')
-            : nls.localize('vuengine/codegen/xFiles', '{0} files', numberOfItems),
+            ? `(${nls.localize('vuengine/codegen/oneTypeFile', '1 file')})`
+            : `(${nls.localize('vuengine/codegen/xTypeFiles', '{0} files', numberOfItems)})`,
+          detail: `→ ${templateTargets.join(', ')}`
         });
       }
     });
@@ -231,36 +242,19 @@ export class VesCodeGenService {
   }
   */
 
-  async generate(types: string[]/* , changedOnly: boolean */, fileUri?: URI): Promise<void> {
+  async generate(types: string[], fileUri?: URI): Promise<void> {
     this.isGeneratingFiles = IsGeneratingFilesStatus.active;
     let numberOfGeneratedFiles = 0;
-
-    const convertItem = async (typeId: string, uri: URI) => {
-      const fileContents = await this.fileService.readFile(uri);
-      const fileContentsJson = JSON.parse(fileContents.value.toString());
-      const n = await this.renderTemplatesForItem(typeId, fileContentsJson, uri);
-      numberOfGeneratedFiles += n;
-    };
 
     try {
       await Promise.all(types.map(async typeId => {
         const type = this.vesProjectService.getProjectDataType(typeId);
-        if (!type) {
-          return;
-        }
-        if (fileUri) {
-          await convertItem(typeId, fileUri);
-        } else {
-          const items = this.vesProjectService.getProjectDataItemsForType(typeId, ProjectContributor.Project) || {};
-          await Promise.all(Object.values(items).map(async item => {
-            /*
-            if (changedOnly && !this.hasChanges(type)) {
-              return;
-            }
-            */
-            await convertItem(typeId, item._fileUri);
+        if (type && Array.isArray(type.templates)) {
+          await Promise.all(type.templates.map(async templateId => {
+            const count = await this.renderTemplate(templateId, fileUri);
+            numberOfGeneratedFiles += count;
           }));
-        }
+        };
       }));
     } catch (error) {
       this.isGeneratingFiles = IsGeneratingFilesStatus.hide;
@@ -317,7 +311,7 @@ export class VesCodeGenService {
       nunjucks.renderString(templateString, data, (err, res) => {
         if (err) {
           this.logLine(
-            `Failed to render template ${templateId}. Nunjucks output: ${err}`,
+            `Failed to render template ${templateId}.Nunjucks output: ${err}`,
             OutputChannelSeverity.Error
           );
           reject();
@@ -361,11 +355,11 @@ export class VesCodeGenService {
   }
 
   async deleteFilesForItem(typeId: string): Promise<void> {
-    const typeData = this.vesProjectService.getProjectDataType(typeId);
-    if (typeData && Array.isArray(typeData.delete)) {
+    const type = this.vesProjectService.getProjectDataType(typeId);
+    if (type && Array.isArray(type.delete)) {
       await this.workspaceService.ready;
       const workspaceRootUri = this.workspaceService.tryGetRoots()[0]?.resource;
-      await Promise.all(typeData.delete.map(async deletePath => {
+      await Promise.all(type.delete.map(async deletePath => {
         const deletePathUri = workspaceRootUri.resolve(deletePath);
         if (await this.fileService?.exists(deletePathUri)) {
           await this.fileService?.delete(deletePathUri);
@@ -374,50 +368,7 @@ export class VesCodeGenService {
     };
   }
 
-  async renderTemplatesForItem(typeId: string, itemData: any, itemUri: URI): Promise<number> {
-    let numberOfGeneratedFiles = 0;
-    const typeData = this.vesProjectService.getProjectDataType(typeId);
-    if (typeData && Array.isArray(typeData.templates)) {
-      await Promise.all(typeData.templates.map(async templateId => {
-        const n = await this.renderTemplate(templateId, itemUri, itemData);
-        numberOfGeneratedFiles += n;
-      }));
-    };
-
-    return numberOfGeneratedFiles;
-  }
-
-  protected async renderTemplate(templateId: string, itemUri?: URI, itemData?: any): Promise<number> {
-    await this.vesProjectService.projectDataReady;
-    const template = this.vesProjectService.getProjectDataTemplate(templateId);
-    if (!template) {
-      console.warn(`Template ${templateId} not found.`);
-      return 0;
-    }
-
-    const encoding = template.encoding ? template.encoding : ProjectDataTemplateEncoding.utf8;
-
-    const uri = itemUri || new URI();
-    const data = {
-      item: {
-        ...(itemData || {}),
-        _filename: itemUri?.path.name,
-        _folder: itemUri?.parent.path.name,
-      },
-      project: this.vesProjectService.getProjectData(),
-      itemUri: itemUri
-    };
-
-    return this.renderFilesFromTemplate(templateId, template, uri, data, encoding);
-  }
-
-  protected async renderFilesFromTemplate(
-    templateId: string,
-    template: ProjectDataTemplate & WithContributor,
-    itemUri: URI,
-    data: any,
-    encoding: ProjectDataTemplateEncoding
-  ): Promise<number> {
+  protected async getTemplateString(template: ProjectDataTemplate & WithContributor): Promise<string> {
     let templateUri = template._contributorUri;
     const templatePathParts = template.template.split('/');
     templatePathParts.forEach(templatePathPart => {
@@ -429,6 +380,20 @@ export class VesCodeGenService {
       templateString = (await this.fileService.readFile(templateUri)).value.toString();
     } catch (error) {
       console.error(`Could not read template file at ${templateUri.path}`);
+    }
+
+    return templateString;
+  }
+
+  protected async renderTemplate(templateId: string, fileUri?: URI): Promise<number> {
+    await this.vesProjectService.projectDataReady;
+    const template = this.vesProjectService.getProjectDataTemplate(templateId);
+    if (!template) {
+      console.warn(`Template ${templateId} not found.`);
+      return 0;
+    }
+
+    if (template.enabled === false) {
       return 0;
     }
 
@@ -438,72 +403,116 @@ export class VesCodeGenService {
       return 0;
     }
 
+    const templateString = await this.getTemplateString(template);
+    if (!templateString) {
+      return 0;
+    }
+
+    const encoding = template.encoding ? template.encoding : ProjectDataTemplateEncoding.utf8;
+    const projectData = this.vesProjectService.getProjectData();
+
     let numberOfGeneratedFiles = 0;
 
-    await Promise.all(template.targets.map(async t => {
-      if (t.conditions && jsonLogic.apply(t.conditions, data.item) !== true) {
-        return;
-      }
-
-      const findTargetAndRender = async (additionalData?: object): Promise<void> => {
-        const updatedData = {
-          ...data,
-          item: {
-            ...data.item,
-            ...(additionalData || {})
+    const toRender = [];
+    if (template.itemSpecific) {
+      const items = this.vesProjectService.getProjectDataItemsForType(template.itemSpecific, ProjectContributor.Project) || {};
+      await Promise.all(
+        Object.values(items).map(async i => {
+          if (fileUri && !fileUri.isEqual(i._fileUri)) {
+            return;
           }
-        };
 
-        const target = t.path
-          .replace(/\$\{([\s\S]*?)\}/ig, match => {
-            match = match.substring(2, match.length - 1);
-            return this.vesCommonService.getByKey(updatedData.item, match);
+          const fileContents = await this.fileService.readFile(i._fileUri);
+          const fileContentsJson = JSON.parse(fileContents.value.toString());
+          toRender.push({
+            item: {
+              ...fileContentsJson,
+              _filename: i._fileUri.path.name,
+              _folder: i._fileUri.parent.path.name,
+            },
+            project: projectData,
+            itemUri: i._fileUri,
           });
+        })
+      );
+    } else {
+      toRender.push({
+        item: {},
+        project: projectData,
+        itemUri: fileUri ?? new URI(),
+      });
+    }
 
-        const targetPathParts = target.split('/');
-        let targetUri = t.root === 'project'
-          ? workspaceRootUri
-          : itemUri.parent;
-        targetPathParts.forEach(targetPathPart => {
-          targetUri = targetUri.resolve(targetPathPart);
-        });
-
-        numberOfGeneratedFiles++;
-        return this.renderTemplateToFile(
-          templateId,
-          targetUri,
-          templateString,
-          updatedData,
-          encoding
-        );
-      };
-
-      if (t.forEachOf) {
-        const forEachOfType = Object.keys(t.forEachOf)[0] as string;
-        const forEachOfValue = Object.values(t.forEachOf)[0] as string;
-        const items = [];
-        switch (forEachOfType) {
-          case ProjectDataTemplateTargetForEachOfType.var:
-            items.push(...this.vesCommonService.getByKey(data.item, forEachOfValue));
-            if (!Array.isArray(items)) {
-              return console.error(`forEachOf "${forEachOfValue}" does not exist on item or is not an array`);
+    await Promise.all(
+      toRender.map(async data => {
+        await Promise.all(
+          template.targets.map(async t => {
+            if (t.conditions && jsonLogic.apply(t.conditions, data.item) !== true) {
+              return;
             }
-            break;
-          case ProjectDataTemplateTargetForEachOfType.fileInFolder:
-            const paths = await Promise.all(window.electronVesCore.findFiles(await this.fileService.fsPath(itemUri.parent), forEachOfValue));
-            items.push(...paths);
-            break;
-        }
 
-        await Promise.all(items.map(async (x: unknown, index) => findTargetAndRender({
-          _forEachOf: x,
-          _forEachOfIndex: index + 1,
-          _forEachOfBasename: workspaceRootUri.resolve(x as string).path.name,
-        })));
-      } else {
-        return findTargetAndRender();
-      }
-    }));
+            const findTargetAndRender = async (additionalData?: object): Promise<void> => {
+              const updatedData = {
+                ...data,
+                item: {
+                  ...data.item,
+                  ...(additionalData || {})
+                }
+              };
+
+              const target = t.path
+                .replace(/\$\{([\s\S]*?)\}/ig, match => {
+                  match = match.substring(2, match.length - 1);
+                  return this.vesCommonService.getByKey(updatedData.item, match);
+                });
+
+              const targetPathParts = target.split('/');
+              let targetUri = t.root === 'project'
+                ? workspaceRootUri
+                : data.itemUri.parent;
+              targetPathParts.forEach(targetPathPart => {
+                targetUri = targetUri.resolve(targetPathPart);
+              });
+
+              numberOfGeneratedFiles++;
+              return this.renderTemplateToFile(
+                templateId,
+                targetUri,
+                templateString,
+                updatedData,
+                encoding
+              );
+            };
+
+            if (t.forEachOf) {
+              const forEachOfType = Object.keys(t.forEachOf)[0] as string;
+              const forEachOfValue = Object.values(t.forEachOf)[0] as string;
+              const items = [];
+              switch (forEachOfType) {
+                case ProjectDataTemplateTargetForEachOfType.var:
+                  items.push(...this.vesCommonService.getByKey(data.item, forEachOfValue));
+                  if (!Array.isArray(items)) {
+                    return console.error(`forEachOf "${forEachOfValue}" does not exist on item or is not an array`);
+                  }
+                  break;
+                case ProjectDataTemplateTargetForEachOfType.fileInFolder:
+                  const paths = await Promise.all(window.electronVesCore.findFiles(await this.fileService.fsPath(data.itemUri.parent), forEachOfValue));
+                  items.push(...paths);
+                  break;
+              }
+
+              await Promise.all(items.map(async (x: unknown, index) => findTargetAndRender({
+                _forEachOf: x,
+                _forEachOfIndex: index + 1,
+                _forEachOfBasename: workspaceRootUri.resolve(x as string).path.name,
+              })));
+            } else {
+              return findTargetAndRender();
+            }
+          })
+        );
+      })
+    );
 
     return numberOfGeneratedFiles;
   }
