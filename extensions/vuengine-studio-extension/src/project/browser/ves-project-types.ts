@@ -195,14 +195,16 @@ export const defaultProjectData: ProjectData = {
         path: 'headers/Config.h',
         root: ProjectDataTemplateTargetRoot.file,
       }],
-      template: 'PluginConfig.h.njk'
+      template: 'PluginConfig.h.njk',
+      itemSpecific: 'PluginFile'
     },
     'PluginConfigMake': {
       targets: [{
         path: 'config.make',
         root: ProjectDataTemplateTargetRoot.file,
       }],
-      template: 'PluginConfig.make.njk'
+      template: 'PluginConfig.make.njk',
+      itemSpecific: 'PluginFile'
     },
     'PluginsConfig': {
       targets: [{
@@ -477,7 +479,7 @@ export const defaultProjectData: ProjectData = {
         type: 'PluginFileEditor',
         scope: '#'
       },
-      icon: 'ves-codicon-file-icon codicon codicon-plug medium-purple',
+      icon: 'codicon codicon-plug',
       templates: [
         'PluginConfig',
         'PluginConfigMake',
@@ -589,7 +591,7 @@ export const defaultProjectData: ProjectData = {
           }
         ]
       },
-      icon: 'fa fa-microchip',
+      icon: 'codicon codicon-chip',
       templates: ['RomInfo']
     },
     Sprite: {
