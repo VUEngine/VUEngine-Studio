@@ -11,6 +11,16 @@ export namespace VesCodeGenCommands {
     'vuengine/codegen/commands/category'
   );
 
+  export const GENERATE_ALL_CHANGED: Command = Command.toLocalizedCommand(
+    {
+      id: 'codegen.generateAllChanged',
+      label: 'Generate All Changed Files',
+      category: 'Code Generator',
+    },
+    'vuengine/codegen/commands/generateAllChanged',
+    'vuengine/codegen/commands/category'
+  );
+
   export const SHOW_OUTPUT_CHANNEL: Command = Command.toLocalizedCommand(
     {
       id: 'codegen.showOutput',

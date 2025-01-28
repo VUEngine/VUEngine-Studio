@@ -16,6 +16,10 @@ export class VesCodeGenContribution implements CommandContribution {
     commandRegistry.registerCommand(VesCodeGenCommands.GENERATE_FILES, {
       execute: () => this.vesCodeGenService.promptGenerateAll(),
     });
+    commandRegistry.registerCommand(VesCodeGenCommands.GENERATE_ALL_CHANGED, {
+      execute: () => this.vesCodeGenService.generateAllChanged(),
+      isVisible: () => false,
+    });
     commandRegistry.registerCommand(VesCodeGenCommands.SHOW_OUTPUT_CHANNEL, {
       execute: () => this.commandService.executeCommand(OutputCommands.SHOW.id, { name: CODEGEN_CHANNEL_NAME }),
     });

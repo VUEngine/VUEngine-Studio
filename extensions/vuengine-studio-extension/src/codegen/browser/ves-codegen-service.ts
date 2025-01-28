@@ -1,4 +1,4 @@
-import { Emitter, MessageService, QuickInputService, QuickPickItem, nls } from '@theia/core';
+import { Emitter, MessageService, QuickInputService, QuickPickItem, QuickPickOptions, QuickPickService, nls } from '@theia/core';
 import { PreferenceService } from '@theia/core/lib/browser';
 import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import URI from '@theia/core/lib/common/uri';
@@ -23,9 +23,11 @@ import {
   ProjectDataTemplateEncoding,
   ProjectDataTemplateEventType,
   ProjectDataTemplateTargetForEachOfType,
-  WithContributor
+  WithContributor,
+  WithFileUri
 } from '../../project/browser/ves-project-types';
-import { CODEGEN_CHANNEL_NAME, IsGeneratingFilesStatus, SHOW_DONE_DURATION } from './ves-codegen-types';
+import { CODEGEN_CHANNEL_NAME, GenerationMode, IsGeneratingFilesStatus, SHOW_DONE_DURATION } from './ves-codegen-types';
+import { FileStatWithMetadata } from '@theia/filesystem/lib/common/files';
 
 @injectable()
 export class VesCodeGenService {
@@ -37,6 +39,8 @@ export class VesCodeGenService {
   protected readonly outputChannelManager: OutputChannelManager;
   @inject(QuickInputService)
   protected quickInputService: QuickInputService;
+  @inject(QuickPickService)
+  protected quickPickService: QuickPickService;
   @inject(PreferenceService)
   protected preferenceService: PreferenceService;
   @inject(VesAudioConverterService)
@@ -136,7 +140,7 @@ export class VesCodeGenService {
       const type = types[typeId];
       if ([fileUri.path.ext, fileUri.path.base].includes(type.file)) {
         await this.deleteFilesForItem(typeId);
-        await this.generate([typeId], fileUri);
+        await this.generate([typeId], GenerationMode.All, fileUri);
         // TODO: delete corresponding generated code for moved files and regenerate at new location
       }
     }));
@@ -147,20 +151,22 @@ export class VesCodeGenService {
   }
 
   async promptGenerateAll(): Promise<void> {
-    const selectecTypes = await this.showTypeSelection();
-    if (selectecTypes?.length) {
-      /*
+    const selectedTypes = await this.showTypeSelection();
+    if (selectedTypes?.length) {
       const changedOnlySelection = await this.showChangedOnlySelection();
       if (changedOnlySelection !== undefined) {
-        const changedOnly = changedOnlySelection?.id === 'changed';
-        this.generate(types, changedOnly);
+        const generationMode: GenerationMode = changedOnlySelection?.id as GenerationMode ?? GenerationMode.All;
+        return this.generate(selectedTypes, generationMode);
       }
-      */
-      return this.generate(selectecTypes);
     }
   }
 
-  protected async showTypeSelection(): Promise<string[] | undefined> {
+  async generateAllChanged(): Promise<void> {
+    const items = await this.getTemplatableTypes();
+    return this.generate(items.map(i => i.id as string), GenerationMode.ChangedOnly);
+  }
+
+  protected async getTemplatableTypes(): Promise<QuickPickItem[]> {
     await this.vesProjectService.projectItemsReady;
     const types = this.vesProjectService.getProjectDataTypes() || {};
     const items: QuickPickItem[] = [];
@@ -190,6 +196,12 @@ export class VesCodeGenService {
       }
     });
 
+    return items;
+  }
+
+  protected async showTypeSelection(): Promise<string[] | undefined> {
+    const items = await this.getTemplatableTypes();
+
     if (!items.length) {
       await this.messageService.info(nls.localize('vuengine/codegen/noFilesInThisProject', 'No templateable files could be found in this project.'));
       return;
@@ -204,45 +216,42 @@ export class VesCodeGenService {
     pick.description = nls.localize('vuengine/codegen/chooseTypesToGenerate', 'Choose all type(s) you want to generate files for.');
     pick.placeholder = nls.localize('vuengine/codegen/typeToFilter', 'Type to filter list');
     pick.canSelectMany = true;
-    // pick.step = 1;
-    // pick.totalSteps = 2;
+    pick.step = 1;
+    pick.totalSteps = 2;
     pick.show();
 
     return new Promise((resolve, reject) => {
       pick.onDidAccept(() => {
-        // if (pick.selectedItems.length) {
         pick.hide();
         const t: string[] = [];
         pick.selectedItems.map(s => s.id !== undefined ? t.push(s.id) : undefined);
         resolve(t);
-        // }
       });
     });
   }
 
-  /*
   protected async showChangedOnlySelection(): Promise<QuickPickItem | undefined> {
     const quickPickOptions: QuickPickOptions<QuickPickItem> = {
       title: nls.localize('vuengine/codegen/commands/generateFiles', 'Generate Files...'),
-      description: nls.localize('vuengine/codegen/allOrChanged', 'Do you want to general all or only changed files?'),
+      description: nls.localize('vuengine/codegen/allOrChanged', 'Do you want to generate all or only changed files?'),
+      placeholder: nls.localize('vuengine/codegen/typeToFilter', 'Type to filter list'),
       step: 2,
       totalSteps: 2,
       hideInput: true,
     };
 
     const items: QuickPickItem[] = [{
-      id: 'all',
+      id: GenerationMode.All,
       label: nls.localize('vuengine/codegen/allFiles', 'All files'),
     }, {
-      id: 'changed',
+      id: GenerationMode.ChangedOnly,
       label: nls.localize('vuengine/codegen/changedOnly', 'Only changed files'),
     }];
 
     return this.quickPickService.show(items, quickPickOptions);
   }
-  */
 
-  async generate(types: string[], fileUri?: URI): Promise<void> {
+  async generate(types: string[], generationMode: GenerationMode, fileUri?: URI): Promise<void> {
     this.isGeneratingFiles = IsGeneratingFilesStatus.active;
     let numberOfGeneratedFiles = 0;
 
@@ -250,8 +259,13 @@ export class VesCodeGenService {
       await Promise.all(types.map(async typeId => {
         const type = this.vesProjectService.getProjectDataType(typeId);
         if (type && Array.isArray(type.templates)) {
+          let inferredFileUri: URI;
+          if (!fileUri && !type.file.startsWith('.')) {
+            inferredFileUri = (this.vesProjectService.getProjectDataItemById(ProjectContributor.Project, typeId) as WithFileUri)?._fileUri;
+          }
+
           await Promise.all(type.templates.map(async templateId => {
-            const count = await this.renderTemplate(templateId, fileUri);
+            const count = await this.renderTemplate(templateId, generationMode, fileUri ?? inferredFileUri);
             numberOfGeneratedFiles += count;
           }));
         };
@@ -264,39 +278,15 @@ export class VesCodeGenService {
     this.isGeneratingFiles = IsGeneratingFilesStatus.done;
   }
 
-  /*
-  protected hasChanges(type: ProjectDataType & WithContributor): boolean {
-    // TODO: at this point, we'd need to know which files are affected by a conversion file, e.g. *.image, but this information is currently not available
-    let hasChanges = false;
-    type.templates?.map(templateId => {
-      const template = this.vesProjectService.getProjectDataTemplate(templateId);
-      if (!template) {
-        return;
-      }
-      template.targets.map(target => {
-        if (target.conditions && jsonLogic.apply(target.conditions, data.item) !== true) {
-          return;
-        }
-      });
-      // TODO: utilize this.fileHasChanged
-      // ...
-      hasChanges = false;
-    });
-
-    return hasChanges;
-  }
-
-  protected fileHasChanged(itemFileStat: FileStatWithMetadata, sourceFileStat: FileStatWithMetadata, convertedFileStat?: FileStatWithMetadata): boolean {
-    // if a file (or the conv file) has been edited (mtime) or has been moved or copied to this folder (ctime)
+  protected fileHasChanged(itemFileStat: FileStatWithMetadata, targetFileStat?: FileStatWithMetadata): boolean {
+    // if a file has been edited (mtime) or has been moved or copied to this folder (ctime)
     // after the converted file has been generated/last edited, consider it a change
-    return (!convertedFileStat
-      || sourceFileStat.ctime > convertedFileStat.mtime
-      || sourceFileStat.mtime > convertedFileStat.mtime
-      || itemFileStat.ctime > convertedFileStat.mtime
-      || itemFileStat.mtime > convertedFileStat.mtime
+    // TODO: take into account files affected by a conversion file, e.g. *.image
+    return (!targetFileStat
+      || itemFileStat.ctime > targetFileStat.mtime
+      || itemFileStat.mtime > targetFileStat.mtime
     );
   }
-  */
 
   protected async renderTemplateToFile(
     templateId: string,
@@ -385,7 +375,7 @@ export class VesCodeGenService {
     return templateString;
   }
 
-  protected async renderTemplate(templateId: string, fileUri?: URI): Promise<number> {
+  protected async renderTemplate(templateId: string, generationMode: GenerationMode, fileUri?: URI): Promise<number> {
     await this.vesProjectService.projectDataReady;
     const template = this.vesProjectService.getProjectDataTemplate(templateId);
     if (!template) {
@@ -439,7 +429,7 @@ export class VesCodeGenService {
       toRender.push({
         item: {},
         project: projectData,
-        itemUri: fileUri ?? new URI(),
+        itemUri: fileUri,
       });
     }
 
@@ -469,10 +459,29 @@ export class VesCodeGenService {
               const targetPathParts = target.split('/');
               let targetUri = t.root === 'project'
                 ? workspaceRootUri
-                : data.itemUri.parent;
+                : data.itemUri?.parent;
               targetPathParts.forEach(targetPathPart => {
-                targetUri = targetUri.resolve(targetPathPart);
+                targetUri = targetUri?.resolve(targetPathPart);
               });
+
+              if (targetUri === undefined) {
+                return;
+              }
+
+              if (generationMode === GenerationMode.ChangedOnly) {
+                if (!data.itemUri) {
+                  return;
+                }
+
+                const itemFileStat = await this.fileService.resolve(data.itemUri, { resolveMetadata: true });
+                const targetFileExists = targetUri !== undefined && await this.fileService.exists(targetUri);
+                const targetFileStat = targetFileExists
+                  ? await this.fileService.resolve(targetUri as URI, { resolveMetadata: true })
+                  : undefined;
+                if (!this.fileHasChanged(itemFileStat, targetFileStat)) {
+                  return;
+                }
+              }
 
               numberOfGeneratedFiles++;
               return this.renderTemplateToFile(
@@ -496,8 +505,10 @@ export class VesCodeGenService {
                   }
                   break;
                 case ProjectDataTemplateTargetForEachOfType.fileInFolder:
-                  const paths = await Promise.all(window.electronVesCore.findFiles(await this.fileService.fsPath(data.itemUri.parent), forEachOfValue));
-                  items.push(...paths);
+                  if (data.itemUri !== undefined) {
+                    const paths = await Promise.all(window.electronVesCore.findFiles(await this.fileService.fsPath(data.itemUri.parent), forEachOfValue));
+                    items.push(...paths);
+                  }
                   break;
               }
 
@@ -525,7 +536,7 @@ export class VesCodeGenService {
         if (template.events) {
           await Promise.all(template.events.map(async event => {
             if (event.type === ProjectDataTemplateEventType.installedPluginsChanged) {
-              return this.renderTemplate(templateId);
+              return this.renderTemplate(templateId, GenerationMode.All);
             }
           }));
         }
@@ -542,7 +553,7 @@ export class VesCodeGenService {
           await Promise.all(template.events.map(async templateEvent => {
             if (templateEvent.type === ProjectDataTemplateEventType.itemOfTypeGotDeleted
               && templateEvent.value === typeId) {
-              await this.renderTemplate(templateId);
+              await this.renderTemplate(templateId, GenerationMode.All);
             }
           }));
         }

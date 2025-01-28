@@ -6,3 +6,8 @@ export enum IsGeneratingFilesStatus {
   done = 1,
   hide = 2,
 }
+
+export enum GenerationMode {
+  All = 'all',
+  ChangedOnly = 'changedOnly',
+}

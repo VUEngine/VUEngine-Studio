@@ -1144,7 +1144,7 @@ export class VesProjectService {
     const projectItems: (unknown & WithContributor & WithFileUri & WithVersion & WithType)[] = [];
     Object.keys(itemsByType).map(typeId => {
       const type = this.getProjectDataType(typeId);
-      Object.values(itemsByType[typeId]).map((item: unknown & WithContributor & WithFileUri & WithVersion) => {
+      Object.values(itemsByType[typeId]).map((item: ProjectDataItem & WithContributor & WithFileUri & WithVersion) => {
         if (item._contributor === ProjectContributor.Project) {
           projectItems.push({
             ...item,

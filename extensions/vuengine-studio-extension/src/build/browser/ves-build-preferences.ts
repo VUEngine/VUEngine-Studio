@@ -1,6 +1,7 @@
 import { isWindows, nls } from '@theia/core';
 import { PreferenceScope } from '@theia/core/lib/browser';
 import { PreferenceSchema, PreferenceSchemaProperties } from '@theia/core/lib/common/preferences/preference-schema';
+import { VesCodeGenCommands } from '../../codegen/browser/ves-codegen-commands';
 import { BuildMode, DEFAULT_BUILD_MODE, PrePostBuildTaskType } from './ves-build-types';
 
 export namespace VesBuildPreferenceIds {
@@ -111,6 +112,9 @@ const properties: PreferenceSchemaProperties = {
         default: [{
             'type': 'command',
             'name': 'core.saveAll',
+        }, {
+            'type': 'command',
+            'name': VesCodeGenCommands.GENERATE_ALL_CHANGED.id,
         }],
         scope: PreferenceScope.Folder,
         overridable: true,

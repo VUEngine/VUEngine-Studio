@@ -11,6 +11,7 @@ import { NavigatorContextMenu } from '@theia/navigator/lib/browser/navigator-con
 import { FILE_NAVIGATOR_ID, FileNavigatorWidget } from '@theia/navigator/lib/browser/navigator-widget';
 import { WorkspaceCommands } from '@theia/workspace/lib/browser';
 import { VesCodeGenService } from '../../codegen/browser/ves-codegen-service';
+import { GenerationMode } from '../../codegen/browser/ves-codegen-types';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesProjectService } from '../../project/browser/ves-project-service';
 import { EditorsCommands, VesEditorsCommands } from './ves-editors-commands';
@@ -292,7 +293,7 @@ export class VesEditorsViewContribution extends AbstractViewContribution<VesEdit
         if (!ref || !ref.uri) {
             return;
         }
-        this.vesCodeGenService.generate([ref.typeId], ref.uri);
+        this.vesCodeGenService.generate([ref.typeId], GenerationMode.All, ref.uri);
     }
 
     protected async generateId(fileUri: URI): Promise<void> {

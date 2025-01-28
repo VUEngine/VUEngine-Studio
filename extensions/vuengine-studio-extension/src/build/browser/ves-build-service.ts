@@ -213,6 +213,15 @@ export class VesBuildService {
     this.onDidChangeBuildStatusEmitter.fire(this._buildStatus);
   }
 
+  appendBuildLogLine(partialBuildLogLine: Partial<BuildLogLine>): void {
+    this._buildStatus.log[this._buildStatus.log.length - 1] = {
+      ...this._buildStatus.log[this._buildStatus.log.length - 1],
+      ...partialBuildLogLine,
+      text: this._buildStatus.log[this._buildStatus.log.length - 1].text + (partialBuildLogLine.text ?? '')
+    };
+    this.onDidChangeBuildStatusEmitter.fire(this._buildStatus);
+  }
+
   clearLogs(): void {
     this._buildStatus.log = [];
   }
@@ -929,11 +938,16 @@ export class VesBuildService {
       });
     }
 
-    await this.commandService.executeCommand(commandName);
-
     this.pushBuildLogLine({
       type: BuildLogLineType.Normal,
-      text: nls.localize('vuengine/build/commandCompleted', 'Command {0} completed.', command?.label),
+      text: nls.localize('vuengine/build/runningCommandX', 'Running command "{0}"...', command?.label) + ' ',
+      timestamp: Date.now(),
+    });
+
+    await this.commandService.executeCommand(commandName);
+
+    this.appendBuildLogLine({
+      text: nls.localize('vuengine/build/completed', 'completed.'),
       timestamp: Date.now(),
     });
   }
@@ -952,6 +966,12 @@ export class VesBuildService {
       });
     }
 
+    this.pushBuildLogLine({
+      type: BuildLogLineType.Normal,
+      text: nls.localize('vuengine/build/runningTaskX', 'Running task "{0}"...', taskName) + ' ',
+      timestamp: Date.now(),
+    });
+
     const getExitCodePromise: Promise<TaskEndedInfo> = this.taskService.getExitCode(taskInfo.taskId).then(result =>
       ({ taskEndedType: TaskEndedTypes.TaskExited, value: result }));
     const isBackgroundTaskEndedPromise: Promise<TaskEndedInfo> = this.taskService.isBackgroundTaskEnded(taskInfo.taskId).then(result =>
@@ -962,36 +982,34 @@ export class VesBuildService {
     const taskEndedInfo: TaskEndedInfo = await Promise.race([getExitCodePromise, isBackgroundTaskEndedPromise]);
 
     if (taskEndedInfo.taskEndedType === TaskEndedTypes.BackgroundTaskEnded && taskEndedInfo.value) {
-      return this.pushBuildLogLine({
-        type: BuildLogLineType.Normal,
-        text: nls.localize('vuengine/build/taskCompleted', 'Task {0} completed.', taskName),
+      return this.appendBuildLogLine({
+        text: nls.localize('vuengine/build/completed', 'completed.'),
         timestamp: Date.now(),
       });
     }
     if (taskEndedInfo.taskEndedType === TaskEndedTypes.TaskExited && taskEndedInfo.value === 0) {
-      return this.pushBuildLogLine({
-        type: BuildLogLineType.Normal,
-        text: nls.localize('vuengine/build/taskCompleted', 'Task {0} completed.', taskName),
+      return this.appendBuildLogLine({
+        text: nls.localize('vuengine/build/completed', 'completed.'),
         timestamp: Date.now(),
       });
     } else if (taskEndedInfo.taskEndedType === TaskEndedTypes.TaskExited && taskEndedInfo.value !== undefined) {
-      return this.pushBuildLogLine({
+      return this.appendBuildLogLine({
         type: BuildLogLineType.Error,
-        text: nls.localize('vuengine/build/taskTerminatedWithExitCode', 'Task {0} terminated with exit code {1}.', taskName, taskEndedInfo.value),
+        text: nls.localize('vuengine/build/terminatedWithExitCode', 'terminated with exit code {1}.', taskEndedInfo.value),
         timestamp: Date.now(),
       });
     } else {
       const signal = await this.taskService.getTerminateSignal(taskInfo.taskId);
       if (signal !== undefined) {
-        return this.pushBuildLogLine({
+        return this.appendBuildLogLine({
           type: BuildLogLineType.Error,
-          text: nls.localize('vuengine/build/taskTerminatedBySignal', 'Task {0} terminated by signal {1}.', taskName, signal),
+          text: nls.localize('vuengine/build/terminatedBySignal', 'terminated by signal {1}.', signal),
           timestamp: Date.now(),
         });
       } else {
-        return this.pushBuildLogLine({
+        return this.appendBuildLogLine({
           type: BuildLogLineType.Error,
-          text: nls.localize('vuengine/build/taskTerminatedForUnknownReason', 'Task {0} terminated for unknown reason.', taskName),
+          text: nls.localize('vuengine/build/terminatedForUnknownReason', 'terminated for unknown reason.'),
           timestamp: Date.now(),
         });
       }
@@ -1049,11 +1067,11 @@ export class VesBuildService {
   protected async runPreBuildTasks(): Promise<void> {
     this.buildStatus = {
       ...this.buildStatus,
-      step: `${nls.localize('vuengine/build/preBuildTasks', 'Pre-build tasks')}...`,
+      step: nls.localize('vuengine/build/preBuildTasks', 'Pre-build tasks'),
     };
     this.pushBuildLogLine({
       type: BuildLogLineType.Headline,
-      text: `${nls.localize('vuengine/build/runningPreBuildTasks', 'Running pre-build tasks')}...`,
+      text: nls.localize('vuengine/build/preBuildTasks', 'Pre-build tasks'),
       timestamp: Date.now(),
     });
 
@@ -1070,7 +1088,7 @@ export class VesBuildService {
   protected async runPostBuildTasks(): Promise<void> {
     this.buildStatus = {
       ...this.buildStatus,
-      step: `${nls.localize('vuengine/build/postBuildTasks', 'Post-build tasks')}...`,
+      step: nls.localize('vuengine/build/postBuildTasks', 'Post-build tasks'),
     };
     this.pushBuildLogLine({
       type: BuildLogLineType.Normal,
@@ -1080,7 +1098,7 @@ export class VesBuildService {
 
     this.pushBuildLogLine({
       type: BuildLogLineType.Headline,
-      text: `${nls.localize('vuengine/build/runningPostBuildTasks', 'Running post-build tasks')}...`,
+      text: nls.localize('vuengine/build/postBuildTasks', 'Post-build tasks'),
       timestamp: Date.now(),
     });
 
