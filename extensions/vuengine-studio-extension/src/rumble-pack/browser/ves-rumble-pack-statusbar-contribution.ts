@@ -27,7 +27,7 @@ export class VesRumblePackStatusBarContribution implements FrontendApplicationCo
             this.statusBar.setElement('ves-rumble-pack', {
                 alignment: StatusBarAlignment.LEFT,
                 priority: 2,
-                text: `$(codicon-screen-full codicon-rotate-90) ${nls.localize('vuengine/rumblePack/rumblePack', 'Rumble Pack')}`,
+                text: `$(codicon-screen-full) ${nls.localize('vuengine/rumblePack/rumblePack', 'Rumble Pack')}`,
                 tooltip: nls.localize('vuengine/rumblePack/rumblePackConnected', 'Rumble Pack Connected')
             });
         } else {

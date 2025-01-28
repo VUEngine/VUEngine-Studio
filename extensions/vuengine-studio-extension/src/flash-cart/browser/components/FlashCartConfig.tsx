@@ -232,7 +232,7 @@ export default function FlashCartConfigForm(props: FlashCartConfigProps): React.
         </VContainer>
         <VContainer className='deviceCodes'>
             <label>
-                {nls.localize('vuengine/flashCarts/configs/deviceCodes', 'DeviceCodes')}
+                {nls.localize('vuengine/flashCarts/configs/deviceCodes', 'Device Codes')}
             </label>
             <VContainer gap={15}>
                 {flashCartConfig.deviceCodes && flashCartConfig.deviceCodes.map((dc, i) =>
