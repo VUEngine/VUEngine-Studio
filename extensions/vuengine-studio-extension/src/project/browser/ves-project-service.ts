@@ -387,14 +387,6 @@ export class VesProjectService {
       this.logLine(`Updated item in project data. Type: ${typeId}, ID: ${itemId}, Contributor: ${this._projectData.items[typeId][itemId]._contributor}.`);
     }
 
-    // check version
-    const checkForOutdatedFiles = this.preferenceService.get(VesProjectPreferenceIds.CHECK_FOR_OUTDATED_FILES) as boolean;
-    if (checkForOutdatedFiles) {
-      if (data._version !== VES_VERSION) {
-        this.promptForFilesUpdate(1);
-      }
-    }
-
     return true;
   }
 
