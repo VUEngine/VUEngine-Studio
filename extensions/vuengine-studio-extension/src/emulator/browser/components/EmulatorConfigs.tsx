@@ -112,7 +112,7 @@ export default function EmulatorConfigs(props: EmulatorConfigsProps): React.JSX.
     };
 
     const openRedViperDocumentation = () => {
-        props.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'user-guide/emulator/#red-viper', false);
+        props.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'basics/emulator/#red-viper', false);
     };
 
     const update3dsIpAddress = (newValue: string) => {

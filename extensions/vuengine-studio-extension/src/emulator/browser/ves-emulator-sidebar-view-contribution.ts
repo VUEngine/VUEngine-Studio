@@ -78,7 +78,7 @@ export class VesEmulatorSidebarViewContribution extends AbstractViewContribution
             isVisible: widget => widget !== undefined &&
                 widget.id !== undefined &&
                 widget.id === VesEmulatorSidebarWidget.ID,
-            execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'user-guide/emulator', false),
+            execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'basics/emulator', false),
         });
     }
 

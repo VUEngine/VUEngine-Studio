@@ -57,7 +57,7 @@ export class VesBuildViewContribution extends AbstractViewContribution<VesBuildW
             isEnabled: () => true,
             isVisible: widget => widget !== undefined &&
                 widget.id === VesBuildWidget.ID,
-            execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'user-guide/building', false),
+            execute: () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'basics/building', false),
         });
         commandRegistry.registerCommand(VesBuildCommands.WIDGET_SETTINGS, {
             isEnabled: () => true,

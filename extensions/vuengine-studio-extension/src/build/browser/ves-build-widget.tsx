@@ -528,5 +528,5 @@ export class VesBuildWidget extends ReactWidget {
     this.update();
   };
 
-  protected openWslDocs = () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'setup/enhancing-build-times-on-windows', false);
+  protected openWslDocs = () => this.commandService.executeCommand(VesCoreCommands.OPEN_DOCUMENTATION.id, 'setup/enhancing-build-times', false);
 }
