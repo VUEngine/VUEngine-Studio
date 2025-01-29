@@ -488,7 +488,6 @@ export const defaultProjectData: ProjectData = {
     RomInfo: {
       file: 'RomInfo',
       schema: {
-        title: 'ROM Info',
         properties: {
           gameTitle: {
             type: 'string',
@@ -497,99 +496,41 @@ export const defaultProjectData: ProjectData = {
             maxLength: 20,
             default: 'VUENGINE PROJECT'
           },
-          'gameCodeSystem': {
+          gameCodeSystem: {
             type: 'string',
-            description: 'Always \'V\' for \'VUE\'',
             minLength: 1,
             maxLength: 1,
             default: 'V'
           },
-          'gameCodeId': {
+          gameCodeId: {
             type: 'string',
-            description: 'Unique game identifier',
             minLength: 2,
             maxLength: 2,
             default: 'VU'
           },
-          'gameCodeLanguage': {
+          gameCodeLanguage: {
             type: 'string',
-            description: 'In-game language',
             minLength: 1,
             maxLength: 1,
             default: 'E'
           },
-          'makerCode': {
+          makerCode: {
             type: 'string',
-            description: "Unique identifier of the game's developer",
             minLength: 2,
             maxLength: 2,
-            default: ''
+            default: '  '
           },
-          'revision': {
+          revision: {
             type: 'integer',
-            description: 'Version of the game, should be counted up with every release',
             minimum: 0,
             maximum: 9,
             default: 0
           }
-        },
-        required: [
-          'gameTitle',
-          'gameCodeSystem',
-          'gameCodeId',
-          'gameCodeLanguage',
-          'makerCode',
-          'revision'
-        ]
+        }
       },
       uiSchema: {
-        type: 'VerticalLayout',
-        elements: [
-          {
-            type: 'Control',
-            label: 'Game Title',
-            scope: '#/properties/gameTitle'
-          },
-          {
-            type: 'Group',
-            label: 'Game Code',
-            elements: [
-              {
-                type: 'HorizontalLayout',
-                elements: [
-                  {
-                    type: 'Control',
-                    label: 'System',
-                    scope: '#/properties/gameCodeSystem'
-                  },
-                  {
-                    type: 'Control',
-                    label: 'ID',
-                    scope: '#/properties/gameCodeId'
-                  },
-                  {
-                    type: 'Control',
-                    label: 'Language',
-                    scope: '#/properties/gameCodeLanguage'
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            type: 'Control',
-            label: 'Maker Code',
-            scope: '#/properties/makerCode'
-          },
-          {
-            type: 'Control',
-            label: 'Revision',
-            scope: '#/properties/revision',
-            options: {
-              inputPrefix: '1.'
-            }
-          }
-        ]
+        type: 'RomInfoEditor',
+        scope: '#'
       },
       icon: 'codicon codicon-chip',
       templates: ['RomInfo']
