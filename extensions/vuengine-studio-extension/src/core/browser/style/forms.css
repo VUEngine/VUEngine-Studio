@@ -13,6 +13,11 @@
     width: 100% !important;
 }
 
+.theia-input.full-width {
+    box-sizing: border-box;
+    width: 100%;
+}
+
 .theia-button .codicon {
     vertical-align: middle;
 }

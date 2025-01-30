@@ -4,6 +4,7 @@ import { BinaryBuffer } from '@theia/core/lib/common/buffer';
 import URI from '@theia/core/lib/common/uri';
 import { inject, injectable, postConstruct } from '@theia/core/shared/inversify';
 import { FileService } from '@theia/filesystem/lib/browser/file-service';
+import { FileStatWithMetadata } from '@theia/filesystem/lib/common/files';
 import { OutputChannelManager, OutputChannelSeverity } from '@theia/output/lib/browser/output-channel';
 import * as iconv from 'iconv-lite';
 import * as jsonLogic from 'json-logic-js';
@@ -11,6 +12,7 @@ import * as nunjucks from 'nunjucks';
 import { VesAudioConverterService } from '../../audio-converter/browser/ves-audio-converter-service';
 import { VesCommonService } from '../../core/browser/ves-common-service';
 import { VesWorkspaceService } from '../../core/browser/ves-workspace-service';
+import { toUpperSnakeCase } from '../../editors/browser/components/Common/Utils';
 import { compressTiles } from '../../images/browser/ves-images-compressor';
 import { VesImagesService } from '../../images/browser/ves-images-service';
 import { AnimationConfig, ImageCompressionType, ImageConfigWithName, TilesCompressionResult } from '../../images/browser/ves-images-types';
@@ -27,7 +29,6 @@ import {
   WithFileUri
 } from '../../project/browser/ves-project-types';
 import { CODEGEN_CHANNEL_NAME, GenerationMode, IsGeneratingFilesStatus, SHOW_DONE_DURATION } from './ves-codegen-types';
-import { FileStatWithMetadata } from '@theia/filesystem/lib/common/files';
 
 @injectable()
 export class VesCodeGenService {
@@ -590,7 +591,7 @@ export class VesCodeGenService {
 
     env.addFilter('sanitizeSpecName', (value: string) => this.vesCommonService.cleanSpecName(value));
 
-    env.addFilter('toUpperSnakeCase', (value: string) => this.toUpperSnakeCase(value));
+    env.addFilter('toUpperSnakeCase', (value: string) => toUpperSnakeCase(value));
 
     env.addFilter('unique', (values: Array<string>, attribute?: string) => {
       if (attribute) {
@@ -667,22 +668,5 @@ export class VesCodeGenService {
     env.addGlobal('compressTiles', (tilesData: string[], compressor: ImageCompressionType, animationConfig: AnimationConfig): TilesCompressionResult =>
       compressTiles(tilesData, compressor, animationConfig)
     );
-  }
-
-  protected toUpperSnakeCase(key: string): string {
-    const splitCaps = (input: string) => input
-      ? input
-        .replace(/([a-z])([A-Z]+)/g, (m, s1, s2) => s1 + ' ' + s2)
-        .replace(/([A-Z])([A-Z]+)([^a-zA-Z0-9]*)$/, (m, s1, s2, s3) => s1 + s2.toLowerCase() + s3)
-        .replace(/([A-Z]+)([A-Z][a-z])/g, (m, s1, s2) => s1.toLowerCase() + ' ' + s2)
-      : '';
-
-    return splitCaps(key)
-      .replace(/\W+/g, ' ')
-      .split(/ |\B(?=[A-Z])/)
-      .map(word => word.toLowerCase())
-      .join('_')
-      .toUpperCase()
-      .replace('VU_ENGINE', 'VUENGINE'); // meh...
   }
 }

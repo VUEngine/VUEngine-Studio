@@ -8,7 +8,7 @@ import {
     MAKER_CODE_MAX_LENGTH,
     REVISION_MAX_VALUE,
     REVISION_MIN_VALUE,
-    RomInfoEditorData
+    RomInfoData
 } from './RomInfoEditorTypes';
 import { nls } from '@theia/core';
 import InfoLabel from '../Common/InfoLabel';
@@ -16,8 +16,8 @@ import { clamp } from '../Common/Utils';
 import HContainer from '../Common/Base/HContainer';
 
 interface RomInfoEditorProps {
-    data: RomInfoEditorData
-    updateData: (data: RomInfoEditorData) => void
+    data: RomInfoData
+    updateData: (data: RomInfoData) => void
 }
 
 export default function RomInfoEditor(props: RomInfoEditorProps): React.JSX.Element {

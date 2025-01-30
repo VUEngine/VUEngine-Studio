@@ -54,4 +54,22 @@ export const getMaxScaleInContainer = (containerWidth: number, containerHeight: 
         : 1;
 };
 
+export const roundToNextMultipleOf4 = (x: number) => (x + 3) & (-4);
 export const roundToNextMultipleOf8 = (x: number) => (x + 7) & (-8);
+
+export const toUpperSnakeCase = (key: string): string => {
+    const splitCaps = (input: string) => input
+        ? input
+            .replace(/([a-z])([A-Z]+)/g, (m, s1, s2) => s1 + ' ' + s2)
+            .replace(/([A-Z])([A-Z]+)([^a-zA-Z0-9]*)$/, (m, s1, s2, s3) => s1 + s2.toLowerCase() + s3)
+            .replace(/([A-Z]+)([A-Z][a-z])/g, (m, s1, s2) => s1.toLowerCase() + ' ' + s2)
+        : '';
+
+    return splitCaps(key)
+        .replace(/\W+/g, ' ')
+        .split(/ |\B(?=[A-Z])/)
+        .map(word => word.toLowerCase())
+        .join('_')
+        .toUpperCase()
+        .replace('VU_ENGINE', 'VUENGINE'); // meh...
+};

@@ -1,4 +1,4 @@
-export interface RomInfoEditorData {
+export interface RomInfoData {
     gameTitle: string
     gameCodeSystem: string
     gameCodeId: string
