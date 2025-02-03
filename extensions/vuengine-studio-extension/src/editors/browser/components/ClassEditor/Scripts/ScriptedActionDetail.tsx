@@ -5,21 +5,21 @@ import ReactTextareaAutosize from 'react-textarea-autosize';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import RadioSelect from '../../Common/Base/RadioSelect';
 import VContainer from '../../Common/Base/VContainer';
-import { ActorEditorContext, ActorEditorContextType, ScriptData } from '../ActorEditorTypes';
-import { ScriptType } from './ScriptTypes';
 import { AVAILABLE_ACTIONS, ActionArgumentsData, ActionConfigType } from './AvailableActions';
 import { ACTOR_FUNCTIONS } from './ActorFunctions';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
+import { INPUT_BLOCKING_COMMANDS } from '../../ActorEditor/ActorEditor';
 import InfoLabel from '../../Common/InfoLabel';
+import { ClassEditorContext, ClassEditorContextType, ScriptData } from '../ClassEditorTypes';
+import { ScriptType } from './ScriptTypes';
 
 export default function ScriptedActionDetail(): React.JSX.Element {
-    const { data, setData, currentComponent } = useContext(ActorEditorContext) as ActorEditorContextType;
+    const { data, setData, currentComponent } = useContext(ClassEditorContext) as ClassEditorContextType;
     const { services, enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
 
     const currentComponentParts = currentComponent.split('-');
     const currentScriptIndex = currentComponentParts[1] ? parseInt(currentComponentParts[1]) : 0;
     const currentActionIndex = currentComponentParts[2] ? parseInt(currentComponentParts[2]) : -1;
-    const scriptConfig = data.components.scripts[currentScriptIndex];
+    const scriptConfig = data.methods[currentScriptIndex];
     const script = scriptConfig?.script ?? [];
     let currentScriptedAction = script[currentActionIndex];
     // follow branches
@@ -34,17 +34,14 @@ export default function ScriptedActionDetail(): React.JSX.Element {
     const currentAction = AVAILABLE_ACTIONS[currentScriptedAction?.id ?? 0];
 
     const updateScript = (partialScriptData: Partial<ScriptData>): void => {
-        const updatedScripts = [...data.components.scripts || []];
-        updatedScripts[currentScriptIndex] = {
-            ...updatedScripts[currentScriptIndex],
+        const updatedMethods = [...data.methods || []];
+        updatedMethods[currentScriptIndex] = {
+            ...updatedMethods[currentScriptIndex],
             ...partialScriptData,
         };
 
         setData({
-            components: {
-                ...data.components,
-                scripts: updatedScripts,
-            }
+            methods: updatedMethods,
         });
     };
 

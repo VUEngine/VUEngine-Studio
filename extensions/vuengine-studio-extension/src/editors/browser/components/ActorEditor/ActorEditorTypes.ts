@@ -23,7 +23,6 @@ import {
     WireframeType
 } from '../Common/VUEngineTypes';
 import { ActorEditorSaveDataOptions } from './ActorEditor';
-import { ScriptedActionData, ScriptType } from './Scripts/ScriptTypes';
 
 // @ts-ignore
 export const ActorEditorContext = createContext<ActorEditorContextType>({});
@@ -41,7 +40,7 @@ export interface LocalStorageActorEditorState {
 export interface ActorEditorContextType {
     data: ActorData
     setData: (partialData: Partial<ActorData>, options?: ActorEditorSaveDataOptions) => Promise<void>
-    removeComponent: (key: ComponentKey | 'extraProperties' | 'physics', index: number) => void
+    removeComponent: (key: ComponentKey | 'extraProperties' | 'body', index: number) => void
     currentComponent: string
     setCurrentComponent: Dispatch<SetStateAction<string>>
     currentAnimationStep: number
@@ -84,8 +83,6 @@ export const MAX_SPHERE_RADIUS = 511;
 export const STEP_SPHERE_RADIUS = 1;
 export const MIN_PREVIEW_SPRITE_ZOOM = 1;
 export const MAX_PREVIEW_SPRITE_ZOOM = 20;
-export const MIN_PREVIEW_SCRIPT_ZOOM = 0.1;
-export const MAX_PREVIEW_SCRIPT_ZOOM = 1;
 export const WHEEL_SENSITIVITY = 50;
 export const WIREFRAME_CANVAS_PADDING = 1;
 
@@ -134,12 +131,6 @@ export interface WireframeData {
     drawCenter: boolean // only WireframeType.Sphere
 }
 
-export interface ScriptData {
-    name: string
-    type: ScriptType
-    script: ScriptedActionData[]
-}
-
 export interface AnimationData {
     name: string
     cycles: number
@@ -148,7 +139,7 @@ export interface AnimationData {
     frames: number[]
 }
 
-export interface BehaviorData {
+export interface MutatorData {
     name: string
 }
 
@@ -220,14 +211,13 @@ export interface PositionedActorData {
     loadRegardlessOfPosition: boolean
 }
 
-export type ComponentKey = 'animations' | 'behaviors' | 'children' | 'colliders' | 'scripts' | 'sprites' | 'wireframes';
-export type ComponentData = AnimationData | BehaviorData | PositionedActorData | ColliderData | SpriteData | WireframeData | ScriptData;
+export type ComponentKey = 'animations' | 'mutators' | 'children' | 'colliders' | 'sprites' | 'wireframes';
+export type ComponentData = AnimationData | MutatorData | PositionedActorData | ColliderData | SpriteData | WireframeData;
 
 export const CLONABLE_COMPONENT_TYPES = [
     'animations',
     'children',
     'colliders',
-    'scripts',
     'sprites',
     'wireframes',
 ];
@@ -257,15 +247,14 @@ export interface ActorData {
     }
     components: {
         animations: AnimationData[]
-        behaviors: BehaviorData[]
+        mutators: MutatorData[]
         children: PositionedActorData[]
         colliders: ColliderData[]
         sprites: SpriteData[]
         wireframes: WireframeData[]
-        scripts: ScriptData[]
     }
     inGameType: string
-    physics: {
+    body: {
         enabled: boolean
         mass: number
         friction: number

@@ -8,7 +8,7 @@ import { ComponentKey, ActorData, ActorEditorContext, ActorEditorContextType } f
 import ComponentTreeNode from './ComponentTreeNode';
 
 interface ComponentType {
-    key: ComponentKey | 'extraProperties' | 'physics'
+    key: ComponentKey | 'extraProperties' | 'body'
     componentKey?: ComponentKey
     labelSingular: string
     labelPlural: string
@@ -81,11 +81,11 @@ export default function ComponentTree(): React.JSX.Element {
             hasContent: data.components?.wireframes?.length > 0,
         },
         {
-            key: 'behaviors',
-            componentKey: 'behaviors',
-            labelSingular: nls.localize('vuengine/actorEditor/behavior', 'Behavior'),
-            labelPlural: nls.localize('vuengine/actorEditor/behaviors', 'Behaviors'),
-            hasContent: data.components?.behaviors?.length > 0,
+            key: 'mutators',
+            componentKey: 'mutators',
+            labelSingular: nls.localize('vuengine/actorEditor/mutator', 'Mutator'),
+            labelPlural: nls.localize('vuengine/actorEditor/mutators', 'Mutators'),
+            hasContent: data.components?.mutators?.length > 0,
         },
         {
             key: 'children',
@@ -95,17 +95,11 @@ export default function ComponentTree(): React.JSX.Element {
             hasContent: data.components?.children?.length > 0,
         },
         {
-            key: 'scripts',
-            componentKey: 'scripts',
-            labelSingular: nls.localize('vuengine/actorEditor/script', 'Script'),
-            labelPlural: nls.localize('vuengine/actorEditor/scripts', 'Scripts'),
-            hasContent: data.components?.scripts?.length > 0,
-        },
-        {
-            key: 'physics',
-            labelSingular: nls.localize('vuengine/actorEditor/physics', 'Physical Properties'),
-            labelPlural: nls.localize('vuengine/actorEditor/physics', 'Physical Properties'),
-            hasContent: data.physics.enabled,
+            key: 'body',
+            labelSingular: nls.localize('vuengine/actorEditor/body', 'Body'),
+            labelPlural: nls.localize('vuengine/actorEditor/body', 'Body'),
+            // labelPlural: nls.localize('vuengine/actorEditor/bodies', 'Bodies'),
+            hasContent: data.body.enabled,
         },
         {
             key: 'extraProperties',

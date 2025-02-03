@@ -23,7 +23,6 @@ import {
   SpriteImageData,
 } from './ActorEditorTypes';
 import Preview from './Preview/Preview';
-import Script from './Scripts/Script';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 
 const EditorSidebar = styled.div`
@@ -109,7 +108,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
 
   const mostFilesOnASprite = getMostFilesOnASprite(data);
   const isMultiFileAnimation = mostFilesOnASprite > 1;
-  const hasAnyComponent = data.physics.enabled || data.extraProperties.enabled || Object.values(data.components).filter(c => c.length > 0).length > 0;
+  const hasAnyComponent = data.body.enabled || data.extraProperties.enabled || Object.values(data.components).filter(c => c.length > 0).length > 0;
 
   const getStateLocalStorageId = (): string =>
     `ves-editors-Actor-state/${fileUri.path.fsPath()}`;
@@ -316,23 +315,18 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
       label: nls.localize('vuengine/actorEditor/wireframe', 'Wireframe'),
       allowAdd: true,
     }, {
-      key: 'behaviors',
-      label: nls.localize('vuengine/actorEditor/behavior', 'Behavior'),
-      allowAdd: true,
+      key: 'mutators',
+      label: nls.localize('vuengine/actorEditor/mutator', 'Mutator'),
+      allowAdd: data.components.mutators.length === 0,
     }, {
       key: 'children',
       label: nls.localize('vuengine/actorEditor/child', 'Child'),
       allowAdd: true,
-    }, /*
+    },
     {
-        key: 'scripts',
-        label: nls.localize('vuengine/actorEditor/script', 'Script'),
-        allowAdd: true,
-    },*/
-    {
-      key: 'physics',
-      label: nls.localize('vuengine/actorEditor/physics', 'Physical Properties'),
-      allowAdd: !data.physics.enabled,
+      key: 'body',
+      label: nls.localize('vuengine/actorEditor/body', 'Body'),
+      allowAdd: !data.body.enabled,
     }, {
       key: 'extraProperties',
       label: nls.localize('vuengine/actorEditor/extraProperties', 'Extra Properties'),
@@ -365,22 +359,20 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
     switch (t) {
       case 'animations':
         return addComponentByType(t, nls.localize('vuengine/actorEditor/animation', 'Animation'));
-      case 'behaviors':
-        return addComponentByType(t, nls.localize('vuengine/actorEditor/animation', 'Animation'));
+      case 'mutators':
+        return addComponentByType(t, nls.localize('vuengine/actorEditor/mutator', 'Mutator'));
       case 'children':
         return addPositionedActor();
       case 'colliders':
-        return addComponentByType(t, nls.localize('vuengine/actorEditor/colliders', 'Collider'));
+        return addComponentByType(t, nls.localize('vuengine/actorEditor/collider', 'Collider'));
       case 'extraProperties':
         return enableExtraProperties();
-      case 'physics':
-        return enablePhysics();
-      case 'scripts':
-        return addComponentByType(t, nls.localize('vuengine/actorEditor/scripts', 'Script'));
+      case 'body':
+        return enableBody();
       case 'sprites':
-        return addComponentByType(t, nls.localize('vuengine/actorEditor/sprites', 'Sprite'));
+        return addComponentByType(t, nls.localize('vuengine/actorEditor/sprite', 'Sprite'));
       case 'wireframes':
-        return addComponentByType(t, nls.localize('vuengine/actorEditor/wireframes', 'Wireframes'));
+        return addComponentByType(t, nls.localize('vuengine/actorEditor/wireframe', 'Wireframe'));
     }
   };
 
@@ -452,15 +444,15 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
     }
   };
 
-  const enablePhysics = (): void => {
+  const enableBody = (): void => {
     setData({
-      physics: {
-        ...data.physics,
+      body: {
+        ...data.body,
         enabled: true,
       }
     });
 
-    setCurrentComponent('physics');
+    setCurrentComponent('body');
   };
 
   const enableExtraProperties = (): void => {
@@ -474,7 +466,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
     setCurrentComponent('extraProperties');
   };
 
-  const removeComponent = async (key: ComponentKey | 'extraProperties' | 'physics', index: number) => {
+  const removeComponent = async (key: ComponentKey | 'extraProperties' | 'body', index: number) => {
     const dialog = new ConfirmDialog({
       title: nls.localize('vuengine/actorEditor/removeComponent', 'Remove Component'),
       msg: nls.localize('vuengine/actorEditor/areYouSureYouWantToRemoveComponent', 'Are you sure you want to remove this component?'),
@@ -484,15 +476,14 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
       setCurrentComponent('');
       switch (key) {
         case 'animations':
-        case 'behaviors':
+        case 'mutators':
         case 'children':
         case 'colliders':
-        case 'scripts':
         case 'sprites':
         case 'wireframes':
           return doRemoveComponent(key, index);
-        case 'physics':
-          return disablePhysics();
+        case 'body':
+          return disableBody();
         case 'extraProperties':
           return disableExtraProperties();
       }
@@ -511,10 +502,10 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
     });
   };
 
-  const disablePhysics = async (): Promise<void> => {
+  const disableBody = async (): Promise<void> => {
     setData({
-      physics: {
-        ...data.physics,
+      body: {
+        ...data.body,
         enabled: false,
       }
     });
@@ -578,7 +569,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
         break;
       case ActorEditorCommands.DELETE_CURRENT_COMPONENT.id:
         const [type, indexString] = currentComponent.split('-');
-        removeComponent(type as ComponentKey | 'extraProperties' | 'physics', parseInt(indexString));
+        removeComponent(type as ComponentKey | 'extraProperties' | 'body', parseInt(indexString));
         break;
       case ActorEditorCommands.DESELECT_CURRENT_COMPONENT.id:
         setCurrentComponent('');
@@ -678,15 +669,11 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
       >
         <ActorEditorContext.Consumer>
           {context =>
-            currentComponent?.startsWith('scripts-')
-              ? <Script
-                index={parseInt(currentComponent?.split('-')[1] ?? '0')}
-              />
-              : <Preview
-                hasAnyComponent={hasAnyComponent}
-                updateComponent={updateComponent}
-                setCurrentComponentDisplacement={setCurrentComponentDisplacement}
-              />
+            <Preview
+              hasAnyComponent={hasAnyComponent}
+              updateComponent={updateComponent}
+              setCurrentComponentDisplacement={setCurrentComponentDisplacement}
+            />
           }
         </ActorEditorContext.Consumer>
         {hasAnyComponent &&
@@ -730,7 +717,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
               }
               <EditorSidebar
                 style={{
-                  marginRight: currentComponent.includes('-') || ['animations', 'colliders', 'extraProperties', 'physics', 'sprites'].includes(currentComponent)
+                  marginRight: currentComponent.includes('-') || ['animations', 'colliders', 'extraProperties', 'body', 'sprites'].includes(currentComponent)
                     ? 0
                     : 'calc(-320px - 1px - var(--padding))',
                 }}

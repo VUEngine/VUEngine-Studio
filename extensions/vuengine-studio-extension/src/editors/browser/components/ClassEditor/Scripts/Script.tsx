@@ -1,10 +1,11 @@
 import React, { useContext, useState } from 'react';
-import { ActorEditorContext, ActorEditorContextType, MAX_PREVIEW_SCRIPT_ZOOM, MIN_PREVIEW_SCRIPT_ZOOM, WHEEL_SENSITIVITY } from '../ActorEditorTypes';
-import PreviewOptions from '../Preview/PreviewOptions';
+import { ClassEditorContext, ClassEditorContextType, MAX_PREVIEW_SCRIPT_ZOOM, MIN_PREVIEW_SCRIPT_ZOOM } from '../ClassEditorTypes';
 import { ScriptedActionData } from './ScriptTypes';
 import ScriptedAction from './ScriptedAction';
 import VContainer from '../../Common/Base/VContainer';
 import { AVAILABLE_ACTIONS } from './AvailableActions';
+import PreviewOptions from '../../ActorEditor/Preview/PreviewOptions';
+import { WHEEL_SENSITIVITY } from '../../ActorEditor/ActorEditorTypes';
 
 interface ScriptProps {
     index: number
@@ -12,7 +13,7 @@ interface ScriptProps {
 
 export default function Script(props: ScriptProps): React.JSX.Element {
     const { index } = props;
-    const { data, setData, currentComponent } = useContext(ActorEditorContext) as ActorEditorContextType;
+    const { data, setData, currentComponent } = useContext(ClassEditorContext) as ClassEditorContextType;
     const [zoom, setZoom] = useState<number>(1);
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [offsetX, setOffsetX] = useState<number>(0);
@@ -21,21 +22,18 @@ export default function Script(props: ScriptProps): React.JSX.Element {
     const currentComponentParts = currentComponent.split('-');
     const currentScriptIndex = currentComponentParts[1] ? parseInt(currentComponentParts[1]) : 0;
 
-    const scriptConfig = data.components.scripts[currentScriptIndex];
+    const scriptConfig = data.methods[currentScriptIndex];
     const script = scriptConfig?.script ?? [];
 
     const updateScript = (s: ScriptedActionData[]) => {
-        const updatedScripts = [...data.components.scripts || []];
-        updatedScripts[currentScriptIndex] = {
-            ...updatedScripts[currentScriptIndex],
+        const updatedMethods = [...data.methods || []];
+        updatedMethods[currentScriptIndex] = {
+            ...updatedMethods[currentScriptIndex],
             ...{ script: s },
         };
 
         setData({
-            components: {
-                ...data.components,
-                scripts: updatedScripts,
-            }
+            methods: updatedMethods
         });
     };
 

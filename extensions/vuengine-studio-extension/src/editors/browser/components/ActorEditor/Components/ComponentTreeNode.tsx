@@ -14,8 +14,7 @@ import {
     Selection,
     SelectionInverse,
     SneakerMove,
-    TreeStructure,
-    UserFocus,
+    UserFocus
 } from '@phosphor-icons/react';
 import { nls } from '@theia/core';
 import React, { useCallback, useContext, useMemo, useState } from 'react';
@@ -24,15 +23,14 @@ import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import { ColliderType, DisplayMode, WireframeType } from '../../Common/VUEngineTypes';
 import { ActorEditorCommands } from '../ActorEditorCommands';
 import {
+    ActorEditorContext,
+    ActorEditorContextType,
     ADDABLE_COMPONENT_TYPES,
     CLONABLE_COMPONENT_TYPES,
     ComponentKey,
-    ActorEditorContext,
-    ActorEditorContextType,
     HIDEABLE_COMPONENT_TYPES,
     HideableComponent,
 } from '../ActorEditorTypes';
-import { ScriptType } from '../Scripts/ScriptTypes';
 
 export default function ComponentTreeNode(props: NodeRendererProps<any>): React.JSX.Element {
     const { node, style, dragHandle } = props;
@@ -49,7 +47,7 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
     const [dragging, setDragging] = useState<boolean>(false);
 
     const nodeParts = node.id.split('-');
-    const type = nodeParts[0] as ComponentKey | 'physics' | 'extraProperties';
+    const type = nodeParts[0] as ComponentKey | 'body' | 'extraProperties';
     const index = parseInt(nodeParts[1] || '-1');
 
     const showPreview = useMemo(() => {
@@ -104,7 +102,7 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                     return <File size={16} />;
                 case 'animations':
                     return <FilmStrip size={16} />;
-                case 'behaviors':
+                case 'mutators':
                     return <SneakerMove size={16} />;
                 case 'children':
                     return <UserFocus size={16} />;
@@ -122,10 +120,8 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                     }
                 case 'extraProperties':
                     return <FadersHorizontal size={16} />;
-                case 'physics':
+                case 'body':
                     return <Atom size={16} />;
-                case 'scripts':
-                    return <TreeStructure size={16} />;
                 case 'sprites':
                     if (data.components.sprites[index].displayMode === DisplayMode.Stereo ||
                         ((data.components.sprites[index].texture?.files?.length ?? 0) +
@@ -189,10 +185,6 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
             ...data.components[type][index],
             name,
         };
-
-        if (type === 'scripts') {
-            updatedComponent.type = ScriptType.Custom;
-        }
 
         const components = {
             ...data.components,

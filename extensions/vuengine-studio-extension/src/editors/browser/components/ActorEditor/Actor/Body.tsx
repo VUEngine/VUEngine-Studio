@@ -9,48 +9,48 @@ import { Axis } from '../../Common/VUEngineTypes';
 import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
 import { ActorEditorContext, ActorEditorContextType } from '../ActorEditorTypes';
 
-export default function Physics(): React.JSX.Element {
+export default function Body(): React.JSX.Element {
     const { data, setData } = useContext(ActorEditorContext) as ActorEditorContextType;
     const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
 
     const setMass = (mass: number): void => {
         setData({
-            physics: {
-                ...data.physics, mass
+            body: {
+                ...data.body, mass
             }
         });
     };
 
     const setFriction = (friction: number): void => {
         setData({
-            physics: {
-                ...data.physics, friction
+            body: {
+                ...data.body, friction
             }
         });
     };
 
     const setBounciness = (bounciness: number): void => {
         setData({
-            physics: {
-                ...data.physics, bounciness
+            body: {
+                ...data.body, bounciness
             }
         });
     };
 
     const setMaximumSpeed = (maximumSpeed: number): void => {
         setData({
-            physics: {
-                ...data.physics, maximumSpeed
+            body: {
+                ...data.body, maximumSpeed
             }
         });
     };
 
     const setMaximumVelocityX = (x: number): void => {
         setData({
-            physics: {
-                ...data.physics,
+            body: {
+                ...data.body,
                 maximumVelocity: {
-                    ...data.physics.maximumVelocity, x
+                    ...data.body.maximumVelocity, x
                 }
             }
         });
@@ -58,10 +58,10 @@ export default function Physics(): React.JSX.Element {
 
     const setMaximumVelocityY = (y: number): void => {
         setData({
-            physics: {
-                ...data.physics,
+            body: {
+                ...data.body,
                 maximumVelocity: {
-                    ...data.physics.maximumVelocity, y
+                    ...data.body.maximumVelocity, y
                 }
             }
         });
@@ -69,10 +69,10 @@ export default function Physics(): React.JSX.Element {
 
     const setMaximumVelocityZ = (z: number): void => {
         setData({
-            physics: {
-                ...data.physics,
+            body: {
+                ...data.body,
                 maximumVelocity: {
-                    ...data.physics.maximumVelocity, z
+                    ...data.body.maximumVelocity, z
                 }
             }
         });
@@ -80,8 +80,8 @@ export default function Physics(): React.JSX.Element {
 
     const setGravityAxes = (gravityAxes: Axis[]): void => {
         setData({
-            physics: {
-                ...data.physics,
+            body: {
+                ...data.body,
                 gravityAxes,
             }
         });
@@ -89,8 +89,8 @@ export default function Physics(): React.JSX.Element {
 
     const setRotationAxes = (rotationAxes: Axis[]): void => {
         setData({
-            physics: {
-                ...data.physics,
+            body: {
+                ...data.body,
                 rotationAxes,
             }
         });
@@ -107,7 +107,7 @@ export default function Physics(): React.JSX.Element {
                     style={{ width: 54 }}
                     type='number'
                     step="0.1"
-                    value={data.physics.mass}
+                    value={data.body.mass}
                     onChange={e => setMass(e.target.value === '' ? 0 : parseFloat(e.target.value))}
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
@@ -122,7 +122,7 @@ export default function Physics(): React.JSX.Element {
                     style={{ width: 54 }}
                     type='number'
                     step="0.1"
-                    value={data.physics.friction}
+                    value={data.body.friction}
                     onChange={e => setFriction(e.target.value === '' ? 0 : parseFloat(e.target.value))}
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
@@ -137,7 +137,7 @@ export default function Physics(): React.JSX.Element {
                     style={{ width: 54 }}
                     type='number'
                     step="0.1"
-                    value={data.physics.bounciness}
+                    value={data.body.bounciness}
                     onChange={e => setBounciness(e.target.value === '' ? 0 : parseFloat(e.target.value))}
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
@@ -152,7 +152,7 @@ export default function Physics(): React.JSX.Element {
                         className='theia-input'
                         style={{ width: 54 }}
                         type='number'
-                        value={data.physics.maximumVelocity.x}
+                        value={data.body.maximumVelocity.x}
                         min={0}
                         onChange={e => setMaximumVelocityX(e.target.value === '' ? 0 : parseInt(e.target.value))}
                         onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
@@ -162,7 +162,7 @@ export default function Physics(): React.JSX.Element {
                         className='theia-input'
                         style={{ width: 54 }}
                         type='number'
-                        value={data.physics.maximumVelocity.y}
+                        value={data.body.maximumVelocity.y}
                         min={0}
                         onChange={e => setMaximumVelocityY(e.target.value === '' ? 0 : parseInt(e.target.value))}
                         onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
@@ -172,7 +172,7 @@ export default function Physics(): React.JSX.Element {
                         className='theia-input'
                         style={{ width: 54 }}
                         type='number'
-                        value={data.physics.maximumVelocity.z}
+                        value={data.body.maximumVelocity.z}
                         min={0}
                         onChange={e => setMaximumVelocityZ(e.target.value === '' ? 0 : parseInt(e.target.value))}
                         onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
@@ -188,7 +188,7 @@ export default function Physics(): React.JSX.Element {
                     className='theia-input'
                     style={{ width: 54 }}
                     type='number'
-                    value={data.physics.maximumSpeed}
+                    value={data.body.maximumSpeed}
                     onChange={e => setMaximumSpeed(e.target.value === '' ? 0 : parseInt(e.target.value))}
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
@@ -207,13 +207,13 @@ export default function Physics(): React.JSX.Element {
                         value: Axis.XAxis,
                         label: 'X',
                     }, {
-                        value: Axis.XAxis,
+                        value: Axis.YAxis,
                         label: 'Y',
                     }, {
-                        value: Axis.XAxis,
+                        value: Axis.ZAxis,
                         label: 'Z',
                     }]}
-                    defaultValue={data.physics.gravityAxes}
+                    defaultValue={data.body.gravityAxes}
                     onChange={options => setGravityAxes(options.map(o => o.value) as Axis[])}
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
@@ -242,7 +242,7 @@ export default function Physics(): React.JSX.Element {
                         value: Axis.ZAxis,
                         label: 'Z',
                     }]}
-                    defaultValue={data.physics.rotationAxes}
+                    defaultValue={data.body.rotationAxes}
                     onChange={options => setRotationAxes(options.map(o => o.value) as Axis[])}
                     onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                     onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
