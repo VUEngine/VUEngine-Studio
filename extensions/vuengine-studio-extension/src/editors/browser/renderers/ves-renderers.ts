@@ -6,8 +6,6 @@ import VesColumnTableEditorControl from './column-table-editor/ves-column-table-
 import VesColumnTableEditorControlTester from './column-table-editor/ves-column-table-editor-control-tester';
 import vesCompilerConfigEditorControl from './compiler-config-editor/ves-compiler-config-editor-control';
 import vesCompilerConfigEditorControlTester from './compiler-config-editor/ves-compiler-config-editor-control-tester';
-import vesDebugMacrosEditorControl from './debug-macros-editor/ves-debug-macros-editor-control';
-import vesDebugMacrosEditorControlTester from './debug-macros-editor/ves-debug-macros-editor-control-tester';
 import vesEngineConfigEditorControl from './engine-config-editor/ves-engine-config-editor-control';
 import vesEngineConfigEditorControlTester from './engine-config-editor/ves-engine-config-editor-control-tester';
 import VesFontEditorControl from './font-editor/ves-font-editor-control';
@@ -42,7 +40,6 @@ export const VES_RENDERERS = [
     { tester: VesBrightnessRepeatEditorControlTester, renderer: VesBrightnessRepeatEditorControl },
     { tester: VesColumnTableEditorControlTester, renderer: VesColumnTableEditorControl },
     { tester: vesCompilerConfigEditorControlTester, renderer: vesCompilerConfigEditorControl },
-    { tester: vesDebugMacrosEditorControlTester, renderer: vesDebugMacrosEditorControl },
     { tester: vesEngineConfigEditorControlTester, renderer: vesEngineConfigEditorControl },
     { tester: VesFontEditorControlTester, renderer: VesFontEditorControl },
     { tester: VesImageEditorControlTester, renderer: VesImageEditorControl },
