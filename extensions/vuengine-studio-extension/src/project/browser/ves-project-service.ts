@@ -80,10 +80,6 @@ export class VesProjectService {
   get projectDataReady(): Promise<void> {
     return this._projectDataReady.promise;
   }
-  protected readonly _projectItemsReady = new Deferred<void>();
-  get projectItemsReady(): Promise<void> {
-    return this._projectItemsReady.promise;
-  }
 
   protected _isUpdatingFiles: boolean = false;
   protected readonly onDidChangeIsUpdatingFilesEmitter = new Emitter<boolean>();
@@ -503,6 +499,11 @@ export class VesProjectService {
       }
 
       fileChangesEvent.changes.map(change => {
+        // ignore files changes by git, etc
+        if (change.resource.scheme !== 'file') {
+          return;
+        }
+
         // update project data when files of registered types change
         switch (change.type) {
           case FileChangeType.DELETED:
@@ -585,9 +586,6 @@ export class VesProjectService {
     if (!this.workspaceService.opened) {
       if (this._projectDataReady.state === 'unresolved') {
         this._projectDataReady.resolve();
-      }
-      if (this._projectItemsReady.state === 'unresolved') {
-        this._projectItemsReady.resolve();
       }
 
       return;
@@ -709,10 +707,6 @@ export class VesProjectService {
       ...combinedProjectData,
     };
 
-    if (this._projectDataReady.state === 'unresolved') {
-      this._projectDataReady.resolve();
-    }
-
     // add items to project data
     const filePatterns = Object.values(combinedProjectData.types).map((t: ProjectDataType) => t.file?.startsWith('.') ? `**/*${t.file}` : `**/${t.file}`);
     await Promise.all(projectDataWithContributors.map(async projectDataWithContributor => {
@@ -826,12 +820,12 @@ export class VesProjectService {
       ...combinedProjectData,
     };
 
-    if (this._projectItemsReady.state === 'unresolved') {
-      this._projectItemsReady.resolve();
-    }
-
     const duration = performance.now() - startTime;
     console.log(`Getting VUEngine project data took: ${Math.round(duration)} ms.`);
+
+    if (this._projectDataReady.state === 'unresolved') {
+      this._projectDataReady.resolve();
+    }
 
     // check for outdated items
     const checkForOutdatedFiles = this.preferenceService.get(VesProjectPreferenceIds.CHECK_FOR_OUTDATED_FILES) as boolean;
