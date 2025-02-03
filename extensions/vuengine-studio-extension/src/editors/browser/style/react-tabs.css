@@ -81,3 +81,25 @@
     background-color: var(--theia-activityBar-background);
     border-color: var(--theia-activityBar-background);
 }
+
+/* Vertical */
+
+.vertical .react-tabs__tab
+{
+    border-bottom: none;
+    border-radius: 2px;
+    margin-right: 0;
+    padding: 0 var(--theia-ui-padding);
+}
+
+.vertical .react-tabs__tab--selected
+{
+    background: var(--theia-list-activeSelectionBackground);
+    color: var(--theia-list-activeSelectionForeground) !important;
+}
+
+.vertical .react-tabs__tab:focus
+{
+    outline: var(--theia-focusBorder) solid 1px;
+    outline-offset: -1px;
+}

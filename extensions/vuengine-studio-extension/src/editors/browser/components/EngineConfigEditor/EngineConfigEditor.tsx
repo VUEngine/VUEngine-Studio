@@ -12,7 +12,7 @@ import EngineConfigCommunications from './tabs/EngineConfigCommunications';
 import EngineConfigDebug from './tabs/EngineConfigDebug';
 import EngineConfigExceptions from './tabs/EngineConfigExceptions';
 import EngineConfigFrameRate from './tabs/EngineConfigFrameRate';
-import EngineConfigGameMacros from './tabs/EngineConfigGameMacros';
+import EngineConfigMacros from './tabs/EngineConfigGameMacros';
 import EngineConfigMath from './tabs/EngineConfigMath';
 import EngineConfigOptics from './tabs/EngineConfigOptics';
 import EngineConfigMemoryPools from './tabs/EngineConfigMemoryPools';
@@ -35,6 +35,7 @@ export default function EngineConfigEditor(props: EngineConfigEditorProps): Reac
 
     return (
         <Tabs
+            className="vertical"
             selectedIndex={sidebarTab}
             onSelect={index => setSidebarTab(index)}
             style={{
@@ -55,7 +56,7 @@ export default function EngineConfigEditor(props: EngineConfigEditorProps): Reac
                 <Tab>{nls.localize('vuengine/engineConfigEditor/debug', 'Debug')}</Tab>
                 <Tab>{nls.localize('vuengine/engineConfigEditor/exceptions', 'Exceptions')}</Tab>
                 <Tab>{nls.localize('vuengine/engineConfigEditor/frameRate', 'Frame Rate')}</Tab>
-                <Tab>{nls.localize('vuengine/engineConfigEditor/gameSpecificMacros', 'Game Specific Macros')}</Tab>
+                <Tab>{nls.localize('vuengine/engineConfigEditor/macros', 'Macros')}</Tab>
                 <Tab>{nls.localize('vuengine/engineConfigEditor/math', 'Math')}</Tab>
                 <Tab>{nls.localize('vuengine/engineConfigEditor/memoryPools', 'Memory Pools')}</Tab>
                 <Tab>{nls.localize('vuengine/engineConfigEditor/optics', 'Optics')}</Tab>
@@ -81,7 +82,7 @@ export default function EngineConfigEditor(props: EngineConfigEditorProps): Reac
                 <TabPanel><EngineConfigDebug data={data} updateData={updateData} /></TabPanel>
                 <TabPanel><EngineConfigExceptions data={data} updateData={updateData} /></TabPanel>
                 <TabPanel><EngineConfigFrameRate data={data} updateData={updateData} /></TabPanel>
-                <TabPanel><EngineConfigGameMacros data={data} updateData={updateData} /></TabPanel>
+                <TabPanel><EngineConfigMacros data={data} updateData={updateData} /></TabPanel>
                 <TabPanel><EngineConfigMath data={data} updateData={updateData} /></TabPanel>
                 <TabPanel><EngineConfigMemoryPools data={data} updateData={updateData} /></TabPanel>
                 <TabPanel><EngineConfigOptics data={data} updateData={updateData} /></TabPanel>

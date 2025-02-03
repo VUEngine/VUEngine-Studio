@@ -157,7 +157,7 @@ export interface EngineConfigData {
     debug: EngineConfigDataDebug,
     exceptions: EngineConfigDataExceptions,
     frameRate: EngineConfigDataFrameRate,
-    game: MacroData[],
+    macros: MacroData[],
     math: EngineConfigDataMath,
     memoryPools: EngineConfigDataMemoryPools,
     optics: EngineConfigDataOptics,

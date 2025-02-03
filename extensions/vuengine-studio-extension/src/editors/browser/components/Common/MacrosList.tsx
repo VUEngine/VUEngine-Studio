@@ -12,6 +12,7 @@ export enum MacroType {
     Define = 'define',
     Macro = 'macro',
     Number = 'number',
+    Symbol = 'symbol',
     Text = 'text',
     Undefine = 'undefine',
 }
@@ -131,6 +132,9 @@ export default function MacrosList(props: MacrosListProps): React.JSX.Element {
                                                     value: MacroType.Number,
                                                     label: nls.localize('vuengine/macrosList/type/number', 'Number'),
                                                 }, {
+                                                    value: MacroType.Symbol,
+                                                    label: nls.localize('vuengine/macrosList/type/symbol', 'Symbol'),
+                                                }, {
                                                     value: MacroType.Text,
                                                     label: nls.localize('vuengine/macrosList/type/text', 'Text'),
                                                 }, {
@@ -141,11 +145,16 @@ export default function MacrosList(props: MacrosListProps): React.JSX.Element {
                                                 onChange={option => setMacro(index, {
                                                     ...macro,
                                                     type: option.value as MacroType,
+                                                    value: option.value === MacroType.Boolean
+                                                        ? false
+                                                        : option.value === MacroType.Number
+                                                            ? 0
+                                                            : ''
                                                 })}
                                             />
                                         </td>
                                         <td>
-                                            {(macro.type === MacroType.Text || macro.type === MacroType.Macro) &&
+                                            {(macro.type === MacroType.Text || macro.type === MacroType.Macro || macro.type === MacroType.Symbol) &&
                                                 <input
                                                     className='theia-input full-width'
                                                     value={macro.value}
