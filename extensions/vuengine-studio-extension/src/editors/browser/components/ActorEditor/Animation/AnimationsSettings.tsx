@@ -19,7 +19,7 @@ export default function AnimationsSettings(props: AnimationsSettingsProps): Reac
     const [maxAnimationFrames, setMaxAnimationFrames] = useState<number>(256);
 
     const getEngineSettings = async (): Promise<void> => {
-        await services.vesProjectService.projectItemsReady;
+        await services.vesProjectService.projectDataReady;
         const engineConfig = services.vesProjectService.getProjectDataItemById(ProjectContributor.Project, 'EngineConfig');
         // @ts-ignore
         setMaxAnimationFrames(engineConfig?.animation?.maxFramesPerAnimationFunction || maxAnimationFrames);

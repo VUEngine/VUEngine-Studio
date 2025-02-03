@@ -168,7 +168,7 @@ export class VesCodeGenService {
   }
 
   protected async getTemplatableTypes(): Promise<QuickPickItem[]> {
-    await this.vesProjectService.projectItemsReady;
+    await this.vesProjectService.projectDataReady;
     const types = this.vesProjectService.getProjectDataTypes() || {};
     const items: QuickPickItem[] = [];
     Object.keys(types).map(typeId => {

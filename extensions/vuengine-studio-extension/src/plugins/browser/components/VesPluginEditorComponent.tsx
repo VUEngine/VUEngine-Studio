@@ -79,7 +79,7 @@ export default class VesPluginEditorComponent extends AbstractVesPluginComponent
 
     async componentDidMount() {
         const renderedReadme = await this.renderReadme(this.props.plugin);
-        await this.props.vesProjectService?.projectItemsReady;
+        await this.props.vesProjectService?.projectDataReady;
 
         const workspaceRootUri = this.props.workspaceService.tryGetRoots()[0]?.resource;
         const gameConfigFileUri = workspaceRootUri.resolve('config').resolve('GameConfig');

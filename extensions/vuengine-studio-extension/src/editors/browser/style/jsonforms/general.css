@@ -34,9 +34,16 @@
   padding-top: 1px;
 }
 
+.jsonforms-container .success {
+  color: var(--theia-editorSuccess-foreground);
+}
+
+.jsonforms-container .warning {
+  color: var(--theia-editorWarning-foreground);
+}
+
 .jsonforms-container .error {
-  color: var(--theia-errorForeground);
-  font-style: italic;
+  color: var(--theia-editorError-foreground);
 }
 
 label i.codicon.codicon-question {

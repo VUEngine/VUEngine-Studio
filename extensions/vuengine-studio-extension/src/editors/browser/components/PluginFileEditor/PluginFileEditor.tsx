@@ -30,7 +30,7 @@ export default function PluginFileEditor(props: PluginFileEditorProps): React.JS
     };
 
     const initPlugins = async (): Promise<void> => {
-        await context.services.vesProjectService.projectItemsReady;
+        await context.services.vesProjectService.projectDataReady;
         const pluginsMap = context.services.vesProjectService.getProjectDataAllKnownPlugins();
         if (pluginsMap !== undefined) {
             setAvailablePlugins(Object.keys(pluginsMap));

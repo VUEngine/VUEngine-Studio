@@ -18,7 +18,7 @@ export default function PluginDefaultInput(props: PluginDefaultInputProps): Reac
     const [items, setItems] = useState<ProjectDataItemsByTypeWithContributor>({});
 
     const initItems = async (): Promise<void> => {
-        await vesProjectService.projectItemsReady;
+        await vesProjectService.projectDataReady;
         const t = vesProjectService.getProjectDataItems();
         if (t !== undefined) {
             setItems(t);

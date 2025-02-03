@@ -9,12 +9,13 @@ interface InfoLabelProps {
     tooltip?: string | ReactElement
     tooltipPosition?: HoverPosition
     hoverService?: HoverService
+    style?: object
 }
 
 export default function InfoLabel(props: PropsWithChildren<InfoLabelProps>): React.JSX.Element {
-    const { label, subLabel, tooltip, tooltipPosition, count, hoverService } = props;
+    const { label, subLabel, tooltip, tooltipPosition, count, hoverService, style } = props;
 
-    return <label>
+    return <label style={style}>
         {label}
         {count && <>
             {' '}<span className='count'>{count}</span>

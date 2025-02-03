@@ -6,14 +6,16 @@ import VesColumnTableEditorControl from './column-table-editor/ves-column-table-
 import VesColumnTableEditorControlTester from './column-table-editor/ves-column-table-editor-control-tester';
 import vesCompilerConfigEditorControl from './compiler-config-editor/ves-compiler-config-editor-control';
 import vesCompilerConfigEditorControlTester from './compiler-config-editor/ves-compiler-config-editor-control-tester';
+import vesDebugMacrosEditorControl from './debug-macros-editor/ves-debug-macros-editor-control';
+import vesDebugMacrosEditorControlTester from './debug-macros-editor/ves-debug-macros-editor-control-tester';
+import vesEngineConfigEditorControl from './engine-config-editor/ves-engine-config-editor-control';
+import vesEngineConfigEditorControlTester from './engine-config-editor/ves-engine-config-editor-control-tester';
 import VesFontEditorControl from './font-editor/ves-font-editor-control';
 import VesFontEditorControlTester from './font-editor/ves-font-editor-control-tester';
 import VesImageEditorControl from './image-editor/ves-image-editor-control';
 import VesImageEditorControlTester from './image-editor/ves-image-editor-control-tester';
 import VesMusicEditorControl from './music-editor/ves-music-editor-control';
 import VesMusicEditorControlTester from './music-editor/ves-music-editor-control-tester';
-import VesPaletteControl from './palette/ves-palette-control';
-import VesPaletteControlTester from './palette/ves-palette-control-tester';
 import VesPcmEditorControl from './pcm-editor/ves-pcm-editor-control';
 import VesPcmEditorControlTester from './pcm-editor/ves-pcm-editor-control-tester';
 import VesPluginFileEditorControl from './plugin-file-editor/ves-plugin-file-editor-control';
@@ -40,10 +42,11 @@ export const VES_RENDERERS = [
     { tester: VesBrightnessRepeatEditorControlTester, renderer: VesBrightnessRepeatEditorControl },
     { tester: VesColumnTableEditorControlTester, renderer: VesColumnTableEditorControl },
     { tester: vesCompilerConfigEditorControlTester, renderer: vesCompilerConfigEditorControl },
+    { tester: vesDebugMacrosEditorControlTester, renderer: vesDebugMacrosEditorControl },
+    { tester: vesEngineConfigEditorControlTester, renderer: vesEngineConfigEditorControl },
     { tester: VesFontEditorControlTester, renderer: VesFontEditorControl },
     { tester: VesImageEditorControlTester, renderer: VesImageEditorControl },
     { tester: VesMusicEditorControlTester, renderer: VesMusicEditorControl },
-    { tester: VesPaletteControlTester, renderer: VesPaletteControl },
     { tester: VesPcmEditorControlTester, renderer: VesPcmEditorControl },
     { tester: VesPluginFileEditorControlTester, renderer: VesPluginFileEditorControl },
     { tester: vesRominfoEditorControlTester, renderer: vesRominfoEditorControl },

@@ -168,7 +168,7 @@ export class VesEditorsWidget extends ReactWidget implements NavigatableWidget, 
             }
         }
 
-        await this.vesProjectService.projectItemsReady;
+        await this.vesProjectService.projectDataReady;
 
         const type = this.vesProjectService.getProjectDataType(this.options.typeId);
         if (!type) {

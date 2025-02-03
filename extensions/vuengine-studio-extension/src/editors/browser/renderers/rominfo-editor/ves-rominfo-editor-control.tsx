@@ -1,12 +1,12 @@
 import { withJsonFormsControlProps } from '@jsonforms/react';
 import React from 'react';
 import RomInfoEditor from '../../components/RomInfoEditor/RomInfoEditor';
-import { RomInfoEditorData } from '../../components/RomInfoEditor/RomInfoEditorTypes';
+import { RomInfoData } from '../../components/RomInfoEditor/RomInfoEditorTypes';
 import { EditorsContext } from '../../ves-editors-types';
 
 interface VesRomInfoEditorControlProps {
-    data: RomInfoEditorData;
-    handleChange(path: string, value: RomInfoEditorData): void;
+    data: RomInfoData;
+    handleChange(path: string, value: RomInfoData): void;
     path: string;
 }
 
@@ -14,7 +14,7 @@ const VesRomInfoEditorControl = ({ data, handleChange, path }: VesRomInfoEditorC
     <EditorsContext.Consumer>
         {context => <RomInfoEditor
             data={data}
-            updateData={(newValue: RomInfoEditorData) => {
+            updateData={(newValue: RomInfoData) => {
                 if (!context.isReadonly) {
                     handleChange(path, newValue);
                 }

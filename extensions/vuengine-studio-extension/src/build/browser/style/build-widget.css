@@ -82,18 +82,6 @@
   font-size: 80%;
 }
 
-.buildWidget .buildStatus .success {
-  color: var(--theia-editorSuccess-foreground);
-}
-
-.buildWidget .buildStatus .warning {
-  color: var(--theia-editorWarning-foreground);
-}
-
-.buildWidget .buildStatus .error {
-  color: var(--theia-editorError-foreground);
-}
-
 .buildWidget .buildStatusMeta span {
   margin-right: var(--theia-ui-padding);
 }
