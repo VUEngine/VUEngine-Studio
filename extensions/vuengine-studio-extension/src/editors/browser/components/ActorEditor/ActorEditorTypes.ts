@@ -40,7 +40,7 @@ export interface LocalStorageActorEditorState {
 export interface ActorEditorContextType {
     data: ActorData
     setData: (partialData: Partial<ActorData>, options?: ActorEditorSaveDataOptions) => Promise<void>
-    removeComponent: (key: ComponentKey | 'extraProperties' | 'body', index: number) => void
+    removeComponent: (key: ComponentKey | 'extraProperties' | 'body' | 'logic', index: number) => void
     currentComponent: string
     setCurrentComponent: Dispatch<SetStateAction<string>>
     currentAnimationStep: number
@@ -239,7 +239,6 @@ export interface ActorData {
         enabled: boolean // flag just for the UI to be able to treat as component
         extraInfo: string
         pixelSize: PixelSize
-        customAllocator: string
     }
     animations: {
         default: number
@@ -268,5 +267,10 @@ export interface ActorData {
     sprites: {
         type: SpriteType
         useZDisplacementInProjection: boolean
+    }
+    logic: {
+        enabled: boolean // flag just for the UI to be able to treat as component
+        customAllocator: string
+        configuration: Record<string, string>
     }
 }

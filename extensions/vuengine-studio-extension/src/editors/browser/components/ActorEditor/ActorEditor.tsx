@@ -108,7 +108,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
 
   const mostFilesOnASprite = getMostFilesOnASprite(data);
   const isMultiFileAnimation = mostFilesOnASprite > 1;
-  const hasAnyComponent = data.body.enabled || data.extraProperties.enabled || Object.values(data.components).filter(c => c.length > 0).length > 0;
+  const hasAnyComponent = data.body.enabled || data.extraProperties.enabled || data.logic.enabled || Object.values(data.components).filter(c => c.length > 0).length > 0;
 
   const getStateLocalStorageId = (): string =>
     `ves-editors-Actor-state/${fileUri.path.fsPath()}`;
@@ -322,8 +322,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
       key: 'children',
       label: nls.localize('vuengine/actorEditor/child', 'Child'),
       allowAdd: true,
-    },
-    {
+    }, {
       key: 'body',
       label: nls.localize('vuengine/actorEditor/body', 'Body'),
       allowAdd: !data.body.enabled,
@@ -331,6 +330,10 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
       key: 'extraProperties',
       label: nls.localize('vuengine/actorEditor/extraProperties', 'Extra Properties'),
       allowAdd: !data.extraProperties.enabled,
+    }, {
+      key: 'logic',
+      label: nls.localize('vuengine/actorEditor/logic', 'Logic'),
+      allowAdd: !data.logic.enabled,
     }]
       .sort((a, b) => a.label.localeCompare(b.label))
       .map(t => {
@@ -367,6 +370,8 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
         return addComponentByType(t, nls.localize('vuengine/actorEditor/collider', 'Collider'));
       case 'extraProperties':
         return enableExtraProperties();
+      case 'logic':
+        return enableLogic();
       case 'body':
         return enableBody();
       case 'sprites':
@@ -466,7 +471,18 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
     setCurrentComponent('extraProperties');
   };
 
-  const removeComponent = async (key: ComponentKey | 'extraProperties' | 'body', index: number) => {
+  const enableLogic = (): void => {
+    setData({
+      logic: {
+        ...data.logic,
+        enabled: true,
+      }
+    });
+
+    setCurrentComponent('logic');
+  };
+
+  const removeComponent = async (key: ComponentKey | 'extraProperties' | 'body' | 'logic', index: number) => {
     const dialog = new ConfirmDialog({
       title: nls.localize('vuengine/actorEditor/removeComponent', 'Remove Component'),
       msg: nls.localize('vuengine/actorEditor/areYouSureYouWantToRemoveComponent', 'Are you sure you want to remove this component?'),
@@ -486,6 +502,8 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
           return disableBody();
         case 'extraProperties':
           return disableExtraProperties();
+        case 'logic':
+          return disableLogic();
       }
     }
   };
@@ -515,6 +533,15 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
     setData({
       extraProperties: {
         ...data.extraProperties,
+        enabled: false,
+      }
+    });
+  };
+
+  const disableLogic = async (): Promise<void> => {
+    setData({
+      logic: {
+        ...data.logic,
         enabled: false,
       }
     });
@@ -569,7 +596,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
         break;
       case ActorEditorCommands.DELETE_CURRENT_COMPONENT.id:
         const [type, indexString] = currentComponent.split('-');
-        removeComponent(type as ComponentKey | 'extraProperties' | 'body', parseInt(indexString));
+        removeComponent(type as ComponentKey | 'extraProperties' | 'body' | 'logic', parseInt(indexString));
         break;
       case ActorEditorCommands.DESELECT_CURRENT_COMPONENT.id:
         setCurrentComponent('');
@@ -717,7 +744,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
               }
               <EditorSidebar
                 style={{
-                  marginRight: currentComponent.includes('-') || ['animations', 'colliders', 'extraProperties', 'body', 'sprites'].includes(currentComponent)
+                  marginRight: currentComponent.includes('-') || ['animations', 'colliders', 'extraProperties', 'logic', 'body', 'sprites'].includes(currentComponent)
                     ? 0
                     : 'calc(-320px - 1px - var(--padding))',
                 }}

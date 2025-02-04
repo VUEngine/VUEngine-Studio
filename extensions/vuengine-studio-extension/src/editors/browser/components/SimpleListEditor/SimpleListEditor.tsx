@@ -8,11 +8,12 @@ import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
 interface SimpleListEditorProps {
     data: Record<string, string>
     updateData: (data: Record<string, string>) => void
+    sort?: boolean
 }
 
 export default function SimpleListEditor(props: SimpleListEditorProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
-    const { data, updateData } = props;
+    const { data, updateData, sort } = props;
 
     const addItem = (): void => {
         updateData({
@@ -45,9 +46,13 @@ export default function SimpleListEditor(props: SimpleListEditorProps): React.JS
 
     const dataKeys = Object.keys(data);
 
+    const preparedData = Object.entries(data);
+    if (sort !== false) {
+        preparedData.sort(([, a], [, b]) => a.localeCompare(b));
+    }
+
     return <VContainer>
-        {dataKeys.length > 0 && Object.entries(data)
-            .sort(([, a], [, b]) => a.localeCompare(b))
+        {dataKeys.length > 0 && preparedData
             .map(([key, value]: string[]) => (
                 <HContainer key={key}>
                     <input

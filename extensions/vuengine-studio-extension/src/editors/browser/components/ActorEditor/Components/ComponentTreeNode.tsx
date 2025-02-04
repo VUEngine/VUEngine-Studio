@@ -47,7 +47,7 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
     const [dragging, setDragging] = useState<boolean>(false);
 
     const nodeParts = node.id.split('-');
-    const type = nodeParts[0] as ComponentKey | 'body' | 'extraProperties';
+    const type = nodeParts[0] as ComponentKey | 'body' | 'extraProperties' | 'logic';
     const index = parseInt(nodeParts[1] || '-1');
 
     const showPreview = useMemo(() => {
@@ -120,6 +120,8 @@ export default function ComponentTreeNode(props: NodeRendererProps<any>): React.
                     }
                 case 'extraProperties':
                     return <FadersHorizontal size={16} />;
+                case 'logic':
+                    return <i className="codicon codicon-pulse" />;
                 case 'body':
                     return <Atom size={16} />;
                 case 'sprites':

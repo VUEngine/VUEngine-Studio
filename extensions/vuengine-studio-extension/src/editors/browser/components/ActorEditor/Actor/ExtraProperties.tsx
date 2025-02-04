@@ -12,15 +12,6 @@ export default function ExtraProperties(): React.JSX.Element {
     const { data, setData } = useContext(ActorEditorContext) as ActorEditorContextType;
     const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
 
-    const setAllocator = (customAllocator: string): void => {
-        setData({
-            extraProperties: {
-                ...data.extraProperties,
-                customAllocator,
-            }
-        });
-    };
-
     const setExtraInfo = (extraInfo: string): void => {
         setData({
             extraProperties: {
@@ -44,21 +35,6 @@ export default function ExtraProperties(): React.JSX.Element {
 
     return (
         <VContainer gap={15}>
-            <VContainer grow={1}>
-                <InfoLabel
-                    label={nls.localize('vuengine/actorEditor/customAllocator', 'Custom Allocator')}
-                    tooltip={nls.localize(
-                        'vuengine/actorEditor/customAllocatorDescription',
-                        'Define which class to use to attach custom logic to this actor. ' +
-                        'If left blank, it will be Actor.',
-                    )}
-                />
-                <input
-                    className='theia-input'
-                    value={data.extraProperties.customAllocator}
-                    onChange={e => setAllocator(e.target.value)}
-                />
-            </VContainer>
             <VContainer grow={1}>
                 <label>
                     {nls.localize('vuengine/actorEditor/extraInfo', 'Extra Info')}

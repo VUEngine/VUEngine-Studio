@@ -1,28 +1,29 @@
 import React, { useContext } from 'react';
-import PositionedActor from '../../Common/PositionedActors/PositionedActor';
 import VContainer from '../../Common/Base/VContainer';
+import PositionedActor from '../../Common/PositionedActors/PositionedActor';
+import Body from '../Actor/Body';
+import ExtraProperties from '../Actor/ExtraProperties';
+import Logic from '../Actor/Logic';
+import { ActorEditorSaveDataOptions } from '../ActorEditor';
+import {
+    ActorEditorContext,
+    ActorEditorContextType,
+    AnimationData,
+    ColliderData,
+    ComponentData,
+    ComponentKey,
+    MutatorData,
+    SpriteData,
+    WireframeData,
+} from '../ActorEditorTypes';
 import Animation from '../Animation/Animation';
 import AnimationsSettings from '../Animation/AnimationsSettings';
 import Collider from '../Collider/Collider';
 import CollidersSettings from '../Collider/CollidersSettings';
-import ExtraProperties from '../Actor/ExtraProperties';
-import Body from '../Actor/Body';
-import { ActorEditorSaveDataOptions } from '../ActorEditor';
-import {
-    AnimationData,
-    MutatorData,
-    ColliderData,
-    ComponentData,
-    ComponentKey,
-    ActorEditorContext,
-    ActorEditorContextType,
-    SpriteData,
-    WireframeData,
-} from '../ActorEditorTypes';
+import Mutator from '../Mutator/Mutator';
 import Sprite from '../Sprites/Sprite';
 import SpritesSettings from '../Sprites/SpritesSettings';
 import Wireframe from '../Wireframes/Wireframe';
-import Mutator from '../Mutator/Mutator';
 
 interface CurrentComponentProps {
     isMultiFileAnimation: boolean
@@ -77,6 +78,8 @@ export default function CurrentComponent(props: CurrentComponentProps): React.JS
             switch (type) {
                 case 'extraProperties':
                     return <ExtraProperties />;
+                case 'logic':
+                    return <Logic />;
                 case 'body':
                     return <Body />;
                 /*

@@ -86,7 +86,7 @@ export default function LogicEditor(props: LogicEditorProps): React.JSX.Element 
             {currentComponent !== '' &&
               <EditorSidebar
                 style={{
-                  marginRight: currentComponent.includes('-') || ['animations', 'colliders', 'extraProperties', 'body', 'sprites'].includes(currentComponent)
+                  marginRight: currentComponent.includes('-') || ['animations', 'colliders', 'extraProperties', 'body', 'logic', 'sprites'].includes(currentComponent)
                     ? 0
                     : 'calc(-320px - 1px - var(--padding))',
                 }}
