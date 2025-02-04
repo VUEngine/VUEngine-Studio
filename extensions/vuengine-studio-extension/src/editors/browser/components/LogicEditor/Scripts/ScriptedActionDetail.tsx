@@ -6,15 +6,14 @@ import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import RadioSelect from '../../Common/Base/RadioSelect';
 import VContainer from '../../Common/Base/VContainer';
 import { AVAILABLE_ACTIONS, ActionArgumentsData, ActionConfigType } from './AvailableActions';
-import { ACTOR_FUNCTIONS } from './ActorFunctions';
-import { INPUT_BLOCKING_COMMANDS } from '../../ActorEditor/ActorEditor';
+import { LOGIC_FUNCTIONS } from './LogicFunctions';
 import InfoLabel from '../../Common/InfoLabel';
-import { ClassEditorContext, ClassEditorContextType, ScriptData } from '../ClassEditorTypes';
+import { LogicEditorContext, LogicEditorContextType, ScriptData } from '../LogicEditorTypes';
 import { ScriptType } from './ScriptTypes';
 
 export default function ScriptedActionDetail(): React.JSX.Element {
-    const { data, setData, currentComponent } = useContext(ClassEditorContext) as ClassEditorContextType;
-    const { services, enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
+    const { data, updateData, currentComponent } = useContext(LogicEditorContext) as LogicEditorContextType;
+    const { services } = useContext(EditorsContext) as EditorsContextType;
 
     const currentComponentParts = currentComponent.split('-');
     const currentScriptIndex = currentComponentParts[1] ? parseInt(currentComponentParts[1]) : 0;
@@ -40,7 +39,8 @@ export default function ScriptedActionDetail(): React.JSX.Element {
             ...partialScriptData,
         };
 
-        setData({
+        updateData({
+            ...data,
             methods: updatedMethods,
         });
     };
@@ -121,80 +121,87 @@ export default function ScriptedActionDetail(): React.JSX.Element {
         }
     };
 
-    return <VContainer gap={15}>
-        {currentActionIndex === -1 &&
-            <>
-                <VContainer>
-                    <label>
-                        {nls.localize('vuengine/editors/type', 'Type')}
-                    </label>
-                    <RadioSelect
-                        options={[
-                            { value: ScriptType.Custom, label: nls.localize('vuengine/actorEditor/scriptTypeCustom', 'Custom') },
-                            { value: ScriptType.Inherited, label: nls.localize('vuengine/actorEditor/scriptTypeInherited', 'Inherited') },
-                        ]}
-                        canSelectMany={false}
-                        allowBlank={false}
-                        defaultValue={scriptConfig.type}
-                        onChange={options => setType(options[0].value as ScriptType)}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                    />
-                </VContainer>
-                {scriptConfig.type === ScriptType.Custom &&
+    return (
+        <VContainer
+            gap={15}
+            style={{
+                overflow: 'auto',
+                padding: 'var(--padding)',
+                zIndex: 1,
+            }}
+        >
+            {currentActionIndex === -1 &&
+                <>
                     <VContainer>
                         <label>
-                            {nls.localize('vuengine/editors/name', 'Name')}
+                            {nls.localize('vuengine/editors/type', 'Type')}
                         </label>
-                        <input
-                            className='theia-input'
-                            type='string'
-                            value={scriptConfig.name}
-                            onChange={e => setName(e.target.value)}
+                        <RadioSelect
+                            options={[
+                                { value: ScriptType.Custom, label: nls.localize('vuengine/logicEditor/scriptTypeCustom', 'Custom') },
+                                { value: ScriptType.Inherited, label: nls.localize('vuengine/logicEditor/scriptTypeInherited', 'Inherited') },
+                            ]}
+                            canSelectMany={false}
+                            allowBlank={false}
+                            defaultValue={scriptConfig.type}
+                            onChange={options => setType(options[0].value as ScriptType)}
                         />
                     </VContainer>
-                }
-                {scriptConfig.type === ScriptType.Inherited &&
-                    <VContainer>
-                        <label>
-                            {nls.localize('vuengine/actorEditor/inheritedFunction', 'Inherited Function')}
-                        </label>
-                        <SelectComponent
-                            options={Object.values(ACTOR_FUNCTIONS)
-                                .sort((a, b) => a.label.localeCompare(b.label))
-                                .map(f => ({
-                                    value: f.name,
-                                    label: f.label,
-                                    description: f.description,
-                                }))}
-                            defaultValue={scriptConfig.name}
-                            onChange={option => setName(option.value!)}
-                        />
-                    </VContainer>
-                }
-            </>
-        }
-        <VContainer>
-            <label>{currentAction?.label}</label>
-            <div className='secondaryText'>
-                {currentAction?.description}
-            </div>
+                    {scriptConfig.type === ScriptType.Custom &&
+                        <VContainer>
+                            <label>
+                                {nls.localize('vuengine/editors/name', 'Name')}
+                            </label>
+                            <input
+                                className='theia-input'
+                                type='string'
+                                value={scriptConfig.name}
+                                onChange={e => setName(e.target.value)}
+                            />
+                        </VContainer>
+                    }
+                    {scriptConfig.type === ScriptType.Inherited &&
+                        <VContainer>
+                            <label>
+                                {nls.localize('vuengine/logicEditor/inheritedFunction', 'Inherited Function')}
+                            </label>
+                            <SelectComponent
+                                options={Object.values(LOGIC_FUNCTIONS)
+                                    .sort((a, b) => a.label.localeCompare(b.label))
+                                    .map(f => ({
+                                        value: f.name,
+                                        label: f.label,
+                                        description: f.description,
+                                    }))}
+                                defaultValue={scriptConfig.name}
+                                onChange={option => setName(option.value!)}
+                            />
+                        </VContainer>
+                    }
+                </>
+            }
+            <VContainer>
+                <label>{currentAction?.label}</label>
+                <div className='secondaryText'>
+                    {currentAction?.description}
+                </div>
+            </VContainer>
+            {currentActionIndex > -1 &&
+                <>
+                    {currentAction?.arguments && currentAction.arguments.map((c, i) =>
+                        <VContainer key={i}>
+                            <InfoLabel
+                                label={c.label}
+                                tooltip={c.description}
+                            />
+                            {getConfigControl(c)}
+                        </VContainer>
+                    )}
+                    {!currentAction?.arguments &&
+                        nls.localize('vuengine/logicEditor/noActionConfiguration', 'This action does not need any configuration.')
+                    }
+                </>
+            }
         </VContainer>
-        {currentActionIndex > -1 &&
-            <>
-                {currentAction?.arguments && currentAction.arguments.map((c, i) =>
-                    <VContainer key={i}>
-                        <InfoLabel
-                            label={c.label}
-                            tooltip={c.description}
-                        />
-                        {getConfigControl(c)}
-                    </VContainer>
-                )}
-                {!currentAction?.arguments &&
-                    nls.localize('vuengine/actorEditor/noActionConfiguration', 'This action does not need any configuration.')
-                }
-            </>
-        }
-    </VContainer>;
+    );
 }

@@ -1,11 +1,11 @@
 import React, { useContext, useState } from 'react';
-import { ClassEditorContext, ClassEditorContextType, MAX_PREVIEW_SCRIPT_ZOOM, MIN_PREVIEW_SCRIPT_ZOOM } from '../ClassEditorTypes';
+import { LogicEditorContext, LogicEditorContextType, MAX_PREVIEW_SCRIPT_ZOOM, MIN_PREVIEW_SCRIPT_ZOOM } from '../LogicEditorTypes';
 import { ScriptedActionData } from './ScriptTypes';
 import ScriptedAction from './ScriptedAction';
 import VContainer from '../../Common/Base/VContainer';
 import { AVAILABLE_ACTIONS } from './AvailableActions';
-import PreviewOptions from '../../ActorEditor/Preview/PreviewOptions';
 import { WHEEL_SENSITIVITY } from '../../ActorEditor/ActorEditorTypes';
+import PreviewOptions from './PreviewOptions';
 
 interface ScriptProps {
     index: number
@@ -13,7 +13,7 @@ interface ScriptProps {
 
 export default function Script(props: ScriptProps): React.JSX.Element {
     const { index } = props;
-    const { data, setData, currentComponent } = useContext(ClassEditorContext) as ClassEditorContextType;
+    const { data, updateData, currentComponent } = useContext(LogicEditorContext) as LogicEditorContextType;
     const [zoom, setZoom] = useState<number>(1);
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [offsetX, setOffsetX] = useState<number>(0);
@@ -32,7 +32,8 @@ export default function Script(props: ScriptProps): React.JSX.Element {
             ...{ script: s },
         };
 
-        setData({
+        updateData({
+            ...data,
             methods: updatedMethods
         });
     };
@@ -72,7 +73,6 @@ export default function Script(props: ScriptProps): React.JSX.Element {
                 position: 'absolute',
             }}>
             <PreviewOptions
-                enableBackground={false}
                 zoom={zoom}
                 setZoom={setZoom}
                 minZoom={MIN_PREVIEW_SCRIPT_ZOOM}

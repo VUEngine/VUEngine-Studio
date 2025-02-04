@@ -205,7 +205,7 @@ export const AVAILABLE_ACTIONS: ActionMap = {
         label: 'If/Else',
         description: 'An if/else conditional block.',
         category: 'Logic',
-        iconClass: 'codicon codicon-arrow-swap',
+        iconClass: 'codicon codicon-repo-forked codicon-rotate-180',
         template: 'templates/action/ifElse',
         branches: [{
             name: 'If',

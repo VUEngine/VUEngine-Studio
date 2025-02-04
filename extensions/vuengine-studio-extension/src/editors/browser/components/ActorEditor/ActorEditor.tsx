@@ -25,7 +25,7 @@ import {
 import Preview from './Preview/Preview';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 
-const EditorSidebar = styled.div`
+export const EditorSidebar = styled.div`
   background-color: rgba(17, 17, 17, .9);
   border-radius: 2px;
   border: 1px solid var(--theia-activityBar-background);
@@ -44,7 +44,7 @@ const EditorSidebar = styled.div`
   }
 `;
 
-const ShowTreeButton = styled.button`
+export const ShowTreeButton = styled.button`
   left: var(--padding);
   position: absolute;
   top: calc(var(--padding) + 4px);
@@ -53,7 +53,7 @@ const ShowTreeButton = styled.button`
   z-index: 100;
 `;
 
-const HideTreeButton = styled.button`
+export const HideTreeButton = styled.button`
   padding: 0;
   position: absolute;
   right: 3px;

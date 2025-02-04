@@ -24,7 +24,7 @@ export interface ActionFunctions {
     [id: string]: ActionFunction
 }
 
-export const ACTOR_FUNCTIONS: ActionFunctions = {
+export const LOGIC_FUNCTIONS: ActionFunctions = {
     'enterCollision': {
         name: 'enterCollision',
         label: 'Enter Collision',

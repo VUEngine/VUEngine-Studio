@@ -12,6 +12,8 @@ import VesFontEditorControl from './font-editor/ves-font-editor-control';
 import VesFontEditorControlTester from './font-editor/ves-font-editor-control-tester';
 import VesImageEditorControl from './image-editor/ves-image-editor-control';
 import VesImageEditorControlTester from './image-editor/ves-image-editor-control-tester';
+import VesLogicEditorControl from './logic-editor/ves-logic-editor-control';
+import vesLogicEditorControlTester from './logic-editor/ves-logic-editor-control-tester';
 import VesMusicEditorControl from './music-editor/ves-music-editor-control';
 import VesMusicEditorControlTester from './music-editor/ves-music-editor-control-tester';
 import VesPcmEditorControl from './pcm-editor/ves-pcm-editor-control';
@@ -43,6 +45,7 @@ export const VES_RENDERERS = [
     { tester: vesEngineConfigEditorControlTester, renderer: vesEngineConfigEditorControl },
     { tester: VesFontEditorControlTester, renderer: VesFontEditorControl },
     { tester: VesImageEditorControlTester, renderer: VesImageEditorControl },
+    { tester: vesLogicEditorControlTester, renderer: VesLogicEditorControl },
     { tester: VesMusicEditorControlTester, renderer: VesMusicEditorControl },
     { tester: VesPcmEditorControlTester, renderer: VesPcmEditorControl },
     { tester: VesPluginFileEditorControlTester, renderer: VesPluginFileEditorControl },

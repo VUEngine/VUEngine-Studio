@@ -3,10 +3,10 @@ import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
 import VContainer from '../../Common/Base/VContainer';
-import { ActorEditorContext, ActorEditorContextType } from '../../ActorEditor/ActorEditorTypes';
 import { ConfirmDialog } from '@theia/core/lib/browser';
 import { AVAILABLE_ACTIONS, ActionConfigType, ActionData } from './AvailableActions';
 import { ScriptedActionData } from './ScriptTypes';
+import { LogicEditorContext, LogicEditorContextType } from '../LogicEditorTypes';
 
 interface ScriptedActionProps {
     id: string
@@ -21,7 +21,7 @@ interface ScriptedActionProps {
 
 export default function ScriptedAction(props: ScriptedActionProps): React.JSX.Element {
     const { services } = useContext(EditorsContext) as EditorsContextType;
-    const { currentComponent, setCurrentComponent } = useContext(ActorEditorContext) as ActorEditorContextType;
+    const { currentComponent, setCurrentComponent } = useContext(LogicEditorContext) as LogicEditorContextType;
     const { id, index, script, action, scriptedAction, updateScript, isRoot, isEnd } = props;
 
     const setHighlightedAction = (actionIndex: number): void => {
@@ -81,8 +81,8 @@ export default function ScriptedAction(props: ScriptedActionProps): React.JSX.El
 
     const removeAction = async (): Promise<void> => {
         const dialog = new ConfirmDialog({
-            title: nls.localize('vuengine/actorEditor/removeAction', 'Remove Action'),
-            msg: nls.localize('vuengine/actorEditor/areYouSureYouWantToRemoveAction', 'Are you sure you want to remove this action?'),
+            title: nls.localize('vuengine/logicEditor/removeAction', 'Remove Action'),
+            msg: nls.localize('vuengine/logicEditor/areYouSureYouWantToRemoveAction', 'Are you sure you want to remove this action?'),
         });
         const confirmed = await dialog.open();
         if (confirmed) {
@@ -169,7 +169,7 @@ export default function ScriptedAction(props: ScriptedActionProps): React.JSX.El
                 <button
                     className="remove-button"
                     onClick={removeAction}
-                    title={nls.localize('vuengine/actorEditor/removeAction', 'Remove Action')}
+                    title={nls.localize('vuengine/logicEditor/removeAction', 'Remove Action')}
                 >
                     <i className='codicon codicon-x' />
                 </button>

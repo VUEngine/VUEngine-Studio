@@ -1,6 +1,7 @@
 import React from 'react';
 import VContainer from '../../Common/Base/VContainer';
 import { MutatorData } from '../ActorEditorTypes';
+import { nls } from '@theia/core';
 
 interface MutatorProps {
     mutator: MutatorData
@@ -16,11 +17,16 @@ export default function Mutator(props: MutatorProps): React.JSX.Element {
 
     return (
         <VContainer gap={15}>
-            <input
-                className='theia-input'
-                value={mutator.name}
-                onChange={e => setName(e.target.value)}
-            />
+            <VContainer>
+                <label>
+                    {nls.localize('vuengine/actorEditor/mutatorClass', 'Mutator Class')}
+                </label>
+                <input
+                    className='theia-input'
+                    value={mutator.name}
+                    onChange={e => setName(e.target.value)}
+                />
+            </VContainer>
         </VContainer>
     );
 }
