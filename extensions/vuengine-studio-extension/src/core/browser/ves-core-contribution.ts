@@ -30,6 +30,7 @@ export class VesCoreContribution implements CommandContribution, MenuContributio
     static REPORT_ISSUE_URL = 'https://github.com/VUEngine/VUEngine-Studio/issues/new';
     static SUPPORT_URL = 'https://www.patreon.com/VUEngine';
     static DOCUMENTATION_URL = 'https://www.vuengine.dev/documentation/';
+    static TUTORIAL_URL = 'https://www.vuengine.dev/documentation/tutorial/introduction/';
 
     @postConstruct()
     protected init(): void {
