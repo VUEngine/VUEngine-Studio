@@ -186,9 +186,9 @@ export default function Preview(props: PreviewProps): React.JSX.Element {
             key={i}
             index={i}
             sprite={sprite}
-            animate={animate}
+            animate={animate && sprite.isAnimated}
             dragging={isDragging}
-            frames={data.animations?.totalFrames || 1}
+            frames={sprite.isAnimated ? data.animations?.totalFrames || 1 : 1}
             currentAnimationFrame={actualCurrentFrame}
             highlighted={currentComponent === `sprites-${i}`}
             palette={previewPalettes[sprite.texture.palette]}

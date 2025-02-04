@@ -47,9 +47,11 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     const [dimensions, setDimensions] = useState<number[][]>([[], []]);
     const [filename, setFilename] = useState<string[]>([]);
 
+    const isAnimated = sprite.isAnimated && (data.components?.animations?.length > 0);
+
     const allowFrameBlendMode = data.sprites.type === SpriteType.Bgmap &&
         // No HiColor support for animated sprites
-        !data.components?.animations?.length &&
+        !isAnimated &&
         // No HiColor support for repeated sprites
         !sprite.texture?.repeat?.x &&
         !sprite.texture?.repeat?.y &&
@@ -105,7 +107,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                         if (imageData.images[i].animation?.largestFrame) {
                             tileCount += imageData.images[i].animation?.largestFrame ?? 0;
                         } else if (imageData.images[i].tiles?.count) {
-                            tileCount += data.components?.animations?.length > 0 && !data.animations.multiframe
+                            tileCount += isAnimated && !data.animations.multiframe
                                 ? (imageData.images[i].tiles?.count ?? 0) / (data.animations?.totalFrames ?? 1)
                                 : imageData.images[i].tiles?.count ?? 0;
                         }
@@ -216,6 +218,12 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                 ...sprite.displacement,
                 parallax: clamp(value, MIN_SPRITE_TEXTURE_DISPLACEMENT_PARALLAX, MAX_SPRITE_TEXTURE_DISPLACEMENT_PARALLAX),
             },
+        });
+    };
+
+    const toggleIsAnimated = (): void => {
+        updateSprite({
+            isAnimated: !!!sprite.isAnimated,
         });
     };
 
@@ -332,7 +340,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
     useEffect(() => {
         getMetaData();
     }, [
-        data.components?.animations?.length,
+        isAnimated,
         data.animations?.totalFrames,
         isMultiFileAnimation,
         sprite.texture?.files,
@@ -428,7 +436,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                         data={sprite.texture?.files || []}
                                         updateData={setFiles}
                                         allInFolderAsFallback={false}
-                                        canSelectMany={data.components?.animations.length > 0}
+                                        canSelectMany={isAnimated}
                                         stack={true}
                                         showMetaData={false}
                                         containerHeight='80px'
@@ -477,7 +485,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                                                     (→ {dimensions[0][2]} × {dimensions[0][3]} px)
                                                                 </div>
                                                             }
-                                                            {data.components?.animations?.length > 0 && !isMultiFileAnimation && data.animations?.totalFrames &&
+                                                            {isAnimated && !isMultiFileAnimation && data.animations?.totalFrames &&
                                                                 <div>
                                                                     (
                                                                     {dimensions[0][0]} × {Math.round(dimensions[0][1] /
@@ -526,7 +534,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                             data={sprite.texture?.files2 || []}
                                             updateData={setFiles2}
                                             allInFolderAsFallback={false}
-                                            canSelectMany={data.components?.animations.length > 0}
+                                            canSelectMany={isAnimated}
                                             stack={true}
                                             showMetaData={false}
                                             containerHeight='80px'
@@ -564,7 +572,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                                                 <i className="codicon codicon-arrow-right"></i> {dimensions[1][2]} × {dimensions[1][3]} px
                                                             </div>
                                                         }
-                                                        {data.components?.animations?.length > 0 && !isMultiFileAnimation && data.animations?.totalFrames &&
+                                                        {isAnimated && !isMultiFileAnimation && data.animations?.totalFrames &&
                                                             <div>
                                                                 {dimensions[1][0]}
                                                                 {' × '}
@@ -776,6 +784,20 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                                 onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                             />
                         </VContainer>
+                        {data.components?.animations?.length > 0 &&
+                            <VContainer>
+                                <label>
+                                    {nls.localize('vuengine/actorEditor/animate', 'Animate')}
+                                </label>
+                                <input
+                                    type="checkbox"
+                                    checked={sprite.isAnimated ?? false}
+                                    onChange={() => toggleIsAnimated()}
+                                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
+                                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                />
+                            </VContainer>
+                        }
                     </HContainer>
                 }
                 {
@@ -935,7 +957,7 @@ export default function Sprite(props: SpriteProps): React.JSX.Element {
                     </VContainer>
                 }
                 {/* this setting is implicitly handled for animations */}
-                {data.components?.animations.length === 0 && <VContainer>
+                {!isAnimated && <VContainer>
                     <label>
                         {nls.localize('vuengine/actorEditor/tiles', 'Tiles')}
                     </label>

@@ -168,6 +168,7 @@ export interface SpriteData {
     colorMode: ColorMode
     displayMode: DisplayMode
     displays: Displays
+    isAnimated: boolean
     transparency: Transparency
     displacement: PixelVector
     manipulationFunction: string
