@@ -284,7 +284,7 @@ export class VesProjectService {
         if (schema.additionalProperties !== false) {
           resultObject = deepmerge(resultObject, data ?? {});
         }
-        return resultObject;
+        return this.sortObjectByKeys(resultObject);
 
       case 'string':
         return getValue('');
@@ -324,6 +324,16 @@ export class VesProjectService {
 
     return fileUri;
   }
+
+  protected sortObjectByKeys(unordered: object): object {
+    return Object.keys(unordered)
+      .sort()
+      .reduce((ordered, key) => {
+        // @ts-ignore
+        ordered[key] = unordered[key];
+        return ordered;
+      }, {});
+  };
 
   protected setProjectDataAllKnownPlugins(plugins: { [id: string]: VesPluginsData }): void {
     if (!this._projectData) {
