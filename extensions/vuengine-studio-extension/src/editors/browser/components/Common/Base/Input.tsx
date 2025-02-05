@@ -1,6 +1,6 @@
 import { nls } from '@theia/core';
 import { debounce, isInteger } from 'lodash';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import VContainer from '../../Common/Base/VContainer';
@@ -91,7 +91,7 @@ export default function Input(props: InputProps): React.JSX.Element {
         }
     };
 
-    const validateAndUpdateValue = debounce(
+    const validateAndUpdateValue = useCallback(debounce(
         iv => {
             if ((type === 'number' && isNumeric(iv))) {
                 setValue(iv);
@@ -104,7 +104,7 @@ export default function Input(props: InputProps): React.JSX.Element {
             }
         },
         type === 'number' ? 250 : 500
-    );
+    ), [setValue]);
 
     // resync if value is changed from the outside, e.g. through undo
     useEffect(() => {
