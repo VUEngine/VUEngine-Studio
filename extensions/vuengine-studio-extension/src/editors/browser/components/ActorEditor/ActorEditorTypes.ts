@@ -143,6 +143,7 @@ export interface AnimationData {
 
 export interface MutatorData {
     name: string
+    mutationClass: string
 }
 
 export interface ColliderData {

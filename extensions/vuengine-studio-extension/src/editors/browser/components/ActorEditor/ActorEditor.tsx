@@ -549,6 +549,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
 
   const updateComponent = (key: ComponentKey, index: number, partialData: Partial<ComponentData>, options?: ActorEditorSaveDataOptions): void => {
     const componentsArray = [...data.components[key]];
+    // @ts-ignore
     componentsArray[index] = {
       ...componentsArray[index],
       ...partialData,

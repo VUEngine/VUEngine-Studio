@@ -13,16 +13,19 @@ interface MutatorProps {
 export default function Mutator(props: MutatorProps): React.JSX.Element {
     const { mutator, updateMutator } = props;
 
-    const setName = (name: string): void => {
-        updateMutator({ name });
+    const setClass = (mutationClass: string): void => {
+        updateMutator({
+            mutationClass,
+            name: mutationClass
+        });
     };
 
     return (
         <VContainer gap={15}>
             <Input
                 label={nls.localize('vuengine/actorEditor/mutationClass', 'Mutation Class')}
-                value={mutator.name}
-                setValue={setName}
+                value={mutator.mutationClass}
+                setValue={setClass}
                 commands={INPUT_BLOCKING_COMMANDS}
             />
         </VContainer>
