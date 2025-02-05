@@ -7,7 +7,6 @@ interface BallFaceProps {
     diameter: number
     displacement: PixelVector
     rotation: PixelRotation
-    highlighted: number // number to work around bug styled-component problem with boolean
 }
 
 const BallFace = styled.div<BallFaceProps>`
@@ -19,7 +18,6 @@ const BallFace = styled.div<BallFaceProps>`
     display: flex;
     height: ${p => p.diameter}px;
     justify-content: center;
-    outline: ${p => p.highlighted ? '1px solid #0f0' : 'none'};
     outline-offset: 1px;
     position: absolute;
     transform: rotateX(${p => p.rotation.x * ROTATION_RATIO}deg) 
@@ -28,7 +26,6 @@ const BallFace = styled.div<BallFaceProps>`
     transform-style: preserve-3d;
     translate: ${p => p.displacement.x}px ${p => p.displacement.y}px ${p => p.displacement.parallax * -1}px;
     width: ${p => p.diameter}px;
-    z-index: ${p => p.highlighted ? 999999 : 120000};
 `;
 
 const BallCenterFace = styled.div`
@@ -49,6 +46,10 @@ export default function BallCollider(props: BallColliderProps): React.JSX.Elemen
     const { index, highlighted, collider } = props;
 
     const diameter = collider.pixelSize.x * collider.scale.x;
+    const highlightedStyle = {
+        backgroundColor: highlighted ? 'rgba(0, 255, 0, .3)' : undefined,
+        zIndex: highlighted ? 999999 : 120000,
+    };
 
     const handleClick = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -56,11 +57,11 @@ export default function BallCollider(props: BallColliderProps): React.JSX.Elemen
     };
 
     return <BallFace
-        highlighted={highlighted ? 1 : 0}
         onClick={handleClick}
         diameter={diameter}
         displacement={collider.displacement}
         rotation={collider.rotation}
+        style={highlightedStyle}
     >
         <BallCenterFace />
     </BallFace>;
