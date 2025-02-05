@@ -1,10 +1,10 @@
 import { nls } from '@theia/core';
-import React, { PropsWithChildren, useContext, useEffect, useState } from 'react';
-import { EditorsContext, EditorsContextType } from '../../ves-editors-types';
+import { isNaN } from 'lodash';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor/ActorEditor';
 import HContainer from './Base/HContainer';
+import Input from './Base/Input';
 import VContainer from './Base/VContainer';
-import { clamp } from './Utils';
 import { MAX_ROTATION, MIN_ROTATION, PixelRotation, ROTATION_RATIO } from './VUEngineTypes';
 
 interface RotationProps {
@@ -14,23 +14,20 @@ interface RotationProps {
 
 export default function Rotation(props: PropsWithChildren<RotationProps>): React.JSX.Element {
     const { rotation, updateRotation } = props;
-    const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
     const [rotationDegrees, setRotationDegrees] = useState<PixelRotation>({ x: 0, y: 0, z: 0 });
 
-    const toDegrees = (engineRotation: number): number =>
-        Math.round(engineRotation * ROTATION_RATIO * 100) / 100;
+    const toDegrees = (r: number): number =>
+        isNaN(r) ? 0 : Math.round(r * ROTATION_RATIO * 100) / 100;
 
     const setRotation = (a: 'x' | 'y' | 'z', value: number): void => {
-        const clampedValue = clamp(value, MIN_ROTATION, MAX_ROTATION);
-
         setRotationDegrees({
             ...rotationDegrees,
-            [a]: toDegrees(clampedValue),
+            [a]: toDegrees(value),
         });
 
         updateRotation({
             ...rotation,
-            [a]: clampedValue,
+            [a]: value,
         });
     };
 
@@ -49,48 +46,42 @@ export default function Rotation(props: PropsWithChildren<RotationProps>): React
             </label>
             <HContainer wrap='wrap'>
                 <VContainer>
-                    <input
-                        className='theia-input'
-                        style={{ width: 76 }}
+                    <Input
+                        value={rotation.x}
+                        setValue={v => setRotation('x', v as number)}
                         type='number'
                         min={MIN_ROTATION}
                         max={MAX_ROTATION}
-                        value={rotation.x}
-                        onChange={e => setRotation('x', e.target.value === '' ? 0 : parseFloat(e.target.value))}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        width={76}
+                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <div className="secondaryText">
                         {rotationDegrees.x}°
                     </div>
                 </VContainer>
                 <VContainer>
-                    <input
-                        className='theia-input'
-                        style={{ width: 76 }}
+                    <Input
+                        value={rotation.y}
+                        setValue={v => setRotation('y', v as number)}
                         type='number'
                         min={MIN_ROTATION}
                         max={MAX_ROTATION}
-                        value={rotation.y}
-                        onChange={e => setRotation('y', e.target.value === '' ? 0 : parseFloat(e.target.value))}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        width={76}
+                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <div className="secondaryText">
                         {rotationDegrees.y}°
                     </div>
                 </VContainer>
                 <VContainer>
-                    <input
-                        className='theia-input'
-                        style={{ width: 76 }}
+                    <Input
+                        value={rotation.z}
+                        setValue={v => setRotation('z', v as number)}
                         type='number'
                         min={MIN_ROTATION}
                         max={MAX_ROTATION}
-                        value={rotation.z}
-                        onChange={e => setRotation('z', e.target.value === '' ? 0 : parseFloat(e.target.value))}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        width={76}
+                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                     <div className="secondaryText">
                         {rotationDegrees.z}°

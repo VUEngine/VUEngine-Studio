@@ -2,9 +2,10 @@ import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
-import InfoLabel from '../../Common/InfoLabel';
+import Input from '../../Common/Base/Input';
 import RadioSelect from '../../Common/Base/RadioSelect';
 import VContainer from '../../Common/Base/VContainer';
+import InfoLabel from '../../Common/InfoLabel';
 import { Axis } from '../../Common/VUEngineTypes';
 import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
 import { ActorEditorContext, ActorEditorContextType } from '../ActorEditorTypes';
@@ -45,34 +46,13 @@ export default function Body(): React.JSX.Element {
         });
     };
 
-    const setMaximumVelocityX = (x: number): void => {
+    const setMaximumVelocity = (axis: 'x' | 'y' | 'z', value: number): void => {
         setData({
             body: {
                 ...data.body,
                 maximumVelocity: {
-                    ...data.body.maximumVelocity, x
-                }
-            }
-        });
-    };
-
-    const setMaximumVelocityY = (y: number): void => {
-        setData({
-            body: {
-                ...data.body,
-                maximumVelocity: {
-                    ...data.body.maximumVelocity, y
-                }
-            }
-        });
-    };
-
-    const setMaximumVelocityZ = (z: number): void => {
-        setData({
-            body: {
-                ...data.body,
-                maximumVelocity: {
-                    ...data.body.maximumVelocity, z
+                    ...data.body.maximumVelocity,
+                    [axis]: value
                 }
             }
         });
@@ -98,102 +78,83 @@ export default function Body(): React.JSX.Element {
 
     return (
         <HContainer gap={15} wrap='wrap'>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/actorEditor/mass', 'Mass')}
-                </label>
-                <input
-                    className='theia-input'
-                    style={{ width: 54 }}
-                    type='number'
-                    step="0.1"
-                    value={data.body.mass}
-                    onChange={e => setMass(e.target.value === '' ? 0 : parseFloat(e.target.value))}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                />
-            </VContainer>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/actorEditor/friction', 'Friction')}
-                </label>
-                <input
-                    className='theia-input'
-                    style={{ width: 54 }}
-                    type='number'
-                    step="0.1"
-                    value={data.body.friction}
-                    onChange={e => setFriction(e.target.value === '' ? 0 : parseFloat(e.target.value))}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                />
-            </VContainer>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/actorEditor/bounciness', 'Bounciness')}
-                </label>
-                <input
-                    className='theia-input'
-                    style={{ width: 54 }}
-                    type='number'
-                    step="0.1"
-                    value={data.body.bounciness}
-                    onChange={e => setBounciness(e.target.value === '' ? 0 : parseFloat(e.target.value))}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                />
-            </VContainer>
+            <Input
+                label={nls.localize('vuengine/actorEditor/mass', 'Mass')}
+                value={data.body.mass}
+                setValue={v => setMass(v as number)}
+                type='number'
+                min={0}
+                max={511}
+                step={0.1}
+                width={54}
+                commands={INPUT_BLOCKING_COMMANDS}
+            />
+            <Input
+                label={nls.localize('vuengine/actorEditor/friction', 'Friction')}
+                value={data.body.friction}
+                setValue={v => setFriction(v as number)}
+                type='number'
+                min={0}
+                max={511}
+                step={0.1}
+                width={54}
+                commands={INPUT_BLOCKING_COMMANDS}
+            />
+            <Input
+                label={nls.localize('vuengine/actorEditor/bounciness', 'Bounciness')}
+                value={data.body.bounciness}
+                setValue={v => setBounciness(v as number)}
+                type='number'
+                min={0}
+                max={511}
+                step={0.1}
+                width={54}
+                commands={INPUT_BLOCKING_COMMANDS}
+            />
             <VContainer>
                 <label>
                     {nls.localize('vuengine/actorEditor/maximumVelocity', 'Maximum Velocity (x, y, z)')}
                 </label>
                 <HContainer>
-                    <input
-                        className='theia-input'
-                        style={{ width: 54 }}
-                        type='number'
+                    <Input
                         value={data.body.maximumVelocity.x}
-                        min={0}
-                        onChange={e => setMaximumVelocityX(e.target.value === '' ? 0 : parseInt(e.target.value))}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                    />
-                    <input
-                        className='theia-input'
-                        style={{ width: 54 }}
+                        setValue={v => setMaximumVelocity('x', v as number)}
                         type='number'
+                        min={0}
+                        max={511}
+                        width={54}
+                        commands={INPUT_BLOCKING_COMMANDS}
+                    />
+                    <Input
                         value={data.body.maximumVelocity.y}
-                        min={0}
-                        onChange={e => setMaximumVelocityY(e.target.value === '' ? 0 : parseInt(e.target.value))}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                    />
-                    <input
-                        className='theia-input'
-                        style={{ width: 54 }}
+                        setValue={v => setMaximumVelocity('y', v as number)}
                         type='number'
-                        value={data.body.maximumVelocity.z}
                         min={0}
-                        onChange={e => setMaximumVelocityZ(e.target.value === '' ? 0 : parseInt(e.target.value))}
-                        onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                        onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                        max={511}
+                        width={54}
+                        commands={INPUT_BLOCKING_COMMANDS}
+                    />
+                    <Input
+                        value={data.body.maximumVelocity.z}
+                        setValue={v => setMaximumVelocity('z', v as number)}
+                        type='number'
+                        min={0}
+                        max={511}
+                        width={54}
+                        commands={INPUT_BLOCKING_COMMANDS}
                     />
                 </HContainer>
             </VContainer>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/actorEditor/maximumSpeed', 'Maximum Speed')}
-                </label>
-                <input
-                    className='theia-input'
-                    style={{ width: 54 }}
-                    type='number'
-                    value={data.body.maximumSpeed}
-                    onChange={e => setMaximumSpeed(e.target.value === '' ? 0 : parseInt(e.target.value))}
-                    onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                    onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                />
-            </VContainer>
+            <Input
+                label={nls.localize('vuengine/actorEditor/maximumSpeed', 'Maximum Speed')}
+                value={data.body.maximumSpeed}
+                setValue={v => setMaximumSpeed(v as number)}
+                type='number'
+                min={0}
+                max={511}
+                width={54}
+                commands={INPUT_BLOCKING_COMMANDS}
+            />
             <VContainer>
                 <InfoLabel
                     label={nls.localize('vuengine/actorEditor/gravityAxes', 'Gravity Axes')}

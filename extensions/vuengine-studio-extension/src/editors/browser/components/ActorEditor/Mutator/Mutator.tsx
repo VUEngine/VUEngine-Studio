@@ -2,6 +2,8 @@ import React from 'react';
 import VContainer from '../../Common/Base/VContainer';
 import { MutatorData } from '../ActorEditorTypes';
 import { nls } from '@theia/core';
+import Input from '../../Common/Base/Input';
+import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
 
 interface MutatorProps {
     mutator: MutatorData
@@ -17,16 +19,12 @@ export default function Mutator(props: MutatorProps): React.JSX.Element {
 
     return (
         <VContainer gap={15}>
-            <VContainer>
-                <label>
-                    {nls.localize('vuengine/actorEditor/mutationClass', 'Mutation Class')}
-                </label>
-                <input
-                    className='theia-input'
-                    value={mutator.name}
-                    onChange={e => setName(e.target.value)}
-                />
-            </VContainer>
+            <Input
+                label={nls.localize('vuengine/actorEditor/mutationClass', 'Mutation Class')}
+                value={mutator.name}
+                setValue={setName}
+                commands={INPUT_BLOCKING_COMMANDS}
+            />
         </VContainer>
     );
 }

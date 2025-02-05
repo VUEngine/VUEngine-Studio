@@ -86,6 +86,8 @@ export const MAX_PREVIEW_SPRITE_ZOOM = 20;
 export const WHEEL_SENSITIVITY = 50;
 export const WIREFRAME_CANVAS_PADDING = 1;
 
+export const MIN_COLLIDER_DIAMETER = 1;
+export const MAX_COLLIDER_DIAMETER = 511;
 export const MIN_COLLIDER_PIXEL_SIZE = 0;
 export const MAX_COLLIDER_PIXEL_SIZE = 511;
 export const MIN_COLLIDER_DISPLACEMENT = -256;

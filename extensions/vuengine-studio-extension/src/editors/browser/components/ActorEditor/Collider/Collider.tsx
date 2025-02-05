@@ -4,20 +4,23 @@ import React, { useContext, useEffect, useState } from 'react';
 import { ProjectContributor } from '../../../../../project/browser/ves-project-types';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
+import Input from '../../Common/Base/Input';
 import MultiSelect, { MultiSelectOption } from '../../Common/Base/MultiSelect';
 import RadioSelect from '../../Common/Base/RadioSelect';
-import Rotation from '../../Common/Rotation';
-import { clamp } from '../../Common/Utils';
 import VContainer from '../../Common/Base/VContainer';
+import Rotation from '../../Common/Rotation';
 import { ColliderType, PixelVector } from '../../Common/VUEngineTypes';
+import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
 import {
     ColliderData,
+    MAX_COLLIDER_DIAMETER,
     MAX_COLLIDER_DISPLACEMENT,
     MAX_COLLIDER_DISPLACEMENT_PARALLAX,
     MAX_COLLIDER_LINEFIELD_LENGTH,
     MAX_COLLIDER_LINEFIELD_THICKNESS,
     MAX_COLLIDER_PIXEL_SIZE,
     MAX_SCALE,
+    MIN_COLLIDER_DIAMETER,
     MIN_COLLIDER_DISPLACEMENT,
     MIN_COLLIDER_DISPLACEMENT_PARALLAX,
     MIN_COLLIDER_LINEFIELD_LENGTH,
@@ -26,7 +29,6 @@ import {
     MIN_SCALE
 } from '../ActorEditorTypes';
 import CollidersSettings from './CollidersSettings';
-import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
 
 interface ColliderProps {
     collider: ColliderData
@@ -79,7 +81,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
         updateCollider({
             pixelSize: {
                 ...collider.pixelSize,
-                [a]: clamp(value, MIN_COLLIDER_PIXEL_SIZE, MAX_COLLIDER_PIXEL_SIZE),
+                [a]: value,
             },
         });
     };
@@ -98,7 +100,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
         updateCollider({
             displacement: {
                 ...collider.displacement,
-                [a]: clamp(value, MIN_COLLIDER_DISPLACEMENT, MAX_COLLIDER_DISPLACEMENT),
+                [a]: value,
             },
         });
     };
@@ -107,7 +109,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
         updateCollider({
             displacement: {
                 ...collider.displacement,
-                parallax: clamp(value, MIN_COLLIDER_DISPLACEMENT_PARALLAX, MAX_COLLIDER_DISPLACEMENT_PARALLAX),
+                parallax: value,
             },
         });
     };
@@ -120,7 +122,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
         updateCollider({
             scale: {
                 ...collider.scale,
-                [a]: clamp(value, MIN_SCALE, MAX_SCALE),
+                [a]: value,
             },
         });
     };
@@ -128,7 +130,7 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
     const setBallScale = (value: number): void => {
         updateCollider({
             scale: {
-                x: clamp(value, MIN_SCALE, MAX_SCALE),
+                x: value,
                 y: 0,
                 z: 0,
             },
@@ -193,25 +195,22 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
     const heaviness = getHeaviness();
 
     const updateLineField = (a: number, l: number, t: number): void => {
-        const cappedLength = clamp(l, MIN_COLLIDER_LINEFIELD_LENGTH, MAX_COLLIDER_LINEFIELD_LENGTH);
-        const cappedThickness = clamp(t, MIN_COLLIDER_LINEFIELD_THICKNESS, MAX_COLLIDER_LINEFIELD_THICKNESS);
-
         updateCollider({
             pixelSize: {
-                x: a === 0 ? cappedLength : 0,
-                y: a === 1 ? cappedLength : 0,
-                z: a === 2 ? cappedLength : 0,
+                x: a === 0 ? l : 0,
+                y: a === 1 ? l : 0,
+                z: a === 2 ? l : 0,
             },
             scale: {
-                x: a === 0 ? cappedThickness : 0,
-                y: a === 1 ? cappedThickness : 0,
-                z: a === 2 ? cappedThickness : 0,
+                x: a === 0 ? t : 0,
+                y: a === 1 ? t : 0,
+                z: a === 2 ? t : 0,
             }
         });
 
         setAxis(a);
-        setLength(cappedLength);
-        setThickness(cappedThickness);
+        setLength(l);
+        setThickness(t);
     };
 
     useEffect(() => {
@@ -299,70 +298,60 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             {nls.localize('vuengine/actorEditor/colliderSize', 'Size (x, y, z)')}
                         </label>
                         <HContainer>
-                            <input
-                                className='theia-input'
-                                style={{ width: 50 }}
-                                type='number'
+                            <Input
                                 value={collider.pixelSize.x}
-                                onChange={e => setPixelSize('x', e.target.value === '' ? 0 : parseFloat(e.target.value))}
-                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                            />
-                            <input
-                                className='theia-input'
-                                style={{ width: 50 }}
+                                setValue={v => setPixelSize('x', v as number)}
                                 type='number'
+                                min={MIN_COLLIDER_PIXEL_SIZE}
+                                max={MAX_COLLIDER_PIXEL_SIZE}
+                                width={50}
+                                commands={INPUT_BLOCKING_COMMANDS}
+                            />
+                            <Input
                                 value={collider.pixelSize.y}
-                                onChange={e => setPixelSize('y', e.target.value === '' ? 0 : parseFloat(e.target.value))}
-                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                            />
-                            <input
-                                className='theia-input'
-                                style={{ width: 50 }}
+                                setValue={v => setPixelSize('y', v as number)}
                                 type='number'
+                                min={MIN_COLLIDER_PIXEL_SIZE}
+                                max={MAX_COLLIDER_PIXEL_SIZE}
+                                width={50}
+                                commands={INPUT_BLOCKING_COMMANDS}
+                            />
+                            <Input
                                 value={collider.pixelSize.z}
-                                onChange={e => setPixelSize('z', e.target.value === '' ? 0 : parseFloat(e.target.value))}
-                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                setValue={v => setPixelSize('z', v as number)}
+                                type='number'
+                                min={MIN_COLLIDER_PIXEL_SIZE}
+                                max={MAX_COLLIDER_PIXEL_SIZE}
+                                width={50}
+                                commands={INPUT_BLOCKING_COMMANDS}
                             />
                         </HContainer>
                     </VContainer>
                 }
                 {collider.type === ColliderType.Ball &&
-                    <VContainer>
-                        <label>
-                            {nls.localize('vuengine/actorEditor/diameter', 'Diameter')}
-                        </label>
-                        <input
-                            className='theia-input'
-                            style={{ width: 50 }}
-                            type='number'
-                            value={collider.pixelSize.x}
-                            onChange={e => setDiameter(e.target.value === '' ? 0 : parseFloat(e.target.value))}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                        />
-                    </VContainer>
+                    <Input
+                        label={nls.localize('vuengine/actorEditor/diameter', 'Diameter')}
+                        value={collider.pixelSize.x}
+                        setValue={v => setDiameter(v as number)}
+                        type='number'
+                        min={MIN_COLLIDER_DIAMETER}
+                        max={MAX_COLLIDER_DIAMETER}
+                        width={50}
+                        commands={INPUT_BLOCKING_COMMANDS}
+                    />
                 }
                 {collider.type === ColliderType.LineField &&
                     <HContainer gap={15} wrap='wrap'>
-                        <VContainer>
-                            <label>
-                                {nls.localize('vuengine/actorEditor/colliderLength', 'Length')}
-                            </label>
-                            <input
-                                className='theia-input'
-                                style={{ width: 50 }}
-                                type='number'
-                                max={512}
-                                min={0}
-                                value={length}
-                                onChange={e => updateLineField(axis, e.target.value === '' ? 0 : parseFloat(e.target.value), thickness)}
-                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                            />
-                        </VContainer>
+                        <Input
+                            label={nls.localize('vuengine/actorEditor/length', 'Length')}
+                            value={length}
+                            setValue={v => updateLineField(axis, v as number, thickness)}
+                            type='number'
+                            min={MIN_COLLIDER_LINEFIELD_LENGTH}
+                            max={MAX_COLLIDER_LINEFIELD_LENGTH}
+                            width={50}
+                            commands={INPUT_BLOCKING_COMMANDS}
+                        />
                         <VContainer>
                             <label>
                                 {nls.localize('vuengine/actorEditor/colliderAxis', 'Axis')}
@@ -385,20 +374,16 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                                 allowBlank
                             />
                         </VContainer>
-                        <VContainer>
-                            <label>
-                                {nls.localize('vuengine/actorEditor/thickness', 'Thickness')}
-                            </label>
-                            <input
-                                className='theia-input'
-                                style={{ width: 50 }}
-                                type='number'
-                                value={thickness}
-                                onChange={e => updateLineField(axis, length, e.target.value === '' ? 0 : parseFloat(e.target.value))}
-                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                            />
-                        </VContainer>
+                        <Input
+                            label={nls.localize('vuengine/actorEditor/thickness', 'Thickness')}
+                            value={thickness}
+                            setValue={v => updateLineField(axis, length, v as number)}
+                            type='number'
+                            min={MIN_COLLIDER_LINEFIELD_THICKNESS}
+                            max={MAX_COLLIDER_LINEFIELD_THICKNESS}
+                            width={50}
+                            commands={INPUT_BLOCKING_COMMANDS}
+                        />
                     </HContainer>
                 }
                 <VContainer>
@@ -406,49 +391,41 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                         {nls.localize('vuengine/actorEditor/colliderDisplacement', 'Displacement (x, y, z, parallax)')}
                     </label>
                     <HContainer>
-                        <input
-                            className='theia-input'
-                            style={{ width: 50 }}
-                            type='number'
-                            min={MIN_COLLIDER_DISPLACEMENT}
-                            max={MAX_COLLIDER_DISPLACEMENT}
+                        <Input
                             value={collider.displacement.x}
-                            onChange={e => setDisplacement('x', e.target.value === '' ? 0 : parseFloat(e.target.value))}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                        />
-                        <input
-                            className='theia-input'
-                            style={{ width: 50 }}
+                            setValue={v => setDisplacement('x', v as number)}
                             type='number'
                             min={MIN_COLLIDER_DISPLACEMENT}
                             max={MAX_COLLIDER_DISPLACEMENT}
+                            width={50}
+                            commands={INPUT_BLOCKING_COMMANDS}
+                        />
+                        <Input
                             value={collider.displacement.y}
-                            onChange={e => setDisplacement('y', e.target.value === '' ? 0 : parseFloat(e.target.value))}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                        />
-                        <input
-                            className='theia-input'
-                            style={{ width: 50 }}
+                            setValue={v => setDisplacement('y', v as number)}
                             type='number'
                             min={MIN_COLLIDER_DISPLACEMENT}
                             max={MAX_COLLIDER_DISPLACEMENT}
-                            value={collider.displacement.z}
-                            onChange={e => setDisplacement('z', e.target.value === '' ? 0 : parseFloat(e.target.value))}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                            width={50}
+                            commands={INPUT_BLOCKING_COMMANDS}
                         />
-                        <input
-                            className='theia-input'
-                            style={{ width: 50 }}
+                        <Input
+                            value={collider.displacement.z}
+                            setValue={v => setDisplacement('z', v as number)}
+                            type='number'
+                            min={MIN_COLLIDER_DISPLACEMENT}
+                            max={MAX_COLLIDER_DISPLACEMENT}
+                            width={50}
+                            commands={INPUT_BLOCKING_COMMANDS}
+                        />
+                        <Input
+                            value={collider.displacement.parallax}
+                            setValue={v => setDisplacementParallax(v as number)}
                             type='number'
                             min={MIN_COLLIDER_DISPLACEMENT_PARALLAX}
                             max={MAX_COLLIDER_DISPLACEMENT_PARALLAX}
-                            value={collider.displacement.parallax}
-                            onChange={e => setDisplacementParallax(e.target.value === '' ? 0 : parseFloat(e.target.value))}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                            width={50}
+                            commands={INPUT_BLOCKING_COMMANDS}
                         />
                     </HContainer>
                 </VContainer>
@@ -463,63 +440,52 @@ export default function Collider(props: ColliderProps): React.JSX.Element {
                             {nls.localize('vuengine/actorEditor/scale', 'Scale (x, y, z)')}
                         </label>
                         <HContainer>
-                            <input
-                                className='theia-input'
-                                style={{ width: 50 }}
-                                type='number'
-                                min={MIN_SCALE}
-                                max={MAX_SCALE}
-                                step={0.5}
+                            <Input
                                 value={collider.scale.x}
-                                onChange={e => setScale('x', e.target.value === '' ? 0 : parseFloat(e.target.value))}
-                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                            />
-                            <input
-                                className='theia-input'
-                                style={{ width: 50 }}
+                                setValue={v => setScale('x', v as number)}
                                 type='number'
                                 min={MIN_SCALE}
                                 max={MAX_SCALE}
                                 step={0.5}
-                                value={collider.scale.y}
-                                onChange={e => setScale('y', e.target.value === '' ? 0 : parseFloat(e.target.value))}
-                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                width={50}
+                                commands={INPUT_BLOCKING_COMMANDS}
                             />
-                            <input
-                                className='theia-input'
-                                style={{ width: 50 }}
+                            <Input
+                                value={collider.scale.y}
+                                setValue={v => setScale('y', v as number)}
                                 type='number'
                                 min={MIN_SCALE}
                                 max={MAX_SCALE}
-                                step={0.1}
+                                step={0.5}
+                                width={50}
+                                commands={INPUT_BLOCKING_COMMANDS}
+                            />
+                            <Input
                                 value={collider.scale.z}
-                                onChange={e => setScale('z', e.target.value === '' ? 0 : parseFloat(e.target.value))}
-                                onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                                onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
+                                setValue={v => setScale('z', v as number)}
+                                type='number'
+                                min={MIN_SCALE}
+                                max={MAX_SCALE}
+                                step={0.5}
+                                width={50}
+                                commands={INPUT_BLOCKING_COMMANDS}
                             />
                         </HContainer>
                     </VContainer>
                 }
                 {
                     collider.type === ColliderType.Ball &&
-                    <VContainer>
-                        <label>
-                            {nls.localize('vuengine/actorEditor/scale', 'Scale')}
-                        </label>
-                        <input
-                            className='theia-input'
-                            style={{ width: 50 }}
-                            type='number'
-                            min={MIN_SCALE}
-                            max={MAX_SCALE}
-                            value={collider.scale.x}
-                            onChange={e => setBallScale(e.target.value === '' ? 0 : parseFloat(e.target.value))}
-                            onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
-                            onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
-                        />
-                    </VContainer>
+                    <Input
+                        label={nls.localize('vuengine/actorEditor/scale', 'Scale')}
+                        value={collider.scale.x}
+                        setValue={v => setBallScale(v as number)}
+                        type='number'
+                        min={MIN_SCALE}
+                        max={MAX_SCALE}
+                        step={0.5}
+                        width={50}
+                        commands={INPUT_BLOCKING_COMMANDS}
+                    />
                 }
                 <VContainer>
                     <label>
