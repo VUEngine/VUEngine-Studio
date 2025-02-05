@@ -363,7 +363,7 @@ export default function ActorEditor(props: ActorEditorProps): React.JSX.Element 
       case 'animations':
         return addComponentByType(t, nls.localize('vuengine/actorEditor/animation', 'Animation'));
       case 'mutators':
-        return addComponentByType(t, nls.localize('vuengine/actorEditor/mutator', 'Mutator'));
+        return addComponentByType(t, nls.localize('vuengine/actorEditor/mutation', 'Mutation'));
       case 'children':
         return addPositionedActor();
       case 'colliders':

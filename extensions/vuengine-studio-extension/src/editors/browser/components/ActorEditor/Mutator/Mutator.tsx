@@ -19,7 +19,7 @@ export default function Mutator(props: MutatorProps): React.JSX.Element {
         <VContainer gap={15}>
             <VContainer>
                 <label>
-                    {nls.localize('vuengine/actorEditor/mutatorClass', 'Mutator Class')}
+                    {nls.localize('vuengine/actorEditor/mutationClass', 'Mutation Class')}
                 </label>
                 <input
                     className='theia-input'
