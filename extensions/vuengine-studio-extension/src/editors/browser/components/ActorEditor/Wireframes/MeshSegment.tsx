@@ -2,13 +2,18 @@ import { nls } from '@theia/core';
 import React, { useContext } from 'react';
 import { EditorsContext, EditorsContextType } from '../../../ves-editors-types';
 import HContainer from '../../Common/Base/HContainer';
-import { clamp } from '../../Common/Utils';
 import VContainer from '../../Common/Base/VContainer';
 import { INPUT_BLOCKING_COMMANDS } from '../ActorEditor';
 import { MeshSegmentData } from '../ActorEditorTypes';
+import { clamp } from '../../Common/Utils';
 
-const MIN_MESH_SEGMENT_VALUE = 0;
-const MAX_MESH_SEGMENT_VALUE = 512;
+const MESH_SEGMENT_MIN_VALUE = -511;
+const MESH_SEGMENT_MAX_VALUE = 512;
+const MESH_SEGMENT_DEFAULT_VALUE = 0;
+
+const MESH_SEGMENT_PARALLAX_MIN_VALUE = -63;
+const MESH_SEGMENT_PARALLAX_MAX_VALUE = 64;
+const MESH_SEGMENT_PARALLAX_DEFAULT_VALUE = 0;
 
 interface MeshSegmentProps {
     segment: MeshSegmentData
@@ -20,74 +25,14 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
     const { segment, updateSegment, removeSegment } = props;
     const { enableCommands, disableCommands } = useContext(EditorsContext) as EditorsContextType;
 
-    const setFromX = (x: number): void => {
+    const setPoint = (point: 'to' | 'from', axis: 'x' | 'y' | 'z' | 'parallax', value: number): void => {
+        const idx = point === 'to' ? 'toVertex' : 'fromVertex';
         updateSegment({
-            fromVertex: {
-                ...segment.fromVertex,
-                x,
-            },
-        });
-    };
-
-    const setFromY = (value: number): void => {
-        updateSegment({
-            fromVertex: {
-                ...segment.fromVertex,
-                y: clamp(value, MIN_MESH_SEGMENT_VALUE, MAX_MESH_SEGMENT_VALUE),
-            },
-        });
-    };
-
-    const setFromZ = (z: number): void => {
-        updateSegment({
-            fromVertex: {
-                ...segment.fromVertex,
-                z,
-            },
-        });
-    };
-
-    const setFromParallax = (parallax: number): void => {
-        updateSegment({
-            fromVertex: {
-                ...segment.fromVertex,
-                parallax,
-            },
-        });
-    };
-
-    const setToX = (x: number): void => {
-        updateSegment({
-            toVertex: {
-                ...segment.toVertex,
-                x,
-            },
-        });
-    };
-
-    const setToY = (y: number): void => {
-        updateSegment({
-            toVertex: {
-                ...segment.toVertex,
-                y,
-            },
-        });
-    };
-
-    const setToZ = (z: number): void => {
-        updateSegment({
-            toVertex: {
-                ...segment.toVertex,
-                z,
-            },
-        });
-    };
-
-    const setToParallax = (parallax: number): void => {
-        updateSegment({
-            toVertex: {
-                ...segment.toVertex,
-                parallax,
+            [idx]: {
+                ...segment[idx],
+                [axis]: axis === 'parallax'
+                    ? clamp(value, MESH_SEGMENT_PARALLAX_MIN_VALUE, MESH_SEGMENT_PARALLAX_MAX_VALUE, MESH_SEGMENT_PARALLAX_DEFAULT_VALUE)
+                    : clamp(value, MESH_SEGMENT_MIN_VALUE, MESH_SEGMENT_MAX_VALUE, MESH_SEGMENT_DEFAULT_VALUE)
             },
         });
     };
@@ -109,7 +54,7 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
                         style={{ width: 50 }}
                         type='number'
                         value={segment.fromVertex.x}
-                        onChange={e => setFromX(e.target.value === '' ? 0 : parseFloat(e.target.value))}
+                        onChange={e => setPoint('from', 'x', e.target.value === '' ? MESH_SEGMENT_DEFAULT_VALUE : parseFloat(e.target.value))}
                         onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                         onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
@@ -118,7 +63,7 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
                         style={{ width: 50 }}
                         type='number'
                         value={segment.fromVertex.y}
-                        onChange={e => setFromY(e.target.value === '' ? 0 : parseFloat(e.target.value))}
+                        onChange={e => setPoint('from', 'y', e.target.value === '' ? MESH_SEGMENT_DEFAULT_VALUE : parseFloat(e.target.value))}
                         onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                         onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
@@ -127,7 +72,7 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
                         style={{ width: 50 }}
                         type='number'
                         value={segment.fromVertex.z}
-                        onChange={e => setFromZ(e.target.value === '' ? 0 : parseFloat(e.target.value))}
+                        onChange={e => setPoint('from', 'z', e.target.value === '' ? MESH_SEGMENT_DEFAULT_VALUE : parseFloat(e.target.value))}
                         onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                         onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
@@ -136,7 +81,7 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
                         style={{ width: 50 }}
                         type='number'
                         value={segment.fromVertex.parallax}
-                        onChange={e => setFromParallax(e.target.value === '' ? 0 : parseFloat(e.target.value))}
+                        onChange={e => setPoint('from', 'parallax', e.target.value === '' ? MESH_SEGMENT_PARALLAX_DEFAULT_VALUE : parseFloat(e.target.value))}
                         onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                         onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
@@ -150,7 +95,7 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
                         style={{ width: 50 }}
                         type='number'
                         value={segment.toVertex.x}
-                        onChange={e => setToX(e.target.value === '' ? 0 : parseFloat(e.target.value))}
+                        onChange={e => setPoint('to', 'x', e.target.value === '' ? MESH_SEGMENT_DEFAULT_VALUE : parseFloat(e.target.value))}
                         onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                         onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
@@ -159,7 +104,7 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
                         style={{ width: 50 }}
                         type='number'
                         value={segment.toVertex.y}
-                        onChange={e => setToY(e.target.value === '' ? 0 : parseFloat(e.target.value))}
+                        onChange={e => setPoint('to', 'y', e.target.value === '' ? MESH_SEGMENT_DEFAULT_VALUE : parseFloat(e.target.value))}
                         onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                         onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
@@ -168,7 +113,7 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
                         style={{ width: 50 }}
                         type='number'
                         value={segment.toVertex.z}
-                        onChange={e => setToZ(e.target.value === '' ? 0 : parseFloat(e.target.value))}
+                        onChange={e => setPoint('to', 'z', e.target.value === '' ? MESH_SEGMENT_DEFAULT_VALUE : parseFloat(e.target.value))}
                         onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                         onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
@@ -177,7 +122,7 @@ export default function MeshSegment(props: MeshSegmentProps): React.JSX.Element 
                         style={{ width: 50 }}
                         type='number'
                         value={segment.toVertex.parallax}
-                        onChange={e => setToParallax(e.target.value === '' ? 0 : parseFloat(e.target.value))}
+                        onChange={e => setPoint('to', 'parallax', e.target.value === '' ? MESH_SEGMENT_PARALLAX_DEFAULT_VALUE : parseFloat(e.target.value))}
                         onFocus={() => disableCommands(INPUT_BLOCKING_COMMANDS)}
                         onBlur={() => enableCommands(INPUT_BLOCKING_COMMANDS)}
                     />
