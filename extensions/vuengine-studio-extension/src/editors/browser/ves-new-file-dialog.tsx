@@ -31,9 +31,9 @@ export class VesNewFileDialog extends ReactDialog<string> {
     protected name: string;
 
     get value(): string {
-        return this.ext.startsWith('.')
-            ? this.name + this.ext
-            : this.ext;
+        return this.ext !== ''
+            ? this.name + '.' + this.ext
+            : this.name;
     }
 
     protected onActivateRequest(msg: Message): void {
@@ -61,7 +61,7 @@ export class VesNewFileDialog extends ReactDialog<string> {
             <div style={{ alignItems: 'end', display: 'flex', gap: 'calc(var(--theia-ui-padding) * 2)' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--theia-ui-padding)', flexGrow: 1 }}>
                     <label style={{ marginTop: 'var(--theia-ui-padding)' }}>{nls.localize('vuengine/editors/newFileDialog/fileName', 'File Name')}</label>
-                    <div style={{ display: 'flex', gap: 'var(--theia-ui-padding)' }}>
+                    <div style={{ display: 'flex', alignItems: 'end', gap: 'var(--theia-ui-padding)' }}>
                         <input
                             type="text"
                             className="theia-input"
@@ -77,12 +77,13 @@ export class VesNewFileDialog extends ReactDialog<string> {
                             autoFocus
                             onFocus={e => e.target.select()}
                         />
+                        <div style={{ visibility: this.ext === '' ? 'hidden' : undefined }}>.</div>
                         <input
                             type="text"
                             className="theia-input"
                             style={{ flexGrow: 1, width: 0 }}
                             spellCheck="false"
-                            placeholder={`.${nls.localize('vuengine/editors/newFileDialog/extension', 'extension')}`}
+                            placeholder={nls.localize('vuengine/editors/newFileDialog/extension', 'extension')}
                             value={this.ext}
                             onChange={e => {
                                 this.ext = e.currentTarget.value;
@@ -100,10 +101,13 @@ export class VesNewFileDialog extends ReactDialog<string> {
                         value={this.ext}
                         onChange={e => {
                             if (e.currentTarget.value.startsWith('.')) {
-                                this.ext = e.currentTarget.value;
-                            } else {
+                                this.ext = e.currentTarget.value.substring(1);
+                            } else if (e.currentTarget.value.includes('.')) {
                                 this.name = e.currentTarget.value.split('.')[0];
-                                this.ext = e.currentTarget.value.split('.').slice(1).join('.');
+                                this.ext = e.currentTarget.value.split('.')[1];
+                            } else {
+                                this.name = e.currentTarget.value;
+                                this.ext = '';
                             }
                             this.update();
                         }}
